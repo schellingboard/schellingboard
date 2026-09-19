@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Give every issue/PR number of the legacy repo the same number in the new repo.
 
-Open issues are transferred (keeping author, comments, reactions); everything else
-becomes a closed stub linking to the original. The new repo itself is the only state:
+Issues are transferred (keeping author, comments, reactions); PRs and gaps become
+closed stubs linking to the original. The new repo itself is the only state:
 each run continues at the first free number, so it can be stopped and re-run any time.
 
 Needs `gh auth login`. Standard library only.
@@ -240,7 +240,7 @@ class Migration:
         self.close(n, item)
 
     def transfer(self, n, item):
-        print(f"#{n}: transferring open issue: {item['title']}", flush=True)
+        print(f"#{n}: transferring {item['state']} issue: {item['title']}", flush=True)
         data = self.gh.graphql(
             """mutation($issue: ID!, $repo: ID!) {
                  transferIssue(input: {issueId: $issue, repositoryId: $repo, createLabelsIfMissing: true}) {
@@ -257,6 +257,11 @@ class Migration:
 
     def restore_type_and_fields(self, n, item):
         moved = self.gh.get(f"/repos/{self.new}/issues/{n}")
+        if item["state"] == "closed" and (
+            moved["state"] != "closed" or moved.get("state_reason") != item.get("state_reason")
+        ):
+            print(f"    WARNING: #{n} came across {moved['state']}/{moved.get('state_reason')}, closing it")
+            self.close(n, item)
         if item.get("type") and (moved.get("type") or {}).get("name") != item["type"]["name"]:
             print(f"    restoring type {item['type']['name']}")
             self.gh.request("PATCH", f"/repos/{self.new}/issues/{n}", {"type": item["type"]["name"]}, write=True)
@@ -305,7 +310,7 @@ class Migration:
                     print(f"Stopped after --limit {limit}.")
                     return
                 item = old_items.get(n)
-                if item and not is_pr(item) and item["state"] == "open":
+                if item and not is_pr(item):
                     self.transfer(n, item)
                 else:
                     self.create_stub(n, item)

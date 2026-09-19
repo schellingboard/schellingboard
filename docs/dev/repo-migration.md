@@ -9,10 +9,11 @@ the old repo stays as the archived `schellingboard/schellingboard-legacy`.
 `scripts/migrate-issues.py` gives every issue/PR number of the legacy repo the same number
 in the new repo, so `#123` in commits and the changelog still resolves:
 
-- **Open issues are transferred**: author, comments, reactions, labels, type and Priority
-  stay, and old URLs redirect. This needs both repos in the same org.
+- **Issues are transferred**, open or closed: author, comments, reactions, labels, type,
+  Priority and close reason stay, and old URLs redirect. This needs both repos in the
+  same org.
 - **Everything else becomes a closed stub** that links to the original and names its
-  author: closed issues, all PRs, and numbers with no issue at all.
+  author: all PRs, and numbers with no issue at all.
 
 The new repo is the script's only state. Each run continues at the first free number and
 stops if GitHub ever hands out a different one, so it can be interrupted and re-run at any
@@ -27,6 +28,7 @@ takes about 5 hours. Re-runs are quick and pick up anything opened in the meanti
    transferred issue gets. The script assumes the next free one and stops otherwise, but
    by then one issue would sit on the wrong number. Try it with two throwaway repos in the
    `schellingboard` org: give A two issues and B one, transfer A#2 to B, and expect B#2.
+   Repeat with a closed A#3 and expect B#3, still closed with its close reason.
    Also transfer from a public repo into a private one if the new repo stays private
    during the run.
 3. Set up the new repo, keeping **Actions disabled** until the code and tags are pushed.
