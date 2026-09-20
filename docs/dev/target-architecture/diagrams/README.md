@@ -13,13 +13,14 @@ The C4 model of the target architecture as [LikeC4](https://likec4.dev) sources.
 ```bash
 make arch-diagrams          # interactive, with navigation between levels
 make arch-diagrams-check    # validates the sources; part of `make arch`, so CI runs it
-make arch-diagrams-export   # regenerate export/*.png, the copies embedded in the chapters
 ```
 
-GitHub can't run LikeC4, so the documents in this folder's parent link to PNGs rendered
-ahead of time into [`export/`](export/) rather than to the interactive view. Re-run
-`make arch-diagrams-export` and commit the result whenever `model.c4` or `views.c4`
-changes; `make arch-diagrams-check` catches a syntax error but not a stale PNG.
+Nothing is rendered ahead of time. The published developer docs build the whole
+explorer at [`/diagrams/`](https://developers.schellingboard.org/diagrams/) and embed
+individual views in the chapters as `<likec4-view view-id="…">`, both from these
+sources on every build — so a view cannot go stale, and changing the model is the whole
+job. The cost is that the chapters show no diagram when read on GitHub, only a link to
+the view.
 
 Views, in reading order:
 

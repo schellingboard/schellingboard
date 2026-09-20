@@ -59,8 +59,8 @@ headcount gap, **organizer rules** the software enforces (reserved windows), and
 LikeC4 views `index` and `containers` in [diagrams/](diagrams/README.md) are the same
 picture with the people and external systems drawn.
 
-[![L1 system context diagram](diagrams/export/index.png)](diagrams/export/index.png)
-[![L2 container diagram](diagrams/export/containers.png)](diagrams/export/containers.png)
+<likec4-view view-id="index"><a href="https://developers.schellingboard.org/diagrams/#/view/index">L1 system context diagram</a></likec4-view>
+<likec4-view view-id="containers"><a href="https://developers.schellingboard.org/diagrams/#/view/containers">L2 container diagram</a></likec4-view>
 
 - **Web app.** Static files. On opening an event it loads a snapshot, subscribes
   to the feed, and renders everything from the local replica. Mutations are
@@ -111,7 +111,7 @@ same road:
    caller's idempotency key, so the caller recognises its own change on the feed
    even when the feed delivers it before the response arrives.
 
-[![Sequence diagram: RSVP with optimistic update and live propagation](diagrams/export/flowRsvp.png)](diagrams/export/flowRsvp.png)
+<likec4-view view-id="flowRsvp" dynamic-variant="sequence"><a href="https://developers.schellingboard.org/diagrams/#/view/flowRsvp">Sequence diagram: RSVP with optimistic update and live propagation</a></likec4-view>
 
 Reads are either the snapshot and feed (for everything in the viewer's audience of
 one event) or explicit queries for paged, searched, or role-restricted data (the

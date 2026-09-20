@@ -42,7 +42,7 @@ event?, assurance, created, expires, device)`; `sessions` is the schedule's
   friction. Nobody has to remember a password in either mode, because a join link
   or an emailed code is always an option.
 
-[![Sequence diagram: first login through a personal join link](diagrams/export/flowJoin.png)](diagrams/export/flowJoin.png)
+<likec4-view view-id="flowJoin" dynamic-variant="sequence"><a href="https://developers.schellingboard.org/diagrams/#/view/flowJoin">Sequence diagram: first login through a personal join link</a></likec4-view>
 
 - **Roles**: `siteAdmin` on the person; `organizer` or `attendee` on the
   participation. **Host** is derived from the session or proposal. Roles are data,

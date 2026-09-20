@@ -3,7 +3,7 @@
 One process: `apps/server`. Three drivers (HTTP, feed, jobs), nine modules, one
 kernel. View `server` in the [diagrams](diagrams/README.md).
 
-[![L3 server: infrastructure components and modules](diagrams/export/server.png)](diagrams/export/server.png)
+<likec4-view view-id="server"><a href="https://developers.schellingboard.org/diagrams/#/view/server">L3 server: infrastructure components and modules</a></likec4-view>
 
 ## Layout
 
@@ -34,7 +34,7 @@ View `modules` in the [diagrams](diagrams/README.md) draws these rules: solid ar
 are direct use-case calls (downward only), dashed arrows are reactions to recorded
 changes, where the reacting module depends on the other and never the reverse.
 
-[![L3 server: module dependencies](diagrams/export/modules.png)](diagrams/export/modules.png)
+<likec4-view view-id="modules"><a href="https://developers.schellingboard.org/diagrams/#/view/modules">L3 server: module dependencies</a></likec4-view>
 
 ## Use cases
 
@@ -179,7 +179,7 @@ One loop, one process, everything a queue would do:
 - Reactions run **after** the causing transaction committed and record their own
   changes with the causing `correlation_id`.
 
-[![Sequence diagram: organizer moves a session, attendees are told](diagrams/export/flowSessionMoved.png)](diagrams/export/flowSessionMoved.png)
+<likec4-view view-id="flowSessionMoved" dynamic-variant="sequence"><a href="https://developers.schellingboard.org/diagrams/#/view/flowSessionMoved">Sequence diagram: organizer moves a session, attendees are told</a></likec4-view>
 
 This replaces the ad-hoc reminder dispatch and the proposed email outbox (#1005)
 with one mechanism.

@@ -4,7 +4,7 @@
 the server as files, installable as a PWA. View `web` in the
 [diagrams](diagrams/README.md).
 
-[![L3 web app components](diagrams/export/web.png)](diagrams/export/web.png)
+<likec4-view view-id="web"><a href="https://developers.schellingboard.org/diagrams/#/view/web">L3 web app components</a></likec4-view>
 
 ## Layout
 
@@ -72,7 +72,7 @@ This answers the reservation in ADR 0006 that a stale schedule is worse than non
 the replica is never presented as current unless the feed is live, and once it is,
 staleness lasts as long as the reconnect.
 
-[![Sequence diagram: back online after a wifi drop](diagrams/export/flowReconnect.png)](diagrams/export/flowReconnect.png)
+<likec4-view view-id="flowReconnect" dynamic-variant="sequence"><a href="https://developers.schellingboard.org/diagrams/#/view/flowReconnect">Sequence diagram: back online after a wifi drop</a></likec4-view>
 
 ## Commands and optimistic updates
 

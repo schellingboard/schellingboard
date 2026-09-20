@@ -25,6 +25,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   reads 12:10 wherever it is shown, and sits with that slot's sessions on the agenda instead
   of ten minutes ahead of them.
 
+### Internal
+
+- Developer documentation is published at developers.schellingboard.org, built from `main`
+  rather than from release tags. `CONTRIBUTING.md` is now a short entry point into it.
+- The architecture diagrams are interactive on that site — a browsable explorer at
+  `/diagrams/` and views embedded in the chapters — and the committed PNG exports are gone.
+
 ## [3.8.0] - 2026-09-12
 
 ### Added
