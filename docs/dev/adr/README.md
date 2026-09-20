@@ -20,6 +20,7 @@ the tracking issue where there is one.
 | [0006](0006-push-notifications.md)                   | Push notifications through an installable web app           | 2026-09-05 |
 | [0007](0007-attendee-count-and-reminder-dispatch.md) | Attendee count storage and in-process reminder dispatch     | 2026-08-25 |
 | [0008](0008-publish-developer-docs.md)               | Publish the developer docs at developers.schellingboard.org | 2026-09-18 |
+| [0009](0009-standalone-repository-in-own-org.md)     | Move to a standalone repo in new schellingboard GitHub org  | 2026-09-19 |
 
 Longer design work that isn't a single decision lives next door:
 [Target architecture](../target-architecture/README.md) and
