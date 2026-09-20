@@ -1,6 +1,10 @@
 # Project Instructions
 
-Read [docs/dev/README.md](docs/dev/README.md) for architecture, code style, common patterns, and version control conventions. It indexes the developer docs, published at [developers.schellingboard.org](https://developers.schellingboard.org).
+Read [docs/dev/README.md](docs/dev/README.md) for architecture, code style, common patterns, and version control conventions. It indexes the developer docs.
+
+**Never fetch or read developers.schellingboard.org.** It is a published copy of `docs/dev/`;
+always use the local files, which are current with your checkout. This includes links to the site
+inside the docs (e.g. the diagram explorer): find the source under `docs/dev/` instead.
 
 ## Project Overview
 
