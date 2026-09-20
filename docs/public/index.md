@@ -38,4 +38,4 @@ The attendee guide is the page worth sharing with your attendees.
   stopping the site.
 
 SchellingBoard is open source (MIT). The code lives on
-[GitHub](https://github.com/LWCW-Europe/schellingboard).
+[GitHub](https://github.com/schellingboard/schellingboard).

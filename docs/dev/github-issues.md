@@ -36,7 +36,7 @@ GraphQL API (`gh api graphql`).
 `gh issue view --json` doesn't expose either field. Use REST instead:
 
 ```bash
-gh api repos/LWCW-Europe/schellingboard/issues/123 --jq \
+gh api repos/schellingboard/schellingboard/issues/123 --jq \
   '{type: .type.name, priority: (.issue_field_values[]? | select(.issue_field_name=="Priority") | .single_select_option.name)}'
 ```
 
@@ -46,13 +46,13 @@ Repo id, issue type ids, and the Priority field/option ids (stable, but re-fetch
 
 ```bash
 gh api graphql -f query='
-{ repository(owner: "LWCW-Europe", name: "schellingboard") {
+{ repository(owner: "schellingboard", name: "schellingboard") {
     id
     issueTypes(first: 10) { nodes { id name } }
 } }'
 
 gh api graphql -f query='
-{ repository(owner: "LWCW-Europe", name: "schellingboard") {
+{ repository(owner: "schellingboard", name: "schellingboard") {
     issueFields(first: 20) { nodes { ... on IssueFieldSingleSelect { id name options { id name } } } }
 } }'
 ```
@@ -94,7 +94,7 @@ mutation($repo: ID!, $title: String!, $body: String!, $type: ID!, $prioField: ID
 Get the issue's node id first (`number` is not a valid GraphQL id):
 
 ```bash
-gh api graphql -f query='{ repository(owner: "LWCW-Europe", name: "schellingboard") { issue(number: 123) { id } } }'
+gh api graphql -f query='{ repository(owner: "schellingboard", name: "schellingboard") { issue(number: 123) { id } } }'
 ```
 
 Then:

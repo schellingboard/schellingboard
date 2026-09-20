@@ -43,7 +43,7 @@ test("the footer's version opens the recent release notes", async ({
     dialog.getByRole("link", { name: /full changelog/i })
   ).toHaveAttribute(
     "href",
-    "https://github.com/LWCW-Europe/schellingboard/blob/main/CHANGELOG.md"
+    "https://github.com/schellingboard/schellingboard/blob/main/CHANGELOG.md"
   );
 
   await page.keyboard.press("Escape");

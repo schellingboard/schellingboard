@@ -32,7 +32,7 @@
     },
     "footer": {
       "style": "minimal",
-      "content": "SchellingBoard — MIT licensed. [Source on GitHub](https://github.com/LWCW-Europe/schellingboard).",
+      "content": "SchellingBoard — MIT licensed. [Source on GitHub](https://github.com/schellingboard/schellingboard).",
       "branding": true
     }
   },
@@ -89,7 +89,7 @@
     },
     {
       "title": "GitHub",
-      "path": "https://github.com/LWCW-Europe/schellingboard",
+      "path": "https://github.com/schellingboard/schellingboard",
       "icon": "github",
       "external": true
     }

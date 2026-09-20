@@ -9,7 +9,7 @@ The app had no dark mode: no `dark:` utility anywhere, no `color-scheme`
 declaration, and roughly a thousand hard-coded palette utilities
 (`text-gray-500` alone appeared 95 times) spread over some 78 components.
 
-Attendees were reaching for browser extensions instead. [#802](https://github.com/LWCW-Europe/schellingboard/issues/802)
+Attendees were reaching for browser extensions instead. [#802](https://github.com/schellingboard/schellingboard/issues/802)
 reported that under [Dark Reader](https://darkreader.org/) a voted-on proposal
 became indistinguishable from an unvoted one, because the only cue was a pale
 blue fill against white and the extension collapsed both to near-identical

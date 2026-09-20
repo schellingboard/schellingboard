@@ -110,4 +110,4 @@ worth it at this exposure; revisit if the exposure changes.
   receives a push and shows nothing, so this can never double as a background
   sync channel.
 
-[#317]: https://github.com/LWCW-Europe/schellingboard/issues/317
+[#317]: https://github.com/schellingboard/schellingboard/issues/317

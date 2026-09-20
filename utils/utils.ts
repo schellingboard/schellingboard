@@ -4,7 +4,7 @@ import { DateTime } from "luxon";
 
 export const TIME_FORMAT = "HH:mm";
 // Note: if you want to change this to am/pm, the timestamp column in day-grid.tsx,
-// needs to be wider (see https://github.com/LWCW-Europe/schellingboard/pull/402/changes)
+// needs to be wider (see https://github.com/schellingboard/schellingboard-legacy/pull/402/changes)
 
 export const DATETIME_FORMAT = `${TIME_FORMAT} - dd MMM`;
 

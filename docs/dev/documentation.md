@@ -114,7 +114,7 @@ that are merged but not yet released.
 
 GitHub Pages serves one custom domain per repository and this one already
 serves `docs.schellingboard.org`, so the built site is pushed to
-[LWCW-Europe/schellingboard.org](https://github.com/LWCW-Europe/schellingboard.org),
+[schellingboard/schellingboard.org](https://github.com/schellingboard/schellingboard.org),
 which holds nothing but that output and is never edited directly. Its Pages
 source is the default branch, so the site keeps working even if the workflow is
 disabled.
@@ -144,7 +144,7 @@ what docmd produced.
   1. Under the organization's Settings → Developer settings → GitHub Apps,
      create an app with the repository permission **Contents: Read and write**
      and nothing else. It needs no webhook and no account permissions.
-  2. Install it on `LWCW-Europe/schellingboard.org` only.
+  2. Install it on `schellingboard/schellingboard.org` only.
   3. In this repository, add the app's **Client ID** as the
      `WWW_DEPLOY_APP_CLIENT_ID` variable and a generated private key as the
      `WWW_DEPLOY_APP_PRIVATE_KEY` secret.

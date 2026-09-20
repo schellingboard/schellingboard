@@ -8,7 +8,7 @@ import { releaseNotes, SHOWN_RELEASES } from "./release-notes";
 import { getAppVersion } from "@/utils/git";
 
 const CHANGELOG_URL =
-  "https://github.com/LWCW-Europe/schellingboard/blob/main/CHANGELOG.md";
+  "https://github.com/schellingboard/schellingboard/blob/main/CHANGELOG.md";
 
 // Rendered without a zone, so the date stays the calendar date the release
 // carries in CHANGELOG.md rather than shifting by the reader's offset.

@@ -50,7 +50,7 @@ export default function Footer({ inline }: { inline?: boolean }) {
         </a>
         <span>·</span>
         <a
-          href="https://github.com/LWCW-Europe/schellingboard/issues"
+          href="https://github.com/schellingboard/schellingboard/issues"
           target="_blank"
           rel="noopener noreferrer"
           className="text-link hover:underline"

@@ -7,7 +7,7 @@ name: Website
 #
 # GitHub Pages serves one custom domain per repository and docs.schellingboard.org
 # already uses this one, so the built site is pushed to
-# LWCW-Europe/schellingboard.org, which holds nothing else.
+# schellingboard/schellingboard.org, which holds nothing else.
 on:
   push:
     branches:
@@ -55,7 +55,7 @@ jobs:
           # token when the job ends.
           permission-contents: write
 
-      - name: Publish to LWCW-Europe/schellingboard.org
+      - name: Publish to schellingboard/schellingboard.org
         env:
           GH_TOKEN: ${{ steps.token.outputs.token }}
           APP_SLUG: ${{ steps.token.outputs.app-slug }}
@@ -65,7 +65,7 @@ jobs:
           # The site repository is public, so only the push needs the token.
           # Cloning anonymously and passing it as a one-off header keeps it out
           # of the checkout's .git/config, which a URL-embedded token would not.
-          git clone --depth 1 https://github.com/LWCW-Europe/schellingboard.org.git target
+          git clone --depth 1 https://github.com/schellingboard/schellingboard.org.git target
 
           # --delete so a removed screenshot disappears from the site;
           # --exclude .git so the clone survives it.
