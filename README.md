@@ -46,7 +46,7 @@ See [CHANGELOG.md](CHANGELOG.md).
 See [CONTRIBUTING.md](CONTRIBUTING.md) to get started, and
 [developers.schellingboard.org](https://developers.schellingboard.org) for the
 full developer documentation (the same documentation but as _plain_ markdown
-files lives under `docs/dev/`).
+files lives under [`docs/dev/`](docs/dev/README.md)).
 
 ## License
 
