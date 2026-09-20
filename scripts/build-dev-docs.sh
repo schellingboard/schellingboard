@@ -72,4 +72,15 @@ const { host } = new URL(require("./" + process.env.CONFIG).url);
 require("fs").writeFileSync(process.env.OUT + "/CNAME", host + "\n");
 '
 
+cat >"$OUT/README.md" <<'EOF'
+# developers.schellingboard.org
+
+Generated — do not edit this repository.
+
+The site is built from `docs/dev/` in
+[schellingboard/schellingboard](https://github.com/schellingboard/schellingboard) and
+pushed here on every change to `main`. Edits made here are overwritten by the
+next deploy.
+EOF
+
 echo "Developer documentation site built in $OUT/"
