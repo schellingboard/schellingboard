@@ -53,6 +53,14 @@ bun x likec4 build --base /diagrams/ --use-hash-history -o "$OUT/diagrams" \
 # own; likec4's copy would just look like the explorer is deindexed.
 rm -f "$OUT/diagrams/robots.txt"
 
+# docmd's SPA router otherwise hot-swaps this shell into the docs layout, which
+# strips its stylesheet and module script; the attribute is the router's opt-out.
+perl -pi -e 's|<body>|<body data-spa-enabled="false">|' "$OUT/diagrams/index.html"
+grep -qF 'data-spa-enabled="false"' "$OUT/diagrams/index.html" || {
+  echo "likec4's index.html no longer has a plain <body>: the SPA opt-out was not applied" >&2
+  exit 1
+}
+
 cp scripts/likec4-embed.js "$OUT/assets/js/likec4-embed.js"
 
 # Every page is dated from the commit that last touched it (see
