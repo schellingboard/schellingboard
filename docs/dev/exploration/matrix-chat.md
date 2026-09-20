@@ -113,7 +113,7 @@ Mostly, with real gaps:
 
 ### Push notifications collide with an existing, deliberate project decision
 
-[ADR 0006](adr/0006-push-notifications.md) chose Web Push over a native app
+[ADR 0006](../adr/0006-push-notifications.md) chose Web Push over a native app
 specifically to avoid **any relay a self-hoster doesn't control**: no Apple
 Developer account, no App Store, "nothing for a self-hoster to configure." Matrix
 mobile push normally goes through a push gateway (Sygnal/UnifiedPush) wired to

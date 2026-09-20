@@ -43,7 +43,9 @@ See [CHANGELOG.md](CHANGELOG.md).
 
 ## Development
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md) to get started, and
+[developers.schellingboard.org](https://developers.schellingboard.org) for the
+full developer documentation.
 
 ## License
 

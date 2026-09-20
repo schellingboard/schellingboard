@@ -1,6 +1,6 @@
 # Project Instructions
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) for architecture, code style, common patterns, and version control conventions. It indexes the longer chapters under `docs/dev/`.
+Read [docs/dev/README.md](docs/dev/README.md) for architecture, code style, common patterns, and version control conventions. It indexes the developer docs, published at [developers.schellingboard.org](https://developers.schellingboard.org).
 
 ## Project Overview
 
@@ -18,7 +18,7 @@ Next.js scheduling app for managing conference/event sessions with three phases:
 
 Update `CHANGELOG.md` under `[Unreleased]` for any user-facing change. The audience is
 event organizers and attendees, so keep it non-technical. Dev-only changes go under
-`Internal`. See [CONTRIBUTING.md § Changelog](CONTRIBUTING.md#changelog) for the section
+`Internal`. See [docs/dev/changelog.md](docs/dev/changelog.md) for the section
 types.
 
 **Format**: `- **Bold lead phrase** (#123): what changed, and — only where it isn't
@@ -75,8 +75,10 @@ being prepared, and it holds **3–5 highlights of that release — no more**.
 - **Attendee/organizer docs**: `docs/public/` — one copy, documenting the _next_
   release. Edit in the same commit as the change they describe, and run
   `make docs-validate` after changing links.
-- **Developer docs**: `docs/dev/` (ADRs, design notes, the long chapters split
-  out of CONTRIBUTING.md). Never published.
+- **Developer docs**: `docs/dev/` (ADRs, design notes, the guideline chapters),
+  published from `main` to developers.schellingboard.org. Links to files outside
+  `docs/dev/` must be absolute GitHub URLs — the site can't resolve them. Run
+  `make docs-dev-validate` after changing links.
 - **Screenshots**: `docs/screenshots/` — the project's only copy. Reference them
   relatively from markdown (`../screenshots/x.webp`), never root-relative.
 - **The landing page** (schellingboard.org): hand-written HTML in `www/`. Don't

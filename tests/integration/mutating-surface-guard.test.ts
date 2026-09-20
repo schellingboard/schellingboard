@@ -11,7 +11,7 @@ import {
 } from "vitest";
 import { NextRequest } from "next/server";
 
-// Guards the invariant in CONTRIBUTING.md § Authorization: every mutating
+// Guards the invariant in docs/dev/coding-guidelines.md § Authorization: every mutating
 // handler must resolve the acting guest and refuse to act as a protected
 // guest without a verified session. This file enumerates app/api route
 // files so a newly added, unguarded handler fails the suite instead of
@@ -86,7 +86,7 @@ function apiRouteFiles(): string[] {
 const OUT_OF_SCOPE_PREFIXES = ["admin/", "auth/"];
 const OUT_OF_SCOPE_EXACT = new Set(["health"]);
 
-// Read-only surfaces are exempt from the invariant per CONTRIBUTING.md.
+// Read-only surfaces are exempt from the invariant per the coding guidelines.
 const READ_ONLY = new Set([
   "meetings",
   "meetings/candidates",

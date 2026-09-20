@@ -1,9 +1,9 @@
 # Releasing a New Version
 
 Pushing the tag is the whole release: it triggers
-[`.github/workflows/release.yml`](../../.github/workflows/release.yml), which
+[`.github/workflows/release.yml`](https://github.com/schellingboard/schellingboard/blob/main/.github/workflows/release.yml), which
 builds the image, runs the E2E suite against it, publishes it to Docker Hub and
-opens the GitHub release — and [`docs.yml`](../../.github/workflows/docs.yml),
+opens the GitHub release — and [`docs.yml`](https://github.com/schellingboard/schellingboard/blob/main/.github/workflows/docs.yml),
 which rebuilds the docs site and serves `docs/public/` as of that tag at its
 root. Docs are versioned per minor release, so `v3.2.1` republishes the `3.2`
 documentation.
