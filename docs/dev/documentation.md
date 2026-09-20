@@ -103,7 +103,7 @@ work that isn't ready to be read on a separate branch.
 
 ## The developer docs site
 
-The site you are reading. `docmd.dev.config.json` builds `docs/dev/` into
+The site you are reading. `docmd.dev.config.mjs` builds `docs/dev/` into
 `dev-site/` with its own title, navigation and search index — a second docmd
 project in the same repository, sharing nothing with the user site but the
 theme and the logo. [ADR 0008](adr/0008-publish-developer-docs.md) has the
@@ -114,6 +114,13 @@ reasoning, including why it isn't a path under docs.schellingboard.org.
 | `make docs-dev`          | Live preview of `docs/dev` (no diagrams — see below) |
 | `make docs-dev-build`    | Build the published site into `dev-site/`            |
 | `make docs-dev-validate` | Check for broken internal links (runs in CI)         |
+
+The config's top level is hand-written, but the children under Decision
+records, Target architecture and Attendance model are read off disk at build
+time: a new ADR gets its sidebar entry, breadcrumbs and prev/next links from its
+own `# ` heading, with no config edit. Only a page listed in `navigation` has a
+place in the structure, so a directory added next to those needs a `pagesIn`
+call of its own.
 
 It is not versioned. `.github/workflows/developers.yml` publishes on pushes to
 `main` that touch `docs/dev/`, so the site always describes the default branch;
@@ -231,7 +238,7 @@ their own, and both use the same setup.
   pointing at `schellingboard.github.io`, and each site repository's Pages
   source set to its default branch — not _GitHub Actions_, which would ignore
   the pushed files. The domain comes from `www/CNAME` for the landing page,
-  which the build copies verbatim, and from `url` in `docmd.dev.config.json`
+  which the build copies verbatim, and from `url` in `docmd.dev.config.mjs`
   for the developer site, which `build-dev-docs.sh` writes to `dev-site/CNAME`.
 
 - **A first commit**: the workflow clones the site repository before writing to

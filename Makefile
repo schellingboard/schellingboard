@@ -205,7 +205,7 @@ docs-build: install
 docs-validate: install
 	bun x docmd validate
 
-# The developer docs are a second docmd project (docmd.dev.config.json) built
+# The developer docs are a second docmd project (docmd.dev.config.mjs) built
 # from docs/dev, unversioned and published from main. See
 # docs/dev/documentation.md § The developer docs site.
 # The preview serves markdown only — the LikeC4 explorer and the embedded views
@@ -213,7 +213,7 @@ docs-validate: install
 # the model and `make docs-dev-build` to see a view embedded in a page.
 docs-dev: install
 	@rm -rf dev-site
-	@( DOCMD_CONTAINER=true bun x docmd dev -c docmd.dev.config.json & \
+	@( DOCMD_CONTAINER=true bun x docmd dev -c docmd.dev.config.mjs & \
 	   pid=$$!; \
 	   trap 'kill $$pid 2>/dev/null' INT TERM; \
 	   until [ -f dev-site/index.html ]; do sleep 0.2; done; \

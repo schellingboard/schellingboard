@@ -19,7 +19,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 REPO_ROOT="$PWD"
 
-CONFIG="docmd.dev.config.json"
+CONFIG="docmd.dev.config.mjs"
 OUT="dev-site"
 DIAGRAMS="docs/dev/target-architecture/diagrams"
 
@@ -76,7 +76,8 @@ fi
 # GitHub Pages serves the custom domain from this file. Taken from the config's
 # `url` so the domain is stated exactly once.
 CONFIG="$CONFIG" OUT="$OUT" bun -e '
-const { host } = new URL(require("./" + process.env.CONFIG).url);
+const config = await import("./" + process.env.CONFIG);
+const { host } = new URL(config.default.url);
 require("fs").writeFileSync(process.env.OUT + "/CNAME", host + "\n");
 '
 

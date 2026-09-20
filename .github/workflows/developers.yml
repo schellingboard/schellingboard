@@ -14,7 +14,7 @@ on:
     paths:
       - "docs/dev/**"
       - "docs/logo/**"
-      - "docmd.dev.config.json"
+      - "docmd.dev.config.mjs"
       - "scripts/build-dev-docs.sh"
       - "scripts/likec4-embed.js"
       - "scripts/docmd-git-history.js"
