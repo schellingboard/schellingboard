@@ -219,6 +219,7 @@ docs-dev: install
 	   until [ -f dev-site/index.html ]; do sleep 0.2; done; \
 	   cp -R docs/logo dev-site/logo; \
 	   rm -f dev-site/logo/README.md; \
+	   cp scripts/docmd-overrides.css dev-site/assets/css/docmd-overrides.css; \
 	   wait $$pid )
 
 docs-dev-build: install

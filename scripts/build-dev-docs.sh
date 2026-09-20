@@ -62,6 +62,7 @@ grep -qF 'data-spa-enabled="false"' "$OUT/diagrams/index.html" || {
 }
 
 cp scripts/likec4-embed.js "$OUT/assets/js/likec4-embed.js"
+cp scripts/docmd-overrides.css "$OUT/assets/css/docmd-overrides.css"
 
 # Every page is dated from the commit that last touched it (see
 # scripts/docmd-git-history.js); the user site published undated for a while

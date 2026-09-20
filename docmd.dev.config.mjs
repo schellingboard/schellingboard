@@ -79,6 +79,8 @@ export default {
     name: "default",
     appearance: "system",
     codeHighlight: true,
+    // Not copied by docmd — the build script and `make docs-dev` place it.
+    customCss: ["assets/css/docmd-overrides.css"],
   },
   customJs: ["assets/js/likec4-embed.js"],
   minify: true,

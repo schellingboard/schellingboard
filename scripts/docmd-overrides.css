@@ -1,0 +1,9 @@
+/* docmd 0.9.5 lays out every heading as a flex container so the permalink
+   anchor can be centred. Any inline element inside a heading — a linkified
+   URL, a `code` span — is then a sibling flex item, and the surrounding words
+   collapse into a one-word-per-line column.
+   Drop this once https://github.com/docmd-io/docmd/issues/240 ships. */
+.docmd-heading {
+  display: block;
+  overflow-wrap: break-word;
+}
