@@ -1,12 +1,18 @@
-# Documentation and the landing page
+# Documentation and the sites
 
-Two audiences, two places:
+Three sites, three audiences, three publishing rules:
 
-- **Developers** — [`CONTRIBUTING.md`](../../CONTRIBUTING.md) plus the markdown
-  under `docs/dev/` it links to (ADRs, `github-issues.md`, design notes). Not
-  published anywhere; read it in the repo.
-- **Attendees and organizers** — `docs/public/`, published to
-  [docs.schellingboard.org](https://docs.schellingboard.org).
+| Site                                                                   | Built from                   | Published when                   |
+| ---------------------------------------------------------------------- | ---------------------------- | -------------------------------- |
+| [docs.schellingboard.org](https://docs.schellingboard.org)             | `docs/public/`, at each tag  | a release is tagged              |
+| [developers.schellingboard.org](https://developers.schellingboard.org) | `docs/dev/`, on `main`       | `docs/dev/` changes on `main`    |
+| [schellingboard.org](https://schellingboard.org)                       | `www/` + `docs/screenshots/` | `www/` or the screenshots change |
+
+The split of audiences is the point: attendees and organizers read the first,
+contributors the second, and nobody should land on the wrong one. Keeping the
+developer docs unversioned and the user docs versioned follows from the same
+split — user docs must describe the release someone is running, while developer
+docs must describe the branch they are working on.
 
 ## The public docs site
 
@@ -68,8 +74,8 @@ them set up again before the first tag push can publish anything:
 
 Until both are in place and `v3.2.0` is tagged, the
 [docs.schellingboard.org](https://docs.schellingboard.org) links in
-[`README.md`](../../README.md) are dead; the same pages are readable in
-`docs/public/`.
+[`README.md`](https://github.com/schellingboard/schellingboard/blob/main/README.md)
+are dead; the same pages are readable in `docs/public/`.
 
 ### Correcting published documentation
 
@@ -94,6 +100,70 @@ jj bookmark create release/3.2   # git: git switch -c release/3.2 v3.2.0
 Because the branch tip wins over the tag, anything committed to it is published
 as that version's documentation the moment it is pushed, released or not. Land
 work that isn't ready to be read on a separate branch.
+
+## The developer docs site
+
+The site you are reading. `docmd.dev.config.json` builds `docs/dev/` into
+`dev-site/` with its own title, navigation and search index — a second docmd
+project in the same repository, sharing nothing with the user site but the
+theme and the logo. [ADR 0008](adr/0008-publish-developer-docs.md) has the
+reasoning, including why it isn't a path under docs.schellingboard.org.
+
+| Command                  | What it does                                         |
+| ------------------------ | ---------------------------------------------------- |
+| `make docs-dev`          | Live preview of `docs/dev` (no diagrams — see below) |
+| `make docs-dev-build`    | Build the published site into `dev-site/`            |
+| `make docs-dev-validate` | Check for broken internal links (runs in CI)         |
+
+It is not versioned. `.github/workflows/developers.yml` publishes on pushes to
+`main` that touch `docs/dev/`, so the site always describes the default branch;
+a contributor on a release branch reads that branch's `docs/dev/` in the
+repository instead.
+
+**Links out of `docs/dev/` must be absolute GitHub URLs.** The site's root is
+`docs/dev/`, so a relative `../../CONTRIBUTING.md` resolves to nothing once
+published. `make docs-dev-validate` catches those, and is the reason to run it
+after moving a file. Links to user documentation go to
+docs.schellingboard.org rather than to `docs/public/` in the repository.
+
+`docs/dev/README.md` is both the site's home page and the folder's index on
+GitHub, which is what keeps the repository copy navigable.
+
+### Why it deploys to a second repository
+
+The same reason as the landing page below: GitHub Pages serves one custom
+domain per repository, and this one already serves docs.schellingboard.org. The
+build is pushed to
+[schellingboard/developers.schellingboard.org](https://github.com/schellingboard/developers.schellingboard.org),
+which holds nothing else, using the same organization-owned deploy app the
+landing page uses — see
+[Hosting setup for the pushed sites](#hosting-setup-for-the-pushed-sites).
+
+### The architecture diagrams
+
+The C4 model in `docs/dev/target-architecture/diagrams/` reaches the site twice:
+
+- **`/diagrams/`** — the full LikeC4 explorer, every view with drill-down
+  between levels, built by `likec4 build`. It uses hash history (`/diagrams/#/…`)
+  because GitHub Pages can't route deep links into a single-page app.
+- **`<likec4-view view-id="…">`** — chapters embed a single view inline, rendered
+  by the web component `likec4 gen webcomponent` produces.
+
+There are no committed PNG exports, so a diagram cannot go stale: the site
+renders from the `.c4` sources on every build. The cost is that GitHub shows no
+diagram at all when reading the chapters in the repository, and that
+`make docs-dev` — plain `docmd dev`, with none of the LikeC4 steps — doesn't
+either. Use `make arch-diagrams` for the explorer while editing the model, and
+`make docs-dev-build` to see an embedded view rendered.
+
+The web component bundle is ~2.5 MB, which is why `scripts/likec4-embed.js`,
+not the bundle, is the site-wide `customJs`: it loads the bundle only on pages
+that actually contain a `<likec4-view>`, and mirrors docmd's theme onto each
+element's `color-scheme`.
+
+`build-dev-docs.sh` fails if a chapter embeds a `view-id` that `views.c4`
+doesn't define. The element renders an empty box otherwise, which is the same
+silent staleness the PNGs had.
 
 ## The landing page
 
@@ -123,8 +193,8 @@ disabled.
 
 `docs/screenshots/` is the only copy of the screenshots. The landing page
 uses them directly and the documentation site can use them too — see
-[`docs/screenshots/README.md`](../screenshots/README.md) for the capture
-checklist and how to reference them from markdown.
+[`docs/screenshots/README.md`](https://github.com/schellingboard/schellingboard/blob/main/docs/screenshots/README.md)
+for the capture checklist and how to reference them from markdown.
 
 They are not under `docs/public/`, and cannot usefully be: docmd discovers
 markdown and nothing else, so a PNG placed there is not copied to the output.
@@ -132,26 +202,37 @@ Both build scripts do the copying themselves. One consequence: images appear in
 `make docs-build` output but not in the `make docs` live preview, which serves
 what docmd produced.
 
-### Hosting setup for the landing page
+### Hosting setup for the pushed sites
 
-- **GitHub App**: the workflow needs to write to a repository that is not its
-  own, so it mints a token from an organization-owned app rather than carrying
-  a standing credential. The token expires within the hour, the app belongs to
+Both the landing page and the developer docs are pushed into a repository of
+their own, and both use the same setup.
+
+- **GitHub App**: these workflows write to a repository that is not their own,
+  so they mint a token from an organization-owned app rather than carrying a
+  standing credential. The token expires within the hour, the app belongs to
   the organization instead of a person, and it is installed on the site
-  repository alone.
+  repositories alone.
 
   1. Under the organization's Settings → Developer settings → GitHub Apps,
      create an app with the repository permission **Contents: Read and write**
      and nothing else. It needs no webhook and no account permissions.
-  2. Install it on `schellingboard/schellingboard.org` only.
+  2. Install it on `schellingboard/schellingboard.org` and
+     `schellingboard/developers.schellingboard.org` only. Each workflow still
+     narrows its own token to the one repository it publishes, so installing
+     the app on both does not let either job touch the other's site.
   3. In this repository, add the app's **Client ID** as the
-     `WWW_DEPLOY_APP_CLIENT_ID` variable and a generated private key as the
-     `WWW_DEPLOY_APP_PRIVATE_KEY` secret.
+     `PAGES_DEPLOY_APP_CLIENT_ID` variable and a generated private key as the
+     `PAGES_DEPLOY_APP_PRIVATE_KEY` secret.
 
   To rotate, generate a new private key on the app and replace the secret; the
   client ID does not change.
 
-- **DNS**: `schellingboard.org` pointing at `schellingboard.github.io`, and the
-  site repository's Pages source set to its default branch — not _GitHub
-  Actions_, which would ignore the pushed files. The domain is in `www/CNAME`,
-  which the build copies verbatim.
+- **DNS**: `schellingboard.org` and `developers.schellingboard.org` each
+  pointing at `schellingboard.github.io`, and each site repository's Pages
+  source set to its default branch — not _GitHub Actions_, which would ignore
+  the pushed files. The domain comes from `www/CNAME` for the landing page,
+  which the build copies verbatim, and from `url` in `docmd.dev.config.json`
+  for the developer site, which `build-dev-docs.sh` writes to `dev-site/CNAME`.
+
+- **A first commit**: the workflow clones the site repository before writing to
+  it, so an entirely empty one fails. Any initial commit does.

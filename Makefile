@@ -1,4 +1,4 @@
-.PHONY: help dev mailpit build start lint typecheck arch arch-graph arch-diagrams arch-diagrams-check arch-diagrams-export lint-watch test test-unit test-integration test-watch test-coverage test-e2e test-e2e-headed test-e2e-docker format format-check precommit dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed dump-release-db install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate www
+.PHONY: help dev mailpit build start lint typecheck arch arch-graph arch-diagrams arch-diagrams-check lint-watch test test-unit test-integration test-watch test-coverage test-e2e test-e2e-headed test-e2e-docker format format-check precommit dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed dump-release-db install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate docs-dev docs-dev-build docs-dev-validate www
 
 SHELL := /usr/bin/env bash
 
@@ -28,7 +28,6 @@ help:
 	@printf "  %-28s %s\n" "make arch-graph"         "Render the dependency graph to arch-graph.svg"
 	@printf "  %-28s %s\n" "make arch-diagrams"      "Browse the target-architecture C4 diagrams (LikeC4)"
 	@printf "  %-28s %s\n" "make arch-diagrams-check" "Check the LikeC4 diagram sources parse"
-	@printf "  %-28s %s\n" "make arch-diagrams-export" "Regenerate the PNGs committed under diagrams/export"
 	@printf "  %-28s %s\n" "make format"             "Format code"
 	@printf "  %-28s %s\n" "make format-check"       "Check code formatting"
 	@printf "\nDatabase:\n"
@@ -37,10 +36,13 @@ help:
 	@printf "  %-28s %s\n" "make dev-migrate-create" "Generate new migration"
 	@printf "  %-28s %s\n" "make dev-db-seed"        "Reset dev database and seed dummy data (SEED_PROFILE=small|large)"
 	@printf "  %-28s %s\n" "make dump-release-db"    "Record VERSION=vX.Y.Z's seeded DB as an upgrade-test fixture"
-	@printf "\nDocumentation site:\n"
+	@printf "\nDocumentation sites:\n"
 	@printf "  %-28s %s\n" "make docs"               "Preview the docs in docs/public"
 	@printf "  %-28s %s\n" "make docs-build"         "Build the public docs site into site/"
 	@printf "  %-28s %s\n" "make docs-validate"      "Check the docs for broken links"
+	@printf "  %-28s %s\n" "make docs-dev"           "Preview the developer docs in docs/dev"
+	@printf "  %-28s %s\n" "make docs-dev-build"     "Build the developer docs site into dev-site/"
+	@printf "  %-28s %s\n" "make docs-dev-validate"  "Check the developer docs for broken links"
 	@printf "\nLanding page:\n"
 	@printf "  %-28s %s\n" "make www"               "Build schellingboard.org into www-site/"
 	@printf "\nDependencies:\n"
@@ -97,13 +99,6 @@ arch-diagrams: install
 arch-diagrams-check: install
 	bun x likec4 validate $(LIKEC4_DIR)
 
-# likec4 pins a different playwright than install-playwright sets up, so it needs its
-# own browser. Exports render at 2x; scaling to 1x keeps text sharp at half the size.
-arch-diagrams-export: install
-	bun --bun node_modules/likec4/node_modules/playwright/cli.js install chromium
-	bun x likec4 export png --seq --flat -o $(LIKEC4_DIR)/export $(LIKEC4_DIR)
-	for f in $(LIKEC4_DIR)/export/*.png; do convert "$$f" -resize 50% "$$f"; done
-
 # Writes a dependency graph to arch-graph.svg. Needs graphviz (`dot`).
 arch-graph: install
 	$(DEPCRUISE) --output-type dot | dot -T svg > arch-graph.svg
@@ -154,7 +149,7 @@ clean:
 	rm -f data.db data.test.db
 	rm -rf playwright-report test-results playwright-results.json .e2e-docker
 	rm -f tsconfig.tsbuildinfo
-	rm -rf www-site
+	rm -rf www-site dev-site
 	rm -rf uploads uploads-test
 	rm -rf coverage
 
@@ -209,6 +204,28 @@ docs-build: install
 
 docs-validate: install
 	bun x docmd validate
+
+# The developer docs are a second docmd project (docmd.dev.config.json) built
+# from docs/dev, unversioned and published from main. See
+# docs/dev/documentation.md § The developer docs site.
+# The preview serves markdown only — the LikeC4 explorer and the embedded views
+# are assembled by the build script, so use `make arch-diagrams` while editing
+# the model and `make docs-dev-build` to see a view embedded in a page.
+docs-dev: install
+	@rm -rf dev-site
+	@( DOCMD_CONTAINER=true bun x docmd dev -c docmd.dev.config.json & \
+	   pid=$$!; \
+	   trap 'kill $$pid 2>/dev/null' INT TERM; \
+	   until [ -f dev-site/index.html ]; do sleep 0.2; done; \
+	   cp -R docs/logo dev-site/logo; \
+	   rm -f dev-site/logo/README.md; \
+	   wait $$pid )
+
+docs-dev-build: install
+	bash scripts/build-dev-docs.sh
+
+docs-dev-validate: install
+	bash scripts/validate-dev-docs.sh
 
 # Hand-written HTML plus a copy step — no toolchain, so no `install` dependency.
 # The output is static and link-relative; open www-site/index.html to preview.

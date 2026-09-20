@@ -85,6 +85,9 @@ result*
 # Generated documentation site (see docs/dev/documentation.md)
 site/
 
+# Generated developer docs site (see docs/dev/documentation.md § The developer docs site)
+dev-site/
+
 # Generated marketing site (see docs/dev/documentation.md § The landing page)
 www-site/
 

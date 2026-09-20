@@ -51,6 +51,7 @@ export default tseslint.config(
       "**/*.mjs",
       ".jj/**",
       "site/**",
+      "dev-site/**",
       "coverage/**",
       "docs/dev/attendance-model/.venv/**",
       "playwright-report/**",

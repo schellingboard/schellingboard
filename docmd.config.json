@@ -32,7 +32,7 @@
     },
     "footer": {
       "style": "minimal",
-      "content": "SchellingBoard — MIT licensed. [Source on GitHub](https://github.com/schellingboard/schellingboard).",
+      "content": "SchellingBoard — MIT licensed. [Source on GitHub](https://github.com/schellingboard/schellingboard) · [Developer docs](https://developers.schellingboard.org).",
       "branding": true
     }
   },

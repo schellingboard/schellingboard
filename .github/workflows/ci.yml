@@ -29,6 +29,9 @@ jobs:
       - name: Validate docs links
         run: make docs-validate
 
+      - name: Validate developer docs links
+        run: make docs-dev-validate
+
   build:
     runs-on: ubuntu-latest
 
