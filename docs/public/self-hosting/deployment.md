@@ -20,7 +20,7 @@ docker run -d \
 ```
 
 Or with `docker compose` — copy `docker-compose.yml` and `.env.docker.example` from the
-[repository](https://github.com/LWCW-Europe/schellingboard) into the same directory, then:
+[repository](https://github.com/schellingboard/schellingboard) into the same directory, then:
 
 ```bash
 cp .env.docker.example .env

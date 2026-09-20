@@ -193,7 +193,7 @@ Three rules that are easy to get wrong:
   shadow alone is invisible in dark mode.
 - **Never encode state in colour alone.** A selected or active state also needs
   a shape, an icon or an aria attribute — see
-  [#802](https://github.com/LWCW-Europe/schellingboard/issues/802) for what
+  [#802](https://github.com/schellingboard/schellingboard/issues/802) for what
   happens otherwise.
 - **`fg-subtle` and `line` only go on the page grounds** (`surface`,
   `surface-raised`, `surface-sunken`). On a filled panel — `surface-muted` or

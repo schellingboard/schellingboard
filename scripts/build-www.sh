@@ -8,7 +8,7 @@
 # to be recaptured twice.
 #
 # The output is what .github/workflows/www.yml pushes to
-# LWCW-Europe/schellingboard.org, whose default branch GitHub Pages serves.
+# schellingboard/schellingboard.org, whose default branch GitHub Pages serves.
 # Nothing here needs bun or node — it is a copy plus a link check.
 set -euo pipefail
 
@@ -38,7 +38,7 @@ cat >"$OUT/README.md" <<'EOF'
 Generated — do not edit this repository.
 
 The site is built from `www/` and `docs/screenshots/` in
-[LWCW-Europe/schellingboard](https://github.com/LWCW-Europe/schellingboard) and
+[schellingboard/schellingboard](https://github.com/schellingboard/schellingboard) and
 pushed here on every change to `main`. Edits made here are overwritten by the
 next deploy.
 EOF
