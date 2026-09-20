@@ -63,7 +63,7 @@ them set up again before the first tag push can publish anything:
 - **GitHub Pages**: repository Settings → Pages → Source must be _GitHub
   Actions_. `actions/deploy-pages` fails without it.
 - **DNS**: a `CNAME` record for `docs.schellingboard.org` pointing at
-  `lwcw-europe.github.io`. The domain itself comes from `url` in
+  `schellingboard.github.io`. The domain itself comes from `url` in
   `docmd.config.json` — the build writes it to `site/CNAME` from there.
 
 Until both are in place and `v3.2.0` is tagged, the
@@ -138,8 +138,7 @@ what docmd produced.
   own, so it mints a token from an organization-owned app rather than carrying
   a standing credential. The token expires within the hour, the app belongs to
   the organization instead of a person, and it is installed on the site
-  repository alone. (A deploy key would also work, but LWCW-Europe policy
-  restricts them.)
+  repository alone.
 
   1. Under the organization's Settings → Developer settings → GitHub Apps,
      create an app with the repository permission **Contents: Read and write**
@@ -152,7 +151,7 @@ what docmd produced.
   To rotate, generate a new private key on the app and replace the secret; the
   client ID does not change.
 
-- **DNS**: `schellingboard.org` pointing at `lwcw-europe.github.io`, and the
+- **DNS**: `schellingboard.org` pointing at `schellingboard.github.io`, and the
   site repository's Pages source set to its default branch — not _GitHub
   Actions_, which would ignore the pushed files. The domain is in `www/CNAME`,
   which the build copies verbatim.
