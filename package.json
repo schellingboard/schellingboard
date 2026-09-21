@@ -33,7 +33,7 @@
     "turndown": "^7.2.4",
     "unified": "^11.0.5",
     "web-push": "^3.6.7",
-    "zod": "^4.6.2"
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@docmd/core": "^0.9.5",
@@ -54,7 +54,7 @@
     "@typescript-eslint/parser": "^8.70.0",
     "@vitest/coverage-v8": "^5",
     "@vitest/ui": "^5",
-    "dependency-cruiser": "^18.2.0",
+    "dependency-cruiser": "^18.3.0",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "^16",
