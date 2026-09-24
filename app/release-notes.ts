@@ -47,6 +47,13 @@ export const releaseNotes: ReleaseNote[] = [
     highlights: [],
   },
   {
+    version: "3.8.1",
+    date: "2026-09-24",
+    highlights: [
+      "**The footer's \"Report a Bug\" link opens the right repository again**, instead of the project's old one.",
+    ],
+  },
+  {
     version: "3.8.0",
     date: "2026-09-12",
     highlights: [

@@ -32,6 +32,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - The architecture diagrams are interactive on that site — a browsable explorer at
   `/diagrams/` and views embedded in the chapters — and the committed PNG exports are gone.
 
+## [3.8.1] - 2026-09-24
+
+### Fixed
+
+- **Footer's "Report a Bug" link opens the right repository again**: it still pointed at
+  the project's previous, now-legacy, repository.
+
 ## [3.8.0] - 2026-09-12
 
 ### Added
@@ -677,17 +684,19 @@ This version corresponds to commit [9aa2a273](https://github.com/schellingboard/
 
 The version number 1.0.0 is a retroactive label assigned here purely as a reference point to mark the upstream baseline — it was never designated as such. This is the upstream codebase at the point the fork was created, taken from commit [babcd627](https://github.com/rachelweinberg12/scheduling-app/commit/babcd6275a853f1911cd48bbdaf4f2b1725c3d47) of [rachelweinberg12/scheduling-app](https://github.com/rachelweinberg12/scheduling-app) ([full log](https://github.com/rachelweinberg12/scheduling-app/commits/babcd6275a853f1911cd48bbdaf4f2b1725c3d47/)). It was never properly released since it was deployed directly from the Git repository.
 
-(??)[3.8.0]: https://github.com/LWCW-Europe/schellingboard/compare/v3.7.0...v3.8.0
-(??)[3.7.0]: https://github.com/LWCW-Europe/schellingboard/compare/v3.6.0...v3.7.0
-(??)[3.6.0]: https://github.com/LWCW-Europe/schellingboard/compare/v3.5.0...v3.6.0
-(??)[3.5.0]: https://github.com/LWCW-Europe/schellingboard/compare/v3.4.2...v3.5.0
-(??)[3.4.2]: https://github.com/LWCW-Europe/schellingboard/compare/v3.4.1...v3.4.2
-(??)[3.4.1]: https://github.com/LWCW-Europe/schellingboard/compare/v3.4.0...v3.4.1
-(??)[3.4.0]: https://github.com/LWCW-Europe/schellingboard/compare/v3.3.1...v3.4.0
-(??)[3.3.1]: https://github.com/LWCW-Europe/schellingboard/compare/v3.3.0...v3.3.1
-(??)[3.3.0]: https://github.com/LWCW-Europe/schellingboard/compare/v3.2.0...v3.3.0
-(??)[3.2.0]: https://github.com/LWCW-Europe/schellingboard/compare/v3.1.0...v3.2.0
-(??)[3.1.0]: https://github.com/LWCW-Europe/schellingboard/compare/v3.0.0...v3.1.0
-(??)[3.0.0]: https://github.com/LWCW-Europe/schellingboard/compare/9aa2a273...v3.0.0
-(??)[2.0.0]: https://github.com/LWCW-Europe/schellingboard/compare/babcd6275a853f1911cd48bbdaf4f2b1725c3d47...9aa2a273
+[Unreleased]: https://github.com/schellingboard/schellingboard/compare/v3.8.1...HEAD
+[3.8.1]: https://github.com/schellingboard/schellingboard/compare/v3.8.0...v3.8.1
+[3.8.0]: https://github.com/schellingboard/schellingboard/compare/v3.7.0...v3.8.0
+[3.7.0]: https://github.com/schellingboard/schellingboard/compare/v3.6.0...v3.7.0
+[3.6.0]: https://github.com/schellingboard/schellingboard/compare/v3.5.0...v3.6.0
+[3.5.0]: https://github.com/schellingboard/schellingboard/compare/v3.4.2...v3.5.0
+[3.4.2]: https://github.com/schellingboard/schellingboard/compare/v3.4.1...v3.4.2
+[3.4.1]: https://github.com/schellingboard/schellingboard/compare/v3.4.0...v3.4.1
+[3.4.0]: https://github.com/schellingboard/schellingboard/compare/v3.3.1...v3.4.0
+[3.3.1]: https://github.com/schellingboard/schellingboard/compare/v3.3.0...v3.3.1
+[3.3.0]: https://github.com/schellingboard/schellingboard/compare/v3.2.0...v3.3.0
+[3.2.0]: https://github.com/schellingboard/schellingboard/compare/v3.1.0...v3.2.0
+[3.1.0]: https://github.com/schellingboard/schellingboard/compare/v3.0.0...v3.1.0
+[3.0.0]: https://github.com/schellingboard/schellingboard/compare/9aa2a273...v3.0.0
+[2.0.0]: https://github.com/schellingboard/schellingboard/compare/babcd6275a853f1911cd48bbdaf4f2b1725c3d47...9aa2a273
 [1.0.0]: https://github.com/rachelweinberg12/scheduling-app/commits/babcd6275a853f1911cd48bbdaf4f2b1725c3d47
