@@ -9,19 +9,20 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useContext, useState } from "react";
 import { CurrentUserModal, ConfirmationModal, AlertModal } from "../modals";
-import {
-  UserContext,
-  EventContext,
-  useBreakMinutes,
-  useSlotIncrement,
-} from "../context";
+import { UserContext, EventContext, useBreakMinutes } from "../context";
 import {
   formatOptionalTime,
   formatStartTimePlusBreak,
   TIME_FORMAT,
 } from "@/utils/utils";
 import { isBookableSlot } from "@/utils/session-bookable";
+import type { ColumnItem } from "@/utils/schedule-column";
 import { LockIcon } from "../lock-icon";
+import {
+  PositionedBlock,
+  TITLE_MIN_PX,
+  type Position,
+} from "./positioned-block";
 import { viewSessionLinkFromOwner } from "./modal-nav";
 import { stripMarkdown } from "@/utils/markdown";
 import {
@@ -32,86 +33,66 @@ import {
 import { useMyMeetings } from "./use-meetings";
 
 export function SessionBlock(props: {
-  session: Session;
+  item: ColumnItem;
   location: Location;
   day: DayWithSessions;
   guests: Guest[];
 }) {
-  const { session, location, day, guests } = props;
+  const { item, location, day, guests } = props;
   const { rsvpdForSession, event, now } = useContext(EventContext);
   const eventSlug = event?.slug ?? "";
   const timezone = event?.timezone ?? "UTC";
-  const { user } = useContext(UserContext);
-  const rsvpd = rsvpdForSession(session.id + (user ? "" : ""));
+  const position = { top: item.topPx, height: item.heightPx };
 
-  const slotIncrement = useSlotIncrement();
-  const startTime = session.startTime?.getTime() ?? 0;
-  const endTime = session.endTime?.getTime() ?? 0;
-  const sessionLength = endTime - startTime;
-  // Ceil (not raw division) so a misaligned/legacy session still spans a
-  // whole number of grid rows instead of producing an invalid Tailwind class.
-  const numSlots = Math.max(
-    1,
-    Math.ceil(sessionLength / 1000 / 60 / slotIncrement)
-  );
-
-  const isBlank = !session.title;
-  const isBookable = isBookableSlot({
-    isBlank,
-    locationBookable: !!location.bookable,
-    blocker: !!session.blocker,
-    startTime,
-    now: now.getTime(),
-    startBookings: day.startBookings?.getTime(),
-    endBookings: day.endBookings?.getTime(),
-  });
-  // `isBookable` already implies a start time (it requires `startTime > now`),
-  // but only the explicit check narrows the optional type for the card, whose
-  // prefill link needs a real date to put in the query string.
-  return isBookable && session.startTime ? (
-    <BookableSessionCard
-      eventSlug={eventSlug}
-      startTime={session.startTime}
-      location={location}
-      numSlots={numSlots}
-      timezone={timezone}
+  if (item.kind === "free") {
+    const bookable = isBookableSlot({
+      locationBookable: !!location.bookable,
+      startTime: item.start.getTime(),
+      now: now.getTime(),
+      startBookings: day.startBookings?.getTime(),
+      endBookings: day.endBookings?.getTime(),
+    });
+    return bookable ? (
+      <BookableSessionCard
+        eventSlug={eventSlug}
+        startTime={item.start}
+        location={location}
+        position={position}
+        timezone={timezone}
+      />
+    ) : null;
+  }
+  const { session } = item;
+  return session.blocker ? (
+    <BlockerSessionCard
+      title={session.title || "Blocked"}
+      position={position}
     />
   ) : (
-    <>
-      {session.blocker ? (
-        <BlockerSessionCard
-          title={session.title || "Blocked"}
-          numSlots={numSlots}
-        />
-      ) : isBlank ? (
-        <BlankSessionCard numSlots={numSlots} />
-      ) : (
-        <RealSessionCard
-          eventSlug={eventSlug}
-          session={session}
-          location={location}
-          numSlots={numSlots}
-          guests={guests}
-          rsvpd={rsvpd}
-        />
-      )}
-    </>
+    <RealSessionCard
+      eventSlug={eventSlug}
+      session={session}
+      location={location}
+      position={position}
+      guests={guests}
+      rsvpd={rsvpdForSession(session.id)}
+    />
   );
 }
 
 export function BookableSessionCard(props: {
   location: Location;
   startTime: Date;
-  numSlots: number;
+  position: Position;
   eventSlug: string;
   timezone: string;
 }) {
-  const { numSlots, startTime, location, eventSlug, timezone } = props;
+  const { position, startTime, location, eventSlug, timezone } = props;
   const start = DateTime.fromJSDate(startTime).setZone(timezone);
   const dayParam = start.toFormat("yyyy-MM-dd");
   const timeParam = start.toFormat("HH:mm");
   return (
-    <div className={`row-span-${numSlots} my-0.5 min-h-10`}>
+    <PositionedBlock position={position}>
       <Link
         aria-label="Add session"
         className="rounded font-roboto h-full w-full bg-surface-muted hover:bg-surface-hover flex items-center justify-center"
@@ -119,30 +100,29 @@ export function BookableSessionCard(props: {
       >
         <PlusIcon aria-hidden="true" className="h-4 w-4 text-fg-subtle" />
       </Link>
-    </div>
+    </PositionedBlock>
   );
 }
 
-function BlankSessionCard(props: { numSlots: number }) {
-  const { numSlots } = props;
-  return <div className={`row-span-${numSlots} my-0.5 min-h-12`} />;
-}
-
-function BlockerSessionCard(props: { title: string; numSlots: number }) {
-  const { title, numSlots } = props;
+function BlockerSessionCard(props: { title: string; position: Position }) {
+  const { title, position } = props;
   return (
-    <div className={`row-span-${numSlots} my-0.5 overflow-hidden`}>
-      <div className="py-1 px-1 rounded font-roboto h-full min-h-10 flex flex-col justify-center bg-surface-hover border-2 border-line text-fg">
+    <PositionedBlock position={position} className="overflow-hidden">
+      <div className="px-1 rounded font-roboto h-full flex flex-col justify-center overflow-hidden bg-surface-hover border-2 border-line text-fg">
         <p
           className={clsx(
             "font-medium text-xs leading-[1.15] text-center",
-            numSlots > 1 ? "line-clamp-2" : "line-clamp-1"
+            position.height < TITLE_MIN_PX
+              ? "sr-only"
+              : position.height >= 80
+                ? "line-clamp-2"
+                : "line-clamp-1"
           )}
         >
           {title}
         </p>
       </div>
-    </div>
+    </PositionedBlock>
   );
 }
 
@@ -202,12 +182,13 @@ function SessionInfoDisplay({
 export function RealSessionCard(props: {
   eventSlug: string;
   session: Session;
-  numSlots: number;
+  position: Position;
   location: Location;
   guests: Guest[];
   rsvpd: boolean;
 }) {
-  const { eventSlug, session, numSlots, location, guests, rsvpd } = props;
+  const { eventSlug, session, position, location, guests, rsvpd } = props;
+  const { height } = position;
   const { user: currentUser } = useContext(UserContext);
   const { localSessions, updateRsvp, userBusySessions, event } =
     useContext(EventContext);
@@ -293,104 +274,122 @@ export function RealSessionCard(props: {
     localSessions.find((ses) => ses.id === session.id)?.numRsvps ??
     session.numRsvps;
 
+  const showTitle = height >= TITLE_MIN_PX;
+  const hostLines =
+    height >= 150 ? 3 : height >= 100 ? 2 : height >= 56 ? 1 : 0;
+
   return (
-    <Tooltip
-      content={
-        <SessionInfoDisplay
-          session={session}
-          formattedHostNames={formattedHostNames}
-          numRSVPs={numRSVPs}
-          timezone={timezone}
-        />
-      }
-      className={`row-span-${numSlots} my-0.5 overflow-hidden group`}
-      noTap={true}
-    >
-      <div
-        className={clsx(
-          "py-1 px-1 rounded font-roboto h-full min-h-10 flex flex-col relative w-full group border-2",
-          `loc-${location.color}`,
-          lowerOpacity ? "loc-block-dim" : "loc-block"
-        )}
+    <PositionedBlock position={position}>
+      <Tooltip
+        content={
+          <SessionInfoDisplay
+            session={session}
+            formattedHostNames={formattedHostNames}
+            numRSVPs={numRSVPs}
+            timezone={timezone}
+          />
+        }
+        className="h-full overflow-hidden group"
+        noTap={true}
       >
-        <Link
-          {...linkProps}
-          className="cursor-pointer after:content-[''] after:absolute after:inset-0"
+        <div
+          className={clsx(
+            "px-1 rounded font-roboto h-full flex flex-col relative w-full group border-2 overflow-hidden",
+            height >= 40 ? "py-1" : "py-0.5",
+            `loc-${location.color}`,
+            lowerOpacity ? "loc-block-dim" : "loc-block"
+          )}
         >
-          <p
-            className={clsx(
-              "font-medium text-xs leading-[1.15] text-left flex items-start gap-1",
-              numSlots >= 3 ? "line-clamp-2" : "line-clamp-1"
-            )}
+          <Link
+            {...linkProps}
+            className="cursor-pointer after:content-[''] after:absolute after:inset-0"
           >
-            {session.closed && (
-              <LockIcon className="h-3 w-3 flex-shrink-0 mt-0" />
-            )}
-            <span className="flex-1">{session.title}</span>
-          </p>
-        </Link>
-        {numSlots > 1 && (
-          <p
-            className={clsx(
-              "text-[10px] leading-tight text-left",
-              numSlots >= 4
-                ? "line-clamp-3"
-                : numSlots >= 3
-                  ? "line-clamp-2"
-                  : "line-clamp-1"
-            )}
-          >
-            {formattedHostNames}
-          </p>
-        )}
-        <div className="absolute bottom-0 right-0 flex gap-1 items-end z-10">
-          {hostStatus && (
-            <div
-              className="py-[2px] flex items-center"
-              title="You are hosting this session"
+            <p
+              className={clsx(
+                "font-medium text-xs leading-[1.15] text-left flex items-start gap-1",
+                !showTitle
+                  ? "sr-only"
+                  : height >= 100
+                    ? "line-clamp-2"
+                    : "line-clamp-1",
+                // Keeps a one-line block's title clear of the RSVP badge.
+                height < 40 && "pr-10"
+              )}
             >
-              <AcademicCapIcon className="h-3 w-3" />
-            </div>
+              {session.closed && (
+                <LockIcon className="h-3 w-3 flex-shrink-0 mt-0" />
+              )}
+              <span className="flex-1">{session.title}</span>
+            </p>
+          </Link>
+          {hostLines > 0 && (
+            <p
+              className={clsx(
+                "text-[10px] leading-tight text-left",
+                hostLines === 3
+                  ? "line-clamp-3"
+                  : hostLines === 2
+                    ? "line-clamp-2"
+                    : "line-clamp-1"
+              )}
+            >
+              {formattedHostNames}
+            </p>
           )}
           <div
-            className="loc-badge py-[1px] px-1 rounded-tl text-[10px] flex gap-0.5 items-center cursor-pointer hover:opacity-80"
-            onClick={handleRSVP}
+            className={clsx(
+              "absolute bottom-0 right-0 flex gap-1 items-end z-10",
+              !showTitle && "hidden"
+            )}
           >
-            <UserIcon className="h-.5 w-2.5" />
-            {numRSVPs}
-            {session.capacity > 0 && `/${session.capacity}`}
+            {hostStatus && (
+              <div
+                className="py-[2px] flex items-center"
+                title="You are hosting this session"
+              >
+                <AcademicCapIcon className="h-3 w-3" />
+              </div>
+            )}
+            <div
+              className="loc-badge py-[1px] px-1 rounded-tl text-[10px] flex gap-0.5 items-center cursor-pointer hover:opacity-80"
+              onClick={handleRSVP}
+            >
+              <UserIcon className="h-.5 w-2.5" />
+              {numRSVPs}
+              {session.capacity > 0 && `/${session.capacity}`}
+            </div>
           </div>
         </div>
-      </div>
 
-      <CurrentUserModal
-        open={userModalOpen}
-        close={() => setUserModalOpen(false)}
-        guests={guests}
-        hosts={session.hosts.map((h) => h.name)}
-        rsvp={() => void doRsvp()}
-        rsvpd={rsvpd}
-        portal={true}
-      />
+        <CurrentUserModal
+          open={userModalOpen}
+          close={() => setUserModalOpen(false)}
+          guests={guests}
+          hosts={session.hosts.map((h) => h.name)}
+          rsvp={() => void doRsvp()}
+          rsvpd={rsvpd}
+          portal={true}
+        />
 
-      <ConfirmationModal
-        open={confirmRSVPModalOpen}
-        close={() => setConfirmRSVPModalOpen(false)}
-        message={
-          clash
-            ? `This session clashes with ${describeRsvpClash(clash, currentUser)}. Do you want to RSVP anyway?`
-            : ""
-        }
-        confirm={handleConfirmRSVP}
-        portal={true}
-      />
+        <ConfirmationModal
+          open={confirmRSVPModalOpen}
+          close={() => setConfirmRSVPModalOpen(false)}
+          message={
+            clash
+              ? `This session clashes with ${describeRsvpClash(clash, currentUser)}. Do you want to RSVP anyway?`
+              : ""
+          }
+          confirm={handleConfirmRSVP}
+          portal={true}
+        />
 
-      <AlertModal
-        open={rsvpError !== null}
-        close={() => setRsvpError(null)}
-        message={rsvpError ?? ""}
-        portal={true}
-      />
-    </Tooltip>
+        <AlertModal
+          open={rsvpError !== null}
+          close={() => setRsvpError(null)}
+          message={rsvpError ?? ""}
+          portal={true}
+        />
+      </Tooltip>
+    </PositionedBlock>
   );
 }

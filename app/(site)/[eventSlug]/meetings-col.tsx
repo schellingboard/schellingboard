@@ -11,6 +11,7 @@ import { useContext, useState } from "react";
 import type { MeetingView } from "@/utils/meeting-views";
 import { meetingColumnRows } from "@/utils/meeting-column";
 import { shownSlotStart } from "@/utils/meeting-slots";
+import { getNumSlots, SLOT_HEIGHT_PX } from "@/utils/slots";
 import type { DayWithSessions } from "@/app/(site)/context";
 import {
   EventContext,
@@ -30,6 +31,11 @@ import {
 import { meetingStateClasses } from "./meeting-state-classes";
 import { isPlainLeftClick, viewMeetingLinkFromOwner } from "./modal-nav";
 import { NowLine } from "./now-line";
+import {
+  PositionedBlock,
+  TITLE_MIN_PX,
+  type Position,
+} from "./positioned-block";
 import { BookMeeting } from "./book-meeting";
 import { Tooltip } from "./tooltip";
 
@@ -50,16 +56,14 @@ function slotLabel(
  * has begun, so offering it -- even greyed out -- would promise nothing.
  */
 function SlotCell({
-  row,
-  span,
+  position,
   start,
   blocked,
   bookable,
   timezone,
   onBook,
 }: {
-  row: number;
-  span: number;
+  position: Position;
   start: string;
   /** The viewer cleared this slot, so nobody may book *them* into it. */
   blocked: boolean;
@@ -69,34 +73,39 @@ function SlotCell({
 }) {
   const breakMinutes = useBreakMinutes();
   const shape = clsx(
-    `row-span-${span} my-0.5 flex items-center justify-center rounded`,
+    "h-full w-full flex items-center justify-center rounded",
     blocked && "meetings-col-blocked"
   );
 
   if (!bookable) {
-    return <div style={{ gridRowStart: row }} className={shape} />;
+    return (
+      <PositionedBlock position={position}>
+        <div className={shape} />
+      </PositionedBlock>
+    );
   }
 
   return (
-    <button
-      type="button"
-      style={{ gridRowStart: row }}
-      onClick={onBook}
-      // Hatching says who may book *them*; it is no bar to arranging a 1-on-1
-      // there themselves, so the slot stays as bookable as any other.
-      aria-label={
-        blocked
-          ? `Arrange a 1-on-1 at ${slotLabel(start, breakMinutes, timezone)} — you are not offering this slot to others`
-          : `Arrange a 1-on-1 at ${slotLabel(start, breakMinutes, timezone)}`
-      }
-      className={clsx(
-        shape,
-        "border border-dashed border-line-subtle text-fg-faint transition-colors",
-        "hover:border-brand-accent hover:bg-brand-tint hover:text-brand-fg"
-      )}
-    >
-      <PlusIcon className="h-4 w-4" aria-hidden="true" />
-    </button>
+    <PositionedBlock position={position}>
+      <button
+        type="button"
+        onClick={onBook}
+        // Hatching says who may book *them*; it is no bar to arranging a 1-on-1
+        // there themselves, so the slot stays as bookable as any other.
+        aria-label={
+          blocked
+            ? `Arrange a 1-on-1 at ${slotLabel(start, breakMinutes, timezone)} — you are not offering this slot to others`
+            : `Arrange a 1-on-1 at ${slotLabel(start, breakMinutes, timezone)}`
+        }
+        className={clsx(
+          shape,
+          "border border-dashed border-line-subtle text-fg-faint transition-colors",
+          "hover:border-brand-accent hover:bg-brand-tint hover:text-brand-fg"
+        )}
+      >
+        <PlusIcon className="h-4 w-4" aria-hidden="true" />
+      </button>
+    </PositionedBlock>
   );
 }
 
@@ -153,17 +162,23 @@ function SlotSummary({
   );
 }
 
-/** One 1-on-1, alone in its slot: room for the place and the state as well. */
+/**
+ * One 1-on-1, alone in its slot: room for the place and the state as well,
+ * unless the block is short, when a dot marks one waiting on the reader.
+ */
 function MeetingBlock({
   meeting,
-  span,
+  heightPx,
   eventSlug,
+  timezone,
 }: {
   meeting: MeetingView;
-  span: number;
+  heightPx: number;
   eventSlug: string;
+  timezone: string;
 }) {
   const searchParams = useSearchParams();
+  const breakMinutes = useBreakMinutes();
   return (
     <Tooltip
       content={<MeetingSummary meeting={meeting} />}
@@ -173,15 +188,25 @@ function MeetingBlock({
     >
       <Link
         {...viewMeetingLinkFromOwner(searchParams, eventSlug, meeting.id)}
+        aria-label={`${meetingTitle(meeting)} at ${slotLabel(
+          meeting.slotStart,
+          breakMinutes,
+          timezone
+        )} · ${meeting.meetingPoint} — ${blockStatus(meeting)}`}
         className={clsx(
           "flex-1 min-w-0 rounded border-2 px-1 py-0.5 overflow-hidden font-roboto",
           meetingStateClasses(meeting.status)
         )}
       >
-        <p className="font-medium text-xs leading-[1.15] line-clamp-1 text-fg">
-          {meeting.otherName}
-        </p>
-        {span > 1 ? (
+        {heightPx >= TITLE_MIN_PX && (
+          <p className="flex items-center gap-1 font-medium text-xs leading-[1.15] text-fg">
+            <span className="truncate">{meeting.otherName}</span>
+            {heightPx < 38 && needsReply(meeting) && (
+              <span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-warning-fg" />
+            )}
+          </p>
+        )}
+        {heightPx >= 50 ? (
           <>
             <p className="text-[10px] leading-[1.15] line-clamp-1 text-fg-muted">
               {meeting.meetingPoint}
@@ -190,8 +215,8 @@ function MeetingBlock({
               {blockStatus(meeting)}
             </p>
           </>
-        ) : (
-          // One slot fits a name and one more line; the place gives way first,
+        ) : heightPx >= 38 ? (
+          // Room for a name and one more line; the place gives way first,
           // since the state is what may want answering.
           <p className="flex gap-1 text-[10px] leading-[1.15] text-fg-subtle">
             <span className="truncate text-fg-muted">
@@ -199,7 +224,7 @@ function MeetingBlock({
             </span>
             <span className="shrink-0">· {blockStatus(meeting)}</span>
           </p>
-        )}
+        ) : null}
       </Link>
     </Tooltip>
   );
@@ -259,10 +284,12 @@ function StackEntry({
  */
 function SlotBlock({
   meetings,
+  heightPx,
   timezone,
   onOpen,
 }: {
   meetings: MeetingView[];
+  heightPx: number;
   timezone: string;
   onOpen: () => void;
 }) {
@@ -284,12 +311,16 @@ function SlotBlock({
         )} — ${slotSummaryLine(meetings)}`}
         className="flex flex-1 min-w-0 flex-col justify-center overflow-hidden rounded border-2 border-line bg-surface-muted px-1 text-left font-roboto hover:border-brand-accent"
       >
-        <span className="text-xs leading-[1.15] font-semibold text-fg">
-          {meetings.length} 1-on-1s
-        </span>
-        <span className="truncate text-[10px] leading-[1.15] text-fg-subtle">
-          {slotSummaryLine(meetings)}
-        </span>
+        {heightPx >= TITLE_MIN_PX && (
+          <span className="text-xs leading-[1.15] font-semibold text-fg">
+            {meetings.length} 1-on-1s
+          </span>
+        )}
+        {heightPx >= 38 && (
+          <span className="truncate text-[10px] leading-[1.15] text-fg-subtle">
+            {slotSummaryLine(meetings)}
+          </span>
+        )}
       </button>
     </Tooltip>
   );
@@ -374,6 +405,7 @@ export function MeetingsCol({
   onBooked: () => void;
 }) {
   const slotIncrement = useSlotIncrement();
+  const breakMinutes = useBreakMinutes();
   // Never missing here: the column only renders once meetings for this event
   // have been fetched, which takes the event being in context.
   const { event, now } = useContext(EventContext);
@@ -388,20 +420,21 @@ export function MeetingsCol({
     availability,
     day,
     slotIncrement,
+    breakMinutes,
   });
+  const numSlots = getNumSlots(day.start, day.end, slotIncrement);
   const openRow = rows.find(
     (candidate) => candidate.kind === "meetings" && candidate.start === openSlot
   );
 
   return (
-    <div className="relative px-0.5">
-      <div className="grid h-full auto-rows-[44px]">
-        {rows.map(({ row, span, start, kind, display, meetings: atRow }) =>
+    <div className="relative" style={{ height: numSlots * SLOT_HEIGHT_PX }}>
+      {rows.map(
+        ({ row, topPx, heightPx, start, kind, display, meetings: atRow }) =>
           kind !== "meetings" ? (
             <SlotCell
               key={row}
-              row={row}
-              span={span}
+              position={{ top: topPx, height: heightPx }}
               start={start}
               blocked={kind === "unavailable"}
               bookable={new Date(start) > now}
@@ -409,13 +442,11 @@ export function MeetingsCol({
               onBook={() => setBooking(start)}
             />
           ) : (
-            <div
+            <PositionedBlock
               key={row}
-              // Placed by row rather than in document order, so a gap between
-              // two meetings needs no filler blocks.
-              style={{ gridRowStart: row }}
+              position={{ top: topPx, height: heightPx }}
               className={clsx(
-                `row-span-${span} flex gap-0.5 my-0.5`,
+                "flex gap-0.5",
                 // Stacked, never side by side: this column is 96–160px wide.
                 display === "stack" && "flex-col"
               )}
@@ -423,6 +454,7 @@ export function MeetingsCol({
               {display === "summary" ? (
                 <SlotBlock
                   meetings={atRow}
+                  heightPx={heightPx}
                   timezone={timezone}
                   onOpen={() => setOpenSlot(start)}
                 />
@@ -438,14 +470,14 @@ export function MeetingsCol({
               ) : (
                 <MeetingBlock
                   meeting={atRow[0]}
-                  span={span}
+                  heightPx={heightPx}
                   eventSlug={eventSlug}
+                  timezone={timezone}
                 />
               )}
-            </div>
+            </PositionedBlock>
           )
-        )}
-      </div>
+      )}
       {openRow && (
         <SlotMeetings
           meetings={openRow.meetings}

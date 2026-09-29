@@ -1057,8 +1057,8 @@ async function seedTestData(profile: SeedProfile) {
       ...rest,
     }));
 
-  // Two people wanting one slot, and four wanting the next: what the schedule
-  // column stacks, and what it has to collapse into a list. On a guest nothing
+  // Two people wanting one slot, and more wanting the next: what the schedule
+  // column collapses into a block that opens a list. On a guest nothing
   // else seeds, since it gives her a 1-on-1 column on every Gamma day.
   const parallelRows = meetingsOf(PARALLEL_GUEST, [
     {

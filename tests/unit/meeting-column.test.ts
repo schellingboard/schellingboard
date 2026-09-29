@@ -6,6 +6,7 @@ import {
   takesPartInMeetings,
 } from "@/utils/meeting-column";
 import type { MeetingView } from "@/utils/meeting-views";
+import { SLOT_HEIGHT_PX } from "@/utils/slots";
 
 const DAY = {
   start: new Date("2026-10-01T09:00:00.000Z"),
@@ -38,11 +39,49 @@ function meeting(minutesIn: number, patch?: Partial<MeetingView>): MeetingView {
 
 const rows = (
   meetings: MeetingView[],
-  availability: string[]
+  availability: string[],
+  breakMinutes = 0
 ): ReturnType<typeof meetingColumnRows> =>
-  meetingColumnRows({ meetings, availability, day: DAY, slotIncrement: SLOT });
+  meetingColumnRows({
+    meetings,
+    availability,
+    day: DAY,
+    slotIncrement: SLOT,
+    breakMinutes,
+  });
+
+const px = (minutes: number) => Math.round((minutes / SLOT) * SLOT_HEIGHT_PX);
 
 describe("meetingColumnRows", () => {
+  // Lined up with a session in the same slot, which the rooms beside it draw
+  // after the break.
+  it("draws a meeting from its shown start, after the break", () => {
+    const [booked] = rows([meeting(30)], [], 10).filter(
+      (r) => r.kind === "meetings"
+    );
+
+    expect(booked).toMatchObject({ topPx: px(40), heightPx: px(60) - px(40) });
+  });
+
+  it("gives an empty slot its whole height", () => {
+    const [free] = rows([meeting(30)], [], 10);
+
+    expect(free).toMatchObject({ kind: "free", topPx: 0, heightPx: px(30) });
+  });
+
+  it("keeps a meeting no longer than the break on the grid", () => {
+    const [booked] = rows([meeting(0)], [], SLOT);
+
+    expect(booked.heightPx).toBeGreaterThan(0);
+    expect(booked.topPx + booked.heightPx).toBe(px(30));
+  });
+
+  it("stacks only as many as fit below the break", () => {
+    const pair = rows([meeting(0), meeting(0, { id: "second" })], [], 10);
+
+    expect(pair[0].display).toBe("summary");
+  });
+
   it("places a meeting in the row its slot starts", () => {
     const booked = rows([meeting(30)], []).filter((r) => r.kind === "meetings");
 
@@ -150,6 +189,7 @@ describe("meetingColumnRows", () => {
         end: new Date(DAY.start.getTime() + 3 * 3600e3),
       },
       slotIncrement: 60,
+      breakMinutes: 0,
     });
 
     expect(hourly.filter((r) => r.kind === "meetings")).toEqual([
@@ -172,6 +212,7 @@ describe("meetingColumnRows", () => {
         end: new Date(DAY.start.getTime() + 130 * 60e3),
       },
       slotIncrement: SLOT,
+      breakMinutes: 0,
     });
 
     expect(ragged.filter((r) => r.kind === "meetings")).toEqual([
@@ -188,6 +229,7 @@ describe("meetingColumnRows", () => {
       availability: [],
       day: { start: DAY.start, end: new Date(DAY.start.getTime() + 90 * 60e3) },
       slotIncrement: SLOT,
+      breakMinutes: 0,
     });
 
     expect(overhang.filter((r) => r.kind === "meetings")).toEqual([
@@ -219,7 +261,7 @@ describe("meetingColumnRows", () => {
   it("leaves each slot the viewer is not open for bookable on its own", () => {
     const declared = rows([], [at(0), at(90)]);
 
-    expect(declared).toEqual([
+    expect(declared).toMatchObject([
       { row: 1, span: 1, start: at(0), kind: "free", meetings: [] },
       { row: 2, span: 1, start: at(30), kind: "unavailable", meetings: [] },
       { row: 3, span: 1, start: at(60), kind: "unavailable", meetings: [] },

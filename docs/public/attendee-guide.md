@@ -321,15 +321,16 @@ before its slot begins simply lapses; nothing is held against you.
 ### Your 1-on-1s on the schedule
 
 Once the event reaches its scheduling phase, your 1-on-1s get the **first
-column of the schedule grid**, before the rooms: the other person's name, where
-you agreed to meet, and whether it is confirmed, waiting for your reply, or
-waiting for theirs. Each sits in its own time slot, next to whatever it would
-clash with.
+column of the schedule grid**, before the rooms: the other person's name and,
+where the block has room, where you agreed to meet and whether it is
+confirmed, waiting for your reply, or waiting for theirs. A block too short for
+that marks one waiting for your reply with a dot. Each sits in its own time
+slot, next to whatever it would clash with.
 
 More than one can share a slot — an agreed 1-on-1 and someone asking for the
-same time is ordinary. They sit one above the other, and where there are more
-of them than the slot has room to name, the block says how many there are and
-opens the list of them instead.
+same time is ordinary. Where the slot has room to name them all they sit one
+above the other; otherwise the block says how many there are and opens the
+list of them instead.
 
 The **Text** view lists them too, in among the sessions by time, with the same
 name, place and state. **RSVP'd** lists only the confirmed ones.

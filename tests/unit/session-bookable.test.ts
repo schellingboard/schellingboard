@@ -2,9 +2,7 @@ import { describe, it, expect } from "vitest";
 import { isBookableSlot } from "@/utils/session-bookable";
 
 const baseParams = {
-  isBlank: true,
   locationBookable: true,
-  blocker: false,
   startTime: new Date("2026-07-11T10:00:00Z").getTime(),
   now: new Date("2026-07-11T09:00:00Z").getTime(),
   startBookings: new Date("2026-07-11T00:00:00Z").getTime(),
@@ -12,7 +10,7 @@ const baseParams = {
 };
 
 describe("isBookableSlot", () => {
-  it("is bookable when the slot is blank, in a bookable location, and in the future", () => {
+  it("is bookable when the slot is in a bookable location, and in the future", () => {
     expect(isBookableSlot(baseParams)).toBe(true);
   });
 
@@ -22,18 +20,10 @@ describe("isBookableSlot", () => {
     ).toBe(false);
   });
 
-  it("is not bookable when the slot has a title", () => {
-    expect(isBookableSlot({ ...baseParams, isBlank: false })).toBe(false);
-  });
-
   it("is not bookable when the location isn't bookable", () => {
     expect(isBookableSlot({ ...baseParams, locationBookable: false })).toBe(
       false
     );
-  });
-
-  it("is not bookable when the slot is a blocker", () => {
-    expect(isBookableSlot({ ...baseParams, blocker: true })).toBe(false);
   });
 
   it("is not bookable before the day's booking window opens", () => {

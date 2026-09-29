@@ -282,9 +282,10 @@ test.describe("1-on-1 meetings", () => {
 
     // The column behind it is already showing the request, without a reload.
     await expect(
-      page.getByRole("link", { name: new RegExp(askee) })
+      page.getByRole("link", {
+        name: new RegExp(`${askee} at 09:10 · .* — waiting for reply`),
+      })
     ).toBeVisible();
-    await expect(page.getByText("waiting for reply").first()).toBeVisible();
     await page.waitForLoadState("networkidle");
   });
 
@@ -394,9 +395,11 @@ test.describe("1-on-1 meetings", () => {
     // the navigation that follows it (see leaveForAttendees).
     await leaveForAttendees(page);
     await page.getByRole("link", { name: eventName }).click();
-    const column = page.getByRole("link", { name: new RegExp(asker) });
-    await expect(column).toBeVisible();
-    await expect(page.getByText("Coffee bar").first()).toBeVisible();
+    await expect(
+      page.getByRole("link", {
+        name: new RegExp(`${asker} at .* · Coffee bar — confirmed`),
+      })
+    ).toBeVisible();
 
     // And the asker hears back, then asks for the day's other slot.
     await leaveForAttendees(page);

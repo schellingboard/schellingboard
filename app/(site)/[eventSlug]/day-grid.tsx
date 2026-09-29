@@ -189,8 +189,8 @@ export function DayGrid(props: {
         </>
       )}
 
-      {/* Row 4 — body. The time gutter sticks to the left; each location renders
-          its session blocks in a matching 44px-row grid so the times line up. */}
+      {/* Row 4 — body. The time gutter sticks to the left; every column places
+          its blocks in pixels on the same 44px-per-slot scale. */}
       <div
         className={clsx(
           "sticky left-0 z-20 grid bg-surface border-r border-line-subtle",

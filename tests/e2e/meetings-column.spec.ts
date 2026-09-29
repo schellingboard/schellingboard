@@ -16,59 +16,41 @@ import { selectUser } from "./helpers/user";
  */
 const VIEWER = "Zanele Khumalo";
 const AT_TEN = ["Leilani Kahale", "Samuel Adeyemi"];
-const AT_ELEVEN = ["Marta Horvat", "Dmitri Volkov", "Chiara Bianchi"];
 
 test.describe("parallel 1-on-1s on the schedule", () => {
-  test("stacks what fits the slot and collapses what does not", async ({
+  test("gathers a slot's 1-on-1s into one block that lists them", async ({
     page,
   }) => {
     await loginAndGoto(page, "/guests");
     await selectUser(page, VIEWER);
     await page.getByRole("link", { name: "Conference Gamma" }).first().click();
 
-    // Two in a slot: both readable at full column width, one above the other
-    // rather than in half-width slivers.
-    const [confirmed, waiting] = AT_TEN.map((name) =>
-      page.getByRole("link", { name: new RegExp(`${name} at 10:10`) })
-    );
-    await expect(confirmed).toBeVisible();
-    await expect(waiting).toBeVisible();
-    const confirmedBox = (await confirmed.boundingBox())!;
-    const waitingBox = (await waiting.boundingBox())!;
-    expect(waitingBox.width).toBe(confirmedBox.width);
-    expect(waitingBox.y).toBeGreaterThanOrEqual(
-      confirmedBox.y + confirmedBox.height
-    );
+    const pair = page.getByRole("button", {
+      name: "2 1-on-1s, 10:10 – 10:30 — 1 needs your reply",
+    });
+    await expect(pair).toBeVisible();
+    await expect(
+      page.getByRole("button", {
+        name: "3 1-on-1s, 11:10 – 11:30 — 3 need your reply",
+      })
+    ).toBeVisible();
 
-    // And each opens its own 1-on-1, the request among them still answerable.
-    await waiting.click();
+    // Each in the list opens its own 1-on-1, the request still answerable.
+    await pair.click();
+    const slotList = page.getByRole("dialog", {
+      name: /2 1-on-1s, 10:10 – 10:30/,
+    });
+    for (const name of AT_TEN) {
+      await expect(
+        slotList.getByRole("link", { name: new RegExp(name) })
+      ).toBeVisible();
+    }
+    await slotList.getByRole("link", { name: new RegExp(AT_TEN[1]) }).click();
     const details = page.getByRole("dialog", { name: "1-on-1 details" });
     await expect(
       details.getByRole("heading", { name: `1-on-1 with ${AT_TEN[1]}` })
     ).toBeVisible();
     await expect(details.getByRole("button", { name: "Accept" })).toBeVisible();
-    await page.keyboard.press("Escape");
-    await expect(details).toBeHidden();
-
-    // Three in a slot no longer fit, so the block stands for the slot itself
-    // and opens the list.
-    const crowded = page.getByRole("button", {
-      name: "3 1-on-1s, 11:10 – 11:30 — 3 need your reply",
-    });
-    await expect(crowded).toBeVisible();
-    await crowded.click();
-
-    const slotList = page.getByRole("dialog", {
-      name: /3 1-on-1s, 11:10 – 11:30/,
-    });
-    const listed = AT_ELEVEN.map((name) =>
-      slotList.getByRole("link", { name: new RegExp(name) })
-    );
-    for (const row of listed) await expect(row).toBeVisible();
-    await listed[1].click();
-    await expect(
-      details.getByRole("heading", { name: `1-on-1 with ${AT_ELEVEN[1]}` })
-    ).toBeVisible();
   });
 });
 

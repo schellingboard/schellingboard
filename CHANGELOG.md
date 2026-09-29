@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Sessions and 1-on-1s sit on the schedule where they really start**: one in the 9:00
+  slot now starts at 9:10 on the grid, after the break, instead of looking as if it began at 9:00.
 - **Every search box searches as you type**: the attendee directory and the organizer lists
   no longer wait for a press of Search, just like the session and proposal searches.
 - **A room's whereabouts and capacity show behind its name**: tapping or hovering a room name on

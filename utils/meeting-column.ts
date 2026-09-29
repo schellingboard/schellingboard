@@ -1,4 +1,5 @@
-import { getNumSlots, SLOT_HEIGHT_PX } from "@/utils/slots";
+import { shownSlotStart } from "@/utils/meeting-slots";
+import { getNumSlots, gridBlockPx } from "@/utils/slots";
 import type { MeetingView } from "@/utils/meeting-views";
 
 const LIVE = new Set<MeetingView["status"]>(["pending", "accepted"]);
@@ -52,11 +53,11 @@ export type MeetingBlockDisplay = "single" | "stack" | "summary";
 /** Least height a stacked entry stays legible in, and the gap below it. */
 const ENTRY_PX = 18;
 const ENTRY_GAP_PX = 2;
-/** The block's own vertical margin (my-0.5), top and bottom. */
+/** The block's own vertical padding (py-0.5), top and bottom. */
 const BLOCK_INSET_PX = 4;
 
-function stackCapacity(span: number): number {
-  const height = span * SLOT_HEIGHT_PX - BLOCK_INSET_PX;
+function stackCapacity(heightPx: number): number {
+  const height = heightPx - BLOCK_INSET_PX;
   return Math.max(
     1,
     Math.floor((height + ENTRY_GAP_PX) / (ENTRY_PX + ENTRY_GAP_PX))
@@ -71,6 +72,8 @@ export type MeetingColumnRow = {
   /** 1-based, matching CSS grid's own row numbering. */
   row: number;
   span: number;
+  topPx: number;
+  heightPx: number;
   /** The slot's start as an ISO string, which is how a booking names it. */
   start: string;
   kind: "meetings" | "unavailable" | "free";
@@ -91,6 +94,7 @@ export function meetingColumnRows({
   availability,
   day,
   slotIncrement,
+  breakMinutes,
 }: {
   /** The viewer's meetings for this day, already filtered to what it shows. */
   meetings: MeetingView[];
@@ -98,6 +102,7 @@ export function meetingColumnRows({
   availability: string[];
   day: { start: Date; end: Date };
   slotIncrement: number;
+  breakMinutes: number;
 }): MeetingColumnRow[] {
   const slotMs = slotIncrement * 60 * 1000;
   const numSlots = getNumSlots(day.start, day.end, slotIncrement);
@@ -154,22 +159,28 @@ export function meetingColumnRows({
 
   const rows: MeetingColumnRow[] = [];
   for (let row = 1; row <= numSlots; row++) {
-    const start = new Date(
-      day.start.getTime() + (row - 1) * slotMs
-    ).toISOString();
+    const rowStart = new Date(day.start.getTime() + (row - 1) * slotMs);
+    const start = rowStart.toISOString();
     const block = byRow.get(row);
     if (block) {
       const span = block.end - block.row;
+      const position = gridBlockPx(
+        day.start,
+        shownSlotStart(rowStart, breakMinutes),
+        new Date(rowStart.getTime() + span * slotMs),
+        slotIncrement
+      );
       rows.push({
         row,
         span,
+        ...position,
         start,
         kind: "meetings",
         meetings: block.meetings,
         display:
           block.meetings.length === 1
             ? "single"
-            : block.meetings.length <= stackCapacity(span)
+            : block.meetings.length <= stackCapacity(position.heightPx)
               ? "stack"
               : "summary",
       });
@@ -177,12 +188,21 @@ export function meetingColumnRows({
     }
     if (covered.has(row)) continue;
 
+    const position = gridBlockPx(
+      day.start,
+      rowStart,
+      new Date(rowStart.getTime() + slotMs),
+      slotIncrement
+    );
     const free = !declaredAnything || declared.has(start);
-    if (free) {
-      rows.push({ row, span: 1, start, kind: "free", meetings: [] });
-      continue;
-    }
-    rows.push({ row, span: 1, start, kind: "unavailable", meetings: [] });
+    rows.push({
+      row,
+      span: 1,
+      ...position,
+      start,
+      kind: free ? "free" : "unavailable",
+      meetings: [],
+    });
   }
 
   // Nothing declared and nothing booked is not a column at all; the caller
