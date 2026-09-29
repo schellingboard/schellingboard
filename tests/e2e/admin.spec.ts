@@ -258,7 +258,6 @@ test.describe("Admin UI", () => {
     await users
       .getByRole("searchbox", { name: "Search", exact: true })
       .fill(newEmail);
-    await users.getByRole("button", { name: "Search", exact: true }).click();
     const row = users.getByRole("listitem").filter({ hasText: newEmail });
     await expect(row.getByText(newName)).toBeVisible();
     await expect(
@@ -297,7 +296,6 @@ test.describe("Admin UI", () => {
     await users
       .getByRole("searchbox", { name: "Search", exact: true })
       .fill("Broken Row");
-    await users.getByRole("button", { name: "Search", exact: true }).click();
     await expect(users.getByText("No users match.")).toBeVisible();
   });
 
@@ -321,7 +319,6 @@ test.describe("Admin UI", () => {
     await users
       .getByRole("searchbox", { name: "Search", exact: true })
       .fill("Alice");
-    await users.getByRole("button", { name: "Search", exact: true }).click();
     await expect(page).toHaveURL(/[?&]q=Alice/);
     await expect(userItem("Alice Test")).toBeVisible();
     await expect(userItem("Bob Test")).toHaveCount(0);
@@ -336,7 +333,6 @@ test.describe("Admin UI", () => {
     await users
       .getByRole("searchbox", { name: "Search", exact: true })
       .fill("bob@test.com");
-    await users.getByRole("button", { name: "Search", exact: true }).click();
     await expect(userItem("Bob Test")).toBeVisible();
     await expect(userItem("Alice Test")).toHaveCount(0);
 
@@ -345,7 +341,6 @@ test.describe("Admin UI", () => {
     await users
       .getByRole("searchbox", { name: "Search", exact: true })
       .fill("   ");
-    await users.getByRole("button", { name: "Search", exact: true }).click();
     await expect(userItem("Alice Test")).toBeVisible();
     await expect(page).not.toHaveURL(/[?&]q=/);
 
@@ -895,8 +890,11 @@ test.describe("Admin UI guest assignment", () => {
     // Server-side search narrows the result set; the URL carries the query.
     await guests
       .getByRole("searchbox", { name: "Search", exact: true })
+      .fill("Ali");
+    await expect(page).toHaveURL(/[?&]q=Ali(&|$)/);
+    await guests
+      .getByRole("searchbox", { name: "Search", exact: true })
       .fill("Alice");
-    await guests.getByRole("button", { name: "Search", exact: true }).click();
     await expect(page).toHaveURL(/[?&]q=Alice/);
     await expect(dataRows()).toHaveCount(1);
     await expect(dataRows().first()).toContainText("Alice Test");
@@ -908,8 +906,8 @@ test.describe("Admin UI guest assignment", () => {
       guests.getByRole("button", { name: "Next page" })
     ).toBeDisabled();
 
-    // Browser back drops the query — the search input must follow the URL
-    // (the table state is URL-driven), not keep showing the stale query.
+    // Browser back drops the whole query, not just the refinement — and the
+    // search input must follow the URL, not keep showing the stale query.
     await page.goBack();
     await expect(page).not.toHaveURL(/[?&]q=/);
     await expect(
@@ -1167,9 +1165,6 @@ test.describe("Admin UI proposals", () => {
     await proposals
       .getByRole("searchbox", { name: "Search", exact: true })
       .fill("Community Showcase");
-    await proposals
-      .getByRole("button", { name: "Search", exact: true })
-      .click();
     await expect(page).toHaveURL(/[?&]q=/);
     await expect(proposals.getByRole("listitem")).toHaveCount(1);
     await expect(row).toBeVisible();
@@ -1178,9 +1173,6 @@ test.describe("Admin UI proposals", () => {
     await proposals
       .getByRole("searchbox", { name: "Search", exact: true })
       .fill("Alice Test");
-    await proposals
-      .getByRole("button", { name: "Search", exact: true })
-      .click();
     await expect(row).toBeVisible();
     await expect(
       proposals
@@ -1342,7 +1334,6 @@ test.describe("Admin UI sessions", () => {
     await sessions
       .getByRole("searchbox", { name: "Search", exact: true })
       .fill("Opening Keynote");
-    await sessions.getByRole("button", { name: "Search", exact: true }).click();
     await expect(page).toHaveURL(/[?&]q=/);
     await expect(sessions.getByRole("listitem")).toHaveCount(1);
     await expect(row).toBeVisible();
@@ -1351,7 +1342,6 @@ test.describe("Admin UI sessions", () => {
     await sessions
       .getByRole("searchbox", { name: "Search", exact: true })
       .fill("Charlie Test");
-    await sessions.getByRole("button", { name: "Search", exact: true }).click();
     await expect(row).toBeVisible();
     await expect(
       sessions.getByRole("listitem").filter({ hasText: "Lunch Break" })
@@ -1454,7 +1444,6 @@ test.describe("Admin UI sessions", () => {
     await sessions
       .getByRole("searchbox", { name: "Search", exact: true })
       .fill(title);
-    await sessions.getByRole("button", { name: "Search", exact: true }).click();
     await expect(sessions.getByRole("listitem")).toHaveCount(1);
     const row = sessions.getByRole("listitem").filter({ hasText: title });
     await expect(row).toBeVisible();

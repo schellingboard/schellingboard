@@ -168,7 +168,6 @@ test("opens a comment author's profile from the profile it was left on", async (
   await actAs(page, "Linh Nguyen");
 
   await page.getByLabel("Search", { exact: true }).fill("Dubois");
-  await page.getByRole("button", { name: "Search", exact: true }).click();
   await expect(page).toHaveURL(/[?&]q=Dubois/);
 
   const profile = await openProfile(page, "Jean-Pierre Dubois");

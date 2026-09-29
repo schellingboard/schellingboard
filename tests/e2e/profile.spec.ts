@@ -317,7 +317,6 @@ test.describe("Edit profile", () => {
     expect(await page.content()).not.toContain("alice@test.com");
 
     await page.getByLabel("Search", { exact: true }).fill("Italian");
-    await page.getByRole("button", { name: "Search", exact: true }).click();
     await expect(page.getByRole("link", { name: /Alice Test/ })).toBeVisible();
     await expect(page.getByRole("link", { name: /Bob Test/ })).toHaveCount(0);
   });
@@ -557,7 +556,6 @@ test("searches, filters and sorts without going back to the server", async ({
 
   // Only Olga is based there, and no editing test writes that city.
   await page.getByLabel("Search", { exact: true }).fill("Novosibirsk");
-  await page.getByRole("button", { name: "Search", exact: true }).click();
   await expect(page.getByRole("link", { name: "Olga Petrova" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Ahmad Karimi" })).toHaveCount(0);
 
@@ -607,7 +605,6 @@ test("sorts the attendee directory by recently updated", async ({ page }) => {
   // A search is ranked by relevance, so sorting is off the table while one is
   // active.
   await page.getByLabel("Search", { exact: true }).fill("Alice");
-  await page.getByRole("button", { name: "Search", exact: true }).click();
   await expect(page).toHaveURL(/[?&]q=Alice/);
   await expect(page.getByLabel("Sort by")).toBeDisabled();
 });

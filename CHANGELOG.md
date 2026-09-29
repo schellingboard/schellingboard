@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Every search box searches as you type**: the attendee directory and the organizer lists
+  no longer wait for a press of Search, just like the session and proposal searches.
 - **A room's whereabouts and capacity show behind its name**: tapping or hovering a room name on
   the schedule now also tells where the room is and how many fit, not just at the top of the grid.
 - **The "Open to 1-on-1s" filter only shows when 1-on-1s are on**: the attendee directory hides

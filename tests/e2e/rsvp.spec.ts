@@ -176,9 +176,6 @@ test("a full session blocks further RSVPs when the event enforces capacity", asy
     .click();
   const sessionsRegion = page.getByRole("region", { name: "Sessions" });
   await sessionsRegion.getByRole("searchbox").fill(sessionTitle);
-  await sessionsRegion
-    .getByRole("button", { name: "Search", exact: true })
-    .click();
   // Wait for the single-result list to commit before clicking Edit. The list is
   // sorted by title, so unfiltered the new session sits near the bottom and the
   // matching row jumps to the top when the search commits. A click whose

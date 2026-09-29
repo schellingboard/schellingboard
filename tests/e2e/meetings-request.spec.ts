@@ -35,6 +35,14 @@ async function adminLogin(page: Page) {
   await expect(page).toHaveURL(/\/admin\/events$/);
 }
 
+// The list searches as you type; a row clicked before the results land is
+// wherever the list shifts it to by the time the click arrives.
+async function expectSearched(page: Page, query: string) {
+  await expect
+    .poll(() => new URL(page.url()).searchParams.get("q"))
+    .toBe(query);
+}
+
 async function createGuests(page: Page, names: string[]) {
   await adminLogin(page);
   await page.goto("/admin/users");
@@ -114,6 +122,7 @@ async function meetingsEvent(page: Page, eventName: string, names: string[]) {
   for (const name of names) {
     // The list is paginated, and a just-created guest is rarely on page one.
     await guests.getByPlaceholder("Search name or email…").fill(name);
+    await expectSearched(page, name);
     const assign = guests
       .getByRole("row")
       .filter({ hasText: name })
@@ -157,6 +166,7 @@ async function openProfile(page: Page, name: string) {
     .getByPlaceholder(/search/i)
     .first()
     .fill(name);
+  await expectSearched(page, name);
   await page
     .getByRole("link", { name: new RegExp(name) })
     .first()
@@ -194,6 +204,7 @@ test.describe("1-on-1 meetings", () => {
       await page.goto("/admin/users");
       // The table is paginated, so a guest created mid-run is rarely on page one.
       await page.getByPlaceholder("Search name or email…").fill(name);
+      await expectSearched(page, name);
       const row = page.getByRole("listitem").filter({ hasText: name });
       await row.getByRole("button", { name: "Delete" }).click();
       await row.getByRole("button", { name: "Confirm delete" }).click();

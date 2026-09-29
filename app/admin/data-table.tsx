@@ -1,8 +1,15 @@
 "use client";
 
-import { type ReactNode, useCallback, useState } from "react";
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { SearchInput } from "@/app/search-input";
+import { SEARCH_DEBOUNCE_MS } from "@/utils/hooks";
 
 export type Column<T> = {
   header: ReactNode;
@@ -41,7 +48,10 @@ export function useTableParams({ shallow = false } = {}) {
   const searchParams = useSearchParams();
 
   const setParams = useCallback(
-    (updates: Record<string, string | null>) => {
+    (
+      updates: Record<string, string | null>,
+      { replace = false }: { replace?: boolean } = {}
+    ) => {
       const next = new URLSearchParams(searchParams.toString());
       for (const [key, value] of Object.entries(updates)) {
         if (value === null || value === "") next.delete(key);
@@ -49,7 +59,10 @@ export function useTableParams({ shallow = false } = {}) {
       }
       const qs = next.toString();
       const url = qs ? `${pathname}?${qs}` : pathname;
-      if (shallow) window.history.pushState(null, "", url);
+      if (shallow) {
+        if (replace) window.history.replaceState(null, "", url);
+        else window.history.pushState(null, "", url);
+      } else if (replace) router.replace(url);
       else router.push(url);
     },
     [router, pathname, searchParams, shallow]
@@ -123,34 +136,62 @@ function SearchForm({
   placeholder: string;
   onSearch: (query: string) => void;
 }) {
+  const pathname = usePathname();
   const [draft, setDraft] = useState(query);
+  const [sent, setSent] = useState(query);
+  const [seenQuery, setSeenQuery] = useState(query);
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(timer.current), []);
+
+  // Only back/forward moves the query under the box; replacing the draft when
+  // one of its own searches lands would eat whatever was typed meanwhile.
+  if (query !== seenQuery) {
+    setSeenQuery(query);
+    if (query !== sent) {
+      setDraft(query);
+      setSent(query);
+    }
+  }
+
+  const search = (value: string) => {
+    clearTimeout(timer.current);
+    // Server pages trim the query, so a whitespace-only value means "no
+    // search" — keep it out of the URL to match what the server renders.
+    const trimmed = value.trim();
+    if (trimmed === sent) return;
+    setSent(trimmed);
+    onSearch(trimmed);
+  };
+
   return (
     <form
       onSubmit={(event) => {
         event.preventDefault();
-        onSearch(draft);
+        search(draft);
       }}
       role="search"
-      className="flex gap-2"
     >
       <SearchInput
         name="q"
         value={draft}
-        onChange={(event) => setDraft(event.target.value)}
+        onChange={(event) => {
+          const value = event.target.value;
+          setDraft(value);
+          clearTimeout(timer.current);
+          timer.current = setTimeout(() => {
+            // A result clicked before the pause ended has left the list (the
+            // directory keeps it mounted under the profile); stay there.
+            if (window.location.pathname === pathname) search(value);
+          }, SEARCH_DEBOUNCE_MS);
+        }}
         onClear={() => {
           setDraft("");
-          if (query) onSearch("");
+          search("");
         }}
         placeholder={placeholder}
         aria-label="Search"
         inputClassName="px-3 py-1.5 text-sm rounded-md border border-line focus:border-line-strong focus:outline-none"
       />
-      <button
-        type="submit"
-        className="px-3 py-1.5 text-sm rounded-md border border-line bg-surface-raised text-fg-muted hover:bg-surface-sunken"
-      >
-        Search
-      </button>
     </form>
   );
 }
@@ -228,16 +269,15 @@ export function DataTable<T>({
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
         <SearchForm
-          // The table state is URL-driven; remount the form when the active
-          // query changes (e.g. browser back/forward) so it never shows a
-          // stale query.
-          key={searchQuery}
           query={searchQuery}
           placeholder={searchPlaceholder}
-          // Server pages trim the query, so a whitespace-only value means "no
-          // search" — keep it out of the URL to match what the server renders.
+          // Starting a search is a step Back can undo; refining it replaces
+          // that step, or Back would unwind the query a few letters at a time.
           onSearch={(query) =>
-            setParams({ q: query.trim() || null, page: null })
+            setParams(
+              { q: query || null, page: null },
+              { replace: searchQuery !== "" && query !== "" }
+            )
           }
         />
         {toolbar}

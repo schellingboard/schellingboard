@@ -11,7 +11,6 @@ import { swipe } from "./helpers/touch";
  */
 async function searchForTestGuests(page: Page) {
   await page.getByLabel("Search", { exact: true }).fill("Test");
-  await page.getByRole("button", { name: "Search", exact: true }).click();
   await expect(page).toHaveURL(/[?&]q=Test/);
 }
 
