@@ -11,6 +11,7 @@ import { useState, useContext, useRef } from "react";
 import { EventContext, useSlotIncrement } from "../context";
 import { getDefaultFoldedDayIds } from "@/utils/schedule-fold";
 import { getNowOffsetPx } from "@/utils/slots";
+import { useDebouncedSearch } from "@/utils/hooks";
 import { KioskController, useKioskMode } from "./kiosk";
 import { SessionModal } from "./session-modal";
 import { MeetingModalFromUrl } from "./meeting-modal";
@@ -29,6 +30,7 @@ export function EventDisplay() {
   const viewSession = searchParams.get("viewSession");
   const kiosk = useKioskMode();
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedSearch(search);
   const [unfoldedDayIds, setUnfoldedDayIds] = useState<Set<string>>(
     () => new Set()
   );
@@ -188,7 +190,7 @@ export function EventDisplay() {
               {!isFolded(day.id) && (
                 <DayText
                   day={day}
-                  search={search}
+                  search={debouncedSearch}
                   locations={locationsForEvent}
                   rsvps={rsvps}
                   rsvpOnly={view === "rsvp"}

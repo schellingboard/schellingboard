@@ -25,6 +25,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **Searching sessions and proposals keeps up with typing**: the results now update once you
+  pause, instead of after every keystroke, which could make typing stutter on large events.
 - **1-on-1s start after the break, like sessions** (#1049): a 1-on-1 in the 12:00 slot now
   reads 12:10 wherever it is shown, and sits with that slot's sessions on the agenda instead
   of ten minutes ahead of them.

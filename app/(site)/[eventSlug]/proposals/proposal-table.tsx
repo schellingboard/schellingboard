@@ -24,7 +24,7 @@ import {
   inProposalPhase,
 } from "@/app/(site)/utils/events";
 import type { Event } from "@/db/repositories/interfaces";
-import { useLocalZone } from "@/utils/hooks";
+import { useDebouncedSearch, useLocalZone } from "@/utils/hooks";
 import { formatDuration, durationMinusBreak } from "@/utils/utils";
 
 import { VotingButtons } from "./voting-buttons";
@@ -68,6 +68,7 @@ export function ProposalTable({
     [paramProposals]
   );
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedQuery = useDebouncedSearch(searchQuery);
   const [page, setPage] = useState(1);
   const [resultFilter, setResultFilter] = useState<Filter>(undefined);
   const [sortConfig, setSortConfig] = useState<SortConfig>(
@@ -130,7 +131,7 @@ export function ProposalTable({
       oldFilter === newFilter ? undefined : newFilter
     );
   }
-  const isSearching = searchQuery.trim() !== "";
+  const isSearching = debouncedQuery.trim() !== "";
   // Indexing every proposal costs more than a search does, so the index is
   // built only once a search is under way — the boolean, not the query,
   // is the dependency, so typing reuses it. Voting rebuilds it, since
@@ -170,7 +171,7 @@ export function ProposalTable({
   const searchResults = useMemo(() => {
     // A search is ordered by relevance; an explicit sort would throw that away.
     if (fuse) {
-      return fuse.search(searchQuery).map((res) => res.item);
+      return fuse.search(debouncedQuery).map((res) => res.item);
     }
     // Copy: filteredProposals is memoized, so sorting it in place would leave
     // the cached value reordered for every later reader.
@@ -220,7 +221,14 @@ export function ProposalTable({
       return direction === "asc" ? cmp : -cmp;
     });
     return sorted;
-  }, [fuse, searchQuery, filteredProposals, sortConfig, currentUserId, votes]);
+  }, [
+    fuse,
+    debouncedQuery,
+    filteredProposals,
+    sortConfig,
+    currentUserId,
+    votes,
+  ]);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
