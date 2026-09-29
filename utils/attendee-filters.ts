@@ -10,19 +10,27 @@ export const ATTENDEE_FILTERS = [
 
 export type AttendeeFilter = (typeof ATTENDEE_FILTERS)[number]["value"];
 
+export function availableAttendeeFilters(meetingsEnabled: boolean) {
+  return ATTENDEE_FILTERS.filter(
+    (f) => meetingsEnabled || f.value !== "openToMeetings"
+  );
+}
+
 // Canonical order, so the same view is always the same URL however the toggles
 // were clicked.
 const VALUES: readonly AttendeeFilter[] = ATTENDEE_FILTERS.map((f) => f.value);
 
 /**
- * Active filters from the `filter` param. Unknown values are dropped rather
- * than rejected — a hand-edited or outdated URL should still show a list.
+ * Active filters from the `filter` param. Unknown or unavailable values are
+ * dropped rather than rejected — a hand-edited or outdated URL should still
+ * show a list.
  */
 export function parseAttendeeFilters(
-  param: string | undefined
+  param: string | undefined,
+  available: readonly { value: AttendeeFilter }[] = ATTENDEE_FILTERS
 ): AttendeeFilter[] {
   const requested = new Set((param ?? "").split(","));
-  return VALUES.filter((value) => requested.has(value));
+  return available.map((f) => f.value).filter((value) => requested.has(value));
 }
 
 /** The `filter` param for a set of filters; null when none are active. */

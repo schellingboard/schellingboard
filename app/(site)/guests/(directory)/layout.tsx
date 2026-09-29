@@ -21,7 +21,11 @@ export default async function AttendeeDirectoryLayout({
   // public profile fields only — `Attendee` has no `info`, so no email can
   // reach the client payload this way.
   const now = await serverNow();
-  const attendees = await getRepositories().guests.listAttendees(now);
+  const repos = getRepositories();
+  const [attendees, events] = await Promise.all([
+    repos.guests.listAttendees(now),
+    repos.events.list(),
+  ]);
   const cookieStore = await cookies();
   const currentUser = await verifiedCurrentUser(cookieStore);
 
@@ -32,6 +36,7 @@ export default async function AttendeeDirectoryLayout({
         now={now}
         currentUserId={currentUser}
         randomSeed={newSortSeed()}
+        meetingsEnabled={events.some((e) => e.meetingsEnabled)}
       />
       {children}
     </>

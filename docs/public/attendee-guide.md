@@ -377,7 +377,8 @@ opening anything.
 
 - **Filters** narrow the list to session hosts, to people who have filled in a
   profile, or to anyone **open to 1-on-1s** — anyone with slots still to come,
-  at any event on the site rather than only this one.
+  at any event on the site rather than only this one. The 1-on-1 filter only
+  appears while at least one event has 1-on-1s turned on.
 - **Search covers everything on a profile**: names, pronouns, bios, languages,
   where someone is based, prompts and answers, and any contact details they
   published. A remembered handle, a service name like "Signal", or a shared

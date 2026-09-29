@@ -19,13 +19,15 @@ export function AttendeeDirectory({
   now,
   currentUserId,
   randomSeed,
+  meetingsEnabled,
 }: {
   attendees: Attendee[];
   now: Date;
   currentUserId: string | null;
   randomSeed: string;
+  meetingsEnabled: boolean;
 }) {
-  const view = useDirectoryView(attendees, now, randomSeed);
+  const view = useDirectoryView(attendees, now, randomSeed, meetingsEnabled);
   const openGuestId = guestIdFromPath(usePathname());
 
   // Wider than the max-w-2xl pages around it: the rows carry a name, a badge

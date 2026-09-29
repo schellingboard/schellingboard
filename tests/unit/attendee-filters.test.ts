@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 
 import {
+  availableAttendeeFilters,
   parseAttendeeFilters,
   serializeAttendeeFilters,
 } from "@/utils/attendee-filters";
@@ -28,5 +29,21 @@ describe("attendee filters", () => {
       "isHost,hasProfile"
     );
     expect(serializeAttendeeFilters([])).toBe(null);
+  });
+
+  it("offers the 1-on-1 filter only while some event has 1-on-1s on", () => {
+    const values = (on: boolean) =>
+      availableAttendeeFilters(on).map((f) => f.value);
+    expect(values(true)).toContain("openToMeetings");
+    expect(values(false)).not.toContain("openToMeetings");
+  });
+
+  it("ignores a filter the directory does not offer", () => {
+    expect(
+      parseAttendeeFilters(
+        "isHost,openToMeetings",
+        availableAttendeeFilters(false)
+      )
+    ).toEqual(["isHost"]);
   });
 });

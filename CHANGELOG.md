@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **The "Open to 1-on-1s" filter only shows when 1-on-1s are on**: the attendee directory hides
+  it unless at least one event has 1-on-1s enabled.
 - **Confirmed 1-on-1s carry the agenda's booked mark** (#1047): the same check as on a session
   you have RSVP'd to, so everything you are booked into is marked alike.
 - **A tidier site password page**: just the password box and the footer, on one screen. It used

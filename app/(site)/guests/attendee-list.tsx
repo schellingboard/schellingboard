@@ -10,10 +10,7 @@ import {
 } from "@/app/(site)/guests/directory-view";
 import { openProfileLink } from "@/app/(site)/guests/profile-nav";
 import { ATTENDEE_SORTS, DEFAULT_ATTENDEE_SORT } from "@/utils/attendee-search";
-import {
-  ATTENDEE_FILTERS,
-  serializeAttendeeFilters,
-} from "@/utils/attendee-filters";
+import { serializeAttendeeFilters } from "@/utils/attendee-filters";
 
 function AttendeeRow({
   attendee: {
@@ -83,6 +80,7 @@ export function AttendeeList({
 }) {
   const {
     query,
+    availableFilters,
     filters,
     sort,
     rows,
@@ -96,7 +94,7 @@ export function AttendeeList({
   const sortDisabled = query !== "";
   const toolbar = (
     <div className="flex flex-wrap items-center gap-2">
-      {ATTENDEE_FILTERS.map((f) => {
+      {availableFilters.map((f) => {
         const active = filters.includes(f.value);
         return (
           <button

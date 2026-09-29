@@ -10,7 +10,11 @@ import {
   newSortSeed,
   searchAttendees,
 } from "@/utils/attendee-search";
-import { AttendeeFilter, parseAttendeeFilters } from "@/utils/attendee-filters";
+import {
+  AttendeeFilter,
+  availableAttendeeFilters,
+  parseAttendeeFilters,
+} from "@/utils/attendee-filters";
 import { hasFilledProfile, profileExcerpt } from "@/utils/attendee-profile";
 import { formatRelativeTime } from "@/utils/relative-time";
 
@@ -44,7 +48,8 @@ export type DirectoryView = ReturnType<typeof useDirectoryView>;
 export function useDirectoryView(
   attendees: Attendee[],
   now: Date,
-  randomSeed: string
+  randomSeed: string,
+  meetingsEnabled: boolean
 ) {
   const { searchParams, setParams } = useTableParams({ shallow: true });
   const [seed, setSeed] = useState(randomSeed);
@@ -56,9 +61,13 @@ export function useDirectoryView(
   const sort: AttendeeSort =
     ATTENDEE_SORTS.find((s) => s.value === sortParam)?.value ??
     DEFAULT_ATTENDEE_SORT;
+  const availableFilters = useMemo(
+    () => availableAttendeeFilters(meetingsEnabled),
+    [meetingsEnabled]
+  );
   const filters: AttendeeFilter[] = useMemo(
-    () => parseAttendeeFilters(filterParam),
-    [filterParam]
+    () => parseAttendeeFilters(filterParam, availableFilters),
+    [filterParam, availableFilters]
   );
 
   // Fixed for the life of the page: keyed on the attendees so the markdown
@@ -104,6 +113,7 @@ export function useDirectoryView(
 
   return {
     query,
+    availableFilters,
     filters,
     sort,
     everyone,
