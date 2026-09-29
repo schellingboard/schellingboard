@@ -94,41 +94,55 @@ export function DayGrid(props: {
           <h3 className="font-semibold text-xs sm:text-sm">1-on-1s</h3>
         </div>
       )}
-      {includedLocations.map((loc) => (
-        <div
-          key={loc.name}
-          className="sticky top-0 z-20 bg-surface border-b border-l border-line-subtle p-1"
-        >
-          {/* What a room offers (projector, whiteboard, …) is behind its name.
+      {includedLocations.map((loc) => {
+        const whereAndSize = [
+          loc.areaDescription,
+          loc.capacity ? `max ${loc.capacity}` : null,
+        ]
+          .filter(Boolean)
+          .join(" · ");
+        const hasDetails = !!(loc.description || whereAndSize);
+        return (
+          <div
+            key={loc.name}
+            className="sticky top-0 z-20 bg-surface border-b border-l border-line-subtle p-1"
+          >
+            {/* What a room offers (projector, whiteboard, …) is behind its name.
               The ⓘ is the only hint that there is anything to open, so it goes
               in the button itself, where a tap or a hover finds it. */}
-          <h3 className="font-semibold text-xs sm:text-sm">
-            <Tooltip
-              toggleable
-              content={
-                loc.description ? (
-                  <div className="p-2 space-y-1">
-                    <p className="text-xs font-semibold text-fg-muted">
-                      {loc.name}
-                    </p>
-                    <p className="text-sm">{loc.description}</p>
-                  </div>
-                ) : undefined
-              }
-              placement="bottom-start"
-              triggerClassName="flex items-start gap-0.5 text-left rounded-sm hover:text-brand-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
-            >
-              {loc.name}
-              {loc.description && (
-                <InformationCircleIcon
-                  className="mt-px h-3 w-3 shrink-0 text-fg-subtle sm:h-3.5 sm:w-3.5"
-                  aria-hidden
-                />
-              )}
-            </Tooltip>
-          </h3>
-        </div>
-      ))}
+            <h3 className="font-semibold text-xs sm:text-sm">
+              <Tooltip
+                toggleable
+                content={
+                  hasDetails ? (
+                    <div className="p-2 space-y-1">
+                      <p className="text-xs font-semibold text-fg-muted">
+                        {loc.name}
+                      </p>
+                      {whereAndSize && (
+                        <p className="text-xs text-fg-subtle">{whereAndSize}</p>
+                      )}
+                      {loc.description && (
+                        <p className="text-sm">{loc.description}</p>
+                      )}
+                    </div>
+                  ) : undefined
+                }
+                placement="bottom-start"
+                triggerClassName="flex items-start gap-0.5 text-left rounded-sm hover:text-brand-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+              >
+                {loc.name}
+                {hasDetails && (
+                  <InformationCircleIcon
+                    className="mt-px h-3 w-3 shrink-0 text-fg-subtle sm:h-3.5 sm:w-3.5"
+                    aria-hidden
+                  />
+                )}
+              </Tooltip>
+            </h3>
+          </div>
+        );
+      })}
       {/* Row 2 — room description */}
       <div className="sticky top-0 z-20 bg-surface border-r border-line-subtle" />
       {showMeetings && (

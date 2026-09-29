@@ -110,7 +110,8 @@ Proposing and voting close.
 ![Scheduling grid with rooms as columns and time slots as rows, and a first column holding the viewer's own 1-on-1s](../screenshots/schedule-grid.webp)
 
 A room name with an **ⓘ** next to it has more to say — tap it (or hover it)
-to read what the room offers: projector, whiteboard, the kind of seating.
+to read what the room offers (projector, whiteboard, the kind of seating), where
+to find it and how many people fit.
 
 The buttons at the top switch how the schedule is laid out: **Grid** (rooms
 side by side, the day running down), **Agenda** (new, in beta: every session

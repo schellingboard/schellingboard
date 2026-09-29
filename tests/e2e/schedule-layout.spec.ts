@@ -182,6 +182,9 @@ test.describe("on a phone", () => {
 
     await page.getByRole("button", { name: "Main Hall" }).first().click();
     await expect(details).toContainText(MAIN_HALL_DETAIL);
+    // Otherwise only shown under the room headers, which scroll away.
+    await expect(details).toContainText("Ground floor, East Wing");
+    await expect(details).toContainText("max 100");
 
     // The whole panel fits the phone screen — the point of the exercise, since
     // a fixed-width one gets cut off at the edges.
