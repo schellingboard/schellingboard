@@ -7,11 +7,7 @@ import { PencilIcon } from "@heroicons/react/24/outline";
 import { CheckCircleIcon, AcademicCapIcon } from "@heroicons/react/24/solid";
 
 import type { Event, Guest, Session, Rsvp } from "@/db/repositories/interfaces";
-import {
-  formatOptionalTime,
-  formatStartTimePlusBreak,
-  TIME_FORMAT,
-} from "@/utils/utils";
+import { formatOptionalTime, TIME_FORMAT } from "@/utils/utils";
 import { UserContext, EventContext } from "../../context";
 import { CurrentUserModal, ConfirmationModal } from "../../modals";
 import { LockIcon } from "../../lock-icon";
@@ -300,9 +296,8 @@ export function ViewSession(props: {
         <div className="flex gap-2">
           <span className="font-medium">Time:</span>
           <span>
-            {formatStartTimePlusBreak(
-              session,
-              event.breakMinutes,
+            {formatOptionalTime(
+              session.startTime,
               event.timezone,
               `EEEE ${TIME_FORMAT}`
             )}{" "}

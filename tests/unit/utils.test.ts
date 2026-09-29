@@ -8,16 +8,14 @@ import {
   formatDayLabel,
   formatSlotLabel,
   getPercentThroughDay,
-  getStartTimePlusBreak,
   formatOptionalTime,
-  formatStartTimePlusBreak,
   TIME_FORMAT,
   votesApiUrl,
   normalizeForSearch,
   containsIgnoringAccents,
   equalsIgnoringAccents,
 } from "@/utils/utils";
-import type { Day, Session } from "@/db/repositories/interfaces";
+import type { Day } from "@/db/repositories/interfaces";
 
 // ── durationMinusBreak ───────────────────────────────────────────────────────
 
@@ -254,44 +252,6 @@ describe("getPercentThroughDay", () => {
   });
 });
 
-// ── getStartTimePlusBreak ────────────────────────────────────────────────────
-
-function makeSession(startTime: Date, endTime: Date): Session {
-  return {
-    id: "s1",
-    title: "",
-    description: "",
-    capacity: 0,
-    adminManaged: false,
-    blocker: false,
-    closed: false,
-    hosts: [],
-    locations: [],
-    numRsvps: 0,
-    startTime,
-    endTime,
-    eventId: "111",
-  };
-}
-
-describe("getStartTimePlusBreak", () => {
-  it("adds a 10 minute break to the start", () => {
-    const start = new Date("2025-06-15T10:00:00Z");
-    const adjusted = getStartTimePlusBreak(start, 10);
-    expect(adjusted.toJSDate().getTime()).toBe(
-      new Date("2025-06-15T10:10:00Z").getTime()
-    );
-  });
-
-  it("adds a 5 minute break to the start", () => {
-    const start = new Date("2025-06-15T10:00:00Z");
-    const adjusted = getStartTimePlusBreak(start, 5);
-    expect(adjusted.toJSDate().getTime()).toBe(
-      new Date("2025-06-15T10:05:00Z").getTime()
-    );
-  });
-});
-
 // ── formatOptionalTime ───────────────────────────────────────────────────────
 
 describe("formatOptionalTime", () => {
@@ -309,31 +269,6 @@ describe("formatOptionalTime", () => {
     expect(formatOptionalTime(undefined, "Europe/Berlin", TIME_FORMAT)).toBe(
       "—"
     );
-  });
-});
-
-// ── formatStartTimePlusBreak ─────────────────────────────────────────────────
-
-describe("formatStartTimePlusBreak", () => {
-  const start = new Date("2025-06-15T10:00:00Z");
-  const end = new Date("2025-06-15T11:00:00Z");
-
-  it("formats the break-adjusted start in the event's zone", () => {
-    expect(
-      formatStartTimePlusBreak(
-        makeSession(start, end),
-        10,
-        "Europe/Berlin",
-        TIME_FORMAT
-      )
-    ).toBe("12:10");
-  });
-
-  it("renders a placeholder instead of the epoch when the start is absent", () => {
-    const session = { ...makeSession(start, end), startTime: undefined };
-    expect(
-      formatStartTimePlusBreak(session, 10, "Europe/Berlin", TIME_FORMAT)
-    ).toBe("—");
   });
 });
 

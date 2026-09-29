@@ -16,7 +16,6 @@ import {
   isValidSlotIncrement,
   isSlotAligned,
 } from "@/utils/slots";
-import { sessionOverlapsWindow } from "@/utils/day-window";
 
 export type EventInput = {
   name: string;
@@ -108,9 +107,9 @@ function parseEventInput(input: EventInput): ParseResult {
   };
 }
 
-// A new increment only works if every day window and every scheduled session
-// still falls on slot boundaries; otherwise sessions would silently drop out
-// of the schedule grid. The admin must fix the misaligned data first.
+// The schedule grid anchors its slots at each day's start, so a new increment
+// only works if every day window still falls on slot boundaries. The admin
+// must fix the misaligned days first.
 async function slotIncrementChangeError(
   eventId: string,
   incrementMinutes: number
@@ -125,21 +124,6 @@ async function slotIncrementChangeError(
     return `Cannot change the slot increment: some day windows are not aligned to ${incrementMinutes}-minute slots. Adjust the days first.`;
   }
 
-  const sessions = await repos.sessions.listScheduledByEvent(eventId);
-  const misaligned = sessions.filter((s) => {
-    const day = days.find((d) => sessionOverlapsWindow(s, d.start, d.end));
-    if (!day || !s.startTime || !s.endTime) return false;
-    return (
-      !isSlotAligned(s.startTime, day.start, incrementMinutes) ||
-      !isSlotAligned(s.endTime, day.start, incrementMinutes)
-    );
-  });
-  if (misaligned.length > 0) {
-    const titles = misaligned.map((s) => `"${s.title}"`).join(", ");
-    return `Cannot change the slot increment: ${titles} would not align to ${incrementMinutes}-minute slots. Reschedule or delete ${
-      misaligned.length === 1 ? "it" : "them"
-    } first.`;
-  }
   return null;
 }
 

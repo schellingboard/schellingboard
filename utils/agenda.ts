@@ -1,21 +1,12 @@
 import type { Location, Session } from "@/db/repositories/interfaces";
 import type { MeetingView } from "@/utils/meeting-views";
 import { shownSlotStart } from "@/utils/meeting-slots";
-import { getStartTimePlusBreak } from "@/utils/utils";
 
 export type AgendaGroup = {
   start: Date;
   sessions: Session[];
   meetings: MeetingView[];
 };
-
-/** As the session's details show it — except a blocker, which fills its slot. */
-export function shownStart(session: Session, breakMinutes: number): Date {
-  const start = session.startTime ?? new Date(0);
-  return session.blocker
-    ? start
-    : getStartTimePlusBreak(start, breakMinutes).toJSDate();
-}
 
 /**
  * A day's entries under their shown starts: sessions in room order, 1-on-1s
@@ -46,7 +37,7 @@ export function agendaGroups(input: {
 
   for (const session of sessions) {
     if (!session.startTime) continue;
-    const group = groupAt(shownStart(session, breakMinutes).getTime());
+    const group = groupAt(session.startTime.getTime());
     const twin = session.blocker
       ? group.sessions.findIndex(
           (s) =>

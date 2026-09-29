@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getRepositories } from "@/db/container";
 import { requireProxyVerifiedAdmin } from "@/utils/auth";
-import { sessionSlotAlignmentError } from "@/utils/day-window";
 
 export const dynamic = "force-dynamic";
 
@@ -111,15 +110,6 @@ export async function POST(req: Request) {
   if (!Number.isInteger(capacity) || capacity < 0) {
     return badRequest("Capacity must be a non-negative whole number");
   }
-
-  const days = await repos.days.listByEvent(event.id);
-  const alignmentError = sessionSlotAlignmentError(
-    days,
-    event.slotIncrementMinutes,
-    startTime,
-    endTime
-  );
-  if (alignmentError) return badRequest(alignmentError);
 
   const conflict = await repos.sessions.findLocationConflict(
     event.id,

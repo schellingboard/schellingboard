@@ -12,6 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Sessions at any minute, with or without a break**: organizers can place a session at
+  any time, not just on the schedule's slots, and leave out the break before one, such as
+  an opening keynote.
 - **Clear a search with one tap**: every search box shows an × while it holds text, which
   empties it and brings back the full list.
 
@@ -19,6 +22,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - **Sessions and 1-on-1s sit on the schedule where they really start**: one in the 9:00
   slot now starts at 9:10 on the grid, after the break, instead of looking as if it began at 9:00.
+- **Changing an event's break affects only sessions booked afterwards**: sessions already on
+  the schedule keep the times attendees have seen.
+- **The session import API stores times as sent**: import scripts that relied on the break
+  being added to each start must now add it themselves.
 - **Every search box searches as you type**: the attendee directory and the organizer lists
   no longer wait for a press of Search, just like the session and proposal searches.
 - **A room's whereabouts and capacity show behind its name**: tapping or hovering a room name on

@@ -682,7 +682,7 @@ describe("event actions", () => {
         ).toBe(30);
       });
 
-      it("blocks the change when a scheduled session is misaligned", async () => {
+      it("changes the increment though sessions sit off the new grid", async () => {
         const event = await createEvent();
         await createDay(event.id, alignedDayOpts);
         await createSession(event.id, {
@@ -695,53 +695,11 @@ describe("event actions", () => {
           ...VALID_EVENT_INPUT,
           slotIncrementMinutes: "45",
         });
-        expect(!result.ok && result.error).toContain("Off Grid");
+        expect(result.ok).toBe(true);
         expect(
           (await getRepositories().events.findById(event.id))
             ?.slotIncrementMinutes
-        ).toBe(30);
-      });
-
-      it("blocks the change when only a session's start is misaligned", async () => {
-        const event = await createEvent();
-        await createDay(event.id, alignedDayOpts);
-        await createSession(event.id, {
-          title: "Bad Start",
-          // Start is 30min off a 45-min grid; end (11:15) is aligned.
-          startTime: new Date("2026-10-01T09:30:00Z"),
-          endTime: new Date("2026-10-01T11:15:00Z"),
-        });
-        const result = await updateEventAction({
-          id: event.id,
-          ...VALID_EVENT_INPUT,
-          slotIncrementMinutes: "45",
-        });
-        expect(!result.ok && result.error).toContain("Bad Start");
-        expect(
-          (await getRepositories().events.findById(event.id))
-            ?.slotIncrementMinutes
-        ).toBe(30);
-      });
-
-      it("blocks the change when only a session's end is misaligned", async () => {
-        const event = await createEvent();
-        await createDay(event.id, alignedDayOpts);
-        await createSession(event.id, {
-          title: "Bad End",
-          // Start (9:45) is aligned; end is 30min off a 45-min grid.
-          startTime: new Date("2026-10-01T09:45:00Z"),
-          endTime: new Date("2026-10-01T11:00:00Z"),
-        });
-        const result = await updateEventAction({
-          id: event.id,
-          ...VALID_EVENT_INPUT,
-          slotIncrementMinutes: "45",
-        });
-        expect(!result.ok && result.error).toContain("Bad End");
-        expect(
-          (await getRepositories().events.findById(event.id))
-            ?.slotIncrementMinutes
-        ).toBe(30);
+        ).toBe(45);
       });
 
       it("skips alignment checks when the increment is unchanged", async () => {

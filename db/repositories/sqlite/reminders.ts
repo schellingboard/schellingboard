@@ -31,11 +31,11 @@ export class SqliteRemindersRepository implements RemindersRepository {
   constructor(private readonly db: DB) {}
 
   async listCandidates(now: Date): Promise<DueReminderCandidate[]> {
-    // A heads-up is due from `start + break - 60 min` and break is never
-    // negative, so nothing due by `now` starts more than an hour from now; a
-    // follow-up is due later still. Deliberately no lower bound: a follow-up
-    // is never dropped for being late (FR-011), so a session that ended
-    // during a long outage is still owed one on the next tick.
+    // A heads-up is due from `start - 60 min`, so nothing due by `now` starts
+    // more than an hour from now; a follow-up is due later still. Deliberately
+    // no lower bound: a follow-up is never dropped for being late (FR-011), so
+    // a session that ended during a long outage is still owed one on the next
+    // tick.
     const horizon = new Date(now.getTime() + HOUR_MS).toISOString();
 
     const sessionRows = this.db
@@ -47,7 +47,6 @@ export class SqliteRemindersRepository implements RemindersRepository {
         attendeeCount: schema.sessions.attendeeCount,
         eventSlug: schema.events.slug,
         eventTimezone: schema.events.timezone,
-        eventBreakMinutes: schema.events.breakMinutes,
       })
       .from(schema.sessions)
       .innerJoin(schema.events, eq(schema.sessions.eventId, schema.events.id))
@@ -144,7 +143,7 @@ export class SqliteRemindersRepository implements RemindersRepository {
             kind,
             dueTime:
               kind === "headsUp"
-                ? headsUpDueTime(startTime, session.eventBreakMinutes)
+                ? headsUpDueTime(startTime)
                 : followUpDueTime(endTime),
             sessionTitle: session.title,
             sessionStartTime: startTime,
@@ -153,7 +152,6 @@ export class SqliteRemindersRepository implements RemindersRepository {
             hasRecordedCount: session.attendeeCount !== null,
             eventSlug: session.eventSlug,
             eventTimezone: session.eventTimezone,
-            eventBreakMinutes: session.eventBreakMinutes,
             guestEmail: host.email === "" ? null : host.email,
             reminderOptIn:
               kind === "headsUp" ? host.headsUpOptIn : host.followUpOptIn,

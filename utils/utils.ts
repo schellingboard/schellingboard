@@ -1,5 +1,4 @@
 import { Day } from "@/db/repositories/interfaces";
-import type { Session } from "@/db/repositories/interfaces";
 import { DateTime } from "luxon";
 
 export const TIME_FORMAT = "HH:mm";
@@ -160,19 +159,6 @@ export function formatDuration(
     : `${hours}${hourString}`;
 }
 
-/**
- * The displayed start time of a session: the break sits at the START of the
- * slot, so the session is shown starting `breakMinutes` after its stored start.
- *
- * Note: This is only used for DISPLAY purposes on existing sessions.
- */
-export function getStartTimePlusBreak(
-  startTime: Date,
-  breakMinutes: number
-): DateTime {
-  return DateTime.fromJSDate(startTime).plus({ minutes: breakMinutes });
-}
-
 /** Stands in for a session time the type allows to be absent. */
 const TIME_PLACEHOLDER = "—";
 
@@ -189,19 +175,6 @@ export function formatOptionalTime(
 ): string {
   if (!time) return TIME_PLACEHOLDER;
   return DateTime.fromJSDate(time).setZone(timezone).toFormat(format);
-}
-
-/** The display counterpart of {@link getStartTimePlusBreak}. */
-export function formatStartTimePlusBreak(
-  session: Session,
-  breakMinutes: number,
-  timezone: string,
-  format: string
-): string {
-  if (!session.startTime) return TIME_PLACEHOLDER;
-  return getStartTimePlusBreak(session.startTime, breakMinutes)
-    .setZone(timezone)
-    .toFormat(format);
 }
 
 /**

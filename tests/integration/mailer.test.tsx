@@ -82,7 +82,7 @@ describe.skipIf(skipWithoutMailpit())("sendMail via mailpit", () => {
 describe.skipIf(skipWithoutMailpit())(
   "attendee-count reminders via mailpit",
   () => {
-    const START = new Date("2026-09-01T10:00:00Z"); // displayed 12:10 in Berlin
+    const START = new Date("2026-09-01T10:10:00Z"); // 12:10 in Berlin
     const END = new Date("2026-09-01T11:00:00Z"); // 13:00 in Berlin
     const HEADS_UP_AT = new Date("2026-09-01T09:10:00Z");
     const FOLLOW_UP_AT = new Date("2026-09-01T11:15:00Z");

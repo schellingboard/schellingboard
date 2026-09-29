@@ -15,7 +15,8 @@ import {
   durationMinusBreak,
   TIME_FORMAT,
 } from "@/utils/utils";
-import { slotDurationOptions, snapDurationToSlots } from "@/utils/slots";
+import { gridEndingDurations, snapDurationToSlots } from "@/utils/slots";
+import { slotIsFree } from "@/utils/schedule-column";
 import { MyListbox, type Option } from "./select";
 import { viewProposalLinkFromElsewhere } from "./modal-nav";
 import type {
@@ -75,25 +76,30 @@ export function SessionForm(props: {
   const initialProposal = proposals.find((p) => p.id === proposalID) ?? null;
   const session =
     sessions.find((ses) => ses.id === sessionID) || newEmptySession(event.id);
+  const breakMs = event.breakMinutes * 60 * 1000;
+  // The form works in slots, and a session starts once its slot's break is
+  // over — so an organizer's breakless session sits in a slot off the grid.
+  const ownSlot = session.startTime
+    ? session.startTime.getTime() - breakMs
+    : undefined;
   // A started session keeps the start its attendees turned up for, so that
   // start stops being a form field: it is read from the session rather than
   // from the picker, which need not offer it once another room is selected.
-  const lockedStart = sessionHasStarted(session, now)
-    ? session.startTime!.getTime()
-    : null;
+  const lockedStart = sessionHasStarted(session, now) ? ownSlot! : null;
   // Attendees may book only some of the event's rooms; the one this session is
   // already in is offered too, so keeping it is never what blocks a save.
   const locations = props.locations.filter(
     (loc) => loc.bookable || loc.id === session.locations[0]?.id
   );
-  const initDateTime =
+  const paramDateTime =
     dayParam && timeParam
       ? convertParamDateTime(dayParam, timeParam, timezone)
-      : (session.startTime ?? null);
+      : null;
+  const initDateTime = paramDateTime ?? session.startTime ?? null;
   const initDay = initDateTime
     ? days.find((d) => dateOnDay(initDateTime, d))
     : undefined;
-  const initSlot = initDateTime?.getTime();
+  const initSlot = paramDateTime?.getTime() ?? ownSlot;
 
   // Compute default hosts for new sessions (no initial proposal, no sessionID).
   // Also used as the "reset" target when the user un-selects a proposal.
@@ -105,14 +111,10 @@ export function SessionForm(props: {
     : sessionID
       ? guests.filter((g) => session.hosts.some((h) => h.id === g.id))
       : defaultHosts;
-  const sessionDuration = sessionID
-    ? Math.round(
-        ((session.endTime?.valueOf() ?? 0) -
-          (session.startTime?.valueOf() ?? 0)) /
-          1000 /
-          60
-      )
-    : null;
+  const sessionDuration =
+    sessionID && ownSlot !== undefined
+      ? Math.round(((session.endTime?.valueOf() ?? 0) - ownSlot) / 1000 / 60)
+      : null;
 
   const [proposal, setProposal] = useState<SessionProposal | null>(
     initialProposal
@@ -182,7 +184,7 @@ export function SessionForm(props: {
     maxSessionDuration;
   const keepsOwnSlot =
     chosenStart !== undefined &&
-    chosenStart === session.startTime?.getTime() &&
+    chosenStart === ownSlot &&
     locationId === session.locations[0]?.id;
   // Proposal durations are free-form, so they get snapped to the nearest
   // selectable slot multiple; an existing session's duration already sits on
@@ -197,15 +199,29 @@ export function SessionForm(props: {
       : (sessionDuration ??
           snapDurationToSlots(60, event.slotIncrementMinutes, maxDuration))
   );
-  // Derived: clamp duration to maxDuration. Preserves user-set value so it
-  // restores when the limit widens again. While the session stays in the slot
-  // it was placed in, the length it already runs is exempt: an organizer may
-  // have given it more than a host may book, and clamping it would move the
-  // session's end without anyone asking.
-  const effectiveDuration =
-    duration > maxDuration && !(keepsOwnSlot && duration === sessionDuration)
-      ? maxDuration
-      : duration;
+  const offeredDurations = gridEndingDurations({
+    slotOffsetMinutes:
+      chosenStart === undefined
+        ? 0
+        : minutesPastGrid(chosenStart, day.start, event.slotIncrementMinutes),
+    incrementMinutes: event.slotIncrementMinutes,
+    maxDuration,
+    breakMinutes: event.breakMinutes,
+  });
+  // While the session stays in the slot it was placed in, the length it
+  // already runs is offered too: an organizer may have given it more than a
+  // host may book, and dropping it would move the session's end unasked.
+  const durationChoices =
+    keepsOwnSlot &&
+    sessionDuration !== null &&
+    !offeredDurations.includes(sessionDuration)
+      ? [...offeredDurations, sessionDuration].sort((a, b) => a - b)
+      : offeredDurations;
+  // Derived rather than stored, so a chosen value comes back when the choices
+  // widen again.
+  const effectiveDuration = durationChoices.includes(duration)
+    ? duration
+    : closestAtMost(durationChoices, duration);
   const [hosts, setHosts] = useState<Guest[]>(initialHosts);
 
   function applyProposal(next: SessionProposal | null) {
@@ -239,7 +255,7 @@ export function SessionForm(props: {
     );
     dummySession = {
       ...newEmptySession(event.id),
-      startTime: start,
+      startTime: new Date(start.getTime() + breakMs),
       endTime: end,
       id: sessionID || "",
     };
@@ -551,7 +567,7 @@ export function SessionForm(props: {
         {lockedStart !== null ? (
           <LockedValue
             value={formatSlotLabel(
-              new Date(lockedStart + event.breakMinutes * 60 * 1000),
+              new Date(lockedStart + breakMs),
               day.start,
               timezone
             )}
@@ -582,14 +598,17 @@ export function SessionForm(props: {
         <SelectDuration
           duration={effectiveDuration}
           setDuration={setDuration}
-          maxDuration={maxDuration}
-          ownDuration={
-            keepsOwnSlot ? (sessionDuration ?? undefined) : undefined
-          }
+          choices={durationChoices}
           breakMinutes={event.breakMinutes}
-          slotIncrementMinutes={event.slotIncrementMinutes}
         />
       </div>
+      {dummySession.startTime && dummySession.endTime && (
+        <p className="text-sm text-fg-muted">
+          Your session runs{" "}
+          {formatSlotLabel(dummySession.startTime, day.start, timezone)} –{" "}
+          {formatSlotLabel(dummySession.endTime, day.start, timezone)}.
+        </p>
+      )}
       {sessionID && session.proposalId && (
         <p className="text-sm text-fg-muted">
           This session was scheduled from a proposal. See it{" "}
@@ -669,71 +688,46 @@ function getAvailableStartTimes(
   timezone: string,
   locationId?: string
 ) {
+  const breakMs = breakMinutes * 60 * 1000;
   const locationSelected = !!locationId;
-  const filteredSessions = (
-    locationSelected
-      ? sessions.filter(
-          (s) =>
-            s.locations.some((l) => l.id === locationId) &&
-            s.id !== currentSession.id
-        )
-      : sessions
-  ).filter((s) => (s.startTime?.getTime() ?? 0) < day.end.getTime());
-  const sortedSessions = filteredSessions.sort(
-    (a, b) => (a.startTime?.getTime() ?? 0) - (b.startTime?.getTime() ?? 0)
+  const others = sessions.filter(
+    (s) =>
+      s.locations.some((l) => l.id === locationId) && s.id !== currentSession.id
   );
+  const maxDurationFrom = (slot: number) => {
+    const nextStart = Math.min(
+      day.endBookings.getTime(),
+      ...others
+        .map((s) => s.startTime?.getTime() ?? Infinity)
+        .filter((start) => start >= slot + breakMs)
+    );
+    return Math.max(
+      0,
+      Math.min((nextStart - slot) / 1000 / 60, maxSessionDuration)
+    );
+  };
+  const label = (slot: number) =>
+    formatSlotLabel(new Date(slot + breakMs), day.start, timezone);
+
   const startTimes: StartTime[] = [];
   for (
     let t = day.startBookings.getTime();
     t < day.endBookings.getTime();
     t += slotIncrementMinutes * 60 * 1000
   ) {
-    // The break sits at the start of each slot, so the displayed start is
-    // pushed back by breakMinutes (e.g. a 9:00 slot shows as 9:10). The slot
-    // itself stays on the round boundary.
-    const formattedTime = formatSlotLabel(
-      new Date(t + breakMinutes * 60 * 1000),
-      day.start,
-      timezone
-    );
-    if (locationSelected) {
-      const sessionNow = sortedSessions.find(
-        (session) =>
-          (session.startTime?.getTime() ?? 0) <= t &&
-          (session.endTime?.getTime() ?? 0) > t
-      );
-      if (sessionNow) {
-        startTimes.push({
-          formattedTime,
-          time: t,
-          maxDuration: 0,
-          available: false,
-        });
-      } else {
-        const nextSession = sortedSessions.find(
-          (session) => (session.startTime?.getTime() ?? 0) > t
-        );
-        const latestEndTime = nextSession
-          ? nextSession.startTime!.getTime()
-          : day.endBookings.getTime();
-        startTimes.push({
-          formattedTime,
-          time: t,
-          maxDuration: Math.min(
-            (latestEndTime - t) / 1000 / 60,
-            maxSessionDuration
-          ),
-          available: true,
-        });
-      }
-    } else {
-      startTimes.push({
-        formattedTime,
-        time: t,
-        maxDuration: maxSessionDuration,
-        available: true,
-      });
-    }
+    const available =
+      !locationSelected ||
+      slotIsFree(others, new Date(t), slotIncrementMinutes, breakMinutes);
+    startTimes.push({
+      formattedTime: label(t),
+      time: t,
+      maxDuration: !available
+        ? 0
+        : locationSelected
+          ? maxDurationFrom(t)
+          : maxSessionDuration,
+      available,
+    });
   }
 
   // The slot the session already occupies, which an organizer may have put
@@ -741,30 +735,17 @@ function getAvailableStartTimes(
   // on top of another session. Keeping it has to stay possible, so it is
   // offered in its own right — only while its room and day are still the ones
   // it was placed in, since anywhere else is a move like any other.
-  const ownSlot = currentSession.startTime?.getTime();
   const staysPut =
-    ownSlot !== undefined &&
+    currentSession.startTime !== undefined &&
     locationSelected &&
     currentSession.locations[0]?.id === locationId &&
-    dateOnDay(currentSession.startTime!, day);
+    dateOnDay(currentSession.startTime, day);
   if (staysPut) {
-    const nextSession = sortedSessions.find(
-      (session) => (session.startTime?.getTime() ?? 0) > ownSlot
-    );
-    const latestEndTime = nextSession
-      ? nextSession.startTime!.getTime()
-      : day.endBookings.getTime();
+    const ownSlot = currentSession.startTime!.getTime() - breakMs;
     const slot: StartTime = {
-      formattedTime: formatSlotLabel(
-        new Date(ownSlot + breakMinutes * 60 * 1000),
-        day.start,
-        timezone
-      ),
+      formattedTime: label(ownSlot),
       time: ownSlot,
-      maxDuration: Math.max(
-        0,
-        Math.min((latestEndTime - ownSlot) / 1000 / 60, maxSessionDuration)
-      ),
+      maxDuration: maxDurationFrom(ownSlot),
       available: true,
     };
     const at = startTimes.findIndex((st) => st.time === ownSlot);
@@ -778,28 +759,32 @@ function getAvailableStartTimes(
   return startTimes;
 }
 
+function minutesPastGrid(
+  slot: number,
+  dayStart: Date,
+  incrementMinutes: number
+): number {
+  const minutes = (slot - dayStart.getTime()) / 60 / 1000;
+  return ((minutes % incrementMinutes) + incrementMinutes) % incrementMinutes;
+}
+
+function closestAtMost(choices: number[], wanted: number): number {
+  const fitting = choices.filter((c) => c <= wanted);
+  return fitting.length ? fitting[fitting.length - 1] : (choices[0] ?? 0);
+}
+
 function SelectDuration(props: {
   duration: number;
   setDuration: (duration: number) => void;
-  maxDuration?: number;
-  /** The length the session already runs, offered even if it exceeds the max. */
-  ownDuration?: number;
+  choices: number[];
   breakMinutes: number;
-  slotIncrementMinutes: number;
 }) {
-  const { duration, setDuration, maxDuration, ownDuration, breakMinutes } =
-    props;
-  const limit = maxDuration ?? 180;
-  const offered = slotDurationOptions(props.slotIncrementMinutes, limit);
-  const availableDurations =
-    ownDuration && !offered.includes(ownDuration)
-      ? [...offered, ownDuration].sort((a, b) => a - b)
-      : offered;
+  const { duration, setDuration, choices, breakMinutes } = props;
 
   return (
     <fieldset>
       <div className="space-y-4">
-        {availableDurations.map((value) => (
+        {choices.map((value) => (
           <div key={value} className="flex items-center">
             <input
               id={`duration-${value}`}

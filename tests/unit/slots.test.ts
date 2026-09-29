@@ -5,6 +5,7 @@ import {
   isValidSlotIncrement,
   getNumSlots,
   getNowOffsetPx,
+  gridEndingDurations,
   isSlotAligned,
   sessionDurationError,
   slotDurationOptions,
@@ -118,6 +119,28 @@ describe("slotDurationOptions", () => {
 
   it("max below the increment still offers one slot", () => {
     expect(slotDurationOptions(45, 30)).toEqual([45]);
+  });
+});
+
+// ── gridEndingDurations ──────────────────────────────────────────────────────
+
+describe("gridEndingDurations", () => {
+  const options = (slotOffsetMinutes: number) =>
+    gridEndingDurations({
+      slotOffsetMinutes,
+      incrementMinutes: 30,
+      maxDuration: 120,
+      breakMinutes: 10,
+    });
+
+  it("offers the slot multiples for a slot on the grid", () => {
+    expect(options(0)).toEqual([30, 60, 90, 120]);
+  });
+
+  it("ends a slot off the grid on the grid, once its break is over", () => {
+    // An 8:50 slot on a :00/:30 grid: the session starts at 9:00, so it can
+    // end at 9:30, 10:00 or 10:30 -- 11:00 would take 130 minutes.
+    expect(options(20)).toEqual([40, 70, 100]);
   });
 });
 

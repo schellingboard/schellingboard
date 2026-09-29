@@ -34,9 +34,10 @@ One global row shown when there's more than one event (see
 - **Description** (Markdown), **Website**, **Start/End dates**, **Timezone**
   (required — all dates/times for this event are edited in this zone),
   **Icon** (decorative).
-- **Max session duration**, **break before each session**, **schedule
-  increment** (15/30/60 min grid granularity — can't be changed if it would
-  misalign existing days or sessions).
+- **Max session duration**, **break before each session** (attendees' sessions
+  start this long into their slot; changing it affects only sessions booked
+  afterwards), **schedule increment** (15/30/60 min grid granularity — can't be
+  changed if it would misalign existing days).
 - **Enforce session capacity as a hard limit** — when on, RSVPs are rejected
   once a session's capacity is reached; otherwise capacity is advisory only.
 - **Phases** — the three phase date ranges, see [How it works](how-it-works.md#the-three-phases).
@@ -139,8 +140,11 @@ Admins can create/edit/delete sessions directly, outside the normal
 proposal → schedule flow.
 
 - **Title** (required), **Description** (Markdown), **Start/End time**
-  (optional — blank means "not scheduled"), **Capacity**, **Hosts**,
-  **Locations**.
+  (optional — blank means "not scheduled"; any minute, not just the schedule
+  increment), **Capacity**, **Hosts**, **Locations**.
+- **Break before** — when creating a session, the event's break is added to
+  the start you enter, as for attendees' sessions. Untick it for a session that
+  should start right away, such as an opening keynote.
 - **Blocker** — marks the slot as unavailable (e.g. a break), not a real
   session.
 - **Closed** — an attendee-facing note that latecomers shouldn't join; it

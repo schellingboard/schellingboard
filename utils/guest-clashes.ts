@@ -1,7 +1,7 @@
 import { getRepositories } from "@/db/container";
 import type { Meeting, Session } from "@/db/repositories/interfaces";
 import { newEmptySession, sessionsOverlap } from "@/app/(site)/session_utils";
-import { getStartTimePlusBreak } from "./utils";
+import { shownSlotStart } from "./meeting-slots";
 
 // A schedule clash for one guest, computed server-side so their RSVPs and
 // meetings never reach the client. Only `detailFor`'s RSVPs and 1-on-1s are
@@ -118,7 +118,7 @@ export function clashesForInterval(
         guestName: schedule.guestName,
         kind: "hosting",
         title: ses.title,
-        start: getStartTimePlusBreak(ses.startTime, breakMinutes).toISO()!,
+        start: ses.startTime.toISOString(),
         end: ses.endTime.toISOString(),
       });
     }
@@ -131,7 +131,7 @@ export function clashesForInterval(
         guestName: schedule.guestName,
         kind: describe ? "attending" : "busy",
         title: describe ? ses.title : null,
-        start: getStartTimePlusBreak(ses.startTime, breakMinutes).toISO()!,
+        start: ses.startTime.toISOString(),
         end: ses.endTime.toISOString(),
       });
     }
@@ -153,7 +153,7 @@ export function clashesForInterval(
         guestName: schedule.guestName,
         kind: describe ? "meeting" : "busy",
         title: null,
-        start: getStartTimePlusBreak(meeting.slotStart, breakMinutes).toISO()!,
+        start: shownSlotStart(meeting.slotStart, breakMinutes).toISOString(),
         end: meeting.slotEnd.toISOString(),
       });
     }

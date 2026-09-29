@@ -59,15 +59,20 @@ export function buildSessionInterval(
   };
 }
 
+/** The slot the host picked, break included — what the booking rules judge. */
+export function bookedSlot(params: SessionParams): SessionInterval {
+  return buildSessionInterval(new Date(params.startTime), params.duration);
+}
+
+/** The session starts once the slot's leading break is over. */
 export function prepareToInsert(
   params: SessionParams,
-  day: Day
+  day: Day,
+  breakMinutes: number
 ): SessionCreateInput {
-  const { title, description, closed, hosts, location, duration } = params;
-  const { start, end } = buildSessionInterval(
-    new Date(params.startTime),
-    duration
-  );
+  const { title, description, closed, hosts, location } = params;
+  const { start: slotStart, end } = bookedSlot(params);
+  const start = new Date(slotStart.getTime() + breakMinutes * 60 * 1000);
   return {
     title,
     description,

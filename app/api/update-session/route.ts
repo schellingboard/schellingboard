@@ -10,6 +10,7 @@ import { verifiedCurrentUser } from "@/utils/acting-guest";
 import { sessionBookingWindowError } from "@/utils/day-window";
 import { sessionDurationError } from "@/utils/slots";
 import {
+  bookedSlot,
   prepareToInsert,
   sessionCapacityError,
   sessionHasStarted,
@@ -38,9 +39,8 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
-  const input = prepareToInsert(params, day);
   const allSessions = (await repos.sessions.listScheduled()).filter(
-    (s) => s.eventId === input.eventId
+    (s) => s.eventId === day.eventId
   );
   const prevSession = allSessions.find((ses) => ses.id === params.id);
   if (prevSession === undefined) {
@@ -55,6 +55,8 @@ export async function POST(req: NextRequest) {
       { status: 403 }
     );
   }
+  const input = prepareToInsert(params, day, event.breakMinutes);
+  const slot = bookedSlot(params);
   if (prevSession.adminManaged || prevSession.blocker) {
     return new Response("Cannot edit via web app", { status: 400 });
   }
@@ -83,8 +85,8 @@ export async function POST(req: NextRequest) {
   // room nobody may self-book — and leaving that as it stands is not an edit.
   const windowError = sessionBookingWindowError(
     day,
-    input.startTime!,
-    input.endTime!,
+    slot.start,
+    slot.end,
     event.slotIncrementMinutes,
     { start: startChanged, end: endChanged }
   );
@@ -93,8 +95,8 @@ export async function POST(req: NextRequest) {
   }
   if (startChanged || endChanged) {
     const durationError = sessionDurationError(
-      input.startTime!,
-      input.endTime!,
+      slot.start,
+      slot.end,
       event.slotIncrementMinutes,
       event.maxSessionDuration
     );

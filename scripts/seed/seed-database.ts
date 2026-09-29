@@ -37,6 +37,7 @@ const TZ = "Europe/Berlin";
 // Set on the seeded events rather than left to the column default: the app
 // derives 1-on-1 slots from it, and so does the availability seeding below.
 const SLOT_INCREMENT_MINUTES = 30;
+const BREAK_MINUTES = 10;
 
 // The attendee the documentation screenshots are taken as, so the large
 // profile gives her the 1-on-1s to photograph (docs/screenshots/README.md).
@@ -389,7 +390,7 @@ async function seedTestData(profile: SeedProfile) {
     schedulingPhaseEnd: config.schedulingPhaseEnd.toISOString(),
     timezone: TZ,
     maxSessionDuration: 120,
-    breakMinutes: 10,
+    breakMinutes: BREAK_MINUTES,
     slotIncrementMinutes: SLOT_INCREMENT_MINUTES,
     meetingsEnabled: true,
   }));
@@ -853,12 +854,14 @@ async function seedTestData(profile: SeedProfile) {
   const sessionHostRows: (typeof schema.sessionHosts.$inferInsert)[] = [];
   const sessionLocationRows: (typeof schema.sessionLocations.$inferInsert)[] =
     [];
+  const keynoteIds = new Set<string>();
 
   eventRows.forEach((ev, eventIndex) => {
     const config = eventConfigs[eventIndex];
 
     // Opening keynote: 09:00–10:30 Berlin on day 1
     const keynoteId = nanoid();
+    keynoteIds.add(keynoteId);
     sessionRows.push({
       id: keynoteId,
       title: `Opening Keynote - ${config.name}`,
@@ -953,6 +956,14 @@ async function seedTestData(profile: SeedProfile) {
     console.log(`  ➕ Scheduled ${bulkSessionCount} bulk Gamma sessions`);
   }
 
+  // Written from their slots above, and stored as a booking would be: starting
+  // once the slot's break is over. The keynotes are an organizer's, breakless.
+  for (const row of sessionRows) {
+    if (row.blocker || keynoteIds.has(row.id) || !row.startTime) continue;
+    row.startTime = new Date(
+      new Date(row.startTime).getTime() + BREAK_MINUTES * 60 * 1000
+    ).toISOString();
+  }
   insertChunked(sessionRows, (chunk) =>
     db.insert(schema.sessions).values(chunk)
   );
@@ -1274,7 +1285,7 @@ function scheduleBulkGammaSessions(
         candidateIndex++;
         created++;
         // 30-minute setup gap between sessions in the same room (the events
-        // are seeded with breakMinutes 10, so this stays comfortably legal).
+        // are seeded with a 10-minute break, so this stays comfortably legal).
         cursor += duration + 30;
       }
     }

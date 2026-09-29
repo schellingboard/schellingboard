@@ -25,7 +25,6 @@ import {
   meetingRequestNoticeText,
 } from "@/emails/meeting";
 import { shownSlotStart } from "@/utils/meeting-slots";
-import { getStartTimePlusBreak } from "@/utils/utils";
 
 // One line in the past tense, where it happened, and when — `at` comes from
 // the caller's clock so the dev fake clock reaches these rows like every other
@@ -138,9 +137,9 @@ async function notifySessionChangedUnsafe({
   const messageProps = {
     sessionUrl: emailBase() + path,
     title: after.title,
-    newTime: formatSessionTime(after, event.timezone, event.breakMinutes),
+    newTime: formatSessionTime(after, event.timezone),
     oldTime: timeChanged
-      ? formatSessionTime(before, event.timezone, event.breakMinutes)
+      ? formatSessionTime(before, event.timezone)
       : undefined,
     newLocation: formatLocations(after),
     oldLocation: locationChanged ? formatLocations(before) : undefined,
@@ -248,7 +247,7 @@ async function notifySessionDeletedUnsafe({
   const eventPath = `/${event.slug}`;
   const messageProps = {
     title: session.title,
-    time: formatSessionTime(session, event.timezone, event.breakMinutes),
+    time: formatSessionTime(session, event.timezone),
     location: formatLocations(session),
     eventUrl: emailBase() + eventPath,
   };
@@ -357,7 +356,7 @@ async function notifyCohostsAddedUnsafe({
   const path = sessionPath(event.slug, session.id);
   const message = cohostAddedEmail({
     title: session.title,
-    time: formatSessionTime(session, event.timezone, event.breakMinutes),
+    time: formatSessionTime(session, event.timezone),
     location: formatLocations(session),
     sessionUrl: emailBase() + path,
   });
@@ -690,15 +689,9 @@ function sameLocations(a: { id: string }[], b: { id: string }[]): boolean {
   return aIds.symmetricDifference(bIds).size === 0;
 }
 
-function formatSessionTime(
-  session: Session,
-  timezone: string,
-  breakMinutes: number
-): string {
+function formatSessionTime(session: Session, timezone: string): string {
   if (!session.startTime || !session.endTime) return "Unscheduled";
-  const start = getStartTimePlusBreak(session.startTime, breakMinutes).setZone(
-    timezone
-  );
+  const start = DateTime.fromJSDate(session.startTime).setZone(timezone);
   const end = DateTime.fromJSDate(session.endTime).setZone(timezone);
   return `${start.toFormat("cccc d LLLL, HH:mm")}–${end.toFormat("HH:mm")}`;
 }

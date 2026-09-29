@@ -57,9 +57,8 @@ test("the agenda groups sessions by start time and opens their details", async (
   await login(page);
   await page.goto("/Conference-Gamma");
   await switchToView(page, "Agenda");
-  // The keynote's slot starts at 09:00; the heading shows when the session
-  // itself starts, after the event's 10-minute break — as its details do.
-  const nineOClock = page.getByRole("region", { name: "09:10" }).first();
+  // The seeded keynote is an organizer's, starting at 09:00 without a break.
+  const nineOClock = page.getByRole("region", { name: "09:00" }).first();
   await nineOClock.getByRole("link", { name: KEYNOTE }).click();
   await expect(
     page.getByRole("dialog", { name: "Session details" })

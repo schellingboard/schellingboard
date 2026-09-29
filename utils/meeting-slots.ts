@@ -38,9 +38,9 @@ export function meetingSlotsForDay(
 }
 
 /**
- * When a slot is shown to start: after the break at its head, as a session in
- * the same slot is (see `getStartTimePlusBreak`), so the two line up on the
- * schedule. Booking, clashes and expiry keep using the slot itself.
+ * When a slot is shown to start: after the break at its head, where a session
+ * booked into the same slot starts, so the two line up on the schedule.
+ * Booking, clashes and expiry keep using the slot itself.
  */
 export function shownSlotStart(slotStart: Date, breakMinutes: number): Date {
   return new Date(slotStart.getTime() + breakMinutes * MS_PER_MINUTE);

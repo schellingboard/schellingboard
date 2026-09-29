@@ -8,18 +8,15 @@ import {
 
 const at = (time: string) => new Date(`2026-09-01T${time}:00Z`);
 
-// The reference session: stored start 10:00 with a 10-minute break, so the
-// displayed start is 10:10, the heads-up is due at 09:10 and the follow-up at
-// 11:15.
-const BREAK_MINUTES = 10;
-const startTime = at("10:00");
+// The reference session starts at 10:10, so the heads-up is due at 09:10 and
+// the follow-up at 11:15.
+const startTime = at("10:10");
 const endTime = at("11:00");
 
 const headsUp = {
   now: at("09:10"),
   startTime,
   endTime,
-  breakMinutes: BREAK_MINUTES,
   storedDueTime: null,
   storedClaimedAt: null,
   alreadyNotifiedHost: false,
@@ -34,12 +31,8 @@ const followUp = {
 };
 
 describe("due times", () => {
-  it("puts the heads-up an hour before the displayed start, break included", () => {
-    expect(headsUpDueTime(startTime, BREAK_MINUTES)).toEqual(at("09:10"));
-  });
-
-  it("puts the heads-up an hour before the stored start when there is no break", () => {
-    expect(headsUpDueTime(startTime, 0)).toEqual(at("09:00"));
+  it("puts the heads-up an hour before the start", () => {
+    expect(headsUpDueTime(startTime)).toEqual(at("09:10"));
   });
 
   it("puts the follow-up a quarter hour after the end", () => {
@@ -52,7 +45,7 @@ describe("headsUpEligible", () => {
     expect(headsUpEligible({ ...headsUp, now: at("09:09") })).toBe(false);
   });
 
-  it("is due exactly an hour before the displayed start", () => {
+  it("is due exactly an hour before the start", () => {
     expect(headsUpEligible(headsUp)).toBe(true);
   });
 
@@ -103,10 +96,10 @@ describe("headsUpEligible", () => {
   });
 
   describe("a session moved three hours out", () => {
-    // Displayed start 13:10, so the new heads-up is due at 12:10.
+    // Start 13:10, so the new heads-up is due at 12:10.
     const moved = {
       ...headsUp,
-      startTime: at("13:00"),
+      startTime: at("13:10"),
       endTime: at("14:00"),
       storedDueTime: at("09:10"),
       alreadyNotifiedHost: true,
@@ -122,12 +115,12 @@ describe("headsUpEligible", () => {
   });
 
   describe("a session moved to start 45 minutes from now", () => {
-    // Displayed start 10:30, so the new heads-up came due at 09:30 and is
+    // Start 10:30, so the new heads-up came due at 09:30 and is
     // already overdue.
     const moved = {
       ...headsUp,
       now: at("09:45"),
-      startTime: at("10:20"),
+      startTime: at("10:30"),
       endTime: at("11:20"),
     };
 
@@ -172,22 +165,22 @@ describe("headsUpEligible", () => {
     };
 
     it("suppresses a heads-up sent exactly 90 minutes before the new start", () => {
-      // Displayed start 10:40, 90 minutes after the 09:10 heads-up.
+      // Start 10:40, 90 minutes after the 09:10 heads-up.
       expect(
         headsUpEligible({
           ...reminded,
-          startTime: at("10:30"),
+          startTime: at("10:40"),
           endTime: at("11:40"),
         })
       ).toBe(false);
     });
 
     it("sends again one minute past that", () => {
-      // Displayed start 10:41.
+      // Start 10:41.
       expect(
         headsUpEligible({
           ...reminded,
-          startTime: at("10:31"),
+          startTime: at("10:41"),
           endTime: at("11:41"),
         })
       ).toBe(true);

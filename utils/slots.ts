@@ -99,6 +99,27 @@ export function slotDurationOptions(
 }
 
 /**
+ * The durations a session booked from a slot `slotOffsetMinutes` past the
+ * grid may run: each ends on the grid, after the slot's break is over. An
+ * organizer's breakless session keeps a slot off the grid.
+ */
+export function gridEndingDurations(opts: {
+  slotOffsetMinutes: number;
+  incrementMinutes: number;
+  maxDuration: number;
+  breakMinutes: number;
+}): number[] {
+  const { slotOffsetMinutes, incrementMinutes, maxDuration, breakMinutes } =
+    opts;
+  if (slotOffsetMinutes === 0) {
+    return slotDurationOptions(incrementMinutes, maxDuration);
+  }
+  return slotDurationOptions(incrementMinutes, maxDuration + slotOffsetMinutes)
+    .map((d) => d - slotOffsetMinutes)
+    .filter((d) => d > breakMinutes && d <= maxDuration);
+}
+
+/**
  * Why a self-booked session is too long, or null. The form only offers the
  * durations above, so anything longer is a hand-crafted payload claiming more
  * of a room than the event allows.

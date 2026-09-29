@@ -9,12 +9,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useContext, useState } from "react";
 import { CurrentUserModal, ConfirmationModal, AlertModal } from "../modals";
-import { UserContext, EventContext, useBreakMinutes } from "../context";
-import {
-  formatOptionalTime,
-  formatStartTimePlusBreak,
-  TIME_FORMAT,
-} from "@/utils/utils";
+import { UserContext, EventContext } from "../context";
+import { formatOptionalTime, TIME_FORMAT } from "@/utils/utils";
 import { isBookableSlot } from "@/utils/session-bookable";
 import type { ColumnItem } from "@/utils/schedule-column";
 import { LockIcon } from "../lock-icon";
@@ -137,7 +133,6 @@ function SessionInfoDisplay({
   numRSVPs: number;
   timezone: string;
 }) {
-  const breakMinutes = useBreakMinutes();
   const plainDescription = stripMarkdown(session.description);
   return (
     <>
@@ -165,13 +160,8 @@ function SessionInfoDisplay({
         <div className="flex gap-1">
           <ClockIcon className="h-4 w-4" />
           <span>
-            {formatStartTimePlusBreak(
-              session,
-              breakMinutes,
-              timezone,
-              TIME_FORMAT
-            )}{" "}
-            - {formatOptionalTime(session.endTime, timezone, TIME_FORMAT)}
+            {formatOptionalTime(session.startTime, timezone, TIME_FORMAT)} -{" "}
+            {formatOptionalTime(session.endTime, timezone, TIME_FORMAT)}
           </span>
         </div>
       </div>

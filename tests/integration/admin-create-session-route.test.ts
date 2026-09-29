@@ -163,7 +163,7 @@ describe("POST /api/admin/create-session", () => {
     );
   });
 
-  it("rejects times misaligned with the event's slot grid", async () => {
+  it("stores the times it is sent, at any minute and with no break added", async () => {
     await createDay(event.id, {
       start: new Date("2026-09-01T08:00:00Z"),
       end: new Date("2026-09-01T18:00:00Z"),
@@ -175,8 +175,9 @@ describe("POST /api/admin/create-session", () => {
       startTime: "2026-09-01T10:07:00Z",
       endTime: "2026-09-01T11:00:00Z",
     });
-    expect(res.status).toBe(400);
-    expect(await getRepositories().sessions.listByEvent(event.id)).toEqual([]);
+    expect(res.ok).toBe(true);
+    const [session] = await getRepositories().sessions.listByEvent(event.id);
+    expect(session.startTime?.toISOString()).toBe("2026-09-01T10:07:00.000Z");
   });
 
   it("returns 404 for an unknown eventSlug", async () => {

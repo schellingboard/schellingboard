@@ -7,6 +7,7 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 
 import { runMigrations } from "@/db/migrate";
 import { followUpDueTime } from "@/utils/reminder-schedule";
+import { MIGRATIONS, migrationsBefore } from "../helpers/migrations";
 
 // The migration that adds the reminder machinery has to settle the follow-up
 // for every session that had already finished when it ran. Without that, the
@@ -18,31 +19,9 @@ import { followUpDueTime } from "@/utils/reminder-schedule";
 // means running the migrations in two passes: up to the one before, then all
 // of them.
 
-const MIGRATIONS = path.join(process.cwd(), "drizzle");
 const BACKFILL_IDX = 33;
 
 const HOUR_MS = 60 * 60 * 1000;
-
-/** A copy of drizzle/ whose journal stops before `idx`. */
-function migrationsBefore(idx: number, into: string): string {
-  const folder = path.join(into, `migrations-before-${idx}`);
-  fs.mkdirSync(path.join(folder, "meta"), { recursive: true });
-  const journal = JSON.parse(
-    fs.readFileSync(path.join(MIGRATIONS, "meta/_journal.json"), "utf8")
-  ) as { entries: { idx: number; tag: string }[] };
-  journal.entries = journal.entries.filter((entry) => entry.idx < idx);
-  fs.writeFileSync(
-    path.join(folder, "meta/_journal.json"),
-    JSON.stringify(journal)
-  );
-  for (const entry of journal.entries) {
-    fs.copyFileSync(
-      path.join(MIGRATIONS, `${entry.tag}.sql`),
-      path.join(folder, `${entry.tag}.sql`)
-    );
-  }
-  return folder;
-}
 
 type Row = {
   session_id: string;

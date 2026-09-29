@@ -44,7 +44,9 @@ export const SHOWN_RELEASES = 3;
 export const releaseNotes: ReleaseNote[] = [
   {
     version: "Unreleased",
-    highlights: [],
+    highlights: [
+      "**Sessions at any minute, with or without a break**: organizers can start a session whenever they like, and skip the break before one such as an opening keynote.",
+    ],
   },
   {
     version: "3.8.1",

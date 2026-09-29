@@ -1,14 +1,10 @@
 import clsx from "clsx";
 import Link from "next/link";
 import type { Session, Location } from "@/db/repositories/interfaces";
-import {
-  formatOptionalTime,
-  formatStartTimePlusBreak,
-  TIME_FORMAT,
-} from "@/utils/utils";
+import { formatOptionalTime, TIME_FORMAT } from "@/utils/utils";
 import { useState, useContext } from "react";
 import { useSearchParams } from "next/navigation";
-import { UserContext, EventContext, useBreakMinutes } from "../context";
+import { UserContext, EventContext } from "../context";
 import { CheckCircleIcon, AcademicCapIcon } from "@heroicons/react/24/solid";
 import { LockIcon } from "../lock-icon";
 import { viewSessionLinkFromOwner } from "./modal-nav";
@@ -25,7 +21,6 @@ export function SessionText(props: {
   const { user: currentUser } = useContext(UserContext);
   const { rsvpdForSession, event } = useContext(EventContext);
   const timezone = event?.timezone ?? "UTC";
-  const breakMinutes = useBreakMinutes();
   const [showFullDescription, setShowFullDescription] = useState(false);
 
   const rsvpd = currentUser ? rsvpdForSession(session.id) : false;
@@ -78,20 +73,9 @@ export function SessionText(props: {
         <div className="flex gap-2 text-sm text-fg-subtle">
           <div className="flex gap-1">
             <span>
-              {formatStartTimePlusBreak(
-                session,
-                breakMinutes,
-                timezone,
-                "EEEE"
-              )}
-              ,{" "}
-              {formatStartTimePlusBreak(
-                session,
-                breakMinutes,
-                timezone,
-                TIME_FORMAT
-              )}{" "}
-              - {formatOptionalTime(session.endTime, timezone, TIME_FORMAT)}
+              {formatOptionalTime(session.startTime, timezone, "EEEE")},{" "}
+              {formatOptionalTime(session.startTime, timezone, TIME_FORMAT)} -{" "}
+              {formatOptionalTime(session.endTime, timezone, TIME_FORMAT)}
             </span>
           </div>
           •

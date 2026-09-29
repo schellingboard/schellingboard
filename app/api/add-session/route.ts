@@ -10,6 +10,7 @@ import {
 import { sessionBookingWindowError } from "@/utils/day-window";
 import { sessionDurationError } from "@/utils/slots";
 import {
+  bookedSlot,
   prepareToInsert,
   sessionCapacityError,
   validateSession,
@@ -43,8 +44,7 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
-  const input = prepareToInsert(params, day);
-  const event = await repos.events.findById(input.eventId);
+  const event = await repos.events.findById(day.eventId);
   const now = requestNow(req);
   if (!event || !inSchedPhase(event, now)) {
     return Response.json(
@@ -52,18 +52,20 @@ export async function POST(req: NextRequest) {
       { status: 403 }
     );
   }
+  const input = prepareToInsert(params, day, event.breakMinutes);
+  const slot = bookedSlot(params);
   const windowError = sessionBookingWindowError(
     day,
-    input.startTime!,
-    input.endTime!,
+    slot.start,
+    slot.end,
     event.slotIncrementMinutes
   );
   if (windowError) {
     return Response.json({ error: windowError }, { status: 400 });
   }
   const durationError = sessionDurationError(
-    input.startTime!,
-    input.endTime!,
+    slot.start,
+    slot.end,
     event.slotIncrementMinutes,
     event.maxSessionDuration
   );

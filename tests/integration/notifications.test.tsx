@@ -197,8 +197,8 @@ describe("notifySessionChanged", () => {
     expect(html).toContain("A session you RSVP’d to");
     // The description is not re-sent over email; the link is enough.
     expect(html).not.toContain("hands-on");
-    expect(html).toContain("Saturday 1 August, 15:10–16:00");
-    expect(html).toContain("(was Saturday 1 August, 10:10–11:00)");
+    expect(html).toContain("Saturday 1 August, 15:00–16:00");
+    expect(html).toContain("(was Saturday 1 August, 10:00–11:00)");
     expect(html).toContain("Room A");
     // The location did not change, so no old location is given.
     expect(html.match(/\(was /g)).toHaveLength(1);
@@ -520,7 +520,7 @@ describe("notifySessionDeleted", () => {
     expect(hostHtml).toContain("has been deleted");
     expect(attendeeHtml).toContain("has been deleted");
     expect(hostHtml).not.toContain("hands-on");
-    expect(hostHtml).toContain("Saturday 1 August, 10:10");
+    expect(hostHtml).toContain("Saturday 1 August, 10:00");
     expect(hostHtml).toContain("Room A");
     expect(hostHtml).toContain(`href="https://site.example/${event.slug}"`);
   });
@@ -640,7 +640,7 @@ describe("notifyCohostsAdded", () => {
     const html = await renderWithoutComments(message.body);
     expect(html).toContain("co-host");
     expect(html).not.toContain("hands-on");
-    expect(html).toContain("Saturday 1 August, 10:10–11:00");
+    expect(html).toContain("Saturday 1 August, 10:00–11:00");
     expect(html).toContain("Room A");
     expect(html).toContain(
       `href="https://site.example/${event.slug}?viewSession=${session.id}"`

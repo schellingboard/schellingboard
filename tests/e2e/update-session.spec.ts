@@ -62,6 +62,10 @@ test("updating a session emails the RSVP'd guest and the added co-host", async (
   await page.getByRole("option", { name: /Garden Terrace/ }).click();
   await listboxButton(page, /^Start Time/).click();
   await page.getByRole("option", { name: "15:10" }).click();
+  await page.getByRole("radio", { name: "50 minutes", exact: true }).check();
+  await expect(
+    page.getByText("Your session runs 15:10 – 16:00.")
+  ).toBeVisible();
   const submit = page.getByRole("button", { name: "Submit" });
   await expect(submit).toBeEnabled();
   await submit.click();

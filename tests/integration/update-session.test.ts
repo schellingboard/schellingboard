@@ -124,7 +124,12 @@ async function createOngoingDay(eventId: string): Promise<Day> {
   });
 }
 
-/** The payload the form posts when it re-sends a session's own times. */
+const BREAK_MS = 10 * 60 * 1000;
+
+/**
+ * The payload the form posts when it re-sends a session's own times: the slot
+ * its start sits in after the factory event's 10-minute break.
+ */
 function payloadFor(
   session: Session,
   host: Guest,
@@ -132,16 +137,22 @@ function payloadFor(
   day: Day,
   overrides?: Partial<SessionParams>
 ): SessionParams {
+  const slot = session.startTime!.getTime() - BREAK_MS;
   return {
     ...basePayload(host, location, day, {
       title: session.title,
-      startTime: session.startTime!.toISOString(),
-      duration:
-        (session.endTime!.getTime() - session.startTime!.getTime()) / 60_000,
+      startTime: new Date(slot).toISOString(),
+      duration: minutesFromSlot(session, session.endTime!.toISOString()),
       ...overrides,
     }),
     id: session.id,
   };
+}
+
+/** The duration that, kept in the session's own slot, ends at `end`. */
+function minutesFromSlot(session: Session, end: string): number {
+  const slot = session.startTime!.getTime() - BREAK_MS;
+  return (new Date(end).getTime() - slot) / 60_000;
 }
 
 /** Creates a session via add-session and returns its id. */
@@ -276,6 +287,36 @@ describe("POST /api/update-session", () => {
     expect(after.startTime!.getTime()).toBeGreaterThan(
       before.startTime!.getTime()
     );
+    expect(after.startTime!.toISOString()).toBe(
+      slotStart(day, 180 + event.breakMinutes)
+    );
+  });
+
+  it("keeps the start of a session an organizer placed without a break", async () => {
+    const event = await createEvent({ phase: "scheduling" });
+    const host = await createGuest({ eventId: event.id });
+    const location = await createLocation({ eventId: event.id });
+    const day = await createDay(event.id);
+    const keynote = await createSession(event.id, {
+      title: "Keynote",
+      hostIds: [host.id],
+      locationIds: [location.id],
+      startTime: new Date(slotStart(day, 0)),
+      endTime: new Date(slotStart(day, 60)),
+    });
+
+    const res = await POST(
+      makeUpdateReq(
+        payloadFor(keynote, host, location, day, { title: "Opening Keynote" }),
+        { editorGuestId: host.id }
+      )
+    );
+    expect(res.ok).toBe(true);
+
+    const updated = (await getRepositories().sessions.findById(keynote.id))!;
+    expect(updated.title).toBe("Opening Keynote");
+    expect(updated.startTime!.toISOString()).toBe(slotStart(day, 0));
+    expect(updated.endTime!.toISOString()).toBe(slotStart(day, 60));
   });
 
   it("rejects move to colliding slot; session remains unchanged", async () => {
@@ -400,7 +441,9 @@ describe("POST /api/update-session", () => {
     expect(res.status).toBe(400);
 
     const unchanged = (await getRepositories().sessions.findById(id))!;
-    expect(unchanged.startTime!.toISOString()).toBe(slotStart(day, 60));
+    expect(unchanged.startTime!.toISOString()).toBe(
+      slotStart(day, 60 + event.breakMinutes)
+    );
   });
 
   it("rejects stretching a session beyond the event's maximum duration", async () => {
@@ -429,9 +472,7 @@ describe("POST /api/update-session", () => {
     });
 
     const unchanged = (await getRepositories().sessions.findById(id))!;
-    expect(unchanged.endTime!.getTime() - unchanged.startTime!.getTime()).toBe(
-      60 * 60 * 1000
-    );
+    expect(unchanged.endTime!.toISOString()).toBe(slotStart(day, 120));
   });
 
   it("rejects a day id that is not one", async () => {
@@ -790,7 +831,7 @@ describe("POST /api/update-session", () => {
       title: "Underway",
       hostIds: [host.id],
       locationIds: [location.id],
-      startTime: new Date(slotStart(day, 120)),
+      startTime: new Date(slotStart(day, 120 + event.breakMinutes)),
       endTime: new Date(slotStart(day, 180)),
     });
 
@@ -883,6 +924,7 @@ describe("POST /api/update-session", () => {
         makeUpdateReq(
           payloadFor(placed, host, location, day, {
             startTime: slotStart(day, 60),
+            duration: 60,
           }),
           { editorGuestId: host.id }
         )
@@ -890,7 +932,9 @@ describe("POST /api/update-session", () => {
       expect(res.ok).toBe(true);
 
       const updated = (await getRepositories().sessions.findById(placed.id))!;
-      expect(updated.startTime!.toISOString()).toBe(slotStart(day, 60));
+      expect(updated.startTime!.toISOString()).toBe(
+        slotStart(day, 60 + event.breakMinutes)
+      );
     });
 
     it("judges the new end without holding the old start against it", async () => {
@@ -908,7 +952,9 @@ describe("POST /api/update-session", () => {
 
       const res = await POST(
         makeUpdateReq(
-          payloadFor(placed, host, location, day, { duration: 120 }),
+          payloadFor(placed, host, location, day, {
+            duration: minutesFromSlot(placed, slotStart(day, 30)),
+          }),
           { editorGuestId: host.id }
         )
       );
@@ -916,7 +962,7 @@ describe("POST /api/update-session", () => {
 
       const updated = (await getRepositories().sessions.findById(placed.id))!;
       expect(updated.startTime!.toISOString()).toBe(slotStart(day, -60));
-      expect(updated.endTime!.toISOString()).toBe(slotStart(day, 60));
+      expect(updated.endTime!.toISOString()).toBe(slotStart(day, 30));
     });
 
     it("keeps a run longer than the event's maximum", async () => {

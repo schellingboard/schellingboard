@@ -658,7 +658,6 @@ export type DueReminderCandidate = ReminderKey & {
 
   eventSlug: string;
   eventTimezone: string;
-  eventBreakMinutes: number;
 
   /**
    * Null when the host has no address on file. That skips the mail only — the

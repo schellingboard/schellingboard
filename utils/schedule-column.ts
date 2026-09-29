@@ -1,14 +1,38 @@
 import type { Session } from "@/db/repositories/interfaces";
-import { shownStart } from "@/utils/agenda";
 import { gridBlockPx } from "@/utils/slots";
 
 export type ColumnItem =
   | { kind: "session"; session: Session; topPx: number; heightPx: number }
   | { kind: "free"; start: Date; topPx: number; heightPx: number };
 
+type Scheduled = Session & { startTime: Date; endTime: Date };
+
+const MS_PER_MINUTE = 60 * 1000;
+
 /**
- * One room's day on the schedule grid: each session placed by the minute as
- * attendees see it, and a cell for each slot the room has entirely free.
+ * Whether a session booked into the slot at `slotStart` could run for one
+ * slot: the room is free from the end of the slot's break to its end.
+ */
+export function slotIsFree(
+  sessions: Session[],
+  slotStart: Date,
+  incrementMinutes: number,
+  breakMinutes: number
+): boolean {
+  const from = slotStart.getTime() + breakMinutes * MS_PER_MINUTE;
+  const until = slotStart.getTime() + incrementMinutes * MS_PER_MINUTE;
+  return !sessions.some(
+    (s) =>
+      !!s.startTime &&
+      !!s.endTime &&
+      s.startTime.getTime() < until &&
+      s.endTime.getTime() > from
+  );
+}
+
+/**
+ * One room's day on the schedule grid: each session placed by the minute, and
+ * a cell for each slot a session could still be booked into.
  */
 export function locationColumn(input: {
   sessions: Session[];
@@ -20,23 +44,30 @@ export function locationColumn(input: {
   const block = (from: Date, to: Date) =>
     gridBlockPx(day.start, from, to, incrementMinutes);
   const scheduled = sessions.filter(
-    (s): s is Session & { startTime: Date; endTime: Date } =>
-      !!s.startTime && !!s.endTime
+    (s): s is Scheduled => !!s.startTime && !!s.endTime
   );
   const items: ColumnItem[] = scheduled.map((session) => ({
     kind: "session",
     session,
-    ...block(shownStart(session, breakMinutes), session.endTime),
+    ...block(session.startTime, session.endTime),
   }));
 
-  const slotMs = incrementMinutes * 60 * 1000;
+  const slotMs = incrementMinutes * MS_PER_MINUTE;
   for (let t = day.start.getTime(); t < day.end.getTime(); t += slotMs) {
     const start = new Date(t);
-    const end = new Date(t + slotMs);
-    const occupied = scheduled.some(
-      (s) => s.startTime < end && s.endTime > start
+    if (!slotIsFree(scheduled, start, incrementMinutes, breakMinutes)) continue;
+    // A session may run into the slot's break; the cell starts where it ends.
+    const top = Math.max(
+      t,
+      ...scheduled
+        .map((s) => s.endTime.getTime())
+        .filter((end) => end > t && end < t + slotMs)
     );
-    if (!occupied) items.push({ kind: "free", start, ...block(start, end) });
+    items.push({
+      kind: "free",
+      start,
+      ...block(new Date(top), new Date(t + slotMs)),
+    });
   }
   return items.sort((a, b) => a.topPx - b.topPx);
 }

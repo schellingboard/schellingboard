@@ -168,7 +168,6 @@ function eligible(candidate: DueReminderCandidate, now: Date): boolean {
         now,
         startTime: candidate.sessionStartTime,
         endTime: candidate.sessionEndTime,
-        breakMinutes: candidate.eventBreakMinutes,
         storedDueTime: candidate.storedDueTime,
         storedClaimedAt: candidate.storedClaimedAt,
         alreadyNotifiedHost: candidate.storedNotifiedAt !== null,
@@ -195,10 +194,7 @@ function message(candidate: DueReminderCandidate, base: string) {
     return attendeeCountHeadsUpEmail({
       title: candidate.sessionTitle,
       time: formatInEventZone(
-        new Date(
-          candidate.sessionStartTime.getTime() +
-            candidate.eventBreakMinutes * 60 * 1000
-        ),
+        candidate.sessionStartTime,
         candidate.eventTimezone
       ),
       location: candidate.sessionLocationNames.join(", ") || "No location",

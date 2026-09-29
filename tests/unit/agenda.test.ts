@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import {
   agendaGroups,
   nowMarkerIndex,
-  shownStart,
   timeState,
   type AgendaGroup,
 } from "@/utils/agenda";
@@ -69,17 +68,13 @@ const group = (input: {
     breakMinutes: input.breakMinutes ?? 10,
   });
 
-describe("shownStart", () => {
-  it("is the slot start plus the break, except for a blocker", () => {
-    expect(shownStart(session(at(9), at(10)), 10)).toEqual(at(9, 10));
-    expect(shownStart(blocker("a", at(14)), 10)).toEqual(at(12, 30));
-  });
-});
-
 describe("agendaGroups", () => {
-  it("heads sessions by their shown start, in room order", () => {
+  it("heads sessions by their start, in room order", () => {
     const groups = group({
-      sessions: [session(at(9), at(10), "b"), session(at(9), at(10), "a")],
+      sessions: [
+        session(at(9, 10), at(10), "b"),
+        session(at(9, 10), at(10), "a"),
+      ],
     });
     expect(groups.map((g) => g.start)).toEqual([at(9, 10)]);
     expect(groups[0].sessions.map((s) => s.locations[0].id)).toEqual([
@@ -90,7 +85,10 @@ describe("agendaGroups", () => {
 
   it("keeps a blocker on its slot when a session shares the slot", () => {
     const groups = group({
-      sessions: [session(at(9), at(10), "a"), blocker("b", at(9, 30), at(9))],
+      sessions: [
+        session(at(9, 10), at(10), "a"),
+        blocker("b", at(9, 30), at(9)),
+      ],
     });
     expect(groups.map((g) => [g.start, g.sessions.length])).toEqual([
       [at(9), 1],
@@ -99,10 +97,12 @@ describe("agendaGroups", () => {
     expect(groups[0].sessions[0].blocker).toBe(true);
   });
 
-  it("keeps sessions whose shown start meets a blocker's slot", () => {
+  it("keeps sessions whose start meets a blocker's slot", () => {
     const groups = group({
-      sessions: [session(at(9), at(10), "a"), blocker("b", at(10), at(9, 30))],
-      breakMinutes: 30,
+      sessions: [
+        session(at(9, 30), at(10), "a"),
+        blocker("b", at(10), at(9, 30)),
+      ],
     });
     expect(groups.map((g) => g.start)).toEqual([at(9, 30)]);
     expect(groups[0].sessions.map((s) => s.blocker).sort()).toEqual([
@@ -145,7 +145,7 @@ describe("agendaGroups", () => {
 
   it("gives a 1-on-1 its own time between the session groups", () => {
     const groups = group({
-      sessions: [session(at(9), at(10)), session(at(11), at(12))],
+      sessions: [session(at(9, 10), at(10)), session(at(11, 10), at(12))],
       meetings: [meeting(at(10), "Leilani")],
     });
     expect(groups.map((g) => g.start)).toEqual([
@@ -162,7 +162,7 @@ describe("agendaGroups", () => {
   // before it.
   it("lists 1-on-1s sharing a session's slot under its heading", () => {
     const groups = group({
-      sessions: [session(at(9), at(10))],
+      sessions: [session(at(9, 10), at(10))],
       meetings: [meeting(at(9), "Sam"), meeting(at(9), "Ana")],
     });
     expect(groups).toHaveLength(1);

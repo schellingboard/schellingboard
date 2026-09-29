@@ -1458,6 +1458,63 @@ test.describe("Admin UI sessions", () => {
     await expect(row).toHaveCount(0);
   });
 
+  test("adds the break before a new session unless told not to", async ({
+    page,
+  }) => {
+    await adminLogin(page);
+    await page.goto("/admin/events");
+    await page
+      .getByRole("listitem")
+      .filter({ hasText: "Conference Alpha" })
+      .getByRole("link", { name: "Manage" })
+      .click();
+    await openEventTab(page, "Sessions");
+    const sessions = page.getByRole("region", { name: "Sessions" });
+
+    const create = async (title: string, breakBefore: boolean) => {
+      await sessions.getByRole("button", { name: "Add session" }).click();
+      await sessions.getByLabel("Title *").fill(title);
+      await sessions.getByLabel(/^Start/).fill("2030-01-01T10:00");
+      await sessions.getByLabel(/^End/).fill("2030-01-01T11:00");
+      const breakBox = sessions.getByLabel(/^Break before/);
+      await expect(breakBox).toBeChecked();
+      if (!breakBefore) await breakBox.uncheck();
+      await expect(
+        sessions.getByText(`Starts at ${breakBefore ? "10:10" : "10:00"}`)
+      ).toBeVisible();
+      await sessions
+        .getByRole("button", { name: "Create", exact: true })
+        .click();
+      await expect(sessions.getByLabel("Title *")).toHaveCount(0);
+    };
+
+    const suffix = uniqueSuffix();
+    const withBreak = `Talk ${suffix}`;
+    const keynote = `Keynote ${suffix}`;
+    await create(withBreak, true);
+    await create(keynote, false);
+
+    const search = sessions.getByRole("searchbox", {
+      name: "Search",
+      exact: true,
+    });
+    for (const [title, start] of [
+      [withBreak, "2030-01-01T10:10"],
+      [keynote, "2030-01-01T10:00"],
+    ]) {
+      await search.fill(title);
+      await expect(sessions.getByRole("listitem")).toHaveCount(1);
+      const row = sessions.getByRole("listitem").filter({ hasText: title });
+      await expect(row).toContainText(`${start} – 2030-01-01T11:00`);
+      await row.getByRole("button", { name: /^Delete/ }).click();
+      await sessions
+        .getByLabel("Type the session title to confirm")
+        .fill(title);
+      await sessions.getByRole("button", { name: "Confirm delete" }).click();
+      await expect(row).toHaveCount(0);
+    }
+  });
+
   test("deletes a session via named confirm", async ({ page }) => {
     await adminLogin(page);
     await page.goto("/admin/events");

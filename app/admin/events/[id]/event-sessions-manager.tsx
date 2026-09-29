@@ -18,6 +18,7 @@ import { DataTable } from "../../data-table";
 import { SelectHosts } from "@/app/select-hosts";
 import { utcToZonedInput, zonedInputToUtc } from "@/utils/admin-datetime";
 import { MarkdownHint } from "@/app/(site)/markdown";
+import { DateTime } from "luxon";
 
 export type SessionRow = {
   id: string;
@@ -185,7 +186,7 @@ function SessionForm({
   initial,
   idPrefix,
   timezone,
-  slotIncrementMinutes,
+  breakMinutes,
   hostCandidates,
   locationCandidates,
   submitLabel,
@@ -197,7 +198,8 @@ function SessionForm({
   initial: SessionFormValues;
   idPrefix: string;
   timezone: string;
-  slotIncrementMinutes: number;
+  /** Offers to start a new session after the event's break. */
+  breakMinutes?: number;
   hostCandidates: EventGuest[];
   locationCandidates: EventLocation[];
   submitLabel: string;
@@ -220,6 +222,13 @@ function SessionForm({
     )
   );
   const [locationIds, setLocationIds] = useState<string[]>(initial.locationIds);
+  const [breakBefore, setBreakBefore] = useState(true);
+  const addsBreak = !!breakMinutes && breakBefore && !blocker && !!startTime;
+  const savedStart = addsBreak
+    ? DateTime.fromISO(startTime, { zone: timezone })
+        .plus({ minutes: breakMinutes })
+        .toFormat("yyyy-MM-dd'T'HH:mm")
+    : startTime;
 
   const toggleLocation = (id: string) =>
     setLocationIds((prev) =>
@@ -231,7 +240,7 @@ function SessionForm({
     onSubmit({
       title,
       description,
-      startTime,
+      startTime: savedStart,
       endTime,
       capacity,
       adminManaged,
@@ -279,7 +288,7 @@ function SessionForm({
           <Input
             id={`${idPrefix}-start`}
             type="datetime-local"
-            step={slotIncrementMinutes * 60}
+            step={60}
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
             className="w-full h-10"
@@ -292,13 +301,31 @@ function SessionForm({
           <Input
             id={`${idPrefix}-end`}
             type="datetime-local"
-            step={slotIncrementMinutes * 60}
+            step={60}
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
             className="w-full h-10"
           />
         </div>
       </div>
+      {!!breakMinutes && !blocker && (
+        <div className="flex flex-col gap-1">
+          <label className="flex items-center gap-2 text-sm text-fg-muted">
+            <input
+              type="checkbox"
+              checked={breakBefore}
+              onChange={(e) => setBreakBefore(e.target.checked)}
+              className="h-4 w-4 cursor-pointer"
+            />
+            Break before ({breakMinutes} min)
+          </label>
+          {startTime && (
+            <p className="text-sm text-fg-subtle">
+              Starts at {savedStart.slice(-5)}
+            </p>
+          )}
+        </div>
+      )}
       <div className="flex flex-col gap-1">
         <label
           htmlFor={`${idPrefix}-capacity`}
@@ -409,14 +436,12 @@ function SessionItem({
   eventGuests,
   eventLocations,
   timezone,
-  slotIncrementMinutes,
   onError,
 }: {
   session: SessionRow;
   eventGuests: EventGuest[];
   eventLocations: EventLocation[];
   timezone: string;
-  slotIncrementMinutes: number;
   onError: (e: string | null) => void;
 }) {
   const router = useRouter();
@@ -577,7 +602,6 @@ function SessionItem({
       }}
       idPrefix={`sess-${session.id}`}
       timezone={timezone}
-      slotIncrementMinutes={slotIncrementMinutes}
       hostCandidates={hostCandidates}
       locationCandidates={locationCandidates}
       submitLabel="Save"
@@ -612,14 +636,14 @@ function AddSession({
   eventGuests,
   eventLocations,
   timezone,
-  slotIncrementMinutes,
+  breakMinutes,
   onError,
 }: {
   eventId: string;
   eventGuests: EventGuest[];
   eventLocations: EventLocation[];
   timezone: string;
-  slotIncrementMinutes: number;
+  breakMinutes: number;
   onError: (e: string | null) => void;
 }) {
   const router = useRouter();
@@ -661,7 +685,7 @@ function AddSession({
         initial={EMPTY_SESSION}
         idPrefix="sess-new"
         timezone={timezone}
-        slotIncrementMinutes={slotIncrementMinutes}
+        breakMinutes={breakMinutes}
         hostCandidates={eventGuests}
         locationCandidates={eventLocations}
         submitLabel="Create"
@@ -683,7 +707,7 @@ export function EventSessionsManager({
   eventGuests,
   eventLocations,
   timezone,
-  slotIncrementMinutes,
+  breakMinutes,
   total,
   page,
   pageSize,
@@ -694,7 +718,7 @@ export function EventSessionsManager({
   eventGuests: EventGuest[];
   eventLocations: EventLocation[];
   timezone: string;
-  slotIncrementMinutes: number;
+  breakMinutes: number;
   total: number;
   page: number;
   pageSize: number;
@@ -715,7 +739,7 @@ export function EventSessionsManager({
         eventGuests={eventGuests}
         eventLocations={eventLocations}
         timezone={timezone}
-        slotIncrementMinutes={slotIncrementMinutes}
+        breakMinutes={breakMinutes}
         onError={setError}
       />
 
@@ -734,7 +758,6 @@ export function EventSessionsManager({
             eventGuests={eventGuests}
             eventLocations={eventLocations}
             timezone={timezone}
-            slotIncrementMinutes={slotIncrementMinutes}
             onError={setError}
           />
         )}

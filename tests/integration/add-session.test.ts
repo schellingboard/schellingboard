@@ -20,6 +20,7 @@ import {
   createGuest,
   createLocation,
   createDay,
+  createSession,
   slotStart,
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
@@ -140,10 +141,41 @@ describe("POST /api/add-session", () => {
     expect(session.title).toBe("Test Session");
     expect(session.hosts[0].id).toBe(guest.id);
     expect(session.locations[0].id).toBe(location.id);
-    expect(session.startTime).toBeDefined();
-    expect(session.endTime!.getTime() - session.startTime!.getTime()).toBe(
-      60 * 60 * 1000
+  });
+
+  it("starts the session after the event's break and ends it with its slot", async () => {
+    const event = await createEvent({ phase: "scheduling" });
+    const guest = await createGuest({ eventId: event.id });
+    const location = await createLocation({ eventId: event.id });
+    const day = await createDay(event.id);
+
+    const res = await POST(
+      makeReq(buildPayload(guest, location, day, { duration: 60 }))
     );
+    expect(res.ok).toBe(true);
+
+    const [session] = await getRepositories().sessions.listByEvent(event.id);
+    expect(session.startTime!.toISOString()).toBe(
+      slotStart(day, 60 + event.breakMinutes)
+    );
+    expect(session.endTime!.toISOString()).toBe(slotStart(day, 120));
+  });
+
+  it("books a slot whose break an organizer's session runs into", async () => {
+    const event = await createEvent({ phase: "scheduling" });
+    const guest = await createGuest({ eventId: event.id });
+    const location = await createLocation({ eventId: event.id });
+    const day = await createDay(event.id);
+    await createSession(event.id, {
+      title: "Keynote",
+      locationIds: [location.id],
+      startTime: new Date(slotStart(day, 0)),
+      endTime: new Date(slotStart(day, 65)),
+    });
+
+    const res = await POST(makeReq(buildPayload(guest, location, day)));
+
+    expect(res.ok).toBe(true);
   });
 
   it("keeps a post-midnight slot on its own calendar date", async () => {
@@ -169,7 +201,9 @@ describe("POST /api/add-session", () => {
     expect(res.ok).toBe(true);
 
     const [session] = await getRepositories().sessions.listByEvent(event.id);
-    expect(session.startTime!.toISOString()).toBe(oneAM);
+    expect(session.startTime!.toISOString()).toBe(
+      slotStart(day, 16 * 60 + event.breakMinutes)
+    );
     expect(session.startTime!.getDate()).not.toBe(dayStart.getDate());
   });
 

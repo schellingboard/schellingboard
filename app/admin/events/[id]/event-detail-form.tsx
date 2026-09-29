@@ -183,6 +183,9 @@ export function EventDetailForm({ event }: { event: Event }) {
               required
               className="w-full h-10"
             />
+            <p className="text-xs text-fg-subtle">
+              Applies to sessions booked from now on.
+            </p>
           </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="ev-increment" className="text-sm text-fg-muted">

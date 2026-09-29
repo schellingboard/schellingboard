@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { getRepositories } from "@/db/container";
 import { isAdminRequest } from "@/utils/acting-admin";
-import { sessionSlotAlignmentError } from "@/utils/day-window";
 import { serverNow } from "@/utils/dev-clock-server";
 import {
   notifyCohostsAdded,
@@ -41,17 +40,6 @@ function parseTimeRange(
     return { error: "Invalid start or end time" };
   if (end <= start) return { error: "End time must be after start time" };
   return { start, end };
-}
-
-async function slotAlignmentError(
-  eventId: string,
-  incrementMinutes: number,
-  start: Date | undefined,
-  end: Date | undefined
-): Promise<string | null> {
-  if (!start || !end) return null;
-  const days = await getRepositories().days.listByEvent(eventId);
-  return sessionSlotAlignmentError(days, incrementMinutes, start, end);
 }
 
 // Mirrors the user-facing rule (validateSession in app/api/session-form-utils.ts):
@@ -108,14 +96,6 @@ export async function adminCreateSessionAction(
   const event = await events.findById(input.eventId);
   if (!event) return { ok: false, error: "Event not found" };
 
-  const alignmentError = await slotAlignmentError(
-    event.id,
-    event.slotIncrementMinutes,
-    range.start,
-    range.end
-  );
-  if (alignmentError) return { ok: false, error: alignmentError };
-
   const conflict = await findLocationConflict(
     input.eventId,
     range,
@@ -168,20 +148,9 @@ export async function adminUpdateSessionAction(
   if (!Number.isInteger(input.capacity) || input.capacity < 0)
     return { ok: false, error: "Capacity must be a non-negative whole number" };
 
-  const { sessions, events } = getRepositories();
+  const { sessions } = getRepositories();
   const session = await sessions.findById(input.id);
   if (!session) return { ok: false, error: "Session not found" };
-
-  const event = await events.findById(session.eventId);
-  if (!event) return { ok: false, error: "Event not found" };
-
-  const alignmentError = await slotAlignmentError(
-    event.id,
-    event.slotIncrementMinutes,
-    range.start,
-    range.end
-  );
-  if (alignmentError) return { ok: false, error: alignmentError };
 
   const conflict = await findLocationConflict(
     session.eventId,

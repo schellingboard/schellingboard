@@ -253,6 +253,13 @@
       "when": 1788768341579,
       "tag": "0035_drop_obsolete_meeting_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "6",
+      "when": 1790711821877,
+      "tag": "0036_session_real_start_times",
+      "breakpoints": true
     }
   ]
 }

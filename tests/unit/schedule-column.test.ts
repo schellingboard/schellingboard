@@ -22,8 +22,8 @@ const layout = (sessions: Session[], breakMinutes = 10) =>
   locationColumn({ sessions, day, incrementMinutes: 30, breakMinutes });
 
 describe("locationColumn", () => {
-  it("draws a session from its shown start, after the break, to its end", () => {
-    const talk = session(at(9, 30), at(10, 30));
+  it("draws a session from its start to its end", () => {
+    const talk = session(at(9, 40), at(10, 30));
     expect(layout([talk])).toContainEqual({
       kind: "session",
       session: talk,
@@ -32,31 +32,9 @@ describe("locationColumn", () => {
     });
   });
 
-  it("draws a blocker over its whole slot", () => {
-    const lunch = { ...session(at(9), at(10), "Lunch"), blocker: true };
-    expect(layout([lunch])).toContainEqual({
-      kind: "session",
-      session: lunch,
-      topPx: 0,
-      heightPx: px(60),
-    });
-  });
-
-  it("offers every slot nothing occupies, and only those", () => {
-    const frees = layout([session(at(9, 30), at(10, 15))]).filter(
-      (item) => item.kind === "free"
-    );
-    expect(frees).toEqual([
-      { kind: "free", start: at(9), topPx: 0, heightPx: px(30) },
-      { kind: "free", start: at(10, 30), topPx: px(90), heightPx: px(30) },
-    ]);
-  });
-
   it("keeps a session that starts off the slot grid", () => {
     const keynote = session(at(9, 5), at(9, 50), "Keynote");
-    expect(
-      layout([keynote], 0).find((item) => item.kind === "session")
-    ).toEqual({
+    expect(layout([keynote]).find((item) => item.kind === "session")).toEqual({
       kind: "session",
       session: keynote,
       topPx: px(5),
@@ -64,12 +42,33 @@ describe("locationColumn", () => {
     });
   });
 
-  // The break has no upper bound, so it can swallow a whole session.
-  it("keeps a session no longer than the break on the grid", () => {
-    const quick = session(at(9), at(9, 10), "Quick");
-    const item = layout([quick], 10).find((i) => i.kind === "session");
-    expect(item!.heightPx).toBeGreaterThan(0);
-    expect(item!.topPx + item!.heightPx).toBe(px(10));
+  it("keeps a very short session on the grid", () => {
+    const blink = session(at(9, 30), at(9, 31), "Blink");
+    const item = layout([blink]).find((i) => i.kind === "session");
+    expect(item!.heightPx).toBeGreaterThan(px(1));
+    expect(item!.topPx + item!.heightPx).toBe(px(31));
+  });
+
+  it("offers every slot the room has free once its break is over", () => {
+    const frees = layout([session(at(9, 40), at(10, 15))]).filter(
+      (item) => item.kind === "free"
+    );
+    expect(frees.map((f) => f.kind === "free" && f.start)).toEqual([
+      at(9),
+      at(10, 30),
+    ]);
+  });
+
+  it("offers a slot that a session runs into only during its break", () => {
+    const frees = layout([session(at(9), at(9, 35), "Keynote")]).filter(
+      (item) => item.kind === "free"
+    );
+    expect(frees[0]).toEqual({
+      kind: "free",
+      start: at(9, 30),
+      topPx: px(35),
+      heightPx: px(60) - px(35),
+    });
   });
 
   it("never draws a block above the day", () => {
@@ -80,7 +79,7 @@ describe("locationColumn", () => {
   });
 
   it("lists the column top to bottom", () => {
-    const tops = layout([session(at(10), at(10, 30))]).map((i) => i.topPx);
+    const tops = layout([session(at(10, 10), at(10, 30))]).map((i) => i.topPx);
     expect(tops).toEqual([...tops].sort((a, b) => a - b));
   });
 });
