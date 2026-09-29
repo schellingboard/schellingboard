@@ -1552,6 +1552,13 @@ test.describe("Admin UI locations", () => {
   test("renders on the server when reloaded", async ({ page }) => {
     await adminLogin(page);
     await gotoLocations(page);
+    // A reload that cuts off a location photo mid-download makes Firefox log
+    // "Image corrupt or truncated", which the console guard fails on.
+    await expect
+      .poll(() =>
+        page.evaluate(() => [...document.images].every((img) => img.complete))
+      )
+      .toBe(true);
 
     const response = await page.reload();
     expect(response?.status()).toBe(200);
