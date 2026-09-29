@@ -10,6 +10,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **Clear a search with one tap**: every search box shows an × while it holds text, which
+  empties it and brings back the full list.
+
 ### Changed
 
 - **A room's whereabouts and capacity show behind its name**: tapping or hovering a room name on

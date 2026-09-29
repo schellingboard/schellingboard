@@ -15,6 +15,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 import HoverTooltip from "@/app/(site)/hover-tooltip";
+import { SearchInput } from "@/app/search-input";
 import { EventContext, UserContext, VotesContext } from "@/app/(site)/context";
 import type { SessionProposal } from "@/db/repositories/interfaces";
 import {
@@ -361,12 +362,12 @@ export function ProposalTable({
           </div>
 
           <div className="lg:w-80">
-            <input
-              type="text"
+            <SearchInput
               placeholder="Search proposals..."
-              className="w-full p-3 border border-line rounded-md focus:ring-2 focus:ring-brand-accent focus:border-transparent"
+              inputClassName="p-3 border border-line rounded-md focus:ring-2 focus:ring-brand-accent focus:border-transparent"
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
+              onClear={() => setSearchQuery("")}
             />
           </div>
         </div>

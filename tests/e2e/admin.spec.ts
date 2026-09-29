@@ -255,8 +255,10 @@ test.describe("Admin UI", () => {
     // The new user shows up in the users list, assigned to the event.
     await gotoUsers(page);
     const users = page.getByRole("region", { name: "Users" });
-    await users.getByRole("searchbox", { name: "Search" }).fill(newEmail);
-    await users.getByRole("button", { name: "Search" }).click();
+    await users
+      .getByRole("searchbox", { name: "Search", exact: true })
+      .fill(newEmail);
+    await users.getByRole("button", { name: "Search", exact: true }).click();
     const row = users.getByRole("listitem").filter({ hasText: newEmail });
     await expect(row.getByText(newName)).toBeVisible();
     await expect(
@@ -292,8 +294,10 @@ test.describe("Admin UI", () => {
     // Nothing was imported.
     await gotoUsers(page);
     const users = page.getByRole("region", { name: "Users" });
-    await users.getByRole("searchbox", { name: "Search" }).fill("Broken Row");
-    await users.getByRole("button", { name: "Search" }).click();
+    await users
+      .getByRole("searchbox", { name: "Search", exact: true })
+      .fill("Broken Row");
+    await users.getByRole("button", { name: "Search", exact: true }).click();
     await expect(users.getByText("No users match.")).toBeVisible();
   });
 
@@ -314,23 +318,34 @@ test.describe("Admin UI", () => {
 
     // Server-side search by name narrows the list and resets to page 1; the
     // URL carries the query.
-    await users.getByRole("searchbox", { name: "Search" }).fill("Alice");
-    await users.getByRole("button", { name: "Search" }).click();
+    await users
+      .getByRole("searchbox", { name: "Search", exact: true })
+      .fill("Alice");
+    await users.getByRole("button", { name: "Search", exact: true }).click();
     await expect(page).toHaveURL(/[?&]q=Alice/);
     await expect(userItem("Alice Test")).toBeVisible();
     await expect(userItem("Bob Test")).toHaveCount(0);
     await expect(users.getByText("Page 1 of 1")).toBeVisible();
 
+    // Clearing the box drops the search without pressing Search.
+    await users.getByRole("button", { name: "Clear search" }).click();
+    await expect(page).not.toHaveURL(/[?&]q=/);
+    await expect(userItem("Bob Test")).toBeVisible();
+
     // Search also matches emails.
-    await users.getByRole("searchbox", { name: "Search" }).fill("bob@test.com");
-    await users.getByRole("button", { name: "Search" }).click();
+    await users
+      .getByRole("searchbox", { name: "Search", exact: true })
+      .fill("bob@test.com");
+    await users.getByRole("button", { name: "Search", exact: true }).click();
     await expect(userItem("Bob Test")).toBeVisible();
     await expect(userItem("Alice Test")).toHaveCount(0);
 
     // A whitespace-only query means "no search": the URL must not keep a
     // stale q param while the list renders unfiltered.
-    await users.getByRole("searchbox", { name: "Search" }).fill("   ");
-    await users.getByRole("button", { name: "Search" }).click();
+    await users
+      .getByRole("searchbox", { name: "Search", exact: true })
+      .fill("   ");
+    await users.getByRole("button", { name: "Search", exact: true }).click();
     await expect(userItem("Alice Test")).toBeVisible();
     await expect(page).not.toHaveURL(/[?&]q=/);
 
@@ -878,8 +893,10 @@ test.describe("Admin UI guest assignment", () => {
         .filter({ has: page.getByRole("checkbox", { name: /^Assign / }) });
 
     // Server-side search narrows the result set; the URL carries the query.
-    await guests.getByRole("searchbox", { name: "Search" }).fill("Alice");
-    await guests.getByRole("button", { name: "Search" }).click();
+    await guests
+      .getByRole("searchbox", { name: "Search", exact: true })
+      .fill("Alice");
+    await guests.getByRole("button", { name: "Search", exact: true }).click();
     await expect(page).toHaveURL(/[?&]q=Alice/);
     await expect(dataRows()).toHaveCount(1);
     await expect(dataRows().first()).toContainText("Alice Test");
@@ -898,9 +915,9 @@ test.describe("Admin UI guest assignment", () => {
     await expect(
       guests.getByRole("cell", { name: "Bob Test", exact: true })
     ).toBeVisible();
-    await expect(guests.getByRole("searchbox", { name: "Search" })).toHaveValue(
-      ""
-    );
+    await expect(
+      guests.getByRole("searchbox", { name: "Search", exact: true })
+    ).toHaveValue("");
   });
 });
 
@@ -1148,18 +1165,22 @@ test.describe("Admin UI proposals", () => {
     // Server-side search: a title substring narrows to one row and the URL
     // carries the query.
     await proposals
-      .getByRole("searchbox", { name: "Search" })
+      .getByRole("searchbox", { name: "Search", exact: true })
       .fill("Community Showcase");
-    await proposals.getByRole("button", { name: "Search" }).click();
+    await proposals
+      .getByRole("button", { name: "Search", exact: true })
+      .click();
     await expect(page).toHaveURL(/[?&]q=/);
     await expect(proposals.getByRole("listitem")).toHaveCount(1);
     await expect(row).toBeVisible();
 
     // Searching a host name matches their proposals and hides others.
     await proposals
-      .getByRole("searchbox", { name: "Search" })
+      .getByRole("searchbox", { name: "Search", exact: true })
       .fill("Alice Test");
-    await proposals.getByRole("button", { name: "Search" }).click();
+    await proposals
+      .getByRole("button", { name: "Search", exact: true })
+      .click();
     await expect(row).toBeVisible();
     await expect(
       proposals
@@ -1319,18 +1340,18 @@ test.describe("Admin UI sessions", () => {
     // Server-side search: a title substring narrows to one row and the URL
     // carries the query.
     await sessions
-      .getByRole("searchbox", { name: "Search" })
+      .getByRole("searchbox", { name: "Search", exact: true })
       .fill("Opening Keynote");
-    await sessions.getByRole("button", { name: "Search" }).click();
+    await sessions.getByRole("button", { name: "Search", exact: true }).click();
     await expect(page).toHaveURL(/[?&]q=/);
     await expect(sessions.getByRole("listitem")).toHaveCount(1);
     await expect(row).toBeVisible();
 
     // Searching a host name matches their sessions and hides others.
     await sessions
-      .getByRole("searchbox", { name: "Search" })
+      .getByRole("searchbox", { name: "Search", exact: true })
       .fill("Charlie Test");
-    await sessions.getByRole("button", { name: "Search" }).click();
+    await sessions.getByRole("button", { name: "Search", exact: true }).click();
     await expect(row).toBeVisible();
     await expect(
       sessions.getByRole("listitem").filter({ hasText: "Lunch Break" })
@@ -1430,8 +1451,10 @@ test.describe("Admin UI sessions", () => {
     // for the single-result list to commit before clicking into the row: the
     // list is sorted by title, so the row moves when the search commits, and a
     // click straddling that reflow is swallowed (mouseup lands elsewhere).
-    await sessions.getByRole("searchbox", { name: "Search" }).fill(title);
-    await sessions.getByRole("button", { name: "Search" }).click();
+    await sessions
+      .getByRole("searchbox", { name: "Search", exact: true })
+      .fill(title);
+    await sessions.getByRole("button", { name: "Search", exact: true }).click();
     await expect(sessions.getByRole("listitem")).toHaveCount(1);
     const row = sessions.getByRole("listitem").filter({ hasText: title });
     await expect(row).toBeVisible();

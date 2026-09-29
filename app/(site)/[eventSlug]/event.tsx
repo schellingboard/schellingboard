@@ -6,7 +6,7 @@ import { DateTime } from "luxon";
 import { useSearchParams } from "next/navigation";
 import { DayText } from "./day-text";
 import { DayAgenda } from "./day-agenda";
-import { Input } from "@/app/input";
+import { SearchInput } from "@/app/search-input";
 import { useState, useContext, useRef } from "react";
 import { EventContext, useSlotIncrement } from "../context";
 import { getDefaultFoldedDayIds } from "@/utils/schedule-fold";
@@ -166,11 +166,13 @@ export function EventDisplay() {
         className="flex-1 w-full overflow-auto flex flex-col items-stretch"
       >
         {toolbar}
-        <Input
+        <SearchInput
           className="max-w-3xl w-full my-5 mx-auto"
+          inputClassName="h-12 rounded-md border border-line bg-surface-raised px-4 shadow-sm placeholder-fg-subtle focus:outline-0 focus:ring-2 focus:ring-brand-accent focus:border-transparent"
           placeholder="Search sessions"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
+          onClear={() => setSearch("")}
         />
         {/* `lg:grow` fills the frame when there is little to show, so the
             footer below lands at its bottom rather than mid-page. */}

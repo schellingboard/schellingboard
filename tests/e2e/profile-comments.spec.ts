@@ -167,7 +167,7 @@ test("opens a comment author's profile from the profile it was left on", async (
   await page.goto("/guests");
   await actAs(page, "Linh Nguyen");
 
-  await page.getByLabel("Search").fill("Dubois");
+  await page.getByLabel("Search", { exact: true }).fill("Dubois");
   await page.getByRole("button", { name: "Search", exact: true }).click();
   await expect(page).toHaveURL(/[?&]q=Dubois/);
 
@@ -190,7 +190,9 @@ test("opens a comment author's profile from the profile it was left on", async (
   await author.getByRole("button", { name: "Close" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page).toHaveURL(/\/guests\?q=Dubois/);
-  await expect(page.getByLabel("Search")).toHaveValue("Dubois");
+  await expect(page.getByLabel("Search", { exact: true })).toHaveValue(
+    "Dubois"
+  );
 });
 
 // A section that can't reach its endpoint used to sit on a "Loading

@@ -1,7 +1,8 @@
 "use client";
 
-import { type ReactNode, useCallback } from "react";
+import { type ReactNode, useCallback, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { SearchInput } from "@/app/search-input";
 
 export type Column<T> = {
   header: ReactNode;
@@ -113,6 +114,47 @@ export function BulkActionsBar({
   );
 }
 
+function SearchForm({
+  query,
+  placeholder,
+  onSearch,
+}: {
+  query: string;
+  placeholder: string;
+  onSearch: (query: string) => void;
+}) {
+  const [draft, setDraft] = useState(query);
+  return (
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        onSearch(draft);
+      }}
+      role="search"
+      className="flex gap-2"
+    >
+      <SearchInput
+        name="q"
+        value={draft}
+        onChange={(event) => setDraft(event.target.value)}
+        onClear={() => {
+          setDraft("");
+          if (query) onSearch("");
+        }}
+        placeholder={placeholder}
+        aria-label="Search"
+        inputClassName="px-3 py-1.5 text-sm rounded-md border border-line focus:border-line-strong focus:outline-none"
+      />
+      <button
+        type="submit"
+        className="px-3 py-1.5 text-sm rounded-md border border-line bg-surface-raised text-fg-muted hover:bg-surface-sunken"
+      >
+        Search
+      </button>
+    </form>
+  );
+}
+
 type TableProps<T> = {
   rows: T[];
   rowKey: (row: T) => string;
@@ -170,15 +212,6 @@ export function DataTable<T>({
   const { setParams } = useTableParams({ shallow });
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
-  const onSearch = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const value = new FormData(event.currentTarget).get("q");
-    // Server pages trim the query, so a whitespace-only value means "no
-    // search" — keep it out of the URL to match what the server renders.
-    const query = typeof value === "string" ? value.trim() : "";
-    setParams({ q: query || null, page: null });
-  };
-
   const pageKeys = rows.map(rowKey);
   const allOnPageSelected =
     pageKeys.length > 0 &&
@@ -194,26 +227,19 @@ export function DataTable<T>({
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
-        <form onSubmit={onSearch} role="search" className="flex gap-2">
-          <input
-            // The table state is URL-driven; remount the input when the active
-            // query changes (e.g. browser back/forward) so it never shows a
-            // stale query. defaultValue alone only applies on first mount.
-            key={searchQuery}
-            type="search"
-            name="q"
-            defaultValue={searchQuery}
-            placeholder={searchPlaceholder}
-            aria-label="Search"
-            className="px-3 py-1.5 text-sm rounded-md border border-line focus:border-line-strong focus:outline-none"
-          />
-          <button
-            type="submit"
-            className="px-3 py-1.5 text-sm rounded-md border border-line bg-surface-raised text-fg-muted hover:bg-surface-sunken"
-          >
-            Search
-          </button>
-        </form>
+        <SearchForm
+          // The table state is URL-driven; remount the form when the active
+          // query changes (e.g. browser back/forward) so it never shows a
+          // stale query.
+          key={searchQuery}
+          query={searchQuery}
+          placeholder={searchPlaceholder}
+          // Server pages trim the query, so a whitespace-only value means "no
+          // search" — keep it out of the URL to match what the server renders.
+          onSearch={(query) =>
+            setParams({ q: query.trim() || null, page: null })
+          }
+        />
         {toolbar}
       </div>
 

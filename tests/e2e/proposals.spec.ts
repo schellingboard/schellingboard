@@ -285,7 +285,8 @@ test("filters the proposal list by search, matching whole descriptions as plain 
   await expect(kubernetes).toBeVisible();
   await expect(designSystems).toHaveCount(0);
 
-  await search.fill("");
+  await page.getByRole("button", { name: "Clear search" }).click();
+  await expect(search).toHaveValue("");
   await expect(designSystems).toBeVisible();
 });
 

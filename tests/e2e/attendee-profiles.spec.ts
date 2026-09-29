@@ -10,7 +10,7 @@ import { swipe } from "./helpers/touch";
  * Charlie are the first three results whatever else matches.
  */
 async function searchForTestGuests(page: Page) {
-  await page.getByLabel("Search").fill("Test");
+  await page.getByLabel("Search", { exact: true }).fill("Test");
   await page.getByRole("button", { name: "Search", exact: true }).click();
   await expect(page).toHaveURL(/[?&]q=Test/);
 }
@@ -91,7 +91,7 @@ test("moves between profiles without returning to the list", async ({
 
   await profile.getByRole("button", { name: "Close" }).click();
   await expect(page).toHaveURL(/\/guests\?q=Test/);
-  await expect(page.getByLabel("Search")).toHaveValue("Test");
+  await expect(page.getByLabel("Search", { exact: true })).toHaveValue("Test");
 });
 
 test("starts each profile at its own top", async ({ page }) => {
