@@ -120,18 +120,12 @@ export function EventDisplay() {
         <Footer inline />
       </div>
     ) : view === "agenda" ? (
-      // Its own branch rather than a variant of the text view below, so the
-      // beta leaves the text and RSVP'd views untouched.
       <div
         data-testid="schedule-scroll"
         ref={scrollerRef}
         className="flex-1 w-full overflow-auto flex flex-col items-stretch"
       >
         {toolbar}
-        <p className="mx-auto w-full max-w-3xl px-2 pt-3 text-xs text-fg-subtle">
-          Beta: the agenda is new this event. If anything looks off, the Grid
-          view has everything.
-        </p>
         <div className="flex flex-col gap-4 w-full lg:grow">
           {daysForEvent.map((day) => (
             <div key={day.id}>

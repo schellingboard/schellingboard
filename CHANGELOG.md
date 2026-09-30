@@ -38,6 +38,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   to sit under an empty header and scroll.
 - **SchellingBoard has a new home on GitHub**: the source, the issue tracker and the changelog
   now live at github.com/schellingboard/schellingboard, and every link in the app points there.
+- **The Agenda view is out of beta**: it no longer carries a beta label or notice.
 
 ### Fixed
 

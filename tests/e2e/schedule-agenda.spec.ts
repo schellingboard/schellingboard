@@ -4,8 +4,8 @@ import { login, loginAndGoto } from "./helpers/auth";
 import { selectUser } from "./helpers/user";
 import { openGammaScheduleDuringEvent } from "./helpers/dev-clock";
 
-// The agenda view: a beta behind its own toolbar button, the grid staying the
-// default everywhere.
+// The agenda view: behind its own toolbar button, the grid staying the default
+// everywhere.
 
 const KEYNOTE = /Opening Keynote - Conference Gamma/;
 

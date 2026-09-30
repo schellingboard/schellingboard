@@ -136,7 +136,6 @@ function SelectView() {
       name: "agenda",
       label: "Agenda",
       icon: QueueListIcon,
-      beta: true,
     },
     {
       name: "text",
@@ -170,11 +169,6 @@ function SelectView() {
         >
           <v.icon className="h-4 w-4 stroke-2" />
           {v.label}
-          {v.beta && (
-            <span className="rounded-sm px-1 text-[9px] uppercase tracking-wide ring-1 ring-current opacity-80">
-              beta
-            </span>
-          )}
         </button>
       ))}
     </div>

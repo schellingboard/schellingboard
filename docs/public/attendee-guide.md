@@ -114,8 +114,8 @@ to read what the room offers (projector, whiteboard, the kind of seating), where
 to find it and how many people fit.
 
 The buttons at the top switch how the schedule is laid out: **Grid** (rooms
-side by side, the day running down), **Agenda** (new, in beta: every session
-under the time it starts, all rooms together — handy on a phone), **Text** (one
+side by side, the day running down), **Agenda** (every session under the time
+it starts, all rooms together — handy on a phone), **Text** (one
 entry per session with its description, and a search box) and **RSVP'd** (the
 sessions you are attending or hosting).
 
