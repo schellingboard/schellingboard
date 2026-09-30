@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   an opening keynote.
 - **Clear a search with one tap**: every search box shows an × while it holds text, which
   empties it and brings back the full list.
+- **Search the agenda**: a search box at the top of the Agenda view finds sessions by
+  title, description, host or room, and your 1-on-1s by name.
 
 ### Changed
 

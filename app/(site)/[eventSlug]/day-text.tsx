@@ -7,9 +7,9 @@ import { DateTime } from "luxon";
 import { useContext } from "react";
 import { UserContext, EventContext } from "../context";
 import type { DayWithSessions } from "@/app/(site)/context";
-import type { Rsvp, Location, Session } from "@/db/repositories/interfaces";
+import type { Rsvp, Location } from "@/db/repositories/interfaces";
 import { dayTextEntries } from "@/utils/day-text-entries";
-import { containsIgnoringAccents } from "@/utils/utils";
+import { sessionMatchesSearch } from "@/utils/schedule-search";
 
 export function DayText(props: {
   locations: Location[];
@@ -107,20 +107,5 @@ export function DayText(props: {
         )}
       </div>
     </div>
-  );
-}
-
-function sessionMatchesSearch(session: Session, search: string) {
-  return (
-    containsIgnoringAccents(session.title ?? "", search) ||
-    containsIgnoringAccents(session.description ?? "", search) ||
-    containsIgnoringAccents(
-      session.hosts.map((h) => h.name).join(" "),
-      search
-    ) ||
-    containsIgnoringAccents(
-      session.locations.map((l) => l.name).join(" "),
-      search
-    )
   );
 }

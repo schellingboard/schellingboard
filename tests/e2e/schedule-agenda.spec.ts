@@ -49,6 +49,22 @@ test.describe("on a phone-sized screen", () => {
     const lunchSlot = page.getByRole("region", { name: "12:30" }).first();
     await expect(lunchSlot.getByText("Lunch Break")).toHaveCount(1);
   });
+
+  test("a narrowed agenda leads back to its search from further down", async ({
+    page,
+  }) => {
+    await loginAndGoto(page, "/Conference-Gamma");
+    await switchToView(page, "Agenda");
+    const search = page.getByRole("searchbox", { name: "Search sessions" });
+    await search.fill("Main Hall");
+    await page
+      .getByRole("link", { name: /Closing Session/ })
+      .scrollIntoViewIfNeeded();
+    await expect(search).not.toBeInViewport();
+
+    await page.getByRole("button", { name: /Showing \d+ of \d+/ }).click();
+    await expect(search).toBeInViewport();
+  });
 });
 
 test("the agenda groups sessions by start time and opens their details", async ({
@@ -95,6 +111,38 @@ test("the viewer's own 1-on-1s are listed at their time", async ({ page }) => {
   await expect(
     details.getByRole("heading", { name: "1-on-1 with Leilani Kahale" })
   ).toBeVisible();
+});
+
+test("searching the agenda narrows it to sessions and 1-on-1s that match", async ({
+  page,
+}) => {
+  await loginAndGoto(page, "/guests");
+  await selectUser(page, "Zanele Khumalo");
+  await page.getByRole("link", { name: "Conference Gamma" }).first().click();
+  await switchToView(page, "Agenda");
+  const search = page.getByRole("searchbox", { name: "Search sessions" });
+  const apiDesign = page.getByRole("link", { name: /API Design/ });
+
+  // Only the API design session's description says "comparative".
+  await search.fill("comparative");
+  await expect(apiDesign).toBeVisible();
+  await expect(page.getByRole("link", { name: KEYNOTE })).toBeHidden();
+  await expect(page.getByText("Lunch Break")).toBeHidden();
+  await expect(page.getByText("Showing 1 of")).toBeVisible();
+
+  await search.fill("Leilani");
+  await expect(
+    page.getByRole("link", { name: /1-on-1 with Leilani Kahale/ })
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /1-on-1 with Samuel Adeyemi/ })
+  ).toBeHidden();
+  await expect(apiDesign).toBeHidden();
+
+  await page.getByRole("button", { name: "Clear search" }).click();
+  await expect(apiDesign).toBeVisible();
+  await expect(page.getByRole("link", { name: KEYNOTE })).toBeVisible();
+  await expect(page.getByText(/Showing \d+ of/)).toBeHidden();
 });
 
 test.describe("while the event is running", () => {

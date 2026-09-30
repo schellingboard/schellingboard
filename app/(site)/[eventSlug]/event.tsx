@@ -1,11 +1,10 @@
 "use client";
 import { ScheduleToolbar } from "./schedule-toolbar";
 import { DayGrid } from "./day-grid";
-import { ChevronRightIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
-import { DateTime } from "luxon";
 import { useSearchParams } from "next/navigation";
 import { DayText } from "./day-text";
-import { DayAgenda } from "./day-agenda";
+import { AgendaView } from "./agenda-view";
+import { DayFoldBar } from "./day-fold-bar";
 import { SearchInput } from "@/app/search-input";
 import { useState, useContext, useRef } from "react";
 import { EventContext, useSlotIncrement } from "../context";
@@ -16,7 +15,6 @@ import { KioskController, useKioskMode } from "./kiosk";
 import { SessionModal } from "./session-modal";
 import { MeetingModalFromUrl } from "./meeting-modal";
 import { MeetingsProvider } from "./use-meetings";
-import type { DayWithSessions } from "../context";
 import { useDragToPan } from "./use-drag-to-pan";
 import { PullToRefresh } from "./pull-to-refresh";
 import { useScrollRestoration } from "./use-scroll-restoration";
@@ -120,39 +118,20 @@ export function EventDisplay() {
         <Footer inline />
       </div>
     ) : view === "agenda" ? (
-      <div
-        data-testid="schedule-scroll"
-        ref={scrollerRef}
-        className="flex-1 w-full overflow-auto flex flex-col items-stretch"
-      >
-        {toolbar}
-        <div className="flex flex-col gap-4 w-full lg:grow">
-          {daysForEvent.map((day) => (
-            <div key={day.id}>
-              {defaultFoldedDayIds.has(day.id) && (
-                <div className="max-w-3xl mx-auto">
-                  <DayFoldBar
-                    day={day}
-                    timezone={event.timezone}
-                    folded={isFolded(day.id)}
-                    onToggle={() => toggleDayFold(day.id)}
-                  />
-                </div>
-              )}
-              {!isFolded(day.id) && (
-                <DayAgenda
-                  day={day}
-                  locations={locationsForEvent}
-                  eventSlug={event.slug}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-        <div className="lg:sticky lg:bottom-0">
-          <Footer inline />
-        </div>
-      </div>
+      <AgendaView
+        days={daysForEvent}
+        locations={locationsForEvent}
+        eventSlug={event.slug}
+        timezone={event.timezone}
+        toolbar={toolbar}
+        scrollerRef={scrollerRef}
+        defaultFoldedDayIds={defaultFoldedDayIds}
+        isFolded={isFolded}
+        onToggleFold={toggleDayFold}
+        search={search}
+        debouncedSearch={debouncedSearch}
+        onSearchChange={setSearch}
+      />
     ) : (
       <div
         data-testid="schedule-scroll"
@@ -223,32 +202,5 @@ export function EventDisplay() {
       <MeetingModalFromUrl />
       {kiosk && <KioskController nowIsOnSchedule={nowIsOnSchedule} />}
     </MeetingsProvider>
-  );
-}
-
-// Collapsed/expandable header for a day that has already passed. In the grid
-// view the label sticks to the left edge so it stays readable while the wide
-// grid is scrolled horizontally.
-function DayFoldBar(props: {
-  day: DayWithSessions;
-  timezone: string;
-  folded: boolean;
-  onToggle: () => void;
-}) {
-  const { day, timezone, folded, onToggle } = props;
-  const date = DateTime.fromJSDate(day.start).setZone(timezone);
-  const Chevron = folded ? ChevronRightIcon : ChevronDownIcon;
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      className="block w-full bg-surface-sunken hover:bg-surface-muted transition-colors border-b border-line-subtle text-left"
-    >
-      <span className="sticky left-0 inline-flex items-center gap-1.5 px-2 py-1.5 text-xs text-fg-subtle">
-        <Chevron className="h-3.5 w-3.5 stroke-2" />
-        <span className="font-medium">{date.toFormat("EEEE, MMMM d")}</span>
-        <span>· day has passed · {folded ? "show" : "hide"}</span>
-      </span>
-    </button>
   );
 }

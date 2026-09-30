@@ -30,10 +30,8 @@ import {
   type TimeState,
 } from "@/utils/agenda";
 import type { MeetingView } from "@/utils/meeting-views";
-import { meetingsForDay } from "@/utils/meeting-column";
 import { shownSlotStart } from "@/utils/meeting-slots";
 import { statusLine } from "@/utils/meeting-rules";
-import { useMyMeetings } from "./use-meetings";
 import {
   formatDayLabel,
   formatOptionalTime,
@@ -50,37 +48,38 @@ import {
 // screen can scroll through, where the grid has to be scrolled both ways.
 export function DayAgenda(props: {
   day: DayWithSessions;
+  /** The day's sessions and 1-on-1s left after the location filter and search. */
+  sessions: Session[];
+  meetings: MeetingView[];
   locations: Location[];
   eventSlug: string;
+  filtering: boolean;
+  /** Where the time headings stick: below whatever is pinned above them. */
+  stickyTop: number;
 }) {
-  const { day, locations, eventSlug } = props;
+  const {
+    day,
+    sessions,
+    meetings,
+    locations,
+    eventSlug,
+    filtering,
+    stickyTop,
+  } = props;
   const { event, now } = useContext(EventContext);
   const timezone = event?.timezone ?? "UTC";
-  const searchParams = useSearchParams();
   const slotIncrement = useSlotIncrement();
   const breakMinutes = useBreakMinutes();
-  const { meetings } = useMyMeetings();
-  const groups = useMemo(() => {
-    const locParams = searchParams?.getAll("loc") ?? [];
-    const locationsFromParams = locations.filter((loc) =>
-      locParams.includes(loc.name)
-    );
-    const includedLocations =
-      locationsFromParams.length === 0 ? locations : locationsFromParams;
-    return agendaGroups({
-      sessions: day.sessions.filter((session) =>
-        includedLocations.some((loc) =>
-          session.locations.some((l) => l.id === loc.id)
-        )
+  const groups = useMemo(
+    () =>
+      agendaGroups({ sessions, meetings, locations, breakMinutes }).map(
+        (group) => ({
+          ...group,
+          label: formatSlotLabel(group.start, day.start, timezone),
+        })
       ),
-      meetings: meetingsForDay(meetings ?? [], day),
-      locations,
-      breakMinutes,
-    }).map((group) => ({
-      ...group,
-      label: formatSlotLabel(group.start, day.start, timezone),
-    }));
-  }, [day, locations, searchParams, meetings, breakMinutes, timezone]);
+    [day, sessions, meetings, locations, breakMinutes, timezone]
+  );
   // Same condition as the grid's now line, so "Now" in the toolbar always has
   // something to jump to when it is offered.
   const nowIndex =
@@ -98,14 +97,19 @@ export function DayAgenda(props: {
         {formatDayLabel(day, timezone)}
       </h2>
       {groups.length === 0 && (
-        <p className="text-fg-subtle italic text-sm">No sessions</p>
+        <p className="text-fg-subtle italic text-sm">
+          {filtering ? "No matching sessions" : "No sessions"}
+        </p>
       )}
       {groups.map((group, i) => {
         return (
           <Fragment key={group.start.getTime()}>
             {nowIndex === i && <NowMarker now={now} timezone={timezone} />}
             <section aria-label={group.label}>
-              <h3 className="sticky top-0 z-10 bg-surface border-b border-line-subtle py-1 text-sm font-semibold">
+              <h3
+                style={{ top: stickyTop }}
+                className="sticky z-10 bg-surface border-b border-line-subtle py-1 text-sm font-semibold"
+              >
                 {group.label}
               </h3>
               <ul className="divide-y divide-line-subtle">

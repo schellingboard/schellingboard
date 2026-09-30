@@ -119,6 +119,11 @@ it starts, all rooms together — handy on a phone), **Text** (one
 entry per session with its description, and a search box) and **RSVP'd** (the
 sessions you are attending or hosting).
 
+The agenda's search box finds sessions by title, description, host or room,
+and your 1-on-1s by the other person's name. While it narrows the agenda, a
+line at the top counts what matches: tap it to get back to the search, or tap
+**Show all** to clear it.
+
 While the event is running, a red line marks the current time in the grid and
 the agenda, and **"Now"** at the top of the schedule jumps straight to it.
 

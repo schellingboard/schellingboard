@@ -1,8 +1,7 @@
 import type { Session } from "@/db/repositories/interfaces";
 import { compareMeetings, meetingsForDay } from "@/utils/meeting-column";
-import { meetingTitle } from "@/utils/meeting-rules";
 import type { MeetingView } from "@/utils/meeting-views";
-import { containsIgnoringAccents } from "@/utils/utils";
+import { meetingMatchesSearch } from "@/utils/schedule-search";
 
 type ListedSession = Pick<Session, "id" | "startTime">;
 
@@ -44,12 +43,4 @@ export function dayTextEntries<S extends ListedSession>({
       ? (entry.session.startTime?.getTime() ?? 0)
       : new Date(entry.meeting.slotStart).getTime();
   return entries.sort((a, b) => startOf(a) - startOf(b));
-}
-
-function meetingMatchesSearch(meeting: MeetingView, search: string) {
-  return (
-    containsIgnoringAccents(meetingTitle(meeting), search) ||
-    containsIgnoringAccents(meeting.meetingPoint, search) ||
-    containsIgnoringAccents(meeting.message, search)
-  );
 }
