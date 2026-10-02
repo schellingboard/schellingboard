@@ -1,4 +1,5 @@
 import { test, expect } from "./helpers/fixtures";
+import { switchToView } from "./helpers/schedule";
 import { loginAndGoto } from "./helpers/auth";
 import { selectUser } from "./helpers/user";
 
@@ -67,9 +68,7 @@ test.describe("1-on-1s in the Text and RSVP'd views", () => {
     );
     const details = page.getByRole("dialog", { name: "1-on-1 details" });
 
-    await page.getByRole("button", { name: "Text" }).click();
-    // Only the text views have a search box, so the grid is gone.
-    await expect(page.getByPlaceholder("Search sessions")).toBeVisible();
+    await switchToView(page, "Text");
     await expect(confirmed).toBeVisible();
     await expect(waiting).toBeVisible();
     await waiting.click();

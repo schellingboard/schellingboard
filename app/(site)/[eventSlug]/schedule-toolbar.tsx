@@ -149,7 +149,11 @@ function SelectView() {
     },
   ];
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div
+      role="group"
+      aria-label="Schedule view"
+      className="flex flex-wrap items-center gap-2"
+    >
       {VIEWS.map((v) => (
         <button
           key={v.name}

@@ -46,7 +46,7 @@ export const releaseNotes: ReleaseNote[] = [
     version: "Unreleased",
     highlights: [
       "**Sessions at any minute, with or without a break**: organizers can start a session whenever they like, and skip the break before one such as an opening keynote.",
-      "**Search and filter the agenda**: find sessions by anything in their description, or narrow the agenda to the ones you have RSVP'd to or are hosting.",
+      "**Search and filter the schedule**: find sessions by anything in their description, or narrow the grid and agenda to the ones you have RSVP'd to or are hosting.",
     ],
   },
   {

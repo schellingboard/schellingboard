@@ -38,6 +38,9 @@ import {
 } from "./positioned-block";
 import { BookMeeting } from "./book-meeting";
 import { Tooltip } from "./tooltip";
+import { GHOST_CLASS, useScheduleMatch } from "./use-schedule-search";
+
+const NO_MATCH = " — doesn't match";
 
 /** "14:40", in the event's zone, for a control's accessible name. */
 function slotLabel(
@@ -72,9 +75,11 @@ function SlotCell({
   onBook: () => void;
 }) {
   const breakMinutes = useBreakMinutes();
+  const { filtering } = useScheduleMatch();
   const shape = clsx(
     "h-full w-full flex items-center justify-center rounded",
-    blocked && "meetings-col-blocked"
+    blocked && "meetings-col-blocked",
+    filtering && GHOST_CLASS
   );
 
   if (!bookable) {
@@ -179,6 +184,8 @@ function MeetingBlock({
 }) {
   const searchParams = useSearchParams();
   const breakMinutes = useBreakMinutes();
+  const { filtering, matchesMeeting } = useScheduleMatch();
+  const ghost = filtering && !matchesMeeting(meeting);
   return (
     <Tooltip
       content={<MeetingSummary meeting={meeting} />}
@@ -192,10 +199,11 @@ function MeetingBlock({
           meeting.slotStart,
           breakMinutes,
           timezone
-        )} · ${meeting.meetingPoint} — ${blockStatus(meeting)}`}
+        )} · ${meeting.meetingPoint} — ${blockStatus(meeting)}${ghost ? NO_MATCH : ""}`}
         className={clsx(
           "flex-1 min-w-0 rounded border-2 px-1 py-0.5 overflow-hidden font-roboto",
-          meetingStateClasses(meeting.status)
+          meetingStateClasses(meeting.status),
+          ghost && GHOST_CLASS
         )}
       >
         {heightPx >= TITLE_MIN_PX && (
@@ -245,6 +253,8 @@ function StackEntry({
 }) {
   const searchParams = useSearchParams();
   const breakMinutes = useBreakMinutes();
+  const { filtering, matchesMeeting } = useScheduleMatch();
+  const ghost = filtering && !matchesMeeting(meeting);
   return (
     <Tooltip
       content={<MeetingSummary meeting={meeting} />}
@@ -258,10 +268,11 @@ function StackEntry({
           meeting.slotStart,
           breakMinutes,
           timezone
-        )} — ${blockStatus(meeting)}`}
+        )} — ${blockStatus(meeting)}${ghost ? NO_MATCH : ""}`}
         className={clsx(
           "flex flex-1 min-w-0 items-center gap-1 overflow-hidden rounded-sm border-l-4 px-1 font-roboto",
-          meetingStateClasses(meeting.status)
+          meetingStateClasses(meeting.status),
+          ghost && GHOST_CLASS
         )}
       >
         <span className="truncate text-[11px] leading-none font-medium text-fg">
@@ -294,6 +305,8 @@ function SlotBlock({
   onOpen: () => void;
 }) {
   const breakMinutes = useBreakMinutes();
+  const { filtering, matchesMeeting } = useScheduleMatch();
+  const ghost = filtering && !meetings.some(matchesMeeting);
   return (
     <Tooltip
       content={<SlotSummary meetings={meetings} timezone={timezone} />}
@@ -308,8 +321,11 @@ function SlotBlock({
           meetings,
           breakMinutes,
           timezone
-        )} — ${slotSummaryLine(meetings)}`}
-        className="flex flex-1 min-w-0 flex-col justify-center overflow-hidden rounded border-2 border-line bg-surface-muted px-1 text-left font-roboto hover:border-brand-accent"
+        )} — ${slotSummaryLine(meetings)}${ghost ? NO_MATCH : ""}`}
+        className={clsx(
+          "flex flex-1 min-w-0 flex-col justify-center overflow-hidden rounded border-2 border-line bg-surface-muted px-1 text-left font-roboto hover:border-brand-accent",
+          ghost && GHOST_CLASS
+        )}
       >
         {heightPx >= TITLE_MIN_PX && (
           <span className="text-xs leading-[1.15] font-semibold text-fg">

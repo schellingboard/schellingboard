@@ -1,6 +1,6 @@
 "use client";
 import { ScheduleToolbar } from "./schedule-toolbar";
-import { DayGrid } from "./day-grid";
+import { GridView } from "./grid-view";
 import { useSearchParams } from "next/navigation";
 import { DayText } from "./day-text";
 import { AgendaView } from "./agenda-view";
@@ -82,41 +82,20 @@ export function EventDisplay() {
   // second scrollbar for little gain.
   const scheduleBody =
     view === "grid" ? (
-      <div
-        data-testid="schedule-scroll"
-        ref={scrollerRef}
-        // `grid` with a single minmax(max-content, 1fr) column (rather than
-        // block flow) so the toolbar, fold bars and footer stretch to the
-        // widest day's grid when it overflows — instead of falling short when
-        // scrolled horizontally — yet still fill the viewport when the grid is
-        // narrower than it.
-        // `cursor` inherits, so links/buttons (session cells, fold toggles, …)
-        // are reset to their normal cursor rather than showing the grab hand.
-        className="flex-1 w-full overflow-auto cursor-grab grid content-start [&_a]:cursor-pointer [&_button]:cursor-pointer"
-        style={{ gridTemplateColumns: "minmax(max-content, 1fr)" }}
-      >
-        {toolbar}
-        {daysForEvent.map((day) => (
-          <div key={day.id} className="contents">
-            {defaultFoldedDayIds.has(day.id) && (
-              <DayFoldBar
-                day={day}
-                timezone={event.timezone}
-                folded={isFolded(day.id)}
-                onToggle={() => toggleDayFold(day.id)}
-              />
-            )}
-            {!isFolded(day.id) && (
-              <DayGrid
-                day={day}
-                locations={locationsForEvent}
-                guests={guests}
-              />
-            )}
-          </div>
-        ))}
-        <Footer inline />
-      </div>
+      <GridView
+        days={daysForEvent}
+        locations={locationsForEvent}
+        guests={guests}
+        timezone={event.timezone}
+        toolbar={toolbar}
+        scrollerRef={scrollerRef}
+        defaultFoldedDayIds={defaultFoldedDayIds}
+        isFolded={isFolded}
+        onToggleFold={toggleDayFold}
+        search={search}
+        debouncedSearch={debouncedSearch}
+        onSearchChange={setSearch}
+      />
     ) : view === "agenda" ? (
       <AgendaView
         days={daysForEvent}

@@ -27,6 +27,7 @@ import {
   type RsvpClash,
 } from "@/utils/rsvp-clash";
 import { useMyMeetings } from "./use-meetings";
+import { GHOST_CLASS, useScheduleMatch } from "./use-schedule-search";
 
 export function SessionBlock(props: {
   item: ColumnItem;
@@ -87,11 +88,15 @@ export function BookableSessionCard(props: {
   const start = DateTime.fromJSDate(startTime).setZone(timezone);
   const dayParam = start.toFormat("yyyy-MM-dd");
   const timeParam = start.toFormat("HH:mm");
+  const { filtering } = useScheduleMatch();
   return (
     <PositionedBlock position={position}>
       <Link
         aria-label="Add session"
-        className="rounded font-roboto h-full w-full bg-surface-muted hover:bg-surface-hover flex items-center justify-center"
+        className={clsx(
+          "rounded font-roboto h-full w-full bg-surface-muted hover:bg-surface-hover flex items-center justify-center",
+          filtering && GHOST_CLASS
+        )}
         href={`/${eventSlug}/add-session?location=${location.name}&time=${timeParam}&day=${dayParam}`}
       >
         <PlusIcon aria-hidden="true" className="h-4 w-4 text-fg-subtle" />
@@ -102,9 +107,15 @@ export function BookableSessionCard(props: {
 
 function BlockerSessionCard(props: { title: string; position: Position }) {
   const { title, position } = props;
+  const { filtering } = useScheduleMatch();
   return (
     <PositionedBlock position={position} className="overflow-hidden">
-      <div className="px-1 rounded font-roboto h-full flex flex-col justify-center overflow-hidden bg-surface-hover border-2 border-line text-fg">
+      <div
+        className={clsx(
+          "px-1 rounded font-roboto h-full flex flex-col justify-center overflow-hidden bg-surface-hover border-2 border-line text-fg",
+          filtering && GHOST_CLASS
+        )}
+      >
         <p
           className={clsx(
             "font-medium text-xs leading-[1.15] text-center",
@@ -194,6 +205,8 @@ export function RealSessionCard(props: {
   const hostStatus =
     currentUser && session.hosts.some((h) => h.id === currentUser);
   const lowerOpacity = !rsvpd && !hostStatus;
+  const { filtering, matchesSession } = useScheduleMatch();
+  const ghost = filtering && !matchesSession(session);
   const formattedHostNames =
     session.hosts.map((h) => h.name).join(", ") || "No hosts";
 
@@ -287,7 +300,8 @@ export function RealSessionCard(props: {
             "px-1 rounded font-roboto h-full flex flex-col relative w-full group border-2 overflow-hidden",
             height >= 40 ? "py-1" : "py-0.5",
             `loc-${location.color}`,
-            lowerOpacity ? "loc-block-dim" : "loc-block"
+            lowerOpacity ? "loc-block-dim" : "loc-block",
+            ghost && GHOST_CLASS
           )}
         >
           <Link
@@ -311,6 +325,7 @@ export function RealSessionCard(props: {
               )}
               <span className="flex-1">{session.title}</span>
             </p>
+            {ghost && <span className="sr-only"> — doesn&apos;t match</span>}
           </Link>
           {hostLines > 0 && (
             <p

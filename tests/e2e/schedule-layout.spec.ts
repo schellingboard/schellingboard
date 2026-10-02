@@ -1,4 +1,5 @@
 import { test, expect } from "./helpers/fixtures";
+import { switchToView } from "./helpers/schedule";
 import { login } from "./helpers/auth";
 import { swipe } from "./helpers/touch";
 import { selectUser } from "./helpers/user";
@@ -101,7 +102,7 @@ for (const view of ["Text", "RSVP'd"]) {
     test(`the footer stays at the bottom of the viewport in the ${view} view`, async ({
       page,
     }) => {
-      await page.getByRole("button", { name: view }).click();
+      await switchToView(page, view);
       const footer = footerLink(page);
       const viewportHeight = page.viewportSize()!.height;
       const atViewportBottom = async () => {
@@ -129,10 +130,9 @@ for (const view of ["Text", "RSVP'd"]) {
 test("the footer ends the content in the Text view on a phone", async ({
   page,
 }) => {
-  await page.getByRole("button", { name: "Text" }).click();
-  // The search box exists only in this view: wait for the switch before
-  // measuring, so the grid's own footer isn't what gets measured.
-  await expect(page.getByPlaceholder("Search sessions")).toBeVisible();
+  // Waits for the switch before measuring, so the grid's own footer isn't
+  // what gets measured.
+  await switchToView(page, "Text");
   const footer = footerLink(page);
   const viewportHeight = page.viewportSize()!.height;
 

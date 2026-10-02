@@ -32,8 +32,10 @@ export function DayGrid(props: {
   locations: Location[];
   day: DayWithSessions;
   guests: Guest[];
+  /** Where the room headers stick: below whatever is pinned above them. */
+  stickyTop: number;
 }) {
-  const { day, locations, guests } = props;
+  const { day, locations, guests, stickyTop } = props;
   const { event, now } = useContext(EventContext);
   const timezone = event?.timezone ?? "UTC";
   const searchParams = useSearchParams();
@@ -83,14 +85,20 @@ export function DayGrid(props: {
       {/* Row 1 — room-name header, sticky to the top. The corner cell (where no
           hour is) carries the day's date, so it gets replaced by the next day's
           date as that day scrolls into view. */}
-      <div className="sticky top-0 left-0 z-21 flex flex-col justify-end bg-surface border-b border-r border-line-subtle p-1 leading-tight">
+      <div
+        style={{ top: stickyTop }}
+        className="sticky left-0 z-21 flex flex-col justify-end bg-surface border-b border-r border-line-subtle p-1 leading-tight"
+      >
         <span className="text-[11px] font-bold">{date.toFormat("EEE")}</span>
         <span className="text-[10px] text-fg-subtle">
           {date.toFormat("MMM d")}
         </span>
       </div>
       {showMeetings && (
-        <div className="sticky top-0 z-20 bg-surface border-b border-l border-line-subtle p-1">
+        <div
+          style={{ top: stickyTop }}
+          className="sticky z-20 bg-surface border-b border-l border-line-subtle p-1"
+        >
           <h3 className="font-semibold text-xs sm:text-sm">1-on-1s</h3>
         </div>
       )}
@@ -105,7 +113,8 @@ export function DayGrid(props: {
         return (
           <div
             key={loc.name}
-            className="sticky top-0 z-20 bg-surface border-b border-l border-line-subtle p-1"
+            style={{ top: stickyTop }}
+            className="sticky z-20 bg-surface border-b border-l border-line-subtle p-1"
           >
             {/* What a room offers (projector, whiteboard, …) is behind its name.
               The ⓘ is the only hint that there is anything to open, so it goes
@@ -144,7 +153,10 @@ export function DayGrid(props: {
         );
       })}
       {/* Row 2 — room description */}
-      <div className="sticky top-0 z-20 bg-surface border-r border-line-subtle" />
+      <div
+        style={{ top: stickyTop }}
+        className="sticky z-20 bg-surface border-r border-line-subtle"
+      />
       {showMeetings && (
         <div className="border-l border-line-subtle p-1">
           <p className="text-[10px] text-fg-subtle">Only you see these</p>

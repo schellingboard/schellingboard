@@ -7,17 +7,20 @@ import type { ScheduleFilter } from "@/utils/schedule-filters";
 
 export function ScheduleFilters(props: {
   statusRef?: Ref<HTMLDivElement>;
+  /** "grid": held at the left edge while the grid scrolls sideways under it. */
+  layout?: "centered" | "grid";
   search: string;
   onSearchChange: (search: string) => void;
   /** Null when there is no viewer for "mine" to mean. */
   filters: { value: ScheduleFilter; label: string; active: boolean }[] | null;
   onToggleFilter: (value: ScheduleFilter) => void;
-  /** How many entries are shown out of how many, or null when nothing narrows them. */
-  count: { shown: number; total: number } | null;
+  /** How many entries match out of how many, or null when nothing narrows them. */
+  count: { matching: number; total: number } | null;
   onShowAll: () => void;
   onBackToTop: () => void;
 }) {
   const {
+    layout = "centered",
     statusRef,
     search,
     onSearchChange,
@@ -31,12 +34,18 @@ export function ScheduleFilters(props: {
     ...(filters ?? []).filter((f) => f.active).map((f) => f.label),
     ...(search.trim() === "" ? [] : [`"${search.trim()}"`]),
   ];
+  const width =
+    layout === "grid"
+      ? "sticky left-0 w-[100dvw] max-w-3xl"
+      : "mx-auto max-w-3xl";
   return (
     <>
       <div
         className={clsx("bg-surface", !count && "border-b border-line-subtle")}
       >
-        <div className="mx-auto flex max-w-3xl flex-wrap items-center gap-2 px-2 py-2">
+        <div
+          className={clsx(width, "flex flex-wrap items-center gap-2 px-2 py-2")}
+        >
           <SearchInput
             className="w-full sm:w-auto sm:flex-1"
             // text-base below sm: iOS zooms into inputs with smaller text.
@@ -78,16 +87,21 @@ export function ScheduleFilters(props: {
       {count && (
         <div
           ref={statusRef}
-          className="sticky top-0 z-20 border-b border-line-subtle bg-surface"
+          className="sticky top-0 z-30 border-b border-line-subtle bg-surface"
         >
-          <p className="mx-auto flex max-w-3xl items-center gap-1 px-2 py-1.5 text-xs text-fg-subtle">
+          <p
+            className={clsx(
+              width,
+              "flex items-center gap-1 px-2 py-1.5 text-xs text-fg-subtle"
+            )}
+          >
             <button
               type="button"
               onClick={onBackToTop}
               className="flex min-w-0 items-center gap-1 hover:text-fg-muted"
             >
               <span className="truncate">
-                {[`Showing ${count.shown} of ${count.total}`, ...active].join(
+                {[`${count.matching} of ${count.total} match`, ...active].join(
                   " · "
                 )}
               </span>

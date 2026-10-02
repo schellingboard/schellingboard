@@ -1,6 +1,7 @@
 import { Page } from "@playwright/test";
 import { DateTime } from "luxon";
 import { test, expect } from "./helpers/fixtures";
+import { switchToView } from "./helpers/schedule";
 import { uniqueSuffix } from "./helpers/unique";
 import { login } from "./helpers/auth";
 import { selectUser } from "./helpers/user";
@@ -178,7 +179,7 @@ test("a session booked after midnight lands on the next calendar date", async ({
   const afterMidnight = DateTime.now()
     .setZone("Europe/Berlin")
     .plus({ days: 17 });
-  await page.getByRole("button", { name: "Text" }).click();
+  await switchToView(page, "Text");
   await page.getByPlaceholder("Search sessions").fill(title);
   await expect(
     page.getByText(`${afterMidnight.toFormat("EEEE")}, 01:10`)

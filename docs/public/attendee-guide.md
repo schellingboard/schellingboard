@@ -119,12 +119,14 @@ it starts, all rooms together — handy on a phone), **Text** (one
 entry per session with its description, and a search box) and **RSVP'd** (the
 sessions you are attending or hosting).
 
-The agenda's search box finds sessions by title, description, host or room,
-and your 1-on-1s by the other person's name. Next to it, **My sessions**,
-**RSVP'd** and **Hosting** narrow the agenda to your own sessions; pick more
-than one and each narrows it further. Your 1-on-1s stay listed under all of
-them. While the agenda is narrowed, a line at the top says what matches and
-by what: tap it to get back to the search, or tap **Show all** to clear it.
+Above the Grid and the Agenda, a search box finds sessions by title,
+description, host or room, and your 1-on-1s by the other person's name. Next
+to it, **My sessions**, **RSVP'd** and **Hosting** narrow the schedule to your
+own sessions; pick more than one and each narrows it further. Your 1-on-1s
+pass all of them. The agenda then lists only what matches, while the grid
+keeps everything in place, greys out the rest and folds away days without a
+match. A line at the top says what matches and by what: tap it to get back to
+the search, or tap **Show all** to clear it.
 
 While the event is running, a red line marks the current time in the grid and
 the agenda, and **"Now"** at the top of the schedule jumps straight to it.

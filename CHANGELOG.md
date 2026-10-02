@@ -17,10 +17,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   an opening keynote.
 - **Clear a search with one tap**: every search box shows an × while it holds text, which
   empties it and brings back the full list.
-- **Search the agenda**: a search box at the top of the Agenda view finds sessions by
+- **Search the schedule**: a search box above the Grid and Agenda views finds sessions by
   title, description, host or room, and your 1-on-1s by name.
-- **Filter the agenda to your own sessions**: My sessions, RSVP'd and Hosting narrow the
-  Agenda view to what you are attending or hosting, and stay on after a reload.
+- **Filter the schedule to your own sessions**: My sessions, RSVP'd and Hosting narrow the
+  Grid and Agenda views to what you are attending or hosting.
 
 ### Changed
 

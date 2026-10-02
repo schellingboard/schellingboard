@@ -1,30 +1,13 @@
 import { test, expect } from "./helpers/fixtures";
-import type { Page } from "@playwright/test";
 import { login, loginAndGoto } from "./helpers/auth";
 import { selectUser } from "./helpers/user";
 import { openGammaScheduleDuringEvent } from "./helpers/dev-clock";
+import { filterChip, switchToView, viewButton } from "./helpers/schedule";
 
 // The agenda view: behind its own toolbar button, the grid staying the default
 // everywhere.
 
 const KEYNOTE = /Opening Keynote - Conference Gamma/;
-
-const viewButton = (page: Page, name: string) =>
-  page.getByRole("button", { name });
-
-// The toggle is server-rendered, so a click can land before React has attached
-// its handler and be dropped — retry until the view has actually switched
-// (docs/dev/testing.md § E2E conventions).
-const switchToView = async (page: Page, name: string) => {
-  await expect(async () => {
-    await viewButton(page, name).click();
-    await expect(viewButton(page, name)).toHaveAttribute(
-      "aria-pressed",
-      "true",
-      { timeout: 2000 }
-    );
-  }).toPass();
-};
 
 test.describe("on a phone-sized screen", () => {
   test.use({ viewport: { width: 390, height: 844 } });
@@ -62,7 +45,7 @@ test.describe("on a phone-sized screen", () => {
       .scrollIntoViewIfNeeded();
     await expect(search).not.toBeInViewport();
 
-    await page.getByRole("button", { name: /Showing \d+ of \d+/ }).click();
+    await page.getByRole("button", { name: /\d+ of \d+ match/ }).click();
     await expect(search).toBeInViewport();
   });
 });
@@ -128,7 +111,7 @@ test("searching the agenda narrows it to sessions and 1-on-1s that match", async
   await expect(apiDesign).toBeVisible();
   await expect(page.getByRole("link", { name: KEYNOTE })).toBeHidden();
   await expect(page.getByText("Lunch Break")).toBeHidden();
-  await expect(page.getByText("Showing 1 of")).toBeVisible();
+  await expect(page.getByText(/^1 of \d+ match/)).toBeVisible();
 
   await search.fill("Leilani");
   await expect(
@@ -142,13 +125,8 @@ test("searching the agenda narrows it to sessions and 1-on-1s that match", async
   await page.getByRole("button", { name: "Clear search" }).click();
   await expect(apiDesign).toBeVisible();
   await expect(page.getByRole("link", { name: KEYNOTE })).toBeVisible();
-  await expect(page.getByText(/Showing \d+ of/)).toBeHidden();
+  await expect(page.getByText(/\d+ of \d+ match/)).toBeHidden();
 });
-
-const filterChip = (page: Page, name: string) =>
-  page
-    .getByRole("group", { name: "Filter sessions" })
-    .getByRole("button", { name });
 
 // Charlie hosts the React session and has an RSVP for Open Source
 // Sustainability in the seed; API Design is neither.
@@ -180,7 +158,7 @@ test("filters narrow the agenda to the viewer's own sessions, each one further",
   // their own session, so hosting and RSVP'd together leaves nothing.
   await filterChip(page, "RSVP'd").click();
   await expect(hosted).toBeHidden();
-  await expect(page.getByText("Showing 0 of")).toBeVisible();
+  await expect(page.getByText(/^0 of \d+ match/)).toBeVisible();
 
   await filterChip(page, "Hosting").click();
   await expect(rsvpd).toBeVisible();
