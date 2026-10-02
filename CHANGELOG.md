@@ -19,6 +19,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   empties it and brings back the full list.
 - **Search the agenda**: a search box at the top of the Agenda view finds sessions by
   title, description, host or room, and your 1-on-1s by name.
+- **Filter the agenda to your own sessions**: My sessions, RSVP'd and Hosting narrow the
+  Agenda view to what you are attending or hosting, and stay on after a reload.
 
 ### Changed
 

@@ -145,6 +145,88 @@ test("searching the agenda narrows it to sessions and 1-on-1s that match", async
   await expect(page.getByText(/Showing \d+ of/)).toBeHidden();
 });
 
+const filterChip = (page: Page, name: string) =>
+  page
+    .getByRole("group", { name: "Filter sessions" })
+    .getByRole("button", { name });
+
+// Charlie hosts the React session and has an RSVP for Open Source
+// Sustainability in the seed; API Design is neither.
+test("filters narrow the agenda to the viewer's own sessions, each one further", async ({
+  page,
+}) => {
+  await loginAndGoto(page, "/Conference-Gamma");
+  await switchToView(page, "Agenda");
+  // Filtering by "mine" needs a name to go on.
+  await expect(
+    page.getByRole("group", { name: "Filter sessions" })
+  ).toBeHidden();
+
+  await selectUser(page, "Charlie Test");
+  const hosted = page.getByRole("link", { name: /Building Scalable Web/ });
+  const rsvpd = page.getByRole("link", { name: /Open Source Sustainability/ });
+  const neither = page.getByRole("link", { name: /API Design/ });
+
+  await filterChip(page, "Hosting").click();
+  await expect(filterChip(page, "Hosting")).toHaveAttribute(
+    "aria-pressed",
+    "true"
+  );
+  await expect(hosted).toBeVisible();
+  await expect(rsvpd).toBeHidden();
+  await expect(neither).toBeHidden();
+
+  // Chips combine like the attendee directory's: a host doesn't RSVP to
+  // their own session, so hosting and RSVP'd together leaves nothing.
+  await filterChip(page, "RSVP'd").click();
+  await expect(hosted).toBeHidden();
+  await expect(page.getByText("Showing 0 of")).toBeVisible();
+
+  await filterChip(page, "Hosting").click();
+  await expect(rsvpd).toBeVisible();
+  await expect(hosted).toBeHidden();
+
+  // The filter is part of the address, so it survives a reload.
+  await page.reload();
+  await expect(filterChip(page, "RSVP'd")).toHaveAttribute(
+    "aria-pressed",
+    "true"
+  );
+  await expect(rsvpd).toBeVisible();
+  await expect(hosted).toBeHidden();
+
+  await filterChip(page, "RSVP'd").click();
+  await filterChip(page, "My sessions").click();
+  await expect(rsvpd).toBeVisible();
+  await expect(hosted).toBeVisible();
+  await expect(neither).toBeHidden();
+
+  await page.getByRole("button", { name: "Show all" }).click();
+  await expect(neither).toBeVisible();
+  await expect(filterChip(page, "My sessions")).toHaveAttribute(
+    "aria-pressed",
+    "false"
+  );
+});
+
+test("the viewer's own 1-on-1s stay listed under every filter", async ({
+  page,
+}) => {
+  await loginAndGoto(page, "/guests");
+  await selectUser(page, "Zanele Khumalo");
+  await page.getByRole("link", { name: "Conference Gamma" }).first().click();
+  await switchToView(page, "Agenda");
+
+  await filterChip(page, "Hosting").click();
+  await expect(
+    page.getByRole("link", { name: /1-on-1 with Leilani Kahale/ })
+  ).toBeVisible();
+  await filterChip(page, "RSVP'd").click();
+  await expect(
+    page.getByRole("link", { name: /1-on-1 with Leilani Kahale/ })
+  ).toBeVisible();
+});
+
 test.describe("while the event is running", () => {
   // At 16:00 the marker sits after day one's last group, only a few rows down
   // the list; a short viewport keeps it off screen until Now is pressed.
