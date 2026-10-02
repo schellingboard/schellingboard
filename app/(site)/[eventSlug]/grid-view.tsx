@@ -1,7 +1,8 @@
 "use client";
-import { useState, type ReactNode, type RefObject } from "react";
+import { useMemo, useState, type ReactNode, type RefObject } from "react";
 import type { Guest, Location } from "@/db/repositories/interfaces";
 import type { DayWithSessions } from "../context";
+import { matchesInReadingOrder } from "@/utils/schedule-search";
 import { DayGrid } from "./day-grid";
 import { DayFoldBar } from "./day-fold-bar";
 import { ScheduleFilters } from "./schedule-filters";
@@ -36,7 +37,7 @@ export function GridView(props: {
     debouncedSearch,
     onSearchChange,
   } = props;
-  const { match, filtering, entries, statusHeight, barProps } =
+  const { match, filtering, entries, statusHeight, barProps, matchKey } =
     useScheduleSearch({
       days,
       locations,
@@ -45,6 +46,52 @@ export function GridView(props: {
       onSearchChange,
       scrollerRef,
     });
+  const [stepped, setStepped] = useState<{
+    key: string;
+    id: string;
+    index: number;
+    of: number;
+  } | null>(null);
+  const current = stepped?.key === matchKey ? stepped : null;
+  // In reading order, top to bottom and then left to right: the DOM runs
+  // column by column instead.
+  const step = (direction: 1 | -1) => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    const found = matchesInReadingOrder(
+      Array.from(scroller.querySelectorAll<HTMLElement>("[data-match-id]")).map(
+        (element) => {
+          const { top, left } = element.getBoundingClientRect();
+          return { element, id: element.dataset.matchId!, top, left };
+        }
+      )
+    );
+    if (found.length === 0) return;
+    const at = current ? found.findIndex((f) => f.id === current.id) : -1;
+    const index =
+      at === -1
+        ? direction === 1
+          ? 0
+          : found.length - 1
+        : (at + direction + found.length) % found.length;
+    const { element, id } = found[index];
+    element.scrollIntoView({
+      block: "center",
+      inline: "center",
+      behavior: "smooth",
+    });
+    setStepped({
+      key: matchKey,
+      id,
+      index,
+      of: found.length,
+    });
+  };
+  const stepMatch = useMemo(
+    () => ({ ...match, currentMatchId: current?.id ?? null }),
+    [match, current?.id]
+  );
+
   // Days without a match, opened anyway while searching or filtering.
   const [openedEmpty, setOpenedEmpty] = useState<Set<string>>(() => new Set());
   const toggleEmpty = (dayId: string) =>
@@ -70,8 +117,15 @@ export function GridView(props: {
       style={{ gridTemplateColumns: "minmax(max-content, 1fr)" }}
     >
       {toolbar}
-      <ScheduleFilters {...barProps} layout="grid" />
-      <ScheduleMatchContext value={match}>
+      <ScheduleFilters
+        {...barProps}
+        layout="grid"
+        stepper={{
+          position: current ? `${current.index + 1}/${current.of}` : null,
+          onStep: step,
+        }}
+      />
+      <ScheduleMatchContext value={stepMatch}>
         {entries.map(({ day, sessions, meetings }) => {
           const empty = filtering && sessions.length + meetings.length === 0;
           const foldable = filtering ? empty : defaultFoldedDayIds.has(day.id);

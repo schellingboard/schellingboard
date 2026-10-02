@@ -34,6 +34,8 @@ export type ScheduleMatch = {
   filtering: boolean;
   matchesSession: (session: Session) => boolean;
   matchesMeeting: (meeting: MeetingView) => boolean;
+  /** The match last stepped to, marked out among the others. */
+  currentMatchId?: string | null;
 };
 
 export const ScheduleMatchContext = createContext<ScheduleMatch>({
@@ -47,6 +49,10 @@ export const useScheduleMatch = () => useContext(ScheduleMatchContext);
 /** What the grid draws in place of anything a search or filter passes over. */
 export const GHOST_CLASS =
   "opacity-30 grayscale transition-opacity hover:opacity-70";
+
+/** Drawn inside the block: its wrappers clip anything outside. */
+export const CURRENT_MATCH_CLASS =
+  "outline-3 outline-brand-accent -outline-offset-3";
 
 /**
  * The search and filter chips shared by the schedule views: what matches,
@@ -192,5 +198,8 @@ export function useScheduleSearch(input: {
       scrollerRef.current?.scrollTo({ top: 0, behavior: "smooth" }),
   };
 
-  return { match, filtering, entries, statusHeight, barProps };
+  // Changes whenever the set of matches may have, which ends any stepping.
+  const matchKey = `${debouncedSearch}|${filters.join()}`;
+
+  return { match, filtering, entries, statusHeight, barProps, matchKey };
 }

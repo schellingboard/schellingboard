@@ -1,9 +1,16 @@
 "use client";
 import type { Ref } from "react";
 import clsx from "clsx";
-import { ArrowUpIcon } from "@heroicons/react/20/solid";
+import {
+  ArrowUpIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+} from "@heroicons/react/20/solid";
 import { SearchInput } from "@/app/search-input";
 import type { ScheduleFilter } from "@/utils/schedule-filters";
+
+const STEP_CLASS =
+  "rounded border border-line-subtle p-0.5 hover:bg-surface-hover hover:text-fg-muted";
 
 export function ScheduleFilters(props: {
   statusRef?: Ref<HTMLDivElement>;
@@ -18,6 +25,8 @@ export function ScheduleFilters(props: {
   count: { matching: number; total: number } | null;
   onShowAll: () => void;
   onBackToTop: () => void;
+  /** Where every match stays in place, a way to find them one by one. */
+  stepper?: { position: string | null; onStep: (direction: 1 | -1) => void };
 }) {
   const {
     layout = "centered",
@@ -29,6 +38,7 @@ export function ScheduleFilters(props: {
     count,
     onShowAll,
     onBackToTop,
+    stepper,
   } = props;
   const active = [
     ...(filters ?? []).filter((f) => f.active).map((f) => f.label),
@@ -55,6 +65,11 @@ export function ScheduleFilters(props: {
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
             onClear={() => onSearchChange("")}
+            onKeyDown={(event) => {
+              if (event.key !== "Enter" || !stepper || !count?.matching) return;
+              event.preventDefault();
+              stepper.onStep(event.shiftKey ? -1 : 1);
+            }}
           />
           {filters && (
             <div
@@ -108,6 +123,29 @@ export function ScheduleFilters(props: {
               <ArrowUpIcon aria-hidden className="h-3.5 w-3.5 shrink-0" />
               <span className="sr-only">, back to the search</span>
             </button>
+            {stepper && count.matching > 0 && (
+              <span className="flex shrink-0 items-center gap-0.5 pl-1">
+                <button
+                  type="button"
+                  aria-label="Previous match"
+                  onClick={() => stepper.onStep(-1)}
+                  className={STEP_CLASS}
+                >
+                  <ChevronUpIcon aria-hidden className="h-4 w-4" />
+                </button>
+                {stepper.position && (
+                  <span className="tabular-nums">{stepper.position}</span>
+                )}
+                <button
+                  type="button"
+                  aria-label="Next match"
+                  onClick={() => stepper.onStep(1)}
+                  className={STEP_CLASS}
+                >
+                  <ChevronDownIcon aria-hidden className="h-4 w-4" />
+                </button>
+              </span>
+            )}
             <span aria-hidden>·</span>
             <button
               type="button"

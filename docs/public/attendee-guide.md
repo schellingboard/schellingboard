@@ -126,7 +126,8 @@ own sessions; pick more than one and each narrows it further. Your 1-on-1s
 pass all of them. The agenda then lists only what matches, while the grid
 keeps everything in place, greys out the rest and folds away days without a
 match. A line at the top says what matches and by what: tap it to get back to
-the search, or tap **Show all** to clear it.
+the search, or tap **Show all** to clear it. On the grid, its arrows (or Enter
+in the search box) take you from one match to the next.
 
 While the event is running, a red line marks the current time in the grid and
 the agenda, and **"Now"** at the top of the schedule jumps straight to it.

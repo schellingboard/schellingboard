@@ -25,3 +25,17 @@ export function meetingMatchesSearch(meeting: MeetingView, search: string) {
     containsIgnoringAccents(meeting.message, search)
   );
 }
+
+// A session in several rooms is drawn in each, but is one match.
+export function matchesInReadingOrder<
+  T extends { id: string; top: number; left: number },
+>(found: T[]): T[] {
+  const seen = new Set<string>();
+  return [...found]
+    .sort((a, b) => a.top - b.top || a.left - b.left)
+    .filter(({ id }) => {
+      if (seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
+}

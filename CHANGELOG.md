@@ -18,7 +18,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Clear a search with one tap**: every search box shows an × while it holds text, which
   empties it and brings back the full list.
 - **Search the schedule**: a search box above the Grid and Agenda views finds sessions by
-  title, description, host or room, and your 1-on-1s by name.
+  title, description, host or room, and your 1-on-1s by name; on the grid, arrows step
+  from one match to the next.
 - **Filter the schedule to your own sessions**: My sessions, RSVP'd and Hosting narrow the
   Grid and Agenda views to what you are attending or hosting.
 

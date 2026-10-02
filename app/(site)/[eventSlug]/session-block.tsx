@@ -27,7 +27,11 @@ import {
   type RsvpClash,
 } from "@/utils/rsvp-clash";
 import { useMyMeetings } from "./use-meetings";
-import { GHOST_CLASS, useScheduleMatch } from "./use-schedule-search";
+import {
+  CURRENT_MATCH_CLASS,
+  GHOST_CLASS,
+  useScheduleMatch,
+} from "./use-schedule-search";
 
 export function SessionBlock(props: {
   item: ColumnItem;
@@ -205,7 +209,7 @@ export function RealSessionCard(props: {
   const hostStatus =
     currentUser && session.hosts.some((h) => h.id === currentUser);
   const lowerOpacity = !rsvpd && !hostStatus;
-  const { filtering, matchesSession } = useScheduleMatch();
+  const { filtering, matchesSession, currentMatchId } = useScheduleMatch();
   const ghost = filtering && !matchesSession(session);
   const formattedHostNames =
     session.hosts.map((h) => h.name).join(", ") || "No hosts";
@@ -296,12 +300,14 @@ export function RealSessionCard(props: {
         noTap={true}
       >
         <div
+          data-match-id={filtering && !ghost ? session.id : undefined}
           className={clsx(
             "px-1 rounded font-roboto h-full flex flex-col relative w-full group border-2 overflow-hidden",
             height >= 40 ? "py-1" : "py-0.5",
             `loc-${location.color}`,
             lowerOpacity ? "loc-block-dim" : "loc-block",
-            ghost && GHOST_CLASS
+            ghost && GHOST_CLASS,
+            currentMatchId === session.id && CURRENT_MATCH_CLASS
           )}
         >
           <Link
