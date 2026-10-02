@@ -28,6 +28,7 @@ vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
 }));
 
+import { isoDay } from "../helpers/dates";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { siteAuthenticate } from "../helpers/site-auth";
 import { createEvent, createGuest, createDay } from "../helpers/factories";
@@ -38,10 +39,11 @@ import type { Event, Guest } from "@/db/repositories/interfaces";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
-const DAY_START = new Date("2026-10-01T09:00:00.000Z");
-const DAY_END = new Date("2026-10-01T17:00:00.000Z");
-const SLOT = "2026-10-01T10:00:00.000Z";
-const SLOT_2 = "2026-10-01T10:30:00.000Z";
+const DAY = isoDay(30);
+const DAY_START = new Date(`${DAY}T09:00:00.000Z`);
+const DAY_END = new Date(`${DAY}T17:00:00.000Z`);
+const SLOT = `${DAY}T10:00:00.000Z`;
+const SLOT_2 = `${DAY}T10:30:00.000Z`;
 
 // A day of the same event that has already happened. Multi-day events spend
 // most of their run with days on both sides of "now".
@@ -164,7 +166,7 @@ describe("requestMeetingAction", () => {
     const { event, recipient } = await scenario();
 
     const result = await request(event, recipient, {
-      slotStart: "2026-10-01T11:00:00.000Z",
+      slotStart: `${DAY}T11:00:00.000Z`,
     });
 
     expect(result.ok).toBe(false);
@@ -174,7 +176,7 @@ describe("requestMeetingAction", () => {
     const { event, recipient } = await scenario();
 
     const result = await request(event, recipient, {
-      slotStart: "2026-10-01T10:17:00.000Z",
+      slotStart: `${DAY}T10:17:00.000Z`,
     });
 
     expect(result.ok).toBe(false);

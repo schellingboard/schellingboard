@@ -4,8 +4,10 @@ import { uniqueSuffix } from "./helpers/unique";
 import { loginAndGoto } from "./helpers/auth";
 import { selectUser } from "./helpers/user";
 import { openAvailability } from "./helpers/meetings";
+import { isoDay } from "../helpers/dates";
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admintest";
+const DAY = isoDay(30);
 
 async function manage(page: Page, eventName: string) {
   await page
@@ -81,12 +83,12 @@ test.describe("attendee meeting availability", () => {
 
     // One day, so the slot list is short and predictable.
     await page.getByRole("button", { name: "Add day" }).click();
-    await page.getByLabel("Start *").last().fill("2026-10-01T09:00");
-    await page.getByLabel("End *").last().fill("2026-10-01T11:00");
-    await page.getByLabel("Bookings open *").fill("2026-10-01T09:00");
-    await page.getByLabel("Bookings close *").fill("2026-10-01T11:00");
+    await page.getByLabel("Start *").last().fill(`${DAY}T09:00`);
+    await page.getByLabel("End *").last().fill(`${DAY}T11:00`);
+    await page.getByLabel("Bookings open *").fill(`${DAY}T09:00`);
+    await page.getByLabel("Bookings close *").fill(`${DAY}T11:00`);
     await page.getByRole("button", { name: "Add day" }).last().click();
-    await expect(page.getByText("2026-10-01T09:00")).toBeVisible();
+    await expect(page.getByText(`${DAY}T09:00`)).toBeVisible();
 
     // Availability is only for people attending, so assign a seeded guest.
     await page.getByRole("link", { name: "Guests" }).click();
@@ -140,13 +142,11 @@ test.describe("attendee meeting availability", () => {
     // Scoped to Days: the event's own "End *" date sits on this page too.
     const days = page.getByRole("region", { name: "Days" });
     await days.getByRole("button", { name: /^Edit day / }).click();
-    await days.getByLabel("End *").fill("2026-10-01T10:00");
+    await days.getByLabel("End *").fill(`${DAY}T10:00`);
     // The bookings window has to stay inside the day's own.
-    await days.getByLabel("Bookings close *").fill("2026-10-01T10:00");
+    await days.getByLabel("Bookings close *").fill(`${DAY}T10:00`);
     await days.getByRole("button", { name: "Save", exact: true }).click();
-    await expect(
-      page.getByText(/2026-10-01T09:00 – 2026-10-01T10:00/)
-    ).toBeVisible();
+    await expect(page.getByText(`${DAY}T09:00 – ${DAY}T10:00`)).toBeVisible();
 
     await page.goto("/settings");
     form = await openAvailability(page, eventName);

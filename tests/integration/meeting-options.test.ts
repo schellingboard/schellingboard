@@ -24,6 +24,7 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
 
+import { isoDay } from "../helpers/dates";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { siteAuthenticate } from "../helpers/site-auth";
 import {
@@ -40,11 +41,12 @@ import { verifiedCurrentUser } from "@/utils/acting-guest";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
-const DAY_START = new Date("2026-10-01T09:00:00.000Z");
-const DAY_END = new Date("2026-10-01T12:00:00.000Z");
-const SLOT_A = "2026-10-01T09:00:00.000Z";
-const SLOT_B = "2026-10-01T09:30:00.000Z";
-const SLOT_C = "2026-10-01T10:00:00.000Z";
+const DAY = isoDay(30);
+const DAY_START = new Date(`${DAY}T09:00:00.000Z`);
+const DAY_END = new Date(`${DAY}T12:00:00.000Z`);
+const SLOT_A = `${DAY}T09:00:00.000Z`;
+const SLOT_B = `${DAY}T09:30:00.000Z`;
+const SLOT_C = `${DAY}T10:00:00.000Z`;
 
 async function signIn(guestId: string) {
   cookieJar.set(GUEST_COOKIE_NAME, await verifiedGuestValue(guestId));

@@ -28,6 +28,7 @@ vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
 }));
 
+import { isoDay } from "../helpers/dates";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { siteAuthenticate } from "../helpers/site-auth";
 import { createEvent, createGuest } from "../helpers/factories";
@@ -42,7 +43,7 @@ import type { Event, Guest, Meeting } from "@/db/repositories/interfaces";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
-const FUTURE_SLOT = new Date("2099-10-01T10:00:00.000Z");
+const FUTURE_SLOT = new Date(`${isoDay(30)}T10:00:00.000Z`);
 const PAST_SLOT = new Date("2020-10-01T10:00:00.000Z");
 
 async function signIn(guestId: string) {

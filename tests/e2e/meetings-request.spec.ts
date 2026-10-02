@@ -4,19 +4,10 @@ import { uniqueSuffix } from "./helpers/unique";
 import { loginAndGoto } from "./helpers/auth";
 import { selectUser } from "./helpers/user";
 import { openAvailability } from "./helpers/meetings";
+import { isoDay } from "../helpers/dates";
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admintest";
 
-/**
- * The event runs a month out. Relative to the run rather than a fixed date:
- * the picker only offers slots that are still ahead, so a hard-coded October
- * would quietly stop offering anything once October passed.
- */
-const isoDay = (offsetDays: number) => {
-  const d = new Date();
-  d.setUTCDate(d.getUTCDate() + offsetDays);
-  return d.toISOString().slice(0, 10);
-};
 const EVENT_START = isoDay(30);
 const EVENT_END = isoDay(32);
 
@@ -105,8 +96,8 @@ async function meetingsEvent(page: Page, eventName: string, names: string[]) {
   // The 1-on-1s column lives on the schedule, which only exists once the
   // event is in its scheduling phase.
   const scheduling = page.getByRole("group", { name: "Scheduling phase" });
-  await scheduling.getByLabel("Start").fill("2026-01-01T00:00");
-  await scheduling.getByLabel("End").fill("2027-01-01T00:00");
+  await scheduling.getByLabel("Start").fill(`${isoDay(-1)}T00:00`);
+  await scheduling.getByLabel("End").fill(`${isoDay(365)}T00:00`);
   await page.getByRole("button", { name: "Save phases" }).click();
   await expect(page.getByText("Saved!").last()).toBeVisible();
 

@@ -9,6 +9,7 @@ import {
 } from "vitest";
 import { NextRequest } from "next/server";
 
+import { isoDay } from "../helpers/dates";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest, createDay } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, verifiedGuestValue } from "../helpers/guest-cookie";
@@ -18,10 +19,11 @@ import type { MeetingCandidates } from "@/utils/meeting-candidates";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
-// Well ahead of any real clock: the endpoint refuses a slot that has begun.
-const DAY_START = new Date("2099-10-01T09:00:00.000Z");
-const DAY_END = new Date("2099-10-01T12:00:00.000Z");
-const SLOT = "2099-10-01T10:00:00.000Z";
+// Ahead of the clock: the endpoint refuses a slot that has begun.
+const DAY = isoDay(30);
+const DAY_START = new Date(`${DAY}T09:00:00.000Z`);
+const DAY_END = new Date(`${DAY}T12:00:00.000Z`);
+const SLOT = `${DAY}T10:00:00.000Z`;
 
 async function request(
   params: { event?: string; slot?: string },
@@ -104,7 +106,7 @@ describe("the 1-on-1 candidates endpoint", () => {
 
     const res = await candidates(
       await request(
-        { event: event.id, slot: "2099-10-01T10:07:00.000Z" },
+        { event: event.id, slot: `${DAY}T10:07:00.000Z` },
         viewer.id
       )
     );
