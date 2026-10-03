@@ -6,8 +6,10 @@ import Link from "next/link";
 import { UserContext } from "@/app/(site)/context";
 import { Markdown, MarkdownHint } from "@/app/(site)/markdown";
 import { ConfirmationModal } from "@/app/(site)/modals";
-import { COMMENT_MAX_LENGTH } from "@schellingboard/domain/comment";
-import type { Comment } from "@/db/repositories/interfaces";
+import {
+  COMMENT_MAX_LENGTH,
+  type Comment,
+} from "@schellingboard/domain/comment";
 import type { CommentActionResult } from "./comment-actions";
 import { deleteComment, updateComment } from "./comment-actions";
 import { useLocalZone } from "@/utils/hooks";

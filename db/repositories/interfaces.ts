@@ -1,3 +1,4 @@
+import type { Comment } from "@schellingboard/domain/comment";
 import type { VoteChoice, Vote } from "@schellingboard/domain/vote";
 import type {
   Rsvp,
@@ -610,21 +611,6 @@ export interface SessionProposalsRepository {
 }
 
 // ── Comments ──────────────────────────────────────────────────────────────────
-
-export type CommentAuthor = Pick<Guest, "id" | "name">;
-
-export type CommentLiker = Pick<Guest, "id" | "name" | "avatarUrl">;
-
-export type Comment = {
-  id: string;
-  parentId: string | null;
-  body: string;
-  deleted: boolean;
-  createdTime: Date;
-  editedTime: Date | null;
-  author: CommentAuthor | null;
-  likes: CommentLiker[];
-};
 
 /**
  * Scope-agnostic comment operations. A comment is attached to exactly one

@@ -3,7 +3,7 @@
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 
-import type { Comment } from "@/db/repositories/interfaces";
+import type { Comment } from "@schellingboard/domain/comment";
 import { createProposalComment } from "../comment-actions";
 import { type CommentCreateInput, CommentsSection } from "../comments-section";
 

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import type { Comment } from "@/db/repositories/interfaces";
+import type { Comment } from "@schellingboard/domain/comment";
 
 type SerializedComment = Omit<Comment, "createdTime" | "editedTime"> & {
   createdTime: string;

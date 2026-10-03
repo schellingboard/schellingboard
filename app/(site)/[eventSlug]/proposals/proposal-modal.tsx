@@ -4,7 +4,7 @@ import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import { ModalCloseButton } from "@/app/components/modal-close-button";
-import type { Comment } from "@/db/repositories/interfaces";
+import type { Comment } from "@schellingboard/domain/comment";
 import type { SessionProposal, Session } from "@schellingboard/domain/session";
 import type { Event } from "@schellingboard/domain/event";
 import { dismissViewProposal } from "../modal-nav";

@@ -18,7 +18,7 @@ import HoverTooltip from "@/app/(site)/hover-tooltip";
 import { EventContext, UserContext, VotesContext } from "@/app/(site)/context";
 import { sessionRooms } from "@/app/(site)/session_utils";
 import { Proposal } from "@/app/(site)/[eventSlug]/proposal";
-import type { Comment } from "@/db/repositories/interfaces";
+import type { Comment } from "@schellingboard/domain/comment";
 import type { SessionProposal, Session } from "@schellingboard/domain/session";
 import type { Event } from "@schellingboard/domain/event";
 import { ProposalComments } from "./proposal-comments";

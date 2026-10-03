@@ -4,11 +4,10 @@ import type { AnySQLiteColumn, SQLiteTable } from "drizzle-orm/sqlite-core";
 import { nanoid } from "nanoid";
 import * as schema from "../../schema";
 import type {
-  Comment,
-  CommentLiker,
   CommentsRepository,
   SubjectCommentsRepository,
 } from "../interfaces";
+import type { Comment, CommentLiker } from "@schellingboard/domain/comment";
 
 type DB = BetterSQLite3Database<typeof schema>;
 

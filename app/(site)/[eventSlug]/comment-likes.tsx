@@ -7,7 +7,7 @@ import { Dialog } from "@headlessui/react";
 import { UserContext } from "@/app/(site)/context";
 import { Avatar } from "@/app/(site)/guests/avatar";
 import { Modal } from "@/app/components/modal";
-import type { Comment } from "@/db/repositories/interfaces";
+import type { Comment } from "@schellingboard/domain/comment";
 import { toggleCommentLike } from "./comment-actions";
 
 const TOOLTIP_NAMES = 3;
