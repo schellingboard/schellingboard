@@ -16,9 +16,9 @@ export const Input = forwardRef(
         <input
           ref={ref}
           className={clsx(
-            "h-12 rounded-md border bg-surface-raised px-4 shadow-sm transition-colors invalid:border-danger invalid:text-danger-fg invalid:placeholder-danger-border focus:outline-none disabled:cursor-not-allowed disabled:border-line-subtle disabled:bg-surface-sunken disabled:text-fg-subtle",
+            "h-12 rounded-md border bg-surface-raised px-4 shadow-sm transition-colors user-invalid:border-danger user-invalid:text-danger-fg user-invalid:placeholder-danger-border focus:outline-none disabled:cursor-not-allowed disabled:border-line-subtle disabled:bg-surface-sunken disabled:text-fg-subtle",
             error
-              ? "border-danger-border text-danger-fg placeholder-danger-border focus:border-danger focus:ring-danger" // matches invalid: styles
+              ? "border-danger-border text-danger-fg placeholder-danger-border focus:border-danger focus:ring-danger" // matches user-invalid: styles
               : "border-line placeholder-fg-subtle focus:ring-2 focus:ring-brand-accent focus:outline-0 focus:border-transparent",
             className
           )}

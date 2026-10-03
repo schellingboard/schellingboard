@@ -71,6 +71,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **Empty required fields no longer show as errors on load**: they now turn red only
+  after you leave one empty or try to submit the form.
 - **The proposals table fits on narrow screens** (#847): on tablet-sized screens, the Edit
   and Schedule buttons, votes and durations used to be cut off, and vote buttons overlapped them.
 - **Editing a session keeps all its rooms**: a host's edit used to reduce a session that an
