@@ -528,12 +528,14 @@ function SessionForm({
 }
 
 function SessionItem({
+  eventId,
   session,
   eventGuests,
   eventLocations,
   timezone,
   days,
 }: {
+  eventId: string;
   session: SessionRow;
   eventGuests: EventGuest[];
   eventLocations: EventLocation[];
@@ -542,7 +544,7 @@ function SessionItem({
 }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
-  const [editMode, setEditMode] = useState(false);
+  const [formMode, setFormMode] = useState<"edit" | "duplicate" | null>(null);
   const [isSaving, startSave] = useTransition();
   const [deleteMode, setDeleteMode] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState("");
@@ -564,15 +566,15 @@ function SessionItem({
   const handleSave = (input: SessionInput) => {
     startSave(async () => {
       try {
-        const result = await adminUpdateSessionAction({
-          id: session.id,
-          ...input,
-        });
+        const result =
+          formMode === "duplicate"
+            ? await adminCreateSessionAction({ eventId, ...input })
+            : await adminUpdateSessionAction({ id: session.id, ...input });
         if (!result.ok) {
           setError(result.error);
         } else {
           setError(null);
-          setEditMode(false);
+          setFormMode(null);
           router.refresh();
         }
       } catch {
@@ -646,7 +648,7 @@ function SessionItem({
     );
   }
 
-  if (!editMode) {
+  if (!formMode) {
     return (
       <div className="space-y-3">
         <div className="flex items-start justify-between gap-3">
@@ -666,12 +668,22 @@ function SessionItem({
             <button
               onClick={() => {
                 setError(null);
-                setEditMode(true);
+                setFormMode("edit");
               }}
               className={SECONDARY_BUTTON}
               aria-label={`Edit ${session.title}`}
             >
               Edit
+            </button>
+            <button
+              onClick={() => {
+                setError(null);
+                setFormMode("duplicate");
+              }}
+              className={SECONDARY_BUTTON}
+              aria-label={`Duplicate ${session.title}`}
+            >
+              Duplicate
             </button>
             <button
               onClick={() => {
@@ -692,25 +704,31 @@ function SessionItem({
   }
 
   const form = sessionFormValues(session, days, timezone);
+  const duplicating = formMode === "duplicate";
   return (
-    <SessionForm
-      initial={form.values}
-      idPrefix={`sess-${session.id}`}
-      label={`Edit ${session.title}`}
-      timezone={timezone}
-      days={form.days}
-      hostCandidates={hostCandidates}
-      locationCandidates={locationCandidates}
-      submitLabel="Save"
-      pendingLabel="Saving..."
-      isPending={isSaving}
-      error={error}
-      onSubmit={handleSave}
-      onCancel={() => {
-        setEditMode(false);
-        setError(null);
-      }}
-    />
+    <div className="space-y-3">
+      {duplicating && (
+        <h3 className="font-medium text-fg">Copy of {session.title}</h3>
+      )}
+      <SessionForm
+        initial={form.values}
+        idPrefix={`sess-${session.id}`}
+        label={`${duplicating ? "Copy of" : "Edit"} ${session.title}`}
+        timezone={timezone}
+        days={form.days}
+        hostCandidates={hostCandidates}
+        locationCandidates={locationCandidates}
+        submitLabel={duplicating ? "Create" : "Save"}
+        pendingLabel={duplicating ? "Creating..." : "Saving..."}
+        isPending={isSaving}
+        error={error}
+        onSubmit={handleSave}
+        onCancel={() => {
+          setFormMode(null);
+          setError(null);
+        }}
+      />
+    </div>
   );
 }
 
@@ -852,6 +870,7 @@ export function EventSessionsManager({
         emptyMessage="No sessions match."
         listItem={(s) => (
           <SessionItem
+            eventId={eventId}
             session={s}
             eventGuests={eventGuests}
             eventLocations={eventLocations}

@@ -169,6 +169,9 @@ proposal → schedule flow.
 - **Admin-managed** — checked by default for admin-created sessions; hosts
   can't edit or delete an admin-managed session themselves, only the admin
   panel can.
+- **Duplicate** opens a new session form filled in from an existing session.
+  To put lunch on every day, create it once, then duplicate it and change the
+  Day.
 - Deleting a session removes its RSVPs but only unlinks (doesn't delete)
   hosts/locations. Admins can also remove a single guest's RSVP from the
   session's RSVP list.
