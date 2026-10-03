@@ -44,6 +44,7 @@ import {
   updateProposal,
 } from "@/app/(site)/[eventSlug]/proposals/actions";
 import { TIME_OFFSET_COOKIE } from "@/utils/dev-clock";
+import { VoteChoice } from "@/db/repositories/interfaces";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
@@ -292,6 +293,94 @@ describe("updateProposal", () => {
     );
     expect(after?.hosts).toEqual([]);
     expect(after?.durationMinutes).toBeUndefined();
+  });
+
+  describe("last updated", () => {
+    const created = new Date("2026-03-01T10:00:00Z");
+
+    async function hostedProposal() {
+      const event = await createEvent();
+      const alice = await createGuest({ name: "Alice", eventId: event.id });
+      const bob = await createGuest({ name: "Bob", eventId: event.id });
+      const proposal = await createProposalFixture(event.id, [alice.id], {
+        title: "Original",
+        description: "As written",
+        durationMinutes: 30,
+        createdTime: created,
+      });
+      cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(alice.id));
+      const unchanged = {
+        eventSlug: "test-event",
+        title: "Original",
+        description: "As written",
+        hostIds: [alice.id],
+        durationMinutes: 30,
+      };
+      const updatedTime = async () =>
+        (await getRepositories().sessionProposals.findById(proposal.id))!
+          .updatedTime;
+      return { proposal, alice, bob, unchanged, updatedTime };
+    }
+
+    it("starts out as the time the proposal was created", async () => {
+      const { updatedTime } = await hostedProposal();
+      expect(await updatedTime()).toEqual(created);
+    });
+
+    it.each([
+      ["title", { title: "Reworded" }],
+      ["description", { description: "Rewritten" }],
+      ["duration", { durationMinutes: 60 }],
+    ])("moves when the %s changes", async (_field, change) => {
+      const { proposal, unchanged, updatedTime } = await hostedProposal();
+
+      const result = await updateProposal(proposal.id, {
+        ...unchanged,
+        ...change,
+      });
+      expect(result).toEqual({ success: true });
+
+      expect((await updatedTime()).getTime()).toBeGreaterThan(
+        created.getTime()
+      );
+    });
+
+    it("moves when a co-host joins", async () => {
+      const { proposal, alice, bob, unchanged, updatedTime } =
+        await hostedProposal();
+
+      await updateProposal(proposal.id, {
+        ...unchanged,
+        hostIds: [alice.id, bob.id],
+      });
+
+      expect((await updatedTime()).getTime()).toBeGreaterThan(
+        created.getTime()
+      );
+    });
+
+    // The edit form submits every field, so opening it and pressing Submit
+    // must not count as an edit.
+    it("stays put when a save changes nothing", async () => {
+      const { proposal, unchanged, updatedTime } = await hostedProposal();
+
+      const result = await updateProposal(proposal.id, unchanged);
+      expect(result).toEqual({ success: true });
+
+      expect(await updatedTime()).toEqual(created);
+    });
+
+    it("stays put when someone votes", async () => {
+      const { proposal, bob, updatedTime } = await hostedProposal();
+
+      await getRepositories().votes.upsert({
+        proposalId: proposal.id,
+        guestId: bob.id,
+        choice: VoteChoice.interested,
+      });
+
+      expect(await updatedTime()).toEqual(created);
+    });
   });
 
   it("rejects a missing title and leaves the proposal unchanged", async () => {

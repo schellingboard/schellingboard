@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getRepositories } from "@/db/container";
 import { isAdminRequest } from "@/utils/acting-admin";
+import { serverNow } from "@/utils/dev-clock-server";
 import type { AdminActionResult } from "./admin-guests";
 
 export type AdminProposalInput = {
@@ -53,6 +54,7 @@ export async function adminUpdateProposalAction(
     description: input.description.trim(),
     durationMinutes: input.durationMinutes,
     hostIds,
+    updatedTime: await serverNow(),
   });
 
   revalidateEventPaths(proposal.eventId);

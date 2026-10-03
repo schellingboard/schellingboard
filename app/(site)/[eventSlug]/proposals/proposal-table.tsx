@@ -79,7 +79,7 @@ export function ProposalTable({
           direction: "asc",
         }
       : {
-          key: "createdTime",
+          key: "updatedTime",
           direction: "desc",
         }
   );
@@ -200,7 +200,7 @@ export function ProposalTable({
         }
       } else if (key === "durationMinutes") {
         cmp = (a[key] || 0) - (b[key] || 0);
-      } else if (key === "createdTime") {
+      } else if (key === "updatedTime") {
         cmp = a[key].getTime() - b[key].getTime();
       } else if (key === "votesCount") {
         cmp = (a[key] || 0) - (b[key] || 0);
@@ -373,37 +373,47 @@ export function ProposalTable({
         </div>
       </div>
 
-      {/* Mobile Sort Dropdown */}
-      <div className="block md:hidden">
-        <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-fg-muted">Sort by:</label>
-          <select
-            value={`${sortConfig.key}-${sortConfig.direction}`}
-            onChange={(e) => {
-              const [key, direction] = e.target.value.split("-") as [
-                SortColumn,
-                "asc" | "desc",
-              ];
-              setSortConfig({ key, direction });
-            }}
-            className="block w-48 px-3 py-2 text-sm border border-line rounded-md bg-surface-raised focus:ring-2 focus:ring-brand-accent focus:border-transparent"
-          >
-            <option value="title-asc">Title ↓</option>
-            <option value="title-desc">Title ↑</option>
-            <option value="hosts-asc">Host(s) ↓</option>
-            <option value="hosts-desc">Host(s) ↑</option>
-            <option value="durationMinutes-asc">Duration ↓</option>
-            <option value="durationMinutes-desc">Duration ↑</option>
-            <option value="userVote-asc">Your vote ↓</option>
-            <option value="userVote-desc">Your vote ↑</option>
-            {schedEnabled && (
-              <>
-                <option value="votes-asc">Votes ↓</option>
-                <option value="votes-desc">Votes ↑</option>
-              </>
-            )}
-          </select>
-        </div>
+      <div
+        className="flex items-center justify-between md:justify-end gap-2 text-sm text-fg-muted"
+        title={
+          isSearching ? "Search results are sorted by relevance" : undefined
+        }
+      >
+        {/* A sibling, not a wrapper: wrapping would add every option's text
+            to the label, and "Title" would then name this menu too. */}
+        <label htmlFor="proposal-sort">Sort by</label>
+        <select
+          id="proposal-sort"
+          disabled={isSearching}
+          value={`${sortConfig.key}-${sortConfig.direction}`}
+          onChange={(e) => {
+            const [key, direction] = e.target.value.split("-") as [
+              SortColumn,
+              "asc" | "desc",
+            ];
+            setSortConfig({ key, direction });
+          }}
+          className="pl-2 pr-9 py-1.5 text-sm rounded-md border border-line bg-surface-raised disabled:bg-surface-muted disabled:text-fg-subtle"
+        >
+          <option value="updatedTime-desc">Recently updated</option>
+          {inVotingPhase(event, now) && (
+            <option value="votesCount-asc">Fewest votes first</option>
+          )}
+          <option value="title-asc">Title ↓</option>
+          <option value="title-desc">Title ↑</option>
+          <option value="hosts-asc">Host(s) ↓</option>
+          <option value="hosts-desc">Host(s) ↑</option>
+          <option value="durationMinutes-asc">Duration ↓</option>
+          <option value="durationMinutes-desc">Duration ↑</option>
+          <option value="userVote-asc">Your vote ↓</option>
+          <option value="userVote-desc">Your vote ↑</option>
+          {schedEnabled && (
+            <>
+              <option value="votes-asc">Votes ↓</option>
+              <option value="votes-desc">Votes ↑</option>
+            </>
+          )}
+        </select>
       </div>
 
       {/* Desktop Table View */}

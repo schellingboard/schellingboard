@@ -795,6 +795,7 @@ export type SessionProposal = {
   description?: string;
   durationMinutes?: number;
   createdTime: Date;
+  updatedTime: Date;
   hosts: ProposalHost[];
   votesCount: number;
   interestedVotesCount: number;
@@ -817,6 +818,7 @@ export type SessionProposalUpdateInput = {
   description?: string;
   hostIds?: string[];
   durationMinutes?: number | null;
+  updatedTime: Date;
 };
 
 /** A page of proposals plus the total count of rows matching the same filter. */

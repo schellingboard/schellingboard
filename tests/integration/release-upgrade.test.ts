@@ -128,6 +128,7 @@ describe.each(dumps)("upgrading from $version", (dump) => {
 
     await sessionProposals.update(proposal.id, {
       title: "Upgrade proposal v2",
+      updatedTime: new Date(),
     });
     const updated = await sessionProposals.findById(proposal.id);
     expect(updated?.title).toBe("Upgrade proposal v2");

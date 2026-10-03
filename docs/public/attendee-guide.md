@@ -48,6 +48,10 @@ on the schedule.
   titles, hosts and full descriptions, so a tool or prerequisite mentioned
   deep in a proposal is enough to find it. While you search, results stay
   ordered by how well they match.
+- **Sort by → Recently updated** puts new and freshly edited proposals first —
+  the quick way to see what changed since your last visit, and the order the
+  list opens in outside the voting phase. An edit is a change to the title,
+  description, duration or hosts; votes and comments don't count.
 
 ![Session proposal form with title, description, hosts, and duration fields](../screenshots/proposal-edit.webp)
 
