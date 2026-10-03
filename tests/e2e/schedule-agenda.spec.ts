@@ -27,6 +27,8 @@ test.describe("on a phone-sized screen", () => {
     await expect(keynote).toBeVisible();
     await expect(keynote).toContainText("Main Hall");
     await expect(keynote).toContainText("until 10:30");
+    // RSVPs against the room's 100 seats, as on the grid.
+    await expect(keynote).toContainText(/\d+\/100$/);
 
     // Lunch blocks every room at once, and is listed once, not once per room.
     const lunchSlot = page.getByRole("region", { name: "12:30" }).first();

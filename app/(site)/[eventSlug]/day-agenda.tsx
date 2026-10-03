@@ -198,7 +198,7 @@ function AgendaRow(props: {
     </>
   );
   const className = clsx(
-    "flex gap-2 py-2",
+    "flex gap-2 py-2 pr-2",
     link && "hover:bg-surface-hover",
     state === "ended" && "text-fg-muted"
   );
@@ -291,6 +291,7 @@ function SessionRow(props: {
           )}
           <UserIcon aria-hidden className="h-3 w-3" />
           {numRsvps}
+          {session.capacity > 0 && `/${session.capacity}`}
         </>
       }
     />
