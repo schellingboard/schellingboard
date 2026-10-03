@@ -45,8 +45,11 @@ const SLOT_1 = "2026-10-01T09:00:00.000Z";
 const SLOT_2 = "2026-10-01T09:30:00.000Z";
 const SLOT_3 = "2026-10-01T10:00:00.000Z";
 
-async function meetingsEvent(patch?: Record<string, unknown>) {
-  const event = await createEvent();
+async function meetingsEvent(
+  patch?: Record<string, unknown>,
+  phase: "proposal" | "scheduling" = "scheduling"
+) {
+  const event = await createEvent({ phase });
   await getRepositories().events.update(event.id, {
     meetingsEnabled: true,
     ...patch,
@@ -201,6 +204,19 @@ describe("saveMeetingAvailabilityAction", () => {
 
   it("refuses when the organizer has not enabled meetings", async () => {
     const event = await meetingsEvent({ meetingsEnabled: false });
+    const guest = await createGuest({ eventId: event.id });
+    await signIn(guest.id);
+
+    const result = await saveMeetingAvailabilityAction({
+      eventId: event.id,
+      slotStarts: [SLOT_1],
+    });
+
+    expect(result.ok).toBe(false);
+  });
+
+  it("refuses before the scheduling phase", async () => {
+    const event = await meetingsEvent({}, "proposal");
     const guest = await createGuest({ eventId: event.id });
     await signIn(guest.id);
 

@@ -12,10 +12,19 @@ const DAY = {
   end: new Date("2026-10-02T11:00:00.000Z"),
 };
 
-async function offering(opts?: { name?: string; meetingsEnabled?: boolean }) {
+// Fixed rather than the factory's default, which is relative to the real clock.
+const SCHEDULING_START = new Date("2026-09-01T00:00:00.000Z");
+
+async function offering(opts?: {
+  name?: string;
+  meetingsEnabled?: boolean;
+  schedulingPhaseStart?: Date;
+}) {
   const event = await createEvent({
     name: opts?.name,
     slotIncrementMinutes: 30,
+    schedulingPhaseStart: opts?.schedulingPhaseStart ?? SCHEDULING_START,
+    schedulingPhaseEnd: new Date("2026-12-31T00:00:00.000Z"),
   });
   await getRepositories().events.update(event.id, {
     meetingsEnabled: opts?.meetingsEnabled ?? true,
@@ -62,6 +71,16 @@ describe("availabilityFormsFor", () => {
     const notOffering = await offering({ meetingsEnabled: false });
     await createDay(notOffering.id, DAY);
     const guest = await createGuest({ eventId: notOffering.id });
+
+    expect(await availabilityFormsFor(guest.id, NOW)).toEqual([]);
+  });
+
+  it("leaves out an event that is not in its scheduling phase yet", async () => {
+    const event = await offering({
+      schedulingPhaseStart: new Date("2026-11-01T00:00:00.000Z"),
+    });
+    await createDay(event.id, DAY);
+    const guest = await createGuest({ eventId: event.id });
 
     expect(await availabilityFormsFor(guest.id, NOW)).toEqual([]);
   });

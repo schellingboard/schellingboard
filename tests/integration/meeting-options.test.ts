@@ -56,9 +56,10 @@ async function signIn(guestId: string) {
 async function scenario(opts?: {
   declared?: string[];
   eventPatch?: Record<string, unknown>;
+  phase?: "proposal" | "scheduling";
 }) {
   const repos = getRepositories();
-  const event = await createEvent({ phase: "scheduling" });
+  const event = await createEvent({ phase: opts?.phase ?? "scheduling" });
   await repos.events.update(event.id, {
     meetingsEnabled: true,
     ...opts?.eventPatch,
@@ -304,6 +305,12 @@ describe("meeting options on a profile", () => {
     const { other } = await scenario({
       eventPatch: { meetingsEnabled: false },
     });
+
+    expect(await listMeetingOptions(other.id)).toEqual([]);
+  });
+
+  it("says nothing before the scheduling phase", async () => {
+    const { other } = await scenario({ phase: "proposal" });
 
     expect(await listMeetingOptions(other.id)).toEqual([]);
   });

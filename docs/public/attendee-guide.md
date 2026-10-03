@@ -278,6 +278,10 @@ Under **Settings**, every event you're attending where the organizer offers
 1-on-1s gets a panel of its own. That is where you say when you are free to
 meet people one to one.
 
+1-on-1s open with the event's scheduling phase, when there is a schedule to fit
+them around. Outside it you can still open a 1-on-1 from its notification, but
+you can't ask, answer or cancel one.
+
 One switch controls the whole thing:
 
 > **I'm open to 1-on-1s at this event**
@@ -345,12 +349,11 @@ before its slot begins simply lapses; nothing is held against you.
 
 ### Your 1-on-1s on the schedule
 
-Once the event reaches its scheduling phase, your 1-on-1s get the **first
-column of the schedule grid**, before the rooms: the other person's name and,
-where the block has room, where you agreed to meet and whether it is
-confirmed, waiting for your reply, or waiting for theirs. A block too short for
-that marks one waiting for your reply with a dot. Each sits in its own time
-slot, next to whatever it would clash with.
+Your 1-on-1s get the **first column of the schedule grid**, before the rooms:
+the other person's name and, where the block has room, where you agreed to meet
+and whether it is confirmed, waiting for your reply, or waiting for theirs. A
+block too short for that marks one waiting for your reply with a dot. Each sits
+in its own time slot, next to whatever it would clash with.
 
 More than one can share a slot — an agreed 1-on-1 and someone asking for the
 same time is ordinary. Where the slot has room to name them all they sit one
@@ -405,7 +408,7 @@ opening anything.
 - **Filters** narrow the list to session hosts, to people who have filled in a
   profile, or to anyone **open to 1-on-1s** — anyone with slots still to come,
   at any event on the site rather than only this one. The 1-on-1 filter only
-  appears while at least one event has 1-on-1s turned on.
+  appears while at least one event is open for 1-on-1s.
 - **Search covers everything on a profile**: names, pronouns, bios, languages,
   where someone is based, prompts and answers, and any contact details they
   published. A remembered handle, a service name like "Signal", or a shared

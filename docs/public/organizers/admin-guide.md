@@ -41,7 +41,8 @@ One global row shown when there's more than one event (see
 - **Enforce session capacity as a hard limit** — when on, RSVPs are rejected
   once a session's capacity is reached; otherwise capacity is advisory only.
 - **Phases** — the three phase date ranges, see [How it works](how-it-works.md#the-three-phases).
-- **Meetings** — 1-on-1s between attendees, off by default. Once switched on:
+- **Meetings** — 1-on-1s between attendees, off by default, and open only
+  during the scheduling phase. Once switched on:
   **suggested meeting points**, a named list with optional descriptions that
   attendees pick from when booking, and a **maximum open requests per
   attendee**, limiting how many unanswered requests one person may have

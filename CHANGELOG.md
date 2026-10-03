@@ -35,6 +35,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **1-on-1s open with the scheduling phase** (#952): before it, there is no schedule to
+  fit them around, so attendees can no longer offer, ask for or answer 1-on-1s then.
 - **Scheduled proposals say so** (#853): the forms to schedule or edit a proposal that is
   already on the schedule link to its sessions and explain that they don't follow the
   proposal.

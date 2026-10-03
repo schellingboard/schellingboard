@@ -28,11 +28,15 @@ import { useMyMeetings } from "./use-meetings";
  * than taking it as a prop so dismissing it (a history replaceState) closes the
  * modal on a server-rendered page too.
  */
-export function MeetingModalFromUrl() {
+export function MeetingModalFromUrl({
+  readOnly = false,
+}: {
+  readOnly?: boolean;
+}) {
   const meetingId = useSearchParams()?.get("viewMeeting");
   // Keyed so a half-confirmed cancel does not carry over to the next meeting.
   return meetingId ? (
-    <MeetingModal key={meetingId} meetingId={meetingId} />
+    <MeetingModal key={meetingId} meetingId={meetingId} readOnly={readOnly} />
   ) : null;
 }
 
@@ -40,7 +44,13 @@ export function MeetingModalFromUrl() {
  * One 1-on-1 in full, and — for the person asked — the Accept and Decline
  * buttons.
  */
-function MeetingModal({ meetingId }: { meetingId: string }) {
+function MeetingModal({
+  meetingId,
+  readOnly,
+}: {
+  meetingId: string;
+  readOnly: boolean;
+}) {
   const router = useRouter();
   const { now } = useContext(EventContext);
   const { meetings, reload } = useMyMeetings();
@@ -163,39 +173,48 @@ function MeetingModal({ meetingId }: { meetingId: string }) {
 
             {error && <p className="text-sm text-danger-fg">{error}</p>}
 
-            {meeting.role === "recipient" && meeting.status === "pending" && (
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() =>
-                    act(() =>
-                      respondToMeetingAction({ meetingId, response: "accept" })
-                    )
-                  }
-                  disabled={isAnswering}
-                  className={PRIMARY_BUTTON}
-                >
-                  Accept
-                </button>
-                {/* Declining takes no explanation: the failure mode of this
+            {!readOnly &&
+              meeting.role === "recipient" &&
+              meeting.status === "pending" && (
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      act(() =>
+                        respondToMeetingAction({
+                          meetingId,
+                          response: "accept",
+                        })
+                      )
+                    }
+                    disabled={isAnswering}
+                    className={PRIMARY_BUTTON}
+                  >
+                    Accept
+                  </button>
+                  {/* Declining takes no explanation: the failure mode of this
                     feature is people feeling obliged (issue #392,
                     section 1.4). */}
-                <button
-                  type="button"
-                  onClick={() =>
-                    act(() =>
-                      respondToMeetingAction({ meetingId, response: "decline" })
-                    )
-                  }
-                  disabled={isAnswering}
-                  className={SECONDARY_BUTTON}
-                >
-                  Decline
-                </button>
-              </div>
-            )}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      act(() =>
+                        respondToMeetingAction({
+                          meetingId,
+                          response: "decline",
+                        })
+                      )
+                    }
+                    disabled={isAnswering}
+                    className={SECONDARY_BUTTON}
+                  >
+                    Decline
+                  </button>
+                </div>
+              )}
 
-            {canCancel(meeting, now) &&
+            {!readOnly &&
+              canCancel(meeting, now) &&
               (confirmingCancel ? (
                 <div className="flex flex-col gap-2">
                   <p className="text-sm text-fg">
