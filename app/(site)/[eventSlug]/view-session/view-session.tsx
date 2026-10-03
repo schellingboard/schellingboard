@@ -18,6 +18,7 @@ import { formatOptionalTime, TIME_FORMAT } from "@/utils/utils";
 import { UserContext, EventContext } from "../../context";
 import { CurrentUserModal, ConfirmationModal } from "../../modals";
 import { LockIcon } from "../../lock-icon";
+import { sessionRooms } from "../../session_utils";
 import { viewProposalLinkFromElsewhere } from "../modal-nav";
 import { SessionComments } from "../session-comments";
 import { Markdown } from "@/app/(site)/markdown";
@@ -107,7 +108,7 @@ export function ViewSession(props: {
           .flatMap((rsvp) => guestMap.get(rsvp.guestId) ?? [])
           .sort((a, b) => a.name.localeCompare(b.name));
 
-  const location = locations.find((loc) => loc.id === session.locations[0]?.id);
+  const inRooms = sessionRooms(session, locations);
 
   const handleRsvp = () => {
     if (!currentUser) {
@@ -297,7 +298,11 @@ export function ViewSession(props: {
         </div>
         <div className="flex gap-2">
           <span className="font-medium">Location:</span>
-          <span>{location && LocationTag({ location })}</span>
+          <span className="flex flex-wrap gap-1">
+            {inRooms.map((location) => (
+              <LocationTag key={location.id} location={location} />
+            ))}
+          </span>
         </div>
         <div className="flex gap-2">
           <span className="font-medium">Time:</span>

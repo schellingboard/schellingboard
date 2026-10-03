@@ -20,6 +20,7 @@ export interface GammaSessionConfig {
   start: [hour: number, minute: number];
   end: [hour: number, minute: number];
   location: number; // index into locationRows: 0 Main Hall, 1 Workshop Room, 2 Garden Terrace
+  extraLocations?: number[]; // further rooms an organizer spread the session over
   hostNames: string[];
   capacity: number;
   closed?: boolean;
@@ -118,6 +119,7 @@ export const gammaSessionConfigs: GammaSessionConfig[] = [
     start: [14, 0],
     end: [15, 0],
     location: 0,
+    extraLocations: [5], // Auditorium; tests/e2e/view-session.spec.ts reads both
     hostNames: ["Priya Sharma"],
     capacity: 100,
   },

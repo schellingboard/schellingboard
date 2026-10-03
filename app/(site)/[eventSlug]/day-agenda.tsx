@@ -39,6 +39,7 @@ import {
   TIME_FORMAT,
 } from "@/utils/utils";
 import { LockIcon } from "../lock-icon";
+import { sessionRooms } from "../session_utils";
 import {
   viewMeetingLinkFromOwner,
   viewSessionLinkFromOwner,
@@ -229,11 +230,7 @@ function SessionRow(props: {
   const { rsvpdForSession, localSessions, now } = useContext(EventContext);
   const state = timeState(start, session.endTime ?? start, now);
   const until = `until ${formatOptionalTime(session.endTime, timezone, TIME_FORMAT)}`;
-  // Through the event's rooms, as the other views: a session's own list can
-  // still name a room since unassigned from the event.
-  const inRooms = locations.filter((loc) =>
-    session.locations.some((l) => l.id === loc.id)
-  );
+  const inRooms = sessionRooms(session, locations);
   const rooms =
     inRooms.length === locations.length && inRooms.length > 1
       ? "All rooms"

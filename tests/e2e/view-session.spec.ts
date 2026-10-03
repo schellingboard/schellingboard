@@ -1,5 +1,6 @@
 import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
+import { switchToView } from "./helpers/schedule";
 
 const KEYNOTE = /Opening Keynote/;
 
@@ -83,4 +84,24 @@ test("leaving a session modal whose RSVPs are still loading is quiet @007-US5", 
   // never held, the reload no longer catches one in flight, and the test goes
   // green without exercising anything.
   expect(heldOne, "the modal's RSVP request was never intercepted").toBe(true);
+});
+
+test("a session held in several rooms names each of them @007-US5 @004-US4", async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto("/Conference-Gamma");
+  // The agenda lists the session once; the grid has a block per room.
+  await switchToView(page, "Agenda");
+  await page.getByRole("link", { name: /Machine Learning Ethics/ }).click();
+
+  const details = page.getByRole("dialog", { name: "Session details" });
+  await expect(details.getByText("Main Hall")).toBeVisible();
+  await expect(details.getByText("Auditorium")).toBeVisible();
+
+  // The proposal it was scheduled from names them too.
+  await details.getByRole("link", { name: "here" }).click();
+  await expect(
+    page.getByRole("link", { name: /in Main Hall, Auditorium$/ })
+  ).toBeVisible();
 });

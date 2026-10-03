@@ -12,6 +12,7 @@ import {
 } from "@/app/(site)/utils/events";
 import HoverTooltip from "@/app/(site)/hover-tooltip";
 import { EventContext, UserContext, VotesContext } from "@/app/(site)/context";
+import { sessionRooms } from "@/app/(site)/session_utils";
 import { Proposal } from "@/app/(site)/[eventSlug]/proposal";
 import type {
   Comment,
@@ -48,7 +49,11 @@ export function ViewProposal(props: {
   } = props;
   const { user: currentUserId } = useContext(UserContext);
   const { proposalVoteEmoji, proposalVoteLabel } = useContext(VotesContext);
-  const { now } = useContext(EventContext);
+  const { now, locations } = useContext(EventContext);
+  const inRooms = (session: Session) => {
+    const names = sessionRooms(session, locations).map((loc) => loc.name);
+    return names.length > 0 ? ` in ${names.join(", ")}` : "";
+  };
   const localZone = useLocalZone();
   const router = useRouter();
 
@@ -182,8 +187,8 @@ export function ViewProposal(props: {
                   sessions[0].startTime,
                   event.timezone,
                   TIME_FORMAT
-                )}{" "}
-                in {sessions[0].locations[0]?.name}
+                )}
+                {inRooms(sessions[0])}
               </Link>
               .
             </p>
@@ -201,8 +206,8 @@ export function ViewProposal(props: {
                         session.startTime,
                         event.timezone,
                         `EEEE ${TIME_FORMAT}`
-                      )}{" "}
-                      in {session.locations[0]?.name}
+                      )}
+                      {inRooms(session)}
                     </Link>
                   </li>
                 ))}

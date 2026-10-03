@@ -60,6 +60,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **Session details list every room**: a session held in several rooms showed only one of
+  them in its details and on the proposal it was scheduled from.
 - **Admin errors show where you acted**: a rejected save, create or delete now explains why
   next to its buttons, instead of at the top of the page, often out of sight.
 - **Searching sessions and proposals keeps up with typing**: the results now update once you
