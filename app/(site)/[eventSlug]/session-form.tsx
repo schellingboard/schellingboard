@@ -40,6 +40,7 @@ import {
 import { revalidateEvent } from "./session-actions";
 import { detectGuestClashes, type GuestClash } from "./clash-actions";
 import { MarkdownHint } from "@/app/(site)/markdown";
+import { ScheduledSessionsNotice } from "./scheduled-sessions-notice";
 import { BackLink } from "@/app/components/back-link";
 import { MarkdownTextarea } from "@/app/components/markdown-textarea";
 
@@ -452,6 +453,12 @@ export function SessionForm(props: {
             truncateText={false}
           />
         </div>
+      )}
+      {proposal && !sessionID && (
+        <ScheduledSessionsNotice proposalId={proposal.id}>
+          Submitting adds another session. To change a scheduled one, open it
+          and edit it there.
+        </ScheduledSessionsNotice>
       )}
       <div className="flex flex-col gap-1">
         <label className="font-medium">

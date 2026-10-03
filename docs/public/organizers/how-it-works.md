@@ -65,7 +65,8 @@ the admin UI:
   proposal; clicking the current choice again removes the vote. "Quick Voting"
   walks through unvoted proposals one at a time.
 - A proposal's host can click "Schedule" (scheduling phase only) to place it
-  on the grid. The same proposal can be scheduled more than once.
+  on the grid. The same proposal can be scheduled more than once. Each
+  session is a copy: later edits to the proposal do not reach it.
 - Attendees can also book a blank slot directly in a "bookable" location
   during that day's booking window, without going through a proposal.
 - A session's hosts can edit it for the whole scheduling phase, but not move
