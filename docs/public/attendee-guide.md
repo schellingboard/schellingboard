@@ -166,6 +166,10 @@ schedule one, and they appear in your "Pre-fill from proposal" dropdown
 alongside your own. And **the same proposal can be scheduled more than once**,
 for instance twice if interest is high.
 
+**A session is a copy of its proposal.** Editing the proposal later leaves the
+session as it is, and "Schedule" always adds a new session. To move or change
+one, edit the session itself. Both forms say so, with a link to the session.
+
 ### Fix a session you're hosting
 
 Open your session and click **"Edit"**. Title, description, room, max
