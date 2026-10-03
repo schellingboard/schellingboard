@@ -13,6 +13,7 @@ import {
   DANGER_BUTTON,
 } from "@/app/admin/buttons";
 import { DataTable } from "../../data-table";
+import { ActionError } from "@/app/components/action-error";
 import { SelectHosts } from "@/app/select-hosts";
 import { MarkdownHint } from "@/app/(site)/markdown";
 
@@ -35,13 +36,12 @@ function hostLabel(hosts: ProposalRow["hosts"]): string {
 function ProposalItem({
   proposal,
   eventGuests,
-  onError,
 }: {
   proposal: ProposalRow;
   eventGuests: EventGuest[];
-  onError: (e: string | null) => void;
 }) {
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [title, setTitle] = useState(proposal.title);
   const [description, setDescription] = useState(proposal.description);
@@ -77,7 +77,7 @@ function ProposalItem({
       if (duration.trim() !== "") {
         const parsed = parseInt(duration, 10);
         if (isNaN(parsed) || parsed < 0 || String(parsed) !== duration.trim()) {
-          onError("Duration must be a non-negative whole number");
+          setError("Duration must be a non-negative whole number");
           return;
         }
         durationMinutes = parsed;
@@ -91,14 +91,14 @@ function ProposalItem({
           hostIds: hosts.map((h) => h.id),
         });
         if (!result.ok) {
-          onError(result.error);
+          setError(result.error);
         } else {
-          onError(null);
+          setError(null);
           setEditMode(false);
           router.refresh();
         }
       } catch {
-        onError("Failed to save proposal");
+        setError("Failed to save proposal");
       }
     });
   };
@@ -108,13 +108,13 @@ function ProposalItem({
       try {
         const result = await adminDeleteProposalAction({ id: proposal.id });
         if (!result.ok) {
-          onError(result.error);
+          setError(result.error);
         } else {
-          onError(null);
+          setError(null);
           router.refresh();
         }
       } catch {
-        onError("Failed to delete proposal");
+        setError("Failed to delete proposal");
       }
     });
   };
@@ -151,6 +151,7 @@ function ProposalItem({
             className="w-full h-10"
           />
         </div>
+        <ActionError message={error} />
         <div className="flex gap-2">
           <button
             onClick={handleDelete}
@@ -163,7 +164,7 @@ function ProposalItem({
             onClick={() => {
               setDeleteMode(false);
               setDeleteConfirm("");
-              onError(null);
+              setError(null);
             }}
             disabled={isDeleting}
             className={SECONDARY_BUTTON}
@@ -278,6 +279,7 @@ function ProposalItem({
           />
         )}
       </div>
+      <ActionError message={error} />
       <div className="flex gap-2">
         <button type="submit" disabled={isSaving} className={PRIMARY_BUTTON}>
           {isSaving ? "Saving..." : "Save"}
@@ -287,7 +289,7 @@ function ProposalItem({
           onClick={() => {
             reset();
             setEditMode(false);
-            onError(null);
+            setError(null);
           }}
           disabled={isSaving}
           className={SECONDARY_BUTTON}
@@ -314,12 +316,9 @@ export function EventProposalsManager({
   pageSize: number;
   query: string;
 }) {
-  const [error, setError] = useState<string | null>(null);
-
   return (
     <section aria-label="Proposals" className="space-y-4">
       <h2 className="text-lg font-semibold text-fg">Proposals</h2>
-      {error && <p className="text-sm text-danger-fg">{error}</p>}
 
       <DataTable
         rows={proposals}
@@ -331,11 +330,7 @@ export function EventProposalsManager({
         searchPlaceholder="Search title or host…"
         emptyMessage="No proposals match."
         listItem={(p) => (
-          <ProposalItem
-            proposal={p}
-            eventGuests={eventGuests}
-            onError={setError}
-          />
+          <ProposalItem proposal={p} eventGuests={eventGuests} />
         )}
       />
     </section>

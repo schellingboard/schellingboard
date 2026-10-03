@@ -14,6 +14,7 @@ import {
   SECONDARY_BUTTON,
   DANGER_BUTTON,
 } from "@/app/admin/buttons";
+import { ActionError } from "@/app/components/action-error";
 import { utcToZonedInput, zonedInputToUtc } from "@/utils/admin-datetime";
 
 // Dates are pre-serialized to ISO strings in the server component to avoid
@@ -55,13 +56,12 @@ function toUtcForm(
 function AddDayForm({
   eventId,
   timezone,
-  onError,
 }: {
   eventId: string;
   timezone: string;
-  onError: (e: string | null) => void;
 }) {
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [form, setFormState] = useState<Omit<DayInput, "eventId">>(EMPTY_FORM);
   const [isPending, startTransition] = useTransition();
@@ -78,15 +78,15 @@ function AddDayForm({
           ...toUtcForm(form, timezone),
         });
         if (!result.ok) {
-          onError(result.error);
+          setError(result.error);
         } else {
-          onError(null);
+          setError(null);
           setFormState(EMPTY_FORM);
           setOpen(false);
           router.refresh();
         }
       } catch {
-        onError("Request failed");
+        setError("Request failed");
       }
     });
   };
@@ -159,6 +159,7 @@ function AddDayForm({
           />
         </div>
       </div>
+      <ActionError message={error} />
       <div className="flex gap-2">
         <button type="submit" disabled={isPending} className={PRIMARY_BUTTON}>
           {isPending ? "Adding..." : "Add day"}
@@ -167,7 +168,7 @@ function AddDayForm({
           type="button"
           onClick={() => {
             setOpen(false);
-            onError(null);
+            setError(null);
           }}
           disabled={isPending}
           className={SECONDARY_BUTTON}
@@ -183,14 +184,13 @@ function DayRow({
   day,
   eventId,
   timezone,
-  onError,
 }: {
   day: SerializedDay;
   eventId: string;
   timezone: string;
-  onError: (e: string | null) => void;
 }) {
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [deleteMode, setDeleteMode] = useState(false);
   const [form, setFormState] = useState<Omit<DayInput, "eventId">>({
@@ -215,14 +215,14 @@ function DayRow({
           ...toUtcForm(form, timezone),
         });
         if (!result.ok) {
-          onError(result.error);
+          setError(result.error);
         } else {
-          onError(null);
+          setError(null);
           setEditMode(false);
           router.refresh();
         }
       } catch {
-        onError("Request failed");
+        setError("Request failed");
       }
     });
   };
@@ -232,13 +232,13 @@ function DayRow({
       try {
         const result = await deleteDayAction({ id: day.id, eventId });
         if (!result.ok) {
-          onError(result.error);
+          setError(result.error);
         } else {
-          onError(null);
+          setError(null);
           router.refresh();
         }
       } catch {
-        onError("Request failed");
+        setError("Request failed");
       }
     });
   };
@@ -269,6 +269,7 @@ function DayRow({
             ))}
           </ul>
         )}
+        <ActionError message={error} />
         <div className="flex gap-2">
           <button
             onClick={handleDelete}
@@ -278,7 +279,10 @@ function DayRow({
             {isDeleting ? "Deleting..." : "Confirm delete"}
           </button>
           <button
-            onClick={() => setDeleteMode(false)}
+            onClick={() => {
+              setDeleteMode(false);
+              setError(null);
+            }}
             disabled={isDeleting}
             className={SECONDARY_BUTTON}
           >
@@ -359,6 +363,7 @@ function DayRow({
               />
             </div>
           </div>
+          <ActionError message={error} />
           <div className="flex gap-2">
             <button
               type="submit"
@@ -369,7 +374,10 @@ function DayRow({
             </button>
             <button
               type="button"
-              onClick={() => setEditMode(false)}
+              onClick={() => {
+                setEditMode(false);
+                setError(null);
+              }}
               disabled={isSaving}
               className={SECONDARY_BUTTON}
             >
@@ -413,8 +421,6 @@ export function EventDaysManager({
   eventId: string;
   timezone: string;
 }) {
-  const [error, setError] = useState<string | null>(null);
-
   return (
     <section aria-label="Days" className="space-y-4">
       <h2 className="text-lg font-semibold text-fg">Days</h2>
@@ -422,7 +428,6 @@ export function EventDaysManager({
         The event&apos;s dates are the days you add here. All times are in the
         event timezone ({timezone}).
       </p>
-      {error && <p className="text-sm text-danger-fg">{error}</p>}
 
       {days.length > 0 && (
         <ul className="divide-y divide-line-subtle border-t border-b border-line-subtle">
@@ -432,13 +437,12 @@ export function EventDaysManager({
               day={day}
               eventId={eventId}
               timezone={timezone}
-              onError={setError}
             />
           ))}
         </ul>
       )}
 
-      <AddDayForm eventId={eventId} timezone={timezone} onError={setError} />
+      <AddDayForm eventId={eventId} timezone={timezone} />
     </section>
   );
 }

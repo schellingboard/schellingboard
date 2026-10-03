@@ -13,6 +13,7 @@ import {
   type Column,
   type Selection,
 } from "../../data-table";
+import { ActionError } from "@/app/components/action-error";
 
 export type LocationRow = {
   id: string;
@@ -198,7 +199,7 @@ export function EventLocationsManager({
   return (
     <section aria-label="Locations" className="space-y-4">
       <h2 className="text-lg font-semibold text-fg">Locations</h2>
-      {error && <p className="text-sm text-danger-fg">{error}</p>}
+      <ActionError message={error} />
 
       <DataTable
         rows={locations}

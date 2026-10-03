@@ -17,6 +17,7 @@ import {
   SECONDARY_BUTTON,
   DANGER_BUTTON,
 } from "@/app/admin/buttons";
+import { ActionError } from "@/app/components/action-error";
 
 type MeetingsForm = Omit<EventMeetingsInput, "id">;
 
@@ -34,13 +35,12 @@ function submitOnEnter(submit: () => void) {
 function PointRow({
   point,
   eventId,
-  onError,
 }: {
   point: MeetingPoint;
   eventId: string;
-  onError: (e: string | null) => void;
 }) {
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [deleteMode, setDeleteMode] = useState(false);
   const [name, setName] = useState(point.name);
@@ -52,14 +52,14 @@ function PointRow({
       try {
         const result = await action();
         if (!result.ok) {
-          onError(result.error);
+          setError(result.error);
         } else {
-          onError(null);
+          setError(null);
           setEditMode(false);
           router.refresh();
         }
       } catch {
-        onError("Request failed");
+        setError("Request failed");
       }
     });
 
@@ -70,115 +70,122 @@ function PointRow({
 
   if (editMode) {
     return (
-      <li className="p-3 space-y-2 sm:flex sm:items-start sm:gap-3 sm:space-y-0">
-        <Input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onKeyDown={submitOnEnter(handleSave)}
-          aria-label={`Name of ${point.name}`}
-          className="w-full h-10 sm:w-1/3"
-        />
-        <Input
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          onKeyDown={submitOnEnter(handleSave)}
-          aria-label={`Description of ${point.name}`}
-          className="w-full h-10 sm:flex-1"
-        />
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={isPending}
-            className={PRIMARY_BUTTON}
-          >
-            {isPending ? "Saving..." : "Save"}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setName(point.name);
-              setDescription(point.description);
-              setEditMode(false);
-              onError(null);
-            }}
-            disabled={isPending}
-            className={SECONDARY_BUTTON}
-          >
-            Cancel
-          </button>
-        </div>
-      </li>
-    );
-  }
-
-  return (
-    <li className="p-3 flex items-start justify-between gap-3">
-      <div className="min-w-0 sm:flex sm:gap-3 sm:flex-1">
-        <p className="text-sm font-medium text-fg sm:w-1/3 break-words">
-          {point.name}
-        </p>
-        {point.description && (
-          <p className="text-sm text-fg-subtle sm:flex-1 break-words">
-            {point.description}
-          </p>
-        )}
-      </div>
-      <div className="flex gap-2 shrink-0">
-        <button
-          type="button"
-          onClick={() => setEditMode(true)}
-          disabled={isPending}
-          className={SECONDARY_BUTTON}
-        >
-          Edit
-        </button>
-        {deleteMode ? (
-          <>
+      <li className="p-3 space-y-2">
+        <div className="space-y-2 sm:flex sm:items-start sm:gap-3 sm:space-y-0">
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={submitOnEnter(handleSave)}
+            aria-label={`Name of ${point.name}`}
+            className="w-full h-10 sm:w-1/3"
+          />
+          <Input
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            onKeyDown={submitOnEnter(handleSave)}
+            aria-label={`Description of ${point.name}`}
+            className="w-full h-10 sm:flex-1"
+          />
+          <div className="flex gap-2">
             <button
               type="button"
-              onClick={() =>
-                run(() => deleteMeetingPointAction({ id: point.id, eventId }))
-              }
+              onClick={handleSave}
               disabled={isPending}
-              aria-label={`Confirm delete ${point.name}`}
-              className={DANGER_BUTTON}
+              className={PRIMARY_BUTTON}
             >
-              {isPending ? "Deleting..." : "Confirm delete"}
+              {isPending ? "Saving..." : "Save"}
             </button>
             <button
               type="button"
-              onClick={() => setDeleteMode(false)}
+              onClick={() => {
+                setName(point.name);
+                setDescription(point.description);
+                setEditMode(false);
+                setError(null);
+              }}
               disabled={isPending}
               className={SECONDARY_BUTTON}
             >
               Cancel
             </button>
-          </>
-        ) : (
+          </div>
+        </div>
+        <ActionError message={error} />
+      </li>
+    );
+  }
+
+  return (
+    <li className="p-3 space-y-2">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 sm:flex sm:gap-3 sm:flex-1">
+          <p className="text-sm font-medium text-fg sm:w-1/3 break-words">
+            {point.name}
+          </p>
+          {point.description && (
+            <p className="text-sm text-fg-subtle sm:flex-1 break-words">
+              {point.description}
+            </p>
+          )}
+        </div>
+        <div className="flex gap-2 shrink-0">
           <button
             type="button"
-            onClick={() => setDeleteMode(true)}
+            onClick={() => {
+              setError(null);
+              setEditMode(true);
+            }}
             disabled={isPending}
-            aria-label={`Delete ${point.name}`}
-            className={DANGER_BUTTON}
+            className={SECONDARY_BUTTON}
           >
-            Delete
+            Edit
           </button>
-        )}
+          {deleteMode ? (
+            <>
+              <button
+                type="button"
+                onClick={() =>
+                  run(() => deleteMeetingPointAction({ id: point.id, eventId }))
+                }
+                disabled={isPending}
+                aria-label={`Confirm delete ${point.name}`}
+                className={DANGER_BUTTON}
+              >
+                {isPending ? "Deleting..." : "Confirm delete"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setDeleteMode(false);
+                  setError(null);
+                }}
+                disabled={isPending}
+                className={SECONDARY_BUTTON}
+              >
+                Cancel
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setDeleteMode(true)}
+              disabled={isPending}
+              aria-label={`Delete ${point.name}`}
+              className={DANGER_BUTTON}
+            >
+              Delete
+            </button>
+          )}
+        </div>
       </div>
+      <ActionError message={error} />
     </li>
   );
 }
 
-function AddPointForm({
-  eventId,
-  onError,
-}: {
-  eventId: string;
-  onError: (e: string | null) => void;
-}) {
+function AddPointForm({ eventId }: { eventId: string }) {
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -193,16 +200,16 @@ function AddPointForm({
           description,
         });
         if (!result.ok) {
-          onError(result.error);
+          setError(result.error);
         } else {
-          onError(null);
+          setError(null);
           setName("");
           setDescription("");
           setOpen(false);
           router.refresh();
         }
       } catch {
-        onError("Request failed");
+        setError("Request failed");
       }
     });
 
@@ -248,6 +255,7 @@ function AddPointForm({
           />
         </div>
       </div>
+      <ActionError message={error} />
       <div className="flex gap-2">
         <button
           type="button"
@@ -263,7 +271,7 @@ function AddPointForm({
             setOpen(false);
             setName("");
             setDescription("");
-            onError(null);
+            setError(null);
           }}
           disabled={isPending}
           className={SECONDARY_BUTTON}
@@ -322,8 +330,6 @@ export function EventMeetingsForm({
         Lets attendees book short 1-on-1s with each other in the gaps between
         sessions.
       </p>
-      {error && <p className="text-sm text-danger-fg">{error}</p>}
-
       <div className="rounded-md border border-line-subtle p-4">
         <div className="flex items-start gap-2">
           <input
@@ -360,16 +366,11 @@ export function EventMeetingsForm({
             {points.length > 0 && (
               <ul className="rounded-md border border-line-subtle divide-y divide-line-subtle">
                 {points.map((point) => (
-                  <PointRow
-                    key={point.id}
-                    point={point}
-                    eventId={event.id}
-                    onError={setError}
-                  />
+                  <PointRow key={point.id} point={point} eventId={event.id} />
                 ))}
               </ul>
             )}
-            <AddPointForm eventId={event.id} onError={setError} />
+            <AddPointForm eventId={event.id} />
           </section>
 
           <div className="flex flex-col gap-1 sm:max-w-xs">
@@ -396,6 +397,7 @@ export function EventMeetingsForm({
         </>
       )}
 
+      <ActionError message={error} />
       <div className="flex items-center gap-3">
         <button type="submit" disabled={isSaving} className={PRIMARY_BUTTON}>
           {isSaving ? "Saving..." : "Save meetings"}

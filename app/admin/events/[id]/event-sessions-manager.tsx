@@ -15,6 +15,7 @@ import {
   DANGER_BUTTON,
 } from "@/app/admin/buttons";
 import { DataTable } from "../../data-table";
+import { ActionError } from "@/app/components/action-error";
 import { SelectHosts } from "@/app/select-hosts";
 import { utcToZonedInput, zonedInputToUtc } from "@/utils/admin-datetime";
 import { MarkdownHint } from "@/app/(site)/markdown";
@@ -185,6 +186,7 @@ function SessionRsvps({
 function SessionForm({
   initial,
   idPrefix,
+  label,
   timezone,
   breakMinutes,
   hostCandidates,
@@ -192,11 +194,13 @@ function SessionForm({
   submitLabel,
   pendingLabel,
   isPending,
+  error,
   onSubmit,
   onCancel,
 }: {
   initial: SessionFormValues;
   idPrefix: string;
+  label: string;
   timezone: string;
   /** Offers to start a new session after the event's break. */
   breakMinutes?: number;
@@ -205,6 +209,7 @@ function SessionForm({
   submitLabel: string;
   pendingLabel: string;
   isPending: boolean;
+  error: string | null;
   onSubmit: (values: SessionFormValues) => void;
   onCancel: () => void;
 }) {
@@ -252,7 +257,7 @@ function SessionForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
+    <form onSubmit={handleSubmit} aria-label={label} className="space-y-3">
       <div className="flex flex-col gap-1">
         <label htmlFor={`${idPrefix}-title`} className="text-sm text-fg-muted">
           Title *
@@ -414,6 +419,7 @@ function SessionForm({
           ))
         )}
       </fieldset>
+      <ActionError message={error} />
       <div className="flex gap-2">
         <button type="submit" disabled={isPending} className={PRIMARY_BUTTON}>
           {isPending ? pendingLabel : submitLabel}
@@ -436,15 +442,14 @@ function SessionItem({
   eventGuests,
   eventLocations,
   timezone,
-  onError,
 }: {
   session: SessionRow;
   eventGuests: EventGuest[];
   eventLocations: EventLocation[];
   timezone: string;
-  onError: (e: string | null) => void;
 }) {
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [isSaving, startSave] = useTransition();
   const [deleteMode, setDeleteMode] = useState(false);
@@ -472,14 +477,14 @@ function SessionItem({
           ...toActionInput(values, timezone),
         });
         if (!result.ok) {
-          onError(result.error);
+          setError(result.error);
         } else {
-          onError(null);
+          setError(null);
           setEditMode(false);
           router.refresh();
         }
       } catch {
-        onError("Request failed");
+        setError("Request failed");
       }
     });
   };
@@ -489,13 +494,13 @@ function SessionItem({
       try {
         const result = await adminDeleteSessionAction({ id: session.id });
         if (!result.ok) {
-          onError(result.error);
+          setError(result.error);
         } else {
-          onError(null);
+          setError(null);
           router.refresh();
         }
       } catch {
-        onError("Request failed");
+        setError("Request failed");
       }
     });
   };
@@ -524,6 +529,7 @@ function SessionItem({
             className="w-full h-10"
           />
         </div>
+        <ActionError message={error} />
         <div className="flex gap-2">
           <button
             onClick={handleDelete}
@@ -536,7 +542,7 @@ function SessionItem({
             onClick={() => {
               setDeleteMode(false);
               setDeleteConfirm("");
-              onError(null);
+              setError(null);
             }}
             disabled={isDeleting}
             className={SECONDARY_BUTTON}
@@ -566,14 +572,20 @@ function SessionItem({
           </div>
           <div className="flex gap-2 shrink-0">
             <button
-              onClick={() => setEditMode(true)}
+              onClick={() => {
+                setError(null);
+                setEditMode(true);
+              }}
               className={SECONDARY_BUTTON}
               aria-label={`Edit ${session.title}`}
             >
               Edit
             </button>
             <button
-              onClick={() => setDeleteMode(true)}
+              onClick={() => {
+                setError(null);
+                setDeleteMode(true);
+              }}
               className={DANGER_BUTTON}
               aria-label={`Delete ${session.title}`}
             >
@@ -581,7 +593,8 @@ function SessionItem({
             </button>
           </div>
         </div>
-        <SessionRsvps session={session} onError={onError} />
+        <SessionRsvps session={session} onError={setError} />
+        <ActionError message={error} />
       </div>
     );
   }
@@ -601,16 +614,18 @@ function SessionItem({
         locationIds: session.locations.map((l) => l.id),
       }}
       idPrefix={`sess-${session.id}`}
+      label={`Edit ${session.title}`}
       timezone={timezone}
       hostCandidates={hostCandidates}
       locationCandidates={locationCandidates}
       submitLabel="Save"
       pendingLabel="Saving..."
       isPending={isSaving}
+      error={error}
       onSubmit={handleSave}
       onCancel={() => {
         setEditMode(false);
-        onError(null);
+        setError(null);
       }}
     />
   );
@@ -637,16 +652,15 @@ function AddSession({
   eventLocations,
   timezone,
   breakMinutes,
-  onError,
 }: {
   eventId: string;
   eventGuests: EventGuest[];
   eventLocations: EventLocation[];
   timezone: string;
   breakMinutes: number;
-  onError: (e: string | null) => void;
 }) {
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [isCreating, startCreate] = useTransition();
 
@@ -658,14 +672,14 @@ function AddSession({
           ...toActionInput(values, timezone),
         });
         if (!result.ok) {
-          onError(result.error);
+          setError(result.error);
         } else {
-          onError(null);
+          setError(null);
           setOpen(false);
           router.refresh();
         }
       } catch {
-        onError("Request failed");
+        setError("Request failed");
       }
     });
   };
@@ -684,6 +698,7 @@ function AddSession({
       <SessionForm
         initial={EMPTY_SESSION}
         idPrefix="sess-new"
+        label="New session"
         timezone={timezone}
         breakMinutes={breakMinutes}
         hostCandidates={eventGuests}
@@ -691,10 +706,11 @@ function AddSession({
         submitLabel="Create"
         pendingLabel="Creating..."
         isPending={isCreating}
+        error={error}
         onSubmit={handleCreate}
         onCancel={() => {
           setOpen(false);
-          onError(null);
+          setError(null);
         }}
       />
     </div>
@@ -724,23 +740,18 @@ export function EventSessionsManager({
   pageSize: number;
   query: string;
 }) {
-  const [error, setError] = useState<string | null>(null);
-
   return (
     <section aria-label="Sessions" className="space-y-4">
       <h2 className="text-lg font-semibold text-fg">Sessions</h2>
       <p className="text-sm text-fg-subtle">
         All times are in the event timezone ({timezone}).
       </p>
-      {error && <p className="text-sm text-danger-fg">{error}</p>}
-
       <AddSession
         eventId={eventId}
         eventGuests={eventGuests}
         eventLocations={eventLocations}
         timezone={timezone}
         breakMinutes={breakMinutes}
-        onError={setError}
       />
 
       <DataTable
@@ -758,7 +769,6 @@ export function EventSessionsManager({
             eventGuests={eventGuests}
             eventLocations={eventLocations}
             timezone={timezone}
-            onError={setError}
           />
         )}
       />

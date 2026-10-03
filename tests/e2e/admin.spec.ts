@@ -1445,6 +1445,32 @@ test.describe("Admin UI sessions", () => {
     await expect(row).toHaveCount(0);
   });
 
+  test("shows a rejected new session's error in its form @018-US2", async ({
+    page,
+  }) => {
+    await adminLogin(page);
+    await page.goto("/admin/events");
+    await page
+      .getByRole("listitem")
+      .filter({ hasText: "Conference Alpha" })
+      .getByRole("link", { name: "Manage" })
+      .click();
+    await openEventTab(page, "Sessions");
+    const sessions = page.getByRole("region", { name: "Sessions" });
+
+    await sessions.getByRole("button", { name: "Add session" }).click();
+    const form = sessions.getByRole("form", { name: "New session" });
+    await form.getByLabel("Title *").fill(`Backwards ${uniqueSuffix()}`);
+    await form.getByLabel(/^Start/).fill("2020-01-01T11:00");
+    await form.getByLabel(/^End/).fill("2020-01-01T10:00");
+    await form.getByLabel(/^Break before/).uncheck();
+    await form.getByRole("button", { name: "Create", exact: true }).click();
+
+    await expect(form.getByRole("alert")).toHaveText(
+      "End time must be after start time"
+    );
+  });
+
   test("adds the break before a new session unless told not to @018-US2", async ({
     page,
   }) => {

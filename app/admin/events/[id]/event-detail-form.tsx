@@ -20,6 +20,7 @@ import { normalizeEventIconName } from "@/app/event-icons";
 import { SLOT_INCREMENT_OPTIONS } from "@/utils/slots";
 import { MarkdownHint } from "@/app/(site)/markdown";
 import { MarkdownTextarea } from "@/app/components/markdown-textarea";
+import { ActionError } from "@/app/components/action-error";
 
 export function EventDetailForm({ event }: { event: Event }) {
   const router = useRouter();
@@ -39,6 +40,7 @@ export function EventDetailForm({ event }: { event: Event }) {
   const [isSaving, startSave] = useTransition();
 
   const [deleteMode, setDeleteMode] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState("");
   const [isDeleting, startDelete] = useTransition();
 
@@ -64,7 +66,7 @@ export function EventDetailForm({ event }: { event: Event }) {
     startDelete(async () => {
       const result = await deleteEventAction({ id: event.id });
       if (!result.ok) {
-        setSaveError(result.error);
+        setDeleteError(result.error);
       } else {
         router.push("/admin/events");
       }
@@ -75,7 +77,6 @@ export function EventDetailForm({ event }: { event: Event }) {
     <div className="space-y-8">
       <form onSubmit={handleSave} className="space-y-4">
         <h2 className="text-lg font-semibold text-fg">Basic info</h2>
-        {saveError && <p className="text-sm text-danger-fg">{saveError}</p>}
         <div className="flex flex-col gap-1">
           <label htmlFor="ev-name" className="text-sm text-fg-muted">
             Name *
@@ -192,6 +193,7 @@ export function EventDetailForm({ event }: { event: Event }) {
             onChange={(v) => set("icon", v)}
           />
         </div>
+        <ActionError message={saveError} />
         <div className="flex items-center gap-3">
           <button type="submit" disabled={isSaving} className={PRIMARY_BUTTON}>
             {isSaving ? "Saving..." : "Save changes"}
@@ -229,6 +231,7 @@ export function EventDetailForm({ event }: { event: Event }) {
                 className="w-full h-10"
               />
             </div>
+            <ActionError message={deleteError} />
             <div className="flex gap-2">
               <button
                 onClick={handleDelete}
@@ -241,6 +244,7 @@ export function EventDetailForm({ event }: { event: Event }) {
                 onClick={() => {
                   setDeleteMode(false);
                   setDeleteConfirm("");
+                  setDeleteError(null);
                 }}
                 disabled={isDeleting}
                 className={SECONDARY_BUTTON}

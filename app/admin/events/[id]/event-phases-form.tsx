@@ -8,6 +8,7 @@ import {
   type EventPhasesInput,
 } from "@/app/actions/admin-events";
 import { PRIMARY_BUTTON } from "@/app/admin/buttons";
+import { ActionError } from "@/app/components/action-error";
 import { utcToZonedInput, zonedInputToUtc } from "@/utils/admin-datetime";
 
 type PhasesForm = Omit<EventPhasesInput, "id">;
@@ -63,8 +64,6 @@ export function EventPhasesForm({ event }: { event: Event }) {
         empty to unset a phase. A phase with no end runs until the next phase
         starts; set an end earlier than the next start to leave an inactive gap.
       </p>
-      {saveError && <p className="text-sm text-danger-fg">{saveError}</p>}
-
       {(
         [
           {
@@ -115,6 +114,7 @@ export function EventPhasesForm({ event }: { event: Event }) {
         </fieldset>
       ))}
 
+      <ActionError message={saveError} />
       <div className="flex items-center gap-3">
         <button type="submit" disabled={isSaving} className={PRIMARY_BUTTON}>
           {isSaving ? "Saving..." : "Save phases"}

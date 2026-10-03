@@ -13,6 +13,7 @@ import {
   SECONDARY_BUTTON,
   DANGER_BUTTON,
 } from "@/app/admin/buttons";
+import { ActionError } from "@/app/components/action-error";
 import { utcToZonedInput, zonedInputToUtc } from "@/utils/admin-datetime";
 
 export type SerializedUnavailability = {
@@ -35,14 +36,13 @@ function PeriodRow({
   period,
   roomName,
   timezone,
-  onError,
 }: {
   period: SerializedUnavailability;
   roomName: string;
   timezone: string;
-  onError: (e: string | null) => void;
 }) {
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
   const [isDeleting, startDelete] = useTransition();
   const label = `${formatIn(period.start, timezone, "ccc d LLL HH:mm")} – ${formatIn(
     period.end,
@@ -57,30 +57,33 @@ function PeriodRow({
           id: period.id,
         });
         if (!result.ok) {
-          onError(result.error);
+          setError(result.error);
         } else {
-          onError(null);
+          setError(null);
           router.refresh();
         }
       } catch {
-        onError("Request failed");
+        setError("Request failed");
       }
     });
   };
 
   return (
-    <li className="py-3 flex items-center justify-between gap-3">
-      <p className="text-sm text-fg-muted">
-        <span className="font-medium text-fg">{roomName}</span> · {label}
-      </p>
-      <button
-        onClick={handleDelete}
-        disabled={isDeleting}
-        className={DANGER_BUTTON}
-        aria-label={`Delete unavailable time ${roomName} ${label}`}
-      >
-        {isDeleting ? "Deleting..." : "Delete"}
-      </button>
+    <li className="py-3 space-y-2">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm text-fg-muted">
+          <span className="font-medium text-fg">{roomName}</span> · {label}
+        </p>
+        <button
+          onClick={handleDelete}
+          disabled={isDeleting}
+          className={DANGER_BUTTON}
+          aria-label={`Delete unavailable time ${roomName} ${label}`}
+        >
+          {isDeleting ? "Deleting..." : "Delete"}
+        </button>
+      </div>
+      <ActionError message={error} />
     </li>
   );
 }
@@ -90,15 +93,14 @@ function AddPeriodForm({
   rooms,
   days,
   timezone,
-  onError,
 }: {
   eventId: string;
   rooms: Room[];
   days: DayWindow[];
   timezone: string;
-  onError: (e: string | null) => void;
 }) {
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
   const [locationId, setLocationId] = useState(rooms[0]?.id ?? "");
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
@@ -115,15 +117,15 @@ function AddPeriodForm({
           end: zonedInputToUtc(end, timezone),
         });
         if (!result.ok) {
-          onError(result.error);
+          setError(result.error);
         } else {
-          onError(null);
+          setError(null);
           setStart("");
           setEnd("");
           router.refresh();
         }
       } catch {
-        onError("Request failed");
+        setError("Request failed");
       }
     });
   };
@@ -199,6 +201,7 @@ function AddPeriodForm({
           ))}
         </fieldset>
       )}
+      <ActionError message={error} />
       <button
         type="submit"
         disabled={isPending || !locationId}
@@ -223,7 +226,6 @@ export function LocationAvailabilityManager({
   days: DayWindow[];
   timezone: string;
 }) {
-  const [error, setError] = useState<string | null>(null);
   const roomNames = new Map(rooms.map((room) => [room.id, room.name]));
 
   return (
@@ -235,7 +237,6 @@ export function LocationAvailabilityManager({
         should see on the schedule, such as lunch, add a blocker session
         instead. All times are in the event timezone ({timezone}).
       </p>
-      {error && <p className="text-sm text-danger-fg">{error}</p>}
 
       {periods.length > 0 && (
         <ul className="divide-y divide-line-subtle border-t border-b border-line-subtle">
@@ -245,7 +246,6 @@ export function LocationAvailabilityManager({
               period={period}
               roomName={roomNames.get(period.locationId) ?? "Unassigned room"}
               timezone={timezone}
-              onError={setError}
             />
           ))}
         </ul>
@@ -261,7 +261,6 @@ export function LocationAvailabilityManager({
           rooms={rooms}
           days={days}
           timezone={timezone}
-          onError={setError}
         />
       )}
     </section>
