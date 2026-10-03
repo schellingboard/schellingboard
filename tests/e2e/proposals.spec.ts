@@ -3,7 +3,7 @@ import { uniqueSuffix } from "./helpers/unique";
 import { loginAndGoto, login } from "./helpers/auth";
 import { selectUser } from "./helpers/user";
 
-test("should auto-focus the title input for new proposals", async ({
+test("should auto-focus the title input for new proposals @004-US1", async ({
   page,
 }) => {
   await loginAndGoto(page, "/Conference-Alpha/proposals");
@@ -12,7 +12,7 @@ test("should auto-focus the title input for new proposals", async ({
   await expect(page.getByLabel("Title")).toBeFocused();
 });
 
-test("should create a new session proposal, edit it, and add hosts", async ({
+test("should create a new session proposal, edit it, and add hosts @004-US1 @004-US2", async ({
   page,
 }) => {
   await login(page);
@@ -84,7 +84,9 @@ test("should create a new session proposal, edit it, and add hosts", async ({
   await expect(updatedRow).toContainText("Bob Test");
 });
 
-test("should delete a proposal from its edit page", async ({ page }) => {
+test("should delete a proposal from its edit page @004-US3", async ({
+  page,
+}) => {
   await login(page);
   await page.goto("/Conference-Alpha/proposals");
   await selectUser(page, /Bob Test/i);
@@ -122,7 +124,7 @@ test("should delete a proposal from its edit page", async ({ page }) => {
   ).toHaveCount(0);
 });
 
-test("a non-host cannot edit or delete another guest's proposal", async ({
+test("a non-host cannot edit or delete another guest's proposal @004-US2 @004-US3", async ({
   page,
 }) => {
   await login(page);
@@ -168,7 +170,7 @@ test("a non-host cannot edit or delete another guest's proposal", async ({
   ).toHaveCount(0);
 });
 
-test("should open proposal detail page when clicking on a proposal", async ({
+test("should open proposal detail page when clicking on a proposal @004-US4", async ({
   page,
 }) => {
   await login(page);
@@ -244,7 +246,7 @@ test("should open proposal detail page when clicking on a proposal", async ({
   ).toBeVisible();
 });
 
-test("filters the proposal list by search, matching whole descriptions as plain text", async ({
+test("filters the proposal list by search, matching whole descriptions as plain text @004-US5", async ({
   page,
 }) => {
   await loginAndGoto(page, "/Conference-Alpha/proposals");
@@ -290,7 +292,7 @@ test("filters the proposal list by search, matching whole descriptions as plain 
   await expect(designSystems).toBeVisible();
 });
 
-test("filters the proposal list down to your own proposals", async ({
+test("filters the proposal list down to your own proposals @004-US5", async ({
   page,
 }) => {
   // Conference Gamma, so the throwaway proposals the tests above create and
@@ -327,7 +329,9 @@ test("filters the proposal list down to your own proposals", async ({
   await expect(hostless).toBeVisible();
 });
 
-test("sorts proposals by title in both directions", async ({ page }) => {
+test("sorts proposals by title in both directions @004-US5", async ({
+  page,
+}) => {
   await loginAndGoto(page, "/Conference-Alpha/proposals");
 
   // Rows with data cells only: the header row's cells are columnheaders.

@@ -359,6 +359,38 @@ is stable — the aim there is to measure flakiness, not to start failing on it.
   test that needs reminders delivered clicks **Send due reminders** on the
   `?dev=1` toolbar, which runs one dispatch against the dev clock
 
+## Use cases
+
+`tests/use-cases.ts` catalogues what attendees, hosts and organizers can do,
+one line per user goal ("Attendee votes on a proposal"), not per UI step or
+edge case. Use cases are grouped into numbered features, and each gets an ID
+from its feature and user story number: `005-US1`. IDs are permanent: retire a
+use case with `status: "deprecated"` rather than renumbering. A use case not
+built yet gets `status: "planned"`, so the report doesn't list it as uncovered.
+
+Tests declare the use cases they cover:
+
+```ts
+// E2E: required; tags go at the end of the title
+test("votes on a proposal @005-US1", async ({ page }) => {});
+
+// Vitest: optional; for a whole file, as its first line
+// @module-tag 005-US1
+// …or for one test or describe block, type-checked against the catalogue
+it("rejects a voter outside the event", { tags: ["005-US1"] }, () => {});
+```
+
+`make test` fails on an E2E test without a use case and on any ID missing from
+the catalogue. Run the tests for one use case with
+`bun set-env.ts test bun x playwright test -g @005-US1` or
+`bun set-env.ts test bun x vitest run --tags-filter 005-US1`.
+
+`make use-cases` prints how many tests in each tier claim each use case, which
+use cases no test covers, and which have so many E2E tests that some are
+probably redundant. CI adds the same report to the test job's summary. The
+counts are claims, not measured coverage: a tag says what a test is for, not
+how well it checks it.
+
 ## Test data
 
 Each E2E run starts from a clean database with 3 events (Alpha/Beta/Gamma) in different phases, plus pre-created proposals, sessions, users, and auth. See `tests/reset-database.ts` for details. Auth helpers: `tests/helpers/auth.ts` (`login`, `loginAndGoto`).

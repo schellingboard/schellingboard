@@ -22,7 +22,7 @@ const dayRadios = (page: Page) =>
     name: /Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday/,
   });
 
-test("RSVP to a session persists across reloads and can be removed again", async ({
+test("RSVP to a session persists across reloads and can be removed again @009-US1", async ({
   page,
 }) => {
   await login(page);
@@ -64,7 +64,7 @@ test("RSVP to a session persists across reloads and can be removed again", async
 // Zanele's seeded 1-on-1 with Rafael falls inside "API Design" on Gamma's
 // first day (scripts/seed/seed-database.ts). Only the warning is under test,
 // so it is declined and her diary is left as it was.
-test("RSVPing over a confirmed 1-on-1 warns about it first", async ({
+test("RSVPing over a confirmed 1-on-1 warns about it first @009-US3", async ({
   page,
 }) => {
   await login(page);
@@ -88,7 +88,7 @@ test("RSVPing over a confirmed 1-on-1 warns about it first", async ({
   ).toBeVisible();
 });
 
-test("a full session blocks further RSVPs when the event enforces capacity", async ({
+test("a full session blocks further RSVPs when the event enforces capacity @009-US2", async ({
   page,
 }) => {
   // Flipping an admin setting, hosting a session, capping it, and then walking
@@ -232,7 +232,7 @@ test("a full session blocks further RSVPs when the event enforces capacity", asy
   ).toBeVisible();
 });
 
-test("leaving an event page while your RSVPs and votes are still loading is quiet", async ({
+test("leaving an event page while your RSVPs and votes are still loading is quiet @009-US1", async ({
   page,
 }) => {
   await login(page);

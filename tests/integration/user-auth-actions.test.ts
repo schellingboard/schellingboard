@@ -1,3 +1,6 @@
+// @module-tag 003-US3
+// @module-tag 003-US4
+// @module-tag 003-US5
 import {
   describe,
   it,

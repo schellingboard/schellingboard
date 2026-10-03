@@ -58,7 +58,7 @@ async function openSession(page: Page, title: RegExp) {
   await expect(dialog(page)).toBeVisible();
 }
 
-test("a host records a count on a finished session and it persists", async ({
+test("a host records a count on a finished session and it persists @001-US1", async ({
   page,
 }) => {
   await login(page);
@@ -88,7 +88,7 @@ test("a host records a count on a finished session and it persists", async ({
   await expect(countInput(page)).toHaveValue("");
 });
 
-test("saving announces that it is in progress before it confirms", async ({
+test("saving announces that it is in progress before it confirms @001-US1", async ({
   page,
 }) => {
   await login(page);
@@ -121,7 +121,7 @@ test("saving announces that it is in progress before it confirms", async ({
   await expect(page.getByText("Saved", { exact: true })).toBeVisible();
 });
 
-test("an out-of-range value is reported on the field itself", async ({
+test("an out-of-range value is reported on the field itself @001-US1", async ({
   page,
 }) => {
   await login(page);
@@ -143,7 +143,9 @@ test("an out-of-range value is reported on the field itself", async ({
   await expect(countInput(page)).not.toHaveAttribute("aria-invalid", "true");
 });
 
-test("an attendee who is not a host sees no count", async ({ page }) => {
+test("an attendee who is not a host sees no count @001-US1", async ({
+  page,
+}) => {
   await login(page);
   await landAs(page, "Tereza Nováková");
   await openSession(page, /Open Source Sustainability/);
@@ -162,7 +164,7 @@ test("an attendee who is not a host sees no count", async ({ page }) => {
 // SC-001: the whole point of the follow-up email. Carlos Silva hosts this
 // session and no other spec touches him, so the mailbox search below cannot
 // collide with a parallel worker.
-test("a host follows the link in the follow-up email and records the count", async ({
+test("a host follows the link in the follow-up email and records the count @001-US2", async ({
   page,
 }) => {
   test.skip(
@@ -218,7 +220,7 @@ async function followUpHtml(title: string, email: string): Promise<string> {
 // still owed a count for. It is withdrawn (FR-025): the notification list says
 // the same thing in the place hosts already look, and it says it without
 // nagging every schedule view. What is left to pin is its absence.
-test("the schedule no longer nags a host about uncounted sessions", async ({
+test("the schedule no longer nags a host about uncounted sessions @001-US3", async ({
   page,
 }) => {
   // Charlie Test hosts two Gamma sessions that have finished by 17:00 on day 1
@@ -237,7 +239,7 @@ test("the schedule no longer nags a host about uncounted sessions", async ({
 test.describe("on a phone", () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
-  test("the control fits without scrolling the page sideways (SC-006)", async ({
+  test("the control fits without scrolling the page sideways (SC-006) @001-US1", async ({
     page,
   }) => {
     await login(page);

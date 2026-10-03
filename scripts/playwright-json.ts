@@ -30,6 +30,7 @@ export interface JsonSpec {
   title?: string;
   file?: string;
   line?: number;
+  tags?: string[];
   tests?: JsonTest[];
 }
 export interface JsonSuite {

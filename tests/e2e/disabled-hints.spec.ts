@@ -11,7 +11,7 @@ import { dismissToast, toast } from "./helpers/toast";
 // enabled, while a finger just taps it.
 test.use({ viewport: { width: 390, height: 844 } });
 
-test("proposal phase: tapping a greyed-out vote button says when voting opens", async ({
+test("proposal phase: tapping a greyed-out vote button says when voting opens @006-US2", async ({
   page,
 }) => {
   await login(page);
@@ -45,7 +45,7 @@ function daysFromNow(days: number): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T12:00`;
 }
 
-test("after the event: a greyed-out control with no reason to give still does nothing", async ({
+test("after the event: a greyed-out control with no reason to give still does nothing @006-US2", async ({
   page,
 }) => {
   await login(page);
@@ -67,7 +67,7 @@ test("after the event: a greyed-out control with no reason to give still does no
   await expect(toast(page)).toHaveCount(0);
 });
 
-test("voting phase: tapping a greyed-out Schedule button says when scheduling opens", async ({
+test("voting phase: tapping a greyed-out Schedule button says when scheduling opens @006-US2", async ({
   page,
 }) => {
   await login(page);

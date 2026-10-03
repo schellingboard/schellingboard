@@ -1,3 +1,5 @@
+// @module-tag 004-US1
+// @module-tag 004-US2
 import {
   describe,
   it,

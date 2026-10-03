@@ -14,7 +14,7 @@ async function adminLogin(page: Page) {
 // One event, one lifecycle: the section's rules are covered by
 // tests/integration/admin-meetings.test.ts, so the browser is here for what
 // only it can show -- that the controls persist and the list updates.
-test("configures the meetings section and keeps it across a reload", async ({
+test("configures the meetings section and keeps it across a reload @012-US1", async ({
   page,
 }) => {
   await adminLogin(page);

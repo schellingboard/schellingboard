@@ -1,4 +1,4 @@
-.PHONY: help dev mailpit build start lint typecheck arch arch-graph arch-diagrams arch-diagrams-check lint-watch test test-unit test-integration test-watch test-coverage test-e2e test-e2e-headed test-e2e-docker format format-check precommit dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed dump-release-db install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate docs-dev docs-dev-build docs-dev-validate www
+.PHONY: help dev mailpit build start lint typecheck arch arch-graph arch-diagrams arch-diagrams-check lint-watch test test-unit test-integration test-watch test-coverage use-cases test-e2e test-e2e-headed test-e2e-docker format format-check precommit dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed dump-release-db install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate docs-dev docs-dev-build docs-dev-validate www
 
 SHELL := /usr/bin/env bash
 
@@ -20,6 +20,7 @@ help:
 	@printf "  %-28s %s\n" "make test-e2e-docker"    "Run E2E tests against the Docker image"
 	@printf "  %-28s %s\n" "make test-watch"         "Run tests in watch mode"
 	@printf "  %-28s %s\n" "make test-coverage"      "Run tests with coverage"
+	@printf "  %-28s %s\n" "make use-cases"          "Report which tests cover which use case"
 	@printf "\nLinting & Formatting:\n"
 	@printf "  %-28s %s\n" "make lint"               "Run linter"
 	@printf "  %-28s %s\n" "make lint-watch"         "Run linter in watch mode"
@@ -120,6 +121,9 @@ test-watch: install
 
 test-coverage: install
 	bun set-env.ts test bun x vitest run --coverage
+
+use-cases: install
+	bun set-env.ts test bun scripts/use-cases.ts
 
 test-e2e: install-playwright
 	bun set-env.ts test bun x playwright test

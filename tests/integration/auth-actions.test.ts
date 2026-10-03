@@ -1,3 +1,4 @@
+// @module-tag 002-US1
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
 type CookieRecord = { name: string; value: string; maxAge?: number };

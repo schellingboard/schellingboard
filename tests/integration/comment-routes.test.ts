@@ -1,3 +1,5 @@
+// @module-tag 010-US2
+// @module-tag 010-US3
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 
 import { setupTestDb, resetTestDb } from "../helpers/db";

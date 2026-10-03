@@ -106,7 +106,7 @@ async function logInAs(page: Page, credential: string) {
   await page.getByRole("button", { name: "Log in" }).click();
 }
 
-test("the name switcher focuses its search, and clearing it keeps the modal open", async ({
+test("the name switcher focuses its search, and clearing it keeps the modal open @003-US1", async ({
   page,
 }) => {
   await login(page);
@@ -140,7 +140,7 @@ test("the name switcher focuses its search, and clearing it keeps the modal open
   await expect(headerChip(page, "Bob Test")).toBeVisible();
 });
 
-test("logging out from the chip menu clears the selected name", async ({
+test("logging out from the chip menu clears the selected name @003-US2", async ({
   page,
 }) => {
   await login(page);
@@ -163,7 +163,7 @@ test("logging out from the chip menu clears the selected name", async ({
   await expect(headerChip(page, "Bob Test")).toBeVisible();
 });
 
-test("protect a name via emailed link, then log in with password and single-use code", async ({
+test("protect a name via emailed link, then log in with password and single-use code @003-US3 @003-US4", async ({
   page,
 }) => {
   test.skip(
@@ -267,7 +267,9 @@ test("protect a name via emailed link, then log in with password and single-use 
   await expect(headerChip(page, "Priya Sharma")).toBeVisible();
 });
 
-test("forgot password: reset it via an emailed link", async ({ page }) => {
+test("forgot password: reset it via an emailed link @003-US5", async ({
+  page,
+}) => {
   test.skip(
     skipWithoutMailpit(),
     "mail env vars unset — start Mailpit (make mailpit) and set them in .env.test.local to run this test (see docs/dev/testing.md § Running tests)"
@@ -323,7 +325,7 @@ test("forgot password: reset it via an emailed link", async ({ page }) => {
 // being honoured the moment the password is set) used to go on showing that
 // name, offering a menu whose "Edit profile" and "Settings" then insisted no
 // name was selected, with no picker in sight to fix it.
-test("setting a password drops the selection the same browser was holding", async ({
+test("setting a password drops the selection the same browser was holding @003-US3", async ({
   page,
 }) => {
   test.skip(
@@ -375,7 +377,7 @@ test("setting a password drops the selection the same browser was holding", asyn
 // honouring. Nothing links to Settings without a selected name, so the page
 // is reached the way a real attendee reaches it — a bookmark or the back
 // button — and must then say what is actually wrong.
-test("a name protected from another device asks this browser to log in, not to pick a name", async ({
+test("a name protected from another device asks this browser to log in, not to pick a name @003-US4", async ({
   page,
   browser,
 }) => {

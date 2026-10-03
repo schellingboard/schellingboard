@@ -211,7 +211,9 @@ test.describe("1-on-1 meetings", () => {
 
   // The other direction: the grid knows the time and asks who is free, which
   // is the only route that does not start from knowing who you want to meet.
-  test("books a 1-on-1 from the schedule's own column", async ({ page }) => {
+  test("books a 1-on-1 from the schedule's own column @012-US6", async ({
+    page,
+  }) => {
     test.slow();
 
     const unique = uniqueSuffix();
@@ -286,7 +288,7 @@ test.describe("1-on-1 meetings", () => {
     await page.waitForLoadState("networkidle");
   });
 
-  test("books a slot the other attendee declared, and gets an answer", async ({
+  test("books a slot the other attendee declared, and gets an answer @012-US3 @012-US4", async ({
     page,
   }) => {
     // One journey through the whole feature, and it drives the admin UI to set

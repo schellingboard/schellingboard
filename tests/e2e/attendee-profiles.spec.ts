@@ -14,7 +14,7 @@ async function searchForTestGuests(page: Page) {
   await expect(page).toHaveURL(/[?&]q=Test/);
 }
 
-test("reads a profile over the list and comes back to the same view", async ({
+test("reads a profile over the list and comes back to the same view @011-US4", async ({
   page,
 }) => {
   await login(page);
@@ -39,7 +39,7 @@ test("reads a profile over the list and comes back to the same view", async ({
   ).toBeVisible();
 });
 
-test("moves between profiles without returning to the list", async ({
+test("moves between profiles without returning to the list @011-US4", async ({
   page,
 }) => {
   await login(page);
@@ -93,7 +93,7 @@ test("moves between profiles without returning to the list", async ({
   await expect(page.getByLabel("Search", { exact: true })).toHaveValue("Test");
 });
 
-test("starts each profile at its own top", async ({ page }) => {
+test("starts each profile at its own top @011-US4", async ({ page }) => {
   await login(page);
   await page.setViewportSize({ width: 375, height: 500 });
   await page.goto("/guests");
@@ -116,7 +116,7 @@ test("starts each profile at its own top", async ({ page }) => {
   await expect(heading).toBeInViewport();
 });
 
-test("a profile taller than the window scrolls", async ({ page }) => {
+test("a profile taller than the window scrolls @011-US4", async ({ page }) => {
   await login(page);
   // Wide enough for the dialog layout rather than the phone sheet, short
   // enough that a filled-in profile runs past the bottom of it.
@@ -141,7 +141,7 @@ test("a profile taller than the window scrolls", async ({ page }) => {
   await expect(contact).toBeInViewport();
 });
 
-test("slides the next profile in from beside this one, not from further out", async ({
+test("slides the next profile in from beside this one, not from further out @011-US4", async ({
   page,
 }) => {
   await login(page);
@@ -192,7 +192,7 @@ test("slides the next profile in from beside this one, not from further out", as
   expect(Math.max(...alice)).toBeLessThanOrEqual(alice[0]);
 });
 
-test("a press during a slide reads on rather than waiting for it", async ({
+test("a press during a slide reads on rather than waiting for it @011-US4", async ({
   page,
 }) => {
   await login(page);
@@ -215,7 +215,7 @@ test("a press during a slide reads on rather than waiting for it", async ({
   await expect(page).toHaveURL(/\/guests\/[^/?]+\?q=Test/);
 });
 
-test("escape closes the profile, and back retraces the ones read", async ({
+test("escape closes the profile, and back retraces the ones read @011-US4", async ({
   page,
 }) => {
   await login(page);
@@ -240,7 +240,7 @@ test("escape closes the profile, and back retraces the ones read", async ({
 test.describe("on a touchscreen", () => {
   test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
 
-  test("reads on with a swipe, and stops at the end of the collection", async ({
+  test("reads on with a swipe, and stops at the end of the collection @011-US4", async ({
     page,
   }) => {
     await login(page);
@@ -267,7 +267,7 @@ test.describe("on a touchscreen", () => {
     ).toBeVisible();
   });
 
-  test("a swipe is spent where it lands, and does not fire again", async ({
+  test("a swipe is spent where it lands, and does not fire again @011-US4", async ({
     page,
   }) => {
     await login(page);
@@ -288,7 +288,7 @@ test.describe("on a touchscreen", () => {
     await expect(heading).toHaveText("Alice Test");
   });
 
-  test("leaves scrolling and the browser's own edge gesture alone", async ({
+  test("leaves scrolling and the browser's own edge gesture alone @011-US4", async ({
     page,
   }) => {
     await login(page);
@@ -312,7 +312,7 @@ test.describe("on a touchscreen", () => {
   });
 });
 
-test("a profile opened from outside the directory can still be read through", async ({
+test("a profile opened from outside the directory can still be read through @011-US4", async ({
   page,
 }) => {
   await login(page);

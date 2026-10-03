@@ -68,6 +68,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   rather than from release tags. `CONTRIBUTING.md` is now a short entry point into it.
 - The architecture diagrams are interactive on that site — a browsable explorer at
   `/diagrams/` and views embedded in the chapters — and the committed PNG exports are gone.
+- **Tests name the use cases they cover** (#1084): every E2E test is tagged from a catalogue
+  of use cases, and `make use-cases` reports gaps and over-tested ones.
 
 ## [3.8.1] - 2026-09-24
 

@@ -12,7 +12,7 @@ const KEYNOTE = /Opening Keynote - Conference Gamma/;
 test.describe("on a phone-sized screen", () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
-  test("the agenda lists each time's sessions with their room and end", async ({
+  test("the agenda lists each time's sessions with their room and end @007-US2", async ({
     page,
   }) => {
     await login(page);
@@ -35,7 +35,7 @@ test.describe("on a phone-sized screen", () => {
     await expect(lunchSlot.getByText("Lunch Break")).toHaveCount(1);
   });
 
-  test("a narrowed agenda leads back to its search from further down", async ({
+  test("a narrowed agenda leads back to its search from further down @007-US3", async ({
     page,
   }) => {
     await loginAndGoto(page, "/Conference-Gamma");
@@ -52,7 +52,7 @@ test.describe("on a phone-sized screen", () => {
   });
 });
 
-test("the agenda groups sessions by start time and opens their details", async ({
+test("the agenda groups sessions by start time and opens their details @007-US2 @007-US5", async ({
   page,
 }) => {
   await login(page);
@@ -70,7 +70,9 @@ test("the agenda groups sessions by start time and opens their details", async (
 // session starts in (see meetings-column.spec.ts). They are hers alone: the
 // grid gives her a column for them, the agenda a time of their own — shown
 // after the break, as a session in that slot would be.
-test("the viewer's own 1-on-1s are listed at their time", async ({ page }) => {
+test("the viewer's own 1-on-1s are listed at their time @012-US5", async ({
+  page,
+}) => {
   await loginAndGoto(page, "/guests");
   await selectUser(page, "Zanele Khumalo");
   await page.getByRole("link", { name: "Conference Gamma" }).first().click();
@@ -98,7 +100,7 @@ test("the viewer's own 1-on-1s are listed at their time", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("searching the agenda narrows it to sessions and 1-on-1s that match", async ({
+test("searching the agenda narrows it to sessions and 1-on-1s that match @007-US3", async ({
   page,
 }) => {
   await loginAndGoto(page, "/guests");
@@ -132,7 +134,7 @@ test("searching the agenda narrows it to sessions and 1-on-1s that match", async
 
 // Charlie hosts the React session and has an RSVP for Open Source
 // Sustainability in the seed; API Design is neither.
-test("filters narrow the agenda to the viewer's own sessions, each one further", async ({
+test("filters narrow the agenda to the viewer's own sessions, each one further @007-US3", async ({
   page,
 }) => {
   await loginAndGoto(page, "/Conference-Gamma");
@@ -189,7 +191,7 @@ test("filters narrow the agenda to the viewer's own sessions, each one further",
   );
 });
 
-test("the viewer's own 1-on-1s stay listed under every filter", async ({
+test("the viewer's own 1-on-1s stay listed under every filter @007-US3 @012-US5", async ({
   page,
 }) => {
   await loginAndGoto(page, "/guests");
@@ -215,7 +217,7 @@ test.describe("while the event is running", () => {
     viewport: { width: 1280, height: 500 },
   });
 
-  test("the agenda marks the current time and Now jumps to it", async ({
+  test("the agenda marks the current time and Now jumps to it @007-US4", async ({
     page,
   }) => {
     await openGammaScheduleDuringEvent(page, "/Conference-Gamma");

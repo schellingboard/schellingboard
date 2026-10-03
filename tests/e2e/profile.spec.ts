@@ -44,7 +44,7 @@ async function makeImage(width: number, height: number): Promise<Buffer> {
 test.describe("Edit profile", () => {
   test.describe.configure({ mode: "serial" });
 
-  test("lists guests and edits the current user's profile", async ({
+  test("lists guests and edits the current user's profile @011-US1", async ({
     page,
   }) => {
     await login(page);
@@ -96,7 +96,7 @@ test.describe("Edit profile", () => {
     ).toBeVisible();
   });
 
-  test("pronoun combobox doesn't revert to one of the default options on enter", async ({
+  test("pronoun combobox doesn't revert to one of the default options on enter @011-US1", async ({
     page,
   }) => {
     await login(page);
@@ -127,7 +127,9 @@ test.describe("Edit profile", () => {
     await expect(pronounsEntry).toHaveValue("She/Her");
   });
 
-  test("avatar doesn't change on profile about me edit", async ({ page }) => {
+  test("avatar doesn't change on profile about me edit @011-US1", async ({
+    page,
+  }) => {
     await login(page);
     await page.goto("/Conference-Alpha/proposals");
 
@@ -148,7 +150,7 @@ test.describe("Edit profile", () => {
     ).toBeVisible();
   });
 
-  test("renders markdown in About me, safely", async ({ page }) => {
+  test("renders markdown in About me, safely @011-US1", async ({ page }) => {
     await login(page);
     await page.goto("/Conference-Alpha/proposals");
 
@@ -195,7 +197,7 @@ test.describe("Edit profile", () => {
     ).toHaveCount(0);
   });
 
-  test("edits the extended profile fields and finds them in the directory", async ({
+  test("edits the extended profile fields and finds them in the directory @011-US1 @011-US3", async ({
     page,
   }) => {
     await login(page);
@@ -321,7 +323,9 @@ test.describe("Edit profile", () => {
     await expect(page.getByRole("link", { name: /Bob Test/ })).toHaveCount(0);
   });
 
-  test("shows no image when the user avatar is reset", async ({ page }) => {
+  test("shows no image when the user avatar is reset @011-US2", async ({
+    page,
+  }) => {
     await login(page);
     await page.goto("/Conference-Alpha/proposals");
 
@@ -342,7 +346,7 @@ test.describe("Edit profile", () => {
     await expect(page.getByText(/^AT$/)).toBeVisible();
   });
 
-  test("formats About me with the markdown toolbar and previews it", async ({
+  test("formats About me with the markdown toolbar and previews it @011-US1", async ({
     page,
   }) => {
     await login(page);
@@ -376,7 +380,7 @@ test.describe("Edit profile", () => {
   });
 });
 
-test("summarizes validation errors next to the Save button", async ({
+test("summarizes validation errors next to the Save button @011-US1", async ({
   page,
 }) => {
   await login(page);
@@ -417,7 +421,7 @@ test("summarizes validation errors next to the Save button", async ({
   await expect(language).toBeFocused();
 });
 
-test("sends a rejected picture back to the picker that chose it", async ({
+test("sends a rejected picture back to the picker that chose it @011-US2", async ({
   page,
 }) => {
   await login(page);
@@ -446,7 +450,7 @@ test("sends a rejected picture back to the picker that chose it", async ({
   ).toBeFocused();
 });
 
-test("shows an error on the edit page when no user is selected", async ({
+test("shows an error on the edit page when no user is selected @011-US1", async ({
   page,
 }) => {
   await login(page);
@@ -458,7 +462,9 @@ test("shows an error on the edit page when no user is selected", async ({
   ).toHaveCount(0);
 });
 
-test("lists every attendee on one page, with their bios", async ({ page }) => {
+test("lists every attendee on one page, with their bios @011-US3", async ({
+  page,
+}) => {
   await login(page);
   await page.goto("/guests");
 
@@ -480,7 +486,9 @@ test("lists every attendee on one page, with their bios", async ({ page }) => {
   );
 });
 
-test("filters the directory to filled-in profiles", async ({ page }) => {
+test("filters the directory to filled-in profiles @011-US3", async ({
+  page,
+}) => {
   await login(page);
   await page.goto("/guests");
 
@@ -518,7 +526,7 @@ test("filters the directory to filled-in profiles", async ({ page }) => {
 const firstOfAliceOrAhmad = (attendees: import("@playwright/test").Locator) =>
   attendees.filter({ hasText: /Alice Test|Ahmad Karimi/ }).first();
 
-test("searches, filters and sorts without going back to the server", async ({
+test("searches, filters and sorts without going back to the server @011-US3", async ({
   page,
 }) => {
   await login(page);
@@ -566,7 +574,9 @@ test("searches, filters and sorts without going back to the server", async ({
   await expect(page).toHaveURL(/[?&]sort=updated/);
 });
 
-test("sorts the attendee directory by recently updated", async ({ page }) => {
+test("sorts the attendee directory by recently updated @011-US3", async ({
+  page,
+}) => {
   await login(page);
   await page.goto("/Conference-Alpha/proposals");
 
@@ -616,7 +626,9 @@ const expectReordered = (before: string[], after: string[]) =>
     before.filter((row) => after.includes(row))
   );
 
-test("shuffles the attendee directory anew on every load", async ({ page }) => {
+test("shuffles the attendee directory anew on every load @011-US3", async ({
+  page,
+}) => {
   await login(page);
   await page.goto("/guests");
 

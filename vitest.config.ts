@@ -1,5 +1,6 @@
 import { defineConfig } from "vitest/config";
 import path from "path";
+import { useCases } from "./tests/use-cases.ts";
 
 export default defineConfig({
   test: {
@@ -10,6 +11,8 @@ export default defineConfig({
     environment: "node",
     pool: "forks",
     silent: "passed-only",
+    tags: useCases.map(({ id, title }) => ({ name: id, description: title })),
+    strictTags: true,
     coverage: {
       provider: "v8",
       reporter: ["text", "lcov", "html"],

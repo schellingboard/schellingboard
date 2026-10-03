@@ -1,3 +1,4 @@
+// @module-tag 001-US2b
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 vi.mock("@/utils/reminder-dispatch", () => ({

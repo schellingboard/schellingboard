@@ -64,7 +64,7 @@ test.describe("attendee meeting availability", () => {
     }
   });
 
-  test("declares availability, clears a slot, and opts back out", async ({
+  test("declares availability, clears a slot, and opts back out @012-US2", async ({
     page,
   }) => {
     const eventName = `E2E Availability ${uniqueSuffix()}`;
@@ -163,7 +163,7 @@ test.describe("attendee meeting availability", () => {
 
   // Only events the attendee can actually be booked at get a panel; the rest
   // of Settings is for everyone, so the section is never missing, only empty.
-  test("lists only the events you attend that offer 1-on-1s", async ({
+  test("lists only the events you attend that offer 1-on-1s @012-US2", async ({
     page,
   }) => {
     const eventName = `E2E Listed ${uniqueSuffix()}`;

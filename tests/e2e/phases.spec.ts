@@ -15,7 +15,7 @@ import { selectUser } from "./helpers/user";
 // Alpha's Lightning Talks, Bob Beta's, Charlie Gamma's) — asserting the
 // buttons are absent for a host would pass no matter what the phase is.
 
-test("proposal phase: proposing is open, voting is not yet available", async ({
+test("proposal phase: proposing is open, voting is not yet available @006-US1", async ({
   page,
 }) => {
   await login(page);
@@ -43,7 +43,7 @@ test("proposal phase: proposing is open, voting is not yet available", async ({
   ).not.toHaveClass(/cursor-not-allowed/);
 });
 
-test("voting phase: proposing and voting are open, scheduling is not", async ({
+test("voting phase: proposing and voting are open, scheduling is not @006-US1", async ({
   page,
 }) => {
   await login(page);
@@ -70,7 +70,7 @@ test("voting phase: proposing and voting are open, scheduling is not", async ({
   await expect(page.getByRole("link", { name: "Add session" })).toHaveCount(0);
 });
 
-test("dev fake clock: time travel moves a proposal-phase event into voting", async ({
+test("dev fake clock: time travel moves a proposal-phase event into voting @006-US1 @020-US1", async ({
   page,
 }) => {
   await login(page);
@@ -97,7 +97,7 @@ test("dev fake clock: time travel moves a proposal-phase event into voting", asy
   await expect(row.getByRole("button", { name: "❤️" })).toBeEnabled();
 });
 
-test("scheduling phase: grid is interactive, proposing and voting are over", async ({
+test("scheduling phase: grid is interactive, proposing and voting are over @006-US1", async ({
   page,
 }) => {
   await login(page);

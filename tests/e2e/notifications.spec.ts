@@ -33,7 +33,7 @@ function bell(page: Page) {
   return page.getByRole("link", { name: /^Notifications/ });
 }
 
-test("a comment on your profile becomes a notification you can open", async ({
+test("a comment on your profile becomes a notification you can open @013-US1 @010-US3", async ({
   page,
 }) => {
   await login(page);
@@ -72,7 +72,9 @@ test("a comment on your profile becomes a notification you can open", async ({
   );
 });
 
-test("marks a notification read without opening it", async ({ page }) => {
+test("marks a notification read without opening it @013-US2", async ({
+  page,
+}) => {
   await login(page);
   await page.goto("/guests");
 
@@ -98,7 +100,9 @@ test("marks a notification read without opening it", async ({ page }) => {
 });
 
 // Freya Nielsen is nobody else's subject, so her whole list is this test's.
-test("acts on the ticked notifications and nothing else", async ({ page }) => {
+test("acts on the ticked notifications and nothing else @013-US2", async ({
+  page,
+}) => {
   await login(page);
   await page.goto("/guests");
 
@@ -150,7 +154,7 @@ async function openSession(page: Page, title: RegExp) {
   return modal;
 }
 
-test("closing a session opened from a notification stays on the schedule", async ({
+test("closing a session opened from a notification stays on the schedule @013-US1", async ({
   page,
 }) => {
   await login(page);
@@ -223,7 +227,7 @@ test.describe("attendee-count reminders", () => {
   const noticeFor = (page: Page, title: RegExp) =>
     page.getByRole("button", { name: title });
 
-  test("a host finds the reminder in their notification list and records the count", async ({
+  test("a host finds the reminder in their notification list and records the count @001-US2", async ({
     page,
   }) => {
     await login(page);

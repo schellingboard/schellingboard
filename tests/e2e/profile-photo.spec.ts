@@ -6,7 +6,7 @@ import { expectImageLoaded } from "./helpers/images";
 // profile, so this never races profile.spec.ts, which resets Alice's avatar.
 const GUEST = "Charlie Test";
 
-test("shows the photo big enough to recognise someone, without clicking", async ({
+test("shows the photo big enough to recognise someone, without clicking @011-US5", async ({
   page,
 }) => {
   await login(page);
@@ -57,7 +57,7 @@ test("shows the photo big enough to recognise someone, without clicking", async 
   expect(phoneAboutMeBox.y).toBeLessThan(height);
 });
 
-test("enlarges a guest's photo in place and shrinks it again", async ({
+test("enlarges a guest's photo in place and shrinks it again @011-US5", async ({
   page,
 }) => {
   await login(page);

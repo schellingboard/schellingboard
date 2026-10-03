@@ -54,7 +54,7 @@ test.describe("Admin UI", () => {
   // Note: no site login here. The admin UI is independent of the normal
   // user UI and must be reachable with only the admin password.
 
-  test("redirects to the admin login when not admin-authenticated", async ({
+  test("redirects to the admin login when not admin-authenticated @015-US1", async ({
     page,
   }) => {
     await page.goto("/admin");
@@ -64,7 +64,7 @@ test.describe("Admin UI", () => {
     await expect(page).toHaveURL(/\/admin\/login/);
   });
 
-  test("shows only admin chrome and can log out", async ({ page }) => {
+  test("shows only admin chrome and can log out @015-US1", async ({ page }) => {
     await adminLogin(page);
 
     // Only the admin nav is present, not the site nav, and only the admin
@@ -80,7 +80,9 @@ test.describe("Admin UI", () => {
     ).toBeVisible();
   });
 
-  test("header title links back to the admin home", async ({ page }) => {
+  test("header title links back to the admin home @015-US1", async ({
+    page,
+  }) => {
     await adminLogin(page);
 
     // Navigate away, then click the title to return home (→ events list).
@@ -93,7 +95,7 @@ test.describe("Admin UI", () => {
     await expect(page.getByRole("heading", { name: "Events" })).toBeVisible();
   });
 
-  test("collapses nav and logout into a hamburger on mobile", async ({
+  test("collapses nav and logout into a hamburger on mobile @015-US1", async ({
     page,
   }) => {
     await adminLogin(page);
@@ -115,7 +117,7 @@ test.describe("Admin UI", () => {
     ).toBeVisible();
   });
 
-  test("redirects /admin to the events list and has no dashboard nav", async ({
+  test("redirects /admin to the events list and has no dashboard nav @015-US1", async ({
     page,
   }) => {
     await adminLogin(page);
@@ -132,7 +134,9 @@ test.describe("Admin UI", () => {
     await gotoLocations(page);
   });
 
-  test("guards new admin routes when not authenticated", async ({ page }) => {
+  test("guards new admin routes when not authenticated @015-US1", async ({
+    page,
+  }) => {
     for (const path of ["/admin/users", "/admin/locations", "/admin/events"]) {
       await page.goto(path);
       await expect(
@@ -142,7 +146,7 @@ test.describe("Admin UI", () => {
     }
   });
 
-  test("rejects a wrong admin password", async ({ page }) => {
+  test("rejects a wrong admin password @015-US1", async ({ page }) => {
     await page.goto("/admin");
     await page.getByLabel("Password").fill("definitely-wrong");
     await page.getByRole("button", { name: "Access Admin" }).click();
@@ -153,7 +157,7 @@ test.describe("Admin UI", () => {
     ).toBeVisible();
   });
 
-  test("can create, edit, and delete a user", async ({ page }) => {
+  test("can create, edit, and delete a user @016-US1", async ({ page }) => {
     await adminLogin(page);
     await gotoUsers(page);
 
@@ -218,7 +222,7 @@ test.describe("Admin UI", () => {
     ).toHaveCount(0);
   });
 
-  test("imports users from CSV and assigns them to an event", async ({
+  test("imports users from CSV and assigns them to an event @016-US2 @016-US3", async ({
     page,
   }) => {
     await adminLogin(page);
@@ -270,7 +274,7 @@ test.describe("Admin UI", () => {
     await expect(row).toHaveCount(0);
   });
 
-  test("rejects an invalid CSV file without importing anything", async ({
+  test("rejects an invalid CSV file without importing anything @016-US2", async ({
     page,
   }) => {
     await adminLogin(page);
@@ -299,7 +303,7 @@ test.describe("Admin UI", () => {
     await expect(users.getByText("No users match.")).toBeVisible();
   });
 
-  test("searches and paginates users", async ({ page }) => {
+  test("searches and paginates users @016-US1", async ({ page }) => {
     await adminLogin(page);
     await gotoUsers(page);
 
@@ -355,7 +359,9 @@ test.describe("Admin UI", () => {
 });
 
 test.describe("Admin UI events", () => {
-  test("lists existing events and can create a new one", async ({ page }) => {
+  test("lists existing events and can create a new one @015-US2", async ({
+    page,
+  }) => {
     await adminLogin(page);
 
     await page
@@ -383,7 +389,7 @@ test.describe("Admin UI events", () => {
     await expect(page).toHaveURL(/\/admin\/events\//);
   });
 
-  test("event detail exposes tab sub-routes for each section", async ({
+  test("event detail exposes tab sub-routes for each section @015-US2", async ({
     page,
   }) => {
     await adminLogin(page);
@@ -431,7 +437,9 @@ test.describe("Admin UI events", () => {
     await expect(page).toHaveURL(/\/admin\/events$/);
   });
 
-  test("can edit event basic info on detail page", async ({ page }) => {
+  test("can edit event basic info on detail page @015-US2", async ({
+    page,
+  }) => {
     await adminLogin(page);
     await page.goto("/admin/events");
 
@@ -477,7 +485,7 @@ test.describe("Admin UI events", () => {
     await expect(page).toHaveURL(/\/admin\/events$/);
   });
 
-  test("can delete an event via named confirm on detail page", async ({
+  test("can delete an event via named confirm on detail page @015-US2", async ({
     page,
   }) => {
     await adminLogin(page);
@@ -507,7 +515,9 @@ test.describe("Admin UI events", () => {
     await expect(page.getByText(eventName)).not.toBeVisible();
   });
 
-  test("can set and clear phase dates on the detail page", async ({ page }) => {
+  test("can set and clear phase dates on the detail page @015-US3", async ({
+    page,
+  }) => {
     await adminLogin(page);
     await page.goto("/admin/events");
 
@@ -584,7 +594,7 @@ test.describe("Admin UI events", () => {
 });
 
 test.describe("Admin UI days", () => {
-  test("can add, edit, and delete days on an event detail page", async ({
+  test("can add, edit, and delete days on an event detail page @015-US4", async ({
     page,
   }) => {
     await adminLogin(page);
@@ -686,7 +696,9 @@ test.describe("Admin UI days", () => {
 });
 
 test.describe("Admin UI guest assignment", () => {
-  test("can assign and remove guests from an event", async ({ page }) => {
+  test("can assign and remove guests from an event @016-US3", async ({
+    page,
+  }) => {
     await adminLogin(page);
     await page.goto("/admin/events");
 
@@ -765,7 +777,9 @@ test.describe("Admin UI guest assignment", () => {
     await expect(page).toHaveURL(/\/admin\/events$/);
   });
 
-  test("bulk assigns and removes selected guests", async ({ page }) => {
+  test("bulk assigns and removes selected guests @016-US3", async ({
+    page,
+  }) => {
     await adminLogin(page);
     await page.goto("/admin/events");
 
@@ -811,7 +825,7 @@ test.describe("Admin UI guest assignment", () => {
     await expect(page).toHaveURL(/\/admin\/events$/);
   });
 
-  test("shows an error and keeps the selection when a bulk action fails", async ({
+  test("shows an error and keeps the selection when a bulk action fails @016-US3", async ({
     page,
   }) => {
     await adminLogin(page);
@@ -840,7 +854,9 @@ test.describe("Admin UI guest assignment", () => {
     await expect(bulkBar).toBeVisible();
   });
 
-  test("searches guests by name on the guests sub-route", async ({ page }) => {
+  test("searches guests by name on the guests sub-route @016-US3", async ({
+    page,
+  }) => {
     await adminLogin(page);
     await page.goto("/admin/events");
 
@@ -896,7 +912,9 @@ test.describe("Admin UI locations", () => {
   test.describe.configure({ mode: "serial" });
 
   test.describe("Location assignment", () => {
-    test("can assign and remove locations from an event", async ({ page }) => {
+    test("can assign and remove locations from an event @017-US3", async ({
+      page,
+    }) => {
       await adminLogin(page);
       await page.goto("/admin/events");
 
@@ -1012,7 +1030,7 @@ test.describe("Admin UI locations", () => {
     });
   });
 
-  test("disables row assign toggles while a bulk action is in flight", async ({
+  test("disables row assign toggles while a bulk action is in flight @017-US3", async ({
     page,
   }) => {
     await adminLogin(page);
@@ -1059,7 +1077,7 @@ test.describe("Admin UI locations", () => {
     ).toBeEnabled();
   });
 
-  test("clears the bulk selection when the filter changes", async ({
+  test("clears the bulk selection when the filter changes @017-US3", async ({
     page,
   }) => {
     await adminLogin(page);
@@ -1103,7 +1121,7 @@ test.describe("Admin UI locations", () => {
 });
 
 test.describe("Admin UI proposals", () => {
-  test("lists proposals with hosts on the event detail page", async ({
+  test("lists proposals with hosts on the event detail page @018-US1", async ({
     page,
   }) => {
     await adminLogin(page);
@@ -1148,7 +1166,7 @@ test.describe("Admin UI proposals", () => {
     ).toHaveCount(0);
   });
 
-  test("redirects to the last valid page when a stale page param is out of range", async ({
+  test("redirects to the last valid page when a stale page param is out of range @018-US1", async ({
     page,
   }) => {
     await adminLogin(page);
@@ -1171,7 +1189,7 @@ test.describe("Admin UI proposals", () => {
     await expect(proposals.getByRole("listitem").first()).toBeVisible();
   });
 
-  test("can edit a proposal's title and hosts on the event detail page", async ({
+  test("can edit a proposal's title and hosts on the event detail page @018-US1", async ({
     page,
   }) => {
     await adminLogin(page);
@@ -1225,7 +1243,7 @@ test.describe("Admin UI proposals", () => {
     await expect(revertedRow).not.toContainText("Alice Test");
   });
 
-  test("deletes a proposal via named confirm", async ({ page }) => {
+  test("deletes a proposal via named confirm @018-US1", async ({ page }) => {
     // Create a fresh proposal so we never permanently delete seeded data
     await loginAndGoto(page, "/Conference-Alpha/proposals");
     await selectUser(page, /Bob Test/i);
@@ -1272,7 +1290,7 @@ test.describe("Admin UI proposals", () => {
 });
 
 test.describe("Admin UI sessions", () => {
-  test("lists sessions with host, time and location on the event detail page", async ({
+  test("lists sessions with host, time and location on the event detail page @018-US2", async ({
     page,
   }) => {
     await adminLogin(page);
@@ -1315,7 +1333,7 @@ test.describe("Admin UI sessions", () => {
     ).toHaveCount(0);
   });
 
-  test("redirects to the last valid page when a stale page param is out of range", async ({
+  test("redirects to the last valid page when a stale page param is out of range @018-US2", async ({
     page,
   }) => {
     await adminLogin(page);
@@ -1338,7 +1356,9 @@ test.describe("Admin UI sessions", () => {
     await expect(sessions.getByRole("listitem").first()).toBeVisible();
   });
 
-  test("can edit a session on the event detail page", async ({ page }) => {
+  test("can edit a session on the event detail page @018-US2", async ({
+    page,
+  }) => {
     await adminLogin(page);
     await page.goto("/admin/events");
     // Conference Alpha's keynote is not asserted by other specs; edit + revert.
@@ -1379,7 +1399,7 @@ test.describe("Admin UI sessions", () => {
     ).toBeVisible();
   });
 
-  test("creates a session and deletes it again", async ({ page }) => {
+  test("creates a session and deletes it again @018-US2", async ({ page }) => {
     await adminLogin(page);
     await page.goto("/admin/events");
     await page
@@ -1425,7 +1445,7 @@ test.describe("Admin UI sessions", () => {
     await expect(row).toHaveCount(0);
   });
 
-  test("adds the break before a new session unless told not to", async ({
+  test("adds the break before a new session unless told not to @018-US2", async ({
     page,
   }) => {
     await adminLogin(page);
@@ -1482,7 +1502,7 @@ test.describe("Admin UI sessions", () => {
     }
   });
 
-  test("deletes a session via named confirm", async ({ page }) => {
+  test("deletes a session via named confirm @018-US2", async ({ page }) => {
     await adminLogin(page);
     await page.goto("/admin/events");
     // Conference Beta's keynote is not referenced by other specs, so it is
@@ -1512,7 +1532,7 @@ test.describe("Admin UI sessions", () => {
     ).toHaveCount(0);
   });
 
-  test("removes an RSVP from a session via standard confirm", async ({
+  test("removes an RSVP from a session via standard confirm @018-US3", async ({
     page,
   }) => {
     // Create the RSVP to remove through the public UI first. Yuki Tanaka is
@@ -1585,7 +1605,7 @@ test.describe("Admin UI locations", () => {
   // Reaching the page through the nav only ever renders it in the browser;
   // reloading is the one route that also renders it on the server, so it is
   // what catches browser-only globals leaking into module scope.
-  test("renders on the server when reloaded", async ({ page }) => {
+  test("renders on the server when reloaded @017-US1", async ({ page }) => {
     await adminLogin(page);
     await gotoLocations(page);
     // A reload that cuts off a location photo mid-download makes Firefox log
@@ -1603,7 +1623,7 @@ test.describe("Admin UI locations", () => {
     ).toBeVisible();
   });
 
-  test("reports invalid fields individually", async ({ page }) => {
+  test("reports invalid fields individually @017-US1", async ({ page }) => {
     await adminLogin(page);
     await gotoLocations(page);
     const region = page.getByRole("region", { name: "Locations" });
@@ -1633,7 +1653,9 @@ test.describe("Admin UI locations", () => {
     await region.getByRole("button", { name: "Cancel" }).click();
   });
 
-  test("can create, edit, reorder, and delete locations", async ({ page }) => {
+  test("can create, edit, reorder, and delete locations @017-US1", async ({
+    page,
+  }) => {
     await adminLogin(page);
     await gotoLocations(page);
     const region = page.getByRole("region", { name: "Locations" });
@@ -1705,7 +1727,7 @@ test.describe("Admin UI locations", () => {
     await deleteLocation(page, nameB);
   });
 
-  test("uploads a location image and rejects invalid ones", async ({
+  test("uploads a location image and rejects invalid ones @017-US2", async ({
     page,
   }) => {
     await adminLogin(page);

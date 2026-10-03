@@ -3,7 +3,7 @@ import { login } from "./helpers/auth";
 
 const KEYNOTE = /Opening Keynote/;
 
-test("hard-navigating to a session URL renders the modal without hydration errors", async ({
+test("hard-navigating to a session URL renders the modal without hydration errors @007-US5", async ({
   page,
 }) => {
   await login(page);
@@ -41,7 +41,7 @@ test("hard-navigating to a session URL renders the modal without hydration error
   await page.waitForLoadState("networkidle");
 });
 
-test("leaving a session modal whose RSVPs are still loading is quiet", async ({
+test("leaving a session modal whose RSVPs are still loading is quiet @007-US5", async ({
   page,
 }) => {
   await login(page);

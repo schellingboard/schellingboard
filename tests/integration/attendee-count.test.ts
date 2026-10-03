@@ -1,3 +1,4 @@
+// @module-tag 001-US1
 import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
 
 const cookieJar = new Map<string, string>();

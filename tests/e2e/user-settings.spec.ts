@@ -4,7 +4,7 @@ import { selectUser } from "./helpers/user";
 
 // Amara Okafor is used by no other spec, so her email settings can be
 // mutated without racing parallel test files.
-test("header user menu reaches profile, edit profile, and settings; email preferences persist", async ({
+test("header user menu reaches profile, edit profile, and settings; email preferences persist @013-US5", async ({
   page,
 }) => {
   await login(page);
@@ -79,7 +79,7 @@ test("header user menu reaches profile, edit profile, and settings; email prefer
   await expect(page.getByLabel(/hosting starts in an hour/i)).toBeChecked();
 });
 
-test("settings page asks to select a name when none is chosen", async ({
+test("settings page asks to select a name when none is chosen @013-US5", async ({
   page,
 }) => {
   await login(page);

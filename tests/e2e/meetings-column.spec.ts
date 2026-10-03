@@ -18,7 +18,7 @@ const VIEWER = "Zanele Khumalo";
 const AT_TEN = ["Leilani Kahale", "Samuel Adeyemi"];
 
 test.describe("parallel 1-on-1s on the schedule", () => {
-  test("gathers a slot's 1-on-1s into one block that lists them", async ({
+  test("gathers a slot's 1-on-1s into one block that lists them @012-US5", async ({
     page,
   }) => {
     await loginAndGoto(page, "/guests");

@@ -4,7 +4,7 @@ import { uniqueSuffix } from "./helpers/unique";
 import { loginAndGoto, login } from "./helpers/auth";
 import { selectUser } from "./helpers/user";
 
-test("should allow voting on proposals with different choices", async ({
+test("should allow voting on proposals with different choices @005-US1", async ({
   page,
 }) => {
   await login(page);
@@ -52,7 +52,7 @@ test("should allow voting on proposals with different choices", async ({
   await expect(interestedButton).toHaveAttribute("aria-pressed", "false");
 });
 
-test("should navigate to quick voting and allow voting on proposals", async ({
+test("should navigate to quick voting and allow voting on proposals @005-US2", async ({
   page,
 }) => {
   await login(page);
@@ -97,7 +97,7 @@ test("should navigate to quick voting and allow voting on proposals", async ({
   await expect(page).toHaveURL(/\/Conference-Beta\/proposals$/);
 });
 
-test("votes from two users persist independently across reloads", async ({
+test("votes from two users persist independently across reloads @005-US1", async ({
   page,
 }) => {
   await login(page);
@@ -175,7 +175,7 @@ test("votes from two users persist independently across reloads", async ({
   );
 });
 
-test("should show voting disabled state when not logged in as a user", async ({
+test("should show voting disabled state when not logged in as a user @005-US1", async ({
   page,
 }) => {
   await loginAndGoto(page, "/Conference-Beta/proposals");
@@ -218,7 +218,7 @@ async function openGammaProposal(page: Page, title: string) {
   return modal;
 }
 
-test("a host sees the vote breakdown of their own proposal", async ({
+test("a host sees the vote breakdown of their own proposal @005-US3", async ({
   page,
 }) => {
   await loginAndGoto(page, "/Conference-Gamma/proposals");
@@ -237,7 +237,7 @@ test("a host sees the vote breakdown of their own proposal", async ({
   ).toBeVisible();
 });
 
-test("someone else's proposal keeps its vote breakdown private", async ({
+test("someone else's proposal keeps its vote breakdown private @005-US3", async ({
   page,
 }) => {
   await loginAndGoto(page, "/Conference-Gamma/proposals");
@@ -250,7 +250,7 @@ test("someone else's proposal keeps its vote breakdown private", async ({
   ).toHaveCount(0);
 });
 
-test("a proposal nobody hosts shows its vote breakdown to everyone", async ({
+test("a proposal nobody hosts shows its vote breakdown to everyone @005-US3", async ({
   page,
 }) => {
   await loginAndGoto(page, "/Conference-Gamma/proposals");
@@ -267,7 +267,7 @@ test("a proposal nobody hosts shows its vote breakdown to everyone", async ({
 // the estimate needs.
 const UNVOTED_PROPOSAL = "Conference Gamma Lightning Talks: Community Showcase";
 
-test("a proposal hardly anyone voted on gets no attendance guess", async ({
+test("a proposal hardly anyone voted on gets no attendance guess @005-US4", async ({
   page,
 }) => {
   await loginAndGoto(page, "/Conference-Gamma/proposals");

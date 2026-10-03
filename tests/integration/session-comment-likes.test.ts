@@ -1,3 +1,4 @@
+// @module-tag 010-US6
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { resetTestDb, setupTestDb } from "../helpers/db";
 import { siteAuthenticate } from "../helpers/site-auth";

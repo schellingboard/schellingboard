@@ -23,7 +23,7 @@ test.beforeEach(async ({ page }) => {
   await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
 });
 
-test("event details open in a popup and the proposals link navigates", async ({
+test("event details open in a popup and the proposals link navigates @007-US6", async ({
   page,
 }) => {
   // The description (here: its "Venue map" link) is hidden until the popup opens.
@@ -42,7 +42,7 @@ test("event details open in a popup and the proposals link navigates", async ({
   ).toBeVisible();
 });
 
-test("the toolbar scrolls out of view while the room headers stay pinned", async ({
+test("the toolbar scrolls out of view while the room headers stay pinned @007-US1", async ({
   page,
 }) => {
   // The toolbar (view toggle) scrolls with the content; the room headers are
@@ -81,7 +81,7 @@ const scrollToEnd = async (page: import("@playwright/test").Page) => {
   }).toPass();
 };
 
-test("the footer ends the schedule content", async ({ page }) => {
+test("the footer ends the schedule content @007-US1", async ({ page }) => {
   // The footer sits at the end of the schedule content, so wheeling down over
   // the schedule brings it into view.
   await scrollToEnd(page);
@@ -105,7 +105,9 @@ const roomDetails = (page: import("@playwright/test").Page) =>
 test.describe("on a phone", () => {
   test.use({ viewport: { width: 375, height: 800 } });
 
-  test("a room's details open on tap and stay on screen", async ({ page }) => {
+  test("a room's details open on tap and stay on screen @007-US6", async ({
+    page,
+  }) => {
     const details = roomDetails(page);
     await expect(details).toHaveCount(0);
 
@@ -130,7 +132,7 @@ test.describe("on a phone", () => {
     ).toBeVisible();
   });
 
-  test("a room's details open from the keyboard and close on Escape", async ({
+  test("a room's details open from the keyboard and close on Escape @007-US6", async ({
     page,
   }) => {
     const details = roomDetails(page);
@@ -147,7 +149,7 @@ test.describe("on a phone", () => {
 test.describe("on a wide screen", () => {
   test.use({ viewport: { width: 1280, height: 800 } });
 
-  test("hovering a room name shows its details", async ({ page }) => {
+  test("hovering a room name shows its details @007-US6", async ({ page }) => {
     const details = roomDetails(page);
     const roomName = page.getByRole("button", { name: "Main Hall" }).first();
     // Hovering once is not enough: under load the mouse can arrive before the
@@ -167,7 +169,7 @@ test.describe("on a wide screen", () => {
   });
 });
 
-test("dragging the schedule pans it sideways", async ({ page }) => {
+test("dragging the schedule pans it sideways @007-US1", async ({ page }) => {
   // The last location's header starts beyond the right edge of the viewport.
   // (Each day repeats the header row — the first one is the visible one.)
   const lastLocation = page
@@ -208,7 +210,7 @@ test.describe("pull to refresh", () => {
         ).type
     );
 
-  test("a long pull down at the top of the schedule reloads it", async ({
+  test("a long pull down at the top of the schedule reloads it @007-US1", async ({
     page,
   }) => {
     expect(await navigationType(page)).toBe("navigate");
@@ -218,7 +220,7 @@ test.describe("pull to refresh", () => {
     expect(await navigationType(page)).toBe("reload");
   });
 
-  test("panning the schedule never reloads it by accident", async ({
+  test("panning the schedule never reloads it by accident @007-US1", async ({
     page,
   }) => {
     const scroller = page.getByTestId("schedule-scroll");
@@ -247,7 +249,7 @@ test.describe("pull to refresh", () => {
   });
 });
 
-test("the grid keeps its place after a session is added from it", async ({
+test("the grid keeps its place after a session is added from it @008-US1", async ({
   page,
 }) => {
   // A drag, a form round trip and a re-render, on a phone-sized viewport.

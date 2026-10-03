@@ -5,7 +5,7 @@ import { releaseNotes, SHOWN_RELEASES } from "@/app/release-notes";
 // What the notes actually say is the release notes' own business (see
 // tests/unit/release-notes.test.ts); this is about the version in the footer
 // being a way in to them at all.
-test("the footer's version opens the recent release notes", async ({
+test("the footer's version opens the recent release notes @014-US3", async ({
   page,
 }) => {
   await login(page);

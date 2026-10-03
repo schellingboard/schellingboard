@@ -42,7 +42,9 @@ async function makeImage(width: number, height: number): Promise<Buffer> {
 test.describe.configure({ mode: "serial" });
 
 test.describe("Admin site settings", () => {
-  test("edits the title, shown in the admin header", async ({ page }) => {
+  test("edits the title, shown in the admin header @015-US5", async ({
+    page,
+  }) => {
     await adminLogin(page);
     await gotoSettings(page);
 
@@ -62,7 +64,9 @@ test.describe("Admin site settings", () => {
     await expect(page.getByText("Settings saved.")).toBeVisible();
   });
 
-  test("map modal appears only after a map is uploaded", async ({ page }) => {
+  test("map modal appears only after a map is uploaded @015-US5", async ({
+    page,
+  }) => {
     // No map by default: the schedule nav has no map button.
     await loginAndGoto(page, "/Conference-Alpha");
     await expect(page.getByRole("button", { name: "Show map" })).toHaveCount(0);

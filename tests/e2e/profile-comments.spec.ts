@@ -21,7 +21,7 @@ async function actAs(page: Page, name: string | RegExp) {
   await expect(page.getByRole("button", { name: /^Your name:/ })).toBeVisible();
 }
 
-test("posts a comment on a profile and shows it when the profile reopens", async ({
+test("posts a comment on a profile and shows it when the profile reopens @010-US3", async ({
   page,
 }) => {
   await login(page);
@@ -56,7 +56,7 @@ test("posts a comment on a profile and shows it when the profile reopens", async
   ).toBeVisible();
 });
 
-test("replies to a profile comment and permalinks to the reply", async ({
+test("replies to a profile comment and permalinks to the reply @010-US3 @010-US5", async ({
   page,
 }) => {
   await login(page);
@@ -92,7 +92,7 @@ test("replies to a profile comment and permalinks to the reply", async ({
   ).toBeVisible();
 });
 
-test("leaves a deep-linked profile scrollable back to its top", async ({
+test("leaves a deep-linked profile scrollable back to its top @010-US5", async ({
   page,
 }) => {
   // Short enough that the profile overflows its panel: the bug needs a profile
@@ -160,7 +160,7 @@ test("leaves a deep-linked profile scrollable back to its top", async ({
 
 // Linh and Jean-Pierre are nobody else's subject, so the comment count here is
 // this test's alone.
-test("opens a comment author's profile from the profile it was left on", async ({
+test("opens a comment author's profile from the profile it was left on @010-US3", async ({
   page,
 }) => {
   await login(page);
@@ -197,7 +197,7 @@ test("opens a comment author's profile from the profile it was left on", async (
 // A section that can't reach its endpoint used to sit on a "Loading
 // comments..." skeleton forever (profiles) or claim "0 comments" (sessions),
 // both of which say something untrue about the thread.
-test("says comments could not be loaded rather than showing an empty thread", async ({
+test("says comments could not be loaded rather than showing an empty thread @010-US3", async ({
   page,
 }) => {
   await login(page);
@@ -219,7 +219,7 @@ test("says comments could not be loaded rather than showing an empty thread", as
   ).toHaveCount(0);
 });
 
-test("asks visitors without a name to select one before commenting", async ({
+test("asks visitors without a name to select one before commenting @010-US3 @003-US1", async ({
   page,
 }) => {
   await login(page);

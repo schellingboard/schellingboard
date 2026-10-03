@@ -12,7 +12,7 @@ import {
 // to a moment inside Conference Gamma's first day.
 test.use({ timezoneId: "Europe/Berlin" });
 
-test("the Now button jumps to the current time on the schedule", async ({
+test("the Now button jumps to the current time on the schedule @007-US4", async ({
   page,
 }) => {
   await openGammaScheduleDuringEvent(page, "/Conference-Gamma");
@@ -32,7 +32,9 @@ test("the Now button jumps to the current time on the schedule", async ({
   await expect(nowLine).toBeInViewport();
 });
 
-test("no now line or Now button outside the event's days", async ({ page }) => {
+test("no now line or Now button outside the event's days @007-US4", async ({
+  page,
+}) => {
   await login(page);
   await page.goto("/Conference-Gamma");
 
@@ -42,7 +44,7 @@ test("no now line or Now button outside the event's days", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Now" })).toHaveCount(0);
 });
 
-test("the now line follows the dev fake clock, not the real clock", async ({
+test("the now line follows the dev fake clock, not the real clock @007-US4 @020-US1", async ({
   page,
 }) => {
   await login(page);

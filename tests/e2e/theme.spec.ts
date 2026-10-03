@@ -8,7 +8,7 @@ import { login } from "./helpers/auth";
 // point, and asserting on their hex values would just restate the stylesheet.
 const root = (page: import("@playwright/test").Page) => page.locator("html");
 
-test("the footer switches the whole site between light and dark", async ({
+test("the footer switches the whole site between light and dark @014-US1", async ({
   page,
 }) => {
   await login(page);
@@ -41,7 +41,7 @@ test("the footer switches the whole site between light and dark", async ({
   await expect(root(page)).not.toHaveClass(/\bdark\b/);
 });
 
-test("the switch is on the password gate, before anyone has logged in", async ({
+test("the switch is on the password gate, before anyone has logged in @014-US1", async ({
   page,
 }) => {
   await page.goto("/");
@@ -63,7 +63,9 @@ test("the switch is on the password gate, before anyone has logged in", async ({
   await expect(root(page)).toHaveClass(/\bdark\b/);
 });
 
-test("appearance can also be set from the settings page", async ({ page }) => {
+test("appearance can also be set from the settings page @014-US1", async ({
+  page,
+}) => {
   await login(page);
   // Reachable without picking a name first: the setting is about the device,
   // and the rest of the settings page is not.

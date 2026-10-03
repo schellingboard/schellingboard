@@ -15,12 +15,14 @@ import {
 // the same time travel: without it no line exists to be in the viewport.
 test.use({ timezoneId: "Europe/Berlin" });
 
-test("kiosk mode auto-scrolls the now line into view", async ({ page }) => {
+test("kiosk mode auto-scrolls the now line into view @007-US7", async ({
+  page,
+}) => {
   await openGammaScheduleDuringEvent(page, "/Conference-Gamma?kiosk=1");
   await expect(page.getByTestId("now-line")).toBeInViewport();
 });
 
-test("kiosk mode persists via cookie after navigating without the parameter", async ({
+test("kiosk mode persists via cookie after navigating without the parameter @007-US7", async ({
   page,
 }) => {
   await openGammaScheduleDuringEvent(page, "/Conference-Gamma?kiosk=1");
@@ -36,7 +38,9 @@ test("kiosk mode persists via cookie after navigating without the parameter", as
   await expect(page.getByTestId("now-line")).toBeInViewport();
 });
 
-test("?kiosk=0 clears the cookie and leaves kiosk mode", async ({ page }) => {
+test("?kiosk=0 clears the cookie and leaves kiosk mode @007-US7", async ({
+  page,
+}) => {
   await openGammaScheduleDuringEvent(page, "/Conference-Gamma?kiosk=1");
   await expect(page.getByTestId("now-line")).toBeInViewport();
 
@@ -68,7 +72,9 @@ test("?kiosk=0 clears the cookie and leaves kiosk mode", async ({ page }) => {
 
 // A display that was already on before the day started has no line to scroll to
 // at load; the fake clock stands in for the day beginning under it.
-test("kiosk mode scrolls to the now line once it appears", async ({ page }) => {
+test("kiosk mode scrolls to the now line once it appears @007-US7", async ({
+  page,
+}) => {
   await login(page);
   await page.goto("/Conference-Gamma?kiosk=1&dev=1");
 

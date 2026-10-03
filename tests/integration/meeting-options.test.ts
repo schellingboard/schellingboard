@@ -1,3 +1,4 @@
+// @module-tag 012-US3
 import {
   describe,
   it,

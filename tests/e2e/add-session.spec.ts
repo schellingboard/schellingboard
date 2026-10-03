@@ -4,7 +4,7 @@ import { login } from "./helpers/auth";
 import { selectUser } from "./helpers/user";
 import { toast } from "./helpers/toast";
 
-test("a newly added session appears on the overview and can be opened", async ({
+test("a newly added session appears on the overview and can be opened @008-US1 @007-US5", async ({
   page,
 }) => {
   await login(page);

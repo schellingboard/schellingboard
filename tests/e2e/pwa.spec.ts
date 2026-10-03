@@ -7,7 +7,10 @@ import { selectUser } from "./helpers/user";
 // them makes "Add to Home Screen" produce a broken icon or nothing at all.
 // Requesting the URLs directly is what a browser does here — no human clicks
 // a manifest.
-test("the app is installable before logging in", async ({ page, request }) => {
+test("the app is installable before logging in @014-US2", async ({
+  page,
+  request,
+}) => {
   await page.goto("/");
 
   const href = await page.locator('link[rel="manifest"]').getAttribute("href");
@@ -36,7 +39,9 @@ test("the app is installable before logging in", async ({ page, request }) => {
 // server render proves nothing about it: this is the only tier where the
 // browser answers for itself. Firefox supports push, so a fresh profile with
 // no subscription must land on the invitation to turn one on.
-test("settings offers notifications on this device", async ({ page }) => {
+test("settings offers notifications on this device @013-US3", async ({
+  page,
+}) => {
   await login(page);
   await page.goto("/settings");
   await selectUser(page, /Anna Kowalska/i);

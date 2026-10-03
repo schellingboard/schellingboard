@@ -114,5 +114,8 @@ jobs:
       - name: Test (with coverage thresholds)
         run: make test-coverage
 
+      - name: Use case coverage
+        run: bun set-env.ts test bun scripts/use-cases.ts >> "$GITHUB_STEP_SUMMARY"
+
 # E2E tests live in ci-e2e.yml: they are path-filtered, and path filters apply
 # to a whole workflow rather than a single job.

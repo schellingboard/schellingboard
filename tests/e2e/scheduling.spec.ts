@@ -73,7 +73,7 @@ async function openEditForm(page: Page, title: string) {
   ).toBeVisible();
 }
 
-test("a host can edit a session's title and the change persists", async ({
+test("a host can edit a session's title and the change persists @008-US2", async ({
   page,
 }) => {
   await login(page);
@@ -98,7 +98,7 @@ test("a host can edit a session's title and the change persists", async ({
   await expect(page.getByRole("link", { name: title })).toHaveCount(0);
 });
 
-test("a host can delete a session and it disappears from the grid", async ({
+test("a host can delete a session and it disappears from the grid @008-US3", async ({
   page,
 }) => {
   await login(page);
@@ -122,7 +122,7 @@ test("a host can delete a session and it disappears from the grid", async ({
   await expect(page.getByRole("link", { name: title })).toHaveCount(0);
 });
 
-test("a host can cap attendance below the room's own maximum", async ({
+test("a host can cap attendance below the room's own maximum @008-US4", async ({
   page,
 }) => {
   await login(page);
@@ -164,7 +164,7 @@ test("a host can cap attendance below the room's own maximum", async ({
   await expect(dialog.getByText("Attendees (0 / 6):")).toBeVisible();
 });
 
-test("a session booked after midnight lands on the next calendar date", async ({
+test("a session booked after midnight lands on the next calendar date @008-US1", async ({
   page,
 }) => {
   await login(page);
@@ -186,7 +186,7 @@ test("a session booked after midnight lands on the next calendar date", async ({
   ).toBeVisible();
 });
 
-test("a day running past midnight says so, and its late slots name the day", async ({
+test("a day running past midnight says so, and its late slots name the day @008-US1", async ({
   page,
 }) => {
   await login(page);
@@ -217,7 +217,7 @@ test("a day running past midnight says so, and its late slots name the day", asy
   ).toBeVisible();
 });
 
-test("occupied start times are not offered in the same location but are in others", async ({
+test("occupied start times are not offered in the same location but are in others @008-US1", async ({
   page,
 }) => {
   await login(page);

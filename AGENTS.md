@@ -155,7 +155,8 @@ jj squash --from <commit> --to @ -m "message" -- <path>
 
 Follow red → green → refactor strictly. **No skipping steps.**
 
-1. Write the failing test.
+1. Find the use case in `tests/use-cases.ts` (add it if missing) and write the failing test,
+   tagged with its ID — see [Use cases](docs/dev/testing.md#use-cases).
 2. Run `make test` or `make test-e2e` and **confirm the failure output**.
 3. Implement the minimum code to pass.
 4. Run again and confirm green.

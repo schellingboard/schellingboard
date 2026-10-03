@@ -26,7 +26,7 @@ const dayRadios = (page: Page) =>
     name: /Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday/,
   });
 
-test("updating a session emails the RSVP'd guest and the added co-host", async ({
+test("updating a session emails the RSVP'd guest and the added co-host @013-US4 @008-US2", async ({
   page,
 }) => {
   test.skip(
@@ -163,7 +163,7 @@ test("updating a session emails the RSVP'd guest and the added co-host", async (
   }
 });
 
-test("a host can fix a session placed where they could never have booked one", async ({
+test("a host can fix a session placed where they could never have booked one @008-US2", async ({
   page,
 }) => {
   await login(page);

@@ -37,7 +37,7 @@ async function actAs(page: Page, name: RegExp) {
   await expect(page.getByRole("button", { name: /^Your name:/ })).toBeVisible();
 }
 
-test("posts a comment on a session and renders it as markdown", async ({
+test("posts a comment on a session and renders it as markdown @010-US2", async ({
   page,
 }) => {
   await login(page);
@@ -73,7 +73,7 @@ test("posts a comment on a session and renders it as markdown", async ({
   await expect(reopened.getByText("bringing my laptop").first()).toBeVisible();
 });
 
-test("edits a comment, showing when it was edited, then deletes it", async ({
+test("edits a comment, showing when it was edited, then deletes it @010-US4", async ({
   page,
 }) => {
   await login(page);
@@ -105,7 +105,7 @@ test("edits a comment, showing when it was edited, then deletes it", async ({
   ).toBeVisible();
 });
 
-test("replies to a comment, collapses the thread, and permalinks to a reply", async ({
+test("replies to a comment, collapses the thread, and permalinks to a reply @010-US5", async ({
   page,
 }) => {
   await login(page);
@@ -165,7 +165,7 @@ test("replies to a comment, collapses the thread, and permalinks to a reply", as
   ).toBeVisible();
 });
 
-test("keeps replies readable when their parent is deleted", async ({
+test("keeps replies readable when their parent is deleted @010-US4", async ({
   page,
   browser,
 }) => {
@@ -208,7 +208,10 @@ test("keeps replies readable when their parent is deleted", async ({
   await expect(reopened.getByText("a surviving reply")).toBeVisible();
 });
 
-test("likes a comment and shows who liked it", async ({ page, browser }) => {
+test("likes a comment and shows who liked it @010-US6", async ({
+  page,
+  browser,
+}) => {
   // Two identities, each a real logout-then-login round trip, plus a second
   // browser context and a reload, add up to just over the 30s default once
   // parallel workers compete for the server.
@@ -273,7 +276,7 @@ test("likes a comment and shows who liked it", async ({ page, browser }) => {
   await expect(reopened.getByRole("button", { name: "1 like" })).toBeVisible();
 });
 
-test("asks visitors without a name to select one before commenting", async ({
+test("asks visitors without a name to select one before commenting @010-US2 @003-US1", async ({
   page,
 }) => {
   await login(page);
@@ -287,7 +290,7 @@ test("asks visitors without a name to select one before commenting", async ({
   await expect(modal.getByPlaceholder("Add a comment")).toHaveCount(0);
 });
 
-test("nests sibling replies under the comment they answer", async ({
+test("nests sibling replies under the comment they answer @010-US5", async ({
   page,
 }) => {
   await login(page);

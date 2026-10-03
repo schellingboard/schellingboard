@@ -1,3 +1,4 @@
+// @module-tag 001-US1
 import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 

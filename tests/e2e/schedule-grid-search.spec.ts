@@ -14,7 +14,7 @@ const gammaDayTwo = DateTime.now()
   .plus({ days: 15 })
   .toFormat("EEEE, MMMM d");
 
-test("searching the grid fades what doesn't match and folds days without a match", async ({
+test("searching the grid fades what doesn't match and folds days without a match @007-US3", async ({
   page,
 }) => {
   await loginAndGoto(page, "/guests");
@@ -58,7 +58,7 @@ test("searching the grid fades what doesn't match and folds days without a match
 test.describe("in a short window", () => {
   test.use({ viewport: { width: 1280, height: 600 } });
 
-  test("stepping through the matches brings each one into view in turn", async ({
+  test("stepping through the matches brings each one into view in turn @007-US3", async ({
     page,
   }) => {
     await loginAndGoto(page, "/guests");
@@ -98,7 +98,7 @@ test.describe("in a short window", () => {
 
 // Charlie hosts the React session and has an RSVP for Open Source
 // Sustainability in the seed.
-test("a filter chosen in the agenda carries over to the grid", async ({
+test("a filter chosen in the agenda carries over to the grid @007-US3", async ({
   page,
 }) => {
   await loginAndGoto(page, "/guests");

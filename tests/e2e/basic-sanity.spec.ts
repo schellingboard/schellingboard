@@ -2,7 +2,7 @@ import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
 
 test.describe("Health endpoint", () => {
-  test("GET /api/health returns 200 without authentication", async ({
+  test("GET /api/health returns 200 without authentication @019-US1", async ({
     request,
   }) => {
     const response = await request.get("/api/health");
@@ -16,7 +16,9 @@ test.describe("Basic Sanity Checks", () => {
     await login(page);
   });
 
-  test("homepage loads and shows multiple events", async ({ page }) => {
+  test("homepage loads and shows multiple events @002-US2", async ({
+    page,
+  }) => {
     // Should show all three test events
     await expect(
       page.getByRole("heading", { name: "Conference Alpha" })
@@ -40,7 +42,9 @@ test.describe("Basic Sanity Checks", () => {
     ).toBeVisible();
   });
 
-  test("can navigate to Alpha event (proposal phase)", async ({ page }) => {
+  test("can navigate to Alpha event (proposal phase) @002-US2", async ({
+    page,
+  }) => {
     await page
       .locator("text=Conference Alpha")
       .locator("..")
@@ -59,7 +63,9 @@ test.describe("Basic Sanity Checks", () => {
     ).toBeVisible();
   });
 
-  test("can navigate to Beta event (voting phase)", async ({ page }) => {
+  test("can navigate to Beta event (voting phase) @002-US2", async ({
+    page,
+  }) => {
     await page
       .locator("text=Conference Beta")
       .locator("..")
@@ -78,7 +84,9 @@ test.describe("Basic Sanity Checks", () => {
     ).toBeVisible();
   });
 
-  test("can navigate to Gamma event (scheduling phase)", async ({ page }) => {
+  test("can navigate to Gamma event (scheduling phase) @002-US2", async ({
+    page,
+  }) => {
     await page
       .locator("text=Conference Gamma")
       .locator("..")
