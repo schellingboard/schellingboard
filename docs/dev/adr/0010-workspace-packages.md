@@ -52,7 +52,9 @@ tracing has only ever been run against a hoisted tree. The rules above give the
 same guarantee without changing how dependencies are laid out.
 
 Tests stay in `tests/` for now. The repository ports stay in `db/` until the
-target architecture's server modules exist to own them.
+target architecture's server modules exist to own them. That departs from #965,
+which put the ports in `model/`; the boundary #965 was after is enforced instead
+by a rule that nothing outside `db/` imports `db/repositories/`.
 
 ## Consequences
 

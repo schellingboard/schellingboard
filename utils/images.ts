@@ -1,4 +1,3 @@
-import { ImageResourceRepository } from "@/db/repositories/interfaces";
 import sharp, { FormatEnum, Metadata, Sharp } from "sharp";
 import fs from "fs/promises";
 import path from "path";
@@ -29,9 +28,7 @@ const FORMAT_EXTENSIONS: Partial<Record<keyof FormatEnum, string>> = {
 
 export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
-export abstract class BaseImageResourceRepository<
-  Id extends string,
-> implements ImageResourceRepository<Id> {
+export abstract class BaseImageResourceRepository<Id extends string> {
   readonly maxImageBytes = MAX_IMAGE_BYTES;
   abstract readonly minImageWidth: number;
   abstract readonly directory: string;

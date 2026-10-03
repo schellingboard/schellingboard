@@ -80,6 +80,17 @@ module.exports = {
       to: { path: "^app/" },
     },
     {
+      name: "repositories-stay-in-db",
+      severity: "error",
+      comment:
+        "`db/repositories/` holds the repository ports and their SQLite adapters, which " +
+        "only `db/` wires up; everything else reaches them through `@/db/container`. An " +
+        "entity type belongs in `packages/domain`, where both sides can import it, and so " +
+        "does a port's input type once code outside `db/` names it (#965).",
+      from: { pathNot: "^db/" },
+      to: { path: "^db/repositories/" },
+    },
+    {
       name: "no-unresolvable",
       severity: "error",
       comment: "A dependency that does not resolve is a broken import.",

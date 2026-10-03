@@ -1,4 +1,4 @@
-import type { ReminderKind } from "@/db/repositories/interfaces";
+import type { ReminderKind } from "@schellingboard/domain/reminder";
 
 // Pure due-time arithmetic and eligibility for the two attendee-count
 // reminders. No I/O and no next/headers: the whole reschedule matrix from the

@@ -3,7 +3,7 @@ import { getRepositories } from "@/db/container";
 import type {
   DueReminderCandidate,
   ReminderKey,
-} from "@/db/repositories/interfaces";
+} from "@schellingboard/domain/reminder";
 import { isMailerConfigured, sendMail } from "@/utils/mailer";
 import { sessionPath } from "@/utils/notifications";
 import { siteUrl } from "@/utils/site-url";

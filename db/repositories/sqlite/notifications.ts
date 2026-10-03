@@ -2,7 +2,8 @@ import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
 import * as schema from "../../schema";
-import type { Notification, NotificationsRepository } from "../interfaces";
+import type { NotificationsRepository } from "../interfaces";
+import type { Notification } from "@schellingboard/domain/notification";
 
 type DB = BetterSQLite3Database<typeof schema>;
 

@@ -93,10 +93,11 @@ where both adapters can import it. A type that only means something to the
 database — a row shape, a driver's handle — stays in `db/` and is used only
 inside `db/`.
 
-We are not there yet. `db/repositories/interfaces.ts` still holds the entity
-vocabulary alongside the ports, and many files outside `db/` import their domain
-types from it. `CONTACT_TYPES` moving to `packages/domain/src/guest.ts` is the first instance
-of the fix; issue [#965](https://github.com/schellingboard/schellingboard/issues/965) has the inventory and the order to do the rest in.
+`db/repositories/` holds the repository ports and their SQLite adapters, and
+nothing outside `db/` imports from it (`repositories-stay-in-db`); the rest of
+the app reaches the repositories through `@/db/container`. A port's input or
+page type stays next to the port while only `db/` uses it; once code outside
+`db/` needs to name it, it is vocabulary and moves to `domain`.
 
 `make arch-graph` renders the graph to `arch-graph.svg` (needs graphviz), which
 is usually faster than arguing about where a boundary should go.

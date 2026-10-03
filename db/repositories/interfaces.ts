@@ -1,21 +1,10 @@
-import type {
-  MeetingPoint,
-  MeetingStatus,
-  Meeting,
-} from "@schellingboard/domain/meeting";
-import type { Comment } from "@schellingboard/domain/comment";
-import type { VoteChoice, Vote } from "@schellingboard/domain/vote";
-import type {
-  Rsvp,
-  SessionProposal,
-  Session,
-  SessionCreateInput,
-} from "@schellingboard/domain/session";
-import type {
-  Location,
-  LocationUnavailability,
-} from "@schellingboard/domain/location";
 import type { AuthCodePurpose, AuthCode } from "@schellingboard/domain/auth";
+import type { Comment } from "@schellingboard/domain/comment";
+import type {
+  Event,
+  EventMeetingSettings,
+  Day,
+} from "@schellingboard/domain/event";
 import type {
   EmailSettings,
   ProfilePrompt,
@@ -25,14 +14,28 @@ import type {
   Attendee,
   EventAttendee,
 } from "@schellingboard/domain/guest";
-import type { SiteSettings } from "@schellingboard/domain/site-settings";
 import type {
-  Event,
-  EventMeetingSettings,
-  Day,
-} from "@schellingboard/domain/event";
-
-// ── Site settings ────────────────────────────────────────────────────────────
+  Location,
+  LocationUnavailability,
+} from "@schellingboard/domain/location";
+import type {
+  MeetingPoint,
+  MeetingStatus,
+  Meeting,
+} from "@schellingboard/domain/meeting";
+import type { Notification } from "@schellingboard/domain/notification";
+import type {
+  ReminderKey,
+  DueReminderCandidate,
+} from "@schellingboard/domain/reminder";
+import type {
+  Rsvp,
+  SessionProposal,
+  Session,
+  SessionCreateInput,
+} from "@schellingboard/domain/session";
+import type { SiteSettings } from "@schellingboard/domain/site-settings";
+import type { VoteChoice, Vote } from "@schellingboard/domain/vote";
 
 export interface SettingsRepository {
   /** The singleton settings row, falling back to defaults when unset. */
@@ -40,8 +43,6 @@ export interface SettingsRepository {
   /** Upserts the singleton row and returns the merged settings. */
   update(patch: Partial<SiteSettings>): Promise<SiteSettings>;
 }
-
-// ── Days ─────────────────────────────────────────────────────────────────────
 
 export interface DaysRepository {
   list(): Promise<Day[]>;
@@ -68,8 +69,6 @@ export interface LocationUnavailabilityRepository {
   delete(id: string): Promise<void>;
 }
 
-// ── Events ────────────────────────────────────────────────────────────────────
-
 type EventDerivedFields = "id" | "slug" | "firstDayStart" | "lastDayStart";
 
 export interface EventsRepository {
@@ -94,8 +93,6 @@ export interface EventsRepository {
   /** Deletes the event and all records referencing it (cascades via DB FK). */
   delete(id: string): Promise<void>;
 }
-
-// ── Guests ────────────────────────────────────────────────────────────────────
 
 /** Server-only auth state of a guest; never send to the client. */
 export type GuestAuthCredentials = {
@@ -283,8 +280,6 @@ export interface GuestsRepository {
   ): Promise<{ created: number }>;
 }
 
-// ── Locations ─────────────────────────────────────────────────────────────────
-
 /** A location paired with whether it is assigned to a given event. */
 export type EventLocationRow = {
   id: string;
@@ -369,8 +364,6 @@ export interface LocationsRepository {
   move(id: string, direction: "up" | "down"): Promise<boolean>;
 }
 
-// ── Sessions ──────────────────────────────────────────────────────────────────
-
 export type SessionUpdateInput = Partial<
   Omit<SessionCreateInput, "hostIds" | "locationIds">
 > & {
@@ -433,51 +426,6 @@ export interface SessionsRepository {
   ): Promise<{ id: string; title: string } | undefined>;
 }
 
-// ── Session reminders ─────────────────────────────────────────────────────────
-
-export type ReminderKind = "headsUp" | "followUp";
-
-export type ReminderKey = {
-  sessionId: string;
-  guestId: string;
-  kind: ReminderKind;
-};
-
-/** One (session, host, kind) the dispatcher may owe a reminder for. */
-export type DueReminderCandidate = ReminderKey & {
-  dueTime: Date;
-
-  sessionTitle: string;
-  sessionStartTime: Date;
-  sessionEndTime: Date;
-  sessionLocationNames: string[];
-  /**
-   * Whether a count is already recorded — a flag, not the number. Suppressing
-   * the follow-up (FR-011) is the dispatcher's decision; the value itself is
-   * host-only and stays inside db/.
-   */
-  hasRecordedCount: boolean;
-
-  eventSlug: string;
-  eventTimezone: string;
-
-  /**
-   * Null when the host has no address on file. That skips the mail only — the
-   * in-app notification still goes out and a row is still written.
-   */
-  guestEmail: string | null;
-  /**
-   * The EmailSettings key for *this* kind — `sessionHeadsUp` or
-   * `attendeeCountReminder` — which gates the **email** alone (FR-017). It has
-   * no bearing on the notification.
-   */
-  reminderOptIn: boolean;
-
-  storedDueTime: Date | null;
-  storedClaimedAt: Date | null;
-  storedNotifiedAt: Date | null;
-};
-
 export interface RemindersRepository {
   /**
    * Every (scheduled session with hosts × host × kind) whose reminder could
@@ -536,8 +484,6 @@ export interface RemindersRepository {
   ): Promise<{ abandoned: boolean }>;
 }
 
-// ── RSVPs ─────────────────────────────────────────────────────────────────────
-
 export interface RsvpsRepository {
   listByGuest(guestId: string): Promise<Rsvp[]>;
   listBySession(sessionId: string): Promise<Rsvp[]>;
@@ -559,8 +505,6 @@ export interface RsvpsRepository {
   }): Promise<Rsvp | null>;
   deleteBySessionAndGuest(sessionId: string, guestId: string): Promise<void>;
 }
-
-// ── Session Proposals ─────────────────────────────────────────────────────────
 
 export type SessionProposalCreateInput = {
   eventId: string;
@@ -615,8 +559,6 @@ export interface SessionProposalsRepository {
   delete(id: string): Promise<void>;
 }
 
-// ── Comments ──────────────────────────────────────────────────────────────────
-
 /**
  * Scope-agnostic comment operations. A comment is attached to exactly one
  * subject — a session proposal, a scheduled session or a guest's profile —
@@ -662,8 +604,6 @@ export interface SubjectCommentsRepository {
   }): Promise<Comment>;
 }
 
-// ── Votes ─────────────────────────────────────────────────────────────────────
-
 export interface VotesRepository {
   listByGuestAndEvent(guestId: string, eventId: string): Promise<Vote[]>;
   create(data: {
@@ -683,8 +623,6 @@ export interface VotesRepository {
     guestIds: string[]
   ): Promise<void>;
 }
-
-// ── Meetings ───────────────────────────────────────────────────────────────────
 
 export interface MeetingPointsRepository {
   /** An event's suggested places to meet, in the organizer's order. */
@@ -798,28 +736,6 @@ export interface MeetingsRepository {
   ): Promise<Meeting | undefined>;
 }
 
-// ── Notifications ──────────────────────────────────────────────────────────────
-
-/**
- * What happened, as one of the guest's email-setting keys. The two channels
- * share a taxonomy: the setting decides whether mail goes out, never whether
- * the in-app notification is recorded.
- */
-export type NotificationType = keyof EmailSettings;
-
-export type Notification = {
-  id: string;
-  guestId: string;
-  type: NotificationType;
-  /** One line, in the past tense: "Anna commented on your session". */
-  text: string;
-  /** Site-relative path to whatever happened, e.g. `/eventslug?viewSession=x`. */
-  url: string;
-  createdAt: Date;
-  /** Unset while unread. */
-  readAt?: Date;
-};
-
 export interface NotificationsRepository {
   /** One notification, iff it belongs to `guestId`. */
   findForGuest(guestId: string, id: string): Promise<Notification | undefined>;
@@ -849,8 +765,6 @@ export interface NotificationsRepository {
   /** @see {@link markManyRead} for how ids not the guest's are treated. */
   deleteMany(guestId: string, ids: string[]): Promise<void>;
 }
-
-// ── Push notifications ────────────────────────────────────────────────────────
 
 /**
  * One browser that has agreed to be notified. `endpoint` is the push service's
@@ -885,14 +799,4 @@ export interface PushRepository {
    * already handed out, and nothing tells a browser to ask for a new one.
    */
   vapidKeys(generate: () => VapidKeys, now: Date): Promise<VapidKeys>;
-}
-
-// ── Images ─────────────────────────────────────────────────────────────────────
-
-export interface ImageResourceRepository<Id> {
-  validate(
-    buffer: Buffer
-  ): Promise<{ buffer: Buffer; ext: string } | { error: string }>;
-  save(id: Id, buffer: Buffer, ext: string): Promise<string>;
-  delete(id: Id): Promise<void>;
 }
