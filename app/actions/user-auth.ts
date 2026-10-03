@@ -1,7 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { z } from "zod";
+import { newPasswordSchema } from "@schellingboard/contracts/auth";
 import { getRepositories } from "@/db/container";
 import type { AuthCode, AuthCodePurpose } from "@schellingboard/domain/auth";
 import {
@@ -51,11 +51,6 @@ export type SelectUserResult =
   // needsAuth: the guest is protected and the caller must present a
   // password or emailed code (loginAsGuestAction) instead.
   | { ok: false; needsAuth?: boolean; error: string };
-
-const newPasswordSchema = z
-  .string()
-  .min(8, { message: "Use at least 8 characters" })
-  .max(200);
 
 async function setAuthenticatedIdentity(guestId: string): Promise<void> {
   const cookieStore = await cookies();

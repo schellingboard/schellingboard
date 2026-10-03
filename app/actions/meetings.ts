@@ -22,6 +22,16 @@ import {
 import { inSchedPhase } from "@/app/(site)/utils/events";
 import type { MeetingStatus } from "@schellingboard/domain/meeting";
 import type { Event } from "@schellingboard/domain/event";
+import {
+  meetingAvailabilitySchema,
+  meetingCancelSchema,
+  meetingRequestSchema,
+  meetingRespondSchema,
+} from "@schellingboard/contracts/meeting";
+
+// A "use server" export is a public endpoint behind site auth, so each
+// action's parameter type is advisory: the payload is parsed against its
+// contract, and a malformed one comes back as a result instead of throwing.
 
 export type MeetingActionResult = { ok: true } | { ok: false; error: string };
 
@@ -31,36 +41,6 @@ function closedReason(event: Event, now: Date): string | null {
   if (!event.meetingsEnabled) return "1-on-1s are not enabled for this event";
   return inSchedPhase(event, now) ? null : NOT_OPEN;
 }
-
-// A "use server" export is a public endpoint behind site auth, so the types
-// these schemas describe are advisory: every payload is parsed rather than
-// trusted, and a malformed one comes back as a result instead of throwing.
-//
-// The lengths are the only bound on two free-text fields that are stored
-// verbatim and shown to the recipient; they are generous rather than tuned.
-const requestSchema = z.object({
-  eventId: z.string(),
-  recipientId: z.string(),
-  slotStart: z.string(),
-  slotCount: z.number().int().min(1).default(1),
-  meetingPoint: z.string().max(200),
-  message: z.string().max(2000).optional(),
-});
-
-const respondSchema = z.object({
-  meetingId: z.string(),
-  response: z.enum(["accept", "decline"]),
-});
-
-const cancelSchema = z.object({
-  meetingId: z.string(),
-  note: z.string().max(2000).optional(),
-});
-
-const availabilitySchema = z.object({
-  eventId: z.string(),
-  slotStarts: z.array(z.string()),
-});
 
 /**
  * Every slot start the event offers, as ISO strings. Deliberately not
@@ -79,11 +59,11 @@ async function eventSlotStarts(event: Event): Promise<Set<string>> {
 }
 
 export async function requestMeetingAction(
-  raw: z.input<typeof requestSchema>
+  raw: z.input<typeof meetingRequestSchema>
 ): Promise<MeetingActionResult> {
   await requireSiteAuth();
 
-  const parsed = requestSchema.safeParse(raw);
+  const parsed = meetingRequestSchema.safeParse(raw);
   if (!parsed.success) return { ok: false, error: "Invalid request" };
   const input = parsed.data;
 
@@ -197,11 +177,11 @@ export async function requestMeetingAction(
  * change plus telling the requester.
  */
 export async function respondToMeetingAction(
-  raw: z.input<typeof respondSchema>
+  raw: z.input<typeof meetingRespondSchema>
 ): Promise<MeetingActionResult> {
   await requireSiteAuth();
 
-  const parsed = respondSchema.safeParse(raw);
+  const parsed = meetingRespondSchema.safeParse(raw);
   if (!parsed.success) return { ok: false, error: "Invalid request" };
   const input = parsed.data;
 
@@ -257,11 +237,11 @@ export async function respondToMeetingAction(
  * — and being told "canceled" where they had declined would misdescribe it.
  */
 export async function cancelMeetingAction(
-  raw: z.input<typeof cancelSchema>
+  raw: z.input<typeof meetingCancelSchema>
 ): Promise<MeetingActionResult> {
   await requireSiteAuth();
 
-  const parsed = cancelSchema.safeParse(raw);
+  const parsed = meetingCancelSchema.safeParse(raw);
   if (!parsed.success) return { ok: false, error: "Invalid request" };
   const input = parsed.data;
 
@@ -324,11 +304,11 @@ export async function cancelMeetingAction(
 }
 
 export async function saveMeetingAvailabilityAction(
-  raw: z.input<typeof availabilitySchema>
+  raw: z.input<typeof meetingAvailabilitySchema>
 ): Promise<MeetingActionResult> {
   await requireSiteAuth();
 
-  const parsed = availabilitySchema.safeParse(raw);
+  const parsed = meetingAvailabilitySchema.safeParse(raw);
   if (!parsed.success) return { ok: false, error: "Invalid request" };
   const input = parsed.data;
 
