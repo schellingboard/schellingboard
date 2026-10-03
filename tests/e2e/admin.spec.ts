@@ -1416,6 +1416,12 @@ test.describe("Admin UI sessions", () => {
     await sessions.getByLabel("Title *").fill(title);
     await sessions.getByLabel("Blocker").check();
 
+    const rooms = sessions.getByRole("group", { name: "Locations" });
+    await rooms.getByRole("checkbox", { name: "All locations" }).check();
+    for (const box of await rooms.getByRole("checkbox").all()) {
+      await expect(box).toBeChecked();
+    }
+
     // Pick a host through the searchable multi-select (opens on focus).
     await sessions.getByLabel("Hosts").click();
     await page.keyboard.type("Alice");
@@ -1437,6 +1443,7 @@ test.describe("Admin UI sessions", () => {
     await expect(row).toContainText("blocker");
     await expect(row).toContainText("admin-managed");
     await expect(row).toContainText("Alice Test");
+    await expect(row).not.toContainText("· —");
 
     // Clean up so the shared seed stays stable for other tests.
     await row.getByRole("button", { name: /^Delete/ }).click();

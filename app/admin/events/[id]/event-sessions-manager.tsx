@@ -15,6 +15,7 @@ import {
   DANGER_BUTTON,
 } from "@/app/admin/buttons";
 import { DataTable } from "../../data-table";
+import { RoomCheckboxes } from "@/app/admin/room-checkboxes";
 import { ActionError } from "@/app/components/action-error";
 import { SelectHosts } from "@/app/select-hosts";
 import {
@@ -294,11 +295,6 @@ function SessionForm({
       ? DateTime.fromISO(start).plus({ minutes: breakMinutes })
       : null;
 
-  const toggleLocation = (id: string) =>
-    setLocationIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const input = toActionInput(
@@ -485,30 +481,18 @@ function SessionForm({
           />
         )}
       </div>
-      <fieldset className="flex flex-col gap-1">
-        <legend className="text-sm text-fg-muted">Locations</legend>
-        {locationCandidates.length === 0 ? (
-          <p className="text-sm text-fg-subtle">
-            No locations assigned to this event yet.
-          </p>
-        ) : (
-          locationCandidates.map((l) => (
-            <label
-              key={l.id}
-              className="flex items-center gap-2 text-sm text-fg-muted"
-            >
-              <input
-                type="checkbox"
-                checked={locationIds.includes(l.id)}
-                onChange={() => toggleLocation(l.id)}
-                aria-label={`Location ${l.name}`}
-                className="h-4 w-4 cursor-pointer"
-              />
-              {l.name}
-            </label>
-          ))
-        )}
-      </fieldset>
+      {locationCandidates.length === 0 ? (
+        <p className="text-sm text-fg-subtle">
+          No locations assigned to this event yet.
+        </p>
+      ) : (
+        <RoomCheckboxes
+          legend="Locations"
+          rooms={locationCandidates}
+          selectedIds={locationIds}
+          onChange={setLocationIds}
+        />
+      )}
       <ActionError message={error} />
       <div className="flex gap-2">
         <button type="submit" disabled={isPending} className={PRIMARY_BUTTON}>
