@@ -5,8 +5,8 @@ import {
   voteChoiceRank,
   voteCount,
   VOTE_CHOICES,
-  VoteChoice,
 } from "@/app/(site)/votes";
+import { VoteChoice } from "@schellingboard/domain/vote";
 
 describe("voteChoiceToEmoji", () => {
   it("interested → ❤️", () =>

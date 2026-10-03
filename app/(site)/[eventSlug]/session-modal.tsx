@@ -3,7 +3,7 @@
 import { useEffect, useContext, useState } from "react";
 
 import { ModalCloseButton } from "@/app/components/modal-close-button";
-import type { Rsvp } from "@/db/repositories/interfaces";
+import type { Rsvp } from "@schellingboard/domain/session";
 import { EventContext } from "../context";
 import { ViewSession } from "./view-session/view-session";
 import { dismissViewSession } from "./modal-nav";

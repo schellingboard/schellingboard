@@ -1,12 +1,12 @@
 import clsx from "clsx";
 
 import {
-  VoteChoice,
   voteChoiceToEmoji,
   voteChoiceToLabel,
   voteCount,
   type ProposalVoteCounts,
 } from "@/app/(site)/votes";
+import { VoteChoice } from "@schellingboard/domain/vote";
 
 // Skip votes are left out on purpose: this is the public tally, and it reads as
 // interest in a proposal rather than as a scoreboard for it. The full split is

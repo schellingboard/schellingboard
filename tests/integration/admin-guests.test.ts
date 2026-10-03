@@ -40,7 +40,7 @@ import { getRepositories } from "@/db/container";
 import { createAdminAuthCookie } from "@/utils/auth";
 import { testEmail } from "@/emails/test-email";
 import { sendMail } from "@/utils/mailer";
-import { VoteChoice } from "@/db/repositories/interfaces";
+import { VoteChoice } from "@schellingboard/domain/vote";
 import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
 import {
   createGuestAction,

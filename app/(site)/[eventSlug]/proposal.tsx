@@ -2,7 +2,7 @@
 
 import type { ComponentProps } from "react";
 import Link from "next/link";
-import type { SessionProposal } from "@/db/repositories/interfaces";
+import type { SessionProposal } from "@schellingboard/domain/session";
 import { formatDuration, durationMinusBreak } from "@/utils/utils";
 import { useBreakMinutes } from "@/app/(site)/context";
 import { Markdown } from "@/app/(site)/markdown";

@@ -34,7 +34,7 @@ import {
   createSession,
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { VoteChoice } from "@/db/repositories/interfaces";
+import { VoteChoice } from "@schellingboard/domain/vote";
 import type { SessionParams } from "@/app/api/session-form-utils";
 import { POST as addVote } from "@/app/api/add-vote/route";
 import { POST as addSession } from "@/app/api/add-session/route";

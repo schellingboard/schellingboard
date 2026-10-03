@@ -1,5 +1,5 @@
 import { getRepositories } from "@/db/container";
-import { VoteChoice } from "@/app/(site)/votes";
+import { VoteChoice } from "@schellingboard/domain/vote";
 import { inVotingPhase } from "@/app/(site)/utils/events";
 import { requestNow } from "@/utils/dev-clock";
 import {

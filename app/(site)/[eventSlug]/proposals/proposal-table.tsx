@@ -18,7 +18,7 @@ import {
 import HoverTooltip from "@/app/(site)/hover-tooltip";
 import { SearchInput } from "@/app/search-input";
 import { EventContext, UserContext, VotesContext } from "@/app/(site)/context";
-import type { SessionProposal } from "@/db/repositories/interfaces";
+import type { SessionProposal } from "@schellingboard/domain/session";
 import {
   inSchedPhase,
   inVotingPhase,

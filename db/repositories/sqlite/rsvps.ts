@@ -2,7 +2,8 @@ import { and, eq, inArray } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
 import * as schema from "../../schema";
-import type { Rsvp, RsvpsRepository } from "../interfaces";
+import type { RsvpsRepository } from "../interfaces";
+import type { Rsvp } from "@schellingboard/domain/session";
 
 type DB = BetterSQLite3Database<typeof schema>;
 

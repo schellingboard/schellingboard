@@ -22,7 +22,7 @@ import {
   readManifest,
 } from "@/scripts/release-dumps";
 import { getRepositories } from "@/db/container";
-import { VoteChoice } from "@/db/repositories/interfaces";
+import { VoteChoice } from "@schellingboard/domain/vote";
 
 const dumps = listReleaseDumps();
 const manifest = readManifest();

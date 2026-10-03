@@ -8,8 +8,7 @@ import {
   useContext,
 } from "react";
 import { usePathname } from "next/navigation";
-import type { Rsvp } from "@/db/repositories/interfaces";
-import type { Session } from "@schellingboard/domain/session";
+import type { Rsvp, Session } from "@schellingboard/domain/session";
 import type {
   Location,
   LocationUnavailability,
@@ -17,11 +16,11 @@ import type {
 import type { Guest } from "@schellingboard/domain/guest";
 import type { Event, Day } from "@schellingboard/domain/event";
 import {
-  Vote,
   voteChoiceToEmoji,
   voteChoiceToLabel,
   NO_VOTE_LABEL,
 } from "@/app/(site)/votes";
+import type { Vote } from "@schellingboard/domain/vote";
 import {
   currentVerifiedUserAction,
   selectUserAction,

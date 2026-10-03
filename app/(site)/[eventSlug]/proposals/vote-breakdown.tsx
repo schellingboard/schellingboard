@@ -5,11 +5,11 @@ import { useContext, useId } from "react";
 import { EventContext } from "@/app/(site)/context";
 import {
   VOTE_CHOICES,
-  VoteChoice,
   voteChoiceToEmoji,
   voteChoiceToLabel,
 } from "@/app/(site)/votes";
-import type { SessionProposal } from "@/db/repositories/interfaces";
+import { VoteChoice } from "@schellingboard/domain/vote";
+import type { SessionProposal } from "@schellingboard/domain/session";
 import {
   MIN_TURNOUT_PCT_FOR_ESTIMATE,
   proposalVoteStats,

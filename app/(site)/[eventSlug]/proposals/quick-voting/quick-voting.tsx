@@ -3,8 +3,8 @@ import { useContext } from "react";
 
 import { BackLink } from "@/app/components/back-link";
 import { Proposal } from "@/app/(site)/[eventSlug]/proposal";
-import { Vote } from "@/app/(site)/votes";
-import type { SessionProposal } from "@/db/repositories/interfaces";
+import type { Vote } from "@schellingboard/domain/vote";
+import type { SessionProposal } from "@schellingboard/domain/session";
 import { VotingButtons } from "@/app/(site)/[eventSlug]/proposals/voting-buttons";
 import { VotesContext } from "@/app/(site)/context";
 import { CommentsSection } from "@/app/(site)/[eventSlug]/comments-section";

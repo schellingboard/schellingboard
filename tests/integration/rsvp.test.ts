@@ -5,7 +5,7 @@ import { NextRequest } from "next/server";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import type { Rsvp } from "@/db/repositories/interfaces";
+import type { Rsvp } from "@schellingboard/domain/session";
 import { POST as toggleRsvp } from "@/app/api/toggle-rsvp/route";
 import { GET as getRsvps } from "@/app/api/rsvps/route";
 

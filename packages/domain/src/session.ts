@@ -24,6 +24,12 @@ export type Session = {
   numRsvps: number;
 };
 
+export type Rsvp = {
+  id: string;
+  sessionId: string;
+  guestId: string;
+};
+
 export type SessionCreateInput = {
   title: string;
   description: string;
@@ -37,4 +43,25 @@ export type SessionCreateInput = {
   eventId: string;
   hostIds: string[];
   locationIds: string[];
+};
+
+export type ProposalHost = Pick<Guest, "id" | "name">;
+
+export type SessionProposal = {
+  id: string;
+  eventId: string;
+  title: string;
+  description?: string;
+  durationMinutes?: number;
+  createdTime: Date;
+  updatedTime: Date;
+  hosts: ProposalHost[];
+  /** Only ever true while there are hosts: with none, a host is wanted anyway. */
+  cohostWanted: boolean;
+  cohostWantedNote?: string;
+  votesCount: number;
+  interestedVotesCount: number;
+  maybeVotesCount: number;
+  skipVotesCount: number;
+  sessionIds: string[];
 };

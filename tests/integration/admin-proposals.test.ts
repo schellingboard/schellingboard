@@ -33,7 +33,7 @@ import {
   createSession,
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { VoteChoice } from "@/db/repositories/interfaces";
+import { VoteChoice } from "@schellingboard/domain/vote";
 import { createAdminAuthCookie } from "@/utils/auth";
 import { STALE_PROPOSAL_MESSAGE } from "@schellingboard/contracts/session";
 import {

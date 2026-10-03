@@ -1,4 +1,7 @@
+import type { VoteChoice, Vote } from "@schellingboard/domain/vote";
 import type {
+  Rsvp,
+  SessionProposal,
   Session,
   SessionCreateInput,
 } from "@schellingboard/domain/session";
@@ -22,14 +25,6 @@ import type {
   EventMeetingSettings,
   Day,
 } from "@schellingboard/domain/event";
-
-// ── Shared enums ─────────────────────────────────────────────────────────────
-
-export enum VoteChoice {
-  interested = "interested",
-  maybe = "maybe",
-  skip = "skip",
-}
 
 // ── Site settings ────────────────────────────────────────────────────────────
 
@@ -537,12 +532,6 @@ export interface RemindersRepository {
 
 // ── RSVPs ─────────────────────────────────────────────────────────────────────
 
-export type Rsvp = {
-  id: string;
-  sessionId: string;
-  guestId: string;
-};
-
 export interface RsvpsRepository {
   listByGuest(guestId: string): Promise<Rsvp[]>;
   listBySession(sessionId: string): Promise<Rsvp[]>;
@@ -566,27 +555,6 @@ export interface RsvpsRepository {
 }
 
 // ── Session Proposals ─────────────────────────────────────────────────────────
-
-export type ProposalHost = Pick<Guest, "id" | "name">;
-
-export type SessionProposal = {
-  id: string;
-  eventId: string;
-  title: string;
-  description?: string;
-  durationMinutes?: number;
-  createdTime: Date;
-  updatedTime: Date;
-  hosts: ProposalHost[];
-  /** Only ever true while there are hosts: with none, a host is wanted anyway. */
-  cohostWanted: boolean;
-  cohostWantedNote?: string;
-  votesCount: number;
-  interestedVotesCount: number;
-  maybeVotesCount: number;
-  skipVotesCount: number;
-  sessionIds: string[];
-};
 
 export type SessionProposalCreateInput = {
   eventId: string;
@@ -704,13 +672,6 @@ export interface SubjectCommentsRepository {
 }
 
 // ── Votes ─────────────────────────────────────────────────────────────────────
-
-export type Vote = {
-  id: string;
-  proposalId: string;
-  guestId: string;
-  choice: VoteChoice;
-};
 
 export interface VotesRepository {
   listByGuestAndEvent(guestId: string, eventId: string): Promise<Vote[]>;

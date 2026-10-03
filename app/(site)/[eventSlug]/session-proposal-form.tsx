@@ -10,7 +10,10 @@ import {
   updateProposal,
   deleteProposal,
 } from "./proposals/actions";
-import type { SessionProposal } from "@/db/repositories/interfaces";
+import {
+  type SessionProposal,
+  COHOST_WANTED_NOTE_MAX,
+} from "@schellingboard/domain/session";
 import type { Guest } from "@schellingboard/domain/guest";
 import { SelectHosts } from "@/app/select-hosts";
 import { ConfirmDeletionModal } from "../modals";
@@ -20,7 +23,6 @@ import { MarkdownHint } from "@/app/(site)/markdown";
 import { ScheduledSessionsNotice } from "./scheduled-sessions-notice";
 import { useController, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { COHOST_WANTED_NOTE_MAX } from "@schellingboard/domain/session";
 import { sessionProposalSchema } from "@schellingboard/contracts/session";
 import { z } from "zod";
 import { BackLink } from "@/app/components/back-link";

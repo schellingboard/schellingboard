@@ -11,7 +11,7 @@ import { resolveDbPath, runMigrations } from "@/db/migrate";
 import { eventNameToSlug } from "@/utils/utils";
 import { meetingSlotsForDay } from "@/utils/meeting-slots";
 import { uploadsDir } from "@/utils/uploads-dir";
-import { VoteChoice } from "@/db/repositories/interfaces";
+import { VoteChoice } from "@schellingboard/domain/vote";
 import { hashUserPassword } from "@/utils/user-credentials";
 import { createSeededRandom } from "./random";
 import { generateBulkGuests, generateBulkProposals } from "./bulk";

@@ -1,8 +1,5 @@
-export { VoteChoice } from "@/db/repositories/interfaces";
-export type { Vote } from "@/db/repositories/interfaces";
-
-import { VoteChoice } from "@/db/repositories/interfaces";
-import type { SessionProposal } from "@/db/repositories/interfaces";
+import { VoteChoice } from "@schellingboard/domain/vote";
+import type { SessionProposal } from "@schellingboard/domain/session";
 
 // Strongest interest first: this is both the order the vote buttons appear in
 // and the order the proposal list sorts by "Your vote".

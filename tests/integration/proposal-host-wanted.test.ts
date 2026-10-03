@@ -54,7 +54,7 @@ import {
   joinProposal,
   updateProposal,
 } from "@/app/(site)/[eventSlug]/proposals/actions";
-import { VoteChoice } from "@/db/repositories/interfaces";
+import { VoteChoice } from "@schellingboard/domain/vote";
 import { sendMail } from "@/utils/mailer";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";

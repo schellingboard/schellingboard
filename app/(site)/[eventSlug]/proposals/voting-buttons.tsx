@@ -1,12 +1,11 @@
 import { useContext } from "react";
 import clsx from "clsx";
 import {
-  VoteChoice,
   VOTE_CHOICES,
   voteChoiceToEmoji,
   voteChoiceToLabel,
-  type Vote,
 } from "@/app/(site)/votes";
+import { VoteChoice, type Vote } from "@schellingboard/domain/vote";
 import HoverTooltip from "@/app/(site)/hover-tooltip";
 import { UserContext, VotesContext } from "@/app/(site)/context";
 

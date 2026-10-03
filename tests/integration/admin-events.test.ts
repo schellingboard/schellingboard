@@ -35,7 +35,7 @@ import {
   createSession,
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { VoteChoice } from "@/db/repositories/interfaces";
+import { VoteChoice } from "@schellingboard/domain/vote";
 import { createAdminAuthCookie } from "@/utils/auth";
 import {
   createEventAction,

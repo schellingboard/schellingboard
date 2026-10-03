@@ -53,7 +53,7 @@ import {
   openGuestValue,
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
-import { VoteChoice } from "@/db/repositories/interfaces";
+import { VoteChoice } from "@schellingboard/domain/vote";
 import { deleteProposal } from "@/app/(site)/[eventSlug]/proposals/actions";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";

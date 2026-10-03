@@ -1,4 +1,4 @@
-import type { SessionProposal } from "@/db/repositories/interfaces";
+import type { SessionProposal } from "@schellingboard/domain/session";
 
 export function wantsHost(
   proposal: Pick<SessionProposal, "hosts" | "cohostWanted">

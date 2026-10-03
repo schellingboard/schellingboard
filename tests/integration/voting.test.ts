@@ -4,7 +4,7 @@ import { NextRequest } from "next/server";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest, createProposal } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { VoteChoice, type Vote } from "@/db/repositories/interfaces";
+import { VoteChoice, type Vote } from "@schellingboard/domain/vote";
 import { POST as addVote } from "@/app/api/add-vote/route";
 import { POST as deleteVote } from "@/app/api/delete-vote/route";
 import { GET as getVotes } from "@/app/api/votes/route";

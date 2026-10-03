@@ -44,7 +44,7 @@ import {
   updateProposal,
 } from "@/app/(site)/[eventSlug]/proposals/actions";
 import { TIME_OFFSET_COOKIE } from "@/utils/dev-clock";
-import { VoteChoice } from "@/db/repositories/interfaces";
+import { VoteChoice } from "@schellingboard/domain/vote";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
