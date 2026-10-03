@@ -15,7 +15,6 @@ interface VotingButtonsProps {
   votingEnabled: boolean;
   votingDisabledText: string;
   large?: boolean;
-  onVote?: (proposalId: string, choice: VoteChoice) => Promise<boolean>;
 }
 
 export function VotingButtons({
@@ -23,7 +22,6 @@ export function VotingButtons({
   votingEnabled,
   votingDisabledText,
   large = false,
-  onVote,
 }: VotingButtonsProps) {
   const { user: currentUserId } = useContext(UserContext);
   const { votes, addVote, removeVote, updateVote } = useContext(VotesContext);
@@ -32,12 +30,6 @@ export function VotingButtons({
   async function vote(proposalId: string, choice: VoteChoice) {
     if (!votingEnabled || !currentUserId) {
       return;
-    }
-
-    // If custom vote handler is provided, use it. This is needed for quick voting.
-    // TODO: quite ugly, should be refactored
-    if (onVote) {
-      return onVote(proposalId, choice);
     }
 
     const existingVote = votes.find(

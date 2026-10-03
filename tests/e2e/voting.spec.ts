@@ -82,8 +82,8 @@ test("should navigate to quick voting and allow voting on proposals @005-US2", a
 
   await interestedButton.click();
 
-  // The counter is this page's own state, updated optimistically — so it
-  // counts up by exactly one even when another worker votes as Bob too.
+  // The counter is updated optimistically from the votes loaded with the page
+  // — so it counts up by exactly one even when another worker votes as Bob too.
   await expect(progress).toHaveText(
     new RegExp(`You have voted on ${before + 1} / `)
   );
@@ -110,6 +110,31 @@ test("shows a proposal's comments read-only while quick voting @005-US2", async 
   ).toBeVisible();
   await expect(page.getByPlaceholder("Add a comment")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Reply" })).toHaveCount(0);
+});
+
+test("opens the full proposal from Quick Voting and returns to the same place @005-US2", async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto("/Conference-Beta/proposals");
+  await selectUser(page, "Dmitri Volkov");
+  await page.getByRole("link", { name: /Go to Quick Voting!/i }).click();
+
+  // Voting first: coming back must not offer the proposal just voted on again.
+  const title = page.getByRole("main").getByRole("heading", { level: 1 });
+  const voted = await title.textContent();
+  await page.getByRole("button", { name: /❤️ Interested/i }).click();
+  await expect(title).not.toHaveText(voted ?? "");
+  const current = (await title.textContent()) ?? "";
+
+  await title.getByRole("link", { name: current }).click();
+  const modal = page.getByRole("dialog", { name: "Proposal details" });
+  await expect(modal.getByRole("heading", { name: current })).toBeVisible();
+  await expect(modal.getByPlaceholder("Add a comment")).toBeVisible();
+
+  await modal.getByRole("button", { name: "Close" }).click();
+  await expect(page).toHaveURL(/\/Conference-Beta\/proposals\/quick-voting$/);
+  await expect(title).toHaveText(current);
 });
 
 test("votes from two users persist independently across reloads @005-US1", async ({
