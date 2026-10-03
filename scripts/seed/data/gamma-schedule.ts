@@ -155,9 +155,9 @@ export const gammaSessionConfigs: GammaSessionConfig[] = [
     hostNames: ["Min-jun Kim"],
     capacity: 15,
   },
-  // Placed by an organizer in the tail after bookings close (17:30), where no
-  // host could have booked it — but left to its host rather than marked
-  // admin-managed. tests/e2e/update-session.spec.ts edits it.
+  // Placed by an organizer where no host could have booked it — in the tail
+  // after bookings close (17:30), and in two rooms at once — but left to its
+  // host rather than marked admin-managed. tests/e2e/update-session.spec.ts edits it.
   {
     title: "Evening Wrap-up",
     fromProposal: false,
@@ -166,6 +166,7 @@ export const gammaSessionConfigs: GammaSessionConfig[] = [
     start: [17, 30],
     end: [18, 0],
     location: 0,
+    extraLocations: [5],
     hostNames: ["Charlie Test"],
     capacity: 100,
   },

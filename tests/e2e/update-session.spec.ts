@@ -183,6 +183,10 @@ test("a host can fix a session placed where they could never have booked one @00
   // The slot it already holds is offered, so keeping it is possible at all.
   // Labels carry the 10-minute break, so 17:30 reads as 17:40.
   await expect(listboxButton(page, /^Start Time/)).toContainText("17:40");
+  // So are the two rooms an organizer gave it, which a host can only book one of.
+  await expect(listboxButton(page, /^Location/)).toContainText(
+    "Main Hall, Auditorium"
+  );
 
   const description = `Loose ends ${uniqueSuffix()}`;
   await page.getByRole("textbox").nth(1).fill(description);
@@ -195,4 +199,17 @@ test("a host can fix a session placed where they could never have booked one @00
 
   await page.getByRole("link", { name: "Evening Wrap-up" }).first().click();
   await expect(dialog.getByText(description)).toBeVisible();
+  await expect(dialog.getByText("Auditorium")).toBeVisible();
+
+  // Settling on one of the rooms is the host's to do as well.
+  await dialog.getByRole("link", { name: "Edit" }).click();
+  await listboxButton(page, /^Location/).click();
+  await page.getByRole("option", { name: /^Main Hall\b(?!,)/ }).click();
+  await page.getByRole("button", { name: "Submit" }).click();
+  await page.waitForURL(/\/Conference-Gamma$/);
+  await dismissToast(page);
+
+  await page.getByRole("link", { name: "Evening Wrap-up" }).click();
+  await expect(dialog.getByText("Main Hall")).toBeVisible();
+  await expect(dialog.getByText("Auditorium")).toHaveCount(0);
 });

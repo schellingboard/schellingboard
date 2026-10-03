@@ -60,6 +60,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **Editing a session keeps all its rooms**: a host's edit used to reduce a session that an
+  organizer had put in several rooms to one room.
 - **Session details list every room**: a session held in several rooms showed only one of
   them in its details and on the proposal it was scheduled from.
 - **Admin errors show where you acted**: a rejected save, create or delete now explains why
