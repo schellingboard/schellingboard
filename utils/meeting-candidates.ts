@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 
 import { getRepositories } from "@/db/container";
-import type { MeetingPoint } from "@/db/repositories/interfaces";
+import type { MeetingPoint } from "@schellingboard/domain/meeting";
 import { clashesForInterval, loadGuestSchedules } from "@/utils/guest-clashes";
 import { meetingsOpen } from "@/utils/meeting-rules";
 import {

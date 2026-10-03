@@ -10,7 +10,7 @@ import {
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { meetingViewsFor } from "@/utils/meeting-views";
-import type { Meeting } from "@/db/repositories/interfaces";
+import type { Meeting } from "@schellingboard/domain/meeting";
 import type { Guest } from "@schellingboard/domain/guest";
 import type { Event } from "@schellingboard/domain/event";
 

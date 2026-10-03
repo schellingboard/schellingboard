@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 import { getRepositories } from "@/db/container";
-import type { MeetingStatus } from "@/db/repositories/interfaces";
+import type { MeetingStatus } from "@schellingboard/domain/meeting";
 import { clashesForInterval, loadGuestSchedules } from "@/utils/guest-clashes";
 import { toMeetingClashes } from "@/utils/meeting-clash-text";
 import { slotTimeLabel } from "@/utils/meeting-slots";

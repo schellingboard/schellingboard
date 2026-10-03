@@ -3,12 +3,11 @@ import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
 import * as schema from "../../schema";
 import type {
-  Meeting,
   MeetingCreateInput,
   MeetingRequestOutcome,
-  MeetingStatus,
   MeetingsRepository,
 } from "../interfaces";
+import type { Meeting, MeetingStatus } from "@schellingboard/domain/meeting";
 
 type DB = BetterSQLite3Database<typeof schema>;
 

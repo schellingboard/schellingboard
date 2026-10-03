@@ -11,7 +11,7 @@ import { clashesForInterval, loadGuestSchedules } from "@/utils/guest-clashes";
 import { toMeetingClashes } from "@/utils/meeting-clash-text";
 import type { MeetingClash } from "@/utils/meeting-clash-text";
 import { DateTime } from "luxon";
-import type { MeetingPoint } from "@/db/repositories/interfaces";
+import type { MeetingPoint } from "@schellingboard/domain/meeting";
 import type { Event } from "@schellingboard/domain/event";
 import { meetingsOpen } from "@/utils/meeting-rules";
 

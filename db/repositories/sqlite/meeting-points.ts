@@ -2,7 +2,8 @@ import { asc, eq } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
 import * as schema from "../../schema";
-import type { MeetingPoint, MeetingPointsRepository } from "../interfaces";
+import type { MeetingPointsRepository } from "../interfaces";
+import type { MeetingPoint } from "@schellingboard/domain/meeting";
 
 type DB = BetterSQLite3Database<typeof schema>;
 

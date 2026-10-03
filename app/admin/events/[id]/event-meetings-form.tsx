@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/app/input";
-import type { MeetingPoint } from "@/db/repositories/interfaces";
+import type { MeetingPoint } from "@schellingboard/domain/meeting";
 import type { Event } from "@schellingboard/domain/event";
 import type { AdminActionResult } from "@/app/actions/admin-guests";
 import {

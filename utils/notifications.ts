@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 import { getRepositories } from "@/db/container";
-import type { Meeting } from "@/db/repositories/interfaces";
+import type { Meeting } from "@schellingboard/domain/meeting";
 import type { Comment } from "@schellingboard/domain/comment";
 import type { Session } from "@schellingboard/domain/session";
 import type { EmailSettings } from "@schellingboard/domain/guest";

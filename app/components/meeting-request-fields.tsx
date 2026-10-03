@@ -2,7 +2,7 @@
 
 import { Input } from "@/app/input";
 import { PRIMARY_BUTTON, SECONDARY_BUTTON } from "@/app/components/buttons";
-import type { MeetingPoint } from "@/db/repositories/interfaces";
+import type { MeetingPoint } from "@schellingboard/domain/meeting";
 
 /**
  * The half of a 1-on-1 request that is the same whichever way round it was

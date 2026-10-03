@@ -40,7 +40,7 @@ import {
   cancelMeetingAction,
   respondToMeetingAction,
 } from "@/app/actions/meetings";
-import type { Meeting } from "@/db/repositories/interfaces";
+import type { Meeting } from "@schellingboard/domain/meeting";
 import type { Guest } from "@schellingboard/domain/guest";
 import type { Event } from "@schellingboard/domain/event";
 

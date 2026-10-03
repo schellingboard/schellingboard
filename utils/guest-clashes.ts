@@ -1,5 +1,5 @@
 import { getRepositories } from "@/db/container";
-import type { Meeting } from "@/db/repositories/interfaces";
+import type { Meeting } from "@schellingboard/domain/meeting";
 import type { Session } from "@schellingboard/domain/session";
 import { newEmptySession, sessionsOverlap } from "@/app/(site)/session_utils";
 import { shownSlotStart } from "./meeting-slots";

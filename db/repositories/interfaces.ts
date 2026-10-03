@@ -1,3 +1,8 @@
+import type {
+  MeetingPoint,
+  MeetingStatus,
+  Meeting,
+} from "@schellingboard/domain/meeting";
 import type { Comment } from "@schellingboard/domain/comment";
 import type { VoteChoice, Vote } from "@schellingboard/domain/vote";
 import type {
@@ -681,14 +686,6 @@ export interface VotesRepository {
 
 // ── Meetings ───────────────────────────────────────────────────────────────────
 
-export type MeetingPoint = {
-  id: string;
-  eventId: string;
-  name: string;
-  description: string;
-  sortIndex: number;
-};
-
 export interface MeetingPointsRepository {
   /** An event's suggested places to meet, in the organizer's order. */
   listByEvent(eventId: string): Promise<MeetingPoint[]>;
@@ -726,31 +723,6 @@ export interface MeetingAvailabilityRepository {
    */
   deleteByEvent(eventId: string): Promise<void>;
 }
-
-/**
- * Stored meeting states. "expired" is deliberately absent: a pending request
- * whose slot has passed is expired by definition, and deriving that on read
- * needs no scheduler.
- */
-export type MeetingStatus = "pending" | "accepted" | "declined" | "canceled";
-
-export type Meeting = {
-  id: string;
-  eventId: string;
-  requesterId: string;
-  recipientId: string;
-  /** ISO instants; the slot the requester picked. */
-  slotStart: Date;
-  slotEnd: Date;
-  /** Where to meet, as agreed at request time. Never empty. */
-  meetingPoint: string;
-  message: string;
-  /** What the canceller said, if anything. Empty on a meeting still standing. */
-  cancelNote: string;
-  status: MeetingStatus;
-  createdAt: Date;
-  respondedAt?: Date;
-};
 
 export type MeetingRequestOutcome =
   { meeting: Meeting } | { refused: "cap" | "duplicate" };
