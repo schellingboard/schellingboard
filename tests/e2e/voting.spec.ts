@@ -212,6 +212,9 @@ const HOSTLESS_PROPOSAL = "Ask Me Anything: Migrating a Legacy Monolith";
 async function openGammaProposal(page: Page, title: string) {
   await page.goto("/Conference-Gamma/proposals");
   await page.getByPlaceholder("Search proposals").fill(title);
+  // The search is debounced; a click before it lands hits a row the
+  // re-render then replaces, and the click is lost.
+  await expect(page.getByRole("combobox", { name: "Sort by" })).toBeDisabled();
   await page.getByRole("link", { name: title }).click();
   const modal = page.getByRole("dialog", { name: "Proposal details" });
   await expect(modal).toBeVisible();
