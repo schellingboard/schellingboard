@@ -253,6 +253,7 @@ describe("updateProposal", () => {
 
     const result = await updateProposal(proposal.id, {
       eventSlug: "test-event",
+      expectedUpdatedTime: proposal.updatedTime.toISOString(),
       title: "Updated",
       description: "New description",
       hostIds: [alice.id, bob.id],
@@ -283,6 +284,7 @@ describe("updateProposal", () => {
 
     const result = await updateProposal(proposal.id, {
       eventSlug: "test-event",
+      expectedUpdatedTime: proposal.updatedTime.toISOString(),
       title: proposal.title,
       durationMinutes: undefined,
     });
@@ -315,6 +317,7 @@ describe("updateProposal", () => {
         description: "As written",
         hostIds: [alice.id],
         durationMinutes: 30,
+        expectedUpdatedTime: proposal.updatedTime.toISOString(),
       };
       const updatedTime = async () =>
         (await getRepositories().sessionProposals.findById(proposal.id))!
@@ -391,6 +394,7 @@ describe("updateProposal", () => {
 
     const result = await updateProposal(proposal.id, {
       eventSlug: "test-event",
+      expectedUpdatedTime: proposal.updatedTime.toISOString(),
       title: "",
     });
     expect(errorFields(result)).toEqual(["title"]);
@@ -411,8 +415,27 @@ describe("updateProposal", () => {
 
     const result = await updateProposal(proposal.id, {
       eventSlug: "test-event",
+      expectedUpdatedTime: proposal.updatedTime.toISOString(),
     } as never);
     expect(errorFields(result)).toEqual(["title"]);
+
+    const after = await getRepositories().sessionProposals.findById(
+      proposal.id
+    );
+    expect(after?.title).toBe("Keep Me");
+  });
+
+  it("rejects a save that does not say which version it edits", async () => {
+    const event = await createEvent();
+    const proposal = await createProposalFixture(event.id, [], {
+      title: "Keep Me",
+    });
+
+    const result = await updateProposal(proposal.id, {
+      eventSlug: "test-event",
+      title: "Changed",
+    } as never);
+    expect(errorFields(result)).toEqual(["expectedUpdatedTime"]);
 
     const after = await getRepositories().sessionProposals.findById(
       proposal.id
@@ -429,6 +452,7 @@ describe("updateProposal", () => {
 
     const result = await updateProposal(proposal.id, {
       eventSlug: "test-event",
+      expectedUpdatedTime: proposal.updatedTime.toISOString(),
       title: proposal.title,
       hostIds: [outsider.id],
     });
@@ -451,6 +475,7 @@ describe("updateProposal", () => {
 
     const result = await updateProposal(proposal.id, {
       eventSlug: "test-event",
+      expectedUpdatedTime: proposal.updatedTime.toISOString(),
       title: "Hijacked",
     });
     expect(result).toHaveProperty("error");
@@ -470,6 +495,7 @@ describe("updateProposal", () => {
 
     const result = await updateProposal(proposal.id, {
       eventSlug: "test-event",
+      expectedUpdatedTime: proposal.updatedTime.toISOString(),
       title: "Hijacked",
     });
     expect(result).toHaveProperty("error");
@@ -488,6 +514,7 @@ describe("updateProposal", () => {
 
     const result = await updateProposal(proposal.id, {
       eventSlug: "test-event",
+      expectedUpdatedTime: proposal.updatedTime.toISOString(),
       title: "Claimed by nobody",
     });
     expect(result).toEqual({ success: true });
@@ -509,6 +536,7 @@ describe("updateProposal", () => {
 
     const result = await updateProposal(proposal.id, {
       eventSlug: "test-event",
+      expectedUpdatedTime: proposal.updatedTime.toISOString(),
       title: "Hijacked",
     });
     expect(result).toHaveProperty("error");
@@ -530,6 +558,7 @@ describe("updateProposal", () => {
 
     const result = await updateProposal(proposal.id, {
       eventSlug: "test-event",
+      expectedUpdatedTime: proposal.updatedTime.toISOString(),
       title: "Renamed",
     });
     expect(result).toEqual({ success: true });

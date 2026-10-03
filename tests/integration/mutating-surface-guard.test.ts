@@ -267,6 +267,7 @@ const PROPOSAL_ACTION_VERIFIERS: Record<
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(host.id));
     const result = await updateProposal(proposal.id, {
       eventSlug: "test-event",
+      expectedUpdatedTime: proposal.updatedTime.toISOString(),
       title: "Renamed",
     });
     expect(result).toHaveProperty("error");

@@ -25,6 +25,7 @@ export type ProposalRow = {
   hosts: { id: string; name: string }[];
   votesCount: number;
   sessionCount: number;
+  updatedTime: string;
 };
 
 export type EventGuest = { id: string; name: string };
@@ -49,6 +50,7 @@ function ProposalItem({
     proposal.durationMinutes === null ? "" : String(proposal.durationMinutes)
   );
   const [hosts, setHosts] = useState<EventGuest[]>(proposal.hosts);
+  const [editedVersion, setEditedVersion] = useState(proposal.updatedTime);
   const [isSaving, startSave] = useTransition();
   const [deleteMode, setDeleteMode] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState("");
@@ -68,6 +70,7 @@ function ProposalItem({
       proposal.durationMinutes === null ? "" : String(proposal.durationMinutes)
     );
     setHosts(proposal.hosts);
+    setEditedVersion(proposal.updatedTime);
   };
 
   const handleSave = (e: React.FormEvent) => {
@@ -89,6 +92,7 @@ function ProposalItem({
           description,
           durationMinutes,
           hostIds: hosts.map((h) => h.id),
+          expectedUpdatedTime: editedVersion,
         });
         if (!result.ok) {
           setError(result.error);

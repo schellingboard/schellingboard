@@ -126,6 +126,7 @@ describe("a proposal that wants a host", () => {
         hostIds: [host.id],
         cohostWanted: true,
         cohostWantedNote: "A facilitator",
+        expectedUpdatedTime: proposal.updatedTime.toISOString(),
       });
       expect(await findProposal(proposal.id)).toMatchObject({
         cohostWanted: true,
@@ -138,6 +139,9 @@ describe("a proposal that wants a host", () => {
         hostIds: [host.id],
         cohostWanted: false,
         cohostWantedNote: "A facilitator",
+        expectedUpdatedTime: (
+          await findProposal(proposal.id)
+        ).updatedTime.toISOString(),
       });
       const after = await findProposal(proposal.id);
       expect(after.cohostWanted).toBe(false);
@@ -159,6 +163,7 @@ describe("a proposal that wants a host", () => {
         hostIds: [],
         cohostWanted: true,
         cohostWantedNote: "A facilitator",
+        expectedUpdatedTime: proposal.updatedTime.toISOString(),
       });
 
       const after = await findProposal(proposal.id);
@@ -346,6 +351,53 @@ describe("a proposal that wants a host", () => {
         await getRepositories().notifications.listByGuest(host.id)
       ).toHaveLength(1);
       expect(sendMail).not.toHaveBeenCalled();
+    });
+
+    it("refuses a save from a form the host opened before the volunteer joined", async () => {
+      const event = await createEvent();
+      const host = await createGuest({ name: "Host", eventId: event.id });
+      const volunteer = await createGuest({ name: "Vol", eventId: event.id });
+      const proposal = await createProposalFixture(event.id, [host.id], {
+        cohostWanted: true,
+        // In the past: a join in the same millisecond would leave updatedTime as is.
+        createdTime: new Date("2026-01-01T00:00:00Z"),
+      });
+      actAs(volunteer.id);
+      await joinProposal(proposal.id, "test-event");
+
+      actAs(host.id);
+      const result = await updateProposal(proposal.id, {
+        eventSlug: "test-event",
+        title: "Reworded",
+        hostIds: [host.id],
+        cohostWanted: true,
+        expectedUpdatedTime: proposal.updatedTime.toISOString(),
+      });
+      expect(result).toHaveProperty("error");
+
+      const after = await findProposal(proposal.id);
+      expect(after.title).toBe(proposal.title);
+      expect(after.hosts.map((h) => h.id).sort()).toEqual(
+        [host.id, volunteer.id].sort()
+      );
+      expect(after.cohostWanted).toBe(false);
+    });
+
+    it("accepts a save from a form that is still current", async () => {
+      const event = await createEvent();
+      const host = await createGuest({ name: "Host", eventId: event.id });
+      const proposal = await createProposalFixture(event.id, [host.id]);
+      actAs(host.id);
+
+      const result = await updateProposal(proposal.id, {
+        eventSlug: "test-event",
+        title: "Reworded",
+        hostIds: [host.id],
+        expectedUpdatedTime: proposal.updatedTime.toISOString(),
+      });
+      expect(result).toEqual({ success: true });
+
+      expect((await findProposal(proposal.id)).title).toBe("Reworded");
     });
 
     it("leaves the mark alone when a host of the proposal tries to join it", async () => {

@@ -24,6 +24,13 @@ export const sessionProposalSchema = z.object({
 // the request. The edit form still submits every remaining field, so an update
 // is a full replacement validated exactly like a creation (e.g. title stays
 // required) — there is no partial-update path to model here.
-export const sessionProposalUpdateSchema = sessionProposalSchema.omit({
-  eventId: true,
-});
+export const sessionProposalUpdateSchema = sessionProposalSchema
+  .omit({ eventId: true })
+  .extend({
+    // The proposal's updatedTime when the form loaded it. A full replacement
+    // from an older copy would undo what happened since, such as a co-host joining.
+    expectedUpdatedTime: z.iso.datetime(),
+  });
+
+export const STALE_PROPOSAL_MESSAGE =
+  "Someone changed this proposal while you edited it. Copy your edits somewhere safe: reloading the page discards them.";
