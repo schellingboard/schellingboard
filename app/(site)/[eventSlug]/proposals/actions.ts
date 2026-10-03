@@ -149,6 +149,7 @@ export async function updateProposal(
       description: description || undefined,
       hostIds,
       durationMinutes,
+      updatedTime: await serverNow(),
     });
     revalidatePath(`/${eventSlug}/proposals`);
   } catch (error) {

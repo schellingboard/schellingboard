@@ -281,6 +281,13 @@
       "when": 1790854435376,
       "tag": "0039_location_unavailability",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "6",
+      "when": 1790946961896,
+      "tag": "0040_proposal_updated_time",
+      "breakpoints": true
     }
   ]
 }

@@ -22,6 +22,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Search the schedule**: a search box above the Grid and Agenda views finds sessions by
   title, description, host or room, and your 1-on-1s by name; on the grid, arrows step
   from one match to the next.
+- **Sort proposals by last update** (#778): the proposal list opens with new and freshly
+  edited proposals first, and its Sort by menu now shows on every screen size. Votes and
+  comments don't count as updates.
 - **Filter the schedule to your own sessions**: My sessions, RSVP'd and Hosting narrow the
   Grid and Agenda views to what you are attending or hosting.
 

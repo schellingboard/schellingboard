@@ -355,3 +355,50 @@ test("sorts proposals by title in both directions @004-US5", async ({
   const descending = await titles();
   expect(descending).toEqual([...ascending].reverse());
 });
+
+test("sorts proposals by when they were last updated @004-US5", async ({
+  page,
+}) => {
+  await loginAndGoto(page, "/Conference-Alpha/proposals");
+  await selectUser(page, /Bob Test/i);
+
+  const addProposal = async (title: string) => {
+    await page.getByRole("link", { name: /Add Proposal/i }).click();
+    await page.getByLabel("Title").fill(title);
+    await page.getByRole("button", { name: /Submit/i }).click();
+    await page.waitForURL(/\/Conference-Alpha\/proposals$/);
+  };
+  const suffix = uniqueSuffix();
+  const older = `Edited later ${suffix}`;
+  const newer = `Left alone ${suffix}`;
+  await addProposal(older);
+  await addProposal(newer);
+
+  // Other tests add proposals to this event while this one runs, so compare
+  // the two rows with each other rather than with the top of the list.
+  const rows = page
+    .getByRole("table")
+    .getByRole("row")
+    .filter({ has: page.getByRole("cell") });
+  const positionOf = async (title: string) =>
+    (await rows.allInnerTexts()).findIndex((text) => text.includes(title));
+  const olderComesFirst = async () =>
+    (await positionOf(older)) < (await positionOf(newer));
+
+  await page.getByLabel("Sort by").selectOption({ label: "Recently updated" });
+  await expect(
+    page.getByRole("row", { name: new RegExp(older) })
+  ).toBeVisible();
+  expect(await olderComesFirst()).toBe(false);
+
+  await page
+    .getByRole("row", { name: new RegExp(older) })
+    .getByRole("button", { name: /Edit/i })
+    .click();
+  await page.getByLabel("Description").fill("Now with a description.");
+  await page.getByRole("button", { name: /Submit/i }).click();
+  await page.waitForURL(/\/Conference-Alpha\/proposals$/);
+
+  await page.getByLabel("Sort by").selectOption({ label: "Recently updated" });
+  await expect.poll(olderComesFirst).toBe(true);
+});

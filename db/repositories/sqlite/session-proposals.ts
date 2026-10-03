@@ -119,6 +119,7 @@ export class SqliteSessionProposalsRepository implements SessionProposalsReposit
         description: row.description ?? undefined,
         durationMinutes: row.durationMinutes ?? undefined,
         createdTime: new Date(row.createdTime),
+        updatedTime: new Date(row.updatedTime ?? row.createdTime),
         hosts: hostsByProposal.get(row.id) ?? [],
         votesCount: votes.total,
         interestedVotesCount: votes.interested,
@@ -244,25 +245,43 @@ export class SqliteSessionProposalsRepository implements SessionProposalsReposit
     patch: SessionProposalUpdateInput
   ): Promise<SessionProposal> {
     this.db.transaction((tx) => {
+      const before = tx
+        .select()
+        .from(schema.sessionProposals)
+        .where(eq(schema.sessionProposals.id, id))
+        .get();
+      if (!before) return;
+
       const values: Partial<typeof schema.sessionProposals.$inferInsert> = {};
-      if (patch.title !== undefined) values.title = patch.title;
-      if (patch.description !== undefined)
-        values.description = patch.description ?? null;
-      if ("durationMinutes" in patch)
+      if (patch.title !== undefined && patch.title !== before.title)
+        values.title = patch.title;
+      if (
+        patch.description !== undefined &&
+        patch.description !== before.description
+      )
+        values.description = patch.description;
+      if (
+        "durationMinutes" in patch &&
+        (patch.durationMinutes ?? null) !== before.durationMinutes
+      )
         values.durationMinutes = patch.durationMinutes ?? null;
 
-      if (Object.keys(values).length > 0) {
-        tx.update(schema.sessionProposals)
-          .set(values)
-          .where(eq(schema.sessionProposals.id, id))
-          .run();
-      }
-
+      let hostsChanged = false;
       if (patch.hostIds !== undefined) {
+        const hostsBefore = tx
+          .select({ guestId: schema.proposalHosts.guestId })
+          .from(schema.proposalHosts)
+          .where(eq(schema.proposalHosts.proposalId, id))
+          .all()
+          .map((r) => r.guestId);
+        const uniqueHostIds = [...new Set(patch.hostIds)];
+        hostsChanged =
+          uniqueHostIds.length !== hostsBefore.length ||
+          uniqueHostIds.some((guestId) => !hostsBefore.includes(guestId));
+
         tx.delete(schema.proposalHosts)
           .where(eq(schema.proposalHosts.proposalId, id))
           .run();
-        const uniqueHostIds = [...new Set(patch.hostIds)];
         for (const guestId of uniqueHostIds) {
           tx.insert(schema.proposalHosts)
             .values({ proposalId: id, guestId })
@@ -279,6 +298,15 @@ export class SqliteSessionProposalsRepository implements SessionProposalsReposit
             )
             .run();
         }
+      }
+
+      // The forms resubmit every field, so only a real difference counts as
+      // an edit; otherwise opening and saving would reorder "recently updated".
+      if (Object.keys(values).length > 0 || hostsChanged) {
+        tx.update(schema.sessionProposals)
+          .set({ ...values, updatedTime: patch.updatedTime.toISOString() })
+          .where(eq(schema.sessionProposals.id, id))
+          .run();
       }
     });
     return (await this.findById(id))!;

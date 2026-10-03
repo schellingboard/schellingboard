@@ -248,6 +248,9 @@ export const sessionProposals = sqliteTable("session_proposals", {
   description: text("description"),
   durationMinutes: integer("duration_minutes"),
   createdTime: text("created_time").notNull(),
+  // When title, description, duration or hosts last changed; votes and comments
+  // don't count. NULL until the first such edit, and read as createdTime.
+  updatedTime: text("updated_time"),
 });
 
 export const proposalHosts = sqliteTable(
