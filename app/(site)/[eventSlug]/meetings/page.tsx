@@ -14,12 +14,10 @@ import { MeetingsProvider } from "../use-meetings";
 export const dynamic = "force-dynamic";
 
 /**
- * Where a meeting notification lands. Availability is set under Settings, so
- * all that is left here is opening the one meeting -- and even that is handed
- * to the schedule once there is one, where the meeting sits in its slot next
- * to whatever it clashes with. Before the scheduling phase the schedule
- * redirects to the proposals and would lose the meeting on the way, so until
- * then it opens here (#952 is to settle that).
+ * Where a meeting notification lands. During scheduling it hands the meeting
+ * to the schedule, where it sits in its slot next to whatever it clashes with.
+ * Outside it the schedule redirects to the proposals and would lose the
+ * meeting on the way, so it opens here, read-only (#952).
  */
 export default async function MeetingsPage({
   params,
@@ -55,11 +53,11 @@ export default async function MeetingsPage({
   return (
     <>
       <PageNotice backHref={`/${eventSlug}`} backLabel={event.name}>
-        Your 1-on-1s at {event.name} will sit on its schedule once scheduling
-        starts; until then, this is where one opens.
+        1-on-1s at {event.name} can only be answered or canceled during its
+        scheduling phase.
       </PageNotice>
       <MeetingsProvider>
-        <MeetingModalFromUrl />
+        <MeetingModalFromUrl readOnly />
       </MeetingsProvider>
     </>
   );

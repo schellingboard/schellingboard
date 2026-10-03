@@ -37,7 +37,8 @@ vi.mock("next/navigation", () => ({
 // A client component that reads router search params; the page only decides
 // whether to render it.
 vi.mock("@/app/(site)/[eventSlug]/meeting-modal", () => ({
-  MeetingModalFromUrl: () => "MEETING_MODAL_STUB",
+  MeetingModalFromUrl: ({ readOnly }: { readOnly?: boolean }) =>
+    `MEETING_MODAL_STUB${readOnly ? " READ_ONLY" : ""}`,
 }));
 // The modal reads the viewer's meetings from this provider, so the page has to
 // render it inside one for the meeting to load at all.
@@ -123,14 +124,14 @@ describe("the meetings page", () => {
 
   // Before then the schedule redirects to the proposals, and the meeting
   // would be lost on the way.
-  it("opens a meeting here before scheduling starts", async () => {
+  it("opens a meeting here, read-only, outside the scheduling phase", async () => {
     const { event } = await scenario({
       phase: "proposal",
       meetingsEnabled: true,
     });
 
     expect(await renderPage(event.slug, { viewMeeting: "any-id" })).toMatch(
-      /MEETING_MODAL_STUB/
+      /MEETING_MODAL_STUB READ_ONLY/
     );
   });
 

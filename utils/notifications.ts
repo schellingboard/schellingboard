@@ -683,9 +683,8 @@ async function meetingContext(
   const end = DateTime.fromJSDate(meeting.slotEnd).setZone(event.timezone);
   return {
     time: `${start.toFormat("cccc d LLLL, HH:mm")}–${end.toFormat("HH:mm")}`,
-    // The meetings page rather than the schedule: the schedule only exists in
-    // the scheduling phase, and a request made before it starts would land on
-    // a redirect to the proposals.
+    // The meetings page rather than the schedule: it asks an unidentified
+    // reader who they are, and outside scheduling the schedule redirects away.
     path: `/${event.slug}/meetings?viewMeeting=${meeting.id}`,
   };
 }

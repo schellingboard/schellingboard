@@ -29,9 +29,15 @@ async function bookable(event: Event, name: string, slots = [SLOT]) {
   return guest;
 }
 
-async function scenario() {
+// Fixed rather than the factory's default, which is relative to the real clock.
+async function scenario(
+  schedulingPhaseStart = new Date("2026-09-01T00:00:00.000Z")
+) {
   const repos = getRepositories();
-  const event = await createEvent({ phase: "scheduling" });
+  const event = await createEvent({
+    schedulingPhaseStart,
+    schedulingPhaseEnd: new Date("2026-12-31T00:00:00.000Z"),
+  });
   await repos.events.update(event.id, { meetingsEnabled: true });
   await createDay(event.id, { start: DAY_START, end: DAY_END });
   const viewer = await createGuest({ name: "Ada", eventId: event.id });
@@ -266,6 +272,16 @@ describe("meetingCandidatesFor", () => {
     await getRepositories().events.update(event.id, {
       meetingsEnabled: false,
     });
+
+    expect(
+      await meetingCandidatesFor(viewer.id, event.id, SLOT, BEFORE)
+    ).toBeNull();
+  });
+
+  it("refuses before the scheduling phase", async () => {
+    const { event, viewer } = await scenario(
+      new Date("2026-11-01T00:00:00.000Z")
+    );
 
     expect(
       await meetingCandidatesFor(viewer.id, event.id, SLOT, BEFORE)
