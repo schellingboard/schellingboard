@@ -102,7 +102,7 @@ export class SqliteDaysRepository implements DaysRepository {
       // Delete every session that overlaps the day window (start < day.end and
       // end > day.start), including ones only partially inside it. Sessions
       // without scheduled times are excluded (null check). Mirrors
-      // sessionOverlapsWindow in utils/day-window.
+      // sessionOverlapsWindow in packages/domain/src/day-window.ts.
       if (day.eventId) {
         tx.delete(schema.sessions)
           .where(

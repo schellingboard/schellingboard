@@ -15,7 +15,7 @@ import {
   SLOT_INCREMENT_OPTIONS,
   isValidSlotIncrement,
   isSlotAligned,
-} from "@/utils/slots";
+} from "@schellingboard/domain/slots";
 
 export type EventInput = {
   name: string;

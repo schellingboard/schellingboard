@@ -7,7 +7,7 @@ import Database from "better-sqlite3";
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 
 import { runMigrations } from "@/db/migrate";
-import { followUpDueTime } from "@/utils/reminder-schedule";
+import { followUpDueTime } from "@schellingboard/domain/reminder-schedule";
 import { MIGRATIONS, migrationsBefore } from "../helpers/migrations";
 
 // The migration that adds the reminder machinery has to settle the follow-up

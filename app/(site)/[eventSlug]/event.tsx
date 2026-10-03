@@ -6,7 +6,7 @@ import { AgendaView } from "./agenda-view";
 import { useState, useContext, useRef } from "react";
 import { EventContext, useSlotIncrement } from "../context";
 import { getDefaultFoldedDayIds } from "@/utils/schedule-fold";
-import { getNowOffsetPx } from "@/utils/slots";
+import { getNowOffsetPx } from "@/utils/grid-layout";
 import { useDebouncedSearch } from "@/utils/hooks";
 import { KioskController, useKioskMode } from "./kiosk";
 import { SessionModal } from "./session-modal";

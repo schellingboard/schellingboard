@@ -10,7 +10,7 @@ import {
   DEFAULT_SLOT_INCREMENT_MINUTES,
   SLOT_INCREMENT_OPTIONS,
   isValidSlotIncrement,
-} from "@/utils/slots";
+} from "@schellingboard/domain/slots";
 
 export const dynamic = "force-dynamic";
 

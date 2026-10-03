@@ -28,8 +28,8 @@ import {
   type ProfileContact,
   type ProfilePrompt,
   type Attendee,
+  sanitizeGuest,
 } from "@schellingboard/domain/guest";
-import { sanitizeGuest } from "@/utils/guests";
 
 type DB = BetterSQLite3Database<typeof schema>;
 

@@ -13,7 +13,7 @@ import { useContext, useState } from "react";
 import { CurrentUserModal, ConfirmationModal, AlertModal } from "../modals";
 import { UserContext, EventContext } from "../context";
 import { formatOptionalTime, TIME_FORMAT } from "@/utils/utils";
-import { isBookableSlot } from "@/utils/session-bookable";
+import { isBookableSlot } from "@schellingboard/domain/session-bookable";
 import type { ColumnItem } from "@/utils/schedule-column";
 import { LockIcon } from "../lock-icon";
 import {

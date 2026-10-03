@@ -137,3 +137,9 @@ export type EventAttendee = Pick<
   Guest,
   "id" | "name" | "avatarUrl" | "pronouns" | "basedIn"
 > & { isHost: boolean };
+
+export function sanitizeGuest(guest: CompleteGuest): Guest {
+  const out = { ...guest, info: undefined };
+  delete out.info;
+  return out;
+}

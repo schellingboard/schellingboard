@@ -14,7 +14,7 @@ import {
   followUpEligible,
   headsUpEligible,
   reminderNoticeText,
-} from "@/utils/reminder-schedule";
+} from "@schellingboard/domain/reminder-schedule";
 
 export type DispatchSummary = {
   /** In-app notifications created. */

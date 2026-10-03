@@ -433,7 +433,7 @@ export interface RemindersRepository {
    * preferences, its recorded-count flag and its stored row. Everything the
    * dispatcher and both email templates read is on the candidate, because
    * dispatch never queries once it starts sending. Eligibility is decided by
-   * the pure predicates in utils/reminder-schedule.ts, not by SQL.
+   * the pure predicates in packages/domain/src/reminder-schedule.ts, not by SQL.
    */
   listCandidates(now: Date): Promise<DueReminderCandidate[]>;
   /**

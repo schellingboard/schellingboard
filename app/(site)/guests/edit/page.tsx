@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { PageNotice } from "@/app/components/page-notice";
 import { getRepositories } from "@/db/container";
-import { sanitizeGuest } from "@/utils/guests";
+import { sanitizeGuest } from "@schellingboard/domain/guest";
 import {
   unverifiedUserMessage,
   verifiedCurrentUser,

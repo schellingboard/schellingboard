@@ -11,7 +11,8 @@ import { useContext, useState } from "react";
 import type { MeetingView } from "@/utils/meeting-views";
 import { meetingColumnRows } from "@/utils/meeting-column";
 import { shownSlotStart } from "@/utils/meeting-slots";
-import { getNumSlots, SLOT_HEIGHT_PX } from "@/utils/slots";
+import { getNumSlots } from "@schellingboard/domain/slots";
+import { SLOT_HEIGHT_PX } from "@/utils/grid-layout";
 import type { DayWithSessions } from "@/app/(site)/context";
 import {
   EventContext,

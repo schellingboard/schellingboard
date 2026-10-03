@@ -7,9 +7,9 @@ import {
   notifySessionChanged,
 } from "@/utils/notifications";
 import { verifiedCurrentUser } from "@/utils/acting-guest";
-import { sessionBookingWindowError } from "@/utils/day-window";
-import { sessionDurationError } from "@/utils/slots";
-import { locationUnavailableError } from "@/utils/location-unavailability";
+import { sessionBookingWindowError } from "@schellingboard/domain/day-window";
+import { sessionDurationError } from "@schellingboard/domain/slots";
+import { locationUnavailableError } from "@schellingboard/domain/location-unavailability";
 import {
   bookedSlot,
   prepareToInsert,

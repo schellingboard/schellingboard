@@ -1,9 +1,8 @@
-import type { ReminderKind } from "@schellingboard/domain/reminder";
+import type { ReminderKind } from "./reminder";
 
-// Pure due-time arithmetic and eligibility for the two attendee-count
-// reminders. No I/O and no next/headers: the whole reschedule matrix from the
-// spec is decided here, in the unit tier, so dispatch needs only a handful of
-// seeded database tests.
+// Due-time arithmetic and eligibility for the two attendee-count reminders.
+// The whole reschedule matrix from the spec is decided here, in the unit tier,
+// so dispatch needs only a handful of seeded database tests.
 
 export const HEADS_UP_LEAD_MINUTES = 60;
 export const FOLLOW_UP_DELAY_MINUTES = 15;

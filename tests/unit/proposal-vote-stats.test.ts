@@ -3,7 +3,7 @@ import {
   eventInterestSummary,
   estimateAttendanceRange,
   proposalVoteStats,
-} from "@/utils/proposal-vote-stats";
+} from "@schellingboard/domain/proposal-vote-stats";
 
 // The 2025 event the model was fitted on: 259 attendees, 9 parallel sessions,
 // mean interest share 27%. See docs/dev/attendance-model/attendance-2025.md.

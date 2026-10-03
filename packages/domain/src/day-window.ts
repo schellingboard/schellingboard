@@ -1,10 +1,9 @@
 // Predicates relating a scheduled session to a day's time window, and rules
 // for validating a day's own window against its event and sibling days.
-// Shared so the delete-cascade, the edit guard, the admin UI warning, and the
-// day-creation entry points (admin action and admin API route) all agree.
+// Shared so every caller agrees.
 
-import { isSlotAligned } from "@/utils/slots";
-import type { Day } from "@schellingboard/domain/event";
+import { isSlotAligned } from "./slots";
+import type { Day } from "./event";
 
 type ScheduledTimes = {
   startTime?: Date | null;

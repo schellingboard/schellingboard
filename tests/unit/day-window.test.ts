@@ -3,7 +3,7 @@ import {
   sessionOverlapsWindow,
   sessionContainedInWindow,
   sessionBookingWindowError,
-} from "@/utils/day-window";
+} from "@schellingboard/domain/day-window";
 import type { Day } from "@schellingboard/domain/event";
 
 const winStart = new Date("2026-10-01T09:00:00Z");

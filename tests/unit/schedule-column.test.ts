@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { locationColumn } from "@/utils/schedule-column";
-import { SLOT_HEIGHT_PX } from "@/utils/slots";
+import { SLOT_HEIGHT_PX } from "@/utils/grid-layout";
 import type { Session } from "@schellingboard/domain/session";
 import { newEmptySession } from "@/app/(site)/session_utils";
 

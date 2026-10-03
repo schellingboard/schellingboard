@@ -1,5 +1,5 @@
 import type { Session } from "@schellingboard/domain/session";
-import { gridBlockPx } from "@/utils/slots";
+import { gridBlockPx } from "@/utils/grid-layout";
 
 export type ColumnItem =
   | { kind: "session"; session: Session; topPx: number; heightPx: number }

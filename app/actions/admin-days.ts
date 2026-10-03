@@ -7,7 +7,7 @@ import {
   dayAlignmentError,
   daysOverlap,
   sessionContainedInWindow,
-} from "@/utils/day-window";
+} from "@schellingboard/domain/day-window";
 import type { AdminActionResult } from "./admin-guests";
 
 export type DayInput = {

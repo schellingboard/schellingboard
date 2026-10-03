@@ -19,16 +19,19 @@ import { EventContext, UserContext, VotesContext } from "@/app/(site)/context";
 import { sessionRooms } from "@/app/(site)/session_utils";
 import { Proposal } from "@/app/(site)/[eventSlug]/proposal";
 import type { Comment } from "@schellingboard/domain/comment";
-import type { SessionProposal, Session } from "@schellingboard/domain/session";
+import {
+  type SessionProposal,
+  type Session,
+  wantsHost,
+} from "@schellingboard/domain/session";
 import type { Event } from "@schellingboard/domain/event";
 import { ProposalComments } from "./proposal-comments";
 import { VotingButtons } from "@/app/(site)/[eventSlug]/proposals/voting-buttons";
 import { VoteBreakdown } from "./vote-breakdown";
 import { VoteTally } from "./vote-tally";
-import type { EventInterestSummary } from "@/utils/proposal-vote-stats";
+import type { EventInterestSummary } from "@schellingboard/domain/proposal-vote-stats";
 import { useLocalZone } from "@/utils/hooks";
 import { formatOptionalTime, TIME_FORMAT } from "@/utils/utils";
-import { wantsHost } from "@/utils/proposal-hosts";
 import { viewSessionLinkFromElsewhere } from "../modal-nav";
 import { joinProposal } from "./actions";
 

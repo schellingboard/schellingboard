@@ -15,7 +15,10 @@ import {
   durationMinusBreak,
   TIME_FORMAT,
 } from "@/utils/utils";
-import { gridEndingDurations, snapDurationToSlots } from "@/utils/slots";
+import {
+  gridEndingDurations,
+  snapDurationToSlots,
+} from "@schellingboard/domain/slots";
 import { slotIsFree } from "@/utils/schedule-column";
 import { MyListbox, type Option } from "./select";
 import { viewProposalLinkFromElsewhere } from "./modal-nav";

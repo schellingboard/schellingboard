@@ -15,7 +15,7 @@ import {
   proposalVoteStats,
   type AttendanceRange,
   type EventInterestSummary,
-} from "@/utils/proposal-vote-stats";
+} from "@schellingboard/domain/proposal-vote-stats";
 
 function pct(value: number | null): string {
   return value === null ? "" : ` (${value}%)`;

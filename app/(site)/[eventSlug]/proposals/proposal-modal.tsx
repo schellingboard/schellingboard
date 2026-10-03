@@ -9,7 +9,7 @@ import type { SessionProposal, Session } from "@schellingboard/domain/session";
 import type { Event } from "@schellingboard/domain/event";
 import { dismissViewProposal } from "../modal-nav";
 import { ViewProposal } from "./view-proposal";
-import type { EventInterestSummary } from "@/utils/proposal-vote-stats";
+import type { EventInterestSummary } from "@schellingboard/domain/proposal-vote-stats";
 
 export function ProposalModal({
   proposal,

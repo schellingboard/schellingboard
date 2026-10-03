@@ -3,6 +3,7 @@ import {
   DEFAULT_EMAIL_SETTINGS,
   type EmailSettings,
   type Guest,
+  sanitizeGuest,
 } from "@schellingboard/domain/guest";
 import type { SessionProposal, Session } from "@schellingboard/domain/session";
 import type {
@@ -10,7 +11,6 @@ import type {
   LocationUnavailability,
 } from "@schellingboard/domain/location";
 import type { Event, Day } from "@schellingboard/domain/event";
-import { sanitizeGuest } from "@/utils/guests";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 

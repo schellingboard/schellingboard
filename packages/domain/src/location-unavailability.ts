@@ -1,4 +1,4 @@
-import type { LocationUnavailability } from "@schellingboard/domain/location";
+import type { LocationUnavailability } from "./location";
 
 type Placement = { locationId: string; start: Date; end: Date };
 

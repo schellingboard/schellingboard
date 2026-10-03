@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getRepositories } from "@/db/container";
-import { sessionOverlapsWindow } from "@/utils/day-window";
+import { sessionOverlapsWindow } from "@schellingboard/domain/day-window";
 import { requireAdminPage } from "../../require-admin";
 import { EventDetailForm } from "./event-detail-form";
 import { EventPhasesForm } from "./event-phases-form";

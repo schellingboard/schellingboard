@@ -6,7 +6,7 @@ import {
   takesPartInMeetings,
 } from "@/utils/meeting-column";
 import type { MeetingView } from "@/utils/meeting-views";
-import { SLOT_HEIGHT_PX } from "@/utils/slots";
+import { SLOT_HEIGHT_PX } from "@/utils/grid-layout";
 
 const DAY = {
   start: new Date("2026-10-01T09:00:00.000Z"),

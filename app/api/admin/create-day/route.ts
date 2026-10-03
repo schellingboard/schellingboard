@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { getRepositories } from "@/db/container";
 import { requireProxyVerifiedAdmin } from "@/utils/auth";
-import { dayAlignmentError, daysOverlap } from "@/utils/day-window";
+import {
+  dayAlignmentError,
+  daysOverlap,
+} from "@schellingboard/domain/day-window";
 
 export const dynamic = "force-dynamic";
 

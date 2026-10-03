@@ -21,7 +21,7 @@ import { getRepositories, serializeDb } from "@/db/container";
 import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
 import { isMailerConfigured, sendMail } from "@/utils/mailer";
 import { dispatchDueReminders } from "@/utils/reminder-dispatch";
-import { followUpDueTime } from "@/utils/reminder-schedule";
+import { followUpDueTime } from "@schellingboard/domain/reminder-schedule";
 
 // The reference session: 10:00–11:00 UTC with the factory's 10-minute break,
 // so the displayed start is 10:10, the heads-up is due at 09:10 and the

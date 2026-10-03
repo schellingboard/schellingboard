@@ -5,7 +5,7 @@ import {
   followUpEligible,
   headsUpDueTime,
   headsUpEligible,
-} from "@/utils/reminder-schedule";
+} from "@schellingboard/domain/reminder-schedule";
 
 const at = (time: string) => new Date(`2026-09-01T${time}:00Z`);
 

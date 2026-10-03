@@ -27,7 +27,7 @@ import {
   type SelectUserResult,
 } from "@/app/actions/user-auth";
 import { DEFAULT_BREAK_MINUTES, votesApiUrl } from "@/utils/utils";
-import { DEFAULT_SLOT_INCREMENT_MINUTES } from "@/utils/slots";
+import { DEFAULT_SLOT_INCREMENT_MINUTES } from "@schellingboard/domain/slots";
 import { startNowTicker, NOW_REFRESH_INTERVAL_MS } from "@/utils/now-ticker";
 
 export type DayWithSessions = Day & { sessions: Session[] };

@@ -1,16 +1,15 @@
 import { describe, it, expect } from "vitest";
 import {
   SLOT_INCREMENT_OPTIONS,
-  SLOT_HEIGHT_PX,
   isValidSlotIncrement,
   getNumSlots,
-  getNowOffsetPx,
   gridEndingDurations,
   isSlotAligned,
   sessionDurationError,
   slotDurationOptions,
   snapDurationToSlots,
-} from "@/utils/slots";
+} from "@schellingboard/domain/slots";
+import { SLOT_HEIGHT_PX, getNowOffsetPx } from "@/utils/grid-layout";
 
 // ── isValidSlotIncrement ─────────────────────────────────────────────────────
 

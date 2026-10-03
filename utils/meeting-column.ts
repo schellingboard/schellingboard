@@ -1,5 +1,6 @@
 import { shownSlotStart } from "@/utils/meeting-slots";
-import { getNumSlots, gridBlockPx } from "@/utils/slots";
+import { getNumSlots } from "@schellingboard/domain/slots";
+import { gridBlockPx } from "@/utils/grid-layout";
 import type { MeetingView } from "@/utils/meeting-views";
 
 const LIVE = new Set<MeetingView["status"]>(["pending", "accepted"]);

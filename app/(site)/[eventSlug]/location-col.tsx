@@ -10,7 +10,8 @@ import {
 } from "@/app/(site)/context";
 import { SessionBlock } from "./session-block";
 import { NowLine } from "./now-line";
-import { getNumSlots, SLOT_HEIGHT_PX } from "@/utils/slots";
+import { getNumSlots } from "@schellingboard/domain/slots";
+import { SLOT_HEIGHT_PX } from "@/utils/grid-layout";
 import { locationColumn } from "@/utils/schedule-column";
 
 export function LocationCol(props: {

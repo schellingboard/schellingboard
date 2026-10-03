@@ -4,7 +4,7 @@ import { getRepositories } from "@/db/container";
 import { ProposalActionBar } from "./proposal-action-bar";
 import { ProposalTable } from "./proposal-table";
 import { ProposalModal } from "./proposal-modal";
-import { eventInterestSummary } from "@/utils/proposal-vote-stats";
+import { eventInterestSummary } from "@schellingboard/domain/proposal-vote-stats";
 
 export const dynamic = "force-dynamic";
 

@@ -18,7 +18,10 @@ import {
 import HoverTooltip from "@/app/(site)/hover-tooltip";
 import { SearchInput } from "@/app/search-input";
 import { EventContext, UserContext, VotesContext } from "@/app/(site)/context";
-import type { SessionProposal } from "@schellingboard/domain/session";
+import {
+  type SessionProposal,
+  wantsHost,
+} from "@schellingboard/domain/session";
 import {
   inSchedPhase,
   inVotingPhase,
@@ -34,7 +37,6 @@ import { VoteTally } from "./vote-tally";
 import { voteChoiceRank } from "@/app/(site)/votes";
 import { viewProposalLinkFromOwner } from "../modal-nav";
 import { stripMarkdown } from "@/utils/markdown";
-import { wantsHost } from "@/utils/proposal-hosts";
 
 const ITEMS_PER_PAGE = 1000;
 

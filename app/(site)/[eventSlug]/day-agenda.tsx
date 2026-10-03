@@ -23,7 +23,7 @@ import {
   useBreakMinutes,
   useSlotIncrement,
 } from "@/app/(site)/context";
-import { getNowOffsetPx } from "@/utils/slots";
+import { getNowOffsetPx } from "@/utils/grid-layout";
 import {
   agendaGroups,
   nowMarkerIndex,
