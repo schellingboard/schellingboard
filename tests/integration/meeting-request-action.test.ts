@@ -57,9 +57,12 @@ async function signIn(guestId: string) {
 }
 
 /** An event with meetings on, a day, and two attendees; the recipient is bookable. */
-async function scenario(patch?: Record<string, unknown>) {
+async function scenario(
+  patch?: Record<string, unknown>,
+  phase: "proposal" | "scheduling" = "scheduling"
+) {
   const repos = getRepositories();
-  const event = await createEvent();
+  const event = await createEvent({ phase });
   await repos.events.update(event.id, {
     meetingsEnabled: true,
     maxOpenMeetingRequests: 5,
@@ -210,6 +213,20 @@ describe("requestMeetingAction", () => {
     const result = await request(event, recipient);
 
     expect(result.ok).toBe(false);
+  });
+
+  it("refuses before the scheduling phase", async () => {
+    const { event, requester, recipient } = await scenario({}, "proposal");
+
+    const result = await request(event, recipient);
+
+    expect(result.ok).toBe(false);
+    expect(
+      await getRepositories().meetings.listByGuestAndEvent(
+        requester.id,
+        event.id
+      )
+    ).toEqual([]);
   });
 
   it("refuses a second request for the same person and slot", async () => {

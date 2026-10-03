@@ -19,9 +19,17 @@ import {
   notifyMeetingOutcome,
   notifyMeetingRequested,
 } from "@/utils/notifications";
+import { inSchedPhase } from "@/app/(site)/utils/events";
 import type { Event, MeetingStatus } from "@/db/repositories/interfaces";
 
 export type MeetingActionResult = { ok: true } | { ok: false; error: string };
+
+const NOT_OPEN = "1-on-1s are only open while the event is scheduling";
+
+function closedReason(event: Event, now: Date): string | null {
+  if (!event.meetingsEnabled) return "1-on-1s are not enabled for this event";
+  return inSchedPhase(event, now) ? null : NOT_OPEN;
+}
 
 // A "use server" export is a public endpoint behind site auth, so the types
 // these schemas describe are advisory: every payload is parsed rather than
@@ -96,9 +104,9 @@ export async function requestMeetingAction(
   const repos = getRepositories();
   const event = await repos.events.findById(input.eventId);
   if (!event) return { ok: false, error: "Event not found" };
-  if (!event.meetingsEnabled) {
-    return { ok: false, error: "1-on-1s are not enabled for this event" };
-  }
+  const now = await serverNow();
+  const closed = closedReason(event, now);
+  if (closed) return { ok: false, error: closed };
 
   const attending = await repos.guests.listEventsByGuests([
     requesterId,
@@ -137,7 +145,6 @@ export async function requestMeetingAction(
   // A multi-day event goes on offering yesterday's slots, and the open-request
   // cap only counts requests still ahead -- so without this, day one stays
   // bookable on day three and every request against it is free of the cap.
-  const now = await serverNow();
   if (new Date(input.slotStart) <= now) {
     return { ok: false, error: "That slot has already passed" };
   }
@@ -209,11 +216,14 @@ export async function respondToMeetingAction(
   if (meeting.recipientId !== guestId) {
     return { ok: false, error: "Only the person asked can answer this" };
   }
-  // No `meetingsEnabled` check, unlike requesting one: the switch stops new
-  // requests, and a pair already holding one still have to settle it. The
-  // meetings page renders the modal for the same reason.
 
+  // Only the phase, not `meetingsEnabled`: the switch stops new requests, and
+  // a pair already holding one still have to settle it.
   const now = await serverNow();
+  const event = await repos.events.findById(meeting.eventId);
+  if (!event || !inSchedPhase(event, now)) {
+    return { ok: false, error: NOT_OPEN };
+  }
   // Expiry is derived rather than swept (issue #392, section 2.4), so it is
   // checked here: answering a request whose slot has begun would agree to a
   // past meeting.
@@ -236,8 +246,7 @@ export async function respondToMeetingAction(
     now,
   });
 
-  const event = await repos.events.findById(meeting.eventId);
-  if (event) revalidatePath(`/${event.slug}`);
+  revalidatePath(`/${event.slug}`);
   return { ok: true };
 }
 
@@ -269,6 +278,10 @@ export async function cancelMeetingAction(
   }
 
   const now = await serverNow();
+  const event = await repos.events.findById(meeting.eventId);
+  if (!event || !inSchedPhase(event, now)) {
+    return { ok: false, error: NOT_OPEN };
+  }
   // A meeting that has already begun happened or didn't; calling it off after
   // the fact would only send its other half a notification about the past.
   if (meeting.slotStart.getTime() <= now.getTime()) {
@@ -305,8 +318,7 @@ export async function cancelMeetingAction(
     now,
   });
 
-  const event = await repos.events.findById(meeting.eventId);
-  if (event) revalidatePath(`/${event.slug}`);
+  revalidatePath(`/${event.slug}`);
   return { ok: true };
 }
 
@@ -338,9 +350,8 @@ export async function saveMeetingAvailabilityAction(
   const repos = getRepositories();
   const event = await repos.events.findById(input.eventId);
   if (!event) return { ok: false, error: "Event not found" };
-  if (!event.meetingsEnabled) {
-    return { ok: false, error: "1-on-1s are not enabled for this event" };
-  }
+  const closed = closedReason(event, await serverNow());
+  if (closed) return { ok: false, error: closed };
 
   const attending = await repos.guests.listEventsByGuests([guestId]);
   if (!attending.get(guestId)?.some((e) => e.id === event.id)) {

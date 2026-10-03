@@ -1,7 +1,15 @@
 import { DateTime } from "luxon";
+import { inSchedPhase } from "@/app/(site)/utils/events";
 import { shownSlotStart } from "@/utils/meeting-slots";
 
+import type { Event } from "@/db/repositories/interfaces";
 import type { MeetingView } from "@/utils/meeting-views";
+
+// Before scheduling there is no schedule to arrange a meeting around, and after
+// it there is nothing left to arrange (#952).
+export function meetingsOpen(event: Event, now: Date): boolean {
+  return event.meetingsEnabled && inSchedPhase(event, now);
+}
 
 /**
  * Whether this guest may call the meeting off. A confirmed one is either

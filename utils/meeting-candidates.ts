@@ -3,6 +3,7 @@ import { DateTime } from "luxon";
 import { getRepositories } from "@/db/container";
 import type { MeetingPoint } from "@/db/repositories/interfaces";
 import { clashesForInterval, loadGuestSchedules } from "@/utils/guest-clashes";
+import { meetingsOpen } from "@/utils/meeting-rules";
 import {
   toMeetingClashes,
   type MeetingClash,
@@ -51,10 +52,10 @@ export type MeetingCandidates = {
  * Who the viewer could meet at `slotStart` — the question the profile picker
  * answers the other way round (`meetingOptionsFor`: when could I meet *them*).
  *
- * Null when there is nothing to offer at all: the event is gone or no longer
- * offers meetings, the viewer is not attending it, or the slot is not one the
- * event still has ahead of it. An empty candidate list is a different answer,
- * and the caller says so differently.
+ * Null when there is nothing to offer at all: the event is gone or does not
+ * offer meetings right now, the viewer is not attending it, or the slot is not
+ * one the event still has ahead of it. An empty candidate list is a different
+ * answer, and the caller says so differently.
  */
 export async function meetingCandidatesFor(
   viewerId: string,
@@ -65,7 +66,7 @@ export async function meetingCandidatesFor(
 ): Promise<MeetingCandidates | null> {
   const repos = getRepositories();
   const event = await repos.events.findById(eventId);
-  if (!event?.meetingsEnabled) return null;
+  if (!event || !meetingsOpen(event, now)) return null;
 
   const attending = await repos.guests.listEventsByGuests([viewerId]);
   if (!attending.get(viewerId)?.some((e) => e.id === eventId)) return null;

@@ -1,6 +1,7 @@
 import { DateTime } from "luxon";
 import { getRepositories } from "@/db/container";
 import type { Day, Event } from "@/db/repositories/interfaces";
+import { meetingsOpen } from "@/utils/meeting-rules";
 import { meetingSlotsForDay, slotTimeLabel } from "@/utils/meeting-slots";
 import { compareEventsByStart } from "@/utils/utils";
 
@@ -23,8 +24,8 @@ export type AvailabilityFormData = {
 
 /**
  * One form per event the guest can still be booked at: attended, offering
- * 1-on-1s, and with a day still to come -- or none yet, since the organizer
- * may add some. Ordered by when the event starts.
+ * 1-on-1s right now, and with a day still to come -- or none yet, since the
+ * organizer may add some. Ordered by when the event starts.
  */
 export async function availabilityFormsFor(
   guestId: string,
@@ -39,7 +40,7 @@ export async function availabilityFormsFor(
   );
   const offering = attending
     .filter(
-      (event): event is Event => event !== undefined && event.meetingsEnabled
+      (event): event is Event => event !== undefined && meetingsOpen(event, now)
     )
     .sort(compareEventsByStart);
 

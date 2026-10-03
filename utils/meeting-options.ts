@@ -12,6 +12,7 @@ import { toMeetingClashes } from "@/utils/meeting-clash-text";
 import type { MeetingClash } from "@/utils/meeting-clash-text";
 import { DateTime } from "luxon";
 import type { Event, MeetingPoint } from "@/db/repositories/interfaces";
+import { meetingsOpen } from "@/utils/meeting-rules";
 
 /** One slot of the picker, in the three states of the design (issue #392). */
 export type MeetingSlotOption = {
@@ -78,7 +79,7 @@ export async function meetingOptionsFor(
   for (const { id: eventId } of viewerEvents) {
     if (!sharedIds.has(eventId)) continue;
     const event = events.find((e) => e.id === eventId);
-    if (!event?.meetingsEnabled) continue;
+    if (!event || !meetingsOpen(event, now)) continue;
 
     const declared = await repos.meetingAvailability.listByGuestAndEvent(
       recipientId,

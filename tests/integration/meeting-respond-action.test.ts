@@ -52,14 +52,17 @@ async function signIn(guestId: string) {
 }
 
 /** A pending request from one attendee to another, with the recipient signed in. */
-async function scenario(opts?: { slotStart?: Date }): Promise<{
+async function scenario(opts?: {
+  slotStart?: Date;
+  phase?: "proposal" | "scheduling";
+}): Promise<{
   event: Event;
   requester: Guest;
   recipient: Guest;
   meeting: Meeting;
 }> {
   const repos = getRepositories();
-  const event = await createEvent();
+  const event = await createEvent({ phase: opts?.phase ?? "scheduling" });
   await repos.events.update(event.id, { meetingsEnabled: true });
   const requester = await createGuest({ eventId: event.id });
   const recipient = await createGuest({ eventId: event.id });
@@ -186,6 +189,20 @@ describe("respondToMeetingAction", () => {
     expect(
       (await getRepositories().meetings.findById(meeting.id))?.status
     ).toBe("accepted");
+  });
+
+  it("refuses an answer outside the scheduling phase", async () => {
+    const { meeting } = await scenario({ phase: "proposal" });
+
+    const result = await respondToMeetingAction({
+      meetingId: meeting.id,
+      response: "accept",
+    });
+
+    expect(result.ok).toBe(false);
+    expect(
+      (await getRepositories().meetings.findById(meeting.id))?.status
+    ).toBe("pending");
   });
 
   it("refuses a request whose slot has already started", async () => {
@@ -399,6 +416,18 @@ describe("cancelMeetingAction", () => {
     const result = await cancelMeetingAction({ meetingId: meeting.id });
 
     expect(result.ok).toBe(false);
+  });
+
+  it("refuses outside the scheduling phase", async () => {
+    const { requester, meeting } = await scenario({ phase: "proposal" });
+    await signIn(requester.id);
+
+    const result = await cancelMeetingAction({ meetingId: meeting.id });
+
+    expect(result.ok).toBe(false);
+    expect(
+      (await getRepositories().meetings.findById(meeting.id))?.status
+    ).toBe("pending");
   });
 
   it("refuses a meeting whose slot has already started", async () => {

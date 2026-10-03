@@ -4,6 +4,7 @@ import { AttendeeDirectory } from "@/app/(site)/guests/directory";
 import { newSortSeed } from "@/utils/attendee-search";
 import { serverNow } from "@/utils/dev-clock-server";
 import { verifiedCurrentUser } from "@/utils/acting-guest";
+import { meetingsOpen } from "@/utils/meeting-rules";
 
 /**
  * The list is a layout, not a page, so `/guests` and `/guests/<id>` share one
@@ -36,7 +37,7 @@ export default async function AttendeeDirectoryLayout({
         now={now}
         currentUserId={currentUser}
         randomSeed={newSortSeed()}
-        meetingsEnabled={events.some((e) => e.meetingsEnabled)}
+        meetingsEnabled={events.some((e) => meetingsOpen(e, now))}
       />
       {children}
     </>
