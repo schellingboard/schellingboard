@@ -1,4 +1,5 @@
-import type { Session, Location, Guest } from "@/db/repositories/interfaces";
+import type { Session, Location } from "@/db/repositories/interfaces";
+import type { Guest } from "@schellingboard/domain/guest";
 import type { DayWithSessions } from "@/app/(site)/context";
 import { useContext } from "react";
 import {

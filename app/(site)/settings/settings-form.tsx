@@ -8,7 +8,7 @@ import { z } from "zod";
 
 import { updateEmailSettingsAction } from "@/app/actions/settings";
 import { emailSettingsSchema } from "@schellingboard/contracts/guest";
-import type { EmailSettings } from "@/db/repositories/interfaces";
+import type { EmailSettings } from "@schellingboard/domain/guest";
 
 export function SettingsForm({
   emailSettings,

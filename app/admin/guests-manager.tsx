@@ -4,7 +4,7 @@ import { Fragment, useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import clsx from "clsx";
 import { Input } from "@/app/input";
-import type { CompleteGuest } from "@/db/repositories/interfaces";
+import type { CompleteGuest } from "@schellingboard/domain/guest";
 import {
   createGuestAction,
   updateGuestAction,

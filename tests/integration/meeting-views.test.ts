@@ -10,7 +10,8 @@ import {
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { meetingViewsFor } from "@/utils/meeting-views";
-import type { Guest, Meeting } from "@/db/repositories/interfaces";
+import type { Meeting } from "@/db/repositories/interfaces";
+import type { Guest } from "@schellingboard/domain/guest";
 import type { Event } from "@schellingboard/domain/event";
 
 const SLOT_START = new Date("2026-10-01T13:00:00.000Z");

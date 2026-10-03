@@ -1,5 +1,7 @@
-import type { Attendee } from "@/db/repositories/interfaces";
-import { CONTACT_TYPE_LABELS } from "@schellingboard/domain/guest";
+import {
+  type Attendee,
+  CONTACT_TYPE_LABELS,
+} from "@schellingboard/domain/guest";
 import { containsIgnoringAccents, equalsIgnoringAccents } from "./utils";
 
 // Rank tiers, higher wins. Exact declared-language matches must beat

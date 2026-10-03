@@ -12,7 +12,7 @@ import Link from "next/link";
 import { MapModal } from "./modals";
 import { HeaderUserSelect } from "./header-user-select";
 import { EVENT_ICONS } from "@/app/event-icons";
-import type { Guest } from "@/db/repositories/interfaces";
+import type { Guest } from "@schellingboard/domain/guest";
 
 export type NavItem = {
   name: string;

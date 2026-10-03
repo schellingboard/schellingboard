@@ -36,7 +36,7 @@ import { createEvent, createGuest, createDay } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, verifiedGuestValue } from "../helpers/guest-cookie";
 import { getRepositories } from "@/db/container";
 import { requestMeetingAction } from "@/app/actions/meetings";
-import type { Guest } from "@/db/repositories/interfaces";
+import type { Guest } from "@schellingboard/domain/guest";
 import type { Event } from "@schellingboard/domain/event";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";

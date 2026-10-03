@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { Attendee } from "@/db/repositories/interfaces";
+import type { Attendee } from "@schellingboard/domain/guest";
 import { AttendeeList } from "@/app/(site)/guests/attendee-list";
 import { useDirectoryView } from "@/app/(site)/guests/directory-view";
 import { ProfileModal } from "@/app/(site)/guests/profile-modal";

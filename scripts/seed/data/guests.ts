@@ -1,7 +1,7 @@
 import type {
   ProfileContact,
   ProfilePrompt,
-} from "@/db/repositories/interfaces";
+} from "@schellingboard/domain/guest";
 
 // Shared demo password for seeded guests with account protection enabled
 // (issue #370). Not a security boundary — dev/e2e seed data only.

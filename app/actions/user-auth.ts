@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { getRepositories } from "@/db/container";
-import type { AuthCode, AuthCodePurpose } from "@/db/repositories/interfaces";
+import type { AuthCode, AuthCodePurpose } from "@schellingboard/domain/auth";
 import {
   createGuestCookie,
   createGuestLogoutCookie,

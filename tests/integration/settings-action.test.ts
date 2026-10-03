@@ -18,7 +18,7 @@ import { siteAuthenticate } from "../helpers/site-auth";
 import { createGuest } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 import { getRepositories } from "@/db/container";
-import { DEFAULT_EMAIL_SETTINGS } from "@/db/repositories/interfaces";
+import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
 import { updateEmailSettingsAction } from "@/app/actions/settings";
 
 describe("updateEmailSettingsAction", () => {

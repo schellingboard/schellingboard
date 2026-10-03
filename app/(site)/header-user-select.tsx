@@ -10,7 +10,7 @@ import {
   MenuSeparator,
 } from "@headlessui/react";
 import { ChevronDownIcon, UserCircleIcon } from "@heroicons/react/24/outline";
-import type { Guest } from "@/db/repositories/interfaces";
+import type { Guest } from "@schellingboard/domain/guest";
 import { UserSelect } from "./user-select";
 import { Modal } from "@/app/components/modal";
 import { UserContext } from "./context";

@@ -1,7 +1,8 @@
 import clsx from "clsx";
 import { ClockIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { UserIcon, AcademicCapIcon } from "@heroicons/react/24/solid";
-import type { Session, Location, Guest } from "@/db/repositories/interfaces";
+import type { Session, Location } from "@/db/repositories/interfaces";
+import type { Guest } from "@schellingboard/domain/guest";
 import type { DayWithSessions } from "@/app/(site)/context";
 import { Tooltip } from "./tooltip";
 import { DateTime } from "luxon";

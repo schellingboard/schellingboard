@@ -1,6 +1,7 @@
 "use client";
 import { useMemo, useState, type ReactNode, type RefObject } from "react";
-import type { Guest, Location } from "@/db/repositories/interfaces";
+import type { Location } from "@/db/repositories/interfaces";
+import type { Guest } from "@schellingboard/domain/guest";
 import type { DayWithSessions } from "../context";
 import { matchesInReadingOrder } from "@/utils/schedule-search";
 import { DayGrid } from "./day-grid";

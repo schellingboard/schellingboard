@@ -8,7 +8,10 @@ import {
   index,
   type AnySQLiteColumn,
 } from "drizzle-orm/sqlite-core";
-import type { ProfileContact, ProfilePrompt } from "./repositories/interfaces";
+import type {
+  ProfileContact,
+  ProfilePrompt,
+} from "@schellingboard/domain/guest";
 
 // Singleton table holding site-wide configuration (title, description, map).
 // Always a single row with id "singleton"; see SqliteSettingsRepository.
@@ -34,7 +37,7 @@ export const guests = sqliteTable(
     languages: text("languages", { mode: "json" }).$type<string[]>(),
     contacts: text("contacts", { mode: "json" }).$type<ProfileContact[]>(),
     // Email notification settings; see EmailSettings in
-    // repositories/interfaces.ts.
+    // packages/domain/src/guest.ts.
     emailOnRsvpChange: integer("email_on_rsvp_change", { mode: "boolean" })
       .notNull()
       .default(true),

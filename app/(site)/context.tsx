@@ -12,9 +12,9 @@ import type {
   Session,
   Location,
   LocationUnavailability,
-  Guest,
   Rsvp,
 } from "@/db/repositories/interfaces";
+import type { Guest } from "@schellingboard/domain/guest";
 import type { Event, Day } from "@schellingboard/domain/event";
 import {
   Vote,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import type { Attendee } from "@/db/repositories/interfaces";
+import type { Attendee } from "@schellingboard/domain/guest";
 import { useTableParams } from "@/app/admin/data-table";
 import {
   ATTENDEE_SORTS,

@@ -10,7 +10,7 @@ import {
 } from "@/app/components/buttons";
 import { UserSelect } from "./user-select";
 import { UserContext } from "./context";
-import type { Guest } from "@/db/repositories/interfaces";
+import type { Guest } from "@schellingboard/domain/guest";
 
 export function MapModal({ mapImageUrl }: { mapImageUrl: string }) {
   const [open, setOpen] = useState(false);

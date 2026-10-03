@@ -23,7 +23,7 @@ import {
   createSession,
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { DEFAULT_EMAIL_SETTINGS } from "@/db/repositories/interfaces";
+import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
 import { render } from "@react-email/render";
 import { sendMail } from "@/utils/mailer";
 import {

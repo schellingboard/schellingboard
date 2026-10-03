@@ -3,9 +3,9 @@ import {
   CONTACT_TYPES,
   MAX_CONTACTS,
   MAX_LANGUAGES,
+  type EmailSettings,
 } from "@schellingboard/domain/guest";
 
-// Matches EmailSettings in db/repositories/interfaces.ts.
 export const emailSettingsSchema = z.object({
   rsvpChange: z.boolean(),
   hostChange: z.boolean(),
@@ -19,7 +19,7 @@ export const emailSettingsSchema = z.object({
   meetingResponse: z.boolean(),
   sessionHeadsUp: z.boolean(),
   attendeeCountReminder: z.boolean(),
-});
+} satisfies Record<keyof EmailSettings, z.ZodBoolean>);
 
 // Length caps are sanity limits only a malicious user would hit.
 const promptEntrySchema = z.object({

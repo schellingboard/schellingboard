@@ -10,7 +10,8 @@ import {
   updateProposal,
   deleteProposal,
 } from "./proposals/actions";
-import type { SessionProposal, Guest } from "@/db/repositories/interfaces";
+import type { SessionProposal } from "@/db/repositories/interfaces";
+import type { Guest } from "@schellingboard/domain/guest";
 import { SelectHosts } from "@/app/select-hosts";
 import { ConfirmDeletionModal } from "../modals";
 import { formatDuration, durationMinusBreak } from "@/utils/utils";

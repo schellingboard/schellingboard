@@ -1,5 +1,5 @@
 "use client";
-import type { Guest } from "@/db/repositories/interfaces";
+import type { Guest } from "@schellingboard/domain/guest";
 import { useContext, useState } from "react";
 import { SelectHosts } from "@/app/select-hosts";
 import { UserContext } from "./context";

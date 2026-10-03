@@ -1,8 +1,10 @@
 import { getRepositories } from "@/db/container";
-import { DEFAULT_EMAIL_SETTINGS } from "@/db/repositories/interfaces";
+import {
+  DEFAULT_EMAIL_SETTINGS,
+  type EmailSettings,
+  type Guest,
+} from "@schellingboard/domain/guest";
 import type {
-  EmailSettings,
-  Guest,
   Location,
   LocationUnavailability,
   Session,

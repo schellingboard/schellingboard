@@ -13,20 +13,22 @@ import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
 import * as schema from "../../schema";
 import {
-  DEFAULT_EMAIL_SETTINGS,
-  type CompleteGuest,
-  type EmailSettings,
-  type EventAttendee,
   type EventGuestPage,
-  type Guest,
   type GuestAuthCredentials,
   type GuestsRepository,
   type GuestPage,
   type NewGuest,
+} from "../interfaces";
+import {
+  DEFAULT_EMAIL_SETTINGS,
+  type CompleteGuest,
+  type EmailSettings,
+  type EventAttendee,
+  type Guest,
   type ProfileContact,
   type ProfilePrompt,
-  Attendee,
-} from "../interfaces";
+  type Attendee,
+} from "@schellingboard/domain/guest";
 import { sanitizeGuest } from "@/utils/guests";
 
 type DB = BetterSQLite3Database<typeof schema>;

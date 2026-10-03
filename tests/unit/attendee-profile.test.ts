@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 
-import type { Attendee } from "@/db/repositories/interfaces";
+import type { Attendee } from "@schellingboard/domain/guest";
 import { hasFilledProfile, profileExcerpt } from "@/utils/attendee-profile";
 
 let counter = 0;

@@ -18,7 +18,7 @@ import Database from "better-sqlite3";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest, createLocation } from "../helpers/factories";
 import { getRepositories, serializeDb } from "@/db/container";
-import { DEFAULT_EMAIL_SETTINGS } from "@/db/repositories/interfaces";
+import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
 import { isMailerConfigured, sendMail } from "@/utils/mailer";
 import { dispatchDueReminders } from "@/utils/reminder-dispatch";
 import { followUpDueTime } from "@/utils/reminder-schedule";

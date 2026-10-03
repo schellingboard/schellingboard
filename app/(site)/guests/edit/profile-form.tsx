@@ -15,8 +15,13 @@ import { BackLink } from "@/app/components/back-link";
 import { Input } from "@/app/input";
 import { updateProfileAction } from "@/app/actions/profile";
 import { Avatar } from "../avatar";
-import type { Guest } from "@/db/repositories/interfaces";
-import { CONTACT_TYPES } from "@schellingboard/domain/guest";
+import {
+  type Guest,
+  CONTACT_TYPES,
+  CONTACT_TYPE_LABELS,
+  MAX_CONTACTS,
+  MAX_LANGUAGES,
+} from "@schellingboard/domain/guest";
 import { resizeImage } from "@/utils/images-client";
 import { AVATAR_MAX_SIZE } from "@/utils/avatar-image-constraints";
 import clsx from "clsx";
@@ -27,11 +32,6 @@ import {
   useForm,
   useWatch,
 } from "react-hook-form";
-import {
-  CONTACT_TYPE_LABELS,
-  MAX_CONTACTS,
-  MAX_LANGUAGES,
-} from "@schellingboard/domain/guest";
 import { profileSchema } from "@schellingboard/contracts/guest";
 import { CORE_PROMPTS, PROMPT_POOL } from "@schellingboard/domain/prompt-pool";
 import { languageSuggestions } from "./languages";

@@ -1,4 +1,4 @@
-import type { Attendee } from "@/db/repositories/interfaces";
+import type { Attendee } from "@schellingboard/domain/guest";
 import { stripMarkdown } from "./markdown";
 
 /**

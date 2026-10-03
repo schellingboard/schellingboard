@@ -1,11 +1,7 @@
 import { DateTime } from "luxon";
 import { getRepositories } from "@/db/container";
-import type {
-  Comment,
-  EmailSettings,
-  Meeting,
-  Session,
-} from "@/db/repositories/interfaces";
+import type { Comment, Meeting, Session } from "@/db/repositories/interfaces";
+import type { EmailSettings } from "@schellingboard/domain/guest";
 import { sendMail, type EmailMessage } from "@/utils/mailer";
 import { pushToGuest } from "@/utils/push";
 import { siteUrl } from "@/utils/site-url";

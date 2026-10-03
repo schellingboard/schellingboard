@@ -1,4 +1,4 @@
-import type { Guest, CompleteGuest } from "@/db/repositories/interfaces";
+import type { Guest, CompleteGuest } from "@schellingboard/domain/guest";
 
 export function sanitizeGuest(guest: CompleteGuest): Guest {
   const out = { ...guest, info: undefined };

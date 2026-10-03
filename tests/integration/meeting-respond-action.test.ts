@@ -40,7 +40,8 @@ import {
   cancelMeetingAction,
   respondToMeetingAction,
 } from "@/app/actions/meetings";
-import type { Guest, Meeting } from "@/db/repositories/interfaces";
+import type { Meeting } from "@/db/repositories/interfaces";
+import type { Guest } from "@schellingboard/domain/guest";
 import type { Event } from "@schellingboard/domain/event";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
