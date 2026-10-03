@@ -25,7 +25,7 @@ The repository becomes a Bun workspace with two packages next to the Next app,
 which stays at the root:
 
 - **`@schellingboard/domain`** (`packages/domain`): entity types, domain constants
-  and pure functions. It imports nothing but itself, not even an npm package.
+  and pure functions. It imports nothing but itself and `luxon`.
 - **`@schellingboard/contracts`** (`packages/contracts`): zod schemas for what
   crosses the wire. It imports `domain` and `zod`, nothing else.
 
@@ -37,10 +37,10 @@ pulls in only the modules it names.
 The boundary is checked three ways, because Bun hoists `node_modules` and an
 undeclared import would otherwise still resolve:
 
-- `make arch` (dependency-cruiser): `domain` reaches only itself, `contracts`
-  only itself, `domain` and `zod`; a package is imported by name, never by a path
-  into its `src/`; and every npm package a workspace package imports is declared
-  in its own `package.json`.
+- `make arch` (dependency-cruiser): `domain` reaches only itself and `luxon`,
+  `contracts` only itself, `domain` and `zod`; a package is imported by name,
+  never by a path into its `src/`; and every npm package a workspace package
+  imports is declared in its own `package.json`.
 - `make typecheck` compiles each package with its own `tsconfig.json`, which has
   no `@/` path alias and, for `domain`, no DOM or Node types.
 - The ambient-clock lint rule (ADR 0004) covers `packages/*/src`.
@@ -60,8 +60,10 @@ by a rule that nothing outside `db/` imports `db/repositories/`.
 
 - `model/` is gone. A new rule goes in `domain`; a new form or route schema goes
   in `contracts`; if it needs a database type, it does not belong in either.
-- An npm dependency for `domain` (a date library, say) is a decision: declare it
-  in the package's `package.json` and widen the `domain-stays-pure` rule.
+- `luxon` is `domain`'s one npm dependency: the time rules need time zones, and
+  the app already formats every instant with it. Another dependency is the same
+  kind of decision: declare it in the package's `package.json` and widen the
+  `domain-stays-pure` rule.
 - The Docker build copies every package's `package.json` before
   `bun install --frozen-lockfile`. A new package needs a line there too.
 - The root `tsconfig.json` still includes the packages, so the root `tsc` run

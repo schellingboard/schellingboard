@@ -14,7 +14,7 @@ import {
   meetingRun,
   meetingSlotsForDay,
   slotTimeLabel,
-} from "@/utils/meeting-slots";
+} from "@schellingboard/domain/meeting-slots";
 
 /** One person the viewer could ask for a 1-on-1 in a given slot. */
 export type MeetingCandidate = {

@@ -31,14 +31,14 @@ import {
   type TimeState,
 } from "@/utils/agenda";
 import type { MeetingView } from "@/utils/meeting-views";
-import { shownSlotStart } from "@/utils/meeting-slots";
+import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
 import { statusLine } from "@/utils/meeting-rules";
 import {
   formatDayLabel,
   formatOptionalTime,
   formatSlotLabel,
   TIME_FORMAT,
-} from "@/utils/utils";
+} from "@schellingboard/domain/time";
 import { LockIcon } from "../lock-icon";
 import { sessionRooms } from "../session_utils";
 import {

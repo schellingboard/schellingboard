@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatInLocalZone } from "@/utils/utils";
+import { formatInLocalZone } from "@schellingboard/domain/time";
 
 const INSTANT = new Date("2026-07-28T17:13:00.000Z");
 

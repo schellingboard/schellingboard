@@ -7,18 +7,18 @@ import Link from "next/link";
 import { Input } from "@/app/input";
 import { SelectHosts } from "@/app/select-hosts";
 import {
-  convertParamDateTime,
-  dateOnDay,
-  formatDayLabel,
-  formatDuration,
-  formatSlotLabel,
   durationMinusBreak,
-  TIME_FORMAT,
-} from "@/utils/utils";
-import {
   gridEndingDurations,
   snapDurationToSlots,
 } from "@schellingboard/domain/slots";
+import { dateOnDay, type Day, type Event } from "@schellingboard/domain/event";
+import {
+  convertParamDateTime,
+  formatDayLabel,
+  formatDuration,
+  formatSlotLabel,
+  TIME_FORMAT,
+} from "@schellingboard/domain/time";
 import { slotIsFree } from "@/utils/schedule-column";
 import { MyListbox, type Option } from "./select";
 import { viewProposalLinkFromElsewhere } from "./modal-nav";
@@ -28,7 +28,6 @@ import type {
   LocationUnavailability,
 } from "@schellingboard/domain/location";
 import type { Guest } from "@schellingboard/domain/guest";
-import type { Day, Event } from "@schellingboard/domain/event";
 import { ConfirmDeletionModal } from "../modals";
 import { EventContext, UserContext } from "../context";
 import { newEmptySession, sessionRooms } from "../session_utils";

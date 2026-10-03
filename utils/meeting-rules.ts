@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 import { inSchedPhase } from "@schellingboard/domain/phase";
-import { shownSlotStart } from "@/utils/meeting-slots";
+import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
 
 import type { Event } from "@schellingboard/domain/event";
 import type { MeetingView } from "@/utils/meeting-views";

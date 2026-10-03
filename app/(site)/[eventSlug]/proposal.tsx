@@ -3,7 +3,8 @@
 import type { ComponentProps } from "react";
 import Link from "next/link";
 import type { SessionProposal } from "@schellingboard/domain/session";
-import { formatDuration, durationMinusBreak } from "@/utils/utils";
+import { durationMinusBreak } from "@schellingboard/domain/slots";
+import { formatDuration } from "@schellingboard/domain/time";
 import { useBreakMinutes } from "@/app/(site)/context";
 import { Markdown } from "@/app/(site)/markdown";
 

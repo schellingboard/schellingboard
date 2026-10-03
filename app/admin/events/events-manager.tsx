@@ -9,7 +9,7 @@ import { PRIMARY_BUTTON, SECONDARY_BUTTON } from "@/app/admin/buttons";
 import { ActionError } from "@/app/components/action-error";
 import { TimezoneSelect } from "@/app/admin/timezone-select";
 import { MarkdownHint } from "@/app/(site)/markdown";
-import { formatEventDates } from "@/utils/utils";
+import { formatEventDates } from "@schellingboard/domain/time";
 
 const DEFAULT_FORM: EventInput = {
   name: "",

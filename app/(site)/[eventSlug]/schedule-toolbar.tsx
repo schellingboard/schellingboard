@@ -17,7 +17,7 @@ import { Markdown } from "@/app/(site)/markdown";
 import { hasPhases } from "@schellingboard/domain/phase";
 import { scrollNowLineIntoView } from "./now-line";
 import type { Event } from "@schellingboard/domain/event";
-import { formatEventDates } from "@/utils/utils";
+import { formatEventDates } from "@schellingboard/domain/time";
 
 const ITEM_CLASS =
   "flex items-center gap-1 rounded-md py-1.5 px-1 text-xs sm:text-sm text-fg-subtle hover:text-brand-fg focus:outline-none focus:ring-2 focus:ring-brand-accent";

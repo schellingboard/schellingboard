@@ -10,7 +10,7 @@ import { useContext, useState } from "react";
 
 import type { MeetingView } from "@/utils/meeting-views";
 import { meetingColumnRows } from "@/utils/meeting-column";
-import { shownSlotStart } from "@/utils/meeting-slots";
+import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
 import { getNumSlots } from "@schellingboard/domain/slots";
 import { SLOT_HEIGHT_PX } from "@/utils/grid-layout";
 import type { DayWithSessions } from "@/app/(site)/context";

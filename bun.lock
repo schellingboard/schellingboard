@@ -82,6 +82,12 @@
     "packages/domain": {
       "name": "@schellingboard/domain",
       "version": "0.0.0",
+      "dependencies": {
+        "luxon": "^3.7.2",
+      },
+      "devDependencies": {
+        "@types/luxon": "^3.7.5",
+      },
     },
   },
   "packages": {

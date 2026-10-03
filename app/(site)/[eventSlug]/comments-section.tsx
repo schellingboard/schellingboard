@@ -15,7 +15,7 @@ import { deleteComment, updateComment } from "./comment-actions";
 import { useLocalZone } from "@/utils/hooks";
 import { CommentLikes } from "./comment-likes";
 import type { LoadedComments } from "./use-comments";
-import { formatInLocalZone } from "@/utils/utils";
+import { formatInLocalZone } from "@schellingboard/domain/time";
 
 export type CommentCreateInput = { parentId?: string; body: string };
 

@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { getRepositories } from "@/db/container";
 import { outOfRangePageRedirect, parsePage } from "@/utils/pagination";
-import { formatDayLabel } from "@/utils/utils";
+import { formatDayLabel } from "@schellingboard/domain/time";
 import { requireAdminPage } from "../../../require-admin";
 import {
   EventSessionsManager,

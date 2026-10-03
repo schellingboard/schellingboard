@@ -2,7 +2,7 @@
 import { LocationCol } from "./location-col";
 import clsx from "clsx";
 import { useSearchParams } from "next/navigation";
-import { TIME_FORMAT } from "@/utils/utils";
+import { TIME_FORMAT } from "@schellingboard/domain/time";
 import { getNumSlots } from "@schellingboard/domain/slots";
 import { getNowOffsetPx } from "@/utils/grid-layout";
 import { NowLine } from "./now-line";

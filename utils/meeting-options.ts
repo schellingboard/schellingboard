@@ -6,7 +6,7 @@ import {
   meetingRun,
   meetingSlotsForDay,
   slotTimeLabel,
-} from "@/utils/meeting-slots";
+} from "@schellingboard/domain/meeting-slots";
 import { clashesForInterval, loadGuestSchedules } from "@/utils/guest-clashes";
 import { toMeetingClashes } from "@/utils/meeting-clash-text";
 import type { MeetingClash } from "@/utils/meeting-clash-text";

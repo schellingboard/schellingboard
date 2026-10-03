@@ -11,7 +11,7 @@ import type { Rsvp, Session } from "@schellingboard/domain/session";
 import type { Location } from "@schellingboard/domain/location";
 import type { Guest } from "@schellingboard/domain/guest";
 import type { Event } from "@schellingboard/domain/event";
-import { formatOptionalTime, TIME_FORMAT } from "@/utils/utils";
+import { formatOptionalTime, TIME_FORMAT } from "@schellingboard/domain/time";
 import { UserContext, EventContext } from "../../context";
 import { CurrentUserModal, ConfirmationModal } from "../../modals";
 import { LockIcon } from "../../lock-icon";

@@ -87,11 +87,11 @@ one nobody can reason about from the import list.
 The direction that matters is inward. `db/` and `app/` are adapters and may
 depend on the workspace packages; the packages may not depend on them
 ([ADR 0010](adr/0010-workspace-packages.md)). `packages/domain` imports nothing
-but itself, and `packages/contracts` only `domain` and `zod`. Types follow the
-same direction: an entity type is domain vocabulary and belongs in `domain`,
-where both adapters can import it. A type that only means something to the
-database — a row shape, a driver's handle — stays in `db/` and is used only
-inside `db/`.
+but itself and `luxon`, and `packages/contracts` only `domain` and `zod`. Types
+follow the same direction: an entity type is domain vocabulary and belongs in
+`domain`, where both adapters can import it. A type that only means something
+to the database — a row shape, a driver's handle — stays in `db/` and is used
+only inside `db/`.
 
 `db/repositories/` holds the repository ports and their SQLite adapters, and
 nothing outside `db/` imports from it (`repositories-stay-in-db`); the rest of

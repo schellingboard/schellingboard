@@ -28,7 +28,7 @@ import { VoteBreakdown } from "./vote-breakdown";
 import { VoteTally } from "./vote-tally";
 import type { EventInterestSummary } from "@schellingboard/domain/proposal-vote-stats";
 import { useLocalZone } from "@/utils/hooks";
-import { formatOptionalTime, TIME_FORMAT } from "@/utils/utils";
+import { formatOptionalTime, TIME_FORMAT } from "@schellingboard/domain/time";
 import { viewSessionLinkFromElsewhere } from "../modal-nav";
 import { joinProposal } from "./actions";
 

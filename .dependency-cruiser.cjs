@@ -22,11 +22,12 @@ module.exports = {
       severity: "error",
       comment:
         "`packages/domain` is the vocabulary and the rules both the server and the browser " +
-        "run, so it imports nothing but itself: no framework, no I/O, no npm package, not " +
-        "even for a type. A schema belongs in `packages/contracts`; a type that only means " +
-        "something to the database stays in `db/`. See docs/dev/adr/0010-workspace-packages.md.",
+        "run, so it imports nothing but itself and luxon for time zones: no framework, no " +
+        "I/O, no other npm package, not even for a type. A schema belongs in " +
+        "`packages/contracts`; a type that only means something to the database stays in " +
+        "`db/`. See docs/dev/adr/0010-workspace-packages.md.",
       from: { path: "^packages/domain/" },
-      to: { pathNot: "^packages/domain/" },
+      to: { pathNot: "^(packages/domain/|node_modules/luxon/)" },
     },
     {
       name: "contracts-import-only-domain-and-zod",

@@ -17,8 +17,11 @@ import {
 import type { Guest } from "@schellingboard/domain/guest";
 import { SelectHosts } from "@/app/select-hosts";
 import { ConfirmDeletionModal } from "../modals";
-import { formatDuration, durationMinusBreak } from "@/utils/utils";
-import { slotDurationOptions } from "@schellingboard/domain/slots";
+import {
+  durationMinusBreak,
+  slotDurationOptions,
+} from "@schellingboard/domain/slots";
+import { formatDuration } from "@schellingboard/domain/time";
 import { MarkdownHint } from "@/app/(site)/markdown";
 import { ScheduledSessionsNotice } from "./scheduled-sessions-notice";
 import { useController, useForm, useWatch } from "react-hook-form";

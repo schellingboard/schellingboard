@@ -30,7 +30,8 @@ import {
 } from "@schellingboard/domain/phase";
 import type { Event } from "@schellingboard/domain/event";
 import { useDebouncedSearch, useLocalZone } from "@/utils/hooks";
-import { formatDuration, durationMinusBreak } from "@/utils/utils";
+import { durationMinusBreak } from "@schellingboard/domain/slots";
+import { formatDuration } from "@schellingboard/domain/time";
 
 import { VotingButtons } from "./voting-buttons";
 import { VoteTally } from "./vote-tally";

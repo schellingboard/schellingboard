@@ -1,4 +1,4 @@
-import { shownSlotStart } from "@/utils/meeting-slots";
+import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
 import { getNumSlots } from "@schellingboard/domain/slots";
 import { gridBlockPx } from "@/utils/grid-layout";
 import type { MeetingView } from "@/utils/meeting-views";

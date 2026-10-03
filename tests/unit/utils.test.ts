@@ -1,21 +1,22 @@
 import { describe, it, expect } from "vitest";
 import {
-  durationMinusBreak,
-  formatDuration,
   eventNameToSlug,
   normalizeWebsiteUrl,
-  dateOnDay,
-  formatDayLabel,
-  formatSlotLabel,
-  getPercentThroughDay,
-  formatOptionalTime,
-  TIME_FORMAT,
   votesApiUrl,
   normalizeForSearch,
   containsIgnoringAccents,
   equalsIgnoringAccents,
 } from "@/utils/utils";
-import type { Day } from "@schellingboard/domain/event";
+import { durationMinusBreak } from "@schellingboard/domain/slots";
+import { dateOnDay, type Day } from "@schellingboard/domain/event";
+import {
+  formatDuration,
+  formatDayLabel,
+  formatSlotLabel,
+  getPercentThroughDay,
+  formatOptionalTime,
+  TIME_FORMAT,
+} from "@schellingboard/domain/time";
 
 // ── durationMinusBreak ───────────────────────────────────────────────────────
 

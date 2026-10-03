@@ -1,9 +1,15 @@
 import { DateTime } from "luxon";
 import { getRepositories } from "@/db/container";
-import type { Day, Event } from "@schellingboard/domain/event";
+import {
+  type Day,
+  type Event,
+  compareEventsByStart,
+} from "@schellingboard/domain/event";
 import { meetingsOpen } from "@/utils/meeting-rules";
-import { meetingSlotsForDay, slotTimeLabel } from "@/utils/meeting-slots";
-import { compareEventsByStart } from "@/utils/utils";
+import {
+  meetingSlotsForDay,
+  slotTimeLabel,
+} from "@schellingboard/domain/meeting-slots";
 
 export type SlotDay = {
   /** Two days may share a date, so the id is what keys them apart. */

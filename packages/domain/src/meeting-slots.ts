@@ -1,7 +1,7 @@
-// Companion to packages/domain/src/slots.ts, which owns the schedule grid's
-// slot math: these are the same grid, stepped from the same increment, and kept
-// separate only because a meeting asks a different question of it (which slots
-// exist on a day) than the grid does (how tall a row is, what aligns).
+// Companion to slots.ts, which owns the schedule grid's slot math: these are
+// the same grid, stepped from the same increment, and kept separate only
+// because a meeting asks a different question of it (which slots exist on a
+// day) than the grid does (how tall a row is, what aligns).
 //
 // 1-on-1 slots are derived, never stored: a day plus the event's slot
 // increment is enough to say which slots exist. Availability rows then key on

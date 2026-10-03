@@ -47,3 +47,15 @@ export type Day = {
   endBookings: Date;
   eventId: string;
 };
+
+// Events without days have no dates yet and sort last.
+export function compareEventsByStart(a: Event, b: Event): number {
+  const [x, y] = [a, b].map((e) => e.firstDayStart?.getTime() ?? Infinity);
+  return x === y ? 0 : x < y ? -1 : 1;
+}
+
+export const dateOnDay = (date: Date, day: Day) => {
+  return (
+    date.getTime() >= day.start.getTime() && date.getTime() <= day.end.getTime()
+  );
+};

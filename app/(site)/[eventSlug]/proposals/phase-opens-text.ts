@@ -1,4 +1,4 @@
-import { formatInLocalZone } from "@/utils/utils";
+import { formatInLocalZone } from "@schellingboard/domain/time";
 
 /**
  * Describes when a phase opens, in the reader's own timezone: attendees often

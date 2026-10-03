@@ -1,7 +1,7 @@
 // Slot math for the schedule grid. Each event divides its days into slots of
 // `slotIncrementMinutes`; the grid, start-time options, and duration options
 // all derive from these helpers so they stay in agreement. 1-on-1 meeting
-// slots share this grid and its increment; utils/meeting-slots.ts derives
+// slots share this grid and its increment; meeting-slots.ts derives
 // those from a day.
 
 export const SLOT_INCREMENT_OPTIONS = [15, 30, 45, 60] as const;
@@ -114,4 +114,22 @@ export function snapDurationToSlots(
     }
   }
   return best;
+}
+
+/**
+ * Default per-event break length, used when an event's value is unavailable.
+ * Mirrors the events schema default.
+ */
+export const DEFAULT_BREAK_MINUTES = 10;
+
+/**
+ * Effective working duration of a slot once its fixed break is removed.
+ * The break is a single per-event value; clamps at 0 so absurd configs
+ * (break ≥ duration) never produce a negative label.
+ */
+export function durationMinusBreak(
+  durationMinutes: number,
+  breakMinutes: number
+): number {
+  return Math.max(0, durationMinutes - breakMinutes);
 }

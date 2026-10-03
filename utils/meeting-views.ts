@@ -3,7 +3,7 @@ import { getRepositories } from "@/db/container";
 import type { MeetingStatus } from "@schellingboard/domain/meeting";
 import { clashesForInterval, loadGuestSchedules } from "@/utils/guest-clashes";
 import { toMeetingClashes } from "@/utils/meeting-clash-text";
-import { slotTimeLabel } from "@/utils/meeting-slots";
+import { slotTimeLabel } from "@schellingboard/domain/meeting-slots";
 import type { MeetingClash } from "@/utils/meeting-clash-text";
 
 /**

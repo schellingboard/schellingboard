@@ -14,7 +14,7 @@ import {
   maxMeetingSlots,
   meetingRun,
   meetingSlotsForDay,
-} from "@/utils/meeting-slots";
+} from "@schellingboard/domain/meeting-slots";
 import {
   notifyMeetingOutcome,
   notifyMeetingRequested,

@@ -5,7 +5,7 @@ import Link from "next/link";
 
 import { EventContext } from "@/app/(site)/context";
 import { sessionRooms } from "@/app/(site)/session_utils";
-import { formatOptionalTime, TIME_FORMAT } from "@/utils/utils";
+import { formatOptionalTime, TIME_FORMAT } from "@schellingboard/domain/time";
 import { viewSessionLinkFromElsewhere } from "./modal-nav";
 
 // A session is a copy of its proposal, not a view of it: hosts keep expecting

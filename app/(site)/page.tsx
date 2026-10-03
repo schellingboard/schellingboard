@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import SummaryPage from "./summary-page";
 import { getRepositories } from "@/db/container";
 import { redirect } from "next/navigation";
-import { compareEventsByStart } from "@/utils/utils";
+import { compareEventsByStart } from "@schellingboard/domain/event";
 
 export default async function Home() {
   const repos = getRepositories();

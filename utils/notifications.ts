@@ -23,7 +23,7 @@ import {
   meetingRequestEmail,
   meetingRequestNoticeText,
 } from "@/emails/meeting";
-import { shownSlotStart } from "@/utils/meeting-slots";
+import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
 
 // One line in the past tense, where it happened, and when — `at` comes from
 // the caller's clock so the dev fake clock reaches these rows like every other
