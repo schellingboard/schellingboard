@@ -11,7 +11,7 @@ import { isUnoptimized } from "@/utils/image-loader";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { Tooltip } from "./tooltip";
 import { DateTime } from "luxon";
-import type { Location } from "@/db/repositories/interfaces";
+import type { Location } from "@schellingboard/domain/location";
 import type { Guest } from "@schellingboard/domain/guest";
 import type { DayWithSessions } from "@/app/(site)/context";
 import { EventContext, useSlotIncrement } from "@/app/(site)/context";

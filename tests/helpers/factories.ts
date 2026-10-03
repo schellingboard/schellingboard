@@ -4,12 +4,11 @@ import {
   type EmailSettings,
   type Guest,
 } from "@schellingboard/domain/guest";
+import type { Session, SessionProposal } from "@/db/repositories/interfaces";
 import type {
   Location,
   LocationUnavailability,
-  Session,
-  SessionProposal,
-} from "@/db/repositories/interfaces";
+} from "@schellingboard/domain/location";
 import type { Event, Day } from "@schellingboard/domain/event";
 import { sanitizeGuest } from "@/utils/guests";
 

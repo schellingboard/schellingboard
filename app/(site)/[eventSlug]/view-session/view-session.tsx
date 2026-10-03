@@ -7,7 +7,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { PencilIcon } from "@heroicons/react/24/outline";
 import { CheckCircleIcon, AcademicCapIcon } from "@heroicons/react/24/solid";
 
-import type { Location, Session, Rsvp } from "@/db/repositories/interfaces";
+import type { Session, Rsvp } from "@/db/repositories/interfaces";
+import type { Location } from "@schellingboard/domain/location";
 import type { Guest } from "@schellingboard/domain/guest";
 import type { Event } from "@schellingboard/domain/event";
 import { formatOptionalTime, TIME_FORMAT } from "@/utils/utils";

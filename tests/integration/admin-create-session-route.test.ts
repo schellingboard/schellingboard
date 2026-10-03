@@ -16,7 +16,7 @@ import {
   createLocation,
   createDay,
 } from "../helpers/factories";
-import type { Location } from "@/db/repositories/interfaces";
+import type { Location } from "@schellingboard/domain/location";
 import type { Guest } from "@schellingboard/domain/guest";
 import type { Event } from "@schellingboard/domain/event";
 import { getRepositories } from "@/db/container";

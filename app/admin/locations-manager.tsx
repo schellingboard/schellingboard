@@ -5,7 +5,7 @@ import Image from "next/image";
 import { isUnoptimized } from "@/utils/image-loader";
 import clsx from "clsx";
 import { Input } from "@/app/input";
-import type { Location } from "@/db/repositories/interfaces";
+import type { Location } from "@schellingboard/domain/location";
 import {
   IMAGE_REQUIREMENTS_HINT,
   MAX_IMAGE_BYTES,

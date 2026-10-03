@@ -1,4 +1,5 @@
-import type { Location, Session } from "@/db/repositories/interfaces";
+import type { Session } from "@/db/repositories/interfaces";
+import type { Location } from "@schellingboard/domain/location";
 
 export function newEmptySession(eventId: string): Session {
   return {

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getRepositories } from "@/db/container";
 import { isAdminRequest } from "@/utils/acting-admin";
 import { getImageRepositories } from "@/utils/images";
-import type { Location } from "@/db/repositories/interfaces";
+import type { Location } from "@schellingboard/domain/location";
 import type { AdminActionResult, AdminFormActionResult } from "./admin-guests";
 import {
   locationSchema,

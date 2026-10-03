@@ -1,8 +1,5 @@
-import type {
-  Location,
-  Session,
-  SessionCreateInput,
-} from "@/db/repositories/interfaces";
+import type { Session, SessionCreateInput } from "@/db/repositories/interfaces";
+import type { Location } from "@schellingboard/domain/location";
 import type { Guest } from "@schellingboard/domain/guest";
 import type { Day } from "@schellingboard/domain/event";
 

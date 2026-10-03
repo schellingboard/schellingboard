@@ -1,6 +1,6 @@
 "use client";
 import type { ReactNode, RefObject } from "react";
-import type { Location } from "@/db/repositories/interfaces";
+import type { Location } from "@schellingboard/domain/location";
 import type { DayWithSessions } from "../context";
 import { DayAgenda } from "./day-agenda";
 import { DayFoldBar } from "./day-fold-bar";

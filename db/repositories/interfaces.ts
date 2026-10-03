@@ -1,3 +1,7 @@
+import type {
+  Location,
+  LocationUnavailability,
+} from "@schellingboard/domain/location";
 import type { AuthCodePurpose, AuthCode } from "@schellingboard/domain/auth";
 import type {
   EmailSettings,
@@ -46,14 +50,6 @@ export interface DaysRepository {
   /** Deletes the day and every session that overlaps the day's window. */
   delete(id: string): Promise<void>;
 }
-
-export type LocationUnavailability = {
-  id: string;
-  eventId: string;
-  locationId: string;
-  start: Date;
-  end: Date;
-};
 
 export interface LocationUnavailabilityRepository {
   /** Ordered by start. */
@@ -283,18 +279,6 @@ export interface GuestsRepository {
 }
 
 // ── Locations ─────────────────────────────────────────────────────────────────
-
-export type Location = {
-  id: string;
-  name: string;
-  imageUrl: string;
-  description: string;
-  capacity: number;
-  color: string;
-  bookable: boolean;
-  sortIndex: number;
-  areaDescription?: string;
-};
 
 /** A location paired with whether it is assigned to a given event. */
 export type EventLocationRow = {

@@ -33,7 +33,7 @@ import {
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
 import type { SessionParams } from "@/app/api/session-form-utils";
-import type { Location } from "@/db/repositories/interfaces";
+import type { Location } from "@schellingboard/domain/location";
 import type { Guest } from "@schellingboard/domain/guest";
 import type { Day } from "@schellingboard/domain/event";
 

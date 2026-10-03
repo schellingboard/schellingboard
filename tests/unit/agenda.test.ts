@@ -5,7 +5,8 @@ import {
   timeState,
   type AgendaGroup,
 } from "@/utils/agenda";
-import type { Location, Session } from "@/db/repositories/interfaces";
+import type { Session } from "@/db/repositories/interfaces";
+import type { Location } from "@schellingboard/domain/location";
 import type { MeetingView } from "@/utils/meeting-views";
 import { newEmptySession } from "@/app/(site)/session_utils";
 

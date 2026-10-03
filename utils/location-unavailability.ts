@@ -1,4 +1,4 @@
-import type { LocationUnavailability } from "@/db/repositories/interfaces";
+import type { LocationUnavailability } from "@schellingboard/domain/location";
 
 type Placement = { locationId: string; start: Date; end: Date };
 

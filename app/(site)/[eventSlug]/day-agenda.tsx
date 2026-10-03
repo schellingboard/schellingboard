@@ -14,7 +14,8 @@ import {
   CheckCircleIcon,
   UserIcon,
 } from "@heroicons/react/24/solid";
-import type { Location, Session } from "@/db/repositories/interfaces";
+import type { Session } from "@/db/repositories/interfaces";
+import type { Location } from "@schellingboard/domain/location";
 import type { DayWithSessions } from "@/app/(site)/context";
 import {
   EventContext,
