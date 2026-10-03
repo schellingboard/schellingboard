@@ -23,6 +23,7 @@ import {
   createDay,
   createSession,
   slotStart,
+  createUnavailability,
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { POST } from "@/app/api/add-session/route";
@@ -356,6 +357,75 @@ describe("POST /api/add-session", () => {
     const sessions = await getRepositories().sessions.listByEvent(event.id);
     expect(sessions).toHaveLength(1);
     expect(sessions[0].title).toBe("First");
+  });
+
+  describe("a room unavailable for part of the day", () => {
+    it(
+      "rejects a session that runs into the unavailable time",
+      { tags: ["017-US4"] },
+      async () => {
+        const event = await createEvent({ phase: "scheduling" });
+        const guest = await createGuest({ eventId: event.id });
+        const location = await createLocation({ eventId: event.id });
+        const day = await createDay(event.id);
+        await createUnavailability(
+          event.id,
+          location.id,
+          new Date(slotStart(day, 90)),
+          new Date(slotStart(day, 180))
+        );
+
+        const res = await POST(makeReq(buildPayload(guest, location, day)));
+
+        expect(res.status).toBe(400);
+        expect(
+          await getRepositories().sessions.listByEvent(event.id)
+        ).toHaveLength(0);
+      }
+    );
+
+    it(
+      "books the room right before it becomes unavailable",
+      { tags: ["017-US4"] },
+      async () => {
+        const event = await createEvent({ phase: "scheduling" });
+        const guest = await createGuest({ eventId: event.id });
+        const location = await createLocation({ eventId: event.id });
+        const day = await createDay(event.id);
+        await createUnavailability(
+          event.id,
+          location.id,
+          new Date(slotStart(day, 120)),
+          new Date(slotStart(day, 180))
+        );
+
+        const res = await POST(makeReq(buildPayload(guest, location, day)));
+
+        expect(res.ok).toBe(true);
+      }
+    );
+
+    it(
+      "books another room at the same time",
+      { tags: ["017-US4"] },
+      async () => {
+        const event = await createEvent({ phase: "scheduling" });
+        const guest = await createGuest({ eventId: event.id });
+        const closed = await createLocation({ eventId: event.id });
+        const open = await createLocation({ eventId: event.id });
+        const day = await createDay(event.id);
+        await createUnavailability(
+          event.id,
+          closed.id,
+          new Date(slotStart(day, 0)),
+          new Date(slotStart(day, 240))
+        );
+
+        const res = await POST(makeReq(buildPayload(guest, open, day)));
+
+        expect(res.ok).toBe(true);
+      }
+    );
   });
 
   it("accepts overlap in different location; both sessions are listed", async () => {

@@ -25,13 +25,15 @@ export async function EventLayoutContent({
   // into the SSR payload.
   const currentUser = await verifiedCurrentUser(cookieStore);
 
-  const [days, sessions, locations, guests, rsvps] = await Promise.all([
-    repos.days.listByEvent(event.id),
-    repos.sessions.listByEvent(event.id),
-    repos.locations.listByEvent(event.id),
-    repos.guests.listByEvent(event.id),
-    currentUser ? repos.rsvps.listByGuest(currentUser) : Promise.resolve([]),
-  ]);
+  const [days, sessions, locations, unavailability, guests, rsvps] =
+    await Promise.all([
+      repos.days.listByEvent(event.id),
+      repos.sessions.listByEvent(event.id),
+      repos.locations.listByEvent(event.id),
+      repos.locationUnavailability.listByEvent(event.id),
+      repos.guests.listByEvent(event.id),
+      currentUser ? repos.rsvps.listByGuest(currentUser) : Promise.resolve([]),
+    ]);
 
   const daysWithSessions: DayWithSessions[] = days.map((day) => ({
     ...day,
@@ -49,6 +51,7 @@ export async function EventLayoutContent({
     days: daysWithSessions,
     sessions,
     locations,
+    unavailability,
     guests,
     rsvps,
     // Computed on the server so SSR and hydration agree on which days

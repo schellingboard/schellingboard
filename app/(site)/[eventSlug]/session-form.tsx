@@ -24,6 +24,7 @@ import type {
   Event,
   Guest,
   Location,
+  LocationUnavailability,
   Session,
   SessionProposal,
 } from "@/db/repositories/interfaces";
@@ -63,7 +64,7 @@ export function SessionForm(props: {
   const { event, days, sessions, guests, proposals, maxSessionDuration } =
     props;
   const { user: currentUser } = useContext(UserContext);
-  const { now } = useContext(EventContext);
+  const { now, unavailability } = useContext(EventContext);
   const eventName = event.name;
   const timezone = event.timezone ?? "UTC";
 
@@ -164,6 +165,7 @@ export function SessionForm(props: {
     event.breakMinutes,
     event.slotIncrementMinutes,
     timezone,
+    unavailability,
     locationId
   );
   const initTimeValid = startTimes.some((st) => st.time === initSlot);
@@ -686,14 +688,21 @@ function getAvailableStartTimes(
   breakMinutes: number,
   slotIncrementMinutes: number,
   timezone: string,
+  unavailability: LocationUnavailability[],
   locationId?: string
 ) {
   const breakMs = breakMinutes * 60 * 1000;
   const locationSelected = !!locationId;
-  const others = sessions.filter(
-    (s) =>
-      s.locations.some((l) => l.id === locationId) && s.id !== currentSession.id
-  );
+  const others = [
+    ...sessions.filter(
+      (s) =>
+        s.locations.some((l) => l.id === locationId) &&
+        s.id !== currentSession.id
+    ),
+    ...unavailability
+      .filter((u) => u.locationId === locationId)
+      .map((u) => ({ startTime: u.start, endTime: u.end })),
+  ];
   const maxDurationFrom = (slot: number) => {
     const nextStart = Math.min(
       day.endBookings.getTime(),

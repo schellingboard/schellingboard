@@ -7,6 +7,8 @@ export type ColumnItem =
 
 type Scheduled = Session & { startTime: Date; endTime: Date };
 
+type Interval = { start: Date; end: Date };
+
 const MS_PER_MINUTE = 60 * 1000;
 
 /**
@@ -14,7 +16,7 @@ const MS_PER_MINUTE = 60 * 1000;
  * slot: the room is free from the end of the slot's break to its end.
  */
 export function slotIsFree(
-  sessions: Session[],
+  sessions: Pick<Session, "startTime" | "endTime">[],
   slotStart: Date,
   incrementMinutes: number,
   breakMinutes: number
@@ -36,11 +38,18 @@ export function slotIsFree(
  */
 export function locationColumn(input: {
   sessions: Session[];
+  unavailable?: Interval[];
   day: { start: Date; end: Date };
   incrementMinutes: number;
   breakMinutes: number;
 }): ColumnItem[] {
-  const { sessions, day, incrementMinutes, breakMinutes } = input;
+  const {
+    sessions,
+    unavailable = [],
+    day,
+    incrementMinutes,
+    breakMinutes,
+  } = input;
   const block = (from: Date, to: Date) =>
     gridBlockPx(day.start, from, to, incrementMinutes);
   const scheduled = sessions.filter(
@@ -52,14 +61,18 @@ export function locationColumn(input: {
     ...block(session.startTime, session.endTime),
   }));
 
+  const occupied = [
+    ...scheduled,
+    ...unavailable.map((u) => ({ startTime: u.start, endTime: u.end })),
+  ];
   const slotMs = incrementMinutes * MS_PER_MINUTE;
   for (let t = day.start.getTime(); t < day.end.getTime(); t += slotMs) {
     const start = new Date(t);
-    if (!slotIsFree(scheduled, start, incrementMinutes, breakMinutes)) continue;
+    if (!slotIsFree(occupied, start, incrementMinutes, breakMinutes)) continue;
     // A session may run into the slot's break; the cell starts where it ends.
     const top = Math.max(
       t,
-      ...scheduled
+      ...occupied
         .map((s) => s.endTime.getTime())
         .filter((end) => end > t && end < t + slotMs)
     );

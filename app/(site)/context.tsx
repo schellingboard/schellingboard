@@ -13,6 +13,7 @@ import type {
   Day,
   Session,
   Location,
+  LocationUnavailability,
   Guest,
   Rsvp,
 } from "@/db/repositories/interfaces";
@@ -62,6 +63,7 @@ export interface EventContextType {
   days: DayWithSessions[];
   sessions: Session[];
   locations: Location[];
+  unavailability: LocationUnavailability[];
   guests: Guest[];
   rsvps: Rsvp[];
   // Starts as the server-rendered value so SSR and hydration agree on
@@ -84,6 +86,7 @@ export const EventContext = createContext<EventContextType>({
   days: [],
   sessions: [],
   locations: [],
+  unavailability: [],
   guests: [],
   rsvps: [],
   now: new Date(0),

@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Room availability** (#1059): organizers can mark when a room can't be used, such as a
+  room only free on Saturday, instead of filling the grid with blocker sessions.
 - **Sessions at any minute, with or without a break**: organizers can place a session at
   any time, not just on the schedule's slots, and leave out the break before one, such as
   an opening keynote.

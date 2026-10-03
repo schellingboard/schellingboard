@@ -53,6 +53,24 @@ export interface DaysRepository {
   delete(id: string): Promise<void>;
 }
 
+export type LocationUnavailability = {
+  id: string;
+  eventId: string;
+  locationId: string;
+  start: Date;
+  end: Date;
+};
+
+export interface LocationUnavailabilityRepository {
+  /** Ordered by start. */
+  listByEvent(eventId: string): Promise<LocationUnavailability[]>;
+  findById(id: string): Promise<LocationUnavailability | undefined>;
+  create(
+    data: Omit<LocationUnavailability, "id">
+  ): Promise<LocationUnavailability>;
+  delete(id: string): Promise<void>;
+}
+
 // ── Events ────────────────────────────────────────────────────────────────────
 
 export type Event = {

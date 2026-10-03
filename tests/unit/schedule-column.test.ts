@@ -71,6 +71,24 @@ describe("locationColumn", () => {
     });
   });
 
+  it(
+    "offers no slot while the room is unavailable",
+    { tags: ["017-US4"] },
+    () => {
+      const frees = locationColumn({
+        sessions: [],
+        unavailable: [{ start: at(9, 30), end: at(10, 30) }],
+        day,
+        incrementMinutes: 30,
+        breakMinutes: 10,
+      }).filter((item) => item.kind === "free");
+      expect(frees.map((f) => f.kind === "free" && f.start)).toEqual([
+        at(9),
+        at(10, 30),
+      ]);
+    }
+  );
+
   it("never draws a block above the day", () => {
     const quick = session(at(9), at(9, 5), "Quick");
     const item = layout([quick], 10).find((i) => i.kind === "session");
