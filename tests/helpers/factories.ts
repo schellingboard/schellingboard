@@ -5,6 +5,7 @@ import type {
   Event,
   Guest,
   Location,
+  LocationUnavailability,
   Day,
   Session,
   SessionProposal,
@@ -215,5 +216,19 @@ export async function createSession(
     eventId,
     hostIds: opts?.hostIds ?? [],
     locationIds: opts?.locationIds ?? [],
+  });
+}
+
+export async function createUnavailability(
+  eventId: string,
+  locationId: string,
+  start: Date,
+  end: Date
+): Promise<LocationUnavailability> {
+  return getRepositories().locationUnavailability.create({
+    eventId,
+    locationId,
+    start,
+    end,
   });
 }

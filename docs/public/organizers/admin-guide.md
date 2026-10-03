@@ -73,8 +73,9 @@ One global row shown when there's more than one event (see
 ## Locations
 
 Locations are a **global pool**, not per-event — one location can be
-assigned to multiple events. The event's "Locations" tab only
-assigns/unassigns from this pool; it doesn't create new ones.
+assigned to multiple events. The event's "Locations" tab assigns rooms from
+this pool and sets [when they are unavailable](#location-unavailability); it doesn't
+create new ones.
 
 - **Name, Capacity, Description, Area description, Color** (schedule grid). The
   description is what a room offers (projector, whiteboard, seating); attendees
@@ -91,6 +92,18 @@ assigns/unassigns from this pool; it doesn't create new ones.
 Attendees are only ever offered the locations assigned to the event they are
 in and that are bookable — everything else is refused. To take a location off
 an event's grid without deleting it, unassign it from the event.
+
+### Room availability
+
+Below the assignments on the event's "Locations" tab, mark the times a room
+can't be used at this event — a room only free on Saturday, or closed in the
+afternoon. Pick the room and a start and end, or fill in a whole day with one
+click. Attendees aren't offered those slots, and the grid shows them empty, as
+before bookings open. You can still place a session there yourself.
+
+Use this rather than a **blocker** session when attendees don't need to know
+why. Something they should see on their schedule, such as lunch, stays a
+blocker.
 
 ## Guests / Users
 
@@ -145,8 +158,9 @@ proposal → schedule flow.
 - **Break before** — when creating a session, the event's break is added to
   the start you enter, as for attendees' sessions. Untick it for a session that
   should start right away, such as an opening keynote.
-- **Blocker** — marks the slot as unavailable (e.g. a break), not a real
-  session.
+- **Blocker** — something attendees should see on the schedule but can't
+  attend as a session, such as lunch. To just take a room out of use, see
+  [Location unavailability](#location-unavailability).
 - **Closed** — an attendee-facing note that latecomers shouldn't join; it
   does _not_ restrict RSVPs.
 - **Admin-managed** — checked by default for admin-created sessions; hosts

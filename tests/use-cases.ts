@@ -490,6 +490,11 @@ export const features = {
         actor: "organizer",
         priority: "P1",
       },
+      US4: {
+        title: "Organizer marks when a room is unavailable",
+        actor: "organizer",
+        priority: "P2",
+      },
     },
   },
   "018": {

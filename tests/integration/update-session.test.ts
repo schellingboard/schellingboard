@@ -25,6 +25,7 @@ import {
   createDay,
   createSession,
   slotStart,
+  createUnavailability,
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import {
@@ -849,6 +850,117 @@ describe("POST /api/update-session", () => {
 
     const updated = (await getRepositories().sessions.findById(started.id))!;
     expect(updated.endTime!.toISOString()).toBe(slotStart(day, 240));
+  });
+
+  describe("a room unavailable for part of the day", () => {
+    it(
+      "rejects moving a session into the unavailable time",
+      { tags: ["017-US4"] },
+      async () => {
+        const event = await createEvent({ phase: "scheduling" });
+        const host = await createGuest({ eventId: event.id });
+        const location = await createLocation({ eventId: event.id });
+        const day = await createDay(event.id);
+        const id = await createScheduledSession(event.id, host, location, day);
+        await createUnavailability(
+          event.id,
+          location.id,
+          new Date(slotStart(day, 180)),
+          new Date(slotStart(day, 240))
+        );
+        const session = (await getRepositories().sessions.findById(id))!;
+
+        const res = await POST(
+          makeUpdateReq(
+            payloadFor(session, host, location, day, {
+              startTime: slotStart(day, 180),
+              duration: 60,
+            }),
+            { editorGuestId: host.id }
+          )
+        );
+
+        expect(res.status).toBe(400);
+        const unchanged = (await getRepositories().sessions.findById(id))!;
+        expect(unchanged.startTime).toEqual(session.startTime);
+      }
+    );
+
+    it(
+      "keeps a session an organizer placed in the unavailable time",
+      { tags: ["017-US4"] },
+      async () => {
+        const event = await createEvent({ phase: "scheduling" });
+        const host = await createGuest({ eventId: event.id });
+        const location = await createLocation({ eventId: event.id });
+        const day = await createDay(event.id);
+        await createUnavailability(
+          event.id,
+          location.id,
+          new Date(slotStart(day, 0)),
+          new Date(slotStart(day, 240))
+        );
+        const placed = await createSession(event.id, {
+          title: "Private Workshop",
+          hostIds: [host.id],
+          locationIds: [location.id],
+          startTime: new Date(slotStart(day, 70)),
+          endTime: new Date(slotStart(day, 120)),
+        });
+
+        const res = await POST(
+          makeUpdateReq(
+            payloadFor(placed, host, location, day, {
+              title: "Open Workshop",
+            }),
+            { editorGuestId: host.id }
+          )
+        );
+
+        expect(res.ok).toBe(true);
+        const updated = (await getRepositories().sessions.findById(placed.id))!;
+        expect(updated.title).toBe("Open Workshop");
+      }
+    );
+
+    it(
+      "rejects stretching such a session further into the unavailable time",
+      { tags: ["017-US4"] },
+      async () => {
+        const event = await createEvent({ phase: "scheduling" });
+        const host = await createGuest({ eventId: event.id });
+        const location = await createLocation({ eventId: event.id });
+        const day = await createDay(event.id);
+        await createUnavailability(
+          event.id,
+          location.id,
+          new Date(slotStart(day, 0)),
+          new Date(slotStart(day, 240))
+        );
+        const placed = await createSession(event.id, {
+          title: "Private Workshop",
+          hostIds: [host.id],
+          locationIds: [location.id],
+          startTime: new Date(slotStart(day, 70)),
+          endTime: new Date(slotStart(day, 120)),
+        });
+
+        const res = await POST(
+          makeUpdateReq(
+            payloadFor(placed, host, location, day, {
+              duration: minutesFromSlot(placed, slotStart(day, 150)),
+            }),
+            { editorGuestId: host.id }
+          )
+        );
+
+        expect(res.status).toBe(400);
+        const unchanged = (await getRepositories().sessions.findById(
+          placed.id
+        ))!;
+        expect(unchanged.endTime!.toISOString()).toBe(slotStart(day, 120));
+      }
+    );
   });
 
   // An organizer can place a session where no host could book one — before the

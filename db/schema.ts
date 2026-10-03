@@ -210,6 +210,24 @@ export const eventLocations = sqliteTable(
   (t) => [primaryKey({ columns: [t.eventId, t.locationId] })]
 );
 
+// A period in which a room cannot be booked at this event. Per event, since a
+// room is shared between events and each has its own dates.
+export const locationUnavailability = sqliteTable(
+  "location_unavailability",
+  {
+    id: text("id").primaryKey(),
+    eventId: text("event_id")
+      .notNull()
+      .references(() => events.id, { onDelete: "cascade" }),
+    locationId: text("location_id")
+      .notNull()
+      .references(() => locations.id, { onDelete: "cascade" }),
+    start: text("start").notNull(),
+    end: text("end").notNull(),
+  },
+  (t) => [index("location_unavailability_event_idx").on(t.eventId)]
+);
+
 export const days = sqliteTable("days", {
   id: text("id").primaryKey(),
   start: text("start").notNull(),

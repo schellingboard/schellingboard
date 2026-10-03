@@ -7,6 +7,7 @@ import {
   type LocationFilter,
   type LocationRow,
 } from "../event-locations-manager";
+import { LocationAvailabilityManager } from "../location-availability-manager";
 
 const PAGE_SIZE = 25;
 
@@ -62,15 +63,39 @@ export default async function AdminEventLocationsPage({
     assigned: l.assigned,
   }));
 
+  const [rooms, days, periods] = await Promise.all([
+    repos.locations.listByEvent(id),
+    repos.days.listByEvent(id),
+    repos.locationUnavailability.listByEvent(id),
+  ]);
+
   return (
-    <EventLocationsManager
-      locations={locationRows}
-      eventId={id}
-      total={total}
-      page={page}
-      pageSize={PAGE_SIZE}
-      query={query}
-      filter={filter}
-    />
+    <div className="space-y-8">
+      <EventLocationsManager
+        locations={locationRows}
+        eventId={id}
+        total={total}
+        page={page}
+        pageSize={PAGE_SIZE}
+        query={query}
+        filter={filter}
+      />
+      <LocationAvailabilityManager
+        eventId={id}
+        timezone={event.timezone}
+        rooms={rooms.map((r) => ({ id: r.id, name: r.name }))}
+        days={days.map((d) => ({
+          id: d.id,
+          start: d.start.toISOString(),
+          end: d.end.toISOString(),
+        }))}
+        periods={periods.map((p) => ({
+          id: p.id,
+          locationId: p.locationId,
+          start: p.start.toISOString(),
+          end: p.end.toISOString(),
+        }))}
+      />
+    </div>
   );
 }

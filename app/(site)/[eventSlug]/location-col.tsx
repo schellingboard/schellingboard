@@ -1,6 +1,11 @@
 import type { Session, Location, Guest } from "@/db/repositories/interfaces";
 import type { DayWithSessions } from "@/app/(site)/context";
-import { useBreakMinutes, useSlotIncrement } from "@/app/(site)/context";
+import { useContext } from "react";
+import {
+  EventContext,
+  useBreakMinutes,
+  useSlotIncrement,
+} from "@/app/(site)/context";
 import { SessionBlock } from "./session-block";
 import { NowLine } from "./now-line";
 import { getNumSlots, SLOT_HEIGHT_PX } from "@/utils/slots";
@@ -17,8 +22,10 @@ export function LocationCol(props: {
   const { sessions, location, day, guests, nowOffsetPx } = props;
   const slotIncrement = useSlotIncrement();
   const breakMinutes = useBreakMinutes();
+  const { unavailability } = useContext(EventContext);
   const items = locationColumn({
     sessions,
+    unavailable: unavailability.filter((u) => u.locationId === location.id),
     day,
     incrementMinutes: slotIncrement,
     breakMinutes,
