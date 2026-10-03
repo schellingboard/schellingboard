@@ -1532,6 +1532,62 @@ test.describe("Admin UI sessions", () => {
     }
   });
 
+  test("duplicates a session onto another day @018-US2", async ({ page }) => {
+    await adminLogin(page);
+    await page.goto("/admin/events");
+    await page
+      .getByRole("listitem")
+      .filter({ hasText: "Conference Alpha" })
+      .getByRole("link", { name: "Manage" })
+      .click();
+    await openEventTab(page, "Sessions");
+    const sessions = page.getByRole("region", { name: "Sessions" });
+    const title = `Lunch ${uniqueSuffix()}`;
+
+    await sessions.getByRole("button", { name: "Add session" }).click();
+    const form = sessions.getByRole("form", { name: "New session" });
+    await form.getByLabel("Title *").fill(title);
+    await form.getByLabel("Blocker").check();
+    await form.getByLabel("Day").selectOption({ index: 1 });
+    await form.getByLabel(/^Start/).fill("12:30");
+    await form.getByLabel(/^End/).fill("13:30");
+    await form.getByRole("button", { name: "Create", exact: true }).click();
+    await expect(form).toHaveCount(0);
+
+    await sessions
+      .getByRole("searchbox", { name: "Search", exact: true })
+      .fill(title);
+    const rows = sessions.getByRole("listitem").filter({ hasText: title });
+    await expect(rows).toHaveCount(1);
+    await rows.getByRole("button", { name: `Duplicate ${title}` }).click();
+
+    const copy = sessions.getByRole("form", { name: `Copy of ${title}` });
+    await expect(copy.getByLabel("Title *")).toHaveValue(title);
+    await expect(copy.getByLabel("Blocker")).toBeChecked();
+    await expect(copy.getByLabel(/^Start/)).toHaveValue("12:30");
+    await copy.getByLabel("Day").selectOption({ index: 2 });
+    await copy.getByRole("button", { name: "Create", exact: true }).click();
+
+    await expect(rows).toHaveCount(2);
+    const dates = (await rows.allTextContents()).map(
+      (text) => /(\d{4}-\d{2}-\d{2})T12:30/.exec(text)?.[1]
+    );
+    expect(dates.every(Boolean)).toBe(true);
+    expect(new Set(dates).size).toBe(2);
+
+    for (let i = 0; i < 2; i++) {
+      await rows
+        .first()
+        .getByRole("button", { name: /^Delete/ })
+        .click();
+      await sessions
+        .getByLabel("Type the session title to confirm")
+        .fill(title);
+      await sessions.getByRole("button", { name: "Confirm delete" }).click();
+      await expect(rows).toHaveCount(1 - i);
+    }
+  });
+
   test("deletes a session via named confirm @018-US2", async ({ page }) => {
     await adminLogin(page);
     await page.goto("/admin/events");
