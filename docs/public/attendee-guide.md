@@ -82,8 +82,8 @@ During the **voting** phase, react to each proposal with ❤️ Interested,
 ⭐ Maybe, or 👋 Skip. Click your choice again to remove it.
 
 The fastest way is **"Go to Quick Voting!"** on the proposals page: one
-proposal at a time, skipping the ones you've already voted on, counting down
-how many are left.
+proposal at a time, with its comments, skipping the ones you've already voted
+on, counting down how many are left.
 
 ![Quick Voting screen showing one proposal with large Interested / Maybe / Skip buttons](../screenshots/quick-voting.webp)
 

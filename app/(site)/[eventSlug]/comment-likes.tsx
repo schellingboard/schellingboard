@@ -21,7 +21,8 @@ export function CommentLikes({
   // Only the cache invalidation target for pages that server-render their
   // comments — proposals. Sessions and profiles omit it.
   eventSlug?: string;
-  onChanged: () => void;
+  // Absent where comments are read-only: the count still shows, but no toggle.
+  onChanged?: () => void;
 }) {
   const { user: currentUserId } = useContext(UserContext);
   const [saving, setSaving] = useState(false);
@@ -53,7 +54,7 @@ export function CommentLikes({
         );
         return;
       }
-      startRefresh(() => onChanged());
+      startRefresh(() => onChanged?.());
     } catch (err) {
       console.error(err);
       setError("An unexpected error occurred");
@@ -64,7 +65,7 @@ export function CommentLikes({
 
   return (
     <>
-      {currentUserId && (
+      {currentUserId && onChanged && (
         <button
           type="button"
           onClick={() => void onToggle()}

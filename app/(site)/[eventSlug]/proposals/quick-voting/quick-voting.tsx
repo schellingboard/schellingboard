@@ -7,6 +7,8 @@ import { Vote, VoteChoice } from "@/app/(site)/votes";
 import type { SessionProposal } from "@/db/repositories/interfaces";
 import { VotingButtons } from "@/app/(site)/[eventSlug]/proposals/voting-buttons";
 import { VotesContext } from "@/app/(site)/context";
+import { CommentsSection } from "@/app/(site)/[eventSlug]/comments-section";
+import { useComments } from "@/app/(site)/[eventSlug]/use-comments";
 
 export function QuickVoting(props: {
   proposals: SessionProposal[];
@@ -14,8 +16,16 @@ export function QuickVoting(props: {
   initialVotes: Vote[];
   eventName: string;
   eventSlug: string;
+  timezone: string;
 }) {
-  const { proposals, currentUser, initialVotes, eventSlug, eventName } = props;
+  const {
+    proposals,
+    currentUser,
+    initialVotes,
+    eventSlug,
+    eventName,
+    timezone,
+  } = props;
   const [votes, setVotes] = useState(initialVotes);
   const { addVote, removeVote, updateVote, getVote } = useContext(VotesContext);
 
@@ -114,7 +124,15 @@ export function QuickVoting(props: {
 
   function showNextProposal() {
     if (proposal) {
-      return <Proposal proposal={proposal} />;
+      return (
+        <>
+          <Proposal proposal={proposal} />
+          <ProposalCommentsReadOnly
+            proposalId={proposal.id}
+            timezone={timezone}
+          />
+        </>
+      );
     } else {
       return (
         <p>
@@ -148,5 +166,17 @@ export function QuickVoting(props: {
         </div>
       )}
     </div>
+  );
+}
+
+function ProposalCommentsReadOnly(props: {
+  proposalId: string;
+  timezone: string;
+}) {
+  const { comments } = useComments(
+    `/api/proposal/${props.proposalId}/comments`
+  );
+  return (
+    <CommentsSection readOnly timezone={props.timezone} comments={comments} />
   );
 }
