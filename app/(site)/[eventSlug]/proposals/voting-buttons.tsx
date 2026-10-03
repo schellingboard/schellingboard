@@ -137,7 +137,7 @@ export function VotingButtons({
     <div
       className={clsx(
         "flex",
-        large ? "gap-2 sm:gap-3 justify-center" : "gap-1.5 flex-row"
+        large ? "gap-2 sm:gap-3 justify-center" : "gap-1.5 flex-row flex-wrap"
       )}
     >
       {VOTE_OPTIONS.map(({ choice, emoji, label }) => (

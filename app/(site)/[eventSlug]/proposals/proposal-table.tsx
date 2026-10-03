@@ -423,10 +423,7 @@ export function ProposalTable({
                 width="w-[15%]"
                 {...sortHeader}
               />
-              <PlainHeader
-                label="Description"
-                width={schedEnabled ? "w-[20%]" : "w-[25%]"}
-              />
+              <PlainHeader label="Description" width="w-[20%]" />
               <SortableHeader
                 column="durationMinutes"
                 label="Duration"
@@ -436,7 +433,7 @@ export function ProposalTable({
               <SortableHeader
                 column="userVote"
                 label="Your vote"
-                width={schedEnabled ? "w-[7%]" : "w-[10%]"}
+                width={schedEnabled ? "w-[7%]" : "w-[15%]"}
                 {...sortHeader}
               />
               {schedEnabled && (
@@ -491,12 +488,12 @@ export function ProposalTable({
                       {proposal.plainDescription || "-"}
                     </div>
                   </td>
-                  <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 lg:px-6 py-4">
                     <div className="flex items-center">
                       {proposal.durationMinutes ? (
                         <>
                           <ClockIcon className="h-4 w-4 mr-1 text-fg-subtle flex-shrink-0" />
-                          <span className="text-sm text-fg-subtle truncate">
+                          <span className="text-sm text-fg-subtle">
                             {formatDuration(
                               durationMinusBreak(
                                 proposal.durationMinutes,
@@ -511,7 +508,7 @@ export function ProposalTable({
                     </div>
                   </td>
                   {!schedEnabled && (
-                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 lg:px-6 py-4">
                       {currentUserId &&
                         !proposal.hosts.some((h) => h.id === currentUserId) && (
                           <VotingButtons
@@ -529,13 +526,13 @@ export function ProposalTable({
                           {proposalVoteEmoji(proposal.id)}
                         </span>
                       </td>
-                      <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
-                        <VoteTally proposal={proposal} />
+                      <td className="px-4 lg:px-6 py-4">
+                        <VoteTally proposal={proposal} className="flex-wrap" />
                       </td>
                     </>
                   )}
-                  <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
-                    <div className="flex gap-1">
+                  <td className="px-4 lg:px-6 py-4">
+                    <div className="flex flex-wrap gap-1">
                       {canEdit(proposal.hosts) && (
                         <ProposalActions
                           eventSlug={eventSlug}
