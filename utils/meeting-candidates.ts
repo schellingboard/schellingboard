@@ -7,7 +7,13 @@ import {
   toMeetingClashes,
   type MeetingClash,
 } from "@/utils/meeting-clash-text";
-import { meetingSlotsForDay, slotTimeLabel } from "@/utils/meeting-slots";
+import {
+  maxMeetingSlots,
+  meetingMinutes,
+  meetingRun,
+  meetingSlotsForDay,
+  slotTimeLabel,
+} from "@/utils/meeting-slots";
 
 /** One person the viewer could ask for a 1-on-1 in a given slot. */
 export type MeetingCandidate = {
@@ -29,6 +35,9 @@ export type MeetingCandidates = {
   eventName: string;
   dayLabel: string;
   slotLabel: string;
+  slotCount: number;
+  /** The lengths a 1-on-1 starting at this slot can run before the day ends. */
+  lengths: { slotCount: number; minutes: number }[];
   meetingPoints: Pick<MeetingPoint, "id" | "name" | "description">[];
   /**
    * The viewer's own clash with the slot, named — one line for the whole
@@ -51,7 +60,8 @@ export async function meetingCandidatesFor(
   viewerId: string,
   eventId: string,
   slotStart: string,
-  now: Date
+  now: Date,
+  slotCount = 1
 ): Promise<MeetingCandidates | null> {
   const repos = getRepositories();
   const event = await repos.events.findById(eventId);
@@ -68,17 +78,44 @@ export async function meetingCandidatesFor(
   const days = await repos.days.listByEvent(eventId);
   const day = days.find((d) => start >= d.start && start < d.end);
   if (!day) return null;
-  const slot = meetingSlotsForDay(day, event.slotIncrementMinutes).find(
-    (s) => s.start.getTime() === start.getTime()
+  const maxSlots = maxMeetingSlots(
+    event.slotIncrementMinutes,
+    event.maxSessionDuration
   );
-  if (!slot) return null;
+  if (slotCount > maxSlots) return null;
+  const daySlots = meetingSlotsForDay(day, event.slotIncrementMinutes);
+  const run = meetingRun(daySlots, start, slotCount);
+  if (!run) return null;
+  const slot = { start, end: run[run.length - 1].end };
 
-  const [declaredIds, eventGuests, meetingPoints, live] = await Promise.all([
-    repos.meetingAvailability.listGuestsBySlot(eventId, start),
-    repos.guests.listAttendeesByEvent(eventId),
-    repos.meetingPoints.listByEvent(eventId),
-    repos.meetings.listLiveBySlot(eventId, start),
-  ]);
+  const lengths = [];
+  for (let count = 1; count <= maxSlots; count++) {
+    if (!meetingRun(daySlots, start, count)) break;
+    lengths.push({
+      slotCount: count,
+      minutes: meetingMinutes(
+        count,
+        event.slotIncrementMinutes,
+        event.breakMinutes
+      ),
+    });
+  }
+
+  const [declaredPerSlot, eventGuests, meetingPoints, live] = await Promise.all(
+    [
+      Promise.all(
+        run.map((s) =>
+          repos.meetingAvailability.listGuestsBySlot(eventId, s.start)
+        )
+      ),
+      repos.guests.listAttendeesByEvent(eventId),
+      repos.meetingPoints.listByEvent(eventId),
+      repos.meetings.listLiveOverlapping(eventId, slot.start, slot.end),
+    ]
+  );
+  const declaredIds = declaredPerSlot[0].filter((id) =>
+    declaredPerSlot.every((ids) => ids.includes(id))
+  );
 
   // Nobody already paired with the viewer here: asking again is refused as a
   // duplicate, and asking back across their open request only crosses it.
@@ -158,6 +195,8 @@ export async function meetingCandidatesFor(
     eventName: event.name,
     dayLabel: zoned(slot.start).toFormat("EEE d LLL"),
     slotLabel: slotTimeLabel(slot, event.breakMinutes, event.timezone),
+    slotCount,
+    lengths,
     meetingPoints: meetingPoints.map(({ id, name, description }) => ({
       id,
       name,

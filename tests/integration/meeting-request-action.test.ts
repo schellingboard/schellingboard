@@ -118,7 +118,6 @@ describe("requestMeetingAction", () => {
     expect(meeting.status).toBe("pending");
     expect(meeting.meetingPoint).toBe("Coffee bar");
     expect(meeting.slotStart.toISOString()).toBe(SLOT);
-    // The slot's length comes from the event, never from the caller.
     expect(meeting.slotEnd.toISOString()).toBe(SLOT_2);
   });
 
@@ -317,6 +316,77 @@ describe("requestMeetingAction", () => {
       expect(again.ok).toBe(true);
     });
   }
+
+  describe("a 1-on-1 longer than one slot", () => {
+    const SLOT_3 = `${DAY}T11:00:00.000Z`;
+
+    const declare = (event: Event, recipient: Guest, starts: string[]) =>
+      getRepositories().meetingAvailability.replaceForGuest(
+        recipient.id,
+        event.id,
+        starts.map((s) => new Date(s))
+      );
+
+    it("runs over as many consecutive slots as were asked for", async () => {
+      const { event, requester, recipient } = await scenario();
+
+      const result = await request(event, recipient, { slotCount: 2 });
+
+      expect(result.ok).toBe(true);
+      const [meeting] = await getRepositories().meetings.listByGuestAndEvent(
+        requester.id,
+        event.id
+      );
+      expect(meeting.slotStart.toISOString()).toBe(SLOT);
+      expect(meeting.slotEnd.toISOString()).toBe(SLOT_3);
+    });
+
+    it("refuses when the recipient cleared a slot inside it", async () => {
+      const { event, recipient } = await scenario();
+
+      const result = await request(event, recipient, { slotCount: 3 });
+
+      expect(result).toEqual({
+        ok: false,
+        error: "They are not available at that time",
+      });
+    });
+
+    it("refuses a length over the event's maximum session length", async () => {
+      const { event, recipient } = await scenario({ maxSessionDuration: 60 });
+      await declare(event, recipient, [SLOT, SLOT_2, SLOT_3]);
+
+      const result = await request(event, recipient, { slotCount: 3 });
+
+      expect(result.ok).toBe(false);
+    });
+
+    it("refuses one that would run past the end of the day", async () => {
+      const { event, recipient } = await scenario();
+      await declare(event, recipient, [`${DAY}T16:30:00.000Z`]);
+
+      const result = await request(event, recipient, {
+        slotStart: `${DAY}T16:30:00.000Z`,
+        slotCount: 2,
+      });
+
+      expect(result.ok).toBe(false);
+    });
+
+    it("refuses a request overlapping a live one with the same person", async () => {
+      const { event, recipient } = await scenario();
+      await request(event, recipient, { slotCount: 2 });
+
+      const overlapping = await request(event, recipient, {
+        slotStart: SLOT_2,
+      });
+
+      expect(overlapping).toEqual({
+        ok: false,
+        error: "You have already asked them for that time",
+      });
+    });
+  });
 
   it("refuses when nobody is signed in", async () => {
     const { event, recipient } = await scenario();

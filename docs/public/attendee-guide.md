@@ -299,7 +299,8 @@ cleared and you are asked to choose again — the slots themselves have moved.
 ### Ask someone for a 1-on-1
 
 Anyone who is open to 1-on-1s has a **Schedule a 1-on-1** button on their
-profile. It shows their slots day by day:
+profile. First pick a **length**: one slot by default, or several slots in a
+row, up to the event's longest session. It then shows their slots day by day:
 
 - **Available** — tap to pick it.
 - **Busy** — one of you already has something at that hour: a session you are
@@ -308,7 +309,7 @@ profile. It shows their slots day by day:
   that it is another 1-on-1 — so you know what you would be missing. Theirs
   never is: you are only told they are already booked.
 - **Unavailable** — a slot they cleared. That is their decision, and the one
-  thing you can't book.
+  thing you can't book. A longer 1-on-1 needs every slot it covers.
 
 Then say **where to meet** — one of the organizer's suggestions, or anywhere you
 type yourself. Nothing is reserved and no place is ever "full": a meeting point
@@ -379,8 +380,9 @@ Tapping an **empty slot** in that column asks the question a profile cannot:
 not "when could I meet this person" but **"who could I meet at 14:30"**. It
 lists everyone who marked that slot open — with their name as a link, so you
 can read their profile in another tab without losing your place — and says
-where anyone is already booked, without saying what they are doing. Pick one
-and the usual request form follows: where to meet, and a line of context.
+where anyone is already booked, without saying what they are doing. Choose a
+longer length and only the people free for all of it are left. Pick one and the
+usual request form follows: where to meet, and a line of context.
 
 The slots you did not offer to others are bookable this way too. What you
 declare says who may book _you_; whom you ask, and when, is yours to decide.

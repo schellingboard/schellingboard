@@ -10,7 +10,11 @@ import {
 } from "@/utils/acting-guest";
 import { requireSiteAuth } from "@/utils/action-auth";
 import { serverNow } from "@/utils/dev-clock-server";
-import { meetingSlotsForDay } from "@/utils/meeting-slots";
+import {
+  maxMeetingSlots,
+  meetingRun,
+  meetingSlotsForDay,
+} from "@/utils/meeting-slots";
 import {
   notifyMeetingOutcome,
   notifyMeetingRequested,
@@ -29,6 +33,7 @@ const requestSchema = z.object({
   eventId: z.string(),
   recipientId: z.string(),
   slotStart: z.string(),
+  slotCount: z.number().int().min(1).default(1),
   meetingPoint: z.string().max(200),
   message: z.string().max(2000).optional(),
 });
@@ -108,8 +113,24 @@ export async function requestMeetingAction(
     return { ok: false, error: "They are not attending this event" };
   }
 
-  const offered = await eventSlotStarts(event);
-  if (!offered.has(input.slotStart)) {
+  if (
+    input.slotCount >
+    maxMeetingSlots(event.slotIncrementMinutes, event.maxSessionDuration)
+  ) {
+    return { ok: false, error: "That 1-on-1 is longer than the event allows" };
+  }
+
+  const slotStart = new Date(input.slotStart);
+  const days = await repos.days.listByEvent(event.id);
+  const day = days.find((d) => slotStart >= d.start && slotStart < d.end);
+  const run = day
+    ? meetingRun(
+        meetingSlotsForDay(day, event.slotIncrementMinutes),
+        slotStart,
+        input.slotCount
+      )
+    : null;
+  if (!run) {
     return { ok: false, error: "That slot is not available" };
   }
 
@@ -127,15 +148,11 @@ export async function requestMeetingAction(
     input.recipientId,
     event.id
   );
-  if (!declared.some((slot) => slot.toISOString() === input.slotStart)) {
+  const declaredStarts = new Set(declared.map((slot) => slot.getTime()));
+  if (!run.every((slot) => declaredStarts.has(slot.start.getTime()))) {
     return { ok: false, error: "They are not available at that time" };
   }
-
-  // The slot's length is the event's schedule increment, never the caller's.
-  const slotStart = new Date(input.slotStart);
-  const slotEnd = new Date(
-    slotStart.getTime() + event.slotIncrementMinutes * 60 * 1000
-  );
+  const slotEnd = run[run.length - 1].end;
 
   const outcome = await repos.meetings.createIfAllowed(
     {
@@ -156,7 +173,7 @@ export async function requestMeetingAction(
       ok: false,
       error:
         outcome.refused === "duplicate"
-          ? "You have already asked them for that slot"
+          ? "You have already asked them for that time"
           : `You already have ${event.maxOpenMeetingRequests} requests waiting for an answer. Wait for a reply, or cancel one first.`,
     };
   }

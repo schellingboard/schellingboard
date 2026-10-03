@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { Modal } from "@/app/components/modal";
 import { requestMeetingAction } from "@/app/actions/meetings";
 import { PRIMARY_BUTTON, SECONDARY_BUTTON } from "@/app/components/buttons";
+import { MeetingLengthChips } from "@/app/components/meeting-length-chips";
 import { MeetingRequestFields } from "@/app/components/meeting-request-fields";
 import { clashLines } from "@/utils/meeting-clash-text";
 import type { MeetingDayOption, MeetingOption } from "@/utils/meeting-options";
@@ -75,6 +76,7 @@ function RequestForm({
   recipientName: string;
   onDone: () => void;
 }) {
+  const [slotCount, setSlotCount] = useState(1);
   const [slotStart, setSlotStart] = useState<string | null>(null);
   const [meetingPoint, setMeetingPoint] = useState("");
   const [message, setMessage] = useState("");
@@ -82,9 +84,9 @@ function RequestForm({
   const [sent, setSent] = useState(false);
   const [isSending, startSend] = useTransition();
 
-  const day = option.days.find((d) =>
-    d.slots.some((s) => s.start === slotStart)
-  );
+  const days =
+    option.lengths.find((l) => l.slotCount === slotCount)?.days ?? [];
+  const day = days.find((d) => d.slots.some((s) => s.start === slotStart));
   const slot = day?.slots.find((s) => s.start === slotStart);
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,6 +98,7 @@ function RequestForm({
           eventId: option.eventId,
           recipientId,
           slotStart,
+          slotCount,
           meetingPoint,
           message,
         });
@@ -134,18 +137,24 @@ function RequestForm({
 
       {error && <p className="text-sm text-danger-fg">{error}</p>}
 
+      <MeetingLengthChips
+        lengths={option.lengths}
+        slotCount={slotCount}
+        onSlotCount={(count) => {
+          setSlotCount(count);
+          setSlotStart(null);
+          setError(null);
+        }}
+      />
+
       <div className="max-h-64 overflow-y-auto">
-        <SlotList
-          days={option.days}
-          selected={slotStart}
-          onSelect={setSlotStart}
-        />
+        <SlotList days={days} selected={slotStart} onSelect={setSlotStart} />
       </div>
 
       {/* A clash is raised, never enforced: the pair decide for themselves. */}
       {slot?.state === "busy" && (
         <p className="text-sm rounded-md bg-warning-tint p-3 text-fg">
-          {clashLines(slot.clashes)} during this slot — book it anyway?
+          {clashLines(slot.clashes)} during this time — book it anyway?
         </p>
       )}
 

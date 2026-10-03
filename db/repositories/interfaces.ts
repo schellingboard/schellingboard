@@ -1049,11 +1049,14 @@ export interface MeetingsRepository {
    */
   listByGuestAndEvent(guestId: string, eventId: string): Promise<Meeting[]>;
   /**
-   * Every meeting still standing in one slot, whoever it is between: what the
-   * grid's booking flow needs to know who is already taken. Matched on the
-   * slot's start, as availability rows are.
+   * Every meeting still standing that overlaps [start, end), whoever it is
+   * between: what the grid's booking flow needs to know who is already taken.
    */
-  listLiveBySlot(eventId: string, slotStart: Date): Promise<Meeting[]>;
+  listLiveOverlapping(
+    eventId: string,
+    start: Date,
+    end: Date
+  ): Promise<Meeting[]>;
   /**
    * Requests this guest has sent and not heard back on, for the organizer's
    * cap. `now` bounds it: a pending request whose slot has passed is expired
@@ -1072,9 +1075,9 @@ export interface MeetingsRepository {
    * "already asked them" is decided here rather than read off a constraint
    * violation.
    *
-   * "duplicate" means a live request already covers that pair and slot;
-   * declined and cancelled ones do not count, so the pair can agree on a slot
-   * they had earlier passed on.
+   * "duplicate" means a live request from the same requester to the same
+   * recipient already overlaps that time; declined and cancelled ones do not
+   * count, so the pair can agree on a slot they had earlier passed on.
    */
   createIfAllowed(
     data: MeetingCreateInput,
