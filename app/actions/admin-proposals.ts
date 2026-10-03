@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getRepositories } from "@/db/container";
 import { isAdminRequest } from "@/utils/acting-admin";
 import { serverNow } from "@/utils/dev-clock-server";
+import { STALE_PROPOSAL_MESSAGE } from "@/model/session";
 import type { AdminActionResult } from "./admin-guests";
 
 export type AdminProposalInput = {
@@ -12,6 +13,7 @@ export type AdminProposalInput = {
   description: string;
   durationMinutes: number | null;
   hostIds: string[];
+  expectedUpdatedTime: string;
 };
 
 function revalidateEventPaths(eventId: string) {
@@ -49,13 +51,20 @@ export async function adminUpdateProposalAction(
     }
   }
 
-  await sessionProposals.update(input.id, {
+  const expectedUpdatedTime = new Date(input.expectedUpdatedTime);
+  if (Number.isNaN(expectedUpdatedTime.getTime())) {
+    return { ok: false, error: "Invalid expectedUpdatedTime" };
+  }
+
+  const updated = await sessionProposals.update(input.id, {
     title,
     description: input.description.trim(),
     durationMinutes: input.durationMinutes,
     hostIds,
+    expectedUpdatedTime,
     updatedTime: await serverNow(),
   });
+  if (!updated) return { ok: false, error: STALE_PROPOSAL_MESSAGE };
 
   revalidateEventPaths(proposal.eventId);
   return { ok: true };

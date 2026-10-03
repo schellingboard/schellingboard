@@ -78,6 +78,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **1-on-1s start after the break, like sessions** (#1049): a 1-on-1 in the 12:00 slot now
   reads 12:10 wherever it is shown, and sits with that slot's sessions on the agenda instead
   of ten minutes ahead of them.
+- **Saving an outdated proposal form no longer undoes newer changes**: if the proposal
+  changed while you were editing it, such as a co-host joining, the save is refused.
 
 ### Internal
 

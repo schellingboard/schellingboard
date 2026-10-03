@@ -35,6 +35,7 @@ import {
 import { getRepositories } from "@/db/container";
 import { VoteChoice } from "@/db/repositories/interfaces";
 import { createAdminAuthCookie } from "@/utils/auth";
+import { STALE_PROPOSAL_MESSAGE } from "@/model/session";
 import {
   adminUpdateProposalAction,
   adminDeleteProposalAction,
@@ -74,6 +75,7 @@ describe("adminUpdateProposalAction", () => {
       description: "New description",
       durationMinutes: 60,
       hostIds: [h2.id],
+      expectedUpdatedTime: proposal.updatedTime.toISOString(),
     });
     expect(result.ok).toBe(true);
 
@@ -99,6 +101,7 @@ describe("adminUpdateProposalAction", () => {
       description: "",
       durationMinutes: null,
       hostIds: [h1.id],
+      expectedUpdatedTime: proposal.updatedTime.toISOString(),
     });
     expect(result.ok).toBe(true);
 
@@ -119,6 +122,7 @@ describe("adminUpdateProposalAction", () => {
       description: "",
       durationMinutes: null,
       hostIds: [h1.id],
+      expectedUpdatedTime: proposal.updatedTime.toISOString(),
     });
     expect(!result.ok && result.error).toBe("Title is required");
   });
@@ -135,8 +139,42 @@ describe("adminUpdateProposalAction", () => {
       description: "",
       durationMinutes: null,
       hostIds: [h1.id],
+      expectedUpdatedTime: proposal.updatedTime.toISOString(),
     });
     expect(!result.ok && result.error).toBe("Unauthorized");
+  });
+
+  it("refuses a save from a form opened before a volunteer joined", async () => {
+    const event = await createEvent();
+    const host = await createGuest({ name: "Host" });
+    const volunteer = await createGuest({ name: "Volunteer" });
+    const proposal = await createProposal(event.id, [host.id], {
+      cohostWanted: true,
+      createdTime: new Date("2026-01-01T00:00:00Z"),
+    });
+    await getRepositories().sessionProposals.addHost(
+      proposal.id,
+      volunteer.id,
+      new Date("2026-01-02T00:00:00Z")
+    );
+
+    const result = await adminUpdateProposalAction({
+      id: proposal.id,
+      title: "Reworded",
+      description: "",
+      durationMinutes: null,
+      hostIds: [host.id],
+      expectedUpdatedTime: proposal.updatedTime.toISOString(),
+    });
+    expect(!result.ok && result.error).toBe(STALE_PROPOSAL_MESSAGE);
+
+    const after = await getRepositories().sessionProposals.findById(
+      proposal.id
+    );
+    expect(after?.title).toBe(proposal.title);
+    expect(after?.hosts.map((h) => h.id).sort()).toEqual(
+      [host.id, volunteer.id].sort()
+    );
   });
 
   it("errors for an unknown proposal", async () => {
@@ -146,6 +184,7 @@ describe("adminUpdateProposalAction", () => {
       description: "",
       durationMinutes: null,
       hostIds: [],
+      expectedUpdatedTime: new Date(0).toISOString(),
     });
     expect(!result.ok && result.error).toBe("Proposal not found");
   });

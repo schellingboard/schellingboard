@@ -252,14 +252,20 @@ export class SqliteSessionProposalsRepository implements SessionProposalsReposit
   async update(
     id: string,
     patch: SessionProposalUpdateInput
-  ): Promise<SessionProposal> {
-    this.db.transaction((tx) => {
+  ): Promise<SessionProposal | undefined> {
+    const applied = this.db.transaction((tx) => {
       const before = tx
         .select()
         .from(schema.sessionProposals)
         .where(eq(schema.sessionProposals.id, id))
         .get();
-      if (!before) return;
+      if (!before) return false;
+      if (
+        patch.expectedUpdatedTime !== undefined &&
+        patch.expectedUpdatedTime.getTime() !==
+          new Date(before.updatedTime ?? before.createdTime).getTime()
+      )
+        return false;
 
       const values: Partial<typeof schema.sessionProposals.$inferInsert> = {};
       if (patch.title !== undefined && patch.title !== before.title)
@@ -336,8 +342,9 @@ export class SqliteSessionProposalsRepository implements SessionProposalsReposit
           .where(eq(schema.sessionProposals.id, id))
           .run();
       }
+      return true;
     });
-    return (await this.findById(id))!;
+    return applied ? this.findById(id) : undefined;
   }
 
   async addHost(

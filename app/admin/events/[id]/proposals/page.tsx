@@ -55,6 +55,7 @@ export default async function AdminEventProposalsPage({
     hosts: p.hosts.map((h) => ({ id: h.id, name: h.name })),
     votesCount: p.votesCount,
     sessionCount: p.sessionIds.length,
+    updatedTime: p.updatedTime.toISOString(),
   }));
 
   return (

@@ -828,6 +828,8 @@ export type SessionProposalUpdateInput = {
   durationMinutes?: number | null;
   cohostWanted?: boolean;
   cohostWantedNote?: string | null;
+  /** The update only applies while the proposal's updatedTime is still this. */
+  expectedUpdatedTime?: Date;
   updatedTime: Date;
 };
 
@@ -851,10 +853,11 @@ export interface SessionProposalsRepository {
   ): Promise<SessionProposalPage>;
   findById(id: string): Promise<SessionProposal | undefined>;
   create(data: SessionProposalCreateInput): Promise<SessionProposal>;
+  /** Undefined, changing nothing, if the proposal is gone or not at `expectedUpdatedTime`. */
   update(
     id: string,
     patch: SessionProposalUpdateInput
-  ): Promise<SessionProposal>;
+  ): Promise<SessionProposal | undefined>;
   /** False, changing nothing, unless the proposal wants a host and the guest isn't one. */
   addHost(id: string, guestId: string, updatedTime: Date): Promise<boolean>;
   delete(id: string): Promise<void>;

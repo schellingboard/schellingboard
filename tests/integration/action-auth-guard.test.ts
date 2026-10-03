@@ -106,7 +106,11 @@ const SITE_GUARDED: Record<string, () => Promise<unknown>> = {
   "(site)/[eventSlug]/proposals/actions.ts:updateProposal": async () => {
     const { updateProposal } =
       await import("@/app/(site)/[eventSlug]/proposals/actions");
-    return updateProposal("p", { eventSlug: "s", title: "T" });
+    return updateProposal("p", {
+      eventSlug: "s",
+      title: "T",
+      expectedUpdatedTime: new Date(0).toISOString(),
+    });
   },
   "(site)/[eventSlug]/proposals/actions.ts:joinProposal": async () => {
     const { joinProposal } =

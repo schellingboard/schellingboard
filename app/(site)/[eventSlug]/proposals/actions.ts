@@ -10,6 +10,7 @@ import { z } from "zod";
 import {
   sessionProposalSchema,
   sessionProposalUpdateSchema,
+  STALE_PROPOSAL_MESSAGE,
 } from "@/model/session";
 import { serverNow } from "@/utils/dev-clock-server";
 import {
@@ -125,6 +126,7 @@ export async function updateProposal(
       durationMinutes,
       cohostWanted,
       cohostWantedNote,
+      expectedUpdatedTime,
     },
   } = parseResult;
 
@@ -165,15 +167,19 @@ export async function updateProposal(
     // The repository clears durationMinutes only when the key is present, and
     // zod drops absent optional keys, so it has to be spelled out here for
     // "no duration selected" to actually clear a previously chosen one.
-    await getRepositories().sessionProposals.update(id, {
+    const updated = await getRepositories().sessionProposals.update(id, {
       title,
       description: description || undefined,
       hostIds,
       durationMinutes,
       cohostWanted,
       cohostWantedNote: cohostWantedNote ?? null,
+      expectedUpdatedTime: new Date(expectedUpdatedTime),
       updatedTime: await serverNow(),
     });
+    if (!updated) {
+      return { error: STALE_PROPOSAL_MESSAGE };
+    }
     revalidatePath(`/${eventSlug}/proposals`);
   } catch (error) {
     console.error("Error updating proposal:", error);
