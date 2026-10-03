@@ -97,6 +97,21 @@ test("should navigate to quick voting and allow voting on proposals @005-US2", a
   await expect(page).toHaveURL(/\/Conference-Beta\/proposals$/);
 });
 
+test("shows a proposal's comments read-only while quick voting @005-US2", async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto("/Conference-Beta/proposals");
+  await selectUser(page, "Marta Horvat");
+  await page.getByRole("link", { name: /Go to Quick Voting!/i }).click();
+
+  await expect(
+    page.getByRole("heading", { name: /^\d+ comments?$/ })
+  ).toBeVisible();
+  await expect(page.getByPlaceholder("Add a comment")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Reply" })).toHaveCount(0);
+});
+
 test("votes from two users persist independently across reloads @005-US1", async ({
   page,
 }) => {

@@ -17,6 +17,14 @@ import { formatInLocalZone } from "@/utils/utils";
 
 export type CommentCreateInput = { parentId?: string; body: string };
 
+// Scope-specific: proposals, sessions and profiles differ in the action called
+// and in where a permalink points. Everything else about commenting is shared.
+type CommentActions = {
+  create: (input: CommentCreateInput) => Promise<CommentActionResult>;
+  permalinkFor: (commentId: string) => string;
+  changed: () => void;
+};
+
 type CommentNode = Comment & { replies: CommentNode[] };
 
 function buildTree(comments: Comment[]): CommentNode[] {
@@ -56,22 +64,15 @@ export function CommentsSection({
   eventSlug,
   timezone,
   comments,
-  create,
-  permalinkFor,
-  changed,
+  ...rest
 }: {
   // Only the cache invalidation target for pages that server-render their
   // comments — proposals. Sessions and profiles omit it.
   eventSlug?: string;
   timezone: string;
   comments?: LoadedComments;
-  // Scope-specific: proposals, sessions and profiles differ in the action
-  // called and in where a permalink points. Everything else about commenting
-  // is shared.
-  create: (input: CommentCreateInput) => Promise<CommentActionResult>;
-  permalinkFor: (commentId: string) => string;
-  changed: () => void;
-}) {
+} & ({ readOnly: true } | ({ readOnly?: false } & CommentActions))) {
+  const actions = rest.readOnly ? null : rest;
   const { user: currentUserId } = useContext(UserContext);
   const loaded = Array.isArray(comments) ? comments : null;
   const roots = useMemo(() => (loaded ? buildTree(loaded) : []), [loaded]);
@@ -134,9 +135,7 @@ export function CommentsSection({
               eventSlug={eventSlug}
               timezone={timezone}
               localZone={localZone}
-              create={create}
-              permalinkFor={permalinkFor}
-              changed={changed}
+              actions={actions}
               highlightedId={highlightedId}
               highlight={highlight}
             />
@@ -144,13 +143,13 @@ export function CommentsSection({
         </div>
       )}
 
-      {currentUserId ? (
+      {!actions ? null : currentUserId ? (
         <CommentForm
-          onSubmit={(body) => create({ body })}
+          onSubmit={(body) => actions.create({ body })}
           clearOnSuccess
           placeholder="Add a comment"
           submitLabel="Comment"
-          onChanged={changed}
+          onChanged={actions.changed}
         />
       ) : (
         <p className="text-sm text-fg-subtle">
@@ -166,9 +165,7 @@ function CommentThread({
   depth,
   eventSlug,
   timezone,
-  create,
-  permalinkFor,
-  changed,
+  actions,
   localZone,
   highlightedId,
   highlight,
@@ -177,9 +174,7 @@ function CommentThread({
   depth: number;
   eventSlug?: string;
   timezone: string;
-  create: (input: CommentCreateInput) => Promise<CommentActionResult>;
-  permalinkFor: (commentId: string) => string;
-  changed: () => void;
+  actions: CommentActions | null;
   localZone: string | null;
   highlightedId: string | null;
   highlight: (id: string) => void;
@@ -191,7 +186,11 @@ function CommentThread({
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const permalink = permalinkFor(node.id);
+  const time = (
+    <time dateTime={node.createdTime.toISOString()}>
+      {formatInLocalZone(node.createdTime, timezone, localZone)}
+    </time>
+  );
   const isAuthor = !!currentUserId && node.author?.id === currentUserId;
   const background = depth % 2 === 1 ? "bg-surface-muted" : "bg-surface-raised";
 
@@ -206,7 +205,7 @@ function CommentThread({
       );
       return;
     }
-    changed();
+    actions?.changed();
   };
 
   return (
@@ -257,20 +256,22 @@ function CommentThread({
                 // The author's guest was removed; there is no profile to link.
                 <span className="font-medium text-fg-muted">Unknown</span>
               )}
-              <Link
-                href={permalink}
-                // replace, not push: the modal is already open at this URL, and
-                // an extra history entry would make dismissing it (which goes
-                // back) leave the modal open (anchor: MnpjIo7Y).
-                replace
-                scroll={false}
-                onClick={() => highlight(node.id)}
-                className="text-xs text-fg-muted hover:text-fg hover:underline"
-              >
-                <time dateTime={node.createdTime.toISOString()}>
-                  {formatInLocalZone(node.createdTime, timezone, localZone)}
-                </time>
-              </Link>
+              {actions ? (
+                <Link
+                  href={actions.permalinkFor(node.id)}
+                  // replace, not push: the modal is already open at this URL, and
+                  // an extra history entry would make dismissing it (which goes
+                  // back) leave the modal open (anchor: MnpjIo7Y).
+                  replace
+                  scroll={false}
+                  onClick={() => highlight(node.id)}
+                  className="text-xs text-fg-muted hover:text-fg hover:underline"
+                >
+                  {time}
+                </Link>
+              ) : (
+                <span className="text-xs text-fg-muted">{time}</span>
+              )}
               {node.editedTime && (
                 <span
                   className="text-xs text-fg-muted"
@@ -285,7 +286,7 @@ function CommentThread({
 
         {!collapsed && !node.deleted && (
           <>
-            {editing ? (
+            {editing && actions ? (
               <CommentForm
                 onSubmit={(body) =>
                   updateComment({ commentId: node.id, eventSlug, body })
@@ -295,7 +296,7 @@ function CommentThread({
                 initialBody={node.body}
                 onCancel={() => setEditing(false)}
                 onDone={() => setEditing(false)}
-                onChanged={changed}
+                onChanged={actions.changed}
               />
             ) : (
               <div className="mt-1 text-sm text-fg break-words">
@@ -308,9 +309,9 @@ function CommentThread({
                 <CommentLikes
                   comment={node}
                   eventSlug={eventSlug}
-                  onChanged={changed}
+                  onChanged={actions?.changed}
                 />
-                {currentUserId && (
+                {actions && currentUserId && (
                   <button
                     type="button"
                     onClick={() => setReplying(!replying)}
@@ -319,7 +320,7 @@ function CommentThread({
                     Reply
                   </button>
                 )}
-                {isAuthor && (
+                {actions && isAuthor && (
                   <>
                     <button
                       type="button"
@@ -342,15 +343,15 @@ function CommentThread({
 
             {error && <p className="mt-1 text-sm text-danger-fg">{error}</p>}
 
-            {replying && (
+            {replying && actions && (
               <CommentForm
-                onSubmit={(body) => create({ parentId: node.id, body })}
+                onSubmit={(body) => actions.create({ parentId: node.id, body })}
                 clearOnSuccess
                 placeholder="Write a reply"
                 submitLabel="Reply"
                 onCancel={() => setReplying(false)}
                 onDone={() => setReplying(false)}
-                onChanged={changed}
+                onChanged={actions.changed}
               />
             )}
           </>
@@ -368,9 +369,7 @@ function CommentThread({
                 depth={depth + 1}
                 eventSlug={eventSlug}
                 timezone={timezone}
-                create={create}
-                permalinkFor={permalinkFor}
-                changed={changed}
+                actions={actions}
                 localZone={localZone}
                 highlightedId={highlightedId}
                 highlight={highlight}
