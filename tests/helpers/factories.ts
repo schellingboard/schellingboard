@@ -175,6 +175,8 @@ export async function createProposal(
     title?: string;
     description?: string;
     durationMinutes?: number;
+    cohostWanted?: boolean;
+    cohostWantedNote?: string;
     createdTime?: Date;
   }
 ): Promise<SessionProposal> {
@@ -185,6 +187,8 @@ export async function createProposal(
     description: opts?.description,
     hostIds,
     durationMinutes: opts?.durationMinutes,
+    cohostWanted: opts?.cohostWanted,
+    cohostWantedNote: opts?.cohostWantedNote,
     createdTime: opts?.createdTime ?? new Date(),
   });
 }

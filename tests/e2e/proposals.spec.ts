@@ -402,3 +402,57 @@ test("sorts proposals by when they were last updated @004-US5", async ({
   await page.getByLabel("Sort by").selectOption({ label: "Recently updated" });
   await expect.poll(olderComesFirst).toBe(true);
 });
+
+test("a host asks for a co-host and a volunteer joins @004-US6 @004-US7", async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto("/Conference-Alpha/proposals");
+  const proposalTitle = `Playwright Cohost Proposal ${uniqueSuffix()}`;
+
+  await selectUser(page, /Bob Test/i);
+  await page.getByRole("link", { name: /Add Proposal/i }).click();
+  await page.getByLabel("Title").fill(proposalTitle);
+  await page.getByLabel(/Looking for a co-host/).check();
+  await page
+    .getByLabel("Who are you looking for?")
+    .fill("Someone to run the demo");
+  await Promise.all([
+    page.waitForURL(/\/Conference-Alpha\/proposals$/),
+    page.getByRole("button", { name: /Submit/i }).click(),
+  ]);
+
+  await selectUser(page, /Alice Test/i);
+  await page.goto("/Conference-Alpha/proposals");
+  const row = page.getByRole("row", { name: new RegExp(proposalTitle) });
+  // Seeded with a host who asked for nobody.
+  const hosted = page.getByRole("row", {
+    name: /Hands-on Docker and Kubernetes/,
+  });
+  await expect(row).toContainText("Co-host wanted");
+  await expect(hosted).toBeVisible();
+
+  const hostWanted = page.getByRole("button", {
+    name: /proposals that want a host/i,
+  });
+  await hostWanted.click();
+  await expect(hostWanted).toHaveAttribute("aria-pressed", "true");
+  await expect(hosted).toHaveCount(0);
+  await expect(row).toBeVisible();
+
+  await row.getByRole("link", { name: proposalTitle }).click();
+  const modal = page.getByRole("dialog", { name: "Proposal details" });
+  await expect(modal.getByText(/Someone to run the demo/)).toBeVisible();
+  await modal.getByRole("button", { name: "Join as co-host" }).click();
+
+  await expect(modal.getByRole("link", { name: "Alice Test" })).toBeVisible();
+  await expect(modal.getByText(/Looking for a co-host/)).toHaveCount(0);
+  await expect(
+    modal.getByRole("button", { name: "Join as co-host" })
+  ).toHaveCount(0);
+
+  // Found a co-host, so it is no longer among the proposals that want one.
+  await modal.getByRole("button", { name: /close/i }).click();
+  await expect(hostWanted).toHaveAttribute("aria-pressed", "true");
+  await expect(row).toHaveCount(0);
+});

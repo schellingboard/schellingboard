@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+export const COHOST_WANTED_NOTE_MAX = 200;
+
 export const sessionProposalSchema = z.object({
   eventId: z.string().min(1),
   eventSlug: z.string().min(1),
@@ -7,6 +9,14 @@ export const sessionProposalSchema = z.object({
   description: z.string().optional(),
   hostIds: z.string().array().default([]),
   durationMinutes: z.number().optional(),
+  cohostWanted: z.boolean().default(false),
+  cohostWantedNote: z
+    .string()
+    .trim()
+    .max(COHOST_WANTED_NOTE_MAX, {
+      message: `Keep it under ${COHOST_WANTED_NOTE_MAX} characters`,
+    })
+    .optional(),
 });
 
 // An update reuses the create payload minus eventId: a proposal can't be moved

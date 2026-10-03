@@ -1,9 +1,13 @@
 "use client";
 
-import { useContext } from "react";
+import { useContext, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { PencilIcon, CalendarIcon } from "@heroicons/react/24/outline";
+import {
+  PencilIcon,
+  CalendarIcon,
+  HandRaisedIcon,
+} from "@heroicons/react/24/outline";
 
 import {
   inVotingPhase,
@@ -27,7 +31,9 @@ import { VoteTally } from "./vote-tally";
 import type { EventInterestSummary } from "@/utils/proposal-vote-stats";
 import { useLocalZone } from "@/utils/hooks";
 import { formatOptionalTime, TIME_FORMAT } from "@/utils/utils";
+import { wantsHost } from "@/utils/proposal-hosts";
 import { viewSessionLinkFromElsewhere } from "../modal-nav";
+import { joinProposal } from "./actions";
 
 export function ViewProposal(props: {
   proposal: SessionProposal;
@@ -75,6 +81,20 @@ export function ViewProposal(props: {
   // on is everyone's, since anyone may still pick it up.
   const canSeeVoteBreakdown = canEdit();
 
+  const [isJoining, startJoining] = useTransition();
+  const [joinError, setJoinError] = useState("");
+  const handleJoinClick = () => {
+    startJoining(async () => {
+      const result = await joinProposal(proposal.id, eventSlug);
+      if ("error" in result) {
+        setJoinError(result.error);
+      } else {
+        setJoinError("");
+        router.refresh();
+      }
+    });
+  };
+
   const handleScheduleClick = () => {
     router.push(`/${eventSlug}/add-session?proposalID=${proposal.id}`);
   };
@@ -99,11 +119,37 @@ export function ViewProposal(props: {
     >
       <Proposal proposal={proposal} />
 
-      {proposal.hosts.length === 0 && (
-        <p className="mt-4 rounded-md border border-brand-tint-hover bg-brand-tint px-3 py-2 text-sm text-fg-muted">
-          Nobody is offering this session yet. If you could give it, take it on:
-          click Edit and add yourself as a host.
-        </p>
+      {wantsHost(proposal) && !isHost() && (
+        <div className="mt-4 rounded-md border border-brand-tint-hover bg-brand-tint px-3 py-2 text-sm text-fg-muted flex flex-wrap items-center gap-x-4 gap-y-2">
+          <p className="flex-1 basis-64">
+            {proposal.hosts.length === 0
+              ? "Nobody is offering this session yet. If you could give it, take it on."
+              : "The hosts would like a co-host. Joining lets you edit this proposal with them."}
+          </p>
+          <HoverTooltip
+            text="Select a user first"
+            visible={!currentUserId}
+            unavailable
+          >
+            <button
+              onClick={handleJoinClick}
+              disabled={isJoining}
+              className={`inline-flex items-center justify-center px-3 py-1.5 font-medium rounded-md bg-brand text-on-brand hover:bg-brand-hover transition-colors disabled:opacity-50 ${
+                currentUserId ? "" : "opacity-50 cursor-not-allowed"
+              }`}
+            >
+              <HandRaisedIcon className="h-4 w-4 mr-1" />
+              {proposal.hosts.length === 0
+                ? "Host this session"
+                : "Join as co-host"}
+            </button>
+          </HoverTooltip>
+          {joinError && (
+            <p role="alert" className="basis-full text-danger-fg">
+              {joinError}
+            </p>
+          )}
+        </div>
       )}
 
       {canEdit() && (

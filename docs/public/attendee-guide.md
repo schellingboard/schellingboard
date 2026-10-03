@@ -39,8 +39,15 @@ on the schedule.
 
 - **A proposal doesn't need a host.** An empty host field says "I'd like
   someone to offer this" rather than "I'll give this". Anyone who can give
-  such a session takes it on by editing the proposal and adding themselves —
-  nobody's permission needed.
+  such a session takes it on by opening the proposal and clicking **Host this
+  session** — nobody's permission needed.
+- **Hosting but want help?** Tick **Looking for a co-host** on your proposal
+  and say who you are looking for — someone to take over, a second
+  facilitator. Anyone can then click **Join as co-host**, which also lets them
+  edit the proposal. You are told when someone joins, and the request ends;
+  tick it again if you want more help.
+- **Want to host something?** The **Host wanted** filter lists the proposals
+  with no host and those asking for a co-host.
 - **Descriptions accept Markdown.** The toolbar above the box adds bold,
   italics, links, lists, quotes and code; the **Preview** tab shows how it
   will look.
@@ -485,6 +492,7 @@ page lists everything newest first. You'll be told when:
 
 - a session you host or have RSVP'd to is moved or deleted
 - someone adds you as a co-host
+- someone joins a proposal you host as a co-host
 - someone comments on a proposal or session you host, or on your profile
 - someone else comments on something you commented on
 - someone asks you for a 1-on-1, or answers a request of yours

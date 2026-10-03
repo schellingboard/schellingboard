@@ -1,0 +1,1 @@
+ALTER TABLE `guests` ADD `email_on_proposal_join` integer DEFAULT true NOT NULL;

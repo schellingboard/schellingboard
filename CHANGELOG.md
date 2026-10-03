@@ -25,6 +25,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Sort proposals by last update** (#778): the proposal list opens with new and freshly
   edited proposals first, and its Sort by menu now shows on every screen size. Votes and
   comments don't count as updates.
+- **Find and take on proposals that want a host** (#774, #775): a Host wanted filter lists
+  proposals with no host or whose hosts ask for a co-host, and one click makes you a host.
 - **Filter the schedule to your own sessions**: My sessions, RSVP'd and Hosting narrow the
   Grid and Agenda views to what you are attending or hosting.
 

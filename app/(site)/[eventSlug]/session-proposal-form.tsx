@@ -18,7 +18,7 @@ import { slotDurationOptions } from "@/utils/slots";
 import { MarkdownHint } from "@/app/(site)/markdown";
 import { useController, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { sessionProposalSchema } from "@/model/session";
+import { COHOST_WANTED_NOTE_MAX, sessionProposalSchema } from "@/model/session";
 import { z } from "zod";
 import { BackLink } from "@/app/components/back-link";
 import { MarkdownTextarea } from "@/app/components/markdown-textarea";
@@ -58,6 +58,8 @@ export function SessionProposalForm(props: {
       description: proposal?.description ?? "",
       hostIds: defaultHosts,
       durationMinutes: proposal?.durationMinutes,
+      cohostWanted: proposal?.cohostWanted ?? false,
+      cohostWantedNote: proposal?.cohostWantedNote ?? "",
     },
   });
 
@@ -74,6 +76,11 @@ export function SessionProposalForm(props: {
   // Read-only: the input itself is registered, this only drives the submit
   // button's disabled state.
   const title = useWatch({ control: form.control, name: "title" });
+  const cohostWanted = useWatch({
+    control: form.control,
+    name: "cohostWanted",
+  });
+  const hostIds = hostsController.field.value ?? [];
 
   const handleSubmit = async (
     sessionProposal: z.infer<typeof sessionProposalSchema>
@@ -180,17 +187,54 @@ export function SessionProposalForm(props: {
           <SelectHosts
             id="proposal-hosts"
             guests={guests}
-            hosts={guests.filter((g) =>
-              hostsController.field.value?.some((h) => h === g.id)
-            )}
-            setHosts={(nextHosts) =>
-              hostsController.field.onChange(nextHosts.map((h) => h.id))
-            }
+            hosts={guests.filter((g) => hostIds.some((h) => h === g.id))}
+            setHosts={(nextHosts) => {
+              // Hosts forget to withdraw the request once they have found their
+              // co-host, so adding one withdraws it; ticking it again asks anew.
+              if (nextHosts.length > hostIds.length) {
+                form.setValue("cohostWanted", false);
+              }
+              hostsController.field.onChange(nextHosts.map((h) => h.id));
+            }}
             selectMany={true}
           />
           <span className="text-danger-fg text-sm">
             {form.formState.errors.hostIds?.message}
           </span>
+          {hostIds.length > 0 && (
+            <div className="mt-2 flex flex-col gap-2">
+              <label className="flex items-start gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  {...form.register("cohostWanted")}
+                  className="mt-0.5 h-4 w-4 rounded border-line text-brand focus:ring-brand-accent"
+                />
+                <span>
+                  <span className="font-medium">Looking for a co-host</span>
+                  <span className="block text-fg-subtle">
+                    Lists the proposal under “Host wanted” and lets anyone join
+                    as a co-host. Stops as soon as someone joins.
+                  </span>
+                </span>
+              </label>
+              {cohostWanted && (
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm" htmlFor="proposal-cohost-note">
+                    Who are you looking for?
+                  </label>
+                  <Input
+                    id="proposal-cohost-note"
+                    {...form.register("cohostWantedNote")}
+                    maxLength={COHOST_WANTED_NOTE_MAX}
+                    placeholder="e.g. someone to take over, or a second facilitator"
+                  />
+                  <span className="text-danger-fg text-sm">
+                    {form.formState.errors.cohostWantedNote?.message}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col gap-1">

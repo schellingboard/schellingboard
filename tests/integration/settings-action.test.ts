@@ -37,6 +37,7 @@ describe("updateEmailSettingsAction", () => {
       rsvpChange: false,
       hostChange: false,
       cohostAdd: true,
+      proposalJoin: true,
       proposalComment: false,
       sessionComment: false,
       profileComment: true,
@@ -96,6 +97,7 @@ describe("updateEmailSettingsAction", () => {
       rsvpChange: false,
       hostChange: false,
       cohostAdd: false,
+      proposalJoin: false,
       proposalComment: false,
       commentThread: false,
     } as never);
@@ -110,6 +112,7 @@ describe("updateEmailSettingsAction", () => {
       rsvpChange: false,
       hostChange: false,
       cohostAdd: false,
+      proposalJoin: false,
       proposalComment: false,
       sessionComment: false,
       profileComment: false,

@@ -233,6 +233,7 @@ const VERIFIERS: Record<string, Verifier> = {
 const PROPOSAL_ACTION_EXPORTS = [
   "createProposal",
   "updateProposal",
+  "joinProposal",
   "deleteProposal",
 ] as const;
 
@@ -268,6 +269,18 @@ const PROPOSAL_ACTION_VERIFIERS: Record<
       eventSlug: "test-event",
       title: "Renamed",
     });
+    expect(result).toHaveProperty("error");
+  },
+
+  joinProposal: async () => {
+    const { joinProposal } =
+      await import("@/app/(site)/[eventSlug]/proposals/actions");
+    const event = await createEvent();
+    const guest = await createGuest({ eventId: event.id });
+    await protectGuest(guest.id);
+    const proposal = await createProposal(event.id, []);
+    cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
+    const result = await joinProposal(proposal.id, "test-event");
     expect(result).toHaveProperty("error");
   },
 

@@ -149,6 +149,8 @@ export type EmailSettings = {
   hostChange: boolean;
   /** The guest was added as a co-host of a session. */
   cohostAdd: boolean;
+  /** Someone joined a proposal the guest is hosting as a co-host. */
+  proposalJoin: boolean;
   /** Someone commented on a proposal the guest is hosting. */
   proposalComment: boolean;
   /** Someone commented on a session the guest is hosting. */
@@ -178,6 +180,7 @@ export const DEFAULT_EMAIL_SETTINGS: EmailSettings = {
   rsvpChange: true,
   hostChange: true,
   cohostAdd: true,
+  proposalJoin: true,
   proposalComment: true,
   sessionComment: true,
   profileComment: true,
@@ -797,6 +800,9 @@ export type SessionProposal = {
   createdTime: Date;
   updatedTime: Date;
   hosts: ProposalHost[];
+  /** Only ever true while there are hosts: with none, a host is wanted anyway. */
+  cohostWanted: boolean;
+  cohostWantedNote?: string;
   votesCount: number;
   interestedVotesCount: number;
   maybeVotesCount: number;
@@ -810,6 +816,8 @@ export type SessionProposalCreateInput = {
   description?: string;
   hostIds: string[];
   durationMinutes?: number;
+  cohostWanted?: boolean;
+  cohostWantedNote?: string;
   createdTime: Date;
 };
 
@@ -818,6 +826,8 @@ export type SessionProposalUpdateInput = {
   description?: string;
   hostIds?: string[];
   durationMinutes?: number | null;
+  cohostWanted?: boolean;
+  cohostWantedNote?: string | null;
   updatedTime: Date;
 };
 
@@ -845,6 +855,8 @@ export interface SessionProposalsRepository {
     id: string,
     patch: SessionProposalUpdateInput
   ): Promise<SessionProposal>;
+  /** False, changing nothing, unless the proposal wants a host and the guest isn't one. */
+  addHost(id: string, guestId: string, updatedTime: Date): Promise<boolean>;
   delete(id: string): Promise<void>;
 }
 

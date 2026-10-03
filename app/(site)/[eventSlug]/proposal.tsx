@@ -31,6 +31,12 @@ export function Proposal(props: { proposal: SessionProposal }) {
           ))}
         </p>
       )}
+      {proposal.cohostWanted && (
+        <p className="text-sm italic text-fg-muted mb-4">
+          Looking for a co-host
+          {proposal.cohostWantedNote && `: ${proposal.cohostWantedNote}`}
+        </p>
+      )}
       <div className="mb-3">
         <Markdown>{proposal.description}</Markdown>
       </div>
