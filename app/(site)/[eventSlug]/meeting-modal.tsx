@@ -10,7 +10,7 @@ import {
   type MeetingActionResult,
 } from "@/app/actions/meetings";
 import {
-  DANGER_BUTTON,
+  SECONDARY_DANGER_BUTTON,
   PRIMARY_BUTTON,
   SECONDARY_BUTTON,
 } from "@/app/components/buttons";
@@ -244,7 +244,7 @@ function MeetingModal({
                         )
                       }
                       disabled={isAnswering}
-                      className={DANGER_BUTTON}
+                      className={SECONDARY_DANGER_BUTTON}
                     >
                       Yes, cancel it
                     </button>

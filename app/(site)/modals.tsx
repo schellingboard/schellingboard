@@ -4,7 +4,7 @@ import Image from "next/image";
 import { MapIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Modal } from "@/app/components/modal";
 import {
-  DESTRUCTIVE_BUTTON,
+  DANGER_BUTTON,
   PRIMARY_BUTTON,
   SECONDARY_BUTTON,
 } from "@/app/components/buttons";
@@ -131,7 +131,7 @@ export function ConfirmDeletionModal(props: {
         <div className="mt-4 flex flex-wrap gap-2">
           <button
             type="button"
-            className={DESTRUCTIVE_BUTTON}
+            className={DANGER_BUTTON}
             onClick={() => void clickHandler()}
           >
             Delete
@@ -170,7 +170,7 @@ export function ConfirmationModal(props: {
         <div className="mt-4 flex flex-wrap gap-2">
           <button
             type="button"
-            className={destructive ? DESTRUCTIVE_BUTTON : PRIMARY_BUTTON}
+            className={destructive ? DANGER_BUTTON : PRIMARY_BUTTON}
             onClick={clickHandler}
           >
             {destructive ? "Delete" : "Yes"}

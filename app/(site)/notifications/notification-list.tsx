@@ -8,7 +8,10 @@ import {
   markNotificationsReadAction,
   openNotificationAction,
 } from "@/app/actions/notifications";
-import { DANGER_BUTTON, SECONDARY_BUTTON } from "@/app/components/buttons";
+import {
+  SECONDARY_DANGER_BUTTON,
+  SECONDARY_BUTTON,
+} from "@/app/components/buttons";
 import { ConfirmationModal } from "../modals";
 import { OpenNotificationButton } from "./open-notification-button";
 
@@ -81,7 +84,7 @@ export function NotificationList({ rows }: { rows: NotificationRow[] }) {
             type="button"
             disabled={!someSelected || pending}
             onClick={() => setConfirmingDelete(true)}
-            className={DANGER_BUTTON}
+            className={SECONDARY_DANGER_BUTTON}
           >
             Delete
           </button>
