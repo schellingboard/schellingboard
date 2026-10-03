@@ -54,8 +54,6 @@ const VALID_EVENT_INPUT = {
   name: "Test Event",
   description: "A description",
   website: "https://example.com",
-  start: "2026-09-01",
-  end: "2026-09-03",
   timezone: "Europe/Berlin",
   maxSessionDuration: "60",
   breakMinutes: "10",
@@ -105,6 +103,31 @@ describe("events repo", () => {
       });
       const fetched = await getRepositories().events.findById(event.id);
       expect(fetched?.name).toBe("Keep");
+    });
+  });
+
+  describe("dates", () => {
+    it("run from the first day's start to the last day's start", async () => {
+      const event = await createEvent();
+      await createDay(event.id, {
+        start: new Date("2026-10-02T20:00:00Z"),
+        end: new Date("2026-10-03T03:00:00Z"),
+      });
+      await createDay(event.id, {
+        start: new Date("2026-10-01T09:00:00Z"),
+        end: new Date("2026-10-01T17:00:00Z"),
+      });
+
+      const [fetched] = await getRepositories().events.list();
+      expect(fetched.firstDayStart).toEqual(new Date("2026-10-01T09:00:00Z"));
+      expect(fetched.lastDayStart).toEqual(new Date("2026-10-02T20:00:00Z"));
+    });
+
+    it("are unset for an event without days", async () => {
+      const event = await createEvent();
+      const fetched = await getRepositories().events.findById(event.id);
+      expect(fetched?.firstDayStart).toBeUndefined();
+      expect(fetched?.lastDayStart).toBeUndefined();
     });
   });
 
@@ -340,34 +363,9 @@ describe("event actions", () => {
       expect(!result.ok && result.error).toBe("Name is required");
     });
 
-    it("requires valid dates", async () => {
-      const result = await createEventAction({
-        ...VALID_EVENT_INPUT,
-        start: "not-a-date",
-      });
-      expect(!result.ok && result.error).toMatch(/invalid/i);
-    });
-
-    it("requires end after start", async () => {
-      const result = await createEventAction({
-        ...VALID_EVENT_INPUT,
-        start: "2026-09-05",
-        end: "2026-09-01",
-      });
-      expect(!result.ok && result.error).toMatch(
-        /end.*after.*start|start.*before.*end/i
-      );
-    });
-
-    it("rejects an event whose end equals its start", async () => {
-      const result = await createEventAction({
-        ...VALID_EVENT_INPUT,
-        start: "2026-09-05",
-        end: "2026-09-05",
-      });
-      expect(!result.ok && result.error).toMatch(
-        /end.*after.*start|start.*before.*end/i
-      );
+    it("needs no dates: the event's days define them", async () => {
+      const result = await createEventAction(VALID_EVENT_INPUT);
+      expect(result.ok).toBe(true);
     });
 
     it("persists the configured break", async () => {

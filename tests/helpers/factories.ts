@@ -64,15 +64,10 @@ export async function createEvent(opts?: {
     proposalPhaseEnd = votingPhaseStart;
   }
 
-  const start = new Date(schedulingPhaseEnd.getTime() + 7 * DAY_MS);
-  const end = new Date(start.getTime() + 2 * DAY_MS);
-
   return events.create({
     name: opts?.name ?? `Test Event ${++eventCounter}`,
     description: "",
     website: "",
-    start,
-    end,
     proposalPhaseStart: opts?.proposalPhaseStart ?? proposalPhaseStart,
     proposalPhaseEnd: opts?.proposalPhaseEnd ?? proposalPhaseEnd,
     votingPhaseStart: opts?.votingPhaseStart ?? votingPhaseStart,

@@ -372,8 +372,6 @@ test.describe("Admin UI events", () => {
     const eventName = `E2E Event ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
     await page.getByLabel("Name *").fill(eventName);
-    await page.getByLabel("Start *").fill("2026-10-01");
-    await page.getByLabel("End *").fill("2026-10-03");
     await page.getByRole("button", { name: "Create event" }).click();
 
     // New event appears in the list
@@ -395,8 +393,6 @@ test.describe("Admin UI events", () => {
     const eventName = `E2E Tabs ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
     await page.getByLabel("Name *").fill(eventName);
-    await page.getByLabel("Start *").fill("2026-10-01");
-    await page.getByLabel("End *").fill("2026-10-03");
     await page.getByRole("button", { name: "Create event" }).click();
     await page
       .getByRole("listitem")
@@ -435,19 +431,6 @@ test.describe("Admin UI events", () => {
     await expect(page).toHaveURL(/\/admin\/events$/);
   });
 
-  test("shows validation error when end is before start", async ({ page }) => {
-    await adminLogin(page);
-    await page.goto("/admin/events");
-    await page.getByRole("button", { name: "New event" }).click();
-    await page.getByLabel("Name *").fill("Bad Dates Event");
-    await page.getByLabel("Start *").fill("2026-10-05");
-    await page.getByLabel("End *").fill("2026-10-01");
-    await page.getByRole("button", { name: "Create event" }).click();
-    await expect(
-      page.getByText(/end date must be after start date/i)
-    ).toBeVisible();
-  });
-
   test("can edit event basic info on detail page", async ({ page }) => {
     await adminLogin(page);
     await page.goto("/admin/events");
@@ -458,8 +441,6 @@ test.describe("Admin UI events", () => {
     const renamed = `E2E Edit Updated ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
     await page.getByLabel("Name *").fill(original);
-    await page.getByLabel("Start *").fill("2026-10-01");
-    await page.getByLabel("End *").fill("2026-10-03");
     await page.getByRole("button", { name: "Create event" }).click();
     await page
       .getByRole("listitem")
@@ -507,8 +488,6 @@ test.describe("Admin UI events", () => {
     const eventName = `Delete Me ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
     await page.getByLabel("Name *").fill(eventName);
-    await page.getByLabel("Start *").fill("2026-11-01");
-    await page.getByLabel("End *").fill("2026-11-03");
     await page.getByRole("button", { name: "Create event" }).click();
     const row = page.getByRole("listitem").filter({ hasText: eventName });
     await row.getByRole("link", { name: "Manage" }).click();
@@ -537,8 +516,6 @@ test.describe("Admin UI events", () => {
     const eventName = `E2E Phases ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
     await page.getByLabel("Name *").fill(eventName);
-    await page.getByLabel("Start *").fill("2026-10-01");
-    await page.getByLabel("End *").fill("2026-10-31");
     await page.getByRole("button", { name: "Create event" }).click();
     await page
       .getByRole("listitem")
@@ -618,8 +595,6 @@ test.describe("Admin UI days", () => {
     const eventName = `E2E Days ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
     await page.getByLabel("Name *").fill(eventName);
-    await page.getByLabel("Start *").fill("2026-10-01");
-    await page.getByLabel("End *").fill("2026-10-03");
     await page.getByRole("button", { name: "Create event" }).click();
     await page
       .getByRole("listitem")
@@ -720,8 +695,6 @@ test.describe("Admin UI guest assignment", () => {
     const eventName = `E2E Guests ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
     await page.getByLabel("Name *").fill(eventName);
-    await page.getByLabel("Start *").fill("2026-10-01");
-    await page.getByLabel("End *").fill("2026-10-03");
     await page.getByRole("button", { name: "Create event" }).click();
     await page
       .getByRole("listitem")
@@ -801,8 +774,6 @@ test.describe("Admin UI guest assignment", () => {
     const eventName = `E2E Bulk Guests ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
     await page.getByLabel("Name *").fill(eventName);
-    await page.getByLabel("Start *").fill("2026-10-01");
-    await page.getByLabel("End *").fill("2026-10-03");
     await page.getByRole("button", { name: "Create event" }).click();
     await page
       .getByRole("listitem")
@@ -935,8 +906,6 @@ test.describe("Admin UI locations", () => {
       const eventName = `E2E Locations ${unique}`;
       await page.getByRole("button", { name: "New event" }).click();
       await page.getByLabel("Name *").fill(eventName);
-      await page.getByLabel("Start *").fill("2026-10-01");
-      await page.getByLabel("End *").fill("2026-10-03");
       await page.getByRole("button", { name: "Create event" }).click();
       await page
         .getByRole("listitem")
@@ -1101,8 +1070,6 @@ test.describe("Admin UI locations", () => {
     const eventName = `E2E Loc Selection ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
     await page.getByLabel("Name *").fill(eventName);
-    await page.getByLabel("Start *").fill("2026-10-01");
-    await page.getByLabel("End *").fill("2026-10-03");
     await page.getByRole("button", { name: "Create event" }).click();
     await page
       .getByRole("listitem")

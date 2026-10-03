@@ -31,7 +31,7 @@ One global row shown when there's more than one event (see
   creation, and never changes afterwards even if you rename the event later.
   This keeps existing links/bookmarks working. `admin`, `api`, `login`, and
   `media` can't be used as event names.
-- **Description** (Markdown), **Website**, **Start/End dates**, **Timezone**
+- **Description** (Markdown), **Website**, **Timezone**
   (required — all dates/times for this event are edited in this zone),
   **Icon** (decorative).
 - **Max session duration**, **break before each session** (attendees' sessions
@@ -52,7 +52,8 @@ One global row shown when there's more than one event (see
   not reservations — several pairs can name the same spot in the same slot, and
   an attendee can type somewhere else instead. Renaming or deleting one never
   changes a meeting already arranged there.
-- **Days** — per-day schedule windows: visible Start/End time range, plus a
+- **Days** — per-day schedule windows, which also make up the event's dates:
+  visible Start/End time range, plus a
   separate Bookings open/close window controlling when attendees can
   self-book a blank bookable slot on that day. Deleting a day also deletes
   any sessions scheduled inside it (warned before confirming).

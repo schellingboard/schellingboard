@@ -21,18 +21,12 @@ import { SLOT_INCREMENT_OPTIONS } from "@/utils/slots";
 import { MarkdownHint } from "@/app/(site)/markdown";
 import { MarkdownTextarea } from "@/app/components/markdown-textarea";
 
-function toDateInputValue(date: Date): string {
-  return date.toISOString().split("T")[0];
-}
-
 export function EventDetailForm({ event }: { event: Event }) {
   const router = useRouter();
   const [form, setForm] = useState<EventInput>({
     name: event.name,
     description: event.description,
     website: event.website,
-    start: toDateInputValue(event.start),
-    end: toDateInputValue(event.end),
     timezone: event.timezone,
     maxSessionDuration: String(event.maxSessionDuration),
     breakMinutes: String(event.breakMinutes),
@@ -116,34 +110,6 @@ export function EventDetailForm({ event }: { event: Event }) {
             onChange={(e) => set("website", e.target.value)}
             className="w-full h-10"
           />
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="flex flex-col gap-1">
-            <label htmlFor="ev-start" className="text-sm text-fg-muted">
-              Start *
-            </label>
-            <Input
-              id="ev-start"
-              type="date"
-              value={form.start}
-              onChange={(e) => set("start", e.target.value)}
-              required
-              className="w-full h-10"
-            />
-          </div>
-          <div className="flex flex-col gap-1">
-            <label htmlFor="ev-end" className="text-sm text-fg-muted">
-              End *
-            </label>
-            <Input
-              id="ev-end"
-              type="date"
-              value={form.end}
-              onChange={(e) => set("end", e.target.value)}
-              required
-              className="w-full h-10"
-            />
-          </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="flex flex-col gap-1">

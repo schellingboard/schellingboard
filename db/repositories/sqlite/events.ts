@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, getTableColumns, sql } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
 import * as schema from "../../schema";
@@ -13,15 +13,32 @@ type EventRow = typeof schema.events.$inferInsert;
 
 type DB = BetterSQLite3Database<typeof schema>;
 
-function rowToEvent(row: typeof schema.events.$inferSelect): Event {
+// Qualified by hand: drizzle drops table names in a single-table select, which
+// would compare days.event_id with days.id.
+const eventColumns = {
+  ...getTableColumns(schema.events),
+  firstDayStart: sql<
+    string | null
+  >`(select min("days"."start") from "days" where "days"."event_id" = "events"."id")`,
+  lastDayStart: sql<
+    string | null
+  >`(select max("days"."start") from "days" where "days"."event_id" = "events"."id")`,
+};
+
+type EventSelectRow = typeof schema.events.$inferSelect & {
+  firstDayStart: string | null;
+  lastDayStart: string | null;
+};
+
+function rowToEvent(row: EventSelectRow): Event {
   return {
     id: row.id,
     name: row.name,
     slug: row.slug,
     description: row.description,
     website: row.website,
-    start: new Date(row.start),
-    end: new Date(row.end),
+    firstDayStart: row.firstDayStart ? new Date(row.firstDayStart) : undefined,
+    lastDayStart: row.lastDayStart ? new Date(row.lastDayStart) : undefined,
     proposalPhaseStart: row.proposalPhaseStart
       ? new Date(row.proposalPhaseStart)
       : undefined,
@@ -55,12 +72,16 @@ export class SqliteEventsRepository implements EventsRepository {
   constructor(private readonly db: DB) {}
 
   async list(): Promise<Event[]> {
-    return this.db.select().from(schema.events).all().map(rowToEvent);
+    return this.db
+      .select(eventColumns)
+      .from(schema.events)
+      .all()
+      .map(rowToEvent);
   }
 
   async findById(id: string): Promise<Event | undefined> {
     const row = this.db
-      .select()
+      .select(eventColumns)
       .from(schema.events)
       .where(eq(schema.events.id, id))
       .get();
@@ -69,7 +90,7 @@ export class SqliteEventsRepository implements EventsRepository {
 
   async findByName(name: string): Promise<Event | undefined> {
     const row = this.db
-      .select()
+      .select(eventColumns)
       .from(schema.events)
       .where(eq(schema.events.name, name))
       .get();
@@ -78,7 +99,7 @@ export class SqliteEventsRepository implements EventsRepository {
 
   async findBySlug(slug: string): Promise<Event | undefined> {
     const row = this.db
-      .select()
+      .select(eventColumns)
       .from(schema.events)
       .where(eq(schema.events.slug, slug))
       .get();
@@ -99,8 +120,6 @@ export class SqliteEventsRepository implements EventsRepository {
         slug,
         description: data.description,
         website: data.website,
-        start: data.start.toISOString(),
-        end: data.end.toISOString(),
         proposalPhaseStart: data.proposalPhaseStart?.toISOString() ?? null,
         proposalPhaseEnd: data.proposalPhaseEnd?.toISOString() ?? null,
         votingPhaseStart: data.votingPhaseStart?.toISOString() ?? null,
@@ -139,8 +158,6 @@ export class SqliteEventsRepository implements EventsRepository {
     if (patch.name !== undefined) set.name = patch.name;
     if (patch.description !== undefined) set.description = patch.description;
     if (patch.website !== undefined) set.website = patch.website;
-    if (patch.start !== undefined) set.start = patch.start.toISOString();
-    if (patch.end !== undefined) set.end = patch.end.toISOString();
     if ("proposalPhaseStart" in patch)
       set.proposalPhaseStart = patch.proposalPhaseStart?.toISOString() ?? null;
     if ("proposalPhaseEnd" in patch)

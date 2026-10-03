@@ -260,6 +260,13 @@
       "when": 1790711821877,
       "tag": "0036_session_real_start_times",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "6",
+      "when": 1790772955504,
+      "tag": "0037_drop_event_dates",
+      "breakpoints": true
     }
   ]
 }

@@ -33,11 +33,7 @@ async function readJson(
   return (await res.json()) as { id: string; slug: string } | { error: string };
 }
 
-const VALID_BODY = {
-  name: "Summer Camp",
-  start: "2026-09-01T00:00:00Z",
-  end: "2026-09-03T00:00:00Z",
-};
+const VALID_BODY = { name: "Summer Camp" };
 
 describe("POST /api/admin/create-event", () => {
   beforeAll(() => setupTestDb());
@@ -65,8 +61,6 @@ describe("POST /api/admin/create-event", () => {
     const event = await getRepositories().events.findBySlug("Summer-Camp");
     expect(event?.id).toBe(body.id);
     expect(event?.name).toBe("Summer Camp");
-    expect(event?.start).toEqual(new Date("2026-09-01T00:00:00Z"));
-    expect(event?.end).toEqual(new Date("2026-09-03T00:00:00Z"));
     expect(event?.timezone).toBe("UTC");
     expect(event?.maxSessionDuration).toBe(120);
     expect(event?.breakMinutes).toBe(10);
@@ -145,8 +139,6 @@ describe("POST /api/admin/create-event", () => {
     ["non-string name", { ...VALID_BODY, name: 123 }],
     ["name without letters or numbers", { ...VALID_BODY, name: "!!!" }],
     ["reserved slug", { ...VALID_BODY, name: "Admin" }],
-    ["invalid start", { ...VALID_BODY, start: "not-a-date" }],
-    ["end before start", { ...VALID_BODY, end: "2026-08-31T00:00:00Z" }],
     ["invalid timezone", { ...VALID_BODY, timezone: "Mars/Olympus" }],
     [
       "non-positive maxSessionDuration",

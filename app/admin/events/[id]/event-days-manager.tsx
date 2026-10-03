@@ -419,7 +419,8 @@ export function EventDaysManager({
     <section aria-label="Days" className="space-y-4">
       <h2 className="text-lg font-semibold text-fg">Days</h2>
       <p className="text-sm text-fg-subtle">
-        All times are in the event timezone ({timezone}).
+        The event&apos;s dates are the days you add here. All times are in the
+        event timezone ({timezone}).
       </p>
       {error && <p className="text-sm text-danger-fg">{error}</p>}
 

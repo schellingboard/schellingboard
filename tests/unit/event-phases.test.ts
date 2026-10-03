@@ -18,8 +18,6 @@ function makeEvent(overrides: Partial<Event>): Event {
     slug: "Test",
     description: "",
     website: "",
-    start: ahead(30),
-    end: ahead(31),
     maxSessionDuration: 120,
     breakMinutes: 10,
     slotIncrementMinutes: 30,

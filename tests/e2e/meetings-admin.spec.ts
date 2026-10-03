@@ -22,8 +22,6 @@ test("configures the meetings section and keeps it across a reload", async ({
 
   await page.getByRole("button", { name: "New event" }).click();
   await page.getByLabel("Name *").fill(eventName);
-  await page.getByLabel("Start *").fill("2026-10-01");
-  await page.getByLabel("End *").fill("2026-10-03");
   await page.getByRole("button", { name: "Create event" }).click();
   await page
     .getByRole("listitem")

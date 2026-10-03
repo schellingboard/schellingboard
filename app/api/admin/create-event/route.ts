@@ -21,8 +21,6 @@ type Body = {
   name?: string;
   description?: string;
   website?: string;
-  start?: string;
-  end?: string;
   timezone?: string;
   maxSessionDuration?: number;
   breakMinutes?: number;
@@ -73,14 +71,6 @@ export async function POST(req: Request) {
 
   const name = (body.name ?? "").trim();
   if (!name) return badRequest("Name is required");
-
-  const start = parseDate(body.start);
-  if (!start) return badRequest("Invalid start date");
-
-  const end = parseDate(body.end);
-  if (!end) return badRequest("Invalid end date");
-
-  if (end <= start) return badRequest("End date must be after start date");
 
   const timezone = (body.timezone ?? "").trim() || "UTC";
   if (!isValidTimezone(timezone)) return badRequest("Unknown timezone");
@@ -151,8 +141,6 @@ export async function POST(req: Request) {
       name,
       description: (body.description ?? "").trim(),
       website: normalizeWebsiteUrl(body.website ?? ""),
-      start,
-      end,
       timezone,
       maxSessionDuration,
       breakMinutes,

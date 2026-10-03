@@ -3,13 +3,12 @@ export const dynamic = "force-dynamic";
 import SummaryPage from "./summary-page";
 import { getRepositories } from "@/db/container";
 import { redirect } from "next/navigation";
+import { compareEventsByStart } from "@/utils/utils";
 
 export default async function Home() {
   const repos = getRepositories();
   const events = await repos.events.list();
-  const sortedEvents = events.sort((a, b) => {
-    return a.start.getTime() - b.start.getTime();
-  });
+  const sortedEvents = events.sort(compareEventsByStart);
   if (sortedEvents.length > 1) {
     const { title, description } = await repos.settings.get();
     return (

@@ -65,8 +65,9 @@ export type Event = {
   slug: string;
   description: string;
   website: string;
-  start: Date;
-  end: Date;
+  /** The event's dates are those of its first and last days, unset without days. */
+  firstDayStart?: Date;
+  lastDayStart?: Date;
   proposalPhaseStart?: Date;
   proposalPhaseEnd?: Date;
   votingPhaseStart?: Date;
@@ -96,6 +97,8 @@ export type EventMeetingSettings = Pick<
   "meetingsEnabled" | "maxOpenMeetingRequests"
 >;
 
+type EventDerivedFields = "id" | "slug" | "firstDayStart" | "lastDayStart";
+
 export interface EventsRepository {
   list(): Promise<Event[]>;
   findById(id: string): Promise<Event | undefined>;
@@ -107,12 +110,12 @@ export interface EventsRepository {
    * event already has that slug (unique constraint).
    */
   create(
-    data: Omit<Event, "id" | "slug" | keyof EventMeetingSettings> &
+    data: Omit<Event, EventDerivedFields | keyof EventMeetingSettings> &
       Partial<EventMeetingSettings>
   ): Promise<Event>;
   update(
     id: string,
-    patch: Partial<Omit<Event, "id" | "slug">>
+    patch: Partial<Omit<Event, EventDerivedFields>>
   ): Promise<Event | undefined>;
   /** Deletes the event and all records referencing it (cascades via DB FK). */
   delete(id: string): Promise<void>;

@@ -2,6 +2,7 @@ import { DateTime } from "luxon";
 import { getRepositories } from "@/db/container";
 import type { Day, Event } from "@/db/repositories/interfaces";
 import { meetingSlotsForDay, slotTimeLabel } from "@/utils/meeting-slots";
+import { compareEventsByStart } from "@/utils/utils";
 
 export type SlotDay = {
   /** Two days may share a date, so the id is what keys them apart. */
@@ -40,7 +41,7 @@ export async function availabilityFormsFor(
     .filter(
       (event): event is Event => event !== undefined && event.meetingsEnabled
     )
-    .sort((a, b) => a.start.getTime() - b.start.getTime());
+    .sort(compareEventsByStart);
 
   const forms = await Promise.all(
     offering.map(async (event) => {

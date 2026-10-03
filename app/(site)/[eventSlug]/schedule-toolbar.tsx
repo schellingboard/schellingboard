@@ -11,13 +11,13 @@ import {
   QueueListIcon,
   TableCellsIcon,
 } from "@heroicons/react/24/outline";
-import { DateTime } from "luxon";
 import Link from "next/link";
 import { Modal } from "@/app/components/modal";
 import { Markdown } from "@/app/(site)/markdown";
 import { hasPhases } from "@/app/(site)/utils/events";
 import { scrollNowLineIntoView } from "./now-line";
 import type { Event } from "@/db/repositories/interfaces";
+import { formatEventDates } from "@/utils/utils";
 
 const ITEM_CLASS =
   "flex items-center gap-1 rounded-md py-1.5 px-1 text-xs sm:text-sm text-fg-subtle hover:text-brand-fg focus:outline-none focus:ring-2 focus:ring-brand-accent";
@@ -82,7 +82,7 @@ export function ScheduleToolbar(props: {
 // popup opened from the toolbar.
 function EventDetails(props: { event: Event }) {
   const { event } = props;
-  const multipleDays = event.start.getTime() !== event.end.getTime();
+  const dates = formatEventDates(event);
   return (
     <div className="max-h-[70dvh] overflow-y-auto">
       <h2 className="pr-8 text-lg font-bold text-fg">{event.name}</h2>
@@ -90,18 +90,7 @@ function EventDetails(props: { event: Event }) {
         <span className="flex items-center gap-1">
           <CalendarIcon className="h-4 w-4 stroke-2" />
           <span>
-            {DateTime.fromJSDate(event.start)
-              .setZone(event.timezone)
-              .toFormat("LLL d")}
-            {multipleDays && (
-              <>
-                {" - "}
-                {DateTime.fromJSDate(event.end)
-                  .setZone(event.timezone)
-                  .toFormat("LLL d")}
-              </>
-            )}
-            {" · "}
+            {dates && `${dates} · `}
             {event.timezone}
           </span>
         </span>

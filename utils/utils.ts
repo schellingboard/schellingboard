@@ -1,4 +1,4 @@
-import { Day } from "@/db/repositories/interfaces";
+import type { Day, Event } from "@/db/repositories/interfaces";
 import { DateTime } from "luxon";
 
 export const TIME_FORMAT = "HH:mm";
@@ -19,6 +19,23 @@ export function formatInLocalZone(
       ? DATETIME_FORMAT
       : `${DATETIME_FORMAT} ZZZZ`
   );
+}
+
+export function formatEventDates(
+  event: Pick<Event, "firstDayStart" | "lastDayStart" | "timezone">,
+  format = "LLL d"
+): string | undefined {
+  if (!event.firstDayStart || !event.lastDayStart) return undefined;
+  const [from, to] = [event.firstDayStart, event.lastDayStart].map((d) =>
+    DateTime.fromJSDate(d).setZone(event.timezone).toFormat(format)
+  );
+  return from === to ? from : `${from} - ${to}`;
+}
+
+// Events without days have no dates yet and sort last.
+export function compareEventsByStart(a: Event, b: Event): number {
+  const [x, y] = [a, b].map((e) => e.firstDayStart?.getTime() ?? Infinity);
+  return x === y ? 0 : x < y ? -1 : 1;
 }
 
 export const getPercentThroughDay = (now: Date, start: Date, end: Date) =>

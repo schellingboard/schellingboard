@@ -43,6 +43,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   you have RSVP'd to, so everything you are booked into is marked alike.
 - **A tidier site password page**: just the password box and the footer, on one screen. It used
   to sit under an empty header and scroll.
+- **Event dates come from its days** (#1058): creating an event no longer asks for start and end
+  dates; the dates shown are those of the days you add. The event creation API ignores them too.
 - **SchellingBoard has a new home on GitHub**: the source, the issue tracker and the changelog
   now live at github.com/schellingboard/schellingboard, and every link in the app points there.
 - **The Agenda view is out of beta**: it no longer carries a beta label or notice.

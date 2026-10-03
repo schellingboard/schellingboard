@@ -9,7 +9,6 @@ import { isoDay } from "../helpers/dates";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admintest";
 
 const EVENT_START = isoDay(30);
-const EVENT_END = isoDay(32);
 
 const POINT_DESCRIPTION = "By the main staircase, open all day.";
 
@@ -78,8 +77,6 @@ async function meetingsEvent(page: Page, eventName: string, names: string[]) {
   }).toPass();
 
   await nameField.fill(eventName);
-  await page.getByLabel("Start *").fill(EVENT_START);
-  await page.getByLabel("End *").fill(EVENT_END);
 
   const row = page.getByRole("listitem").filter({ hasText: eventName });
   await expect(async () => {

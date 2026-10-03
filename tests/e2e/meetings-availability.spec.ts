@@ -36,8 +36,6 @@ async function createEvent(page: Page, eventName: string) {
   }).toPass();
 
   await nameField.fill(eventName);
-  await page.getByLabel("Start *").fill("2026-10-01");
-  await page.getByLabel("End *").fill("2026-10-03");
   await page.getByRole("button", { name: "Create event" }).click();
   await manage(page, eventName);
   // Manage is a client-side navigation; a hard goto while its RSC fetch is

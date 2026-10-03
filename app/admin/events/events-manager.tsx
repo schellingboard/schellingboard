@@ -8,19 +8,12 @@ import { createEventAction, type EventInput } from "@/app/actions/admin-events";
 import { PRIMARY_BUTTON, SECONDARY_BUTTON } from "@/app/admin/buttons";
 import { TimezoneSelect } from "@/app/admin/timezone-select";
 import { MarkdownHint } from "@/app/(site)/markdown";
-
-// Event start/end are date-only values stored as UTC midnight; format them in
-// UTC so browsers west of Greenwich don't show the previous day.
-function formatEventDate(date: Date): string {
-  return date.toISOString().split("T")[0];
-}
+import { formatEventDates } from "@/utils/utils";
 
 const DEFAULT_FORM: EventInput = {
   name: "",
   description: "",
   website: "",
-  start: "",
-  end: "",
   timezone: "UTC",
   maxSessionDuration: "60",
   breakMinutes: "10",
@@ -105,34 +98,6 @@ function AddEventForm({
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="flex flex-col gap-1">
-          <label htmlFor="ev-start" className="text-sm text-fg-muted">
-            Start *
-          </label>
-          <Input
-            id="ev-start"
-            type="date"
-            value={form.start}
-            onChange={(e) => set("start", e.target.value)}
-            required
-            className="w-full h-10"
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="ev-end" className="text-sm text-fg-muted">
-            End *
-          </label>
-          <Input
-            id="ev-end"
-            type="date"
-            value={form.end}
-            onChange={(e) => set("end", e.target.value)}
-            required
-            className="w-full h-10"
-          />
-        </div>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div className="flex flex-col gap-1">
           <label htmlFor="ev-timezone" className="text-sm text-fg-muted">
             Timezone *
           </label>
@@ -202,7 +167,7 @@ export function EventsManager({ events }: { events: Event[] }) {
               <div className="min-w-0">
                 <p className="font-medium text-fg truncate">{event.name}</p>
                 <p className="text-sm text-fg-subtle">
-                  {formatEventDate(event.start)} – {formatEventDate(event.end)}
+                  {formatEventDates(event, "yyyy-MM-dd") ?? "No days yet"}
                   {" · "}
                   {event.timezone}
                 </p>

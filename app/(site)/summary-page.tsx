@@ -4,10 +4,10 @@ import {
   CalendarIcon,
   LinkIcon,
 } from "@heroicons/react/16/solid";
-import { DateTime } from "luxon";
 import Link from "next/link";
 import type { Event } from "@/db/repositories/interfaces";
 import { Markdown } from "@/app/(site)/markdown";
+import { compareEventsByStart, formatEventDates } from "@/utils/utils";
 
 export default function SummaryPage(props: {
   events: Event[];
@@ -15,9 +15,7 @@ export default function SummaryPage(props: {
   description: string;
 }) {
   const { events, title, description } = props;
-  const sortedEvents = events.sort((a, b) => {
-    return a.start.getTime() - b.start.getTime();
-  });
+  const sortedEvents = events.sort(compareEventsByStart);
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <div className="mx-auto max-w-2xl">
@@ -30,18 +28,12 @@ export default function SummaryPage(props: {
             <div key={event.name}>
               <h1 className="sm:text-2xl text-xl font-bold">{event.name}</h1>
               <div className="flex text-fg-subtle text-xs mt-1 gap-5 font-medium">
-                <span className="flex gap-1 items-center">
-                  <CalendarIcon className="3 w-3 stroke-2" />
-                  <span>
-                    {DateTime.fromJSDate(event.start)
-                      .setZone(event.timezone)
-                      .toFormat("LLL d")}
-                    {" - "}
-                    {DateTime.fromJSDate(event.end)
-                      .setZone(event.timezone)
-                      .toFormat("LLL d")}
+                {formatEventDates(event) && (
+                  <span className="flex gap-1 items-center">
+                    <CalendarIcon className="3 w-3 stroke-2" />
+                    <span>{formatEventDates(event)}</span>
                   </span>
-                </span>
+                )}
                 {event.website && (
                   <a
                     className="flex gap-1 items-center hover:underline"

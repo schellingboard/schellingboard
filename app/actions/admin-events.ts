@@ -21,8 +21,6 @@ export type EventInput = {
   name: string;
   description: string;
   website: string;
-  start: string;
-  end: string;
   timezone: string;
   maxSessionDuration: string;
   breakMinutes: string;
@@ -31,12 +29,6 @@ export type EventInput = {
   icon?: string;
 };
 
-function parseDate(value: string | undefined): Date | undefined {
-  if (!value) return undefined;
-  const d = new Date(value);
-  return isNaN(d.getTime()) ? undefined : d;
-}
-
 // Phase dates and the meeting settings are deliberately excluded: they are
 // managed only by updateEventPhasesAction and the admin Meetings section, so
 // leaving them out is what keeps a basic-info save from touching them.
@@ -44,6 +36,8 @@ type ParsedEvent = Omit<
   Event,
   | "id"
   | "slug"
+  | "firstDayStart"
+  | "lastDayStart"
   | "proposalPhaseStart"
   | "proposalPhaseEnd"
   | "votingPhaseStart"
@@ -57,14 +51,6 @@ type ParseResult = { data: ParsedEvent } | { error: string };
 function parseEventInput(input: EventInput): ParseResult {
   const name = input.name.trim();
   if (!name) return { error: "Name is required" };
-
-  const start = parseDate(input.start);
-  if (!start) return { error: "Invalid start date" };
-
-  const end = parseDate(input.end);
-  if (!end) return { error: "Invalid end date" };
-
-  if (end <= start) return { error: "End date must be after start date" };
 
   const timezone = input.timezone.trim() || "UTC";
 
@@ -95,8 +81,6 @@ function parseEventInput(input: EventInput): ParseResult {
       name,
       description: input.description.trim(),
       website: normalizeWebsiteUrl(input.website),
-      start,
-      end,
       timezone,
       maxSessionDuration,
       breakMinutes,

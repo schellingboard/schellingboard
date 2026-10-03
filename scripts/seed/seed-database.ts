@@ -380,8 +380,6 @@ async function seedTestData(profile: SeedProfile) {
     description: config.description,
     icon: config.icon,
     website: `https://test-event-${index + 1}.example.com`,
-    start: config.start.toISOString(),
-    end: config.end.toISOString(),
     proposalPhaseStart: config.proposalPhaseStart.toISOString(),
     proposalPhaseEnd: config.proposalPhaseEnd.toISOString(),
     votingPhaseStart: config.votingPhaseStart.toISOString(),
