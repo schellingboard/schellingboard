@@ -97,7 +97,11 @@ test("edits a comment, showing when it was edited, then deletes it @010-US4", as
   await expect(editedMarker).toHaveAttribute("title", /^Edited /);
 
   await modal.getByRole("button", { name: "Delete" }).click();
-  await page.getByRole("button", { name: "Yes" }).click();
+  await page
+    .getByRole("dialog")
+    .filter({ hasText: "Delete this comment?" })
+    .getByRole("button", { name: "Delete" })
+    .click();
 
   await expect(modal.getByText("second thoughts")).toHaveCount(0);
   await expect(
@@ -201,7 +205,11 @@ test("keeps replies readable when their parent is deleted @010-US4", async ({
   await expect(reopened.getByText("a surviving reply").first()).toBeVisible();
 
   await reopened.getByRole("button", { name: "Delete" }).click();
-  await page.getByRole("button", { name: "Yes" }).click();
+  await page
+    .getByRole("dialog")
+    .filter({ hasText: "Delete this comment?" })
+    .getByRole("button", { name: "Delete" })
+    .click();
 
   await expect(reopened.getByText("a doomed parent")).toHaveCount(0);
   await expect(reopened.getByText("Comment deleted")).toBeVisible();

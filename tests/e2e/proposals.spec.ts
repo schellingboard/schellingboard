@@ -84,6 +84,34 @@ test("should create a new session proposal, edit it, and add hosts @004-US1 @004
   await expect(updatedRow).toContainText("Bob Test");
 });
 
+test("cancelling a proposal edit keeps it unchanged @004-US2", async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto("/Conference-Alpha/proposals");
+  await selectUser(page, /Bob Test/i);
+
+  const proposalTitle = `Playwright Cancel Proposal ${uniqueSuffix()}`;
+  await page.getByRole("link", { name: /Add Proposal/i }).click();
+  await page.getByLabel("Title").fill(proposalTitle);
+  await Promise.all([
+    page.waitForURL(/\/Conference-Alpha\/proposals$/),
+    page.getByRole("button", { name: /Submit/i }).click(),
+  ]);
+
+  const row = page.getByRole("row", { name: new RegExp(proposalTitle) });
+  await row.getByRole("button", { name: /Edit/i }).click();
+  await page.getByLabel("Title").fill(`${proposalTitle} discarded`);
+  await Promise.all([
+    page.waitForURL(/\/Conference-Alpha\/proposals$/),
+    page.getByRole("link", { name: "Cancel" }).click(),
+  ]);
+
+  await page.reload();
+  await expect(row).toBeVisible();
+  await expect(page.getByText(`${proposalTitle} discarded`)).toHaveCount(0);
+});
+
 test("should delete a proposal from its edit page @004-US3", async ({
   page,
 }) => {
@@ -111,7 +139,7 @@ test("should delete a proposal from its edit page @004-US3", async ({
   await expect(page.getByText("Delete session proposal?")).toBeVisible();
   await Promise.all([
     page.waitForURL(/\/Conference-Alpha\/proposals$/),
-    page.getByRole("button", { name: "Yes" }).click(),
+    page.getByRole("dialog").getByRole("button", { name: "Delete" }).click(),
   ]);
 
   // Gone from the list, also after a reload

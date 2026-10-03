@@ -135,6 +135,7 @@ export function NotificationList({ rows }: { rows: NotificationRow[] }) {
       {confirmingDelete && (
         <ConfirmationModal
           open
+          destructive
           close={() => setConfirmingDelete(false)}
           confirm={() => run(deleteNotificationsAction)}
           message={

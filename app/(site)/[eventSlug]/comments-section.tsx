@@ -382,6 +382,7 @@ function CommentThread({
       {confirmingDelete && (
         <ConfirmationModal
           open
+          destructive
           close={() => setConfirmingDelete(false)}
           confirm={() => void onDelete()}
           message="Delete this comment? This cannot be undone."

@@ -135,7 +135,10 @@ test("acts on the ticked notifications and nothing else @013-US2", async ({
 
   await actions.getByRole("checkbox", { name: "Select all" }).check();
   await actions.getByRole("button", { name: "Delete" }).click();
-  await page.getByRole("button", { name: "Yes" }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Delete" })
+    .click();
 
   await expect(page.getByText(/Nothing yet/)).toBeVisible();
   await expect(bell(page)).toHaveAccessibleName("Notifications");

@@ -42,6 +42,8 @@ import { detectGuestClashes, type GuestClash } from "./clash-actions";
 import { MarkdownHint } from "@/app/(site)/markdown";
 import { ScheduledSessionsNotice } from "./scheduled-sessions-notice";
 import { BackLink } from "@/app/components/back-link";
+import { FormActions } from "./form-actions";
+import { SUBMIT_BUTTON } from "@/app/components/buttons";
 import { MarkdownTextarea } from "@/app/components/markdown-textarea";
 
 // A save confirmation is routine news, so it clears itself — but late enough
@@ -662,31 +664,37 @@ export function SessionForm(props: {
           <p className="text-sm font-medium">Error: {error}</p>
         </div>
       )}
-      <button
-        type="submit"
-        className="bg-brand text-on-brand font-semibold py-2 rounded shadow disabled:bg-surface-hover disabled:text-fg-muted disabled:shadow-none hover:bg-brand-hover active:bg-brand-hover mx-auto px-12"
-        disabled={
-          !title ||
-          chosenStart === undefined ||
-          !hosts.length ||
-          !locationId ||
-          !capacityValid ||
-          !day ||
-          !effectiveDuration ||
-          isCheckingClashes ||
-          isSubmitting
+      <FormActions
+        cancelHref={`/${event.slug}`}
+        deleteButton={
+          sessionID && (
+            <ConfirmDeletionModal
+              btnDisabled={isSubmitting}
+              confirm={Delete}
+              itemName="session"
+            />
+          )
         }
-        onClick={() => void Submit()}
       >
-        Submit
-      </button>
-      {sessionID && (
-        <ConfirmDeletionModal
-          btnDisabled={isSubmitting}
-          confirm={Delete}
-          itemName="session"
-        />
-      )}
+        <button
+          type="submit"
+          className={SUBMIT_BUTTON}
+          disabled={
+            !title ||
+            chosenStart === undefined ||
+            !hosts.length ||
+            !locationId ||
+            !capacityValid ||
+            !day ||
+            !effectiveDuration ||
+            isCheckingClashes ||
+            isSubmitting
+          }
+          onClick={() => void Submit()}
+        >
+          Submit
+        </button>
+      </FormActions>
     </div>
   );
 }

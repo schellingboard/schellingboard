@@ -98,6 +98,26 @@ test("a host can edit a session's title and the change persists @008-US2", async
   await expect(page.getByRole("link", { name: title })).toHaveCount(0);
 });
 
+test("cancelling a session edit keeps it unchanged @008-US2", async ({
+  page,
+}) => {
+  await login(page);
+  const title = `E2E Cancelled Edit ${uniqueSuffix()}`;
+
+  await createSessionViaForm(page, title, /Workshop Room/, "16:10");
+
+  await openEditForm(page, title);
+  await page.getByRole("textbox").first().fill(`${title} discarded`);
+  await page.getByRole("link", { name: "Cancel" }).click();
+  await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
+
+  await page.reload();
+  await expect(page.getByRole("link", { name: title })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: `${title} discarded` })
+  ).toHaveCount(0);
+});
+
 test("a host can delete a session and it disappears from the grid @008-US3", async ({
   page,
 }) => {
@@ -109,7 +129,10 @@ test("a host can delete a session and it disappears from the grid @008-US3", asy
   await openEditForm(page, title);
   await page.getByRole("button", { name: "Delete", exact: true }).click();
   await expect(page.getByText("Delete session?")).toBeVisible();
-  await page.getByRole("button", { name: "Yes" }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Delete" })
+    .click();
   await expect(toast(page)).toContainText(
     /Your session .* has been deleted successfully/i
   );

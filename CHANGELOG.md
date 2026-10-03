@@ -37,6 +37,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Clearer Delete, and a Cancel button**: proposal and session edit forms gain Cancel to
+  leave without saving; Delete now has a trash icon, sits apart from Submit, and is confirmed
+  with a red Delete button instead of Yes.
 - **1-on-1s open with the scheduling phase** (#952): before it, there is no schedule to
   fit them around, so attendees can no longer offer, ask for or answer 1-on-1s then.
 - **Scheduled proposals say so** (#853): the forms to schedule or edit a proposal that is

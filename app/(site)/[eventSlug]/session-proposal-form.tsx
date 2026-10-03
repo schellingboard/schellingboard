@@ -25,6 +25,8 @@ import { BackLink } from "@/app/components/back-link";
 import { MarkdownTextarea } from "@/app/components/markdown-textarea";
 import { FormErrorSummary } from "@/app/components/form-error-summary";
 import { setActionErrors } from "@/utils/forms";
+import { FormActions } from "./form-actions";
+import { SUBMIT_BUTTON } from "@/app/components/buttons";
 
 export function SessionProposalForm(props: {
   eventID: string;
@@ -287,22 +289,27 @@ export function SessionProposalForm(props: {
 
         <FormErrorSummary form={form} />
 
-        <button
-          type="submit"
-          className="bg-brand text-on-brand font-semibold py-2 rounded shadow disabled:bg-surface-hover disabled:text-fg-muted disabled:shadow-none hover:bg-brand-hover active:bg-brand-hover mx-auto px-12"
-          disabled={!title || form.formState.isSubmitting || isDeleting}
+        <FormActions
+          cancelHref={`/${eventSlug}/proposals`}
+          deleteButton={
+            proposal && (
+              <ConfirmDeletionModal
+                btnDisabled={form.formState.isSubmitting || isDeleting}
+                confirm={handleDelete}
+                itemName="session proposal"
+              />
+            )
+          }
         >
-          {form.formState.isSubmitting ? "Submitting..." : "Submit"}
-        </button>
+          <button
+            type="submit"
+            className={SUBMIT_BUTTON}
+            disabled={!title || form.formState.isSubmitting || isDeleting}
+          >
+            {form.formState.isSubmitting ? "Submitting..." : "Submit"}
+          </button>
+        </FormActions>
       </form>
-
-      {proposal && (
-        <ConfirmDeletionModal
-          btnDisabled={form.formState.isSubmitting || isDeleting}
-          confirm={handleDelete}
-          itemName="session proposal"
-        />
-      )}
     </div>
   );
 }

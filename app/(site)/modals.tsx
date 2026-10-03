@@ -1,9 +1,13 @@
 "use client";
 import { useContext, useState } from "react";
 import Image from "next/image";
-import { MapIcon } from "@heroicons/react/24/outline";
+import { MapIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Modal } from "@/app/components/modal";
-import { PRIMARY_BUTTON, SECONDARY_BUTTON } from "@/app/components/buttons";
+import {
+  DESTRUCTIVE_BUTTON,
+  PRIMARY_BUTTON,
+  SECONDARY_BUTTON,
+} from "@/app/components/buttons";
 import { UserSelect } from "./user-select";
 import { UserContext } from "./context";
 import type { Guest } from "@/db/repositories/interfaces";
@@ -114,11 +118,12 @@ export function ConfirmDeletionModal(props: {
   return (
     <>
       <button
-        type="submit"
-        className="bg-surface-raised text-danger-fg font-semibold py-2 rounded shadow disabled:bg-surface-hover border-2 border-danger mx-auto px-12 hover:bg-danger-tint active:bg-danger-tint"
+        type="button"
+        className="inline-flex items-center gap-1.5 py-2 px-4 rounded font-semibold text-danger-fg border-2 border-danger bg-surface-raised hover:bg-danger-tint active:bg-danger-tint disabled:opacity-50"
         onClick={() => setOpen(true)}
         disabled={btnDisabled}
       >
+        <TrashIcon className="h-5 w-5" aria-hidden="true" />
         Delete
       </button>
       <Modal open={open} setOpen={setOpen}>
@@ -126,17 +131,17 @@ export function ConfirmDeletionModal(props: {
         <div className="mt-4 flex flex-wrap gap-2">
           <button
             type="button"
-            className={PRIMARY_BUTTON}
+            className={DESTRUCTIVE_BUTTON}
             onClick={() => void clickHandler()}
           >
-            Yes
+            Delete
           </button>
           <button
             type="button"
             className={SECONDARY_BUTTON}
             onClick={() => setOpen(false)}
           >
-            No
+            Cancel
           </button>
         </div>
       </Modal>
@@ -151,8 +156,9 @@ export function ConfirmationModal(props: {
   message: string;
   zIndex?: string;
   portal?: boolean; // For nested modal contexts
+  destructive?: boolean;
 }) {
-  const { open, close, confirm, message, zIndex, portal } = props;
+  const { open, close, confirm, message, zIndex, portal, destructive } = props;
   const clickHandler = () => {
     confirm();
     close();
@@ -164,13 +170,13 @@ export function ConfirmationModal(props: {
         <div className="mt-4 flex flex-wrap gap-2">
           <button
             type="button"
-            className={PRIMARY_BUTTON}
+            className={destructive ? DESTRUCTIVE_BUTTON : PRIMARY_BUTTON}
             onClick={clickHandler}
           >
-            Yes
+            {destructive ? "Delete" : "Yes"}
           </button>
           <button type="button" className={SECONDARY_BUTTON} onClick={close}>
-            No
+            {destructive ? "Cancel" : "No"}
           </button>
         </div>
       </Modal>
