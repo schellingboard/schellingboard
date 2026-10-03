@@ -40,6 +40,7 @@ export default async function ProposalQuickVoting(props: {
       initialVotes={votes}
       eventName={event.name}
       eventSlug={eventSlug}
+      timezone={event.timezone}
     />
   );
 }
