@@ -660,3 +660,12 @@ export const changes = sqliteTable(
     index("changes_subject_idx").on(t.subjectType, t.subjectId, t.seq),
   ]
 );
+
+// Which process runs the jobs loop against this database (ADR 0011). It keeps
+// a second server on the same file from doing the same work; what makes a
+// repeat harmless is each job's own claim or cursor.
+export const jobLeases = sqliteTable("job_leases", {
+  name: text("name").primaryKey(),
+  owner: text("owner").notNull(),
+  expiresAt: text("expires_at").notNull(),
+});

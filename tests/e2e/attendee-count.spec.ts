@@ -176,7 +176,7 @@ test("a host follows the link in the follow-up email and records the count @001-
   // Day 2, 14:00–15:00 Berlin: by 17:00 the follow-up has long come due.
   await landAs(page, "Carlos Silva", 1);
 
-  // The scheduler is off in E2E (REMINDER_DISPATCH_INTERVAL_MS=0, see
+  // Reminders are off in E2E (REMINDER_DISPATCH_INTERVAL_MS=0, see
   // docs/dev/testing.md), so the dev toolbar's button stands in for the tick
   // that would run on a real deployment.
   await page.getByRole("button", { name: "Send due reminders" }).click();

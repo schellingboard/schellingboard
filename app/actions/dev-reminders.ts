@@ -11,7 +11,7 @@ import {
 /**
  * Runs one dispatch tick on demand, from the dev toolbar. Only exists so the
  * reminder emails can be exercised without waiting for the interval — E2E
- * disables the scheduler outright (REMINDER_DISPATCH_INTERVAL_MS=0) to keep
+ * switches the reminders off (REMINDER_DISPATCH_INTERVAL_MS=0) to keep
  * stray sends out of the Mailpit assertions, and a developer checking the
  * emails by hand does not want to wait either.
  *

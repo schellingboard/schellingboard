@@ -1,6 +1,6 @@
 # ADR 0007: Attendee count storage and in-process reminder dispatch
 
-- **Status:** Accepted
+- **Status:** Accepted; decision 1 superseded by [ADR 0011](0011-change-log-and-jobs-loop.md)
 - **Date:** 2026-08-25, amended 2026-09-02 (see [Amendment](#amendment-2026-09-02--the-in-app-channel))
 
 ## Context

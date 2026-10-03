@@ -815,3 +815,16 @@ export interface ChangesRepository {
   /** Up to `limit` changes recorded after `seq`, oldest first. */
   listAfter(seq: number, limit?: number): Promise<RecordedChange[]>;
 }
+
+export interface JobsRepository {
+  /**
+   * Takes or renews the lease `name` for `owner` until `now + ttlMs`. False,
+   * changing nothing, while another owner holds an unexpired lease.
+   */
+  acquireLease(
+    name: string,
+    owner: string,
+    now: Date,
+    ttlMs: number
+  ): Promise<boolean>;
+}

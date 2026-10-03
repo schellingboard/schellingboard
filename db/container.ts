@@ -12,6 +12,7 @@ import {
 import { SqliteDaysRepository } from "./repositories/sqlite/days";
 import { SqliteEventsRepository } from "./repositories/sqlite/events";
 import { SqliteGuestsRepository } from "./repositories/sqlite/guests";
+import { SqliteJobsRepository } from "./repositories/sqlite/jobs";
 import { SqliteLocationsRepository } from "./repositories/sqlite/locations";
 import { SqliteLocationUnavailabilityRepository } from "./repositories/sqlite/location-unavailability";
 import { SqliteMeetingAvailabilityRepository } from "./repositories/sqlite/meeting-availability";
@@ -32,6 +33,7 @@ import type {
   DaysRepository,
   EventsRepository,
   GuestsRepository,
+  JobsRepository,
   LocationsRepository,
   LocationUnavailabilityRepository,
   MeetingAvailabilityRepository,
@@ -59,6 +61,7 @@ export type Repositories = {
   days: DaysRepository;
   events: EventsRepository;
   guests: GuestsRepository;
+  jobs: JobsRepository;
   locations: LocationsRepository;
   locationUnavailability: LocationUnavailabilityRepository;
   meetingPoints: MeetingPointsRepository;
@@ -89,6 +92,7 @@ function buildRepositories(sqlite: Database.Database): Repositories {
     days: new SqliteDaysRepository(db),
     events: new SqliteEventsRepository(db),
     guests: new SqliteGuestsRepository(db),
+    jobs: new SqliteJobsRepository(db),
     locations: new SqliteLocationsRepository(db),
     locationUnavailability: new SqliteLocationUnavailabilityRepository(db),
     meetingPoints: new SqliteMeetingPointsRepository(db),

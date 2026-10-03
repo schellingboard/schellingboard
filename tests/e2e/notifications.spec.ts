@@ -239,7 +239,7 @@ test.describe("attendee-count reminders", () => {
     await setDevClock(page, lateOnGammaDay(1));
     await page.reload();
 
-    // The scheduler is off in E2E (REMINDER_DISPATCH_INTERVAL_MS=0, see
+    // Reminders are off in E2E (REMINDER_DISPATCH_INTERVAL_MS=0, see
     // docs/dev/testing.md), so the dev toolbar's button stands in for the tick
     // a real deployment runs.
     await page.getByRole("button", { name: "Send due reminders" }).click();
