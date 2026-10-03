@@ -35,9 +35,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
-- **Quicker session setup for organizers**: the admin session form asks for a day and
-  two times instead of two full dates, All rooms ticks every room, and Duplicate copies a
-  session, e.g. lunch to every day.
+- **Quicker session setup for organizers**: the admin session form takes a day and two
+  times instead of two full dates, offers All locations and Duplicate (e.g. lunch on every
+  day), and fills in the room's capacity.
 - **Session capacity on the Agenda**: a session's RSVP count shows its capacity too, e.g.
   31/45, as on the Grid.
 - **Sessions and 1-on-1s sit on the schedule where they really start**: one in the 9:00

@@ -43,9 +43,10 @@ export default async function AdminEventSessionsPage({
   const assignedLocationIds = new Set(
     await repos.locations.listLocationIdsByEvent(id)
   );
+  const capacityById = new Map(allLocations.map((l) => [l.id, l.capacity]));
   const eventLocations: EventLocation[] = allLocations
     .filter((l) => assignedLocationIds.has(l.id))
-    .map((l) => ({ id: l.id, name: l.name }));
+    .map((l) => ({ id: l.id, name: l.name, capacity: l.capacity }));
 
   const days: DayOption[] = (await repos.days.listByEvent(id)).map((d) => ({
     key: d.id,
@@ -83,7 +84,11 @@ export default async function AdminEventSessionsPage({
     blocker: s.blocker,
     closed: s.closed,
     hosts: s.hosts.map((h) => ({ id: h.id, name: h.name })),
-    locations: s.locations.map((l) => ({ id: l.id, name: l.name })),
+    locations: s.locations.map((l) => ({
+      id: l.id,
+      name: l.name,
+      capacity: capacityById.get(l.id) ?? 0,
+    })),
     numRsvps: s.numRsvps,
     rsvps: (rsvpsBySession.get(s.id) ?? []).map((r) => ({
       guestId: r.guestId,

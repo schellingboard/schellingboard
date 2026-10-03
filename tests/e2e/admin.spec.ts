@@ -1539,6 +1539,36 @@ test.describe("Admin UI sessions", () => {
     }
   });
 
+  test("takes a new session's capacity from its room until one is typed @018-US2", async ({
+    page,
+  }) => {
+    await adminLogin(page);
+    await page.goto("/admin/events");
+    await page
+      .getByRole("listitem")
+      .filter({ hasText: "Conference Alpha" })
+      .getByRole("link", { name: "Manage" })
+      .click();
+    await openEventTab(page, "Sessions");
+    const sessions = page.getByRole("region", { name: "Sessions" });
+
+    await sessions.getByRole("button", { name: "Add session" }).click();
+    const form = sessions.getByRole("form", { name: "New session" });
+    const rooms = form.getByRole("group", { name: "Locations" });
+    const capacity = form.getByLabel("Capacity");
+
+    await rooms.getByRole("checkbox", { name: "Workshop Room" }).check();
+    await expect(capacity).toHaveValue("30");
+    await rooms.getByRole("checkbox", { name: "Boardroom" }).check();
+    await expect(capacity).toHaveValue("0");
+    await rooms.getByRole("checkbox", { name: "Workshop Room" }).uncheck();
+    await expect(capacity).toHaveValue("10");
+
+    await capacity.fill("12");
+    await rooms.getByRole("checkbox", { name: "Main Hall" }).check();
+    await expect(capacity).toHaveValue("12");
+  });
+
   test("duplicates a session onto another day @018-US2", async ({ page }) => {
     await adminLogin(page);
     await page.goto("/admin/events");
