@@ -17,7 +17,13 @@ import {
 import { DataTable } from "../../data-table";
 import { ActionError } from "@/app/components/action-error";
 import { SelectHosts } from "@/app/select-hosts";
-import { utcToZonedInput, zonedInputToUtc } from "@/utils/admin-datetime";
+import {
+  calendarDayOf,
+  dayIndexOf,
+  dayTimeToUtc,
+  utcToZonedInput,
+  type DayRange,
+} from "@/utils/admin-datetime";
 import { MarkdownHint } from "@/app/(site)/markdown";
 import { DateTime } from "luxon";
 
@@ -38,6 +44,7 @@ export type SessionRow = {
 };
 
 export type EventGuest = { id: string; name: string };
+export type DayOption = DayRange & { key: string; label: string };
 export type EventLocation = { id: string; name: string };
 
 function joinNames(items: { name: string }[]): string {
@@ -60,16 +67,18 @@ function flagLabels(session: SessionRow): string[] {
   return flags;
 }
 
-// datetime-local values are edited in the event timezone; the server expects
-// UTC ISO. Empty means "not scheduled".
-function toIsoOrNull(value: string, timezone: string): string | null {
-  const utc = zonedInputToUtc(value, timezone);
-  return utc === "" ? null : `${utc}Z`;
+function toIsoOrNull(
+  day: DayRange | undefined,
+  time: string,
+  timezone: string
+): string | null {
+  return (day && dayTimeToUtc(day, time, timezone)) || null;
 }
 
 type SessionFormValues = {
   title: string;
   description: string;
+  dayKey: string;
   startTime: string;
   endTime: string;
   capacity: string;
@@ -80,13 +89,60 @@ type SessionFormValues = {
   locationIds: string[];
 };
 
+type SessionInput = ReturnType<typeof toActionInput>;
+
+// A session on a date outside the event's days keeps that date as an extra
+// option, so editing it doesn't unschedule it.
+function sessionFormValues(
+  session: SessionRow,
+  days: DayOption[],
+  timezone: string
+): { values: SessionFormValues; days: DayOption[] } {
+  const values = {
+    title: session.title,
+    description: session.description,
+    dayKey: "",
+    startTime: "",
+    endTime: "",
+    capacity: String(session.capacity),
+    adminManaged: session.adminManaged,
+    blocker: session.blocker,
+    closed: session.closed,
+    hostIds: session.hosts.map((h) => h.id),
+    locationIds: session.locations.map((l) => l.id),
+  };
+  if (!session.startTime || !session.endTime) return { values, days };
+  const time = (iso: string) => utcToZonedInput(iso, timezone).slice(11);
+  const scheduled = {
+    ...values,
+    startTime: time(session.startTime),
+    endTime: time(session.endTime),
+  };
+  const index = dayIndexOf(session.startTime, days, timezone);
+  if (index >= 0)
+    return { values: { ...scheduled, dayKey: days[index].key }, days };
+  const other: DayOption = {
+    key: "other",
+    label: `${utcToZonedInput(session.startTime, timezone).slice(0, 10)} (not an event day)`,
+    ...calendarDayOf(session.startTime, timezone),
+  };
+  return {
+    values: { ...scheduled, dayKey: other.key },
+    days: [...days, other],
+  };
+}
+
 // Shared shape of the create/update action payloads (everything but the ids).
-function toActionInput(values: SessionFormValues, timezone: string) {
+function toActionInput(
+  values: SessionFormValues,
+  day: DayRange | undefined,
+  timezone: string
+) {
   return {
     title: values.title,
     description: values.description,
-    startTime: toIsoOrNull(values.startTime, timezone),
-    endTime: toIsoOrNull(values.endTime, timezone),
+    startTime: toIsoOrNull(day, values.startTime, timezone),
+    endTime: toIsoOrNull(day, values.endTime, timezone),
     // Empty means 0; anything else passes through (NaN included) so the
     // server's capacity validation rejects it instead of saving a silent 0.
     capacity: values.capacity === "" ? 0 : Number(values.capacity),
@@ -188,6 +244,7 @@ function SessionForm({
   idPrefix,
   label,
   timezone,
+  days,
   breakMinutes,
   hostCandidates,
   locationCandidates,
@@ -202,6 +259,7 @@ function SessionForm({
   idPrefix: string;
   label: string;
   timezone: string;
+  days: DayOption[];
   /** Offers to start a new session after the event's break. */
   breakMinutes?: number;
   hostCandidates: EventGuest[];
@@ -210,11 +268,12 @@ function SessionForm({
   pendingLabel: string;
   isPending: boolean;
   error: string | null;
-  onSubmit: (values: SessionFormValues) => void;
+  onSubmit: (input: SessionInput) => void;
   onCancel: () => void;
 }) {
   const [title, setTitle] = useState(initial.title);
   const [description, setDescription] = useState(initial.description);
+  const [dayKey, setDayKey] = useState(initial.dayKey);
   const [startTime, setStartTime] = useState(initial.startTime);
   const [endTime, setEndTime] = useState(initial.endTime);
   const [capacity, setCapacity] = useState(initial.capacity);
@@ -228,12 +287,12 @@ function SessionForm({
   );
   const [locationIds, setLocationIds] = useState<string[]>(initial.locationIds);
   const [breakBefore, setBreakBefore] = useState(true);
-  const addsBreak = !!breakMinutes && breakBefore && !blocker && !!startTime;
-  const savedStart = addsBreak
-    ? DateTime.fromISO(startTime, { zone: timezone })
-        .plus({ minutes: breakMinutes })
-        .toFormat("yyyy-MM-dd'T'HH:mm")
-    : startTime;
+  const day = days.find((d) => d.key === dayKey);
+  const start = toIsoOrNull(day, startTime, timezone);
+  const savedStart =
+    start && breakMinutes && breakBefore && !blocker
+      ? DateTime.fromISO(start).plus({ minutes: breakMinutes })
+      : null;
 
   const toggleLocation = (id: string) =>
     setLocationIds((prev) =>
@@ -242,18 +301,24 @@ function SessionForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({
-      title,
-      description,
-      startTime: savedStart,
-      endTime,
-      capacity,
-      adminManaged,
-      blocker,
-      closed,
-      hostIds: hosts.map((h) => h.id),
-      locationIds,
-    });
+    const input = toActionInput(
+      {
+        title,
+        description,
+        dayKey,
+        startTime,
+        endTime,
+        capacity,
+        adminManaged,
+        blocker,
+        closed,
+        hostIds: hosts.map((h) => h.id),
+        locationIds,
+      },
+      day,
+      timezone
+    );
+    onSubmit(savedStart ? { ...input, startTime: savedStart.toISO() } : input);
   };
 
   return (
@@ -282,20 +347,40 @@ function SessionForm({
         />
         <MarkdownHint />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="flex flex-col gap-1">
+          <label htmlFor={`${idPrefix}-day`} className="text-sm text-fg-muted">
+            Day
+          </label>
+          <select
+            id={`${idPrefix}-day`}
+            value={dayKey}
+            onChange={(e) => setDayKey(e.target.value)}
+            className="w-full h-10 rounded-md border border-line bg-surface-raised px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-accent"
+          >
+            <option value="">Not scheduled</option>
+            {days.map((d) => (
+              <option key={d.key} value={d.key}>
+                {d.label}
+              </option>
+            ))}
+          </select>
+        </div>
         <div className="flex flex-col gap-1">
           <label
             htmlFor={`${idPrefix}-start`}
             className="text-sm text-fg-muted"
           >
-            Start ({timezone}) — leave empty if not scheduled
+            Start ({timezone})
           </label>
           <Input
             id={`${idPrefix}-start`}
-            type="datetime-local"
+            type="time"
             step={60}
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
+            required={!!day}
+            disabled={!day}
             className="w-full h-10"
           />
         </div>
@@ -305,10 +390,12 @@ function SessionForm({
           </label>
           <Input
             id={`${idPrefix}-end`}
-            type="datetime-local"
+            type="time"
             step={60}
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
+            required={!!day}
+            disabled={!day}
             className="w-full h-10"
           />
         </div>
@@ -324,9 +411,12 @@ function SessionForm({
             />
             Break before ({breakMinutes} min)
           </label>
-          {startTime && (
+          {start && (
             <p className="text-sm text-fg-subtle">
-              Starts at {savedStart.slice(-5)}
+              Starts at{" "}
+              {(savedStart ?? DateTime.fromISO(start))
+                .setZone(timezone)
+                .toFormat("HH:mm")}
             </p>
           )}
         </div>
@@ -442,11 +532,13 @@ function SessionItem({
   eventGuests,
   eventLocations,
   timezone,
+  days,
 }: {
   session: SessionRow;
   eventGuests: EventGuest[];
   eventLocations: EventLocation[];
   timezone: string;
+  days: DayOption[];
 }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -469,12 +561,12 @@ function SessionItem({
     ),
   ];
 
-  const handleSave = (values: SessionFormValues) => {
+  const handleSave = (input: SessionInput) => {
     startSave(async () => {
       try {
         const result = await adminUpdateSessionAction({
           id: session.id,
-          ...toActionInput(values, timezone),
+          ...input,
         });
         if (!result.ok) {
           setError(result.error);
@@ -599,23 +691,14 @@ function SessionItem({
     );
   }
 
+  const form = sessionFormValues(session, days, timezone);
   return (
     <SessionForm
-      initial={{
-        title: session.title,
-        description: session.description,
-        startTime: utcToZonedInput(session.startTime, timezone),
-        endTime: utcToZonedInput(session.endTime, timezone),
-        capacity: String(session.capacity),
-        adminManaged: session.adminManaged,
-        blocker: session.blocker,
-        closed: session.closed,
-        hostIds: session.hosts.map((h) => h.id),
-        locationIds: session.locations.map((l) => l.id),
-      }}
+      initial={form.values}
       idPrefix={`sess-${session.id}`}
       label={`Edit ${session.title}`}
       timezone={timezone}
+      days={form.days}
       hostCandidates={hostCandidates}
       locationCandidates={locationCandidates}
       submitLabel="Save"
@@ -636,6 +719,7 @@ function SessionItem({
 const EMPTY_SESSION: SessionFormValues = {
   title: "",
   description: "",
+  dayKey: "",
   startTime: "",
   endTime: "",
   capacity: "0",
@@ -651,12 +735,14 @@ function AddSession({
   eventGuests,
   eventLocations,
   timezone,
+  days,
   breakMinutes,
 }: {
   eventId: string;
   eventGuests: EventGuest[];
   eventLocations: EventLocation[];
   timezone: string;
+  days: DayOption[];
   breakMinutes: number;
 }) {
   const router = useRouter();
@@ -664,13 +750,10 @@ function AddSession({
   const [open, setOpen] = useState(false);
   const [isCreating, startCreate] = useTransition();
 
-  const handleCreate = (values: SessionFormValues) => {
+  const handleCreate = (input: SessionInput) => {
     startCreate(async () => {
       try {
-        const result = await adminCreateSessionAction({
-          eventId,
-          ...toActionInput(values, timezone),
-        });
+        const result = await adminCreateSessionAction({ eventId, ...input });
         if (!result.ok) {
           setError(result.error);
         } else {
@@ -700,6 +783,7 @@ function AddSession({
         idPrefix="sess-new"
         label="New session"
         timezone={timezone}
+        days={days}
         breakMinutes={breakMinutes}
         hostCandidates={eventGuests}
         locationCandidates={eventLocations}
@@ -723,6 +807,7 @@ export function EventSessionsManager({
   eventGuests,
   eventLocations,
   timezone,
+  days,
   breakMinutes,
   total,
   page,
@@ -734,6 +819,7 @@ export function EventSessionsManager({
   eventGuests: EventGuest[];
   eventLocations: EventLocation[];
   timezone: string;
+  days: DayOption[];
   breakMinutes: number;
   total: number;
   page: number;
@@ -751,6 +837,7 @@ export function EventSessionsManager({
         eventGuests={eventGuests}
         eventLocations={eventLocations}
         timezone={timezone}
+        days={days}
         breakMinutes={breakMinutes}
       />
 
@@ -769,6 +856,7 @@ export function EventSessionsManager({
             eventGuests={eventGuests}
             eventLocations={eventLocations}
             timezone={timezone}
+            days={days}
           />
         )}
       />

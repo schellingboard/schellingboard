@@ -35,6 +35,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Quicker session setup for organizers**: the admin session form asks for a day and
+  two times instead of two full dates.
 - **Session capacity on the Agenda**: a session's RSVP count shows its capacity too, e.g.
   31/45, as on the Grid.
 - **Sessions and 1-on-1s sit on the schedule where they really start**: one in the 9:00

@@ -154,9 +154,10 @@ and votable as soon as attendees submit them.
 Admins can create/edit/delete sessions directly, outside the normal
 proposal → schedule flow.
 
-- **Title** (required), **Description** (Markdown), **Start/End time**
-  (optional — blank means "not scheduled"; any minute, not just the schedule
-  increment), **Capacity**, **Hosts**, **Locations**.
+- **Title** (required), **Description** (Markdown), **Day** and
+  **Start/End time** (any minute, not just the schedule increment; on a day
+  that runs past midnight, 01:00 is the next morning; pick "Not scheduled" to
+  leave a session off the schedule), **Capacity**, **Hosts**, **Locations**.
 - **Break before** — when creating a session, the event's break is added to
   the start you enter, as for attendees' sessions. Untick it for a session that
   should start right away, such as an opening keynote.

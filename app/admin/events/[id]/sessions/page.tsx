@@ -1,12 +1,14 @@
 import { notFound, redirect } from "next/navigation";
 import { getRepositories } from "@/db/container";
 import { outOfRangePageRedirect, parsePage } from "@/utils/pagination";
+import { formatDayLabel } from "@/utils/utils";
 import { requireAdminPage } from "../../../require-admin";
 import {
   EventSessionsManager,
   type SessionRow,
   type EventGuest,
   type EventLocation,
+  type DayOption,
 } from "../event-sessions-manager";
 
 const PAGE_SIZE = 25;
@@ -44,6 +46,13 @@ export default async function AdminEventSessionsPage({
   const eventLocations: EventLocation[] = allLocations
     .filter((l) => assignedLocationIds.has(l.id))
     .map((l) => ({ id: l.id, name: l.name }));
+
+  const days: DayOption[] = (await repos.days.listByEvent(id)).map((d) => ({
+    key: d.id,
+    label: formatDayLabel(d, event.timezone),
+    start: d.start.toISOString(),
+    end: d.end.toISOString(),
+  }));
 
   const { rows, total } = await repos.sessions.searchByEvent(id, {
     query: query || undefined,
@@ -89,6 +98,7 @@ export default async function AdminEventSessionsPage({
       eventGuests={eventGuests}
       eventLocations={eventLocations}
       timezone={event.timezone}
+      days={days}
       breakMinutes={event.breakMinutes}
       total={total}
       page={page}
