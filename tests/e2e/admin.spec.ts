@@ -1461,8 +1461,9 @@ test.describe("Admin UI sessions", () => {
     await sessions.getByRole("button", { name: "Add session" }).click();
     const form = sessions.getByRole("form", { name: "New session" });
     await form.getByLabel("Title *").fill(`Backwards ${uniqueSuffix()}`);
-    await form.getByLabel(/^Start/).fill("2020-01-01T11:00");
-    await form.getByLabel(/^End/).fill("2020-01-01T10:00");
+    await form.getByLabel("Day").selectOption({ index: 1 });
+    await form.getByLabel(/^Start/).fill("11:00");
+    await form.getByLabel(/^End/).fill("10:00");
     await form.getByLabel(/^Break before/).uncheck();
     await form.getByRole("button", { name: "Create", exact: true }).click();
 
@@ -1487,8 +1488,9 @@ test.describe("Admin UI sessions", () => {
     const create = async (title: string, breakBefore: boolean) => {
       await sessions.getByRole("button", { name: "Add session" }).click();
       await sessions.getByLabel("Title *").fill(title);
-      await sessions.getByLabel(/^Start/).fill("2020-01-01T10:00");
-      await sessions.getByLabel(/^End/).fill("2020-01-01T11:00");
+      await sessions.getByLabel("Day").selectOption({ index: 1 });
+      await sessions.getByLabel(/^Start/).fill("10:00");
+      await sessions.getByLabel(/^End/).fill("11:00");
       const breakBox = sessions.getByLabel(/^Break before/);
       await expect(breakBox).toBeChecked();
       if (!breakBefore) await breakBox.uncheck();
@@ -1512,13 +1514,15 @@ test.describe("Admin UI sessions", () => {
       exact: true,
     });
     for (const [title, start] of [
-      [withBreak, "2020-01-01T10:10"],
-      [keynote, "2020-01-01T10:00"],
+      [withBreak, "10:10"],
+      [keynote, "10:00"],
     ]) {
       await search.fill(title);
       await expect(sessions.getByRole("listitem")).toHaveCount(1);
       const row = sessions.getByRole("listitem").filter({ hasText: title });
-      await expect(row).toContainText(`${start} – 2020-01-01T11:00`);
+      await expect(row).toContainText(
+        new RegExp(`T${start} – \\d{4}-\\d{2}-\\d{2}T11:00`)
+      );
       await row.getByRole("button", { name: /^Delete/ }).click();
       await sessions
         .getByLabel("Type the session title to confirm")

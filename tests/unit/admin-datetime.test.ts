@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { utcToZonedInput, zonedInputToUtc } from "@/utils/admin-datetime";
+import {
+  calendarDayOf,
+  dayIndexOf,
+  dayTimeToUtc,
+  utcToZonedInput,
+  zonedInputToUtc,
+} from "@/utils/admin-datetime";
 
 // ── utcToZonedInput ──────────────────────────────────────────────────────────
 
@@ -69,4 +75,67 @@ describe("zonedInputToUtc", () => {
     const zoned = utcToZonedInput(utcIso, "Europe/Berlin");
     expect(zonedInputToUtc(zoned, "Europe/Berlin")).toBe("2026-03-29T05:30");
   });
+});
+
+describe("dayTimeToUtc", () => {
+  const tz = "Europe/Berlin";
+  // Fri 2026-10-02 09:00 – 18:00 Berlin (UTC+2)
+  const day = {
+    start: "2026-10-02T07:00:00.000Z",
+    end: "2026-10-02T16:00:00.000Z",
+  };
+  // Fri 2026-10-02 20:00 – Sat 03:00 Berlin
+  const lateDay = {
+    start: "2026-10-02T18:00:00.000Z",
+    end: "2026-10-03T01:00:00.000Z",
+  };
+
+  it("puts the time on the day's date in the event zone", () =>
+    expect(dayTimeToUtc(day, "12:30", tz)).toBe("2026-10-02T10:30:00.000Z"));
+
+  it("keeps a time before the day's start on the same date", () =>
+    expect(dayTimeToUtc(day, "08:00", tz)).toBe("2026-10-02T06:00:00.000Z"));
+
+  it("moves a time past midnight onto the next date for a day running late", () =>
+    expect(dayTimeToUtc(lateDay, "01:00", tz)).toBe(
+      "2026-10-02T23:00:00.000Z"
+    ));
+
+  it("treats midnight as the end of a day that ends at midnight", () =>
+    expect(
+      dayTimeToUtc(
+        { start: "2026-10-02T16:00:00.000Z", end: "2026-10-02T22:00:00.000Z" },
+        "00:00",
+        tz
+      )
+    ).toBe("2026-10-02T22:00:00.000Z"));
+
+  it("returns empty string for an empty time", () =>
+    expect(dayTimeToUtc(day, "", tz)).toBe(""));
+});
+
+describe("dayIndexOf", () => {
+  const days = [
+    { start: "2026-10-02T07:00:00.000Z", end: "2026-10-02T16:00:00.000Z" },
+    { start: "2026-10-03T07:00:00.000Z", end: "2026-10-03T16:00:00.000Z" },
+  ];
+
+  const tz = "Europe/Berlin";
+
+  it("finds the day a session starts on", () =>
+    expect(dayIndexOf("2026-10-03T10:00:00.000Z", days, tz)).toBe(1));
+
+  it("finds the day of a session starting before the day opens", () =>
+    expect(dayIndexOf("2026-10-03T06:00:00.000Z", days, tz)).toBe(1));
+
+  it("returns -1 for a start outside every day", () =>
+    expect(dayIndexOf("2026-10-04T10:00:00.000Z", days, tz)).toBe(-1));
+});
+
+describe("calendarDayOf", () => {
+  it("spans the local calendar date of the given instant", () =>
+    expect(calendarDayOf("2026-10-02T23:30:00.000Z", "Europe/Berlin")).toEqual({
+      start: "2026-10-02T22:00:00.000Z",
+      end: "2026-10-03T22:00:00.000Z",
+    }));
 });
