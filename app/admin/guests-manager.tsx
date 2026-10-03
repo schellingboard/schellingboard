@@ -18,6 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createGuestSchema, updateGuestSchema } from "@/model/guest";
 import { z } from "zod";
 import { setActionErrors } from "@/utils/forms";
+import { ActionError } from "@/app/components/action-error";
 
 /** A guest plus the events they are assigned to. */
 export type AdminUser = {
@@ -88,11 +89,7 @@ function AddGuestForm() {
           </button>
         </div>
       </form>
-      {form.formState.errors.root && (
-        <p role="alert" className="text-sm text-danger-fg">
-          {form.formState.errors.root.message}
-        </p>
-      )}
+      <ActionError message={form.formState.errors.root?.message ?? null} />
     </div>
   );
 }
@@ -218,11 +215,7 @@ function GuestRow({
             </button>
           </div>
         </form>
-        {form.formState.errors.root && (
-          <p role="alert" className="text-sm text-danger-fg">
-            {form.formState.errors.root.message}
-          </p>
-        )}
+        <ActionError message={form.formState.errors.root?.message ?? null} />
       </div>
     );
   }
@@ -297,11 +290,7 @@ function GuestRow({
           </div>
         )}
       </div>
-      {viewError && (
-        <p role="alert" className="text-sm text-danger-fg">
-          {viewError}
-        </p>
-      )}
+      <ActionError message={viewError} />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { Input } from "@/app/input";
 import type { Event } from "@/db/repositories/interfaces";
 import { createEventAction, type EventInput } from "@/app/actions/admin-events";
 import { PRIMARY_BUTTON, SECONDARY_BUTTON } from "@/app/admin/buttons";
+import { ActionError } from "@/app/components/action-error";
 import { TimezoneSelect } from "@/app/admin/timezone-select";
 import { MarkdownHint } from "@/app/(site)/markdown";
 import { formatEventDates } from "@/utils/utils";
@@ -20,11 +21,8 @@ const DEFAULT_FORM: EventInput = {
   slotIncrementMinutes: "30",
 };
 
-function AddEventForm({
-  onError,
-}: {
-  onError: (error: string | null) => void;
-}) {
+function AddEventForm() {
+  const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<EventInput>(DEFAULT_FORM);
   const [isPending, startTransition] = useTransition();
@@ -37,9 +35,9 @@ function AddEventForm({
     startTransition(async () => {
       const result = await createEventAction(form);
       if (!result.ok) {
-        onError(result.error);
+        setError(result.error);
       } else {
-        onError(null);
+        setError(null);
         setForm(DEFAULT_FORM);
         setOpen(false);
       }
@@ -122,6 +120,7 @@ function AddEventForm({
           />
         </div>
       </div>
+      <ActionError message={error} />
       <div className="flex gap-2">
         <button type="submit" disabled={isPending} className={PRIMARY_BUTTON}>
           {isPending ? "Creating..." : "Create event"}
@@ -130,7 +129,7 @@ function AddEventForm({
           type="button"
           onClick={() => {
             setOpen(false);
-            onError(null);
+            setError(null);
           }}
           disabled={isPending}
           className={SECONDARY_BUTTON}
@@ -143,17 +142,9 @@ function AddEventForm({
 }
 
 export function EventsManager({ events }: { events: Event[] }) {
-  const [error, setError] = useState<string | null>(null);
-
   return (
     <div className="space-y-4">
-      {error && (
-        <p role="alert" className="text-sm text-danger-fg">
-          {error}
-        </p>
-      )}
-
-      <AddEventForm onError={setError} />
+      <AddEventForm />
 
       {events.length === 0 ? (
         <p className="text-sm text-fg-subtle">No events yet.</p>

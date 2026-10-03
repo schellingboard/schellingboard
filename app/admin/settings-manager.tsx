@@ -8,6 +8,7 @@ import { MAP_REQUIREMENTS_HINT } from "@/utils/map-image-constraints";
 import { updateSettingsAction } from "../actions/admin-settings";
 import { PRIMARY_BUTTON } from "./buttons";
 import { MarkdownHint } from "@/app/(site)/markdown";
+import { ActionError } from "@/app/components/action-error";
 
 export function SettingsManager({ settings }: { settings: SiteSettings }) {
   const [error, setError] = useState<string | null>(null);
@@ -35,13 +36,6 @@ export function SettingsManager({ settings }: { settings: SiteSettings }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl">
-      {error && (
-        <p role="alert" className="text-sm text-danger-fg">
-          {error}
-        </p>
-      )}
-      {saved && <p className="text-sm text-success-fg">Settings saved.</p>}
-
       <div className="flex flex-col gap-1">
         <label htmlFor="settings-title" className="text-sm text-fg-muted">
           Title
@@ -106,9 +100,13 @@ export function SettingsManager({ settings }: { settings: SiteSettings }) {
         )}
       </div>
 
-      <button type="submit" disabled={isPending} className={PRIMARY_BUTTON}>
-        {isPending ? "Saving..." : "Save settings"}
-      </button>
+      <ActionError message={error} />
+      <div className="flex items-center gap-3">
+        <button type="submit" disabled={isPending} className={PRIMARY_BUTTON}>
+          {isPending ? "Saving..." : "Save settings"}
+        </button>
+        {saved && <p className="text-sm text-success-fg">Settings saved.</p>}
+      </div>
     </form>
   );
 }

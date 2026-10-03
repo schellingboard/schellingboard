@@ -28,6 +28,7 @@ import { locationSchema, updateLocationSchema } from "@/model/location";
 import { z } from "zod";
 import { setActionErrors } from "@/utils/forms";
 import { FormErrorSummary } from "@/app/components/form-error-summary";
+import { ActionError } from "@/app/components/action-error";
 
 export type AdminLocation = {
   location: Location;
@@ -386,22 +387,21 @@ function LocationRow({
   events,
   isFirst,
   isLast,
-  onError,
 }: {
   adminLocation: AdminLocation;
   events: EventOption[];
   isFirst: boolean;
   isLast: boolean;
-  onError: (error: string | null) => void;
 }) {
   const { location, eventIds } = adminLocation;
+  const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<"view" | "edit" | "delete">("view");
   const [isMovePending, startMoveTransition] = useTransition();
 
   const handleMove = (direction: "up" | "down") => {
     startMoveTransition(async () => {
       const result = await moveLocationAction({ id: location.id, direction });
-      onError(result.ok ? null : result.error);
+      setError(result.ok ? null : result.error);
     });
   };
 
@@ -412,7 +412,7 @@ function LocationRow({
     };
     const result = await updateLocationAction(updateLocation);
     if (result.ok) {
-      onError(null);
+      setError(null);
       setMode("view");
     }
     return result;
@@ -429,7 +429,7 @@ function LocationRow({
           pendingLabel="Saving..."
           action={handleUpdate}
           onCancel={() => {
-            onError(null);
+            setError(null);
             setMode("view");
           }}
         />
@@ -495,7 +495,7 @@ function LocationRow({
           </button>
           <button
             onClick={() => {
-              onError(null);
+              setError(null);
               setMode("edit");
             }}
             className={SECONDARY_BUTTON}
@@ -504,7 +504,7 @@ function LocationRow({
           </button>
           <button
             onClick={() => {
-              onError(null);
+              setError(null);
               setMode("delete");
             }}
             className={clsx(
@@ -519,10 +519,14 @@ function LocationRow({
       {mode === "delete" && (
         <DeleteConfirmation
           adminLocation={adminLocation}
-          onError={onError}
-          onCancel={() => setMode("view")}
+          onError={setError}
+          onCancel={() => {
+            setError(null);
+            setMode("view");
+          }}
         />
       )}
+      <ActionError message={error} />
     </li>
   );
 }
@@ -534,26 +538,16 @@ export function LocationsManager({
   locations: AdminLocation[];
   events: EventOption[];
 }) {
-  const [error, setError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
 
   const handleCreate = async (formData: z.input<typeof locationSchema>) => {
     const result = await createLocationAction(formData);
-    if (result.ok) {
-      setError(null);
-      setShowAddForm(false);
-    }
+    if (result.ok) setShowAddForm(false);
     return result;
   };
 
   return (
     <div className="space-y-4">
-      {error && (
-        <p role="alert" className="text-sm text-danger-fg">
-          {error}
-        </p>
-      )}
-
       {showAddForm ? (
         <LocationForm
           eventIds={[]}
@@ -561,10 +555,7 @@ export function LocationsManager({
           submitLabel="Add location"
           pendingLabel="Adding..."
           action={handleCreate}
-          onCancel={() => {
-            setError(null);
-            setShowAddForm(false);
-          }}
+          onCancel={() => setShowAddForm(false)}
         />
       ) : (
         <button onClick={() => setShowAddForm(true)} className={PRIMARY_BUTTON}>
@@ -583,7 +574,6 @@ export function LocationsManager({
               events={events}
               isFirst={index === 0}
               isLast={index === locations.length - 1}
-              onError={setError}
             />
           ))}
         </ul>
