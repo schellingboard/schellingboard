@@ -13,7 +13,7 @@ import {
   profileCommentSchema,
   proposalCommentSchema,
   sessionCommentSchema,
-} from "@/model/comment";
+} from "@schellingboard/contracts/comment";
 import {
   notifyProfileCommented,
   notifyProposalCommented,

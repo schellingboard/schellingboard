@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { getRepositories } from "@/db/container";
-import { attendeeCountFormSchema } from "@/model/attendee-count";
+import { attendeeCountFormSchema } from "@schellingboard/contracts/attendee-count";
 import { verifiedCurrentUser } from "@/utils/acting-guest";
 import { requireSiteAuth } from "@/utils/action-auth";
 import { serverNow } from "@/utils/dev-clock-server";

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "fs";
-import { LOCATION_COLOR_NAMES } from "@/utils/location-colors";
+import { LOCATION_COLOR_NAMES } from "@schellingboard/domain/location-colors";
 import {
   GLOBALS_CSS_PATH,
   contrastRatio,

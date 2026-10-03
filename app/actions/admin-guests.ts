@@ -6,7 +6,10 @@ import { isAdminRequest } from "@/utils/acting-admin";
 import { sendMail } from "@/utils/mailer";
 import { testEmail } from "@/emails/test-email";
 import { z } from "zod";
-import { createGuestSchema, updateGuestSchema } from "@/model/guest";
+import {
+  createGuestSchema,
+  updateGuestSchema,
+} from "@schellingboard/contracts/guest";
 
 export type AdminFormActionResult =
   { ok: true } | { ok: false; error: string | z.core.$ZodIssue[] };

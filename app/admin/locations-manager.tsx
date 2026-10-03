@@ -21,10 +21,13 @@ import {
   LOCATION_COLOR_NAMES,
   DEFAULT_LOCATION_COLOR,
   isLocationColorName,
-} from "@/utils/location-colors";
+} from "@schellingboard/domain/location-colors";
 import { useController, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { locationSchema, updateLocationSchema } from "@/model/location";
+import {
+  locationSchema,
+  updateLocationSchema,
+} from "@schellingboard/contracts/location";
 import { z } from "zod";
 import { setActionErrors } from "@/utils/forms";
 import { FormErrorSummary } from "@/app/components/form-error-summary";

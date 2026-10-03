@@ -27,7 +27,7 @@ selector plus the sentence you want the author to read:
 
 Scope it with a config block listing the enforced areas in `files`. The
 ambient-clock ban (ADR 0004) is the worked example: it covers `app/`, `db/`,
-`emails/`, `model/` and `utils/`.
+`emails/`, `packages/` and `utils/`.
 
 Exempt a line, not a file, with `eslint-disable-next-line <rule> -- <reason>`.
 A file-wide `ignores` entry would stop checking the other hundred lines too,
@@ -73,28 +73,29 @@ a `to` set, and the reason:
   name: "domain-stays-pure",
   severity: "error",
   comment: "why this edge is wrong, and what to do instead",
-  from: { path: "^model/" },
-  to: { path: "^(app|db)/" },
+  from: { path: "^packages/domain/" },
+  to: { pathNot: "^packages/domain/" },
 }
 ```
 
 `dependencyTypesNot: ["type-only"]` would narrow a rule to runtime edges only —
 a useful escape valve mid-migration, when a shared type is still declared on the
-wrong side of a boundary. Neither layer rule uses it: an import the compiler
+wrong side of a boundary. No layer rule uses it: an import the compiler
 erases still points the wrong way, and a boundary that holds only at runtime is
 one nobody can reason about from the import list.
 
 The direction that matters is inward. `db/` and `app/` are adapters and may
-depend on `model/`; `model/` may not depend on them. Types follow the same
-direction: an entity type is domain vocabulary and belongs in `model/`, where
-both adapters can import it. A type that only means something to the database —
-a row shape, a driver's handle — stays in `db/` and is used only inside `db/`.
-The repository ports belong in the centre too, next to the types they speak in;
-`db/` is then adapters and row shapes only.
+depend on the workspace packages; the packages may not depend on them
+([ADR 0010](adr/0010-workspace-packages.md)). `packages/domain` imports nothing
+but itself, and `packages/contracts` only `domain` and `zod`. Types follow the
+same direction: an entity type is domain vocabulary and belongs in `domain`,
+where both adapters can import it. A type that only means something to the
+database — a row shape, a driver's handle — stays in `db/` and is used only
+inside `db/`.
 
 We are not there yet. `db/repositories/interfaces.ts` still holds the entity
-vocabulary alongside the ports, and 62 files outside `db/` import their domain
-types from it. `CONTACT_TYPES` moving to `model/guest.ts` is the first instance
+vocabulary alongside the ports, and many files outside `db/` import their domain
+types from it. `CONTACT_TYPES` moving to `packages/domain/src/guest.ts` is the first instance
 of the fix; issue [#965](https://github.com/schellingboard/schellingboard/issues/965) has the inventory and the order to do the rest in.
 
 `make arch-graph` renders the graph to `arch-graph.svg` (needs graphviz), which

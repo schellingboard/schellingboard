@@ -94,7 +94,7 @@ export default tseslint.config(
       "app/**/*.{ts,tsx,js,jsx}",
       "db/**/*.{ts,js}",
       "emails/**/*.{ts,tsx,js,jsx}",
-      "model/**/*.{ts,js}",
+      "packages/*/src/**/*.ts",
       "utils/**/*.{ts,js}",
     ],
     // Exemptions are per-line `eslint-disable-next-line no-restricted-syntax`

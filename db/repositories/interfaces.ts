@@ -1,4 +1,4 @@
-import type { ContactType } from "@/model/guest";
+import type { ContactType } from "@schellingboard/domain/guest";
 
 // ── Shared enums ─────────────────────────────────────────────────────────────
 

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getRepositories } from "@/db/container";
 import { requireProxyVerifiedAdmin } from "@/utils/auth";
-import { normalizeLocationColor } from "@/utils/location-colors";
+import { normalizeLocationColor } from "@schellingboard/domain/location-colors";
 
 export const dynamic = "force-dynamic";
 

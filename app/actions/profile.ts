@@ -7,7 +7,7 @@ import { getImageRepositories } from "@/utils/images";
 import { verifiedCurrentUser } from "@/utils/acting-guest";
 import { requireSiteAuth } from "@/utils/action-auth";
 import { serverNow } from "@/utils/dev-clock-server";
-import { profileSchema } from "@/model/guest";
+import { profileSchema } from "@schellingboard/contracts/guest";
 import { z } from "zod";
 
 export type ProfileActionResult =

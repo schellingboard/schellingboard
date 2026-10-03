@@ -1,6 +1,5 @@
 import { z } from "zod";
-
-export const COHOST_WANTED_NOTE_MAX = 200;
+import { COHOST_WANTED_NOTE_MAX } from "@schellingboard/domain/session";
 
 export const sessionProposalSchema = z.object({
   eventId: z.string().min(1),

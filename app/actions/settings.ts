@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers";
 import { getRepositories } from "@/db/container";
-import { emailSettingsSchema } from "@/model/guest";
+import { emailSettingsSchema } from "@schellingboard/contracts/guest";
 import { verifiedCurrentUser } from "@/utils/acting-guest";
 import { requireSiteAuth } from "@/utils/action-auth";
 import { z } from "zod";

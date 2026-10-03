@@ -3,7 +3,7 @@ import {
   DEFAULT_LOCATION_COLOR,
   LOCATION_COLOR_NAMES,
   normalizeLocationColor,
-} from "@/utils/location-colors";
+} from "@schellingboard/domain/location-colors";
 
 // Clearing the capacity field yields NaN, and a fractional entry yields a
 // non-integer; both need the same plain-language message rather than zod's

@@ -84,8 +84,10 @@ typecheck: install
 	rm -rf .next/dev/types
 	bun x next typegen
 	bun x tsc --noEmit
+	bun x tsc -p packages/domain
+	bun x tsc -p packages/contracts
 
-DEPCRUISE := bun x depcruise app db model utils emails tests scripts instrumentation.ts --config .dependency-cruiser.cjs
+DEPCRUISE := bun x depcruise app db packages utils emails tests scripts instrumentation.ts --config .dependency-cruiser.cjs
 
 # Module-graph rules (cycles, layer boundaries) — the constraints eslint can't
 # see, since it reads one file at a time. See docs/dev/architecture-rules.md.
@@ -105,7 +107,7 @@ arch-graph: install
 	$(DEPCRUISE) --output-type dot | dot -T svg > arch-graph.svg
 
 lint-watch: install
-	watchexec -c -w app -w db -w utils -w tests "bun x eslint --fix ."
+	watchexec -c -w app -w db -w packages -w utils -w tests "bun x eslint --fix ."
 
 test: install
 	bun set-env.ts test bun x vitest run

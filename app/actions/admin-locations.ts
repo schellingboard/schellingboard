@@ -6,7 +6,10 @@ import { isAdminRequest } from "@/utils/acting-admin";
 import { getImageRepositories } from "@/utils/images";
 import type { Location } from "@/db/repositories/interfaces";
 import type { AdminActionResult, AdminFormActionResult } from "./admin-guests";
-import { locationSchema, updateLocationSchema } from "@/model/location";
+import {
+  locationSchema,
+  updateLocationSchema,
+} from "@schellingboard/contracts/location";
 import { z } from "zod";
 
 async function validateEventIds(eventIds: string[]): Promise<boolean> {

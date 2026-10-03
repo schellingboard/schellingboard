@@ -1,10 +1,8 @@
 import { z } from "zod";
-
-// Client-safe: the attendee-count control imports this into a client bundle,
-// so nothing here may reach db/, next/headers or the mailer.
-
-export const MIN_ATTENDEE_COUNT = 0;
-export const MAX_ATTENDEE_COUNT = 1000;
+import {
+  MAX_ATTENDEE_COUNT,
+  MIN_ATTENDEE_COUNT,
+} from "@schellingboard/domain/attendee-count";
 
 const RANGE_MESSAGE = `Enter a whole number between ${MIN_ATTENDEE_COUNT} and ${MAX_ATTENDEE_COUNT}`;
 

@@ -1,27 +1,9 @@
 import { z } from "zod";
-
-export const CONTACT_TYPES = [
-  "email",
-  "phone",
-  "whatsapp",
-  "signal",
-  "telegram",
-  "discord",
-  "website",
-  "other",
-] as const;
-export type ContactType = (typeof CONTACT_TYPES)[number];
-
-export const CONTACT_TYPE_LABELS: Record<ContactType, string> = {
-  email: "Email",
-  phone: "Phone",
-  whatsapp: "WhatsApp",
-  signal: "Signal",
-  telegram: "Telegram",
-  discord: "Discord",
-  website: "Website",
-  other: "Other",
-};
+import {
+  CONTACT_TYPES,
+  MAX_CONTACTS,
+  MAX_LANGUAGES,
+} from "@schellingboard/domain/guest";
 
 // Matches EmailSettings in db/repositories/interfaces.ts.
 export const emailSettingsSchema = z.object({
@@ -39,11 +21,7 @@ export const emailSettingsSchema = z.object({
   attendeeCountReminder: z.boolean(),
 });
 
-// Length caps are sanity limits only a malicious user would hit; entry caps
-// (10 languages/contacts) keep profiles and the edit form scannable.
-export const MAX_LANGUAGES = 10;
-export const MAX_CONTACTS = 10;
-
+// Length caps are sanity limits only a malicious user would hit.
 const promptEntrySchema = z.object({
   prompt: z.string().trim().min(1).max(100),
   answer: z.string().trim().max(500, {

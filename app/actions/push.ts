@@ -1,7 +1,7 @@
 "use server";
 
 import { getRepositories } from "@/db/container";
-import { pushSubscriptionSchema } from "@/model/push";
+import { pushSubscriptionSchema } from "@schellingboard/contracts/push";
 import { requireVerifiedGuest } from "@/utils/action-auth";
 import { serverNow } from "@/utils/dev-clock-server";
 

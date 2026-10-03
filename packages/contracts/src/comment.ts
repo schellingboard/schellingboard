@@ -1,6 +1,5 @@
 import { z } from "zod";
-
-export const COMMENT_MAX_LENGTH = 20000;
+import { COMMENT_MAX_LENGTH } from "@schellingboard/domain/comment";
 
 const body = z
   .string()

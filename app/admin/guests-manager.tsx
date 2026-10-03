@@ -15,7 +15,10 @@ import { PRIMARY_BUTTON, SECONDARY_BUTTON, DANGER_BUTTON } from "./buttons";
 import { DataTable } from "./data-table";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createGuestSchema, updateGuestSchema } from "@/model/guest";
+import {
+  createGuestSchema,
+  updateGuestSchema,
+} from "@schellingboard/contracts/guest";
 import { z } from "zod";
 import { setActionErrors } from "@/utils/forms";
 import { ActionError } from "@/app/components/action-error";

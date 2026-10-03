@@ -13,7 +13,7 @@ import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { callThroughProxy } from "../helpers/through-proxy";
-import { DEFAULT_LOCATION_COLOR } from "@/utils/location-colors";
+import { DEFAULT_LOCATION_COLOR } from "@schellingboard/domain/location-colors";
 import { POST } from "@/app/api/admin/create-location/route";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef"; // 32 chars

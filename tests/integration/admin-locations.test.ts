@@ -43,7 +43,7 @@ import {
   moveLocationAction,
 } from "@/app/actions/admin-locations";
 import { createImageFile } from "@/tests/helpers/utils";
-import { locationSchema } from "@/model/location";
+import { locationSchema } from "@schellingboard/contracts/location";
 import { z } from "zod";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef"; // 32 chars

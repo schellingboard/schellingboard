@@ -10,6 +10,8 @@
         "@heroicons/react": "^2.2.0",
         "@hookform/resolvers": "^5.9.1",
         "@react-email/render": "^2.1.0",
+        "@schellingboard/contracts": "workspace:*",
+        "@schellingboard/domain": "workspace:*",
         "@tailwindcss/forms": "^0.5.11",
         "better-sqlite3": "^13.0.3",
         "clsx": "^2.1.1",
@@ -68,6 +70,18 @@
         "typescript-eslint": "^8.70.1",
         "vitest": "^5",
       },
+    },
+    "packages/contracts": {
+      "name": "@schellingboard/contracts",
+      "version": "0.0.0",
+      "dependencies": {
+        "@schellingboard/domain": "workspace:*",
+        "zod": "^4.6.5",
+      },
+    },
+    "packages/domain": {
+      "name": "@schellingboard/domain",
+      "version": "0.0.0",
     },
   },
   "packages": {
@@ -418,6 +432,10 @@
     "@rolldown/pluginutils": ["@rolldown/pluginutils@1.0.1", "", {}, "sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw=="],
 
     "@rtsao/scc": ["@rtsao/scc@1.1.0", "", {}, "sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g=="],
+
+    "@schellingboard/contracts": ["@schellingboard/contracts@workspace:packages/contracts"],
+
+    "@schellingboard/domain": ["@schellingboard/domain@workspace:packages/domain"],
 
     "@selderee/plugin-htmlparser2": ["@selderee/plugin-htmlparser2@0.11.0", "", { "dependencies": { "domhandler": "^5.0.3", "selderee": "^0.11.0" } }, "sha512-P33hHGdldxGabLFjPPpaTxVolMrzrcegejx+0GxjrIb9Zv48D8yAIA/QTDR2dFl7Uz7urX8aX6+5bCZslr+gWQ=="],
 

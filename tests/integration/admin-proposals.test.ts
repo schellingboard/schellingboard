@@ -35,7 +35,7 @@ import {
 import { getRepositories } from "@/db/container";
 import { VoteChoice } from "@/db/repositories/interfaces";
 import { createAdminAuthCookie } from "@/utils/auth";
-import { STALE_PROPOSAL_MESSAGE } from "@/model/session";
+import { STALE_PROPOSAL_MESSAGE } from "@schellingboard/contracts/session";
 import {
   adminUpdateProposalAction,
   adminDeleteProposalAction,

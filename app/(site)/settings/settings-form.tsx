@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { updateEmailSettingsAction } from "@/app/actions/settings";
-import { emailSettingsSchema } from "@/model/guest";
+import { emailSettingsSchema } from "@schellingboard/contracts/guest";
 import type { EmailSettings } from "@/db/repositories/interfaces";
 
 export function SettingsForm({

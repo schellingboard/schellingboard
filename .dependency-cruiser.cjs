@@ -21,12 +21,54 @@ module.exports = {
       name: "domain-stays-pure",
       severity: "error",
       comment:
-        "`model/` holds validation and domain rules; it must not reach into the web layer " +
-        "or into persistence — not even for a type. Entity types belong here, where both " +
-        "adapters can import them; a type that only means something to the database stays " +
-        "in `db/` and is used only there.",
-      from: { path: "^model/" },
-      to: { path: "^(app|db)/" },
+        "`packages/domain` is the vocabulary and the rules both the server and the browser " +
+        "run, so it imports nothing but itself: no framework, no I/O, no npm package, not " +
+        "even for a type. A schema belongs in `packages/contracts`; a type that only means " +
+        "something to the database stays in `db/`. See docs/dev/adr/0010-workspace-packages.md.",
+      from: { path: "^packages/domain/" },
+      to: { pathNot: "^packages/domain/" },
+    },
+    {
+      name: "contracts-import-only-domain-and-zod",
+      severity: "error",
+      comment:
+        "`packages/contracts` describes what crosses the wire: zod schemas built on the " +
+        "domain's types and constants. Anything else it reached for would ship to every " +
+        "client that validates a form. See docs/dev/adr/0010-workspace-packages.md.",
+      from: { path: "^packages/contracts/" },
+      to: { pathNot: "^(packages/(contracts|domain)/|node_modules/zod/)" },
+    },
+    {
+      name: "packages-declare-their-dependencies",
+      severity: "error",
+      comment:
+        "A workspace package may only import what its own package.json declares. Hoisting " +
+        "lets the import resolve anyway, which is exactly why it has to be caught here.",
+      from: { path: "^packages/" },
+      to: { dependencyTypes: ["npm-no-pkg", "npm-unknown"] },
+    },
+    {
+      name: "import-packages-by-name",
+      severity: "error",
+      comment:
+        "Import a workspace package by its name (`@schellingboard/domain/guest`), never by " +
+        "path (`@/packages/…`, `../packages/…`). A path import skips the package's manifest " +
+        "and `exports`, so none of the package rules can see it. See ADR 0010.",
+      from: { pathNot: "^packages/" },
+      to: { path: "^packages/", dependencyTypesNot: ["aliased-workspace"] },
+    },
+    {
+      name: "packages-import-each-other-by-name",
+      severity: "error",
+      comment:
+        "One workspace package imports another by name (`@schellingboard/domain/guest`), " +
+        "never by a relative path into its `src/`. See ADR 0010.",
+      from: { path: "^packages/([^/]+)/" },
+      to: {
+        path: "^packages/",
+        pathNot: "^packages/$1/",
+        dependencyTypesNot: ["aliased-workspace", "undetermined"],
+      },
     },
     {
       name: "persistence-does-not-reach-up",
@@ -66,7 +108,7 @@ module.exports = {
       mainFields: ["module", "main", "types", "typings"],
     },
     reporterOptions: {
-      dot: { collapsePattern: "^(app|db|model|utils|tests)/[^/]+" },
+      dot: { collapsePattern: "^(app|db|utils|tests)/[^/]+|^packages/[^/]+" },
     },
   },
 };

@@ -15,6 +15,9 @@ Where things live:
 - **Database layer**: `db/` — `schema.ts`, `container.ts`, repositories in `db/repositories/sqlite/`
 - **API routes**: Server actions in `app/actions/`, API routes in `app/api/`
 - **Utils**: Shared utilities in `utils/`
+- **Domain and contracts**: workspace packages — `packages/domain` (vocabulary,
+  constants, pure rules) and `packages/contracts` (zod schemas); see
+  [ADR 0010](adr/0010-workspace-packages.md)
 - **Migrations**: Drizzle-managed SQL migrations in `drizzle/`
 
 The design the codebase is moving towards is written up separately in

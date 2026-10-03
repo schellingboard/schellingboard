@@ -8,11 +8,11 @@ import {
   getAttendeeCountAction,
   setAttendeeCountAction,
 } from "@/app/actions/attendee-count";
+import { attendeeCountFormSchema } from "@schellingboard/contracts/attendee-count";
 import {
-  attendeeCountFormSchema,
   MAX_ATTENDEE_COUNT,
   MIN_ATTENDEE_COUNT,
-} from "@/model/attendee-count";
+} from "@schellingboard/domain/attendee-count";
 import { setActionErrors } from "@/utils/forms";
 
 /**

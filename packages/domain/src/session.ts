@@ -1,0 +1,1 @@
+export const COHOST_WANTED_NOTE_MAX = 200;

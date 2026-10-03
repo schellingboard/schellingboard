@@ -1,7 +1,7 @@
 import { test, expect } from "./helpers/fixtures";
 import { uniqueSuffix } from "./helpers/unique";
 import { login } from "./helpers/auth";
-import { PROMPT_POOL } from "@/model/prompt-pool";
+import { PROMPT_POOL } from "@schellingboard/domain/prompt-pool";
 import sharp from "sharp";
 
 async function selectCurrentUser(page: import("@playwright/test").Page) {

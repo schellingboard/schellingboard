@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getRepositories } from "@/db/container";
 import { isAdminRequest } from "@/utils/acting-admin";
 import { serverNow } from "@/utils/dev-clock-server";
-import { STALE_PROPOSAL_MESSAGE } from "@/model/session";
+import { STALE_PROPOSAL_MESSAGE } from "@schellingboard/contracts/session";
 import type { AdminActionResult } from "./admin-guests";
 
 export type AdminProposalInput = {

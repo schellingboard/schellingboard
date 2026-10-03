@@ -11,7 +11,7 @@ import {
   sessionProposalSchema,
   sessionProposalUpdateSchema,
   STALE_PROPOSAL_MESSAGE,
-} from "@/model/session";
+} from "@schellingboard/contracts/session";
 import { serverNow } from "@/utils/dev-clock-server";
 import {
   unverifiedUserMessage,
