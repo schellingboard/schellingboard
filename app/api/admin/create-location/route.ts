@@ -11,7 +11,6 @@ type Body = {
   areaDescription?: string;
   capacity?: number;
   color?: string;
-  hidden?: boolean;
   bookable?: boolean;
   eventSlug?: string;
 };
@@ -85,7 +84,6 @@ export async function POST(req: Request) {
     areaDescription: (body.areaDescription ?? "").trim() || undefined,
     capacity,
     color: normalizeLocationColor(body.color ?? ""),
-    hidden: body.hidden ?? false,
     bookable: body.bookable ?? false,
     sortIndex,
   });

@@ -120,7 +120,6 @@ describe("admin location actions", () => {
       const formData = {
         ...baseLocationData,
         areaDescription: "First floor",
-        hidden: true,
         bookable: true,
       };
       const result = await createLocationAction(formData);
@@ -133,7 +132,6 @@ describe("admin location actions", () => {
         description: "The big one",
         capacity: 50,
         color: "teal",
-        hidden: true,
         bookable: true,
         areaDescription: "First floor",
         imageUrl: "",

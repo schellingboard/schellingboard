@@ -60,7 +60,6 @@ describe("POST /api/admin/create-location", () => {
     expect(location?.name).toBe("Main Hall");
     expect(location?.capacity).toBe(0);
     expect(location?.color).toBe(DEFAULT_LOCATION_COLOR);
-    expect(location?.hidden).toBe(false);
     expect(location?.bookable).toBe(false);
     expect(location?.sortIndex).toBe(0);
   });
@@ -73,7 +72,6 @@ describe("POST /api/admin/create-location", () => {
       areaDescription: "North wing",
       capacity: 25,
       color: "blue",
-      hidden: true,
       bookable: true,
     });
     const { id } = await readJson(res);
@@ -83,7 +81,6 @@ describe("POST /api/admin/create-location", () => {
     expect(location?.areaDescription).toBe("North wing");
     expect(location?.capacity).toBe(25);
     expect(location?.color).toBe("blue");
-    expect(location?.hidden).toBe(true);
     expect(location?.bookable).toBe(true);
     expect(location?.sortIndex).toBe(1);
   });

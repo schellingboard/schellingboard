@@ -128,7 +128,7 @@ export function SessionForm(props: {
   const [closed, setClosed] = useState(session.closed);
   const [day, setDay] = useState(initDay ?? days[0]);
   // Only preselect a location the picker offers: an existing session may sit
-  // in one that has since been unassigned from the event or hidden.
+  // in one that has since been unassigned from the event.
   const [locationId, setLocationId] = useState<string | undefined>(
     locations.find((l) => l.name === initLocation)?.id ??
       locations.find((l) => l.id === session.locations[0]?.id)?.id

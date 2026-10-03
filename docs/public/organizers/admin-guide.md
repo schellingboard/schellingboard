@@ -82,8 +82,6 @@ assigns/unassigns from this pool; it doesn't create new ones.
 - **Bookable** — whether attendees can self-book blank slots here. A location
   that isn't bookable still shows on the grid and you can schedule sessions
   into it yourself; attendees just can't pick it.
-- **Hidden** — excludes it from the visible grid without deleting it, and from
-  everything attendees can book.
 - **Image** — JPEG/PNG/WebP, max 5 MB, min 400px wide, **must be 4:3**
   (±2% tolerance).
 - **Sort order** — controls column order in the grid.
@@ -91,7 +89,8 @@ assigns/unassigns from this pool; it doesn't create new ones.
   shows how many sessions/events reference it before it cascades.
 
 Attendees are only ever offered the locations assigned to the event they are
-in, that are bookable and not hidden — everything else is refused.
+in and that are bookable — everything else is refused. To take a location off
+an event's grid without deleting it, unassign it from the event.
 
 ## Guests / Users
 

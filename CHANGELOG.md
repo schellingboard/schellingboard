@@ -53,6 +53,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - **The Text and RSVP'd schedule views are gone**: the Agenda, with its search and its My
   sessions, RSVP'd and Hosting filters, does what they did.
+- **Locations no longer have a Hidden setting** (#855): to take a room off an event's
+  schedule, unassign it from the event. Hidden rooms are unassigned when you upgrade.
 
 ### Fixed
 

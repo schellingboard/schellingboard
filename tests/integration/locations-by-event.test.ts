@@ -4,11 +4,11 @@ import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createLocation } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 
-describe("locations.listVisibleByEvent", () => {
+describe("locations.listByEvent", () => {
   beforeAll(() => setupTestDb());
   beforeEach(() => resetTestDb());
 
-  it("returns only visible locations assigned to the event", async () => {
+  it("returns only locations assigned to the event", async () => {
     const { locations } = getRepositories();
     const eventA = await createEvent();
     const eventB = await createEvent();
@@ -19,19 +19,8 @@ describe("locations.listVisibleByEvent", () => {
     await locations.setEventIds(assigned.id, [eventA.id]);
     await locations.setEventIds(otherEvent.id, [eventB.id]);
 
-    const result = await locations.listVisibleByEvent(eventA.id);
+    const result = await locations.listByEvent(eventA.id);
     expect(result.map((l) => l.id)).toEqual([assigned.id]);
-  });
-
-  it("excludes hidden locations even when assigned", async () => {
-    const { locations } = getRepositories();
-    const event = await createEvent();
-
-    const hidden = await createLocation({ name: "Hidden Room", hidden: true });
-    await locations.setEventIds(hidden.id, [event.id]);
-
-    const result = await locations.listVisibleByEvent(event.id);
-    expect(result).toEqual([]);
   });
 
   it("orders locations by sortIndex", async () => {
@@ -43,7 +32,7 @@ describe("locations.listVisibleByEvent", () => {
     await locations.setEventIds(second.id, [event.id]);
     await locations.setEventIds(first.id, [event.id]);
 
-    const result = await locations.listVisibleByEvent(event.id);
+    const result = await locations.listByEvent(event.id);
     expect(result.map((l) => l.id)).toEqual([first.id, second.id]);
   });
 });
@@ -52,7 +41,7 @@ describe("locations.listBookableByEvent", () => {
   beforeAll(() => setupTestDb());
   beforeEach(() => resetTestDb());
 
-  it("returns only bookable, visible locations assigned to the event", async () => {
+  it("returns only bookable locations assigned to the event", async () => {
     const { locations } = getRepositories();
     const event = await createEvent();
     const otherEvent = await createEvent();
@@ -66,11 +55,6 @@ describe("locations.listBookableByEvent", () => {
       eventId: otherEvent.id,
     });
     await createLocation({ name: "Unassigned Room" });
-    await createLocation({
-      name: "Hidden Room",
-      hidden: true,
-      eventId: event.id,
-    });
     await createLocation({
       name: "Not Bookable Room",
       bookable: false,

@@ -192,7 +192,6 @@ export const locations = sqliteTable("locations", {
   description: text("description").notNull().default(""),
   capacity: integer("capacity").notNull().default(0),
   color: text("color").notNull().default(""),
-  hidden: integer("hidden", { mode: "boolean" }).notNull().default(false),
   bookable: integer("bookable", { mode: "boolean" }).notNull().default(false),
   sortIndex: integer("sort_index").notNull().default(0),
   areaDescription: text("area_description"),

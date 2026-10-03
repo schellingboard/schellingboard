@@ -445,7 +445,6 @@ export type Location = {
   description: string;
   capacity: number;
   color: string;
-  hidden: boolean;
   bookable: boolean;
   sortIndex: number;
   areaDescription?: string;
@@ -466,7 +465,7 @@ export type EventLocationPage = {
 };
 
 export interface LocationsRepository {
-  /** All locations (including hidden), ordered by sortIndex. */
+  /** All locations, ordered by sortIndex. */
   list(): Promise<Location[]>;
   /**
    * Server-side paginated + searchable location list scoped to an event's
@@ -482,11 +481,11 @@ export interface LocationsRepository {
       offset: number;
     }
   ): Promise<EventLocationPage>;
-  /** Visible locations assigned to the given event, ordered by sortIndex. */
-  listVisibleByEvent(eventId: string): Promise<Location[]>;
+  /** Locations assigned to the given event, ordered by sortIndex. */
+  listByEvent(eventId: string): Promise<Location[]>;
   /**
-   * Visible, bookable locations assigned to the given event, ordered by
-   * sortIndex — what attendees may pick when scheduling a session.
+   * Bookable locations assigned to the given event, ordered by sortIndex —
+   * what attendees may pick when scheduling a session.
    */
   listBookableByEvent(eventId: string): Promise<Location[]>;
   findById(id: string): Promise<Location | undefined>;
@@ -514,7 +513,7 @@ export interface LocationsRepository {
    * Replaces the location's event assignments. Does not touch session_locations:
    * a session already scheduled at this location keeps that link even if its
    * event is dropped here, so it stops appearing in that event's schedule grid
-   * (see listVisibleByEvent) while the underlying link is untouched.
+   * (see listByEvent) while the underlying link is untouched.
    */
   setEventIds(id: string, eventIds: string[]): Promise<void>;
   /** Returns the subset of `ids` that exist in the locations table. */
@@ -524,7 +523,7 @@ export interface LocationsRepository {
   /**
    * Atomically removes the location from the given events. Does not touch
    * session_locations, so sessions already scheduled there stop appearing in
-   * the event's schedule grid (see listVisibleByEvent) but keep the stale link.
+   * the event's schedule grid (see listByEvent) but keep the stale link.
    */
   removeFromEvent(eventId: string, locationIds: string[]): Promise<void>;
   /**

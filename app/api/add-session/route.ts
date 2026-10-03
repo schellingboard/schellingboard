@@ -81,8 +81,8 @@ export async function POST(req: NextRequest) {
       { status: 403 }
     );
   }
-  // Exactly the set the session form offers: assigned to the event, not
-  // hidden, and open to self-booking.
+  // Exactly the set the session form offers: assigned to the event and open
+  // to self-booking.
   const bookable = new Map(
     (await repos.locations.listBookableByEvent(event.id)).map((l) => [l.id, l])
   );

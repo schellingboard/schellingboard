@@ -24,7 +24,6 @@ function rowToLocation(row: typeof schema.locations.$inferSelect): Location {
     description: row.description,
     capacity: row.capacity,
     color: row.color,
-    hidden: row.hidden,
     bookable: row.bookable,
     sortIndex: row.sortIndex,
     areaDescription: row.areaDescription ?? undefined,
@@ -108,7 +107,7 @@ export class SqliteLocationsRepository implements LocationsRepository {
     return { rows, total: totalRow?.count ?? 0 };
   }
 
-  async listVisibleByEvent(eventId: string): Promise<Location[]> {
+  async listByEvent(eventId: string): Promise<Location[]> {
     return this.db
       .select()
       .from(schema.locations)
@@ -116,12 +115,7 @@ export class SqliteLocationsRepository implements LocationsRepository {
         schema.eventLocations,
         eq(schema.locations.id, schema.eventLocations.locationId)
       )
-      .where(
-        and(
-          eq(schema.eventLocations.eventId, eventId),
-          eq(schema.locations.hidden, false)
-        )
-      )
+      .where(eq(schema.eventLocations.eventId, eventId))
       .orderBy(schema.locations.sortIndex, schema.locations.id)
       .all()
       .map((row) => rowToLocation(row.locations));
@@ -138,7 +132,6 @@ export class SqliteLocationsRepository implements LocationsRepository {
       .where(
         and(
           eq(schema.eventLocations.eventId, eventId),
-          eq(schema.locations.hidden, false),
           eq(schema.locations.bookable, true)
         )
       )
@@ -167,7 +160,6 @@ export class SqliteLocationsRepository implements LocationsRepository {
         description: data.description,
         capacity: data.capacity,
         color: data.color,
-        hidden: data.hidden,
         bookable: data.bookable,
         sortIndex: data.sortIndex,
         areaDescription: data.areaDescription ?? null,

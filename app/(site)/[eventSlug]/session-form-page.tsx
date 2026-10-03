@@ -41,7 +41,7 @@ export async function renderSessionForm(
     repos.guests.list(),
     // Not just the bookable ones: a session an organizer placed in a room
     // attendees may not book still has to be savable where it stands.
-    repos.locations.listVisibleByEvent(event.id),
+    repos.locations.listByEvent(event.id),
     repos.sessionProposals.listByEvent(event.id),
   ]);
 

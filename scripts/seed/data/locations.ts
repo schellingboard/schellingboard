@@ -10,7 +10,6 @@ export const locationRows = [
     description:
       "Our largest venue, featuring a professional stage with tiered seating. Equipped with full AV including projector and sound system. Ideal for keynotes, panels, and large-audience sessions.",
     areaDescription: "Ground floor, East Wing",
-    hidden: false,
   },
   {
     id: "loc-room-a",
@@ -23,7 +22,6 @@ export const locationRows = [
     description:
       "A bright breakout room with whiteboards and flexible seating. Natural light and a relaxed atmosphere make it well suited for workshops and interactive sessions.",
     areaDescription: "1st floor, West Wing",
-    hidden: false,
   },
   {
     id: "loc-room-b",
@@ -36,7 +34,6 @@ export const locationRows = [
     description:
       "An informal outdoor space with picnic tables overlooking the lake. Perfect for open-space sessions, unconference discussions, and casual networking.",
     areaDescription: "Outdoor, South Courtyard",
-    hidden: false,
   },
   {
     id: "loc-library",
@@ -49,7 +46,6 @@ export const locationRows = [
     description:
       "A quiet, book-lined room with a grand skylight and long communal tables. Great for focused breakout sessions or attendees who need a calm space to work between talks.",
     areaDescription: "2nd floor, North Wing",
-    hidden: false,
   },
   {
     id: "loc-boardroom",
@@ -62,7 +58,6 @@ export const locationRows = [
     description:
       "A compact meeting room with a glass-walled conference table and video conferencing setup. Well suited for small-group discussions, interviews, or sponsor meetings.",
     areaDescription: "1st floor, East Wing",
-    hidden: false,
   },
   {
     id: "loc-auditorium",
@@ -75,7 +70,6 @@ export const locationRows = [
     description:
       "A tiered lecture theatre with fixed seating and a large presentation screen. Best for high-attendance keynotes and formal talks that don't need audience interaction.",
     areaDescription: "Ground floor, West Wing",
-    hidden: false,
   },
   {
     id: "loc-courtyard",
@@ -88,7 +82,6 @@ export const locationRows = [
     description:
       "A dramatic covered courtyard framed by stone arches, open to the sky above. Works well as a striking gathering point between sessions or a quiet spot to reflect.",
     areaDescription: "Ground floor, Central Courtyard",
-    hidden: false,
   },
   {
     id: "loc-rooftop",
@@ -101,6 +94,5 @@ export const locationRows = [
     description:
       "An open-air rooftop space with skyline views and casual seating. Ideal for informal chats, evening socials, or breakout conversations away from the main venue.",
     areaDescription: "Rooftop, East Wing",
-    hidden: false,
   },
 ];

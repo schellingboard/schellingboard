@@ -28,7 +28,7 @@ export async function EventLayoutContent({
   const [days, sessions, locations, guests, rsvps] = await Promise.all([
     repos.days.listByEvent(event.id),
     repos.sessions.listByEvent(event.id),
-    repos.locations.listVisibleByEvent(event.id),
+    repos.locations.listByEvent(event.id),
     repos.guests.listByEvent(event.id),
     currentUser ? repos.rsvps.listByGuest(currentUser) : Promise.resolve([]),
   ]);

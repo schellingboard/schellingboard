@@ -28,7 +28,6 @@ export const locationSchema = z.object({
     .pipe(z.enum(LOCATION_COLOR_NAMES))
     .optional()
     .default(DEFAULT_LOCATION_COLOR),
-  hidden: z.boolean().default(false),
   bookable: z.boolean().default(false),
   eventIds: z.string().array().default([]),
   image: z

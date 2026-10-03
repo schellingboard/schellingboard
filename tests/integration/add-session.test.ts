@@ -484,19 +484,6 @@ describe("POST /api/add-session", () => {
     expect(sessions).toHaveLength(0);
   });
 
-  it("rejects a hidden location", async () => {
-    const event = await createEvent({ phase: "scheduling" });
-    const guest = await createGuest({ eventId: event.id });
-    const location = await createLocation({ hidden: true, eventId: event.id });
-    const day = await createDay(event.id);
-
-    const res = await POST(makeReq(buildPayload(guest, location, day)));
-    expect(res.status).toBe(403);
-
-    const sessions = await getRepositories().sessions.listByEvent(event.id);
-    expect(sessions).toHaveLength(0);
-  });
-
   it("takes capacity from the stored location, not the payload", async () => {
     const event = await createEvent({ phase: "scheduling" });
     const guest = await createGuest({ eventId: event.id });

@@ -30,7 +30,6 @@ const room = (id: string, sortIndex: number): Location => ({
   color: "blue",
   imageUrl: "",
   description: "",
-  hidden: false,
 });
 const rooms = [room("a", 1), room("b", 2)];
 

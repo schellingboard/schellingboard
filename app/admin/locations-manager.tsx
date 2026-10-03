@@ -79,7 +79,6 @@ function LocationForm({
       description: location?.description ?? "",
       areaDescription: location?.areaDescription ?? "",
       color: defaultColor,
-      hidden: location?.hidden ?? false,
       bookable: location?.bookable ?? false,
       eventIds,
       image: null,
@@ -232,14 +231,6 @@ function LocationForm({
       </div>
 
       <div className="flex gap-6">
-        <label className="flex items-center gap-2 text-sm text-fg-muted">
-          <input
-            type="checkbox"
-            {...form.register("hidden")}
-            className="rounded border-line text-brand focus:ring-brand-accent"
-          />
-          Hidden
-        </label>
         <label className="flex items-center gap-2 text-sm text-fg-muted">
           <input
             type="checkbox"
@@ -475,7 +466,6 @@ function LocationRow({
           <p className="text-sm text-fg-subtle truncate">
             {[
               location.capacity ? `max ${location.capacity}` : null,
-              location.hidden ? "hidden" : null,
               location.bookable ? "bookable" : null,
               events
                 .filter((e) => eventIds.includes(e.id))
