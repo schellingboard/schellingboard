@@ -16,6 +16,9 @@ export async function login(page: Page, password: string = DEFAULT_PASSWORD) {
   // "/" in the address bar, so waiting for the URL to leave "/login"
   // resolves immediately, before the login request completes.
   await expect(passwordInput).toBeHidden();
+  // Login ends in a hard reload. Leaving that page while it still streams
+  // makes Firefox end its parse early, and Next throws React error #412.
+  await page.waitForLoadState("load");
 }
 
 export async function loginAndGoto(page: Page, path: string) {
