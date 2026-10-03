@@ -13,6 +13,11 @@ export type SessionParams = {
   closed: boolean;
   hosts: Guest[];
   location: Location;
+  /**
+   * An edit that leaves a session in the several rooms an organizer gave it
+   * names them all here; otherwise `location` is the session's one room.
+   */
+  locationIds?: string[];
   /** The day is resolved from the store: its window bounds what may be booked. */
   dayId: string;
   /**
@@ -114,7 +119,7 @@ export const validateSession = (
   const sessionStartsBeforeEnds = sessionStart < sessionEnd;
   const sessionStartsAfterNow = opts?.allowPastStart || sessionStart > now;
   const sessionsHere = existingSessions.filter((s) => {
-    return s.locations.some((l) => l.id === session.locationIds[0]);
+    return s.locations.some((l) => session.locationIds.includes(l.id));
   });
   const concurrentSessions = sessionsHere.filter((existing) => {
     const existingStart = existing.startTime ?? new Date(0);

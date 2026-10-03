@@ -1198,6 +1198,180 @@ describe("POST /api/update-session", () => {
     });
   });
 
+  describe("a session an organizer spread over several rooms", () => {
+    async function placeInTwoRooms(opts?: { bookable?: boolean }) {
+      const event = await createEvent({ phase: "scheduling" });
+      const host = await createGuest({ eventId: event.id });
+      const hall = await createLocation({ name: "Hall", eventId: event.id });
+      const annex = await createLocation({ name: "Annex", eventId: event.id });
+      const rooms = [
+        await createLocation({ name: "East", eventId: event.id, ...opts }),
+        await createLocation({ name: "West", eventId: event.id, ...opts }),
+      ];
+      const day = await createDay(event.id);
+      const session = await createSession(event.id, {
+        title: "Plenary",
+        hostIds: [host.id],
+        locationIds: rooms.map((r) => r.id),
+        startTime: new Date(slotStart(day, 10)),
+        endTime: new Date(slotStart(day, 60)),
+      });
+      const roomIds = async () =>
+        (await getRepositories().sessions.findById(session.id))!.locations
+          .map((l) => l.id)
+          .sort();
+      return { event, host, hall, annex, rooms, day, session, roomIds };
+    }
+    const ids = (rooms: Location[]) => rooms.map((r) => r.id).sort();
+
+    it("keeps every room when the host changes something else", async () => {
+      const { host, rooms, day, session, roomIds } = await placeInTwoRooms({
+        bookable: false,
+      });
+
+      const res = await POST(
+        makeUpdateReq(
+          payloadFor(session, host, rooms[0], day, {
+            title: "Town Hall",
+            locationIds: rooms.map((r) => r.id),
+          }),
+          { editorGuestId: host.id }
+        )
+      );
+      expect(res.ok).toBe(true);
+
+      const updated = (await getRepositories().sessions.findById(session.id))!;
+      expect(updated.title).toBe("Town Hall");
+      expect(await roomIds()).toEqual(ids(rooms));
+    });
+
+    it.each([0, 1])(
+      "narrows it to one of its rooms, even one hosts cannot book (%i)",
+      async (index) => {
+        const { host, rooms, day, session, roomIds } = await placeInTwoRooms({
+          bookable: false,
+        });
+
+        const res = await POST(
+          makeUpdateReq(payloadFor(session, host, rooms[index], day), {
+            editorGuestId: host.id,
+          })
+        );
+        expect(res.ok).toBe(true);
+        expect(await roomIds()).toEqual([rooms[index].id]);
+      }
+    );
+
+    it("moves it to a single other room", async () => {
+      const { host, hall, day, session, roomIds } = await placeInTwoRooms();
+
+      const res = await POST(
+        makeUpdateReq(payloadFor(session, host, hall, day), {
+          editorGuestId: host.id,
+        })
+      );
+      expect(res.ok).toBe(true);
+      expect(await roomIds()).toEqual([hall.id]);
+    });
+
+    it("rejects any other set of several rooms", async () => {
+      const { host, hall, annex, rooms, day, session, roomIds } =
+        await placeInTwoRooms();
+
+      const res = await POST(
+        makeUpdateReq(
+          payloadFor(session, host, hall, day, {
+            locationIds: [hall.id, annex.id],
+          }),
+          { editorGuestId: host.id }
+        )
+      );
+      expect(res.status).toBe(403);
+      expect(await roomIds()).toEqual(ids(rooms));
+    });
+
+    it("keeps the rooms the event still has when another was unassigned", async () => {
+      const { event, host, annex, rooms, day, session, roomIds } =
+        await placeInTwoRooms();
+      const { sessions, locations } = getRepositories();
+      await sessions.update(session.id, {
+        locationIds: [...rooms, annex].map((r) => r.id),
+      });
+      await locations.removeFromEvent(event.id, [annex.id]);
+
+      const res = await POST(
+        makeUpdateReq(
+          payloadFor(session, host, rooms[0], day, {
+            locationIds: rooms.map((r) => r.id),
+          }),
+          { editorGuestId: host.id }
+        )
+      );
+      expect(res.ok).toBe(true);
+      expect(await roomIds()).toEqual(ids(rooms));
+    });
+
+    it("rejects a new time at which one of its rooms is taken", async () => {
+      const { event, host, rooms, day, session } = await placeInTwoRooms();
+      const other = await createGuest({ eventId: event.id });
+      await createSession(event.id, {
+        title: "Workshop",
+        hostIds: [other.id],
+        locationIds: [rooms[1].id],
+        startTime: new Date(slotStart(day, 130)),
+        endTime: new Date(slotStart(day, 180)),
+      });
+
+      const res = await POST(
+        makeUpdateReq(
+          payloadFor(session, host, rooms[0], day, {
+            locationIds: rooms.map((r) => r.id),
+            startTime: slotStart(day, 120),
+            duration: 60,
+          }),
+          { editorGuestId: host.id }
+        )
+      );
+      expect(res.ok).toBe(false);
+
+      const unchanged = (await getRepositories().sessions.findById(
+        session.id
+      ))!;
+      expect(unchanged.startTime).toEqual(session.startTime);
+    });
+
+    it(
+      "rejects a new time at which one of its rooms is unavailable",
+      { tags: ["017-US4"] },
+      async () => {
+        const { event, host, rooms, day, session } = await placeInTwoRooms();
+        await createUnavailability(
+          event.id,
+          rooms[1].id,
+          new Date(slotStart(day, 120)),
+          new Date(slotStart(day, 180))
+        );
+
+        const res = await POST(
+          makeUpdateReq(
+            payloadFor(session, host, rooms[0], day, {
+              locationIds: rooms.map((r) => r.id),
+              startTime: slotStart(day, 120),
+              duration: 60,
+            }),
+            { editorGuestId: host.id }
+          )
+        );
+        expect(res.status).toBe(400);
+
+        const unchanged = (await getRepositories().sessions.findById(
+          session.id
+        ))!;
+        expect(unchanged.startTime).toEqual(session.startTime);
+      }
+    );
+  });
+
   it("still refuses to edit an organizer-managed session", async () => {
     const event = await createEvent({ phase: "scheduling" });
     const host = await createGuest({ eventId: event.id });

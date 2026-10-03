@@ -165,9 +165,10 @@ scheduling phase runs.
   is still up to you.
 - **If an organizer put it somewhere you couldn't have booked it yourself** —
   outside the day's bookable hours, in a room that isn't open to bookings,
-  longer than sessions are normally allowed to run — it simply stays there
-  while you fix everything else. Move it and it has to land somewhere you
-  could have booked.
+  in several rooms at once, longer than sessions are normally allowed to run —
+  it simply stays there while you fix everything else. Move it and it has to
+  land somewhere you could have booked. A session in several rooms can also be
+  narrowed down to one of them.
 
 ### How many people to expect
 

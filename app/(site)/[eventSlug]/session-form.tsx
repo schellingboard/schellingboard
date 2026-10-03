@@ -30,7 +30,7 @@ import type {
 } from "@/db/repositories/interfaces";
 import { ConfirmDeletionModal } from "../modals";
 import { EventContext, UserContext } from "../context";
-import { newEmptySession } from "../session_utils";
+import { newEmptySession, sessionRooms } from "../session_utils";
 import { useToast } from "../toast";
 import {
   buildSessionInterval,
@@ -87,11 +87,13 @@ export function SessionForm(props: {
   // start stops being a form field: it is read from the session rather than
   // from the picker, which need not offer it once another room is selected.
   const lockedStart = sessionHasStarted(session, now) ? ownSlot! : null;
-  // Attendees may book only some of the event's rooms; the one this session is
-  // already in is offered too, so keeping it is never what blocks a save.
+  // Attendees may book only some of the event's rooms; the ones this session
+  // is already in are offered too, so keeping them is never what blocks a save.
+  const ownRooms = sessionRooms(session, props.locations);
   const locations = props.locations.filter(
-    (loc) => loc.bookable || loc.id === session.locations[0]?.id
+    (loc) => loc.bookable || ownRooms.includes(loc)
   );
+  const ownRoomsChoice = ownRooms.length > 1 ? KEEP_ROOMS : ownRooms[0]?.id;
   const paramDateTime =
     dayParam && timeParam
       ? convertParamDateTime(dayParam, timeParam, timezone)
@@ -131,18 +133,22 @@ export function SessionForm(props: {
   // Only preselect a location the picker offers: an existing session may sit
   // in one that has since been unassigned from the event.
   const [locationId, setLocationId] = useState<string | undefined>(
-    locations.find((l) => l.name === initLocation)?.id ??
-      locations.find((l) => l.id === session.locations[0]?.id)?.id
+    locations.find((l) => l.name === initLocation)?.id ?? ownRoomsChoice
   );
-  const location = locations.find((loc) => loc.id === locationId);
+  const rooms =
+    locationId === KEEP_ROOMS
+      ? ownRooms
+      : locations.filter((loc) => loc.id === locationId);
+  const location = rooms.length === 1 ? rooms[0] : undefined;
+  // Settling on one of several rooms leaves the session where it is, too.
+  const staysInRooms =
+    rooms.length > 0 && rooms.every((room) => ownRooms.includes(room));
   // null while the field still follows the room. An existing session whose
   // capacity already differs from its room's is a number the host chose, so
   // it survives a move to another room.
   const [capacityInput, setCapacityInput] = useState<string | null>(
     sessionID &&
-      session.capacity !==
-        (locations.find((l) => l.id === session.locations[0]?.id)?.capacity ??
-          0)
+      (ownRooms.length > 1 || session.capacity !== (ownRooms[0]?.capacity ?? 0))
       ? String(session.capacity)
       : null
   );
@@ -166,7 +172,8 @@ export function SessionForm(props: {
     event.slotIncrementMinutes,
     timezone,
     unavailability,
-    locationId
+    rooms.map((room) => room.id),
+    staysInRooms
   );
   const initTimeValid = startTimes.some((st) => st.time === initSlot);
   const [startTime, setStartTime] = useState<number | undefined>(
@@ -185,9 +192,7 @@ export function SessionForm(props: {
     startTimes.find((st) => st.time === chosenStart)?.maxDuration ??
     maxSessionDuration;
   const keepsOwnSlot =
-    chosenStart !== undefined &&
-    chosenStart === ownSlot &&
-    locationId === session.locations[0]?.id;
+    chosenStart !== undefined && chosenStart === ownSlot && staysInRooms;
   // Proposal durations are free-form, so they get snapped to the nearest
   // selectable slot multiple; an existing session's duration already sits on
   // the grid and passes through unchanged.
@@ -317,7 +322,7 @@ export function SessionForm(props: {
   const Submit = async () => {
     setIsSubmitting(true);
     setError(null);
-    if (!location || !day || chosenStart === undefined) {
+    if (!rooms.length || !day || chosenStart === undefined) {
       setError("Missing required fields");
       setIsSubmitting(false);
       return;
@@ -334,7 +339,8 @@ export function SessionForm(props: {
         description,
         closed,
         dayId: day.id,
-        location,
+        location: rooms[0],
+        locationIds: rooms.length > 1 ? rooms.map((r) => r.id) : undefined,
         capacity: capacityNumber,
         startTime: new Date(chosenStart).toISOString(),
         duration: effectiveDuration,
@@ -506,12 +512,23 @@ export function SessionForm(props: {
         <MyListbox
           currValue={locationId}
           setCurrValue={setLocationId}
-          options={locations.map((loc) => ({
-            value: loc.id,
-            display: loc.name,
-            available: true,
-            helperText: `max ${loc.capacity}`,
-          }))}
+          options={[
+            ...(ownRooms.length > 1
+              ? [
+                  {
+                    value: KEEP_ROOMS,
+                    display: ownRooms.map((room) => room.name).join(", "),
+                    available: true,
+                  },
+                ]
+              : []),
+            ...locations.map((loc) => ({
+              value: loc.id,
+              display: loc.name,
+              available: true,
+              helperText: `max ${loc.capacity}`,
+            })),
+          ]}
           placeholder={"Select a location"}
           truncateText={true}
         />
@@ -667,6 +684,10 @@ export function SessionForm(props: {
   );
 }
 
+// The picker's value for leaving a session in the several rooms an organizer
+// gave it; every other value is the id of one room.
+const KEEP_ROOMS = "keep-rooms";
+
 const RequiredStar = () => <span className="text-brand-fg mx-1">*</span>;
 
 const LockedValue = ({ value }: { value: string }) => (
@@ -689,18 +710,19 @@ function getAvailableStartTimes(
   slotIncrementMinutes: number,
   timezone: string,
   unavailability: LocationUnavailability[],
-  locationId?: string
+  roomIds: string[],
+  staysInRooms: boolean
 ) {
   const breakMs = breakMinutes * 60 * 1000;
-  const locationSelected = !!locationId;
+  const locationSelected = roomIds.length > 0;
   const others = [
     ...sessions.filter(
       (s) =>
-        s.locations.some((l) => l.id === locationId) &&
+        s.locations.some((l) => roomIds.includes(l.id)) &&
         s.id !== currentSession.id
     ),
     ...unavailability
-      .filter((u) => u.locationId === locationId)
+      .filter((u) => roomIds.includes(u.locationId))
       .map((u) => ({ startTime: u.start, endTime: u.end })),
   ];
   const maxDurationFrom = (slot: number) => {
@@ -742,12 +764,11 @@ function getAvailableStartTimes(
   // The slot the session already occupies, which an organizer may have put
   // where no host could book one: outside the bookable hours, off the grid, or
   // on top of another session. Keeping it has to stay possible, so it is
-  // offered in its own right — only while its room and day are still the ones
+  // offered in its own right — only while its rooms and day are still the ones
   // it was placed in, since anywhere else is a move like any other.
   const staysPut =
     currentSession.startTime !== undefined &&
-    locationSelected &&
-    currentSession.locations[0]?.id === locationId &&
+    staysInRooms &&
     dateOnDay(currentSession.startTime, day);
   if (staysPut) {
     const ownSlot = currentSession.startTime!.getTime() - breakMs;
