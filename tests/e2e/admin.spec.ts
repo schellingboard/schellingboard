@@ -535,8 +535,8 @@ test.describe("Admin UI events", () => {
 
     // Set proposal phase start and end
     const proposalGroup = page.getByRole("group", { name: "Proposal phase" });
-    await proposalGroup.getByLabel("Start").fill("2026-09-01T09:00");
-    await proposalGroup.getByLabel("End").fill("2026-09-15T17:00");
+    await proposalGroup.getByLabel("Start").fill("2020-09-01T09:00");
+    await proposalGroup.getByLabel("End").fill("2020-09-15T17:00");
     await page.getByRole("button", { name: "Save phases" }).click();
     await expect(page.getByText("Saved!")).toBeVisible();
 
@@ -554,20 +554,20 @@ test.describe("Admin UI events", () => {
       .click();
     await expect(
       page.getByRole("group", { name: "Proposal phase" }).getByLabel("Start")
-    ).toHaveValue("2026-09-01T09:00");
+    ).toHaveValue("2020-09-01T09:00");
     await expect(
       page.getByRole("group", { name: "Proposal phase" }).getByLabel("End")
-    ).toHaveValue("2026-09-15T17:00");
+    ).toHaveValue("2020-09-15T17:00");
 
     // Validation: end before start shows an error
     await page
       .getByRole("group", { name: "Proposal phase" })
       .getByLabel("Start")
-      .fill("2026-09-20T09:00");
+      .fill("2020-09-20T09:00");
     await page
       .getByRole("group", { name: "Proposal phase" })
       .getByLabel("End")
-      .fill("2026-09-01T09:00");
+      .fill("2020-09-01T09:00");
     await page.getByRole("button", { name: "Save phases" }).click();
     await expect(
       page.getByText(/proposal phase end must be after its start/i)
@@ -616,10 +616,10 @@ test.describe("Admin UI days", () => {
 
     // Add a day
     await daysSection.getByRole("button", { name: "Add day" }).click();
-    await daysSection.getByLabel("Start *").fill("2026-10-01T09:00");
-    await daysSection.getByLabel("End *").fill("2026-10-01T18:00");
-    await daysSection.getByLabel("Bookings open *").fill("2026-10-01T09:00");
-    await daysSection.getByLabel("Bookings close *").fill("2026-10-01T17:30");
+    await daysSection.getByLabel("Start *").fill("2020-10-01T09:00");
+    await daysSection.getByLabel("End *").fill("2020-10-01T18:00");
+    await daysSection.getByLabel("Bookings open *").fill("2020-10-01T09:00");
+    await daysSection.getByLabel("Bookings close *").fill("2020-10-01T17:30");
     await daysSection.getByRole("button", { name: "Add day" }).click();
 
     // router.refresh() re-fetches the server component — wait for the day
@@ -636,7 +636,7 @@ test.describe("Admin UI days", () => {
     await page
       .getByRole("region", { name: "Days" })
       .getByLabel("End *")
-      .fill("2026-10-01T20:00");
+      .fill("2020-10-01T20:00");
     await page
       .getByRole("region", { name: "Days" })
       .getByRole("button", { name: "Save" })
@@ -668,19 +668,19 @@ test.describe("Admin UI days", () => {
     await page
       .getByRole("region", { name: "Days" })
       .getByLabel("Start *")
-      .fill("2026-10-01T18:00");
+      .fill("2020-10-01T18:00");
     await page
       .getByRole("region", { name: "Days" })
       .getByLabel("End *")
-      .fill("2026-10-01T09:00");
+      .fill("2020-10-01T09:00");
     await page
       .getByRole("region", { name: "Days" })
       .getByLabel("Bookings open *")
-      .fill("2026-10-01T09:00");
+      .fill("2020-10-01T09:00");
     await page
       .getByRole("region", { name: "Days" })
       .getByLabel("Bookings close *")
-      .fill("2026-10-01T17:30");
+      .fill("2020-10-01T17:30");
     await page
       .getByRole("region", { name: "Days" })
       .getByRole("button", { name: "Add day" })
@@ -1461,8 +1461,8 @@ test.describe("Admin UI sessions", () => {
     const create = async (title: string, breakBefore: boolean) => {
       await sessions.getByRole("button", { name: "Add session" }).click();
       await sessions.getByLabel("Title *").fill(title);
-      await sessions.getByLabel(/^Start/).fill("2030-01-01T10:00");
-      await sessions.getByLabel(/^End/).fill("2030-01-01T11:00");
+      await sessions.getByLabel(/^Start/).fill("2020-01-01T10:00");
+      await sessions.getByLabel(/^End/).fill("2020-01-01T11:00");
       const breakBox = sessions.getByLabel(/^Break before/);
       await expect(breakBox).toBeChecked();
       if (!breakBefore) await breakBox.uncheck();
@@ -1486,13 +1486,13 @@ test.describe("Admin UI sessions", () => {
       exact: true,
     });
     for (const [title, start] of [
-      [withBreak, "2030-01-01T10:10"],
-      [keynote, "2030-01-01T10:00"],
+      [withBreak, "2020-01-01T10:10"],
+      [keynote, "2020-01-01T10:00"],
     ]) {
       await search.fill(title);
       await expect(sessions.getByRole("listitem")).toHaveCount(1);
       const row = sessions.getByRole("listitem").filter({ hasText: title });
-      await expect(row).toContainText(`${start} – 2030-01-01T11:00`);
+      await expect(row).toContainText(`${start} – 2020-01-01T11:00`);
       await row.getByRole("button", { name: /^Delete/ }).click();
       await sessions
         .getByLabel("Type the session title to confirm")
