@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 import { test, expect } from "./helpers/fixtures";
 import { switchToView } from "./helpers/schedule";
 import { uniqueSuffix } from "./helpers/unique";
-import { login } from "./helpers/auth";
+import { login, loginAndGoto } from "./helpers/auth";
 import { selectUser } from "./helpers/user";
 import { dismissToast, toast } from "./helpers/toast";
 
@@ -261,4 +261,35 @@ test("occupied start times are not offered in the same location but are in other
     "aria-disabled",
     "true"
   );
+});
+
+test("an already scheduled proposal says the schedule won't follow it @008-US1 @004-US2", async ({
+  page,
+}) => {
+  // Seeded in Gamma's Main Hall, hosted by Isabella Rossi.
+  const title = "Design Systems: Creating Consistency at Scale";
+  await loginAndGoto(page, "/Conference-Gamma/proposals");
+  await selectUser(page, "Isabella Rossi");
+  const row = page.getByRole("row", { name: new RegExp(title) });
+
+  await row.getByRole("button", { name: "Schedule" }).click();
+  await expect(
+    page.getByRole("heading", { name: /Add a session/i })
+  ).toBeVisible();
+  await expect(
+    page.getByText(/already on the schedule.*Submitting adds another session/)
+  ).toBeVisible();
+
+  await page.goBack();
+  await row.getByRole("button", { name: "Edit" }).click();
+  await expect(
+    page.getByRole("heading", { name: /Edit Session Proposal/i })
+  ).toBeVisible();
+  await expect(
+    page.getByText(/already on the schedule.*do not reach the schedule/)
+  ).toBeVisible();
+
+  await page.getByRole("link", { name: /in Main Hall$/ }).click();
+  const dialog = page.getByRole("dialog", { name: "Session details" });
+  await expect(dialog.getByText(title, { exact: true })).toBeVisible();
 });

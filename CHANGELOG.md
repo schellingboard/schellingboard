@@ -35,6 +35,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Scheduled proposals say so** (#853): the forms to schedule or edit a proposal that is
+  already on the schedule link to its sessions and explain that they don't follow the
+  proposal.
 - **Quicker session setup for organizers**: the admin session form takes a day and two
   times instead of two full dates, offers All locations and Duplicate (e.g. lunch on every
   day), and fills in the room's capacity.

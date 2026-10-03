@@ -16,6 +16,7 @@ import { ConfirmDeletionModal } from "../modals";
 import { formatDuration, durationMinusBreak } from "@/utils/utils";
 import { slotDurationOptions } from "@/utils/slots";
 import { MarkdownHint } from "@/app/(site)/markdown";
+import { ScheduledSessionsNotice } from "./scheduled-sessions-notice";
 import { useController, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { COHOST_WANTED_NOTE_MAX, sessionProposalSchema } from "@/model/session";
@@ -146,6 +147,12 @@ export function SessionProposalForm(props: {
           required.
         </p>
       </div>
+      {proposal && (
+        <ScheduledSessionsNotice proposalId={proposal.id}>
+          Changes here do not reach the schedule. To change a session, open it
+          and edit it there.
+        </ScheduledSessionsNotice>
+      )}
 
       <form
         onSubmit={(e) => form.handleSubmit(handleSubmit)(e) as never}
