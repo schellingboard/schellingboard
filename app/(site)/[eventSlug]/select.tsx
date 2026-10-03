@@ -24,7 +24,7 @@ export function MyListbox(props: {
     // an undefined value would flip it to uncontrolled and warn.
     <Listbox value={currValue ?? ""} onChange={setCurrValue}>
       <div className="relative mt-1">
-        <Listbox.Button className="h-12 rounded-md border px-4 shadow-sm transition-colors invalid:border-danger invalid:text-danger-fg focus:outline-none relative w-full cursor-pointer border-line focus:ring-2 focus:ring-brand-accent focus:outline-0 focus:border-none bg-surface-raised py-2 pl-3 pr-10 text-left">
+        <Listbox.Button className="h-12 rounded-md border px-4 shadow-sm transition-colors focus:outline-none relative w-full cursor-pointer border-line focus:ring-2 focus:ring-brand-accent focus:outline-0 focus:border-none bg-surface-raised py-2 pl-3 pr-10 text-left">
           {currValue ? (
             <span className="text-fg truncate flex items-center justify-between">
               {currOption?.display ?? currValue}
