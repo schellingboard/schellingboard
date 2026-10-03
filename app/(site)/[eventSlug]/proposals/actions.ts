@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { after } from "next/server";
 import { getRepositories } from "@/db/container";
-import { inSchedPhase } from "@/app/(site)/utils/events";
+import { inSchedPhase } from "@schellingboard/domain/phase";
 import { z } from "zod";
 import {
   sessionProposalSchema,

@@ -9,12 +9,12 @@ import {
 } from "@heroicons/react/24/outline";
 
 import HoverTooltip from "@/app/(site)/hover-tooltip";
+import { dateStartDescription } from "./phase-opens-text";
 import {
   inVotingPhase,
   inSchedPhase,
-  dateStartDescription,
   inProposalPhase,
-} from "@/app/(site)/utils/events";
+} from "@schellingboard/domain/phase";
 import { EventContext, UserContext } from "@/app/(site)/context";
 import { useLocalZone } from "@/utils/hooks";
 import type { Event } from "@schellingboard/domain/event";

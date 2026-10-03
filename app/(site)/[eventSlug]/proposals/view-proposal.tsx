@@ -9,11 +9,8 @@ import {
   HandRaisedIcon,
 } from "@heroicons/react/24/outline";
 
-import {
-  inVotingPhase,
-  inSchedPhase,
-  dateStartDescription,
-} from "@/app/(site)/utils/events";
+import { dateStartDescription } from "./phase-opens-text";
+import { inVotingPhase, inSchedPhase } from "@schellingboard/domain/phase";
 import HoverTooltip from "@/app/(site)/hover-tooltip";
 import { EventContext, UserContext, VotesContext } from "@/app/(site)/context";
 import { sessionRooms } from "@/app/(site)/session_utils";

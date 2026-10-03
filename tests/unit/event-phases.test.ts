@@ -1,9 +1,6 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
-import {
-  EventPhase,
-  dateStartDescription,
-  getCurrentPhase,
-} from "@/app/(site)/utils/events";
+import { dateStartDescription } from "@/app/(site)/[eventSlug]/proposals/phase-opens-text";
+import { EventPhase, getCurrentPhase } from "@schellingboard/domain/phase";
 import type { Event } from "@schellingboard/domain/event";
 
 const DAY_MS = 24 * 60 * 60 * 1000;

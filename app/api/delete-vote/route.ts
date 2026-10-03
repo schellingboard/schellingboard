@@ -1,5 +1,5 @@
 import { getRepositories } from "@/db/container";
-import { inVotingPhase } from "@/app/(site)/utils/events";
+import { inVotingPhase } from "@schellingboard/domain/phase";
 import { requestNow } from "@/utils/dev-clock";
 import {
   guestProtectionError,

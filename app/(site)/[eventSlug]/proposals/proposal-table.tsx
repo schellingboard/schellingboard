@@ -22,12 +22,12 @@ import {
   type SessionProposal,
   wantsHost,
 } from "@schellingboard/domain/session";
+import { dateStartDescription } from "./phase-opens-text";
 import {
   inSchedPhase,
   inVotingPhase,
-  dateStartDescription,
   inProposalPhase,
-} from "@/app/(site)/utils/events";
+} from "@schellingboard/domain/phase";
 import type { Event } from "@schellingboard/domain/event";
 import { useDebouncedSearch, useLocalZone } from "@/utils/hooks";
 import { formatDuration, durationMinusBreak } from "@/utils/utils";

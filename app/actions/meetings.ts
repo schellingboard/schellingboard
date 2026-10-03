@@ -19,7 +19,7 @@ import {
   notifyMeetingOutcome,
   notifyMeetingRequested,
 } from "@/utils/notifications";
-import { inSchedPhase } from "@/app/(site)/utils/events";
+import { inSchedPhase } from "@schellingboard/domain/phase";
 import type { MeetingStatus } from "@schellingboard/domain/meeting";
 import type { Event } from "@schellingboard/domain/event";
 import {

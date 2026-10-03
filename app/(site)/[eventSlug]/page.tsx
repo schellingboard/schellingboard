@@ -1,4 +1,4 @@
-import { EventPhase, getCurrentPhase } from "../utils/events";
+import { EventPhase, getCurrentPhase } from "@schellingboard/domain/phase";
 import { getRepositories } from "@/db/container";
 import EventPage from "./event-page";
 import { redirect } from "next/navigation";

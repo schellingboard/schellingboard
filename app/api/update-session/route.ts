@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { getRepositories } from "@/db/container";
-import { inSchedPhase } from "@/app/(site)/utils/events";
+import { inSchedPhase } from "@schellingboard/domain/phase";
 import { requestNow } from "@/utils/dev-clock";
 import {
   notifyCohostsAdded,

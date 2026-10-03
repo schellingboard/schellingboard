@@ -14,7 +14,7 @@ import {
 import Link from "next/link";
 import { Modal } from "@/app/components/modal";
 import { Markdown } from "@/app/(site)/markdown";
-import { hasPhases } from "@/app/(site)/utils/events";
+import { hasPhases } from "@schellingboard/domain/phase";
 import { scrollNowLineIntoView } from "./now-line";
 import type { Event } from "@schellingboard/domain/event";
 import { formatEventDates } from "@/utils/utils";

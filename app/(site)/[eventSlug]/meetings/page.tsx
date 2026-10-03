@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { PageNotice } from "@/app/components/page-notice";
-import { EventPhase, getCurrentPhase } from "@/app/(site)/utils/events";
+import { EventPhase, getCurrentPhase } from "@schellingboard/domain/phase";
 import { getRepositories } from "@/db/container";
 import {
   unverifiedUserMessage,
