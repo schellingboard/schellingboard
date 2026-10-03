@@ -931,10 +931,12 @@ async function seedTestData(profile: SeedProfile) {
     for (const name of cfg.hostNames) {
       sessionHostRows.push({ sessionId, guestId: guestIdByName(name) });
     }
-    sessionLocationRows.push({
-      sessionId,
-      locationId: locationRows[cfg.location].id,
-    });
+    for (const index of [cfg.location, ...(cfg.extraLocations ?? [])]) {
+      sessionLocationRows.push({
+        sessionId,
+        locationId: locationRows[index].id,
+      });
+    }
   }
 
   // Large profile: pack Gamma's remaining grid with sessions scheduled from

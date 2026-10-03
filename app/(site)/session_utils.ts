@@ -1,4 +1,4 @@
-import type { Session } from "@/db/repositories/interfaces";
+import type { Location, Session } from "@/db/repositories/interfaces";
 
 export function newEmptySession(eventId: string): Session {
   return {
@@ -30,4 +30,15 @@ export function sessionsOverlap(ses1: Session, ses2: Session): boolean {
   const maxStart = Math.max(startSes1, startSes2);
   const minEnd = Math.min(endSes1, endSes2);
   return maxStart < minEnd;
+}
+
+// Through the event's rooms, in their order: a session's own list is unordered
+// and can still name a room since unassigned from the event.
+export function sessionRooms(
+  session: Session,
+  locations: Location[]
+): Location[] {
+  return locations.filter((loc) =>
+    session.locations.some((l) => l.id === loc.id)
+  );
 }
