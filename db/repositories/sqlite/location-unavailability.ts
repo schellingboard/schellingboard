@@ -60,6 +60,22 @@ export class SqliteLocationUnavailabilityRepository implements LocationUnavailab
     return { id, ...data };
   }
 
+  async createMany(data: Omit<LocationUnavailability, "id">[]): Promise<void> {
+    if (data.length === 0) return;
+    this.db
+      .insert(schema.locationUnavailability)
+      .values(
+        data.map((period) => ({
+          id: nanoid(),
+          eventId: period.eventId,
+          locationId: period.locationId,
+          start: period.start.toISOString(),
+          end: period.end.toISOString(),
+        }))
+      )
+      .run();
+  }
+
   async delete(id: string): Promise<void> {
     this.db
       .delete(schema.locationUnavailability)

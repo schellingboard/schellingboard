@@ -58,7 +58,7 @@ describe("location unavailability actions", () => {
 
     const result = await addLocationUnavailabilityAction({
       eventId: event.id,
-      locationId: room.id,
+      locationIds: [room.id],
       start: "2026-10-03T12:00",
       end: "2026-10-03T13:30",
     });
@@ -75,13 +75,65 @@ describe("location unavailability actions", () => {
     ]);
   });
 
+  it("records the same period for several rooms at once", async () => {
+    const event = await createEvent();
+    const hall = await createLocation({ eventId: event.id });
+    const terrace = await createLocation({ eventId: event.id });
+
+    const result = await addLocationUnavailabilityAction({
+      eventId: event.id,
+      locationIds: [hall.id, terrace.id],
+      start: "2026-10-03T12:00",
+      end: "2026-10-03T13:30",
+    });
+
+    expect(result).toEqual({ ok: true });
+    const periods = await getRepositories().locationUnavailability.listByEvent(
+      event.id
+    );
+    expect(periods.map((p) => p.locationId).sort()).toEqual(
+      [hall.id, terrace.id].sort()
+    );
+  });
+
+  it("records nothing when one of the rooms is not part of the event", async () => {
+    const event = await createEvent();
+    const room = await createLocation({ eventId: event.id });
+    const elsewhere = await createLocation();
+
+    const result = await addLocationUnavailabilityAction({
+      eventId: event.id,
+      locationIds: [room.id, elsewhere.id],
+      start: "2026-10-03T12:00",
+      end: "2026-10-03T13:00",
+    });
+
+    expect(result.ok).toBe(false);
+    expect(
+      await getRepositories().locationUnavailability.listByEvent(event.id)
+    ).toEqual([]);
+  });
+
+  it("asks for at least one room", async () => {
+    const event = await createEvent();
+
+    const result = await addLocationUnavailabilityAction({
+      eventId: event.id,
+      locationIds: [],
+      start: "2026-10-03T12:00",
+      end: "2026-10-03T13:00",
+    });
+
+    expect(result).toEqual({ ok: false, error: "Pick at least one room" });
+  });
+
   it("rejects a period that ends before it starts", async () => {
     const event = await createEvent();
     const room = await createLocation({ eventId: event.id });
 
     const result = await addLocationUnavailabilityAction({
       eventId: event.id,
-      locationId: room.id,
+      locationIds: [room.id],
       start: "2026-10-03T13:00",
       end: "2026-10-03T12:00",
     });
@@ -98,7 +150,7 @@ describe("location unavailability actions", () => {
 
     const result = await addLocationUnavailabilityAction({
       eventId: event.id,
-      locationId: elsewhere.id,
+      locationIds: [elsewhere.id],
       start: "2026-10-03T12:00",
       end: "2026-10-03T13:00",
     });
@@ -114,7 +166,7 @@ describe("location unavailability actions", () => {
     const room = await createLocation({ eventId: event.id });
     await addLocationUnavailabilityAction({
       eventId: event.id,
-      locationId: room.id,
+      locationIds: [room.id],
       start: "2026-10-03T12:00",
       end: "2026-10-03T13:00",
     });
@@ -137,7 +189,7 @@ describe("location unavailability actions", () => {
 
     const result = await addLocationUnavailabilityAction({
       eventId: event.id,
-      locationId: room.id,
+      locationIds: [room.id],
       start: "2026-10-03T12:00",
       end: "2026-10-03T13:00",
     });

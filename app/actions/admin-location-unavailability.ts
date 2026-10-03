@@ -7,7 +7,7 @@ import type { AdminActionResult } from "./admin-guests";
 
 export type LocationUnavailabilityInput = {
   eventId: string;
-  locationId: string;
+  locationIds: string[];
   /** UTC "yyyy-MM-ddTHH:mm", as the admin forms send. */
   start: string;
   end: string;
@@ -35,18 +35,25 @@ export async function addLocationUnavailabilityAction(
   if (!start || !end) return { ok: false, error: "Invalid start or end time" };
   if (end <= start) return { ok: false, error: "End must be after start" };
 
+  if (input.locationIds.length === 0)
+    return { ok: false, error: "Pick at least one room" };
+
   const repos = getRepositories();
-  const rooms = await repos.locations.listByEvent(input.eventId);
-  if (!rooms.some((room) => room.id === input.locationId)) {
+  const roomIds = new Set(
+    (await repos.locations.listByEvent(input.eventId)).map((room) => room.id)
+  );
+  if (!input.locationIds.every((id) => roomIds.has(id))) {
     return { ok: false, error: "That room is not part of this event" };
   }
 
-  await repos.locationUnavailability.create({
-    eventId: input.eventId,
-    locationId: input.locationId,
-    start,
-    end,
-  });
+  await repos.locationUnavailability.createMany(
+    [...new Set(input.locationIds)].map((locationId) => ({
+      eventId: input.eventId,
+      locationId,
+      start,
+      end,
+    }))
+  );
   await revalidateEventPaths(input.eventId);
   return { ok: true };
 }

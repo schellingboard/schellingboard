@@ -24,7 +24,7 @@ async function openGammaLocations(page: Page) {
     .getByRole("navigation", { name: "Event sections" })
     .getByRole("link", { name: "Locations" })
     .click();
-  return page.getByRole("region", { name: "Room availability" });
+  return page.getByRole("region", { name: "Location unavailability" });
 }
 
 // No other spec books the Rooftop Terrace, so closing it for Gamma's second
@@ -34,7 +34,7 @@ test("a room marked unavailable cannot be booked then @017-US4", async ({
 }) => {
   await adminLogin(page);
   let availability = await openGammaLocations(page);
-  await availability.getByLabel("Room").selectOption("Rooftop Terrace");
+  await availability.getByRole("checkbox", { name: "Rooftop Terrace" }).check();
   await availability
     .getByRole("group", { name: "Fill in a whole day" })
     .getByRole("button")

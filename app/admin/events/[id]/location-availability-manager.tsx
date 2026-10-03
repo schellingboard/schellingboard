@@ -14,6 +14,7 @@ import {
   DANGER_BUTTON,
 } from "@/app/admin/buttons";
 import { ActionError } from "@/app/components/action-error";
+import { RoomCheckboxes } from "@/app/admin/room-checkboxes";
 import { utcToZonedInput, zonedInputToUtc } from "@/utils/admin-datetime";
 
 export type SerializedUnavailability = {
@@ -101,7 +102,7 @@ function AddPeriodForm({
 }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
-  const [locationId, setLocationId] = useState(rooms[0]?.id ?? "");
+  const [locationIds, setLocationIds] = useState<string[]>([]);
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -112,7 +113,7 @@ function AddPeriodForm({
       try {
         const result = await addLocationUnavailabilityAction({
           eventId,
-          locationId,
+          locationIds,
           start: zonedInputToUtc(start, timezone),
           end: zonedInputToUtc(end, timezone),
         });
@@ -135,24 +136,13 @@ function AddPeriodForm({
       onSubmit={handleSubmit}
       className="space-y-3 border border-line-subtle rounded-md p-4"
     >
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="flex flex-col gap-1">
-          <label htmlFor="unavailable-room" className="text-sm text-fg-muted">
-            Room
-          </label>
-          <select
-            id="unavailable-room"
-            value={locationId}
-            onChange={(e) => setLocationId(e.target.value)}
-            className="w-full h-10 rounded-md border border-line bg-surface-raised px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-accent"
-          >
-            {rooms.map((room) => (
-              <option key={room.id} value={room.id}>
-                {room.name}
-              </option>
-            ))}
-          </select>
-        </div>
+      <RoomCheckboxes
+        legend="Locations"
+        rooms={rooms}
+        selectedIds={locationIds}
+        onChange={setLocationIds}
+      />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="flex flex-col gap-1">
           <label htmlFor="unavailable-start" className="text-sm text-fg-muted">
             From *
@@ -204,7 +194,7 @@ function AddPeriodForm({
       <ActionError message={error} />
       <button
         type="submit"
-        disabled={isPending || !locationId}
+        disabled={isPending || locationIds.length === 0}
         className={PRIMARY_BUTTON}
       >
         {isPending ? "Adding..." : "Add unavailable time"}
@@ -229,12 +219,12 @@ export function LocationAvailabilityManager({
   const roomNames = new Map(rooms.map((room) => [room.id, room.name]));
 
   return (
-    <section aria-label="Room availability" className="space-y-4">
-      <h2 className="text-lg font-semibold text-fg">Room availability</h2>
+    <section aria-label="Location unavailability" className="space-y-4">
+      <h2 className="text-lg font-semibold text-fg">Location unavailability</h2>
       <p className="text-sm text-fg-subtle">
-        Times a room can&apos;t be booked, such as a room only open on one day.
-        Attendees simply aren&apos;t offered those slots. For something they
-        should see on the schedule, such as lunch, add a blocker session
+        Times a location can&apos;t be booked, such as a location only open on
+        one day. Attendees simply aren&apos;t offered those slots. For something
+        they should see on the schedule, such as lunch, add a blocker session
         instead. All times are in the event timezone ({timezone}).
       </p>
 
@@ -244,7 +234,9 @@ export function LocationAvailabilityManager({
             <PeriodRow
               key={period.id}
               period={period}
-              roomName={roomNames.get(period.locationId) ?? "Unassigned room"}
+              roomName={
+                roomNames.get(period.locationId) ?? "Unassigned location"
+              }
               timezone={timezone}
             />
           ))}
@@ -253,7 +245,7 @@ export function LocationAvailabilityManager({
 
       {rooms.length === 0 ? (
         <p className="text-sm text-fg-muted">
-          Assign a room to the event first.
+          Assign a location to the event first.
         </p>
       ) : (
         <AddPeriodForm
