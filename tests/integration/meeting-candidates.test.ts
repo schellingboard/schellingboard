@@ -10,7 +10,8 @@ import {
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { meetingCandidatesFor } from "@/utils/meeting-candidates";
-import type { Event, Guest } from "@/db/repositories/interfaces";
+import type { Guest } from "@/db/repositories/interfaces";
+import type { Event } from "@schellingboard/domain/event";
 
 const DAY_START = new Date("2026-10-01T09:00:00.000Z");
 const DAY_END = new Date("2026-10-01T12:00:00.000Z");

@@ -20,14 +20,13 @@ import { slotIsFree } from "@/utils/schedule-column";
 import { MyListbox, type Option } from "./select";
 import { viewProposalLinkFromElsewhere } from "./modal-nav";
 import type {
-  Day,
-  Event,
   Guest,
   Location,
   LocationUnavailability,
   Session,
   SessionProposal,
 } from "@/db/repositories/interfaces";
+import type { Day, Event } from "@schellingboard/domain/event";
 import { ConfirmDeletionModal } from "../modals";
 import { EventContext, UserContext } from "../context";
 import { newEmptySession, sessionRooms } from "../session_utils";

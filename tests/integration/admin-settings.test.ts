@@ -33,7 +33,7 @@ import { getRepositories } from "@/db/container";
 import { createAdminAuthCookie } from "@/utils/auth";
 import { createImageFile } from "@/tests/helpers/utils";
 import { updateSettingsAction } from "@/app/actions/admin-settings";
-import { DEFAULT_SITE_SETTINGS } from "@/db/repositories/interfaces";
+import { DEFAULT_SITE_SETTINGS } from "@schellingboard/domain/site-settings";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef"; // 32 chars
 

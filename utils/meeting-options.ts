@@ -11,7 +11,8 @@ import { clashesForInterval, loadGuestSchedules } from "@/utils/guest-clashes";
 import { toMeetingClashes } from "@/utils/meeting-clash-text";
 import type { MeetingClash } from "@/utils/meeting-clash-text";
 import { DateTime } from "luxon";
-import type { Event, MeetingPoint } from "@/db/repositories/interfaces";
+import type { MeetingPoint } from "@/db/repositories/interfaces";
+import type { Event } from "@schellingboard/domain/event";
 import { meetingsOpen } from "@/utils/meeting-rules";
 
 /** One slot of the picker, in the three states of the design (issue #392). */

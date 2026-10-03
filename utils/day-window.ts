@@ -4,7 +4,7 @@
 // day-creation entry points (admin action and admin API route) all agree.
 
 import { isSlotAligned } from "@/utils/slots";
-import type { Day } from "@/db/repositories/interfaces";
+import type { Day } from "@schellingboard/domain/event";
 
 type ScheduledTimes = {
   startTime?: Date | null;

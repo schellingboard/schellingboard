@@ -4,7 +4,7 @@ import {
   sessionContainedInWindow,
   sessionBookingWindowError,
 } from "@/utils/day-window";
-import type { Day } from "@/db/repositories/interfaces";
+import type { Day } from "@schellingboard/domain/event";
 
 const winStart = new Date("2026-10-01T09:00:00Z");
 const winEnd = new Date("2026-10-01T18:00:00Z");

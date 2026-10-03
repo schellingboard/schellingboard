@@ -15,7 +15,7 @@ import {
   containsIgnoringAccents,
   equalsIgnoringAccents,
 } from "@/utils/utils";
-import type { Day } from "@/db/repositories/interfaces";
+import type { Day } from "@schellingboard/domain/event";
 
 // ── durationMinusBreak ───────────────────────────────────────────────────────
 

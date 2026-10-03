@@ -8,7 +8,7 @@ import {
   RESERVED_EVENT_SLUGS,
 } from "@/utils/utils";
 import { isAdminRequest } from "@/utils/acting-admin";
-import type { Event, EventMeetingSettings } from "@/db/repositories/interfaces";
+import type { Event, EventMeetingSettings } from "@schellingboard/domain/event";
 import type { AdminActionResult } from "./admin-guests";
 import { isEventIconName } from "@/app/event-icons";
 import {

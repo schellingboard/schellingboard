@@ -4,7 +4,7 @@ import {
   dateStartDescription,
   getCurrentPhase,
 } from "@/app/(site)/utils/events";
-import type { Event } from "@/db/repositories/interfaces";
+import type { Event } from "@schellingboard/domain/event";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const ago = (days: number) => new Date(Date.now() - days * DAY_MS);

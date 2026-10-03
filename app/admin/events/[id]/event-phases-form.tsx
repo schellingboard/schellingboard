@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Input } from "@/app/input";
-import type { Event } from "@/db/repositories/interfaces";
+import type { Event } from "@schellingboard/domain/event";
 import {
   updateEventPhasesAction,
   type EventPhasesInput,

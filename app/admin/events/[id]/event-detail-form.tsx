@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/app/input";
-import type { Event } from "@/db/repositories/interfaces";
+import type { Event } from "@schellingboard/domain/event";
 import {
   updateEventAction,
   deleteEventAction,

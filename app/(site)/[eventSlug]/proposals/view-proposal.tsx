@@ -20,10 +20,10 @@ import { sessionRooms } from "@/app/(site)/session_utils";
 import { Proposal } from "@/app/(site)/[eventSlug]/proposal";
 import type {
   Comment,
-  Event,
   SessionProposal,
   Session,
 } from "@/db/repositories/interfaces";
+import type { Event } from "@schellingboard/domain/event";
 import { ProposalComments } from "./proposal-comments";
 import { VotingButtons } from "@/app/(site)/[eventSlug]/proposals/voting-buttons";
 import { VoteBreakdown } from "./vote-breakdown";

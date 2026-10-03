@@ -11,7 +11,8 @@ import {
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
-import type { Event, Guest, Session } from "@/db/repositories/interfaces";
+import type { Guest, Session } from "@/db/repositories/interfaces";
+import type { Event } from "@schellingboard/domain/event";
 import { getRepositories } from "@/db/container";
 import { callThroughProxy } from "../helpers/through-proxy";
 import { POST } from "@/app/api/admin/create-rsvp/route";

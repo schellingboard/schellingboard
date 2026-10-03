@@ -1,10 +1,10 @@
 import type {
-  Day,
   Location,
   Guest,
   Session,
   SessionCreateInput,
 } from "@/db/repositories/interfaces";
+import type { Day } from "@schellingboard/domain/event";
 
 export type SessionParams = {
   id?: string;

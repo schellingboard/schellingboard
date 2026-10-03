@@ -17,7 +17,7 @@ import {
 } from "@/app/(site)/utils/events";
 import { EventContext, UserContext } from "@/app/(site)/context";
 import { useLocalZone } from "@/utils/hooks";
-import type { Event } from "@/db/repositories/interfaces";
+import type { Event } from "@schellingboard/domain/event";
 
 export function ProposalActionBar({
   eventSlug,

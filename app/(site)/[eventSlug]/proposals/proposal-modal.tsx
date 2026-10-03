@@ -6,10 +6,10 @@ import { useRouter } from "next/navigation";
 import { ModalCloseButton } from "@/app/components/modal-close-button";
 import type {
   Comment,
-  Event,
   Session,
   SessionProposal,
 } from "@/db/repositories/interfaces";
+import type { Event } from "@schellingboard/domain/event";
 import { dismissViewProposal } from "../modal-nav";
 import { ViewProposal } from "./view-proposal";
 import type { EventInterestSummary } from "@/utils/proposal-vote-stats";

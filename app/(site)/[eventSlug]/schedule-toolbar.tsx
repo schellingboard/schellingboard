@@ -16,7 +16,7 @@ import { Modal } from "@/app/components/modal";
 import { Markdown } from "@/app/(site)/markdown";
 import { hasPhases } from "@/app/(site)/utils/events";
 import { scrollNowLineIntoView } from "./now-line";
-import type { Event } from "@/db/repositories/interfaces";
+import type { Event } from "@schellingboard/domain/event";
 import { formatEventDates } from "@/utils/utils";
 
 const ITEM_CLASS =

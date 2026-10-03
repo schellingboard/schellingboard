@@ -31,7 +31,8 @@ import {
 import { POST as addPOST } from "@/app/api/add-session/route";
 import { POST } from "@/app/api/delete-session/route";
 import type { SessionParams } from "@/app/api/session-form-utils";
-import type { Day, Guest, Location } from "@/db/repositories/interfaces";
+import type { Guest, Location } from "@/db/repositories/interfaces";
+import type { Day } from "@schellingboard/domain/event";
 import { sendMail } from "@/utils/mailer";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";

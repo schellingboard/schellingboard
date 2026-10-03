@@ -2,14 +2,13 @@ import { getRepositories } from "@/db/container";
 import { DEFAULT_EMAIL_SETTINGS } from "@/db/repositories/interfaces";
 import type {
   EmailSettings,
-  Event,
   Guest,
   Location,
   LocationUnavailability,
-  Day,
   Session,
   SessionProposal,
 } from "@/db/repositories/interfaces";
+import type { Event, Day } from "@schellingboard/domain/event";
 import { sanitizeGuest } from "@/utils/guests";
 
 const DAY_MS = 24 * 60 * 60 * 1000;

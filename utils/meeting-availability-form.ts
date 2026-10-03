@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 import { getRepositories } from "@/db/container";
-import type { Day, Event } from "@/db/repositories/interfaces";
+import type { Day, Event } from "@schellingboard/domain/event";
 import { meetingsOpen } from "@/utils/meeting-rules";
 import { meetingSlotsForDay, slotTimeLabel } from "@/utils/meeting-slots";
 import { compareEventsByStart } from "@/utils/utils";

@@ -36,12 +36,8 @@ import {
 import { POST as addPOST } from "@/app/api/add-session/route";
 import { POST } from "@/app/api/update-session/route";
 import type { SessionParams } from "@/app/api/session-form-utils";
-import type {
-  Day,
-  Guest,
-  Location,
-  Session,
-} from "@/db/repositories/interfaces";
+import type { Guest, Location, Session } from "@/db/repositories/interfaces";
+import type { Day } from "@schellingboard/domain/event";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 

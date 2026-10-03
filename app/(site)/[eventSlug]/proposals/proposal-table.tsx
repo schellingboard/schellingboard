@@ -25,7 +25,7 @@ import {
   dateStartDescription,
   inProposalPhase,
 } from "@/app/(site)/utils/events";
-import type { Event } from "@/db/repositories/interfaces";
+import type { Event } from "@schellingboard/domain/event";
 import { useDebouncedSearch, useLocalZone } from "@/utils/hooks";
 import { formatDuration, durationMinusBreak } from "@/utils/utils";
 

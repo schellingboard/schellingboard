@@ -2,7 +2,7 @@ import { DateTime } from "luxon";
 import { inSchedPhase } from "@/app/(site)/utils/events";
 import { shownSlotStart } from "@/utils/meeting-slots";
 
-import type { Event } from "@/db/repositories/interfaces";
+import type { Event } from "@schellingboard/domain/event";
 import type { MeetingView } from "@/utils/meeting-views";
 
 // Before scheduling there is no schedule to arrange a meeting around, and after

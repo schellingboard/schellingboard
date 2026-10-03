@@ -11,7 +11,7 @@ import {
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent } from "../helpers/factories";
-import type { Event } from "@/db/repositories/interfaces";
+import type { Event } from "@schellingboard/domain/event";
 import { getRepositories } from "@/db/container";
 import { callThroughProxy } from "../helpers/through-proxy";
 import { POST } from "@/app/api/admin/create-day/route";

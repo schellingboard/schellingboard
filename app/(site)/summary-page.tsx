@@ -5,7 +5,7 @@ import {
   LinkIcon,
 } from "@heroicons/react/16/solid";
 import Link from "next/link";
-import type { Event } from "@/db/repositories/interfaces";
+import type { Event } from "@schellingboard/domain/event";
 import { Markdown } from "@/app/(site)/markdown";
 import { compareEventsByStart, formatEventDates } from "@/utils/utils";
 

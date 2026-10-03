@@ -1,4 +1,4 @@
-import type { Day, Event } from "@/db/repositories/interfaces";
+import type { Day, Event } from "@schellingboard/domain/event";
 import { DateTime } from "luxon";
 
 export const TIME_FORMAT = "HH:mm";

@@ -9,14 +9,13 @@ import {
 } from "react";
 import { usePathname } from "next/navigation";
 import type {
-  Event,
-  Day,
   Session,
   Location,
   LocationUnavailability,
   Guest,
   Rsvp,
 } from "@/db/repositories/interfaces";
+import type { Event, Day } from "@schellingboard/domain/event";
 import {
   Vote,
   voteChoiceToEmoji,

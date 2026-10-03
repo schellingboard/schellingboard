@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { Input } from "@/app/input";
-import type { Event } from "@/db/repositories/interfaces";
+import type { Event } from "@schellingboard/domain/event";
 import { createEventAction, type EventInput } from "@/app/actions/admin-events";
 import { PRIMARY_BUTTON, SECONDARY_BUTTON } from "@/app/admin/buttons";
 import { ActionError } from "@/app/components/action-error";

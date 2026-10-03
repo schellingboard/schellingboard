@@ -1,11 +1,11 @@
 import { eq } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import * as schema from "../../schema";
+import type { SettingsRepository } from "../interfaces";
 import {
   DEFAULT_SITE_SETTINGS,
-  type SettingsRepository,
   type SiteSettings,
-} from "../interfaces";
+} from "@schellingboard/domain/site-settings";
 
 type DB = BetterSQLite3Database<typeof schema>;
 

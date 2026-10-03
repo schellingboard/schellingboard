@@ -20,7 +20,8 @@ import {
   notifyMeetingRequested,
 } from "@/utils/notifications";
 import { inSchedPhase } from "@/app/(site)/utils/events";
-import type { Event, MeetingStatus } from "@/db/repositories/interfaces";
+import type { MeetingStatus } from "@/db/repositories/interfaces";
+import type { Event } from "@schellingboard/domain/event";
 
 export type MeetingActionResult = { ok: true } | { ok: false; error: string };
 

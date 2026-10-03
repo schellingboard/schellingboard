@@ -8,12 +8,12 @@ import { PencilIcon } from "@heroicons/react/24/outline";
 import { CheckCircleIcon, AcademicCapIcon } from "@heroicons/react/24/solid";
 
 import type {
-  Event,
   Guest,
   Location,
   Session,
   Rsvp,
 } from "@/db/repositories/interfaces";
+import type { Event } from "@schellingboard/domain/event";
 import { formatOptionalTime, TIME_FORMAT } from "@/utils/utils";
 import { UserContext, EventContext } from "../../context";
 import { CurrentUserModal, ConfirmationModal } from "../../modals";

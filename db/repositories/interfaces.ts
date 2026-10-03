@@ -1,3 +1,9 @@
+import type { SiteSettings } from "@schellingboard/domain/site-settings";
+import type {
+  Event,
+  EventMeetingSettings,
+  Day,
+} from "@schellingboard/domain/event";
 import type { ContactType } from "@schellingboard/domain/guest";
 
 // ── Shared enums ─────────────────────────────────────────────────────────────
@@ -10,18 +16,6 @@ export enum VoteChoice {
 
 // ── Site settings ────────────────────────────────────────────────────────────
 
-export type SiteSettings = {
-  title: string;
-  description: string;
-  mapImageUrl: string;
-};
-
-export const DEFAULT_SITE_SETTINGS: SiteSettings = {
-  title: "Example Conference Weekend",
-  description: "Welcome! Browse the schedules for each event below.",
-  mapImageUrl: "",
-};
-
 export interface SettingsRepository {
   /** The singleton settings row, falling back to defaults when unset. */
   get(): Promise<SiteSettings>;
@@ -30,15 +24,6 @@ export interface SettingsRepository {
 }
 
 // ── Days ─────────────────────────────────────────────────────────────────────
-
-export type Day = {
-  id: string;
-  start: Date;
-  end: Date;
-  startBookings: Date;
-  endBookings: Date;
-  eventId: string;
-};
 
 export interface DaysRepository {
   list(): Promise<Day[]>;
@@ -75,48 +60,6 @@ export interface LocationUnavailabilityRepository {
 
 // ── Events ────────────────────────────────────────────────────────────────────
 
-export type Event = {
-  id: string;
-  name: string;
-  /**
-   * URL segment for the event. Derived from the name at creation and stable
-   * afterwards (renames don't change it), so shared links keep working.
-   */
-  slug: string;
-  description: string;
-  website: string;
-  /** The event's dates are those of its first and last days, unset without days. */
-  firstDayStart?: Date;
-  lastDayStart?: Date;
-  proposalPhaseStart?: Date;
-  proposalPhaseEnd?: Date;
-  votingPhaseStart?: Date;
-  votingPhaseEnd?: Date;
-  schedulingPhaseStart?: Date;
-  schedulingPhaseEnd?: Date;
-  maxSessionDuration: number;
-  breakMinutes: number;
-  slotIncrementMinutes: number;
-  timezone: string;
-  /** When true, a session's capacity (> 0) rejects further RSVPs once reached. */
-  rsvpCapacityHardLimit: boolean;
-  icon?: string | null;
-  /** Whether attendees can book 1-on-1 meetings with each other. */
-  meetingsEnabled: boolean;
-  /** How many unanswered requests one attendee may have outstanding. */
-  maxOpenMeetingRequests: number;
-};
-
-/**
- * The organizer's 1-on-1 settings. Split out because they are configured from
- * the admin Meetings section after the event exists, never at creation, so
- * `create` takes them as optional and falls back to the schema's defaults.
- */
-export type EventMeetingSettings = Pick<
-  Event,
-  "meetingsEnabled" | "maxOpenMeetingRequests"
->;
-
 type EventDerivedFields = "id" | "slug" | "firstDayStart" | "lastDayStart";
 
 export interface EventsRepository {
@@ -127,7 +70,8 @@ export interface EventsRepository {
   findBySlug(slug: string): Promise<Event | undefined>;
   /**
    * Creates the event with a slug derived from its name. Rejects when another
-   * event already has that slug (unique constraint).
+   * event already has that slug (unique constraint). Meeting settings are
+   * optional and fall back to the schema's defaults.
    */
   create(
     data: Omit<Event, EventDerivedFields | keyof EventMeetingSettings> &

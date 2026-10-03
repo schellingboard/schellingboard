@@ -1,4 +1,4 @@
-import type { Event } from "@/db/repositories/interfaces";
+import type { Event } from "@schellingboard/domain/event";
 import { formatInLocalZone } from "@/utils/utils";
 
 /**

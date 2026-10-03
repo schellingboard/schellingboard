@@ -3,7 +3,7 @@
 import { useRef, useState, useTransition } from "react";
 import Image from "next/image";
 import { Input } from "@/app/input";
-import type { SiteSettings } from "@/db/repositories/interfaces";
+import type { SiteSettings } from "@schellingboard/domain/site-settings";
 import { MAP_REQUIREMENTS_HINT } from "@/utils/map-image-constraints";
 import { updateSettingsAction } from "../actions/admin-settings";
 import { PRIMARY_BUTTON } from "./buttons";
