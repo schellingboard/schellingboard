@@ -39,14 +39,14 @@ export type SessionRow = {
   blocker: boolean;
   closed: boolean;
   hosts: { id: string; name: string }[];
-  locations: { id: string; name: string }[];
+  locations: EventLocation[];
   numRsvps: number;
   rsvps: { guestId: string; name: string }[];
 };
 
 export type EventGuest = { id: string; name: string };
 export type DayOption = DayRange & { key: string; label: string };
-export type EventLocation = { id: string; name: string };
+export type EventLocation = { id: string; name: string; capacity: number };
 
 function joinNames(items: { name: string }[]): string {
   return items.length > 0 ? items.map((i) => i.name).join(", ") : "—";
@@ -82,7 +82,8 @@ type SessionFormValues = {
   dayKey: string;
   startTime: string;
   endTime: string;
-  capacity: string;
+  /** null while it follows the room's capacity. */
+  capacity: string | null;
   adminManaged: boolean;
   blocker: boolean;
   closed: boolean;
@@ -277,7 +278,7 @@ function SessionForm({
   const [dayKey, setDayKey] = useState(initial.dayKey);
   const [startTime, setStartTime] = useState(initial.startTime);
   const [endTime, setEndTime] = useState(initial.endTime);
-  const [capacity, setCapacity] = useState(initial.capacity);
+  const [capacityInput, setCapacityInput] = useState(initial.capacity);
   const [adminManaged, setAdminManaged] = useState(initial.adminManaged);
   const [blocker, setBlocker] = useState(initial.blocker);
   const [closed, setClosed] = useState(initial.closed);
@@ -288,6 +289,9 @@ function SessionForm({
   );
   const [locationIds, setLocationIds] = useState<string[]>(initial.locationIds);
   const [breakBefore, setBreakBefore] = useState(true);
+  const rooms = locationCandidates.filter((l) => locationIds.includes(l.id));
+  const capacity =
+    capacityInput ?? String(rooms.length === 1 ? rooms[0].capacity : 0);
   const day = days.find((d) => d.key === dayKey);
   const start = toIsoOrNull(day, startTime, timezone);
   const savedStart =
@@ -429,7 +433,7 @@ function SessionForm({
           type="number"
           min="0"
           value={capacity}
-          onChange={(e) => setCapacity(e.target.value)}
+          onChange={(e) => setCapacityInput(e.target.value)}
           className="w-full h-10"
         />
       </div>
@@ -724,7 +728,7 @@ const EMPTY_SESSION: SessionFormValues = {
   dayKey: "",
   startTime: "",
   endTime: "",
-  capacity: "0",
+  capacity: null,
   adminManaged: true,
   blocker: false,
   closed: false,
