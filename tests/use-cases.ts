@@ -132,6 +132,16 @@ export const features = {
         actor: "attendee",
         priority: "P2",
       },
+      US6: {
+        title: "Attendee takes on a proposal that wants a host",
+        actor: "attendee",
+        priority: "P2",
+      },
+      US7: {
+        title: "Host asks for a co-host on their proposal",
+        actor: "host",
+        priority: "P3",
+      },
     },
   },
   "005": {

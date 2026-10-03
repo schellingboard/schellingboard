@@ -44,6 +44,9 @@ export const guests = sqliteTable(
     emailOnCohostAdd: integer("email_on_cohost_add", { mode: "boolean" })
       .notNull()
       .default(true),
+    emailOnProposalJoin: integer("email_on_proposal_join", { mode: "boolean" })
+      .notNull()
+      .default(true),
     emailOnProposalComment: integer("email_on_proposal_comment", {
       mode: "boolean",
     })
@@ -248,9 +251,13 @@ export const sessionProposals = sqliteTable("session_proposals", {
   description: text("description"),
   durationMinutes: integer("duration_minutes"),
   createdTime: text("created_time").notNull(),
-  // When title, description, duration or hosts last changed; votes and comments
-  // don't count. NULL until the first such edit, and read as createdTime.
+  // When the proposal itself last changed; votes and comments don't count.
+  // NULL until the first such edit, and read as createdTime.
   updatedTime: text("updated_time"),
+  cohostWanted: integer("cohost_wanted", { mode: "boolean" })
+    .notNull()
+    .default(false),
+  cohostWantedNote: text("cohost_wanted_note"),
 });
 
 export const proposalHosts = sqliteTable(
@@ -578,6 +585,7 @@ export const notifications = sqliteTable(
         "rsvpChange",
         "hostChange",
         "cohostAdd",
+        "proposalJoin",
         "proposalComment",
         "sessionComment",
         "profileComment",

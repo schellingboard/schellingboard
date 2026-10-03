@@ -84,6 +84,10 @@ export function SettingsForm({
             someone adds me as a session co-host
           </label>
           <label className="flex items-center gap-2 text-sm text-fg-muted">
+            <input type="checkbox" {...form.register("proposalJoin")} />
+            someone joins a proposal I&rsquo;m hosting as a co-host
+          </label>
+          <label className="flex items-center gap-2 text-sm text-fg-muted">
             <input type="checkbox" {...form.register("proposalComment")} />
             someone comments on a proposal I&rsquo;m hosting
           </label>

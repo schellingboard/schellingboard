@@ -12,6 +12,7 @@ import { siteUrl } from "@/utils/site-url";
 import { sessionChangedEmail } from "@/emails/session-changed";
 import { sessionDeletedEmail } from "@/emails/session-deleted";
 import { cohostAddedEmail } from "@/emails/cohost-added";
+import { proposalJoinedEmail } from "@/emails/proposal-joined";
 import {
   type CommentSubject,
   commentEmail,
@@ -371,6 +372,45 @@ async function notifyCohostsAddedUnsafe({
   }
 }
 
+// Tell a proposal's other hosts that `joinerId` made themselves a co-host.
+// Never throws: it trails the join and must not break it.
+export async function notifyProposalJoined({
+  proposalId,
+  joinerId,
+  now,
+}: {
+  proposalId: string;
+  joinerId: string;
+  now: Date;
+}): Promise<void> {
+  try {
+    const { events, sessionProposals } = getRepositories();
+    const proposal = await sessionProposals.findById(proposalId);
+    const joiner = proposal?.hosts.find((h) => h.id === joinerId);
+    if (!proposal || !joiner) return;
+    const event = await events.findById(proposal.eventId);
+    if (!event) return;
+
+    const path = proposalPath(event.slug, proposalId);
+    const message = proposalJoinedEmail({
+      title: proposal.title,
+      joinerName: joiner.name,
+      proposalUrl: emailBase() + path,
+    });
+    const inApp = {
+      text: `${joiner.name} joined "${proposal.title}" as a co-host`,
+      url: path,
+      at: now,
+    };
+    for (const host of proposal.hosts) {
+      if (host.id === joinerId) continue;
+      await tryNotifyGuest(host.id, "proposalJoin", message, inApp);
+    }
+  } catch (err) {
+    console.error("Failed to send proposal-joined notifications:", err);
+  }
+}
+
 // Notify the guests responsible for what was commented on — a proposal's or
 // session's hosts, a profile's owner — and the authors of its earlier
 // comments. Everyone told gets the in-app notification; their email settings
@@ -657,14 +697,18 @@ async function guestName(guestId: string): Promise<string> {
   return guest?.name ?? "Someone";
 }
 
-// Deep link to the comment inside the proposal modal, same shape as
-// modal-nav's viewProposalLinkFromElsewhere plus the comment's anchor.
+// Deep link to the proposal modal, same shape as modal-nav's
+// viewProposalLinkFromElsewhere.
+function proposalPath(eventSlug: string, proposalId: string) {
+  return `/${eventSlug}/proposals?viewProposal=${proposalId}`;
+}
+
 function proposalCommentPath(
   eventSlug: string,
   proposalId: string,
   commentId: string
 ) {
-  return `/${eventSlug}/proposals?viewProposal=${proposalId}#comment-${commentId}`;
+  return `${proposalPath(eventSlug, proposalId)}#comment-${commentId}`;
 }
 
 // Deep link to the session, same shape as modal-nav's

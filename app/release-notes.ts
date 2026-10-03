@@ -47,6 +47,7 @@ export const releaseNotes: ReleaseNote[] = [
     highlights: [
       "**Sessions at any minute, with or without a break**: organizers can start a session whenever they like, and skip the break before one such as an opening keynote.",
       "**Room availability**: mark when a room can't be used, such as a room only free on Saturday, and attendees simply aren't offered those slots.",
+      "**Proposals that want a host**: hosts can ask for a co-host, a Host wanted filter finds those proposals and the ones with no host, and one click makes you a host.",
       "**Search and filter the schedule**: find sessions by anything in their description, or narrow the grid and agenda to the ones you have RSVP'd to or are hosting.",
     ],
   },

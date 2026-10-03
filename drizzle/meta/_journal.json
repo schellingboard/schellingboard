@@ -288,6 +288,20 @@
       "when": 1790946961896,
       "tag": "0040_proposal_updated_time",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "6",
+      "when": 1790950140243,
+      "tag": "0041_proposal_cohost_wanted",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "6",
+      "when": 1790951320917,
+      "tag": "0042_guest_email_on_proposal_join",
+      "breakpoints": true
     }
   ]
 }

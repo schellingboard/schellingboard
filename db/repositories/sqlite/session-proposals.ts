@@ -112,6 +112,10 @@ export class SqliteSessionProposalsRepository implements SessionProposalsReposit
         maybe: 0,
         skip: 0,
       };
+      const hosts = hostsByProposal.get(row.id) ?? [];
+      // A deleted guest takes their host row with them but leaves the request,
+      // so the last host gone is read as the request gone.
+      const cohostWanted = row.cohostWanted && hosts.length > 0;
       return {
         id: row.id,
         eventId: row.eventId,
@@ -120,7 +124,9 @@ export class SqliteSessionProposalsRepository implements SessionProposalsReposit
         durationMinutes: row.durationMinutes ?? undefined,
         createdTime: new Date(row.createdTime),
         updatedTime: new Date(row.updatedTime ?? row.createdTime),
-        hosts: hostsByProposal.get(row.id) ?? [],
+        hosts,
+        cohostWanted,
+        cohostWantedNote: (cohostWanted && row.cohostWantedNote) || undefined,
         votesCount: votes.total,
         interestedVotesCount: votes.interested,
         maybeVotesCount: votes.maybe,
@@ -220,6 +226,7 @@ export class SqliteSessionProposalsRepository implements SessionProposalsReposit
 
   async create(data: SessionProposalCreateInput): Promise<SessionProposal> {
     const id = nanoid();
+    const cohostWanted = !!data.cohostWanted && data.hostIds.length > 0;
     this.db.transaction((tx) => {
       tx.insert(schema.sessionProposals)
         .values({
@@ -228,6 +235,8 @@ export class SqliteSessionProposalsRepository implements SessionProposalsReposit
           title: data.title,
           description: data.description ?? null,
           durationMinutes: data.durationMinutes ?? null,
+          cohostWanted,
+          cohostWantedNote: (cohostWanted && data.cohostWantedNote) || null,
           createdTime: data.createdTime.toISOString(),
         })
         .run();
@@ -266,14 +275,33 @@ export class SqliteSessionProposalsRepository implements SessionProposalsReposit
       )
         values.durationMinutes = patch.durationMinutes ?? null;
 
+      const hostsBefore = tx
+        .select({ guestId: schema.proposalHosts.guestId })
+        .from(schema.proposalHosts)
+        .where(eq(schema.proposalHosts.proposalId, id))
+        .all()
+        .map((r) => r.guestId);
+      const hostCount =
+        patch.hostIds === undefined
+          ? hostsBefore.length
+          : new Set(patch.hostIds).size;
+      // Without hosts the proposal wants one anyway, and a request left behind
+      // would come back unasked on whoever takes the proposal on next.
+      const wantedBefore = before.cohostWanted && hostsBefore.length > 0;
+      const cohostWanted =
+        (patch.cohostWanted ?? wantedBefore) && hostCount > 0;
+      const cohostWantedNote = !cohostWanted
+        ? null
+        : patch.cohostWantedNote === undefined
+          ? before.cohostWantedNote
+          : patch.cohostWantedNote || null;
+      if (cohostWanted !== before.cohostWanted)
+        values.cohostWanted = cohostWanted;
+      if (cohostWantedNote !== before.cohostWantedNote)
+        values.cohostWantedNote = cohostWantedNote;
+
       let hostsChanged = false;
       if (patch.hostIds !== undefined) {
-        const hostsBefore = tx
-          .select({ guestId: schema.proposalHosts.guestId })
-          .from(schema.proposalHosts)
-          .where(eq(schema.proposalHosts.proposalId, id))
-          .all()
-          .map((r) => r.guestId);
         const uniqueHostIds = [...new Set(patch.hostIds)];
         hostsChanged =
           uniqueHostIds.length !== hostsBefore.length ||
@@ -310,6 +338,49 @@ export class SqliteSessionProposalsRepository implements SessionProposalsReposit
       }
     });
     return (await this.findById(id))!;
+  }
+
+  async addHost(
+    id: string,
+    guestId: string,
+    updatedTime: Date
+  ): Promise<boolean> {
+    return this.db.transaction((tx) => {
+      const proposal = tx
+        .select({ cohostWanted: schema.sessionProposals.cohostWanted })
+        .from(schema.sessionProposals)
+        .where(eq(schema.sessionProposals.id, id))
+        .get();
+      if (!proposal) return false;
+      const hostIds = tx
+        .select({ guestId: schema.proposalHosts.guestId })
+        .from(schema.proposalHosts)
+        .where(eq(schema.proposalHosts.proposalId, id))
+        .all()
+        .map((r) => r.guestId);
+      if (hostIds.includes(guestId)) return false;
+      if (hostIds.length > 0 && !proposal.cohostWanted) return false;
+
+      tx.insert(schema.proposalHosts).values({ proposalId: id, guestId }).run();
+      // Hosts can't vote for their own proposal; remove their vote.
+      tx.delete(schema.votes)
+        .where(
+          and(
+            eq(schema.votes.proposalId, id),
+            eq(schema.votes.guestId, guestId)
+          )
+        )
+        .run();
+      tx.update(schema.sessionProposals)
+        .set({
+          cohostWanted: false,
+          cohostWantedNote: null,
+          updatedTime: updatedTime.toISOString(),
+        })
+        .where(eq(schema.sessionProposals.id, id))
+        .run();
+      return true;
+    });
   }
 
   async delete(id: string): Promise<void> {

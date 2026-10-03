@@ -108,6 +108,11 @@ const SITE_GUARDED: Record<string, () => Promise<unknown>> = {
       await import("@/app/(site)/[eventSlug]/proposals/actions");
     return updateProposal("p", { eventSlug: "s", title: "T" });
   },
+  "(site)/[eventSlug]/proposals/actions.ts:joinProposal": async () => {
+    const { joinProposal } =
+      await import("@/app/(site)/[eventSlug]/proposals/actions");
+    return joinProposal("p", "s");
+  },
   "(site)/[eventSlug]/proposals/actions.ts:deleteProposal": async () => {
     const { deleteProposal } =
       await import("@/app/(site)/[eventSlug]/proposals/actions");
@@ -222,6 +227,7 @@ const SITE_GUARDED: Record<string, () => Promise<unknown>> = {
       rsvpChange: true,
       hostChange: true,
       cohostAdd: true,
+      proposalJoin: true,
       proposalComment: true,
       sessionComment: true,
       profileComment: true,

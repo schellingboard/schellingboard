@@ -12,6 +12,7 @@ import {
   EyeSlashIcon,
   CheckCircleIcon,
   CalendarIcon,
+  HandRaisedIcon,
 } from "@heroicons/react/24/outline";
 
 import HoverTooltip from "@/app/(site)/hover-tooltip";
@@ -33,6 +34,7 @@ import { VoteTally } from "./vote-tally";
 import { voteChoiceRank } from "@/app/(site)/votes";
 import { viewProposalLinkFromOwner } from "../modal-nav";
 import { stripMarkdown } from "@/utils/markdown";
+import { wantsHost } from "@/utils/proposal-hosts";
 
 const ITEMS_PER_PAGE = 1000;
 
@@ -43,7 +45,7 @@ type SortConfig = {
   direction: "asc" | "desc";
 };
 
-type Filter = "mine" | "voted" | "unvoted" | undefined;
+type Filter = "mine" | "voted" | "unvoted" | "hostWanted" | undefined;
 
 export function ProposalTable({
   proposals: paramProposals,
@@ -87,13 +89,16 @@ export function ProposalTable({
   const { votes, proposalVoteEmoji, proposalVoteLabel } =
     useContext(VotesContext);
   const localZone = useLocalZone();
-  // Derived: filter only applies when a user is selected. Hidden from data
-  // and UI when logged out, without discarding the selection.
-  const effectiveFilter: Filter = currentUserId ? resultFilter : undefined;
+  // Derived: the filters about "you" only apply when a user is selected.
+  // Hidden from data and UI when logged out, without discarding the selection.
+  const effectiveFilter: Filter =
+    currentUserId || resultFilter === "hostWanted" ? resultFilter : undefined;
   const filteredProposals = useMemo(
     () =>
       initialProposals.filter((pr) => {
-        if (effectiveFilter) {
+        if (effectiveFilter === "hostWanted") {
+          return wantsHost(pr);
+        } else if (effectiveFilter) {
           const isMine = pr.hosts.some((h) => h.id === currentUserId);
           const hasVoted = votes.some((vote) => vote.proposalId === pr.id);
           let actual: Filter;
@@ -349,6 +354,17 @@ export function ProposalTable({
                 count={filteredProposals.length}
                 onClick={updateResultFilter}
               />
+              <FilterButton
+                filter="hostWanted"
+                label="Host wanted"
+                describes="proposals that want a host"
+                icon={HandRaisedIcon}
+                available
+                unavailableText=""
+                active={effectiveFilter === "hostWanted"}
+                count={filteredProposals.length}
+                onClick={updateResultFilter}
+              />
               {effectiveFilter && (
                 <button
                   onClick={() => updateResultFilter(undefined)}
@@ -489,6 +505,9 @@ export function ProposalTable({
                         ))
                       )}
                     </div>
+                    {proposal.cohostWanted && (
+                      <div className="text-xs italic">Co-host wanted</div>
+                    )}
                   </td>
                   <td
                     className="px-4 lg:px-6 py-4"
@@ -594,6 +613,9 @@ export function ProposalTable({
                       <span className="italic">No host yet</span>
                     ) : (
                       `Host(s): ${proposal.hosts.map((h) => h.name).join(", ")}`
+                    )}
+                    {proposal.cohostWanted && (
+                      <span className="italic"> · Co-host wanted</span>
                     )}
                   </p>
                 </div>

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import { after } from "next/server";
 import { getRepositories } from "@/db/container";
 import { inSchedPhase } from "@/app/(site)/utils/events";
 import { z } from "zod";
@@ -16,6 +17,7 @@ import {
   verifiedCurrentUser,
 } from "@/utils/acting-guest";
 import { requireSiteAuth } from "@/utils/action-auth";
+import { notifyProposalJoined } from "@/utils/notifications";
 
 export async function createProposal(
   sessionProposal: z.input<typeof sessionProposalSchema>
@@ -40,7 +42,16 @@ export async function createProposal(
   }
 
   const {
-    data: { eventId, eventSlug, title, description, hostIds, durationMinutes },
+    data: {
+      eventId,
+      eventSlug,
+      title,
+      description,
+      hostIds,
+      durationMinutes,
+      cohostWanted,
+      cohostWantedNote,
+    },
   } = parseResult;
 
   try {
@@ -74,6 +85,8 @@ export async function createProposal(
       description: description || undefined,
       hostIds,
       durationMinutes,
+      cohostWanted,
+      cohostWantedNote,
       createdTime: now,
     });
     revalidatePath(`/${eventSlug}/proposals`);
@@ -104,7 +117,15 @@ export async function updateProposal(
   }
 
   const {
-    data: { eventSlug, title, description, hostIds, durationMinutes },
+    data: {
+      eventSlug,
+      title,
+      description,
+      hostIds,
+      durationMinutes,
+      cohostWanted,
+      cohostWantedNote,
+    },
   } = parseResult;
 
   try {
@@ -149,12 +170,57 @@ export async function updateProposal(
       description: description || undefined,
       hostIds,
       durationMinutes,
+      cohostWanted,
+      cohostWantedNote: cohostWantedNote ?? null,
       updatedTime: await serverNow(),
     });
     revalidatePath(`/${eventSlug}/proposals`);
   } catch (error) {
     console.error("Error updating proposal:", error);
     return { error: "Failed to update proposal" };
+  }
+  return { success: true };
+}
+
+export async function joinProposal(
+  id: string,
+  eventSlug: string
+): Promise<{ error: string } | { success: true }> {
+  await requireSiteAuth();
+  const cookieStore = await cookies();
+  const actor = await verifiedCurrentUser(cookieStore);
+  if (!actor) {
+    return {
+      error: await unverifiedUserMessage(cookieStore, "hosting a proposal"),
+    };
+  }
+
+  try {
+    const repos = getRepositories();
+    const proposal = await repos.sessionProposals.findById(id);
+    if (!proposal) {
+      return { error: "Proposal not found" };
+    }
+    if (proposal.hosts.some((h) => h.id === actor)) {
+      return { error: "You already host this proposal" };
+    }
+    const eventGuests = await repos.guests.listByEvent(proposal.eventId);
+    if (!eventGuests.some((g) => g.id === actor)) {
+      return { error: "You are not part of this event" };
+    }
+
+    // The repository decides whether a host is still wanted, in the same
+    // transaction that adds one: two volunteers can click at the same moment.
+    const now = await serverNow();
+    const joined = await repos.sessionProposals.addHost(id, actor, now);
+    if (!joined) {
+      return { error: "This proposal is not looking for a host" };
+    }
+    after(() => notifyProposalJoined({ proposalId: id, joinerId: actor, now }));
+    revalidatePath(`/${eventSlug}/proposals`);
+  } catch (error) {
+    console.error("Error joining proposal:", error);
+    return { error: "Failed to join the proposal" };
   }
   return { success: true };
 }

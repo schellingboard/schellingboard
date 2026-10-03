@@ -28,6 +28,7 @@ export const emailSettingsSchema = z.object({
   rsvpChange: z.boolean(),
   hostChange: z.boolean(),
   cohostAdd: z.boolean(),
+  proposalJoin: z.boolean(),
   proposalComment: z.boolean(),
   sessionComment: z.boolean(),
   profileComment: z.boolean(),
