@@ -27,7 +27,7 @@ const DAY_END = new Date(`${DAY}T12:00:00.000Z`);
 const SLOT = `${DAY}T10:00:00.000Z`;
 
 async function request(
-  params: { event?: string; slot?: string },
+  params: { event?: string; slot?: string; slots?: string },
   guestId?: string
 ) {
   const url = new URL("http://test/api/meetings/candidates");
@@ -113,5 +113,29 @@ describe("the 1-on-1 candidates endpoint", () => {
     );
 
     expect(res.status).toBe(404);
+  });
+
+  it("answers for the length asked for", async () => {
+    const { event, viewer } = await scenario();
+
+    const res = await candidates(
+      await request({ event: event.id, slot: SLOT, slots: "2" }, viewer.id)
+    );
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as MeetingCandidates;
+    expect(body.slotCount).toBe(2);
+    // Grace declared the first slot only.
+    expect(body.candidates).toEqual([]);
+  });
+
+  it("needs a whole number of slots", async () => {
+    const { event, viewer } = await scenario();
+
+    const res = await candidates(
+      await request({ event: event.id, slot: SLOT, slots: "1.5" }, viewer.id)
+    );
+
+    expect(res.status).toBe(400);
   });
 });

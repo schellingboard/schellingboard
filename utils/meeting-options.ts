@@ -1,6 +1,12 @@
 import { getRepositories } from "@/db/container";
 import { serverNow } from "@/utils/dev-clock-server";
-import { meetingSlotsForDay, slotTimeLabel } from "@/utils/meeting-slots";
+import {
+  maxMeetingSlots,
+  meetingMinutes,
+  meetingRun,
+  meetingSlotsForDay,
+  slotTimeLabel,
+} from "@/utils/meeting-slots";
 import { clashesForInterval, loadGuestSchedules } from "@/utils/guest-clashes";
 import { toMeetingClashes } from "@/utils/meeting-clash-text";
 import type { MeetingClash } from "@/utils/meeting-clash-text";
@@ -26,11 +32,18 @@ export type MeetingDayOption = {
   slots: MeetingSlotOption[];
 };
 
+/** The starts a 1-on-1 of one length can take, each labelled with its span. */
+export type MeetingLengthOption = {
+  slotCount: number;
+  minutes: number;
+  days: MeetingDayOption[];
+};
+
 export type MeetingOption = {
   eventId: string;
   eventName: string;
   meetingPoints: Pick<MeetingPoint, "id" | "name" | "description">[];
-  days: MeetingDayOption[];
+  lengths: MeetingLengthOption[];
 };
 
 /**
@@ -86,43 +99,64 @@ export async function meetingOptionsFor(
     const zoned = (date: Date) =>
       DateTime.fromJSDate(date).setZone(event.timezone);
 
-    const dayOptions: MeetingDayOption[] = [];
-    for (const day of days) {
-      const slots: MeetingSlotOption[] = [];
-      for (const slot of meetingSlotsForDay(day, event.slotIncrementMinutes)) {
-        // Day one of a three-day event stops being bookable once it is past --
-        // and the organizer's cap only counts requests still ahead.
-        if (slot.start <= now) continue;
-        const start = slot.start.toISOString();
-        const label = slotTimeLabel(slot, event.breakMinutes, event.timezone);
-        if (!declaredStarts.has(start)) {
-          slots.push({ start, label, state: "unavailable", clashes: [] });
-          continue;
+    const maxSlots = maxMeetingSlots(
+      event.slotIncrementMinutes,
+      event.maxSessionDuration
+    );
+    const lengths: MeetingLengthOption[] = [];
+    for (let slotCount = 1; slotCount <= maxSlots; slotCount++) {
+      const dayOptions: MeetingDayOption[] = [];
+      for (const day of days) {
+        const daySlots = meetingSlotsForDay(day, event.slotIncrementMinutes);
+        const slots: MeetingSlotOption[] = [];
+        for (const slot of daySlots) {
+          // Day one of a three-day event stops being bookable once it is past
+          // -- and the organizer's cap only counts requests still ahead.
+          if (slot.start <= now) continue;
+          const run = meetingRun(daySlots, slot.start, slotCount);
+          if (!run) continue;
+          const span = { start: slot.start, end: run[run.length - 1].end };
+          const start = slot.start.toISOString();
+          const label = slotTimeLabel(span, event.breakMinutes, event.timezone);
+          if (!run.every((s) => declaredStarts.has(s.start.toISOString()))) {
+            slots.push({ start, label, state: "unavailable", clashes: [] });
+            continue;
+          }
+          const clashes = clashesForInterval(schedules, {
+            eventId,
+            start: span.start,
+            end: span.end,
+            breakMinutes: event.breakMinutes,
+            detailFor: viewerId,
+          });
+          slots.push({
+            start,
+            label,
+            // Busy is a warning, never a wall: still selectable.
+            state: clashes.length > 0 ? "busy" : "available",
+            clashes: toMeetingClashes(clashes, viewerId),
+          });
         }
-        const clashes = clashesForInterval(schedules, {
-          eventId,
-          start: slot.start,
-          end: slot.end,
-          breakMinutes: event.breakMinutes,
-          detailFor: viewerId,
-        });
-        slots.push({
-          start,
-          label,
-          // Busy is a warning, never a wall: still selectable.
-          state: clashes.length > 0 ? "busy" : "available",
-          clashes: toMeetingClashes(clashes, viewerId),
-        });
+        if (slots.length > 0) {
+          dayOptions.push({
+            label: zoned(day.start).toFormat("EEE d LLL"),
+            slots,
+          });
+        }
       }
-      if (slots.length > 0) {
-        dayOptions.push({
-          label: zoned(day.start).toFormat("EEE d LLL"),
-          slots,
-        });
-      }
+      if (dayOptions.length === 0) break;
+      lengths.push({
+        slotCount,
+        minutes: meetingMinutes(
+          slotCount,
+          event.slotIncrementMinutes,
+          event.breakMinutes
+        ),
+        days: dayOptions,
+      });
     }
 
-    if (dayOptions.length === 0) continue;
+    if (lengths.length === 0) continue;
 
     options.push({
       eventId,
@@ -132,7 +166,7 @@ export async function meetingOptionsFor(
         name,
         description,
       })),
-      days: dayOptions,
+      lengths,
     });
   }
 

@@ -86,10 +86,13 @@ const listMeetingOptions = async (recipientId: string): Promise<Option[]> =>
     await getRepositories().events.list()
   );
 
-const allSlots = (option: Option) => option.days.flatMap((d) => d.slots);
+const allSlots = (option: Option, slotCount = 1) =>
+  option.lengths
+    .find((l) => l.slotCount === slotCount)!
+    .days.flatMap((d) => d.slots);
 
-const slotAt = (option: Option, start: string) =>
-  allSlots(option).find((s) => s.start === start)!;
+const slotAt = (option: Option, start: string, slotCount = 1) =>
+  allSlots(option, slotCount).find((s) => s.start === start)!;
 
 describe("meeting options on a profile", () => {
   beforeAll(() => setupTestDb());
@@ -363,5 +366,52 @@ describe("meeting options on a profile", () => {
     expect(options.map((o) => o.eventName).sort()).toEqual(
       [event.name, second.name].sort()
     );
+  });
+
+  describe("a 1-on-1 longer than one slot", () => {
+    it("offers each length up to the event's longest session", async () => {
+      const { other } = await scenario({
+        eventPatch: { maxSessionDuration: 60, breakMinutes: 10 },
+      });
+
+      const [option] = await listMeetingOptions(other.id);
+
+      expect(option.lengths.map((l) => l.minutes)).toEqual([20, 50]);
+      expect(slotAt(option, SLOT_A, 2).label).toBe("09:10 – 10:00");
+    });
+
+    it("needs every slot it covers declared", async () => {
+      const { other } = await scenario({ declared: [SLOT_A, SLOT_B] });
+
+      const [option] = await listMeetingOptions(other.id);
+
+      expect(slotAt(option, SLOT_A, 2).state).toBe("available");
+      expect(slotAt(option, SLOT_B, 2).state).toBe("unavailable");
+    });
+
+    it("does not offer a start too late in the day for the length", async () => {
+      const { other } = await scenario({
+        declared: [`${DAY}T11:00:00.000Z`, `${DAY}T11:30:00.000Z`],
+      });
+
+      const [option] = await listMeetingOptions(other.id);
+
+      expect(slotAt(option, `${DAY}T11:00:00.000Z`, 2).state).toBe("available");
+      expect(slotAt(option, `${DAY}T11:30:00.000Z`, 2)).toBeUndefined();
+    });
+
+    it("warns of a clash anywhere in the time it covers", async () => {
+      const { event, other } = await scenario();
+      await createSession(event.id, {
+        title: "Their talk",
+        hostIds: [other.id],
+        startTime: new Date(SLOT_B),
+        endTime: new Date(SLOT_C),
+      });
+
+      const [option] = await listMeetingOptions(other.id);
+
+      expect(slotAt(option, SLOT_A, 2).state).toBe("busy");
+    });
   });
 });

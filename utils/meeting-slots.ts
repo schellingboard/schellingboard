@@ -55,3 +55,39 @@ export function slotTimeLabel(
     DateTime.fromJSDate(date).setZone(timezone).toFormat("HH:mm");
   return `${clock(shownSlotStart(slot.start, breakMinutes))} – ${clock(slot.end)}`;
 }
+
+/**
+ * How many consecutive slots one 1-on-1 may span: as many as the event's
+ * longest session, and never fewer than one.
+ */
+export function maxMeetingSlots(
+  slotMinutes: number,
+  maxSessionDuration: number
+): number {
+  return Math.max(1, Math.floor(maxSessionDuration / slotMinutes));
+}
+
+/** How long a 1-on-1 of `slotCount` slots is shown to last. */
+export function meetingMinutes(
+  slotCount: number,
+  slotMinutes: number,
+  breakMinutes: number
+): number {
+  return slotCount * slotMinutes - breakMinutes;
+}
+
+/**
+ * The day's slots a 1-on-1 of `slotCount` starting at `start` covers. Null
+ * when `start` is not one of them or the day ends first.
+ */
+export function meetingRun(
+  daySlots: MeetingSlot[],
+  start: Date,
+  slotCount: number
+): MeetingSlot[] | null {
+  const first = daySlots.findIndex(
+    (slot) => slot.start.getTime() === start.getTime()
+  );
+  if (first < 0 || first + slotCount > daySlots.length) return null;
+  return daySlots.slice(first, first + slotCount);
+}

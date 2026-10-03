@@ -280,4 +280,65 @@ describe("meetingCandidatesFor", () => {
       await meetingCandidatesFor(viewer.id, event.id, SLOT, BEFORE)
     ).toBeNull();
   });
+
+  describe("a 1-on-1 longer than one slot", () => {
+    const NEXT_SLOT = "2026-10-01T10:30:00.000Z";
+
+    const namesFor = async (event: Event, viewer: Guest, slotCount: number) =>
+      (
+        await meetingCandidatesFor(viewer.id, event.id, SLOT, BEFORE, slotCount)
+      )?.candidates.map((c) => c.name);
+
+    it("lists only people free for all of it", async () => {
+      const { event, viewer } = await scenario();
+      await bookable(event, "Yuki", [SLOT, NEXT_SLOT]);
+
+      expect(await namesFor(event, viewer, 2)).toEqual(["Yuki"]);
+    });
+
+    it("offers the lengths that fit before the day ends", async () => {
+      const { event, viewer } = await scenario();
+      await getRepositories().events.update(event.id, { breakMinutes: 10 });
+
+      const found = await meetingCandidatesFor(
+        viewer.id,
+        event.id,
+        "2026-10-01T11:00:00.000Z",
+        BEFORE
+      );
+
+      expect(found?.lengths.map((l) => l.minutes)).toEqual([20, 50]);
+    });
+
+    it("refuses a length that runs past the end of the day", async () => {
+      const { event, viewer } = await scenario();
+
+      expect(
+        await meetingCandidatesFor(
+          viewer.id,
+          event.id,
+          "2026-10-01T11:30:00.000Z",
+          BEFORE,
+          2
+        )
+      ).toBeNull();
+    });
+
+    it("leaves out someone the viewer already meets during it", async () => {
+      const { event, viewer } = await scenario();
+      const yuki = await bookable(event, "Yuki", [SLOT, NEXT_SLOT]);
+      await getRepositories().meetings.create({
+        eventId: event.id,
+        requesterId: viewer.id,
+        recipientId: yuki.id,
+        slotStart: new Date(NEXT_SLOT),
+        slotEnd: new Date("2026-10-01T11:00:00.000Z"),
+        meetingPoint: "Coffee bar",
+        message: "",
+        createdAt: BEFORE,
+      });
+
+      expect(await namesFor(event, viewer, 2)).toEqual([]);
+    });
+  });
 });

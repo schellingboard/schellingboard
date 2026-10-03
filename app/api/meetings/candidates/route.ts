@@ -21,6 +21,13 @@ export async function GET(request: NextRequest) {
       { ...NO_STORE, status: 400 }
     );
   }
+  const slotCount = Number(request.nextUrl.searchParams.get("slots") ?? "1");
+  if (!Number.isInteger(slotCount) || slotCount < 1) {
+    return NextResponse.json(
+      { error: "slots must be a whole number of at least 1" },
+      { ...NO_STORE, status: 400 }
+    );
+  }
 
   // Who is free when is as private as an RSVP, so this answers for the caller
   // alone: there is no id parameter to ask on anyone else's behalf.
@@ -37,7 +44,8 @@ export async function GET(request: NextRequest) {
       guestId,
       eventId,
       slotStart,
-      requestNow(request)
+      requestNow(request),
+      slotCount
     );
     if (!found) {
       return NextResponse.json(

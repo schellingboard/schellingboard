@@ -5,6 +5,7 @@ import { useEffect, useState, useTransition } from "react";
 import { requestMeetingAction } from "@/app/actions/meetings";
 import { PRIMARY_BUTTON, SECONDARY_BUTTON } from "@/app/components/buttons";
 import { Avatar } from "@/app/(site)/guests/avatar";
+import { MeetingLengthChips } from "@/app/components/meeting-length-chips";
 import { MeetingRequestFields } from "@/app/components/meeting-request-fields";
 import { Modal } from "@/app/components/modal";
 import Link from "next/link";
@@ -42,13 +43,14 @@ export function BookMeeting({
 }) {
   const [found, setFound] = useState<MeetingCandidates | null | Failure>(null);
   const [chosen, setChosen] = useState<MeetingCandidate | null>(null);
+  const [slotCount, setSlotCount] = useState(1);
 
   useEffect(() => {
     const controller = new AbortController();
     void fetch(
       `/api/meetings/candidates?event=${eventId}&slot=${encodeURIComponent(
         slotStart
-      )}`,
+      )}&slots=${slotCount}`,
       { signal: controller.signal }
     )
       .then<MeetingCandidates | Failure>((res) =>
@@ -64,7 +66,7 @@ export function BookMeeting({
         if (!controller.signal.aborted) setFound("failed");
       });
     return () => controller.abort();
-  }, [eventId, slotStart]);
+  }, [eventId, slotStart, slotCount]);
 
   return (
     <Modal
@@ -93,7 +95,12 @@ export function BookMeeting({
           onClose={onClose}
         />
       ) : (
-        <CandidateStep found={found} onPick={setChosen} />
+        <CandidateStep
+          found={found}
+          slotCount={slotCount}
+          onSlotCount={setSlotCount}
+          onPick={setChosen}
+        />
       )}
     </Modal>
   );
@@ -101,11 +108,16 @@ export function BookMeeting({
 
 function CandidateStep({
   found,
+  slotCount,
+  onSlotCount,
   onPick,
 }: {
   found: MeetingCandidates;
+  slotCount: number;
+  onSlotCount: (slotCount: number) => void;
   onPick: (candidate: MeetingCandidate) => void;
 }) {
+  const loading = found.slotCount !== slotCount;
   return (
     <div className="flex flex-col gap-4">
       <div className="pr-8">
@@ -117,16 +129,22 @@ function CandidateStep({
         </span>
       </div>
 
+      <MeetingLengthChips
+        lengths={found.lengths}
+        slotCount={slotCount}
+        onSlotCount={onSlotCount}
+      />
+
       {/* Your own commitment, once for the whole screen: it is the same slot
           whoever you end up asking. */}
       {found.yourClashes.length > 0 && (
         <p className="text-sm rounded-md bg-warning-tint p-3 text-fg">
-          {clashLines(found.yourClashes)} during this slot — book it anyway?
+          {clashLines(found.yourClashes)} during this time — book it anyway?
         </p>
       )}
 
       {found.candidates.length === 0 ? (
-        <p className="text-fg-muted">Nobody has marked this slot free.</p>
+        <p className="text-fg-muted">Nobody has marked this time free.</p>
       ) : (
         // Scrolls rather than growing the modal past the viewport: a popular
         // slot at a big event is a long list, and Ask has to stay reachable.
@@ -181,6 +199,7 @@ function CandidateStep({
                   column of buttons, and a long list makes them all alike. */}
               <button
                 type="button"
+                disabled={loading}
                 onClick={() => onPick(candidate)}
                 aria-label={`Ask ${candidate.name}`}
                 className={SECONDARY_BUTTON}
@@ -193,7 +212,7 @@ function CandidateStep({
       )}
 
       <p className="text-xs text-fg-subtle">
-        Only people who marked this slot free are listed. Nobody is told you
+        Only people who marked this time free are listed. Nobody is told you
         looked.
       </p>
     </div>
@@ -232,6 +251,7 @@ function RequestStep({
           eventId,
           recipientId: candidate.id,
           slotStart,
+          slotCount: found.slotCount,
           meetingPoint,
           message,
         });
@@ -283,7 +303,7 @@ function RequestStep({
               : []),
             ...(candidate.busy ? [`${candidate.name} is already booked`] : []),
           ].join("; ")}{" "}
-          during this slot — book it anyway?
+          during this time — book it anyway?
         </p>
       )}
 

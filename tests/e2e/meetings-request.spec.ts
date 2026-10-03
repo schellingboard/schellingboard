@@ -211,7 +211,7 @@ test.describe("1-on-1 meetings", () => {
 
   // The other direction: the grid knows the time and asks who is free, which
   // is the only route that does not start from knowing who you want to meet.
-  test("books a 1-on-1 from the schedule's own column @012-US6", async ({
+  test("books a 50-minute 1-on-1 from the schedule's own column @012-US6", async ({
     page,
   }) => {
     test.slow();
@@ -261,6 +261,9 @@ test.describe("1-on-1 meetings", () => {
     await expect(
       picker.getByRole("heading", { name: /Who's free at 09:10/ })
     ).toBeVisible();
+    // The askee declared the whole day, so they are free for the longer one.
+    await picker.getByRole("button", { name: "50 min" }).click();
+    await expect(picker.getByText(/09:10 – 10:00/)).toBeVisible();
     await picker.getByRole("button", { name: `Ask ${askee}` }).click();
 
     await expect(
@@ -276,7 +279,9 @@ test.describe("1-on-1 meetings", () => {
     expect((await send.boundingBox())?.y).toBe(sendBefore?.y);
 
     await send.click();
-    await expect(picker.getByText(new RegExp(`Asked ${askee}`))).toBeVisible();
+    await expect(
+      picker.getByText(new RegExp(`Asked ${askee} for 09:10 – 10:00`))
+    ).toBeVisible();
     await picker.getByRole("button", { name: "Done" }).click();
 
     // The column behind it is already showing the request, without a reload.

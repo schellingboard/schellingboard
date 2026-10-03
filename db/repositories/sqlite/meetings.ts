@@ -1,4 +1,4 @@
-import { and, asc, count, eq, gt, inArray, or } from "drizzle-orm";
+import { and, asc, count, eq, gt, inArray, lt, or } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
 import * as schema from "../../schema";
@@ -82,14 +82,19 @@ export class SqliteMeetingsRepository implements MeetingsRepository {
       .map(rowToMeeting);
   }
 
-  async listLiveBySlot(eventId: string, slotStart: Date): Promise<Meeting[]> {
+  async listLiveOverlapping(
+    eventId: string,
+    start: Date,
+    end: Date
+  ): Promise<Meeting[]> {
     return this.db
       .select()
       .from(schema.meetings)
       .where(
         and(
           eq(schema.meetings.eventId, eventId),
-          eq(schema.meetings.slotStart, slotStart.toISOString()),
+          lt(schema.meetings.slotStart, end.toISOString()),
+          gt(schema.meetings.slotEnd, start.toISOString()),
           inArray(schema.meetings.status, ["pending", "accepted"])
         )
       )
@@ -148,12 +153,14 @@ export class SqliteMeetingsRepository implements MeetingsRepository {
     return result.changes === 0 ? undefined : this.findById(id);
   }
 
-  // The same pair and slot, still awaiting or holding an answer. Mirrors the
-  // partial unique index, which stays as the backstop: this is what turns the
-  // clash into a sentence the requester can act on.
+  // The same pair at an overlapping time, still awaiting or holding an answer.
+  // The partial unique index stays as the backstop for an identical start.
   private hasLiveRequest(
     db: DB,
-    data: Pick<Meeting, "eventId" | "requesterId" | "recipientId" | "slotStart">
+    data: Pick<
+      Meeting,
+      "eventId" | "requesterId" | "recipientId" | "slotStart" | "slotEnd"
+    >
   ): boolean {
     return (
       db
@@ -164,7 +171,8 @@ export class SqliteMeetingsRepository implements MeetingsRepository {
             eq(schema.meetings.eventId, data.eventId),
             eq(schema.meetings.requesterId, data.requesterId),
             eq(schema.meetings.recipientId, data.recipientId),
-            eq(schema.meetings.slotStart, data.slotStart.toISOString()),
+            lt(schema.meetings.slotStart, data.slotEnd.toISOString()),
+            gt(schema.meetings.slotEnd, data.slotStart.toISOString()),
             inArray(schema.meetings.status, ["pending", "accepted"])
           )
         )

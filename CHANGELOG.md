@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Longer 1-on-1s**: when you ask someone for a 1-on-1 you can choose its length, such as
+  50 minutes instead of 20, as long as they are free for all of it.
 - **Room availability** (#1059): organizers can mark when a room can't be used, such as a
   room only free on Saturday, instead of filling the grid with blocker sessions.
 - **Sessions at any minute, with or without a break**: organizers can place a session at
