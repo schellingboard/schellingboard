@@ -1,132 +1,46 @@
 "use client";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 
 import { BackLink } from "@/app/components/back-link";
 import { Proposal } from "@/app/(site)/[eventSlug]/proposal";
-import { Vote, VoteChoice } from "@/app/(site)/votes";
+import { Vote } from "@/app/(site)/votes";
 import type { SessionProposal } from "@/db/repositories/interfaces";
 import { VotingButtons } from "@/app/(site)/[eventSlug]/proposals/voting-buttons";
 import { VotesContext } from "@/app/(site)/context";
 import { CommentsSection } from "@/app/(site)/[eventSlug]/comments-section";
 import { useComments } from "@/app/(site)/[eventSlug]/use-comments";
+import { viewProposalLinkFromOwner } from "@/app/(site)/[eventSlug]/modal-nav";
 
 export function QuickVoting(props: {
   proposals: SessionProposal[];
-  currentUser: string;
   initialVotes: Vote[];
   eventName: string;
   eventSlug: string;
   timezone: string;
 }) {
-  const {
-    proposals,
-    currentUser,
-    initialVotes,
-    eventSlug,
-    eventName,
-    timezone,
-  } = props;
-  const [votes, setVotes] = useState(initialVotes);
-  const { addVote, removeVote, updateVote, getVote } = useContext(VotesContext);
+  const { proposals, initialVotes, eventSlug, eventName, timezone } = props;
+  const { votes } = useContext(VotesContext);
 
+  // The layout's votes outlive this page, so they include those cast in the
+  // proposal modal; initialVotes may be the router's stale copy after Back.
+  const voted = new Set(
+    [...initialVotes, ...votes].map((vote) => vote.proposalId)
+  );
   const totalProposals = proposals.length;
-  const eligibleProposals = proposals
-    .filter((pr) => !votes.some((vote) => vote.proposalId === pr.id))
-    .sort((a, b) => a.votesCount - b.votesCount);
-  const proposal = eligibleProposals.at(0);
-
-  // Custom vote handler for quick voting
-  async function handleVote(proposalId: string, choice: VoteChoice) {
-    const previousVote = getVote(proposalId);
-    const optimisticVote: Vote = {
-      id: "",
-      proposalId,
-      guestId: currentUser,
-      choice,
-    };
-
-    try {
-      setVotes((prevVotes) => {
-        const existingIndex = prevVotes.findIndex(
-          (v) => v.proposalId === proposalId && v.guestId === currentUser
-        );
-        if (existingIndex >= 0) {
-          const updated = [...prevVotes];
-          updated[existingIndex] = optimisticVote;
-          return updated;
-        }
-        return [...prevVotes, optimisticVote];
-      });
-
-      // Optimistic global context update for overview/UI highlight
-      if (previousVote) {
-        updateVote(proposalId, choice);
-      } else {
-        addVote(optimisticVote);
-      }
-
-      const response = await fetch("/api/add-vote", {
-        method: "POST",
-        body: JSON.stringify(optimisticVote),
-      });
-
-      if (!response.ok) {
-        // Revert both local and global on failure
-        setVotes((prevVotes) => {
-          if (previousVote) {
-            const idx = prevVotes.findIndex(
-              (v) => v.proposalId === proposalId && v.guestId === currentUser
-            );
-            if (idx >= 0) {
-              const reverted = [...prevVotes];
-              reverted[idx] = previousVote;
-              return reverted;
-            }
-          }
-          return prevVotes.filter(
-            (v) => !(v.proposalId === proposalId && v.guestId === currentUser)
-          );
-        });
-
-        if (previousVote) {
-          updateVote(proposalId, previousVote.choice);
-        } else {
-          removeVote(proposalId);
-        }
-      }
-      return response.ok;
-    } catch (error: unknown) {
-      console.error("Error updating vote:", error);
-      setVotes((prevVotes) => {
-        if (previousVote) {
-          const idx = prevVotes.findIndex(
-            (v) => v.proposalId === proposalId && v.guestId === currentUser
-          );
-          if (idx >= 0) {
-            const reverted = [...prevVotes];
-            reverted[idx] = previousVote;
-            return reverted;
-          }
-        }
-        return prevVotes.filter(
-          (v) => !(v.proposalId === proposalId && v.guestId === currentUser)
-        );
-      });
-
-      if (previousVote) {
-        updateVote(proposalId, previousVote.choice);
-      } else {
-        removeVote(proposalId);
-      }
-      return false;
-    }
-  }
+  const votedCount = proposals.filter((pr) => voted.has(pr.id)).length;
+  const proposal = proposals
+    .filter((pr) => !voted.has(pr.id))
+    .sort((a, b) => a.votesCount - b.votesCount)
+    .at(0);
 
   function showNextProposal() {
     if (proposal) {
       return (
         <>
-          <Proposal proposal={proposal} />
+          <Proposal
+            proposal={proposal}
+            titleLink={viewProposalLinkFromOwner(eventSlug, proposal.id)}
+          />
           <ProposalCommentsReadOnly
             proposalId={proposal.id}
             timezone={timezone}
@@ -148,7 +62,7 @@ export function QuickVoting(props: {
       <BackLink href={`/${eventSlug}/proposals`}>Proposals</BackLink>
       <p className="text-lg mt-4 mb-4">{eventName} Quick Voting</p>
       <div className="text-fg-muted mb-6">
-        You have voted on {votes.length} / {totalProposals} proposals
+        You have voted on {votedCount} / {totalProposals} proposals
       </div>
 
       {showNextProposal()}
@@ -161,7 +75,6 @@ export function QuickVoting(props: {
             votingEnabled={true}
             votingDisabledText=""
             large={true}
-            onVote={handleVote}
           />
         </div>
       )}

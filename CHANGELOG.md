@@ -30,8 +30,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   comments don't count as updates.
 - **Find and take on proposals that want a host** (#774, #775): a Host wanted filter lists
   proposals with no host or whose hosts ask for a co-host, and one click makes you a host.
-- **Comments in Quick Voting** (#780): each proposal shows its discussion below it, so
-  you can read what others said before you vote.
+- **Comments in Quick Voting** (#780, #781): each proposal shows its discussion below it,
+  and its title opens the full proposal to join in; closing it returns you to Quick Voting.
 - **Filter the schedule to your own sessions**: My sessions, RSVP'd and Hosting narrow the
   Grid and Agenda views to what you are attending or hosting.
 
