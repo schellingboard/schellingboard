@@ -15,6 +15,7 @@ vi.mock("@/utils/mailer", () => ({
 }));
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { BY_TEST } from "../helpers/changes";
 import {
   createEvent,
   createGuest,
@@ -177,10 +178,14 @@ describe("notifySessionChanged", () => {
 
   it("emails RSVP'd guests the new and old time when the time changes", async () => {
     const { event, session } = await setup();
-    const after = await getRepositories().sessions.update(session.id, {
-      startTime: new Date("2026-08-01T15:00:00Z"),
-      endTime: new Date("2026-08-01T16:00:00Z"),
-    });
+    const after = await getRepositories().sessions.update(
+      session.id,
+      {
+        startTime: new Date("2026-08-01T15:00:00Z"),
+        endTime: new Date("2026-08-01T16:00:00Z"),
+      },
+      BY_TEST
+    );
 
     await notifySessionChanged({
       before: session,
@@ -212,10 +217,14 @@ describe("notifySessionChanged", () => {
   it("sends nothing when SITE_URL is not set (email is disabled then too)", async () => {
     vi.stubEnv("SITE_URL", "");
     const { session } = await setup();
-    const after = await getRepositories().sessions.update(session.id, {
-      startTime: new Date("2026-08-01T15:00:00Z"),
-      endTime: new Date("2026-08-01T16:00:00Z"),
-    });
+    const after = await getRepositories().sessions.update(
+      session.id,
+      {
+        startTime: new Date("2026-08-01T15:00:00Z"),
+        endTime: new Date("2026-08-01T16:00:00Z"),
+      },
+      BY_TEST
+    );
 
     await notifySessionChanged({
       before: session,
@@ -230,10 +239,14 @@ describe("notifySessionChanged", () => {
   it("does not throw, and sends nothing, when SITE_URL is invalid", async () => {
     vi.stubEnv("SITE_URL", "not-a-valid-url");
     const { session } = await setup();
-    const after = await getRepositories().sessions.update(session.id, {
-      startTime: new Date("2026-08-01T15:00:00Z"),
-      endTime: new Date("2026-08-01T16:00:00Z"),
-    });
+    const after = await getRepositories().sessions.update(
+      session.id,
+      {
+        startTime: new Date("2026-08-01T15:00:00Z"),
+        endTime: new Date("2026-08-01T16:00:00Z"),
+      },
+      BY_TEST
+    );
 
     await expect(
       notifySessionChanged({
@@ -252,13 +265,21 @@ describe("notifySessionChanged", () => {
   it("names the old time as well as the new one in the app", async () => {
     const { session } = await setup();
     const host = await createGuest({ email: "host@test.example" });
-    const withHost = await getRepositories().sessions.update(session.id, {
-      hostIds: [host.id],
-    });
-    const after = await getRepositories().sessions.update(session.id, {
-      startTime: new Date("2026-08-01T15:00:00Z"),
-      endTime: new Date("2026-08-01T16:00:00Z"),
-    });
+    const withHost = await getRepositories().sessions.update(
+      session.id,
+      {
+        hostIds: [host.id],
+      },
+      BY_TEST
+    );
+    const after = await getRepositories().sessions.update(
+      session.id,
+      {
+        startTime: new Date("2026-08-01T15:00:00Z"),
+        endTime: new Date("2026-08-01T16:00:00Z"),
+      },
+      BY_TEST
+    );
 
     await notifySessionChanged({
       before: withHost,
@@ -277,13 +298,21 @@ describe("notifySessionChanged", () => {
   it("emails hosts, addressing them as hosts", async () => {
     const { session } = await setup();
     const host = await createGuest({ email: "host@test.example" });
-    const withHost = await getRepositories().sessions.update(session.id, {
-      hostIds: [host.id],
-    });
-    const after = await getRepositories().sessions.update(session.id, {
-      startTime: new Date("2026-08-01T15:00:00Z"),
-      endTime: new Date("2026-08-01T16:00:00Z"),
-    });
+    const withHost = await getRepositories().sessions.update(
+      session.id,
+      {
+        hostIds: [host.id],
+      },
+      BY_TEST
+    );
+    const after = await getRepositories().sessions.update(
+      session.id,
+      {
+        startTime: new Date("2026-08-01T15:00:00Z"),
+        endTime: new Date("2026-08-01T16:00:00Z"),
+      },
+      BY_TEST
+    );
 
     await notifySessionChanged({
       before: withHost,
@@ -312,13 +341,21 @@ describe("notifySessionChanged", () => {
       email: "host@test.example",
       emailSettings: { rsvpChange: false, cohostAdd: true, hostChange: true },
     });
-    const withHost = await getRepositories().sessions.update(session.id, {
-      hostIds: [host.id],
-    });
-    const after = await getRepositories().sessions.update(session.id, {
-      startTime: new Date("2026-08-01T15:00:00Z"),
-      endTime: new Date("2026-08-01T16:00:00Z"),
-    });
+    const withHost = await getRepositories().sessions.update(
+      session.id,
+      {
+        hostIds: [host.id],
+      },
+      BY_TEST
+    );
+    const after = await getRepositories().sessions.update(
+      session.id,
+      {
+        startTime: new Date("2026-08-01T15:00:00Z"),
+        endTime: new Date("2026-08-01T16:00:00Z"),
+      },
+      BY_TEST
+    );
 
     await notifySessionChanged({
       before: withHost,
@@ -338,13 +375,21 @@ describe("notifySessionChanged", () => {
       email: "host@test.example",
       emailSettings: { rsvpChange: true, cohostAdd: true, hostChange: false },
     });
-    const withHost = await getRepositories().sessions.update(session.id, {
-      hostIds: [host.id],
-    });
-    const after = await getRepositories().sessions.update(session.id, {
-      startTime: new Date("2026-08-01T15:00:00Z"),
-      endTime: new Date("2026-08-01T16:00:00Z"),
-    });
+    const withHost = await getRepositories().sessions.update(
+      session.id,
+      {
+        hostIds: [host.id],
+      },
+      BY_TEST
+    );
+    const after = await getRepositories().sessions.update(
+      session.id,
+      {
+        startTime: new Date("2026-08-01T15:00:00Z"),
+        endTime: new Date("2026-08-01T16:00:00Z"),
+      },
+      BY_TEST
+    );
 
     await notifySessionChanged({
       before: withHost,
@@ -360,13 +405,21 @@ describe("notifySessionChanged", () => {
   it("does not email the guest who made the change", async () => {
     const { session } = await setup();
     const host = await createGuest({ email: "host@test.example" });
-    const withHost = await getRepositories().sessions.update(session.id, {
-      hostIds: [host.id],
-    });
-    const after = await getRepositories().sessions.update(session.id, {
-      startTime: new Date("2026-08-01T15:00:00Z"),
-      endTime: new Date("2026-08-01T16:00:00Z"),
-    });
+    const withHost = await getRepositories().sessions.update(
+      session.id,
+      {
+        hostIds: [host.id],
+      },
+      BY_TEST
+    );
+    const after = await getRepositories().sessions.update(
+      session.id,
+      {
+        startTime: new Date("2026-08-01T15:00:00Z"),
+        endTime: new Date("2026-08-01T16:00:00Z"),
+      },
+      BY_TEST
+    );
 
     await notifySessionChanged({
       before: withHost,
@@ -381,9 +434,13 @@ describe("notifySessionChanged", () => {
 
   it("emails the new and old location when only the location changes", async () => {
     const { roomB, session } = await setup();
-    const after = await getRepositories().sessions.update(session.id, {
-      locationIds: [roomB.id],
-    });
+    const after = await getRepositories().sessions.update(
+      session.id,
+      {
+        locationIds: [roomB.id],
+      },
+      BY_TEST
+    );
 
     await notifySessionChanged({
       before: session,
@@ -404,9 +461,13 @@ describe("notifySessionChanged", () => {
 
   it("does not email when neither time nor location changed", async () => {
     const { session } = await setup();
-    const after = await getRepositories().sessions.update(session.id, {
-      title: "Renamed Workshop",
-    });
+    const after = await getRepositories().sessions.update(
+      session.id,
+      {
+        title: "Renamed Workshop",
+      },
+      BY_TEST
+    );
 
     await notifySessionChanged({
       before: session,
@@ -428,10 +489,14 @@ describe("notifySessionChanged", () => {
       sessionId: session.id,
       guestId: optedOut.id,
     });
-    const after = await getRepositories().sessions.update(session.id, {
-      startTime: new Date("2026-08-01T15:00:00Z"),
-      endTime: new Date("2026-08-01T16:00:00Z"),
-    });
+    const after = await getRepositories().sessions.update(
+      session.id,
+      {
+        startTime: new Date("2026-08-01T15:00:00Z"),
+        endTime: new Date("2026-08-01T16:00:00Z"),
+      },
+      BY_TEST
+    );
 
     await notifySessionChanged({
       before: session,
@@ -447,11 +512,15 @@ describe("notifySessionChanged", () => {
   it("sends the change email to hosts added by the same change too", async () => {
     const { session } = await setup();
     const newHost = await createGuest({ email: "new-host@test.example" });
-    const after = await getRepositories().sessions.update(session.id, {
-      hostIds: [newHost.id],
-      startTime: new Date("2026-08-01T15:00:00Z"),
-      endTime: new Date("2026-08-01T16:00:00Z"),
-    });
+    const after = await getRepositories().sessions.update(
+      session.id,
+      {
+        hostIds: [newHost.id],
+        startTime: new Date("2026-08-01T15:00:00Z"),
+        endTime: new Date("2026-08-01T16:00:00Z"),
+      },
+      BY_TEST
+    );
 
     await notifySessionChanged({
       before: session,
@@ -680,9 +749,13 @@ describe("notifyCohostsAdded", () => {
       email: "opted-out@test.example",
       emailSettings: { rsvpChange: true, hostChange: true, cohostAdd: false },
     });
-    const after = await getRepositories().sessions.update(session.id, {
-      hostIds: [optedOut.id],
-    });
+    const after = await getRepositories().sessions.update(
+      session.id,
+      {
+        hostIds: [optedOut.id],
+      },
+      BY_TEST
+    );
 
     await notifyCohostsAdded({
       session: after,
@@ -1041,7 +1114,7 @@ describe("notifySessionCommented", () => {
     const { session } = await setup();
     const commenter = await createGuest({ email: "commenter@test.example" });
     const posted = await addComment(session.id, commenter.id, "Hello");
-    await getRepositories().sessions.delete(session.id);
+    await getRepositories().sessions.delete(session.id, BY_TEST);
 
     await expect(
       notifySessionCommented({

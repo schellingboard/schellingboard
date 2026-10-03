@@ -26,6 +26,7 @@ vi.mock("next/cache", () => ({
 }));
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { BY_TEST } from "../helpers/changes";
 import {
   createEvent,
   createDay,
@@ -228,7 +229,11 @@ describe("events repo", () => {
       const proposal = await createProposal(event.id, [guest.id]);
       const session = await createSession(event.id, { hostIds: [guest.id] });
       // link session to proposal
-      await repos.sessions.update(session.id, { proposalId: proposal.id });
+      await repos.sessions.update(
+        session.id,
+        { proposalId: proposal.id },
+        BY_TEST
+      );
 
       await repos.events.delete(event.id);
 

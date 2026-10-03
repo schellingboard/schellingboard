@@ -43,7 +43,10 @@ export async function POST(req: NextRequest) {
   const rsvpGuestIds = await rsvpGuestIdsToNotify(id);
 
   try {
-    await repos.sessions.delete(id);
+    await repos.sessions.delete(id, {
+      actor: { type: "guest", id: actor },
+      at: now,
+    });
     console.log(`Deleted session: ${id}`);
   } catch (err) {
     console.error(err);

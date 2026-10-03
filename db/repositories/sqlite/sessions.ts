@@ -16,6 +16,8 @@ import type {
   SessionsRepository,
   SessionUpdateInput,
 } from "../interfaces";
+import { changes, type ChangeContext } from "@schellingboard/domain/change";
+import { insertChange } from "./changes";
 import type {
   Session,
   SessionCreateInput,
@@ -248,6 +250,12 @@ export class SqliteSessionsRepository implements SessionsRepository {
   }
 
   async findById(id: string): Promise<Session | undefined> {
+    return this.findByIdSync(id);
+  }
+
+  // better-sqlite3 runs a transaction synchronously on this same connection,
+  // so this reads the transaction's own uncommitted writes.
+  private findByIdSync(id: string): Session | undefined {
     const row = this.db
       .select()
       .from(schema.sessions)
@@ -308,72 +316,105 @@ export class SqliteSessionsRepository implements SessionsRepository {
     return (await this.findById(id))!;
   }
 
-  async update(id: string, patch: SessionUpdateInput): Promise<Session> {
-    this.db.transaction((tx) => {
-      const values: Partial<typeof schema.sessions.$inferInsert> = {};
-      if (patch.title !== undefined) values.title = patch.title;
-      if (patch.description !== undefined)
-        values.description = patch.description;
-      if ("startTime" in patch)
-        values.startTime = patch.startTime?.toISOString() ?? null;
-      if ("endTime" in patch)
-        values.endTime = patch.endTime?.toISOString() ?? null;
-      if (patch.capacity !== undefined) values.capacity = patch.capacity;
-      if (patch.adminManaged !== undefined)
-        values.adminManaged = patch.adminManaged;
-      if (patch.blocker !== undefined) values.blocker = patch.blocker;
-      if (patch.closed !== undefined) values.closed = patch.closed;
-      if ("proposalId" in patch) values.proposalId = patch.proposalId ?? null;
-      if (patch.eventId !== undefined) values.eventId = patch.eventId;
+  async update(
+    id: string,
+    patch: SessionUpdateInput,
+    by: ChangeContext
+  ): Promise<Session> {
+    this.db.transaction(
+      (tx) => {
+        const before = this.findByIdSync(id);
+        const values: Partial<typeof schema.sessions.$inferInsert> = {};
+        if (patch.title !== undefined) values.title = patch.title;
+        if (patch.description !== undefined)
+          values.description = patch.description;
+        if ("startTime" in patch)
+          values.startTime = patch.startTime?.toISOString() ?? null;
+        if ("endTime" in patch)
+          values.endTime = patch.endTime?.toISOString() ?? null;
+        if (patch.capacity !== undefined) values.capacity = patch.capacity;
+        if (patch.adminManaged !== undefined)
+          values.adminManaged = patch.adminManaged;
+        if (patch.blocker !== undefined) values.blocker = patch.blocker;
+        if (patch.closed !== undefined) values.closed = patch.closed;
+        if ("proposalId" in patch) values.proposalId = patch.proposalId ?? null;
+        if (patch.eventId !== undefined) values.eventId = patch.eventId;
 
-      if (Object.keys(values).length > 0) {
-        tx.update(schema.sessions)
-          .set(values)
-          .where(eq(schema.sessions.id, id))
-          .run();
-      }
-
-      if (patch.hostIds !== undefined) {
-        tx.delete(schema.sessionHosts)
-          .where(eq(schema.sessionHosts.sessionId, id))
-          .run();
-        for (const guestId of patch.hostIds) {
-          tx.insert(schema.sessionHosts)
-            .values({ sessionId: id, guestId })
+        if (Object.keys(values).length > 0) {
+          tx.update(schema.sessions)
+            .set(values)
+            .where(eq(schema.sessions.id, id))
             .run();
         }
-        // Hosts don't RSVP to their own session, so any of the new hosts'
-        // existing RSVPs are removed here too.
-        if (patch.hostIds.length > 0) {
-          tx.delete(schema.rsvps)
-            .where(
-              and(
-                eq(schema.rsvps.sessionId, id),
-                inArray(schema.rsvps.guestId, patch.hostIds)
+
+        if (patch.hostIds !== undefined) {
+          tx.delete(schema.sessionHosts)
+            .where(eq(schema.sessionHosts.sessionId, id))
+            .run();
+          for (const guestId of patch.hostIds) {
+            tx.insert(schema.sessionHosts)
+              .values({ sessionId: id, guestId })
+              .run();
+          }
+          // Hosts don't RSVP to their own session, so any of the new hosts'
+          // existing RSVPs are removed here too.
+          if (patch.hostIds.length > 0) {
+            tx.delete(schema.rsvps)
+              .where(
+                and(
+                  eq(schema.rsvps.sessionId, id),
+                  inArray(schema.rsvps.guestId, patch.hostIds)
+                )
               )
-            )
-            .run();
+              .run();
+          }
         }
-      }
 
-      if (patch.locationIds !== undefined) {
-        tx.delete(schema.sessionLocations)
-          .where(eq(schema.sessionLocations.sessionId, id))
-          .run();
-        for (const locationId of patch.locationIds) {
-          tx.insert(schema.sessionLocations)
-            .values({ sessionId: id, locationId })
+        if (patch.locationIds !== undefined) {
+          tx.delete(schema.sessionLocations)
+            .where(eq(schema.sessionLocations.sessionId, id))
             .run();
+          for (const locationId of patch.locationIds) {
+            tx.insert(schema.sessionLocations)
+              .values({ sessionId: id, locationId })
+              .run();
+          }
         }
-      }
-    });
+
+        const after = this.findByIdSync(id);
+        if (
+          before &&
+          after &&
+          JSON.stringify(before) !== JSON.stringify(after)
+        ) {
+          insertChange(tx, changes.sessionChanged(before, after, by));
+        }
+        // Immediate: the read above would otherwise take the write lock late,
+        // and a second process on the same file would get SQLITE_BUSY.
+      },
+      { behavior: "immediate" }
+    );
     return (await this.findById(id))!;
   }
 
-  async delete(id: string): Promise<void> {
-    // rsvps, session_hosts and session_locations are removed by ON DELETE
-    // CASCADE.
-    this.db.delete(schema.sessions).where(eq(schema.sessions.id, id)).run();
+  async delete(id: string, by: ChangeContext): Promise<void> {
+    this.db.transaction(
+      (tx) => {
+        const session = this.findByIdSync(id);
+        if (!session) return;
+        const rsvpGuestIds = tx
+          .select({ guestId: schema.rsvps.guestId })
+          .from(schema.rsvps)
+          .where(eq(schema.rsvps.sessionId, id))
+          .all()
+          .map((row) => row.guestId);
+        // rsvps, session_hosts and session_locations are removed by ON DELETE
+        // CASCADE.
+        tx.delete(schema.sessions).where(eq(schema.sessions.id, id)).run();
+        insertChange(tx, changes.sessionDeleted(session, rsvpGuestIds, by));
+      },
+      { behavior: "immediate" }
+    );
   }
 
   async findLocationConflict(

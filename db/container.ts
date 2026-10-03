@@ -4,6 +4,7 @@ import path from "path";
 import * as schema from "./schema";
 import { resolveDbPath, runMigrations } from "./migrate";
 import { SqliteAuthCodesRepository } from "./repositories/sqlite/auth-codes";
+import { SqliteChangesRepository } from "./repositories/sqlite/changes";
 import {
   SqliteCommentsRepository,
   sqliteSubjectCommentsRepository,
@@ -26,6 +27,7 @@ import { SqliteSessionsRepository } from "./repositories/sqlite/sessions";
 import { SqliteVotesRepository } from "./repositories/sqlite/votes";
 import type {
   AuthCodesRepository,
+  ChangesRepository,
   CommentsRepository,
   DaysRepository,
   EventsRepository,
@@ -48,6 +50,7 @@ import type {
 
 export type Repositories = {
   authCodes: AuthCodesRepository;
+  changes: ChangesRepository;
   /** Scope-agnostic comment operations (find, edit, like, delete). */
   comments: CommentsRepository;
   proposalComments: SubjectCommentsRepository;
@@ -78,6 +81,7 @@ function buildRepositories(sqlite: Database.Database): Repositories {
   const db = drizzle(sqlite, { schema });
   return {
     authCodes: new SqliteAuthCodesRepository(db),
+    changes: new SqliteChangesRepository(db),
     comments: new SqliteCommentsRepository(db),
     proposalComments: sqliteSubjectCommentsRepository(db, "proposal"),
     sessionComments: sqliteSubjectCommentsRepository(db, "session"),

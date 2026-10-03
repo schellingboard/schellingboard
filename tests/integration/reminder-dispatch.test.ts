@@ -16,6 +16,7 @@ vi.mock("@/utils/mailer", () => ({
 
 import Database from "better-sqlite3";
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { BY_TEST } from "../helpers/changes";
 import { createEvent, createGuest, createLocation } from "../helpers/factories";
 import { getRepositories, serializeDb } from "@/db/container";
 import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
@@ -288,10 +289,14 @@ describe("dispatchDueReminders", () => {
     vi.mocked(isMailerConfigured).mockReturnValue(true);
     expect((await dispatchDueReminders(HEADS_UP_AT)).sent).toBe(0);
 
-    await getRepositories().sessions.update(session.id, {
-      startTime: later(START, 3),
-      endTime: later(END, 3),
-    });
+    await getRepositories().sessions.update(
+      session.id,
+      {
+        startTime: later(START, 3),
+        endTime: later(END, 3),
+      },
+      BY_TEST
+    );
     expect((await dispatchDueReminders(later(HEADS_UP_AT, 3))).sent).toBe(2);
     expect(recipients()).toEqual([FIRST, SECOND].sort());
   });
@@ -301,7 +306,7 @@ describe("dispatchDueReminders", () => {
     await dispatchDueReminders(HEADS_UP_AT);
     expect(reminderRowCount(session.id)).toBe(2);
 
-    await getRepositories().sessions.delete(session.id);
+    await getRepositories().sessions.delete(session.id, BY_TEST);
 
     expect(reminderRowCount(session.id)).toBe(0);
   });
@@ -356,10 +361,14 @@ describe("dispatchDueReminders", () => {
       storedReminder(session.id, first.id, "followUp")?.sent_at
     ).not.toBeNull();
 
-    await getRepositories().sessions.update(session.id, {
-      startTime: later(START, 3),
-      endTime: later(END, 3),
-    });
+    await getRepositories().sessions.update(
+      session.id,
+      {
+        startTime: later(START, 3),
+        endTime: later(END, 3),
+      },
+      BY_TEST
+    );
     vi.mocked(isMailerConfigured).mockReturnValue(false);
     await dispatchDueReminders(later(FOLLOW_UP_AT, 3));
 
@@ -432,10 +441,14 @@ describe("dispatchDueReminders", () => {
       const { session, first } = await twoHostSession();
       await dispatchDueReminders(FOLLOW_UP_AT);
 
-      await getRepositories().sessions.update(session.id, {
-        startTime: later(START, 3),
-        endTime: later(END, 3),
-      });
+      await getRepositories().sessions.update(
+        session.id,
+        {
+          startTime: later(START, 3),
+          endTime: later(END, 3),
+        },
+        BY_TEST
+      );
       await dispatchDueReminders(later(FOLLOW_UP_AT, 3));
 
       expect(await reminderNotices(first.id)).toHaveLength(2);

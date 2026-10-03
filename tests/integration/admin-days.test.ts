@@ -26,6 +26,7 @@ vi.mock("next/cache", () => ({
 }));
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { BY_TEST } from "../helpers/changes";
 import { createEvent, createDay, createSession } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { createAdminAuthCookie } from "@/utils/auth";
@@ -101,10 +102,14 @@ describe("days repo", () => {
       });
       // Session fully within the day window
       const session = await createSession(event.id);
-      await getRepositories().sessions.update(session.id, {
-        startTime: new Date("2026-10-01T10:00:00Z"),
-        endTime: new Date("2026-10-01T11:00:00Z"),
-      });
+      await getRepositories().sessions.update(
+        session.id,
+        {
+          startTime: new Date("2026-10-01T10:00:00Z"),
+          endTime: new Date("2026-10-01T11:00:00Z"),
+        },
+        BY_TEST
+      );
 
       await getRepositories().days.delete(day.id);
 
@@ -121,10 +126,14 @@ describe("days repo", () => {
       });
       // Session starts inside the window but runs past the day end.
       const session = await createSession(event.id);
-      await getRepositories().sessions.update(session.id, {
-        startTime: new Date("2026-10-01T17:00:00Z"),
-        endTime: new Date("2026-10-01T19:00:00Z"),
-      });
+      await getRepositories().sessions.update(
+        session.id,
+        {
+          startTime: new Date("2026-10-01T17:00:00Z"),
+          endTime: new Date("2026-10-01T19:00:00Z"),
+        },
+        BY_TEST
+      );
 
       await getRepositories().days.delete(day.id);
 
@@ -141,10 +150,14 @@ describe("days repo", () => {
       });
       // Session on a different day
       const session = await createSession(event.id);
-      await getRepositories().sessions.update(session.id, {
-        startTime: new Date("2026-10-02T10:00:00Z"),
-        endTime: new Date("2026-10-02T11:00:00Z"),
-      });
+      await getRepositories().sessions.update(
+        session.id,
+        {
+          startTime: new Date("2026-10-02T10:00:00Z"),
+          endTime: new Date("2026-10-02T11:00:00Z"),
+        },
+        BY_TEST
+      );
 
       await getRepositories().days.delete(day.id);
 
@@ -405,10 +418,14 @@ describe("day actions", () => {
       const session = await createSession(event.id, {
         title: "Outside Session",
       });
-      await getRepositories().sessions.update(session.id, {
-        startTime: new Date("2026-10-01T16:00:00Z"),
-        endTime: new Date("2026-10-01T17:00:00Z"),
-      });
+      await getRepositories().sessions.update(
+        session.id,
+        {
+          startTime: new Date("2026-10-01T16:00:00Z"),
+          endTime: new Date("2026-10-01T17:00:00Z"),
+        },
+        BY_TEST
+      );
 
       const result = await updateDayAction({
         id: day.id,
@@ -433,10 +450,14 @@ describe("day actions", () => {
         end: new Date("2026-10-01T18:00:00Z"),
       });
       const session = await createSession(event.id);
-      await getRepositories().sessions.update(session.id, {
-        startTime: new Date("2026-10-01T10:00:00Z"),
-        endTime: new Date("2026-10-01T11:00:00Z"),
-      });
+      await getRepositories().sessions.update(
+        session.id,
+        {
+          startTime: new Date("2026-10-01T10:00:00Z"),
+          endTime: new Date("2026-10-01T11:00:00Z"),
+        },
+        BY_TEST
+      );
 
       const result = await updateDayAction({
         id: day.id,

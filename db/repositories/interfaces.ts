@@ -1,4 +1,8 @@
 import type { AuthCodePurpose, AuthCode } from "@schellingboard/domain/auth";
+import type {
+  ChangeContext,
+  RecordedChange,
+} from "@schellingboard/domain/change";
 import type { Comment } from "@schellingboard/domain/comment";
 import type {
   Event,
@@ -408,10 +412,16 @@ export interface SessionsRepository {
   create(data: SessionCreateInput): Promise<Session>;
   /**
    * When `hostIds` is given, any RSVPs by the session's hosts are removed
-   * in the same transaction: hosts don't RSVP to their own session.
+   * in the same transaction: hosts don't RSVP to their own session. Records
+   * the session before and after in the change log, in that transaction too.
    */
-  update(id: string, patch: SessionUpdateInput): Promise<Session>;
-  delete(id: string): Promise<void>;
+  update(
+    id: string,
+    patch: SessionUpdateInput,
+    by: ChangeContext
+  ): Promise<Session>;
+  /** Records the deletion, with the guests who had RSVPed, in the change log. */
+  delete(id: string, by: ChangeContext): Promise<void>;
   /**
    * Finds a scheduled session in the event that overlaps [start, end) and
    * shares at least one of the given locations, excluding `excludeId`. Used
@@ -799,4 +809,9 @@ export interface PushRepository {
    * already handed out, and nothing tells a browser to ask for a new one.
    */
   vapidKeys(generate: () => VapidKeys, now: Date): Promise<VapidKeys>;
+}
+
+export interface ChangesRepository {
+  /** Up to `limit` changes recorded after `seq`, oldest first. */
+  listAfter(seq: number, limit?: number): Promise<RecordedChange[]>;
 }

@@ -160,27 +160,31 @@ export async function adminUpdateSessionAction(
   );
   if (conflict) return { ok: false, error: conflict };
 
+  const now = await serverNow();
   let updated;
   try {
-    updated = await sessions.update(input.id, {
-      title,
-      description: input.description.trim(),
-      startTime: range.start,
-      endTime: range.end,
-      capacity: input.capacity,
-      adminManaged: input.adminManaged,
-      blocker: input.blocker,
-      closed: input.closed,
-      hostIds: input.hostIds,
-      locationIds: input.locationIds,
-    });
+    updated = await sessions.update(
+      input.id,
+      {
+        title,
+        description: input.description.trim(),
+        startTime: range.start,
+        endTime: range.end,
+        capacity: input.capacity,
+        adminManaged: input.adminManaged,
+        blocker: input.blocker,
+        closed: input.closed,
+        hostIds: input.hostIds,
+        locationIds: input.locationIds,
+      },
+      { actor: { type: "admin" }, at: now }
+    );
   } catch {
     return { ok: false, error: "Failed to update session" };
   }
 
   await revalidateEventPaths(session.eventId);
 
-  const now = await serverNow();
   await notifyCohostsAdded({
     now,
     session: updated,
@@ -206,15 +210,15 @@ export async function adminDeleteSessionAction(input: {
   if (!session) return { ok: false, error: "Session not found" };
 
   const rsvpGuestIds = await rsvpGuestIdsToNotify(input.id);
+  const now = await serverNow();
 
   try {
-    await sessions.delete(input.id);
+    await sessions.delete(input.id, { actor: { type: "admin" }, at: now });
   } catch {
     return { ok: false, error: "Failed to delete session" };
   }
 
   await revalidateEventPaths(session.eventId);
-  const now = await serverNow();
   await notifySessionDeleted({
     now,
     session,

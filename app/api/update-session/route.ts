@@ -186,7 +186,10 @@ export async function POST(req: NextRequest) {
   if (sessionValid) {
     let updated;
     try {
-      updated = await repos.sessions.update(params.id, input);
+      updated = await repos.sessions.update(params.id, input, {
+        actor: { type: "guest", id: actor },
+        at: now,
+      });
       console.log(updated.id);
     } catch (err) {
       console.error(err);

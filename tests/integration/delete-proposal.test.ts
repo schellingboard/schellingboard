@@ -40,6 +40,7 @@ vi.mock("next/headers", () => ({
 }));
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { BY_TEST } from "../helpers/changes";
 import { siteAuthenticate } from "../helpers/site-auth";
 import {
   createEvent,
@@ -113,7 +114,11 @@ describe("deleteProposal", () => {
     });
 
     const session = await createSession(event.id, { hostIds: [host.id] });
-    await repos.sessions.update(session.id, { proposalId: proposal.id });
+    await repos.sessions.update(
+      session.id,
+      { proposalId: proposal.id },
+      BY_TEST
+    );
 
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(host.id));
     expect(await deleteAndFollowRedirect(proposal.id, "test-event")).toBe(

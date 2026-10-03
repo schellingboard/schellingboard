@@ -18,6 +18,7 @@ vi.mock("next/cache", () => ({
 }));
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { BY_TEST } from "../helpers/changes";
 import { siteAuthenticate } from "../helpers/site-auth";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
@@ -187,9 +188,13 @@ describe("attendee count server action", () => {
     const event = await createEvent({ phase: "scheduling" });
     const host = await createGuest({ eventId: event.id });
     const session = await finishedSession(event.id, [host.id]);
-    await getRepositories().sessions.update(session.id, {
-      adminManaged: true,
-    });
+    await getRepositories().sessions.update(
+      session.id,
+      {
+        adminManaged: true,
+      },
+      BY_TEST
+    );
     actAs(host.id);
 
     expect(await setAttendeeCountAction(session.id, "7")).toEqual({
@@ -225,7 +230,7 @@ describe("attendee count server action", () => {
     await setAttendeeCountAction(session.id, "12");
 
     const { sessions } = getRepositories();
-    await sessions.delete(session.id);
+    await sessions.delete(session.id, BY_TEST);
 
     expect(await sessions.findById(session.id)).toBeUndefined();
     expect(await sessions.getAttendeeCount(session.id)).toBeNull();

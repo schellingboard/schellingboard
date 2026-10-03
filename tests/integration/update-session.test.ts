@@ -18,6 +18,7 @@ vi.mock("@/utils/mailer", () => ({
 import { render } from "@react-email/render";
 import { sendMail } from "@/utils/mailer";
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { BY_TEST } from "../helpers/changes";
 import {
   createEvent,
   createGuest,
@@ -1292,9 +1293,13 @@ describe("POST /api/update-session", () => {
       const { event, host, annex, rooms, day, session, roomIds } =
         await placeInTwoRooms();
       const { sessions, locations } = getRepositories();
-      await sessions.update(session.id, {
-        locationIds: [...rooms, annex].map((r) => r.id),
-      });
+      await sessions.update(
+        session.id,
+        {
+          locationIds: [...rooms, annex].map((r) => r.id),
+        },
+        BY_TEST
+      );
       await locations.removeFromEvent(event.id, [annex.id]);
 
       const res = await POST(

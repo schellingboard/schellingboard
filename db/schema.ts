@@ -638,3 +638,25 @@ export const pushKeys = sqliteTable("push_keys", {
   privateKey: text("private_key").notNull(),
   createdAt: text("created_at").notNull(),
 });
+
+// The change log (ADR 0011). No foreign keys: an entry outlives the row it
+// describes.
+export const changes = sqliteTable(
+  "changes",
+  {
+    seq: integer("seq").primaryKey({ autoIncrement: true }),
+    id: text("id").notNull().unique(),
+    eventId: text("event_id"),
+    type: text("type").notNull(),
+    subjectType: text("subject_type").notNull(),
+    subjectId: text("subject_id").notNull(),
+    actorType: text("actor_type").notNull(),
+    actorId: text("actor_id"),
+    occurredAt: text("occurred_at").notNull(),
+    payload: text("payload", { mode: "json" }).notNull(),
+  },
+  (t) => [
+    index("changes_event_seq_idx").on(t.eventId, t.seq),
+    index("changes_subject_idx").on(t.subjectType, t.subjectId, t.seq),
+  ]
+);
