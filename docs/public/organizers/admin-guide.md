@@ -93,13 +93,15 @@ Attendees are only ever offered the locations assigned to the event they are
 in and that are bookable — everything else is refused. To take a location off
 an event's grid without deleting it, unassign it from the event.
 
-### Room availability
+### Location unavailability
 
-Below the assignments on the event's "Locations" tab, mark the times a room
-can't be used at this event — a room only free on Saturday, or closed in the
-afternoon. Pick the room and a start and end, or fill in a whole day with one
-click. Attendees aren't offered those slots, and the grid shows them empty, as
-before bookings open. You can still place a session there yourself.
+Below the assignments on the event's "Locations" tab, mark the times a
+location can't be used at this event — a room only free on Saturday, or closed
+in the afternoon. Tick one or more locations (or **All locations**) and pick a
+start and end, or fill in a whole day with one click. Each ticked location gets
+its own entry.
+Attendees aren't offered those slots, and the grid shows them empty, as before
+bookings open. You can still place a session there yourself.
 
 Use this rather than a **blocker** session when attendees don't need to know
 why. Something they should see on their schedule, such as lunch, stays a

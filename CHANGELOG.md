@@ -14,8 +14,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - **Longer 1-on-1s**: when you ask someone for a 1-on-1 you can choose its length, such as
   50 minutes instead of 20, as long as they are free for all of it.
-- **Room availability** (#1059): organizers can mark when a room can't be used, such as a
-  room only free on Saturday, instead of filling the grid with blocker sessions.
+- **Location unavailability** (#1059): organizers can mark when locations can't be used,
+  several at once, such as a room only free on Saturday, instead of filling the grid with
+  blockers.
 - **Sessions at any minute, with or without a break**: organizers can place a session at
   any time, not just on the schedule's slots, and leave out the break before one, such as
   an opening keynote.
