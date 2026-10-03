@@ -36,7 +36,7 @@ import {
 import { POST as addPOST } from "@/app/api/add-session/route";
 import { POST } from "@/app/api/update-session/route";
 import type { SessionParams } from "@/app/api/session-form-utils";
-import type { Session } from "@/db/repositories/interfaces";
+import type { Session } from "@schellingboard/domain/session";
 import type { Location } from "@schellingboard/domain/location";
 import type { Guest } from "@schellingboard/domain/guest";
 import type { Day } from "@schellingboard/domain/event";

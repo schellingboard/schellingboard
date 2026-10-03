@@ -4,7 +4,8 @@ import {
   type EmailSettings,
   type Guest,
 } from "@schellingboard/domain/guest";
-import type { Session, SessionProposal } from "@/db/repositories/interfaces";
+import type { SessionProposal } from "@/db/repositories/interfaces";
+import type { Session } from "@schellingboard/domain/session";
 import type {
   Location,
   LocationUnavailability,

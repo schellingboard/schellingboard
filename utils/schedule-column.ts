@@ -1,4 +1,4 @@
-import type { Session } from "@/db/repositories/interfaces";
+import type { Session } from "@schellingboard/domain/session";
 import { gridBlockPx } from "@/utils/slots";
 
 export type ColumnItem =

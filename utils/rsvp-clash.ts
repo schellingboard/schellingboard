@@ -1,4 +1,4 @@
-import type { Session } from "@/db/repositories/interfaces";
+import type { Session } from "@schellingboard/domain/session";
 import { sessionsOverlap } from "@/app/(site)/session_utils";
 import type { MeetingView } from "./meeting-views";
 

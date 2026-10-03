@@ -1,4 +1,4 @@
-import type { Session } from "@/db/repositories/interfaces";
+import type { Session } from "@schellingboard/domain/session";
 import { meetingTitle } from "@/utils/meeting-rules";
 import type { MeetingView } from "@/utils/meeting-views";
 import { containsIgnoringAccents } from "@/utils/utils";

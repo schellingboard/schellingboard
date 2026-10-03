@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { ClockIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { UserIcon, AcademicCapIcon } from "@heroicons/react/24/solid";
-import type { Session } from "@/db/repositories/interfaces";
+import type { Session } from "@schellingboard/domain/session";
 import type { Location } from "@schellingboard/domain/location";
 import type { Guest } from "@schellingboard/domain/guest";
 import type { DayWithSessions } from "@/app/(site)/context";

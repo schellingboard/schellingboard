@@ -19,7 +19,8 @@ import { gridEndingDurations, snapDurationToSlots } from "@/utils/slots";
 import { slotIsFree } from "@/utils/schedule-column";
 import { MyListbox, type Option } from "./select";
 import { viewProposalLinkFromElsewhere } from "./modal-nav";
-import type { Session, SessionProposal } from "@/db/repositories/interfaces";
+import type { SessionProposal } from "@/db/repositories/interfaces";
+import type { Session } from "@schellingboard/domain/session";
 import type {
   Location,
   LocationUnavailability,

@@ -8,7 +8,8 @@ import {
   useContext,
 } from "react";
 import { usePathname } from "next/navigation";
-import type { Session, Rsvp } from "@/db/repositories/interfaces";
+import type { Rsvp } from "@/db/repositories/interfaces";
+import type { Session } from "@schellingboard/domain/session";
 import type {
   Location,
   LocationUnavailability,

@@ -12,14 +12,16 @@ import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
 import * as schema from "../../schema";
 import type {
-  Session,
-  SessionCreateInput,
-  SessionHost,
-  SessionLocation,
   SessionPage,
   SessionsRepository,
   SessionUpdateInput,
 } from "../interfaces";
+import type {
+  Session,
+  SessionCreateInput,
+  SessionHost,
+  SessionLocation,
+} from "@schellingboard/domain/session";
 
 type DB = BetterSQLite3Database<typeof schema>;
 type SessionRow = typeof schema.sessions.$inferSelect;

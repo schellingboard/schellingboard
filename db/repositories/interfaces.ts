@@ -1,4 +1,8 @@
 import type {
+  Session,
+  SessionCreateInput,
+} from "@schellingboard/domain/session";
+import type {
   Location,
   LocationUnavailability,
 } from "@schellingboard/domain/location";
@@ -365,41 +369,6 @@ export interface LocationsRepository {
 }
 
 // ── Sessions ──────────────────────────────────────────────────────────────────
-
-export type SessionHost = Pick<Guest, "id" | "name">;
-export type SessionLocation = Pick<Location, "id" | "name" | "color">;
-
-export type Session = {
-  id: string;
-  title: string;
-  description: string;
-  startTime?: Date;
-  endTime?: Date;
-  capacity: number;
-  adminManaged: boolean;
-  blocker: boolean;
-  closed: boolean;
-  proposalId?: string;
-  eventId: string;
-  hosts: SessionHost[];
-  locations: SessionLocation[];
-  numRsvps: number;
-};
-
-export type SessionCreateInput = {
-  title: string;
-  description: string;
-  startTime?: Date;
-  endTime?: Date;
-  capacity: number;
-  adminManaged: boolean;
-  blocker: boolean;
-  closed: boolean;
-  proposalId?: string;
-  eventId: string;
-  hostIds: string[];
-  locationIds: string[];
-};
 
 export type SessionUpdateInput = Partial<
   Omit<SessionCreateInput, "hostIds" | "locationIds">

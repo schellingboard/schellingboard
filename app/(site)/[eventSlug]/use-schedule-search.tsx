@@ -10,7 +10,7 @@ import {
   type RefObject,
 } from "react";
 import { useSearchParams } from "next/navigation";
-import type { Session } from "@/db/repositories/interfaces";
+import type { Session } from "@schellingboard/domain/session";
 import type { Location } from "@schellingboard/domain/location";
 import type { MeetingView } from "@/utils/meeting-views";
 import { EventContext, UserContext, type DayWithSessions } from "../context";

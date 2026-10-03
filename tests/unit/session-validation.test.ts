@@ -4,7 +4,10 @@ import {
   sessionCapacityError,
   validateSession,
 } from "@/app/api/session-form-utils";
-import type { Session, SessionCreateInput } from "@/db/repositories/interfaces";
+import type {
+  Session,
+  SessionCreateInput,
+} from "@schellingboard/domain/session";
 
 const LOC_A = "loc-a";
 const LOC_B = "loc-b";
