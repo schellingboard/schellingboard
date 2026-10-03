@@ -20,9 +20,9 @@ so the user should be taken to the schedule page instead,
 which is the same as removing the session-specific query param from the URL.
 
 To summarize:
-* When linking the details modal from its owning page (proposal from the proposals list,
-  session from the schedule), use `<Link {...viewFooLinkFromOwner(...)}>`. It intercepts the
-  navigation to set dismiss mode to "back".
+* When linking the details modal from its owning page (proposal from the proposals list or
+  Quick Voting, session from the schedule), use `<Link {...viewFooLinkFromOwner(...)}>`. It
+  intercepts the navigation to set dismiss mode to "back".
 * When linking from a different page, use `<Link {...viewFooLinkFromElsewhere(...)}>`. There is no
   in-place open and no history entry of ours to pop, so it sets the dismiss mode to "replace".
 * When the modal is opened by a server-action redirect rather than a link (the notification
