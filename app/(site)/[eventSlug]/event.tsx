@@ -1,11 +1,8 @@
 "use client";
-import { ScheduleToolbar } from "./schedule-toolbar";
+import { ScheduleToolbar, scheduleView } from "./schedule-toolbar";
 import { GridView } from "./grid-view";
 import { useSearchParams } from "next/navigation";
-import { DayText } from "./day-text";
 import { AgendaView } from "./agenda-view";
-import { DayFoldBar } from "./day-fold-bar";
-import { SearchInput } from "@/app/search-input";
 import { useState, useContext, useRef } from "react";
 import { EventContext, useSlotIncrement } from "../context";
 import { getDefaultFoldedDayIds } from "@/utils/schedule-fold";
@@ -18,13 +15,11 @@ import { MeetingsProvider } from "./use-meetings";
 import { useDragToPan } from "./use-drag-to-pan";
 import { PullToRefresh } from "./pull-to-refresh";
 import { useScrollRestoration } from "./use-scroll-restoration";
-import Footer from "@/app/footer";
 
 export function EventDisplay() {
-  const { event, days, locations, guests, rsvps, now } =
-    useContext(EventContext);
+  const { event, days, locations, guests, now } = useContext(EventContext);
   const searchParams = useSearchParams();
-  const view = searchParams.get("view") ?? "grid";
+  const view = scheduleView(searchParams);
   const viewSession = searchParams.get("viewSession");
   const kiosk = useKioskMode();
   const [search, setSearch] = useState("");
@@ -35,7 +30,7 @@ export function EventDisplay() {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const slotIncrement = useSlotIncrement();
   useDragToPan(scrollerRef, view === "grid");
-  // Per view: the grid and the text list have nothing in common to scroll to.
+  // Per view: the grid and the agenda have nothing in common to scroll to.
   useScrollRestoration(scrollerRef, `${event?.slug ?? ""}:${view}`);
 
   if (!event) return <div>No event data available</div>;
@@ -53,17 +48,13 @@ export function EventDisplay() {
     });
   const locationsForEvent = locations;
 
-  // "Now" only makes sense while the event is running, and only in the grid
-  // and the agenda: it scrolls to the now line, which they draw on the day the
-  // current moment falls inside.
+  // "Now" only makes sense while the event is running: it scrolls to the now
+  // line, drawn on the day the current moment falls inside.
   const nowIsOnSchedule = daysForEvent.some(
     (day) => getNowOffsetPx(day, now, slotIncrement) !== null
   );
   const toolbar = (
-    <ScheduleToolbar
-      event={event}
-      showJumpToNow={(view === "grid" || view === "agenda") && nowIsOnSchedule}
-    />
+    <ScheduleToolbar event={event} showJumpToNow={nowIsOnSchedule} />
   );
 
   // Both views own the viewport below the nav bar via the same fixed frame, so
@@ -73,30 +64,8 @@ export function EventDisplay() {
   // only the sticky room headers pinned in the grid view. globals.css locks
   // window scrolling and hides the site footer while [data-schedule-frame] is
   // mounted; a footer copy is rendered below instead.
-  //
-  // That copy follows the site-wide footer (see Footer): on wide screens the
-  // text and RSVP views pin it to the bottom of the frame, so it stays visible
-  // and isn't left mid-page when the content is short — a handful of RSVPs,
-  // say — while narrower screens end the scrolled content with it. The grid
-  // never pins it: it can overflow horizontally, where a pinned footer costs a
-  // second scrollbar for little gain.
   const scheduleBody =
-    view === "grid" ? (
-      <GridView
-        days={daysForEvent}
-        locations={locationsForEvent}
-        guests={guests}
-        timezone={event.timezone}
-        toolbar={toolbar}
-        scrollerRef={scrollerRef}
-        defaultFoldedDayIds={defaultFoldedDayIds}
-        isFolded={isFolded}
-        onToggleFold={toggleDayFold}
-        search={search}
-        debouncedSearch={debouncedSearch}
-        onSearchChange={setSearch}
-      />
-    ) : view === "agenda" ? (
+    view === "agenda" ? (
       <AgendaView
         days={daysForEvent}
         locations={locationsForEvent}
@@ -112,54 +81,20 @@ export function EventDisplay() {
         onSearchChange={setSearch}
       />
     ) : (
-      <div
-        data-testid="schedule-scroll"
-        ref={scrollerRef}
-        className="flex-1 w-full overflow-auto flex flex-col items-stretch"
-      >
-        {toolbar}
-        <SearchInput
-          className="max-w-3xl w-full my-5 mx-auto"
-          inputClassName="h-12 rounded-md border border-line bg-surface-raised px-4 shadow-sm placeholder-fg-subtle focus:outline-0 focus:ring-2 focus:ring-brand-accent focus:border-transparent"
-          placeholder="Search sessions"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          onClear={() => setSearch("")}
-        />
-        {/* `lg:grow` fills the frame when there is little to show, so the
-            footer below lands at its bottom rather than mid-page. */}
-        <div className="flex flex-col gap-12 w-full lg:grow">
-          {daysForEvent.map((day) => (
-            <div key={day.id}>
-              {defaultFoldedDayIds.has(day.id) && (
-                <div className="max-w-3xl mx-auto">
-                  <DayFoldBar
-                    day={day}
-                    timezone={event.timezone}
-                    folded={isFolded(day.id)}
-                    onToggle={() => toggleDayFold(day.id)}
-                  />
-                </div>
-              )}
-              {!isFolded(day.id) && (
-                <DayText
-                  day={day}
-                  search={debouncedSearch}
-                  locations={locationsForEvent}
-                  rsvps={rsvps}
-                  rsvpOnly={view === "rsvp"}
-                  eventSlug={event.slug}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-        {/* Sticky rather than a row of the frame: pinned to the bottom of the
-            scroll surface on wide screens, plain end-of-content below lg. */}
-        <div className="lg:sticky lg:bottom-0">
-          <Footer inline />
-        </div>
-      </div>
+      <GridView
+        days={daysForEvent}
+        locations={locationsForEvent}
+        guests={guests}
+        timezone={event.timezone}
+        toolbar={toolbar}
+        scrollerRef={scrollerRef}
+        defaultFoldedDayIds={defaultFoldedDayIds}
+        isFolded={isFolded}
+        onToggleFold={toggleDayFold}
+        search={search}
+        debouncedSearch={debouncedSearch}
+        onSearchChange={setSearch}
+      />
     );
 
   return (

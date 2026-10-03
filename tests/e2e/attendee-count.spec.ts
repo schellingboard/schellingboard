@@ -1,7 +1,6 @@
 import { Page } from "@playwright/test";
 import { DateTime } from "luxon";
 import { test, expect } from "./helpers/fixtures";
-import { switchToView } from "./helpers/schedule";
 import { login } from "./helpers/auth";
 import { setDevClock } from "./helpers/dev-clock";
 import { selectUser } from "./helpers/user";
@@ -232,10 +231,6 @@ test("the schedule no longer nags a host about uncounted sessions", async ({
     name: /sessions you haven.t counted/i,
   });
 
-  // Both schedule views mounted the prompt, so check both: deleting one render
-  // site would pass a test that only looked at the other.
-  await expect(prompt).toHaveCount(0);
-  await switchToView(page, "Text");
   await expect(prompt).toHaveCount(0);
 });
 

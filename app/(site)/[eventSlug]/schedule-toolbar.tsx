@@ -6,8 +6,6 @@ import {
   CalendarIcon,
   ClipboardDocumentListIcon,
   ClockIcon,
-  DocumentTextIcon,
-  FlagIcon,
   InformationCircleIcon,
   LinkIcon,
   QueueListIcon,
@@ -24,8 +22,12 @@ import type { Event } from "@/db/repositories/interfaces";
 const ITEM_CLASS =
   "flex items-center gap-1 rounded-md py-1.5 px-1 text-xs sm:text-sm text-fg-subtle hover:text-brand-fg focus:outline-none focus:ring-2 focus:ring-brand-accent";
 
+// Links to the retired Text and RSVP'd views (?view=text, ?view=rsvp) land on the grid.
+export const scheduleView = (searchParams: Pick<URLSearchParams, "get">) =>
+  searchParams.get("view") === "agenda" ? "agenda" : "grid";
+
 // Slim single-row (wrapping on mobile) header for the schedule views. The view
-// toggle (Grid/Agenda/Text/RSVP'd) sits next to "Now", which jumps the grid
+// toggle (Grid/Agenda) sits next to "Now", which jumps the grid
 // or agenda to the current time, and two distinct navigation links — "Event details" (opens a
 // popup with dates/description) and "Proposals". The event name is
 // intentionally omitted: the site header already shows it.
@@ -122,7 +124,7 @@ function EventDetails(props: { event: Event }) {
 
 function SelectView() {
   const searchParams = useSearchParams();
-  const [view, setView] = useState(searchParams.get("view") ?? "grid");
+  const [view, setView] = useState(scheduleView(searchParams));
   const urlSearchParams = new URLSearchParams(searchParams);
   const pathname = usePathname();
   const router = useRouter();
@@ -136,16 +138,6 @@ function SelectView() {
       name: "agenda",
       label: "Agenda",
       icon: QueueListIcon,
-    },
-    {
-      name: "text",
-      label: "Text",
-      icon: DocumentTextIcon,
-    },
-    {
-      name: "rsvp",
-      label: "RSVP'd",
-      icon: FlagIcon,
     },
   ];
   return (

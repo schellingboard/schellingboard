@@ -1,5 +1,4 @@
 import { test, expect } from "./helpers/fixtures";
-import { switchToView } from "./helpers/schedule";
 import { login } from "./helpers/auth";
 import {
   duringGammaDayOne,
@@ -40,15 +39,6 @@ test("no now line or Now button outside the event's days", async ({ page }) => {
   // The real clock is two weeks before the event starts.
   await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
   await expect(page.getByTestId("now-line")).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Now" })).toHaveCount(0);
-});
-
-test("the Now button is not offered by the text view", async ({ page }) => {
-  await openGammaScheduleDuringEvent(page, "/Conference-Gamma");
-  await expect(page.getByRole("button", { name: "Now" })).toBeVisible();
-
-  // The text view has no now line to jump to.
-  await switchToView(page, "Text");
   await expect(page.getByRole("button", { name: "Now" })).toHaveCount(0);
 });
 

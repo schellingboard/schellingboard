@@ -45,6 +45,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   now live at github.com/schellingboard/schellingboard, and every link in the app points there.
 - **The Agenda view is out of beta**: it no longer carries a beta label or notice.
 
+### Removed
+
+- **The Text and RSVP'd schedule views are gone**: the Agenda, with its search and its My
+  sessions, RSVP'd and Hosting filters, does what they did.
+
 ### Fixed
 
 - **Searching sessions and proposals keeps up with typing**: the results now update once you

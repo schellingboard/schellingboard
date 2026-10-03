@@ -114,10 +114,8 @@ to read what the room offers (projector, whiteboard, the kind of seating), where
 to find it and how many people fit.
 
 The buttons at the top switch how the schedule is laid out: **Grid** (rooms
-side by side, the day running down), **Agenda** (every session under the time
-it starts, all rooms together — handy on a phone), **Text** (one
-entry per session with its description, and a search box) and **RSVP'd** (the
-sessions you are attending or hosting).
+side by side, the day running down) and **Agenda** (every session under the
+time it starts, all rooms together — handy on a phone).
 
 Above the Grid and the Agenda, a search box finds sessions by title,
 description, host or room, and your 1-on-1s by the other person's name. Next
@@ -342,8 +340,7 @@ same time is ordinary. Where the slot has room to name them all they sit one
 above the other; otherwise the block says how many there are and opens the
 list of them instead.
 
-The **Text** view lists them too, in among the sessions by time, with the same
-name, place and state. **RSVP'd** lists only the confirmed ones.
+The **Agenda** lists them too, in among the sessions by time.
 
 The column is yours alone — nobody else sees it, and it stays put when you
 filter the schedule down to one room. It is there on every day of the event

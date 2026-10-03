@@ -1,14 +1,13 @@
 import { test, expect } from "./helpers/fixtures";
-import { switchToView } from "./helpers/schedule";
 import { loginAndGoto } from "./helpers/auth";
 import { selectUser } from "./helpers/user";
 
 /**
- * The viewer's 1-on-1s on the schedule: the grid's column when several share a
- * slot, and the text views. The fixture is seeded rather than booked through
- * the UI here — arranging five 1-on-1s takes five attendees and five user
- * switches, and what is under test is how the schedule draws them. Booking one
- * is covered by meetings-request.spec.ts.
+ * The viewer's 1-on-1s in the grid's column when several share a slot. The
+ * fixture is seeded rather than booked through the UI here — arranging five
+ * 1-on-1s takes five attendees and five user switches, and what is under test
+ * is how the schedule draws them. Booking one is covered by
+ * meetings-request.spec.ts.
  *
  * Conference Gamma is the seeded event in its scheduling phase, and Zanele's
  * first morning there holds two 1-on-1s in the 10:00 slot and three in the
@@ -52,40 +51,5 @@ test.describe("parallel 1-on-1s on the schedule", () => {
       details.getByRole("heading", { name: `1-on-1 with ${AT_TEN[1]}` })
     ).toBeVisible();
     await expect(details.getByRole("button", { name: "Accept" })).toBeVisible();
-  });
-});
-
-// The Text and RSVP'd views used to list sessions only, so switching to either
-// made the viewer's own 1-on-1s vanish from the schedule (#1023).
-test.describe("1-on-1s in the Text and RSVP'd views", () => {
-  test("Text lists them all, RSVP'd only the confirmed", async ({ page }) => {
-    await loginAndGoto(page, "/guests");
-    await selectUser(page, VIEWER);
-    await page.getByRole("link", { name: "Conference Gamma" }).first().click();
-
-    const [confirmed, waiting] = AT_TEN.map((name) =>
-      page.getByRole("link", { name: `1-on-1 with ${name}`, exact: true })
-    );
-    const details = page.getByRole("dialog", { name: "1-on-1 details" });
-
-    await switchToView(page, "Text");
-    await expect(confirmed).toBeVisible();
-    await expect(waiting).toBeVisible();
-    await waiting.click();
-    await expect(
-      details.getByRole("heading", { name: `1-on-1 with ${AT_TEN[1]}` })
-    ).toBeVisible();
-    await page.keyboard.press("Escape");
-    await expect(details).toBeHidden();
-
-    // Waiting on an answer is no commitment yet; its going also shows the
-    // Text view has given way.
-    await page.getByRole("button", { name: "RSVP'd" }).click();
-    await expect(waiting).toBeHidden();
-    await expect(confirmed).toBeVisible();
-    await confirmed.click();
-    await expect(
-      details.getByRole("heading", { name: `1-on-1 with ${AT_TEN[0]}` })
-    ).toBeVisible();
   });
 });

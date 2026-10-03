@@ -1,17 +1,23 @@
 "use client";
 
+import clsx from "clsx";
 import Link from "next/link";
 import { useContext, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PencilIcon } from "@heroicons/react/24/outline";
 import { CheckCircleIcon, AcademicCapIcon } from "@heroicons/react/24/solid";
 
-import type { Event, Guest, Session, Rsvp } from "@/db/repositories/interfaces";
+import type {
+  Event,
+  Guest,
+  Location,
+  Session,
+  Rsvp,
+} from "@/db/repositories/interfaces";
 import { formatOptionalTime, TIME_FORMAT } from "@/utils/utils";
 import { UserContext, EventContext } from "../../context";
 import { CurrentUserModal, ConfirmationModal } from "../../modals";
 import { LockIcon } from "../../lock-icon";
-import { LocationTag } from "../session-text";
 import { viewProposalLinkFromElsewhere } from "../modal-nav";
 import { SessionComments } from "../session-comments";
 import { Markdown } from "@/app/(site)/markdown";
@@ -362,6 +368,20 @@ export function ViewSession(props: {
         eventSlug={eventSlug}
         timezone={event.timezone}
       />
+    </div>
+  );
+}
+
+function LocationTag(props: { location: Location }) {
+  const { location } = props;
+  return (
+    <div
+      className={clsx(
+        "flex items-center gap-2 rounded-full py-0.5 px-2 text-xs font-semibold w-fit border-2 loc-tag",
+        `loc-${location.color}`
+      )}
+    >
+      {location.name}
     </div>
   );
 }

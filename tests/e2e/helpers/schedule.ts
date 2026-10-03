@@ -8,8 +8,6 @@ export const viewButton = (page: Page, name: string) =>
 const VIEW_PARAMS: Record<string, string> = {
   Grid: "grid",
   Agenda: "agenda",
-  Text: "text",
-  "RSVP'd": "rsvp",
 };
 
 // The toggle is server-rendered, so a click can land before React has attached

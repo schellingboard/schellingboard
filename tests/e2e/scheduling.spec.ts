@@ -174,15 +174,15 @@ test("a session booked after midnight lands on the next calendar date", async ({
   // 01:10 is bookable under that day and belongs to the following date.
   await createSessionViaForm(page, title, /Main Hall/, "01:10");
 
-  // The text view labels a session with the weekday of its actual start.
+  // The agenda labels a time past midnight with the weekday it falls on.
   // Gamma runs today+14 … today+16, so the last night's 01:10 is today+17.
   const afterMidnight = DateTime.now()
     .setZone("Europe/Berlin")
     .plus({ days: 17 });
-  await switchToView(page, "Text");
+  await switchToView(page, "Agenda");
   await page.getByPlaceholder("Search sessions").fill(title);
   await expect(
-    page.getByText(`${afterMidnight.toFormat("EEEE")}, 01:10`)
+    page.getByText(`${afterMidnight.toFormat("EEE")} 01:10`)
   ).toBeVisible();
 });
 
