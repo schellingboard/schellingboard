@@ -9,6 +9,8 @@ node_modules
 .git
 .jj
 tests
+# vitest.config.ts and scripts/use-cases.ts import it, and next build type-checks them.
+!tests/use-cases.ts
 .github
 coverage
 site
