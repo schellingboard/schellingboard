@@ -8,7 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > If the change is a highlight of the coming release, it also belongs in
 > [`app/release-notes.ts`](app/release-notes.ts), which holds 3-5 of them.
 
-## [Unreleased]
+## [4.0.0] - 2026-10-04
+
+> **Breaking change**: the session import API now stores times exactly as sent, so scripts that
+> relied on the break being added to each start must add it themselves. The event creation API
+> ignores start and end dates, the Text and RSVP'd schedule views are gone, and locations no
+> longer have a Hidden setting.
 
 ### Added
 
@@ -769,7 +774,7 @@ This version corresponds to commit [9aa2a273](https://github.com/schellingboard/
 
 The version number 1.0.0 is a retroactive label assigned here purely as a reference point to mark the upstream baseline — it was never designated as such. This is the upstream codebase at the point the fork was created, taken from commit [babcd627](https://github.com/rachelweinberg12/scheduling-app/commit/babcd6275a853f1911cd48bbdaf4f2b1725c3d47) of [rachelweinberg12/scheduling-app](https://github.com/rachelweinberg12/scheduling-app) ([full log](https://github.com/rachelweinberg12/scheduling-app/commits/babcd6275a853f1911cd48bbdaf4f2b1725c3d47/)). It was never properly released since it was deployed directly from the Git repository.
 
-[Unreleased]: https://github.com/schellingboard/schellingboard/compare/v3.8.1...HEAD
+[4.0.0]: https://github.com/schellingboard/schellingboard/compare/v3.8.1...v4.0.0
 [3.8.1]: https://github.com/schellingboard/schellingboard/compare/v3.8.0...v3.8.1
 [3.8.0]: https://github.com/schellingboard/schellingboard/compare/v3.7.0...v3.8.0
 [3.7.0]: https://github.com/schellingboard/schellingboard/compare/v3.6.0...v3.7.0

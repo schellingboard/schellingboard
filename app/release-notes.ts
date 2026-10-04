@@ -43,7 +43,8 @@ export const SHOWN_RELEASES = 3;
 
 export const releaseNotes: ReleaseNote[] = [
   {
-    version: "Unreleased",
+    version: "4.0.0",
+    date: "2026-10-04",
     highlights: [
       "**Sessions at any minute, with or without a break**: organizers can start a session whenever they like, and skip the break before one such as an opening keynote.",
       "**Location unavailability**: mark when a location can't be used, such as a room only free on Saturday, and attendees simply aren't offered those slots.",
