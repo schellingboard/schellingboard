@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && if [ -f .claude/run/PLAN.md ]; then cat .claude/run/PLAN.md .claude/run/PROGRESS.md 2>/dev/null; fi; true"
+          }
+        ]
+      }
+    ]
+  }
+}

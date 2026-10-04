@@ -236,6 +236,34 @@ await repos.votes.upsert({ proposalId, guestId, choice });
 const renderedSize = { lg: 112, md: 64, sm: 48 }[size];
 ```
 
+## Autonomous runs
+
+Applies only while `.claude/run/PLAN.md` exists. A hook prints it and
+`.claude/run/PROGRESS.md` at session start and after compaction; those files, not the
+conversation, are the state of the run.
+
+- Do one PLAN.md step at a time, each in a fresh `implementer` subagent. Pass it the
+  step and the PROGRESS.md entries it needs; it shares no memory with you.
+- After every implementer, run a fresh `reviewer` subagent on its commit. Push only
+  after the review, so the reviewer's amend needs no force-push.
+- Delegate searches that read more than a few files to the `Explore` agent. Do not
+  read large files, logs or full test output in the main session.
+- A step is done when `make precommit` passes. If a tier cannot run in the
+  environment, say so in PROGRESS.md and in the commit message; never skip it silently.
+- One commit per step. If a step is too big for one coherent commit, split it in
+  PLAN.md first. Tick the step in PLAN.md and update PROGRESS.md (decisions, problems,
+  next step) in the step's own commit.
+- Push every commit as its own stacked PR: branch `<session branch>-NN` (01, 02, …)
+  holding exactly that commit on top of the branch before it. The first PR's base is
+  the branch of the commit below it if that has an open PR, otherwise `main`. PR
+  title and body are the commit message. Never push to `main`.
+- Never rewrite a pushed commit; a fix to it is a new step. If `gh` cannot open a PR,
+  push the branch and list it with its base in PROGRESS.md.
+- Blocked, or facing a decision the plan and ADRs do not settle: record it under
+  "Questions" in PROGRESS.md, then continue with a step that does not depend on it.
+- When no step is left: write a summary in PROGRESS.md, delete `.claude/run/` in a
+  last commit, and stop.
+
 ## Misc
 
 When adding a link to session/proposal modal, see `modal-nav.ts`, there are gotchas (anchor: MnpjIo7Y).
