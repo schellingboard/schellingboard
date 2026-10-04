@@ -199,7 +199,9 @@ export function ViewSession(props: {
             : ""
         }
       />
-      <div className="flex items-start gap-2 mb-2 mt-5">
+      <div
+        className={`flex items-start gap-2 mb-2 mt-5 ${isInModal ? "pr-8" : ""}`}
+      >
         <p
           className="text-xl font-semibold flex-1 flex items-center gap-2"
           id="title"

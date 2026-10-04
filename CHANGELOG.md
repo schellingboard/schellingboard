@@ -84,6 +84,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **The session close button no longer covers the RSVP'd and hosting marks**: they sat under
+  it in the session details.
 - **Empty required fields no longer show as errors on load**: they now turn red only
   after you leave one empty or try to submit the form.
 - **The proposals table fits on narrow screens** (#847): on tablet-sized screens, the Edit
