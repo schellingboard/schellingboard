@@ -99,3 +99,13 @@ test.describe("Basic Sanity Checks", () => {
     ).toBeVisible();
   });
 });
+
+test("opens an event from the phone's menu @002-US2", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  await login(page);
+
+  await page.getByRole("button", { name: "Open menu" }).click();
+  await page.getByRole("link", { name: "Conference Gamma" }).click();
+
+  await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
+});

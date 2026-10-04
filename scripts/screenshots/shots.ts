@@ -101,9 +101,9 @@ const manageGamma = async (page: Page) => {
   await page.getByRole("heading", { name: "Conference Gamma" }).waitFor();
 };
 
-// The phone's menu button has no name to click by.
 const openGammaOnPhone = async (page: Page) => {
-  await page.goto("/Conference-Gamma");
+  await page.getByRole("button", { name: "Open menu" }).click();
+  await page.getByRole("link", { name: "Conference Gamma" }).click();
   await page.getByRole("group", { name: "Schedule view" }).waitFor();
 };
 

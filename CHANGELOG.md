@@ -84,6 +84,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **Screen readers name the phone's menu button**: it used to be announced as an unlabelled
+  button.
 - **The session close button no longer covers the RSVP'd and hosting marks**: they sat under
   it in the session details.
 - **The schedule grid no longer jumps sideways on load**: your 1-on-1s column used to appear a
