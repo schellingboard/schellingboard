@@ -6,6 +6,7 @@ export type {
 export type { CreateSessionInput } from "./application/create-session";
 export type { UpdateSessionInput } from "./application/update-session";
 export type { RsvpInput } from "./application/rsvps";
+export type { LocationUnavailabilityInput } from "./application/room-unavailability";
 export {
   createSessionUseCases,
   type SessionUseCases,
@@ -13,3 +14,4 @@ export {
 export { addSessionRoutes } from "./http/routes";
 export { addRsvpRoutes } from "./http/rsvp-routes";
 export { addAttendeeCountRoutes } from "./http/attendee-count-routes";
+export { addAdminUnavailabilityRoutes } from "./http/unavailability-routes";

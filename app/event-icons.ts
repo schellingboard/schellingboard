@@ -30,6 +30,12 @@ import {
   WrenchIcon,
 } from "@heroicons/react/24/outline";
 import { ForwardRefExoticComponent, RefAttributes, SVGProps } from "react";
+import {
+  isEventIconName,
+  type EventIconName,
+} from "@schellingboard/domain/event-icons";
+
+export { isEventIconName };
 
 export type HeroIcon = ForwardRefExoticComponent<
   Omit<SVGProps<SVGSVGElement>, "ref"> & {
@@ -68,11 +74,7 @@ export const EVENT_ICONS: Record<string, HeroIcon> = {
   TrophyIcon,
   UserGroupIcon,
   WrenchIcon,
-};
-
-export function isEventIconName(name: string): boolean {
-  return Object.prototype.hasOwnProperty.call(EVENT_ICONS, name);
-}
+} satisfies Record<EventIconName, HeroIcon>;
 
 /**
  * Icons used to be stored as free text, so the DB may hold values outside

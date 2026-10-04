@@ -1,8 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getRepositories } from "@/db/container";
-import { isAdminRequest } from "@/utils/acting-admin";
+import { cookies } from "next/headers";
+import { eventUseCases, sessionUseCases } from "@/server/composition";
+import { resolveActor, type Actor } from "@/server/kernel/actor";
 import type { AdminActionResult } from "./admin-guests";
 
 export type LocationUnavailabilityInput = {
@@ -14,60 +15,41 @@ export type LocationUnavailabilityInput = {
 };
 
 function parseDateTime(value: string): Date | undefined {
-  if (!value) return undefined;
-  const d = new Date(value + "Z");
-  return isNaN(d.getTime()) ? undefined : d;
+  return value ? new Date(value + "Z") : undefined;
 }
 
-async function revalidateEventPaths(eventId: string) {
+async function revalidateEventPaths(actor: Actor, eventId: string) {
   revalidatePath(`/admin/events/${eventId}/locations`);
-  const event = await getRepositories().events.findById(eventId);
-  if (event) revalidatePath(`/${event.slug}`, "layout");
+  const found = await eventUseCases().getEvent(actor, { id: eventId });
+  if (found.ok) revalidatePath(`/${found.value.event.slug}`, "layout");
 }
 
 export async function addLocationUnavailabilityAction(
   input: LocationUnavailabilityInput
 ): Promise<AdminActionResult> {
-  if (!(await isAdminRequest())) return { ok: false, error: "Unauthorized" };
-
-  const start = parseDateTime(input.start);
-  const end = parseDateTime(input.end);
-  if (!start || !end) return { ok: false, error: "Invalid start or end time" };
-  if (end <= start) return { ok: false, error: "End must be after start" };
-
-  if (input.locationIds.length === 0)
-    return { ok: false, error: "Pick at least one room" };
-
-  const repos = getRepositories();
-  const roomIds = new Set(
-    (await repos.locations.listByEvent(input.eventId)).map((room) => room.id)
-  );
-  if (!input.locationIds.every((id) => roomIds.has(id))) {
-    return { ok: false, error: "That room is not part of this event" };
-  }
-
-  await repos.locationUnavailability.createMany(
-    [...new Set(input.locationIds)].map((locationId) => ({
-      eventId: input.eventId,
-      locationId,
-      start,
-      end,
-    }))
-  );
-  await revalidateEventPaths(input.eventId);
+  const actor = await resolveActor(await cookies());
+  const result = await sessionUseCases().addLocationUnavailability(actor, {
+    eventId: input.eventId,
+    locationIds: input.locationIds,
+    start: parseDateTime(input.start),
+    end: parseDateTime(input.end),
+  });
+  if (!result.ok)
+    return { ok: false, error: result.error.detail ?? "Something went wrong" };
+  await revalidateEventPaths(actor, input.eventId);
   return { ok: true };
 }
 
 export async function deleteLocationUnavailabilityAction(input: {
   id: string;
 }): Promise<AdminActionResult> {
-  if (!(await isAdminRequest())) return { ok: false, error: "Unauthorized" };
-
-  const repos = getRepositories();
-  const period = await repos.locationUnavailability.findById(input.id);
-  if (!period) return { ok: false, error: "Not found" };
-
-  await repos.locationUnavailability.delete(input.id);
-  await revalidateEventPaths(period.eventId);
+  const actor = await resolveActor(await cookies());
+  const result = await sessionUseCases().deleteLocationUnavailability(
+    actor,
+    input
+  );
+  if (!result.ok)
+    return { ok: false, error: result.error.detail ?? "Something went wrong" };
+  await revalidateEventPaths(actor, result.value.eventId);
   return { ok: true };
 }

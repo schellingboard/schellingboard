@@ -549,6 +549,12 @@ export const features = {
         actor: "self-hoster",
         priority: "P3",
       },
+      US3: {
+        title:
+          "Organizer's script reads and syncs events, days and locations through the admin API",
+        actor: "organizer",
+        priority: "P3",
+      },
     },
   },
   "020": {

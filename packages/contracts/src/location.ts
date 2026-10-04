@@ -40,3 +40,50 @@ export const locationSchema = z.object({
 export const updateLocationSchema = locationSchema.extend({
   id: z.string().nonempty(),
 });
+
+const instant = z.iso.datetime({ offset: true });
+
+export const locationBodySchema = locationSchema.omit({ image: true });
+
+export const locationViewSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string(),
+  areaDescription: z.string().nullable(),
+  capacity: z.number().int(),
+  color: z.string(),
+  bookable: z.boolean().describe("false hides it from attendees' booking"),
+  imageUrl: z.string(),
+  sortIndex: z.number().int(),
+  eventIds: z.array(z.string()),
+});
+
+export const locationListSchema = z.object({
+  locations: z.array(locationViewSchema),
+});
+
+export const locationMoveSchema = z.object({
+  direction: z.enum(["up", "down"]),
+});
+
+export const eventLocationsBodySchema = z.object({
+  locationIds: z.array(z.string()),
+});
+
+export const unavailabilityBodySchema = z.object({
+  locationIds: z.array(z.string()),
+  start: instant,
+  end: instant,
+});
+
+export const unavailabilityViewSchema = z.object({
+  id: z.string(),
+  eventId: z.string(),
+  locationId: z.string(),
+  start: instant,
+  end: instant,
+});
+
+export const unavailabilityListSchema = z.object({
+  periods: z.array(unavailabilityViewSchema),
+});

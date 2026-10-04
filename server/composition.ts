@@ -17,6 +17,10 @@ import {
   type CommentUseCases,
 } from "@/server/modules/comments/module";
 import {
+  createEventUseCases,
+  type EventUseCases,
+} from "@/server/modules/events/module";
+import {
   createMeetingUseCases,
   type MeetingUseCases,
 } from "@/server/modules/meetings/module";
@@ -36,6 +40,10 @@ import {
   createSessionUseCases,
   type SessionUseCases,
 } from "@/server/modules/sessions/module";
+import {
+  createVenueUseCases,
+  type VenueUseCases,
+} from "@/server/modules/venue/module";
 
 // Built per call: tests swap the repository container between cases.
 export function sessionUseCases(): SessionUseCases {
@@ -87,4 +95,15 @@ export function peopleUseCases(): PeopleUseCases {
 
 export function notificationUseCases(): NotificationUseCases {
   return createNotificationUseCases({ repos: getRepositories() });
+}
+
+export function eventUseCases(): EventUseCases {
+  return createEventUseCases({ repos: getRepositories() });
+}
+
+export function venueUseCases(): VenueUseCases {
+  return createVenueUseCases({
+    repos: getRepositories(),
+    images: getImageRepositories().locations,
+  });
 }

@@ -47,6 +47,7 @@ export function problemFromError(error: AppError): Response {
     status: HTTP_STATUS_BY_KIND[error.kind],
     code: error.code,
     ...(error.detail === undefined ? {} : { detail: error.detail }),
+    ...(error.errors === undefined ? {} : { errors: error.errors }),
   });
 }
 

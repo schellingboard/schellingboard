@@ -9,6 +9,11 @@ import { createSession } from "./create-session";
 import { deleteSession } from "./delete-session";
 import { getSession, listSessions } from "./queries";
 import {
+  addLocationUnavailability,
+  deleteLocationUnavailability,
+  listLocationUnavailability,
+} from "./room-unavailability";
+import {
   adminRemoveRsvp,
   listGuestRsvps,
   listSessionRsvps,
@@ -34,6 +39,9 @@ export function createSessionUseCases(deps: SessionDeps) {
     adminRemoveRsvp: adminRemoveRsvp(deps),
     getAttendeeCount: getAttendeeCount(deps),
     recordAttendeeCount: recordAttendeeCount(deps),
+    listLocationUnavailability: listLocationUnavailability(deps),
+    addLocationUnavailability: addLocationUnavailability(deps),
+    deleteLocationUnavailability: deleteLocationUnavailability(deps),
   };
 }
 

@@ -17,6 +17,14 @@ export function createApp(basePath = "/") {
       });
     },
   }).basePath(basePath);
+  // Without an explicit no-store, browsers heuristically cache reads and show
+  // stale data after a reload.
+  app.use("*", async (c, next) => {
+    await next();
+    if (!c.res.headers.has("cache-control")) {
+      c.res.headers.set("cache-control", "no-store");
+    }
+  });
   app.notFound(() => problemResponse({ status: 404, code: "route.notFound" }));
   app.onError((error) => {
     // Hono's validators throw these for a body they cannot parse at all.

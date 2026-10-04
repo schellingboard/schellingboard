@@ -1,21 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getRepositories } from "@/db/container";
-import {
-  eventNameToSlug,
-  normalizeWebsiteUrl,
-  RESERVED_EVENT_SLUGS,
-} from "@/utils/utils";
-import { isAdminRequest } from "@/utils/acting-admin";
-import type { Event, EventMeetingSettings } from "@schellingboard/domain/event";
+import { cookies } from "next/headers";
+import { eventUseCases } from "@/server/composition";
+import { resolveActor } from "@/server/kernel/actor";
+import type { Result } from "@/server/kernel/result";
 import type { AdminActionResult } from "./admin-guests";
-import { isEventIconName } from "@/app/event-icons";
-import {
-  SLOT_INCREMENT_OPTIONS,
-  isValidSlotIncrement,
-  isSlotAligned,
-} from "@schellingboard/domain/slots";
 
 export type EventInput = {
   name: string;
@@ -29,175 +19,6 @@ export type EventInput = {
   icon?: string;
 };
 
-// Phase dates and the meeting settings are deliberately excluded: they are
-// managed only by updateEventPhasesAction and the admin Meetings section, so
-// leaving them out is what keeps a basic-info save from touching them.
-type ParsedEvent = Omit<
-  Event,
-  | "id"
-  | "slug"
-  | "firstDayStart"
-  | "lastDayStart"
-  | "proposalPhaseStart"
-  | "proposalPhaseEnd"
-  | "votingPhaseStart"
-  | "votingPhaseEnd"
-  | "schedulingPhaseStart"
-  | "schedulingPhaseEnd"
-  | keyof EventMeetingSettings
->;
-type ParseResult = { data: ParsedEvent } | { error: string };
-
-function parseEventInput(input: EventInput): ParseResult {
-  const name = input.name.trim();
-  if (!name) return { error: "Name is required" };
-
-  const timezone = input.timezone.trim() || "UTC";
-
-  const maxSessionDuration = parseInt(input.maxSessionDuration, 10);
-  if (isNaN(maxSessionDuration) || maxSessionDuration <= 0) {
-    return { error: "Max session duration must be a positive number" };
-  }
-
-  const breakMinutes = parseInt(input.breakMinutes, 10);
-  if (isNaN(breakMinutes) || breakMinutes < 0) {
-    return { error: "Break must be zero or a positive number" };
-  }
-
-  const slotIncrementMinutes = parseInt(input.slotIncrementMinutes, 10);
-  if (!isValidSlotIncrement(slotIncrementMinutes)) {
-    return {
-      error: `Slot increment must be one of ${SLOT_INCREMENT_OPTIONS.join(", ")} minutes`,
-    };
-  }
-
-  const icon = input.icon?.trim() || undefined;
-  if (icon && !isEventIconName(icon)) {
-    return { error: "Unknown icon" };
-  }
-
-  return {
-    data: {
-      name,
-      description: input.description.trim(),
-      website: normalizeWebsiteUrl(input.website),
-      timezone,
-      maxSessionDuration,
-      breakMinutes,
-      slotIncrementMinutes,
-      rsvpCapacityHardLimit: input.rsvpCapacityHardLimit ?? false,
-      icon,
-    },
-  };
-}
-
-// The schedule grid anchors its slots at each day's start, so a new increment
-// only works if every day window still falls on slot boundaries. The admin
-// must fix the misaligned days first.
-async function slotIncrementChangeError(
-  eventId: string,
-  incrementMinutes: number
-): Promise<string | null> {
-  const repos = getRepositories();
-  const days = await repos.days.listByEvent(eventId);
-  const dayAligned = (d: (typeof days)[number]) =>
-    isSlotAligned(d.end, d.start, incrementMinutes) &&
-    isSlotAligned(d.startBookings, d.start, incrementMinutes) &&
-    isSlotAligned(d.endBookings, d.start, incrementMinutes);
-  if (!days.every(dayAligned)) {
-    return `Cannot change the slot increment: some day windows are not aligned to ${incrementMinutes}-minute slots. Adjust the days first.`;
-  }
-
-  return null;
-}
-
-export async function createEventAction(
-  input: EventInput
-): Promise<AdminActionResult> {
-  if (!(await isAdminRequest())) return { ok: false, error: "Unauthorized" };
-
-  const parsed = parseEventInput(input);
-  if ("error" in parsed) return { ok: false, error: parsed.error };
-
-  const { events } = getRepositories();
-  const slug = eventNameToSlug(parsed.data.name);
-  if (!slug) {
-    return { ok: false, error: "Name must contain a letter or number" };
-  }
-  if (RESERVED_EVENT_SLUGS.has(slug.toLowerCase())) {
-    return {
-      ok: false,
-      error: `"${slug}" is a reserved URL and cannot be used as an event name`,
-    };
-  }
-  const existing = await events.findBySlug(slug);
-  if (existing) {
-    return {
-      ok: false,
-      error: `An event with the URL "${slug}" already exists ("${existing.name}")`,
-    };
-  }
-
-  try {
-    await events.create(parsed.data);
-  } catch (e) {
-    // A concurrent create can win the race between the findBySlug check
-    // above and this insert; translate the constraint violation into the
-    // same friendly error instead of surfacing a 500.
-    if (
-      e instanceof Error &&
-      e.message.includes("UNIQUE constraint failed: events.slug")
-    ) {
-      return {
-        ok: false,
-        error: `An event with the URL "${slug}" already exists`,
-      };
-    }
-    throw e;
-  }
-  revalidatePath("/admin");
-  revalidatePath("/admin/events");
-  return { ok: true };
-}
-
-export async function updateEventAction(
-  input: EventInput & { id: string }
-): Promise<AdminActionResult> {
-  if (!(await isAdminRequest())) return { ok: false, error: "Unauthorized" };
-
-  const parsed = parseEventInput(input);
-  if ("error" in parsed) return { ok: false, error: parsed.error };
-
-  const existing = await getRepositories().events.findById(input.id);
-  if (!existing) return { ok: false, error: "Event not found" };
-
-  const incrementChanged =
-    parsed.data.slotIncrementMinutes !== existing.slotIncrementMinutes;
-  if (incrementChanged) {
-    const error = await slotIncrementChangeError(
-      input.id,
-      parsed.data.slotIncrementMinutes
-    );
-    if (error) return { ok: false, error };
-  }
-
-  const updated = await getRepositories().events.update(input.id, parsed.data);
-  if (!updated) return { ok: false, error: "Event not found" };
-
-  // 1-on-1 slots are this same grid, so a new increment re-reads what people
-  // declared. A coarser grid is the dangerous direction: a surviving 10:00 row
-  // would advertise 10:00-11:00 when the guest only ever offered 10:00-10:30.
-  // A finer grid could in principle be kept; it isn't worth the special case.
-  if (incrementChanged) {
-    await getRepositories().meetingAvailability.deleteByEvent(input.id);
-  }
-
-  revalidatePath("/admin");
-  revalidatePath("/admin/events");
-  revalidatePath(`/admin/events/${input.id}`);
-  return { ok: true };
-}
-
 export type EventPhasesInput = {
   id: string;
   proposalPhaseStart?: string;
@@ -208,120 +29,68 @@ export type EventPhasesInput = {
   schedulingPhaseEnd?: string;
 };
 
-function parseDateTime(value: string | undefined): Date | undefined {
-  if (!value) return undefined;
-  // datetime-local input gives "YYYY-MM-DDTHH:mm" without timezone; treat as UTC
-  const d = new Date(value + "Z");
-  return isNaN(d.getTime()) ? undefined : d;
+async function actor() {
+  return resolveActor(await cookies());
 }
 
-type ParsedPhaseDates = {
-  proposalPhaseStart: Date | undefined;
-  proposalPhaseEnd: Date | undefined;
-  votingPhaseStart: Date | undefined;
-  votingPhaseEnd: Date | undefined;
-  schedulingPhaseStart: Date | undefined;
-  schedulingPhaseEnd: Date | undefined;
-};
+function settled(result: Result<unknown>, eventId?: string): AdminActionResult {
+  if (!result.ok) {
+    return { ok: false, error: result.error.detail ?? "Something went wrong" };
+  }
+  revalidatePath("/admin");
+  revalidatePath("/admin/events");
+  if (eventId) revalidatePath(`/admin/events/${eventId}`);
+  return { ok: true };
+}
 
-function validatePhasesInput(
-  input: EventPhasesInput
-): string | ParsedPhaseDates {
-  const fieldDefs: [keyof Omit<EventPhasesInput, "id">, string][] = [
-    ["proposalPhaseStart", "proposal phase start"],
-    ["proposalPhaseEnd", "proposal phase end"],
-    ["votingPhaseStart", "voting phase start"],
-    ["votingPhaseEnd", "voting phase end"],
-    ["schedulingPhaseStart", "scheduling phase start"],
-    ["schedulingPhaseEnd", "scheduling phase end"],
-  ];
+const settings = (input: EventInput) => ({
+  ...input,
+  maxSessionDuration: parseInt(input.maxSessionDuration, 10),
+  breakMinutes: parseInt(input.breakMinutes, 10),
+  slotIncrementMinutes: parseInt(input.slotIncrementMinutes, 10),
+});
 
-  const parsed: Partial<ParsedPhaseDates> = {};
-  for (const [field, label] of fieldDefs) {
-    const raw = input[field]?.trim();
-    if (raw) {
-      const d = parseDateTime(raw);
-      if (d === undefined) return `Invalid ${label}`;
-      parsed[field] = d;
-    } else {
-      parsed[field] = undefined;
-    }
-  }
+// datetime-local gives "YYYY-MM-DDTHH:mm" without a zone; the forms send UTC.
+function phaseDate(value: string | undefined): Date | undefined {
+  const raw = value?.trim();
+  return raw ? new Date(raw + "Z") : undefined;
+}
 
-  const {
-    proposalPhaseStart: pStart,
-    proposalPhaseEnd: pEnd,
-    votingPhaseStart: vStart,
-    votingPhaseEnd: vEnd,
-    schedulingPhaseStart: sStart,
-    schedulingPhaseEnd: sEnd,
-  } = parsed as ParsedPhaseDates;
+export async function createEventAction(
+  input: EventInput
+): Promise<AdminActionResult> {
+  return settled(
+    await eventUseCases().createEvent(await actor(), settings(input))
+  );
+}
 
-  if (pStart && pEnd && pEnd <= pStart) {
-    return "Proposal phase end must be after its start";
-  }
-  if (vStart && vEnd && vEnd <= vStart) {
-    return "Voting phase end must be after its start";
-  }
-  if (sStart && sEnd && sEnd <= sStart) {
-    return "Scheduling phase end must be after its start";
-  }
-  if (pEnd && vStart && vStart < pEnd) {
-    return "Voting phase must not start before proposal phase ends";
-  }
-  if (vEnd && sStart && sStart < vEnd) {
-    return "Scheduling phase must not start before voting phase ends";
-  }
-  // A phase without an explicit end implicitly ends when the next phase starts,
-  // so the starts themselves must stay in order.
-  if (pStart && vStart && vStart < pStart) {
-    return "Voting phase must not start before proposal phase starts";
-  }
-  if (vStart && sStart && sStart < vStart) {
-    return "Scheduling phase must not start before voting phase starts";
-  }
-  // When voting is unset, the checks above leave scheduling unconstrained
-  // relative to the proposal phase. Constrain it directly so scheduling can
-  // never start before the proposal phase starts or ends.
-  if (pStart && sStart && sStart < pStart) {
-    return "Scheduling phase must not start before proposal phase starts";
-  }
-  if (pEnd && sStart && sStart < pEnd) {
-    return "Scheduling phase must not start before proposal phase ends";
-  }
-  return parsed as ParsedPhaseDates;
+export async function updateEventAction(
+  input: EventInput & { id: string }
+): Promise<AdminActionResult> {
+  const result = await eventUseCases().updateEvent(await actor(), {
+    ...settings(input),
+    id: input.id,
+  });
+  return settled(result, input.id);
 }
 
 export async function updateEventPhasesAction(
   input: EventPhasesInput
 ): Promise<AdminActionResult> {
-  if (!(await isAdminRequest())) return { ok: false, error: "Unauthorized" };
-
-  const result = validatePhasesInput(input);
-  if (typeof result === "string") {
-    return { ok: false, error: result };
-  }
-
-  const updated = await getRepositories().events.update(input.id, result);
-  if (!updated) return { ok: false, error: "Event not found" };
-
-  revalidatePath("/admin");
-  revalidatePath("/admin/events");
-  revalidatePath(`/admin/events/${input.id}`);
-  return { ok: true };
+  const result = await eventUseCases().updateEventPhases(await actor(), {
+    id: input.id,
+    proposalPhaseStart: phaseDate(input.proposalPhaseStart),
+    proposalPhaseEnd: phaseDate(input.proposalPhaseEnd),
+    votingPhaseStart: phaseDate(input.votingPhaseStart),
+    votingPhaseEnd: phaseDate(input.votingPhaseEnd),
+    schedulingPhaseStart: phaseDate(input.schedulingPhaseStart),
+    schedulingPhaseEnd: phaseDate(input.schedulingPhaseEnd),
+  });
+  return settled(result, input.id);
 }
 
 export async function deleteEventAction(input: {
   id: string;
 }): Promise<AdminActionResult> {
-  if (!(await isAdminRequest())) return { ok: false, error: "Unauthorized" };
-
-  const { events } = getRepositories();
-  const event = await events.findById(input.id);
-  if (!event) return { ok: false, error: "Event not found" };
-
-  await events.delete(input.id);
-  revalidatePath("/admin");
-  revalidatePath("/admin/events");
-  return { ok: true };
+  return settled(await eventUseCases().deleteEvent(await actor(), input));
 }

@@ -6215,6 +6215,2082 @@
           }
         }
       }
+    },
+    "/api/v1/admin/events": {
+      "get": {
+        "tags": ["admin"],
+        "responses": {
+          "200": {
+            "description": "Every event, hidden or past ones included",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "events": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "slug": { "type": "string" },
+                          "name": { "type": "string" },
+                          "description": { "type": "string" },
+                          "website": { "type": "string" },
+                          "timezone": { "type": "string" },
+                          "maxSessionDuration": { "type": "integer" },
+                          "breakMinutes": { "type": "integer" },
+                          "slotIncrementMinutes": { "type": "integer" },
+                          "rsvpCapacityHardLimit": { "type": "boolean" },
+                          "icon": { "type": ["string", "null"] },
+                          "meetingsEnabled": { "type": "boolean" },
+                          "maxOpenMeetingRequests": { "type": "integer" },
+                          "firstDayStart": {
+                            "type": ["string", "null"],
+                            "format": "date-time"
+                          },
+                          "lastDayStart": {
+                            "type": ["string", "null"],
+                            "format": "date-time"
+                          },
+                          "proposalPhaseStart": {
+                            "type": ["string", "null"],
+                            "format": "date-time",
+                            "description": "null clears it"
+                          },
+                          "proposalPhaseEnd": {
+                            "type": ["string", "null"],
+                            "format": "date-time",
+                            "description": "null clears it"
+                          },
+                          "votingPhaseStart": {
+                            "type": ["string", "null"],
+                            "format": "date-time",
+                            "description": "null clears it"
+                          },
+                          "votingPhaseEnd": {
+                            "type": ["string", "null"],
+                            "format": "date-time",
+                            "description": "null clears it"
+                          },
+                          "schedulingPhaseStart": {
+                            "type": ["string", "null"],
+                            "format": "date-time",
+                            "description": "null clears it"
+                          },
+                          "schedulingPhaseEnd": {
+                            "type": ["string", "null"],
+                            "format": "date-time",
+                            "description": "null clears it"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "slug",
+                          "name",
+                          "description",
+                          "website",
+                          "timezone",
+                          "maxSessionDuration",
+                          "breakMinutes",
+                          "slotIncrementMinutes",
+                          "rsvpCapacityHardLimit",
+                          "icon",
+                          "meetingsEnabled",
+                          "maxOpenMeetingRequests",
+                          "firstDayStart",
+                          "lastDayStart",
+                          "proposalPhaseStart",
+                          "proposalPhaseEnd",
+                          "votingPhaseStart",
+                          "votingPhaseEnd",
+                          "schedulingPhaseStart",
+                          "schedulingPhaseEnd"
+                        ]
+                      }
+                    }
+                  },
+                  "required": ["events"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["admin"],
+        "description": "Creates an event; its URL slug is derived from the name.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string", "default": "" },
+                  "website": { "type": "string", "default": "" },
+                  "timezone": {
+                    "type": "string",
+                    "default": "UTC",
+                    "description": "IANA time zone the event's times are shown in"
+                  },
+                  "maxSessionDuration": {
+                    "type": "integer",
+                    "description": "Minutes"
+                  },
+                  "breakMinutes": {
+                    "type": "integer",
+                    "description": "Break before each session, in minutes"
+                  },
+                  "slotIncrementMinutes": {
+                    "type": "integer",
+                    "description": "One of 15, 30, 45, 60"
+                  },
+                  "rsvpCapacityHardLimit": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "icon": {
+                    "type": ["string", "null"],
+                    "enum": [
+                      "AcademicCapIcon",
+                      "BeakerIcon",
+                      "BoltIcon",
+                      "BookOpenIcon",
+                      "BriefcaseIcon",
+                      "BuildingOfficeIcon",
+                      "CakeIcon",
+                      "CalendarIcon",
+                      "ChatBubbleLeftIcon",
+                      "CloudIcon",
+                      "CodeBracketIcon",
+                      "CogIcon",
+                      "CommandLineIcon",
+                      "ComputerDesktopIcon",
+                      "CpuChipIcon",
+                      "FireIcon",
+                      "GlobeAltIcon",
+                      "HeartIcon",
+                      "HomeIcon",
+                      "MicrophoneIcon",
+                      "MusicalNoteIcon",
+                      "PaintBrushIcon",
+                      "RocketLaunchIcon",
+                      "SparklesIcon",
+                      "StarIcon",
+                      "SunIcon",
+                      "TrophyIcon",
+                      "UserGroupIcon",
+                      "WrenchIcon",
+                      null
+                    ]
+                  }
+                },
+                "required": [
+                  "name",
+                  "maxSessionDuration",
+                  "breakMinutes",
+                  "slotIncrementMinutes"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The new event",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "slug": { "type": "string" },
+                    "name": { "type": "string" },
+                    "description": { "type": "string" },
+                    "website": { "type": "string" },
+                    "timezone": { "type": "string" },
+                    "maxSessionDuration": { "type": "integer" },
+                    "breakMinutes": { "type": "integer" },
+                    "slotIncrementMinutes": { "type": "integer" },
+                    "rsvpCapacityHardLimit": { "type": "boolean" },
+                    "icon": { "type": ["string", "null"] },
+                    "meetingsEnabled": { "type": "boolean" },
+                    "maxOpenMeetingRequests": { "type": "integer" },
+                    "firstDayStart": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    },
+                    "lastDayStart": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    },
+                    "proposalPhaseStart": {
+                      "type": ["string", "null"],
+                      "format": "date-time",
+                      "description": "null clears it"
+                    },
+                    "proposalPhaseEnd": {
+                      "type": ["string", "null"],
+                      "format": "date-time",
+                      "description": "null clears it"
+                    },
+                    "votingPhaseStart": {
+                      "type": ["string", "null"],
+                      "format": "date-time",
+                      "description": "null clears it"
+                    },
+                    "votingPhaseEnd": {
+                      "type": ["string", "null"],
+                      "format": "date-time",
+                      "description": "null clears it"
+                    },
+                    "schedulingPhaseStart": {
+                      "type": ["string", "null"],
+                      "format": "date-time",
+                      "description": "null clears it"
+                    },
+                    "schedulingPhaseEnd": {
+                      "type": ["string", "null"],
+                      "format": "date-time",
+                      "description": "null clears it"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "slug",
+                    "name",
+                    "description",
+                    "website",
+                    "timezone",
+                    "maxSessionDuration",
+                    "breakMinutes",
+                    "slotIncrementMinutes",
+                    "rsvpCapacityHardLimit",
+                    "icon",
+                    "meetingsEnabled",
+                    "maxOpenMeetingRequests",
+                    "firstDayStart",
+                    "lastDayStart",
+                    "proposalPhaseStart",
+                    "proposalPhaseEnd",
+                    "votingPhaseStart",
+                    "votingPhaseEnd",
+                    "schedulingPhaseStart",
+                    "schedulingPhaseEnd"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/events/{id}": {
+      "get": {
+        "tags": ["admin"],
+        "description": "The event's settings, phase dates and days.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The event and its days",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "event": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string" },
+                        "slug": { "type": "string" },
+                        "name": { "type": "string" },
+                        "description": { "type": "string" },
+                        "website": { "type": "string" },
+                        "timezone": { "type": "string" },
+                        "maxSessionDuration": { "type": "integer" },
+                        "breakMinutes": { "type": "integer" },
+                        "slotIncrementMinutes": { "type": "integer" },
+                        "rsvpCapacityHardLimit": { "type": "boolean" },
+                        "icon": { "type": ["string", "null"] },
+                        "meetingsEnabled": { "type": "boolean" },
+                        "maxOpenMeetingRequests": { "type": "integer" },
+                        "firstDayStart": {
+                          "type": ["string", "null"],
+                          "format": "date-time"
+                        },
+                        "lastDayStart": {
+                          "type": ["string", "null"],
+                          "format": "date-time"
+                        },
+                        "proposalPhaseStart": {
+                          "type": ["string", "null"],
+                          "format": "date-time",
+                          "description": "null clears it"
+                        },
+                        "proposalPhaseEnd": {
+                          "type": ["string", "null"],
+                          "format": "date-time",
+                          "description": "null clears it"
+                        },
+                        "votingPhaseStart": {
+                          "type": ["string", "null"],
+                          "format": "date-time",
+                          "description": "null clears it"
+                        },
+                        "votingPhaseEnd": {
+                          "type": ["string", "null"],
+                          "format": "date-time",
+                          "description": "null clears it"
+                        },
+                        "schedulingPhaseStart": {
+                          "type": ["string", "null"],
+                          "format": "date-time",
+                          "description": "null clears it"
+                        },
+                        "schedulingPhaseEnd": {
+                          "type": ["string", "null"],
+                          "format": "date-time",
+                          "description": "null clears it"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "slug",
+                        "name",
+                        "description",
+                        "website",
+                        "timezone",
+                        "maxSessionDuration",
+                        "breakMinutes",
+                        "slotIncrementMinutes",
+                        "rsvpCapacityHardLimit",
+                        "icon",
+                        "meetingsEnabled",
+                        "maxOpenMeetingRequests",
+                        "firstDayStart",
+                        "lastDayStart",
+                        "proposalPhaseStart",
+                        "proposalPhaseEnd",
+                        "votingPhaseStart",
+                        "votingPhaseEnd",
+                        "schedulingPhaseStart",
+                        "schedulingPhaseEnd"
+                      ]
+                    },
+                    "days": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "start": { "type": "string", "format": "date-time" },
+                          "end": { "type": "string", "format": "date-time" },
+                          "startBookings": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "When sessions may start"
+                          },
+                          "endBookings": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "When sessions must end"
+                          },
+                          "id": { "type": "string" },
+                          "eventId": { "type": "string" }
+                        },
+                        "required": [
+                          "start",
+                          "end",
+                          "startBookings",
+                          "endBookings",
+                          "id",
+                          "eventId"
+                        ]
+                      }
+                    }
+                  },
+                  "required": ["event", "days"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["admin"],
+        "description": "Replaces the event's settings; phase dates, 1-on-1 settings and the slug stay. A new slot increment clears declared 1-on-1 availability.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string", "default": "" },
+                  "website": { "type": "string", "default": "" },
+                  "timezone": {
+                    "type": "string",
+                    "default": "UTC",
+                    "description": "IANA time zone the event's times are shown in"
+                  },
+                  "maxSessionDuration": {
+                    "type": "integer",
+                    "description": "Minutes"
+                  },
+                  "breakMinutes": {
+                    "type": "integer",
+                    "description": "Break before each session, in minutes"
+                  },
+                  "slotIncrementMinutes": {
+                    "type": "integer",
+                    "description": "One of 15, 30, 45, 60"
+                  },
+                  "rsvpCapacityHardLimit": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "icon": {
+                    "type": ["string", "null"],
+                    "enum": [
+                      "AcademicCapIcon",
+                      "BeakerIcon",
+                      "BoltIcon",
+                      "BookOpenIcon",
+                      "BriefcaseIcon",
+                      "BuildingOfficeIcon",
+                      "CakeIcon",
+                      "CalendarIcon",
+                      "ChatBubbleLeftIcon",
+                      "CloudIcon",
+                      "CodeBracketIcon",
+                      "CogIcon",
+                      "CommandLineIcon",
+                      "ComputerDesktopIcon",
+                      "CpuChipIcon",
+                      "FireIcon",
+                      "GlobeAltIcon",
+                      "HeartIcon",
+                      "HomeIcon",
+                      "MicrophoneIcon",
+                      "MusicalNoteIcon",
+                      "PaintBrushIcon",
+                      "RocketLaunchIcon",
+                      "SparklesIcon",
+                      "StarIcon",
+                      "SunIcon",
+                      "TrophyIcon",
+                      "UserGroupIcon",
+                      "WrenchIcon",
+                      null
+                    ]
+                  }
+                },
+                "required": [
+                  "name",
+                  "maxSessionDuration",
+                  "breakMinutes",
+                  "slotIncrementMinutes"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated event",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "slug": { "type": "string" },
+                    "name": { "type": "string" },
+                    "description": { "type": "string" },
+                    "website": { "type": "string" },
+                    "timezone": { "type": "string" },
+                    "maxSessionDuration": { "type": "integer" },
+                    "breakMinutes": { "type": "integer" },
+                    "slotIncrementMinutes": { "type": "integer" },
+                    "rsvpCapacityHardLimit": { "type": "boolean" },
+                    "icon": { "type": ["string", "null"] },
+                    "meetingsEnabled": { "type": "boolean" },
+                    "maxOpenMeetingRequests": { "type": "integer" },
+                    "firstDayStart": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    },
+                    "lastDayStart": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    },
+                    "proposalPhaseStart": {
+                      "type": ["string", "null"],
+                      "format": "date-time",
+                      "description": "null clears it"
+                    },
+                    "proposalPhaseEnd": {
+                      "type": ["string", "null"],
+                      "format": "date-time",
+                      "description": "null clears it"
+                    },
+                    "votingPhaseStart": {
+                      "type": ["string", "null"],
+                      "format": "date-time",
+                      "description": "null clears it"
+                    },
+                    "votingPhaseEnd": {
+                      "type": ["string", "null"],
+                      "format": "date-time",
+                      "description": "null clears it"
+                    },
+                    "schedulingPhaseStart": {
+                      "type": ["string", "null"],
+                      "format": "date-time",
+                      "description": "null clears it"
+                    },
+                    "schedulingPhaseEnd": {
+                      "type": ["string", "null"],
+                      "format": "date-time",
+                      "description": "null clears it"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "slug",
+                    "name",
+                    "description",
+                    "website",
+                    "timezone",
+                    "maxSessionDuration",
+                    "breakMinutes",
+                    "slotIncrementMinutes",
+                    "rsvpCapacityHardLimit",
+                    "icon",
+                    "meetingsEnabled",
+                    "maxOpenMeetingRequests",
+                    "firstDayStart",
+                    "lastDayStart",
+                    "proposalPhaseStart",
+                    "proposalPhaseEnd",
+                    "votingPhaseStart",
+                    "votingPhaseEnd",
+                    "schedulingPhaseStart",
+                    "schedulingPhaseEnd"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["admin"],
+        "description": "Deletes the event with its days, proposals, sessions and everything attached.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Deleted" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/events/{id}/phases": {
+      "put": {
+        "tags": ["admin"],
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "proposalPhaseStart": {
+                    "type": ["string", "null"],
+                    "format": "date-time",
+                    "description": "null clears it"
+                  },
+                  "proposalPhaseEnd": {
+                    "type": ["string", "null"],
+                    "format": "date-time",
+                    "description": "null clears it"
+                  },
+                  "votingPhaseStart": {
+                    "type": ["string", "null"],
+                    "format": "date-time",
+                    "description": "null clears it"
+                  },
+                  "votingPhaseEnd": {
+                    "type": ["string", "null"],
+                    "format": "date-time",
+                    "description": "null clears it"
+                  },
+                  "schedulingPhaseStart": {
+                    "type": ["string", "null"],
+                    "format": "date-time",
+                    "description": "null clears it"
+                  },
+                  "schedulingPhaseEnd": {
+                    "type": ["string", "null"],
+                    "format": "date-time",
+                    "description": "null clears it"
+                  }
+                },
+                "required": [
+                  "proposalPhaseStart",
+                  "proposalPhaseEnd",
+                  "votingPhaseStart",
+                  "votingPhaseEnd",
+                  "schedulingPhaseStart",
+                  "schedulingPhaseEnd"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated event",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "slug": { "type": "string" },
+                    "name": { "type": "string" },
+                    "description": { "type": "string" },
+                    "website": { "type": "string" },
+                    "timezone": { "type": "string" },
+                    "maxSessionDuration": { "type": "integer" },
+                    "breakMinutes": { "type": "integer" },
+                    "slotIncrementMinutes": { "type": "integer" },
+                    "rsvpCapacityHardLimit": { "type": "boolean" },
+                    "icon": { "type": ["string", "null"] },
+                    "meetingsEnabled": { "type": "boolean" },
+                    "maxOpenMeetingRequests": { "type": "integer" },
+                    "firstDayStart": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    },
+                    "lastDayStart": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    },
+                    "proposalPhaseStart": {
+                      "type": ["string", "null"],
+                      "format": "date-time",
+                      "description": "null clears it"
+                    },
+                    "proposalPhaseEnd": {
+                      "type": ["string", "null"],
+                      "format": "date-time",
+                      "description": "null clears it"
+                    },
+                    "votingPhaseStart": {
+                      "type": ["string", "null"],
+                      "format": "date-time",
+                      "description": "null clears it"
+                    },
+                    "votingPhaseEnd": {
+                      "type": ["string", "null"],
+                      "format": "date-time",
+                      "description": "null clears it"
+                    },
+                    "schedulingPhaseStart": {
+                      "type": ["string", "null"],
+                      "format": "date-time",
+                      "description": "null clears it"
+                    },
+                    "schedulingPhaseEnd": {
+                      "type": ["string", "null"],
+                      "format": "date-time",
+                      "description": "null clears it"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "slug",
+                    "name",
+                    "description",
+                    "website",
+                    "timezone",
+                    "maxSessionDuration",
+                    "breakMinutes",
+                    "slotIncrementMinutes",
+                    "rsvpCapacityHardLimit",
+                    "icon",
+                    "meetingsEnabled",
+                    "maxOpenMeetingRequests",
+                    "firstDayStart",
+                    "lastDayStart",
+                    "proposalPhaseStart",
+                    "proposalPhaseEnd",
+                    "votingPhaseStart",
+                    "votingPhaseEnd",
+                    "schedulingPhaseStart",
+                    "schedulingPhaseEnd"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/events/{id}/days": {
+      "post": {
+        "tags": ["admin"],
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "start": { "type": "string", "format": "date-time" },
+                  "end": { "type": "string", "format": "date-time" },
+                  "startBookings": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "When sessions may start"
+                  },
+                  "endBookings": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "When sessions must end"
+                  }
+                },
+                "required": ["start", "end", "startBookings", "endBookings"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The new day",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "start": { "type": "string", "format": "date-time" },
+                    "end": { "type": "string", "format": "date-time" },
+                    "startBookings": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "When sessions may start"
+                    },
+                    "endBookings": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "When sessions must end"
+                    },
+                    "id": { "type": "string" },
+                    "eventId": { "type": "string" }
+                  },
+                  "required": [
+                    "start",
+                    "end",
+                    "startBookings",
+                    "endBookings",
+                    "id",
+                    "eventId"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/days/{id}": {
+      "put": {
+        "tags": ["admin"],
+        "description": "Refused while a session scheduled in the day would fall outside it.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "start": { "type": "string", "format": "date-time" },
+                  "end": { "type": "string", "format": "date-time" },
+                  "startBookings": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "When sessions may start"
+                  },
+                  "endBookings": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "When sessions must end"
+                  }
+                },
+                "required": ["start", "end", "startBookings", "endBookings"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated day",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "start": { "type": "string", "format": "date-time" },
+                    "end": { "type": "string", "format": "date-time" },
+                    "startBookings": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "When sessions may start"
+                    },
+                    "endBookings": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "When sessions must end"
+                    },
+                    "id": { "type": "string" },
+                    "eventId": { "type": "string" }
+                  },
+                  "required": [
+                    "start",
+                    "end",
+                    "startBookings",
+                    "endBookings",
+                    "id",
+                    "eventId"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["admin"],
+        "description": "Deletes the day and every session overlapping it.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Deleted" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/locations": {
+      "get": {
+        "tags": ["admin"],
+        "description": "Every location in display order, hidden ones included; with `eventId`, those assigned to that event.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": false,
+            "name": "eventId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The locations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "locations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "name": { "type": "string" },
+                          "description": { "type": "string" },
+                          "areaDescription": { "type": ["string", "null"] },
+                          "capacity": { "type": "integer" },
+                          "color": { "type": "string" },
+                          "bookable": {
+                            "type": "boolean",
+                            "description": "false hides it from attendees' booking"
+                          },
+                          "imageUrl": { "type": "string" },
+                          "sortIndex": { "type": "integer" },
+                          "eventIds": {
+                            "type": "array",
+                            "items": { "type": "string" }
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "description",
+                          "areaDescription",
+                          "capacity",
+                          "color",
+                          "bookable",
+                          "imageUrl",
+                          "sortIndex",
+                          "eventIds"
+                        ]
+                      }
+                    }
+                  },
+                  "required": ["locations"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["admin"],
+        "description": "Adds a location after the others. Images are set in the admin UI.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "minLength": 1 },
+                  "capacity": { "type": "integer", "minimum": 0 },
+                  "description": { "type": "string", "default": "" },
+                  "areaDescription": { "type": "string" },
+                  "color": { "type": "string", "default": "slate" },
+                  "bookable": { "type": "boolean", "default": false },
+                  "eventIds": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "default": []
+                  }
+                },
+                "required": ["name", "capacity"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The new location",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "name": { "type": "string" },
+                    "description": { "type": "string" },
+                    "areaDescription": { "type": ["string", "null"] },
+                    "capacity": { "type": "integer" },
+                    "color": { "type": "string" },
+                    "bookable": {
+                      "type": "boolean",
+                      "description": "false hides it from attendees' booking"
+                    },
+                    "imageUrl": { "type": "string" },
+                    "sortIndex": { "type": "integer" },
+                    "eventIds": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "description",
+                    "areaDescription",
+                    "capacity",
+                    "color",
+                    "bookable",
+                    "imageUrl",
+                    "sortIndex",
+                    "eventIds"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/locations/{id}": {
+      "put": {
+        "tags": ["admin"],
+        "description": "Replaces the location's fields and events; its image and place in the order stay.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "minLength": 1 },
+                  "capacity": { "type": "integer", "minimum": 0 },
+                  "description": { "type": "string", "default": "" },
+                  "areaDescription": { "type": "string" },
+                  "color": { "type": "string", "default": "slate" },
+                  "bookable": { "type": "boolean", "default": false },
+                  "eventIds": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "default": []
+                  }
+                },
+                "required": ["name", "capacity"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated location",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "name": { "type": "string" },
+                    "description": { "type": "string" },
+                    "areaDescription": { "type": ["string", "null"] },
+                    "capacity": { "type": "integer" },
+                    "color": { "type": "string" },
+                    "bookable": {
+                      "type": "boolean",
+                      "description": "false hides it from attendees' booking"
+                    },
+                    "imageUrl": { "type": "string" },
+                    "sortIndex": { "type": "integer" },
+                    "eventIds": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "description",
+                    "areaDescription",
+                    "capacity",
+                    "color",
+                    "bookable",
+                    "imageUrl",
+                    "sortIndex",
+                    "eventIds"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["admin"],
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Deleted" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/locations/{id}/move": {
+      "post": {
+        "tags": ["admin"],
+        "description": "Swaps the location with its neighbour in the display order.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "direction": { "type": "string", "enum": ["up", "down"] }
+                },
+                "required": ["direction"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Moved, or already at that end" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/events/{id}/locations/assign": {
+      "post": {
+        "tags": ["admin"],
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "locationIds": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                },
+                "required": ["locationIds"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Assigned" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/events/{id}/locations/remove": {
+      "post": {
+        "tags": ["admin"],
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "locationIds": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                },
+                "required": ["locationIds"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Removed" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/events/{id}/location-unavailability": {
+      "get": {
+        "tags": ["admin"],
+        "description": "When the event's rooms cannot be booked, ordered by start.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The periods",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "periods": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "eventId": { "type": "string" },
+                          "locationId": { "type": "string" },
+                          "start": { "type": "string", "format": "date-time" },
+                          "end": { "type": "string", "format": "date-time" }
+                        },
+                        "required": [
+                          "id",
+                          "eventId",
+                          "locationId",
+                          "start",
+                          "end"
+                        ]
+                      }
+                    }
+                  },
+                  "required": ["periods"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["admin"],
+        "description": "Marks the rooms, all assigned to the event, unavailable for one period.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "locationIds": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "start": { "type": "string", "format": "date-time" },
+                  "end": { "type": "string", "format": "date-time" }
+                },
+                "required": ["locationIds", "start", "end"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Added" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/location-unavailability/{id}": {
+      "delete": {
+        "tags": ["admin"],
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Deleted" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "webhooks": {}

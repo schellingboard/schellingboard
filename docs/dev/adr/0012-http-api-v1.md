@@ -29,7 +29,9 @@ mounted by one route handler, `app/api/v1/[[...route]]/route.ts`, which passes
 every method to the app's `fetch`. It runs on the Node runtime and is never
 statically rendered. There is no custom server: the Dockerfile, the standalone
 output and `next dev` stay as they are, and `proxy.ts` gates `/api/v1` as
-section 3 sets out.
+section 3 sets out. Every response is sent with `cache-control: no-store`
+unless a route sets its own, so a browser never shows a stale read after a
+reload.
 
 `@hono/zod-openapi` supports zod 4, checked on 2026-10-04: version 1.6.3
 declares the peer dependencies `zod ^4.0.0` and `hono >=4.10.0` and builds on
@@ -105,7 +107,8 @@ kind (`notFound`, `forbidden`, `conflict`, `invalid`, `gone`). One function in
 (`application/problem+json`): `type: "about:blank"`, `title`, `status`, an
 optional `detail`, and the extension member `code`. A request that fails its
 contract gets `400` with code `request.invalid` and an `errors` list of paths
-and messages. Codes are dotted, named for what was refused
+and messages; a use case may attach the same list to its own `invalid` error to
+name every refused field at once (`location.invalid`). Codes are dotted, named for what was refused
 (`guest.protected`, `session.notFound`); a code once shipped keeps its meaning,
 and the client translates it rather than showing `detail`.
 

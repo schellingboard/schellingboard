@@ -1,52 +1,44 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getRepositories } from "@/db/container";
-import { isAdminRequest } from "@/utils/acting-admin";
-import { getImageRepositories } from "@/utils/images";
-import type { Location } from "@schellingboard/domain/location";
-import type { AdminActionResult, AdminFormActionResult } from "./admin-guests";
-import {
+import { cookies } from "next/headers";
+import type { z } from "zod";
+import type {
   locationSchema,
   updateLocationSchema,
 } from "@schellingboard/contracts/location";
-import { z } from "zod";
+import { venueUseCases } from "@/server/composition";
+import { resolveActor } from "@/server/kernel/actor";
+import type { Result } from "@/server/kernel/result";
+import type { LocationInput } from "@/server/modules/venue/module";
+import type { AdminActionResult, AdminFormActionResult } from "./admin-guests";
 
-async function validateEventIds(eventIds: string[]): Promise<boolean> {
-  const events = await getRepositories().events.list();
-  const known = new Set(events.map((e) => e.id));
-  return eventIds.every((id) => known.has(id));
+async function actor() {
+  return resolveActor(await cookies());
 }
 
-/** Reads and validates an uploaded image without storing it yet. */
-async function prepareImage(
-  image: Blob | null | undefined,
-  ctx: z.core.$RefinementCtx<Blob | null | undefined>
-): Promise<{ buffer: Buffer; ext: string } | undefined> {
-  if (!image) return;
-  const buffer = Buffer.from(await image.arrayBuffer());
-  const validation = await getImageRepositories().locations.validate(buffer);
-  if ("error" in validation) {
-    ctx.addIssue({
-      code: "custom",
-      message: validation.error,
-    });
-    return z.NEVER;
+function settled(result: Result<unknown>): AdminActionResult {
+  if (!result.ok) {
+    return { ok: false, error: result.error.detail ?? "Something went wrong" };
   }
-  return { buffer: validation.buffer, ext: validation.ext };
+  revalidatePath("/admin/locations");
+  return { ok: true };
 }
 
-const validations = {
-  eventIds: locationSchema.shape.eventIds.refine(validateEventIds, {
-    message: "Unknown event",
-  }),
-  // Validate the image before creating the location so a bad upload
-  // doesn't leave a half-created record behind
-  image: locationSchema.shape.image.transform(prepareImage),
-} as const;
-
-const locationValidationSchema = locationSchema.extend(validations);
-const updateLocationValidationSchema = updateLocationSchema.extend(validations);
+// Field issues go back as issues, so each message lands on its input.
+function settledForm(result: Result<unknown>): AdminFormActionResult {
+  const errors = result.ok ? undefined : result.error.errors;
+  if (!errors) return settled(result);
+  return {
+    ok: false,
+    error: errors.map(({ path, message }) => ({
+      code: "custom",
+      path: path ? path.split(".") : [],
+      message,
+      input: undefined,
+    })),
+  };
+}
 
 export async function createLocationAction(
   formData: z.input<typeof locationSchema>
@@ -54,42 +46,12 @@ export async function createLocationAction(
 export async function createLocationAction(
   formData: unknown
 ): Promise<AdminFormActionResult> {
-  if (!(await isAdminRequest())) {
-    return { ok: false, error: "Unauthorized" };
-  }
-
-  const parsed = await locationValidationSchema.safeParseAsync(formData);
-  if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues };
-  }
-  const { image, ...fields } = parsed.data;
-  const { eventIds, ...locationFields } = fields;
-
-  const { locations } = getRepositories();
-  const existing = await locations.list();
-  const sortIndex =
-    existing.length === 0
-      ? 0
-      : Math.max(...existing.map((l) => l.sortIndex)) + 1;
-
-  const location = await locations.create({
-    ...locationFields,
-    imageUrl: "",
-    sortIndex,
-  });
-
-  if (image) {
-    const imageUrl = await getImageRepositories().locations.save(
-      location.id,
-      image.buffer,
-      image.ext
-    );
-    await locations.update(location.id, { ...location, imageUrl });
-  }
-  await locations.setEventIds(location.id, eventIds);
-
-  revalidatePath("/admin/locations");
-  return { ok: true };
+  return settledForm(
+    await venueUseCases().createLocation(
+      await actor(),
+      formData as LocationInput
+    )
+  );
 }
 
 export async function updateLocationAction(
@@ -98,75 +60,23 @@ export async function updateLocationAction(
 export async function updateLocationAction(
   formData: unknown
 ): Promise<AdminFormActionResult> {
-  if (!(await isAdminRequest())) {
-    return { ok: false, error: "Unauthorized" };
-  }
-
-  const parsed = await updateLocationValidationSchema.safeParseAsync(formData);
-  if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues };
-  }
-  const { image, id, ...fields } = parsed.data;
-  const { eventIds, ...locationFields } = fields;
-
-  const { locations } = getRepositories();
-  const existing = await locations.findById(id);
-  if (!existing) {
-    return { ok: false, error: "Location not found" };
-  }
-
-  let imageUrl = existing.imageUrl;
-  if (image) {
-    imageUrl = await getImageRepositories().locations.save(
-      id,
-      image.buffer,
-      image.ext
-    );
-  }
-
-  const data: Omit<Location, "id"> = {
-    ...locationFields,
-    imageUrl,
-    sortIndex: existing.sortIndex,
-  };
-  await locations.update(id, data);
-  await locations.setEventIds(id, eventIds);
-
-  revalidatePath("/admin/locations");
-  return { ok: true };
+  return settledForm(
+    await venueUseCases().updateLocation(
+      await actor(),
+      formData as LocationInput & { id: string }
+    )
+  );
 }
 
 export async function deleteLocationAction(input: {
   id: string;
 }): Promise<AdminActionResult> {
-  if (!(await isAdminRequest())) {
-    return { ok: false, error: "Unauthorized" };
-  }
-
-  const { locations } = getRepositories();
-  const location = await locations.findById(input.id);
-  if (!location) {
-    return { ok: false, error: "Location not found" };
-  }
-
-  await locations.delete(input.id);
-  await getImageRepositories().locations.delete(input.id);
-
-  revalidatePath("/admin/locations");
-  return { ok: true };
+  return settled(await venueUseCases().deleteLocation(await actor(), input));
 }
 
 export async function moveLocationAction(input: {
   id: string;
   direction: "up" | "down";
 }): Promise<AdminActionResult> {
-  if (!(await isAdminRequest())) {
-    return { ok: false, error: "Unauthorized" };
-  }
-
-  const { locations } = getRepositories();
-  await locations.move(input.id, input.direction);
-
-  revalidatePath("/admin/locations");
-  return { ok: true };
+  return settled(await venueUseCases().moveLocation(await actor(), input));
 }

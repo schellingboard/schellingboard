@@ -1,6 +1,6 @@
 # Run progress
 
-Next step: 9.
+Next step: 10.
 
 ## Decisions
 
@@ -236,6 +236,46 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   #831), the VAPID public key route, and the profile and notification pages
   still read the repositories directly.
 
+- Step 9: `server/modules/events/` (`eventUseCases()`: `listEvents`, `getEvent` (with
+  its days), `createEvent`, `updateEvent`, `updateEventPhases`, `deleteEvent`,
+  `createDay`, `updateDay`, `deleteDay`) and `server/modules/venue/`
+  (`venueUseCases()`: `listLocations` (hidden ones and each one's `eventIds`
+  included; `eventId` filters), `createLocation`, `updateLocation`, `deleteLocation`,
+  `moveLocation`, `assignLocationsToEvent`, `removeLocationsFromEvent`; the image
+  store is a port). Room unavailability is a reserved window, which the target
+  architecture gives to scheduling, so it lives in the sessions module
+  (`listLocationUnavailability`, `addLocationUnavailability`,
+  `deleteLocationUnavailability`). Use cases take `Date | undefined` for dates (an
+  invalid Date is refused with the legacy message), so the actions keep parsing the
+  forms' UTC wall-clock strings and the API takes ISO instants with an offset;
+  check order is the legacy one (update day: day lookup before parsing). Kernel:
+  `AppError.errors` (`{ path, message }[]`, also sent in the problem body) and
+  `invalidFields(code, errors)`, so `location.invalid` reports every field at once as
+  the legacy form did; the action turns them back into issues. Event icon names
+  moved to `@schellingboard/domain/event-icons` (`app/event-icons.ts` checks its map
+  against them with `satisfies`). Routes: `GET/POST /admin/events`,
+  `GET/PUT/DELETE /admin/events/{id}`, `PUT /admin/events/{id}/phases`,
+  `POST /admin/events/{id}/days`, `PUT/DELETE /admin/days/{id}`,
+  `GET/POST /admin/locations` (`?eventId=`), `PUT/DELETE /admin/locations/{id}`,
+  `POST /admin/locations/{id}/move`, `POST /admin/events/{id}/locations/assign|remove`,
+  `GET/POST /admin/events/{id}/location-unavailability`,
+  `DELETE /admin/location-unavailability/{id}`; contract
+  `@schellingboard/contracts/event` and additions to `.../location`. Codes:
+  `admin.required`, `event.notFound`, `event.nameRequired`, `event.durationInvalid`,
+  `event.breakInvalid`, `event.slotIncrementInvalid`, `event.iconUnknown`,
+  `event.timezoneUnknown`, `event.slugEmpty`, `event.slugReserved`, `event.slugTaken` (409),
+  `event.slotIncrementMisaligned` (409), `event.phaseDateInvalid`,
+  `event.phasesOutOfOrder`, `day.notFound`, `day.dateInvalid`, `day.windowInvalid`,
+  `day.misaligned`, `day.overlap` (409), `day.sessionsOutside` (409),
+  `day.saveFailed` (409), `location.invalid` (with `errors`), `location.notFound`,
+  `unavailability.timeInvalid`, `unavailability.endBeforeStart`,
+  `unavailability.roomRequired`, `unavailability.roomNotInEvent`,
+  `unavailability.notFound`. Left out of the API: location images (multipart, admin
+  UI only). The time zone is checked (`Intl`), as the legacy `create-event` route
+  did. Location event ids are de-duplicated (a repeat used to crash on the
+  primary key). Every `/api/v1` response defaults to `cache-control: no-store`
+  (`createApp`). `app/api/admin/create-*` routes stay for step 10.
+
 ## Questions
 
 - Each module's `*-use-cases.test.ts` (steps 4–6b) re-tests rules the legacy action
@@ -250,6 +290,14 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   first" order and quick voting need them. When the UI moves to the API, should
   that order be served by the API (no counts) and the counts left out of the
   page payloads?
+
+- #1006 is only partly served by step 9 (`issue #1006`): events with their days and
+  locations with hidden ones can be read, and locations kept in sync by id. Still open
+  from the issue: an admin session list, a partial admin session update that keeps an
+  explicit capacity, a session delete answering the affected RSVP count, a
+  find-or-create for locations by name (`no-store` on every `/api/v1` response was
+  added in step 9's review). Which of these belong in this run (step 10?) and
+  which stay on the issue?
 
 ## Log
 
@@ -338,3 +386,13 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   which passed 3 of 3 with `--retries 0 --repeat-each 3` (a loading-race test this
   step does not touch). Every profile, notifications and push spec outside the
   baseline passed. No user-facing change, no CHANGELOG entry.
+- Step 9: events module (events, phases, days), venue module (locations, order,
+  event assignment), room unavailability in the sessions module, `/api/v1/admin`
+  routes for all of them (reads included), and the `admin-events`, `admin-days`,
+  `admin-locations`, `admin-location-events` and `admin-location-unavailability`
+  actions delegate. format, lint, arch, openapi-check, typecheck, test-coverage pass.
+  Firefox E2E cannot run (Playwright CDN blocked); full suite on Chromium: 175
+  passed, 17 failed, 3 flaky, all in the known baseline or known flakes (`kiosk:18`,
+  `schedule-agenda:220`, `view-session:7`); every admin spec outside the baseline
+  passed (the location-assignment test on retry). No user-facing change, no
+  CHANGELOG entry.

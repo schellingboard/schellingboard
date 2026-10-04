@@ -1,13 +1,16 @@
 import { getRepositories } from "@/db/container";
 import {
   commentUseCases,
+  eventUseCases,
   meetingUseCases,
   notificationUseCases,
   peopleUseCases,
   proposalUseCases,
   sessionUseCases,
+  venueUseCases,
 } from "@/server/composition";
 import { addCommentRoutes } from "@/server/modules/comments/module";
+import { addAdminEventRoutes } from "@/server/modules/events/module";
 import {
   addAdminMeetingRoutes,
   addMeetingRoutes,
@@ -19,10 +22,12 @@ import {
   addVoteRoutes,
 } from "@/server/modules/proposals/module";
 import {
+  addAdminUnavailabilityRoutes,
   addAttendeeCountRoutes,
   addRsvpRoutes,
   addSessionRoutes,
 } from "@/server/modules/sessions/module";
+import { addAdminVenueRoutes } from "@/server/modules/venue/module";
 import { actorMiddleware } from "./actor";
 import { createApp } from "./create-app";
 import { addHealthRoute } from "./health";
@@ -47,3 +52,6 @@ addAdminMeetingRoutes(api, meetingUseCases);
 addAttendeeCountRoutes(api, sessionUseCases);
 addPeopleRoutes(api, peopleUseCases);
 addNotificationRoutes(api, notificationUseCases);
+addAdminEventRoutes(api, eventUseCases);
+addAdminVenueRoutes(api, venueUseCases);
+addAdminUnavailabilityRoutes(api, sessionUseCases);

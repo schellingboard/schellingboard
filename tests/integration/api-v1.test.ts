@@ -41,6 +41,11 @@ describe("GET /api/v1/health", () => {
     }
   );
 
+  it("tells browsers not to cache it", { tags: ["019-US1"] }, async () => {
+    const res = await GET(new NextRequest("http://test/api/v1/health"));
+    expect(res.headers.get("cache-control")).toBe("no-store");
+  });
+
   it("is declared in the OpenAPI document with its response contract", () => {
     const doc = openApiDocument();
     expect(doc.openapi).toBe("3.1.0");

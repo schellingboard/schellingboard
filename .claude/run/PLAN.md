@@ -58,7 +58,7 @@ family delegate to the use cases. Keep each legacy route's response shape.
 - [x] 7. **Meetings**: `meetings` route and actions, `admin-meetings`.
 - [x] 8. **People and own settings**: `profile`, `settings`, `notifications`, `push`,
       `attendee-count`.
-- [ ] 9. **Admin: events, days, locations** (#1006): `admin-events`, `admin-days`,
+- [x] 9. **Admin: events, days, locations** (#1006): `admin-events`, `admin-days`,
       `admin-locations`, `admin-location-events`, `admin-location-unavailability`.
 - [ ] 10. **Admin: guests and site settings**: `admin-guests`, `admin-guest-events`,
       `admin-guest-import`, `admin-settings`, `admin/*` routes.

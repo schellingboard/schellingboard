@@ -10,10 +10,16 @@ export const HTTP_STATUS_BY_KIND = {
   gone: 410,
 } as const satisfies Record<ErrorKind, number>;
 
+export interface FieldError {
+  path: string;
+  message: string;
+}
+
 export interface AppError {
   kind: ErrorKind;
   code: string;
   detail?: string;
+  errors?: FieldError[];
 }
 
 export type Failure = { ok: false; error: AppError };
@@ -35,3 +41,10 @@ export const forbidden = failing("forbidden");
 export const conflict = failing("conflict");
 export const invalid = failing("invalid");
 export const gone = failing("gone");
+
+export function invalidFields(code: string, errors: FieldError[]): Failure {
+  return {
+    ok: false,
+    error: { kind: "invalid", code, detail: errors[0]?.message, errors },
+  };
+}
