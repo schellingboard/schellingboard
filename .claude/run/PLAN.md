@@ -74,7 +74,7 @@ family delegate to the use cases. Keep each legacy route's response shape.
       exist.
 - [x] 11. **`packages/api-client`**: generated from `openapi.json` in the build; one
       integration test calls the API through it.
-- [ ] 12. **Docs**: API page under `docs/public/self-hosting/`; a `docs/dev/` note;
+- [x] 12. **Docs**: API page under `docs/public/self-hosting/`; a `docs/dev/` note;
       step 3 status in `10-path-from-here.md`; one CHANGELOG bullet; ADR 0012 text
       matches what was built.
 - [ ] 13. **Finish**: summary in PROGRESS.md for review, then delete `.claude/run/`.

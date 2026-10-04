@@ -117,6 +117,11 @@ export default {
           icon: "shield-check",
         },
         {
+          title: "Server and API",
+          path: "/server/",
+          icon: "server",
+        },
+        {
           title: "Database migrations",
           path: "/migrations/",
           icon: "database",

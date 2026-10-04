@@ -48,7 +48,7 @@ app allows:
 
 ```
 server/
-  kernel/              Result, error codes, Actor and its resolution, the clock port
+  kernel/              Result and error kinds, Actor and its resolution, actingGuest
   http/                the Hono app, middleware (actor, idempotency, problem details), OpenAPI document
   composition.ts       builds every use case from the repositories; the one place they are wired
   modules/<module>/
@@ -58,8 +58,12 @@ server/
     http/              route declarations and handlers: contract in, use case, contract out
 ```
 
-Modules follow the target's names (scheduling, participation, proposals,
-meetings, people, notifications, events). Repositories stay in `db/` as
+Modules are named after what they hold, close to the target's: `sessions`
+(the target's scheduling and participation: sessions, RSVPs, room
+unavailability, attendee counts), `proposals` (with votes), `comments`,
+`meetings`, `people` (profiles and the admin guest list), `notifications`,
+`events` (with days), `venue` (locations) and `settings` (site settings, which
+the target's modules have no home for). Repositories stay in `db/` as
 ADR 0010 left them: a module's `ports.ts` names the repositories it needs
 instead of declaring new ones, and `composition.ts` passes in
 `getRepositories()`. dependency-cruiser enforces the target's rules on this
@@ -69,8 +73,9 @@ beyond the container's types; a module is imported only through its
 `module.ts` files, the use cases `composition.ts` wires, the kernel (server
 actions resolve the actor there, section 3) and the mount.
 
-A use case is a function of its dependencies taking an actor and validated
-input and returning a `Result`, as in the target. The unit of work and
+A use case is a function of its dependencies taking an actor, validated
+input and `now`, and returning a `Result`, as in the target. `now` is resolved
+per request (the dev fake clock, ADR 0004) rather than read from a clock port. The unit of work and
 `tx.record()` do not exist yet: repositories keep their own transactions and
 change logging (ADR 0011), so a use case that writes through two repositories
 is not atomic until a unit of work replaces them.
@@ -127,10 +132,21 @@ same key and actor:
 - after the first request finished, gets the stored response without running
   the use case again;
 - while it is still running, gets `409` with `idempotency.inProgress`;
-- with a different method, path or body, gets `422` with
+- with a different method, path (query included) or body, gets `422` with
   `idempotency.keyReused`.
 
-A `5xx` response is not stored, so a retry after a server error runs again.
+The actor a key is scoped to is the admin flag plus the guest's id and cookie
+level, so an open cookie naming a protected guest does not share that guest's
+verified keys. Claiming a key is one immediate transaction, so two concurrent
+requests cannot both run. A claim still unfinished after 60 seconds counts as
+abandoned (its process died), so a retry runs again rather than getting `409`
+for a day. The replay carries the stored status, headers (without
+`set-cookie`) and body. A key that is empty or over 255 characters is
+`400 request.invalid`. The body hash covers the raw bytes, so a multipart retry
+must resend the identical body, boundary included.
+
+A `5xx` response or a thrown error releases the key, so a retry after a server
+error runs again.
 Rows older than 24 hours are deleted by the jobs loop (ADR 0011) as scheduled
 work. The key is optional; without it a mutation simply runs. A request with
 neither admin nor guest has no one to scope a key to, so its key is ignored
@@ -145,8 +161,18 @@ A script imports the Hono app and writes its OpenAPI 3.1 document to
 it; `make openapi-check` regenerates it and fails with "Regenerate and review
 the API change" when it differs, and runs in `make precommit` and CI. Every
 route is declared with `createRoute` and its request and response contracts,
-so the document covers the whole API. The generated `api-client` is built from
-this file (a later step of this run).
+so the document covers the whole API.
+
+`packages/api-client` (`@schellingboard/api-client`) is a thin wrapper over
+`openapi-fetch` with types that `openapi-typescript` generates from this file.
+The generated types are committed too: `make openapi` writes both from the same
+document and `make openapi-check` fails when either is stale. This departs from
+the target ([03](../target-architecture/03-server.md#http-api): "generated from
+it in the build"): generating at build time would need a step before every
+`tsc`, ESLint, dependency-cruiser, Vitest and `next build` run, the Dockerfile
+included, and leave editors without types. One source and no staleness, the
+target's intent, hold either way. The app does not import the client, so the
+standalone build does not carry it.
 
 ## Consequences
 
@@ -162,7 +188,8 @@ this file (a later step of this run).
   use cases that write through one repository call.
 - A new `idempotency_keys` table and migration; a retried request after a lost
   response no longer RSVPs twice or creates two proposals (#141), for clients
-  that send the key.
+  that send the key. The web app's server actions do not, so #141 stays open
+  until the UI calls the API.
 - Pagination, rate limiting and `expectedVersion` checks from the target are
   not part of this decision; a table gains a version check only if it already
   has a version column.

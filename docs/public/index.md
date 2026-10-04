@@ -36,6 +36,8 @@ The attendee guide is the page worth sharing with your attendees.
   plus how to set up email.
 - [Backup and restore](self-hosting/backup.md) — what to back up, without
   stopping the site.
+- [HTTP API](self-hosting/api.md) — scripting event setup and connecting other
+  tools.
 
 SchellingBoard is open source (MIT). The code lives on
 [GitHub](https://github.com/schellingboard/schellingboard).

@@ -84,6 +84,11 @@
           "title": "Backup and restore",
           "path": "/self-hosting/backup/",
           "icon": "database-backup"
+        },
+        {
+          "title": "HTTP API",
+          "path": "/self-hosting/api/",
+          "icon": "braces"
         }
       ]
     },

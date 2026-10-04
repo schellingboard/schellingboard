@@ -105,8 +105,8 @@ page type stays next to the port while only `db/` uses it; once code outside
 no module, no HTTP and no framework, not even through a helper it imports; a
 module's `application/` imports no HTTP, framework or `db/` code; a module is
 imported only through its `module.ts`, by other modules, tests and `app/` alike;
-and `app/` reaches `server/` only through `module.ts`, the kernel and the API
-mount.
+and `app/` reaches `server/` only through `module.ts`, `composition.ts`, the
+kernel and the API mount. See [The server and the API](server.md).
 
 `make arch-graph` renders the graph to `arch-graph.svg` (needs graphviz), which
 is usually faster than arguing about where a boundary should go.

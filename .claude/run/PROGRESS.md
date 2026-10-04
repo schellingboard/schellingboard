@@ -1,6 +1,6 @@
 # Run progress
 
-Next step: 12.
+Next step: 13.
 
 ## Decisions
 
@@ -351,6 +351,24 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   section 6 still says the client comes "in a later step"; ADR 0010 and docs do not
   list the package.
 
+- Step 12: public page `docs/public/self-hosting/api.md` (sidebar and index
+  linked): signing in through `/api/auth/login` (the cookie format stays
+  undocumented: it changes with tokens in target step 6), problem codes, `Idempotency-Key`, `no-store`,
+  the client (private workspace package, not on npm; `openapi.json` is not
+  served, readers take it from the release tag). Dev note `docs/dev/server.md`
+  (layout, adding a use case and route, testing split). The target's
+  03-server.md and 07-repo-and-rules.md describe the target, so they stay; the
+  committed api-client types are recorded as a deviation in ADR 0012 section 6.
+  ADR 0012 (still Proposed) now names the built modules (`people` holds the
+  admin guest list, `settings` is extra), `now` per request, the idempotency
+  scope, claim, 60 s abandonment, key length, replayed headers and multipart
+  rule. Step 3's status and what remains are in `10-path-from-here.md`.
+  coding-guidelines' Authorization helpers point at the new paths. CHANGELOG `Added` bullet (#677); no release-notes highlight
+  (the five are attendee features an API for scripts would not displace).
+  `fixes #677`: every route the issue asked for has an `/api/v1` equivalent in
+  `openapi.json`, now documented. Not changed: AGENTS.md's "Bad" example cites
+  comments in `app/(site)/context.tsx` that were gone before this run.
+
 ## Questions
 
 - Each module's `*-use-cases.test.ts` (steps 4–6b) re-tests rules the legacy action
@@ -498,3 +516,7 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   test-coverage pass. No app code changed, so no E2E run; `make test-e2e-docker`
   cannot run here (Dockerfile gained one manifest `COPY`). No user-facing change, no
   CHANGELOG entry.
+- Step 12: API page for self-hosters, `docs/dev/server.md`, ADR 0012 matching the
+  build, step 3 status, one CHANGELOG bullet, moved example paths. format, lint,
+  docs-validate, docs-dev-validate, arch, openapi-check, typecheck, test-coverage
+  pass. Docs only, no E2E run (Firefox cannot run: Playwright CDN blocked).
