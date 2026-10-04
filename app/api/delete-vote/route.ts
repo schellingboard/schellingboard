@@ -1,10 +1,6 @@
-import { getRepositories } from "@/db/container";
-import { inVotingPhase } from "@schellingboard/domain/phase";
+import { proposalUseCases } from "@/server/composition";
 import { requestNow } from "@/utils/dev-clock";
-import {
-  guestProtectionError,
-  isRequestVerifiedAsGuest,
-} from "@/utils/acting-guest";
+import { legacyActor, legacyRefusal } from "@/app/api/legacy";
 
 export const dynamic = "force-dynamic";
 
@@ -13,28 +9,18 @@ export async function POST(req: Request) {
     guestId: string;
     proposalId: string;
   };
-
-  const repos = getRepositories();
-  if (!(await isRequestVerifiedAsGuest(req, guestId))) {
-    return guestProtectionError();
-  }
-  const proposal = await repos.sessionProposals.findById(proposalId);
-  if (!proposal) {
-    return Response.json({ error: "Proposal not found" }, { status: 404 });
-  }
-  const event = await repos.events.findById(proposal.eventId);
-  if (!event || !inVotingPhase(event, requestNow(req))) {
-    return Response.json(
-      { error: "Voting is only allowed during the voting phase" },
-      { status: 403 }
-    );
-  }
-
+  const actor = await legacyActor(req);
+  let result;
   try {
-    await repos.votes.deleteByGuestAndProposal(guestId, proposalId);
-    return Response.json({ success: true });
+    result = await proposalUseCases().withdrawVote(
+      actor,
+      { guestId, proposalId },
+      requestNow(req)
+    );
   } catch (err) {
     console.error(err);
     return Response.error();
   }
+  if (!result.ok) return legacyRefusal(result.error);
+  return Response.json({ success: true });
 }

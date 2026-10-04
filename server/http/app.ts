@@ -1,6 +1,10 @@
 import { getRepositories } from "@/db/container";
-import { sessionUseCases } from "@/server/composition";
-import { addSessionRoutes } from "@/server/modules/sessions/module";
+import { proposalUseCases, sessionUseCases } from "@/server/composition";
+import { addProposalRoutes } from "@/server/modules/proposals/module";
+import {
+  addRsvpRoutes,
+  addSessionRoutes,
+} from "@/server/modules/sessions/module";
 import { actorMiddleware } from "./actor";
 import { createApp } from "./create-app";
 import { addHealthRoute } from "./health";
@@ -16,3 +20,5 @@ api.use(
 );
 addHealthRoute(api);
 addSessionRoutes(api, sessionUseCases);
+addRsvpRoutes(api, sessionUseCases);
+addProposalRoutes(api, proposalUseCases);

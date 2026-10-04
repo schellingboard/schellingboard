@@ -44,7 +44,7 @@ family delegate to the use cases. Keep each legacy route's response shape.
       request returns the stored response. Cover #141 if it falls out.
 - [x] 4. **Sessions**: get, list, create, update, delete. Delegate `add-session`,
       `update-session`, `delete-session`, `session`, `admin-sessions`.
-- [ ] 5. **RSVPs and votes**: `toggle-rsvp`, `rsvps`, `add-vote`, `delete-vote`,
+- [x] 5. **RSVPs and votes**: `toggle-rsvp`, `rsvps`, `add-vote`, `delete-vote`,
       `votes`, `admin-rsvps`.
 - [ ] 6. **Proposals and comments**: `proposal`, `admin-proposals`, comment actions.
 - [ ] 7. **Meetings**: `meetings` route and actions, `admin-meetings`.

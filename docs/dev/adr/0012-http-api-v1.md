@@ -84,8 +84,10 @@ the same `Actor` from `cookies()` through the same function.
 Acting as a guest keeps today's rule, as one kernel function every use case
 calls (`actingGuest`): a request may act as an unprotected guest it names, and
 as a protected guest only with that guest's verified cookie (#370). It refuses
-with `guest.unselected` or `guest.protected`. Organizer actions require
-the admin actor. No tokens, persons or roles: those are step 6.
+with `guest.unselected` or `guest.protected`. Where the request names the guest
+in its path or body (RSVPs, votes), `actingAsNamedGuest` applies the same rule
+to the named guest. Organizer actions require the admin actor. No tokens,
+persons or roles: those are step 6.
 
 `proxy.ts` gates the API as it gates the legacy routes. Endpoints that require
 the admin actor live under `/api/v1/admin/`, which gets the `/api/admin/*`

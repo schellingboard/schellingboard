@@ -219,7 +219,7 @@ Bad — `app/(site)/context.tsx` narrates itself; every one of these should be d
 ```
 
 Good — each says something the code cannot (`app/api/votes/route.ts`,
-`app/api/add-vote/route.ts`, `app/(site)/guests/avatar.tsx`):
+`server/modules/proposals/application/votes.ts`, `app/(site)/guests/avatar.tsx`):
 
 ```ts
 // Without an explicit no-store, browsers heuristically cache this response

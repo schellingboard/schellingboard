@@ -19,3 +19,17 @@ export async function actingGuest(
     return forbidden("guest.protected");
   return ok(actor.guest.id);
 }
+
+// The same rule for a guest the request names. An unknown guest passes: the
+// use case's own membership or existence check refuses it.
+export async function actingAsNamedGuest(
+  actor: Actor,
+  guestId: string,
+  guests: GuestProtectionLookup
+): Promise<Result<string>> {
+  const creds = await guests.getAuthCredentials(guestId);
+  const verified =
+    actor.guest?.id === guestId && actor.guest.level === "verified";
+  if (creds?.authProtected && !verified) return forbidden("guest.protected");
+  return ok(guestId);
+}

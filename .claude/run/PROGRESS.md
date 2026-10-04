@@ -1,6 +1,6 @@
 # Run progress
 
-Next step: 5.
+Next step: 6.
 
 ## Decisions
 
@@ -101,6 +101,28 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   request anyway.
 - Step 4: the legacy `session/[sessionId]/comments` route only delegates its
   session-exists check to `getSession`; listing comments moves with comments (step 6).
+- Step 5: RSVPs live in the sessions module (`application/rsvps.ts`,
+  `http/rsvp-routes.ts`: the target's scheduling owns `canRsvp`); votes start the
+  `server/modules/proposals/` module (`proposalUseCases()`), which step 6 extends.
+  Legacy RSVP and vote routes name the guest in the body, so the kernel gains
+  `actingAsNamedGuest(actor, guestId, guests)`: `guest.protected` unless the actor is
+  that guest verified; an unknown guest passes, the membership check refuses it
+  (`guest.notInEvent`), keeping the legacy check order (ADR 0012 section 3 amended).
+  Routes: `GET /sessions/{id}/rsvps`, `GET /guests/{id}/rsvps`,
+  `PUT/DELETE /sessions/{id}/rsvps/{guestId}`, `DELETE /admin/sessions/{id}/rsvps/{guestId}`,
+  `PUT/DELETE /proposals/{id}/votes/{guestId}` (body `{ choice }`),
+  `GET /guests/{id}/votes?eventId=`; mutations answer 204. Codes: `guest.notInEvent`,
+  `rsvp.ownSession`, `session.full` (409), `proposal.notFound`,
+  `event.notVotingPhase`, reused `event.notSchedulingPhase`, `session.notFound`,
+  `event.notFound`, `admin.required`. `listSessionRsvps` 404s an unknown session; the
+  legacy `rsvps?session=` maps that back to `[]`. `listGuestVotes` takes the event by
+  id or slug so the legacy route keeps privacy before the 404. `app/api/legacy.ts`:
+  `legacyActor(req)` (cookies from the headers: `new NextRequest(req)` consumes the
+  body) and `legacyRefusal` (old `{ error }` bodies). Route helpers (`json`, `body`,
+  `idParam`, `noContent`, `App`) moved to `server/http/route-parts.ts`.
+- Step 5: the vote breakdown is server-rendered from proposal data, not served by
+  any route in this step; its privacy rule moves with proposals (step 6).
+  `app/api/admin/create-rsvp` stays for step 10 (`admin/*` routes).
 
 ## Questions
 
@@ -147,3 +169,12 @@ None open.
   commit (2 of 2); flaky `profile.spec.ts:383` passes on rerun. Session specs
   (`update-session`, `scheduling`, `rsvp`, `disabled-hints`) pass with retries 0.
   No user-facing change, no CHANGELOG entry.
+- Step 5: RSVP use cases in the sessions module, vote use cases in a new proposals
+  module, `/api/v1` RSVP and vote routes (guest and admin), legacy `toggle-rsvp`,
+  `rsvps`, `add-vote`, `delete-vote`, `votes` and the admin RSVP action delegate to
+  them with their old bodies, statuses and `no-store` headers. format, lint, arch,
+  openapi-check, typecheck, test-coverage pass. Firefox E2E cannot run (Playwright CDN
+  blocked); full suite on Chromium: 177 passed, 14 failed, 4 flaky, all in the known
+  baseline or known flakes (`kiosk.spec.ts:18`, `schedule-agenda:220`); every rsvp,
+  voting, view-session and update-session spec passed. No user-facing change, no
+  CHANGELOG entry.

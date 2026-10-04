@@ -7,24 +7,17 @@ import {
   sessionUpdateSchema,
   sessionViewSchema,
 } from "@schellingboard/contracts/session";
-import type { createApp } from "@/server/http/create-app";
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import { problem, problemDefault } from "@/server/http/problem";
+import {
+  body,
+  idParam,
+  json,
+  noContent,
+  type App,
+} from "@/server/http/route-parts";
 import type { SessionUseCases } from "../application/use-cases";
 import { toSessionView } from "./view";
-
-type App = ReturnType<typeof createApp>;
-
-const json = <T extends z.ZodType>(schema: T, description: string) => ({
-  description,
-  content: { "application/json": { schema } },
-});
-const body = <T extends z.ZodType>(schema: T) => ({
-  required: true,
-  content: { "application/json": { schema } },
-});
-const idParam = z.object({ id: z.string().min(1) });
-const noContent = (description: string) => ({ description });
 
 const getSession = createRoute({
   method: "get",

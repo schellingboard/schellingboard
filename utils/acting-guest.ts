@@ -33,33 +33,6 @@ export function guestProtectionError(): Response {
   return Response.json({ error: NAME_PROTECTED_ERROR }, { status: 403 });
 }
 
-/** Cookie-header parsing that works for plain `Request` route handlers. */
-function requestCookie(req: Request, name: string): string | undefined {
-  const header = req.headers.get("cookie");
-  if (!header) return undefined;
-  for (const part of header.split(/;\s*/)) {
-    const eq = part.indexOf("=");
-    if (eq > -1 && part.slice(0, eq) === name) {
-      const raw = part.slice(eq + 1);
-      // A client-forged cookie can carry malformed percent-encoding; fall
-      // back to the raw value rather than throwing (it won't verify anyway).
-      try {
-        return decodeURIComponent(raw);
-      } catch {
-        return raw;
-      }
-    }
-  }
-  return undefined;
-}
-
-export async function isRequestVerifiedAsGuest(
-  req: Request,
-  guestId: string
-): Promise<boolean> {
-  return isVerifiedAsGuest(guestId, requestCookie(req, GUEST_COOKIE_NAME));
-}
-
 type ReadonlyCookies = {
   get(name: string): { value: string } | undefined;
 };

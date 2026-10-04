@@ -1,24 +1,22 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getRepositories } from "@/db/container";
-import { isAdminRequest } from "@/utils/acting-admin";
+import { cookies } from "next/headers";
+import { sessionUseCases } from "@/server/composition";
+import { resolveActor } from "@/server/kernel/actor";
 import type { AdminActionResult } from "./admin-guests";
 
 export async function adminRemoveRsvpAction(input: {
   sessionId: string;
   guestId: string;
 }): Promise<AdminActionResult> {
-  if (!(await isAdminRequest())) return { ok: false, error: "Unauthorized" };
-
-  const { sessions, rsvps } = getRepositories();
-  const session = await sessions.findById(input.sessionId);
-  if (!session) return { ok: false, error: "Session not found" };
-
-  await rsvps.deleteBySessionAndGuest(input.sessionId, input.guestId);
+  const actor = await resolveActor(await cookies());
+  const result = await sessionUseCases().adminRemoveRsvp(actor, input);
+  if (!result.ok)
+    return { ok: false, error: result.error.detail ?? "Failed to remove RSVP" };
 
   revalidatePath("/admin");
   revalidatePath("/admin/events");
-  revalidatePath(`/admin/events/${session.eventId}`);
+  revalidatePath(`/admin/events/${result.value.eventId}`);
   return { ok: true };
 }

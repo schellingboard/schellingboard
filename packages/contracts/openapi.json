@@ -1015,6 +1015,557 @@
           }
         }
       }
+    },
+    "/api/v1/sessions/{id}/rsvps": {
+      "get": {
+        "tags": ["rsvps"],
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Who RSVPed to the session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rsvps": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "sessionId": { "type": "string" },
+                          "guestId": { "type": "string" }
+                        },
+                        "required": ["id", "sessionId", "guestId"]
+                      }
+                    }
+                  },
+                  "required": ["rsvps"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/guests/{id}/rsvps": {
+      "get": {
+        "tags": ["rsvps"],
+        "description": "A protected guest's RSVPs need that guest's verified cookie.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The guest's RSVPs in every event",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rsvps": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "sessionId": { "type": "string" },
+                          "guestId": { "type": "string" }
+                        },
+                        "required": ["id", "sessionId", "guestId"]
+                      }
+                    }
+                  },
+                  "required": ["rsvps"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sessions/{id}/rsvps/{guestId}": {
+      "put": {
+        "tags": ["rsvps"],
+        "description": "RSVPs the named guest during scheduling; a protected guest needs its verified cookie.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "guestId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "204": { "description": "RSVPed" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["rsvps"],
+        "description": "Withdraws the named guest's RSVP during scheduling.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "guestId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Withdrawn" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/sessions/{id}/rsvps/{guestId}": {
+      "delete": {
+        "tags": ["admin"],
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "guestId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Removed" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/guests/{id}/votes": {
+      "get": {
+        "tags": ["votes"],
+        "description": "A protected guest's votes need that guest's verified cookie.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "eventId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The guest's votes in the event",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "votes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "proposalId": { "type": "string" },
+                          "guestId": { "type": "string" },
+                          "choice": {
+                            "type": "string",
+                            "enum": ["interested", "maybe", "skip"]
+                          }
+                        },
+                        "required": ["id", "proposalId", "guestId", "choice"]
+                      }
+                    }
+                  },
+                  "required": ["votes"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/proposals/{id}/votes/{guestId}": {
+      "put": {
+        "tags": ["votes"],
+        "description": "Casts or replaces the named guest's vote during voting; a protected guest needs its verified cookie.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "guestId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "choice": {
+                    "type": "string",
+                    "enum": ["interested", "maybe", "skip"]
+                  }
+                },
+                "required": ["choice"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Voted" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["votes"],
+        "description": "Withdraws the named guest's vote during voting.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "guestId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Withdrawn" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "webhooks": {}

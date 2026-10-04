@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getRepositories } from "@/db/container";
-import { isRequestVerifiedAsGuest } from "@/utils/acting-guest";
+import { proposalUseCases } from "@/server/composition";
+import { resolveActor } from "@/server/kernel/actor";
 
 export const dynamic = "force-dynamic";
 
@@ -20,27 +20,22 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Votes are private to their owner once the guest is protected — as is a
-  // guest's per-user RSVP list (see app/api/rsvps). Only the per-session RSVP
-  // list stays openly readable.
-  if (!(await isRequestVerifiedAsGuest(request, user))) {
-    return NextResponse.json(
-      { error: "This user's votes are private" },
-      { ...NO_STORE, status: 403 }
-    );
-  }
-
   try {
-    const repos = getRepositories();
-    const event = await repos.events.findBySlug(eventSlug);
-    if (!event) {
+    const result = await proposalUseCases().listGuestVotes(
+      await resolveActor(request.cookies),
+      { guestId: user, event: { slug: eventSlug } }
+    );
+    if (result.ok) return NextResponse.json(result.value, NO_STORE);
+    if (result.error.code === "guest.protected") {
       return NextResponse.json(
-        { error: "Event not found" },
-        { ...NO_STORE, status: 404 }
+        { error: "This user's votes are private" },
+        { ...NO_STORE, status: 403 }
       );
     }
-    const votes = await repos.votes.listByGuestAndEvent(user, event.id);
-    return NextResponse.json(votes, NO_STORE);
+    return NextResponse.json(
+      { error: "Event not found" },
+      { ...NO_STORE, status: 404 }
+    );
   } catch (error) {
     console.error("Error fetching votes:", error);
     return NextResponse.json(

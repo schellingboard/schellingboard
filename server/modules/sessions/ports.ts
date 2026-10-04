@@ -10,6 +10,7 @@ export interface SessionDeps {
     | "guests"
     | "locations"
     | "locationUnavailability"
+    | "rsvps"
   >;
   notifyCohostsAdded(args: {
     session: Session;
