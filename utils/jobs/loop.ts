@@ -15,6 +15,7 @@ import {
   PRUNE_CHANGES,
   PRUNE_DELIVERIES,
   PRUNE_EVERY_MS,
+  PRUNE_IDEMPOTENCY_KEYS,
   SESSION_NOTIFICATIONS,
   type Job,
 } from "./job";
@@ -51,6 +52,10 @@ export function defaultJobs(): Job[] {
     lazy(PRUNE_DELIVERIES, PRUNE_EVERY_MS, async () => {
       const { pruneDeliveries } = await import("./deliveries");
       return pruneDeliveries;
+    }),
+    lazy(PRUNE_IDEMPOTENCY_KEYS, PRUNE_EVERY_MS, async () => {
+      const { pruneIdempotencyKeys } = await import("./idempotency");
+      return pruneIdempotencyKeys;
     }),
   ];
   // 0 switches the reminders off, which is how a self-hoster turns them off

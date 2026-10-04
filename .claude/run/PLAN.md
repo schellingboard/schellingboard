@@ -40,7 +40,7 @@ family delegate to the use cases. Keep each legacy route's response shape.
 - [x] 2a. **Kernel free of Next**: move the cookie checks the actor needs out of
       `utils/auth.ts` into a module without a Next import; the kernel's
       dependency-cruiser rule checks reachable modules, not only direct imports.
-- [ ] 3. **Idempotency**: table, migration, middleware for mutations; a retried
+- [x] 3. **Idempotency**: table, migration, middleware for mutations; a retried
       request returns the stored response. Cover #141 if it falls out.
 - [ ] 4. **Sessions**: get, list, create, update, delete. Delegate `add-session`,
       `update-session`, `delete-session`, `session`, `admin-sessions`.

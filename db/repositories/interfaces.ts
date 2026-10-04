@@ -838,6 +838,50 @@ export interface JobsRepository {
   setCursor(name: string, seq: number): Promise<void>;
 }
 
+export interface StoredResponse {
+  status: number;
+  headers: Record<string, string>;
+  body: string | null;
+}
+
+export interface IdempotencyRequest {
+  actor: string;
+  key: string;
+  method: string;
+  path: string;
+  bodyHash: string;
+}
+
+export interface IdempotencyOwner {
+  actor: string;
+  key: string;
+  claimedAt: Date;
+}
+
+export type IdempotencyClaim =
+  | { state: "claimed" }
+  | { state: "inProgress" }
+  | { state: "keyReused" }
+  | { state: "done"; response: StoredResponse };
+
+export interface IdempotencyRepository {
+  /**
+   * Claims the actor's key for this request. A row created before
+   * `expiredBefore`, or still unfinished since before `abandonedBefore`, is
+   * replaced as if it were gone.
+   */
+  claim(
+    request: IdempotencyRequest,
+    now: Date,
+    cutoffs: { expiredBefore: Date; abandonedBefore: Date }
+  ): Promise<IdempotencyClaim>;
+  // `claimedAt` is the `now` the claim was made with, so a request whose claim
+  // was taken over as abandoned cannot touch its successor's row.
+  complete(claim: IdempotencyOwner, response: StoredResponse): Promise<void>;
+  release(claim: IdempotencyOwner): Promise<void>;
+  prune(before: Date): Promise<void>;
+}
+
 export interface DeliveriesRepository {
   enqueue(delivery: {
     guestId: string;

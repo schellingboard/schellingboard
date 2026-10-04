@@ -543,6 +543,12 @@ export const features = {
         actor: "self-hoster",
         priority: "P2",
       },
+      US2: {
+        title:
+          "Self-hoster's script retries an API call without it taking effect twice",
+        actor: "self-hoster",
+        priority: "P3",
+      },
     },
   },
   "020": {

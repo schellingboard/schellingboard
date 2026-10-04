@@ -1,6 +1,6 @@
 # Run progress
 
-Next step: 3.
+Next step: 4.
 
 ## Decisions
 
@@ -47,6 +47,32 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   `server/composition.ts` arrive with the first use case; `v1/[[...route]]` is in the
   mutating-surface guard's `READ_ONLY` and must move to a verifier with the first
   mutation.
+- Step 3: `idempotency_keys` (PK actor + key, `created_at` index; migration 0047),
+  `IdempotencyRepository.claim/complete/release/prune` in `db/` (claim is one immediate
+  transaction, so concurrent requests cannot both run; a row older than 24 h counts as
+  gone). `server/http/idempotency.ts`: `idempotencyMiddleware({ store, now })` after the
+  actor middleware, for POST/PUT/PATCH/DELETE with the header; actor scope
+  `admin|-` + `:` + guest level and id or `-` (an open cookie naming a protected guest
+  does not share the verified guest's keys); path is pathname plus query; body is a
+  sha256 of the raw bytes; replays status, headers (minus `set-cookie`) and body; a 5xx
+  or a throw releases the key; a row still unfinished after 60 s counts as abandoned
+  (its process died), so a retry runs again instead of 409 for 24 h; `complete` and
+  `release` match the claim's `created_at`, so the abandoned request finishing late
+  cannot touch the retry's row; a key over 255
+  chars or empty is `400 request.invalid`.
+  Pruned hourly by the `prune-idempotency-keys` job (`utils/jobs/idempotency.ts`).
+  Expiry uses real time, not the dev fake clock (infrastructure, like the throttles).
+  #141 does not fall out: the proposal form is a server action, which does not send the
+  key (ADR 0012 section 5); it is closed only once the UI calls the API with a key.
+- Step 3 left for step 4: declare the `Idempotency-Key` header on each mutating route's
+  contract so `openapi.json` shows it; no test yet goes through the mounted `api`'s
+  idempotency wiring, since no mutating route exists.
+- Left for the first multipart route (avatar upload, guest import): the body hash
+  covers the raw bytes, and clients pick a new multipart boundary per attempt, so a
+  retry would get `422 idempotency.keyReused`; hash the parsed form there. Requests
+  with neither admin nor guest all share the scope `-:-`; give them a scope (or ignore
+  the key) before any route accepts them. Responses are stored as text, so a route
+  answering binary must not be replayed as is.
 
 ## Questions
 
@@ -78,3 +104,8 @@ None open.
   format, lint, arch, openapi-check, typecheck, test-coverage pass. Firefox E2E cannot
   run (Playwright CDN blocked); on Chromium `user-auth`, `admin`, `update-session` pass
   except the two baseline `admin.spec.ts` failures (`:828`, `:1033`).
+- Step 3: idempotency table, migration 0047, middleware, prune job; integration tests
+  against a test-only app (`tests/integration/idempotency.test.ts`, use case 019-US2).
+  format, lint, arch, openapi-check, typecheck, test-coverage pass. Firefox E2E cannot
+  run (Playwright CDN blocked); on Chromium `user-auth.spec.ts` passes (app boots with
+  the migration and the new job). No user-facing change, no CHANGELOG entry.

@@ -661,6 +661,27 @@ export const changes = sqliteTable(
   ]
 );
 
+// One row per Idempotency-Key an actor sent to /api/v1 (ADR 0012). The status
+// stays null while the first request runs.
+export const idempotencyKeys = sqliteTable(
+  "idempotency_keys",
+  {
+    actor: text("actor").notNull(),
+    key: text("key").notNull(),
+    method: text("method").notNull(),
+    path: text("path").notNull(),
+    bodyHash: text("body_hash").notNull(),
+    status: integer("status"),
+    headers: text("headers", { mode: "json" }).$type<Record<string, string>>(),
+    body: text("body"),
+    createdAt: text("created_at").notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.actor, t.key] }),
+    index("idempotency_keys_created_at_idx").on(t.createdAt),
+  ]
+);
+
 // Which process runs the jobs loop against this database (ADR 0011). It keeps
 // a second server on the same file from doing the same work. It is renewed
 // only between jobs: claims cover the jobs that send, and a reaction's cursor
