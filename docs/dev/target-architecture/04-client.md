@@ -97,7 +97,7 @@ export const rsvp = command({
    shows the problem's code.
 4. Only `commands/` may write to the replica outside `apply`. There is exactly one
    optimistic mechanism, used by every mutation, which is what ends the class of
-   bugs in #463.
+   bugs in [#463](https://github.com/schellingboard/schellingboard/issues/463).
 
 Edits carry `expectedVersion`; a `409` shows "changed by someone else" with the
 current values.
@@ -117,7 +117,7 @@ scroll). Notable consequences:
   width; a "now" strip shows what is running across all places at this minute.
 - **Modals** are routes (`?session={id}` as a search param over the current
   screen), so back returns to the previous modal and deep links open the
-  right screen behind them (#856, #994).
+  right screen behind them ([#856](https://github.com/schellingboard/schellingboard/issues/856), [#994](https://github.com/schellingboard/schellingboard/issues/994)).
 - **Venue**: a place popover shows floor and directions; the venue screen shows the
   map with pins; a session block's place chip opens the popover.
 - **Kiosk** is `?kiosk=1` on the schedule: the same replica, auto-scroll to now,
@@ -135,7 +135,7 @@ scroll). Notable consequences:
   A push carries only a notification id; the app fetches the record when opened,
   so push payloads hold no content.
 - An update check compares the served version with the running one and offers a
-  reload (#788).
+  reload ([#788](https://github.com/schellingboard/schellingboard/issues/788)).
 
 ## UI foundations
 
@@ -145,4 +145,4 @@ scroll). Notable consequences:
 - Time is formatted only through `i18n/format`, which wraps `domain/time` with the
   person's zone, locale and 12/24-hour preference.
 - Forms validate against the same zod contract the server uses, per field, with
-  the server's problem details mapped back onto fields (#639).
+  the server's problem details mapped back onto fields ([#639](https://github.com/schellingboard/schellingboard/issues/639)).

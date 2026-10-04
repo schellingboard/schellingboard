@@ -187,7 +187,7 @@ border instead of a solid block of colour.
   `color-scheme` is set by the same rule as the tokens.
 - New components get dark mode for free by naming roles.
 - The contrast test makes readability regressions fail the build.
-- #802's class of bug is harder to reintroduce: state is no longer encoded as a
+- [#802](https://github.com/schellingboard/schellingboard/issues/802)'s class of bug is harder to reintroduce: state is no longer encoded as a
   bare palette shade.
 
 ### Negative

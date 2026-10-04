@@ -95,7 +95,7 @@ The repository ports belong in the centre too, next to the types they speak in;
 We are not there yet. `db/repositories/interfaces.ts` still holds the entity
 vocabulary alongside the ports, and 62 files outside `db/` import their domain
 types from it. `CONTACT_TYPES` moving to `model/guest.ts` is the first instance
-of the fix; issue #965 has the inventory and the order to do the rest in.
+of the fix; issue [#965](https://github.com/schellingboard/schellingboard/issues/965) has the inventory and the order to do the rest in.
 
 `make arch-graph` renders the graph to `arch-graph.svg` (needs graphviz), which
 is usually faster than arguing about where a boundary should go.

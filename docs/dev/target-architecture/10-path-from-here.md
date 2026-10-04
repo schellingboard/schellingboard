@@ -6,11 +6,11 @@ sketch, not a plan; each step would get its own issue and ADR.
 
 1. **Extract `domain` and `contracts` as packages.** Move `model/` and the pure
    parts of `utils/` into `packages/domain`; move the zod schemas from server
-   actions and routes into `packages/contracts`. Finish #965 in the process. The
+   actions and routes into `packages/contracts`. Finish [#965](https://github.com/schellingboard/schellingboard/issues/965) in the process. The
    Next app keeps working; the boundary becomes physical.
 2. **Introduce the change log and the jobs loop inside the Next app.** Add the
    `changes` table and `tx.record()` to the repositories; move reminders and email
-   dispatch onto the loop (this is #1005 done the target way). No UI change.
+   dispatch onto the loop (this is [#1005](https://github.com/schellingboard/schellingboard/issues/1005) done the target way). No UI change.
 3. **Stand up the API in the same process.** Mount a Hono app under `/api/v1` in a
    custom server (or as route handlers) that calls the same repositories; declare
    contracts, generate `openapi.json` and `api-client`. Server actions start

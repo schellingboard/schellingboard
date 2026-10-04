@@ -142,19 +142,19 @@ GET /api/v1/events/{slug}/feed?since={seq}    → text/event-stream of changes w
 - The **contract is the source of truth**: each route declares its zod request and
   response schemas from `packages/contracts`; Hono's OpenAPI integration emits the
   document; `api-client` is generated from it in the build. A change to a contract
-  changes the committed `openapi.json` and fails CI until reviewed (#677 done for
+  changes the committed `openapi.json` and fails CI until reviewed ([#677](https://github.com/schellingboard/schellingboard/issues/677) done for
   good).
 - **Errors** are RFC 9457 problem details with a stable `code` (the policy's reason
   code, e.g. `scheduling.reservedWindow`) the client translates.
 - **Idempotency**: mutations accept `Idempotency-Key`; the key and response are
   stored for 24 h so a retry after a lost response does not RSVP twice or create two
-  proposals (#141).
-- **Pagination** is cursor-based everywhere a list can grow (#831).
+  proposals ([#141](https://github.com/schellingboard/schellingboard/issues/141)).
+- **Pagination** is cursor-based everywhere a list can grow ([#831](https://github.com/schellingboard/schellingboard/issues/831)).
 - **Rate limiting** per actor or IP with an in-memory token bucket; strict
-  defaults on `/auth/*` (#679).
+  defaults on `/auth/*` ([#679](https://github.com/schellingboard/schellingboard/issues/679)).
 - The **admin API** is the same API with organizer or site-admin roles, so the
   admin section of the SPA, a script with a token, and an attendee all go through
-  one set of use cases (#1006).
+  one set of use cases ([#1006](https://github.com/schellingboard/schellingboard/issues/1006)).
 - Uploads (`POST /people/{id}/avatar`, `/events/{slug}/venue/map`) go through one
   file adapter: size cap, re-encode with sharp to fixed formats, content-hash
   filename, served from `/files/{hash}` with immutable caching.
@@ -181,7 +181,7 @@ One loop, one process, everything a queue would do:
 
 <likec4-view view-id="flowSessionMoved" dynamic-variant="sequence"><a href="https://developers.schellingboard.org/diagrams/#/view/flowSessionMoved">Sequence diagram: organizer moves a session, attendees are told</a></likec4-view>
 
-This replaces the ad-hoc reminder dispatch and the proposed email outbox (#1005)
+This replaces the ad-hoc reminder dispatch and the proposed email outbox ([#1005](https://github.com/schellingboard/schellingboard/issues/1005))
 with one mechanism.
 
 ## Notifications and channels
@@ -196,9 +196,9 @@ NotificationCreated ──► deliveries for each binding the person has for tha
 
 - In-app is always on. A **binding** is a verified address on a channel: an email
   (verified by code), a push subscription (per device, listed and revocable in
-  settings, #969), a chat account (linked by sending a one-time token to the bot).
+  settings, [#969](https://github.com/schellingboard/schellingboard/issues/969)), a chat account (linked by sending a one-time token to the bot).
 - Preferences are per category per channel; the category enum lives in `domain`.
-- Every attempt is logged (#580) and visible to site admins.
+- Every attempt is logged ([#580](https://github.com/schellingboard/schellingboard/issues/580)) and visible to site admins.
 - Chat platforms are **outbound only** in this design; an inbound bot command is
   just an API token call and can be added as a separate integration later.
 
