@@ -30,6 +30,7 @@ vi.mock("@/utils/mailer", () => ({
 }));
 
 import { isoDay } from "../helpers/dates";
+import { runJobs } from "../helpers/jobs";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { siteAuthenticate } from "../helpers/site-auth";
 import { createEvent, createGuest } from "../helpers/factories";
@@ -374,6 +375,7 @@ describe("cancelMeetingAction", () => {
     );
     expect(notification.text).toMatch(/canceled/);
     expect(notification.text).not.toMatch(/my session moved/);
+    await runJobs();
     expect(JSON.stringify(vi.mocked(sendMail).mock.calls)).not.toContain(
       "my session moved"
     );

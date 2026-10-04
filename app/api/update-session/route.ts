@@ -3,7 +3,7 @@ import { getRepositories } from "@/db/container";
 import { inSchedPhase } from "@schellingboard/domain/phase";
 import { requestNow } from "@/utils/dev-clock";
 import { notifyCohostsAdded } from "@/utils/notifications";
-import { nudgeJobs } from "@/utils/jobs/loop";
+import { nudgeJobs } from "@/utils/jobs/nudge";
 import { verifiedCurrentUser } from "@/utils/acting-guest";
 import { sessionBookingWindowError } from "@schellingboard/domain/day-window";
 import { sessionDurationError } from "@schellingboard/domain/slots";

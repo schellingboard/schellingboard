@@ -10,6 +10,7 @@ import {
   sqliteSubjectCommentsRepository,
 } from "./repositories/sqlite/comments";
 import { SqliteDaysRepository } from "./repositories/sqlite/days";
+import { SqliteDeliveriesRepository } from "./repositories/sqlite/deliveries";
 import { SqliteEventsRepository } from "./repositories/sqlite/events";
 import { SqliteGuestsRepository } from "./repositories/sqlite/guests";
 import { SqliteJobsRepository } from "./repositories/sqlite/jobs";
@@ -31,6 +32,7 @@ import type {
   ChangesRepository,
   CommentsRepository,
   DaysRepository,
+  DeliveriesRepository,
   EventsRepository,
   GuestsRepository,
   JobsRepository,
@@ -59,6 +61,7 @@ export type Repositories = {
   sessionComments: SubjectCommentsRepository;
   profileComments: SubjectCommentsRepository;
   days: DaysRepository;
+  deliveries: DeliveriesRepository;
   events: EventsRepository;
   guests: GuestsRepository;
   jobs: JobsRepository;
@@ -90,6 +93,7 @@ function buildRepositories(sqlite: Database.Database): Repositories {
     sessionComments: sqliteSubjectCommentsRepository(db, "session"),
     profileComments: sqliteSubjectCommentsRepository(db, "profile"),
     days: new SqliteDaysRepository(db),
+    deliveries: new SqliteDeliveriesRepository(db),
     events: new SqliteEventsRepository(db),
     guests: new SqliteGuestsRepository(db),
     jobs: new SqliteJobsRepository(db),

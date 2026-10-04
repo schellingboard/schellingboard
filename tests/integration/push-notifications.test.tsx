@@ -17,14 +17,20 @@ let generated = 0;
 
 import webpush from "web-push";
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { runJobs } from "../helpers/jobs";
 import { createGuest } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { sendMail } from "@/utils/mailer";
+import { buildEmail, type EmailRecipe } from "@/emails/registry";
 import { notifyGuest } from "@/utils/notifications";
 
-const MESSAGE = {
-  subject: "Session moved",
-  body: <p>Your session moved.</p>,
+const MESSAGE: EmailRecipe = {
+  template: "proposalJoined",
+  props: {
+    title: "Workshop",
+    joinerName: "Ari",
+    proposalUrl: "https://site.example/e/proposals/p1",
+  },
 };
 const NOW = new Date("2026-08-01T12:00:00.000Z");
 const IN_APP = {
@@ -74,6 +80,7 @@ describe("push notifications", () => {
 
     await notifyGuest(guest.id, "rsvpChange", MESSAGE, IN_APP);
 
+    await runJobs();
     const calls = vi.mocked(webpush.sendNotification).mock.calls;
     expect(calls).toHaveLength(2);
     expect(calls.map((c) => (c[0] as { endpoint: string }).endpoint)).toEqual(
@@ -95,10 +102,11 @@ describe("push notifications", () => {
 
     await notifyGuest(guest.id, "rsvpChange", MESSAGE, IN_APP);
 
+    await runJobs();
     const payload = payloadOf(
       vi.mocked(webpush.sendNotification).mock.calls[0]
     );
-    expect(payload.title).toBe("Session moved");
+    expect(payload.title).toBe(buildEmail(MESSAGE).subject);
     expect(payload.body).toBe("Your session moved");
   });
 
@@ -110,6 +118,7 @@ describe("push notifications", () => {
 
     await notifyGuest(guest.id, "rsvpChange", MESSAGE, IN_APP);
 
+    await runJobs();
     expect(webpush.sendNotification).toHaveBeenCalledTimes(1);
     expect(sendMail).not.toHaveBeenCalled();
     expect(
@@ -125,6 +134,7 @@ describe("push notifications", () => {
 
     await notifyGuest(guest.id, "rsvpChange", MESSAGE, IN_APP);
 
+    await runJobs();
     const options = vi.mocked(webpush.sendNotification).mock.calls[0][2];
     expect(options?.TTL).toBeGreaterThan(0);
     expect(options?.TTL).toBeLessThanOrEqual(24 * 60 * 60);
@@ -135,6 +145,7 @@ describe("push notifications", () => {
 
     await notifyGuest(guest.id, "rsvpChange", MESSAGE, IN_APP);
 
+    await runJobs();
     expect(webpush.sendNotification).not.toHaveBeenCalled();
   });
 
@@ -146,6 +157,7 @@ describe("push notifications", () => {
     );
 
     await notifyGuest(guest.id, "rsvpChange", MESSAGE, IN_APP);
+    await runJobs();
 
     expect(await getRepositories().push.listSubscriptions(guest.id)).toEqual(
       []
@@ -160,6 +172,7 @@ describe("push notifications", () => {
     );
 
     await notifyGuest(guest.id, "rsvpChange", MESSAGE, IN_APP);
+    await runJobs();
 
     expect(
       await getRepositories().push.listSubscriptions(guest.id)
@@ -181,6 +194,7 @@ describe("push notifications", () => {
 
     await notifyGuest(guest.id, "rsvpChange", MESSAGE, IN_APP);
 
+    await runJobs();
     expect(webpush.sendNotification).toHaveBeenCalledTimes(2);
   });
 });

@@ -9,14 +9,18 @@
 // inlines that variable per bundle, which makes the import dead code there.
 
 import { nanoid } from "nanoid";
+import { nudgeJobs, setNudgeHandler } from "./nudge";
 import {
+  DELIVERIES,
   PRUNE_CHANGES,
+  PRUNE_DELIVERIES,
   PRUNE_EVERY_MS,
   SESSION_NOTIFICATIONS,
   type Job,
 } from "./job";
 
 export type { Job };
+export { nudgeJobs };
 
 const HEARTBEAT_MS = 5_000;
 const LEASE_TTL_MS = 30_000;
@@ -35,9 +39,18 @@ export function defaultJobs(): Job[] {
       const { sessionNotifications } = await import("./reactions");
       return sessionNotifications;
     }),
+    // After the reactions in the same pass, so what they queue goes out in it.
+    lazy(DELIVERIES, undefined, async () => {
+      const { deliveries } = await import("./deliveries");
+      return deliveries;
+    }),
     lazy(PRUNE_CHANGES, PRUNE_EVERY_MS, async () => {
       const { pruneChanges } = await import("./reactions");
       return pruneChanges;
+    }),
+    lazy(PRUNE_DELIVERIES, PRUNE_EVERY_MS, async () => {
+      const { pruneDeliveries } = await import("./deliveries");
+      return pruneDeliveries;
     }),
   ];
   // 0 switches the reminders off, which is how a self-hoster turns them off
@@ -98,13 +111,10 @@ export function startJobsLoop(jobs: Job[] = defaultJobs()): void {
     running: false,
     nudged: false,
   };
+  setNudgeHandler(nudge);
 }
 
-/**
- * Asks for a pass as soon as possible, after a request has committed
- * something the loop should act on. A no-op where no loop runs.
- */
-export function nudgeJobs(): void {
+function nudge(): void {
   const loop = g.__jobsLoop;
   if (!loop) return;
   if (loop.running) {
@@ -118,6 +128,7 @@ export function nudgeJobs(): void {
 /** For tests only. */
 export function stopJobsLoop(): void {
   if (g.__jobsLoop) clearInterval(g.__jobsLoop.timer);
+  setNudgeHandler(undefined);
   delete g.__jobsLoop;
 }
 

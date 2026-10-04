@@ -4,23 +4,14 @@ import type { Meeting } from "@schellingboard/domain/meeting";
 import type { Comment } from "@schellingboard/domain/comment";
 import type { Session } from "@schellingboard/domain/session";
 import type { EmailSettings } from "@schellingboard/domain/guest";
-import { sendMail, type EmailMessage } from "@/utils/mailer";
-import { pushToGuest } from "@/utils/push";
+import { buildEmail, type EmailRecipe } from "@/emails/registry";
+import type { EmailPayload, PushPayload } from "@/utils/jobs/deliveries";
+import { nudgeJobs } from "@/utils/jobs/nudge";
 import { siteUrl } from "@/utils/site-url";
-import { sessionChangedEmail } from "@/emails/session-changed";
-import { sessionDeletedEmail } from "@/emails/session-deleted";
-import { cohostAddedEmail } from "@/emails/cohost-added";
-import { proposalJoinedEmail } from "@/emails/proposal-joined";
-import {
-  type CommentSubject,
-  commentEmail,
-  commentNoticeText,
-} from "@/emails/comment";
+import { type CommentSubject, commentNoticeText } from "@/emails/comment";
 import {
   type MeetingOutcome,
-  meetingOutcomeEmail,
   meetingOutcomeNoticeText,
-  meetingRequestEmail,
   meetingRequestNoticeText,
 } from "@/emails/meeting";
 import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
@@ -32,12 +23,10 @@ export type InAppNotice = { text: string; url: string; at: Date };
 
 // Tell the guest that something happened, on every channel: an in-app
 // notification always, a push to each device they have turned notifications
-// on, and `message` by email iff they have opted in for `setting` (see
-// EmailSettings). Only the mail answers to the per-type setting — a device is
-// all or nothing, see ADR 0006.
-//
-// The in-app row is written first, so a mail that fails to send doesn't take
-// the notification with it.
+// on, and `email` iff they have opted in for `setting` (see EmailSettings).
+// Only the mail answers to the per-type setting — a device is all or nothing,
+// see ADR 0006. The push and the mail are queued for the jobs loop to send
+// (ADR 0011), so a slow mail server never holds up the request.
 //
 // An unknown guest id is a no-op rather than an error: notifications are sent
 // after the triggering change is committed, by which time the guest may have
@@ -45,10 +34,10 @@ export type InAppNotice = { text: string; url: string; at: Date };
 export async function notifyGuest(
   guestId: string,
   setting: keyof EmailSettings,
-  message: EmailMessage,
+  email: EmailRecipe,
   inApp: InAppNotice
 ): Promise<void> {
-  const { guests, notifications } = getRepositories();
+  const { deliveries, guests, notifications, push } = getRepositories();
   const guest = await guests.findById(guestId);
   if (!guest) return;
 
@@ -64,7 +53,16 @@ export async function notifyGuest(
   // own origin, so unlike the mail it works on an instance with no SITE_URL.
   // The mail's subject is the one-line "what happened" a notification title
   // wants.
-  await pushToGuest(guestId, { title: message.subject, ...inApp }, inApp.at);
+  if ((await push.listSubscriptions(guestId)).length > 0) {
+    const notice: PushPayload = {
+      title: buildEmail(email).subject,
+      text: inApp.text,
+      url: inApp.url,
+      at: inApp.at.toISOString(),
+    };
+    await deliveries.enqueue({ guestId, channel: "push", payload: notice });
+    nudgeJobs();
+  }
 
   if (!guest.info.emailSettings[setting]) return;
 
@@ -73,17 +71,19 @@ export async function notifyGuest(
   // have been delivered — the in-app notification and the push above are what
   // such an instance runs on.
   if (siteUrl() === null) return;
-  await sendMail({ to: guest.info.email, ...message });
+  const mail: EmailPayload = { recipe: email };
+  await deliveries.enqueue({ guestId, channel: "email", payload: mail });
+  nudgeJobs();
 }
 
 async function tryNotifyGuest(
   guestId: string,
   setting: keyof EmailSettings,
-  message: EmailMessage,
+  email: EmailRecipe,
   inApp: InAppNotice
 ): Promise<void> {
   try {
-    await notifyGuest(guestId, setting, message, inApp);
+    await notifyGuest(guestId, setting, email, inApp);
   } catch (err) {
     console.error(`Failed to notify guest ${guestId}:`, err);
   }
@@ -143,14 +143,20 @@ async function notifySessionChangedUnsafe({
     newLocation: formatLocations(after),
     oldLocation: locationChanged ? formatLocations(before) : undefined,
   };
-  const hostMessage = sessionChangedEmail({
-    ...messageProps,
-    recipient: "host",
-  });
-  const attendeeMessage = sessionChangedEmail({
-    ...messageProps,
-    recipient: "attendee",
-  });
+  const hostMessage: EmailRecipe = {
+    template: "sessionChanged",
+    props: {
+      ...messageProps,
+      recipient: "host",
+    },
+  };
+  const attendeeMessage: EmailRecipe = {
+    template: "sessionChanged",
+    props: {
+      ...messageProps,
+      recipient: "attendee",
+    },
+  };
   const what = changeSummary(messageProps);
   await notifySessionRecipients({
     hostIds: after.hosts.map((host) => host.id),
@@ -233,14 +239,20 @@ async function notifySessionDeletedUnsafe({
     hostIds: session.hosts.map((host) => host.id),
     rsvpGuestIds,
     changedById,
-    hostMessage: sessionDeletedEmail({
-      ...messageProps,
-      recipient: "host",
-    }),
-    attendeeMessage: sessionDeletedEmail({
-      ...messageProps,
-      recipient: "attendee",
-    }),
+    hostMessage: {
+      template: "sessionDeleted",
+      props: {
+        ...messageProps,
+        recipient: "host",
+      },
+    },
+    attendeeMessage: {
+      template: "sessionDeleted",
+      props: {
+        ...messageProps,
+        recipient: "attendee",
+      },
+    },
     // The session is gone, so the link can only be the event it was at.
     hostInApp: {
       text: `Your session "${session.title}" was deleted`,
@@ -267,8 +279,8 @@ async function notifySessionRecipients({
   hostIds: string[];
   rsvpGuestIds: string[];
   changedById: string | null;
-  hostMessage: EmailMessage;
-  attendeeMessage: EmailMessage;
+  hostMessage: EmailRecipe;
+  attendeeMessage: EmailRecipe;
   hostInApp: InAppNotice;
   attendeeInApp: InAppNotice;
 }): Promise<void> {
@@ -331,12 +343,15 @@ async function notifyCohostsAddedUnsafe({
   if (!event) return;
 
   const path = sessionPath(event.slug, session.id);
-  const message = cohostAddedEmail({
-    title: session.title,
-    time: formatSessionTime(session, event.timezone),
-    location: formatLocations(session),
-    sessionUrl: emailBase() + path,
-  });
+  const message: EmailRecipe = {
+    template: "cohostAdded",
+    props: {
+      title: session.title,
+      time: formatSessionTime(session, event.timezone),
+      location: formatLocations(session),
+      sessionUrl: emailBase() + path,
+    },
+  };
 
   const inApp = {
     text: `You were added as a co-host of "${session.title}"`,
@@ -368,11 +383,14 @@ export async function notifyProposalJoined({
     if (!event) return;
 
     const path = proposalPath(event.slug, proposalId);
-    const message = proposalJoinedEmail({
-      title: proposal.title,
-      joinerName: joiner.name,
-      proposalUrl: emailBase() + path,
-    });
+    const message: EmailRecipe = {
+      template: "proposalJoined",
+      props: {
+        title: proposal.title,
+        joinerName: joiner.name,
+        proposalUrl: emailBase() + path,
+      },
+    };
     const inApp = {
       text: `${joiner.name} joined "${proposal.title}" as a co-host`,
       url: path,
@@ -425,7 +443,10 @@ async function deliverCommentNotifications({
     await tryNotifyGuest(
       guestId,
       responsibleSetting,
-      commentEmail({ ...messageProps, recipient: "responsible" }),
+      {
+        template: "comment",
+        props: { ...messageProps, recipient: "responsible" },
+      },
       {
         text: commentNoticeText(
           subject,
@@ -446,7 +467,10 @@ async function deliverCommentNotifications({
     await tryNotifyGuest(
       author.id,
       "commentThread",
-      commentEmail({ ...messageProps, recipient: "commenter" }),
+      {
+        template: "comment",
+        props: { ...messageProps, recipient: "commenter" },
+      },
       {
         text: commentNoticeText(
           subject,
@@ -582,12 +606,15 @@ export async function notifyMeetingRequested({
     await notifyGuest(
       meeting.recipientId,
       "meetingRequest",
-      meetingRequestEmail({
-        requesterName,
-        time,
-        meetingPoint: meeting.meetingPoint,
-        url: emailBase() + path,
-      }),
+      {
+        template: "meetingRequest",
+        props: {
+          requesterName,
+          time,
+          meetingPoint: meeting.meetingPoint,
+          url: emailBase() + path,
+        },
+      },
       {
         text: meetingRequestNoticeText(requesterName, time),
         url: path,
@@ -627,13 +654,16 @@ export async function notifyMeetingOutcome({
     await notifyGuest(
       otherId,
       "meetingResponse",
-      meetingOutcomeEmail({
-        actorName,
-        outcome,
-        time,
-        meetingPoint: meeting.meetingPoint,
-        url: emailBase() + path,
-      }),
+      {
+        template: "meetingOutcome",
+        props: {
+          actorName,
+          outcome,
+          time,
+          meetingPoint: meeting.meetingPoint,
+          url: emailBase() + path,
+        },
+      },
       {
         text: meetingOutcomeNoticeText(actorName, outcome, time),
         url: path,

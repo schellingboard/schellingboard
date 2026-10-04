@@ -36,6 +36,7 @@ vi.mock("next/headers", () => ({
 }));
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { runJobs } from "../helpers/jobs";
 import { siteAuthenticate } from "../helpers/site-auth";
 import { createEvent, createGuest, createProposal } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
@@ -93,6 +94,7 @@ describe("proposal comments", () => {
     });
     await flushAfter();
 
+    await runJobs();
     expect(vi.mocked(sendMail).mock.calls.map((c) => c[0].to)).toEqual([
       "host@test.example",
     ]);

@@ -36,6 +36,7 @@ vi.mock("next/headers", () => ({
 }));
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { runJobs } from "../helpers/jobs";
 import { siteAuthenticate } from "../helpers/site-auth";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
@@ -88,6 +89,7 @@ describe("profile comments", () => {
     await createComment({ profileId: owner.id, body: "Great to meet you" });
     await flushAfter();
 
+    await runJobs();
     expect(vi.mocked(sendMail).mock.calls.map((c) => c[0].to)).toEqual([
       "owner@test.example",
     ]);

@@ -70,13 +70,18 @@ reminder scheduler it replaces. It does three kinds of work:
 - **Scheduled work** runs on its own period: the attendee-count reminders,
   unchanged (ADR 0007's claim-by-due-time stays), still switched off by
   `REMINDER_DISPATCH_INTERVAL_MS=0`.
-- **Deliveries** send what notification code enqueues, one per email or push,
-  retried with backoff and eventually given up.
+- **Deliveries** send what notification code enqueues, one per email or push.
+  A failed email is retried with backoff and eventually given up; a push is
+  best-effort, sent once to each device and not retried.
 
 A request that commits a change nudges the loop, so a notification goes out
 within moments without the request waiting for it. A heartbeat catches retries
 and anything a nudge missed. A lease row in the database lets only one process
 run the loop against a database; another process idles until the lease lapses.
+
+A queued email is stored as the template and props to build it from, since a
+built message holds a React element. As with change payloads, a template's
+props may gain optional fields; anything else needs a new template name.
 
 Delivery is at-least-once: a crash between sending and marking sent repeats
 that one message on the next run. ADR 0007 chose the opposite for reminders,

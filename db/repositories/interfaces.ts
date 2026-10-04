@@ -27,7 +27,11 @@ import type {
   MeetingStatus,
   Meeting,
 } from "@schellingboard/domain/meeting";
-import type { Notification } from "@schellingboard/domain/notification";
+import type {
+  Delivery,
+  DeliveryChannel,
+  Notification,
+} from "@schellingboard/domain/notification";
 import type {
   ReminderKey,
   DueReminderCandidate,
@@ -832,4 +836,27 @@ export interface JobsRepository {
   /** The last change `name` has handled; 0 before its first. */
   cursor(name: string): Promise<number>;
   setCursor(name: string, seq: number): Promise<void>;
+}
+
+export interface DeliveriesRepository {
+  enqueue(delivery: {
+    guestId: string;
+    channel: DeliveryChannel;
+    payload: unknown;
+  }): Promise<void>;
+  /**
+   * Takes up to `limit` unsent deliveries due at `now`, oldest first, and
+   * holds them until `now + holdMs` so no other run sends them meanwhile.
+   */
+  claimDue(now: Date, limit: number, holdMs: number): Promise<Delivery[]>;
+  markSent(id: string, now: Date): Promise<void>;
+  /** Schedules another attempt at `retryAt`, or gives up when it is null. */
+  markFailed(
+    id: string,
+    now: Date,
+    error: string,
+    retryAt: Date | null
+  ): Promise<void>;
+  /** Deletes sent and abandoned deliveries settled before `before`. */
+  pruneSettled(before: Date): Promise<void>;
 }

@@ -122,6 +122,7 @@ describe("adminCreateSessionAction", () => {
       locationIds: [],
     });
     expect(result.ok).toBe(true);
+    await runJobs();
     expect(sendMail).toHaveBeenCalledOnce();
     expect(vi.mocked(sendMail).mock.calls[0][0].to).toBe("cohost@test.example");
   });
@@ -559,6 +560,7 @@ describe("adminUpdateSessionAction", () => {
       locationIds: [],
     });
     expect(result.ok).toBe(true);
+    await runJobs();
     expect(sendMail).toHaveBeenCalledOnce();
     expect(vi.mocked(sendMail).mock.calls[0][0].to).toBe("cohost@test.example");
   });

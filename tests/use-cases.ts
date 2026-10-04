@@ -406,6 +406,12 @@ export const features = {
         actor: "attendee",
         priority: "P2",
       },
+      US6: {
+        title:
+          "Attendee still gets their notification emails after a mail outage",
+        actor: "attendee",
+        priority: "P2",
+      },
     },
   },
   "014": {

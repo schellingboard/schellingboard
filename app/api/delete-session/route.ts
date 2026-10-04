@@ -3,7 +3,7 @@ import { getRepositories } from "@/db/container";
 import { inSchedPhase } from "@schellingboard/domain/phase";
 import { requestNow } from "@/utils/dev-clock";
 import { verifiedCurrentUser } from "@/utils/acting-guest";
-import { nudgeJobs } from "@/utils/jobs/loop";
+import { nudgeJobs } from "@/utils/jobs/nudge";
 
 export const dynamic = "force-dynamic"; // defaults to auto
 

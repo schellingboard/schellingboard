@@ -15,6 +15,7 @@ vi.mock("@/utils/mailer", () => ({
 }));
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { deliverQueued } from "../helpers/jobs";
 import { BY_TEST } from "../helpers/changes";
 import {
   createEvent,
@@ -27,6 +28,7 @@ import { getRepositories } from "@/db/container";
 import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
 import { render } from "@react-email/render";
 import { sendMail } from "@/utils/mailer";
+import { buildEmail, type EmailRecipe } from "@/emails/registry";
 import {
   notifyCohostsAdded,
   notifyGuest,
@@ -39,9 +41,13 @@ import {
   notifySessionDeleted,
 } from "@/utils/notifications";
 
-const MESSAGE = {
-  subject: "Session moved",
-  body: <p>Your session moved.</p>,
+const MESSAGE: EmailRecipe = {
+  template: "proposalJoined",
+  props: {
+    title: "Workshop",
+    joinerName: "Ari",
+    proposalUrl: "https://site.example/e/proposals/p1",
+  },
 };
 
 const NOW = new Date("2026-08-01T12:00:00.000Z");
@@ -66,9 +72,10 @@ describe("notifyGuest", () => {
       emailSettings: { rsvpChange: true, hostChange: false, cohostAdd: false },
     });
     await notifyGuest(guest.id, "rsvpChange", MESSAGE, IN_APP);
+    await deliverQueued();
     expect(sendMail).toHaveBeenCalledExactlyOnceWith({
       to: "on@test.example",
-      ...MESSAGE,
+      ...buildEmail(MESSAGE),
     });
   });
 
@@ -77,6 +84,7 @@ describe("notifyGuest", () => {
       emailSettings: { rsvpChange: false, hostChange: true, cohostAdd: true },
     });
     await notifyGuest(guest.id, "rsvpChange", MESSAGE, IN_APP);
+    await deliverQueued();
     expect(sendMail).not.toHaveBeenCalled();
   });
 
@@ -86,9 +94,10 @@ describe("notifyGuest", () => {
       emailSettings: { rsvpChange: false, hostChange: false, cohostAdd: true },
     });
     await notifyGuest(guest.id, "cohostAdd", MESSAGE, IN_APP);
+    await deliverQueued();
     expect(sendMail).toHaveBeenCalledExactlyOnceWith({
       to: "cohost@test.example",
-      ...MESSAGE,
+      ...buildEmail(MESSAGE),
     });
   });
 
@@ -96,6 +105,7 @@ describe("notifyGuest", () => {
     await expect(
       notifyGuest("does-not-exist", "rsvpChange", MESSAGE, IN_APP)
     ).resolves.toBeUndefined();
+    await deliverQueued();
     expect(sendMail).not.toHaveBeenCalled();
   });
 
@@ -106,6 +116,7 @@ describe("notifyGuest", () => {
 
     await notifyGuest(guest.id, "rsvpChange", MESSAGE, IN_APP);
 
+    await deliverQueued();
     expect(sendMail).not.toHaveBeenCalled();
     const listed = await getRepositories().notifications.listByGuest(guest.id);
     expect(listed).toHaveLength(1);
@@ -123,6 +134,7 @@ describe("notifyGuest", () => {
 
     await notifyGuest(guest.id, "rsvpChange", MESSAGE, IN_APP);
 
+    await deliverQueued();
     expect(sendMail).toHaveBeenCalledOnce();
     expect(
       await getRepositories().notifications.listByGuest(guest.id)
@@ -194,6 +206,7 @@ describe("notifySessionChanged", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     expect(sendMail).toHaveBeenCalledOnce();
     const message = vi.mocked(sendMail).mock.calls[0][0];
     expect(message.to).toBe("rsvper@test.example");
@@ -233,6 +246,7 @@ describe("notifySessionChanged", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     expect(sendMail).not.toHaveBeenCalled();
   });
 
@@ -257,6 +271,7 @@ describe("notifySessionChanged", () => {
       })
     ).resolves.toBeUndefined();
 
+    await deliverQueued();
     expect(sendMail).not.toHaveBeenCalled();
   });
 
@@ -321,6 +336,7 @@ describe("notifySessionChanged", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     expect(sendMail).toHaveBeenCalledTimes(2);
     const messages = vi.mocked(sendMail).mock.calls.map((call) => call[0]);
     const hostMessage = messages.find((m) => m.to === "host@test.example");
@@ -365,6 +381,7 @@ describe("notifySessionChanged", () => {
     });
 
     // Host has rsvpChange off but hostChange on: they're still emailed.
+    await deliverQueued();
     const recipients = vi.mocked(sendMail).mock.calls.map((c) => c[0].to);
     expect(recipients).toContain("host@test.example");
   });
@@ -398,6 +415,7 @@ describe("notifySessionChanged", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     const recipients = vi.mocked(sendMail).mock.calls.map((c) => c[0].to);
     expect(recipients).not.toContain("host@test.example");
   });
@@ -428,6 +446,7 @@ describe("notifySessionChanged", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     expect(sendMail).toHaveBeenCalledOnce();
     expect(vi.mocked(sendMail).mock.calls[0][0].to).toBe("rsvper@test.example");
   });
@@ -449,6 +468,7 @@ describe("notifySessionChanged", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     expect(sendMail).toHaveBeenCalledOnce();
     const html = await renderWithoutComments(
       vi.mocked(sendMail).mock.calls[0][0].body
@@ -476,6 +496,7 @@ describe("notifySessionChanged", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     expect(sendMail).not.toHaveBeenCalled();
   });
 
@@ -505,6 +526,7 @@ describe("notifySessionChanged", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     expect(sendMail).toHaveBeenCalledOnce();
     expect(vi.mocked(sendMail).mock.calls[0][0].to).toBe("rsvper@test.example");
   });
@@ -529,6 +551,7 @@ describe("notifySessionChanged", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     const recipients = vi.mocked(sendMail).mock.calls.map((c) => c[0].to);
     expect(recipients.sort()).toEqual([
       "new-host@test.example",
@@ -573,6 +596,7 @@ describe("notifySessionDeleted", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     expect(sendMail).toHaveBeenCalledTimes(2);
     const messages = vi.mocked(sendMail).mock.calls.map((call) => call[0]);
     const hostMessage = messages.find((m) => m.to === "host@test.example");
@@ -632,6 +656,7 @@ describe("notifySessionDeleted", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     expect(sendMail).toHaveBeenCalledOnce();
     expect(vi.mocked(sendMail).mock.calls[0][0].to).toBe(
       "rsvp-on@test.example"
@@ -689,6 +714,7 @@ describe("notifyCohostsAdded", () => {
       })
     ).resolves.toBeUndefined();
 
+    await deliverQueued();
     expect(sendMail).not.toHaveBeenCalled();
   });
 
@@ -703,6 +729,7 @@ describe("notifyCohostsAdded", () => {
     });
 
     // Only the new co-host; RSVP'd guests are not involved.
+    await deliverQueued();
     expect(sendMail).toHaveBeenCalledOnce();
     const message = vi.mocked(sendMail).mock.calls[0][0];
     expect(message.to).toBe("cohost@test.example");
@@ -727,6 +754,7 @@ describe("notifyCohostsAdded", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     expect(sendMail).not.toHaveBeenCalled();
   });
 
@@ -740,6 +768,7 @@ describe("notifyCohostsAdded", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     expect(sendMail).not.toHaveBeenCalled();
   });
 
@@ -764,6 +793,7 @@ describe("notifyCohostsAdded", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     expect(sendMail).not.toHaveBeenCalled();
   });
 });
@@ -835,6 +865,7 @@ describe("notifyProposalCommented", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     expect(sendMail).toHaveBeenCalledTimes(2);
     const messages = vi.mocked(sendMail).mock.calls.map((call) => call[0]);
     const hostMessage = messages.find((m) => m.to === "host@test.example");
@@ -867,6 +898,7 @@ describe("notifyProposalCommented", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     const recipients = vi.mocked(sendMail).mock.calls.map((c) => c[0].to);
     expect(recipients).not.toContain("host@test.example");
   });
@@ -882,6 +914,7 @@ describe("notifyProposalCommented", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     const recipients = vi.mocked(sendMail).mock.calls.map((c) => c[0].to);
     expect(recipients).toEqual(["host@test.example"]);
   });
@@ -902,6 +935,7 @@ describe("notifyProposalCommented", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     expect(sendMail).not.toHaveBeenCalled();
   });
 
@@ -918,6 +952,7 @@ describe("notifyProposalCommented", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     const recipients = vi.mocked(sendMail).mock.calls.map((c) => c[0].to);
     expect(recipients.filter((to) => to === "host@test.example")).toHaveLength(
       1
@@ -936,6 +971,7 @@ describe("notifyProposalCommented", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     expect(sendMail).not.toHaveBeenCalled();
   });
 
@@ -952,6 +988,7 @@ describe("notifyProposalCommented", () => {
         now: NOW,
       })
     ).resolves.toBeUndefined();
+    await deliverQueued();
     expect(sendMail).not.toHaveBeenCalled();
   });
 });
@@ -1008,6 +1045,7 @@ describe("notifySessionCommented", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     expect(sendMail).toHaveBeenCalledTimes(2);
     const messages = vi.mocked(sendMail).mock.calls.map((call) => call[0]);
     const hostMessage = messages.find((m) => m.to === "host@test.example");
@@ -1032,6 +1070,7 @@ describe("notifySessionCommented", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     const recipients = vi.mocked(sendMail).mock.calls.map((c) => c[0].to);
     expect(recipients).not.toContain("host@test.example");
   });
@@ -1087,6 +1126,7 @@ describe("notifySessionCommented", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     const recipients = vi.mocked(sendMail).mock.calls.map((c) => c[0].to);
     expect(recipients).toEqual(["host@test.example"]);
   });
@@ -1107,6 +1147,7 @@ describe("notifySessionCommented", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     expect(sendMail).not.toHaveBeenCalled();
   });
 
@@ -1123,6 +1164,7 @@ describe("notifySessionCommented", () => {
         now: NOW,
       })
     ).resolves.toBeUndefined();
+    await deliverQueued();
     expect(sendMail).not.toHaveBeenCalled();
   });
 });
@@ -1177,6 +1219,7 @@ describe("notifyProfileCommented", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     expect(sendMail).toHaveBeenCalledTimes(2);
     const messages = vi.mocked(sendMail).mock.calls.map((call) => call[0]);
     const ownerMessage = messages.find((m) => m.to === "owner@test.example");
@@ -1207,6 +1250,7 @@ describe("notifyProfileCommented", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     const recipients = vi.mocked(sendMail).mock.calls.map((c) => c[0].to);
     expect(recipients).not.toContain("owner@test.example");
   });
@@ -1222,6 +1266,7 @@ describe("notifyProfileCommented", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     const recipients = vi.mocked(sendMail).mock.calls.map((c) => c[0].to);
     expect(recipients).toEqual(["owner@test.example"]);
   });
@@ -1240,6 +1285,7 @@ describe("notifyProfileCommented", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     expect(sendMail).not.toHaveBeenCalled();
   });
 
@@ -1252,6 +1298,7 @@ describe("notifyProfileCommented", () => {
     await expect(
       notifyProfileCommented({ profileId: owner.id, comment: posted, now: NOW })
     ).resolves.toBeUndefined();
+    await deliverQueued();
     expect(sendMail).not.toHaveBeenCalled();
   });
 });
@@ -1302,6 +1349,7 @@ describe("meeting notifications", () => {
 
     await notifyMeetingRequested({ meeting, now: NOW });
 
+    await deliverQueued();
     expect(sendMail).toHaveBeenCalledOnce();
     const message = vi.mocked(sendMail).mock.calls[0][0];
     expect(message.to).toBe("grace@test.example");
@@ -1320,6 +1368,7 @@ describe("meeting notifications", () => {
 
     await notifyMeetingRequested({ meeting, now: NOW });
 
+    await deliverQueued();
     const html = await render(vi.mocked(sendMail).mock.calls[0][0].body);
     expect(html).not.toContain("attendance model");
   });
@@ -1329,6 +1378,7 @@ describe("meeting notifications", () => {
 
     await notifyMeetingRequested({ meeting, now: NOW });
 
+    await deliverQueued();
     const html = await render(vi.mocked(sendMail).mock.calls[0][0].body);
     expect(html).toContain("Monday 3 August, 01:10–01:30");
   });
@@ -1342,6 +1392,7 @@ describe("meeting notifications", () => {
 
     await notifyMeetingRequested({ meeting, now: NOW });
 
+    await deliverQueued();
     expect(sendMail).not.toHaveBeenCalled();
     const [notification] = await getRepositories().notifications.listByGuest(
       recipient.id
@@ -1362,6 +1413,7 @@ describe("meeting notifications", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     expect(sendMail).toHaveBeenCalledOnce();
     expect(vi.mocked(sendMail).mock.calls[0][0].to).toBe("ada@test.example");
     const [notification] = await getRepositories().notifications.listByGuest(
@@ -1382,6 +1434,7 @@ describe("meeting notifications", () => {
       now: NOW,
     });
 
+    await deliverQueued();
     expect(vi.mocked(sendMail).mock.calls[0][0].to).toBe("grace@test.example");
     const [notification] = await getRepositories().notifications.listByGuest(
       recipient.id
@@ -1396,6 +1449,7 @@ describe("meeting notifications", () => {
     await expect(
       notifyMeetingRequested({ meeting, now: NOW })
     ).resolves.toBeUndefined();
+    await deliverQueued();
     expect(sendMail).not.toHaveBeenCalled();
   });
 });

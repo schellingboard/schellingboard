@@ -19,3 +19,16 @@ export type Notification = {
   /** Unset while unread. */
   readAt?: Date;
 };
+
+export type DeliveryChannel = "email" | "push";
+
+/** One email or push on its way to a guest. */
+export type Delivery = {
+  id: string;
+  guestId: string;
+  channel: DeliveryChannel;
+  /** What the channel's sender needs, as notifyGuest queued it. */
+  payload: unknown;
+  attempts: number;
+  firstFailedAt: Date | null;
+};

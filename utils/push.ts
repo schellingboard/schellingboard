@@ -17,9 +17,8 @@ const generateKeys = () => webpush.generateVAPIDKeys();
 // pile of it. Hours, not the default four weeks.
 const TTL_SECONDS = 4 * 60 * 60;
 
-// The send runs inside the request that made the change, once per recipient.
-// A push service that stops answering must not hold that request for as long
-// as a socket takes to give up by itself.
+// A push service that stops answering must not hold up the jobs loop for as
+// long as a socket takes to give up by itself.
 const TIMEOUT_MS = 10_000;
 
 /**
@@ -38,8 +37,7 @@ export async function vapidPublicKey(now: Date): Promise<string> {
 
 /**
  * Sends `notice` to every browser the guest has turned notifications on in.
- * Never throws: a push that fails must not cost the guest the email about the
- * same event.
+ * Never throws: a push is best-effort, sent once and not retried (ADR 0011).
  *
  * The caller decides whether the guest wants this at all — see notifyGuest.
  */

@@ -9,5 +9,7 @@ export type Job = {
 // Named here rather than in each job's module, which the loop only imports
 // lazily (see loop.ts).
 export const SESSION_NOTIFICATIONS = "session-notifications";
+export const DELIVERIES = "deliveries";
 export const PRUNE_CHANGES = "prune-changes";
+export const PRUNE_DELIVERIES = "prune-deliveries";
 export const PRUNE_EVERY_MS = 60 * 60 * 1000;

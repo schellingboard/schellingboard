@@ -675,3 +675,27 @@ export const jobCursors = sqliteTable("job_cursors", {
   name: text("name").primaryKey(),
   seq: integer("seq").notNull(),
 });
+
+// One email or push for one guest, sent by the jobs loop (ADR 0011). A row is
+// due once next_attempt_at has passed, or straight away while it is null.
+export const deliveries = sqliteTable(
+  "deliveries",
+  {
+    id: text("id").primaryKey(),
+    guestId: text("guest_id")
+      .notNull()
+      .references(() => guests.id, { onDelete: "cascade" }),
+    channel: text("channel").notNull(),
+    payload: text("payload", { mode: "json" }).notNull(),
+    attempts: integer("attempts").notNull().default(0),
+    nextAttemptAt: text("next_attempt_at"),
+    firstFailedAt: text("first_failed_at"),
+    lastError: text("last_error"),
+    sentAt: text("sent_at"),
+    abandonedAt: text("abandoned_at"),
+  },
+  (t) => [
+    index("deliveries_due_idx").on(t.sentAt, t.abandonedAt),
+    index("deliveries_guest_idx").on(t.guestId),
+  ]
+);

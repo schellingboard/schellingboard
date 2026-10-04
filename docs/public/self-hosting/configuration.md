@@ -43,6 +43,10 @@ with `SMTP_PORT`/`SMTP_USER`/`SMTP_PASSWORD`/`SMTP_SECURE` — not both.
 \* `SITE_URL` is required when email is enabled, so that emails can link back
 to the site.
 
+Notification emails go out a few seconds after whatever they announce, not as
+part of it, so a slow mail server never slows the site down. One that fails is
+retried for up to a day.
+
 Leaving email unconfigured also disables
 [attendee name protection](../organizers/how-it-works.md#attendee-identity),
 since it relies on emailed login codes. It does **not** disable in-app

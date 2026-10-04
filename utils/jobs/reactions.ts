@@ -9,8 +9,8 @@ import { PRUNE_CHANGES, SESSION_NOTIFICATIONS, type Job } from "./job";
 const BATCH = 50;
 const RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
 
-// The cursor advances after each change: a crash repeats that one change,
-// while a failed send is logged, not retried, until deliveries take over.
+// The cursor advances after each change, so a crash repeats that one change;
+// a failed email is the deliveries job's to retry.
 function reaction(
   name: string,
   handle: (change: RecordedChange) => Promise<void>

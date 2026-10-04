@@ -16,6 +16,7 @@ vi.mock("@/utils/mailer", () => ({
 
 import { sendMail } from "@/utils/mailer";
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { runJobs } from "../helpers/jobs";
 import {
   createEvent,
   createGuest,
@@ -124,6 +125,7 @@ describe("POST /api/add-session", () => {
     );
 
     expect(res.ok).toBe(true);
+    await runJobs();
     expect(sendMail).toHaveBeenCalledOnce();
     expect(vi.mocked(sendMail).mock.calls[0][0].to).toBe("cohost@test.example");
   });

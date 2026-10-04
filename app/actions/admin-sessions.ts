@@ -5,7 +5,7 @@ import { getRepositories } from "@/db/container";
 import { isAdminRequest } from "@/utils/acting-admin";
 import { serverNow } from "@/utils/dev-clock-server";
 import { notifyCohostsAdded } from "@/utils/notifications";
-import { nudgeJobs } from "@/utils/jobs/loop";
+import { nudgeJobs } from "@/utils/jobs/nudge";
 import type { AdminActionResult } from "./admin-guests";
 
 export type AdminSessionInput = {

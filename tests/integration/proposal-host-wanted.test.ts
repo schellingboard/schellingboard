@@ -41,6 +41,7 @@ vi.mock("next/headers", () => ({
 }));
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { runJobs } from "../helpers/jobs";
 import { siteAuthenticate } from "../helpers/site-auth";
 import {
   createEvent,
@@ -326,6 +327,7 @@ describe("a proposal that wants a host", () => {
         },
       ]);
       expect(await notifications.listByGuest(volunteer.id)).toEqual([]);
+      await runJobs();
       expect(vi.mocked(sendMail).mock.calls.map((c) => c[0].to)).toEqual([
         "host@test.example",
       ]);
@@ -350,6 +352,7 @@ describe("a proposal that wants a host", () => {
       expect(
         await getRepositories().notifications.listByGuest(host.id)
       ).toHaveLength(1);
+      await runJobs();
       expect(sendMail).not.toHaveBeenCalled();
     });
 

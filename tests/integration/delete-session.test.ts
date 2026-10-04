@@ -218,6 +218,8 @@ describe("POST /api/delete-session", () => {
       sessionId,
       guestId: attendee.id,
     });
+    // Delivers the co-host mail the setup queued.
+    await runJobs();
     vi.mocked(sendMail).mockReset();
 
     const res = await POST(
