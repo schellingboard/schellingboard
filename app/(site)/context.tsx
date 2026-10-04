@@ -32,6 +32,7 @@ import {
   DEFAULT_SLOT_INCREMENT_MINUTES,
 } from "@schellingboard/domain/slots";
 import { startNowTicker, NOW_REFRESH_INTERVAL_MS } from "@/utils/now-ticker";
+import type { MyMeetingsResponse } from "@/utils/meeting-views";
 
 export type DayWithSessions = Day & { sessions: Session[] };
 
@@ -67,6 +68,9 @@ export interface EventContextType {
   unavailability: LocationUnavailability[];
   guests: Guest[];
   rsvps: Rsvp[];
+  // Seeds the 1-on-1 column, so the grid doesn't shift once the client fetch
+  // lands. Only valid while `guestId` is still the selected guest.
+  myMeetings: ({ guestId: string } & MyMeetingsResponse) | null;
   // Starts as the server-rendered value so SSR and hydration agree on
   // time-dependent decisions (e.g. which schedule days default to folded),
   // then ticks forward on the client (see startNowTicker) so long-lived
@@ -90,6 +94,7 @@ export const EventContext = createContext<EventContextType>({
   unavailability: [],
   guests: [],
   rsvps: [],
+  myMeetings: null,
   now: new Date(0),
   localSessions: [],
   userBusySessions: () => [],

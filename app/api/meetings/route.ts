@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifiedCurrentUser } from "@/utils/acting-guest";
 import { requestNow } from "@/utils/dev-clock";
-import { getRepositories } from "@/db/container";
-import { meetingViewsFor } from "@/utils/meeting-views";
+import { myMeetingsFor } from "@/utils/meeting-views";
 
 export const dynamic = "force-dynamic";
 
@@ -32,18 +31,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const [meetings, availability] = await Promise.all([
-      meetingViewsFor(guestId, eventId, requestNow(request)),
-      getRepositories().meetingAvailability.listByGuestAndEvent(
-        guestId,
-        eventId
-      ),
-    ]);
     return NextResponse.json(
-      {
-        meetings,
-        availability: availability.map((slot) => slot.toISOString()),
-      },
+      await myMeetingsFor(guestId, eventId, requestNow(request)),
       NO_STORE
     );
   } catch (error) {

@@ -123,3 +123,21 @@ export async function meetingViewsFor(
     };
   });
 }
+
+export async function myMeetingsFor(
+  viewerId: string,
+  eventId: string,
+  now: Date
+): Promise<MyMeetingsResponse> {
+  const [meetings, availability] = await Promise.all([
+    meetingViewsFor(viewerId, eventId, now),
+    getRepositories().meetingAvailability.listByGuestAndEvent(
+      viewerId,
+      eventId
+    ),
+  ]);
+  return {
+    meetings,
+    availability: availability.map((slot) => slot.toISOString()),
+  };
+}

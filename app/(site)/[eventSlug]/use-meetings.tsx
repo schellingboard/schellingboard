@@ -35,16 +35,24 @@ const MeetingsContext = createContext<MyMeetings>({
  * needs them — the schedule's column and the modal it opens, which must agree
  * about a meeting the modal has just answered.
  *
- * Client-side rather than part of the page's server render: the schedule is
- * shared by everyone looking at it, and these are private to one guest
- * (issue #392, section 2.6).
+ * Starts from the server render's copy, as RSVPs do, and refetches on mount:
+ * the layout holding that copy survives client-side navigation, so it can be
+ * stale by the time the schedule mounts again.
  */
 export function MeetingsProvider({ children }: { children: ReactNode }) {
-  const { event } = useContext(EventContext);
+  const { event, myMeetings: seed } = useContext(EventContext);
   const { user } = useContext(UserContext);
   const [loaded, setLoaded] = useState<
     ({ key: string } & MyMeetingsResponse) | null
-  >(null);
+  >(() =>
+    event && seed
+      ? {
+          key: `${event.id}:${seed.guestId}`,
+          meetings: seed.meetings,
+          availability: seed.availability,
+        }
+      : null
+  );
   // Bumped by reload() to re-run the fetch below.
   const [reloads, setReloads] = useState(0);
 

@@ -4,6 +4,7 @@ import { EventProviderWrapper } from "./event-provider-wrapper";
 import type { DayWithSessions } from "@/app/(site)/context";
 import { verifiedCurrentUser } from "@/utils/acting-guest";
 import { serverNow } from "@/utils/dev-clock-server";
+import { myMeetingsFor } from "@/utils/meeting-views";
 
 export async function EventLayoutContent({
   eventSlug,
@@ -25,7 +26,8 @@ export async function EventLayoutContent({
   // into the SSR payload.
   const currentUser = await verifiedCurrentUser(cookieStore);
 
-  const [days, sessions, locations, unavailability, guests, rsvps] =
+  const now = await serverNow();
+  const [days, sessions, locations, unavailability, guests, rsvps, myMeetings] =
     await Promise.all([
       repos.days.listByEvent(event.id),
       repos.sessions.listByEvent(event.id),
@@ -33,6 +35,12 @@ export async function EventLayoutContent({
       repos.locationUnavailability.listByEvent(event.id),
       repos.guests.listByEvent(event.id),
       currentUser ? repos.rsvps.listByGuest(currentUser) : Promise.resolve([]),
+      currentUser
+        ? myMeetingsFor(currentUser, event.id, now).then((mine) => ({
+            guestId: currentUser,
+            ...mine,
+          }))
+        : Promise.resolve(null),
     ]);
 
   const daysWithSessions: DayWithSessions[] = days.map((day) => ({
@@ -54,10 +62,11 @@ export async function EventLayoutContent({
     unavailability,
     guests,
     rsvps,
+    myMeetings,
     // Computed on the server so SSR and hydration agree on which days
     // default to folded (see getDefaultFoldedDayIds). Honours the dev fake
     // clock so time travel drives phase/schedule UI (see docs/dev/adr/0004-dev-fake-clock.md).
-    now: await serverNow(),
+    now,
   };
 
   return (

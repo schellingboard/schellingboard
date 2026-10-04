@@ -44,9 +44,7 @@ export function DayGrid(props: {
   const { meetings, availability, reload } = useMyMeetings();
   // Outside the ?loc= filter below: the column is not a location, so narrowing
   // the schedule to one room must not drop it (issue #392, section 2.6). All
-  // days or none, so the rooms line up from one day to the next -- and until
-  // the fetch lands, none: reserving the width for a viewer who turns out to
-  // have nothing would shift the grid for the many instead of the few.
+  // days or none, so the rooms line up from one day to the next.
   const showMeetings =
     meetings !== null &&
     availability !== null &&
