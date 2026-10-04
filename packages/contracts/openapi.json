@@ -3678,6 +3678,1142 @@
           }
         }
       }
+    },
+    "/api/v1/meetings": {
+      "get": {
+        "tags": ["meetings"],
+        "description": "The acting guest's own 1-on-1s at an event, and the slots they declared themselves free.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "eventId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The caller's 1-on-1s and availability",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meetings": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "pending",
+                              "accepted",
+                              "declined",
+                              "canceled",
+                              "expired"
+                            ],
+                            "description": "expired: a request nobody answered before its slot began"
+                          },
+                          "role": {
+                            "type": "string",
+                            "enum": ["requester", "recipient"]
+                          },
+                          "otherId": { "type": "string" },
+                          "otherName": { "type": "string" },
+                          "slotStart": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "slotEnd": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "dayLabel": { "type": "string" },
+                          "timeLabel": { "type": "string" },
+                          "meetingPoint": { "type": "string" },
+                          "message": { "type": "string" },
+                          "cancelNote": { "type": "string" },
+                          "clashes": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "guestName": { "type": "string" },
+                                "kind": {
+                                  "type": "string",
+                                  "enum": [
+                                    "hosting",
+                                    "attending",
+                                    "meeting",
+                                    "busy"
+                                  ]
+                                },
+                                "title": { "type": ["string", "null"] },
+                                "isViewer": { "type": "boolean" }
+                              },
+                              "required": [
+                                "guestName",
+                                "kind",
+                                "title",
+                                "isViewer"
+                              ],
+                              "description": "Only the caller's own commitment is named; another's is busy"
+                            }
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "status",
+                          "role",
+                          "otherId",
+                          "otherName",
+                          "slotStart",
+                          "slotEnd",
+                          "dayLabel",
+                          "timeLabel",
+                          "meetingPoint",
+                          "message",
+                          "cancelNote",
+                          "clashes"
+                        ]
+                      },
+                      "description": "The caller's own, by slot"
+                    },
+                    "availability": {
+                      "type": "array",
+                      "items": { "type": "string", "format": "date-time" },
+                      "description": "The slot starts the caller declared themselves free"
+                    }
+                  },
+                  "required": ["meetings", "availability"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["meetings"],
+        "description": "Asks another attendee for a 1-on-1 as the acting guest; the recipient is notified.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "eventId": { "type": "string" },
+                  "recipientId": { "type": "string" },
+                  "slotStart": { "type": "string" },
+                  "slotCount": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "default": 1
+                  },
+                  "meetingPoint": { "type": "string", "maxLength": 200 },
+                  "message": { "type": "string", "maxLength": 2000 }
+                },
+                "required": [
+                  "eventId",
+                  "recipientId",
+                  "slotStart",
+                  "meetingPoint"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The pending request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "eventId": { "type": "string" },
+                    "requesterId": { "type": "string" },
+                    "recipientId": { "type": "string" },
+                    "slotStart": { "type": "string", "format": "date-time" },
+                    "slotEnd": { "type": "string", "format": "date-time" },
+                    "meetingPoint": { "type": "string" },
+                    "message": { "type": "string" },
+                    "cancelNote": { "type": "string" },
+                    "status": {
+                      "type": "string",
+                      "enum": ["pending", "accepted", "declined", "canceled"]
+                    },
+                    "createdAt": { "type": "string", "format": "date-time" },
+                    "respondedAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "eventId",
+                    "requesterId",
+                    "recipientId",
+                    "slotStart",
+                    "slotEnd",
+                    "meetingPoint",
+                    "message",
+                    "cancelNote",
+                    "status",
+                    "createdAt",
+                    "respondedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/meeting-candidates": {
+      "get": {
+        "tags": ["meetings"],
+        "description": "Who the acting guest could ask for a 1-on-1 starting at a slot, for slotCount consecutive slots.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "eventId",
+            "in": "query"
+          },
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "slotStart",
+            "in": "query"
+          },
+          {
+            "schema": { "type": "integer", "minimum": 1, "default": 1 },
+            "required": false,
+            "name": "slotCount",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The slot and who is free in it",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "eventName": { "type": "string" },
+                    "dayLabel": { "type": "string" },
+                    "slotLabel": { "type": "string" },
+                    "slotCount": { "type": "integer" },
+                    "lengths": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "slotCount": { "type": "integer" },
+                          "minutes": { "type": "number" }
+                        },
+                        "required": ["slotCount", "minutes"]
+                      }
+                    },
+                    "meetingPoints": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "name": { "type": "string" },
+                          "description": { "type": "string" }
+                        },
+                        "required": ["id", "name", "description"]
+                      }
+                    },
+                    "yourClashes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "guestName": { "type": "string" },
+                          "kind": {
+                            "type": "string",
+                            "enum": ["hosting", "attending", "meeting", "busy"]
+                          },
+                          "title": { "type": ["string", "null"] },
+                          "isViewer": { "type": "boolean" }
+                        },
+                        "required": ["guestName", "kind", "title", "isViewer"],
+                        "description": "Only the caller's own commitment is named; another's is busy"
+                      }
+                    },
+                    "candidates": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "name": { "type": "string" },
+                          "pronouns": { "type": ["string", "null"] },
+                          "basedIn": { "type": ["string", "null"] },
+                          "avatarUrl": { "type": ["string", "null"] },
+                          "isHost": { "type": "boolean" },
+                          "busy": {
+                            "type": "boolean",
+                            "description": "They have something then; what it is stays theirs"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "pronouns",
+                          "basedIn",
+                          "avatarUrl",
+                          "isHost",
+                          "busy"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "eventName",
+                    "dayLabel",
+                    "slotLabel",
+                    "slotCount",
+                    "lengths",
+                    "meetingPoints",
+                    "yourClashes",
+                    "candidates"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/meetings/{id}/accept": {
+      "post": {
+        "tags": ["meetings"],
+        "description": "The person asked accepts a pending request; the requester is notified.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The answered 1-on-1",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "eventId": { "type": "string" },
+                    "requesterId": { "type": "string" },
+                    "recipientId": { "type": "string" },
+                    "slotStart": { "type": "string", "format": "date-time" },
+                    "slotEnd": { "type": "string", "format": "date-time" },
+                    "meetingPoint": { "type": "string" },
+                    "message": { "type": "string" },
+                    "cancelNote": { "type": "string" },
+                    "status": {
+                      "type": "string",
+                      "enum": ["pending", "accepted", "declined", "canceled"]
+                    },
+                    "createdAt": { "type": "string", "format": "date-time" },
+                    "respondedAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "eventId",
+                    "requesterId",
+                    "recipientId",
+                    "slotStart",
+                    "slotEnd",
+                    "meetingPoint",
+                    "message",
+                    "cancelNote",
+                    "status",
+                    "createdAt",
+                    "respondedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/meetings/{id}/decline": {
+      "post": {
+        "tags": ["meetings"],
+        "description": "The person asked declines a pending request; the requester is notified.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The answered 1-on-1",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "eventId": { "type": "string" },
+                    "requesterId": { "type": "string" },
+                    "recipientId": { "type": "string" },
+                    "slotStart": { "type": "string", "format": "date-time" },
+                    "slotEnd": { "type": "string", "format": "date-time" },
+                    "meetingPoint": { "type": "string" },
+                    "message": { "type": "string" },
+                    "cancelNote": { "type": "string" },
+                    "status": {
+                      "type": "string",
+                      "enum": ["pending", "accepted", "declined", "canceled"]
+                    },
+                    "createdAt": { "type": "string", "format": "date-time" },
+                    "respondedAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "eventId",
+                    "requesterId",
+                    "recipientId",
+                    "slotStart",
+                    "slotEnd",
+                    "meetingPoint",
+                    "message",
+                    "cancelNote",
+                    "status",
+                    "createdAt",
+                    "respondedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/meetings/{id}/cancel": {
+      "post": {
+        "tags": ["meetings"],
+        "description": "Calls a 1-on-1 off: the requester at any time before its slot, the recipient once agreed. The other party is notified.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "note": { "type": "string", "maxLength": 2000 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The canceled 1-on-1",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "eventId": { "type": "string" },
+                    "requesterId": { "type": "string" },
+                    "recipientId": { "type": "string" },
+                    "slotStart": { "type": "string", "format": "date-time" },
+                    "slotEnd": { "type": "string", "format": "date-time" },
+                    "meetingPoint": { "type": "string" },
+                    "message": { "type": "string" },
+                    "cancelNote": { "type": "string" },
+                    "status": {
+                      "type": "string",
+                      "enum": ["pending", "accepted", "declined", "canceled"]
+                    },
+                    "createdAt": { "type": "string", "format": "date-time" },
+                    "respondedAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "eventId",
+                    "requesterId",
+                    "recipientId",
+                    "slotStart",
+                    "slotEnd",
+                    "meetingPoint",
+                    "message",
+                    "cancelNote",
+                    "status",
+                    "createdAt",
+                    "respondedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/meeting-availability": {
+      "put": {
+        "tags": ["meetings"],
+        "description": "Replaces the slots the acting guest declares themselves free for 1-on-1s at an event.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "eventId": { "type": "string" },
+                  "slotStarts": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                },
+                "required": ["eventId", "slotStarts"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Saved" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/events/{id}/meetings": {
+      "put": {
+        "tags": ["admin"],
+        "description": "Switches 1-on-1s on or off for an event, with its request cap.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "meetingsEnabled": { "type": "boolean" },
+                  "maxOpenMeetingRequests": {
+                    "type": "integer",
+                    "description": "Required, at least 1, when meetingsEnabled is true"
+                  }
+                },
+                "required": ["meetingsEnabled"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Saved" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/events/{id}/meeting-points": {
+      "post": {
+        "tags": ["admin"],
+        "description": "Adds a suggested place to meet, after the event's others.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The new meeting point",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "eventId": { "type": "string" },
+                    "name": { "type": "string" },
+                    "description": { "type": "string" },
+                    "sortIndex": { "type": "integer" }
+                  },
+                  "required": [
+                    "id",
+                    "eventId",
+                    "name",
+                    "description",
+                    "sortIndex"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/events/{eventId}/meeting-points/{id}": {
+      "put": {
+        "tags": ["admin"],
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "eventId",
+            "in": "path"
+          },
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The renamed meeting point",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "eventId": { "type": "string" },
+                    "name": { "type": "string" },
+                    "description": { "type": "string" },
+                    "sortIndex": { "type": "integer" }
+                  },
+                  "required": [
+                    "id",
+                    "eventId",
+                    "name",
+                    "description",
+                    "sortIndex"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["admin"],
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "eventId",
+            "in": "path"
+          },
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Deleted" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "webhooks": {}

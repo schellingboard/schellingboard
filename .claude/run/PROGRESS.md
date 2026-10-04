@@ -1,6 +1,6 @@
 # Run progress
 
-Next step: 7.
+Next step: 8.
 
 ## Decisions
 
@@ -169,6 +169,36 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   their verified-guest check before parsing; the legacy GET routes keep their bodies,
   404 messages and `no-store`.
 
+- Step 7: `server/modules/meetings/` (`meetingUseCases()`): `listMyMeetings`,
+  `listMeetingCandidates`, `requestMeeting`, `respondToMeeting`, `cancelMeeting`,
+  `saveMeetingAvailability`, and admin `updateEventMeetings`, `createMeetingPoint`,
+  `updateMeetingPoint`, `deleteMeetingPoint`. The legacy "verified current user" is
+  the #370 rule (`actingGuest`). Reads answer only for the acting guest (no guest
+  parameter), with the same views the UI gets (`MeetingView`: other parties' clashes
+  redacted to busy; candidates: a busy flag only). `meetingViewsFor`,
+  `meetingCandidatesFor` and `loadGuestSchedules` stay in `utils/` (the UI imports
+  their types) and take the use case's repositories as an optional last argument;
+  moving them into the module is left for the UI's move to the API. Notifications are
+  ports awaited as before (no `after()`). Routes: `GET /meetings?eventId=`,
+  `GET /meeting-candidates?eventId=&slotStart=&slotCount=`, `POST /meetings` (201),
+  `POST /meetings/{id}/accept|decline|cancel` (200, the meeting; cancel's `{ note }`
+  body optional), `PUT /meeting-availability` (204), `PUT /admin/events/{id}/meetings`
+  (204), `POST /admin/events/{id}/meeting-points` (201),
+  `PUT/DELETE /admin/events/{eventId}/meeting-points/{id}`; contract additions in
+  `@schellingboard/contracts/meeting`. Codes: `event.notFound`,
+  `event.meetingsDisabled`, `event.notSchedulingPhase`, `guest.notInEvent`,
+  `meeting.self`, `meeting.pointRequired`, `meeting.recipientNotInEvent`,
+  `meeting.tooLong`, `meeting.slotUnavailable`, `meeting.slotPassed` (409),
+  `meeting.recipientUnavailable` (409), `meeting.duplicate` (409),
+  `meeting.tooManyOpen` (409), `meeting.notFound`, `meeting.notRecipient`,
+  `meeting.notParticipant`, `meeting.started` (409), `meeting.alreadyAnswered` (409),
+  `meeting.recipientMustDecline` (409), `meeting.nothingToCancel` (409),
+  `meeting.slotsUnavailable`, `meeting.slotNotOpen` (404), `meeting.capInvalid`,
+  `meetingPoint.nameRequired`, `meetingPoint.notFound`, `admin.required`. Actions keep
+  their messages (`detail`, or their own sign-in line for `guest.*`) and check order;
+  the legacy routes keep their bodies, statuses and `no-store`; `GET /api/meetings`
+  maps an unknown event back to empty lists.
+
 ## Questions
 
 - Each module's `*-use-cases.test.ts` (steps 4–6b) re-tests rules the legacy action
@@ -252,3 +282,11 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   (`kiosk:18`, `schedule-agenda:220`, `view-session:7`/`:45`); every comment spec
   outside the baseline passed, `profile-comments:95` included. No user-facing change,
   no CHANGELOG entry.
+- Step 7: meetings module (own meetings, candidates, request, accept/decline,
+  cancel, availability; admin 1-on-1 settings and meeting points), `/api/v1` meeting
+  routes (guest and admin), the meeting actions, `admin-meetings` actions and both
+  `/api/meetings` routes delegate. format, lint, arch, openapi-check, typecheck,
+  test-coverage pass. Firefox E2E cannot run (Playwright CDN blocked); full suite on
+  Chromium: 178 passed, 13 failed, 4 flaky, all in the known baseline or known flakes
+  (`schedule-agenda:220`, `view-session:7`); every meetings spec passed. No
+  user-facing change, no CHANGELOG entry.

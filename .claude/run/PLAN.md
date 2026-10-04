@@ -55,7 +55,7 @@ family delegate to the use cases. Keep each legacy route's response shape.
 - [x] 6b. **Comments**: a comments module for proposals, sessions and profiles (list,
       create, edit, like, delete) and its routes; `app/(site)/[eventSlug]/comment-actions.ts`
       and the three `app/api/{proposal,session,profile}/[id]/comments` routes delegate.
-- [ ] 7. **Meetings**: `meetings` route and actions, `admin-meetings`.
+- [x] 7. **Meetings**: `meetings` route and actions, `admin-meetings`.
 - [ ] 8. **People and own settings**: `profile`, `settings`, `notifications`, `push`,
       `attendee-count`.
 - [ ] 9. **Admin: events, days, locations** (#1006): `admin-events`, `admin-days`,

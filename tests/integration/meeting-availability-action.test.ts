@@ -238,7 +238,10 @@ describe("saveMeetingAvailabilityAction", () => {
       slotStarts: [SLOT_1],
     });
 
-    expect(result.ok).toBe(false);
+    expect(result).toEqual({
+      ok: false,
+      error: "You are not attending this event",
+    });
   });
 
   // Picking a name is enough for an unprotected guest, exactly as it is for an

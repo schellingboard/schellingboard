@@ -3,6 +3,8 @@ import { getRepositories } from "@/db/container";
 import { nudgeJobs } from "@/utils/jobs/nudge";
 import {
   notifyCohostsAdded,
+  notifyMeetingOutcome,
+  notifyMeetingRequested,
   notifyProfileCommented,
   notifyProposalCommented,
   notifyProposalJoined,
@@ -13,6 +15,10 @@ import {
   type CommentDeps,
   type CommentUseCases,
 } from "@/server/modules/comments/module";
+import {
+  createMeetingUseCases,
+  type MeetingUseCases,
+} from "@/server/modules/meetings/module";
 import {
   createProposalUseCases,
   type ProposalUseCases,
@@ -53,4 +59,12 @@ const notifyCommented: CommentDeps["notifyCommented"] = ({
 
 export function commentUseCases(): CommentUseCases {
   return createCommentUseCases({ repos: getRepositories(), notifyCommented });
+}
+
+export function meetingUseCases(): MeetingUseCases {
+  return createMeetingUseCases({
+    repos: getRepositories(),
+    notifyMeetingRequested,
+    notifyMeetingOutcome,
+  });
 }

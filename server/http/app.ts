@@ -1,10 +1,15 @@
 import { getRepositories } from "@/db/container";
 import {
   commentUseCases,
+  meetingUseCases,
   proposalUseCases,
   sessionUseCases,
 } from "@/server/composition";
 import { addCommentRoutes } from "@/server/modules/comments/module";
+import {
+  addAdminMeetingRoutes,
+  addMeetingRoutes,
+} from "@/server/modules/meetings/module";
 import {
   addProposalRoutes,
   addVoteRoutes,
@@ -32,3 +37,5 @@ addRsvpRoutes(api, sessionUseCases);
 addProposalRoutes(api, proposalUseCases);
 addVoteRoutes(api, proposalUseCases);
 addCommentRoutes(api, commentUseCases);
+addMeetingRoutes(api, meetingUseCases);
+addAdminMeetingRoutes(api, meetingUseCases);

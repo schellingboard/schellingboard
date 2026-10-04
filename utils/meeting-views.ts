@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { getRepositories } from "@/db/container";
+import { getRepositories, type Repositories } from "@/db/container";
 import type { MeetingStatus } from "@schellingboard/domain/meeting";
 import { clashesForInterval, loadGuestSchedules } from "@/utils/guest-clashes";
 import { toMeetingClashes } from "@/utils/meeting-clash-text";
@@ -58,9 +58,12 @@ export type MyMeetingsResponse = {
 export async function meetingViewsFor(
   viewerId: string,
   eventId: string,
-  now: Date
+  now: Date,
+  repos: Pick<
+    Repositories,
+    "events" | "guests" | "sessions" | "meetings"
+  > = getRepositories()
 ): Promise<MeetingView[]> {
-  const repos = getRepositories();
   const event = await repos.events.findById(eventId);
   if (!event) return [];
 
@@ -74,7 +77,11 @@ export async function meetingViewsFor(
   );
   // Loaded once for everyone involved: a guest's schedule is several queries,
   // and the same person may appear in several of these meetings.
-  const schedules = await loadGuestSchedules(eventId, [viewerId, ...otherIds]);
+  const schedules = await loadGuestSchedules(
+    eventId,
+    [viewerId, ...otherIds],
+    repos
+  );
   const byGuest = new Map(schedules.map((s) => [s.guestId, s]));
 
   const zoned = (date: Date) =>
@@ -127,14 +134,15 @@ export async function meetingViewsFor(
 export async function myMeetingsFor(
   viewerId: string,
   eventId: string,
-  now: Date
+  now: Date,
+  repos: Pick<
+    Repositories,
+    "events" | "guests" | "sessions" | "meetings" | "meetingAvailability"
+  > = getRepositories()
 ): Promise<MyMeetingsResponse> {
   const [meetings, availability] = await Promise.all([
-    meetingViewsFor(viewerId, eventId, now),
-    getRepositories().meetingAvailability.listByGuestAndEvent(
-      viewerId,
-      eventId
-    ),
+    meetingViewsFor(viewerId, eventId, now, repos),
+    repos.meetingAvailability.listByGuestAndEvent(viewerId, eventId),
   ]);
   return {
     meetings,

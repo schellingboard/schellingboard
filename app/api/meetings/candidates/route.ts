@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifiedCurrentUser } from "@/utils/acting-guest";
+import { meetingUseCases } from "@/server/composition";
+import { resolveActor } from "@/server/kernel/actor";
 import { requestNow } from "@/utils/dev-clock";
-import { meetingCandidatesFor } from "@/utils/meeting-candidates";
 
 export const dynamic = "force-dynamic";
 
@@ -29,31 +29,23 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Who is free when is as private as an RSVP, so this answers for the caller
-  // alone: there is no id parameter to ask on anyone else's behalf.
-  const guestId = await verifiedCurrentUser(request.cookies);
-  if (!guestId) {
-    return NextResponse.json(
-      { error: "Select your name to arrange a 1-on-1" },
-      { ...NO_STORE, status: 403 }
-    );
-  }
-
   try {
-    const found = await meetingCandidatesFor(
-      guestId,
-      eventId,
-      slotStart,
-      requestNow(request),
-      slotCount
+    const result = await meetingUseCases().listMeetingCandidates(
+      await resolveActor(request.cookies),
+      { eventId, slotStart, slotCount },
+      requestNow(request)
     );
-    if (!found) {
+    if (result.ok) return NextResponse.json(result.value, NO_STORE);
+    if (result.error.code.startsWith("guest.")) {
       return NextResponse.json(
-        { error: "That slot is not open for 1-on-1s" },
-        { ...NO_STORE, status: 404 }
+        { error: "Select your name to arrange a 1-on-1" },
+        { ...NO_STORE, status: 403 }
       );
     }
-    return NextResponse.json(found, NO_STORE);
+    return NextResponse.json(
+      { error: "That slot is not open for 1-on-1s" },
+      { ...NO_STORE, status: 404 }
+    );
   } catch (error) {
     console.error("Error fetching 1-on-1 candidates:", error);
     return NextResponse.json(

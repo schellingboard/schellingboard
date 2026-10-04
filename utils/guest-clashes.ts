@@ -1,4 +1,4 @@
-import { getRepositories } from "@/db/container";
+import { getRepositories, type Repositories } from "@/db/container";
 import type { Meeting } from "@schellingboard/domain/meeting";
 import type { Session } from "@schellingboard/domain/session";
 import { newEmptySession, sessionsOverlap } from "@/app/(site)/session_utils";
@@ -31,11 +31,16 @@ export type GuestSchedule = {
   meetings: Meeting[];
 };
 
+type GuestScheduleRepos = Pick<
+  Repositories,
+  "guests" | "sessions" | "meetings"
+>;
+
 export async function loadGuestSchedules(
   eventId: string,
-  guestIds: string[]
+  guestIds: string[],
+  repos: GuestScheduleRepos = getRepositories()
 ): Promise<GuestSchedule[]> {
-  const repos = getRepositories();
   const schedules: GuestSchedule[] = [];
   for (const guestId of guestIds) {
     const guest = await repos.guests.findById(guestId);

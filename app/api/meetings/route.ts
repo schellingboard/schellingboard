@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifiedCurrentUser } from "@/utils/acting-guest";
+import { meetingUseCases } from "@/server/composition";
+import { resolveActor } from "@/server/kernel/actor";
 import { requestNow } from "@/utils/dev-clock";
-import { myMeetingsFor } from "@/utils/meeting-views";
 
 export const dynamic = "force-dynamic";
 
@@ -22,19 +22,20 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const guestId = await verifiedCurrentUser(request.cookies);
-  if (!guestId) {
-    return NextResponse.json(
-      { error: "Select your name to see your meetings" },
-      { ...NO_STORE, status: 403 }
-    );
-  }
-
   try {
-    return NextResponse.json(
-      await myMeetingsFor(guestId, eventId, requestNow(request)),
-      NO_STORE
+    const result = await meetingUseCases().listMyMeetings(
+      await resolveActor(request.cookies),
+      { eventId },
+      requestNow(request)
     );
+    if (result.ok) return NextResponse.json(result.value, NO_STORE);
+    if (result.error.code.startsWith("guest.")) {
+      return NextResponse.json(
+        { error: "Select your name to see your meetings" },
+        { ...NO_STORE, status: 403 }
+      );
+    }
+    return NextResponse.json({ meetings: [], availability: [] }, NO_STORE);
   } catch (error) {
     console.error("Error fetching meetings:", error);
     return NextResponse.json(

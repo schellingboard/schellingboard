@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 
-import { getRepositories } from "@/db/container";
+import { getRepositories, type Repositories } from "@/db/container";
 import type { MeetingPoint } from "@schellingboard/domain/meeting";
 import { clashesForInterval, loadGuestSchedules } from "@/utils/guest-clashes";
 import { meetingsOpen } from "@/utils/meeting-rules";
@@ -62,9 +62,19 @@ export async function meetingCandidatesFor(
   eventId: string,
   slotStart: string,
   now: Date,
-  slotCount = 1
+  slotCount = 1,
+  repos: Pick<
+    Repositories,
+    | "events"
+    | "guests"
+    | "days"
+    | "meetingAvailability"
+    | "meetingPoints"
+    | "meetings"
+    | "sessions"
+    | "rsvps"
+  > = getRepositories()
 ): Promise<MeetingCandidates | null> {
-  const repos = getRepositories();
   const event = await repos.events.findById(eventId);
   if (!event || !meetingsOpen(event, now)) return null;
 
@@ -175,7 +185,7 @@ export async function meetingCandidatesFor(
 
   // The viewer's own schedule is worth the four queries: theirs is the one
   // clash that may be named, and it is the same line the picker shows.
-  const [mine] = await loadGuestSchedules(eventId, [viewerId]);
+  const [mine] = await loadGuestSchedules(eventId, [viewerId], repos);
   const yourClashes = mine
     ? toMeetingClashes(
         clashesForInterval([mine], {
