@@ -1,6 +1,87 @@
 # Run progress
 
-Next step: 13.
+## Summary
+
+The run built step 3 of the target architecture (#677): a versioned HTTP API under
+`/api/v1` in the same Next process (Hono, mounted by a catch-all route), described by a
+committed `packages/contracts/openapi.json`. Server actions and the legacy `/api/*`
+routes now call the same use cases as the API. No UI change. Each step is its own
+stacked PR, the first based on `main`, each later one on the PR before it; #1203
+carries `fixes #677`.
+
+### Delivered
+
+| Step | PR    | What                                                                                                   |
+| ---- | ----- | ------------------------------------------------------------------------------------------------------ |
+| 1    | #1178 | ADR 0012: layout, actor, problem details, idempotency                                                  |
+| 2    | #1184 | Kernel, problem details, actor middleware, `GET /api/v1/health`, `make openapi-check`, depcruise rules |
+| 2a   | #1185 | Cookie checks moved out of `utils/auth.ts` so the kernel reaches no Next import (squashed into step 2) |
+| 3    | #1186 | `Idempotency-Key`: table, migration 0047, middleware, hourly prune job                                 |
+| 4    | #1187 | Sessions module and routes; session actions and routes delegate                                        |
+| 5    | #1192 | RSVPs (sessions module) and votes (proposals module); legacy routes delegate                           |
+| 6a   | #1195 | Proposals with the vote-breakdown privacy rule; proposal actions delegate                              |
+| 6b   | #1196 | Comments module for proposals, sessions and profiles                                                   |
+| 7    | #1197 | Meetings module (guest and admin)                                                                      |
+| 8    | #1198 | People (profile, avatar), notifications, push, attendee count                                          |
+| 9    | #1199 | Admin events, days, locations, room unavailability (#1006, partly)                                     |
+| 10a  | #1200 | Admin guests (people module) and site settings (new settings module)                                   |
+| 10b  | #1201 | The six `app/api/admin/create-*` seeding routes delegate                                               |
+| 11   | #1202 | `packages/api-client` (openapi-fetch) with one integration test                                        |
+| 12   | #1203 | Self-hosting API page, `docs/dev/server.md`, ADR 0012 updated, CHANGELOG                               |
+
+### Decisions and deviations from the plan
+
+- `/api/v1/admin/*` is gated like `/api/admin/*`: admin cookie only, no site
+  password, cross-site check, 404 when admin is disabled. The rest of `/api/v1` needs
+  the site password; proxy refusals are problem details.
+- The #370 "may act as guest" rule is in the kernel (`actingGuest`, and
+  `actingAsNamedGuest` for legacy routes that name the guest). The API's vote
+  breakdown uses it for "is the viewer a host", which is stricter than the UI (an
+  unverified cookie for a protected guest is not a host); the UI is unchanged.
+- An `Idempotency-Key` from an anonymous request is ignored (runs, nothing stored), so
+  anonymous clients never share a scope. #141 is not closed: forms are server actions,
+  which send no key.
+- Every `/api/v1` response defaults to `cache-control: no-store`.
+- The api-client types are committed and checked by `make openapi-check` instead of
+  generated in the build (the plan and `03-server.md` said build): build-time
+  generation would need a step before every tsc, lint, test and Docker build run.
+  Recorded in ADR 0012 section 6.
+- Plan changes: step 2a added (kernel free of Next); steps 6 and 10 split into 6a/6b
+  and 10a/10b. Admin guests ended up in the people module and site settings in a new
+  settings module (not among the target's nine modules).
+- One intentional behaviour change for malformed requests only: `create-location`
+  refuses a non-boolean `bookable`.
+
+### Verification caveats
+
+- Firefox E2E never ran: the Playwright CDN is blocked by network policy. The suite ran
+  on the preinstalled Chromium through an untracked local config. A known Chromium
+  baseline of failures and timing flakes (e.g. `admin.spec.ts:828`/`:1033`,
+  `kiosk:18`, `schedule-agenda:220`, `view-session:7`/`:45`) also fails on `main`;
+  nothing outside it failed consistently (see Log).
+- `make test-e2e-docker` never ran, and step 11 changed the `Dockerfile` (one
+  manifest `COPY`). **Run it before merging.**
+- Every other precommit tier (format, lint, arch, openapi-check, typecheck,
+  test-coverage) passed on every step.
+
+### Open questions for the reviewer
+
+- Keep the stricter #370 host check for the vote breakdown (API only; the UI's
+  `canEdit` still trusts an unverified cookie)?
+- Pre-existing: proposal pages send all vote counts (skip and total included) to the
+  browser in every phase, though the UI shows them only from scheduling. Fix now or
+  track as an issue? Details under Questions.
+- Use-case tests from steps 4–6b partly duplicate the legacy route and action tests
+  (e.g. `comment-use-cases.test.ts` vs the comment route tests). Trim them?
+- #1006 can be closed with an explanation; it is still open. Each request is served
+  by an existing route (the "Syncing from a script" section of the API page has the
+  recipe): sessions via `GET /api/v1/sessions?eventId=`, which the admin cookie now
+  opens; partial update as read then `PUT /admin/sessions/{id}`, which now refuses a
+  missing field instead of resetting it; the RSVP count as `numRsvps` read before the
+  delete (a count after it is too late to warn); find-or-create as
+  `GET /admin/locations` then a keyed POST, since location names are not unique.
+
+Next step: none; the run is finished.
 
 ## Decisions
 
@@ -276,7 +357,8 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   primary key). Every `/api/v1` response defaults to `cache-control: no-store`
   (`createApp`). `app/api/admin/create-*` routes stay for step 10.
 
-- Step 10a: `server/modules/people/` (`peopleUseCases()`: `listGuests` (id, name,
+- Step 10a: admin guest use cases in `server/modules/people/` (`peopleUseCases()`,
+  moved there from a separate guests module in review: `listGuests` (id, name,
   email, `authProtected`, `eventIds`; never the password hash or email settings),
   `createGuest` (409 on a taken email), `ensureGuest` (the legacy `create-guest`
   route's find-or-create by email with an optional event slug; no `/api/v1` route,
@@ -389,8 +471,7 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   from the issue: an admin session list, a partial admin session update that keeps an
   explicit capacity, a session delete answering the affected RSVP count, a
   find-or-create for locations by name (`no-store` on every `/api/v1` response was
-  added in step 9's review). Which of these belong in this run (step 10?) and
-  which stay on the issue?
+  added in step 9's review). Resolved in review: see the Summary's open questions.
 
 ## Log
 
@@ -489,8 +570,8 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   `schedule-agenda:220`, `view-session:7`); every admin spec outside the baseline
   passed (the location-assignment test on retry). No user-facing change, no
   CHANGELOG entry.
-- Step 10a: guests module (list, create, find-or-create, update, delete, test
-  email, event assignment, CSV import) and settings module (site settings with the
+- Step 10a: admin guest use cases in the people module (list, create, find-or-create,
+  update, delete, test email, event assignment, CSV import) and settings module (site settings with the
   map upload), `/api/v1/admin` guest and settings routes, and the `admin-guests`,
   `admin-guest-events`, `admin-guest-import`, `admin-settings` actions and the
   `create-guest` and `users` routes delegate. format, lint, arch, openapi-check,

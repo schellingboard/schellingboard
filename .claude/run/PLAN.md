@@ -60,11 +60,11 @@ family delegate to the use cases. Keep each legacy route's response shape.
       `attendee-count`.
 - [x] 9. **Admin: events, days, locations** (#1006): `admin-events`, `admin-days`,
       `admin-locations`, `admin-location-events`, `admin-location-unavailability`.
-- [x] 10a. **Admin guests and site settings**: a guests module (list without password
-      hashes or secrets, create, update, delete with its cascade, test email,
-      assign/remove to an event, CSV import with per-row errors) and site settings
-      get/update without secrets; `/api/v1/admin/guests…` and `/api/v1/admin/settings`
-      routes; `admin-guests`, `admin-guest-events`, `admin-guest-import`,
+- [x] 10a. **Admin guests and site settings**: admin guest use cases in the people
+      module (list without password hashes or secrets, create, update, delete with its
+      cascade, test email, assign/remove to an event, CSV import with per-row errors)
+      and site settings get/update without secrets; `/api/v1/admin/guests…` and
+      `/api/v1/admin/settings` routes; `admin-guests`, `admin-guest-events`, `admin-guest-import`,
       `admin-settings` actions and `app/api/admin/create-guest` and `users` delegate.
 - [x] 10b. **Admin seeding routes**: `app/api/admin/create-event`, `create-day`,
       `create-location`, `create-session`, `create-proposal`, `create-rsvp` delegate to
@@ -77,4 +77,4 @@ family delegate to the use cases. Keep each legacy route's response shape.
 - [x] 12. **Docs**: API page under `docs/public/self-hosting/`; a `docs/dev/` note;
       step 3 status in `10-path-from-here.md`; one CHANGELOG bullet; ADR 0012 text
       matches what was built.
-- [ ] 13. **Finish**: summary in PROGRESS.md for review, then delete `.claude/run/`.
+- [x] 13. **Finish**: summary in PROGRESS.md for review, then delete `.claude/run/`.
