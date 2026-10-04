@@ -27,7 +27,7 @@ Each family step: use cases first (integration tests against them), then routes 
 request and response contracts, then the server actions and legacy routes for that
 family delegate to the use cases. Keep each legacy route's response shape.
 
-- [ ] 1. **ADR 0012** (Status: Proposed): mount, where use cases and route modules
+- [x] 1. **ADR 0012** (Status: Proposed): mount, where use cases and route modules
       live in the current repo (recommendation: `server/kernel`, `server/http`,
       `server/modules/<module>/{application,http}`, as in 03-server.md), actor
       resolution, `Result` and RFC 9457 problem details with stable codes,

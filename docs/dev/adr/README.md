@@ -23,6 +23,7 @@ the tracking issue where there is one.
 | [0009](0009-standalone-repository-in-own-org.md)     | Move to a standalone repo in new schellingboard GitHub org  | 2026-09-19 |
 | [0010](0010-workspace-packages.md)                   | Domain and contracts as workspace packages                  | 2026-10-03 |
 | [0011](0011-change-log-and-jobs-loop.md)             | A change log and one jobs loop                              | 2026-10-03 |
+| [0012](0012-http-api-v1.md)                          | A versioned HTTP API in the Next process                    | 2026-10-04 |
 
 Longer design work that isn't a single decision lives next door:
 [Target architecture](../target-architecture/README.md) and
