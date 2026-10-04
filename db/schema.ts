@@ -662,8 +662,9 @@ export const changes = sqliteTable(
 );
 
 // Which process runs the jobs loop against this database (ADR 0011). It keeps
-// a second server on the same file from doing the same work; what makes a
-// repeat harmless is each job's own claim or cursor.
+// a second server on the same file from doing the same work. It is renewed
+// only between jobs: claims cover the jobs that send, and a reaction's cursor
+// is safe only because a reaction just writes rows, well within the lease.
 export const jobLeases = sqliteTable("job_leases", {
   name: text("name").primaryKey(),
   owner: text("owner").notNull(),

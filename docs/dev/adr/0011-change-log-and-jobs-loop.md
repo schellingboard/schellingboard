@@ -99,3 +99,9 @@ notifications have no such rule, and losing one silently is worse.
   is not.
 - Repository methods that are logged need the actor and time from their
   caller, so a call site cannot leave out who made the change.
+- A reaction that fails for one guest logs it and moves on; the cursor does
+  not retry it. Retrying the whole change would tell the guests already told
+  a second time, until a change's notices are written in one transaction.
+- An edit's notices go to whoever has RSVPed when the reaction runs, a
+  deletion's to who had when it was made. Edited and then deleted before the
+  reaction runs, a session's attendees hear only of the deletion.
