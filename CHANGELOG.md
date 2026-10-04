@@ -104,10 +104,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Internal
 
-- Developer documentation is published at developers.schellingboard.org, built from `main`
-  rather than from release tags. `CONTRIBUTING.md` is now a short entry point into it.
-- The architecture diagrams are interactive on that site — a browsable explorer at
-  `/diagrams/` and views embedded in the chapters — and the committed PNG exports are gone.
+- **Developer docs are published** at developers.schellingboard.org from `main`, with
+  interactive architecture diagrams; `CONTRIBUTING.md` is now a short entry point into them.
 - **Tests name the use cases they cover** (#1084): every E2E test is tagged from a catalogue
   of use cases, and `make use-cases` reports gaps and over-tested ones.
 - **Domain and contracts are workspace packages** (#965): they replace `model/` and
