@@ -22,106 +22,69 @@ more than the last few % of image quality.
 
 ## Taking screenshots
 
-Start the app with a full database and a presentable version string:
-
 ```sh
-SEED_PROFILE=large make dev-db-seed
-APP_VERSION=v3.2.0 make dev
+make screenshots                       # all of them
+make screenshots ARGS="schedule-grid"  # only the named ones
 ```
 
-- Use the **large** seed profile (the dev default, but pass it explicitly): the
-  small profile is the E2E fixture set, and its ~10-proposal lists and
-  half-empty grids make the app look like a toy. Large gives 400 guests and
-  hundreds of proposals, so lists scroll, filters have something to filter and
-  the schedule looks like a real event.
-- Set `APP_VERSION` to the release the shots are for. Every page's footer shows
-  it, and without the variable it comes from the working tree — so the shots
-  would otherwise carry `a1b2c3d4-dirty` across both sites. `next dev` reads it
-  at startup, so set it on the command that starts the server.
+`scripts/screenshots/` does the rest: it seeds a throwaway database with the
+**large** profile (400 guests, hundreds of proposals — the small profile is the
+E2E fixture set and makes the app look like a toy), starts its own `next dev`
+server, drives Firefox as the attendee **Hana Kobayashi** (whose 1-on-1 states
+the shots need, see the seed script) and writes WebP files straight into this
+directory. Your dev database is not touched, but stop `make dev` first:
+Next.js runs one dev server per checkout. It takes a few minutes.
 
-General setup:
+- The footer shows the newest released version in `CHANGELOG.md`; set
+  `APP_VERSION=vX.Y.Z` to override.
+- Desktop shots are 1280x950 ("Laptop with touch"), mobile ones 360x736 at
+  2.5x (900px wide, "Galaxy Note 9"), all in the light theme except the one
+  dark shot named below.
+- `schedule-grid` also regenerates `www/og-image.jpg`, the Open Graph card on
+  the landing page — a separate JPEG because link-preview crawlers handle
+  WebP inconsistently.
+- How each shot is reached is in `scripts/screenshots/shots.ts`. When the UI
+  changes so that a shot no longer matches its description below, fix the
+  recipe there rather than capturing by hand.
+- `make screenshots ARGS=--serve` leaves the seeded server running, to explore.
 
-- Firefox
-- Responsive Design Mode (Ctrl+Shift+M)
-- Desktop shots: "Laptop with touch" device, 1280x950
-- Mobile shots: "Galaxy Note 9 / Android 7" device
-- Hide the Next.js developer tools overlay before capturing
-- Select the attendee **Hana Kobayashi** before capturing, so the "logged in
-  as" state is consistent across all screenshots. The large profile gives her
-  the 1-on-1 states the shots below need — availability with gaps in it, one
-  agreed meeting, one waiting on her and one waiting on the other person — so
-  nothing has to be arranged by hand
-- Light theme for everything except the one dark shot flagged in the checklist
-  below. The theme switch is in the footer on every page; switch it back
-  afterwards.
-
-Firefox saves captures as PNG. Convert before committing — never commit a
-`.png` here:
-
-```sh
-# Desktop shots
-cwebp -q 80 ~/Downloads/capture.png -o docs/screenshots/<name>.webp
-
-# Mobile shots — also resize. Firefox's full-page capture is taken at the
-# device's pixel ratio, so a mobile shot can come out ~1450x2960px (1.4 MB+)
-# even though the gallery only ever displays it at 280px wide. -resize 900 0
-# keeps it sharp at that size (and in the lightbox, capped at 1000px) while
-# cutting the file down to roughly a tenth of the raw capture.
-cwebp -q 80 -resize 900 0 ~/Downloads/capture.png -o docs/screenshots/<name>.webp
-```
-
-`cwebp` ships with `webp-pixbuf-loader` / `libwebp-tools` on most distros
-(`apt install webp`, `brew install webp`).
-
-If `schedule-grid.webp` changed, also regenerate `www/og-image.jpg` — the
-Open Graph / Twitter card image on the landing page. It's a separate JPEG
-copy rather than a reference to the WebP because link-preview crawlers
-(Slack, iMessage, older scrapers) have inconsistent WebP support:
-
-```sh
-magick docs/screenshots/schedule-grid.webp -quality 85 www/og-image.jpg
-```
-
-Save files here using the exact file names below, then update the captions in
-`www/screenshots.html` (and `www/index.html`'s hero image and OpenGraph tags,
-if the hero shot changed). `make www` fails if the HTML references a file that
-is not here, so a rename cannot silently break the site.
+After capturing, update the captions in `www/screenshots.html` (and
+`www/index.html`'s hero image and OpenGraph tags, if the hero shot changed),
+run `make www`, open `www-site/screenshots.html` and click through the lightbox
+to confirm captions still match what's on screen. `make www` fails if the HTML
+references a file that is not here.
 
 ## Screenshot checklist
 
-Go through the app end-to-end and (re)capture each of these when the UI
-changes materially. Check off `[ ]` as you go.
+What each shot shows. Recapture them all when the UI changes materially.
 
 ### Desktop (1280x950)
 
-- [ ] `home-multi-event.webp` — Home page listing multiple events with phase, dates, and quick links
-- [ ] `proposals-browse.webp` — Proposal list with search, filters, and sortable columns
-- [ ] `proposal-edit.webp` — Session proposal form (title, description, hosts, duration)
-- [ ] `proposals-vote.webp` — Proposal list with Interested / Maybe / Skip voting
-- [ ] `quick-voting.webp` — Quick Voting mode, one proposal at a time
-- [ ] `proposals-results.webp` — Proposal list in the **scheduling** phase: "Your vote" column and ❤️/⭐ vote counts (only visible once voting is over)
-- [ ] `proposal-vote-breakdown.webp` — A proposal's popup in the **scheduling** phase, showing the vote breakdown and the "expect N–M people" prediction. Open it as the host (Hana Kobayashi) of a proposal with enough votes, or the box is withheld
-- [ ] `schedule-grid.webp` — Scheduling grid with room photos, taken at the top of day one so the viewer's own 1-on-1 column is in it (also used as the site hero and as the landing page's only 1-on-1 shot; also regenerates `www/og-image.jpg`, see above)
-- [ ] `session-details.webp` — Session detail popup (host, location, time, attendees, description)
-- [ ] `add-session.webp` — Form for adding a session directly to the schedule
-- [ ] `meetings-availability.webp` — The **1-on-1s** section of Settings with an event's panel open: the "I'm open to 1-on-1s" switch on, and a day's slots as checkboxes with some of them cleared
-- [ ] `meeting-request.webp` — The request form behind **Schedule a 1-on-1** on another attendee's profile, with a slot picked, a meeting point chosen and a line of context typed. Ahmad Karimi's profile has slots to offer on the event's first day: the afternoon he declared reads **Busy**, because Hana is in a session for all of it, and the rest of the day is **Unavailable**
-- [ ] `meeting-answer.webp` — The 1-on-1 waiting for Hana's reply (Aisha Diallo's, 15:00 on day one), opened from her column of the grid: Accept, Decline, and the clash warning
-- [ ] `meetings-schedule-column.webp` — The scheduling grid's first column, picture and all, with Hana's own 1-on-1s in it. Scroll the grid so day one's whole afternoon is in view
-- [ ] `meeting-book-from-grid.webp` — "Who's free at …?", from the **+** on an empty slot of that column. Take it on 14:30, where the seeded attendees are bookable — most hours nobody is free, and the popup then has nothing to show
-- [ ] `attendees.webp` — Searchable attendee directory with avatars and host badges
-- [ ] `participant-profile.webp` — Participant profile page (bio, proposals, sessions they're hosting)
-- [ ] `edit-profile.webp` — Edit profile form (name, pronouns, avatar, Markdown bio)
-- [ ] `user-settings.webp` — Settings page (email notification preferences, account protection) — **capture this one in dark theme**, so both sites show that the app has one; it is the natural page for it, since the theme switch sits under Appearance right there
-- [ ] `kiosk-mode.webp` — Schedule grid in kiosk mode, with the red current-time line visible
-- [ ] `admin-events.webp` — Admin panel listing all events with a Manage button
-- [ ] `admin-event-settings.webp` — Admin event configuration form (name, dates, timezone, rules)
-- [ ] `admin-meetings.webp` — The **Meetings** section of the same form: 1-on-1s enabled, the suggested meeting points, and the cap on open requests
+- `home-multi-event.webp` — Home page listing multiple events with phase, dates, and quick links
+- `proposals-browse.webp` — Proposal list with search, filters, and sortable columns
+- `proposal-edit.webp` — Session proposal form (title, description, hosts, duration)
+- `proposals-vote.webp` — Proposal list with Interested / Maybe / Skip voting
+- `quick-voting.webp` — Quick Voting mode, one proposal at a time
+- `proposals-results.webp` — Proposal list in the **scheduling** phase: "Your vote" column and ❤️/⭐ vote counts (only visible once voting is over)
+- `proposal-vote-breakdown.webp` — A proposal's popup in the **scheduling** phase, showing the vote breakdown and the "expect N–M people" prediction. Open it as the host (Hana Kobayashi) of a proposal with enough votes, or the box is withheld
+- `schedule-grid.webp` — Scheduling grid with room photos, taken at the top of day one so the viewer's own 1-on-1 column is in it (also used as the site hero and as the landing page's only 1-on-1 shot; also regenerates `www/og-image.jpg`, see above)
+- `session-details.webp` — Session detail popup (host, location, time, attendees, description)
+- `add-session.webp` — Form for adding a session directly to the schedule
+- `meetings-availability.webp` — The **1-on-1s** section of Settings with an event's panel open: the "I'm open to 1-on-1s" switch on, and a day's slots as checkboxes with some of them cleared
+- `meeting-request.webp` — The request form behind **Schedule a 1-on-1** on another attendee's profile, with a slot picked, a meeting point chosen and a line of context typed. Ahmad Karimi's profile has slots to offer on the event's first day: the afternoon he declared reads **Busy**, because Hana is in a session for all of it, and the rest of the day is **Unavailable**
+- `meeting-answer.webp` — The 1-on-1 waiting for Hana's reply (Aisha Diallo's, 15:00 on day one), opened from her column of the grid: Accept, Decline, and the clash warning
+- `meetings-schedule-column.webp` — The scheduling grid's first column, picture and all, with Hana's own 1-on-1s in it. Scroll the grid so day one's whole afternoon is in view
+- `meeting-book-from-grid.webp` — "Who's free at …?", from the **+** on an empty slot of that column. Take it on 14:30, where the seeded attendees are bookable — most hours nobody is free, and the popup then has nothing to show
+- `attendees.webp` — Searchable attendee directory with avatars and host badges
+- `participant-profile.webp` — Participant profile page (bio, proposals, sessions they're hosting)
+- `edit-profile.webp` — Edit profile form (name, pronouns, avatar, Markdown bio)
+- `user-settings.webp` — Settings page (email notification preferences, account protection) — **capture this one in dark theme**, so both sites show that the app has one; it is the natural page for it, since the theme switch sits under Appearance right there
+- `kiosk-mode.webp` — Schedule grid in kiosk mode, with the red current-time line visible
+- `admin-events.webp` — Admin panel listing all events with a Manage button
+- `admin-event-settings.webp` — Admin event configuration form (name, dates, timezone, rules)
+- `admin-meetings.webp` — The **Meetings** section of the same form: 1-on-1s enabled, the suggested meeting points, and the cap on open requests
 
 ### Mobile (Galaxy Note 9)
 
-- [ ] `mobile-schedule.webp` — Scheduling grid rendered on a phone screen
-- [ ] `mobile-session-details.webp` — Mobile session detail popup **with closed-session warning**
-
-After capturing, run `make www`, open `www-site/screenshots.html`, and click
-through the lightbox to confirm captions still match what's on screen.
+- `mobile-schedule.webp` — Scheduling grid rendered on a phone screen
+- `mobile-session-details.webp` — Mobile session detail popup **with closed-session warning**

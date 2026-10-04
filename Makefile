@@ -1,4 +1,4 @@
-.PHONY: help dev mailpit build start lint typecheck arch arch-graph arch-diagrams arch-diagrams-check lint-watch test test-unit test-integration test-watch test-coverage use-cases test-e2e test-e2e-headed test-e2e-docker format format-check precommit dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed dump-release-db install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate docs-dev docs-dev-build docs-dev-validate www
+.PHONY: help dev mailpit build start lint typecheck arch arch-graph arch-diagrams arch-diagrams-check lint-watch test test-unit test-integration test-watch test-coverage use-cases test-e2e test-e2e-headed test-e2e-docker format format-check precommit dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed dump-release-db screenshots install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate docs-dev docs-dev-build docs-dev-validate www
 
 SHELL := /usr/bin/env bash
 
@@ -36,6 +36,7 @@ help:
 	@printf "  %-28s %s\n" "make dev-migrate-status" "Check migration status"
 	@printf "  %-28s %s\n" "make dev-migrate-create" "Generate new migration"
 	@printf "  %-28s %s\n" "make dev-db-seed"        "Reset dev database and seed dummy data (SEED_PROFILE=small|large)"
+	@printf "  %-28s %s\n" "make screenshots"        "Recapture docs/screenshots/ (ARGS=\"name ...\" for some)"
 	@printf "  %-28s %s\n" "make dump-release-db"    "Record VERSION=vX.Y.Z's seeded DB as an upgrade-test fixture"
 	@printf "\nDocumentation sites:\n"
 	@printf "  %-28s %s\n" "make docs"               "Preview the docs in docs/public"
@@ -176,6 +177,10 @@ dev-migrate-create: install
 
 dev-db-seed: install
 	bun set-env.ts dev bun x tsx scripts/seed/seed-database.ts
+
+# Recapture docs/screenshots/ against a throwaway seeded server; ARGS names shots.
+screenshots: install
+	bun x tsx scripts/screenshots/index.ts $(ARGS)
 
 # Once per release: the fixture the release-upgrade tests migrate forward.
 # No set-env.ts — the script seeds a database of its own, in a worktree of the

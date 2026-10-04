@@ -62,6 +62,9 @@ data.*.db-journal
 /uploads
 /uploads-test
 
+# Scratch database, uploads and captures of `make screenshots`
+/screenshots-tmp
+
 # Database and uploads bind-mounted into the container by
 # `make test-e2e-docker` (see docs/dev/testing.md § Testing the Docker image)
 /.e2e-docker

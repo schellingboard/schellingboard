@@ -11,6 +11,8 @@ node_modules
 tests
 # vitest.config.ts and scripts/use-cases.ts import it, and next build type-checks them.
 !tests/use-cases.ts
+# Dev-only; imports the E2E helpers excluded above.
+scripts/screenshots
 .github
 coverage
 site
