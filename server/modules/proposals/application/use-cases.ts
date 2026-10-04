@@ -1,5 +1,9 @@
 import type { ProposalDeps } from "../ports";
-import { adminDeleteProposal, adminUpdateProposal } from "./admin-proposals";
+import {
+  adminCreateProposal,
+  adminDeleteProposal,
+  adminUpdateProposal,
+} from "./admin-proposals";
 import {
   createProposal,
   deleteProposal,
@@ -17,6 +21,7 @@ export function createProposalUseCases(deps: ProposalDeps) {
     updateProposal: updateProposal(deps),
     joinProposal: joinProposal(deps),
     deleteProposal: deleteProposal(deps),
+    adminCreateProposal: adminCreateProposal(deps),
     adminUpdateProposal: adminUpdateProposal(deps),
     adminDeleteProposal: adminDeleteProposal(deps),
     castVote: castVote(deps),

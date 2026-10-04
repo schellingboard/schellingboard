@@ -150,4 +150,24 @@ describe("POST /api/admin/create-location", () => {
     expect(res.status).toBe(400);
     expect(await getRepositories().locations.list()).toEqual([]);
   });
+
+  async function refusal(body: unknown) {
+    const res = await postJson(body);
+    return [res.status, ((await res.json()) as { error: string }).error];
+  }
+
+  it("keeps its refusal messages, checking the fields before the event", async () => {
+    expect(
+      await refusal({ name: " ", capacity: -1, eventSlug: "missing" })
+    ).toEqual([400, "Name is required"]);
+    expect(await refusal({ name: "Hall", capacity: 1.5 })).toEqual([
+      400,
+      "Capacity must be a non-negative whole number",
+    ]);
+    expect(await refusal({ name: "Hall", eventSlug: "missing" })).toEqual([
+      404,
+      "Event not found",
+    ]);
+    expect(await getRepositories().locations.list()).toEqual([]);
+  });
 });

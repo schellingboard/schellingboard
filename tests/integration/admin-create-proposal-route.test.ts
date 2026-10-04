@@ -140,4 +140,24 @@ describe("POST /api/admin/create-proposal", () => {
     });
     expect(res.status).toBe(404);
   });
+
+  async function refusal(body: unknown) {
+    const res = await postJson(body);
+    return [res.status, ((await res.json()) as { error: string }).error];
+  }
+
+  it("checks title and duration before the eventSlug", async () => {
+    expect(await refusal({ title: "", durationMinutes: -1 })).toEqual([
+      400,
+      "Title is required",
+    ]);
+    expect(await refusal({ title: "T", durationMinutes: -1 })).toEqual([
+      400,
+      "Duration must be a non-negative integer",
+    ]);
+    expect(await refusal({ title: "T" })).toEqual([
+      400,
+      "eventSlug is required",
+    ]);
+  });
 });

@@ -247,4 +247,18 @@ describe("POST /api/admin/create-session", () => {
     expect(res.status).toBe(400);
     expect(await getRepositories().sessions.listByEvent(event.id)).toEqual([]);
   });
+
+  async function refusal(body: unknown) {
+    const res = await postJson(body);
+    return [res.status, ((await res.json()) as { error: string }).error];
+  }
+
+  it("keeps its refusal messages", async () => {
+    expect(
+      await refusal({ ...validBody(), title: " ", startTime: undefined })
+    ).toEqual([400, "Title is required"]);
+    expect(
+      await refusal({ ...validBody(), eventSlug: "missing", hostIds: ["x"] })
+    ).toEqual([404, "Event not found"]);
+  });
 });

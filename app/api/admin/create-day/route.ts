@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
-import { getRepositories } from "@/db/container";
+import { legacyActor, legacyDate, legacyRefusal } from "@/app/api/legacy";
+import { eventUseCases } from "@/server/composition";
 import { requireProxyVerifiedAdmin } from "@/utils/auth";
-import {
-  dayAlignmentError,
-  daysOverlap,
-} from "@schellingboard/domain/day-window";
 
 export const dynamic = "force-dynamic";
 
@@ -22,12 +19,6 @@ type Body = {
   startBookings?: string;
   endBookings?: string;
 };
-
-function parseDate(value: string | undefined): Date | undefined {
-  if (!value) return undefined;
-  const d = new Date(value);
-  return isNaN(d.getTime()) ? undefined : d;
-}
 
 function badRequest(error: string) {
   return NextResponse.json({ error }, { status: 400 });
@@ -60,65 +51,19 @@ export async function POST(req: Request) {
 
   if (!body.eventSlug) return badRequest("eventSlug is required");
 
-  const start = parseDate(body.start);
-  if (!start) return badRequest("Invalid start date/time");
-
-  const end = parseDate(body.end);
-  if (!end) return badRequest("Invalid end date/time");
-
-  if (end <= start) return badRequest("Day end must be after start");
-
-  const startBookings = parseDate(body.startBookings);
-  if (!startBookings) return badRequest("Invalid bookings start date/time");
-
-  const endBookings = parseDate(body.endBookings);
-  if (!endBookings) return badRequest("Invalid bookings end date/time");
-
-  if (endBookings <= startBookings) {
-    return badRequest("Bookings end must be after bookings start");
+  const result = await eventUseCases().createDay(await legacyActor(req), {
+    eventSlug: body.eventSlug,
+    start: legacyDate(body.start),
+    end: legacyDate(body.end),
+    startBookings: legacyDate(body.startBookings),
+    endBookings: legacyDate(body.endBookings),
+  });
+  if (!result.ok) {
+    if (result.error.code === "day.saveFailed") {
+      return NextResponse.json({ error: result.error.detail }, { status: 500 });
+    }
+    return legacyRefusal(result.error);
   }
 
-  if (startBookings < start || endBookings > end) {
-    return badRequest("Bookings window must be within the day window");
-  }
-
-  const repos = getRepositories();
-  const event = await repos.events.findBySlug(body.eventSlug);
-  if (!event) {
-    return NextResponse.json({ error: "Event not found" }, { status: 404 });
-  }
-
-  const alignmentError = dayAlignmentError(
-    { start, end, startBookings, endBookings },
-    event.slotIncrementMinutes
-  );
-  if (alignmentError) {
-    return badRequest(alignmentError);
-  }
-
-  const existingDays = await repos.days.listByEvent(event.id);
-  if (existingDays.some((d) => daysOverlap(start, end, d.start, d.end))) {
-    return NextResponse.json(
-      { error: "Day overlaps an existing day" },
-      { status: 409 }
-    );
-  }
-
-  let day;
-  try {
-    day = await repos.days.create({
-      eventId: event.id,
-      start,
-      end,
-      startBookings,
-      endBookings,
-    });
-  } catch {
-    return NextResponse.json(
-      { error: "Failed to create day" },
-      { status: 500 }
-    );
-  }
-
-  return NextResponse.json({ id: day.id }, { status: 201 });
+  return NextResponse.json({ id: result.value.id }, { status: 201 });
 }

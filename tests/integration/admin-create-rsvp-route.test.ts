@@ -175,4 +175,19 @@ describe("POST /api/admin/create-rsvp", () => {
     const body = await readJson(res);
     expect(body.created).toBe(false);
   });
+
+  async function refusal(body: unknown) {
+    const res = await postJson(body);
+    return [res.status, ((await res.json()) as { error: string }).error];
+  }
+
+  it("keeps its refusal messages", async () => {
+    expect(await refusal({ sessionId: "missing", guestId: "nobody" })).toEqual([
+      404,
+      "Session not found",
+    ]);
+    expect(await refusal({ sessionId: session.id, guestId: "nobody" })).toEqual(
+      [404, "Guest not found"]
+    );
+  });
 });

@@ -1,5 +1,6 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import {
+  adminProposalCreateSchema,
   adminProposalUpdateSchema,
   proposalCreateSchema,
   proposalListSchema,
@@ -90,6 +91,22 @@ const deleteProposal = createRoute({
   responses: { 204: noContent("Deleted"), ...problemDefault },
 });
 
+const adminCreateProposal = createRoute({
+  method: "post",
+  path: "/admin/proposals",
+  tags: ["admin"],
+  description:
+    "Creates a proposal in any phase; its hosts are added to the event.",
+  request: {
+    headers: idempotencyHeaders,
+    body: body(adminProposalCreateSchema),
+  },
+  responses: {
+    201: json(proposalViewSchema, "The new proposal"),
+    ...problemDefault,
+  },
+});
+
 const adminUpdateProposal = createRoute({
   method: "put",
   path: "/admin/proposals/{id}",
@@ -175,6 +192,17 @@ export function addProposalRoutes(app: App, proposals: () => ProposalUseCases) {
     });
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);
+  });
+
+  app.openapi(adminCreateProposal, async (c) => {
+    const { eventId, ...input } = c.req.valid("json");
+    const result = await proposals().adminCreateProposal(
+      c.var.actor,
+      { ...input, event: { id: eventId } },
+      c.var.now
+    );
+    if (!result.ok) return problem(result.error);
+    return c.json(toProposalView(result.value), 201);
   });
 
   app.openapi(adminUpdateProposal, async (c) => {

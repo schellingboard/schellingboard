@@ -1,6 +1,6 @@
 # Run progress
 
-Next step: 10b.
+Next step: 11.
 
 ## Decisions
 
@@ -307,6 +307,30 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   `create-guest` route keeps its own JSON and type checks and messages, `users`
   its body, `no-store` and 500. Use case `019-US4` added.
 
+- Step 10b: the six `app/api/admin/create-*` seeding routes delegate. Seeding
+  differences became options or admin variants: `createEvent` takes optional
+  `phases` (checked after the settings, before the slug); `createDay` takes
+  `eventId` or `eventSlug`; `createLocation` takes an optional `eventSlug` (404
+  after the field checks); sessions module `adminSeedSession` (event by slug, no
+  phase, booking-window or future gate, no co-host notification, unknown host or
+  location refused, capacity defaults to the first location's, hosts and
+  locations added to the event) and `adminAddRsvp` (no phase gate, hosts may RSVP,
+  hard limit kept, `{ rsvp, created }`, guest added to the event); proposals
+  module `adminCreateProposal` (event by id or slug, no phase gate, hosts added to
+  the event). New routes only where `/api/v1` had none: `POST /admin/proposals`
+  (201, the proposal) and `PUT /admin/sessions/{id}/rsvps/{guestId}` (201 new,
+  200 existing, the RSVP). Events, days, locations and sessions keep their
+  existing `/api/v1/admin` routes (a script there passes an explicit capacity and
+  assigns hosts and rooms itself). New codes: `session.hostUnknown`,
+  `session.locationUnknown`, `guest.notFound` (RSVP). Use case `019-US5` added.
+  The routes keep their own JSON and type checks, bodies and statuses
+  (`day.saveFailed` stays 500 there; `create-proposal` maps a missing slug's
+  `event.notFound` back to "eventSlug is required", keeping its order;
+  `createEvent`'s settings check refuses a non-boolean `rsvpCapacityHardLimit`
+  where the route used to). One intentional behaviour change, for malformed
+  requests only: `create-location` now refuses a non-boolean `bookable`
+  (`location.invalid`, 400) instead of storing it in the boolean column.
+
 ## Questions
 
 - Each module's `*-use-cases.test.ts` (steps 4–6b) re-tests rules the legacy action
@@ -437,3 +461,13 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   or known flakes (`kiosk:18`, `profile-comments:95`, `schedule-agenda:220`,
   `view-session:7`); every admin guest, import and settings spec outside the
   baseline passed. No user-facing change, no CHANGELOG entry.
+- Step 10b: the six admin seeding routes (`create-event`, `create-day`,
+  `create-location`, `create-session`, `create-proposal`, `create-rsvp`) delegate
+  to the events, venue, sessions and proposals use cases; new
+  `POST /api/v1/admin/proposals` and `PUT /api/v1/admin/sessions/{id}/rsvps/{guestId}`.
+  Legacy route tests gained refusal-message and check-order cases, which pass on
+  the old routes too. format, lint, arch, openapi-check, typecheck, test-coverage
+  pass. Firefox E2E cannot run (Playwright CDN blocked); full suite on Chromium:
+  179 passed, 12 failed, 4 flaky, all in the known baseline or known flakes
+  (`kiosk:18`, `view-session:7`/`:45`). No E2E test calls these routes. No
+  user-facing change, no CHANGELOG entry.

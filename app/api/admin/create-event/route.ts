@@ -1,16 +1,8 @@
 import { NextResponse } from "next/server";
-import { getRepositories } from "@/db/container";
+import { DEFAULT_SLOT_INCREMENT_MINUTES } from "@schellingboard/domain/slots";
+import { legacyActor, legacyDate, legacyRefusal } from "@/app/api/legacy";
+import { eventUseCases } from "@/server/composition";
 import { requireProxyVerifiedAdmin } from "@/utils/auth";
-import {
-  eventNameToSlug,
-  normalizeWebsiteUrl,
-  RESERVED_EVENT_SLUGS,
-} from "@/utils/utils";
-import {
-  DEFAULT_SLOT_INCREMENT_MINUTES,
-  SLOT_INCREMENT_OPTIONS,
-  isValidSlotIncrement,
-} from "@schellingboard/domain/slots";
 
 export const dynamic = "force-dynamic";
 
@@ -30,21 +22,8 @@ type Body = {
   schedulingPhaseEnd?: string;
 };
 
-function parseDate(value: string | undefined): Date | undefined {
-  if (!value) return undefined;
-  const d = new Date(value);
-  return isNaN(d.getTime()) ? undefined : d;
-}
-
-// The admin UI offers a timezone dropdown; scripts get a strict 400 instead.
-function isValidTimezone(tz: string): boolean {
-  try {
-    new Intl.DateTimeFormat("en", { timeZone: tz });
-    return true;
-  } catch {
-    return false;
-  }
-}
+// NaN gets the use case's own "positive number" refusal.
+const wholeNumber = (value: number) => (Number.isInteger(value) ? value : NaN);
 
 function badRequest(error: string) {
   return NextResponse.json({ error }, { status: 400 });
@@ -69,101 +48,25 @@ export async function POST(req: Request) {
     }
   }
 
-  const name = (body.name ?? "").trim();
-  if (!name) return badRequest("Name is required");
+  const result = await eventUseCases().createEvent(await legacyActor(req), {
+    name: body.name ?? "",
+    description: body.description ?? "",
+    website: body.website ?? "",
+    timezone: body.timezone ?? "",
+    maxSessionDuration: wholeNumber(body.maxSessionDuration ?? 120),
+    breakMinutes: wholeNumber(body.breakMinutes ?? 10),
+    slotIncrementMinutes:
+      body.slotIncrementMinutes ?? DEFAULT_SLOT_INCREMENT_MINUTES,
+    rsvpCapacityHardLimit: body.rsvpCapacityHardLimit,
+    // Omitting both leaves the event phase-less, so admin seeding and RSVPs
+    // work immediately (inSchedPhase treats no phases as always-on).
+    phases: {
+      schedulingPhaseStart: legacyDate(body.schedulingPhaseStart),
+      schedulingPhaseEnd: legacyDate(body.schedulingPhaseEnd),
+    },
+  });
+  if (!result.ok) return legacyRefusal(result.error);
 
-  const timezone = (body.timezone ?? "").trim() || "UTC";
-  if (!isValidTimezone(timezone)) return badRequest("Unknown timezone");
-
-  const maxSessionDuration = body.maxSessionDuration ?? 120;
-  if (!Number.isInteger(maxSessionDuration) || maxSessionDuration <= 0) {
-    return badRequest("Max session duration must be a positive number");
-  }
-
-  const breakMinutes = body.breakMinutes ?? 10;
-  if (!Number.isInteger(breakMinutes) || breakMinutes < 0) {
-    return badRequest("Break must be zero or a positive number");
-  }
-
-  const slotIncrementMinutes =
-    body.slotIncrementMinutes ?? DEFAULT_SLOT_INCREMENT_MINUTES;
-  if (!isValidSlotIncrement(slotIncrementMinutes)) {
-    return badRequest(
-      `Slot increment must be one of ${SLOT_INCREMENT_OPTIONS.join(", ")} minutes`
-    );
-  }
-
-  const rsvpCapacityHardLimit = body.rsvpCapacityHardLimit ?? false;
-  if (typeof rsvpCapacityHardLimit !== "boolean") {
-    return badRequest("RSVP capacity hard limit must be a boolean");
-  }
-
-  // Omitting both leaves the event phase-less, so admin seeding and RSVPs
-  // work immediately (inSchedPhase treats no phases as always-on).
-  const schedulingPhaseStart = parseDate(body.schedulingPhaseStart);
-  if (body.schedulingPhaseStart && !schedulingPhaseStart) {
-    return badRequest("Invalid scheduling phase start");
-  }
-  const schedulingPhaseEnd = parseDate(body.schedulingPhaseEnd);
-  if (body.schedulingPhaseEnd && !schedulingPhaseEnd) {
-    return badRequest("Invalid scheduling phase end");
-  }
-  if (
-    schedulingPhaseStart &&
-    schedulingPhaseEnd &&
-    schedulingPhaseEnd <= schedulingPhaseStart
-  ) {
-    return badRequest("Scheduling phase end must be after its start");
-  }
-
-  const slug = eventNameToSlug(name);
-  if (!slug) return badRequest("Name must contain a letter or number");
-  if (RESERVED_EVENT_SLUGS.has(slug.toLowerCase())) {
-    return badRequest(
-      `"${slug}" is a reserved URL and cannot be used as an event name`
-    );
-  }
-
-  const { events } = getRepositories();
-  const existing = await events.findBySlug(slug);
-  if (existing) {
-    return NextResponse.json(
-      {
-        error: `An event with the URL "${slug}" already exists ("${existing.name}")`,
-      },
-      { status: 409 }
-    );
-  }
-
-  let event;
-  try {
-    event = await events.create({
-      name,
-      description: (body.description ?? "").trim(),
-      website: normalizeWebsiteUrl(body.website ?? ""),
-      timezone,
-      maxSessionDuration,
-      breakMinutes,
-      slotIncrementMinutes,
-      rsvpCapacityHardLimit,
-      schedulingPhaseStart,
-      schedulingPhaseEnd,
-    });
-  } catch (e) {
-    // A concurrent create can win the race between the findBySlug check
-    // above and this insert; translate the constraint violation into the
-    // same conflict response instead of surfacing a 500.
-    if (
-      e instanceof Error &&
-      e.message.includes("UNIQUE constraint failed: events.slug")
-    ) {
-      return NextResponse.json(
-        { error: `An event with the URL "${slug}" already exists` },
-        { status: 409 }
-      );
-    }
-    throw e;
-  }
-
-  return NextResponse.json({ id: event.id, slug: event.slug }, { status: 201 });
+  const { id, slug } = result.value;
+  return NextResponse.json({ id, slug }, { status: 201 });
 }

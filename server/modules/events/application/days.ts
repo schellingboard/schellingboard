@@ -1,4 +1,4 @@
-import type { Day } from "@schellingboard/domain/event";
+import type { Day, Event } from "@schellingboard/domain/event";
 import {
   dayAlignmentError,
   daysOverlap,
@@ -52,17 +52,14 @@ function parseWindow(input: DayWindowInput): { data: DayWindow } | Failure {
 
 async function placementError(
   repos: EventDeps["repos"],
-  eventId: string,
+  event: Event,
   window: DayWindow,
   ownId?: string
 ): Promise<Failure | null> {
-  const event = await repos.events.findById(eventId);
-  if (!event) return eventNotFound();
-
   const alignmentError = dayAlignmentError(window, event.slotIncrementMinutes);
   if (alignmentError) return invalid("day.misaligned", alignmentError);
 
-  const days = await repos.days.listByEvent(eventId);
+  const days = await repos.days.listByEvent(event.id);
   const overlaps = days.some(
     (d) =>
       d.id !== ownId && daysOverlap(window.start, window.end, d.start, d.end)
@@ -76,18 +73,21 @@ export const createDay =
   ({ repos }: EventDeps) =>
   async (
     actor: Actor,
-    input: DayWindowInput & { eventId: string }
+    input: DayWindowInput & ({ eventId: string } | { eventSlug: string })
   ): Promise<Result<Day>> => {
     if (!actor.admin) return adminRequired();
     const parsed = parseWindow(input);
     if (!("data" in parsed)) return parsed;
-    const refused = await placementError(repos, input.eventId, parsed.data);
+    const event =
+      "eventId" in input
+        ? await repos.events.findById(input.eventId)
+        : await repos.events.findBySlug(input.eventSlug);
+    if (!event) return eventNotFound();
+    const refused = await placementError(repos, event, parsed.data);
     if (refused) return refused;
 
     try {
-      return ok(
-        await repos.days.create({ ...parsed.data, eventId: input.eventId })
-      );
+      return ok(await repos.days.create({ ...parsed.data, eventId: event.id }));
     } catch {
       return conflict("day.saveFailed", "Failed to create day");
     }
@@ -105,12 +105,9 @@ export const updateDay =
     const parsed = parseWindow(input);
     if (!("data" in parsed)) return parsed;
     const window = parsed.data;
-    const refused = await placementError(
-      repos,
-      existing.eventId,
-      window,
-      existing.id
-    );
+    const event = await repos.events.findById(existing.eventId);
+    if (!event) return eventNotFound();
+    const refused = await placementError(repos, event, window, existing.id);
     if (refused) return refused;
 
     // A session scheduled inside this day that the new window would leave out

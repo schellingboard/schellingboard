@@ -66,13 +66,18 @@ export const createLocation =
   async (actor: Actor, input: unknown): Promise<Result<LocationWithEvents>> => {
     if (!actor.admin) return adminRequired();
     const parsed = await locationSchema
-      .extend(validations(deps))
+      .extend({ ...validations(deps), eventSlug: z.string().optional() })
       .safeParseAsync(input);
     if (!parsed.success) return refused(parsed.error);
-    const { image, eventIds: requested, ...fields } = parsed.data;
-    const eventIds = [...new Set(requested)];
+    const { image, eventIds: requested, eventSlug, ...fields } = parsed.data;
+    const { locations, events } = deps.repos;
+    const bySlug = eventSlug ? await events.findBySlug(eventSlug) : undefined;
+    if (eventSlug && !bySlug)
+      return notFound("event.notFound", "Event not found");
+    const eventIds = [
+      ...new Set([...requested, ...(bySlug ? [bySlug.id] : [])]),
+    ];
 
-    const { locations } = deps.repos;
     const existing = await locations.list();
     const sortIndex =
       existing.length === 0

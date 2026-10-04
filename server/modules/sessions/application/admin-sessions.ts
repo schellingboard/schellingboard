@@ -37,7 +37,26 @@ type Checked = Omit<AdminSessionFields, "startTime" | "endTime"> & {
   endTime: Date | undefined;
 };
 
+export interface AdminSeedSessionInput {
+  eventSlug: string;
+  title: string;
+  description: string;
+  startTime: Date | undefined;
+  endTime: Date | undefined;
+  hostIds: string[];
+  locationIds: string[];
+  /** Unset takes the first location's capacity. */
+  capacity?: number;
+  adminManaged: boolean;
+  closed: boolean;
+}
+
 const adminRequired = () => forbidden("admin.required", "Unauthorized");
+const capacityInvalid = () =>
+  invalid(
+    "session.capacityInvalid",
+    "Capacity must be a non-negative whole number"
+  );
 const sessionNotFound = () => notFound("session.notFound", "Session not found");
 
 // Times must form a valid interval: both set (end after start) or both empty.
@@ -64,10 +83,7 @@ function checked(input: AdminSessionFields): Result<Checked> {
     range = { startTime: start, endTime: end };
   }
   if (!Number.isInteger(input.capacity) || input.capacity < 0)
-    return invalid(
-      "session.capacityInvalid",
-      "Capacity must be a non-negative whole number"
-    );
+    return capacityInvalid();
   return ok({
     title,
     description: input.description.trim(),
@@ -195,4 +211,63 @@ export const adminDeleteSession =
     await repos.sessions.delete(id, { actor: { type: "admin" }, at: now });
     deps.nudgeJobs();
     return ok(session);
+  };
+
+const isDate = (d: Date | undefined): d is Date =>
+  d !== undefined && !Number.isNaN(d.getTime());
+
+// For seeding scripts, which import past and fixed times: no phase, booking
+// window or notification applies, and the hosts and rooms join the event.
+export const adminSeedSession =
+  ({ repos }: SessionDeps) =>
+  async (
+    actor: Actor,
+    input: AdminSeedSessionInput
+  ): Promise<Result<Session>> => {
+    if (!actor.admin) return adminRequired();
+    const title = input.title.trim();
+    if (!title) return invalid("session.titleRequired", "Title is required");
+    const { startTime, endTime, hostIds, locationIds } = input;
+    const timeInvalid = (detail: string) =>
+      invalid("session.timeRangeInvalid", detail);
+    if (!isDate(startTime)) return timeInvalid("Invalid start time");
+    if (!isDate(endTime)) return timeInvalid("Invalid end time");
+    if (endTime <= startTime)
+      return timeInvalid("End time must be after start time");
+
+    const event = await repos.events.findBySlug(input.eventSlug);
+    if (!event) return notFound("event.notFound", "Event not found");
+    const unknown = await unknownReference(repos, input);
+    if (unknown) return unknown;
+    const capacity =
+      input.capacity !== undefined
+        ? input.capacity
+        : ((locationIds.length > 0
+            ? (await repos.locations.findById(locationIds[0]))?.capacity
+            : undefined) ?? 0);
+    if (!Number.isInteger(capacity) || capacity < 0) return capacityInvalid();
+
+    const fields: Checked = {
+      title,
+      description: input.description.trim(),
+      startTime,
+      endTime,
+      capacity,
+      adminManaged: input.adminManaged,
+      blocker: false,
+      closed: input.closed,
+      hostIds,
+      locationIds,
+    };
+    const clashing = await clash(repos, event.id, fields);
+    if (clashing) return clashing;
+
+    const created = await repos.sessions.create({
+      ...fields,
+      eventId: event.id,
+    });
+    if (hostIds.length > 0) await repos.guests.assignToEvent(event.id, hostIds);
+    if (locationIds.length > 0)
+      await repos.locations.assignToEvent(event.id, locationIds);
+    return ok(created);
   };

@@ -174,4 +174,24 @@ describe("POST /api/admin/create-day", () => {
     expect(res.status).toBe(400);
     expect(await getRepositories().days.listByEvent(event.id)).toEqual([]);
   });
+
+  async function refusal(body: unknown) {
+    const res = await postJson(body);
+    return [res.status, ((await res.json()) as { error: string }).error];
+  }
+
+  it("keeps its refusal messages, checking the window before the event", async () => {
+    expect(
+      await refusal({ ...validBody(event), eventSlug: "missing", start: "x" })
+    ).toEqual([400, "Invalid start date/time"]);
+    expect(
+      await refusal({
+        ...validBody(event),
+        startBookings: "2026-09-01T07:00:00Z",
+      })
+    ).toEqual([400, "Bookings window must be within the day window"]);
+    expect(
+      await refusal({ ...validBody(event), eventSlug: "missing" })
+    ).toEqual([404, "Event not found"]);
+  });
 });

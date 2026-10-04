@@ -561,6 +561,12 @@ export const features = {
         actor: "organizer",
         priority: "P3",
       },
+      US5: {
+        title:
+          "Organizer's script seeds an event's proposals, sessions and RSVPs, past ones included",
+        actor: "organizer",
+        priority: "P3",
+      },
     },
   },
   "020": {

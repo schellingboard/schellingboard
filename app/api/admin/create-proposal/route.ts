@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getRepositories } from "@/db/container";
+import { legacyActor, legacyRefusal } from "@/app/api/legacy";
+import { proposalUseCases } from "@/server/composition";
 import { requestNow } from "@/utils/dev-clock";
 import { requireProxyVerifiedAdmin } from "@/utils/auth";
 
@@ -40,59 +41,28 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
-  const title = (body.title ?? "").trim();
-  if (!title) {
-    return NextResponse.json({ error: "Title is required" }, { status: 400 });
-  }
-
-  const duration = body.durationMinutes;
-  if (
-    duration !== null &&
-    duration !== undefined &&
-    (!Number.isInteger(duration) || duration < 0)
-  ) {
-    return NextResponse.json(
-      { error: "Duration must be a non-negative integer" },
-      { status: 400 }
-    );
-  }
-
-  if (!body.eventSlug) {
-    return NextResponse.json(
-      { error: "eventSlug is required" },
-      { status: 400 }
-    );
-  }
-
-  const { sessionProposals, guests, events } = getRepositories();
-  const event = await events.findBySlug(body.eventSlug);
-  if (!event) {
-    return NextResponse.json({ error: "Event not found" }, { status: 404 });
-  }
-
-  const hostIds = [...new Set((body.hostIds ?? []).filter(Boolean))];
-  for (const guestId of hostIds) {
-    if (!(await guests.findById(guestId))) {
+  const result = await proposalUseCases().adminCreateProposal(
+    await legacyActor(req),
+    {
+      event: { slug: body.eventSlug ?? "" },
+      title: body.title ?? "",
+      description: body.description ?? "",
+      durationMinutes: body.durationMinutes ?? null,
+      hostIds: body.hostIds ?? [],
+    },
+    requestNow(req)
+  );
+  if (!result.ok) {
+    // The use case checks the fields before looking the event up, as this
+    // route always did.
+    if (result.error.code === "event.notFound" && !body.eventSlug) {
       return NextResponse.json(
-        { error: `Guest not found: ${guestId}` },
+        { error: "eventSlug is required" },
         { status: 400 }
       );
     }
+    return legacyRefusal(result.error);
   }
 
-  // Keep hosts as members of the event so they show up in its guest list.
-  if (hostIds.length > 0) {
-    await guests.assignToEvent(event.id, hostIds);
-  }
-
-  const proposal = await sessionProposals.create({
-    eventId: event.id,
-    title,
-    description: body.description?.trim() || undefined,
-    hostIds,
-    durationMinutes: duration ?? undefined,
-    createdTime: requestNow(req),
-  });
-
-  return NextResponse.json({ id: proposal.id }, { status: 201 });
+  return NextResponse.json({ id: result.value.id }, { status: 201 });
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getRepositories } from "@/db/container";
+import { legacyActor, legacyRefusal } from "@/app/api/legacy";
+import { sessionUseCases } from "@/server/composition";
 import { requireProxyVerifiedAdmin } from "@/utils/auth";
 
 export const dynamic = "force-dynamic";
@@ -46,47 +47,15 @@ export async function POST(req: Request) {
     );
   }
 
-  const repos = getRepositories();
-  const session = await repos.sessions.findById(sessionId);
-  if (!session) {
-    return NextResponse.json({ error: "Session not found" }, { status: 404 });
-  }
-  const guest = await repos.guests.findById(guestId);
-  if (!guest) {
-    return NextResponse.json({ error: "Guest not found" }, { status: 404 });
-  }
-  const event = await repos.events.findById(session.eventId);
+  const result = await sessionUseCases().adminAddRsvp(await legacyActor(req), {
+    sessionId,
+    guestId,
+  });
+  if (!result.ok) return legacyRefusal(result.error);
 
-  const existing = (await repos.rsvps.listBySession(sessionId)).find(
-    (r) => r.guestId === guestId
-  );
-
-  let rsvp = existing;
-  if (!rsvp) {
-    const enforceCapacity =
-      event?.rsvpCapacityHardLimit && session.capacity > 0;
-    if (enforceCapacity) {
-      rsvp =
-        (await repos.rsvps.createIfUnderCapacity({
-          sessionId,
-          guestId,
-          capacity: session.capacity,
-        })) ?? undefined;
-      if (!rsvp) {
-        return NextResponse.json(
-          { error: "This session is full" },
-          { status: 409 }
-        );
-      }
-    } else {
-      rsvp = await repos.rsvps.create({ sessionId, guestId });
-    }
-  }
-
-  await repos.guests.assignToEvent(session.eventId, [guestId]);
-
+  const { rsvp, created } = result.value;
   return NextResponse.json(
-    { id: rsvp.id, created: !existing },
-    { status: existing ? 200 : 201 }
+    { id: rsvp.id, created },
+    { status: created ? 201 : 200 }
   );
 }

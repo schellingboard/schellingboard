@@ -5,11 +5,18 @@ import {
   conflict,
   forbidden,
   invalid,
+  notFound,
   ok,
+  type Failure,
   type Result,
 } from "@/server/kernel/result";
 import type { ProposalDeps } from "../ports";
-import { presentOne, proposalNotFound, type ProposalView } from "./queries";
+import {
+  presentOne,
+  presenter,
+  proposalNotFound,
+  type ProposalView,
+} from "./queries";
 
 export interface AdminUpdateProposalInput {
   id: string;
@@ -20,7 +27,80 @@ export interface AdminUpdateProposalInput {
   expectedUpdatedTime: string;
 }
 
+export interface AdminCreateProposalInput {
+  event: { id: string } | { slug: string };
+  title: string;
+  description: string;
+  durationMinutes: number | null;
+  hostIds: string[];
+}
+
+type ProposalFields = Pick<
+  AdminUpdateProposalInput,
+  "title" | "durationMinutes" | "hostIds"
+>;
+
 const adminRequired = () => forbidden("admin.required", "Unauthorized");
+
+function checked(input: ProposalFields): Result<ProposalFields> {
+  const title = input.title.trim();
+  if (!title) return invalid("proposal.titleRequired", "Title is required");
+  const { durationMinutes } = input;
+  if (
+    durationMinutes !== null &&
+    (!Number.isInteger(durationMinutes) || durationMinutes < 0)
+  )
+    return invalid(
+      "proposal.durationInvalid",
+      "Duration must be a non-negative integer"
+    );
+  const hostIds = [...new Set(input.hostIds.filter(Boolean))];
+  return ok({ title, durationMinutes, hostIds });
+}
+
+async function unknownHost(
+  repos: ProposalDeps["repos"],
+  hostIds: string[]
+): Promise<Failure | null> {
+  for (const guestId of hostIds) {
+    if (!(await repos.guests.findById(guestId)))
+      return invalid("proposal.hostUnknown", `Guest not found: ${guestId}`);
+  }
+  return null;
+}
+
+// For seeding scripts: no phase gate, and the hosts join the event so they
+// show up in its guest list.
+export const adminCreateProposal =
+  ({ repos }: ProposalDeps) =>
+  async (
+    actor: Actor,
+    { event: ref, ...input }: AdminCreateProposalInput,
+    now: Date
+  ): Promise<Result<ProposalView>> => {
+    if (!actor.admin) return adminRequired();
+    const fields = checked(input);
+    if (!fields.ok) return fields;
+    const { title, durationMinutes, hostIds } = fields.value;
+    const event =
+      "id" in ref
+        ? await repos.events.findById(ref.id)
+        : await repos.events.findBySlug(ref.slug);
+    if (!event) return notFound("event.notFound", "Event not found");
+    const refused = await unknownHost(repos, hostIds);
+    if (refused) return refused;
+
+    if (hostIds.length > 0) await repos.guests.assignToEvent(event.id, hostIds);
+    const created = await repos.sessionProposals.create({
+      eventId: event.id,
+      title,
+      description: input.description.trim() || undefined,
+      hostIds,
+      durationMinutes: durationMinutes ?? undefined,
+      createdTime: now,
+    });
+    return ok((await presenter(actor, repos, event, now))(created));
+  };
 
 export const adminUpdateProposal =
   ({ repos }: ProposalDeps) =>
@@ -30,25 +110,14 @@ export const adminUpdateProposal =
     now: Date
   ): Promise<Result<ProposalView>> => {
     if (!actor.admin) return adminRequired();
-    const title = input.title.trim();
-    if (!title) return invalid("proposal.titleRequired", "Title is required");
-    const { durationMinutes } = input;
-    if (
-      durationMinutes !== null &&
-      (!Number.isInteger(durationMinutes) || durationMinutes < 0)
-    )
-      return invalid(
-        "proposal.durationInvalid",
-        "Duration must be a non-negative integer"
-      );
-    const hostIds = [...new Set(input.hostIds.filter(Boolean))];
+    const fields = checked(input);
+    if (!fields.ok) return fields;
+    const { title, durationMinutes, hostIds } = fields.value;
 
     const proposal = await repos.sessionProposals.findById(input.id);
     if (!proposal) return proposalNotFound();
-    for (const guestId of hostIds) {
-      if (!(await repos.guests.findById(guestId)))
-        return invalid("proposal.hostUnknown", `Guest not found: ${guestId}`);
-    }
+    const refused = await unknownHost(repos, hostIds);
+    if (refused) return refused;
     const expectedUpdatedTime = new Date(input.expectedUpdatedTime);
     if (Number.isNaN(expectedUpdatedTime.getTime()))
       return invalid(

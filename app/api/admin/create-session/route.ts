@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getRepositories } from "@/db/container";
+import { legacyActor, legacyDate, legacyRefusal } from "@/app/api/legacy";
+import { sessionUseCases } from "@/server/composition";
 import { requireProxyVerifiedAdmin } from "@/utils/auth";
 
 export const dynamic = "force-dynamic";
@@ -30,12 +31,6 @@ type Body = {
   adminManaged?: boolean;
   closed?: boolean;
 };
-
-function parseDate(value: string | undefined): Date | undefined {
-  if (!value) return undefined;
-  const d = new Date(value);
-  return isNaN(d.getTime()) ? undefined : d;
-}
 
 function badRequest(error: string) {
   return NextResponse.json({ error }, { status: 400 });
@@ -68,82 +63,22 @@ export async function POST(req: Request) {
 
   if (!body.eventSlug) return badRequest("eventSlug is required");
 
-  const title = (body.title ?? "").trim();
-  if (!title) return badRequest("Title is required");
-
-  const startTime = parseDate(body.startTime);
-  if (!startTime) return badRequest("Invalid start time");
-
-  const endTime = parseDate(body.endTime);
-  if (!endTime) return badRequest("Invalid end time");
-
-  if (endTime <= startTime) {
-    return badRequest("End time must be after start time");
-  }
-
-  const hostIds = body.hostIds ?? [];
-  const locationIds = body.locationIds ?? [];
-
-  const repos = getRepositories();
-  const event = await repos.events.findBySlug(body.eventSlug);
-  if (!event) {
-    return NextResponse.json({ error: "Event not found" }, { status: 404 });
-  }
-
-  const knownHosts = await repos.guests.findExistingIds(hostIds);
-  if (knownHosts.length !== hostIds.length) {
-    return badRequest("Unknown host");
-  }
-  const knownLocations = await repos.locations.findExistingIds(locationIds);
-  if (knownLocations.length !== locationIds.length) {
-    return badRequest("Unknown location");
-  }
-
-  let capacity = body.capacity;
-  if (capacity === undefined) {
-    const firstLocation =
-      locationIds.length > 0
-        ? await repos.locations.findById(locationIds[0])
-        : undefined;
-    capacity = firstLocation?.capacity ?? 0;
-  }
-  if (!Number.isInteger(capacity) || capacity < 0) {
-    return badRequest("Capacity must be a non-negative whole number");
-  }
-
-  const conflict = await repos.sessions.findLocationConflict(
-    event.id,
-    startTime,
-    endTime,
-    locationIds
+  const result = await sessionUseCases().adminSeedSession(
+    await legacyActor(req),
+    {
+      eventSlug: body.eventSlug,
+      title: body.title ?? "",
+      description: body.description ?? "",
+      startTime: legacyDate(body.startTime),
+      endTime: legacyDate(body.endTime),
+      hostIds: body.hostIds ?? [],
+      locationIds: body.locationIds ?? [],
+      capacity: body.capacity,
+      adminManaged: body.adminManaged ?? false,
+      closed: body.closed ?? false,
+    }
   );
-  if (conflict) {
-    return NextResponse.json(
-      { error: `Overlaps "${conflict.title}" in the same location` },
-      { status: 409 }
-    );
-  }
+  if (!result.ok) return legacyRefusal(result.error);
 
-  const session = await repos.sessions.create({
-    title,
-    description: (body.description ?? "").trim(),
-    startTime,
-    endTime,
-    capacity,
-    adminManaged: body.adminManaged ?? false,
-    blocker: false,
-    closed: body.closed ?? false,
-    eventId: event.id,
-    hostIds,
-    locationIds,
-  });
-
-  if (hostIds.length > 0) {
-    await repos.guests.assignToEvent(event.id, hostIds);
-  }
-  if (locationIds.length > 0) {
-    await repos.locations.assignToEvent(event.id, locationIds);
-  }
-
-  return NextResponse.json({ id: session.id }, { status: 201 });
+  return NextResponse.json({ id: result.value.id }, { status: 201 });
 }

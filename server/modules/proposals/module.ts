@@ -5,7 +5,10 @@ export type {
   CreateProposalInput,
   UpdateProposalInput,
 } from "./application/proposals";
-export type { AdminUpdateProposalInput } from "./application/admin-proposals";
+export type {
+  AdminCreateProposalInput,
+  AdminUpdateProposalInput,
+} from "./application/admin-proposals";
 export {
   createProposalUseCases,
   type ProposalUseCases,

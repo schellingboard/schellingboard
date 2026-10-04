@@ -66,7 +66,7 @@ family delegate to the use cases. Keep each legacy route's response shape.
       get/update without secrets; `/api/v1/admin/guests…` and `/api/v1/admin/settings`
       routes; `admin-guests`, `admin-guest-events`, `admin-guest-import`,
       `admin-settings` actions and `app/api/admin/create-guest` and `users` delegate.
-- [ ] 10b. **Admin seeding routes**: `app/api/admin/create-event`, `create-day`,
+- [x] 10b. **Admin seeding routes**: `app/api/admin/create-event`, `create-day`,
       `create-location`, `create-session`, `create-proposal`, `create-rsvp` delegate to
       the existing use cases, with admin seeding variants only where their rules differ
       (events by slug, no phase/future gates, auto-adding hosts/locations to the event,

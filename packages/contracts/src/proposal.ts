@@ -73,3 +73,7 @@ export const adminProposalUpdateSchema = z.object({
   hostIds: z.array(z.string()).default([]),
   expectedUpdatedTime: instant,
 });
+
+export const adminProposalCreateSchema = adminProposalUpdateSchema
+  .omit({ expectedUpdatedTime: true })
+  .extend({ eventId: z.string().min(1) });

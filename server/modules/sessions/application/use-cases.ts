@@ -2,6 +2,7 @@ import type { SessionDeps } from "../ports";
 import {
   adminCreateSession,
   adminDeleteSession,
+  adminSeedSession,
   adminUpdateSession,
 } from "./admin-sessions";
 import { getAttendeeCount, recordAttendeeCount } from "./attendee-count";
@@ -14,6 +15,7 @@ import {
   listLocationUnavailability,
 } from "./room-unavailability";
 import {
+  adminAddRsvp,
   adminRemoveRsvp,
   listGuestRsvps,
   listSessionRsvps,
@@ -32,10 +34,12 @@ export function createSessionUseCases(deps: SessionDeps) {
     adminCreateSession: adminCreateSession(deps),
     adminUpdateSession: adminUpdateSession(deps),
     adminDeleteSession: adminDeleteSession(deps),
+    adminSeedSession: adminSeedSession(deps),
     rsvp: rsvp(deps),
     withdrawRsvp: withdrawRsvp(deps),
     listSessionRsvps: listSessionRsvps(deps),
     listGuestRsvps: listGuestRsvps(deps),
+    adminAddRsvp: adminAddRsvp(deps),
     adminRemoveRsvp: adminRemoveRsvp(deps),
     getAttendeeCount: getAttendeeCount(deps),
     recordAttendeeCount: recordAttendeeCount(deps),

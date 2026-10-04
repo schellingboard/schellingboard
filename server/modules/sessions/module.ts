@@ -1,6 +1,7 @@
 export type { SessionDeps } from "./ports";
 export type {
   AdminCreateSessionInput,
+  AdminSeedSessionInput,
   AdminUpdateSessionInput,
 } from "./application/admin-sessions";
 export type { CreateSessionInput } from "./application/create-session";

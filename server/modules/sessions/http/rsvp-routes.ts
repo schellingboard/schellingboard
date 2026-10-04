@@ -1,5 +1,5 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import { rsvpListSchema } from "@schellingboard/contracts/rsvp";
+import { rsvpListSchema, rsvpViewSchema } from "@schellingboard/contracts/rsvp";
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import { problem, problemDefault } from "@/server/http/problem";
 import { idParam, json, noContent, type App } from "@/server/http/route-parts";
@@ -52,6 +52,20 @@ const withdrawRsvp = createRoute({
   responses: { 204: noContent("Withdrawn"), ...problemDefault },
 });
 
+const adminAddRsvp = createRoute({
+  method: "put",
+  path: "/admin/sessions/{id}/rsvps/{guestId}",
+  tags: ["admin"],
+  description:
+    "RSVPs the guest in any phase, keeping a hard capacity limit, and adds them to the event.",
+  request: { headers: idempotencyHeaders, params: rsvpParams },
+  responses: {
+    200: json(rsvpViewSchema, "The guest had already RSVPed"),
+    201: json(rsvpViewSchema, "RSVPed"),
+    ...problemDefault,
+  },
+});
+
 const adminRemoveRsvp = createRoute({
   method: "delete",
   path: "/admin/sessions/{id}/rsvps/{guestId}",
@@ -97,6 +111,17 @@ export function addRsvpRoutes(app: App, sessions: () => SessionUseCases) {
     );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);
+  });
+
+  app.openapi(adminAddRsvp, async (c) => {
+    const { id, guestId } = c.req.valid("param");
+    const result = await sessions().adminAddRsvp(c.var.actor, {
+      sessionId: id,
+      guestId,
+    });
+    if (!result.ok) return problem(result.error);
+    const { rsvp, created } = result.value;
+    return c.json(rsvp, created ? 201 : 200);
   });
 
   app.openapi(adminRemoveRsvp, async (c) => {

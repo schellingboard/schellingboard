@@ -55,17 +55,25 @@ export const rsvp =
         "Hosts cannot RSVP to their own session"
       );
 
-    const { rsvps } = deps.repos;
-    if (!rsvpCapacityHardLimit || session.capacity <= 0)
-      return ok(await rsvps.create(input));
-    const created = await rsvps.createIfUnderCapacity({
-      ...input,
-      capacity: session.capacity,
-    });
-    return created
-      ? ok(created)
-      : conflict("session.full", "This session is full");
+    return addRsvp(deps.repos, input, session, rsvpCapacityHardLimit);
   };
+
+async function addRsvp(
+  { rsvps }: SessionDeps["repos"],
+  input: RsvpInput,
+  session: Session,
+  rsvpCapacityHardLimit: boolean
+): Promise<Result<Rsvp>> {
+  if (!rsvpCapacityHardLimit || session.capacity <= 0)
+    return ok(await rsvps.create(input));
+  const created = await rsvps.createIfUnderCapacity({
+    ...input,
+    capacity: session.capacity,
+  });
+  return created
+    ? ok(created)
+    : conflict("session.full", "This session is full");
+}
 
 export const withdrawRsvp =
   (deps: SessionDeps) =>
@@ -110,4 +118,37 @@ export const adminRemoveRsvp =
     if (!session) return sessionNotFound();
     await repos.rsvps.deleteBySessionAndGuest(input.sessionId, input.guestId);
     return ok(session);
+  };
+
+// For seeding scripts: no phase gate and hosts may RSVP to their own session,
+// but a hard capacity limit still holds. Re-adding an RSVP changes nothing.
+export const adminAddRsvp =
+  ({ repos }: SessionDeps) =>
+  async (
+    actor: Actor,
+    input: RsvpInput
+  ): Promise<Result<{ rsvp: Rsvp; created: boolean }>> => {
+    if (!actor.admin) return forbidden("admin.required", "Unauthorized");
+    const session = await repos.sessions.findById(input.sessionId);
+    if (!session) return sessionNotFound();
+    if (!(await repos.guests.findById(input.guestId)))
+      return notFound("guest.notFound", "Guest not found");
+
+    const existing = (await repos.rsvps.listBySession(input.sessionId)).find(
+      (r) => r.guestId === input.guestId
+    );
+    let rsvp = existing;
+    if (!rsvp) {
+      const event = await repos.events.findById(session.eventId);
+      const added = await addRsvp(
+        repos,
+        input,
+        session,
+        event?.rsvpCapacityHardLimit ?? false
+      );
+      if (!added.ok) return added;
+      rsvp = added.value;
+    }
+    await repos.guests.assignToEvent(session.eventId, [input.guestId]);
+    return ok({ rsvp, created: !existing });
   };

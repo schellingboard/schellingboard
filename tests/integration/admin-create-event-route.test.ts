@@ -160,4 +160,48 @@ describe("POST /api/admin/create-event", () => {
     expect(res.status).toBe(400);
     expect(await getRepositories().events.list()).toEqual([]);
   });
+
+  async function refusal(body: unknown) {
+    const res = await postJson(body);
+    return [res.status, ((await res.json()) as { error: string }).error];
+  }
+
+  it("keeps its refusal messages, checking the fields in order", async () => {
+    expect(
+      await refusal({ name: "", maxSessionDuration: 1.5, timezone: "Nowhere" })
+    ).toEqual([400, "Name is required"]);
+    expect(await refusal({ ...VALID_BODY, maxSessionDuration: 1.5 })).toEqual([
+      400,
+      "Max session duration must be a positive number",
+    ]);
+    expect(await refusal({ ...VALID_BODY, breakMinutes: "5" })).toEqual([
+      400,
+      "Break must be zero or a positive number",
+    ]);
+    expect(
+      await refusal({
+        ...VALID_BODY,
+        slotIncrementMinutes: 7,
+        rsvpCapacityHardLimit: "yes",
+      })
+    ).toEqual([400, "Slot increment must be one of 15, 30, 45, 60 minutes"]);
+    expect(
+      await refusal({ ...VALID_BODY, rsvpCapacityHardLimit: "yes" })
+    ).toEqual([400, "RSVP capacity hard limit must be a boolean"]);
+    expect(
+      await refusal({ name: "admin", schedulingPhaseStart: "nope" })
+    ).toEqual([400, "Invalid scheduling phase start"]);
+    expect(
+      await refusal({
+        name: "admin",
+        schedulingPhaseStart: "2026-09-02T00:00:00Z",
+        schedulingPhaseEnd: "2026-09-01T00:00:00Z",
+      })
+    ).toEqual([400, "Scheduling phase end must be after its start"]);
+    expect(await refusal({ name: "admin" })).toEqual([
+      400,
+      '"admin" is a reserved URL and cannot be used as an event name',
+    ]);
+    expect(await getRepositories().events.list()).toEqual([]);
+  });
 });

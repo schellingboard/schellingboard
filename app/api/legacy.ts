@@ -17,3 +17,8 @@ export function legacyRefusal(error: AppError): Response {
     { status: HTTP_STATUS_BY_KIND[error.kind] }
   );
 }
+
+// Blank stays unset; anything else, an invalid date included, goes to the use
+// case, which refuses it by the field's name.
+export const legacyDate = (value: string | undefined) =>
+  value ? new Date(value) : undefined;

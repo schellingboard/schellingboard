@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { getRepositories } from "@/db/container";
+import { legacyActor, legacyRefusal } from "@/app/api/legacy";
+import { venueUseCases } from "@/server/composition";
 import { requireProxyVerifiedAdmin } from "@/utils/auth";
-import { normalizeLocationColor } from "@schellingboard/domain/location-colors";
 
 export const dynamic = "force-dynamic";
 
@@ -52,45 +52,16 @@ export async function POST(req: Request) {
     }
   }
 
-  const name = (body.name ?? "").trim();
-  if (!name) {
-    return badRequest("Name is required");
-  }
-
-  const capacity = body.capacity ?? 0;
-  if (!Number.isInteger(capacity) || capacity < 0) {
-    return badRequest("Capacity must be a non-negative whole number");
-  }
-
-  const { locations, events } = getRepositories();
-
-  let eventId: string | undefined;
-  if (body.eventSlug) {
-    const event = await events.findBySlug(body.eventSlug);
-    if (!event) {
-      return NextResponse.json({ error: "Event not found" }, { status: 404 });
-    }
-    eventId = event.id;
-  }
-
-  const all = await locations.list();
-  // sortIndex is auto-assigned exactly as in createLocationAction.
-  const sortIndex =
-    all.length === 0 ? 0 : Math.max(...all.map((l) => l.sortIndex)) + 1;
-  const location = await locations.create({
-    name,
-    imageUrl: "",
-    description: (body.description ?? "").trim(),
-    areaDescription: (body.areaDescription ?? "").trim() || undefined,
-    capacity,
-    color: normalizeLocationColor(body.color ?? ""),
+  const result = await venueUseCases().createLocation(await legacyActor(req), {
+    name: body.name ?? "",
+    capacity: body.capacity ?? 0,
+    description: body.description,
+    areaDescription: body.areaDescription,
+    color: body.color,
     bookable: body.bookable ?? false,
-    sortIndex,
+    eventSlug: body.eventSlug,
   });
+  if (!result.ok) return legacyRefusal(result.error);
 
-  if (eventId) {
-    await locations.assignToEvent(eventId, [location.id]);
-  }
-
-  return NextResponse.json({ id: location.id }, { status: 201 });
+  return NextResponse.json({ id: result.value.id }, { status: 201 });
 }

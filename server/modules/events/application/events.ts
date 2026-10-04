@@ -51,6 +51,8 @@ export type EventPhasesInput = { id: string } & Record<
   Date | undefined
 >;
 
+type EventPhases = Partial<Record<PhaseField, Date | undefined>>;
+
 export const adminRequired = () => forbidden("admin.required", "Unauthorized");
 export const eventNotFound = () =>
   notFound("event.notFound", "Event not found");
@@ -112,6 +114,14 @@ function parseSettings(
       `Slot increment must be one of ${SLOT_INCREMENT_OPTIONS.join(", ")} minutes`
     );
   }
+  // Seeding scripts send raw JSON, so the type isn't guaranteed at runtime.
+  const rsvpCapacityHardLimit = input.rsvpCapacityHardLimit ?? false;
+  if (typeof rsvpCapacityHardLimit !== "boolean") {
+    return invalid(
+      "event.rsvpCapacityHardLimitInvalid",
+      "RSVP capacity hard limit must be a boolean"
+    );
+  }
 
   const icon = input.icon?.trim() || undefined;
   if (icon && !isEventIconName(icon)) {
@@ -127,7 +137,7 @@ function parseSettings(
       maxSessionDuration,
       breakMinutes,
       slotIncrementMinutes,
-      rsvpCapacityHardLimit: input.rsvpCapacityHardLimit ?? false,
+      rsvpCapacityHardLimit,
       icon,
     },
   };
@@ -151,10 +161,15 @@ function misalignedDays(days: Day[], incrementMinutes: number): Failure | null {
 
 export const createEvent =
   ({ repos }: EventDeps) =>
-  async (actor: Actor, input: EventSettingsInput): Promise<Result<Event>> => {
+  async (
+    actor: Actor,
+    { phases = {}, ...input }: EventSettingsInput & { phases?: EventPhases }
+  ): Promise<Result<Event>> => {
     if (!actor.admin) return adminRequired();
     const parsed = parseSettings(input);
     if (!("data" in parsed)) return parsed;
+    const phasesRefused = phasesError(phases);
+    if (phasesRefused) return phasesRefused;
 
     const slug = eventNameToSlug(parsed.data.name);
     if (!slug) {
@@ -175,7 +190,7 @@ export const createEvent =
     }
 
     try {
-      return ok(await repos.events.create(parsed.data));
+      return ok(await repos.events.create({ ...parsed.data, ...phases }));
     } catch (e) {
       // A concurrent create can win the race between the findBySlug check
       // above and this insert.
@@ -228,7 +243,7 @@ export const updateEvent =
     return ok(updated);
   };
 
-function phaseOrderError(p: Record<PhaseField, Date | undefined>) {
+function phaseOrderError(p: EventPhases) {
   const {
     proposalPhaseStart: pStart,
     proposalPhaseEnd: pEnd,
@@ -272,19 +287,24 @@ function phaseOrderError(p: Record<PhaseField, Date | undefined>) {
   return null;
 }
 
+function phasesError(phases: EventPhases): Failure | null {
+  for (const [field, label] of PHASE_FIELDS) {
+    const date = phases[field];
+    if (date && isNaN(date.getTime())) {
+      return invalid("event.phaseDateInvalid", `Invalid ${label}`);
+    }
+  }
+  const orderError = phaseOrderError(phases);
+  return orderError ? invalid("event.phasesOutOfOrder", orderError) : null;
+}
+
 export const updateEventPhases =
   ({ repos }: EventDeps) =>
   async (actor: Actor, input: EventPhasesInput): Promise<Result<Event>> => {
     if (!actor.admin) return adminRequired();
     const { id, ...phases } = input;
-    for (const [field, label] of PHASE_FIELDS) {
-      const date = phases[field];
-      if (date && isNaN(date.getTime())) {
-        return invalid("event.phaseDateInvalid", `Invalid ${label}`);
-      }
-    }
-    const orderError = phaseOrderError(phases);
-    if (orderError) return invalid("event.phasesOutOfOrder", orderError);
+    const refused = phasesError(phases);
+    if (refused) return refused;
 
     const updated = await repos.events.update(id, phases);
     return updated ? ok(updated) : eventNotFound();
