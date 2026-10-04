@@ -37,4 +37,21 @@ export class SqliteJobsRepository implements JobsRepository {
       { behavior: "immediate" }
     );
   }
+
+  async cursor(name: string): Promise<number> {
+    const row = this.db
+      .select({ seq: schema.jobCursors.seq })
+      .from(schema.jobCursors)
+      .where(eq(schema.jobCursors.name, name))
+      .get();
+    return row?.seq ?? 0;
+  }
+
+  async setCursor(name: string, seq: number): Promise<void> {
+    this.db
+      .insert(schema.jobCursors)
+      .values({ name, seq })
+      .onConflictDoUpdate({ target: schema.jobCursors.name, set: { seq } })
+      .run();
+  }
 }

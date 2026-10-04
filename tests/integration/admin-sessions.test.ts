@@ -32,6 +32,7 @@ vi.mock("@/utils/mailer", () => ({
 import { sendMail } from "@/utils/mailer";
 import { revalidatePath } from "next/cache";
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { runJobs } from "../helpers/jobs";
 import {
   createDay,
   createEvent,
@@ -592,6 +593,9 @@ describe("adminUpdateSessionAction", () => {
       locationIds: [loc.id],
     });
     expect(result.ok).toBe(true);
+    expect(sendMail).not.toHaveBeenCalled();
+
+    await runJobs();
     expect(sendMail).toHaveBeenCalledOnce();
     expect(vi.mocked(sendMail).mock.calls[0][0].to).toBe("rsvper@test.example");
   });
@@ -1023,7 +1027,9 @@ describe("adminDeleteSessionAction", () => {
 
     const result = await adminDeleteSessionAction({ id: session.id });
     expect(result.ok).toBe(true);
+    expect(sendMail).not.toHaveBeenCalled();
 
+    await runJobs();
     const recipients = vi.mocked(sendMail).mock.calls.map((call) => call[0].to);
     expect(recipients.sort()).toEqual([
       "attendee@test.example",

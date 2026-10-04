@@ -18,6 +18,7 @@ vi.mock("@/utils/mailer", () => ({
 import { render } from "@react-email/render";
 import { sendMail } from "@/utils/mailer";
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { runJobs } from "../helpers/jobs";
 import { BY_TEST } from "../helpers/changes";
 import {
   createEvent,
@@ -215,6 +216,10 @@ describe("POST /api/update-session", () => {
       )
     );
     expect(res.ok).toBe(true);
+    // The request only records the change; telling people is left to the jobs.
+    expect(sendMail).not.toHaveBeenCalled();
+
+    await runJobs();
     expect(sendMail).toHaveBeenCalledOnce();
     expect(vi.mocked(sendMail).mock.calls[0][0].to).toBe("rsvper@test.example");
   });
@@ -251,6 +256,7 @@ describe("POST /api/update-session", () => {
       )
     );
     expect(res.ok).toBe(true);
+    await runJobs();
     // Their RSVP was removed with the promotion, so they are told as a
     // co-host and as a host of a changed session — never as an attendee.
     const messages = vi.mocked(sendMail).mock.calls.map((c) => c[0]);

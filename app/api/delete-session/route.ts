@@ -3,10 +3,7 @@ import { getRepositories } from "@/db/container";
 import { inSchedPhase } from "@schellingboard/domain/phase";
 import { requestNow } from "@/utils/dev-clock";
 import { verifiedCurrentUser } from "@/utils/acting-guest";
-import {
-  notifySessionDeleted,
-  rsvpGuestIdsToNotify,
-} from "@/utils/notifications";
+import { nudgeJobs } from "@/utils/jobs/loop";
 
 export const dynamic = "force-dynamic"; // defaults to auto
 
@@ -40,8 +37,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const rsvpGuestIds = await rsvpGuestIdsToNotify(id);
-
   try {
     await repos.sessions.delete(id, {
       actor: { type: "guest", id: actor },
@@ -53,11 +48,6 @@ export async function POST(req: NextRequest) {
     return Response.error();
   }
 
-  await notifySessionDeleted({
-    now,
-    session,
-    rsvpGuestIds,
-    changedById: actor,
-  });
+  nudgeJobs();
   return Response.json({ success: true });
 }

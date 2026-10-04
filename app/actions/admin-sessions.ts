@@ -4,12 +4,8 @@ import { revalidatePath } from "next/cache";
 import { getRepositories } from "@/db/container";
 import { isAdminRequest } from "@/utils/acting-admin";
 import { serverNow } from "@/utils/dev-clock-server";
-import {
-  notifyCohostsAdded,
-  notifySessionChanged,
-  notifySessionDeleted,
-  rsvpGuestIdsToNotify,
-} from "@/utils/notifications";
+import { notifyCohostsAdded } from "@/utils/notifications";
+import { nudgeJobs } from "@/utils/jobs/loop";
 import type { AdminActionResult } from "./admin-guests";
 
 export type AdminSessionInput = {
@@ -191,12 +187,7 @@ export async function adminUpdateSessionAction(
     previousHostIds: session.hosts.map((h) => h.id),
     changedById: null,
   });
-  await notifySessionChanged({
-    now,
-    before: session,
-    after: updated,
-    changedById: null,
-  });
+  nudgeJobs();
   return { ok: true };
 }
 
@@ -209,7 +200,6 @@ export async function adminDeleteSessionAction(input: {
   const session = await sessions.findById(input.id);
   if (!session) return { ok: false, error: "Session not found" };
 
-  const rsvpGuestIds = await rsvpGuestIdsToNotify(input.id);
   const now = await serverNow();
 
   try {
@@ -219,11 +209,6 @@ export async function adminDeleteSessionAction(input: {
   }
 
   await revalidateEventPaths(session.eventId);
-  await notifySessionDeleted({
-    now,
-    session,
-    rsvpGuestIds,
-    changedById: null,
-  });
+  nudgeJobs();
   return { ok: true };
 }

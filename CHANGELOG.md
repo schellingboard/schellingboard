@@ -37,6 +37,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Editing or deleting a session is quicker** (#1005): it no longer waits for every
+  attendee's email before saving; they are told a moment later.
 - **Clearer Delete, and a Cancel button**: proposal and session edit forms gain Cancel to
   leave without saving; Delete now has a trash icon, sits apart from Submit, and is confirmed
   with a red Delete button instead of Yes.

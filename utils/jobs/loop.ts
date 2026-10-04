@@ -9,14 +9,14 @@
 // inlines that variable per bundle, which makes the import dead code there.
 
 import { nanoid } from "nanoid";
+import {
+  PRUNE_CHANGES,
+  PRUNE_EVERY_MS,
+  SESSION_NOTIFICATIONS,
+  type Job,
+} from "./job";
 
-export type Job = {
-  name: string;
-  /** Run at most once per this many ms; on every pass when unset. */
-  everyMs?: number;
-  /** How many items it handled: 0 tells the caller it is idle. */
-  run: (now: Date) => Promise<number>;
-};
+export type { Job };
 
 const HEARTBEAT_MS = 5_000;
 const LEASE_TTL_MS = 30_000;
@@ -30,7 +30,16 @@ export function defaultJobs(): Job[] {
     configured === undefined || configured === ""
       ? DEFAULT_REMINDER_INTERVAL_MS
       : Number(configured);
-  const jobs: Job[] = [];
+  const jobs: Job[] = [
+    lazy(SESSION_NOTIFICATIONS, undefined, async () => {
+      const { sessionNotifications } = await import("./reactions");
+      return sessionNotifications;
+    }),
+    lazy(PRUNE_CHANGES, PRUNE_EVERY_MS, async () => {
+      const { pruneChanges } = await import("./reactions");
+      return pruneChanges;
+    }),
+  ];
   // 0 switches the reminders off, which is how a self-hoster turns them off
   // and how both E2E tiers keep stray reminders out of the mailbox.
   if (Number.isFinite(reminderMs) && reminderMs > 0) {
@@ -46,6 +55,14 @@ export function defaultJobs(): Job[] {
     });
   }
   return jobs;
+}
+
+function lazy(
+  name: string,
+  everyMs: number | undefined,
+  load: () => Promise<Job>
+): Job {
+  return { name, everyMs, run: async (now) => (await load()).run(now) };
 }
 
 type Loop = {
@@ -129,7 +146,9 @@ async function pass(): Promise<void> {
       }
       loop.lastRun.set(job.name, now.getTime());
       try {
-        await job.run(now);
+        // Work done may mean more is waiting: a backlog drains pass after
+        // pass rather than one batch per heartbeat.
+        if ((await job.run(now)) > 0) loop.nudged = true;
       } catch (err) {
         console.error(`Job ${job.name} failed:`, err);
       }

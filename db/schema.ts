@@ -669,3 +669,9 @@ export const jobLeases = sqliteTable("job_leases", {
   owner: text("owner").notNull(),
   expiresAt: text("expires_at").notNull(),
 });
+
+// How far each reaction has read the change log.
+export const jobCursors = sqliteTable("job_cursors", {
+  name: text("name").primaryKey(),
+  seq: integer("seq").notNull(),
+});

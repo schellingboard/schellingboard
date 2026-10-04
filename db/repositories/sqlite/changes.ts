@@ -1,4 +1,4 @@
-import { and, asc, gt, inArray } from "drizzle-orm";
+import { and, asc, gt, inArray, lt, lte } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
 import * as schema from "../../schema";
@@ -116,5 +116,17 @@ export class SqliteChangesRepository implements ChangesRepository {
       .limit(limit)
       .all()
       .map(toRecordedChange);
+  }
+
+  async deleteUpTo(seq: number, before: Date): Promise<void> {
+    this.db
+      .delete(schema.changes)
+      .where(
+        and(
+          lte(schema.changes.seq, seq),
+          lt(schema.changes.occurredAt, before.toISOString())
+        )
+      )
+      .run();
   }
 }

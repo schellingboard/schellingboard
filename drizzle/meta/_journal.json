@@ -316,6 +316,13 @@
       "when": 1791071000334,
       "tag": "0044_job_leases",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "6",
+      "when": 1791071981257,
+      "tag": "0045_job_cursors",
+      "breakpoints": true
     }
   ]
 }

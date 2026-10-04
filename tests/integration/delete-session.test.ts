@@ -15,6 +15,7 @@ vi.mock("@/utils/mailer", () => ({
 }));
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { runJobs } from "../helpers/jobs";
 import {
   createEvent,
   createGuest,
@@ -223,7 +224,9 @@ describe("POST /api/delete-session", () => {
       makeDeleteReq(sessionId, { editorGuestId: deletingHost.id })
     );
     expect(res.ok).toBe(true);
+    expect(sendMail).not.toHaveBeenCalled();
 
+    await runJobs();
     const recipients = vi.mocked(sendMail).mock.calls.map((call) => call[0].to);
     expect(recipients.sort()).toEqual([
       "attendee@test.example",

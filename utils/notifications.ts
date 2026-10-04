@@ -96,8 +96,8 @@ async function tryNotifyGuest(
 // not told about their own edit.
 //
 // Never throws: any failure (including a bad SITE_URL, or a lookup error) is
-// logged and must not break the session update it trails, nor the sends to
-// the other guests.
+// logged and must not stop the reaction that calls it, nor the sends to the
+// other guests.
 export async function notifySessionChanged(args: {
   before: Session;
   after: Session;
@@ -190,32 +190,10 @@ function changeSummary({
   return `moved to ${newLocation} (was ${oldLocation})`;
 }
 
-// The guests to tell about a session's deletion, to be called *before*
-// deleting it: the delete cascades to its RSVP rows, so afterwards there is
-// nobody left to look up. Pass the result to notifySessionDeleted.
-//
-// Never throws: failing to find the recipients must not fail the deletion.
-export async function rsvpGuestIdsToNotify(
-  sessionId: string
-): Promise<string[]> {
-  try {
-    const rsvps = await getRepositories().rsvps.listBySession(sessionId);
-    return rsvps.map((rsvp) => rsvp.guestId);
-  } catch (err) {
-    console.error(
-      `Failed to load deletion notification recipients for session ${sessionId}:`,
-      err
-    );
-    return [];
-  }
-}
-
 // Email the session's hosts and RSVP'd guests (who have opted in) after a
-// deletion. `rsvpGuestIds` comes from rsvpGuestIdsToNotify, called before the
-// deletion.
+// deletion. `rsvpGuestIds` were taken before the deletion, which removes them.
 //
-// Never throws: notification failures must not make a successful deletion
-// look unsuccessful.
+// Never throws: as above.
 export async function notifySessionDeleted(args: {
   session: Session;
   rsvpGuestIds: string[];

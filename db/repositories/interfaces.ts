@@ -814,6 +814,8 @@ export interface PushRepository {
 export interface ChangesRepository {
   /** Up to `limit` changes recorded after `seq`, oldest first. */
   listAfter(seq: number, limit?: number): Promise<RecordedChange[]>;
+  /** Deletes changes up to `seq` that happened before `before`. */
+  deleteUpTo(seq: number, before: Date): Promise<void>;
 }
 
 export interface JobsRepository {
@@ -827,4 +829,7 @@ export interface JobsRepository {
     now: Date,
     ttlMs: number
   ): Promise<boolean>;
+  /** The last change `name` has handled; 0 before its first. */
+  cursor(name: string): Promise<number>;
+  setCursor(name: string, seq: number): Promise<void>;
 }

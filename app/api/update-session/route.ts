@@ -2,10 +2,8 @@ import type { NextRequest } from "next/server";
 import { getRepositories } from "@/db/container";
 import { inSchedPhase } from "@schellingboard/domain/phase";
 import { requestNow } from "@/utils/dev-clock";
-import {
-  notifyCohostsAdded,
-  notifySessionChanged,
-} from "@/utils/notifications";
+import { notifyCohostsAdded } from "@/utils/notifications";
+import { nudgeJobs } from "@/utils/jobs/loop";
 import { verifiedCurrentUser } from "@/utils/acting-guest";
 import { sessionBookingWindowError } from "@schellingboard/domain/day-window";
 import { sessionDurationError } from "@schellingboard/domain/slots";
@@ -202,12 +200,7 @@ export async function POST(req: NextRequest) {
       previousHostIds: prevSession.hosts.map((h) => h.id),
       changedById: actor,
     });
-    await notifySessionChanged({
-      now,
-      before: prevSession,
-      after: updated,
-      changedById: actor,
-    });
+    nudgeJobs();
     return Response.json({ success: true });
   } else {
     return Response.error();

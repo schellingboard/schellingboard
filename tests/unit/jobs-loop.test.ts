@@ -85,6 +85,16 @@ describe("jobs loop", () => {
     expect(work.run).toHaveBeenCalledTimes(2);
   });
 
+  it("keeps passing while a job finds work, to drain a backlog", async () => {
+    const backlog = job("backlog");
+    backlog.run.mockResolvedValueOnce(50).mockResolvedValueOnce(50);
+    startJobsLoop([backlog]);
+
+    nudgeJobs();
+    await vi.advanceTimersByTimeAsync(10);
+    expect(backlog.run).toHaveBeenCalledTimes(3);
+  });
+
   it("leaves periodic jobs alone on a nudge until they are due", async () => {
     const reminders = job("reminders", 60_000);
     startJobsLoop([reminders]);
