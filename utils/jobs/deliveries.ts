@@ -43,8 +43,23 @@ async function send(delivery: Delivery): Promise<void> {
   await sendMail({ to: guest.info.email, ...buildEmail(recipe) });
 }
 
+// A 5xx to the recipient or the message will be the same tomorrow. One to the
+// login or the sender is the instance's configuration, which can be fixed.
+function refusedForGood(err: unknown): boolean {
+  if (!(err instanceof Error)) return false;
+  const { responseCode, command } = err as {
+    responseCode?: number;
+    command?: string;
+  };
+  return (
+    responseCode !== undefined &&
+    responseCode >= 500 &&
+    (command === "RCPT TO" || command === "DATA")
+  );
+}
+
 function retryAt(delivery: Delivery, now: Date, err: unknown): Date | null {
-  if (err instanceof UnknownTemplateError) return null;
+  if (err instanceof UnknownTemplateError || refusedForGood(err)) return null;
   const failingSince = delivery.firstFailedAt ?? now;
   if (now.getTime() - failingSince.getTime() >= GIVE_UP_MS) return null;
   const step = Math.min(delivery.attempts, BACKOFF_MINUTES.length - 1);

@@ -166,6 +166,40 @@ describe("deliveries", () => {
     ).toEqual([]);
   });
 
+  it("gives up at once on an email the server refuses for its recipient", async () => {
+    const guest = await createGuest({ email: "ari@test.example" });
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.mocked(sendMail).mockRejectedValue(
+      Object.assign(new Error("Mailbox unavailable"), {
+        responseCode: 550,
+        command: "RCPT TO",
+      })
+    );
+    await notifyGuest(guest.id, "rsvpChange", RECIPE, IN_APP);
+
+    await runJobs(T0);
+    await runJobs(minutes(2));
+
+    expect(sendMail).toHaveBeenCalledOnce();
+  });
+
+  it("retries an email the server refuses for a login it rejects", async () => {
+    const guest = await createGuest({ email: "ari@test.example" });
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.mocked(sendMail).mockRejectedValueOnce(
+      Object.assign(new Error("Invalid login"), {
+        responseCode: 535,
+        command: "AUTH PLAIN",
+      })
+    );
+    await notifyGuest(guest.id, "rsvpChange", RECIPE, IN_APP);
+
+    await runJobs(T0);
+    await runJobs(minutes(2));
+
+    expect(sendMail).toHaveBeenCalledTimes(2);
+  });
+
   it("does not hand a claimed delivery to a second run", async () => {
     const guest = await createGuest({ email: "ari@test.example" });
     await notifyGuest(guest.id, "rsvpChange", RECIPE, IN_APP);
