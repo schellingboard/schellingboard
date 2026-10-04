@@ -24,6 +24,7 @@ import { gammaSessionConfigs } from "./data/gamma-schedule";
 import { locationRows } from "./data/locations";
 import {
   sessionTemplates,
+  type SessionTemplate,
   eventSpecificProposals,
   eventSpecificTitlePatterns,
   gammaExtraProposals,
@@ -534,7 +535,7 @@ async function seedTestData(profile: SeedProfile) {
     // generator (large profile only).
     const numProposals = PROPOSAL_COUNTS[profile][eventIndex];
     const bulkCount = Math.max(0, numProposals - sessionTemplates.length);
-    const templates =
+    const templates: SessionTemplate[] =
       bulkCount > 0
         ? [...sessionTemplates, ...generateBulkProposals(bulkCount, bulkRng)]
         : sessionTemplates;
@@ -561,6 +562,9 @@ async function seedTestData(profile: SeedProfile) {
           Math.floor(seededRandom() * possibleDurations.length)
         ];
 
+      const cohostWantedNote =
+        hostIds.length > 0 ? template.cohostWantedNote : undefined;
+
       const proposalId = nanoid();
       proposalRows.push({
         id: proposalId,
@@ -569,6 +573,8 @@ async function seedTestData(profile: SeedProfile) {
         description: template.description,
         durationMinutes: duration ?? null,
         createdTime: new Date().toISOString(),
+        cohostWanted: cohostWantedNote !== undefined,
+        cohostWantedNote: cohostWantedNote ?? null,
       });
       for (const guestId of hostIds) {
         proposalHostRows.push({ proposalId, guestId });

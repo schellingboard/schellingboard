@@ -1,8 +1,15 @@
-export const sessionTemplates = [
+export type SessionTemplate = {
+  title: string;
+  description: string;
+  cohostWantedNote?: string;
+};
+
+export const sessionTemplates: SessionTemplate[] = [
   {
     title: "Building Scalable Web Applications with Modern React",
     description:
       "Dive deep into the latest React patterns and best practices for building scalable applications. We'll cover state management, performance optimization, and modern tooling.",
+    cohostWantedNote: "Someone who has run React in production at scale",
   },
   {
     title: "The Future of AI: Transforming Industries Through Machine Learning",
@@ -18,6 +25,7 @@ export const sessionTemplates = [
     title: "Design Systems: Creating Consistency at Scale",
     description:
       "Learn how to build and maintain design systems that scale across teams and products.",
+    cohostWantedNote: "A designer to cover the Figma side",
   },
   {
     title:
@@ -29,6 +37,7 @@ export const sessionTemplates = [
     title: "Microservices Architecture: Lessons from the Trenches",
     description:
       "Real-world experiences with microservices: what works, what doesn't, and when to avoid them entirely.",
+    cohostWantedNote: "Anyone with a migration back to a monolith to share",
   },
   {
     title: "Sustainable Software Development: Green Coding Practices",
