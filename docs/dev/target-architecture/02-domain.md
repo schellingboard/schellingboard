@@ -75,12 +75,12 @@ everything else is validation on the contract.
   (`attendee` | `organizer`) and event-scoped settings such as "my RSVPs are
   anonymous by default".
 - `siteAdmin` is a site role on the person.
-- Profile comments belong to the subject person, who may remove them (#901).
+- Profile comments belong to the subject person, who may remove them ([#901](https://github.com/schellingboard/schellingboard/issues/901)).
 
 ### Proposal, Vote
 
 - Hosts are participations. A proposal with no host is editable by any attendee
-  (unclaimed ideas can be picked up); `lookingForCoHosts` is a flag (#775).
+  (unclaimed ideas can be picked up); `lookingForCoHosts` is a flag ([#775](https://github.com/schellingboard/schellingboard/issues/775)).
 - `createdBy` is kept and shown (attendees asked who proposed something); it is
   not a host.
 - One vote per participation per proposal; casting the same choice again withdraws.
@@ -165,7 +165,7 @@ stateDiagram-v2
   are never in the event-wide audience.
 - 1-on-1s are **on by default** for a new event (feedback), with the organizer able
   to turn them off, and are offered only while the event is in a phase the
-  organizer chose (default: scheduling, per #952).
+  organizer chose (default: scheduling, per [#952](https://github.com/schellingboard/schellingboard/issues/952)).
 
 ### Mark (personal)
 
@@ -178,7 +178,7 @@ Mark { participation, subject: {type: 'session'|'proposal'|'person', id}, kind: 
   person's marks, so a bug cannot leak them by omission of a filter.
 - `star` on a session puts it on the agenda without counting; `hide` removes it
   from the default views; `note` is free text. A star on a person is the "people I
-  want to meet" shortlist (#773).
+  want to meet" shortlist ([#773](https://github.com/schellingboard/schellingboard/issues/773)).
 
 ### Notification
 
@@ -202,7 +202,7 @@ enabled but the server refused" becomes a bug with one cause.
 | `scheduling.canEditSession`  | Host and not `lockedByOrganizer`; organizer always; a started session keeps its start                                                                                | session, clock                                   |
 | `scheduling.canPlace`        | Booking window, bookable place, length, reserved windows, place uses; only fields actually changed are held to the rules (an organizer-placed session stays fixable) | day, place, rules, previous session state, clock |
 | `scheduling.canRsvp`         | Phase, participation, `rsvp ≠ none`, capacity mode (hard limit vs advisory), not a host                                                                              | rsvp count, event settings                       |
-| `scheduling.clashes`         | Which of a person's agenda items overlap a candidate; returns all of them (#1042)                                                                                    | agenda                                           |
+| `scheduling.clashes`         | Which of a person's agenda items overlap a candidate; returns all of them ([#1042](https://github.com/schellingboard/schellingboard/issues/1042))                    | agenda                                           |
 | `meetings.canRequest`        | Enabled, phase, availability of both, open-request cap, place use                                                                                                    | meeting settings, availabilities, open count     |
 | `people.canEditProfile`      | The person, or organizer for labels only; profile comments removable by subject or author                                                                            |                                                  |
 | `identity.assuranceRequired` | Whether this action needs a verified session: the event's minimum, raised by the person's own protection                                                             | event identity mode, person's protection flag    |
@@ -229,7 +229,7 @@ the same function as the screen).
 - Instants are stored and transported as ISO-8601 UTC strings. Every Event has an
   IANA zone. Days are local dates in that zone.
 - `domain/time` has the only formatting functions: `formatTime(instant, zone,
-prefs)` honouring the person's 12/24-hour preference (#607) and locale, and the
+prefs)` honouring the person's 12/24-hour preference ([#607](https://github.com/schellingboard/schellingboard/issues/607)) and locale, and the
   grid maths. Nothing else formats a time. An ambient-clock ban (`new Date()`) and
   an ambient-zone ban (`toLocaleTimeString` without a zone) are lint rules.
 - The `Clock` is a port. Production reads the system clock; the dev toolbar sets a

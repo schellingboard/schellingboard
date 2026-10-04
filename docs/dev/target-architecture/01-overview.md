@@ -36,7 +36,7 @@ headcount gap, **organizer rules** the software enforces (reserved windows), and
 - A database other than SQLite. Ports keep it possible; nothing promises it.
 - Native mobile apps. The PWA is the phone app.
 - Server-side rendering. See [D1](08-decisions.md#d1).
-- A general chat product. Attendee-to-attendee chat (#776) fits the change log and
+- A general chat product. Attendee-to-attendee chat ([#776](https://github.com/schellingboard/schellingboard/issues/776)) fits the change log and
   feed if it is ever wanted, but nothing here is designed around it.
 
 ## The containers

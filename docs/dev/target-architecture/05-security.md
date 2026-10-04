@@ -105,7 +105,7 @@ nosniff`.
   anonymizes their changes (actor becomes `deleted`) rather than breaking the log,
   and removes profile, credentials, marks, meetings, bindings.
 - A per-site **data collection statement** page is generated from the schema's
-  data classes (#801), so it cannot drift.
+  data classes ([#801](https://github.com/schellingboard/schellingboard/issues/801)), so it cannot drift.
 - Retention: change payload pruning, delivery logs and idempotency keys expire;
   all windows are settings with safe defaults.
 
