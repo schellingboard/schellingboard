@@ -1,6 +1,6 @@
 # Run progress
 
-Next step: 6b.
+Next step: 7.
 
 ## Decisions
 
@@ -150,7 +150,32 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   before. `createProposal` keeps its acting-guest check before parsing in the
   action (legacy order), the use case checks again.
 
+- Step 6b: `server/modules/comments/` (`commentUseCases()`): `listComments`,
+  `createComment`, `editComment`, `deleteComment`, `toggleCommentLike` (the legacy
+  action) and `setCommentLike` (the API), on a subject (`kind` proposal, session or
+  profile, and its `id`). The legacy has no admin moderation and no event-membership or
+  profile-visibility rule (every guest's profile is public; anyone may comment on any
+  subject), so neither has the API; the only author rule is "your own comment".
+  Lists return what the legacy routes and UI already show: tombstones (no body or
+  author) and likers (id, name, avatar). New repository method
+  `comments.setLike` (insert-or-ignore / delete). Notifications go through one port,
+  `notifyCommented`, wired in `composition.ts` via `after()`. Routes:
+  `GET/POST /proposals/{id}/comments`, `/sessions/{id}/comments`,
+  `/guests/{id}/comments` (201 on create), `PUT/DELETE /comments/{id}`,
+  `PUT/DELETE /comments/{id}/like` (204); contract additions in
+  `@schellingboard/contracts/comment`. Codes: `proposal.notFound`, `session.notFound`,
+  `profile.notFound`, `comment.notFound` (also for tombstones), `comment.notAuthor`,
+  `comment.parentInvalid`, `guest.unselected`, `guest.protected`. The actions keep
+  their verified-guest check before parsing; the legacy GET routes keep their bodies,
+  404 messages and `no-store`.
+
 ## Questions
+
+- Each module's `*-use-cases.test.ts` (steps 4–6b) re-tests rules the legacy action
+  tests already cover through the same use cases (e.g. `comment-use-cases.test.ts`
+  vs `{proposal,session,profile}-comments` and `*-comment-likes`). Keep both tiers,
+  or trim the use-case files to what only they reach (the API-only `setCommentLike`,
+  admin actors) once the actions are thin?
 
 - The proposal pages pass whole `SessionProposal`s, skip and total counts
   included, to client components in every phase, so the browser already holds
@@ -219,3 +244,11 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   spec passed. No user-facing change, no CHANGELOG entry.
 - Step 6a review: the API sent the tally and breakdown in every phase; they are now
   `null` before scheduling, as in the UI (test added).
+- Step 6b: comments module (list, create, edit, delete, like) for proposals,
+  sessions and profiles, `/api/v1` comment routes, `comment-actions.ts` and the three
+  legacy comment GET routes delegate. format, lint, arch, openapi-check, typecheck,
+  test-coverage pass. Firefox E2E cannot run (Playwright CDN blocked); full suite on
+  Chromium: 176 passed, 16 failed, 3 flaky, all in the known baseline or known flakes
+  (`kiosk:18`, `schedule-agenda:220`, `view-session:7`/`:45`); every comment spec
+  outside the baseline passed, `profile-comments:95` included. No user-facing change,
+  no CHANGELOG entry.

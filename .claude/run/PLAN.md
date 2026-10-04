@@ -52,7 +52,7 @@ family delegate to the use cases. Keep each legacy route's response shape.
       `/api/v1/admin/proposals/{id}`; `app/(site)/[eventSlug]/proposals/actions.ts` and
       `app/actions/admin-proposals.ts` delegate. `app/api/admin/create-proposal` stays
       for step 10.
-- [ ] 6b. **Comments**: a comments module for proposals, sessions and profiles (list,
+- [x] 6b. **Comments**: a comments module for proposals, sessions and profiles (list,
       create, edit, like, delete) and its routes; `app/(site)/[eventSlug]/comment-actions.ts`
       and the three `app/api/{proposal,session,profile}/[id]/comments` routes delegate.
 - [ ] 7. **Meetings**: `meetings` route and actions, `admin-meetings`.

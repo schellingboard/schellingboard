@@ -46,3 +46,38 @@ export const commentLikeSchema = z.object({
   commentId: z.string().min(1),
   eventSlug: z.string().min(1).optional(),
 });
+
+const instant = z.iso.datetime({ offset: true });
+const guestRef = z.object({ id: z.string(), name: z.string() });
+
+export const commentViewSchema = z.object({
+  id: z.string(),
+  parentId: z.string().nullable(),
+  body: z.string(),
+  deleted: z
+    .boolean()
+    .describe(
+      "A deleted comment with replies stays in the thread, without body or author"
+    ),
+  createdTime: instant,
+  editedTime: instant.nullable(),
+  author: guestRef.nullable(),
+  likes: z
+    .array(guestRef.extend({ avatarUrl: z.string().nullable() }))
+    .describe("Who liked the comment, oldest first"),
+});
+
+export const commentListSchema = z.object({
+  comments: z.array(commentViewSchema).describe("Oldest first"),
+});
+
+export const commentCreateSchema = z.object({
+  parentId: z
+    .string()
+    .min(1)
+    .optional()
+    .describe("The comment this replies to, on the same subject"),
+  body,
+});
+
+export const commentEditSchema = z.object({ body });

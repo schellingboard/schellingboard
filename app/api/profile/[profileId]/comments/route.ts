@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getRepositories } from "@/db/container";
+import { commentUseCases } from "@/server/composition";
+import { legacyActor } from "@/app/api/legacy";
 
 export const dynamic = "force-dynamic";
 
@@ -10,22 +11,23 @@ const NO_STORE = { headers: { "cache-control": "no-store" } };
 // Comments are displayed to everyone in the profile details,
 // similarly to sessions
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ profileId: string }> }
 ) {
   const { profileId } = await params;
 
   try {
-    const { guests, profileComments } = getRepositories();
-    // Without this an unknown id would answer with an empty thread, which is
-    // indistinguishable from a profile nobody has commented on.
-    if (!(await guests.findById(profileId))) {
+    const result = await commentUseCases().listComments(
+      await legacyActor(request),
+      { kind: "profile", id: profileId }
+    );
+    if (!result.ok) {
       return NextResponse.json(
-        { error: "Profile not found" },
+        { error: result.error.detail },
         { ...NO_STORE, status: 404 }
       );
     }
-    return NextResponse.json(await profileComments.list(profileId), NO_STORE);
+    return NextResponse.json(result.value, NO_STORE);
   } catch (error) {
     console.error("Error fetching comments:", error);
     return NextResponse.json(

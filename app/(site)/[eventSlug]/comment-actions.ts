@@ -2,10 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
-import { after } from "next/server";
 import { z } from "zod";
 
-import { getRepositories } from "@/db/container";
 import {
   commentDeleteSchema,
   commentLikeSchema,
@@ -14,13 +12,13 @@ import {
   proposalCommentSchema,
   sessionCommentSchema,
 } from "@schellingboard/contracts/comment";
-import {
-  notifyProfileCommented,
-  notifyProposalCommented,
-  notifySessionCommented,
-} from "@/utils/notifications";
+import { commentUseCases } from "@/server/composition";
+import { resolveActor, type Actor } from "@/server/kernel/actor";
+import type { CommentSubject } from "@/server/modules/comments/module";
+import type { AppError, Result } from "@/server/kernel/result";
 import { serverNow } from "@/utils/dev-clock-server";
 import {
+  actingGuestRefusalMessage,
   unverifiedUserMessage,
   verifiedCurrentUser,
 } from "@/utils/acting-guest";
@@ -58,13 +56,14 @@ function revalidateEvent(eventSlug: string | undefined): void {
   }
 }
 
-async function requireGuest(task: string): Promise<string> {
+// Before parsing, so a visitor without a name hears that first; the use cases
+// check again.
+async function requireGuest(task: string): Promise<Actor> {
   const cookieStore = await cookies();
-  const guest = await verifiedCurrentUser(cookieStore);
-  if (!guest) {
+  if (!(await verifiedCurrentUser(cookieStore))) {
     throw new Refusal(await unverifiedUserMessage(cookieStore, task));
   }
-  return guest;
+  return resolveActor(cookieStore);
 }
 
 async function requireParsed<Schema extends z.ZodType>(
@@ -78,16 +77,30 @@ async function requireParsed<Schema extends z.ZodType>(
   return parsed.data;
 }
 
-async function requireOwnComment(
-  commentId: string,
-  actor: string
+function settled<T>(result: Result<T>, task: string): T {
+  if (result.ok) return result.value;
+  throw new Refusal(refusalMessage(result.error, task));
+}
+
+function refusalMessage(error: AppError, task: string): string {
+  return error.code.startsWith("guest.")
+    ? actingGuestRefusalMessage(error.code, task)
+    : (error.detail ?? "Something went wrong");
+}
+
+async function create(
+  actor: Actor,
+  subject: CommentSubject,
+  { parentId, body }: { parentId?: string; body: string }
 ): Promise<void> {
-  const comment = await getRepositories().comments.findById(commentId);
-  if (!comment || comment.deleted) {
-    throw new Refusal("Comment not found");
-  } else if (comment.author?.id !== actor) {
-    throw new Refusal("Comment owned by another guest");
-  }
+  settled(
+    await commentUseCases().createComment(
+      actor,
+      { subject, parentId, body },
+      await serverNow()
+    ),
+    "commenting"
+  );
 }
 
 export async function createProposalComment(
@@ -98,34 +111,13 @@ export async function createProposalComment(
 ): Promise<CommentActionResult> {
   await requireSiteAuth();
   try {
-    const guest = await requireGuest("commenting");
-    const { proposalId, parentId, body, eventSlug } = await requireParsed(
+    const actor = await requireGuest("commenting");
+    const { proposalId, eventSlug, ...comment } = await requireParsed(
       proposalCommentSchema,
       input
     );
-
-    // validation
-    if (!(await getRepositories().sessionProposals.findById(proposalId))) {
-      return { error: "Proposal not found" };
-    }
-    if (parentId) {
-      const parentOf =
-        await getRepositories().proposalComments.findSubjectId(parentId);
-      if (!parentOf || parentOf !== proposalId) {
-        return { error: "The comment being replied to is invalid" };
-      }
-    }
-
-    const now = await serverNow();
-    const comment = await getRepositories().proposalComments.create({
-      subjectId: proposalId,
-      authorId: guest,
-      parentId,
-      body,
-      createdTime: now,
-    });
+    await create(actor, { kind: "proposal", id: proposalId }, comment);
     revalidateEvent(eventSlug);
-    after(() => notifyProposalCommented({ proposalId, comment, now }));
     return { success: true };
   } catch (error) {
     return toResult(error, "Failed to post comment");
@@ -140,33 +132,12 @@ export async function createSessionComment(
 ): Promise<CommentActionResult> {
   await requireSiteAuth();
   try {
-    const guest = await requireGuest("commenting");
-    const { sessionId, parentId, body } = await requireParsed(
+    const actor = await requireGuest("commenting");
+    const { sessionId, ...comment } = await requireParsed(
       sessionCommentSchema,
       input
     );
-
-    // validation
-    if (!(await getRepositories().sessions.findById(sessionId))) {
-      return { error: "Session not found" };
-    }
-    if (parentId) {
-      const parentOf =
-        await getRepositories().sessionComments.findSubjectId(parentId);
-      if (!parentOf || parentOf !== sessionId) {
-        return { error: "The comment being replied to is invalid" };
-      }
-    }
-
-    const now = await serverNow();
-    const comment = await getRepositories().sessionComments.create({
-      subjectId: sessionId,
-      authorId: guest,
-      parentId,
-      body,
-      createdTime: now,
-    });
-    after(() => notifySessionCommented({ sessionId, comment, now }));
+    await create(actor, { kind: "session", id: sessionId }, comment);
     return { success: true };
   } catch (error) {
     return toResult(error, "Failed to post comment");
@@ -181,33 +152,12 @@ export async function createProfileComment(
 ): Promise<CommentActionResult> {
   await requireSiteAuth();
   try {
-    const guest = await requireGuest("commenting");
-    const { profileId, parentId, body } = await requireParsed(
+    const actor = await requireGuest("commenting");
+    const { profileId, ...comment } = await requireParsed(
       profileCommentSchema,
       input
     );
-
-    // validation
-    if (!(await getRepositories().guests.findById(profileId))) {
-      return { error: "Profile not found" };
-    }
-    if (parentId) {
-      const parentOf =
-        await getRepositories().profileComments.findSubjectId(parentId);
-      if (!parentOf || parentOf !== profileId) {
-        return { error: "The comment being replied to is invalid" };
-      }
-    }
-
-    const now = await serverNow();
-    const comment = await getRepositories().profileComments.create({
-      subjectId: profileId,
-      authorId: guest,
-      parentId,
-      body,
-      createdTime: now,
-    });
-    after(() => notifyProfileCommented({ profileId, comment, now }));
+    await create(actor, { kind: "profile", id: profileId }, comment);
     return { success: true };
   } catch (error) {
     return toResult(error, "Failed to post comment");
@@ -222,18 +172,20 @@ export async function updateComment(
 ): Promise<CommentActionResult> {
   await requireSiteAuth();
   try {
-    const guest = await requireGuest("editing your comment");
+    const task = "editing your comment";
+    const actor = await requireGuest(task);
     const { commentId, body, eventSlug } = await requireParsed(
       commentUpdateSchema,
       input
     );
-    await requireOwnComment(commentId, guest);
-
-    const now = await serverNow();
-    await getRepositories().comments.update(commentId, {
-      body,
-      editedTime: now,
-    });
+    settled(
+      await commentUseCases().editComment(
+        actor,
+        { commentId, body },
+        await serverNow()
+      ),
+      task
+    );
     revalidateEvent(eventSlug);
     return { success: true };
   } catch (error) {
@@ -249,23 +201,20 @@ export async function toggleCommentLike(
 ): Promise<CommentLikeResult> {
   await requireSiteAuth();
   try {
-    const guest = await requireGuest("liking a comment");
+    const task = "liking a comment";
+    const actor = await requireGuest(task);
     const { commentId, eventSlug } = await requireParsed(
       commentLikeSchema,
       input
     );
-    const comment = await getRepositories().comments.findById(commentId);
-
-    if (!comment || comment.deleted) {
-      return { error: "Comment not found" };
-    }
-
-    const now = await serverNow();
-    const liked = await getRepositories().comments.toggleLike({
-      commentId,
-      guestId: guest,
-      createdTime: now,
-    });
+    const liked = settled(
+      await commentUseCases().toggleCommentLike(
+        actor,
+        { commentId },
+        await serverNow()
+      ),
+      task
+    );
     revalidateEvent(eventSlug);
     return { success: true, liked };
   } catch (error) {
@@ -281,14 +230,13 @@ export async function deleteComment(
 ): Promise<CommentActionResult> {
   await requireSiteAuth();
   try {
-    const guest = await requireGuest("deleting your comment");
+    const task = "deleting your comment";
+    const actor = await requireGuest(task);
     const { commentId, eventSlug } = await requireParsed(
       commentDeleteSchema,
       input
     );
-    await requireOwnComment(commentId, guest);
-
-    await getRepositories().comments.delete(commentId);
+    settled(await commentUseCases().deleteComment(actor, { commentId }), task);
     revalidateEvent(eventSlug);
     return { success: true };
   } catch (error) {

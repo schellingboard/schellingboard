@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getRepositories } from "@/db/container";
+import { commentUseCases } from "@/server/composition";
+import { legacyActor } from "@/app/api/legacy";
 
 export const dynamic = "force-dynamic";
 
@@ -10,20 +11,23 @@ const NO_STORE = { headers: { "cache-control": "no-store" } };
 // Quick Voting moves from proposal to proposal without a server roundtrip, so
 // it loads each one's comments from here. They are as public as the proposal.
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ proposalId: string }> }
 ) {
   const { proposalId } = await params;
 
   try {
-    const { sessionProposals, proposalComments } = getRepositories();
-    if (!(await sessionProposals.findById(proposalId))) {
+    const result = await commentUseCases().listComments(
+      await legacyActor(request),
+      { kind: "proposal", id: proposalId }
+    );
+    if (!result.ok) {
       return NextResponse.json(
-        { error: "Proposal not found" },
+        { error: result.error.detail },
         { ...NO_STORE, status: 404 }
       );
     }
-    return NextResponse.json(await proposalComments.list(proposalId), NO_STORE);
+    return NextResponse.json(result.value, NO_STORE);
   } catch (error) {
     console.error("Error fetching comments:", error);
     return NextResponse.json(

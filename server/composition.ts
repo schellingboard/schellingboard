@@ -3,8 +3,16 @@ import { getRepositories } from "@/db/container";
 import { nudgeJobs } from "@/utils/jobs/nudge";
 import {
   notifyCohostsAdded,
+  notifyProfileCommented,
+  notifyProposalCommented,
   notifyProposalJoined,
+  notifySessionCommented,
 } from "@/utils/notifications";
+import {
+  createCommentUseCases,
+  type CommentDeps,
+  type CommentUseCases,
+} from "@/server/modules/comments/module";
 import {
   createProposalUseCases,
   type ProposalUseCases,
@@ -28,4 +36,21 @@ export function proposalUseCases(): ProposalUseCases {
     repos: getRepositories(),
     notifyProposalJoined: (args) => after(() => notifyProposalJoined(args)),
   });
+}
+
+const notifyCommented: CommentDeps["notifyCommented"] = ({
+  subject,
+  comment,
+  now,
+}) =>
+  after(() => {
+    if (subject.kind === "proposal")
+      return notifyProposalCommented({ proposalId: subject.id, comment, now });
+    if (subject.kind === "session")
+      return notifySessionCommented({ sessionId: subject.id, comment, now });
+    return notifyProfileCommented({ profileId: subject.id, comment, now });
+  });
+
+export function commentUseCases(): CommentUseCases {
+  return createCommentUseCases({ repos: getRepositories(), notifyCommented });
 }

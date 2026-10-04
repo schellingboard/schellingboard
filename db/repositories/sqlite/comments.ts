@@ -168,6 +168,35 @@ export class SqliteCommentsRepository implements CommentsRepository {
     });
   }
 
+  async setLike(data: {
+    commentId: string;
+    guestId: string;
+    liked: boolean;
+    createdTime: Date;
+  }): Promise<void> {
+    if (!data.liked) {
+      this.db
+        .delete(schema.commentLikes)
+        .where(
+          and(
+            eq(schema.commentLikes.commentId, data.commentId),
+            eq(schema.commentLikes.guestId, data.guestId)
+          )
+        )
+        .run();
+      return;
+    }
+    this.db
+      .insert(schema.commentLikes)
+      .values({
+        commentId: data.commentId,
+        guestId: data.guestId,
+        createdTime: data.createdTime.toISOString(),
+      })
+      .onConflictDoNothing()
+      .run();
+  }
+
   async update(
     id: string,
     data: { body: string; editedTime: Date }

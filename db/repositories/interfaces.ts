@@ -587,6 +587,13 @@ export interface CommentsRepository {
     guestId: string;
     createdTime: Date;
   }): Promise<boolean>;
+  /** A like already there keeps its original time. */
+  setLike(data: {
+    commentId: string;
+    guestId: string;
+    liked: boolean;
+    createdTime: Date;
+  }): Promise<void>;
   /**
    * Erases the comment. One with replies is kept as a tombstone holding
    * nothing but its place in the thread; one without is removed outright,

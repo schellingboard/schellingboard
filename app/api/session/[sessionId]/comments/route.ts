@@ -1,7 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getRepositories } from "@/db/container";
-import { sessionUseCases } from "@/server/composition";
-import { resolveActor } from "@/server/kernel/actor";
+import { NextResponse } from "next/server";
+import { commentUseCases } from "@/server/composition";
+import { legacyActor } from "@/app/api/legacy";
 
 export const dynamic = "force-dynamic";
 
@@ -18,22 +17,17 @@ export async function GET(
   const { sessionId } = await params;
 
   try {
-    // Without this an unknown id would answer with an empty thread, which is
-    // indistinguishable from a session nobody has commented on.
-    const session = await sessionUseCases().getSession(
-      await resolveActor(new NextRequest(request).cookies),
-      { sessionId }
+    const result = await commentUseCases().listComments(
+      await legacyActor(request),
+      { kind: "session", id: sessionId }
     );
-    if (!session.ok) {
+    if (!result.ok) {
       return NextResponse.json(
-        { error: "Session not found" },
+        { error: result.error.detail },
         { ...NO_STORE, status: 404 }
       );
     }
-    return NextResponse.json(
-      await getRepositories().sessionComments.list(sessionId),
-      NO_STORE
-    );
+    return NextResponse.json(result.value, NO_STORE);
   } catch (error) {
     console.error("Error fetching comments:", error);
     return NextResponse.json(

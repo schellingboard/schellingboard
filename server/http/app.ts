@@ -1,5 +1,10 @@
 import { getRepositories } from "@/db/container";
-import { proposalUseCases, sessionUseCases } from "@/server/composition";
+import {
+  commentUseCases,
+  proposalUseCases,
+  sessionUseCases,
+} from "@/server/composition";
+import { addCommentRoutes } from "@/server/modules/comments/module";
 import {
   addProposalRoutes,
   addVoteRoutes,
@@ -26,3 +31,4 @@ addSessionRoutes(api, sessionUseCases);
 addRsvpRoutes(api, sessionUseCases);
 addProposalRoutes(api, proposalUseCases);
 addVoteRoutes(api, proposalUseCases);
+addCommentRoutes(api, commentUseCases);
