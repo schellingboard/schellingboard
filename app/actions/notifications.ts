@@ -3,8 +3,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { getRepositories } from "@/db/container";
-import { verifiedCurrentUser } from "@/utils/acting-guest";
+import { notificationUseCases } from "@/server/composition";
+import { resolveActor } from "@/server/kernel/actor";
 import { serverNow } from "@/utils/dev-clock-server";
 import { requireSiteAuth } from "@/utils/action-auth";
 
@@ -13,18 +13,20 @@ export type NotificationActionResult =
 
 const NO_USER = "No user is logged in";
 
+async function actor() {
+  return resolveActor(await cookies());
+}
+
 export async function markNotificationsReadAction(
   ids: string[]
 ): Promise<NotificationActionResult> {
   await requireSiteAuth();
-  const currentUser = await verifiedCurrentUser(await cookies());
-  if (!currentUser) return { ok: false, error: NO_USER };
-
-  await getRepositories().notifications.markManyRead(
-    currentUser,
-    ids,
+  const result = await notificationUseCases().markNotificationsRead(
+    await actor(),
+    { ids },
     await serverNow()
   );
+  if (!result.ok) return { ok: false, error: NO_USER };
 
   // Only this page: the badge sits in a layout that reads cookies, so it is
   // never statically cached, and the caller refreshes the router anyway.
@@ -37,10 +39,11 @@ export async function deleteNotificationsAction(
   ids: string[]
 ): Promise<NotificationActionResult> {
   await requireSiteAuth();
-  const currentUser = await verifiedCurrentUser(await cookies());
-  if (!currentUser) return { ok: false, error: NO_USER };
-
-  await getRepositories().notifications.deleteMany(currentUser, ids);
+  const result = await notificationUseCases().deleteNotifications(
+    await actor(),
+    { ids }
+  );
+  if (!result.ok) return { ok: false, error: NO_USER };
   revalidatePath("/notifications");
   return { ok: true };
 }
@@ -53,14 +56,13 @@ export async function deleteNotificationsAction(
  */
 export async function openNotificationAction(id: string): Promise<void> {
   await requireSiteAuth();
-  const currentUser = await verifiedCurrentUser(await cookies());
-  if (!currentUser) return;
+  const result = await notificationUseCases().readNotification(
+    await actor(),
+    { id },
+    await serverNow()
+  );
+  if (!result.ok) return;
 
-  const { notifications } = getRepositories();
-  const notification = await notifications.findForGuest(currentUser, id);
-  if (!notification) return;
-
-  await notifications.markRead(currentUser, id, await serverNow());
   revalidatePath("/notifications");
-  redirect(notification.url);
+  redirect(result.value.url);
 }

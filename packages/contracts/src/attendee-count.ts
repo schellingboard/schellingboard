@@ -32,3 +32,16 @@ export const attendeeCountSchema = z
 export const attendeeCountFormSchema = z.object({
   count: attendeeCountSchema,
 });
+
+export const attendeeCountBodySchema = z.object({
+  count: z
+    .number()
+    .nullable()
+    .describe(
+      `A whole number between ${MIN_ATTENDEE_COUNT} and ${MAX_ATTENDEE_COUNT}, or null to clear it`
+    ),
+});
+
+export const attendeeCountViewSchema = z.object({
+  count: z.number().int().nullable(),
+});

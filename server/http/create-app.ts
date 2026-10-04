@@ -1,4 +1,5 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { HTTPException } from "hono/http-exception";
 import type { ApiEnv } from "./actor";
 import { problemResponse } from "./problem";
 
@@ -18,6 +19,13 @@ export function createApp(basePath = "/") {
   }).basePath(basePath);
   app.notFound(() => problemResponse({ status: 404, code: "route.notFound" }));
   app.onError((error) => {
+    // Hono's validators throw these for a body they cannot parse at all.
+    if (error instanceof HTTPException && error.status < 500)
+      return problemResponse({
+        status: error.status,
+        code: "request.invalid",
+        detail: error.message,
+      });
     console.error(error);
     return problemResponse({ status: 500, code: "server.error" });
   });

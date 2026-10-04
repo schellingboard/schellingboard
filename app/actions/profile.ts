@@ -2,9 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
-import { getRepositories } from "@/db/container";
+import { peopleUseCases } from "@/server/composition";
+import { resolveActor } from "@/server/kernel/actor";
 import { getImageRepositories } from "@/utils/images";
-import { verifiedCurrentUser } from "@/utils/acting-guest";
 import { requireSiteAuth } from "@/utils/action-auth";
 import { serverNow } from "@/utils/dev-clock-server";
 import { profileSchema } from "@schellingboard/contracts/guest";
@@ -47,41 +47,21 @@ export async function updateProfileAction(
     return { ok: false, error: parseResult.error.issues };
   }
 
-  const { avatar: avatarFile, ...profile } = parseResult.data;
-
-  const currentUser = await verifiedCurrentUser(await cookies());
-  if (!currentUser) {
-    return { ok: false, error: "No user is logged in" };
-  }
-
-  const { guests } = getRepositories();
-  const currentProfile = await guests.findById(currentUser);
-  if (!currentProfile) {
-    return { ok: false, error: "Profile not found" };
-  }
-
-  const { avatars } = getImageRepositories();
-
-  let avatarUrl: string | undefined | null =
-    avatarFile === null ? null : (currentProfile.avatarUrl ?? null);
-
-  if (avatarFile === null) {
-    await avatars.delete(currentUser);
-  } else if (avatarFile) {
-    avatarUrl = await avatars.save(
-      currentUser,
-      avatarFile.buffer,
-      avatarFile.ext
-    );
-  }
-
-  await guests.updateProfile(
-    currentUser,
-    { ...profile, avatarUrl },
+  const result = await peopleUseCases().updateMyProfile(
+    await resolveActor(await cookies()),
+    parseResult.data,
     await serverNow()
   );
+  if (!result.ok) {
+    return {
+      ok: false,
+      error: result.error.code.startsWith("guest.")
+        ? "No user is logged in"
+        : (result.error.detail ?? "Something went wrong"),
+    };
+  }
 
-  revalidatePath(`/guests/${currentUser}`);
+  revalidatePath(`/guests/${result.value.id}`);
   revalidatePath("/guests");
   return { ok: true };
 }

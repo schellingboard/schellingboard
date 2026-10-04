@@ -1,6 +1,6 @@
 # Run progress
 
-Next step: 8.
+Next step: 9.
 
 ## Decisions
 
@@ -199,6 +199,43 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   the legacy routes keep their bodies, statuses and `no-store`; `GET /api/meetings`
   maps an unknown event back to empty lists.
 
+- Step 8: `server/modules/people/` (`peopleUseCases()`): `getProfile` (public fields
+  only, via `sanitizeGuest`: no email, no email settings), `updateMyProfile`,
+  `replaceMyAvatar` (authorizes, then validates through the `avatars` port: the
+  existing `AvatarImageResourceRepository`, same storage paths), `removeMyAvatar`.
+  `server/modules/notifications/` (`notificationUseCases()`): `listMyNotifications`
+  (newest `limit`, `unreadCount`, `total`), `markNotificationsRead`,
+  `deleteNotifications` (others' ids skipped), `readNotification` (the legacy
+  "open"), `getMyEmailSettings`, `updateMyEmailSettings`, `subscribeToPush`,
+  `unsubscribeFromPush` (someone else's device: success, nothing deleted),
+  `isPushEnabledHere`. Attendee count in the sessions module: `getAttendeeCount`,
+  `recordAttendeeCount` (takes the raw value and validates it after authorizing).
+  Every one acts only as the acting guest (#370 rule, `actingGuest`); no route
+  names another guest except the public `GET /guests/{id}`. Routes:
+  `GET /guests/{id}`, `PUT /me/profile` (JSON, photo kept), `PUT /me/avatar`
+  (multipart `avatar`; its description says a keyed retry must resend identical
+  bytes or get 422), `DELETE /me/avatar` (204), `GET /me/notifications?limit=`
+  (1–100, default 20), `POST /me/notifications/read|delete` (`{ ids }`, 204),
+  `POST /me/notifications/{id}/read` (200, the notification),
+  `GET/PUT /me/email-settings`, `POST /me/push-subscriptions` (204),
+  `POST /me/push-subscriptions/remove|check` (endpoint in the body, never the URL;
+  subscriptions are never returned), `GET/PUT /sessions/{id}/attendee-count`
+  (`{ count }`). Contracts: `publicProfileSchema`, `profileBodySchema` (guest),
+  `@schellingboard/contracts/notification`, `pushEndpointSchema`,
+  `pushEnabledSchema`, `attendeeCountBodySchema`, `attendeeCountViewSchema`. Codes:
+  `profile.notFound`, `avatar.invalid`, `notification.notFound`,
+  `attendeeCount.notHost` (403, also for an unknown session),
+  `attendeeCount.sessionNotFinished` (409), `attendeeCount.invalid`,
+  `guest.unselected`, `guest.protected`. The profile, settings, notifications,
+  push and attendee-count actions delegate with their messages and check order
+  (profile and settings parse first, push keeps `requireVerifiedGuest` before
+  parsing, attendee count authorizes before validating and re-derives the zod
+  issues for `attendeeCount.invalid`). A body Hono cannot parse at all (bad JSON,
+  bad multipart) is now `request.invalid` with its 4xx status instead of `500`.
+  Left out: notification paging beyond `limit` (ADR 0012 leaves pagination out,
+  #831), the VAPID public key route, and the profile and notification pages
+  still read the repositories directly.
+
 ## Questions
 
 - Each module's `*-use-cases.test.ts` (steps 4–6b) re-tests rules the legacy action
@@ -290,3 +327,14 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   Chromium: 178 passed, 13 failed, 4 flaky, all in the known baseline or known flakes
   (`schedule-agenda:220`, `view-session:7`); every meetings spec passed. No
   user-facing change, no CHANGELOG entry.
+- Step 8: people module (public profile, own profile, photo upload and removal),
+  notifications module (own notifications, email settings, push devices), attendee
+  count in the sessions module; `/api/v1` routes; the profile, settings,
+  notifications, push and attendee-count actions delegate. format, lint, arch,
+  openapi-check, typecheck, test-coverage pass. Firefox E2E cannot run (Playwright
+  CDN blocked); full suite on Chromium: 174 passed, 13 failed, 8 flaky, all in the
+  known baseline or known flakes (`kiosk:18`, `schedule-agenda:220`,
+  `view-session:7`/`:45`, `profile-comments:95`) except flaky `rsvp.spec.ts:235`,
+  which passed 3 of 3 with `--retries 0 --repeat-each 3` (a loading-race test this
+  step does not touch). Every profile, notifications and push spec outside the
+  baseline passed. No user-facing change, no CHANGELOG entry.

@@ -4,6 +4,7 @@ import {
   adminDeleteSession,
   adminUpdateSession,
 } from "./admin-sessions";
+import { getAttendeeCount, recordAttendeeCount } from "./attendee-count";
 import { createSession } from "./create-session";
 import { deleteSession } from "./delete-session";
 import { getSession, listSessions } from "./queries";
@@ -31,6 +32,8 @@ export function createSessionUseCases(deps: SessionDeps) {
     listSessionRsvps: listSessionRsvps(deps),
     listGuestRsvps: listGuestRsvps(deps),
     adminRemoveRsvp: adminRemoveRsvp(deps),
+    getAttendeeCount: getAttendeeCount(deps),
+    recordAttendeeCount: recordAttendeeCount(deps),
   };
 }
 

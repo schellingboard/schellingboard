@@ -1,9 +1,9 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { getRepositories } from "@/db/container";
+import { notificationUseCases } from "@/server/composition";
+import { resolveActor } from "@/server/kernel/actor";
 import { emailSettingsSchema } from "@schellingboard/contracts/guest";
-import { verifiedCurrentUser } from "@/utils/acting-guest";
 import { requireSiteAuth } from "@/utils/action-auth";
 import { z } from "zod";
 
@@ -23,18 +23,17 @@ export async function updateEmailSettingsAction(
     return { ok: false, error: parseResult.error.issues };
   }
 
-  const currentUser = await verifiedCurrentUser(await cookies());
-  if (!currentUser) {
-    return { ok: false, error: "No user is logged in" };
-  }
-
-  const { guests } = getRepositories();
-  const updated = await guests.updateEmailSettings(
-    currentUser,
+  const result = await notificationUseCases().updateMyEmailSettings(
+    await resolveActor(await cookies()),
     parseResult.data
   );
-  if (!updated) {
-    return { ok: false, error: "Profile not found" };
+  if (!result.ok) {
+    return {
+      ok: false,
+      error: result.error.code.startsWith("guest.")
+        ? "No user is logged in"
+        : (result.error.detail ?? "Something went wrong"),
+    };
   }
 
   return { ok: true };

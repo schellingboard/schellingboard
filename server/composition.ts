@@ -1,5 +1,6 @@
 import { after } from "next/server";
 import { getRepositories } from "@/db/container";
+import { getImageRepositories } from "@/utils/images";
 import { nudgeJobs } from "@/utils/jobs/nudge";
 import {
   notifyCohostsAdded,
@@ -19,6 +20,14 @@ import {
   createMeetingUseCases,
   type MeetingUseCases,
 } from "@/server/modules/meetings/module";
+import {
+  createNotificationUseCases,
+  type NotificationUseCases,
+} from "@/server/modules/notifications/module";
+import {
+  createPeopleUseCases,
+  type PeopleUseCases,
+} from "@/server/modules/people/module";
 import {
   createProposalUseCases,
   type ProposalUseCases,
@@ -67,4 +76,15 @@ export function meetingUseCases(): MeetingUseCases {
     notifyMeetingRequested,
     notifyMeetingOutcome,
   });
+}
+
+export function peopleUseCases(): PeopleUseCases {
+  return createPeopleUseCases({
+    repos: getRepositories(),
+    avatars: getImageRepositories().avatars,
+  });
+}
+
+export function notificationUseCases(): NotificationUseCases {
+  return createNotificationUseCases({ repos: getRepositories() });
 }

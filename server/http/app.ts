@@ -2,6 +2,8 @@ import { getRepositories } from "@/db/container";
 import {
   commentUseCases,
   meetingUseCases,
+  notificationUseCases,
+  peopleUseCases,
   proposalUseCases,
   sessionUseCases,
 } from "@/server/composition";
@@ -10,11 +12,14 @@ import {
   addAdminMeetingRoutes,
   addMeetingRoutes,
 } from "@/server/modules/meetings/module";
+import { addNotificationRoutes } from "@/server/modules/notifications/module";
+import { addPeopleRoutes } from "@/server/modules/people/module";
 import {
   addProposalRoutes,
   addVoteRoutes,
 } from "@/server/modules/proposals/module";
 import {
+  addAttendeeCountRoutes,
   addRsvpRoutes,
   addSessionRoutes,
 } from "@/server/modules/sessions/module";
@@ -39,3 +44,6 @@ addVoteRoutes(api, proposalUseCases);
 addCommentRoutes(api, commentUseCases);
 addMeetingRoutes(api, meetingUseCases);
 addAdminMeetingRoutes(api, meetingUseCases);
+addAttendeeCountRoutes(api, sessionUseCases);
+addPeopleRoutes(api, peopleUseCases);
+addNotificationRoutes(api, notificationUseCases);
