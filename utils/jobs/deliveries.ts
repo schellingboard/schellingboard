@@ -17,7 +17,10 @@ export type PushPayload = {
   at: string;
 };
 
-const BATCH = 20;
+// Small: the loop runs nothing else, reminders included, while a batch sends,
+// and a batch that hits the SMTP timeouts on every message must end within
+// HOLD_MS.
+const BATCH = 5;
 // Longer than a batch could take, so a run that outlives the loop's lease
 // still holds its rows against a second process.
 const HOLD_MS = 5 * 60 * 1000;

@@ -13,6 +13,7 @@ import {
   initMailer,
   resetMailer,
   sendMail,
+  SMTP_TIMEOUTS,
   smtpTransportConfig,
 } from "@/utils/mailer";
 
@@ -180,9 +181,10 @@ describe("mailer", () => {
 
     it("creates the transport using SMTP_URL", () => {
       initMailer();
-      expect(nodemailer.createTransport).toHaveBeenCalledWith(
-        "smtp://localhost:1025"
-      );
+      expect(nodemailer.createTransport).toHaveBeenCalledWith({
+        ...SMTP_TIMEOUTS,
+        url: "smtp://localhost:1025",
+      });
     });
 
     it("creates the transport using SMTP_HOST", () => {
@@ -190,6 +192,7 @@ describe("mailer", () => {
       vi.stubEnv("SMTP_HOST", "mail.example");
       initMailer();
       expect(nodemailer.createTransport).toHaveBeenCalledWith({
+        ...SMTP_TIMEOUTS,
         host: "mail.example",
         secure: false,
         requireTLS: true,
@@ -205,6 +208,7 @@ describe("mailer", () => {
       vi.stubEnv("SMTP_SECURE", "true");
       initMailer();
       expect(nodemailer.createTransport).toHaveBeenCalledWith({
+        ...SMTP_TIMEOUTS,
         host: "mail.example",
         port: 123,
         auth: {

@@ -82,6 +82,14 @@ export function smtpTransportConfig(env: {
   return { tag: "object", settings };
 }
 
+// Nodemailer's defaults (minutes) would let one unresponsive server stall the
+// jobs loop, reminders included. An SMTP_URL query parameter still wins.
+export const SMTP_TIMEOUTS = {
+  connectionTimeout: 10_000,
+  greetingTimeout: 10_000,
+  socketTimeout: 10_000,
+} satisfies SMTPTransport.Options;
+
 type MailerState = { configured: true; mailer: Mailer } | { configured: false };
 
 // Singletons need to be assigned to globalThis, not simply module-level
@@ -120,11 +128,12 @@ export function initMailer(): void {
   g.__mailerState = {
     configured: true,
     mailer: {
-      transport: nodemailer.createTransport(
-        transportConfig.tag === "url"
-          ? transportConfig.url
-          : transportConfig.settings
-      ),
+      transport: nodemailer.createTransport({
+        ...SMTP_TIMEOUTS,
+        ...(transportConfig.tag === "url"
+          ? { url: transportConfig.url }
+          : transportConfig.settings),
+      }),
       from,
     },
   };
