@@ -1,6 +1,10 @@
+import { after } from "next/server";
 import { getRepositories } from "@/db/container";
 import { nudgeJobs } from "@/utils/jobs/nudge";
-import { notifyCohostsAdded } from "@/utils/notifications";
+import {
+  notifyCohostsAdded,
+  notifyProposalJoined,
+} from "@/utils/notifications";
 import {
   createProposalUseCases,
   type ProposalUseCases,
@@ -20,5 +24,8 @@ export function sessionUseCases(): SessionUseCases {
 }
 
 export function proposalUseCases(): ProposalUseCases {
-  return createProposalUseCases({ repos: getRepositories() });
+  return createProposalUseCases({
+    repos: getRepositories(),
+    notifyProposalJoined: (args) => after(() => notifyProposalJoined(args)),
+  });
 }

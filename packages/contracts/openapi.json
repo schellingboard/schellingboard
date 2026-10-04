@@ -1344,6 +1344,1083 @@
         }
       }
     },
+    "/api/v1/proposals/{id}": {
+      "get": {
+        "tags": ["proposals"],
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The proposal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "eventId": { "type": "string" },
+                    "title": { "type": "string" },
+                    "description": { "type": ["string", "null"] },
+                    "durationMinutes": { "type": ["number", "null"] },
+                    "createdTime": { "type": "string", "format": "date-time" },
+                    "updatedTime": { "type": "string", "format": "date-time" },
+                    "hosts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "name": { "type": "string" }
+                        },
+                        "required": ["id", "name"]
+                      }
+                    },
+                    "cohostWanted": { "type": "boolean" },
+                    "cohostWantedNote": { "type": ["string", "null"] },
+                    "sessionIds": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    },
+                    "tally": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "interested": { "type": "integer" },
+                        "maybe": { "type": "integer" }
+                      },
+                      "required": ["interested", "maybe"],
+                      "description": "The public tally, from the scheduling phase on; skip votes are only in the breakdown"
+                    },
+                    "breakdown": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "attendees": { "type": "integer" },
+                        "interested": { "type": "integer" },
+                        "maybe": { "type": "integer" },
+                        "skip": { "type": "integer" },
+                        "votes": { "type": "integer" },
+                        "votesPctOfAttendees": { "type": ["number", "null"] },
+                        "nonVoters": { "type": "integer" },
+                        "nonVotersPctOfAttendees": {
+                          "type": ["number", "null"]
+                        },
+                        "interestedPctOfVotes": { "type": ["number", "null"] },
+                        "maybePctOfVotes": { "type": ["number", "null"] },
+                        "skipPctOfVotes": { "type": ["number", "null"] },
+                        "estimatedAttendance": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "low": { "type": "integer" },
+                            "high": { "type": "integer" }
+                          },
+                          "required": ["low", "high"],
+                          "description": "A very rough 50% range of how many people to expect"
+                        },
+                        "noEstimateReason": {
+                          "type": ["string", "null"],
+                          "enum": [
+                            "low-turnout",
+                            "no-interest",
+                            "unknown-event",
+                            null
+                          ]
+                        }
+                      },
+                      "required": [
+                        "attendees",
+                        "interested",
+                        "maybe",
+                        "skip",
+                        "votes",
+                        "votesPctOfAttendees",
+                        "nonVoters",
+                        "nonVotersPctOfAttendees",
+                        "interestedPctOfVotes",
+                        "maybePctOfVotes",
+                        "skipPctOfVotes",
+                        "estimatedAttendance",
+                        "noEstimateReason"
+                      ],
+                      "description": "From the scheduling phase on, shown to a proposal's hosts, and to everyone for a proposal nobody hosts"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "eventId",
+                    "title",
+                    "description",
+                    "durationMinutes",
+                    "createdTime",
+                    "updatedTime",
+                    "hosts",
+                    "cohostWanted",
+                    "cohostWantedNote",
+                    "sessionIds",
+                    "tally",
+                    "breakdown"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["proposals"],
+        "description": "Replaces a proposal the acting guest hosts, or one nobody hosts.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string", "minLength": 1 },
+                  "description": { "type": "string" },
+                  "hostIds": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "default": []
+                  },
+                  "durationMinutes": { "type": "integer", "minimum": 0 },
+                  "cohostWanted": { "type": "boolean", "default": false },
+                  "cohostWantedNote": { "type": "string", "maxLength": 200 },
+                  "expectedUpdatedTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "The proposal's updatedTime when it was read; a later change refuses the edit"
+                  }
+                },
+                "required": ["title", "expectedUpdatedTime"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated proposal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "eventId": { "type": "string" },
+                    "title": { "type": "string" },
+                    "description": { "type": ["string", "null"] },
+                    "durationMinutes": { "type": ["number", "null"] },
+                    "createdTime": { "type": "string", "format": "date-time" },
+                    "updatedTime": { "type": "string", "format": "date-time" },
+                    "hosts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "name": { "type": "string" }
+                        },
+                        "required": ["id", "name"]
+                      }
+                    },
+                    "cohostWanted": { "type": "boolean" },
+                    "cohostWantedNote": { "type": ["string", "null"] },
+                    "sessionIds": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    },
+                    "tally": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "interested": { "type": "integer" },
+                        "maybe": { "type": "integer" }
+                      },
+                      "required": ["interested", "maybe"],
+                      "description": "The public tally, from the scheduling phase on; skip votes are only in the breakdown"
+                    },
+                    "breakdown": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "attendees": { "type": "integer" },
+                        "interested": { "type": "integer" },
+                        "maybe": { "type": "integer" },
+                        "skip": { "type": "integer" },
+                        "votes": { "type": "integer" },
+                        "votesPctOfAttendees": { "type": ["number", "null"] },
+                        "nonVoters": { "type": "integer" },
+                        "nonVotersPctOfAttendees": {
+                          "type": ["number", "null"]
+                        },
+                        "interestedPctOfVotes": { "type": ["number", "null"] },
+                        "maybePctOfVotes": { "type": ["number", "null"] },
+                        "skipPctOfVotes": { "type": ["number", "null"] },
+                        "estimatedAttendance": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "low": { "type": "integer" },
+                            "high": { "type": "integer" }
+                          },
+                          "required": ["low", "high"],
+                          "description": "A very rough 50% range of how many people to expect"
+                        },
+                        "noEstimateReason": {
+                          "type": ["string", "null"],
+                          "enum": [
+                            "low-turnout",
+                            "no-interest",
+                            "unknown-event",
+                            null
+                          ]
+                        }
+                      },
+                      "required": [
+                        "attendees",
+                        "interested",
+                        "maybe",
+                        "skip",
+                        "votes",
+                        "votesPctOfAttendees",
+                        "nonVoters",
+                        "nonVotersPctOfAttendees",
+                        "interestedPctOfVotes",
+                        "maybePctOfVotes",
+                        "skipPctOfVotes",
+                        "estimatedAttendance",
+                        "noEstimateReason"
+                      ],
+                      "description": "From the scheduling phase on, shown to a proposal's hosts, and to everyone for a proposal nobody hosts"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "eventId",
+                    "title",
+                    "description",
+                    "durationMinutes",
+                    "createdTime",
+                    "updatedTime",
+                    "hosts",
+                    "cohostWanted",
+                    "cohostWantedNote",
+                    "sessionIds",
+                    "tally",
+                    "breakdown"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["proposals"],
+        "description": "Deletes a proposal the acting guest hosts, or one nobody hosts.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Deleted" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/proposals": {
+      "get": {
+        "tags": ["proposals"],
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "eventId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The event's proposals",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "proposals": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "eventId": { "type": "string" },
+                          "title": { "type": "string" },
+                          "description": { "type": ["string", "null"] },
+                          "durationMinutes": { "type": ["number", "null"] },
+                          "createdTime": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "updatedTime": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "hosts": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": { "type": "string" },
+                                "name": { "type": "string" }
+                              },
+                              "required": ["id", "name"]
+                            }
+                          },
+                          "cohostWanted": { "type": "boolean" },
+                          "cohostWantedNote": { "type": ["string", "null"] },
+                          "sessionIds": {
+                            "type": "array",
+                            "items": { "type": "string" }
+                          },
+                          "tally": {
+                            "type": ["object", "null"],
+                            "properties": {
+                              "interested": { "type": "integer" },
+                              "maybe": { "type": "integer" }
+                            },
+                            "required": ["interested", "maybe"],
+                            "description": "The public tally, from the scheduling phase on; skip votes are only in the breakdown"
+                          },
+                          "breakdown": {
+                            "type": ["object", "null"],
+                            "properties": {
+                              "attendees": { "type": "integer" },
+                              "interested": { "type": "integer" },
+                              "maybe": { "type": "integer" },
+                              "skip": { "type": "integer" },
+                              "votes": { "type": "integer" },
+                              "votesPctOfAttendees": {
+                                "type": ["number", "null"]
+                              },
+                              "nonVoters": { "type": "integer" },
+                              "nonVotersPctOfAttendees": {
+                                "type": ["number", "null"]
+                              },
+                              "interestedPctOfVotes": {
+                                "type": ["number", "null"]
+                              },
+                              "maybePctOfVotes": { "type": ["number", "null"] },
+                              "skipPctOfVotes": { "type": ["number", "null"] },
+                              "estimatedAttendance": {
+                                "type": ["object", "null"],
+                                "properties": {
+                                  "low": { "type": "integer" },
+                                  "high": { "type": "integer" }
+                                },
+                                "required": ["low", "high"],
+                                "description": "A very rough 50% range of how many people to expect"
+                              },
+                              "noEstimateReason": {
+                                "type": ["string", "null"],
+                                "enum": [
+                                  "low-turnout",
+                                  "no-interest",
+                                  "unknown-event",
+                                  null
+                                ]
+                              }
+                            },
+                            "required": [
+                              "attendees",
+                              "interested",
+                              "maybe",
+                              "skip",
+                              "votes",
+                              "votesPctOfAttendees",
+                              "nonVoters",
+                              "nonVotersPctOfAttendees",
+                              "interestedPctOfVotes",
+                              "maybePctOfVotes",
+                              "skipPctOfVotes",
+                              "estimatedAttendance",
+                              "noEstimateReason"
+                            ],
+                            "description": "From the scheduling phase on, shown to a proposal's hosts, and to everyone for a proposal nobody hosts"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "eventId",
+                          "title",
+                          "description",
+                          "durationMinutes",
+                          "createdTime",
+                          "updatedTime",
+                          "hosts",
+                          "cohostWanted",
+                          "cohostWantedNote",
+                          "sessionIds",
+                          "tally",
+                          "breakdown"
+                        ]
+                      }
+                    }
+                  },
+                  "required": ["proposals"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["proposals"],
+        "description": "Proposes a session as the acting guest, until scheduling starts.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "eventId": { "type": "string", "minLength": 1 },
+                  "title": { "type": "string", "minLength": 1 },
+                  "description": { "type": "string" },
+                  "hostIds": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "default": []
+                  },
+                  "durationMinutes": { "type": "integer", "minimum": 0 },
+                  "cohostWanted": { "type": "boolean", "default": false },
+                  "cohostWantedNote": { "type": "string", "maxLength": 200 }
+                },
+                "required": ["eventId", "title"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The new proposal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "eventId": { "type": "string" },
+                    "title": { "type": "string" },
+                    "description": { "type": ["string", "null"] },
+                    "durationMinutes": { "type": ["number", "null"] },
+                    "createdTime": { "type": "string", "format": "date-time" },
+                    "updatedTime": { "type": "string", "format": "date-time" },
+                    "hosts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "name": { "type": "string" }
+                        },
+                        "required": ["id", "name"]
+                      }
+                    },
+                    "cohostWanted": { "type": "boolean" },
+                    "cohostWantedNote": { "type": ["string", "null"] },
+                    "sessionIds": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    },
+                    "tally": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "interested": { "type": "integer" },
+                        "maybe": { "type": "integer" }
+                      },
+                      "required": ["interested", "maybe"],
+                      "description": "The public tally, from the scheduling phase on; skip votes are only in the breakdown"
+                    },
+                    "breakdown": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "attendees": { "type": "integer" },
+                        "interested": { "type": "integer" },
+                        "maybe": { "type": "integer" },
+                        "skip": { "type": "integer" },
+                        "votes": { "type": "integer" },
+                        "votesPctOfAttendees": { "type": ["number", "null"] },
+                        "nonVoters": { "type": "integer" },
+                        "nonVotersPctOfAttendees": {
+                          "type": ["number", "null"]
+                        },
+                        "interestedPctOfVotes": { "type": ["number", "null"] },
+                        "maybePctOfVotes": { "type": ["number", "null"] },
+                        "skipPctOfVotes": { "type": ["number", "null"] },
+                        "estimatedAttendance": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "low": { "type": "integer" },
+                            "high": { "type": "integer" }
+                          },
+                          "required": ["low", "high"],
+                          "description": "A very rough 50% range of how many people to expect"
+                        },
+                        "noEstimateReason": {
+                          "type": ["string", "null"],
+                          "enum": [
+                            "low-turnout",
+                            "no-interest",
+                            "unknown-event",
+                            null
+                          ]
+                        }
+                      },
+                      "required": [
+                        "attendees",
+                        "interested",
+                        "maybe",
+                        "skip",
+                        "votes",
+                        "votesPctOfAttendees",
+                        "nonVoters",
+                        "nonVotersPctOfAttendees",
+                        "interestedPctOfVotes",
+                        "maybePctOfVotes",
+                        "skipPctOfVotes",
+                        "estimatedAttendance",
+                        "noEstimateReason"
+                      ],
+                      "description": "From the scheduling phase on, shown to a proposal's hosts, and to everyone for a proposal nobody hosts"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "eventId",
+                    "title",
+                    "description",
+                    "durationMinutes",
+                    "createdTime",
+                    "updatedTime",
+                    "hosts",
+                    "cohostWanted",
+                    "cohostWantedNote",
+                    "sessionIds",
+                    "tally",
+                    "breakdown"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/proposals/{id}/hosts": {
+      "post": {
+        "tags": ["proposals"],
+        "description": "Adds the acting guest as a host of a proposal that wants one; its hosts are notified.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Joined" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/proposals/{id}": {
+      "put": {
+        "tags": ["admin"],
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "description": { "type": "string", "default": "" },
+                  "durationMinutes": {
+                    "type": ["integer", "null"],
+                    "minimum": 0,
+                    "default": null
+                  },
+                  "hostIds": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "default": []
+                  },
+                  "expectedUpdatedTime": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": ["title", "expectedUpdatedTime"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated proposal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "eventId": { "type": "string" },
+                    "title": { "type": "string" },
+                    "description": { "type": ["string", "null"] },
+                    "durationMinutes": { "type": ["number", "null"] },
+                    "createdTime": { "type": "string", "format": "date-time" },
+                    "updatedTime": { "type": "string", "format": "date-time" },
+                    "hosts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "name": { "type": "string" }
+                        },
+                        "required": ["id", "name"]
+                      }
+                    },
+                    "cohostWanted": { "type": "boolean" },
+                    "cohostWantedNote": { "type": ["string", "null"] },
+                    "sessionIds": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    },
+                    "tally": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "interested": { "type": "integer" },
+                        "maybe": { "type": "integer" }
+                      },
+                      "required": ["interested", "maybe"],
+                      "description": "The public tally, from the scheduling phase on; skip votes are only in the breakdown"
+                    },
+                    "breakdown": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "attendees": { "type": "integer" },
+                        "interested": { "type": "integer" },
+                        "maybe": { "type": "integer" },
+                        "skip": { "type": "integer" },
+                        "votes": { "type": "integer" },
+                        "votesPctOfAttendees": { "type": ["number", "null"] },
+                        "nonVoters": { "type": "integer" },
+                        "nonVotersPctOfAttendees": {
+                          "type": ["number", "null"]
+                        },
+                        "interestedPctOfVotes": { "type": ["number", "null"] },
+                        "maybePctOfVotes": { "type": ["number", "null"] },
+                        "skipPctOfVotes": { "type": ["number", "null"] },
+                        "estimatedAttendance": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "low": { "type": "integer" },
+                            "high": { "type": "integer" }
+                          },
+                          "required": ["low", "high"],
+                          "description": "A very rough 50% range of how many people to expect"
+                        },
+                        "noEstimateReason": {
+                          "type": ["string", "null"],
+                          "enum": [
+                            "low-turnout",
+                            "no-interest",
+                            "unknown-event",
+                            null
+                          ]
+                        }
+                      },
+                      "required": [
+                        "attendees",
+                        "interested",
+                        "maybe",
+                        "skip",
+                        "votes",
+                        "votesPctOfAttendees",
+                        "nonVoters",
+                        "nonVotersPctOfAttendees",
+                        "interestedPctOfVotes",
+                        "maybePctOfVotes",
+                        "skipPctOfVotes",
+                        "estimatedAttendance",
+                        "noEstimateReason"
+                      ],
+                      "description": "From the scheduling phase on, shown to a proposal's hosts, and to everyone for a proposal nobody hosts"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "eventId",
+                    "title",
+                    "description",
+                    "durationMinutes",
+                    "createdTime",
+                    "updatedTime",
+                    "hosts",
+                    "cohostWanted",
+                    "cohostWantedNote",
+                    "sessionIds",
+                    "tally",
+                    "breakdown"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["admin"],
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Deleted" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/guests/{id}/votes": {
       "get": {
         "tags": ["votes"],

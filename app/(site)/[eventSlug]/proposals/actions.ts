@@ -3,22 +3,21 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { after } from "next/server";
-import { getRepositories } from "@/db/container";
-import { inSchedPhase } from "@schellingboard/domain/phase";
 import { z } from "zod";
 import {
   sessionProposalSchema,
   sessionProposalUpdateSchema,
-  STALE_PROPOSAL_MESSAGE,
 } from "@schellingboard/contracts/session";
+import { proposalUseCases } from "@/server/composition";
+import { resolveActor } from "@/server/kernel/actor";
+import type { AppError } from "@/server/kernel/result";
 import { serverNow } from "@/utils/dev-clock-server";
 import {
+  actingGuestRefusalMessage,
   unverifiedUserMessage,
   verifiedCurrentUser,
 } from "@/utils/acting-guest";
 import { requireSiteAuth } from "@/utils/action-auth";
-import { notifyProposalJoined } from "@/utils/notifications";
 
 export async function createProposal(
   sessionProposal: z.input<typeof sessionProposalSchema>
@@ -27,9 +26,6 @@ export async function createProposal(
   input: unknown
 ): Promise<{ error: string | z.core.$ZodIssue[] } | { success: true }> {
   await requireSiteAuth();
-  // Creating needs a name actually selected, not merely one that isn't being
-  // falsely claimed: a proposal is attributed to its hosts, so an anonymous
-  // caller has no identity to attribute it to.
   const cookieStore = await cookies();
   if (!(await verifiedCurrentUser(cookieStore))) {
     return {
@@ -41,55 +37,17 @@ export async function createProposal(
   if (!parseResult.success) {
     return { error: parseResult.error.issues };
   }
-
-  const {
-    data: {
-      eventId,
-      eventSlug,
-      title,
-      description,
-      hostIds,
-      durationMinutes,
-      cohostWanted,
-      cohostWantedNote,
-    },
-  } = parseResult;
+  const { eventSlug, ...fields } = parseResult.data;
 
   try {
-    const now = await serverNow();
-    // Mirrors the UI: proposals may be added during the proposal and voting
-    // phases; once scheduling starts they are closed.
-    const event = await getRepositories().events.findById(eventId);
-    if (!event || inSchedPhase(event, now)) {
-      return { error: "The proposal phase is over" };
-    }
-
-    const eventGuestIds = new Set(
-      (await getRepositories().guests.listByEvent(eventId)).map((g) => g.id)
+    const result = await proposalUseCases().createProposal(
+      await resolveActor(cookieStore),
+      fields,
+      await serverNow()
     );
-    if (!hostIds.every((id) => eventGuestIds.has(id))) {
-      return {
-        error: [
-          {
-            code: "custom",
-            path: ["hostIds"],
-            message: "A host is not part of this event",
-            input: hostIds,
-          },
-        ],
-      };
+    if (!result.ok) {
+      return refusal(result.error, "creating a proposal", fields.hostIds);
     }
-
-    await getRepositories().sessionProposals.create({
-      eventId,
-      title,
-      description: description || undefined,
-      hostIds,
-      durationMinutes,
-      cohostWanted,
-      cohostWantedNote,
-      createdTime: now,
-    });
     revalidatePath(`/${eventSlug}/proposals`);
   } catch (error) {
     console.error("Error creating proposal:", error);
@@ -98,11 +56,6 @@ export async function createProposal(
   return { success: true };
 }
 
-// Unlike createProposal, this intentionally has no event/phase check: the
-// UI's canEdit() gates editing by ownership only (host or unclaimed
-// proposal), not by phase, so hosts can still fix up or withdraw their own
-// proposal after scheduling starts. Adding a phase gate here would make the
-// server reject an action the UI still offers.
 export async function updateProposal(
   id: string,
   sessionProposal: z.input<typeof sessionProposalUpdateSchema>
@@ -116,69 +69,20 @@ export async function updateProposal(
   if (!parseResult.success) {
     return { error: parseResult.error.issues };
   }
-
-  const {
-    data: {
-      eventSlug,
-      title,
-      description,
-      hostIds,
-      durationMinutes,
-      cohostWanted,
-      cohostWantedNote,
-      expectedUpdatedTime,
-    },
-  } = parseResult;
+  const { eventSlug, expectedUpdatedTime, ...fields } = parseResult.data;
 
   try {
-    const proposal = await getRepositories().sessionProposals.findById(id);
-    if (!proposal) {
-      return { error: "Proposal not found" };
-    }
-
-    if (proposal.hosts.length > 0) {
-      const actor = await verifiedCurrentUser(await cookies());
-      if (!actor || !proposal.hosts.some((h) => h.id === actor)) {
-        return {
-          error:
-            "Only a host may edit this proposal — switch to your name first",
-        };
-      }
-    }
-
-    const eventGuestIds = new Set(
-      (await getRepositories().guests.listByEvent(proposal.eventId)).map(
-        (g) => g.id
-      )
+    const result = await proposalUseCases().updateProposal(
+      await resolveActor(await cookies()),
+      {
+        ...fields,
+        proposalId: id,
+        expectedUpdatedTime: new Date(expectedUpdatedTime),
+      },
+      await serverNow()
     );
-    if (!hostIds.every((hostId) => eventGuestIds.has(hostId))) {
-      return {
-        error: [
-          {
-            code: "custom",
-            path: ["hostIds"],
-            message: "A host is not part of this event",
-            input: hostIds,
-          },
-        ],
-      };
-    }
-
-    // The repository clears durationMinutes only when the key is present, and
-    // zod drops absent optional keys, so it has to be spelled out here for
-    // "no duration selected" to actually clear a previously chosen one.
-    const updated = await getRepositories().sessionProposals.update(id, {
-      title,
-      description: description || undefined,
-      hostIds,
-      durationMinutes,
-      cohostWanted,
-      cohostWantedNote: cohostWantedNote ?? null,
-      expectedUpdatedTime: new Date(expectedUpdatedTime),
-      updatedTime: await serverNow(),
-    });
-    if (!updated) {
-      return { error: STALE_PROPOSAL_MESSAGE };
+    if (!result.ok) {
+      return refusal(result.error, "editing a proposal", fields.hostIds);
     }
     revalidatePath(`/${eventSlug}/proposals`);
   } catch (error) {
@@ -193,36 +97,17 @@ export async function joinProposal(
   eventSlug: string
 ): Promise<{ error: string } | { success: true }> {
   await requireSiteAuth();
-  const cookieStore = await cookies();
-  const actor = await verifiedCurrentUser(cookieStore);
-  if (!actor) {
-    return {
-      error: await unverifiedUserMessage(cookieStore, "hosting a proposal"),
-    };
-  }
-
   try {
-    const repos = getRepositories();
-    const proposal = await repos.sessionProposals.findById(id);
-    if (!proposal) {
-      return { error: "Proposal not found" };
+    const result = await proposalUseCases().joinProposal(
+      await resolveActor(await cookies()),
+      { proposalId: id },
+      await serverNow()
+    );
+    if (!result.ok) {
+      return {
+        error: actingGuestMessage(result.error, "hosting a proposal"),
+      };
     }
-    if (proposal.hosts.some((h) => h.id === actor)) {
-      return { error: "You already host this proposal" };
-    }
-    const eventGuests = await repos.guests.listByEvent(proposal.eventId);
-    if (!eventGuests.some((g) => g.id === actor)) {
-      return { error: "You are not part of this event" };
-    }
-
-    // The repository decides whether a host is still wanted, in the same
-    // transaction that adds one: two volunteers can click at the same moment.
-    const now = await serverNow();
-    const joined = await repos.sessionProposals.addHost(id, actor, now);
-    if (!joined) {
-      return { error: "This proposal is not looking for a host" };
-    }
-    after(() => notifyProposalJoined({ proposalId: id, joinerId: actor, now }));
     revalidatePath(`/${eventSlug}/proposals`);
   } catch (error) {
     console.error("Error joining proposal:", error);
@@ -231,30 +116,19 @@ export async function joinProposal(
   return { success: true };
 }
 
-// Same reasoning as updateProposal: no phase gate, so a host can withdraw
-// their proposal in any phase, including scheduling.
 export async function deleteProposal(
   id: string,
   eventSlug: string
 ): Promise<{ error: string } | undefined> {
   await requireSiteAuth();
   try {
-    const proposal = await getRepositories().sessionProposals.findById(id);
-    if (!proposal) {
-      return { error: "Proposal not found" };
+    const result = await proposalUseCases().deleteProposal(
+      await resolveActor(await cookies()),
+      { proposalId: id }
+    );
+    if (!result.ok) {
+      return { error: result.error.detail ?? "Failed to delete proposal" };
     }
-
-    if (proposal.hosts.length > 0) {
-      const actor = await verifiedCurrentUser(await cookies());
-      if (!actor || !proposal.hosts.some((h) => h.id === actor)) {
-        return {
-          error:
-            "Only a host may delete this proposal — switch to your name first",
-        };
-      }
-    }
-
-    await getRepositories().sessionProposals.delete(id);
     revalidatePath(`/${eventSlug}/proposals`);
   } catch (error) {
     console.error("Error deleting proposal:", error);
@@ -266,4 +140,33 @@ export async function deleteProposal(
   // here replaces that render with the list's. Outside the try: redirect()
   // works by throwing, and the catch above would swallow it.
   redirect(`/${eventSlug}/proposals`);
+}
+
+function actingGuestMessage(error: AppError, task: string): string {
+  return error.code.startsWith("guest.") && error.code !== "guest.notInEvent"
+    ? actingGuestRefusalMessage(error.code, task)
+    : (error.detail ?? "Something went wrong");
+}
+
+function refusal(
+  error: AppError,
+  task: string,
+  hostIds: string[]
+): { error: string | z.core.$ZodIssue[] } {
+  if (error.code === "proposal.hostNotInEvent") {
+    return {
+      error: [
+        {
+          code: "custom",
+          path: ["hostIds"],
+          message: "A host is not part of this event",
+          input: hostIds,
+        },
+      ],
+    };
+  }
+  if (error.code === "event.notFound") {
+    return { error: "The proposal phase is over" };
+  }
+  return { error: actingGuestMessage(error, task) };
 }

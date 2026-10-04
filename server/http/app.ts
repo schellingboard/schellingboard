@@ -1,6 +1,9 @@
 import { getRepositories } from "@/db/container";
 import { proposalUseCases, sessionUseCases } from "@/server/composition";
-import { addProposalRoutes } from "@/server/modules/proposals/module";
+import {
+  addProposalRoutes,
+  addVoteRoutes,
+} from "@/server/modules/proposals/module";
 import {
   addRsvpRoutes,
   addSessionRoutes,
@@ -22,3 +25,4 @@ addHealthRoute(api);
 addSessionRoutes(api, sessionUseCases);
 addRsvpRoutes(api, sessionUseCases);
 addProposalRoutes(api, proposalUseCases);
+addVoteRoutes(api, proposalUseCases);

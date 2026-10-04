@@ -1,5 +1,11 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import { voteCastSchema, voteListSchema } from "@schellingboard/contracts/vote";
+import {
+  adminProposalUpdateSchema,
+  proposalCreateSchema,
+  proposalListSchema,
+  proposalUpdateSchema,
+  proposalViewSchema,
+} from "@schellingboard/contracts/proposal";
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import { problem, problemDefault } from "@/server/http/problem";
 import {
@@ -10,75 +16,181 @@ import {
   type App,
 } from "@/server/http/route-parts";
 import type { ProposalUseCases } from "../application/use-cases";
+import { toProposalView } from "./view";
 
-const voteParams = z.object({
-  id: z.string().min(1),
-  guestId: z.string().min(1),
-});
-
-const listGuestVotes = createRoute({
+const getProposal = createRoute({
   method: "get",
-  path: "/guests/{id}/votes",
-  tags: ["votes"],
-  description: "A protected guest's votes need that guest's verified cookie.",
-  request: { params: idParam, query: z.object({ eventId: z.string().min(1) }) },
+  path: "/proposals/{id}",
+  tags: ["proposals"],
+  request: { params: idParam },
   responses: {
-    200: json(voteListSchema, "The guest's votes in the event"),
+    200: json(proposalViewSchema, "The proposal"),
     ...problemDefault,
   },
 });
 
-const castVote = createRoute({
-  method: "put",
-  path: "/proposals/{id}/votes/{guestId}",
-  tags: ["votes"],
-  description:
-    "Casts or replaces the named guest's vote during voting; a protected guest needs its verified cookie.",
-  request: {
-    headers: idempotencyHeaders,
-    params: voteParams,
-    body: body(voteCastSchema),
+const listProposals = createRoute({
+  method: "get",
+  path: "/proposals",
+  tags: ["proposals"],
+  request: { query: z.object({ eventId: z.string().min(1) }) },
+  responses: {
+    200: json(proposalListSchema, "The event's proposals"),
+    ...problemDefault,
   },
-  responses: { 204: noContent("Voted"), ...problemDefault },
 });
 
-const withdrawVote = createRoute({
+const createProposal = createRoute({
+  method: "post",
+  path: "/proposals",
+  tags: ["proposals"],
+  description:
+    "Proposes a session as the acting guest, until scheduling starts.",
+  request: { headers: idempotencyHeaders, body: body(proposalCreateSchema) },
+  responses: {
+    201: json(proposalViewSchema, "The new proposal"),
+    ...problemDefault,
+  },
+});
+
+const updateProposal = createRoute({
+  method: "put",
+  path: "/proposals/{id}",
+  tags: ["proposals"],
+  description:
+    "Replaces a proposal the acting guest hosts, or one nobody hosts.",
+  request: {
+    headers: idempotencyHeaders,
+    params: idParam,
+    body: body(proposalUpdateSchema),
+  },
+  responses: {
+    200: json(proposalViewSchema, "The updated proposal"),
+    ...problemDefault,
+  },
+});
+
+const joinProposal = createRoute({
+  method: "post",
+  path: "/proposals/{id}/hosts",
+  tags: ["proposals"],
+  description:
+    "Adds the acting guest as a host of a proposal that wants one; its hosts are notified.",
+  request: { headers: idempotencyHeaders, params: idParam },
+  responses: { 204: noContent("Joined"), ...problemDefault },
+});
+
+const deleteProposal = createRoute({
   method: "delete",
-  path: "/proposals/{id}/votes/{guestId}",
-  tags: ["votes"],
-  description: "Withdraws the named guest's vote during voting.",
-  request: { headers: idempotencyHeaders, params: voteParams },
-  responses: { 204: noContent("Withdrawn"), ...problemDefault },
+  path: "/proposals/{id}",
+  tags: ["proposals"],
+  description:
+    "Deletes a proposal the acting guest hosts, or one nobody hosts.",
+  request: { headers: idempotencyHeaders, params: idParam },
+  responses: { 204: noContent("Deleted"), ...problemDefault },
+});
+
+const adminUpdateProposal = createRoute({
+  method: "put",
+  path: "/admin/proposals/{id}",
+  tags: ["admin"],
+  request: {
+    headers: idempotencyHeaders,
+    params: idParam,
+    body: body(adminProposalUpdateSchema),
+  },
+  responses: {
+    200: json(proposalViewSchema, "The updated proposal"),
+    ...problemDefault,
+  },
+});
+
+const adminDeleteProposal = createRoute({
+  method: "delete",
+  path: "/admin/proposals/{id}",
+  tags: ["admin"],
+  request: { headers: idempotencyHeaders, params: idParam },
+  responses: { 204: noContent("Deleted"), ...problemDefault },
 });
 
 export function addProposalRoutes(app: App, proposals: () => ProposalUseCases) {
-  app.openapi(listGuestVotes, async (c) => {
-    const result = await proposals().listGuestVotes(c.var.actor, {
-      guestId: c.req.valid("param").id,
-      event: { id: c.req.valid("query").eventId },
-    });
+  app.openapi(getProposal, async (c) => {
+    const result = await proposals().getProposal(
+      c.var.actor,
+      { proposalId: c.req.valid("param").id },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error);
-    return c.json({ votes: result.value }, 200);
+    return c.json(toProposalView(result.value), 200);
   });
 
-  app.openapi(castVote, async (c) => {
-    const { id, guestId } = c.req.valid("param");
-    const result = await proposals().castVote(
+  app.openapi(listProposals, async (c) => {
+    const result = await proposals().listProposals(
       c.var.actor,
-      { proposalId: id, guestId, choice: c.req.valid("json").choice },
+      c.req.valid("query"),
+      c.var.now
+    );
+    if (!result.ok) return problem(result.error);
+    return c.json({ proposals: result.value.map(toProposalView) }, 200);
+  });
+
+  app.openapi(createProposal, async (c) => {
+    const result = await proposals().createProposal(
+      c.var.actor,
+      c.req.valid("json"),
+      c.var.now
+    );
+    if (!result.ok) return problem(result.error);
+    return c.json(toProposalView(result.value), 201);
+  });
+
+  app.openapi(updateProposal, async (c) => {
+    const { expectedUpdatedTime, ...input } = c.req.valid("json");
+    const result = await proposals().updateProposal(
+      c.var.actor,
+      {
+        ...input,
+        proposalId: c.req.valid("param").id,
+        expectedUpdatedTime: new Date(expectedUpdatedTime),
+      },
+      c.var.now
+    );
+    if (!result.ok) return problem(result.error);
+    return c.json(toProposalView(result.value), 200);
+  });
+
+  app.openapi(joinProposal, async (c) => {
+    const result = await proposals().joinProposal(
+      c.var.actor,
+      { proposalId: c.req.valid("param").id },
       c.var.now
     );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);
   });
 
-  app.openapi(withdrawVote, async (c) => {
-    const { id, guestId } = c.req.valid("param");
-    const result = await proposals().withdrawVote(
+  app.openapi(deleteProposal, async (c) => {
+    const result = await proposals().deleteProposal(c.var.actor, {
+      proposalId: c.req.valid("param").id,
+    });
+    if (!result.ok) return problem(result.error);
+    return c.body(null, 204);
+  });
+
+  app.openapi(adminUpdateProposal, async (c) => {
+    const result = await proposals().adminUpdateProposal(
       c.var.actor,
-      { proposalId: id, guestId },
+      { ...c.req.valid("json"), id: c.req.valid("param").id },
       c.var.now
     );
+    if (!result.ok) return problem(result.error);
+    return c.json(toProposalView(result.value), 200);
+  });
+
+  app.openapi(adminDeleteProposal, async (c) => {
+    const result = await proposals().adminDeleteProposal(c.var.actor, {
+      id: c.req.valid("param").id,
+    });
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);
   });

@@ -1,10 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getRepositories } from "@/db/container";
-import { isAdminRequest } from "@/utils/acting-admin";
+import { cookies } from "next/headers";
+import { proposalUseCases } from "@/server/composition";
+import { resolveActor } from "@/server/kernel/actor";
 import { serverNow } from "@/utils/dev-clock-server";
-import { STALE_PROPOSAL_MESSAGE } from "@schellingboard/contracts/session";
 import type { AdminActionResult } from "./admin-guests";
 
 export type AdminProposalInput = {
@@ -25,66 +25,38 @@ function revalidateEventPaths(eventId: string) {
 export async function adminUpdateProposalAction(
   input: AdminProposalInput
 ): Promise<AdminActionResult> {
-  if (!(await isAdminRequest())) return { ok: false, error: "Unauthorized" };
-
-  const title = input.title.trim();
-  if (!title) return { ok: false, error: "Title is required" };
-
-  if (
-    input.durationMinutes !== null &&
-    (!Number.isInteger(input.durationMinutes) ||
-      !Number.isFinite(input.durationMinutes) ||
-      input.durationMinutes < 0)
-  ) {
-    return { ok: false, error: "Duration must be a non-negative integer" };
+  const actor = await resolveActor(await cookies());
+  const result = await proposalUseCases().adminUpdateProposal(
+    actor,
+    input,
+    await serverNow()
+  );
+  if (!result.ok) {
+    return {
+      ok: false,
+      error: result.error.detail ?? "Failed to update proposal",
+    };
   }
-
-  const hostIds = [...new Set(input.hostIds.filter(Boolean))];
-
-  const { sessionProposals, guests } = getRepositories();
-  const proposal = await sessionProposals.findById(input.id);
-  if (!proposal) return { ok: false, error: "Proposal not found" };
-
-  for (const guestId of hostIds) {
-    if (!(await guests.findById(guestId))) {
-      return { ok: false, error: `Guest not found: ${guestId}` };
-    }
-  }
-
-  const expectedUpdatedTime = new Date(input.expectedUpdatedTime);
-  if (Number.isNaN(expectedUpdatedTime.getTime())) {
-    return { ok: false, error: "Invalid expectedUpdatedTime" };
-  }
-
-  const updated = await sessionProposals.update(input.id, {
-    title,
-    description: input.description.trim(),
-    durationMinutes: input.durationMinutes,
-    hostIds,
-    expectedUpdatedTime,
-    updatedTime: await serverNow(),
-  });
-  if (!updated) return { ok: false, error: STALE_PROPOSAL_MESSAGE };
-
-  revalidateEventPaths(proposal.eventId);
+  revalidateEventPaths(result.value.eventId);
   return { ok: true };
 }
 
 export async function adminDeleteProposalAction(input: {
   id: string;
 }): Promise<AdminActionResult> {
-  if (!(await isAdminRequest())) return { ok: false, error: "Unauthorized" };
-
-  const { sessionProposals } = getRepositories();
-  const proposal = await sessionProposals.findById(input.id);
-  if (!proposal) return { ok: false, error: "Proposal not found" };
-
+  const actor = await resolveActor(await cookies());
+  let result;
   try {
-    await sessionProposals.delete(input.id);
+    result = await proposalUseCases().adminDeleteProposal(actor, input);
   } catch {
     return { ok: false, error: "Failed to delete proposal" };
   }
-
-  revalidateEventPaths(proposal.eventId);
+  if (!result.ok) {
+    return {
+      ok: false,
+      error: result.error.detail ?? "Failed to delete proposal",
+    };
+  }
+  revalidateEventPaths(result.value.eventId);
   return { ok: true };
 }

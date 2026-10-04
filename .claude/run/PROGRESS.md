@@ -1,6 +1,6 @@
 # Run progress
 
-Next step: 6.
+Next step: 6b.
 
 ## Decisions
 
@@ -123,10 +123,41 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
 - Step 5: the vote breakdown is server-rendered from proposal data, not served by
   any route in this step; its privacy rule moves with proposals (step 6).
   `app/api/admin/create-rsvp` stays for step 10 (`admin/*` routes).
+- Step 6a: the vote-breakdown rule lives in the proposals module's `presenter`
+  (`application/queries.ts`): `getProposal`/`listProposals` (which take `now`) and
+  every proposal the API returns carry a public `tally` (interested, maybe) and a
+  `breakdown` (`proposalVoteStats`, skip votes and total included). As in the UI,
+  both are `null` for everyone before the scheduling phase; from then on the tally
+  is public and the breakdown is `null` unless the proposal has no host or the
+  viewer hosts it. Skip and total counts never leave the breakdown. "Is the viewer
+  a host" uses the #370 rule (`actingGuest`): an open cookie for an unprotected
+  guest counts; a protected guest only with its verified cookie. Admins are not
+  hosts (as in the UI). The API only: the proposal pages still render from the
+  repository, where `view-proposal.tsx` (`canEdit`) takes the host from the cookie
+  even when unverified, so the stricter host check does not reach the UI yet;
+  routing the pages through the use cases is left for the UI's move to the API.
+- Step 6a: routes `GET /proposals?eventId=`, `GET/PUT/DELETE /proposals/{id}`,
+  `POST /proposals` (201), `POST /proposals/{id}/hosts` (join as the acting guest,
+  204), `PUT/DELETE /admin/proposals/{id}`; contract
+  `@schellingboard/contracts/proposal`. Vote routes moved to `http/vote-routes.ts`
+  (`addVoteRoutes`). Codes: `proposal.notFound`, `event.notFound`,
+  `event.proposalsClosed`, `proposal.hostNotInEvent`, `proposal.notHost`,
+  `proposal.stale` (409), `proposal.alreadyHost` (409), `proposal.hostNotWanted`
+  (409), `guest.notInEvent`, `admin.required`, `proposal.titleRequired`,
+  `proposal.durationInvalid`, `proposal.hostUnknown`,
+  `proposal.expectedUpdatedTimeInvalid`. The join notification is a port
+  (`notifyProposalJoined`), wired in `composition.ts` through Next's `after()` as
+  before. `createProposal` keeps its acting-guest check before parsing in the
+  action (legacy order), the use case checks again.
 
 ## Questions
 
-None open.
+- The proposal pages pass whole `SessionProposal`s, skip and total counts
+  included, to client components in every phase, so the browser already holds
+  what the API now withholds before scheduling; the voting phase's "Fewest votes
+  first" order and quick voting need them. When the UI moves to the API, should
+  that order be served by the API (no counts) and the counts left out of the
+  page payloads?
 
 ## Log
 
@@ -178,3 +209,13 @@ None open.
   baseline or known flakes (`kiosk.spec.ts:18`, `schedule-agenda:220`); every rsvp,
   voting, view-session and update-session spec passed. No user-facing change, no
   CHANGELOG entry.
+- Step 6a: proposal use cases (get, list, create, update, join, delete, admin
+  update/delete) with the breakdown rule, `/api/v1` proposal routes, the proposal
+  actions and admin proposal actions delegate. format, lint, arch, openapi-check,
+  typecheck, test-coverage pass. Firefox E2E cannot run (Playwright CDN blocked);
+  full suite on Chromium: 176 passed, 18 failed, 1 flaky, all in the known
+  baseline or known flakes (`profile-comments:95`, `schedule-agenda:220`,
+  `view-session:7`, flaky `kiosk:18`); every proposal, voting and admin-proposal
+  spec passed. No user-facing change, no CHANGELOG entry.
+- Step 6a review: the API sent the tally and breakdown in every phase; they are now
+  `null` before scheduling, as in the UI (test added).

@@ -46,7 +46,15 @@ family delegate to the use cases. Keep each legacy route's response shape.
       `update-session`, `delete-session`, `session`, `admin-sessions`.
 - [x] 5. **RSVPs and votes**: `toggle-rsvp`, `rsvps`, `add-vote`, `delete-vote`,
       `votes`, `admin-rsvps`.
-- [ ] 6. **Proposals and comments**: `proposal`, `admin-proposals`, comment actions.
+- [x] 6a. **Proposals**: use cases for get, list, create, update, join (with its
+      notification), delete, and admin update/delete, with the vote-breakdown privacy
+      rule enforced in get/list and in the API responses; /api/v1 routes plus
+      `/api/v1/admin/proposals/{id}`; `app/(site)/[eventSlug]/proposals/actions.ts` and
+      `app/actions/admin-proposals.ts` delegate. `app/api/admin/create-proposal` stays
+      for step 10.
+- [ ] 6b. **Comments**: a comments module for proposals, sessions and profiles (list,
+      create, edit, like, delete) and its routes; `app/(site)/[eventSlug]/comment-actions.ts`
+      and the three `app/api/{proposal,session,profile}/[id]/comments` routes delegate.
 - [ ] 7. **Meetings**: `meetings` route and actions, `admin-meetings`.
 - [ ] 8. **People and own settings**: `profile`, `settings`, `notifications`, `push`,
       `attendee-count`.
