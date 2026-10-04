@@ -40,6 +40,16 @@ module.exports = {
       to: { pathNot: "^(packages/(contracts|domain)/|node_modules/zod/)" },
     },
     {
+      name: "api-client-imports-only-openapi-fetch",
+      severity: "error",
+      comment:
+        "`packages/api-client` is generated from `openapi.json` (`make openapi`) plus a " +
+        "thin `openapi-fetch` wrapper. Its types come from the document, not from the " +
+        "server's code or the contracts, so it describes only what goes over the wire.",
+      from: { path: "^packages/api-client/" },
+      to: { pathNot: "^(packages/api-client/|node_modules/openapi-fetch/)" },
+    },
+    {
       name: "packages-declare-their-dependencies",
       severity: "error",
       comment:

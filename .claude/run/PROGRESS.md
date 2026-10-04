@@ -1,6 +1,6 @@
 # Run progress
 
-Next step: 11.
+Next step: 12.
 
 ## Decisions
 
@@ -331,6 +331,26 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   requests only: `create-location` now refuses a non-boolean `bookable`
   (`location.invalid`, 400) instead of storing it in the boolean column.
 
+- Step 11: `packages/api-client` (`@schellingboard/api-client`): `src/schema.ts` holds
+  openapi-typescript 7.13.0's types for `openapi.json` (peer `typescript ^5.x`; it runs
+  fine on the repo's 6.0.3, bun only warns), `src/index.ts` is `createApiClient(options)`
+  over openapi-fetch 0.17.0 (`createClient<paths>`; paths carry `/api/v1`, so
+  `baseUrl` is the site origin). The generated types are committed, like `openapi.json`:
+  `make openapi` writes both from the same document and `make openapi-check` (precommit,
+  CI lint job) fails on either being stale. Generating at build time instead would
+  need a step before every `tsc`, ESLint, depcruise, Vitest and `next build` run (the
+  root tsconfig includes `packages/`), the Dockerfile included, and leave editors
+  without types. The root takes the package as a devDependency (tests only; nothing in
+  the app imports it, so the standalone build does not carry it). Dockerfile: one
+  `COPY` of the new manifest (frozen install needs every workspace's). Depcruise rule
+  `api-client-imports-only-openapi-fetch`. **Deviation**: PLAN step 11 and
+  `03-server.md` ("`api-client` is generated from it in the build") ask for build-time
+  generation; committed output plus `openapi-check` keeps their intent (one source,
+  `openapi.json`; cannot go stale). Left for step 12: reword that `03-server.md` line
+  and `07-repo-and-rules.md` ("generated; do not edit" → generated, committed); ADR 0012
+  section 6 still says the client comes "in a later step"; ADR 0010 and docs do not
+  list the package.
+
 ## Questions
 
 - Each module's `*-use-cases.test.ts` (steps 4–6b) re-tests rules the legacy action
@@ -471,3 +491,10 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   179 passed, 12 failed, 4 flaky, all in the known baseline or known flakes
   (`kiosk:18`, `view-session:7`/`:45`). No E2E test calls these routes. No
   user-facing change, no CHANGELOG entry.
+- Step 11: `packages/api-client` generated from `openapi.json` by `make openapi`,
+  checked by `make openapi-check`; `tests/integration/api-client.test.ts` calls
+  `GET /api/v1/admin/events` (and its 401 problem) through the client and the real
+  proxy. format, lint, arch, openapi-check, typecheck,
+  test-coverage pass. No app code changed, so no E2E run; `make test-e2e-docker`
+  cannot run here (Dockerfile gained one manifest `COPY`). No user-facing change, no
+  CHANGELOG entry.

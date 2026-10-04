@@ -72,7 +72,7 @@ family delegate to the use cases. Keep each legacy route's response shape.
       (events by slug, no phase/future gates, auto-adding hosts/locations to the event,
       capacity, 200-existing vs 201-new) and `/api/v1` equivalents only where none
       exist.
-- [ ] 11. **`packages/api-client`**: generated from `openapi.json` in the build; one
+- [x] 11. **`packages/api-client`**: generated from `openapi.json` in the build; one
       integration test calls the API through it.
 - [ ] 12. **Docs**: API page under `docs/public/self-hosting/`; a `docs/dev/` note;
       step 3 status in `10-path-from-here.md`; one CHANGELOG bullet; ADR 0012 text

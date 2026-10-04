@@ -7,6 +7,7 @@ COPY package.json bun.lock ./
 # A frozen install fails unless every workspace's manifest is present.
 COPY packages/domain/package.json packages/domain/
 COPY packages/contracts/package.json packages/contracts/
+COPY packages/api-client/package.json packages/api-client/
 RUN bun install --frozen-lockfile
 
 FROM node:22-bookworm AS builder
