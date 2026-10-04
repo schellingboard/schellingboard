@@ -104,13 +104,15 @@ module.exports = {
       name: "app-reaches-server-through-module-ts",
       severity: "error",
       comment:
-        "`app/` calls the server through a module's `module.ts`, the kernel's actor and " +
-        "Result, or the API mount; a module's internals are private. See ADR 0012.",
+        "`app/` calls the server through a module's `module.ts`, the use cases wired in " +
+        "`composition.ts`, the kernel's actor and Result, or the API mount; a module's " +
+        "internals are private. See ADR 0012.",
       from: { path: "^app/" },
       to: {
         path: "^server/",
         pathNot: [
           "^server/modules/[^/]+/module\\.ts$",
+          "^server/composition\\.ts$",
           "^server/kernel/",
           "^server/http/app\\.ts$",
         ],

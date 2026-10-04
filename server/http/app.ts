@@ -1,4 +1,6 @@
 import { getRepositories } from "@/db/container";
+import { sessionUseCases } from "@/server/composition";
+import { addSessionRoutes } from "@/server/modules/sessions/module";
 import { actorMiddleware } from "./actor";
 import { createApp } from "./create-app";
 import { addHealthRoute } from "./health";
@@ -13,3 +15,4 @@ api.use(
   idempotencyMiddleware({ store: () => getRepositories().idempotency })
 );
 addHealthRoute(api);
+addSessionRoutes(api, sessionUseCases);

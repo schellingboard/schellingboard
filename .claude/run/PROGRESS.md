@@ -1,6 +1,6 @@
 # Run progress
 
-Next step: 4.
+Next step: 5.
 
 ## Decisions
 
@@ -69,10 +69,38 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   idempotency wiring, since no mutating route exists.
 - Left for the first multipart route (avatar upload, guest import): the body hash
   covers the raw bytes, and clients pick a new multipart boundary per attempt, so a
-  retry would get `422 idempotency.keyReused`; hash the parsed form there. Requests
-  with neither admin nor guest all share the scope `-:-`; give them a scope (or ignore
-  the key) before any route accepts them. Responses are stored as text, so a route
+  retry would get `422 idempotency.keyReused`; hash the parsed form there (the `-:-`
+  anonymous scope was settled in step 4). Responses are stored as text, so a route
   answering binary must not be replayed as is.
+- Step 4: `server/modules/sessions/` (`module.ts`, `ports.ts`, `application/`,
+  `http/`); `server/composition.ts` wires use cases per call (`sessionUseCases()`;
+  tests swap the container). `app/` may import `composition.ts` (depcruise rule and
+  ADR 0012 section 2 amended): `composition.ts` imports each `module.ts`, so a
+  `module.ts` cannot export wired use cases. Use cases are
+  `(deps) => (actor, input, now)`: `now` is per request (dev fake clock), set by the
+  actor middleware as `c.var.now`. Kernel `actingGuest(actor, guests)` (#370 rule):
+  `guest.unselected` (no cookie or unknown guest) or `guest.protected`.
+- Step 4: routes `GET/POST /sessions`, `GET/PUT/DELETE /sessions/{id}`,
+  `POST /admin/sessions`, `PUT/DELETE /admin/sessions/{id}` (PUT: both edits are
+  full replacements). Problems are each route's `default` response
+  (`problemDefault`, `problem(error)` in `server/http/problem.ts`); contract
+  `@schellingboard/contracts/problem`. `idempotencyHeaders` declared on every
+  mutation. Codes: `session.notFound`, `event.notFound`, `event.notSchedulingPhase`,
+  `session.dayUnknown`, `session.outsideBookingWindow`, `session.durationNotAllowed`,
+  `session.hostNotInEvent`, `session.locationNotBookable`, `session.capacityInvalid`,
+  `session.locationUnavailable`, `session.started`, `session.notHost`,
+  `session.managedByOrganizer`, `session.timeRangeInvalid`, `admin.required`, and the
+  placement codes in `@schellingboard/domain/session-booking`
+  (`SESSION_PLACEMENT_CODES`; `session.clash` is 409). Legacy routes keep their
+  check order (day before authorization on update) and map codes back to their old
+  bodies; placement codes stay `Response.error()`. Booking rules moved from
+  `app/api/session-form-utils.ts` to `packages/domain/src/session-booking.ts`.
+- Step 4: anonymous idempotency: a request with neither admin nor guest has its
+  `Idempotency-Key` ignored (runs, nothing stored), so anonymous clients never share
+  a scope; recorded in ADR 0012 section 5. Every mutation so far refuses such a
+  request anyway.
+- Step 4: the legacy `session/[sessionId]/comments` route only delegates its
+  session-exists check to `getSession`; listing comments moves with comments (step 6).
 
 ## Questions
 
@@ -109,3 +137,13 @@ None open.
   format, lint, arch, openapi-check, typecheck, test-coverage pass. Firefox E2E cannot
   run (Playwright CDN blocked); on Chromium `user-auth.spec.ts` passes (app boots with
   the migration and the new job). No user-facing change, no CHANGELOG entry.
+- Step 4: sessions module, `/api/v1` session routes (guest and admin), legacy
+  `add-session`, `update-session`, `delete-session`, `admin-sessions` actions and the
+  session-comments existence check delegate to the use cases; `v1/[[...route]]` moved
+  to a guard verifier. format, lint, arch, openapi-check, typecheck, test-coverage
+  pass. Firefox E2E cannot run (Playwright CDN blocked); full suite on Chromium: 174
+  passed, failures only the known baseline plus known flakes (`schedule-agenda:220`,
+  `view-session:7`/`:45`) and `kiosk.spec.ts:18`, which also fails on the parent
+  commit (2 of 2); flaky `profile.spec.ts:383` passes on rerun. Session specs
+  (`update-session`, `scheduling`, `rsvp`, `disabled-hints`) pass with retries 0.
+  No user-facing change, no CHANGELOG entry.

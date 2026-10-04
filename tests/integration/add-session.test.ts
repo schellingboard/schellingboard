@@ -673,6 +673,16 @@ describe("POST /api/add-session", () => {
     expect(sessions).toHaveLength(1);
   });
 
+  it("refuses a caller without a name before reading hosts or location", async () => {
+    const day = await createDay(
+      (await createEvent({ phase: "scheduling" })).id
+    );
+
+    const res = await POST(makeReq({ title: "T", dayId: day.id }));
+
+    expect(res.status).toBe(403);
+  });
+
   // Route does not guard req.json() — parse errors surface as a thrown SyntaxError
   it("malformed JSON causes a SyntaxError", async () => {
     const guest = await createGuest();

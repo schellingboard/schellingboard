@@ -36,7 +36,7 @@ import {
   buildSessionInterval,
   CAPACITY_ERROR,
   sessionHasStarted,
-} from "@/app/api/session-form-utils";
+} from "@schellingboard/domain/session-booking";
 import { revalidateEvent } from "./session-actions";
 import { detectGuestClashes, type GuestClash } from "./clash-actions";
 import { MarkdownHint } from "@/app/(site)/markdown";

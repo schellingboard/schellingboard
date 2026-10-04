@@ -1,8 +1,9 @@
 import { getCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
 import { resolveActor, type Actor } from "@/server/kernel/actor";
+import { requestNow } from "@/utils/dev-clock";
 
-export type ApiEnv = { Variables: { actor: Actor } };
+export type ApiEnv = { Variables: { actor: Actor; now: Date } };
 
 export const actorMiddleware = createMiddleware<ApiEnv>(async (c, next) => {
   c.set(
@@ -14,5 +15,6 @@ export const actorMiddleware = createMiddleware<ApiEnv>(async (c, next) => {
       },
     })
   );
+  c.set("now", requestNow(c.req.raw));
   await next();
 });

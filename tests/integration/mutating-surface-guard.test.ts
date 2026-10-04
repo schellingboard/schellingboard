@@ -95,7 +95,6 @@ const READ_ONLY = new Set([
   "session/[sessionId]/comments",
   "profile/[profileId]/comments",
   "proposal/[proposalId]/comments",
-  "v1/[[...route]]",
 ]);
 
 type Verifier = () => Promise<void>;
@@ -177,6 +176,35 @@ const VERIFIERS: Record<string, Verifier> = {
         method: "POST",
         body: JSON.stringify({ id: session.id }),
         headers: { cookie: `${GUEST_COOKIE_NAME}=${openGuestValue(host.id)}` },
+      })
+    );
+    expect(res.status).toBe(403);
+  },
+
+  "v1/[[...route]]": async () => {
+    const { POST } = await import("@/app/api/v1/[[...route]]/route");
+    const event = await createEvent({ phase: "scheduling" });
+    const guest = await createGuest({ eventId: event.id });
+    await protectGuest(guest.id);
+    const location = await createLocation({ eventId: event.id });
+    const day = await createDay(event.id);
+    const res = await POST(
+      new NextRequest("http://test/api/v1/sessions", {
+        method: "POST",
+        body: JSON.stringify({
+          dayId: day.id,
+          title: "T",
+          description: "",
+          closed: false,
+          hostIds: [guest.id],
+          locationId: location.id,
+          startTime: slotStart(day, 60),
+          durationMinutes: 60,
+        }),
+        headers: {
+          "content-type": "application/json",
+          cookie: `${GUEST_COOKIE_NAME}=${openGuestValue(guest.id)}`,
+        },
       })
     );
     expect(res.status).toBe(403);

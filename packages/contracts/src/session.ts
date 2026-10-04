@@ -33,3 +33,77 @@ export const sessionProposalUpdateSchema = sessionProposalSchema
 
 export const STALE_PROPOSAL_MESSAGE =
   "Someone changed this proposal while you edited it. Copy your edits somewhere safe: reloading the page discards them.";
+
+const instant = z.iso.datetime({ offset: true });
+
+export const sessionViewSchema = z.object({
+  id: z.string(),
+  eventId: z.string(),
+  title: z.string(),
+  description: z.string(),
+  startTime: instant.nullable(),
+  endTime: instant.nullable(),
+  capacity: z.number().int(),
+  adminManaged: z.boolean(),
+  blocker: z.boolean(),
+  closed: z.boolean(),
+  proposalId: z.string().nullable(),
+  hosts: z.array(z.object({ id: z.string(), name: z.string() })),
+  locations: z.array(
+    z.object({ id: z.string(), name: z.string(), color: z.string() })
+  ),
+  numRsvps: z.number().int(),
+});
+
+export const sessionListSchema = z.object({
+  sessions: z.array(sessionViewSchema),
+});
+
+const bookingFields = {
+  dayId: z.string().min(1),
+  title: z.string(),
+  description: z.string().default(""),
+  closed: z.boolean().default(false),
+  hostIds: z.array(z.string()),
+  startTime: instant.describe(
+    "Start of the slot picked; the session starts after the event's break"
+  ),
+  durationMinutes: z.number().int().positive(),
+  capacity: z
+    .number()
+    .int()
+    .min(0)
+    .optional()
+    .describe("Attendee maximum, 0 for none; absent takes the room's"),
+  proposalId: z.string().min(1).optional(),
+};
+
+export const sessionCreateSchema = z.object({
+  ...bookingFields,
+  locationId: z.string().min(1),
+});
+
+export const sessionUpdateSchema = z.object({
+  ...bookingFields,
+  locationIds: z.array(z.string()).min(1),
+});
+
+const adminFields = {
+  title: z.string(),
+  description: z.string().default(""),
+  startTime: instant.nullable(),
+  endTime: instant.nullable(),
+  capacity: z.number().int().min(0).default(0),
+  adminManaged: z.boolean().default(false),
+  blocker: z.boolean().default(false),
+  closed: z.boolean().default(false),
+  hostIds: z.array(z.string()).default([]),
+  locationIds: z.array(z.string()).default([]),
+};
+
+export const adminSessionCreateSchema = z.object({
+  ...adminFields,
+  eventId: z.string().min(1),
+});
+
+export const adminSessionUpdateSchema = z.object(adminFields);

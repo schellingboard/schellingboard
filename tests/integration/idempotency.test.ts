@@ -92,12 +92,26 @@ describe("Idempotency-Key", () => {
 
   it("replays a response without a body", async () => {
     const app = testApp();
-    const init = { method: "DELETE", headers: { "idempotency-key": "k1" } };
+    const init = {
+      method: "DELETE",
+      headers: {
+        "idempotency-key": "k1",
+        cookie: `${GUEST_COOKIE_NAME}=${openGuestValue("g1")}`,
+      },
+    };
     await app.request("/things/1", init);
     const retry = await app.request("/things/1", init);
     expect(calls).toBe(1);
     expect(retry.status).toBe(204);
     expect(await retry.text()).toBe("");
+  });
+
+  it("ignores the key of a request with neither admin nor guest", async () => {
+    const app = testApp();
+    const init = { method: "DELETE", headers: { "idempotency-key": "k1" } };
+    await app.request("/things/1", init);
+    await app.request("/things/1", init);
+    expect(calls).toBe(2);
   });
 
   it("runs every request that carries no key", async () => {

@@ -1,12 +1,11 @@
-import type { AppError, ErrorKind } from "@/server/kernel/result";
-
-const STATUS_BY_KIND: Record<ErrorKind, number> = {
-  invalid: 400,
-  forbidden: 403,
-  notFound: 404,
-  conflict: 409,
-  gone: 410,
-};
+import type { TypedResponse } from "hono";
+import { problemSchema } from "@schellingboard/contracts/problem";
+import type { z } from "zod";
+import {
+  HTTP_STATUS_BY_KIND,
+  type AppError,
+  type ErrorKind,
+} from "@/server/kernel/result";
 
 const TITLES: Record<number, string> = {
   400: "Bad Request",
@@ -45,8 +44,25 @@ export function problemResponse({ status, ...rest }: Problem): Response {
 
 export function problemFromError(error: AppError): Response {
   return problemResponse({
-    status: STATUS_BY_KIND[error.kind],
+    status: HTTP_STATUS_BY_KIND[error.kind],
     code: error.code,
     ...(error.detail === undefined ? {} : { detail: error.detail }),
   });
 }
+
+type ProblemStatus = (typeof HTTP_STATUS_BY_KIND)[ErrorKind];
+
+// For a route's handler: the route declares problems as its `default` response.
+export function problem(
+  error: AppError
+): Response &
+  TypedResponse<z.infer<typeof problemSchema>, ProblemStatus, "json"> {
+  return problemFromError(error) as never;
+}
+
+export const problemDefault = {
+  default: {
+    description: "Problem details (RFC 9457); clients branch on `code`",
+    content: { "application/problem+json": { schema: problemSchema } },
+  },
+} as const;

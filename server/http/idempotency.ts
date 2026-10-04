@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { createMiddleware } from "hono/factory";
+import { z } from "zod";
 import type { Repositories } from "@/db/container";
 import type { Actor } from "@/server/kernel/actor";
 import { IDEMPOTENCY_TTL_MS } from "@/utils/jobs/idempotency";
@@ -12,9 +13,22 @@ const ABANDONED_AFTER_MS = 60 * 1000;
 const MAX_KEY_LENGTH = 255;
 const MUTATIONS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
-function actorScope({ admin, guest }: Actor): string {
+// Requests with neither admin nor guest have no one to scope a key to, so for
+// them the key is ignored rather than shared by every anonymous client.
+function actorScope({ admin, guest }: Actor): string | null {
+  if (!admin && !guest) return null;
   return `${admin ? "admin" : "-"}:${guest ? `${guest.level}:${guest.id}` : "-"}`;
 }
+
+// Declared on each mutating route so the OpenAPI document shows it.
+export const idempotencyHeaders = z.object({
+  "idempotency-key": z
+    .string()
+    .min(1)
+    .max(MAX_KEY_LENGTH)
+    .optional()
+    .describe("Retries with the same key get the first response (24 h)"),
+});
 
 function pathAndQuery(url: string): string {
   const { pathname, search } = new URL(url);
@@ -45,8 +59,9 @@ export function idempotencyMiddleware({
       });
     }
 
-    const repo = store();
     const actor = actorScope(c.var.actor);
+    if (actor === null) return next();
+    const repo = store();
     const body = await c.req.raw.clone().arrayBuffer();
     const at = now();
     const claim = await repo.claim(

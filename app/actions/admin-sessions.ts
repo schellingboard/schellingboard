@@ -1,11 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { getRepositories } from "@/db/container";
-import { isAdminRequest } from "@/utils/acting-admin";
+import { sessionUseCases } from "@/server/composition";
+import { resolveActor } from "@/server/kernel/actor";
+import type { Result } from "@/server/kernel/result";
+import type { Session } from "@schellingboard/domain/session";
 import { serverNow } from "@/utils/dev-clock-server";
-import { notifyCohostsAdded } from "@/utils/notifications";
-import { nudgeJobs } from "@/utils/jobs/nudge";
 import type { AdminActionResult } from "./admin-guests";
 
 export type AdminSessionInput = {
@@ -22,43 +24,6 @@ export type AdminSessionInput = {
   locationIds: string[];
 };
 
-// Times must form a valid interval: both set (end after start) or both empty.
-function parseTimeRange(
-  startTime: string | null,
-  endTime: string | null
-): { start?: Date; end?: Date } | { error: string } {
-  if (!startTime && !endTime) return {};
-  if (!startTime || !endTime)
-    return { error: "Start and end time must both be set or both empty" };
-  const start = new Date(startTime);
-  const end = new Date(endTime);
-  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()))
-    return { error: "Invalid start or end time" };
-  if (end <= start) return { error: "End time must be after start time" };
-  return { start, end };
-}
-
-// Mirrors the user-facing rule (validateSession in app/api/session-form-utils.ts):
-// two sessions conflict when they share a location and their times overlap.
-async function findLocationConflict(
-  eventId: string,
-  range: { start?: Date; end?: Date },
-  locationIds: string[],
-  excludeId?: string
-): Promise<string | null> {
-  const { start, end } = range;
-  if (!start || !end || locationIds.length === 0) return null;
-  const { sessions } = getRepositories();
-  const conflict = await sessions.findLocationConflict(
-    eventId,
-    start,
-    end,
-    locationIds,
-    excludeId
-  );
-  return conflict ? `Overlaps "${conflict.title}" in the same location` : null;
-}
-
 // The attendee-facing schedule fetches the session list in the shared
 // [eventSlug] layout (see app/(site)/[eventSlug]/session-actions.ts), so the
 // public layout must be revalidated alongside the admin pages.
@@ -70,6 +35,21 @@ async function revalidateEventPaths(eventId: string) {
   if (event) revalidatePath(`/${event.slug}`, "layout");
 }
 
+async function settle(
+  run: () => Promise<Result<Session>>,
+  failure: string
+): Promise<AdminActionResult> {
+  let result;
+  try {
+    result = await run();
+  } catch {
+    return { ok: false, error: failure };
+  }
+  if (!result.ok) return { ok: false, error: result.error.detail ?? failure };
+  await revalidateEventPaths(result.value.eventId);
+  return { ok: true };
+}
+
 export type AdminSessionCreateInput = Omit<AdminSessionInput, "id"> & {
   eventId: string;
 };
@@ -77,138 +57,32 @@ export type AdminSessionCreateInput = Omit<AdminSessionInput, "id"> & {
 export async function adminCreateSessionAction(
   input: AdminSessionCreateInput
 ): Promise<AdminActionResult> {
-  if (!(await isAdminRequest())) return { ok: false, error: "Unauthorized" };
-
-  const title = input.title.trim();
-  if (!title) return { ok: false, error: "Title is required" };
-
-  const range = parseTimeRange(input.startTime, input.endTime);
-  if ("error" in range) return { ok: false, error: range.error };
-
-  if (!Number.isInteger(input.capacity) || input.capacity < 0)
-    return { ok: false, error: "Capacity must be a non-negative whole number" };
-
-  const { sessions, events } = getRepositories();
-  const event = await events.findById(input.eventId);
-  if (!event) return { ok: false, error: "Event not found" };
-
-  const conflict = await findLocationConflict(
-    input.eventId,
-    range,
-    input.locationIds
-  );
-  if (conflict) return { ok: false, error: conflict };
-
-  let created;
-  try {
-    created = await sessions.create({
-      title,
-      description: input.description.trim(),
-      startTime: range.start,
-      endTime: range.end,
-      capacity: input.capacity,
-      adminManaged: input.adminManaged,
-      blocker: input.blocker,
-      closed: input.closed,
-      eventId: input.eventId,
-      hostIds: input.hostIds,
-      locationIds: input.locationIds,
-    });
-  } catch {
-    return { ok: false, error: "Failed to create session" };
-  }
-
-  await revalidateEventPaths(input.eventId);
-
+  const actor = await resolveActor(await cookies());
   const now = await serverNow();
-  await notifyCohostsAdded({
-    now,
-    session: created,
-    previousHostIds: [],
-    changedById: null,
-  });
-  return { ok: true };
+  return settle(
+    () => sessionUseCases().adminCreateSession(actor, input, now),
+    "Failed to create session"
+  );
 }
 
 export async function adminUpdateSessionAction(
   input: AdminSessionInput
 ): Promise<AdminActionResult> {
-  if (!(await isAdminRequest())) return { ok: false, error: "Unauthorized" };
-
-  const title = input.title.trim();
-  if (!title) return { ok: false, error: "Title is required" };
-
-  const range = parseTimeRange(input.startTime, input.endTime);
-  if ("error" in range) return { ok: false, error: range.error };
-
-  if (!Number.isInteger(input.capacity) || input.capacity < 0)
-    return { ok: false, error: "Capacity must be a non-negative whole number" };
-
-  const { sessions } = getRepositories();
-  const session = await sessions.findById(input.id);
-  if (!session) return { ok: false, error: "Session not found" };
-
-  const conflict = await findLocationConflict(
-    session.eventId,
-    range,
-    input.locationIds,
-    input.id
-  );
-  if (conflict) return { ok: false, error: conflict };
-
+  const actor = await resolveActor(await cookies());
   const now = await serverNow();
-  let updated;
-  try {
-    updated = await sessions.update(
-      input.id,
-      {
-        title,
-        description: input.description.trim(),
-        startTime: range.start,
-        endTime: range.end,
-        capacity: input.capacity,
-        adminManaged: input.adminManaged,
-        blocker: input.blocker,
-        closed: input.closed,
-        hostIds: input.hostIds,
-        locationIds: input.locationIds,
-      },
-      { actor: { type: "admin" }, at: now }
-    );
-  } catch {
-    return { ok: false, error: "Failed to update session" };
-  }
-
-  await revalidateEventPaths(session.eventId);
-
-  await notifyCohostsAdded({
-    now,
-    session: updated,
-    previousHostIds: session.hosts.map((h) => h.id),
-    changedById: null,
-  });
-  nudgeJobs();
-  return { ok: true };
+  return settle(
+    () => sessionUseCases().adminUpdateSession(actor, input, now),
+    "Failed to update session"
+  );
 }
 
 export async function adminDeleteSessionAction(input: {
   id: string;
 }): Promise<AdminActionResult> {
-  if (!(await isAdminRequest())) return { ok: false, error: "Unauthorized" };
-
-  const { sessions } = getRepositories();
-  const session = await sessions.findById(input.id);
-  if (!session) return { ok: false, error: "Session not found" };
-
+  const actor = await resolveActor(await cookies());
   const now = await serverNow();
-
-  try {
-    await sessions.delete(input.id, { actor: { type: "admin" }, at: now });
-  } catch {
-    return { ok: false, error: "Failed to delete session" };
-  }
-
-  await revalidateEventPaths(session.eventId);
-  nudgeJobs();
-  return { ok: true };
+  return settle(
+    () => sessionUseCases().adminDeleteSession(actor, input, now),
+    "Failed to delete session"
+  );
 }

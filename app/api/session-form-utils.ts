@@ -1,10 +1,6 @@
-import type {
-  Session,
-  SessionCreateInput,
-} from "@schellingboard/domain/session";
+import type { CreateSessionInput } from "@/server/modules/sessions/module";
 import type { Location } from "@schellingboard/domain/location";
 import type { Guest } from "@schellingboard/domain/guest";
-import type { Day } from "@schellingboard/domain/event";
 
 export type SessionParams = {
   id?: string;
@@ -34,104 +30,20 @@ export type SessionParams = {
   proposal?: string;
 };
 
-export const CAPACITY_ERROR =
-  "Max attendees must be a non-negative whole number";
-
-/** Null when the value may be saved; absent means "whatever the room holds". */
-export function sessionCapacityError(capacity: unknown): string | null {
-  if (capacity === undefined) return null;
-  if (
-    typeof capacity !== "number" ||
-    !Number.isInteger(capacity) ||
-    capacity < 0
-  )
-    return CAPACITY_ERROR;
-  return null;
-}
-
-export type SessionInterval = {
-  start: Date;
-  end: Date;
-};
-
-export function buildSessionInterval(
-  startTime: Date,
-  durationMinutes: number
-): SessionInterval {
+export function legacyBooking(
+  params: SessionParams
+): Omit<CreateSessionInput, "locationId"> {
   return {
-    start: startTime,
-    end: new Date(startTime.getTime() + durationMinutes * 60 * 1000),
-  };
-}
-
-/** The slot the host picked, break included — what the booking rules judge. */
-export function bookedSlot(params: SessionParams): SessionInterval {
-  return buildSessionInterval(new Date(params.startTime), params.duration);
-}
-
-/** The session starts once the slot's leading break is over. */
-export function prepareToInsert(
-  params: SessionParams,
-  day: Day,
-  breakMinutes: number
-): SessionCreateInput {
-  const { title, description, closed, hosts, location } = params;
-  const { start: slotStart, end } = bookedSlot(params);
-  const start = new Date(slotStart.getTime() + breakMinutes * 60 * 1000);
-  return {
-    title,
-    description,
-    closed,
-    hostIds: hosts.map((host) => host.id),
-    locationIds: [location.id],
-    startTime: start,
-    endTime: end,
-    capacity: params.capacity ?? location.capacity ?? 0,
-    adminManaged: false,
-    blocker: false,
+    // Anything but a string reaches the query as an unbindable parameter, which
+    // fails as a server error rather than a rejected request.
+    dayId: typeof params.dayId === "string" ? params.dayId : "",
+    title: params.title,
+    description: params.description,
+    closed: params.closed,
+    hostIds: Array.isArray(params.hosts) ? params.hosts.map((h) => h.id) : [],
+    startTime: new Date(params.startTime),
+    durationMinutes: params.duration,
+    capacity: params.capacity,
     proposalId: params.proposal ?? undefined,
-    eventId: day.eventId,
   };
 }
-
-/**
- * A session under way keeps the start its attendees turned up for. Everything
- * else about it, its duration included, is still the host's to fix.
- */
-export function sessionHasStarted(
-  session: Pick<Session, "startTime">,
-  now: Date
-): boolean {
-  return !!session.startTime && session.startTime <= now;
-}
-
-// `now` is the effective current time (see docs/dev/adr/0004-dev-fake-clock.md),
-// required rather than defaulted so a caller cannot silently bypass the fake
-// clock and judge "in the past" against real time.
-export const validateSession = (
-  session: SessionCreateInput,
-  existingSessions: Session[],
-  now: Date,
-  opts?: { allowPastStart?: boolean }
-): boolean => {
-  const sessionStart = session.startTime ?? new Date(0);
-  const sessionEnd = session.endTime ?? new Date(0);
-  const sessionStartsBeforeEnds = sessionStart < sessionEnd;
-  const sessionStartsAfterNow = opts?.allowPastStart || sessionStart > now;
-  const sessionsHere = existingSessions.filter((s) => {
-    return s.locations.some((l) => session.locationIds.includes(l.id));
-  });
-  const concurrentSessions = sessionsHere.filter((existing) => {
-    const existingStart = existing.startTime ?? new Date(0);
-    const existingEnd = existing.endTime ?? new Date(0);
-    return existingStart < sessionEnd && existingEnd > sessionStart;
-  });
-  const sessionValid =
-    sessionStartsBeforeEnds &&
-    sessionStartsAfterNow &&
-    concurrentSessions.length === 0 &&
-    !!session.title &&
-    !!session.locationIds[0] &&
-    !!session.hostIds[0];
-  return sessionValid;
-};

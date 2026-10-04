@@ -1,6 +1,15 @@
 export type ErrorKind =
   "notFound" | "forbidden" | "conflict" | "invalid" | "gone";
 
+// The API and the legacy routes answer a kind with the same status.
+export const HTTP_STATUS_BY_KIND = {
+  invalid: 400,
+  forbidden: 403,
+  notFound: 404,
+  conflict: 409,
+  gone: 410,
+} as const satisfies Record<ErrorKind, number>;
+
 export interface AppError {
   kind: ErrorKind;
   code: string;

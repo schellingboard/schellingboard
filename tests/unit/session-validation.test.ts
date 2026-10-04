@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import {
   CAPACITY_ERROR,
   sessionCapacityError,
-  validateSession,
-} from "@/app/api/session-form-utils";
+  sessionPlacementError,
+} from "@schellingboard/domain/session-booking";
 import type {
   Session,
   SessionCreateInput,
@@ -86,9 +86,9 @@ describe("sessionCapacityError", () => {
   );
 });
 
-describe("validateSession", () => {
+describe("sessionPlacementError", () => {
   it("accepts a valid session with no existing sessions", () => {
-    expect(validateSession(makeInput(), [], NOW)).toBeTruthy();
+    expect(sessionPlacementError(makeInput(), [], NOW)).toBeNull();
   });
 
   it("rejects when start >= end", () => {
@@ -96,14 +96,16 @@ describe("validateSession", () => {
       startTime: fromNow(120),
       endTime: fromNow(60),
     });
-    expect(validateSession(input, [], NOW)).toBeFalsy();
+    expect(sessionPlacementError(input, [], NOW)).toBe(
+      "session.endsBeforeStart"
+    );
   });
 
   it("rejects when start equals end", () => {
     const t = fromNow(60);
     expect(
-      validateSession(makeInput({ startTime: t, endTime: t }), [], NOW)
-    ).toBeFalsy();
+      sessionPlacementError(makeInput({ startTime: t, endTime: t }), [], NOW)
+    ).toBe("session.endsBeforeStart");
   });
 
   it("rejects when start is in the past", () => {
@@ -111,7 +113,7 @@ describe("validateSession", () => {
       startTime: fromNow(-60),
       endTime: fromNow(60),
     });
-    expect(validateSession(input, [], NOW)).toBeFalsy();
+    expect(sessionPlacementError(input, [], NOW)).toBe("session.startsInPast");
   });
 
   // The other direction, which the NOW-based cases can't show: a start still in
@@ -124,45 +126,51 @@ describe("validateSession", () => {
       endTime: new Date(realFuture.getTime() + 60 * 60_000),
     });
     const travelledPastIt = new Date(realFuture.getTime() + 30 * 60_000);
-    expect(validateSession(input, [], travelledPastIt)).toBeFalsy();
+    expect(sessionPlacementError(input, [], travelledPastIt)).toBe(
+      "session.startsInPast"
+    );
   });
 
   it("rejects when title is missing", () => {
-    expect(validateSession(makeInput({ title: "" }), [], NOW)).toBeFalsy();
+    expect(sessionPlacementError(makeInput({ title: "" }), [], NOW)).toBe(
+      "session.titleRequired"
+    );
   });
 
   it("rejects when hostIds is empty", () => {
-    expect(validateSession(makeInput({ hostIds: [] }), [], NOW)).toBeFalsy();
+    expect(sessionPlacementError(makeInput({ hostIds: [] }), [], NOW)).toBe(
+      "session.hostRequired"
+    );
   });
 
   it("rejects when locationIds is empty", () => {
-    expect(
-      validateSession(makeInput({ locationIds: [] }), [], NOW)
-    ).toBeFalsy();
+    expect(sessionPlacementError(makeInput({ locationIds: [] }), [], NOW)).toBe(
+      "session.locationRequired"
+    );
   });
 
   it("rejects partial overlap in same location (start-overlap)", () => {
     const existing = makeExisting(fromNow(30), fromNow(90));
     const input = makeInput({ startTime: fromNow(60), endTime: fromNow(120) });
-    expect(validateSession(input, [existing], NOW)).toBeFalsy();
+    expect(sessionPlacementError(input, [existing], NOW)).toBe("session.clash");
   });
 
   it("rejects partial overlap in same location (end-overlap)", () => {
     const existing = makeExisting(fromNow(90), fromNow(150));
     const input = makeInput({ startTime: fromNow(60), endTime: fromNow(120) });
-    expect(validateSession(input, [existing], NOW)).toBeFalsy();
+    expect(sessionPlacementError(input, [existing], NOW)).toBe("session.clash");
   });
 
   it("rejects when existing session is fully contained within new session", () => {
     const existing = makeExisting(fromNow(70), fromNow(110));
     const input = makeInput({ startTime: fromNow(60), endTime: fromNow(120) });
-    expect(validateSession(input, [existing], NOW)).toBeFalsy();
+    expect(sessionPlacementError(input, [existing], NOW)).toBe("session.clash");
   });
 
   it("accepts back-to-back sessions in same location", () => {
     const existing = makeExisting(fromNow(0), fromNow(60));
     const input = makeInput({ startTime: fromNow(60), endTime: fromNow(120) });
-    expect(validateSession(input, [existing], NOW)).toBeTruthy();
+    expect(sessionPlacementError(input, [existing], NOW)).toBeNull();
   });
 
   it("accepts overlapping sessions in different locations", () => {
@@ -172,24 +180,24 @@ describe("validateSession", () => {
       endTime: fromNow(120),
       locationIds: [LOC_A],
     });
-    expect(validateSession(input, [existing], NOW)).toBeTruthy();
+    expect(sessionPlacementError(input, [existing], NOW)).toBeNull();
   });
 
   it("rejects identical interval in same location", () => {
     const existing = makeExisting(fromNow(60), fromNow(120));
     const input = makeInput({ startTime: fromNow(60), endTime: fromNow(120) });
-    expect(validateSession(input, [existing], NOW)).toBeFalsy();
+    expect(sessionPlacementError(input, [existing], NOW)).toBe("session.clash");
   });
 
   it("rejects same-start longer-end in same location", () => {
     const existing = makeExisting(fromNow(60), fromNow(180));
     const input = makeInput({ startTime: fromNow(60), endTime: fromNow(120) });
-    expect(validateSession(input, [existing], NOW)).toBeFalsy();
+    expect(sessionPlacementError(input, [existing], NOW)).toBe("session.clash");
   });
 
   it("rejects same-end earlier-start in same location", () => {
     const existing = makeExisting(fromNow(30), fromNow(120));
     const input = makeInput({ startTime: fromNow(60), endTime: fromNow(120) });
-    expect(validateSession(input, [existing], NOW)).toBeFalsy();
+    expect(sessionPlacementError(input, [existing], NOW)).toBe("session.clash");
   });
 });

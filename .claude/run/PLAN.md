@@ -42,7 +42,7 @@ family delegate to the use cases. Keep each legacy route's response shape.
       dependency-cruiser rule checks reachable modules, not only direct imports.
 - [x] 3. **Idempotency**: table, migration, middleware for mutations; a retried
       request returns the stored response. Cover #141 if it falls out.
-- [ ] 4. **Sessions**: get, list, create, update, delete. Delegate `add-session`,
+- [x] 4. **Sessions**: get, list, create, update, delete. Delegate `add-session`,
       `update-session`, `delete-session`, `session`, `admin-sessions`.
 - [ ] 5. **RSVPs and votes**: `toggle-rsvp`, `rsvps`, `add-vote`, `delete-vote`,
       `votes`, `admin-rsvps`.

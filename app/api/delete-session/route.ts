@@ -1,53 +1,35 @@
 import type { NextRequest } from "next/server";
-import { getRepositories } from "@/db/container";
-import { inSchedPhase } from "@schellingboard/domain/phase";
+import { sessionUseCases } from "@/server/composition";
+import { HTTP_STATUS_BY_KIND } from "@/server/kernel/result";
+import { resolveActor } from "@/server/kernel/actor";
 import { requestNow } from "@/utils/dev-clock";
-import { verifiedCurrentUser } from "@/utils/acting-guest";
-import { nudgeJobs } from "@/utils/jobs/nudge";
 
 export const dynamic = "force-dynamic"; // defaults to auto
 
 export async function POST(req: NextRequest) {
   const { id } = (await req.json()) as { id: string };
-  const repos = getRepositories();
-
-  const session = await repos.sessions.findById(id);
-  if (!session) {
-    return new Response("Session not found", { status: 404 });
-  }
-
-  const event = await repos.events.findById(session.eventId);
-  const now = requestNow(req);
-  if (!event || !inSchedPhase(event, now)) {
-    return new Response(
-      "Sessions can only be deleted during the scheduling phase",
-      { status: 403 }
+  const actor = await resolveActor(req.cookies);
+  let result;
+  try {
+    result = await sessionUseCases().deleteSession(
+      actor,
+      { sessionId: id },
+      requestNow(req)
     );
+  } catch (err) {
+    console.error(err);
+    return Response.error();
   }
+  if (result.ok) return Response.json({ success: true });
 
-  if (session.adminManaged || session.blocker) {
-    return new Response("Cannot delete via web app", { status: 400 });
-  }
-
-  const actor = await verifiedCurrentUser(req.cookies);
-  if (!actor || !session.hosts.some((h) => h.id === actor)) {
+  const { kind, code, detail } = result.error;
+  if (code === "session.managedByOrganizer")
+    return new Response(detail, { status: 400 });
+  if (code.startsWith("guest.") || code === "session.notHost") {
     return Response.json(
       { error: "Only a host may delete this session" },
       { status: 403 }
     );
   }
-
-  try {
-    await repos.sessions.delete(id, {
-      actor: { type: "guest", id: actor },
-      at: now,
-    });
-    console.log(`Deleted session: ${id}`);
-  } catch (err) {
-    console.error(err);
-    return Response.error();
-  }
-
-  nudgeJobs();
-  return Response.json({ success: true });
+  return new Response(detail, { status: HTTP_STATUS_BY_KIND[kind] });
 }

@@ -64,8 +64,8 @@ instead of declaring new ones, and `composition.ts` passes in
 layout: `application/` imports no `http/`, `next/*`, `hono` or `db/` code
 beyond the container's types; a module is imported only through its
 `module.ts`; `kernel/` imports no module; `app/` reaches `server/` only through
-`module.ts` files, the kernel (server actions resolve the actor there, section 3)
-and the mount.
+`module.ts` files, the use cases `composition.ts` wires, the kernel (server
+actions resolve the actor there, section 3) and the mount.
 
 A use case is a function of its dependencies taking an actor and validated
 input and returning a `Result`, as in the target. The unit of work and
@@ -82,8 +82,9 @@ cookie selects and at what level (`open` or `verified`). Server actions resolve
 the same `Actor` from `cookies()` through the same function.
 
 Acting as a guest keeps today's rule, as one kernel function every use case
-calls: a request may act as an unprotected guest it names, and as a protected
-guest only with that guest's verified cookie (#370). Organizer actions require
+calls (`actingGuest`): a request may act as an unprotected guest it names, and
+as a protected guest only with that guest's verified cookie (#370). It refuses
+with `guest.unselected` or `guest.protected`. Organizer actions require
 the admin actor. No tokens, persons or roles: those are step 6.
 
 `proxy.ts` gates the API as it gates the legacy routes. Endpoints that require
@@ -124,9 +125,11 @@ same key and actor:
 
 A `5xx` response is not stored, so a retry after a server error runs again.
 Rows older than 24 hours are deleted by the jobs loop (ADR 0011) as scheduled
-work. The key is optional; without it a mutation simply runs. Server actions do
-not use it. Echoing the key on the change log (`command_key`) waits for the
-feed that reads it, in step 4.
+work. The key is optional; without it a mutation simply runs. A request with
+neither admin nor guest has no one to scope a key to, so its key is ignored
+rather than shared by every anonymous client. Server actions do not use it.
+Echoing the key on the change log (`command_key`) waits for the feed that reads
+it, in step 4.
 
 ### 6. A committed `openapi.json` that cannot go stale
 

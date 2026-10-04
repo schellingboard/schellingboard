@@ -120,7 +120,17 @@ export async function unverifiedUserMessage(
   cookieStore: ReadonlyCookies,
   task: string
 ): Promise<string> {
-  if (await currentGuestSelection(cookieStore)) {
+  return actingGuestRefusalMessage(
+    (await currentGuestSelection(cookieStore))
+      ? "guest.protected"
+      : "guest.unselected",
+    task
+  );
+}
+
+/** The same advice, for a use case's `guest.*` refusal code. */
+export function actingGuestRefusalMessage(code: string, task: string): string {
+  if (code === "guest.protected") {
     return `This name is protected. Switch to it with your password or emailed code — via the name chip in the header — before ${task}.`;
   }
   return `You need to select who you are before ${task}. Pick your name via the “Select your name” chip in the header at the top of the page.`;
