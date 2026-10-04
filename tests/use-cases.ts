@@ -555,6 +555,12 @@ export const features = {
         actor: "organizer",
         priority: "P3",
       },
+      US4: {
+        title:
+          "Organizer's script manages guests and the site settings through the admin API",
+        actor: "organizer",
+        priority: "P3",
+      },
     },
   },
   "020": {

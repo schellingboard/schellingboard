@@ -35,6 +35,7 @@ const people = () =>
   createPeopleUseCases({
     repos: getRepositories(),
     avatars: getImageRepositories().avatars,
+    sendTestEmail: async () => {},
   });
 
 function value<T>(result: Result<T>): T {

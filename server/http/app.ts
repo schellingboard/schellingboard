@@ -7,6 +7,7 @@ import {
   peopleUseCases,
   proposalUseCases,
   sessionUseCases,
+  settingsUseCases,
   venueUseCases,
 } from "@/server/composition";
 import { addCommentRoutes } from "@/server/modules/comments/module";
@@ -16,7 +17,10 @@ import {
   addMeetingRoutes,
 } from "@/server/modules/meetings/module";
 import { addNotificationRoutes } from "@/server/modules/notifications/module";
-import { addPeopleRoutes } from "@/server/modules/people/module";
+import {
+  addAdminGuestRoutes,
+  addPeopleRoutes,
+} from "@/server/modules/people/module";
 import {
   addProposalRoutes,
   addVoteRoutes,
@@ -27,6 +31,7 @@ import {
   addRsvpRoutes,
   addSessionRoutes,
 } from "@/server/modules/sessions/module";
+import { addAdminSettingsRoutes } from "@/server/modules/settings/module";
 import { addAdminVenueRoutes } from "@/server/modules/venue/module";
 import { actorMiddleware } from "./actor";
 import { createApp } from "./create-app";
@@ -55,3 +60,5 @@ addNotificationRoutes(api, notificationUseCases);
 addAdminEventRoutes(api, eventUseCases);
 addAdminVenueRoutes(api, venueUseCases);
 addAdminUnavailabilityRoutes(api, sessionUseCases);
+addAdminGuestRoutes(api, peopleUseCases);
+addAdminSettingsRoutes(api, settingsUseCases);

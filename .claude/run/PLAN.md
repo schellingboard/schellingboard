@@ -60,8 +60,18 @@ family delegate to the use cases. Keep each legacy route's response shape.
       `attendee-count`.
 - [x] 9. **Admin: events, days, locations** (#1006): `admin-events`, `admin-days`,
       `admin-locations`, `admin-location-events`, `admin-location-unavailability`.
-- [ ] 10. **Admin: guests and site settings**: `admin-guests`, `admin-guest-events`,
-      `admin-guest-import`, `admin-settings`, `admin/*` routes.
+- [x] 10a. **Admin guests and site settings**: a guests module (list without password
+      hashes or secrets, create, update, delete with its cascade, test email,
+      assign/remove to an event, CSV import with per-row errors) and site settings
+      get/update without secrets; `/api/v1/admin/guests…` and `/api/v1/admin/settings`
+      routes; `admin-guests`, `admin-guest-events`, `admin-guest-import`,
+      `admin-settings` actions and `app/api/admin/create-guest` and `users` delegate.
+- [ ] 10b. **Admin seeding routes**: `app/api/admin/create-event`, `create-day`,
+      `create-location`, `create-session`, `create-proposal`, `create-rsvp` delegate to
+      the existing use cases, with admin seeding variants only where their rules differ
+      (events by slug, no phase/future gates, auto-adding hosts/locations to the event,
+      capacity, 200-existing vs 201-new) and `/api/v1` equivalents only where none
+      exist.
 - [ ] 11. **`packages/api-client`**: generated from `openapi.json` in the build; one
       integration test calls the API through it.
 - [ ] 12. **Docs**: API page under `docs/public/self-hosting/`; a `docs/dev/` note;

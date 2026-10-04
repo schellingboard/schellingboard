@@ -1,6 +1,13 @@
 import { after } from "next/server";
 import { getRepositories } from "@/db/container";
+import { testEmail } from "@/emails/test-email";
 import { getImageRepositories } from "@/utils/images";
+import { sendMail } from "@/utils/mailer";
+import {
+  deleteMapImage,
+  saveMapImage,
+  validateMapImage,
+} from "@/utils/map-image";
 import { nudgeJobs } from "@/utils/jobs/nudge";
 import {
   notifyCohostsAdded,
@@ -40,6 +47,10 @@ import {
   createSessionUseCases,
   type SessionUseCases,
 } from "@/server/modules/sessions/module";
+import {
+  createSettingsUseCases,
+  type SettingsUseCases,
+} from "@/server/modules/settings/module";
 import {
   createVenueUseCases,
   type VenueUseCases,
@@ -90,6 +101,8 @@ export function peopleUseCases(): PeopleUseCases {
   return createPeopleUseCases({
     repos: getRepositories(),
     avatars: getImageRepositories().avatars,
+    sendTestEmail: ({ name, email }) =>
+      sendMail({ to: email, ...testEmail({ name }) }),
   });
 }
 
@@ -105,5 +118,16 @@ export function venueUseCases(): VenueUseCases {
   return createVenueUseCases({
     repos: getRepositories(),
     images: getImageRepositories().locations,
+  });
+}
+
+export function settingsUseCases(): SettingsUseCases {
+  return createSettingsUseCases({
+    repos: getRepositories(),
+    maps: {
+      validate: validateMapImage,
+      save: saveMapImage,
+      delete: deleteMapImage,
+    },
   });
 }

@@ -1,6 +1,6 @@
 # Run progress
 
-Next step: 10.
+Next step: 10b.
 
 ## Decisions
 
@@ -276,6 +276,37 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   primary key). Every `/api/v1` response defaults to `cache-control: no-store`
   (`createApp`). `app/api/admin/create-*` routes stay for step 10.
 
+- Step 10a: `server/modules/people/` (`peopleUseCases()`: `listGuests` (id, name,
+  email, `authProtected`, `eventIds`; never the password hash or email settings),
+  `createGuest` (409 on a taken email), `ensureGuest` (the legacy `create-guest`
+  route's find-or-create by email with an optional event slug; no `/api/v1` route,
+  `POST /admin/guests` plus an `Idempotency-Key` covers scripts), `updateGuest` (the
+  UNIQUE-constraint race is still `guest.emailTaken`), `deleteGuest` (the database
+  cascade, unchanged), `sendTestEmail` (mail is a port, wired to `sendMail` in
+  `composition.ts`), `assignGuestsToEvent`, `removeGuestsFromEvent`, `importGuests`
+  (CSV as text; every bad row is an `errors` entry with path `csv`). Site settings
+  are a new `server/modules/settings/` (`settingsUseCases()`: `getSiteSettings`,
+  `updateSiteSettings`; the map store is a port wired to `utils/map-image`, same
+  storage paths and validation): the target's nine modules have no home for the
+  site title, and the venue module's maps are per-place pins. Not `site/`, which
+  `.gitignore` ignores (the generated docs site). Kernel: a sixth
+  error kind `unavailable` (503, ADR 0012 section 4 amended) for `mail.failed`.
+  Routes: `GET/POST /admin/guests`, `PUT/DELETE /admin/guests/{id}`,
+  `POST /admin/guests/{id}/test-email` (204), `POST /admin/guests/import` (JSON
+  `{ csv, eventIds }`, 200 `{ created, existing }`),
+  `POST /admin/events/{id}/guests/assign|remove` (204), `GET /admin/settings`,
+  `PUT /admin/settings` (multipart `title`, `description`, `image`, `removeMap`
+  `true`/`on`; like `/me/avatar`, a keyed retry must resend identical bytes; hashing
+  the parsed form stays open). Contracts: admin guest schemas in `.../guest`,
+  `@schellingboard/contracts/settings`. Codes: `admin.required`, `guest.invalid` (with
+  `errors`), `guest.emailTaken` (409, with `errors`), `guest.notFound`,
+  `guest.unknown` (an assign naming an unknown guest), `event.notFound`,
+  `mail.failed` (503), `guestImport.invalid` (with `errors`),
+  `settings.titleRequired`, `settings.mapInvalid`. Actions keep their messages
+  (field issues now carry code `custom`, as in step 9) and revalidations; the
+  `create-guest` route keeps its own JSON and type checks and messages, `users`
+  its body, `no-store` and 500. Use case `019-US4` added.
+
 ## Questions
 
 - Each module's `*-use-cases.test.ts` (steps 4–6b) re-tests rules the legacy action
@@ -396,3 +427,13 @@ request.invalid` with `errors`. Idempotency: `idempotency_keys` keyed by actor +
   `schedule-agenda:220`, `view-session:7`); every admin spec outside the baseline
   passed (the location-assignment test on retry). No user-facing change, no
   CHANGELOG entry.
+- Step 10a: guests module (list, create, find-or-create, update, delete, test
+  email, event assignment, CSV import) and settings module (site settings with the
+  map upload), `/api/v1/admin` guest and settings routes, and the `admin-guests`,
+  `admin-guest-events`, `admin-guest-import`, `admin-settings` actions and the
+  `create-guest` and `users` routes delegate. format, lint, arch, openapi-check,
+  typecheck, test-coverage pass. Firefox E2E cannot run (Playwright CDN blocked);
+  full suite on Chromium: 178 passed, 12 failed, 5 flaky, all in the known baseline
+  or known flakes (`kiosk:18`, `profile-comments:95`, `schedule-agenda:220`,
+  `view-session:7`); every admin guest, import and settings spec outside the
+  baseline passed. No user-facing change, no CHANGELOG entry.

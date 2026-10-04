@@ -13,6 +13,7 @@ export interface AvatarStore {
 }
 
 export interface PeopleDeps {
-  repos: Pick<Repositories, "guests">;
+  repos: Pick<Repositories, "events" | "guests">;
   avatars: AvatarStore;
+  sendTestEmail: (to: { name: string; email: string }) => Promise<void>;
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { getRepositories } from "@/db/container";
+import { peopleUseCases } from "@/server/composition";
 import { requireProxyVerifiedAdmin } from "@/utils/auth";
+import { legacyActor, legacyRefusal } from "@/app/api/legacy";
 
 export const dynamic = "force-dynamic";
 
@@ -43,30 +44,13 @@ export async function POST(req: Request) {
     );
   }
 
-  const { guests, events } = getRepositories();
-
-  let eventId: string | undefined;
-  if (body.eventSlug) {
-    const event = await events.findBySlug(body.eventSlug);
-    if (!event) {
-      return NextResponse.json({ error: "Event not found" }, { status: 404 });
-    }
-    eventId = event.id;
-  }
-
-  // Idempotent by email (case-insensitive) so concurrent seeding scripts
-  // re-running an import do not race into duplicate guests.
-  const { guest, created } = await guests.findOrCreateByEmail({
+  const result = await peopleUseCases().ensureGuest(await legacyActor(req), {
     name,
-    info: { email },
+    email,
+    eventSlug: body.eventSlug,
   });
+  if (!result.ok) return legacyRefusal(result.error);
 
-  if (eventId) {
-    await guests.assignToEvent(eventId, [guest.id]);
-  }
-
-  return NextResponse.json(
-    { id: guest.id, created },
-    { status: created ? 201 : 200 }
-  );
+  const { id, created } = result.value;
+  return NextResponse.json({ id, created }, { status: created ? 201 : 200 });
 }

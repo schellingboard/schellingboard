@@ -1,46 +1,36 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getRepositories } from "@/db/container";
-import { isAdminRequest } from "@/utils/acting-admin";
-import { parseUserImportCsv } from "@/utils/user-import";
+import { cookies } from "next/headers";
+import { peopleUseCases } from "@/server/composition";
+import { resolveActor } from "@/server/kernel/actor";
 
 export type ImportGuestsResult =
   | { ok: true; created: number; existing: number }
   | { ok: false; error: string; lineErrors?: string[] };
 
-/**
- * Imports users from CSV (header: name,email) and assigns them to the given
- * events. Users are matched by email (case-insensitive): existing users are
- * left unchanged but still assigned, so re-running an import is idempotent.
- */
 export async function importGuestsAction(input: {
   csvText: string;
   eventIds: string[];
 }): Promise<ImportGuestsResult> {
-  if (!(await isAdminRequest())) return { ok: false, error: "Unauthorized" };
-
-  const { events, guests } = getRepositories();
-  const eventIds = [...new Set(input.eventIds)];
-  for (const eventId of eventIds) {
-    if (!(await events.findById(eventId))) {
-      return { ok: false, error: "Event not found" };
-    }
+  const result = await peopleUseCases().importGuests(
+    await resolveActor(await cookies()),
+    { csv: input.csvText, eventIds: input.eventIds }
+  );
+  if (!result.ok) {
+    const { detail, errors } = result.error;
+    return {
+      ok: false,
+      error: detail ?? "Something went wrong",
+      ...(errors ? { lineErrors: errors.map((e) => e.message) } : {}),
+    };
   }
-
-  const parsed = parseUserImportCsv(input.csvText);
-  if (!parsed.ok) {
-    return { ok: false, error: "Invalid CSV file", lineErrors: parsed.errors };
-  }
-
-  const { created } = await guests.importAndAssign(parsed.rows, eventIds);
 
   revalidatePath("/admin/users");
   revalidatePath("/admin");
   revalidatePath("/admin/events");
-  for (const eventId of eventIds) {
+  for (const eventId of new Set(input.eventIds)) {
     revalidatePath(`/admin/events/${eventId}`);
   }
-
-  return { ok: true, created, existing: parsed.rows.length - created };
+  return { ok: true, ...result.value };
 }

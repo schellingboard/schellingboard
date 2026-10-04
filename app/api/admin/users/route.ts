@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { getRepositories } from "@/db/container";
+import { peopleUseCases } from "@/server/composition";
 import { NO_STORE, requireProxyVerifiedAdmin } from "@/utils/auth";
+import { legacyActor, legacyRefusal } from "@/app/api/legacy";
 
 export const dynamic = "force-dynamic";
 
@@ -20,11 +21,12 @@ export async function GET(req: Request) {
   }
 
   try {
-    const { guests } = getRepositories();
-    const users = (await guests.listFull()).map((g) => ({
-      id: g.id,
-      name: g.name,
-      email: g.info.email,
+    const result = await peopleUseCases().listGuests(await legacyActor(req));
+    if (!result.ok) return legacyRefusal(result.error);
+    const users = result.value.map(({ id, name, email }) => ({
+      id,
+      name,
+      email,
     }));
 
     return NextResponse.json({ users }, NO_STORE);

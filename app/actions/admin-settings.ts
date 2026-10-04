@@ -1,61 +1,35 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getRepositories } from "@/db/container";
-import { isAdminRequest } from "@/utils/acting-admin";
-import {
-  deleteMapImage,
-  saveMapImage,
-  validateMapImage,
-} from "@/utils/map-image";
+import { cookies } from "next/headers";
+import { settingsUseCases } from "@/server/composition";
+import { resolveActor } from "@/server/kernel/actor";
 import type { AdminActionResult } from "./admin-guests";
 
 function formString(formData: FormData, key: string): string {
   const value = formData.get(key);
-  return typeof value === "string" ? value.trim() : "";
+  return typeof value === "string" ? value : "";
 }
 
 export async function updateSettingsAction(
   formData: FormData
 ): Promise<AdminActionResult> {
-  if (!(await isAdminRequest())) {
-    return { ok: false, error: "Unauthorized" };
-  }
-
-  const title = formString(formData, "title");
-  if (!title) {
-    return { ok: false, error: "Title is required" };
-  }
-  const description = formString(formData, "description");
-
+  const actor = await resolveActor(await cookies());
   const imageEntry = formData.get("image");
   const image =
-    imageEntry instanceof File && imageEntry.size > 0 ? imageEntry : undefined;
-  const removeMap = formData.get("removeMap") === "on";
+    actor.admin && imageEntry instanceof File && imageEntry.size > 0
+      ? Buffer.from(await imageEntry.arrayBuffer())
+      : undefined;
 
-  const { settings } = getRepositories();
-  const current = await settings.get();
-
-  // Validate the image (if any) before persisting anything.
-  let prepared: { buffer: Buffer; ext: string } | undefined;
-  if (image) {
-    const buffer = Buffer.from(await image.arrayBuffer());
-    const validation = await validateMapImage(buffer);
-    if ("error" in validation) {
-      return { ok: false, error: validation.error };
-    }
-    prepared = { buffer, ext: validation.ext };
+  const result = await settingsUseCases().updateSiteSettings(actor, {
+    title: formString(formData, "title"),
+    description: formString(formData, "description"),
+    image,
+    removeMap: formData.get("removeMap") === "on",
+  });
+  if (!result.ok) {
+    return { ok: false, error: result.error.detail ?? "Something went wrong" };
   }
-
-  let mapImageUrl = current.mapImageUrl;
-  if (prepared) {
-    mapImageUrl = await saveMapImage(prepared.buffer, prepared.ext);
-  } else if (removeMap) {
-    await deleteMapImage();
-    mapImageUrl = "";
-  }
-
-  await settings.update({ title, description, mapImageUrl });
 
   revalidatePath("/admin/settings");
   revalidatePath("/", "layout");

@@ -102,13 +102,15 @@ instead of the login redirect or `{ error }` body the legacy routes get.
 ### 4. Errors are values, sent as problem details
 
 Use cases return `Result<T>`: a value, or an error with a stable `code` and a
-kind (`notFound`, `forbidden`, `conflict`, `invalid`, `gone`). One function in
+kind (`notFound`, `forbidden`, `conflict`, `invalid`, `gone`, and `unavailable`,
+`503`, when a service the app relies on fails, such as the mail server). One function in
 `server/http` maps the kind to a status and the error to an RFC 9457 body
 (`application/problem+json`): `type: "about:blank"`, `title`, `status`, an
 optional `detail`, and the extension member `code`. A request that fails its
 contract gets `400` with code `request.invalid` and an `errors` list of paths
 and messages; a use case may attach the same list to its own `invalid` error to
-name every refused field at once (`location.invalid`). Codes are dotted, named for what was refused
+name every refused field at once (`location.invalid`), and a `conflict` may too
+(`guest.emailTaken`). Codes are dotted, named for what was refused
 (`guest.protected`, `session.notFound`); a code once shipped keeps its meaning,
 and the client translates it rather than showing `detail`.
 

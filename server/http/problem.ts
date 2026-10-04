@@ -16,6 +16,7 @@ const TITLES: Record<number, string> = {
   410: "Gone",
   422: "Unprocessable Content",
   500: "Internal Server Error",
+  503: "Service Unavailable",
 };
 
 export interface Problem {

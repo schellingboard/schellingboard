@@ -1,5 +1,5 @@
 export type ErrorKind =
-  "notFound" | "forbidden" | "conflict" | "invalid" | "gone";
+  "notFound" | "forbidden" | "conflict" | "invalid" | "gone" | "unavailable";
 
 // The API and the legacy routes answer a kind with the same status.
 export const HTTP_STATUS_BY_KIND = {
@@ -8,6 +8,7 @@ export const HTTP_STATUS_BY_KIND = {
   notFound: 404,
   conflict: 409,
   gone: 410,
+  unavailable: 503,
 } as const satisfies Record<ErrorKind, number>;
 
 export interface FieldError {
@@ -41,6 +42,7 @@ export const forbidden = failing("forbidden");
 export const conflict = failing("conflict");
 export const invalid = failing("invalid");
 export const gone = failing("gone");
+export const unavailable = failing("unavailable");
 
 export function invalidFields(code: string, errors: FieldError[]): Failure {
   return {

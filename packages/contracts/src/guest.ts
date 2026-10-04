@@ -159,3 +159,42 @@ export const publicProfileSchema = z.object({
   ),
   profileUpdatedAt: z.iso.datetime({ offset: true }).nullable(),
 });
+
+export const adminGuestBodySchema = z.object({
+  name: z.string(),
+  email: z.string(),
+});
+
+// What an organizer sees of a guest: never the password hash.
+export const adminGuestViewSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string(),
+  authProtected: z.boolean(),
+  eventIds: z.array(z.string()),
+});
+
+export const adminGuestListSchema = z.object({
+  guests: z.array(adminGuestViewSchema),
+});
+
+export const eventGuestsBodySchema = z.object({
+  guestIds: z.array(z.string()),
+});
+
+export const guestImportBodySchema = z.object({
+  csv: z
+    .string()
+    .describe(
+      "A header row naming `name` and `email` columns, then one guest per row"
+    ),
+  eventIds: z.array(z.string()),
+});
+
+export const guestImportResultSchema = z.object({
+  created: z.number().int(),
+  existing: z
+    .number()
+    .int()
+    .describe("Rows matching a guest by email, left unchanged but assigned"),
+});
