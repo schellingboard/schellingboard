@@ -92,6 +92,89 @@ module.exports = {
       to: { path: "^db/repositories/" },
     },
     {
+      name: "server-does-not-reach-into-app",
+      severity: "error",
+      comment:
+        "`server/` holds the use cases and the API that outlive Next (step 7 of the target " +
+        "architecture); `app/` is a client of it, never the other way round. See ADR 0012.",
+      from: { path: "^server/" },
+      to: { path: "^app/" },
+    },
+    {
+      name: "app-reaches-server-through-module-ts",
+      severity: "error",
+      comment:
+        "`app/` calls the server through a module's `module.ts`, the kernel's actor and " +
+        "Result, or the API mount; a module's internals are private. See ADR 0012.",
+      from: { path: "^app/" },
+      to: {
+        path: "^server/",
+        pathNot: [
+          "^server/modules/[^/]+/module\\.ts$",
+          "^server/kernel/",
+          "^server/http/app\\.ts$",
+        ],
+      },
+    },
+    {
+      name: "kernel-reaches-no-module",
+      severity: "error",
+      comment:
+        "The kernel is what every module builds on: Result, errors, Actor. It cannot know " +
+        "about a module, the HTTP layer or a framework, not even through a helper it imports. " +
+        "See ADR 0012.",
+      from: { path: "^server/kernel/" },
+      to: {
+        path: "^(server/(modules|http)/|server/composition\\.ts$|app/|node_modules/(next|hono|@hono)/)",
+        reachable: true,
+      },
+    },
+    {
+      name: "use-cases-depend-on-ports",
+      severity: "error",
+      comment:
+        "Use cases depend on ports; adapters are wired in composition.ts. `application/` " +
+        "imports no HTTP, framework or `db/` code beyond the container's types. See ADR 0012.",
+      from: { path: "^server/modules/[^/]+/application/" },
+      to: {
+        path: "^(server/http/|server/modules/[^/]+/http/|server/composition\\.ts$|db/|node_modules/(next|hono|@hono)/)",
+        pathNot: "^db/container\\.ts$",
+      },
+    },
+    {
+      name: "use-cases-take-only-container-types",
+      severity: "error",
+      comment:
+        "`application/` may name the container's repository types, never call the container: " +
+        "repositories come in through the use case's dependencies. See ADR 0012.",
+      from: { path: "^server/modules/[^/]+/application/" },
+      to: { path: "^db/container\\.ts$", dependencyTypesNot: ["type-only"] },
+    },
+    {
+      name: "modules-through-module-ts",
+      severity: "error",
+      comment:
+        "Other modules' internals are private; call a use case through its `module.ts` or " +
+        "react to a change. See ADR 0012.",
+      from: { path: "^server/modules/([^/]+)/" },
+      to: {
+        path: "^server/modules/[^/]+/",
+        pathNot: ["^server/modules/$1/", "^server/modules/[^/]+/module\\.ts$"],
+      },
+    },
+    {
+      name: "outside-reaches-modules-through-module-ts",
+      severity: "error",
+      comment:
+        "A module is imported only through its `module.ts`, by tests too: what it does not " +
+        "export is free to change. See ADR 0012.",
+      from: { pathNot: "^server/modules/" },
+      to: {
+        path: "^server/modules/[^/]+/",
+        pathNot: "^server/modules/[^/]+/module\\.ts$",
+      },
+    },
+    {
       name: "no-unresolvable",
       severity: "error",
       comment: "A dependency that does not resolve is a broken import.",
@@ -120,7 +203,9 @@ module.exports = {
       mainFields: ["module", "main", "types", "typings"],
     },
     reporterOptions: {
-      dot: { collapsePattern: "^(app|db|utils|tests)/[^/]+|^packages/[^/]+" },
+      dot: {
+        collapsePattern: "^(app|db|server|utils|tests)/[^/]+|^packages/[^/]+",
+      },
     },
   },
 };

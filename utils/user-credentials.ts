@@ -8,7 +8,7 @@ import {
 
 // Server-only credential helpers for guest account security (issue #370):
 // emailed temporary codes and optional permanent passwords. Cookie signing
-// lives in utils/auth.ts, which must stay free of node:crypto.
+// lives in utils/auth-cookies.ts, which must stay free of node:crypto.
 
 export const AUTH_CODE_LENGTH = 8;
 export const AUTH_CODE_VALID_MINUTES = 10;

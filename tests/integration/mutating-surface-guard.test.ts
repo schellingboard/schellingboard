@@ -95,6 +95,7 @@ const READ_ONLY = new Set([
   "session/[sessionId]/comments",
   "profile/[profileId]/comments",
   "proposal/[proposalId]/comments",
+  "v1/[[...route]]",
 ]);
 
 type Verifier = () => Promise<void>;

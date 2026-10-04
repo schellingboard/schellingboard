@@ -1,22 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
+import { problemResponse, type Problem } from "./server/http/problem";
 import {
+  adminApiRefusal,
   ADMIN_DISABLED_MESSAGE,
   ADMIN_VERIFIED_HEADER,
+  forwardAsVerifiedAdmin,
   isAdminEnabled,
+  isAuthenticated,
+  isPasswordProtectionEnabled,
   requireAdminAuth,
   requireAdminAuthApi,
   requireAuth,
 } from "./utils/auth";
 import { requireMediaAuth } from "./utils/media-auth";
 
-// Only requireAdminAuthApi may grant ADMIN_VERIFIED_HEADER (and only ever
-// sets it to "1"); every other forwarded request must have any
-// client-supplied copy of it removed so a route added outside /api/admin/*
-// can never be tricked into trusting a forged value.
+// Only the admin API branches (via forwardAsVerifiedAdmin) may grant
+// ADMIN_VERIFIED_HEADER (and only ever set it to "1"); every other forwarded
+// request must have any client-supplied copy of it removed so a route added
+// outside the admin prefixes can never be tricked into trusting a forged value.
 function forwardWithoutAdminHeader(request: NextRequest): NextResponse {
   const headers = new Headers(request.headers);
   headers.delete(ADMIN_VERIFIED_HEADER);
   return NextResponse.next({ request: { headers } });
+}
+
+function refuseApiV1(problem: Problem): NextResponse {
+  const res = problemResponse(problem);
+  return new NextResponse(res.body, {
+    status: res.status,
+    headers: res.headers,
+  });
 }
 
 export async function proxy(request: NextRequest) {
@@ -52,6 +65,21 @@ export async function proxy(request: NextRequest) {
   // do require its presence — see requireProxyVerifiedAdmin).
   if (pathname === "/api/admin" || pathname.startsWith("/api/admin/")) {
     return requireAdminAuthApi(request);
+  }
+
+  // The versioned API gates like the legacy routes, but refuses as problem
+  // details: its clients read a status and a code, never a login page.
+  if (pathname === "/api/v1/admin" || pathname.startsWith("/api/v1/admin/")) {
+    const refusal = await adminApiRefusal(request);
+    return refusal
+      ? refuseApiV1({ status: refusal.status, code: refusal.code })
+      : forwardAsVerifiedAdmin(request);
+  }
+  if (pathname === "/api/v1" || pathname.startsWith("/api/v1/")) {
+    if (isPasswordProtectionEnabled() && !(await isAuthenticated(request))) {
+      return refuseApiV1({ status: 401, code: "site.unauthenticated" });
+    }
+    return forwardWithoutAdminHeader(request);
   }
 
   // Uploaded images are shown to attendees and previewed in the admin UI, so

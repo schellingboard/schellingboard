@@ -1,0 +1,28 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "SchellingBoard API", "version": "1" },
+  "components": { "schemas": {}, "parameters": {} },
+  "paths": {
+    "/api/v1/health": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "The server is up",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "enum": ["ok"] }
+                  },
+                  "required": ["status"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "webhooks": {}
+}

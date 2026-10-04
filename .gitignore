@@ -80,7 +80,7 @@ data.*.db-journal
 # Nix
 flake.nix
 flake.lock
-result*
+/result*
 
 # Config file for jip, a stacked PR tool (see: https://github.com/omarkohl/jip)
 .jip.local.toml

@@ -33,10 +33,13 @@ family delegate to the use cases. Keep each legacy route's response shape.
       resolution, `Result` and RFC 9457 problem details with stable codes,
       `Idempotency-Key` storage (24 h), committed `openapi.json` and its check. Verify
       the Hono zod OpenAPI package supports zod 4 before deciding; record the answer.
-- [ ] 2. **Kernel and skeleton**: `Result`, problem-details mapping, actor middleware,
+- [x] 2. **Kernel and skeleton**: `Result`, problem-details mapping, actor middleware,
       the Hono app with one route (`GET /api/v1/health`), `openapi.json` generation and
       a `make` check that fails when it is stale (part of `make precommit`).
       dependency-cruiser rules for the new layout.
+- [x] 2a. **Kernel free of Next**: move the cookie checks the actor needs out of
+      `utils/auth.ts` into a module without a Next import; the kernel's
+      dependency-cruiser rule checks reachable modules, not only direct imports.
 - [ ] 3. **Idempotency**: table, migration, middleware for mutations; a retried
       request returns the stored response. Cover #141 if it falls out.
 - [ ] 4. **Sessions**: get, list, create, update, delete. Delegate `add-session`,

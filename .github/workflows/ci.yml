@@ -26,6 +26,9 @@ jobs:
       - name: Check architecture rules
         run: make arch
 
+      - name: Check openapi.json is current
+        run: make openapi-check
+
       - name: Validate docs links
         run: make docs-validate
 

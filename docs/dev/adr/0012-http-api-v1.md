@@ -64,7 +64,8 @@ instead of declaring new ones, and `composition.ts` passes in
 layout: `application/` imports no `http/`, `next/*`, `hono` or `db/` code
 beyond the container's types; a module is imported only through its
 `module.ts`; `kernel/` imports no module; `app/` reaches `server/` only through
-`module.ts` files and the mount.
+`module.ts` files, the kernel (server actions resolve the actor there, section 3)
+and the mount.
 
 A use case is a function of its dependencies taking an actor and validated
 input and returning a `Result`, as in the target. The unit of work and

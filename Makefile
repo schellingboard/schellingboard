@@ -1,4 +1,4 @@
-.PHONY: help dev mailpit build start lint typecheck arch arch-graph arch-diagrams arch-diagrams-check lint-watch test test-unit test-integration test-watch test-coverage use-cases test-e2e test-e2e-headed test-e2e-docker format format-check precommit dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed dump-release-db screenshots install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate docs-dev docs-dev-build docs-dev-validate www
+.PHONY: help dev mailpit build start lint typecheck arch openapi openapi-check arch-graph arch-diagrams arch-diagrams-check lint-watch test test-unit test-integration test-watch test-coverage use-cases test-e2e test-e2e-headed test-e2e-docker format format-check precommit dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed dump-release-db screenshots install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate docs-dev docs-dev-build docs-dev-validate www
 
 SHELL := /usr/bin/env bash
 
@@ -26,6 +26,8 @@ help:
 	@printf "  %-28s %s\n" "make lint-watch"         "Run linter in watch mode"
 	@printf "  %-28s %s\n" "make typecheck"          "Run TypeScript type checking"
 	@printf "  %-28s %s\n" "make arch"               "Check architecture rules (cycles, layer boundaries)"
+	@printf "  %-28s %s\n" "make openapi"            "Regenerate packages/contracts/openapi.json"
+	@printf "  %-28s %s\n" "make openapi-check"      "Check openapi.json matches the API"
 	@printf "  %-28s %s\n" "make arch-graph"         "Render the dependency graph to arch-graph.svg"
 	@printf "  %-28s %s\n" "make arch-diagrams"      "Browse the target-architecture C4 diagrams (LikeC4)"
 	@printf "  %-28s %s\n" "make arch-diagrams-check" "Check the LikeC4 diagram sources parse"
@@ -88,12 +90,19 @@ typecheck: install
 	bun x tsc -p packages/domain
 	bun x tsc -p packages/contracts
 
-DEPCRUISE := bun x depcruise app db packages utils emails tests scripts instrumentation.ts --config .dependency-cruiser.cjs
+DEPCRUISE := bun x depcruise app db packages server utils emails tests scripts instrumentation.ts proxy.ts --config .dependency-cruiser.cjs
 
 # Module-graph rules (cycles, layer boundaries) — the constraints eslint can't
 # see, since it reads one file at a time. See docs/dev/architecture-rules.md.
 arch: install arch-diagrams-check
 	$(DEPCRUISE) --output-type err-long
+
+# The committed API description; a stale copy fails precommit and CI (ADR 0012).
+openapi: install
+	bun x tsx scripts/openapi.ts
+
+openapi-check: install
+	bun x tsx scripts/openapi.ts --check
 
 LIKEC4_DIR := docs/dev/target-architecture/diagrams
 
@@ -147,7 +156,7 @@ format: install
 format-check: install
 	bun x prettier --check .
 
-precommit: format lint arch typecheck test-coverage test-e2e
+precommit: format lint arch openapi-check typecheck test-coverage test-e2e
 
 clean:
 	rm -rf .next
