@@ -278,6 +278,15 @@ describe("proposal mutations", () => {
       expect(!stranger.ok && stranger.error.code).toBe(
         "proposal.hostNotInEvent"
       );
+      const outsider = await createGuest({
+        eventId: (await createEvent()).id,
+      });
+      const foreign = await proposalUseCases().createProposal(
+        open(outsider.id),
+        input,
+        now()
+      );
+      expect(!foreign.ok && foreign.error.code).toBe("guest.notInEvent");
 
       const created = await proposalUseCases().createProposal(
         open(guest.id),

@@ -82,9 +82,15 @@ describe("createProposal", () => {
   });
   afterEach(() => vi.unstubAllEnvs());
 
+  async function proposeAsMemberOf(eventId: string) {
+    const proposer = await createGuest({ name: "Member", eventId });
+    cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(proposer.id));
+  }
+
   it("creates a proposal with hosts and duration, readable via listByEvent", async () => {
     const event = await createEvent();
     const host = await createGuest({ name: "Host", eventId: event.id });
+    await proposeAsMemberOf(event.id);
 
     const result = await createProposal({
       eventId: event.id,
@@ -111,6 +117,7 @@ describe("createProposal", () => {
   it("rejects a host who is not part of the event", async () => {
     const event = await createEvent();
     const outsider = await createGuest({ name: "Outsider" }); // not assigned
+    await proposeAsMemberOf(event.id);
 
     const result = await createProposal({
       eventId: event.id,
@@ -214,6 +221,7 @@ describe("createProposal", () => {
     const event = await createEvent();
     const threeDays = 3 * 24 * 60 * 60 * 1000;
     cookieJar.set(TIME_OFFSET_COOKIE, String(threeDays));
+    await proposeAsMemberOf(event.id);
 
     const result = await createProposal({
       eventId: event.id,

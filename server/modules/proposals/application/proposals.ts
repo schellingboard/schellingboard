@@ -37,14 +37,17 @@ export interface UpdateProposalInput extends ProposalFields {
   expectedUpdatedTime: Date;
 }
 
-async function strangerHost(
+async function guestIdsOf(
   repos: ProposalDeps["repos"],
-  eventId: string,
+  eventId: string
+): Promise<Set<string>> {
+  return new Set((await repos.guests.listByEvent(eventId)).map((g) => g.id));
+}
+
+function strangerHost(
+  eventGuestIds: Set<string>,
   hostIds: string[]
-): Promise<Failure | null> {
-  const eventGuestIds = new Set(
-    (await repos.guests.listByEvent(eventId)).map((g) => g.id)
-  );
+): Failure | null {
   return hostIds.every((id) => eventGuestIds.has(id))
     ? null
     : forbidden("proposal.hostNotInEvent", "A host is not part of this event");
@@ -81,7 +84,10 @@ export const createProposal =
     if (!event) return notFound("event.notFound", "Event not found");
     if (inSchedPhase(event, now))
       return forbidden("event.proposalsClosed", "The proposal phase is over");
-    const stranger = await strangerHost(repos, eventId, fields.hostIds);
+    const eventGuestIds = await guestIdsOf(repos, eventId);
+    if (!eventGuestIds.has(acting.value))
+      return forbidden("guest.notInEvent", "You are not part of this event");
+    const stranger = strangerHost(eventGuestIds, fields.hostIds);
     if (stranger) return stranger;
 
     const created = await repos.sessionProposals.create({
@@ -105,9 +111,8 @@ export const updateProposal =
     if (!proposal) return proposalNotFound();
     const refused = await notItsHost(actor, repos, proposal, "edit");
     if (refused) return refused;
-    const stranger = await strangerHost(
-      repos,
-      proposal.eventId,
+    const stranger = strangerHost(
+      await guestIdsOf(repos, proposal.eventId),
       fields.hostIds
     );
     if (stranger) return stranger;
