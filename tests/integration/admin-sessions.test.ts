@@ -330,9 +330,8 @@ describe("adminCreateSessionAction", () => {
       hostIds: ["no-such-guest"],
       locationIds: [],
     });
-    expect(!result.ok && result.error).toBe("Failed to create session");
+    expect(!result.ok && result.error).toBe("Unknown host");
 
-    // the transaction rolled back, nothing was created
     expect(await getRepositories().sessions.listByEvent(event.id)).toHaveLength(
       0
     );
@@ -892,18 +891,15 @@ describe("adminUpdateSessionAction", () => {
       hostIds: ["no-such-guest"],
       locationIds: [],
     });
-    expect(!badHost.ok && badHost.error).toBe("Failed to update session");
+    expect(!badHost.ok && badHost.error).toBe("Unknown host");
 
     const badLocation = await adminUpdateSessionAction({
       ...base,
       hostIds: [],
       locationIds: ["no-such-location"],
     });
-    expect(!badLocation.ok && badLocation.error).toBe(
-      "Failed to update session"
-    );
+    expect(!badLocation.ok && badLocation.error).toBe("Unknown location");
 
-    // the transaction rolled back, session is unchanged
     const updated = await getRepositories().sessions.findById(session.id);
     expect(updated?.title).toBe("Old title");
   });

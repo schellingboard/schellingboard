@@ -83,6 +83,19 @@ function checked(input: AdminSessionFields): Result<Checked> {
   });
 }
 
+async function unknownReference(
+  repos: SessionDeps["repos"],
+  { hostIds, locationIds }: Pick<AdminSessionFields, "hostIds" | "locationIds">
+): Promise<Failure | null> {
+  const knownHosts = await repos.guests.findExistingIds(hostIds);
+  if (knownHosts.length !== hostIds.length)
+    return invalid("session.hostUnknown", "Unknown host");
+  const knownLocations = await repos.locations.findExistingIds(locationIds);
+  if (knownLocations.length !== locationIds.length)
+    return invalid("session.locationUnknown", "Unknown location");
+  return null;
+}
+
 // The rule attendees book by too: two sessions conflict when they share a
 // location and their times overlap.
 async function clash(
@@ -121,6 +134,8 @@ export const adminCreateSession =
     const { repos } = deps;
     if (!(await repos.events.findById(eventId)))
       return notFound("event.notFound", "Event not found");
+    const unknown = await unknownReference(repos, fields.value);
+    if (unknown) return unknown;
     const clashing = await clash(repos, eventId, fields.value);
     if (clashing) return clashing;
 
@@ -147,6 +162,8 @@ export const adminUpdateSession =
     const { repos } = deps;
     const session = await repos.sessions.findById(id);
     if (!session) return sessionNotFound();
+    const unknown = await unknownReference(repos, fields.value);
+    if (unknown) return unknown;
     const clashing = await clash(repos, session.eventId, fields.value, id);
     if (clashing) return clashing;
 

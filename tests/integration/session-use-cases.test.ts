@@ -418,6 +418,37 @@ describe("organizer session use cases", () => {
     }
   );
 
+  it("answers an unknown host or room instead of failing to save", async () => {
+    const event = await createEvent();
+    const sessions = sessionUseCases();
+    const created = await sessions.adminCreateSession(
+      ADMIN,
+      { ...fields, eventId: event.id, locationIds: [] },
+      now()
+    );
+    if (!created.ok) throw new Error(created.error.code);
+
+    const unknownHost = await sessions.adminCreateSession(
+      ADMIN,
+      { ...fields, eventId: event.id, hostIds: ["nope"], locationIds: [] },
+      now()
+    );
+    const unknownRoom = await sessions.adminUpdateSession(
+      ADMIN,
+      { ...fields, id: created.value.id, locationIds: ["nope"] },
+      now()
+    );
+
+    expect(unknownHost).toMatchObject({
+      ok: false,
+      error: { kind: "invalid", code: "session.hostUnknown" },
+    });
+    expect(unknownRoom).toMatchObject({
+      ok: false,
+      error: { kind: "invalid", code: "session.locationUnknown" },
+    });
+  });
+
   it("answers an overlap in the same room with session.clash", async () => {
     const event = await createEvent();
     const location = await createLocation();
