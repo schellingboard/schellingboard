@@ -50,7 +50,7 @@
     "@types/better-sqlite3": "^9.6.0",
     "@types/js-cookie": "^3.0.6",
     "@types/lodash": "^4.17.25",
-    "@types/luxon": "^3.7.5",
+    "@types/luxon": "^3.7.6",
     "@types/mdast": "^4.0.4",
     "@types/node": "^26",
     "@types/nodemailer": "^8.0.2",
@@ -58,8 +58,8 @@
     "@types/react-dom": "^19",
     "@types/turndown": "^5.0.6",
     "@types/web-push": "^3.6.4",
-    "@typescript-eslint/eslint-plugin": "^8.70.1",
-    "@typescript-eslint/parser": "^8.70.1",
+    "@typescript-eslint/eslint-plugin": "^8.71.0",
+    "@typescript-eslint/parser": "^8.71.0",
     "@vitest/coverage-v8": "^5",
     "@vitest/ui": "^5",
     "dependency-cruiser": "^18.4.0",
@@ -73,7 +73,7 @@
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.15",
     "typescript": "^6",
-    "typescript-eslint": "^8.70.1",
+    "typescript-eslint": "^8.71.0",
     "vitest": "^5"
   }
 }
