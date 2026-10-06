@@ -27,7 +27,7 @@ counts), `proposals` (proposals and votes), `comments`, `meetings`, `people`
 days), `venue` (locations) and `settings` (site settings).
 
 The Next mount is `app/api/v1/[[...route]]/route.ts`; `proxy.ts` gates it like
-any other route (site password for `/api/v1`, the admin cookie for
+any other route (site password or admin cookie for `/api/v1`, the admin cookie for
 `/api/v1/admin/`). Repositories stay in `db/`.
 
 ## Adding a use case and its route

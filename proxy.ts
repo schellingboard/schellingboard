@@ -5,6 +5,7 @@ import {
   ADMIN_DISABLED_MESSAGE,
   ADMIN_VERIFIED_HEADER,
   forwardAsVerifiedAdmin,
+  isAdminAuthenticated,
   isAdminEnabled,
   isAuthenticated,
   isPasswordProtectionEnabled,
@@ -75,8 +76,13 @@ export async function proxy(request: NextRequest) {
       ? refuseApiV1({ status: refusal.status, code: refusal.code })
       : forwardAsVerifiedAdmin(request);
   }
+  // An admin script then needs one cookie for the whole API, not two.
   if (pathname === "/api/v1" || pathname.startsWith("/api/v1/")) {
-    if (isPasswordProtectionEnabled() && !(await isAuthenticated(request))) {
+    if (
+      isPasswordProtectionEnabled() &&
+      !(await isAuthenticated(request)) &&
+      !(await isAdminAuthenticated(request))
+    ) {
       return refuseApiV1({ status: 401, code: "site.unauthenticated" });
     }
     return forwardWithoutAdminHeader(request);

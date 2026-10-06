@@ -30,7 +30,7 @@ password's, the admin login's, and the one choosing your name. There are no
 API tokens yet; they are planned.
 
 - **Site password.** When `SITE_PASSWORD` is set, every `/api/v1` endpoint
-  outside `/api/v1/admin/` needs the site cookie.
+  outside `/api/v1/admin/` needs the site cookie or the admin cookie.
 - **Admin password.** `/api/v1/admin/` needs the admin cookie, and only that:
   the site password is not asked for there, as in the admin UI. With
   `ADMIN_PASSWORD` unset, these endpoints answer `404`.

@@ -172,6 +172,13 @@ describe("proxy: /api/v1", () => {
     });
   });
 
+  it("lets the admin cookie stand in for the site cookie", async () => {
+    const admin = await createAdminAuthCookie();
+    const result = await throughProxy("/api/v1/sessions", {}, [admin]);
+    if (!result.ok) throw new Error("expected proxy to forward the request");
+    expect(result.request.headers.get(ADMIN_VERIFIED_HEADER)).toBeNull();
+  });
+
   it("gates /api/v1/admin/* by the admin cookie alone", async () => {
     const admin = await createAdminAuthCookie();
     const result = await throughProxy("/api/v1/admin/events", {}, [admin]);

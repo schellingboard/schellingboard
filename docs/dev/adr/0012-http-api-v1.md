@@ -101,7 +101,7 @@ the admin actor live under `/api/v1/admin/`, which gets the `/api/admin/*`
 branch: the admin cookie alone, without the site password (the two are
 independent, as the admin guide documents), the cross-site check, and `404`
 when `ADMIN_PASSWORD` is unset. The rest of `/api/v1` requires the site
-password. Under `/api/v1`, the proxy refuses with problem details (section 4)
+password or the admin cookie, so an admin script needs one cookie. Under `/api/v1`, the proxy refuses with problem details (section 4)
 instead of the login redirect or `{ error }` body the legacy routes get.
 
 ### 4. Errors are values, sent as problem details
