@@ -6,8 +6,9 @@ import {
   updateMeetingPoint,
 } from "./admin-meetings";
 import { saveMeetingAvailability } from "./availability";
+import { listMeetingCandidates } from "./candidates";
 import { cancelMeeting, requestMeeting, respondToMeeting } from "./meetings";
-import { listMeetingCandidates, listMyMeetings } from "./queries";
+import { listMyMeetings } from "./queries";
 
 export function createMeetingUseCases(deps: MeetingDeps) {
   return {

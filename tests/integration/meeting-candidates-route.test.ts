@@ -16,7 +16,8 @@ import { createEvent, createGuest, createDay } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, verifiedGuestValue } from "../helpers/guest-cookie";
 import { getRepositories } from "@/db/container";
 import { GET as candidates } from "@/app/api/meetings/candidates/route";
-import type { MeetingCandidates } from "@/utils/meeting-candidates";
+import type { meetingCandidatesSchema } from "@schellingboard/contracts/meeting";
+import type { z } from "zod";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
@@ -72,7 +73,7 @@ describe("the 1-on-1 candidates endpoint", () => {
     );
 
     expect(res.status).toBe(200);
-    const body = (await res.json()) as MeetingCandidates;
+    const body = (await res.json()) as z.infer<typeof meetingCandidatesSchema>;
     expect(body.candidates.map((c) => c.name)).toEqual(["Grace"]);
     expect(res.headers.get("cache-control")).toBe("no-store");
   });
@@ -123,7 +124,7 @@ describe("the 1-on-1 candidates endpoint", () => {
     );
 
     expect(res.status).toBe(200);
-    const body = (await res.json()) as MeetingCandidates;
+    const body = (await res.json()) as z.infer<typeof meetingCandidatesSchema>;
     expect(body.slotCount).toBe(2);
     // Grace declared the first slot only.
     expect(body.candidates).toEqual([]);

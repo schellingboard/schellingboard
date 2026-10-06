@@ -9,7 +9,7 @@ import {
   createSession,
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { meetingCandidatesFor } from "@/utils/meeting-candidates";
+import { meetingUseCases } from "@/server/composition";
 import type { Guest } from "@schellingboard/domain/guest";
 import type { Event } from "@schellingboard/domain/event";
 
@@ -46,12 +46,27 @@ async function scenario(
   return { event, viewer, grace };
 }
 
+async function meetingCandidatesFor(
+  viewerId: string,
+  eventId: string,
+  slotStart: string,
+  now: Date,
+  slotCount = 1
+) {
+  const result = await meetingUseCases().listMeetingCandidates(
+    { admin: false, guest: { id: viewerId, level: "open" } },
+    { eventId, slotStart, slotCount },
+    now
+  );
+  return result.ok ? result.value : null;
+}
+
 const names = async (event: Event, viewer: Guest, now = BEFORE) =>
   (await meetingCandidatesFor(viewer.id, event.id, SLOT, now))?.candidates.map(
     (c) => c.name
   );
 
-describe("meetingCandidatesFor", () => {
+describe("listMeetingCandidates", () => {
   beforeAll(() => setupTestDb());
 
   beforeEach(() => resetTestDb());

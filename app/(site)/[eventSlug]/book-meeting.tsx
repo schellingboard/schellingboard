@@ -10,10 +10,11 @@ import { MeetingRequestFields } from "@/app/components/meeting-request-fields";
 import { Modal } from "@/app/components/modal";
 import Link from "next/link";
 import { clashLines } from "@/utils/meeting-clash-text";
-import type {
-  MeetingCandidate,
-  MeetingCandidates,
-} from "@/utils/meeting-candidates";
+import type { meetingCandidatesSchema } from "@schellingboard/contracts/meeting";
+import type { z } from "zod";
+
+type MeetingCandidates = z.infer<typeof meetingCandidatesSchema>;
+type MeetingCandidate = MeetingCandidates["candidates"][number];
 
 /**
  * Why there is no list to show: the slot is not one this viewer can book at

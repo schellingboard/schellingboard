@@ -1,10 +1,6 @@
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
-import { notFound, ok, type Result } from "@/server/kernel/result";
-import {
-  meetingCandidatesFor,
-  type MeetingCandidates,
-} from "@/utils/meeting-candidates";
+import { ok, type Result } from "@/server/kernel/result";
 import { myMeetingsFor, type MyMeetingsResponse } from "@/utils/meeting-views";
 import type { MeetingDeps } from "../ports";
 import { eventNotFound } from "./meetings";
@@ -22,26 +18,4 @@ export const listMyMeetings =
     if (!acting.ok) return acting;
     if (!(await repos.events.findById(eventId))) return eventNotFound();
     return ok(await myMeetingsFor(acting.value, eventId, now, repos));
-  };
-
-export const listMeetingCandidates =
-  ({ repos }: MeetingDeps) =>
-  async (
-    actor: Actor,
-    input: { eventId: string; slotStart: string; slotCount: number },
-    now: Date
-  ): Promise<Result<MeetingCandidates>> => {
-    const acting = await actingGuest(actor, repos.guests);
-    if (!acting.ok) return acting;
-    const found = await meetingCandidatesFor(
-      acting.value,
-      input.eventId,
-      input.slotStart,
-      now,
-      input.slotCount,
-      repos
-    );
-    return found
-      ? ok(found)
-      : notFound("meeting.slotNotOpen", "That slot is not open for 1-on-1s");
   };
