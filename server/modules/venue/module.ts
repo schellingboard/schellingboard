@@ -1,5 +1,4 @@
 export type { LocationImageStore, VenueDeps } from "./ports";
-export type { LocationInput } from "./application/locations";
 export {
   createVenueUseCases,
   type VenueUseCases,

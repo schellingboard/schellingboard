@@ -14,7 +14,6 @@ import {
 } from "@/server/kernel/result";
 import type { VenueDeps } from "../ports";
 
-export type LocationInput = z.input<typeof locationSchema>;
 export type LocationWithEvents = Location & { eventIds: string[] };
 
 export const adminRequired = () => forbidden("admin.required", "Unauthorized");
@@ -64,10 +63,7 @@ function refused(error: z.ZodError) {
 
 export const createLocation =
   (deps: VenueDeps) =>
-  async (
-    actor: Actor,
-    input: LocationInput
-  ): Promise<Result<LocationWithEvents>> => {
+  async (actor: Actor, input: unknown): Promise<Result<LocationWithEvents>> => {
     if (!actor.admin) return adminRequired();
     const parsed = await locationSchema
       .extend(validations(deps))
@@ -103,10 +99,7 @@ export const createLocation =
 
 export const updateLocation =
   (deps: VenueDeps) =>
-  async (
-    actor: Actor,
-    input: LocationInput & { id: string }
-  ): Promise<Result<LocationWithEvents>> => {
+  async (actor: Actor, input: unknown): Promise<Result<LocationWithEvents>> => {
     if (!actor.admin) return adminRequired();
     const parsed = await updateLocationSchema
       .extend(validations(deps))

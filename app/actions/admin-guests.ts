@@ -10,7 +10,6 @@ import type {
 import { peopleUseCases } from "@/server/composition";
 import { resolveActor } from "@/server/kernel/actor";
 import type { AppError, Result } from "@/server/kernel/result";
-import type { GuestInput } from "@/server/modules/people/module";
 
 export type AdminFormActionResult =
   { ok: true } | { ok: false; error: string | z.core.$ZodIssue[] };
@@ -51,9 +50,7 @@ export async function createGuestAction(
 export async function createGuestAction(
   input: unknown
 ): Promise<AdminFormActionResult> {
-  return settledForm(
-    await peopleUseCases().createGuest(await actor(), input as GuestInput)
-  );
+  return settledForm(await peopleUseCases().createGuest(await actor(), input));
 }
 
 export async function updateGuestAction(
@@ -62,12 +59,7 @@ export async function updateGuestAction(
 export async function updateGuestAction(
   input: unknown
 ): Promise<AdminFormActionResult> {
-  return settledForm(
-    await peopleUseCases().updateGuest(
-      await actor(),
-      input as GuestInput & { id: string }
-    )
-  );
+  return settledForm(await peopleUseCases().updateGuest(await actor(), input));
 }
 
 export async function deleteGuestAction(input: {

@@ -101,7 +101,7 @@ export const listGuests =
 
 export const createGuest =
   (deps: PeopleDeps) =>
-  async (actor: Actor, input: GuestInput): Promise<Result<AdminGuest>> => {
+  async (actor: Actor, input: unknown): Promise<Result<AdminGuest>> => {
     if (!actor.admin) return adminRequired();
     const parsed = parseGuest(createGuestSchema, input);
     if (!parsed.ok) return parsed;
@@ -144,10 +144,7 @@ export const ensureGuest =
 
 export const updateGuest =
   (deps: PeopleDeps) =>
-  async (
-    actor: Actor,
-    input: GuestInput & { id: string }
-  ): Promise<Result<AdminGuest>> => {
+  async (actor: Actor, input: unknown): Promise<Result<AdminGuest>> => {
     if (!actor.admin) return adminRequired();
     const parsed = parseGuest(updateGuestSchema, input);
     if (!parsed.ok) return parsed;

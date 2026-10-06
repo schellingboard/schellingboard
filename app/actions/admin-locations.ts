@@ -10,7 +10,6 @@ import type {
 import { venueUseCases } from "@/server/composition";
 import { resolveActor } from "@/server/kernel/actor";
 import type { Result } from "@/server/kernel/result";
-import type { LocationInput } from "@/server/modules/venue/module";
 import type { AdminActionResult, AdminFormActionResult } from "./admin-guests";
 
 async function actor() {
@@ -47,10 +46,7 @@ export async function createLocationAction(
   formData: unknown
 ): Promise<AdminFormActionResult> {
   return settledForm(
-    await venueUseCases().createLocation(
-      await actor(),
-      formData as LocationInput
-    )
+    await venueUseCases().createLocation(await actor(), formData)
   );
 }
 
@@ -61,10 +57,7 @@ export async function updateLocationAction(
   formData: unknown
 ): Promise<AdminFormActionResult> {
   return settledForm(
-    await venueUseCases().updateLocation(
-      await actor(),
-      formData as LocationInput & { id: string }
-    )
+    await venueUseCases().updateLocation(await actor(), formData)
   );
 }
 

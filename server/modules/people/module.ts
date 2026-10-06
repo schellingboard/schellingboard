@@ -1,6 +1,6 @@
 export type { AvatarStore, PeopleDeps, ValidatedImage } from "./ports";
 export type { ProfileInput } from "./application/profiles";
-export type { AdminGuest, GuestInput } from "./application/admin-guests";
+export type { AdminGuest } from "./application/admin-guests";
 export {
   createPeopleUseCases,
   type PeopleUseCases,
