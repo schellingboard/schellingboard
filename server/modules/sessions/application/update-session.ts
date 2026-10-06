@@ -48,13 +48,13 @@ export const updateSession =
     const { repos } = deps;
     const day = await repos.days.findById(input.dayId);
     if (!day) return dayUnknown();
-    const allSessions = await repos.sessions.listScheduledByEvent(day.eventId);
-    const prev = allSessions.find((s) => s.id === input.sessionId);
+    const prev = await repos.sessions.findById(input.sessionId);
     if (!prev)
       return notFound(
         "session.notFound",
         `Cannot find session with ID ${input.sessionId}`
       );
+    if (prev.eventId !== day.eventId) return dayUnknown();
     const event = await repos.events.findById(prev.eventId);
     if (!event || !inSchedPhase(event, now)) return outsidePhase("edited");
     if (prev.adminManaged || prev.blocker) return managedByOrganizer("edit");
@@ -110,7 +110,9 @@ export const updateSession =
     if (unavailable) return unavailable;
     const placement = sessionPlacementError(
       session,
-      allSessions.filter((s) => s.id !== prev.id),
+      (await repos.sessions.listScheduledByEvent(event.id)).filter(
+        (s) => s.id !== prev.id
+      ),
       now,
       { allowPastStart: !startChanged }
     );

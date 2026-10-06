@@ -242,6 +242,55 @@ describe("updateSession and deleteSession", () => {
     expect(result).toMatchObject({ ok: true, value: { title: "Renamed" } });
   });
 
+  it(
+    "lets a host place their session that has no time yet",
+    { tags: ["008-US2"] },
+    async () => {
+      const { event, host, location, day } = await scheduledWorld();
+      const unplaced = await createSession(event.id, {
+        hostIds: [host.id],
+        locationIds: [location.id],
+      });
+
+      const result = await sessionUseCases().updateSession(
+        open(host.id),
+        {
+          ...booking(day, [host.id], location.id),
+          sessionId: unplaced.id,
+          locationIds: [location.id],
+        },
+        now()
+      );
+
+      expect(result.ok).toBe(true);
+      expect(
+        (await getRepositories().sessions.findById(unplaced.id))?.startTime
+      ).toBeInstanceOf(Date);
+    }
+  );
+
+  it("answers a day of another event with session.dayUnknown", async () => {
+    const { host, location, session } = await hostedSession();
+    const otherDay = await createDay(
+      (await createEvent({ phase: "scheduling" })).id
+    );
+
+    const result = await sessionUseCases().updateSession(
+      open(host.id),
+      {
+        ...booking(otherDay, [host.id], location.id),
+        sessionId: session.id,
+        locationIds: [location.id],
+      },
+      now()
+    );
+
+    expect(result).toMatchObject({
+      ok: false,
+      error: { kind: "invalid", code: "session.dayUnknown" },
+    });
+  });
+
   it("refuses a guest who does not host the session", async () => {
     const { event, location, day, host, session } = await hostedSession();
     const stranger = await createGuest({ eventId: event.id });
