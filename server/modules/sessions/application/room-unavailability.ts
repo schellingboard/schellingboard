@@ -37,7 +37,7 @@ export const addLocationUnavailability =
   async (
     actor: Actor,
     input: LocationUnavailabilityInput
-  ): Promise<Result<void>> => {
+  ): Promise<Result<LocationUnavailability[]>> => {
     if (!actor.admin) return adminRequired();
     const { start, end } = input;
     if (!valid(start) || !valid(end)) {
@@ -63,15 +63,16 @@ export const addLocationUnavailability =
       );
     }
 
-    await repos.locationUnavailability.createMany(
-      [...new Set(input.locationIds)].map((locationId) => ({
-        eventId: input.eventId,
-        locationId,
-        start,
-        end,
-      }))
+    return ok(
+      await repos.locationUnavailability.createMany(
+        [...new Set(input.locationIds)].map((locationId) => ({
+          eventId: input.eventId,
+          locationId,
+          start,
+          end,
+        }))
+      )
     );
-    return ok(undefined);
   };
 
 export const deleteLocationUnavailability =

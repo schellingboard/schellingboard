@@ -73,7 +73,9 @@ export interface LocationUnavailabilityRepository {
     data: Omit<LocationUnavailability, "id">
   ): Promise<LocationUnavailability>;
   /** One insert statement: either every period is stored or none is. */
-  createMany(data: Omit<LocationUnavailability, "id">[]): Promise<void>;
+  createMany(
+    data: Omit<LocationUnavailability, "id">[]
+  ): Promise<LocationUnavailability[]>;
   delete(id: string): Promise<void>;
 }
 

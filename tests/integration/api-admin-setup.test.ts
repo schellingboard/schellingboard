@@ -329,10 +329,9 @@ describe("/api/v1/admin locations", () => {
       const added = await call("POST", path, {
         body: { locationIds: [room.id], start: at("10:00"), end: at("12:00") },
       });
-      expect(added.status).toBe(204);
-      const { periods } = (await (await call("GET", path)).json()) as {
-        periods: { id: string }[];
-      };
+      expect(added.status).toBe(201);
+      const { periods } = (await added.json()) as { periods: { id: string }[] };
+      expect(await (await call("GET", path)).json()).toEqual({ periods });
       expect(periods).toEqual([
         {
           id: expect.any(String) as string,

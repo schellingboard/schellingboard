@@ -46,7 +46,10 @@ const add = createRoute({
     params: idParam,
     body: body(unavailabilityBodySchema),
   },
-  responses: { 204: noContent("Added"), ...problemDefault },
+  responses: {
+    201: json(unavailabilityListSchema, "The new periods, one per room"),
+    ...problemDefault,
+  },
 });
 
 const remove = createRoute({
@@ -78,7 +81,7 @@ export function addAdminUnavailabilityRoutes(
       end: new Date(end),
     });
     if (!result.ok) return problem(result.error);
-    return c.body(null, 204);
+    return c.json({ periods: result.value.map(toView) }, 201);
   });
 
   app.openapi(remove, async (c) => {

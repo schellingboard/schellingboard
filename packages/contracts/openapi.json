@@ -8202,7 +8202,39 @@
           }
         },
         "responses": {
-          "204": { "description": "Added" },
+          "201": {
+            "description": "The new periods, one per room",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "periods": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "eventId": { "type": "string" },
+                          "locationId": { "type": "string" },
+                          "start": { "type": "string", "format": "date-time" },
+                          "end": { "type": "string", "format": "date-time" }
+                        },
+                        "required": [
+                          "id",
+                          "eventId",
+                          "locationId",
+                          "start",
+                          "end"
+                        ]
+                      }
+                    }
+                  },
+                  "required": ["periods"]
+                }
+              }
+            }
+          },
           "default": {
             "description": "Problem details (RFC 9457); clients branch on `code`",
             "content": {
