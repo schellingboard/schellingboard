@@ -113,6 +113,29 @@ with neither the admin cookie nor a selected attendee has its key ignored.
 Every response is sent with `cache-control: no-store`: browsers and proxies
 never keep it, so a read always shows the current state.
 
+## Syncing from a script
+
+A script that keeps an event in step with an outside plan, such as a list of
+shifts, reads what is there first and then changes only what differs. With the
+admin cookie it can read every endpoint it needs:
+
+- **Check times before booking.** `GET /api/v1/admin/events/{id}` answers the
+  event's settings and its days, so the script can check session times first.
+- **Find a location before adding it.** `GET /api/v1/admin/locations` lists
+  every location, hidden ones included. Location names need not be unique, so
+  the script decides what counts as the same location, then creates the missing
+  ones with `POST /api/v1/admin/locations`.
+- **Find the existing sessions.** `GET /api/v1/sessions?eventId=…` lists every
+  session of the event, with its rooms, hosts (id and name only) and capacity.
+- **Update a session.** `PUT /api/v1/admin/sessions/{id}` replaces the
+  session: send every field, taking the ones you do not change from the read. A
+  field left out gets `400`, so nothing is reset by accident.
+- **Warn before deleting.** Each session in the list has `numRsvps`; show it
+  before `DELETE /api/v1/admin/sessions/{id}`.
+
+Send an `Idempotency-Key` with each change, so retrying one after a dropped
+connection does not create a second location or session.
+
 ## The TypeScript client
 
 The repository holds a typed client, `@schellingboard/api-client` in
