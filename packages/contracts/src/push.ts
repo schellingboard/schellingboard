@@ -16,5 +16,3 @@ export const pushSubscriptionSchema = z.object({
   p256dh: z.string().min(1).max(200),
   auth: z.string().min(1).max(200),
 });
-
-export type PushSubscriptionInput = z.infer<typeof pushSubscriptionSchema>;
