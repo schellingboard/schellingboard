@@ -293,6 +293,36 @@ describe("/api/v1/admin/sessions", () => {
     }
   );
 
+  it("refuses an update that leaves out a field rather than clearing it", async () => {
+    const event = await createEvent();
+    const cookie = await asAdmin();
+    const created = await POST(
+      request("POST", "/admin/sessions", {
+        body: { ...fields, capacity: 12, eventId: event.id },
+        cookie,
+      })
+    );
+    const { id } = (await created.json()) as { id: string };
+    const withoutCapacity: Partial<typeof fields> = { ...fields };
+    delete withoutCapacity.capacity;
+
+    const res = await PUT(
+      request("PUT", `/admin/sessions/${id}`, {
+        body: withoutCapacity,
+        cookie,
+      })
+    );
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toMatchObject({
+      code: "request.invalid",
+      errors: [expect.objectContaining({ path: "capacity" })],
+    });
+    expect(await getRepositories().sessions.findById(id)).toMatchObject({
+      capacity: 12,
+    });
+  });
+
   it("refuses a guest with admin.required", async () => {
     const event = await createEvent();
     const guest = await createGuest();

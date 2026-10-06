@@ -935,7 +935,7 @@
                 "type": "object",
                 "properties": {
                   "title": { "type": "string" },
-                  "description": { "type": "string", "default": "" },
+                  "description": { "type": "string" },
                   "startTime": {
                     "type": ["string", "null"],
                     "format": "date-time"
@@ -944,22 +944,28 @@
                     "type": ["string", "null"],
                     "format": "date-time"
                   },
-                  "capacity": { "type": "integer", "minimum": 0, "default": 0 },
-                  "adminManaged": { "type": "boolean", "default": false },
-                  "blocker": { "type": "boolean", "default": false },
-                  "closed": { "type": "boolean", "default": false },
-                  "hostIds": {
-                    "type": "array",
-                    "items": { "type": "string" },
-                    "default": []
-                  },
+                  "capacity": { "type": "integer", "minimum": 0 },
+                  "adminManaged": { "type": "boolean" },
+                  "blocker": { "type": "boolean" },
+                  "closed": { "type": "boolean" },
+                  "hostIds": { "type": "array", "items": { "type": "string" } },
                   "locationIds": {
                     "type": "array",
-                    "items": { "type": "string" },
-                    "default": []
+                    "items": { "type": "string" }
                   }
                 },
-                "required": ["title", "startTime", "endTime"]
+                "required": [
+                  "title",
+                  "description",
+                  "startTime",
+                  "endTime",
+                  "capacity",
+                  "adminManaged",
+                  "blocker",
+                  "closed",
+                  "hostIds",
+                  "locationIds"
+                ]
               }
             }
           }

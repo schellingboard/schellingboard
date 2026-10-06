@@ -371,24 +371,17 @@ export interface paths {
         content: {
           "application/json": {
             title: string;
-            /** @default  */
-            description?: string;
+            description: string;
             /** Format: date-time */
             startTime: string | null;
             /** Format: date-time */
             endTime: string | null;
-            /** @default 0 */
-            capacity?: number;
-            /** @default false */
-            adminManaged?: boolean;
-            /** @default false */
-            blocker?: boolean;
-            /** @default false */
-            closed?: boolean;
-            /** @default [] */
-            hostIds?: string[];
-            /** @default [] */
-            locationIds?: string[];
+            capacity: number;
+            adminManaged: boolean;
+            blocker: boolean;
+            closed: boolean;
+            hostIds: string[];
+            locationIds: string[];
           };
         };
       };

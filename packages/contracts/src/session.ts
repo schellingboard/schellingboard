@@ -92,20 +92,28 @@ export const sessionUpdateSchema = z.object({
 
 const adminFields = {
   title: z.string(),
-  description: z.string().default(""),
+  description: z.string(),
   startTime: instant.nullable(),
   endTime: instant.nullable(),
-  capacity: z.number().int().min(0).default(0),
-  adminManaged: z.boolean().default(false),
-  blocker: z.boolean().default(false),
-  closed: z.boolean().default(false),
-  hostIds: z.array(z.string()).default([]),
-  locationIds: z.array(z.string()).default([]),
+  capacity: z.number().int().min(0),
+  adminManaged: z.boolean(),
+  blocker: z.boolean(),
+  closed: z.boolean(),
+  hostIds: z.array(z.string()),
+  locationIds: z.array(z.string()),
 };
 
 export const adminSessionCreateSchema = z.object({
   ...adminFields,
+  description: adminFields.description.default(""),
+  capacity: adminFields.capacity.default(0),
+  adminManaged: adminFields.adminManaged.default(false),
+  blocker: adminFields.blocker.default(false),
+  closed: adminFields.closed.default(false),
+  hostIds: adminFields.hostIds.default([]),
+  locationIds: adminFields.locationIds.default([]),
   eventId: z.string().min(1),
 });
 
+// A replacement: a field left out is refused, not reset to a default.
 export const adminSessionUpdateSchema = z.object(adminFields);
