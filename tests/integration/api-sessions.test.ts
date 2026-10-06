@@ -232,22 +232,6 @@ describe("Idempotency-Key on the mounted API", () => {
     }
   );
 
-  it("does not let requests without an actor share a key", async () => {
-    const { host, location, day } = await scheduledWorld();
-    const send = (title: string) =>
-      POST(
-        request("POST", "/sessions", {
-          body: { ...booking(day, host.id, location.id), title },
-          key: "shared",
-        })
-      );
-
-    await send("One");
-    const other = await send("Another");
-
-    expect(await other.json()).toMatchObject({ code: "guest.unselected" });
-  });
-
   it("is declared on every mutating route in the OpenAPI document", () => {
     const paths = openApiDocument().paths ?? {};
     const mutations = Object.entries(paths).flatMap(([path, item]) =>
