@@ -3718,7 +3718,8 @@
                           },
                           "role": {
                             "type": "string",
-                            "enum": ["requester", "recipient"]
+                            "enum": ["requester", "recipient"],
+                            "description": "Which side the caller is on; only a recipient can answer"
                           },
                           "otherId": { "type": "string" },
                           "otherName": { "type": "string" },
@@ -3730,11 +3731,20 @@
                             "type": "string",
                             "format": "date-time"
                           },
-                          "dayLabel": { "type": "string" },
-                          "timeLabel": { "type": "string" },
+                          "dayLabel": {
+                            "type": "string",
+                            "description": "In the event's time zone"
+                          },
+                          "timeLabel": {
+                            "type": "string",
+                            "description": "In the event's time zone"
+                          },
                           "meetingPoint": { "type": "string" },
                           "message": { "type": "string" },
-                          "cancelNote": { "type": "string" },
+                          "cancelNote": {
+                            "type": "string",
+                            "description": "What the canceller said, if anything; empty otherwise"
+                          },
                           "clashes": {
                             "type": "array",
                             "items": {
@@ -3760,7 +3770,8 @@
                                 "isViewer"
                               ],
                               "description": "Only the caller's own commitment is named; another's is busy"
-                            }
+                            },
+                            "description": "Either party's commitments in the slot"
                           }
                         },
                         "required": [

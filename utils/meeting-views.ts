@@ -1,51 +1,14 @@
 import { DateTime } from "luxon";
 import { getRepositories, type Repositories } from "@/db/container";
-import type { MeetingStatus } from "@schellingboard/domain/meeting";
+import type { z } from "zod";
+import type { myMeetingsSchema } from "@schellingboard/contracts/meeting";
 import { clashesForInterval, loadGuestSchedules } from "@/utils/guest-clashes";
 import { toMeetingClashes } from "@/utils/meeting-clash-text";
 import { slotTimeLabel } from "@schellingboard/domain/meeting-slots";
-import type { MeetingClash } from "@/utils/meeting-clash-text";
 
-/**
- * A stored status, or "expired" — a pending request whose slot has begun.
- * Derived on read so nothing has to sweep the table on a timer
- * (issue #392, section 2.4).
- */
-export type MeetingViewStatus = MeetingStatus | "expired";
-
-/** One of the viewer's 1-on-1s, ready to render. */
-export type MeetingView = {
-  id: string;
-  status: MeetingViewStatus;
-  /** Which side the viewer is on — only a recipient can answer. */
-  role: "requester" | "recipient";
-  /** The other party, for linking their profile. */
-  otherId: string;
-  otherName: string;
-  /** ISO instants, for placing the meeting on the schedule grid. */
-  slotStart: string;
-  slotEnd: string;
-  /** Both in the event's timezone, as the picker labels its slots. */
-  dayLabel: string;
-  timeLabel: string;
-  meetingPoint: string;
-  message: string;
-  /** What the canceller said, if anything; empty on anything else. */
-  cancelNote: string;
-  /** Either party's commitments in the slot, so both can weigh the clash. */
-  clashes: MeetingClash[];
-};
-
-/**
- * What /api/meetings answers with: the viewer's own meetings, and the slots
- * they declared themselves open for. The column draws both, so one request
- * carries both.
- */
-export type MyMeetingsResponse = {
-  meetings: MeetingView[];
-  /** ISO slot starts, as `meetingAvailability` stores them. */
-  availability: string[];
-};
+export type MyMeetingsResponse = z.infer<typeof myMeetingsSchema>;
+export type MeetingView = MyMeetingsResponse["meetings"][number];
+export type MeetingViewStatus = MeetingView["status"];
 
 /**
  * The viewer's own 1-on-1s at an event, in every state — the caller decides
