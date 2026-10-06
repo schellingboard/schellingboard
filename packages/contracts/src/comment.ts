@@ -50,22 +50,24 @@ export const commentLikeSchema = z.object({
 const instant = z.iso.datetime({ offset: true });
 const guestRef = z.object({ id: z.string(), name: z.string() });
 
-export const commentViewSchema = z.object({
-  id: z.string(),
-  parentId: z.string().nullable(),
-  body: z.string(),
-  deleted: z
-    .boolean()
-    .describe(
-      "A deleted comment with replies stays in the thread, without body or author"
-    ),
-  createdTime: instant,
-  editedTime: instant.nullable(),
-  author: guestRef.nullable(),
-  likes: z
-    .array(guestRef.extend({ avatarUrl: z.string().nullable() }))
-    .describe("Who liked the comment, oldest first"),
-});
+export const commentViewSchema = z
+  .object({
+    id: z.string(),
+    parentId: z.string().nullable(),
+    body: z.string(),
+    deleted: z
+      .boolean()
+      .describe(
+        "A deleted comment with replies stays in the thread, without body or author"
+      ),
+    createdTime: instant,
+    editedTime: instant.nullable(),
+    author: guestRef.nullable(),
+    likes: z
+      .array(guestRef.extend({ avatarUrl: z.string().nullable() }))
+      .describe("Who liked the comment, oldest first"),
+  })
+  .meta({ id: "Comment" });
 
 export const commentListSchema = z.object({
   comments: z.array(commentViewSchema).describe("Oldest first"),

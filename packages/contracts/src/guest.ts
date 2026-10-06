@@ -141,24 +141,26 @@ const nullableList = <T extends z.ZodType>(item: T) => z.array(item).nullable();
 
 // What anyone past the site password sees on a profile: never the email or
 // the email settings, which are the guest's own.
-export const publicProfileSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  aboutMe: z.string().nullable(),
-  avatarUrl: z.string().nullable(),
-  pronouns: z.string().nullable(),
-  basedIn: z.string().nullable(),
-  prompts: nullableList(z.object({ prompt: z.string(), answer: z.string() })),
-  languages: nullableList(z.string()),
-  contacts: nullableList(
-    z.object({
-      type: z.enum(CONTACT_TYPES),
-      label: z.string().optional(),
-      value: z.string(),
-    })
-  ),
-  profileUpdatedAt: z.iso.datetime({ offset: true }).nullable(),
-});
+export const publicProfileSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    aboutMe: z.string().nullable(),
+    avatarUrl: z.string().nullable(),
+    pronouns: z.string().nullable(),
+    basedIn: z.string().nullable(),
+    prompts: nullableList(z.object({ prompt: z.string(), answer: z.string() })),
+    languages: nullableList(z.string()),
+    contacts: nullableList(
+      z.object({
+        type: z.enum(CONTACT_TYPES),
+        label: z.string().optional(),
+        value: z.string(),
+      })
+    ),
+    profileUpdatedAt: z.iso.datetime({ offset: true }).nullable(),
+  })
+  .meta({ id: "PublicProfile" });
 
 export const adminGuestBodySchema = z.object({
   name: z.string(),
@@ -166,13 +168,15 @@ export const adminGuestBodySchema = z.object({
 });
 
 // What an organizer sees of a guest: never the password hash.
-export const adminGuestViewSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  email: z.string(),
-  authProtected: z.boolean(),
-  eventIds: z.array(z.string()),
-});
+export const adminGuestViewSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string(),
+    authProtected: z.boolean(),
+    eventIds: z.array(z.string()),
+  })
+  .meta({ id: "AdminGuest" });
 
 export const adminGuestListSchema = z.object({
   guests: z.array(adminGuestViewSchema),

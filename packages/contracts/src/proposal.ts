@@ -29,26 +29,28 @@ export const voteBreakdownSchema = z
     "From the scheduling phase on, shown to a proposal's hosts, and to everyone for a proposal nobody hosts"
   );
 
-export const proposalViewSchema = z.object({
-  id: z.string(),
-  eventId: z.string(),
-  title: z.string(),
-  description: z.string().nullable(),
-  durationMinutes: z.number().nullable(),
-  createdTime: instant,
-  updatedTime: instant,
-  hosts: z.array(z.object({ id: z.string(), name: z.string() })),
-  cohostWanted: z.boolean(),
-  cohostWantedNote: z.string().nullable(),
-  sessionIds: z.array(z.string()),
-  tally: z
-    .object({ interested: z.number().int(), maybe: z.number().int() })
-    .nullable()
-    .describe(
-      "The public tally, from the scheduling phase on; skip votes are only in the breakdown"
-    ),
-  breakdown: voteBreakdownSchema.nullable(),
-});
+export const proposalViewSchema = z
+  .object({
+    id: z.string(),
+    eventId: z.string(),
+    title: z.string(),
+    description: z.string().nullable(),
+    durationMinutes: z.number().nullable(),
+    createdTime: instant,
+    updatedTime: instant,
+    hosts: z.array(z.object({ id: z.string(), name: z.string() })),
+    cohostWanted: z.boolean(),
+    cohostWantedNote: z.string().nullable(),
+    sessionIds: z.array(z.string()),
+    tally: z
+      .object({ interested: z.number().int(), maybe: z.number().int() })
+      .nullable()
+      .describe(
+        "The public tally, from the scheduling phase on; skip votes are only in the breakdown"
+      ),
+    breakdown: voteBreakdownSchema.nullable(),
+  })
+  .meta({ id: "Proposal" });
 
 export const proposalListSchema = z.object({
   proposals: z.array(proposalViewSchema),

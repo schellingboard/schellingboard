@@ -36,24 +36,26 @@ export const STALE_PROPOSAL_MESSAGE =
 
 const instant = z.iso.datetime({ offset: true });
 
-export const sessionViewSchema = z.object({
-  id: z.string(),
-  eventId: z.string(),
-  title: z.string(),
-  description: z.string(),
-  startTime: instant.nullable(),
-  endTime: instant.nullable(),
-  capacity: z.number().int(),
-  adminManaged: z.boolean(),
-  blocker: z.boolean(),
-  closed: z.boolean(),
-  proposalId: z.string().nullable(),
-  hosts: z.array(z.object({ id: z.string(), name: z.string() })),
-  locations: z.array(
-    z.object({ id: z.string(), name: z.string(), color: z.string() })
-  ),
-  numRsvps: z.number().int(),
-});
+export const sessionViewSchema = z
+  .object({
+    id: z.string(),
+    eventId: z.string(),
+    title: z.string(),
+    description: z.string(),
+    startTime: instant.nullable(),
+    endTime: instant.nullable(),
+    capacity: z.number().int(),
+    adminManaged: z.boolean(),
+    blocker: z.boolean(),
+    closed: z.boolean(),
+    proposalId: z.string().nullable(),
+    hosts: z.array(z.object({ id: z.string(), name: z.string() })),
+    locations: z.array(
+      z.object({ id: z.string(), name: z.string(), color: z.string() })
+    ),
+    numRsvps: z.number().int(),
+  })
+  .meta({ id: "Session" });
 
 export const sessionListSchema = z.object({
   sessions: z.array(sessionViewSchema),

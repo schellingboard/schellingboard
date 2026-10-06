@@ -53,29 +53,31 @@ const clashSchema = z
   })
   .describe("Only the caller's own commitment is named; another's is busy");
 
-export const meetingViewSchema = z.object({
-  id: z.string(),
-  status: z
-    .enum([...meetingStatus.options, "expired"])
-    .describe("expired: a request nobody answered before its slot began"),
-  role: z
-    .enum(["requester", "recipient"])
-    .describe("Which side the caller is on; only a recipient can answer"),
-  otherId: z.string(),
-  otherName: z.string(),
-  slotStart: instant,
-  slotEnd: instant,
-  dayLabel: z.string().describe("In the event's time zone"),
-  timeLabel: z.string().describe("In the event's time zone"),
-  meetingPoint: z.string(),
-  message: z.string(),
-  cancelNote: z
-    .string()
-    .describe("What the canceller said, if anything; empty otherwise"),
-  clashes: z
-    .array(clashSchema)
-    .describe("Either party's commitments in the slot"),
-});
+export const meetingViewSchema = z
+  .object({
+    id: z.string(),
+    status: z
+      .enum([...meetingStatus.options, "expired"])
+      .describe("expired: a request nobody answered before its slot began"),
+    role: z
+      .enum(["requester", "recipient"])
+      .describe("Which side the caller is on; only a recipient can answer"),
+    otherId: z.string(),
+    otherName: z.string(),
+    slotStart: instant,
+    slotEnd: instant,
+    dayLabel: z.string().describe("In the event's time zone"),
+    timeLabel: z.string().describe("In the event's time zone"),
+    meetingPoint: z.string(),
+    message: z.string(),
+    cancelNote: z
+      .string()
+      .describe("What the canceller said, if anything; empty otherwise"),
+    clashes: z
+      .array(clashSchema)
+      .describe("Either party's commitments in the slot"),
+  })
+  .meta({ id: "Meeting" });
 
 export const myMeetingsSchema = z.object({
   meetings: z.array(meetingViewSchema).describe("The caller's own, by slot"),

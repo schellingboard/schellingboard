@@ -63,31 +63,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              eventId: string;
-              title: string;
-              description: string;
-              /** Format: date-time */
-              startTime: string | null;
-              /** Format: date-time */
-              endTime: string | null;
-              capacity: number;
-              adminManaged: boolean;
-              blocker: boolean;
-              closed: boolean;
-              proposalId: string | null;
-              hosts: {
-                id: string;
-                name: string;
-              }[];
-              locations: {
-                id: string;
-                name: string;
-                color: string;
-              }[];
-              numRsvps: number;
-            };
+            "application/json": components["schemas"]["Session"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -96,17 +72,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -154,31 +120,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              eventId: string;
-              title: string;
-              description: string;
-              /** Format: date-time */
-              startTime: string | null;
-              /** Format: date-time */
-              endTime: string | null;
-              capacity: number;
-              adminManaged: boolean;
-              blocker: boolean;
-              closed: boolean;
-              proposalId: string | null;
-              hosts: {
-                id: string;
-                name: string;
-              }[];
-              locations: {
-                id: string;
-                name: string;
-                color: string;
-              }[];
-              numRsvps: number;
-            };
+            "application/json": components["schemas"]["Session"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -187,17 +129,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -231,17 +163,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -276,31 +198,7 @@ export interface paths {
           };
           content: {
             "application/json": {
-              sessions: {
-                id: string;
-                eventId: string;
-                title: string;
-                description: string;
-                /** Format: date-time */
-                startTime: string | null;
-                /** Format: date-time */
-                endTime: string | null;
-                capacity: number;
-                adminManaged: boolean;
-                blocker: boolean;
-                closed: boolean;
-                proposalId: string | null;
-                hosts: {
-                  id: string;
-                  name: string;
-                }[];
-                locations: {
-                  id: string;
-                  name: string;
-                  color: string;
-                }[];
-                numRsvps: number;
-              }[];
+              sessions: components["schemas"]["Session"][];
             };
           };
         };
@@ -310,17 +208,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -367,31 +255,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              eventId: string;
-              title: string;
-              description: string;
-              /** Format: date-time */
-              startTime: string | null;
-              /** Format: date-time */
-              endTime: string | null;
-              capacity: number;
-              adminManaged: boolean;
-              blocker: boolean;
-              closed: boolean;
-              proposalId: string | null;
-              hosts: {
-                id: string;
-                name: string;
-              }[];
-              locations: {
-                id: string;
-                name: string;
-                color: string;
-              }[];
-              numRsvps: number;
-            };
+            "application/json": components["schemas"]["Session"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -400,17 +264,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -473,31 +327,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              eventId: string;
-              title: string;
-              description: string;
-              /** Format: date-time */
-              startTime: string | null;
-              /** Format: date-time */
-              endTime: string | null;
-              capacity: number;
-              adminManaged: boolean;
-              blocker: boolean;
-              closed: boolean;
-              proposalId: string | null;
-              hosts: {
-                id: string;
-                name: string;
-              }[];
-              locations: {
-                id: string;
-                name: string;
-                color: string;
-              }[];
-              numRsvps: number;
-            };
+            "application/json": components["schemas"]["Session"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -506,17 +336,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -579,31 +399,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              eventId: string;
-              title: string;
-              description: string;
-              /** Format: date-time */
-              startTime: string | null;
-              /** Format: date-time */
-              endTime: string | null;
-              capacity: number;
-              adminManaged: boolean;
-              blocker: boolean;
-              closed: boolean;
-              proposalId: string | null;
-              hosts: {
-                id: string;
-                name: string;
-              }[];
-              locations: {
-                id: string;
-                name: string;
-                color: string;
-              }[];
-              numRsvps: number;
-            };
+            "application/json": components["schemas"]["Session"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -612,17 +408,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -655,17 +441,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -700,11 +476,7 @@ export interface paths {
           };
           content: {
             "application/json": {
-              rsvps: {
-                id: string;
-                sessionId: string;
-                guestId: string;
-              }[];
+              rsvps: components["schemas"]["Rsvp"][];
             };
           };
         };
@@ -714,17 +486,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -763,11 +525,7 @@ export interface paths {
           };
           content: {
             "application/json": {
-              rsvps: {
-                id: string;
-                sessionId: string;
-                guestId: string;
-              }[];
+              rsvps: components["schemas"]["Rsvp"][];
             };
           };
         };
@@ -777,17 +535,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -837,17 +585,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -882,17 +620,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -932,11 +660,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              sessionId: string;
-              guestId: string;
-            };
+            "application/json": components["schemas"]["Rsvp"];
           };
         };
         /** @description RSVPed */
@@ -945,11 +669,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              sessionId: string;
-              guestId: string;
-            };
+            "application/json": components["schemas"]["Rsvp"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -958,17 +678,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -1002,17 +712,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -1046,51 +746,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              eventId: string;
-              title: string;
-              description: string | null;
-              durationMinutes: number | null;
-              /** Format: date-time */
-              createdTime: string;
-              /** Format: date-time */
-              updatedTime: string;
-              hosts: {
-                id: string;
-                name: string;
-              }[];
-              cohostWanted: boolean;
-              cohostWantedNote: string | null;
-              sessionIds: string[];
-              /** @description The public tally, from the scheduling phase on; skip votes are only in the breakdown */
-              tally: {
-                interested: number;
-                maybe: number;
-              } | null;
-              /** @description From the scheduling phase on, shown to a proposal's hosts, and to everyone for a proposal nobody hosts */
-              breakdown: {
-                attendees: number;
-                interested: number;
-                maybe: number;
-                skip: number;
-                votes: number;
-                votesPctOfAttendees: number | null;
-                nonVoters: number;
-                nonVotersPctOfAttendees: number | null;
-                interestedPctOfVotes: number | null;
-                maybePctOfVotes: number | null;
-                skipPctOfVotes: number | null;
-                /** @description A very rough 50% range of how many people to expect */
-                estimatedAttendance: {
-                  low: number;
-                  high: number;
-                } | null;
-                /** @enum {string|null} */
-                noEstimateReason:
-                  "low-turnout" | "no-interest" | "unknown-event" | null;
-              } | null;
-            };
+            "application/json": components["schemas"]["Proposal"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -1099,17 +755,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -1153,51 +799,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              eventId: string;
-              title: string;
-              description: string | null;
-              durationMinutes: number | null;
-              /** Format: date-time */
-              createdTime: string;
-              /** Format: date-time */
-              updatedTime: string;
-              hosts: {
-                id: string;
-                name: string;
-              }[];
-              cohostWanted: boolean;
-              cohostWantedNote: string | null;
-              sessionIds: string[];
-              /** @description The public tally, from the scheduling phase on; skip votes are only in the breakdown */
-              tally: {
-                interested: number;
-                maybe: number;
-              } | null;
-              /** @description From the scheduling phase on, shown to a proposal's hosts, and to everyone for a proposal nobody hosts */
-              breakdown: {
-                attendees: number;
-                interested: number;
-                maybe: number;
-                skip: number;
-                votes: number;
-                votesPctOfAttendees: number | null;
-                nonVoters: number;
-                nonVotersPctOfAttendees: number | null;
-                interestedPctOfVotes: number | null;
-                maybePctOfVotes: number | null;
-                skipPctOfVotes: number | null;
-                /** @description A very rough 50% range of how many people to expect */
-                estimatedAttendance: {
-                  low: number;
-                  high: number;
-                } | null;
-                /** @enum {string|null} */
-                noEstimateReason:
-                  "low-turnout" | "no-interest" | "unknown-event" | null;
-              } | null;
-            };
+            "application/json": components["schemas"]["Proposal"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -1206,17 +808,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -1250,17 +842,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -1295,51 +877,7 @@ export interface paths {
           };
           content: {
             "application/json": {
-              proposals: {
-                id: string;
-                eventId: string;
-                title: string;
-                description: string | null;
-                durationMinutes: number | null;
-                /** Format: date-time */
-                createdTime: string;
-                /** Format: date-time */
-                updatedTime: string;
-                hosts: {
-                  id: string;
-                  name: string;
-                }[];
-                cohostWanted: boolean;
-                cohostWantedNote: string | null;
-                sessionIds: string[];
-                /** @description The public tally, from the scheduling phase on; skip votes are only in the breakdown */
-                tally: {
-                  interested: number;
-                  maybe: number;
-                } | null;
-                /** @description From the scheduling phase on, shown to a proposal's hosts, and to everyone for a proposal nobody hosts */
-                breakdown: {
-                  attendees: number;
-                  interested: number;
-                  maybe: number;
-                  skip: number;
-                  votes: number;
-                  votesPctOfAttendees: number | null;
-                  nonVoters: number;
-                  nonVotersPctOfAttendees: number | null;
-                  interestedPctOfVotes: number | null;
-                  maybePctOfVotes: number | null;
-                  skipPctOfVotes: number | null;
-                  /** @description A very rough 50% range of how many people to expect */
-                  estimatedAttendance: {
-                    low: number;
-                    high: number;
-                  } | null;
-                  /** @enum {string|null} */
-                  noEstimateReason:
-                    "low-turnout" | "no-interest" | "unknown-event" | null;
-                } | null;
-              }[];
+              proposals: components["schemas"]["Proposal"][];
             };
           };
         };
@@ -1349,17 +887,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -1398,51 +926,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              eventId: string;
-              title: string;
-              description: string | null;
-              durationMinutes: number | null;
-              /** Format: date-time */
-              createdTime: string;
-              /** Format: date-time */
-              updatedTime: string;
-              hosts: {
-                id: string;
-                name: string;
-              }[];
-              cohostWanted: boolean;
-              cohostWantedNote: string | null;
-              sessionIds: string[];
-              /** @description The public tally, from the scheduling phase on; skip votes are only in the breakdown */
-              tally: {
-                interested: number;
-                maybe: number;
-              } | null;
-              /** @description From the scheduling phase on, shown to a proposal's hosts, and to everyone for a proposal nobody hosts */
-              breakdown: {
-                attendees: number;
-                interested: number;
-                maybe: number;
-                skip: number;
-                votes: number;
-                votesPctOfAttendees: number | null;
-                nonVoters: number;
-                nonVotersPctOfAttendees: number | null;
-                interestedPctOfVotes: number | null;
-                maybePctOfVotes: number | null;
-                skipPctOfVotes: number | null;
-                /** @description A very rough 50% range of how many people to expect */
-                estimatedAttendance: {
-                  low: number;
-                  high: number;
-                } | null;
-                /** @enum {string|null} */
-                noEstimateReason:
-                  "low-turnout" | "no-interest" | "unknown-event" | null;
-              } | null;
-            };
+            "application/json": components["schemas"]["Proposal"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -1451,17 +935,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -1509,17 +983,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -1571,51 +1035,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              eventId: string;
-              title: string;
-              description: string | null;
-              durationMinutes: number | null;
-              /** Format: date-time */
-              createdTime: string;
-              /** Format: date-time */
-              updatedTime: string;
-              hosts: {
-                id: string;
-                name: string;
-              }[];
-              cohostWanted: boolean;
-              cohostWantedNote: string | null;
-              sessionIds: string[];
-              /** @description The public tally, from the scheduling phase on; skip votes are only in the breakdown */
-              tally: {
-                interested: number;
-                maybe: number;
-              } | null;
-              /** @description From the scheduling phase on, shown to a proposal's hosts, and to everyone for a proposal nobody hosts */
-              breakdown: {
-                attendees: number;
-                interested: number;
-                maybe: number;
-                skip: number;
-                votes: number;
-                votesPctOfAttendees: number | null;
-                nonVoters: number;
-                nonVotersPctOfAttendees: number | null;
-                interestedPctOfVotes: number | null;
-                maybePctOfVotes: number | null;
-                skipPctOfVotes: number | null;
-                /** @description A very rough 50% range of how many people to expect */
-                estimatedAttendance: {
-                  low: number;
-                  high: number;
-                } | null;
-                /** @enum {string|null} */
-                noEstimateReason:
-                  "low-turnout" | "no-interest" | "unknown-event" | null;
-              } | null;
-            };
+            "application/json": components["schemas"]["Proposal"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -1624,17 +1044,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -1687,51 +1097,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              eventId: string;
-              title: string;
-              description: string | null;
-              durationMinutes: number | null;
-              /** Format: date-time */
-              createdTime: string;
-              /** Format: date-time */
-              updatedTime: string;
-              hosts: {
-                id: string;
-                name: string;
-              }[];
-              cohostWanted: boolean;
-              cohostWantedNote: string | null;
-              sessionIds: string[];
-              /** @description The public tally, from the scheduling phase on; skip votes are only in the breakdown */
-              tally: {
-                interested: number;
-                maybe: number;
-              } | null;
-              /** @description From the scheduling phase on, shown to a proposal's hosts, and to everyone for a proposal nobody hosts */
-              breakdown: {
-                attendees: number;
-                interested: number;
-                maybe: number;
-                skip: number;
-                votes: number;
-                votesPctOfAttendees: number | null;
-                nonVoters: number;
-                nonVotersPctOfAttendees: number | null;
-                interestedPctOfVotes: number | null;
-                maybePctOfVotes: number | null;
-                skipPctOfVotes: number | null;
-                /** @description A very rough 50% range of how many people to expect */
-                estimatedAttendance: {
-                  low: number;
-                  high: number;
-                } | null;
-                /** @enum {string|null} */
-                noEstimateReason:
-                  "low-turnout" | "no-interest" | "unknown-event" | null;
-              } | null;
-            };
+            "application/json": components["schemas"]["Proposal"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -1740,17 +1106,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -1783,17 +1139,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -1831,13 +1177,7 @@ export interface paths {
           };
           content: {
             "application/json": {
-              votes: {
-                id: string;
-                proposalId: string;
-                guestId: string;
-                /** @enum {string} */
-                choice: "interested" | "maybe" | "skip";
-              }[];
+              votes: components["schemas"]["Vote"][];
             };
           };
         };
@@ -1847,17 +1187,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -1914,17 +1244,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -1959,17 +1279,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -2005,27 +1315,7 @@ export interface paths {
           content: {
             "application/json": {
               /** @description Oldest first */
-              comments: {
-                id: string;
-                parentId: string | null;
-                body: string;
-                /** @description A deleted comment with replies stays in the thread, without body or author */
-                deleted: boolean;
-                /** Format: date-time */
-                createdTime: string;
-                /** Format: date-time */
-                editedTime: string | null;
-                author: {
-                  id: string;
-                  name: string;
-                } | null;
-                /** @description Who liked the comment, oldest first */
-                likes: {
-                  id: string;
-                  name: string;
-                  avatarUrl: string | null;
-                }[];
-              }[];
+              comments: components["schemas"]["Comment"][];
             };
           };
         };
@@ -2035,17 +1325,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -2080,27 +1360,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              parentId: string | null;
-              body: string;
-              /** @description A deleted comment with replies stays in the thread, without body or author */
-              deleted: boolean;
-              /** Format: date-time */
-              createdTime: string;
-              /** Format: date-time */
-              editedTime: string | null;
-              author: {
-                id: string;
-                name: string;
-              } | null;
-              /** @description Who liked the comment, oldest first */
-              likes: {
-                id: string;
-                name: string;
-                avatarUrl: string | null;
-              }[];
-            };
+            "application/json": components["schemas"]["Comment"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -2109,17 +1369,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -2156,27 +1406,7 @@ export interface paths {
           content: {
             "application/json": {
               /** @description Oldest first */
-              comments: {
-                id: string;
-                parentId: string | null;
-                body: string;
-                /** @description A deleted comment with replies stays in the thread, without body or author */
-                deleted: boolean;
-                /** Format: date-time */
-                createdTime: string;
-                /** Format: date-time */
-                editedTime: string | null;
-                author: {
-                  id: string;
-                  name: string;
-                } | null;
-                /** @description Who liked the comment, oldest first */
-                likes: {
-                  id: string;
-                  name: string;
-                  avatarUrl: string | null;
-                }[];
-              }[];
+              comments: components["schemas"]["Comment"][];
             };
           };
         };
@@ -2186,17 +1416,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -2231,27 +1451,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              parentId: string | null;
-              body: string;
-              /** @description A deleted comment with replies stays in the thread, without body or author */
-              deleted: boolean;
-              /** Format: date-time */
-              createdTime: string;
-              /** Format: date-time */
-              editedTime: string | null;
-              author: {
-                id: string;
-                name: string;
-              } | null;
-              /** @description Who liked the comment, oldest first */
-              likes: {
-                id: string;
-                name: string;
-                avatarUrl: string | null;
-              }[];
-            };
+            "application/json": components["schemas"]["Comment"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -2260,17 +1460,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -2307,27 +1497,7 @@ export interface paths {
           content: {
             "application/json": {
               /** @description Oldest first */
-              comments: {
-                id: string;
-                parentId: string | null;
-                body: string;
-                /** @description A deleted comment with replies stays in the thread, without body or author */
-                deleted: boolean;
-                /** Format: date-time */
-                createdTime: string;
-                /** Format: date-time */
-                editedTime: string | null;
-                author: {
-                  id: string;
-                  name: string;
-                } | null;
-                /** @description Who liked the comment, oldest first */
-                likes: {
-                  id: string;
-                  name: string;
-                  avatarUrl: string | null;
-                }[];
-              }[];
+              comments: components["schemas"]["Comment"][];
             };
           };
         };
@@ -2337,17 +1507,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -2382,27 +1542,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              parentId: string | null;
-              body: string;
-              /** @description A deleted comment with replies stays in the thread, without body or author */
-              deleted: boolean;
-              /** Format: date-time */
-              createdTime: string;
-              /** Format: date-time */
-              editedTime: string | null;
-              author: {
-                id: string;
-                name: string;
-              } | null;
-              /** @description Who liked the comment, oldest first */
-              likes: {
-                id: string;
-                name: string;
-                avatarUrl: string | null;
-              }[];
-            };
+            "application/json": components["schemas"]["Comment"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -2411,17 +1551,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -2467,27 +1597,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              parentId: string | null;
-              body: string;
-              /** @description A deleted comment with replies stays in the thread, without body or author */
-              deleted: boolean;
-              /** Format: date-time */
-              createdTime: string;
-              /** Format: date-time */
-              editedTime: string | null;
-              author: {
-                id: string;
-                name: string;
-              } | null;
-              /** @description Who liked the comment, oldest first */
-              likes: {
-                id: string;
-                name: string;
-                avatarUrl: string | null;
-              }[];
-            };
+            "application/json": components["schemas"]["Comment"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -2496,17 +1606,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -2540,17 +1640,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -2596,17 +1686,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -2640,17 +1720,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -2687,42 +1757,7 @@ export interface paths {
           content: {
             "application/json": {
               /** @description The caller's own, by slot */
-              meetings: {
-                id: string;
-                /**
-                 * @description expired: a request nobody answered before its slot began
-                 * @enum {string}
-                 */
-                status:
-                  "pending" | "accepted" | "declined" | "canceled" | "expired";
-                /**
-                 * @description Which side the caller is on; only a recipient can answer
-                 * @enum {string}
-                 */
-                role: "requester" | "recipient";
-                otherId: string;
-                otherName: string;
-                /** Format: date-time */
-                slotStart: string;
-                /** Format: date-time */
-                slotEnd: string;
-                /** @description In the event's time zone */
-                dayLabel: string;
-                /** @description In the event's time zone */
-                timeLabel: string;
-                meetingPoint: string;
-                message: string;
-                /** @description What the canceller said, if anything; empty otherwise */
-                cancelNote: string;
-                /** @description Either party's commitments in the slot */
-                clashes: {
-                  guestName: string;
-                  /** @enum {string} */
-                  kind: "hosting" | "attending" | "meeting" | "busy";
-                  title: string | null;
-                  isViewer: boolean;
-                }[];
-              }[];
+              meetings: components["schemas"]["Meeting"][];
               /** @description The slot starts the caller declared themselves free */
               availability: string[];
             };
@@ -2734,17 +1769,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -2808,17 +1833,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -2896,17 +1911,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -2976,17 +1981,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -3054,17 +2049,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -3138,17 +2123,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -3200,17 +2175,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -3266,17 +2231,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -3340,17 +2295,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -3412,17 +2357,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -3456,17 +2391,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -3512,17 +2437,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -3566,17 +2481,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -3613,39 +2518,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              name: string;
-              aboutMe: string | null;
-              avatarUrl: string | null;
-              pronouns: string | null;
-              basedIn: string | null;
-              prompts:
-                | {
-                    prompt: string;
-                    answer: string;
-                  }[]
-                | null;
-              languages: string[] | null;
-              contacts:
-                | {
-                    /** @enum {string} */
-                    type:
-                      | "email"
-                      | "phone"
-                      | "whatsapp"
-                      | "signal"
-                      | "telegram"
-                      | "discord"
-                      | "website"
-                      | "other";
-                    label?: string;
-                    value: string;
-                  }[]
-                | null;
-              /** Format: date-time */
-              profileUpdatedAt: string | null;
-            };
+            "application/json": components["schemas"]["PublicProfile"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -3654,17 +2527,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -3742,39 +2605,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              name: string;
-              aboutMe: string | null;
-              avatarUrl: string | null;
-              pronouns: string | null;
-              basedIn: string | null;
-              prompts:
-                | {
-                    prompt: string;
-                    answer: string;
-                  }[]
-                | null;
-              languages: string[] | null;
-              contacts:
-                | {
-                    /** @enum {string} */
-                    type:
-                      | "email"
-                      | "phone"
-                      | "whatsapp"
-                      | "signal"
-                      | "telegram"
-                      | "discord"
-                      | "website"
-                      | "other";
-                    label?: string;
-                    value: string;
-                  }[]
-                | null;
-              /** Format: date-time */
-              profileUpdatedAt: string | null;
-            };
+            "application/json": components["schemas"]["PublicProfile"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -3783,17 +2614,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -3842,39 +2663,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              name: string;
-              aboutMe: string | null;
-              avatarUrl: string | null;
-              pronouns: string | null;
-              basedIn: string | null;
-              prompts:
-                | {
-                    prompt: string;
-                    answer: string;
-                  }[]
-                | null;
-              languages: string[] | null;
-              contacts:
-                | {
-                    /** @enum {string} */
-                    type:
-                      | "email"
-                      | "phone"
-                      | "whatsapp"
-                      | "signal"
-                      | "telegram"
-                      | "discord"
-                      | "website"
-                      | "other";
-                    label?: string;
-                    value: string;
-                  }[]
-                | null;
-              /** Format: date-time */
-              profileUpdatedAt: string | null;
-            };
+            "application/json": components["schemas"]["PublicProfile"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -3883,17 +2672,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -3925,17 +2704,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -3972,30 +2741,7 @@ export interface paths {
           content: {
             "application/json": {
               /** @description Newest first */
-              notifications: {
-                id: string;
-                /** @enum {string} */
-                type:
-                  | "rsvpChange"
-                  | "hostChange"
-                  | "cohostAdd"
-                  | "proposalJoin"
-                  | "proposalComment"
-                  | "sessionComment"
-                  | "profileComment"
-                  | "commentThread"
-                  | "meetingRequest"
-                  | "meetingResponse"
-                  | "sessionHeadsUp"
-                  | "attendeeCountReminder";
-                text: string;
-                /** @description Site-relative path to what happened */
-                url: string;
-                /** Format: date-time */
-                createdAt: string;
-                /** Format: date-time */
-                readAt: string | null;
-              }[];
+              notifications: components["schemas"]["Notification"][];
               unreadCount: number;
               total: number;
             };
@@ -4007,17 +2753,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -4071,17 +2807,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -4133,17 +2859,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -4184,30 +2900,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              /** @enum {string} */
-              type:
-                | "rsvpChange"
-                | "hostChange"
-                | "cohostAdd"
-                | "proposalJoin"
-                | "proposalComment"
-                | "sessionComment"
-                | "profileComment"
-                | "commentThread"
-                | "meetingRequest"
-                | "meetingResponse"
-                | "sessionHeadsUp"
-                | "attendeeCountReminder";
-              text: string;
-              /** @description Site-relative path to what happened */
-              url: string;
-              /** Format: date-time */
-              createdAt: string;
-              /** Format: date-time */
-              readAt: string | null;
-            };
+            "application/json": components["schemas"]["Notification"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -4216,17 +2909,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -4282,17 +2965,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -4340,17 +3013,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -4406,17 +3069,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -4468,17 +3121,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -4534,17 +3177,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -4578,55 +3211,7 @@ export interface paths {
           };
           content: {
             "application/json": {
-              events: {
-                id: string;
-                slug: string;
-                name: string;
-                description: string;
-                website: string;
-                timezone: string;
-                maxSessionDuration: number;
-                breakMinutes: number;
-                slotIncrementMinutes: number;
-                rsvpCapacityHardLimit: boolean;
-                icon: string | null;
-                meetingsEnabled: boolean;
-                maxOpenMeetingRequests: number;
-                /** Format: date-time */
-                firstDayStart: string | null;
-                /** Format: date-time */
-                lastDayStart: string | null;
-                /**
-                 * Format: date-time
-                 * @description null clears it
-                 */
-                proposalPhaseStart: string | null;
-                /**
-                 * Format: date-time
-                 * @description null clears it
-                 */
-                proposalPhaseEnd: string | null;
-                /**
-                 * Format: date-time
-                 * @description null clears it
-                 */
-                votingPhaseStart: string | null;
-                /**
-                 * Format: date-time
-                 * @description null clears it
-                 */
-                votingPhaseEnd: string | null;
-                /**
-                 * Format: date-time
-                 * @description null clears it
-                 */
-                schedulingPhaseStart: string | null;
-                /**
-                 * Format: date-time
-                 * @description null clears it
-                 */
-                schedulingPhaseEnd: string | null;
-              }[];
+              events: components["schemas"]["Event"][];
             };
           };
         };
@@ -4636,17 +3221,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -4726,55 +3301,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              slug: string;
-              name: string;
-              description: string;
-              website: string;
-              timezone: string;
-              maxSessionDuration: number;
-              breakMinutes: number;
-              slotIncrementMinutes: number;
-              rsvpCapacityHardLimit: boolean;
-              icon: string | null;
-              meetingsEnabled: boolean;
-              maxOpenMeetingRequests: number;
-              /** Format: date-time */
-              firstDayStart: string | null;
-              /** Format: date-time */
-              lastDayStart: string | null;
-              /**
-               * Format: date-time
-               * @description null clears it
-               */
-              proposalPhaseStart: string | null;
-              /**
-               * Format: date-time
-               * @description null clears it
-               */
-              proposalPhaseEnd: string | null;
-              /**
-               * Format: date-time
-               * @description null clears it
-               */
-              votingPhaseStart: string | null;
-              /**
-               * Format: date-time
-               * @description null clears it
-               */
-              votingPhaseEnd: string | null;
-              /**
-               * Format: date-time
-               * @description null clears it
-               */
-              schedulingPhaseStart: string | null;
-              /**
-               * Format: date-time
-               * @description null clears it
-               */
-              schedulingPhaseEnd: string | null;
-            };
+            "application/json": components["schemas"]["Event"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -4783,17 +3310,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -4830,55 +3347,7 @@ export interface paths {
           };
           content: {
             "application/json": {
-              event: {
-                id: string;
-                slug: string;
-                name: string;
-                description: string;
-                website: string;
-                timezone: string;
-                maxSessionDuration: number;
-                breakMinutes: number;
-                slotIncrementMinutes: number;
-                rsvpCapacityHardLimit: boolean;
-                icon: string | null;
-                meetingsEnabled: boolean;
-                maxOpenMeetingRequests: number;
-                /** Format: date-time */
-                firstDayStart: string | null;
-                /** Format: date-time */
-                lastDayStart: string | null;
-                /**
-                 * Format: date-time
-                 * @description null clears it
-                 */
-                proposalPhaseStart: string | null;
-                /**
-                 * Format: date-time
-                 * @description null clears it
-                 */
-                proposalPhaseEnd: string | null;
-                /**
-                 * Format: date-time
-                 * @description null clears it
-                 */
-                votingPhaseStart: string | null;
-                /**
-                 * Format: date-time
-                 * @description null clears it
-                 */
-                votingPhaseEnd: string | null;
-                /**
-                 * Format: date-time
-                 * @description null clears it
-                 */
-                schedulingPhaseStart: string | null;
-                /**
-                 * Format: date-time
-                 * @description null clears it
-                 */
-                schedulingPhaseEnd: string | null;
-              };
+              event: components["schemas"]["Event"];
               days: {
                 /** Format: date-time */
                 start: string;
@@ -4906,17 +3375,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -4997,55 +3456,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              slug: string;
-              name: string;
-              description: string;
-              website: string;
-              timezone: string;
-              maxSessionDuration: number;
-              breakMinutes: number;
-              slotIncrementMinutes: number;
-              rsvpCapacityHardLimit: boolean;
-              icon: string | null;
-              meetingsEnabled: boolean;
-              maxOpenMeetingRequests: number;
-              /** Format: date-time */
-              firstDayStart: string | null;
-              /** Format: date-time */
-              lastDayStart: string | null;
-              /**
-               * Format: date-time
-               * @description null clears it
-               */
-              proposalPhaseStart: string | null;
-              /**
-               * Format: date-time
-               * @description null clears it
-               */
-              proposalPhaseEnd: string | null;
-              /**
-               * Format: date-time
-               * @description null clears it
-               */
-              votingPhaseStart: string | null;
-              /**
-               * Format: date-time
-               * @description null clears it
-               */
-              votingPhaseEnd: string | null;
-              /**
-               * Format: date-time
-               * @description null clears it
-               */
-              schedulingPhaseStart: string | null;
-              /**
-               * Format: date-time
-               * @description null clears it
-               */
-              schedulingPhaseEnd: string | null;
-            };
+            "application/json": components["schemas"]["Event"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -5054,17 +3465,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -5098,17 +3499,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -5181,55 +3572,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              slug: string;
-              name: string;
-              description: string;
-              website: string;
-              timezone: string;
-              maxSessionDuration: number;
-              breakMinutes: number;
-              slotIncrementMinutes: number;
-              rsvpCapacityHardLimit: boolean;
-              icon: string | null;
-              meetingsEnabled: boolean;
-              maxOpenMeetingRequests: number;
-              /** Format: date-time */
-              firstDayStart: string | null;
-              /** Format: date-time */
-              lastDayStart: string | null;
-              /**
-               * Format: date-time
-               * @description null clears it
-               */
-              proposalPhaseStart: string | null;
-              /**
-               * Format: date-time
-               * @description null clears it
-               */
-              proposalPhaseEnd: string | null;
-              /**
-               * Format: date-time
-               * @description null clears it
-               */
-              votingPhaseStart: string | null;
-              /**
-               * Format: date-time
-               * @description null clears it
-               */
-              votingPhaseEnd: string | null;
-              /**
-               * Format: date-time
-               * @description null clears it
-               */
-              schedulingPhaseStart: string | null;
-              /**
-               * Format: date-time
-               * @description null clears it
-               */
-              schedulingPhaseEnd: string | null;
-            };
+            "application/json": components["schemas"]["Event"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -5238,17 +3581,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -5334,17 +3667,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -5429,17 +3752,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -5473,17 +3786,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -5519,19 +3822,7 @@ export interface paths {
           };
           content: {
             "application/json": {
-              locations: {
-                id: string;
-                name: string;
-                description: string;
-                areaDescription: string | null;
-                capacity: number;
-                color: string;
-                /** @description false hides it from attendees' booking */
-                bookable: boolean;
-                imageUrl: string;
-                sortIndex: number;
-                eventIds: string[];
-              }[];
+              locations: components["schemas"]["Location"][];
             };
           };
         };
@@ -5541,17 +3832,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -5592,19 +3873,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              name: string;
-              description: string;
-              areaDescription: string | null;
-              capacity: number;
-              color: string;
-              /** @description false hides it from attendees' booking */
-              bookable: boolean;
-              imageUrl: string;
-              sortIndex: number;
-              eventIds: string[];
-            };
+            "application/json": components["schemas"]["Location"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -5613,17 +3882,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -5679,19 +3938,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              name: string;
-              description: string;
-              areaDescription: string | null;
-              capacity: number;
-              color: string;
-              /** @description false hides it from attendees' booking */
-              bookable: boolean;
-              imageUrl: string;
-              sortIndex: number;
-              eventIds: string[];
-            };
+            "application/json": components["schemas"]["Location"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -5700,17 +3947,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -5743,17 +3980,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -5807,17 +4034,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -5870,17 +4087,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -5933,17 +4140,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -5980,15 +4177,7 @@ export interface paths {
           };
           content: {
             "application/json": {
-              periods: {
-                id: string;
-                eventId: string;
-                locationId: string;
-                /** Format: date-time */
-                start: string;
-                /** Format: date-time */
-                end: string;
-              }[];
+              periods: components["schemas"]["Unavailability"][];
             };
           };
         };
@@ -5998,17 +4187,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -6046,15 +4225,7 @@ export interface paths {
           };
           content: {
             "application/json": {
-              periods: {
-                id: string;
-                eventId: string;
-                locationId: string;
-                /** Format: date-time */
-                start: string;
-                /** Format: date-time */
-                end: string;
-              }[];
+              periods: components["schemas"]["Unavailability"][];
             };
           };
         };
@@ -6064,17 +4235,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -6122,17 +4283,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -6166,13 +4317,7 @@ export interface paths {
           };
           content: {
             "application/json": {
-              guests: {
-                id: string;
-                name: string;
-                email: string;
-                authProtected: boolean;
-                eventIds: string[];
-              }[];
+              guests: components["schemas"]["AdminGuest"][];
             };
           };
         };
@@ -6182,17 +4327,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -6224,13 +4359,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              name: string;
-              email: string;
-              authProtected: boolean;
-              eventIds: string[];
-            };
+            "application/json": components["schemas"]["AdminGuest"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -6239,17 +4368,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -6296,13 +4415,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": {
-              id: string;
-              name: string;
-              email: string;
-              authProtected: boolean;
-              eventIds: string[];
-            };
+            "application/json": components["schemas"]["AdminGuest"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -6311,17 +4424,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -6355,17 +4458,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -6412,17 +4505,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -6482,17 +4565,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -6545,17 +4618,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -6608,17 +4671,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -6666,17 +4719,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -6731,17 +4774,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-            };
+            "application/problem+json": components["schemas"]["Problem"];
           };
         };
       };
@@ -6756,7 +4789,292 @@ export interface paths {
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: never;
+  schemas: {
+    Session: {
+      id: string;
+      eventId: string;
+      title: string;
+      description: string;
+      /** Format: date-time */
+      startTime: string | null;
+      /** Format: date-time */
+      endTime: string | null;
+      capacity: number;
+      adminManaged: boolean;
+      blocker: boolean;
+      closed: boolean;
+      proposalId: string | null;
+      hosts: {
+        id: string;
+        name: string;
+      }[];
+      locations: {
+        id: string;
+        name: string;
+        color: string;
+      }[];
+      numRsvps: number;
+    };
+    Problem: {
+      type: string;
+      title: string;
+      status: number;
+      code: string;
+      detail?: string;
+      errors?: {
+        path: string;
+        message: string;
+      }[];
+    };
+    Rsvp: {
+      id: string;
+      sessionId: string;
+      guestId: string;
+    };
+    Proposal: {
+      id: string;
+      eventId: string;
+      title: string;
+      description: string | null;
+      durationMinutes: number | null;
+      /** Format: date-time */
+      createdTime: string;
+      /** Format: date-time */
+      updatedTime: string;
+      hosts: {
+        id: string;
+        name: string;
+      }[];
+      cohostWanted: boolean;
+      cohostWantedNote: string | null;
+      sessionIds: string[];
+      /** @description The public tally, from the scheduling phase on; skip votes are only in the breakdown */
+      tally: {
+        interested: number;
+        maybe: number;
+      } | null;
+      /** @description From the scheduling phase on, shown to a proposal's hosts, and to everyone for a proposal nobody hosts */
+      breakdown: {
+        attendees: number;
+        interested: number;
+        maybe: number;
+        skip: number;
+        votes: number;
+        votesPctOfAttendees: number | null;
+        nonVoters: number;
+        nonVotersPctOfAttendees: number | null;
+        interestedPctOfVotes: number | null;
+        maybePctOfVotes: number | null;
+        skipPctOfVotes: number | null;
+        /** @description A very rough 50% range of how many people to expect */
+        estimatedAttendance: {
+          low: number;
+          high: number;
+        } | null;
+        /** @enum {string|null} */
+        noEstimateReason:
+          "low-turnout" | "no-interest" | "unknown-event" | null;
+      } | null;
+    };
+    Vote: {
+      id: string;
+      proposalId: string;
+      guestId: string;
+      /** @enum {string} */
+      choice: "interested" | "maybe" | "skip";
+    };
+    Comment: {
+      id: string;
+      parentId: string | null;
+      body: string;
+      /** @description A deleted comment with replies stays in the thread, without body or author */
+      deleted: boolean;
+      /** Format: date-time */
+      createdTime: string;
+      /** Format: date-time */
+      editedTime: string | null;
+      author: {
+        id: string;
+        name: string;
+      } | null;
+      /** @description Who liked the comment, oldest first */
+      likes: {
+        id: string;
+        name: string;
+        avatarUrl: string | null;
+      }[];
+    };
+    Meeting: {
+      id: string;
+      /**
+       * @description expired: a request nobody answered before its slot began
+       * @enum {string}
+       */
+      status: "pending" | "accepted" | "declined" | "canceled" | "expired";
+      /**
+       * @description Which side the caller is on; only a recipient can answer
+       * @enum {string}
+       */
+      role: "requester" | "recipient";
+      otherId: string;
+      otherName: string;
+      /** Format: date-time */
+      slotStart: string;
+      /** Format: date-time */
+      slotEnd: string;
+      /** @description In the event's time zone */
+      dayLabel: string;
+      /** @description In the event's time zone */
+      timeLabel: string;
+      meetingPoint: string;
+      message: string;
+      /** @description What the canceller said, if anything; empty otherwise */
+      cancelNote: string;
+      /** @description Either party's commitments in the slot */
+      clashes: {
+        guestName: string;
+        /** @enum {string} */
+        kind: "hosting" | "attending" | "meeting" | "busy";
+        title: string | null;
+        isViewer: boolean;
+      }[];
+    };
+    PublicProfile: {
+      id: string;
+      name: string;
+      aboutMe: string | null;
+      avatarUrl: string | null;
+      pronouns: string | null;
+      basedIn: string | null;
+      prompts:
+        | {
+            prompt: string;
+            answer: string;
+          }[]
+        | null;
+      languages: string[] | null;
+      contacts:
+        | {
+            /** @enum {string} */
+            type:
+              | "email"
+              | "phone"
+              | "whatsapp"
+              | "signal"
+              | "telegram"
+              | "discord"
+              | "website"
+              | "other";
+            label?: string;
+            value: string;
+          }[]
+        | null;
+      /** Format: date-time */
+      profileUpdatedAt: string | null;
+    };
+    Notification: {
+      id: string;
+      /** @enum {string} */
+      type:
+        | "rsvpChange"
+        | "hostChange"
+        | "cohostAdd"
+        | "proposalJoin"
+        | "proposalComment"
+        | "sessionComment"
+        | "profileComment"
+        | "commentThread"
+        | "meetingRequest"
+        | "meetingResponse"
+        | "sessionHeadsUp"
+        | "attendeeCountReminder";
+      text: string;
+      /** @description Site-relative path to what happened */
+      url: string;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      readAt: string | null;
+    };
+    Event: {
+      id: string;
+      slug: string;
+      name: string;
+      description: string;
+      website: string;
+      timezone: string;
+      maxSessionDuration: number;
+      breakMinutes: number;
+      slotIncrementMinutes: number;
+      rsvpCapacityHardLimit: boolean;
+      icon: string | null;
+      meetingsEnabled: boolean;
+      maxOpenMeetingRequests: number;
+      /** Format: date-time */
+      firstDayStart: string | null;
+      /** Format: date-time */
+      lastDayStart: string | null;
+      /**
+       * Format: date-time
+       * @description null clears it
+       */
+      proposalPhaseStart: string | null;
+      /**
+       * Format: date-time
+       * @description null clears it
+       */
+      proposalPhaseEnd: string | null;
+      /**
+       * Format: date-time
+       * @description null clears it
+       */
+      votingPhaseStart: string | null;
+      /**
+       * Format: date-time
+       * @description null clears it
+       */
+      votingPhaseEnd: string | null;
+      /**
+       * Format: date-time
+       * @description null clears it
+       */
+      schedulingPhaseStart: string | null;
+      /**
+       * Format: date-time
+       * @description null clears it
+       */
+      schedulingPhaseEnd: string | null;
+    };
+    Location: {
+      id: string;
+      name: string;
+      description: string;
+      areaDescription: string | null;
+      capacity: number;
+      color: string;
+      /** @description false hides it from attendees' booking */
+      bookable: boolean;
+      imageUrl: string;
+      sortIndex: number;
+      eventIds: string[];
+    };
+    Unavailability: {
+      id: string;
+      eventId: string;
+      locationId: string;
+      /** Format: date-time */
+      start: string;
+      /** Format: date-time */
+      end: string;
+    };
+    AdminGuest: {
+      id: string;
+      name: string;
+      email: string;
+      authProtected: boolean;
+      eventIds: string[];
+    };
+  };
   responses: never;
   parameters: never;
   requestBodies: never;

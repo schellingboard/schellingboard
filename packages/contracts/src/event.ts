@@ -36,24 +36,26 @@ export const eventPhasesBodySchema = z.object({
   schedulingPhaseEnd: phaseDate,
 });
 
-export const eventViewSchema = z.object({
-  id: z.string(),
-  slug: z.string(),
-  name: z.string(),
-  description: z.string(),
-  website: z.string(),
-  timezone: z.string(),
-  maxSessionDuration: z.number().int(),
-  breakMinutes: z.number().int(),
-  slotIncrementMinutes: z.number().int(),
-  rsvpCapacityHardLimit: z.boolean(),
-  icon: z.string().nullable(),
-  meetingsEnabled: z.boolean(),
-  maxOpenMeetingRequests: z.number().int(),
-  firstDayStart: instant.nullable(),
-  lastDayStart: instant.nullable(),
-  ...eventPhasesBodySchema.shape,
-});
+export const eventViewSchema = z
+  .object({
+    id: z.string(),
+    slug: z.string(),
+    name: z.string(),
+    description: z.string(),
+    website: z.string(),
+    timezone: z.string(),
+    maxSessionDuration: z.number().int(),
+    breakMinutes: z.number().int(),
+    slotIncrementMinutes: z.number().int(),
+    rsvpCapacityHardLimit: z.boolean(),
+    icon: z.string().nullable(),
+    meetingsEnabled: z.boolean(),
+    maxOpenMeetingRequests: z.number().int(),
+    firstDayStart: instant.nullable(),
+    lastDayStart: instant.nullable(),
+    ...eventPhasesBodySchema.shape,
+  })
+  .meta({ id: "Event" });
 
 export const eventListSchema = z.object({ events: z.array(eventViewSchema) });
 
