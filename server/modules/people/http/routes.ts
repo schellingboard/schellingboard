@@ -55,8 +55,7 @@ const replaceMyAvatar = createRoute({
   method: "put",
   path: "/me/avatar",
   tags: ["people"],
-  description:
-    "Replaces the acting guest's photo, cropped to a square. With an Idempotency-Key, a retry must resend the identical bytes, multipart boundary included, or it gets 422 idempotency.keyReused.",
+  description: "Replaces the acting guest's photo, cropped to a square.",
   request: {
     headers: idempotencyHeaders,
     body: {

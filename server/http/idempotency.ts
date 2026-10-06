@@ -35,6 +35,34 @@ function pathAndQuery(url: string): string {
   return pathname + search;
 }
 
+const sha256 = (data: string | ArrayBuffer) =>
+  createHash("sha256")
+    .update(typeof data === "string" ? data : Buffer.from(data))
+    .digest("hex");
+
+// Clients pick a new multipart boundary per attempt, so a form is hashed by its
+// parsed fields, not its bytes. A body that fails to parse is hashed as bytes.
+async function bodyHash(req: Request): Promise<string> {
+  const isForm = req.headers
+    .get("content-type")
+    ?.toLowerCase()
+    .startsWith("multipart/form-data");
+  if (isForm) {
+    try {
+      const form = await req.clone().formData();
+      const fields = await Promise.all(
+        [...form].map(async ([name, value]) =>
+          typeof value === "string"
+            ? [name, value]
+            : [name, value.name, value.type, sha256(await value.arrayBuffer())]
+        )
+      );
+      return sha256(JSON.stringify(fields));
+    } catch {}
+  }
+  return sha256(await req.clone().arrayBuffer());
+}
+
 // ADR 0012 section 5. Runs after the actor middleware, which it scopes keys by.
 export function idempotencyMiddleware({
   store,
@@ -62,7 +90,6 @@ export function idempotencyMiddleware({
     const actor = actorScope(c.var.actor);
     if (actor === null) return next();
     const repo = store();
-    const body = await c.req.raw.clone().arrayBuffer();
     const at = now();
     const claim = await repo.claim(
       {
@@ -70,7 +97,7 @@ export function idempotencyMiddleware({
         key,
         method: c.req.method,
         path: pathAndQuery(c.req.url),
-        bodyHash: createHash("sha256").update(Buffer.from(body)).digest("hex"),
+        bodyHash: await bodyHash(c.req.raw),
       },
       at,
       {

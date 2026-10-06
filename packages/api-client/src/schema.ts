@@ -2634,7 +2634,7 @@ export interface paths {
       cookie?: never;
     };
     get?: never;
-    /** @description Replaces the acting guest's photo, cropped to a square. With an Idempotency-Key, a retry must resend the identical bytes, multipart boundary included, or it gets 422 idempotency.keyReused. */
+    /** @description Replaces the acting guest's photo, cropped to a square. */
     put: {
       parameters: {
         query?: never;
@@ -4724,7 +4724,7 @@ export interface paths {
         };
       };
     };
-    /** @description Replaces the title and description; the map is replaced by `image`, removed by `removeMap`, or else kept. With an Idempotency-Key, a retry must resend the identical bytes, multipart boundary included, or it gets 422 idempotency.keyReused. */
+    /** @description Replaces the title and description; the map is replaced by `image`, removed by `removeMap`, or else kept. */
     put: {
       parameters: {
         query?: never;

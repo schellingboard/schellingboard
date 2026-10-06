@@ -41,6 +41,11 @@ function testApp() {
     c.header("location", `/things/${calls}`);
     return c.json({ call: calls, body }, 201);
   });
+  app.put("/upload", async (c) => {
+    calls += 1;
+    const form = await c.req.formData();
+    return c.json({ call: calls, title: form.get("title") });
+  });
   app.delete("/things/1", (c) => {
     calls += 1;
     return c.body(null, 204);
@@ -153,6 +158,40 @@ describe("Idempotency-Key", () => {
       code: "idempotency.keyReused",
     });
     expect(calls).toBe(1);
+  });
+
+  it("answers a multipart retry with a new boundary as a retry", async () => {
+    const app = testApp();
+    const upload = (boundary: string, file: string) =>
+      app.request("/upload", {
+        method: "PUT",
+        headers: {
+          "content-type": `multipart/form-data; boundary=${boundary}`,
+          "idempotency-key": "k1",
+          cookie: `${GUEST_COOKIE_NAME}=${openGuestValue("g1")}`,
+        },
+        body: [
+          `--${boundary}`,
+          'Content-Disposition: form-data; name="title"',
+          "",
+          "Map",
+          `--${boundary}`,
+          'Content-Disposition: form-data; name="image"; filename="map.png"',
+          "Content-Type: image/png",
+          "",
+          file,
+          `--${boundary}--`,
+          "",
+        ].join("\r\n"),
+      });
+
+    await upload("first", "PNGDATA");
+    const retry = await upload("second", "PNGDATA");
+    const changed = await upload("third", "OTHERPNG");
+
+    expect(retry.status).toBe(200);
+    expect(calls).toBe(1);
+    expect(changed.status).toBe(422);
   });
 
   it("refuses the key reused with a different method", async () => {

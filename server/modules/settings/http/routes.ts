@@ -40,7 +40,7 @@ const updateSettings = createRoute({
   path: "/admin/settings",
   tags,
   description:
-    "Replaces the title and description; the map is replaced by `image`, removed by `removeMap`, or else kept. With an Idempotency-Key, a retry must resend the identical bytes, multipart boundary included, or it gets 422 idempotency.keyReused.",
+    "Replaces the title and description; the map is replaced by `image`, removed by `removeMap`, or else kept.",
   request: {
     headers: idempotencyHeaders,
     body: {

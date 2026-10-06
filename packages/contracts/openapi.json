@@ -3426,7 +3426,7 @@
     "/api/v1/me/avatar": {
       "put": {
         "tags": ["people"],
-        "description": "Replaces the acting guest's photo, cropped to a square. With an Idempotency-Key, a retry must resend the identical bytes, multipart boundary included, or it gets 422 idempotency.keyReused.",
+        "description": "Replaces the acting guest's photo, cropped to a square.",
         "parameters": [
           {
             "schema": {
@@ -5592,7 +5592,7 @@
       },
       "put": {
         "tags": ["admin"],
-        "description": "Replaces the title and description; the map is replaced by `image`, removed by `removeMap`, or else kept. With an Idempotency-Key, a retry must resend the identical bytes, multipart boundary included, or it gets 422 idempotency.keyReused.",
+        "description": "Replaces the title and description; the map is replaced by `image`, removed by `removeMap`, or else kept.",
         "parameters": [
           {
             "schema": {

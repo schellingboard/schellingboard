@@ -108,10 +108,6 @@ Keys are kept for 24 hours and are separate for each signed-in user, so two
 scripts cannot collide on a key. A key must be 1 to 255 characters. A request
 with neither the admin cookie nor a selected attendee has its key ignored.
 
-For uploads (a profile photo, the venue map), a retry must resend exactly the
-same bytes; most HTTP libraries pick a new multipart boundary per attempt, which
-counts as a different body.
-
 ## Caching
 
 Every response is sent with `cache-control: no-store`: browsers and proxies

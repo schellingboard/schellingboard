@@ -142,8 +142,8 @@ requests cannot both run. A claim still unfinished after 60 seconds counts as
 abandoned (its process died), so a retry runs again rather than getting `409`
 for a day. The replay carries the stored status, headers (without
 `set-cookie`) and body. A key that is empty or over 255 characters is
-`400 request.invalid`. The body hash covers the raw bytes, so a multipart retry
-must resend the identical body, boundary included.
+`400 request.invalid`. A multipart body is hashed by its parsed fields (files by
+name, type and content), so a retry with a new boundary still matches.
 
 A `5xx` response or a thrown error releases the key, so a retry after a server
 error runs again.
