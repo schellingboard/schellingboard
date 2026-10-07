@@ -16,7 +16,7 @@ import { UserContext, EventContext } from "../../context";
 import { CurrentUserModal, ConfirmationModal } from "../../modals";
 import { LockIcon } from "../../lock-icon";
 import { sessionRooms } from "../../session_utils";
-import { viewProposalLinkFromElsewhere } from "../modal-nav";
+import { isPlainLeftClick, viewProposalLinkFromElsewhere } from "../modal-nav";
 import { SessionComments } from "../session-comments";
 import { Markdown } from "@/app/(site)/markdown";
 import {
@@ -148,8 +148,8 @@ export function ViewSession(props: {
       });
   };
 
-  const handleEditClick = (e: React.MouseEvent) => {
-    if (isInModal && closeModalThen) {
+  const handleEditClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (isInModal && closeModalThen && isPlainLeftClick(e)) {
       e.preventDefault();
       closeModalThen(() =>
         router.push(`/${eventSlug}/edit-session?sessionID=${session.id}`)
