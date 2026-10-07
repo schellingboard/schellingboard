@@ -10,6 +10,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **An API for scripts and integrations** (#677): organizers can set up events, days,
+  rooms, guests and sessions from a script over a documented, versioned API.
+
 ### Fixed
 
 - **Edit opens the session form reliably**: on a slow device, pressing Edit in a
@@ -48,8 +53,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   and its title opens the full proposal to join in; closing it returns you to Quick Voting.
 - **Filter the schedule to your own sessions**: My sessions, RSVP'd and Hosting narrow the
   Grid and Agenda views to what you are attending or hosting.
-- **An API for scripts and integrations** (#677): organizers can set up events, days,
-  rooms, guests and sessions from a script over a documented, versioned API.
 
 ### Changed
 
