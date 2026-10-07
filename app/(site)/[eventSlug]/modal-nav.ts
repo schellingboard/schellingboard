@@ -177,6 +177,18 @@ export function dismissViewSession() {
   window.history.replaceState(null, "", url);
 }
 
+// history.back() is asynchronous: a navigation started before its popstate
+// arrives is undone by it, and no fixed delay is safe on a busy device.
+export function dismissViewSessionThen(next: () => void) {
+  if (sessionDismissMode === "back") {
+    window.addEventListener("popstate", () => next(), { once: true });
+    window.history.back();
+    return;
+  }
+  dismissViewSession();
+  next();
+}
+
 // Mirror next/link's own modifier-key check so plain clicks are handled in
 // place, but Cmd/Ctrl/Shift/middle clicks fall through to the browser's normal
 // "open in new tab/window" behavior.

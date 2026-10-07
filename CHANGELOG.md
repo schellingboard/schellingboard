@@ -10,6 +10,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **Edit opens the session form reliably**: on a slow device, pressing Edit in a
+  session's details sometimes left you on the schedule.
+
 ## [4.0.0] - 2026-10-04
 
 > **Breaking change**: the session import API now stores times exactly as sent, so scripts that

@@ -6,7 +6,7 @@ import { ModalCloseButton } from "@/app/components/modal-close-button";
 import type { Rsvp } from "@schellingboard/domain/session";
 import { EventContext } from "../context";
 import { ViewSession } from "./view-session/view-session";
-import { dismissViewSession } from "./modal-nav";
+import { dismissViewSession, dismissViewSessionThen } from "./modal-nav";
 
 export function SessionModal({
   sessionId,
@@ -77,7 +77,7 @@ export function SessionModal({
             eventSlug={eventSlug}
             event={event}
             isInModal={true}
-            onCloseModal={onDismiss}
+            closeModalThen={dismissViewSessionThen}
           />
         )}
       </div>

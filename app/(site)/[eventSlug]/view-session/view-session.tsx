@@ -34,7 +34,7 @@ export function ViewSession(props: {
   eventSlug: string;
   event: Event;
   isInModal?: boolean;
-  onCloseModal?: () => void;
+  closeModalThen?: (next: () => void) => void;
 }) {
   const {
     session,
@@ -43,7 +43,7 @@ export function ViewSession(props: {
     eventSlug,
     event,
     isInModal = false,
-    onCloseModal,
+    closeModalThen,
   } = props;
 
   const { user: currentUser } = useContext(UserContext);
@@ -149,12 +149,11 @@ export function ViewSession(props: {
   };
 
   const handleEditClick = (e: React.MouseEvent) => {
-    if (isInModal && onCloseModal) {
+    if (isInModal && closeModalThen) {
       e.preventDefault();
-      onCloseModal();
-      setTimeout(() => {
-        router.push(`/${eventSlug}/edit-session?sessionID=${session.id}`);
-      }, 100);
+      closeModalThen(() =>
+        router.push(`/${eventSlug}/edit-session?sessionID=${session.id}`)
+      );
     }
   };
 
