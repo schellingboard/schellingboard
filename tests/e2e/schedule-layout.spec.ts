@@ -276,20 +276,27 @@ test("the grid keeps its place after a session is added from it @008-US1", async
   expect(before[0]).toBeGreaterThan(80);
   expect(before[1]).toBeGreaterThan(300);
 
-  // Click a slot that is on screen: clicking one out of view would scroll it
-  // in first, and that scroll — not the reader's — is what would then be
-  // brought back. Measured in a single pass inside the page rather than a
-  // boundingBox() round trip per link, of which there are hundreds.
+  // Click a slot that is on screen and not under the grid's sticky headers:
+  // Playwright would scroll any other one into the clear first, and that
+  // scroll — not the reader's — is what would then be brought back. Measured
+  // in a single pass inside the page rather than a boundingBox() round trip
+  // per link, of which there are hundreds.
   const slots = page.getByRole("link", { name: "Add session" });
   const onScreen = await slots.evaluateAll(
     (links, f) =>
       links.findIndex((link) => {
         const r = link.getBoundingClientRect();
+        const hit = document.elementFromPoint(
+          r.left + r.width / 2,
+          r.top + r.height / 2
+        );
         return (
           r.left >= f.x &&
           r.top >= f.y &&
           r.right <= f.x + f.width &&
-          r.bottom <= f.y + f.height
+          r.bottom <= f.y + f.height &&
+          hit !== null &&
+          link.contains(hit)
         );
       }),
     frame
@@ -297,9 +304,10 @@ test("the grid keeps its place after a session is added from it @008-US1", async
   // Rather than falling back to the first slot, which is off screen: clicking
   // that scrolls it in, leaving the test asserting that a scroll the reader
   // never made was restored.
-  expect(onScreen, "no free slot lies wholly inside the grid").toBeGreaterThan(
-    -1
-  );
+  expect(
+    onScreen,
+    "no free slot lies wholly inside the grid, clear of its headers"
+  ).toBeGreaterThan(-1);
   await slots.nth(onScreen).click();
   await expect(
     page.getByRole("heading", { name: /Add a session/i })
