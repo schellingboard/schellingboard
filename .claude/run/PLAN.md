@@ -37,7 +37,8 @@ feed and snapshot), `04-client.md` (The replica), `05-security.md` (Authorizatio
 
 ### Unit of work
 
-- [ ] 1. **ADR 0013, unit of work** (Status: Proposed). `uow.run(async (tx) => …)`: one
+- [ ] 1. **ADR 0013, unit of work** (Status: Proposed; written, awaiting decision).
+      `uow.run(async (tx) => …)`: one
       transaction per use case; `tx` holds the repositories and `record(change)`; after
       commit and before the writer lock is released, `publish` to in-process
       subscribers (the jobs nudge now, the feed hub later), so subscribers see changes
