@@ -14,11 +14,19 @@ votes. The `v1` in the path is the API's version.
 ## The OpenAPI description
 
 Every endpoint, with its parameters, request bodies and responses, is described
-in an OpenAPI 3.1 document, `packages/contracts/openapi.json` in the
-repository. The site does not serve it: take the file from the tag of the
-release you run,
-`https://github.com/schellingboard/schellingboard/blob/vX.Y.Z/packages/contracts/openapi.json`,
-and open it in any OpenAPI viewer (Swagger UI, Redoc) or client generator.
+in an OpenAPI 3.1 document. The site serves the document of the version it
+runs:
+
+- **`/api/v1/docs`** is an interactive reference. Read the endpoints and send
+  requests from the browser; they carry your login cookies, so they act as
+  you.
+- **`/api/v1/openapi.json`** is the document itself, for another OpenAPI
+  viewer or a client generator.
+
+Both need the same login as the rest of `/api/v1` (see below). To stop serving
+them, set `API_DOCS=false` ([Configuration](configuration.md)). The document
+is also in the repository, at `packages/contracts/openapi.json` in the tag of
+each release.
 
 Endpoints under `/api/v1/admin/` are for organizers; the rest are what
 attendees do in the app.

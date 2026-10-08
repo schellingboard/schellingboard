@@ -567,6 +567,12 @@ export const features = {
         actor: "organizer",
         priority: "P3",
       },
+      US6: {
+        title:
+          "Self-hoster reads the API reference of the running version and tries requests in the browser",
+        actor: "self-hoster",
+        priority: "P3",
+      },
     },
   },
   "020": {

@@ -10,6 +10,12 @@ const nextConfig = {
   // serve its scripts to any origin it hasn't been told about. Only read by
   // `next dev`; a production build ignores it.
   allowedDevOrigins: ["*.trycloudflare.com"],
+  // The API reference page serves this bundle by path, which tracing can't see.
+  outputFileTracingIncludes: {
+    "/api/v1/\\[\\[\\.\\.\\.route\\]\\]": [
+      "./node_modules/@scalar/api-reference/dist/browser/standalone.js",
+    ],
+  },
   experimental: {
     serverActions: {
       bodySizeLimit: "5mb",

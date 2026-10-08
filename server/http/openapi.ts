@@ -1,8 +1,6 @@
 import { api } from "./app";
+import { openApiDocumentOf } from "./docs";
 
 export function openApiDocument() {
-  return api.getOpenAPI31Document({
-    openapi: "3.1.0",
-    info: { title: "SchellingBoard API", version: "1" },
-  });
+  return openApiDocumentOf(api);
 }

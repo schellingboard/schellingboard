@@ -12,7 +12,7 @@ user-facing description of the API is
 ```
 server/
   kernel/              Result and error kinds, Actor and resolveActor, actingGuest
-  http/                the Hono app (app.ts), middleware, problem details, OpenAPI document
+  http/                the Hono app (app.ts), middleware, problem details, OpenAPI document and its reference page (docs.ts)
   composition.ts       builds each module's use cases from the repositories and adapters
   modules/<module>/
     module.ts          the only file anything outside the module imports
