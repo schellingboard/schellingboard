@@ -10,6 +10,7 @@ import {
   type Result,
 } from "@/server/kernel/result";
 import type { SessionDeps } from "../ports";
+import { changedMeanwhile } from "./booking";
 
 export interface AdminSessionFields {
   title: string;
@@ -30,6 +31,7 @@ export interface AdminCreateSessionInput extends AdminSessionFields {
 
 export interface AdminUpdateSessionInput extends AdminSessionFields {
   id: string;
+  expectedVersion?: number;
 }
 
 type Checked = Omit<AdminSessionFields, "startTime" | "endTime"> & {
@@ -169,7 +171,7 @@ export const adminUpdateSession =
   (deps: SessionDeps) =>
   async (
     actor: Actor,
-    { id, ...input }: AdminUpdateSessionInput,
+    { id, expectedVersion, ...input }: AdminUpdateSessionInput,
     now: Date
   ): Promise<Result<Session>> => {
     if (!actor.admin) return adminRequired();
@@ -183,10 +185,12 @@ export const adminUpdateSession =
     const clashing = await clash(repos, session.eventId, fields.value, id);
     if (clashing) return clashing;
 
-    const updated = await repos.sessions.update(id, fields.value, {
-      actor: { type: "admin" },
-      at: now,
-    });
+    const updated = await repos.sessions.update(
+      id,
+      { ...fields.value, expectedVersion },
+      { actor: { type: "admin" }, at: now }
+    );
+    if (!updated) return changedMeanwhile(repos, id);
     await deps.notifyCohostsAdded({
       now,
       session: updated,

@@ -58,6 +58,7 @@ function makeExisting(
     startTime: start,
     endTime: end,
     eventId: "111",
+    version: 1,
   };
 }
 

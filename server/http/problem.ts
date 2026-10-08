@@ -1,5 +1,8 @@
 import type { TypedResponse } from "hono";
-import { problemSchema } from "@schellingboard/contracts/problem";
+import {
+  problemSchema,
+  versionConflictSchema,
+} from "@schellingboard/contracts/problem";
 import type { z } from "zod";
 import {
   HTTP_STATUS_BY_KIND,
@@ -24,6 +27,7 @@ export interface Problem {
   code: string;
   detail?: string;
   errors?: { path: string; message: string }[];
+  current?: unknown;
 }
 
 // RFC 9457. Clients branch on `code`, never on `title` or `detail`.
@@ -43,12 +47,20 @@ export function problemResponse({ status, ...rest }: Problem): Response {
   });
 }
 
-export function problemFromError(error: AppError): Response {
+// `present` turns a conflict's current state into the route's view of it;
+// without one, the domain object stays out of the response.
+export function problemFromError(
+  error: AppError,
+  present?: (current: never) => unknown
+): Response {
   return problemResponse({
     status: HTTP_STATUS_BY_KIND[error.kind],
     code: error.code,
     ...(error.detail === undefined ? {} : { detail: error.detail }),
     ...(error.errors === undefined ? {} : { errors: error.errors }),
+    ...(error.current === undefined || !present
+      ? {}
+      : { current: present(error.current as never) }),
   });
 }
 
@@ -56,10 +68,17 @@ type ProblemStatus = (typeof HTTP_STATUS_BY_KIND)[ErrorKind];
 
 // For a route's handler: the route declares problems as its `default` response.
 export function problem(
-  error: AppError
+  error: AppError,
+  present?: (current: never) => unknown
 ): Response &
-  TypedResponse<z.infer<typeof problemSchema>, ProblemStatus, "json"> {
-  return problemFromError(error) as never;
+  {
+    [S in ProblemStatus]: TypedResponse<
+      z.infer<typeof problemSchema>,
+      S,
+      "json"
+    >;
+  }[ProblemStatus] {
+  return problemFromError(error, present) as never;
 }
 
 export const problemDefault = {
@@ -68,3 +87,13 @@ export const problemDefault = {
     content: { "application/problem+json": { schema: problemSchema } },
   },
 } as const;
+
+export const versionConflictResponse = <T extends z.ZodType>(current: T) => ({
+  409: {
+    description:
+      "A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion`",
+    content: {
+      "application/problem+json": { schema: versionConflictSchema(current) },
+    },
+  },
+});

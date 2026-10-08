@@ -17,6 +17,7 @@ function makeSession(id: string, start?: Date, end?: Date): Session {
     startTime: start,
     endTime: end,
     eventId: "111",
+    version: 1,
   };
 }
 

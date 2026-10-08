@@ -81,7 +81,7 @@ describe("/api/v1 proposals", () => {
       expect(created.status).toBe(201);
       const proposal = (await created.json()) as {
         id: string;
-        updatedTime: string;
+        version: number;
       };
       expect(proposal).toMatchObject({
         title: "Knots",
@@ -95,12 +95,15 @@ describe("/api/v1 proposals", () => {
             title: "Sailing knots",
             hostIds: [host.id],
             cohostWanted: true,
-            expectedUpdatedTime: proposal.updatedTime,
+            expectedVersion: proposal.version,
           },
         })
       );
       expect(updated.status).toBe(200);
-      expect(await updated.json()).toMatchObject({ title: "Sailing knots" });
+      expect(await updated.json()).toMatchObject({
+        title: "Sailing knots",
+        version: 2,
+      });
 
       const joined = await POST(
         request("POST", `/proposals/${proposal.id}/hosts`, {
@@ -131,6 +134,68 @@ describe("/api/v1 proposals", () => {
       expect(await gone.json()).toMatchObject({ code: "proposal.notFound" });
     }
   );
+
+  it(
+    "refuses an edit made before a co-host joined, answering with the proposal as it is",
+    { tags: ["004-US2", "004-US6"] },
+    async () => {
+      const event = await createEvent({ phase: "voting" });
+      const host = await createGuest({ eventId: event.id });
+      const joiner = await createGuest({ eventId: event.id });
+      const { id, version } = await createProposal(event.id, [host.id], {
+        cohostWanted: true,
+      });
+      await POST(
+        request("POST", `/proposals/${id}/hosts`, {
+          cookie: asGuest(joiner.id),
+        })
+      );
+
+      const res = await PUT(
+        request("PUT", `/proposals/${id}`, {
+          cookie: asGuest(host.id),
+          body: {
+            title: "Renamed",
+            hostIds: [host.id],
+            cohostWanted: false,
+            expectedVersion: version,
+          },
+        })
+      );
+
+      const body = (await res.json()) as {
+        code: string;
+        current: { id: string; hosts: { id: string }[]; version: number };
+      };
+      expect(res.status).toBe(409);
+      expect(body).toMatchObject({
+        code: "proposal.versionConflict",
+        current: { id, version: version + 1 },
+      });
+      expect(body.current.hosts.map((h) => h.id).sort()).toEqual(
+        [host.id, joiner.id].sort()
+      );
+    }
+  );
+
+  it("refuses an edit without expectedVersion", async () => {
+    const event = await createEvent({ phase: "voting" });
+    const host = await createGuest({ eventId: event.id });
+    const proposal = await createProposal(event.id, [host.id]);
+
+    const res = await PUT(
+      request("PUT", `/proposals/${proposal.id}`, {
+        cookie: asGuest(host.id),
+        body: { title: "Renamed", hostIds: [host.id], cohostWanted: false },
+      })
+    );
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toMatchObject({
+      code: "request.invalid",
+      errors: [expect.objectContaining({ path: "expectedVersion" })],
+    });
+  });
 
   it(
     "keeps a hosted proposal's breakdown from everyone but its hosts",
@@ -187,7 +252,7 @@ describe("/api/v1 proposals", () => {
         description: "",
         durationMinutes: null,
         hostIds: [],
-        expectedUpdatedTime: proposal.updatedTime.toISOString(),
+        expectedVersion: proposal.version,
       };
 
       const refused = await PUT(
@@ -209,6 +274,18 @@ describe("/api/v1 proposals", () => {
       expect(await updated.json()).toMatchObject({
         title: "By the organizer",
         hosts: [],
+      });
+
+      const stale = await PUT(
+        request("PUT", `/admin/proposals/${proposal.id}`, {
+          cookie: admin,
+          body: { ...edit, title: "Again" },
+        })
+      );
+      expect(stale.status).toBe(409);
+      expect(await stale.json()).toMatchObject({
+        code: "proposal.versionConflict",
+        current: { id: proposal.id, title: "By the organizer", version: 2 },
       });
 
       const deleted = await DELETE(

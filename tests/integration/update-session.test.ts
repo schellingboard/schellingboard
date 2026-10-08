@@ -300,6 +300,38 @@ describe("POST /api/update-session", () => {
     );
   });
 
+  it(
+    "refuses an edit from a version the session has moved past",
+    { tags: ["008-US2"] },
+    async () => {
+      const event = await createEvent({ phase: "scheduling" });
+      const guest = await createGuest({ eventId: event.id });
+      const location = await createLocation({ eventId: event.id });
+      const day = await createDay(event.id);
+      const id = await createScheduledSession(event.id, guest, location, day);
+      const session = (await getRepositories().sessions.findById(id))!;
+      const edit = (title: string) =>
+        POST(
+          makeUpdateReq(
+            payloadFor(session, guest, location, day, {
+              title,
+              expectedVersion: session.version,
+            }),
+            { editorGuestId: guest.id }
+          )
+        );
+
+      expect((await edit("First")).ok).toBe(true);
+      const stale = await edit("Second");
+
+      expect(stale.status).toBe(409);
+      expect(await getRepositories().sessions.findById(id)).toMatchObject({
+        title: "First",
+        version: session.version + 1,
+      });
+    }
+  );
+
   it("keeps the start of a session an organizer placed without a break", async () => {
     const event = await createEvent({ phase: "scheduling" });
     const host = await createGuest({ eventId: event.id });

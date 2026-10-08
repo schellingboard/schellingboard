@@ -8,7 +8,11 @@ import {
   proposalViewSchema,
 } from "@schellingboard/contracts/proposal";
 import { idempotencyHeaders } from "@/server/http/idempotency";
-import { problem, problemDefault } from "@/server/http/problem";
+import {
+  problem,
+  problemDefault,
+  versionConflictResponse,
+} from "@/server/http/problem";
 import {
   body,
   idParam,
@@ -67,6 +71,7 @@ const updateProposal = createRoute({
   },
   responses: {
     200: json(proposalViewSchema, "The updated proposal"),
+    ...versionConflictResponse(proposalViewSchema),
     ...problemDefault,
   },
 });
@@ -118,6 +123,7 @@ const adminUpdateProposal = createRoute({
   },
   responses: {
     200: json(proposalViewSchema, "The updated proposal"),
+    ...versionConflictResponse(proposalViewSchema),
     ...problemDefault,
   },
 });
@@ -162,17 +168,12 @@ export function addProposalRoutes(app: App, proposals: () => ProposalUseCases) {
   });
 
   app.openapi(updateProposal, async (c) => {
-    const { expectedUpdatedTime, ...input } = c.req.valid("json");
     const result = await proposals().updateProposal(
       c.var.actor,
-      {
-        ...input,
-        proposalId: c.req.valid("param").id,
-        expectedUpdatedTime: new Date(expectedUpdatedTime),
-      },
+      { ...c.req.valid("json"), proposalId: c.req.valid("param").id },
       c.var.now
     );
-    if (!result.ok) return problem(result.error);
+    if (!result.ok) return problem(result.error, toProposalView);
     return c.json(toProposalView(result.value), 200);
   });
 
@@ -211,7 +212,7 @@ export function addProposalRoutes(app: App, proposals: () => ProposalUseCases) {
       { ...c.req.valid("json"), id: c.req.valid("param").id },
       c.var.now
     );
-    if (!result.ok) return problem(result.error);
+    if (!result.ok) return problem(result.error, toProposalView);
     return c.json(toProposalView(result.value), 200);
   });
 

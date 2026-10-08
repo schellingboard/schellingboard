@@ -19,5 +19,6 @@ export function toProposalView(
     sessionIds: p.sessionIds,
     tally: p.tally,
     breakdown: p.breakdown,
+    version: p.version,
   };
 }

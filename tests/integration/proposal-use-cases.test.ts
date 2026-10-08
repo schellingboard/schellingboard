@@ -323,7 +323,7 @@ describe("proposal mutations", () => {
         title: "Renamed",
         hostIds: [host.id, other.id],
         cohostWanted: false,
-        expectedUpdatedTime: proposal.updatedTime,
+        expectedVersion: proposal.version,
       };
 
       const notHost = await proposalUseCases().updateProposal(
@@ -351,7 +351,7 @@ describe("proposal mutations", () => {
         edit,
         now()
       );
-      expect(!stale.ok && stale.error.code).toBe("proposal.stale");
+      expect(!stale.ok && stale.error.code).toBe("proposal.versionConflict");
     }
   );
 

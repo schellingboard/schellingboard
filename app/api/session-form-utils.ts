@@ -28,6 +28,7 @@ export type SessionParams = {
    */
   capacity?: number;
   proposal?: string;
+  expectedVersion?: number;
 };
 
 export function legacyBooking(

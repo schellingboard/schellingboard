@@ -1,8 +1,6 @@
-import { STALE_PROPOSAL_MESSAGE } from "@schellingboard/contracts/session";
 import type { SessionProposal } from "@schellingboard/domain/session";
 import type { Actor } from "@/server/kernel/actor";
 import {
-  conflict,
   forbidden,
   invalid,
   notFound,
@@ -12,6 +10,7 @@ import {
 } from "@/server/kernel/result";
 import type { ProposalDeps } from "../ports";
 import {
+  changedMeanwhile,
   presentOne,
   presenter,
   proposalNotFound,
@@ -24,7 +23,9 @@ export interface AdminUpdateProposalInput {
   description: string;
   durationMinutes: number | null;
   hostIds: string[];
-  expectedUpdatedTime: string;
+  expectedVersion?: number;
+  /** What the web form sends until it sends the version. */
+  expectedUpdatedTime?: string;
 }
 
 export interface AdminCreateProposalInput {
@@ -118,8 +119,11 @@ export const adminUpdateProposal =
     if (!proposal) return proposalNotFound();
     const refused = await unknownHost(repos, hostIds);
     if (refused) return refused;
-    const expectedUpdatedTime = new Date(input.expectedUpdatedTime);
-    if (Number.isNaN(expectedUpdatedTime.getTime()))
+    const expectedUpdatedTime =
+      input.expectedUpdatedTime === undefined
+        ? undefined
+        : new Date(input.expectedUpdatedTime);
+    if (expectedUpdatedTime && Number.isNaN(expectedUpdatedTime.getTime()))
       return invalid(
         "proposal.expectedUpdatedTimeInvalid",
         "Invalid expectedUpdatedTime"
@@ -131,9 +135,10 @@ export const adminUpdateProposal =
       durationMinutes,
       hostIds,
       expectedUpdatedTime,
+      expectedVersion: input.expectedVersion,
       updatedTime: now,
     });
-    if (!updated) return conflict("proposal.stale", STALE_PROPOSAL_MESSAGE);
+    if (!updated) return changedMeanwhile(actor, repos, input.id, now);
     return presentOne(actor, repos, updated, now);
   };
 

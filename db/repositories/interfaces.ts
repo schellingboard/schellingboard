@@ -379,6 +379,8 @@ export type SessionUpdateInput = Partial<
 > & {
   hostIds?: string[];
   locationIds?: string[];
+  /** The update only applies while the session is still at this version. */
+  expectedVersion?: number;
 };
 
 /** A page of sessions plus the total count of rows matching the same filter. */
@@ -420,12 +422,14 @@ export interface SessionsRepository {
    * When `hostIds` is given, any RSVPs by the session's hosts are removed
    * in the same transaction: hosts don't RSVP to their own session. Records
    * the session before and after in the change log, in that transaction too.
+   * Undefined, changing nothing, if the session is gone or not at
+   * `expectedVersion`.
    */
   update(
     id: string,
     patch: SessionUpdateInput,
     by: ChangeContext
-  ): Promise<Session>;
+  ): Promise<Session | undefined>;
   /** Records the deletion, with the guests who had RSVPed, in the change log. */
   delete(id: string, by: ChangeContext): Promise<void>;
   /**
@@ -542,6 +546,8 @@ export type SessionProposalUpdateInput = {
   cohostWantedNote?: string | null;
   /** The update only applies while the proposal's updatedTime is still this. */
   expectedUpdatedTime?: Date;
+  /** The update only applies while the proposal is still at this version. */
+  expectedVersion?: number;
   updatedTime: Date;
 };
 
@@ -565,7 +571,10 @@ export interface SessionProposalsRepository {
   ): Promise<SessionProposalPage>;
   findById(id: string): Promise<SessionProposal | undefined>;
   create(data: SessionProposalCreateInput): Promise<SessionProposal>;
-  /** Undefined, changing nothing, if the proposal is gone or not at `expectedUpdatedTime`. */
+  /**
+   * Undefined, changing nothing, if the proposal is gone or not at
+   * `expectedUpdatedTime` or `expectedVersion`.
+   */
   update(
     id: string,
     patch: SessionProposalUpdateInput

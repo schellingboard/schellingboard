@@ -134,6 +134,7 @@ export class SqliteSessionProposalsRepository implements SessionProposalsReposit
         maybeVotesCount: votes.maybe,
         skipVotesCount: votes.skip,
         sessionIds: sessionIdsByProposal.get(row.id) ?? [],
+        version: row.version,
       };
     });
   }
@@ -255,97 +256,109 @@ export class SqliteSessionProposalsRepository implements SessionProposalsReposit
     id: string,
     patch: SessionProposalUpdateInput
   ): Promise<SessionProposal | undefined> {
-    const applied = this.db.transaction((tx) => {
-      const before = tx
-        .select()
-        .from(schema.sessionProposals)
-        .where(eq(schema.sessionProposals.id, id))
-        .get();
-      if (!before) return false;
-      if (
-        patch.expectedUpdatedTime !== undefined &&
-        patch.expectedUpdatedTime.getTime() !==
-          new Date(before.updatedTime ?? before.createdTime).getTime()
-      )
-        return false;
-
-      const values: Partial<typeof schema.sessionProposals.$inferInsert> = {};
-      if (patch.title !== undefined && patch.title !== before.title)
-        values.title = patch.title;
-      if (
-        patch.description !== undefined &&
-        patch.description !== before.description
-      )
-        values.description = patch.description;
-      if (
-        "durationMinutes" in patch &&
-        (patch.durationMinutes ?? null) !== before.durationMinutes
-      )
-        values.durationMinutes = patch.durationMinutes ?? null;
-
-      const hostsBefore = tx
-        .select({ guestId: schema.proposalHosts.guestId })
-        .from(schema.proposalHosts)
-        .where(eq(schema.proposalHosts.proposalId, id))
-        .all()
-        .map((r) => r.guestId);
-      const hostCount =
-        patch.hostIds === undefined
-          ? hostsBefore.length
-          : new Set(patch.hostIds).size;
-      // Without hosts the proposal wants one anyway, and a request left behind
-      // would come back unasked on whoever takes the proposal on next.
-      const wantedBefore = before.cohostWanted && hostsBefore.length > 0;
-      const cohostWanted =
-        (patch.cohostWanted ?? wantedBefore) && hostCount > 0;
-      const cohostWantedNote = !cohostWanted
-        ? null
-        : patch.cohostWantedNote === undefined
-          ? before.cohostWantedNote
-          : patch.cohostWantedNote || null;
-      if (cohostWanted !== before.cohostWanted)
-        values.cohostWanted = cohostWanted;
-      if (cohostWantedNote !== before.cohostWantedNote)
-        values.cohostWantedNote = cohostWantedNote;
-
-      let hostsChanged = false;
-      if (patch.hostIds !== undefined) {
-        const uniqueHostIds = [...new Set(patch.hostIds)];
-        hostsChanged =
-          uniqueHostIds.length !== hostsBefore.length ||
-          uniqueHostIds.some((guestId) => !hostsBefore.includes(guestId));
-
-        tx.delete(schema.proposalHosts)
-          .where(eq(schema.proposalHosts.proposalId, id))
-          .run();
-        for (const guestId of uniqueHostIds) {
-          tx.insert(schema.proposalHosts)
-            .values({ proposalId: id, guestId })
-            .run();
-        }
-        // Hosts can't vote for their own proposal; remove their votes.
-        if (uniqueHostIds.length > 0) {
-          tx.delete(schema.votes)
-            .where(
-              and(
-                eq(schema.votes.proposalId, id),
-                inArray(schema.votes.guestId, uniqueHostIds)
-              )
-            )
-            .run();
-        }
-      }
-
-      // The forms resubmit every field, so only a real difference counts as
-      // an edit; otherwise opening and saving would reorder "recently updated".
-      if (Object.keys(values).length > 0 || hostsChanged) {
-        tx.update(schema.sessionProposals)
-          .set({ ...values, updatedTime: patch.updatedTime.toISOString() })
+    const applied = this.db.transaction(
+      (tx) => {
+        const before = tx
+          .select()
+          .from(schema.sessionProposals)
           .where(eq(schema.sessionProposals.id, id))
-          .run();
-      }
-      return true;
-    });
+          .get();
+        if (!before) return false;
+        if (
+          patch.expectedUpdatedTime !== undefined &&
+          patch.expectedUpdatedTime.getTime() !==
+            new Date(before.updatedTime ?? before.createdTime).getTime()
+        )
+          return false;
+        if (
+          patch.expectedVersion !== undefined &&
+          patch.expectedVersion !== before.version
+        )
+          return false;
+
+        const values: Partial<typeof schema.sessionProposals.$inferInsert> = {};
+        if (patch.title !== undefined && patch.title !== before.title)
+          values.title = patch.title;
+        if (
+          patch.description !== undefined &&
+          patch.description !== before.description
+        )
+          values.description = patch.description;
+        if (
+          "durationMinutes" in patch &&
+          (patch.durationMinutes ?? null) !== before.durationMinutes
+        )
+          values.durationMinutes = patch.durationMinutes ?? null;
+
+        const hostsBefore = tx
+          .select({ guestId: schema.proposalHosts.guestId })
+          .from(schema.proposalHosts)
+          .where(eq(schema.proposalHosts.proposalId, id))
+          .all()
+          .map((r) => r.guestId);
+        const hostCount =
+          patch.hostIds === undefined
+            ? hostsBefore.length
+            : new Set(patch.hostIds).size;
+        // Without hosts the proposal wants one anyway, and a request left behind
+        // would come back unasked on whoever takes the proposal on next.
+        const wantedBefore = before.cohostWanted && hostsBefore.length > 0;
+        const cohostWanted =
+          (patch.cohostWanted ?? wantedBefore) && hostCount > 0;
+        const cohostWantedNote = !cohostWanted
+          ? null
+          : patch.cohostWantedNote === undefined
+            ? before.cohostWantedNote
+            : patch.cohostWantedNote || null;
+        if (cohostWanted !== before.cohostWanted)
+          values.cohostWanted = cohostWanted;
+        if (cohostWantedNote !== before.cohostWantedNote)
+          values.cohostWantedNote = cohostWantedNote;
+
+        let hostsChanged = false;
+        if (patch.hostIds !== undefined) {
+          const uniqueHostIds = [...new Set(patch.hostIds)];
+          hostsChanged =
+            uniqueHostIds.length !== hostsBefore.length ||
+            uniqueHostIds.some((guestId) => !hostsBefore.includes(guestId));
+
+          tx.delete(schema.proposalHosts)
+            .where(eq(schema.proposalHosts.proposalId, id))
+            .run();
+          for (const guestId of uniqueHostIds) {
+            tx.insert(schema.proposalHosts)
+              .values({ proposalId: id, guestId })
+              .run();
+          }
+          // Hosts can't vote for their own proposal; remove their votes.
+          if (uniqueHostIds.length > 0) {
+            tx.delete(schema.votes)
+              .where(
+                and(
+                  eq(schema.votes.proposalId, id),
+                  inArray(schema.votes.guestId, uniqueHostIds)
+                )
+              )
+              .run();
+          }
+        }
+
+        // The forms resubmit every field, so only a real difference counts as
+        // an edit; otherwise opening and saving would reorder "recently updated".
+        if (Object.keys(values).length > 0 || hostsChanged) {
+          tx.update(schema.sessionProposals)
+            .set({
+              ...values,
+              updatedTime: patch.updatedTime.toISOString(),
+              version: sql`${schema.sessionProposals.version} + 1`,
+            })
+            .where(eq(schema.sessionProposals.id, id))
+            .run();
+        }
+        return true;
+      },
+      { behavior: "immediate" }
+    );
     return applied ? this.findById(id) : undefined;
   }
 
@@ -385,6 +398,7 @@ export class SqliteSessionProposalsRepository implements SessionProposalsReposit
           cohostWanted: false,
           cohostWantedNote: null,
           updatedTime: updatedTime.toISOString(),
+          version: sql`${schema.sessionProposals.version} + 1`,
         })
         .where(eq(schema.sessionProposals.id, id))
         .run();

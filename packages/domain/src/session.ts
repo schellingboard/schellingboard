@@ -22,6 +22,7 @@ export type Session = {
   hosts: SessionHost[];
   locations: SessionLocation[];
   numRsvps: number;
+  version: number;
 };
 
 export type Rsvp = {
@@ -64,6 +65,7 @@ export type SessionProposal = {
   maybeVotesCount: number;
   skipVotesCount: number;
   sessionIds: string[];
+  version: number;
 };
 
 export function wantsHost(

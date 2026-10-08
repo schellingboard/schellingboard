@@ -29,6 +29,7 @@ export const sessionProposalUpdateSchema = sessionProposalSchema
     // The proposal's updatedTime when the form loaded it. A full replacement
     // from an older copy would undo what happened since, such as a co-host joining.
     expectedUpdatedTime: z.iso.datetime(),
+    expectedVersion: z.number().int().optional(),
   });
 
 export const STALE_PROPOSAL_MESSAGE =
@@ -54,12 +55,20 @@ export const sessionViewSchema = z
       z.object({ id: z.string(), name: z.string(), color: z.string() })
     ),
     numRsvps: z.number().int(),
+    version: z.number().int(),
   })
   .meta({ id: "Session" });
 
 export const sessionListSchema = z.object({
   sessions: z.array(sessionViewSchema),
 });
+
+export const expectedVersion = z
+  .number()
+  .int()
+  .describe(
+    "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
+  );
 
 const bookingFields = {
   dayId: z.string().min(1),
@@ -88,6 +97,7 @@ export const sessionCreateSchema = z.object({
 export const sessionUpdateSchema = z.object({
   ...bookingFields,
   locationIds: z.array(z.string()).min(1),
+  expectedVersion,
 });
 
 const adminFields = {
@@ -116,4 +126,7 @@ export const adminSessionCreateSchema = z.object({
 });
 
 // A replacement: a field left out is refused, not reset to a default.
-export const adminSessionUpdateSchema = z.object(adminFields);
+export const adminSessionUpdateSchema = z.object({
+  ...adminFields,
+  expectedVersion,
+});

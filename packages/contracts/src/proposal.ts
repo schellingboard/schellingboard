@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { sessionProposalSchema } from "./session";
+import { expectedVersion, sessionProposalSchema } from "./session";
 
 const instant = z.iso.datetime({ offset: true });
 const pct = z.number().nullable();
@@ -49,6 +49,7 @@ export const proposalViewSchema = z
         "The public tally, from the scheduling phase on; skip votes are only in the breakdown"
       ),
     breakdown: voteBreakdownSchema.nullable(),
+    version: z.number().int(),
   })
   .meta({ id: "Proposal" });
 
@@ -62,20 +63,16 @@ export const proposalCreateSchema = sessionProposalSchema
 
 export const proposalUpdateSchema = proposalCreateSchema
   .omit({ eventId: true })
-  .extend({
-    expectedUpdatedTime: instant.describe(
-      "The proposal's updatedTime when it was read; a later change refuses the edit"
-    ),
-  });
+  .extend({ expectedVersion });
 
 export const adminProposalUpdateSchema = z.object({
   title: z.string(),
   description: z.string().default(""),
   durationMinutes: z.number().int().min(0).nullable().default(null),
   hostIds: z.array(z.string()).default([]),
-  expectedUpdatedTime: instant,
+  expectedVersion,
 });
 
 export const adminProposalCreateSchema = adminProposalUpdateSchema
-  .omit({ expectedUpdatedTime: true })
+  .omit({ expectedVersion: true })
   .extend({ eventId: z.string().min(1) });

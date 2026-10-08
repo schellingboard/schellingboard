@@ -21,6 +21,8 @@ export interface AppError {
   code: string;
   detail?: string;
   errors?: FieldError[];
+  /** The subject as it is now, sent with a version conflict. */
+  current?: unknown;
 }
 
 export type Failure = { ok: false; error: AppError };
@@ -48,5 +50,21 @@ export function invalidFields(code: string, errors: FieldError[]): Failure {
   return {
     ok: false,
     error: { kind: "invalid", code, detail: errors[0]?.message, errors },
+  };
+}
+
+export function versionConflict(
+  subject: string,
+  current: unknown,
+  detail: string
+): Failure {
+  return {
+    ok: false,
+    error: {
+      kind: "conflict",
+      code: `${subject}.versionConflict`,
+      detail,
+      current,
+    },
   };
 }
