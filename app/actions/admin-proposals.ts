@@ -14,6 +14,7 @@ export type AdminProposalInput = {
   durationMinutes: number | null;
   hostIds: string[];
   expectedUpdatedTime: string;
+  expectedVersion?: number;
 };
 
 function revalidateEventPaths(eventId: string) {

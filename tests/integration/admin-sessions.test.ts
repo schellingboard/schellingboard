@@ -501,6 +501,32 @@ describe("adminUpdateSessionAction", () => {
     expect(remaining.map((r) => r.guestId)).toEqual([otherRsvper.id]);
   });
 
+  it("refuses an edit from a version the session has moved past", async () => {
+    const event = await createEvent();
+    const session = await createSession(event.id, { title: "Workshop" });
+    const edit = (title: string) =>
+      adminUpdateSessionAction({
+        id: session.id,
+        title,
+        description: "",
+        startTime: null,
+        endTime: null,
+        capacity: 0,
+        adminManaged: true,
+        blocker: false,
+        closed: false,
+        hostIds: [],
+        locationIds: [],
+        expectedVersion: session.version,
+      });
+
+    expect(await edit("First")).toEqual({ ok: true });
+    expect(await edit("Second")).toMatchObject({ ok: false });
+    expect(await getRepositories().sessions.findById(session.id)).toMatchObject(
+      { title: "First" }
+    );
+  });
+
   it("updates title, description, capacity, flags, time, host and location", async () => {
     const event = await createEvent();
     const h1 = await createGuest({ name: "Host One" });

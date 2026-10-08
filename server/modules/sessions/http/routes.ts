@@ -8,7 +8,11 @@ import {
   sessionViewSchema,
 } from "@schellingboard/contracts/session";
 import { idempotencyHeaders } from "@/server/http/idempotency";
-import { problem, problemDefault } from "@/server/http/problem";
+import {
+  problem,
+  problemDefault,
+  versionConflictResponse,
+} from "@/server/http/problem";
 import {
   body,
   idParam,
@@ -65,6 +69,7 @@ const updateSession = createRoute({
   },
   responses: {
     200: json(sessionViewSchema, "The updated session"),
+    ...versionConflictResponse(sessionViewSchema),
     ...problemDefault,
   },
 });
@@ -103,6 +108,7 @@ const adminUpdateSession = createRoute({
   },
   responses: {
     200: json(sessionViewSchema, "The updated session"),
+    ...versionConflictResponse(sessionViewSchema),
     ...problemDefault,
   },
 });
@@ -155,7 +161,7 @@ export function addSessionRoutes(app: App, sessions: () => SessionUseCases) {
       },
       c.var.now
     );
-    if (!result.ok) return problem(result.error);
+    if (!result.ok) return problem(result.error, toSessionView);
     return c.json(toSessionView(result.value), 200);
   });
 
@@ -185,7 +191,7 @@ export function addSessionRoutes(app: App, sessions: () => SessionUseCases) {
       { ...c.req.valid("json"), id: c.req.valid("param").id },
       c.var.now
     );
-    if (!result.ok) return problem(result.error);
+    if (!result.ok) return problem(result.error, toSessionView);
     return c.json(toSessionView(result.value), 200);
   });
 

@@ -55,6 +55,7 @@ function buildSessions(
     hosts: hostsBySession.get(row.id) ?? [],
     locations: locationsBySession.get(row.id) ?? [],
     numRsvps: rsvpCountBySession.get(row.id) ?? 0,
+    version: row.version,
   }));
 }
 
@@ -320,10 +321,16 @@ export class SqliteSessionsRepository implements SessionsRepository {
     id: string,
     patch: SessionUpdateInput,
     by: ChangeContext
-  ): Promise<Session> {
-    this.db.transaction(
+  ): Promise<Session | undefined> {
+    const applied = this.db.transaction(
       (tx) => {
         const before = this.findByIdSync(id);
+        if (
+          !before ||
+          (patch.expectedVersion !== undefined &&
+            before.version !== patch.expectedVersion)
+        )
+          return false;
         const values: Partial<typeof schema.sessions.$inferInsert> = {};
         if (patch.title !== undefined) values.title = patch.title;
         if (patch.description !== undefined)
@@ -381,20 +388,23 @@ export class SqliteSessionsRepository implements SessionsRepository {
           }
         }
 
-        const after = this.findByIdSync(id);
-        if (
-          before &&
-          after &&
-          JSON.stringify(before) !== JSON.stringify(after)
-        ) {
-          insertChange(tx, changes.sessionChanged(before, after, by));
+        if (JSON.stringify(before) !== JSON.stringify(this.findByIdSync(id))) {
+          tx.update(schema.sessions)
+            .set({ version: sql`${schema.sessions.version} + 1` })
+            .where(eq(schema.sessions.id, id))
+            .run();
+          insertChange(
+            tx,
+            changes.sessionChanged(before, this.findByIdSync(id)!, by)
+          );
         }
-        // Immediate: the read above would otherwise take the write lock late,
-        // and a second process on the same file would get SQLITE_BUSY.
+        return true;
       },
+      // Immediate: the read above would otherwise take the write lock late,
+      // and a second process on the same file would get SQLITE_BUSY.
       { behavior: "immediate" }
     );
-    return (await this.findById(id))!;
+    return applied ? this.findById(id) : undefined;
   }
 
   async delete(id: string, by: ChangeContext): Promise<void> {

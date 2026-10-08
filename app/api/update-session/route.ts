@@ -27,6 +27,10 @@ export async function POST(req: NextRequest) {
         locationIds: Array.isArray(params.locationIds)
           ? params.locationIds
           : [params.location?.id ?? ""],
+        expectedVersion:
+          typeof params.expectedVersion === "number"
+            ? params.expectedVersion
+            : undefined,
       },
       requestNow(req)
     );

@@ -3,12 +3,19 @@ import {
   proposalVoteStats,
   type ProposalVoteStats,
 } from "@schellingboard/domain/proposal-vote-stats";
+import { STALE_PROPOSAL_MESSAGE } from "@schellingboard/contracts/session";
 import type { Event } from "@schellingboard/domain/event";
 import { inSchedPhase } from "@schellingboard/domain/phase";
 import type { SessionProposal } from "@schellingboard/domain/session";
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
-import { notFound, ok, type Result } from "@/server/kernel/result";
+import {
+  notFound,
+  ok,
+  versionConflict,
+  type Failure,
+  type Result,
+} from "@/server/kernel/result";
 import type { ProposalDeps } from "../ports";
 
 // Skip votes and the total stay out of the public tally: it reads as interest
@@ -26,6 +33,7 @@ export interface ProposalView extends Pick<
   | "cohostWanted"
   | "cohostWantedNote"
   | "sessionIds"
+  | "version"
 > {
   tally: { interested: number; maybe: number } | null;
   breakdown: ProposalVoteStats | null;
@@ -82,6 +90,22 @@ export async function presentOne(
   return ok((await presenter(actor, repos, event, now))(proposal));
 }
 
+// For an update the repository refused: the proposal is gone or changed
+// since the edit was made from it.
+export async function changedMeanwhile(
+  actor: Actor,
+  repos: ProposalDeps["repos"],
+  id: string,
+  now: Date
+): Promise<Failure> {
+  const current = await repos.sessionProposals.findById(id);
+  if (!current) return proposalNotFound();
+  const view = await presentOne(actor, repos, current, now);
+  return view.ok
+    ? versionConflict("proposal", view.value, STALE_PROPOSAL_MESSAGE)
+    : view;
+}
+
 function fields(p: SessionProposal) {
   return {
     id: p.id,
@@ -95,6 +119,7 @@ function fields(p: SessionProposal) {
     cohostWanted: p.cohostWanted,
     cohostWantedNote: p.cohostWantedNote,
     sessionIds: p.sessionIds,
+    version: p.version,
   };
 }
 

@@ -18,5 +18,6 @@ export function toSessionView(s: Session): z.input<typeof sessionViewSchema> {
     hosts: s.hosts.map(({ id, name }) => ({ id, name })),
     locations: s.locations.map(({ id, name, color }) => ({ id, name, color })),
     numRsvps: s.numRsvps,
+    version: s.version,
   };
 }

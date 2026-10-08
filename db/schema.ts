@@ -261,6 +261,7 @@ export const sessionProposals = sqliteTable("session_proposals", {
     .notNull()
     .default(false),
   cohostWantedNote: text("cohost_wanted_note"),
+  version: integer("version").notNull().default(1),
 });
 
 export const proposalHosts = sqliteTable(
@@ -301,6 +302,7 @@ export const sessions = sqliteTable("sessions", {
   // "held, nobody came". Deliberately absent from the Session type, which is
   // serialised to every visitor — see docs/dev/adr/0007.
   attendeeCount: integer("attendee_count"),
+  version: integer("version").notNull().default(1),
 });
 
 export const sessionHosts = sqliteTable(

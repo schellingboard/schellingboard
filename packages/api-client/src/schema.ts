@@ -110,6 +110,8 @@ export interface paths {
             capacity?: number;
             proposalId?: string;
             locationIds: string[];
+            /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
+            expectedVersion: number;
           };
         };
       };
@@ -121,6 +123,26 @@ export interface paths {
           };
           content: {
             "application/json": components["schemas"]["Session"];
+          };
+        };
+        /** @description A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion` */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": {
+              type: string;
+              title: string;
+              status: number;
+              code: string;
+              detail?: string;
+              errors?: {
+                path: string;
+                message: string;
+              }[];
+              current?: components["schemas"]["Session"];
+            };
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -382,6 +404,8 @@ export interface paths {
             closed: boolean;
             hostIds: string[];
             locationIds: string[];
+            /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
+            expectedVersion: number;
           };
         };
       };
@@ -393,6 +417,26 @@ export interface paths {
           };
           content: {
             "application/json": components["schemas"]["Session"];
+          };
+        };
+        /** @description A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion` */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": {
+              type: string;
+              title: string;
+              status: number;
+              code: string;
+              detail?: string;
+              errors?: {
+                path: string;
+                message: string;
+              }[];
+              current?: components["schemas"]["Session"];
+            };
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -777,11 +821,8 @@ export interface paths {
             /** @default false */
             cohostWanted?: boolean;
             cohostWantedNote?: string;
-            /**
-             * Format: date-time
-             * @description The proposal's updatedTime when it was read; a later change refuses the edit
-             */
-            expectedUpdatedTime: string;
+            /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
+            expectedVersion: number;
           };
         };
       };
@@ -793,6 +834,26 @@ export interface paths {
           };
           content: {
             "application/json": components["schemas"]["Proposal"];
+          };
+        };
+        /** @description A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion` */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": {
+              type: string;
+              title: string;
+              status: number;
+              code: string;
+              detail?: string;
+              errors?: {
+                path: string;
+                message: string;
+              }[];
+              current?: components["schemas"]["Proposal"];
+            };
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -1078,8 +1139,8 @@ export interface paths {
             durationMinutes?: number | null;
             /** @default [] */
             hostIds?: string[];
-            /** Format: date-time */
-            expectedUpdatedTime: string;
+            /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
+            expectedVersion: number;
           };
         };
       };
@@ -1091,6 +1152,26 @@ export interface paths {
           };
           content: {
             "application/json": components["schemas"]["Proposal"];
+          };
+        };
+        /** @description A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion` */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": {
+              type: string;
+              title: string;
+              status: number;
+              code: string;
+              detail?: string;
+              errors?: {
+                path: string;
+                message: string;
+              }[];
+              current?: components["schemas"]["Proposal"];
+            };
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -4807,6 +4888,7 @@ export interface components {
         color: string;
       }[];
       numRsvps: number;
+      version: number;
     };
     Problem: {
       type: string;
@@ -4868,6 +4950,7 @@ export interface components {
         noEstimateReason:
           "low-turnout" | "no-interest" | "unknown-event" | null;
       } | null;
+      version: number;
     };
     Vote: {
       id: string;

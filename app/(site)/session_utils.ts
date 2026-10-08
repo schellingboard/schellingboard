@@ -17,6 +17,7 @@ export function newEmptySession(eventId: string): Session {
     closed: false,
     proposalId: undefined,
     eventId,
+    version: 0,
   };
 }
 

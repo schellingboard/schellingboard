@@ -174,7 +174,12 @@ describe("guest session mutations", () => {
 
       const updated = await PUT(
         request("PUT", `/sessions/${id}`, {
-          body: { ...fields, title: "Renamed", locationIds: [locationId] },
+          body: {
+            ...fields,
+            title: "Renamed",
+            locationIds: [locationId],
+            expectedVersion: 1,
+          },
           cookie: asGuest(host.id),
         })
       );
@@ -188,6 +193,74 @@ describe("guest session mutations", () => {
       expect(await getRepositories().sessions.findById(id)).toBe(undefined);
     }
   );
+
+  it(
+    "refuses an edit made from an outdated copy, answering with the session as it is",
+    { tags: ["008-US2"] },
+    async () => {
+      const { host, location, day } = await scheduledWorld();
+      const created = await POST(
+        request("POST", "/sessions", {
+          body: booking(day, host.id, location.id),
+          cookie: asGuest(host.id),
+        })
+      );
+      const { id, version } = (await created.json()) as {
+        id: string;
+        version: number;
+      };
+      const { locationId, ...fields } = booking(day, host.id, location.id);
+      const edit = (title: string) =>
+        PUT(
+          request("PUT", `/sessions/${id}`, {
+            body: {
+              ...fields,
+              title,
+              locationIds: [locationId],
+              expectedVersion: version,
+            },
+            cookie: asGuest(host.id),
+          })
+        );
+
+      const first = await edit("First");
+      const second = await edit("Second");
+
+      expect(version).toBe(1);
+      expect(await first.json()).toMatchObject({ title: "First", version: 2 });
+      expect(second.status).toBe(409);
+      expect(await second.json()).toMatchObject({
+        code: "session.versionConflict",
+        current: { id, title: "First", version: 2 },
+      });
+      expect(await getRepositories().sessions.findById(id)).toMatchObject({
+        title: "First",
+        version: 2,
+      });
+    }
+  );
+
+  it("refuses an edit without expectedVersion", async () => {
+    const { event, host, location, day } = await scheduledWorld();
+    const session = await createSession(event.id, {
+      hostIds: [host.id],
+      locationIds: [location.id],
+    });
+    const { locationId, ...fields } = booking(day, host.id, location.id);
+
+    const res = await PUT(
+      request("PUT", `/sessions/${session.id}`, {
+        body: { ...fields, locationIds: [locationId] },
+        cookie: asGuest(host.id),
+      })
+    );
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toMatchObject({
+      code: "request.invalid",
+      errors: [expect.objectContaining({ path: "expectedVersion" })],
+    });
+  });
 
   it("refuses an edit by a guest who does not host the session", async () => {
     const { event, host, location } = await scheduledWorld();
@@ -279,7 +352,7 @@ describe("/api/v1/admin/sessions", () => {
       const { id } = (await created.json()) as { id: string };
       const updated = await PUT(
         request("PUT", `/admin/sessions/${id}`, {
-          body: { ...fields, title: "Dinner" },
+          body: { ...fields, title: "Dinner", expectedVersion: 1 },
           cookie,
         })
       );
@@ -288,8 +361,43 @@ describe("/api/v1/admin/sessions", () => {
       );
 
       expect(created.status).toBe(201);
-      expect(await updated.json()).toMatchObject({ title: "Dinner" });
+      expect(await updated.json()).toMatchObject({
+        title: "Dinner",
+        version: 2,
+      });
       expect(deleted.status).toBe(204);
+    }
+  );
+
+  it(
+    "refuses an organizer's edit from an outdated copy with the session as it is",
+    { tags: ["018-US2"] },
+    async () => {
+      const event = await createEvent();
+      const cookie = await asAdmin();
+      const created = await POST(
+        request("POST", "/admin/sessions", {
+          body: { ...fields, eventId: event.id },
+          cookie,
+        })
+      );
+      const { id } = (await created.json()) as { id: string };
+      const edit = (title: string) =>
+        PUT(
+          request("PUT", `/admin/sessions/${id}`, {
+            body: { ...fields, title, expectedVersion: 1 },
+            cookie,
+          })
+        );
+
+      await edit("Dinner");
+      const stale = await edit("Breakfast");
+
+      expect(stale.status).toBe(409);
+      expect(await stale.json()).toMatchObject({
+        code: "session.versionConflict",
+        current: { id, title: "Dinner", version: 2 },
+      });
     }
   );
 
@@ -303,7 +411,9 @@ describe("/api/v1/admin/sessions", () => {
       })
     );
     const { id } = (await created.json()) as { id: string };
-    const withoutCapacity: Partial<typeof fields> = { ...fields };
+    const withoutCapacity: Partial<typeof fields> & {
+      expectedVersion: number;
+    } = { ...fields, expectedVersion: 1 };
     delete withoutCapacity.capacity;
 
     const res = await PUT(

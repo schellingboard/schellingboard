@@ -1,4 +1,3 @@
-import { STALE_PROPOSAL_MESSAGE } from "@schellingboard/contracts/session";
 import { inSchedPhase } from "@schellingboard/domain/phase";
 import type { SessionProposal } from "@schellingboard/domain/session";
 import { actingGuest } from "@/server/kernel/acting-guest";
@@ -13,6 +12,7 @@ import {
 } from "@/server/kernel/result";
 import type { ProposalDeps } from "../ports";
 import {
+  changedMeanwhile,
   presenter,
   presentOne,
   proposalNotFound,
@@ -34,7 +34,9 @@ export interface CreateProposalInput extends ProposalFields {
 
 export interface UpdateProposalInput extends ProposalFields {
   proposalId: string;
-  expectedUpdatedTime: Date;
+  expectedVersion?: number;
+  /** What the web forms send until they send the version. */
+  expectedUpdatedTime?: Date;
 }
 
 async function guestIdsOf(
@@ -104,7 +106,12 @@ export const updateProposal =
   ({ repos }: ProposalDeps) =>
   async (
     actor: Actor,
-    { proposalId, expectedUpdatedTime, ...fields }: UpdateProposalInput,
+    {
+      proposalId,
+      expectedVersion,
+      expectedUpdatedTime,
+      ...fields
+    }: UpdateProposalInput,
     now: Date
   ): Promise<Result<ProposalView>> => {
     const proposal = await repos.sessionProposals.findById(proposalId);
@@ -127,9 +134,10 @@ export const updateProposal =
       cohostWanted: fields.cohostWanted,
       cohostWantedNote: fields.cohostWantedNote ?? null,
       expectedUpdatedTime,
+      expectedVersion,
       updatedTime: now,
     });
-    if (!updated) return conflict("proposal.stale", STALE_PROPOSAL_MESSAGE);
+    if (!updated) return changedMeanwhile(actor, repos, proposalId, now);
     return presentOne(actor, repos, updated, now);
   };
 

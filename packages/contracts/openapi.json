@@ -40,7 +40,8 @@
               "required": ["id", "name", "color"]
             }
           },
-          "numRsvps": { "type": "integer" }
+          "numRsvps": { "type": "integer" },
+          "version": { "type": "integer" }
         },
         "required": [
           "id",
@@ -56,7 +57,8 @@
           "proposalId",
           "hosts",
           "locations",
-          "numRsvps"
+          "numRsvps",
+          "version"
         ]
       },
       "Problem": {
@@ -167,7 +169,8 @@
               "noEstimateReason"
             ],
             "description": "From the scheduling phase on, shown to a proposal's hosts, and to everyone for a proposal nobody hosts"
-          }
+          },
+          "version": { "type": "integer" }
         },
         "required": [
           "id",
@@ -182,7 +185,8 @@
           "cohostWantedNote",
           "sessionIds",
           "tally",
-          "breakdown"
+          "breakdown",
+          "version"
         ]
       },
       "Vote": {
@@ -643,6 +647,10 @@
                     "type": "array",
                     "items": { "type": "string" },
                     "minItems": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "description": "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
                   }
                 },
                 "required": [
@@ -651,7 +659,8 @@
                   "hostIds",
                   "startTime",
                   "durationMinutes",
-                  "locationIds"
+                  "locationIds",
+                  "expectedVersion"
                 ]
               }
             }
@@ -663,6 +672,36 @@
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Session" }
+              }
+            }
+          },
+          "409": {
+            "description": "A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    },
+                    "current": { "$ref": "#/components/schemas/Session" }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
               }
             }
           },
@@ -952,6 +991,10 @@
                   "locationIds": {
                     "type": "array",
                     "items": { "type": "string" }
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "description": "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
                   }
                 },
                 "required": [
@@ -964,7 +1007,8 @@
                   "blocker",
                   "closed",
                   "hostIds",
-                  "locationIds"
+                  "locationIds",
+                  "expectedVersion"
                 ]
               }
             }
@@ -976,6 +1020,36 @@
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Session" }
+              }
+            }
+          },
+          "409": {
+            "description": "A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    },
+                    "current": { "$ref": "#/components/schemas/Session" }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
               }
             }
           },
@@ -1357,13 +1431,12 @@
                   "durationMinutes": { "type": "integer", "minimum": 0 },
                   "cohostWanted": { "type": "boolean", "default": false },
                   "cohostWantedNote": { "type": "string", "maxLength": 200 },
-                  "expectedUpdatedTime": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "The proposal's updatedTime when it was read; a later change refuses the edit"
+                  "expectedVersion": {
+                    "type": "integer",
+                    "description": "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
                   }
                 },
-                "required": ["title", "expectedUpdatedTime"]
+                "required": ["title", "expectedVersion"]
               }
             }
           }
@@ -1374,6 +1447,36 @@
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Proposal" }
+              }
+            }
+          },
+          "409": {
+            "description": "A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    },
+                    "current": { "$ref": "#/components/schemas/Proposal" }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
               }
             }
           },
@@ -1666,12 +1769,12 @@
                     "items": { "type": "string" },
                     "default": []
                   },
-                  "expectedUpdatedTime": {
-                    "type": "string",
-                    "format": "date-time"
+                  "expectedVersion": {
+                    "type": "integer",
+                    "description": "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
                   }
                 },
-                "required": ["title", "expectedUpdatedTime"]
+                "required": ["title", "expectedVersion"]
               }
             }
           }
@@ -1682,6 +1785,36 @@
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Proposal" }
+              }
+            }
+          },
+          "409": {
+            "description": "A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    },
+                    "current": { "$ref": "#/components/schemas/Proposal" }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
               }
             }
           },

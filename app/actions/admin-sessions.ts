@@ -22,6 +22,7 @@ export type AdminSessionInput = {
   closed: boolean;
   hostIds: string[];
   locationIds: string[];
+  expectedVersion?: number;
 };
 
 // The attendee-facing schedule fetches the session list in the shared
@@ -50,7 +51,10 @@ async function settle(
   return { ok: true };
 }
 
-export type AdminSessionCreateInput = Omit<AdminSessionInput, "id"> & {
+export type AdminSessionCreateInput = Omit<
+  AdminSessionInput,
+  "id" | "expectedVersion"
+> & {
   eventId: string;
 };
 

@@ -117,13 +117,29 @@ describe("change log", () => {
     expect(change.actor).toEqual({ type: "admin" });
   });
 
-  it("records nothing for a save that changes nothing", async () => {
+  it("records nothing for a save that changes nothing, nor bumps the version", async () => {
     const { session, by } = await world();
     const { sessions, changes } = getRepositories();
 
-    await sessions.update(session.id, { title: "Old title" }, by);
+    const saved = await sessions.update(session.id, { title: "Old title" }, by);
 
     expect(await changes.listAfter(0)).toEqual([]);
+    expect(saved?.version).toBe(session.version);
+  });
+
+  it("logs the version a change brought the session to", async () => {
+    const { session, by } = await world();
+    const { sessions, changes } = getRepositories();
+
+    await sessions.update(session.id, { title: "One" }, by);
+
+    const [change] = await changes.listAfter(0);
+    expect(change).toMatchObject({
+      payload: {
+        before: { version: session.version },
+        after: { version: session.version + 1 },
+      },
+    });
   });
 
   it("skips entries of a type this version does not know", async () => {

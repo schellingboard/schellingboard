@@ -115,7 +115,12 @@ optional `detail`, and the extension member `code`. A request that fails its
 contract gets `400` with code `request.invalid` and an `errors` list of paths
 and messages; a use case may attach the same list to its own `invalid` error to
 name every refused field at once (`location.invalid`), and a `conflict` may too
-(`guest.emailTaken`). Codes are dotted, named for what was refused
+(`guest.emailTaken`). An edit names the version it was made from
+(`expectedVersion`, the `version` every read of the subject carries); when the
+subject has changed since, the edit is refused with `409`,
+`<subject>.versionConflict`, and the extension member `current`: the subject
+as it is now, shaped as a read of it, so a client can redo the edit on it
+without another request. Codes are dotted, named for what was refused
 (`guest.protected`, `session.notFound`); a code once shipped keeps its meaning,
 and the client translates it rather than showing `detail`.
 
@@ -190,6 +195,6 @@ standalone build does not carry it.
   response no longer RSVPs twice or creates two proposals (#141), for clients
   that send the key. The web app's server actions do not, so #141 stays open
   until the UI calls the API.
-- Pagination, rate limiting and `expectedVersion` checks from the target are
-  not part of this decision; a table gains a version check only if it already
-  has a version column.
+- Pagination and rate limiting from the target are not part of this
+  decision. `expectedVersion` came later, with a `version` column on each
+  editable table.

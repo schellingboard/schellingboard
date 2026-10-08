@@ -14,6 +14,8 @@ import {
   conflict,
   forbidden,
   invalid,
+  notFound,
+  versionConflict,
   type Failure,
   type Result,
 } from "@/server/kernel/result";
@@ -104,4 +106,20 @@ export async function actingHost(
   return session.hosts.some((h) => h.id === acting.value)
     ? acting
     : forbidden("session.notHost", `Only a host may ${verb} this session`);
+}
+
+// For an update the repository refused: the session is gone or at another
+// version than the edit was made from.
+export async function changedMeanwhile(
+  repos: SessionDeps["repos"],
+  id: string
+): Promise<Failure> {
+  const current = await repos.sessions.findById(id);
+  return current
+    ? versionConflict(
+        "session",
+        current,
+        "Someone changed this session while you edited it"
+      )
+    : notFound("session.notFound", "Session not found");
 }

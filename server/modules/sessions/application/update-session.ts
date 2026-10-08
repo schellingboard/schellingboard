@@ -21,6 +21,7 @@ import {
 import type { SessionDeps } from "../ports";
 import {
   actingHost,
+  changedMeanwhile,
   dayUnknown,
   hostNotInEvent,
   hostsOutsideEvent,
@@ -36,6 +37,7 @@ export interface UpdateSessionInput extends SessionBooking {
   sessionId: string;
   /** Several only when they are the rooms an organizer already gave it. */
   locationIds: string[];
+  expectedVersion?: number;
 }
 
 export const updateSession =
@@ -118,10 +120,12 @@ export const updateSession =
     );
     if (placement) return placementFailure(placement);
 
-    const updated = await repos.sessions.update(prev.id, session, {
-      actor: { type: "guest", id: host.value },
-      at: now,
-    });
+    const updated = await repos.sessions.update(
+      prev.id,
+      { ...session, expectedVersion: input.expectedVersion },
+      { actor: { type: "guest", id: host.value }, at: now }
+    );
+    if (!updated) return changedMeanwhile(repos, prev.id);
     await deps.notifyCohostsAdded({
       now,
       session: updated,

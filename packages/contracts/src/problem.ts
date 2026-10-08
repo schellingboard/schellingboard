@@ -14,3 +14,8 @@ export const problemSchema = z
       .optional(),
   })
   .meta({ id: "Problem" });
+
+// With `<subject>.versionConflict`, `current` is the subject as it is now:
+// redo the edit on it and send its version.
+export const versionConflictSchema = <T extends z.ZodType>(current: T) =>
+  problemSchema.extend({ current: current.optional() });

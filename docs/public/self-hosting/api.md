@@ -121,6 +121,15 @@ with neither the admin cookie nor a selected attendee has its key ignored.
 Every response is sent with `cache-control: no-store`: browsers and proxies
 never keep it, so a read always shows the current state.
 
+## Editing what someone else may be editing
+
+Sessions and proposals carry a `version`, which goes up with every change. An
+edit (`PUT`) sends the version it was made from as `expectedVersion`. If
+someone changed the item since, the edit is refused with `409` and
+`session.versionConflict` or `proposal.versionConflict`, and the body's
+`current` member holds the item as it is now: redo the edit on it and send
+again with its `version`. Nothing is overwritten unseen.
+
 ## Syncing from a script
 
 A script that keeps an event in step with an outside plan, such as a list of
@@ -136,8 +145,9 @@ admin cookie it can read every endpoint it needs:
 - **Find the existing sessions.** `GET /api/v1/sessions?eventId=…` lists every
   session of the event, with its rooms, hosts (id and name only) and capacity.
 - **Update a session.** `PUT /api/v1/admin/sessions/{id}` replaces the
-  session: send every field, taking the ones you do not change from the read. A
-  field left out gets `400`, so nothing is reset by accident.
+  session: send every field, taking the ones you do not change from the read,
+  and its `version` as `expectedVersion`. A field left out gets `400`, so
+  nothing is reset by accident.
 - **Warn before deleting.** Each session in the list has `numRsvps`; show it
   before `DELETE /api/v1/admin/sessions/{id}`.
 
