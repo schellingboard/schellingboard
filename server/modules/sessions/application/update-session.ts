@@ -1,4 +1,3 @@
-import type { ChangeContext } from "@schellingboard/domain/change";
 import { sessionBookingWindowError } from "@schellingboard/domain/day-window";
 import type { Location } from "@schellingboard/domain/location";
 import { locationUnavailableError } from "@schellingboard/domain/location-unavailability";
@@ -49,97 +48,96 @@ export const updateSession =
     input: UpdateSessionInput,
     now: Date
   ): Promise<Result<Session>> => {
-    const { repos } = deps;
-    const day = await repos.days.findById(input.dayId);
-    if (!day) return dayUnknown();
-    const prev = await repos.sessions.findById(input.sessionId);
-    if (!prev)
-      return notFound(
-        "session.notFound",
-        `Cannot find session with ID ${input.sessionId}`
-      );
-    if (prev.eventId !== day.eventId) return dayUnknown();
-    const event = await repos.events.findById(prev.eventId);
-    if (!event || !inSchedPhase(event, now)) return outsidePhase("edited");
-    if (prev.adminManaged || prev.blocker) return managedByOrganizer("edit");
-    const host = await actingHost(actor, prev, repos, "edit");
-    if (!host.ok) return host;
+    const result = await deps.uow.run(async (tx) => {
+      const day = await tx.days.findById(input.dayId);
+      if (!day) return dayUnknown();
+      const prev = await tx.sessions.findById(input.sessionId);
+      if (!prev)
+        return notFound(
+          "session.notFound",
+          `Cannot find session with ID ${input.sessionId}`
+        );
+      if (prev.eventId !== day.eventId) return dayUnknown();
+      const event = await tx.events.findById(prev.eventId);
+      if (!event || !inSchedPhase(event, now)) return outsidePhase("edited");
+      if (prev.adminManaged || prev.blocker) return managedByOrganizer("edit");
+      const host = await actingHost(actor, prev, tx, "edit");
+      if (!host.ok) return host;
 
-    const { slot, session } = placed(input, day, event.breakMinutes, []);
-    const startChanged =
-      session.startTime!.getTime() !== prev.startTime?.getTime();
-    const endChanged = slot.end.getTime() !== prev.endTime?.getTime();
-    if (startChanged && sessionHasStarted(prev, now))
-      return forbidden(
-        "session.started",
-        "This session has already started, so it can no longer be moved"
-      );
-    // Only what the host is changing is theirs to answer for. An organizer may
-    // have placed the session where a host could not book it.
-    const windowError = sessionBookingWindowError(
-      day,
-      slot.start,
-      slot.end,
-      event.slotIncrementMinutes,
-      { start: startChanged, end: endChanged }
-    );
-    if (windowError)
-      return invalid("session.outsideBookingWindow", windowError);
-    if (startChanged || endChanged) {
-      const durationError = sessionDurationError(
+      const { slot, session } = placed(input, day, event.breakMinutes, []);
+      const startChanged =
+        session.startTime!.getTime() !== prev.startTime?.getTime();
+      const endChanged = slot.end.getTime() !== prev.endTime?.getTime();
+      if (startChanged && sessionHasStarted(prev, now))
+        return forbidden(
+          "session.started",
+          "This session has already started, so it can no longer be moved"
+        );
+      // Only what the host is changing is theirs to answer for. An organizer
+      // may have placed the session where a host could not book it.
+      const windowError = sessionBookingWindowError(
+        day,
         slot.start,
         slot.end,
         event.slotIncrementMinutes,
-        event.maxSessionDuration
+        { start: startChanged, end: endChanged }
       );
-      if (durationError)
-        return invalid("session.durationNotAllowed", durationError);
-    }
-    if (await hostsOutsideEvent(repos, event.id, session.hostIds))
-      return hostNotInEvent();
-    const rooms = await chosenRooms(repos, event.id, prev, input.locationIds);
-    if (!rooms.ok) return rooms;
-    const chosen = rooms.value;
-    session.locationIds = chosen.map((l) => l.id);
-    const capacityError = sessionCapacityError(input.capacity);
-    if (capacityError) return invalid("session.capacityInvalid", capacityError);
-    session.capacity =
-      input.capacity ??
-      (chosen.length > 1 ? prev.capacity : chosen[0].capacity);
-    const unavailable = await unavailableFailure(repos, event.id, prev, {
-      locationIds: session.locationIds,
-      start: session.startTime!,
-      end: slot.end,
-    });
-    if (unavailable) return unavailable;
-    const placement = sessionPlacementError(
-      session,
-      (await repos.sessions.listScheduledByEvent(event.id)).filter(
-        (s) => s.id !== prev.id
-      ),
-      now,
-      { allowPastStart: !startChanged }
-    );
-    if (placement) return placementFailure(placement);
+      if (windowError)
+        return invalid("session.outsideBookingWindow", windowError);
+      if (startChanged || endChanged) {
+        const durationError = sessionDurationError(
+          slot.start,
+          slot.end,
+          event.slotIncrementMinutes,
+          event.maxSessionDuration
+        );
+        if (durationError)
+          return invalid("session.durationNotAllowed", durationError);
+      }
+      if (await hostsOutsideEvent(tx, event.id, session.hostIds))
+        return hostNotInEvent();
+      const rooms = await chosenRooms(tx, event.id, prev, input.locationIds);
+      if (!rooms.ok) return rooms;
+      const chosen = rooms.value;
+      session.locationIds = chosen.map((l) => l.id);
+      const capacityError = sessionCapacityError(input.capacity);
+      if (capacityError)
+        return invalid("session.capacityInvalid", capacityError);
+      session.capacity =
+        input.capacity ??
+        (chosen.length > 1 ? prev.capacity : chosen[0].capacity);
+      const unavailable = await unavailableFailure(tx, event.id, prev, {
+        locationIds: session.locationIds,
+        start: session.startTime!,
+        end: slot.end,
+      });
+      if (unavailable) return unavailable;
+      const placement = sessionPlacementError(
+        session,
+        (await tx.sessions.listScheduledByEvent(event.id)).filter(
+          (s) => s.id !== prev.id
+        ),
+        now,
+        { allowPastStart: !startChanged }
+      );
+      if (placement) return placementFailure(placement);
 
-    const by: ChangeContext = {
-      actor: { type: "guest", id: host.value },
-      at: now,
-    };
-    const updated = await deps.uow.run((tx) =>
-      changeSession(
+      const updated = await changeSession(
         tx,
         prev.id,
         { ...session, expectedVersion: input.expectedVersion },
-        by
-      )
-    );
-    if (!updated) return changedMeanwhile(repos, prev.id);
+        { actor: { type: "guest", id: host.value }, at: now }
+      );
+      if (!updated) return changedMeanwhile(tx, prev.id);
+      return ok({ updated, prev, host: host.value });
+    });
+    if (!result.ok) return result;
+    const { updated, prev, host } = result.value;
     await deps.notifyCohostsAdded({
       now,
       session: updated,
       previousHostIds: prev.hosts.map((h) => h.id),
-      changedById: host.value,
+      changedById: host,
     });
     return ok(updated);
   };

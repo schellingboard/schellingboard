@@ -10,6 +10,7 @@ import {
   type Failure,
   type Result,
 } from "@/server/kernel/result";
+import type { Tx } from "@/server/kernel/unit-of-work";
 import type { SessionDeps } from "../ports";
 import { changedMeanwhile } from "./booking";
 import { changeSession, removeSession } from "./session-changes";
@@ -151,22 +152,23 @@ export const adminCreateSession =
     if (!actor.admin) return adminRequired();
     const fields = checked(input);
     if (!fields.ok) return fields;
-    const { repos } = deps;
-    if (!(await repos.events.findById(eventId)))
-      return notFound("event.notFound", "Event not found");
-    const unknown = await unknownReference(repos, fields.value);
-    if (unknown) return unknown;
-    const clashing = await clash(repos, eventId, fields.value);
-    if (clashing) return clashing;
-
-    const created = await repos.sessions.create({ ...fields.value, eventId });
+    const result = await deps.uow.run(async (tx) => {
+      if (!(await tx.events.findById(eventId)))
+        return notFound("event.notFound", "Event not found");
+      const unknown = await unknownReference(tx, fields.value);
+      if (unknown) return unknown;
+      const clashing = await clash(tx, eventId, fields.value);
+      if (clashing) return clashing;
+      return ok(await tx.sessions.create({ ...fields.value, eventId }));
+    });
+    if (!result.ok) return result;
     await deps.notifyCohostsAdded({
       now,
-      session: created,
+      session: result.value,
       previousHostIds: [],
       changedById: null,
     });
-    return ok(created);
+    return result;
   };
 
 export const adminUpdateSession =
@@ -179,42 +181,49 @@ export const adminUpdateSession =
     if (!actor.admin) return adminRequired();
     const fields = checked(input);
     if (!fields.ok) return fields;
-    const { repos } = deps;
-    const session = await repos.sessions.findById(id);
-    if (!session) return sessionNotFound();
-    const unknown = await unknownReference(repos, fields.value);
-    if (unknown) return unknown;
-    const clashing = await clash(repos, session.eventId, fields.value, id);
-    if (clashing) return clashing;
-
     const by: ChangeContext = { actor: { type: "admin" }, at: now };
-    const updated = await deps.uow.run((tx) =>
-      changeSession(tx, id, { ...fields.value, expectedVersion }, by)
-    );
-    if (!updated) return changedMeanwhile(repos, id);
+    const result = await deps.uow.run(async (tx) => {
+      const session = await tx.sessions.findById(id);
+      if (!session) return sessionNotFound();
+      const unknown = await unknownReference(tx, fields.value);
+      if (unknown) return unknown;
+      const clashing = await clash(tx, session.eventId, fields.value, id);
+      if (clashing) return clashing;
+      const updated = await changeSession(
+        tx,
+        id,
+        { ...fields.value, expectedVersion },
+        by
+      );
+      if (!updated) return changedMeanwhile(tx, id);
+      return ok({ updated, previousHostIds: session.hosts.map((h) => h.id) });
+    });
+    if (!result.ok) return result;
+    const { updated, previousHostIds } = result.value;
     await deps.notifyCohostsAdded({
       now,
       session: updated,
-      previousHostIds: session.hosts.map((h) => h.id),
+      previousHostIds,
       changedById: null,
     });
     return ok(updated);
   };
 
 export const adminDeleteSession =
-  (deps: SessionDeps) =>
+  ({ uow }: SessionDeps) =>
   async (
     actor: Actor,
     { id }: { id: string },
     now: Date
   ): Promise<Result<Session>> => {
     if (!actor.admin) return adminRequired();
-    const { repos } = deps;
-    const session = await repos.sessions.findById(id);
-    if (!session) return sessionNotFound();
     const by: ChangeContext = { actor: { type: "admin" }, at: now };
-    await deps.uow.run((tx) => removeSession(tx, id, by));
-    return ok(session);
+    return uow.run(async (tx) => {
+      const session = await tx.sessions.findById(id);
+      if (!session) return sessionNotFound();
+      await removeSession(tx, id, by);
+      return ok(session);
+    });
   };
 
 const isDate = (d: Date | undefined): d is Date =>
@@ -223,7 +232,7 @@ const isDate = (d: Date | undefined): d is Date =>
 // For seeding scripts, which import past and fixed times: no phase, booking
 // window or notification applies, and the hosts and rooms join the event.
 export const adminSeedSession =
-  ({ repos }: SessionDeps) =>
+  ({ uow }: SessionDeps) =>
   async (
     actor: Actor,
     input: AdminSeedSessionInput
@@ -231,7 +240,7 @@ export const adminSeedSession =
     if (!actor.admin) return adminRequired();
     const title = input.title.trim();
     if (!title) return invalid("session.titleRequired", "Title is required");
-    const { startTime, endTime, hostIds, locationIds } = input;
+    const { startTime, endTime } = input;
     const timeInvalid = (detail: string) =>
       invalid("session.timeRangeInvalid", detail);
     if (!isDate(startTime)) return timeInvalid("Invalid start time");
@@ -239,39 +248,47 @@ export const adminSeedSession =
     if (endTime <= startTime)
       return timeInvalid("End time must be after start time");
 
-    const event = await repos.events.findBySlug(input.eventSlug);
-    if (!event) return notFound("event.notFound", "Event not found");
-    const unknown = await unknownReference(repos, input);
-    if (unknown) return unknown;
-    const capacity =
-      input.capacity !== undefined
-        ? input.capacity
-        : ((locationIds.length > 0
-            ? (await repos.locations.findById(locationIds[0]))?.capacity
-            : undefined) ?? 0);
-    if (!Number.isInteger(capacity) || capacity < 0) return capacityInvalid();
-
-    const fields: Checked = {
-      title,
-      description: input.description.trim(),
-      startTime,
-      endTime,
-      capacity,
-      adminManaged: input.adminManaged,
-      blocker: false,
-      closed: input.closed,
-      hostIds,
-      locationIds,
-    };
-    const clashing = await clash(repos, event.id, fields);
-    if (clashing) return clashing;
-
-    const created = await repos.sessions.create({
-      ...fields,
-      eventId: event.id,
-    });
-    if (hostIds.length > 0) await repos.guests.assignToEvent(event.id, hostIds);
-    if (locationIds.length > 0)
-      await repos.locations.assignToEvent(event.id, locationIds);
-    return ok(created);
+    return uow.run((tx) => seeded(tx, { ...input, title, startTime, endTime }));
   };
+
+async function seeded(
+  tx: Tx,
+  input: AdminSeedSessionInput & { startTime: Date; endTime: Date }
+): Promise<Result<Session>> {
+  const { hostIds, locationIds } = input;
+  const event = await tx.events.findBySlug(input.eventSlug);
+  if (!event) return notFound("event.notFound", "Event not found");
+  const unknown = await unknownReference(tx, input);
+  if (unknown) return unknown;
+  const capacity =
+    input.capacity !== undefined
+      ? input.capacity
+      : ((locationIds.length > 0
+          ? (await tx.locations.findById(locationIds[0]))?.capacity
+          : undefined) ?? 0);
+  if (!Number.isInteger(capacity) || capacity < 0) return capacityInvalid();
+
+  const fields: Checked = {
+    title: input.title,
+    description: input.description.trim(),
+    startTime: input.startTime,
+    endTime: input.endTime,
+    capacity,
+    adminManaged: input.adminManaged,
+    blocker: false,
+    closed: input.closed,
+    hostIds,
+    locationIds,
+  };
+  const clashing = await clash(tx, event.id, fields);
+  if (clashing) return clashing;
+
+  const created = await tx.sessions.create({
+    ...fields,
+    eventId: event.id,
+  });
+  if (hostIds.length > 0) await tx.guests.assignToEvent(event.id, hostIds);
+  if (locationIds.length > 0)
+    await tx.locations.assignToEvent(event.id, locationIds);
+  return ok(created);
+}

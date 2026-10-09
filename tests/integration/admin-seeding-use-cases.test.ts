@@ -8,8 +8,9 @@ import {
   createLocation,
   createSession,
 } from "../helpers/factories";
+import { uowFailingAt } from "../helpers/changes";
 import { getRepositories } from "@/db/container";
-import { unitOfWork } from "@/server/kernel/unit-of-work";
+import { unitOfWork, type UnitOfWork } from "@/server/kernel/unit-of-work";
 import { createEventUseCases } from "@/server/modules/events/module";
 import { createProposalUseCases } from "@/server/modules/proposals/module";
 import { createSessionUseCases } from "@/server/modules/sessions/module";
@@ -36,11 +37,11 @@ const venue = () =>
       delete: async () => {},
     },
   });
-const sessions = () =>
+const sessions = (uow: UnitOfWork = unitOfWork) =>
   createSessionUseCases({
     repos: getRepositories(),
     notifyCohostsAdded,
-    uow: unitOfWork,
+    uow,
   });
 const proposals = () =>
   createProposalUseCases({
@@ -261,6 +262,34 @@ describe("admin seeding: sessions", () => {
   );
 
   it(
+    "seeds nothing when adding its rooms to the event fails",
+    { tags: ["018-US2", "019-US5", "019-US7"] },
+    async () => {
+      const event = await createEvent();
+      const host = await createGuest();
+      const room = await createLocation();
+
+      await expect(
+        sessions(uowFailingAt("locations", "assignToEvent")).adminSeedSession(
+          ADMIN,
+          {
+            ...seed,
+            eventSlug: event.slug,
+            hostIds: [host.id],
+            locationIds: [room.id],
+          }
+        )
+      ).rejects.toThrow("locations.assignToEvent failed");
+
+      const repos = getRepositories();
+      expect(await repos.sessions.listByEvent(event.id)).toEqual([]);
+      expect(await repos.guests.listByEvent(event.id)).toEqual([]);
+      expect(await repos.locations.listByEvent(event.id)).toEqual([]);
+      expect(await repos.changes.listAfter(0)).toEqual([]);
+    }
+  );
+
+  it(
     "refuses a seeded session in the legacy order",
     { tags: ["018-US2", "019-US5"] },
     async () => {
@@ -438,6 +467,28 @@ describe("admin seeding: proposals and RSVPs", () => {
           })
         )
       ).toBe("guest.notFound");
+    }
+  );
+
+  it(
+    "adds no RSVP when adding the guest to the event fails",
+    { tags: ["018-US3", "019-US5", "019-US7"] },
+    async () => {
+      const event = await createEvent();
+      const session = await createSession(event.id);
+      const guest = await createGuest();
+
+      await expect(
+        sessions(uowFailingAt("guests", "assignToEvent")).adminAddRsvp(ADMIN, {
+          sessionId: session.id,
+          guestId: guest.id,
+        })
+      ).rejects.toThrow("guests.assignToEvent failed");
+
+      const repos = getRepositories();
+      expect(await repos.rsvps.listBySession(session.id)).toEqual([]);
+      expect(await repos.guests.listByEvent(event.id)).toEqual([]);
+      expect(await repos.changes.listAfter(0)).toEqual([]);
     }
   );
 

@@ -72,11 +72,11 @@ feed and snapshot), `04-client.md` (The replica), `05-security.md` (Authorizatio
 - [ ] 3. **Atomic multi-repository use cases**: every use case that writes through more
       than one repository call runs in `uow.run`. Test each by making its second write
       fail. One commit per family; skip a family with no such use case:
-  - 3a. Sessions and RSVPs (admin session create with guest and location assignment,
-    RSVP with event assignment).
-  - 3b. Proposals, votes, comments (admin proposal create, …).
-  - 3c. Events, days, venue.
-  - 3d. People, meetings, notifications, settings.
+  - [x] 3a. Sessions and RSVPs (admin session create with guest and location assignment,
+        RSVP with event assignment).
+  - [ ] 3b. Proposals, votes, comments (admin proposal create, …).
+  - [ ] 3c. Events, days, venue.
+  - [ ] 3d. People, meetings, notifications, settings.
 
 ### API contracts
 

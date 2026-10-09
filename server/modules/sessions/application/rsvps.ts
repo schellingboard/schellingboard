@@ -123,32 +123,34 @@ export const adminRemoveRsvp =
 // For seeding scripts: no phase gate and hosts may RSVP to their own session,
 // but a hard capacity limit still holds. Re-adding an RSVP changes nothing.
 export const adminAddRsvp =
-  ({ repos }: SessionDeps) =>
+  ({ uow }: SessionDeps) =>
   async (
     actor: Actor,
     input: RsvpInput
   ): Promise<Result<{ rsvp: Rsvp; created: boolean }>> => {
     if (!actor.admin) return forbidden("admin.required", "Unauthorized");
-    const session = await repos.sessions.findById(input.sessionId);
-    if (!session) return sessionNotFound();
-    if (!(await repos.guests.findById(input.guestId)))
-      return notFound("guest.notFound", "Guest not found");
+    return uow.run(async (tx) => {
+      const session = await tx.sessions.findById(input.sessionId);
+      if (!session) return sessionNotFound();
+      if (!(await tx.guests.findById(input.guestId)))
+        return notFound("guest.notFound", "Guest not found");
 
-    const existing = (await repos.rsvps.listBySession(input.sessionId)).find(
-      (r) => r.guestId === input.guestId
-    );
-    let rsvp = existing;
-    if (!rsvp) {
-      const event = await repos.events.findById(session.eventId);
-      const added = await addRsvp(
-        repos,
-        input,
-        session,
-        event?.rsvpCapacityHardLimit ?? false
+      const existing = (await tx.rsvps.listBySession(input.sessionId)).find(
+        (r) => r.guestId === input.guestId
       );
-      if (!added.ok) return added;
-      rsvp = added.value;
-    }
-    await repos.guests.assignToEvent(session.eventId, [input.guestId]);
-    return ok({ rsvp, created: !existing });
+      let rsvp = existing;
+      if (!rsvp) {
+        const event = await tx.events.findById(session.eventId);
+        const added = await addRsvp(
+          tx,
+          input,
+          session,
+          event?.rsvpCapacityHardLimit ?? false
+        );
+        if (!added.ok) return added;
+        rsvp = added.value;
+      }
+      await tx.guests.assignToEvent(session.eventId, [input.guestId]);
+      return ok({ rsvp, created: !existing });
+    });
   };
