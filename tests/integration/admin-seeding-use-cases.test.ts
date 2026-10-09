@@ -9,6 +9,7 @@ import {
   createSession,
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
 import { createEventUseCases } from "@/server/modules/events/module";
 import { createProposalUseCases } from "@/server/modules/proposals/module";
 import { createSessionUseCases } from "@/server/modules/sessions/module";
@@ -39,7 +40,7 @@ const sessions = () =>
   createSessionUseCases({
     repos: getRepositories(),
     notifyCohostsAdded,
-    nudgeJobs: () => {},
+    uow: unitOfWork,
   });
 const proposals = () =>
   createProposalUseCases({

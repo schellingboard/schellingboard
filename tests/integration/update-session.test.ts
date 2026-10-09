@@ -19,7 +19,7 @@ import { render } from "@react-email/render";
 import { sendMail } from "@/utils/mailer";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { runJobs } from "../helpers/jobs";
-import { BY_TEST } from "../helpers/changes";
+import { BY_TEST, updateLoggedSession } from "../helpers/changes";
 import {
   createEvent,
   createGuest,
@@ -1330,8 +1330,8 @@ describe("POST /api/update-session", () => {
     it("keeps the rooms the event still has when another was unassigned", async () => {
       const { event, host, annex, rooms, day, session, roomIds } =
         await placeInTwoRooms();
-      const { sessions, locations } = getRepositories();
-      await sessions.update(
+      const { locations } = getRepositories();
+      await updateLoggedSession(
         session.id,
         {
           locationIds: [...rooms, annex].map((r) => r.id),

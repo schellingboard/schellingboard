@@ -13,26 +13,6 @@ import type { Session } from "@schellingboard/domain/session";
 type DB = BetterSQLite3Database<typeof schema>;
 type ChangeRow = typeof schema.changes.$inferSelect;
 
-/**
- * Appends `change` to the log. Takes the caller's transaction: a change is
- * only ever written together with the state it describes.
- */
-export function insertChange(tx: Pick<DB, "insert">, change: Change): void {
-  tx.insert(schema.changes)
-    .values({
-      id: nanoid(),
-      eventId: change.eventId,
-      type: change.type,
-      subjectType: change.subjectType,
-      subjectId: change.subjectId,
-      actorType: change.actor.type,
-      actorId: change.actor.type === "guest" ? change.actor.id : null,
-      occurredAt: change.occurredAt.toISOString(),
-      payload: change.payload,
-    })
-    .run();
-}
-
 // JSON keeps a Date as its ISO string; these put the instants back.
 function reviveSession(json: Session): Session {
   const raw = json as unknown as Record<string, string | undefined>;
@@ -101,6 +81,26 @@ const KNOWN_TYPES: RecordedChange["type"][] = [
 
 export class SqliteChangesRepository implements ChangesRepository {
   constructor(private db: DB) {}
+
+  async append(change: Change): Promise<RecordedChange> {
+    const id = nanoid();
+    const { seq } = this.db
+      .insert(schema.changes)
+      .values({
+        id,
+        eventId: change.eventId,
+        type: change.type,
+        subjectType: change.subjectType,
+        subjectId: change.subjectId,
+        actorType: change.actor.type,
+        actorId: change.actor.type === "guest" ? change.actor.id : null,
+        occurredAt: change.occurredAt.toISOString(),
+        payload: change.payload,
+      })
+      .returning({ seq: schema.changes.seq })
+      .get();
+    return { ...change, seq, id };
+  }
 
   async listAfter(seq: number, limit = 100): Promise<RecordedChange[]> {
     return this.db

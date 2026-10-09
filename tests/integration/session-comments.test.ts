@@ -37,7 +37,7 @@ vi.mock("next/headers", () => ({
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { runJobs } from "../helpers/jobs";
-import { BY_TEST } from "../helpers/changes";
+import { BY_TEST, deleteLoggedSession } from "../helpers/changes";
 import { siteAuthenticate } from "../helpers/site-auth";
 import {
   createEvent,
@@ -290,7 +290,7 @@ describe("session comments", () => {
       body: "doomed",
     });
 
-    await getRepositories().sessions.delete(session.id, BY_TEST);
+    await deleteLoggedSession(session.id, BY_TEST);
 
     expect(await getRepositories().sessionComments.list(session.id)).toEqual(
       []
@@ -589,7 +589,7 @@ describe("threaded session replies", () => {
       body: "a reply",
     });
 
-    await getRepositories().sessions.delete(session.id, BY_TEST);
+    await deleteLoggedSession(session.id, BY_TEST);
 
     expect(await getRepositories().sessionComments.list(session.id)).toEqual(
       []

@@ -1,3 +1,4 @@
+import type { ChangeContext } from "@schellingboard/domain/change";
 import { sessionBookingWindowError } from "@schellingboard/domain/day-window";
 import type { Location } from "@schellingboard/domain/location";
 import { locationUnavailableError } from "@schellingboard/domain/location-unavailability";
@@ -32,6 +33,7 @@ import {
   placementFailure,
   type SessionBooking,
 } from "./booking";
+import { changeSession } from "./session-changes";
 
 export interface UpdateSessionInput extends SessionBooking {
   sessionId: string;
@@ -120,10 +122,17 @@ export const updateSession =
     );
     if (placement) return placementFailure(placement);
 
-    const updated = await repos.sessions.update(
-      prev.id,
-      { ...session, expectedVersion: input.expectedVersion },
-      { actor: { type: "guest", id: host.value }, at: now }
+    const by: ChangeContext = {
+      actor: { type: "guest", id: host.value },
+      at: now,
+    };
+    const updated = await deps.uow.run((tx) =>
+      changeSession(
+        tx,
+        prev.id,
+        { ...session, expectedVersion: input.expectedVersion },
+        by
+      )
     );
     if (!updated) return changedMeanwhile(repos, prev.id);
     await deps.notifyCohostsAdded({
@@ -132,7 +141,6 @@ export const updateSession =
       previousHostIds: prev.hosts.map((h) => h.id),
       changedById: host.value,
     });
-    deps.nudgeJobs();
     return ok(updated);
   };
 

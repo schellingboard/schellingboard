@@ -4,7 +4,7 @@ import fs from "fs";
 import path from "path";
 import * as schema from "./schema";
 import { resolveDbPath, runMigrations } from "./migrate";
-import { withWriteLock } from "./write-lock";
+import { createLock, withWriteLock, type Lock } from "./write-lock";
 import { SqliteAuthCodesRepository } from "./repositories/sqlite/auth-codes";
 import { SqliteChangesRepository } from "./repositories/sqlite/changes";
 import {
@@ -88,7 +88,12 @@ export type Repositories = {
 type Connections = {
   writer: Database.Database;
   reader: Database.Database;
+  /** For read transactions only, so a plain read never joins one's older view. */
+  snapshot: Database.Database;
+  snapshotLock: Lock;
   repositories: Repositories;
+  writes: Repositories;
+  snapshotReads: Repositories;
 };
 
 let _connections: Connections | null = null;
@@ -176,7 +181,7 @@ function open(
   { migrate, durable }: { migrate: boolean; durable: boolean }
 ): Connections {
   const writer = new Database(file);
-  let reader: Database.Database | null = null;
+  const readers: Database.Database[] = [];
   try {
     // Enforce foreign keys on every connection. better-sqlite3 happens to
     // compile SQLite with SQLITE_DEFAULT_FOREIGN_KEYS=1, but set it explicitly
@@ -191,17 +196,22 @@ function open(
     }
     writer.pragma(`synchronous = ${durable ? "NORMAL" : "OFF"}`);
     if (migrate) runMigrations(writer, path.join(process.cwd(), "drizzle"));
-    reader = new Database(file, { readonly: true });
+    const reader = new Database(file, { readonly: true });
+    readers.push(reader);
+    const snapshot = new Database(file, { readonly: true });
+    readers.push(snapshot);
+    const writes = buildRepositories(writer);
     return {
       writer,
       reader,
-      repositories: routeAll(
-        buildRepositories(reader),
-        buildRepositories(writer)
-      ),
+      snapshot,
+      snapshotLock: createLock(),
+      repositories: routeAll(buildRepositories(reader), writes),
+      writes,
+      snapshotReads: buildRepositories(snapshot),
     };
   } catch (e) {
-    reader?.close();
+    for (const reader of readers) reader.close();
     writer.close();
     throw e;
   }
@@ -226,7 +236,49 @@ export function withWriter<T>(
   return withWriteLock(() => fn(connections().writer));
 }
 
+/**
+ * Runs `work` in one transaction on the write connection, holding the write
+ * lock until `afterCommit` has run. A throw rolls the transaction back.
+ */
+export function writeTransaction<T>(
+  work: (repositories: Repositories) => Promise<T>,
+  afterCommit: () => void
+): Promise<T> {
+  return withWriteLock(async () => {
+    const { writer, writes } = connections();
+    // Immediate: a deferred transaction that reads first cannot wait for
+    // another process's write, and fails with SQLITE_BUSY instead.
+    writer.exec("BEGIN IMMEDIATE");
+    let value: T;
+    try {
+      value = await work(writes);
+      writer.exec("COMMIT");
+    } catch (e) {
+      if (writer.inTransaction) writer.exec("ROLLBACK");
+      throw e;
+    }
+    afterCommit();
+    return value;
+  });
+}
+
+/** Runs `work` in one read transaction: every read sees the same commit. */
+export function readTransaction<T>(
+  work: (repositories: Repositories) => Promise<T>
+): Promise<T> {
+  const { snapshot, snapshotLock, snapshotReads } = connections();
+  return snapshotLock(async () => {
+    snapshot.exec("BEGIN");
+    try {
+      return await work(snapshotReads);
+    } finally {
+      if (snapshot.inTransaction) snapshot.exec("COMMIT");
+    }
+  });
+}
+
 export function resetRepositories(): void {
+  _connections?.snapshot.close();
   _connections?.reader.close();
   _connections?.writer.close();
   _connections = null;

@@ -1,7 +1,9 @@
 import type { Repositories } from "@/db/container";
 import type { Session } from "@schellingboard/domain/session";
+import type { UnitOfWork } from "@/server/kernel/unit-of-work";
 
 export interface SessionDeps {
+  uow: UnitOfWork;
   repos: Pick<
     Repositories,
     | "sessions"
@@ -18,5 +20,4 @@ export interface SessionDeps {
     changedById: string | null;
     now: Date;
   }): Promise<void>;
-  nudgeJobs(): void;
 }

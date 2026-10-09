@@ -26,7 +26,7 @@ vi.mock("next/cache", () => ({
 }));
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
-import { BY_TEST } from "../helpers/changes";
+import { BY_TEST, updateLoggedSession } from "../helpers/changes";
 import {
   createEvent,
   createGuest,
@@ -216,11 +216,7 @@ describe("adminDeleteProposalAction", () => {
       choice: VoteChoice.interested,
     });
     const session = await createSession(event.id, { hostIds: [host.id] });
-    await repos.sessions.update(
-      session.id,
-      { proposalId: proposal.id },
-      BY_TEST
-    );
+    await updateLoggedSession(session.id, { proposalId: proposal.id }, BY_TEST);
 
     const result = await adminDeleteProposalAction({ id: proposal.id });
     expect(result.ok).toBe(true);

@@ -9,6 +9,7 @@
 // inlines that variable per bundle, which makes the import dead code there.
 
 import { nanoid } from "nanoid";
+import { subscribeToChanges } from "@/server/kernel/change-subscribers";
 import { nudgeJobs, setNudgeHandler } from "./nudge";
 import {
   DELIVERIES,
@@ -91,6 +92,7 @@ type Loop = {
   timer: ReturnType<typeof setInterval>;
   running: boolean;
   nudged: boolean;
+  unsubscribe: () => void;
 };
 
 // Singletons need to be assigned to globalThis, not simply module-level
@@ -115,6 +117,7 @@ export function startJobsLoop(jobs: Job[] = defaultJobs()): void {
     timer,
     running: false,
     nudged: false,
+    unsubscribe: subscribeToChanges(nudge),
   };
   setNudgeHandler(nudge);
 }
@@ -132,7 +135,10 @@ function nudge(): void {
 
 /** For tests only. */
 export function stopJobsLoop(): void {
-  if (g.__jobsLoop) clearInterval(g.__jobsLoop.timer);
+  if (g.__jobsLoop) {
+    clearInterval(g.__jobsLoop.timer);
+    g.__jobsLoop.unsubscribe();
+  }
   setNudgeHandler(undefined);
   delete g.__jobsLoop;
 }

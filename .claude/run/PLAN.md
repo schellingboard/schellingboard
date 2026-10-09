@@ -59,13 +59,13 @@ feed and snapshot), `04-client.md` (The replica), `05-security.md` (Authorizatio
       WAL in production, effect on the snapshot's read transaction) for the user to
       decide; until decided, record it under Questions and continue with steps that
       do not depend on it (4 to 7).
-- [ ] 2. **Kernel unit of work**: as the ADR says. The user chose option (a) on
+- [x] 2. **Kernel unit of work**: as the ADR says. The user chose option (a) on
       2026-10-06; record it in ADR 0013's Decision (a new commit: step 1's is pushed).
   - [x] 2a. Connections: WAL in production, one writer connection behind an in-process
         async mutex, a read connection; file-backed test databases in
         `tests/helpers/db.ts`. Every repository write takes the mutex. Test: a read
         never sees uncommitted rows; concurrent writes serialize.
-  - [ ] 2b. `uow.run(async (tx) => …)` with `tx.record()` and `publish` after
+  - [x] 2b. `uow.run(async (tx) => …)` with `tx.record()` and `publish` after
         commit; `uow.read` on the read connection. Move session change logging out of
         `SqliteSessionsRepository` into the session use cases; the nudge becomes a
         subscriber. Test: a rollback writes neither state nor change.

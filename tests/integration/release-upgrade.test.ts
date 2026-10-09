@@ -9,7 +9,11 @@ import {
   schemaOfUpgradedDb,
   schemaOfFreshDb,
 } from "../helpers/upgrade-db";
-import { BY_TEST } from "../helpers/changes";
+import {
+  BY_TEST,
+  deleteLoggedSession,
+  updateLoggedSession,
+} from "../helpers/changes";
 import {
   createGuest,
   createLocation,
@@ -170,14 +174,18 @@ describe.each(dumps)("upgrading from $version", (dump) => {
       )
     ).toBeDefined();
 
-    await sessions.update(session.id, { title: "Upgrade session v2" }, BY_TEST);
+    await updateLoggedSession(
+      session.id,
+      { title: "Upgrade session v2" },
+      BY_TEST
+    );
     expect((await sessions.findById(session.id))?.title).toBe(
       "Upgrade session v2"
     );
     expect(await sessions.listRsvpdByGuest(attendee.id)).toHaveLength(1);
 
     await rsvps.deleteBySessionAndGuest(session.id, attendee.id);
-    await sessions.delete(session.id, BY_TEST);
+    await deleteLoggedSession(session.id, BY_TEST);
     await days.delete(day.id);
     await locations.delete(room.id);
     expect(await sessions.findById(session.id)).toBeUndefined();
