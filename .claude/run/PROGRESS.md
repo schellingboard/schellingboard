@@ -11,6 +11,24 @@ openapi-check typecheck test-coverage` (or `make test`), without E2E. E2E runs
 - User, 2026-10-06: push no further PRs; later steps stay local jj commits
   stacked on each other. (PR #1208 holds step 1.)
 
+- Step 1 decided: the user chose ADR 0013 option (a) on 2026-10-06 (recorded
+  in its Decision; Status stays Proposed until step 18).
+- 2a: WAL (`synchronous=NORMAL`), a write and a read-only connection in
+  `db/container.ts`. Repository methods named `find|list|search|count|get…`
+  (not `findOrCreate…`) run on the reader; every other method takes the write
+  lock (`db/write-lock.ts`, on `globalThis`). `withWriter(fn)` holds the lock
+  and hands over the write connection: 2b's `uow.run` wraps it. Inside
+  `uow.run`, writes must go through `tx`; `getRepositories()` writes would wait
+  for the held lock (deadlock).
+- 2a: test databases are files in a per-run temp dir (vitest `globalSetup`,
+  `inject("testDbDir")`), one per worker; a migrated template is copied before
+  each test, reopened with `synchronous=OFF`. `make test`: 19.4 s before,
+  21.1 s after.
+- 2a: `make test-e2e-docker` must run before release (step 18): WAL adds
+  `-wal`/`-shm` next to the database, and E2E seeding shares the file with
+  the container through a bind mount. The public backup docs already handle
+  the WAL files, so no public-doc or CHANGELOG change.
+
 - Step 4 split into 4a1–4a4 (one commit and migration per subject family),
   then 4b.
 - 4a1: `versionConflict(subject, current, detail)` in `server/kernel/result.ts`
@@ -37,8 +55,8 @@ None.
 
 ## Questions
 
-- Step 1: choose the unit-of-work option in ADR 0013 (a/b/c); steps 2–3 wait for it.
+None.
 
 ## Next step
 
-4a2 (steps 2–3 blocked).
+2b.

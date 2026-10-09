@@ -6,9 +6,7 @@ import {
   createLocation,
   createSession,
 } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
-import Database from "better-sqlite3";
-import { restoreDb, serializeDb } from "@/db/container";
+import { getRepositories, withWriter } from "@/db/container";
 import type { ChangeContext } from "@schellingboard/domain/change";
 
 const AT = new Date("2026-06-01T10:00:00.000Z");
@@ -147,15 +145,14 @@ describe("change log", () => {
     const { sessions, changes } = getRepositories();
     await sessions.update(session.id, { title: "One" }, by);
     const [first] = await changes.listAfter(0);
-    const copy = new Database(serializeDb());
-    copy
-      .prepare(
-        `INSERT INTO changes (id, type, subject_type, subject_id, actor_type, occurred_at, payload)
-         VALUES ('from-a-newer-version', 'session.renamed.v9', 'session', ?, 'system', ?, '{}')`
-      )
-      .run(session.id, AT.toISOString());
-    restoreDb(copy.serialize());
-    copy.close();
+    await withWriter((writer) =>
+      writer
+        .prepare(
+          `INSERT INTO changes (id, type, subject_type, subject_id, actor_type, occurred_at, payload)
+           VALUES ('from-a-newer-version', 'session.renamed.v9', 'session', ?, 'system', ?, '{}')`
+        )
+        .run(session.id, AT.toISOString())
+    );
     const repos = getRepositories();
     await repos.sessions.update(session.id, { title: "Two" }, by);
 
