@@ -3,6 +3,7 @@ import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
 import { createSessionUseCases } from "@/server/modules/sessions/module";
 import type { Actor } from "@/server/kernel/actor";
 import type { Result } from "@/server/kernel/result";
@@ -24,7 +25,7 @@ const sessions = () =>
   createSessionUseCases({
     repos: getRepositories(),
     notifyCohostsAdded: vi.fn(async () => {}),
-    nudgeJobs: vi.fn(),
+    uow: unitOfWork,
   });
 
 const code = (result: Result<unknown>) =>

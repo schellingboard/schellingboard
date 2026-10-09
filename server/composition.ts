@@ -1,5 +1,6 @@
 import { after } from "next/server";
 import { getRepositories } from "@/db/container";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
 import { testEmail } from "@/emails/test-email";
 import { getImageRepositories } from "@/utils/images";
 import { sendMail } from "@/utils/mailer";
@@ -8,7 +9,6 @@ import {
   saveMapImage,
   validateMapImage,
 } from "@/utils/map-image";
-import { nudgeJobs } from "@/utils/jobs/nudge";
 import {
   notifyCohostsAdded,
   notifyMeetingOutcome,
@@ -61,7 +61,7 @@ export function sessionUseCases(): SessionUseCases {
   return createSessionUseCases({
     repos: getRepositories(),
     notifyCohostsAdded,
-    nudgeJobs,
+    uow: unitOfWork,
   });
 }
 

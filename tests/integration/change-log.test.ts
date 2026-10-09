@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { updateLoggedSession, deleteLoggedSession } from "../helpers/changes";
 import {
   createEvent,
   createGuest,
@@ -33,9 +34,9 @@ describe("change log", () => {
 
   it("records an update with the state before and after it", async () => {
     const { event, host, session, by } = await world();
-    const { sessions, changes } = getRepositories();
+    const { changes } = getRepositories();
 
-    await sessions.update(session.id, { title: "New title" }, by);
+    await updateLoggedSession(session.id, { title: "New title" }, by);
 
     const recorded = await changes.listAfter(0);
     expect(recorded).toHaveLength(1);
@@ -58,10 +59,10 @@ describe("change log", () => {
 
   it("records a deletion with the guests who had RSVPed", async () => {
     const { attendee, session, by } = await world();
-    const { sessions, rsvps, changes } = getRepositories();
+    const { rsvps, changes } = getRepositories();
     await rsvps.create({ sessionId: session.id, guestId: attendee.id });
 
-    await sessions.delete(session.id, by);
+    await deleteLoggedSession(session.id, by);
 
     const [deleted] = await changes.listAfter(0);
     expect(deleted).toMatchObject({
@@ -76,10 +77,10 @@ describe("change log", () => {
 
   it("records nothing when the change itself fails", async () => {
     const { session, by } = await world();
-    const { sessions, changes } = getRepositories();
+    const { changes } = getRepositories();
 
     await expect(
-      sessions.update(session.id, { locationIds: ["no-such-room"] }, by)
+      updateLoggedSession(session.id, { locationIds: ["no-such-room"] }, by)
     ).rejects.toThrow();
 
     expect(await changes.listAfter(0)).toEqual([]);
@@ -87,10 +88,10 @@ describe("change log", () => {
 
   it("resumes after a sequence number, in order", async () => {
     const { session, by } = await world();
-    const { sessions, changes } = getRepositories();
+    const { changes } = getRepositories();
 
-    await sessions.update(session.id, { title: "One" }, by);
-    await sessions.update(session.id, { title: "Two" }, by);
+    await updateLoggedSession(session.id, { title: "One" }, by);
+    await updateLoggedSession(session.id, { title: "Two" }, by);
 
     const all = await changes.listAfter(0);
     expect(
@@ -103,9 +104,9 @@ describe("change log", () => {
 
   it("records who made the change", async () => {
     const { session } = await world();
-    const { sessions, changes } = getRepositories();
+    const { changes } = getRepositories();
 
-    await sessions.update(
+    await updateLoggedSession(
       session.id,
       { title: "By an organizer" },
       { actor: { type: "admin" }, at: AT }
@@ -117,9 +118,13 @@ describe("change log", () => {
 
   it("records nothing for a save that changes nothing, nor bumps the version", async () => {
     const { session, by } = await world();
-    const { sessions, changes } = getRepositories();
+    const { changes } = getRepositories();
 
-    const saved = await sessions.update(session.id, { title: "Old title" }, by);
+    const saved = await updateLoggedSession(
+      session.id,
+      { title: "Old title" },
+      by
+    );
 
     expect(await changes.listAfter(0)).toEqual([]);
     expect(saved?.version).toBe(session.version);
@@ -127,9 +132,9 @@ describe("change log", () => {
 
   it("logs the version a change brought the session to", async () => {
     const { session, by } = await world();
-    const { sessions, changes } = getRepositories();
+    const { changes } = getRepositories();
 
-    await sessions.update(session.id, { title: "One" }, by);
+    await updateLoggedSession(session.id, { title: "One" }, by);
 
     const [change] = await changes.listAfter(0);
     expect(change).toMatchObject({
@@ -142,8 +147,8 @@ describe("change log", () => {
 
   it("skips entries of a type this version does not know", async () => {
     const { session, by } = await world();
-    const { sessions, changes } = getRepositories();
-    await sessions.update(session.id, { title: "One" }, by);
+    const { changes } = getRepositories();
+    await updateLoggedSession(session.id, { title: "One" }, by);
     const [first] = await changes.listAfter(0);
     await withWriter((writer) =>
       writer
@@ -154,7 +159,7 @@ describe("change log", () => {
         .run(session.id, AT.toISOString())
     );
     const repos = getRepositories();
-    await repos.sessions.update(session.id, { title: "Two" }, by);
+    await updateLoggedSession(session.id, { title: "Two" }, by);
 
     const rest = await repos.changes.listAfter(first.seq);
     expect(rest).toHaveLength(1);

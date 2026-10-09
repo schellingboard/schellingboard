@@ -16,7 +16,11 @@ vi.mock("@/utils/mailer", () => ({
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { deliverQueued } from "../helpers/jobs";
-import { BY_TEST } from "../helpers/changes";
+import {
+  BY_TEST,
+  deleteLoggedSession,
+  updateLoggedSession,
+} from "../helpers/changes";
 import {
   createEvent,
   createGuest,
@@ -52,10 +56,8 @@ const MESSAGE: EmailRecipe = {
 
 const NOW = new Date("2026-08-01T12:00:00.000Z");
 
-type Repositories = ReturnType<typeof getRepositories>;
-const updateSession = async (
-  ...args: Parameters<Repositories["sessions"]["update"]>
-) => (await getRepositories().sessions.update(...args))!;
+const updateSession = async (...args: Parameters<typeof updateLoggedSession>) =>
+  (await updateLoggedSession(...args))!;
 
 const IN_APP = {
   text: "Your session moved",
@@ -1160,7 +1162,7 @@ describe("notifySessionCommented", () => {
     const { session } = await setup();
     const commenter = await createGuest({ email: "commenter@test.example" });
     const posted = await addComment(session.id, commenter.id, "Hello");
-    await getRepositories().sessions.delete(session.id, BY_TEST);
+    await deleteLoggedSession(session.id, BY_TEST);
 
     await expect(
       notifySessionCommented({

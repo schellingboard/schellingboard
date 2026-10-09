@@ -145,7 +145,13 @@ never see a write that is still open, also outside the unit of work.
   `data.db-shm` sit next to `data.db` in the `/data` volume. The documented
   backup (`.backup`) and restore already handle them. The database must stay
   on a local file system.
-- `uow.read` needs the read connection to itself while its transaction is
-  open; it takes a read lock or a pool, decided in step 2b.
+- `uow.run` opens `BEGIN IMMEDIATE` on the write connection under the write
+  lock and keeps it open across the callback's awaits; a repository's own
+  transaction inside it becomes a savepoint. A throw or a failure `Result`
+  rolls it back. `tx.record()` collects changes, which are written before
+  `COMMIT` and published after it, still under the lock.
+- `uow.read` has a third, read-only connection behind a lock of its own: a
+  plain read on the shared read connection would otherwise join an open read
+  transaction and see its older view.
 - A use case inside `uow.run` must write through `tx`, never through
   `getRepositories()`: that waits for the lock it holds.

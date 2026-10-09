@@ -1,8 +1,5 @@
 import type { AuthCodePurpose, AuthCode } from "@schellingboard/domain/auth";
-import type {
-  ChangeContext,
-  RecordedChange,
-} from "@schellingboard/domain/change";
+import type { Change, RecordedChange } from "@schellingboard/domain/change";
 import type { Comment } from "@schellingboard/domain/comment";
 import type {
   Event,
@@ -420,18 +417,12 @@ export interface SessionsRepository {
   create(data: SessionCreateInput): Promise<Session>;
   /**
    * When `hostIds` is given, any RSVPs by the session's hosts are removed
-   * in the same transaction: hosts don't RSVP to their own session. Records
-   * the session before and after in the change log, in that transaction too.
-   * Undefined, changing nothing, if the session is gone or not at
-   * `expectedVersion`.
+   * in the same transaction: hosts don't RSVP to their own session. The
+   * version goes up only if the session really changed. Undefined, changing
+   * nothing, if the session is gone or not at `expectedVersion`.
    */
-  update(
-    id: string,
-    patch: SessionUpdateInput,
-    by: ChangeContext
-  ): Promise<Session | undefined>;
-  /** Records the deletion, with the guests who had RSVPed, in the change log. */
-  delete(id: string, by: ChangeContext): Promise<void>;
+  update(id: string, patch: SessionUpdateInput): Promise<Session | undefined>;
+  delete(id: string): Promise<void>;
   /**
    * Finds a scheduled session in the event that overlaps [start, end) and
    * shares at least one of the given locations, excluding `excludeId`. Used
@@ -834,6 +825,8 @@ export interface PushRepository {
 }
 
 export interface ChangesRepository {
+  /** Only through the unit of work, which writes it with the state it describes. */
+  append(change: Change): Promise<RecordedChange>;
   /** Up to `limit` changes recorded after `seq`, oldest first. */
   listAfter(seq: number, limit?: number): Promise<RecordedChange[]>;
   /** Deletes changes up to `seq` that happened before `before`. */

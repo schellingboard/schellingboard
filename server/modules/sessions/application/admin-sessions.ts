@@ -1,3 +1,4 @@
+import type { ChangeContext } from "@schellingboard/domain/change";
 import type { Session } from "@schellingboard/domain/session";
 import type { Actor } from "@/server/kernel/actor";
 import {
@@ -11,6 +12,7 @@ import {
 } from "@/server/kernel/result";
 import type { SessionDeps } from "../ports";
 import { changedMeanwhile } from "./booking";
+import { changeSession, removeSession } from "./session-changes";
 
 export interface AdminSessionFields {
   title: string;
@@ -185,10 +187,9 @@ export const adminUpdateSession =
     const clashing = await clash(repos, session.eventId, fields.value, id);
     if (clashing) return clashing;
 
-    const updated = await repos.sessions.update(
-      id,
-      { ...fields.value, expectedVersion },
-      { actor: { type: "admin" }, at: now }
+    const by: ChangeContext = { actor: { type: "admin" }, at: now };
+    const updated = await deps.uow.run((tx) =>
+      changeSession(tx, id, { ...fields.value, expectedVersion }, by)
     );
     if (!updated) return changedMeanwhile(repos, id);
     await deps.notifyCohostsAdded({
@@ -197,7 +198,6 @@ export const adminUpdateSession =
       previousHostIds: session.hosts.map((h) => h.id),
       changedById: null,
     });
-    deps.nudgeJobs();
     return ok(updated);
   };
 
@@ -212,8 +212,8 @@ export const adminDeleteSession =
     const { repos } = deps;
     const session = await repos.sessions.findById(id);
     if (!session) return sessionNotFound();
-    await repos.sessions.delete(id, { actor: { type: "admin" }, at: now });
-    deps.nudgeJobs();
+    const by: ChangeContext = { actor: { type: "admin" }, at: now };
+    await deps.uow.run((tx) => removeSession(tx, id, by));
     return ok(session);
   };
 

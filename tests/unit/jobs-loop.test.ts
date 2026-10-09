@@ -8,6 +8,8 @@ vi.mock("@/utils/reminder-dispatch", () => ({
   dispatchDueReminders: vi.fn(),
 }));
 
+import type { RecordedChange } from "@schellingboard/domain/change";
+import { publish } from "@/server/kernel/change-subscribers";
 import { dispatchDueReminders } from "@/utils/reminder-dispatch";
 import {
   defaultJobs,
@@ -55,6 +57,15 @@ describe("jobs loop", () => {
     startJobsLoop([work]);
 
     nudgeJobs();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(work.run).toHaveBeenCalledTimes(1);
+  });
+
+  it("runs every job right away when a change is published", async () => {
+    const work = job("work");
+    startJobsLoop([work]);
+
+    publish([{ seq: 1 } as RecordedChange]);
     await vi.advanceTimersByTimeAsync(0);
     expect(work.run).toHaveBeenCalledTimes(1);
   });

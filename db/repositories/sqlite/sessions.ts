@@ -16,8 +16,6 @@ import type {
   SessionsRepository,
   SessionUpdateInput,
 } from "../interfaces";
-import { changes, type ChangeContext } from "@schellingboard/domain/change";
-import { insertChange } from "./changes";
 import type {
   Session,
   SessionCreateInput,
@@ -319,8 +317,7 @@ export class SqliteSessionsRepository implements SessionsRepository {
 
   async update(
     id: string,
-    patch: SessionUpdateInput,
-    by: ChangeContext
+    patch: SessionUpdateInput
   ): Promise<Session | undefined> {
     const applied = this.db.transaction(
       (tx) => {
@@ -393,10 +390,6 @@ export class SqliteSessionsRepository implements SessionsRepository {
             .set({ version: sql`${schema.sessions.version} + 1` })
             .where(eq(schema.sessions.id, id))
             .run();
-          insertChange(
-            tx,
-            changes.sessionChanged(before, this.findByIdSync(id)!, by)
-          );
         }
         return true;
       },
@@ -407,24 +400,10 @@ export class SqliteSessionsRepository implements SessionsRepository {
     return applied ? this.findById(id) : undefined;
   }
 
-  async delete(id: string, by: ChangeContext): Promise<void> {
-    this.db.transaction(
-      (tx) => {
-        const session = this.findByIdSync(id);
-        if (!session) return;
-        const rsvpGuestIds = tx
-          .select({ guestId: schema.rsvps.guestId })
-          .from(schema.rsvps)
-          .where(eq(schema.rsvps.sessionId, id))
-          .all()
-          .map((row) => row.guestId);
-        // rsvps, session_hosts and session_locations are removed by ON DELETE
-        // CASCADE.
-        tx.delete(schema.sessions).where(eq(schema.sessions.id, id)).run();
-        insertChange(tx, changes.sessionDeleted(session, rsvpGuestIds, by));
-      },
-      { behavior: "immediate" }
-    );
+  async delete(id: string): Promise<void> {
+    // rsvps, session_hosts and session_locations are removed by ON DELETE
+    // CASCADE.
+    this.db.delete(schema.sessions).where(eq(schema.sessions.id, id)).run();
   }
 
   async findLocationConflict(

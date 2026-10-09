@@ -29,6 +29,26 @@ openapi-check typecheck test-coverage` (or `make test`), without E2E. E2E runs
   the container through a bind mount. The public backup docs already handle
   the WAL files, so no public-doc or CHANGELOG change.
 
+- 2b: `server/kernel/unit-of-work.ts` exports `unitOfWork` (`run`, `read`)
+  and the `Tx` type; `db/container.ts` holds the SQL (`writeTransaction`,
+  `readTransaction`). `run` keeps a manual `BEGIN IMMEDIATE` open across awaits
+  under the write lock; a repository's own transaction inside it is a
+  savepoint. A throw or a failure `Result` (`ok: false`) rolls back.
+  `tx.record()` collects changes; they are appended (`changes.append`) before
+  `COMMIT` and published after it, under the lock.
+- 2b: `uow.read` uses a third, read-only connection behind its own lock, so
+  plain reads never join its older view.
+- 2b: subscribers live in `server/kernel/change-subscribers.ts`, which imports
+  nothing at run time (the jobs loop is bundled for Edge too). The jobs loop
+  subscribes in `startJobsLoop`; `SessionDeps.nudgeJobs` is gone, replaced by
+  `uow`.
+- 2b: `sessions.update`/`delete` no longer take `by` or log. The sessions
+  module's `changeSession`/`removeSession(tx, …)` read the state before,
+  write, and record (a change only when the version went up). Tests use
+  `updateLoggedSession`/`deleteLoggedSession` from `tests/helpers/changes.ts`.
+  Validation reads in the session use cases still run outside `uow.run`
+  (step 3a moves them in).
+
 - Step 4 split into 4a1–4a4 (one commit and migration per subject family),
   then 4b.
 - 4a1: `versionConflict(subject, current, detail)` in `server/kernel/result.ts`
@@ -59,4 +79,4 @@ None.
 
 ## Next step
 
-2b.
+3a.

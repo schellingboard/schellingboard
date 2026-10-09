@@ -7,6 +7,7 @@ vi.mock("@/utils/mailer", () => ({
 
 import { sendMail } from "@/utils/mailer";
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { updateLoggedSession } from "../helpers/changes";
 import {
   createEvent,
   createGuest,
@@ -44,7 +45,7 @@ describe("session notifications from the change log", () => {
       sessionId: session.id,
       guestId: rsvper.id,
     });
-    await getRepositories().sessions.update(
+    await updateLoggedSession(
       session.id,
       {
         startTime: new Date("2026-06-02T11:00:00.000Z"),
@@ -85,8 +86,8 @@ describe("session notifications from the change log", () => {
   it("keeps the changes a reaction has not reached yet", async () => {
     const session = await moveSessionWithAnRsvp();
     await runJobs();
-    const { changes, sessions } = getRepositories();
-    await sessions.update(session.id, { title: "Renamed" }, BY_TEST_AT);
+    const { changes } = getRepositories();
+    await updateLoggedSession(session.id, { title: "Renamed" }, BY_TEST_AT);
 
     await pruneChanges.run(new Date(AT.getTime() + 8 * DAY_MS));
 

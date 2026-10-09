@@ -26,7 +26,7 @@ vi.mock("next/cache", () => ({
 }));
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
-import { BY_TEST } from "../helpers/changes";
+import { BY_TEST, updateLoggedSession } from "../helpers/changes";
 import { createEvent, createDay, createSession } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { createAdminAuthCookie } from "@/utils/auth";
@@ -102,7 +102,7 @@ describe("days repo", () => {
       });
       // Session fully within the day window
       const session = await createSession(event.id);
-      await getRepositories().sessions.update(
+      await updateLoggedSession(
         session.id,
         {
           startTime: new Date("2026-10-01T10:00:00Z"),
@@ -126,7 +126,7 @@ describe("days repo", () => {
       });
       // Session starts inside the window but runs past the day end.
       const session = await createSession(event.id);
-      await getRepositories().sessions.update(
+      await updateLoggedSession(
         session.id,
         {
           startTime: new Date("2026-10-01T17:00:00Z"),
@@ -150,7 +150,7 @@ describe("days repo", () => {
       });
       // Session on a different day
       const session = await createSession(event.id);
-      await getRepositories().sessions.update(
+      await updateLoggedSession(
         session.id,
         {
           startTime: new Date("2026-10-02T10:00:00Z"),
@@ -418,7 +418,7 @@ describe("day actions", () => {
       const session = await createSession(event.id, {
         title: "Outside Session",
       });
-      await getRepositories().sessions.update(
+      await updateLoggedSession(
         session.id,
         {
           startTime: new Date("2026-10-01T16:00:00Z"),
@@ -450,7 +450,7 @@ describe("day actions", () => {
         end: new Date("2026-10-01T18:00:00Z"),
       });
       const session = await createSession(event.id);
-      await getRepositories().sessions.update(
+      await updateLoggedSession(
         session.id,
         {
           startTime: new Date("2026-10-01T10:00:00Z"),
