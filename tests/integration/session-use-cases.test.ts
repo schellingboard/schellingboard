@@ -10,6 +10,7 @@ import {
   createEvent,
   createGuest,
   createLocation,
+  createProposal,
   createSession,
   slotStart,
 } from "../helpers/factories";
@@ -191,26 +192,61 @@ describe("createSession", () => {
     });
   });
 
-  it("answers a clash in the same room with session.clash", async () => {
-    const { host, location, day } = await scheduledWorld();
-    const sessions = sessionUseCases();
-    await sessions.createSession(
-      open(host.id),
-      booking(day, [host.id], location.id),
-      now()
-    );
+  it(
+    "answers an unknown proposal, or one deleted meanwhile, with proposal.notFound",
+    { tags: ["008-US1"] },
+    async () => {
+      const { event, host, location, day } = await scheduledWorld();
+      const proposal = await createProposal(event.id, [host.id]);
+      const sessions = sessionUseCases();
+      const notFound = {
+        ok: false,
+        error: { kind: "notFound", code: "proposal.notFound" },
+      };
 
-    const result = await sessions.createSession(
-      open(host.id),
-      booking(day, [host.id], location.id),
-      now()
-    );
+      const unknown = await sessions.createSession(
+        open(host.id),
+        { ...booking(day, [host.id], location.id), proposalId: "nope" },
+        now()
+      );
+      const [, raced] = await Promise.all([
+        getRepositories().sessionProposals.delete(proposal.id),
+        sessions.createSession(
+          open(host.id),
+          { ...booking(day, [host.id], location.id), proposalId: proposal.id },
+          now()
+        ),
+      ]);
 
-    expect(result).toMatchObject({
-      ok: false,
-      error: { kind: "conflict", code: "session.clash" },
-    });
-  });
+      expect(unknown).toMatchObject(notFound);
+      expect(raced).toMatchObject(notFound);
+    }
+  );
+
+  it(
+    "answers a clash in the same room with session.clash, also when both book at once",
+    { tags: ["008-US1", "019-US7"] },
+    async () => {
+      const { host, location, day } = await scheduledWorld();
+      const sessions = sessionUseCases();
+
+      const [first, second] = await Promise.all(
+        [0, 1].map(() =>
+          sessions.createSession(
+            open(host.id),
+            booking(day, [host.id], location.id),
+            now()
+          )
+        )
+      );
+
+      expect(first.ok).toBe(true);
+      expect(second).toMatchObject({
+        ok: false,
+        error: { kind: "conflict", code: "session.clash" },
+      });
+    }
+  );
 });
 
 describe("updateSession and deleteSession", () => {
@@ -449,18 +485,29 @@ describe("organizer session use cases", () => {
     });
   });
 
-  it("answers an overlap in the same room with session.clash", async () => {
-    const event = await createEvent();
-    const location = await createLocation();
-    const sessions = sessionUseCases();
-    const input = { ...fields, eventId: event.id, locationIds: [location.id] };
-    await sessions.adminCreateSession(ADMIN, input, now());
+  it(
+    "answers an overlap in the same room with session.clash, also when both create at once",
+    { tags: ["018-US2", "019-US7"] },
+    async () => {
+      const event = await createEvent();
+      const location = await createLocation();
+      const sessions = sessionUseCases();
+      const input = {
+        ...fields,
+        eventId: event.id,
+        locationIds: [location.id],
+      };
 
-    const result = await sessions.adminCreateSession(ADMIN, input, now());
+      const [first, second] = await Promise.all([
+        sessions.adminCreateSession(ADMIN, input, now()),
+        sessions.adminCreateSession(ADMIN, input, now()),
+      ]);
 
-    expect(result).toMatchObject({
-      ok: false,
-      error: { kind: "conflict", code: "session.clash" },
-    });
-  });
+      expect(first.ok).toBe(true);
+      expect(second).toMatchObject({
+        ok: false,
+        error: { kind: "conflict", code: "session.clash" },
+      });
+    }
+  );
 });

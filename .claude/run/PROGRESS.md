@@ -49,6 +49,19 @@ openapi-check typecheck test-coverage` (or `make test`), without E2E. E2E runs
   Validation reads in the session use cases still run outside `uow.run`
   (step 3a moves them in).
 
+- 3a: the multi-write use cases of the family were `adminSeedSession`
+  (session, then hosts and rooms join the event) and `adminAddRsvp` (RSVP,
+  then guest joins the event); both now run whole in `uow.run`. The session
+  update and delete use cases (guest and admin) moved their validation reads
+  into `uow.run` too, so check and write are atomic; `notifyCohostsAdded`
+  runs after commit. So do `createSession` and `adminCreateSession`: two
+  concurrent bookings of one room both passed the clash check before. `rsvp`,
+  `withdrawRsvp` and `adminRemoveRsvp` stay as they were (one write; the
+  capacity check is atomic in the repository). No legacy route or server
+  action orchestrates several writes.
+- 3a: `uowFailingAt(repo, method)` in `tests/helpers/changes.ts` makes one
+  `tx` method fail, for the rollback tests of 3b–3d.
+
 - Step 4 split into 4a1–4a4 (one commit and migration per subject family),
   then 4b.
 - 4a1: `versionConflict(subject, current, detail)` in `server/kernel/result.ts`
@@ -79,4 +92,4 @@ None.
 
 ## Next step
 
-3a.
+3b.
