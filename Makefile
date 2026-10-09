@@ -164,7 +164,7 @@ clean:
 	rm -rf .next
 	rm -f arch-graph.svg
 	rm -f next-env.d.ts
-	rm -f data.db data.test.db
+	rm -f data.db data.db-wal data.db-shm data.test.db data.test.db-wal data.test.db-shm
 	rm -rf playwright-report test-results playwright-results.json .e2e-docker
 	rm -f tsconfig.tsbuildinfo
 	rm -rf www-site dev-site

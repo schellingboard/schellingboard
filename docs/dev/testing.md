@@ -6,7 +6,7 @@ See [ADR 0002](adr/0002-testing-strategy.md) for the full rationale. Three tiers
 
 **Unit tests** (Vitest, `tests/unit/`) — pure functions and isolated business rules only. No DB, no I/O.
 
-**Integration tests** (Vitest, `tests/integration/`) — server actions and API route handlers against a real in-memory SQLite DB. Verify post-condition state through a read surface in order of preference: (1) the corresponding GET endpoint, (2) repo read methods, (3) direct DB rows (last resort). Only `redirect()` and `revalidatePath()` are mocked.
+**Integration tests** (Vitest, `tests/integration/`) — server actions and API route handlers against a real SQLite database file, restored from a migrated template before each test. Verify post-condition state through a read surface in order of preference: (1) the corresponding GET endpoint, (2) repo read methods, (3) direct DB rows (last resort). Only `redirect()` and `revalidatePath()` are mocked.
 
 **E2E tests** (Playwright, `tests/e2e/`) — behavior that only manifests in a browser: routing, phase-dependent UI, modals, form interaction, mobile layout. Prefer fewer, high-confidence tests over broad coverage.
 

@@ -119,8 +119,33 @@ repository interfaces that the rest of the target does not want.
 
 ## Decision
 
-Open: the user chooses (a), (b) or (c). Steps 2 and 3 of the run wait for it.
+(a), chosen by the user on 2026-10-06 over the recommendation: reads must
+never see a write that is still open, also outside the unit of work.
+
+- The database runs in WAL mode with `synchronous=NORMAL`. `db/container.ts`
+  opens a write connection and a read-only connection.
+- Repository methods named `find…`, `list…`, `search…`, `count…` or `get…`
+  run on the read connection. Every other method takes the in-process write
+  lock and runs on the write connection, so a write outside `uow.run` (the
+  jobs loop, a single-write path) waits for an open use case instead of
+  joining its transaction.
+- The lock is on `globalThis`, like the jobs nudge, so module copies under
+  Next share it. `withWriter(fn)` holds it and hands `fn` the write
+  connection; `uow.run` builds on it. Writes keep `BEGIN IMMEDIATE` for other
+  processes.
+- Test databases are files: each worker migrates a template once per test
+  file and copies it before each test.
 
 ## Consequences
 
-To be written with the decision.
+- A repository method that writes must not have a read name: the read
+  connection is read-only, so such a method fails on its first call.
+- A read sees each write as soon as it commits, and never one in progress.
+- Self-hosted databases switch to WAL on first start; `data.db-wal` and
+  `data.db-shm` sit next to `data.db` in the `/data` volume. The documented
+  backup (`.backup`) and restore already handle them. The database must stay
+  on a local file system.
+- `uow.read` needs the read connection to itself while its transaction is
+  open; it takes a read lock or a pool, decided in step 2b.
+- A use case inside `uow.run` must write through `tx`, never through
+  `getRepositories()`: that waits for the lock it holds.

@@ -9,6 +9,7 @@ export default defineConfig({
       "tests/integration/**/*.test.{ts,tsx}",
     ],
     environment: "node",
+    globalSetup: ["tests/global-setup.ts"],
     pool: "forks",
     silent: "passed-only",
     tags: useCases.map(({ id, title }) => ({ name: id, description: title })),

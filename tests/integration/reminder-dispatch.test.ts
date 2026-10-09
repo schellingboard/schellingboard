@@ -18,7 +18,8 @@ import Database from "better-sqlite3";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { BY_TEST } from "../helpers/changes";
 import { createEvent, createGuest, createLocation } from "../helpers/factories";
-import { getRepositories, serializeDb } from "@/db/container";
+import { getRepositories } from "@/db/container";
+import { resolveDbPath } from "@/db/migrate";
 import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
 import { isMailerConfigured, sendMail } from "@/utils/mailer";
 import { dispatchDueReminders } from "@/utils/reminder-dispatch";
@@ -53,11 +54,11 @@ function subjects(): string[] {
   return vi.mocked(sendMail).mock.calls.map((call) => call[0].subject);
 }
 
-// Reads the raw reminder rows from a snapshot of the test database. The
+// Reads the raw reminder rows straight from the test database file. The
 // cascade is a storage-layer guarantee, so it is asserted at the storage
 // layer rather than through a repository method nothing in the app needs.
 function reminderRowCount(sessionId: string): number {
-  const db = new Database(serializeDb());
+  const db = new Database(resolveDbPath(), { readonly: true });
   try {
     const row = db
       .prepare(
@@ -86,7 +87,7 @@ function storedReminder(
   guestId: string,
   kind: string
 ): StoredReminder | undefined {
-  const db = new Database(serializeDb());
+  const db = new Database(resolveDbPath(), { readonly: true });
   try {
     return db
       .prepare(

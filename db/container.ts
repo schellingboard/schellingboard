@@ -1,8 +1,10 @@
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
+import fs from "fs";
 import path from "path";
 import * as schema from "./schema";
 import { resolveDbPath, runMigrations } from "./migrate";
+import { withWriteLock } from "./write-lock";
 import { SqliteAuthCodesRepository } from "./repositories/sqlite/auth-codes";
 import { SqliteChangesRepository } from "./repositories/sqlite/changes";
 import {
@@ -83,8 +85,13 @@ export type Repositories = {
   votes: VotesRepository;
 };
 
-let _sqlite: Database.Database | null = null;
-let _repositories: Repositories | null = null;
+type Connections = {
+  writer: Database.Database;
+  reader: Database.Database;
+  repositories: Repositories;
+};
+
+let _connections: Connections | null = null;
 
 function buildRepositories(sqlite: Database.Database): Repositories {
   const db = drizzle(sqlite, { schema });
@@ -117,52 +124,122 @@ function buildRepositories(sqlite: Database.Database): Repositories {
   };
 }
 
-export function getRepositories(): Repositories {
-  if (!_repositories) {
-    const conn = new Database(resolveDbPath());
-    try {
-      // Enforce foreign keys on every connection. better-sqlite3 happens to
-      // compile SQLite with SQLITE_DEFAULT_FOREIGN_KEYS=1, but set it explicitly
-      // so our ON DELETE CASCADE / SET NULL behaviour never depends on that
-      // build default. runMigrations toggles it off and back on internally.
-      conn.pragma("foreign_keys = ON");
-      runMigrations(conn, path.join(process.cwd(), "drizzle"));
-      _sqlite = conn;
-      _repositories = buildRepositories(conn);
-    } catch (e) {
-      conn.close();
-      throw e;
+const READ_METHOD = /^(find(?!OrCreate)|list|search|count|get)/;
+
+type AnyMethod = (...args: unknown[]) => unknown;
+
+function methodNames(repository: object): string[] {
+  const names = new Set<string>();
+  for (
+    let o: object | null = repository;
+    o && o !== Object.prototype;
+    o = Object.getPrototypeOf(o) as object | null
+  ) {
+    for (const name of Object.getOwnPropertyNames(o)) {
+      if (name !== "constructor") names.add(name);
     }
   }
-  return _repositories;
+  return [...names].filter(
+    (name) => typeof Reflect.get(repository, name) === "function"
+  );
+}
+
+// Reads see only committed rows; every other call takes the write lock, so it
+// never joins a transaction that someone else holds open on the writer.
+function route<R extends object>(reads: R, writes: R): R {
+  return Object.fromEntries(
+    methodNames(writes).map((name) => {
+      if (READ_METHOD.test(name)) {
+        const read = Reflect.get(reads, name) as AnyMethod;
+        return [name, read.bind(reads)];
+      }
+      const write = (Reflect.get(writes, name) as AnyMethod).bind(writes);
+      return [
+        name,
+        (...args: unknown[]) => withWriteLock(() => write(...args)),
+      ];
+    })
+  ) as R;
+}
+
+function routeAll(reads: Repositories, writes: Repositories): Repositories {
+  return Object.fromEntries(
+    Object.entries(writes).map(([name, repository]) => [
+      name,
+      route(reads[name as keyof Repositories], repository),
+    ])
+  ) as Repositories;
+}
+
+function open(
+  file: string,
+  { migrate, durable }: { migrate: boolean; durable: boolean }
+): Connections {
+  const writer = new Database(file);
+  let reader: Database.Database | null = null;
+  try {
+    // Enforce foreign keys on every connection. better-sqlite3 happens to
+    // compile SQLite with SQLITE_DEFAULT_FOREIGN_KEYS=1, but set it explicitly
+    // so our ON DELETE CASCADE / SET NULL behaviour never depends on that
+    // build default. runMigrations toggles it off and back on internally.
+    writer.pragma("foreign_keys = ON");
+    const mode = writer.pragma("journal_mode = WAL", { simple: true });
+    if (mode !== "wal") {
+      throw new Error(
+        `${file}: journal mode is ${String(mode)}, not wal; the read connection needs a database file`
+      );
+    }
+    writer.pragma(`synchronous = ${durable ? "NORMAL" : "OFF"}`);
+    if (migrate) runMigrations(writer, path.join(process.cwd(), "drizzle"));
+    reader = new Database(file, { readonly: true });
+    return {
+      writer,
+      reader,
+      repositories: routeAll(
+        buildRepositories(reader),
+        buildRepositories(writer)
+      ),
+    };
+  } catch (e) {
+    reader?.close();
+    writer.close();
+    throw e;
+  }
+}
+
+function connections(): Connections {
+  _connections ??= open(resolveDbPath(), { migrate: true, durable: true });
+  return _connections;
+}
+
+export function getRepositories(): Repositories {
+  return connections().repositories;
+}
+
+/**
+ * Runs `fn` with the write connection while holding the write lock, so no
+ * repository write runs until `fn` settles.
+ */
+export function withWriter<T>(
+  fn: (writer: Database.Database) => T | Promise<T>
+): Promise<T> {
+  return withWriteLock(() => fn(connections().writer));
 }
 
 export function resetRepositories(): void {
-  _sqlite?.close();
-  _sqlite = null;
-  _repositories = null;
+  _connections?.reader.close();
+  _connections?.writer.close();
+  _connections = null;
 }
 
-export function serializeDb(): Buffer {
-  if (!_sqlite)
-    throw new Error("DB not initialized — call getRepositories() first");
-  return _sqlite.serialize();
-}
-
-export function restoreDb(snapshot: Buffer): void {
-  const conn = new Database(snapshot);
-  try {
-    // Enforce foreign keys on every connection (see getRepositories).
-    conn.pragma("foreign_keys = ON");
-    // Deserialization is lazy: force a read so a corrupt snapshot fails here,
-    // while the current connection is still intact.
-    conn.pragma("schema_version");
-    const repositories = buildRepositories(conn);
-    _sqlite?.close();
-    _sqlite = conn;
-    _repositories = repositories;
-  } catch (e) {
-    conn.close();
-    throw e;
+// For tests: reopens on a copy of the closed, migrated `template`, without the
+// fsyncs a disposable copy does not need (they made each reset ~40 ms slower).
+export function restoreDb(template: string): void {
+  resetRepositories();
+  const file = resolveDbPath();
+  for (const suffix of ["-wal", "-shm"]) {
+    fs.rmSync(file + suffix, { force: true });
   }
+  fs.copyFileSync(template, file);
+  _connections = open(file, { migrate: false, durable: false });
 }

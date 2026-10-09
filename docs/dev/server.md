@@ -30,6 +30,12 @@ The Next mount is `app/api/v1/[[...route]]/route.ts`; `proxy.ts` gates it like
 any other route (site password or admin cookie for `/api/v1`, the admin cookie for
 `/api/v1/admin/`). Repositories stay in `db/`.
 
+`db/container.ts` opens the database in WAL mode with two connections.
+Repository methods named `find…`, `list…`, `search…`, `count…` or `get…` run
+on a read-only connection, which sees only committed rows. Every other method
+takes the in-process write lock and runs on the write connection, so name a
+method that writes accordingly ([ADR 0013](adr/0013-unit-of-work.md)).
+
 ## Adding a use case and its route
 
 1. **Contract.** Add the request and response zod schemas to

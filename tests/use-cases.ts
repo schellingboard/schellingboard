@@ -573,6 +573,12 @@ export const features = {
         actor: "self-hoster",
         priority: "P3",
       },
+      US7: {
+        title:
+          "Self-hoster's instance keeps every change whole while many people edit at once",
+        actor: "self-hoster",
+        priority: "P2",
+      },
     },
   },
   "020": {

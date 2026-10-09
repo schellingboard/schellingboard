@@ -37,7 +37,7 @@ feed and snapshot), `04-client.md` (The replica), `05-security.md` (Authorizatio
 
 ### Unit of work
 
-- [ ] 1. **ADR 0013, unit of work** (Status: Proposed; written, awaiting decision).
+- [x] 1. **ADR 0013, unit of work** (Status: Proposed; decided (a) on 2026-10-06).
       `uow.run(async (tx) => …)`: one
       transaction per use case; `tx` holds the repositories and `record(change)`; after
       commit and before the writer lock is released, `publish` to in-process
@@ -59,10 +59,16 @@ feed and snapshot), `04-client.md` (The replica), `05-security.md` (Authorizatio
       WAL in production, effect on the snapshot's read transaction) for the user to
       decide; until decided, record it under Questions and continue with steps that
       do not depend on it (4 to 7).
-- [ ] 2. **Kernel unit of work**: as the ADR says. Move session change logging out of
-      `SqliteSessionsRepository` into the session use cases (`tx.record()`); the nudge
-      becomes a subscriber. Tests: a rollback writes neither state nor change;
-      concurrent use cases serialize; a `uow.read` never sees uncommitted rows.
+- [ ] 2. **Kernel unit of work**: as the ADR says. The user chose option (a) on
+      2026-10-06; record it in ADR 0013's Decision (a new commit: step 1's is pushed).
+  - [x] 2a. Connections: WAL in production, one writer connection behind an in-process
+        async mutex, a read connection; file-backed test databases in
+        `tests/helpers/db.ts`. Every repository write takes the mutex. Test: a read
+        never sees uncommitted rows; concurrent writes serialize.
+  - [ ] 2b. `uow.run(async (tx) => …)` with `tx.record()` and `publish` after
+        commit; `uow.read` on the read connection. Move session change logging out of
+        `SqliteSessionsRepository` into the session use cases; the nudge becomes a
+        subscriber. Test: a rollback writes neither state nor change.
 - [ ] 3. **Atomic multi-repository use cases**: every use case that writes through more
       than one repository call runs in `uow.run`. Test each by making its second write
       fail. One commit per family; skip a family with no such use case:
