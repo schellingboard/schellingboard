@@ -105,7 +105,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
       (`fake-indexeddb`).
   - [x] 10a. Copy store, `apply`, sync state, feed client, live replica and
         selectors into `apps/web/src/replica/` with their tests.
-  - [ ] 10b. Clock offset from the snapshot's `now` and the feed ping.
+  - [x] 10b. Clock offset from the snapshot's `now` and the feed ping.
   - [ ] 10c. IndexedDB persistence; a persisted replica opens `stale`.
 - [ ] 11. **Commands and queries**: the command mechanism (predict with the
       domain policy, pending change keyed by `Idempotency-Key`, call, reconcile by

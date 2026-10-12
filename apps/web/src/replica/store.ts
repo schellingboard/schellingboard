@@ -7,11 +7,19 @@ export type ReplicaStore = ReturnType<typeof createReplicaStore>;
 
 export function createReplicaStore(
   initial: Snapshot,
-  clock: () => number = () => performance.now()
+  clock: () => number = () => performance.now(),
+  wallClock: () => number = () => Date.now()
 ) {
   let replica = initial;
   let gone = false;
   let meetingsRevision = 0;
+  // Measured at receipt, so it is off by the one-way latency; fine for minute-grained screens.
+  let clockOffset = 0;
+  const observeServerTime = (iso: string) => {
+    const server = Date.parse(iso);
+    if (!Number.isNaN(server)) clockOffset = server - wallClock();
+  };
+  observeServerTime(initial.now);
   let deliveredKeys: ReadonlySet<string> = new Set();
   // The seed is fresh from the server, so the replica starts out connected.
   let link: Link = { connected: true, since: clock() };
@@ -42,6 +50,8 @@ export function createReplicaStore(
     meetingsRevision: () => meetingsRevision,
     deliveredKeys: () => deliveredKeys,
     link: () => link,
+    serverNow: () => wallClock() + clockOffset,
+    observeServerTime,
     linkUp: () =>
       setLink(link.connected ? link : { connected: true, since: clock() }),
     // Repeated drops keep the time the first one began, so staleness counts
@@ -65,13 +75,17 @@ export function createReplicaStore(
     },
     replace: (next: Snapshot) => {
       deliveredKeys = new Set();
+      observeServerTime(next.now);
       set(next, false);
     },
     // A server render can be older than what the feed already delivered. A
     // restored backup is not this case: the feed answers it with a reset, and
     // the reload goes through replace.
     adopt: (next: Snapshot) => {
-      if (next.seq >= replica.seq) set(next, false, false);
+      if (next.seq >= replica.seq) {
+        observeServerTime(next.now);
+        set(next, false, false);
+      }
     },
   };
 }

@@ -75,9 +75,11 @@ export function connectFeed({
         if (message) store.applyMessage(message);
       });
     }
-    current.addEventListener("ping", () => {
+    current.addEventListener("ping", ({ data }) => {
       failures = 0;
       heard(current);
+      const now = pingTime(data);
+      if (now) store.observeServerTime(now);
     });
     current.addEventListener("open", () => {
       failures = 0;
@@ -175,6 +177,15 @@ function parse(data: string): FeedMessage | null {
   try {
     const parsed = feedMessageSchema.safeParse(JSON.parse(data));
     return parsed.success ? parsed.data : null;
+  } catch {
+    return null;
+  }
+}
+
+function pingTime(data: string): string | null {
+  try {
+    const { now } = JSON.parse(data) as { now?: unknown };
+    return typeof now === "string" ? now : null;
   } catch {
     return null;
   }
