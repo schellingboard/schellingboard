@@ -6,6 +6,7 @@ import { peopleUseCases } from "@/server/composition";
 import { resolveActor } from "@/server/kernel/actor";
 import type { Result } from "@/server/kernel/result";
 import type { AdminActionResult } from "./admin-guests";
+import { serverNow } from "@/utils/dev-clock-server";
 
 function settled(result: Result<void>, eventId: string): AdminActionResult {
   if (!result.ok) {
@@ -23,7 +24,7 @@ export async function assignGuestsToEventAction(input: {
 }): Promise<AdminActionResult> {
   const actor = await resolveActor(await cookies());
   return settled(
-    await peopleUseCases().assignGuestsToEvent(actor, input),
+    await peopleUseCases().assignGuestsToEvent(actor, input, await serverNow()),
     input.eventId
   );
 }
@@ -34,7 +35,11 @@ export async function removeGuestsFromEventAction(input: {
 }): Promise<AdminActionResult> {
   const actor = await resolveActor(await cookies());
   return settled(
-    await peopleUseCases().removeGuestsFromEvent(actor, input),
+    await peopleUseCases().removeGuestsFromEvent(
+      actor,
+      input,
+      await serverNow()
+    ),
     input.eventId
   );
 }

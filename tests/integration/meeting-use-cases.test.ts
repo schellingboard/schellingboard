@@ -505,10 +505,14 @@ describe("organizer settings", () => {
       const points = await Promise.all(
         ["Coffee bar", "Lobby"].map(async (name) =>
           value(
-            await meetings().createMeetingPoint(ADMIN, {
-              eventId: event.id,
-              name,
-            })
+            await meetings().createMeetingPoint(
+              ADMIN,
+              {
+                eventId: event.id,
+                name,
+              },
+              new Date()
+            )
           )
         )
       );
@@ -524,64 +528,92 @@ describe("organizer settings", () => {
       const event = await createEvent();
       const other = await createEvent();
       const point = value(
-        await meetings().createMeetingPoint(ADMIN, {
-          eventId: event.id,
-          name: " Coffee bar ",
-        })
+        await meetings().createMeetingPoint(
+          ADMIN,
+          {
+            eventId: event.id,
+            name: " Coffee bar ",
+          },
+          new Date()
+        )
       );
       expect(point).toMatchObject({ name: "Coffee bar", description: "" });
       expect(
         code(
-          await meetings().createMeetingPoint(ADMIN, {
-            eventId: event.id,
-            name: " ",
-          })
+          await meetings().createMeetingPoint(
+            ADMIN,
+            {
+              eventId: event.id,
+              name: " ",
+            },
+            new Date()
+          )
         )
       ).toBe("meetingPoint.nameRequired");
       expect(
         code(
-          await meetings().createMeetingPoint(open("x"), {
-            eventId: event.id,
-            name: "Lobby",
-          })
+          await meetings().createMeetingPoint(
+            open("x"),
+            {
+              eventId: event.id,
+              name: "Lobby",
+            },
+            new Date()
+          )
         )
       ).toBe("admin.required");
 
       expect(
         code(
-          await meetings().updateMeetingPoint(ADMIN, {
-            eventId: other.id,
-            id: point.id,
-            expectedVersion: point.version,
-            name: "Lobby",
-          })
+          await meetings().updateMeetingPoint(
+            ADMIN,
+            {
+              eventId: other.id,
+              id: point.id,
+              expectedVersion: point.version,
+              name: "Lobby",
+            },
+            new Date()
+          )
         )
       ).toBe("meetingPoint.notFound");
       expect(
         value(
-          await meetings().updateMeetingPoint(ADMIN, {
-            eventId: event.id,
-            id: point.id,
-            expectedVersion: point.version,
-            name: "Lobby",
-            description: " By the door ",
-          })
+          await meetings().updateMeetingPoint(
+            ADMIN,
+            {
+              eventId: event.id,
+              id: point.id,
+              expectedVersion: point.version,
+              name: "Lobby",
+              description: " By the door ",
+            },
+            new Date()
+          )
         )
       ).toMatchObject({ name: "Lobby", description: "By the door" });
 
       expect(
         code(
-          await meetings().deleteMeetingPoint(ADMIN, {
-            eventId: other.id,
-            id: point.id,
-          })
+          await meetings().deleteMeetingPoint(
+            ADMIN,
+            {
+              eventId: other.id,
+              id: point.id,
+            },
+            new Date()
+          )
         )
       ).toBe("meetingPoint.notFound");
       value(
-        await meetings().deleteMeetingPoint(ADMIN, {
-          eventId: event.id,
-          id: point.id,
-        })
+        await meetings().deleteMeetingPoint(
+          ADMIN,
+          {
+            eventId: event.id,
+            id: point.id,
+          },
+          new Date()
+        )
       );
       expect(
         await getRepositories().meetingPoints.listByEvent(event.id)

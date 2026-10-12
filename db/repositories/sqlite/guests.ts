@@ -179,8 +179,10 @@ export class SqliteGuestsRepository implements GuestsRepository {
   }
 
   async listShownByEvent(
-    eventId: string
+    eventId: string,
+    onlyGuestIds?: string[]
   ): Promise<(Guest & { member: boolean })[]> {
+    if (onlyGuestIds?.length === 0) return [];
     const g = schema.guests;
     const members = sql`SELECT guest_id FROM event_guests WHERE event_id = ${eventId}`;
     const hosts = sql`SELECT sh.guest_id FROM session_hosts sh
@@ -191,10 +193,25 @@ export class SqliteGuestsRepository implements GuestsRepository {
         member: sql<number>`${g.id} IN (${members})`,
       })
       .from(g)
-      .where(sql`${g.id} IN (${members}) OR ${g.id} IN (${hosts})`)
+      .where(
+        and(
+          sql`(${g.id} IN (${members}) OR ${g.id} IN (${hosts}))`,
+          onlyGuestIds ? inArray(g.id, onlyGuestIds) : undefined
+        )
+      )
       .orderBy(g.name, g.id)
       .all()
       .map((row) => ({ ...row, member: Boolean(row.member), info: undefined }));
+  }
+
+  async listShownEventIds(guestId: string): Promise<string[]> {
+    return this.db
+      .all<{ event_id: string }>(
+        sql`SELECT event_id FROM event_guests WHERE guest_id = ${guestId}
+          UNION SELECT s.event_id FROM session_hosts sh
+            JOIN sessions s ON s.id = sh.session_id WHERE sh.guest_id = ${guestId}`
+      )
+      .map((row) => row.event_id);
   }
 
   async listByIds(ids: string[]): Promise<Guest[]> {

@@ -3,8 +3,12 @@ import {
   updateGuestSchema,
 } from "@schellingboard/contracts/guest";
 import type { z } from "zod";
+import { changes } from "@schellingboard/domain/change";
 import type { CompleteGuest } from "@schellingboard/domain/guest";
 import type { Actor } from "@/server/kernel/actor";
+import { byAdmin } from "@/server/kernel/change-context";
+import { recordingSessionCascade } from "@/server/kernel/session-cascade";
+import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import { withStoredFile } from "@/server/kernel/stored-files";
 import {
   forbidden,
@@ -125,7 +129,8 @@ export const ensureGuest =
   ({ uow }: PeopleDeps) =>
   async (
     actor: Actor,
-    input: GuestInput & { eventSlug?: string }
+    input: GuestInput & { eventSlug?: string },
+    now: Date
   ): Promise<Result<{ id: string; created: boolean }>> => {
     if (!actor.admin) return adminRequired();
     const parsed = parseGuest(createGuestSchema, input);
@@ -143,14 +148,24 @@ export const ensureGuest =
         name,
         info: { email },
       });
-      if (eventId) await tx.guests.assignToEvent(eventId, [guest.id]);
+      if (eventId)
+        await recordingShownGuests(
+          tx,
+          [eventId],
+          () => tx.guests.assignToEvent(eventId, [guest.id]),
+          byAdmin(now)
+        );
       return ok({ id: guest.id, created });
     });
   };
 
 export const updateGuest =
   ({ uow }: PeopleDeps) =>
-  async (actor: Actor, input: unknown): Promise<Result<AdminGuest>> => {
+  async (
+    actor: Actor,
+    input: unknown,
+    now: Date
+  ): Promise<Result<AdminGuest>> => {
     if (!actor.admin) return adminRequired();
     const parsed = parseGuest(updateGuestSchema, input);
     if (!parsed.ok) return parsed;
@@ -167,11 +182,12 @@ export const updateGuest =
         );
       const existing = await tx.guests.findByEmail(email);
       if (existing && existing.id !== id) return emailTaken();
-      const updated = await tx.guests.update(id, {
-        name,
-        info: { email },
-        expectedVersion,
-      });
+      const updated = await recordingShownGuests(
+        tx,
+        await tx.guests.listShownEventIds(id),
+        () => tx.guests.update(id, { name, info: { email }, expectedVersion }),
+        byAdmin(now)
+      );
       if (!updated) return guestNotFound();
       return ok(await withEvents(tx.guests, updated));
     });
@@ -179,13 +195,38 @@ export const updateGuest =
 
 export const deleteGuest =
   ({ uow, avatars }: PeopleDeps) =>
-  async (actor: Actor, input: { id: string }): Promise<Result<void>> => {
+  async (
+    actor: Actor,
+    input: { id: string },
+    now: Date
+  ): Promise<Result<void>> => {
     if (!actor.admin) return adminRequired();
     return withStoredFile(avatars, null, (replaces) =>
       uow.run(async (tx) => {
         const guest = await tx.guests.findById(input.id);
         if (!guest) return guestNotFound();
-        await tx.guests.delete(input.id);
+        const by = byAdmin(now);
+        const sessions = new Map(
+          [
+            ...(await tx.sessions.listHostedByGuest(input.id)),
+            ...(await tx.sessions.listRsvpdByGuest(input.id)),
+          ].map((s) => [s.id, s])
+        );
+        const meetings = await tx.meetings.listByGuest(input.id);
+        await recordingShownGuests(
+          tx,
+          await tx.guests.listShownEventIds(input.id),
+          () =>
+            recordingSessionCascade(
+              tx,
+              [...sessions.values()],
+              () => tx.guests.delete(input.id),
+              by
+            ),
+          by
+        );
+        for (const meeting of meetings)
+          tx.record(changes.meetingDeleted(meeting, by));
         replaces(guest.avatarUrl);
         return ok(undefined);
       })

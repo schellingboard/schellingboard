@@ -1,3 +1,4 @@
+import { changes } from "@schellingboard/domain/change";
 import type { Event } from "@schellingboard/domain/event";
 import type { Meeting, MeetingStatus } from "@schellingboard/domain/meeting";
 import {
@@ -8,6 +9,7 @@ import {
 import { inSchedPhase } from "@schellingboard/domain/phase";
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
+import { byGuest } from "@/server/kernel/change-context";
 import {
   conflict,
   forbidden,
@@ -75,9 +77,18 @@ export const requestMeeting =
     if (!meetingPoint)
       return invalid("meeting.pointRequired", "Choose or type where to meet");
 
-    const requested = await uow.run((tx) =>
-      bookMeeting(tx, { ...input, requesterId, meetingPoint }, now)
-    );
+    const requested = await uow.run(async (tx) => {
+      const booked = await bookMeeting(
+        tx,
+        { ...input, requesterId, meetingPoint },
+        now
+      );
+      if (booked.ok)
+        tx.record(
+          changes.meetingChanged(booked.value, byGuest(requesterId, now))
+        );
+      return booked;
+    });
     if (!requested.ok) return requested;
     await notifyMeetingRequested({ meeting: requested.value, now });
     return requested;
@@ -222,6 +233,7 @@ export const respondToMeeting =
           "meeting.alreadyAnswered",
           "This request has already been answered"
         );
+      tx.record(changes.meetingChanged(updated, byGuest(acting.value, now)));
       return ok({ meeting: updated, eventSlug: event.value.slug });
     });
     if (!answered.ok) return answered;
@@ -277,6 +289,7 @@ export const cancelMeeting =
           "meeting.nothingToCancel",
           "There is nothing left to cancel"
         );
+      tx.record(changes.meetingChanged(updated, byGuest(acting.value, now)));
       return ok({ meeting: updated, eventSlug: event.value.slug });
     });
     if (!canceled.ok) return canceled;

@@ -6,6 +6,7 @@ import {
   sessionContainedInWindow,
 } from "@schellingboard/domain/day-window";
 import type { Actor } from "@/server/kernel/actor";
+import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import { recordingSessionCascade } from "@/server/kernel/session-cascade";
 import type { Tx } from "@/server/kernel/unit-of-work";
 import {
@@ -186,11 +187,19 @@ export const deleteDay =
       const event = await tx.events.findById(day.eventId);
       const by = byAdmin(now);
       try {
-        await recordingSessionCascade(
+        const sessions = await tx.sessions.listByEvent(day.eventId);
+        await recordingShownGuests(
           tx,
-          await tx.sessions.listByEvent(day.eventId),
-          () => tx.days.delete(input.id),
-          by
+          [day.eventId],
+          () =>
+            recordingSessionCascade(
+              tx,
+              sessions,
+              () => tx.days.delete(input.id),
+              by
+            ),
+          by,
+          sessions.flatMap((s) => s.hosts.map((h) => h.id))
         );
       } catch {
         return conflict("day.saveFailed", "Failed to delete day");

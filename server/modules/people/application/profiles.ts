@@ -7,6 +7,8 @@ import {
 } from "@schellingboard/domain/guest";
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
+import { byGuest } from "@/server/kernel/change-context";
+import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import { withStoredFile } from "@/server/kernel/stored-files";
 import {
   forbidden,
@@ -86,15 +88,21 @@ async function saveProfile(
     uow.run(async (tx) => {
       const current = await tx.guests.findById(guestId);
       if (!current) return profileNotFound();
-      const updated = await tx.guests.updateProfile(
-        guestId,
-        {
-          ...fields(current),
-          avatarUrl:
-            avatar === undefined ? (current.avatarUrl ?? null) : newUrl,
-          expectedVersion,
-        },
-        now
+      const updated = await recordingShownGuests(
+        tx,
+        await tx.guests.listShownEventIds(guestId),
+        () =>
+          tx.guests.updateProfile(
+            guestId,
+            {
+              ...fields(current),
+              avatarUrl:
+                avatar === undefined ? (current.avatarUrl ?? null) : newUrl,
+              expectedVersion,
+            },
+            now
+          ),
+        byGuest(guestId, now)
       );
       if (!updated) {
         const after = await tx.guests.findById(guestId);

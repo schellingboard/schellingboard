@@ -17,6 +17,9 @@ import { unitOfWork } from "@/server/kernel/unit-of-work";
 import { createVenueUseCases } from "@/server/modules/venue/module";
 import { createEventUseCases } from "@/server/modules/events/module";
 import { createSessionUseCases } from "@/server/modules/sessions/module";
+import { createMeetingUseCases } from "@/server/modules/meetings/module";
+import { createPeopleUseCases } from "@/server/modules/people/module";
+import { isoDay } from "../helpers/dates";
 
 const NINE = new Date("2026-06-02T09:00:00.000Z");
 const TEN = new Date("2026-06-02T10:00:00.000Z");
@@ -43,6 +46,31 @@ const venue = () =>
     },
     uow: unitOfWork,
   });
+
+const people = () =>
+  createPeopleUseCases({
+    repos: getRepositories(),
+    avatars: {
+      validate: (buffer) => Promise.resolve({ buffer, ext: "png" }),
+      saveNew: (id) => Promise.resolve(`/media/avatars/${id}-1.png`),
+      deleteByUrl: async () => {},
+    },
+    sendTestEmail: async () => {},
+    uow: unitOfWork,
+  });
+
+const meetings = () =>
+  createMeetingUseCases({
+    repos: getRepositories(),
+    notifyMeetingRequested: async () => {},
+    notifyMeetingOutcome: async () => {},
+    uow: unitOfWork,
+  });
+
+const open = (id: string): Actor => ({
+  admin: false,
+  guest: { id, level: "open" },
+});
 
 describe("the logged changes suffice to keep a replica current", () => {
   beforeAll(() => setupTestDb());
@@ -506,6 +534,303 @@ describe("the logged changes suffice to keep a replica current", () => {
               adminManaged: false,
               closed: false,
             },
+            NOW
+          )
+        );
+      });
+    });
+  });
+  describe("with guests", () => {
+    const ok = (result: { ok: boolean }) => expect(result.ok).toBe(true);
+
+    it("for guests joining and leaving an event", async () => {
+      const w = await world();
+      const newcomer = await createGuest({ name: "Nia Newcomer" });
+      await expectChangesSuffice(w.viewer, w.event.slug, async () => {
+        ok(
+          await people().assignGuestsToEvent(
+            ADMIN,
+            { eventId: w.event.id, guestIds: [newcomer.id] },
+            NOW
+          )
+        );
+      });
+      await expectChangesSuffice(w.viewer, w.event.slug, async () => {
+        ok(
+          await people().removeGuestsFromEvent(
+            ADMIN,
+            { eventId: w.event.id, guestIds: [newcomer.id, w.host.id] },
+            NOW
+          )
+        );
+      });
+    });
+
+    it("for guests an import or a script brings in, and a deleted guest", async () => {
+      const w = await world();
+      const leaving = await createGuest({ name: "Lee", eventId: w.event.id });
+      await expectChangesSuffice(w.viewer, w.event.slug, async () => {
+        ok(
+          await people().importGuests(
+            ADMIN,
+            {
+              csv: "name,email\nIda,ida@example.com\n",
+              eventIds: [w.event.id],
+            },
+            NOW
+          )
+        );
+        ok(
+          await people().ensureGuest(
+            ADMIN,
+            {
+              name: "Esme",
+              email: "esme@example.com",
+              eventSlug: w.event.slug,
+            },
+            NOW
+          )
+        );
+        ok(await people().deleteGuest(ADMIN, { id: leaving.id }, NOW));
+      });
+    });
+
+    it("for public profile edits, seen by the guest and by others", async () => {
+      const w = await world();
+      const friend = await createGuest({ name: "Fay", eventId: w.event.id });
+      const edit = (id: string, version: number) =>
+        people().updateMyProfile(
+          open(id),
+          {
+            name: "Fay Renamed",
+            aboutMe: "Hello",
+            pronouns: null,
+            basedIn: null,
+            prompts: null,
+            languages: null,
+            contacts: null,
+            expectedVersion: version,
+          },
+          NOW
+        );
+      await expectChangesSuffice(w.viewer, w.event.slug, async () => {
+        ok(await edit(friend.id, friend.profileVersion));
+      });
+      await expectChangesSuffice(open(friend.id), w.event.slug, async () => {
+        ok(
+          await people().updateGuest(
+            ADMIN,
+            {
+              id: friend.id,
+              name: "Fay Again",
+              email: "fay@example.com",
+              expectedVersion: (await getRepositories().guests.findById(
+                friend.id
+              ))!.version,
+            },
+            NOW
+          )
+        );
+      });
+    });
+  });
+
+  describe("with meetings", () => {
+    const ok = (result: { ok: boolean }) => expect(result.ok).toBe(true);
+    const DAY = isoDay(30);
+    const SLOT = `${DAY}T10:00:00.000Z`;
+    const SLOT_2 = `${DAY}T10:30:00.000Z`;
+
+    async function meetingWorld() {
+      const repos = getRepositories();
+      const event = await createEvent({ phase: "scheduling" });
+      await repos.events.update(event.id, {
+        meetingsEnabled: true,
+        maxOpenMeetingRequests: 5,
+      });
+      await createDay(event.id, {
+        start: new Date(`${DAY}T09:00:00.000Z`),
+        end: new Date(`${DAY}T17:00:00.000Z`),
+      });
+      const ada = await createGuest({ name: "Ada", eventId: event.id });
+      const grace = await createGuest({ name: "Grace", eventId: event.id });
+      const bystander = await createGuest({ name: "Bo", eventId: event.id });
+      await repos.meetingAvailability.replaceForGuest(grace.id, event.id, [
+        new Date(SLOT),
+        new Date(SLOT_2),
+      ]);
+      return { event, ada, grace, bystander };
+    }
+
+    it("for a 1-on-1 asked, answered and called off, per party", async () => {
+      const w = await meetingWorld();
+      let meetingId = "";
+      const watchers = [open(w.ada.id), open(w.grace.id), open(w.bystander.id)];
+      const watch = async (work: () => Promise<unknown>) => {
+        const run = watchers.reduceRight(
+          (inner, viewer) => () =>
+            expectChangesSuffice(viewer, w.event.slug, inner),
+          work
+        );
+        await run();
+      };
+      await watch(async () => {
+        const result = await meetings().requestMeeting(
+          open(w.ada.id),
+          {
+            eventId: w.event.id,
+            recipientId: w.grace.id,
+            slotStart: SLOT,
+            slotCount: 1,
+            meetingPoint: "Coffee bar",
+          },
+          NOW
+        );
+        ok(result);
+        if (result.ok) meetingId = result.value.id;
+      });
+      await watch(async () => {
+        ok(
+          await meetings().respondToMeeting(
+            open(w.grace.id),
+            { meetingId, response: "accept" },
+            NOW
+          )
+        );
+      });
+      await watch(async () => {
+        ok(
+          await meetings().cancelMeeting(
+            open(w.ada.id),
+            { meetingId, note: "Sorry" },
+            NOW
+          )
+        );
+      });
+    });
+
+    it("for a deleted guest's hosting, RSVPs and 1-on-1s", async () => {
+      const w = await meetingWorld();
+      const hosted = await createSession(w.event.id, {
+        title: "Grace's talk",
+        hostIds: [w.grace.id],
+        startTime: new Date(`${DAY}T12:00:00.000Z`),
+        endTime: new Date(`${DAY}T13:00:00.000Z`),
+      });
+      const adas = await createSession(w.event.id, {
+        title: "Ada's talk",
+        hostIds: [w.ada.id],
+        startTime: new Date(`${DAY}T14:00:00.000Z`),
+        endTime: new Date(`${DAY}T15:00:00.000Z`),
+      });
+      ok(
+        await sessions().rsvp(
+          open(w.grace.id),
+          { sessionId: adas.id, guestId: w.grace.id },
+          NOW
+        )
+      );
+      ok(
+        await sessions().rsvp(
+          open(w.ada.id),
+          { sessionId: hosted.id, guestId: w.ada.id },
+          NOW
+        )
+      );
+      ok(
+        await meetings().requestMeeting(
+          open(w.ada.id),
+          {
+            eventId: w.event.id,
+            recipientId: w.grace.id,
+            slotStart: SLOT,
+            slotCount: 1,
+            meetingPoint: "Lawn",
+          },
+          NOW
+        )
+      );
+      await expectChangesSuffice(open(w.ada.id), w.event.slug, () =>
+        expectChangesSuffice(open(w.bystander.id), w.event.slug, async () => {
+          ok(await people().deleteGuest(ADMIN, { id: w.grace.id }, NOW));
+        })
+      );
+    });
+
+    it("for a host who is not a member, as a session comes and goes", async () => {
+      const w = await meetingWorld();
+      const outsider = await createGuest({ name: "Otto Outsider" });
+      let id = "";
+      await expectChangesSuffice(open(w.ada.id), w.event.slug, async () => {
+        const result = await sessions().adminCreateSession(
+          ADMIN,
+          {
+            eventId: w.event.id,
+            title: "Guest talk",
+            description: "",
+            startTime: `${DAY}T12:00:00.000Z`,
+            endTime: `${DAY}T13:00:00.000Z`,
+            capacity: 10,
+            blocker: false,
+            hostIds: [outsider.id],
+            locationIds: [],
+            adminManaged: false,
+            closed: false,
+          },
+          NOW
+        );
+        ok(result);
+        if (result.ok) id = result.value.id;
+      });
+      await expectChangesSuffice(open(w.ada.id), w.event.slug, async () => {
+        ok(await sessions().adminDeleteSession(ADMIN, { id }, NOW));
+      });
+    });
+
+    it("for the slots a guest declares free", async () => {
+      const w = await meetingWorld();
+      await expectChangesSuffice(open(w.grace.id), w.event.slug, async () => {
+        ok(
+          await meetings().saveMeetingAvailability(
+            open(w.grace.id),
+            { eventId: w.event.id, slotStarts: [SLOT_2] },
+            NOW
+          )
+        );
+      });
+    });
+
+    it("for meeting points added, renamed and removed", async () => {
+      const w = await meetingWorld();
+      let point: { id: string; version: number } | undefined;
+      await expectChangesSuffice(open(w.ada.id), w.event.slug, async () => {
+        const result = await meetings().createMeetingPoint(
+          ADMIN,
+          { eventId: w.event.id, name: "Lawn" },
+          NOW
+        );
+        ok(result);
+        if (result.ok) point = result.value;
+      });
+      await expectChangesSuffice(open(w.ada.id), w.event.slug, async () => {
+        ok(
+          await meetings().updateMeetingPoint(
+            ADMIN,
+            {
+              eventId: w.event.id,
+              id: point!.id,
+              name: "Lawn 2",
+              expectedVersion: point!.version,
+            },
+            NOW
+          )
+        );
+      });
+      await expectChangesSuffice(open(w.ada.id), w.event.slug, async () => {
+        ok(
+          await meetings().deleteMeetingPoint(
+            ADMIN,
+            { eventId: w.event.id, id: point!.id },
             NOW
           )
         );

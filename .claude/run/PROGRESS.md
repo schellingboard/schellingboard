@@ -535,6 +535,28 @@ cursor.invalid`. The use case now returns the whole list; the
   and double `list()` in delete and move stay (admin-only, small). Selectors
   skipping a removed room are now a task of step 14.
 
+- 12d: `guest.changed` (the lean guest plus `member`) and `guest.removed`, for
+  the event; `meetingPoint.changed|removed` for the event; `meeting.changed`
+  (audience: requester and recipient); `availability.changed` (the guest's
+  declared slots, to the guest; not in the plan, but the snapshot's
+  `me.availability` needs it). `recordingShownGuests` (`server/kernel`) diffs
+  the event's shown guests (members and hosts) around any work that joins,
+  removes or edits guests, so assign, remove, import, `ensureGuest`, admin
+  guest edit and delete, profile edits, and the admin paths that add hosts as
+  members all use it (new repo method `listShownEventIds`). `apply` also
+  updates `me.meetingGuests` from `guest.changed`, and adds the other party
+  of a new meeting from `guests`. Use cases that gained `now`: the guest and
+  meeting-point admin ones. `byAdmin`/`byGuest` in `server/kernel`.
+  Review: `addSession`/`changeSession`/`removeSession` and a day delete wrap
+  `recordingShownGuests` limited to the session's hosts (admin paths can make a
+  non-member a host). A guest delete runs `recordingSessionCascade` over the
+  sessions they hosted or RSVP'd (it now also records host changes and
+  `session.attendanceChanged`, marked cascade), then `guest.removed`, and
+  `meeting.deleted` per meeting (audience: its two guests; `apply` drops the
+  meeting and partners no meeting names). Meetings an event delete removes get
+  no change: `event.deleted` ends the event's replica, which `apply` keeps as
+  it is, so no one reads those meetings afterwards.
+
 ## Problems
 
 None.
@@ -560,4 +582,4 @@ None.
 
 ## Next step
 
-12d.
+13.

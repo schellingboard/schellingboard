@@ -1,6 +1,7 @@
 import { changes, type ChangeContext } from "@schellingboard/domain/change";
 import type { Session } from "@schellingboard/domain/session";
 import type { Actor } from "@/server/kernel/actor";
+import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import {
   conflict,
   forbidden,
@@ -290,7 +291,14 @@ async function seeded(
   if (clashing) return clashing;
 
   const created = await addSession(tx, { ...fields, eventId: event.id }, by);
-  if (hostIds.length > 0) await tx.guests.assignToEvent(event.id, hostIds);
+  if (hostIds.length > 0)
+    await recordingShownGuests(
+      tx,
+      [event.id],
+      () => tx.guests.assignToEvent(event.id, hostIds),
+      by,
+      hostIds
+    );
   if (locationIds.length > 0) {
     const had = new Set(await tx.locations.listLocationIdsByEvent(event.id));
     await tx.locations.assignToEvent(event.id, locationIds);

@@ -103,19 +103,21 @@ export function addAdminMeetingRoutes(
   });
 
   app.openapi(createPoint, async (c) => {
-    const result = await meetings().createMeetingPoint(c.var.actor, {
-      ...c.req.valid("json"),
-      eventId: c.req.valid("param").id,
-    });
+    const result = await meetings().createMeetingPoint(
+      c.var.actor,
+      { ...c.req.valid("json"), eventId: c.req.valid("param").id },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error);
     return c.json(result.value, 201);
   });
 
   app.openapi(updatePoint, async (c) => {
-    const result = await meetings().updateMeetingPoint(c.var.actor, {
-      ...c.req.valid("json"),
-      ...c.req.valid("param"),
-    });
+    const result = await meetings().updateMeetingPoint(
+      c.var.actor,
+      { ...c.req.valid("json"), ...c.req.valid("param") },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error, (p: MeetingPoint) => p);
     return c.json(result.value, 200);
   });
@@ -123,7 +125,8 @@ export function addAdminMeetingRoutes(
   app.openapi(deletePoint, async (c) => {
     const result = await meetings().deleteMeetingPoint(
       c.var.actor,
-      c.req.valid("param")
+      c.req.valid("param"),
+      c.var.now
     );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);

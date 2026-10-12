@@ -3,13 +3,13 @@ import { STALE_EVENT_MESSAGE } from "@schellingboard/contracts/event";
 import type { Event } from "@schellingboard/domain/event";
 import type { MeetingPoint } from "@schellingboard/domain/meeting";
 import type { Actor } from "@/server/kernel/actor";
+import { byAdmin } from "@/server/kernel/change-context";
 import {
   forbidden,
   invalid,
   notFound,
   ok,
   versionConflict,
-  type Failure,
   type Result,
 } from "@/server/kernel/result";
 import type { MeetingDeps } from "../ports";
@@ -78,7 +78,8 @@ export const createMeetingPoint =
   ({ uow }: MeetingDeps) =>
   async (
     actor: Actor,
-    input: MeetingPointInput
+    input: MeetingPointInput,
+    now: Date
   ): Promise<Result<MeetingPoint>> => {
     if (!actor.admin) return adminRequired();
     const name = input.name.trim();
@@ -87,37 +88,28 @@ export const createMeetingPoint =
       if (!(await tx.events.findById(input.eventId))) return eventNotFound();
 
       const existing = await tx.meetingPoints.listByEvent(input.eventId);
-      return ok(
-        await tx.meetingPoints.create({
-          eventId: input.eventId,
-          name,
-          description: input.description?.trim() ?? "",
-          // Max rather than length, so the order survives a deletion.
-          sortIndex:
-            existing.reduce((max, p) => Math.max(max, p.sortIndex), -1) + 1,
-        })
-      );
+      const created = await tx.meetingPoints.create({
+        eventId: input.eventId,
+        name,
+        description: input.description?.trim() ?? "",
+        // Max rather than length, so the order survives a deletion.
+        sortIndex:
+          existing.reduce((max, p) => Math.max(max, p.sortIndex), -1) + 1,
+      });
+      tx.record(changes.meetingPointChanged(created, byAdmin(now)));
+      return ok(created);
     });
   };
 
 const pointNotFound = () =>
   notFound("meetingPoint.notFound", "Meeting point not found");
 
-// Scoped to the event named, so an id from elsewhere can't reach another
-// event's points.
-async function missingPoint(
-  repos: MeetingDeps["repos"],
-  { eventId, id }: { eventId: string; id: string }
-): Promise<Failure | null> {
-  const points = await repos.meetingPoints.listByEvent(eventId);
-  return points.some((p) => p.id === id) ? null : pointNotFound();
-}
-
 export const updateMeetingPoint =
   ({ uow }: MeetingDeps) =>
   async (
     actor: Actor,
-    input: MeetingPointInput & { id: string; expectedVersion: number }
+    input: MeetingPointInput & { id: string; expectedVersion: number },
+    now: Date
   ): Promise<Result<MeetingPoint>> => {
     if (!actor.admin) return adminRequired();
     const name = input.name.trim();
@@ -138,19 +130,27 @@ export const updateMeetingPoint =
         description: input.description?.trim() ?? "",
         expectedVersion: input.expectedVersion,
       });
-      return updated ? ok(updated) : pointNotFound();
+      if (!updated) return pointNotFound();
+      tx.record(changes.meetingPointChanged(updated, byAdmin(now)));
+      return ok(updated);
     });
   };
 
 export const deleteMeetingPoint =
-  ({ repos }: MeetingDeps) =>
+  ({ uow }: MeetingDeps) =>
   async (
     actor: Actor,
-    input: { eventId: string; id: string }
+    input: { eventId: string; id: string },
+    now: Date
   ): Promise<Result<void>> => {
     if (!actor.admin) return adminRequired();
-    const missing = await missingPoint(repos, input);
-    if (missing) return missing;
-    await repos.meetingPoints.delete(input.id);
-    return ok(undefined);
+    return uow.run(async (tx) => {
+      const point = (await tx.meetingPoints.listByEvent(input.eventId)).find(
+        (p) => p.id === input.id
+      );
+      if (!point) return pointNotFound();
+      await tx.meetingPoints.delete(point.id);
+      tx.record(changes.meetingPointRemoved(point, byAdmin(now)));
+      return ok(undefined);
+    });
   };

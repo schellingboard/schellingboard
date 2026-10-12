@@ -58,7 +58,8 @@ export async function createMeetingPointAction(
 ): Promise<AdminActionResult> {
   const result = await meetingUseCases().createMeetingPoint(
     await actor(),
-    input
+    input,
+    await serverNow()
   );
   return settled(result, input.eventId);
 }
@@ -68,7 +69,8 @@ export async function updateMeetingPointAction(
 ): Promise<AdminActionResult> {
   const result = await meetingUseCases().updateMeetingPoint(
     await actor(),
-    input
+    input,
+    await serverNow()
   );
   return settled(result, input.eventId);
 }
@@ -79,7 +81,8 @@ export async function deleteMeetingPointAction(input: {
 }): Promise<AdminActionResult> {
   const result = await meetingUseCases().deleteMeetingPoint(
     await actor(),
-    input
+    input,
+    await serverNow()
   );
   return settled(result, input.eventId);
 }

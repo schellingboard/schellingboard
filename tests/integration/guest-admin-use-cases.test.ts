@@ -55,27 +55,47 @@ describe("guest admin use cases", () => {
       const refusals = [
         await guests().listGuests(NOBODY),
         await guests().createGuest(NOBODY, { name: "A", email: "a@x.org" }),
-        await guests().ensureGuest(NOBODY, { name: "A", email: "a@x.org" }),
-        await guests().updateGuest(NOBODY, {
-          id: guest.id,
-          expectedVersion: guest.version,
-          name: "A",
-          email: "a@x.org",
-        }),
-        await guests().deleteGuest(NOBODY, { id: guest.id }),
+        await guests().ensureGuest(
+          NOBODY,
+          { name: "A", email: "a@x.org" },
+          new Date()
+        ),
+        await guests().updateGuest(
+          NOBODY,
+          {
+            id: guest.id,
+            expectedVersion: guest.version,
+            name: "A",
+            email: "a@x.org",
+          },
+          new Date()
+        ),
+        await guests().deleteGuest(NOBODY, { id: guest.id }, new Date()),
         await guests().sendTestEmail(NOBODY, { id: guest.id }),
-        await guests().assignGuestsToEvent(NOBODY, {
-          eventId: event.id,
-          guestIds: [guest.id],
-        }),
-        await guests().removeGuestsFromEvent(NOBODY, {
-          eventId: event.id,
-          guestIds: [guest.id],
-        }),
-        await guests().importGuests(NOBODY, {
-          csv: "name,email\nA,a@x.org",
-          eventIds: [],
-        }),
+        await guests().assignGuestsToEvent(
+          NOBODY,
+          {
+            eventId: event.id,
+            guestIds: [guest.id],
+          },
+          new Date()
+        ),
+        await guests().removeGuestsFromEvent(
+          NOBODY,
+          {
+            eventId: event.id,
+            guestIds: [guest.id],
+          },
+          new Date()
+        ),
+        await guests().importGuests(
+          NOBODY,
+          {
+            csv: "name,email\nA,a@x.org",
+            eventIds: [],
+          },
+          new Date()
+        ),
         await site().getSiteSettings(NOBODY),
         await site().updateSiteSettings(NOBODY, {
           title: "T",
@@ -167,31 +187,43 @@ describe("guest admin use cases", () => {
       );
       expect(ada).toMatchObject({ name: "Ada", email: "ada@x.org" });
       expect(
-        await guests().updateGuest(ADMIN, {
-          id: ada.id,
-          expectedVersion: ada.version,
-          name: "Ada",
-          email: "taken@x.org",
-        })
+        await guests().updateGuest(
+          ADMIN,
+          {
+            id: ada.id,
+            expectedVersion: ada.version,
+            name: "Ada",
+            email: "taken@x.org",
+          },
+          new Date()
+        )
       ).toEqual(duplicate);
       expect(
         value(
-          await guests().updateGuest(ADMIN, {
-            id: ada.id,
-            expectedVersion: ada.version,
-            name: "Ada L.",
-            email: "ada@x.org",
-          })
+          await guests().updateGuest(
+            ADMIN,
+            {
+              id: ada.id,
+              expectedVersion: ada.version,
+              name: "Ada L.",
+              email: "ada@x.org",
+            },
+            new Date()
+          )
         )
       ).toMatchObject({ id: ada.id, name: "Ada L." });
       expect(
         code(
-          await guests().updateGuest(ADMIN, {
-            id: "nope",
-            expectedVersion: 1,
-            name: "X",
-            email: "x@x.org",
-          })
+          await guests().updateGuest(
+            ADMIN,
+            {
+              id: "nope",
+              expectedVersion: 1,
+              name: "X",
+              email: "x@x.org",
+            },
+            new Date()
+          )
         )
       ).toBe("guest.notFound");
       expect(taken.id).toBeTruthy();
@@ -207,12 +239,16 @@ describe("guest admin use cases", () => {
 
       const updated = await Promise.all(
         [ada, bo].map((guest) =>
-          guests().updateGuest(ADMIN, {
-            id: guest.id,
-            expectedVersion: guest.version,
-            name: "X",
-            email: "x@x.org",
-          })
+          guests().updateGuest(
+            ADMIN,
+            {
+              id: guest.id,
+              expectedVersion: guest.version,
+              name: "X",
+              email: "x@x.org",
+            },
+            new Date()
+          )
         )
       );
 
@@ -226,15 +262,23 @@ describe("guest admin use cases", () => {
     async () => {
       const event = await createEvent();
       const first = value(
-        await guests().ensureGuest(ADMIN, {
-          name: "Ada",
-          email: "ada@x.org",
-          eventSlug: event.slug,
-        })
+        await guests().ensureGuest(
+          ADMIN,
+          {
+            name: "Ada",
+            email: "ada@x.org",
+            eventSlug: event.slug,
+          },
+          new Date()
+        )
       );
       expect(first.created).toBe(true);
       const again = value(
-        await guests().ensureGuest(ADMIN, { name: "Other", email: "ADA@x.org" })
+        await guests().ensureGuest(
+          ADMIN,
+          { name: "Other", email: "ADA@x.org" },
+          new Date()
+        )
       );
       expect(again).toEqual({ id: first.id, created: false });
       expect(
@@ -242,11 +286,15 @@ describe("guest admin use cases", () => {
       ).toEqual([first.id]);
       expect(
         code(
-          await guests().ensureGuest(ADMIN, {
-            name: "Bo",
-            email: "bo@x.org",
-            eventSlug: "missing",
-          })
+          await guests().ensureGuest(
+            ADMIN,
+            {
+              name: "Bo",
+              email: "bo@x.org",
+              eventSlug: "missing",
+            },
+            new Date()
+          )
         )
       ).toBe("event.notFound");
       expect(
@@ -262,11 +310,15 @@ describe("guest admin use cases", () => {
       const event = await createEvent();
 
       await expect(
-        guests(uowFailingAt("guests", "assignToEvent")).ensureGuest(ADMIN, {
-          name: "Ada",
-          email: "ada@x.org",
-          eventSlug: event.slug,
-        })
+        guests(uowFailingAt("guests", "assignToEvent")).ensureGuest(
+          ADMIN,
+          {
+            name: "Ada",
+            email: "ada@x.org",
+            eventSlug: event.slug,
+          },
+          new Date()
+        )
       ).rejects.toThrow("guests.assignToEvent failed");
 
       expect(
@@ -297,11 +349,11 @@ describe("guest admin use cases", () => {
         },
       });
 
-      value(await guests().deleteGuest(ADMIN, { id: guest.id }));
+      value(await guests().deleteGuest(ADMIN, { id: guest.id }, new Date()));
       expect(await getRepositories().guests.findById(guest.id)).toBeUndefined();
-      expect(code(await guests().deleteGuest(ADMIN, { id: guest.id }))).toBe(
-        "guest.notFound"
-      );
+      expect(
+        code(await guests().deleteGuest(ADMIN, { id: guest.id }, new Date()))
+      ).toBe("guest.notFound");
       expect(code(await guests().sendTestEmail(ADMIN, { id: guest.id }))).toBe(
         "guest.notFound"
       );
@@ -321,34 +373,50 @@ describe("guest admin use cases", () => {
 
       expect(
         code(
-          await guests().assignGuestsToEvent(ADMIN, {
-            eventId: "nope",
-            guestIds: [guest.id],
-          })
+          await guests().assignGuestsToEvent(
+            ADMIN,
+            {
+              eventId: "nope",
+              guestIds: [guest.id],
+            },
+            new Date()
+          )
         )
       ).toBe("event.notFound");
       expect(
         code(
-          await guests().assignGuestsToEvent(ADMIN, {
-            eventId: event.id,
-            guestIds: [guest.id, "nope"],
-          })
+          await guests().assignGuestsToEvent(
+            ADMIN,
+            {
+              eventId: event.id,
+              guestIds: [guest.id, "nope"],
+            },
+            new Date()
+          )
         )
       ).toBe("guest.unknown");
       expect(await assigned()).toEqual([]);
 
       value(
-        await guests().assignGuestsToEvent(ADMIN, {
-          eventId: event.id,
-          guestIds: [guest.id, guest.id],
-        })
+        await guests().assignGuestsToEvent(
+          ADMIN,
+          {
+            eventId: event.id,
+            guestIds: [guest.id, guest.id],
+          },
+          new Date()
+        )
       );
       expect(await assigned()).toEqual([guest.id]);
       value(
-        await guests().removeGuestsFromEvent(ADMIN, {
-          eventId: event.id,
-          guestIds: [guest.id],
-        })
+        await guests().removeGuestsFromEvent(
+          ADMIN,
+          {
+            eventId: event.id,
+            guestIds: [guest.id],
+          },
+          new Date()
+        )
       );
       expect(await assigned()).toEqual([]);
     }
@@ -362,11 +430,15 @@ describe("guest admin use cases", () => {
       const guest = await createGuest();
 
       const [deleted, added] = await Promise.all([
-        guests().deleteGuest(ADMIN, { id: guest.id }),
-        guests().assignGuestsToEvent(ADMIN, {
-          eventId: event.id,
-          guestIds: [guest.id],
-        }),
+        guests().deleteGuest(ADMIN, { id: guest.id }, new Date()),
+        guests().assignGuestsToEvent(
+          ADMIN,
+          {
+            eventId: event.id,
+            guestIds: [guest.id],
+          },
+          new Date()
+        ),
       ]);
 
       expect(code(deleted)).toBe("ok");
@@ -383,10 +455,14 @@ describe("guest admin use cases", () => {
 
       const [, imported] = await Promise.all([
         getRepositories().events.delete(event.id),
-        guests().importGuests(ADMIN, {
-          csv: "name,email\nAda,ada@x.org",
-          eventIds: [event.id],
-        }),
+        guests().importGuests(
+          ADMIN,
+          {
+            csv: "name,email\nAda,ada@x.org",
+            eventIds: [event.id],
+          },
+          new Date()
+        ),
       ]);
 
       expect(["ok", "event.notFound"]).toContain(code(imported));
@@ -400,10 +476,14 @@ describe("guest admin use cases", () => {
       const event = await createEvent();
       await createGuest({ email: "old@x.org" });
 
-      const rejected = await guests().importGuests(ADMIN, {
-        csv: "name,email\n,a@x.org\nBo,nope",
-        eventIds: [event.id],
-      });
+      const rejected = await guests().importGuests(
+        ADMIN,
+        {
+          csv: "name,email\n,a@x.org\nBo,nope",
+          eventIds: [event.id],
+        },
+        new Date()
+      );
       expect(rejected).toEqual({
         ok: false,
         error: {
@@ -418,20 +498,28 @@ describe("guest admin use cases", () => {
       });
       expect(
         code(
-          await guests().importGuests(ADMIN, {
-            csv: "name,email\nAda,ada@x.org",
-            eventIds: ["nope"],
-          })
+          await guests().importGuests(
+            ADMIN,
+            {
+              csv: "name,email\nAda,ada@x.org",
+              eventIds: ["nope"],
+            },
+            new Date()
+          )
         )
       ).toBe("event.notFound");
       expect(await getRepositories().guests.listFull()).toHaveLength(1);
 
       expect(
         value(
-          await guests().importGuests(ADMIN, {
-            csv: "name,email\nAda,ada@x.org\nOld,OLD@x.org",
-            eventIds: [event.id, event.id],
-          })
+          await guests().importGuests(
+            ADMIN,
+            {
+              csv: "name,email\nAda,ada@x.org\nOld,OLD@x.org",
+              eventIds: [event.id, event.id],
+            },
+            new Date()
+          )
         )
       ).toEqual({ created: 1, existing: 1 });
       expect(await getRepositories().guests.listByEvent(event.id)).toHaveLength(

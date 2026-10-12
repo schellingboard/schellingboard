@@ -3,6 +3,7 @@ import { inSchedPhase } from "@schellingboard/domain/phase";
 import type { Rsvp, Session } from "@schellingboard/domain/session";
 import { actingAsNamedGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
+import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import {
   conflict,
   forbidden,
@@ -175,7 +176,12 @@ export const adminAddRsvp =
         rsvp = added.value;
         await recordRsvpAdded(tx, rsvp, { actor: { type: "admin" }, at: now });
       }
-      await tx.guests.assignToEvent(session.eventId, [input.guestId]);
+      await recordingShownGuests(
+        tx,
+        [session.eventId],
+        () => tx.guests.assignToEvent(session.eventId, [input.guestId]),
+        { actor: { type: "admin" }, at: now }
+      );
       return ok({ rsvp, created: !existing });
     });
   };
