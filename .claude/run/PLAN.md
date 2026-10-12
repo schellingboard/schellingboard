@@ -116,7 +116,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
   - [x] 11a. Command core (`commands/runner.ts`) and RSVP add and remove.
   - [x] 11b. Comment create.
   - [x] 11c. `queries/`: attendee list and paged comments.
-- [ ] 12. **The shell**: `ui/` primitives, layout, nav, user picker (step 7a),
+- [x] 12. **The shell**: `ui/` primitives, layout, nav, user picker (step 7a),
       theme (ADR 0005 cookie), footer with version and release notes, sync
       indicator, error boundary, the dev toolbar's time travel when dev tools are
       on. Links to unmoved screens go to `/legacy/…` directly.
@@ -124,7 +124,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
   - [x] 12a. `ui/` primitives, layout, nav.
   - [x] 12b. Viewer provider, user picker, protected-name redirect.
   - [x] 12c. Theme, footer with release notes, dev toolbar.
-  - [ ] 12d. Sync indicator, error boundary.
+  - [x] 12d. Sync indicator, error boundary.
 - [ ] 13. **Schedule screens**: grid, agenda, filters, now line, day fold, drag
       to pan, scroll restoration, and the meetings column read-only from the
       replica (booking and the meeting modal link to legacy). Not routed yet:

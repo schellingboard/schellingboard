@@ -73,6 +73,15 @@ it writes the `time-override` cookie and calls `onChange`, which the shell makes
 app so the replica is read under the new time. The legacy toolbar's "Send due reminders"
 button has no SPA counterpart.
 
+## Sync indicator, error boundary and the shell
+
+`SyncIndicator` shows the replica's link state (`useSyncState`: live, reconnecting after a
+short grace, stale) and re-renders at the instant it next changes. `ErrorBoundary` keeps
+the nav and footer when one screen crashes (try again, reload, or open `/legacy`). `Shell`
+(`app/shell.tsx`) composes theme, viewer, layout, nav, user menu, footer, boundary and dev
+clock from props (events, the picker's guests, location); the router does not mount it
+before step 13, so the catch-all still forwards every path.
+
 ## Tests
 
 Unit tests sit next to the code (`*.test.ts(x)`) and run in the `web` Vitest project
