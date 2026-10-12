@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { eventUseCases } from "@/server/composition";
 import { resolveActor } from "@/server/kernel/actor";
+import { serverNow } from "@/utils/dev-clock-server";
 import type { Result } from "@/server/kernel/result";
 import type { AdminActionResult } from "./admin-guests";
 
@@ -68,32 +69,42 @@ export async function createEventAction(
 export async function updateEventAction(
   input: EventInput & { id: string; expectedVersion: number }
 ): Promise<AdminActionResult> {
-  const result = await eventUseCases().updateEvent(await actor(), {
-    ...settings(input),
-    id: input.id,
-    expectedVersion: input.expectedVersion,
-  });
+  const result = await eventUseCases().updateEvent(
+    await actor(),
+    {
+      ...settings(input),
+      id: input.id,
+      expectedVersion: input.expectedVersion,
+    },
+    await serverNow()
+  );
   return settled(result, input.id);
 }
 
 export async function updateEventPhasesAction(
   input: EventPhasesInput
 ): Promise<AdminActionResult> {
-  const result = await eventUseCases().updateEventPhases(await actor(), {
-    id: input.id,
-    expectedVersion: input.expectedVersion,
-    proposalPhaseStart: phaseDate(input.proposalPhaseStart),
-    proposalPhaseEnd: phaseDate(input.proposalPhaseEnd),
-    votingPhaseStart: phaseDate(input.votingPhaseStart),
-    votingPhaseEnd: phaseDate(input.votingPhaseEnd),
-    schedulingPhaseStart: phaseDate(input.schedulingPhaseStart),
-    schedulingPhaseEnd: phaseDate(input.schedulingPhaseEnd),
-  });
+  const result = await eventUseCases().updateEventPhases(
+    await actor(),
+    {
+      id: input.id,
+      expectedVersion: input.expectedVersion,
+      proposalPhaseStart: phaseDate(input.proposalPhaseStart),
+      proposalPhaseEnd: phaseDate(input.proposalPhaseEnd),
+      votingPhaseStart: phaseDate(input.votingPhaseStart),
+      votingPhaseEnd: phaseDate(input.votingPhaseEnd),
+      schedulingPhaseStart: phaseDate(input.schedulingPhaseStart),
+      schedulingPhaseEnd: phaseDate(input.schedulingPhaseEnd),
+    },
+    await serverNow()
+  );
   return settled(result, input.id);
 }
 
 export async function deleteEventAction(input: {
   id: string;
 }): Promise<AdminActionResult> {
-  return settled(await eventUseCases().deleteEvent(await actor(), input));
+  return settled(
+    await eventUseCases().deleteEvent(await actor(), input, await serverNow())
+  );
 }

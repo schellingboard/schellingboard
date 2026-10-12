@@ -167,8 +167,12 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
       types.
   - [x] 12a. Sessions (create, change, delete, cascades) and RSVPs (add, remove, with the
         session's new count).
-  - 12b. Events, days, locations and their event assignment, room unavailability.
-  - 12c. Guests joining or leaving an event, public profile edits; meetings (audience:
+  - [x] 12b. Events and days (settings, phases, meeting settings, day edits, event and
+        day deletes), and the `cascade: true` marker with the session cascades they cause.
+        Split from the original 12b: every use case needs the request clock threaded in.
+  - 12c. Locations and their event assignment, room unavailability, and the session
+    cascades of a location delete.
+  - 12d. Guests joining or leaving an event, public profile edits; meetings (audience:
     the two guests) and meeting points.
 - [ ] 13. **Feed endpoint and hub**: replay from the table, then live from the hub in
       `seq` order; audience filter per connection; heartbeat; `410`; cleanup on

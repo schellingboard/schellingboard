@@ -436,7 +436,8 @@ describe("declaring availability", () => {
             maxSessionDuration: 120,
             breakMinutes: 0,
             slotIncrementMinutes: 60,
-          }
+          },
+          now()
         ),
       ]);
 
@@ -458,13 +459,18 @@ describe("organizer settings", () => {
     async () => {
       const event = await createEvent();
       const update = async (actor: Actor, cap?: number) =>
-        meetings().updateEventMeetings(actor, {
-          eventId: event.id,
-          meetingsEnabled: true,
-          maxOpenMeetingRequests: cap,
-          expectedVersion: (await getRepositories().events.findById(event.id))!
-            .version,
-        });
+        meetings().updateEventMeetings(
+          actor,
+          {
+            eventId: event.id,
+            meetingsEnabled: true,
+            maxOpenMeetingRequests: cap,
+            expectedVersion: (await getRepositories().events.findById(
+              event.id
+            ))!.version,
+          },
+          now()
+        );
 
       expect(code(await update(open("x"), 3))).toBe("admin.required");
       expect(code(await update(ADMIN, 0))).toBe("meeting.capInvalid");
@@ -476,11 +482,15 @@ describe("organizer settings", () => {
       });
       expect(
         code(
-          await meetings().updateEventMeetings(ADMIN, {
-            eventId: "nope",
-            meetingsEnabled: false,
-            expectedVersion: 1,
-          })
+          await meetings().updateEventMeetings(
+            ADMIN,
+            {
+              eventId: "nope",
+              meetingsEnabled: false,
+              expectedVersion: 1,
+            },
+            now()
+          )
         )
       ).toBe("event.notFound");
     }

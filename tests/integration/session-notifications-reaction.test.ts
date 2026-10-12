@@ -17,7 +17,10 @@ import {
 import { runJobs } from "../helpers/jobs";
 import { getRepositories } from "@/db/container";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
-import { recordRsvpAdded } from "@/server/modules/sessions/module";
+import {
+  recordRsvpAdded,
+  removeSession,
+} from "@/server/modules/sessions/module";
 import { pruneChanges } from "@/utils/jobs/reactions";
 
 const AT = new Date("2026-06-01T10:00:00.000Z");
@@ -128,5 +131,25 @@ describe("session notifications from the change log", () => {
     expect(vi.mocked(sendMail).mock.calls.map(([m]) => m.to)).toEqual([
       "rsvper@test.example",
     ]);
+  });
+
+  it("does not tell anyone about a session a cascade removed", async () => {
+    const event = await createEvent();
+    const rsvper = await createGuest({ email: "rsvper@test.example" });
+    const session = await createSession(event.id, {
+      startTime: new Date("2026-06-02T09:00:00.000Z"),
+      endTime: new Date("2026-06-02T10:00:00.000Z"),
+    });
+    await getRepositories().rsvps.create({
+      sessionId: session.id,
+      guestId: rsvper.id,
+    });
+
+    await unitOfWork.run((tx) =>
+      removeSession(tx, session.id, { ...BY_TEST_AT, cascade: true })
+    );
+    await runJobs();
+
+    expect(sendMail).not.toHaveBeenCalled();
   });
 });

@@ -9,6 +9,21 @@ export function apply(replica: Snapshot, message: FeedMessage): Snapshot {
   if (message.seq <= replica.seq) return replica;
   const next = { ...replica, seq: message.seq };
   switch (message.type) {
+    case "event.changed":
+      next.event = message.event;
+      return next;
+    case "day.created":
+    case "day.changed": {
+      const { day } = message;
+      const others = next.days.filter((d) => d.id !== day.id);
+      next.days = [...others, day].sort((a, b) =>
+        a.start < b.start ? -1 : a.start > b.start ? 1 : 0
+      );
+      return next;
+    }
+    case "day.deleted":
+      next.days = next.days.filter((d) => d.id !== message.dayId);
+      return next;
     case "session.created":
     case "session.changed": {
       const { session } = message;

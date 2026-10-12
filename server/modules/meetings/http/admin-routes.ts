@@ -90,10 +90,14 @@ export function addAdminMeetingRoutes(
   meetings: () => MeetingUseCases
 ) {
   app.openapi(updateEventMeetings, async (c) => {
-    const result = await meetings().updateEventMeetings(c.var.actor, {
-      ...c.req.valid("json"),
-      eventId: c.req.valid("param").id,
-    });
+    const result = await meetings().updateEventMeetings(
+      c.var.actor,
+      {
+        ...c.req.valid("json"),
+        eventId: c.req.valid("param").id,
+      },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error, toEventView);
     return c.json(toEventView(result.value), 200);
   });

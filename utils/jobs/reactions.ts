@@ -40,6 +40,12 @@ export const sessionNotifications = reaction(
     // Dated by the clock of whoever made the change, so the dev fake clock
     // reaches the notice (ADR 0004).
     const now = change.occurredAt;
+    if (
+      (change.type === "session.changed" ||
+        change.type === "session.deleted") &&
+      change.payload.cascade
+    )
+      return;
     if (change.type === "session.changed") {
       await notifySessionChanged({ ...change.payload, changedById, now });
     } else if (change.type === "session.deleted") {

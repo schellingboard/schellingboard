@@ -19,6 +19,7 @@ import type { Actor } from "@/server/kernel/actor";
 import type { Result } from "@/server/kernel/result";
 
 const ADMIN: Actor = { admin: true, guest: null };
+const NOW = new Date();
 const NOBODY: Actor = { admin: false, guest: null };
 const DAY = isoDay(30);
 const at = (time: string) => new Date(`${DAY}T${time}:00.000Z`);
@@ -93,24 +94,40 @@ describe("event use cases", () => {
       const day = await createDay(event.id);
       const refusals = [
         await events().createEvent(NOBODY, settings),
-        await events().updateEvent(NOBODY, {
-          ...settings,
-          id: event.id,
-          expectedVersion: event.version,
-        }),
-        await events().updateEventPhases(NOBODY, {
-          ...noPhases,
-          id: event.id,
-          expectedVersion: event.version,
-        }),
-        await events().deleteEvent(NOBODY, { id: event.id }),
-        await events().createDay(NOBODY, { ...dayWindow, eventId: event.id }),
-        await events().updateDay(NOBODY, {
-          ...dayWindow,
-          id: day.id,
-          expectedVersion: day.version,
-        }),
-        await events().deleteDay(NOBODY, { id: day.id }),
+        await events().updateEvent(
+          NOBODY,
+          {
+            ...settings,
+            id: event.id,
+            expectedVersion: event.version,
+          },
+          NOW
+        ),
+        await events().updateEventPhases(
+          NOBODY,
+          {
+            ...noPhases,
+            id: event.id,
+            expectedVersion: event.version,
+          },
+          NOW
+        ),
+        await events().deleteEvent(NOBODY, { id: event.id }, NOW),
+        await events().createDay(
+          NOBODY,
+          { ...dayWindow, eventId: event.id },
+          NOW
+        ),
+        await events().updateDay(
+          NOBODY,
+          {
+            ...dayWindow,
+            id: day.id,
+            expectedVersion: day.version,
+          },
+          NOW
+        ),
+        await events().deleteDay(NOBODY, { id: day.id }, NOW),
       ];
       expect(refusals.map(code)).toEqual(
         Array(refusals.length).fill("admin.required")
@@ -150,7 +167,11 @@ describe("event use cases", () => {
         rsvpCapacityHardLimit: false,
       });
       const day = value(
-        await events().createDay(ADMIN, { ...dayWindow, eventId: event.id })
+        await events().createDay(
+          ADMIN,
+          { ...dayWindow, eventId: event.id },
+          NOW
+        )
       );
 
       expect(value(await events().listEvents())).toMatchObject([
@@ -220,24 +241,32 @@ describe("event use cases", () => {
         at("10:00"),
       ]);
 
-      const misaligned = await events().updateEvent(ADMIN, {
-        ...settings,
-        id: event.id,
-        expectedVersion: event.version,
-        slotIncrementMinutes: 45,
-      });
+      const misaligned = await events().updateEvent(
+        ADMIN,
+        {
+          ...settings,
+          id: event.id,
+          expectedVersion: event.version,
+          slotIncrementMinutes: 45,
+        },
+        NOW
+      );
       expect(misaligned).toMatchObject({
         ok: false,
         error: { kind: "conflict", code: "event.slotIncrementMisaligned" },
       });
 
       const coarser = value(
-        await events().updateEvent(ADMIN, {
-          ...settings,
-          id: event.id,
-          expectedVersion: event.version,
-          slotIncrementMinutes: 60,
-        })
+        await events().updateEvent(
+          ADMIN,
+          {
+            ...settings,
+            id: event.id,
+            expectedVersion: event.version,
+            slotIncrementMinutes: 60,
+          },
+          NOW
+        )
       );
       expect(coarser.slotIncrementMinutes).toBe(60);
       expect(
@@ -245,11 +274,15 @@ describe("event use cases", () => {
       ).toEqual([]);
       expect(
         code(
-          await events().updateEvent(ADMIN, {
-            ...settings,
-            id: "nope",
-            expectedVersion: 1,
-          })
+          await events().updateEvent(
+            ADMIN,
+            {
+              ...settings,
+              id: "nope",
+              expectedVersion: 1,
+            },
+            NOW
+          )
         )
       ).toBe("event.notFound");
     }
@@ -269,12 +302,16 @@ describe("event use cases", () => {
       await expect(
         events(
           uowFailingAt("meetingAvailability", "deleteByEvent")
-        ).updateEvent(ADMIN, {
-          ...settings,
-          id: event.id,
-          expectedVersion: event.version,
-          slotIncrementMinutes: 60,
-        })
+        ).updateEvent(
+          ADMIN,
+          {
+            ...settings,
+            id: event.id,
+            expectedVersion: event.version,
+            slotIncrementMinutes: 60,
+          },
+          NOW
+        )
       ).rejects.toThrow("meetingAvailability.deleteByEvent failed");
 
       expect(
@@ -293,17 +330,25 @@ describe("event use cases", () => {
       const event = await createEvent({ slotIncrementMinutes: 15 });
 
       const [day, changed] = await Promise.all([
-        events().createDay(ADMIN, {
-          ...dayWindow,
-          eventId: event.id,
-          end: at("18:15"),
-        }),
-        events().updateEvent(ADMIN, {
-          ...settings,
-          id: event.id,
-          expectedVersion: event.version,
-          slotIncrementMinutes: 60,
-        }),
+        events().createDay(
+          ADMIN,
+          {
+            ...dayWindow,
+            eventId: event.id,
+            end: at("18:15"),
+          },
+          NOW
+        ),
+        events().updateEvent(
+          ADMIN,
+          {
+            ...settings,
+            id: event.id,
+            expectedVersion: event.version,
+            slotIncrementMinutes: 60,
+          },
+          NOW
+        ),
       ]);
 
       expect([code(day), code(changed)].filter((c) => c === "ok")).toHaveLength(
@@ -318,13 +363,17 @@ describe("event use cases", () => {
     async () => {
       const event = await createEvent();
       const set = value(
-        await events().updateEventPhases(ADMIN, {
-          ...noPhases,
-          id: event.id,
-          expectedVersion: event.version,
-          proposalPhaseStart: at("08:00"),
-          votingPhaseStart: at("12:00"),
-        })
+        await events().updateEventPhases(
+          ADMIN,
+          {
+            ...noPhases,
+            id: event.id,
+            expectedVersion: event.version,
+            proposalPhaseStart: at("08:00"),
+            votingPhaseStart: at("12:00"),
+          },
+          NOW
+        )
       );
       expect(set).toMatchObject({
         proposalPhaseStart: at("08:00"),
@@ -332,13 +381,17 @@ describe("event use cases", () => {
       });
       expect(set.schedulingPhaseStart).toBeUndefined();
 
-      const outOfOrder = await events().updateEventPhases(ADMIN, {
-        ...noPhases,
-        id: event.id,
-        expectedVersion: event.version,
-        proposalPhaseStart: at("12:00"),
-        votingPhaseStart: at("08:00"),
-      });
+      const outOfOrder = await events().updateEventPhases(
+        ADMIN,
+        {
+          ...noPhases,
+          id: event.id,
+          expectedVersion: event.version,
+          proposalPhaseStart: at("12:00"),
+          votingPhaseStart: at("08:00"),
+        },
+        NOW
+      );
       expect(outOfOrder).toEqual({
         ok: false,
         error: {
@@ -349,21 +402,29 @@ describe("event use cases", () => {
       });
       expect(
         code(
-          await events().updateEventPhases(ADMIN, {
-            ...noPhases,
-            id: event.id,
-            expectedVersion: event.version,
-            votingPhaseEnd: new Date("nonsense"),
-          })
+          await events().updateEventPhases(
+            ADMIN,
+            {
+              ...noPhases,
+              id: event.id,
+              expectedVersion: event.version,
+              votingPhaseEnd: new Date("nonsense"),
+            },
+            NOW
+          )
         )
       ).toBe("event.phaseDateInvalid");
       expect(
         code(
-          await events().updateEventPhases(ADMIN, {
-            ...noPhases,
-            id: "nope",
-            expectedVersion: 1,
-          })
+          await events().updateEventPhases(
+            ADMIN,
+            {
+              ...noPhases,
+              id: "nope",
+              expectedVersion: 1,
+            },
+            NOW
+          )
         )
       ).toBe("event.notFound");
     }
@@ -371,11 +432,11 @@ describe("event use cases", () => {
 
   it("deletes an event", { tags: ["015-US2"] }, async () => {
     const event = await createEvent();
-    value(await events().deleteEvent(ADMIN, { id: event.id }));
+    value(await events().deleteEvent(ADMIN, { id: event.id }, NOW));
     expect(code(await events().getEvent(ADMIN, { id: event.id }))).toBe(
       "event.notFound"
     );
-    expect(code(await events().deleteEvent(ADMIN, { id: event.id }))).toBe(
+    expect(code(await events().deleteEvent(ADMIN, { id: event.id }, NOW))).toBe(
       "event.notFound"
     );
   });
@@ -388,42 +449,68 @@ describe("day use cases", () => {
     async () => {
       const event = await createEvent();
       value(
-        await events().createDay(ADMIN, { ...dayWindow, eventId: event.id })
+        await events().createDay(
+          ADMIN,
+          { ...dayWindow, eventId: event.id },
+          NOW
+        )
       );
       expect(
         code(
-          await events().createDay(ADMIN, { ...dayWindow, eventId: event.id })
+          await events().createDay(
+            ADMIN,
+            { ...dayWindow, eventId: event.id },
+            NOW
+          )
         )
       ).toBe("day.overlap");
       expect(
         code(
-          await events().createDay(ADMIN, {
-            ...dayWindow,
-            eventId: event.id,
-            end: at("17:50"),
-          })
+          await events().createDay(
+            ADMIN,
+            {
+              ...dayWindow,
+              eventId: event.id,
+              end: at("17:50"),
+            },
+            NOW
+          )
         )
       ).toBe("day.misaligned");
       expect(
         code(
-          await events().createDay(ADMIN, {
-            ...dayWindow,
-            eventId: event.id,
-            start: undefined,
-          })
+          await events().createDay(
+            ADMIN,
+            {
+              ...dayWindow,
+              eventId: event.id,
+              start: undefined,
+            },
+            NOW
+          )
         )
       ).toBe("day.dateInvalid");
       expect(
         code(
-          await events().createDay(ADMIN, {
-            ...dayWindow,
-            eventId: event.id,
-            startBookings: at("07:00"),
-          })
+          await events().createDay(
+            ADMIN,
+            {
+              ...dayWindow,
+              eventId: event.id,
+              startBookings: at("07:00"),
+            },
+            NOW
+          )
         )
       ).toBe("day.windowInvalid");
       expect(
-        code(await events().createDay(ADMIN, { ...dayWindow, eventId: "nope" }))
+        code(
+          await events().createDay(
+            ADMIN,
+            { ...dayWindow, eventId: "nope" },
+            NOW
+          )
+        )
       ).toBe("event.notFound");
     }
   );
@@ -440,13 +527,17 @@ describe("day use cases", () => {
         endTime: at("17:00"),
       });
 
-      const shrunk = await events().updateDay(ADMIN, {
-        ...dayWindow,
-        id: day.id,
-        expectedVersion: day.version,
-        end: at("16:00"),
-        endBookings: at("16:00"),
-      });
+      const shrunk = await events().updateDay(
+        ADMIN,
+        {
+          ...dayWindow,
+          id: day.id,
+          expectedVersion: day.version,
+          end: at("16:00"),
+          endBookings: at("16:00"),
+        },
+        NOW
+      );
       expect(shrunk).toEqual({
         ok: false,
         error: {
@@ -458,21 +549,29 @@ describe("day use cases", () => {
       });
 
       const grown = value(
-        await events().updateDay(ADMIN, {
-          ...dayWindow,
-          id: day.id,
-          expectedVersion: day.version,
-          end: at("19:00"),
-        })
+        await events().updateDay(
+          ADMIN,
+          {
+            ...dayWindow,
+            id: day.id,
+            expectedVersion: day.version,
+            end: at("19:00"),
+          },
+          NOW
+        )
       );
       expect(grown).toMatchObject({ id: day.id, end: at("19:00") });
       expect(
         code(
-          await events().updateDay(ADMIN, {
-            ...dayWindow,
-            id: "nope",
-            expectedVersion: 1,
-          })
+          await events().updateDay(
+            ADMIN,
+            {
+              ...dayWindow,
+              id: "nope",
+              expectedVersion: 1,
+            },
+            NOW
+          )
         )
       ).toBe("day.notFound");
     }
@@ -485,8 +584,8 @@ describe("day use cases", () => {
       const event = await createEvent();
 
       const added = await Promise.all([
-        events().createDay(ADMIN, { ...dayWindow, eventId: event.id }),
-        events().createDay(ADMIN, { ...dayWindow, eventId: event.id }),
+        events().createDay(ADMIN, { ...dayWindow, eventId: event.id }, NOW),
+        events().createDay(ADMIN, { ...dayWindow, eventId: event.id }, NOW),
       ]);
 
       expect(added.map(code).sort()).toEqual(["day.overlap", "ok"]);
@@ -503,13 +602,17 @@ describe("day use cases", () => {
       const day = await createDay(event.id, dayWindow);
 
       const [shrunk, booked] = await Promise.all([
-        events().updateDay(ADMIN, {
-          ...dayWindow,
-          id: day.id,
-          expectedVersion: day.version,
-          end: at("16:00"),
-          endBookings: at("16:00"),
-        }),
+        events().updateDay(
+          ADMIN,
+          {
+            ...dayWindow,
+            id: day.id,
+            expectedVersion: day.version,
+            end: at("16:00"),
+            endBookings: at("16:00"),
+          },
+          NOW
+        ),
         sessions().createSession(
           { admin: false, guest: { id: host.id, level: "open" } },
           {
@@ -535,8 +638,10 @@ describe("day use cases", () => {
   it("deletes a day", { tags: ["015-US4"] }, async () => {
     const event = await createEvent();
     const day = await createDay(event.id);
-    expect(value(await events().deleteDay(ADMIN, { id: day.id }))).toEqual(day);
-    expect(code(await events().deleteDay(ADMIN, { id: day.id }))).toBe(
+    expect(value(await events().deleteDay(ADMIN, { id: day.id }, NOW))).toEqual(
+      day
+    );
+    expect(code(await events().deleteDay(ADMIN, { id: day.id }, NOW))).toBe(
       "day.notFound"
     );
   });
@@ -889,7 +994,7 @@ describe("venue use cases", () => {
 
       const [created] = await Promise.all([
         venue().createLocation(ADMIN, { ...room, eventIds: [event.id] }),
-        events().deleteEvent(ADMIN, { id: event.id }),
+        events().deleteEvent(ADMIN, { id: event.id }, NOW),
       ]);
 
       expect(["ok", "location.invalid"]).toContain(code(created));

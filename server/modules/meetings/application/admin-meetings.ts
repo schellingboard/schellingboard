@@ -1,3 +1,4 @@
+import { changes } from "@schellingboard/domain/change";
 import { STALE_EVENT_MESSAGE } from "@schellingboard/contracts/event";
 import type { Event } from "@schellingboard/domain/event";
 import type { MeetingPoint } from "@schellingboard/domain/meeting";
@@ -33,7 +34,11 @@ const nameRequired = () =>
 
 export const updateEventMeetings =
   ({ uow }: MeetingDeps) =>
-  async (actor: Actor, input: EventMeetingsInput): Promise<Result<Event>> => {
+  async (
+    actor: Actor,
+    input: EventMeetingsInput,
+    now: Date
+  ): Promise<Result<Event>> => {
     if (!actor.admin) return adminRequired();
     // The cap is hidden while meetings are off, so judging it then would leave
     // the organizer unable to switch meetings off over a field they cannot see.
@@ -61,7 +66,11 @@ export const updateEventMeetings =
         ...patch,
         expectedVersion: input.expectedVersion,
       });
-      return updated ? ok(updated) : eventNotFound();
+      if (!updated) return eventNotFound();
+      tx.record(
+        changes.eventChanged(updated, { actor: { type: "admin" }, at: now })
+      );
+      return ok(updated);
     });
   };
 

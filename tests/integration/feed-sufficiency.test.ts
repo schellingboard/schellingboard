@@ -3,6 +3,7 @@ import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { deleteLoggedSession, updateLoggedSession } from "../helpers/changes";
 import {
+  createDay,
   createEvent,
   createGuest,
   createLocation,
@@ -12,6 +13,7 @@ import { expectChangesSuffice } from "../helpers/sufficiency";
 import { getRepositories } from "@/db/container";
 import type { Actor } from "@/server/kernel/actor";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
+import { createEventUseCases } from "@/server/modules/events/module";
 import { createSessionUseCases } from "@/server/modules/sessions/module";
 
 const NINE = new Date("2026-06-02T09:00:00.000Z");
@@ -25,6 +27,9 @@ const sessions = () =>
     notifyCohostsAdded: async () => {},
     uow: unitOfWork,
   });
+
+const events = () =>
+  createEventUseCases({ repos: getRepositories(), uow: unitOfWork });
 
 describe("the logged changes suffice to keep a replica current", () => {
   beforeAll(() => setupTestDb());
@@ -204,6 +209,121 @@ describe("the logged changes suffice to keep a replica current", () => {
       await expectChangesSuffice(w.actor(w.guest.id), w.scheduling.slug, () =>
         deleteLoggedSession(w.talk.id)
       );
+    });
+  });
+
+  describe("with events and days", () => {
+    async function dayWorld() {
+      const scheduling = await createEvent({ phase: "scheduling" });
+      const guest = await createGuest({ eventId: scheduling.id });
+      const day = await createDay(scheduling.id, {
+        start: new Date("2026-06-02T08:00:00.000Z"),
+        end: new Date("2026-06-02T18:00:00.000Z"),
+        startBookings: new Date("2026-06-02T09:00:00.000Z"),
+        endBookings: new Date("2026-06-02T17:00:00.000Z"),
+      });
+      const talk = await createSession(scheduling.id, {
+        title: "On the day",
+        startTime: NINE,
+        endTime: TEN,
+      });
+      await getRepositories().rsvps.create({
+        sessionId: talk.id,
+        guestId: guest.id,
+      });
+      const viewer: Actor = {
+        admin: false,
+        guest: { id: guest.id, level: "open" },
+      };
+      return { scheduling, guest, day, talk, viewer };
+    }
+
+    const settingsOf = (e: Awaited<ReturnType<typeof createEvent>>) => ({
+      name: e.name,
+      description: e.description,
+      website: e.website,
+      timezone: e.timezone,
+      maxSessionDuration: e.maxSessionDuration,
+      breakMinutes: e.breakMinutes,
+      slotIncrementMinutes: e.slotIncrementMinutes,
+    });
+
+    it("for event settings", async () => {
+      const w = await dayWorld();
+      await expectChangesSuffice(w.viewer, w.scheduling.slug, async () => {
+        const result = await events().updateEvent(
+          ADMIN,
+          {
+            ...settingsOf(w.scheduling),
+            name: "Renamed event",
+            id: w.scheduling.id,
+            expectedVersion: w.scheduling.version,
+          },
+          NOW
+        );
+        expect(result.ok).toBe(true);
+      });
+    });
+
+    it("for event phases", async () => {
+      const w = await dayWorld();
+      await expectChangesSuffice(w.viewer, w.scheduling.slug, async () => {
+        const result = await events().updateEventPhases(
+          ADMIN,
+          {
+            id: w.scheduling.id,
+            expectedVersion: w.scheduling.version,
+            proposalPhaseStart: undefined,
+            proposalPhaseEnd: undefined,
+            votingPhaseStart: undefined,
+            votingPhaseEnd: undefined,
+            schedulingPhaseStart: w.scheduling.schedulingPhaseStart,
+            schedulingPhaseEnd: undefined,
+          },
+          NOW
+        );
+        expect(result.ok).toBe(true);
+      });
+    });
+
+    it("for a day added, moved and deleted, with the event's dates", async () => {
+      const w = await dayWorld();
+      const window = (hour: number) => ({
+        start: new Date(`2026-06-03T0${hour}:00:00.000Z`),
+        end: new Date(`2026-06-03T1${hour}:00:00.000Z`),
+        startBookings: new Date(`2026-06-03T0${hour + 1}:00:00.000Z`),
+        endBookings: new Date(`2026-06-03T1${hour - 1}:00:00.000Z`),
+      });
+      let added: { id: string; version: number } | undefined;
+      await expectChangesSuffice(w.viewer, w.scheduling.slug, async () => {
+        const result = await events().createDay(
+          ADMIN,
+          { ...window(8), eventId: w.scheduling.id },
+          NOW
+        );
+        expect(result.ok).toBe(true);
+        if (result.ok) added = result.value;
+      });
+      await expectChangesSuffice(w.viewer, w.scheduling.slug, async () => {
+        const result = await events().updateDay(
+          ADMIN,
+          { ...window(7), id: added!.id, expectedVersion: added!.version },
+          NOW
+        );
+        expect(result.ok).toBe(true);
+      });
+      await expectChangesSuffice(w.viewer, w.scheduling.slug, async () => {
+        const result = await events().deleteDay(ADMIN, { id: added!.id }, NOW);
+        expect(result.ok).toBe(true);
+      });
+    });
+
+    it("for a day deleted with a session and its RSVP on it", async () => {
+      const w = await dayWorld();
+      await expectChangesSuffice(w.viewer, w.scheduling.slug, async () => {
+        const result = await events().deleteDay(ADMIN, { id: w.day.id }, NOW);
+        expect(result.ok).toBe(true);
+      });
     });
   });
 });

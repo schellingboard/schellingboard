@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { eventUseCases } from "@/server/composition";
 import { resolveActor } from "@/server/kernel/actor";
+import { serverNow } from "@/utils/dev-clock-server";
 import type { Day } from "@schellingboard/domain/event";
 import type { Result } from "@/server/kernel/result";
 import type { AdminActionResult } from "./admin-guests";
@@ -45,10 +46,14 @@ export async function createDayAction(
   input: DayInput
 ): Promise<AdminActionResult> {
   return settled(
-    await eventUseCases().createDay(await actor(), {
-      ...window(input),
-      eventId: input.eventId,
-    })
+    await eventUseCases().createDay(
+      await actor(),
+      {
+        ...window(input),
+        eventId: input.eventId,
+      },
+      await serverNow()
+    )
   );
 }
 
@@ -56,11 +61,15 @@ export async function updateDayAction(
   input: DayInput & { id: string; expectedVersion: number }
 ): Promise<AdminActionResult> {
   return settled(
-    await eventUseCases().updateDay(await actor(), {
-      ...window(input),
-      id: input.id,
-      expectedVersion: input.expectedVersion,
-    })
+    await eventUseCases().updateDay(
+      await actor(),
+      {
+        ...window(input),
+        id: input.id,
+        expectedVersion: input.expectedVersion,
+      },
+      await serverNow()
+    )
   );
 }
 
@@ -68,5 +77,7 @@ export async function deleteDayAction(input: {
   id: string;
   eventId: string;
 }): Promise<AdminActionResult> {
-  return settled(await eventUseCases().deleteDay(await actor(), input));
+  return settled(
+    await eventUseCases().deleteDay(await actor(), input, await serverNow())
+  );
 }

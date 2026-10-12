@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { legacyActor, legacyDate, legacyRefusal } from "@/app/api/legacy";
+import { requestNow } from "@/utils/dev-clock";
 import { eventUseCases } from "@/server/composition";
 import { requireProxyVerifiedAdmin } from "@/utils/auth";
 
@@ -51,13 +52,17 @@ export async function POST(req: Request) {
 
   if (!body.eventSlug) return badRequest("eventSlug is required");
 
-  const result = await eventUseCases().createDay(await legacyActor(req), {
-    eventSlug: body.eventSlug,
-    start: legacyDate(body.start),
-    end: legacyDate(body.end),
-    startBookings: legacyDate(body.startBookings),
-    endBookings: legacyDate(body.endBookings),
-  });
+  const result = await eventUseCases().createDay(
+    await legacyActor(req),
+    {
+      eventSlug: body.eventSlug,
+      start: legacyDate(body.start),
+      end: legacyDate(body.end),
+      startBookings: legacyDate(body.startBookings),
+      endBookings: legacyDate(body.endBookings),
+    },
+    requestNow(req)
+  );
   if (!result.ok) {
     if (result.error.code === "day.saveFailed") {
       return NextResponse.json({ error: result.error.detail }, { status: 500 });

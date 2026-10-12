@@ -2,12 +2,14 @@ import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { updateLoggedSession, deleteLoggedSession } from "../helpers/changes";
 import {
+  createDay,
   createEvent,
   createGuest,
   createLocation,
   createSession,
 } from "../helpers/factories";
 import { getRepositories, withWriter } from "@/db/container";
+import { createEventUseCases } from "@/server/modules/events/module";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
 import {
   addSession,
@@ -345,6 +347,54 @@ describe("change log", () => {
         audience: { kind: "event" },
         payload: { session: { title: "New", hosts: [{ id: host.id }] } },
       },
+    ]);
+  });
+
+  it(
+    "marks the sessions a deleted day takes with it as cascades",
+    { tags: ["007-US8"] },
+    async () => {
+      const { event, attendee, session } = await world();
+      const day = await createDay(event.id, {
+        start: new Date("2026-06-02T08:00:00.000Z"),
+        end: new Date("2026-06-02T18:00:00.000Z"),
+        startBookings: new Date("2026-06-02T09:00:00.000Z"),
+        endBookings: new Date("2026-06-02T17:00:00.000Z"),
+      });
+      await getRepositories().rsvps.create({
+        sessionId: session.id,
+        guestId: attendee.id,
+      });
+
+      await createEventUseCases({
+        repos: getRepositories(),
+        uow: unitOfWork,
+      }).deleteDay({ admin: true, guest: null }, { id: day.id }, AT);
+
+      expect(await getRepositories().changes.listAfter(0)).toMatchObject([
+        { type: "rsvp.removed", subjectType: "rsvp" },
+        { type: "session.deleted", payload: { cascade: true } },
+        { type: "day.deleted", subjectId: day.id, audience: { kind: "event" } },
+        { type: "event.changed" },
+      ]);
+    }
+  );
+
+  it("records an event's deletion after its sessions'", async () => {
+    const { event, session } = await world();
+
+    await createEventUseCases({
+      repos: getRepositories(),
+      uow: unitOfWork,
+    }).deleteEvent({ admin: true, guest: null }, { id: event.id }, AT);
+
+    expect(await getRepositories().changes.listAfter(0)).toMatchObject([
+      {
+        type: "session.deleted",
+        subjectId: session.id,
+        payload: { cascade: true },
+      },
+      { type: "event.deleted", subjectId: event.id, eventId: event.id },
     ]);
   });
 });

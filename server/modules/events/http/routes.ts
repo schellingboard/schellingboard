@@ -175,21 +175,29 @@ export function addAdminEventRoutes(app: App, events: () => EventUseCases) {
   });
 
   app.openapi(updateEvent, async (c) => {
-    const result = await events().updateEvent(c.var.actor, {
-      ...c.req.valid("json"),
-      id: c.req.valid("param").id,
-    });
+    const result = await events().updateEvent(
+      c.var.actor,
+      {
+        ...c.req.valid("json"),
+        id: c.req.valid("param").id,
+      },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error, toEventView);
     return c.json(toEventView(result.value), 200);
   });
 
   app.openapi(updatePhases, async (c) => {
     const { expectedVersion, ...phases } = c.req.valid("json");
-    const result = await events().updateEventPhases(c.var.actor, {
-      ...dates(phases),
-      expectedVersion,
-      id: c.req.valid("param").id,
-    });
+    const result = await events().updateEventPhases(
+      c.var.actor,
+      {
+        ...dates(phases),
+        expectedVersion,
+        id: c.req.valid("param").id,
+      },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error, toEventView);
     return c.json(toEventView(result.value), 200);
   });
@@ -197,34 +205,47 @@ export function addAdminEventRoutes(app: App, events: () => EventUseCases) {
   app.openapi(deleteEvent, async (c) => {
     const result = await events().deleteEvent(
       c.var.actor,
-      c.req.valid("param")
+      c.req.valid("param"),
+      c.var.now
     );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);
   });
 
   app.openapi(createDay, async (c) => {
-    const result = await events().createDay(c.var.actor, {
-      ...dates(c.req.valid("json")),
-      eventId: c.req.valid("param").id,
-    });
+    const result = await events().createDay(
+      c.var.actor,
+      {
+        ...dates(c.req.valid("json")),
+        eventId: c.req.valid("param").id,
+      },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error);
     return c.json(toDayView(result.value), 201);
   });
 
   app.openapi(updateDay, async (c) => {
     const { expectedVersion, ...window } = c.req.valid("json");
-    const result = await events().updateDay(c.var.actor, {
-      ...dates(window),
-      expectedVersion,
-      id: c.req.valid("param").id,
-    });
+    const result = await events().updateDay(
+      c.var.actor,
+      {
+        ...dates(window),
+        expectedVersion,
+        id: c.req.valid("param").id,
+      },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error, toDayView);
     return c.json(toDayView(result.value), 200);
   });
 
   app.openapi(deleteDay, async (c) => {
-    const result = await events().deleteDay(c.var.actor, c.req.valid("param"));
+    const result = await events().deleteDay(
+      c.var.actor,
+      c.req.valid("param"),
+      c.var.now
+    );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);
   });

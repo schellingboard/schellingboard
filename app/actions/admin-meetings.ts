@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { meetingUseCases } from "@/server/composition";
 import { resolveActor } from "@/server/kernel/actor";
+import { serverNow } from "@/utils/dev-clock-server";
 import type { Result } from "@/server/kernel/result";
 import type { AdminActionResult } from "./admin-guests";
 
@@ -37,14 +38,18 @@ function settled(result: Result<unknown>, eventId: string): AdminActionResult {
 export async function updateEventMeetingsAction(
   input: EventMeetingsInput
 ): Promise<AdminActionResult> {
-  const result = await meetingUseCases().updateEventMeetings(await actor(), {
-    eventId: input.id,
-    meetingsEnabled: input.meetingsEnabled,
-    maxOpenMeetingRequests: input.meetingsEnabled
-      ? parseInt(input.maxOpenMeetingRequests, 10)
-      : undefined,
-    expectedVersion: input.expectedVersion,
-  });
+  const result = await meetingUseCases().updateEventMeetings(
+    await actor(),
+    {
+      eventId: input.id,
+      meetingsEnabled: input.meetingsEnabled,
+      maxOpenMeetingRequests: input.meetingsEnabled
+        ? parseInt(input.maxOpenMeetingRequests, 10)
+        : undefined,
+      expectedVersion: input.expectedVersion,
+    },
+    await serverNow()
+  );
   return settled(result, input.id);
 }
 

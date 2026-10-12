@@ -9,6 +9,7 @@ import type {
   Change,
   RecordedChange,
 } from "@schellingboard/domain/change";
+import type { Day, Event } from "@schellingboard/domain/event";
 import type { Rsvp, Session } from "@schellingboard/domain/session";
 
 type DB = BetterSQLite3Database<typeof schema>;
@@ -21,6 +22,38 @@ function reviveSession(json: Session): Session {
     ...json,
     startTime: raw.startTime ? new Date(raw.startTime) : undefined,
     endTime: raw.endTime ? new Date(raw.endTime) : undefined,
+  };
+}
+
+const EVENT_DATES = [
+  "firstDayStart",
+  "lastDayStart",
+  "proposalPhaseStart",
+  "proposalPhaseEnd",
+  "votingPhaseStart",
+  "votingPhaseEnd",
+  "schedulingPhaseStart",
+  "schedulingPhaseEnd",
+] as const;
+
+function reviveEvent(json: Event): Event {
+  const raw = json as unknown as Record<string, string | undefined>;
+  return {
+    ...json,
+    ...Object.fromEntries(
+      EVENT_DATES.map((key) => [key, raw[key] ? new Date(raw[key]) : undefined])
+    ),
+  };
+}
+
+function reviveDay(json: Day): Day {
+  const raw = json as unknown as Record<string, string>;
+  return {
+    ...json,
+    start: new Date(raw.start),
+    end: new Date(raw.end),
+    startBookings: new Date(raw.startBookings),
+    endBookings: new Date(raw.endBookings),
   };
 }
 
@@ -44,7 +77,11 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
   };
   switch (row.type) {
     case "session.changed": {
-      const payload = row.payload as { before: Session; after: Session };
+      const payload = row.payload as {
+        before: Session;
+        after: Session;
+        cascade?: true;
+      };
       return {
         ...common,
         type: "session.changed",
@@ -52,6 +89,7 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
         payload: {
           before: reviveSession(payload.before),
           after: reviveSession(payload.after),
+          ...(payload.cascade && { cascade: true as const }),
         },
       };
     }
@@ -59,6 +97,7 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
       const payload = row.payload as {
         session: Session;
         rsvpGuestIds: string[];
+        cascade?: true;
       };
       return {
         ...common,
@@ -67,7 +106,29 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
         payload: {
           session: reviveSession(payload.session),
           rsvpGuestIds: payload.rsvpGuestIds,
+          ...(payload.cascade && { cascade: true as const }),
         },
+      };
+    }
+    case "event.changed":
+    case "event.deleted": {
+      const payload = row.payload as { event: Event };
+      return {
+        ...common,
+        type: row.type,
+        subjectType: "event",
+        payload: { event: reviveEvent(payload.event) },
+      };
+    }
+    case "day.created":
+    case "day.changed":
+    case "day.deleted": {
+      const payload = row.payload as { day: Day };
+      return {
+        ...common,
+        type: row.type,
+        subjectType: "day",
+        payload: { day: reviveDay(payload.day) },
       };
     }
     case "session.created": {
@@ -108,6 +169,11 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
 // A reader skips types it does not know, such as rows written by a newer
 // version before a rollback, rather than stopping at them.
 const KNOWN_TYPES: RecordedChange["type"][] = [
+  "event.changed",
+  "event.deleted",
+  "day.created",
+  "day.changed",
+  "day.deleted",
   "session.created",
   "session.changed",
   "session.deleted",
