@@ -129,6 +129,12 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
       to pan, scroll restoration, and the meetings column read-only from the
       replica (booking and the meeting modal link to legacy). Not routed yet:
       the catch-all still forwards `/{slug}`.
+  - [x] 13a. Pure logic in `apps/web/src/schedule/` (layout, columns, agenda,
+        filters, search, fold, meetings from the replica), copied with tests.
+  - [ ] 13b. Grid, now line, day fold.
+  - [ ] 13c. Agenda, filters, toolbar, search stepping.
+  - [ ] 13d. Drag to pan, scroll restoration, meetings column, wiring (Shell,
+        replica, viewer switching) and the dev-only preview route; E2E spec.
 - [ ] 14. **Kiosk** on the SPA schedule, same behavior as today.
 - [ ] 15. **Session modal** as a search param over the schedule: details, RSVP,
       attendee list, comments; edit and delete link to legacy.
