@@ -13,8 +13,16 @@
 - `make test-e2e-docker`: 208 passed.
 - No failure comes from the last run's commits; no fix step needed.
 
+## Step 2 (2026-10-08)
+
+- A 2 s grace (`RECONNECT_GRACE_MS`) after any drop keeps the state `live`; the
+  store cannot tell a planned stream end from a failure, so the grace covers both.
+  The feed sends `retry: 1000` with its first message so browsers reconnect inside
+  the grace (an integration test ties the two).
+- No CHANGELOG entry: the sync indicator is itself unreleased (#1111's entry).
+
 ## Questions
 
 ## Next step
 
-2.
+3.
