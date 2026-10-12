@@ -42,4 +42,44 @@ describe("replica store", () => {
     store.adopt({ ...snapshot, seq: 11 });
     expect(store.get().seq).toBe(11);
   });
+
+  it("moves the meetings revision only for what the meetings column depends on", () => {
+    const store = createReplicaStore(snapshot);
+    const start = store.meetingsRevision();
+
+    store.applyMessage({
+      seq: snapshot.seq + 1,
+      type: "session.attendanceChanged",
+      commandKey: null,
+      sessionId: "s",
+      numRsvps: 9,
+    });
+    expect(store.meetingsRevision()).toBe(start);
+
+    store.applyMessage({
+      seq: snapshot.seq + 2,
+      type: "rsvp.removed",
+      commandKey: null,
+      sessionId: "s",
+      guestId: "mia",
+    });
+    expect(store.meetingsRevision()).toBe(start + 1);
+
+    store.applyMessage({
+      seq: snapshot.seq + 3,
+      type: "meeting.deleted",
+      commandKey: null,
+      meetingId: "none",
+    });
+    expect(store.meetingsRevision()).toBe(start + 2);
+  });
+
+  it("leaves the meetings revision alone when a seed is adopted", () => {
+    const store = createReplicaStore(snapshot);
+    const start = store.meetingsRevision();
+
+    store.adopt({ ...snapshot, sessions: [...snapshot.sessions], seq: 20 });
+
+    expect(store.meetingsRevision()).toBe(start);
+  });
 });

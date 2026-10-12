@@ -663,6 +663,28 @@ cursor.invalid`. The use case now returns the whole list; the
   on the old slug; its snapshot reload then 404s and retries (60 s cap).
   Left for 14d / a later step.
 
+- 14c: `EventProvider`'s count deltas and `/api/rsvps` fetch are gone; the
+  replica (`me.rsvps`, `counts`) is the source. `useOptimisticRsvps` keeps
+  pending toggles over it (`replica/rsvp-overlay.ts`, pure, unit-tested). A
+  toggle ends once the replica has its RSVP and a changed count (the POST's ok
+  only for a no-op toggle), so the `rsvp.*` then `attendanceChanged` order
+  neither double-counts nor flickers. A failed POST drops it and the later
+  toggles of that session (the revert). An answered toggle expires after 3 s,
+  once the feed has moved past the seq at the click (the replica can skip the
+  states it settles on; a slow stream keeps the optimistic state).
+  `expirePendingRsvps` is unit-tested, the timer is not.
+  Known, for step 17's `commandKey` match: another guest's count change before
+  our echo turns our delta off for a moment; our add and another guest's
+  remove arriving together return the count to base while we hold the RSVP, so
+  the overlay adds 1 again until the toggle expires; the POST has no timeout,
+  so a hung request keeps its toggle shown. A toggle made while the
+  viewer lags a name switch is dropped; RSVPs are blank meanwhile.
+  `meetingsRevision` (sessions, own RSVPs, own meetings) drives the meetings
+  column's refetch, 500 ms debounced. Seeds do not move it; a reload does
+  (it may have missed changes), so a name switch fetches once more.
+  No CHANGELOG line (fixes a flicker in the unreleased live schedule). Not
+  run: E2E (user's rule); wiring has no DOM test.
+
 ## Problems
 
 None.
@@ -688,4 +710,4 @@ None.
 
 ## Next step
 
-14c.
+14d.

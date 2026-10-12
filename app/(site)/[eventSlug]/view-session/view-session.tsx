@@ -58,7 +58,7 @@ export function ViewSession(props: {
   } = useContext(EventContext);
 
   // Reconcile session RSVPs with the current user's RSVP from context, so
-  // optimistic toggles in EventProvider reflect immediately here.
+  // pending toggles reflect immediately here.
   const optimisticRsvps = useMemo<Rsvp[] | null>(() => {
     if (rsvps === null) return null;
     if (!currentUser) return rsvps;

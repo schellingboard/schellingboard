@@ -2,11 +2,15 @@
 
 import Link from "next/link";
 import { useContext, useMemo } from "react";
+import type { Rsvp } from "@schellingboard/domain/session";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { EventProvider, UserContext } from "@/app/(site)/context";
 import type { EventContextType } from "@/app/(site)/context";
 import { eventContextFrom } from "./replica/selectors";
 import { useLiveReplica } from "./replica/use-live-replica";
+import { useOptimisticRsvps } from "./replica/use-optimistic-rsvps";
+
+const NO_RSVPS: Rsvp[] = [];
 
 export function EventProviderWrapper({
   snapshot,
@@ -20,12 +24,22 @@ export function EventProviderWrapper({
   children: React.ReactNode;
 }) {
   const { user } = useContext(UserContext);
-  const { replica, gone } = useLiveReplica(snapshot, user);
-  const context = useMemo(() => eventContextFrom(replica), [replica]);
+  const { replica, gone, meetingsRevision } = useLiveReplica(snapshot, user);
+  const { shown, updateRsvp } = useOptimisticRsvps(replica);
+  const context = useMemo(() => eventContextFrom(shown), [shown]);
 
+  // The replica's viewer lags a name switch until its snapshot lands.
+  const rsvps = replica.me?.guestId === user ? context.rsvps : NO_RSVPS;
   const value = useMemo(
-    () => ({ ...context, myMeetings, now }),
-    [context, myMeetings, now]
+    () => ({
+      ...context,
+      rsvps,
+      myMeetings,
+      now,
+      meetingsRevision,
+      updateRsvp,
+    }),
+    [context, rsvps, myMeetings, now, meetingsRevision, updateRsvp]
   );
 
   if (gone) {

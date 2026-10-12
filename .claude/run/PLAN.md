@@ -202,7 +202,7 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
   - [x] 14b2. Visibility close/reopen after 30 s hidden, an `EventSource` that
         closes for good (401/404: refetch the snapshot, back off), slug change. A dead
         stream plus a hard refresh whose seed has a lower seq stays stale: handle there.
-  - [ ] 14c. RSVP echo reconciliation (replaces the count deltas), and the
+  - [x] 14c. RSVP echo reconciliation (replaces the count deltas), and the
         meetings column's debounced refetch.
   - [ ] 14d. E2E: two browser contexts, kiosk included.
 - [ ] 15. **Sync state**: an indicator on the schedule (live, reconnecting, stale), so

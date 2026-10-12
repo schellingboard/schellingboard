@@ -38,7 +38,6 @@ export type DayWithSessions = Day & { sessions: Session[] };
 
 // Shared "none" values, so a render with nothing loaded yields the same array
 // each time instead of a fresh one.
-const NO_RSVPS: Rsvp[] = [];
 const NO_VOTES: Vote[] = [];
 
 export interface UserContextType {
@@ -76,6 +75,7 @@ export interface EventContextType {
   // then ticks forward on the client (see startNowTicker) so long-lived
   // pages don't treat a stale `now` as current (e.g. bookable-slot checks).
   now: Date;
+  meetingsRevision: number;
   rsvpdForSession: (sessionId: string) => boolean;
   localSessions: Session[];
   userBusySessions: () => Session[];
@@ -96,6 +96,7 @@ export const EventContext = createContext<EventContextType>({
   rsvps: [],
   myMeetings: null,
   now: new Date(0),
+  meetingsRevision: 0,
   localSessions: [],
   userBusySessions: () => [],
   rsvpdForSession: () => false,
@@ -226,30 +227,12 @@ export function EventProvider({
   children: ReactNode;
   value: Omit<
     EventContextType,
-    "localSessions" | "userBusySessions" | "rsvpdForSession" | "updateRsvp"
+    "localSessions" | "userBusySessions" | "rsvpdForSession"
   >;
 }) {
   const { user } = useContext(UserContext);
-  const serverSessions = value.days.flatMap((d) => d.sessions);
-  // value.rsvps seeds the initial state once. The user-change effect below
-  // is the only authoritative source of subsequent updates (plus optimistic
-  // mutations in updateRsvp). Server-side revalidation is not used for RSVPs.
-  // Keyed by the guest they belong to, so switching names never shows the
-  // previous guest's RSVPs while the new answer is in flight, and logging out
-  // has nothing to clear.
-  const [loadedRsvps, setLoadedRsvps] = useState<{
-    user: string | null;
-    rsvps: Rsvp[];
-  }>(() => ({ user, rsvps: value.rsvps }));
-  const rsvps = loadedRsvps.user === user ? loadedRsvps.rsvps : NO_RSVPS;
-  const updateRsvps = (update: (current: Rsvp[]) => Rsvp[]) =>
-    setLoadedRsvps((prev) => ({
-      user,
-      rsvps: update(prev.user === user ? prev.rsvps : NO_RSVPS),
-    }));
-  const [rsvpCountDeltas, setRsvpCountDeltas] = useState(
-    () => new Map<string, number>()
-  );
+  const localSessions = value.days.flatMap((d) => d.sessions);
+  const rsvps = value.rsvps;
   const [now, setNow] = useState(value.now);
   // The server re-seeds `now` on every RSC render; it jumps when the dev fake
   // clock changes and triggers a router.refresh. Adopt the new instant during
@@ -272,53 +255,6 @@ export function EventProvider({
     return startNowTicker(setNow, NOW_REFRESH_INTERVAL_MS, offsetMs);
   }, [seedMs]);
 
-  const localSessions = serverSessions.map((session) => {
-    const delta = rsvpCountDeltas.get(session.id) ?? 0;
-    if (delta === 0) return session;
-
-    return {
-      ...session,
-      numRsvps: session.numRsvps + delta,
-    };
-  });
-
-  useEffect(() => {
-    // Deltas are relative to serverSessions' numRsvps values. When value.days
-    // changes after an RSC refresh, the old deltas must be discarded so we don't
-    // double-count optimistic changes that are now included by the server.
-    //
-    // Do not reset rsvps here: value.rsvps is only the initial/RSC value, and
-    // may be older than the client-side user fetch or optimistic RSVP state.
-    //
-    // Tradeoffs of doing this in an effect:
-    // - React first renders fresh serverSessions with the previous deltas, then
-    //   this effect clears them, so there can be a transient wrong count.
-    // - Depending on value.days may reset more often than strictly necessary.
-    // - A failed RSVP request already in flight can still restore its old delta
-    //   snapshot after this reset. That race already exists in the optimistic
-    //   update flow; fixing it would require tracking a generation per request.
-    // The alternative is storing generation metadata with the deltas, which is
-    // more complex.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setRsvpCountDeltas((current) =>
-      current.size === 0 ? current : new Map<string, number>()
-    );
-  }, [value.days]);
-
-  useEffect(() => {
-    if (!user) return;
-    const controller = new AbortController();
-    void fetch(`/api/rsvps?user=${user}`, { signal: controller.signal })
-      .then((res) => (res.ok ? (res.json() as Promise<Rsvp[]>) : null))
-      .then((userRsvps) => {
-        if (userRsvps) setLoadedRsvps({ user, rsvps: userRsvps });
-      })
-      // Aborted on switching names, and the browser kills it when the page
-      // goes; either way there is nobody left to tell.
-      .catch(() => undefined);
-    return () => controller.abort();
-  }, [user]);
-
   function userBusySessions() {
     if (user) {
       const sessionsWithRSVP = rsvps.map((r) => r.sessionId);
@@ -336,78 +272,12 @@ export function EventProvider({
     return rsvps.some((rsvp) => rsvp.sessionId === sessionId);
   };
 
-  const updateRsvp = async (
-    guestId: string,
-    sessionId: string,
-    remove: boolean
-  ) => {
-    const rsvpsBeforeUpdate = loadedRsvps;
-    const rsvpCountDeltasBeforeUpdate = rsvpCountDeltas;
-    // A snapshot from before a name switch must not replace what has since
-    // been loaded for the new guest.
-    const revertRsvps = () =>
-      setLoadedRsvps((current) =>
-        current.user === user ? rsvpsBeforeUpdate : current
-      );
-    try {
-      const countChange = remove ? -1 : 1;
-      setRsvpCountDeltas((old) => {
-        const res = new Map(old);
-        const delta = (res.get(sessionId) ?? 0) + countChange;
-        if (delta === 0) {
-          res.delete(sessionId);
-        } else {
-          res.set(sessionId, delta);
-        }
-        return res;
-      });
-
-      if (remove) {
-        updateRsvps((prevRsvps) =>
-          prevRsvps.filter(
-            (rsvp) =>
-              !(rsvp.guestId === guestId && rsvp.sessionId === sessionId)
-          )
-        );
-      } else {
-        const newRsvp: Rsvp = { id: "", guestId, sessionId };
-        updateRsvps((prevRsvps) => [...prevRsvps, newRsvp]);
-      }
-
-      const response = await fetch("/api/toggle-rsvp", {
-        method: "POST",
-        body: JSON.stringify({
-          guestId,
-          sessionId,
-          remove,
-        }),
-      });
-
-      if (!response.ok) {
-        revertRsvps();
-        setRsvpCountDeltas(rsvpCountDeltasBeforeUpdate);
-        const body = (await response.json().catch(() => null)) as {
-          error?: string;
-        } | null;
-        return { ok: false, error: body?.error };
-      }
-      return { ok: true };
-    } catch (error: unknown) {
-      console.error("Error updating RSVP:", error);
-      revertRsvps();
-      setRsvpCountDeltas(rsvpCountDeltasBeforeUpdate);
-      return { ok: false };
-    }
-  };
-
   const contextValue: EventContextType = {
     ...value,
     now,
-    rsvps,
     localSessions,
     userBusySessions,
     rsvpdForSession,
-    updateRsvp,
   };
 
   return (

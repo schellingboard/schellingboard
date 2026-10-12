@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -24,6 +25,8 @@ type MyMeetings = {
 // new object on every render.
 const NONE: MyMeetingsResponse = { meetings: [], availability: [] };
 
+const MEETINGS_REFETCH_MS = 500;
+
 const MeetingsContext = createContext<MyMeetings>({
   meetings: null,
   availability: null,
@@ -40,7 +43,11 @@ const MeetingsContext = createContext<MyMeetings>({
  * stale by the time the schedule mounts again.
  */
 export function MeetingsProvider({ children }: { children: ReactNode }) {
-  const { event, myMeetings: seed } = useContext(EventContext);
+  const {
+    event,
+    myMeetings: seed,
+    meetingsRevision,
+  } = useContext(EventContext);
   const { user } = useContext(UserContext);
   const [loaded, setLoaded] = useState<
     ({ key: string } & MyMeetingsResponse) | null
@@ -77,6 +84,16 @@ export function MeetingsProvider({ children }: { children: ReactNode }) {
   }, [eventId, key, reloads]);
 
   const reload = useCallback(() => setReloads((n) => n + 1), []);
+
+  // A burst of feed changes costs one refetch, and the mount's fetch above
+  // already covers the revision the page started at.
+  const seenRevision = useRef(meetingsRevision);
+  useEffect(() => {
+    if (seenRevision.current === meetingsRevision) return;
+    seenRevision.current = meetingsRevision;
+    const timer = setTimeout(reload, MEETINGS_REFETCH_MS);
+    return () => clearTimeout(timer);
+  }, [meetingsRevision, reload]);
 
   // Keyed rather than cleared in an effect, so switching names never shows
   // the previous guest's meetings while the new answer is in flight. With
