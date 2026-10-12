@@ -165,8 +165,8 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
 - [ ] 12. **Log every change the schedule shows**, through `tx.record()`, each type
       with its `apply` case and a sufficiency test. Existing reactions ignore the new
       types.
-  - 12a. Sessions (create, change, delete, cascades) and RSVPs (add, remove, with the
-    session's new count).
+  - [x] 12a. Sessions (create, change, delete, cascades) and RSVPs (add, remove, with the
+        session's new count).
   - 12b. Events, days, locations and their event assignment, room unavailability.
   - 12c. Guests joining or leaving an event, public profile edits; meetings (audience:
     the two guests) and meeting points.

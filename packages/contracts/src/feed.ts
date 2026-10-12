@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { rsvpViewSchema } from "./rsvp";
 import { snapshotSessionSchema } from "./snapshot";
 
 const common = {
@@ -13,6 +14,11 @@ export const feedMessageSchema = z
   .discriminatedUnion("type", [
     z.object({
       ...common,
+      type: z.literal("session.created"),
+      session: snapshotSessionSchema,
+    }),
+    z.object({
+      ...common,
       type: z.literal("session.changed"),
       session: snapshotSessionSchema,
     }),
@@ -20,6 +26,23 @@ export const feedMessageSchema = z
       ...common,
       type: z.literal("session.deleted"),
       sessionId: z.string(),
+    }),
+    z.object({
+      ...common,
+      type: z.literal("session.attendanceChanged"),
+      sessionId: z.string(),
+      numRsvps: z.number().int(),
+    }),
+    z.object({
+      ...common,
+      type: z.literal("rsvp.added"),
+      rsvp: rsvpViewSchema,
+    }),
+    z.object({
+      ...common,
+      type: z.literal("rsvp.removed"),
+      sessionId: z.string(),
+      guestId: z.string(),
     }),
   ])
   .meta({ id: "FeedMessage" });

@@ -1,3 +1,4 @@
+import type { ChangeContext } from "@schellingboard/domain/change";
 import { inSchedPhase } from "@schellingboard/domain/phase";
 import type { Rsvp, Session } from "@schellingboard/domain/session";
 import { actingAsNamedGuest } from "@/server/kernel/acting-guest";
@@ -10,6 +11,7 @@ import {
   type Result,
 } from "@/server/kernel/result";
 import type { SessionDeps } from "../ports";
+import { recordRsvpAdded, removeRsvp } from "./session-changes";
 
 export interface RsvpInput {
   sessionId: string;
@@ -19,7 +21,7 @@ export interface RsvpInput {
 const sessionNotFound = () => notFound("session.notFound", "Session not found");
 
 async function rsvpTarget(
-  { repos }: SessionDeps,
+  repos: SessionDeps["repos"],
   actor: Actor,
   { sessionId, guestId }: RsvpInput,
   now: Date
@@ -44,19 +46,28 @@ async function rsvpTarget(
 }
 
 export const rsvp =
-  (deps: SessionDeps) =>
-  async (actor: Actor, input: RsvpInput, now: Date): Promise<Result<Rsvp>> => {
-    const target = await rsvpTarget(deps, actor, input, now);
-    if (!target.ok) return target;
-    const { session, rsvpCapacityHardLimit } = target.value;
-    if (session.hosts.some((h) => h.id === input.guestId))
-      return forbidden(
-        "rsvp.ownSession",
-        "Hosts cannot RSVP to their own session"
-      );
+  ({ uow }: SessionDeps) =>
+  async (actor: Actor, input: RsvpInput, now: Date): Promise<Result<Rsvp>> =>
+    uow.run(async (tx) => {
+      const target = await rsvpTarget(tx, actor, input, now);
+      if (!target.ok) return target;
+      const { session, rsvpCapacityHardLimit } = target.value;
+      if (session.hosts.some((h) => h.id === input.guestId))
+        return forbidden(
+          "rsvp.ownSession",
+          "Hosts cannot RSVP to their own session"
+        );
 
-    return addRsvp(deps.repos, input, session, rsvpCapacityHardLimit);
-  };
+      const added = await addRsvp(tx, input, session, rsvpCapacityHardLimit);
+      if (added.ok)
+        await recordRsvpAdded(tx, added.value, byGuest(input.guestId, now));
+      return added;
+    });
+
+const byGuest = (id: string, at: Date): ChangeContext => ({
+  actor: { type: "guest", id },
+  at,
+});
 
 async function addRsvp(
   { rsvps }: SessionDeps["repos"],
@@ -76,16 +87,19 @@ async function addRsvp(
 }
 
 export const withdrawRsvp =
-  (deps: SessionDeps) =>
-  async (actor: Actor, input: RsvpInput, now: Date): Promise<Result<void>> => {
-    const target = await rsvpTarget(deps, actor, input, now);
-    if (!target.ok) return target;
-    await deps.repos.rsvps.deleteBySessionAndGuest(
-      input.sessionId,
-      input.guestId
-    );
-    return ok(undefined);
-  };
+  ({ uow }: SessionDeps) =>
+  async (actor: Actor, input: RsvpInput, now: Date): Promise<Result<void>> =>
+    uow.run(async (tx) => {
+      const target = await rsvpTarget(tx, actor, input, now);
+      if (!target.ok) return target;
+      await removeRsvp(
+        tx,
+        input.sessionId,
+        input.guestId,
+        byGuest(input.guestId, now)
+      );
+      return ok(undefined);
+    });
 
 // Who RSVPed to a session is shown to everyone in the session details.
 export const listSessionRsvps =
@@ -111,13 +125,22 @@ export const listGuestRsvps =
   };
 
 export const adminRemoveRsvp =
-  ({ repos }: SessionDeps) =>
-  async (actor: Actor, input: RsvpInput): Promise<Result<Session>> => {
+  ({ uow }: SessionDeps) =>
+  async (
+    actor: Actor,
+    input: RsvpInput,
+    now: Date
+  ): Promise<Result<Session>> => {
     if (!actor.admin) return forbidden("admin.required", "Unauthorized");
-    const session = await repos.sessions.findById(input.sessionId);
-    if (!session) return sessionNotFound();
-    await repos.rsvps.deleteBySessionAndGuest(input.sessionId, input.guestId);
-    return ok(session);
+    return uow.run(async (tx) => {
+      const session = await tx.sessions.findById(input.sessionId);
+      if (!session) return sessionNotFound();
+      await removeRsvp(tx, input.sessionId, input.guestId, {
+        actor: { type: "admin" },
+        at: now,
+      });
+      return ok(session);
+    });
   };
 
 // For seeding scripts: no phase gate and hosts may RSVP to their own session,
@@ -126,7 +149,8 @@ export const adminAddRsvp =
   ({ uow }: SessionDeps) =>
   async (
     actor: Actor,
-    input: RsvpInput
+    input: RsvpInput,
+    now: Date
   ): Promise<Result<{ rsvp: Rsvp; created: boolean }>> => {
     if (!actor.admin) return forbidden("admin.required", "Unauthorized");
     return uow.run(async (tx) => {
@@ -149,6 +173,7 @@ export const adminAddRsvp =
         );
         if (!added.ok) return added;
         rsvp = added.value;
+        await recordRsvpAdded(tx, rsvp, { actor: { type: "admin" }, at: now });
       }
       await tx.guests.assignToEvent(session.eventId, [input.guestId]);
       return ok({ rsvp, created: !existing });

@@ -185,16 +185,24 @@ describe("admin RSVP use cases", () => {
       const input = { sessionId: session.id, guestId: guest.id };
 
       expect(
-        await sessionUseCases().adminRemoveRsvp(open(guest.id), input)
+        await sessionUseCases().adminRemoveRsvp(open(guest.id), input, now())
       ).toMatchObject({ error: { code: "admin.required" } });
       expect(
-        await sessionUseCases().adminRemoveRsvp(ADMIN, {
-          ...input,
-          sessionId: "missing",
-        })
+        await sessionUseCases().adminRemoveRsvp(
+          ADMIN,
+          {
+            ...input,
+            sessionId: "missing",
+          },
+          now()
+        )
       ).toMatchObject({ error: { code: "session.notFound" } });
 
-      const removed = await sessionUseCases().adminRemoveRsvp(ADMIN, input);
+      const removed = await sessionUseCases().adminRemoveRsvp(
+        ADMIN,
+        input,
+        now()
+      );
       expect(removed.ok && removed.value.id).toBe(session.id);
       expect(
         await getRepositories().rsvps.listBySession(session.id)

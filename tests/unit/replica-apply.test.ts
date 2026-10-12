@@ -44,6 +44,54 @@ describe("apply", () => {
     expect(after.counts).toEqual({ unscheduled: 0 });
   });
 
+  it("sets a session's count, leaving a session it does not hold", () => {
+    const counted = (sessionId: string): FeedMessage => ({
+      seq: 8,
+      type: "session.attendanceChanged",
+      commandKey: null,
+      sessionId,
+      numRsvps: 9,
+    });
+
+    expect(apply(snapshot, counted("s")).counts).toEqual({
+      s: 9,
+      unscheduled: 0,
+    });
+    expect(apply(snapshot, counted("gone")).counts).toEqual(snapshot.counts);
+  });
+
+  it("adds and removes the viewer's own RSVP, once", () => {
+    const mine = snapshot.me!.guestId;
+    const added: FeedMessage = {
+      seq: 8,
+      type: "rsvp.added",
+      commandKey: null,
+      rsvp: { id: "r", sessionId: "unscheduled", guestId: mine },
+    };
+    const withRsvp = apply(snapshot, added);
+    const removed: FeedMessage = {
+      seq: 9,
+      type: "rsvp.removed",
+      commandKey: null,
+      sessionId: "unscheduled",
+      guestId: mine,
+    };
+
+    expect(withRsvp.me!.rsvps.filter((r) => r.id === "r")).toHaveLength(1);
+    expect(apply(withRsvp, removed).me!.rsvps).toEqual(snapshot.me!.rsvps);
+  });
+
+  it("ignores an RSVP of another guest", () => {
+    const other: FeedMessage = {
+      seq: 8,
+      type: "rsvp.added",
+      commandKey: null,
+      rsvp: { id: "r", sessionId: "s", guestId: "someone-else" },
+    };
+
+    expect(apply(snapshot, other).me).toEqual(snapshot.me);
+  });
+
   it("ignores a change it already holds", () => {
     expect(apply(snapshot, changed(7, "s", "Stale"))).toBe(snapshot);
   });

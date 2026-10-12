@@ -1,4 +1,4 @@
-import type { Session } from "./session";
+import type { Rsvp, Session } from "./session";
 
 export type Actor =
   { type: "guest"; id: string } | { type: "admin" } | { type: "system" };
@@ -16,6 +16,12 @@ type ChangeOf<Type extends string, SubjectType extends string, Payload> = {
   payload: Payload;
 };
 
+export type SessionCreated = ChangeOf<
+  "session.created",
+  "session",
+  { session: Session }
+>;
+
 export type SessionChanged = ChangeOf<
   "session.changed",
   "session",
@@ -32,7 +38,29 @@ export type SessionDeleted = ChangeOf<
   { session: Session; rsvpGuestIds: string[] }
 >;
 
-export type Change = SessionChanged | SessionDeleted;
+/** The count after an RSVP was added or taken away: what every viewer shows. */
+export type SessionAttendanceChanged = ChangeOf<
+  "session.attendanceChanged",
+  "session",
+  { numRsvps: number }
+>;
+
+/** The RSVP itself is private to its guest: the count is the event's. */
+export type RsvpAdded = ChangeOf<"rsvp.added", "rsvp", { rsvp: Rsvp }>;
+
+export type RsvpRemoved = ChangeOf<
+  "rsvp.removed",
+  "rsvp",
+  { sessionId: string; guestId: string }
+>;
+
+export type Change =
+  | SessionCreated
+  | SessionChanged
+  | SessionDeleted
+  | SessionAttendanceChanged
+  | RsvpAdded
+  | RsvpRemoved;
 
 /**
  * Who may receive a change (ADR 0014). `guests` and `admins` stand in for the
@@ -43,9 +71,15 @@ export type Audience =
 
 export function audienceOf(change: Change): Audience {
   switch (change.type) {
+    case "session.created":
     case "session.changed":
     case "session.deleted":
+    case "session.attendanceChanged":
       return { kind: "event" };
+    case "rsvp.added":
+      return { kind: "guests", ids: [change.payload.rsvp.guestId] };
+    case "rsvp.removed":
+      return { kind: "guests", ids: [change.payload.guestId] };
   }
 }
 
@@ -77,6 +111,21 @@ export type RecordedChange = Change & {
 };
 
 export const changes = {
+  sessionCreated(
+    session: Session,
+    { actor, at }: ChangeContext
+  ): SessionCreated {
+    return {
+      type: "session.created",
+      subjectType: "session",
+      subjectId: session.id,
+      eventId: session.eventId,
+      actor,
+      occurredAt: at,
+      payload: { session },
+    };
+  },
+
   sessionChanged(
     before: Session,
     after: Session,
@@ -106,6 +155,56 @@ export const changes = {
       actor,
       occurredAt: at,
       payload: { session, rsvpGuestIds },
+    };
+  },
+
+  sessionAttendanceChanged(
+    session: Session,
+    numRsvps: number,
+    { actor, at }: ChangeContext
+  ): SessionAttendanceChanged {
+    return {
+      type: "session.attendanceChanged",
+      subjectType: "session",
+      subjectId: session.id,
+      eventId: session.eventId,
+      actor,
+      occurredAt: at,
+      payload: { numRsvps },
+    };
+  },
+
+  rsvpAdded(
+    rsvp: Rsvp,
+    eventId: string,
+    { actor, at }: ChangeContext
+  ): RsvpAdded {
+    return {
+      type: "rsvp.added",
+      subjectType: "rsvp",
+      subjectId: rsvp.id,
+      eventId,
+      actor,
+      occurredAt: at,
+      payload: { rsvp },
+    };
+  },
+
+  rsvpRemoved(
+    rsvpId: string,
+    sessionId: string,
+    guestId: string,
+    eventId: string,
+    { actor, at }: ChangeContext
+  ): RsvpRemoved {
+    return {
+      type: "rsvp.removed",
+      subjectType: "rsvp",
+      subjectId: rsvpId,
+      eventId,
+      actor,
+      occurredAt: at,
+      payload: { sessionId, guestId },
     };
   },
 };

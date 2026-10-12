@@ -8,9 +8,16 @@ import {
   createSession,
 } from "../helpers/factories";
 import { getRepositories, withWriter } from "@/db/container";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
+import {
+  addSession,
+  recordRsvpAdded,
+  removeRsvp,
+} from "@/server/modules/sessions/module";
 import type { ChangeContext } from "@schellingboard/domain/change";
 
 const AT = new Date("2026-06-01T10:00:00.000Z");
+const BY: ChangeContext = { actor: { type: "system" }, at: AT };
 
 describe("change log", () => {
   beforeAll(() => setupTestDb());
@@ -64,7 +71,9 @@ describe("change log", () => {
 
     await deleteLoggedSession(session.id, by);
 
-    const [deleted] = await changes.listAfter(0);
+    const deleted = (await changes.listAfter(0)).find(
+      (c) => c.type === "session.deleted"
+    );
     expect(deleted).toMatchObject({
       type: "session.deleted",
       subjectId: session.id,
@@ -205,5 +214,137 @@ describe("change log", () => {
     const rest = await repos.changes.listAfter(first.seq);
     expect(rest).toHaveLength(1);
     expect(rest[0]).toMatchObject({ payload: { after: { title: "Two" } } });
+  });
+
+  it(
+    "records an RSVP for its guest and the new count for the event",
+    { tags: ["007-US8"] },
+    async () => {
+      const { event, attendee, session } = await world();
+      const { changes } = getRepositories();
+
+      await unitOfWork.run(async (tx) => {
+        const rsvp = await tx.rsvps.create({
+          sessionId: session.id,
+          guestId: attendee.id,
+        });
+        await recordRsvpAdded(tx, rsvp, BY);
+      });
+
+      const recorded = await changes.listAfter(0);
+      expect(recorded).toMatchObject([
+        {
+          type: "rsvp.added",
+          eventId: event.id,
+          audience: { kind: "guests", ids: [attendee.id] },
+          payload: { rsvp: { sessionId: session.id, guestId: attendee.id } },
+        },
+        {
+          type: "session.attendanceChanged",
+          subjectId: session.id,
+          audience: { kind: "event" },
+          payload: { numRsvps: 1 },
+        },
+      ]);
+    }
+  );
+
+  it("counts RSVPs added one after the other", async () => {
+    const { host, attendee, session } = await world();
+    for (const guest of [attendee, host]) {
+      await unitOfWork.run(async (tx) => {
+        const rsvp = await tx.rsvps.create({
+          sessionId: session.id,
+          guestId: guest.id,
+        });
+        await recordRsvpAdded(tx, rsvp, BY);
+      });
+    }
+
+    const counts = (await getRepositories().changes.listAfter(0))
+      .filter((c) => c.type === "session.attendanceChanged")
+      .map((c) => c.payload.numRsvps);
+    expect(counts).toEqual([1, 2]);
+  });
+
+  it(
+    "records a withdrawn RSVP with the count left",
+    { tags: ["007-US8"] },
+    async () => {
+      const { attendee, session } = await world();
+      const { changes, rsvps } = getRepositories();
+      await rsvps.create({ sessionId: session.id, guestId: attendee.id });
+
+      await unitOfWork.run((tx) => removeRsvp(tx, session.id, attendee.id, BY));
+
+      expect(await changes.listAfter(0)).toMatchObject([
+        {
+          type: "rsvp.removed",
+          audience: { kind: "guests", ids: [attendee.id] },
+          payload: { sessionId: session.id, guestId: attendee.id },
+        },
+        { type: "session.attendanceChanged", payload: { numRsvps: 0 } },
+      ]);
+    }
+  );
+
+  it("records nothing for an RSVP that was already gone", async () => {
+    const { attendee, session } = await world();
+
+    await unitOfWork.run((tx) => removeRsvp(tx, session.id, attendee.id, BY));
+
+    expect(await getRepositories().changes.listAfter(0)).toEqual([]);
+  });
+
+  it(
+    "tells each RSVPer their RSVP went with a deleted session",
+    { tags: ["007-US8"] },
+    async () => {
+      const { attendee, session, by } = await world();
+      const { changes, rsvps } = getRepositories();
+      await rsvps.create({ sessionId: session.id, guestId: attendee.id });
+
+      await deleteLoggedSession(session.id, by);
+
+      expect(await changes.listAfter(0)).toMatchObject([
+        {
+          type: "rsvp.removed",
+          audience: { kind: "guests", ids: [attendee.id] },
+        },
+        { type: "session.deleted" },
+      ]);
+    }
+  );
+
+  it("records a created session with its state", async () => {
+    const { event, host } = await world();
+
+    const created = await unitOfWork.run((tx) =>
+      addSession(
+        tx,
+        {
+          title: "New",
+          description: "",
+          capacity: 5,
+          adminManaged: false,
+          blocker: false,
+          closed: false,
+          eventId: event.id,
+          hostIds: [host.id],
+          locationIds: [],
+        },
+        BY
+      )
+    );
+
+    expect(await getRepositories().changes.listAfter(0)).toMatchObject([
+      {
+        type: "session.created",
+        subjectId: created.id,
+        eventId: event.id,
+        audience: { kind: "event" },
+        payload: { session: { title: "New", hosts: [{ id: host.id }] } },
+      },
+    ]);
   });
 });

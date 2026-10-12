@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { legacyActor, legacyDate, legacyRefusal } from "@/app/api/legacy";
 import { sessionUseCases } from "@/server/composition";
+import { requestNow } from "@/utils/dev-clock";
 import { requireProxyVerifiedAdmin } from "@/utils/auth";
 
 export const dynamic = "force-dynamic";
@@ -76,7 +77,8 @@ export async function POST(req: Request) {
       capacity: body.capacity,
       adminManaged: body.adminManaged ?? false,
       closed: body.closed ?? false,
-    }
+    },
+    requestNow(req)
   );
   if (!result.ok) return legacyRefusal(result.error);
 

@@ -19,6 +19,12 @@ export function project(
 ): FeedMessage | undefined {
   const common = { seq: change.seq, commandKey: commandKeyFor(change, viewer) };
   switch (change.type) {
+    case "session.created":
+      return {
+        ...common,
+        type: change.type,
+        session: toSnapshotSessionView(change.payload.session),
+      };
     case "session.changed":
       return {
         ...common,
@@ -27,6 +33,17 @@ export function project(
       };
     case "session.deleted":
       return { ...common, type: change.type, sessionId: change.subjectId };
+    case "session.attendanceChanged":
+      return {
+        ...common,
+        type: change.type,
+        sessionId: change.subjectId,
+        numRsvps: change.payload.numRsvps,
+      };
+    case "rsvp.added":
+      return { ...common, type: change.type, rsvp: change.payload.rsvp };
+    case "rsvp.removed":
+      return { ...common, type: change.type, ...change.payload };
     default:
       return undefined;
   }

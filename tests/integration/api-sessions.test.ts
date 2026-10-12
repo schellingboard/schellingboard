@@ -396,7 +396,11 @@ describe("Idempotency-Key on the mounted API", () => {
       await edit("Unkeyed", 2);
 
       const recorded = await getRepositories().changes.listAfter(0);
-      expect(recorded.map((c) => c.commandKey)).toEqual(["edit-1", null]);
+      expect(
+        recorded
+          .filter((c) => c.type === "session.changed")
+          .map((c) => c.commandKey)
+      ).toEqual(["edit-1", null]);
     }
   );
 

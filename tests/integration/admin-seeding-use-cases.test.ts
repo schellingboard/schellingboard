@@ -206,10 +206,14 @@ describe("admin seeding: sessions", () => {
     const event = await createEvent();
     expect(
       code(
-        await sessions().adminSeedSession(NOBODY, {
-          ...seed,
-          eventSlug: event.slug,
-        })
+        await sessions().adminSeedSession(
+          NOBODY,
+          {
+            ...seed,
+            eventSlug: event.slug,
+          },
+          NOW
+        )
       )
     ).toBe("admin.required");
   });
@@ -222,12 +226,16 @@ describe("admin seeding: sessions", () => {
       const host = await createGuest();
       const room = await createLocation({ capacity: 25 });
       const session = value(
-        await sessions().adminSeedSession(ADMIN, {
-          ...seed,
-          eventSlug: event.slug,
-          hostIds: [host.id],
-          locationIds: [room.id],
-        })
+        await sessions().adminSeedSession(
+          ADMIN,
+          {
+            ...seed,
+            eventSlug: event.slug,
+            hostIds: [host.id],
+            locationIds: [room.id],
+          },
+          NOW
+        )
       );
       expect(session).toMatchObject({
         eventId: event.id,
@@ -246,19 +254,27 @@ describe("admin seeding: sessions", () => {
 
       expect(
         value(
-          await sessions().adminSeedSession(ADMIN, {
-            ...seed,
-            eventSlug: event.slug,
-            capacity: 3,
-          })
+          await sessions().adminSeedSession(
+            ADMIN,
+            {
+              ...seed,
+              eventSlug: event.slug,
+              capacity: 3,
+            },
+            NOW
+          )
         ).capacity
       ).toBe(3);
       expect(
         value(
-          await sessions().adminSeedSession(ADMIN, {
-            ...seed,
-            eventSlug: event.slug,
-          })
+          await sessions().adminSeedSession(
+            ADMIN,
+            {
+              ...seed,
+              eventSlug: event.slug,
+            },
+            NOW
+          )
         ).capacity
       ).toBe(0);
     }
@@ -280,7 +296,8 @@ describe("admin seeding: sessions", () => {
             eventSlug: event.slug,
             hostIds: [host.id],
             locationIds: [room.id],
-          }
+          },
+          NOW
         )
       ).rejects.toThrow("locations.assignToEvent failed");
 
@@ -305,11 +322,15 @@ describe("admin seeding: sessions", () => {
         locationIds: [room.id],
       });
       const attempt = async (input: Partial<typeof seed> & object) =>
-        sessions().adminSeedSession(ADMIN, {
-          ...seed,
-          eventSlug: event.slug,
-          ...input,
-        });
+        sessions().adminSeedSession(
+          ADMIN,
+          {
+            ...seed,
+            eventSlug: event.slug,
+            ...input,
+          },
+          NOW
+        );
       const refusal = async (input: Partial<typeof seed> & object) => {
         const result = await attempt(input);
         return result.ok ? "ok" : [result.error.code, result.error.detail];
@@ -333,11 +354,15 @@ describe("admin seeding: sessions", () => {
       ]);
       expect(
         code(
-          await sessions().adminSeedSession(ADMIN, {
-            ...seed,
-            eventSlug: "missing",
-            hostIds: ["nobody"],
-          })
+          await sessions().adminSeedSession(
+            ADMIN,
+            {
+              ...seed,
+              eventSlug: "missing",
+              hostIds: ["nobody"],
+            },
+            NOW
+          )
         )
       ).toBe("event.notFound");
       expect(
@@ -470,13 +495,13 @@ describe("admin seeding: proposals and RSVPs", () => {
       const session = await createSession(event.id);
       const guest = await createGuest();
       const input = { sessionId: session.id, guestId: guest.id };
-      expect(code(await sessions().adminAddRsvp(NOBODY, input))).toBe(
+      expect(code(await sessions().adminAddRsvp(NOBODY, input, NOW))).toBe(
         "admin.required"
       );
 
-      const first = value(await sessions().adminAddRsvp(ADMIN, input));
+      const first = value(await sessions().adminAddRsvp(ADMIN, input, NOW));
       expect(first).toMatchObject({ created: true, rsvp: input });
-      expect(value(await sessions().adminAddRsvp(ADMIN, input))).toEqual({
+      expect(value(await sessions().adminAddRsvp(ADMIN, input, NOW))).toEqual({
         created: false,
         rsvp: first.rsvp,
       });
@@ -486,18 +511,26 @@ describe("admin seeding: proposals and RSVPs", () => {
 
       expect(
         code(
-          await sessions().adminAddRsvp(ADMIN, {
-            sessionId: "missing",
-            guestId: "nobody",
-          })
+          await sessions().adminAddRsvp(
+            ADMIN,
+            {
+              sessionId: "missing",
+              guestId: "nobody",
+            },
+            NOW
+          )
         )
       ).toBe("session.notFound");
       expect(
         code(
-          await sessions().adminAddRsvp(ADMIN, {
-            sessionId: session.id,
-            guestId: "nobody",
-          })
+          await sessions().adminAddRsvp(
+            ADMIN,
+            {
+              sessionId: session.id,
+              guestId: "nobody",
+            },
+            NOW
+          )
         )
       ).toBe("guest.notFound");
     }
@@ -512,10 +545,14 @@ describe("admin seeding: proposals and RSVPs", () => {
       const guest = await createGuest();
 
       await expect(
-        sessions(uowFailingAt("guests", "assignToEvent")).adminAddRsvp(ADMIN, {
-          sessionId: session.id,
-          guestId: guest.id,
-        })
+        sessions(uowFailingAt("guests", "assignToEvent")).adminAddRsvp(
+          ADMIN,
+          {
+            sessionId: session.id,
+            guestId: guest.id,
+          },
+          NOW
+        )
       ).rejects.toThrow("guests.assignToEvent failed");
 
       const repos = getRepositories();
@@ -533,25 +570,37 @@ describe("admin seeding: proposals and RSVPs", () => {
       const session = await createSession(event.id, { capacity: 1 });
       const [first, second] = [await createGuest(), await createGuest()];
       value(
-        await sessions().adminAddRsvp(ADMIN, {
-          sessionId: session.id,
-          guestId: first.id,
-        })
+        await sessions().adminAddRsvp(
+          ADMIN,
+          {
+            sessionId: session.id,
+            guestId: first.id,
+          },
+          NOW
+        )
       );
       expect(
         code(
-          await sessions().adminAddRsvp(ADMIN, {
-            sessionId: session.id,
-            guestId: second.id,
-          })
+          await sessions().adminAddRsvp(
+            ADMIN,
+            {
+              sessionId: session.id,
+              guestId: second.id,
+            },
+            NOW
+          )
         )
       ).toBe("session.full");
       expect(
         value(
-          await sessions().adminAddRsvp(ADMIN, {
-            sessionId: session.id,
-            guestId: first.id,
-          })
+          await sessions().adminAddRsvp(
+            ADMIN,
+            {
+              sessionId: session.id,
+              guestId: first.id,
+            },
+            NOW
+          )
         ).created
       ).toBe(false);
     }
