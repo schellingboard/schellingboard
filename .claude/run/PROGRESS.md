@@ -116,6 +116,19 @@
   the picture: it only shows when rooms have images, which no spec sets up.
 - E2E fixes were URL assertions only (`/login`, `/guests`, a slug prefix).
 
+## Step 9a (2026-10-09)
+
+- `apps/web` (workspace `apps/*`): Vite 8.3.0, plugin-react 6.1.1, TanStack Router
+  1.170.38 (code-based routes, no router plugin), `@tailwindcss/vite` 4.3.3, happy-dom
+  20.14.4, all pinned exact and at least two weeks old. Built to `apps/web/dist` with
+  base `/_spa/`.
+- The colour tokens, `loc-*` classes and utilities moved from `app/globals.css` to
+  `styles/tokens.css`, imported by both CSS entries; the contrast tests read the new file.
+- Vitest uses `projects` (`server`, and `apps/web/vitest.config.ts` with happy-dom).
+- `tsc -b apps/web` joins `make typecheck`; depcruise covers `apps` with four rules.
+- The catch-all route replaces the location with `/legacy` + path + query + hash
+  (`window.location.replace`); a path already under `/legacy` is left alone.
+
 ## Questions
 
 - A session that loses its only room reads `"X" moved to No location (was Room A)`

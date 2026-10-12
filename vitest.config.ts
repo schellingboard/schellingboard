@@ -4,17 +4,29 @@ import { useCases } from "./tests/use-cases.ts";
 
 export default defineConfig({
   test: {
-    include: [
-      "tests/unit/**/*.test.{ts,tsx}",
-      "tests/integration/**/*.test.{ts,tsx}",
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: "server",
+          include: [
+            "tests/unit/**/*.test.{ts,tsx}",
+            "tests/integration/**/*.test.{ts,tsx}",
+          ],
+          environment: "node",
+          globalSetup: ["tests/global-setup.ts"],
+          setupFiles: ["tests/setup.ts"],
+          pool: "forks",
+          tags: useCases.map(({ id, title }) => ({
+            name: id,
+            description: title,
+          })),
+          strictTags: true,
+        },
+      },
+      "apps/web/vitest.config.ts",
     ],
-    environment: "node",
-    globalSetup: ["tests/global-setup.ts"],
-    setupFiles: ["tests/setup.ts"],
-    pool: "forks",
     silent: "passed-only",
-    tags: useCases.map(({ id, title }) => ({ name: id, description: title })),
-    strictTags: true,
     coverage: {
       provider: "v8",
       reporter: ["text", "lcov", "html"],

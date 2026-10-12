@@ -92,6 +92,10 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
       Dockerfile and standalone output carry the files. Docs: getting-started,
       `docs/dev/` on the new package. Full `make test-e2e` and
       `make test-e2e-docker`.
+  - [x] 9a. Package, tokens shared in `styles/tokens.css`, build, arch rules,
+        Vitest project, catch-all forwarding (unit tests).
+  - [ ] 9b. Next serves the shell and `/_spa/` assets; the proxy redirect goes.
+  - [ ] 9c. `make dev` with Vite in front, Dockerfile, docs, full E2E tiers.
 - [ ] 10. **Replica in the SPA**: `apps/web/src/replica/` from today's
       `app/(site)/[eventSlug]/replica/` (store, `apply`, feed client, sync state
       with step 2's fix, selectors), plus a clock offset from step 7b's server

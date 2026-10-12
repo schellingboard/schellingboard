@@ -2,7 +2,7 @@ import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
 
 // The theme is per device rather than per attendee, so it lives in a cookie
-// and shows up as a class on <html> — the contract `app/globals.css` and the
+// and shows up as a class on <html> — the contract `styles/tokens.css` and the
 // `dark` variant are written against (see docs/dev/adr/0005-dark-mode.md).
 // Nothing else about the page is observable from a test: colours are the
 // point, and asserting on their hex values would just restate the stylesheet.
@@ -49,7 +49,7 @@ test("the switch is on the password gate, before anyone has logged in @014-US1",
   await page.getByRole("button", { name: "Dark" }).click();
   await expect(root(page)).toHaveClass(/\bdark\b/);
   // The class is only half of it: scrollbars, autofill and native controls
-  // follow `color-scheme`, which globals.css derives from the same class
+  // follow `color-scheme`, which tokens.css derives from the same class
   // rather than the layout setting it a second time.
   await expect(root(page)).toHaveCSS("color-scheme", "dark");
   // The window chrome around an installed app reads the theme-color tag,

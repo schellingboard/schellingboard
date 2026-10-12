@@ -164,7 +164,7 @@ const VOTE_OPTIONS = VOTE_CHOICES.map((choice) => ({
 // cues — aria-pressed, a solid `vote-chosen` fill that keeps its luminance gap
 // from the page under any recolouring, and a check mark — rather than a
 // background colour alone. Why that fill is a hue rather than a neutral is at
-// the token in `globals.css`.
+// the token in `styles/tokens.css`.
 function VoteButton({
   emoji,
   label,

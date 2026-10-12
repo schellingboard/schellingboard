@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <title>SchellingBoard</title>
+    <script>
+      var m = document.cookie.match(/(?:^|; )sb-theme=(light|dark)/);
+      if (m) document.documentElement.classList.add(m[1]);
+    </script>
+  </head>
+  <body>
+    <noscript><a href="/legacy">Open SchellingBoard</a></noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -48,6 +48,7 @@ export default tseslint.config(
       "tailwind.config.ts",
       ".dependency-cruiser.cjs",
       ".next/**",
+      "apps/web/dist/**",
       "**/*.mjs",
       ".jj/**",
       "site/**",

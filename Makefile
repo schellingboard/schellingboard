@@ -75,6 +75,7 @@ mailpit:
 	docker compose -f docker-compose.dev.yml $(if $(wildcard .env.dev.local),--env-file .env.dev.local,) up mailpit
 
 build: install
+	bun x vite build apps/web
 	bun x next build
 
 start: install
@@ -90,8 +91,9 @@ typecheck: install
 	bun x tsc -p packages/domain
 	bun x tsc -p packages/contracts
 	bun x tsc -p packages/api-client
+	bun x tsc -b apps/web
 
-DEPCRUISE := bun x depcruise app db packages server utils emails tests scripts instrumentation.ts proxy.ts --config .dependency-cruiser.cjs
+DEPCRUISE := bun x depcruise app apps db packages server utils emails tests scripts instrumentation.ts proxy.ts --config .dependency-cruiser.cjs
 
 # Module-graph rules (cycles, layer boundaries) — the constraints eslint can't
 # see, since it reads one file at a time. See docs/dev/architecture-rules.md.

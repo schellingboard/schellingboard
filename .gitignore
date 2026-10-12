@@ -5,6 +5,7 @@
 /.pnp
 .pnp.js
 .yarn/install-state.gz
+/apps/web/node_modules/
 
 # testing
 /coverage
@@ -15,6 +16,7 @@
 
 # production
 /build
+/apps/web/dist/
 
 # misc
 .DS_Store

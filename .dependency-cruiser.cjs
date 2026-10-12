@@ -82,6 +82,48 @@ module.exports = {
       },
     },
     {
+      name: "web-imports-only-shared-packages",
+      severity: "error",
+      comment:
+        "`apps/web` is a static bundle that talks to the server over `/api/v1`. It may import " +
+        "`packages/domain`, `packages/contracts` and `packages/api-client`, never the Next " +
+        "app, the server, the database or Next itself. See ADR 0015 section 2.",
+      from: { path: "^apps/web/" },
+      to: {
+        path: "^(app|server|utils|db|emails|tests|scripts)/|^(proxy|instrumentation)\\.ts$|node_modules/(next|hono|@hono|better-sqlite3|drizzle-orm)/",
+      },
+    },
+    {
+      name: "nothing-imports-web",
+      severity: "error",
+      comment:
+        "`apps/web` is an entry point: it is built and served, not imported. Shared code " +
+        "belongs in a package. See ADR 0015 section 2.",
+      from: { pathNot: "^apps/web/" },
+      to: { path: "^apps/web/" },
+    },
+    {
+      name: "features-never-call-the-api-client",
+      severity: "error",
+      comment:
+        "Screens read the replica and call `commands/` or `queries/`; only those reach the " +
+        "wire, so every request is predicted, keyed and reconciled in one place. See " +
+        "docs/dev/target-architecture/04-client.md.",
+      from: { path: "^apps/web/src/features/" },
+      to: {
+        path: "^packages/api-client/|node_modules/@schellingboard/api-client/",
+      },
+    },
+    {
+      name: "web-declares-its-dependencies",
+      severity: "error",
+      comment:
+        "`apps/web` may only import what its own package.json declares; hoisting lets an " +
+        "undeclared import resolve anyway.",
+      from: { path: "^apps/web/" },
+      to: { dependencyTypes: ["npm-no-pkg", "npm-unknown"] },
+    },
+    {
       name: "persistence-does-not-reach-up",
       severity: "error",
       comment:
@@ -241,7 +283,7 @@ module.exports = {
   options: {
     doNotFollow: { path: "node_modules" },
     exclude: {
-      path: "(^|/)(\\.next|coverage|site|playwright-report|test-results)/",
+      path: "(^|/)(\\.next|coverage|site|playwright-report|test-results|apps/web/dist)/",
     },
     tsPreCompilationDeps: true,
     tsConfig: { fileName: "tsconfig.json" },
