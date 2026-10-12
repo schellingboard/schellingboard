@@ -105,6 +105,7 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
         before: Session;
         after: Session;
         cascade?: true;
+        tellAttendees?: true;
       };
       return {
         ...common,
@@ -114,6 +115,7 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
           before: reviveSession(payload.before),
           after: reviveSession(payload.after),
           ...(payload.cascade && { cascade: true as const }),
+          ...(payload.tellAttendees && { tellAttendees: true as const }),
         },
       };
     }
@@ -122,6 +124,7 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
         session: Session;
         rsvpGuestIds: string[];
         cascade?: true;
+        tellAttendees?: true;
       };
       return {
         ...common,
@@ -131,6 +134,7 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
           session: reviveSession(payload.session),
           rsvpGuestIds: payload.rsvpGuestIds,
           ...(payload.cascade && { cascade: true as const }),
+          ...(payload.tellAttendees && { tellAttendees: true as const }),
         },
       };
     }

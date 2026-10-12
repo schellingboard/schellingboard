@@ -68,7 +68,19 @@
   notify dependency any more, so step 4 is done and `composition.ts` has no `after()`.
 - Tests that waited for the inline notice now call `runJobs()`.
 
+## Step 5 (2026-10-08)
+
+- `recordingSessionCascade` takes `{ tellAttendees }`; the day and location
+  deletes set it, event and guest deletes do not. The flag rides on the
+  `session.changed` / `session.deleted` payload next to `cascade`, and the
+  reaction then notifies only the RSVPed guests (hosts get nothing, as settled).
+  RSVP ids were already in the `session.deleted` payload. ADR 0014 open question 1
+  marked answered.
+
 ## Questions
+
+- A session that loses its only room reads `"X" moved to No location (was Room A)`
+  in notices; common now with location deletes. Reword if wanted.
 
 - `utils/guest-clashes.ts` imports `@/app/(site)/session_utils`, so `server/modules/`
   reaches `app/` transitively, which `server-does-not-reach-into-app` does not catch.
@@ -76,4 +88,4 @@
 
 ## Next step
 
-5.
+6.

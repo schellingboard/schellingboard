@@ -14,6 +14,8 @@ export type ChangeContext = {
   at: Date;
   /** Set when the change follows from deleting or editing something else. */
   cascade?: true;
+  /** With `cascade`: the session's RSVPed guests are told (not its hosts). */
+  tellAttendees?: true;
 };
 
 type ChangeOf<Type extends string, SubjectType extends string, Payload> = {
@@ -35,7 +37,7 @@ export type SessionCreated = ChangeOf<
 export type SessionChanged = ChangeOf<
   "session.changed",
   "session",
-  { before: Session; after: Session; cascade?: true }
+  { before: Session; after: Session; cascade?: true; tellAttendees?: true }
 >;
 
 /**
@@ -45,7 +47,12 @@ export type SessionChanged = ChangeOf<
 export type SessionDeleted = ChangeOf<
   "session.deleted",
   "session",
-  { session: Session; rsvpGuestIds: string[]; cascade?: true }
+  {
+    session: Session;
+    rsvpGuestIds: string[];
+    cascade?: true;
+    tellAttendees?: true;
+  }
 >;
 
 /** The count after an RSVP was added or taken away: what every viewer shows. */
@@ -317,7 +324,7 @@ export const changes = {
   sessionChanged(
     before: Session,
     after: Session,
-    { actor, at, cascade }: ChangeContext
+    { actor, at, cascade, tellAttendees }: ChangeContext
   ): SessionChanged {
     return {
       type: "session.changed",
@@ -326,14 +333,19 @@ export const changes = {
       eventId: after.eventId,
       actor,
       occurredAt: at,
-      payload: { before, after, ...(cascade && { cascade }) },
+      payload: {
+        before,
+        after,
+        ...(cascade && { cascade }),
+        ...(tellAttendees && { tellAttendees }),
+      },
     };
   },
 
   sessionDeleted(
     session: Session,
     rsvpGuestIds: string[],
-    { actor, at, cascade }: ChangeContext
+    { actor, at, cascade, tellAttendees }: ChangeContext
   ): SessionDeleted {
     return {
       type: "session.deleted",
@@ -342,7 +354,12 @@ export const changes = {
       eventId: session.eventId,
       actor,
       occurredAt: at,
-      payload: { session, rsvpGuestIds, ...(cascade && { cascade }) },
+      payload: {
+        session,
+        rsvpGuestIds,
+        ...(cascade && { cascade }),
+        ...(tellAttendees && { tellAttendees }),
+      },
     };
   },
 

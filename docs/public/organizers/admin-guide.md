@@ -57,7 +57,8 @@ One global row shown when there's more than one event (see
   visible Start/End time range, plus a
   separate Bookings open/close window controlling when attendees can
   self-book a blank bookable slot on that day. Deleting a day also deletes
-  any sessions scheduled inside it (warned before confirming).
+  any sessions scheduled inside it (warned before confirming); guests who
+  RSVPed to them are notified.
   A day may end after midnight (e.g. Friday 09:00 → Saturday 03:00). Since a
   session always belongs to exactly one day, that is how you allow late-night
   sessions: extend the evening's day into the small hours instead of adding a
@@ -88,7 +89,8 @@ create new ones.
   (±2% tolerance).
 - **Sort order** — controls column order in the grid.
 - **Deleting a location** requires typing the name to confirm; the dialog
-  shows how many sessions/events reference it before it cascades.
+  shows how many sessions/events reference it before it cascades. Guests who
+  RSVPed to sessions in it are notified that the session changed.
 
 Attendees are only ever offered the locations assigned to the event they are
 in and that are bookable — everything else is refused. To take a location off

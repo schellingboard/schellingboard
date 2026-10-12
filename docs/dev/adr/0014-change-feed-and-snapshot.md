@@ -191,8 +191,9 @@ for each session they had an RSVP for, `meeting.deleted` for each of their
 meetings (audience: the other guest) and `guest.left`. `apply`
 stays one subject per change, and the log answers "where did this session
 go". The session-notification reaction skips changes marked
-`cascade: true`, so attendees are told no more than today (see Open
-questions).
+`cascade: true`, except those a day or location delete records with
+`tellAttendees: true`: for those it notifies the RSVPed guests, not the hosts.
+Event and guest deletes stay silent.
 
 ### 10. The feed
 
@@ -291,9 +292,9 @@ that matches. Because publish runs under the write lock, changes arrive in
 
 ## Open questions
 
-1. **Cascades and notifications.** When an organizer deletes a day or a
-   location, attendees of the affected sessions are told nothing today. This
-   ADR keeps that (the reaction skips `cascade: true`). Should they be told?
+1. **Cascades and notifications.** _Answered:_ RSVPed guests are told when a
+   day or location delete removes or changes their session (section 9). Event
+   and guest deletes stay silent.
 2. **Hidden tabs.** Closing the feed after 30 seconds hidden is the
    recommendation. The alternative is to keep every tab connected and rely
    only on HTTP/2.

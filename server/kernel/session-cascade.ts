@@ -9,16 +9,22 @@ const hostsOf = (s: Session) => s.hosts.map((h) => h.id).join();
 
 /**
  * Runs `work`, which removes or edits `sessions` as a side effect (deleting a
- * day or an event), and records a change for each one it touched (ADR 0014
- * section 9). The changes are marked `cascade`, so no one is emailed for them.
+ * day, location, event or guest), and records a change for each one it touched (ADR 0014
+ * section 9). The changes are marked `cascade`, so no one is emailed for them
+ * unless `tellAttendees` asks for the RSVPed guests to be.
  */
 export async function recordingSessionCascade<T>(
   tx: Tx,
   sessions: Session[],
   work: () => Promise<T>,
-  by: ChangeContext
+  by: ChangeContext,
+  { tellAttendees = false } = {}
 ): Promise<T> {
-  const cascade = { ...by, cascade: true as const };
+  const cascade = {
+    ...by,
+    cascade: true as const,
+    ...(tellAttendees && { tellAttendees: true as const }),
+  };
   const rsvps = await Promise.all(
     sessions.map((s) => tx.rsvps.listBySession(s.id))
   );

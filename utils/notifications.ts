@@ -102,6 +102,7 @@ export async function notifySessionChanged(args: {
   before: Session;
   after: Session;
   changedById: string | null;
+  attendeesOnly?: boolean;
   now: Date;
 }): Promise<void> {
   try {
@@ -115,11 +116,13 @@ async function notifySessionChangedUnsafe({
   before,
   after,
   changedById,
+  attendeesOnly,
   now,
 }: {
   before: Session;
   after: Session;
   changedById: string | null;
+  attendeesOnly?: boolean;
   now: Date;
 }): Promise<void> {
   const timeChanged =
@@ -159,7 +162,7 @@ async function notifySessionChangedUnsafe({
   };
   const what = changeSummary(messageProps);
   await notifySessionRecipients({
-    hostIds: after.hosts.map((host) => host.id),
+    hostIds: attendeesOnly ? [] : after.hosts.map((host) => host.id),
     rsvpGuestIds: (await rsvps.listBySession(after.id)).map(
       (rsvp) => rsvp.guestId
     ),
@@ -204,6 +207,7 @@ export async function notifySessionDeleted(args: {
   session: Session;
   rsvpGuestIds: string[];
   changedById: string | null;
+  attendeesOnly?: boolean;
   now: Date;
 }): Promise<void> {
   try {
@@ -217,11 +221,13 @@ async function notifySessionDeletedUnsafe({
   session,
   rsvpGuestIds,
   changedById,
+  attendeesOnly,
   now,
 }: {
   session: Session;
   rsvpGuestIds: string[];
   changedById: string | null;
+  attendeesOnly?: boolean;
   now: Date;
 }): Promise<void> {
   const event = await getRepositories().events.findById(session.eventId);
@@ -236,7 +242,7 @@ async function notifySessionDeletedUnsafe({
   };
 
   await notifySessionRecipients({
-    hostIds: session.hosts.map((host) => host.id),
+    hostIds: attendeesOnly ? [] : session.hosts.map((host) => host.id),
     rsvpGuestIds,
     changedById,
     hostMessage: {
