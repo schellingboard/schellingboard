@@ -30,6 +30,8 @@ export interface paths {
               version: string;
               /** @description Differs between builds; a client that sees it change is stale */
               buildId: string;
+              /** @description Whether the development tools (the time-travel toolbar) are on */
+              devTools: boolean;
             };
           };
         };

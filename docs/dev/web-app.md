@@ -62,6 +62,17 @@ command runner and the queries for the new `guestId` when it changes. The provid
 again every 5 s while the first identity fetch fails. `app/keys.ts` holds the
 `newKey` the runner needs.
 
+## Theme, footer and dev clock
+
+`app/theme.tsx` keeps the ADR 0005 `sb-theme` cookie (read at start, written with the
+`light`/`dark` class on `<html>`; `index.html`'s inline script applies it before first
+paint, as the Next layout does). The footer's version and build come from
+`GET /api/v1/health` (`useHealth`); its release notes are `packages/domain`'s. The dev
+clock toolbar needs `devTools` from the same endpoint (`SB_ENABLE_DEV_TOOLS`) and `?dev=1`;
+it writes the `time-override` cookie and calls `onChange`, which the shell makes reload the
+app so the replica is read under the new time. The legacy toolbar's "Send due reminders"
+button has no SPA counterpart.
+
 ## Tests
 
 Unit tests sit next to the code (`*.test.ts(x)`) and run in the `web` Vitest project

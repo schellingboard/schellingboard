@@ -285,3 +285,10 @@
   SPA only has an event's snapshot guests (members and hosts) and `GET /guests` is closed to
   anonymous visitors. Step 13 passes the snapshot's guests; a non-member cannot pick their
   name in the SPA until that is decided.
+
+## Step 12c (2026-10-09)
+
+- `GET /api/v1/health` gained `devTools` (the SPA cannot read the server env). `app/theme.tsx`
+  (cookie + class + theme-color metas, consistent with the Next one and index.html's script),
+  `app/footer.tsx` (version button, release notes dialog from domain, `ui/inline-markdown`
+  for bold and code only), `app/health.tsx`, `app/dev-toolbar.tsx` (time travel only).
