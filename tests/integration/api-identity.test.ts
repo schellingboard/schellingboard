@@ -9,7 +9,7 @@ import {
 } from "vitest";
 
 import { NextRequest } from "next/server";
-import { PUT, DELETE } from "@/app/api/v1/[[...route]]/route";
+import { GET, PUT, DELETE } from "@/app/api/v1/[[...route]]/route";
 import { getRepositories } from "@/db/container";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createGuest } from "../helpers/factories";
@@ -54,7 +54,54 @@ beforeEach(() => {
 });
 afterEach(() => vi.unstubAllEnvs());
 
+const whoAmI = (cookie?: string) =>
+  GET(
+    new NextRequest("http://test/api/v1/me/identity", {
+      headers: cookie ? { cookie } : {},
+    })
+  );
+
 describe("/api/v1/me/identity", () => {
+  it("tells who the browser acts as", { tags: ["003-US1"] }, async () => {
+    const ada = await createGuest({ name: "Ada" });
+
+    const res = await whoAmI(`${GUEST_COOKIE_NAME}=${openGuestValue(ada.id)}`);
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ guestId: ada.id });
+  });
+
+  it("tells nobody when no name is chosen", { tags: ["003-US1"] }, async () => {
+    expect(await (await whoAmI()).json()).toEqual({ guestId: null });
+  });
+
+  it(
+    "does not tell a protected name that was not verified",
+    { tags: ["003-US4"] },
+    async () => {
+      const grace = await createGuest({ name: "Grace" });
+      await protect(grace.id);
+
+      const open = await whoAmI(
+        `${GUEST_COOKIE_NAME}=${openGuestValue(grace.id)}`
+      );
+      const verified = await whoAmI(
+        `${GUEST_COOKIE_NAME}=${await verifiedGuestValue(grace.id)}`
+      );
+
+      expect(await open.json()).toEqual({ guestId: null });
+      expect(await verified.json()).toEqual({ guestId: grace.id });
+    }
+  );
+
+  it("tells nobody for a deleted guest", { tags: ["003-US1"] }, async () => {
+    expect(
+      await (
+        await whoAmI(`${GUEST_COOKIE_NAME}=${openGuestValue("gone")}`)
+      ).json()
+    ).toEqual({ guestId: null });
+  });
+
   it(
     "picks an open name and sets the guest cookie",
     { tags: ["003-US1"] },

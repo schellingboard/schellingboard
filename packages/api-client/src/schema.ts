@@ -2668,7 +2668,39 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /** @description The guest this browser acts as, or null; a protected name counts only once logged in. */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The current guest */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              /** @description The guest the browser now acts as, or null when signed out */
+              guestId: string | null;
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
     /** @description Makes this browser act as an open guest name (sets the guest cookie). A protected name answers 403 `guest.protected`: send the user to the login page. */
     put: {
       parameters: {

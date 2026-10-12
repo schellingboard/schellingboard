@@ -117,6 +117,18 @@ const removeMyAvatar = createRoute({
   },
 });
 
+const getIdentity = createRoute({
+  method: "get",
+  path: "/me/identity",
+  tags: ["people"],
+  description:
+    "The guest this browser acts as, or null; a protected name counts only once logged in.",
+  responses: {
+    200: json(identitySchema, "The current guest"),
+    ...problemDefault,
+  },
+});
+
 const chooseIdentity = createRoute({
   method: "put",
   path: "/me/identity",
@@ -140,6 +152,10 @@ const signOutIdentity = createRoute({
 });
 
 export function addPeopleRoutes(app: App, people: () => PeopleUseCases) {
+  app.openapi(getIdentity, async (c) =>
+    c.json(await people().currentGuest(c.var.actor), 200)
+  );
+
   app.openapi(chooseIdentity, async (c) => {
     const result = await people().chooseGuest(c.var.actor, c.req.valid("json"));
     if (!result.ok) return problem(result.error);
