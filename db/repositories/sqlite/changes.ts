@@ -234,6 +234,13 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
         subjectType: "rsvp",
         payload: row.payload as { rsvp: Rsvp },
       };
+    case "session.cohostsAdded":
+      return {
+        ...common,
+        type: "session.cohostsAdded",
+        subjectType: "session",
+        payload: row.payload as { hostIds: string[] },
+      };
     case "proposal.joined":
       return {
         ...common,
@@ -296,6 +303,7 @@ const KNOWN_TYPES: RecordedChange["type"][] = [
   "rsvp.removed",
   "proposal.joined",
   "comment.created",
+  "session.cohostsAdded",
 ];
 
 const PRUNED_CURSOR = "changes.pruned";

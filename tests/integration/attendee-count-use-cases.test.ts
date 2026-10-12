@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
@@ -24,7 +24,6 @@ const now = () => new Date();
 const sessions = () =>
   createSessionUseCases({
     repos: getRepositories(),
-    notifyCohostsAdded: vi.fn(async () => {}),
     uow: unitOfWork,
   });
 

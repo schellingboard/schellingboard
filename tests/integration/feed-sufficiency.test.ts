@@ -29,7 +29,6 @@ const NOW = new Date();
 const sessions = () =>
   createSessionUseCases({
     repos: getRepositories(),
-    notifyCohostsAdded: async () => {},
     uow: unitOfWork,
   });
 

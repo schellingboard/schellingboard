@@ -13,7 +13,6 @@ import { sendMail } from "@/utils/mailer";
 import { generateVapidKeys } from "@/utils/push";
 import { mapImages } from "@/utils/map-image";
 import {
-  notifyCohostsAdded,
   notifyMeetingOutcome,
   notifyMeetingRequested,
 } from "@/utils/notifications";
@@ -82,7 +81,6 @@ import {
 export function sessionUseCases(): SessionUseCases {
   return createSessionUseCases({
     repos: getRepositories(),
-    notifyCohostsAdded,
     uow: unitOfWork,
   });
 }

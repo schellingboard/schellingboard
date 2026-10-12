@@ -19,6 +19,7 @@ export { addAdminUnavailabilityRoutes } from "./http/unavailability-routes";
 export {
   addSession,
   changeSession,
+  recordCohostsAdded,
   recordRsvpAdded,
   removeRsvp,
   removeSession,

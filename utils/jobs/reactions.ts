@@ -1,6 +1,7 @@
 import { getRepositories } from "@/db/container";
 import type { Actor, RecordedChange } from "@schellingboard/domain/change";
 import {
+  notifyCohostsAdded,
   notifyProfileCommented,
   notifyProposalCommented,
   notifyProposalJoined,
@@ -44,6 +45,18 @@ export const changeNotifications = reaction(
     // Dated by the clock of whoever made the change, so the dev fake clock
     // reaches the notice (ADR 0004).
     const now = change.occurredAt;
+    if (change.type === "session.cohostsAdded") {
+      const session = await getRepositories().sessions.findById(
+        change.subjectId
+      );
+      if (!session) return;
+      await notifyCohostsAdded({
+        session,
+        addedIds: change.payload.hostIds,
+        now,
+      });
+      return;
+    }
     if (change.type === "proposal.joined") {
       await notifyProposalJoined({
         proposalId: change.subjectId,

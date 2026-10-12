@@ -26,7 +26,6 @@ const at = (time: string) => new Date(`${DAY}T${time}:00.000Z`);
 const PAST = new Date("2020-03-01T10:00:00.000Z");
 const PAST_END = new Date("2020-03-01T11:00:00.000Z");
 
-const notifyCohostsAdded = vi.fn(async () => {});
 const events = () =>
   createEventUseCases({ repos: getRepositories(), uow: unitOfWork });
 const venue = () =>
@@ -42,7 +41,6 @@ const venue = () =>
 const sessions = (uow: UnitOfWork = unitOfWork) =>
   createSessionUseCases({
     repos: getRepositories(),
-    notifyCohostsAdded,
     uow,
   });
 const proposals = (uow: UnitOfWork = unitOfWork) =>
@@ -273,7 +271,9 @@ describe("admin seeding: sessions", () => {
       expect(
         (await repos.locations.listByEvent(event.id)).map((l) => l.id)
       ).toEqual([room.id]);
-      expect(notifyCohostsAdded).not.toHaveBeenCalled();
+      expect(
+        (await repos.changes.listAfter(0)).map((c) => c.type)
+      ).not.toContain("session.cohostsAdded");
 
       expect(
         value(

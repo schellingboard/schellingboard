@@ -29,6 +29,20 @@ export async function addSession(
   );
 }
 
+/** Records the hosts a session gained; whoever made the change is not told. */
+export function recordCohostsAdded(
+  tx: Tx,
+  session: Session,
+  previousHostIds: string[],
+  by: ChangeContext
+): void {
+  const known = new Set(previousHostIds);
+  if (by.actor.type === "guest") known.add(by.actor.id);
+  const added = session.hosts.map((h) => h.id).filter((id) => !known.has(id));
+  if (added.length > 0)
+    tx.record(changes.sessionCohostsAdded(session, added, by));
+}
+
 /** Updates the session and records the change, if there is one. */
 export async function changeSession(
   tx: Tx,
