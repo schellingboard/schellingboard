@@ -7,6 +7,7 @@ import type { Location } from "@schellingboard/domain/location";
 import type { Actor } from "@/server/kernel/actor";
 import {
   forbidden,
+  invalid,
   invalidFields,
   notFound,
   ok,
@@ -162,15 +163,11 @@ export const updateLocation =
     } = parsed.data;
     const eventIds = [...new Set(requested)];
 
-    // Checked before the image is saved too, so a stale edit replaces no file.
-    const found = await deps.repos.locations.findById(id);
-    if (!found) return locationNotFound();
-    if (outdated(found, expectedVersion))
-      return locationChangedMeanwhile(deps.repos.locations, id);
-    const newImageUrl =
-      image && (await deps.images.save(id, image.buffer, image.ext));
+    const saved = await saveImageIfCurrent(deps, id, expectedVersion, image);
+    if (!saved.ok) return saved;
+    const newImageUrl = saved.value;
 
-    return deps.uow.run(async (tx) => {
+    const updated = await deps.uow.run(async (tx) => {
       const existing = await tx.locations.findById(id);
       if (!existing) return locationNotFound();
       const unknown = await unknownEvent(tx.events, eventIds);
@@ -186,6 +183,89 @@ export const updateLocation =
       if (!updated) return locationChangedMeanwhile(tx.locations, id);
       return ok({ ...updated, eventIds });
     });
+    return dropOrphanedImage(deps, id, updated, newImageUrl);
+  };
+
+// Checked before the file is replaced, so a stale save replaces no file. The
+// check is not atomic with the write: a save conflicting in between keeps its file.
+async function saveImageIfCurrent(
+  { repos, images }: VenueDeps,
+  id: string,
+  expectedVersion: number,
+  image: { buffer: Buffer; ext: string } | undefined
+): Promise<Result<string | undefined>> {
+  const found = await repos.locations.findById(id);
+  if (!found) return locationNotFound();
+  if (outdated(found, expectedVersion))
+    return locationChangedMeanwhile(repos.locations, id);
+  return ok(image && (await images.save(id, image.buffer, image.ext)));
+}
+
+async function dropOrphanedImage<T>(
+  { images }: VenueDeps,
+  id: string,
+  result: Result<T>,
+  savedImageUrl: string | undefined
+): Promise<Result<T>> {
+  if (!result.ok && result.error.code === "location.notFound" && savedImageUrl)
+    await images.delete(id);
+  return result;
+}
+
+async function setImageUrl(
+  { uow }: VenueDeps,
+  id: string,
+  imageUrl: string,
+  expectedVersion: number
+): Promise<Result<LocationWithEvents>> {
+  return uow.run(async (tx) => {
+    const existing = await tx.locations.findById(id);
+    if (!existing) return locationNotFound();
+    const updated = await tx.locations.update(id, {
+      ...existing,
+      imageUrl,
+      expectedVersion,
+    });
+    if (!updated) return locationChangedMeanwhile(tx.locations, id);
+    return ok({ ...updated, eventIds: await tx.locations.listEventIds(id) });
+  });
+}
+
+export const replaceLocationImage =
+  (deps: VenueDeps) =>
+  async (
+    actor: Actor,
+    {
+      id,
+      image,
+      expectedVersion,
+    }: { id: string; image: Buffer; expectedVersion: number }
+  ): Promise<Result<LocationWithEvents>> => {
+    if (!actor.admin) return adminRequired();
+    const checked = await deps.images.validate(image);
+    if ("error" in checked)
+      return invalid("location.imageInvalid", checked.error);
+    const saved = await saveImageIfCurrent(deps, id, expectedVersion, checked);
+    if (!saved.ok) return saved;
+    const imageUrl = saved.value ?? "";
+    return dropOrphanedImage(
+      deps,
+      id,
+      await setImageUrl(deps, id, imageUrl, expectedVersion),
+      imageUrl
+    );
+  };
+
+export const removeLocationImage =
+  (deps: VenueDeps) =>
+  async (
+    actor: Actor,
+    { id, expectedVersion }: { id: string; expectedVersion: number }
+  ): Promise<Result<LocationWithEvents>> => {
+    if (!actor.admin) return adminRequired();
+    const removed = await setImageUrl(deps, id, "", expectedVersion);
+    if (removed.ok) await deps.images.delete(id);
+    return removed;
   };
 
 export const deleteLocation =

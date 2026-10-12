@@ -153,7 +153,10 @@ admin cookie it can read every endpoint it needs:
 - **Find a location before adding it.** `GET /api/v1/admin/locations` lists
   every location, hidden ones included. Location names need not be unique, so
   the script decides what counts as the same location, then creates the missing
-  ones with `POST /api/v1/admin/locations`.
+  ones with `POST /api/v1/admin/locations`. Upload a location's image with
+  `PUT /api/v1/admin/locations/{id}/image` (a form with `image` and
+  `expectedVersion`) and remove it with
+  `DELETE /api/v1/admin/locations/{id}/image?expectedVersion=…`.
 - **Find the existing sessions.** `GET /api/v1/sessions?eventId=…` lists the
   event's sessions, with their rooms, hosts (id and name only) and capacity,
   one page at a time (see [Long lists](#long-lists)); sort them by start

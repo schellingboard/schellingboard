@@ -1,4 +1,5 @@
 import { z } from "@hono/zod-openapi";
+import { expectedVersion } from "@schellingboard/contracts/session";
 import type { createApp } from "./create-app";
 
 export type App = ReturnType<typeof createApp>;
@@ -13,3 +14,10 @@ export const body = <T extends z.ZodType>(schema: T) => ({
 });
 export const idParam = z.object({ id: z.string().min(1) });
 export const noContent = (description: string) => ({ description });
+
+// Form fields and query parameters arrive as text.
+export const textExpectedVersion = z
+  .string()
+  .regex(/^\d+$/)
+  .transform(Number)
+  .describe(expectedVersion.description ?? "");

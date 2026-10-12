@@ -5,7 +5,6 @@ import {
   publicProfileListSchema,
   publicProfileSchema,
 } from "@schellingboard/contracts/guest";
-import { expectedVersion as sharedExpectedVersion } from "@schellingboard/contracts/session";
 import { MIN_AVATAR_WIDTH } from "@/utils/avatar-image-constraints";
 import { MAX_IMAGE_BYTES } from "@/utils/images";
 import { idempotencyHeaders } from "@/server/http/idempotency";
@@ -15,16 +14,15 @@ import {
   problemDefault,
   versionConflictResponse,
 } from "@/server/http/problem";
-import { body, idParam, json, type App } from "@/server/http/route-parts";
+import {
+  body,
+  idParam,
+  json,
+  textExpectedVersion as expectedVersion,
+  type App,
+} from "@/server/http/route-parts";
 import type { PeopleUseCases } from "../application/use-cases";
 import { toProfileView } from "./view";
-
-// Form fields and query parameters arrive as text.
-const expectedVersion = z
-  .string()
-  .regex(/^\d+$/)
-  .transform(Number)
-  .describe(sharedExpectedVersion.description ?? "");
 
 const avatarForm = z.object({
   avatar: z

@@ -294,6 +294,25 @@ cursor.invalid`. The use case now returns the whole list; the
   a port (`generateVapidKeys`, web-push in `server/composition.ts`); the
   settings page calls the use case, and `vapidPublicKey` is gone.
 
+- 6b: `PUT /admin/locations/{id}/image` (multipart `image` and
+  `expectedVersion`) and `DELETE …/image?expectedVersion=` call the new venue
+  use cases `replaceLocationImage` and `removeLocationImage`, which raise the
+  location's version and answer `location.versionConflict` with `current`
+  (the image is part of the location's read). The version is checked before
+  the file is replaced; a removal deletes the file after commit. A bad file is
+  `400 location.imageInvalid`. The form-text `expectedVersion` schema moved
+  to `server/http/route-parts.ts` (shared with `/me/avatar`). The admin
+  location form keeps uploading through `updateLocation`, one save for fields
+  and image: calling the image use case separately would split one save into
+  two writes that can half succeed. Step 7a revisits files and rows.
+- 6b review: the version check before the file save is shared with
+  `updateLocation`; a location deleted between save and write now drops the
+  new file. Left for 7a2: a conflict between check and write keeps the new
+  file (the row names the old URL, which 404s if the extension changed), and
+  a replace committed between a removal's commit and its file delete loses
+  its new file. No test for these races: they need a delete or write between
+  two awaits of one request.
+
 ## Problems
 
 None.
@@ -314,4 +333,4 @@ None.
 
 ## Next step
 
-6b.
+7.

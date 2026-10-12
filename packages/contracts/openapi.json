@@ -5576,7 +5576,7 @@
       },
       "post": {
         "tags": ["admin"],
-        "description": "Adds a location after the others. Images are set in the admin UI.",
+        "description": "Adds a location after the others; its image is set with PUT /admin/locations/{id}/image.",
         "parameters": [
           {
             "schema": {
@@ -5762,6 +5762,188 @@
         ],
         "responses": {
           "204": { "description": "Deleted" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "adminAuth": [] }]
+      }
+    },
+    "/api/v1/admin/locations/{id}/image": {
+      "put": {
+        "tags": ["admin"],
+        "description": "Replaces the location's image.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "JPEG, PNG or WebP, at most 5 MiB, at least 400 px wide, 4:3"
+                  },
+                  "expectedVersion": {
+                    "type": "string",
+                    "pattern": "^\\d+$",
+                    "description": "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
+                  }
+                },
+                "required": ["image", "expectedVersion"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The location with its new image",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Location" }
+              }
+            }
+          },
+          "409": {
+            "description": "A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    },
+                    "current": { "$ref": "#/components/schemas/Location" }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "adminAuth": [] }]
+      },
+      "delete": {
+        "tags": ["admin"],
+        "description": "Removes the location's image.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
+            },
+            "required": true,
+            "description": "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`",
+            "name": "expectedVersion",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The location without an image",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Location" }
+              }
+            }
+          },
+          "409": {
+            "description": "A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    },
+                    "current": { "$ref": "#/components/schemas/Location" }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          },
           "default": {
             "description": "Problem details (RFC 9457); clients branch on `code`",
             "content": {
