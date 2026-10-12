@@ -8,14 +8,17 @@
     "@schellingboard/contracts": "workspace:*",
     "@schellingboard/domain": "workspace:*",
     "@tanstack/react-router": "1.170.38",
+    "luxon": "^3.7.2",
     "react": "^19",
-    "react-dom": "^19"
+    "react-dom": "^19",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.3.3",
     "@testing-library/dom": "10.4.0",
     "@testing-library/react": "16.3.0",
     "@testing-library/user-event": "14.6.1",
+    "@types/luxon": "^3.7.6",
     "@types/node": "^26",
     "@types/react": "^19",
     "@types/react-dom": "^19",
