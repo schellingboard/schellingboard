@@ -68,7 +68,7 @@ describe("reading one's own notifications", () => {
       await getRepositories().notifications.markRead(ada.id, older.id, now());
 
       const listed = value(
-        await notifications().listMyNotifications(open(ada.id), { limit: 20 })
+        await notifications().listMyNotifications(open(ada.id))
       );
 
       expect(listed.notifications.map((n) => n.text)).toEqual([
@@ -80,23 +80,6 @@ describe("reading one's own notifications", () => {
         url: "/e?viewSession=s1",
       });
       expect(listed.unreadCount).toBe(1);
-      expect(listed.total).toBe(2);
-    }
-  );
-
-  it(
-    "returns at most `limit` notifications",
-    { tags: ["013-US1"] },
-    async () => {
-      const ada = await createGuest();
-      await notify(ada.id, "a");
-      await notify(ada.id, "b");
-
-      const listed = value(
-        await notifications().listMyNotifications(open(ada.id), { limit: 1 })
-      );
-      expect(listed.notifications).toHaveLength(1);
-      expect(listed.total).toBe(2);
     }
   );
 
@@ -106,8 +89,7 @@ describe("reading one's own notifications", () => {
     async () => {
       const ada = await createGuest();
       await protect(ada.id);
-      const list = (actor: Actor) =>
-        notifications().listMyNotifications(actor, { limit: 20 });
+      const list = (actor: Actor) => notifications().listMyNotifications(actor);
 
       expect(code(await list(NOBODY))).toBe("guest.unselected");
       expect(code(await list(ADMIN))).toBe("guest.unselected");

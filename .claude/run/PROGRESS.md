@@ -266,6 +266,17 @@ openapi-check typecheck test-coverage` (or `make test`), without E2E. E2E runs
   event conflict message (`STALE_EVENT_MESSAGE`) says to copy the edits
   before reloading.
 
+- 5c: `GET /me/notifications` takes the cursor contract (newest first:
+  negated creation time, then id ascending) and answers
+  `{ items, nextCursor, unreadCount }`; its `limit`-only query (max 100,
+  default 20) and `total` are gone. Review, rejected: equal-time ties go by
+  id ascending, the web page's by id descending; sort keys ascend and an id
+  cannot be negated, and only ties within a millisecond differ. The cursor
+  names the guest's list, so another guest's cursor is `400
+cursor.invalid`. The use case now returns the whole list; the
+  notifications page keeps its own offset paging through the repository
+  (step 16 moves it to queries).
+
 ## Problems
 
 None.
@@ -283,4 +294,4 @@ None.
 
 ## Next step
 
-5c.
+5d.

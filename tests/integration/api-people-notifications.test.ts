@@ -297,7 +297,7 @@ describe("/api/v1 notifications and settings", () => {
       });
       expect(listed.status).toBe(200);
       expect(await listed.json()).toEqual({
-        notifications: [
+        items: [
           {
             id: mine.id,
             type: "sessionComment",
@@ -307,8 +307,8 @@ describe("/api/v1 notifications and settings", () => {
             readAt: null,
           },
         ],
+        nextCursor: null,
         unreadCount: 1,
-        total: 1,
       });
 
       const read = await call("POST", `/me/notifications/${mine.id}/read`, {
@@ -331,6 +331,52 @@ describe("/api/v1 notifications and settings", () => {
       expect(deleted.status).toBe(204);
       expect(await repo.countByGuest(ada.id)).toBe(0);
       expect(await repo.countByGuest(grace.id)).toBe(1);
+    }
+  );
+
+  it(
+    "lists the caller's notifications page by page, newest first",
+    { tags: ["013-US1", "019-US8"] },
+    async () => {
+      const ada = await createGuest();
+      const repo = getRepositories().notifications;
+      const at = (minute: number) =>
+        repo.create({
+          guestId: ada.id,
+          type: "sessionComment",
+          text: `At ${minute}`,
+          url: "/e",
+          createdAt: new Date(Date.UTC(2026, 0, 1, 10, minute)),
+        });
+      await at(1);
+      await at(3);
+      await at(2);
+      const page = async (query: string) =>
+        (await (
+          await call("GET", `/me/notifications?${query}`, {
+            cookie: asGuest(ada.id),
+          })
+        ).json()) as {
+          items: { text: string }[];
+          nextCursor: string | null;
+          unreadCount: number;
+        };
+
+      const first = await page("limit=2");
+      expect(first.items.map((n) => n.text)).toEqual(["At 3", "At 2"]);
+      expect(first.unreadCount).toBe(3);
+      const second = await page(`limit=2&cursor=${first.nextCursor}`);
+      expect(second.items.map((n) => n.text)).toEqual(["At 1"]);
+      expect(second.nextCursor).toBeNull();
+
+      const grace = await createGuest();
+      const foreign = await call(
+        "GET",
+        `/me/notifications?cursor=${first.nextCursor}`,
+        { cookie: asGuest(grace.id) }
+      );
+      expect(foreign.status).toBe(400);
+      expect(await foreign.json()).toMatchObject({ code: "cursor.invalid" });
     }
   );
 

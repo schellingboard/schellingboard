@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { pageSchema } from "./cursor-page";
 import { emailSettingsSchema } from "./guest";
 
 export const notificationSchema = z
@@ -12,14 +13,8 @@ export const notificationSchema = z
   })
   .meta({ id: "Notification" });
 
-export const myNotificationsQuerySchema = z.object({
-  limit: z.coerce.number().int().min(1).max(100).default(20),
-});
-
-export const myNotificationsSchema = z.object({
-  notifications: z.array(notificationSchema).describe("Newest first"),
-  unreadCount: z.number().int(),
-  total: z.number().int(),
+export const myNotificationsSchema = pageSchema(notificationSchema).extend({
+  unreadCount: z.number().int().describe("Unread across every page"),
 });
 
 export const notificationIdsSchema = z.object({
