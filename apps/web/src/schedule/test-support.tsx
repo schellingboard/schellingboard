@@ -37,6 +37,10 @@ export function renderScheduled(
           data,
           links: legacyScheduleLinks(snapshot.event.slug),
           params,
+          actions: {
+            toggleRsvp: () => Promise.resolve({ ok: true }),
+            pickName: () => {},
+          },
         }}
       >
         {ui}

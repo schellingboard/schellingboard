@@ -70,6 +70,8 @@ async function open({
       });
     if (call.path === "/api/v1/events/conf/snapshot")
       return snap instanceof Response ? snap : Response.json(snap);
+    if (call.method === "DELETE" && call.path.includes("/rsvps/"))
+      return new Response(null, { status: 204 });
     return problem(404, "not.found");
   });
   const services: AppServices = {
@@ -119,6 +121,25 @@ describe("the schedule page", () => {
       expect(
         await screen.findByRole("button", { name: /Version 4.1.0/ })
       ).toBeTruthy();
+    }
+  );
+
+  it(
+    "sends an RSVP withdrawn from the grid badge to the server and shows it at once",
+    { tags: ["009-US1"] },
+    async () => {
+      const { calls } = await open();
+      await userEvent.click(
+        await screen.findByRole("button", { name: "Withdraw RSVP from Talk" })
+      );
+      expect(
+        await screen.findByRole("button", { name: "RSVP to Talk" })
+      ).toBeTruthy();
+      expect(calls.at(-1)).toMatchObject({
+        method: "DELETE",
+        path: "/api/v1/sessions/s/rsvps/mia",
+      });
+      expect(calls.at(-1)?.key).toBeTruthy();
     }
   );
 
