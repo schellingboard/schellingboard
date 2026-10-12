@@ -40,7 +40,7 @@ The files are read relative to the working directory, so the same code serves
 ## Layout and rules
 
 `apps/web/src/` follows [the client layout](target-architecture/04-client.md#layout);
-`app/` and `replica/` exist so far (the replica: store, `apply`, feed client, sync state, a server clock offset and IndexedDB persistence keyed by event and viewer, opened as `stale`). dependency-cruiser enforces that the package imports
+`app/` (layout, nav bar), `ui/` (dialog, button), `replica/`, `commands/` and `queries/` exist so far (the replica: store, `apply`, feed client, sync state, a server clock offset and IndexedDB persistence keyed by event and viewer, opened as `stale`). dependency-cruiser enforces that the package imports
 `packages/domain`, `packages/contracts` and `packages/api-client` only (never `app/`,
 `server/`, `utils/` or `next`), that nothing imports it, that `features/` never
 imports `api-client`, and that it declares what it imports. See
@@ -49,5 +49,6 @@ imports `api-client`, and that it declares what it imports. See
 ## Tests
 
 Unit tests sit next to the code (`*.test.ts(x)`) and run in the `web` Vitest project
-under happy-dom as part of `make test`. Screens are covered by the E2E suite; there
-are no component tests in a browser runner.
+under happy-dom as part of `make test`. Components are tested with `@testing-library/react` and `user-event` (cleanup is
+registered in `src/test-setup.ts`), through roles and names, never styling. Screens
+are covered by the E2E suite; there is no browser component runner.

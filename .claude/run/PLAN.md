@@ -121,7 +121,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
       indicator, error boundary, the dev toolbar's time travel when dev tools are
       on. Links to unmoved screens go to `/legacy/…` directly.
   - [x] 12.0. `GET /api/v1/me/identity`: the SPA's viewer source.
-  - [ ] 12a. `ui/` primitives, layout, nav.
+  - [x] 12a. `ui/` primitives, layout, nav.
   - [ ] 12b. Viewer provider, user picker, protected-name redirect.
   - [ ] 12c. Theme, footer with release notes, dev toolbar.
   - [ ] 12d. Sync indicator, error boundary.
