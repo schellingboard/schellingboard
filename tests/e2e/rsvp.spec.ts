@@ -26,7 +26,7 @@ test("RSVP to a session persists across reloads and can be removed again @009-US
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/legacy/Conference-Gamma");
 
   // Bob is not a host of the seeded keynote, so he gets an RSVP button
   await selectUser(page, /Bob Test/i);
@@ -68,7 +68,7 @@ test("RSVPing over a confirmed 1-on-1 warns about it first @009-US3", async ({
   page,
 }) => {
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/legacy/Conference-Gamma");
   await selectUser(page, "Zanele Khumalo");
 
   await page
@@ -112,7 +112,7 @@ test("a full session blocks further RSVPs when the event enforces capacity @009-
 
   // Site: Alice hosts a fresh session, so it deterministically has no RSVPs.
   await login(page);
-  await page.goto("/Conference-Gamma");
+  await page.goto("/legacy/Conference-Gamma");
   await selectUser(page, /Alice Test/i);
   const sessionTitle = "Tiny Room Tasting";
   await page.getByRole("link", { name: "Add session" }).first().click();
@@ -191,7 +191,7 @@ test("a full session blocks further RSVPs when the event enforces capacity @009-
   ).toBeVisible();
 
   // Bob takes the only seat.
-  await page.goto("/Conference-Gamma");
+  await page.goto("/legacy/Conference-Gamma");
   const dialog = page.getByRole("dialog", { name: "Session details" });
   const openSession = async () => {
     await page.getByRole("link", { name: sessionTitle }).click();
@@ -254,7 +254,7 @@ test("leaving an event page while its live feed is still connecting is quiet @00
     await route.continue().catch(() => undefined);
   });
 
-  await page.goto("/Conference-Gamma");
+  await page.goto("/legacy/Conference-Gamma");
   await selectUser(page, /Bob Test/i);
 
   // Reloading before the request was issued would hold the reloaded page's

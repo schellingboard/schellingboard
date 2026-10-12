@@ -16,9 +16,15 @@ colour tokens in `styles/tokens.css` (the Next pages import the same file).
 - Hashed files are requested as `/_spa/assets/…`. The proxy skips them; a rewrite in
   `next.config.js` hands them to `/api/spa/assets/…`, which serves them as
   immutable and answers 404 for anything missing, never the shell.
-- Until a screen moves, the router's catch-all route replaces the location with
-  `/legacy` + path + query, so the app behaves as before. A path already under
-  `/legacy` is left alone.
+- The router owns `/{slug}`, an event's schedule. Everything else the SPA does not own is
+  forwarded: the catch-all route replaces the location with `/legacy` + path + query (a path
+  already under `/legacy` is left alone), and a static route per legacy root page
+  (`app/legacy-pages.ts`, checked against `app/legacy/` by `tests/unit/spa-legacy-pages.test.ts`)
+  keeps an event slug from shadowing `/settings`, `/guests`, and so on. While their screens are
+  not SPA yet, `?viewSession=`, `?viewMeeting=` and kiosk mode (`?kiosk=`, or the `kiosk`
+  cookie) hand the `/{slug}` address on to the legacy schedule (`forwards-to-legacy.ts`).
+- Legacy pages link to the SPA with plain anchors, never Next's `Link` (`AppLink`, which
+  does that for every root path outside `/legacy`): Next has nothing to fetch there.
 
 The files are read relative to the working directory, so the same code serves
 `next start`, and the Docker image, which copies `apps/web/dist` next to
@@ -34,8 +40,9 @@ The files are read relative to the working directory, so the same code serves
   `/media` and the other Next paths to Next. The shell gate does not apply in dev.
   A bare `next dev` answers root pages with the shell (503 until the SPA is built):
   use `/legacy/...` URLs with it, as the screenshots script does.
-- E2E specs call `page.goto` with root paths; the fixture sends them to `/legacy/...`
-  so a click never lands before hydration. One spec covers the shell's forward.
+- E2E specs call `page.goto` with root paths; the fixture sends them to `/legacy/...` so a
+  click never lands before hydration, except an event's own address (`/{slug}`, any query),
+  which is the SPA's schedule and is opened as it is. One spec covers the shell's forward.
 
 ## Layout and rules
 

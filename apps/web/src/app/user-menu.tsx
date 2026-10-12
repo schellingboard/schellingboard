@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Dialog } from "../ui/dialog";
 import { hardNavigate, hardReload } from "./hard-navigate";
+import { endSiteSession } from "./site-session";
 import type { Viewer } from "./viewer";
 
 export type PickableGuest = {
@@ -34,6 +35,7 @@ export function UserMenu({
     setLogoutFailed(false);
     try {
       await viewer.signOut();
+      await endSiteSession();
     } catch {
       setLoggingOut(false);
       setLogoutFailed(true);
@@ -77,19 +79,28 @@ export function UserMenu({
         </span>
       </button>
       {menuOpen && (
-        <div className="absolute right-0 z-40 mt-1 w-48 rounded-md bg-surface-raised py-1 shadow-lg ring-1 ring-line-subtle">
-          <a href={`/legacy/guests/${current.id}`} className={item}>
+        <div
+          role="menu"
+          aria-label="Your name"
+          className="absolute right-0 z-40 mt-1 w-48 rounded-md bg-surface-raised py-1 shadow-lg ring-1 ring-line-subtle"
+        >
+          <a
+            role="menuitem"
+            href={`/legacy/guests/${current.id}`}
+            className={item}
+          >
             My profile
           </a>
-          <a href="/legacy/guests/edit" className={item}>
+          <a role="menuitem" href="/legacy/guests/edit" className={item}>
             Edit profile
           </a>
-          <a href="/legacy/settings" className={item}>
+          <a role="menuitem" href="/legacy/settings" className={item}>
             Settings
           </a>
           <div className="my-1 h-px bg-surface-muted" />
           <button
             type="button"
+            role="menuitem"
             disabled={loggingOut}
             onClick={() => void logOut()}
             className={`${item} disabled:opacity-50`}
@@ -120,6 +131,8 @@ export function NamePicker({
 }) {
   const [query, setQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const inputId = useId();
+  const listId = useId();
   const shown = guests.filter((g) =>
     g.name.toLowerCase().includes(query.trim().toLowerCase())
   );
@@ -134,33 +147,50 @@ export function NamePicker({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} title="My name is">
+    <Dialog open={open} onClose={onClose} title="Who are you?">
+      <label htmlFor={inputId} className="text-fg-subtle">
+        My name is:
+      </label>
       <input
-        type="search"
-        aria-label="Find your name"
+        id={inputId}
+        role="combobox"
+        aria-expanded
+        aria-controls={listId}
         autoFocus
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="w-full rounded-md border border-line bg-surface-raised px-3 py-2 text-sm"
+        className="mt-1 w-full rounded-md border border-line bg-surface-raised px-3 py-2 text-sm"
       />
       {error && (
         <p role="alert" className="mt-2 text-sm text-danger-fg">
           {error}
         </p>
       )}
-      <ul className="mt-2 max-h-72 overflow-y-auto">
+      <ul
+        id={listId}
+        role="listbox"
+        aria-label="Names"
+        className="mt-2 max-h-72 overflow-y-auto"
+      >
         {shown.map((guest) => (
-          <li key={guest.id}>
-            <button
-              type="button"
-              onClick={() => void pick(guest)}
-              className={item}
-            >
-              {guest.name}
-              {guest.authProtected && (
-                <span className="ml-2 text-xs text-fg-subtle">(password)</span>
-              )}
-            </button>
+          <li
+            key={guest.id}
+            role="option"
+            aria-selected={false}
+            tabIndex={0}
+            onClick={() => void pick(guest)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                void pick(guest);
+              }
+            }}
+            className={`${item} cursor-pointer`}
+          >
+            {guest.name}
+            {guest.authProtected && (
+              <span className="ml-2 text-xs text-fg-subtle">(password)</span>
+            )}
           </li>
         ))}
       </ul>

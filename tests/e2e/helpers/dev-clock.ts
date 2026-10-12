@@ -37,24 +37,25 @@ export async function setDevClock(page: Page, target: DateTime) {
   // A test that lands on the same simulated moment twice hits exactly this —
   // the override cookie survives the user switch in between.
   if ((await picker.inputValue()) === value) return;
-  // Applying the clock triggers a router.refresh(); a navigation started while
-  // its RSC payload is still streaming aborts it, which logs an RSC-payload
-  // error the console guard fails on. So wait for that very response, body and
-  // all — "networkidle" is both later and less certain, since Next goes on
-  // prefetching in the background. A refresh asks for RSC without the
-  // prefetch header, which is what tells it apart from those prefetches.
-  const refreshed = page.waitForResponse(
-    (res) =>
-      res.ok() &&
-      res.request().headers()["rsc"] === "1" &&
-      !res.request().headers()["next-router-prefetch"]
-  );
+  // The legacy pages refresh in place (wait for that RSC response, or aborting
+  // it fails the console guard); the SPA reloads instead. Whichever comes first.
+  const moved = Promise.race([
+    page
+      .waitForResponse(
+        (res) =>
+          res.ok() &&
+          res.request().headers()["rsc"] === "1" &&
+          !res.request().headers()["next-router-prefetch"]
+      )
+      .then((res) => res.finished()),
+    page.waitForEvent("load"),
+  ]).catch(() => undefined);
   await picker.fill(value);
   // The toolbar prints the simulated instant in UTC; for the afternoon targets
   // these tests use, the calendar date is the same as Berlin's, so match on
   // the date alone.
   await expect(page.getByText(target.toFormat("yyyy-MM-dd"))).toBeVisible();
-  await (await refreshed).finished();
+  await moved;
 }
 
 /**

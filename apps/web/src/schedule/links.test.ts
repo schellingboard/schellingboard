@@ -25,6 +25,12 @@ describe("legacyScheduleLinks", () => {
     );
   });
 
+  it("books a free 1-on-1 slot on the legacy schedule, which opens the request", () => {
+    expect(links.bookMeeting("2026-06-15T10:00:00.000Z")).toBe(
+      "/legacy/conf?bookMeeting=2026-06-15T10%3A00%3A00.000Z"
+    );
+  });
+
   it("links the proposals and the schedule", () => {
     expect(links.proposals).toBe("/legacy/conf/proposals");
     expect(links.schedule).toBe("/legacy/conf");

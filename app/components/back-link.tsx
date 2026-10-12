@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { AppLink } from "./app-link";
 
 export function BackLink({
   href,
@@ -8,7 +8,7 @@ export function BackLink({
   children: React.ReactNode;
 }) {
   return (
-    <Link
+    <AppLink
       // py/-my: a 14px line is a 20px tap target, under the 24px minimum a
       // thumb needs; the negative margin keeps the extra height from pushing
       // the content below it down.
@@ -16,6 +16,6 @@ export function BackLink({
       href={href}
     >
       ← {children}
-    </Link>
+    </AppLink>
   );
 }

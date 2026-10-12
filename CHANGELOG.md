@@ -26,8 +26,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
-- **Pages now live under `/legacy/`**: the address bar shows `/legacy/…` for the
-  schedule, proposals, profiles and admin pages. Old links, bookmarks and emails still work.
+- **Pages now live under `/legacy/`**: the address bar shows `/legacy/…` for proposals,
+  profiles and admin pages; the schedule keeps its plain address. Old links, bookmarks and emails still work.
+- **The schedule is now a faster-loading app page**: the grid, agenda, filters and RSVP
+  buttons work as before; session details and kiosk mode open as before.
 - **Deleting a day or location now tells RSVPed guests**: attendees whose session is removed
   or moved by it are notified, in the app and by email or push as their settings allow.
 - **Self-hosters behind a reverse proxy must set `SB_TRUSTED_PROXIES`** (#679): the

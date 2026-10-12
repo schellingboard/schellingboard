@@ -29,7 +29,7 @@ export async function renderSessionForm(
   // A session is attributed to its hosts, so it can't be booked anonymously.
   if (!currentUser) {
     return (
-      <PageNotice backHref={`/legacy/${eventSlug}`} backLabel="Schedule">
+      <PageNotice backHref={`/${eventSlug}`} backLabel="Schedule">
         {await unverifiedUserMessage(cookieStore, task)}
       </PageNotice>
     );

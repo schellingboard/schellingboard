@@ -46,6 +46,21 @@ describe("Tooltip", () => {
 });
 
 describe("Tooltip toggleable", () => {
+  it("also opens when the pointer rests on it", () => {
+    vi.useFakeTimers();
+    render(
+      <Tooltip toggleable content="Details">
+        Room
+      </Tooltip>
+    );
+    fireEvent.mouseEnter(screen.getByRole("button", { name: "Room" }));
+    act(() => void vi.advanceTimersByTime(600));
+    expect(screen.getByRole("tooltip").textContent).toBe("Details");
+    fireEvent.mouseLeave(screen.getByRole("button", { name: "Room" }));
+    expect(screen.queryByRole("tooltip")).toBeNull();
+    vi.useRealTimers();
+  });
+
   it("opens on a tap and closes on Escape or a press elsewhere", async () => {
     render(
       <>

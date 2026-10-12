@@ -450,6 +450,14 @@ export function MeetingsCol({
     slotIncrement,
     breakMinutes,
   });
+  // The SPA schedule links a free slot here, naming it.
+  const requested = useSearchParams().get("bookMeeting");
+  const [seenRequest, setSeenRequest] = useState<string | null>(null);
+  if (requested !== seenRequest) {
+    setSeenRequest(requested);
+    if (requested && rows.some((r) => r.start === requested))
+      setBooking(requested);
+  }
   const numSlots = getNumSlots(day.start, day.end, slotIncrement);
   const openRow = rows.find(
     (candidate) => candidate.kind === "meetings" && candidate.start === openSlot
