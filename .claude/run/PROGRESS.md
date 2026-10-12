@@ -333,6 +333,16 @@ cursor.invalid`. The use case now returns the whole list; the
   does an invalid value. The bucket map keeps at most 10,000 entries: full
   buckets go first, then the oldest. The CHANGELOG has a breaking-change
   note (coordinator's decision, 2026-10-07).
+- 7.2: `server/http/rate-limit.ts` takes a token per request after the
+  actor middleware: one bucket for the admin, one per verified guest, else
+  per client IP (`API_LIMIT`: 300 at once, then 5 a second; my choice, the
+  plan names no numbers). Past it: `429 rate.limited` with `Retry-After`.
+  `/api/v1/health` is exempt (monitors would share the anonymous bucket).
+  `tests/setup.ts` resets the buckets before every test. No CHANGELOG
+  bullet: `/api/v1` is unreleased and its docs say it. No OpenAPI change:
+  the `default` problem response covers `429`.
+- 7.2 review: an open (unsigned) guest cookie no longer gets its own
+  bucket, as any id would buy a fresh one; open names count by client IP.
 
 ## Problems
 
@@ -354,4 +364,4 @@ None.
 
 ## Next step
 
-7.2.
+7a.

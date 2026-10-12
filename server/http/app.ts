@@ -41,11 +41,13 @@ import { createApp } from "./create-app";
 import { addApiDocsRoutes } from "./docs";
 import { addHealthRoute } from "./health";
 import { idempotencyMiddleware } from "./idempotency";
+import { rateLimitMiddleware } from "./rate-limit";
 
 export const API_BASE_PATH = "/api/v1";
 
 export const api = createApp(API_BASE_PATH);
 api.use("*", actorMiddleware);
+api.use("*", rateLimitMiddleware([`${API_BASE_PATH}/health`]));
 api.use(
   "*",
   idempotencyMiddleware({ store: () => getRepositories().idempotency })

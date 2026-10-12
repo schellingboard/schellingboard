@@ -16,7 +16,7 @@ import {
   AUTH_COOKIE_NAME,
   ADMIN_COOKIE_NAME,
 } from "@/utils/auth";
-import { LOGIN_LIMITS, resetRateLimits } from "@/server/kernel/rate-limit";
+import { LOGIN_LIMITS } from "@/server/kernel/rate-limit";
 
 const MAX_LOGIN_FAILURES_PER_CLIENT = LOGIN_LIMITS.perClient.capacity;
 
@@ -35,7 +35,6 @@ describe("POST /api/auth/login", () => {
 
   beforeEach(() => {
     resetTestDb();
-    resetRateLimits();
     vi.stubEnv("SITE_PASSWORD", "site-pw");
     vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);

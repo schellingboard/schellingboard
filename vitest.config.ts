@@ -10,6 +10,7 @@ export default defineConfig({
     ],
     environment: "node",
     globalSetup: ["tests/global-setup.ts"],
+    setupFiles: ["tests/setup.ts"],
     pool: "forks",
     silent: "passed-only",
     tags: useCases.map(({ id, title }) => ({ name: id, description: title })),
