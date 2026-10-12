@@ -102,6 +102,9 @@ graphql` commands (neither field is settable via plain `gh issue create`/`edit`)
 - Work on a GitHub issue ends with a footer naming it: `fixes #123` when the commit fully resolves
   the issue (GitHub then closes it), `issue #123` when it is only part of the work
 - See [docs/dev/migrations.md](docs/dev/migrations.md) for resolving `drizzle` migration conflicts
+- NEVER push to a remote server unless explicitly told to do so, in which case
+  it's a one time ask, not a general permission. This also applies to any kind
+  of agents.
 
 ### jj paths with special characters
 
@@ -242,10 +245,14 @@ Applies only while `.claude/run/PLAN.md` exists. A hook prints it and
 `.claude/run/PROGRESS.md` at session start and after compaction; those files, not the
 conversation, are the state of the run.
 
-- Do one PLAN.md step at a time, each in a fresh `implementer` subagent. Pass it the
-  step and the PROGRESS.md entries it needs; it shares no memory with you.
-- After every implementer, run a fresh `reviewer` subagent on its commit. Push only
-  after the review, so the reviewer's amend needs no force-push.
+- Do one PLAN.md step at a time in an `implementer` subagent. Keep the same one for
+  the next step (`SendMessage`), with the step and the PROGRESS.md entries it needs.
+  Start a fresh one only when its context is at or above 200k tokens at the end of a
+  step, as the Agent result's usage shows; a fresh one shares no memory with you.
+- After every step, run a fresh `reviewer` subagent on its commit. It changes nothing.
+  Pass its report verbatim to the implementer, which evaluates each finding
+  critically, fixes those it accepts, amends the commit, and gives a reason for each
+  finding it rejects. Push only after that, so the amend needs no force-push.
 - Delegate searches that read more than a few files to the `Explore` agent. Do not
   read large files, logs or full test output in the main session.
 - A step is done when `make precommit` passes. If a tier cannot run in the
@@ -253,10 +260,11 @@ conversation, are the state of the run.
 - One commit per step. If a step is too big for one coherent commit, split it in
   PLAN.md first. Tick the step in PLAN.md and update PROGRESS.md (decisions, problems,
   next step) in the step's own commit.
-- Push every commit as its own stacked PR: branch `<session branch>-NN` (01, 02, …)
-  holding exactly that commit on top of the branch before it. The first PR's base is
-  the branch of the commit below it if that has an open PR, otherwise `main`. PR
-  title and body are the commit message. Never push to `main`.
+- Only push if explicitly instructed to! If pushing, push every commit as its
+  own stacked PR: branch `<session branch>-NN` (01, 02, …) holding exactly that
+  commit on top of the branch before it. The first PR's base is the branch of
+  the commit below it if that has an open PR, otherwise `main`. PR title and
+  body are the commit message. Never push to `main`.
 - Never rewrite a pushed commit; a fix to it is a new step. If `gh` cannot open a PR,
   push the branch and list it with its base in PROGRESS.md.
 - Blocked, or facing a decision the plan and ADRs do not settle: record it under
