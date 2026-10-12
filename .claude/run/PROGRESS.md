@@ -62,6 +62,15 @@ openapi-check typecheck test-coverage` (or `make test`), without E2E. E2E runs
 - 3a: `uowFailingAt(repo, method)` in `tests/helpers/changes.ts` makes one
   `tx` method fail, for the rollback tests of 3b–3d.
 
+- 3b: the only multi-write use case of the family was `adminCreateProposal`
+  (hosts join the event, then the proposal); it now runs whole in `uow.run`.
+  Every other proposal, vote and comment write runs its checks in `uow.run`
+  too: before, a vote, comment or like racing a delete hit a foreign key
+  error (500), an edit could revive a deleted comment's tombstone, and a
+  co-host removed meanwhile could still edit. `ProposalDeps` and
+  `CommentDeps` take `uow`. Views are presented and notifications sent after
+  commit. Proposal to session conversion belongs to the sessions family (3a).
+
 - Step 4 split into 4a1–4a4 (one commit and migration per subject family),
   then 4b.
 - 4a1: `versionConflict(subject, current, detail)` in `server/kernel/result.ts`
@@ -92,4 +101,4 @@ None.
 
 ## Next step
 
-3b.
+3c.

@@ -79,90 +79,98 @@ export const createComment =
     { subject, parentId, body }: CreateCommentInput,
     now: Date
   ): Promise<Result<Comment>> => {
-    const { repos } = deps;
-    const acting = await actingGuest(actor, repos.guests);
-    if (!acting.ok) return acting;
-    const missing = await missingSubject(repos, subject);
-    if (missing) return missing;
-    const comments = thread(repos, subject.kind);
-    if (parentId && (await comments.findSubjectId(parentId)) !== subject.id)
-      return invalid(
-        "comment.parentInvalid",
-        "The comment being replied to is invalid"
-      );
+    const result = await deps.uow.run(async (tx) => {
+      const acting = await actingGuest(actor, tx.guests);
+      if (!acting.ok) return acting;
+      const missing = await missingSubject(tx, subject);
+      if (missing) return missing;
+      const comments = thread(tx, subject.kind);
+      if (parentId && (await comments.findSubjectId(parentId)) !== subject.id)
+        return invalid(
+          "comment.parentInvalid",
+          "The comment being replied to is invalid"
+        );
 
-    const comment = await comments.create({
-      subjectId: subject.id,
-      authorId: acting.value,
-      parentId,
-      body,
-      createdTime: now,
+      return ok(
+        await comments.create({
+          subjectId: subject.id,
+          authorId: acting.value,
+          parentId,
+          body,
+          createdTime: now,
+        })
+      );
     });
-    deps.notifyCommented({ subject, comment, now });
-    return ok(comment);
+    if (result.ok)
+      deps.notifyCommented({ subject, comment: result.value, now });
+    return result;
   };
 
 export const editComment =
-  ({ repos }: CommentDeps) =>
+  ({ uow }: CommentDeps) =>
   async (
     actor: Actor,
     { commentId, body }: { commentId: string; body: string },
     now: Date
-  ): Promise<Result<Comment>> => {
-    const own = await ownComment(actor, repos, commentId);
-    if (!own.ok) return own;
-    await repos.comments.update(commentId, { body, editedTime: now });
-    return ok({ ...own.value, body, editedTime: now });
-  };
+  ): Promise<Result<Comment>> =>
+    uow.run(async (tx) => {
+      const own = await ownComment(actor, tx, commentId);
+      if (!own.ok) return own;
+      await tx.comments.update(commentId, { body, editedTime: now });
+      return ok({ ...own.value, body, editedTime: now });
+    });
 
 export const deleteComment =
-  ({ repos }: CommentDeps) =>
+  ({ uow }: CommentDeps) =>
   async (
     actor: Actor,
     { commentId }: { commentId: string }
-  ): Promise<Result<void>> => {
-    const own = await ownComment(actor, repos, commentId);
-    if (!own.ok) return own;
-    await repos.comments.delete(commentId);
-    return ok(undefined);
-  };
+  ): Promise<Result<void>> =>
+    uow.run(async (tx) => {
+      const own = await ownComment(actor, tx, commentId);
+      if (!own.ok) return own;
+      await tx.comments.delete(commentId);
+      return ok(undefined);
+    });
 
 export const toggleCommentLike =
-  ({ repos }: CommentDeps) =>
+  ({ uow }: CommentDeps) =>
   async (
     actor: Actor,
     { commentId }: { commentId: string },
     now: Date
-  ): Promise<Result<boolean>> => {
-    const acting = await actingGuest(actor, repos.guests);
-    if (!acting.ok) return acting;
-    const comment = await liveComment(repos, commentId);
-    if (!comment.ok) return comment;
-    return ok(
-      await repos.comments.toggleLike({
-        commentId,
-        guestId: acting.value,
-        createdTime: now,
-      })
-    );
-  };
+  ): Promise<Result<boolean>> =>
+    uow.run(async (tx) => {
+      const acting = await actingGuest(actor, tx.guests);
+      if (!acting.ok) return acting;
+      const comment = await liveComment(tx, commentId);
+      if (!comment.ok) return comment;
+      return ok(
+        await tx.comments.toggleLike({
+          commentId,
+          guestId: acting.value,
+          createdTime: now,
+        })
+      );
+    });
 
 export const setCommentLike =
-  ({ repos }: CommentDeps) =>
+  ({ uow }: CommentDeps) =>
   async (
     actor: Actor,
     { commentId, liked }: { commentId: string; liked: boolean },
     now: Date
-  ): Promise<Result<void>> => {
-    const acting = await actingGuest(actor, repos.guests);
-    if (!acting.ok) return acting;
-    const comment = await liveComment(repos, commentId);
-    if (!comment.ok) return comment;
-    await repos.comments.setLike({
-      commentId,
-      guestId: acting.value,
-      liked,
-      createdTime: now,
+  ): Promise<Result<void>> =>
+    uow.run(async (tx) => {
+      const acting = await actingGuest(actor, tx.guests);
+      if (!acting.ok) return acting;
+      const comment = await liveComment(tx, commentId);
+      if (!comment.ok) return comment;
+      await tx.comments.setLike({
+        commentId,
+        guestId: acting.value,
+        liked,
+        createdTime: now,
+      });
+      return ok(undefined);
     });
-    return ok(undefined);
-  };

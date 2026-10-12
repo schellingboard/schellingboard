@@ -74,7 +74,7 @@ feed and snapshot), `04-client.md` (The replica), `05-security.md` (Authorizatio
       fail. One commit per family; skip a family with no such use case:
   - [x] 3a. Sessions and RSVPs (admin session create with guest and location assignment,
         RSVP with event assignment).
-  - [ ] 3b. Proposals, votes, comments (admin proposal create, …).
+  - [x] 3b. Proposals, votes, comments (admin proposal create, …).
   - [ ] 3c. Events, days, venue.
   - [ ] 3d. People, meetings, notifications, settings.
 

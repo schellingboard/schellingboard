@@ -1,4 +1,5 @@
 import type { Repositories } from "@/db/container";
+import type { UnitOfWork } from "@/server/kernel/unit-of-work";
 import type { Comment } from "@schellingboard/domain/comment";
 
 export type CommentSubjectKind = "proposal" | "session" | "profile";
@@ -9,6 +10,7 @@ export interface CommentSubject {
 }
 
 export interface CommentDeps {
+  uow: UnitOfWork;
   repos: Pick<
     Repositories,
     | "comments"

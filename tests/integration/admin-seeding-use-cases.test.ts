@@ -43,10 +43,11 @@ const sessions = (uow: UnitOfWork = unitOfWork) =>
     notifyCohostsAdded,
     uow,
   });
-const proposals = () =>
+const proposals = (uow: UnitOfWork = unitOfWork) =>
   createProposalUseCases({
     repos: getRepositories(),
     notifyProposalJoined: () => {},
+    uow,
   });
 
 function value<T>(result: Result<T>): T {
@@ -359,6 +360,36 @@ describe("admin seeding: sessions", () => {
 });
 
 describe("admin seeding: proposals and RSVPs", () => {
+  it(
+    "creates no proposal and adds no host when saving the proposal fails",
+    { tags: ["018-US1", "019-US5", "019-US7"] },
+    async () => {
+      const event = await createEvent();
+      const host = await createGuest();
+
+      await expect(
+        proposals(
+          uowFailingAt("sessionProposals", "create")
+        ).adminCreateProposal(
+          ADMIN,
+          {
+            title: "Seeded idea",
+            description: "",
+            durationMinutes: null,
+            hostIds: [host.id],
+            event: { id: event.id },
+          },
+          NOW
+        )
+      ).rejects.toThrow("sessionProposals.create failed");
+
+      const repos = getRepositories();
+      expect(await repos.sessionProposals.listByEvent(event.id)).toEqual([]);
+      expect(await repos.guests.listByEvent(event.id)).toEqual([]);
+      expect(await repos.changes.listAfter(0)).toEqual([]);
+    }
+  );
+
   it(
     "creates a proposal in any phase, adding its hosts to the event",
     { tags: ["018-US1", "019-US5"] },

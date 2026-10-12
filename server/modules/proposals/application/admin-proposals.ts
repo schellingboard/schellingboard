@@ -73,7 +73,7 @@ async function unknownHost(
 // For seeding scripts: no phase gate, and the hosts join the event so they
 // show up in its guest list.
 export const adminCreateProposal =
-  ({ repos }: ProposalDeps) =>
+  ({ repos, uow }: ProposalDeps) =>
   async (
     actor: Actor,
     { event: ref, ...input }: AdminCreateProposalInput,
@@ -83,28 +83,33 @@ export const adminCreateProposal =
     const fields = checked(input);
     if (!fields.ok) return fields;
     const { title, durationMinutes, hostIds } = fields.value;
-    const event =
-      "id" in ref
-        ? await repos.events.findById(ref.id)
-        : await repos.events.findBySlug(ref.slug);
-    if (!event) return notFound("event.notFound", "Event not found");
-    const refused = await unknownHost(repos, hostIds);
-    if (refused) return refused;
+    const result = await uow.run(async (tx) => {
+      const event =
+        "id" in ref
+          ? await tx.events.findById(ref.id)
+          : await tx.events.findBySlug(ref.slug);
+      if (!event) return notFound("event.notFound", "Event not found");
+      const refused = await unknownHost(tx, hostIds);
+      if (refused) return refused;
 
-    if (hostIds.length > 0) await repos.guests.assignToEvent(event.id, hostIds);
-    const created = await repos.sessionProposals.create({
-      eventId: event.id,
-      title,
-      description: input.description.trim() || undefined,
-      hostIds,
-      durationMinutes: durationMinutes ?? undefined,
-      createdTime: now,
+      if (hostIds.length > 0) await tx.guests.assignToEvent(event.id, hostIds);
+      const created = await tx.sessionProposals.create({
+        eventId: event.id,
+        title,
+        description: input.description.trim() || undefined,
+        hostIds,
+        durationMinutes: durationMinutes ?? undefined,
+        createdTime: now,
+      });
+      return ok({ created, event });
     });
+    if (!result.ok) return result;
+    const { created, event } = result.value;
     return ok((await presenter(actor, repos, event, now))(created));
   };
 
 export const adminUpdateProposal =
-  ({ repos }: ProposalDeps) =>
+  ({ repos, uow }: ProposalDeps) =>
   async (
     actor: Actor,
     input: AdminUpdateProposalInput,
@@ -114,43 +119,49 @@ export const adminUpdateProposal =
     const fields = checked(input);
     if (!fields.ok) return fields;
     const { title, durationMinutes, hostIds } = fields.value;
-
-    const proposal = await repos.sessionProposals.findById(input.id);
-    if (!proposal) return proposalNotFound();
-    const refused = await unknownHost(repos, hostIds);
-    if (refused) return refused;
     const expectedUpdatedTime =
       input.expectedUpdatedTime === undefined
         ? undefined
         : new Date(input.expectedUpdatedTime);
-    if (expectedUpdatedTime && Number.isNaN(expectedUpdatedTime.getTime()))
-      return invalid(
-        "proposal.expectedUpdatedTimeInvalid",
-        "Invalid expectedUpdatedTime"
-      );
 
-    const updated = await repos.sessionProposals.update(input.id, {
-      title,
-      description: input.description.trim(),
-      durationMinutes,
-      hostIds,
-      expectedUpdatedTime,
-      expectedVersion: input.expectedVersion,
-      updatedTime: now,
+    const result = await uow.run(async (tx) => {
+      const proposal = await tx.sessionProposals.findById(input.id);
+      if (!proposal) return proposalNotFound();
+      const refused = await unknownHost(tx, hostIds);
+      if (refused) return refused;
+      if (expectedUpdatedTime && Number.isNaN(expectedUpdatedTime.getTime()))
+        return invalid(
+          "proposal.expectedUpdatedTimeInvalid",
+          "Invalid expectedUpdatedTime"
+        );
+
+      const updated = await tx.sessionProposals.update(input.id, {
+        title,
+        description: input.description.trim(),
+        durationMinutes,
+        hostIds,
+        expectedUpdatedTime,
+        expectedVersion: input.expectedVersion,
+        updatedTime: now,
+      });
+      if (!updated) return changedMeanwhile(actor, tx, input.id, now);
+      return ok(updated);
     });
-    if (!updated) return changedMeanwhile(actor, repos, input.id, now);
-    return presentOne(actor, repos, updated, now);
+    if (!result.ok) return result;
+    return presentOne(actor, repos, result.value, now);
   };
 
 export const adminDeleteProposal =
-  ({ repos }: ProposalDeps) =>
+  ({ uow }: ProposalDeps) =>
   async (
     actor: Actor,
     { id }: { id: string }
   ): Promise<Result<SessionProposal>> => {
     if (!actor.admin) return adminRequired();
-    const proposal = await repos.sessionProposals.findById(id);
-    if (!proposal) return proposalNotFound();
-    await repos.sessionProposals.delete(id);
-    return ok(proposal);
+    return uow.run(async (tx) => {
+      const proposal = await tx.sessionProposals.findById(id);
+      if (!proposal) return proposalNotFound();
+      await tx.sessionProposals.delete(id);
+      return ok(proposal);
+    });
   };
