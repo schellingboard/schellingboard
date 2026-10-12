@@ -184,6 +184,13 @@
   reads `workspaces` from the importer's own manifest, so by-name imports inside
   `apps/web` are `undetermined`; `import-packages-by-name` now accepts that type.
 
+## Step 10b (2026-10-09)
+
+- The store keeps a clock offset (`serverNow()`): the snapshot's `now` on construction,
+  `replace` and a newer `adopt`, and the feed ping's `{now}`, each against `Date.now()`
+  at receipt (latency is ignored; the error is well under a second). Step 10c must not
+  observe the `now` of a persisted snapshot.
+
 ## Questions
 
 - A session that loses its only room reads `"X" moved to No location (was Room A)`
