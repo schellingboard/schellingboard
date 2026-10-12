@@ -648,6 +648,21 @@ cursor.invalid`. The use case now returns the whole list; the
   console exception for the feed hides a never-connecting feed until 14d's
   live-update assertions.
 
+- 14b2: `visibilityChanged` closes the feed after 30 s hidden and resumes with `since=`
+  (the server resets if too old) when the tab is visible again; a quicker return keeps the
+  stream. An `error` on a source in CLOSED state (401/404) reloads the
+  snapshot; reload retries now back off (2 s doubling to 60 s). The hook
+  makes a new live replica when the seed's slug changes. A seed with a lower
+  seq is still refused by `adopt`; with a dead stream the reload (retrying,
+  or on becoming visible) replaces the replica anyway, so no extra path. A
+  hard refresh builds a new store from its seed. No CHANGELOG line (no
+  visible change beyond what 14b announced). Hook wiring (visibility listener,
+  slug change) has no unit test: no DOM test environment; E2E is 14d and was
+  not run here.
+  Known gap: a rename that arrives only through the feed leaves the replica
+  on the old slug; its snapshot reload then 404s and retries (60 s cap).
+  Left for 14d / a later step.
+
 ## Problems
 
 None.
@@ -673,4 +688,4 @@ None.
 
 ## Next step
 
-14b2 (or 14c).
+14c.

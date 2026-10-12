@@ -10,6 +10,7 @@ type Listener = (event: { data: string }) => void;
 
 class FakeSource {
   closed = false;
+  readyState = 1;
   listeners = new Map<string, Listener>();
   constructor(readonly url: string) {}
   addEventListener(type: string, listener: Listener) {
@@ -97,12 +98,12 @@ describe("connectFeed", () => {
     expect(sources[1].url).toBe("/api/v1/events/my-event/feed?since=40");
   });
 
-  it("listens for every message type and for reset", () => {
+  it("listens for every message type, reset, error and open", () => {
     const { sources } = setup();
 
     const types = feedMessageSchema.options.map((o) => o.shape.type.value);
     expect([...sources[0].listeners.keys()].sort()).toEqual(
-      [...types, "reset"].sort()
+      [...types, "reset", "error", "open"].sort()
     );
   });
 
@@ -167,5 +168,106 @@ describe("connectFeed", () => {
 
     expect(store.get().seq).toBe(40);
     expect(sources[0].url).toBe("/api/v1/events/my-event/feed?since=40");
+  });
+
+  it("reloads the snapshot when the source closes for good, and ignores a reconnecting error", async () => {
+    const { store, sources } = setup();
+
+    sources[0].emit("error", {});
+    expect(sources).toHaveLength(1);
+    sources[0].readyState = 2;
+    sources[0].emit("error", {});
+    await vi.waitFor(() => expect(sources).toHaveLength(2));
+
+    expect(store.get().seq).toBe(40);
+    expect(sources[1].url).toContain("since=40");
+  });
+
+  it("backs off while the snapshot cannot be loaded", async () => {
+    const delays: number[] = [];
+    const load = vi.fn(() => Promise.reject(new Error("404")));
+    const sources: FakeSource[] = [];
+    connectFeed({
+      slug: "my-event",
+      store: createReplicaStore(snapshot),
+      loadSnapshot: load,
+      delay: (ms) => {
+        delays.push(ms);
+        return delays.length < 4 ? Promise.resolve() : new Promise(() => {});
+      },
+      createSource: (url) => {
+        const source = new FakeSource(url);
+        sources.push(source);
+        return source;
+      },
+    });
+    sources[0].readyState = 2;
+    sources[0].emit("error", {});
+    await vi.waitFor(() => expect(delays.length).toBe(4));
+
+    expect(delays[1]).toBeGreaterThan(delays[0]);
+    expect(delays[3]).toBeGreaterThan(delays[1]);
+  });
+
+  it("keeps backing off when the snapshot loads but the stream is refused again", async () => {
+    const delays: number[] = [];
+    const sources: FakeSource[] = [];
+    connectFeed({
+      slug: "my-event",
+      store: createReplicaStore(snapshot),
+      loadSnapshot: () => Promise.resolve({ ...snapshot, seq: 40 }),
+      delay: (ms) => {
+        delays.push(ms);
+        return delays.length < 3 ? Promise.resolve() : new Promise(() => {});
+      },
+      createSource: (url) => {
+        const source = new FakeSource(url);
+        source.readyState = 2;
+        sources.push(source);
+        queueMicrotask(() => source.emit("error", {}));
+        return source;
+      },
+    });
+    await vi.waitFor(() => expect(delays).toHaveLength(3));
+
+    expect(delays[2]).toBeGreaterThan(delays[0]);
+  });
+
+  it("finishes a reload that a hide cut short once the tab is back", async () => {
+    let fail = true;
+    const synced = vi.fn();
+    const store = createReplicaStore(snapshot);
+    const sources: FakeSource[] = [];
+    const gate: { release: (() => void) | null } = { release: null };
+    let delays = 0;
+    const feed = connectFeed({
+      slug: "my-event",
+      store,
+      resume: false,
+      onSynced: synced,
+      loadSnapshot: () =>
+        fail
+          ? Promise.reject(new Error("down"))
+          : Promise.resolve({ ...snapshot, seq: 40 }),
+      delay: () =>
+        ++delays > 1
+          ? Promise.resolve()
+          : new Promise<void>((resolve) => (gate.release = resolve)),
+      createSource: (url) => {
+        const source = new FakeSource(url);
+        sources.push(source);
+        return source;
+      },
+    });
+    await vi.waitFor(() => expect(gate.release).not.toBeNull());
+    feed.stop();
+    gate.release?.();
+    await new Promise((r) => setTimeout(r, 0));
+    fail = false;
+    feed.resume();
+
+    await vi.waitFor(() => expect(synced).toHaveBeenCalled());
+    expect(store.get().seq).toBe(40);
+    expect(sources[0].url).toContain("since=40");
   });
 });

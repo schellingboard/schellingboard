@@ -13,14 +13,16 @@ async function fetchSnapshot(slug: string): Promise<Snapshot> {
 }
 
 export function useLiveReplica(seed: Snapshot, user: string | null) {
-  const [live] = useState(() =>
+  const create = () =>
     createLiveReplica({
       seed,
       user,
       createSource: (url) => new EventSource(url),
       loadSnapshot: fetchSnapshot,
-    })
-  );
+    });
+  const [live, setLive] = useState(create);
+  // The feed URL names the slug, so a renamed event needs a new replica.
+  if (live.slug !== seed.event.slug) setLive(create());
   const { store } = live;
   const replica = useSyncExternalStore(store.subscribe, store.get, store.get);
   const gone = useSyncExternalStore(store.subscribe, store.gone, store.gone);
@@ -34,9 +36,15 @@ export function useLiveReplica(seed: Snapshot, user: string | null) {
     const hide = () => live.pageHidden();
     const show = (event: PageTransitionEvent) =>
       live.pageShown(event.persisted);
+    const visibility = () =>
+      live.visibilityChanged(document.visibilityState === "hidden");
+    document.addEventListener("visibilitychange", visibility);
+    // A tab opened in the background gets no visibilitychange.
+    if (document.visibilityState === "hidden") visibility();
     window.addEventListener("pagehide", hide);
     window.addEventListener("pageshow", show);
     return () => {
+      document.removeEventListener("visibilitychange", visibility);
       window.removeEventListener("pagehide", hide);
       window.removeEventListener("pageshow", show);
       live.disconnect();
