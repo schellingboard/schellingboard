@@ -209,9 +209,26 @@
   adopts freshly fetched snapshots, no SSR seeds) and offset 0 for a persisted store until
   the first ping or snapshot (device clock is the fallback); the shared 007-US8 tag.
 
+## Step 11a (2026-10-09)
+
+- `apps/web/src/commands/runner.ts`: `createCommandRunner({store, api, newKey})`.
+  `run(command, input)` predicts with the command's policy (a refusal returns
+  `{ok:false, code}` and sends nothing), keeps a pending projection keyed by the
+  `Idempotency-Key`, and calls the API. `view()` is the replica with the projections
+  applied (the replica itself when none). A pending entry ends when the feed delivers
+  its key, when the response says the click changed nothing, or 3 s after the response
+  once the feed has moved past the click (the legacy overlay's rules). A 4xx removes it
+  and returns the problem `code`; a network error or 5xx retries with the same key
+  (1, 2, 4, 8, 16 s), then rolls back as `network.unreachable`. Pending entries of a
+  guest who is no longer the viewer are dropped. The RSVP count prediction applies only
+  while the replica still holds the click-time count, so a feed count is never doubled.
+- Tests drive a real `api-client` over a fake `fetch` (`commands/fake-api.ts`).
+- The guest and fixture `now` in tests: the web fixture's `now` is before its scheduling
+  phase, so command tests move `now` to `iso(10)`.
+
 ## Next step
 
-11.
+11b.
 
 ## Questions
 

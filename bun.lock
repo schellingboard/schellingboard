@@ -82,6 +82,7 @@
       "name": "@schellingboard/web",
       "version": "0.0.0",
       "dependencies": {
+        "@schellingboard/api-client": "workspace:*",
         "@schellingboard/contracts": "workspace:*",
         "@schellingboard/domain": "workspace:*",
         "@tanstack/react-router": "1.170.38",

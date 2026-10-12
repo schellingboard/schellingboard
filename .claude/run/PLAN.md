@@ -113,6 +113,9 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
       network error, roll back on `4xx`); RSVP add and remove and comment create.
       `queries/` for the attendee list and paged comments. Unit tests against a
       fake API.
+  - [x] 11a. Command core (`commands/runner.ts`) and RSVP add and remove.
+  - [ ] 11b. Comment create.
+  - [ ] 11c. `queries/`: attendee list and paged comments.
 - [ ] 12. **The shell**: `ui/` primitives, layout, nav, user picker (step 7a),
       theme (ADR 0005 cookie), footer with version and release notes, sync
       indicator, error boundary, the dev toolbar's time travel when dev tools are
