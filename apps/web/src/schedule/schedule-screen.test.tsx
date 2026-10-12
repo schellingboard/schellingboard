@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { snapshot as base, iso } from "../replica/snapshot-fixture";
 import { legacyScheduleLinks } from "./links";
-import { ScheduleScreen } from "./schedule-screen";
+import { ScheduleScreen, type ScheduleActions } from "./schedule-screen";
 
 const sessionOf = (
   id: string,
@@ -40,12 +40,24 @@ const snap: Snapshot = {
   unavailability: [],
 };
 
+function fakeActions(
+  result: Awaited<ReturnType<ScheduleActions["toggleRsvp"]>> = { ok: true }
+) {
+  return {
+    toggleRsvp: vi.fn<ScheduleActions["toggleRsvp"]>(() =>
+      Promise.resolve(result)
+    ),
+    pickName: vi.fn<ScheduleActions["pickName"]>(),
+  };
+}
+
 function screenAt(
   params = "",
   {
     snapshot = snap,
     now = new Date(iso(9)),
-  }: { snapshot?: Snapshot; now?: Date } = {}
+    actions = fakeActions(),
+  }: { snapshot?: Snapshot; now?: Date; actions?: ScheduleActions } = {}
 ) {
   const onParamsChange = vi.fn<(params: URLSearchParams) => void>();
   render(
@@ -58,6 +70,7 @@ function screenAt(
       sync={<span>Live</span>}
       footer={<footer>Footer</footer>}
       onReload={() => {}}
+      actions={actions}
     />
   );
   return { onParamsChange };
@@ -290,5 +303,99 @@ describe("ScheduleScreen day folds", () => {
     );
     expect(await screen.findByRole("link", { name: /Talk/ })).toBeTruthy();
     expect(screen.queryByRole("button", { name: /day has passed/ })).toBeNull();
+  });
+});
+
+describe("ScheduleScreen RSVP badge", () => {
+  const overlapping: Snapshot = {
+    ...snap,
+    sessions: [
+      sessionOf("s", "Talk", ["host"], ["r"]),
+      sessionOf("w", "Workshop", ["host"], ["r2"], 9),
+    ],
+  };
+
+  it("RSVPs to a session from its badge", { tags: ["009-US1"] }, async () => {
+    const actions = fakeActions();
+    screenAt("", { actions });
+    await userEvent.click(
+      screen.getByRole("button", { name: "RSVP to Workshop" })
+    );
+    expect(actions.toggleRsvp).toHaveBeenCalledExactlyOnceWith("w", false);
+  });
+
+  it("withdraws an RSVP from the badge", { tags: ["009-US1"] }, async () => {
+    const actions = fakeActions();
+    screenAt("", { actions });
+    await userEvent.click(
+      screen.getByRole("button", { name: "Withdraw RSVP from Talk" })
+    );
+    expect(actions.toggleRsvp).toHaveBeenCalledExactlyOnceWith("s", true);
+  });
+
+  it("leaves a host's own session alone", () => {
+    const hosting: Snapshot = {
+      ...snap,
+      me: { ...snap.me!, guestId: "host", rsvps: [] },
+    };
+    screenAt("", { snapshot: hosting });
+    expect(
+      screen.queryByRole("button", { name: /^(RSVP to|Withdraw RSVP from)/ })
+    ).toBeNull();
+  });
+
+  it("asks who is RSVPing when nobody is picked", async () => {
+    const actions = fakeActions();
+    screenAt("", { snapshot: { ...snap, me: null }, actions });
+    await userEvent.click(
+      screen.getByRole("button", { name: "RSVP to Workshop" })
+    );
+    expect(actions.pickName).toHaveBeenCalled();
+    expect(actions.toggleRsvp).not.toHaveBeenCalled();
+  });
+
+  it(
+    "warns before RSVPing over a session already attended",
+    { tags: ["009-US3"] },
+    async () => {
+      const actions = fakeActions();
+      screenAt("", { snapshot: overlapping, actions });
+      await userEvent.click(
+        screen.getByRole("button", { name: "RSVP to Workshop" })
+      );
+      const dialog = screen.getByRole("dialog");
+      expect(dialog.textContent).toContain(
+        'This session clashes with "Talk", which you are attending. Do you want to RSVP anyway?'
+      );
+      expect(actions.toggleRsvp).not.toHaveBeenCalled();
+      await userEvent.click(
+        within(dialog).getByRole("button", { name: "Yes" })
+      );
+      expect(actions.toggleRsvp).toHaveBeenCalledExactlyOnceWith("w", false);
+      expect(screen.queryByRole("dialog")).toBeNull();
+    }
+  );
+
+  it("drops the RSVP when the warning is declined", async () => {
+    const actions = fakeActions();
+    screenAt("", { snapshot: overlapping, actions });
+    await userEvent.click(
+      screen.getByRole("button", { name: "RSVP to Workshop" })
+    );
+    await userEvent.click(screen.getByRole("button", { name: "No" }));
+    expect(actions.toggleRsvp).not.toHaveBeenCalled();
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("says why an RSVP was refused", async () => {
+    const actions = fakeActions({ ok: false, message: "This session is full" });
+    screenAt("", { actions });
+    await userEvent.click(
+      screen.getByRole("button", { name: "RSVP to Workshop" })
+    );
+    const alert = await screen.findByRole("alert");
+    expect(alert.textContent).toBe("This session is full");
+    await userEvent.click(screen.getByRole("button", { name: "OK" }));
+    expect(screen.queryByRole("alert")).toBeNull();
   });
 });

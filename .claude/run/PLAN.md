@@ -137,7 +137,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
         meetings column.
   - [x] 13e. Wiring (Shell, events nav, replica, viewer switching) in
         `app/schedule-page.tsx`, tested through a test router; not routed.
-  - [ ] 13f. The grid block's RSVP badge click (RSVP, clash confirm, name
+  - [x] 13f. The grid block's RSVP badge click (RSVP, clash confirm, name
         picker), so the SPA schedule has what the legacy one does.
   - [ ] 13g. **Takeover** (user decision 2026-10-09: no preview route): the
         router owns `/{slug}` and renders the SPA schedule. Until their steps

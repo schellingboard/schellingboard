@@ -7,11 +7,22 @@ import type { ScheduleData } from "./data";
 import type { ScheduleLinks } from "./links";
 import { createScheduleMatch, type ScheduleMatch } from "./model";
 
+export type ScheduleActions = {
+  /** Resolves to a message the reader can be shown when the change was refused. */
+  toggleRsvp: (
+    sessionId: string,
+    withdraw: boolean
+  ) => Promise<{ ok: true } | { ok: false; message: string }>;
+  /** Asks who the reader is, which an RSVP needs. */
+  pickName: () => void;
+};
+
 export type ScheduleContextValue = {
   data: ScheduleData;
   links: ScheduleLinks;
   /** The page's search params, which links carry over. */
   params: URLSearchParams;
+  actions: ScheduleActions;
 };
 
 const ScheduleContext = createContext<ScheduleContextValue | null>(null);

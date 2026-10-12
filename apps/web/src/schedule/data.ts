@@ -5,6 +5,7 @@ import type {
   LocationUnavailability,
 } from "@schellingboard/domain/location";
 import { eventContextFrom } from "../replica/selectors";
+import type { Session } from "@schellingboard/domain/session";
 import type { MeetingView } from "./meeting-view";
 import { meetingViewsFrom } from "./meetings";
 import type { DayWithSessions } from "./model";
@@ -13,6 +14,8 @@ import type { DayWithSessions } from "./model";
 export type ScheduleData = {
   event: Event;
   days: DayWithSessions[];
+  /** Every scheduled session of the event. */
+  sessions: Session[];
   locations: Location[];
   unavailability: LocationUnavailability[];
   now: Date;
@@ -23,12 +26,13 @@ export type ScheduleData = {
 };
 
 export function scheduleDataFrom(snapshot: Snapshot, now: Date): ScheduleData {
-  const { event, days, locations, unavailability, rsvps } =
+  const { event, days, sessions, locations, unavailability, rsvps } =
     eventContextFrom(snapshot);
   const rsvpdIds = new Set(rsvps.map((r) => r.sessionId));
   return {
     event,
     days,
+    sessions,
     locations,
     unavailability,
     now,
