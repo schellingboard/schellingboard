@@ -258,3 +258,10 @@
 - `utils/guest-clashes.ts` imports `@/app/(site)/session_utils`, so `server/modules/`
   reaches `app/` transitively, which `server-does-not-reach-into-app` does not catch.
   Move the two helpers it uses to `packages/domain` or `utils/`.
+
+## Step 12.0 (2026-10-09)
+
+- No SPA-side viewer source existed (`snapshot.me` is per event and absent outside one).
+  Added `GET /api/v1/me/identity` -> `{guestId|null}` (verified acting guest: a protected
+  name without a verified cookie, or a deleted guest, reads null). The shell's viewer
+  provider reads it once at start and after the picker/sign-out.

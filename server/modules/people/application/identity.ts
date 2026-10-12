@@ -26,3 +26,14 @@ export const chooseGuest =
   };
 
 export const signOut = (): Identity => ({ guestId: null });
+
+/** The guest this browser acts as; a protected name needs its verified cookie. */
+export const currentGuest =
+  ({ repos }: PeopleDeps) =>
+  async (actor: Actor): Promise<{ guestId: string | null }> => {
+    if (!actor.guest) return { guestId: null };
+    const creds = await repos.guests.getAuthCredentials(actor.guest.id);
+    if (!creds) return { guestId: null };
+    const proven = !creds.authProtected || actor.guest.level === "verified";
+    return { guestId: proven ? actor.guest.id : null };
+  };

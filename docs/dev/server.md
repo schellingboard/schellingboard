@@ -59,7 +59,8 @@ repositories. `make arch` enforces it, with the auth flows allow-listed.
 ## Choosing a name
 
 `PUT /api/v1/me/identity` makes the browser act as an open guest name and
-`DELETE` signs it out; both set the `guest` cookie, which the route adapter
+`DELETE` signs it out; `GET` answers who the browser acts as now (null for a protected name
+not yet logged in, the SPA's viewer); all three set the `guest` cookie, which the route adapter
 builds from the use case's `Identity` (`people/application/identity.ts`). A
 protected name answers `403 guest.protected`: the SPA sends the user to the
 legacy login. The `selectUserAction` server action calls the same use case.
