@@ -887,7 +887,21 @@ export interface ChangesRepository {
   getNewestSeq(): Promise<number>;
   /** Up to `limit` changes recorded after `seq`, oldest first. */
   listAfter(seq: number, limit?: number): Promise<RecordedChange[]>;
-  /** Deletes changes up to `seq` that happened before `before`. */
+  /** Up to `limit` changes of one event after `seq`, oldest first. */
+  listEventAfter(
+    eventId: string,
+    seq: number,
+    limit?: number
+  ): Promise<RecordedChange[]>;
+  /**
+   * The newest `seq` pruning has removed: a feed can resume from it or later,
+   * from earlier ones it would miss changes. 0 before any pruning.
+   */
+  getPrunedThrough(): Promise<number>;
+  /**
+   * Deletes the changes up to `seq` that happened before `before`, stopping at
+   * the first one too new, so what remains has no gaps.
+   */
   deleteUpTo(seq: number, before: Date): Promise<void>;
 }
 

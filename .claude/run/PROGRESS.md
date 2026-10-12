@@ -557,6 +557,16 @@ cursor.invalid`. The use case now returns the whole list; the
   no change: `event.deleted` ends the event's replica, which `apply` keeps as
   it is, so no one reads those meetings afterwards.
 
+- Step 13 split into 13a (hub and feed core) and 13b (the route).
+- 13a: `openFeed(uow, { eventId, viewer, since }, send)` in
+  `server/feed/feed.ts` registers with the hub (`server/feed/hub.ts`, on
+  `globalThis`, one `subscribeToChanges` subscription), buffers live changes,
+  replays `listEventAfter` in batches, then flushes the buffer above the last
+  `seq` with no await in between. It answers `reset` when `since` is below the
+  prune watermark or above the newest `seq`. Pruning (`deleteUpTo`) now stops
+  at the first change too new and stores the watermark in the `changes.pruned`
+  job cursor (`getPrunedThrough`, a reader method), so what remains has no gaps.
+
 ## Problems
 
 None.
@@ -582,4 +592,4 @@ None.
 
 ## Next step
 
-13.
+13b.
