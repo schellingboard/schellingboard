@@ -9,3 +9,15 @@ body {
   background-color: var(--surface-sunken);
   color: var(--fg);
 }
+
+/*
+ * The schedule owns the viewport (see ScheduleScreen): while its frame is
+ * mounted the window must not scroll and the page's footer is hidden, the
+ * schedule rendering its own copy at the bottom of its scroll content.
+ */
+body:has([data-schedule-frame]) {
+  overflow: hidden;
+}
+body:has([data-schedule-frame]) [data-site-footer] {
+  display: none;
+}
