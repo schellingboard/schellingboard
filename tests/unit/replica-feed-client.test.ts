@@ -32,7 +32,8 @@ const renamed = (seq: number, title: string): FeedMessage => ({
 
 function setup(
   loadSnapshot: () => Promise<typeof snapshot> = () =>
-    Promise.resolve({ ...snapshot, seq: 40 })
+    Promise.resolve({ ...snapshot, seq: 40 }),
+  resume = true
 ) {
   const store = createReplicaStore(snapshot);
   const sources: FakeSource[] = [];
@@ -41,6 +42,7 @@ function setup(
     store,
     loadSnapshot,
     delay: () => Promise.resolve(),
+    resume,
     createSource: (url) => {
       const source = new FakeSource(url);
       sources.push(source);
@@ -155,5 +157,15 @@ describe("connectFeed", () => {
 
     feed.close();
     expect(() => feed.close()).not.toThrow();
+  });
+
+  it("starts from a fresh snapshot instead of resuming when asked", async () => {
+    const { store, sources } = setup(undefined, false);
+
+    expect(sources).toHaveLength(0);
+    await vi.waitFor(() => expect(sources).toHaveLength(1));
+
+    expect(store.get().seq).toBe(40);
+    expect(sources[0].url).toBe("/api/v1/events/my-event/feed?since=40");
   });
 });

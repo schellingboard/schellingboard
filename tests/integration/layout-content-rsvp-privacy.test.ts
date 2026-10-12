@@ -1,3 +1,5 @@
+import type { Snapshot } from "@schellingboard/contracts/snapshot";
+import { eventContextFrom } from "@/app/(site)/[eventSlug]/replica/selectors";
 import {
   describe,
   it,
@@ -31,12 +33,8 @@ vi.mock("next/headers", () => ({
 // client tree it wraps.
 const captured: { rsvps?: unknown[] } = {};
 vi.mock("@/app/(site)/[eventSlug]/event-provider-wrapper", () => ({
-  EventProviderWrapper: ({
-    eventContextValue,
-  }: {
-    eventContextValue: { rsvps: unknown[] };
-  }) => {
-    captured.rsvps = eventContextValue.rsvps;
+  EventProviderWrapper: ({ snapshot }: { snapshot: Snapshot }) => {
+    captured.rsvps = eventContextFrom(snapshot).rsvps;
     return "PROVIDER_STUB";
   },
 }));

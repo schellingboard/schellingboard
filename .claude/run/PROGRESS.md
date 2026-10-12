@@ -608,6 +608,46 @@ cursor.invalid`. The use case now returns the whole list; the
   14b: error handling when the `EventSource` closes for good (refetch the
   snapshot, back off), since 14a only handles `reset`.
 
+- 14a review: accepted all but 3's change: `replace` stays unconditional
+  (after a restored backup the snapshot's seq is legitimately lower; comment
+  says so). Reload retries with a delay on failure; one reload at a time,
+  a stale source's reset is ignored. Item 8: days and meetings do not
+  reference rooms, so only sessions and unavailability apply.
+- 14b: `EventProviderWrapper` takes the snapshot and builds the context with
+  `useLiveReplica` (store + `connectFeed`, one `EventSource` per tab). A new
+  SSR seed (page refresh) replaces the replica. A user change loads a fresh
+  snapshot (`resume: false`) before opening the feed. `event.deleted` sets the
+  store's `gone` flag and the wrapper shows a notice. `EventProvider`'s RSVP
+  count deltas and its `/api/rsvps` fetch still exist: their reset effect now
+  runs on every replica change, so a count can flicker until the echo (14c).
+  CHANGELOG, release note and attendee guide updated. Deferred to 14b2:
+  hidden-tab close, `EventSource` closed by 401/404, slug change. The feed
+  closes on `pagehide`: Firefox otherwise logged a console error (failing the
+  console guard) when a page left with the stream open; one run in seven of
+  attendee-count still failed once before that settled, 4 of 4 pass after.
+  The layout integration tests now read the wrapper's `snapshot` prop.
+
+- 14b review: the hook's logic moved to `replica/live-replica.ts` (no React,
+  unit-tested with fake sources; the repo has no DOM test environment).
+  Accepted: a seed is adopted only at or above the replica's seq (`store.adopt`;
+  a restored backup still works, since the feed's reset reloads through
+  `replace`); a user switch is one path (the snapshot load) and seeds are
+  dropped until it lands; `pagehide` stops the stream and a bfcache `pageshow`
+  reloads; the context value is memoized. Rejected: a new use-case ID (007-US8
+  exists); a translated or in-place "gone" state (the sibling "Event not
+  found" states are plain English too). `myMeetings` stays the SSR value; its
+  consumers already check `guestId` against the selected guest. The CHANGELOG
+  line stays: only the RSVP count flickers until 14c. Slug freeze is in 14b2.
+
+- 14b re-review: seeds are dropped when the viewer they were rendered for
+  (`me.guestId`, null if none) differs from the replica's, so an old user's
+  late refresh cannot overwrite the new user's data. Known gap: a server-side
+  viewer change with no client user change (logout elsewhere) is also
+  dropped until the stream ends. `stop()` sets a flag that an in-flight reload
+  checks, so no stream opens after pagehide; `restart()` clears it. The E2E
+  console exception for the feed hides a never-connecting feed until 14d's
+  live-update assertions.
+
 ## Problems
 
 None.
@@ -633,4 +673,4 @@ None.
 
 ## Next step
 
-14b.
+14b2 (or 14c).

@@ -117,7 +117,8 @@ to see why:
 ## The schedule
 
 Once **scheduling** opens, proposals turn into real sessions on the grid.
-Proposing and voting close.
+Proposing and voting close. The schedule updates by itself when an organizer or
+another attendee changes a session or RSVPs, so you don't need to reload it.
 
 ![Scheduling grid with rooms as columns and time slots as rows, and a first column holding the viewer's own 1-on-1s](../screenshots/schedule-grid.webp)
 

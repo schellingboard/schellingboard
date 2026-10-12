@@ -22,17 +22,22 @@ export function connectFeed({
   store,
   loadSnapshot,
   createSource,
+  resume = true,
+  onSynced,
   delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
 }: {
   slug: string;
   store: ReplicaStore;
   loadSnapshot: () => Promise<Snapshot>;
   createSource: (url: string) => Source;
+  resume?: boolean;
+  onSynced?: () => void;
   delay?: (ms: number) => Promise<void>;
 }) {
   let source: Source | null = null;
   let reloading = false;
   let closed = false;
+  let stopped = false;
 
   function open() {
     source?.close();
@@ -49,7 +54,7 @@ export function connectFeed({
       });
     }
     current.addEventListener("reset", () => {
-      if (current === source && !reloading) void reload();
+      if (current === source && !reloading && !stopped) void reload();
     });
   }
 
@@ -64,11 +69,13 @@ export function connectFeed({
           // Unconditional: after a restored backup the snapshot's seq is
           // legitimately lower than the replica's.
           store.replace(fresh);
+          if (stopped) return;
           open();
+          onSynced?.();
           return;
         } catch {
           await delay(RETRY_MS);
-          if (closed) return;
+          if (closed || stopped) return;
         }
       }
     } finally {
@@ -76,8 +83,18 @@ export function connectFeed({
     }
   }
 
-  open();
+  if (resume) open();
+  else void reload();
   return {
+    // The page is going into the back/forward cache; restart() brings it back.
+    stop() {
+      stopped = true;
+      source?.close();
+    },
+    restart() {
+      stopped = false;
+      if (!closed && !reloading) void reload();
+    },
     close() {
       closed = true;
       source?.close();

@@ -28,12 +28,8 @@ vi.mock("next/headers", () => ({
 
 const captured: { myMeetings?: unknown } = {};
 vi.mock("@/app/(site)/[eventSlug]/event-provider-wrapper", () => ({
-  EventProviderWrapper: ({
-    eventContextValue,
-  }: {
-    eventContextValue: { myMeetings: unknown };
-  }) => {
-    captured.myMeetings = eventContextValue.myMeetings;
+  EventProviderWrapper: ({ myMeetings }: { myMeetings: unknown }) => {
+    captured.myMeetings = myMeetings;
     return "PROVIDER_STUB";
   },
 }));

@@ -19,6 +19,10 @@ const ALLOWED_CONSOLE_PATTERNS: RegExp[] = [
   // which Next's client runtime reports as an uncaught "Error: Connection
   // closed" while reading that stream.
   /Error: Connection closed\./,
+  // Firefox quirk: a reload or navigation that lands while the schedule's
+  // change feed (an EventSource) is connecting is logged as a failed
+  // connection, even though the page closes the stream as it leaves.
+  /can.t establish a connection to the server at \S+\/api\/v1\/events\/[^/]+\/feed/,
 ];
 
 function isAllowed(text: string): boolean {

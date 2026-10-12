@@ -197,9 +197,11 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
   - [x] 14a. Store (`replica/store.ts`), feed client (`replica/feed-client.ts`:
         `EventSource`, `reset` reloads the snapshot), selectors skip a removed
         room; no React yet.
-  - [ ] 14b. `EventContext` derives from the store, one `EventSource` per tab,
-        visibility close/reopen, reconnect after errors, user switch;
-        `event.deleted` state; CHANGELOG and docs (the schedule is then live).
+  - [x] 14b. `EventContext` derives from the store (`useLiveReplica`), user
+        switch, `event.deleted` state; CHANGELOG and docs (the schedule is live).
+  - [ ] 14b2. Visibility close/reopen after 30 s hidden, an `EventSource` that
+        closes for good (401/404: refetch the snapshot, back off), slug change. A dead
+        stream plus a hard refresh whose seed has a lower seq stays stale: handle there.
   - [ ] 14c. RSVP echo reconciliation (replaces the count deltas), and the
         meetings column's debounced refetch.
   - [ ] 14d. E2E: two browser contexts, kiosk included.
