@@ -13,6 +13,7 @@ user-facing description of the API is
 server/
   kernel/              Result and error kinds, Actor and resolveActor, actingGuest, the unit of work
   http/                the Hono app (app.ts), middleware, problem details, OpenAPI document and its reference page (docs.ts)
+  feed/                the snapshot and the SSE change feed (routes.ts), the hub of open connections, projection of a change to a viewer
   composition.ts       builds each module's use cases from the repositories and adapters
   modules/<module>/
     module.ts          the only file anything outside the module imports
@@ -41,11 +42,46 @@ A use case writes in `deps.uow.run(async (tx) => …)`
 `Result` rolls back. Inside it, read and write through `tx`, never through
 `deps.repos`: their writes wait for the lock `tx` holds, and their reads do not
 see its rows. `tx.record(change)` logs a change with the state, addressed to
-the audience `audienceOf` gives (add a case for each new type) and marked with
+the audience `audienceOf` (`packages/domain/src/change.ts`) gives (add a case for each new type) and marked with
 the request's `Idempotency-Key`, if any; after commit,
 each change goes to the `subscribeToChanges` subscribers in `seq` order, the
 jobs loop among them. Keep I/O to other systems, such as mail, out of the
 callback. `uow.read` runs several reads on one consistent view.
+
+## Reading for pages
+
+Site pages do not call the repositories. `pageReads()` in `composition.ts`
+gives plain reads (no actor: the pages sit behind the site password only), and
+`adminReads()` in `server/admin-reads.ts` the admin pages' reads. Each is a
+function in a module's `application/page-reads.ts` taking a `Pick` of the
+repositories. `make arch` enforces it, with the auth flows allow-listed.
+
+## The feed and the snapshot
+
+[ADR 0014](adr/0014-change-feed-and-snapshot.md) has the decisions.
+`GET /api/v1/events/{slug}/snapshot` returns what one viewer may see of an
+event, with the `seq` of the newest change it includes. `GET
+/api/v1/events/{slug}/feed?since=` is a Server-Sent Events stream: it replays
+the `changes` table after `since`, then follows live changes registered with
+the hub. `project()` in `server/feed/project.ts` turns each recorded change
+into the message that viewer may see, or none; a new change type needs a case
+there and in `audienceOf`. The message carries the `command_key` only for the
+actor who made the change.
+
+The client applies messages to its replica in
+`app/(site)/[eventSlug]/replica/` (`apply.ts`, a pure function from replica and
+message to replica; `store.ts`; `live-replica.ts` for the connection). A new
+message type needs a case in `apply.ts`: unknown types only move `seq`.
+
+## Keys from the UI
+
+A server action or legacy route that creates something runs under
+`idempotentAction()` from `composition.ts`, with a key the form made when it
+opened (`newIdempotencyKey()` in `utils/idempotency-key.ts`) and sent as the
+`Idempotency-Key` header or an argument outside the zod schema. A success is
+stored and replayed for a repeat; a refusal frees the key. The changes it
+records carry the key, and the feed echoes it to the sender, which is how the
+RSVP overlay (`replica/rsvp-overlay.ts`) knows its toggle has arrived.
 
 ## Adding a use case and its route
 

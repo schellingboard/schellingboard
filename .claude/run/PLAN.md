@@ -241,7 +241,7 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
 - [ ] 18. **Docs**, in parts:
   - [x] 18a. ADRs 0013 and 0014 accepted; `10-path-from-here.md` marks steps 3
         and 4 done.
-  - [ ] 18b. `docs/dev/server.md` (feed, snapshot, unit of work, idempotency
+  - [x] 18b. `docs/dev/server.md` (feed, snapshot, unit of work, idempotency
         from the UI, replica) matching the code.
   - [ ] 18c. Public docs (live schedule; API changes; self-hosting: proxy
         buffering, timeouts and HTTP/2 for SSE, trusted-proxy setting) and

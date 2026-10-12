@@ -840,6 +840,10 @@ None.
   `utils/` helpers); step 4 marked done. Still to run by the user:
   `make test-e2e-docker` (streaming through the standalone build).
 
+## 18b
+
+- `docs/dev/server.md` gained: page reads, feed and snapshot, keys from the UI.
+
 ## Next step
 
-18b.
+18c.
