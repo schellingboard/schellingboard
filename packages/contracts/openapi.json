@@ -1280,9 +1280,13 @@
                     "buildId": {
                       "type": "string",
                       "description": "Differs between builds; a client that sees it change is stale"
+                    },
+                    "devTools": {
+                      "type": "boolean",
+                      "description": "Whether the development tools (the time-travel toolbar) are on"
                     }
                   },
-                  "required": ["status", "version", "buildId"]
+                  "required": ["status", "version", "buildId", "devTools"]
                 }
               }
             }

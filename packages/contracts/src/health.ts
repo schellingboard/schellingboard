@@ -6,4 +6,7 @@ export const healthSchema = z.object({
   buildId: z
     .string()
     .describe("Differs between builds; a client that sees it change is stale"),
+  devTools: z
+    .boolean()
+    .describe("Whether the development tools (the time-travel toolbar) are on"),
 });
