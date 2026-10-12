@@ -15,9 +15,12 @@ let nextId = 0;
 
 export type RsvpResult = { ok: true } | { ok: false; error?: string };
 
-export function useOptimisticRsvps(replica: Snapshot) {
+export function useOptimisticRsvps(
+  replica: Snapshot,
+  deliveredKeys: ReadonlySet<string>
+) {
   const [pending, setPending] = useState<PendingRsvp[]>([]);
-  const live = settlePendingRsvps(replica, pending);
+  const live = settlePendingRsvps(replica, pending, deliveredKeys);
   if (live !== pending) setPending(live);
   const shown = useMemo(() => withPendingRsvps(replica, live), [replica, live]);
 
@@ -56,11 +59,13 @@ export function useOptimisticRsvps(replica: Snapshot) {
       const held =
         expected.me?.rsvps.some((r) => r.sessionId === sessionId) ?? false;
       const clickSeq = current.seq;
+      const key = newIdempotencyKey();
       const toggle: PendingRsvp = {
         id,
         guestId,
         sessionId,
         remove,
+        key,
         baseCount: expected.counts[sessionId] ?? 0,
         noop: held !== remove,
         acknowledged: false,
@@ -72,7 +77,7 @@ export function useOptimisticRsvps(replica: Snapshot) {
       try {
         const response = await fetch("/api/toggle-rsvp", {
           method: "POST",
-          headers: { "Idempotency-Key": newIdempotencyKey() },
+          headers: { "Idempotency-Key": key },
           body: JSON.stringify({ guestId, sessionId, remove }),
         });
         if (!response.ok) {

@@ -12,6 +12,7 @@ export function createReplicaStore(
   let replica = initial;
   let gone = false;
   let meetingsRevision = 0;
+  let deliveredKeys: ReadonlySet<string> = new Set();
   // The seed is fresh from the server, so the replica starts out connected.
   let link: Link = { connected: true, since: clock() };
   const listeners = new Set<() => void>();
@@ -39,6 +40,7 @@ export function createReplicaStore(
     // What a meeting's clash lines are computed from, which the replica does
     // not hold (ADR 0014 section 4).
     meetingsRevision: () => meetingsRevision,
+    deliveredKeys: () => deliveredKeys,
     link: () => link,
     linkUp: () =>
       setLink(link.connected ? link : { connected: true, since: clock() }),
@@ -51,9 +53,20 @@ export function createReplicaStore(
       listeners.add(listener);
       return () => void listeners.delete(listener);
     },
-    applyMessage: (message: FeedMessage) =>
-      set(apply(replica, message), gone || message.type === "event.deleted"),
-    replace: (next: Snapshot) => set(next, false),
+    applyMessage: (message: FeedMessage) => {
+      // An RSVP change ends with its count, so that message completes a key.
+      if (
+        message.commandKey !== null &&
+        message.seq > replica.seq &&
+        message.type === "session.attendanceChanged"
+      )
+        deliveredKeys = new Set([...deliveredKeys, message.commandKey]);
+      set(apply(replica, message), gone || message.type === "event.deleted");
+    },
+    replace: (next: Snapshot) => {
+      deliveredKeys = new Set();
+      set(next, false);
+    },
     // A server render can be older than what the feed already delivered. A
     // restored backup is not this case: the feed answers it with a reset, and
     // the reload goes through replace.

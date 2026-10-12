@@ -33,6 +33,11 @@ export function useLiveReplica(seed: Snapshot, user: string | null) {
     store.meetingsRevision
   );
 
+  const deliveredKeys = useSyncExternalStore(
+    store.subscribe,
+    store.deliveredKeys,
+    store.deliveredKeys
+  );
   const link = useSyncExternalStore(store.subscribe, store.link, store.link);
   const [now, setNow] = useState(link.since);
   useEffect(() => {
@@ -69,5 +74,5 @@ export function useLiveReplica(seed: Snapshot, user: string | null) {
     };
   }, [live, user]);
 
-  return { replica, gone, meetingsRevision, sync };
+  return { replica, gone, meetingsRevision, deliveredKeys, sync };
 }

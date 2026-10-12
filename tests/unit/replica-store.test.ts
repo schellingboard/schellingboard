@@ -34,6 +34,28 @@ describe("replica store", () => {
     expect(store.gone()).toBe(false);
   });
 
+  it("remembers the keys whose RSVP count has arrived, and notifies", () => {
+    const store = createReplicaStore(snapshot);
+    let calls = 0;
+    store.subscribe(() => calls++);
+    const count = (seq: number, commandKey: string | null) => ({
+      seq,
+      type: "session.attendanceChanged" as const,
+      commandKey,
+      sessionId: "s",
+      numRsvps: seq,
+    });
+
+    store.applyMessage(count(snapshot.seq + 1, null));
+    expect(store.deliveredKeys().size).toBe(0);
+    const before = store.deliveredKeys();
+    store.applyMessage(count(snapshot.seq + 2, "click-1"));
+
+    expect(store.deliveredKeys().has("click-1")).toBe(true);
+    expect(store.deliveredKeys()).not.toBe(before);
+    expect(calls).toBe(2);
+  });
+
   it("adopt takes a seed at or above the replica's seq, never a lower one", () => {
     const store = createReplicaStore({ ...snapshot, seq: 10 });
 

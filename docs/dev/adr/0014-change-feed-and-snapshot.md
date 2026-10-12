@@ -229,7 +229,9 @@ existing Hono mount.
 - **Command keys.** A change's `command_key` is the raw `Idempotency-Key`,
   which is unique only per actor (ADR 0012 section 5). The feed sends it only
   to the connections of the actor who made the change, and the client matches
-  its echo by key and actor, never by key alone. "The actor" is coarser here
+  its echo by key and actor, never by key alone. A connection only receives
+  its own actor's keys, so a key it has seen already belongs to that actor.
+  "The actor" is coarser here
   than in ADR 0012: admins have no id, so every admin connection gets every
   admin's keys, and a guest's keys go to any connection naming that guest,
   whatever its cookie level. A key reveals only that someone made a request,

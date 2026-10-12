@@ -221,7 +221,7 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
   - [x] 16c. A dependency-cruiser rule forbidding `app/` → `db/container`, with an
         allow-list for the auth flows (step 6 of the path), and a rule allowing
         `adminReads` only from `app/admin/**` and `app/actions/admin-*`.
-- [ ] 17. **`Idempotency-Key` from the UI (#141)**: the create forms (proposal,
+- [x] 17. **`Idempotency-Key` from the UI (#141)**: the create forms (proposal,
       session, comment) and the RSVP toggle send a key made per form instance; server
       actions use the same idempotency store as the middleware (its core moves to the
       kernel), so their changes carry `command_key` too. The replica then matches the RSVP
@@ -235,7 +235,7 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
   - [x] 17b3. Session create (the form posts to an API route today): takes a key.
   - [x] 17c1. The RSVP toggle route runs under the key; the hook sends one per
         click, so its changes carry `command_key`.
-  - [ ] 17c2. The replica records the `command_key`s the feed delivers and the
+  - [x] 17c2. The replica records the `command_key`s the feed delivers and the
         overlay matches the RSVP echo by key instead of by the count; CHANGELOG
         bullet (`(#141)`), docs. `fixes #141`.
 - [ ] 18. **Docs**: ADRs 0012–0014 accepted and matching the code;

@@ -24,11 +24,9 @@ export function EventProviderWrapper({
   children: React.ReactNode;
 }) {
   const { user } = useContext(UserContext);
-  const { replica, gone, meetingsRevision, sync } = useLiveReplica(
-    snapshot,
-    user
-  );
-  const { shown, updateRsvp } = useOptimisticRsvps(replica);
+  const { replica, gone, meetingsRevision, deliveredKeys, sync } =
+    useLiveReplica(snapshot, user);
+  const { shown, updateRsvp } = useOptimisticRsvps(replica, deliveredKeys);
   const context = useMemo(() => eventContextFrom(shown), [shown]);
 
   // The replica's viewer lags a name switch until its snapshot lands.

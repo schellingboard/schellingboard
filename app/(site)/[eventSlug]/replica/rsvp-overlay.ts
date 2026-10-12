@@ -5,7 +5,9 @@ export type PendingRsvp = {
   guestId: string;
   sessionId: string;
   remove: boolean;
-  /** The replica's count when the guest clicked, to tell the echo from "not yet". */
+  /** The Idempotency-Key of the click; the feed echoes it on the resulting changes. */
+  key: string;
+  /** The replica's count when the guest clicked, for the optimistic count. */
   baseCount: number;
   /** The replica already held the target state, so no count change follows. */
   noop: boolean;
@@ -22,22 +24,22 @@ const forViewer = (replica: Snapshot, op: PendingRsvp) =>
 
 /**
  * The pending toggles the replica has not caught up with. A toggle is done
- * once the feed carries its RSVP and its count (or the server answered a
- * toggle that changed nothing); a later toggle of the same session waits for
- * the earlier one.
+ * once the feed has delivered its key (or the server answered a toggle that
+ * changed nothing); a later toggle of the same session waits for the earlier
+ * one.
  */
 export function settlePendingRsvps(
   replica: Snapshot,
-  pending: PendingRsvp[]
+  pending: PendingRsvp[],
+  delivered: ReadonlySet<string>
 ): PendingRsvp[] {
   const waiting = new Set<string>();
   const kept = pending.filter((op) => {
     const done =
       !waiting.has(op.sessionId) &&
       (!forViewer(replica, op) ||
-        (holds(replica, op) !== op.remove &&
-          ((op.acknowledged && op.noop) ||
-            replica.counts[op.sessionId] !== op.baseCount)));
+        delivered.has(op.key) ||
+        (op.acknowledged && op.noop && holds(replica, op) !== op.remove));
     if (!done) waiting.add(op.sessionId);
     return !done;
   });

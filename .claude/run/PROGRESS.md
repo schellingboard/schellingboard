@@ -822,6 +822,17 @@ None.
   toggle is an intent, not a form). Replica matching, CHANGELOG and docs are
   17c2. Not run: E2E (user's rule).
 
+## 17c2
+
+- The false `rsvp.added` of a no-op add was fixed first, as its own commit
+  (`rsvp` now returns an existing RSVP without recording).
+- The store keeps `deliveredKeys` (immutable set, new one per key), filled from
+  `session.attendanceChanged` only: an RSVP change ends with its count, so the
+  key completes there and the count never flickers. The overlay settles an op
+  on `delivered.has(op.key)`; a no-op toggle still settles on the server's
+  answer. A reload (`replace`) loses keys, so such an op ends by the 3 s expiry.
+  Not run: E2E (user's rule).
+
 ## Next step
 
-17c2.
+18.
