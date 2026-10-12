@@ -1,6 +1,6 @@
 # ADR 0013: The unit of work
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-10-06
 
 ## Context
