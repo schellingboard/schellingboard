@@ -1,4 +1,6 @@
+import { createHash } from "node:crypto";
 import type { Repositories } from "@/db/container";
+import type { Actor } from "./actor";
 import { withCommandKey } from "./command-key";
 
 type Store = Repositories["idempotency"];
@@ -48,4 +50,76 @@ export async function runIdempotent<T>(
   if (outcome.response) await repo.complete(owner, outcome.response);
   else await repo.release(owner);
   return { state: "ran", value: outcome.value };
+}
+
+export const MAX_KEY_LENGTH = 255;
+
+// Requests with neither admin nor guest have no one to scope a key to, so for
+// them the key is ignored rather than shared by every anonymous client.
+export function actorScope({ admin, guest }: Actor): string | null {
+  if (!admin && !guest) return null;
+  return `${admin ? "admin" : "-"}:${guest ? `${guest.level}:${guest.id}` : "-"}`;
+}
+
+export type ActionResult = { success: true } | { error: unknown };
+
+// A server action under a key from its form. Only a success is kept: a refused
+// submit leaves the key free, so the corrected form can go out under it.
+export async function runIdempotentAction<R extends ActionResult>(
+  repo: Store,
+  call: {
+    actor: Actor;
+    key: string | undefined;
+    name: string;
+    input: unknown;
+    now: Date;
+  },
+  run: () => Promise<R>
+): Promise<R | { error: string }> {
+  const { actor, key, name, input, now } = call;
+  const scope = actorScope(actor);
+  if (
+    typeof key !== "string" ||
+    !key ||
+    key.length > MAX_KEY_LENGTH ||
+    scope === null
+  )
+    return run();
+
+  const outcome = await runIdempotent(
+    repo,
+    {
+      actor: scope,
+      key,
+      method: "ACTION",
+      path: name,
+      bodyHash: createHash("sha256")
+        .update(JSON.stringify(input))
+        .digest("hex"),
+    },
+    now,
+    async () => {
+      const value = await run();
+      return {
+        value,
+        response:
+          "success" in value
+            ? { status: 200, headers: {}, body: JSON.stringify(value) }
+            : null,
+      };
+    }
+  );
+  switch (outcome.state) {
+    case "ran":
+      return outcome.value;
+    case "replayed":
+      return JSON.parse(outcome.response.body ?? "null") as R;
+    case "keyReused":
+      return {
+        error:
+          "This form was already sent with other content. Reload the page and try again.",
+      };
+    case "inProgress":
+      return { error: "This form is still being saved. Wait a moment." };
+  }
 }

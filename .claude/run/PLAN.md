@@ -228,10 +228,11 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
       echo by `command_key` instead of by the count (step 14). `fixes #141`.
   - [x] 17a. The claim/run/complete core moves to `server/kernel/idempotency.ts`
         (`runIdempotent`); the HTTP middleware becomes an adapter over it.
-  - [ ] 17b. Server actions take a key: a wrapper around `runIdempotent` for actions
-        (scope by the cookie actor; a replay returns the stored result), used by the
-        proposal, session and comment create actions; the forms send a key made per
-        form instance.
+  - [x] 17b1. `runIdempotentAction` in the kernel (`idempotentAction()` in
+        composition); the proposal create action takes a key, its form sends one.
+  - [ ] 17b2. The three comment create actions take a key; `CommentsSection` makes
+        one per compose box and renews it after a success.
+  - [ ] 17b3. Session create (the form posts to an API route today): takes a key.
   - [ ] 17c. The RSVP toggle sends a key; the replica matches the RSVP echo by
         `command_key` instead of by the count. `fixes #141`.
 - [ ] 18. **Docs**: ADRs 0012–0014 accepted and matching the code;

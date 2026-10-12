@@ -8,7 +8,7 @@ import {
   sessionProposalSchema,
   sessionProposalUpdateSchema,
 } from "@schellingboard/contracts/session";
-import { proposalUseCases } from "@/server/composition";
+import { idempotentAction, proposalUseCases } from "@/server/composition";
 import { resolveActor } from "@/server/kernel/actor";
 import type { AppError } from "@/server/kernel/result";
 import { serverNow } from "@/utils/dev-clock-server";
@@ -19,12 +19,16 @@ import {
 } from "@/utils/acting-guest";
 import { requireSiteAuth } from "@/utils/action-auth";
 
+type CreateResult = { error: string | z.core.$ZodIssue[] } | { success: true };
+
 export async function createProposal(
-  sessionProposal: z.input<typeof sessionProposalSchema>
-): Promise<{ error: string | z.core.$ZodIssue[] } | { success: true }>;
+  sessionProposal: z.input<typeof sessionProposalSchema>,
+  idempotencyKey?: string
+): Promise<CreateResult>;
 export async function createProposal(
-  input: unknown
-): Promise<{ error: string | z.core.$ZodIssue[] } | { success: true }> {
+  input: unknown,
+  idempotencyKey?: string
+): Promise<CreateResult> {
   await requireSiteAuth();
   const cookieStore = await cookies();
   if (!(await verifiedCurrentUser(cookieStore))) {
@@ -39,21 +43,31 @@ export async function createProposal(
   }
   const { eventSlug, ...fields } = parseResult.data;
 
-  try {
-    const result = await proposalUseCases().createProposal(
-      await resolveActor(cookieStore),
-      fields,
-      await serverNow()
-    );
-    if (!result.ok) {
-      return refusal(result.error, "creating a proposal", fields.hostIds);
+  const actor = await resolveActor(cookieStore);
+  const now = await serverNow();
+  const result = await idempotentAction(
+    { actor, key: idempotencyKey, name: "createProposal", input: fields, now },
+    async (): Promise<CreateResult> => {
+      try {
+        const result = await proposalUseCases().createProposal(
+          actor,
+          fields,
+          now
+        );
+        if (!result.ok) {
+          return refusal(result.error, "creating a proposal", fields.hostIds);
+        }
+      } catch (error) {
+        console.error("Error creating proposal:", error);
+        return { error: "Failed to create proposal" };
+      }
+      return { success: true };
     }
-    revalidatePath(`/${eventSlug}/proposals`);
-  } catch (error) {
-    console.error("Error creating proposal:", error);
-    return { error: "Failed to create proposal" };
-  }
-  return { success: true };
+  );
+  // Outside the keyed run: a failure here must not free a key whose proposal
+  // is already saved.
+  if ("success" in result) revalidatePath(`/${eventSlug}/proposals`);
+  return result;
 }
 
 export async function updateProposal(

@@ -2,20 +2,15 @@ import { createHash } from "node:crypto";
 import { createMiddleware } from "hono/factory";
 import { z } from "zod";
 import type { Repositories } from "@/db/container";
-import type { Actor } from "@/server/kernel/actor";
-import { runIdempotent } from "@/server/kernel/idempotency";
+import {
+  actorScope,
+  MAX_KEY_LENGTH,
+  runIdempotent,
+} from "@/server/kernel/idempotency";
 import type { ApiEnv } from "./actor";
 import { problemResponse } from "./problem";
 
-const MAX_KEY_LENGTH = 255;
 const MUTATIONS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
-
-// Requests with neither admin nor guest have no one to scope a key to, so for
-// them the key is ignored rather than shared by every anonymous client.
-function actorScope({ admin, guest }: Actor): string | null {
-  if (!admin && !guest) return null;
-  return `${admin ? "admin" : "-"}:${guest ? `${guest.level}:${guest.id}` : "-"}`;
-}
 
 // Declared on each mutating route so the OpenAPI document shows it.
 export const idempotencyHeaders = z.object({

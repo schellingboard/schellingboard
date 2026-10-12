@@ -2,6 +2,10 @@ import { after } from "next/server";
 import { getRepositories } from "@/db/container";
 import { snapshotFor } from "@/server/feed/snapshot";
 import type { Actor } from "@/server/kernel/actor";
+import {
+  type ActionResult,
+  runIdempotentAction,
+} from "@/server/kernel/idempotency";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
 import { testEmail } from "@/emails/test-email";
 import { getImageRepositories } from "@/utils/images";
@@ -194,4 +198,11 @@ export function pageReads() {
     hostedSessions: (guestId: string) => hostedSessions(repos, guestId),
     eventLocations: (eventId: string) => eventLocations(repos, eventId),
   };
+}
+
+export function idempotentAction<R extends ActionResult>(
+  call: Parameters<typeof runIdempotentAction>[1],
+  run: () => Promise<R>
+) {
+  return runIdempotentAction(getRepositories().idempotency, call, run);
 }

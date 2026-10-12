@@ -785,6 +785,18 @@ None.
   keep or null to forget the key. `IDEMPOTENCY_TTL_MS` moved there too.
   Behaviour of the HTTP middleware is unchanged (its tests pass untouched).
 
+## 17b1
+
+- `runIdempotentAction` (kernel) stores only a success under `ACTION` +
+  action name, scoped by the cookie actor; a refusal frees the key. The key is
+  a separate argument, outside the zod schemas. Key made with
+  `getRandomValues` (`randomUUID` needs a secure context). The proposal create
+  action has no change type yet, so no `command_key` shows; the test checks
+  one proposal per key.
+
+- CHANGELOG: one `(#141)` bullet (double submits no longer duplicate) is added
+  by 17c, when the RSVP toggle completes the feature.
+
 ## Next step
 
-17b.
+17b2.
