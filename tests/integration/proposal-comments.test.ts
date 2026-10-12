@@ -9,20 +9,6 @@ vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
 }));
 
-const { afterTasks } = vi.hoisted(() => ({
-  afterTasks: [] as Promise<unknown>[],
-}));
-
-vi.mock("next/server", () => ({
-  after: (task: () => unknown) => {
-    afterTasks.push(Promise.resolve(task()));
-  },
-}));
-
-async function flushAfter(): Promise<void> {
-  await Promise.all(afterTasks);
-}
-
 const cookieJar = new Map<string, string>();
 
 vi.mock("next/headers", () => ({
@@ -72,7 +58,6 @@ describe("proposal comments", () => {
     cookieJar.clear();
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     vi.mocked(sendMail).mockReset();
-    afterTasks.length = 0;
     await siteAuthenticate(cookieJar);
   });
 
@@ -92,7 +77,7 @@ describe("proposal comments", () => {
       eventSlug: event.slug,
       body: "Sounds great",
     });
-    await flushAfter();
+    await runJobs();
 
     await runJobs();
     expect(vi.mocked(sendMail).mock.calls.map((c) => c[0].to)).toEqual([

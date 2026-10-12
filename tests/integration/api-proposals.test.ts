@@ -10,23 +10,13 @@ import {
 
 vi.mock("@/utils/mailer", () => ({ sendMail: vi.fn() }));
 
-const { afterTasks } = vi.hoisted(() => ({
-  afterTasks: [] as Promise<unknown>[],
-}));
-
-vi.mock("next/server", async (original) => ({
-  ...(await original<typeof import("next/server")>()),
-  after: (task: () => unknown) => {
-    afterTasks.push(Promise.resolve(task()));
-  },
-}));
-
 import { NextRequest } from "next/server";
 import { GET, POST, PUT, DELETE } from "@/app/api/v1/[[...route]]/route";
 import { createAdminAuthCookie } from "@/utils/auth";
 import { getRepositories } from "@/db/container";
 import { VoteChoice } from "@schellingboard/domain/vote";
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { runJobs } from "../helpers/jobs";
 import { createEvent, createGuest, createProposal } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 
@@ -52,7 +42,6 @@ const asGuest = (id: string) => `${GUEST_COOKIE_NAME}=${openGuestValue(id)}`;
 beforeAll(() => setupTestDb());
 beforeEach(() => {
   resetTestDb();
-  afterTasks.length = 0;
   vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
   vi.stubEnv("AUTH_SECRET", VALID_SECRET);
 });
@@ -111,7 +100,7 @@ describe("/api/v1 proposals", () => {
         })
       );
       expect(joined.status).toBe(204);
-      await Promise.all(afterTasks);
+      await runJobs();
       expect(await getRepositories().notifications.countByGuest(host.id)).toBe(
         1
       );

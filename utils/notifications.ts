@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import { getRepositories } from "@/db/container";
 import type { Meeting } from "@schellingboard/domain/meeting";
-import type { Comment } from "@schellingboard/domain/comment";
+import type { Comment, CommentRef } from "@schellingboard/domain/comment";
 import type { Session } from "@schellingboard/domain/session";
 import type { EmailSettings } from "@schellingboard/domain/guest";
 import { buildEmail, type EmailRecipe } from "@/emails/registry";
@@ -424,7 +424,7 @@ async function deliverCommentNotifications({
   responsibleIds: string[];
   responsibleSetting: keyof EmailSettings;
   earlier: Comment[];
-  comment: Comment;
+  comment: CommentRef;
   path: string;
   now: Date;
 }): Promise<void> {
@@ -459,7 +459,10 @@ async function deliverCommentNotifications({
     );
   }
 
-  for (const { author } of earlier) {
+  for (const { author, createdTime } of earlier) {
+    // The thread is read when the reaction runs, so it may hold comments
+    // posted after this one.
+    if (createdTime > comment.createdTime) continue;
     if (!author || done.has(author.id)) {
       continue;
     }
@@ -504,7 +507,7 @@ export async function notifyProposalCommented({
   now,
 }: {
   proposalId: string;
-  comment: Comment;
+  comment: CommentRef;
   now: Date;
 }): Promise<void> {
   await notifyCommented("proposal", async () => {
@@ -535,7 +538,7 @@ export async function notifySessionCommented({
   now,
 }: {
   sessionId: string;
-  comment: Comment;
+  comment: CommentRef;
   now: Date;
 }): Promise<void> {
   await notifyCommented("session", async () => {
@@ -566,7 +569,7 @@ export async function notifyProfileCommented({
   now,
 }: {
   profileId: string;
-  comment: Comment;
+  comment: CommentRef;
   now: Date;
 }): Promise<void> {
   await notifyCommented("profile", async () => {

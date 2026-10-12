@@ -1,6 +1,5 @@
 import type { Repositories } from "@/db/container";
 import type { UnitOfWork } from "@/server/kernel/unit-of-work";
-import type { Comment } from "@schellingboard/domain/comment";
 
 export type CommentSubjectKind = "proposal" | "session" | "profile";
 
@@ -21,9 +20,4 @@ export interface CommentDeps {
     | "sessions"
     | "guests"
   >;
-  notifyCommented(args: {
-    subject: CommentSubject;
-    comment: Comment;
-    now: Date;
-  }): void;
 }

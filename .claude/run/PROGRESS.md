@@ -40,6 +40,17 @@
   container itself (it is allow-listed with the other job plumbing).
 - Step 3 done: the rule covers `utils/` with only jobs, notifications and push allowed.
 
+## Step 4a (2026-10-08)
+
+- New change types `proposal.joined` and `comment.created` (all three subject
+  kinds), audience `none`: logged for the reaction, projected to no one. The
+  comment entry keeps only the comment's id, author and time, not its body. The
+  reaction (renamed `changeNotifications`, stored name `session-notifications`
+  kept so its cursor stays) handles them. Use cases no longer take
+  `notifyProposalJoined` / `notifyCommented`.
+- Co-hosts added belongs to the sessions family, so it moves to 4b.
+- Tests that waited for `after()` tasks now call `runJobs()`.
+
 ## Questions
 
 - `utils/guest-clashes.ts` imports `@/app/(site)/session_utils`, so `server/modules/`
@@ -48,4 +59,4 @@
 
 ## Next step
 
-4.
+4b.

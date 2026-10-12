@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import {
@@ -28,13 +28,16 @@ const verified = (id: string): Actor => ({
 });
 const now = () => new Date();
 
-const notifyCommented = vi.fn();
 const comments = () =>
   createCommentUseCases({
     repos: getRepositories(),
-    notifyCommented,
     uow: unitOfWork,
   });
+
+const commentChanges = async () =>
+  (await getRepositories().changes.listAfter(0)).filter(
+    (c) => c.type === "comment.created"
+  );
 
 async function protect(guestId: string) {
   await getRepositories().guests.setAuthProtection(guestId, {
@@ -69,7 +72,6 @@ async function posted(authorId: string, subject: CommentSubject) {
 beforeAll(() => setupTestDb());
 beforeEach(() => {
   resetTestDb();
-  notifyCommented.mockReset();
 });
 
 describe("listing comments", () => {
@@ -118,7 +120,7 @@ describe("listing comments", () => {
 
 describe("posting a comment", () => {
   it(
-    "posts as the acting guest and notifies about it",
+    "posts as the acting guest and records the comment",
     { tags: ["010-US1"] },
     async () => {
       const { guest, proposal } = await subjects();
@@ -135,11 +137,19 @@ describe("posting a comment", () => {
         author: { id: guest.id },
         createdTime: at,
       });
-      expect(notifyCommented).toHaveBeenCalledWith({
-        subject: proposal,
-        comment: result.ok && result.value,
-        now: at,
-      });
+      expect(await commentChanges()).toMatchObject([
+        {
+          payload: {
+            subject: proposal,
+            comment: {
+              id: result.ok && result.value.id,
+              author: { id: guest.id },
+              createdTime: at,
+            },
+          },
+          occurredAt: at,
+        },
+      ]);
     }
   );
 
@@ -168,7 +178,7 @@ describe("posting a comment", () => {
         now()
       );
       expect(allowed.ok).toBe(true);
-      expect(notifyCommented).toHaveBeenCalledTimes(1);
+      expect(await commentChanges()).toHaveLength(1);
     }
   );
 
@@ -236,7 +246,7 @@ describe("posting a comment", () => {
 
       expect(deleted.ok).toBe(true);
       expect(!commented.ok && commented.error.code).toBe("proposal.notFound");
-      expect(notifyCommented).not.toHaveBeenCalled();
+      expect(await commentChanges()).toHaveLength(0);
     }
   );
 });

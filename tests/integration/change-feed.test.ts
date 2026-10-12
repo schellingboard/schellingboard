@@ -8,7 +8,7 @@ import { changes, type Viewer } from "@schellingboard/domain/change";
 import type { FeedMessage } from "@schellingboard/contracts/feed";
 import { openFeed } from "@/server/feed/feed";
 import { unitOfWork, type UnitOfWork } from "@/server/kernel/unit-of-work";
-import { SESSION_NOTIFICATIONS } from "@/utils/jobs/job";
+import { CHANGE_NOTIFICATIONS } from "@/utils/jobs/job";
 import { pruneChanges } from "@/utils/jobs/reactions";
 
 const EVERYONE: Viewer = { guestId: null, admin: false };
@@ -167,7 +167,7 @@ describe("the change feed", () => {
       await renamed(session.id, ["One", "Two"]);
       const { changes: log, jobs } = getRepositories();
       const [, second] = await log.listAfter(0);
-      await jobs.setCursor(SESSION_NOTIFICATIONS, second.seq);
+      await jobs.setCursor(CHANGE_NOTIFICATIONS, second.seq);
       let reads = 0;
       const pruning: UnitOfWork = {
         ...unitOfWork,
@@ -195,7 +195,7 @@ describe("the change feed", () => {
       await renamed(session.id, ["One", "Two"]);
       const { changes: log, jobs } = getRepositories();
       const [first, second] = await log.listAfter(0);
-      await jobs.setCursor(SESSION_NOTIFICATIONS, second.seq);
+      await jobs.setCursor(CHANGE_NOTIFICATIONS, second.seq);
       await pruneChanges.run(new Date(Date.now() + 30 * DAY_MS));
       expect(await log.listAfter(0)).toEqual([]);
 
@@ -234,7 +234,7 @@ describe("pruning the change log", () => {
     }
     const { changes: log, jobs } = getRepositories();
     const [first, second, third] = await log.listAfter(0);
-    await jobs.setCursor(SESSION_NOTIFICATIONS, third.seq);
+    await jobs.setCursor(CHANGE_NOTIFICATIONS, third.seq);
 
     await pruneChanges.run(new Date(t0.getTime() + 8 * DAY_MS));
 

@@ -1,3 +1,4 @@
+import { changes } from "@schellingboard/domain/change";
 import { inSchedPhase } from "@schellingboard/domain/phase";
 import type { SessionProposal } from "@schellingboard/domain/session";
 import { actingGuest } from "@/server/kernel/acting-guest";
@@ -149,7 +150,7 @@ export const joinProposal =
     { proposalId }: { proposalId: string },
     now: Date
   ): Promise<Result<void>> => {
-    const result = await deps.uow.run(async (tx) => {
+    return deps.uow.run(async (tx) => {
       const acting = await actingGuest(actor, tx.guests);
       if (!acting.ok) return acting;
       const joinerId = acting.value;
@@ -171,11 +172,14 @@ export const joinProposal =
           "proposal.hostNotWanted",
           "This proposal is not looking for a host"
         );
-      return ok(joinerId);
+      tx.record(
+        changes.proposalJoined(proposalId, proposal.eventId, joinerId, {
+          actor: { type: "guest", id: joinerId },
+          at: now,
+        })
+      );
+      return ok(undefined);
     });
-    if (!result.ok) return result;
-    deps.notifyProposalJoined({ proposalId, joinerId: result.value, now });
-    return ok(undefined);
   };
 
 export const deleteProposal =

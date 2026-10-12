@@ -2,18 +2,8 @@ import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
 
 vi.mock("@/utils/mailer", () => ({ sendMail: vi.fn() }));
 
-const { afterTasks } = vi.hoisted(() => ({
-  afterTasks: [] as Promise<unknown>[],
-}));
-
-vi.mock("next/server", async (original) => ({
-  ...(await original<typeof import("next/server")>()),
-  after: (task: () => unknown) => {
-    afterTasks.push(Promise.resolve(task()));
-  },
-}));
-
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { runJobs } from "../helpers/jobs";
 import { createEvent, createGuest, createProposal } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { proposalUseCases } from "@/server/composition";
@@ -57,7 +47,6 @@ async function voters(eventId: string, count: number) {
 beforeAll(() => setupTestDb());
 beforeEach(() => {
   resetTestDb();
-  afterTasks.length = 0;
 });
 
 describe("reading proposals: the vote breakdown", () => {
@@ -409,7 +398,7 @@ describe("proposal mutations", () => {
         now()
       );
       expect(joined.ok).toBe(true);
-      await Promise.all(afterTasks);
+      await runJobs();
       expect(
         await getRepositories().notifications.listByGuest(host.id)
       ).toMatchObject([{ text: expect.stringContaining("co-host") as string }]);
