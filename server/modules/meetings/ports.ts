@@ -1,9 +1,11 @@
 import type { Repositories } from "@/db/container";
+import type { UnitOfWork } from "@/server/kernel/unit-of-work";
 import type { Meeting } from "@schellingboard/domain/meeting";
 
 export type MeetingOutcome = "accepted" | "declined" | "canceled";
 
 export interface MeetingDeps {
+  uow: UnitOfWork;
   repos: Pick<
     Repositories,
     | "events"

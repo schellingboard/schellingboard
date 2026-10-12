@@ -9,8 +9,9 @@ import {
   createLocation,
   createSession,
 } from "../helpers/factories";
+import { uowFailingAt } from "../helpers/changes";
 import { getRepositories } from "@/db/container";
-import { unitOfWork } from "@/server/kernel/unit-of-work";
+import { unitOfWork, type UnitOfWork } from "@/server/kernel/unit-of-work";
 import { createEventUseCases } from "@/server/modules/events/module";
 import { createVenueUseCases } from "@/server/modules/venue/module";
 import { createSessionUseCases } from "@/server/modules/sessions/module";
@@ -32,8 +33,10 @@ const images = {
   save: vi.fn((id: string) => Promise.resolve(`/media/locations/${id}.png`)),
   delete: vi.fn(async () => {}),
 };
-const events = () => createEventUseCases({ repos: getRepositories() });
-const venue = () => createVenueUseCases({ repos: getRepositories(), images });
+const events = (uow: UnitOfWork = unitOfWork) =>
+  createEventUseCases({ repos: getRepositories(), uow });
+const venue = (uow: UnitOfWork = unitOfWork) =>
+  createVenueUseCases({ repos: getRepositories(), images, uow });
 const sessions = () =>
   createSessionUseCases({
     repos: getRepositories(),
@@ -213,6 +216,61 @@ describe("event use cases", () => {
   );
 
   it(
+    "keeps the slot increment when clearing the 1-on-1 availability fails",
+    { tags: ["015-US2", "019-US7"] },
+    async () => {
+      const event = await createEvent({ slotIncrementMinutes: 15 });
+      const guest = await createGuest({ eventId: event.id });
+      const repos = getRepositories();
+      await repos.meetingAvailability.replaceForGuest(guest.id, event.id, [
+        at("10:00"),
+      ]);
+
+      await expect(
+        events(
+          uowFailingAt("meetingAvailability", "deleteByEvent")
+        ).updateEvent(ADMIN, {
+          ...settings,
+          id: event.id,
+          slotIncrementMinutes: 60,
+        })
+      ).rejects.toThrow("meetingAvailability.deleteByEvent failed");
+
+      expect(
+        (await repos.events.findById(event.id))?.slotIncrementMinutes
+      ).toBe(15);
+      expect(
+        await repos.meetingAvailability.listByGuestAndEvent(guest.id, event.id)
+      ).toHaveLength(1);
+    }
+  );
+
+  it(
+    "refuses a day off the new grid added while the increment changes",
+    { tags: ["015-US2", "015-US4", "019-US7"] },
+    async () => {
+      const event = await createEvent({ slotIncrementMinutes: 15 });
+
+      const [day, changed] = await Promise.all([
+        events().createDay(ADMIN, {
+          ...dayWindow,
+          eventId: event.id,
+          end: at("18:15"),
+        }),
+        events().updateEvent(ADMIN, {
+          ...settings,
+          id: event.id,
+          slotIncrementMinutes: 60,
+        }),
+      ]);
+
+      expect([code(day), code(changed)].filter((c) => c === "ok")).toHaveLength(
+        1
+      );
+    }
+  );
+
+  it(
     "sets, checks and clears the phase dates",
     { tags: ["015-US3"] },
     async () => {
@@ -363,6 +421,59 @@ describe("day use cases", () => {
     }
   );
 
+  it(
+    "refuses one of two overlapping days added at once",
+    { tags: ["015-US4", "019-US7"] },
+    async () => {
+      const event = await createEvent();
+
+      const added = await Promise.all([
+        events().createDay(ADMIN, { ...dayWindow, eventId: event.id }),
+        events().createDay(ADMIN, { ...dayWindow, eventId: event.id }),
+      ]);
+
+      expect(added.map(code).sort()).toEqual(["day.overlap", "ok"]);
+    }
+  );
+
+  it(
+    "refuses to shrink a day past a session booked at the same moment",
+    { tags: ["015-US4", "019-US7"] },
+    async () => {
+      const event = await createEvent({ phase: "scheduling" });
+      const host = await createGuest({ eventId: event.id });
+      const room = await createLocation({ eventId: event.id });
+      const day = await createDay(event.id, dayWindow);
+
+      const [shrunk, booked] = await Promise.all([
+        events().updateDay(ADMIN, {
+          ...dayWindow,
+          id: day.id,
+          end: at("16:00"),
+          endBookings: at("16:00"),
+        }),
+        sessions().createSession(
+          { admin: false, guest: { id: host.id, level: "open" } },
+          {
+            dayId: day.id,
+            locationId: room.id,
+            title: "Late talk",
+            description: "",
+            closed: false,
+            hostIds: [host.id],
+            startTime: at("16:00"),
+            durationMinutes: 60,
+          },
+          new Date()
+        ),
+      ]);
+
+      expect(
+        [code(shrunk), code(booked)].filter((c) => c === "ok")
+      ).toHaveLength(1);
+    }
+  );
+
   it("deletes a day", { tags: ["015-US4"] }, async () => {
     const event = await createEvent();
     const day = await createDay(event.id);
@@ -481,6 +592,26 @@ describe("venue use cases", () => {
     }
   );
 
+  it(
+    "keeps no image of a location deleted while its image was saved",
+    { tags: ["017-US2", "019-US7"] },
+    async () => {
+      images.save.mockImplementationOnce(async (id: string) => {
+        value(await venue().deleteLocation(ADMIN, { id }));
+        images.delete.mockClear();
+        return `/media/locations/${id}.png`;
+      });
+
+      const created = await venue().createLocation(ADMIN, {
+        ...room,
+        image: new Blob([new Uint8Array([1, 2, 3])]),
+      });
+
+      expect(code(created)).toBe("location.notFound");
+      expect(images.delete).toHaveBeenCalledOnce();
+    }
+  );
+
   it("edits, moves and deletes a location", { tags: ["017-US1"] }, async () => {
     const first = await createLocation({ name: "A", sortIndex: 0 });
     const second = await createLocation({ name: "B", sortIndex: 1 });
@@ -534,9 +665,105 @@ describe("venue use cases", () => {
       ).toEqual([]);
     }
   );
+
+  it(
+    "creates no location when assigning its events fails",
+    { tags: ["017-US1", "019-US7"] },
+    async () => {
+      const event = await createEvent();
+
+      await expect(
+        venue(uowFailingAt("locations", "setEventIds")).createLocation(ADMIN, {
+          ...room,
+          eventIds: [event.id],
+        })
+      ).rejects.toThrow("locations.setEventIds failed");
+
+      expect(await getRepositories().locations.list()).toEqual([]);
+    }
+  );
+
+  it(
+    "keeps a location as it was when assigning its events fails",
+    { tags: ["017-US1", "019-US7"] },
+    async () => {
+      const event = await createEvent();
+      const location = await createLocation({ name: "A" });
+
+      await expect(
+        venue(uowFailingAt("locations", "setEventIds")).updateLocation(ADMIN, {
+          ...room,
+          id: location.id,
+          eventIds: [event.id],
+        })
+      ).rejects.toThrow("locations.setEventIds failed");
+
+      expect(
+        (await getRepositories().locations.findById(location.id))?.name
+      ).toBe("A");
+    }
+  );
+
+  it(
+    "assigns no location deleted at the same moment",
+    { tags: ["017-US3", "019-US7"] },
+    async () => {
+      const event = await createEvent();
+      const location = await createLocation();
+
+      const [assigned] = await Promise.all([
+        venue().assignLocationsToEvent(ADMIN, {
+          eventId: event.id,
+          locationIds: [location.id],
+        }),
+        venue().deleteLocation(ADMIN, { id: location.id }),
+      ]);
+
+      expect(["ok", "location.notFound"]).toContain(code(assigned));
+      expect(
+        await getRepositories().locations.listLocationIdsByEvent(event.id)
+      ).toEqual([]);
+    }
+  );
+
+  it(
+    "refuses a location for an event deleted at the same moment",
+    { tags: ["017-US3", "019-US7"] },
+    async () => {
+      const event = await createEvent();
+
+      const [created] = await Promise.all([
+        venue().createLocation(ADMIN, { ...room, eventIds: [event.id] }),
+        events().deleteEvent(ADMIN, { id: event.id }),
+      ]);
+
+      expect(["ok", "location.invalid"]).toContain(code(created));
+    }
+  );
 });
 
 describe("room unavailability use cases", () => {
+  it(
+    "refuses a room deleted at the same moment",
+    { tags: ["017-US4", "019-US7"] },
+    async () => {
+      const event = await createEvent();
+      const room = await createLocation({ eventId: event.id });
+
+      const [added] = await Promise.all([
+        sessions().addLocationUnavailability(ADMIN, {
+          eventId: event.id,
+          locationIds: [room.id],
+          start: at("10:00"),
+          end: at("12:00"),
+        }),
+        venue().deleteLocation(ADMIN, { id: room.id }),
+      ]);
+
+      expect(["ok", "unavailability.roomNotInEvent"]).toContain(code(added));
+    }
+  );
+
   it(
     "marks rooms of the event unavailable and lifts it",
     { tags: ["017-US4", "019-US3"] },

@@ -99,6 +99,7 @@ export function meetingUseCases(): MeetingUseCases {
     repos: getRepositories(),
     notifyMeetingRequested,
     notifyMeetingOutcome,
+    uow: unitOfWork,
   });
 }
 
@@ -116,13 +117,14 @@ export function notificationUseCases(): NotificationUseCases {
 }
 
 export function eventUseCases(): EventUseCases {
-  return createEventUseCases({ repos: getRepositories() });
+  return createEventUseCases({ repos: getRepositories(), uow: unitOfWork });
 }
 
 export function venueUseCases(): VenueUseCases {
   return createVenueUseCases({
     repos: getRepositories(),
     images: getImageRepositories().locations,
+    uow: unitOfWork,
   });
 }
 

@@ -70,7 +70,7 @@ async function placementError(
 }
 
 export const createDay =
-  ({ repos }: EventDeps) =>
+  ({ uow }: EventDeps) =>
   async (
     actor: Actor,
     input: DayWindowInput & ({ eventId: string } | { eventSlug: string })
@@ -78,65 +78,66 @@ export const createDay =
     if (!actor.admin) return adminRequired();
     const parsed = parseWindow(input);
     if (!("data" in parsed)) return parsed;
-    const event =
-      "eventId" in input
-        ? await repos.events.findById(input.eventId)
-        : await repos.events.findBySlug(input.eventSlug);
-    if (!event) return eventNotFound();
-    const refused = await placementError(repos, event, parsed.data);
-    if (refused) return refused;
-
-    try {
-      return ok(await repos.days.create({ ...parsed.data, eventId: event.id }));
-    } catch {
-      return conflict("day.saveFailed", "Failed to create day");
-    }
+    return uow.run(async (tx) => {
+      const event =
+        "eventId" in input
+          ? await tx.events.findById(input.eventId)
+          : await tx.events.findBySlug(input.eventSlug);
+      if (!event) return eventNotFound();
+      const refused = await placementError(tx, event, parsed.data);
+      if (refused) return refused;
+      try {
+        return ok(await tx.days.create({ ...parsed.data, eventId: event.id }));
+      } catch {
+        return conflict("day.saveFailed", "Failed to create day");
+      }
+    });
   };
 
 export const updateDay =
-  ({ repos }: EventDeps) =>
+  ({ uow }: EventDeps) =>
   async (
     actor: Actor,
     input: DayWindowInput & { id: string }
   ): Promise<Result<Day>> => {
     if (!actor.admin) return adminRequired();
-    const existing = await repos.days.findById(input.id);
-    if (!existing) return dayNotFound();
-    const parsed = parseWindow(input);
-    if (!("data" in parsed)) return parsed;
-    const window = parsed.data;
-    const event = await repos.events.findById(existing.eventId);
-    if (!event) return eventNotFound();
-    const refused = await placementError(repos, event, window, existing.id);
-    if (refused) return refused;
+    return uow.run(async (tx) => {
+      const existing = await tx.days.findById(input.id);
+      if (!existing) return dayNotFound();
+      const parsed = parseWindow(input);
+      if (!("data" in parsed)) return parsed;
+      const window = parsed.data;
+      const event = await tx.events.findById(existing.eventId);
+      if (!event) return eventNotFound();
+      const refused = await placementError(tx, event, window, existing.id);
+      if (refused) return refused;
 
-    // A session scheduled inside this day that the new window would leave out
-    // becomes invalid and uneditable; the admin must move or delete it first.
-    const sessions = await repos.sessions.listScheduledByEvent(
-      existing.eventId
-    );
-    const orphaned = sessions.filter(
-      (s) =>
-        sessionContainedInWindow(s, existing.start, existing.end) &&
-        !sessionContainedInWindow(s, window.start, window.end)
-    );
-    if (orphaned.length > 0) {
-      const titles = orphaned.map((s) => `"${s.title}"`).join(", ");
-      return conflict(
-        "day.sessionsOutside",
-        `Cannot resize this day: ${titles} would fall outside the new window. Reschedule or delete ${
-          orphaned.length === 1 ? "it" : "them"
-        } first.`
+      // A session scheduled inside this day that the new window would leave out
+      // becomes invalid and uneditable; the admin must move or delete it first.
+      const sessions = await tx.sessions.listScheduledByEvent(existing.eventId);
+      const orphaned = sessions.filter(
+        (s) =>
+          sessionContainedInWindow(s, existing.start, existing.end) &&
+          !sessionContainedInWindow(s, window.start, window.end)
       );
-    }
+      if (orphaned.length > 0) {
+        const titles = orphaned.map((s) => `"${s.title}"`).join(", ");
+        return conflict(
+          "day.sessionsOutside",
+          `Cannot resize this day: ${titles} would fall outside the new window. Reschedule or delete ${
+            orphaned.length === 1 ? "it" : "them"
+          } first.`
+        );
+      }
 
-    let updated: Day | undefined;
-    try {
-      updated = await repos.days.update(input.id, window);
-    } catch {
-      return conflict("day.saveFailed", "Failed to update day");
-    }
-    return updated ? ok(updated) : dayNotFound();
+      let updated: Day | undefined;
+      try {
+        updated = await tx.days.update(input.id, window);
+      } catch {
+        return conflict("day.saveFailed", "Failed to update day");
+      }
+      return updated ? ok(updated) : dayNotFound();
+    });
   };
 
 export const deleteDay =

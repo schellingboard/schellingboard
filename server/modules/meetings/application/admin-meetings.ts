@@ -54,7 +54,7 @@ export const updateEventMeetings =
   };
 
 export const createMeetingPoint =
-  ({ repos }: MeetingDeps) =>
+  ({ uow }: MeetingDeps) =>
   async (
     actor: Actor,
     input: MeetingPointInput
@@ -62,19 +62,21 @@ export const createMeetingPoint =
     if (!actor.admin) return adminRequired();
     const name = input.name.trim();
     if (!name) return nameRequired();
-    if (!(await repos.events.findById(input.eventId))) return eventNotFound();
+    return uow.run(async (tx) => {
+      if (!(await tx.events.findById(input.eventId))) return eventNotFound();
 
-    const existing = await repos.meetingPoints.listByEvent(input.eventId);
-    return ok(
-      await repos.meetingPoints.create({
-        eventId: input.eventId,
-        name,
-        description: input.description?.trim() ?? "",
-        // Max rather than length, so the order survives a deletion.
-        sortIndex:
-          existing.reduce((max, p) => Math.max(max, p.sortIndex), -1) + 1,
-      })
-    );
+      const existing = await tx.meetingPoints.listByEvent(input.eventId);
+      return ok(
+        await tx.meetingPoints.create({
+          eventId: input.eventId,
+          name,
+          description: input.description?.trim() ?? "",
+          // Max rather than length, so the order survives a deletion.
+          sortIndex:
+            existing.reduce((max, p) => Math.max(max, p.sortIndex), -1) + 1,
+        })
+      );
+    });
   };
 
 // Scoped to the event named, so an id from elsewhere can't reach another

@@ -208,7 +208,7 @@ export const createEvent =
   };
 
 export const updateEvent =
-  ({ repos }: EventDeps) =>
+  ({ uow }: EventDeps) =>
   async (
     actor: Actor,
     input: EventSettingsInput & { id: string }
@@ -217,30 +217,32 @@ export const updateEvent =
     const parsed = parseSettings(input);
     if (!("data" in parsed)) return parsed;
 
-    const existing = await repos.events.findById(input.id);
-    if (!existing) return eventNotFound();
+    return uow.run(async (tx) => {
+      const existing = await tx.events.findById(input.id);
+      if (!existing) return eventNotFound();
 
-    const incrementChanged =
-      parsed.data.slotIncrementMinutes !== existing.slotIncrementMinutes;
-    if (incrementChanged) {
-      const misaligned = misalignedDays(
-        await repos.days.listByEvent(input.id),
-        parsed.data.slotIncrementMinutes
-      );
-      if (misaligned) return misaligned;
-    }
+      const incrementChanged =
+        parsed.data.slotIncrementMinutes !== existing.slotIncrementMinutes;
+      if (incrementChanged) {
+        const misaligned = misalignedDays(
+          await tx.days.listByEvent(input.id),
+          parsed.data.slotIncrementMinutes
+        );
+        if (misaligned) return misaligned;
+      }
 
-    const updated = await repos.events.update(input.id, parsed.data);
-    if (!updated) return eventNotFound();
+      const updated = await tx.events.update(input.id, parsed.data);
+      if (!updated) return eventNotFound();
 
-    // 1-on-1 slots are this same grid, so a new increment re-reads what people
-    // declared. A coarser grid is the dangerous direction: a surviving 10:00 row
-    // would advertise 10:00-11:00 when the guest only ever offered 10:00-10:30.
-    // A finer grid could in principle be kept; it isn't worth the special case.
-    if (incrementChanged) {
-      await repos.meetingAvailability.deleteByEvent(input.id);
-    }
-    return ok(updated);
+      // 1-on-1 slots are this same grid, so a new increment re-reads what people
+      // declared. A coarser grid is the dangerous direction: a surviving 10:00 row
+      // would advertise 10:00-11:00 when the guest only ever offered 10:00-10:30.
+      // A finer grid could in principle be kept; it isn't worth the special case.
+      if (incrementChanged) {
+        await tx.meetingAvailability.deleteByEvent(input.id);
+      }
+      return ok(updated);
+    });
   };
 
 function phaseOrderError(p: EventPhases) {

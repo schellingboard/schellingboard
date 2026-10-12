@@ -4,6 +4,7 @@ import { isoDay } from "../helpers/dates";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createDay, createEvent, createGuest } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
 import { createMeetingUseCases } from "@/server/modules/meetings/module";
 import type { Actor } from "@/server/kernel/actor";
 import type { Result } from "@/server/kernel/result";
@@ -31,6 +32,7 @@ const meetings = () =>
     repos: getRepositories(),
     notifyMeetingRequested,
     notifyMeetingOutcome,
+    uow: unitOfWork,
   });
 
 function value<T>(result: Result<T>): T {
@@ -396,6 +398,27 @@ describe("organizer settings", () => {
           })
         )
       ).toBe("event.notFound");
+    }
+  );
+
+  it(
+    "orders meeting points added at the same moment one after the other",
+    { tags: ["012-US1", "019-US7"] },
+    async () => {
+      const event = await createEvent();
+
+      const points = await Promise.all(
+        ["Coffee bar", "Lobby"].map(async (name) =>
+          value(
+            await meetings().createMeetingPoint(ADMIN, {
+              eventId: event.id,
+              name,
+            })
+          )
+        )
+      );
+
+      expect(points.map((p) => p.sortIndex).sort()).toEqual([0, 1]);
     }
   );
 

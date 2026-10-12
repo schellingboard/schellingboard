@@ -27,7 +27,8 @@ const PAST = new Date("2020-03-01T10:00:00.000Z");
 const PAST_END = new Date("2020-03-01T11:00:00.000Z");
 
 const notifyCohostsAdded = vi.fn(async () => {});
-const events = () => createEventUseCases({ repos: getRepositories() });
+const events = () =>
+  createEventUseCases({ repos: getRepositories(), uow: unitOfWork });
 const venue = () =>
   createVenueUseCases({
     repos: getRepositories(),
@@ -36,6 +37,7 @@ const venue = () =>
       save: (id) => Promise.resolve(`/media/locations/${id}.png`),
       delete: async () => {},
     },
+    uow: unitOfWork,
   });
 const sessions = (uow: UnitOfWork = unitOfWork) =>
   createSessionUseCases({
