@@ -3,10 +3,8 @@
 import { requireSiteAuth } from "@/utils/action-auth";
 import { isDevToolsEnabled } from "@/utils/dev-clock";
 import { serverNow } from "@/utils/dev-clock-server";
-import {
-  dispatchDueReminders,
-  type DispatchSummary,
-} from "@/utils/reminder-dispatch";
+import { dispatchReminders } from "@/server/composition";
+import type { DispatchSummary } from "@/utils/reminder-dispatch";
 
 /**
  * Runs one dispatch tick on demand, from the dev toolbar. Only exists so the
@@ -26,5 +24,5 @@ export async function dispatchRemindersAction(): Promise<
   if (!isDevToolsEnabled()) {
     return { ok: false, error: "Dev tools are not enabled" };
   }
-  return { ok: true, summary: await dispatchDueReminders(await serverNow()) };
+  return { ok: true, summary: await dispatchReminders(await serverNow()) };
 }

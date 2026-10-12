@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { getRepositories } from "@/db/container";
+import type { Repositories } from "@/db/container";
 import type {
   DueReminderCandidate,
   ReminderKey,
@@ -40,7 +40,8 @@ const ABANDON_AFTER_MS = ABANDON_AFTER_HOURS * 60 * 60 * 1000;
 // the email only where there is one to send. An instance with no mail
 // configured still reminds its hosts (FR-021).
 export async function dispatchDueReminders(
-  now: Date
+  now: Date,
+  repos: Pick<Repositories, "notifications" | "reminders">
 ): Promise<DispatchSummary> {
   const summary: DispatchSummary = {
     notified: 0,
@@ -50,7 +51,7 @@ export async function dispatchDueReminders(
     abandoned: 0,
   };
 
-  const { notifications, reminders } = getRepositories();
+  const { notifications, reminders } = repos;
   const base = siteUrl();
 
   // Re-arms the reminder for the next tick, or gives up on it once the first

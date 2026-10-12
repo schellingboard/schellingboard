@@ -68,7 +68,8 @@ export function defaultJobs(): Job[] {
       run: async (now) => {
         const { dispatchDueReminders } =
           await import("@/utils/reminder-dispatch");
-        const summary = await dispatchDueReminders(now);
+        const { getRepositories } = await import("@/db/container");
+        const summary = await dispatchDueReminders(now, getRepositories());
         return summary.notified + summary.sent;
       },
     });

@@ -144,7 +144,6 @@ module.exports = {
           "^app/\\(site\\)/auth/(login|reset)/page\\.tsx$",
           "^utils/jobs/",
           "^utils/(notifications|push)\\.ts$",
-          "^utils/(reminder-dispatch)\\.ts$",
         ],
       },
       to: { path: "^db/container\\.ts$", dependencyTypesNot: ["type-only"] },

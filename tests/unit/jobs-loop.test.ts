@@ -1,9 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 const acquireLease = vi.fn();
-vi.mock("@/db/container", () => ({
-  getRepositories: () => ({ jobs: { acquireLease } }),
-}));
+const repos = { jobs: { acquireLease } };
+vi.mock("@/db/container", () => ({ getRepositories: () => repos }));
 vi.mock("@/utils/reminder-dispatch", () => ({
   dispatchDueReminders: vi.fn(),
 }));
@@ -193,7 +192,7 @@ describe("jobs loop", () => {
 
       const at = new Date("2026-06-01T10:00:00.000Z");
       expect(await reminders?.run(at)).toBe(3);
-      expect(dispatchDueReminders).toHaveBeenCalledWith(at);
+      expect(dispatchDueReminders).toHaveBeenCalledWith(at, repos);
     });
 
     it("leaves reminders out when the interval is 0", () => {

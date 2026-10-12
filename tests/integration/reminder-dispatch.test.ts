@@ -26,7 +26,7 @@ import { getRepositories } from "@/db/container";
 import { resolveDbPath } from "@/db/migrate";
 import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
 import { isMailerConfigured, sendMail } from "@/utils/mailer";
-import { dispatchDueReminders } from "@/utils/reminder-dispatch";
+import { dispatchReminders } from "@/server/composition";
 import { followUpDueTime } from "@schellingboard/domain/reminder-schedule";
 
 // The reference session: 10:00–11:00 UTC with the factory's 10-minute break,
@@ -139,7 +139,7 @@ async function twoHostSession() {
   return { event, session, first, second };
 }
 
-describe("dispatchDueReminders", () => {
+describe("dispatchReminders", () => {
   beforeAll(() => setupTestDb());
 
   beforeEach(() => {
@@ -157,7 +157,7 @@ describe("dispatchDueReminders", () => {
   it("sends every host exactly one heads-up", async () => {
     await twoHostSession();
 
-    const summary = await dispatchDueReminders(HEADS_UP_AT);
+    const summary = await dispatchReminders(HEADS_UP_AT);
 
     expect(summary.sent).toBe(2);
     expect(recipients()).toEqual([FIRST, SECOND].sort());
@@ -170,7 +170,7 @@ describe("dispatchDueReminders", () => {
   it("sends every host exactly one follow-up", async () => {
     await twoHostSession();
 
-    const summary = await dispatchDueReminders(FOLLOW_UP_AT);
+    const summary = await dispatchReminders(FOLLOW_UP_AT);
 
     expect(summary.sent).toBe(2);
     expect(recipients()).toEqual([FIRST, SECOND].sort());
@@ -183,8 +183,8 @@ describe("dispatchDueReminders", () => {
   it("sends nothing more on a second run with the times unchanged (FR-015, SC-003)", async () => {
     await twoHostSession();
 
-    await dispatchDueReminders(HEADS_UP_AT);
-    const second = await dispatchDueReminders(HEADS_UP_AT);
+    await dispatchReminders(HEADS_UP_AT);
+    const second = await dispatchReminders(HEADS_UP_AT);
 
     expect(second.sent).toBe(0);
     expect(sendMail).toHaveBeenCalledTimes(2);
@@ -194,10 +194,10 @@ describe("dispatchDueReminders", () => {
     const { session } = await twoHostSession();
     await getRepositories().sessions.setAttendeeCount(session.id, 12);
 
-    expect((await dispatchDueReminders(HEADS_UP_AT)).sent).toBe(2);
+    expect((await dispatchReminders(HEADS_UP_AT)).sent).toBe(2);
     vi.mocked(sendMail).mockClear();
 
-    expect((await dispatchDueReminders(FOLLOW_UP_AT)).sent).toBe(0);
+    expect((await dispatchReminders(FOLLOW_UP_AT)).sent).toBe(0);
     expect(sendMail).not.toHaveBeenCalled();
   });
 
@@ -210,8 +210,8 @@ describe("dispatchDueReminders", () => {
       attendeeCountReminder: false,
     });
 
-    await dispatchDueReminders(HEADS_UP_AT);
-    await dispatchDueReminders(FOLLOW_UP_AT);
+    await dispatchReminders(HEADS_UP_AT);
+    await dispatchReminders(FOLLOW_UP_AT);
 
     // The setting silences the mail, not the reminder: both still reach them
     // in the app.
@@ -227,7 +227,7 @@ describe("dispatchDueReminders", () => {
 
     vi.mocked(sendMail).mockClear();
     await guests.updateEmailSettings(second.id, DEFAULT_EMAIL_SETTINGS);
-    await dispatchDueReminders(FOLLOW_UP_AT);
+    await dispatchReminders(FOLLOW_UP_AT);
     expect(recipients()).toEqual([]);
   });
 
@@ -239,11 +239,11 @@ describe("dispatchDueReminders", () => {
       sessionHeadsUp: false,
     });
 
-    await dispatchDueReminders(HEADS_UP_AT);
+    await dispatchReminders(HEADS_UP_AT);
     expect(recipients()).toEqual([FIRST]);
 
     vi.mocked(sendMail).mockClear();
-    await dispatchDueReminders(FOLLOW_UP_AT);
+    await dispatchReminders(FOLLOW_UP_AT);
     expect(recipients()).toEqual([FIRST, SECOND]);
 
     expect(await reminderNotices(second.id)).toHaveLength(2);
@@ -256,7 +256,7 @@ describe("dispatchDueReminders", () => {
 
     // `sent` counts reminders settled, not emails: the unreachable host's is
     // settled too, with nothing to mail.
-    const summary = await dispatchDueReminders(HEADS_UP_AT);
+    const summary = await dispatchReminders(HEADS_UP_AT);
 
     expect(summary.sent).toBe(2);
     expect(recipients()).toEqual(["reachable@test.example"]);
@@ -266,7 +266,7 @@ describe("dispatchDueReminders", () => {
   it("produces nothing for a session with no hosts", async () => {
     await scheduledSession([]);
 
-    const summary = await dispatchDueReminders(HEADS_UP_AT);
+    const summary = await dispatchReminders(HEADS_UP_AT);
 
     expect(summary.sent).toBe(0);
     expect(sendMail).not.toHaveBeenCalled();
@@ -277,7 +277,7 @@ describe("dispatchDueReminders", () => {
     vi.mocked(isMailerConfigured).mockReturnValue(false);
     const logged = vi.spyOn(console, "error").mockImplementation(() => {});
 
-    const summary = await dispatchDueReminders(HEADS_UP_AT);
+    const summary = await dispatchReminders(HEADS_UP_AT);
 
     expect(sendMail).not.toHaveBeenCalled();
     expect(summary.notified).toBe(2);
@@ -292,7 +292,7 @@ describe("dispatchDueReminders", () => {
     // The reminder was delivered, so configuring mail later does not re-open
     // this due time. The next reschedule is what reminds them again.
     vi.mocked(isMailerConfigured).mockReturnValue(true);
-    expect((await dispatchDueReminders(HEADS_UP_AT)).sent).toBe(0);
+    expect((await dispatchReminders(HEADS_UP_AT)).sent).toBe(0);
 
     await updateLoggedSession(
       session.id,
@@ -302,13 +302,13 @@ describe("dispatchDueReminders", () => {
       },
       BY_TEST
     );
-    expect((await dispatchDueReminders(later(HEADS_UP_AT, 3))).sent).toBe(2);
+    expect((await dispatchReminders(later(HEADS_UP_AT, 3))).sent).toBe(2);
     expect(recipients()).toEqual([FIRST, SECOND].sort());
   });
 
   it("discards a session's reminder rows when the session is deleted (FR-019)", async () => {
     const { session } = await twoHostSession();
-    await dispatchDueReminders(HEADS_UP_AT);
+    await dispatchReminders(HEADS_UP_AT);
     expect(reminderRowCount(session.id)).toBe(2);
 
     await deleteLoggedSession(session.id, BY_TEST);
@@ -361,7 +361,7 @@ describe("dispatchDueReminders", () => {
   // otherwise the row claims a send the new slot never had.
   it("keeps no record of the mail sent for a superseded due time", async () => {
     const { session, first } = await twoHostSession();
-    await dispatchDueReminders(FOLLOW_UP_AT);
+    await dispatchReminders(FOLLOW_UP_AT);
     expect(
       storedReminder(session.id, first.id, "followUp")?.sent_at
     ).not.toBeNull();
@@ -375,7 +375,7 @@ describe("dispatchDueReminders", () => {
       BY_TEST
     );
     vi.mocked(isMailerConfigured).mockReturnValue(false);
-    await dispatchDueReminders(later(FOLLOW_UP_AT, 3));
+    await dispatchReminders(later(FOLLOW_UP_AT, 3));
 
     const stored = storedReminder(session.id, first.id, "followUp");
     expect(stored?.due_time).toBe(followUpDueTime(later(END, 3)).toISOString());
@@ -386,7 +386,7 @@ describe("dispatchDueReminders", () => {
     it("reaches every host once, linking to the session (FR-022)", async () => {
       const { event, session, first, second } = await twoHostSession();
 
-      const summary = await dispatchDueReminders(HEADS_UP_AT);
+      const summary = await dispatchReminders(HEADS_UP_AT);
 
       expect(summary.notified).toBe(2);
       for (const host of [first, second]) {
@@ -403,7 +403,7 @@ describe("dispatchDueReminders", () => {
     it("points the follow-up at the count field (FR-022)", async () => {
       const { event, session, first } = await twoHostSession();
 
-      await dispatchDueReminders(FOLLOW_UP_AT);
+      await dispatchReminders(FOLLOW_UP_AT);
 
       const [notice] = await reminderNotices(first.id);
       expect(notice.type).toBe("attendeeCountReminder");
@@ -416,8 +416,8 @@ describe("dispatchDueReminders", () => {
     it("is not repeated by a second run at the same due time (FR-015)", async () => {
       const { first } = await twoHostSession();
 
-      await dispatchDueReminders(HEADS_UP_AT);
-      const second = await dispatchDueReminders(HEADS_UP_AT);
+      await dispatchReminders(HEADS_UP_AT);
+      const second = await dispatchReminders(HEADS_UP_AT);
 
       expect(second.notified).toBe(0);
       expect(await reminderNotices(first.id)).toHaveLength(1);
@@ -430,11 +430,11 @@ describe("dispatchDueReminders", () => {
           ? Promise.reject(new Error("smtp is down"))
           : Promise.resolve()
       );
-      await dispatchDueReminders(FOLLOW_UP_AT);
+      await dispatchReminders(FOLLOW_UP_AT);
       expect(await reminderNotices(second.id)).toHaveLength(1);
 
       vi.mocked(sendMail).mockReset();
-      await dispatchDueReminders(later(FOLLOW_UP_AT, 1));
+      await dispatchReminders(later(FOLLOW_UP_AT, 1));
 
       // The mail is attempted again; the notification they already have is
       // left alone.
@@ -444,7 +444,7 @@ describe("dispatchDueReminders", () => {
 
     it("is created again when the session is rescheduled (FR-024)", async () => {
       const { session, first } = await twoHostSession();
-      await dispatchDueReminders(FOLLOW_UP_AT);
+      await dispatchReminders(FOLLOW_UP_AT);
 
       await updateLoggedSession(
         session.id,
@@ -454,7 +454,7 @@ describe("dispatchDueReminders", () => {
         },
         BY_TEST
       );
-      await dispatchDueReminders(later(FOLLOW_UP_AT, 3));
+      await dispatchReminders(later(FOLLOW_UP_AT, 3));
 
       expect(await reminderNotices(first.id)).toHaveLength(2);
     });
@@ -462,10 +462,10 @@ describe("dispatchDueReminders", () => {
     it("survives an abandoned mail", async () => {
       const { second } = await twoHostSession();
       vi.mocked(sendMail).mockRejectedValue(new Error("smtp is down"));
-      await dispatchDueReminders(FOLLOW_UP_AT);
+      await dispatchReminders(FOLLOW_UP_AT);
       vi.spyOn(console, "error").mockImplementation(() => {});
 
-      const summary = await dispatchDueReminders(later(FOLLOW_UP_AT, 25));
+      const summary = await dispatchReminders(later(FOLLOW_UP_AT, 25));
 
       expect(summary.abandoned).toBe(2);
       expect(await reminderNotices(second.id)).toHaveLength(1);
@@ -475,7 +475,7 @@ describe("dispatchDueReminders", () => {
       const { session, first, second } = await twoHostSession();
       await getRepositories().sessions.setAttendeeCount(session.id, 12);
 
-      await dispatchDueReminders(HEADS_UP_AT);
+      await dispatchReminders(HEADS_UP_AT);
 
       for (const host of [first, second]) {
         const [notice] = await reminderNotices(host.id);
@@ -503,7 +503,7 @@ describe("dispatchDueReminders", () => {
       await twoHostSession();
       failFor(SECOND);
 
-      const summary = await dispatchDueReminders(FOLLOW_UP_AT);
+      const summary = await dispatchReminders(FOLLOW_UP_AT);
 
       expect(summary.sent).toBe(1);
       expect(summary.failed).toBe(1);
@@ -511,7 +511,7 @@ describe("dispatchDueReminders", () => {
 
       // The next run retries only the one that failed.
       vi.mocked(sendMail).mockReset();
-      await dispatchDueReminders(later(FOLLOW_UP_AT, 1));
+      await dispatchReminders(later(FOLLOW_UP_AT, 1));
       expect(recipients()).toEqual([SECOND]);
     });
 
@@ -520,12 +520,10 @@ describe("dispatchDueReminders", () => {
     it("retries a failed heads-up while the session is still to come", async () => {
       const { second } = await twoHostSession();
       failFor(SECOND);
-      await dispatchDueReminders(HEADS_UP_AT);
+      await dispatchReminders(HEADS_UP_AT);
 
       vi.mocked(sendMail).mockReset();
-      const summary = await dispatchDueReminders(
-        new Date("2026-09-01T09:20:00Z")
-      );
+      const summary = await dispatchReminders(new Date("2026-09-01T09:20:00Z"));
 
       expect(summary.sent).toBe(1);
       expect(recipients()).toEqual([SECOND]);
@@ -535,10 +533,10 @@ describe("dispatchDueReminders", () => {
     it("retries a reminder whose first failure is under 24 hours old", async () => {
       await twoHostSession();
       failFor(SECOND);
-      await dispatchDueReminders(FOLLOW_UP_AT);
+      await dispatchReminders(FOLLOW_UP_AT);
 
       vi.mocked(sendMail).mockReset();
-      const summary = await dispatchDueReminders(later(FOLLOW_UP_AT, 23));
+      const summary = await dispatchReminders(later(FOLLOW_UP_AT, 23));
 
       expect(summary.sent).toBe(1);
       expect(recipients()).toEqual([SECOND]);
@@ -547,10 +545,10 @@ describe("dispatchDueReminders", () => {
     it("abandons and logs one whose first failure is more than 24 hours old (FR-016)", async () => {
       const { session } = await twoHostSession();
       failFor(SECOND);
-      await dispatchDueReminders(FOLLOW_UP_AT);
+      await dispatchReminders(FOLLOW_UP_AT);
 
       const logged = vi.spyOn(console, "error").mockImplementation(() => {});
-      const summary = await dispatchDueReminders(later(FOLLOW_UP_AT, 25));
+      const summary = await dispatchReminders(later(FOLLOW_UP_AT, 25));
 
       expect(summary.abandoned).toBe(1);
       const message = logged.mock.calls
@@ -564,9 +562,7 @@ describe("dispatchDueReminders", () => {
 
       // Abandoned means abandoned: a working mail server does not revive it.
       vi.mocked(sendMail).mockReset();
-      expect((await dispatchDueReminders(later(FOLLOW_UP_AT, 26))).sent).toBe(
-        0
-      );
+      expect((await dispatchReminders(later(FOLLOW_UP_AT, 26))).sent).toBe(0);
     });
   });
 
@@ -595,7 +591,7 @@ describe("dispatchDueReminders", () => {
       const { first, second } = await twoHostSession();
       failNotificationFor(first.id);
 
-      const summary = await dispatchDueReminders(FOLLOW_UP_AT);
+      const summary = await dispatchReminders(FOLLOW_UP_AT);
 
       expect(summary.notified).toBe(1);
       expect(summary.failed).toBe(1);
@@ -606,12 +602,12 @@ describe("dispatchDueReminders", () => {
     it("leaves the reminder owed rather than settling it unsent", async () => {
       const { first } = await twoHostSession();
       const stop = failNotificationFor(first.id);
-      await dispatchDueReminders(FOLLOW_UP_AT);
+      await dispatchReminders(FOLLOW_UP_AT);
       expect(await reminderNotices(first.id)).toHaveLength(0);
 
       stop();
       vi.mocked(sendMail).mockReset();
-      const summary = await dispatchDueReminders(later(FOLLOW_UP_AT, 1));
+      const summary = await dispatchReminders(later(FOLLOW_UP_AT, 1));
 
       expect(summary.notified).toBe(1);
       expect(await reminderNotices(first.id)).toHaveLength(1);
@@ -627,7 +623,7 @@ describe("dispatchDueReminders", () => {
         .mockImplementation(claim);
       const logged = vi.spyOn(console, "error").mockImplementation(() => {});
 
-      const summary = await dispatchDueReminders(FOLLOW_UP_AT);
+      const summary = await dispatchReminders(FOLLOW_UP_AT);
 
       // Which host loses their claim depends on the candidate order; that one
       // host is the whole cost is what matters.

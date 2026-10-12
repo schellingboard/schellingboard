@@ -33,8 +33,19 @@
   the meetings module's page reads (`pageReads().meetingViews` and the like) bind
   them for `app/`. Their integration tests call those. Server modules keep passing their own repos.
 
+## Step 3c (2026-10-08)
+
+- `dispatchDueReminders` takes its repositories; `dispatchReminders()` in
+  `composition.ts` serves the dev action and tests, the job loop passes the
+  container itself (it is allow-listed with the other job plumbing).
+- Step 3 done: the rule covers `utils/` with only jobs, notifications and push allowed.
+
 ## Questions
+
+- `utils/guest-clashes.ts` imports `@/app/(site)/session_utils`, so `server/modules/`
+  reaches `app/` transitively, which `server-does-not-reach-into-app` does not catch.
+  Move the two helpers it uses to `packages/domain` or `utils/`.
 
 ## Next step
 
-3c.
+4.

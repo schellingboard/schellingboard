@@ -16,7 +16,7 @@ import {
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest, createLocation } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { dispatchDueReminders } from "@/utils/reminder-dispatch";
+import { dispatchReminders } from "@/server/composition";
 
 // This suite runs only when MAILPIT_API_URL points at a mailpit instance
 // (start one with `make mailpit`, see docs/dev/testing.md § Running tests). Skips
@@ -143,7 +143,7 @@ describe.skipIf(skipWithoutMailpit())(
       const title = `Heads-up session ${Date.now()}`;
       await berlinSession(title);
 
-      await dispatchDueReminders(HEADS_UP_AT);
+      await dispatchReminders(HEADS_UP_AT);
 
       const message = await receive(title, `You're hosting "${title}" shortly`);
       expect(message.HTML).toContain("12:10");
@@ -155,7 +155,7 @@ describe.skipIf(skipWithoutMailpit())(
       const title = `Follow-up session ${Date.now()}`;
       const { session, slug } = await berlinSession(title);
 
-      await dispatchDueReminders(FOLLOW_UP_AT);
+      await dispatchReminders(FOLLOW_UP_AT);
 
       const message = await receive(
         title,
