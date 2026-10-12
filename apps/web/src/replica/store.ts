@@ -1,14 +1,15 @@
 import type { FeedMessage } from "@schellingboard/contracts/feed";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { apply } from "./apply";
-import type { Link } from "./sync-state";
+import { STALE_AFTER_MS, type Link } from "./sync-state";
 
 export type ReplicaStore = ReturnType<typeof createReplicaStore>;
 
 export function createReplicaStore(
   initial: Snapshot,
   clock: () => number = () => performance.now(),
-  wallClock: () => number = () => Date.now()
+  wallClock: () => number = () => Date.now(),
+  { persisted = false }: { persisted?: boolean } = {}
 ) {
   let replica = initial;
   let gone = false;
@@ -19,10 +20,13 @@ export function createReplicaStore(
     const server = Date.parse(iso);
     if (!Number.isNaN(server)) clockOffset = server - wallClock();
   };
-  observeServerTime(initial.now);
+  if (!persisted) observeServerTime(initial.now);
   let deliveredKeys: ReadonlySet<string> = new Set();
-  // The seed is fresh from the server, so the replica starts out connected.
-  let link: Link = { connected: true, since: clock() };
+  // A server seed is fresh, so the replica starts out connected; a persisted
+  // copy is as old as its last save, so it starts out stale until the feed opens.
+  let link: Link = persisted
+    ? { connected: false, since: clock() - STALE_AFTER_MS }
+    : { connected: true, since: clock() };
   const listeners = new Set<() => void>();
   const set = (next: Snapshot, nextGone: boolean, revise = true) => {
     if (next === replica && nextGone === gone) return;

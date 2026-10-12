@@ -40,7 +40,7 @@ The files are read relative to the working directory, so the same code serves
 ## Layout and rules
 
 `apps/web/src/` follows [the client layout](target-architecture/04-client.md#layout);
-only `app/` exists so far. dependency-cruiser enforces that the package imports
+`app/` and `replica/` exist so far (the replica: store, `apply`, feed client, sync state, a server clock offset and IndexedDB persistence keyed by event and viewer, opened as `stale`). dependency-cruiser enforces that the package imports
 `packages/domain`, `packages/contracts` and `packages/api-client` only (never `app/`,
 `server/`, `utils/` or `next`), that nothing imports it, that `features/` never
 imports `api-client`, and that it declares what it imports. See

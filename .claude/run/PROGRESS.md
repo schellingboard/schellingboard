@@ -191,6 +191,28 @@
   at receipt (latency is ignored; the error is well under a second). Step 10c must not
   observe the `now` of a persisted snapshot.
 
+## Step 10c (2026-10-09)
+
+- `persistence.ts`: one IndexedDB record per (event, viewer or anonymous); `save` also
+  deletes the event's other viewers' records (the user-switch clearing, derived from the
+  snapshot's `me`), `load` validates with `snapshotSchema` and reads every failure as
+  absent. `openReplica` returns the persisted copy as a store whose link starts `stale`
+  and whose clock offset ignores the old `now`, else a network snapshot; `autosaveReplica`
+  saves 1 s after the last change. The feed already resumes from `store.get().seq`.
+- Not wired to a screen yet: `live-replica` still takes a seed; step 12 composes
+  `openReplica`, `connectFeed` and `autosaveReplica` in the SPA shell.
+
+- Review of 10: `openReplica` discards the event's other viewers' copies and `load`
+  refuses a record whose `me.guestId` is not the asked viewer (tests). Step 12 must pass
+  the guest the feed will be opened for as `viewer` (from the user picker's cookie), never
+  one read from the persisted copy. Kept as is: `adopt` observing `now` (the SPA only
+  adopts freshly fetched snapshots, no SSR seeds) and offset 0 for a persisted store until
+  the first ping or snapshot (device clock is the fallback); the shared 007-US8 tag.
+
+## Next step
+
+11.
+
 ## Questions
 
 - A session that loses its only room reads `"X" moved to No location (was Room A)`
@@ -199,7 +221,3 @@
 - `utils/guest-clashes.ts` imports `@/app/(site)/session_utils`, so `server/modules/`
   reaches `app/` transitively, which `server-does-not-reach-into-app` does not catch.
   Move the two helpers it uses to `packages/domain` or `utils/`.
-
-## Next step
-
-10.
