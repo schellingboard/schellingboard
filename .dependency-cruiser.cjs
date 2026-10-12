@@ -133,15 +133,18 @@ module.exports = {
       name: "app-does-not-read-repositories",
       severity: "error",
       comment:
-        "Pages, layouts and actions read through `pageReads()` or a use case, not the " +
-        "repository container. Only direct imports are caught: `utils/` helpers that " +
-        "app/ calls still reach it (see PLAN.md). The auth flows are the allow-list: " +
-        "they run before an actor exists.",
+        "Pages, layouts, actions and the `utils/` helpers they call read through " +
+        "`pageReads()` or a use case, not the repository container. The allow-list: the " +
+        "auth flows, which run before an actor exists, and the job loop, deliveries, " +
+        "notification and push infrastructure, which are server plumbing, not reads.",
       from: {
-        path: "^app/",
+        path: "^(app|utils)/",
         pathNot: [
           "^app/actions/user-auth\\.ts$",
           "^app/\\(site\\)/auth/(login|reset)/page\\.tsx$",
+          "^utils/jobs/",
+          "^utils/(notifications|push)\\.ts$",
+          "^utils/(meeting-views|meeting-options|meeting-availability-form|guest-clashes|reminder-dispatch)\\.ts$",
         ],
       },
       to: { path: "^db/container\\.ts$", dependencyTypesNot: ["type-only"] },

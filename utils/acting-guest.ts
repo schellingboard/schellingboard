@@ -1,4 +1,4 @@
-import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
 import { readGuestCookie, GUEST_COOKIE_NAME } from "./auth";
 
 // Server-side enforcement for guest account security (issue #370): a request
@@ -17,7 +17,7 @@ export async function isVerifiedAsGuest(
   guestId: string,
   guestCookieValue: string | undefined
 ): Promise<boolean> {
-  const creds = await getRepositories().guests.getAuthCredentials(guestId);
+  const creds = await pageReads().guestAuthProtection(guestId);
   if (!creds || !creds.authProtected) return true;
   const parsed = await readGuestCookie(guestCookieValue);
   return parsed?.guestId === guestId && parsed.level === "verified";
@@ -40,7 +40,7 @@ type ReadonlyCookies = {
 async function guestExists(id: string): Promise<boolean> {
   // The cheapest existence probe the repository offers: two columns, where
   // findById assembles the whole profile.
-  return (await getRepositories().guests.getAuthCredentials(id)) !== null;
+  return (await pageReads().guestAuthProtection(id)) !== null;
 }
 
 /**

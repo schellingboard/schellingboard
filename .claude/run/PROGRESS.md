@@ -21,8 +21,14 @@
   the grace (an integration test ties the two).
 - No CHANGELOG entry: the sync indicator is itself unreleased (#1111's entry).
 
+## Step 3a (2026-10-08)
+
+- `acting-guest` reads the auth credentials through a new `pageReads()` query.
+  The dependency-cruiser rule now covers `utils/`; the helpers still to convert
+  (3b, 3c) sit on its allow-list until then.
+
 ## Questions
 
 ## Next step
 
-3.
+3b.

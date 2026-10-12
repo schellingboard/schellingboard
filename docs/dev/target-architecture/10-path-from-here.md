@@ -27,8 +27,7 @@ sketch, not a plan; each step would get its own issue and ADR.
    A use case writing through several repositories is atomic (the unit of work),
    pages read through page reads, lists are paged, edits carry
    `expectedVersion`, and the UI sends `Idempotency-Key`. Still open: location
-   images and the push key outside the API, and the `utils/` helpers that still
-   read the repositories.
+   images and the push key outside the API.
 
 4. **Ship the feed and the snapshot.** SSE endpoint over the change log; a
    `replica` package in the Next app that the schedule page reads from. Live

@@ -13,6 +13,7 @@ export {
   allGuests,
   attendees,
   eventsOfGuests,
+  guestAuthProtection,
   guestById,
   guestsForEventAssignment,
   guestsOfEvent,

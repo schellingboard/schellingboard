@@ -51,6 +51,7 @@ import {
   type PeopleUseCases,
   allGuests,
   attendees,
+  guestAuthProtection,
   guestById,
 } from "@/server/modules/people/module";
 import {
@@ -179,6 +180,7 @@ export function pageReads() {
     eventDays: (eventId: string) => eventDays(repos, eventId),
     allGuests: () => allGuests(repos),
     guestById: (id: string) => guestById(repos, id),
+    guestAuthProtection: (id: string) => guestAuthProtection(repos, id),
     attendees: (now: Date) => attendees(repos, now),
     notificationPage: (
       guestId: string,
