@@ -12,7 +12,7 @@ import {
   type Result,
 } from "@/server/kernel/result";
 import type { SessionDeps } from "../ports";
-import { recordRsvpAdded, removeRsvp } from "./session-changes";
+import { findRsvp, recordRsvpAdded, removeRsvp } from "./session-changes";
 
 export interface RsvpInput {
   sessionId: string;
@@ -58,6 +58,9 @@ export const rsvp =
           "rsvp.ownSession",
           "Hosts cannot RSVP to their own session"
         );
+
+      const existing = await findRsvp(tx, input.sessionId, input.guestId);
+      if (existing) return ok(existing);
 
       const added = await addRsvp(tx, input, session, rsvpCapacityHardLimit);
       if (added.ok)
@@ -160,9 +163,7 @@ export const adminAddRsvp =
       if (!(await tx.guests.findById(input.guestId)))
         return notFound("guest.notFound", "Guest not found");
 
-      const existing = (await tx.rsvps.listBySession(input.sessionId)).find(
-        (r) => r.guestId === input.guestId
-      );
+      const existing = await findRsvp(tx, input.sessionId, input.guestId);
       let rsvp = existing;
       if (!rsvp) {
         const event = await tx.events.findById(session.eventId);

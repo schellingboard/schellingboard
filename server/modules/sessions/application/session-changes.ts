@@ -94,15 +94,23 @@ export async function recordRsvpAdded(
   tx.record(changes.sessionAttendanceChanged(session, session.numRsvps, by));
 }
 
+export async function findRsvp(
+  tx: Tx,
+  sessionId: string,
+  guestId: string
+): Promise<Rsvp | undefined> {
+  return (await tx.rsvps.listBySession(sessionId)).find(
+    (r) => r.guestId === guestId
+  );
+}
+
 export async function removeRsvp(
   tx: Tx,
   sessionId: string,
   guestId: string,
   by: ChangeContext
 ): Promise<void> {
-  const rsvp = (await tx.rsvps.listBySession(sessionId)).find(
-    (r) => r.guestId === guestId
-  );
+  const rsvp = await findRsvp(tx, sessionId, guestId);
   if (!rsvp) return;
   await tx.rsvps.deleteBySessionAndGuest(sessionId, guestId);
   const session = await tx.sessions.findById(sessionId);
