@@ -107,7 +107,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
         selectors into `apps/web/src/replica/` with their tests.
   - [x] 10b. Clock offset from the snapshot's `now` and the feed ping.
   - [x] 10c. IndexedDB persistence; a persisted replica opens `stale`.
-- [ ] 11. **Commands and queries**: the command mechanism (predict with the
+- [x] 11. **Commands and queries**: the command mechanism (predict with the
       domain policy, pending change keyed by `Idempotency-Key`, call, reconcile by
       `command_key` from the feed or the response, retry with the same key on a
       network error, roll back on `4xx`); RSVP add and remove and comment create.
@@ -115,7 +115,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
       fake API.
   - [x] 11a. Command core (`commands/runner.ts`) and RSVP add and remove.
   - [x] 11b. Comment create.
-  - [ ] 11c. `queries/`: attendee list and paged comments.
+  - [x] 11c. `queries/`: attendee list and paged comments.
 - [ ] 12. **The shell**: `ui/` primitives, layout, nav, user picker (step 7a),
       theme (ADR 0005 cookie), footer with version and release notes, sync
       indicator, error boundary, the dev toolbar's time travel when dev tools are
