@@ -32,7 +32,7 @@ export default async function MeetingsPage({
 
   const { viewMeeting } = await searchParams;
   const meetingId = Array.isArray(viewMeeting) ? viewMeeting[0] : viewMeeting;
-  if (!meetingId) redirect(`/legacy/${eventSlug}`);
+  if (!meetingId) redirect(`/${eventSlug}`);
 
   // Before the redirect below: the schedule has no notice for a visitor who
   // hasn't said who they are, so its modal could only call the meeting "not
@@ -40,7 +40,7 @@ export default async function MeetingsPage({
   const cookieStore = await cookies();
   if (!(await verifiedCurrentUser(cookieStore))) {
     return (
-      <PageNotice backHref={`/legacy/${eventSlug}`} backLabel={event.name}>
+      <PageNotice backHref={`/${eventSlug}`} backLabel={event.name}>
         {await unverifiedUserMessage(cookieStore, "opening your 1-on-1s")}
       </PageNotice>
     );
@@ -54,7 +54,7 @@ export default async function MeetingsPage({
 
   return (
     <>
-      <PageNotice backHref={`/legacy/${eventSlug}`} backLabel={event.name}>
+      <PageNotice backHref={`/${eventSlug}`} backLabel={event.name}>
         1-on-1s at {event.name} can only be answered or canceled during its
         scheduling phase.
       </PageNotice>

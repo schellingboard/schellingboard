@@ -83,7 +83,7 @@ function SlotCell({
   return (
     <PositionedBlock position={position}>
       <a
-        href={links.bookMeeting}
+        href={links.bookMeeting(start)}
         // Hatching says who may book *them*; it is no bar to arranging a
         // 1-on-1 there themselves, so the slot stays as bookable as any other.
         aria-label={

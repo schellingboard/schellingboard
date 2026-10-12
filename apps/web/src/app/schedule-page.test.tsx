@@ -2,19 +2,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { IDBFactory } from "fake-indexeddb";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import {
-  createMemoryHistory,
-  createRootRoute,
-  createRoute,
-  createRouter,
-  RouterProvider,
-} from "@tanstack/react-router";
+import { createMemoryHistory, RouterProvider } from "@tanstack/react-router";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { fakeApi, problem } from "../commands/fake-api";
 import { createReplicaPersistence } from "../replica/persistence";
 import { iso, snapshot } from "../replica/snapshot-fixture";
 import { hardNavigate } from "./hard-navigate";
-import { SchedulePage } from "./schedule-page";
+import { createAppRouter } from "./router";
 import type { AppServices } from "./services";
 
 vi.mock("./hard-navigate", () => ({
@@ -83,18 +77,10 @@ async function open({
       return source as unknown as EventSource;
     },
   };
-  const root = createRootRoute();
-  const event = createRoute({
-    getParentRoute: () => root,
-    path: "/$slug",
-    component: function Page() {
-      return <SchedulePage services={services} slug={path.split("/")[1]} />;
-    },
-  });
-  const router = createRouter({
-    routeTree: root.addChildren([event]),
-    history: createMemoryHistory({ initialEntries: [path] }),
-  });
+  const router = createAppRouter(
+    createMemoryHistory({ initialEntries: [path] }),
+    services
+  );
   await router.load();
   render(<RouterProvider router={router} />);
   return { calls, sources, router };
@@ -103,6 +89,34 @@ async function open({
 beforeEach(() => {
   vi.mocked(hardNavigate).mockClear();
   Element.prototype.scrollTo = vi.fn() as never;
+});
+
+describe("the event route", () => {
+  it("sends a modal, kiosk or 1-on-1 address on to the legacy schedule", async () => {
+    await open({ path: "/conf?view=agenda&viewSession=s1" });
+    await waitFor(() =>
+      expect(hardNavigate).toHaveBeenCalledWith(
+        "/legacy/conf?view=agenda&viewSession=s1"
+      )
+    );
+    expect(screen.queryByRole("link", { name: "Talk" })).toBeNull();
+  });
+
+  it("sends kiosk mode, remembered or asked for, on to the legacy schedule", async () => {
+    document.cookie = "kiosk=1; path=/";
+    await open();
+    await waitFor(() =>
+      expect(hardNavigate).toHaveBeenCalledWith("/legacy/conf")
+    );
+    document.cookie = "kiosk=; path=/; max-age=0";
+  });
+
+  it("leaves a legacy page's address to the legacy app, whatever events exist", async () => {
+    await open({ path: "/settings" });
+    await waitFor(() =>
+      expect(hardNavigate).toHaveBeenCalledWith("/legacy/settings")
+    );
+  });
 });
 
 describe("the schedule page", () => {
@@ -116,7 +130,7 @@ describe("the schedule page", () => {
         screen
           .getAllByRole("link", { name: "Other con" })[0]
           .getAttribute("href")
-      ).toBe("/legacy/other");
+      ).toBe("/other");
       expect(screen.getByText("Live")).toBeTruthy();
       expect(
         await screen.findByRole("button", { name: /Version 4.1.0/ })
@@ -168,7 +182,7 @@ describe("the schedule page", () => {
     await screen.findByRole("link", { name: "Talk" });
     await userEvent.click(screen.getByRole("button", { name: "Your name" }));
     await userEvent.click(
-      within(await screen.findByRole("dialog")).getByRole("button", {
+      within(await screen.findByRole("dialog")).getByRole("option", {
         name: /HOST/,
       })
     );

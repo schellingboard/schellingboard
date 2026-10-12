@@ -5,8 +5,8 @@ export type ScheduleLinks = {
   session: (current: URLSearchParams, sessionId: string) => string;
   meeting: (current: URLSearchParams, meetingId: string) => string;
   addSession: (slot: { location: string; day: string; time: string }) => string;
-  /** Where a free 1-on-1 slot is arranged. */
-  bookMeeting: string;
+  /** Where a free 1-on-1 slot, by its start, is arranged. */
+  bookMeeting: (slotStart: string) => string;
 };
 
 /**
@@ -27,6 +27,7 @@ export function legacyScheduleLinks(eventSlug: string): ScheduleLinks {
     meeting: over("viewMeeting"),
     addSession: ({ location, day, time }) =>
       `${schedule}/add-session?${new URLSearchParams({ location, time, day })}`,
-    bookMeeting: schedule,
+    bookMeeting: (slotStart) =>
+      `${schedule}?${new URLSearchParams({ bookMeeting: slotStart })}`,
   };
 }

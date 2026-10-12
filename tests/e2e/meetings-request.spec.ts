@@ -251,7 +251,7 @@ test.describe("1-on-1 meetings", () => {
     await page.goto(`/${slug}`);
     // The slot they did not offer, which is still a slot they can book in.
     await page
-      .getByRole("button", {
+      .getByRole("link", {
         name: /^Arrange a 1-on-1 at 09:10 — you are not offering/,
       })
       .first()

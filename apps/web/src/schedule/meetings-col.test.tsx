@@ -113,7 +113,9 @@ describe("the 1-on-1 column", () => {
     const free = screen.getByRole("link", {
       name: "Arrange a 1-on-1 at 11:10",
     });
-    expect(free.getAttribute("href")).toBe("/legacy/conf");
+    expect(free.getAttribute("href")).toBe(
+      `/legacy/conf?bookMeeting=${encodeURIComponent(iso(11))}`
+    );
   });
 
   it("says when a slot is one the viewer is not offering", () => {

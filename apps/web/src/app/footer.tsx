@@ -26,7 +26,7 @@ export function Footer({
   inline,
 }: {
   version: string | undefined;
-  /** A copy inside a screen that hides the page's own footer. */
+  /** A copy inside a screen's scroll content, for screens that hide the page's footer. */
   inline?: boolean;
 }) {
   const [open, setOpen] = useState(false);
@@ -35,9 +35,11 @@ export function Footer({
   return (
     <footer
       data-site-footer={inline ? undefined : ""}
-      className="mt-auto border-t border-line-subtle bg-surface-sunken py-2"
+      className={`${inline ? "" : "mt-auto "}border-t border-line-subtle bg-surface-sunken py-2`}
     >
-      <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 px-3 text-xs text-fg-subtle md:grid md:grid-cols-[1fr_auto_1fr]">
+      <div
+        className={`flex flex-wrap items-center justify-between gap-x-2 gap-y-1 px-3 text-xs text-fg-subtle md:grid md:grid-cols-[1fr_auto_1fr] ${inline ? "sticky left-0 max-w-[100dvw]" : ""}`}
+      >
         <div className="md:justify-self-start">
           <button
             type="button"

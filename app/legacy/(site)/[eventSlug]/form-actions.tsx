@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { AppLink } from "@/app/components/app-link";
 
 export function FormActions(props: {
   cancelHref: string;
@@ -10,12 +10,12 @@ export function FormActions(props: {
     <div className="flex flex-wrap-reverse items-center gap-3">
       {deleteButton}
       <div className="ml-auto flex gap-3">
-        <Link
+        <AppLink
           href={cancelHref}
           className="py-2 px-6 rounded font-semibold text-fg-muted bg-surface-muted hover:bg-surface-hover"
         >
           Cancel
-        </Link>
+        </AppLink>
         {children}
       </div>
     </div>

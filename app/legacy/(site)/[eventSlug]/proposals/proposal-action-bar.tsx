@@ -2,6 +2,7 @@
 
 import { useContext } from "react";
 import Link from "next/link";
+import { AppLink } from "@/app/components/app-link";
 import {
   PlusIcon,
   ChartBarIcon,
@@ -88,15 +89,15 @@ export function ProposalActionBar({
         visible={!schedEnabled}
         unavailable
       >
-        <Link
-          href={schedEnabled ? `/legacy/${eventSlug}` : "#"}
+        <AppLink
+          href={schedEnabled ? `/${eventSlug}` : "#"}
           className={`bg-brand hover:bg-brand-hover transition-colors text-on-brand px-4 py-2 rounded-md flex items-center gap-2 ${
             schedEnabled ? "" : "opacity-50 cursor-not-allowed"
           }`}
         >
           <CalendarDaysIcon className="h-5 w-5" />
           <span>View Schedule</span>
-        </Link>
+        </AppLink>
       </HoverTooltip>
     </div>
   );
