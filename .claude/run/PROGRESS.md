@@ -265,3 +265,11 @@
   Added `GET /api/v1/me/identity` -> `{guestId|null}` (verified acting guest: a protected
   name without a verified cookie, or a deleted guest, reads null). The shell's viewer
   provider reads it once at start and after the picker/sign-out.
+
+## Step 12a (2026-10-09)
+
+- Added `@testing-library/react` 16.3.0, `dom` 10.4.0, `user-event` 14.6.1 (exact pins, old
+  enough) for component tests; `src/test-setup.ts` runs `cleanup`. Primitives are plain
+  elements (no headlessui/heroicons dependency in the SPA): `ui/dialog` (Escape, backdrop,
+  Close button, focus in and back), `ui/button`; `app/layout` (skip link) and `app/nav-bar`
+  (events as `/legacy/<slug>` links, mobile menu, trailing slot).
