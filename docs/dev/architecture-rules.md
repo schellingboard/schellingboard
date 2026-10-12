@@ -108,6 +108,13 @@ imported only through its `module.ts`, by other modules, tests and `app/` alike;
 and `app/` reaches `server/` only through `module.ts`, `composition.ts`, the
 kernel and the API mount. See [The server and the API](server.md).
 
+`app/` does not import the repository container (`@/db/container`) directly:
+pages and actions read through `pageReads()` or a use case. Only direct imports
+are checked; some `utils/` helpers still reach the container. The auth flows
+(`actions/user-auth.ts`, `auth/login`, `auth/reset`) are exempt. `adminReads()`
+(`server/admin-reads.ts`) is importable only from `app/admin/` and
+`app/actions/admin-*`.
+
 `make arch-graph` renders the graph to `arch-graph.svg` (needs graphviz), which
 is usually faster than arguing about where a boundary should go.
 

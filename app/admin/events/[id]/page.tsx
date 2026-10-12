@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { adminReads, pageReads } from "@/server/composition";
+import { adminReads } from "@/server/admin-reads";
+import { pageReads } from "@/server/composition";
 import { sessionOverlapsWindow } from "@schellingboard/domain/day-window";
 import { requireAdminPage } from "../../require-admin";
 import { EventDetailForm } from "./event-detail-form";

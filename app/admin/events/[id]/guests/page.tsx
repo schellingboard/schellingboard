@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
-import { adminReads, pageReads } from "@/server/composition";
+import { adminReads } from "@/server/admin-reads";
+import { pageReads } from "@/server/composition";
 import { outOfRangePageRedirect, parsePage } from "@/utils/pagination";
 import { requireAdminPage } from "../../../require-admin";
 import {

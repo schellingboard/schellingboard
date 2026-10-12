@@ -1,4 +1,5 @@
-import { adminReads, pageReads } from "@/server/composition";
+import { adminReads } from "@/server/admin-reads";
+import { pageReads } from "@/server/composition";
 import { requireAdminPage } from "../require-admin";
 import { LocationsManager, type AdminLocation } from "../locations-manager";
 

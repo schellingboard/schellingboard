@@ -123,10 +123,36 @@ module.exports = {
         pathNot: [
           "^server/modules/[^/]+/module\\.ts$",
           "^server/composition\\.ts$",
+          "^server/admin-reads\\.ts$",
           "^server/kernel/",
           "^server/http/app\\.ts$",
         ],
       },
+    },
+    {
+      name: "app-does-not-read-repositories",
+      severity: "error",
+      comment:
+        "Pages, layouts and actions read through `pageReads()` or a use case, not the " +
+        "repository container. Only direct imports are caught: `utils/` helpers that " +
+        "app/ calls still reach it (see PLAN.md). The auth flows are the allow-list: " +
+        "they run before an actor exists.",
+      from: {
+        path: "^app/",
+        pathNot: [
+          "^app/actions/user-auth\\.ts$",
+          "^app/\\(site\\)/auth/(login|reset)/page\\.tsx$",
+        ],
+      },
+      to: { path: "^db/container\\.ts$", dependencyTypesNot: ["type-only"] },
+    },
+    {
+      name: "admin-reads-only-for-admin",
+      severity: "error",
+      comment:
+        "`adminReads()` checks nothing itself, so only admin pages and actions may use it.",
+      from: { pathNot: "^(app/admin/|app/actions/admin-)" },
+      to: { path: "^server/admin-reads\\.ts$" },
     },
     {
       name: "kernel-reaches-no-module",
