@@ -23,10 +23,7 @@ vi.mock("next/headers", () => ({
 
 import { loginAction, logoutAction } from "@/app/actions/auth";
 import { AUTH_COOKIE_NAME, GUEST_COOKIE_NAME } from "@/utils/auth";
-import {
-  MAX_LOGIN_FAILURES_PER_CLIENT,
-  resetLoginRateLimiter,
-} from "@/utils/login-rate-limit";
+import { LOGIN_LIMITS, resetRateLimits } from "@/server/kernel/rate-limit";
 
 function loginForm(password: string): FormData {
   const form = new FormData();
@@ -37,7 +34,7 @@ function loginForm(password: string): FormData {
 describe("loginAction", () => {
   beforeEach(() => {
     cookieJar.clear();
-    resetLoginRateLimiter();
+    resetRateLimits();
     vi.stubEnv("SITE_PASSWORD", "site-pw");
     vi.stubEnv("AUTH_SECRET", "0123456789abcdef0123456789abcdef");
   });
@@ -45,7 +42,7 @@ describe("loginAction", () => {
   afterEach(() => vi.unstubAllEnvs());
 
   it("throttles repeated failed logins, even with the right password", async () => {
-    for (let i = 0; i < MAX_LOGIN_FAILURES_PER_CLIENT; i++) {
+    for (let i = 0; i < LOGIN_LIMITS.perClient.capacity; i++) {
       const res = await loginAction(null, loginForm("wrong"));
       expect(res).toMatchObject({ error: "Invalid password" });
     }

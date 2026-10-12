@@ -25,6 +25,7 @@ services:
       SMTP_FROM: ${SMTP_FROM:-}
       REMINDER_DISPATCH_INTERVAL_MS: ${REMINDER_DISPATCH_INTERVAL_MS:-}
       API_DOCS: ${API_DOCS:-}
+      SB_TRUSTED_PROXIES: ${SB_TRUSTED_PROXIES:-}
     logging:
       driver: json-file
       options:

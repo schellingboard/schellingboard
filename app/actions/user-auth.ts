@@ -29,10 +29,10 @@ import {
   TOO_MANY_ATTEMPTS_ERROR,
   TOO_MANY_EMAILS_ERROR,
   isEmailIssuanceBlocked,
-  isLoginBlocked,
+  loginRetryAfter,
   recordEmailIssued,
   recordLoginFailure,
-} from "@/utils/login-rate-limit";
+} from "@/server/kernel/rate-limit";
 import { isMailerConfigured, sendMail } from "@/utils/mailer";
 import { siteUrl } from "@/utils/site-url";
 import { authCodeEmail } from "@/emails/auth-code";
@@ -304,7 +304,7 @@ export async function loginAsGuestAction(
   if (!creds) {
     return { ok: false, error: "Unknown user" };
   }
-  const passwordBlocked = isLoginBlocked("guest", guestId);
+  const passwordBlocked = loginRetryAfter("guest", guestId) > 0;
   if (
     !passwordBlocked &&
     (await verifyUserPassword(credential, creds.passwordHash))
@@ -407,7 +407,7 @@ export async function changePasswordAction(
   }
   // Shares the login limiter: a stolen session must not be able to guess the
   // current password (and so take the account over) at unlimited speed.
-  if (isLoginBlocked("guest", guestId)) {
+  if (loginRetryAfter("guest", guestId) > 0) {
     return { ok: false, error: TOO_MANY_ATTEMPTS_ERROR };
   }
   if (!(await verifyUserPassword(currentPassword, creds.passwordHash))) {
@@ -442,7 +442,7 @@ export async function disableProtectionAction(
     return { ok: false, error: "Your name isn't protected" };
   }
   // Same reasoning as changePasswordAction: gate the guess rate.
-  if (isLoginBlocked("guest", guestId)) {
+  if (loginRetryAfter("guest", guestId) > 0) {
     return { ok: false, error: TOO_MANY_ATTEMPTS_ERROR };
   }
   if (!(await verifyUserPassword(currentPassword, creds.passwordHash))) {

@@ -313,6 +313,27 @@ cursor.invalid`. The use case now returns the whole list; the
   its new file. No test for these races: they need a delete or write between
   two awaits of one request.
 
+- Step 7 split into 7.1 (kernel bucket, client IP, logins) and 7.2 (API
+  middleware).
+- 7.1: `server/kernel/rate-limit.ts` holds the token buckets (`takeToken`,
+  `retryAfter`), the login limits (per client 10, one back every 90 s; per
+  scope 100, one every 9 s: the old 15-minute windows as rates) and the
+  daily email cap (20, one back every 72 min); only failures (and sent
+  mails) take tokens, as before. `utils/login-rate-limit.ts` is gone. The
+  client IP comes from `X-Forwarded-For` only with `SB_TRUSTED_PROXIES=N`
+  (the Nth entry from the end; default 0, then all clients share one key);
+  `X-Real-IP` is no longer read. The login route's `429` carries
+  `Retry-After`. The ambient-clock lint does not cover `server/`, so the
+  kernel needs no exemption comments.
+- 7.1 review: a bucket refills one token at a time, so a client can use
+  up to about twice the capacity in the first window (~39 mails in 24 h,
+  not 20; ~19 failed logins in 15 min, not 10); later it holds to the rate.
+  The email message says "try again later". With `SB_TRUSTED_PROXIES`
+  unset, the first request carrying `X-Forwarded-For` logs a warning, and so
+  does an invalid value. The bucket map keeps at most 10,000 entries: full
+  buckets go first, then the oldest. The CHANGELOG has a breaking-change
+  note (coordinator's decision, 2026-10-07).
+
 ## Problems
 
 None.
@@ -333,4 +354,4 @@ None.
 
 ## Next step
 
-7.
+7.2.
