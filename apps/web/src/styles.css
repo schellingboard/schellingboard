@@ -1,0 +1,11 @@
+@import "tailwindcss";
+@import "../../../styles/tokens.css";
+
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  background-color: var(--surface-sunken);
+  color: var(--fg);
+}

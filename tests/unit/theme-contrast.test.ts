@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync } from "fs";
 import path from "path";
 import {
-  GLOBALS_CSS_PATH,
+  TOKENS_CSS_PATH,
   contrastRatio,
   parseColor,
   readThemes,
@@ -94,7 +94,7 @@ const NON_TEXT_PAIRS: [fg: string, bg: string, min: number][] = [
   ["--vote-chosen", "--surface-raised", 3],
 ];
 
-const THEMES = readThemes(readFileSync(GLOBALS_CSS_PATH, "utf8"));
+const THEMES = readThemes(readFileSync(TOKENS_CSS_PATH, "utf8"));
 
 describe.each(["light", "dark"] as const)("theme tokens — %s", (theme) => {
   const tokens = THEMES[theme];

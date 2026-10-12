@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "fs";
 import { LOCATION_COLOR_NAMES } from "@schellingboard/domain/location-colors";
 import {
-  GLOBALS_CSS_PATH,
+  TOKENS_CSS_PATH,
   contrastRatio,
   mixOklab,
   parseColor,
@@ -11,7 +11,7 @@ import {
   type Linear,
 } from "../helpers/color-math";
 
-const css = readFileSync(GLOBALS_CSS_PATH, "utf8");
+const css = readFileSync(TOKENS_CSS_PATH, "utf8");
 const palette = readTailwindPalette();
 const THEMES = readThemes(css);
 

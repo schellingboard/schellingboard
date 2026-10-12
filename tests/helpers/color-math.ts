@@ -1,11 +1,11 @@
 import { readFileSync } from "fs";
 import path from "path";
 
-export const GLOBALS_CSS_PATH = path.join(__dirname, "../../app/globals.css");
+export const TOKENS_CSS_PATH = path.join(__dirname, "../../styles/tokens.css");
 
 /**
  * Colours are carried as linear-light sRGB: WCAG luminance is defined on it,
- * and it is the halfway point between the two notations `app/globals.css`
+ * and it is the halfway point between the two notations `styles/tokens.css`
  * uses — our own hex tokens and Tailwind's `oklch()` palette.
  */
 export type Linear = [number, number, number];
