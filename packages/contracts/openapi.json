@@ -4156,6 +4156,40 @@
         "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
       }
     },
+    "/api/v1/push/key": {
+      "get": {
+        "tags": ["notifications"],
+        "description": "The instance's public push key, needed before a browser can subscribe.",
+        "responses": {
+          "200": {
+            "description": "The public key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "publicKey": {
+                      "type": "string",
+                      "description": "The VAPID key a browser passes to pushManager.subscribe"
+                    }
+                  },
+                  "required": ["publicKey"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+      }
+    },
     "/api/v1/me/notifications": {
       "get": {
         "tags": ["notifications"],

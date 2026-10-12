@@ -6,7 +6,8 @@ import {
   verifiedCurrentUser,
 } from "@/utils/acting-guest";
 import { serverNow } from "@/utils/dev-clock-server";
-import { vapidPublicKey } from "@/utils/push";
+import { notificationUseCases } from "@/server/composition";
+import { resolveActor } from "@/server/kernel/actor";
 import {
   availabilityFormsFor,
   type AvailabilityFormData,
@@ -48,7 +49,11 @@ export default async function SettingsPage() {
   }
 
   const now = await serverNow();
-  const publicKey = await vapidPublicKey(now);
+  const pushKey = await notificationUseCases().getPushKey(
+    await resolveActor(cookieStore),
+    now
+  );
+  if (!pushKey.ok) throw new Error(pushKey.error.code);
   const availability = await availabilityFormsFor(guest.id, now);
 
   // Never render the stored email address here: switching the current user
@@ -56,7 +61,7 @@ export default async function SettingsPage() {
   return (
     <div className="flex flex-col gap-8">
       <SettingsForm emailSettings={guest.info.emailSettings} />
-      <PushNotifications publicKey={publicKey} />
+      <PushNotifications publicKey={pushKey.value.publicKey} />
       <OneOnOneSettings forms={availability} />
       <div className="max-w-2xl mx-auto w-full px-4 sm:px-0">
         <AccountSecurity

@@ -9,6 +9,7 @@ import {
 import {
   pushEnabledSchema,
   pushEndpointSchema,
+  pushKeySchema,
   pushSubscriptionSchema,
 } from "@schellingboard/contracts/push";
 import type { Notification } from "@schellingboard/domain/notification";
@@ -130,10 +131,28 @@ const checkEnabled = createRoute({
   },
 });
 
+const getPushKey = createRoute({
+  method: "get",
+  path: "/push/key",
+  tags: ["notifications"],
+  description:
+    "The instance's public push key, needed before a browser can subscribe.",
+  responses: {
+    200: json(pushKeySchema, "The public key"),
+    ...problemDefault,
+  },
+});
+
 export function addNotificationRoutes(
   app: App,
   notifications: () => NotificationUseCases
 ) {
+  app.openapi(getPushKey, async (c) => {
+    const result = await notifications().getPushKey(c.var.actor, c.var.now);
+    if (!result.ok) return problem(result.error);
+    return c.json(result.value, 200);
+  });
+
   app.openapi(listMyNotifications, async (c) => {
     const result = await notifications().listMyNotifications(c.var.actor);
     if (!result.ok) return problem(result.error);

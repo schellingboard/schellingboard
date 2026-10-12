@@ -7,6 +7,7 @@ import {
   readNotification,
 } from "./notifications";
 import {
+  getPushKey,
   isPushEnabledHere,
   subscribeToPush,
   unsubscribeFromPush,
@@ -23,6 +24,7 @@ export function createNotificationUseCases(deps: NotificationDeps) {
     subscribeToPush: subscribeToPush(deps),
     unsubscribeFromPush: unsubscribeFromPush(deps),
     isPushEnabledHere: isPushEnabledHere(deps),
+    getPushKey: getPushKey(deps),
   };
 }
 

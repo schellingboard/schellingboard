@@ -287,6 +287,13 @@ cursor.invalid`. The use case now returns the whole list; the
   `listByEvent` leaves out. No search or filters: the web directory keeps
   its own in-browser search (step 5 of the path decides the rest).
 
+- Step 6 split into 6a (push key) and 6b (location images), one commit each.
+- 6a: `GET /push/key` answers `{ publicKey }` through the notifications
+  use case `getPushKey`, open to anyone past the site password (the key is
+  public, and a browser needs it before it can subscribe). Key generation is
+  a port (`generateVapidKeys`, web-push in `server/composition.ts`); the
+  settings page calls the use case, and `vapidPublicKey` is gone.
+
 ## Problems
 
 None.
@@ -307,4 +314,4 @@ None.
 
 ## Next step
 
-6.
+6b.

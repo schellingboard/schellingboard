@@ -10,7 +10,7 @@ import { siteUrl } from "@/utils/site-url";
  */
 const CONTACT = "https://schellingboard.org";
 
-const generateKeys = () => webpush.generateVAPIDKeys();
+export const generateVapidKeys = () => webpush.generateVAPIDKeys();
 
 // Everything sent is about now — a moved session, a request for the next
 // slot — so a phone that comes back online days later should not wake to a
@@ -20,20 +20,6 @@ const TTL_SECONDS = 4 * 60 * 60;
 // A push service that stops answering must not hold up the jobs loop for as
 // long as a socket takes to give up by itself.
 const TIMEOUT_MS = 10_000;
-
-/**
- * The instance's VAPID public key, which a browser needs before it can
- * subscribe. Generated on the first call and never replaced: it is baked into
- * every subscription already handed out, and nothing tells a browser to ask
- * for a new one.
- */
-export async function vapidPublicKey(now: Date): Promise<string> {
-  const { publicKey } = await getRepositories().push.vapidKeys(
-    generateKeys,
-    now
-  );
-  return publicKey;
-}
 
 /**
  * Sends `notice` to every browser the guest has turned notifications on in.
@@ -51,7 +37,7 @@ export async function pushToGuest(
     const subscriptions = await push.listSubscriptions(guestId);
     if (subscriptions.length === 0) return;
 
-    const keys = await push.vapidKeys(generateKeys, now);
+    const keys = await push.vapidKeys(generateVapidKeys, now);
     webpush.setVapidDetails(
       siteUrl() ?? CONTACT,
       keys.publicKey,
