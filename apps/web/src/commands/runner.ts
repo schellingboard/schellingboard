@@ -1,5 +1,6 @@
 import type { ApiClient } from "@schellingboard/api-client";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
+import { problemCode } from "./problem";
 import type { ReplicaStore } from "../replica/store";
 
 export type CommandResponse<R> = {
@@ -130,11 +131,9 @@ export function createCommandRunner({
         "idempotency.inProgress";
       if (result && result.response.status < 500 && !inProgress) {
         if (result.response.ok) return { ok: true, data: result.data };
-        const code = (result.error as { code?: unknown } | undefined)?.code;
         return {
           ok: false,
-          code:
-            typeof code === "string" ? code : `http.${result.response.status}`,
+          code: problemCode(result.error, result.response.status),
         };
       }
       if (attempt >= retryDelays.length) return "gave up";

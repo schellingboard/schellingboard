@@ -235,9 +235,20 @@
   to add to its query (11c). The same key is resent on a network error, so a retry
   makes one comment.
 
+## Step 11c (2026-10-09)
+
+- `queries/attendees.ts` (`createAttendeesQuery`: `refresh`, keeps the earlier list while
+  reloading, `attendeeGuests` names them from the replica's guests) and
+  `queries/comments.ts` (`createCommentsQuery`: `loadMore` by cursor, one request at a
+  time, a failed page is asked again, `add` for a just-created comment, deduped by id).
+  Both are small observable stores (`get`/`subscribe`) for step 12's React bindings.
+- Decisions: retries are 1, 2, 4, 8, 16 s, then `network.unreachable`; 5xx retries like
+  a network error because the key makes it safe. Pending commands are not persisted
+  across a reload. `apps/web` now declares `@schellingboard/api-client`.
+
 ## Next step
 
-11c.
+12.
 
 ## Questions
 
