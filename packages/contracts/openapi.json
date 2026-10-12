@@ -491,6 +491,268 @@
         },
         "required": ["id", "type", "text", "url", "createdAt", "readAt"]
       },
+      "Snapshot": {
+        "type": "object",
+        "properties": {
+          "seq": {
+            "type": "integer",
+            "description": "Resume the feed after this"
+          },
+          "event": { "$ref": "#/components/schemas/Event" },
+          "days": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "start": { "type": "string", "format": "date-time" },
+                "end": { "type": "string", "format": "date-time" },
+                "startBookings": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "When sessions may start"
+                },
+                "endBookings": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "When sessions must end"
+                },
+                "id": { "type": "string" },
+                "eventId": { "type": "string" },
+                "version": { "type": "integer" }
+              },
+              "required": [
+                "start",
+                "end",
+                "startBookings",
+                "endBookings",
+                "id",
+                "eventId",
+                "version"
+              ]
+            }
+          },
+          "locations": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/SnapshotLocation" }
+          },
+          "unavailability": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Unavailability" }
+          },
+          "guests": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/EventGuest" },
+            "description": "Members and session hosts"
+          },
+          "sessions": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/SnapshotSession" }
+          },
+          "counts": {
+            "type": "object",
+            "additionalProperties": { "type": "integer" },
+            "description": "RSVPs by session"
+          },
+          "meetingPoints": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "eventId": { "type": "string" },
+                "name": { "type": "string" },
+                "description": { "type": "string" },
+                "sortIndex": { "type": "integer" },
+                "version": { "type": "integer" }
+              },
+              "required": [
+                "id",
+                "eventId",
+                "name",
+                "description",
+                "sortIndex",
+                "version"
+              ]
+            }
+          },
+          "me": {
+            "type": ["object", "null"],
+            "properties": {
+              "guestId": { "type": "string" },
+              "rsvps": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/Rsvp" }
+              },
+              "meetings": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "eventId": { "type": "string" },
+                    "requesterId": { "type": "string" },
+                    "recipientId": { "type": "string" },
+                    "slotStart": { "type": "string", "format": "date-time" },
+                    "slotEnd": { "type": "string", "format": "date-time" },
+                    "meetingPoint": { "type": "string" },
+                    "message": { "type": "string" },
+                    "cancelNote": { "type": "string" },
+                    "status": {
+                      "type": "string",
+                      "enum": ["pending", "accepted", "declined", "canceled"]
+                    },
+                    "createdAt": { "type": "string", "format": "date-time" },
+                    "respondedAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "eventId",
+                    "requesterId",
+                    "recipientId",
+                    "slotStart",
+                    "slotEnd",
+                    "meetingPoint",
+                    "message",
+                    "cancelNote",
+                    "status",
+                    "createdAt",
+                    "respondedAt"
+                  ]
+                }
+              },
+              "meetingGuests": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/EventGuest" },
+                "description": "The other party of each own meeting"
+              },
+              "availability": {
+                "type": "array",
+                "items": { "type": "string", "format": "date-time" }
+              }
+            },
+            "required": [
+              "guestId",
+              "rsvps",
+              "meetings",
+              "meetingGuests",
+              "availability"
+            ]
+          }
+        },
+        "required": [
+          "seq",
+          "event",
+          "days",
+          "locations",
+          "unavailability",
+          "guests",
+          "sessions",
+          "counts",
+          "meetingPoints",
+          "me"
+        ]
+      },
+      "SnapshotLocation": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "areaDescription": { "type": ["string", "null"] },
+          "capacity": { "type": "integer" },
+          "color": { "type": "string" },
+          "bookable": {
+            "type": "boolean",
+            "description": "false hides it from attendees' booking"
+          },
+          "imageUrl": { "type": "string" },
+          "sortIndex": { "type": "integer" },
+          "version": {
+            "type": "integer",
+            "description": "Goes up with every change, its events and place included"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "areaDescription",
+          "capacity",
+          "color",
+          "bookable",
+          "imageUrl",
+          "sortIndex",
+          "version"
+        ]
+      },
+      "Unavailability": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "eventId": { "type": "string" },
+          "locationId": { "type": "string" },
+          "start": { "type": "string", "format": "date-time" },
+          "end": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "eventId", "locationId", "start", "end"]
+      },
+      "EventGuest": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "avatarUrl": { "type": ["string", "null"] },
+          "aboutMe": { "type": ["string", "null"] },
+          "authProtected": { "type": "boolean" },
+          "profileVersion": { "type": "integer" }
+        },
+        "required": [
+          "id",
+          "name",
+          "avatarUrl",
+          "aboutMe",
+          "authProtected",
+          "profileVersion"
+        ]
+      },
+      "SnapshotSession": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "eventId": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "startTime": { "type": ["string", "null"], "format": "date-time" },
+          "endTime": { "type": ["string", "null"], "format": "date-time" },
+          "capacity": { "type": "integer" },
+          "adminManaged": { "type": "boolean" },
+          "blocker": { "type": "boolean" },
+          "closed": { "type": "boolean" },
+          "proposalId": { "type": ["string", "null"] },
+          "version": { "type": "integer" },
+          "hostIds": { "type": "array", "items": { "type": "string" } },
+          "locationIds": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": [
+          "id",
+          "eventId",
+          "title",
+          "description",
+          "startTime",
+          "endTime",
+          "capacity",
+          "adminManaged",
+          "blocker",
+          "closed",
+          "proposalId",
+          "version",
+          "hostIds",
+          "locationIds"
+        ]
+      },
       "Location": {
         "type": "object",
         "properties": {
@@ -525,17 +787,6 @@
           "eventIds",
           "version"
         ]
-      },
-      "Unavailability": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "string" },
-          "eventId": { "type": "string" },
-          "locationId": { "type": "string" },
-          "start": { "type": "string", "format": "date-time" },
-          "end": { "type": "string", "format": "date-time" }
-        },
-        "required": ["id", "eventId", "locationId", "start", "end"]
       },
       "AdminGuest": {
         "type": "object",
@@ -4781,6 +5032,39 @@
                   },
                   "required": ["event", "days"]
                 }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+      }
+    },
+    "/api/v1/events/{slug}/snapshot": {
+      "get": {
+        "tags": ["events"],
+        "description": "The event's schedule, normalized, and `seq`, the last change it includes. `me` holds the RSVPs, meetings and free slots of the guest the `guest` cookie names; it is null without that cookie, or for a protected guest whose cookie is not verified.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "slug",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The snapshot",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Snapshot" }
               }
             }
           },

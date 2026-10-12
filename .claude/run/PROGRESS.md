@@ -436,6 +436,20 @@ cursor.invalid`. The use case now returns the whole list; the
   `me.meetingGuests`, and meeting changes will carry both parties' lean
   fields (ADR 0014 section 1). A partner's rename reaches the viewer only
   with the next change to that meeting.
+- 10b: `GET /events/{slug}/snapshot` (`server/feed/routes.ts`, mounted in
+  `server/http/app.ts`, which hands it `uow` and the guest lookup). The
+  viewer is `actingGuest`: an open cookie for an unprotected guest or a
+  verified one, else `me` is null (as the SSR's `verifiedCurrentUser`). An
+  unknown slug is `404 event.notFound`. Golden files in
+  `tests/integration/golden/` (ids replaced by labels) for the five viewers;
+  update them with `vitest -u`. Event guests are now ordered by name, then
+  id, so the files are stable. Public API docs: one bullet under "Syncing
+  from a script". No CHANGELOG line: `/api/v1` is unreleased and its bullet
+  covers it.
+- 10b review, accepted: `snapshotFor(uow, actor, slug)` (returns a `Result`)
+  resolves the viewer with `actingGuest` inside the `uow.read`, for the
+  route and for 10c's SSR; `event.notFound` says "Event not found"; the
+  route's description names the `guest` cookie.
 
 ## Problems
 
@@ -462,4 +476,4 @@ None.
 
 ## Next step
 
-10b.
+10c.

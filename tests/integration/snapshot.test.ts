@@ -12,11 +12,23 @@ import {
 import { updateLoggedSession } from "../helpers/changes";
 import { getRepositories, withWriter } from "@/db/container";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
-import { readSnapshot } from "@/server/feed/snapshot";
+import { snapshotFor } from "@/server/feed/snapshot";
+import type { Actor } from "@/server/kernel/actor";
 import { snapshotSchema } from "@schellingboard/contracts/snapshot";
 
 const NINE = new Date("2026-06-02T09:00:00.000Z");
 const TEN = new Date("2026-06-02T10:00:00.000Z");
+
+const NOBODY: Actor = { admin: false, guest: null };
+const openGuest = (id: string): Actor => ({
+  admin: false,
+  guest: { id, level: "open" },
+});
+
+async function read(slug: string, actor: Actor) {
+  const result = await snapshotFor(unitOfWork, actor, slug);
+  return result.ok ? result.value : undefined;
+}
 
 describe("snapshot", () => {
   beforeAll(() => setupTestDb());
@@ -85,7 +97,7 @@ describe("snapshot", () => {
   it("holds the event's schedule, normalized", async () => {
     const w = await world();
 
-    const snapshot = await readSnapshot(unitOfWork, w.event.slug, null);
+    const snapshot = await read(w.event.slug, NOBODY);
 
     expect(snapshotSchema.parse(snapshot)).toEqual(snapshot);
     expect(snapshot).toMatchObject({
@@ -114,7 +126,7 @@ describe("snapshot", () => {
   it("names the event's members and session hosts, not meeting parties", async () => {
     const w = await world();
 
-    const snapshot = await readSnapshot(unitOfWork, w.event.slug, null);
+    const snapshot = await read(w.event.slug, NOBODY);
 
     expect(snapshot!.guests.map((g) => g.name).sort()).toEqual([
       "Hal Host",
@@ -148,7 +160,7 @@ describe("snapshot", () => {
       TEN,
     ]);
 
-    const snapshot = await readSnapshot(unitOfWork, w.event.slug, w.member.id);
+    const snapshot = await read(w.event.slug, openGuest(w.member.id));
 
     expect(snapshotSchema.parse(snapshot)).toEqual(snapshot);
 
@@ -171,19 +183,19 @@ describe("snapshot", () => {
 
   it("is stamped with the newest seq, which pruning does not lower", async () => {
     const w = await world();
-    expect((await readSnapshot(unitOfWork, w.event.slug, null))!.seq).toBe(0);
+    expect((await read(w.event.slug, NOBODY))!.seq).toBe(0);
 
     await updateLoggedSession(w.session.id, { title: "One" });
     await updateLoggedSession(w.session.id, { title: "Two" });
     const [, second] = await getRepositories().changes.listAfter(0);
     await withWriter((writer) => writer.exec("DELETE FROM changes"));
 
-    const snapshot = await readSnapshot(unitOfWork, w.event.slug, null);
+    const snapshot = await read(w.event.slug, NOBODY);
     expect(snapshot!.seq).toBe(second.seq);
     expect(snapshot!.sessions[0].title).toBe("Two");
   });
 
   it("is undefined for an unknown event", async () => {
-    expect(await readSnapshot(unitOfWork, "nope", null)).toBeUndefined();
+    expect(await read("nope", NOBODY)).toBeUndefined();
   });
 });

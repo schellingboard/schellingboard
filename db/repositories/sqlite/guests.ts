@@ -196,7 +196,7 @@ export class SqliteGuestsRepository implements GuestsRepository {
       })
       .from(g)
       .where(where)
-      .orderBy(g.id)
+      .orderBy(g.name, g.id)
       .all()
       .map((row) => ({ ...row, info: undefined }));
   }

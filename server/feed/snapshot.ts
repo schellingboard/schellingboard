@@ -1,5 +1,8 @@
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
+import { actingGuest } from "@/server/kernel/acting-guest";
+import type { Actor } from "@/server/kernel/actor";
 import { newestSeq } from "@/server/kernel/change-log";
+import { notFound, ok, type Result } from "@/server/kernel/result";
 import type { UnitOfWork } from "@/server/kernel/unit-of-work";
 import {
   eventScheduleBySlug,
@@ -27,15 +30,22 @@ type SnapshotReads = Parameters<typeof eventScheduleBySlug>[0] &
   Parameters<typeof newestSeq>[0];
 
 /**
- * The event's schedule as `viewerId` may see it (ADR 0014 section 7), read on
- * one view with the `seq` the feed resumes after.
+ * The event's schedule as `actor` may see it (ADR 0014 section 7), read on one
+ * view with the `seq` the feed resumes after. The API and the SSR layout share
+ * it, so both apply one rule for whose `me` a cookie gets.
  */
-export function readSnapshot(
+export function snapshotFor(
   uow: UnitOfWork,
-  slug: string,
-  viewerId: string | null
-): Promise<Snapshot | undefined> {
-  return uow.read((q) => assemble(q, slug, viewerId));
+  actor: Actor,
+  slug: string
+): Promise<Result<Snapshot>> {
+  return uow.read(async (q) => {
+    const viewer = await actingGuest(actor, q.guests);
+    const snapshot = await assemble(q, slug, viewer.ok ? viewer.value : null);
+    return snapshot
+      ? ok(snapshot)
+      : notFound("event.notFound", "Event not found");
+  });
 }
 
 async function assemble(
