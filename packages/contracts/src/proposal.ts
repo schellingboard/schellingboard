@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { pageSchema } from "./cursor-page";
 import { expectedVersion, sessionProposalSchema } from "./session";
 
 const instant = z.iso.datetime({ offset: true });
@@ -53,9 +54,7 @@ export const proposalViewSchema = z
   })
   .meta({ id: "Proposal" });
 
-export const proposalListSchema = z.object({
-  proposals: z.array(proposalViewSchema),
-});
+export const proposalListSchema = pageSchema(proposalViewSchema);
 
 export const proposalCreateSchema = sessionProposalSchema
   .omit({ eventSlug: true })

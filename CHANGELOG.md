@@ -14,8 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - **An API for scripts and integrations** (#677): organizers can set up events, rooms,
   guests and sessions from a script over a documented, versioned API, with a reference
-  at `/api/v1/docs`. Edits to sessions, proposals, event setup or profiles made from an
-  outdated copy are refused, not overwritten.
+  at `/api/v1/docs`. Edits made from an outdated copy are refused, not overwritten, and
+  long lists come in pages.
 
 ### Fixed
 

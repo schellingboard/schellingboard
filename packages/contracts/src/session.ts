@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { COHOST_WANTED_NOTE_MAX } from "@schellingboard/domain/session";
+import { pageSchema } from "./cursor-page";
 
 export const expectedVersion = z
   .number()
@@ -64,9 +65,7 @@ export const sessionViewSchema = z
   })
   .meta({ id: "Session" });
 
-export const sessionListSchema = z.object({
-  sessions: z.array(sessionViewSchema),
-});
+export const sessionListSchema = pageSchema(sessionViewSchema);
 
 const bookingFields = {
   dayId: z.string().min(1),

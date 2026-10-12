@@ -7,7 +7,9 @@ import {
   sessionUpdateSchema,
   sessionViewSchema,
 } from "@schellingboard/contracts/session";
+import { pageQuerySchema } from "@schellingboard/contracts/cursor-page";
 import { idempotencyHeaders } from "@/server/http/idempotency";
+import { pageOf } from "@/server/http/pagination";
 import {
   problem,
   problemDefault,
@@ -38,7 +40,10 @@ const listSessions = createRoute({
   method: "get",
   path: "/sessions",
   tags: ["sessions"],
-  request: { query: z.object({ eventId: z.string().min(1) }) },
+  description: "An event's sessions, in id order.",
+  request: {
+    query: pageQuerySchema.extend({ eventId: z.string().min(1) }),
+  },
   responses: {
     200: json(sessionListSchema, "The event's sessions, scheduled or not"),
     ...problemDefault,
@@ -131,12 +136,18 @@ export function addSessionRoutes(app: App, sessions: () => SessionUseCases) {
   });
 
   app.openapi(listSessions, async (c) => {
-    const result = await sessions().listSessions(
-      c.var.actor,
-      c.req.valid("query")
-    );
+    const { limit, cursor, eventId } = c.req.valid("query");
+    const result = await sessions().listSessions(c.var.actor, { eventId });
     if (!result.ok) return problem(result.error);
-    return c.json({ sessions: result.value.map(toSessionView) }, 200);
+    // By id: a sort key that never changes, unlike the start time.
+    const page = pageOf(result.value, { limit, cursor }, "sessions", (s) => [
+      s.id,
+    ]);
+    if (!page.ok) return problem(page.error);
+    return c.json(
+      { ...page.value, items: page.value.items.map(toSessionView) },
+      200
+    );
   });
 
   app.openapi(createSession, async (c) => {

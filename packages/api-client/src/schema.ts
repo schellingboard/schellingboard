@@ -202,9 +202,14 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** @description An event's sessions, in id order. */
     get: {
       parameters: {
         query: {
+          /** @description How many items to answer at most */
+          limit?: number;
+          /** @description The `nextCursor` of the previous page; left out for the first */
+          cursor?: string;
           eventId: string;
         };
         header?: never;
@@ -220,7 +225,9 @@ export interface paths {
           };
           content: {
             "application/json": {
-              sessions: components["schemas"]["Session"][];
+              items: components["schemas"]["Session"][];
+              /** @description Pass as `cursor` for the next page; null on the last */
+              nextCursor: string | null;
             };
           };
         };
@@ -913,9 +920,14 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** @description An event's proposals, oldest first. */
     get: {
       parameters: {
         query: {
+          /** @description How many items to answer at most */
+          limit?: number;
+          /** @description The `nextCursor` of the previous page; left out for the first */
+          cursor?: string;
           eventId: string;
         };
         header?: never;
@@ -931,7 +943,9 @@ export interface paths {
           };
           content: {
             "application/json": {
-              proposals: components["schemas"]["Proposal"][];
+              items: components["schemas"]["Proposal"][];
+              /** @description Pass as `cursor` for the next page; null on the last */
+              nextCursor: string | null;
             };
           };
         };

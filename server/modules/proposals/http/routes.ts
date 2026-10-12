@@ -7,6 +7,8 @@ import {
   proposalUpdateSchema,
   proposalViewSchema,
 } from "@schellingboard/contracts/proposal";
+import { pageQuerySchema } from "@schellingboard/contracts/cursor-page";
+import { pageOf } from "@/server/http/pagination";
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import {
   problem,
@@ -38,7 +40,10 @@ const listProposals = createRoute({
   method: "get",
   path: "/proposals",
   tags: ["proposals"],
-  request: { query: z.object({ eventId: z.string().min(1) }) },
+  description: "An event's proposals, oldest first.",
+  request: {
+    query: pageQuerySchema.extend({ eventId: z.string().min(1) }),
+  },
   responses: {
     200: json(proposalListSchema, "The event's proposals"),
     ...problemDefault,
@@ -148,13 +153,22 @@ export function addProposalRoutes(app: App, proposals: () => ProposalUseCases) {
   });
 
   app.openapi(listProposals, async (c) => {
+    const { limit, cursor, eventId } = c.req.valid("query");
     const result = await proposals().listProposals(
       c.var.actor,
-      c.req.valid("query"),
+      { eventId },
       c.var.now
     );
     if (!result.ok) return problem(result.error);
-    return c.json({ proposals: result.value.map(toProposalView) }, 200);
+    const page = pageOf(result.value, { limit, cursor }, "proposals", (p) => [
+      p.createdTime.toISOString(),
+      p.id,
+    ]);
+    if (!page.ok) return problem(page.error);
+    return c.json(
+      { ...page.value, items: page.value.items.map(toProposalView) },
+      200
+    );
   });
 
   app.openapi(createProposal, async (c) => {
