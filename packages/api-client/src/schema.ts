@@ -3690,6 +3690,55 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/events/{slug}/feed": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description A `text/event-stream` of the event's changes after `since` (the snapshot's `seq`), filtered to what the `guest` cookie may see. Each message has `id` = its `seq`, `event` = its type and the message as JSON `data`; a browser's reconnect sends `Last-Event-ID`, which wins over `since`. An `event: reset` message, after which the stream ends, means the resume point cannot be served: load the snapshot again. A comment every 25 seconds keeps proxies from closing it; it ends after 10 minutes. */
+    get: {
+      parameters: {
+        query?: {
+          since?: string;
+        };
+        header?: never;
+        path: {
+          slug: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Changes as server-sent events; each `data` is a FeedMessage */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "text/event-stream": components["schemas"]["FeedMessage"];
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/admin/events": {
     parameters: {
       query?: never;
@@ -5898,6 +5947,245 @@ export interface components {
       authProtected: boolean;
       profileVersion: number;
     };
+    FeedMessage:
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "event.changed";
+          event: components["schemas"]["Event"];
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "event.deleted";
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "day.created";
+          day: {
+            /** Format: date-time */
+            start: string;
+            /** Format: date-time */
+            end: string;
+            /**
+             * Format: date-time
+             * @description When sessions may start
+             */
+            startBookings: string;
+            /**
+             * Format: date-time
+             * @description When sessions must end
+             */
+            endBookings: string;
+            id: string;
+            eventId: string;
+            version: number;
+          };
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "day.changed";
+          day: {
+            /** Format: date-time */
+            start: string;
+            /** Format: date-time */
+            end: string;
+            /**
+             * Format: date-time
+             * @description When sessions may start
+             */
+            startBookings: string;
+            /**
+             * Format: date-time
+             * @description When sessions must end
+             */
+            endBookings: string;
+            id: string;
+            eventId: string;
+            version: number;
+          };
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "day.deleted";
+          dayId: string;
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "location.changed";
+          location: components["schemas"]["SnapshotLocation"];
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "location.removed";
+          locationId: string;
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "unavailability.added";
+          period: components["schemas"]["Unavailability"];
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "unavailability.removed";
+          periodId: string;
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "guest.changed";
+          guest: components["schemas"]["SnapshotGuest"];
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "guest.removed";
+          guestId: string;
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "meetingPoint.changed";
+          meetingPoint: {
+            id: string;
+            eventId: string;
+            name: string;
+            description: string;
+            sortIndex: number;
+            version: number;
+          };
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "meetingPoint.removed";
+          meetingPointId: string;
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "meeting.changed";
+          meeting: {
+            id: string;
+            eventId: string;
+            requesterId: string;
+            recipientId: string;
+            /** Format: date-time */
+            slotStart: string;
+            /** Format: date-time */
+            slotEnd: string;
+            meetingPoint: string;
+            message: string;
+            cancelNote: string;
+            /** @enum {string} */
+            status: "pending" | "accepted" | "declined" | "canceled";
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            respondedAt: string | null;
+          };
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "meeting.deleted";
+          meetingId: string;
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "availability.changed";
+          slotStarts: string[];
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "session.created";
+          session: components["schemas"]["SnapshotSession"];
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "session.changed";
+          session: components["schemas"]["SnapshotSession"];
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "session.deleted";
+          sessionId: string;
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "session.attendanceChanged";
+          sessionId: string;
+          numRsvps: number;
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "rsvp.added";
+          rsvp: components["schemas"]["Rsvp"];
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "rsvp.removed";
+          sessionId: string;
+          guestId: string;
+        };
     Location: {
       id: string;
       name: string;

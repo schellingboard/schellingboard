@@ -164,6 +164,11 @@ admin cookie it can read every endpoint it needs:
 - **Read the whole schedule at once.** `GET /api/v1/events/{slug}/snapshot`
   answers the event, its days, rooms, guests and sessions in one response,
   with RSVP counts by session and, for a guest, their own RSVPs and meetings.
+- **Follow changes as they happen.** `GET /api/v1/events/{slug}/feed?since=…`
+  streams the changes after the snapshot's `seq` as server-sent events, limited
+  to what the guest cookie may see. It ends after 10 minutes; reconnect with the
+  last `id` as `Last-Event-ID`. An `event: reset` message means the position is
+  too old: read the snapshot again.
 - **Find a location before adding it.** `GET /api/v1/admin/locations` lists
   every location, hidden ones included. Location names need not be unique, so
   the script decides what counts as the same location, then creates the missing
