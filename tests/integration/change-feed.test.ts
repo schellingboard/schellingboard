@@ -27,8 +27,10 @@ describe("the change feed", () => {
     viewer: Viewer = EVERYONE
   ): Promise<FeedMessage[]> {
     const sent: FeedMessage[] = [];
-    const feed = await openFeed(unitOfWork, { eventId, viewer, since }, (m) =>
-      sent.push(m)
+    const feed = await openFeed(
+      unitOfWork,
+      { eventId, viewer, since },
+      (m) => void sent.push(m)
     );
     if (feed.kind === "open") close = feed.close;
     else throw new Error("the feed was reset");
@@ -133,7 +135,7 @@ describe("the change feed", () => {
     const feed = await openFeed(
       unitOfWork,
       { eventId: event.id, viewer: EVERYONE, since: 0 },
-      (m) => sent.push(m)
+      (m) => void sent.push(m)
     );
     await writes;
     if (feed.kind === "open") close = feed.close;

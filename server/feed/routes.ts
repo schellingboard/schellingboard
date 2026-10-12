@@ -61,6 +61,10 @@ function resumePoint(
   return ok(Number(raw));
 }
 
+// A client that reads slower than the feed writes is cut off; its browser
+// reconnects with Last-Event-ID and replays from the table.
+const MAX_UNSENT_BYTES = 1_000_000;
+
 const encoder = new TextEncoder();
 
 export function addFeedRoutes(app: App, deps: { uow: UnitOfWork }): void {
@@ -113,13 +117,17 @@ export function addFeedRoutes(app: App, deps: { uow: UnitOfWork }): void {
         // already cancelled
       }
     }
-    const write = (text: string) => {
-      if (!finished) controller.enqueue(encoder.encode(text));
+    const write = (text: string): boolean => {
+      if (finished) return false;
+      controller.enqueue(encoder.encode(text));
+      if ((controller.desiredSize ?? 0) >= 0) return true;
+      finish();
+      return false;
     };
-    const body = new ReadableStream<Uint8Array>({
-      start: (ctrl) => void (controller = ctrl),
-      cancel: finish,
-    });
+    const body = new ReadableStream<Uint8Array>(
+      { start: (ctrl) => void (controller = ctrl), cancel: finish },
+      new ByteLengthQueuingStrategy({ highWaterMark: MAX_UNSENT_BYTES })
+    );
 
     const { signal } = c.req.raw;
     if (signal.aborted) finish();
@@ -129,7 +137,8 @@ export function addFeedRoutes(app: App, deps: { uow: UnitOfWork }): void {
       deps.uow,
       { ...target, since: resume.value },
       (m) =>
-        write(`id: ${m.seq}\nevent: ${m.type}\ndata: ${JSON.stringify(m)}\n\n`)
+        write(`id: ${m.seq}\nevent: ${m.type}\ndata: ${JSON.stringify(m)}\n\n`),
+      finish
     );
     if (feed.kind === "reset") {
       write("event: reset\ndata: {}\n\n");

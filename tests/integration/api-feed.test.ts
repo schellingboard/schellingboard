@@ -14,7 +14,11 @@ import { getRepositories } from "@/db/container";
 import { connectionCount } from "@/server/feed/hub";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { updateLoggedSession } from "../helpers/changes";
-import { createEvent, createSession } from "../helpers/factories";
+import { createEvent, createGuest, createSession } from "../helpers/factories";
+import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
+import { credentialsChanged } from "@/server/kernel/credential-changes";
+import { createPeopleUseCases } from "@/server/modules/people/module";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
 
 beforeAll(() => setupTestDb());
 beforeEach(() => resetTestDb());
@@ -163,5 +167,90 @@ describe("GET /events/{slug}/feed", () => {
     })();
     await vi.advanceTimersByTimeAsync(10 * 60_000);
     expect(await end).toBe(true);
+  });
+
+  async function drain(stream: ReturnType<typeof reader>): Promise<string[]> {
+    const chunks: string[] = [];
+    for (let c = await stream.next(); c !== null; c = await stream.next())
+      chunks.push(c);
+    return chunks;
+  }
+
+  it("closes a client whose unsent data passes 1 MB, and resumes without a gap", async () => {
+    const { event, session } = await setup();
+    const big = "x".repeat(600_000);
+    for (const description of [big, big + "1", big + "2"])
+      await updateLoggedSession(session.id, { description });
+    const logged = (await getRepositories().changes.listAfter(0)).map(
+      (c) => c.seq
+    );
+
+    const received: number[] = [];
+    let lastId = 0;
+    for (let reconnects = 0; received.length < logged.length; reconnects++) {
+      expect(reconnects).toBeLessThan(logged.length);
+      const stream = reader(
+        await open(event.slug, "", { "last-event-id": String(lastId) })
+      );
+      const chunks: string[] = [];
+      for (let c = await stream.next(); c !== null; c = await stream.next()) {
+        chunks.push(c);
+        lastId = Number(/^id: (\d+)/.exec(c)![1]);
+        received.push(lastId);
+        if (lastId === logged.at(-1)) break;
+      }
+      await stream.cancel();
+      if (reconnects === 0) expect(chunks.length).toBeLessThan(logged.length);
+    }
+
+    expect(received).toEqual(logged);
+  });
+
+  describe("when a guest's credentials change or the guest is deleted", () => {
+    async function guestStream() {
+      const { event } = await setup();
+      const guest = await createGuest({ eventId: event.id });
+      const res = await open(event.slug, "?since=0", {
+        cookie: `${GUEST_COOKIE_NAME}=${openGuestValue(guest.id)}`,
+      });
+      const stream = reader(res);
+      await stream.next();
+      return { event, guest, stream };
+    }
+
+    it("ends that guest's streams only", async () => {
+      const { event, guest, stream } = await guestStream();
+      const other = reader(await open(event.slug, "?since=0"));
+      await other.next();
+
+      credentialsChanged(guest.id);
+
+      expect(await stream.next()).toBeNull();
+      expect(connectionCount()).toBe(1);
+      await other.cancel();
+    });
+
+    it("ends the stream of a deleted guest", async () => {
+      const { guest, stream } = await guestStream();
+      const people = createPeopleUseCases({
+        repos: getRepositories(),
+        avatars: {
+          validate: (buffer) => Promise.resolve({ buffer, ext: "png" }),
+          saveNew: (id) => Promise.resolve(`/media/avatars/${id}-1.png`),
+          deleteByUrl: async () => {},
+        },
+        sendTestEmail: async () => {},
+        uow: unitOfWork,
+      });
+
+      await people.deleteGuest(
+        { admin: true, guest: null },
+        { id: guest.id },
+        new Date()
+      );
+
+      await drain(stream);
+      expect(connectionCount()).toBe(0);
+    });
   });
 });

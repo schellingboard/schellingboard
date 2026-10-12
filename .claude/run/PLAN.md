@@ -174,7 +174,7 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
         cascades of a location delete.
   - [x] 12d. Guests joining or leaving an event, public profile edits; meetings (audience:
         the two guests) and meeting points.
-- [ ] 13. **Feed endpoint and hub**: replay from the table, then live from the hub in
+- [x] 13. **Feed endpoint and hub**: replay from the table, then live from the hub in
       `seq` order; audience filter per connection; heartbeat; `410`; cleanup on
       disconnect. OpenAPI documents it as `text/event-stream` with the message schema.
       Integration tests: resume, audience, `410`, order under concurrent writes.
@@ -184,7 +184,7 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
   - [x] 13b. The route: `GET /events/{slug}/feed` as `text/event-stream` (`id`, `event`,
         heartbeat, `reset` event, `Last-Event-ID` over `?since=`, `400` with neither,
         headers), the 10-minute limit, cleanup on abort; OpenAPI; docs.
-  - [ ] 13c. The 1 MB slow-client cap and closing a guest's connections on
+  - [x] 13c. The 1 MB slow-client cap and closing a guest's connections on
         credential changes.
 - [ ] 14. **Replica on the schedule**: a client store seeded with the SSR snapshot and
       fed by `EventSource`; `EventContext` derives its values from it. A reconnect
