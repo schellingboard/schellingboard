@@ -1,18 +1,16 @@
-import { getRepositories } from "@/db/container";
+import { adminReads, pageReads } from "@/server/composition";
 import { requireAdminPage } from "../require-admin";
 import { LocationsManager, type AdminLocation } from "../locations-manager";
 
 export default async function AdminLocationsPage() {
   await requireAdminPage();
 
-  const repositories = getRepositories();
-  const events = await repositories.events.list();
-  const allLocations = await repositories.locations.list();
+  const admin = adminReads();
+  const events = await pageReads().allEvents();
+  const allLocations = await admin.allLocations();
   const locationIds = allLocations.map((l) => l.id);
-  const eventIdsByLocation =
-    await repositories.locations.listEventIdsByLocations(locationIds);
-  const sessionLinkCounts =
-    await repositories.locations.countSessionLinksByLocations(locationIds);
+  const eventIdsByLocation = await admin.eventIdsOfLocations(locationIds);
+  const sessionLinkCounts = await admin.sessionLinkCounts(locationIds);
   const locations: AdminLocation[] = allLocations.map((location) => ({
     location,
     eventIds: eventIdsByLocation.get(location.id) ?? [],

@@ -20,4 +20,5 @@ export {
   proposalById,
   hostedProposals,
   guestVotes,
+  searchProposals,
 } from "./application/page-reads";

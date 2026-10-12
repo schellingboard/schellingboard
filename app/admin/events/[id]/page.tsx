@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getRepositories } from "@/db/container";
+import { adminReads, pageReads } from "@/server/composition";
 import { sessionOverlapsWindow } from "@schellingboard/domain/day-window";
 import { requireAdminPage } from "../../require-admin";
 import { EventDetailForm } from "./event-detail-form";
@@ -15,13 +15,14 @@ export default async function AdminEventConfigPage({
   await requireAdminPage();
 
   const { id } = await params;
-  const repos = getRepositories();
-  const event = await repos.events.findById(id);
+  const admin = adminReads();
+  const reads = pageReads();
+  const event = await reads.eventById(id);
   if (!event) notFound();
 
-  const scheduledSessions = await repos.sessions.listScheduledByEvent(id);
-  const meetingPoints = await repos.meetingPoints.listByEvent(id);
-  const days: SerializedDay[] = (await repos.days.listByEvent(id)).map((d) => ({
+  const scheduledSessions = await admin.scheduledSessions(id);
+  const meetingPoints = await admin.meetingPointsOfEvent(id);
+  const days: SerializedDay[] = (await reads.eventDays(id)).map((d) => ({
     id: d.id,
     eventId: d.eventId,
     start: d.start.toISOString(),

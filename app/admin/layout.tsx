@@ -1,5 +1,5 @@
 import Footer from "../footer";
-import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
 import { isAdminRequest } from "@/utils/acting-admin";
 import { AdminHeader } from "./admin-header";
 
@@ -9,7 +9,7 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }>) {
   const isAdmin = await isAdminRequest();
-  const { title } = await getRepositories().settings.get();
+  const { title } = await pageReads().siteSettings();
 
   return (
     <>

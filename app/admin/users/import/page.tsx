@@ -1,12 +1,12 @@
 import { BackLink } from "@/app/components/back-link";
-import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
 import { requireAdminPage } from "../../require-admin";
 import { UserImportForm } from "./user-import-form";
 
 export default async function AdminUserImportPage() {
   await requireAdminPage();
 
-  const events = await getRepositories().events.list();
+  const events = await pageReads().allEvents();
 
   return (
     <div className="w-full max-w-3xl mx-auto space-y-6">
