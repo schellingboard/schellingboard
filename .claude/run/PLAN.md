@@ -69,14 +69,14 @@ feed and snapshot), `04-client.md` (The replica), `05-security.md` (Authorizatio
         commit; `uow.read` on the read connection. Move session change logging out of
         `SqliteSessionsRepository` into the session use cases; the nudge becomes a
         subscriber. Test: a rollback writes neither state nor change.
-- [ ] 3. **Atomic multi-repository use cases**: every use case that writes through more
+- [x] 3. **Atomic multi-repository use cases**: every use case that writes through more
       than one repository call runs in `uow.run`. Test each by making its second write
       fail. One commit per family; skip a family with no such use case:
   - [x] 3a. Sessions and RSVPs (admin session create with guest and location assignment,
         RSVP with event assignment).
   - [x] 3b. Proposals, votes, comments (admin proposal create, …).
   - [x] 3c. Events, days, venue.
-  - [ ] 3d. People, meetings, notifications, settings.
+  - [x] 3d. People, meetings, notifications, settings.
 
 ### API contracts
 

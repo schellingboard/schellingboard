@@ -109,11 +109,15 @@ export function peopleUseCases(): PeopleUseCases {
     avatars: getImageRepositories().avatars,
     sendTestEmail: ({ name, email }) =>
       sendMail({ to: email, ...testEmail({ name }) }),
+    uow: unitOfWork,
   });
 }
 
 export function notificationUseCases(): NotificationUseCases {
-  return createNotificationUseCases({ repos: getRepositories() });
+  return createNotificationUseCases({
+    repos: getRepositories(),
+    uow: unitOfWork,
+  });
 }
 
 export function eventUseCases(): EventUseCases {

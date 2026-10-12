@@ -6,7 +6,7 @@ import type { MeetingDeps } from "../ports";
 import { attendees, closedFor, eventNotFound } from "./meetings";
 
 export const saveMeetingAvailability =
-  ({ repos }: MeetingDeps) =>
+  ({ repos, uow }: MeetingDeps) =>
   async (
     actor: Actor,
     input: { eventId: string; slotStarts: string[] },
@@ -16,34 +16,39 @@ export const saveMeetingAvailability =
     if (!acting.ok) return acting;
     const guestId = acting.value;
 
-    const event = await repos.events.findById(input.eventId);
-    if (!event) return eventNotFound();
-    const closed = closedFor(event, now);
-    if (closed) return closed;
-    if (!(await attendees(repos, event.id, [guestId]))(guestId))
-      return forbidden("guest.notInEvent", "You are not attending this event");
+    return uow.run(async (tx) => {
+      const event = await tx.events.findById(input.eventId);
+      if (!event) return eventNotFound();
+      const closed = closedFor(event, now);
+      if (closed) return closed;
+      if (!(await attendees(tx, event.id, [guestId]))(guestId))
+        return forbidden(
+          "guest.notInEvent",
+          "You are not attending this event"
+        );
 
-    // Slots are derived, so a hand-made payload must not be able to declare a
-    // guest free at an instant that is not a slot at all.
-    const days = await repos.days.listByEvent(event.id);
-    const offered = new Set(
-      days.flatMap((day) =>
-        meetingSlotsForDay(day, event.slotIncrementMinutes).map((slot) =>
-          slot.start.toISOString()
+      // Slots are derived, so a hand-made payload must not be able to declare a
+      // guest free at an instant that is not a slot at all.
+      const days = await tx.days.listByEvent(event.id);
+      const offered = new Set(
+        days.flatMap((day) =>
+          meetingSlotsForDay(day, event.slotIncrementMinutes).map((slot) =>
+            slot.start.toISOString()
+          )
         )
-      )
-    );
-    const declared = [...new Set(input.slotStarts)];
-    if (declared.some((slot) => !offered.has(slot)))
-      return invalid(
-        "meeting.slotsUnavailable",
-        "Those slots are no longer available"
       );
+      const declared = [...new Set(input.slotStarts)];
+      if (declared.some((slot) => !offered.has(slot)))
+        return invalid(
+          "meeting.slotsUnavailable",
+          "Those slots are no longer available"
+        );
 
-    await repos.meetingAvailability.replaceForGuest(
-      guestId,
-      event.id,
-      declared.map((slot) => new Date(slot))
-    );
-    return ok(undefined);
+      await tx.meetingAvailability.replaceForGuest(
+        guestId,
+        event.id,
+        declared.map((slot) => new Date(slot))
+      );
+      return ok(undefined);
+    });
   };

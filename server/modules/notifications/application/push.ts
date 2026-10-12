@@ -6,39 +6,38 @@ import { ok, type Result } from "@/server/kernel/result";
 import type { NotificationDeps } from "../ports";
 
 export const subscribeToPush =
-  ({ repos }: NotificationDeps) =>
-  async (
+  ({ uow }: NotificationDeps) =>
+  (
     actor: Actor,
     subscription: z.infer<typeof pushSubscriptionSchema>,
     now: Date
-  ): Promise<Result<void>> => {
-    const acting = await actingGuest(actor, repos.guests);
-    if (!acting.ok) return acting;
-    await repos.push.saveSubscription({
-      guestId: acting.value,
-      ...subscription,
-      createdAt: now,
+  ): Promise<Result<void>> =>
+    uow.run(async (tx) => {
+      const acting = await actingGuest(actor, tx.guests);
+      if (!acting.ok) return acting;
+      await tx.push.saveSubscription({
+        guestId: acting.value,
+        ...subscription,
+        createdAt: now,
+      });
+      return ok(undefined);
     });
-    return ok(undefined);
-  };
 
 export const unsubscribeFromPush =
-  ({ repos }: NotificationDeps) =>
-  async (
-    actor: Actor,
-    { endpoint }: { endpoint: string }
-  ): Promise<Result<void>> => {
-    const acting = await actingGuest(actor, repos.guests);
-    if (!acting.ok) return acting;
-    const subscription = await repos.push.findSubscription(endpoint);
-    // Scoped to the caller: an endpoint is not a secret worth trusting, and
-    // deleting by it alone would let anyone who learns one silence its owner.
-    // A device that is already gone, or was never ours, reports success —
-    // there is nothing for the browser to do differently either way.
-    if (subscription?.guestId === acting.value)
-      await repos.push.deleteSubscription(endpoint);
-    return ok(undefined);
-  };
+  ({ uow }: NotificationDeps) =>
+  (actor: Actor, { endpoint }: { endpoint: string }): Promise<Result<void>> =>
+    uow.run(async (tx) => {
+      const acting = await actingGuest(actor, tx.guests);
+      if (!acting.ok) return acting;
+      const subscription = await tx.push.findSubscription(endpoint);
+      // Scoped to the caller: an endpoint is not a secret worth trusting, and
+      // deleting by it alone would let anyone who learns one silence its owner.
+      // A device that is already gone, or was never ours, reports success —
+      // there is nothing for the browser to do differently either way.
+      if (subscription?.guestId === acting.value)
+        await tx.push.deleteSubscription(endpoint);
+      return ok(undefined);
+    });
 
 /**
  * Whether the subscription a browser is holding is the acting guest's. The

@@ -30,7 +30,6 @@ export const updateSiteSettings =
     if (!title) return invalid("settings.titleRequired", "Title is required");
     const description = input.description.trim();
 
-    const current = await repos.settings.get();
     let prepared: { buffer: Buffer; ext: string } | undefined;
     if (input.image) {
       const validation = await maps.validate(input.image);
@@ -40,12 +39,14 @@ export const updateSiteSettings =
       prepared = { buffer: input.image, ext: validation.ext };
     }
 
-    let mapImageUrl = current.mapImageUrl;
+    // Left out of the patch unless it changes: the update merges into the row
+    // under the write lock, so a map uploaded meanwhile survives.
+    let map: { mapImageUrl: string } | undefined;
     if (prepared) {
-      mapImageUrl = await maps.save(prepared.buffer, prepared.ext);
+      map = { mapImageUrl: await maps.save(prepared.buffer, prepared.ext) };
     } else if (input.removeMap) {
       await maps.delete();
-      mapImageUrl = "";
+      map = { mapImageUrl: "" };
     }
-    return ok(await repos.settings.update({ title, description, mapImageUrl }));
+    return ok(await repos.settings.update({ title, description, ...map }));
   };

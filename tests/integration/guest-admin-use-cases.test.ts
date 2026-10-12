@@ -2,7 +2,9 @@ import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest } from "../helpers/factories";
+import { uowFailingAt } from "../helpers/changes";
 import { getRepositories } from "@/db/container";
+import { unitOfWork, type UnitOfWork } from "@/server/kernel/unit-of-work";
 import { createPeopleUseCases } from "@/server/modules/people/module";
 import { createSettingsUseCases } from "@/server/modules/settings/module";
 import type { Actor } from "@/server/kernel/actor";
@@ -20,11 +22,12 @@ const maps = {
   save: vi.fn(() => Promise.resolve("/media/site/map.png?v=1")),
   delete: vi.fn(async () => {}),
 };
-const guests = () =>
+const guests = (uow: UnitOfWork = unitOfWork) =>
   createPeopleUseCases({
     repos: getRepositories(),
     avatars: getImageRepositories().avatars,
     sendTestEmail,
+    uow,
   });
 const site = () => createSettingsUseCases({ repos: getRepositories(), maps });
 
@@ -190,25 +193,23 @@ describe("guest admin use cases", () => {
   );
 
   it(
-    "turns an email taken between the check and the update into a conflict",
-    { tags: ["016-US1"] },
+    "gives an email to only one of two guests changing to it at once",
+    { tags: ["016-US1", "019-US7"] },
     async () => {
-      const guest = await createGuest();
-      await createGuest({ email: "x@x.org" });
-      const { guests: repo } = getRepositories();
-      const check = vi
-        .spyOn(repo, "findByEmail")
-        .mockResolvedValueOnce(undefined);
-      expect(
-        code(
-          await guests().updateGuest(ADMIN, {
+      const ada = await createGuest();
+      const bo = await createGuest();
+
+      const updated = await Promise.all(
+        [ada, bo].map((guest) =>
+          guests().updateGuest(ADMIN, {
             id: guest.id,
             name: "X",
             email: "x@x.org",
           })
         )
-      ).toBe("guest.emailTaken");
-      check.mockRestore();
+      );
+
+      expect(updated.map(code).sort()).toEqual(["guest.emailTaken", "ok"]);
     }
   );
 
@@ -243,6 +244,26 @@ describe("guest admin use cases", () => {
       ).toBe("event.notFound");
       expect(
         await getRepositories().guests.findByEmail("bo@x.org")
+      ).toBeUndefined();
+    }
+  );
+
+  it(
+    "creates no guest when adding them to the event fails",
+    { tags: ["016-US1", "019-US7"] },
+    async () => {
+      const event = await createEvent();
+
+      await expect(
+        guests(uowFailingAt("guests", "assignToEvent")).ensureGuest(ADMIN, {
+          name: "Ada",
+          email: "ada@x.org",
+          eventSlug: event.slug,
+        })
+      ).rejects.toThrow("guests.assignToEvent failed");
+
+      expect(
+        await getRepositories().guests.findByEmail("ada@x.org")
       ).toBeUndefined();
     }
   );
@@ -323,6 +344,45 @@ describe("guest admin use cases", () => {
         })
       );
       expect(await assigned()).toEqual([]);
+    }
+  );
+
+  it(
+    "does not add a guest deleted at the same moment to an event",
+    { tags: ["016-US3", "019-US7"] },
+    async () => {
+      const event = await createEvent();
+      const guest = await createGuest();
+
+      const [deleted, added] = await Promise.all([
+        guests().deleteGuest(ADMIN, { id: guest.id }),
+        guests().assignGuestsToEvent(ADMIN, {
+          eventId: event.id,
+          guestIds: [guest.id],
+        }),
+      ]);
+
+      expect(code(deleted)).toBe("ok");
+      expect(["ok", "guest.unknown"]).toContain(code(added));
+      expect(await getRepositories().guests.listByEvent(event.id)).toEqual([]);
+    }
+  );
+
+  it(
+    "refuses or completes an import into an event deleted at the same moment, never failing",
+    { tags: ["016-US2", "019-US7"] },
+    async () => {
+      const event = await createEvent();
+
+      const [, imported] = await Promise.all([
+        getRepositories().events.delete(event.id),
+        guests().importGuests(ADMIN, {
+          csv: "name,email\nAda,ada@x.org",
+          eventIds: [event.id],
+        }),
+      ]);
+
+      expect(["ok", "event.notFound"]).toContain(code(imported));
     }
   );
 
@@ -432,6 +492,41 @@ describe("site settings use cases", () => {
       expect(removed.mapImageUrl).toBe("");
       expect(maps.delete).toHaveBeenCalledOnce();
       expect(value(await site().getSiteSettings(ADMIN))).toEqual(removed);
+    }
+  );
+
+  it(
+    "keeps a map uploaded while the title was being saved",
+    { tags: ["015-US5", "019-US7"] },
+    async () => {
+      const repo = getRepositories().settings;
+      const read = repo.get.bind(repo);
+      let uploaded = () => {};
+      const upload = new Promise<void>((resolve) => (uploaded = resolve));
+      const slowRead = vi
+        .spyOn(repo, "get")
+        .mockImplementationOnce(async () => {
+          const current = await read();
+          await upload;
+          return current;
+        });
+
+      const retitled = site().updateSiteSettings(ADMIN, {
+        title: "Camp",
+        description: "",
+      });
+      value(
+        await site().updateSiteSettings(ADMIN, {
+          title: "Camp",
+          description: "",
+          image: Buffer.from([1]),
+        })
+      );
+      uploaded();
+      value(await retitled);
+
+      slowRead.mockRestore();
+      expect((await read()).mapImageUrl).toBe("/media/site/map.png?v=1");
     }
   );
 });

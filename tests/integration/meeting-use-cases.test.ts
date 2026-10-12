@@ -5,6 +5,7 @@ import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createDay, createEvent, createGuest } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
+import { createEventUseCases } from "@/server/modules/events/module";
 import { createMeetingUseCases } from "@/server/modules/meetings/module";
 import type { Actor } from "@/server/kernel/actor";
 import type { Result } from "@/server/kernel/result";
@@ -155,6 +156,45 @@ describe("asking for a 1-on-1", () => {
       expect(
         code(await meetings().requestMeeting(verified(ada.id), input, now()))
       ).toBe("ok");
+    }
+  );
+});
+
+describe("asking while the recipient is deleted", () => {
+  it(
+    "refuses the request or loses it with them, never failing",
+    { tags: ["012-US3", "019-US7"] },
+    async () => {
+      const { event, ada, grace } = await scenario();
+
+      const repos = getRepositories();
+      const read = repos.meetingAvailability.listByGuestAndEvent.bind(
+        repos.meetingAvailability
+      );
+      let checking = () => {};
+      const checked = new Promise<void>((resolve) => (checking = resolve));
+      let deleted = () => {};
+      const gone = new Promise<void>((resolve) => (deleted = resolve));
+      const slowRead = vi
+        .spyOn(repos.meetingAvailability, "listByGuestAndEvent")
+        .mockImplementationOnce(async (guestId, eventId) => {
+          checking();
+          const declared = await read(guestId, eventId);
+          await gone;
+          return declared;
+        });
+
+      const asking = ask(event.id, ada.id, grace.id);
+      await Promise.race([checked, asking]);
+      await repos.guests.delete(grace.id);
+      deleted();
+      const asked = await asking;
+      slowRead.mockRestore();
+
+      expect(["ok", "meeting.recipientNotInEvent"]).toContain(code(asked));
+      expect(
+        await getRepositories().meetings.listByGuestAndEvent(ada.id, event.id)
+      ).toEqual([]);
     }
   );
 });
@@ -365,6 +405,46 @@ describe("declaring availability", () => {
           )
         )
       ).toBe("event.meetingsDisabled");
+    }
+  );
+
+  it(
+    "keeps no slot off the grid the organizer changes at the same moment",
+    { tags: ["012-US2", "015-US2", "019-US7"] },
+    async () => {
+      const { event, ada } = await scenario();
+
+      const [, changed] = await Promise.all([
+        meetings().saveMeetingAvailability(
+          open(ada.id),
+          { eventId: event.id, slotStarts: [SLOT_2] },
+          now()
+        ),
+        createEventUseCases({
+          repos: getRepositories(),
+          uow: unitOfWork,
+        }).updateEvent(
+          { admin: true, guest: null },
+          {
+            id: event.id,
+            name: event.name,
+            description: "",
+            website: "",
+            timezone: "UTC",
+            maxSessionDuration: 120,
+            breakMinutes: 0,
+            slotIncrementMinutes: 60,
+          }
+        ),
+      ]);
+
+      expect(code(changed)).toBe("ok");
+      expect(
+        await getRepositories().meetingAvailability.listByGuestAndEvent(
+          ada.id,
+          event.id
+        )
+      ).toEqual([]);
     }
   );
 });

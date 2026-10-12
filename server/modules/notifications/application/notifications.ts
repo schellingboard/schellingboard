@@ -50,20 +50,21 @@ export const deleteNotifications =
   };
 
 export const readNotification =
-  ({ repos }: NotificationDeps) =>
-  async (
+  ({ uow }: NotificationDeps) =>
+  (
     actor: Actor,
     { id }: { id: string },
     now: Date
-  ): Promise<Result<Notification>> => {
-    const acting = await actingGuest(actor, repos.guests);
-    if (!acting.ok) return acting;
-    const notification = await repos.notifications.findForGuest(
-      acting.value,
-      id
-    );
-    if (!notification)
-      return notFound("notification.notFound", "Notification not found");
-    await repos.notifications.markRead(acting.value, id, now);
-    return ok({ ...notification, readAt: notification.readAt ?? now });
-  };
+  ): Promise<Result<Notification>> =>
+    uow.run(async (tx) => {
+      const acting = await actingGuest(actor, tx.guests);
+      if (!acting.ok) return acting;
+      const notification = await tx.notifications.findForGuest(
+        acting.value,
+        id
+      );
+      if (!notification)
+        return notFound("notification.notFound", "Notification not found");
+      await tx.notifications.markRead(acting.value, id, now);
+      return ok({ ...notification, readAt: notification.readAt ?? now });
+    });
