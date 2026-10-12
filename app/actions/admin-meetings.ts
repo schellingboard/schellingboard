@@ -11,7 +11,7 @@ export type EventMeetingsInput = {
   id: string;
   meetingsEnabled: boolean;
   maxOpenMeetingRequests: string;
-  expectedVersion?: number;
+  expectedVersion: number;
 };
 
 export type MeetingPointInput = {

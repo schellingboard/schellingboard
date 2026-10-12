@@ -10,20 +10,24 @@ import {
 import { PRIMARY_BUTTON } from "@/app/admin/buttons";
 import { ActionError } from "@/app/components/action-error";
 import { utcToZonedInput, zonedInputToUtc } from "@/utils/admin-datetime";
+import { useEventSection } from "./use-event-section";
 
 type PhasesForm = Omit<EventPhasesInput, "id" | "expectedVersion">;
 
 export function EventPhasesForm({ event }: { event: Event }) {
   const toInput = (date: Date | undefined) =>
     utcToZonedInput(date?.toISOString(), event.timezone);
-  const [form, setForm] = useState<PhasesForm>({
-    proposalPhaseStart: toInput(event.proposalPhaseStart),
-    proposalPhaseEnd: toInput(event.proposalPhaseEnd),
-    votingPhaseStart: toInput(event.votingPhaseStart),
-    votingPhaseEnd: toInput(event.votingPhaseEnd),
-    schedulingPhaseStart: toInput(event.schedulingPhaseStart),
-    schedulingPhaseEnd: toInput(event.schedulingPhaseEnd),
-  });
+  const { form, setForm, version, markSaved } = useEventSection<PhasesForm>(
+    {
+      proposalPhaseStart: toInput(event.proposalPhaseStart),
+      proposalPhaseEnd: toInput(event.proposalPhaseEnd),
+      votingPhaseStart: toInput(event.votingPhaseStart),
+      votingPhaseEnd: toInput(event.votingPhaseEnd),
+      schedulingPhaseStart: toInput(event.schedulingPhaseStart),
+      schedulingPhaseEnd: toInput(event.schedulingPhaseEnd),
+    },
+    event.version
+  );
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isSaving, startSave] = useTransition();
@@ -47,10 +51,12 @@ export function EventPhasesForm({ event }: { event: Event }) {
       const result = await updateEventPhasesAction({
         id: event.id,
         ...utcForm,
+        expectedVersion: version,
       });
       if (!result.ok) {
         setSaveError(result.error);
       } else {
+        markSaved(form);
         setSaveSuccess(true);
       }
     });

@@ -44,7 +44,7 @@ async function loginAsAdmin() {
   cookieJar.set(c.name, c.value);
 }
 
-const SETTINGS: Omit<EventMeetingsInput, "id"> = {
+const SETTINGS: Omit<EventMeetingsInput, "id" | "expectedVersion"> = {
   meetingsEnabled: true,
   maxOpenMeetingRequests: "5",
 };
@@ -65,6 +65,7 @@ describe("admin meetings settings", () => {
 
     const result = await updateEventMeetingsAction({
       id: event.id,
+      expectedVersion: event.version,
       ...SETTINGS,
       maxOpenMeetingRequests: "3",
     });
@@ -77,10 +78,15 @@ describe("admin meetings settings", () => {
 
   it("turns meetings back off without discarding the rest of the section", async () => {
     const event = await createEvent();
-    await updateEventMeetingsAction({ id: event.id, ...SETTINGS });
+    await updateEventMeetingsAction({
+      id: event.id,
+      expectedVersion: event.version,
+      ...SETTINGS,
+    });
 
     await updateEventMeetingsAction({
       id: event.id,
+      expectedVersion: event.version + 1,
       ...SETTINGS,
       meetingsEnabled: false,
     });
@@ -94,10 +100,15 @@ describe("admin meetings settings", () => {
   // validating those fields then would reject a save the organizer cannot fix.
   it("switches meetings off even when the hidden fields are invalid", async () => {
     const event = await createEvent();
-    await updateEventMeetingsAction({ id: event.id, ...SETTINGS });
+    await updateEventMeetingsAction({
+      id: event.id,
+      expectedVersion: event.version,
+      ...SETTINGS,
+    });
 
     const result = await updateEventMeetingsAction({
       id: event.id,
+      expectedVersion: event.version + 1,
       ...SETTINGS,
       meetingsEnabled: false,
       maxOpenMeetingRequests: "",
@@ -113,7 +124,11 @@ describe("admin meetings settings", () => {
   it("leaves the event's other settings alone", async () => {
     const event = await createEvent();
 
-    await updateEventMeetingsAction({ id: event.id, ...SETTINGS });
+    await updateEventMeetingsAction({
+      id: event.id,
+      expectedVersion: event.version,
+      ...SETTINGS,
+    });
 
     const saved = await getRepositories().events.findById(event.id);
     expect(saved?.name).toBe(event.name);
@@ -128,6 +143,7 @@ describe("admin meetings settings", () => {
 
     const result = await updateEventMeetingsAction({
       id: event.id,
+      expectedVersion: event.version,
       ...SETTINGS,
       maxOpenMeetingRequests: "0",
     });
@@ -138,6 +154,7 @@ describe("admin meetings settings", () => {
   it("reports an unknown event", async () => {
     const result = await updateEventMeetingsAction({
       id: "no-such-event",
+      expectedVersion: 1,
       ...SETTINGS,
     });
 
@@ -150,6 +167,7 @@ describe("admin meetings settings", () => {
 
     const result = await updateEventMeetingsAction({
       id: event.id,
+      expectedVersion: event.version,
       ...SETTINGS,
     });
 

@@ -180,5 +180,7 @@ proposal → schedule flow.
   session's RSVP list.
 - If a host or another admin saved the session or proposal while you had its
   form open, your save is refused rather than undoing their change. Copy your
-  edits, cancel, and edit again. The same holds for days, locations, meeting points
-  and guests.
+  edits, cancel, and edit again. The same holds for event settings, days, locations,
+  meeting points and guests. On the event page, save a section before you edit
+  the next one: saving one section refuses the save of another section that
+  already has unsaved edits.

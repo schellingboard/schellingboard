@@ -1,3 +1,4 @@
+import { STALE_EVENT_MESSAGE } from "@schellingboard/contracts/event";
 import type { Day, Event } from "@schellingboard/domain/event";
 import { isEventIconName } from "@schellingboard/domain/event-icons";
 import {
@@ -49,7 +50,7 @@ type PhaseField = (typeof PHASE_FIELDS)[number][0];
 /** An unset field clears that date; an invalid Date is refused. */
 export type EventPhasesInput = {
   id: string;
-  expectedVersion?: number;
+  expectedVersion: number;
 } & Record<PhaseField, Date | undefined>;
 
 type EventPhases = Partial<Record<PhaseField, Date | undefined>>;
@@ -66,11 +67,7 @@ async function eventChangedMeanwhile(
 ): Promise<Failure> {
   const current = await repos.events.findById(id);
   return current
-    ? versionConflict(
-        "event",
-        current,
-        "Someone changed this event while you edited it"
-      )
+    ? versionConflict("event", current, STALE_EVENT_MESSAGE)
     : eventNotFound();
 }
 
@@ -228,7 +225,7 @@ export const updateEvent =
   ({ uow }: EventDeps) =>
   async (
     actor: Actor,
-    input: EventSettingsInput & { id: string; expectedVersion?: number }
+    input: EventSettingsInput & { id: string; expectedVersion: number }
   ): Promise<Result<Event>> => {
     if (!actor.admin) return adminRequired();
     const parsed = parseSettings(input);
@@ -237,6 +234,8 @@ export const updateEvent =
     return uow.run(async (tx) => {
       const existing = await tx.events.findById(input.id);
       if (!existing) return eventNotFound();
+      if (existing.version !== input.expectedVersion)
+        return eventChangedMeanwhile(tx, input.id);
 
       const incrementChanged =
         parsed.data.slotIncrementMinutes !== existing.slotIncrementMinutes;
@@ -329,6 +328,9 @@ export const updateEventPhases =
     if (refused) return refused;
 
     return uow.run(async (tx) => {
+      const existing = await tx.events.findById(id);
+      if (existing?.version !== expectedVersion)
+        return eventChangedMeanwhile(tx, id);
       const updated = await tx.events.update(id, {
         ...phases,
         expectedVersion,

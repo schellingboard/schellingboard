@@ -24,9 +24,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
-- **Edits no longer overwrite each other** (#1111): saving a session, profile, guest,
-  day, room or meeting point from a form someone changed in the meantime now says so,
-  instead of silently undoing their change.
+- **Edits no longer overwrite each other** (#1111): saving a session, event setting,
+  profile, guest, day, room or meeting point from a form someone changed in the
+  meantime now says so, instead of silently undoing their change.
 - **Edit opens the session form reliably**: on a slow device, pressing Edit in a
   session's details sometimes left you on the schedule.
 - **Edit in session details opens in a new tab**: Ctrl/Cmd-click on Edit used to

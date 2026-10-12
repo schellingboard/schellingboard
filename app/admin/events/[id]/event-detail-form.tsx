@@ -21,20 +21,24 @@ import { SLOT_INCREMENT_OPTIONS } from "@schellingboard/domain/slots";
 import { MarkdownHint } from "@/app/(site)/markdown";
 import { MarkdownTextarea } from "@/app/components/markdown-textarea";
 import { ActionError } from "@/app/components/action-error";
+import { useEventSection } from "./use-event-section";
 
 export function EventDetailForm({ event }: { event: Event }) {
   const router = useRouter();
-  const [form, setForm] = useState<EventInput>({
-    name: event.name,
-    description: event.description,
-    website: event.website,
-    timezone: event.timezone,
-    maxSessionDuration: String(event.maxSessionDuration),
-    breakMinutes: String(event.breakMinutes),
-    slotIncrementMinutes: String(event.slotIncrementMinutes),
-    rsvpCapacityHardLimit: event.rsvpCapacityHardLimit,
-    icon: normalizeEventIconName(event.icon),
-  });
+  const { form, setForm, version, markSaved } = useEventSection<EventInput>(
+    {
+      name: event.name,
+      description: event.description,
+      website: event.website,
+      timezone: event.timezone,
+      maxSessionDuration: String(event.maxSessionDuration),
+      breakMinutes: String(event.breakMinutes),
+      slotIncrementMinutes: String(event.slotIncrementMinutes),
+      rsvpCapacityHardLimit: event.rsvpCapacityHardLimit,
+      icon: normalizeEventIconName(event.icon),
+    },
+    event.version
+  );
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isSaving, startSave] = useTransition();
@@ -53,10 +57,15 @@ export function EventDetailForm({ event }: { event: Event }) {
     e.preventDefault();
     setSaveError(null);
     startSave(async () => {
-      const result = await updateEventAction({ id: event.id, ...form });
+      const result = await updateEventAction({
+        id: event.id,
+        ...form,
+        expectedVersion: version,
+      });
       if (!result.ok) {
         setSaveError(result.error);
       } else {
+        markSaved(form);
         setSaveSuccess(true);
       }
     });

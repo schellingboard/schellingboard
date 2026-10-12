@@ -25,6 +25,7 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
 
+import { updateEventMeetingsAction } from "@/app/actions/admin-meetings";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { BY_TEST, updateLoggedSession } from "../helpers/changes";
 import {
@@ -296,6 +297,7 @@ describe("event actions", () => {
       const event = await createEvent();
       const result = await updateEventAction({
         id: event.id,
+        expectedVersion: event.version,
         ...VALID_EVENT_INPUT,
       });
       expect(!result.ok && result.error).toBe("Unauthorized");
@@ -331,6 +333,7 @@ describe("event actions", () => {
 
       const result = await updateEventAction({
         id: event.id,
+        expectedVersion: event.version,
         ...VALID_EVENT_INPUT,
         name: event.name,
         slotIncrementMinutes: "60",
@@ -353,6 +356,7 @@ describe("event actions", () => {
 
       await updateEventAction({
         id: event.id,
+        expectedVersion: event.version,
         ...VALID_EVENT_INPUT,
         name: event.name,
         description: "Changed, but not the grid",
@@ -573,6 +577,7 @@ describe("event actions", () => {
       const event = await createEvent({ name: "Old Name" });
       const result = await updateEventAction({
         id: event.id,
+        expectedVersion: event.version,
         ...VALID_EVENT_INPUT,
         name: "New Name",
       });
@@ -599,9 +604,42 @@ describe("event actions", () => {
       );
     });
 
+    it(
+      "refuses edits that name no version",
+      {
+        tags: ["015-US3", "012-US1"],
+      },
+      async () => {
+        const event = await createEvent({ name: "Old Name" });
+
+        const refused = [
+          await updateEventAction({
+            id: event.id,
+            ...VALID_EVENT_INPUT,
+            name: "New Name",
+          } as Parameters<typeof updateEventAction>[0]),
+          await updateEventPhasesAction({
+            id: event.id,
+            proposalPhaseStart: "2026-09-01T08:00",
+          } as Parameters<typeof updateEventPhasesAction>[0]),
+          await updateEventMeetingsAction({
+            id: event.id,
+            meetingsEnabled: true,
+            maxOpenMeetingRequests: "3",
+          } as Parameters<typeof updateEventMeetingsAction>[0]),
+        ];
+
+        expect(refused.map((r) => r.ok)).toEqual([false, false, false]);
+        expect(await getRepositories().events.findById(event.id)).toEqual(
+          event
+        );
+      }
+    );
+
     it("errors for unknown id", async () => {
       const result = await updateEventAction({
         id: "no-such-id",
+        expectedVersion: 1,
         ...VALID_EVENT_INPUT,
       });
       expect(!result.ok && result.error).toBe("Event not found");
@@ -616,6 +654,7 @@ describe("event actions", () => {
       // The basic-info form sends no phase fields; they must survive the save.
       const result = await updateEventAction({
         id: event.id,
+        expectedVersion: event.version,
         ...VALID_EVENT_INPUT,
         timezone: "America/New_York",
       });
@@ -639,6 +678,7 @@ describe("event actions", () => {
 
       const result = await updateEventAction({
         id: event.id,
+        expectedVersion: event.version,
         ...VALID_EVENT_INPUT,
         rsvpCapacityHardLimit: true,
       });
@@ -653,6 +693,7 @@ describe("event actions", () => {
       const event = await createEvent({ name: "Breaky" });
       const result = await updateEventAction({
         id: event.id,
+        expectedVersion: event.version,
         ...VALID_EVENT_INPUT,
         breakMinutes: "15",
       });
@@ -680,6 +721,7 @@ describe("event actions", () => {
         });
         const result = await updateEventAction({
           id: event.id,
+          expectedVersion: event.version,
           ...VALID_EVENT_INPUT,
           slotIncrementMinutes: "45",
         });
@@ -699,6 +741,7 @@ describe("event actions", () => {
         });
         const result = await updateEventAction({
           id: event.id,
+          expectedVersion: event.version,
           ...VALID_EVENT_INPUT,
           slotIncrementMinutes: "45",
         });
@@ -722,6 +765,7 @@ describe("event actions", () => {
         });
         const result = await updateEventAction({
           id: event.id,
+          expectedVersion: event.version,
           ...VALID_EVENT_INPUT,
           slotIncrementMinutes: "45",
         });
@@ -742,6 +786,7 @@ describe("event actions", () => {
         });
         const result = await updateEventAction({
           id: event.id,
+          expectedVersion: event.version,
           ...VALID_EVENT_INPUT,
           slotIncrementMinutes: "45",
         });
@@ -761,6 +806,7 @@ describe("event actions", () => {
         });
         const result = await updateEventAction({
           id: event.id,
+          expectedVersion: event.version,
           ...VALID_EVENT_INPUT,
           slotIncrementMinutes: "30",
         });
@@ -771,6 +817,7 @@ describe("event actions", () => {
         const event = await createEvent();
         const result = await updateEventAction({
           id: event.id,
+          expectedVersion: event.version,
           ...VALID_EVENT_INPUT,
           slotIncrementMinutes: "25",
         });
@@ -798,6 +845,7 @@ describe("event actions", () => {
       const event = await createEvent();
       const result = await updateEventPhasesAction({
         id: event.id,
+        expectedVersion: event.version,
         proposalPhaseStart: "2026-09-15T18:00",
         proposalPhaseEnd: "2026-09-01T08:00",
       });
@@ -810,6 +858,7 @@ describe("event actions", () => {
       const event = await createEvent();
       const result = await updateEventPhasesAction({
         id: event.id,
+        expectedVersion: event.version,
         proposalPhaseStart: "2026-09-01T08:00",
         proposalPhaseEnd: "2026-09-01T08:00",
       });
@@ -822,6 +871,7 @@ describe("event actions", () => {
       const event = await createEvent();
       const result = await updateEventPhasesAction({
         id: event.id,
+        expectedVersion: event.version,
         votingPhaseStart: "2026-09-15T18:00",
         votingPhaseEnd: "2026-09-01T08:00",
       });
@@ -832,6 +882,7 @@ describe("event actions", () => {
       const event = await createEvent();
       const result = await updateEventPhasesAction({
         id: event.id,
+        expectedVersion: event.version,
         schedulingPhaseStart: "2026-09-15T18:00",
         schedulingPhaseEnd: "2026-09-01T08:00",
       });
@@ -844,6 +895,7 @@ describe("event actions", () => {
       const event = await createEvent();
       const result = await updateEventPhasesAction({
         id: event.id,
+        expectedVersion: event.version,
         proposalPhaseStart: "2026-09-01T08:00",
         proposalPhaseEnd: "2026-09-20T18:00",
         votingPhaseStart: "2026-09-10T08:00",
@@ -858,6 +910,7 @@ describe("event actions", () => {
       const event = await createEvent();
       const result = await updateEventPhasesAction({
         id: event.id,
+        expectedVersion: event.version,
         votingPhaseStart: "2026-09-01T08:00",
         votingPhaseEnd: "2026-09-20T18:00",
         schedulingPhaseStart: "2026-09-10T08:00",
@@ -871,6 +924,7 @@ describe("event actions", () => {
       const event = await createEvent();
       const result = await updateEventPhasesAction({
         id: event.id,
+        expectedVersion: event.version,
         proposalPhaseStart: "2026-09-01T08:00",
       });
       expect(result.ok).toBe(true);
@@ -880,6 +934,7 @@ describe("event actions", () => {
       const event = await createEvent();
       const result = await updateEventPhasesAction({
         id: event.id,
+        expectedVersion: event.version,
         proposalPhaseStart: "2026-09-01T08:00",
         votingPhaseStart: "2026-09-10T08:00",
       });
@@ -890,6 +945,7 @@ describe("event actions", () => {
       const event = await createEvent();
       const result = await updateEventPhasesAction({
         id: event.id,
+        expectedVersion: event.version,
         proposalPhaseStart: "2026-09-10T08:00",
         votingPhaseStart: "2026-09-01T08:00",
       });
@@ -902,6 +958,7 @@ describe("event actions", () => {
       const event = await createEvent();
       const result = await updateEventPhasesAction({
         id: event.id,
+        expectedVersion: event.version,
         votingPhaseStart: "2026-09-10T08:00",
         schedulingPhaseStart: "2026-09-01T08:00",
       });
@@ -914,6 +971,7 @@ describe("event actions", () => {
       const event = await createEvent();
       const result = await updateEventPhasesAction({
         id: event.id,
+        expectedVersion: event.version,
         proposalPhaseStart: "2026-09-01T08:00",
         proposalPhaseEnd: "2026-09-20T18:00",
         schedulingPhaseStart: "2026-09-10T08:00",
@@ -927,6 +985,7 @@ describe("event actions", () => {
       const event = await createEvent();
       const result = await updateEventPhasesAction({
         id: event.id,
+        expectedVersion: event.version,
         proposalPhaseStart: "2026-09-10T08:00",
         schedulingPhaseStart: "2026-09-01T08:00",
       });
@@ -941,6 +1000,7 @@ describe("event actions", () => {
       const event = await createEvent();
       const result = await updateEventPhasesAction({
         id: event.id,
+        expectedVersion: event.version,
         proposalPhaseStart: "2026-09-01T08:00",
         proposalPhaseEnd: "2026-09-15T18:00",
         votingPhaseStart: "2026-09-15T18:00",
@@ -969,6 +1029,7 @@ describe("event actions", () => {
       });
       const result = await updateEventPhasesAction({
         id: event.id,
+        expectedVersion: event.version,
         proposalPhaseStart: "",
         proposalPhaseEnd: "",
       });
@@ -981,12 +1042,18 @@ describe("event actions", () => {
     it("rejects without admin cookie", async () => {
       cookieJar.clear();
       const event = await createEvent();
-      const result = await updateEventPhasesAction({ id: event.id });
+      const result = await updateEventPhasesAction({
+        id: event.id,
+        expectedVersion: event.version,
+      });
       expect(!result.ok && result.error).toBe("Unauthorized");
     });
 
     it("errors for unknown id", async () => {
-      const result = await updateEventPhasesAction({ id: "no-such-id" });
+      const result = await updateEventPhasesAction({
+        id: "no-such-id",
+        expectedVersion: 1,
+      });
       expect(!result.ok && result.error).toBe("Event not found");
     });
   });

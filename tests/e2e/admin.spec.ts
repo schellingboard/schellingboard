@@ -467,6 +467,31 @@ test.describe("Admin UI events", () => {
     await nameInput.fill(renamed);
     await page.getByRole("button", { name: "Save changes" }).click();
     await expect(page.getByText("Saved!")).toBeVisible();
+
+    // Another section of the same event saves right after, untouched by the
+    // first save, without being told someone else changed the event.
+    await page
+      .getByRole("group", { name: "Proposal phase" })
+      .getByLabel("Start")
+      .fill("2020-09-01T09:00");
+    await page.getByRole("button", { name: "Save phases" }).click();
+    await expect(page.getByText("Saved!")).toHaveCount(2);
+
+    // A section with unsaved edits keeps them and its version: its save is
+    // refused after the event changed, and nothing typed is lost.
+    const phaseStart = page
+      .getByRole("group", { name: "Proposal phase" })
+      .getByLabel("Start");
+    await phaseStart.fill("2020-09-02T09:00");
+    await page.getByLabel("Website").fill("example.org");
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await expect(page.getByText("Saved!")).toHaveCount(1);
+    await expect(phaseStart).toHaveValue("2020-09-02T09:00");
+    await page.getByRole("button", { name: "Save phases" }).click();
+    await expect(
+      page.getByText(/Someone changed this event while you edited it/)
+    ).toBeVisible();
+    await expect(phaseStart).toHaveValue("2020-09-02T09:00");
     await page.getByRole("link", { name: "← Events" }).click();
     await expect(page).toHaveURL(/\/admin\/events$/);
     await expect(
