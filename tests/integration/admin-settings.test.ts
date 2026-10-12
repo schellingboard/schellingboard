@@ -34,6 +34,10 @@ import { createAdminAuthCookie } from "@/utils/auth";
 import { createImageFile } from "@/tests/helpers/utils";
 import { updateSettingsAction } from "@/app/actions/admin-settings";
 import { DEFAULT_SITE_SETTINGS } from "@schellingboard/domain/site-settings";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
+import { createSettingsUseCases } from "@/server/modules/settings/module";
+import { mapImages } from "@/utils/map-image";
+import { uowFailingAt } from "../helpers/changes";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef"; // 32 chars
 
@@ -111,8 +115,10 @@ describe("admin settings actions", () => {
     expect(result).toEqual({ ok: true });
 
     const settings = await getRepositories().settings.get();
-    expect(settings.mapImageUrl).toMatch(/^\/media\/site\/map\.png\?v=/);
-    expect(fs.existsSync(path.join(uploadsDir, "site", "map.png"))).toBe(true);
+    expect(settings.mapImageUrl).toMatch(/^\/media\/site\/map-.+\.png$/);
+    expect(fs.readdirSync(path.join(uploadsDir, "site"))).toEqual([
+      path.basename(settings.mapImageUrl),
+    ]);
   });
 
   it("rejects an invalid image without changing settings", async () => {
@@ -135,6 +141,45 @@ describe("admin settings actions", () => {
     expect(result).toEqual({ ok: true });
 
     expect((await getRepositories().settings.get()).mapImageUrl).toBe("");
-    expect(fs.existsSync(path.join(uploadsDir, "site", "map.png"))).toBe(false);
+    expect(fs.readdirSync(path.join(uploadsDir, "site"))).toEqual([]);
   });
+
+  it(
+    "keeps the old map and deletes the new file when a save fails",
+    { tags: ["019-US7"] },
+    async () => {
+      const ADMIN = { admin: true, guest: null };
+      const settings = (uow = unitOfWork) =>
+        createSettingsUseCases({
+          repos: getRepositories(),
+          maps: mapImages,
+          uow,
+        });
+      const image = async () =>
+        Buffer.from(
+          await (await createImageFile(800, 500, "map.png")).arrayBuffer()
+        );
+      const first = await settings().updateSiteSettings(ADMIN, {
+        title: "T",
+        description: "",
+        image: await image(),
+      });
+      if (!first.ok) throw new Error(first.error.code);
+
+      await expect(
+        settings(uowFailingAt("settings", "update")).updateSiteSettings(ADMIN, {
+          title: "T",
+          description: "",
+          image: await image(),
+        })
+      ).rejects.toThrow();
+
+      expect((await getRepositories().settings.get()).mapImageUrl).toBe(
+        first.value.mapImageUrl
+      );
+      expect(fs.readdirSync(path.join(uploadsDir, "site"))).toEqual([
+        path.basename(first.value.mapImageUrl),
+      ]);
+    }
+  );
 });

@@ -5,11 +5,7 @@ import { testEmail } from "@/emails/test-email";
 import { getImageRepositories } from "@/utils/images";
 import { sendMail } from "@/utils/mailer";
 import { generateVapidKeys } from "@/utils/push";
-import {
-  deleteMapImage,
-  saveMapImage,
-  validateMapImage,
-} from "@/utils/map-image";
+import { mapImages } from "@/utils/map-image";
 import {
   notifyCohostsAdded,
   notifyMeetingOutcome,
@@ -137,10 +133,7 @@ export function venueUseCases(): VenueUseCases {
 export function settingsUseCases(): SettingsUseCases {
   return createSettingsUseCases({
     repos: getRepositories(),
-    maps: {
-      validate: validateMapImage,
-      save: saveMapImage,
-      delete: deleteMapImage,
-    },
+    maps: mapImages,
+    uow: unitOfWork,
   });
 }

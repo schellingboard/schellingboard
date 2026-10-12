@@ -105,43 +105,6 @@ export abstract class BaseImageResourceRepository<Id extends string> {
     return { ok: image.rotate().toFormat(metadata.format) };
   }
 
-  /** Removes all stored image files for the ID, if any. */
-  async delete(id: Id): Promise<void> {
-    const dir = this.dirPath;
-    let entries: string[];
-    try {
-      entries = await fs.readdir(dir);
-    } catch {
-      return;
-    }
-    await Promise.all(
-      entries
-        .filter((name) => name.startsWith(`${id}.`))
-        .map((name) =>
-          fs
-            .unlink(path.join(/*turbopackIgnore: true*/ dir, name))
-            .catch(() => {})
-        )
-    );
-  }
-
-  /**
-   * Stores the image as <ID>.<ext>, replacing any previous image for
-   * the ID. Returns the public URL (with a cache-busting version).
-   */
-  async save(id: Id, buffer: Buffer, ext: string): Promise<string> {
-    const dir = this.dirPath;
-    await fs.mkdir(dir, { recursive: true });
-    await this.delete(id);
-    const filename = `${id}.${ext}`;
-    await fs.writeFile(
-      path.join(/*turbopackIgnore: true*/ dir, filename),
-      buffer
-    );
-    // eslint-disable-next-line no-restricted-syntax -- a cache buster, not a time: it only has to differ from the last one
-    return `${this.getEndpoint(filename)}?v=${Date.now()}`;
-  }
-
   /**
    * Stores the image under a name of its own, leaving any earlier file for
    * the ID alone until the row that names it has moved on.
@@ -157,33 +120,27 @@ export abstract class BaseImageResourceRepository<Id extends string> {
     return this.getEndpoint(filename);
   }
 
+  // The original goes before the directory is listed: a rendition written
+  // after the listing finds the original gone and removes itself (readSized).
   async deleteByUrl(url: string): Promise<void> {
     const filename = path.posix.basename(url.split("?")[0]);
-    if (!SAFE_FILENAME.test(filename)) return;
+    if (!url.startsWith(this.getEndpoint("")) || !SAFE_FILENAME.test(filename))
+      return;
     const [stem] = splitExtension(filename);
     const dir = this.dirPath;
+    await unlinkLogged(dir, filename);
     let entries: string[];
     try {
       entries = await fs.readdir(dir);
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT")
-        console.error(`Could not delete ${filename}; delete it by hand`, error);
+        console.error(`Could not list ${dir}; delete ${stem}.* by hand`, error);
       return;
     }
     await Promise.all(
       entries
-        .filter((name) => name === filename || name.startsWith(`${stem}.`))
-        .map((name) =>
-          fs
-            .unlink(path.join(/*turbopackIgnore: true*/ dir, name))
-            .catch((error: NodeJS.ErrnoException) => {
-              if (error.code !== "ENOENT")
-                console.error(
-                  `Could not delete ${name}; delete it by hand`,
-                  error
-                );
-            })
-        )
+        .filter((name) => name.startsWith(`${stem}.`))
+        .map((name) => unlinkLogged(dir, name))
     );
   }
 
@@ -222,9 +179,9 @@ export abstract class BaseImageResourceRepository<Id extends string> {
    * would, because it can't reach these files once /media needs a cookie
    * (see utils/image-loader.js).
    *
-   * The rendition is cached beside the original as `<id>.<width>.<ext>`, so
-   * replacing an image drops its renditions too — {@link delete} already
-   * removes everything starting with `<id>.`.
+   * The rendition is cached beside the original as `<stem>.<width>.<ext>`, so
+   * {@link deleteByUrl}, which removes everything starting with `<stem>.`,
+   * drops it with the original.
    */
   async readSized(
     filename: string,
@@ -255,6 +212,17 @@ export abstract class BaseImageResourceRepository<Id extends string> {
     }
 
     await this.writeRendition(rendition, resized);
+    const originalPath = path.join(
+      /*turbopackIgnore: true*/ this.dirPath,
+      filename
+    );
+    if (
+      !(await fs.access(originalPath).then(
+        () => true,
+        () => false
+      ))
+    )
+      await unlinkLogged(this.dirPath, rendition);
     return { data: resized, contentType: original.contentType };
   }
 
@@ -273,6 +241,15 @@ export abstract class BaseImageResourceRepository<Id extends string> {
       // A failed cache write costs a resize next time, nothing more.
       await fs.unlink(temp).catch(() => {});
     }
+  }
+}
+
+async function unlinkLogged(dir: string, name: string) {
+  try {
+    await fs.unlink(path.join(/*turbopackIgnore: true*/ dir, name));
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT")
+      console.error(`Could not delete ${name}; delete it by hand`, error);
   }
 }
 

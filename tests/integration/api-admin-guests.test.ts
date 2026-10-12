@@ -278,10 +278,12 @@ describe("/api/v1/admin guests and settings", () => {
       expect(saved.status).toBe(200);
       const settings = (await saved.json()) as { mapImageUrl: string };
       expect(settings).toMatchObject({ title: "Camp", description: "Welcome" });
-      expect(settings.mapImageUrl).toMatch(/^\/media\/site\/map\.png\?v=/);
-      expect(fs.existsSync(path.join(uploadsDir, "site", "map.png"))).toBe(
-        true
-      );
+      expect(settings.mapImageUrl).toMatch(/^\/media\/site\/map-.+\.png$/);
+      expect(
+        fs.existsSync(
+          path.join(uploadsDir, "site", path.basename(settings.mapImageUrl))
+        )
+      ).toBe(true);
       expect(await (await call("GET", "/admin/settings")).json()).toEqual(
         settings
       );

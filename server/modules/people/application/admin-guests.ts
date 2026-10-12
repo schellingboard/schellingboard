@@ -5,6 +5,7 @@ import {
 import type { z } from "zod";
 import type { CompleteGuest } from "@schellingboard/domain/guest";
 import type { Actor } from "@/server/kernel/actor";
+import { withStoredFile } from "@/server/kernel/stored-files";
 import {
   forbidden,
   invalidFields,
@@ -180,15 +181,15 @@ export const deleteGuest =
   ({ uow, avatars }: PeopleDeps) =>
   async (actor: Actor, input: { id: string }): Promise<Result<void>> => {
     if (!actor.admin) return adminRequired();
-    const deleted = await uow.run(async (tx) => {
-      const guest = await tx.guests.findById(input.id);
-      if (!guest) return guestNotFound();
-      await tx.guests.delete(input.id);
-      return ok(guest.avatarUrl);
-    });
-    if (!deleted.ok) return deleted;
-    if (deleted.value) await avatars.deleteByUrl(deleted.value);
-    return ok(undefined);
+    return withStoredFile(avatars, null, (replaces) =>
+      uow.run(async (tx) => {
+        const guest = await tx.guests.findById(input.id);
+        if (!guest) return guestNotFound();
+        await tx.guests.delete(input.id);
+        replaces(guest.avatarUrl);
+        return ok(undefined);
+      })
+    );
   };
 
 export const sendTestEmail =

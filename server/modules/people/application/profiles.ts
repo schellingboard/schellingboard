@@ -7,6 +7,7 @@ import {
 } from "@schellingboard/domain/guest";
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
+import { withStoredFile } from "@/server/kernel/stored-files";
 import {
   forbidden,
   invalid,
@@ -70,8 +71,6 @@ const profileConflict = (current: CompleteGuest) =>
     "Someone changed this profile while you edited it. Copy your edits somewhere safe: reloading the page discards them."
   );
 
-// The new photo gets a file of its own, so the row and the files agree
-// whichever way the transaction ends: the loser's file is the one deleted.
 async function saveProfile(
   { uow, avatars }: PeopleDeps,
   guestId: string,
@@ -83,10 +82,8 @@ async function saveProfile(
   const newUrl = avatar
     ? await avatars.saveNew(guestId, avatar.buffer, avatar.ext)
     : null;
-  let replacedUrl: string | undefined;
-  let saved: Result<Guest>;
-  try {
-    saved = await uow.run(async (tx) => {
+  return withStoredFile(avatars, newUrl, (replaces) =>
+    uow.run(async (tx) => {
       const current = await tx.guests.findById(guestId);
       if (!current) return profileNotFound();
       const updated = await tx.guests.updateProfile(
@@ -94,9 +91,7 @@ async function saveProfile(
         {
           ...fields(current),
           avatarUrl:
-            avatar === undefined
-              ? (current.avatarUrl ?? null)
-              : (newUrl ?? null),
+            avatar === undefined ? (current.avatarUrl ?? null) : newUrl,
           expectedVersion,
         },
         now
@@ -105,16 +100,10 @@ async function saveProfile(
         const after = await tx.guests.findById(guestId);
         return after ? profileConflict(after) : profileNotFound();
       }
-      if (avatar !== undefined) replacedUrl = current.avatarUrl ?? undefined;
+      if (avatar !== undefined) replaces(current.avatarUrl);
       return ok(sanitizeGuest(updated));
-    });
-  } catch (error) {
-    if (newUrl) await avatars.deleteByUrl(newUrl);
-    throw error;
-  }
-  const unused = saved.ok ? replacedUrl : newUrl;
-  if (unused) await avatars.deleteByUrl(unused);
-  return saved;
+    })
+  );
 }
 
 export const updateMyProfile =

@@ -19,8 +19,8 @@ const maps = {
   validate: vi.fn(() =>
     Promise.resolve<{ ext: string } | { error: string }>({ ext: "png" })
   ),
-  save: vi.fn(() => Promise.resolve("/media/site/map.png?v=1")),
-  delete: vi.fn(async () => {}),
+  saveNew: vi.fn(() => Promise.resolve("/media/site/map-1.png")),
+  deleteByUrl: vi.fn<(url: string) => Promise<void>>(() => Promise.resolve()),
 };
 const guests = (uow: UnitOfWork = unitOfWork) =>
   createPeopleUseCases({
@@ -29,7 +29,8 @@ const guests = (uow: UnitOfWork = unitOfWork) =>
     sendTestEmail,
     uow,
   });
-const site = () => createSettingsUseCases({ repos: getRepositories(), maps });
+const site = () =>
+  createSettingsUseCases({ repos: getRepositories(), maps, uow: unitOfWork });
 
 function value<T>(result: Result<T>): T {
   if (!result.ok) throw new Error(result.error.code);
@@ -471,7 +472,7 @@ describe("site settings use cases", () => {
           detail: "File is not a valid image",
         },
       });
-      expect(maps.save).not.toHaveBeenCalled();
+      expect(maps.saveNew).not.toHaveBeenCalled();
 
       expect(
         value(
@@ -484,9 +485,9 @@ describe("site settings use cases", () => {
       ).toEqual({
         title: "Camp",
         description: "Hi",
-        mapImageUrl: "/media/site/map.png?v=1",
+        mapImageUrl: "/media/site/map-1.png",
       });
-      expect(maps.save).toHaveBeenCalledWith(Buffer.from([1]), "png");
+      expect(maps.saveNew).toHaveBeenCalledWith(Buffer.from([1]), "png");
 
       const removed = value(
         await site().updateSiteSettings(ADMIN, {
@@ -496,31 +497,15 @@ describe("site settings use cases", () => {
         })
       );
       expect(removed.mapImageUrl).toBe("");
-      expect(maps.delete).toHaveBeenCalledOnce();
+      expect(maps.deleteByUrl.mock.calls).toEqual([["/media/site/map-1.png"]]);
       expect(value(await site().getSiteSettings(ADMIN))).toEqual(removed);
     }
   );
 
   it(
-    "keeps a map uploaded while the title was being saved",
+    "keeps the map when a later save changes only the title",
     { tags: ["015-US5", "019-US7"] },
     async () => {
-      const repo = getRepositories().settings;
-      const read = repo.get.bind(repo);
-      let uploaded = () => {};
-      const upload = new Promise<void>((resolve) => (uploaded = resolve));
-      const slowRead = vi
-        .spyOn(repo, "get")
-        .mockImplementationOnce(async () => {
-          const current = await read();
-          await upload;
-          return current;
-        });
-
-      const retitled = site().updateSiteSettings(ADMIN, {
-        title: "Camp",
-        description: "",
-      });
       value(
         await site().updateSiteSettings(ADMIN, {
           title: "Camp",
@@ -528,11 +513,17 @@ describe("site settings use cases", () => {
           image: Buffer.from([1]),
         })
       );
-      uploaded();
-      value(await retitled);
-
-      slowRead.mockRestore();
-      expect((await read()).mapImageUrl).toBe("/media/site/map.png?v=1");
+      const retitled = value(
+        await site().updateSiteSettings(ADMIN, {
+          title: "Camp 2",
+          description: "",
+        })
+      );
+      expect(retitled.mapImageUrl).toBe("/media/site/map-1.png");
+      expect(maps.deleteByUrl).not.toHaveBeenCalled();
+      expect((await getRepositories().settings.get()).mapImageUrl).toBe(
+        "/media/site/map-1.png"
+      );
     }
   );
 });

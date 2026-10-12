@@ -39,7 +39,7 @@ export async function requireMediaAuth(
   });
 }
 
-// Uploads are immutable at a given URL: every save mints a fresh ?v=. Private
+// Uploads are immutable at a given URL: every save gets a new filename. Private
 // so a shared cache can't hand one attendee's avatar to an unauthenticated
 // stranger — the whole point of the gate above.
 export const MEDIA_CACHE_CONTROL = "private, max-age=31536000, immutable";
