@@ -131,7 +131,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
       the catch-all still forwards `/{slug}`.
   - [x] 13a. Pure logic in `apps/web/src/schedule/` (layout, columns, agenda,
         filters, search, fold, meetings from the replica), copied with tests.
-  - [ ] 13b. Grid, now line, day fold.
+  - [x] 13b. Grid, now line, day fold.
   - [ ] 13c. Agenda, filters, toolbar, search stepping.
   - [ ] 13d. Drag to pan, scroll restoration, meetings column, wiring (Shell,
         replica, viewer switching) and the dev-only preview route; E2E spec.
