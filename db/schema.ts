@@ -174,6 +174,7 @@ export const events = sqliteTable(
     maxOpenMeetingRequests: integer("max_open_meeting_requests")
       .notNull()
       .default(5),
+    version: integer("version").notNull().default(1),
   },
   (table) => [uniqueIndex("events_slug_unique").on(table.slug)]
 );
@@ -243,6 +244,7 @@ export const days = sqliteTable("days", {
   eventId: text("event_id")
     .notNull()
     .references(() => events.id, { onDelete: "cascade" }),
+  version: integer("version").notNull().default(1),
 });
 
 export const sessionProposals = sqliteTable("session_proposals", {

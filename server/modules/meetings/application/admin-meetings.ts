@@ -6,6 +6,7 @@ import {
   invalid,
   notFound,
   ok,
+  versionConflict,
   type Failure,
   type Result,
 } from "@/server/kernel/result";
@@ -16,6 +17,7 @@ export interface EventMeetingsInput {
   eventId: string;
   meetingsEnabled: boolean;
   maxOpenMeetingRequests?: number;
+  expectedVersion?: number;
 }
 
 export interface MeetingPointInput {
@@ -29,7 +31,7 @@ const nameRequired = () =>
   invalid("meetingPoint.nameRequired", "Name is required");
 
 export const updateEventMeetings =
-  ({ repos }: MeetingDeps) =>
+  ({ uow }: MeetingDeps) =>
   async (actor: Actor, input: EventMeetingsInput): Promise<Result<Event>> => {
     if (!actor.admin) return adminRequired();
     // The cap is hidden while meetings are off, so judging it then would leave
@@ -49,8 +51,21 @@ export const updateEventMeetings =
         );
       patch = { meetingsEnabled: true, maxOpenMeetingRequests: cap };
     }
-    const updated = await repos.events.update(input.eventId, patch);
-    return updated ? ok(updated) : eventNotFound();
+    return uow.run(async (tx) => {
+      const updated = await tx.events.update(input.eventId, {
+        ...patch,
+        expectedVersion: input.expectedVersion,
+      });
+      if (updated) return ok(updated);
+      const current = await tx.events.findById(input.eventId);
+      return current
+        ? versionConflict(
+            "event",
+            current,
+            "Someone changed this event while you edited it"
+          )
+        : eventNotFound();
+    });
   };
 
 export const createMeetingPoint =

@@ -30,6 +30,7 @@ export function toEventView(e: Event): z.input<typeof eventViewSchema> {
     votingPhaseEnd: iso(e.votingPhaseEnd),
     schedulingPhaseStart: iso(e.schedulingPhaseStart),
     schedulingPhaseEnd: iso(e.schedulingPhaseEnd),
+    version: e.version,
   };
 }
 
@@ -41,5 +42,6 @@ export function toDayView(d: Day): z.input<typeof dayViewSchema> {
     end: d.end.toISOString(),
     startBookings: d.startBookings.toISOString(),
     endBookings: d.endBookings.toISOString(),
+    version: d.version,
   };
 }

@@ -53,10 +53,16 @@ export interface DaysRepository {
   list(): Promise<Day[]>;
   listByEvent(eventId: string): Promise<Day[]>;
   findById(id: string): Promise<Day | undefined>;
-  create(data: Omit<Day, "id">): Promise<Day>;
+  create(data: Omit<Day, "id" | "version">): Promise<Day>;
+  /**
+   * Undefined, changing nothing, if the day is gone or not at
+   * `expectedVersion`.
+   */
   update(
     id: string,
-    patch: Partial<Omit<Day, "id" | "eventId">>
+    patch: Partial<Omit<Day, "id" | "eventId" | "version">> & {
+      expectedVersion?: number;
+    }
   ): Promise<Day | undefined>;
   /** Deletes the day and every session that overlaps the day's window. */
   delete(id: string): Promise<void>;
@@ -76,7 +82,8 @@ export interface LocationUnavailabilityRepository {
   delete(id: string): Promise<void>;
 }
 
-type EventDerivedFields = "id" | "slug" | "firstDayStart" | "lastDayStart";
+type EventDerivedFields =
+  "id" | "slug" | "firstDayStart" | "lastDayStart" | "version";
 
 export interface EventsRepository {
   list(): Promise<Event[]>;
@@ -93,9 +100,15 @@ export interface EventsRepository {
     data: Omit<Event, EventDerivedFields | keyof EventMeetingSettings> &
       Partial<EventMeetingSettings>
   ): Promise<Event>;
+  /**
+   * Undefined, changing nothing, if the event is gone or not at
+   * `expectedVersion`.
+   */
   update(
     id: string,
-    patch: Partial<Omit<Event, EventDerivedFields>>
+    patch: Partial<Omit<Event, EventDerivedFields>> & {
+      expectedVersion?: number;
+    }
   ): Promise<Event | undefined>;
   /** Deletes the event and all records referencing it (cascades via DB FK). */
   delete(id: string): Promise<void>;

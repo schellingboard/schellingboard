@@ -11,7 +11,7 @@ import { PRIMARY_BUTTON } from "@/app/admin/buttons";
 import { ActionError } from "@/app/components/action-error";
 import { utcToZonedInput, zonedInputToUtc } from "@/utils/admin-datetime";
 
-type PhasesForm = Omit<EventPhasesInput, "id">;
+type PhasesForm = Omit<EventPhasesInput, "id" | "expectedVersion">;
 
 export function EventPhasesForm({ event }: { event: Event }) {
   const toInput = (date: Date | undefined) =>

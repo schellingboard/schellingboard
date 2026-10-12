@@ -98,6 +98,35 @@ describe("events repo", () => {
       expect(result).toBeUndefined();
     });
 
+    it("raises the version only when the event really changes", async () => {
+      const event = await createEvent({ name: "Same" });
+      const { events } = getRepositories();
+
+      const resaved = await events.update(event.id, { name: "Same" });
+      const renamed = await events.update(event.id, { name: "Renamed" });
+
+      expect(event.version).toBe(1);
+      expect(resaved?.version).toBe(1);
+      expect(renamed?.version).toBe(2);
+    });
+
+    it("changes nothing when the event has moved past the expected version", async () => {
+      const event = await createEvent({ name: "Original" });
+      const { events } = getRepositories();
+      await events.update(event.id, { name: "First" });
+
+      const stale = await events.update(event.id, {
+        name: "Second",
+        expectedVersion: event.version,
+      });
+
+      expect(stale).toBeUndefined();
+      expect(await events.findById(event.id)).toMatchObject({
+        name: "First",
+        version: 2,
+      });
+    });
+
     it("preserves unpatched fields", async () => {
       const event = await createEvent({ name: "Keep" });
       await getRepositories().events.update(event.id, {
@@ -550,6 +579,23 @@ describe("event actions", () => {
       expect(result.ok).toBe(true);
       expect((await getRepositories().events.findById(event.id))?.name).toBe(
         "New Name"
+      );
+    });
+
+    it("refuses an edit from a version the event has moved past", async () => {
+      const event = await createEvent({ name: "Old Name" });
+      const edit = (name: string) =>
+        updateEventAction({
+          id: event.id,
+          ...VALID_EVENT_INPUT,
+          name,
+          expectedVersion: event.version,
+        });
+
+      expect(await edit("First")).toEqual({ ok: true });
+      expect(await edit("Second")).toMatchObject({ ok: false });
+      expect((await getRepositories().events.findById(event.id))?.name).toBe(
+        "First"
       );
     });
 

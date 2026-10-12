@@ -1,11 +1,16 @@
 import { createRoute, z } from "@hono/zod-openapi";
+import { eventViewSchema } from "@schellingboard/contracts/event";
 import {
-  eventMeetingsSchema,
+  eventMeetingsUpdateBodySchema,
   meetingPointInputSchema,
   meetingPointSchema,
 } from "@schellingboard/contracts/meeting";
 import { idempotencyHeaders } from "@/server/http/idempotency";
-import { problem, problemDefault } from "@/server/http/problem";
+import {
+  problem,
+  problemDefault,
+  versionConflictResponse,
+} from "@/server/http/problem";
 import {
   body,
   idParam,
@@ -13,6 +18,7 @@ import {
   noContent,
   type App,
 } from "@/server/http/route-parts";
+import { toEventView } from "@/server/modules/events/module";
 import type { MeetingUseCases } from "../application/use-cases";
 
 const pointParams = z.object({
@@ -28,9 +34,13 @@ const updateEventMeetings = createRoute({
   request: {
     headers: idempotencyHeaders,
     params: idParam,
-    body: body(eventMeetingsSchema),
+    body: body(eventMeetingsUpdateBodySchema),
   },
-  responses: { 204: noContent("Saved"), ...problemDefault },
+  responses: {
+    200: json(eventViewSchema, "The updated event"),
+    ...versionConflictResponse(eventViewSchema),
+    ...problemDefault,
+  },
 });
 
 const createPoint = createRoute({
@@ -81,8 +91,8 @@ export function addAdminMeetingRoutes(
       ...c.req.valid("json"),
       eventId: c.req.valid("param").id,
     });
-    if (!result.ok) return problem(result.error);
-    return c.body(null, 204);
+    if (!result.ok) return problem(result.error, toEventView);
+    return c.json(toEventView(result.value), 200);
   });
 
   app.openapi(createPoint, async (c) => {

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { EVENT_ICON_NAMES } from "@schellingboard/domain/event-icons";
 import { SLOT_INCREMENT_OPTIONS } from "@schellingboard/domain/slots";
+import { expectedVersion } from "./session";
 
 const instant = z.iso.datetime({ offset: true });
 
@@ -54,8 +55,17 @@ export const eventViewSchema = z
     firstDayStart: instant.nullable(),
     lastDayStart: instant.nullable(),
     ...eventPhasesBodySchema.shape,
+    version: z.number().int(),
   })
   .meta({ id: "Event" });
+
+export const eventUpdateBodySchema = eventSettingsBodySchema.extend({
+  expectedVersion,
+});
+
+export const eventPhasesUpdateBodySchema = eventPhasesBodySchema.extend({
+  expectedVersion,
+});
 
 export const eventListSchema = z.object({ events: z.array(eventViewSchema) });
 
@@ -66,9 +76,12 @@ export const dayBodySchema = z.object({
   endBookings: instant.describe("When sessions must end"),
 });
 
+export const dayUpdateBodySchema = dayBodySchema.extend({ expectedVersion });
+
 export const dayViewSchema = dayBodySchema.extend({
   id: z.string(),
   eventId: z.string(),
+  version: z.number().int(),
 });
 
 export const eventDetailSchema = z.object({

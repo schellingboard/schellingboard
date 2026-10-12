@@ -1,15 +1,21 @@
 import { createRoute } from "@hono/zod-openapi";
 import {
   dayBodySchema,
+  dayUpdateBodySchema,
   dayViewSchema,
   eventDetailSchema,
   eventListSchema,
-  eventPhasesBodySchema,
+  eventPhasesUpdateBodySchema,
   eventSettingsBodySchema,
+  eventUpdateBodySchema,
   eventViewSchema,
 } from "@schellingboard/contracts/event";
 import { idempotencyHeaders } from "@/server/http/idempotency";
-import { problem, problemDefault } from "@/server/http/problem";
+import {
+  problem,
+  problemDefault,
+  versionConflictResponse,
+} from "@/server/http/problem";
 import {
   body,
   idParam,
@@ -69,10 +75,11 @@ const updateEvent = createRoute({
   request: {
     headers: idempotencyHeaders,
     params: idParam,
-    body: body(eventSettingsBodySchema),
+    body: body(eventUpdateBodySchema),
   },
   responses: {
     200: json(eventViewSchema, "The updated event"),
+    ...versionConflictResponse(eventViewSchema),
     ...problemDefault,
   },
 });
@@ -84,10 +91,11 @@ const updatePhases = createRoute({
   request: {
     headers: idempotencyHeaders,
     params: idParam,
-    body: body(eventPhasesBodySchema),
+    body: body(eventPhasesUpdateBodySchema),
   },
   responses: {
     200: json(eventViewSchema, "The updated event"),
+    ...versionConflictResponse(eventViewSchema),
     ...problemDefault,
   },
 });
@@ -123,9 +131,13 @@ const updateDay = createRoute({
   request: {
     headers: idempotencyHeaders,
     params: idParam,
-    body: body(dayBodySchema),
+    body: body(dayUpdateBodySchema),
   },
-  responses: { 200: json(dayViewSchema, "The updated day"), ...problemDefault },
+  responses: {
+    200: json(dayViewSchema, "The updated day"),
+    ...versionConflictResponse(dayViewSchema),
+    ...problemDefault,
+  },
 });
 
 const deleteDay = createRoute({
@@ -165,16 +177,18 @@ export function addAdminEventRoutes(app: App, events: () => EventUseCases) {
       ...c.req.valid("json"),
       id: c.req.valid("param").id,
     });
-    if (!result.ok) return problem(result.error);
+    if (!result.ok) return problem(result.error, toEventView);
     return c.json(toEventView(result.value), 200);
   });
 
   app.openapi(updatePhases, async (c) => {
+    const { expectedVersion, ...phases } = c.req.valid("json");
     const result = await events().updateEventPhases(c.var.actor, {
-      ...dates(c.req.valid("json")),
+      ...dates(phases),
+      expectedVersion,
       id: c.req.valid("param").id,
     });
-    if (!result.ok) return problem(result.error);
+    if (!result.ok) return problem(result.error, toEventView);
     return c.json(toEventView(result.value), 200);
   });
 
@@ -197,11 +211,13 @@ export function addAdminEventRoutes(app: App, events: () => EventUseCases) {
   });
 
   app.openapi(updateDay, async (c) => {
+    const { expectedVersion, ...window } = c.req.valid("json");
     const result = await events().updateDay(c.var.actor, {
-      ...dates(c.req.valid("json")),
+      ...dates(window),
+      expectedVersion,
       id: c.req.valid("param").id,
     });
-    if (!result.ok) return problem(result.error);
+    if (!result.ok) return problem(result.error, toDayView);
     return c.json(toDayView(result.value), 200);
   });
 

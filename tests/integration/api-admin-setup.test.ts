@@ -14,7 +14,7 @@ import { getRepositories } from "@/db/container";
 import { createAdminAuthCookie } from "@/utils/auth";
 import { isoDay } from "../helpers/dates";
 import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createEvent, createLocation } from "../helpers/factories";
+import { createDay, createEvent, createLocation } from "../helpers/factories";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 const DAY = isoDay(30);
@@ -102,6 +102,7 @@ describe("/api/v1/admin events and days", () => {
       const event = (await first.json()) as { id: string };
       expect(event).toMatchObject({
         slug: "Unconference",
+        version: 1,
         timezone: "UTC",
         icon: null,
         proposalPhaseStart: null,
@@ -124,7 +125,7 @@ describe("/api/v1/admin events and days", () => {
           firstDayStart: at("08:00"),
           lastDayStart: at("08:00"),
         },
-        days: [{ id: dayId, eventId: event.id, ...dayBody }],
+        days: [{ id: dayId, eventId: event.id, ...dayBody, version: 1 }],
       });
       const list = await call("GET", "/admin/events");
       expect(
@@ -138,9 +139,12 @@ describe("/api/v1/admin events and days", () => {
       expect(await overlap.json()).toMatchObject({ code: "day.overlap" });
 
       const moved = await call("PUT", `/admin/days/${dayId}`, {
-        body: { ...dayBody, end: at("19:00") },
+        body: { ...dayBody, end: at("19:00"), expectedVersion: 1 },
       });
-      expect(await moved.json()).toMatchObject({ end: at("19:00") });
+      expect(await moved.json()).toMatchObject({
+        end: at("19:00"),
+        version: 2,
+      });
       expect((await call("DELETE", `/admin/days/${dayId}`)).status).toBe(204);
     }
   );
@@ -151,13 +155,19 @@ describe("/api/v1/admin events and days", () => {
     async () => {
       const event = await createEvent();
       const updated = await call("PUT", `/admin/events/${event.id}`, {
-        body: { ...settings, icon: "StarIcon", timezone: "Europe/Berlin" },
+        body: {
+          ...settings,
+          icon: "StarIcon",
+          timezone: "Europe/Berlin",
+          expectedVersion: 1,
+        },
       });
       expect(updated.status).toBe(200);
       expect(await updated.json()).toMatchObject({
         name: "Unconference",
         icon: "StarIcon",
         timezone: "Europe/Berlin",
+        version: 2,
       });
 
       const phases = {
@@ -167,6 +177,7 @@ describe("/api/v1/admin events and days", () => {
         votingPhaseEnd: null,
         schedulingPhaseStart: null,
         schedulingPhaseEnd: null,
+        expectedVersion: 2,
       };
       const outOfOrder = await call("PUT", `/admin/events/${event.id}/phases`, {
         body: phases,
@@ -182,6 +193,7 @@ describe("/api/v1/admin events and days", () => {
         proposalPhaseStart: at("08:00"),
         votingPhaseStart: at("12:00"),
         schedulingPhaseStart: null,
+        version: 3,
       });
 
       const notAnInstant = await call(
@@ -204,6 +216,122 @@ describe("/api/v1/admin events and days", () => {
       expect(await gone.json()).toMatchObject({ code: "event.notFound" });
     }
   );
+
+  it(
+    "refuses an event edit made from an outdated copy, answering with the event as it is",
+    { tags: ["015-US2", "015-US3", "012-US1", "019-US3"] },
+    async () => {
+      const event = await createEvent();
+      const rename = (name: string) =>
+        call("PUT", `/admin/events/${event.id}`, {
+          body: { ...settings, name, expectedVersion: 1 },
+        });
+      expect(await (await rename("First")).json()).toMatchObject({
+        version: 2,
+      });
+
+      const stale = await rename("Second");
+      const stalePhases = await call(
+        "PUT",
+        `/admin/events/${event.id}/phases`,
+        {
+          body: {
+            proposalPhaseStart: at("08:00"),
+            proposalPhaseEnd: null,
+            votingPhaseStart: null,
+            votingPhaseEnd: null,
+            schedulingPhaseStart: null,
+            schedulingPhaseEnd: null,
+            expectedVersion: 1,
+          },
+        }
+      );
+
+      const staleMeetings = await call(
+        "PUT",
+        `/admin/events/${event.id}/meetings`,
+        {
+          body: {
+            meetingsEnabled: true,
+            maxOpenMeetingRequests: 3,
+            expectedVersion: 1,
+          },
+        }
+      );
+
+      for (const res of [stale, stalePhases, staleMeetings]) {
+        expect(res.status).toBe(409);
+        expect(await res.json()).toMatchObject({
+          code: "event.versionConflict",
+          current: { id: event.id, name: "First", version: 2 },
+        });
+      }
+      expect(await getRepositories().events.findById(event.id)).toMatchObject({
+        name: "First",
+        proposalPhaseStart: event.proposalPhaseStart,
+        meetingsEnabled: false,
+        version: 2,
+      });
+    }
+  );
+
+  it(
+    "keeps one of two concurrent day edits made from the same version",
+    { tags: ["015-US4", "019-US3", "019-US7"] },
+    async () => {
+      const event = await createEvent();
+      const created = await call("POST", `/admin/events/${event.id}/days`, {
+        body: dayBody,
+      });
+      const { id, version } = (await created.json()) as {
+        id: string;
+        version: number;
+      };
+      const move = (end: string) =>
+        call("PUT", `/admin/days/${id}`, {
+          body: { ...dayBody, end: at(end), expectedVersion: version },
+        });
+
+      const results = await Promise.all([move("18:30"), move("19:00")]);
+
+      expect(results.map((r) => r.status).sort()).toEqual([200, 409]);
+      const kept = (await getRepositories().days.findById(id))!;
+      expect(kept.version).toBe(version + 1);
+      const conflict = results.find((r) => r.status === 409)!;
+      expect(await conflict.json()).toMatchObject({
+        code: "day.versionConflict",
+        current: { id, end: kept.end.toISOString(), version: version + 1 },
+      });
+    }
+  );
+
+  it("refuses event, phase, 1-on-1 and day edits without expectedVersion", async () => {
+    const event = await createEvent();
+    const day = await createDay(event.id);
+    for (const [path, body] of [
+      [`/admin/events/${event.id}`, settings],
+      [
+        `/admin/events/${event.id}/phases`,
+        {
+          proposalPhaseStart: null,
+          proposalPhaseEnd: null,
+          votingPhaseStart: null,
+          votingPhaseEnd: null,
+          schedulingPhaseStart: null,
+          schedulingPhaseEnd: null,
+        },
+      ],
+      [`/admin/events/${event.id}/meetings`, { meetingsEnabled: false }],
+      [`/admin/days/${day.id}`, dayBody],
+    ] as const) {
+      const res = await call("PUT", path, { body });
+      expect(res.status).toBe(400);
+      expect(await res.json()).toMatchObject({
+        code: "request.invalid",
+        errors: [expect.objectContaining({ path: "expectedVersion" })],
+      });
+    }
+  });
 });
 
 describe("/api/v1/admin locations", () => {

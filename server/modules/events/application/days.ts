@@ -10,6 +10,7 @@ import {
   invalid,
   notFound,
   ok,
+  versionConflict,
   type Failure,
   type Result,
 } from "@/server/kernel/result";
@@ -26,6 +27,20 @@ export interface DayWindowInput {
 type DayWindow = Pick<Day, "start" | "end" | "startBookings" | "endBookings">;
 
 const dayNotFound = () => notFound("day.notFound", "Day not found");
+
+async function dayChangedMeanwhile(
+  repos: EventDeps["repos"],
+  id: string
+): Promise<Failure> {
+  const current = await repos.days.findById(id);
+  return current
+    ? versionConflict(
+        "day",
+        current,
+        "Someone changed this day while you edited it"
+      )
+    : dayNotFound();
+}
 const valid = (d: Date | undefined): d is Date =>
   d !== undefined && !isNaN(d.getTime());
 
@@ -98,7 +113,7 @@ export const updateDay =
   ({ uow }: EventDeps) =>
   async (
     actor: Actor,
-    input: DayWindowInput & { id: string }
+    input: DayWindowInput & { id: string; expectedVersion?: number }
   ): Promise<Result<Day>> => {
     if (!actor.admin) return adminRequired();
     return uow.run(async (tx) => {
@@ -132,11 +147,14 @@ export const updateDay =
 
       let updated: Day | undefined;
       try {
-        updated = await tx.days.update(input.id, window);
+        updated = await tx.days.update(input.id, {
+          ...window,
+          expectedVersion: input.expectedVersion,
+        });
       } catch {
         return conflict("day.saveFailed", "Failed to update day");
       }
-      return updated ? ok(updated) : dayNotFound();
+      return updated ? ok(updated) : dayChangedMeanwhile(tx, input.id);
     });
   };
 

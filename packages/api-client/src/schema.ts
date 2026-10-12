@@ -2288,16 +2288,40 @@ export interface paths {
             meetingsEnabled: boolean;
             /** @description Required, at least 1, when meetingsEnabled is true */
             maxOpenMeetingRequests?: number;
+            /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
+            expectedVersion: number;
           };
         };
       };
       responses: {
-        /** @description Saved */
-        204: {
+        /** @description The updated event */
+        200: {
           headers: {
             [name: string]: unknown;
           };
-          content?: never;
+          content: {
+            "application/json": components["schemas"]["Event"];
+          };
+        };
+        /** @description A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion` */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": {
+              type: string;
+              title: string;
+              status: number;
+              code: string;
+              detail?: string;
+              errors?: {
+                path: string;
+                message: string;
+              }[];
+              current?: components["schemas"]["Event"];
+            };
+          };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
         default: {
@@ -3439,6 +3463,7 @@ export interface paths {
                 endBookings: string;
                 id: string;
                 eventId: string;
+                version: number;
               }[];
             };
           };
@@ -3520,6 +3545,8 @@ export interface paths {
               | "UserGroupIcon"
               | "WrenchIcon"
               | null;
+            /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
+            expectedVersion: number;
           };
         };
       };
@@ -3531,6 +3558,26 @@ export interface paths {
           };
           content: {
             "application/json": components["schemas"]["Event"];
+          };
+        };
+        /** @description A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion` */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": {
+              type: string;
+              title: string;
+              status: number;
+              code: string;
+              detail?: string;
+              errors?: {
+                path: string;
+                message: string;
+              }[];
+              current?: components["schemas"]["Event"];
+            };
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -3636,6 +3683,8 @@ export interface paths {
              * @description null clears it
              */
             schedulingPhaseEnd: string | null;
+            /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
+            expectedVersion: number;
           };
         };
       };
@@ -3647,6 +3696,26 @@ export interface paths {
           };
           content: {
             "application/json": components["schemas"]["Event"];
+          };
+        };
+        /** @description A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion` */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": {
+              type: string;
+              title: string;
+              status: number;
+              code: string;
+              detail?: string;
+              errors?: {
+                path: string;
+                message: string;
+              }[];
+              current?: components["schemas"]["Event"];
+            };
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -3732,6 +3801,7 @@ export interface paths {
               endBookings: string;
               id: string;
               eventId: string;
+              version: number;
             };
           };
         };
@@ -3790,6 +3860,8 @@ export interface paths {
              * @description When sessions must end
              */
             endBookings: string;
+            /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
+            expectedVersion: number;
           };
         };
       };
@@ -3817,6 +3889,45 @@ export interface paths {
               endBookings: string;
               id: string;
               eventId: string;
+              version: number;
+            };
+          };
+        };
+        /** @description A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion` */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": {
+              type: string;
+              title: string;
+              status: number;
+              code: string;
+              detail?: string;
+              errors?: {
+                path: string;
+                message: string;
+              }[];
+              current?: {
+                /** Format: date-time */
+                start: string;
+                /** Format: date-time */
+                end: string;
+                /**
+                 * Format: date-time
+                 * @description When sessions may start
+                 */
+                startBookings: string;
+                /**
+                 * Format: date-time
+                 * @description When sessions must end
+                 */
+                endBookings: string;
+                id: string;
+                eventId: string;
+                version: number;
+              };
             };
           };
         };
@@ -5015,6 +5126,56 @@ export interface components {
         isViewer: boolean;
       }[];
     };
+    Event: {
+      id: string;
+      slug: string;
+      name: string;
+      description: string;
+      website: string;
+      timezone: string;
+      maxSessionDuration: number;
+      breakMinutes: number;
+      slotIncrementMinutes: number;
+      rsvpCapacityHardLimit: boolean;
+      icon: string | null;
+      meetingsEnabled: boolean;
+      maxOpenMeetingRequests: number;
+      /** Format: date-time */
+      firstDayStart: string | null;
+      /** Format: date-time */
+      lastDayStart: string | null;
+      /**
+       * Format: date-time
+       * @description null clears it
+       */
+      proposalPhaseStart: string | null;
+      /**
+       * Format: date-time
+       * @description null clears it
+       */
+      proposalPhaseEnd: string | null;
+      /**
+       * Format: date-time
+       * @description null clears it
+       */
+      votingPhaseStart: string | null;
+      /**
+       * Format: date-time
+       * @description null clears it
+       */
+      votingPhaseEnd: string | null;
+      /**
+       * Format: date-time
+       * @description null clears it
+       */
+      schedulingPhaseStart: string | null;
+      /**
+       * Format: date-time
+       * @description null clears it
+       */
+      schedulingPhaseEnd: string | null;
+      version: number;
+    };
     PublicProfile: {
       id: string;
       name: string;
@@ -5071,55 +5232,6 @@ export interface components {
       createdAt: string;
       /** Format: date-time */
       readAt: string | null;
-    };
-    Event: {
-      id: string;
-      slug: string;
-      name: string;
-      description: string;
-      website: string;
-      timezone: string;
-      maxSessionDuration: number;
-      breakMinutes: number;
-      slotIncrementMinutes: number;
-      rsvpCapacityHardLimit: boolean;
-      icon: string | null;
-      meetingsEnabled: boolean;
-      maxOpenMeetingRequests: number;
-      /** Format: date-time */
-      firstDayStart: string | null;
-      /** Format: date-time */
-      lastDayStart: string | null;
-      /**
-       * Format: date-time
-       * @description null clears it
-       */
-      proposalPhaseStart: string | null;
-      /**
-       * Format: date-time
-       * @description null clears it
-       */
-      proposalPhaseEnd: string | null;
-      /**
-       * Format: date-time
-       * @description null clears it
-       */
-      votingPhaseStart: string | null;
-      /**
-       * Format: date-time
-       * @description null clears it
-       */
-      votingPhaseEnd: string | null;
-      /**
-       * Format: date-time
-       * @description null clears it
-       */
-      schedulingPhaseStart: string | null;
-      /**
-       * Format: date-time
-       * @description null clears it
-       */
-      schedulingPhaseEnd: string | null;
     };
     Location: {
       id: string;

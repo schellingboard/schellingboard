@@ -9,3 +9,4 @@ export {
   type EventUseCases,
 } from "./application/use-cases";
 export { addAdminEventRoutes } from "./http/routes";
+export { toEventView } from "./http/view";
