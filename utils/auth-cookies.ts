@@ -189,3 +189,37 @@ export async function readGuestCookie(
 
   return null;
 }
+
+export function cookieOptions(maxAge: number) {
+  return {
+    maxAge,
+    httpOnly: true,
+    path: "/",
+    sameSite: "lax" as const,
+    secure: process.env.NODE_ENV === "production",
+  };
+}
+
+// Signing (the "verified" path) needs AUTH_SECRET; the "open" path never does,
+// so a passwordless site with no protected guests still runs without a secret.
+export async function createGuestCookie(
+  guestId: string,
+  level: GuestAuthLevel
+) {
+  return {
+    name: GUEST_COOKIE_NAME,
+    value:
+      level === "verified"
+        ? await signCookieValue(verifiedScope(guestId))
+        : `open.${guestId}`,
+    ...cookieOptions(COOKIE_MAX_AGE_SEC),
+  };
+}
+
+export function createGuestLogoutCookie() {
+  return {
+    name: GUEST_COOKIE_NAME,
+    value: "",
+    ...cookieOptions(0),
+  };
+}

@@ -3,14 +3,12 @@ import {
   ADMIN_COOKIE_NAME,
   ADMIN_SCOPE,
   COOKIE_MAX_AGE_SEC,
-  GUEST_COOKIE_NAME,
   isAdminCookieValid,
   isAdminEnabled,
   isAuthCookieValid,
   isPasswordProtectionEnabled,
   signCookieValue,
-  verifiedScope,
-  type GuestAuthLevel,
+  cookieOptions,
 } from "@/utils/auth-cookies";
 
 export {
@@ -21,6 +19,8 @@ export {
   isAuthCookieValid,
   isPasswordProtectionEnabled,
   readGuestCookie,
+  createGuestCookie,
+  createGuestLogoutCookie,
   type GuestAuthLevel,
 } from "@/utils/auth-cookies";
 
@@ -113,16 +113,6 @@ export async function isAuthenticated(request: NextRequest): Promise<boolean> {
   return isAuthCookieValid(cookie);
 }
 
-function cookieOptions(maxAge: number) {
-  return {
-    maxAge,
-    httpOnly: true,
-    path: "/",
-    sameSite: "lax" as const,
-    secure: process.env.NODE_ENV === "production",
-  };
-}
-
 // Cookie attributes are spread flat onto the returned object — NOT nested under
 // an `options` key. Next's `cookies().set(obj)` reads cookie attributes
 // (maxAge, httpOnly, secure, sameSite, path) from the top level of `obj`; a
@@ -140,30 +130,6 @@ export async function createAuthCookie() {
 export function createLogoutCookie() {
   return {
     name: AUTH_COOKIE_NAME,
-    value: "",
-    ...cookieOptions(0),
-  };
-}
-
-// Signing (the "verified" path) needs AUTH_SECRET; the "open" path never does,
-// so a passwordless site with no protected guests still runs without a secret.
-export async function createGuestCookie(
-  guestId: string,
-  level: GuestAuthLevel
-) {
-  return {
-    name: GUEST_COOKIE_NAME,
-    value:
-      level === "verified"
-        ? await signCookieValue(verifiedScope(guestId))
-        : `open.${guestId}`,
-    ...cookieOptions(COOKIE_MAX_AGE_SEC),
-  };
-}
-
-export function createGuestLogoutCookie() {
-  return {
-    name: GUEST_COOKIE_NAME,
     value: "",
     ...cookieOptions(0),
   };

@@ -4421,6 +4421,90 @@
         "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
       }
     },
+    "/api/v1/me/identity": {
+      "put": {
+        "tags": ["people"],
+        "description": "Makes this browser act as an open guest name (sets the guest cookie). A protected name answers 403 `guest.protected`: send the user to the login page.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "guestId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The guest to act as"
+                  }
+                },
+                "required": ["guestId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The guest the browser now acts as",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "guestId": {
+                      "type": ["string", "null"],
+                      "description": "The guest the browser now acts as, or null when signed out"
+                    }
+                  },
+                  "required": ["guestId"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+      },
+      "delete": {
+        "tags": ["people"],
+        "description": "Signs the browser out of its guest name (clears the guest cookie).",
+        "responses": {
+          "200": {
+            "description": "Signed out",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "guestId": {
+                      "type": ["string", "null"],
+                      "description": "The guest the browser now acts as, or null when signed out"
+                    }
+                  },
+                  "required": ["guestId"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+      }
+    },
     "/api/v1/guests": {
       "get": {
         "tags": ["people"],

@@ -9,6 +9,7 @@ import {
 } from "./admin-guests";
 import { assignGuestsToEvent, removeGuestsFromEvent } from "./event-guests";
 import { importGuests } from "./guest-import";
+import { chooseGuest, signOut } from "./identity";
 import {
   getProfile,
   listEventProfiles,
@@ -19,6 +20,8 @@ import {
 
 export function createPeopleUseCases(deps: PeopleDeps) {
   return {
+    chooseGuest: chooseGuest(deps),
+    signOut,
     getProfile: getProfile(deps),
     listEventProfiles: listEventProfiles(deps),
     updateMyProfile: updateMyProfile(deps),

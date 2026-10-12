@@ -56,6 +56,14 @@ gives plain reads (no actor: the pages sit behind the site password only), and
 function in a module's `application/page-reads.ts` taking a `Pick` of the
 repositories. `make arch` enforces it, with the auth flows allow-listed.
 
+## Choosing a name
+
+`PUT /api/v1/me/identity` makes the browser act as an open guest name and
+`DELETE` signs it out; both set the `guest` cookie, which the route adapter
+builds from the use case's `Identity` (`people/application/identity.ts`). A
+protected name answers `403 guest.protected`: the SPA sends the user to the
+legacy login. The `selectUserAction` server action calls the same use case.
+
 ## The feed and the snapshot
 
 [ADR 0014](adr/0014-change-feed-and-snapshot.md) has the decisions.

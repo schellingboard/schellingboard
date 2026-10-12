@@ -1,6 +1,10 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import { pageQuerySchema } from "@schellingboard/contracts/cursor-page";
 import {
+  chooseGuestBodySchema,
+  identitySchema,
+} from "@schellingboard/contracts/auth";
+import {
   profileBodySchema,
   publicProfileListSchema,
   publicProfileSchema,
@@ -23,6 +27,7 @@ import {
 } from "@/server/http/route-parts";
 import type { PeopleUseCases } from "../application/use-cases";
 import { toProfileView } from "./view";
+import { setGuestCookie } from "./guest-cookie";
 
 const avatarForm = z.object({
   avatar: z
@@ -112,7 +117,41 @@ const removeMyAvatar = createRoute({
   },
 });
 
+const chooseIdentity = createRoute({
+  method: "put",
+  path: "/me/identity",
+  tags: ["people"],
+  description:
+    "Makes this browser act as an open guest name (sets the guest cookie). A protected name answers 403 `guest.protected`: send the user to the login page.",
+  request: { body: body(chooseGuestBodySchema) },
+  responses: {
+    200: json(identitySchema, "The guest the browser now acts as"),
+    ...problemDefault,
+  },
+});
+
+const signOutIdentity = createRoute({
+  method: "delete",
+  path: "/me/identity",
+  tags: ["people"],
+  description:
+    "Signs the browser out of its guest name (clears the guest cookie).",
+  responses: { 200: json(identitySchema, "Signed out"), ...problemDefault },
+});
+
 export function addPeopleRoutes(app: App, people: () => PeopleUseCases) {
+  app.openapi(chooseIdentity, async (c) => {
+    const result = await people().chooseGuest(c.var.actor, c.req.valid("json"));
+    if (!result.ok) return problem(result.error);
+    await setGuestCookie(c, result.value);
+    return c.json({ guestId: result.value.guestId }, 200);
+  });
+
+  app.openapi(signOutIdentity, async (c) => {
+    await setGuestCookie(c, people().signOut());
+    return c.json({ guestId: null }, 200);
+  });
+
   app.openapi(listEventProfiles, async (c) => {
     const { limit, cursor, eventId } = c.req.valid("query");
     const result = await people().listEventProfiles(c.var.actor, { eventId });

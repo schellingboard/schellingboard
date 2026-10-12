@@ -12,6 +12,10 @@ import { problemResponse } from "./problem";
 
 const MUTATIONS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
+// Their effect is a Set-Cookie, which a replay would not repeat; PUT and DELETE
+// on them are naturally idempotent, so a retry just runs again.
+export const IDEMPOTENCY_EXEMPT_PATHS = ["/api/v1/me/identity"];
+
 // Declared on each mutating route so the OpenAPI document shows it.
 export const idempotencyHeaders = z.object({
   "idempotency-key": z
@@ -66,6 +70,8 @@ export function idempotencyMiddleware({
   return createMiddleware<ApiEnv>(async (c, next) => {
     const key = c.req.header("idempotency-key");
     if (key === undefined || !MUTATIONS.has(c.req.method)) return next();
+    if (IDEMPOTENCY_EXEMPT_PATHS.includes(new URL(c.req.url).pathname))
+      return next();
     if (key === "" || key.length > MAX_KEY_LENGTH) {
       return problemResponse({
         status: 400,
