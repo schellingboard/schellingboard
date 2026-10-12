@@ -167,6 +167,23 @@
 - `app/api/spa/**` is out of scope of the mutating-surface guard (read-only static files).
 - Docs: `docs/dev/web-app.md` (new), getting-started, architecture-rules, README, nav.
 
+## Step 10a (2026-10-09)
+
+- `apps/web/src/replica/` holds copies of `apply`, `store`, `sync-state` (grace fix
+  included), `feed-client` (`retry:` coupling included), `live-replica` and
+  `selectors`, with their tests moved beside them (happy-dom). Copied, not moved to a
+  package: they depend only on `contracts`, but the legacy copy lives until step 16
+  and a new `packages/replica` would need its own rules for one consumer. The
+  `rsvp-overlay` and the React hooks are not copied (steps 11 and 12).
+- `selectors.ts` defines its own `DayWithSessions` rather than reaching into `app/`.
+  The web tests use their own `snapshot-fixture.ts`; delete `tests/helpers/`'s copy
+  with the legacy replica at step 16.
+- `apps/web` now declares `contracts`, `domain` (workspace), `fast-check` 4.10.2 and
+  `fake-indexeddb` 6.2.5. The web Vitest config registers the use-case tags like the
+  server project (the config may import `tests/use-cases`). depcruise: dependency-cruiser
+  reads `workspaces` from the importer's own manifest, so by-name imports inside
+  `apps/web` are `undetermined`; `import-packages-by-name` now accepts that type.
+
 ## Questions
 
 - A session that loses its only room reads `"X" moved to No location (was Room A)`

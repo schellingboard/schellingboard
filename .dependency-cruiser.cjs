@@ -66,7 +66,12 @@ module.exports = {
         "path (`@/packages/…`, `../packages/…`). A path import skips the package's manifest " +
         "and `exports`, so none of the package rules can see it. See ADR 0010.",
       from: { pathNot: "^packages/" },
-      to: { path: "^packages/", dependencyTypesNot: ["aliased-workspace"] },
+      // dependency-cruiser reads `workspaces` from the importer's nearest manifest, so
+      // inside apps/web (which has none) a by-name import is "undetermined", not aliased.
+      to: {
+        path: "^packages/",
+        dependencyTypesNot: ["aliased-workspace", "undetermined"],
+      },
     },
     {
       name: "packages-import-each-other-by-name",
@@ -88,7 +93,8 @@ module.exports = {
         "`apps/web` is a static bundle that talks to the server over `/api/v1`. It may import " +
         "`packages/domain`, `packages/contracts` and `packages/api-client`, never the Next " +
         "app, the server, the database or Next itself. See ADR 0015 section 2.",
-      from: { path: "^apps/web/" },
+      // The test config reads the use-case catalogue to register its tags.
+      from: { path: "^apps/web/", pathNot: "^apps/web/vitest\\.config\\.ts$" },
       to: {
         path: "^(app|server|utils|db|emails|tests|scripts)/|^(proxy|instrumentation)\\.ts$|node_modules/(next|hono|@hono|better-sqlite3|drizzle-orm)/",
       },
