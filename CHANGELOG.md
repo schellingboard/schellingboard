@@ -42,8 +42,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **A double click or double submit no longer repeats the action** (#141): proposals,
   sessions, comments and RSVPs sent twice by a slow connection or a retry count once.
 - **Deleting a guest deletes their photo too**: it used to stay on the server.
-- **Edits no longer overwrite each other** (#1111): saving a session, event setting,
-  profile, guest, day, room or meeting point from a form someone changed in the
+- **Edits no longer overwrite each other** (#1111): saving a session, proposal, event
+  setting, profile, guest, day, room or meeting point from a form someone changed in the
   meantime now says so, instead of silently undoing their change.
 - **Edit opens the session form reliably**: on a slow device, pressing Edit in a
   session's details sometimes left you on the schedule.

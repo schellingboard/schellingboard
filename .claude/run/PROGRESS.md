@@ -844,6 +844,15 @@ None.
 
 - `docs/dev/server.md` gained: page reads, feed and snapshot, keys from the UI.
 
+## 18c
+
+- Public docs already described the snapshot, feed, paging, keys and rate limits
+  (api.md) and the live note (attendee guide). Added the self-hosting section
+  "Live updates through a proxy" (buffering, read timeout, HTTP/2). CHANGELOG
+  already has the live schedule, API, edit-conflict and #141 bullets; the one
+  breaking note (SB_TRUSTED_PROXIES) is marked. Release-notes highlights now
+  two (live schedule, API). Still for the user: `make test-e2e-docker`.
+
 ## Next step
 
-18c.
+19.
