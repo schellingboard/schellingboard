@@ -111,6 +111,7 @@ describe("guest admin use cases", () => {
           email: "ada@x.org",
           authProtected: true,
           eventIds: [event.id],
+          version: 3,
         },
       ]);
       expect(JSON.stringify(listed)).not.toContain("secret-hash");

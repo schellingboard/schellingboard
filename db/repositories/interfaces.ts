@@ -112,7 +112,7 @@ export interface EventsRepository {
   ): Promise<Event | undefined>;
   /**
    * Deletes the event and all records referencing it (cascades via DB FK),
-   * raising the version of the locations it leaves.
+   * raising the version of the locations and guests it leaves.
    */
   delete(id: string): Promise<void>;
 }
@@ -240,7 +240,10 @@ export interface GuestsRepository {
   findById(id: string): Promise<CompleteGuest | undefined>;
   /** Server-only: protection flag + password hash, for credential checks. */
   getAuthCredentials(id: string): Promise<GuestAuthCredentials | null>;
-  /** Returns false when the guest doesn't exist. */
+  /**
+   * Returns false when the guest doesn't exist. Raises the version only when
+   * `authProtected` changes: the hash is in no read.
+   */
   setAuthProtection(id: string, creds: GuestAuthCredentials): Promise<boolean>;
   // Matches the email case-insensitively.
   findByEmail(email: string): Promise<CompleteGuest | undefined>;
@@ -256,15 +259,17 @@ export interface GuestsRepository {
     data: NewGuest
   ): Promise<{ guest: CompleteGuest; created: boolean }>;
   // Usage: an admin updates a user (name and email). Email settings are not
-  // touched: those belong to the guest, via updateProfile.
+  // touched: those belong to the guest, via updateProfile. Undefined, changing
+  // nothing, if the guest is gone or not at `expectedVersion`.
   update(
     id: string,
-    data: { name: string; info: { email: string } }
+    data: { name: string; info: { email: string }; expectedVersion?: number }
   ): Promise<CompleteGuest | undefined>;
   // Usage: a user updates their own public profile (name and profile fields).
   // `profileUpdatedAt` is set to `now` only if a public profile field actually
   // changed — saving the form unchanged must not push you to the top of the
-  // "recently updated" list.
+  // "recently updated" list. Undefined, changing nothing, if the guest is gone
+  // or not at `expectedVersion`.
   updateProfile(
     id: string,
     data: {
@@ -276,6 +281,7 @@ export interface GuestsRepository {
       prompts: ProfilePrompt[] | null;
       languages: string[] | null;
       contacts: ProfileContact[] | null;
+      expectedVersion?: number;
     },
     now: Date
   ): Promise<CompleteGuest | undefined>;

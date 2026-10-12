@@ -86,6 +86,8 @@ function rowToGuest(row: typeof schema.guests.$inferSelect): CompleteGuest {
       ? new Date(row.profileUpdatedAt)
       : null,
     authProtected: row.authProtected,
+    version: row.version,
+    profileVersion: row.profileVersion,
     info: {
       email: row.email,
       emailSettings: {
@@ -117,13 +119,25 @@ export class SqliteGuestsRepository implements GuestsRepository {
     return (await this.listFull())
       .map(sanitizeGuest)
       .map(
-        ({ id, name, aboutMe, avatarUrl, pronouns, authProtected, info }) => ({
+        ({
           id,
           name,
           aboutMe,
           avatarUrl,
           pronouns,
           authProtected,
+          version,
+          profileVersion,
+          info,
+        }) => ({
+          id,
+          name,
+          aboutMe,
+          avatarUrl,
+          pronouns,
+          authProtected,
+          version,
+          profileVersion,
           info,
         })
       );
@@ -377,11 +391,7 @@ export class SqliteGuestsRepository implements GuestsRepository {
   }
 
   async findById(id: string): Promise<CompleteGuest | undefined> {
-    const row = this.db
-      .select()
-      .from(schema.guests)
-      .where(eq(schema.guests.id, id))
-      .get();
+    const row = this.findRow(id);
     return row ? rowToGuest(row) : undefined;
   }
 
@@ -426,6 +436,7 @@ export class SqliteGuestsRepository implements GuestsRepository {
       .set({
         authProtected: creds.authProtected,
         passwordHash: creds.passwordHash,
+        version: sql`${schema.guests.version} + (${schema.guests.authProtected} != ${creds.authProtected ? 1 : 0})`,
       })
       .where(eq(schema.guests.id, id))
       .run();
@@ -445,6 +456,8 @@ export class SqliteGuestsRepository implements GuestsRepository {
       id,
       name,
       authProtected: false,
+      version: 1,
+      profileVersion: 1,
       info: { email, emailSettings: { ...DEFAULT_EMAIL_SETTINGS } },
     };
   }
@@ -479,22 +492,58 @@ export class SqliteGuestsRepository implements GuestsRepository {
     return { guest: existing, created: false };
   }
 
+  private findRow(id: string) {
+    return this.db
+      .select()
+      .from(schema.guests)
+      .where(eq(schema.guests.id, id))
+      .get();
+  }
+
+  private bumpVersions(ids: string[]) {
+    if (ids.length === 0) return;
+    this.db
+      .update(schema.guests)
+      .set({ version: sql`${schema.guests.version} + 1` })
+      .where(inArray(schema.guests.id, [...new Set(ids)]))
+      .run();
+  }
+
   async update(
     id: string,
-    data: { name: string; info: { email: string } }
+    data: { name: string; info: { email: string }; expectedVersion?: number }
   ): Promise<CompleteGuest | undefined> {
     const {
       name,
       info: { email },
+      expectedVersion,
     } = data;
 
-    const result = this.db
-      .update(schema.guests)
-      .set({ name, email })
-      .where(eq(schema.guests.id, id))
-      .run();
-    if (result.changes === 0) return undefined;
-    return this.findById(id);
+    const applied = this.db.transaction(
+      (tx) => {
+        const before = this.findRow(id);
+        if (
+          !before ||
+          (expectedVersion !== undefined && before.version !== expectedVersion)
+        )
+          return false;
+        if (before.name !== name || before.email !== email) {
+          tx.update(schema.guests)
+            .set({
+              name,
+              email,
+              version: before.version + 1,
+              profileVersion:
+                before.profileVersion + (before.name === name ? 0 : 1),
+            })
+            .where(eq(schema.guests.id, id))
+            .run();
+        }
+        return true;
+      },
+      { behavior: "immediate" }
+    );
+    return applied ? this.findById(id) : undefined;
   }
 
   async updateProfile(
@@ -508,37 +557,45 @@ export class SqliteGuestsRepository implements GuestsRepository {
       prompts: ProfilePrompt[] | null;
       languages: string[] | null;
       contacts: ProfileContact[] | null;
+      expectedVersion?: number;
     },
     now: Date
   ): Promise<CompleteGuest | undefined> {
     // Read and write in one transaction: profileUpdatedAt is derived from the
     // row being overwritten, so a concurrent save must not slip in between.
-    const found = this.db.transaction((tx) => {
-      const before = tx
-        .select()
-        .from(schema.guests)
-        .where(eq(schema.guests.id, id))
-        .get();
-      if (!before) return false;
+    const found = this.db.transaction(
+      (tx) => {
+        const before = this.findRow(id);
+        if (
+          !before ||
+          (data.expectedVersion !== undefined &&
+            before.profileVersion !== data.expectedVersion)
+        )
+          return false;
+        const changed = publicProfileChanged(before, data);
 
-      tx.update(schema.guests)
-        .set({
-          name: data.name,
-          aboutMe: data.aboutMe,
-          avatarUrl: data.avatarUrl,
-          pronouns: data.pronouns,
-          basedIn: data.basedIn,
-          prompts: data.prompts,
-          languages: data.languages,
-          contacts: data.contacts,
-          profileUpdatedAt: publicProfileChanged(before, data)
-            ? now.toISOString()
-            : before.profileUpdatedAt,
-        })
-        .where(eq(schema.guests.id, id))
-        .run();
-      return true;
-    });
+        tx.update(schema.guests)
+          .set({
+            name: data.name,
+            aboutMe: data.aboutMe,
+            avatarUrl: data.avatarUrl,
+            pronouns: data.pronouns,
+            basedIn: data.basedIn,
+            prompts: data.prompts,
+            languages: data.languages,
+            contacts: data.contacts,
+            profileUpdatedAt: changed
+              ? now.toISOString()
+              : before.profileUpdatedAt,
+            profileVersion: before.profileVersion + (changed ? 1 : 0),
+            version: before.version + (before.name === data.name ? 0 : 1),
+          })
+          .where(eq(schema.guests.id, id))
+          .run();
+        return true;
+      },
+      { behavior: "immediate" }
+    );
     if (!found) return undefined;
     return this.findById(id);
   }
@@ -581,11 +638,15 @@ export class SqliteGuestsRepository implements GuestsRepository {
 
   async assignToEvent(eventId: string, guestIds: string[]): Promise<void> {
     if (guestIds.length === 0) return;
-    this.db
-      .insert(schema.eventGuests)
-      .values(guestIds.map((guestId) => ({ eventId, guestId })))
-      .onConflictDoNothing()
-      .run();
+    this.db.transaction((tx) => {
+      const added = tx
+        .insert(schema.eventGuests)
+        .values(guestIds.map((guestId) => ({ eventId, guestId })))
+        .onConflictDoNothing()
+        .returning({ guestId: schema.eventGuests.guestId })
+        .all();
+      this.bumpVersions(added.map((r) => r.guestId));
+    });
   }
 
   async importAndAssign(
@@ -626,14 +687,19 @@ export class SqliteGuestsRepository implements GuestsRepository {
         }
       }
 
+      const joined: string[] = [];
       if (guestIds.length > 0) {
         for (const eventId of eventIds) {
-          tx.insert(schema.eventGuests)
+          const added = tx
+            .insert(schema.eventGuests)
             .values(guestIds.map((guestId) => ({ eventId, guestId })))
             .onConflictDoNothing()
-            .run();
+            .returning({ guestId: schema.eventGuests.guestId })
+            .all();
+          joined.push(...added.map((r) => r.guestId));
         }
       }
+      this.bumpVersions(joined);
     });
 
     return { created };
@@ -641,15 +707,19 @@ export class SqliteGuestsRepository implements GuestsRepository {
 
   async removeFromEvent(eventId: string, guestIds: string[]): Promise<void> {
     if (guestIds.length === 0) return;
-    this.db
-      .delete(schema.eventGuests)
-      .where(
-        and(
-          eq(schema.eventGuests.eventId, eventId),
-          inArray(schema.eventGuests.guestId, guestIds)
+    this.db.transaction((tx) => {
+      const removed = tx
+        .delete(schema.eventGuests)
+        .where(
+          and(
+            eq(schema.eventGuests.eventId, eventId),
+            inArray(schema.eventGuests.guestId, guestIds)
+          )
         )
-      )
-      .run();
+        .returning({ guestId: schema.eventGuests.guestId })
+        .all();
+      this.bumpVersions(removed.map((r) => r.guestId));
+    });
   }
 
   async delete(id: string): Promise<void> {

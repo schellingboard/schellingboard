@@ -2,13 +2,18 @@ import { createRoute } from "@hono/zod-openapi";
 import {
   adminGuestBodySchema,
   adminGuestListSchema,
+  adminGuestUpdateBodySchema,
   adminGuestViewSchema,
   eventGuestsBodySchema,
   guestImportBodySchema,
   guestImportResultSchema,
 } from "@schellingboard/contracts/guest";
 import { idempotencyHeaders } from "@/server/http/idempotency";
-import { problem, problemDefault } from "@/server/http/problem";
+import {
+  problem,
+  problemDefault,
+  versionConflictResponse,
+} from "@/server/http/problem";
 import {
   body,
   idParam,
@@ -16,6 +21,7 @@ import {
   noContent,
   type App,
 } from "@/server/http/route-parts";
+import type { AdminGuest } from "../application/admin-guests";
 import type { PeopleUseCases } from "../application/use-cases";
 
 const tags = ["admin"];
@@ -52,10 +58,11 @@ const updateGuest = createRoute({
   request: {
     headers: idempotencyHeaders,
     params: idParam,
-    body: body(adminGuestBodySchema),
+    body: body(adminGuestUpdateBodySchema),
   },
   responses: {
     200: json(adminGuestViewSchema, "The updated guest"),
+    ...versionConflictResponse(adminGuestViewSchema),
     ...problemDefault,
   },
 });
@@ -135,7 +142,7 @@ export function addAdminGuestRoutes(app: App, people: () => PeopleUseCases) {
       ...c.req.valid("json"),
       id: c.req.valid("param").id,
     });
-    if (!result.ok) return problem(result.error);
+    if (!result.ok) return problem(result.error, (g: AdminGuest) => g);
     return c.json(result.value, 200);
   });
 

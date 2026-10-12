@@ -165,6 +165,23 @@ openapi-check typecheck test-coverage` (or `make test`), without E2E. E2E runs
   the one `update` call.
 - 4a3: the CHANGELOG API bullet now says "edits to sessions, proposals or
   event setup"; 4a4 adds profiles to that list (keep it near 40 words).
+- 4a4: guests get two versions (migration 0051), one per read: `version`
+  for the admin view (name, email, `authProtected`, events) and
+  `profileVersion` for the public profile (its fields, photo, name); a name
+  change raises both. Review: one shared version refused a profile edit after
+  an admin-only change the guest could not see (ADR 0012 section 4: a change
+  raises the version of the subjects whose read it changes). Each goes up once
+  per real change: `updateProfile` (when `profileUpdatedAt` moves), `update`
+  (name or email), `setAuthProtection` (only when the flag flips) and
+  `assignToEvent`, `removeFromEvent`, `importAndAssign` and an event delete
+  for each guest whose events changed. Email settings have a read of their
+  own: no bump. `PUT /me/profile`, `PUT /me/avatar` (form field) and
+  `DELETE /me/avatar` (query parameter) require `expectedVersion` and answer
+  `profile.versionConflict` with the public profile; `PUT /admin/guests/{id}`
+  answers `guest.versionConflict` with the admin view, checked before the
+  email (review). `DELETE /me/avatar` answers `200` with the profile (was
+  `204`). A photo upload or removal checks the version before touching the
+  file; a conflict after that no longer deletes the saved file.
 
 ## Problems
 
@@ -172,10 +189,15 @@ None.
 
 ## Questions
 
+- A photo save or removal still races its row (since 3d; 4a4 narrows the
+  window): a conflict or failure after the file is replaced or deleted leaves
+  the row's URL on another or no file. Fix: a new filename per upload, and
+  delete the unused file after commit. A step of its own?
+
 - Deleting a guest (`deleteGuest`) leaves their avatar file in the uploads
   directory; it was so before 3d. Delete it after the row, as `deleteLocation`
   does for its image?
 
 ## Next step
 
-4a4. The run is paused here at the user's request (after the 4a3 review).
+4b.

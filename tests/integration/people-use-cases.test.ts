@@ -176,7 +176,9 @@ describe("editing one's own profile", () => {
       );
       expect(kept.avatarUrl).toBe(withPhoto.avatarUrl);
 
-      const removed = value(await people().removeMyAvatar(open(ada.id), now()));
+      const removed = value(
+        await people().removeMyAvatar(open(ada.id), {}, now())
+      );
       expect(removed.avatarUrl).toBeNull();
       expect(fs.readdirSync(path.join(uploadsDir, "avatars"))).toEqual([]);
     }

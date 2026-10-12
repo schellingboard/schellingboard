@@ -9,6 +9,7 @@ import {
   createSession,
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
+import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
 
 describe("guest profile repositories", () => {
   beforeAll(() => setupTestDb());
@@ -274,6 +275,124 @@ describe("guest profile repositories", () => {
 
       const result = await sessionProposals.listByHost(guest.id);
       expect(result.map((p) => p.id)).toEqual([mine.id]);
+    });
+  });
+
+  describe("guests version", () => {
+    it("goes up once per change to a guest's admin view or events, and not for a no-op", async () => {
+      const { guests, events } = getRepositories();
+      const event = await createEvent();
+      const other = await createEvent();
+      const guest = await createGuest({ email: "ada@x.org" });
+      const version = async () => (await guests.findById(guest.id))!.version;
+      const steps: [() => Promise<unknown>, number][] = [
+        [() => guests.assignToEvent(event.id, [guest.id]), 2],
+        [() => guests.assignToEvent(event.id, [guest.id]), 2],
+        [() => guests.removeFromEvent(event.id, [guest.id]), 3],
+        [() => guests.removeFromEvent(event.id, [guest.id]), 3],
+        [
+          () =>
+            guests.importAndAssign(
+              [{ name: "Ada", email: "ADA@x.org" }],
+              [event.id, other.id]
+            ),
+          4,
+        ],
+        [() => events.delete(other.id), 5],
+        [
+          () =>
+            guests.setAuthProtection(guest.id, {
+              authProtected: true,
+              passwordHash: "h1",
+            }),
+          6,
+        ],
+        [
+          () =>
+            guests.setAuthProtection(guest.id, {
+              authProtected: true,
+              passwordHash: "h2",
+            }),
+          6,
+        ],
+        [
+          () =>
+            guests.updateEmailSettings(guest.id, {
+              ...DEFAULT_EMAIL_SETTINGS,
+              commentThread: true,
+            }),
+          6,
+        ],
+        [
+          () =>
+            guests.update(guest.id, {
+              name: guest.name,
+              info: { email: "ada@x.org" },
+            }),
+          6,
+        ],
+        [
+          () =>
+            guests.update(guest.id, {
+              name: guest.name,
+              info: { email: "ada@y.org" },
+              expectedVersion: 5,
+            }),
+          6,
+        ],
+      ];
+      for (const [step, expected] of steps) {
+        await step();
+        expect(await version()).toBe(expected);
+      }
+      expect(await guests.findById(guest.id)).toMatchObject({
+        info: { email: "ada@x.org" },
+        profileVersion: 1,
+      });
+    });
+
+    it("keeps a profile version that only profile fields and the name raise", async () => {
+      const { guests } = getRepositories();
+      const guest = await createGuest({ name: "Ada", email: "ada@x.org" });
+      const profile = {
+        name: "Ada",
+        aboutMe: "Hi",
+        avatarUrl: null,
+        pronouns: null,
+        basedIn: null,
+        prompts: null,
+        languages: null,
+        contacts: null,
+      };
+      const versions = async () => {
+        const g = (await guests.findById(guest.id))!;
+        return [g.profileVersion, g.version];
+      };
+
+      await guests.updateProfile(guest.id, profile, new Date());
+      expect(await versions()).toEqual([2, 1]);
+      await guests.updateProfile(
+        guest.id,
+        { ...profile, expectedVersion: 1 },
+        new Date()
+      );
+      expect(await versions()).toEqual([2, 1]);
+      await guests.updateProfile(
+        guest.id,
+        { ...profile, name: "Ada L.", expectedVersion: 2 },
+        new Date()
+      );
+      expect(await versions()).toEqual([3, 2]);
+      await guests.update(guest.id, {
+        name: "Ada L.",
+        info: { email: "ada@y.org" },
+      });
+      expect(await versions()).toEqual([3, 3]);
+      await guests.update(guest.id, {
+        name: "Ada",
+        info: { email: "ada@y.org" },
+      });
+      expect(await versions()).toEqual([4, 4]);
     });
   });
 });

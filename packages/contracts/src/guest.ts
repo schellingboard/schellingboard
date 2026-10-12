@@ -5,6 +5,7 @@ import {
   MAX_LANGUAGES,
   type EmailSettings,
 } from "@schellingboard/domain/guest";
+import { expectedVersion } from "./session";
 
 export const emailSettingsSchema = z.object({
   rsvpChange: z.boolean(),
@@ -133,9 +134,12 @@ export const createGuestSchema = z.object({
 
 export const updateGuestSchema = createGuestSchema.extend({
   id: z.string().nonempty(),
+  expectedVersion: expectedVersion.optional(),
 });
 
-export const profileBodySchema = profileSchema.omit({ avatar: true });
+export const profileBodySchema = profileSchema
+  .omit({ avatar: true })
+  .extend({ expectedVersion });
 
 const nullableList = <T extends z.ZodType>(item: T) => z.array(item).nullable();
 
@@ -159,12 +163,17 @@ export const publicProfileSchema = z
       })
     ),
     profileUpdatedAt: z.iso.datetime({ offset: true }).nullable(),
+    version: z.number().int(),
   })
   .meta({ id: "PublicProfile" });
 
 export const adminGuestBodySchema = z.object({
   name: z.string(),
   email: z.string(),
+});
+
+export const adminGuestUpdateBodySchema = adminGuestBodySchema.extend({
+  expectedVersion,
 });
 
 // What an organizer sees of a guest: never the password hash.
@@ -175,6 +184,7 @@ export const adminGuestViewSchema = z
     email: z.string(),
     authProtected: z.boolean(),
     eventIds: z.array(z.string()),
+    version: z.number().int(),
   })
   .meta({ id: "AdminGuest" });
 

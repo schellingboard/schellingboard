@@ -443,7 +443,8 @@
           "profileUpdatedAt": {
             "type": ["string", "null"],
             "format": "date-time"
-          }
+          },
+          "version": { "type": "integer" }
         },
         "required": [
           "id",
@@ -455,7 +456,8 @@
           "prompts",
           "languages",
           "contacts",
-          "profileUpdatedAt"
+          "profileUpdatedAt",
+          "version"
         ]
       },
       "Notification": {
@@ -542,9 +544,17 @@
           "name": { "type": "string" },
           "email": { "type": "string" },
           "authProtected": { "type": "boolean" },
-          "eventIds": { "type": "array", "items": { "type": "string" } }
+          "eventIds": { "type": "array", "items": { "type": "string" } },
+          "version": { "type": "integer" }
         },
-        "required": ["id", "name", "email", "authProtected", "eventIds"]
+        "required": [
+          "id",
+          "name",
+          "email",
+          "authProtected",
+          "eventIds",
+          "version"
+        ]
       }
     },
     "parameters": {}
@@ -3639,9 +3649,13 @@
                       "required": ["type", "value"]
                     },
                     "default": null
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "description": "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
                   }
                 },
-                "required": ["name"]
+                "required": ["name", "expectedVersion"]
               }
             }
           }
@@ -3652,6 +3666,36 @@
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/PublicProfile" }
+              }
+            }
+          },
+          "409": {
+            "description": "A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    },
+                    "current": { "$ref": "#/components/schemas/PublicProfile" }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
               }
             }
           },
@@ -3695,9 +3739,14 @@
                     "type": "string",
                     "format": "binary",
                     "description": "JPEG, PNG or WebP, at most 5 MiB, at least 256 px square"
+                  },
+                  "expectedVersion": {
+                    "type": "string",
+                    "pattern": "^\\d+$",
+                    "description": "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
                   }
                 },
-                "required": ["avatar"]
+                "required": ["avatar", "expectedVersion"]
               }
             }
           }
@@ -3708,6 +3757,36 @@
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/PublicProfile" }
+              }
+            }
+          },
+          "409": {
+            "description": "A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    },
+                    "current": { "$ref": "#/components/schemas/PublicProfile" }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
               }
             }
           },
@@ -3728,6 +3807,17 @@
           {
             "schema": {
               "type": "string",
+              "pattern": "^\\d+$",
+              "description": "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
+            },
+            "required": true,
+            "description": "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`",
+            "name": "expectedVersion",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
               "minLength": 1,
               "maxLength": 255,
               "description": "Retries with the same key get the first response (24 h)"
@@ -3739,7 +3829,44 @@
           }
         ],
         "responses": {
-          "204": { "description": "Removed" },
+          "200": {
+            "description": "The profile without a photo",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PublicProfile" }
+              }
+            }
+          },
+          "409": {
+            "description": "A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    },
+                    "current": { "$ref": "#/components/schemas/PublicProfile" }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          },
           "default": {
             "description": "Problem details (RFC 9457); clients branch on `code`",
             "content": {
@@ -5762,9 +5889,13 @@
                 "type": "object",
                 "properties": {
                   "name": { "type": "string" },
-                  "email": { "type": "string" }
+                  "email": { "type": "string" },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "description": "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
+                  }
                 },
-                "required": ["name", "email"]
+                "required": ["name", "email", "expectedVersion"]
               }
             }
           }
@@ -5775,6 +5906,36 @@
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/AdminGuest" }
+              }
+            }
+          },
+          "409": {
+            "description": "A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    },
+                    "current": { "$ref": "#/components/schemas/AdminGuest" }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
               }
             }
           },

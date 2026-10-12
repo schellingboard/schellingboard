@@ -48,9 +48,10 @@ function call(
 
 const asGuest = (id: string) => `${GUEST_COOKIE_NAME}=${openGuestValue(id)}`;
 
-async function avatarForm(size: number) {
+async function avatarForm(size: number, expectedVersion = 1) {
   const form = new FormData();
   form.set("avatar", await createImageFile(size, size, "me.png"));
+  form.set("expectedVersion", String(expectedVersion));
   return form;
 }
 
@@ -105,7 +106,11 @@ describe("/api/v1 profiles", () => {
     { tags: ["011-US1"] },
     async () => {
       const ada = await createGuest({ name: "Ada" });
-      const profile = { name: "Ada L.", languages: ["English", ""] };
+      const profile = {
+        name: "Ada L.",
+        languages: ["English", ""],
+        expectedVersion: 1,
+      };
 
       const saved = await call("PUT", "/me/profile", {
         cookie: asGuest(ada.id),
@@ -115,6 +120,7 @@ describe("/api/v1 profiles", () => {
       expect(await saved.json()).toMatchObject({
         name: "Ada L.",
         languages: ["English"],
+        version: 2,
       });
 
       const refused = await call("PUT", "/me/profile", { body: profile });
@@ -155,15 +161,84 @@ describe("/api/v1 profiles", () => {
       expect(body.avatarUrl).toMatch(/^\/media\/avatars\/.+\.png\?v=\d+$/);
       expect(await (await upload()).json()).toEqual(body);
 
-      const removed = await call("DELETE", "/me/avatar", {
+      const removed = await call("DELETE", "/me/avatar?expectedVersion=2", {
         cookie: asGuest(ada.id),
       });
-      expect(removed.status).toBe(204);
+      expect(removed.status).toBe(200);
+      expect(await removed.json()).toMatchObject({
+        avatarUrl: null,
+        version: 3,
+      });
       expect(
         (await getRepositories().guests.findById(ada.id))?.avatarUrl ?? null
       ).toBeNull();
     }
   );
+
+  it(
+    "refuses profile and photo edits made from an outdated version, answering with the profile as it is",
+    { tags: ["011-US1", "011-US2", "019-US7"] },
+    async () => {
+      const ada = await createGuest({ name: "Ada" });
+      const me = asGuest(ada.id);
+      const save = (name: string, expectedVersion: number) =>
+        call("PUT", "/me/profile", {
+          cookie: me,
+          body: { name, expectedVersion },
+        });
+      expect(await (await save("Ada L.", 1)).json()).toMatchObject({
+        version: 2,
+      });
+      expect(await (await save("Ada L.", 2)).json()).toMatchObject({
+        version: 2,
+      });
+      await getRepositories().guests.assignToEvent((await createEvent()).id, [
+        ada.id,
+      ]);
+
+      const stale = [
+        await save("Ada Lovelace", 1),
+        await call("PUT", "/me/avatar", {
+          cookie: me,
+          form: await avatarForm(256, 1),
+        }),
+        await call("DELETE", "/me/avatar?expectedVersion=1", { cookie: me }),
+      ];
+
+      for (const res of stale) {
+        expect(res.status).toBe(409);
+        expect(await res.json()).toMatchObject({
+          code: "profile.versionConflict",
+          current: { id: ada.id, name: "Ada L.", version: 2 },
+        });
+      }
+      expect(
+        fs.readdirSync(uploadsDir, { recursive: true })
+      ).not.toContainEqual(expect.stringMatching(/\.png$/));
+      expect(await getRepositories().guests.findById(ada.id)).toMatchObject({
+        name: "Ada L.",
+        avatarUrl: null,
+        profileVersion: 2,
+      });
+    }
+  );
+
+  it("refuses profile and photo edits without expectedVersion", async () => {
+    const me = asGuest((await createGuest()).id);
+    const photo = new FormData();
+    photo.set("avatar", await createImageFile(256, 256, "me.png"));
+    for (const res of [
+      await call("PUT", "/me/profile", { cookie: me, body: { name: "Ada" } }),
+      await call("PUT", "/me/avatar", { cookie: me, form: photo }),
+      await call("DELETE", "/me/avatar", { cookie: me }),
+    ]) {
+      expect(res.status).toBe(400);
+      expect(await res.json()).toMatchObject({
+        code: "request.invalid",
+        errors: [expect.objectContaining({ path: "expectedVersion" })],
+      });
+    }
+  });
 
   it(
     "answers an unusable photo with avatar.invalid, and an unparsable body with request.invalid",

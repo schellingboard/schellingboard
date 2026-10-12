@@ -11,6 +11,7 @@ import {
   notFound,
   ok,
   unavailable,
+  versionConflict,
   type Failure,
   type Result,
 } from "@/server/kernel/result";
@@ -22,6 +23,7 @@ export interface AdminGuest {
   email: string;
   authProtected: boolean;
   eventIds: string[];
+  version: number;
 }
 
 export interface GuestInput {
@@ -67,6 +69,7 @@ function toAdminGuest(guest: CompleteGuest, eventIds: string[]): AdminGuest {
     email: guest.info.email,
     authProtected: guest.authProtected ?? false,
     eventIds,
+    version: guest.version,
   };
 }
 
@@ -150,12 +153,24 @@ export const updateGuest =
     if (!actor.admin) return adminRequired();
     const parsed = parseGuest(updateGuestSchema, input);
     if (!parsed.ok) return parsed;
-    const { id, name, email } = parsed.value;
+    const { id, name, email, expectedVersion } = parsed.value;
 
     return uow.run(async (tx) => {
+      const current = await tx.guests.findById(id);
+      if (!current) return guestNotFound();
+      if (expectedVersion !== undefined && current.version !== expectedVersion)
+        return versionConflict(
+          "guest",
+          await withEvents(tx.guests, current),
+          "Someone changed this guest while you edited it"
+        );
       const existing = await tx.guests.findByEmail(email);
       if (existing && existing.id !== id) return emailTaken();
-      const updated = await tx.guests.update(id, { name, info: { email } });
+      const updated = await tx.guests.update(id, {
+        name,
+        info: { email },
+        expectedVersion,
+      });
       if (!updated) return guestNotFound();
       return ok(await withEvents(tx.guests, updated));
     });
