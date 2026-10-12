@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@schellingboard/contracts": "workspace:*",
+    "@schellingboard/domain": "workspace:*",
     "@tanstack/react-router": "1.170.38",
     "react": "^19",
     "react-dom": "^19"
@@ -14,9 +16,11 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "6.1.1",
+    "fake-indexeddb": "6.2.5",
+    "fast-check": "4.10.2",
     "happy-dom": "20.14.4",
     "tailwindcss": "^4.3.3",
     "vite": "8.3.0",
-    "vitest": "5.0.3"
+    "vitest": "5.0.4"
   }
 }
