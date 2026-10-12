@@ -1,4 +1,4 @@
-import { and, asc, gt, inArray, lt, lte } from "drizzle-orm";
+import { and, asc, gt, inArray, lt, lte, sql } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
 import * as schema from "../../schema";
@@ -108,6 +108,13 @@ export class SqliteChangesRepository implements ChangesRepository {
       .returning({ seq: schema.changes.seq })
       .get();
     return { ...change, ...meta, seq, id };
+  }
+
+  async getNewestSeq(): Promise<number> {
+    const row = this.db.get<{ seq: number }>(
+      sql`SELECT seq FROM sqlite_sequence WHERE name = 'changes'`
+    );
+    return row?.seq ?? 0;
   }
 
   async listAfter(seq: number, limit = 100): Promise<RecordedChange[]> {

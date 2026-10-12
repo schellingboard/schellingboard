@@ -1,4 +1,6 @@
+import type { LocationUnavailability } from "@schellingboard/domain/location";
 import type { Session } from "@schellingboard/domain/session";
+import type { unavailabilityViewSchema } from "@schellingboard/contracts/location";
 import type { sessionViewSchema } from "@schellingboard/contracts/session";
 import type { z } from "zod";
 
@@ -19,5 +21,17 @@ export function toSessionView(s: Session): z.input<typeof sessionViewSchema> {
     locations: s.locations.map(({ id, name, color }) => ({ id, name, color })),
     numRsvps: s.numRsvps,
     version: s.version,
+  };
+}
+
+export function toUnavailabilityView(
+  p: LocationUnavailability
+): z.input<typeof unavailabilityViewSchema> {
+  return {
+    id: p.id,
+    eventId: p.eventId,
+    locationId: p.locationId,
+    start: p.start.toISOString(),
+    end: p.end.toISOString(),
   };
 }

@@ -27,25 +27,14 @@ import {
 } from "@/utils/location-image-constraints";
 import type { LocationWithEvents } from "../application/locations";
 import type { VenueUseCases } from "../application/use-cases";
+import { toLocationView } from "./view";
 
 const tags = ["admin"];
 
-function toLocationView(
+function toLocationWithEventsView(
   l: LocationWithEvents
 ): z.input<typeof locationViewSchema> {
-  return {
-    id: l.id,
-    name: l.name,
-    description: l.description,
-    areaDescription: l.areaDescription ?? null,
-    capacity: l.capacity,
-    color: l.color,
-    bookable: l.bookable,
-    imageUrl: l.imageUrl,
-    sortIndex: l.sortIndex,
-    eventIds: l.eventIds,
-    version: l.version,
-  };
+  return { ...toLocationView(l), eventIds: l.eventIds };
 }
 
 const listLocations = createRoute({
@@ -198,7 +187,10 @@ export function addAdminVenueRoutes(app: App, venue: () => VenueUseCases) {
       c.req.valid("query")
     );
     if (!result.ok) return problem(result.error);
-    return c.json({ locations: result.value.map(toLocationView) }, 200);
+    return c.json(
+      { locations: result.value.map(toLocationWithEventsView) },
+      200
+    );
   });
 
   app.openapi(createLocation, async (c) => {
@@ -207,7 +199,7 @@ export function addAdminVenueRoutes(app: App, venue: () => VenueUseCases) {
       c.req.valid("json")
     );
     if (!result.ok) return problem(result.error);
-    return c.json(toLocationView(result.value), 201);
+    return c.json(toLocationWithEventsView(result.value), 201);
   });
 
   app.openapi(updateLocation, async (c) => {
@@ -215,8 +207,8 @@ export function addAdminVenueRoutes(app: App, venue: () => VenueUseCases) {
       ...c.req.valid("json"),
       id: c.req.valid("param").id,
     });
-    if (!result.ok) return problem(result.error, toLocationView);
-    return c.json(toLocationView(result.value), 200);
+    if (!result.ok) return problem(result.error, toLocationWithEventsView);
+    return c.json(toLocationWithEventsView(result.value), 200);
   });
 
   app.openapi(replaceLocationImage, async (c) => {
@@ -226,8 +218,8 @@ export function addAdminVenueRoutes(app: App, venue: () => VenueUseCases) {
       image: Buffer.from(await image.arrayBuffer()),
       expectedVersion,
     });
-    if (!result.ok) return problem(result.error, toLocationView);
-    return c.json(toLocationView(result.value), 200);
+    if (!result.ok) return problem(result.error, toLocationWithEventsView);
+    return c.json(toLocationWithEventsView(result.value), 200);
   });
 
   app.openapi(removeLocationImage, async (c) => {
@@ -235,8 +227,8 @@ export function addAdminVenueRoutes(app: App, venue: () => VenueUseCases) {
       id: c.req.valid("param").id,
       ...c.req.valid("query"),
     });
-    if (!result.ok) return problem(result.error, toLocationView);
-    return c.json(toLocationView(result.value), 200);
+    if (!result.ok) return problem(result.error, toLocationWithEventsView);
+    return c.json(toLocationWithEventsView(result.value), 200);
   });
 
   app.openapi(deleteLocation, async (c) => {
@@ -253,8 +245,11 @@ export function addAdminVenueRoutes(app: App, venue: () => VenueUseCases) {
       ...c.req.valid("json"),
       id: c.req.valid("param").id,
     });
-    if (!result.ok) return problem(result.error, toLocationView);
-    return c.json({ locations: result.value.map(toLocationView) }, 200);
+    if (!result.ok) return problem(result.error, toLocationWithEventsView);
+    return c.json(
+      { locations: result.value.map(toLocationWithEventsView) },
+      200
+    );
   });
 
   app.openapi(assign, async (c) => {

@@ -6,3 +6,5 @@ export {
 } from "./application/use-cases";
 export { addMeetingRoutes } from "./http/routes";
 export { addAdminMeetingRoutes } from "./http/admin-routes";
+export { eventMeetings } from "./application/snapshot";
+export { toMeetingPointView, toMeetingView } from "./http/view";

@@ -8,6 +8,7 @@ import {
   isNull,
   or,
   sql,
+  type SQL,
 } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
@@ -165,6 +166,39 @@ export class SqliteGuestsRepository implements GuestsRepository {
       .all()
       .map((row) => row as Guest);
     return rows;
+  }
+
+  async listShownByEvent(eventId: string): Promise<Guest[]> {
+    const shown = sql`
+      SELECT guest_id FROM event_guests WHERE event_id = ${eventId}
+      UNION SELECT sh.guest_id FROM session_hosts sh
+        JOIN sessions s ON s.id = sh.session_id WHERE s.event_id = ${eventId}
+`;
+    return this.listLean(sql`${schema.guests.id} IN (${shown})`);
+  }
+
+  async listByIds(ids: string[]): Promise<Guest[]> {
+    if (ids.length === 0) return [];
+    return this.listLean(inArray(schema.guests.id, ids));
+  }
+
+  private listLean(where: SQL): Guest[] {
+    const g = schema.guests;
+    return this.db
+      .select({
+        id: g.id,
+        name: g.name,
+        avatarUrl: g.avatarUrl,
+        aboutMe: g.aboutMe,
+        authProtected: g.authProtected,
+        version: g.version,
+        profileVersion: g.profileVersion,
+      })
+      .from(g)
+      .where(where)
+      .orderBy(g.id)
+      .all()
+      .map((row) => ({ ...row, info: undefined }));
   }
 
   async listProfilesByEvent(eventId: string): Promise<Guest[]> {

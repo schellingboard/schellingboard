@@ -61,10 +61,14 @@ carries only ids.
   `event_id` for site-level changes
   ([06](../target-architecture/06-data-and-time.md#the-change-log-table)):
   a per-event feed cannot resume over such rows.
-- **Event guests** are the guests the event shows: its members, plus every
-  guest that a session or meeting of the event names (a host need not be a
-  member, and leaving keeps hosts and meetings). `guest.joined` and
-  `guest.left` mean entering and leaving that set, so `hostIds` always resolve.
+- **Event guests** are the guests the event shows everyone: its members and
+  its sessions' hosts (a host need not be a member, and leaving keeps hosted
+  sessions). `guest.joined` and `guest.left` mean entering and leaving that
+  set, so `hostIds` always resolve. Meeting parties are not in it: a meeting
+  request is private to its two guests. A viewer gets the other party of each
+  own meeting in `me.meetingGuests`, and a meeting change carries both
+  parties' lean fields, so a partner's rename shows with the next change to
+  that meeting.
 - **Audiences** are the three that today's model has:
   `{ kind: "event" }`, `{ kind: "guests", ids }` and `{ kind: "admins" }`.
   `event` means anyone who may open the event page today, which is anyone past
@@ -150,12 +154,16 @@ The snapshot contains what `EventContext` holds today, normalized:
 - `counts`: `numRsvps` by session;
 - `meetingPoints`;
 - `me`, only for a viewer as in section 2: `guestId`, own RSVPs, own meetings
-  (raw, without clash lines), own meeting slots.
+  (raw, without clash lines) and their other parties (`meetingGuests`), own
+  meeting slots.
 
 It is assembled in one `uow.read`, so the state and its `seq` agree.
-`server/feed/snapshot.ts` builds it from module queries. A new
-dependency-cruiser rule lets `server/feed/` import modules only through
-`module.ts`. `GET /api/v1/events/{slug}/snapshot` serves it, and the SSR layout
+`server/feed/snapshot.ts` builds it from module queries and the kernel's
+`newestSeq`. It imports modules only through `module.ts` (an existing
+dependency-cruiser rule) and no `db/` code beyond types (a new rule), so it
+reaches the repositories only through `uow.read`. The repositories it may use
+are typed as the ones those queries take; review, not a rule, keeps it from
+calling them directly. `GET /api/v1/events/{slug}/snapshot` serves it, and the SSR layout
 calls the same query. Golden-file tests cover each viewer (step 10).
 
 ### 8. Denormalized fields
