@@ -18,8 +18,8 @@ export function ProfileComments({ profileId }: { profileId: string }) {
   );
 
   const create = useCallback(
-    (input: CommentCreateInput) =>
-      createProfileComment({ profileId, ...input }),
+    (input: CommentCreateInput, key: string) =>
+      createProfileComment({ profileId, ...input }, key),
     [profileId]
   );
   const permalinkFor = useCallback(

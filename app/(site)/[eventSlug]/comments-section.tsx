@@ -13,6 +13,7 @@ import {
 import type { CommentActionResult } from "./comment-actions";
 import { deleteComment, updateComment } from "./comment-actions";
 import { useLocalZone } from "@/utils/hooks";
+import { newIdempotencyKey } from "@/utils/idempotency-key";
 import { CommentLikes } from "./comment-likes";
 import type { LoadedComments } from "./use-comments";
 import { formatInLocalZone } from "@schellingboard/domain/time";
@@ -22,7 +23,10 @@ export type CommentCreateInput = { parentId?: string; body: string };
 // Scope-specific: proposals, sessions and profiles differ in the action called
 // and in where a permalink points. Everything else about commenting is shared.
 type CommentActions = {
-  create: (input: CommentCreateInput) => Promise<CommentActionResult>;
+  create: (
+    input: CommentCreateInput,
+    idempotencyKey: string
+  ) => Promise<CommentActionResult>;
   permalinkFor: (commentId: string) => string;
   changed: () => void;
 };
@@ -147,7 +151,7 @@ export function CommentsSection({
 
       {!actions ? null : currentUserId ? (
         <CommentForm
-          onSubmit={(body) => actions.create({ body })}
+          onSubmit={(body, key) => actions.create({ body }, key)}
           clearOnSuccess
           placeholder="Add a comment"
           submitLabel="Comment"
@@ -347,7 +351,9 @@ function CommentThread({
 
             {replying && actions && (
               <CommentForm
-                onSubmit={(body) => actions.create({ parentId: node.id, body })}
+                onSubmit={(body, key) =>
+                  actions.create({ parentId: node.id, body }, key)
+                }
                 clearOnSuccess
                 placeholder="Write a reply"
                 submitLabel="Reply"
@@ -406,7 +412,7 @@ function CommentForm({
   onDone,
   onChanged,
 }: {
-  onSubmit: (body: string) => Promise<CommentActionResult>;
+  onSubmit: (body: string, key: string) => Promise<CommentActionResult>;
   clearOnSuccess?: boolean;
   initialBody?: string;
   placeholder: string;
@@ -419,13 +425,14 @@ function CommentForm({
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const formId = useId();
+  const [idempotencyKey, setIdempotencyKey] = useState(newIdempotencyKey);
 
   const doSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSubmitting(true);
     try {
-      const result = await onSubmit(body);
+      const result = await onSubmit(body, idempotencyKey);
       if ("error" in result) {
         setError(
           typeof result.error === "string"
@@ -436,6 +443,7 @@ function CommentForm({
       }
       if (clearOnSuccess) {
         setBody("");
+        setIdempotencyKey(newIdempotencyKey());
       }
       onDone?.();
       onChanged?.();

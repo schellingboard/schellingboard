@@ -797,6 +797,12 @@ None.
 - CHANGELOG: one `(#141)` bullet (double submits no longer duplicate) is added
   by 17c, when the RSVP toggle completes the feature.
 
+## 17b2
+
+- The three comment create actions take a key via `createOnce` (same
+  `idempotentAction`); the compose box and each reply box hold a key and
+  renew it after a success. Edit has no key. Not run: E2E (user's rule).
+
 ## Next step
 
-17b2.
+17b3.
