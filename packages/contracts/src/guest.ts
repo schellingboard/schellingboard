@@ -134,7 +134,7 @@ export const createGuestSchema = z.object({
 
 export const updateGuestSchema = createGuestSchema.extend({
   id: z.string().nonempty(),
-  expectedVersion: expectedVersion.optional(),
+  expectedVersion,
 });
 
 export const profileBodySchema = profileSchema

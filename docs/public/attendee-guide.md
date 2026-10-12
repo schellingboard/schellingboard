@@ -458,6 +458,10 @@ appears — proposals, hosting, RSVPs.
 About me, conversation-starter answers, and contact details all accept
 Markdown, and a web or email address you paste in becomes clickable on its own.
 
+If your profile changed while you had the form open, for example from another
+tab or because an organizer renamed you, your save is refused rather than
+undoing that change. Copy your edits, reload the page, and make them again.
+
 ![Edit profile form with name, pronouns, avatar, and a Markdown-supported about-me field](../screenshots/edit-profile.webp)
 
 ## Protect your name

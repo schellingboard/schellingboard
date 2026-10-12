@@ -33,13 +33,13 @@ async function locationChangedMeanwhile(
     ? versionConflict(
         "location",
         { ...current, eventIds: await locations.listEventIds(id) },
-        "Someone changed this location while you edited it"
+        "Someone changed this location while you edited it. Copy your edits somewhere safe: reloading the page discards them."
       )
     : locationNotFound();
 }
 
-const outdated = (location: Location, expectedVersion: number | undefined) =>
-  expectedVersion !== undefined && location.version !== expectedVersion;
+const outdated = (location: Location, expectedVersion: number) =>
+  location.version !== expectedVersion;
 
 // The image is checked before anything is stored, so a bad upload doesn't
 // leave a half-created location behind.
@@ -202,7 +202,7 @@ export const moveLocation =
   (deps: VenueDeps) =>
   async (
     actor: Actor,
-    input: { id: string; direction: "up" | "down"; expectedVersion?: number }
+    input: { id: string; direction: "up" | "down"; expectedVersion: number }
   ): Promise<Result<LocationWithEvents[]>> => {
     if (!actor.admin) return adminRequired();
     const moved = await deps.uow.run(async (tx) => {

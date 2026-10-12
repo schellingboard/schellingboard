@@ -96,7 +96,12 @@ describe("admin guest actions", () => {
       const guest = await createGuest();
       cookieJar.clear();
       expect(
-        await updateGuestAction({ id: guest.id, name: "X", email: "x@x.de" })
+        await updateGuestAction({
+          id: guest.id,
+          expectedVersion: guest.version,
+          name: "X",
+          email: "x@x.de",
+        })
       ).toEqual({ ok: false, error: "Unauthorized" });
       expect(await deleteGuestAction({ id: guest.id })).toEqual({
         ok: false,
@@ -194,6 +199,7 @@ describe("admin guest actions", () => {
       const guest = await createGuest();
       const result = await updateGuestAction({
         id: guest.id,
+        expectedVersion: guest.version,
         name: "New Name",
         email: "new@test.example",
       });
@@ -209,6 +215,7 @@ describe("admin guest actions", () => {
       const guest = await createGuest({ email: "keep@test.example" });
       const result = await updateGuestAction({
         id: guest.id,
+        expectedVersion: guest.version,
         name: "Renamed",
         email: "keep@test.example",
       });
@@ -220,6 +227,7 @@ describe("admin guest actions", () => {
       const guest = await createGuest({ email: "mine@test.example" });
       const result = await updateGuestAction({
         id: guest.id,
+        expectedVersion: guest.version,
         name: "Name",
         email: "taken@test.example",
       });
@@ -234,9 +242,45 @@ describe("admin guest actions", () => {
       });
     });
 
+    it("refuses an edit from a version the guest has moved past", async () => {
+      const guest = await createGuest({ email: "mine@test.example" });
+      const edit = (name: string) =>
+        updateGuestAction({
+          id: guest.id,
+          name,
+          email: "mine@test.example",
+          expectedVersion: guest.version,
+        });
+
+      expect(await edit("First")).toEqual({ ok: true });
+      expect(await edit("Second")).toEqual({
+        ok: false,
+        error: expect.stringMatching(
+          /^Someone changed this guest while you edited it\. Copy your edits/
+        ) as string,
+      });
+      expect((await getRepositories().guests.findById(guest.id))?.name).toBe(
+        "First"
+      );
+    });
+
+    it("refuses an edit that names no version", async () => {
+      const guest = await createGuest({ email: "mine@test.example" });
+      const result = await updateGuestAction({
+        id: guest.id,
+        name: "Renamed",
+        email: "mine@test.example",
+      } as Parameters<typeof updateGuestAction>[0]);
+      expect(result.ok).toBe(false);
+      expect((await getRepositories().guests.findById(guest.id))?.name).toBe(
+        guest.name
+      );
+    });
+
     it("errors for an unknown id", async () => {
       const result = await updateGuestAction({
         id: "does-not-exist",
+        expectedVersion: 1,
         name: "Name",
         email: "x@test.example",
       });

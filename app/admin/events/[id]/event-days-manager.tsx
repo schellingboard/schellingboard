@@ -27,6 +27,7 @@ export type SerializedDay = {
   end: string;
   startBookings: string;
   endBookings: string;
+  version: number;
   // Titles of scheduled sessions overlapping this day's window — i.e. the
   // sessions that deleting the day will also delete.
   affectedSessionTitles: string[];
@@ -193,12 +194,14 @@ function DayRow({
   const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [deleteMode, setDeleteMode] = useState(false);
-  const [form, setFormState] = useState<Omit<DayInput, "eventId">>({
+  const loaded = () => ({
     start: utcToZonedInput(day.start, timezone),
     end: utcToZonedInput(day.end, timezone),
     startBookings: utcToZonedInput(day.startBookings, timezone),
     endBookings: utcToZonedInput(day.endBookings, timezone),
   });
+  const [form, setFormState] = useState<Omit<DayInput, "eventId">>(loaded);
+  const [editedVersion, setEditedVersion] = useState(day.version);
   const [isSaving, startSave] = useTransition();
   const [isDeleting, startDelete] = useTransition();
 
@@ -213,9 +216,12 @@ function DayRow({
           id: day.id,
           eventId,
           ...toUtcForm(form, timezone),
+          expectedVersion: editedVersion,
         });
         if (!result.ok) {
           setError(result.error);
+          // So the next Edit starts from the day as it is now.
+          router.refresh();
         } else {
           setError(null);
           setEditMode(false);
@@ -394,7 +400,11 @@ function DayRow({
       <p className="text-sm text-fg-muted">{label}</p>
       <div className="flex gap-2 shrink-0">
         <button
-          onClick={() => setEditMode(true)}
+          onClick={() => {
+            setFormState(loaded());
+            setEditedVersion(day.version);
+            setEditMode(true);
+          }}
           className={SECONDARY_BUTTON}
           aria-label={`Edit day ${label}`}
         >

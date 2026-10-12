@@ -59,7 +59,7 @@ export async function createMeetingPointAction(
 }
 
 export async function updateMeetingPointAction(
-  input: MeetingPointInput & { id: string; expectedVersion?: number }
+  input: MeetingPointInput & { id: string; expectedVersion: number }
 ): Promise<AdminActionResult> {
   const result = await meetingUseCases().updateMeetingPoint(
     await actor(),

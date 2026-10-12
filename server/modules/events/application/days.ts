@@ -37,7 +37,7 @@ async function dayChangedMeanwhile(
     ? versionConflict(
         "day",
         current,
-        "Someone changed this day while you edited it"
+        "Someone changed this day while you edited it. Copy your edits somewhere safe: reloading the page discards them."
       )
     : dayNotFound();
 }
@@ -113,12 +113,14 @@ export const updateDay =
   ({ uow }: EventDeps) =>
   async (
     actor: Actor,
-    input: DayWindowInput & { id: string; expectedVersion?: number }
+    input: DayWindowInput & { id: string; expectedVersion: number }
   ): Promise<Result<Day>> => {
     if (!actor.admin) return adminRequired();
     return uow.run(async (tx) => {
       const existing = await tx.days.findById(input.id);
       if (!existing) return dayNotFound();
+      if (existing.version !== input.expectedVersion)
+        return dayChangedMeanwhile(tx, input.id);
       const parsed = parseWindow(input);
       if (!("data" in parsed)) return parsed;
       const window = parsed.data;

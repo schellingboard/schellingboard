@@ -57,6 +57,7 @@ describe("guest admin use cases", () => {
         await guests().ensureGuest(NOBODY, { name: "A", email: "a@x.org" }),
         await guests().updateGuest(NOBODY, {
           id: guest.id,
+          expectedVersion: guest.version,
           name: "A",
           email: "a@x.org",
         }),
@@ -167,6 +168,7 @@ describe("guest admin use cases", () => {
       expect(
         await guests().updateGuest(ADMIN, {
           id: ada.id,
+          expectedVersion: ada.version,
           name: "Ada",
           email: "taken@x.org",
         })
@@ -175,6 +177,7 @@ describe("guest admin use cases", () => {
         value(
           await guests().updateGuest(ADMIN, {
             id: ada.id,
+            expectedVersion: ada.version,
             name: "Ada L.",
             email: "ada@x.org",
           })
@@ -184,6 +187,7 @@ describe("guest admin use cases", () => {
         code(
           await guests().updateGuest(ADMIN, {
             id: "nope",
+            expectedVersion: 1,
             name: "X",
             email: "x@x.org",
           })
@@ -204,6 +208,7 @@ describe("guest admin use cases", () => {
         [ada, bo].map((guest) =>
           guests().updateGuest(ADMIN, {
             id: guest.id,
+            expectedVersion: guest.version,
             name: "X",
             email: "x@x.org",
           })

@@ -46,6 +46,7 @@ function PointRow({
   const [deleteMode, setDeleteMode] = useState(false);
   const [name, setName] = useState(point.name);
   const [description, setDescription] = useState(point.description);
+  const [editedVersion, setEditedVersion] = useState(point.version);
   const [isPending, startTransition] = useTransition();
 
   const run = (action: () => Promise<AdminActionResult>) =>
@@ -57,8 +58,8 @@ function PointRow({
         } else {
           setError(null);
           setEditMode(false);
-          router.refresh();
         }
+        router.refresh();
       } catch {
         setError("Request failed");
       }
@@ -66,7 +67,13 @@ function PointRow({
 
   const handleSave = () =>
     run(() =>
-      updateMeetingPointAction({ id: point.id, eventId, name, description })
+      updateMeetingPointAction({
+        id: point.id,
+        eventId,
+        name,
+        description,
+        expectedVersion: editedVersion,
+      })
     );
 
   if (editMode) {
@@ -134,6 +141,9 @@ function PointRow({
             type="button"
             onClick={() => {
               setError(null);
+              setName(point.name);
+              setDescription(point.description);
+              setEditedVersion(point.version);
               setEditMode(true);
             }}
             disabled={isPending}

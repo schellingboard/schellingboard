@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { isUnoptimized } from "@/utils/image-loader";
 import clsx from "clsx";
 import { Input } from "@/app/input";
@@ -397,14 +398,21 @@ function LocationRow({
   isLast: boolean;
 }) {
   const { location, eventIds } = adminLocation;
+  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<"view" | "edit" | "delete">("view");
+  const [editedVersion, setEditedVersion] = useState(location.version);
   const [isMovePending, startMoveTransition] = useTransition();
 
   const handleMove = (direction: "up" | "down") => {
     startMoveTransition(async () => {
-      const result = await moveLocationAction({ id: location.id, direction });
+      const result = await moveLocationAction({
+        id: location.id,
+        direction,
+        expectedVersion: location.version,
+      });
       setError(result.ok ? null : result.error);
+      if (!result.ok) router.refresh();
     });
   };
 
@@ -412,11 +420,15 @@ function LocationRow({
     const updateLocation: z.input<typeof updateLocationSchema> = {
       ...formData,
       id: location.id,
+      expectedVersion: editedVersion,
     };
     const result = await updateLocationAction(updateLocation);
     if (result.ok) {
       setError(null);
       setMode("view");
+    } else {
+      // So the next Edit starts from the location as it is now.
+      router.refresh();
     }
     return result;
   };
@@ -499,6 +511,7 @@ function LocationRow({
           <button
             onClick={() => {
               setError(null);
+              setEditedVersion(location.version);
               setMode("edit");
             }}
             className={SECONDARY_BUTTON}

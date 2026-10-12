@@ -231,6 +231,7 @@ describe("admin meeting points", () => {
 
     const result = await updateMeetingPointAction({
       id: point.id,
+      expectedVersion: point.version,
       eventId: event.id,
       name: "Café",
       description: "By the entrance",
@@ -240,6 +241,22 @@ describe("admin meeting points", () => {
     const [saved] = await getRepositories().meetingPoints.listByEvent(event.id);
     expect(saved.name).toBe("Café");
     expect(saved.description).toBe("By the entrance");
+  });
+
+  it("refuses a rename that names no version", async () => {
+    const event = await createEvent();
+    await createMeetingPointAction({ eventId: event.id, name: "Coffee bar" });
+    const [point] = await getRepositories().meetingPoints.listByEvent(event.id);
+
+    const result = await updateMeetingPointAction({
+      id: point.id,
+      eventId: event.id,
+      name: "Café",
+    } as Parameters<typeof updateMeetingPointAction>[0]);
+
+    expect(result.ok).toBe(false);
+    const [saved] = await getRepositories().meetingPoints.listByEvent(event.id);
+    expect(saved.name).toBe("Coffee bar");
   });
 
   it("deletes a point", async () => {
@@ -268,6 +285,7 @@ describe("admin meeting points", () => {
 
     const renamed = await updateMeetingPointAction({
       id: point.id,
+      expectedVersion: point.version,
       eventId: event.id,
       name: "Hijacked",
     });

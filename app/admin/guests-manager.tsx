@@ -2,6 +2,7 @@
 
 import { Fragment, useEffect, useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import { Input } from "@/app/input";
 import type { CompleteGuest } from "@schellingboard/domain/guest";
@@ -104,7 +105,10 @@ function GuestRow({
   guest: CompleteGuest;
   events: AdminUser["events"];
 }) {
+  const router = useRouter();
   const [mode, setMode] = useState<"view" | "edit" | "delete">("view");
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [editedVersion, setEditedVersion] = useState(guest.version);
   const form = useForm({
     // `values`, not `defaultValues`: a save revalidates the page and re-renders
     // this row with the new guest, and the form has to follow — otherwise
@@ -114,7 +118,9 @@ function GuestRow({
       name: guest.name,
       email: guest.info.email,
     },
-    resolver: zodResolver(updateGuestSchema),
+    // A refresh after a refused save must not discard what the admin typed.
+    resetOptions: { keepDirtyValues: true },
+    resolver: zodResolver(updateGuestSchema.omit({ expectedVersion: true })),
   });
   const [isDeleting, startDeleteTransition] = useTransition();
   const [isSendingEmail, startEmailTransition] = useTransition();
@@ -123,6 +129,8 @@ function GuestRow({
 
   const startEdit = () => {
     form.reset();
+    setSaveError(null);
+    setEditedVersion(guest.version);
     setMode("edit");
   };
 
@@ -130,9 +138,19 @@ function GuestRow({
     id,
     name,
     email,
-  }: z.input<typeof updateGuestSchema>) => {
-    const result = await updateGuestAction({ id, name, email });
-    if (!result.ok) {
+  }: Omit<z.input<typeof updateGuestSchema>, "expectedVersion">) => {
+    setSaveError(null);
+    const result = await updateGuestAction({
+      id,
+      name,
+      email,
+      expectedVersion: editedVersion,
+    });
+    if (!result.ok && typeof result.error === "string") {
+      // Kept apart from the form's errors, which the refresh clears.
+      setSaveError(result.error);
+      router.refresh();
+    } else if (!result.ok) {
       setActionErrors(form, result.error);
     } else {
       setEmailSent(false);
@@ -218,7 +236,9 @@ function GuestRow({
             </button>
           </div>
         </form>
-        <ActionError message={form.formState.errors.root?.message ?? null} />
+        <ActionError
+          message={saveError ?? form.formState.errors.root?.message ?? null}
+        />
       </div>
     );
   }

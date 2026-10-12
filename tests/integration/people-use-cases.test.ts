@@ -127,7 +127,11 @@ describe("editing one's own profile", () => {
       const ada = await createGuest({ name: "Ada", email: "ada@example.com" });
 
       const saved = value(
-        await people().updateMyProfile(open(ada.id), PROFILE, now())
+        await people().updateMyProfile(
+          open(ada.id),
+          { ...PROFILE, expectedVersion: ada.profileVersion },
+          now()
+        )
       );
 
       expect(saved).toMatchObject({ id: ada.id, ...PROFILE });
@@ -144,15 +148,16 @@ describe("editing one's own profile", () => {
     async () => {
       const ada = await createGuest({ name: "Ada" });
       await protect(ada.id);
+      const profile = { ...PROFILE, expectedVersion: ada.profileVersion };
 
-      expect(code(await people().updateMyProfile(NOBODY, PROFILE, now()))).toBe(
+      expect(code(await people().updateMyProfile(NOBODY, profile, now()))).toBe(
         "guest.unselected"
       );
       expect(
-        code(await people().updateMyProfile(open(ada.id), PROFILE, now()))
+        code(await people().updateMyProfile(open(ada.id), profile, now()))
       ).toBe("guest.protected");
       expect(
-        code(await people().updateMyProfile(verified(ada.id), PROFILE, now()))
+        code(await people().updateMyProfile(verified(ada.id), profile, now()))
       ).toBe("ok");
     }
   );
@@ -165,19 +170,27 @@ describe("editing one's own profile", () => {
       const withPhoto = value(
         await people().replaceMyAvatar(
           open(ada.id),
-          { image: await png(256) },
+          { image: await png(256), expectedVersion: ada.profileVersion },
           now()
         )
       );
       expect(withPhoto.avatarUrl).toMatch(/^\/media\/avatars\/.+\.png\?v=\d+$/);
 
       const kept = value(
-        await people().updateMyProfile(open(ada.id), PROFILE, now())
+        await people().updateMyProfile(
+          open(ada.id),
+          { ...PROFILE, expectedVersion: withPhoto.profileVersion },
+          now()
+        )
       );
       expect(kept.avatarUrl).toBe(withPhoto.avatarUrl);
 
       const removed = value(
-        await people().removeMyAvatar(open(ada.id), {}, now())
+        await people().removeMyAvatar(
+          open(ada.id),
+          { expectedVersion: kept.profileVersion },
+          now()
+        )
       );
       expect(removed.avatarUrl).toBeNull();
       expect(fs.readdirSync(path.join(uploadsDir, "avatars"))).toEqual([]);
@@ -185,35 +198,29 @@ describe("editing one's own profile", () => {
   );
 
   it(
-    "keeps a photo uploaded while the profile was being saved",
+    "refuses a profile save from before a photo upload, keeping the photo",
     { tags: ["011-US1", "011-US2", "019-US7"] },
     async () => {
       const ada = await createGuest({ name: "Ada" });
-      const repo = getRepositories().guests;
-      const find = repo.findById.bind(repo);
-      let uploaded = () => {};
-      const upload = new Promise<void>((resolve) => (uploaded = resolve));
-      const slowRead = vi
-        .spyOn(repo, "findById")
-        .mockImplementationOnce(async (id) => {
-          const current = await find(id);
-          await upload;
-          return current;
-        });
-
-      const saved = people().updateMyProfile(open(ada.id), PROFILE, now());
-      const image = await png(256);
+      const expectedVersion = ada.profileVersion;
       const photo = value(
-        await people().replaceMyAvatar(open(ada.id), { image }, now())
+        await people().replaceMyAvatar(
+          open(ada.id),
+          { image: await png(256), expectedVersion },
+          now()
+        )
       );
-      uploaded();
-      value(await saved);
-      slowRead.mockRestore();
 
-      expect(await find(ada.id)).toMatchObject({
-        ...PROFILE,
-        avatarUrl: photo.avatarUrl,
-      });
+      const saved = await people().updateMyProfile(
+        open(ada.id),
+        { ...PROFILE, expectedVersion },
+        now()
+      );
+
+      expect(code(saved)).toBe("profile.versionConflict");
+      expect((await getRepositories().guests.findById(ada.id))?.avatarUrl).toBe(
+        photo.avatarUrl
+      );
     }
   );
 
@@ -224,17 +231,20 @@ describe("editing one's own profile", () => {
       const ada = await createGuest({ name: "Ada" });
       const repo = getRepositories().guests;
       const credentials = await repo.getAuthCredentials(ada.id);
+      const before = (await repo.findById(ada.id))!;
       await repo.delete(ada.id);
       const lookup = vi
         .spyOn(repo, "getAuthCredentials")
         .mockResolvedValueOnce(credentials);
+      const read = vi.spyOn(repo, "findById").mockResolvedValueOnce(before);
 
       const uploaded = await people().replaceMyAvatar(
         open(ada.id),
-        { image: await png(256) },
+        { image: await png(256), expectedVersion: ada.profileVersion },
         now()
       );
       lookup.mockRestore();
+      read.mockRestore();
 
       expect(code(uploaded)).toBe("profile.notFound");
       expect(fs.readdirSync(path.join(uploadsDir, "avatars"))).toEqual([]);
@@ -251,11 +261,17 @@ describe("uploading a photo", () => {
       const small = await png(64);
 
       expect(
-        code(await people().replaceMyAvatar(NOBODY, { image: small }, now()))
+        code(
+          await people().replaceMyAvatar(
+            NOBODY,
+            { image: small, expectedVersion: 1 },
+            now()
+          )
+        )
       ).toBe("guest.unselected");
       const refused = await people().replaceMyAvatar(
         open(ada.id),
-        { image: small },
+        { image: small, expectedVersion: ada.profileVersion },
         now()
       );
       expect(refused).toMatchObject({

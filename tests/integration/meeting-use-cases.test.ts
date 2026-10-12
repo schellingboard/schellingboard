@@ -537,6 +537,7 @@ describe("organizer settings", () => {
           await meetings().updateMeetingPoint(ADMIN, {
             eventId: other.id,
             id: point.id,
+            expectedVersion: point.version,
             name: "Lobby",
           })
         )
@@ -546,6 +547,7 @@ describe("organizer settings", () => {
           await meetings().updateMeetingPoint(ADMIN, {
             eventId: event.id,
             id: point.id,
+            expectedVersion: point.version,
             name: "Lobby",
             description: " By the door ",
           })

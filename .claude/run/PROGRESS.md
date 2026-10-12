@@ -215,16 +215,52 @@ openapi-check typecheck test-coverage` (or `make test`), without E2E. E2E runs
   `{ sessions }`/`{ proposals }`); `/api/v1` is unreleased, so the CHANGELOG
   API bullet is extended. New use case 019-US8.
 
+- User rule, 2026-10-07, for every form that sends a version (4b, 4c1, 4c2):
+  a refused save must never lose the typed edits without a warning. The form
+  keeps the edits and shows the conflict message; no reset or refresh may
+  overwrite them, and a message that suggests reloading warns that it
+  discards them. Checked for 4b and 4c1: the session, proposal, day, location
+  and meeting point forms hold their inputs in state that a refresh leaves
+  alone; the guest row keeps typed values over its refresh
+  (`keepDirtyValues`); the profile form does not refresh.
+- 4c split into 4c1 and 4c2 (PLAN.md): the event page's three forms share one
+  version and stay open side by side, which 4b's pattern does not settle.
+- 4c1: the day, location, meeting point, profile and admin guest forms send
+  the version their values came from; their server actions and use cases
+  (and `replaceMyAvatar`/`removeMyAvatar`) require it, and a missing one is
+  refused, not unchecked: `updateLocationSchema`, `updateGuestSchema` and
+  the profile action's schema require it; `updateDay`, `updateMeetingPoint`
+  and `moveLocation` compare it with the row they read. Repositories keep it
+  optional (seeding). The day and meeting point rows reset their inputs from
+  the current row when Edit is pressed (they kept the values from page load);
+  the admin rows refresh after a refused save. The guest row's form follows
+  the page (`values`) but keeps typed edits over a refresh
+  (`keepDirtyValues`, review); its version is taken on Edit as in 4b, and a
+  refused save's message is kept outside the form, whose reset clears its
+  errors. A move sends the version shown. The profile, day, location,
+  meeting point and guest conflicts now say to copy the edits before
+  reloading (review). Review, rejected: a move raises the versions of the
+  rows it reorders (4a3's decision), so an edit form open on a row that
+  another row's move passed is refused; rare, and the order is part of the
+  location's read. A profile save from before a photo upload is now
+  refused (the 3d race test is adapted). E2E run: admin, meetings-admin,
+  meetings-availability, meetings-request, profile and user-auth specs.
+
 ## Problems
 
 None.
 
 ## Questions
 
-None open. Answered by the user on 2026-10-07: the remaining forms send the
-version (step 4c); guest photo files and rows stay in sync, and a guest
-delete removes the photo (step 7a).
+- 4c2, settled by the user's rule above (2026-10-07): the event page's
+  details, phases and 1-on-1 forms share one version and stay open side by
+  side. A form with unsaved edits keeps them (and the version it loaded); a
+  form without edits takes the new values and version when the page
+  refreshes, so saving one form and then an untouched other is not refused.
+- Answered by the user on 2026-10-07: the remaining forms send the version
+  (step 4c); guest photo files and rows stay in sync, and a guest delete
+  removes the photo (step 7a).
 
 ## Next step
 
-5b.
+5b. 4c2 waits on its question.

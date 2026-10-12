@@ -100,6 +100,7 @@ describe("admin location actions", () => {
         await updateLocationAction({
           ...baseLocationData,
           id: location.id,
+          expectedVersion: location.version,
           name: "Hacked",
         })
       ).toEqual({ ok: false, error: "Unauthorized" });
@@ -108,7 +109,11 @@ describe("admin location actions", () => {
         error: "Unauthorized",
       });
       expect(
-        await moveLocationAction({ id: location.id, direction: "up" })
+        await moveLocationAction({
+          id: location.id,
+          expectedVersion: location.version,
+          direction: "up",
+        })
       ).toEqual({ ok: false, error: "Unauthorized" });
       const after = await getRepositories().locations.findById(location.id);
       expect(after?.name).toBe(location.name);
@@ -311,6 +316,7 @@ describe("admin location actions", () => {
         name: "Renamed",
         capacity: 10,
         eventIds: [event.id],
+        expectedVersion: (await locations.findById(location.id))!.version,
       };
       const result = await updateLocationAction(formData);
       expect(result).toEqual({ ok: true });
@@ -382,6 +388,7 @@ describe("admin location actions", () => {
         ...baseLocationData,
         id: location.id,
         image: await makeImageFile(800, 600),
+        expectedVersion: location.version,
       };
       const result = await updateLocationAction(formData);
       expect(result).toEqual({ ok: true });
@@ -392,10 +399,24 @@ describe("admin location actions", () => {
       );
     });
 
+    it("refuses an edit that names no version", async () => {
+      const location = await createLocation();
+      const result = await updateLocationAction({
+        ...baseLocationData,
+        id: location.id,
+        name: "Renamed",
+      } as Parameters<typeof updateLocationAction>[0]);
+      expect(result.ok).toBe(false);
+      expect(
+        (await getRepositories().locations.findById(location.id))?.name
+      ).toBe(location.name);
+    });
+
     it("errors for an unknown id", async () => {
       const result = await updateLocationAction({
         ...baseLocationData,
         id: "does-not-exist",
+        expectedVersion: 1,
       });
       expect(result).toEqual({ ok: false, error: "Location not found" });
     });
@@ -473,13 +494,17 @@ describe("admin location actions", () => {
       await createLocationAction({ ...baseLocationData, name: "C" });
 
       const byName = async () => (await locations.list()).map((l) => l.name);
-      const idOf = async (name: string) =>
-        (await locations.list()).find((l) => l.name === name)!.id;
+      const move = async (name: string, direction: "up" | "down") => {
+        const { id, version } = (await locations.list()).find(
+          (l) => l.name === name
+        )!;
+        return moveLocationAction({ id, direction, expectedVersion: version });
+      };
 
-      await moveLocationAction({ id: await idOf("C"), direction: "up" });
+      await move("C", "up");
       expect(await byName()).toEqual(["A", "C", "B"]);
 
-      await moveLocationAction({ id: await idOf("A"), direction: "down" });
+      await move("A", "down");
       expect(await byName()).toEqual(["C", "A", "B"]);
     });
 
@@ -508,6 +533,41 @@ describe("admin location actions", () => {
       ]);
     });
 
+    it("refuses a move from a version the location has moved past", async () => {
+      const { locations } = getRepositories();
+      const a = await createLocation({ name: "A", sortIndex: 0 });
+      await createLocation({ name: "B", sortIndex: 1 });
+      await locations.update(a.id, { ...a, name: "A2" });
+
+      const result = await moveLocationAction({
+        id: a.id,
+        direction: "down",
+        expectedVersion: a.version,
+      });
+
+      expect(result).toEqual({
+        ok: false,
+        error: expect.stringMatching(
+          /^Someone changed this location while you edited it/
+        ) as string,
+      });
+      expect((await locations.list()).map((l) => l.name)).toEqual(["A2", "B"]);
+    });
+
+    it("refuses a move that names no version", async () => {
+      const { locations } = getRepositories();
+      const a = await createLocation({ name: "A", sortIndex: 0 });
+      await createLocation({ name: "B", sortIndex: 1 });
+
+      const result = await moveLocationAction({
+        id: a.id,
+        direction: "down",
+      } as Parameters<typeof moveLocationAction>[0]);
+
+      expect(result.ok).toBe(false);
+      expect((await locations.list()).map((l) => l.name)).toEqual(["A", "B"]);
+    });
+
     it("ignores moves beyond the boundaries", async () => {
       const { locations } = getRepositories();
       await createLocationAction({ ...baseLocationData, name: "A" });
@@ -516,6 +576,7 @@ describe("admin location actions", () => {
 
       const result = await moveLocationAction({
         id: first.id,
+        expectedVersion: first.version,
         direction: "up",
       });
       expect(result).toEqual({ ok: true });
