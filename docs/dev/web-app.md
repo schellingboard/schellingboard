@@ -46,6 +46,22 @@ The files are read relative to the working directory, so the same code serves
 imports `api-client`, and that it declares what it imports. See
 [Architecture rules](architecture-rules.md).
 
+## The viewer and the user picker
+
+Who the browser acts as comes from `GET /api/v1/me/identity` (`ViewerProvider`,
+`app/viewer.tsx`): `guestId` is `undefined` until the server answers, then a guest id or
+`null`. The replica and the command runner are opened for that guest, never for one read
+from a persisted copy. `choose` and `signOut` call `PUT`/`DELETE` on the same path. A
+protected name answers `guest.protected` and `UserMenu` sends the user to the legacy
+login, `/legacy/auth/login?guest=<id>`; a successful login lands on `/legacy`. The picker
+lists the guests it is given (the event snapshot's `guests`: members and hosts only, since
+`GET /guests` is closed to anonymous visitors, so a non-member cannot yet pick their name).
+Sign-out and a switch between names clear the device's persisted replicas
+(`persistence.clear()`); step 13 must also close the feed and reopen the replica, the
+command runner and the queries for the new `guestId` when it changes. The provider asks
+again every 5 s while the first identity fetch fails. `app/keys.ts` holds the
+`newKey` the runner needs.
+
 ## Tests
 
 Unit tests sit next to the code (`*.test.ts(x)`) and run in the `web` Vitest project
