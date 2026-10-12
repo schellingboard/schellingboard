@@ -76,8 +76,6 @@ describe("/api/v1/admin events and days", () => {
     async () => {
       const event = await createEvent();
       for (const [method, path, body] of [
-        ["GET", "/admin/events", undefined],
-        ["GET", `/admin/events/${event.id}`, undefined],
         ["POST", "/admin/events", settings],
         ["DELETE", `/admin/events/${event.id}`, undefined],
         ["GET", "/admin/locations", undefined],
@@ -118,7 +116,7 @@ describe("/api/v1/admin events and days", () => {
       expect(day.status).toBe(201);
       const { id: dayId } = (await day.json()) as { id: string };
 
-      const detail = await call("GET", `/admin/events/${event.id}`);
+      const detail = await call("GET", `/events/${event.id}`);
       expect(await detail.json()).toEqual({
         event: {
           ...event,
@@ -127,7 +125,7 @@ describe("/api/v1/admin events and days", () => {
         },
         days: [{ id: dayId, eventId: event.id, ...dayBody, version: 1 }],
       });
-      const list = await call("GET", "/admin/events");
+      const list = await call("GET", "/events");
       expect(
         ((await list.json()) as { events: unknown[] }).events
       ).toHaveLength(1);
@@ -211,7 +209,7 @@ describe("/api/v1/admin events and days", () => {
       expect((await call("DELETE", `/admin/events/${event.id}`)).status).toBe(
         204
       );
-      const gone = await call("GET", `/admin/events/${event.id}`);
+      const gone = await call("GET", `/events/${event.id}`);
       expect(gone.status).toBe(404);
       expect(await gone.json()).toMatchObject({ code: "event.notFound" });
     }

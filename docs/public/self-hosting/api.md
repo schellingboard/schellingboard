@@ -32,6 +32,10 @@ each release.
 Endpoints under `/api/v1/admin/` are for organizers; the rest are what
 attendees do in the app.
 
+Endpoints that take an `eventId` need an event's ID. `GET /api/v1/events` lists
+the events and `GET /api/v1/events/{id}` reads one with its days; neither needs
+the admin cookie.
+
 ## Signing in
 
 A request carries the same cookies the site sets in a browser: the site
@@ -54,7 +58,7 @@ curl -c cookies.txt -H 'content-type: application/json' \
   -d '{"password": "your admin password", "scope": "admin"}' \
   "$SITE/api/auth/login"
 
-curl -b cookies.txt "$SITE/api/v1/admin/events"
+curl -b cookies.txt "$SITE/api/v1/events"
 ```
 
 Endpoints that act as an attendee — RSVPs, votes, your own profile and
@@ -144,7 +148,7 @@ A script that keeps an event in step with an outside plan, such as a list of
 shifts, reads what is there first and then changes only what differs. With the
 admin cookie it can read every endpoint it needs:
 
-- **Check times before booking.** `GET /api/v1/admin/events/{id}` answers the
+- **Check times before booking.** `GET /api/v1/events/{id}` answers the
   event's settings and its days, so the script can check session times first.
 - **Find a location before adding it.** `GET /api/v1/admin/locations` lists
   every location, hidden ones included. Location names need not be unique, so
@@ -190,6 +194,6 @@ const api = createApiClient({
   baseUrl: "https://sessions.example.org",
   headers: { cookie: adminCookie },
 });
-const { data, error } = await api.GET("/api/v1/admin/events");
+const { data, error } = await api.GET("/api/v1/events");
 if (error) console.error(error.code);
 ```

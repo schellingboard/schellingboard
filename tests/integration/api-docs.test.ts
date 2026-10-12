@@ -33,7 +33,7 @@ describe("API docs", () => {
       "siteAuth",
     ]);
     expect(paths["/api/v1/health"].get).not.toHaveProperty("security");
-    expect(paths["/api/v1/admin/events"].get?.security).toEqual([
+    expect(paths["/api/v1/admin/events"].post?.security).toEqual([
       { adminAuth: [] },
     ]);
     const attendee = Object.entries(paths).find(

@@ -50,12 +50,12 @@ afterEach(() => vi.unstubAllEnvs());
 
 describe("@schellingboard/api-client", () => {
   it(
-    "reads the events as an admin, typed by the contract",
+    "reads the events, typed by the contract",
     { tags: ["019-US3"] },
     async () => {
       const event = await createEvent({ name: "Unconf" });
       const client = clientWithCookies([await createAdminAuthCookie()]);
-      const { data, error } = await client.GET("/api/v1/admin/events");
+      const { data, error } = await client.GET("/api/v1/events");
       expect(error).toBeUndefined();
       expect(data?.events.map(({ id, name }) => ({ id, name }))).toEqual([
         { id: event.id, name: "Unconf" },
@@ -69,7 +69,7 @@ describe("@schellingboard/api-client", () => {
     async () => {
       const client = clientWithCookies([]);
       const { data, error, response } = await client.GET(
-        "/api/v1/admin/events"
+        "/api/v1/admin/guests"
       );
       expect(response.status).toBe(401);
       expect(data).toBeUndefined();
