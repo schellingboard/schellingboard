@@ -40,7 +40,9 @@ A use case writes in `deps.uow.run(async (tx) => …)`
 (`server/kernel/unit-of-work.ts`): one transaction, which a throw or a failure
 `Result` rolls back. Inside it, read and write through `tx`, never through
 `deps.repos`: their writes wait for the lock `tx` holds, and their reads do not
-see its rows. `tx.record(change)` logs a change with the state; after commit,
+see its rows. `tx.record(change)` logs a change with the state, addressed to
+the audience `audienceOf` gives (add a case for each new type) and marked with
+the request's `Idempotency-Key`, if any; after commit,
 each change goes to the `subscribeToChanges` subscribers in `seq` order, the
 jobs loop among them. Keep I/O to other systems, such as mail, out of the
 callback. `uow.read` runs several reads on one consistent view.

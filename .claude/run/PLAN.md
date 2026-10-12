@@ -139,7 +139,7 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
     viewer is fixed per connection, and a user switch reconnects;
   - the hub: in-process, on `globalThis` like `nudgeJobs`;
   - where `apply` (in `packages/domain`) and the client store live.
-- [ ] 9. **Change log columns**: a migration adds `audience`, `command_key` and
+- [x] 9. **Change log columns**: a migration adds `audience`, `command_key` and
       `correlation_id`. `tx.record()` computes the audience with `audienceOf` in
       `domain`. The idempotency middleware hands `Idempotency-Key` to the unit of work,
       so changes carry `command_key`. The existing session changes get audiences.

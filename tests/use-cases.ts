@@ -225,6 +225,11 @@ export const features = {
         actor: "organizer",
         priority: "P3",
       },
+      US8: {
+        title: "Attendee sees schedule changes without reloading the page",
+        actor: "attendee",
+        priority: "P1",
+      },
     },
   },
   "008": {

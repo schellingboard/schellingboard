@@ -5,6 +5,7 @@ import * as schema from "../../schema";
 import type { ChangesRepository } from "../interfaces";
 import type {
   Actor,
+  Audience,
   Change,
   RecordedChange,
 } from "@schellingboard/domain/change";
@@ -38,6 +39,8 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
     eventId: row.eventId,
     actor: actorOf(row),
     occurredAt: new Date(row.occurredAt),
+    audience: row.audience as Audience | null,
+    commandKey: row.commandKey,
   };
   switch (row.type) {
     case "session.changed": {
@@ -82,7 +85,10 @@ const KNOWN_TYPES: RecordedChange["type"][] = [
 export class SqliteChangesRepository implements ChangesRepository {
   constructor(private db: DB) {}
 
-  async append(change: Change): Promise<RecordedChange> {
+  async append(
+    change: Change,
+    meta: Pick<RecordedChange, "audience" | "commandKey">
+  ): Promise<RecordedChange> {
     const id = nanoid();
     const { seq } = this.db
       .insert(schema.changes)
@@ -96,10 +102,12 @@ export class SqliteChangesRepository implements ChangesRepository {
         actorId: change.actor.type === "guest" ? change.actor.id : null,
         occurredAt: change.occurredAt.toISOString(),
         payload: change.payload,
+        audience: meta.audience,
+        commandKey: meta.commandKey,
       })
       .returning({ seq: schema.changes.seq })
       .get();
-    return { ...change, seq, id };
+    return { ...change, ...meta, seq, id };
   }
 
   async listAfter(seq: number, limit = 100): Promise<RecordedChange[]> {

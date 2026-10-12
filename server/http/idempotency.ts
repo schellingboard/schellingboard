@@ -3,6 +3,7 @@ import { createMiddleware } from "hono/factory";
 import { z } from "zod";
 import type { Repositories } from "@/db/container";
 import type { Actor } from "@/server/kernel/actor";
+import { withCommandKey } from "@/server/kernel/command-key";
 import { IDEMPOTENCY_TTL_MS } from "@/utils/jobs/idempotency";
 import type { ApiEnv } from "./actor";
 import { problemResponse } from "./problem";
@@ -118,7 +119,7 @@ export function idempotencyMiddleware({
     }
 
     try {
-      await next();
+      await withCommandKey(key, next);
     } catch (error) {
       await repo.release(owner);
       throw error;

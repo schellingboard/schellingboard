@@ -158,8 +158,8 @@ Rows older than 24 hours are deleted by the jobs loop (ADR 0011) as scheduled
 work. The key is optional; without it a mutation simply runs. A request with
 neither admin nor guest has no one to scope a key to, so its key is ignored
 rather than shared by every anonymous client. Server actions do not use it.
-Echoing the key on the change log (`command_key`) waits for the feed that reads
-it, in step 4.
+The changes a keyed request records carry the key as `command_key`; the feed
+sends it as ADR 0014 section 10 says.
 
 ### 6. Lists that grow with an event come in pages
 

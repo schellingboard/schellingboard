@@ -365,6 +365,41 @@ describe("Idempotency-Key on the mounted API", () => {
     }
   );
 
+  it(
+    "marks the changes of a keyed request with its key",
+    { tags: ["019-US2"] },
+    async () => {
+      const { host, location, day } = await scheduledWorld();
+      const created = await POST(
+        request("POST", "/sessions", {
+          body: booking(day, host.id, location.id),
+          cookie: asGuest(host.id),
+        })
+      );
+      const { id } = (await created.json()) as { id: string };
+      const { locationId, ...fields } = booking(day, host.id, location.id);
+      const edit = (title: string, version: number, key?: string) =>
+        PUT(
+          request("PUT", `/sessions/${id}`, {
+            body: {
+              ...fields,
+              title,
+              locationIds: [locationId],
+              expectedVersion: version,
+            },
+            cookie: asGuest(host.id),
+            key,
+          })
+        );
+
+      await edit("Keyed", 1, "edit-1");
+      await edit("Unkeyed", 2);
+
+      const recorded = await getRepositories().changes.listAfter(0);
+      expect(recorded.map((c) => c.commandKey)).toEqual(["edit-1", null]);
+    }
+  );
+
   it("is declared on every mutating route in the OpenAPI document", () => {
     const paths = openApiDocument().paths ?? {};
     const mutations = Object.entries(paths).flatMap(([path, item]) =>
