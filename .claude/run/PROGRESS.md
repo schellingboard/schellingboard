@@ -226,9 +226,18 @@
 - The guest and fixture `now` in tests: the web fixture's `now` is before its scheduling
   phase, so command tests move `now` to `iso(10)`.
 
+## Step 11b (2026-10-09)
+
+- `commands/comment.ts`: `createComment` for a session, proposal or profile (guest) subject,
+  with an optional parent. Comments are not in the replica, so its prediction has no
+  projection: an empty or over-long body is refused (`comment.invalid`, from
+  `commentCreateSchema`), and the created comment comes back as `data` for the caller
+  to add to its query (11c). The same key is resent on a network error, so a retry
+  makes one comment.
+
 ## Next step
 
-11b.
+11c.
 
 ## Questions
 
