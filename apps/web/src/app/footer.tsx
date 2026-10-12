@@ -21,12 +21,22 @@ const formatDate = (date: string) =>
 
 const link = "text-link hover:underline";
 
-export function Footer({ version }: { version: string | undefined }) {
+export function Footer({
+  version,
+  inline,
+}: {
+  version: string | undefined;
+  /** A copy inside a screen that hides the page's own footer. */
+  inline?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const shown = version ?? "unknown";
 
   return (
-    <footer className="mt-auto border-t border-line-subtle bg-surface-sunken py-2">
+    <footer
+      data-site-footer={inline ? undefined : ""}
+      className="mt-auto border-t border-line-subtle bg-surface-sunken py-2"
+    >
       <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 px-3 text-xs text-fg-subtle md:grid md:grid-cols-[1fr_auto_1fr]">
         <div className="md:justify-self-start">
           <button

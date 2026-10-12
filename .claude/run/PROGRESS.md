@@ -248,7 +248,7 @@
 
 ## Next step
 
-13c.
+13d.
 
 ## Questions
 
@@ -330,3 +330,16 @@
   clash confirm, no name picker). The runner exists (11); step 15 must give the grid badge its
   click, before step 16 routes `/{slug}`.
 - eslint: `@next/next/no-img-element` is off for `apps/web`.
+
+## Step 13c (2026-10-09)
+
+- `ScheduleScreen` (`schedule/schedule-screen.tsx`): takes `snapshot`, `now`, `links`, `params`
+  (+ `onParamsChange`), a `sync` slot and a `footer` slot. The view, `filter` chips and `loc` live
+  in the params (controlled by whoever owns the address bar; legacy kept filters in local state
+  mirrored to the URL); the search text and the unfolded days are local. Agenda gets all rooms,
+  the grid the `?loc=` ones, as in legacy. Search stepping (Enter, stepper) is grid-only, as in
+  legacy. `Footer` has an `inline` copy (the page's own is hidden by CSS while the schedule frame
+  is mounted, `data-site-footer`).
+- Event details render the description with a small `ui/markdown` (paragraphs, bullet lists,
+  bold, italics, code, http(s) links), not the server's full markdown renderer.
+- Not carried over: pull-to-refresh (decided in 13d, see there).
