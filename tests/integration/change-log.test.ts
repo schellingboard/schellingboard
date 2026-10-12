@@ -459,8 +459,6 @@ describe("change log", () => {
       ]);
       const meetings = createMeetingUseCases({
         repos,
-        notifyMeetingRequested: async () => {},
-        notifyMeetingOutcome: async () => {},
         uow: unitOfWork,
       });
 
@@ -484,6 +482,11 @@ describe("change log", () => {
           actor: { type: "guest", id: ada.id },
           audience: { kind: "guests", ids: [ada.id, grace.id] },
           payload: { meeting: { status: "pending", slotStart: slot } },
+        },
+        {
+          type: "meeting.requested",
+          actor: { type: "guest", id: ada.id },
+          audience: { kind: "none" },
         },
       ]);
     }

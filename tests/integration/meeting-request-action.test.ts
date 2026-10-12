@@ -31,6 +31,7 @@ vi.mock("@/utils/mailer", () => ({
 
 import { isoDay } from "../helpers/dates";
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { runJobs } from "../helpers/jobs";
 import { siteAuthenticate } from "../helpers/site-auth";
 import { createEvent, createGuest, createDay } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, verifiedGuestValue } from "../helpers/guest-cookie";
@@ -129,6 +130,7 @@ describe("requestMeetingAction", () => {
     const { event, requester, recipient } = await scenario();
 
     await request(event, recipient);
+    await runJobs();
 
     const [notification] = await getRepositories().notifications.listByGuest(
       recipient.id

@@ -13,10 +13,6 @@ import { sendMail } from "@/utils/mailer";
 import { generateVapidKeys } from "@/utils/push";
 import { mapImages } from "@/utils/map-image";
 import {
-  notifyMeetingOutcome,
-  notifyMeetingRequested,
-} from "@/utils/notifications";
-import {
   createCommentUseCases,
   type CommentUseCases,
   proposalComments,
@@ -102,8 +98,6 @@ export function commentUseCases(): CommentUseCases {
 export function meetingUseCases(): MeetingUseCases {
   return createMeetingUseCases({
     repos: getRepositories(),
-    notifyMeetingRequested,
-    notifyMeetingOutcome,
     uow: unitOfWork,
   });
 }

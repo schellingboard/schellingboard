@@ -142,6 +142,20 @@ export type MeetingDeleted = ChangeOf<
   { meeting: Meeting }
 >;
 
+/** A 1-on-1 was asked for; recorded so the recipient is told. */
+export type MeetingRequested = ChangeOf<
+  "meeting.requested",
+  "meeting",
+  Record<string, never>
+>;
+
+/** A 1-on-1 was answered or called off; the actor is who did it. */
+export type MeetingAnswered = ChangeOf<
+  "meeting.answered",
+  "meeting",
+  { outcome: "accepted" | "declined" | "canceled" }
+>;
+
 /** The slot starts a guest declared themselves free, as ISO instants. */
 export type AvailabilityChanged = ChangeOf<
   "availability.changed",
@@ -183,6 +197,8 @@ export type Change =
   | MeetingPointRemoved
   | MeetingChanged
   | MeetingDeleted
+  | MeetingRequested
+  | MeetingAnswered
   | AvailabilityChanged
   | LocationChanged
   | LocationRemoved
@@ -242,6 +258,8 @@ export function audienceOf(change: Change): Audience {
       };
     case "availability.changed":
       return { kind: "guests", ids: [change.payload.guestId] };
+    case "meeting.requested":
+    case "meeting.answered":
     case "session.cohostsAdded":
     case "proposal.joined":
     case "comment.created":
@@ -375,6 +393,37 @@ export const changes = {
       actor,
       occurredAt: at,
       payload: { sessionId, guestId },
+    };
+  },
+
+  meetingRequested(
+    meeting: Pick<Meeting, "id" | "eventId">,
+    { actor, at }: ChangeContext
+  ): MeetingRequested {
+    return {
+      type: "meeting.requested",
+      subjectType: "meeting",
+      subjectId: meeting.id,
+      eventId: meeting.eventId,
+      actor,
+      occurredAt: at,
+      payload: {},
+    };
+  },
+
+  meetingAnswered(
+    meeting: Pick<Meeting, "id" | "eventId">,
+    outcome: MeetingAnswered["payload"]["outcome"],
+    { actor, at }: ChangeContext
+  ): MeetingAnswered {
+    return {
+      type: "meeting.answered",
+      subjectType: "meeting",
+      subjectId: meeting.id,
+      eventId: meeting.eventId,
+      actor,
+      occurredAt: at,
+      payload: { outcome },
     };
   },
 

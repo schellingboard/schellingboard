@@ -8,6 +8,7 @@ import type {
   Audience,
   Change,
   CommentCreated,
+  MeetingAnswered,
   RecordedChange,
 } from "@schellingboard/domain/change";
 import type { Day, Event } from "@schellingboard/domain/event";
@@ -204,6 +205,20 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
         payload: { meeting: reviveMeeting(payload.meeting) },
       };
     }
+    case "meeting.requested":
+      return {
+        ...common,
+        type: "meeting.requested",
+        subjectType: "meeting",
+        payload: {},
+      };
+    case "meeting.answered":
+      return {
+        ...common,
+        type: "meeting.answered",
+        subjectType: "meeting",
+        payload: row.payload as MeetingAnswered["payload"],
+      };
     case "availability.changed":
       return {
         ...common,
@@ -285,6 +300,8 @@ const KNOWN_TYPES: RecordedChange["type"][] = [
   "meetingPoint.removed",
   "meeting.changed",
   "meeting.deleted",
+  "meeting.requested",
+  "meeting.answered",
   "availability.changed",
   "location.changed",
   "location.removed",
