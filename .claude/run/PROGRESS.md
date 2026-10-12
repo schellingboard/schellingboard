@@ -248,7 +248,7 @@
 
 ## Next step
 
-13d.
+13e.
 
 ## Questions
 
@@ -343,3 +343,15 @@
 - Event details render the description with a small `ui/markdown` (paragraphs, bullet lists,
   bold, italics, code, http(s) links), not the server's full markdown renderer.
 - Not carried over: pull-to-refresh (decided in 13d, see there).
+
+## Step 13d (2026-10-09)
+
+- Copied with tests: `use-drag-to-pan`, `use-scroll-restoration` (session storage per
+  `{slug}:{view}`), `pull-to-refresh` (now takes `onReload`; the screen's `onReload` prop).
+  `meetings-col.tsx`: the viewer's own 1-on-1s, read-only, from the replica
+  (`snapshot.me.meetings`); single, stacked and summary blocks, the "Only you see these"
+  header, the picture, free/blocked slots. Every link out (meeting, "Arrange a 1-on-1" in a
+  free slot) goes through `links.ts` to the legacy schedule, the one place to switch. The
+  hover summary's clash lines are empty: the replica holds no other guest's RSVPs.
+- Legacy refetches the meetings on mount and on feed changes (`/api/meetings`); the SPA reads
+  them straight from the replica, which the feed keeps current.

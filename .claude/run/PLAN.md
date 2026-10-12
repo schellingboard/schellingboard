@@ -133,8 +133,10 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
         filters, search, fold, meetings from the replica), copied with tests.
   - [x] 13b. Grid, now line, day fold.
   - [x] 13c. Agenda, filters, toolbar, search stepping.
-  - [ ] 13d. Drag to pan, scroll restoration, meetings column, wiring (Shell,
-        replica, viewer switching) and the dev-only preview route; E2E spec.
+  - [x] 13d. Drag to pan, scroll restoration, pull to refresh, read-only
+        meetings column.
+  - [ ] 13e. Wiring (Shell, events nav, replica, viewer switching) and the
+        dev-only preview route; docs; E2E spec.
 - [ ] 14. **Kiosk** on the SPA schedule, same behavior as today.
 - [ ] 15. **Session modal** as a search param over the schedule: details, RSVP,
       attendee list, comments; edit and delete link to legacy.
