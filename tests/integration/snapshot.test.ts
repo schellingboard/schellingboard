@@ -26,7 +26,7 @@ const openGuest = (id: string): Actor => ({
 });
 
 async function read(slug: string, actor: Actor) {
-  const result = await snapshotFor(unitOfWork, actor, slug);
+  const result = await snapshotFor(unitOfWork, actor, slug, new Date());
   return result.ok ? result.value : undefined;
 }
 

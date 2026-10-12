@@ -1,7 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "fs";
 import path from "path";
-import { releaseNotes, SHOWN_RELEASES } from "@/app/release-notes";
+import {
+  releaseNotes,
+  SHOWN_RELEASES,
+} from "@schellingboard/domain/release-notes";
 
 /**
  * The in-app release notes are written by hand, so nothing keeps them in step

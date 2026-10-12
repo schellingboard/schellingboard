@@ -169,13 +169,22 @@ describe("GET /events/{slug}/feed", () => {
     const { event } = await setup();
     const [last] = (await getRepositories().changes.listAfter(0)).slice(-1);
     vi.useFakeTimers({
-      toFake: ["setInterval", "setTimeout", "clearInterval", "clearTimeout"],
+      toFake: [
+        "setInterval",
+        "setTimeout",
+        "clearInterval",
+        "clearTimeout",
+        "Date",
+      ],
     });
+    vi.setSystemTime(new Date("2026-06-15T10:00:00.000Z"));
     const stream = reader(await open(event.slug, `?since=${last.seq}`));
 
     const beat = stream.next();
     await vi.advanceTimersByTimeAsync(25_000);
-    expect(await beat).toBe("event: ping\ndata: {}\n\n");
+    expect(await beat).toBe(
+      'event: ping\ndata: {"now":"2026-06-15T10:00:25.000Z"}\n\n'
+    );
 
     const end = (async () => {
       while ((await stream.next()) !== null) {
@@ -185,6 +194,30 @@ describe("GET /events/{slug}/feed", () => {
     })();
     await vi.advanceTimersByTimeAsync(10 * 60_000);
     expect(await end).toBe(true);
+  });
+
+  it("sends the fake clock's now in a ping", async () => {
+    const { event } = await setup();
+    const [last] = (await getRepositories().changes.listAfter(0)).slice(-1);
+    vi.stubEnv("SB_ENABLE_DEV_TOOLS", "1");
+    vi.useFakeTimers({ toFake: ["setInterval", "clearInterval", "Date"] });
+    vi.setSystemTime(new Date("2026-06-15T10:00:00.000Z"));
+    const aborted = new AbortController();
+    const stream = reader(
+      await open(
+        event.slug,
+        `?since=${last.seq}`,
+        { cookie: "time-override=3600000" },
+        aborted.signal
+      )
+    );
+    const beat = stream.next();
+    await vi.advanceTimersByTimeAsync(25_000);
+    expect(await beat).toBe(
+      'event: ping\ndata: {"now":"2026-06-15T11:00:25.000Z"}\n\n'
+    );
+    aborted.abort();
+    vi.unstubAllEnvs();
   });
 
   async function drain(stream: ReturnType<typeof reader>): Promise<string[]> {

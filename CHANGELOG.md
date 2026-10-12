@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 > **Developers**: keep entries short — see [AGENTS.md § Changelog](AGENTS.md#changelog).
 > If the change is a highlight of the coming release, it also belongs in
-> [`app/release-notes.ts`](app/release-notes.ts), which holds 3-5 of them.
+> [`packages/domain/src/release-notes.ts`](packages/domain/src/release-notes.ts), which holds 3-5 of them.
 
 ## [Unreleased]
 

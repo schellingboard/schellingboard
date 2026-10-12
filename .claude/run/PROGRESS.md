@@ -93,6 +93,14 @@
   `403 guest.protected`; logging in stays on the legacy flow. The guest cookie
   builders moved to `utils/auth-cookies.ts` (Next-free) so `server/http` can use them.
 
+## Step 7b (2026-10-08)
+
+- Snapshot has `now` (from the request's clock, fake clock included); the feed's
+  `ping` data is `{"now"}` using the cookie's offset read at connect. Health stays
+  behind the site password and returns `version` plus `buildId`, read from
+  `.next/BUILD_ID` (version outside a production build; untested in Docker).
+- Release notes moved to `packages/domain/src/release-notes.ts`.
+
 ## Questions
 
 - A session that loses its only room reads `"X" moved to No location (was Room A)`
@@ -104,4 +112,4 @@
 
 ## Next step
 
-7b.
+8.

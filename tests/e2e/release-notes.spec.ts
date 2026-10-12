@@ -1,6 +1,9 @@
 import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
-import { releaseNotes, SHOWN_RELEASES } from "@/app/release-notes";
+import {
+  releaseNotes,
+  SHOWN_RELEASES,
+} from "@schellingboard/domain/release-notes";
 
 // What the notes actually say is the release notes' own business (see
 // tests/unit/release-notes.test.ts); this is about the version in the footer

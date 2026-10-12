@@ -32,11 +32,16 @@ const at = (iso: string) => new Date(`2026-06-${iso}:00.000Z`);
 
 beforeAll(() => setupTestDb());
 beforeEach(() => {
+  vi.useFakeTimers({ toFake: ["Date"] });
+  vi.setSystemTime(new Date("2026-06-15T10:00:00.000Z"));
   resetTestDb();
   vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
   vi.stubEnv("AUTH_SECRET", VALID_SECRET);
 });
-afterEach(() => vi.unstubAllEnvs());
+afterEach(() => {
+  vi.useRealTimers();
+  vi.unstubAllEnvs();
+});
 
 // Every id in the world gets a stable label, so the golden files hold no
 // random ids.
@@ -183,6 +188,24 @@ describe("GET /api/v1/events/{slug}/snapshot", () => {
     await expect(
       await snapshotAs(w, `${admin.name}=${admin.value}`)
     ).toMatchFileSnapshot(golden("admin"));
+  });
+
+  it("carries the server's now, the fake clock included", async () => {
+    const w = await world();
+    const now = async (headers: Record<string, string>) => {
+      const res = await GET(
+        new NextRequest(`http://test/api/v1/events/${w.event.slug}/snapshot`, {
+          headers,
+        })
+      );
+      return ((await res.json()) as { now: string }).now;
+    };
+    expect(await now({})).toBe("2026-06-15T10:00:00.000Z");
+
+    vi.stubEnv("SB_ENABLE_DEV_TOOLS", "1");
+    expect(await now({ cookie: "time-override=3600000" })).toBe(
+      "2026-06-15T11:00:00.000Z"
+    );
   });
 
   it("answers an unknown event with event.notFound", async () => {

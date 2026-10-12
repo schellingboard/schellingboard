@@ -37,11 +37,17 @@ type SnapshotReads = Parameters<typeof eventScheduleBySlug>[0] &
 export function snapshotFor(
   uow: UnitOfWork,
   actor: Actor,
-  slug: string
+  slug: string,
+  now: Date
 ): Promise<Result<Snapshot>> {
   return uow.read(async (q) => {
     const viewer = await actingGuest(actor, q.guests);
-    const snapshot = await assemble(q, slug, viewer.ok ? viewer.value : null);
+    const snapshot = await assemble(
+      q,
+      slug,
+      viewer.ok ? viewer.value : null,
+      now
+    );
     return snapshot
       ? ok(snapshot)
       : notFound("event.notFound", "Event not found");
@@ -51,7 +57,8 @@ export function snapshotFor(
 async function assemble(
   q: SnapshotReads,
   slug: string,
-  viewerId: string | null
+  viewerId: string | null,
+  now: Date
 ): Promise<Snapshot | undefined> {
   const schedule = await eventScheduleBySlug(q, slug);
   if (!schedule) return undefined;
@@ -65,6 +72,7 @@ async function assemble(
   ]);
   return {
     seq,
+    now: now.toISOString(),
     event: toEventView(schedule.event),
     days: schedule.days.map(toDayView),
     locations: locations.map(toLocationView),

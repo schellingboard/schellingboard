@@ -36,7 +36,7 @@ The full rules, with the hard limits and worked examples, are in
 ## In-app release notes
 
 The app carries a much shorter version of the changelog:
-[`app/release-notes.ts`](https://github.com/schellingboard/schellingboard/blob/main/app/release-notes.ts),
+[`packages/domain/src/release-notes.ts`](https://github.com/schellingboard/schellingboard/blob/main/packages/domain/src/release-notes.ts),
 shown when the footer's version is clicked. It holds **3–5 highlights** of the
 coming release — inline markdown, taking the same **bold** lead phrase as the
 changelog bullets.

@@ -9,7 +9,7 @@ import type { Actor } from "@/server/kernel/actor";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
 
 async function snapshotAs(actor: Actor, slug: string): Promise<Snapshot> {
-  const result = await snapshotFor(unitOfWork, actor, slug);
+  const result = await snapshotFor(unitOfWork, actor, slug, new Date());
   if (!result.ok) throw new Error(`No snapshot of ${slug}`);
   return result.value;
 }
@@ -18,11 +18,11 @@ const byId = (a: { id: string }, b: { id: string }) =>
   a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
 
 // The order of a list is the reader's concern (the selectors sort), and seq
-// is the newest of the whole log, not of this viewer's changes.
+// is the newest of the whole log, not of this viewer's changes; now is the clock.
 function comparable(replica: Snapshot) {
   return Object.fromEntries(
     Object.entries(replica)
-      .filter(([key]) => key !== "seq")
+      .filter(([key]) => key !== "seq" && key !== "now")
       .map(([key, value]) => [
         key,
         Array.isArray(value)

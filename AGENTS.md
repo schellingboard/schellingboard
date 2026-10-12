@@ -61,7 +61,7 @@ Good - **Interrupting a profile slide no longer restarts it** (#123): pressing N
 
 ## In-app release notes
 
-`app/release-notes.ts` backs the footer's version button. Its first entry is the release
+`packages/domain/src/release-notes.ts` backs the footer's version button. Its first entry is the release
 being prepared, and it holds **3–5 highlights of that release — no more**.
 
 - A highlight is something a reader would want announced. If it wouldn't open a release

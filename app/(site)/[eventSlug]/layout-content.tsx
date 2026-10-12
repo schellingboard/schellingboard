@@ -11,15 +11,16 @@ export async function EventLayoutContent({
   eventSlug: string;
   children: React.ReactNode;
 }) {
+  const now = await serverNow();
   const snapshot = await eventSnapshot(
     await resolveActor(await cookies()),
-    eventSlug
+    eventSlug,
+    now
   );
   if (!snapshot.ok) {
     return <div>Event not found</div>;
   }
 
-  const now = await serverNow();
   // Clash lines rest on other guests' RSVPs, which the snapshot never holds
   // (ADR 0014 section 4).
   const me = snapshot.value.me;

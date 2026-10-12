@@ -4,7 +4,10 @@ import { Dialog } from "@headlessui/react";
 import { DateTime } from "luxon";
 import { Modal } from "./components/modal";
 import { InlineMarkdown } from "./(site)/markdown";
-import { releaseNotes, SHOWN_RELEASES } from "./release-notes";
+import {
+  releaseNotes,
+  SHOWN_RELEASES,
+} from "@schellingboard/domain/release-notes";
 import { getAppVersion } from "@/utils/git";
 
 const CHANGELOG_URL =

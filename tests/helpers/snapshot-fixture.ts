@@ -15,6 +15,7 @@ const guest = (id: string, member: boolean) => ({
 
 export const snapshot: Snapshot = {
   seq: 7,
+  now: "2026-06-02T10:00:00.000Z",
   event: {
     id: "e",
     slug: "conf",
