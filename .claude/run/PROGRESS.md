@@ -273,3 +273,15 @@
   elements (no headlessui/heroicons dependency in the SPA): `ui/dialog` (Escape, backdrop,
   Close button, focus in and back), `ui/button`; `app/layout` (skip link) and `app/nav-bar`
   (events as `/legacy/<slug>` links, mobile menu, trailing slot).
+
+## Step 12b (2026-10-09)
+
+- `app/viewer.tsx`: `ViewerProvider`/`useViewer` over `GET/PUT/DELETE /api/v1/me/identity`
+  (`guestId` undefined while unknown; a network failure keeps it unknown). `app/user-menu.tsx`:
+  name chip, searchable name dialog, profile/settings links to `/legacy/...`, log out reloads.
+  A protected name goes to `/legacy/auth/login?guest=<id>` (the emailed-link landing page; it
+  asks for password or code and returns to `/legacy`).
+- Open: the picker lists whatever guests it is given. The legacy picker lists all guests; the
+  SPA only has an event's snapshot guests (members and hosts) and `GET /guests` is closed to
+  anonymous visitors. Step 13 passes the snapshot's guests; a non-member cannot pick their
+  name in the SPA until that is decided.
