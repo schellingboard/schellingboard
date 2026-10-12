@@ -96,7 +96,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
         Vitest project, catch-all forwarding (unit tests).
   - [x] 9b. Next serves the shell and `/_spa/` assets; the proxy redirect goes.
   - [x] 9c. `make dev` with Vite in front, Dockerfile, docs, full E2E tiers.
-- [ ] 10. **Replica in the SPA**: `apps/web/src/replica/` from today's
+- [x] 10. **Replica in the SPA**: `apps/web/src/replica/` from today's
       `app/(site)/[eventSlug]/replica/` (store, `apply`, feed client, sync state
       with step 2's fix, selectors), plus a clock offset from step 7b's server
       time, and IndexedDB persistence keyed by (event, guest or anonymous),
@@ -106,7 +106,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
   - [x] 10a. Copy store, `apply`, sync state, feed client, live replica and
         selectors into `apps/web/src/replica/` with their tests.
   - [x] 10b. Clock offset from the snapshot's `now` and the feed ping.
-  - [ ] 10c. IndexedDB persistence; a persisted replica opens `stale`.
+  - [x] 10c. IndexedDB persistence; a persisted replica opens `stale`.
 - [ ] 11. **Commands and queries**: the command mechanism (predict with the
       domain policy, pending change keyed by `Idempotency-Key`, call, reconcile by
       `command_key` from the feed or the response, retry with the same key on a
