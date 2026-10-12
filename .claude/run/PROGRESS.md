@@ -382,12 +382,33 @@ cursor.invalid`. The use case now returns the whole list; the
   title. Its unit test is gone (the use-case tests cover it). Rejected: a
   CHANGELOG line for room images and the map; a failed save losing them
   was a rare edge case, which AGENTS.md keeps out of the changelog.
+- 8: ADR 0014 written (Proposed), one recommendation per PLAN bullet. Notable:
+  RSVPs record two changes (own RSVP to the guest, the count to the event);
+  site-level subjects (locations, guests) are recorded once per event;
+  host names, counts and location names are normalized in the replica;
+  cascades record one change per session (reaction skips `cascade: true`);
+  meeting expiry is derived on the client, clash lines stay a server query;
+  pruning moves to a contiguous prefix with a stored watermark (`410` below
+  it or above the newest `seq`); hidden tabs close the feed after 30 s, and
+  the docs ask for HTTP/2.
+- 8 review, all accepted: resets go in-stream (`event: reset`, status 200),
+  hidden tabs reopen with `?since=`; newest `seq` from `sqlite_sequence`;
+  event guests include hosts and meeting guests, guest delete is a cascade;
+  the hub closes a guest's connections on credential changes, and every
+  connection ends after 10 min; audiences keep `guests`/`admins` and per-event
+  rows, stated as superseding the target; `no-transform`, slug change, guest
+  payloads carry `profileVersion`, fake-clock pruning note, 1 MB send limit.
 
 ## Problems
 
 None.
 
 ## Questions
+
+- 8 (ADR 0014, open questions): should attendees be told when a day or
+  location delete removes or changes their sessions (today: no; the ADR
+  keeps that)? Should hidden tabs close the feed after 30 s (recommended),
+  or stay connected and rely on HTTP/2 only?
 
 - 5d: `GET /guests?eventId=…` is limited to admins and the event's guests
   (safe default, review). Widen it to anyone with the site password if the
@@ -403,4 +424,4 @@ None.
 
 ## Next step
 
-8.
+9.
