@@ -232,7 +232,7 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
         composition); the proposal create action takes a key, its form sends one.
   - [x] 17b2. The three comment create actions take a key; `CommentsSection` makes
         one per compose box and renews it after a success.
-  - [ ] 17b3. Session create (the form posts to an API route today): takes a key.
+  - [x] 17b3. Session create (the form posts to an API route today): takes a key.
   - [ ] 17c. The RSVP toggle sends a key; the replica matches the RSVP echo by
         `command_key` instead of by the count. `fixes #141`.
 - [ ] 18. **Docs**: ADRs 0012–0014 accepted and matching the code;

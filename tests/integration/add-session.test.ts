@@ -49,7 +49,7 @@ async function protectGuest(guestId: string): Promise<void> {
 
 function makeReq(
   payload: unknown,
-  opts?: { editorGuestId?: string; verified?: boolean }
+  opts?: { editorGuestId?: string; verified?: boolean; key?: string }
 ): NextRequest {
   // Creating requires a name to be selected, so default to the payload's
   // first host: the ordinary case of a host booking their own session.
@@ -62,7 +62,10 @@ function makeReq(
     method: "POST",
     body: JSON.stringify(payload),
     // The guest cookie identifies the acting guest, like the site sets it.
-    headers: cookies.length ? { cookie: cookies.join("; ") } : undefined,
+    headers: {
+      ...(cookies.length ? { cookie: cookies.join("; ") } : {}),
+      ...(opts?.key ? { "idempotency-key": opts.key } : {}),
+    },
   });
 }
 
@@ -128,6 +131,43 @@ describe("POST /api/add-session", () => {
     await runJobs();
     expect(sendMail).toHaveBeenCalledOnce();
     expect(vi.mocked(sendMail).mock.calls[0][0].to).toBe("cohost@test.example");
+  });
+
+  it("creates the session once when the same form is sent twice", async () => {
+    const event = await createEvent({ phase: "scheduling" });
+    const guest = await createGuest({ eventId: event.id });
+    const location = await createLocation({ eventId: event.id });
+    const day = await createDay(event.id);
+    const payload = buildPayload(guest, location, day);
+
+    const first = await POST(makeReq(payload, { key: "form-1" }));
+    const second = await POST(makeReq(payload, { key: "form-1" }));
+
+    expect(await first.json()).toEqual({ success: true });
+    expect(await second.json()).toEqual({ success: true });
+    expect(await getRepositories().sessions.listByEvent(event.id)).toHaveLength(
+      1
+    );
+  });
+
+  it("refuses a key reused with different content", async () => {
+    const event = await createEvent({ phase: "scheduling" });
+    const guest = await createGuest({ eventId: event.id });
+    const location = await createLocation({ eventId: event.id });
+    const day = await createDay(event.id);
+
+    await POST(makeReq(buildPayload(guest, location, day), { key: "form-1" }));
+    const second = await POST(
+      makeReq(buildPayload(guest, location, day, { title: "Other" }), {
+        key: "form-1",
+      })
+    );
+
+    expect(second.status).toBe(409);
+    expect(((await second.json()) as { error: string }).error).not.toBe("");
+    expect(await getRepositories().sessions.listByEvent(event.id)).toHaveLength(
+      1
+    );
   });
 
   it("creates a session and returns success", async () => {

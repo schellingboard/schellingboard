@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 import { Input } from "@/app/input";
+import { newIdempotencyKey } from "@/utils/idempotency-key";
 import { SelectHosts } from "@/app/select-hosts";
 import {
   durationMinusBreak,
@@ -323,6 +324,7 @@ export function SessionForm(props: {
   const router = useRouter();
   const showToast = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [idempotencyKey] = useState(newIdempotencyKey);
   const Submit = async () => {
     setIsSubmitting(true);
     setError(null);
@@ -336,6 +338,7 @@ export function SessionForm(props: {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...(sessionID ? {} : { "Idempotency-Key": idempotencyKey }),
       },
       body: JSON.stringify({
         id: sessionID,
