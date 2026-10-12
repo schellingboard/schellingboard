@@ -11,6 +11,7 @@ import { assignGuestsToEvent, removeGuestsFromEvent } from "./event-guests";
 import { importGuests } from "./guest-import";
 import {
   getProfile,
+  listEventProfiles,
   removeMyAvatar,
   replaceMyAvatar,
   updateMyProfile,
@@ -19,6 +20,7 @@ import {
 export function createPeopleUseCases(deps: PeopleDeps) {
   return {
     getProfile: getProfile(deps),
+    listEventProfiles: listEventProfiles(deps),
     updateMyProfile: updateMyProfile(deps),
     replaceMyAvatar: replaceMyAvatar(deps),
     removeMyAvatar: removeMyAvatar(deps),

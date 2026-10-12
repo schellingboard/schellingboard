@@ -19,6 +19,7 @@ import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 import { createImageFile } from "../helpers/utils";
+import { createAdminAuthCookie } from "@/utils/auth";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 const HANDLERS = { GET, POST, PUT, DELETE } as const;
@@ -77,6 +78,68 @@ afterEach(() => {
 });
 
 describe("/api/v1 profiles", () => {
+  it(
+    "lists an event's guests' public profiles page by page, in id order",
+    { tags: ["019-US8"] },
+    async () => {
+      const event = await createEvent();
+      const [a, b, c] = (
+        await Promise.all(
+          ["Ada", "Bo", "Cy"].map((name) =>
+            createGuest({
+              name,
+              email: `${name}@example.com`,
+              eventId: event.id,
+            })
+          )
+        )
+      ).sort((x, y) => (x.id < y.id ? -1 : 1));
+      await createGuest({ name: "Elsewhere" });
+      const list = (query: string, cookie = asGuest(a.id)) =>
+        call("GET", `/guests?eventId=${event.id}${query}`, { cookie });
+
+      const first = await list("&limit=2");
+      expect(first.status).toBe(200);
+      const text = await first.text();
+      expect(text).not.toContain("@example.com");
+      const page = JSON.parse(text) as {
+        items: { id: string; name: string }[];
+        nextCursor: string;
+      };
+      expect(page.items.map((g) => g.id)).toEqual([a.id, b.id]);
+      expect(page.items[0]).toMatchObject({ name: a.name, version: 1 });
+      expect(await (await list(`&cursor=${page.nextCursor}`)).json()).toEqual({
+        items: [expect.objectContaining({ id: c.id })],
+        nextCursor: null,
+      });
+
+      const missing = await call("GET", "/guests?eventId=nope", {
+        cookie: asGuest(a.id),
+      });
+      expect(missing.status).toBe(404);
+      expect(await missing.json()).toMatchObject({ code: "event.notFound" });
+    }
+  );
+
+  it(
+    "lists an event's guests to its guests and admins only",
+    { tags: ["019-US8"] },
+    async () => {
+      vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
+      const event = await createEvent();
+      const member = await createGuest({ eventId: event.id });
+      const outsider = await createGuest();
+      const admin = await createAdminAuthCookie();
+      const status = async (cookie?: string) =>
+        (await call("GET", `/guests?eventId=${event.id}`, { cookie })).status;
+
+      expect(await status(asGuest(member.id))).toBe(200);
+      expect(await status(`${admin.name}=${admin.value}`)).toBe(200);
+      expect(await status(asGuest(outsider.id))).toBe(403);
+      expect(await status()).toBe(403);
+    }
+  );
+
   it(
     "serves a public profile without the email, and 404s an unknown guest",
     { tags: ["011-US1"] },

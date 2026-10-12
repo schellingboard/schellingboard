@@ -1,12 +1,15 @@
 import { createRoute, z } from "@hono/zod-openapi";
+import { pageQuerySchema } from "@schellingboard/contracts/cursor-page";
 import {
   profileBodySchema,
+  publicProfileListSchema,
   publicProfileSchema,
 } from "@schellingboard/contracts/guest";
 import { expectedVersion as sharedExpectedVersion } from "@schellingboard/contracts/session";
 import { MIN_AVATAR_WIDTH } from "@/utils/avatar-image-constraints";
 import { MAX_IMAGE_BYTES } from "@/utils/images";
 import { idempotencyHeaders } from "@/server/http/idempotency";
+import { pageOf } from "@/server/http/pagination";
 import {
   problem,
   problemDefault,
@@ -31,6 +34,23 @@ const avatarForm = z.object({
       `JPEG, PNG or WebP, at most ${MAX_IMAGE_BYTES / 1024 / 1024} MiB, at least ${MIN_AVATAR_WIDTH} px square`
     ),
   expectedVersion,
+});
+
+const listEventProfiles = createRoute({
+  method: "get",
+  path: "/guests",
+  tags: ["people"],
+  description:
+    "The public profiles of an event's guests, in id order; for the event's guests and admins.",
+  request: {
+    query: pageQuerySchema.extend({
+      eventId: z.string().min(1).describe("The event whose guests to list"),
+    }),
+  },
+  responses: {
+    200: json(publicProfileListSchema, "The event's guests"),
+    ...problemDefault,
+  },
 });
 
 const getProfile = createRoute({
@@ -95,6 +115,23 @@ const removeMyAvatar = createRoute({
 });
 
 export function addPeopleRoutes(app: App, people: () => PeopleUseCases) {
+  app.openapi(listEventProfiles, async (c) => {
+    const { limit, cursor, eventId } = c.req.valid("query");
+    const result = await people().listEventProfiles(c.var.actor, { eventId });
+    if (!result.ok) return problem(result.error);
+    const page = pageOf(
+      result.value,
+      { limit, cursor },
+      `guests:${eventId}`,
+      (g) => [g.id]
+    );
+    if (!page.ok) return problem(page.error);
+    return c.json(
+      { ...page.value, items: page.value.items.map(toProfileView) },
+      200
+    );
+  });
+
   app.openapi(getProfile, async (c) => {
     const result = await people().getProfile(c.var.actor, {
       guestId: c.req.valid("param").id,

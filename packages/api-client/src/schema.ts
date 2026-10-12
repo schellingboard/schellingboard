@@ -2657,6 +2657,62 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/guests": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The public profiles of an event's guests, in id order; for the event's guests and admins. */
+    get: {
+      parameters: {
+        query: {
+          /** @description How many items to answer at most */
+          limit?: number;
+          /** @description The `nextCursor` of the previous page; left out for the first */
+          cursor?: string;
+          /** @description The event whose guests to list */
+          eventId: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The event's guests */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              items: components["schemas"]["PublicProfile"][];
+              /** @description Pass as `cursor` for the next page; null on the last */
+              nextCursor: string | null;
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/guests/{id}": {
     parameters: {
       query?: never;

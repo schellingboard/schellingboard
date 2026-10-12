@@ -8,6 +8,7 @@ import {
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import {
+  forbidden,
   invalid,
   notFound,
   ok,
@@ -30,6 +31,24 @@ export interface ProfileInput {
 }
 
 const profileNotFound = () => notFound("profile.notFound", "Profile not found");
+
+export const listEventProfiles =
+  ({ repos }: PeopleDeps) =>
+  async (
+    actor: Actor,
+    { eventId }: { eventId: string }
+  ): Promise<Result<Guest[]>> => {
+    const acting = actor.admin ? null : await actingGuest(actor, repos.guests);
+    if (acting && !acting.ok) return acting;
+    if (!(await repos.events.findById(eventId)))
+      return notFound("event.notFound", "Event not found");
+    if (acting) {
+      const attending = await repos.guests.listEventsByGuests([acting.value]);
+      if (!attending.get(acting.value)?.some((e) => e.id === eventId))
+        return forbidden("guest.notInEvent", "You are not part of this event");
+    }
+    return ok(await repos.guests.listProfilesByEvent(eventId));
+  };
 
 export const getProfile =
   ({ repos }: PeopleDeps) =>

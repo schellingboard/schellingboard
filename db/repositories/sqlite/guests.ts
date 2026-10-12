@@ -167,6 +167,37 @@ export class SqliteGuestsRepository implements GuestsRepository {
     return rows;
   }
 
+  async listProfilesByEvent(eventId: string): Promise<Guest[]> {
+    const g = schema.guests;
+    return this.db
+      .select({
+        id: g.id,
+        name: g.name,
+        aboutMe: g.aboutMe,
+        avatarUrl: g.avatarUrl,
+        pronouns: g.pronouns,
+        basedIn: g.basedIn,
+        prompts: g.prompts,
+        languages: g.languages,
+        contacts: g.contacts,
+        profileUpdatedAt: g.profileUpdatedAt,
+        authProtected: g.authProtected,
+        version: g.version,
+        profileVersion: g.profileVersion,
+      })
+      .from(g)
+      .innerJoin(schema.eventGuests, eq(g.id, schema.eventGuests.guestId))
+      .where(eq(schema.eventGuests.eventId, eventId))
+      .all()
+      .map((row) => ({
+        ...row,
+        profileUpdatedAt: row.profileUpdatedAt
+          ? new Date(row.profileUpdatedAt)
+          : null,
+        info: undefined,
+      }));
+  }
+
   async search(opts: {
     query?: string;
     limit: number;
