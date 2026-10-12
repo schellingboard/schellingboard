@@ -204,7 +204,7 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
         stream plus a hard refresh whose seed has a lower seq stays stale: handle there.
   - [x] 14c. RSVP echo reconciliation (replaces the count deltas), and the
         meetings column's debounced refetch.
-  - [ ] 14d. E2E: two browser contexts, kiosk included.
+  - [x] 14d. E2E: two browser contexts, kiosk included.
 - [ ] 15. **Sync state**: an indicator on the schedule (live, reconnecting, stale), so
       a stale schedule never looks current (ADR 0006). `fixes #1111`.
 
