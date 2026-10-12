@@ -27,7 +27,7 @@ export default async function SiteLayout({
   const events = isAuthenticated ? await reads.allEvents() : [];
   const navItems = events.map((e) => ({
     name: e.name,
-    href: `/legacy/${e.slug}`,
+    href: `/${e.slug}`,
     icon: e.icon ?? null,
   }));
   // Global attendee list backs the header name selector, which is shown on

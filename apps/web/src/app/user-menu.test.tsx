@@ -3,7 +3,9 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { UserMenu } from "./user-menu";
 import { hardNavigate, hardReload } from "./hard-navigate";
+import { endSiteSession } from "./site-session";
 
+vi.mock("./site-session", () => ({ endSiteSession: vi.fn() }));
 vi.mock("./hard-navigate", () => ({
   hardNavigate: vi.fn(),
   hardReload: vi.fn(),
@@ -35,8 +37,8 @@ describe("UserMenu", () => {
     const { user, choose } = setup();
 
     await user.click(screen.getByRole("button", { name: "Your name" }));
-    const dialog = screen.getByRole("dialog", { name: "My name is" });
-    await user.click(within(dialog).getByRole("button", { name: "Alan" }));
+    const dialog = screen.getByRole("dialog", { name: "Who are you?" });
+    await user.click(within(dialog).getByRole("option", { name: "Alan" }));
 
     expect(choose).toHaveBeenCalledWith("g3");
     expect(screen.queryByRole("dialog")).toBeNull();
@@ -47,12 +49,12 @@ describe("UserMenu", () => {
     await user.click(screen.getByRole("button", { name: "Your name" }));
 
     await user.type(
-      screen.getByRole("searchbox", { name: "Find your name" }),
+      screen.getByRole("combobox", { name: "My name is:" }),
       "gr"
     );
 
-    expect(screen.queryByRole("button", { name: "Alan" })).toBeNull();
-    expect(screen.getByRole("button", { name: /Grace/ })).toBeTruthy();
+    expect(screen.queryByRole("option", { name: "Alan" })).toBeNull();
+    expect(screen.getByRole("option", { name: /Grace/ })).toBeTruthy();
   });
 
   it("sends a protected name to the legacy login", async () => {
@@ -63,7 +65,7 @@ describe("UserMenu", () => {
     });
     await user.click(screen.getByRole("button", { name: "Your name" }));
 
-    await user.click(screen.getByRole("button", { name: /Grace/ }));
+    await user.click(screen.getByRole("option", { name: /Grace/ }));
 
     expect(choose).toHaveBeenCalledWith("g2");
     expect(hardNavigate).toHaveBeenCalledWith("/legacy/auth/login?guest=g2");
@@ -77,7 +79,7 @@ describe("UserMenu", () => {
     });
     await user.click(screen.getByRole("button", { name: "Your name" }));
 
-    await user.click(screen.getByRole("button", { name: "Alan" }));
+    await user.click(screen.getByRole("option", { name: "Alan" }));
 
     expect((await screen.findByRole("alert")).textContent).toMatch(
       /try again/i
@@ -91,7 +93,7 @@ describe("UserMenu", () => {
     await user.click(screen.getByRole("button", { name: "Your name: Ada" }));
 
     const href = (name: string) =>
-      screen.getByRole("link", { name }).getAttribute("href");
+      screen.getByRole("menuitem", { name }).getAttribute("href");
     expect(href("My profile")).toBe("/legacy/guests/g1");
     expect(href("Edit profile")).toBe("/legacy/guests/edit");
     expect(href("Settings")).toBe("/legacy/settings");
@@ -101,9 +103,10 @@ describe("UserMenu", () => {
     const { user, signOut } = setup({ guestId: "g1" });
     await user.click(screen.getByRole("button", { name: "Your name: Ada" }));
 
-    await user.click(screen.getByRole("button", { name: "Log out" }));
+    await user.click(screen.getByRole("menuitem", { name: "Log out" }));
 
     expect(signOut).toHaveBeenCalled();
+    expect(endSiteSession).toHaveBeenCalled();
     expect(hardReload).toHaveBeenCalled();
   });
 
@@ -114,13 +117,13 @@ describe("UserMenu", () => {
     });
     await user.click(screen.getByRole("button", { name: "Your name: Ada" }));
 
-    await user.click(screen.getByRole("button", { name: "Log out" }));
+    await user.click(screen.getByRole("menuitem", { name: "Log out" }));
 
     expect((await screen.findByRole("alert")).textContent).toMatch(
       /try again/i
     );
     expect(hardReload).not.toHaveBeenCalled();
-    expect(screen.getByRole("button", { name: "Log out" })).toBeTruthy();
+    expect(screen.getByRole("menuitem", { name: "Log out" })).toBeTruthy();
   });
 
   it("shows nothing while the viewer is unknown", () => {

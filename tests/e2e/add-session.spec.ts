@@ -9,7 +9,7 @@ test("a newly added session appears on the overview and can be opened @008-US1 @
 }) => {
   await login(page);
 
-  await page.goto("/Conference-Gamma");
+  await page.goto("/legacy/Conference-Gamma");
   await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
   await selectUser(page, /Alice Test/i);
 

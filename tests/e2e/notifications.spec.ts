@@ -234,7 +234,8 @@ test.describe("attendee-count reminders", () => {
     page,
   }) => {
     await login(page);
-    await page.goto("/Conference-Gamma?dev=1");
+    // "Send due reminders" below is a legacy-page dev tool.
+    await page.goto("/legacy/Conference-Gamma?dev=1");
     await selectUser(page, "Charlie Test");
     await setDevClock(page, lateOnGammaDay(1));
     await page.reload();

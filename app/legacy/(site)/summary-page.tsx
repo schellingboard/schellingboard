@@ -4,7 +4,7 @@ import {
   CalendarIcon,
   LinkIcon,
 } from "@heroicons/react/16/solid";
-import Link from "next/link";
+import { AppLink } from "@/app/components/app-link";
 import { type Event, compareEventsByStart } from "@schellingboard/domain/event";
 import { Markdown } from "@/app/legacy/(site)/markdown";
 import { formatEventDates } from "@schellingboard/domain/time";
@@ -47,13 +47,13 @@ export default function SummaryPage(props: {
               <div className="text-fg mt-2">
                 <Markdown>{event.description}</Markdown>
               </div>
-              <Link
-                href={`/legacy/${event.slug}`}
+              <AppLink
+                href={`/${event.slug}`}
                 className="font-semibold text-brand-fg hover:text-brand-fg-hover flex gap-1 items-center text-sm justify-end mt-2"
               >
                 View event
                 <ArrowRightIcon className="h-4 w-4" />
-              </Link>
+              </AppLink>
             </div>
           ))}
         </div>

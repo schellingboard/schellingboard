@@ -105,7 +105,7 @@ describe("the meetings page", () => {
     });
 
     await expect(renderPage(event.slug)).rejects.toThrow(
-      new RegExp(`NEXT_REDIRECT;/legacy/${event.slug}$`)
+      new RegExp(`NEXT_REDIRECT;/${event.slug}$`)
     );
   });
 

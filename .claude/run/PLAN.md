@@ -139,7 +139,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
         `app/schedule-page.tsx`, tested through a test router; not routed.
   - [x] 13f. The grid block's RSVP badge click (RSVP, clash confirm, name
         picker), so the SPA schedule has what the legacy one does.
-  - [ ] 13g. **Takeover** (user decision 2026-10-09: no preview route): the
+  - [x] 13g. **Takeover** (user decision 2026-10-09: no preview route): the
         router owns `/{slug}` and renders the SPA schedule. Until their steps
         move, `kiosk`, `viewSession` and `viewMeeting` in the query forward to
         the legacy schedule, and so do the legacy static root pages. Legacy

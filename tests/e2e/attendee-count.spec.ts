@@ -46,8 +46,10 @@ const dialog = (page: Page) =>
 // Land on Gamma's schedule as `who`, with the fake clock past the first day's
 // sessions so the server-side gate is open from first paint. Also used to
 // change identity mid-test: selectUser logs out and back in on its own.
+// The session modal and the dev toolbar's "Send due reminders" are the legacy
+// schedule's until the SPA has them, so this lands there.
 async function landAs(page: Page, who: string, day = 0) {
-  await page.goto("/Conference-Gamma?dev=1");
+  await page.goto("/legacy/Conference-Gamma?dev=1");
   await selectUser(page, who);
   await setDevClock(page, lateOnGammaDay(day));
   await page.reload();

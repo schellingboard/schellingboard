@@ -30,6 +30,24 @@ const ALLOWED_CONSOLE_PATTERNS: RegExp[] = [
 const SERVER_PATH =
   /^\/(legacy|api|media|locations|_next|_spa|sw\.js|manifest\.webmanifest|favicon\.ico|icon|apple-touch-icon|one-on-one)(\/|\.|-|$)/;
 
+// Legacy pages directly under the root: `/settings` is never an event. Kept in
+// step with apps/web/src/app/legacy-pages.ts (tests/unit/spa-legacy-pages.test.ts).
+const LEGACY_ROOT_PAGES = [
+  "admin",
+  "auth",
+  "guests",
+  "login",
+  "notifications",
+  "settings",
+];
+
+// An event's own page, `/{slug}`, which the SPA serves. Its modals and kiosk
+// mode are still the legacy schedule's, which the SPA hands the address to.
+function isEventPage(url: string): boolean {
+  const slug = /^\/([^/?#]+)(?:[?#].*)?$/.exec(url)?.[1];
+  return slug !== undefined && !LEGACY_ROOT_PAGES.includes(slug);
+}
+
 function isAllowed(text: string): boolean {
   return ALLOWED_CONSOLE_PATTERNS.some((re) => re.test(text));
 }
@@ -41,13 +59,16 @@ function formatConsoleMessage(msg: ConsoleMessage): string {
 }
 
 export const test = base.extend<{ consoleGuard: void }>({
-  // Specs go to the legacy page directly: through the shell, a click can land
+  // Specs go to a legacy page directly: through the shell, a click can land
   // before the page behind it has hydrated. The hop has its own spec (@014-US4).
+  // An event's schedule is the SPA's own, so it is opened as it is.
   page: async ({ page }, provide) => {
     const goto = page.goto.bind(page);
     page.goto = (url, options) =>
       goto(
-        url.startsWith("/") && !SERVER_PATH.test(url) ? `/legacy${url}` : url,
+        url.startsWith("/") && !SERVER_PATH.test(url) && !isEventPage(url)
+          ? `/legacy${url}`
+          : url,
         options
       );
     await provide(page);
