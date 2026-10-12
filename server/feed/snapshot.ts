@@ -17,7 +17,7 @@ import {
 import { eventGuests, toEventGuestView } from "@/server/modules/people/module";
 import {
   eventSessions,
-  toSessionView,
+  toSnapshotSessionView,
   toUnavailabilityView,
 } from "@/server/modules/sessions/module";
 import { eventLocations, toLocationView } from "@/server/modules/venue/module";
@@ -63,17 +63,6 @@ async function assemble(
     eventGuests(q, eventId),
     eventMeetings(q, eventId, viewerId),
   ]);
-  const counts: Record<string, number> = {};
-  const sessionViews = sessions.sessions.map((s) => {
-    const { hosts, locations, numRsvps, ...view } = toSessionView(s);
-    counts[s.id] = numRsvps;
-    return {
-      ...view,
-      hostIds: hosts.map((h) => h.id),
-      locationIds: locations.map((l) => l.id),
-    };
-  });
-
   return {
     seq,
     event: toEventView(schedule.event),
@@ -81,8 +70,10 @@ async function assemble(
     locations: locations.map(toLocationView),
     unavailability: sessions.unavailability.map(toUnavailabilityView),
     guests: guests.map((g) => ({ ...toEventGuestView(g), member: g.member })),
-    sessions: sessionViews,
-    counts,
+    sessions: sessions.sessions.map(toSnapshotSessionView),
+    counts: Object.fromEntries(
+      sessions.sessions.map((s) => [s.id, s.numRsvps])
+    ),
     meetingPoints: meetings.meetingPoints.map(toMeetingPointView),
     me: viewerId
       ? {

@@ -68,6 +68,7 @@
     "drizzle-kit": "^0.31.11",
     "eslint": "^9",
     "eslint-config-next": "^16",
+    "fast-check": "^4.10.2",
     "likec4": "1.59.4",
     "openapi-typescript": "^7.13.0",
     "postcss": "^8.5.29",

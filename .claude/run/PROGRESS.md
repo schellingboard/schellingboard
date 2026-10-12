@@ -469,18 +469,32 @@ cursor.invalid`. The use case now returns the whole list; the
   the meetings again outside the snapshot's read (step 14 replaces it with
   the meetings column's own fetch). The guest mapping is checked with
   `satisfies`; the ADR paragraphs are reflowed.
+- 11: settled 10c's question: `apply` lives with the client store
+  (`app/(site)/[eventSlug]/replica/apply.ts`) over the contracts' `Snapshot`
+  and `FeedMessage` (new `packages/contracts/src/feed.ts`, the two session
+  types so far); `packages/domain` would need a copy of the wire types
+  (ADR 0014 section 12 amended). `reaches(audience, viewer)` is in the
+  domain; `project(change, viewer)` in `server/feed/project.ts` sends
+  `commandKey` to the actor only. Sessions in the snapshot and in
+  `session.changed` share `toSnapshotSessionView`. The harness,
+  `expectChangesSuffice(actor, slug, work)` in `tests/helpers/sufficiency.ts`,
+  compares replica and snapshot without `seq` and with lists sorted by id.
+  A session deletion drops the session's count; the viewer's own RSVPs to
+  it wait for `rsvp.removed` (12a). `fast-check` added (dev); the property
+  test uses a fixed seed (#1169). The snapshot fixture moved to
+  `tests/helpers/snapshot-fixture.ts`.
+- 11 review, all accepted: unit tests for `project` (command key per actor)
+  and `reaches`; `apply` gives a new session a count of 0, as the snapshot
+  does, and the fixture has a count per session; the property test adds seq
+  gaps and duplicate deliveries; the harness takes a `viewer`. The command
+  key's actor is coarser than ADR 0012's key scope (no admin id, no cookie
+  level): written down in ADR 0014 section 10, not changed.
 
 ## Problems
 
 None.
 
 ## Questions
-
-- 10c, for step 11: ADR 0014 section 12 puts `Replica` and `apply` in
-  `packages/domain`, but domain may not import `packages/contracts`, where
-  the snapshot and feed message types live. Options: domain defines the
-  replica's types itself and the contracts' schemas are checked against them
-  (`satisfies`), or `apply` lives with the client store. Step 11 needs one.
 
 - 8 (ADR 0014, open questions): should attendees be told when a day or
   location delete removes or changes their sessions (today: no; the ADR
@@ -501,4 +515,4 @@ None.
 
 ## Next step
 
-11.
+12a.

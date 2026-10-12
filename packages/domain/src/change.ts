@@ -49,6 +49,22 @@ export function audienceOf(change: Change): Audience {
   }
 }
 
+/** Whom a feed connection serves: its guest, if any, and whether an admin. */
+export type Viewer = { guestId: string | null; admin: boolean };
+
+export function reaches(audience: Audience | null, viewer: Viewer): boolean {
+  switch (audience?.kind) {
+    case "event":
+      return true;
+    case "guests":
+      return viewer.guestId !== null && audience.ids.includes(viewer.guestId);
+    case "admins":
+      return viewer.admin;
+    default:
+      return false;
+  }
+}
+
 /**
  * A change as the log holds it: `seq` orders the log, `id` names one entry.
  * Entries written before audiences have none and go to no one.
