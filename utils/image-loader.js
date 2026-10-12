@@ -40,7 +40,7 @@ export function isUnoptimized(src) {
 export default function imageLoader({ src, width, quality }) {
   if (isUnoptimized(src)) return src;
 
-  // Stored media URLs already carry a ?v= cache-buster.
+  // Stored media URLs may already carry a ?v= cache-buster.
   const separator = src.includes("?") ? "&" : "?";
   return `${src}${separator}w=${width}&q=${quality || DEFAULT_QUALITY}`;
 }

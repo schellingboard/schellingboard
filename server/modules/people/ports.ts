@@ -8,9 +8,9 @@ export interface ValidatedImage {
 
 export interface AvatarStore {
   validate(image: Buffer): Promise<ValidatedImage | { error: string }>;
-  /** Returns the photo's public URL. */
-  save(guestId: string, image: Buffer, ext: string): Promise<string>;
-  delete(guestId: string): Promise<void>;
+  /** Returns the new file's public URL; earlier files stay. */
+  saveNew(guestId: string, image: Buffer, ext: string): Promise<string>;
+  deleteByUrl(url: string): Promise<void>;
 }
 
 export interface PeopleDeps {

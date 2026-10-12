@@ -343,6 +343,23 @@ cursor.invalid`. The use case now returns the whole list; the
   the `default` problem response covers `429`.
 - 7.2 review: an open (unsigned) guest cookie no longer gets its own
   bucket, as any id would buy a fresh one; open names count by client IP.
+- 7a1: each photo upload gets a file of its own (`<guestId>-<uuid>.<ext>`,
+  no `?v=`: the name is the cache buster) through the avatar port's
+  `saveNew`; the row then moves in the transaction. After it, the file the
+  row no longer names is deleted (`deleteByUrl`, renditions too): the old
+  one on success, the new one on a conflict, a missing guest or a throw. So
+  the version check before the file write is gone. A guest delete deletes
+  the photo after commit. A file that cannot be deleted is logged. Old
+  `<guestId>.<ext>` files are deleted by URL like new ones. Photos of
+  guests deleted before this change stay on disk. The admin cannot change
+  a guest's photo, so "admin save and removal" is only the delete. E2E run:
+  profile-photo and profile specs.
+- 7a1 review: a resize (`?w=`) of the old photo still running when the
+  file is deleted can write `<old>.<w>.<ext>` afterwards, and nothing
+  removes it (the old `save` deleted every `<id>.` file on the next
+  upload). Left for 7a2. A failed directory read while deleting is logged.
+  The race test now covers only a stale upload: with no check before the
+  file write, the race it guarded no longer exists.
 
 ## Problems
 
@@ -364,4 +381,4 @@ None.
 
 ## Next step
 
-7a.
+7a2.

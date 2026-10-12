@@ -70,49 +70,50 @@ const profileConflict = (current: CompleteGuest) =>
     "Someone changed this profile while you edited it. Copy your edits somewhere safe: reloading the page discards them."
   );
 
-// Files first, then the row is read and written in one transaction, so a photo
-// upload and a profile save racing each other never revert each other's fields.
+// The new photo gets a file of its own, so the row and the files agree
+// whichever way the transaction ends: the loser's file is the one deleted.
 async function saveProfile(
-  { uow, avatars, repos }: PeopleDeps,
+  { uow, avatars }: PeopleDeps,
   guestId: string,
   avatar: ValidatedImage | null | undefined,
   fields: (current: CompleteGuest) => ProfileFields,
   now: Date,
   expectedVersion: number
 ): Promise<Result<Guest>> {
-  if (avatar !== undefined) {
-    const current = await repos.guests.findById(guestId);
-    if (!current) return profileNotFound();
-    if (current.profileVersion !== expectedVersion)
-      return profileConflict(current);
+  const newUrl = avatar
+    ? await avatars.saveNew(guestId, avatar.buffer, avatar.ext)
+    : null;
+  let replacedUrl: string | undefined;
+  let saved: Result<Guest>;
+  try {
+    saved = await uow.run(async (tx) => {
+      const current = await tx.guests.findById(guestId);
+      if (!current) return profileNotFound();
+      const updated = await tx.guests.updateProfile(
+        guestId,
+        {
+          ...fields(current),
+          avatarUrl:
+            avatar === undefined
+              ? (current.avatarUrl ?? null)
+              : (newUrl ?? null),
+          expectedVersion,
+        },
+        now
+      );
+      if (!updated) {
+        const after = await tx.guests.findById(guestId);
+        return after ? profileConflict(after) : profileNotFound();
+      }
+      if (avatar !== undefined) replacedUrl = current.avatarUrl ?? undefined;
+      return ok(sanitizeGuest(updated));
+    });
+  } catch (error) {
+    if (newUrl) await avatars.deleteByUrl(newUrl);
+    throw error;
   }
-  let avatarUrl: string | null | undefined;
-  if (avatar === null) {
-    await avatars.delete(guestId);
-    avatarUrl = null;
-  } else if (avatar) {
-    avatarUrl = await avatars.save(guestId, avatar.buffer, avatar.ext);
-  }
-
-  const saved = await uow.run(async (tx) => {
-    const current = await tx.guests.findById(guestId);
-    if (!current) return profileNotFound();
-    const updated = await tx.guests.updateProfile(
-      guestId,
-      {
-        ...fields(current),
-        avatarUrl:
-          avatarUrl === undefined ? (current.avatarUrl ?? null) : avatarUrl,
-        expectedVersion,
-      },
-      now
-    );
-    if (updated) return ok(sanitizeGuest(updated));
-    const after = await tx.guests.findById(guestId);
-    return after ? profileConflict(after) : profileNotFound();
-  });
-  if (!saved.ok && saved.error.code === "profile.notFound" && avatarUrl)
-    await avatars.delete(guestId);
+  const unused = saved.ok ? replacedUrl : newUrl;
+  if (unused) await avatars.deleteByUrl(unused);
   return saved;
 }
 
