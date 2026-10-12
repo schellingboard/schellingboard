@@ -438,6 +438,11 @@ export const features = {
         actor: "attendee",
         priority: "P3",
       },
+      US4: {
+        title: "Attendee opens an old link from an email or bookmark",
+        actor: "attendee",
+        priority: "P1",
+      },
     },
   },
   "015": {

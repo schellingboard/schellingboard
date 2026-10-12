@@ -55,3 +55,13 @@ test("settings offers notifications on this device @013-US3", async ({
     section.getByRole("button", { name: "Turn on for this device" })
   ).toBeVisible();
 });
+
+test("an old root link reaches its page @014-US4", async ({ page }) => {
+  await login(page);
+  await page.evaluate(() =>
+    window.location.assign("/Conference-Alpha/proposals")
+  );
+
+  await expect(page).toHaveURL(/\/legacy\/Conference-Alpha\/proposals$/);
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+});

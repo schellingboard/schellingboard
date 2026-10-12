@@ -117,6 +117,12 @@ exists, and the job loop, notification and push infrastructure (`utils/jobs/`,
 (`server/admin-reads.ts`) is importable only from `app/legacy/admin/` and
 `app/actions/admin-*`.
 
+`apps/web` ([ADR 0015](adr/0015-spa-alongside-next.md)) imports
+`packages/domain`, `packages/contracts` and `packages/api-client` only: never `app/`,
+`server/`, `utils/`, `db/` or `next`. Nothing imports it, `features/` never imports
+`api-client` (screens call `commands/` and `queries/`), and it may import only what
+its own `package.json` declares. See [The web app](web-app.md).
+
 `make arch-graph` renders the graph to `arch-graph.svg` (needs graphviz), which
 is usually faster than arguing about where a boundary should go.
 
