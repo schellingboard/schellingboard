@@ -50,9 +50,8 @@ export async function POST(req: NextRequest) {
   });
   if ("success" in outcome) return Response.json({ success: true });
   if ("networkError" in outcome) return Response.error();
-  if ("status" in outcome) {
-    return Response.json({ error: outcome.error }, { status: outcome.status });
+  if ("idempotency" in outcome) {
+    return Response.json({ error: outcome.error }, { status: 409 });
   }
-  // The key was reused or is still in flight.
-  return Response.json({ error: outcome.error }, { status: 409 });
+  return Response.json({ error: outcome.error }, { status: outcome.status });
 }

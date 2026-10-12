@@ -61,6 +61,8 @@ export function actorScope({ admin, guest }: Actor): string | null {
   return `${admin ? "admin" : "-"}:${guest ? `${guest.level}:${guest.id}` : "-"}`;
 }
 
+export type KeyRefusal = { error: string; idempotency: true };
+
 export type ActionResult = { success: true } | { error: unknown };
 
 // A server action under a key from its form. Only a success is kept: a refused
@@ -75,7 +77,7 @@ export async function runIdempotentAction<R extends ActionResult>(
     now: Date;
   },
   run: () => Promise<R>
-): Promise<R | { error: string }> {
+): Promise<R | KeyRefusal> {
   const { actor, key, name, input, now } = call;
   const scope = actorScope(actor);
   if (
@@ -118,8 +120,12 @@ export async function runIdempotentAction<R extends ActionResult>(
       return {
         error:
           "This form was already sent with other content. Reload the page and try again.",
+        idempotency: true,
       };
     case "inProgress":
-      return { error: "This form is still being saved. Wait a moment." };
+      return {
+        error: "This form is still being saved. Wait a moment.",
+        idempotency: true,
+      };
   }
 }
