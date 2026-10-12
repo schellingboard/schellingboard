@@ -246,6 +246,15 @@ openapi-check typecheck test-coverage` (or `make test`), without E2E. E2E runs
   refused (the 3d race test is adapted). E2E run: admin, meetings-admin,
   meetings-availability, meetings-request, profile and user-auth specs.
 
+- 5b: `GET /admin/guests` (by id: names and emails change) and the three
+  comment lists (oldest first: creation time, then id) take the cursor
+  contract and answer `{ items, nextCursor }` (were `{ guests }` and
+  `{ comments }`). Replies are paged with the rest in time order, not under
+  their parent; `parentId` rebuilds the threads. A cursor's list name holds the
+  event or subject id (review; 5a's sessions and proposals too), so one from
+  another event's or subject's list is `400 cursor.invalid`. `/api/v1` is unreleased: the CHANGELOG API
+  bullet already covers pages.
+
 ## Problems
 
 None.
@@ -263,4 +272,4 @@ None.
 
 ## Next step
 
-5b. 4c2 waits on its question.
+4c2 (settled 2026-10-07), then 5c.

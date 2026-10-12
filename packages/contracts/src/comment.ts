@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { pageSchema } from "./cursor-page";
 import { COMMENT_MAX_LENGTH } from "@schellingboard/domain/comment";
 
 const body = z
@@ -69,9 +70,7 @@ export const commentViewSchema = z
   })
   .meta({ id: "Comment" });
 
-export const commentListSchema = z.object({
-  comments: z.array(commentViewSchema).describe("Oldest first"),
-});
+export const commentListSchema = pageSchema(commentViewSchema);
 
 export const commentCreateSchema = z.object({
   parentId: z

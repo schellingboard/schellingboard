@@ -170,14 +170,16 @@ connection does not create a second location or session.
 
 ## Long lists
 
-Lists that grow with an event, such as sessions and proposals, come in pages.
+Lists that grow with an event (sessions, proposals, guests and comments)
+come in pages.
 Ask for up to `limit` items (1 to 1000, default 100); the answer is
 `{ "items": […], "nextCursor": "…" }`. Pass `nextCursor` as `cursor` to get the
 next page, until it is `null`. Each list keeps a fixed order, given in the
 reference. An item deleted between two pages moves nothing; one changed
 meanwhile may show up twice or not at all, so read the whole list again
 when that matters. A cursor that does not come from the server is refused with
-`400` and `cursor.invalid`, and so is one from another list.
+`400` and `cursor.invalid`, and so is one from another list, such as
+another event's sessions.
 
 ## The TypeScript client
 

@@ -2127,12 +2127,36 @@
     "/api/v1/proposals/{id}/comments": {
       "get": {
         "tags": ["comments"],
+        "description": "The proposal's comments and replies, oldest first; `parentId` places a reply in its thread.",
         "parameters": [
           {
             "schema": { "type": "string", "minLength": 1 },
             "required": true,
             "name": "id",
             "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 100,
+              "description": "How many items to answer at most"
+            },
+            "required": false,
+            "description": "How many items to answer at most",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "The `nextCursor` of the previous page; left out for the first"
+            },
+            "required": false,
+            "description": "The `nextCursor` of the previous page; left out for the first",
+            "name": "cursor",
+            "in": "query"
           }
         ],
         "responses": {
@@ -2143,13 +2167,16 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "comments": {
+                    "items": {
                       "type": "array",
-                      "items": { "$ref": "#/components/schemas/Comment" },
-                      "description": "Oldest first"
+                      "items": { "$ref": "#/components/schemas/Comment" }
+                    },
+                    "nextCursor": {
+                      "type": ["string", "null"],
+                      "description": "Pass as `cursor` for the next page; null on the last"
                     }
                   },
-                  "required": ["comments"]
+                  "required": ["items", "nextCursor"]
                 }
               }
             }
@@ -2235,12 +2262,36 @@
     "/api/v1/sessions/{id}/comments": {
       "get": {
         "tags": ["comments"],
+        "description": "The session's comments and replies, oldest first; `parentId` places a reply in its thread.",
         "parameters": [
           {
             "schema": { "type": "string", "minLength": 1 },
             "required": true,
             "name": "id",
             "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 100,
+              "description": "How many items to answer at most"
+            },
+            "required": false,
+            "description": "How many items to answer at most",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "The `nextCursor` of the previous page; left out for the first"
+            },
+            "required": false,
+            "description": "The `nextCursor` of the previous page; left out for the first",
+            "name": "cursor",
+            "in": "query"
           }
         ],
         "responses": {
@@ -2251,13 +2302,16 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "comments": {
+                    "items": {
                       "type": "array",
-                      "items": { "$ref": "#/components/schemas/Comment" },
-                      "description": "Oldest first"
+                      "items": { "$ref": "#/components/schemas/Comment" }
+                    },
+                    "nextCursor": {
+                      "type": ["string", "null"],
+                      "description": "Pass as `cursor` for the next page; null on the last"
                     }
                   },
-                  "required": ["comments"]
+                  "required": ["items", "nextCursor"]
                 }
               }
             }
@@ -2343,12 +2397,36 @@
     "/api/v1/guests/{id}/comments": {
       "get": {
         "tags": ["comments"],
+        "description": "The guest's profile's comments and replies, oldest first; `parentId` places a reply in its thread.",
         "parameters": [
           {
             "schema": { "type": "string", "minLength": 1 },
             "required": true,
             "name": "id",
             "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 100,
+              "description": "How many items to answer at most"
+            },
+            "required": false,
+            "description": "How many items to answer at most",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "The `nextCursor` of the previous page; left out for the first"
+            },
+            "required": false,
+            "description": "The `nextCursor` of the previous page; left out for the first",
+            "name": "cursor",
+            "in": "query"
           }
         ],
         "responses": {
@@ -2359,13 +2437,16 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "comments": {
+                    "items": {
                       "type": "array",
-                      "items": { "$ref": "#/components/schemas/Comment" },
-                      "description": "Oldest first"
+                      "items": { "$ref": "#/components/schemas/Comment" }
+                    },
+                    "nextCursor": {
+                      "type": ["string", "null"],
+                      "description": "Pass as `cursor` for the next page; null on the last"
                     }
                   },
-                  "required": ["comments"]
+                  "required": ["items", "nextCursor"]
                 }
               }
             }
@@ -5931,7 +6012,32 @@
     "/api/v1/admin/guests": {
       "get": {
         "tags": ["admin"],
-        "description": "Every guest with their email and the events they belong to.",
+        "description": "Every guest with their email and the events they belong to, in id order.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 100,
+              "description": "How many items to answer at most"
+            },
+            "required": false,
+            "description": "How many items to answer at most",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "The `nextCursor` of the previous page; left out for the first"
+            },
+            "required": false,
+            "description": "The `nextCursor` of the previous page; left out for the first",
+            "name": "cursor",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "The guests",
@@ -5940,12 +6046,16 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "guests": {
+                    "items": {
                       "type": "array",
                       "items": { "$ref": "#/components/schemas/AdminGuest" }
+                    },
+                    "nextCursor": {
+                      "type": ["string", "null"],
+                      "description": "Pass as `cursor` for the next page; null on the last"
                     }
                   },
-                  "required": ["guests"]
+                  "required": ["items", "nextCursor"]
                 }
               }
             }

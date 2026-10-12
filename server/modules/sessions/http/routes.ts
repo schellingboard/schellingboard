@@ -140,9 +140,12 @@ export function addSessionRoutes(app: App, sessions: () => SessionUseCases) {
     const result = await sessions().listSessions(c.var.actor, { eventId });
     if (!result.ok) return problem(result.error);
     // By id: a sort key that never changes, unlike the start time.
-    const page = pageOf(result.value, { limit, cursor }, "sessions", (s) => [
-      s.id,
-    ]);
+    const page = pageOf(
+      result.value,
+      { limit, cursor },
+      `sessions:${eventId}`,
+      (s) => [s.id]
+    );
     if (!page.ok) return problem(page.error);
     return c.json(
       { ...page.value, items: page.value.items.map(toSessionView) },

@@ -59,6 +59,7 @@ type CommentBody = {
   parentId: string | null;
   body: string;
   deleted: boolean;
+  createdTime: string;
   editedTime: string | null;
   author: { id: string; name: string } | null;
   likes: { id: string; name: string }[];
@@ -129,10 +130,10 @@ describe("/api/v1 comments", () => {
         request("GET", `/proposals/${proposal.id}/comments`)
       );
       expect(listed.status).toBe(200);
-      const { comments } = (await listed.json()) as {
-        comments: CommentBody[];
+      const { items } = (await listed.json()) as {
+        items: CommentBody[];
       };
-      expect(comments).toEqual([
+      expect(items).toEqual([
         expect.objectContaining({
           id: comment.id,
           body: "Count me out",
@@ -188,15 +189,68 @@ describe("/api/v1 comments", () => {
         expect(reply.status).toBe(201);
 
         const listed = (await (await GET(request("GET", path))).json()) as {
-          comments: CommentBody[];
+          items: CommentBody[];
         };
         expect(
-          listed.comments.map(({ body, parentId }) => ({ body, parentId }))
+          listed.items.map(({ body, parentId }) => ({ body, parentId }))
         ).toEqual([
           { body: "First", parentId: null },
           { body: "Second", parentId: parent.id },
         ]);
       }
+    }
+  );
+
+  it(
+    "lists comments page by page, oldest first",
+    { tags: ["010-US3", "019-US8"] },
+    async () => {
+      const event = await createEvent({ phase: "scheduling" });
+      const guest = await createGuest({ eventId: event.id });
+      const path = `/guests/${guest.id}/comments`;
+      const posted: CommentBody[] = [];
+      for (const body of ["One", "Two", "Three"]) {
+        posted.push(
+          (await (
+            await POST(
+              request("POST", path, {
+                cookie: asGuest(guest.id),
+                body: { body },
+              })
+            )
+          ).json()) as CommentBody
+        );
+      }
+      const [a, b, c] = posted.sort((x, y) =>
+        x.createdTime === y.createdTime
+          ? x.id < y.id
+            ? -1
+            : 1
+          : x.createdTime < y.createdTime
+            ? -1
+            : 1
+      );
+      const page = async (query: string) =>
+        (await (await GET(request("GET", `${path}?${query}`))).json()) as {
+          items: CommentBody[];
+          nextCursor: string | null;
+        };
+
+      const first = await page("limit=2");
+      expect(first.items.map((x) => x.id)).toEqual([a.id, b.id]);
+      const second = await page(`limit=2&cursor=${first.nextCursor}`);
+      expect(second.items.map((x) => x.id)).toEqual([c.id]);
+      expect(second.nextCursor).toBeNull();
+
+      const other = await createGuest({ eventId: event.id });
+      const foreign = await GET(
+        request(
+          "GET",
+          `/guests/${other.id}/comments?cursor=${first.nextCursor}`
+        )
+      );
+      expect(foreign.status).toBe(400);
+      expect(await foreign.json()).toMatchObject({ code: "cursor.invalid" });
     }
   );
 
