@@ -133,6 +133,11 @@ describe("proxy: /media auth", () => {
   });
 });
 
+const rewriteTarget = (response: Response) => {
+  const header = response.headers.get("x-middleware-rewrite");
+  return header === null ? null : new URL(header);
+};
+
 describe("proxy: pages live under /legacy", () => {
   beforeEach(() => {
     vi.stubEnv("SITE_PASSWORD", "site-pw");
@@ -141,23 +146,30 @@ describe("proxy: pages live under /legacy", () => {
   });
   afterEach(() => vi.unstubAllEnvs());
 
-  it("sends a root page path to /legacy, keeping the query, before any login", async () => {
-    const result = await throughProxy(
-      "/conf/proposals?viewProposal=p1",
-      {},
-      []
-    );
+  it("serves the SPA shell for a root page path, keeping the query, once logged in", async () => {
+    const cookie = await createAuthCookie();
+    for (const path of ["/", "/conf/proposals?viewProposal=p1"]) {
+      const result = await throughProxy(path, {}, [cookie]);
+      if (result.ok) throw new Error(`expected a rewrite for ${path}`);
+      const target = rewriteTarget(result.response);
+      expect(target?.pathname, path).toBe("/api/spa/shell");
+      expect(result.response.headers.get("location"), path).toBeNull();
+    }
+  });
+
+  it("asks for the site password before the shell, and returns to the same page", async () => {
+    const result = await throughProxy("/conf?x=1", {}, []);
     if (result.ok) throw new Error("expected a redirect");
-    expect(result.response.status).toBe(307);
+    expect(rewriteTarget(result.response)).toBeNull();
     const location = new URL(result.response.headers.get("location")!);
-    expect(location.pathname + location.search).toBe(
-      "/legacy/conf/proposals?viewProposal=p1"
-    );
-    const root = await throughProxy("/", {}, []);
-    if (root.ok) throw new Error("expected a redirect");
-    expect(new URL(root.response.headers.get("location")!).pathname).toBe(
-      "/legacy"
-    );
+    expect(location.pathname).toBe("/legacy/login");
+    expect(location.searchParams.get("redirect")).toBe("/conf?x=1");
+  });
+
+  it("serves the shell for the admin paths without the site password, as their gate lives at /legacy/admin", async () => {
+    const result = await throughProxy("/admin/events", {}, []);
+    if (result.ok) throw new Error("expected a rewrite");
+    expect(rewriteTarget(result.response)?.pathname).toBe("/api/spa/shell");
   });
 
   it("gates /legacy pages with the site password and returns to the same page", async () => {
@@ -192,13 +204,18 @@ describe("proxy: pages live under /legacy", () => {
     }
   });
 
-  it("redirects a POST to a root path as well", async () => {
-    const result = await throughProxy("/conf", { method: "POST" }, []);
-    if (result.ok) throw new Error("expected a redirect");
-    expect(result.response.status).toBe(307);
+  it("always rewrites to the one shell route, whatever the path", async () => {
+    const cookie = await createAuthCookie();
+    for (const path of ["//evil.com", "/\\evil.com", "/%2f%2fevil.com"]) {
+      const result = await throughProxy(path, {}, [cookie]);
+      if (result.ok) throw new Error(`expected a rewrite for ${path}`);
+      const target = rewriteTarget(result.response)!;
+      expect(target.origin, path).toBe("http://test");
+      expect(target.pathname, path).toBe("/api/spa/shell");
+    }
   });
 
-  it("keeps a crafted path on this origin", async () => {
+  it("keeps unauthenticated crafted paths on this origin", async () => {
     for (const path of ["//evil.com", "/\\evil.com", "/%2f%2fevil.com"]) {
       const result = await throughProxy(path, {}, []);
       if (result.ok) throw new Error(`expected a redirect for ${path}`);
@@ -207,7 +224,7 @@ describe("proxy: pages live under /legacy", () => {
         "http://test"
       );
       expect(location.origin, path).toBe("http://test");
-      expect(location.pathname.startsWith("/legacy"), path).toBe(true);
+      expect(location.pathname, path).toBe("/legacy/login");
     }
   });
 

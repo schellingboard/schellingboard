@@ -129,6 +129,16 @@
 - The catch-all route replaces the location with `/legacy` + path + query + hash
   (`window.location.replace`); a path already under `/legacy` is left alone.
 
+## Step 9b (2026-10-09)
+
+- The proxy no longer redirects root pages: after the site gate (admin paths skip it: the forwarded `/legacy/admin` request meets the admin gate)
+  it rewrites them to `/api/spa/shell`, a route handler reading `apps/web/dist/index.html`
+  from `process.cwd()` on each request (`no-store`; 503 when not built). `/_spa/**` skips
+  the proxy (matcher) and `next.config.js` rewrites it to `/api/spa/assets/**` (hashed,
+  immutable; 404 for anything missing, `..` or the shell file, never the shell).
+- The login redirect for a root path now returns to the root path; the SPA forwards it.
+- The Playwright web server runs `vite build` before `next build`.
+
 ## Questions
 
 - A session that loses its only room reads `"X" moved to No location (was Room A)`
@@ -140,4 +150,4 @@
 
 ## Next step
 
-9.
+9c.

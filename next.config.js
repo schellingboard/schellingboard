@@ -21,6 +21,12 @@ const nextConfig = {
       bodySizeLimit: "5mb",
     },
   },
+  // The SPA's build output is read from disk by a route handler, so it is the
+  // same files `next start` and the standalone image serve.
+  // eslint-disable-next-line @typescript-eslint/require-await -- Next requires an async function here
+  async rewrites() {
+    return [{ source: "/_spa/:path*", destination: "/api/spa/assets/:path*" }];
+  },
   // Baseline browser-side hardening for every response. No frame ever embeds
   // this app, so framing is denied outright (blocks clickjacking on the
   // cookie-authenticated admin and attendee pages).

@@ -83,7 +83,7 @@ test.describe("Admin site settings", () => {
     await expect(page.getByText("Settings saved.")).toBeVisible();
 
     // The map button now shows on the schedule and opens the map image.
-    await page.goto("/Conference-Alpha");
+    await page.goto("/legacy/Conference-Alpha");
     const mapButton = page.getByRole("button", { name: "Show map" });
     await expect(mapButton).toBeVisible();
     await mapButton.click();

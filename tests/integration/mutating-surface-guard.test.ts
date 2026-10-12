@@ -83,7 +83,8 @@ function apiRouteFiles(): string[] {
 
 // Independent auth layers (admin/site gates), not the acting-guest
 // invariant this guard covers; and the unauthenticated health check.
-const OUT_OF_SCOPE_PREFIXES = ["admin/", "auth/"];
+// The SPA's static files are not acting-guest surfaces either.
+const OUT_OF_SCOPE_PREFIXES = ["admin/", "auth/", "spa/"];
 const OUT_OF_SCOPE_EXACT = new Set(["health"]);
 
 // Read-only surfaces are exempt from the invariant per the coding guidelines.

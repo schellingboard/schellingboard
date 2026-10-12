@@ -76,6 +76,15 @@ describe("proxy matcher", () => {
     }
   });
 
+  // The bundle holds no user data and the shell it belongs to is gated; a
+  // proxy rewrite of a missing asset to the shell would also serve HTML as JS.
+  it("skips the SPA's hashed assets, not a path that merely starts like them", () => {
+    expect(matches("/_spa/assets/index-abc.js")).toBe(false);
+    for (const path of ["/_spa", "/_spax/a.js", "/spa/assets/a.js"]) {
+      expect(matches(path), `${path} must reach the proxy`).toBe(true);
+    }
+  });
+
   it("skips the service worker", () => {
     expect(matches("/sw.js"), "/sw.js must skip the proxy").toBe(false);
   });
