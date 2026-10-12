@@ -2,7 +2,7 @@
 import { describe, it, expect } from "vitest";
 import fc from "fast-check";
 import type { FeedMessage } from "@schellingboard/contracts/feed";
-import { apply } from "@/app/(site)/[eventSlug]/replica/apply";
+import { apply } from "@/app/legacy/(site)/[eventSlug]/replica/apply";
 import { snapshot } from "../helpers/snapshot-fixture";
 
 const [talk] = snapshot.sessions;

@@ -1,0 +1,280 @@
+"use client";
+
+import { useContext, useEffect, useState, useTransition } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+
+import {
+  cancelMeetingAction,
+  respondToMeetingAction,
+  type MeetingActionResult,
+} from "@/app/actions/meetings";
+import {
+  SECONDARY_DANGER_BUTTON,
+  PRIMARY_BUTTON,
+  SECONDARY_BUTTON,
+} from "@/app/components/buttons";
+import { Input } from "@/app/input";
+import { ModalCloseButton } from "@/app/components/modal-close-button";
+import { EventContext } from "@/app/legacy/(site)/context";
+import { clashLines } from "@/utils/meeting-clash-text";
+import { canCancel, statusLine } from "@/utils/meeting-rules";
+import { dismissViewMeeting } from "./modal-nav";
+import { useMyMeetings } from "./use-meetings";
+
+/**
+ * The meeting modal wherever `?viewMeeting=` can be opened — the meetings page
+ * a notification links to, and the schedule. Reads the parameter itself rather
+ * than taking it as a prop so dismissing it (a history replaceState) closes the
+ * modal on a server-rendered page too.
+ */
+export function MeetingModalFromUrl({
+  readOnly = false,
+}: {
+  readOnly?: boolean;
+}) {
+  const meetingId = useSearchParams()?.get("viewMeeting");
+  // Keyed so a half-confirmed cancel does not carry over to the next meeting.
+  return meetingId ? (
+    <MeetingModal key={meetingId} meetingId={meetingId} readOnly={readOnly} />
+  ) : null;
+}
+
+/**
+ * One 1-on-1 in full, and — for the person asked — the Accept and Decline
+ * buttons.
+ */
+function MeetingModal({
+  meetingId,
+  readOnly,
+}: {
+  meetingId: string;
+  readOnly: boolean;
+}) {
+  const router = useRouter();
+  const { now } = useContext(EventContext);
+  const { meetings, reload } = useMyMeetings();
+  const [error, setError] = useState<string | null>(null);
+  const [confirmingCancel, setConfirmingCancel] = useState(false);
+  const [cancelNote, setCancelNote] = useState("");
+  const [isAnswering, startAnswer] = useTransition();
+
+  // Duplication, anchor: waggHhba
+  useEffect(() => {
+    document.documentElement.style.overflow = "hidden";
+    const handleEscapeKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") dismissViewMeeting();
+    };
+    document.addEventListener("keydown", handleEscapeKey);
+    return () => {
+      document.documentElement.style.overflow = "";
+      document.removeEventListener("keydown", handleEscapeKey);
+    };
+  }, []);
+
+  const meeting = meetings?.find((m) => m.id === meetingId);
+
+  // Every write ends the same way: re-read the meetings, so the modal and the
+  // schedule column behind it agree, and refresh the page, since an accepted
+  // meeting is a commitment other things now clash with.
+  const act = (run: () => Promise<MeetingActionResult>) => {
+    setError(null);
+    setConfirmingCancel(false);
+    setCancelNote("");
+    startAnswer(async () => {
+      try {
+        const result = await run();
+        if (!result.ok) {
+          setError(result.error);
+          // The refusal usually means the meeting has moved on -- answered in
+          // another tab, or its slot has begun -- so re-read it rather than
+          // leaving the buttons describing a request that is no longer there.
+          reload();
+          return;
+        }
+        reload();
+        router.refresh();
+      } catch {
+        setError("Request failed");
+      }
+    });
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      role="dialog"
+      aria-modal="true"
+      aria-label="1-on-1 details"
+    >
+      <div className="fixed inset-0 bg-overlay" onClick={dismissViewMeeting} />
+      <div className="relative bg-surface-raised rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto p-6">
+        <ModalCloseButton
+          onClick={dismissViewMeeting}
+          className="absolute right-3 top-3 z-10"
+        />
+
+        {meetings === null ? (
+          <p className="text-fg-muted">Loading…</p>
+        ) : !meeting ? (
+          <p className="text-fg-muted">1-on-1 not found.</p>
+        ) : (
+          <div className="flex flex-col gap-4">
+            <h2 className="text-xl font-bold text-fg pr-8">
+              1-on-1 with{" "}
+              <Link
+                href={`/legacy/guests/${meeting.otherId}`}
+                className="text-brand-fg hover:text-brand-fg-hover hover:underline"
+              >
+                {meeting.otherName}
+              </Link>
+            </h2>
+
+            <dl className="flex flex-col gap-1 text-sm">
+              <div className="flex gap-2">
+                <dt className="font-medium text-fg-muted">When</dt>
+                <dd className="text-fg">
+                  {meeting.dayLabel}, {meeting.timeLabel}
+                </dd>
+              </div>
+              <div className="flex gap-2">
+                <dt className="font-medium text-fg-muted">Where</dt>
+                <dd className="text-fg">{meeting.meetingPoint}</dd>
+              </div>
+            </dl>
+
+            <p className="text-sm text-fg-muted">{statusLine(meeting)}</p>
+
+            {meeting.message && (
+              <p className="text-sm rounded-md bg-surface-sunken p-3 text-fg">
+                {meeting.message}
+              </p>
+            )}
+
+            {/* A canceled meeting leaves the column, so this modal is where the
+                note is read -- named, since the message above is a box like it. */}
+            {meeting.cancelNote && (
+              <p className="text-sm rounded-md bg-surface-sunken p-3 text-fg">
+                <span className="font-medium text-fg-muted">
+                  Why it was called off:{" "}
+                </span>
+                {meeting.cancelNote}
+              </p>
+            )}
+
+            {/* The requester saw only that the slot was taken; the person
+                answering sees what it is, so they can weigh it against the
+                request (issue #392, section 1.4). */}
+            {meeting.clashes.length > 0 && (
+              <p className="text-sm rounded-md bg-warning-tint p-3 text-fg">
+                {clashLines(meeting.clashes)} during this slot.
+              </p>
+            )}
+
+            {error && <p className="text-sm text-danger-fg">{error}</p>}
+
+            {!readOnly &&
+              meeting.role === "recipient" &&
+              meeting.status === "pending" && (
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      act(() =>
+                        respondToMeetingAction({
+                          meetingId,
+                          response: "accept",
+                        })
+                      )
+                    }
+                    disabled={isAnswering}
+                    className={PRIMARY_BUTTON}
+                  >
+                    Accept
+                  </button>
+                  {/* Declining takes no explanation: the failure mode of this
+                    feature is people feeling obliged (issue #392,
+                    section 1.4). */}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      act(() =>
+                        respondToMeetingAction({
+                          meetingId,
+                          response: "decline",
+                        })
+                      )
+                    }
+                    disabled={isAnswering}
+                    className={SECONDARY_BUTTON}
+                  >
+                    Decline
+                  </button>
+                </div>
+              )}
+
+            {!readOnly &&
+              canCancel(meeting, now) &&
+              (confirmingCancel ? (
+                <div className="flex flex-col gap-2">
+                  <p className="text-sm text-fg">
+                    {meeting.otherName} will be told. Cancel it?
+                  </p>
+                  <div className="flex flex-col gap-1">
+                    <label
+                      htmlFor="cancel-note"
+                      className="text-sm font-medium text-fg-muted"
+                    >
+                      Say why, if you like (optional)
+                    </label>
+                    <Input
+                      id="cancel-note"
+                      value={cancelNote}
+                      onChange={(e) => setCancelNote(e.target.value)}
+                      placeholder="Sorry — my session moved…"
+                      className="w-full h-10"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        act(() =>
+                          cancelMeetingAction({ meetingId, note: cancelNote })
+                        )
+                      }
+                      disabled={isAnswering}
+                      className={SECONDARY_DANGER_BUTTON}
+                    >
+                      Yes, cancel it
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmingCancel(false)}
+                      disabled={isAnswering}
+                      className={SECONDARY_BUTTON}
+                    >
+                      Keep it
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setConfirmingCancel(true)}
+                  className={`${SECONDARY_BUTTON} self-start`}
+                >
+                  Cancel 1-on-1
+                </button>
+              ))}
+
+            <p className="text-xs text-fg-subtle">
+              Nothing is reserved — the meeting point is just where to find each
+              other.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

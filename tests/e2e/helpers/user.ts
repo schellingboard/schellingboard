@@ -47,7 +47,7 @@ export async function openNameSwitcher(page: Page): Promise<Locator> {
     // click below can land on a page mid-navigation-away. The test env
     // always sets SITE_PASSWORD, so the reload's destination is always
     // /login.
-    await page.waitForURL((url) => url.pathname === "/login");
+    await page.waitForURL((url) => url.pathname === "/legacy/login");
     await login(page);
     // Not getByText("Select your name"): some pages show a paragraph with
     // that same phrase (e.g. "select who you are before editing this...

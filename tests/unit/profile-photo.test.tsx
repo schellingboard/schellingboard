@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { ProfilePhoto } from "@/app/(site)/guests/profile-photo";
+import { ProfilePhoto } from "@/app/legacy/(site)/guests/profile-photo";
 
 describe("ProfilePhoto", () => {
   it("makes an uploaded photo clickable", () => {

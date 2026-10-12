@@ -31,10 +31,10 @@ vi.mock("next/headers", () => ({
 // test file doesn't set up. Stubbed out: this test only cares which branch
 // the page takes, not those components' own behavior (covered elsewhere). The
 // directory stub echoes the guest it was handed, since that is the branch.
-vi.mock("@/app/(site)/guests/edit/profile-form", () => ({
+vi.mock("@/app/legacy/(site)/guests/edit/profile-form", () => ({
   ProfileForm: () => "PROFILE_FORM_STUB",
 }));
-vi.mock("@/app/(site)/guests/directory", () => ({
+vi.mock("@/app/legacy/(site)/guests/directory", () => ({
   AttendeeDirectory: ({ currentUserId }: { currentUserId: string | null }) =>
     `CURRENT_USER:${currentUserId ?? "none"}`,
 }));
@@ -71,7 +71,7 @@ describe("server components read the verified guest, not the raw cookie", () => 
   describe("guests/edit page", () => {
     it("treats an unverified protected guest as logged out", async () => {
       const { default: EditProfilePage } =
-        await import("@/app/(site)/guests/edit/page");
+        await import("@/app/legacy/(site)/guests/edit/page");
       const guest = await createGuest();
       await protectGuest(guest.id);
       cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
@@ -84,7 +84,7 @@ describe("server components read the verified guest, not the raw cookie", () => 
 
     it("renders the edit form for a verified protected guest", async () => {
       const { default: EditProfilePage } =
-        await import("@/app/(site)/guests/edit/page");
+        await import("@/app/legacy/(site)/guests/edit/page");
       const guest = await createGuest();
       await protectGuest(guest.id);
       cookieJar.set(GUEST_COOKIE_NAME, await verifiedGuestValue(guest.id));
@@ -100,7 +100,7 @@ describe("server components read the verified guest, not the raw cookie", () => 
   describe("attendee directory layout", () => {
     const renderLayout = async () => {
       const { default: DirectoryLayout } =
-        await import("@/app/(site)/guests/(directory)/layout");
+        await import("@/app/legacy/(site)/guests/(directory)/layout");
       return renderToStaticMarkup(await DirectoryLayout({ children: null }));
     };
 

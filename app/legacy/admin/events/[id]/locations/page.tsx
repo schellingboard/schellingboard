@@ -1,0 +1,103 @@
+import { notFound, redirect } from "next/navigation";
+import { adminReads } from "@/server/admin-reads";
+import { pageReads } from "@/server/composition";
+import { outOfRangePageRedirect, parsePage } from "@/utils/pagination";
+import { requireAdminPage } from "../../../require-admin";
+import {
+  EventLocationsManager,
+  type LocationFilter,
+  type LocationRow,
+} from "../event-locations-manager";
+import { LocationAvailabilityManager } from "../location-availability-manager";
+
+const PAGE_SIZE = 25;
+
+function parseFilter(value: string | undefined): LocationFilter {
+  return value === "assigned" || value === "not-assigned" ? value : "all";
+}
+
+export default async function AdminEventLocationsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ q?: string; page?: string; filter?: string }>;
+}) {
+  await requireAdminPage();
+
+  const { id } = await params;
+  const { q, page: pageParam, filter: filterParam } = await searchParams;
+  const admin = adminReads();
+  const reads = pageReads();
+  const event = await reads.eventById(id);
+  if (!event) notFound();
+
+  const filter = parseFilter(filterParam);
+  const page = parsePage(pageParam);
+  const query = q?.trim() ?? "";
+  const assigned =
+    filter === "assigned"
+      ? true
+      : filter === "not-assigned"
+        ? false
+        : undefined;
+
+  const { rows, total } = await admin.locationsForEventAssignment(id, {
+    query: query || undefined,
+    assigned,
+    limit: PAGE_SIZE,
+    offset: (page - 1) * PAGE_SIZE,
+  });
+
+  const redirectTarget = outOfRangePageRedirect({
+    basePath: `/legacy/admin/events/${id}/locations`,
+    page,
+    total,
+    pageSize: PAGE_SIZE,
+    params: { q: query, filter: filter === "all" ? "" : filter },
+  });
+  if (redirectTarget) redirect(redirectTarget);
+
+  const locationRows: LocationRow[] = rows.map((l) => ({
+    id: l.id,
+    name: l.name,
+    capacity: l.capacity,
+    assigned: l.assigned,
+  }));
+
+  const [rooms, days, periods] = await Promise.all([
+    reads.eventLocations(id),
+    reads.eventDays(id),
+    admin.unavailabilityOfEvent(id),
+  ]);
+
+  return (
+    <div className="space-y-8">
+      <EventLocationsManager
+        locations={locationRows}
+        eventId={id}
+        total={total}
+        page={page}
+        pageSize={PAGE_SIZE}
+        query={query}
+        filter={filter}
+      />
+      <LocationAvailabilityManager
+        eventId={id}
+        timezone={event.timezone}
+        rooms={rooms.map((r) => ({ id: r.id, name: r.name }))}
+        days={days.map((d) => ({
+          id: d.id,
+          start: d.start.toISOString(),
+          end: d.end.toISOString(),
+        }))}
+        periods={periods.map((p) => ({
+          id: p.id,
+          locationId: p.locationId,
+          start: p.start.toISOString(),
+          end: p.end.toISOString(),
+        }))}
+      />
+    </div>
+  );
+}

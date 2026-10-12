@@ -18,7 +18,7 @@ import { NextRequest } from "next/server";
 // silently shipping — it must be added to VERIFIERS (with a check that
 // proves the 403) or to READ_ONLY (with a reason).
 //
-// `app/(site)/[eventSlug]/proposals/actions.ts` is covered the same way:
+// `app/legacy/(site)/[eventSlug]/proposals/actions.ts` is covered the same way:
 // its export list is asserted below so a new export must be added to
 // PROPOSAL_ACTION_VERIFIERS too.
 
@@ -274,7 +274,7 @@ const PROPOSAL_ACTION_VERIFIERS: Record<
 > = {
   createProposal: async () => {
     const { createProposal } =
-      await import("@/app/(site)/[eventSlug]/proposals/actions");
+      await import("@/app/legacy/(site)/[eventSlug]/proposals/actions");
     const event = await createEvent();
     const guest = await createGuest({ eventId: event.id });
     await protectGuest(guest.id);
@@ -290,7 +290,7 @@ const PROPOSAL_ACTION_VERIFIERS: Record<
 
   updateProposal: async () => {
     const { updateProposal } =
-      await import("@/app/(site)/[eventSlug]/proposals/actions");
+      await import("@/app/legacy/(site)/[eventSlug]/proposals/actions");
     const event = await createEvent();
     const host = await createGuest({ eventId: event.id });
     await protectGuest(host.id);
@@ -306,7 +306,7 @@ const PROPOSAL_ACTION_VERIFIERS: Record<
 
   joinProposal: async () => {
     const { joinProposal } =
-      await import("@/app/(site)/[eventSlug]/proposals/actions");
+      await import("@/app/legacy/(site)/[eventSlug]/proposals/actions");
     const event = await createEvent();
     const guest = await createGuest({ eventId: event.id });
     await protectGuest(guest.id);
@@ -318,7 +318,7 @@ const PROPOSAL_ACTION_VERIFIERS: Record<
 
   deleteProposal: async () => {
     const { deleteProposal } =
-      await import("@/app/(site)/[eventSlug]/proposals/actions");
+      await import("@/app/legacy/(site)/[eventSlug]/proposals/actions");
     const event = await createEvent();
     const host = await createGuest({ eventId: event.id });
     await protectGuest(host.id);
@@ -363,7 +363,8 @@ describe("mutating-surface regression guard", () => {
   }
 
   it("proposals/actions.ts exports exactly the known mutating actions", async () => {
-    const actions = await import("@/app/(site)/[eventSlug]/proposals/actions");
+    const actions =
+      await import("@/app/legacy/(site)/[eventSlug]/proposals/actions");
     const exported = Object.keys(actions).sort();
     expect(
       exported,

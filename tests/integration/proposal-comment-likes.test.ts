@@ -26,7 +26,7 @@ import {
   createProposalComment as createComment,
   deleteComment,
   toggleCommentLike,
-} from "@/app/(site)/[eventSlug]/comment-actions";
+} from "@/app/legacy/(site)/[eventSlug]/comment-actions";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 

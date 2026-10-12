@@ -33,8 +33,26 @@ function refuseApiV1(problem: Problem): NextResponse {
   });
 }
 
+// Roots that are not pages: the API and uploaded media keep their URLs.
+const NATIVE_ROOTS = ["/api", "/media"];
+
+const underRoot = (pathname: string, root: string) =>
+  pathname === root || pathname.startsWith(`${root}/`);
+
 export async function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname: requested } = request.nextUrl;
+
+  // Until the SPA owns the root, every other page path is a legacy page.
+  // Nothing is revealed by the redirect, so the gate applies at its target.
+  const isLegacy = underRoot(requested, "/legacy");
+  if (!isLegacy && !NATIVE_ROOTS.some((r) => underRoot(requested, r))) {
+    const target = request.nextUrl.clone();
+    target.pathname = `/legacy${requested === "/" ? "" : requested}`;
+    return NextResponse.redirect(target);
+  }
+  const pathname = isLegacy
+    ? requested.slice("/legacy".length) || "/"
+    : requested;
 
   // Allow access to login page, health check, and auth API routes
   if (
@@ -119,6 +137,8 @@ export const config = {
      *   has logged in, and Safari fetches the manifest without our cookie
      *   either way. Both are build assets naming the instance, which the
      *   login page shows already
+     * - one-on-one.webp — the 1-on-1 column's picture, requested by its root
+     *   path (the image is unoptimized)
      * - sw.js — the service worker push notifications are delivered to. The
      *   browser fetches it without our cookie, and a login page in its place
      *   takes notifications with it
@@ -128,6 +148,6 @@ export const config = {
      * uploaded avatar, location image and site map from auth entirely — see
      * matcher's own test at tests/unit/proxy-matcher.test.ts.
      */
-    "/((?!_next/static|_next/image|favicon\\.ico|icon\\.svg|apple-touch-icon\\.png|manifest\\.webmanifest|icon-192\\.png|icon-512\\.png|icon-maskable-512\\.png|sw\\.js|locations/).*)",
+    "/((?!_next/static|_next/image|favicon\\.ico|icon\\.svg|apple-touch-icon\\.png|manifest\\.webmanifest|icon-192\\.png|icon-512\\.png|icon-maskable-512\\.png|sw\\.js|one-on-one\\.webp|locations/).*)",
   ],
 };

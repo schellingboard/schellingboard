@@ -31,7 +31,7 @@ export async function updateSettingsAction(
     return { ok: false, error: result.error.detail ?? "Something went wrong" };
   }
 
-  revalidatePath("/admin/settings");
-  revalidatePath("/", "layout");
+  revalidatePath("/legacy/admin/settings");
+  revalidatePath("/legacy", "layout");
   return { ok: true };
 }

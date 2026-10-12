@@ -55,7 +55,7 @@ import {
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
 import { VoteChoice } from "@schellingboard/domain/vote";
-import { deleteProposal } from "@/app/(site)/[eventSlug]/proposals/actions";
+import { deleteProposal } from "@/app/legacy/(site)/[eventSlug]/proposals/actions";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
@@ -118,11 +118,11 @@ describe("deleteProposal", () => {
 
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(host.id));
     expect(await deleteAndFollowRedirect(proposal.id, "test-event")).toBe(
-      "/test-event/proposals"
+      "/legacy/test-event/proposals"
     );
     // The redirect lands on a list the router may have prefetched before the
     // delete, so the list still has to be revalidated as well.
-    expect(revalidated).toContain("/test-event/proposals");
+    expect(revalidated).toContain("/legacy/test-event/proposals");
 
     expect(await repos.sessionProposals.findById(proposal.id)).toBeUndefined();
 
@@ -178,7 +178,7 @@ describe("deleteProposal", () => {
     const proposal = await createProposal(event.id, []);
 
     expect(await deleteAndFollowRedirect(proposal.id, "test-event")).toBe(
-      "/test-event/proposals"
+      "/legacy/test-event/proposals"
     );
 
     expect(await repos.sessionProposals.findById(proposal.id)).toBeUndefined();
@@ -207,7 +207,7 @@ describe("deleteProposal", () => {
     cookieJar.set(GUEST_COOKIE_NAME, await verifiedGuestValue(host.id));
 
     expect(await deleteAndFollowRedirect(proposal.id, "test-event")).toBe(
-      "/test-event/proposals"
+      "/legacy/test-event/proposals"
     );
 
     expect(await repos.sessionProposals.findById(proposal.id)).toBeUndefined();

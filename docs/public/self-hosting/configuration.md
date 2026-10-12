@@ -15,7 +15,7 @@ a feature off when unset.
 | Variable                        | Required | Description                                                                                                                                               |
 | ------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `SITE_PASSWORD`                 | No       | Password gate for the whole site (leave unset to disable)                                                                                                 |
-| `ADMIN_PASSWORD`                | No       | Password for the `/admin` UI (leave unset to disable)                                                                                                     |
+| `ADMIN_PASSWORD`                | No       | Password for the `/legacy/admin` UI (leave unset to disable)                                                                                              |
 | `AUTH_SECRET`                   | Yes      | Signs all login cookies — site, admin, and attendee name protection. Random, min 32 chars. Changing it logs everyone out                                  |
 | `DATABASE_URL`                  | No       | SQLite path (default: `file:/data/data.db`)                                                                                                               |
 | `SB_UPLOADS_DIR`                | No       | Dir for admin-uploaded files (default: `./uploads`, `/data/uploads` in Docker)                                                                            |

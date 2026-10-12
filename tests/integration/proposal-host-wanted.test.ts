@@ -44,7 +44,7 @@ import {
   createProposal,
   joinProposal,
   updateProposal,
-} from "@/app/(site)/[eventSlug]/proposals/actions";
+} from "@/app/legacy/(site)/[eventSlug]/proposals/actions";
 import { VoteChoice } from "@schellingboard/domain/vote";
 import { sendMail } from "@/utils/mailer";
 

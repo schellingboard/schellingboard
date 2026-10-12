@@ -78,14 +78,14 @@ const PRE_AUTH = new Set([
  * it runs before anything looks at them.
  */
 const SITE_GUARDED: Record<string, () => Promise<unknown>> = {
-  "(site)/guests/profile-activity.ts:listProfileActivity": async () => {
+  "legacy/(site)/guests/profile-activity.ts:listProfileActivity": async () => {
     const { listProfileActivity } =
-      await import("@/app/(site)/guests/profile-activity");
+      await import("@/app/legacy/(site)/guests/profile-activity");
     return listProfileActivity("some-guest");
   },
-  "(site)/[eventSlug]/clash-actions.ts:detectGuestClashes": async () => {
+  "legacy/(site)/[eventSlug]/clash-actions.ts:detectGuestClashes": async () => {
     const { detectGuestClashes } =
-      await import("@/app/(site)/[eventSlug]/clash-actions");
+      await import("@/app/legacy/(site)/[eventSlug]/clash-actions");
     return detectGuestClashes({
       eventId: "e",
       guestIds: ["g"],
@@ -93,67 +93,71 @@ const SITE_GUARDED: Record<string, () => Promise<unknown>> = {
       end: new Date().toISOString(),
     });
   },
-  "(site)/[eventSlug]/session-actions.ts:revalidateEvent": async () => {
+  "legacy/(site)/[eventSlug]/session-actions.ts:revalidateEvent": async () => {
     const { revalidateEvent } =
-      await import("@/app/(site)/[eventSlug]/session-actions");
+      await import("@/app/legacy/(site)/[eventSlug]/session-actions");
     return revalidateEvent("some-event");
   },
-  "(site)/[eventSlug]/proposals/actions.ts:createProposal": async () => {
+  "legacy/(site)/[eventSlug]/proposals/actions.ts:createProposal": async () => {
     const { createProposal } =
-      await import("@/app/(site)/[eventSlug]/proposals/actions");
+      await import("@/app/legacy/(site)/[eventSlug]/proposals/actions");
     return createProposal({ eventId: "e", eventSlug: "s", title: "T" });
   },
-  "(site)/[eventSlug]/proposals/actions.ts:updateProposal": async () => {
+  "legacy/(site)/[eventSlug]/proposals/actions.ts:updateProposal": async () => {
     const { updateProposal } =
-      await import("@/app/(site)/[eventSlug]/proposals/actions");
+      await import("@/app/legacy/(site)/[eventSlug]/proposals/actions");
     return updateProposal("p", {
       eventSlug: "s",
       title: "T",
       expectedVersion: 1,
     });
   },
-  "(site)/[eventSlug]/proposals/actions.ts:joinProposal": async () => {
+  "legacy/(site)/[eventSlug]/proposals/actions.ts:joinProposal": async () => {
     const { joinProposal } =
-      await import("@/app/(site)/[eventSlug]/proposals/actions");
+      await import("@/app/legacy/(site)/[eventSlug]/proposals/actions");
     return joinProposal("p", "s");
   },
-  "(site)/[eventSlug]/proposals/actions.ts:deleteProposal": async () => {
+  "legacy/(site)/[eventSlug]/proposals/actions.ts:deleteProposal": async () => {
     const { deleteProposal } =
-      await import("@/app/(site)/[eventSlug]/proposals/actions");
+      await import("@/app/legacy/(site)/[eventSlug]/proposals/actions");
     return deleteProposal("p", "s");
   },
-  "(site)/[eventSlug]/comment-actions.ts:createProposalComment": async () => {
-    const { createProposalComment } =
-      await import("@/app/(site)/[eventSlug]/comment-actions");
-    return createProposalComment({
-      proposalId: "p",
-      eventSlug: "s",
-      body: "b",
-    });
-  },
-  "(site)/[eventSlug]/comment-actions.ts:createSessionComment": async () => {
-    const { createSessionComment } =
-      await import("@/app/(site)/[eventSlug]/comment-actions");
-    return createSessionComment({ sessionId: "s", body: "b" });
-  },
-  "(site)/[eventSlug]/comment-actions.ts:createProfileComment": async () => {
-    const { createProfileComment } =
-      await import("@/app/(site)/[eventSlug]/comment-actions");
-    return createProfileComment({ profileId: "g", body: "b" });
-  },
-  "(site)/[eventSlug]/comment-actions.ts:updateComment": async () => {
+  "legacy/(site)/[eventSlug]/comment-actions.ts:createProposalComment":
+    async () => {
+      const { createProposalComment } =
+        await import("@/app/legacy/(site)/[eventSlug]/comment-actions");
+      return createProposalComment({
+        proposalId: "p",
+        eventSlug: "s",
+        body: "b",
+      });
+    },
+  "legacy/(site)/[eventSlug]/comment-actions.ts:createSessionComment":
+    async () => {
+      const { createSessionComment } =
+        await import("@/app/legacy/(site)/[eventSlug]/comment-actions");
+      return createSessionComment({ sessionId: "s", body: "b" });
+    },
+  "legacy/(site)/[eventSlug]/comment-actions.ts:createProfileComment":
+    async () => {
+      const { createProfileComment } =
+        await import("@/app/legacy/(site)/[eventSlug]/comment-actions");
+      return createProfileComment({ profileId: "g", body: "b" });
+    },
+  "legacy/(site)/[eventSlug]/comment-actions.ts:updateComment": async () => {
     const { updateComment } =
-      await import("@/app/(site)/[eventSlug]/comment-actions");
+      await import("@/app/legacy/(site)/[eventSlug]/comment-actions");
     return updateComment({ commentId: "c", eventSlug: "s", body: "b" });
   },
-  "(site)/[eventSlug]/comment-actions.ts:toggleCommentLike": async () => {
-    const { toggleCommentLike } =
-      await import("@/app/(site)/[eventSlug]/comment-actions");
-    return toggleCommentLike({ commentId: "c", eventSlug: "s" });
-  },
-  "(site)/[eventSlug]/comment-actions.ts:deleteComment": async () => {
+  "legacy/(site)/[eventSlug]/comment-actions.ts:toggleCommentLike":
+    async () => {
+      const { toggleCommentLike } =
+        await import("@/app/legacy/(site)/[eventSlug]/comment-actions");
+      return toggleCommentLike({ commentId: "c", eventSlug: "s" });
+    },
+  "legacy/(site)/[eventSlug]/comment-actions.ts:deleteComment": async () => {
     const { deleteComment } =
-      await import("@/app/(site)/[eventSlug]/comment-actions");
+      await import("@/app/legacy/(site)/[eventSlug]/comment-actions");
     return deleteComment({ commentId: "c", eventSlug: "s" });
   },
   "actions/meetings.ts:requestMeetingAction": async () => {

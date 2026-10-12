@@ -549,7 +549,7 @@ test("searches, filters and sorts without going back to the server @011-US3", as
     const asksForThisView = ["q", "filter", "sort"].some((param) =>
       url.searchParams.has(param)
     );
-    if (url.pathname === "/guests" && asksForThisView)
+    if (url.pathname === "/legacy/guests" && asksForThisView)
       listRequests.push(request.url());
   });
 

@@ -1,0 +1,218 @@
+"use client";
+
+import type { MouseEvent } from "react";
+import type { useRouter } from "next/navigation";
+
+/*
+(anchor: MnpjIo7Y)
+
+When we click on a session in the schedule, the app shows a modal with the session details.
+Additionally, it pushes a new session-specific URL.
+The reason for pushing rather than replacing is so that browser back button dismiss the modal.
+
+What should happen when the user dimisses the modal by clicking the close button or
+by clicking outside of the modal?
+Same: browser back, via History API.
+
+However, suppose the session-specific page was opened directly via a link.
+In that case, there is no "previous page" to go back to,
+so the user should be taken to the schedule page instead,
+which is the same as removing the session-specific query param from the URL.
+
+To summarize:
+* When linking the details modal from its owning page (proposal from the proposals list or
+  Quick Voting, session from the schedule), use `<Link {...viewFooLinkFromOwner(...)}>`. It
+  intercepts the navigation to set dismiss mode to "back".
+* When linking from a different page, use `<Link {...viewFooLinkFromElsewhere(...)}>`. There is no
+  in-place open and no history entry of ours to pop, so it sets the dismiss mode to "replace".
+* When the modal is opened by a server-action redirect rather than a link (the notification
+  list), call `openingModalFromRedirect()` from the click that submits the action. Same
+  reasoning as FromElsewhere — there is just no link whose onClick could do it.
+*/
+
+export function viewSessionLinkFromOwner(
+  currentSearchParams: URLSearchParams,
+  eventSlug: string,
+  sessionId: string
+) {
+  const params = new URLSearchParams(currentSearchParams);
+  params.set("viewSession", sessionId);
+  const href = `/legacy/${eventSlug}?${params.toString()}`;
+  return {
+    href,
+    prefetch: false,
+    scroll: false,
+    onClick: (e: MouseEvent<HTMLAnchorElement>) => {
+      if (!isPlainLeftClick(e)) return;
+      e.preventDefault();
+      // Why window.history.pushState/replaceState instead of next/navigation's router?
+      // We want the modal to open instantly, without an RSC roundtrip.
+      // https://nextjs.org/docs/app/getting-started/linking-and-navigating#native-history-api
+      window.history.pushState(null, "", href);
+      sessionDismissMode = "back";
+    },
+  };
+}
+
+export function viewSessionLinkFromElsewhere(
+  eventSlug: string,
+  sessionId: string
+) {
+  return {
+    href: `/legacy/${eventSlug}?viewSession=${sessionId}`,
+    onClick: () => {
+      sessionDismissMode = "replace";
+    },
+  };
+}
+
+export function viewProposalLinkFromOwner(
+  eventSlug: string,
+  proposalId: string
+) {
+  const href = `/legacy/${eventSlug}/proposals?viewProposal=${proposalId}`;
+  return {
+    href,
+    prefetch: false,
+    scroll: false,
+    onClick: (e: MouseEvent<HTMLAnchorElement>) => {
+      if (!isPlainLeftClick(e)) return;
+      proposalDismissMode = "back";
+      // no pushState here — unlike session modal, proposal modal is RSC-rendered, so we want normal navigation
+    },
+  };
+}
+
+export function viewProposalLinkFromElsewhere(
+  eventSlug: string,
+  proposalId: string
+) {
+  return {
+    href: `/legacy/${eventSlug}/proposals?viewProposal=${proposalId}`,
+    onClick: () => {
+      proposalDismissMode = "replace";
+    },
+  };
+}
+
+/**
+ * Dismiss mode for a modal reached without going through one of the links
+ * above: the notification list opens one by submitting a server action that
+ * redirects into it, so no opener's onClick runs and a "back" armed by an
+ * earlier schedule or proposal click would still be in force — and would pop
+ * the reader off the page they just landed on.
+ */
+export function openingModalFromRedirect() {
+  sessionDismissMode = "replace";
+  proposalDismissMode = "replace";
+  meetingDismissMode = "replace";
+}
+
+export function viewMeetingLinkFromOwner(
+  currentSearchParams: URLSearchParams,
+  eventSlug: string,
+  meetingId: string
+) {
+  const params = new URLSearchParams(currentSearchParams);
+  params.set("viewMeeting", meetingId);
+  const href = `/legacy/${eventSlug}?${params.toString()}`;
+  return {
+    href,
+    prefetch: false,
+    scroll: false,
+    onClick: (e: MouseEvent<HTMLAnchorElement>) => {
+      if (!isPlainLeftClick(e)) return;
+      e.preventDefault();
+      // As with the session modal: open it now, without an RSC roundtrip.
+      window.history.pushState(null, "", href);
+      meetingDismissMode = "back";
+    },
+  };
+}
+
+export function dismissViewMeeting() {
+  if (meetingDismissMode === "back") {
+    window.history.back();
+    return;
+  }
+  const params = new URLSearchParams(window.location.search);
+  params.delete("viewMeeting");
+  const query = params.toString();
+  const url = query
+    ? `${window.location.pathname}?${query}`
+    : window.location.pathname;
+  window.history.replaceState(null, "", url);
+}
+
+export function dismissViewProposal(router: ReturnType<typeof useRouter>) {
+  if (proposalDismissMode === "back") {
+    router.back();
+    return;
+  }
+  const params = new URLSearchParams(window.location.search);
+  params.delete("viewProposal");
+  const query = params.toString();
+  const url = query
+    ? `${window.location.pathname}?${query}`
+    : window.location.pathname;
+  router.replace(url, { scroll: false });
+}
+
+export function dismissViewSession() {
+  if (sessionDismissMode === "back") {
+    window.history.back();
+    return;
+  }
+  const params = new URLSearchParams(window.location.search);
+  params.delete("viewSession");
+  // The attendee-count follow-up's auto-focus flag belongs to the session it
+  // arrived for. viewSessionLinkFromOwner copies the current query into every
+  // session link on the schedule, so leaving it behind auto-focuses the field
+  // on every finished session opened afterwards.
+  params.delete("record");
+  const query = params.toString();
+  const url = query
+    ? `${window.location.pathname}?${query}`
+    : window.location.pathname;
+  window.history.replaceState(null, "", url);
+}
+
+// history.back() is asynchronous: a navigation started before its popstate
+// arrives is undone by it, and no fixed delay is safe on a busy device.
+export function dismissViewSessionThen(next: () => void) {
+  if (sessionDismissMode === "back") {
+    window.addEventListener("popstate", () => next(), { once: true });
+    window.history.back();
+    return;
+  }
+  dismissViewSession();
+  next();
+}
+
+// Mirror next/link's own modifier-key check so plain clicks are handled in
+// place, but Cmd/Ctrl/Shift/middle clicks fall through to the browser's normal
+// "open in new tab/window" behavior.
+export function isPlainLeftClick(e: MouseEvent<HTMLAnchorElement>) {
+  return (
+    !e.defaultPrevented &&
+    e.button === 0 &&
+    !e.metaKey &&
+    !e.ctrlKey &&
+    !e.shiftKey &&
+    !e.altKey
+  );
+}
+
+// Using module-level variables rather than useState/useRef,
+// because it has to survive across the parent re-render triggered by navigation,
+// and it isn't part of any component's render output.
+//
+// Every opener (viewFooLinkFromOwner / viewFooLinkFromElsewhere /
+// openingModalFromRedirect) writes the mode, so the value is never inherited
+// from an unrelated earlier modal. The default applies only to direct/deep-link
+// opens, where "replace" is intended.
+let sessionDismissMode: "back" | "replace" = "replace";
+let proposalDismissMode: "back" | "replace" = "replace";
+// A meeting modal is opened in place from the schedule column, and by link
+// from a notification — where "replace" is what keeps Back on the site.
+let meetingDismissMode: "back" | "replace" = "replace";

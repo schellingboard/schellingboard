@@ -161,7 +161,7 @@ export async function requireAuth(
     return null;
   }
 
-  const loginUrl = new URL("/login", request.url);
+  const loginUrl = new URL("/legacy/login", request.url);
   loginUrl.searchParams.set(
     "redirect",
     request.nextUrl.pathname + request.nextUrl.search
@@ -186,7 +186,7 @@ export async function requireAdminAuth(
     return null;
   }
 
-  const loginUrl = new URL("/admin/login", request.url);
+  const loginUrl = new URL("/legacy/admin/login", request.url);
   loginUrl.searchParams.set(
     "redirect",
     request.nextUrl.pathname + request.nextUrl.search

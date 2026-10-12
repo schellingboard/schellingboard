@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { locationColumn } from "@/utils/schedule-column";
 import { SLOT_HEIGHT_PX } from "@/utils/grid-layout";
 import type { Session } from "@schellingboard/domain/session";
-import { newEmptySession } from "@/app/(site)/session_utils";
+import { newEmptySession } from "@/app/legacy/(site)/session_utils";
 
 const at = (hour: number, minute = 0) =>
   new Date(Date.UTC(2026, 9, 1, hour, minute));

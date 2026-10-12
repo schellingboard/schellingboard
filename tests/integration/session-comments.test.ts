@@ -42,7 +42,7 @@ import {
   createSessionComment as createComment,
   deleteComment,
   updateComment,
-} from "@/app/(site)/[eventSlug]/comment-actions";
+} from "@/app/legacy/(site)/[eventSlug]/comment-actions";
 import { sendMail } from "@/utils/mailer";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";

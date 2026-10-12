@@ -15,7 +15,7 @@ Tailwind with the existing tokens, no server-side rendering.
 
 What exists: the schedule (grid, agenda, kiosk, session modal) reads from a
 replica seeded by SSR and kept current by the feed (ADR 0014), in
-`app/(site)/[eventSlug]/replica/`. RSVPs reconcile by `command_key`. The API
+`app/legacy/(site)/[eventSlug]/replica/`. RSVPs reconcile by `command_key`. The API
 under `/api/v1` covers what the schedule does (ADR 0012). The site password is
 enforced in `proxy.ts`. `public/sw.js` handles push only and caches nothing.
 

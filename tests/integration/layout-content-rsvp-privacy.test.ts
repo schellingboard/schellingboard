@@ -1,5 +1,5 @@
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
-import { eventContextFrom } from "@/app/(site)/[eventSlug]/replica/selectors";
+import { eventContextFrom } from "@/app/legacy/(site)/[eventSlug]/replica/selectors";
 import {
   describe,
   it,
@@ -32,7 +32,7 @@ vi.mock("next/headers", () => ({
 // Capture the rsvps handed to the client provider without rendering the heavy
 // client tree it wraps.
 const captured: { rsvps?: unknown[] } = {};
-vi.mock("@/app/(site)/[eventSlug]/event-provider-wrapper", () => ({
+vi.mock("@/app/legacy/(site)/[eventSlug]/event-provider-wrapper", () => ({
   EventProviderWrapper: ({ snapshot }: { snapshot: Snapshot }) => {
     captured.rsvps = eventContextFrom(snapshot).rsvps;
     return "PROVIDER_STUB";
@@ -59,7 +59,7 @@ async function protectGuest(guestId: string): Promise<void> {
 
 async function renderLayout(eventSlug: string): Promise<void> {
   const { EventLayoutContent } =
-    await import("@/app/(site)/[eventSlug]/layout-content");
+    await import("@/app/legacy/(site)/[eventSlug]/layout-content");
   renderToStaticMarkup(await EventLayoutContent({ eventSlug, children: null }));
 }
 

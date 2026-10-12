@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import clsx from "clsx";
-import { Markdown } from "@/app/(site)/markdown";
+import { Markdown } from "@/app/legacy/(site)/markdown";
 import {
   isKey,
   applyToTextarea,

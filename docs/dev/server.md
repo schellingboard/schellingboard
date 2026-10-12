@@ -79,7 +79,7 @@ there and in `audienceOf`. The message carries the `command_key` only for the
 actor who made the change.
 
 The client applies messages to its replica in
-`app/(site)/[eventSlug]/replica/` (`apply.ts`, a pure function from replica and
+`app/legacy/(site)/[eventSlug]/replica/` (`apply.ts`, a pure function from replica and
 message to replica; `store.ts`; `live-replica.ts` for the connection). A new
 message type needs a case in `apply.ts`: unknown types only move `seq`.
 
@@ -93,6 +93,14 @@ the build id change offers a reload. It stays behind the site password.
 
 The in-app release notes live in `packages/domain/src/release-notes.ts` so the
 Next footer and the SPA import the same data.
+
+## Pages under `/legacy`
+
+The Next pages live in `app/legacy/` ([ADR 0015](adr/0015-spa-alongside-next.md)),
+so a page path in code is written `/legacy/…` (`<a href>`, `router.push`,
+`redirect()`, `revalidatePath()`). `/api` and `/media` stay at the root. `proxy.ts`
+redirects every other root path to `/legacy` + path, so emails and push links keep
+their root URLs, and applies its gates to the path without the `/legacy` prefix.
 
 ## Keys from the UI
 

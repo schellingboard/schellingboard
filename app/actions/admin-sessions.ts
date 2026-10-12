@@ -25,14 +25,14 @@ export type AdminSessionInput = {
 };
 
 // The attendee-facing schedule fetches the session list in the shared
-// [eventSlug] layout (see app/(site)/[eventSlug]/session-actions.ts), so the
+// [eventSlug] layout (see app/legacy/(site)/[eventSlug]/session-actions.ts), so the
 // public layout must be revalidated alongside the admin pages.
 async function revalidateEventPaths(eventId: string) {
-  revalidatePath("/admin");
-  revalidatePath("/admin/events");
-  revalidatePath(`/admin/events/${eventId}`);
+  revalidatePath("/legacy/admin");
+  revalidatePath("/legacy/admin/events");
+  revalidatePath(`/legacy/admin/events/${eventId}`);
   const event = await pageReads().eventById(eventId);
-  if (event) revalidatePath(`/${event.slug}`, "layout");
+  if (event) revalidatePath(`/legacy/${event.slug}`, "layout");
 }
 
 async function settle(

@@ -42,7 +42,7 @@ import {
 import {
   createProposal,
   updateProposal,
-} from "@/app/(site)/[eventSlug]/proposals/actions";
+} from "@/app/legacy/(site)/[eventSlug]/proposals/actions";
 import { TIME_OFFSET_COOKIE } from "@/utils/dev-clock";
 import { VoteChoice } from "@schellingboard/domain/vote";
 

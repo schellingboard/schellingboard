@@ -20,9 +20,9 @@ function parseDateTime(value: string): Date | undefined {
 }
 
 async function revalidateEventPaths(actor: Actor, eventId: string) {
-  revalidatePath(`/admin/events/${eventId}/locations`);
+  revalidatePath(`/legacy/admin/events/${eventId}/locations`);
   const found = await eventUseCases().getEvent(actor, { id: eventId });
-  if (found.ok) revalidatePath(`/${found.value.event.slug}`, "layout");
+  if (found.ok) revalidatePath(`/legacy/${found.value.event.slug}`, "layout");
 }
 
 export async function addLocationUnavailabilityAction(

@@ -103,7 +103,7 @@ test("saving announces that it is in progress before it confirms @001-US1", asyn
     release = resolve;
   });
   await page.route(
-    (url) => url.pathname.startsWith("/Conference-Gamma"),
+    (url) => url.pathname.startsWith("/legacy/Conference-Gamma"),
     async (route, request) => {
       if (request.method() !== "POST") return route.continue();
       await held;

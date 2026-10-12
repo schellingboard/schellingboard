@@ -132,3 +132,91 @@ describe("proxy: /media auth", () => {
     expect(result.response.headers.get("location")).toBeNull();
   });
 });
+
+describe("proxy: pages live under /legacy", () => {
+  beforeEach(() => {
+    vi.stubEnv("SITE_PASSWORD", "site-pw");
+    vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
+    vi.stubEnv("AUTH_SECRET", VALID_SECRET);
+  });
+  afterEach(() => vi.unstubAllEnvs());
+
+  it("sends a root page path to /legacy, keeping the query, before any login", async () => {
+    const result = await throughProxy(
+      "/conf/proposals?viewProposal=p1",
+      {},
+      []
+    );
+    if (result.ok) throw new Error("expected a redirect");
+    expect(result.response.status).toBe(307);
+    const location = new URL(result.response.headers.get("location")!);
+    expect(location.pathname + location.search).toBe(
+      "/legacy/conf/proposals?viewProposal=p1"
+    );
+    const root = await throughProxy("/", {}, []);
+    if (root.ok) throw new Error("expected a redirect");
+    expect(new URL(root.response.headers.get("location")!).pathname).toBe(
+      "/legacy"
+    );
+  });
+
+  it("gates /legacy pages with the site password and returns to the same page", async () => {
+    const result = await throughProxy("/legacy/conf", {}, []);
+    if (result.ok) throw new Error("expected a redirect");
+    const location = new URL(result.response.headers.get("location")!);
+    expect(location.pathname).toBe("/legacy/login");
+    expect(location.searchParams.get("redirect")).toBe("/legacy/conf");
+  });
+
+  it("lets the login page through and gates /legacy/admin with the admin cookie", async () => {
+    expect((await throughProxy("/legacy/login", {}, [])).ok).toBe(true);
+    const gated = await throughProxy("/legacy/admin/events", {}, []);
+    if (gated.ok) throw new Error("expected a redirect");
+    expect(new URL(gated.response.headers.get("location")!).pathname).toBe(
+      "/legacy/admin/login"
+    );
+  });
+
+  it("leaves /api and /media at the root", async () => {
+    expect((await throughProxy("/api/health", {}, [])).ok).toBe(true);
+    const media = await throughProxy("/media/avatars/x.webp", {}, []);
+    if (media.ok) throw new Error("expected a refusal");
+    expect(media.response.status).toBe(401);
+    expect(media.response.headers.get("location")).toBeNull();
+  });
+
+  it("never redirects a /legacy path to itself", async () => {
+    const cookie = await createAuthCookie();
+    for (const path of ["/legacy", "/legacy/conf", "/legacy/guests/x"]) {
+      expect((await throughProxy(path, {}, [cookie])).ok, path).toBe(true);
+    }
+  });
+
+  it("redirects a POST to a root path as well", async () => {
+    const result = await throughProxy("/conf", { method: "POST" }, []);
+    if (result.ok) throw new Error("expected a redirect");
+    expect(result.response.status).toBe(307);
+  });
+
+  it("keeps a crafted path on this origin", async () => {
+    for (const path of ["//evil.com", "/\\evil.com", "/%2f%2fevil.com"]) {
+      const result = await throughProxy(path, {}, []);
+      if (result.ok) throw new Error(`expected a redirect for ${path}`);
+      const location = new URL(
+        result.response.headers.get("location")!,
+        "http://test"
+      );
+      expect(location.origin, path).toBe("http://test");
+      expect(location.pathname.startsWith("/legacy"), path).toBe(true);
+    }
+  });
+
+  it("gates /legacy/api and /legacy/media like the root ones, which hold no routes", async () => {
+    const api = await throughProxy("/legacy/api/v1/health", {}, []);
+    if (api.ok) throw new Error("expected a refusal");
+    expect(api.response.status).toBe(401);
+    const media = await throughProxy("/legacy/media/x.webp", {}, []);
+    if (media.ok) throw new Error("expected a refusal");
+    expect(media.response.status).toBe(401);
+  });
+});

@@ -20,7 +20,7 @@ What exists: the change log (ADR 0011), logging only `session.changed` and
 `rsvpGuestIds`). The unit of work (ADR 0013) records changes in the state's
 transaction and publishes them in `seq` order under the write lock. There is a
 `uow.read` for consistent reads. The schedule's data is `EventContext`,
-assembled in `app/(site)/[eventSlug]/layout-content.tsx`. Identity is as in
+assembled in `app/legacy/(site)/[eventSlug]/layout-content.tsx`. Identity is as in
 ADR 0012: an admin actor, and a guest actor that is either verified or open.
 
 ## Decision (proposed)
@@ -256,7 +256,7 @@ that matches. Because publish runs under the write lock, changes arrive in
 ### 12. Where the code lives
 
 - `apply(replica, message)` lives with the client store, in
-  `app/(site)/[eventSlug]/replica/apply.ts`. The replica is the snapshot's
+  `app/legacy/(site)/[eventSlug]/replica/apply.ts`. The replica is the snapshot's
   wire type (`Snapshot`) and a message the feed's (`FeedMessage`), both from
   `packages/contracts`. `apply` is pure: it upserts or deletes per type,
   ignores `seq ≤ replica.seq` and skips unknown types, moving `seq` past
@@ -267,7 +267,7 @@ that matches. Because publish runs under the write lock, changes arrive in
   `packages/domain/src/change.ts`; `project(change, viewer)` is in
   `server/feed/project.ts` and gives `commandKey` only to the change's actor.
 - Snapshot and feed message contracts live in `packages/contracts`.
-- The client store lives in `app/(site)/[eventSlug]/replica/`: the store,
+- The client store lives in `app/legacy/(site)/[eventSlug]/replica/`: the store,
   the `EventSource` client, the sync state and the selectors, with no React.
   One hook connects them to `EventContext`. Step 5 of the path moves the
   store to the SPA unchanged.

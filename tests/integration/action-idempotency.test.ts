@@ -41,12 +41,12 @@ import {
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
-import { createProposal } from "@/app/(site)/[eventSlug]/proposals/actions";
+import { createProposal } from "@/app/legacy/(site)/[eventSlug]/proposals/actions";
 import {
   createProfileComment,
   createProposalComment,
   createSessionComment,
-} from "@/app/(site)/[eventSlug]/comment-actions";
+} from "@/app/legacy/(site)/[eventSlug]/comment-actions";
 
 describe("create proposal with an idempotency key", () => {
   beforeAll(() => setupTestDb());

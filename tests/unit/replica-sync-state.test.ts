@@ -6,8 +6,8 @@ import {
   nextChangeAt,
   staleAt,
   syncState,
-} from "@/app/(site)/[eventSlug]/replica/sync-state";
-import { createReplicaStore } from "@/app/(site)/[eventSlug]/replica/store";
+} from "@/app/legacy/(site)/[eventSlug]/replica/sync-state";
+import { createReplicaStore } from "@/app/legacy/(site)/[eventSlug]/replica/store";
 import { snapshot } from "../helpers/snapshot-fixture";
 
 describe("syncState", () => {

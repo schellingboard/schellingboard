@@ -80,7 +80,7 @@ test("replies to a profile comment and permalinks to the reply @010-US3 @010-US5
   const timestamps = profile.getByRole("link", { name: /^\d/ });
   await expect(timestamps).toHaveCount(2);
   const permalink = await timestamps.last().getAttribute("href");
-  expect(permalink).toMatch(/^\/guests\/[^/?]+#comment-/);
+  expect(permalink).toMatch(/^\/legacy\/guests\/[^/?]+#comment-/);
 
   // The permalink is a real profile URL: opening it cold lands on this
   // profile with the reply shown (and highlighted).

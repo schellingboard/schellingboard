@@ -5,7 +5,7 @@ import {
   voteChoiceRank,
   voteCount,
   VOTE_CHOICES,
-} from "@/app/(site)/votes";
+} from "@/app/legacy/(site)/votes";
 import { VoteChoice } from "@schellingboard/domain/vote";
 
 describe("voteChoiceToEmoji", () => {

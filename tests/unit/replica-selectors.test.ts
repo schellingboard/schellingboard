@@ -1,7 +1,7 @@
 // @module-tag 007-US8
 import { describe, it, expect } from "vitest";
-import { eventContextFrom } from "@/app/(site)/[eventSlug]/replica/selectors";
-import { apply } from "@/app/(site)/[eventSlug]/replica/apply";
+import { eventContextFrom } from "@/app/legacy/(site)/[eventSlug]/replica/selectors";
+import { apply } from "@/app/legacy/(site)/[eventSlug]/replica/apply";
 import { iso, snapshot } from "../helpers/snapshot-fixture";
 
 describe("eventContextFrom", () => {

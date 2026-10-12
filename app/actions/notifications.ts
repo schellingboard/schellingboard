@@ -31,7 +31,7 @@ export async function markNotificationsReadAction(
   // Only this page: the badge sits in a layout that reads cookies, so it is
   // never statically cached, and the caller refreshes the router anyway.
   // revalidatePath("/", "layout") would purge every route for every visitor.
-  revalidatePath("/notifications");
+  revalidatePath("/legacy/notifications");
   return { ok: true };
 }
 
@@ -44,7 +44,7 @@ export async function deleteNotificationsAction(
     { ids }
   );
   if (!result.ok) return { ok: false, error: NO_USER };
-  revalidatePath("/notifications");
+  revalidatePath("/legacy/notifications");
   return { ok: true };
 }
 
@@ -63,6 +63,6 @@ export async function openNotificationAction(id: string): Promise<void> {
   );
   if (!result.ok) return;
 
-  revalidatePath("/notifications");
-  redirect(result.value.url);
+  revalidatePath("/legacy/notifications");
+  redirect(`/legacy${result.value.url}`);
 }

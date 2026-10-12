@@ -5,8 +5,8 @@ import type { FeedMessage } from "@schellingboard/contracts/feed";
 import {
   connectFeed,
   SILENCE_MS,
-} from "@/app/(site)/[eventSlug]/replica/feed-client";
-import { createReplicaStore } from "@/app/(site)/[eventSlug]/replica/store";
+} from "@/app/legacy/(site)/[eventSlug]/replica/feed-client";
+import { createReplicaStore } from "@/app/legacy/(site)/[eventSlug]/replica/store";
 import { snapshot } from "../helpers/snapshot-fixture";
 
 type Listener = (event: { data: string }) => void;

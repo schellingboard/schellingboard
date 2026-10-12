@@ -45,10 +45,10 @@ import {
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
 import { AUTH_COOKIE_NAME, createAuthCookie } from "@/utils/auth";
-import { listProfileActivity } from "@/app/(site)/guests/profile-activity";
-import { detectGuestClashes } from "@/app/(site)/[eventSlug]/clash-actions";
-import { revalidateEvent } from "@/app/(site)/[eventSlug]/session-actions";
-import { createProposal } from "@/app/(site)/[eventSlug]/proposals/actions";
+import { listProfileActivity } from "@/app/legacy/(site)/guests/profile-activity";
+import { detectGuestClashes } from "@/app/legacy/(site)/[eventSlug]/clash-actions";
+import { revalidateEvent } from "@/app/legacy/(site)/[eventSlug]/session-actions";
+import { createProposal } from "@/app/legacy/(site)/[eventSlug]/proposals/actions";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
@@ -106,7 +106,7 @@ describe("server actions require site auth", () => {
   it("revalidateEvent works for a site-authenticated caller", async () => {
     await siteAuthenticate();
     await revalidateEvent("some-event");
-    expect(revalidatePath).toHaveBeenCalledWith("/some-event", "layout");
+    expect(revalidatePath).toHaveBeenCalledWith("/legacy/some-event", "layout");
   });
 
   it("detectGuestClashes refuses a caller with no site-auth cookie", async () => {
