@@ -84,7 +84,7 @@ const scrollGridTo = async (page: Page, hour: string) => {
 };
 
 const adminLogin = async (page: Page) => {
-  await page.goto("/admin/login");
+  await page.goto("/legacy/admin/login");
   const password = page.getByLabel("Password");
   await password.fill(ADMIN_PASSWORD);
   await password.press("Enter");
@@ -185,13 +185,13 @@ export const shots: Shot[] = [
         .setZone("Europe/Berlin")
         .plus({ days: 14 })
         .set({ hour: 14, minute: 35, second: 0, millisecond: 0 });
-      await page.goto("/Conference-Gamma?dev=1");
+      await page.goto("/legacy/Conference-Gamma?dev=1");
       await page
         .getByLabel("Pick date and time")
         .fill(dayOne.toFormat("yyyy-MM-dd'T'HH:mm"));
       await page.getByText(dayOne.toFormat("yyyy-MM-dd")).waitFor();
       await page.waitForLoadState("networkidle");
-      await page.goto("/Conference-Gamma?kiosk=1");
+      await page.goto("/legacy/Conference-Gamma?kiosk=1");
       await page.getByTestId("now-line").waitFor();
       await page.waitForTimeout(1500);
     },

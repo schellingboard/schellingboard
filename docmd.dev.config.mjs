@@ -122,6 +122,11 @@ export default {
           icon: "server",
         },
         {
+          title: "Web app",
+          path: "/web-app/",
+          icon: "monitor",
+        },
+        {
           title: "Database migrations",
           path: "/migrations/",
           icon: "database",

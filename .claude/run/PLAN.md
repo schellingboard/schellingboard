@@ -82,7 +82,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
 
 ### SPA
 
-- [ ] 9. **`apps/web` scaffold**: workspace package (Vite, React, TanStack Router,
+- [x] 9. **`apps/web` scaffold**: workspace package (Vite, React, TanStack Router,
       Tailwind with the existing tokens, TS project references); build output
       served by Next as the shell (`no-store`) for every non-rewritten root path,
       assets under `/_spa/`; a catch-all route forwarding to `/legacy` (so the
@@ -95,7 +95,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
   - [x] 9a. Package, tokens shared in `styles/tokens.css`, build, arch rules,
         Vitest project, catch-all forwarding (unit tests).
   - [x] 9b. Next serves the shell and `/_spa/` assets; the proxy redirect goes.
-  - [ ] 9c. `make dev` with Vite in front, Dockerfile, docs, full E2E tiers.
+  - [x] 9c. `make dev` with Vite in front, Dockerfile, docs, full E2E tiers.
 - [ ] 10. **Replica in the SPA**: `apps/web/src/replica/` from today's
       `app/(site)/[eventSlug]/replica/` (store, `apply`, feed client, sync state
       with step 2's fix, selectors), plus a clock offset from step 7b's server

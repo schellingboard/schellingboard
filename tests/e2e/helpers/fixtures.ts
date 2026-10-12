@@ -41,27 +41,15 @@ function formatConsoleMessage(msg: ConsoleMessage): string {
 }
 
 export const test = base.extend<{ consoleGuard: void }>({
-  // A person opening a link waits for the page it ends on, so goto does too:
-  // the shell has loaded by then, but the page behind it has not.
+  // Specs go to the legacy page directly: through the shell, a click can land
+  // before the page behind it has hydrated. The hop has its own spec (@014-US4).
   page: async ({ page }, provide) => {
     const goto = page.goto.bind(page);
-    page.goto = async (url, options) => {
-      let response = null;
-      try {
-        response = await goto(url, options);
-      } catch (error) {
-        if (!String(error).includes("interrupted by another navigation")) {
-          throw error;
-        }
-      }
-      if (!SERVER_PATH.test(new URL(page.url()).pathname)) {
-        await expect
-          .poll(() => new URL(page.url()).pathname, { timeout: 15_000 })
-          .toMatch(/^\/legacy(\/|$)/);
-        await page.waitForLoadState("load");
-      }
-      return response;
-    };
+    page.goto = (url, options) =>
+      goto(
+        url.startsWith("/") && !SERVER_PATH.test(url) ? `/legacy${url}` : url,
+        options
+      );
     await provide(page);
   },
   consoleGuard: [

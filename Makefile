@@ -5,7 +5,7 @@ SHELL := /usr/bin/env bash
 help:
 	@printf "Available commands:\n"
 	@printf "\nDevelopment:\n"
-	@printf "  %-28s %s\n" "make dev"                "Start development server"
+	@printf "  %-28s %s\n" "make dev"                "Start development server (Vite on PORT in front of Next)"
 	@printf "  %-28s %s\n" "make mailpit"            "Start local mail server (for email in dev and tests)"
 	@printf "  %-28s %s\n" "make precommit"          "Format, lint, typecheck, and run all tests (incl. e2e)"
 	@printf "\nBuilding:\n"
@@ -65,7 +65,7 @@ install-playwright: install
 	bun x playwright install
 
 dev: dev-migrate-up install
-	bun set-env.ts dev bun x next dev
+	bun set-env.ts dev bun scripts/dev.ts
 
 # `docker compose` only auto-reads `.env`, so point it at `.env.dev.local`
 # instead — that way one file per clone carries MAILPIT_SMTP_PORT/MAILPIT_UI_PORT

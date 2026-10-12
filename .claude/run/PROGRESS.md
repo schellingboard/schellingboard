@@ -139,6 +139,34 @@
 - The login redirect for a root path now returns to the root path; the SPA forwards it.
 - The Playwright web server runs `vite build` before `next build`.
 
+## Step 9c (2026-10-09)
+
+- `make dev` runs `scripts/dev.ts`: Next on `PORT + 1`, Vite on `PORT` proxying `/legacy`,
+  `/api`, `/media` and the other Next paths (websockets included). Not exercised here
+  beyond the config; the tiers below run against the built app.
+- Dockerfile builds the SPA before Next and copies `apps/web/dist` to `/app/apps/web/dist`;
+  `make test-e2e-docker` shows the standalone image serves the shell and assets from disk.
+- E2E: the `page.goto` fixture sends root paths to `/legacy/...` directly (through the
+  shell a click could land before hydration: the profile:577 and settings map-modal
+  flakes); `pwa.spec.ts` "an old root link reaches its page" (@014-US4) covers the
+  shell's forward. `--repeat-each` makes user-auth:270 fail by itself (it leaves
+  Ahmad protected), so it is not a measure.
+- Review fixes: `<noscript>` link to `/legacy` and an inline script copying the `sb-theme`
+  cookie to `<html>` (no light flash) in `index.html`; the screenshots script uses
+  `/legacy/...`; ADR 0015 now says root `/admin*` skips the site gate; spa-files test uses
+  a nested temp dir. Not changed: React/tailwind/@types carets (they mirror the root
+  package.json, so one copy is installed); the vacuous depcruise rules (they bite once
+  `apps/web` imports packages); dev-proxy prefix matching and POST 405 (harmless).
+- Final E2E after the review fixes: `make test-e2e` 209 passed at low load. At high load
+  (25+) schedule-layout:252 ("grid keeps its place") failed in the full run and in
+  `make test-e2e-docker` (scroll 432 vs 400, same value both times; 206 passed otherwise),
+  yet passed alone 9 of 9 times, with `rsvp`+`schedule-layout` together, and in the clean
+  full run. Not repeatable with `--repeat-each` (it books a fixed slot, so later repeats
+  fail on the taken 18:10). Judged a load flake in the legacy grid's scroll restore, not
+  the shell: the spec now goes to `/legacy` directly, as before step 9.
+- `app/api/spa/**` is out of scope of the mutating-surface guard (read-only static files).
+- Docs: `docs/dev/web-app.md` (new), getting-started, architecture-rules, README, nav.
+
 ## Questions
 
 - A session that loses its only room reads `"X" moved to No location (was Room A)`
@@ -150,4 +178,4 @@
 
 ## Next step
 
-9c.
+10.
