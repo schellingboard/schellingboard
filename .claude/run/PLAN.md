@@ -125,7 +125,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
   - [x] 12b. Viewer provider, user picker, protected-name redirect.
   - [x] 12c. Theme, footer with release notes, dev toolbar.
   - [x] 12d. Sync indicator, error boundary.
-- [ ] 13. **Schedule screens**: grid, agenda, filters, now line, day fold, drag
+- [x] 13. **Schedule screens**: grid, agenda, filters, now line, day fold, drag
       to pan, scroll restoration, and the meetings column read-only from the
       replica (booking and the meeting modal link to legacy). Not routed yet:
       the catch-all still forwards `/{slug}`.
@@ -135,16 +135,28 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
   - [x] 13c. Agenda, filters, toolbar, search stepping.
   - [x] 13d. Drag to pan, scroll restoration, pull to refresh, read-only
         meetings column.
-  - [ ] 13e. Wiring (Shell, events nav, replica, viewer switching) and the
-        dev-only preview route; docs; E2E spec.
-- [ ] 14. **Kiosk** on the SPA schedule, same behavior as today.
+  - [x] 13e. Wiring (Shell, events nav, replica, viewer switching) in
+        `app/schedule-page.tsx`, tested through a test router; not routed.
+  - [ ] 13f. The grid block's RSVP badge click (RSVP, clash confirm, name
+        picker), so the SPA schedule has what the legacy one does.
+  - [ ] 13g. **Takeover** (user decision 2026-10-09: no preview route): the
+        router owns `/{slug}` and renders the SPA schedule. Until their steps
+        move, `kiosk`, `viewSession` and `viewMeeting` in the query forward to
+        the legacy schedule, and so do the legacy static root pages. Legacy
+        links that mean "the schedule" point at `/{slug}`; the Next schedule
+        page stays for the modals. E2E fixture and specs adapted; CHANGELOG,
+        docs. Full `make test-e2e` and `make test-e2e-docker`.
+- [ ] 14. **Kiosk** on the SPA schedule, same behavior as today; `kiosk` stops
+      forwarding to legacy.
 - [ ] 15. **Session modal** as a search param over the schedule: details, RSVP,
       attendee list, comments; edit and delete link to legacy.
-- [ ] 16. **The SPA takes the schedule**: the router owns `/{slug}` and the
-      session modal; delete the Next schedule page, its components, server
-      actions, `replica/` and the overlay; legacy pages link to the SPA schedule
-      and modal with plain `<a>` (`modal-nav.ts`). Adapt the E2E specs that break.
-      Full `make test-e2e`. CHANGELOG, `docs/public/`, release-notes highlight.
+- [ ] 16. **Retire the Next schedule**: the router owns the session modal
+      (`viewSession` stops forwarding); delete the Next schedule page, its
+      components, server actions, `replica/` and the overlay, except what the
+      meeting modal (`viewMeeting`, still legacy until the meetings family moves)
+      needs; legacy pages link to the SPA modal with plain `<a>`
+      (`modal-nav.ts`). Adapt the E2E specs that break. Full `make test-e2e`.
+      CHANGELOG, `docs/public/`, release-notes highlight.
 - [ ] 17. **Offline and reload offer**: `sw.js` precaches the shell and `/_spa/`
       assets and serves the shell for SPA navigations offline; never caches
       `/api/**` or `/legacy/**`; push unchanged. The SPA compares the running

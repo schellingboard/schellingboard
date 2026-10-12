@@ -40,7 +40,7 @@ The files are read relative to the working directory, so the same code serves
 ## Layout and rules
 
 `apps/web/src/` follows [the client layout](target-architecture/04-client.md#layout);
-`app/` (layout, nav bar), `ui/` (dialog, button), `replica/`, `commands/` and `queries/` exist so far (the replica: store, `apply`, feed client, sync state, a server clock offset and IndexedDB persistence keyed by event and viewer, opened as `stale`). dependency-cruiser enforces that the package imports
+`app/` (layout, nav bar, shell, pages), `ui/` (dialog, button, tooltip, icons), `schedule/`, `replica/`, `commands/` and `queries/` exist so far (the replica: store, `apply`, feed client, sync state, a server clock offset and IndexedDB persistence keyed by event and viewer, opened as `stale`). dependency-cruiser enforces that the package imports
 `packages/domain`, `packages/contracts` and `packages/api-client` only (never `app/`,
 `server/`, `utils/` or `next`), that nothing imports it, that `features/` never
 imports `api-client`, and that it declares what it imports. See
@@ -58,7 +58,8 @@ lists the guests it is given (the event snapshot's `guests`: members and hosts o
 `GET /guests` is closed to anonymous visitors, so a non-member cannot yet pick their name).
 Sign-out and a switch between names clear the device's persisted replicas
 (`persistence.clear()`); step 13 must also close the feed and reopen the replica, the
-command runner and the queries for the new `guestId` when it changes. The provider asks
+command runner and the queries for the new `guestId` when it changes (`useScheduleSession` does:
+the viewer is part of its effect key). The provider asks
 again every 5 s while the first identity fetch fails. `app/keys.ts` holds the
 `newKey` the runner needs.
 
@@ -79,8 +80,32 @@ button has no SPA counterpart.
 short grace, stale) and re-renders at the instant it next changes. `ErrorBoundary` keeps
 the nav and footer when one screen crashes (try again, reload, or open `/legacy`). `Shell`
 (`app/shell.tsx`) composes theme, viewer, layout, nav, user menu, footer, boundary and dev
-clock from props (events, the picker's guests, location); the router does not mount it
-before step 13, so the catch-all still forwards every path.
+clock from props (events, the picker's guests, location). `ShellProviders` (theme and viewer)
+and `ShellFrame` are also exported, for a screen that needs the viewer before it can say what
+the frame shows. The schedule page mounts it.
+
+## The schedule
+
+`src/schedule/` holds the schedule screens; `ScheduleScreen` is the entry: a snapshot, the
+server's `now`, `links`, the page's search params (+ a setter) and slots for the sync indicator
+and footer. The view (`view=agenda`), filter chips (`filter=`) and narrowed rooms (`loc=`) live
+in the params; the search text and unfolded days are local. Everything is drawn from the
+replica: sessions, rooms and RSVPs from the snapshot, the viewer's own 1-on-1s from
+`snapshot.me.meetings` (`meetingViewsFrom`; clash lines stay empty, the replica holds no other
+guest's RSVPs). Times use the event's zone, never the ambient one; the now line follows
+`store.serverNow()` (`useServerNow`).
+
+The pure parts (`grid-layout`, `column`, `meeting-column`, `agenda`, `fold`, `filters`,
+`search`, `meeting-rules`, `meeting-clash-text`) are copies of `utils/` with their tests: the
+legacy copies go with the legacy schedule at step 16. `model.ts` has the new pure rules
+(narrowing by room, matching, day folds). `links.ts` is the one place that decides where a
+session, a 1-on-1, add-session or booking link goes; today everything goes to `/legacy/...`.
+
+`app/schedule-page.tsx` composes it: `useScheduleSession` (`replica/session.ts`: `openReplica`,
+`connectFeed`, `autosaveReplica`, hidden-tab and back/forward-cache handling, plus a command
+runner) for the viewer from `useViewer()`, the events for the nav (`GET /api/v1/events`), the
+snapshot's guests for the picker, the proposals redirect for an event not in its scheduling
+phase. A viewer change closes the feed and opens the event again.
 
 ## Tests
 
