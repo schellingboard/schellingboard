@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
 import { LIGHT_SURFACE } from "@/utils/theme";
 
 // The name comes out of the database, so this can't be baked at build time —
@@ -8,7 +8,7 @@ import { LIGHT_SURFACE } from "@/utils/theme";
 export const dynamic = "force-dynamic";
 
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
-  const settings = await getRepositories().settings.get();
+  const settings = await pageReads().siteSettings();
 
   return {
     name: settings.title,

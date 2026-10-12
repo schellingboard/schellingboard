@@ -21,10 +21,15 @@ import {
   createCommentUseCases,
   type CommentDeps,
   type CommentUseCases,
+  proposalComments,
 } from "@/server/modules/comments/module";
 import {
   createEventUseCases,
   type EventUseCases,
+  allEvents,
+  eventById,
+  eventBySlug,
+  eventDays,
 } from "@/server/modules/events/module";
 import {
   createMeetingUseCases,
@@ -33,26 +38,40 @@ import {
 import {
   createNotificationUseCases,
   type NotificationUseCases,
+  notificationCount,
+  notificationPage,
+  unreadNotificationCount,
 } from "@/server/modules/notifications/module";
 import {
   createPeopleUseCases,
   type PeopleUseCases,
+  allGuests,
+  attendees,
+  guestById,
 } from "@/server/modules/people/module";
 import {
   createProposalUseCases,
   type ProposalUseCases,
+  eventProposals,
+  guestVotes,
+  hostedProposals,
+  proposalById,
 } from "@/server/modules/proposals/module";
 import {
   createSessionUseCases,
   type SessionUseCases,
+  hostedSessions,
+  sessionsOfEvent,
 } from "@/server/modules/sessions/module";
 import {
   createSettingsUseCases,
   type SettingsUseCases,
+  siteSettings,
 } from "@/server/modules/settings/module";
 import {
   createVenueUseCases,
   type VenueUseCases,
+  eventLocations,
 } from "@/server/modules/venue/module";
 
 // Built per call: tests swap the repository container between cases.
@@ -142,4 +161,37 @@ export function settingsUseCases(): SettingsUseCases {
 
 export function eventSnapshot(actor: Actor, slug: string) {
   return snapshotFor(unitOfWork, actor, slug);
+}
+
+// What server-rendered pages read. No actor: these sit behind the site
+// password only.
+export function pageReads() {
+  const repos = getRepositories();
+  return {
+    siteSettings: () => siteSettings(repos),
+    allEvents: () => allEvents(repos),
+    eventBySlug: (slug: string) => eventBySlug(repos, slug),
+    eventById: (id: string) => eventById(repos, id),
+    eventDays: (eventId: string) => eventDays(repos, eventId),
+    allGuests: () => allGuests(repos),
+    guestById: (id: string) => guestById(repos, id),
+    attendees: (now: Date) => attendees(repos, now),
+    notificationPage: (
+      guestId: string,
+      page: { limit: number; offset: number }
+    ) => notificationPage(repos, guestId, page),
+    notificationCount: (guestId: string) => notificationCount(repos, guestId),
+    unreadNotificationCount: (guestId: string) =>
+      unreadNotificationCount(repos, guestId),
+    eventProposals: (eventId: string) => eventProposals(repos, eventId),
+    proposalById: (id: string) => proposalById(repos, id),
+    hostedProposals: (guestId: string) => hostedProposals(repos, guestId),
+    guestVotes: (guestId: string, eventId: string) =>
+      guestVotes(repos, guestId, eventId),
+    proposalComments: (proposalId: string) =>
+      proposalComments(repos, proposalId),
+    sessionsOfEvent: (eventId: string) => sessionsOfEvent(repos, eventId),
+    hostedSessions: (guestId: string) => hostedSessions(repos, guestId),
+    eventLocations: (eventId: string) => eventLocations(repos, eventId),
+  };
 }

@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
 import {
   unverifiedUserMessage,
   verifiedCurrentUser,
@@ -14,8 +14,8 @@ export default async function NewProposalPage({
 }) {
   const { eventSlug } = await params;
 
-  const repos = getRepositories();
-  const event = await repos.events.findBySlug(eventSlug);
+  const reads = pageReads();
+  const event = await reads.eventBySlug(eventSlug);
 
   if (!event) {
     return <div>Event not found</div>;
@@ -30,7 +30,7 @@ export default async function NewProposalPage({
     );
   }
 
-  const guests = await repos.guests.list();
+  const guests = await reads.allGuests();
 
   return (
     <div className="max-w-2xl mx-auto pb-24">

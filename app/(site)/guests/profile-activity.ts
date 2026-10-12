@@ -1,7 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
 import { verifiedCurrentUser } from "@/utils/acting-guest";
 import { requireSiteAuth } from "@/utils/action-auth";
 import { eventNameToSlug } from "@/utils/utils";
@@ -35,14 +35,14 @@ export async function listProfileActivity(
   guestId: string
 ): Promise<ProfileActivity> {
   await requireSiteAuth();
-  const repos = getRepositories();
+  const reads = pageReads();
   const viewerId = await verifiedCurrentUser(await cookies());
   // The event list is fetched first because the meeting options are computed
   // over it, rather than each looking its own events up again.
-  const events = await repos.events.list();
+  const events = await reads.allEvents();
   const [hostedSessions, proposals, meetingOptions] = await Promise.all([
-    repos.sessions.listHostedByGuest(guestId),
-    repos.sessionProposals.listByHost(guestId),
+    reads.hostedSessions(guestId),
+    reads.hostedProposals(guestId),
     meetingOptionsFor(viewerId, guestId, events),
   ]);
 

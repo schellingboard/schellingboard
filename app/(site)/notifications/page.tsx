@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { PageNotice } from "@/app/components/page-notice";
-import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
 import {
   unverifiedUserMessage,
   verifiedCurrentUser,
@@ -31,8 +31,8 @@ export default async function NotificationsPage({
   }
 
   const page = parsePage((await searchParams).page);
-  const { notifications } = getRepositories();
-  const total = await notifications.countByGuest(currentUser);
+  const reads = pageReads();
+  const total = await reads.notificationCount(currentUser);
   // A stale link to a page that no longer exists lands on the last real one,
   // as everywhere else that paginates.
   const redirectTarget = outOfRangePageRedirect({
@@ -43,7 +43,7 @@ export default async function NotificationsPage({
   });
   if (redirectTarget) redirect(redirectTarget);
 
-  const listed = await notifications.listByGuest(currentUser, {
+  const listed = await reads.notificationPage(currentUser, {
     limit: PAGE_SIZE,
     offset: (page - 1) * PAGE_SIZE,
   });

@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import NavBar from "./nav-bar";
 import Footer from "../footer";
 import { UserProvider } from "./context";
-import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
 import { cookies } from "next/headers";
 import { AUTH_COOKIE_NAME, isAuthCookieValid } from "@/utils/auth";
 import { verifiedCurrentUser } from "@/utils/acting-guest";
@@ -23,7 +23,8 @@ export default async function SiteLayout({
   const initialUser = isAuthenticated
     ? await verifiedCurrentUser(cookieStore)
     : null;
-  const events = isAuthenticated ? await getRepositories().events.list() : [];
+  const reads = pageReads();
+  const events = isAuthenticated ? await reads.allEvents() : [];
   const navItems = events.map((e) => ({
     name: e.name,
     href: `/${e.slug}`,
@@ -31,15 +32,15 @@ export default async function SiteLayout({
   }));
   // Global attendee list backs the header name selector, which is shown on
   // every page (guests are global, not per-event).
-  const guests = isAuthenticated ? await getRepositories().guests.list() : [];
+  const guests = isAuthenticated ? await reads.allGuests() : [];
   const mapImageUrl = isAuthenticated
-    ? (await getRepositories().settings.get()).mapImageUrl
+    ? (await reads.siteSettings()).mapImageUrl
     : "";
   // Counted here rather than in the client: the selected guest is a cookie the
   // layout already reads, and one indexed count is cheaper than a round trip
   // from every page.
   const unreadNotifications = initialUser
-    ? await getRepositories().notifications.countUnread(initialUser)
+    ? await reads.unreadNotificationCount(initialUser)
     : 0;
 
   return (

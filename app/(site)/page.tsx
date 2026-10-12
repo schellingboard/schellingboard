@@ -1,16 +1,16 @@
 export const dynamic = "force-dynamic";
 
 import SummaryPage from "./summary-page";
-import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
 import { redirect } from "next/navigation";
 import { compareEventsByStart } from "@schellingboard/domain/event";
 
 export default async function Home() {
-  const repos = getRepositories();
-  const events = await repos.events.list();
+  const reads = pageReads();
+  const events = await reads.allEvents();
   const sortedEvents = events.sort(compareEventsByStart);
   if (sortedEvents.length > 1) {
-    const { title, description } = await repos.settings.get();
+    const { title, description } = await reads.siteSettings();
     return (
       <SummaryPage
         events={sortedEvents}

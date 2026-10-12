@@ -15,3 +15,9 @@ export {
 } from "./application/use-cases";
 export { addProposalRoutes } from "./http/routes";
 export { addVoteRoutes } from "./http/vote-routes";
+export {
+  eventProposals,
+  proposalById,
+  hostedProposals,
+  guestVotes,
+} from "./application/page-reads";

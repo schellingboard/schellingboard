@@ -7,7 +7,7 @@ import {
 
 import { PageNotice } from "@/app/components/page-notice";
 import { SessionForm } from "./session-form";
-import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
 
 export async function renderSessionForm(
   props: {
@@ -19,9 +19,9 @@ export async function renderSessionForm(
   const { eventSlug } = await props.params;
   const cookieStore = await cookies();
   const currentUser = await verifiedCurrentUser(cookieStore);
-  const repos = getRepositories();
+  const reads = pageReads();
 
-  const event = await repos.events.findBySlug(eventSlug);
+  const event = await reads.eventBySlug(eventSlug);
   if (!event) {
     return <div>Event not found</div>;
   }
@@ -36,13 +36,13 @@ export async function renderSessionForm(
   }
 
   const [days, sessions, guests, locations, allProposals] = await Promise.all([
-    repos.days.listByEvent(event.id),
-    repos.sessions.listByEvent(event.id),
-    repos.guests.list(),
+    reads.eventDays(event.id),
+    reads.sessionsOfEvent(event.id),
+    reads.allGuests(),
     // Not just the bookable ones: a session an organizer placed in a room
     // attendees may not book still has to be savable where it stands.
-    repos.locations.listByEvent(event.id),
-    repos.sessionProposals.listByEvent(event.id),
+    reads.eventLocations(event.id),
+    reads.eventProposals(event.id),
   ]);
 
   const currentUserProposals = allProposals.filter((p) =>

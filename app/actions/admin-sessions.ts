@@ -2,8 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
-import { getRepositories } from "@/db/container";
-import { sessionUseCases } from "@/server/composition";
+import { pageReads, sessionUseCases } from "@/server/composition";
 import { resolveActor } from "@/server/kernel/actor";
 import type { Result } from "@/server/kernel/result";
 import type { Session } from "@schellingboard/domain/session";
@@ -32,7 +31,7 @@ async function revalidateEventPaths(eventId: string) {
   revalidatePath("/admin");
   revalidatePath("/admin/events");
   revalidatePath(`/admin/events/${eventId}`);
-  const event = await getRepositories().events.findById(eventId);
+  const event = await pageReads().eventById(eventId);
   if (event) revalidatePath(`/${event.slug}`, "layout");
 }
 

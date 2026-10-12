@@ -754,6 +754,16 @@ None.
   repeats crowd the name list). So 14d is ticked with that flake as the only
   non-zero cause.
 
+## 16a
+
+- Site pages read through `pageReads()` in `server/composition.ts`: plain,
+  actor-free reads (the pages sit behind the site password only, as before),
+  each a function in its module's `application/page-reads.ts` taking
+  `Pick<Repositories, ...>`, like the snapshot readers. Existing use cases
+  need an actor and return `Result`, which would change what a visitor
+  without a name sees. Auth flows left on the repositories (allow-list in 16c).
+  Not run: E2E (user's rule).
+
 ## Next step
 
-16.
+16b: admin pages and layouts.

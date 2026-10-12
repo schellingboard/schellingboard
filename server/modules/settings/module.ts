@@ -5,3 +5,4 @@ export {
   type SettingsUseCases,
 } from "./application/use-cases";
 export { addAdminSettingsRoutes } from "./http/routes";
+export { siteSettings } from "./application/page-reads";

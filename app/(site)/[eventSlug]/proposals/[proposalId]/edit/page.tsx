@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { PageNotice } from "@/app/components/page-notice";
-import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
 import { SessionProposalForm } from "@/app/(site)/[eventSlug]/session-proposal-form";
 import {
   verifiedCurrentUser,
@@ -26,16 +26,16 @@ export default async function EditProposalPage({
 }) {
   const { eventSlug, proposalId } = await params;
 
-  const repos = getRepositories();
-  const event = await repos.events.findBySlug(eventSlug);
+  const reads = pageReads();
+  const event = await reads.eventBySlug(eventSlug);
 
   if (!event) {
     return <div>Event not found</div>;
   }
 
   const [proposal, guests] = await Promise.all([
-    repos.sessionProposals.findById(proposalId),
-    repos.guests.list(),
+    reads.proposalById(proposalId),
+    reads.allGuests(),
   ]);
 
   if (!proposal) {

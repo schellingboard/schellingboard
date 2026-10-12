@@ -1,5 +1,5 @@
 import { EventPhase, getCurrentPhase } from "@schellingboard/domain/phase";
-import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
 import EventPage from "./event-page";
 import { redirect } from "next/navigation";
 import { serverNow } from "@/utils/dev-clock-server";
@@ -8,7 +8,7 @@ export default async function Page(props: {
   params: Promise<{ eventSlug: string }>;
 }) {
   const { eventSlug } = await props.params;
-  const event = await getRepositories().events.findBySlug(eventSlug);
+  const event = await pageReads().eventBySlug(eventSlug);
 
   if (!event) {
     return "Event not found: " + eventSlug;
