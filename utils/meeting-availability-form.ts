@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { getRepositories } from "@/db/container";
+import type { Repositories } from "@/db/container";
 import {
   type Day,
   type Event,
@@ -35,9 +35,12 @@ export type AvailabilityFormData = {
  */
 export async function availabilityFormsFor(
   guestId: string,
-  now: Date
+  now: Date,
+  repos: Pick<
+    Repositories,
+    "guests" | "events" | "days" | "meetingAvailability"
+  >
 ): Promise<AvailabilityFormData[]> {
-  const repos = getRepositories();
   // The assignment lookup carries ids and names only.
   const attending = await Promise.all(
     ((await repos.guests.listEventsByGuests([guestId])).get(guestId) ?? []).map(

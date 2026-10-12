@@ -1,4 +1,4 @@
-import { getRepositories } from "@/db/container";
+import type { Repositories } from "@/db/container";
 import { serverNow } from "@/utils/dev-clock-server";
 import {
   maxMeetingSlots,
@@ -14,6 +14,16 @@ import { DateTime } from "luxon";
 import type { MeetingPoint } from "@schellingboard/domain/meeting";
 import type { Event } from "@schellingboard/domain/event";
 import { meetingsOpen } from "@/utils/meeting-rules";
+
+type MeetingOptionRepos = Pick<
+  Repositories,
+  | "guests"
+  | "sessions"
+  | "meetings"
+  | "meetingAvailability"
+  | "days"
+  | "meetingPoints"
+>;
 
 /** One slot of the picker, in the three states of the design (issue #392). */
 export type MeetingSlotOption = {
@@ -59,13 +69,13 @@ export type MeetingOption = {
 export async function meetingOptionsFor(
   viewerId: string | null,
   recipientId: string,
-  events: Event[]
+  events: Event[],
+  repos: MeetingOptionRepos
 ): Promise<MeetingOption[]> {
   // Booking yourself is not a thing, and an unidentified visitor has no
   // schedule to compare against.
   if (!viewerId || viewerId === recipientId) return [];
 
-  const repos = getRepositories();
   const attending = await repos.guests.listEventsByGuests([
     viewerId,
     recipientId,
@@ -95,7 +105,7 @@ export async function meetingOptionsFor(
       repos.days.listByEvent(eventId),
       repos.meetingPoints.listByEvent(eventId),
       // Both parties: a clash of the viewer's own is a warning they want too.
-      loadGuestSchedules(eventId, [recipientId, viewerId]),
+      loadGuestSchedules(eventId, [recipientId, viewerId], repos),
     ]);
 
     const zoned = (date: Date) =>

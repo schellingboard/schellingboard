@@ -9,7 +9,7 @@ import {
   createSession,
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { meetingViewsFor } from "@/utils/meeting-views";
+import { pageReads } from "@/server/composition";
 import type { Meeting } from "@schellingboard/domain/meeting";
 import type { Guest } from "@schellingboard/domain/guest";
 import type { Event } from "@schellingboard/domain/event";
@@ -55,7 +55,11 @@ describe("meetingViewsFor", () => {
       message: "the attendance model",
     });
 
-    const [view] = await meetingViewsFor(recipient.id, event.id, BEFORE);
+    const [view] = await pageReads().meetingViews(
+      recipient.id,
+      event.id,
+      BEFORE
+    );
 
     expect(view.id).toBe(meeting.id);
     expect(view.role).toBe("recipient");
@@ -71,7 +75,11 @@ describe("meetingViewsFor", () => {
     const { event, requester, recipient } = await scenario();
     await meetingBetween(event, requester, recipient);
 
-    const [view] = await meetingViewsFor(requester.id, event.id, BEFORE);
+    const [view] = await pageReads().meetingViews(
+      requester.id,
+      event.id,
+      BEFORE
+    );
 
     expect(view.role).toBe("requester");
     expect(view.otherId).toBe(recipient.id);
@@ -84,7 +92,11 @@ describe("meetingViewsFor", () => {
     const { event, requester, recipient } = await scenario();
     await meetingBetween(event, requester, recipient);
 
-    const [view] = await meetingViewsFor(recipient.id, event.id, AFTER);
+    const [view] = await pageReads().meetingViews(
+      recipient.id,
+      event.id,
+      AFTER
+    );
 
     expect(view.status).toBe("expired");
   });
@@ -99,7 +111,11 @@ describe("meetingViewsFor", () => {
       ["pending"]
     );
 
-    const [view] = await meetingViewsFor(recipient.id, event.id, AFTER);
+    const [view] = await pageReads().meetingViews(
+      recipient.id,
+      event.id,
+      AFTER
+    );
 
     expect(view.status).toBe("accepted");
   });
@@ -116,7 +132,11 @@ describe("meetingViewsFor", () => {
     });
     await meetingBetween(event, requester, recipient);
 
-    const [view] = await meetingViewsFor(recipient.id, event.id, BEFORE);
+    const [view] = await pageReads().meetingViews(
+      recipient.id,
+      event.id,
+      BEFORE
+    );
 
     expect(view.clashes).toEqual([
       {
@@ -141,7 +161,11 @@ describe("meetingViewsFor", () => {
     });
     await meetingBetween(event, requester, recipient);
 
-    const [view] = await meetingViewsFor(recipient.id, event.id, BEFORE);
+    const [view] = await pageReads().meetingViews(
+      recipient.id,
+      event.id,
+      BEFORE
+    );
 
     expect(view.clashes).toEqual([
       { guestName: "Ada", kind: "busy", title: null, isViewer: false },
@@ -164,7 +188,11 @@ describe("meetingViewsFor", () => {
     });
     await meetingBetween(event, requester, recipient);
 
-    const [view] = await meetingViewsFor(recipient.id, event.id, BEFORE);
+    const [view] = await pageReads().meetingViews(
+      recipient.id,
+      event.id,
+      BEFORE
+    );
 
     expect(view.clashes).toEqual([
       {
@@ -189,7 +217,11 @@ describe("meetingViewsFor", () => {
       "sorry, my session moved"
     );
 
-    const [view] = await meetingViewsFor(recipient.id, event.id, BEFORE);
+    const [view] = await pageReads().meetingViews(
+      recipient.id,
+      event.id,
+      BEFORE
+    );
 
     expect(view.status).toBe("canceled");
     expect(view.cancelNote).toBe("sorry, my session moved");
@@ -212,7 +244,11 @@ describe("meetingViewsFor", () => {
     });
     await meetingBetween(event, requester, recipient);
 
-    const [view] = await meetingViewsFor(recipient.id, event.id, BEFORE);
+    const [view] = await pageReads().meetingViews(
+      recipient.id,
+      event.id,
+      BEFORE
+    );
 
     expect(view.clashes).toEqual([
       { guestName: "Ada", kind: "busy", title: null, isViewer: false },
@@ -231,7 +267,11 @@ describe("meetingViewsFor", () => {
       ["pending"]
     );
 
-    const [view] = await meetingViewsFor(recipient.id, event.id, BEFORE);
+    const [view] = await pageReads().meetingViews(
+      recipient.id,
+      event.id,
+      BEFORE
+    );
 
     expect(view.clashes).toEqual([]);
   });
@@ -241,6 +281,8 @@ describe("meetingViewsFor", () => {
     await meetingBetween(event, requester, recipient);
     const bystander = await createGuest({ eventId: event.id });
 
-    expect(await meetingViewsFor(bystander.id, event.id, BEFORE)).toEqual([]);
+    expect(
+      await pageReads().meetingViews(bystander.id, event.id, BEFORE)
+    ).toEqual([]);
   });
 });

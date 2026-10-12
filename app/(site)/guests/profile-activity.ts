@@ -5,7 +5,7 @@ import { pageReads } from "@/server/composition";
 import { verifiedCurrentUser } from "@/utils/acting-guest";
 import { requireSiteAuth } from "@/utils/action-auth";
 import { eventNameToSlug } from "@/utils/utils";
-import { meetingOptionsFor, type MeetingOption } from "@/utils/meeting-options";
+import type { MeetingOption } from "@/utils/meeting-options";
 
 /** A session or proposal on a profile, ready to link to. */
 export type ProfileActivityItem = {
@@ -43,7 +43,7 @@ export async function listProfileActivity(
   const [hostedSessions, proposals, meetingOptions] = await Promise.all([
     reads.hostedSessions(guestId),
     reads.hostedProposals(guestId),
-    meetingOptionsFor(viewerId, guestId, events),
+    reads.meetingOptions(viewerId, guestId, events),
   ]);
 
   const slugOf = (eventId: string) =>

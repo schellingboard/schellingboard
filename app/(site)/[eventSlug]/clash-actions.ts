@@ -2,11 +2,7 @@
 
 import { pageReads } from "@/server/composition";
 import { requireVerifiedGuest } from "@/utils/action-auth";
-import {
-  clashesForInterval,
-  loadGuestSchedules,
-  type GuestClash,
-} from "@/utils/guest-clashes";
+import { clashesForInterval, type GuestClash } from "@/utils/guest-clashes";
 
 export type { GuestClash };
 
@@ -26,7 +22,7 @@ export async function detectGuestClashes(input: {
   const event = await pageReads().eventById(eventId);
   if (!event) return [];
 
-  const schedules = await loadGuestSchedules(eventId, guestIds);
+  const schedules = await pageReads().guestSchedules(eventId, guestIds);
   return clashesForInterval(schedules, {
     eventId,
     start: new Date(start),

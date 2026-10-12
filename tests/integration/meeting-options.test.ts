@@ -37,7 +37,8 @@ import {
 import { GUEST_COOKIE_NAME, verifiedGuestValue } from "../helpers/guest-cookie";
 import { getRepositories } from "@/db/container";
 import { cookies } from "next/headers";
-import { meetingOptionsFor } from "@/utils/meeting-options";
+import { pageReads } from "@/server/composition";
+import type { MeetingOption } from "@/utils/meeting-options";
 import { verifiedCurrentUser } from "@/utils/acting-guest";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
@@ -76,12 +77,12 @@ async function scenario(opts?: {
   return { event, viewer, other };
 }
 
-type Option = Awaited<ReturnType<typeof meetingOptionsFor>>[number];
+type Option = MeetingOption;
 
 // The profile resolves the viewer from their cookie before calling, so the
 // signed-out case stays a real one.
 const listMeetingOptions = async (recipientId: string): Promise<Option[]> =>
-  meetingOptionsFor(
+  pageReads().meetingOptions(
     await verifiedCurrentUser(await cookies()),
     recipientId,
     await getRepositories().events.list()
