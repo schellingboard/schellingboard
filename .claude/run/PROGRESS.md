@@ -778,6 +778,13 @@ None.
   `adminReads()` moved to `server/admin-reads.ts`. The rule catches direct
   imports only; `utils/` helpers still reach the container (follow-up in PLAN.md).
 
+## 17a
+
+- `runIdempotent(repo, request, now, run)` in the kernel returns
+  `keyReused | inProgress | replayed | ran`; `run` returns the response to
+  keep or null to forget the key. `IDEMPOTENCY_TTL_MS` moved there too.
+  Behaviour of the HTTP middleware is unchanged (its tests pass untouched).
+
 ## Next step
 
-17.
+17b.
