@@ -221,7 +221,7 @@ describe("/api/v1 meetings", () => {
 
   it(
     "lets an organizer set up 1-on-1s under /admin",
-    { tags: ["012-US1"] },
+    { tags: ["012-US1", "019-US3"] },
     async () => {
       const event = await createEvent();
       const adminCookie = await createAdminAuthCookie();
@@ -263,13 +263,30 @@ describe("/api/v1 meetings", () => {
         name: "Coffee bar",
         description: "",
         sortIndex: 0,
+        version: 1,
       });
-      const renamed = await call("PUT", `${points}/${point.id}`, {
-        cookie: admin,
-        body: { name: "Lobby" },
-      });
+      const rename = (name: string) =>
+        call("PUT", `${points}/${point.id}`, {
+          cookie: admin,
+          body: { name, expectedVersion: 1 },
+        });
+      const renamed = await rename("Lobby");
       expect(renamed.status).toBe(200);
-      expect(await renamed.json()).toMatchObject({ name: "Lobby" });
+      expect(await renamed.json()).toMatchObject({ name: "Lobby", version: 2 });
+      const stale = await rename("Terrace");
+      expect(stale.status).toBe(409);
+      expect(await stale.json()).toMatchObject({
+        code: "meetingPoint.versionConflict",
+        current: { id: point.id, name: "Lobby", version: 2 },
+      });
+      const unversioned = await call("PUT", `${points}/${point.id}`, {
+        cookie: admin,
+        body: { name: "Terrace" },
+      });
+      expect(await unversioned.json()).toMatchObject({
+        status: 400,
+        errors: [expect.objectContaining({ path: "expectedVersion" })],
+      });
       const deleted = await call("DELETE", `${points}/${point.id}`, {
         cookie: admin,
       });
@@ -280,6 +297,40 @@ describe("/api/v1 meetings", () => {
       expect(gone.status).toBe(404);
       expect(await gone.json()).toMatchObject({
         code: "meetingPoint.notFound",
+      });
+    }
+  );
+
+  it(
+    "keeps one of two concurrent meeting point edits made from the same version",
+    { tags: ["012-US1", "019-US3", "019-US7"] },
+    async () => {
+      const event = await createEvent();
+      const adminCookie = await createAdminAuthCookie();
+      const admin = `${adminCookie.name}=${adminCookie.value}`;
+      const point = await getRepositories().meetingPoints.create({
+        eventId: event.id,
+        name: "Coffee bar",
+        description: "",
+        sortIndex: 0,
+      });
+      const rename = (name: string) =>
+        call("PUT", `/admin/events/${event.id}/meeting-points/${point.id}`, {
+          cookie: admin,
+          body: { name, expectedVersion: point.version },
+        });
+
+      const results = await Promise.all([rename("Lobby"), rename("Terrace")]);
+
+      expect(results.map((r) => r.status).sort()).toEqual([200, 409]);
+      const [kept] = await getRepositories().meetingPoints.listByEvent(
+        event.id
+      );
+      expect(kept.version).toBe(point.version + 1);
+      const conflict = results.find((r) => r.status === 409)!;
+      expect(await conflict.json()).toMatchObject({
+        code: "meetingPoint.versionConflict",
+        current: { id: point.id, name: kept.name, version: kept.version },
       });
     }
   );

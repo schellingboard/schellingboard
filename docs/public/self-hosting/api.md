@@ -123,13 +123,16 @@ never keep it, so a read always shows the current state.
 
 ## Editing what someone else may be editing
 
-Sessions, proposals, events and days carry a `version`, which goes up with
-every change. An edit (`PUT`) sends the version it was made from as
-`expectedVersion`; an event's settings, phase dates and 1-on-1 settings share
-the event's version. If someone changed the item since, the edit is refused with `409` and
-`<item>.versionConflict` (`session`, `proposal`, `event` or `day`), and the
-body's `current` member holds the item as it is now: redo the edit on it and
-send again with its `version`. Nothing is overwritten unseen.
+Sessions, proposals, events, days, locations and meeting points carry a
+`version`, which goes up with every change. An edit (`PUT`) sends the version
+it was made from as `expectedVersion`, and so does moving a location in the
+order. An event's settings, phase dates and 1-on-1 settings share the event's
+version; a location's version also goes up when it joins or leaves an event or
+changes places. If someone changed the item since, the edit is refused with
+`409` and `<item>.versionConflict` (`session`, `proposal`, `event`, `day`,
+`location` or `meetingPoint`), and the body's `current` member holds the item
+as it is now: redo the edit on it and send again with its `version`. Nothing is
+overwritten unseen.
 
 ## Syncing from a script
 

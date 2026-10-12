@@ -142,10 +142,15 @@ export const meetingPointInputSchema = z.object({
   description: z.string().optional(),
 });
 
+export const meetingPointUpdateBodySchema = meetingPointInputSchema.extend({
+  expectedVersion,
+});
+
 export const meetingPointSchema = z.object({
   id: z.string(),
   eventId: z.string(),
   name: z.string(),
   description: z.string(),
   sortIndex: z.number().int(),
+  version: z.number().int(),
 });

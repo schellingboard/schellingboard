@@ -144,6 +144,28 @@ openapi-check typecheck test-coverage` (or `make test`), without E2E. E2E runs
   `/meetings` answers `200` with the event (was `204`), so a script learns
   the new version.
 
+- 4a3: locations and meeting points get `version` (migration 0050). A
+  location's version covers its fields, its events and its place: the
+  repository bumps it once per real change in `update` (which now also
+  replaces the event links), `setEventIds`, `assignToEvent`/`removeFromEvent`
+  (event side, seeding included) and `move` (only rows whose sortIndex
+  changed) and an event delete (review: the cascade dropped links unseen).
+  Assign and remove send no `expectedVersion`: a set delta overwrites
+  nothing (recorded in ADR 0012 section 4; 4a4 follows it for guests).
+  `createLocation` answers the version after its event links (review: it
+  answered 1 while the row held 2, so the next edit got 409). Room unavailability
+  is its own table: no bump. `PUT /admin/locations/{id}`, `POST …/move` and
+  `PUT /admin/events/{id}/meeting-points/{id}` require `expectedVersion`;
+  conflicts are `location.versionConflict` / `meetingPoint.versionConflict`
+  with `current`. Move answers `200` with every location in the new order
+  (was `204`), so both swapped rows' versions are known. `updateLocation`
+  checks the version before saving the image too, so a stale edit replaces no
+  file. `updateMeetingPoint` and `moveLocation` now run in `uow.run`. The
+  updateLocation rollback test is gone: its event links are now written by
+  the one `update` call.
+- 4a3: the CHANGELOG API bullet now says "edits to sessions, proposals or
+  event setup"; 4a4 adds profiles to that list (keep it near 40 words).
+
 ## Problems
 
 None.
@@ -156,4 +178,4 @@ None.
 
 ## Next step
 
-4a3.
+4a4. The run is paused here at the user's request (after the 4a3 review).

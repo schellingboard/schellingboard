@@ -684,27 +684,6 @@ describe("venue use cases", () => {
   );
 
   it(
-    "keeps a location as it was when assigning its events fails",
-    { tags: ["017-US1", "019-US7"] },
-    async () => {
-      const event = await createEvent();
-      const location = await createLocation({ name: "A" });
-
-      await expect(
-        venue(uowFailingAt("locations", "setEventIds")).updateLocation(ADMIN, {
-          ...room,
-          id: location.id,
-          eventIds: [event.id],
-        })
-      ).rejects.toThrow("locations.setEventIds failed");
-
-      expect(
-        (await getRepositories().locations.findById(location.id))?.name
-      ).toBe("A");
-    }
-  );
-
-  it(
     "assigns no location deleted at the same moment",
     { tags: ["017-US3", "019-US7"] },
     async () => {

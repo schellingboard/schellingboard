@@ -1,4 +1,4 @@
-import { eq, getTableColumns, sql } from "drizzle-orm";
+import { eq, getTableColumns, inArray, sql } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
 import * as schema from "../../schema";
@@ -211,6 +211,20 @@ export class SqliteEventsRepository implements EventsRepository {
   }
 
   async delete(id: string): Promise<void> {
-    this.db.delete(schema.events).where(eq(schema.events.id, id)).run();
+    this.db.transaction((tx) => {
+      tx.update(schema.locations)
+        .set({ version: sql`${schema.locations.version} + 1` })
+        .where(
+          inArray(
+            schema.locations.id,
+            tx
+              .select({ id: schema.eventLocations.locationId })
+              .from(schema.eventLocations)
+              .where(eq(schema.eventLocations.eventId, id))
+          )
+        )
+        .run();
+      tx.delete(schema.events).where(eq(schema.events.id, id)).run();
+    });
   }
 }

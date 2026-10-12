@@ -70,6 +70,7 @@ export async function deleteLocationAction(input: {
 export async function moveLocationAction(input: {
   id: string;
   direction: "up" | "down";
+  expectedVersion?: number;
 }): Promise<AdminActionResult> {
   return settled(await venueUseCases().moveLocation(await actor(), input));
 }

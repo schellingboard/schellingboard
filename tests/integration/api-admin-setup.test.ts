@@ -351,6 +351,7 @@ describe("/api/v1/admin locations", () => {
         color: "slate",
         areaDescription: null,
         eventIds: [],
+        version: 1,
       });
 
       const assigned = await call(
@@ -361,7 +362,7 @@ describe("/api/v1/admin locations", () => {
       expect(assigned.status).toBe(204);
       const listed = await call("GET", `/admin/locations?eventId=${event.id}`);
       expect(await listed.json()).toEqual({
-        locations: [{ ...store, eventIds: [event.id] }],
+        locations: [{ ...store, eventIds: [event.id], version: 2 }],
       });
 
       const unknown = await call(
@@ -373,11 +374,17 @@ describe("/api/v1/admin locations", () => {
       expect(await unknown.json()).toMatchObject({ code: "location.notFound" });
 
       const renamed = await call("PUT", `/admin/locations/${store.id}`, {
-        body: { name: "Storage", capacity: 4, eventIds: [] },
+        body: {
+          name: "Storage",
+          capacity: 4,
+          eventIds: [],
+          expectedVersion: 2,
+        },
       });
       expect(await renamed.json()).toMatchObject({
         name: "Storage",
         eventIds: [],
+        version: 3,
       });
       expect(
         (await call("DELETE", `/admin/locations/${store.id}`)).status
@@ -404,21 +411,171 @@ describe("/api/v1/admin locations", () => {
     const first = await createLocation({ name: "A", sortIndex: 0 });
     const second = await createLocation({ name: "B", sortIndex: 1 });
     const moved = await call("POST", `/admin/locations/${second.id}/move`, {
-      body: { direction: "up" },
+      body: { direction: "up", expectedVersion: 1 },
     });
-    expect(moved.status).toBe(204);
-    const { locations } = (await (
-      await call("GET", "/admin/locations")
-    ).json()) as { locations: { id: string }[] };
-    expect(locations.map((l) => l.id)).toEqual([second.id, first.id]);
+    expect(moved.status).toBe(200);
+    const { locations } = (await moved.json()) as {
+      locations: { id: string; version: number }[];
+    };
+    expect(locations).toMatchObject([
+      { id: second.id, sortIndex: 0, version: 2 },
+      { id: first.id, sortIndex: 1, version: 2 },
+    ]);
+    expect(await (await call("GET", "/admin/locations")).json()).toEqual({
+      locations,
+    });
 
     const unknown = await call("POST", "/admin/locations/no-such-id/move", {
-      body: { direction: "up" },
+      body: { direction: "up", expectedVersion: 1 },
     });
     expect(await unknown.json()).toMatchObject({
       status: 404,
       code: "location.notFound",
     });
+  });
+
+  it(
+    "refuses a location edit or move made from an outdated copy, answering with the location as it is",
+    { tags: ["017-US1", "019-US3"] },
+    async () => {
+      const event = await createEvent();
+      const room = await createLocation({ name: "Hall", sortIndex: 1 });
+      await createLocation({ name: "Lobby", sortIndex: 0 });
+      const rename = (name: string) =>
+        call("PUT", `/admin/locations/${room.id}`, {
+          body: {
+            name,
+            capacity: 10,
+            eventIds: [event.id],
+            expectedVersion: 1,
+          },
+        });
+      expect(await (await rename("Main hall")).json()).toMatchObject({
+        version: 2,
+      });
+
+      const stale = await rename("Great hall");
+      const staleMove = await call("POST", `/admin/locations/${room.id}/move`, {
+        body: { direction: "up", expectedVersion: 1 },
+      });
+
+      for (const res of [stale, staleMove]) {
+        expect(res.status).toBe(409);
+        expect(await res.json()).toMatchObject({
+          code: "location.versionConflict",
+          current: {
+            id: room.id,
+            name: "Main hall",
+            sortIndex: 1,
+            eventIds: [event.id],
+            version: 2,
+          },
+        });
+      }
+    }
+  );
+
+  it(
+    "keeps one of two concurrent location edits made from the same version",
+    { tags: ["017-US1", "019-US3", "019-US7"] },
+    async () => {
+      const room = await createLocation({ name: "Hall" });
+      const rename = (name: string) =>
+        call("PUT", `/admin/locations/${room.id}`, {
+          body: { name, capacity: 10, expectedVersion: room.version },
+        });
+
+      const results = await Promise.all([rename("North"), rename("South")]);
+
+      expect(results.map((r) => r.status).sort()).toEqual([200, 409]);
+      const kept = (await getRepositories().locations.findById(room.id))!;
+      expect(kept.version).toBe(room.version + 1);
+      const conflict = results.find((r) => r.status === 409)!;
+      expect(await conflict.json()).toMatchObject({
+        code: "location.versionConflict",
+        current: { id: room.id, name: kept.name, version: kept.version },
+      });
+    }
+  );
+
+  it(
+    "raises a location's version when it joins or leaves an event",
+    { tags: ["017-US3", "019-US3"] },
+    async () => {
+      const event = await createEvent();
+      const room = await createLocation();
+      const version = async () =>
+        (await getRepositories().locations.findById(room.id))?.version;
+      const send = (action: "assign" | "remove") =>
+        call("POST", `/admin/events/${event.id}/locations/${action}`, {
+          body: { locationIds: [room.id] },
+        });
+
+      await send("assign");
+      await send("assign");
+      expect(await version()).toBe(2);
+      await send("remove");
+      await send("remove");
+      expect(await version()).toBe(3);
+    }
+  );
+
+  it(
+    "answers a new location with the version an edit must send",
+    { tags: ["017-US1", "019-US3"] },
+    async () => {
+      const event = await createEvent();
+      const created = await call("POST", "/admin/locations", {
+        body: { name: "Hall", capacity: 10, eventIds: [event.id] },
+      });
+      const { id, version } = (await created.json()) as {
+        id: string;
+        version: number;
+      };
+
+      const renamed = await call("PUT", `/admin/locations/${id}`, {
+        body: {
+          name: "Main hall",
+          capacity: 10,
+          eventIds: [event.id],
+          expectedVersion: version,
+        },
+      });
+
+      expect(renamed.status).toBe(200);
+    }
+  );
+
+  it(
+    "raises the version of an event's locations when the event is deleted",
+    { tags: ["017-US3", "019-US3"] },
+    async () => {
+      const event = await createEvent();
+      const room = await createLocation({ eventId: event.id });
+
+      expect((await call("DELETE", `/admin/events/${event.id}`)).status).toBe(
+        204
+      );
+
+      expect(await getRepositories().locations.findById(room.id)).toMatchObject(
+        { version: room.version + 1 }
+      );
+    }
+  );
+
+  it("refuses location edits and moves without expectedVersion", async () => {
+    const room = await createLocation();
+    for (const [method, path, body] of [
+      ["PUT", `/admin/locations/${room.id}`, { name: "Hall", capacity: 1 }],
+      ["POST", `/admin/locations/${room.id}/move`, { direction: "up" }],
+    ] as const) {
+      const res = await call(method, path, { body });
+      expect(res.status).toBe(400);
+      expect(await res.json()).toMatchObject({
+        code: "request.invalid",
+        errors: [expect.objectContaining({ path: "expectedVersion" })],
+      });
+    }
   });
 
   it(

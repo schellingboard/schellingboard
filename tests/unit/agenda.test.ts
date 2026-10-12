@@ -28,6 +28,7 @@ const room = (id: string, sortIndex: number): Location => ({
   capacity: 10,
   bookable: true,
   sortIndex,
+  version: 1,
   color: "blue",
   imageUrl: "",
   description: "",

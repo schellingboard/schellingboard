@@ -94,6 +94,9 @@ export const createMeetingPoint =
     });
   };
 
+const pointNotFound = () =>
+  notFound("meetingPoint.notFound", "Meeting point not found");
+
 // Scoped to the event named, so an id from elsewhere can't reach another
 // event's points.
 async function missingPoint(
@@ -101,29 +104,38 @@ async function missingPoint(
   { eventId, id }: { eventId: string; id: string }
 ): Promise<Failure | null> {
   const points = await repos.meetingPoints.listByEvent(eventId);
-  return points.some((p) => p.id === id)
-    ? null
-    : notFound("meetingPoint.notFound", "Meeting point not found");
+  return points.some((p) => p.id === id) ? null : pointNotFound();
 }
 
 export const updateMeetingPoint =
-  ({ repos }: MeetingDeps) =>
+  ({ uow }: MeetingDeps) =>
   async (
     actor: Actor,
-    input: MeetingPointInput & { id: string }
+    input: MeetingPointInput & { id: string; expectedVersion?: number }
   ): Promise<Result<MeetingPoint>> => {
     if (!actor.admin) return adminRequired();
     const name = input.name.trim();
     if (!name) return nameRequired();
-    const missing = await missingPoint(repos, input);
-    if (missing) return missing;
-    const updated = await repos.meetingPoints.update(input.id, {
-      name,
-      description: input.description?.trim() ?? "",
+    return uow.run(async (tx) => {
+      const missing = await missingPoint(tx, input);
+      if (missing) return missing;
+      const updated = await tx.meetingPoints.update(input.id, {
+        name,
+        description: input.description?.trim() ?? "",
+        expectedVersion: input.expectedVersion,
+      });
+      if (updated) return ok(updated);
+      const current = (await tx.meetingPoints.listByEvent(input.eventId)).find(
+        (p) => p.id === input.id
+      );
+      return current
+        ? versionConflict(
+            "meetingPoint",
+            current,
+            "Someone changed this meeting point while you edited it"
+          )
+        : pointNotFound();
     });
-    return updated
-      ? ok(updated)
-      : notFound("meetingPoint.notFound", "Meeting point not found");
   };
 
 export const deleteMeetingPoint =

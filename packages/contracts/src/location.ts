@@ -4,6 +4,7 @@ import {
   LOCATION_COLOR_NAMES,
   normalizeLocationColor,
 } from "@schellingboard/domain/location-colors";
+import { expectedVersion } from "./session";
 
 // Clearing the capacity field yields NaN, and a fractional entry yields a
 // non-integer; both need the same plain-language message rather than zod's
@@ -39,11 +40,16 @@ export const locationSchema = z.object({
 
 export const updateLocationSchema = locationSchema.extend({
   id: z.string().nonempty(),
+  expectedVersion: expectedVersion.optional(),
 });
 
 const instant = z.iso.datetime({ offset: true });
 
 export const locationBodySchema = locationSchema.omit({ image: true });
+
+export const locationUpdateBodySchema = locationBodySchema.extend({
+  expectedVersion,
+});
 
 export const locationViewSchema = z
   .object({
@@ -57,6 +63,10 @@ export const locationViewSchema = z
     imageUrl: z.string(),
     sortIndex: z.number().int(),
     eventIds: z.array(z.string()),
+    version: z
+      .number()
+      .int()
+      .describe("Goes up with every change, its events and place included"),
   })
   .meta({ id: "Location" });
 
@@ -66,6 +76,7 @@ export const locationListSchema = z.object({
 
 export const locationMoveSchema = z.object({
   direction: z.enum(["up", "down"]),
+  expectedVersion,
 });
 
 export const eventLocationsBodySchema = z.object({

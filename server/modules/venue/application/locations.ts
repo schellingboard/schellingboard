@@ -10,6 +10,8 @@ import {
   invalidFields,
   notFound,
   ok,
+  versionConflict,
+  type Failure,
   type Result,
 } from "@/server/kernel/result";
 import type { VenueDeps } from "../ports";
@@ -21,6 +23,23 @@ export const locationNotFound = () =>
   notFound("location.notFound", "Location not found");
 export const eventNotFound = () =>
   notFound("event.notFound", "Event not found");
+
+async function locationChangedMeanwhile(
+  locations: VenueDeps["repos"]["locations"],
+  id: string
+): Promise<Failure> {
+  const current = await locations.findById(id);
+  return current
+    ? versionConflict(
+        "location",
+        { ...current, eventIds: await locations.listEventIds(id) },
+        "Someone changed this location while you edited it"
+      )
+    : locationNotFound();
+}
+
+const outdated = (location: Location, expectedVersion: number | undefined) =>
+  expectedVersion !== undefined && location.version !== expectedVersion;
 
 // The image is checked before anything is stored, so a bad upload doesn't
 // leave a half-created location behind.
@@ -107,7 +126,9 @@ export const createLocation =
         sortIndex,
       });
       await tx.locations.setEventIds(location.id, eventIds);
-      return ok({ ...location, eventIds });
+      const saved = await tx.locations.findById(location.id);
+      if (!saved) throw new Error("Failed to create location");
+      return ok({ ...saved, eventIds });
     });
     if (!created.ok || !image) return created;
 
@@ -132,10 +153,20 @@ export const updateLocation =
       .extend(validations(deps))
       .safeParseAsync(input);
     if (!parsed.success) return refused(parsed.error);
-    const { image, id, eventIds: requested, ...fields } = parsed.data;
+    const {
+      image,
+      id,
+      eventIds: requested,
+      expectedVersion,
+      ...fields
+    } = parsed.data;
     const eventIds = [...new Set(requested)];
 
-    if (!(await deps.repos.locations.findById(id))) return locationNotFound();
+    // Checked before the image is saved too, so a stale edit replaces no file.
+    const found = await deps.repos.locations.findById(id);
+    if (!found) return locationNotFound();
+    if (outdated(found, expectedVersion))
+      return locationChangedMeanwhile(deps.repos.locations, id);
     const newImageUrl =
       image && (await deps.images.save(id, image.buffer, image.ext));
 
@@ -149,9 +180,10 @@ export const updateLocation =
         ...fields,
         imageUrl: newImageUrl ?? existing.imageUrl,
         sortIndex: existing.sortIndex,
+        eventIds,
+        expectedVersion,
       });
-      if (!updated) return locationNotFound();
-      await tx.locations.setEventIds(id, eventIds);
+      if (!updated) return locationChangedMeanwhile(tx.locations, id);
       return ok({ ...updated, eventIds });
     });
   };
@@ -167,15 +199,21 @@ export const deleteLocation =
   };
 
 export const moveLocation =
-  ({ repos }: VenueDeps) =>
+  (deps: VenueDeps) =>
   async (
     actor: Actor,
-    input: { id: string; direction: "up" | "down" }
-  ): Promise<Result<void>> => {
+    input: { id: string; direction: "up" | "down"; expectedVersion?: number }
+  ): Promise<Result<LocationWithEvents[]>> => {
     if (!actor.admin) return adminRequired();
-    if (!(await repos.locations.findById(input.id))) return locationNotFound();
-    await repos.locations.move(input.id, input.direction);
-    return ok(undefined);
+    const moved = await deps.uow.run(async (tx) => {
+      const location = await tx.locations.findById(input.id);
+      if (!location) return locationNotFound();
+      if (outdated(location, input.expectedVersion))
+        return locationChangedMeanwhile(tx.locations, input.id);
+      await tx.locations.move(input.id, input.direction);
+      return ok(undefined);
+    });
+    return moved.ok ? listLocations(deps)(actor, {}) : moved;
   };
 
 export const listLocations =
