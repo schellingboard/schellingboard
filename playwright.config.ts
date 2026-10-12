@@ -190,7 +190,7 @@ export default defineConfig({
   webServer: externalServer
     ? undefined
     : {
-        command: `bun set-env.ts test "next build && next start -p ${port}"`,
+        command: `bun set-env.ts test "bun x vite build apps/web && next build && next start -p ${port}"`,
         url: baseURL,
         reuseExistingServer: !process.env.CI,
         timeout: 180_000,

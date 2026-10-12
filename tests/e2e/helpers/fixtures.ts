@@ -25,6 +25,11 @@ const ALLOWED_CONSOLE_PATTERNS: RegExp[] = [
   /can.t establish a connection to the server at \S+\/api\/v1\/events\/[^/]+\/feed/,
 ];
 
+// Paths the server answers itself. Any other root path gets the SPA shell,
+// which forwards to /legacy once it has loaded.
+const SERVER_PATH =
+  /^\/(legacy|api|media|locations|_next|_spa|sw\.js|manifest\.webmanifest|favicon\.ico|icon|apple-touch-icon|one-on-one)(\/|\.|-|$)/;
+
 function isAllowed(text: string): boolean {
   return ALLOWED_CONSOLE_PATTERNS.some((re) => re.test(text));
 }
@@ -36,6 +41,29 @@ function formatConsoleMessage(msg: ConsoleMessage): string {
 }
 
 export const test = base.extend<{ consoleGuard: void }>({
+  // A person opening a link waits for the page it ends on, so goto does too:
+  // the shell has loaded by then, but the page behind it has not.
+  page: async ({ page }, provide) => {
+    const goto = page.goto.bind(page);
+    page.goto = async (url, options) => {
+      let response = null;
+      try {
+        response = await goto(url, options);
+      } catch (error) {
+        if (!String(error).includes("interrupted by another navigation")) {
+          throw error;
+        }
+      }
+      if (!SERVER_PATH.test(new URL(page.url()).pathname)) {
+        await expect
+          .poll(() => new URL(page.url()).pathname, { timeout: 15_000 })
+          .toMatch(/^\/legacy(\/|$)/);
+        await page.waitForLoadState("load");
+      }
+      return response;
+    };
+    await provide(page);
+  },
   consoleGuard: [
     async ({ page }, use) => {
       const consoleErrors: string[] = [];

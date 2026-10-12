@@ -17,3 +17,5 @@ scripts/screenshots
 coverage
 site
 .e2e-docker
+apps/web/dist
+apps/web/node_modules

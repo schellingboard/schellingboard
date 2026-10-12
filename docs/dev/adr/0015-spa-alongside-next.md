@@ -42,7 +42,9 @@ move, and what the first slice contains.
   directly. Legacy links to moved screens are plain `<a>` without the base
   path. Emails, push, QR codes and bookmarks keep root URLs and get to the
   right screen through the SPA.
-- `proxy.ts` keeps the site password on every path, root and `/legacy` alike.
+- `proxy.ts` keeps the site password on every path, root and `/legacy` alike, except
+  root `/admin*`: that gets the static shell, and the forwarded `/legacy/admin` request
+  meets the admin gate (admin is independent of the site password).
 - The SPA calls only `/api/v1`, never a legacy route or server action.
 
 When Next retires (step 7), `/legacy` goes with it and the server serves the
