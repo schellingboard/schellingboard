@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { dayViewSchema, eventViewSchema } from "./event";
+import { unavailabilityViewSchema } from "./location";
 import { rsvpViewSchema } from "./rsvp";
-import { snapshotSessionSchema } from "./snapshot";
+import { snapshotLocationSchema, snapshotSessionSchema } from "./snapshot";
 
 const common = {
   seq: z.number().int(),
@@ -33,6 +34,26 @@ export const feedMessageSchema = z
       ...common,
       type: z.literal("day.deleted"),
       dayId: z.string(),
+    }),
+    z.object({
+      ...common,
+      type: z.literal("location.changed"),
+      location: snapshotLocationSchema,
+    }),
+    z.object({
+      ...common,
+      type: z.literal("location.removed"),
+      locationId: z.string(),
+    }),
+    z.object({
+      ...common,
+      type: z.literal("unavailability.added"),
+      period: unavailabilityViewSchema,
+    }),
+    z.object({
+      ...common,
+      type: z.literal("unavailability.removed"),
+      periodId: z.string(),
     }),
     z.object({
       ...common,

@@ -177,11 +177,15 @@ describe("admin seeding: events, days and locations", () => {
     async () => {
       const event = await createEvent();
       const location = value(
-        await venue().createLocation(ADMIN, {
-          name: "Hall",
-          capacity: 40,
-          eventSlug: event.slug,
-        })
+        await venue().createLocation(
+          ADMIN,
+          {
+            name: "Hall",
+            capacity: 40,
+            eventSlug: event.slug,
+          },
+          NOW
+        )
       );
       expect(location.eventIds).toEqual([event.id]);
       expect(
@@ -192,20 +196,28 @@ describe("admin seeding: events, days and locations", () => {
 
       expect(
         code(
-          await venue().createLocation(ADMIN, {
-            name: "",
-            capacity: 1,
-            eventSlug: "missing",
-          })
+          await venue().createLocation(
+            ADMIN,
+            {
+              name: "",
+              capacity: 1,
+              eventSlug: "missing",
+            },
+            NOW
+          )
         )
       ).toBe("location.invalid");
       expect(
         code(
-          await venue().createLocation(ADMIN, {
-            name: "Annex",
-            capacity: 1,
-            eventSlug: "missing",
-          })
+          await venue().createLocation(
+            ADMIN,
+            {
+              name: "Annex",
+              capacity: 1,
+              eventSlug: "missing",
+            },
+            NOW
+          )
         )
       ).toBe("event.notFound");
       expect(await getRepositories().locations.list()).toHaveLength(1);

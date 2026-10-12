@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { eventUseCases, sessionUseCases } from "@/server/composition";
+import { serverNow } from "@/utils/dev-clock-server";
 import { resolveActor, type Actor } from "@/server/kernel/actor";
 import type { AdminActionResult } from "./admin-guests";
 
@@ -28,12 +29,16 @@ export async function addLocationUnavailabilityAction(
   input: LocationUnavailabilityInput
 ): Promise<AdminActionResult> {
   const actor = await resolveActor(await cookies());
-  const result = await sessionUseCases().addLocationUnavailability(actor, {
-    eventId: input.eventId,
-    locationIds: input.locationIds,
-    start: parseDateTime(input.start),
-    end: parseDateTime(input.end),
-  });
+  const result = await sessionUseCases().addLocationUnavailability(
+    actor,
+    {
+      eventId: input.eventId,
+      locationIds: input.locationIds,
+      start: parseDateTime(input.start),
+      end: parseDateTime(input.end),
+    },
+    await serverNow()
+  );
   if (!result.ok)
     return { ok: false, error: result.error.detail ?? "Something went wrong" };
   await revalidateEventPaths(actor, input.eventId);
@@ -46,7 +51,8 @@ export async function deleteLocationUnavailabilityAction(input: {
   const actor = await resolveActor(await cookies());
   const result = await sessionUseCases().deleteLocationUnavailability(
     actor,
-    input
+    input,
+    await serverNow()
   );
   if (!result.ok)
     return { ok: false, error: result.error.detail ?? "Something went wrong" };

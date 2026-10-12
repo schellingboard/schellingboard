@@ -1,4 +1,5 @@
 import type { Day, Event } from "./event";
+import type { Location, LocationUnavailability } from "./location";
 import type { Rsvp, Session } from "./session";
 
 export type Actor =
@@ -69,7 +70,37 @@ export type DayCreated = ChangeOf<"day.created", "day", { day: Day }>;
 export type DayChanged = ChangeOf<"day.changed", "day", { day: Day }>;
 export type DayDeleted = ChangeOf<"day.deleted", "day", { day: Day }>;
 
+/** Recorded once for each event the location is assigned to. */
+export type LocationChanged = ChangeOf<
+  "location.changed",
+  "location",
+  { location: Location }
+>;
+
+/** The location left this event, or was deleted. */
+export type LocationRemoved = ChangeOf<
+  "location.removed",
+  "location",
+  { location: Location }
+>;
+
+export type UnavailabilityAdded = ChangeOf<
+  "unavailability.added",
+  "unavailability",
+  { period: LocationUnavailability }
+>;
+
+export type UnavailabilityRemoved = ChangeOf<
+  "unavailability.removed",
+  "unavailability",
+  { period: LocationUnavailability }
+>;
+
 export type Change =
+  | LocationChanged
+  | LocationRemoved
+  | UnavailabilityAdded
+  | UnavailabilityRemoved
   | EventChanged
   | EventDeleted
   | DayCreated
@@ -100,6 +131,10 @@ export function audienceOf(change: Change): Audience {
     case "day.created":
     case "day.changed":
     case "day.deleted":
+    case "location.changed":
+    case "location.removed":
+    case "unavailability.added":
+    case "unavailability.removed":
       return { kind: "event" };
     case "rsvp.added":
       return { kind: "guests", ids: [change.payload.rsvp.guestId] };
@@ -254,6 +289,68 @@ export const changes = {
       actor,
       occurredAt: at,
       payload: { event },
+    };
+  },
+
+  locationChanged(
+    location: Location,
+    eventId: string,
+    { actor, at }: ChangeContext
+  ): LocationChanged {
+    return {
+      type: "location.changed",
+      subjectType: "location",
+      subjectId: location.id,
+      eventId,
+      actor,
+      occurredAt: at,
+      payload: { location },
+    };
+  },
+
+  locationRemoved(
+    location: Location,
+    eventId: string,
+    { actor, at }: ChangeContext
+  ): LocationRemoved {
+    return {
+      type: "location.removed",
+      subjectType: "location",
+      subjectId: location.id,
+      eventId,
+      actor,
+      occurredAt: at,
+      payload: { location },
+    };
+  },
+
+  unavailabilityAdded(
+    period: LocationUnavailability,
+    { actor, at }: ChangeContext
+  ): UnavailabilityAdded {
+    return {
+      type: "unavailability.added",
+      subjectType: "unavailability",
+      subjectId: period.id,
+      eventId: period.eventId,
+      actor,
+      occurredAt: at,
+      payload: { period },
+    };
+  },
+
+  unavailabilityRemoved(
+    period: LocationUnavailability,
+    { actor, at }: ChangeContext
+  ): UnavailabilityRemoved {
+    return {
+      type: "unavailability.removed",
+      subjectType: "unavailability",
+      subjectId: period.id,
+      eventId: period.eventId,
+      actor,
+      occurredAt: at,
+      payload: { period },
     };
   },
 

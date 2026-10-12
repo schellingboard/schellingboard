@@ -196,37 +196,50 @@ export function addAdminVenueRoutes(app: App, venue: () => VenueUseCases) {
   app.openapi(createLocation, async (c) => {
     const result = await venue().createLocation(
       c.var.actor,
-      c.req.valid("json")
+      c.req.valid("json"),
+      c.var.now
     );
     if (!result.ok) return problem(result.error);
     return c.json(toLocationWithEventsView(result.value), 201);
   });
 
   app.openapi(updateLocation, async (c) => {
-    const result = await venue().updateLocation(c.var.actor, {
-      ...c.req.valid("json"),
-      id: c.req.valid("param").id,
-    });
+    const result = await venue().updateLocation(
+      c.var.actor,
+      {
+        ...c.req.valid("json"),
+        id: c.req.valid("param").id,
+      },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error, toLocationWithEventsView);
     return c.json(toLocationWithEventsView(result.value), 200);
   });
 
   app.openapi(replaceLocationImage, async (c) => {
     const { image, expectedVersion } = c.req.valid("form");
-    const result = await venue().replaceLocationImage(c.var.actor, {
-      id: c.req.valid("param").id,
-      image: Buffer.from(await image.arrayBuffer()),
-      expectedVersion,
-    });
+    const result = await venue().replaceLocationImage(
+      c.var.actor,
+      {
+        id: c.req.valid("param").id,
+        image: Buffer.from(await image.arrayBuffer()),
+        expectedVersion,
+      },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error, toLocationWithEventsView);
     return c.json(toLocationWithEventsView(result.value), 200);
   });
 
   app.openapi(removeLocationImage, async (c) => {
-    const result = await venue().removeLocationImage(c.var.actor, {
-      id: c.req.valid("param").id,
-      ...c.req.valid("query"),
-    });
+    const result = await venue().removeLocationImage(
+      c.var.actor,
+      {
+        id: c.req.valid("param").id,
+        ...c.req.valid("query"),
+      },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error, toLocationWithEventsView);
     return c.json(toLocationWithEventsView(result.value), 200);
   });
@@ -234,17 +247,22 @@ export function addAdminVenueRoutes(app: App, venue: () => VenueUseCases) {
   app.openapi(deleteLocation, async (c) => {
     const result = await venue().deleteLocation(
       c.var.actor,
-      c.req.valid("param")
+      c.req.valid("param"),
+      c.var.now
     );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);
   });
 
   app.openapi(moveLocation, async (c) => {
-    const result = await venue().moveLocation(c.var.actor, {
-      ...c.req.valid("json"),
-      id: c.req.valid("param").id,
-    });
+    const result = await venue().moveLocation(
+      c.var.actor,
+      {
+        ...c.req.valid("json"),
+        id: c.req.valid("param").id,
+      },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error, toLocationWithEventsView);
     return c.json(
       { locations: result.value.map(toLocationWithEventsView) },
@@ -253,19 +271,27 @@ export function addAdminVenueRoutes(app: App, venue: () => VenueUseCases) {
   });
 
   app.openapi(assign, async (c) => {
-    const result = await venue().assignLocationsToEvent(c.var.actor, {
-      ...c.req.valid("json"),
-      eventId: c.req.valid("param").id,
-    });
+    const result = await venue().assignLocationsToEvent(
+      c.var.actor,
+      {
+        ...c.req.valid("json"),
+        eventId: c.req.valid("param").id,
+      },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);
   });
 
   app.openapi(remove, async (c) => {
-    const result = await venue().removeLocationsFromEvent(c.var.actor, {
-      ...c.req.valid("json"),
-      eventId: c.req.valid("param").id,
-    });
+    const result = await venue().removeLocationsFromEvent(
+      c.var.actor,
+      {
+        ...c.req.valid("json"),
+        eventId: c.req.valid("param").id,
+      },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);
   });

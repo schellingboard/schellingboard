@@ -10,6 +10,10 @@ import type {
   RecordedChange,
 } from "@schellingboard/domain/change";
 import type { Day, Event } from "@schellingboard/domain/event";
+import type {
+  Location,
+  LocationUnavailability,
+} from "@schellingboard/domain/location";
 import type { Rsvp, Session } from "@schellingboard/domain/session";
 
 type DB = BetterSQLite3Database<typeof schema>;
@@ -55,6 +59,11 @@ function reviveDay(json: Day): Day {
     startBookings: new Date(raw.startBookings),
     endBookings: new Date(raw.endBookings),
   };
+}
+
+function revivePeriod(json: LocationUnavailability): LocationUnavailability {
+  const raw = json as unknown as Record<string, string>;
+  return { ...json, start: new Date(raw.start), end: new Date(raw.end) };
 }
 
 function actorOf(row: ChangeRow): Actor {
@@ -131,6 +140,24 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
         payload: { day: reviveDay(payload.day) },
       };
     }
+    case "location.changed":
+    case "location.removed":
+      return {
+        ...common,
+        type: row.type,
+        subjectType: "location",
+        payload: row.payload as { location: Location },
+      };
+    case "unavailability.added":
+    case "unavailability.removed": {
+      const payload = row.payload as { period: LocationUnavailability };
+      return {
+        ...common,
+        type: row.type,
+        subjectType: "unavailability",
+        payload: { period: revivePeriod(payload.period) },
+      };
+    }
     case "session.created": {
       const payload = row.payload as { session: Session };
       return {
@@ -169,6 +196,10 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
 // A reader skips types it does not know, such as rows written by a newer
 // version before a rollback, rather than stopping at them.
 const KNOWN_TYPES: RecordedChange["type"][] = [
+  "location.changed",
+  "location.removed",
+  "unavailability.added",
+  "unavailability.removed",
   "event.changed",
   "event.deleted",
   "day.created",

@@ -7,6 +7,7 @@ import type {
   locationSchema,
   updateLocationSchema,
 } from "@schellingboard/contracts/location";
+import { serverNow } from "@/utils/dev-clock-server";
 import { venueUseCases } from "@/server/composition";
 import { resolveActor } from "@/server/kernel/actor";
 import type { Result } from "@/server/kernel/result";
@@ -46,7 +47,11 @@ export async function createLocationAction(
   formData: unknown
 ): Promise<AdminFormActionResult> {
   return settledForm(
-    await venueUseCases().createLocation(await actor(), formData)
+    await venueUseCases().createLocation(
+      await actor(),
+      formData,
+      await serverNow()
+    )
   );
 }
 
@@ -57,14 +62,24 @@ export async function updateLocationAction(
   formData: unknown
 ): Promise<AdminFormActionResult> {
   return settledForm(
-    await venueUseCases().updateLocation(await actor(), formData)
+    await venueUseCases().updateLocation(
+      await actor(),
+      formData,
+      await serverNow()
+    )
   );
 }
 
 export async function deleteLocationAction(input: {
   id: string;
 }): Promise<AdminActionResult> {
-  return settled(await venueUseCases().deleteLocation(await actor(), input));
+  return settled(
+    await venueUseCases().deleteLocation(
+      await actor(),
+      input,
+      await serverNow()
+    )
+  );
 }
 
 export async function moveLocationAction(input: {
@@ -72,5 +87,7 @@ export async function moveLocationAction(input: {
   direction: "up" | "down";
   expectedVersion: number;
 }): Promise<AdminActionResult> {
-  return settled(await venueUseCases().moveLocation(await actor(), input));
+  return settled(
+    await venueUseCases().moveLocation(await actor(), input, await serverNow())
+  );
 }

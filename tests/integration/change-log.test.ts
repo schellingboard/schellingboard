@@ -6,10 +6,12 @@ import {
   createEvent,
   createGuest,
   createLocation,
+  createUnavailability,
   createSession,
 } from "../helpers/factories";
 import { getRepositories, withWriter } from "@/db/container";
 import { createEventUseCases } from "@/server/modules/events/module";
+import { createVenueUseCases } from "@/server/modules/venue/module";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
 import {
   addSession,
@@ -397,4 +399,38 @@ describe("change log", () => {
       { type: "event.deleted", subjectId: event.id, eventId: event.id },
     ]);
   });
+
+  it(
+    "records what deleting a location takes with it, once for the event",
+    { tags: ["007-US8"] },
+    async () => {
+      const { event, room, session } = await world();
+      const period = await createUnavailability(
+        event.id,
+        room.id,
+        AT,
+        new Date(AT.getTime() + 3600_000)
+      );
+
+      await createVenueUseCases({
+        repos: getRepositories(),
+        images: {
+          validate: (buffer) => Promise.resolve({ buffer, ext: "png" }),
+          saveNew: (id) => Promise.resolve(`/media/${id}.png`),
+          deleteByUrl: async () => {},
+        },
+        uow: unitOfWork,
+      }).deleteLocation({ admin: true, guest: null }, { id: room.id }, AT);
+
+      expect(await getRepositories().changes.listAfter(0)).toMatchObject([
+        {
+          type: "session.changed",
+          subjectId: session.id,
+          payload: { cascade: true, after: { locations: [] } },
+        },
+        { type: "unavailability.removed", subjectId: period.id },
+        { type: "location.removed", subjectId: room.id, eventId: event.id },
+      ]);
+    }
+  );
 });

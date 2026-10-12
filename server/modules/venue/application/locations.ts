@@ -3,8 +3,11 @@ import {
   locationSchema,
   updateLocationSchema,
 } from "@schellingboard/contracts/location";
+import { changes } from "@schellingboard/domain/change";
 import type { Location } from "@schellingboard/domain/location";
 import type { Actor } from "@/server/kernel/actor";
+import { recordingSessionCascade } from "@/server/kernel/session-cascade";
+import type { Tx } from "@/server/kernel/unit-of-work";
 import { withStoredFile } from "@/server/kernel/stored-files";
 import {
   forbidden,
@@ -17,6 +20,11 @@ import {
   type Result,
 } from "@/server/kernel/result";
 import type { VenueDeps } from "../ports";
+import {
+  byAdmin,
+  recordLocationChanged,
+  recordLocationRemoved,
+} from "./location-changes";
 
 export type LocationWithEvents = Location & { eventIds: string[] };
 
@@ -98,8 +106,13 @@ async function unknownEvent(
 
 export const createLocation =
   (deps: VenueDeps) =>
-  async (actor: Actor, input: unknown): Promise<Result<LocationWithEvents>> => {
+  async (
+    actor: Actor,
+    input: unknown,
+    now: Date
+  ): Promise<Result<LocationWithEvents>> => {
     if (!actor.admin) return adminRequired();
+    const by = byAdmin(now);
     const parsed = await locationSchema
       .extend({ ...validations(deps), eventSlug: z.string().optional() })
       .safeParseAsync(input);
@@ -130,6 +143,7 @@ export const createLocation =
       await tx.locations.setEventIds(location.id, eventIds);
       const saved = await tx.locations.findById(location.id);
       if (!saved) throw new Error("Failed to create location");
+      await recordLocationChanged(tx, saved.id, eventIds, by);
       return ok({ ...saved, eventIds });
     });
     if (!created.ok || !image) return created;
@@ -148,6 +162,7 @@ export const createLocation =
         });
         if (!updated) return locationNotFound();
         replaces(location.imageUrl);
+        await recordLocationChanged(tx, id, eventIds, by);
         return ok({ ...updated, eventIds });
       })
     );
@@ -155,8 +170,13 @@ export const createLocation =
 
 export const updateLocation =
   (deps: VenueDeps) =>
-  async (actor: Actor, input: unknown): Promise<Result<LocationWithEvents>> => {
+  async (
+    actor: Actor,
+    input: unknown,
+    now: Date
+  ): Promise<Result<LocationWithEvents>> => {
     if (!actor.admin) return adminRequired();
+    const by = byAdmin(now);
     const parsed = await updateLocationSchema
       .extend(validations(deps))
       .safeParseAsync(input);
@@ -179,6 +199,7 @@ export const updateLocation =
         if (!existing) return locationNotFound();
         const unknown = await unknownEvent(tx.events, eventIds);
         if (unknown) return unknown;
+        const wasIn = await tx.locations.listEventIds(id);
 
         const updated = await tx.locations.update(id, {
           ...fields,
@@ -189,6 +210,13 @@ export const updateLocation =
         });
         if (!updated) return locationChangedMeanwhile(tx.locations, id);
         if (newImageUrl) replaces(existing.imageUrl);
+        await recordLocationChanged(tx, id, eventIds, by);
+        recordLocationRemoved(
+          tx,
+          updated,
+          wasIn.filter((e) => !eventIds.includes(e)),
+          by
+        );
         return ok({ ...updated, eventIds });
       })
     );
@@ -198,7 +226,8 @@ function setImageUrl(
   { uow, images }: VenueDeps,
   id: string,
   imageUrl: string,
-  expectedVersion: number
+  expectedVersion: number,
+  now: Date
 ): Promise<Result<LocationWithEvents>> {
   return withStoredFile(images, imageUrl || null, (replaces) =>
     uow.run(async (tx) => {
@@ -211,7 +240,9 @@ function setImageUrl(
       });
       if (!updated) return locationChangedMeanwhile(tx.locations, id);
       replaces(existing.imageUrl);
-      return ok({ ...updated, eventIds: await tx.locations.listEventIds(id) });
+      const eventIds = await tx.locations.listEventIds(id);
+      await recordLocationChanged(tx, id, eventIds, byAdmin(now));
+      return ok({ ...updated, eventIds });
     })
   );
 }
@@ -224,35 +255,55 @@ export const replaceLocationImage =
       id,
       image,
       expectedVersion,
-    }: { id: string; image: Buffer; expectedVersion: number }
+    }: { id: string; image: Buffer; expectedVersion: number },
+    now: Date
   ): Promise<Result<LocationWithEvents>> => {
     if (!actor.admin) return adminRequired();
     const checked = await deps.images.validate(image);
     if ("error" in checked)
       return invalid("location.imageInvalid", checked.error);
     const imageUrl = await deps.images.saveNew(id, checked.buffer, checked.ext);
-    return setImageUrl(deps, id, imageUrl, expectedVersion);
+    return setImageUrl(deps, id, imageUrl, expectedVersion, now);
   };
 
 export const removeLocationImage =
   (deps: VenueDeps) =>
   async (
     actor: Actor,
-    { id, expectedVersion }: { id: string; expectedVersion: number }
+    { id, expectedVersion }: { id: string; expectedVersion: number },
+    now: Date
   ): Promise<Result<LocationWithEvents>> => {
     if (!actor.admin) return adminRequired();
-    return setImageUrl(deps, id, "", expectedVersion);
+    return setImageUrl(deps, id, "", expectedVersion, now);
   };
 
 export const deleteLocation =
   ({ uow, images }: VenueDeps) =>
-  async (actor: Actor, input: { id: string }): Promise<Result<void>> => {
+  async (
+    actor: Actor,
+    input: { id: string },
+    now: Date
+  ): Promise<Result<void>> => {
     if (!actor.admin) return adminRequired();
+    const by = byAdmin(now);
     return withStoredFile(images, null, (replaces) =>
       uow.run(async (tx) => {
         const location = await tx.locations.findById(input.id);
         if (!location) return locationNotFound();
-        await tx.locations.delete(input.id);
+        const eventIds = await tx.locations.listEventIds(input.id);
+        const periods = await periodsOf(tx, input.id);
+        const using = (await tx.sessions.list()).filter((s) =>
+          s.locations.some((l) => l.id === input.id)
+        );
+        await recordingSessionCascade(
+          tx,
+          using,
+          () => tx.locations.delete(input.id),
+          by
+        );
+        for (const period of periods)
+          tx.record(changes.unavailabilityRemoved(period, by));
+        recordLocationRemoved(tx, location, eventIds, by);
         replaces(location.imageUrl);
         return ok(undefined);
       })
@@ -263,7 +314,8 @@ export const moveLocation =
   (deps: VenueDeps) =>
   async (
     actor: Actor,
-    input: { id: string; direction: "up" | "down"; expectedVersion: number }
+    input: { id: string; direction: "up" | "down"; expectedVersion: number },
+    now: Date
   ): Promise<Result<LocationWithEvents[]>> => {
     if (!actor.admin) return adminRequired();
     const moved = await deps.uow.run(async (tx) => {
@@ -271,7 +323,18 @@ export const moveLocation =
       if (!location) return locationNotFound();
       if (outdated(location, input.expectedVersion))
         return locationChangedMeanwhile(tx.locations, input.id);
+      const before = new Map((await tx.locations.list()).map((l) => [l.id, l]));
       await tx.locations.move(input.id, input.direction);
+      for (const after of await tx.locations.list()) {
+        const was = before.get(after.id);
+        if (was?.sortIndex !== after.sortIndex || was.version !== after.version)
+          await recordLocationChanged(
+            tx,
+            after.id,
+            await tx.locations.listEventIds(after.id),
+            byAdmin(now)
+          );
+      }
       return ok(undefined);
     });
     return moved.ok ? listLocations(deps)(actor, {}) : moved;
@@ -297,3 +360,12 @@ export const listLocations =
       locations.map((l) => ({ ...l, eventIds: eventIds.get(l.id) ?? [] }))
     );
   };
+
+// A location's closed periods go with it, in every event.
+async function periodsOf(tx: Tx, locationId: string) {
+  const events = await tx.events.list();
+  const lists = await Promise.all(
+    events.map((e) => tx.locationUnavailability.listByEvent(e.id))
+  );
+  return lists.flat().filter((p) => p.locationId === locationId);
+}
