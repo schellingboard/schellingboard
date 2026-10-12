@@ -42,7 +42,11 @@ sketch, not a plan; each step would get its own issue and ADR.
 5. **Move screens to the SPA one family at a time.** Start with the schedule
    (biggest win: replica, filters, agenda, kiosk), then proposals and voting,
    people and meetings, settings, admin. Each moved screen deletes its server
-   actions. A route in Next redirects to the SPA route until all are moved.
+   actions.
+
+   **Started** ([ADR 0015](../adr/0015-spa-alongside-next.md)): the SPA owns
+   every URL and Next moves under `/legacy` until all screens have moved.
+
 6. **Identity and roles.** Persons, participations, login sessions, assurance,
    join links; migrate protected guests to verified credentials; replace the admin
    password with a site-admin role and the bootstrap link.

@@ -26,6 +26,7 @@ the tracking issue where there is one.
 | [0012](0012-http-api-v1.md)                          | A versioned HTTP API in the Next process                    | 2026-10-04 |
 | [0013](0013-unit-of-work.md)                         | The unit of work                                            | 2026-10-06 |
 | [0014](0014-change-feed-and-snapshot.md)             | The change feed and the snapshot                            | 2026-10-07 |
+| [0015](0015-spa-alongside-next.md)                   | The SPA alongside Next                                      | 2026-10-08 |
 
 Longer design work that isn't a single decision lives next door:
 [Target architecture](../target-architecture/README.md) and
