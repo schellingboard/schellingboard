@@ -54,7 +54,7 @@ export function SessionProposalForm(props: {
   const [isDeleting, startDeleting] = useTransition();
   // The fields keep what the form loaded even when a refresh brings a newer
   // proposal, so the save must claim the loaded version, not the newest.
-  const [loadedVersion] = useState(() => proposal?.updatedTime.toISOString());
+  const [loadedVersion] = useState(proposal?.version);
 
   const defaultHosts = useMemo(() => {
     if (proposal) return proposal.hosts.map((h) => h.id);
@@ -103,7 +103,7 @@ export function SessionProposalForm(props: {
       if (proposal) {
         result = await updateProposal(proposal.id, {
           ...sessionProposal,
-          expectedUpdatedTime: loadedVersion!,
+          expectedVersion: loadedVersion!,
         });
       } else {
         result = await createProposal(sessionProposal);

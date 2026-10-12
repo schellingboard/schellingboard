@@ -186,6 +186,9 @@ scheduling phase runs.
   it simply stays there while you fix everything else. Move it and it has to
   land somewhere you could have booked. A session in several rooms can also be
   narrowed down to one of them.
+- **If a co-host or an organizer saved the session while you had the form
+  open**, your save is refused rather than undoing their change. Copy your
+  edits, reload the page, and make them again.
 
 ### How many people to expect
 

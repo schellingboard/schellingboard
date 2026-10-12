@@ -38,7 +38,7 @@ export interface UpdateSessionInput extends SessionBooking {
   sessionId: string;
   /** Several only when they are the rooms an organizer already gave it. */
   locationIds: string[];
-  expectedVersion?: number;
+  expectedVersion: number;
 }
 
 export const updateSession =

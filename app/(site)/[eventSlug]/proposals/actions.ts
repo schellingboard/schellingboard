@@ -69,16 +69,12 @@ export async function updateProposal(
   if (!parseResult.success) {
     return { error: parseResult.error.issues };
   }
-  const { eventSlug, expectedUpdatedTime, ...fields } = parseResult.data;
+  const { eventSlug, ...fields } = parseResult.data;
 
   try {
     const result = await proposalUseCases().updateProposal(
       await resolveActor(await cookies()),
-      {
-        ...fields,
-        proposalId: id,
-        expectedUpdatedTime: new Date(expectedUpdatedTime),
-      },
+      { ...fields, proposalId: id },
       await serverNow()
     );
     if (!result.ok) {

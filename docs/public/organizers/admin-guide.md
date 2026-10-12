@@ -178,3 +178,6 @@ proposal → schedule flow.
 - Deleting a session removes its RSVPs but only unlinks (doesn't delete)
   hosts/locations. Admins can also remove a single guest's RSVP from the
   session's RSVP list.
+- If a host or another admin saved the session or proposal while you had its
+  form open, your save is refused rather than undoing their change. Copy your
+  edits, cancel, and edit again.

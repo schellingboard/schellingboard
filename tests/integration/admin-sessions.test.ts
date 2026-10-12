@@ -485,6 +485,7 @@ describe("adminUpdateSessionAction", () => {
 
     const result = await adminUpdateSessionAction({
       id: session.id,
+      expectedVersion: session.version,
       title: "Workshop",
       description: "",
       startTime: null,
@@ -521,7 +522,12 @@ describe("adminUpdateSessionAction", () => {
       });
 
     expect(await edit("First")).toEqual({ ok: true });
-    expect(await edit("Second")).toMatchObject({ ok: false });
+    expect(await edit("Second")).toEqual({
+      ok: false,
+      error: expect.stringMatching(
+        /^Someone changed this session while you edited it\. Copy your edits/
+      ) as string,
+    });
     expect(await getRepositories().sessions.findById(session.id)).toMatchObject(
       { title: "First" }
     );
@@ -539,6 +545,7 @@ describe("adminUpdateSessionAction", () => {
 
     const result = await adminUpdateSessionAction({
       id: session.id,
+      expectedVersion: session.version,
       title: "New title",
       description: "New description",
       startTime: "2030-01-01T10:00:00.000Z",
@@ -573,6 +580,7 @@ describe("adminUpdateSessionAction", () => {
 
     const result = await adminUpdateSessionAction({
       id: session.id,
+      expectedVersion: session.version,
       title: "Workshop",
       description: "",
       startTime: null,
@@ -608,6 +616,7 @@ describe("adminUpdateSessionAction", () => {
 
     const result = await adminUpdateSessionAction({
       id: session.id,
+      expectedVersion: session.version,
       title: "Workshop",
       description: "",
       startTime: "2030-01-01T12:00:00.000Z",
@@ -636,6 +645,7 @@ describe("adminUpdateSessionAction", () => {
 
     const result = await adminUpdateSessionAction({
       id: session.id,
+      expectedVersion: session.version,
       title: "Keeps title",
       description: "",
       startTime: null,
@@ -663,6 +673,7 @@ describe("adminUpdateSessionAction", () => {
 
     const base = {
       id: session.id,
+      expectedVersion: session.version,
       title: "Title",
       description: "",
       capacity: 30,
@@ -703,6 +714,7 @@ describe("adminUpdateSessionAction", () => {
 
     const base = {
       id: session.id,
+      expectedVersion: session.version,
       title: "Title",
       description: "",
       capacity: 30,
@@ -736,6 +748,7 @@ describe("adminUpdateSessionAction", () => {
 
     const result = await adminUpdateSessionAction({
       id: session.id,
+      expectedVersion: session.version,
       title: "Title",
       description: "",
       startTime: "not-a-date",
@@ -756,6 +769,7 @@ describe("adminUpdateSessionAction", () => {
 
     const base = {
       id: session.id,
+      expectedVersion: session.version,
       title: "Title",
       description: "",
       startTime: null,
@@ -794,6 +808,7 @@ describe("adminUpdateSessionAction", () => {
 
     const result = await adminUpdateSessionAction({
       id: session.id,
+      expectedVersion: session.version,
       title: "Title",
       description: "",
       startTime: "2030-01-01T10:07:00.000Z",
@@ -818,6 +833,7 @@ describe("adminUpdateSessionAction", () => {
 
     const result = await adminUpdateSessionAction({
       id: session.id,
+      expectedVersion: session.version,
       title: "   ",
       description: "",
       startTime: null,
@@ -850,6 +866,7 @@ describe("adminUpdateSessionAction", () => {
 
     const result = await adminUpdateSessionAction({
       id: session.id,
+      expectedVersion: session.version,
       title: "Second",
       description: "",
       startTime: "2030-01-01T10:30:00.000Z",
@@ -882,6 +899,7 @@ describe("adminUpdateSessionAction", () => {
 
     const result = await adminUpdateSessionAction({
       id: session.id,
+      expectedVersion: session.version,
       title: "Keeps slot",
       description: "Updated description",
       startTime: "2030-01-01T10:00:00.000Z",
@@ -902,6 +920,7 @@ describe("adminUpdateSessionAction", () => {
 
     const base = {
       id: session.id,
+      expectedVersion: session.version,
       title: "New title",
       description: "",
       startTime: null,
@@ -937,6 +956,7 @@ describe("adminUpdateSessionAction", () => {
 
     const result = await adminUpdateSessionAction({
       id: session.id,
+      expectedVersion: session.version,
       title: "New title",
       description: "",
       startTime: null,
@@ -960,6 +980,7 @@ describe("adminUpdateSessionAction", () => {
 
     const result = await adminUpdateSessionAction({
       id: session.id,
+      expectedVersion: session.version,
       title: "x",
       description: "",
       startTime: null,
@@ -977,6 +998,7 @@ describe("adminUpdateSessionAction", () => {
   it("errors for an unknown session", async () => {
     const result = await adminUpdateSessionAction({
       id: "no-such-session",
+      expectedVersion: 1,
       title: "x",
       description: "",
       startTime: null,

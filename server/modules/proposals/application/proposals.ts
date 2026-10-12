@@ -34,9 +34,7 @@ export interface CreateProposalInput extends ProposalFields {
 
 export interface UpdateProposalInput extends ProposalFields {
   proposalId: string;
-  expectedVersion?: number;
-  /** What the web forms send until they send the version. */
-  expectedUpdatedTime?: Date;
+  expectedVersion: number;
 }
 
 async function guestIdsOf(
@@ -111,12 +109,7 @@ export const updateProposal =
   ({ repos, uow }: ProposalDeps) =>
   async (
     actor: Actor,
-    {
-      proposalId,
-      expectedVersion,
-      expectedUpdatedTime,
-      ...fields
-    }: UpdateProposalInput,
+    { proposalId, expectedVersion, ...fields }: UpdateProposalInput,
     now: Date
   ): Promise<Result<ProposalView>> => {
     const result = await uow.run(async (tx) => {
@@ -139,7 +132,6 @@ export const updateProposal =
         durationMinutes: fields.durationMinutes,
         cohostWanted: fields.cohostWanted,
         cohostWantedNote: fields.cohostWantedNote ?? null,
-        expectedUpdatedTime,
         expectedVersion,
         updatedTime: now,
       });

@@ -13,8 +13,7 @@ export type AdminProposalInput = {
   description: string;
   durationMinutes: number | null;
   hostIds: string[];
-  expectedUpdatedTime: string;
-  expectedVersion?: number;
+  expectedVersion: number;
 };
 
 function revalidateEventPaths(eventId: string) {

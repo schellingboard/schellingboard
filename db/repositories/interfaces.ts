@@ -568,8 +568,6 @@ export type SessionProposalUpdateInput = {
   durationMinutes?: number | null;
   cohostWanted?: boolean;
   cohostWantedNote?: string | null;
-  /** The update only applies while the proposal's updatedTime is still this. */
-  expectedUpdatedTime?: Date;
   /** The update only applies while the proposal is still at this version. */
   expectedVersion?: number;
   updatedTime: Date;
@@ -597,7 +595,7 @@ export interface SessionProposalsRepository {
   create(data: SessionProposalCreateInput): Promise<SessionProposal>;
   /**
    * Undefined, changing nothing, if the proposal is gone or not at
-   * `expectedUpdatedTime` or `expectedVersion`.
+   * `expectedVersion`.
    */
   update(
     id: string,

@@ -25,7 +25,7 @@ export type ProposalRow = {
   hosts: { id: string; name: string }[];
   votesCount: number;
   sessionCount: number;
-  updatedTime: string;
+  version: number;
 };
 
 export type EventGuest = { id: string; name: string };
@@ -50,7 +50,7 @@ function ProposalItem({
     proposal.durationMinutes === null ? "" : String(proposal.durationMinutes)
   );
   const [hosts, setHosts] = useState<EventGuest[]>(proposal.hosts);
-  const [editedVersion, setEditedVersion] = useState(proposal.updatedTime);
+  const [editedVersion, setEditedVersion] = useState(proposal.version);
   const [isSaving, startSave] = useTransition();
   const [deleteMode, setDeleteMode] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState("");
@@ -70,7 +70,7 @@ function ProposalItem({
       proposal.durationMinutes === null ? "" : String(proposal.durationMinutes)
     );
     setHosts(proposal.hosts);
-    setEditedVersion(proposal.updatedTime);
+    setEditedVersion(proposal.version);
   };
 
   const handleSave = (e: React.FormEvent) => {
@@ -92,10 +92,12 @@ function ProposalItem({
           description,
           durationMinutes,
           hostIds: hosts.map((h) => h.id),
-          expectedUpdatedTime: editedVersion,
+          expectedVersion: editedVersion,
         });
         if (!result.ok) {
           setError(result.error);
+          // So the next Edit starts from the proposal as it is now.
+          router.refresh();
         } else {
           setError(null);
           setEditMode(false);

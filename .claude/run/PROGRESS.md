@@ -183,11 +183,30 @@ openapi-check typecheck test-coverage` (or `make test`), without E2E. E2E runs
   `204`). A photo upload or removal checks the version before touching the
   file; a conflict after that no longer deletes the saved file.
 
+- 4b: the guest and admin session and proposal edit forms send the version
+  they loaded (taken when the form opens, so a refresh meanwhile cannot
+  advance it). Their server actions, the legacy `/api/update-session` route
+  (400 without it) and the four update use cases now require it;
+  `expectedUpdatedTime` is gone from the forms, the actions, the use cases and
+  the proposal repository. A conflict says "Someone changed this session/
+  proposal while you edited it. Copy your edits somewhere safe: reloading the
+  page discards them." (`STALE_SESSION_MESSAGE`, also the API's `detail`).
+  The admin forms refresh after a refused save, so the next Edit starts from
+  the current version. No new E2E (review: the proposal one was never red;
+  the route's 409 body has integration coverage). The other forms
+  of 4a2-4a4 (event, day, location, meeting point, profile, admin guest) are
+  outside 4b and still send no version (see Questions). E2E run:
+  proposals, update-session, scheduling and admin specs.
+
 ## Problems
 
 None.
 
 ## Questions
+
+- The event, day, location, meeting point, profile and admin guest forms send
+  no version yet (their server actions take it optionally since 4a2-4a4), so
+  their saves still overwrite unseen. Add a step like 4b for them?
 
 - A photo save or removal still races its row (since 3d; 4a4 narrows the
   window): a conflict or failure after the file is replaced or deleted leaves
@@ -200,4 +219,4 @@ None.
 
 ## Next step
 
-4b.
+5.

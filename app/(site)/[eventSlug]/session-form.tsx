@@ -132,6 +132,7 @@ export function SessionForm(props: {
     initialProposal?.description ?? session.description
   );
   const [closed, setClosed] = useState(session.closed);
+  const [loadedVersion] = useState(session.version);
   const [day, setDay] = useState(initDay ?? days[0]);
   // Only preselect a location the picker offers: an existing session may sit
   // in one that has since been unassigned from the event.
@@ -349,6 +350,7 @@ export function SessionForm(props: {
         duration: effectiveDuration,
         hosts,
         proposal: proposal?.id ?? session.proposalId,
+        expectedVersion: sessionID ? loadedVersion : undefined,
       }),
     });
     if (res.ok) {

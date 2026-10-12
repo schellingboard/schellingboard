@@ -1,6 +1,13 @@
 import { z } from "zod";
 import { COHOST_WANTED_NOTE_MAX } from "@schellingboard/domain/session";
 
+export const expectedVersion = z
+  .number()
+  .int()
+  .describe(
+    "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
+  );
+
 export const sessionProposalSchema = z.object({
   eventId: z.string().min(1),
   eventSlug: z.string().min(1),
@@ -25,15 +32,13 @@ export const sessionProposalSchema = z.object({
 // required) — there is no partial-update path to model here.
 export const sessionProposalUpdateSchema = sessionProposalSchema
   .omit({ eventId: true })
-  .extend({
-    // The proposal's updatedTime when the form loaded it. A full replacement
-    // from an older copy would undo what happened since, such as a co-host joining.
-    expectedUpdatedTime: z.iso.datetime(),
-    expectedVersion: z.number().int().optional(),
-  });
+  .extend({ expectedVersion });
 
 export const STALE_PROPOSAL_MESSAGE =
   "Someone changed this proposal while you edited it. Copy your edits somewhere safe: reloading the page discards them.";
+
+export const STALE_SESSION_MESSAGE =
+  "Someone changed this session while you edited it. Copy your edits somewhere safe: reloading the page discards them.";
 
 const instant = z.iso.datetime({ offset: true });
 
@@ -62,13 +67,6 @@ export const sessionViewSchema = z
 export const sessionListSchema = z.object({
   sessions: z.array(sessionViewSchema),
 });
-
-export const expectedVersion = z
-  .number()
-  .int()
-  .describe(
-    "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
-  );
 
 const bookingFields = {
   dayId: z.string().min(1),

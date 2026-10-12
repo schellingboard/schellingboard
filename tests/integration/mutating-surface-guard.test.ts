@@ -152,6 +152,7 @@ const VERIFIERS: Record<string, Verifier> = {
           dayId: day.id,
           startTime: slotStart(day, 60),
           duration: 60,
+          expectedVersion: session.version,
         }),
         headers: { cookie: `${GUEST_COOKIE_NAME}=${openGuestValue(host.id)}` },
       })
@@ -297,7 +298,7 @@ const PROPOSAL_ACTION_VERIFIERS: Record<
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(host.id));
     const result = await updateProposal(proposal.id, {
       eventSlug: "test-event",
-      expectedUpdatedTime: proposal.updatedTime.toISOString(),
+      expectedVersion: proposal.version,
       title: "Renamed",
     });
     expect(result).toHaveProperty("error");

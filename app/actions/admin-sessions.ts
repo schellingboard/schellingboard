@@ -22,7 +22,7 @@ export type AdminSessionInput = {
   closed: boolean;
   hostIds: string[];
   locationIds: string[];
-  expectedVersion?: number;
+  expectedVersion: number;
 };
 
 // The attendee-facing schedule fetches the session list in the shared

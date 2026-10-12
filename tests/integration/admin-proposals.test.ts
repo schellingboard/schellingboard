@@ -76,7 +76,7 @@ describe("adminUpdateProposalAction", () => {
       description: "New description",
       durationMinutes: 60,
       hostIds: [h2.id],
-      expectedUpdatedTime: proposal.updatedTime.toISOString(),
+      expectedVersion: proposal.version,
     });
     expect(result.ok).toBe(true);
 
@@ -102,7 +102,7 @@ describe("adminUpdateProposalAction", () => {
       description: "",
       durationMinutes: null,
       hostIds: [h1.id],
-      expectedUpdatedTime: proposal.updatedTime.toISOString(),
+      expectedVersion: proposal.version,
     });
     expect(result.ok).toBe(true);
 
@@ -123,7 +123,7 @@ describe("adminUpdateProposalAction", () => {
       description: "",
       durationMinutes: null,
       hostIds: [h1.id],
-      expectedUpdatedTime: proposal.updatedTime.toISOString(),
+      expectedVersion: proposal.version,
     });
     expect(!result.ok && result.error).toBe("Title is required");
   });
@@ -140,7 +140,7 @@ describe("adminUpdateProposalAction", () => {
       description: "",
       durationMinutes: null,
       hostIds: [h1.id],
-      expectedUpdatedTime: proposal.updatedTime.toISOString(),
+      expectedVersion: proposal.version,
     });
     expect(!result.ok && result.error).toBe("Unauthorized");
   });
@@ -165,7 +165,7 @@ describe("adminUpdateProposalAction", () => {
       description: "",
       durationMinutes: null,
       hostIds: [host.id],
-      expectedUpdatedTime: proposal.updatedTime.toISOString(),
+      expectedVersion: proposal.version,
     });
     expect(!result.ok && result.error).toBe(STALE_PROPOSAL_MESSAGE);
 
@@ -185,7 +185,7 @@ describe("adminUpdateProposalAction", () => {
       description: "",
       durationMinutes: null,
       hostIds: [],
-      expectedUpdatedTime: new Date(0).toISOString(),
+      expectedVersion: 1,
     });
     expect(!result.ok && result.error).toBe("Proposal not found");
   });
