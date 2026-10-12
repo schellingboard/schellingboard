@@ -16,6 +16,7 @@ import { Modal } from "@/app/components/modal";
 import { Markdown } from "@/app/(site)/markdown";
 import { hasPhases } from "@schellingboard/domain/phase";
 import { scrollNowLineIntoView } from "./now-line";
+import { SyncIndicator } from "./sync-indicator";
 import type { Event } from "@schellingboard/domain/event";
 import { formatEventDates } from "@schellingboard/domain/time";
 
@@ -70,6 +71,7 @@ export function ScheduleToolbar(props: {
             </Link>
           )}
         </div>
+        <SyncIndicator />
       </div>
       <Modal open={detailsOpen} setOpen={setDetailsOpen}>
         <EventDetails event={event} />

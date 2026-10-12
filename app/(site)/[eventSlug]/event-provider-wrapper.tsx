@@ -24,7 +24,10 @@ export function EventProviderWrapper({
   children: React.ReactNode;
 }) {
   const { user } = useContext(UserContext);
-  const { replica, gone, meetingsRevision } = useLiveReplica(snapshot, user);
+  const { replica, gone, meetingsRevision, sync } = useLiveReplica(
+    snapshot,
+    user
+  );
   const { shown, updateRsvp } = useOptimisticRsvps(replica);
   const context = useMemo(() => eventContextFrom(shown), [shown]);
 
@@ -37,9 +40,10 @@ export function EventProviderWrapper({
       myMeetings,
       now,
       meetingsRevision,
+      sync,
       updateRsvp,
     }),
-    [context, rsvps, myMeetings, now, meetingsRevision, updateRsvp]
+    [context, rsvps, myMeetings, now, meetingsRevision, sync, updateRsvp]
   );
 
   if (gone) {

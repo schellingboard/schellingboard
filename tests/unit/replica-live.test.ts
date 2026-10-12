@@ -195,7 +195,10 @@ describe("live replica", () => {
       live.visibilityChanged(true);
       vi.advanceTimersByTime(20_000);
       live.visibilityChanged(false);
-      vi.advanceTimersByTime(60_000);
+      for (let i = 0; i < 3; i++) {
+        sources[0].emit("ping", {});
+        vi.advanceTimersByTime(20_000);
+      }
 
       expect(sources[0].closed).toBe(false);
       expect(loadSnapshot).not.toHaveBeenCalled();
@@ -212,7 +215,10 @@ describe("live replica", () => {
       live.visibilityChanged(true);
       live.disconnect();
       live.connect("mia");
-      vi.advanceTimersByTime(60_000);
+      for (let i = 0; i < 3; i++) {
+        sources[1].emit("ping", {});
+        vi.advanceTimersByTime(20_000);
+      }
 
       expect(sources[0].closed).toBe(true);
       expect(sources).toHaveLength(2);

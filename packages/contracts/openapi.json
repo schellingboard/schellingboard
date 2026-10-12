@@ -5514,7 +5514,7 @@
     "/api/v1/events/{slug}/feed": {
       "get": {
         "tags": ["events"],
-        "description": "A `text/event-stream` of the event's changes after `since` (the snapshot's `seq`), filtered to what the `guest` cookie may see. Each message has `id` = its `seq`, `event` = its type and the message as JSON `data`; a browser's reconnect sends `Last-Event-ID`, which wins over `since`. An `event: reset` message, after which the stream ends, means the resume point cannot be served: load the snapshot again. A comment every 25 seconds keeps proxies from closing it; it ends after 10 minutes.",
+        "description": "A `text/event-stream` of the event's changes after `since` (the snapshot's `seq`), filtered to what the `guest` cookie may see. Each message has `id` = its `seq`, `event` = its type and the message as JSON `data`; a browser's reconnect sends `Last-Event-ID`, which wins over `since`. An `event: reset` message, after which the stream ends, means the resume point cannot be served: load the snapshot again. An `event: ping` every 25 seconds keeps proxies from closing it and lets a client notice a dead connection; it ends after 10 minutes.",
         "parameters": [
           {
             "schema": { "type": "string", "minLength": 1 },

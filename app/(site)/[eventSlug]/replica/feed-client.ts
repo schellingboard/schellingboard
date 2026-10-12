@@ -19,6 +19,9 @@ const messageTypes = feedMessageSchema.options.map((o) => o.shape.type.value);
 const RETRY_MS = 2000;
 const MAX_RETRY_MS = 60_000;
 const CLOSED = 2;
+// Two missed server pings: the connection is dead without any
+// error event (sleep, a network change).
+export const SILENCE_MS = 50_000;
 
 export function connectFeed({
   slug,
@@ -43,6 +46,17 @@ export function connectFeed({
   let stopped = false;
   let failures = 0;
   let pending = false;
+  let watchdog: ReturnType<typeof setTimeout> | undefined;
+
+  function heard(current: Source, within = SILENCE_MS) {
+    if (current !== source) return;
+    clearTimeout(watchdog);
+    if (stopped || closed) return;
+    watchdog = setTimeout(() => {
+      store.linkDown();
+      if (!reloading) open();
+    }, within);
+  }
 
   function open() {
     source?.close();
@@ -50,17 +64,25 @@ export function connectFeed({
       `/api/v1/events/${slug}/feed?since=${store.get().seq}`
     );
     source = current;
+    heard(current);
     // Only the types this version knows get a listener, so a newer server's
     // unknown type never reaches the store.
     for (const type of messageTypes) {
       current.addEventListener(type, ({ data }) => {
         const message = parse(data);
         failures = 0;
+        heard(current);
         if (message) store.applyMessage(message);
       });
     }
+    current.addEventListener("ping", () => {
+      failures = 0;
+      heard(current);
+    });
     current.addEventListener("open", () => {
       failures = 0;
+      heard(current);
+      if (current === source) store.linkUp();
     });
     current.addEventListener("reset", () => {
       if (current === source && !reloading && !stopped) void reload();
@@ -68,6 +90,11 @@ export function connectFeed({
     // The browser reconnects by itself unless the server refused the stream
     // (401, 404), which closes it for good.
     current.addEventListener("error", () => {
+      if (current === source) store.linkDown();
+      // The browser retries on its own schedule and its open re-arms the
+      // watchdog; this backstop only covers a retry that hangs.
+      if (current.readyState !== CLOSED)
+        heard(current, MAX_RETRY_MS + SILENCE_MS);
       if (current === source && current.readyState === CLOSED) {
         if (!reloading && !stopped) {
           failures++;
@@ -80,6 +107,8 @@ export function connectFeed({
   async function reload() {
     reloading = true;
     pending = true;
+    clearTimeout(watchdog);
+    store.linkDown();
     source?.close();
     try {
       for (;;) {
@@ -113,12 +142,15 @@ export function connectFeed({
     // The page is going into the back/forward cache; restart() brings it back.
     stop() {
       stopped = true;
+      clearTimeout(watchdog);
+      store.linkRestart();
       source?.close();
     },
     // Back from a hidden tab: the server answers a too-old position with a
     // reset, so no snapshot is loaded unless a reload was cut short.
     resume() {
       stopped = false;
+      store.linkRestart();
       if (closed || reloading) return;
       if (pending) {
         failures = 0;
@@ -127,11 +159,13 @@ export function connectFeed({
     },
     restart() {
       stopped = false;
+      store.linkRestart();
       failures = 0;
       if (!closed && !reloading) void reload();
     },
     close() {
       closed = true;
+      clearTimeout(watchdog);
       source?.close();
     },
   };

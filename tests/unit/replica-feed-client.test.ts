@@ -2,7 +2,10 @@
 import { describe, it, expect, vi } from "vitest";
 import { feedMessageSchema } from "@schellingboard/contracts/feed";
 import type { FeedMessage } from "@schellingboard/contracts/feed";
-import { connectFeed } from "@/app/(site)/[eventSlug]/replica/feed-client";
+import {
+  connectFeed,
+  SILENCE_MS,
+} from "@/app/(site)/[eventSlug]/replica/feed-client";
 import { createReplicaStore } from "@/app/(site)/[eventSlug]/replica/store";
 import { snapshot } from "../helpers/snapshot-fixture";
 
@@ -98,12 +101,12 @@ describe("connectFeed", () => {
     expect(sources[1].url).toBe("/api/v1/events/my-event/feed?since=40");
   });
 
-  it("listens for every message type, reset, error and open", () => {
+  it("listens for every message type, ping, reset, error and open", () => {
     const { sources } = setup();
 
     const types = feedMessageSchema.options.map((o) => o.shape.type.value);
     expect([...sources[0].listeners.keys()].sort()).toEqual(
-      [...types, "reset", "error", "open"].sort()
+      [...types, "ping", "reset", "error", "open"].sort()
     );
   });
 
@@ -269,5 +272,128 @@ describe("connectFeed", () => {
     await vi.waitFor(() => expect(synced).toHaveBeenCalled());
     expect(store.get().seq).toBe(40);
     expect(sources[0].url).toContain("since=40");
+  });
+
+  it("is connected once the stream opens, down on an error, connected again on reopen", () => {
+    const { store, sources } = setup();
+
+    sources[0].emit("error", {});
+    expect(store.link().connected).toBe(false);
+    sources[0].emit("open", {});
+    expect(store.link().connected).toBe(true);
+  });
+
+  it("is down after stop, and again after resume until the stream opens", () => {
+    const { store, sources, feed } = setup();
+    sources[0].emit("open", {});
+
+    feed.stop();
+    expect(store.link().connected).toBe(false);
+    feed.resume();
+    expect(store.link().connected).toBe(false);
+    sources[1].emit("open", {});
+    expect(store.link().connected).toBe(true);
+  });
+
+  describe("silence", () => {
+    it("drops the link and reopens when nothing, not even a ping, arrives in time", () => {
+      vi.useFakeTimers();
+      try {
+        const { store, sources } = setup();
+        sources[0].emit("open", {});
+
+        vi.advanceTimersByTime(SILENCE_MS - 1);
+        sources[0].emit("ping", {});
+        vi.advanceTimersByTime(SILENCE_MS - 1);
+        expect(store.link().connected).toBe(true);
+        expect(sources).toHaveLength(1);
+
+        vi.advanceTimersByTime(1);
+        expect(store.link().connected).toBe(false);
+        expect(sources).toHaveLength(2);
+        expect(sources[0].closed).toBe(true);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it("goes down and reopens when the first stream never sends anything", () => {
+      vi.useFakeTimers();
+      try {
+        const { store, sources } = setup();
+
+        vi.advanceTimersByTime(SILENCE_MS);
+
+        expect(store.link().connected).toBe(false);
+        expect(sources).toHaveLength(2);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it("leaves the browser's own retry alone after an error, but not a hung one", () => {
+      vi.useFakeTimers();
+      try {
+        const { sources } = setup();
+        sources[0].emit("open", {});
+
+        sources[0].emit("error", {});
+        vi.advanceTimersByTime(SILENCE_MS * 2);
+        expect(sources).toHaveLength(1);
+
+        vi.advanceTimersByTime(10_000);
+        expect(sources).toHaveLength(2);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it("does not open a second source while the browser keeps retrying", () => {
+      vi.useFakeTimers();
+      try {
+        const { sources } = setup();
+        sources[0].emit("open", {});
+
+        for (let i = 0; i < 40; i++) {
+          sources[0].emit("error", {});
+          vi.advanceTimersByTime(5_000);
+        }
+
+        expect(sources).toHaveLength(1);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it("ignores events from a source that was replaced", () => {
+      vi.useFakeTimers();
+      try {
+        const { sources } = setup();
+        vi.advanceTimersByTime(SILENCE_MS);
+        expect(sources).toHaveLength(2);
+
+        sources[0].emit("ping", {});
+        vi.advanceTimersByTime(SILENCE_MS);
+
+        expect(sources).toHaveLength(3);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it("is not watched while stopped", () => {
+      vi.useFakeTimers();
+      try {
+        const { sources, feed } = setup();
+        sources[0].emit("open", {});
+
+        feed.stop();
+        vi.advanceTimersByTime(SILENCE_MS * 2);
+
+        expect(sources).toHaveLength(1);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
   });
 });

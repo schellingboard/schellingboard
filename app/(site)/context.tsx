@@ -33,6 +33,7 @@ import {
 } from "@schellingboard/domain/slots";
 import { startNowTicker, NOW_REFRESH_INTERVAL_MS } from "@/utils/now-ticker";
 import type { MyMeetingsResponse } from "@/utils/meeting-views";
+import type { SyncState } from "@/app/(site)/[eventSlug]/replica/sync-state";
 
 export type DayWithSessions = Day & { sessions: Session[] };
 
@@ -76,6 +77,7 @@ export interface EventContextType {
   // pages don't treat a stale `now` as current (e.g. bookable-slot checks).
   now: Date;
   meetingsRevision: number;
+  sync: SyncState;
   rsvpdForSession: (sessionId: string) => boolean;
   localSessions: Session[];
   userBusySessions: () => Session[];
@@ -97,6 +99,7 @@ export const EventContext = createContext<EventContextType>({
   myMeetings: null,
   now: new Date(0),
   meetingsRevision: 0,
+  sync: "live",
   localSessions: [],
   userBusySessions: () => [],
   rsvpdForSession: () => false,
