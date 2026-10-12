@@ -194,7 +194,7 @@ export interface GuestsRepository {
    * The guests an event shows everyone, with the lean fields: its members and
    * its sessions' hosts (ADR 0014).
    */
-  listShownByEvent(eventId: string): Promise<Guest[]>;
+  listShownByEvent(eventId: string): Promise<(Guest & { member: boolean })[]>;
   /** The lean fields, by id. */
   listByIds(ids: string[]): Promise<Guest[]>;
   /** One event's guests with their whole public profile. */

@@ -5798,7 +5798,7 @@ export interface components {
       locations: components["schemas"]["SnapshotLocation"][];
       unavailability: components["schemas"]["Unavailability"][];
       /** @description Members and session hosts */
-      guests: components["schemas"]["EventGuest"][];
+      guests: components["schemas"]["SnapshotGuest"][];
       sessions: components["schemas"]["SnapshotSession"][];
       /** @description RSVPs by session */
       counts: {
@@ -5862,13 +5862,15 @@ export interface components {
       /** Format: date-time */
       end: string;
     };
-    EventGuest: {
+    SnapshotGuest: {
       id: string;
       name: string;
       avatarUrl: string | null;
       aboutMe: string | null;
       authProtected: boolean;
       profileVersion: number;
+      /** @description false for a host who is not one */
+      member: boolean;
     };
     SnapshotSession: {
       id: string;
@@ -5887,6 +5889,14 @@ export interface components {
       version: number;
       hostIds: string[];
       locationIds: string[];
+    };
+    EventGuest: {
+      id: string;
+      name: string;
+      avatarUrl: string | null;
+      aboutMe: string | null;
+      authProtected: boolean;
+      profileVersion: number;
     };
     Location: {
       id: string;

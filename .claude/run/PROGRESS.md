@@ -450,12 +450,37 @@ cursor.invalid`. The use case now returns the whole list; the
   resolves the viewer with `actingGuest` inside the `uow.read`, for the
   route and for 10c's SSR; `event.notFound` says "Event not found"; the
   route's description names the `guest` cookie.
+- 10c: the layout calls `eventSnapshot(actor, slug)` (`server/composition.ts`,
+  since `app/` may not import `server/feed/`) and `eventContextFrom`
+  (`app/(site)/[eventSlug]/replica/selectors.ts`) rebuilds today's shapes:
+  host names, room names and `numRsvps` joined in, dates parsed. The
+  selectors live with the client store (ADR 0014 section 12, amended), not
+  in `packages/domain`, which may import nothing but itself. Snapshot guests
+  gained `member` (contract, golden files, ADR section 1): the host picker
+  and the attendee count in `EventContext.guests` stay members only. A host
+  or room missing from the snapshot is left out of a session rather than
+  shown unnamed. `myMeetings` still comes from `myMeetingsFor` (clash lines
+  need other guests' RSVPs) until step 14. E2E run: scheduling,
+  schedule-agenda, -grid-search, -layout, kiosk, rsvp, view-session,
+  add-session, update-session, meetings-column, room-availability,
+  now-line, attendee-count, voting, user-auth (71 passed).
+- 10c review, accepted: free slots come from the snapshot's `me`; the
+  meeting views (clash lines) still come from `meetingViewsFor`, which reads
+  the meetings again outside the snapshot's read (step 14 replaces it with
+  the meetings column's own fetch). The guest mapping is checked with
+  `satisfies`; the ADR paragraphs are reflowed.
 
 ## Problems
 
 None.
 
 ## Questions
+
+- 10c, for step 11: ADR 0014 section 12 puts `Replica` and `apply` in
+  `packages/domain`, but domain may not import `packages/contracts`, where
+  the snapshot and feed message types live. Options: domain defines the
+  replica's types itself and the contracts' schemas are checked against them
+  (`satisfies`), or `apply` lives with the client store. Step 11 needs one.
 
 - 8 (ADR 0014, open questions): should attendees be told when a day or
   location delete removes or changes their sessions (today: no; the ADR
@@ -476,4 +501,4 @@ None.
 
 ## Next step
 
-10c.
+11.

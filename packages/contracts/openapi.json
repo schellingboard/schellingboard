@@ -541,7 +541,7 @@
           },
           "guests": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/EventGuest" },
+            "items": { "$ref": "#/components/schemas/SnapshotGuest" },
             "description": "Members and session hosts"
           },
           "sessions": {
@@ -699,7 +699,7 @@
         },
         "required": ["id", "eventId", "locationId", "start", "end"]
       },
-      "EventGuest": {
+      "SnapshotGuest": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -707,7 +707,11 @@
           "avatarUrl": { "type": ["string", "null"] },
           "aboutMe": { "type": ["string", "null"] },
           "authProtected": { "type": "boolean" },
-          "profileVersion": { "type": "integer" }
+          "profileVersion": { "type": "integer" },
+          "member": {
+            "type": "boolean",
+            "description": "false for a host who is not one"
+          }
         },
         "required": [
           "id",
@@ -715,7 +719,8 @@
           "avatarUrl",
           "aboutMe",
           "authProtected",
-          "profileVersion"
+          "profileVersion",
+          "member"
         ]
       },
       "SnapshotSession": {
@@ -751,6 +756,25 @@
           "version",
           "hostIds",
           "locationIds"
+        ]
+      },
+      "EventGuest": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "avatarUrl": { "type": ["string", "null"] },
+          "aboutMe": { "type": ["string", "null"] },
+          "authProtected": { "type": "boolean" },
+          "profileVersion": { "type": "integer" }
+        },
+        "required": [
+          "id",
+          "name",
+          "avatarUrl",
+          "aboutMe",
+          "authProtected",
+          "profileVersion"
         ]
       },
       "Location": {

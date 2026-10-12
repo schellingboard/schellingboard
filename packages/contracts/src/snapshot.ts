@@ -27,6 +27,10 @@ export const eventGuestSchema = z
   })
   .meta({ id: "EventGuest" });
 
+export const snapshotGuestSchema = eventGuestSchema
+  .extend({ member: z.boolean().describe("false for a host who is not one") })
+  .meta({ id: "SnapshotGuest" });
+
 export const snapshotSchema = z
   .object({
     seq: z.number().int().describe("Resume the feed after this"),
@@ -34,7 +38,7 @@ export const snapshotSchema = z
     days: z.array(dayViewSchema),
     locations: z.array(snapshotLocationSchema),
     unavailability: z.array(unavailabilityViewSchema),
-    guests: z.array(eventGuestSchema).describe("Members and session hosts"),
+    guests: z.array(snapshotGuestSchema).describe("Members and session hosts"),
     sessions: z.array(snapshotSessionSchema),
     counts: z.record(z.string(), z.number().int()).describe("RSVPs by session"),
     meetingPoints: z.array(meetingPointSchema),

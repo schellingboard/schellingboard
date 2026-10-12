@@ -109,6 +109,16 @@ function rowToGuest(row: typeof schema.guests.$inferSelect): CompleteGuest {
   };
 }
 
+const LEAN_FIELDS = {
+  id: schema.guests.id,
+  name: schema.guests.name,
+  avatarUrl: schema.guests.avatarUrl,
+  aboutMe: schema.guests.aboutMe,
+  authProtected: schema.guests.authProtected,
+  version: schema.guests.version,
+  profileVersion: schema.guests.profileVersion,
+};
+
 export class SqliteGuestsRepository implements GuestsRepository {
   constructor(private readonly db: DB) {}
 
@@ -168,13 +178,23 @@ export class SqliteGuestsRepository implements GuestsRepository {
     return rows;
   }
 
-  async listShownByEvent(eventId: string): Promise<Guest[]> {
-    const shown = sql`
-      SELECT guest_id FROM event_guests WHERE event_id = ${eventId}
-      UNION SELECT sh.guest_id FROM session_hosts sh
-        JOIN sessions s ON s.id = sh.session_id WHERE s.event_id = ${eventId}
-`;
-    return this.listLean(sql`${schema.guests.id} IN (${shown})`);
+  async listShownByEvent(
+    eventId: string
+  ): Promise<(Guest & { member: boolean })[]> {
+    const g = schema.guests;
+    const members = sql`SELECT guest_id FROM event_guests WHERE event_id = ${eventId}`;
+    const hosts = sql`SELECT sh.guest_id FROM session_hosts sh
+      JOIN sessions s ON s.id = sh.session_id WHERE s.event_id = ${eventId}`;
+    return this.db
+      .select({
+        ...LEAN_FIELDS,
+        member: sql<number>`${g.id} IN (${members})`,
+      })
+      .from(g)
+      .where(sql`${g.id} IN (${members}) OR ${g.id} IN (${hosts})`)
+      .orderBy(g.name, g.id)
+      .all()
+      .map((row) => ({ ...row, member: Boolean(row.member), info: undefined }));
   }
 
   async listByIds(ids: string[]): Promise<Guest[]> {
@@ -183,20 +203,11 @@ export class SqliteGuestsRepository implements GuestsRepository {
   }
 
   private listLean(where: SQL): Guest[] {
-    const g = schema.guests;
     return this.db
-      .select({
-        id: g.id,
-        name: g.name,
-        avatarUrl: g.avatarUrl,
-        aboutMe: g.aboutMe,
-        authProtected: g.authProtected,
-        version: g.version,
-        profileVersion: g.profileVersion,
-      })
-      .from(g)
+      .select(LEAN_FIELDS)
+      .from(schema.guests)
       .where(where)
-      .orderBy(g.name, g.id)
+      .orderBy(schema.guests.name, schema.guests.id)
       .all()
       .map((row) => ({ ...row, info: undefined }));
   }
