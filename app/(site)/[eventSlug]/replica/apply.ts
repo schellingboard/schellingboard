@@ -9,6 +9,7 @@ export function apply(replica: Snapshot, message: FeedMessage): Snapshot {
   if (message.seq <= replica.seq) return replica;
   const next = { ...replica, seq: message.seq };
   switch (message.type) {
+    case "session.created":
     case "session.changed": {
       const { session } = message;
       const at = next.sessions.findIndex((s) => s.id === session.id);
@@ -25,6 +26,29 @@ export function apply(replica: Snapshot, message: FeedMessage): Snapshot {
       next.counts = Object.fromEntries(
         Object.entries(next.counts).filter(([id]) => id !== message.sessionId)
       );
+      return next;
+    }
+    case "session.attendanceChanged": {
+      if (message.sessionId in next.counts)
+        next.counts = { ...next.counts, [message.sessionId]: message.numRsvps };
+      return next;
+    }
+    case "rsvp.added": {
+      const { me } = next;
+      if (
+        me?.guestId === message.rsvp.guestId &&
+        !me.rsvps.some((r) => r.id === message.rsvp.id)
+      )
+        next.me = { ...me, rsvps: [...me.rsvps, message.rsvp] };
+      return next;
+    }
+    case "rsvp.removed": {
+      const { me } = next;
+      if (me?.guestId === message.guestId)
+        next.me = {
+          ...me,
+          rsvps: me.rsvps.filter((r) => r.sessionId !== message.sessionId),
+        };
       return next;
     }
     default:

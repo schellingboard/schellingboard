@@ -1,9 +1,23 @@
 import { changes, type ChangeContext } from "@schellingboard/domain/change";
-import type { Session } from "@schellingboard/domain/session";
+import type {
+  Rsvp,
+  Session,
+  SessionCreateInput,
+} from "@schellingboard/domain/session";
 import type { Tx } from "@/server/kernel/unit-of-work";
 import type { SessionDeps } from "../ports";
 
 type SessionPatch = Parameters<SessionDeps["repos"]["sessions"]["update"]>[1];
+
+export async function addSession(
+  tx: Tx,
+  input: SessionCreateInput,
+  by: ChangeContext
+): Promise<Session> {
+  const created = await tx.sessions.create(input);
+  tx.record(changes.sessionCreated(created, by));
+  return created;
+}
 
 /** Updates the session and records the change, if there is one. */
 export async function changeSession(
@@ -29,6 +43,10 @@ export async function removeSession(
   if (!session) return;
   const rsvps = await tx.rsvps.listBySession(id);
   await tx.sessions.delete(id);
+  for (const rsvp of rsvps)
+    tx.record(
+      changes.rsvpRemoved(rsvp.id, id, rsvp.guestId, session.eventId, by)
+    );
   tx.record(
     changes.sessionDeleted(
       session,
@@ -36,4 +54,35 @@ export async function removeSession(
       by
     )
   );
+}
+
+/** Records an RSVP the caller has just stored, and the count it brought. */
+export async function recordRsvpAdded(
+  tx: Tx,
+  rsvp: Rsvp,
+  by: ChangeContext
+): Promise<void> {
+  const session = await tx.sessions.findById(rsvp.sessionId);
+  if (!session) throw new Error(`RSVP ${rsvp.id} has no session`);
+  tx.record(changes.rsvpAdded(rsvp, session.eventId, by));
+  tx.record(changes.sessionAttendanceChanged(session, session.numRsvps, by));
+}
+
+export async function removeRsvp(
+  tx: Tx,
+  sessionId: string,
+  guestId: string,
+  by: ChangeContext
+): Promise<void> {
+  const rsvp = (await tx.rsvps.listBySession(sessionId)).find(
+    (r) => r.guestId === guestId
+  );
+  if (!rsvp) return;
+  await tx.rsvps.deleteBySessionAndGuest(sessionId, guestId);
+  const session = await tx.sessions.findById(sessionId);
+  if (!session) throw new Error(`RSVP ${rsvp.id} has no session`);
+  tx.record(
+    changes.rsvpRemoved(rsvp.id, sessionId, guestId, session.eventId, by)
+  );
+  tx.record(changes.sessionAttendanceChanged(session, session.numRsvps, by));
 }

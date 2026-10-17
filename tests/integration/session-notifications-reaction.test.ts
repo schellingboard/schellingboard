@@ -16,6 +16,8 @@ import {
 } from "../helpers/factories";
 import { runJobs } from "../helpers/jobs";
 import { getRepositories } from "@/db/container";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
+import { recordRsvpAdded } from "@/server/modules/sessions/module";
 import { pruneChanges } from "@/utils/jobs/reactions";
 
 const AT = new Date("2026-06-01T10:00:00.000Z");
@@ -92,5 +94,39 @@ describe("session notifications from the change log", () => {
     await pruneChanges.run(new Date(AT.getTime() + 8 * DAY_MS));
 
     expect(await changes.listAfter(0)).toHaveLength(1);
+  });
+
+  it("sends nothing for RSVPs, and still reaches the changes after them", async () => {
+    const event = await createEvent();
+    const host = await createGuest({ email: "host@test.example" });
+    const rsvper = await createGuest({ email: "rsvper@test.example" });
+    const session = await createSession(event.id, {
+      hostIds: [host.id],
+      startTime: new Date("2026-06-02T09:00:00.000Z"),
+      endTime: new Date("2026-06-02T10:00:00.000Z"),
+    });
+    await unitOfWork.run(async (tx) => {
+      const rsvp = await tx.rsvps.create({
+        sessionId: session.id,
+        guestId: rsvper.id,
+      });
+      await recordRsvpAdded(tx, rsvp, BY_TEST_AT);
+    });
+    await runJobs();
+    expect(sendMail).not.toHaveBeenCalled();
+
+    await updateLoggedSession(
+      session.id,
+      {
+        startTime: new Date("2026-06-02T11:00:00.000Z"),
+        endTime: new Date("2026-06-02T12:00:00.000Z"),
+      },
+      { actor: { type: "guest", id: host.id }, at: AT }
+    );
+    await runJobs();
+
+    expect(vi.mocked(sendMail).mock.calls.map(([m]) => m.to)).toEqual([
+      "rsvper@test.example",
+    ]);
   });
 });

@@ -21,6 +21,7 @@ import {
   placementFailure,
   type SessionBooking,
 } from "./booking";
+import { addSession } from "./session-changes";
 
 export interface CreateSessionInput extends SessionBooking {
   locationId: string;
@@ -92,7 +93,10 @@ export const createSession =
       );
       if (placement) return placementFailure(placement);
 
-      const created = await tx.sessions.create(session);
+      const created = await addSession(tx, session, {
+        actor: { type: "guest", id: acting.value },
+        at: now,
+      });
       return ok({ created, actingId: acting.value });
     });
     if (!result.ok) return result;

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { legacyActor, legacyRefusal } from "@/app/api/legacy";
 import { sessionUseCases } from "@/server/composition";
+import { requestNow } from "@/utils/dev-clock";
 import { requireProxyVerifiedAdmin } from "@/utils/auth";
 
 export const dynamic = "force-dynamic";
@@ -47,10 +48,11 @@ export async function POST(req: Request) {
     );
   }
 
-  const result = await sessionUseCases().adminAddRsvp(await legacyActor(req), {
-    sessionId,
-    guestId,
-  });
+  const result = await sessionUseCases().adminAddRsvp(
+    await legacyActor(req),
+    { sessionId, guestId },
+    requestNow(req)
+  );
   if (!result.ok) return legacyRefusal(result.error);
 
   const { rsvp, created } = result.value;

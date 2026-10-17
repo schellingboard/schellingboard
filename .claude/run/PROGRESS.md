@@ -489,6 +489,18 @@ cursor.invalid`. The use case now returns the whole list; the
   gaps and duplicate deliveries; the harness takes a `viewer`. The command
   key's actor is coarser than ADR 0012's key scope (no admin id, no cookie
   level): written down in ADR 0014 section 10, not changed.
+- 12a: new changes `session.created`, `session.attendanceChanged` (event),
+  `rsvp.added`, `rsvp.removed` (guests: the RSVPer), each with a message, a
+  `project` case, an `apply` case and a sufficiency test. Helpers in
+  `sessions/application/session-changes.ts`: `addSession`, `recordRsvpAdded`
+  (the RSVP row, then the new count), `removeRsvp` (no-op when absent).
+  `removeSession` records `rsvp.removed` per RSVPer before `session.deleted`
+  (the session's own cascade); no count change, `apply` drops the count.
+  `rsvp`, `withdrawRsvp`, `adminRemoveRsvp` now run in `uow.run`;
+  `adminSeedSession`, `adminAddRsvp`, `adminRemoveRsvp` take `now` (callers
+  pass the request clock). The reaction ignores the new types already (it
+  tests for its two). Not done, left to 12b/12c: the `cascade: true` marker
+  and the cascading changes of day, location, event and guest deletes.
 
 ## Problems
 

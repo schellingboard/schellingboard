@@ -9,7 +9,7 @@ import type {
   Change,
   RecordedChange,
 } from "@schellingboard/domain/change";
-import type { Session } from "@schellingboard/domain/session";
+import type { Rsvp, Session } from "@schellingboard/domain/session";
 
 type DB = BetterSQLite3Database<typeof schema>;
 type ChangeRow = typeof schema.changes.$inferSelect;
@@ -70,6 +70,36 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
         },
       };
     }
+    case "session.created": {
+      const payload = row.payload as { session: Session };
+      return {
+        ...common,
+        type: "session.created",
+        subjectType: "session",
+        payload: { session: reviveSession(payload.session) },
+      };
+    }
+    case "session.attendanceChanged":
+      return {
+        ...common,
+        type: "session.attendanceChanged",
+        subjectType: "session",
+        payload: row.payload as { numRsvps: number },
+      };
+    case "rsvp.added":
+      return {
+        ...common,
+        type: "rsvp.added",
+        subjectType: "rsvp",
+        payload: row.payload as { rsvp: Rsvp },
+      };
+    case "rsvp.removed":
+      return {
+        ...common,
+        type: "rsvp.removed",
+        subjectType: "rsvp",
+        payload: row.payload as { sessionId: string; guestId: string },
+      };
     default:
       throw new Error(`Unknown change type in the log: ${row.type}`);
   }
@@ -78,8 +108,12 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
 // A reader skips types it does not know, such as rows written by a newer
 // version before a rollback, rather than stopping at them.
 const KNOWN_TYPES: RecordedChange["type"][] = [
+  "session.created",
   "session.changed",
   "session.deleted",
+  "session.attendanceChanged",
+  "rsvp.added",
+  "rsvp.removed",
 ];
 
 export class SqliteChangesRepository implements ChangesRepository {

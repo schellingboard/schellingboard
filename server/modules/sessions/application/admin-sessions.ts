@@ -13,7 +13,7 @@ import {
 import type { Tx } from "@/server/kernel/unit-of-work";
 import type { SessionDeps } from "../ports";
 import { changedMeanwhile } from "./booking";
-import { changeSession, removeSession } from "./session-changes";
+import { addSession, changeSession, removeSession } from "./session-changes";
 
 export interface AdminSessionFields {
   title: string;
@@ -152,6 +152,7 @@ export const adminCreateSession =
     if (!actor.admin) return adminRequired();
     const fields = checked(input);
     if (!fields.ok) return fields;
+    const by: ChangeContext = { actor: { type: "admin" }, at: now };
     const result = await deps.uow.run(async (tx) => {
       if (!(await tx.events.findById(eventId)))
         return notFound("event.notFound", "Event not found");
@@ -159,7 +160,7 @@ export const adminCreateSession =
       if (unknown) return unknown;
       const clashing = await clash(tx, eventId, fields.value);
       if (clashing) return clashing;
-      return ok(await tx.sessions.create({ ...fields.value, eventId }));
+      return ok(await addSession(tx, { ...fields.value, eventId }, by));
     });
     if (!result.ok) return result;
     await deps.notifyCohostsAdded({
@@ -235,7 +236,8 @@ export const adminSeedSession =
   ({ uow }: SessionDeps) =>
   async (
     actor: Actor,
-    input: AdminSeedSessionInput
+    input: AdminSeedSessionInput,
+    now: Date
   ): Promise<Result<Session>> => {
     if (!actor.admin) return adminRequired();
     const title = input.title.trim();
@@ -248,12 +250,16 @@ export const adminSeedSession =
     if (endTime <= startTime)
       return timeInvalid("End time must be after start time");
 
-    return uow.run((tx) => seeded(tx, { ...input, title, startTime, endTime }));
+    const by: ChangeContext = { actor: { type: "admin" }, at: now };
+    return uow.run((tx) =>
+      seeded(tx, { ...input, title, startTime, endTime }, by)
+    );
   };
 
 async function seeded(
   tx: Tx,
-  input: AdminSeedSessionInput & { startTime: Date; endTime: Date }
+  input: AdminSeedSessionInput & { startTime: Date; endTime: Date },
+  by: ChangeContext
 ): Promise<Result<Session>> {
   const { hostIds, locationIds } = input;
   const event = await tx.events.findBySlug(input.eventSlug);
@@ -283,10 +289,7 @@ async function seeded(
   const clashing = await clash(tx, event.id, fields);
   if (clashing) return clashing;
 
-  const created = await tx.sessions.create({
-    ...fields,
-    eventId: event.id,
-  });
+  const created = await addSession(tx, { ...fields, eventId: event.id }, by);
   if (hostIds.length > 0) await tx.guests.assignToEvent(event.id, hostIds);
   if (locationIds.length > 0)
     await tx.locations.assignToEvent(event.id, locationIds);

@@ -115,10 +115,11 @@ export function addRsvpRoutes(app: App, sessions: () => SessionUseCases) {
 
   app.openapi(adminAddRsvp, async (c) => {
     const { id, guestId } = c.req.valid("param");
-    const result = await sessions().adminAddRsvp(c.var.actor, {
-      sessionId: id,
-      guestId,
-    });
+    const result = await sessions().adminAddRsvp(
+      c.var.actor,
+      { sessionId: id, guestId },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error);
     const { rsvp, created } = result.value;
     return c.json(rsvp, created ? 201 : 200);
@@ -126,10 +127,11 @@ export function addRsvpRoutes(app: App, sessions: () => SessionUseCases) {
 
   app.openapi(adminRemoveRsvp, async (c) => {
     const { id, guestId } = c.req.valid("param");
-    const result = await sessions().adminRemoveRsvp(c.var.actor, {
-      sessionId: id,
-      guestId,
-    });
+    const result = await sessions().adminRemoveRsvp(
+      c.var.actor,
+      { sessionId: id, guestId },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);
   });

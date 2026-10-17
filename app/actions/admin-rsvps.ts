@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { sessionUseCases } from "@/server/composition";
 import { resolveActor } from "@/server/kernel/actor";
+import { serverNow } from "@/utils/dev-clock-server";
 import type { AdminActionResult } from "./admin-guests";
 
 export async function adminRemoveRsvpAction(input: {
@@ -11,7 +12,11 @@ export async function adminRemoveRsvpAction(input: {
   guestId: string;
 }): Promise<AdminActionResult> {
   const actor = await resolveActor(await cookies());
-  const result = await sessionUseCases().adminRemoveRsvp(actor, input);
+  const result = await sessionUseCases().adminRemoveRsvp(
+    actor,
+    input,
+    await serverNow()
+  );
   if (!result.ok)
     return { ok: false, error: result.error.detail ?? "Failed to remove RSVP" };
 
