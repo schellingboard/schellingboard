@@ -10,12 +10,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+> **Breaking change**: behind a reverse proxy, set `SB_TRUSTED_PROXIES` (usually `1`) when
+> upgrading. Without it, everyone shares one limit on failed logins, so a few mistyped site
+> passwords can lock all visitors out for some minutes.
+
 ### Added
 
 - **An API for scripts and integrations** (#677): organizers can set up events, rooms,
   guests and sessions from a script over a documented, versioned API, with a reference
   at `/api/v1/docs`. Edits made from an outdated copy are refused, not overwritten, and
   long lists come in pages.
+
+### Changed
+
+- **Self-hosters behind a reverse proxy must set `SB_TRUSTED_PROXIES`** (#679): the
+  app no longer trusts the forwarded address by default, so without it all visitors
+  share one limit on failed logins.
 
 ### Fixed
 

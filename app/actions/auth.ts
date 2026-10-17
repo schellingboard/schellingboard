@@ -11,10 +11,10 @@ import {
 import { cookies, headers } from "next/headers";
 import {
   TOO_MANY_ATTEMPTS_ERROR,
-  clientKeyFromHeaders,
-  isLoginBlocked,
+  clientIp,
+  loginRetryAfter,
   recordLoginFailure,
-} from "@/utils/login-rate-limit";
+} from "@/server/kernel/rate-limit";
 
 // Deliberately does not redirect(): see logoutAction below for why a
 // server-action redirect is unsafe here — the (site) layout persists across
@@ -35,8 +35,8 @@ export async function loginAction(
     return { error: "Password is required" };
   }
 
-  const clientKey = clientKeyFromHeaders(await headers());
-  if (isLoginBlocked("site", clientKey)) {
+  const clientKey = clientIp(await headers());
+  if (loginRetryAfter("site", clientKey) > 0) {
     return { error: TOO_MANY_ATTEMPTS_ERROR };
   }
 

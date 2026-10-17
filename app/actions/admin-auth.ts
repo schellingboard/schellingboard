@@ -11,10 +11,10 @@ import { redirect } from "next/navigation";
 import { cookies, headers } from "next/headers";
 import {
   TOO_MANY_ATTEMPTS_ERROR,
-  clientKeyFromHeaders,
-  isLoginBlocked,
+  clientIp,
+  loginRetryAfter,
   recordLoginFailure,
-} from "@/utils/login-rate-limit";
+} from "@/server/kernel/rate-limit";
 
 export async function adminLoginAction(
   prevState: { error: string } | null,
@@ -34,8 +34,8 @@ export async function adminLoginAction(
     return { error: "Password is required" };
   }
 
-  const clientKey = clientKeyFromHeaders(await headers());
-  if (isLoginBlocked("admin", clientKey)) {
+  const clientKey = clientIp(await headers());
+  if (loginRetryAfter("admin", clientKey) > 0) {
     return { error: TOO_MANY_ATTEMPTS_ERROR };
   }
 

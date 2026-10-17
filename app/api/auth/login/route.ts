@@ -9,10 +9,10 @@ import {
 } from "@/utils/auth";
 import {
   TOO_MANY_ATTEMPTS_ERROR,
-  clientKeyFromHeaders,
-  isLoginBlocked,
+  clientIp,
+  loginRetryAfter,
   recordLoginFailure,
-} from "@/utils/login-rate-limit";
+} from "@/server/kernel/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unknown scope" }, { status: 400 });
   }
 
-  const clientKey = clientKeyFromHeaders(req.headers);
+  const clientKey = clientIp(req.headers);
 
   if (scope === "admin") {
     if (!isAdminEnabled()) {
@@ -49,10 +49,11 @@ export async function POST(req: Request) {
         { status: 403 }
       );
     }
-    if (isLoginBlocked("admin", clientKey)) {
+    const wait = loginRetryAfter("admin", clientKey);
+    if (wait > 0) {
       return NextResponse.json(
         { error: TOO_MANY_ATTEMPTS_ERROR },
-        { status: 429 }
+        { status: 429, headers: { "retry-after": String(wait) } }
       );
     }
     if (!verifyAdminPassword(password)) {
@@ -69,10 +70,11 @@ export async function POST(req: Request) {
   if (!isPasswordProtectionEnabled()) {
     return NextResponse.json({ ok: true });
   }
-  if (isLoginBlocked("site", clientKey)) {
+  const wait = loginRetryAfter("site", clientKey);
+  if (wait > 0) {
     return NextResponse.json(
       { error: TOO_MANY_ATTEMPTS_ERROR },
-      { status: 429 }
+      { status: 429, headers: { "retry-after": String(wait) } }
     );
   }
   if (!verifyPassword(password)) {

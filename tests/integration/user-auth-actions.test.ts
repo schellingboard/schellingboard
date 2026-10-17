@@ -52,10 +52,10 @@ import {
 } from "@/utils/auth";
 import { MAX_CODE_ATTEMPTS, hashUserPassword } from "@/utils/user-credentials";
 import {
-  MAX_EMAILS_PER_GUEST_PER_DAY,
-  MAX_LOGIN_FAILURES_PER_CLIENT,
-  resetLoginRateLimiter,
-} from "@/utils/login-rate-limit";
+  EMAIL_LIMIT,
+  LOGIN_LIMITS,
+  resetRateLimits,
+} from "@/server/kernel/rate-limit";
 import {
   changePasswordAction,
   disableProtectionAction,
@@ -134,7 +134,7 @@ describe("user auth actions", () => {
 
   beforeEach(async () => {
     resetTestDb();
-    resetLoginRateLimiter();
+    resetRateLimits();
     cookieJar.clear();
     vi.mocked(sendMail).mockReset();
     vi.mocked(isMailerConfigured).mockReturnValue(true);
@@ -177,7 +177,7 @@ describe("user auth actions", () => {
     });
 
     // REQUEST_THROTTLE_SECONDS bounds the *rate*, not the total: a stream of
-    // successful requests never trips isLoginBlocked, which counts only
+    // successful requests never trips the login limit, which counts only
     // failures. Without a cumulative cap one guest id buys ~1,440 emails a
     // day to that attendee's inbox, indefinitely.
     it("caps how many codes a guest can be sent in a day", async () => {
@@ -186,23 +186,19 @@ describe("user auth actions", () => {
 
       // Two minutes apart so each request clears REQUEST_THROTTLE_SECONDS and
       // the daily cap, not the rate throttle, is what finally refuses one.
-      for (let i = 0; i < MAX_EMAILS_PER_GUEST_PER_DAY; i++) {
+      for (let i = 0; i < EMAIL_LIMIT.capacity; i++) {
         vi.setSystemTime(new Date(Date.UTC(2026, 6, 18, 12, i * 2, 0)));
         expect((await requestLoginCodeAction(guest.id)).ok).toBe(true);
       }
-      expect(vi.mocked(sendMail)).toHaveBeenCalledTimes(
-        MAX_EMAILS_PER_GUEST_PER_DAY
-      );
+      expect(vi.mocked(sendMail)).toHaveBeenCalledTimes(EMAIL_LIMIT.capacity);
 
-      vi.setSystemTime(new Date(Date.UTC(2026, 6, 18, 23, 0, 0)));
+      vi.setSystemTime(new Date(Date.UTC(2026, 6, 18, 12, 40, 0)));
       const capped = await requestLoginCodeAction(guest.id);
       expect(capped.ok).toBe(false);
-      expect(vi.mocked(sendMail)).toHaveBeenCalledTimes(
-        MAX_EMAILS_PER_GUEST_PER_DAY
-      );
+      expect(vi.mocked(sendMail)).toHaveBeenCalledTimes(EMAIL_LIMIT.capacity);
 
-      // A day later the budget is fresh again.
-      vi.setSystemTime(new Date(Date.UTC(2026, 6, 19, 12, 30, 0)));
+      // The budget refills one code per twentieth of a day.
+      vi.setSystemTime(new Date(Date.UTC(2026, 6, 18, 13, 52, 0)));
       expect((await requestLoginCodeAction(guest.id)).ok).toBe(true);
     });
 
@@ -212,7 +208,7 @@ describe("user auth actions", () => {
       const flooded = await createGuest();
       const other = await createGuest();
 
-      for (let i = 0; i < MAX_EMAILS_PER_GUEST_PER_DAY; i++) {
+      for (let i = 0; i < EMAIL_LIMIT.capacity; i++) {
         vi.setSystemTime(new Date(Date.UTC(2026, 6, 18, 12, i * 2, 0)));
         expect((await requestLoginCodeAction(flooded.id)).ok).toBe(true);
       }
@@ -226,11 +222,11 @@ describe("user auth actions", () => {
       await freezeClockAt(new Date("2026-07-18T12:00:00Z"));
       const guest = await createGuest();
 
-      for (let i = 0; i < MAX_EMAILS_PER_GUEST_PER_DAY; i++) {
+      for (let i = 0; i < EMAIL_LIMIT.capacity; i++) {
         vi.setSystemTime(new Date(Date.UTC(2026, 6, 18, 12, i * 2, 0)));
         expect((await requestLoginCodeAction(guest.id)).ok).toBe(true);
       }
-      vi.setSystemTime(new Date(Date.UTC(2026, 6, 18, 22, 0, 0)));
+      vi.setSystemTime(new Date(Date.UTC(2026, 6, 18, 12, 40, 0)));
       expect((await requestPasswordLinkAction(guest.id)).ok).toBe(false);
     });
 
@@ -424,7 +420,7 @@ describe("user auth actions", () => {
         authProtected: true,
         passwordHash: await hashUserPassword("hunter2 forever"),
       });
-      for (let i = 0; i < MAX_LOGIN_FAILURES_PER_CLIENT; i++) {
+      for (let i = 0; i < LOGIN_LIMITS.perClient.capacity; i++) {
         expect((await loginAsGuestAction(guest.id, "wrong")).ok).toBe(false);
       }
       // The right password no longer gets in...
@@ -445,7 +441,7 @@ describe("user auth actions", () => {
         authProtected: true,
         passwordHash: await hashUserPassword("hunter2 forever"),
       });
-      for (let i = 0; i < MAX_LOGIN_FAILURES_PER_CLIENT; i++) {
+      for (let i = 0; i < LOGIN_LIMITS.perClient.capacity; i++) {
         await loginAsGuestAction(guest.id, "wrong");
       }
       const blocked = await loginAsGuestAction(guest.id, "hunter2 forever");
@@ -460,7 +456,7 @@ describe("user auth actions", () => {
         authProtected: true,
         passwordHash: await hashUserPassword("hunter2 forever"),
       });
-      for (let i = 0; i < MAX_LOGIN_FAILURES_PER_CLIENT; i++) {
+      for (let i = 0; i < LOGIN_LIMITS.perClient.capacity; i++) {
         await loginAsGuestAction(guest.id, "wrong");
       }
       const blocked = await loginAsGuestAction(guest.id, "hunter2 forever");
@@ -477,7 +473,7 @@ describe("user auth actions", () => {
           passwordHash: await hashUserPassword("hunter2 forever"),
         });
       }
-      for (let i = 0; i < MAX_LOGIN_FAILURES_PER_CLIENT; i++) {
+      for (let i = 0; i < LOGIN_LIMITS.perClient.capacity; i++) {
         await loginAsGuestAction(locked.id, "wrong");
       }
       expect((await loginAsGuestAction(other.id, "hunter2 forever")).ok).toBe(

@@ -37,7 +37,9 @@ your data.
 
 ## Serve it over HTTPS
 
-Put the container behind a reverse proxy with a certificate. Two attendee-facing
+Put the container behind a reverse proxy with a certificate. Set `SB_TRUSTED_PROXIES`
+so the app can tell visitors apart (see
+[Behind a reverse proxy](configuration.md#behind-a-reverse-proxy)). Two attendee-facing
 features only work on an `https://` address, because browsers refuse them
 anywhere else:
 

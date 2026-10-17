@@ -19,6 +19,7 @@ a feature off when unset.
 | `AUTH_SECRET`                   | Yes      | Signs all login cookies — site, admin, and attendee name protection. Random, min 32 chars. Changing it logs everyone out                                  |
 | `DATABASE_URL`                  | No       | SQLite path (default: `file:/data/data.db`)                                                                                                               |
 | `SB_UPLOADS_DIR`                | No       | Dir for admin-uploaded files (default: `./uploads`, `/data/uploads` in Docker)                                                                            |
+| `SB_TRUSTED_PROXIES`            | No       | How many reverse proxies stand in front of the app, e.g. `1` (default: `0`). See [Behind a reverse proxy](#behind-a-reverse-proxy)                        |
 | `HOST_PORT`                     | No       | Host port to bind (default: `3000`, compose only)                                                                                                         |
 | `SCHELLINGBOARD_VERSION`        | No       | Image tag to run, e.g. a release tag (default: `latest`, compose only)                                                                                    |
 | `SMTP_FROM`                     | No       | Sender address for outgoing email                                                                                                                         |
@@ -32,6 +33,20 @@ a feature off when unset.
 | `SB_ENABLE_DEV_TOOLS`           | No       | Set to `1` to enable the dev fake clock on a staging/demo instance. Leave unset in production                                                             |
 | `REMINDER_DISPATCH_INTERVAL_MS` | No       | How often to deliver due attendee-count reminders, in milliseconds (default: `60000`). `0` turns them off entirely — nothing else does, email or no email |
 | `API_DOCS`                      | No       | Set to `false` to stop serving the [API reference](api.md#the-openapi-description) and the OpenAPI document (default: served)                             |
+
+## Behind a reverse proxy
+
+SchellingBoard limits failed logins per visitor, and tells visitors apart by
+their address. Behind a reverse proxy, every request comes from the proxy, so
+set `SB_TRUSTED_PROXIES` to the number of proxies in front of the app (usually
+`1`). The app then reads the visitor's address from the `X-Forwarded-For`
+header, which each proxy must append to (Caddy and Traefik do by default; in
+nginx use `proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for`).
+
+Leave it at `0` when nothing stands in front of the app: a visitor could then
+fake the header to dodge the limit. Without it, all visitors share one limit,
+so a few people mistyping the site password can lock everyone out for some
+minutes.
 
 ## Email
 
