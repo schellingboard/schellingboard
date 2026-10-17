@@ -1,7 +1,6 @@
 import { getRepositories } from "@/db/container";
+import { IDEMPOTENCY_TTL_MS } from "@/server/kernel/idempotency";
 import { PRUNE_IDEMPOTENCY_KEYS, type Job } from "./job";
-
-export const IDEMPOTENCY_TTL_MS = 24 * 60 * 60 * 1000;
 
 export const pruneIdempotencyKeys: Job = {
   name: PRUNE_IDEMPOTENCY_KEYS,

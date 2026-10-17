@@ -226,6 +226,14 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
       actions use the same idempotency store as the middleware (its core moves to the
       kernel), so their changes carry `command_key` too. The replica then matches the RSVP
       echo by `command_key` instead of by the count (step 14). `fixes #141`.
+  - [x] 17a. The claim/run/complete core moves to `server/kernel/idempotency.ts`
+        (`runIdempotent`); the HTTP middleware becomes an adapter over it.
+  - [ ] 17b. Server actions take a key: a wrapper around `runIdempotent` for actions
+        (scope by the cookie actor; a replay returns the stored result), used by the
+        proposal, session and comment create actions; the forms send a key made per
+        form instance.
+  - [ ] 17c. The RSVP toggle sends a key; the replica matches the RSVP echo by
+        `command_key` instead of by the count. `fixes #141`.
 - [ ] 18. **Docs**: ADRs 0012–0014 accepted and matching the code;
       `docs/dev/server.md`; check the public docs (live schedule; API changes;
       self-hosting: proxy buffering, timeouts and HTTP/2 for SSE, the trusted-proxy

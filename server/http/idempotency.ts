@@ -3,14 +3,10 @@ import { createMiddleware } from "hono/factory";
 import { z } from "zod";
 import type { Repositories } from "@/db/container";
 import type { Actor } from "@/server/kernel/actor";
-import { withCommandKey } from "@/server/kernel/command-key";
-import { IDEMPOTENCY_TTL_MS } from "@/utils/jobs/idempotency";
+import { runIdempotent } from "@/server/kernel/idempotency";
 import type { ApiEnv } from "./actor";
 import { problemResponse } from "./problem";
 
-// A request still unfinished after this is taken to have died with its process,
-// so a retry runs again instead of getting 409 until the row expires.
-const ABANDONED_AFTER_MS = 60 * 1000;
 const MAX_KEY_LENGTH = 255;
 const MUTATIONS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
@@ -64,7 +60,7 @@ async function bodyHash(req: Request): Promise<string> {
   return sha256(await req.clone().arrayBuffer());
 }
 
-// ADR 0012 section 5. Runs after the actor middleware, which it scopes keys by.
+// Runs after the actor middleware, which it scopes keys by.
 export function idempotencyMiddleware({
   store,
   now = () => new Date(),
@@ -90,9 +86,8 @@ export function idempotencyMiddleware({
 
     const actor = actorScope(c.var.actor);
     if (actor === null) return next();
-    const repo = store();
-    const at = now();
-    const claim = await repo.claim(
+    const outcome = await runIdempotent(
+      store(),
       {
         actor,
         key,
@@ -100,41 +95,34 @@ export function idempotencyMiddleware({
         path: pathAndQuery(c.req.url),
         bodyHash: await bodyHash(c.req.raw),
       },
-      at,
-      {
-        expiredBefore: new Date(at.getTime() - IDEMPOTENCY_TTL_MS),
-        abandonedBefore: new Date(at.getTime() - ABANDONED_AFTER_MS),
+      now(),
+      async () => {
+        await next();
+        if (c.res.status >= 500) return { value: undefined, response: null };
+        const headers = Object.fromEntries(c.res.headers);
+        delete headers["set-cookie"];
+        const text = await c.res.clone().text();
+        return {
+          value: undefined,
+          response: {
+            status: c.res.status,
+            headers,
+            body: text === "" ? null : text,
+          },
+        };
       }
     );
-    const owner = { actor, key, claimedAt: at };
-    switch (claim.state) {
+    switch (outcome.state) {
       case "keyReused":
         return problemResponse({ status: 422, code: "idempotency.keyReused" });
       case "inProgress":
         return problemResponse({ status: 409, code: "idempotency.inProgress" });
-      case "done": {
-        const { status, headers, body } = claim.response;
+      case "replayed": {
+        const { status, headers, body } = outcome.response;
         return new Response(body, { status, headers });
       }
+      case "ran":
+        return;
     }
-
-    try {
-      await withCommandKey(key, next);
-    } catch (error) {
-      await repo.release(owner);
-      throw error;
-    }
-    if (c.res.status >= 500) {
-      await repo.release(owner);
-      return;
-    }
-    const headers = Object.fromEntries(c.res.headers);
-    delete headers["set-cookie"];
-    const text = await c.res.clone().text();
-    await repo.complete(owner, {
-      status: c.res.status,
-      headers,
-      body: text === "" ? null : text,
-    });
   });
 }
