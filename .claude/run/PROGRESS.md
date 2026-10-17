@@ -809,6 +809,19 @@ None.
   under `idempotentAction`; the session form sends one per opened form (not on
   edit). A reused key answers 409. Not run: E2E (user's rule).
 
+## Questions (17c1 review)
+
+- `rsvp` (sessions/application/rsvps.ts:61) records `rsvp.added` even when the
+  create is a no-op (onConflictDoNothing), so a keyless repeat logs a false
+  change. Pre-existing; left alone. Decide in 17c2 whether the echo match needs it.
+
+## 17c1
+
+- 17c split: the toggle route (`/api/toggle-rsvp`) runs under
+  `idempotentAction`; `useOptimisticRsvps` sends a fresh key per click (a
+  toggle is an intent, not a form). Replica matching, CHANGELOG and docs are
+  17c2. Not run: E2E (user's rule).
+
 ## Next step
 
-17c.
+17c2.

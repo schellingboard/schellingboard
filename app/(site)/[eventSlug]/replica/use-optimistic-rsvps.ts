@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { newIdempotencyKey } from "@/utils/idempotency-key";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import {
   dropFrom,
@@ -71,6 +72,7 @@ export function useOptimisticRsvps(replica: Snapshot) {
       try {
         const response = await fetch("/api/toggle-rsvp", {
           method: "POST",
+          headers: { "Idempotency-Key": newIdempotencyKey() },
           body: JSON.stringify({ guestId, sessionId, remove }),
         });
         if (!response.ok) {

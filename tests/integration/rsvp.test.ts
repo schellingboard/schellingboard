@@ -6,6 +6,7 @@ import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import type { Rsvp } from "@schellingboard/domain/session";
+import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 import { POST as toggleRsvp } from "@/app/api/toggle-rsvp/route";
 import { GET as getRsvps } from "@/app/api/rsvps/route";
 
@@ -53,6 +54,31 @@ describe("POST /api/toggle-rsvp", () => {
     expect(removeRes.ok).toBe(true);
 
     expect(await rsvpsForGuest(guest.id)).toHaveLength(0);
+  });
+
+  it("records the Idempotency-Key on the change and ignores a repeat", async () => {
+    const event = await createEvent({ phase: "scheduling" });
+    const guest = await createGuest({ eventId: event.id });
+    const session = await createSession(event.id);
+    const send = () =>
+      toggleRsvp(
+        new Request("http://test/api/toggle-rsvp", {
+          method: "POST",
+          body: JSON.stringify({ sessionId: session.id, guestId: guest.id }),
+          headers: {
+            cookie: `${GUEST_COOKIE_NAME}=${openGuestValue(guest.id)}`,
+            "idempotency-key": "click-1",
+          },
+        })
+      );
+
+    expect((await send()).ok).toBe(true);
+    expect((await send()).ok).toBe(true);
+
+    const added = (await getRepositories().changes.listAfter(0)).filter(
+      (c) => c.type === "rsvp.added"
+    );
+    expect(added.map((c) => c.commandKey)).toEqual(["click-1"]);
   });
 
   it("removing an absent RSVP is a no-op", async () => {
