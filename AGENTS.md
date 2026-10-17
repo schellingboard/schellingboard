@@ -244,7 +244,7 @@ conversation, are the state of the run.
 
 - Do one PLAN.md step at a time in an `implementer` subagent. Keep the same one for
   the next step (`SendMessage`), with the step and the PROGRESS.md entries it needs.
-  Start a fresh one only when its context is at or above 300k tokens at the end of a
+  Start a fresh one only when its context is at or above 200k tokens at the end of a
   step, as the Agent result's usage shows; a fresh one shares no memory with you.
 - After every step, run a fresh `reviewer` subagent on its commit. It changes nothing.
   Pass its report verbatim to the implementer, which evaluates each finding
