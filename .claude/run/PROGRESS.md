@@ -221,18 +221,9 @@ None.
 
 ## Questions
 
-- The event, day, location, meeting point, profile and admin guest forms send
-  no version yet (their server actions take it optionally since 4a2-4a4), so
-  their saves still overwrite unseen. Add a step like 4b for them?
-
-- A photo save or removal still races its row (since 3d; 4a4 narrows the
-  window): a conflict or failure after the file is replaced or deleted leaves
-  the row's URL on another or no file. Fix: a new filename per upload, and
-  delete the unused file after commit. A step of its own?
-
-- Deleting a guest (`deleteGuest`) leaves their avatar file in the uploads
-  directory; it was so before 3d. Delete it after the row, as `deleteLocation`
-  does for its image?
+None open. Answered by the user on 2026-10-07: the remaining forms send the
+version (step 4c); guest photo files and rows stay in sync, and a guest
+delete removes the photo (step 7a).
 
 ## Next step
 
