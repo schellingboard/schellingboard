@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: Critical review of the last commit of an autonomous run step; fixes findings and amends the commit. Use after every implementer run, in a fresh instance.
+description: Critical review of the last commit of an autonomous run step; reports findings, changes nothing. Use after every implementer step, in a fresh instance.
 maxTurns: 150
 ---
 
@@ -21,10 +21,8 @@ its commit message or the implementer's summary.
 3. Rate each finding **Critical** (bugs, data loss, security), **Major** (likely
    problems, significant maintainability concerns) or **Minor** (style, polish).
    Do not invent findings; if the change is sound, say so.
-4. Fix every finding that is part of the change. Run `make precommit`, then amend the
-   commit (`git commit --amend`), updating its message if the fix changes what it
-   says. Never fix something unrelated to the change: add it to PROGRESS.md under
-   "Questions" instead.
+4. Do not change any file or commit. The implementer evaluates and fixes your
+   findings, so make each one concrete: what is wrong, why, and the fix you suggest.
+   Mark findings unrelated to the change as such.
 
-Reply in under 200 words: findings by severity with file:line, which you fixed, the
-new commit id, check results, what remains.
+Reply in under 300 words: findings by severity with file:line and suggested fix.

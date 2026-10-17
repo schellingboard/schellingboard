@@ -242,10 +242,14 @@ Applies only while `.claude/run/PLAN.md` exists. A hook prints it and
 `.claude/run/PROGRESS.md` at session start and after compaction; those files, not the
 conversation, are the state of the run.
 
-- Do one PLAN.md step at a time, each in a fresh `implementer` subagent. Pass it the
-  step and the PROGRESS.md entries it needs; it shares no memory with you.
-- After every implementer, run a fresh `reviewer` subagent on its commit. Push only
-  after the review, so the reviewer's amend needs no force-push.
+- Do one PLAN.md step at a time in an `implementer` subagent. Keep the same one for
+  the next step (`SendMessage`), with the step and the PROGRESS.md entries it needs.
+  Start a fresh one only when its context is at or above 300k tokens at the end of a
+  step, as the Agent result's usage shows; a fresh one shares no memory with you.
+- After every step, run a fresh `reviewer` subagent on its commit. It changes nothing.
+  Pass its report verbatim to the implementer, which evaluates each finding
+  critically, fixes those it accepts, amends the commit, and gives a reason for each
+  finding it rejects. Push only after that, so the amend needs no force-push.
 - Delegate searches that read more than a few files to the `Explore` agent. Do not
   read large files, logs or full test output in the main session.
 - A step is done when `make precommit` passes. If a tier cannot run in the
