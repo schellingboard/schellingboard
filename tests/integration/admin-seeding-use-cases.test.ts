@@ -136,24 +136,36 @@ describe("admin seeding: events, days and locations", () => {
     async () => {
       const event = await createEvent();
       const day = value(
-        await events().createDay(ADMIN, { ...dayWindow, eventSlug: event.slug })
+        await events().createDay(
+          ADMIN,
+          { ...dayWindow, eventSlug: event.slug },
+          NOW
+        )
       );
       expect(day.eventId).toBe(event.id);
       expect(
         code(
-          await events().createDay(ADMIN, {
-            ...dayWindow,
-            start: undefined,
-            eventSlug: "missing",
-          })
+          await events().createDay(
+            ADMIN,
+            {
+              ...dayWindow,
+              start: undefined,
+              eventSlug: "missing",
+            },
+            NOW
+          )
         )
       ).toBe("day.dateInvalid");
       expect(
         code(
-          await events().createDay(ADMIN, {
-            ...dayWindow,
-            eventSlug: "missing",
-          })
+          await events().createDay(
+            ADMIN,
+            {
+              ...dayWindow,
+              eventSlug: "missing",
+            },
+            NOW
+          )
         )
       ).toBe("event.notFound");
     }

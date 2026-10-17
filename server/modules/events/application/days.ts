@@ -1,3 +1,4 @@
+import { changes, type ChangeContext } from "@schellingboard/domain/change";
 import type { Day, Event } from "@schellingboard/domain/event";
 import {
   dayAlignmentError,
@@ -5,6 +6,8 @@ import {
   sessionContainedInWindow,
 } from "@schellingboard/domain/day-window";
 import type { Actor } from "@/server/kernel/actor";
+import { recordingSessionCascade } from "@/server/kernel/session-cascade";
+import type { Tx } from "@/server/kernel/unit-of-work";
 import {
   conflict,
   invalid,
@@ -15,7 +18,7 @@ import {
   type Result,
 } from "@/server/kernel/result";
 import type { EventDeps } from "../ports";
-import { adminRequired, eventNotFound } from "./events";
+import { adminRequired, byAdmin, eventNotFound } from "./events";
 
 export interface DayWindowInput {
   start: Date | undefined;
@@ -88,7 +91,8 @@ export const createDay =
   ({ uow }: EventDeps) =>
   async (
     actor: Actor,
-    input: DayWindowInput & ({ eventId: string } | { eventSlug: string })
+    input: DayWindowInput & ({ eventId: string } | { eventSlug: string }),
+    now: Date
   ): Promise<Result<Day>> => {
     if (!actor.admin) return adminRequired();
     const parsed = parseWindow(input);
@@ -101,11 +105,15 @@ export const createDay =
       if (!event) return eventNotFound();
       const refused = await placementError(tx, event, parsed.data);
       if (refused) return refused;
+      let created: Day;
       try {
-        return ok(await tx.days.create({ ...parsed.data, eventId: event.id }));
+        created = await tx.days.create({ ...parsed.data, eventId: event.id });
       } catch {
         return conflict("day.saveFailed", "Failed to create day");
       }
+      tx.record(changes.dayCreated(created, byAdmin(now)));
+      await recordEventDates(tx, event, byAdmin(now));
+      return ok(created);
     });
   };
 
@@ -113,7 +121,8 @@ export const updateDay =
   ({ uow }: EventDeps) =>
   async (
     actor: Actor,
-    input: DayWindowInput & { id: string; expectedVersion: number }
+    input: DayWindowInput & { id: string; expectedVersion: number },
+    now: Date
   ): Promise<Result<Day>> => {
     if (!actor.admin) return adminRequired();
     return uow.run(async (tx) => {
@@ -156,20 +165,55 @@ export const updateDay =
       } catch {
         return conflict("day.saveFailed", "Failed to update day");
       }
-      return updated ? ok(updated) : dayChangedMeanwhile(tx, input.id);
+      if (!updated) return dayChangedMeanwhile(tx, input.id);
+      tx.record(changes.dayChanged(updated, byAdmin(now)));
+      await recordEventDates(tx, event, byAdmin(now));
+      return ok(updated);
     });
   };
 
 export const deleteDay =
-  ({ repos }: EventDeps) =>
-  async (actor: Actor, input: { id: string }): Promise<Result<Day>> => {
+  ({ uow }: EventDeps) =>
+  async (
+    actor: Actor,
+    input: { id: string },
+    now: Date
+  ): Promise<Result<Day>> => {
     if (!actor.admin) return adminRequired();
-    const day = await repos.days.findById(input.id);
-    if (!day) return dayNotFound();
-    try {
-      await repos.days.delete(input.id);
-    } catch {
-      return conflict("day.saveFailed", "Failed to delete day");
-    }
-    return ok(day);
+    return uow.run(async (tx) => {
+      const day = await tx.days.findById(input.id);
+      if (!day) return dayNotFound();
+      const event = await tx.events.findById(day.eventId);
+      const by = byAdmin(now);
+      try {
+        await recordingSessionCascade(
+          tx,
+          await tx.sessions.listByEvent(day.eventId),
+          () => tx.days.delete(input.id),
+          by
+        );
+      } catch {
+        return conflict("day.saveFailed", "Failed to delete day");
+      }
+      tx.record(changes.dayDeleted(day, by));
+      if (event) await recordEventDates(tx, event, by);
+      return ok(day);
+    });
   };
+
+// An event's first and last day are part of its view, so a day that moves
+// them is an event change too.
+async function recordEventDates(
+  tx: Tx,
+  before: Event,
+  by: ChangeContext
+): Promise<void> {
+  const after = await tx.events.findById(before.id);
+  const time = (d: Date | undefined) => d?.getTime();
+  if (
+    after &&
+    (time(after.firstDayStart) !== time(before.firstDayStart) ||
+      time(after.lastDayStart) !== time(before.lastDayStart))
+  )
+    tx.record(changes.eventChanged(after, by));
+}

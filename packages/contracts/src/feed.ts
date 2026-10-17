@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { dayViewSchema, eventViewSchema } from "./event";
 import { rsvpViewSchema } from "./rsvp";
 import { snapshotSessionSchema } from "./snapshot";
 
@@ -12,6 +13,27 @@ const common = {
 
 export const feedMessageSchema = z
   .discriminatedUnion("type", [
+    z.object({
+      ...common,
+      type: z.literal("event.changed"),
+      event: eventViewSchema,
+    }),
+    z.object({ ...common, type: z.literal("event.deleted") }),
+    z.object({
+      ...common,
+      type: z.literal("day.created"),
+      day: dayViewSchema,
+    }),
+    z.object({
+      ...common,
+      type: z.literal("day.changed"),
+      day: dayViewSchema,
+    }),
+    z.object({
+      ...common,
+      type: z.literal("day.deleted"),
+      dayId: z.string(),
+    }),
     z.object({
       ...common,
       type: z.literal("session.created"),

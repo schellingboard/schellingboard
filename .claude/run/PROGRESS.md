@@ -502,6 +502,22 @@ cursor.invalid`. The use case now returns the whole list; the
   tests for its two). Not done, left to 12b/12c: the `cascade: true` marker
   and the cascading changes of day, location, event and guest deletes.
 
+- 12b split in PLAN.md: every use case needs the request clock (`now`), so
+  this commit covers events and days; 12c is locations, their assignment and
+  room unavailability (with the session cascade of a location delete), 12d the
+  old 12c. Added: `event.changed` (settings, phases, meeting settings, and a
+  day edit that moves the event's first or last day), `event.deleted`,
+  `day.created|changed|deleted`, all for the event. `updateEvent`,
+  `updateEventPhases`, `deleteEvent`, the day use cases and
+  `updateEventMeetings` take `now`. `cascade: true` is `ChangeContext.cascade`,
+  stored in the session change payload; the notification reaction skips it.
+  `recordingSessionCascade` (`server/kernel/session-cascade.ts`) wraps a delete
+  that removes sessions as a side effect (day, event) and records, from the
+  sessions before and after, `rsvp.removed` + `session.deleted` or
+  `session.changed`, marked cascade: no copy of the repository's overlap rule.
+  Event delete records its sessions' deletions, then `event.deleted`; `apply`
+  keeps the replica as it is on `event.deleted` (step 14 shows "event gone").
+
 ## Problems
 
 None.
@@ -527,4 +543,4 @@ None.
 
 ## Next step
 
-12a.
+12c.

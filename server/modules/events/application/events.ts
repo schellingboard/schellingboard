@@ -1,4 +1,5 @@
 import { STALE_EVENT_MESSAGE } from "@schellingboard/contracts/event";
+import { changes, type ChangeContext } from "@schellingboard/domain/change";
 import type { Day, Event } from "@schellingboard/domain/event";
 import { isEventIconName } from "@schellingboard/domain/event-icons";
 import {
@@ -7,6 +8,7 @@ import {
   isValidSlotIncrement,
 } from "@schellingboard/domain/slots";
 import type { Actor } from "@/server/kernel/actor";
+import { recordingSessionCascade } from "@/server/kernel/session-cascade";
 import {
   conflict,
   forbidden,
@@ -54,6 +56,11 @@ export type EventPhasesInput = {
 } & Record<PhaseField, Date | undefined>;
 
 type EventPhases = Partial<Record<PhaseField, Date | undefined>>;
+
+export const byAdmin = (at: Date): ChangeContext => ({
+  actor: { type: "admin" },
+  at,
+});
 
 export const adminRequired = () => forbidden("admin.required", "Unauthorized");
 export const eventNotFound = () =>
@@ -225,7 +232,8 @@ export const updateEvent =
   ({ uow }: EventDeps) =>
   async (
     actor: Actor,
-    input: EventSettingsInput & { id: string; expectedVersion: number }
+    input: EventSettingsInput & { id: string; expectedVersion: number },
+    now: Date
   ): Promise<Result<Event>> => {
     if (!actor.admin) return adminRequired();
     const parsed = parseSettings(input);
@@ -260,6 +268,7 @@ export const updateEvent =
       if (incrementChanged) {
         await tx.meetingAvailability.deleteByEvent(input.id);
       }
+      tx.record(changes.eventChanged(updated, byAdmin(now)));
       return ok(updated);
     });
   };
@@ -321,7 +330,11 @@ function phasesError(phases: EventPhases): Failure | null {
 
 export const updateEventPhases =
   ({ uow }: EventDeps) =>
-  async (actor: Actor, input: EventPhasesInput): Promise<Result<Event>> => {
+  async (
+    actor: Actor,
+    input: EventPhasesInput,
+    now: Date
+  ): Promise<Result<Event>> => {
     if (!actor.admin) return adminRequired();
     const { id, expectedVersion, ...phases } = input;
     const refused = phasesError(phases);
@@ -335,15 +348,31 @@ export const updateEventPhases =
         ...phases,
         expectedVersion,
       });
-      return updated ? ok(updated) : eventChangedMeanwhile(tx, id);
+      if (!updated) return eventChangedMeanwhile(tx, id);
+      tx.record(changes.eventChanged(updated, byAdmin(now)));
+      return ok(updated);
     });
   };
 
 export const deleteEvent =
-  ({ repos }: EventDeps) =>
-  async (actor: Actor, input: { id: string }): Promise<Result<void>> => {
+  ({ uow }: EventDeps) =>
+  async (
+    actor: Actor,
+    input: { id: string },
+    now: Date
+  ): Promise<Result<void>> => {
     if (!actor.admin) return adminRequired();
-    if (!(await repos.events.findById(input.id))) return eventNotFound();
-    await repos.events.delete(input.id);
-    return ok(undefined);
+    const by = byAdmin(now);
+    return uow.run(async (tx) => {
+      const event = await tx.events.findById(input.id);
+      if (!event) return eventNotFound();
+      await recordingSessionCascade(
+        tx,
+        await tx.sessions.listByEvent(input.id),
+        () => tx.events.delete(input.id),
+        by
+      );
+      tx.record(changes.eventDeleted(event, by));
+      return ok(undefined);
+    });
   };

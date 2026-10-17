@@ -92,6 +92,48 @@ describe("apply", () => {
     expect(apply(snapshot, other).me).toEqual(snapshot.me);
   });
 
+  it("keeps days in order of their start, and drops a deleted one", () => {
+    const [first] = snapshot.days;
+    const later = { ...first, id: "later", start: "2999-01-01T00:00:00.000Z" };
+    const earlier = {
+      ...first,
+      id: "earlier",
+      start: "1999-01-01T00:00:00.000Z",
+    };
+    const day = (seq: number, d: typeof later): FeedMessage => ({
+      seq,
+      type: "day.created",
+      commandKey: null,
+      day: d,
+    });
+
+    const after = replay([day(8, later), day(9, earlier), day(10, earlier)]);
+
+    expect(after.days.map((d) => d.id)).toEqual([
+      "earlier",
+      ...snapshot.days.map((d) => d.id),
+      "later",
+    ]);
+    const removed = apply(after, {
+      seq: 11,
+      type: "day.deleted",
+      commandKey: null,
+      dayId: "later",
+    });
+    expect(removed.days.map((d) => d.id)).not.toContain("later");
+  });
+
+  it("replaces the event on an event change", () => {
+    const after = apply(snapshot, {
+      seq: 8,
+      type: "event.changed",
+      commandKey: null,
+      event: { ...snapshot.event, name: "Renamed" },
+    });
+
+    expect(after.event.name).toBe("Renamed");
+  });
+
   it("ignores a change it already holds", () => {
     expect(apply(snapshot, changed(7, "s", "Stale"))).toBe(snapshot);
   });

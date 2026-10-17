@@ -1,5 +1,6 @@
 import type { FeedMessage } from "@schellingboard/contracts/feed";
 import type { RecordedChange, Viewer } from "@schellingboard/domain/change";
+import { toDayView, toEventView } from "@/server/modules/events/module";
 import { toSnapshotSessionView } from "@/server/modules/sessions/module";
 
 // Only the actor learns the key: keys are unique per actor. Coarser than ADR
@@ -19,6 +20,23 @@ export function project(
 ): FeedMessage | undefined {
   const common = { seq: change.seq, commandKey: commandKeyFor(change, viewer) };
   switch (change.type) {
+    case "event.changed":
+      return {
+        ...common,
+        type: change.type,
+        event: toEventView(change.payload.event),
+      };
+    case "event.deleted":
+      return { ...common, type: change.type };
+    case "day.created":
+    case "day.changed":
+      return {
+        ...common,
+        type: change.type,
+        day: toDayView(change.payload.day),
+      };
+    case "day.deleted":
+      return { ...common, type: change.type, dayId: change.subjectId };
     case "session.created":
       return {
         ...common,
