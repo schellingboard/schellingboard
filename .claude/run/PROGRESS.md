@@ -803,6 +803,12 @@ None.
   `idempotentAction`); the compose box and each reply box hold a key and
   renew it after a success. Edit has no key. Not run: E2E (user's rule).
 
+## 17b3
+
+- `/api/add-session` reads the standard `Idempotency-Key` header and runs
+  under `idempotentAction`; the session form sends one per opened form (not on
+  edit). A reused key answers 409. Not run: E2E (user's rule).
+
 ## Next step
 
-17b3.
+17c.
