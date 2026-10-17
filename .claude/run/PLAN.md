@@ -90,7 +90,7 @@ feed and snapshot), `04-client.md` (The replica), `05-security.md` (Authorizatio
     migration; one CHANGELOG bullet, extended by each:
     - [x] 4a1. The shared conflict failure; sessions and proposals (guest and admin).
     - [x] 4a2. Events (edit and phases) and days.
-    - [ ] 4a3. Locations and meeting points.
+    - [x] 4a3. Locations and meeting points.
     - [ ] 4a4. Guest profiles (`/me/profile`, `/me/avatar`, `/admin/guests/{id}`).
   - 4b. UI: the session and proposal edit forms send the version they loaded and say
     "changed by someone else".

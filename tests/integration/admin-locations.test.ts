@@ -324,6 +324,58 @@ describe("admin location actions", () => {
       expect(await locations.listEventIds(location.id)).toEqual([event.id]);
     });
 
+    it("raises the version only when the location or its events really change", async () => {
+      const event = await createEvent();
+      const { locations } = getRepositories();
+      const location = await createLocation();
+      const save = (patch: object) =>
+        locations.update(location.id, { ...location, ...patch });
+
+      const resaved = await save({});
+      const joined = await save({ eventIds: [event.id] });
+      const rejoined = await save({ eventIds: [event.id] });
+      const renamed = await save({ name: "Renamed", eventIds: [event.id] });
+
+      expect([location, resaved, joined, rejoined, renamed]).toMatchObject(
+        [1, 1, 2, 2, 3].map((version) => ({ version }))
+      );
+    });
+
+    it("changes nothing when the location has moved past the expected version", async () => {
+      const event = await createEvent();
+      const { locations } = getRepositories();
+      const location = await createLocation({ name: "A" });
+      await locations.update(location.id, { ...location, name: "B" });
+
+      const stale = await locations.update(location.id, {
+        ...location,
+        name: "C",
+        eventIds: [event.id],
+        expectedVersion: location.version,
+      });
+
+      expect(stale).toBeUndefined();
+      expect((await locations.findById(location.id))?.name).toBe("B");
+      expect(await locations.listEventIds(location.id)).toEqual([]);
+    });
+
+    it("refuses an edit from a version the location has moved past", async () => {
+      const location = await createLocation();
+      const edit = (name: string) =>
+        updateLocationAction({
+          ...baseLocationData,
+          id: location.id,
+          name,
+          expectedVersion: location.version,
+        });
+
+      expect(await edit("First")).toEqual({ ok: true });
+      expect(await edit("Second")).toMatchObject({ ok: false });
+      expect(
+        (await getRepositories().locations.findById(location.id))?.name
+      ).toBe("First");
+    });
+
     it("replaces the image when a new one is uploaded", async () => {
       const location = await createLocation();
       const formData = {
@@ -429,6 +481,31 @@ describe("admin location actions", () => {
 
       await moveLocationAction({ id: await idOf("A"), direction: "down" });
       expect(await byName()).toEqual(["C", "A", "B"]);
+    });
+
+    it("raises the version of the locations that changed places only", async () => {
+      const { locations } = getRepositories();
+      const a = await createLocation({ name: "A", sortIndex: 0 });
+      await createLocation({ name: "B", sortIndex: 1 });
+      await createLocation({ name: "C", sortIndex: 2 });
+
+      const stale = await moveLocationAction({
+        id: a.id,
+        direction: "down",
+        expectedVersion: a.version + 1,
+      });
+      await moveLocationAction({
+        id: a.id,
+        direction: "down",
+        expectedVersion: a.version,
+      });
+
+      expect(stale).toMatchObject({ ok: false });
+      expect((await locations.list()).map((l) => [l.name, l.version])).toEqual([
+        ["B", 2],
+        ["A", 2],
+        ["C", 1],
+      ]);
     });
 
     it("ignores moves beyond the boundaries", async () => {

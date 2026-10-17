@@ -110,7 +110,10 @@ export interface EventsRepository {
       expectedVersion?: number;
     }
   ): Promise<Event | undefined>;
-  /** Deletes the event and all records referencing it (cascades via DB FK). */
+  /**
+   * Deletes the event and all records referencing it (cascades via DB FK),
+   * raising the version of the locations it leaves.
+   */
   delete(id: string): Promise<void>;
 }
 
@@ -339,8 +342,19 @@ export interface LocationsRepository {
    */
   listBookableByEvent(eventId: string): Promise<Location[]>;
   findById(id: string): Promise<Location | undefined>;
-  create(data: Omit<Location, "id">): Promise<Location>;
-  update(id: string, data: Omit<Location, "id">): Promise<Location | undefined>;
+  create(data: Omit<Location, "id" | "version">): Promise<Location>;
+  /**
+   * Replaces the location's fields, and its event assignments when `eventIds`
+   * is given. Undefined, changing nothing, if the location is gone or not at
+   * `expectedVersion`.
+   */
+  update(
+    id: string,
+    data: Omit<Location, "id" | "version"> & {
+      eventIds?: string[];
+      expectedVersion?: number;
+    }
+  ): Promise<Location | undefined>;
   /** Deletes the location and all session/event links referencing it. */
   delete(id: string): Promise<void>;
   /** Number of sessions linked to this location. */
@@ -663,10 +677,16 @@ export interface VotesRepository {
 export interface MeetingPointsRepository {
   /** An event's suggested places to meet, in the organizer's order. */
   listByEvent(eventId: string): Promise<MeetingPoint[]>;
-  create(data: Omit<MeetingPoint, "id">): Promise<MeetingPoint>;
+  create(data: Omit<MeetingPoint, "id" | "version">): Promise<MeetingPoint>;
+  /**
+   * Undefined, changing nothing, if the point is gone or not at
+   * `expectedVersion`.
+   */
   update(
     id: string,
-    patch: Partial<Omit<MeetingPoint, "id" | "eventId">>
+    patch: Partial<Omit<MeetingPoint, "id" | "eventId" | "version">> & {
+      expectedVersion?: number;
+    }
   ): Promise<MeetingPoint | undefined>;
   delete(id: string): Promise<void>;
 }

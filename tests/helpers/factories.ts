@@ -130,10 +130,9 @@ export async function createLocation(opts?: {
     bookable: opts?.bookable ?? true,
     sortIndex: opts?.sortIndex ?? 0,
   });
-  if (opts?.eventId) {
-    await locations.assignToEvent(opts.eventId, [location.id]);
-  }
-  return location;
+  if (!opts?.eventId) return location;
+  await locations.assignToEvent(opts.eventId, [location.id]);
+  return (await locations.findById(location.id))!;
 }
 
 export async function createDay(

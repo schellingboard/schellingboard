@@ -4,6 +4,7 @@ export type MeetingPoint = {
   name: string;
   description: string;
   sortIndex: number;
+  version: number;
 };
 
 /**

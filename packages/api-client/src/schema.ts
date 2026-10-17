@@ -2384,6 +2384,7 @@ export interface paths {
               name: string;
               description: string;
               sortIndex: number;
+              version: number;
             };
           };
         };
@@ -2430,6 +2431,8 @@ export interface paths {
           "application/json": {
             name: string;
             description?: string;
+            /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
+            expectedVersion: number;
           };
         };
       };
@@ -2446,6 +2449,34 @@ export interface paths {
               name: string;
               description: string;
               sortIndex: number;
+              version: number;
+            };
+          };
+        };
+        /** @description A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion` */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": {
+              type: string;
+              title: string;
+              status: number;
+              code: string;
+              detail?: string;
+              errors?: {
+                path: string;
+                message: string;
+              }[];
+              current?: {
+                id: string;
+                eventId: string;
+                name: string;
+                description: string;
+                sortIndex: number;
+                version: number;
+              };
             };
           };
         };
@@ -4113,6 +4144,8 @@ export interface paths {
             bookable?: boolean;
             /** @default [] */
             eventIds?: string[];
+            /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
+            expectedVersion: number;
           };
         };
       };
@@ -4124,6 +4157,26 @@ export interface paths {
           };
           content: {
             "application/json": components["schemas"]["Location"];
+          };
+        };
+        /** @description A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion` */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": {
+              type: string;
+              title: string;
+              status: number;
+              code: string;
+              detail?: string;
+              errors?: {
+                path: string;
+                message: string;
+              }[];
+              current?: components["schemas"]["Location"];
+            };
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -4202,16 +4255,42 @@ export interface paths {
           "application/json": {
             /** @enum {string} */
             direction: "up" | "down";
+            /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
+            expectedVersion: number;
           };
         };
       };
       responses: {
-        /** @description Moved, or already at that end */
-        204: {
+        /** @description Every location in the new order; unchanged when already at that end */
+        200: {
           headers: {
             [name: string]: unknown;
           };
-          content?: never;
+          content: {
+            "application/json": {
+              locations: components["schemas"]["Location"][];
+            };
+          };
+        };
+        /** @description A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion` */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": {
+              type: string;
+              title: string;
+              status: number;
+              code: string;
+              detail?: string;
+              errors?: {
+                path: string;
+                message: string;
+              }[];
+              current?: components["schemas"]["Location"];
+            };
+          };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
         default: {
@@ -5245,6 +5324,8 @@ export interface components {
       imageUrl: string;
       sortIndex: number;
       eventIds: string[];
+      /** @description Goes up with every change, its events and place included */
+      version: number;
     };
     Unavailability: {
       id: string;

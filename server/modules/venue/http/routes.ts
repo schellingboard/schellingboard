@@ -4,10 +4,15 @@ import {
   locationBodySchema,
   locationListSchema,
   locationMoveSchema,
+  locationUpdateBodySchema,
   locationViewSchema,
 } from "@schellingboard/contracts/location";
 import { idempotencyHeaders } from "@/server/http/idempotency";
-import { problem, problemDefault } from "@/server/http/problem";
+import {
+  problem,
+  problemDefault,
+  versionConflictResponse,
+} from "@/server/http/problem";
 import {
   body,
   idParam,
@@ -34,6 +39,7 @@ function toLocationView(
     imageUrl: l.imageUrl,
     sortIndex: l.sortIndex,
     eventIds: l.eventIds,
+    version: l.version,
   };
 }
 
@@ -72,10 +78,11 @@ const updateLocation = createRoute({
   request: {
     headers: idempotencyHeaders,
     params: idParam,
-    body: body(locationBodySchema),
+    body: body(locationUpdateBodySchema),
   },
   responses: {
     200: json(locationViewSchema, "The updated location"),
+    ...versionConflictResponse(locationViewSchema),
     ...problemDefault,
   },
 });
@@ -99,7 +106,11 @@ const moveLocation = createRoute({
     body: body(locationMoveSchema),
   },
   responses: {
-    204: noContent("Moved, or already at that end"),
+    200: json(
+      locationListSchema,
+      "Every location in the new order; unchanged when already at that end"
+    ),
+    ...versionConflictResponse(locationViewSchema),
     ...problemDefault,
   },
 });
@@ -135,12 +146,7 @@ export function addAdminVenueRoutes(app: App, venue: () => VenueUseCases) {
       c.req.valid("query")
     );
     if (!result.ok) return problem(result.error);
-    return c.json(
-      {
-        locations: result.value.map(toLocationView),
-      },
-      200
-    );
+    return c.json({ locations: result.value.map(toLocationView) }, 200);
   });
 
   app.openapi(createLocation, async (c) => {
@@ -157,7 +163,7 @@ export function addAdminVenueRoutes(app: App, venue: () => VenueUseCases) {
       ...c.req.valid("json"),
       id: c.req.valid("param").id,
     });
-    if (!result.ok) return problem(result.error);
+    if (!result.ok) return problem(result.error, toLocationView);
     return c.json(toLocationView(result.value), 200);
   });
 
@@ -175,8 +181,8 @@ export function addAdminVenueRoutes(app: App, venue: () => VenueUseCases) {
       ...c.req.valid("json"),
       id: c.req.valid("param").id,
     });
-    if (!result.ok) return problem(result.error);
-    return c.body(null, 204);
+    if (!result.ok) return problem(result.error, toLocationView);
+    return c.json({ locations: result.value.map(toLocationView) }, 200);
   });
 
   app.openapi(assign, async (c) => {

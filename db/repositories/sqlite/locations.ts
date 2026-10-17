@@ -6,6 +6,7 @@ import type { EventLocationPage, LocationsRepository } from "../interfaces";
 import type { Location } from "@schellingboard/domain/location";
 
 type DB = BetterSQLite3Database<typeof schema>;
+type Tx = Parameters<Parameters<DB["transaction"]>[0]>[0];
 
 // Escape LIKE meta-characters so user input is matched literally. Pairs with an
 // explicit `ESCAPE '\'` clause in the query below.
@@ -24,6 +25,7 @@ function rowToLocation(row: typeof schema.locations.$inferSelect): Location {
     bookable: row.bookable,
     sortIndex: row.sortIndex,
     areaDescription: row.areaDescription ?? undefined,
+    version: row.version,
   };
 }
 
@@ -138,6 +140,10 @@ export class SqliteLocationsRepository implements LocationsRepository {
   }
 
   async findById(id: string): Promise<Location | undefined> {
+    return this.findByIdSync(id);
+  }
+
+  private findByIdSync(id: string): Location | undefined {
     const row = this.db
       .select()
       .from(schema.locations)
@@ -146,7 +152,36 @@ export class SqliteLocationsRepository implements LocationsRepository {
     return row ? rowToLocation(row) : undefined;
   }
 
-  async create(data: Omit<Location, "id">): Promise<Location> {
+  private eventIdsSync(id: string): string[] {
+    return this.db
+      .select({ eventId: schema.eventLocations.eventId })
+      .from(schema.eventLocations)
+      .where(eq(schema.eventLocations.locationId, id))
+      .orderBy(schema.eventLocations.eventId)
+      .all()
+      .map((r) => r.eventId);
+  }
+
+  private bumpVersions(tx: Tx, ids: string[]) {
+    if (ids.length === 0) return;
+    tx.update(schema.locations)
+      .set({ version: sql`${schema.locations.version} + 1` })
+      .where(inArray(schema.locations.id, ids))
+      .run();
+  }
+
+  private replaceEventIds(tx: Tx, id: string, eventIds: string[]) {
+    tx.delete(schema.eventLocations)
+      .where(eq(schema.eventLocations.locationId, id))
+      .run();
+    for (const eventId of eventIds) {
+      tx.insert(schema.eventLocations)
+        .values({ eventId, locationId: id })
+        .run();
+    }
+  }
+
+  async create(data: Omit<Location, "id" | "version">): Promise<Location> {
     const id = nanoid();
     this.db
       .insert(schema.locations)
@@ -162,20 +197,51 @@ export class SqliteLocationsRepository implements LocationsRepository {
         areaDescription: data.areaDescription ?? null,
       })
       .run();
-    return { id, ...data };
+    return { id, ...data, version: 1 };
   }
 
   async update(
     id: string,
-    data: Omit<Location, "id">
+    {
+      eventIds,
+      expectedVersion,
+      ...data
+    }: Omit<Location, "id" | "version"> & {
+      eventIds?: string[];
+      expectedVersion?: number;
+    }
   ): Promise<Location | undefined> {
-    const result = this.db
-      .update(schema.locations)
-      .set({ ...data, areaDescription: data.areaDescription ?? null })
-      .where(eq(schema.locations.id, id))
-      .run();
-    if (result.changes === 0) return undefined;
-    return { id, ...data };
+    const state = () =>
+      JSON.stringify([this.findByIdSync(id), this.eventIdsSync(id)]);
+    const applied = this.db.transaction(
+      (tx) => {
+        const before = this.findByIdSync(id);
+        if (
+          !before ||
+          (expectedVersion !== undefined && before.version !== expectedVersion)
+        )
+          return false;
+        const beforeState = state();
+        tx.update(schema.locations)
+          .set({
+            name: data.name,
+            imageUrl: data.imageUrl,
+            description: data.description,
+            capacity: data.capacity,
+            color: data.color,
+            bookable: data.bookable,
+            sortIndex: data.sortIndex,
+            areaDescription: data.areaDescription ?? null,
+          })
+          .where(eq(schema.locations.id, id))
+          .run();
+        if (eventIds) this.replaceEventIds(tx, id, eventIds);
+        if (state() !== beforeState) this.bumpVersions(tx, [id]);
+        return true;
+      },
+      { behavior: "immediate" }
+    );
+    return applied ? this.findByIdSync(id) : undefined;
   }
 
   async delete(id: string): Promise<void> {
@@ -245,14 +311,9 @@ export class SqliteLocationsRepository implements LocationsRepository {
 
   async setEventIds(id: string, eventIds: string[]): Promise<void> {
     this.db.transaction((tx) => {
-      tx.delete(schema.eventLocations)
-        .where(eq(schema.eventLocations.locationId, id))
-        .run();
-      for (const eventId of eventIds) {
-        tx.insert(schema.eventLocations)
-          .values({ eventId, locationId: id })
-          .run();
-      }
+      const before = this.eventIdsSync(id).join();
+      this.replaceEventIds(tx, id, eventIds);
+      if (this.eventIdsSync(id).join() !== before) this.bumpVersions(tx, [id]);
     });
   }
 
@@ -268,30 +329,47 @@ export class SqliteLocationsRepository implements LocationsRepository {
 
   async assignToEvent(eventId: string, locationIds: string[]): Promise<void> {
     if (locationIds.length === 0) return;
-    this.db
-      .insert(schema.eventLocations)
-      .values(locationIds.map((locationId) => ({ eventId, locationId })))
-      .onConflictDoNothing()
-      .run();
+    this.db.transaction((tx) => {
+      const added = tx
+        .insert(schema.eventLocations)
+        .values(locationIds.map((locationId) => ({ eventId, locationId })))
+        .onConflictDoNothing()
+        .returning({ locationId: schema.eventLocations.locationId })
+        .all();
+      this.bumpVersions(
+        tx,
+        added.map((r) => r.locationId)
+      );
+    });
   }
 
   async removeFromEvent(eventId: string, locationIds: string[]): Promise<void> {
     if (locationIds.length === 0) return;
-    this.db
-      .delete(schema.eventLocations)
-      .where(
-        and(
-          eq(schema.eventLocations.eventId, eventId),
-          inArray(schema.eventLocations.locationId, locationIds)
+    this.db.transaction((tx) => {
+      const removed = tx
+        .delete(schema.eventLocations)
+        .where(
+          and(
+            eq(schema.eventLocations.eventId, eventId),
+            inArray(schema.eventLocations.locationId, locationIds)
+          )
         )
-      )
-      .run();
+        .returning({ locationId: schema.eventLocations.locationId })
+        .all();
+      this.bumpVersions(
+        tx,
+        removed.map((r) => r.locationId)
+      );
+    });
   }
 
   async move(id: string, direction: "up" | "down"): Promise<boolean> {
     return this.db.transaction((tx) => {
       const ordered = tx
-        .select({ id: schema.locations.id })
+        .select({
+          id: schema.locations.id,
+          sortIndex: schema.locations.sortIndex,
+        })
         .from(schema.locations)
         .orderBy(schema.locations.sortIndex, schema.locations.id)
         .all();
@@ -301,8 +379,9 @@ export class SqliteLocationsRepository implements LocationsRepository {
       if (target < 0 || target >= ordered.length) return false;
       [ordered[index], ordered[target]] = [ordered[target], ordered[index]];
       ordered.forEach((l, sortIndex) => {
+        if (l.sortIndex === sortIndex) return;
         tx.update(schema.locations)
-          .set({ sortIndex })
+          .set({ sortIndex, version: sql`${schema.locations.version} + 1` })
           .where(eq(schema.locations.id, l.id))
           .run();
       });

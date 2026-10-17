@@ -89,6 +89,15 @@ describe("meeting points", () => {
 
     const updated = await meetingPoints.update(point.id, { name: "Café" });
     expect(updated?.name).toBe("Café");
+    expect(updated?.version).toBe(2);
+    const resaved = await meetingPoints.update(point.id, { name: "Café" });
+    expect(resaved?.version).toBe(2);
+    const stale = await meetingPoints.update(point.id, {
+      name: "Bar",
+      expectedVersion: 1,
+    });
+    expect(stale).toBeUndefined();
+    expect((await meetingPoints.listByEvent(event.id))[0].name).toBe("Café");
 
     await meetingPoints.delete(point.id);
     expect(await meetingPoints.listByEvent(event.id)).toEqual([]);

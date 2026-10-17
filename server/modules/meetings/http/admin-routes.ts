@@ -4,6 +4,7 @@ import {
   eventMeetingsUpdateBodySchema,
   meetingPointInputSchema,
   meetingPointSchema,
+  meetingPointUpdateBodySchema,
 } from "@schellingboard/contracts/meeting";
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import {
@@ -19,6 +20,7 @@ import {
   type App,
 } from "@/server/http/route-parts";
 import { toEventView } from "@/server/modules/events/module";
+import type { MeetingPoint } from "@schellingboard/domain/meeting";
 import type { MeetingUseCases } from "../application/use-cases";
 
 const pointParams = z.object({
@@ -66,10 +68,11 @@ const updatePoint = createRoute({
   request: {
     headers: idempotencyHeaders,
     params: pointParams,
-    body: body(meetingPointInputSchema),
+    body: body(meetingPointUpdateBodySchema),
   },
   responses: {
     200: json(meetingPointSchema, "The renamed meeting point"),
+    ...versionConflictResponse(meetingPointSchema),
     ...problemDefault,
   },
 });
@@ -109,7 +112,7 @@ export function addAdminMeetingRoutes(
       ...c.req.valid("json"),
       ...c.req.valid("param"),
     });
-    if (!result.ok) return problem(result.error);
+    if (!result.ok) return problem(result.error, (p: MeetingPoint) => p);
     return c.json(result.value, 200);
   });
 

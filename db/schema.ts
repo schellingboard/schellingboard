@@ -202,6 +202,7 @@ export const locations = sqliteTable("locations", {
   bookable: integer("bookable", { mode: "boolean" }).notNull().default(false),
   sortIndex: integer("sort_index").notNull().default(0),
   areaDescription: text("area_description"),
+  version: integer("version").notNull().default(1),
 });
 
 export const eventLocations = sqliteTable(
@@ -494,6 +495,7 @@ export const meetingPoints = sqliteTable(
     name: text("name").notNull(),
     description: text("description").notNull().default(""),
     sortIndex: integer("sort_index").notNull().default(0),
+    version: integer("version").notNull().default(1),
   },
   (t) => [index("meeting_points_event_idx").on(t.eventId)]
 );

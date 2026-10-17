@@ -504,7 +504,11 @@
           },
           "imageUrl": { "type": "string" },
           "sortIndex": { "type": "integer" },
-          "eventIds": { "type": "array", "items": { "type": "string" } }
+          "eventIds": { "type": "array", "items": { "type": "string" } },
+          "version": {
+            "type": "integer",
+            "description": "Goes up with every change, its events and place included"
+          }
         },
         "required": [
           "id",
@@ -516,7 +520,8 @@
           "bookable",
           "imageUrl",
           "sortIndex",
-          "eventIds"
+          "eventIds",
+          "version"
         ]
       },
       "Unavailability": {
@@ -3225,14 +3230,16 @@
                     "eventId": { "type": "string" },
                     "name": { "type": "string" },
                     "description": { "type": "string" },
-                    "sortIndex": { "type": "integer" }
+                    "sortIndex": { "type": "integer" },
+                    "version": { "type": "integer" }
                   },
                   "required": [
                     "id",
                     "eventId",
                     "name",
                     "description",
-                    "sortIndex"
+                    "sortIndex",
+                    "version"
                   ]
                 }
               }
@@ -3286,9 +3293,13 @@
                 "type": "object",
                 "properties": {
                   "name": { "type": "string" },
-                  "description": { "type": "string" }
+                  "description": { "type": "string" },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "description": "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
+                  }
                 },
-                "required": ["name"]
+                "required": ["name", "expectedVersion"]
               }
             }
           }
@@ -3305,15 +3316,65 @@
                     "eventId": { "type": "string" },
                     "name": { "type": "string" },
                     "description": { "type": "string" },
-                    "sortIndex": { "type": "integer" }
+                    "sortIndex": { "type": "integer" },
+                    "version": { "type": "integer" }
                   },
                   "required": [
                     "id",
                     "eventId",
                     "name",
                     "description",
-                    "sortIndex"
+                    "sortIndex",
+                    "version"
                   ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    },
+                    "current": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string" },
+                        "eventId": { "type": "string" },
+                        "name": { "type": "string" },
+                        "description": { "type": "string" },
+                        "sortIndex": { "type": "integer" },
+                        "version": { "type": "integer" }
+                      },
+                      "required": [
+                        "id",
+                        "eventId",
+                        "name",
+                        "description",
+                        "sortIndex",
+                        "version"
+                      ]
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
                 }
               }
             }
@@ -5136,9 +5197,13 @@
                     "type": "array",
                     "items": { "type": "string" },
                     "default": []
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "description": "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
                   }
                 },
-                "required": ["name", "capacity"]
+                "required": ["name", "capacity", "expectedVersion"]
               }
             }
           }
@@ -5149,6 +5214,36 @@
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Location" }
+              }
+            }
+          },
+          "409": {
+            "description": "A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    },
+                    "current": { "$ref": "#/components/schemas/Location" }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
               }
             }
           },
@@ -5228,15 +5323,65 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "direction": { "type": "string", "enum": ["up", "down"] }
+                  "direction": { "type": "string", "enum": ["up", "down"] },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "description": "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
+                  }
                 },
-                "required": ["direction"]
+                "required": ["direction", "expectedVersion"]
               }
             }
           }
         },
         "responses": {
-          "204": { "description": "Moved, or already at that end" },
+          "200": {
+            "description": "Every location in the new order; unchanged when already at that end",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "locations": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Location" }
+                    }
+                  },
+                  "required": ["locations"]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    },
+                    "current": { "$ref": "#/components/schemas/Location" }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          },
           "default": {
             "description": "Problem details (RFC 9457); clients branch on `code`",
             "content": {

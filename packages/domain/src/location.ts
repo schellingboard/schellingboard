@@ -8,6 +8,7 @@ export type Location = {
   bookable: boolean;
   sortIndex: number;
   areaDescription?: string;
+  version: number;
 };
 
 export type LocationUnavailability = {
