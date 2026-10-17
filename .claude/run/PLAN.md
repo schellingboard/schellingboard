@@ -178,6 +178,13 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
       `seq` order; audience filter per connection; heartbeat; `410`; cleanup on
       disconnect. OpenAPI documents it as `text/event-stream` with the message schema.
       Integration tests: resume, audience, `410`, order under concurrent writes.
+  - [x] 13a. Hub and feed core (no HTTP): the change-log watermark (pruning stops at
+        the first change too new), `listEventAfter`, `openFeed` (reset check, replay,
+        then live, audience filter, order under concurrent writes).
+  - [ ] 13b. The route: `GET /events/{slug}/feed` as `text/event-stream` (`id`, `event`,
+        heartbeat, `reset` event, `Last-Event-ID` over `?since=`, `400` with neither,
+        headers), the 1 MB slow-client cap, the 10-minute limit, closing a guest's
+        connections on credential changes; OpenAPI; docs.
 - [ ] 14. **Replica on the schedule**: a client store seeded with the SSR snapshot and
       fed by `EventSource`; `EventContext` derives its values from it. A reconnect
       resumes; `410` refetches the snapshot; a user switch reloads snapshot and feed.

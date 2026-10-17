@@ -1,4 +1,4 @@
-import { and, asc, gt, inArray, lt, lte, sql } from "drizzle-orm";
+import { and, asc, eq, gt, gte, inArray, lte, min, sql } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
 import * as schema from "../../schema";
@@ -272,6 +272,8 @@ const KNOWN_TYPES: RecordedChange["type"][] = [
   "rsvp.removed",
 ];
 
+const PRUNED_CURSOR = "changes.pruned";
+
 export class SqliteChangesRepository implements ChangesRepository {
   constructor(private db: DB) {}
 
@@ -307,16 +309,38 @@ export class SqliteChangesRepository implements ChangesRepository {
     return row?.seq ?? 0;
   }
 
+  async getPrunedThrough(): Promise<number> {
+    const row = this.db
+      .select({ seq: schema.jobCursors.seq })
+      .from(schema.jobCursors)
+      .where(eq(schema.jobCursors.name, PRUNED_CURSOR))
+      .get();
+    return row?.seq ?? 0;
+  }
+
   async listAfter(seq: number, limit = 100): Promise<RecordedChange[]> {
+    return this.listWhere(gt(schema.changes.seq, seq), limit);
+  }
+
+  async listEventAfter(
+    eventId: string,
+    seq: number,
+    limit = 100
+  ): Promise<RecordedChange[]> {
+    return this.listWhere(
+      and(eq(schema.changes.eventId, eventId), gt(schema.changes.seq, seq)),
+      limit
+    );
+  }
+
+  private listWhere(
+    where: ReturnType<typeof gt> | undefined,
+    limit: number
+  ): RecordedChange[] {
     return this.db
       .select()
       .from(schema.changes)
-      .where(
-        and(
-          gt(schema.changes.seq, seq),
-          inArray(schema.changes.type, KNOWN_TYPES)
-        )
-      )
+      .where(and(where, inArray(schema.changes.type, KNOWN_TYPES)))
       .orderBy(asc(schema.changes.seq))
       .limit(limit)
       .all()
@@ -324,14 +348,31 @@ export class SqliteChangesRepository implements ChangesRepository {
   }
 
   async deleteUpTo(seq: number, before: Date): Promise<void> {
-    this.db
-      .delete(schema.changes)
-      .where(
-        and(
-          lte(schema.changes.seq, seq),
-          lt(schema.changes.occurredAt, before.toISOString())
-        )
-      )
-      .run();
+    this.db.transaction(
+      (tx) => {
+        // Stop at the first change that is too new, so what remains has no
+        // gaps and a resume point is either served whole or reset.
+        const tooNew = tx
+          .select({ seq: min(schema.changes.seq) })
+          .from(schema.changes)
+          .where(
+            and(
+              lte(schema.changes.seq, seq),
+              gte(schema.changes.occurredAt, before.toISOString())
+            )
+          )
+          .get();
+        const through = tooNew?.seq == null ? seq : tooNew.seq - 1;
+        tx.delete(schema.changes).where(lte(schema.changes.seq, through)).run();
+        tx.insert(schema.jobCursors)
+          .values({ name: PRUNED_CURSOR, seq: through })
+          .onConflictDoUpdate({
+            target: schema.jobCursors.name,
+            set: { seq: sql`max(${schema.jobCursors.seq}, ${through})` },
+          })
+          .run();
+      },
+      { behavior: "immediate" }
+    );
   }
 }
