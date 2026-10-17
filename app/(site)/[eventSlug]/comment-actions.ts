@@ -12,7 +12,7 @@ import {
   proposalCommentSchema,
   sessionCommentSchema,
 } from "@schellingboard/contracts/comment";
-import { commentUseCases } from "@/server/composition";
+import { commentUseCases, idempotentAction } from "@/server/composition";
 import { resolveActor, type Actor } from "@/server/kernel/actor";
 import type { CommentSubject } from "@/server/modules/comments/module";
 import type { AppError, Result } from "@/server/kernel/result";
@@ -88,77 +88,104 @@ function refusalMessage(error: AppError, task: string): string {
     : (error.detail ?? "Something went wrong");
 }
 
-async function create(
+async function createOnce(
   actor: Actor,
   subject: CommentSubject,
-  { parentId, body }: { parentId?: string; body: string }
-): Promise<void> {
-  settled(
-    await commentUseCases().createComment(
+  { parentId, body }: { parentId?: string; body: string },
+  keyed: { name: string; idempotencyKey: string | undefined; input: unknown }
+): Promise<CommentActionResult> {
+  const now = await serverNow();
+  return idempotentAction(
+    {
       actor,
-      { subject, parentId, body },
-      await serverNow()
-    ),
-    "commenting"
+      key: keyed.idempotencyKey,
+      name: keyed.name,
+      input: keyed.input,
+      now,
+    },
+    async (): Promise<CommentActionResult> => {
+      settled(
+        await commentUseCases().createComment(
+          actor,
+          { subject, parentId, body },
+          now
+        ),
+        "commenting"
+      );
+      return { success: true };
+    }
   );
 }
 
 export async function createProposalComment(
-  comment: z.input<typeof proposalCommentSchema>
+  comment: z.input<typeof proposalCommentSchema>,
+  idempotencyKey?: string
 ): Promise<CommentActionResult>;
 export async function createProposalComment(
-  input: unknown
+  input: unknown,
+  idempotencyKey?: string
 ): Promise<CommentActionResult> {
   await requireSiteAuth();
   try {
     const actor = await requireGuest("commenting");
-    const { proposalId, eventSlug, ...comment } = await requireParsed(
-      proposalCommentSchema,
-      input
+    const parsed = await requireParsed(proposalCommentSchema, input);
+    const { proposalId, eventSlug, ...comment } = parsed;
+    const result = await createOnce(
+      actor,
+      { kind: "proposal", id: proposalId },
+      comment,
+      { name: "createProposalComment", idempotencyKey, input: parsed }
     );
-    await create(actor, { kind: "proposal", id: proposalId }, comment);
-    revalidateEvent(eventSlug);
-    return { success: true };
+    if ("success" in result) revalidateEvent(eventSlug);
+    return result;
   } catch (error) {
     return toResult(error, "Failed to post comment");
   }
 }
 
 export async function createSessionComment(
-  comment: z.input<typeof sessionCommentSchema>
+  comment: z.input<typeof sessionCommentSchema>,
+  idempotencyKey?: string
 ): Promise<CommentActionResult>;
 export async function createSessionComment(
-  input: unknown
+  input: unknown,
+  idempotencyKey?: string
 ): Promise<CommentActionResult> {
   await requireSiteAuth();
   try {
     const actor = await requireGuest("commenting");
-    const { sessionId, ...comment } = await requireParsed(
-      sessionCommentSchema,
-      input
+    const parsed = await requireParsed(sessionCommentSchema, input);
+    const { sessionId, ...comment } = parsed;
+    return await createOnce(
+      actor,
+      { kind: "session", id: sessionId },
+      comment,
+      { name: "createSessionComment", idempotencyKey, input: parsed }
     );
-    await create(actor, { kind: "session", id: sessionId }, comment);
-    return { success: true };
   } catch (error) {
     return toResult(error, "Failed to post comment");
   }
 }
 
 export async function createProfileComment(
-  comment: z.input<typeof profileCommentSchema>
+  comment: z.input<typeof profileCommentSchema>,
+  idempotencyKey?: string
 ): Promise<CommentActionResult>;
 export async function createProfileComment(
-  input: unknown
+  input: unknown,
+  idempotencyKey?: string
 ): Promise<CommentActionResult> {
   await requireSiteAuth();
   try {
     const actor = await requireGuest("commenting");
-    const { profileId, ...comment } = await requireParsed(
-      profileCommentSchema,
-      input
+    const parsed = await requireParsed(profileCommentSchema, input);
+    const { profileId, ...comment } = parsed;
+    return await createOnce(
+      actor,
+      { kind: "profile", id: profileId },
+      comment,
+      { name: "createProfileComment", idempotencyKey, input: parsed }
     );
-    await create(actor, { kind: "profile", id: profileId }, comment);
-    return { success: true };
   } catch (error) {
     return toResult(error, "Failed to post comment");
   }

@@ -230,7 +230,7 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
         (`runIdempotent`); the HTTP middleware becomes an adapter over it.
   - [x] 17b1. `runIdempotentAction` in the kernel (`idempotentAction()` in
         composition); the proposal create action takes a key, its form sends one.
-  - [ ] 17b2. The three comment create actions take a key; `CommentsSection` makes
+  - [x] 17b2. The three comment create actions take a key; `CommentsSection` makes
         one per compose box and renews it after a success.
   - [ ] 17b3. Session create (the form posts to an API route today): takes a key.
   - [ ] 17c. The RSVP toggle sends a key; the replica matches the RSVP echo by

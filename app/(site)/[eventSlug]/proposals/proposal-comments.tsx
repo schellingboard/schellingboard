@@ -21,8 +21,8 @@ export function ProposalComments({
   const router = useRouter();
   const changed = useCallback(() => router.refresh(), [router]);
   const create = useCallback(
-    (input: CommentCreateInput) =>
-      createProposalComment({ proposalId, eventSlug, ...input }),
+    (input: CommentCreateInput, key: string) =>
+      createProposalComment({ proposalId, eventSlug, ...input }, key),
     [proposalId, eventSlug]
   );
   const permalinkFor = useCallback(
