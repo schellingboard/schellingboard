@@ -2,6 +2,8 @@ import { getRepositories } from "@/db/container";
 import type { Actor, RecordedChange } from "@schellingboard/domain/change";
 import {
   notifyCohostsAdded,
+  notifyMeetingOutcome,
+  notifyMeetingRequested,
   notifyProfileCommented,
   notifyProposalCommented,
   notifyProposalJoined,
@@ -55,6 +57,26 @@ export const changeNotifications = reaction(
         addedIds: change.payload.hostIds,
         now,
       });
+      return;
+    }
+    if (
+      change.type === "meeting.requested" ||
+      change.type === "meeting.answered"
+    ) {
+      const meeting = await getRepositories().meetings.findById(
+        change.subjectId
+      );
+      if (!meeting) return;
+      if (change.type === "meeting.requested") {
+        if (meeting.status === "pending")
+          await notifyMeetingRequested({ meeting, now });
+      } else if (changedById)
+        await notifyMeetingOutcome({
+          meeting,
+          outcome: change.payload.outcome,
+          actorId: changedById,
+          now,
+        });
       return;
     }
     if (change.type === "proposal.joined") {

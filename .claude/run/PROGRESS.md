@@ -59,6 +59,15 @@
   loads the session when it runs. `notifyCohostsAdded` is no longer a use-case
   dependency.
 
+## Step 4c (2026-10-08)
+
+- New change types `meeting.requested` and `meeting.answered` (meeting id, plus
+  the outcome for the latter; audience `none`), recorded beside `meeting.changed`
+  in the request, respond and cancel use cases. The existing reaction loads the
+  meeting and notifies; a meeting that is gone is skipped. No use case takes a
+  notify dependency any more, so step 4 is done and `composition.ts` has no `after()`.
+- Tests that waited for the inline notice now call `runJobs()`.
+
 ## Questions
 
 - `utils/guest-clashes.ts` imports `@/app/(site)/session_utils`, so `server/modules/`
@@ -67,4 +76,4 @@
 
 ## Next step
 
-4c.
+5.

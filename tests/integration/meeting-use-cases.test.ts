@@ -26,13 +26,9 @@ const DAY = isoDay(30);
 const SLOT = `${DAY}T10:00:00.000Z`;
 const SLOT_2 = `${DAY}T10:30:00.000Z`;
 
-const notifyMeetingRequested = vi.fn(async () => {});
-const notifyMeetingOutcome = vi.fn(async () => {});
 const meetings = () =>
   createMeetingUseCases({
     repos: getRepositories(),
-    notifyMeetingRequested,
-    notifyMeetingOutcome,
     uow: unitOfWork,
   });
 
@@ -89,8 +85,6 @@ const ask = (eventId: string, from: string, to: string, slotStart = SLOT) =>
 beforeAll(() => setupTestDb());
 beforeEach(() => {
   resetTestDb();
-  notifyMeetingRequested.mockClear();
-  notifyMeetingOutcome.mockClear();
 });
 
 describe("asking for a 1-on-1", () => {
@@ -109,9 +103,9 @@ describe("asking for a 1-on-1", () => {
         meetingPoint: "Coffee bar",
       });
       expect(meeting.slotEnd.toISOString()).toBe(SLOT_2);
-      expect(notifyMeetingRequested).toHaveBeenCalledWith(
-        expect.objectContaining({ meeting })
-      );
+      expect(
+        (await getRepositories().changes.listAfter(0)).map((c) => c.type)
+      ).toContain("meeting.requested");
     }
   );
 
@@ -226,8 +220,12 @@ describe("answering and calling off", () => {
 
       expect(answered.meeting.status).toBe("accepted");
       expect(answered.eventSlug).toBe(event.slug);
-      expect(notifyMeetingOutcome).toHaveBeenCalledWith(
-        expect.objectContaining({ outcome: "accepted", actorId: grace.id })
+      const recorded = await getRepositories().changes.listAfter(0);
+      expect(recorded.find((c) => c.type === "meeting.answered")).toMatchObject(
+        {
+          actor: { type: "guest", id: grace.id },
+          payload: { outcome: "accepted" },
+        }
       );
       expect(
         code(

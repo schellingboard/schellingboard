@@ -133,6 +133,7 @@ describe("respondToMeetingAction", () => {
     const { requester, meeting } = await scenario();
 
     await respondToMeetingAction({ meetingId: meeting.id, response: "accept" });
+    await runJobs();
 
     const [notification] = await getRepositories().notifications.listByGuest(
       requester.id
@@ -291,6 +292,7 @@ describe("cancelMeetingAction", () => {
     expect(
       (await getRepositories().meetings.findById(meeting.id))?.status
     ).toBe("canceled");
+    await runJobs();
     const [notification] = await getRepositories().notifications.listByGuest(
       recipient.id
     );
@@ -306,11 +308,12 @@ describe("cancelMeetingAction", () => {
     expect(
       (await getRepositories().meetings.findById(meeting.id))?.status
     ).toBe("canceled");
+    await runJobs();
     // The one who cancelled is the recipient here, so the requester is told.
-    const [notification] = await getRepositories().notifications.listByGuest(
+    const notices = await getRepositories().notifications.listByGuest(
       requester.id
     );
-    expect(notification.text).toMatch(/canceled/);
+    expect(notices.filter((n) => /canceled/.test(n.text))).toHaveLength(1);
   });
 
   // Calling a meeting off is the one point in the feature where a word of
@@ -369,6 +372,7 @@ describe("cancelMeetingAction", () => {
       meetingId: meeting.id,
       note: "my session moved",
     });
+    await runJobs();
 
     const [notification] = await getRepositories().notifications.listByGuest(
       recipient.id

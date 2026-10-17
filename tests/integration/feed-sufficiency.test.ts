@@ -61,8 +61,6 @@ const people = () =>
 const meetings = () =>
   createMeetingUseCases({
     repos: getRepositories(),
-    notifyMeetingRequested: async () => {},
-    notifyMeetingOutcome: async () => {},
     uow: unitOfWork,
   });
 

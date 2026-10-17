@@ -61,7 +61,7 @@ export async function attendees(
 }
 
 export const requestMeeting =
-  ({ repos, uow, notifyMeetingRequested }: MeetingDeps) =>
+  ({ repos, uow }: MeetingDeps) =>
   async (
     actor: Actor,
     input: MeetingRequestInput,
@@ -83,14 +83,13 @@ export const requestMeeting =
         { ...input, requesterId, meetingPoint },
         now
       );
-      if (booked.ok)
-        tx.record(
-          changes.meetingChanged(booked.value, byGuest(requesterId, now))
-        );
+      if (booked.ok) {
+        const by = byGuest(requesterId, now);
+        tx.record(changes.meetingChanged(booked.value, by));
+        tx.record(changes.meetingRequested(booked.value, by));
+      }
       return booked;
     });
-    if (!requested.ok) return requested;
-    await notifyMeetingRequested({ meeting: requested.value, now });
     return requested;
   };
 
@@ -205,7 +204,7 @@ async function standingMeeting(
 const meetingNotFound = () => notFound("meeting.notFound", "1-on-1 not found");
 
 export const respondToMeeting =
-  ({ repos, uow, notifyMeetingOutcome }: MeetingDeps) =>
+  ({ repos, uow }: MeetingDeps) =>
   async (
     actor: Actor,
     input: { meetingId: string; response: "accept" | "decline" },
@@ -233,22 +232,16 @@ export const respondToMeeting =
           "meeting.alreadyAnswered",
           "This request has already been answered"
         );
-      tx.record(changes.meetingChanged(updated, byGuest(acting.value, now)));
+      const by = byGuest(acting.value, now);
+      tx.record(changes.meetingChanged(updated, by));
+      tx.record(changes.meetingAnswered(updated, outcome, by));
       return ok({ meeting: updated, eventSlug: event.value.slug });
-    });
-    if (!answered.ok) return answered;
-
-    await notifyMeetingOutcome({
-      meeting: answered.value.meeting,
-      outcome,
-      actorId: acting.value,
-      now,
     });
     return answered;
   };
 
 export const cancelMeeting =
-  ({ repos, uow, notifyMeetingOutcome }: MeetingDeps) =>
+  ({ repos, uow }: MeetingDeps) =>
   async (
     actor: Actor,
     input: { meetingId: string; note?: string },
@@ -289,16 +282,10 @@ export const cancelMeeting =
           "meeting.nothingToCancel",
           "There is nothing left to cancel"
         );
-      tx.record(changes.meetingChanged(updated, byGuest(acting.value, now)));
+      const by = byGuest(acting.value, now);
+      tx.record(changes.meetingChanged(updated, by));
+      tx.record(changes.meetingAnswered(updated, "canceled", by));
       return ok({ meeting: updated, eventSlug: event.value.slug });
-    });
-    if (!canceled.ok) return canceled;
-
-    await notifyMeetingOutcome({
-      meeting: canceled.value.meeting,
-      outcome: "canceled",
-      actorId: acting.value,
-      now,
     });
     return canceled;
   };

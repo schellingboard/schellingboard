@@ -1,8 +1,5 @@
 import type { Repositories } from "@/db/container";
 import type { UnitOfWork } from "@/server/kernel/unit-of-work";
-import type { Meeting } from "@schellingboard/domain/meeting";
-
-export type MeetingOutcome = "accepted" | "declined" | "canceled";
 
 export interface MeetingDeps {
   uow: UnitOfWork;
@@ -17,14 +14,4 @@ export interface MeetingDeps {
     | "sessions"
     | "rsvps"
   >;
-  notifyMeetingRequested: (args: {
-    meeting: Meeting;
-    now: Date;
-  }) => Promise<void>;
-  notifyMeetingOutcome: (args: {
-    meeting: Meeting;
-    outcome: MeetingOutcome;
-    actorId: string;
-    now: Date;
-  }) => Promise<void>;
 }
