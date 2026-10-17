@@ -110,7 +110,7 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
 
 ### Change feed and snapshot (#1111)
 
-- [ ] 8. **ADR 0014, change feed and snapshot** (Status: Proposed). Settle:
+- [x] 8. **ADR 0014, change feed and snapshot** (Status: Proposed). Settle:
   - the change types the replica needs and their payloads (with `version`); the feed
     sends a per-type projection, so reaction-only fields (`before`, `rsvpGuestIds`)
     never reach a client;
