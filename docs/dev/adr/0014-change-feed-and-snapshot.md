@@ -216,6 +216,10 @@ existing Hono mount.
 - **Slug change.** The feed is addressed by slug. On an `event.changed` with a
   new slug, the client replaces the page URL and reopens the feed under the
   new slug with `?since=`.
+- **Command keys.** A change's `command_key` is the raw `Idempotency-Key`,
+  which is unique only per actor (ADR 0012 section 5). The feed sends it only
+  to the connections of the actor who made the change, and the client matches
+  its echo by key and actor, never by key alone.
 - **Slow clients.** A connection whose unsent data passes 1 MB is closed. The
   browser reconnects with `Last-Event-ID` and replays from the table.
 - **Replay, then live.** A new connection registers with the hub and buffers

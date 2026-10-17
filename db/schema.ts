@@ -664,6 +664,9 @@ export const changes = sqliteTable(
     actorId: text("actor_id"),
     occurredAt: text("occurred_at").notNull(),
     payload: text("payload", { mode: "json" }).notNull(),
+    audience: text("audience", { mode: "json" }),
+    correlationId: text("correlation_id"),
+    commandKey: text("command_key"),
   },
   (t) => [
     index("changes_event_seq_idx").on(t.eventId, t.seq),

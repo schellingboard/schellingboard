@@ -865,7 +865,10 @@ export interface PushRepository {
 
 export interface ChangesRepository {
   /** Only through the unit of work, which writes it with the state it describes. */
-  append(change: Change): Promise<RecordedChange>;
+  append(
+    change: Change,
+    meta: Pick<RecordedChange, "audience" | "commandKey">
+  ): Promise<RecordedChange>;
   /** Up to `limit` changes recorded after `seq`, oldest first. */
   listAfter(seq: number, limit?: number): Promise<RecordedChange[]>;
   /** Deletes changes up to `seq` that happened before `before`. */

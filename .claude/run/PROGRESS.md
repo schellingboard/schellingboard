@@ -398,6 +398,18 @@ cursor.invalid`. The use case now returns the whole list; the
   connection ends after 10 min; audiences keep `guests`/`admins` and per-event
   rows, stated as superseding the target; `no-transform`, slug change, guest
   payloads carry `profileVersion`, fake-clock pruning note, 1 MB send limit.
+- 9: migration 0052 adds `audience` (JSON, NULL on old rows),
+  `correlation_id` (nothing sets it yet: no reaction records changes) and
+  `command_key`. `Audience` and `audienceOf` live in
+  `packages/domain/src/change.ts` (a separate file was a dependency cycle);
+  session changes go to `event`. `uow.run` stores the audience on append. The
+  idempotency middleware runs the request in `withCommandKey`
+  (`server/kernel/command-key.ts`, AsyncLocalStorage), which `uow.run` reads.
+  New use case 007-US8 (schedule updates without a reload).
+- 9 review, all accepted: publish runs outside the request's command key
+  (`withoutCommandKey`), so the jobs pass a nudge starts does not inherit it;
+  ADR 0014 says the feed sends `command_key` only to the change's actor
+  (keys are unique per actor only); ADR 0012 points to it; test tag added.
 
 ## Problems
 
@@ -424,4 +436,4 @@ None.
 
 ## Next step
 
-9.
+10.

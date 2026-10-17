@@ -145,6 +145,47 @@ describe("change log", () => {
     });
   });
 
+  it(
+    "addresses session changes to everyone who can open the event",
+    { tags: ["007-US8"] },
+    async () => {
+      const { session, by } = await world();
+      const { changes } = getRepositories();
+
+      await updateLoggedSession(session.id, { title: "One" }, by);
+      await deleteLoggedSession(session.id, by);
+
+      const recorded = await changes.listAfter(0);
+      expect(recorded.map((c) => c.audience)).toEqual([
+        { kind: "event" },
+        { kind: "event" },
+      ]);
+    }
+  );
+
+  it(
+    "reads an entry written before audiences as addressed to no one",
+    { tags: ["007-US8"] },
+    async () => {
+      const { session } = await world();
+      await withWriter((writer) =>
+        writer
+          .prepare(
+            `INSERT INTO changes (id, type, subject_type, subject_id, actor_type, occurred_at, payload)
+           VALUES ('before-audiences', 'session.deleted', 'session', ?, 'system', ?, ?)`
+          )
+          .run(
+            session.id,
+            AT.toISOString(),
+            JSON.stringify({ session, rsvpGuestIds: [] })
+          )
+      );
+
+      const [old] = await getRepositories().changes.listAfter(0);
+      expect(old).toMatchObject({ id: "before-audiences", audience: null });
+    }
+  );
+
   it("skips entries of a type this version does not know", async () => {
     const { session, by } = await world();
     const { changes } = getRepositories();

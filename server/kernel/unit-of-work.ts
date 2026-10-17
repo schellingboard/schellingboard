@@ -3,8 +3,13 @@ import {
   writeTransaction,
   type Repositories,
 } from "@/db/container";
-import type { Change, RecordedChange } from "@schellingboard/domain/change";
+import {
+  audienceOf,
+  type Change,
+  type RecordedChange,
+} from "@schellingboard/domain/change";
 import { publish } from "./change-subscribers";
+import { commandKey, withoutCommandKey } from "./command-key";
 
 /** The repositories bound to one use case's transaction. */
 export type Tx = Repositories & { record(change: Change): void };
@@ -48,11 +53,16 @@ export const unitOfWork: UnitOfWork = {
           });
           if (isFailure(result)) throw new Refused(result);
           for (const change of pending) {
-            recorded.push(await repositories.changes.append(change));
+            recorded.push(
+              await repositories.changes.append(change, {
+                audience: audienceOf(change),
+                commandKey: commandKey(),
+              })
+            );
           }
           return result;
         },
-        () => publish(recorded)
+        () => withoutCommandKey(() => publish(recorded))
       );
     } catch (e) {
       if (e instanceof Refused) return e.result as T;

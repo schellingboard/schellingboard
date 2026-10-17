@@ -34,8 +34,31 @@ export type SessionDeleted = ChangeOf<
 
 export type Change = SessionChanged | SessionDeleted;
 
-/** A change as the log holds it: `seq` orders the log, `id` names one entry. */
-export type RecordedChange = Change & { seq: number; id: string };
+/**
+ * Who may receive a change (ADR 0014). `guests` and `admins` stand in for the
+ * target's `persons` and `organizers` until persons exist.
+ */
+export type Audience =
+  { kind: "event" } | { kind: "guests"; ids: string[] } | { kind: "admins" };
+
+export function audienceOf(change: Change): Audience {
+  switch (change.type) {
+    case "session.changed":
+    case "session.deleted":
+      return { kind: "event" };
+  }
+}
+
+/**
+ * A change as the log holds it: `seq` orders the log, `id` names one entry.
+ * Entries written before audiences have none and go to no one.
+ */
+export type RecordedChange = Change & {
+  seq: number;
+  id: string;
+  audience: Audience | null;
+  commandKey: string | null;
+};
 
 export const changes = {
   sessionChanged(

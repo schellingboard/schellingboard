@@ -7,6 +7,7 @@ import { getRepositories } from "@/db/container";
 import { unitOfWork, type Tx } from "@/server/kernel/unit-of-work";
 import { subscribeToChanges } from "@/server/kernel/change-subscribers";
 import { conflict } from "@/server/kernel/result";
+import { commandKey, withCommandKey } from "@/server/kernel/command-key";
 import { changes, type RecordedChange } from "@schellingboard/domain/change";
 
 function gate() {
@@ -148,6 +149,20 @@ describe("unit of work", () => {
       "Second"
     );
     expect(await getRepositories().changes.listAfter(0)).toHaveLength(2);
+  });
+
+  it("publishes outside the request's command key", async () => {
+    const session = await createSession((await createEvent()).id);
+    const seen: (string | null)[] = [];
+    unsubscribe = subscribeToChanges(() => void seen.push(commandKey()));
+
+    const recorded = await withCommandKey("edit-1", async () => {
+      await unitOfWork.run((tx) => renamedInside(tx, session.id, "Keyed"));
+      return getRepositories().changes.listAfter(0);
+    });
+
+    expect(recorded[0].commandKey).toBe("edit-1");
+    expect(seen).toEqual([null]);
   });
 
   it("publishes changes after commit, in seq order", async () => {
