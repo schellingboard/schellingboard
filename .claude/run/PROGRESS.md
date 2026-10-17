@@ -764,6 +764,13 @@ None.
   without a name sees. Auth flows left on the repositories (allow-list in 16c).
   Not run: E2E (user's rule).
 
+## 16b
+
+- Admin pages read through `adminReads()` (search/paging and per-event admin
+  reads) and `pageReads()` in `server/composition.ts`; per-module `page-reads.ts`
+  as in 16a. Only the three auth-flow files still call `getRepositories()`.
+  Not run: E2E (user's rule).
+
 ## Next step
 
-16b: admin pages and layouts.
+16c: the dependency-cruiser rule.

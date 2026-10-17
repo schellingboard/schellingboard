@@ -20,3 +20,9 @@ export const guestVotes = (
   guestId: string,
   eventId: string
 ) => q.votes.listByGuestAndEvent(guestId, eventId);
+
+export const searchProposals = (
+  q: Pick<Repositories, "sessionProposals">,
+  eventId: string,
+  opts: Parameters<Repositories["sessionProposals"]["searchByEvent"]>[1]
+) => q.sessionProposals.searchByEvent(eventId, opts);

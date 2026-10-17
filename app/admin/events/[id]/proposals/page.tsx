@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { getRepositories } from "@/db/container";
+import { adminReads, pageReads } from "@/server/composition";
 import { outOfRangePageRedirect, parsePage } from "@/utils/pagination";
 import { requireAdminPage } from "../../../require-admin";
 import {
@@ -21,18 +21,18 @@ export default async function AdminEventProposalsPage({
 
   const { id } = await params;
   const { q, page: pageParam } = await searchParams;
-  const repos = getRepositories();
-  const event = await repos.events.findById(id);
+  const admin = adminReads();
+  const event = await pageReads().eventById(id);
   if (!event) notFound();
 
   const page = parsePage(pageParam);
   const query = q?.trim() ?? "";
 
-  const eventGuests: EventGuest[] = (await repos.guests.listByEvent(id)).map(
+  const eventGuests: EventGuest[] = (await admin.guestsOfEvent(id)).map(
     (g) => ({ id: g.id, name: g.name })
   );
 
-  const { rows, total } = await repos.sessionProposals.searchByEvent(id, {
+  const { rows, total } = await admin.searchProposals(id, {
     query: query || undefined,
     limit: PAGE_SIZE,
     offset: (page - 1) * PAGE_SIZE,

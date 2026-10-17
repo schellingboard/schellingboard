@@ -217,9 +217,10 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
         (`server/composition.ts`; per-module `page-reads.ts`). The auth flows
         (`actions/user-auth.ts`, `auth/login`, `auth/reset`) stay on the repositories
         for the allow-list.
-  - [ ] 16b. Admin pages and layouts (12 files under `app/admin/`).
+  - [x] 16b. Admin pages and layouts (12 files under `app/admin/`).
   - [ ] 16c. A dependency-cruiser rule forbidding `app/` → `db/container`, with an
-        allow-list for the auth flows (step 6 of the path).
+        allow-list for the auth flows (step 6 of the path), and a rule allowing
+        `adminReads` only from `app/admin/**` and `app/actions/admin-*`.
 - [ ] 17. **`Idempotency-Key` from the UI (#141)**: the create forms (proposal,
       session, comment) and the RSVP toggle send a key made per form instance; server
       actions use the same idempotency store as the middleware (its core moves to the

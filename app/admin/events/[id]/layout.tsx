@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { BackLink } from "@/app/components/back-link";
-import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
 import { requireAdminPage } from "../../require-admin";
 import { EventTabs } from "./event-tabs";
 
@@ -14,7 +14,7 @@ export default async function AdminEventDetailLayout({
   await requireAdminPage();
 
   const { id } = await params;
-  const event = await getRepositories().events.findById(id);
+  const event = await pageReads().eventById(id);
   if (!event) notFound();
 
   return (

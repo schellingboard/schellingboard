@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { getRepositories } from "@/db/container";
+import { adminReads, pageReads } from "@/server/composition";
 import { outOfRangePageRedirect, parsePage } from "@/utils/pagination";
 import { formatDayLabel } from "@schellingboard/domain/time";
 import { requireAdminPage } from "../../../require-admin";
@@ -24,38 +24,37 @@ export default async function AdminEventSessionsPage({
 
   const { id } = await params;
   const { q, page: pageParam } = await searchParams;
-  const repos = getRepositories();
-  const event = await repos.events.findById(id);
+  const admin = adminReads();
+  const reads = pageReads();
+  const event = await reads.eventById(id);
   if (!event) notFound();
 
   const page = parsePage(pageParam);
   const query = q?.trim() ?? "";
 
-  const eventGuests: EventGuest[] = (await repos.guests.listByEvent(id)).map(
+  const eventGuests: EventGuest[] = (await admin.guestsOfEvent(id)).map(
     (g) => ({ id: g.id, name: g.name })
   );
   // RSVP names resolve against all guests, not just currently-assigned ones.
   const guestNameById = new Map(
-    (await repos.guests.list()).map((g) => [g.id, g.name])
+    (await reads.allGuests()).map((g) => [g.id, g.name])
   );
 
-  const allLocations = await repos.locations.list();
-  const assignedLocationIds = new Set(
-    await repos.locations.listLocationIdsByEvent(id)
-  );
+  const allLocations = await admin.allLocations();
+  const assignedLocationIds = new Set(await admin.locationIdsOfEvent(id));
   const capacityById = new Map(allLocations.map((l) => [l.id, l.capacity]));
   const eventLocations: EventLocation[] = allLocations
     .filter((l) => assignedLocationIds.has(l.id))
     .map((l) => ({ id: l.id, name: l.name, capacity: l.capacity }));
 
-  const days: DayOption[] = (await repos.days.listByEvent(id)).map((d) => ({
+  const days: DayOption[] = (await reads.eventDays(id)).map((d) => ({
     key: d.id,
     label: formatDayLabel(d, event.timezone),
     start: d.start.toISOString(),
     end: d.end.toISOString(),
   }));
 
-  const { rows, total } = await repos.sessions.searchByEvent(id, {
+  const { rows, total } = await admin.searchSessions(id, {
     query: query || undefined,
     limit: PAGE_SIZE,
     offset: (page - 1) * PAGE_SIZE,
@@ -70,9 +69,7 @@ export default async function AdminEventSessionsPage({
   });
   if (redirectTarget) redirect(redirectTarget);
 
-  const rsvpsBySession = await repos.rsvps.listBySessions(
-    rows.map((s) => s.id)
-  );
+  const rsvpsBySession = await admin.rsvpsOfSessions(rows.map((s) => s.id));
   const sessionRows: SessionRow[] = rows.map((s) => ({
     id: s.id,
     title: s.title,

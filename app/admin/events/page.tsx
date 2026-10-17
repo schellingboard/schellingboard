@@ -1,12 +1,11 @@
-import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
 import { requireAdminPage } from "../require-admin";
 import { EventsManager } from "./events-manager";
 
 export default async function AdminEventsPage() {
   await requireAdminPage();
 
-  const repositories = getRepositories();
-  const events = await repositories.events.list();
+  const events = await pageReads().allEvents();
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">

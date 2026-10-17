@@ -1,11 +1,11 @@
-import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
 import { requireAdminPage } from "../require-admin";
 import { SettingsManager } from "../settings-manager";
 
 export default async function AdminSettingsPage() {
   await requireAdminPage();
 
-  const settings = await getRepositories().settings.get();
+  const settings = await pageReads().siteSettings();
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">

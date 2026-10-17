@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getRepositories } from "@/db/container";
+import { adminReads } from "@/server/composition";
 import { SECONDARY_BUTTON } from "../buttons";
 import { outOfRangePageRedirect, parsePage } from "@/utils/pagination";
 import { requireAdminPage } from "../require-admin";
@@ -19,8 +19,8 @@ export default async function AdminUsersPage({
   const page = parsePage(pageParam);
   const query = q?.trim() ?? "";
 
-  const repositories = getRepositories();
-  const { rows, total } = await repositories.guests.search({
+  const admin = adminReads();
+  const { rows, total } = await admin.searchGuests({
     query: query || undefined,
     limit: PAGE_SIZE,
     offset: (page - 1) * PAGE_SIZE,
@@ -35,9 +35,7 @@ export default async function AdminUsersPage({
   });
   if (redirectTarget) redirect(redirectTarget);
 
-  const eventsByGuest = await repositories.guests.listEventsByGuests(
-    rows.map((g) => g.id)
-  );
+  const eventsByGuest = await admin.eventsOfGuests(rows.map((g) => g.id));
   const users: AdminUser[] = rows.map((guest) => ({
     guest,
     events: eventsByGuest.get(guest.id) ?? [],

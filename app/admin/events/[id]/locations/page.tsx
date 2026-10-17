@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { getRepositories } from "@/db/container";
+import { adminReads, pageReads } from "@/server/composition";
 import { outOfRangePageRedirect, parsePage } from "@/utils/pagination";
 import { requireAdminPage } from "../../../require-admin";
 import {
@@ -26,8 +26,9 @@ export default async function AdminEventLocationsPage({
 
   const { id } = await params;
   const { q, page: pageParam, filter: filterParam } = await searchParams;
-  const repos = getRepositories();
-  const event = await repos.events.findById(id);
+  const admin = adminReads();
+  const reads = pageReads();
+  const event = await reads.eventById(id);
   if (!event) notFound();
 
   const filter = parseFilter(filterParam);
@@ -40,7 +41,7 @@ export default async function AdminEventLocationsPage({
         ? false
         : undefined;
 
-  const { rows, total } = await repos.locations.searchForEventAssignment(id, {
+  const { rows, total } = await admin.locationsForEventAssignment(id, {
     query: query || undefined,
     assigned,
     limit: PAGE_SIZE,
@@ -64,9 +65,9 @@ export default async function AdminEventLocationsPage({
   }));
 
   const [rooms, days, periods] = await Promise.all([
-    repos.locations.listByEvent(id),
-    repos.days.listByEvent(id),
-    repos.locationUnavailability.listByEvent(id),
+    reads.eventLocations(id),
+    reads.eventDays(id),
+    admin.unavailabilityOfEvent(id),
   ]);
 
   return (
