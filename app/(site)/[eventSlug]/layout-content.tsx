@@ -2,7 +2,6 @@ import { cookies } from "next/headers";
 import { eventSnapshot } from "@/server/composition";
 import { resolveActor } from "@/server/kernel/actor";
 import { EventProviderWrapper } from "./event-provider-wrapper";
-import { eventContextFrom } from "./replica/selectors";
 import { serverNow } from "@/utils/dev-clock-server";
 import { meetingViewsFor } from "@/utils/meeting-views";
 
@@ -21,7 +20,6 @@ export async function EventLayoutContent({
     return <div>Event not found</div>;
   }
 
-  const context = eventContextFrom(snapshot.value);
   const now = await serverNow();
   // Clash lines rest on other guests' RSVPs, which the snapshot never holds
   // (ADR 0014 section 4).
@@ -29,22 +27,24 @@ export async function EventLayoutContent({
   const myMeetings = me
     ? {
         guestId: me.guestId,
-        meetings: await meetingViewsFor(me.guestId, context.event.id, now),
+        meetings: await meetingViewsFor(
+          me.guestId,
+          snapshot.value.event.id,
+          now
+        ),
         availability: me.availability,
       }
     : null;
 
-  const eventContextValue = {
-    ...context,
-    myMeetings,
-    // Computed on the server so SSR and hydration agree on which days
-    // default to folded (see getDefaultFoldedDayIds). Honours the dev fake
-    // clock so time travel drives phase/schedule UI (see docs/dev/adr/0004-dev-fake-clock.md).
-    now,
-  };
-
+  // `now` is computed on the server so SSR and hydration agree on which days
+  // default to folded (see getDefaultFoldedDayIds). It honours the dev fake
+  // clock (docs/dev/adr/0004-dev-fake-clock.md).
   return (
-    <EventProviderWrapper eventContextValue={eventContextValue}>
+    <EventProviderWrapper
+      snapshot={snapshot.value}
+      myMeetings={myMeetings}
+      now={now}
+    >
       {children}
     </EventProviderWrapper>
   );

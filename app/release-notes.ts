@@ -44,7 +44,9 @@ export const SHOWN_RELEASES = 3;
 export const releaseNotes: ReleaseNote[] = [
   {
     version: "Unreleased",
-    highlights: [],
+    highlights: [
+      "**A live schedule**: sessions, RSVP counts and rooms update on everyone's screen as they change, with no reload, which suits the kiosk.",
+    ],
   },
   {
     version: "4.0.0",

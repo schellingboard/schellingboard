@@ -16,4 +16,30 @@ describe("replica store", () => {
     expect(store.get().seq).toBe(2);
     expect(calls).toBe(1);
   });
+
+  it("knows the event is gone once it is deleted, until a snapshot replaces it", () => {
+    const store = createReplicaStore(snapshot);
+    let calls = 0;
+    store.subscribe(() => calls++);
+
+    store.applyMessage({
+      seq: snapshot.seq + 1,
+      type: "event.deleted",
+      commandKey: null,
+    });
+
+    expect(store.gone()).toBe(true);
+    expect(calls).toBe(1);
+    store.replace(snapshot);
+    expect(store.gone()).toBe(false);
+  });
+
+  it("adopt takes a seed at or above the replica's seq, never a lower one", () => {
+    const store = createReplicaStore({ ...snapshot, seq: 10 });
+
+    store.adopt({ ...snapshot, seq: 9 });
+    expect(store.get().seq).toBe(10);
+    store.adopt({ ...snapshot, seq: 11 });
+    expect(store.get().seq).toBe(11);
+  });
 });

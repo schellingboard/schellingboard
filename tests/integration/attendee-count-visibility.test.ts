@@ -1,4 +1,6 @@
 // @module-tag 001-US1
+import type { Snapshot } from "@schellingboard/contracts/snapshot";
+import { eventContextFrom } from "@/app/(site)/[eventSlug]/replica/selectors";
 import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 
@@ -23,12 +25,8 @@ vi.mock("next/headers", () => ({
 
 const captured: { sessions?: unknown } = {};
 vi.mock("@/app/(site)/[eventSlug]/event-provider-wrapper", () => ({
-  EventProviderWrapper: ({
-    eventContextValue,
-  }: {
-    eventContextValue: { sessions: unknown };
-  }) => {
-    captured.sessions = eventContextValue.sessions;
+  EventProviderWrapper: ({ snapshot }: { snapshot: Snapshot }) => {
+    captured.sessions = eventContextFrom(snapshot).sessions;
     return "PROVIDER_STUB";
   },
 }));
