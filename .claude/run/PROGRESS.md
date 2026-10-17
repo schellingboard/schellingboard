@@ -579,6 +579,25 @@ cursor.invalid`. The use case now returns the whole list; the
   (the `publicSchedule` setting is not part of this step). Replay is written
   before the response returns, so a very long replay is held in memory first.
 
+- 13b review, accepted: the route registers its abort listener before
+  `openFeed` and closes a feed that finished while opening, starting no
+  timers; the 400 test also checks `feed.sinceInvalid`.
+- 13c: the response body is a `ByteLengthQueuingStrategy` of 1,000,000 bytes;
+  past it the route ends the stream (also during the replay: `send` returns
+  false and `openFeed` stops), which bounds the replay buffer too.
+  `server/kernel/credential-changes.ts` (`credentialsChanged`, listened to by
+  the hub) ends a guest's connections; it is called after the three
+  `setAuthProtection` calls in `app/actions/user-auth.ts` (through
+  `setProtection`) and after `deleteGuest`. The action call sites have no new
+  test (the kernel signal and the guest delete do).
+
+- 13c review: a `credentialsChanged` between the route resolving the viewer
+  and `openFeed` registering is missed, so that stream keeps the old viewer
+  until its 10-minute end (accepted: the window is a few reads; the cookie
+  is checked again then). A replay over 1 MB is cut and resumed on each
+  reconnect (about 3 s apart for the browser), so a very late resume is slow
+  but complete. Listener errors in `credentialsChanged` are logged.
+
 ## Problems
 
 None.
@@ -604,4 +623,4 @@ None.
 
 ## Next step
 
-13c.
+14.

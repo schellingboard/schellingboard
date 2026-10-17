@@ -1,3 +1,4 @@
+import { credentialsChanged } from "@/server/kernel/credential-changes";
 import {
   createGuestSchema,
   updateGuestSchema,
@@ -201,7 +202,7 @@ export const deleteGuest =
     now: Date
   ): Promise<Result<void>> => {
     if (!actor.admin) return adminRequired();
-    return withStoredFile(avatars, null, (replaces) =>
+    const result = await withStoredFile(avatars, null, (replaces) =>
       uow.run(async (tx) => {
         const guest = await tx.guests.findById(input.id);
         if (!guest) return guestNotFound();
@@ -231,6 +232,8 @@ export const deleteGuest =
         return ok(undefined);
       })
     );
+    if (result.ok) credentialsChanged(input.id);
+    return result;
   };
 
 export const sendTestEmail =

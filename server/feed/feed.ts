@@ -24,23 +24,33 @@ export type OpenFeed =
 export async function openFeed(
   uow: UnitOfWork,
   { eventId, viewer, since }: FeedRequest,
-  send: (message: FeedMessage) => void
+  send: (message: FeedMessage) => boolean | void,
+  drop: () => void = () => {}
 ): Promise<OpenFeed> {
   let lastSeq = since;
   let buffer: RecordedChange[] | null = [];
+  let stopped = false;
+
+  function emit(change: RecordedChange): void {
+    const message = project(change, viewer);
+    if (message && send(message) === false) {
+      stopped = true;
+      unregister();
+    }
+  }
 
   function deliver(change: RecordedChange): void {
-    if (change.seq <= lastSeq) return;
+    if (change.seq <= lastSeq || stopped) return;
     lastSeq = change.seq;
-    const message = project(change, viewer);
-    if (message) send(message);
+    emit(change);
   }
 
   const unregister = register({
     eventId,
     viewer,
+    drop,
     // Bounded in practice: a replay lasts a few reads.
-    deliver: (change) => (buffer ? buffer.push(change) : deliver(change)),
+    deliver: (change) => void (buffer ? buffer.push(change) : deliver(change)),
   });
 
   try {
@@ -62,12 +72,10 @@ export async function openFeed(
       );
       for (const change of batch) {
         lastSeq = change.seq;
-        if (reaches(change.audience, viewer)) {
-          const message = project(change, viewer);
-          if (message) send(message);
-        }
+        if (reaches(change.audience, viewer)) emit(change);
+        if (stopped) break;
       }
-      if (batch.length < BATCH) break;
+      if (stopped || batch.length < BATCH) break;
     }
 
     // Pruning may have passed the resume point while we replayed.

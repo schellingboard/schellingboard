@@ -3,17 +3,21 @@ import {
   type RecordedChange,
   type Viewer,
 } from "@schellingboard/domain/change";
+import { onCredentialsChanged } from "@/server/kernel/credential-changes";
 import { subscribeToChanges } from "@/server/kernel/change-subscribers";
 
 export interface Connection {
   eventId: string;
   viewer: Viewer;
   deliver(change: RecordedChange): void;
+  /** The hub ends the connection; its owner closes the stream. */
+  drop(): void;
 }
 
 const g = globalThis as typeof globalThis & {
   __feedConnections?: Set<Connection>;
   __feedSubscription?: () => void;
+  __feedCredentialSubscription?: () => void;
 };
 
 function connections(): Set<Connection> {
@@ -37,6 +41,14 @@ export function register(connection: Connection): () => void {
           connections().delete(c);
         }
       }
+    }
+  });
+  // A viewer is fixed when a connection opens, so a changed login must end it.
+  g.__feedCredentialSubscription ??= onCredentialsChanged((guestId) => {
+    for (const c of [...connections()]) {
+      if (c.viewer.guestId !== guestId) continue;
+      connections().delete(c);
+      c.drop();
     }
   });
   connections().add(connection);

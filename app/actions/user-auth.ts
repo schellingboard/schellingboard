@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { newPasswordSchema } from "@schellingboard/contracts/auth";
 import { getRepositories } from "@/db/container";
+import { credentialsChanged } from "@/server/kernel/credential-changes";
 import type { AuthCode, AuthCodePurpose } from "@schellingboard/domain/auth";
 import {
   createGuestCookie,
@@ -334,6 +335,16 @@ export async function loginAsGuestAction(
   };
 }
 
+async function setProtection(
+  guestId: string,
+  creds: Parameters<
+    ReturnType<typeof getRepositories>["guests"]["setAuthProtection"]
+  >[1]
+): Promise<void> {
+  await getRepositories().guests.setAuthProtection(guestId, creds);
+  credentialsChanged(guestId);
+}
+
 /**
  * Sets a new password from a valid reset link and turns protection on. Proves
  * nothing but control of the emailed link, so it deliberately does NOT create a
@@ -363,7 +374,7 @@ export async function setPasswordWithTokenAction(
   }
   const creds = await guests.getAuthCredentials(guestId);
   const wasProtected = creds?.authProtected ?? false;
-  await guests.setAuthProtection(guestId, {
+  await setProtection(guestId, {
     authProtected: true,
     passwordHash: await hashUserPassword(parsed.data),
   });
@@ -414,7 +425,7 @@ export async function changePasswordAction(
     recordLoginFailure("guest", guestId);
     return { ok: false, error: "Wrong password" };
   }
-  await guests.setAuthProtection(guestId, {
+  await setProtection(guestId, {
     authProtected: true,
     passwordHash: await hashUserPassword(parsed.data),
   });
@@ -449,7 +460,7 @@ export async function disableProtectionAction(
     recordLoginFailure("guest", guestId);
     return { ok: false, error: "Wrong password" };
   }
-  await guests.setAuthProtection(guestId, {
+  await setProtection(guestId, {
     authProtected: false,
     passwordHash: null,
   });
