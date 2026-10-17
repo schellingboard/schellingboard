@@ -28,6 +28,7 @@ export type Event = {
   meetingsEnabled: boolean;
   /** How many unanswered requests one attendee may have outstanding. */
   maxOpenMeetingRequests: number;
+  version: number;
 };
 
 /**
@@ -46,6 +47,7 @@ export type Day = {
   startBookings: Date;
   endBookings: Date;
   eventId: string;
+  version: number;
 };
 
 // Events without days have no dates yet and sort last.

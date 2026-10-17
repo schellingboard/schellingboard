@@ -123,12 +123,13 @@ never keep it, so a read always shows the current state.
 
 ## Editing what someone else may be editing
 
-Sessions and proposals carry a `version`, which goes up with every change. An
-edit (`PUT`) sends the version it was made from as `expectedVersion`. If
-someone changed the item since, the edit is refused with `409` and
-`session.versionConflict` or `proposal.versionConflict`, and the body's
-`current` member holds the item as it is now: redo the edit on it and send
-again with its `version`. Nothing is overwritten unseen.
+Sessions, proposals, events and days carry a `version`, which goes up with
+every change. An edit (`PUT`) sends the version it was made from as
+`expectedVersion`; an event's settings, phase dates and 1-on-1 settings share
+the event's version. If someone changed the item since, the edit is refused with `409` and
+`<item>.versionConflict` (`session`, `proposal`, `event` or `day`), and the
+body's `current` member holds the item as it is now: redo the edit on it and
+send again with its `version`. Nothing is overwritten unseen.
 
 ## Syncing from a script
 

@@ -314,6 +314,84 @@
           "clashes"
         ]
       },
+      "Event": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "slug": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "website": { "type": "string" },
+          "timezone": { "type": "string" },
+          "maxSessionDuration": { "type": "integer" },
+          "breakMinutes": { "type": "integer" },
+          "slotIncrementMinutes": { "type": "integer" },
+          "rsvpCapacityHardLimit": { "type": "boolean" },
+          "icon": { "type": ["string", "null"] },
+          "meetingsEnabled": { "type": "boolean" },
+          "maxOpenMeetingRequests": { "type": "integer" },
+          "firstDayStart": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          },
+          "lastDayStart": { "type": ["string", "null"], "format": "date-time" },
+          "proposalPhaseStart": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "null clears it"
+          },
+          "proposalPhaseEnd": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "null clears it"
+          },
+          "votingPhaseStart": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "null clears it"
+          },
+          "votingPhaseEnd": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "null clears it"
+          },
+          "schedulingPhaseStart": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "null clears it"
+          },
+          "schedulingPhaseEnd": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "null clears it"
+          },
+          "version": { "type": "integer" }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "description",
+          "website",
+          "timezone",
+          "maxSessionDuration",
+          "breakMinutes",
+          "slotIncrementMinutes",
+          "rsvpCapacityHardLimit",
+          "icon",
+          "meetingsEnabled",
+          "maxOpenMeetingRequests",
+          "firstDayStart",
+          "lastDayStart",
+          "proposalPhaseStart",
+          "proposalPhaseEnd",
+          "votingPhaseStart",
+          "votingPhaseEnd",
+          "schedulingPhaseStart",
+          "schedulingPhaseEnd",
+          "version"
+        ]
+      },
       "PublicProfile": {
         "type": "object",
         "properties": {
@@ -410,82 +488,6 @@
           "readAt": { "type": ["string", "null"], "format": "date-time" }
         },
         "required": ["id", "type", "text", "url", "createdAt", "readAt"]
-      },
-      "Event": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "string" },
-          "slug": { "type": "string" },
-          "name": { "type": "string" },
-          "description": { "type": "string" },
-          "website": { "type": "string" },
-          "timezone": { "type": "string" },
-          "maxSessionDuration": { "type": "integer" },
-          "breakMinutes": { "type": "integer" },
-          "slotIncrementMinutes": { "type": "integer" },
-          "rsvpCapacityHardLimit": { "type": "boolean" },
-          "icon": { "type": ["string", "null"] },
-          "meetingsEnabled": { "type": "boolean" },
-          "maxOpenMeetingRequests": { "type": "integer" },
-          "firstDayStart": {
-            "type": ["string", "null"],
-            "format": "date-time"
-          },
-          "lastDayStart": { "type": ["string", "null"], "format": "date-time" },
-          "proposalPhaseStart": {
-            "type": ["string", "null"],
-            "format": "date-time",
-            "description": "null clears it"
-          },
-          "proposalPhaseEnd": {
-            "type": ["string", "null"],
-            "format": "date-time",
-            "description": "null clears it"
-          },
-          "votingPhaseStart": {
-            "type": ["string", "null"],
-            "format": "date-time",
-            "description": "null clears it"
-          },
-          "votingPhaseEnd": {
-            "type": ["string", "null"],
-            "format": "date-time",
-            "description": "null clears it"
-          },
-          "schedulingPhaseStart": {
-            "type": ["string", "null"],
-            "format": "date-time",
-            "description": "null clears it"
-          },
-          "schedulingPhaseEnd": {
-            "type": ["string", "null"],
-            "format": "date-time",
-            "description": "null clears it"
-          }
-        },
-        "required": [
-          "id",
-          "slug",
-          "name",
-          "description",
-          "website",
-          "timezone",
-          "maxSessionDuration",
-          "breakMinutes",
-          "slotIncrementMinutes",
-          "rsvpCapacityHardLimit",
-          "icon",
-          "meetingsEnabled",
-          "maxOpenMeetingRequests",
-          "firstDayStart",
-          "lastDayStart",
-          "proposalPhaseStart",
-          "proposalPhaseEnd",
-          "votingPhaseStart",
-          "votingPhaseEnd",
-          "schedulingPhaseStart",
-          "schedulingPhaseEnd"
-        ]
       },
       "Location": {
         "type": "object",
@@ -3111,15 +3113,56 @@
                   "maxOpenMeetingRequests": {
                     "type": "integer",
                     "description": "Required, at least 1, when meetingsEnabled is true"
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "description": "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
                   }
                 },
-                "required": ["meetingsEnabled"]
+                "required": ["meetingsEnabled", "expectedVersion"]
               }
             }
           }
         },
         "responses": {
-          "204": { "description": "Saved" },
+          "200": {
+            "description": "The updated event",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Event" }
+              }
+            }
+          },
+          "409": {
+            "description": "A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    },
+                    "current": { "$ref": "#/components/schemas/Event" }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
+              }
+            }
+          },
           "default": {
             "description": "Problem details (RFC 9457); clients branch on `code`",
             "content": {
@@ -4307,7 +4350,8 @@
                             "description": "When sessions must end"
                           },
                           "id": { "type": "string" },
-                          "eventId": { "type": "string" }
+                          "eventId": { "type": "string" },
+                          "version": { "type": "integer" }
                         },
                         "required": [
                           "start",
@@ -4315,7 +4359,8 @@
                           "startBookings",
                           "endBookings",
                           "id",
-                          "eventId"
+                          "eventId",
+                          "version"
                         ]
                       }
                     }
@@ -4423,13 +4468,18 @@
                       "WrenchIcon",
                       null
                     ]
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "description": "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
                   }
                 },
                 "required": [
                   "name",
                   "maxSessionDuration",
                   "breakMinutes",
-                  "slotIncrementMinutes"
+                  "slotIncrementMinutes",
+                  "expectedVersion"
                 ]
               }
             }
@@ -4441,6 +4491,36 @@
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Event" }
+              }
+            }
+          },
+          "409": {
+            "description": "A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    },
+                    "current": { "$ref": "#/components/schemas/Event" }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
               }
             }
           },
@@ -4549,6 +4629,10 @@
                     "type": ["string", "null"],
                     "format": "date-time",
                     "description": "null clears it"
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "description": "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
                   }
                 },
                 "required": [
@@ -4557,7 +4641,8 @@
                   "votingPhaseStart",
                   "votingPhaseEnd",
                   "schedulingPhaseStart",
-                  "schedulingPhaseEnd"
+                  "schedulingPhaseEnd",
+                  "expectedVersion"
                 ]
               }
             }
@@ -4569,6 +4654,36 @@
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Event" }
+              }
+            }
+          },
+          "409": {
+            "description": "A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    },
+                    "current": { "$ref": "#/components/schemas/Event" }
+                  },
+                  "required": ["type", "title", "status", "code"]
+                }
               }
             }
           },
@@ -4652,7 +4767,8 @@
                       "description": "When sessions must end"
                     },
                     "id": { "type": "string" },
-                    "eventId": { "type": "string" }
+                    "eventId": { "type": "string" },
+                    "version": { "type": "integer" }
                   },
                   "required": [
                     "start",
@@ -4660,7 +4776,8 @@
                     "startBookings",
                     "endBookings",
                     "id",
-                    "eventId"
+                    "eventId",
+                    "version"
                   ]
                 }
               }
@@ -4719,9 +4836,19 @@
                     "type": "string",
                     "format": "date-time",
                     "description": "When sessions must end"
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "description": "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
                   }
                 },
-                "required": ["start", "end", "startBookings", "endBookings"]
+                "required": [
+                  "start",
+                  "end",
+                  "startBookings",
+                  "endBookings",
+                  "expectedVersion"
+                ]
               }
             }
           }
@@ -4747,7 +4874,8 @@
                       "description": "When sessions must end"
                     },
                     "id": { "type": "string" },
-                    "eventId": { "type": "string" }
+                    "eventId": { "type": "string" },
+                    "version": { "type": "integer" }
                   },
                   "required": [
                     "start",
@@ -4755,8 +4883,67 @@
                     "startBookings",
                     "endBookings",
                     "id",
-                    "eventId"
+                    "eventId",
+                    "version"
                   ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion`",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "title": { "type": "string" },
+                    "status": { "type": "integer" },
+                    "code": { "type": "string" },
+                    "detail": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": { "type": "string" },
+                          "message": { "type": "string" }
+                        },
+                        "required": ["path", "message"]
+                      }
+                    },
+                    "current": {
+                      "type": "object",
+                      "properties": {
+                        "start": { "type": "string", "format": "date-time" },
+                        "end": { "type": "string", "format": "date-time" },
+                        "startBookings": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "When sessions may start"
+                        },
+                        "endBookings": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "When sessions must end"
+                        },
+                        "id": { "type": "string" },
+                        "eventId": { "type": "string" },
+                        "version": { "type": "integer" }
+                      },
+                      "required": [
+                        "start",
+                        "end",
+                        "startBookings",
+                        "endBookings",
+                        "id",
+                        "eventId",
+                        "version"
+                      ]
+                    }
+                  },
+                  "required": ["type", "title", "status", "code"]
                 }
               }
             }

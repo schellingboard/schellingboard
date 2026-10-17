@@ -139,6 +139,7 @@ const DAY: Day = {
   startBookings: new Date("2025-06-15T09:00:00Z"),
   endBookings: new Date("2025-06-15T17:00:00Z"),
   eventId: "111",
+  version: 1,
 };
 
 describe("dateOnDay", () => {

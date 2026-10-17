@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { expectedVersion } from "./session";
 
 // The lengths are the only bound on two free-text fields that are stored
 // verbatim and shown to the recipient; they are generous rather than tuned.
@@ -130,6 +131,10 @@ export const eventMeetingsSchema = z.object({
     .int()
     .optional()
     .describe("Required, at least 1, when meetingsEnabled is true"),
+});
+
+export const eventMeetingsUpdateBodySchema = eventMeetingsSchema.extend({
+  expectedVersion,
 });
 
 export const meetingPointInputSchema = z.object({

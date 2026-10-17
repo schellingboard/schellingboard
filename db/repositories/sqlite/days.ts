@@ -1,4 +1,4 @@
-import { and, eq, gt, isNotNull, lt } from "drizzle-orm";
+import { and, eq, gt, isNotNull, lt, sql } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
 import * as schema from "../../schema";
@@ -15,6 +15,7 @@ function rowToDay(row: typeof schema.days.$inferSelect): Day {
     startBookings: new Date(row.startBookings),
     endBookings: new Date(row.endBookings),
     eventId: row.eventId,
+    version: row.version,
   };
 }
 
@@ -40,6 +41,10 @@ export class SqliteDaysRepository implements DaysRepository {
   }
 
   async findById(id: string): Promise<Day | undefined> {
+    return this.findByIdSync(id);
+  }
+
+  private findByIdSync(id: string): Day | undefined {
     const row = this.db
       .select()
       .from(schema.days)
@@ -48,7 +53,7 @@ export class SqliteDaysRepository implements DaysRepository {
     return row ? rowToDay(row) : undefined;
   }
 
-  async create(data: Omit<Day, "id">): Promise<Day> {
+  async create(data: Omit<Day, "id" | "version">): Promise<Day> {
     const id = nanoid();
     this.db
       .insert(schema.days)
@@ -61,35 +66,45 @@ export class SqliteDaysRepository implements DaysRepository {
         eventId: data.eventId,
       })
       .run();
-    return { id, ...data };
+    return { id, ...data, version: 1 };
   }
 
   async update(
     id: string,
-    patch: Partial<Omit<Day, "id" | "eventId">>
+    patch: Partial<Omit<Day, "id" | "eventId" | "version">> & {
+      expectedVersion?: number;
+    }
   ): Promise<Day | undefined> {
-    if (!(await this.findById(id))) {
-      return undefined;
-    }
-
     const set: Partial<typeof schema.days.$inferInsert> = {};
-    if (patch.start !== undefined) {
-      set.start = patch.start.toISOString();
-    }
-    if (patch.end !== undefined) {
-      set.end = patch.end.toISOString();
-    }
-    if (patch.startBookings !== undefined) {
+    if (patch.start !== undefined) set.start = patch.start.toISOString();
+    if (patch.end !== undefined) set.end = patch.end.toISOString();
+    if (patch.startBookings !== undefined)
       set.startBookings = patch.startBookings.toISOString();
-    }
-    if (patch.endBookings !== undefined) {
+    if (patch.endBookings !== undefined)
       set.endBookings = patch.endBookings.toISOString();
-    }
 
-    if (Object.keys(set).length > 0) {
-      this.db.update(schema.days).set(set).where(eq(schema.days.id, id)).run();
-    }
-    return this.findById(id);
+    const applied = this.db.transaction(
+      (tx) => {
+        const before = this.findByIdSync(id);
+        if (
+          !before ||
+          (patch.expectedVersion !== undefined &&
+            before.version !== patch.expectedVersion)
+        )
+          return false;
+        if (Object.keys(set).length === 0) return true;
+        tx.update(schema.days).set(set).where(eq(schema.days.id, id)).run();
+        if (JSON.stringify(before) !== JSON.stringify(this.findByIdSync(id))) {
+          tx.update(schema.days)
+            .set({ version: sql`${schema.days.version} + 1` })
+            .where(eq(schema.days.id, id))
+            .run();
+        }
+        return true;
+      },
+      { behavior: "immediate" }
+    );
+    return applied ? this.findByIdSync(id) : undefined;
   }
 
   async delete(id: string): Promise<void> {

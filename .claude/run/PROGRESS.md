@@ -135,6 +135,15 @@ openapi-check typecheck test-coverage` (or `make test`), without E2E. E2E runs
   no break to mark: the existing API bullet is extended instead. 4a2–4a4 add
   their subjects to its last sentence.
 
+- 4a2: events and days get `version` (migration 0049). The event's settings,
+  phases and 1-on-1 settings share one version; the repositories bump it only
+  when the re-read row differs. `PUT /admin/events/{id}`, `/phases`,
+  `/meetings` and `/admin/days/{id}` require `expectedVersion` and answer
+  `event.versionConflict` / `day.versionConflict` with `current`.
+  `updateEventPhases` and `updateEventMeetings` now run in `uow.run`;
+  `/meetings` answers `200` with the event (was `204`), so a script learns
+  the new version.
+
 ## Problems
 
 None.
@@ -147,4 +156,4 @@ None.
 
 ## Next step
 
-4a2.
+4a3.

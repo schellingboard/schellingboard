@@ -17,6 +17,7 @@ export type EventInput = {
   slotIncrementMinutes: string;
   rsvpCapacityHardLimit?: boolean;
   icon?: string;
+  expectedVersion?: number;
 };
 
 export type EventPhasesInput = {
@@ -27,6 +28,7 @@ export type EventPhasesInput = {
   votingPhaseEnd?: string;
   schedulingPhaseStart?: string;
   schedulingPhaseEnd?: string;
+  expectedVersion?: number;
 };
 
 async function actor() {
@@ -79,6 +81,7 @@ export async function updateEventPhasesAction(
 ): Promise<AdminActionResult> {
   const result = await eventUseCases().updateEventPhases(await actor(), {
     id: input.id,
+    expectedVersion: input.expectedVersion,
     proposalPhaseStart: phaseDate(input.proposalPhaseStart),
     proposalPhaseEnd: phaseDate(input.proposalPhaseEnd),
     votingPhaseStart: phaseDate(input.votingPhaseStart),

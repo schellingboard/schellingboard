@@ -22,6 +22,7 @@ function makeEvent(overrides: Partial<Event>): Event {
     rsvpCapacityHardLimit: false,
     meetingsEnabled: false,
     maxOpenMeetingRequests: 5,
+    version: 1,
     ...overrides,
   };
 }

@@ -228,15 +228,28 @@ describe("/api/v1 meetings", () => {
       const admin = `${adminCookie.name}=${adminCookie.value}`;
 
       const refused = await call("PUT", `/admin/events/${event.id}/meetings`, {
-        body: { meetingsEnabled: true, maxOpenMeetingRequests: 3 },
+        body: {
+          meetingsEnabled: true,
+          maxOpenMeetingRequests: 3,
+          expectedVersion: 1,
+        },
       });
       expect(refused.status).toBe(403);
       expect(await refused.json()).toMatchObject({ code: "admin.required" });
       const enabled = await call("PUT", `/admin/events/${event.id}/meetings`, {
         cookie: admin,
-        body: { meetingsEnabled: true, maxOpenMeetingRequests: 3 },
+        body: {
+          meetingsEnabled: true,
+          maxOpenMeetingRequests: 3,
+          expectedVersion: 1,
+        },
       });
-      expect(enabled.status).toBe(204);
+      expect(enabled.status).toBe(200);
+      expect(await enabled.json()).toMatchObject({
+        meetingsEnabled: true,
+        maxOpenMeetingRequests: 3,
+        version: 2,
+      });
 
       const points = `/admin/events/${event.id}/meeting-points`;
       const created = await call("POST", points, {

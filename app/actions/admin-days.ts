@@ -53,12 +53,13 @@ export async function createDayAction(
 }
 
 export async function updateDayAction(
-  input: DayInput & { id: string }
+  input: DayInput & { id: string; expectedVersion?: number }
 ): Promise<AdminActionResult> {
   return settled(
     await eventUseCases().updateDay(await actor(), {
       ...window(input),
       id: input.id,
+      expectedVersion: input.expectedVersion,
     })
   );
 }

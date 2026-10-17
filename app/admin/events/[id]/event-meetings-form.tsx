@@ -20,7 +20,7 @@ import {
 } from "@/app/admin/buttons";
 import { ActionError } from "@/app/components/action-error";
 
-type MeetingsForm = Omit<EventMeetingsInput, "id">;
+type MeetingsForm = Omit<EventMeetingsInput, "id" | "expectedVersion">;
 
 // The meeting-point controls sit inside the settings form, where a nested
 // <form> would be invalid HTML — so they are ordinary buttons, and Enter is

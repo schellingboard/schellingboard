@@ -11,6 +11,7 @@ export type EventMeetingsInput = {
   id: string;
   meetingsEnabled: boolean;
   maxOpenMeetingRequests: string;
+  expectedVersion?: number;
 };
 
 export type MeetingPointInput = {
@@ -42,6 +43,7 @@ export async function updateEventMeetingsAction(
     maxOpenMeetingRequests: input.meetingsEnabled
       ? parseInt(input.maxOpenMeetingRequests, 10)
       : undefined,
+    expectedVersion: input.expectedVersion,
   });
   return settled(result, input.id);
 }

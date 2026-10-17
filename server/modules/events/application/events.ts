@@ -12,6 +12,7 @@ import {
   invalid,
   notFound,
   ok,
+  versionConflict,
   type Failure,
   type Result,
 } from "@/server/kernel/result";
@@ -46,16 +47,32 @@ export const PHASE_FIELDS = [
 type PhaseField = (typeof PHASE_FIELDS)[number][0];
 
 /** An unset field clears that date; an invalid Date is refused. */
-export type EventPhasesInput = { id: string } & Record<
-  PhaseField,
-  Date | undefined
->;
+export type EventPhasesInput = {
+  id: string;
+  expectedVersion?: number;
+} & Record<PhaseField, Date | undefined>;
 
 type EventPhases = Partial<Record<PhaseField, Date | undefined>>;
 
 export const adminRequired = () => forbidden("admin.required", "Unauthorized");
 export const eventNotFound = () =>
   notFound("event.notFound", "Event not found");
+
+// For an update the repository refused: the event is gone or at another
+// version than the edit was made from.
+async function eventChangedMeanwhile(
+  repos: EventDeps["repos"],
+  id: string
+): Promise<Failure> {
+  const current = await repos.events.findById(id);
+  return current
+    ? versionConflict(
+        "event",
+        current,
+        "Someone changed this event while you edited it"
+      )
+    : eventNotFound();
+}
 
 // Phase dates and the meeting settings are deliberately excluded: they are
 // managed only by updateEventPhases and the admin Meetings section, so
@@ -211,7 +228,7 @@ export const updateEvent =
   ({ uow }: EventDeps) =>
   async (
     actor: Actor,
-    input: EventSettingsInput & { id: string }
+    input: EventSettingsInput & { id: string; expectedVersion?: number }
   ): Promise<Result<Event>> => {
     if (!actor.admin) return adminRequired();
     const parsed = parseSettings(input);
@@ -231,8 +248,11 @@ export const updateEvent =
         if (misaligned) return misaligned;
       }
 
-      const updated = await tx.events.update(input.id, parsed.data);
-      if (!updated) return eventNotFound();
+      const updated = await tx.events.update(input.id, {
+        ...parsed.data,
+        expectedVersion: input.expectedVersion,
+      });
+      if (!updated) return eventChangedMeanwhile(tx, input.id);
 
       // 1-on-1 slots are this same grid, so a new increment re-reads what people
       // declared. A coarser grid is the dangerous direction: a surviving 10:00 row
@@ -301,15 +321,20 @@ function phasesError(phases: EventPhases): Failure | null {
 }
 
 export const updateEventPhases =
-  ({ repos }: EventDeps) =>
+  ({ uow }: EventDeps) =>
   async (actor: Actor, input: EventPhasesInput): Promise<Result<Event>> => {
     if (!actor.admin) return adminRequired();
-    const { id, ...phases } = input;
+    const { id, expectedVersion, ...phases } = input;
     const refused = phasesError(phases);
     if (refused) return refused;
 
-    const updated = await repos.events.update(id, phases);
-    return updated ? ok(updated) : eventNotFound();
+    return uow.run(async (tx) => {
+      const updated = await tx.events.update(id, {
+        ...phases,
+        expectedVersion,
+      });
+      return updated ? ok(updated) : eventChangedMeanwhile(tx, id);
+    });
   };
 
 export const deleteEvent =

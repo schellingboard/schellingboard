@@ -62,6 +62,7 @@ function rowToEvent(row: EventSelectRow): Event {
     icon: row.icon ?? undefined,
     meetingsEnabled: row.meetingsEnabled,
     maxOpenMeetingRequests: row.maxOpenMeetingRequests,
+    version: row.version,
   };
 }
 
@@ -77,6 +78,10 @@ export class SqliteEventsRepository implements EventsRepository {
   }
 
   async findById(id: string): Promise<Event | undefined> {
+    return this.findByIdSync(id);
+  }
+
+  private findByIdSync(id: string): Event | undefined {
     const row = this.db
       .select(eventColumns)
       .from(schema.events)
@@ -104,7 +109,7 @@ export class SqliteEventsRepository implements EventsRepository {
   }
 
   async create(
-    data: Omit<Event, "id" | "slug" | keyof EventMeetingSettings> &
+    data: Omit<Event, "id" | "slug" | "version" | keyof EventMeetingSettings> &
       Partial<EventMeetingSettings>
   ): Promise<Event> {
     const id = nanoid();
@@ -146,11 +151,10 @@ export class SqliteEventsRepository implements EventsRepository {
 
   async update(
     id: string,
-    patch: Partial<Omit<Event, "id" | "slug">>
+    patch: Partial<Omit<Event, "id" | "slug" | "version">> & {
+      expectedVersion?: number;
+    }
   ): Promise<Event | undefined> {
-    const existing = await this.findById(id);
-    if (!existing) return undefined;
-
     const set: Partial<EventRow> = {};
     if (patch.name !== undefined) set.name = patch.name;
     if (patch.description !== undefined) set.description = patch.description;
@@ -182,13 +186,28 @@ export class SqliteEventsRepository implements EventsRepository {
     if (patch.maxOpenMeetingRequests !== undefined)
       set.maxOpenMeetingRequests = patch.maxOpenMeetingRequests;
 
-    this.db
-      .update(schema.events)
-      .set(set)
-      .where(eq(schema.events.id, id))
-      .run();
-
-    return { ...existing, ...patch };
+    const applied = this.db.transaction(
+      (tx) => {
+        const before = this.findByIdSync(id);
+        if (
+          !before ||
+          (patch.expectedVersion !== undefined &&
+            before.version !== patch.expectedVersion)
+        )
+          return false;
+        if (Object.keys(set).length === 0) return true;
+        tx.update(schema.events).set(set).where(eq(schema.events.id, id)).run();
+        if (JSON.stringify(before) !== JSON.stringify(this.findByIdSync(id))) {
+          tx.update(schema.events)
+            .set({ version: sql`${schema.events.version} + 1` })
+            .where(eq(schema.events.id, id))
+            .run();
+        }
+        return true;
+      },
+      { behavior: "immediate" }
+    );
+    return applied ? this.findByIdSync(id) : undefined;
   }
 
   async delete(id: string): Promise<void> {

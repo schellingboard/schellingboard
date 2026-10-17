@@ -74,6 +74,37 @@ describe("days repo", () => {
       expect(result).toBeUndefined();
     });
 
+    it("raises the version only when the day really changes", async () => {
+      const event = await createEvent();
+      const day = await createDay(event.id);
+      const { days } = getRepositories();
+
+      const resaved = await days.update(day.id, { start: day.start });
+      const moved = await days.update(day.id, {
+        start: new Date(day.start.getTime() - 3600_000),
+      });
+
+      expect(day.version).toBe(1);
+      expect(resaved?.version).toBe(1);
+      expect(moved?.version).toBe(2);
+    });
+
+    it("changes nothing when the day has moved past the expected version", async () => {
+      const event = await createEvent();
+      const day = await createDay(event.id);
+      const { days } = getRepositories();
+      const earlier = new Date(day.start.getTime() - 3600_000);
+      await days.update(day.id, { start: earlier });
+
+      const stale = await days.update(day.id, {
+        start: new Date(day.start.getTime() - 7200_000),
+        expectedVersion: day.version,
+      });
+
+      expect(stale).toBeUndefined();
+      expect((await days.findById(day.id))?.start).toEqual(earlier);
+    });
+
     it("preserves unpatched fields", async () => {
       const event = await createEvent();
       const day = await createDay(event.id);
@@ -342,6 +373,30 @@ describe("day actions", () => {
       expect(result.ok).toBe(true);
       const updated = await getRepositories().days.findById(day.id);
       expect(updated?.start.toISOString()).toBe("2026-10-01T09:00:00.000Z");
+    });
+
+    it("refuses an edit from a version the day has moved past", async () => {
+      const event = await createEvent();
+      const day = await createDay(event.id, {
+        start: new Date("2026-10-01T08:00:00Z"),
+        end: new Date("2026-10-01T18:00:00Z"),
+      });
+      const edit = (end: string) =>
+        updateDayAction({
+          id: day.id,
+          eventId: event.id,
+          start: "2026-10-01T08:00",
+          end,
+          startBookings: "2026-10-01T09:00",
+          endBookings: "2026-10-01T17:00",
+          expectedVersion: day.version,
+        });
+
+      expect(await edit("2026-10-01T18:30")).toEqual({ ok: true });
+      expect(await edit("2026-10-01T19:00")).toMatchObject({ ok: false });
+      expect((await getRepositories().days.findById(day.id))?.end).toEqual(
+        new Date("2026-10-01T18:30:00Z")
+      );
     });
 
     it("errors for unknown id", async () => {

@@ -78,6 +78,7 @@ describe("sessionBookingWindowError", () => {
     end: new Date("2026-10-02T03:00:00Z"),
     startBookings: new Date("2026-10-01T09:00:00Z"),
     endBookings: new Date("2026-10-02T02:30:00Z"),
+    version: 1,
   };
   const error = (start: string, end: string) =>
     sessionBookingWindowError(day, new Date(start), new Date(end), 30);
