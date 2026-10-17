@@ -89,8 +89,6 @@ describe("event use cases", () => {
       const event = await createEvent();
       const day = await createDay(event.id);
       const refusals = [
-        await events().listEvents(NOBODY),
-        await events().getEvent(NOBODY, { id: event.id }),
         await events().createEvent(NOBODY, settings),
         await events().updateEvent(NOBODY, { ...settings, id: event.id }),
         await events().updateEventPhases(NOBODY, { ...noPhases, id: event.id }),
@@ -103,6 +101,25 @@ describe("event use cases", () => {
         Array(refusals.length).fill("admin.required")
       );
       expect(await getRepositories().events.findById(event.id)).toBeDefined();
+    }
+  );
+
+  it(
+    "lets anyone read the events and their days",
+    { tags: ["019-US9"] },
+    async () => {
+      const event = await createEvent();
+      const day = await createDay(event.id);
+
+      expect(value(await events().listEvents())).toMatchObject([
+        { id: event.id },
+      ]);
+      expect(
+        value(await events().getEvent(NOBODY, { id: event.id })).days
+      ).toMatchObject([{ id: day.id }]);
+      expect(code(await events().getEvent(NOBODY, { id: "nope" }))).toBe(
+        "event.notFound"
+      );
     }
   );
 
@@ -121,7 +138,7 @@ describe("event use cases", () => {
         await events().createDay(ADMIN, { ...dayWindow, eventId: event.id })
       );
 
-      expect(value(await events().listEvents(ADMIN))).toMatchObject([
+      expect(value(await events().listEvents())).toMatchObject([
         { id: event.id },
       ]);
       expect(value(await events().getEvent(ADMIN, { id: event.id }))).toEqual({

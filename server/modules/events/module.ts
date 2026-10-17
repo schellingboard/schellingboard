@@ -8,5 +8,5 @@ export {
   createEventUseCases,
   type EventUseCases,
 } from "./application/use-cases";
-export { addAdminEventRoutes } from "./http/routes";
+export { addAdminEventRoutes, addEventReadRoutes } from "./http/routes";
 export { toEventView } from "./http/view";

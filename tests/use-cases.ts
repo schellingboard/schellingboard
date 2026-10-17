@@ -584,6 +584,11 @@ export const features = {
         actor: "organizer",
         priority: "P3",
       },
+      US9: {
+        title: "Attendee's script finds the events it can read",
+        actor: "attendee",
+        priority: "P3",
+      },
     },
   },
   "020": {

@@ -4486,12 +4486,12 @@
         "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
       }
     },
-    "/api/v1/admin/events": {
+    "/api/v1/events": {
       "get": {
-        "tags": ["admin"],
+        "tags": ["events"],
         "responses": {
           "200": {
-            "description": "Every event, hidden or past ones included",
+            "description": "Every event, past ones included",
             "content": {
               "application/json": {
                 "schema": {
@@ -4516,8 +4516,81 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
-      },
+        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+      }
+    },
+    "/api/v1/events/{id}": {
+      "get": {
+        "tags": ["events"],
+        "description": "The event's settings, phase dates and days.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The event and its days",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "event": { "$ref": "#/components/schemas/Event" },
+                    "days": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "start": { "type": "string", "format": "date-time" },
+                          "end": { "type": "string", "format": "date-time" },
+                          "startBookings": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "When sessions may start"
+                          },
+                          "endBookings": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "When sessions must end"
+                          },
+                          "id": { "type": "string" },
+                          "eventId": { "type": "string" },
+                          "version": { "type": "integer" }
+                        },
+                        "required": [
+                          "start",
+                          "end",
+                          "startBookings",
+                          "endBookings",
+                          "id",
+                          "eventId",
+                          "version"
+                        ]
+                      }
+                    }
+                  },
+                  "required": ["event", "days"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+      }
+    },
+    "/api/v1/admin/events": {
       "post": {
         "tags": ["admin"],
         "description": "Creates an event; its URL slug is derived from the name.",
@@ -4634,75 +4707,6 @@
       }
     },
     "/api/v1/admin/events/{id}": {
-      "get": {
-        "tags": ["admin"],
-        "description": "The event's settings, phase dates and days.",
-        "parameters": [
-          {
-            "schema": { "type": "string", "minLength": 1 },
-            "required": true,
-            "name": "id",
-            "in": "path"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The event and its days",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "event": { "$ref": "#/components/schemas/Event" },
-                    "days": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "start": { "type": "string", "format": "date-time" },
-                          "end": { "type": "string", "format": "date-time" },
-                          "startBookings": {
-                            "type": "string",
-                            "format": "date-time",
-                            "description": "When sessions may start"
-                          },
-                          "endBookings": {
-                            "type": "string",
-                            "format": "date-time",
-                            "description": "When sessions must end"
-                          },
-                          "id": { "type": "string" },
-                          "eventId": { "type": "string" },
-                          "version": { "type": "integer" }
-                        },
-                        "required": [
-                          "start",
-                          "end",
-                          "startBookings",
-                          "endBookings",
-                          "id",
-                          "eventId",
-                          "version"
-                        ]
-                      }
-                    }
-                  },
-                  "required": ["event", "days"]
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Problem details (RFC 9457); clients branch on `code`",
-            "content": {
-              "application/problem+json": {
-                "schema": { "$ref": "#/components/schemas/Problem" }
-              }
-            }
-          }
-        },
-        "security": [{ "adminAuth": [] }]
-      },
       "put": {
         "tags": ["admin"],
         "description": "Replaces the event's settings; phase dates, 1-on-1 settings and the slug stay. A new slot increment clears declared 1-on-1 availability.",

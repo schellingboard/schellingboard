@@ -34,18 +34,18 @@ const dates = <T extends Record<string, string | null>>(fields: T) =>
 
 const listEvents = createRoute({
   method: "get",
-  path: "/admin/events",
-  tags,
+  path: "/events",
+  tags: ["events"],
   responses: {
-    200: json(eventListSchema, "Every event, hidden or past ones included"),
+    200: json(eventListSchema, "Every event, past ones included"),
     ...problemDefault,
   },
 });
 
 const getEvent = createRoute({
   method: "get",
-  path: "/admin/events/{id}",
-  tags,
+  path: "/events/{id}",
+  tags: ["events"],
   description: "The event's settings, phase dates and days.",
   request: { params: idParam },
   responses: {
@@ -149,9 +149,9 @@ const deleteDay = createRoute({
   responses: { 204: noContent("Deleted"), ...problemDefault },
 });
 
-export function addAdminEventRoutes(app: App, events: () => EventUseCases) {
+export function addEventReadRoutes(app: App, events: () => EventUseCases) {
   app.openapi(listEvents, async (c) => {
-    const result = await events().listEvents(c.var.actor);
+    const result = await events().listEvents();
     if (!result.ok) return problem(result.error);
     return c.json({ events: result.value.map(toEventView) }, 200);
   });
@@ -165,7 +165,9 @@ export function addAdminEventRoutes(app: App, events: () => EventUseCases) {
       200
     );
   });
+}
 
+export function addAdminEventRoutes(app: App, events: () => EventUseCases) {
   app.openapi(createEvent, async (c) => {
     const result = await events().createEvent(c.var.actor, c.req.valid("json"));
     if (!result.ok) return problem(result.error);

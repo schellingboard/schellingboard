@@ -11,7 +11,10 @@ import {
   venueUseCases,
 } from "@/server/composition";
 import { addCommentRoutes } from "@/server/modules/comments/module";
-import { addAdminEventRoutes } from "@/server/modules/events/module";
+import {
+  addAdminEventRoutes,
+  addEventReadRoutes,
+} from "@/server/modules/events/module";
 import {
   addAdminMeetingRoutes,
   addMeetingRoutes,
@@ -59,6 +62,7 @@ addAdminMeetingRoutes(api, meetingUseCases);
 addAttendeeCountRoutes(api, sessionUseCases);
 addPeopleRoutes(api, peopleUseCases);
 addNotificationRoutes(api, notificationUseCases);
+addEventReadRoutes(api, eventUseCases);
 addAdminEventRoutes(api, eventUseCases);
 addAdminVenueRoutes(api, venueUseCases);
 addAdminUnavailabilityRoutes(api, sessionUseCases);

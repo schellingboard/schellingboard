@@ -3400,7 +3400,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/admin/events": {
+  "/api/v1/events": {
     parameters: {
       query?: never;
       header?: never;
@@ -3416,7 +3416,7 @@ export interface paths {
       };
       requestBody?: never;
       responses: {
-        /** @description Every event, hidden or past ones included */
+        /** @description Every event, past ones included */
         200: {
           headers: {
             [name: string]: unknown;
@@ -3438,6 +3438,90 @@ export interface paths {
         };
       };
     };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/events/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The event's settings, phase dates and days. */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The event and its days */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              event: components["schemas"]["Event"];
+              days: {
+                /** Format: date-time */
+                start: string;
+                /** Format: date-time */
+                end: string;
+                /**
+                 * Format: date-time
+                 * @description When sessions may start
+                 */
+                startBookings: string;
+                /**
+                 * Format: date-time
+                 * @description When sessions must end
+                 */
+                endBookings: string;
+                id: string;
+                eventId: string;
+                version: number;
+              }[];
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/events": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
     put?: never;
     /** @description Creates an event; its URL slug is derived from the name. */
     post: {
@@ -3540,59 +3624,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** @description The event's settings, phase dates and days. */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description The event and its days */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              event: components["schemas"]["Event"];
-              days: {
-                /** Format: date-time */
-                start: string;
-                /** Format: date-time */
-                end: string;
-                /**
-                 * Format: date-time
-                 * @description When sessions may start
-                 */
-                startBookings: string;
-                /**
-                 * Format: date-time
-                 * @description When sessions must end
-                 */
-                endBookings: string;
-                id: string;
-                eventId: string;
-                version: number;
-              }[];
-            };
-          };
-        };
-        /** @description Problem details (RFC 9457); clients branch on `code` */
-        default: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/problem+json": components["schemas"]["Problem"];
-          };
-        };
-      };
-    };
+    get?: never;
     /** @description Replaces the event's settings; phase dates, 1-on-1 settings and the slug stay. A new slot increment clears declared 1-on-1 availability. */
     put: {
       parameters: {
