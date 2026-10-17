@@ -64,11 +64,13 @@ carries only ids.
 - **Event guests** are the guests the event shows everyone: its members and
   its sessions' hosts (a host need not be a member, and leaving keeps hosted
   sessions). `guest.joined` and `guest.left` mean entering and leaving that
-  set, so `hostIds` always resolve. Meeting parties are not in it: a meeting
-  request is private to its two guests. A viewer gets the other party of each
-  own meeting in `me.meetingGuests`, and a meeting change carries both
-  parties' lean fields, so a partner's rename shows with the next change to
-  that meeting.
+  set, so `hostIds` always resolve. Each carries `member`, since the
+  schedule's guest lists (host picker, attendee count) are members only; a
+  change of membership alone is a `guest.changed`. Meeting parties are not
+  in it: a meeting request is private to its two guests. A viewer gets the
+  other party of each own meeting in `me.meetingGuests`, and a meeting change
+  carries both parties' lean fields, so a partner's rename shows with the
+  next change to that meeting.
 - **Audiences** are the three that today's model has:
   `{ kind: "event" }`, `{ kind: "guests", ids }` and `{ kind: "admins" }`.
   `event` means anyone who may open the event page today, which is anyone past
@@ -251,10 +253,10 @@ that matches. Because publish runs under the write lock, changes arrive in
   type, ignores `seq ≤ replica.seq` and skips unknown types. Server tests use
   it to check that payloads are sufficient (step 11).
 - Snapshot and feed message contracts live in `packages/contracts`.
-- The client store lives in `app/(site)/[eventSlug]/replica/`: the store, the
-  `EventSource` client and the sync state, with no React. One hook connects
-  them to `EventContext`. Step 5 of the path moves the store to the SPA
-  unchanged.
+- The client store lives in `app/(site)/[eventSlug]/replica/`: the store,
+  the `EventSource` client, the sync state and the selectors, with no React.
+  One hook connects them to `EventContext`. Step 5 of the path moves the
+  store to the SPA unchanged.
 
 ## Consequences
 

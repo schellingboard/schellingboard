@@ -1,10 +1,10 @@
 import { cookies } from "next/headers";
-import { getRepositories } from "@/db/container";
+import { eventSnapshot } from "@/server/composition";
+import { resolveActor } from "@/server/kernel/actor";
 import { EventProviderWrapper } from "./event-provider-wrapper";
-import type { DayWithSessions } from "@/app/(site)/context";
-import { verifiedCurrentUser } from "@/utils/acting-guest";
+import { eventContextFrom } from "./replica/selectors";
 import { serverNow } from "@/utils/dev-clock-server";
-import { myMeetingsFor } from "@/utils/meeting-views";
+import { meetingViewsFor } from "@/utils/meeting-views";
 
 export async function EventLayoutContent({
   eventSlug,
@@ -13,55 +13,29 @@ export async function EventLayoutContent({
   eventSlug: string;
   children: React.ReactNode;
 }) {
-  const repos = getRepositories();
-  const event = await repos.events.findBySlug(eventSlug);
-
-  if (!event) {
+  const snapshot = await eventSnapshot(
+    await resolveActor(await cookies()),
+    eventSlug
+  );
+  if (!snapshot.ok) {
     return <div>Event not found</div>;
   }
 
-  const cookieStore = await cookies();
-  // Verified, not the raw `user` cookie: a guest's RSVP list is private, so a
-  // forged plain cookie naming a protected guest must not seed their RSVPs
-  // into the SSR payload.
-  const currentUser = await verifiedCurrentUser(cookieStore);
-
+  const context = eventContextFrom(snapshot.value);
   const now = await serverNow();
-  const [days, sessions, locations, unavailability, guests, rsvps, myMeetings] =
-    await Promise.all([
-      repos.days.listByEvent(event.id),
-      repos.sessions.listByEvent(event.id),
-      repos.locations.listByEvent(event.id),
-      repos.locationUnavailability.listByEvent(event.id),
-      repos.guests.listByEvent(event.id),
-      currentUser ? repos.rsvps.listByGuest(currentUser) : Promise.resolve([]),
-      currentUser
-        ? myMeetingsFor(currentUser, event.id, now).then((mine) => ({
-            guestId: currentUser,
-            ...mine,
-          }))
-        : Promise.resolve(null),
-    ]);
-
-  const daysWithSessions: DayWithSessions[] = days.map((day) => ({
-    ...day,
-    sessions: sessions.filter((s) => {
-      if (!s.startTime || !s.endTime) return false;
-      return (
-        day.start.getTime() <= s.startTime.getTime() &&
-        day.end.getTime() >= s.endTime.getTime()
-      );
-    }),
-  }));
+  // Clash lines rest on other guests' RSVPs, which the snapshot never holds
+  // (ADR 0014 section 4).
+  const me = snapshot.value.me;
+  const myMeetings = me
+    ? {
+        guestId: me.guestId,
+        meetings: await meetingViewsFor(me.guestId, context.event.id, now),
+        availability: me.availability,
+      }
+    : null;
 
   const eventContextValue = {
-    event,
-    days: daysWithSessions,
-    sessions,
-    locations,
-    unavailability,
-    guests,
-    rsvps,
+    ...context,
     myMeetings,
     // Computed on the server so SSR and hydration agree on which days
     // default to folded (see getDefaultFoldedDayIds). Honours the dev fake

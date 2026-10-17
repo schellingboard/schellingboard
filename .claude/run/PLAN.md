@@ -143,7 +143,7 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
       `correlation_id`. `tx.record()` computes the audience with `audienceOf` in
       `domain`. The idempotency middleware hands `Idempotency-Key` to the unit of work,
       so changes carry `command_key`. The existing session changes get audiences.
-- [ ] 10. **Snapshot**: contract in `packages/contracts`; a query that assembles it
+- [x] 10. **Snapshot**: contract in `packages/contracts`; a query that assembles it
       from module queries (`server/feed/`, with a dependency-cruiser rule);
       `GET /api/v1/events/{slug}/snapshot`; `layout-content.tsx` uses the query, not
       the repositories. Golden-file tests per viewer: site password only, open guest,
@@ -154,8 +154,9 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
         query: normalized shape, event guests, `me` per viewer id, `seq`.
   - [x] 10b. `GET /api/v1/events/{slug}/snapshot` (viewer as the SSR decides
         it), OpenAPI; the golden-file tests per viewer.
-  - [ ] 10c. `layout-content.tsx` reads through the query; selectors in
-        `packages/domain` rebuild today's `EventContext` shapes.
+  - [x] 10c. `layout-content.tsx` reads through the query; selectors in
+        `app/(site)/[eventSlug]/replica/` rebuild today's `EventContext`
+        shapes (`packages/domain` may not import the contracts).
 - [ ] 11. **`apply` and the sufficiency harness**: `apply(replica, change)`, pure, in
       `packages/domain`: upsert or delete per type, ignore `seq ≤ replica.seq`, skip
       unknown types. A test helper: snapshot before, run a use case, apply the logged

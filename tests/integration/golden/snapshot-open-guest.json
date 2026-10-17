@@ -65,7 +65,8 @@
       "avatarUrl": null,
       "aboutMe": null,
       "authProtected": false,
-      "profileVersion": 1
+      "profileVersion": 1,
+      "member": false
     },
     {
       "id": "<mia>",
@@ -73,7 +74,8 @@
       "avatarUrl": null,
       "aboutMe": null,
       "authProtected": false,
-      "profileVersion": 1
+      "profileVersion": 1,
+      "member": true
     },
     {
       "id": "<pia>",
@@ -81,7 +83,8 @@
       "avatarUrl": null,
       "aboutMe": null,
       "authProtected": true,
-      "profileVersion": 1
+      "profileVersion": 1,
+      "member": true
     }
   ],
   "sessions": [

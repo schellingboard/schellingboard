@@ -1,5 +1,7 @@
 import { after } from "next/server";
 import { getRepositories } from "@/db/container";
+import { snapshotFor } from "@/server/feed/snapshot";
+import type { Actor } from "@/server/kernel/actor";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
 import { testEmail } from "@/emails/test-email";
 import { getImageRepositories } from "@/utils/images";
@@ -136,4 +138,8 @@ export function settingsUseCases(): SettingsUseCases {
     maps: mapImages,
     uow: unitOfWork,
   });
+}
+
+export function eventSnapshot(actor: Actor, slug: string) {
+  return snapshotFor(unitOfWork, actor, slug);
 }

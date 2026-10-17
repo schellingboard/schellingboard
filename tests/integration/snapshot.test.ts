@@ -128,15 +128,16 @@ describe("snapshot", () => {
 
     const snapshot = await read(w.event.slug, NOBODY);
 
-    expect(snapshot!.guests.map((g) => g.name).sort()).toEqual([
-      "Hal Host",
-      "Mia Member",
+    expect(snapshot!.guests.map((g) => [g.name, g.member])).toEqual([
+      ["Hal Host", false],
+      ["Mia Member", true],
     ]);
     expect(Object.keys(snapshot!.guests[0]).sort()).toEqual([
       "aboutMe",
       "authProtected",
       "avatarUrl",
       "id",
+      "member",
       "name",
       "profileVersion",
     ]);

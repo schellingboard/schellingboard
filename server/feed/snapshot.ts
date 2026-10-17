@@ -80,7 +80,7 @@ async function assemble(
     days: schedule.days.map(toDayView),
     locations: locations.map(toLocationView),
     unavailability: sessions.unavailability.map(toUnavailabilityView),
-    guests: guests.map(toEventGuestView),
+    guests: guests.map((g) => ({ ...toEventGuestView(g), member: g.member })),
     sessions: sessionViews,
     counts,
     meetingPoints: meetings.meetingPoints.map(toMeetingPointView),
