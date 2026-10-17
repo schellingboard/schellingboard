@@ -8,6 +8,8 @@ import {
   createSession,
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
+import { proposalUseCases } from "@/server/composition";
 import {
   createCommentUseCases,
   type CommentSubject,
@@ -28,7 +30,11 @@ const now = () => new Date();
 
 const notifyCommented = vi.fn();
 const comments = () =>
-  createCommentUseCases({ repos: getRepositories(), notifyCommented });
+  createCommentUseCases({
+    repos: getRepositories(),
+    notifyCommented,
+    uow: unitOfWork,
+  });
 
 async function protect(guestId: string) {
   await getRepositories().guests.setAuthProtection(guestId, {
@@ -212,6 +218,27 @@ describe("posting a comment", () => {
       });
     }
   );
+
+  it(
+    "refuses a comment on a proposal deleted at the same moment",
+    { tags: ["010-US1", "019-US7"] },
+    async () => {
+      const { guest, proposal } = await subjects();
+
+      const [deleted, commented] = await Promise.all([
+        proposalUseCases().deleteProposal(NOBODY, { proposalId: proposal.id }),
+        comments().createComment(
+          open(guest.id),
+          { subject: proposal, body: "Hello" },
+          now()
+        ),
+      ]);
+
+      expect(deleted.ok).toBe(true);
+      expect(!commented.ok && commented.error.code).toBe("proposal.notFound");
+      expect(notifyCommented).not.toHaveBeenCalled();
+    }
+  );
 });
 
 describe("editing and deleting a comment", () => {
@@ -306,9 +333,61 @@ describe("editing and deleting a comment", () => {
       });
     }
   );
+
+  it(
+    "keeps a tombstone deleted when its author edits it at the same moment",
+    { tags: ["010-US4", "019-US7"] },
+    async () => {
+      const { guest, profile } = await subjects();
+      const comment = await posted(guest.id, profile);
+      await comments().createComment(
+        open(guest.id),
+        { subject: profile, parentId: comment.id, body: "Reply" },
+        now()
+      );
+
+      const [removed, edit] = await Promise.all([
+        comments().deleteComment(open(guest.id), { commentId: comment.id }),
+        comments().editComment(
+          open(guest.id),
+          { commentId: comment.id, body: "Back" },
+          now()
+        ),
+      ]);
+
+      expect(removed.ok).toBe(true);
+      expect(!edit.ok && edit.error.code).toBe("comment.notFound");
+      const listed = await comments().listComments(NOBODY, profile);
+      expect(listed.ok && listed.value[0]).toMatchObject({
+        deleted: true,
+        body: "",
+      });
+    }
+  );
 });
 
 describe("liking a comment", () => {
+  it(
+    "refuses a like on a comment deleted at the same moment",
+    { tags: ["010-US6", "019-US7"] },
+    async () => {
+      const { guest, session } = await subjects();
+      const comment = await posted(guest.id, session);
+
+      const [removed, liked] = await Promise.all([
+        comments().deleteComment(open(guest.id), { commentId: comment.id }),
+        comments().setCommentLike(
+          open(guest.id),
+          { commentId: comment.id, liked: true },
+          now()
+        ),
+      ]);
+
+      expect(removed.ok).toBe(true);
+      expect(!liked.ok && liked.error.code).toBe("comment.notFound");
+    }
+  );
+
   it("toggles the acting guest's like", { tags: ["010-US6"] }, async () => {
     const { guest, proposal } = await subjects();
     const comment = await posted(guest.id, proposal);

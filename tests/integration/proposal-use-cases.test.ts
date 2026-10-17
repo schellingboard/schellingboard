@@ -356,6 +356,42 @@ describe("proposal mutations", () => {
   );
 
   it(
+    "refuses a co-host's edit made while a host removes them",
+    { tags: ["004-US2", "019-US7"] },
+    async () => {
+      const event = await createEvent();
+      const host = await createGuest({ eventId: event.id });
+      const cohost = await createGuest({ eventId: event.id });
+      const proposal = await createProposal(event.id, [host.id, cohost.id]);
+      const edit = (title: string, hostIds: string[]) => ({
+        proposalId: proposal.id,
+        title,
+        hostIds,
+        cohostWanted: false,
+      });
+
+      const [removed, edited] = await Promise.all([
+        proposalUseCases().updateProposal(
+          open(host.id),
+          edit("Host's", [host.id]),
+          now()
+        ),
+        proposalUseCases().updateProposal(
+          open(cohost.id),
+          edit("Co-host's", [host.id, cohost.id]),
+          now()
+        ),
+      ]);
+
+      expect(removed.ok).toBe(true);
+      expect(!edited.ok && edited.error.code).toBe("proposal.notHost");
+      expect(
+        await getRepositories().sessionProposals.findById(proposal.id)
+      ).toMatchObject({ title: "Host's", hosts: [{ id: host.id }] });
+    }
+  );
+
+  it(
     "joins a proposal that wants a host and tells its hosts",
     { tags: ["004-US6"] },
     async () => {

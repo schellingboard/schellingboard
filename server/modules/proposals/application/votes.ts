@@ -19,43 +19,45 @@ const outsideVoting = () =>
   );
 
 export const castVote =
-  ({ repos }: ProposalDeps) =>
+  ({ uow }: ProposalDeps) =>
   async (
     actor: Actor,
     { proposalId, guestId, choice }: VoteInput & { choice: VoteChoice },
     now: Date
-  ): Promise<Result<void>> => {
-    const acting = await actingAsNamedGuest(actor, guestId, repos.guests);
-    if (!acting.ok) return acting;
-    const proposal = await repos.sessionProposals.findById(proposalId);
-    if (!proposal) return proposalNotFound();
-    const event = await repos.events.findById(proposal.eventId);
-    const eventGuests = event ? await repos.guests.listByEvent(event.id) : [];
-    if (!eventGuests.some((g) => g.id === guestId))
-      return forbidden("guest.notInEvent", "Guest is not part of this event");
-    if (!event || !inVotingPhase(event, now)) return outsideVoting();
-    // Atomic upsert: concurrent requests for the same (guest, proposal)
-    // cannot produce duplicate votes.
-    await repos.votes.upsert({ proposalId, guestId, choice });
-    return ok(undefined);
-  };
+  ): Promise<Result<void>> =>
+    uow.run(async (tx) => {
+      const acting = await actingAsNamedGuest(actor, guestId, tx.guests);
+      if (!acting.ok) return acting;
+      const proposal = await tx.sessionProposals.findById(proposalId);
+      if (!proposal) return proposalNotFound();
+      const event = await tx.events.findById(proposal.eventId);
+      const eventGuests = event ? await tx.guests.listByEvent(event.id) : [];
+      if (!eventGuests.some((g) => g.id === guestId))
+        return forbidden("guest.notInEvent", "Guest is not part of this event");
+      if (!event || !inVotingPhase(event, now)) return outsideVoting();
+      // Atomic upsert: concurrent requests for the same (guest, proposal)
+      // cannot produce duplicate votes.
+      await tx.votes.upsert({ proposalId, guestId, choice });
+      return ok(undefined);
+    });
 
 export const withdrawVote =
-  ({ repos }: ProposalDeps) =>
+  ({ uow }: ProposalDeps) =>
   async (
     actor: Actor,
     { proposalId, guestId }: VoteInput,
     now: Date
-  ): Promise<Result<void>> => {
-    const acting = await actingAsNamedGuest(actor, guestId, repos.guests);
-    if (!acting.ok) return acting;
-    const proposal = await repos.sessionProposals.findById(proposalId);
-    if (!proposal) return proposalNotFound();
-    const event = await repos.events.findById(proposal.eventId);
-    if (!event || !inVotingPhase(event, now)) return outsideVoting();
-    await repos.votes.deleteByGuestAndProposal(guestId, proposalId);
-    return ok(undefined);
-  };
+  ): Promise<Result<void>> =>
+    uow.run(async (tx) => {
+      const acting = await actingAsNamedGuest(actor, guestId, tx.guests);
+      if (!acting.ok) return acting;
+      const proposal = await tx.sessionProposals.findById(proposalId);
+      if (!proposal) return proposalNotFound();
+      const event = await tx.events.findById(proposal.eventId);
+      if (!event || !inVotingPhase(event, now)) return outsideVoting();
+      await tx.votes.deleteByGuestAndProposal(guestId, proposalId);
+      return ok(undefined);
+    });
 
 export const listGuestVotes =
   ({ repos }: ProposalDeps) =>

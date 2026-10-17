@@ -30,6 +30,30 @@ beforeEach(() => resetTestDb());
 
 describe("vote use cases", () => {
   it(
+    "refuses a vote on a proposal deleted at the same moment",
+    { tags: ["005-US1", "019-US7"] },
+    async () => {
+      const { guest, proposal } = await world();
+
+      const [deleted, cast] = await Promise.all([
+        proposalUseCases().deleteProposal(NOBODY, { proposalId: proposal.id }),
+        proposalUseCases().castVote(
+          NOBODY,
+          {
+            proposalId: proposal.id,
+            guestId: guest.id,
+            choice: VoteChoice.interested,
+          },
+          now()
+        ),
+      ]);
+
+      expect(deleted.ok).toBe(true);
+      expect(!cast.ok && cast.error.code).toBe("proposal.notFound");
+    }
+  );
+
+  it(
     "casts, replaces and withdraws a named guest's vote",
     { tags: ["005-US1"] },
     async () => {

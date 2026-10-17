@@ -69,6 +69,7 @@ export function proposalUseCases(): ProposalUseCases {
   return createProposalUseCases({
     repos: getRepositories(),
     notifyProposalJoined: (args) => after(() => notifyProposalJoined(args)),
+    uow: unitOfWork,
   });
 }
 
@@ -86,7 +87,11 @@ const notifyCommented: CommentDeps["notifyCommented"] = ({
   });
 
 export function commentUseCases(): CommentUseCases {
-  return createCommentUseCases({ repos: getRepositories(), notifyCommented });
+  return createCommentUseCases({
+    repos: getRepositories(),
+    notifyCommented,
+    uow: unitOfWork,
+  });
 }
 
 export function meetingUseCases(): MeetingUseCases {
