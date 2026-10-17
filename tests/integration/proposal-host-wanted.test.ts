@@ -127,7 +127,7 @@ describe("a proposal that wants a host", () => {
         hostIds: [host.id],
         cohostWanted: true,
         cohostWantedNote: "A facilitator",
-        expectedUpdatedTime: proposal.updatedTime.toISOString(),
+        expectedVersion: proposal.version,
       });
       expect(await findProposal(proposal.id)).toMatchObject({
         cohostWanted: true,
@@ -140,9 +140,7 @@ describe("a proposal that wants a host", () => {
         hostIds: [host.id],
         cohostWanted: false,
         cohostWantedNote: "A facilitator",
-        expectedUpdatedTime: (
-          await findProposal(proposal.id)
-        ).updatedTime.toISOString(),
+        expectedVersion: (await findProposal(proposal.id)).version,
       });
       const after = await findProposal(proposal.id);
       expect(after.cohostWanted).toBe(false);
@@ -164,7 +162,7 @@ describe("a proposal that wants a host", () => {
         hostIds: [],
         cohostWanted: true,
         cohostWantedNote: "A facilitator",
-        expectedUpdatedTime: proposal.updatedTime.toISOString(),
+        expectedVersion: proposal.version,
       });
 
       const after = await findProposal(proposal.id);
@@ -374,7 +372,7 @@ describe("a proposal that wants a host", () => {
         title: "Reworded",
         hostIds: [host.id],
         cohostWanted: true,
-        expectedUpdatedTime: proposal.updatedTime.toISOString(),
+        expectedVersion: proposal.version,
       });
       expect(result).toHaveProperty("error");
 
@@ -396,7 +394,7 @@ describe("a proposal that wants a host", () => {
         eventSlug: "test-event",
         title: "Reworded",
         hostIds: [host.id],
-        expectedUpdatedTime: proposal.updatedTime.toISOString(),
+        expectedVersion: proposal.version,
       });
       expect(result).toEqual({ success: true });
 

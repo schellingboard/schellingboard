@@ -269,6 +269,7 @@ describe("updateSession and deleteSession", () => {
       {
         ...booking(day, [host.id], location.id),
         sessionId: session.id,
+        expectedVersion: session.version,
         title: "Renamed",
         locationIds: [location.id],
       },
@@ -293,6 +294,7 @@ describe("updateSession and deleteSession", () => {
         {
           ...booking(day, [host.id], location.id),
           sessionId: unplaced.id,
+          expectedVersion: unplaced.version,
           locationIds: [location.id],
         },
         now()
@@ -316,6 +318,7 @@ describe("updateSession and deleteSession", () => {
       {
         ...booking(otherDay, [host.id], location.id),
         sessionId: session.id,
+        expectedVersion: session.version,
         locationIds: [location.id],
       },
       now()
@@ -337,6 +340,7 @@ describe("updateSession and deleteSession", () => {
       {
         ...booking(day, [host.id], location.id),
         sessionId: session.id,
+        expectedVersion: session.version,
         locationIds: [location.id],
       },
       now()
@@ -435,6 +439,7 @@ describe("organizer session use cases", () => {
         {
           ...fields,
           id: created.value.id,
+          expectedVersion: created.value.version,
           title: "Dinner",
           locationIds: [location.id],
         },
@@ -471,7 +476,12 @@ describe("organizer session use cases", () => {
     );
     const unknownRoom = await sessions.adminUpdateSession(
       ADMIN,
-      { ...fields, id: created.value.id, locationIds: ["nope"] },
+      {
+        ...fields,
+        id: created.value.id,
+        locationIds: ["nope"],
+        expectedVersion: created.value.version,
+      },
       now()
     );
 

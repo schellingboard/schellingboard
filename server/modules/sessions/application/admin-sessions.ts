@@ -34,7 +34,7 @@ export interface AdminCreateSessionInput extends AdminSessionFields {
 
 export interface AdminUpdateSessionInput extends AdminSessionFields {
   id: string;
-  expectedVersion?: number;
+  expectedVersion: number;
 }
 
 type Checked = Omit<AdminSessionFields, "startTime" | "endTime"> & {

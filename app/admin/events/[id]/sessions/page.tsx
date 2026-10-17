@@ -90,6 +90,7 @@ export default async function AdminEventSessionsPage({
       capacity: capacityById.get(l.id) ?? 0,
     })),
     numRsvps: s.numRsvps,
+    version: s.version,
     rsvps: (rsvpsBySession.get(s.id) ?? []).map((r) => ({
       guestId: r.guestId,
       name: guestNameById.get(r.guestId) ?? "Unknown guest",

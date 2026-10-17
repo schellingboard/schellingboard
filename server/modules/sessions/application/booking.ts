@@ -1,3 +1,4 @@
+import { STALE_SESSION_MESSAGE } from "@schellingboard/contracts/session";
 import type { Day } from "@schellingboard/domain/event";
 import type {
   Session,
@@ -116,10 +117,6 @@ export async function changedMeanwhile(
 ): Promise<Failure> {
   const current = await repos.sessions.findById(id);
   return current
-    ? versionConflict(
-        "session",
-        current,
-        "Someone changed this session while you edited it"
-      )
+    ? versionConflict("session", current, STALE_SESSION_MESSAGE)
     : notFound("session.notFound", "Session not found");
 }

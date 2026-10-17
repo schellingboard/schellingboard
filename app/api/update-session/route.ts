@@ -16,6 +16,12 @@ export async function POST(req: NextRequest) {
     console.error("Session ID is required for update.");
     return new Response("Session ID is required", { status: 400 });
   }
+  const { expectedVersion } = params;
+  if (typeof expectedVersion !== "number")
+    return Response.json(
+      { error: "Reload the page and redo your edit" },
+      { status: 400 }
+    );
   const actor = await resolveActor(req.cookies);
   let result;
   try {
@@ -27,10 +33,7 @@ export async function POST(req: NextRequest) {
         locationIds: Array.isArray(params.locationIds)
           ? params.locationIds
           : [params.location?.id ?? ""],
-        expectedVersion:
-          typeof params.expectedVersion === "number"
-            ? params.expectedVersion
-            : undefined,
+        expectedVersion,
       },
       requestNow(req)
     );

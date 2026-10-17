@@ -41,6 +41,7 @@ export type SessionRow = {
   hosts: { id: string; name: string }[];
   locations: EventLocation[];
   numRsvps: number;
+  version: number;
   rsvps: { guestId: string; name: string }[];
 };
 
@@ -533,6 +534,7 @@ function SessionItem({
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [formMode, setFormMode] = useState<"edit" | "duplicate" | null>(null);
+  const [editedVersion, setEditedVersion] = useState(session.version);
   const [isSaving, startSave] = useTransition();
   const [deleteMode, setDeleteMode] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState("");
@@ -557,9 +559,15 @@ function SessionItem({
         const result =
           formMode === "duplicate"
             ? await adminCreateSessionAction({ eventId, ...input })
-            : await adminUpdateSessionAction({ id: session.id, ...input });
+            : await adminUpdateSessionAction({
+                id: session.id,
+                ...input,
+                expectedVersion: editedVersion,
+              });
         if (!result.ok) {
           setError(result.error);
+          // So the next Edit starts from the session as it is now.
+          router.refresh();
         } else {
           setError(null);
           setFormMode(null);
@@ -656,6 +664,7 @@ function SessionItem({
             <button
               onClick={() => {
                 setError(null);
+                setEditedVersion(session.version);
                 setFormMode("edit");
               }}
               className={SECONDARY_BUTTON}

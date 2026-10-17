@@ -23,9 +23,7 @@ export interface AdminUpdateProposalInput {
   description: string;
   durationMinutes: number | null;
   hostIds: string[];
-  expectedVersion?: number;
-  /** What the web form sends until it sends the version. */
-  expectedUpdatedTime?: string;
+  expectedVersion: number;
 }
 
 export interface AdminCreateProposalInput {
@@ -119,28 +117,18 @@ export const adminUpdateProposal =
     const fields = checked(input);
     if (!fields.ok) return fields;
     const { title, durationMinutes, hostIds } = fields.value;
-    const expectedUpdatedTime =
-      input.expectedUpdatedTime === undefined
-        ? undefined
-        : new Date(input.expectedUpdatedTime);
 
     const result = await uow.run(async (tx) => {
       const proposal = await tx.sessionProposals.findById(input.id);
       if (!proposal) return proposalNotFound();
       const refused = await unknownHost(tx, hostIds);
       if (refused) return refused;
-      if (expectedUpdatedTime && Number.isNaN(expectedUpdatedTime.getTime()))
-        return invalid(
-          "proposal.expectedUpdatedTimeInvalid",
-          "Invalid expectedUpdatedTime"
-        );
 
       const updated = await tx.sessionProposals.update(input.id, {
         title,
         description: input.description.trim(),
         durationMinutes,
         hostIds,
-        expectedUpdatedTime,
         expectedVersion: input.expectedVersion,
         updatedTime: now,
       });

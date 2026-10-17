@@ -265,12 +265,6 @@ export class SqliteSessionProposalsRepository implements SessionProposalsReposit
           .get();
         if (!before) return false;
         if (
-          patch.expectedUpdatedTime !== undefined &&
-          patch.expectedUpdatedTime.getTime() !==
-            new Date(before.updatedTime ?? before.createdTime).getTime()
-        )
-          return false;
-        if (
           patch.expectedVersion !== undefined &&
           patch.expectedVersion !== before.version
         )

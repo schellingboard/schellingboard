@@ -105,6 +105,8 @@ function basePayload(
     dayId: day.id,
     startTime: slotStart(day, 60),
     duration: 60,
+    // A new session's: the payload edits it once.
+    expectedVersion: 1,
     ...overrides,
   };
 }
@@ -146,6 +148,7 @@ function payloadFor(
       title: session.title,
       startTime: new Date(slot).toISOString(),
       duration: minutesFromSlot(session, session.endTime!.toISOString()),
+      expectedVersion: session.version,
       ...overrides,
     }),
     id: session.id,
@@ -325,12 +328,41 @@ describe("POST /api/update-session", () => {
       const stale = await edit("Second");
 
       expect(stale.status).toBe(409);
+      expect(await stale.json()).toEqual({
+        error: expect.stringMatching(
+          /^Someone changed this session while you edited it\. Copy your edits/
+        ) as string,
+      });
       expect(await getRepositories().sessions.findById(id)).toMatchObject({
         title: "First",
         version: session.version + 1,
       });
     }
   );
+
+  it("refuses an edit that does not say which version it was made from", async () => {
+    const event = await createEvent({ phase: "scheduling" });
+    const guest = await createGuest({ eventId: event.id });
+    const location = await createLocation({ eventId: event.id });
+    const day = await createDay(event.id);
+    const id = await createScheduledSession(event.id, guest, location, day);
+    const session = (await getRepositories().sessions.findById(id))!;
+
+    const res = await POST(
+      makeUpdateReq(
+        payloadFor(session, guest, location, day, {
+          title: "Renamed",
+          expectedVersion: undefined,
+        }),
+        { editorGuestId: guest.id }
+      )
+    );
+
+    expect(res.status).toBe(400);
+    expect((await getRepositories().sessions.findById(id))!.title).toBe(
+      session.title
+    );
+  });
 
   it("keeps the start of a session an organizer placed without a break", async () => {
     const event = await createEvent({ phase: "scheduling" });
@@ -1339,10 +1371,11 @@ describe("POST /api/update-session", () => {
         BY_TEST
       );
       await locations.removeFromEvent(event.id, [annex.id]);
+      const spread = (await getRepositories().sessions.findById(session.id))!;
 
       const res = await POST(
         makeUpdateReq(
-          payloadFor(session, host, rooms[0], day, {
+          payloadFor(spread, host, rooms[0], day, {
             locationIds: rooms.map((r) => r.id),
           }),
           { editorGuestId: host.id }

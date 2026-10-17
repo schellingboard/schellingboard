@@ -368,6 +368,7 @@ describe("proposal mutations", () => {
         title,
         hostIds,
         cohostWanted: false,
+        expectedVersion: proposal.version,
       });
 
       const [removed, edited] = await Promise.all([
@@ -469,7 +470,7 @@ describe("proposal mutations", () => {
         description: "",
         durationMinutes: 30,
         hostIds: [host.id, host.id],
-        expectedUpdatedTime: proposal.updatedTime.toISOString(),
+        expectedVersion: proposal.version,
       };
 
       const guest = await proposalUseCases().adminUpdateProposal(

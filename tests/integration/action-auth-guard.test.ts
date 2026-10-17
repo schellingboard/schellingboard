@@ -109,7 +109,7 @@ const SITE_GUARDED: Record<string, () => Promise<unknown>> = {
     return updateProposal("p", {
       eventSlug: "s",
       title: "T",
-      expectedUpdatedTime: new Date(0).toISOString(),
+      expectedVersion: 1,
     });
   },
   "(site)/[eventSlug]/proposals/actions.ts:joinProposal": async () => {
