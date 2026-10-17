@@ -102,6 +102,9 @@ graphql` commands (neither field is settable via plain `gh issue create`/`edit`)
 - Work on a GitHub issue ends with a footer naming it: `fixes #123` when the commit fully resolves
   the issue (GitHub then closes it), `issue #123` when it is only part of the work
 - See [docs/dev/migrations.md](docs/dev/migrations.md) for resolving `drizzle` migration conflicts
+- NEVER push to a remote server unless explicitly told to do so, in which case
+  it's a one time ask, not a general permission. This also applies to any kind
+  of agents.
 
 ### jj paths with special characters
 
@@ -257,10 +260,11 @@ conversation, are the state of the run.
 - One commit per step. If a step is too big for one coherent commit, split it in
   PLAN.md first. Tick the step in PLAN.md and update PROGRESS.md (decisions, problems,
   next step) in the step's own commit.
-- Push every commit as its own stacked PR: branch `<session branch>-NN` (01, 02, …)
-  holding exactly that commit on top of the branch before it. The first PR's base is
-  the branch of the commit below it if that has an open PR, otherwise `main`. PR
-  title and body are the commit message. Never push to `main`.
+- Only push if explicitly instructed to! If pushing, push every commit as its
+  own stacked PR: branch `<session branch>-NN` (01, 02, …) holding exactly that
+  commit on top of the branch before it. The first PR's base is the branch of
+  the commit below it if that has an open PR, otherwise `main`. PR title and
+  body are the commit message. Never push to `main`.
 - Never rewrite a pushed commit; a fix to it is a new step. If `gh` cannot open a PR,
   push the branch and list it with its base in PROGRESS.md.
 - Blocked, or facing a decision the plan and ADRs do not settle: record it under
