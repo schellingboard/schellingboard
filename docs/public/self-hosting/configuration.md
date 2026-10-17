@@ -48,6 +48,25 @@ fake the header to dodge the limit. Without it, all visitors share one limit,
 so a few people mistyping the site password can lock everyone out for some
 minutes.
 
+### Live updates through a proxy
+
+The live schedule is a stream the browser keeps open, and the app sends a
+small message on it every 25 seconds. A proxy must pass it on as it arrives and
+not hold it back:
+
+- Turn off response buffering for `/api/v1/events/` (nginx:
+  `proxy_buffering off`; the app already sends `X-Accel-Buffering: no`, which
+  nginx honours unless you override it).
+- Allow a read timeout above 25 seconds (nginx: `proxy_read_timeout 60s`). The
+  app ends each stream after 10 minutes and the browser reconnects by itself.
+- Use HTTP/2 or HTTP/3 to the browser if you can. Over HTTP/1.1 a browser opens
+  at most six connections to one site, and each open tab with the schedule uses
+  one.
+
+When the stream cannot get through, the schedule shows **Reconnecting…** and
+then **Not updating: may be out of date**; the pages still work and show the
+state at the last load.
+
 ## Email
 
 Email is optional — leave the SMTP variables unset to disable it. To enable
