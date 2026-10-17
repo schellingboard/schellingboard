@@ -1,4 +1,4 @@
-import type { ChangeContext } from "@schellingboard/domain/change";
+import { changes, type ChangeContext } from "@schellingboard/domain/change";
 import type { Session } from "@schellingboard/domain/session";
 import type { Actor } from "@/server/kernel/actor";
 import {
@@ -291,7 +291,13 @@ async function seeded(
 
   const created = await addSession(tx, { ...fields, eventId: event.id }, by);
   if (hostIds.length > 0) await tx.guests.assignToEvent(event.id, hostIds);
-  if (locationIds.length > 0)
+  if (locationIds.length > 0) {
+    const had = new Set(await tx.locations.listLocationIdsByEvent(event.id));
     await tx.locations.assignToEvent(event.id, locationIds);
+    for (const id of new Set(locationIds).difference(had)) {
+      const location = await tx.locations.findById(id);
+      if (location) tx.record(changes.locationChanged(location, event.id, by));
+    }
+  }
   return ok(created);
 }

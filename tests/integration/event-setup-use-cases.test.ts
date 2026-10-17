@@ -658,22 +658,34 @@ describe("venue use cases", () => {
       const location = await createLocation();
       const refusals = [
         await venue().listLocations(NOBODY, {}),
-        await venue().createLocation(NOBODY, room),
-        await venue().updateLocation(NOBODY, { ...room, id: location.id }),
-        await venue().deleteLocation(NOBODY, { id: location.id }),
-        await venue().moveLocation(NOBODY, {
-          id: location.id,
-          expectedVersion: location.version,
-          direction: "up",
-        }),
-        await venue().assignLocationsToEvent(NOBODY, {
-          eventId: event.id,
-          locationIds: [location.id],
-        }),
-        await venue().removeLocationsFromEvent(NOBODY, {
-          eventId: event.id,
-          locationIds: [location.id],
-        }),
+        await venue().createLocation(NOBODY, room, NOW),
+        await venue().updateLocation(NOBODY, { ...room, id: location.id }, NOW),
+        await venue().deleteLocation(NOBODY, { id: location.id }, NOW),
+        await venue().moveLocation(
+          NOBODY,
+          {
+            id: location.id,
+            expectedVersion: location.version,
+            direction: "up",
+          },
+          NOW
+        ),
+        await venue().assignLocationsToEvent(
+          NOBODY,
+          {
+            eventId: event.id,
+            locationIds: [location.id],
+          },
+          NOW
+        ),
+        await venue().removeLocationsFromEvent(
+          NOBODY,
+          {
+            eventId: event.id,
+            locationIds: [location.id],
+          },
+          NOW
+        ),
       ];
       expect(refusals.map(code)).toEqual(
         Array(refusals.length).fill("admin.required")
@@ -687,17 +699,25 @@ describe("venue use cases", () => {
     async () => {
       const event = await createEvent();
       const hall = value(
-        await venue().createLocation(ADMIN, {
-          ...room,
-          eventIds: [event.id, event.id],
-        })
+        await venue().createLocation(
+          ADMIN,
+          {
+            ...room,
+            eventIds: [event.id, event.id],
+          },
+          NOW
+        )
       );
       const store = value(
-        await venue().createLocation(ADMIN, {
-          ...room,
-          name: "Store",
-          bookable: false,
-        })
+        await venue().createLocation(
+          ADMIN,
+          {
+            ...room,
+            name: "Store",
+            bookable: false,
+          },
+          NOW
+        )
       );
       expect(hall).toMatchObject({
         name: "Main Hall",
@@ -717,11 +737,15 @@ describe("venue use cases", () => {
   );
 
   it("reports every invalid field at once", { tags: ["017-US1"] }, async () => {
-    const result = await venue().createLocation(ADMIN, {
-      ...room,
-      name: " ",
-      eventIds: ["no-such-event"],
-    });
+    const result = await venue().createLocation(
+      ADMIN,
+      {
+        ...room,
+        name: " ",
+        eventIds: ["no-such-event"],
+      },
+      NOW
+    );
     expect(result).toEqual({
       ok: false,
       error: {
@@ -743,17 +767,21 @@ describe("venue use cases", () => {
     async () => {
       const image = new Blob([new Uint8Array([1, 2, 3])]);
       const created = value(
-        await venue().createLocation(ADMIN, { ...room, image })
+        await venue().createLocation(ADMIN, { ...room, image }, NOW)
       );
       expect(created.imageUrl).toMatch(`/media/locations/${created.id}-`);
       images.validate.mockResolvedValueOnce({ error: "Wrong shape" });
       expect(
-        await venue().updateLocation(ADMIN, {
-          ...room,
-          id: created.id,
-          image,
-          expectedVersion: created.version,
-        })
+        await venue().updateLocation(
+          ADMIN,
+          {
+            ...room,
+            id: created.id,
+            image,
+            expectedVersion: created.version,
+          },
+          NOW
+        )
       ).toMatchObject({
         ok: false,
         error: { errors: [{ path: "image", message: "Wrong shape" }] },
@@ -766,14 +794,18 @@ describe("venue use cases", () => {
     { tags: ["017-US2", "019-US7"] },
     async () => {
       images.saveNew.mockImplementationOnce(async (id: string) => {
-        value(await venue().deleteLocation(ADMIN, { id }));
+        value(await venue().deleteLocation(ADMIN, { id }, NOW));
         return `/media/locations/${id}-new.png`;
       });
 
-      const created = await venue().createLocation(ADMIN, {
-        ...room,
-        image: new Blob([new Uint8Array([1, 2, 3])]),
-      });
+      const created = await venue().createLocation(
+        ADMIN,
+        {
+          ...room,
+          image: new Blob([new Uint8Array([1, 2, 3])]),
+        },
+        NOW
+      );
 
       expect(code(created)).toBe("location.notFound");
       expect(images.deleteByUrl.mock.calls).toEqual([
@@ -785,10 +817,14 @@ describe("venue use cases", () => {
   describe("keeping image files in step with locations", () => {
     const withImage = async () =>
       value(
-        await venue().createLocation(ADMIN, {
-          ...room,
-          image: new Blob([new Uint8Array([1, 2, 3])]),
-        })
+        await venue().createLocation(
+          ADMIN,
+          {
+            ...room,
+            image: new Blob([new Uint8Array([1, 2, 3])]),
+          },
+          NOW
+        )
       );
     const image = Buffer.from([1, 2, 3]);
     const stored = async (id: string) =>
@@ -800,20 +836,28 @@ describe("venue use cases", () => {
       async () => {
         const created = await withImage();
         value(
-          await venue().updateLocation(ADMIN, {
-            ...room,
-            id: created.id,
-            name: "Renamed",
-            expectedVersion: created.version,
-          })
+          await venue().updateLocation(
+            ADMIN,
+            {
+              ...room,
+              id: created.id,
+              name: "Renamed",
+              expectedVersion: created.version,
+            },
+            NOW
+          )
         );
         images.deleteByUrl.mockClear();
 
-        const stale = await venue().replaceLocationImage(ADMIN, {
-          id: created.id,
-          image,
-          expectedVersion: created.version,
-        });
+        const stale = await venue().replaceLocationImage(
+          ADMIN,
+          {
+            id: created.id,
+            image,
+            expectedVersion: created.version,
+          },
+          NOW
+        );
 
         expect(code(stale)).toBe("location.versionConflict");
         expect(await stored(created.id)).toBe(created.imageUrl);
@@ -828,12 +872,16 @@ describe("venue use cases", () => {
       async () => {
         const created = await withImage();
         const replaced = value(
-          await venue().updateLocation(ADMIN, {
-            ...room,
-            id: created.id,
-            image: new Blob([new Uint8Array([4])]),
-            expectedVersion: created.version,
-          })
+          await venue().updateLocation(
+            ADMIN,
+            {
+              ...room,
+              id: created.id,
+              image: new Blob([new Uint8Array([4])]),
+              expectedVersion: created.version,
+            },
+            NOW
+          )
         );
         expect(images.deleteByUrl.mock.calls).toEqual([[created.imageUrl]]);
         images.deleteByUrl.mockClear();
@@ -841,7 +889,8 @@ describe("venue use cases", () => {
         await expect(
           venue(uowFailingAt("locations", "update")).replaceLocationImage(
             ADMIN,
-            { id: created.id, image, expectedVersion: replaced.version }
+            { id: created.id, image, expectedVersion: replaced.version },
+            NOW
           )
         ).rejects.toThrow();
         expect(await stored(created.id)).toBe(replaced.imageUrl);
@@ -856,24 +905,32 @@ describe("venue use cases", () => {
       async () => {
         const created = await withImage();
         await expect(
-          venue(uowFailingAt("locations", "delete")).deleteLocation(ADMIN, {
-            id: created.id,
-          })
+          venue(uowFailingAt("locations", "delete")).deleteLocation(
+            ADMIN,
+            {
+              id: created.id,
+            },
+            NOW
+          )
         ).rejects.toThrow();
         expect(images.deleteByUrl).not.toHaveBeenCalled();
 
         const removed = value(
-          await venue().removeLocationImage(ADMIN, {
-            id: created.id,
-            expectedVersion: created.version,
-          })
+          await venue().removeLocationImage(
+            ADMIN,
+            {
+              id: created.id,
+              expectedVersion: created.version,
+            },
+            NOW
+          )
         );
         expect(removed.imageUrl).toBe("");
         expect(images.deleteByUrl.mock.calls).toEqual([[created.imageUrl]]);
 
         const again = await withImage();
         images.deleteByUrl.mockClear();
-        value(await venue().deleteLocation(ADMIN, { id: again.id }));
+        value(await venue().deleteLocation(ADMIN, { id: again.id }, NOW));
         expect(images.deleteByUrl.mock.calls).toEqual([[again.imageUrl]]);
       }
     );
@@ -883,38 +940,50 @@ describe("venue use cases", () => {
     const first = await createLocation({ name: "A", sortIndex: 0 });
     const second = await createLocation({ name: "B", sortIndex: 1 });
     const renamed = value(
-      await venue().updateLocation(ADMIN, {
-        ...room,
-        id: first.id,
-        expectedVersion: first.version,
-      })
+      await venue().updateLocation(
+        ADMIN,
+        {
+          ...room,
+          id: first.id,
+          expectedVersion: first.version,
+        },
+        NOW
+      )
     );
     expect(renamed).toMatchObject({ id: first.id, name: "Main Hall" });
     expect(
       code(
-        await venue().updateLocation(ADMIN, {
-          ...room,
-          id: "nope",
-          expectedVersion: 1,
-        })
+        await venue().updateLocation(
+          ADMIN,
+          {
+            ...room,
+            id: "nope",
+            expectedVersion: 1,
+          },
+          NOW
+        )
       )
     ).toBe("location.notFound");
 
     value(
-      await venue().moveLocation(ADMIN, {
-        id: second.id,
-        expectedVersion: second.version,
-        direction: "up",
-      })
+      await venue().moveLocation(
+        ADMIN,
+        {
+          id: second.id,
+          expectedVersion: second.version,
+          direction: "up",
+        },
+        NOW
+      )
     );
     const order = value(await venue().listLocations(ADMIN, {}));
     expect(order.map((l) => l.id)).toEqual([second.id, first.id]);
 
-    value(await venue().deleteLocation(ADMIN, { id: first.id }));
+    value(await venue().deleteLocation(ADMIN, { id: first.id }, NOW));
     expect(images.deleteByUrl).not.toHaveBeenCalled();
-    expect(code(await venue().deleteLocation(ADMIN, { id: first.id }))).toBe(
-      "location.notFound"
-    );
+    expect(
+      code(await venue().deleteLocation(ADMIN, { id: first.id }, NOW))
+    ).toBe("location.notFound");
   });
 
   it(
@@ -924,7 +993,7 @@ describe("venue use cases", () => {
       const event = await createEvent();
       const location = await createLocation();
       const assign = (locationIds: string[], eventId = event.id) =>
-        venue().assignLocationsToEvent(ADMIN, { eventId, locationIds });
+        venue().assignLocationsToEvent(ADMIN, { eventId, locationIds }, NOW);
 
       expect(code(await assign([location.id, "nope"]))).toBe(
         "location.notFound"
@@ -936,10 +1005,14 @@ describe("venue use cases", () => {
       ).toEqual([location.id]);
 
       value(
-        await venue().removeLocationsFromEvent(ADMIN, {
-          eventId: event.id,
-          locationIds: [location.id],
-        })
+        await venue().removeLocationsFromEvent(
+          ADMIN,
+          {
+            eventId: event.id,
+            locationIds: [location.id],
+          },
+          NOW
+        )
       );
       expect(
         await getRepositories().locations.listLocationIdsByEvent(event.id)
@@ -954,10 +1027,14 @@ describe("venue use cases", () => {
       const event = await createEvent();
 
       await expect(
-        venue(uowFailingAt("locations", "setEventIds")).createLocation(ADMIN, {
-          ...room,
-          eventIds: [event.id],
-        })
+        venue(uowFailingAt("locations", "setEventIds")).createLocation(
+          ADMIN,
+          {
+            ...room,
+            eventIds: [event.id],
+          },
+          NOW
+        )
       ).rejects.toThrow("locations.setEventIds failed");
 
       expect(await getRepositories().locations.list()).toEqual([]);
@@ -972,11 +1049,15 @@ describe("venue use cases", () => {
       const location = await createLocation();
 
       const [assigned] = await Promise.all([
-        venue().assignLocationsToEvent(ADMIN, {
-          eventId: event.id,
-          locationIds: [location.id],
-        }),
-        venue().deleteLocation(ADMIN, { id: location.id }),
+        venue().assignLocationsToEvent(
+          ADMIN,
+          {
+            eventId: event.id,
+            locationIds: [location.id],
+          },
+          NOW
+        ),
+        venue().deleteLocation(ADMIN, { id: location.id }, NOW),
       ]);
 
       expect(["ok", "location.notFound"]).toContain(code(assigned));
@@ -993,7 +1074,7 @@ describe("venue use cases", () => {
       const event = await createEvent();
 
       const [created] = await Promise.all([
-        venue().createLocation(ADMIN, { ...room, eventIds: [event.id] }),
+        venue().createLocation(ADMIN, { ...room, eventIds: [event.id] }, NOW),
         events().deleteEvent(ADMIN, { id: event.id }, NOW),
       ]);
 
@@ -1011,13 +1092,17 @@ describe("room unavailability use cases", () => {
       const room = await createLocation({ eventId: event.id });
 
       const [added] = await Promise.all([
-        sessions().addLocationUnavailability(ADMIN, {
-          eventId: event.id,
-          locationIds: [room.id],
-          start: at("10:00"),
-          end: at("12:00"),
-        }),
-        venue().deleteLocation(ADMIN, { id: room.id }),
+        sessions().addLocationUnavailability(
+          ADMIN,
+          {
+            eventId: event.id,
+            locationIds: [room.id],
+            start: at("10:00"),
+            end: at("12:00"),
+          },
+          NOW
+        ),
+        venue().deleteLocation(ADMIN, { id: room.id }, NOW),
       ]);
 
       expect(["ok", "unavailability.roomNotInEvent"]).toContain(code(added));
@@ -1036,21 +1121,29 @@ describe("room unavailability use cases", () => {
         start?: Date;
         end?: Date;
       }) =>
-        sessions().addLocationUnavailability(ADMIN, {
-          eventId: event.id,
-          start: at("10:00"),
-          end: at("12:00"),
-          ...input,
-        });
+        sessions().addLocationUnavailability(
+          ADMIN,
+          {
+            eventId: event.id,
+            start: at("10:00"),
+            end: at("12:00"),
+            ...input,
+          },
+          NOW
+        );
 
       expect(
         code(
-          await sessions().addLocationUnavailability(NOBODY, {
-            eventId: event.id,
-            locationIds: [room.id],
-            start: at("10:00"),
-            end: at("12:00"),
-          })
+          await sessions().addLocationUnavailability(
+            NOBODY,
+            {
+              eventId: event.id,
+              locationIds: [room.id],
+              start: at("10:00"),
+              end: at("12:00"),
+            },
+            NOW
+          )
         )
       ).toBe("admin.required");
       expect(code(await add({ locationIds: [elsewhere.id] }))).toBe(
@@ -1080,16 +1173,24 @@ describe("room unavailability use cases", () => {
 
       expect(
         value(
-          await sessions().deleteLocationUnavailability(ADMIN, {
-            id: period.id,
-          })
+          await sessions().deleteLocationUnavailability(
+            ADMIN,
+            {
+              id: period.id,
+            },
+            NOW
+          )
         )
       ).toEqual(period);
       expect(
         code(
-          await sessions().deleteLocationUnavailability(ADMIN, {
-            id: period.id,
-          })
+          await sessions().deleteLocationUnavailability(
+            ADMIN,
+            {
+              id: period.id,
+            },
+            NOW
+          )
         )
       ).toBe("unavailability.notFound");
     }

@@ -68,12 +68,16 @@ export function addAdminUnavailabilityRoutes(
 
   app.openapi(add, async (c) => {
     const { start, end, locationIds } = c.req.valid("json");
-    const result = await sessions().addLocationUnavailability(c.var.actor, {
-      eventId: c.req.valid("param").id,
-      locationIds,
-      start: new Date(start),
-      end: new Date(end),
-    });
+    const result = await sessions().addLocationUnavailability(
+      c.var.actor,
+      {
+        eventId: c.req.valid("param").id,
+        locationIds,
+        start: new Date(start),
+        end: new Date(end),
+      },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error);
     return c.json({ periods: result.value.map(toUnavailabilityView) }, 201);
   });
@@ -81,7 +85,8 @@ export function addAdminUnavailabilityRoutes(
   app.openapi(remove, async (c) => {
     const result = await sessions().deleteLocationUnavailability(
       c.var.actor,
-      c.req.valid("param")
+      c.req.valid("param"),
+      c.var.now
     );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);

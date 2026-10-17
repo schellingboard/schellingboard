@@ -21,6 +21,35 @@ export function apply(replica: Snapshot, message: FeedMessage): Snapshot {
       );
       return next;
     }
+    case "location.changed": {
+      const { location } = message;
+      next.locations = [
+        ...next.locations.filter((l) => l.id !== location.id),
+        location,
+      ].sort(
+        (a, b) =>
+          a.sortIndex - b.sortIndex || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
+      );
+      return next;
+    }
+    case "location.removed":
+      next.locations = next.locations.filter(
+        (l) => l.id !== message.locationId
+      );
+      return next;
+    case "unavailability.added": {
+      const { period } = message;
+      next.unavailability = [
+        ...next.unavailability.filter((p) => p.id !== period.id),
+        period,
+      ].sort((a, b) => (a.start < b.start ? -1 : a.start > b.start ? 1 : 0));
+      return next;
+    }
+    case "unavailability.removed":
+      next.unavailability = next.unavailability.filter(
+        (p) => p.id !== message.periodId
+      );
+      return next;
     case "day.deleted":
       next.days = next.days.filter((d) => d.id !== message.dayId);
       return next;

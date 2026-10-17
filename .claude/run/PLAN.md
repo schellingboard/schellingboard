@@ -170,8 +170,8 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
   - [x] 12b. Events and days (settings, phases, meeting settings, day edits, event and
         day deletes), and the `cascade: true` marker with the session cascades they cause.
         Split from the original 12b: every use case needs the request clock threaded in.
-  - 12c. Locations and their event assignment, room unavailability, and the session
-    cascades of a location delete.
+  - [x] 12c. Locations and their event assignment, room unavailability, and the session
+        cascades of a location delete.
   - 12d. Guests joining or leaving an event, public profile edits; meetings (audience:
     the two guests) and meeting points.
 - [ ] 13. **Feed endpoint and hub**: replay from the table, then live from the hub in
@@ -182,6 +182,8 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
       fed by `EventSource`; `EventContext` derives its values from it. A reconnect
       resumes; `410` refetches the snapshot; a user switch reloads snapshot and feed.
       The RSVP optimistic update reconciles with the feed's echo, never counts twice.
+      Selectors skip a room the replica no longer holds (`location.removed` leaves
+      sessions' links and unavailability rows); a replica test shows it.
       E2E: two browser contexts; one creates, moves and deletes a session and RSVPs,
       the other sees each change without a reload. Kiosk included.
 - [ ] 15. **Sync state**: an indicator on the schedule (live, reconnecting, stale), so

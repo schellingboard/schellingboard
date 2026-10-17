@@ -1,3 +1,4 @@
+import { changes, type ChangeContext } from "@schellingboard/domain/change";
 import type { LocationUnavailability } from "@schellingboard/domain/location";
 import type { Actor } from "@/server/kernel/actor";
 import {
@@ -16,6 +17,10 @@ export interface LocationUnavailabilityInput {
   end: Date | undefined;
 }
 
+const byAdmin = (at: Date): ChangeContext => ({
+  actor: { type: "admin" },
+  at,
+});
 const adminRequired = () => forbidden("admin.required", "Unauthorized");
 const eventNotFound = () => notFound("event.notFound", "Event not found");
 const valid = (d: Date | undefined): d is Date =>
@@ -36,7 +41,8 @@ export const addLocationUnavailability =
   ({ uow }: SessionDeps) =>
   async (
     actor: Actor,
-    input: LocationUnavailabilityInput
+    input: LocationUnavailabilityInput,
+    now: Date
   ): Promise<Result<LocationUnavailability[]>> => {
     if (!actor.admin) return adminRequired();
     const { start, end } = input;
@@ -64,28 +70,33 @@ export const addLocationUnavailability =
         );
       }
 
-      return ok(
-        await tx.locationUnavailability.createMany(
-          [...new Set(input.locationIds)].map((locationId) => ({
-            eventId: input.eventId,
-            locationId,
-            start,
-            end,
-          }))
-        )
+      const created = await tx.locationUnavailability.createMany(
+        [...new Set(input.locationIds)].map((locationId) => ({
+          eventId: input.eventId,
+          locationId,
+          start,
+          end,
+        }))
       );
+      for (const period of created)
+        tx.record(changes.unavailabilityAdded(period, byAdmin(now)));
+      return ok(created);
     });
   };
 
 export const deleteLocationUnavailability =
-  ({ repos }: SessionDeps) =>
+  ({ uow }: SessionDeps) =>
   async (
     actor: Actor,
-    input: { id: string }
+    input: { id: string },
+    now: Date
   ): Promise<Result<LocationUnavailability>> => {
     if (!actor.admin) return adminRequired();
-    const period = await repos.locationUnavailability.findById(input.id);
-    if (!period) return notFound("unavailability.notFound", "Not found");
-    await repos.locationUnavailability.delete(input.id);
-    return ok(period);
+    return uow.run(async (tx) => {
+      const period = await tx.locationUnavailability.findById(input.id);
+      if (!period) return notFound("unavailability.notFound", "Not found");
+      await tx.locationUnavailability.delete(input.id);
+      tx.record(changes.unavailabilityRemoved(period, byAdmin(now)));
+      return ok(period);
+    });
   };

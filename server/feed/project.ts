@@ -1,7 +1,11 @@
 import type { FeedMessage } from "@schellingboard/contracts/feed";
 import type { RecordedChange, Viewer } from "@schellingboard/domain/change";
 import { toDayView, toEventView } from "@/server/modules/events/module";
-import { toSnapshotSessionView } from "@/server/modules/sessions/module";
+import { toLocationView } from "@/server/modules/venue/module";
+import {
+  toSnapshotSessionView,
+  toUnavailabilityView,
+} from "@/server/modules/sessions/module";
 
 // Only the actor learns the key: keys are unique per actor. Coarser than ADR
 // 0012 section 5's scope (no admin id, no cookie level); see ADR 0014.
@@ -28,6 +32,22 @@ export function project(
       };
     case "event.deleted":
       return { ...common, type: change.type };
+    case "location.changed":
+      return {
+        ...common,
+        type: change.type,
+        location: toLocationView(change.payload.location),
+      };
+    case "location.removed":
+      return { ...common, type: change.type, locationId: change.subjectId };
+    case "unavailability.added":
+      return {
+        ...common,
+        type: change.type,
+        period: toUnavailabilityView(change.payload.period),
+      };
+    case "unavailability.removed":
+      return { ...common, type: change.type, periodId: change.subjectId };
     case "day.created":
     case "day.changed":
       return {

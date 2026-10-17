@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { legacyActor, legacyRefusal } from "@/app/api/legacy";
 import { venueUseCases } from "@/server/composition";
+import { requestNow } from "@/utils/dev-clock";
 import { requireProxyVerifiedAdmin } from "@/utils/auth";
 
 export const dynamic = "force-dynamic";
@@ -52,15 +53,19 @@ export async function POST(req: Request) {
     }
   }
 
-  const result = await venueUseCases().createLocation(await legacyActor(req), {
-    name: body.name ?? "",
-    capacity: body.capacity ?? 0,
-    description: body.description,
-    areaDescription: body.areaDescription,
-    color: body.color,
-    bookable: body.bookable ?? false,
-    eventSlug: body.eventSlug,
-  });
+  const result = await venueUseCases().createLocation(
+    await legacyActor(req),
+    {
+      name: body.name ?? "",
+      capacity: body.capacity ?? 0,
+      description: body.description,
+      areaDescription: body.areaDescription,
+      color: body.color,
+      bookable: body.bookable ?? false,
+      eventSlug: body.eventSlug,
+    },
+    requestNow(req)
+  );
   if (!result.ok) return legacyRefusal(result.error);
 
   return NextResponse.json({ id: result.value.id }, { status: 201 });

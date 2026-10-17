@@ -518,6 +518,23 @@ cursor.invalid`. The use case now returns the whole list; the
   Event delete records its sessions' deletions, then `event.deleted`; `apply`
   keeps the replica as it is on `event.deleted` (step 14 shows "event gone").
 
+- 12c: `location.changed` / `location.removed` (recorded once per event the
+  location is assigned to, payload the domain `Location`), and
+  `unavailability.added|removed`. Recorded by create, update (changed for its
+  events, removed for those it left), image replace/remove, move (every
+  location whose order or version moved), assign and remove for an event,
+  delete, and the seeding session that brings a location into its event. A
+  location delete wraps `recordingSessionCascade` over the sessions that use
+  it (any event), and records `unavailability.removed` for its closed periods
+  and `location.removed` per event. Removing a location from an event leaves
+  its sessions' links alone, as the repository does; selectors skip a room
+  the replica no longer holds. All venue use cases and the unavailability ones
+  take `now`.
+- 12c review: kept the second `location.changed` of a create with an image
+  (version and image URL differ; replay is idempotent); the per-event queries
+  and double `list()` in delete and move stay (admin-only, small). Selectors
+  skipping a removed room are now a task of step 14.
+
 ## Problems
 
 None.
@@ -543,4 +560,4 @@ None.
 
 ## Next step
 
-12c.
+12d.

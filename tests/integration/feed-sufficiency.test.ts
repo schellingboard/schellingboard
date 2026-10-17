@@ -8,11 +8,13 @@ import {
   createGuest,
   createLocation,
   createSession,
+  createUnavailability,
 } from "../helpers/factories";
 import { expectChangesSuffice } from "../helpers/sufficiency";
 import { getRepositories } from "@/db/container";
 import type { Actor } from "@/server/kernel/actor";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
+import { createVenueUseCases } from "@/server/modules/venue/module";
 import { createEventUseCases } from "@/server/modules/events/module";
 import { createSessionUseCases } from "@/server/modules/sessions/module";
 
@@ -30,6 +32,17 @@ const sessions = () =>
 
 const events = () =>
   createEventUseCases({ repos: getRepositories(), uow: unitOfWork });
+
+const venue = () =>
+  createVenueUseCases({
+    repos: getRepositories(),
+    images: {
+      validate: (buffer) => Promise.resolve({ buffer, ext: "png" }),
+      saveNew: (id) => Promise.resolve(`/media/locations/${id}-1.png`),
+      deleteByUrl: async () => {},
+    },
+    uow: unitOfWork,
+  });
 
 describe("the logged changes suffice to keep a replica current", () => {
   beforeAll(() => setupTestDb());
@@ -323,6 +336,179 @@ describe("the logged changes suffice to keep a replica current", () => {
       await expectChangesSuffice(w.viewer, w.scheduling.slug, async () => {
         const result = await events().deleteDay(ADMIN, { id: w.day.id }, NOW);
         expect(result.ok).toBe(true);
+      });
+    });
+  });
+
+  describe("with locations", () => {
+    async function venueWorld() {
+      const w = await world();
+      const period = await createUnavailability(
+        w.event.id,
+        w.room.id,
+        NINE,
+        TEN
+      );
+      const elsewhere = await createEvent();
+      return { ...w, period, elsewhere };
+    }
+    const ok = (result: { ok: boolean }) => expect(result.ok).toBe(true);
+
+    it("for a location created, edited and moved to another event", async () => {
+      const w = await venueWorld();
+      let made: { id: string; version: number } | undefined;
+      await expectChangesSuffice(w.viewer, w.event.slug, async () => {
+        const result = await venue().createLocation(
+          ADMIN,
+          { name: "Annex", capacity: 8, eventIds: [w.event.id] },
+          NOW
+        );
+        ok(result);
+        if (result.ok) made = result.value;
+      });
+      await expectChangesSuffice(w.viewer, w.event.slug, async () => {
+        ok(
+          await venue().updateLocation(
+            ADMIN,
+            {
+              id: made!.id,
+              name: "Annex 2",
+              capacity: 9,
+              eventIds: [w.event.id, w.elsewhere.id],
+              expectedVersion: made!.version,
+            },
+            NOW
+          )
+        );
+      });
+      await expectChangesSuffice(w.viewer, w.event.slug, async () => {
+        ok(
+          await venue().updateLocation(
+            ADMIN,
+            {
+              id: made!.id,
+              name: "Annex 2",
+              capacity: 9,
+              eventIds: [w.elsewhere.id],
+              expectedVersion: (await getRepositories().locations.findById(
+                made!.id
+              ))!.version,
+            },
+            NOW
+          )
+        );
+      });
+    });
+
+    it("for a location's image and its place in the order", async () => {
+      const w = await venueWorld();
+      await expectChangesSuffice(w.viewer, w.event.slug, async () => {
+        ok(
+          await venue().moveLocation(
+            ADMIN,
+            { id: w.hall.id, direction: "up", expectedVersion: w.hall.version },
+            NOW
+          )
+        );
+      });
+      await expectChangesSuffice(w.viewer, w.event.slug, async () => {
+        ok(
+          await venue().replaceLocationImage(
+            ADMIN,
+            {
+              id: w.room.id,
+              image: Buffer.from("x"),
+              expectedVersion: (await getRepositories().locations.findById(
+                w.room.id
+              ))!.version,
+            },
+            NOW
+          )
+        );
+      });
+    });
+
+    it("for locations assigned to and removed from the event", async () => {
+      const w = await venueWorld();
+      const spare = await createLocation({ name: "Spare" });
+      const input = { eventId: w.event.id, locationIds: [spare.id] };
+      await expectChangesSuffice(w.viewer, w.event.slug, async () => {
+        ok(await venue().assignLocationsToEvent(ADMIN, input, NOW));
+      });
+      await expectChangesSuffice(w.viewer, w.event.slug, async () => {
+        ok(
+          await venue().removeLocationsFromEvent(
+            ADMIN,
+            { eventId: w.event.id, locationIds: [spare.id, w.room.id] },
+            NOW
+          )
+        );
+      });
+    });
+
+    it("for a location deleted from under a session and a closed period", async () => {
+      const w = await venueWorld();
+      await expectChangesSuffice(w.viewer, w.event.slug, async () => {
+        ok(await venue().deleteLocation(ADMIN, { id: w.room.id }, NOW));
+      });
+    });
+
+    it("for a room made unavailable, then available again", async () => {
+      const w = await venueWorld();
+      let added: { id: string }[] = [];
+      await expectChangesSuffice(w.viewer, w.event.slug, async () => {
+        const result = await sessions().addLocationUnavailability(
+          ADMIN,
+          {
+            eventId: w.event.id,
+            locationIds: [w.hall.id, w.room.id],
+            start: new Date("2026-06-02T12:00:00.000Z"),
+            end: new Date("2026-06-02T13:00:00.000Z"),
+          },
+          NOW
+        );
+        ok(result);
+        if (result.ok) added = result.value;
+      });
+      await expectChangesSuffice(w.viewer, w.event.slug, async () => {
+        ok(
+          await sessions().deleteLocationUnavailability(
+            ADMIN,
+            { id: added[0].id },
+            NOW
+          )
+        );
+        ok(
+          await sessions().deleteLocationUnavailability(
+            ADMIN,
+            { id: w.period.id },
+            NOW
+          )
+        );
+      });
+    });
+
+    it("for a location a seeded session brings into the event", async () => {
+      const w = await venueWorld();
+      const annex = await createLocation({ name: "Annex" });
+      await expectChangesSuffice(w.viewer, w.event.slug, async () => {
+        ok(
+          await sessions().adminSeedSession(
+            ADMIN,
+            {
+              eventSlug: w.event.slug,
+              title: "In the annex",
+              description: "",
+              startTime: TEN,
+              endTime: new Date("2026-06-02T11:00:00.000Z"),
+              hostIds: [],
+              locationIds: [annex.id],
+              adminManaged: false,
+              closed: false,
+            },
+            NOW
+          )
+        );
       });
     });
   });

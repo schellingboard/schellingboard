@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import { serverNow } from "@/utils/dev-clock-server";
 import { venueUseCases } from "@/server/composition";
 import { resolveActor } from "@/server/kernel/actor";
 import type { Result } from "@/server/kernel/result";
@@ -28,7 +29,11 @@ export async function assignLocationsToEventAction(
   input: EventLocationsInput
 ): Promise<AdminActionResult> {
   return settled(
-    await venueUseCases().assignLocationsToEvent(await actor(), input),
+    await venueUseCases().assignLocationsToEvent(
+      await actor(),
+      input,
+      await serverNow()
+    ),
     input.eventId
   );
 }
@@ -37,7 +42,11 @@ export async function removeLocationsFromEventAction(
   input: EventLocationsInput
 ): Promise<AdminActionResult> {
   return settled(
-    await venueUseCases().removeLocationsFromEvent(await actor(), input),
+    await venueUseCases().removeLocationsFromEvent(
+      await actor(),
+      input,
+      await serverNow()
+    ),
     input.eventId
   );
 }
