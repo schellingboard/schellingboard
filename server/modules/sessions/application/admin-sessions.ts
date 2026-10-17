@@ -14,7 +14,12 @@ import {
 import type { Tx } from "@/server/kernel/unit-of-work";
 import type { SessionDeps } from "../ports";
 import { changedMeanwhile } from "./booking";
-import { addSession, changeSession, removeSession } from "./session-changes";
+import {
+  addSession,
+  changeSession,
+  recordCohostsAdded,
+  removeSession,
+} from "./session-changes";
 
 export interface AdminSessionFields {
   title: string;
@@ -154,23 +159,17 @@ export const adminCreateSession =
     const fields = checked(input);
     if (!fields.ok) return fields;
     const by: ChangeContext = { actor: { type: "admin" }, at: now };
-    const result = await deps.uow.run(async (tx) => {
+    return deps.uow.run(async (tx) => {
       if (!(await tx.events.findById(eventId)))
         return notFound("event.notFound", "Event not found");
       const unknown = await unknownReference(tx, fields.value);
       if (unknown) return unknown;
       const clashing = await clash(tx, eventId, fields.value);
       if (clashing) return clashing;
-      return ok(await addSession(tx, { ...fields.value, eventId }, by));
+      const created = await addSession(tx, { ...fields.value, eventId }, by);
+      recordCohostsAdded(tx, created, [], by);
+      return ok(created);
     });
-    if (!result.ok) return result;
-    await deps.notifyCohostsAdded({
-      now,
-      session: result.value,
-      previousHostIds: [],
-      changedById: null,
-    });
-    return result;
   };
 
 export const adminUpdateSession =
@@ -184,7 +183,7 @@ export const adminUpdateSession =
     const fields = checked(input);
     if (!fields.ok) return fields;
     const by: ChangeContext = { actor: { type: "admin" }, at: now };
-    const result = await deps.uow.run(async (tx) => {
+    return deps.uow.run(async (tx) => {
       const session = await tx.sessions.findById(id);
       if (!session) return sessionNotFound();
       const unknown = await unknownReference(tx, fields.value);
@@ -198,17 +197,14 @@ export const adminUpdateSession =
         by
       );
       if (!updated) return changedMeanwhile(tx, id);
-      return ok({ updated, previousHostIds: session.hosts.map((h) => h.id) });
+      recordCohostsAdded(
+        tx,
+        updated,
+        session.hosts.map((h) => h.id),
+        by
+      );
+      return ok(updated);
     });
-    if (!result.ok) return result;
-    const { updated, previousHostIds } = result.value;
-    await deps.notifyCohostsAdded({
-      now,
-      session: updated,
-      previousHostIds,
-      changedById: null,
-    });
-    return ok(updated);
   };
 
 export const adminDeleteSession =

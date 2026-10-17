@@ -311,8 +311,7 @@ async function notifySessionRecipients({
 // guests.
 export async function notifyCohostsAdded(args: {
   session: Session;
-  previousHostIds: string[];
-  changedById: string | null;
+  addedIds: string[];
   now: Date;
 }): Promise<void> {
   try {
@@ -324,19 +323,14 @@ export async function notifyCohostsAdded(args: {
 
 async function notifyCohostsAddedUnsafe({
   session,
-  previousHostIds,
-  changedById,
+  addedIds,
   now,
 }: {
   session: Session;
-  previousHostIds: string[];
-  changedById: string | null;
+  addedIds: string[];
   now: Date;
 }): Promise<void> {
-  const previous = new Set(previousHostIds);
-  const added = session.hosts.filter(
-    (h) => !previous.has(h.id) && h.id !== changedById
-  );
+  const added = session.hosts.filter((h) => addedIds.includes(h.id));
   if (added.length === 0) return;
 
   const event = await getRepositories().events.findById(session.eventId);

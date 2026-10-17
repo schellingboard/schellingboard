@@ -710,13 +710,12 @@ describe("notifyCohostsAdded", () => {
 
   it("does not throw, and sends nothing, when SITE_URL is invalid", async () => {
     vi.stubEnv("SITE_URL", "not-a-valid-url");
-    const { session } = await setupWithCohost();
+    const { cohost, session } = await setupWithCohost();
 
     await expect(
       notifyCohostsAdded({
         session,
-        previousHostIds: [],
-        changedById: null,
+        addedIds: [cohost.id],
         now: NOW,
       })
     ).resolves.toBeUndefined();
@@ -730,8 +729,7 @@ describe("notifyCohostsAdded", () => {
 
     await notifyCohostsAdded({
       session,
-      previousHostIds: [],
-      changedById: null,
+      addedIds: session.hosts.map((h) => h.id),
       now: NOW,
     });
 
@@ -752,26 +750,11 @@ describe("notifyCohostsAdded", () => {
   });
 
   it("does not email guests who were hosts already", async () => {
-    const { cohost, session } = await setupWithCohost();
+    const { session } = await setupWithCohost();
 
     await notifyCohostsAdded({
       session,
-      previousHostIds: [cohost.id],
-      changedById: null,
-      now: NOW,
-    });
-
-    await deliverQueued();
-    expect(sendMail).not.toHaveBeenCalled();
-  });
-
-  it("does not email a guest who added themselves", async () => {
-    const { cohost, session } = await setupWithCohost();
-
-    await notifyCohostsAdded({
-      session,
-      previousHostIds: [],
-      changedById: cohost.id,
+      addedIds: [],
       now: NOW,
     });
 
@@ -795,8 +778,7 @@ describe("notifyCohostsAdded", () => {
 
     await notifyCohostsAdded({
       session: after,
-      previousHostIds: [],
-      changedById: null,
+      addedIds: [optedOut.id],
       now: NOW,
     });
 

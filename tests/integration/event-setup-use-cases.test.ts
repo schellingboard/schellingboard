@@ -44,7 +44,6 @@ const venue = (uow: UnitOfWork = unitOfWork) =>
 const sessions = () =>
   createSessionUseCases({
     repos: getRepositories(),
-    notifyCohostsAdded: async () => {},
     uow: unitOfWork,
   });
 

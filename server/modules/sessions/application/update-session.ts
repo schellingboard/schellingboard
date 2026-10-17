@@ -1,3 +1,4 @@
+import type { ChangeContext } from "@schellingboard/domain/change";
 import { sessionBookingWindowError } from "@schellingboard/domain/day-window";
 import type { Location } from "@schellingboard/domain/location";
 import { locationUnavailableError } from "@schellingboard/domain/location-unavailability";
@@ -32,7 +33,7 @@ import {
   placementFailure,
   type SessionBooking,
 } from "./booking";
-import { changeSession } from "./session-changes";
+import { changeSession, recordCohostsAdded } from "./session-changes";
 
 export interface UpdateSessionInput extends SessionBooking {
   sessionId: string;
@@ -48,7 +49,7 @@ export const updateSession =
     input: UpdateSessionInput,
     now: Date
   ): Promise<Result<Session>> => {
-    const result = await deps.uow.run(async (tx) => {
+    return deps.uow.run(async (tx) => {
       const day = await tx.days.findById(input.dayId);
       if (!day) return dayUnknown();
       const prev = await tx.sessions.findById(input.sessionId);
@@ -122,24 +123,25 @@ export const updateSession =
       );
       if (placement) return placementFailure(placement);
 
+      const by: ChangeContext = {
+        actor: { type: "guest", id: host.value },
+        at: now,
+      };
       const updated = await changeSession(
         tx,
         prev.id,
         { ...session, expectedVersion: input.expectedVersion },
-        { actor: { type: "guest", id: host.value }, at: now }
+        by
       );
       if (!updated) return changedMeanwhile(tx, prev.id);
-      return ok({ updated, prev, host: host.value });
+      recordCohostsAdded(
+        tx,
+        updated,
+        prev.hosts.map((h) => h.id),
+        by
+      );
+      return ok(updated);
     });
-    if (!result.ok) return result;
-    const { updated, prev, host } = result.value;
-    await deps.notifyCohostsAdded({
-      now,
-      session: updated,
-      previousHostIds: prev.hosts.map((h) => h.id),
-      changedById: host,
-    });
-    return ok(updated);
   };
 
 // The rooms the event lets attendees book, plus the ones the session is

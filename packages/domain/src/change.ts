@@ -149,6 +149,13 @@ export type AvailabilityChanged = ChangeOf<
   { guestId: string; slotStarts: string[] }
 >;
 
+/** The hosts a session gained, other than whoever made the change. */
+export type SessionCohostsAdded = ChangeOf<
+  "session.cohostsAdded",
+  "session",
+  { hostIds: string[] }
+>;
+
 /** Only the reaction that notifies the other hosts reads this. */
 export type ProposalJoined = ChangeOf<
   "proposal.joined",
@@ -167,6 +174,7 @@ export type CommentCreated = ChangeOf<
 >;
 
 export type Change =
+  | SessionCohostsAdded
   | ProposalJoined
   | CommentCreated
   | GuestChanged
@@ -234,6 +242,7 @@ export function audienceOf(change: Change): Audience {
       };
     case "availability.changed":
       return { kind: "guests", ids: [change.payload.guestId] };
+    case "session.cohostsAdded":
     case "proposal.joined":
     case "comment.created":
       return { kind: "none" };
@@ -366,6 +375,22 @@ export const changes = {
       actor,
       occurredAt: at,
       payload: { sessionId, guestId },
+    };
+  },
+
+  sessionCohostsAdded(
+    session: Pick<Session, "id" | "eventId">,
+    hostIds: string[],
+    { actor, at }: ChangeContext
+  ): SessionCohostsAdded {
+    return {
+      type: "session.cohostsAdded",
+      subjectType: "session",
+      subjectId: session.id,
+      eventId: session.eventId,
+      actor,
+      occurredAt: at,
+      payload: { hostIds },
     };
   },
 

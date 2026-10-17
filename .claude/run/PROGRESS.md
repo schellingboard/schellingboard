@@ -51,6 +51,14 @@
 - Co-hosts added belongs to the sessions family, so it moves to 4b.
 - Tests that waited for `after()` tasks now call `runJobs()`.
 
+## Step 4b (2026-10-08)
+
+- New change type `session.cohostsAdded` (ids of the added hosts, audience `none`),
+  recorded by the four paths that created or edited a session with new hosts.
+  The seed path records none, so it stays silent as before. The existing reaction
+  loads the session when it runs. `notifyCohostsAdded` is no longer a use-case
+  dependency.
+
 ## Questions
 
 - `utils/guest-clashes.ts` imports `@/app/(site)/session_utils`, so `server/modules/`
@@ -59,4 +67,4 @@
 
 ## Next step
 
-4b.
+4c.

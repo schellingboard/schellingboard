@@ -1,3 +1,4 @@
+import type { ChangeContext } from "@schellingboard/domain/change";
 import { sessionBookingWindowError } from "@schellingboard/domain/day-window";
 import { locationUnavailableError } from "@schellingboard/domain/location-unavailability";
 import { inSchedPhase } from "@schellingboard/domain/phase";
@@ -21,7 +22,7 @@ import {
   placementFailure,
   type SessionBooking,
 } from "./booking";
-import { addSession } from "./session-changes";
+import { addSession, recordCohostsAdded } from "./session-changes";
 
 export interface CreateSessionInput extends SessionBooking {
   locationId: string;
@@ -34,7 +35,7 @@ export const createSession =
     input: CreateSessionInput,
     now: Date
   ): Promise<Result<Session>> => {
-    const result = await deps.uow.run(async (tx) => {
+    return deps.uow.run(async (tx) => {
       // A session is attributed to its hosts, so creating needs a name actually
       // selected, not merely one that isn't being falsely claimed.
       const acting = await actingGuest(actor, tx.guests);
@@ -93,19 +94,12 @@ export const createSession =
       );
       if (placement) return placementFailure(placement);
 
-      const created = await addSession(tx, session, {
+      const by: ChangeContext = {
         actor: { type: "guest", id: acting.value },
         at: now,
-      });
-      return ok({ created, actingId: acting.value });
+      };
+      const created = await addSession(tx, session, by);
+      recordCohostsAdded(tx, created, [], by);
+      return ok(created);
     });
-    if (!result.ok) return result;
-    const { created, actingId } = result.value;
-    await deps.notifyCohostsAdded({
-      now,
-      session: created,
-      previousHostIds: [],
-      changedById: actingId,
-    });
-    return ok(created);
   };
