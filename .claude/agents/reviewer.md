@@ -1,6 +1,7 @@
 ---
 name: reviewer
 description: Critical review of the last commit of an autonomous run step; reports findings, changes nothing. Use after every implementer step, in a fresh instance.
+model: opus
 maxTurns: 150
 ---
 
