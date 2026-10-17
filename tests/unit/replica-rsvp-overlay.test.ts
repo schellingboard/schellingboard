@@ -16,6 +16,7 @@ const pendingAdd: PendingRsvp = {
   guestId: "mia",
   sessionId: "unscheduled",
   remove: false,
+  key: "add-key",
   baseCount: 0,
   noop: false,
   acknowledged: false,
@@ -25,12 +26,16 @@ const pendingRemove: PendingRsvp = {
   guestId: "mia",
   sessionId: "s",
   remove: true,
+  key: "remove-key",
   baseCount: 4,
   noop: false,
   acknowledged: false,
 };
 
-const echo = (replica: typeof snapshot, remove: boolean) => {
+const none = new Set<string>();
+const delivered = (...keys: string[]) => new Set(keys);
+
+const echo = (replica: typeof snapshot, remove: boolean, key = "k") => {
   const [rsvp, count] = remove
     ? [
         {
@@ -56,7 +61,7 @@ const echo = (replica: typeof snapshot, remove: boolean) => {
     {
       seq: replica.seq + 2,
       type: "session.attendanceChanged" as const,
-      commandKey: null,
+      commandKey: key,
       ...count,
     },
   ] as const;
@@ -75,26 +80,35 @@ describe("optimistic RSVPs over the replica", () => {
     const pending = [pendingAdd];
 
     const afterRsvp = apply(snapshot, rsvp);
-    const acked = [{ ...pendingAdd, acknowledged: true }];
-    expect(settlePendingRsvps(afterRsvp, acked)).toEqual(acked);
-    expect(withPendingRsvps(afterRsvp, acked).counts.unscheduled).toBe(1);
-    expect(settlePendingRsvps(afterRsvp, pending)).toEqual(pending);
+    expect(settlePendingRsvps(afterRsvp, pending, none)).toEqual(pending);
     expect(withPendingRsvps(afterRsvp, pending).counts.unscheduled).toBe(1);
 
     const afterCount = apply(afterRsvp, count);
-    expect(settlePendingRsvps(afterCount, pending)).toEqual([]);
+    expect(
+      settlePendingRsvps(afterCount, pending, delivered("add-key"))
+    ).toEqual([]);
     expect(afterCount.counts.unscheduled).toBe(1);
 
     const countFirst = apply(snapshot, count);
     expect(withPendingRsvps(countFirst, pending).counts.unscheduled).toBe(1);
   });
 
-  it("settles a remove when its echo lands, and a count that was already right", () => {
-    const [rsvp, count] = echo(snapshot, true);
-    const afterBoth = apply(apply(snapshot, rsvp), count);
+  it("settles a toggle on its own key, not on any count change", () => {
+    const [rsvp, count] = echo(snapshot, false);
+    const someoneElses = apply(apply(snapshot, rsvp), count);
 
-    expect(settlePendingRsvps(afterBoth, [pendingRemove])).toEqual([]);
-    expect(withPendingRsvps(afterBoth, [])).toBe(afterBoth);
+    expect(settlePendingRsvps(someoneElses, [pendingAdd], none)).toEqual([
+      pendingAdd,
+    ]);
+    expect(
+      settlePendingRsvps(someoneElses, [pendingAdd], delivered("add-key"))
+    ).toEqual([]);
+  });
+
+  it("settles a remove when its key arrives", () => {
+    expect(
+      settlePendingRsvps(snapshot, [pendingRemove], delivered("remove-key"))
+    ).toEqual([]);
   });
 
   it("settles a toggle that changed nothing on the server's answer", () => {
@@ -105,25 +119,29 @@ describe("optimistic RSVPs over the replica", () => {
       noop: true,
     };
 
-    expect(settlePendingRsvps(snapshot, [again])).toEqual([again]);
+    expect(settlePendingRsvps(snapshot, [again], none)).toEqual([again]);
     expect(
-      settlePendingRsvps(snapshot, [{ ...again, acknowledged: true }])
+      settlePendingRsvps(snapshot, [{ ...again, acknowledged: true }], none)
     ).toEqual([]);
   });
 
   it("keeps an acknowledged op until its echo arrives", () => {
     const pending = [{ ...pendingAdd, acknowledged: true }];
 
-    expect(settlePendingRsvps(snapshot, pending)).toEqual(pending);
+    expect(settlePendingRsvps(snapshot, pending, none)).toEqual(pending);
   });
 
   it("does not settle a later toggle on a state the first one has not reached yet", () => {
-    const undo: PendingRsvp = { ...pendingAdd, id: 3, remove: true };
+    const undo: PendingRsvp = {
+      ...pendingAdd,
+      id: 3,
+      remove: true,
+      key: "remove-key",
+    };
 
-    expect(settlePendingRsvps(snapshot, [pendingAdd, undo])).toEqual([
-      pendingAdd,
-      undo,
-    ]);
+    expect(
+      settlePendingRsvps(snapshot, [pendingAdd, undo], delivered("remove-key"))
+    ).toEqual([pendingAdd, undo]);
     expect(
       withPendingRsvps(snapshot, [pendingAdd, undo]).counts.unscheduled
     ).toBe(0);
