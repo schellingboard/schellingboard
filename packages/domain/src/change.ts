@@ -1,3 +1,4 @@
+import type { CommentRef } from "./comment";
 import type { Day, Event } from "./event";
 import type { Guest } from "./guest";
 import type { Location, LocationUnavailability } from "./location";
@@ -148,7 +149,26 @@ export type AvailabilityChanged = ChangeOf<
   { guestId: string; slotStarts: string[] }
 >;
 
+/** Only the reaction that notifies the other hosts reads this. */
+export type ProposalJoined = ChangeOf<
+  "proposal.joined",
+  "proposal",
+  { joinerId: string }
+>;
+
+/** Only the reaction that notifies the thread reads this. */
+export type CommentCreated = ChangeOf<
+  "comment.created",
+  "comment",
+  {
+    subject: { kind: "proposal" | "session" | "profile"; id: string };
+    comment: CommentRef;
+  }
+>;
+
 export type Change =
+  | ProposalJoined
+  | CommentCreated
   | GuestChanged
   | GuestRemoved
   | MeetingPointChanged
@@ -177,7 +197,11 @@ export type Change =
  * target's `persons` and `organizers` until persons exist.
  */
 export type Audience =
-  { kind: "event" } | { kind: "guests"; ids: string[] } | { kind: "admins" };
+  | { kind: "event" }
+  | { kind: "guests"; ids: string[] }
+  | { kind: "admins" }
+  /** Logged for reactions only; no feed viewer is told. */
+  | { kind: "none" };
 
 export function audienceOf(change: Change): Audience {
   switch (change.type) {
@@ -210,6 +234,9 @@ export function audienceOf(change: Change): Audience {
       };
     case "availability.changed":
       return { kind: "guests", ids: [change.payload.guestId] };
+    case "proposal.joined":
+    case "comment.created":
+      return { kind: "none" };
     case "rsvp.added":
       return { kind: "guests", ids: [change.payload.rsvp.guestId] };
     case "rsvp.removed":
@@ -339,6 +366,47 @@ export const changes = {
       actor,
       occurredAt: at,
       payload: { sessionId, guestId },
+    };
+  },
+
+  proposalJoined(
+    proposalId: string,
+    eventId: string,
+    joinerId: string,
+    { actor, at }: ChangeContext
+  ): ProposalJoined {
+    return {
+      type: "proposal.joined",
+      subjectType: "proposal",
+      subjectId: proposalId,
+      eventId,
+      actor,
+      occurredAt: at,
+      payload: { joinerId },
+    };
+  },
+
+  commentCreated(
+    comment: CommentRef,
+    subject: CommentCreated["payload"]["subject"],
+    eventId: string | null,
+    { actor, at }: ChangeContext
+  ): CommentCreated {
+    return {
+      type: "comment.created",
+      subjectType: "comment",
+      subjectId: comment.id,
+      eventId,
+      actor,
+      occurredAt: at,
+      payload: {
+        subject,
+        comment: {
+          id: comment.id,
+          author: comment.author,
+          createdTime: comment.createdTime,
+        },
+      },
     };
   },
 

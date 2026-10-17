@@ -1,3 +1,4 @@
+import { changes } from "@schellingboard/domain/change";
 import type { Comment } from "@schellingboard/domain/comment";
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
@@ -42,6 +43,17 @@ async function missingSubject(
     : notFound("profile.notFound", "Profile not found");
 }
 
+async function eventIdOf(
+  repos: CommentDeps["repos"],
+  { kind, id }: CommentSubject
+): Promise<string | null> {
+  if (kind === "proposal")
+    return (await repos.sessionProposals.findById(id))?.eventId ?? null;
+  if (kind === "session")
+    return (await repos.sessions.findById(id))?.eventId ?? null;
+  return null;
+}
+
 const commentNotFound = () => notFound("comment.notFound", "Comment not found");
 
 async function liveComment(
@@ -79,7 +91,7 @@ export const createComment =
     { subject, parentId, body }: CreateCommentInput,
     now: Date
   ): Promise<Result<Comment>> => {
-    const result = await deps.uow.run(async (tx) => {
+    return deps.uow.run(async (tx) => {
       const acting = await actingGuest(actor, tx.guests);
       if (!acting.ok) return acting;
       const missing = await missingSubject(tx, subject);
@@ -91,19 +103,23 @@ export const createComment =
           "The comment being replied to is invalid"
         );
 
-      return ok(
-        await comments.create({
-          subjectId: subject.id,
-          authorId: acting.value,
-          parentId,
-          body,
-          createdTime: now,
-        })
+      const created = await comments.create({
+        subjectId: subject.id,
+        authorId: acting.value,
+        parentId,
+        body,
+        createdTime: now,
+      });
+      tx.record(
+        changes.commentCreated(
+          created,
+          { kind: subject.kind, id: subject.id },
+          await eventIdOf(tx, subject),
+          { actor: { type: "guest", id: acting.value }, at: now }
+        )
       );
+      return ok(created);
     });
-    if (result.ok)
-      deps.notifyCommented({ subject, comment: result.value, now });
-    return result;
   };
 
 export const editComment =

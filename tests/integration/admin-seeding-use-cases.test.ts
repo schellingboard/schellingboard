@@ -48,7 +48,6 @@ const sessions = (uow: UnitOfWork = unitOfWork) =>
 const proposals = (uow: UnitOfWork = unitOfWork) =>
   createProposalUseCases({
     repos: getRepositories(),
-    notifyProposalJoined: () => {},
     uow,
   });
 

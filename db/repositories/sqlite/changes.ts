@@ -7,6 +7,7 @@ import type {
   Actor,
   Audience,
   Change,
+  CommentCreated,
   RecordedChange,
 } from "@schellingboard/domain/change";
 import type { Day, Event } from "@schellingboard/domain/event";
@@ -233,6 +234,29 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
         subjectType: "rsvp",
         payload: row.payload as { rsvp: Rsvp },
       };
+    case "proposal.joined":
+      return {
+        ...common,
+        type: "proposal.joined",
+        subjectType: "proposal",
+        payload: row.payload as { joinerId: string },
+      };
+    case "comment.created": {
+      const payload = row.payload as CommentCreated["payload"];
+      const raw = payload.comment as unknown as Record<string, string>;
+      return {
+        ...common,
+        type: "comment.created",
+        subjectType: "comment",
+        payload: {
+          subject: payload.subject,
+          comment: {
+            ...payload.comment,
+            createdTime: new Date(raw.createdTime),
+          },
+        },
+      };
+    }
     case "rsvp.removed":
       return {
         ...common,
@@ -270,6 +294,8 @@ const KNOWN_TYPES: RecordedChange["type"][] = [
   "session.attendanceChanged",
   "rsvp.added",
   "rsvp.removed",
+  "proposal.joined",
+  "comment.created",
 ];
 
 const PRUNED_CURSOR = "changes.pruned";

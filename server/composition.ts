@@ -1,4 +1,3 @@
-import { after } from "next/server";
 import { getRepositories } from "@/db/container";
 import { snapshotFor } from "@/server/feed/snapshot";
 import type { Actor } from "@/server/kernel/actor";
@@ -17,14 +16,9 @@ import {
   notifyCohostsAdded,
   notifyMeetingOutcome,
   notifyMeetingRequested,
-  notifyProfileCommented,
-  notifyProposalCommented,
-  notifyProposalJoined,
-  notifySessionCommented,
 } from "@/utils/notifications";
 import {
   createCommentUseCases,
-  type CommentDeps,
   type CommentUseCases,
   proposalComments,
 } from "@/server/modules/comments/module";
@@ -96,28 +90,13 @@ export function sessionUseCases(): SessionUseCases {
 export function proposalUseCases(): ProposalUseCases {
   return createProposalUseCases({
     repos: getRepositories(),
-    notifyProposalJoined: (args) => after(() => notifyProposalJoined(args)),
     uow: unitOfWork,
   });
 }
 
-const notifyCommented: CommentDeps["notifyCommented"] = ({
-  subject,
-  comment,
-  now,
-}) =>
-  after(() => {
-    if (subject.kind === "proposal")
-      return notifyProposalCommented({ proposalId: subject.id, comment, now });
-    if (subject.kind === "session")
-      return notifySessionCommented({ sessionId: subject.id, comment, now });
-    return notifyProfileCommented({ profileId: subject.id, comment, now });
-  });
-
 export function commentUseCases(): CommentUseCases {
   return createCommentUseCases({
     repos: getRepositories(),
-    notifyCommented,
     uow: unitOfWork,
   });
 }

@@ -18,16 +18,6 @@ vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
 }));
 
-const { afterTasks } = vi.hoisted(() => ({
-  afterTasks: [] as Promise<unknown>[],
-}));
-
-vi.mock("next/server", () => ({
-  after: (task: () => unknown) => {
-    afterTasks.push(Promise.resolve(task()));
-  },
-}));
-
 const cookieJar = new Map<string, string>();
 
 vi.mock("next/headers", () => ({
@@ -73,7 +63,6 @@ describe("a proposal that wants a host", () => {
   beforeEach(async () => {
     resetTestDb();
     cookieJar.clear();
-    afterTasks.length = 0;
     vi.mocked(sendMail).mockReset();
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await siteAuthenticate(cookieJar);
@@ -314,7 +303,7 @@ describe("a proposal that wants a host", () => {
       actAs(volunteer.id);
 
       await joinProposal(proposal.id, event.slug);
-      await Promise.all(afterTasks);
+      await runJobs();
 
       const { notifications } = getRepositories();
       expect(await notifications.listByGuest(host.id)).toMatchObject([
@@ -345,7 +334,7 @@ describe("a proposal that wants a host", () => {
       actAs(volunteer.id);
 
       await joinProposal(proposal.id, event.slug);
-      await Promise.all(afterTasks);
+      await runJobs();
 
       expect(
         await getRepositories().notifications.listByGuest(host.id)

@@ -10,17 +10,6 @@ import {
 
 vi.mock("@/utils/mailer", () => ({ sendMail: vi.fn() }));
 
-const { afterTasks } = vi.hoisted(() => ({
-  afterTasks: [] as Promise<unknown>[],
-}));
-
-vi.mock("next/server", async (original) => ({
-  ...(await original<typeof import("next/server")>()),
-  after: (task: () => unknown) => {
-    afterTasks.push(Promise.resolve(task()));
-  },
-}));
-
 import { NextRequest } from "next/server";
 import { GET, POST, PUT, DELETE } from "@/app/api/v1/[[...route]]/route";
 import { getRepositories } from "@/db/container";
@@ -68,7 +57,6 @@ type CommentBody = {
 beforeAll(() => setupTestDb());
 beforeEach(() => {
   resetTestDb();
-  afterTasks.length = 0;
   vi.mocked(sendMail).mockReset();
   vi.stubEnv("AUTH_SECRET", VALID_SECRET);
   vi.stubEnv("SITE_URL", "https://site.example");
@@ -102,7 +90,6 @@ describe("/api/v1 comments", () => {
         author: { id: guest.id },
         likes: [],
       });
-      await Promise.all(afterTasks);
       await runJobs();
       expect(vi.mocked(sendMail).mock.calls.map((c) => c[0].to)).toEqual([
         "host@example.com",

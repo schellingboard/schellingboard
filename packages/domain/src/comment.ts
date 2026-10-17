@@ -6,6 +6,9 @@ export type CommentAuthor = Pick<Guest, "id" | "name">;
 
 export type CommentLiker = Pick<Guest, "id" | "name" | "avatarUrl">;
 
+/** What a notification needs of a comment; the body stays out of the change log. */
+export type CommentRef = Pick<Comment, "id" | "author" | "createdTime">;
+
 export type Comment = {
   id: string;
   parentId: string | null;
