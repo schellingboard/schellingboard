@@ -146,10 +146,11 @@ export function addAdminGuestRoutes(app: App, people: () => PeopleUseCases) {
   });
 
   app.openapi(updateGuest, async (c) => {
-    const result = await people().updateGuest(c.var.actor, {
-      ...c.req.valid("json"),
-      id: c.req.valid("param").id,
-    });
+    const result = await people().updateGuest(
+      c.var.actor,
+      { ...c.req.valid("json"), id: c.req.valid("param").id },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error, (g: AdminGuest) => g);
     return c.json(result.value, 200);
   });
@@ -157,7 +158,8 @@ export function addAdminGuestRoutes(app: App, people: () => PeopleUseCases) {
   app.openapi(deleteGuest, async (c) => {
     const result = await people().deleteGuest(
       c.var.actor,
-      c.req.valid("param")
+      c.req.valid("param"),
+      c.var.now
     );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);
@@ -175,26 +177,29 @@ export function addAdminGuestRoutes(app: App, people: () => PeopleUseCases) {
   app.openapi(importGuests, async (c) => {
     const result = await people().importGuests(
       c.var.actor,
-      c.req.valid("json")
+      c.req.valid("json"),
+      c.var.now
     );
     if (!result.ok) return problem(result.error);
     return c.json(result.value, 200);
   });
 
   app.openapi(assign, async (c) => {
-    const result = await people().assignGuestsToEvent(c.var.actor, {
-      ...c.req.valid("json"),
-      eventId: c.req.valid("param").id,
-    });
+    const result = await people().assignGuestsToEvent(
+      c.var.actor,
+      { ...c.req.valid("json"), eventId: c.req.valid("param").id },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);
   });
 
   app.openapi(remove, async (c) => {
-    const result = await people().removeGuestsFromEvent(c.var.actor, {
-      ...c.req.valid("json"),
-      eventId: c.req.valid("param").id,
-    });
+    const result = await people().removeGuestsFromEvent(
+      c.var.actor,
+      { ...c.req.valid("json"), eventId: c.req.valid("param").id },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);
   });

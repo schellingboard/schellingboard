@@ -1,5 +1,7 @@
 import type { Day, Event } from "./event";
+import type { Guest } from "./guest";
 import type { Location, LocationUnavailability } from "./location";
+import type { Meeting, MeetingPoint } from "./meeting";
 import type { Rsvp, Session } from "./session";
 
 export type Actor =
@@ -96,7 +98,64 @@ export type UnavailabilityRemoved = ChangeOf<
   { period: LocationUnavailability }
 >;
 
+/**
+ * A guest the event shows everyone: a member, or a host who is not one. Also
+ * recorded when a shown guest's public fields change.
+ */
+export type GuestChanged = ChangeOf<
+  "guest.changed",
+  "guest",
+  { guest: Guest; member: boolean }
+>;
+
+/** The guest left the event's shown set, or was deleted. */
+export type GuestRemoved = ChangeOf<
+  "guest.removed",
+  "guest",
+  Record<string, never>
+>;
+
+export type MeetingPointChanged = ChangeOf<
+  "meetingPoint.changed",
+  "meetingPoint",
+  { point: MeetingPoint }
+>;
+
+export type MeetingPointRemoved = ChangeOf<
+  "meetingPoint.removed",
+  "meetingPoint",
+  { point: MeetingPoint }
+>;
+
+/** A 1-on-1 in any state; only the two guests it is between hear of it. */
+export type MeetingChanged = ChangeOf<
+  "meeting.changed",
+  "meeting",
+  { meeting: Meeting }
+>;
+
+/** Deleting a guest takes their 1-on-1s with them. */
+export type MeetingDeleted = ChangeOf<
+  "meeting.deleted",
+  "meeting",
+  { meeting: Meeting }
+>;
+
+/** The slot starts a guest declared themselves free, as ISO instants. */
+export type AvailabilityChanged = ChangeOf<
+  "availability.changed",
+  "availability",
+  { guestId: string; slotStarts: string[] }
+>;
+
 export type Change =
+  | GuestChanged
+  | GuestRemoved
+  | MeetingPointChanged
+  | MeetingPointRemoved
+  | MeetingChanged
+  | MeetingDeleted
+  | AvailabilityChanged
   | LocationChanged
   | LocationRemoved
   | UnavailabilityAdded
@@ -135,7 +194,22 @@ export function audienceOf(change: Change): Audience {
     case "location.removed":
     case "unavailability.added":
     case "unavailability.removed":
+    case "guest.changed":
+    case "guest.removed":
+    case "meetingPoint.changed":
+    case "meetingPoint.removed":
       return { kind: "event" };
+    case "meeting.changed":
+    case "meeting.deleted":
+      return {
+        kind: "guests",
+        ids: [
+          change.payload.meeting.requesterId,
+          change.payload.meeting.recipientId,
+        ],
+      };
+    case "availability.changed":
+      return { kind: "guests", ids: [change.payload.guestId] };
     case "rsvp.added":
       return { kind: "guests", ids: [change.payload.rsvp.guestId] };
     case "rsvp.removed":
@@ -351,6 +425,116 @@ export const changes = {
       actor,
       occurredAt: at,
       payload: { period },
+    };
+  },
+
+  guestChanged(
+    guest: Guest,
+    member: boolean,
+    eventId: string,
+    { actor, at }: ChangeContext
+  ): GuestChanged {
+    return {
+      type: "guest.changed",
+      subjectType: "guest",
+      subjectId: guest.id,
+      eventId,
+      actor,
+      occurredAt: at,
+      payload: { guest, member },
+    };
+  },
+
+  guestRemoved(
+    guestId: string,
+    eventId: string,
+    { actor, at }: ChangeContext
+  ): GuestRemoved {
+    return {
+      type: "guest.removed",
+      subjectType: "guest",
+      subjectId: guestId,
+      eventId,
+      actor,
+      occurredAt: at,
+      payload: {},
+    };
+  },
+
+  meetingPointChanged(
+    point: MeetingPoint,
+    { actor, at }: ChangeContext
+  ): MeetingPointChanged {
+    return {
+      type: "meetingPoint.changed",
+      subjectType: "meetingPoint",
+      subjectId: point.id,
+      eventId: point.eventId,
+      actor,
+      occurredAt: at,
+      payload: { point },
+    };
+  },
+
+  meetingPointRemoved(
+    point: MeetingPoint,
+    { actor, at }: ChangeContext
+  ): MeetingPointRemoved {
+    return {
+      type: "meetingPoint.removed",
+      subjectType: "meetingPoint",
+      subjectId: point.id,
+      eventId: point.eventId,
+      actor,
+      occurredAt: at,
+      payload: { point },
+    };
+  },
+
+  meetingChanged(
+    meeting: Meeting,
+    { actor, at }: ChangeContext
+  ): MeetingChanged {
+    return {
+      type: "meeting.changed",
+      subjectType: "meeting",
+      subjectId: meeting.id,
+      eventId: meeting.eventId,
+      actor,
+      occurredAt: at,
+      payload: { meeting },
+    };
+  },
+
+  meetingDeleted(
+    meeting: Meeting,
+    { actor, at }: ChangeContext
+  ): MeetingDeleted {
+    return {
+      type: "meeting.deleted",
+      subjectType: "meeting",
+      subjectId: meeting.id,
+      eventId: meeting.eventId,
+      actor,
+      occurredAt: at,
+      payload: { meeting },
+    };
+  },
+
+  availabilityChanged(
+    guestId: string,
+    eventId: string,
+    slotStarts: string[],
+    { actor, at }: ChangeContext
+  ): AvailabilityChanged {
+    return {
+      type: "availability.changed",
+      subjectType: "availability",
+      subjectId: guestId,
+      eventId,
+      actor,
+      occurredAt: at,
+      payload: { guestId, slotStarts },
     };
   },
 

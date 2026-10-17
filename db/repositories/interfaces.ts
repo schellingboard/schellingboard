@@ -194,7 +194,12 @@ export interface GuestsRepository {
    * The guests an event shows everyone, with the lean fields: its members and
    * its sessions' hosts (ADR 0014).
    */
-  listShownByEvent(eventId: string): Promise<(Guest & { member: boolean })[]>;
+  listShownByEvent(
+    eventId: string,
+    onlyGuestIds?: string[]
+  ): Promise<(Guest & { member: boolean })[]>;
+  /** The ids of the events that show the guest: membership or hosting. */
+  listShownEventIds(guestId: string): Promise<string[]>;
   /** The lean fields, by id. */
   listByIds(ids: string[]): Promise<Guest[]>;
   /** One event's guests with their whole public profile. */
@@ -752,6 +757,8 @@ export interface MeetingsRepository {
    * accepted, clash detection only accepted.
    */
   listByGuestAndEvent(guestId: string, eventId: string): Promise<Meeting[]>;
+  /** Every meeting the guest is part of, at any event. */
+  listByGuest(guestId: string): Promise<Meeting[]>;
   /**
    * Every meeting still standing that overlaps [start, end), whoever it is
    * between: what the grid's booking flow needs to know who is already taken.

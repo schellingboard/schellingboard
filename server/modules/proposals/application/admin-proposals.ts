@@ -1,5 +1,7 @@
 import type { SessionProposal } from "@schellingboard/domain/session";
 import type { Actor } from "@/server/kernel/actor";
+import { byAdmin } from "@/server/kernel/change-context";
+import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import {
   forbidden,
   invalid,
@@ -90,7 +92,13 @@ export const adminCreateProposal =
       const refused = await unknownHost(tx, hostIds);
       if (refused) return refused;
 
-      if (hostIds.length > 0) await tx.guests.assignToEvent(event.id, hostIds);
+      if (hostIds.length > 0)
+        await recordingShownGuests(
+          tx,
+          [event.id],
+          () => tx.guests.assignToEvent(event.id, hostIds),
+          byAdmin(now)
+        );
       const created = await tx.sessionProposals.create({
         eventId: event.id,
         title,

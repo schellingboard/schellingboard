@@ -172,8 +172,8 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
         Split from the original 12b: every use case needs the request clock threaded in.
   - [x] 12c. Locations and their event assignment, room unavailability, and the session
         cascades of a location delete.
-  - 12d. Guests joining or leaving an event, public profile edits; meetings (audience:
-    the two guests) and meeting points.
+  - [x] 12d. Guests joining or leaving an event, public profile edits; meetings (audience:
+        the two guests) and meeting points.
 - [ ] 13. **Feed endpoint and hub**: replay from the table, then live from the hub in
       `seq` order; audience filter per connection; heartbeat; `410`; cleanup on
       disconnect. OpenAPI documents it as `text/event-stream` with the message schema.

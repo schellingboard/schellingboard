@@ -12,6 +12,7 @@ import {
 import { getRepositories, withWriter } from "@/db/container";
 import { createEventUseCases } from "@/server/modules/events/module";
 import { createVenueUseCases } from "@/server/modules/venue/module";
+import { createMeetingUseCases } from "@/server/modules/meetings/module";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
 import {
   addSession,
@@ -29,7 +30,7 @@ describe("change log", () => {
 
   async function world() {
     const event = await createEvent();
-    const host = await createGuest({ name: "Hana Host" });
+    const host = await createGuest({ name: "Hana Host", eventId: event.id });
     const attendee = await createGuest({ name: "Ari Attendee" });
     const room = await createLocation({ name: "Room A", eventId: event.id });
     const session = await createSession(event.id, {
@@ -430,6 +431,60 @@ describe("change log", () => {
         },
         { type: "unavailability.removed", subjectId: period.id },
         { type: "location.removed", subjectId: room.id, eventId: event.id },
+      ]);
+    }
+  );
+
+  it(
+    "keeps a 1-on-1 between its two guests and a guest leaving visible to all",
+    { tags: ["012-US3"] },
+    async () => {
+      const event = await createEvent({ phase: "scheduling" });
+      const repos = getRepositories();
+      await repos.events.update(event.id, {
+        meetingsEnabled: true,
+        maxOpenMeetingRequests: 5,
+      });
+      const day = new Date(Date.now() + 30 * 86_400_000);
+      day.setUTCHours(9, 0, 0, 0);
+      await createDay(event.id, {
+        start: day,
+        end: new Date(day.getTime() + 8 * 3600_000),
+      });
+      const ada = await createGuest({ name: "Ada", eventId: event.id });
+      const grace = await createGuest({ name: "Grace", eventId: event.id });
+      const slot = new Date(day.getTime() + 3600_000);
+      await repos.meetingAvailability.replaceForGuest(grace.id, event.id, [
+        slot,
+      ]);
+      const meetings = createMeetingUseCases({
+        repos,
+        notifyMeetingRequested: async () => {},
+        notifyMeetingOutcome: async () => {},
+        uow: unitOfWork,
+      });
+
+      const asked = await meetings.requestMeeting(
+        { admin: false, guest: { id: ada.id, level: "open" } },
+        {
+          eventId: event.id,
+          recipientId: grace.id,
+          slotStart: slot.toISOString(),
+          slotCount: 1,
+          meetingPoint: "Lawn",
+        },
+        new Date()
+      );
+      expect(asked.ok).toBe(true);
+
+      expect(await repos.changes.listAfter(0)).toMatchObject([
+        {
+          type: "meeting.changed",
+          eventId: event.id,
+          actor: { type: "guest", id: ada.id },
+          audience: { kind: "guests", ids: [ada.id, grace.id] },
+          payload: { meeting: { status: "pending", slotStart: slot } },
+        },
       ]);
     }
   );

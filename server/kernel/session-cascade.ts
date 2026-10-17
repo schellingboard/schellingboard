@@ -2,8 +2,10 @@ import { changes, type ChangeContext } from "@schellingboard/domain/change";
 import type { Session } from "@schellingboard/domain/session";
 import type { Tx } from "./unit-of-work";
 
-// Rooms are compared too: their link rows cascade-delete without a version bump.
+// Rooms and hosts are compared too: their link rows cascade-delete without a
+// version bump.
 const roomsOf = (s: Session) => s.locations.map((l) => l.id).join();
+const hostsOf = (s: Session) => s.hosts.map((h) => h.id).join();
 
 /**
  * Runs `work`, which removes or edits `sessions` as a side effect (deleting a
@@ -43,10 +45,15 @@ export async function recordingSessionCascade<T>(
       );
     } else if (
       after.version !== before.version ||
-      roomsOf(after) !== roomsOf(before)
+      roomsOf(after) !== roomsOf(before) ||
+      hostsOf(after) !== hostsOf(before)
     ) {
       tx.record(changes.sessionChanged(before, after, cascade));
     }
+    if (after && after.numRsvps !== before.numRsvps)
+      tx.record(
+        changes.sessionAttendanceChanged(after, after.numRsvps, cascade)
+      );
   }
   return result;
 }

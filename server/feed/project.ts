@@ -1,6 +1,11 @@
 import type { FeedMessage } from "@schellingboard/contracts/feed";
 import type { RecordedChange, Viewer } from "@schellingboard/domain/change";
 import { toDayView, toEventView } from "@/server/modules/events/module";
+import {
+  toMeetingPointView,
+  toMeetingView,
+} from "@/server/modules/meetings/module";
+import { toEventGuestView } from "@/server/modules/people/module";
 import { toLocationView } from "@/server/modules/venue/module";
 import {
   toSnapshotSessionView,
@@ -48,6 +53,39 @@ export function project(
       };
     case "unavailability.removed":
       return { ...common, type: change.type, periodId: change.subjectId };
+    case "guest.changed":
+      return {
+        ...common,
+        type: change.type,
+        guest: {
+          ...toEventGuestView(change.payload.guest),
+          member: change.payload.member,
+        },
+      };
+    case "guest.removed":
+      return { ...common, type: change.type, guestId: change.subjectId };
+    case "meetingPoint.changed":
+      return {
+        ...common,
+        type: change.type,
+        meetingPoint: toMeetingPointView(change.payload.point),
+      };
+    case "meetingPoint.removed":
+      return { ...common, type: change.type, meetingPointId: change.subjectId };
+    case "meeting.changed":
+      return {
+        ...common,
+        type: change.type,
+        meeting: toMeetingView(change.payload.meeting),
+      };
+    case "meeting.deleted":
+      return { ...common, type: change.type, meetingId: change.subjectId };
+    case "availability.changed":
+      return {
+        ...common,
+        type: change.type,
+        slotStarts: change.payload.slotStarts,
+      };
     case "day.created":
     case "day.changed":
       return {

@@ -14,6 +14,8 @@ import type {
   Location,
   LocationUnavailability,
 } from "@schellingboard/domain/location";
+import type { Guest } from "@schellingboard/domain/guest";
+import type { Meeting, MeetingPoint } from "@schellingboard/domain/meeting";
 import type { Rsvp, Session } from "@schellingboard/domain/session";
 
 type DB = BetterSQLite3Database<typeof schema>;
@@ -64,6 +66,17 @@ function reviveDay(json: Day): Day {
 function revivePeriod(json: LocationUnavailability): LocationUnavailability {
   const raw = json as unknown as Record<string, string>;
   return { ...json, start: new Date(raw.start), end: new Date(raw.end) };
+}
+
+function reviveMeeting(json: Meeting): Meeting {
+  const raw = json as unknown as Record<string, string | undefined>;
+  return {
+    ...json,
+    slotStart: new Date(raw.slotStart!),
+    slotEnd: new Date(raw.slotEnd!),
+    createdAt: new Date(raw.createdAt!),
+    respondedAt: raw.respondedAt ? new Date(raw.respondedAt) : undefined,
+  };
 }
 
 function actorOf(row: ChangeRow): Actor {
@@ -158,6 +171,45 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
         payload: { period: revivePeriod(payload.period) },
       };
     }
+    case "guest.changed":
+      return {
+        ...common,
+        type: "guest.changed",
+        subjectType: "guest",
+        payload: row.payload as { guest: Guest; member: boolean },
+      };
+    case "guest.removed":
+      return {
+        ...common,
+        type: "guest.removed",
+        subjectType: "guest",
+        payload: {},
+      };
+    case "meetingPoint.changed":
+    case "meetingPoint.removed":
+      return {
+        ...common,
+        type: row.type,
+        subjectType: "meetingPoint",
+        payload: row.payload as { point: MeetingPoint },
+      };
+    case "meeting.changed":
+    case "meeting.deleted": {
+      const payload = row.payload as { meeting: Meeting };
+      return {
+        ...common,
+        type: row.type,
+        subjectType: "meeting",
+        payload: { meeting: reviveMeeting(payload.meeting) },
+      };
+    }
+    case "availability.changed":
+      return {
+        ...common,
+        type: "availability.changed",
+        subjectType: "availability",
+        payload: row.payload as { guestId: string; slotStarts: string[] },
+      };
     case "session.created": {
       const payload = row.payload as { session: Session };
       return {
@@ -196,6 +248,13 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
 // A reader skips types it does not know, such as rows written by a newer
 // version before a rollback, rather than stopping at them.
 const KNOWN_TYPES: RecordedChange["type"][] = [
+  "guest.changed",
+  "guest.removed",
+  "meetingPoint.changed",
+  "meetingPoint.removed",
+  "meeting.changed",
+  "meeting.deleted",
+  "availability.changed",
   "location.changed",
   "location.removed",
   "unavailability.added",

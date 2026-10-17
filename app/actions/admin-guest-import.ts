@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { peopleUseCases } from "@/server/composition";
 import { resolveActor } from "@/server/kernel/actor";
+import { serverNow } from "@/utils/dev-clock-server";
 
 export type ImportGuestsResult =
   | { ok: true; created: number; existing: number }
@@ -15,7 +16,8 @@ export async function importGuestsAction(input: {
 }): Promise<ImportGuestsResult> {
   const result = await peopleUseCases().importGuests(
     await resolveActor(await cookies()),
-    { csv: input.csvText, eventIds: input.eventIds }
+    { csv: input.csvText, eventIds: input.eventIds },
+    await serverNow()
   );
   if (!result.ok) {
     const { detail, errors } = result.error;

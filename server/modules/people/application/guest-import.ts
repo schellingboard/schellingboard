@@ -1,4 +1,6 @@
 import type { Actor } from "@/server/kernel/actor";
+import { byAdmin } from "@/server/kernel/change-context";
+import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import { ok, type Result } from "@/server/kernel/result";
 import { parseUserImportCsv } from "@/utils/user-import";
 import type { PeopleDeps } from "../ports";
@@ -10,7 +12,8 @@ export const importGuests =
   ({ uow }: PeopleDeps) =>
   async (
     actor: Actor,
-    input: { csv: string; eventIds: string[] }
+    input: { csv: string; eventIds: string[] },
+    now: Date
   ): Promise<Result<{ created: number; existing: number }>> => {
     if (!actor.admin) return adminRequired();
     const eventIds = [...new Set(input.eventIds)];
@@ -32,7 +35,12 @@ export const importGuests =
       for (const eventId of eventIds) {
         if (!(await tx.events.findById(eventId))) return eventNotFound();
       }
-      const { created } = await tx.guests.importAndAssign(rows, eventIds);
+      const { created } = await recordingShownGuests(
+        tx,
+        eventIds,
+        () => tx.guests.importAndAssign(rows, eventIds),
+        byAdmin(now)
+      );
       return ok({ created, existing: rows.length - created });
     });
   };

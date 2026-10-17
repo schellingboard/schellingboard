@@ -60,6 +60,21 @@ export class SqliteMeetingsRepository implements MeetingsRepository {
     return row ? rowToMeeting(row) : undefined;
   }
 
+  async listByGuest(guestId: string): Promise<Meeting[]> {
+    return this.db
+      .select()
+      .from(schema.meetings)
+      .where(
+        or(
+          eq(schema.meetings.requesterId, guestId),
+          eq(schema.meetings.recipientId, guestId)
+        )
+      )
+      .orderBy(asc(schema.meetings.slotStart), asc(schema.meetings.id))
+      .all()
+      .map(rowToMeeting);
+  }
+
   async listByGuestAndEvent(
     guestId: string,
     eventId: string

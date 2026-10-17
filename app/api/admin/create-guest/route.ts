@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { peopleUseCases } from "@/server/composition";
 import { requireProxyVerifiedAdmin } from "@/utils/auth";
 import { legacyActor, legacyRefusal } from "@/app/api/legacy";
+import { requestNow } from "@/utils/dev-clock";
 
 export const dynamic = "force-dynamic";
 
@@ -44,11 +45,11 @@ export async function POST(req: Request) {
     );
   }
 
-  const result = await peopleUseCases().ensureGuest(await legacyActor(req), {
-    name,
-    email,
-    eventSlug: body.eventSlug,
-  });
+  const result = await peopleUseCases().ensureGuest(
+    await legacyActor(req),
+    { name, email, eventSlug: body.eventSlug },
+    requestNow(req)
+  );
   if (!result.ok) return legacyRefusal(result.error);
 
   const { id, created } = result.value;

@@ -4,6 +4,7 @@ import type {
   Session,
   SessionCreateInput,
 } from "@schellingboard/domain/session";
+import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import type { Tx } from "@/server/kernel/unit-of-work";
 import type { SessionDeps } from "../ports";
 
@@ -14,9 +15,18 @@ export async function addSession(
   input: SessionCreateInput,
   by: ChangeContext
 ): Promise<Session> {
-  const created = await tx.sessions.create(input);
-  tx.record(changes.sessionCreated(created, by));
-  return created;
+  // A host who is not a member is shown by hosting alone.
+  return recordingShownGuests(
+    tx,
+    [input.eventId],
+    async () => {
+      const created = await tx.sessions.create(input);
+      tx.record(changes.sessionCreated(created, by));
+      return created;
+    },
+    by,
+    input.hostIds
+  );
 }
 
 /** Updates the session and records the change, if there is one. */
@@ -28,10 +38,18 @@ export async function changeSession(
 ): Promise<Session | undefined> {
   const before = await tx.sessions.findById(id);
   if (!before) return undefined;
-  const after = await tx.sessions.update(id, patch);
-  if (after && after.version !== before.version)
-    tx.record(changes.sessionChanged(before, after, by));
-  return after;
+  return recordingShownGuests(
+    tx,
+    [before.eventId],
+    async () => {
+      const after = await tx.sessions.update(id, patch);
+      if (after && after.version !== before.version)
+        tx.record(changes.sessionChanged(before, after, by));
+      return after;
+    },
+    by,
+    [...before.hosts.map((h) => h.id), ...(patch.hostIds ?? [])]
+  );
 }
 
 export async function removeSession(
@@ -42,17 +60,25 @@ export async function removeSession(
   const session = await tx.sessions.findById(id);
   if (!session) return;
   const rsvps = await tx.rsvps.listBySession(id);
-  await tx.sessions.delete(id);
-  for (const rsvp of rsvps)
-    tx.record(
-      changes.rsvpRemoved(rsvp.id, id, rsvp.guestId, session.eventId, by)
-    );
-  tx.record(
-    changes.sessionDeleted(
-      session,
-      rsvps.map((r) => r.guestId),
-      by
-    )
+  await recordingShownGuests(
+    tx,
+    [session.eventId],
+    async () => {
+      await tx.sessions.delete(id);
+      for (const rsvp of rsvps)
+        tx.record(
+          changes.rsvpRemoved(rsvp.id, id, rsvp.guestId, session.eventId, by)
+        );
+      tx.record(
+        changes.sessionDeleted(
+          session,
+          rsvps.map((r) => r.guestId),
+          by
+        )
+      );
+    },
+    by,
+    session.hosts.map((h) => h.id)
   );
 }
 

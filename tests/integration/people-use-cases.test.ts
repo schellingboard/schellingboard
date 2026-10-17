@@ -340,7 +340,11 @@ describe("keeping photo files in step with profiles", () => {
         )
       );
       value(
-        await people().deleteGuest({ admin: true, guest: null }, { id: ada.id })
+        await people().deleteGuest(
+          { admin: true, guest: null },
+          { id: ada.id },
+          new Date()
+        )
       );
       expect(storedPhotos()).toEqual([]);
     }
