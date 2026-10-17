@@ -94,7 +94,7 @@ describe("POST /api/toggle-rsvp", () => {
     expect(await rsvpsForGuest(guest.id)).toHaveLength(0);
   });
 
-  it("adding twice keeps a single RSVP per (guest, session)", async () => {
+  it("adding twice keeps one RSVP and records one change", async () => {
     const event = await createEvent({ phase: "scheduling" });
     const guest = await createGuest();
     const session = await createSession(event.id);
@@ -108,6 +108,10 @@ describe("POST /api/toggle-rsvp", () => {
     }
 
     expect(await rsvpsForGuest(guest.id)).toHaveLength(1);
+    const added = (await getRepositories().changes.listAfter(0)).filter(
+      (c) => c.type === "rsvp.added"
+    );
+    expect(added).toHaveLength(1);
   });
 
   it("rejects toggling an RSVP for a nonexistent session", async () => {
