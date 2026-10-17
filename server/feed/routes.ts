@@ -33,7 +33,7 @@ const getFeed = createRoute({
   path: "/events/{slug}/feed",
   tags: ["events"],
   description:
-    "A `text/event-stream` of the event's changes after `since` (the snapshot's `seq`), filtered to what the `guest` cookie may see. Each message has `id` = its `seq`, `event` = its type and the message as JSON `data`; a browser's reconnect sends `Last-Event-ID`, which wins over `since`. An `event: reset` message, after which the stream ends, means the resume point cannot be served: load the snapshot again. A comment every 25 seconds keeps proxies from closing it; it ends after 10 minutes.",
+    "A `text/event-stream` of the event's changes after `since` (the snapshot's `seq`), filtered to what the `guest` cookie may see. Each message has `id` = its `seq`, `event` = its type and the message as JSON `data`; a browser's reconnect sends `Last-Event-ID`, which wins over `since`. An `event: reset` message, after which the stream ends, means the resume point cannot be served: load the snapshot again. An `event: ping` every 25 seconds keeps proxies from closing it and lets a client notice a dead connection; it ends after 10 minutes.",
   request: {
     params: z.object({ slug: z.string().min(1) }),
     query: z.object({ since: z.string().optional() }),
@@ -147,7 +147,10 @@ export function addFeedRoutes(app: App, deps: { uow: UnitOfWork }): void {
       feed.close();
     } else {
       stop = feed.close;
-      heartbeat = setInterval(() => write(": keepalive\n\n"), HEARTBEAT_MS);
+      heartbeat = setInterval(
+        () => write("event: ping\ndata: {}\n\n"),
+        HEARTBEAT_MS
+      );
       deadline = setTimeout(finish, MAX_AGE_MS);
     }
     return c.body(body, 200, {

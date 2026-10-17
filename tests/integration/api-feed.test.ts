@@ -147,7 +147,7 @@ describe("GET /events/{slug}/feed", () => {
     expect(connectionCount()).toBe(before);
   });
 
-  it("sends a heartbeat comment every 25 seconds, and ends after 10 minutes", async () => {
+  it("sends a ping event every 25 seconds, and ends after 10 minutes", async () => {
     const { event } = await setup();
     const [last] = (await getRepositories().changes.listAfter(0)).slice(-1);
     vi.useFakeTimers({
@@ -157,7 +157,7 @@ describe("GET /events/{slug}/feed", () => {
 
     const beat = stream.next();
     await vi.advanceTimersByTimeAsync(25_000);
-    expect(await beat).toBe(": keepalive\n\n");
+    expect(await beat).toBe("event: ping\ndata: {}\n\n");
 
     const end = (async () => {
       while ((await stream.next()) !== null) {

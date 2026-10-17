@@ -5,6 +5,7 @@ import {
   type Snapshot,
 } from "@schellingboard/contracts/snapshot";
 import { createLiveReplica } from "./live-replica";
+import { staleAt, syncState } from "./sync-state";
 
 async function fetchSnapshot(slug: string): Promise<Snapshot> {
   const response = await fetch(`/api/v1/events/${slug}/snapshot`);
@@ -32,6 +33,18 @@ export function useLiveReplica(seed: Snapshot, user: string | null) {
     store.meetingsRevision
   );
 
+  const link = useSyncExternalStore(store.subscribe, store.link, store.link);
+  const [now, setNow] = useState(link.since);
+  useEffect(() => {
+    if (link.connected) return;
+    const timer = setTimeout(
+      () => setNow(performance.now()),
+      Math.max(0, staleAt(link) - performance.now())
+    );
+    return () => clearTimeout(timer);
+  }, [link]);
+  const sync = syncState(link, now);
+
   useEffect(() => live.adoptSeed(seed), [live, seed]);
 
   useEffect(() => {
@@ -56,5 +69,5 @@ export function useLiveReplica(seed: Snapshot, user: string | null) {
     };
   }, [live, user]);
 
-  return { replica, gone, meetingsRevision };
+  return { replica, gone, meetingsRevision, sync };
 }

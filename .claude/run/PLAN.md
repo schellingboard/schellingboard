@@ -205,7 +205,7 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
   - [x] 14c. RSVP echo reconciliation (replaces the count deltas), and the
         meetings column's debounced refetch.
   - [x] 14d. E2E: two browser contexts, kiosk included.
-- [ ] 15. **Sync state**: an indicator on the schedule (live, reconnecting, stale), so
+- [x] 15. **Sync state**: an indicator on the schedule (live, reconnecting, stale), so
       a stale schedule never looks current (ADR 0006). `fixes #1111`.
 
 ### Built on the above

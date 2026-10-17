@@ -691,6 +691,27 @@ cursor.invalid`. The use case now returns the whole list; the
   (204 passed). Bob's RSVP was left out: the session dialog's attendee list
   is not live for other viewers (see Questions).
 
+- 15: `replica/sync-state.ts` derives live / reconnecting / stale from the
+  store's link (connected, since). The feed client marks it up on `open`, down
+  on error or reload, restarted on stop/resume/restart; stale after 15 s down
+  (my choice; ADR 0006 sets no figure). Indicator in the schedule toolbar (grid,
+  agenda, kiosk), CHANGELOG line folded into the live-schedule bullet, one line
+  in the attendee guide. The architecture doc's "offline" state is not used
+  (no persisted replica yet). The link starts connected so a fresh seed does
+  not flash a warning before the stream opens. The server heartbeat is now an
+  `event: ping`; the client reopens after 50 s of silence (half-open links
+  raise no error). Not run: E2E (user's rule).
+
+## Known
+
+- 15: the server ends a stream after 10 minutes, so "Reconnecting…" flickers
+  for a few seconds on a healthy connection. Left as is: a retry line on the
+  stream is a server change beyond this step.
+
+- 15: the silence watchdog reopens with no backoff, at most once per 50 s
+  (once per 110 s after a browser retry error). Silence is not a refusal, so
+  the failure backoff does not apply, and each reopen is one cheap request.
+
 ## Problems
 
 None.
@@ -735,4 +756,4 @@ None.
 
 ## Next step
 
-15.
+16.
