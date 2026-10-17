@@ -4,6 +4,7 @@ import { useContext, useMemo, useState, useTransition } from "react";
 import { useRouter, unstable_rethrow } from "next/navigation";
 
 import { Input } from "@/app/input";
+import { newIdempotencyKey } from "@/utils/idempotency-key";
 import { UserContext, useBreakMinutes, useSlotIncrement } from "../context";
 import {
   createProposal,
@@ -95,6 +96,10 @@ export function SessionProposalForm(props: {
   });
   const hostIds = hostsController.field.value ?? [];
 
+  // One key per opened form: a double click or a retry after a lost reply
+  // sends the same one.
+  const [idempotencyKey] = useState(newIdempotencyKey);
+
   const handleSubmit = async (
     sessionProposal: z.infer<typeof sessionProposalSchema>
   ) => {
@@ -106,7 +111,7 @@ export function SessionProposalForm(props: {
           expectedVersion: loadedVersion!,
         });
       } else {
-        result = await createProposal(sessionProposal);
+        result = await createProposal(sessionProposal, idempotencyKey);
       }
 
       if ("error" in result) {
