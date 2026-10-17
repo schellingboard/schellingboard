@@ -10,6 +10,8 @@ import {
   settingsUseCases,
   venueUseCases,
 } from "@/server/composition";
+import { addFeedRoutes } from "@/server/feed/routes";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
 import { addCommentRoutes } from "@/server/modules/comments/module";
 import {
   addAdminEventRoutes,
@@ -65,6 +67,7 @@ addAttendeeCountRoutes(api, sessionUseCases);
 addPeopleRoutes(api, peopleUseCases);
 addNotificationRoutes(api, notificationUseCases);
 addEventReadRoutes(api, eventUseCases);
+addFeedRoutes(api, { uow: unitOfWork });
 addAdminEventRoutes(api, eventUseCases);
 addAdminVenueRoutes(api, venueUseCases);
 addAdminUnavailabilityRoutes(api, sessionUseCases);

@@ -161,6 +161,9 @@ admin cookie it can read every endpoint it needs:
 
 - **Check times before booking.** `GET /api/v1/events/{id}` answers the
   event's settings and its days, so the script can check session times first.
+- **Read the whole schedule at once.** `GET /api/v1/events/{slug}/snapshot`
+  answers the event, its days, rooms, guests and sessions in one response,
+  with RSVP counts by session and, for a guest, their own RSVPs and meetings.
 - **Find a location before adding it.** `GET /api/v1/admin/locations` lists
   every location, hidden ones included. Location names need not be unique, so
   the script decides what counts as the same location, then creates the missing

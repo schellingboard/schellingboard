@@ -1,0 +1,162 @@
+{
+  "seq": 0,
+  "event": {
+    "id": "<event>",
+    "slug": "Golden-Conf",
+    "name": "Golden Conf",
+    "description": "",
+    "website": "",
+    "timezone": "UTC",
+    "maxSessionDuration": 120,
+    "breakMinutes": 10,
+    "slotIncrementMinutes": 30,
+    "rsvpCapacityHardLimit": false,
+    "icon": null,
+    "meetingsEnabled": false,
+    "maxOpenMeetingRequests": 5,
+    "firstDayStart": "2026-06-15T08:00:00.000Z",
+    "lastDayStart": "2026-06-15T08:00:00.000Z",
+    "proposalPhaseStart": "2026-06-01T00:00:00.000Z",
+    "proposalPhaseEnd": "2026-06-05T00:00:00.000Z",
+    "votingPhaseStart": "2026-06-05T00:00:00.000Z",
+    "votingPhaseEnd": "2026-06-10T00:00:00.000Z",
+    "schedulingPhaseStart": "2026-06-10T00:00:00.000Z",
+    "schedulingPhaseEnd": "2026-06-20T00:00:00.000Z",
+    "version": 1
+  },
+  "days": [
+    {
+      "id": "<day>",
+      "eventId": "<event>",
+      "start": "2026-06-15T08:00:00.000Z",
+      "end": "2026-06-15T18:00:00.000Z",
+      "startBookings": "2026-06-15T09:00:00.000Z",
+      "endBookings": "2026-06-15T17:00:00.000Z",
+      "version": 1
+    }
+  ],
+  "locations": [
+    {
+      "id": "<room>",
+      "name": "Room A",
+      "description": "",
+      "areaDescription": null,
+      "capacity": 30,
+      "color": "blue",
+      "bookable": true,
+      "imageUrl": "",
+      "sortIndex": 0,
+      "version": 2
+    }
+  ],
+  "unavailability": [
+    {
+      "id": "<closed>",
+      "eventId": "<event>",
+      "locationId": "<room>",
+      "start": "2026-06-15T12:00:00.000Z",
+      "end": "2026-06-15T13:00:00.000Z"
+    }
+  ],
+  "guests": [
+    {
+      "id": "<hal>",
+      "name": "Hal Host",
+      "avatarUrl": null,
+      "aboutMe": null,
+      "authProtected": false,
+      "profileVersion": 1
+    },
+    {
+      "id": "<mia>",
+      "name": "Mia Open",
+      "avatarUrl": null,
+      "aboutMe": null,
+      "authProtected": false,
+      "profileVersion": 1
+    },
+    {
+      "id": "<pia>",
+      "name": "Pia Protected",
+      "avatarUrl": null,
+      "aboutMe": null,
+      "authProtected": true,
+      "profileVersion": 1
+    }
+  ],
+  "sessions": [
+    {
+      "id": "<talk>",
+      "eventId": "<event>",
+      "title": "Talk",
+      "description": "",
+      "startTime": "2026-06-15T09:00:00.000Z",
+      "endTime": "2026-06-15T10:00:00.000Z",
+      "capacity": 30,
+      "adminManaged": false,
+      "blocker": false,
+      "closed": false,
+      "proposalId": null,
+      "version": 1,
+      "hostIds": [
+        "<hal>"
+      ],
+      "locationIds": [
+        "<room>"
+      ]
+    }
+  ],
+  "counts": {
+    "<talk>": 2
+  },
+  "meetingPoints": [
+    {
+      "id": "<lobby>",
+      "eventId": "<event>",
+      "name": "Lobby",
+      "description": "By the door",
+      "sortIndex": 0,
+      "version": 1
+    }
+  ],
+  "me": {
+    "guestId": "<pia>",
+    "rsvps": [
+      {
+        "id": "<piaRsvp>",
+        "sessionId": "<talk>",
+        "guestId": "<pia>"
+      }
+    ],
+    "meetings": [
+      {
+        "id": "<meeting>",
+        "eventId": "<event>",
+        "requesterId": "<mia>",
+        "recipientId": "<pia>",
+        "slotStart": "2026-06-15T11:00:00.000Z",
+        "slotEnd": "2026-06-15T11:30:00.000Z",
+        "meetingPoint": "Lobby",
+        "message": "Coffee?",
+        "cancelNote": "",
+        "status": "pending",
+        "createdAt": "2026-06-14T10:00:00.000Z",
+        "respondedAt": null
+      }
+    ],
+    "meetingGuests": [
+      {
+        "id": "<mia>",
+        "name": "Mia Open",
+        "avatarUrl": null,
+        "aboutMe": null,
+        "authProtected": false,
+        "profileVersion": 1
+      }
+    ],
+    "availability": [
+      "2026-06-15T11:00:00.000Z",
+      "2026-06-15T11:30:00.000Z"
+    ]
+  }
+}

@@ -152,7 +152,7 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
         module queries, `server/feed/snapshot.ts` in one `uow.read` with the
         newest `seq`, the dependency-cruiser rule. Integration tests of the
         query: normalized shape, event guests, `me` per viewer id, `seq`.
-  - [ ] 10b. `GET /api/v1/events/{slug}/snapshot` (viewer as the SSR decides
+  - [x] 10b. `GET /api/v1/events/{slug}/snapshot` (viewer as the SSR decides
         it), OpenAPI; the golden-file tests per viewer.
   - [ ] 10c. `layout-content.tsx` reads through the query; selectors in
         `packages/domain` rebuild today's `EventContext` shapes.

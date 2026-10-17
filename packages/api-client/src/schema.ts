@@ -3643,6 +3643,53 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/events/{slug}/snapshot": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The event's schedule, normalized, and `seq`, the last change it includes. `me` holds the RSVPs, meetings and free slots of the guest the `guest` cookie names; it is null without that cookie, or for a protected guest whose cookie is not verified. */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          slug: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The snapshot */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["Snapshot"];
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/admin/events": {
     parameters: {
       query?: never;
@@ -5725,6 +5772,122 @@ export interface components {
       /** Format: date-time */
       readAt: string | null;
     };
+    Snapshot: {
+      /** @description Resume the feed after this */
+      seq: number;
+      event: components["schemas"]["Event"];
+      days: {
+        /** Format: date-time */
+        start: string;
+        /** Format: date-time */
+        end: string;
+        /**
+         * Format: date-time
+         * @description When sessions may start
+         */
+        startBookings: string;
+        /**
+         * Format: date-time
+         * @description When sessions must end
+         */
+        endBookings: string;
+        id: string;
+        eventId: string;
+        version: number;
+      }[];
+      locations: components["schemas"]["SnapshotLocation"][];
+      unavailability: components["schemas"]["Unavailability"][];
+      /** @description Members and session hosts */
+      guests: components["schemas"]["EventGuest"][];
+      sessions: components["schemas"]["SnapshotSession"][];
+      /** @description RSVPs by session */
+      counts: {
+        [key: string]: number;
+      };
+      meetingPoints: {
+        id: string;
+        eventId: string;
+        name: string;
+        description: string;
+        sortIndex: number;
+        version: number;
+      }[];
+      me: {
+        guestId: string;
+        rsvps: components["schemas"]["Rsvp"][];
+        meetings: {
+          id: string;
+          eventId: string;
+          requesterId: string;
+          recipientId: string;
+          /** Format: date-time */
+          slotStart: string;
+          /** Format: date-time */
+          slotEnd: string;
+          meetingPoint: string;
+          message: string;
+          cancelNote: string;
+          /** @enum {string} */
+          status: "pending" | "accepted" | "declined" | "canceled";
+          /** Format: date-time */
+          createdAt: string;
+          /** Format: date-time */
+          respondedAt: string | null;
+        }[];
+        /** @description The other party of each own meeting */
+        meetingGuests: components["schemas"]["EventGuest"][];
+        availability: string[];
+      } | null;
+    };
+    SnapshotLocation: {
+      id: string;
+      name: string;
+      description: string;
+      areaDescription: string | null;
+      capacity: number;
+      color: string;
+      /** @description false hides it from attendees' booking */
+      bookable: boolean;
+      imageUrl: string;
+      sortIndex: number;
+      /** @description Goes up with every change, its events and place included */
+      version: number;
+    };
+    Unavailability: {
+      id: string;
+      eventId: string;
+      locationId: string;
+      /** Format: date-time */
+      start: string;
+      /** Format: date-time */
+      end: string;
+    };
+    EventGuest: {
+      id: string;
+      name: string;
+      avatarUrl: string | null;
+      aboutMe: string | null;
+      authProtected: boolean;
+      profileVersion: number;
+    };
+    SnapshotSession: {
+      id: string;
+      eventId: string;
+      title: string;
+      description: string;
+      /** Format: date-time */
+      startTime: string | null;
+      /** Format: date-time */
+      endTime: string | null;
+      capacity: number;
+      adminManaged: boolean;
+      blocker: boolean;
+      closed: boolean;
+      proposalId: string | null;
+      version: number;
+      hostIds: string[];
+      locationIds: string[];
+    };
     Location: {
       id: string;
       name: string;
@@ -5739,15 +5902,6 @@ export interface components {
       eventIds: string[];
       /** @description Goes up with every change, its events and place included */
       version: number;
-    };
-    Unavailability: {
-      id: string;
-      eventId: string;
-      locationId: string;
-      /** Format: date-time */
-      start: string;
-      /** Format: date-time */
-      end: string;
     };
     AdminGuest: {
       id: string;

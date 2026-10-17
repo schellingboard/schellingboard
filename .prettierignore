@@ -8,3 +8,6 @@ docs/dev/attendance-model/.venv/
 
 # Claude Code worktrees carry their own .next/ and source trees
 .claude/worktrees/
+
+# Written by vitest (toMatchFileSnapshot); formatting them makes the tests fail
+tests/integration/golden/
