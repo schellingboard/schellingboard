@@ -1,6 +1,6 @@
 # ADR 0014: The change feed and the snapshot
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-10-07
 - **Issue:** #1111
 

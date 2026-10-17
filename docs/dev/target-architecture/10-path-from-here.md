@@ -16,24 +16,29 @@ sketch, not a plan; each step would get its own issue and ADR.
    contracts, generate `openapi.json` and `api-client`. Server actions start
    delegating to use cases so both paths share one implementation.
 
-   **Done** ([ADR 0012](../adr/0012-http-api-v1.md), [#677](https://github.com/schellingboard/schellingboard/issues/677)):
-   Hono under `/api/v1` as route handlers, use cases in `server/modules/`, and
-   every server action and legacy route that changes data delegating to them,
-   except sign-in, passwords and the dev tools (see
-   [The server and the API](../server.md)). Still open: the
-   [#1006](https://github.com/schellingboard/schellingboard/issues/1006) gaps (an
-   admin session list, a partial session update that keeps an explicit
-   capacity, a session delete reporting the RSVPs it removed, find-or-create for
-   locations by name); pages that read the repositories directly instead of
-   through queries; the unit of work, so a use case writing through two
-   repositories is not yet atomic; pagination, rate limiting and
-   `expectedVersion`; location images and the push key outside the API; and
-   [#141](https://github.com/schellingboard/schellingboard/issues/141), which
-   closes once the UI sends `Idempotency-Key`.
+   **Done** ([ADR 0012](../adr/0012-http-api-v1.md),
+   [ADR 0013](../adr/0013-unit-of-work.md),
+   [#677](https://github.com/schellingboard/schellingboard/issues/677),
+   [#1006](https://github.com/schellingboard/schellingboard/issues/1006),
+   [#141](https://github.com/schellingboard/schellingboard/issues/141)): Hono
+   under `/api/v1` as route handlers, use cases in `server/modules/`, and every
+   server action and legacy route that changes data delegating to them, except
+   sign-in, passwords and the dev tools (see [The server and the API](../server.md)).
+   A use case writing through several repositories is atomic (the unit of work),
+   pages read through page reads, lists are paged, edits carry
+   `expectedVersion`, and the UI sends `Idempotency-Key`. Still open: location
+   images and the push key outside the API, and the `utils/` helpers that still
+   read the repositories.
 
 4. **Ship the feed and the snapshot.** SSE endpoint over the change log; a
    `replica` package in the Next app that the schedule page reads from. Live
    updates arrive for everyone while the rest of the UI is unchanged.
+
+   **Done** ([ADR 0014](../adr/0014-change-feed-and-snapshot.md),
+   [#1111](https://github.com/schellingboard/schellingboard/issues/1111)): the
+   feed and the snapshot are served under `/api/v1`, and the schedule, agenda
+   and kiosk read from a replica in `app/(site)/[eventSlug]/replica/`.
+
 5. **Move screens to the SPA one family at a time.** Start with the schedule
    (biggest win: replica, filters, agenda, kiosk), then proposals and voting,
    people and meetings, settings, admin. Each moved screen deletes its server

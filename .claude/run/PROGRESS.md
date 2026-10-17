@@ -833,6 +833,13 @@ None.
   answer. A reload (`replace`) loses keys, so such an op ends by the 3 s expiry.
   Not run: E2E (user's rule).
 
+## 18a
+
+- Split step 18 into 18a-c. ADR 0012 was already Accepted; 0013 and 0014 are
+  now. Path step 3 lists what is still open (location images, push key,
+  `utils/` helpers); step 4 marked done. Still to run by the user:
+  `make test-e2e-docker` (streaming through the standalone build).
+
 ## Next step
 
-18.
+18b.

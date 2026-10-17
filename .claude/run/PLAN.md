@@ -238,13 +238,15 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
   - [x] 17c2. The replica records the `command_key`s the feed delivers and the
         overlay matches the RSVP echo by key instead of by the count; CHANGELOG
         bullet (`(#141)`), docs. `fixes #141`.
-- [ ] 18. **Docs**: ADRs 0012–0014 accepted and matching the code;
-      `docs/dev/server.md`; check the public docs (live schedule; API changes;
-      self-hosting: proxy buffering, timeouts and HTTP/2 for SSE, the trusted-proxy
-      setting) and CHANGELOG (API breaks marked) against the code; release-notes
-      highlight; `10-path-from-here.md` marks
-      step 3 complete (drop the #1006 gaps, it is done) and step 4 done. Run
-      `make test-e2e-docker`: streaming through the standalone build.
+- [ ] 18. **Docs**, in parts:
+  - [x] 18a. ADRs 0013 and 0014 accepted; `10-path-from-here.md` marks steps 3
+        and 4 done.
+  - [ ] 18b. `docs/dev/server.md` (feed, snapshot, unit of work, idempotency
+        from the UI, replica) matching the code.
+  - [ ] 18c. Public docs (live schedule; API changes; self-hosting: proxy
+        buffering, timeouts and HTTP/2 for SSE, trusted-proxy setting) and
+        CHANGELOG (API breaks marked) against the code; release-notes
+        highlight check. `make test-e2e-docker` is left to the user: record it.
 - [ ] 19. **Finish**: summary in PROGRESS.md for review, then delete `.claude/run/`.
 
 ## Next to plan
