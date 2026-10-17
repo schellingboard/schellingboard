@@ -170,7 +170,8 @@ connection does not create a second location or session.
 
 ## Long lists
 
-Lists that grow with an event (sessions, proposals, guests and comments)
+Lists that grow with an event (sessions, proposals, guests, comments and
+your notifications)
 come in pages.
 Ask for up to `limit` items (1 to 1000, default 100); the answer is
 `{ "items": […], "nextCursor": "…" }`. Pass `nextCursor` as `cursor` to get the

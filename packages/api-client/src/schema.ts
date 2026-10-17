@@ -2954,11 +2954,14 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** @description The acting guest's newest notifications. */
+    /** @description The acting guest's notifications, newest first. */
     get: {
       parameters: {
         query?: {
+          /** @description How many items to answer at most */
           limit?: number;
+          /** @description The `nextCursor` of the previous page; left out for the first */
+          cursor?: string;
         };
         header?: never;
         path?: never;
@@ -2973,10 +2976,11 @@ export interface paths {
           };
           content: {
             "application/json": {
-              /** @description Newest first */
-              notifications: components["schemas"]["Notification"][];
+              items: components["schemas"]["Notification"][];
+              /** @description Pass as `cursor` for the next page; null on the last */
+              nextCursor: string | null;
+              /** @description Unread across every page */
               unreadCount: number;
-              total: number;
             };
           };
         };

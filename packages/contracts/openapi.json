@@ -4085,17 +4085,29 @@
     "/api/v1/me/notifications": {
       "get": {
         "tags": ["notifications"],
-        "description": "The acting guest's newest notifications.",
+        "description": "The acting guest's notifications, newest first.",
         "parameters": [
           {
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 100,
-              "default": 20
+              "maximum": 1000,
+              "default": 100,
+              "description": "How many items to answer at most"
             },
             "required": false,
+            "description": "How many items to answer at most",
             "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "The `nextCursor` of the previous page; left out for the first"
+            },
+            "required": false,
+            "description": "The `nextCursor` of the previous page; left out for the first",
+            "name": "cursor",
             "in": "query"
           }
         ],
@@ -4107,15 +4119,20 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "notifications": {
+                    "items": {
                       "type": "array",
-                      "items": { "$ref": "#/components/schemas/Notification" },
-                      "description": "Newest first"
+                      "items": { "$ref": "#/components/schemas/Notification" }
                     },
-                    "unreadCount": { "type": "integer" },
-                    "total": { "type": "integer" }
+                    "nextCursor": {
+                      "type": ["string", "null"],
+                      "description": "Pass as `cursor` for the next page; null on the last"
+                    },
+                    "unreadCount": {
+                      "type": "integer",
+                      "description": "Unread across every page"
+                    }
                   },
-                  "required": ["notifications", "unreadCount", "total"]
+                  "required": ["items", "nextCursor", "unreadCount"]
                 }
               }
             }

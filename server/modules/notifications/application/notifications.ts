@@ -5,26 +5,22 @@ import { notFound, ok, type Result } from "@/server/kernel/result";
 import type { NotificationDeps } from "../ports";
 
 export interface MyNotifications {
+  guestId: string;
   notifications: Notification[];
   unreadCount: number;
-  total: number;
 }
 
 export const listMyNotifications =
   ({ repos }: NotificationDeps) =>
-  async (
-    actor: Actor,
-    { limit }: { limit: number }
-  ): Promise<Result<MyNotifications>> => {
+  async (actor: Actor): Promise<Result<MyNotifications>> => {
     const acting = await actingGuest(actor, repos.guests);
     if (!acting.ok) return acting;
     const guestId = acting.value;
-    const [notifications, unreadCount, total] = await Promise.all([
-      repos.notifications.listByGuest(guestId, { limit }),
+    const [notifications, unreadCount] = await Promise.all([
+      repos.notifications.listByGuest(guestId),
       repos.notifications.countUnread(guestId),
-      repos.notifications.countByGuest(guestId),
     ]);
-    return ok({ notifications, unreadCount, total });
+    return ok({ guestId, notifications, unreadCount });
   };
 
 export const markNotificationsRead =

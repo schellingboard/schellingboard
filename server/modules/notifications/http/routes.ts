@@ -1,7 +1,7 @@
 import { createRoute } from "@hono/zod-openapi";
+import { pageQuerySchema } from "@schellingboard/contracts/cursor-page";
 import { emailSettingsSchema } from "@schellingboard/contracts/guest";
 import {
-  myNotificationsQuerySchema,
   myNotificationsSchema,
   notificationIdsSchema,
   notificationSchema,
@@ -13,6 +13,7 @@ import {
 } from "@schellingboard/contracts/push";
 import type { Notification } from "@schellingboard/domain/notification";
 import { idempotencyHeaders } from "@/server/http/idempotency";
+import { pageOf } from "@/server/http/pagination";
 import { problem, problemDefault } from "@/server/http/problem";
 import {
   body,
@@ -36,8 +37,8 @@ const listMyNotifications = createRoute({
   method: "get",
   path: "/me/notifications",
   tags: ["notifications"],
-  description: "The acting guest's newest notifications.",
-  request: { query: myNotificationsQuerySchema },
+  description: "The acting guest's notifications, newest first.",
+  request: { query: pageQuerySchema },
   responses: {
     200: json(myNotificationsSchema, "The caller's notifications"),
     ...problemDefault,
@@ -134,14 +135,22 @@ export function addNotificationRoutes(
   notifications: () => NotificationUseCases
 ) {
   app.openapi(listMyNotifications, async (c) => {
-    const result = await notifications().listMyNotifications(
-      c.var.actor,
-      c.req.valid("query")
-    );
+    const result = await notifications().listMyNotifications(c.var.actor);
     if (!result.ok) return problem(result.error);
-    const { notifications: listed, unreadCount, total } = result.value;
+    const { guestId, notifications: listed, unreadCount } = result.value;
+    const page = pageOf(
+      listed,
+      c.req.valid("query"),
+      `notifications:${guestId}`,
+      (n) => [-n.createdAt.getTime(), n.id]
+    );
+    if (!page.ok) return problem(page.error);
     return c.json(
-      { notifications: listed.map(toNotificationView), unreadCount, total },
+      {
+        ...page.value,
+        items: page.value.items.map(toNotificationView),
+        unreadCount,
+      },
       200
     );
   });
