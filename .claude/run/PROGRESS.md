@@ -685,6 +685,12 @@ cursor.invalid`. The use case now returns the whole list; the
   No CHANGELOG line (fixes a flicker in the unreleased live schedule). Not
   run: E2E (user's rule); wiring has no DOM test.
 
+- 14d: `tests/e2e/live-schedule.spec.ts` (two contexts, @007-US8): Alice
+  creates, moves and deletes a session and Bob's agenda follows without a
+  reload; a kiosk context sees add and delete. Both pass in the full E2E run
+  (204 passed). Bob's RSVP was left out: the session dialog's attendee list
+  is not live for other viewers (see Questions).
+
 ## Problems
 
 None.
@@ -708,6 +714,25 @@ None.
   (step 4c); guest photo files and rows stay in sync, and a guest delete
   removes the photo (step 7a).
 
+- 14d: does the session dialog's attendee list need to update live when
+  another guest RSVPs? Not covered by 14b/14c.
+
+- Full E2E after 14d: `rsvp.spec.ts` "leaving an event page..." held
+  `/api/rsvps?user=*`, removed in 14c; rewritten to hold the live feed's
+  first request instead (same intent, same tag). The 2 "did not run" were
+  the tests of the project depending on the failed one. `profile.spec.ts:577`
+  (guest modal close on /guests, no schedule or replica) is unrelated and
+  was left alone. 14d stays unticked until the full suite is green.
+
+- Second full E2E: 207 passed, 0 failed, 0 not run; 1 flaky
+  (`meetings-request.spec.ts:214`, "Saved!" never shown, passed on retry) and
+  `make` exits 1 on it. Shown unrelated to 14c: the "Saved!" is on /settings
+  (availability form), which has no schedule replica or meetings provider; the
+  spec passed 6 of 6 run serially (`--workers=1 --repeat-each 6`), and fails
+  only when repeated in parallel against one database (guests of other
+  repeats crowd the name list). So 14d is ticked with that flake as the only
+  non-zero cause.
+
 ## Next step
 
-14d.
+15.
