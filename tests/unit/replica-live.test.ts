@@ -5,6 +5,7 @@ import { snapshot } from "../helpers/snapshot-fixture";
 
 class FakeSource {
   closed = false;
+  readyState = 1;
   listeners = new Map<string, (e: { data: string }) => void>();
   constructor(readonly url: string) {}
   addEventListener(type: string, l: (e: { data: string }) => void) {
@@ -161,5 +162,63 @@ describe("live replica", () => {
 
     expect(sources).toHaveLength(1);
     expect(sources[0].closed).toBe(true);
+  });
+
+  it("closes the stream after 30 s hidden and resumes when visible again", () => {
+    vi.useFakeTimers();
+    try {
+      const { live, sources, loadSnapshot } = setup();
+      live.connect("mia");
+
+      live.visibilityChanged(true);
+      vi.advanceTimersByTime(29_000);
+      expect(sources[0].closed).toBe(false);
+      vi.advanceTimersByTime(1_000);
+      expect(sources[0].closed).toBe(true);
+
+      live.visibilityChanged(false);
+
+      expect(sources).toHaveLength(2);
+      expect(sources[1].url).toContain(`since=${snapshot.seq}`);
+      expect(loadSnapshot).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("keeps the stream when the tab is visible again within 30 s", () => {
+    vi.useFakeTimers();
+    try {
+      const { live, sources, loadSnapshot } = setup();
+      live.connect("mia");
+
+      live.visibilityChanged(true);
+      vi.advanceTimersByTime(20_000);
+      live.visibilityChanged(false);
+      vi.advanceTimersByTime(60_000);
+
+      expect(sources[0].closed).toBe(false);
+      expect(loadSnapshot).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("does not close the hidden-tab timer's stream after disconnect", () => {
+    vi.useFakeTimers();
+    try {
+      const { live, sources } = setup();
+      live.connect("mia");
+      live.visibilityChanged(true);
+      live.disconnect();
+      live.connect("mia");
+      vi.advanceTimersByTime(60_000);
+
+      expect(sources[0].closed).toBe(true);
+      expect(sources).toHaveLength(2);
+      expect(sources[1].closed).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

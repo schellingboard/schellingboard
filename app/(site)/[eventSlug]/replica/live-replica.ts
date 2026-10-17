@@ -2,6 +2,8 @@ import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { connectFeed } from "./feed-client";
 import { createReplicaStore } from "./store";
 
+const HIDDEN_CLOSE_MS = 30_000;
+
 const viewerOf = (s: Snapshot) => s.me?.guestId ?? null;
 
 type Feed = ReturnType<typeof connectFeed>;
@@ -31,9 +33,12 @@ export function createLiveReplica({
   let feed: Feed | null = null;
   let feedUser = user;
   let switching = false;
+  let hiddenTimer: ReturnType<typeof setTimeout> | null = null;
+  let hiddenStop = false;
 
   return {
     store,
+    slug,
     connect(next: string | null) {
       const resume = next === feedUser;
       switching = !resume;
@@ -51,6 +56,9 @@ export function createLiveReplica({
       });
     },
     disconnect() {
+      clearTimeout(hiddenTimer ?? undefined);
+      hiddenTimer = null;
+      hiddenStop = false;
       feed?.close();
       feed = null;
     },
@@ -59,6 +67,21 @@ export function createLiveReplica({
     adoptSeed(next: Snapshot) {
       if (!switching && viewerOf(next) === viewerOf(store.get()))
         store.adopt(next);
+    },
+    // A hidden tab drops its stream so it holds no server connection; a
+    // short switch away keeps it.
+    visibilityChanged(hidden: boolean) {
+      clearTimeout(hiddenTimer ?? undefined);
+      hiddenTimer = null;
+      if (hidden) {
+        hiddenTimer = setTimeout(() => {
+          hiddenStop = true;
+          feed?.stop();
+        }, HIDDEN_CLOSE_MS);
+      } else if (hiddenStop) {
+        hiddenStop = false;
+        feed?.resume();
+      }
     },
     pageHidden: () => feed?.stop(),
     pageShown(persisted: boolean) {
