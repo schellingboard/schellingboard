@@ -411,6 +411,32 @@ cursor.invalid`. The use case now returns the whole list; the
   ADR 0014 says the feed sends `command_key` only to the change's actor
   (keys are unique per actor only); ADR 0012 points to it; test tag added.
 
+- Step 10 split into 10a (query), 10b (route, golden files per viewer), 10c
+  (SSR layout through the query, selectors).
+- 10a: `readSnapshot(uow, slug, viewerId)` in `server/feed/snapshot.ts` runs
+  in one `uow.read` and returns the wire shape (`Snapshot`,
+  `packages/contracts/src/snapshot.ts`), so SSR, the API and the feed share
+  one JSON shape. Module queries (`application/snapshot.ts` in events,
+  sessions, venue, people, meetings) return domain objects; the feed maps
+  them with the modules' view functions (now exported from `module.ts`).
+  Guests are the lean fields today's schedule has (`id`, `name`,
+  `avatarUrl`, `aboutMe`, `authProtected`) plus `profileVersion`, from the
+  new `guests.listShownByEvent` (members and hosts). Locations
+  leave out `eventIds`. `me.rsvps` holds only this event's RSVPs. `seq` is
+  `changes.getNewestSeq()` (`sqlite_sequence`). New dependency-cruiser rule
+  `feed-reads-through-module-queries`: `server/feed/` imports no `db/` code
+  beyond types.
+- 10a review, accepted: the rule comment and ADR 0014 section 7 say what is
+  enforced (no `db/` value imports; `q` typed as the module queries'
+  repositories); `seq` comes from the kernel's `newestSeq`; view functions
+  for locations, unavailability, meeting points and event guests live in
+  their modules; tests check other guests' meetings and slots stay out of
+  `me`. Coordinator's decision (privacy): the shared `guests` list is members
+  and session hosts only; a viewer's meeting partners come only in
+  `me.meetingGuests`, and meeting changes will carry both parties' lean
+  fields (ADR 0014 section 1). A partner's rename reaches the viewer only
+  with the next change to that meeting.
+
 ## Problems
 
 None.
@@ -436,4 +462,4 @@ None.
 
 ## Next step
 
-10.
+10b.

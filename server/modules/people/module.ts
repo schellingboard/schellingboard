@@ -7,3 +7,5 @@ export {
 } from "./application/use-cases";
 export { addPeopleRoutes } from "./http/routes";
 export { addAdminGuestRoutes } from "./http/admin-routes";
+export { eventGuests } from "./application/snapshot";
+export { toEventGuestView } from "./http/view";

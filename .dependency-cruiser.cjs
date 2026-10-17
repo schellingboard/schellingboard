@@ -187,6 +187,15 @@ module.exports = {
       },
     },
     {
+      name: "feed-reads-through-module-queries",
+      severity: "error",
+      comment:
+        "`server/feed/` loads no `db/` code, only the container's types: it gets the " +
+        "repositories from `uow.read` and hands them to module queries. See ADR 0014.",
+      from: { path: "^server/feed/" },
+      to: { path: "^db/", dependencyTypesNot: ["type-only"] },
+    },
+    {
       name: "no-unresolvable",
       severity: "error",
       comment: "A dependency that does not resolve is a broken import.",

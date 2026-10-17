@@ -4,3 +4,5 @@ export {
   type VenueUseCases,
 } from "./application/use-cases";
 export { addAdminVenueRoutes } from "./http/routes";
+export { eventLocations } from "./application/snapshot";
+export { toLocationView } from "./http/view";

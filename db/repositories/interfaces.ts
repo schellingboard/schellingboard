@@ -190,6 +190,13 @@ export interface GuestsRepository {
   /** Every user with their private info (email). For admin export/lookup. */
   listFull(): Promise<CompleteGuest[]>;
   listByEvent(eventId: string): Promise<Guest[]>;
+  /**
+   * The guests an event shows everyone, with the lean fields: its members and
+   * its sessions' hosts (ADR 0014).
+   */
+  listShownByEvent(eventId: string): Promise<Guest[]>;
+  /** The lean fields, by id. */
+  listByIds(ids: string[]): Promise<Guest[]>;
   /** One event's guests with their whole public profile. */
   listProfilesByEvent(eventId: string): Promise<Guest[]>;
   /**
@@ -869,6 +876,8 @@ export interface ChangesRepository {
     change: Change,
     meta: Pick<RecordedChange, "audience" | "commandKey">
   ): Promise<RecordedChange>;
+  /** The last `seq` assigned, which deleting changes does not lower; 0 before any. */
+  getNewestSeq(): Promise<number>;
   /** Up to `limit` changes recorded after `seq`, oldest first. */
   listAfter(seq: number, limit?: number): Promise<RecordedChange[]>;
   /** Deletes changes up to `seq` that happened before `before`. */

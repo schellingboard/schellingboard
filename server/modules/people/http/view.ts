@@ -1,3 +1,4 @@
+import type { eventGuestSchema } from "@schellingboard/contracts/snapshot";
 import type { publicProfileSchema } from "@schellingboard/contracts/guest";
 import type { Guest } from "@schellingboard/domain/guest";
 import type { z } from "zod";
@@ -15,5 +16,16 @@ export function toProfileView(g: Guest): z.input<typeof publicProfileSchema> {
     contacts: g.contacts ?? null,
     profileUpdatedAt: g.profileUpdatedAt?.toISOString() ?? null,
     version: g.profileVersion,
+  };
+}
+
+export function toEventGuestView(g: Guest): z.input<typeof eventGuestSchema> {
+  return {
+    id: g.id,
+    name: g.name,
+    avatarUrl: g.avatarUrl ?? null,
+    aboutMe: g.aboutMe ?? null,
+    authProtected: g.authProtected ?? false,
+    profileVersion: g.profileVersion,
   };
 }

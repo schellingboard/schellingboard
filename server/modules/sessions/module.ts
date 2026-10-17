@@ -17,3 +17,5 @@ export { addRsvpRoutes } from "./http/rsvp-routes";
 export { addAttendeeCountRoutes } from "./http/attendee-count-routes";
 export { addAdminUnavailabilityRoutes } from "./http/unavailability-routes";
 export { changeSession, removeSession } from "./application/session-changes";
+export { eventSessions } from "./application/snapshot";
+export { toSessionView, toUnavailabilityView } from "./http/view";

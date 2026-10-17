@@ -3,7 +3,6 @@ import {
   unavailabilityBodySchema,
   unavailabilityListSchema,
 } from "@schellingboard/contracts/location";
-import type { LocationUnavailability } from "@schellingboard/domain/location";
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import { problem, problemDefault } from "@/server/http/problem";
 import {
@@ -14,14 +13,9 @@ import {
   type App,
 } from "@/server/http/route-parts";
 import type { SessionUseCases } from "../application/use-cases";
+import { toUnavailabilityView } from "./view";
 
 const tags = ["admin"];
-
-const toView = (p: LocationUnavailability) => ({
-  ...p,
-  start: p.start.toISOString(),
-  end: p.end.toISOString(),
-});
 
 const list = createRoute({
   method: "get",
@@ -69,7 +63,7 @@ export function addAdminUnavailabilityRoutes(
       eventId: c.req.valid("param").id,
     });
     if (!result.ok) return problem(result.error);
-    return c.json({ periods: result.value.map(toView) }, 200);
+    return c.json({ periods: result.value.map(toUnavailabilityView) }, 200);
   });
 
   app.openapi(add, async (c) => {
@@ -81,7 +75,7 @@ export function addAdminUnavailabilityRoutes(
       end: new Date(end),
     });
     if (!result.ok) return problem(result.error);
-    return c.json({ periods: result.value.map(toView) }, 201);
+    return c.json({ periods: result.value.map(toUnavailabilityView) }, 201);
   });
 
   app.openapi(remove, async (c) => {
