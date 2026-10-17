@@ -61,6 +61,20 @@ function refused(error: z.ZodError) {
   );
 }
 
+// Checked again inside the transaction: an event deleted since the form was
+// validated would otherwise fail the insert.
+async function unknownEvent(
+  events: VenueDeps["repos"]["events"],
+  eventIds: string[]
+) {
+  const known = new Set((await events.list()).map((e) => e.id));
+  return eventIds.every((id) => known.has(id))
+    ? null
+    : invalidFields("location.invalid", [
+        { path: "eventIds", message: "Unknown event" },
+      ]);
+}
+
 export const createLocation =
   (deps: VenueDeps) =>
   async (actor: Actor, input: unknown): Promise<Result<LocationWithEvents>> => {
@@ -70,36 +84,44 @@ export const createLocation =
       .safeParseAsync(input);
     if (!parsed.success) return refused(parsed.error);
     const { image, eventIds: requested, eventSlug, ...fields } = parsed.data;
-    const { locations, events } = deps.repos;
-    const bySlug = eventSlug ? await events.findBySlug(eventSlug) : undefined;
-    if (eventSlug && !bySlug)
-      return notFound("event.notFound", "Event not found");
-    const eventIds = [
-      ...new Set([...requested, ...(bySlug ? [bySlug.id] : [])]),
-    ];
 
-    const existing = await locations.list();
-    const sortIndex =
-      existing.length === 0
-        ? 0
-        : Math.max(...existing.map((l) => l.sortIndex)) + 1;
-    let location = await locations.create({
-      ...fields,
-      imageUrl: "",
-      sortIndex,
+    const created = await deps.uow.run(async (tx) => {
+      const bySlug = eventSlug
+        ? await tx.events.findBySlug(eventSlug)
+        : undefined;
+      if (eventSlug && !bySlug) return eventNotFound();
+      const eventIds = [
+        ...new Set([...requested, ...(bySlug ? [bySlug.id] : [])]),
+      ];
+      const unknown = await unknownEvent(tx.events, eventIds);
+      if (unknown) return unknown;
+
+      const existing = await tx.locations.list();
+      const sortIndex =
+        existing.length === 0
+          ? 0
+          : Math.max(...existing.map((l) => l.sortIndex)) + 1;
+      const location = await tx.locations.create({
+        ...fields,
+        imageUrl: "",
+        sortIndex,
+      });
+      await tx.locations.setEventIds(location.id, eventIds);
+      return ok({ ...location, eventIds });
     });
-    if (image) {
-      const imageUrl = await deps.images.save(
-        location.id,
-        image.buffer,
-        image.ext
-      );
-      location =
-        (await locations.update(location.id, { ...location, imageUrl })) ??
-        location;
-    }
-    await locations.setEventIds(location.id, eventIds);
-    return ok({ ...location, eventIds });
+    if (!created.ok || !image) return created;
+
+    // Saved after the commit, as the file is named by the location's id. A
+    // failed save leaves the location without an image.
+    const { id, eventIds } = created.value;
+    const imageUrl = await deps.images.save(id, image.buffer, image.ext);
+    const updated = await deps.uow.run(async (tx) => {
+      const location = await tx.locations.findById(id);
+      return location && tx.locations.update(id, { ...location, imageUrl });
+    });
+    if (updated) return ok({ ...updated, eventIds });
+    await deps.images.delete(id);
+    return locationNotFound();
   };
 
 export const updateLocation =
@@ -113,21 +135,25 @@ export const updateLocation =
     const { image, id, eventIds: requested, ...fields } = parsed.data;
     const eventIds = [...new Set(requested)];
 
-    const { locations } = deps.repos;
-    const existing = await locations.findById(id);
-    if (!existing) return locationNotFound();
+    if (!(await deps.repos.locations.findById(id))) return locationNotFound();
+    const newImageUrl =
+      image && (await deps.images.save(id, image.buffer, image.ext));
 
-    const imageUrl = image
-      ? await deps.images.save(id, image.buffer, image.ext)
-      : existing.imageUrl;
-    const updated = await locations.update(id, {
-      ...fields,
-      imageUrl,
-      sortIndex: existing.sortIndex,
+    return deps.uow.run(async (tx) => {
+      const existing = await tx.locations.findById(id);
+      if (!existing) return locationNotFound();
+      const unknown = await unknownEvent(tx.events, eventIds);
+      if (unknown) return unknown;
+
+      const updated = await tx.locations.update(id, {
+        ...fields,
+        imageUrl: newImageUrl ?? existing.imageUrl,
+        sortIndex: existing.sortIndex,
+      });
+      if (!updated) return locationNotFound();
+      await tx.locations.setEventIds(id, eventIds);
+      return ok({ ...updated, eventIds });
     });
-    if (!updated) return locationNotFound();
-    await locations.setEventIds(id, eventIds);
-    return ok({ ...updated, eventIds });
   };
 
 export const deleteLocation =

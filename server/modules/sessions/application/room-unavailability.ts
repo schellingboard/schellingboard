@@ -33,7 +33,7 @@ export const listLocationUnavailability =
   };
 
 export const addLocationUnavailability =
-  ({ repos }: SessionDeps) =>
+  ({ uow }: SessionDeps) =>
   async (
     actor: Actor,
     input: LocationUnavailabilityInput
@@ -52,27 +52,29 @@ export const addLocationUnavailability =
     if (input.locationIds.length === 0) {
       return invalid("unavailability.roomRequired", "Pick at least one room");
     }
-    if (!(await repos.events.findById(input.eventId))) return eventNotFound();
 
-    const rooms = await repos.locations.listByEvent(input.eventId);
-    const roomIds = new Set(rooms.map((room) => room.id));
-    if (!input.locationIds.every((id) => roomIds.has(id))) {
-      return invalid(
-        "unavailability.roomNotInEvent",
-        "That room is not part of this event"
+    return uow.run(async (tx) => {
+      if (!(await tx.events.findById(input.eventId))) return eventNotFound();
+      const rooms = await tx.locations.listByEvent(input.eventId);
+      const roomIds = new Set(rooms.map((room) => room.id));
+      if (!input.locationIds.every((id) => roomIds.has(id))) {
+        return invalid(
+          "unavailability.roomNotInEvent",
+          "That room is not part of this event"
+        );
+      }
+
+      return ok(
+        await tx.locationUnavailability.createMany(
+          [...new Set(input.locationIds)].map((locationId) => ({
+            eventId: input.eventId,
+            locationId,
+            start,
+            end,
+          }))
+        )
       );
-    }
-
-    return ok(
-      await repos.locationUnavailability.createMany(
-        [...new Set(input.locationIds)].map((locationId) => ({
-          eventId: input.eventId,
-          locationId,
-          start,
-          end,
-        }))
-      )
-    );
+    });
   };
 
 export const deleteLocationUnavailability =

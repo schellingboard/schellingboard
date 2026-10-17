@@ -9,18 +9,19 @@ export interface EventLocationsInput {
 }
 
 export const assignLocationsToEvent =
-  ({ repos }: VenueDeps) =>
+  ({ uow }: VenueDeps) =>
   async (actor: Actor, input: EventLocationsInput): Promise<Result<void>> => {
     if (!actor.admin) return adminRequired();
-    if (!(await repos.events.findById(input.eventId))) return eventNotFound();
-
     const unique = [...new Set(input.locationIds)];
-    if (unique.length > 0) {
-      const existing = await repos.locations.findExistingIds(unique);
-      if (existing.length !== unique.length) return locationNotFound();
-    }
-    await repos.locations.assignToEvent(input.eventId, unique);
-    return ok(undefined);
+    return uow.run(async (tx) => {
+      if (!(await tx.events.findById(input.eventId))) return eventNotFound();
+      if (unique.length > 0) {
+        const existing = await tx.locations.findExistingIds(unique);
+        if (existing.length !== unique.length) return locationNotFound();
+      }
+      await tx.locations.assignToEvent(input.eventId, unique);
+      return ok(undefined);
+    });
   };
 
 export const removeLocationsFromEvent =

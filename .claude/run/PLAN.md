@@ -75,7 +75,7 @@ feed and snapshot), `04-client.md` (The replica), `05-security.md` (Authorizatio
   - [x] 3a. Sessions and RSVPs (admin session create with guest and location assignment,
         RSVP with event assignment).
   - [x] 3b. Proposals, votes, comments (admin proposal create, …).
-  - [ ] 3c. Events, days, venue.
+  - [x] 3c. Events, days, venue.
   - [ ] 3d. People, meetings, notifications, settings.
 
 ### API contracts

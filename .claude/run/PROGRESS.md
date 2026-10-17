@@ -71,6 +71,27 @@ openapi-check typecheck test-coverage` (or `make test`), without E2E. E2E runs
   `CommentDeps` take `uow`. Views are presented and notifications sent after
   commit. Proposal to session conversion belongs to the sessions family (3a).
 
+- 3c: multi-write use cases: `updateEvent` (event, then 1-on-1 availability
+  on a new increment), `createLocation` and `updateLocation` (location, then
+  its events). They run in `uow.run`, and so do the checks of `createDay`,
+  `updateDay` (overlap, grid, sessions outside), `assignLocationsToEvent`,
+  `addLocationUnavailability` and `createMeetingPoint` (sort index). Before,
+  two overlapping days could both be saved, a day could shrink past a session
+  booked meanwhile, a day off a new grid could survive an increment change,
+  and a room or event deleted meanwhile gave a foreign key error (500).
+  `EventDeps`, `VenueDeps` and `MeetingDeps` take `uow`.
+- 3c: a new location's image is saved after the commit (it is stored by the
+  location's id) and its URL set in a second `uow.run`; a failed save leaves
+  the location without an image; a delete meanwhile removes the saved file.
+  An edit saves the image before `uow.run` (as before): if the transaction
+  then refuses or fails, the file is replaced but the row keeps the old URL.
+- 3c: single-write use cases without a racing check stay as they were
+  (`createEvent` relies on the unique slug, phases, the deletes, moves).
+- 3c: day, event and location cascades record no session change, as before
+  (the repositories and foreign keys remove the sessions or their rooms; no
+  change or notification was ever sent). Recording them would start emailing
+  hosts and attendees; steps 8 (ADR 0014) and 12a decide it.
+
 - Step 4 split into 4a1–4a4 (one commit and migration per subject family),
   then 4b.
 - 4a1: `versionConflict(subject, current, detail)` in `server/kernel/result.ts`
@@ -101,4 +122,4 @@ None.
 
 ## Next step
 
-3c.
+3d.

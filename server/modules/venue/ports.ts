@@ -1,4 +1,5 @@
 import type { Repositories } from "@/db/container";
+import type { UnitOfWork } from "@/server/kernel/unit-of-work";
 
 export interface LocationImageStore {
   validate(
@@ -10,6 +11,7 @@ export interface LocationImageStore {
 }
 
 export interface VenueDeps {
+  uow: UnitOfWork;
   repos: Pick<Repositories, "events" | "locations">;
   images: LocationImageStore;
 }
