@@ -3739,6 +3739,80 @@
         "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
       }
     },
+    "/api/v1/guests": {
+      "get": {
+        "tags": ["people"],
+        "description": "The public profiles of an event's guests, in id order; for the event's guests and admins.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 100,
+              "description": "How many items to answer at most"
+            },
+            "required": false,
+            "description": "How many items to answer at most",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "The `nextCursor` of the previous page; left out for the first"
+            },
+            "required": false,
+            "description": "The `nextCursor` of the previous page; left out for the first",
+            "name": "cursor",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The event whose guests to list"
+            },
+            "required": true,
+            "description": "The event whose guests to list",
+            "name": "eventId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The event's guests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/PublicProfile" }
+                    },
+                    "nextCursor": {
+                      "type": ["string", "null"],
+                      "description": "Pass as `cursor` for the next page; null on the last"
+                    }
+                  },
+                  "required": ["items", "nextCursor"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+      }
+    },
     "/api/v1/guests/{id}": {
       "get": {
         "tags": ["people"],

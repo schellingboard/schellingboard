@@ -277,12 +277,25 @@ cursor.invalid`. The use case now returns the whole list; the
   notifications page keeps its own offset paging through the repository
   (step 16 moves it to queries).
 
+- 5d: `GET /guests?eventId=…` answers the event's guests' public profiles
+  (`PublicProfile`, as `GET /guests/{id}`), in id order, with the cursor
+  contract; an unknown event is `404 event.notFound`. Review: only admins
+  and the event's own guests may list it (others `403`, a non-member
+  `guest.notInEvent`), since who attends which event was not public; the
+  query selects public columns only. A new repository query
+  (`listProfilesByEvent`) reads the whole public profile, which the lean
+  `listByEvent` leaves out. No search or filters: the web directory keeps
+  its own in-browser search (step 5 of the path decides the rest).
+
 ## Problems
 
 None.
 
 ## Questions
 
+- 5d: `GET /guests?eventId=…` is limited to admins and the event's guests
+  (safe default, review). Widen it to anyone with the site password if the
+  directory should be public like the web `/guests` page.
 - 4c2, settled by the user's rule above (2026-10-07): the event page's
   details, phases and 1-on-1 forms share one version and stay open side by
   side. A form with unsaved edits keeps them (and the version it loaded); a
@@ -294,4 +307,4 @@ None.
 
 ## Next step
 
-5d.
+6.

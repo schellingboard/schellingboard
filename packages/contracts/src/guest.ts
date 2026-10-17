@@ -168,6 +168,8 @@ export const publicProfileSchema = z
   })
   .meta({ id: "PublicProfile" });
 
+export const publicProfileListSchema = pageSchema(publicProfileSchema);
+
 export const adminGuestBodySchema = z.object({
   name: z.string(),
   email: z.string(),

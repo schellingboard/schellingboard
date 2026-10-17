@@ -190,6 +190,8 @@ export interface GuestsRepository {
   /** Every user with their private info (email). For admin export/lookup. */
   listFull(): Promise<CompleteGuest[]>;
   listByEvent(eventId: string): Promise<Guest[]>;
+  /** One event's guests with their whole public profile. */
+  listProfilesByEvent(eventId: string): Promise<Guest[]>;
   /**
    * Server-side paginated + searchable global user list. `query` matches name
    * or email (case-insensitive substring, LIKE metacharacters matched
