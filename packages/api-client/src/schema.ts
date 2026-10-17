@@ -2724,6 +2724,8 @@ export interface paths {
                   value: string;
                 }[]
               | null;
+            /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
+            expectedVersion: number;
           };
         };
       };
@@ -2735,6 +2737,26 @@ export interface paths {
           };
           content: {
             "application/json": components["schemas"]["PublicProfile"];
+          };
+        };
+        /** @description A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion` */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": {
+              type: string;
+              title: string;
+              status: number;
+              code: string;
+              detail?: string;
+              errors?: {
+                path: string;
+                message: string;
+              }[];
+              current?: components["schemas"]["PublicProfile"];
+            };
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -2782,6 +2804,8 @@ export interface paths {
              * @description JPEG, PNG or WebP, at most 5 MiB, at least 256 px square
              */
             avatar: string;
+            /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
+            expectedVersion: string;
           };
         };
       };
@@ -2793,6 +2817,26 @@ export interface paths {
           };
           content: {
             "application/json": components["schemas"]["PublicProfile"];
+          };
+        };
+        /** @description A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion` */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": {
+              type: string;
+              title: string;
+              status: number;
+              code: string;
+              detail?: string;
+              errors?: {
+                path: string;
+                message: string;
+              }[];
+              current?: components["schemas"]["PublicProfile"];
+            };
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -2810,7 +2854,10 @@ export interface paths {
     /** @description Removes the acting guest's photo. */
     delete: {
       parameters: {
-        query?: never;
+        query: {
+          /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
+          expectedVersion: string;
+        };
         header?: {
           /** @description Retries with the same key get the first response (24 h) */
           "idempotency-key"?: string;
@@ -2820,12 +2867,34 @@ export interface paths {
       };
       requestBody?: never;
       responses: {
-        /** @description Removed */
-        204: {
+        /** @description The profile without a photo */
+        200: {
           headers: {
             [name: string]: unknown;
           };
-          content?: never;
+          content: {
+            "application/json": components["schemas"]["PublicProfile"];
+          };
+        };
+        /** @description A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion` */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": {
+              type: string;
+              title: string;
+              status: number;
+              code: string;
+              detail?: string;
+              errors?: {
+                path: string;
+                message: string;
+              }[];
+              current?: components["schemas"]["PublicProfile"];
+            };
+          };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
         default: {
@@ -4669,6 +4738,8 @@ export interface paths {
           "application/json": {
             name: string;
             email: string;
+            /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
+            expectedVersion: number;
           };
         };
       };
@@ -4680,6 +4751,26 @@ export interface paths {
           };
           content: {
             "application/json": components["schemas"]["AdminGuest"];
+          };
+        };
+        /** @description A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion` */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": {
+              type: string;
+              title: string;
+              status: number;
+              code: string;
+              detail?: string;
+              errors?: {
+                path: string;
+                message: string;
+              }[];
+              current?: components["schemas"]["AdminGuest"];
+            };
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -5287,6 +5378,7 @@ export interface components {
         | null;
       /** Format: date-time */
       profileUpdatedAt: string | null;
+      version: number;
     };
     Notification: {
       id: string;
@@ -5342,6 +5434,7 @@ export interface components {
       email: string;
       authProtected: boolean;
       eventIds: string[];
+      version: number;
     };
   };
   responses: never;

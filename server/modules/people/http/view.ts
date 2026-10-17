@@ -14,5 +14,6 @@ export function toProfileView(g: Guest): z.input<typeof publicProfileSchema> {
     languages: g.languages ?? null,
     contacts: g.contacts ?? null,
     profileUpdatedAt: g.profileUpdatedAt?.toISOString() ?? null,
+    version: g.profileVersion,
   };
 }

@@ -116,6 +116,10 @@ export type Guest<PI extends GuestPrivateInfo | void = void> = {
   // Public (the name switcher must know to ask for credentials); the
   // password hash itself is server-only, see GuestAuthCredentials in db/.
   authProtected?: boolean;
+  /** The admin view's version: name, email, protection, events. */
+  version: number;
+  /** The public profile's version. */
+  profileVersion: number;
   info: PI;
 };
 

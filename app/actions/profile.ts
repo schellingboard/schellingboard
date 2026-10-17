@@ -8,6 +8,7 @@ import { getImageRepositories } from "@/utils/images";
 import { requireSiteAuth } from "@/utils/action-auth";
 import { serverNow } from "@/utils/dev-clock-server";
 import { profileSchema } from "@schellingboard/contracts/guest";
+import { expectedVersion } from "@schellingboard/contracts/session";
 import { z } from "zod";
 
 export type ProfileActionResult =
@@ -32,10 +33,11 @@ const profileActionSchema = profileSchema.extend({
 
     return avatarBuffer;
   }),
+  expectedVersion: expectedVersion.optional(),
 });
 
 export async function updateProfileAction(
-  formData: z.input<typeof profileSchema>
+  formData: z.input<typeof profileSchema> & { expectedVersion?: number }
 ): Promise<ProfileActionResult>;
 
 export async function updateProfileAction(

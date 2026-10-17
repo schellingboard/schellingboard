@@ -109,6 +109,10 @@ export const guests = sqliteTable(
     // The salt is mandatory: never derive this without one. Never leaves the
     // server.
     passwordHash: text("password_hash"),
+    version: integer("version").notNull().default(1),
+    // The public profile's version, apart from `version` (the admin view):
+    // assigning a guest to an event must not refuse their profile edit.
+    profileVersion: integer("profile_version").notNull().default(1),
   },
   (table) => [
     // Case-insensitive: two guests must never share an email up to case.

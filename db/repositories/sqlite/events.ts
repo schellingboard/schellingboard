@@ -224,6 +224,18 @@ export class SqliteEventsRepository implements EventsRepository {
           )
         )
         .run();
+      tx.update(schema.guests)
+        .set({ version: sql`${schema.guests.version} + 1` })
+        .where(
+          inArray(
+            schema.guests.id,
+            tx
+              .select({ id: schema.eventGuests.guestId })
+              .from(schema.eventGuests)
+              .where(eq(schema.eventGuests.eventId, id))
+          )
+        )
+        .run();
       tx.delete(schema.events).where(eq(schema.events.id, id)).run();
     });
   }

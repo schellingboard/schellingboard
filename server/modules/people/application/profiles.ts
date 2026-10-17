@@ -7,7 +7,13 @@ import {
 } from "@schellingboard/domain/guest";
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
-import { invalid, notFound, ok, type Result } from "@/server/kernel/result";
+import {
+  invalid,
+  notFound,
+  ok,
+  versionConflict,
+  type Result,
+} from "@/server/kernel/result";
 import type { PeopleDeps, ValidatedImage } from "../ports";
 
 export interface ProfileInput {
@@ -20,6 +26,7 @@ export interface ProfileInput {
   contacts: ProfileContact[] | null;
   /** Left out keeps the current photo; null removes it. */
   avatar?: ValidatedImage | null;
+  expectedVersion?: number;
 }
 
 const profileNotFound = () => notFound("profile.notFound", "Profile not found");
@@ -35,17 +42,31 @@ export const getProfile =
     return ok(sanitizeGuest(guest));
   };
 
-type ProfileFields = Omit<ProfileInput, "avatar">;
+type ProfileFields = Omit<ProfileInput, "avatar" | "expectedVersion">;
+
+const profileConflict = (current: CompleteGuest) =>
+  versionConflict(
+    "profile",
+    sanitizeGuest(current),
+    "Someone changed this profile while you edited it"
+  );
 
 // Files first, then the row is read and written in one transaction, so a photo
 // upload and a profile save racing each other never revert each other's fields.
 async function saveProfile(
-  { uow, avatars }: PeopleDeps,
+  { uow, avatars, repos }: PeopleDeps,
   guestId: string,
   avatar: ValidatedImage | null | undefined,
   fields: (current: CompleteGuest) => ProfileFields,
-  now: Date
+  now: Date,
+  expectedVersion?: number
 ): Promise<Result<Guest>> {
+  if (avatar !== undefined && expectedVersion !== undefined) {
+    const current = await repos.guests.findById(guestId);
+    if (!current) return profileNotFound();
+    if (current.profileVersion !== expectedVersion)
+      return profileConflict(current);
+  }
   let avatarUrl: string | null | undefined;
   if (avatar === null) {
     await avatars.delete(guestId);
@@ -63,13 +84,16 @@ async function saveProfile(
         ...fields(current),
         avatarUrl:
           avatarUrl === undefined ? (current.avatarUrl ?? null) : avatarUrl,
+        expectedVersion,
       },
       now
     );
-    if (!updated) return profileNotFound();
-    return ok(sanitizeGuest(updated));
+    if (updated) return ok(sanitizeGuest(updated));
+    const after = await tx.guests.findById(guestId);
+    return after ? profileConflict(after) : profileNotFound();
   });
-  if (!saved.ok && avatarUrl) await avatars.delete(guestId);
+  if (!saved.ok && saved.error.code === "profile.notFound" && avatarUrl)
+    await avatars.delete(guestId);
   return saved;
 }
 
@@ -82,8 +106,15 @@ export const updateMyProfile =
   ): Promise<Result<Guest>> => {
     const acting = await actingGuest(actor, deps.repos.guests);
     if (!acting.ok) return acting;
-    const { avatar, ...fields } = input;
-    return saveProfile(deps, acting.value, avatar, () => fields, now);
+    const { avatar, expectedVersion, ...fields } = input;
+    return saveProfile(
+      deps,
+      acting.value,
+      avatar,
+      () => fields,
+      now,
+      expectedVersion
+    );
   };
 
 const currentFields = (current: CompleteGuest): ProfileFields => ({
@@ -100,20 +131,38 @@ export const replaceMyAvatar =
   (deps: PeopleDeps) =>
   async (
     actor: Actor,
-    { image }: { image: Buffer },
+    { image, expectedVersion }: { image: Buffer; expectedVersion?: number },
     now: Date
   ): Promise<Result<Guest>> => {
     const acting = await actingGuest(actor, deps.repos.guests);
     if (!acting.ok) return acting;
     const validated = await deps.avatars.validate(image);
     if ("error" in validated) return invalid("avatar.invalid", validated.error);
-    return saveProfile(deps, acting.value, validated, currentFields, now);
+    return saveProfile(
+      deps,
+      acting.value,
+      validated,
+      currentFields,
+      now,
+      expectedVersion
+    );
   };
 
 export const removeMyAvatar =
   (deps: PeopleDeps) =>
-  async (actor: Actor, now: Date): Promise<Result<Guest>> => {
+  async (
+    actor: Actor,
+    { expectedVersion }: { expectedVersion?: number },
+    now: Date
+  ): Promise<Result<Guest>> => {
     const acting = await actingGuest(actor, deps.repos.guests);
     if (!acting.ok) return acting;
-    return saveProfile(deps, acting.value, null, currentFields, now);
+    return saveProfile(
+      deps,
+      acting.value,
+      null,
+      currentFields,
+      now,
+      expectedVersion
+    );
   };

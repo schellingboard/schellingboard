@@ -105,6 +105,7 @@ describe("/api/v1/admin guests and settings", () => {
         email: "ada@x.org",
         authProtected: false,
         eventIds: [],
+        version: 1,
       });
       expect(await (await create()).json()).toEqual(guest);
 
@@ -118,10 +119,10 @@ describe("/api/v1/admin guests and settings", () => {
       });
 
       const edited = await call("PUT", `/admin/guests/${guest.id}`, {
-        body: { name: "Ada L.", email: "ada@x.org" },
+        body: { name: "Ada L.", email: "ada@x.org", expectedVersion: 1 },
       });
       expect(edited.status).toBe(200);
-      expect(await edited.json()).toMatchObject({ name: "Ada L." });
+      expect(await edited.json()).toMatchObject({ name: "Ada L.", version: 2 });
 
       const assigned = await call(
         "POST",
@@ -132,7 +133,9 @@ describe("/api/v1/admin guests and settings", () => {
       const listed = await call("GET", "/admin/guests");
       expect(listed.headers.get("cache-control")).toBe("no-store");
       expect(await listed.json()).toEqual({
-        guests: [{ ...guest, name: "Ada L.", eventIds: [event.id] }],
+        guests: [
+          { ...guest, name: "Ada L.", eventIds: [event.id], version: 3 },
+        ],
       });
       expect(
         (
@@ -156,6 +159,64 @@ describe("/api/v1/admin guests and settings", () => {
       expect(await gone.json()).toMatchObject({ code: "guest.notFound" });
     }
   );
+
+  it(
+    "refuses a guest edit made from an outdated version, answering with the guest as it is",
+    { tags: ["019-US4", "019-US7"] },
+    async () => {
+      const event = await createEvent();
+      const guest = await createGuest({ name: "Ada", email: "ada@x.org" });
+      const edit = (name: string, expectedVersion: number) =>
+        call("PUT", `/admin/guests/${guest.id}`, {
+          body: { name, email: "ada@x.org", expectedVersion },
+        });
+      expect(await (await edit("Ada", 1)).json()).toMatchObject({
+        version: 1,
+      });
+      await call("POST", `/admin/events/${event.id}/guests/assign`, {
+        body: { guestIds: [guest.id] },
+      });
+
+      const stale = await edit("Ada L.", 1);
+
+      expect(stale.status).toBe(409);
+      expect(await stale.json()).toMatchObject({
+        code: "guest.versionConflict",
+        current: {
+          id: guest.id,
+          name: "Ada",
+          eventIds: [event.id],
+          version: 2,
+        },
+      });
+      expect(await (await edit("Ada L.", 2)).json()).toMatchObject({
+        name: "Ada L.",
+        version: 3,
+      });
+
+      await call("POST", "/admin/guests", {
+        body: { name: "Bo", email: "bo@x.org" },
+      });
+      const staleAndTaken = await call("PUT", `/admin/guests/${guest.id}`, {
+        body: { name: "Ada", email: "bo@x.org", expectedVersion: 2 },
+      });
+      expect(await staleAndTaken.json()).toMatchObject({
+        code: "guest.versionConflict",
+      });
+    }
+  );
+
+  it("refuses a guest edit without expectedVersion", async () => {
+    const guest = await createGuest();
+    const res = await call("PUT", `/admin/guests/${guest.id}`, {
+      body: { name: "Ada", email: "ada@x.org" },
+    });
+    expect(res.status).toBe(400);
+    expect(await res.json()).toMatchObject({
+      code: "request.invalid",
+      errors: [expect.objectContaining({ path: "expectedVersion" })],
+    });
+  });
 
   it(
     "imports a CSV, answering every bad row at once",
