@@ -7,6 +7,11 @@ import { actingGuest } from "@/server/kernel/acting-guest";
 import { invalid, notFound, ok, type Result } from "@/server/kernel/result";
 import type { UnitOfWork } from "@/server/kernel/unit-of-work";
 import { eventScheduleBySlug } from "@/server/modules/events/module";
+import {
+  nowWithOffset,
+  parseTimeOffset,
+  readTimeOffsetCookie,
+} from "@/utils/dev-clock";
 import { openFeed } from "./feed";
 import { snapshotFor } from "./snapshot";
 
@@ -36,7 +41,7 @@ const getFeed = createRoute({
   path: "/events/{slug}/feed",
   tags: ["events"],
   description:
-    "A `text/event-stream` of the event's changes after `since` (the snapshot's `seq`), filtered to what the `guest` cookie may see. Each message has `id` = its `seq`, `event` = its type and the message as JSON `data`; a browser's reconnect sends `Last-Event-ID`, which wins over `since`. An `event: reset` message, after which the stream ends, means the resume point cannot be served: load the snapshot again. An `event: ping` every 25 seconds keeps proxies from closing it and lets a client notice a dead connection; it ends after 10 minutes. The first message carries `retry: 1000`, so a client reconnects after one second.",
+    "A `text/event-stream` of the event's changes after `since` (the snapshot's `seq`), filtered to what the `guest` cookie may see. Each message has `id` = its `seq`, `event` = its type and the message as JSON `data`; a browser's reconnect sends `Last-Event-ID`, which wins over `since`. An `event: reset` message, after which the stream ends, means the resume point cannot be served: load the snapshot again. An `event: ping` every 25 seconds, its data the server's `now`, keeps proxies from closing it and lets a client notice a dead connection; it ends after 10 minutes. The first message carries `retry: 1000`, so a client reconnects after one second.",
   request: {
     params: z.object({ slug: z.string().min(1) }),
     query: z.object({ since: z.string().optional() }),
@@ -75,7 +80,8 @@ export function addFeedRoutes(app: App, deps: { uow: UnitOfWork }): void {
     const result = await snapshotFor(
       deps.uow,
       c.var.actor,
-      c.req.valid("param").slug
+      c.req.valid("param").slug,
+      c.var.now
     );
     if (!result.ok) return problem(result.error);
     return c.json(result.value, 200);
@@ -103,6 +109,7 @@ export function addFeedRoutes(app: App, deps: { uow: UnitOfWork }): void {
     if (!target)
       return problem(notFound("event.notFound", "Event not found").error);
 
+    const offset = parseTimeOffset(readTimeOffsetCookie(c.req.raw));
     let controller!: ReadableStreamDefaultController<Uint8Array>;
     let finished = false;
     let stop = () => {};
@@ -152,10 +159,10 @@ export function addFeedRoutes(app: App, deps: { uow: UnitOfWork }): void {
       feed.close();
     } else {
       stop = feed.close;
-      heartbeat = setInterval(
-        () => write("event: ping\ndata: {}\n\n"),
-        HEARTBEAT_MS
-      );
+      heartbeat = setInterval(() => {
+        const now = nowWithOffset(offset).toISOString();
+        write(`event: ping\ndata: ${JSON.stringify({ now })}\n\n`);
+      }, HEARTBEAT_MS);
       deadline = setTimeout(finish, MAX_AGE_MS);
     }
     return c.body(body, 200, {

@@ -37,7 +37,20 @@ describe("GET /api/v1/health", () => {
       if (!result.ok) throw new Error("expected proxy to forward the request");
       const res = await GET(new NextRequest(result.request));
       expect(res.status).toBe(200);
-      expect(await res.json()).toEqual({ status: "ok" });
+      expect(await res.json()).toMatchObject({ status: "ok" });
+    }
+  );
+
+  it(
+    "names the version and the build, for a client to notice a new deployment",
+    { tags: ["019-US1"] },
+    async () => {
+      vi.stubEnv("NEXT_PUBLIC_APP_VERSION", "v9.9.9");
+      const res = await GET(new NextRequest("http://test/api/v1/health"));
+      const body = (await res.json()) as { version: string; buildId: string };
+      expect(body.version).toBe("v9.9.9");
+      expect(body.buildId).toEqual(expect.any(String));
+      expect(body.buildId).not.toBe("");
     }
   );
 

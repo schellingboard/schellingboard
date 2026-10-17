@@ -10,7 +10,7 @@ documentation.
 
 1. **Finalize the changelog** — in `CHANGELOG.md`, rename `## [Unreleased]` to `## [X.Y.Z] - YYYY-MM-DD` (no `v` prefix in the header), and replace the `[Unreleased]` compare link at the bottom of the file with the new version's, pointing from the previous release's endpoint to the new tag (`vX.Y.Z`). Do _not_ add a fresh `## [Unreleased]` section here — the released tag should carry no empty section, since that is what the documentation site publishes. Step 4 reopens it afterwards.
 
-   **Release the in-app notes in the same commit** — in `app/release-notes.ts`, the first entry of `releaseNotes` is the one being prepared: replace its `version: "Unreleased"` with this version and add the `date`. Nothing else moves. `make test` fails until the newest release the changelog names has an entry.
+   **Release the in-app notes in the same commit** — in `packages/domain/src/release-notes.ts`, the first entry of `releaseNotes` is the one being prepared: replace its `version: "Unreleased"` with this version and add the `date`. Nothing else moves. `make test` fails until the newest release the changelog names has an entry.
 
    **Re-read those highlights against the finalized changelog first.** They were written one at a time, before it was known what else the release would hold, so they are a draft, not a record: check that they are still the 3-5 changes an attendee or organizer would call this release's highlights, and rewrite or replace any that are not.
 
@@ -47,7 +47,7 @@ documentation.
 4. **Reopen the changelog** — in a follow-up commit on `main`, add an empty
    `## [Unreleased]` section above `## [X.Y.Z]` and an `[Unreleased]` compare
    link from `vX.Y.Z` to `HEAD`. **Reopen the in-app notes too** — in
-   `app/release-notes.ts`, add a new first entry with `version: "Unreleased"`
+   `packages/domain/src/release-notes.ts`, add a new first entry with `version: "Unreleased"`
    and no `date`, above the one just released.
 
 ## What the release workflow does

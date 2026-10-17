@@ -498,6 +498,11 @@
             "type": "integer",
             "description": "Resume the feed after this"
           },
+          "now": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The server's clock, the dev fake clock included"
+          },
           "event": { "$ref": "#/components/schemas/Event" },
           "days": {
             "type": "array",
@@ -644,6 +649,7 @@
         },
         "required": [
           "seq",
+          "now",
           "event",
           "days",
           "locations",
@@ -1260,15 +1266,23 @@
       "get": {
         "responses": {
           "200": {
-            "description": "The server is up",
+            "description": "The server is up, and which build it runs",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "status": { "type": "string", "enum": ["ok"] }
+                    "status": { "type": "string", "enum": ["ok"] },
+                    "version": {
+                      "type": "string",
+                      "description": "The release or commit this server runs"
+                    },
+                    "buildId": {
+                      "type": "string",
+                      "description": "Differs between builds; a client that sees it change is stale"
+                    }
                   },
-                  "required": ["status"]
+                  "required": ["status", "version", "buildId"]
                 }
               }
             }
@@ -5598,7 +5612,7 @@
     "/api/v1/events/{slug}/feed": {
       "get": {
         "tags": ["events"],
-        "description": "A `text/event-stream` of the event's changes after `since` (the snapshot's `seq`), filtered to what the `guest` cookie may see. Each message has `id` = its `seq`, `event` = its type and the message as JSON `data`; a browser's reconnect sends `Last-Event-ID`, which wins over `since`. An `event: reset` message, after which the stream ends, means the resume point cannot be served: load the snapshot again. An `event: ping` every 25 seconds keeps proxies from closing it and lets a client notice a dead connection; it ends after 10 minutes. The first message carries `retry: 1000`, so a client reconnects after one second.",
+        "description": "A `text/event-stream` of the event's changes after `since` (the snapshot's `seq`), filtered to what the `guest` cookie may see. Each message has `id` = its `seq`, `event` = its type and the message as JSON `data`; a browser's reconnect sends `Last-Event-ID`, which wins over `since`. An `event: reset` message, after which the stream ends, means the resume point cannot be served: load the snapshot again. An `event: ping` every 25 seconds, its data the server's `now`, keeps proxies from closing it and lets a client notice a dead connection; it ends after 10 minutes. The first message carries `retry: 1000`, so a client reconnects after one second.",
         "parameters": [
           {
             "schema": { "type": "string", "minLength": 1 },

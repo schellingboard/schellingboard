@@ -140,8 +140,8 @@ export function settingsUseCases(): SettingsUseCases {
   });
 }
 
-export function eventSnapshot(actor: Actor, slug: string) {
-  return snapshotFor(unitOfWork, actor, slug);
+export function eventSnapshot(actor: Actor, slug: string, now: Date) {
+  return snapshotFor(unitOfWork, actor, slug, now);
 }
 
 // What server-rendered pages read. No actor: these sit behind the site

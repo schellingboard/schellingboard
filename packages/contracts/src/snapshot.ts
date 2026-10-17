@@ -34,6 +34,7 @@ export const snapshotGuestSchema = eventGuestSchema
 export const snapshotSchema = z
   .object({
     seq: z.number().int().describe("Resume the feed after this"),
+    now: instant.describe("The server's clock, the dev fake clock included"),
     event: eventViewSchema,
     days: z.array(dayViewSchema),
     locations: z.array(snapshotLocationSchema),

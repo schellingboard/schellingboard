@@ -17,7 +17,7 @@ export interface paths {
       };
       requestBody?: never;
       responses: {
-        /** @description The server is up */
+        /** @description The server is up, and which build it runs */
         200: {
           headers: {
             [name: string]: unknown;
@@ -26,6 +26,10 @@ export interface paths {
             "application/json": {
               /** @enum {string} */
               status: "ok";
+              /** @description The release or commit this server runs */
+              version: string;
+              /** @description Differs between builds; a client that sees it change is stale */
+              buildId: string;
             };
           };
         };
@@ -3784,7 +3788,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** @description A `text/event-stream` of the event's changes after `since` (the snapshot's `seq`), filtered to what the `guest` cookie may see. Each message has `id` = its `seq`, `event` = its type and the message as JSON `data`; a browser's reconnect sends `Last-Event-ID`, which wins over `since`. An `event: reset` message, after which the stream ends, means the resume point cannot be served: load the snapshot again. An `event: ping` every 25 seconds keeps proxies from closing it and lets a client notice a dead connection; it ends after 10 minutes. The first message carries `retry: 1000`, so a client reconnects after one second. */
+    /** @description A `text/event-stream` of the event's changes after `since` (the snapshot's `seq`), filtered to what the `guest` cookie may see. Each message has `id` = its `seq`, `event` = its type and the message as JSON `data`; a browser's reconnect sends `Last-Event-ID`, which wins over `since`. An `event: reset` message, after which the stream ends, means the resume point cannot be served: load the snapshot again. An `event: ping` every 25 seconds, its data the server's `now`, keeps proxies from closing it and lets a client notice a dead connection; it ends after 10 minutes. The first message carries `retry: 1000`, so a client reconnects after one second. */
     get: {
       parameters: {
         query?: {
@@ -5911,6 +5915,11 @@ export interface components {
     Snapshot: {
       /** @description Resume the feed after this */
       seq: number;
+      /**
+       * Format: date-time
+       * @description The server's clock, the dev fake clock included
+       */
+      now: string;
       event: components["schemas"]["Event"];
       days: {
         /** Format: date-time */
