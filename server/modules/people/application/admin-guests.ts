@@ -71,10 +71,10 @@ function toAdminGuest(guest: CompleteGuest, eventIds: string[]): AdminGuest {
 }
 
 async function withEvents(
-  { repos }: PeopleDeps,
+  guests: PeopleDeps["repos"]["guests"],
   guest: CompleteGuest
 ): Promise<AdminGuest> {
-  const events = await repos.guests.listEventsByGuests([guest.id]);
+  const events = await guests.listEventsByGuests([guest.id]);
   return toAdminGuest(
     guest,
     (events.get(guest.id) ?? []).map((e) => e.id)
@@ -118,7 +118,7 @@ export const createGuest =
 
 // For seeding scripts: re-running one must not fail on guests it already made.
 export const ensureGuest =
-  ({ repos }: PeopleDeps) =>
+  ({ uow }: PeopleDeps) =>
   async (
     actor: Actor,
     input: GuestInput & { eventSlug?: string }
@@ -128,59 +128,48 @@ export const ensureGuest =
     if (!parsed.ok) return parsed;
     const { name, email } = parsed.value;
 
-    let eventId: string | undefined;
-    if (input.eventSlug) {
-      const event = await repos.events.findBySlug(input.eventSlug);
-      if (!event) return eventNotFound();
-      eventId = event.id;
-    }
-    const { guest, created } = await repos.guests.findOrCreateByEmail({
-      name,
-      info: { email },
+    return uow.run(async (tx) => {
+      let eventId: string | undefined;
+      if (input.eventSlug) {
+        const event = await tx.events.findBySlug(input.eventSlug);
+        if (!event) return eventNotFound();
+        eventId = event.id;
+      }
+      const { guest, created } = await tx.guests.findOrCreateByEmail({
+        name,
+        info: { email },
+      });
+      if (eventId) await tx.guests.assignToEvent(eventId, [guest.id]);
+      return ok({ id: guest.id, created });
     });
-    if (eventId) await repos.guests.assignToEvent(eventId, [guest.id]);
-    return ok({ id: guest.id, created });
   };
 
 export const updateGuest =
-  (deps: PeopleDeps) =>
+  ({ uow }: PeopleDeps) =>
   async (actor: Actor, input: unknown): Promise<Result<AdminGuest>> => {
     if (!actor.admin) return adminRequired();
     const parsed = parseGuest(updateGuestSchema, input);
     if (!parsed.ok) return parsed;
     const { id, name, email } = parsed.value;
-    const { guests } = deps.repos;
 
-    const existing = await guests.findByEmail(email);
-    if (existing && existing.id !== id) return emailTaken();
-
-    let updated;
-    try {
-      updated = await guests.update(id, { name, info: { email } });
-    } catch (e) {
-      // A concurrent update or create can take the email between the check
-      // above and this update.
-      if (
-        e instanceof Error &&
-        e.message.includes(
-          "UNIQUE constraint failed: index 'guests_email_unique'"
-        )
-      ) {
-        return emailTaken();
-      }
-      throw e;
-    }
-    if (!updated) return guestNotFound();
-    return ok(await withEvents(deps, updated));
+    return uow.run(async (tx) => {
+      const existing = await tx.guests.findByEmail(email);
+      if (existing && existing.id !== id) return emailTaken();
+      const updated = await tx.guests.update(id, { name, info: { email } });
+      if (!updated) return guestNotFound();
+      return ok(await withEvents(tx.guests, updated));
+    });
   };
 
 export const deleteGuest =
-  ({ repos }: PeopleDeps) =>
+  ({ uow }: PeopleDeps) =>
   async (actor: Actor, input: { id: string }): Promise<Result<void>> => {
     if (!actor.admin) return adminRequired();
-    if (!(await repos.guests.findById(input.id))) return guestNotFound();
-    await repos.guests.delete(input.id);
-    return ok(undefined);
+    return uow.run(async (tx) => {
+      if (!(await tx.guests.findById(input.id))) return guestNotFound();
+      await tx.guests.delete(input.id);
+      return ok(undefined);
+    });
   };
 
 export const sendTestEmail =

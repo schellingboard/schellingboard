@@ -37,10 +37,10 @@ export const getProfile =
 
 type ProfileFields = Omit<ProfileInput, "avatar">;
 
-// Files first, then the row is read just before it is written: a photo upload
-// and a profile save racing each other must not revert one another's fields.
+// Files first, then the row is read and written in one transaction, so a photo
+// upload and a profile save racing each other never revert each other's fields.
 async function saveProfile(
-  { repos, avatars }: PeopleDeps,
+  { uow, avatars }: PeopleDeps,
   guestId: string,
   avatar: ValidatedImage | null | undefined,
   fields: (current: CompleteGuest) => ProfileFields,
@@ -54,19 +54,23 @@ async function saveProfile(
     avatarUrl = await avatars.save(guestId, avatar.buffer, avatar.ext);
   }
 
-  const current = await repos.guests.findById(guestId);
-  if (!current) return profileNotFound();
-  const updated = await repos.guests.updateProfile(
-    guestId,
-    {
-      ...fields(current),
-      avatarUrl:
-        avatarUrl === undefined ? (current.avatarUrl ?? null) : avatarUrl,
-    },
-    now
-  );
-  if (!updated) return profileNotFound();
-  return ok(sanitizeGuest(updated));
+  const saved = await uow.run(async (tx) => {
+    const current = await tx.guests.findById(guestId);
+    if (!current) return profileNotFound();
+    const updated = await tx.guests.updateProfile(
+      guestId,
+      {
+        ...fields(current),
+        avatarUrl:
+          avatarUrl === undefined ? (current.avatarUrl ?? null) : avatarUrl,
+      },
+      now
+    );
+    if (!updated) return profileNotFound();
+    return ok(sanitizeGuest(updated));
+  });
+  if (!saved.ok && avatarUrl) await avatars.delete(guestId);
+  return saved;
 }
 
 export const updateMyProfile =

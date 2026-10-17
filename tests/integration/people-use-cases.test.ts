@@ -15,6 +15,7 @@ import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createGuest } from "../helpers/factories";
 import { createImageFile } from "../helpers/utils";
 import { getRepositories } from "@/db/container";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
 import { createPeopleUseCases } from "@/server/modules/people/module";
 import type { Actor } from "@/server/kernel/actor";
 import type { Result } from "@/server/kernel/result";
@@ -36,6 +37,7 @@ const people = () =>
     repos: getRepositories(),
     avatars: getImageRepositories().avatars,
     sendTestEmail: async () => {},
+    uow: unitOfWork,
   });
 
 function value<T>(result: Result<T>): T {
@@ -176,6 +178,63 @@ describe("editing one's own profile", () => {
 
       const removed = value(await people().removeMyAvatar(open(ada.id), now()));
       expect(removed.avatarUrl).toBeNull();
+      expect(fs.readdirSync(path.join(uploadsDir, "avatars"))).toEqual([]);
+    }
+  );
+
+  it(
+    "keeps a photo uploaded while the profile was being saved",
+    { tags: ["011-US1", "011-US2", "019-US7"] },
+    async () => {
+      const ada = await createGuest({ name: "Ada" });
+      const repo = getRepositories().guests;
+      const find = repo.findById.bind(repo);
+      let uploaded = () => {};
+      const upload = new Promise<void>((resolve) => (uploaded = resolve));
+      const slowRead = vi
+        .spyOn(repo, "findById")
+        .mockImplementationOnce(async (id) => {
+          const current = await find(id);
+          await upload;
+          return current;
+        });
+
+      const saved = people().updateMyProfile(open(ada.id), PROFILE, now());
+      const image = await png(256);
+      const photo = value(
+        await people().replaceMyAvatar(open(ada.id), { image }, now())
+      );
+      uploaded();
+      value(await saved);
+      slowRead.mockRestore();
+
+      expect(await find(ada.id)).toMatchObject({
+        ...PROFILE,
+        avatarUrl: photo.avatarUrl,
+      });
+    }
+  );
+
+  it(
+    "keeps no photo of a guest deleted while it was being uploaded",
+    { tags: ["011-US2", "019-US7"] },
+    async () => {
+      const ada = await createGuest({ name: "Ada" });
+      const repo = getRepositories().guests;
+      const credentials = await repo.getAuthCredentials(ada.id);
+      await repo.delete(ada.id);
+      const lookup = vi
+        .spyOn(repo, "getAuthCredentials")
+        .mockResolvedValueOnce(credentials);
+
+      const uploaded = await people().replaceMyAvatar(
+        open(ada.id),
+        { image: await png(256) },
+        now()
+      );
+      lookup.mockRestore();
+
+      expect(code(uploaded)).toBe("profile.notFound");
       expect(fs.readdirSync(path.join(uploadsDir, "avatars"))).toEqual([]);
     }
   );

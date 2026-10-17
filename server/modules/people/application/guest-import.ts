@@ -7,17 +7,13 @@ import { adminRequired, eventNotFound } from "./admin-guests";
 // Guests are matched by email, case-insensitively: existing ones are left
 // unchanged but still assigned, so re-running an import changes nothing.
 export const importGuests =
-  ({ repos }: PeopleDeps) =>
+  ({ uow }: PeopleDeps) =>
   async (
     actor: Actor,
     input: { csv: string; eventIds: string[] }
   ): Promise<Result<{ created: number; existing: number }>> => {
     if (!actor.admin) return adminRequired();
     const eventIds = [...new Set(input.eventIds)];
-    for (const eventId of eventIds) {
-      if (!(await repos.events.findById(eventId))) return eventNotFound();
-    }
-
     const parsed = parseUserImportCsv(input.csv);
     if (!parsed.ok) {
       return {
@@ -31,9 +27,12 @@ export const importGuests =
       };
     }
 
-    const { created } = await repos.guests.importAndAssign(
-      parsed.rows,
-      eventIds
-    );
-    return ok({ created, existing: parsed.rows.length - created });
+    const rows = parsed.rows;
+    return uow.run(async (tx) => {
+      for (const eventId of eventIds) {
+        if (!(await tx.events.findById(eventId))) return eventNotFound();
+      }
+      const { created } = await tx.guests.importAndAssign(rows, eventIds);
+      return ok({ created, existing: rows.length - created });
+    });
   };

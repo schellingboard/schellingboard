@@ -1,4 +1,5 @@
 import type { Repositories } from "@/db/container";
+import type { UnitOfWork } from "@/server/kernel/unit-of-work";
 
 export interface ValidatedImage {
   ext: string;
@@ -13,6 +14,7 @@ export interface AvatarStore {
 }
 
 export interface PeopleDeps {
+  uow: UnitOfWork;
   repos: Pick<Repositories, "events" | "guests">;
   avatars: AvatarStore;
   sendTestEmail: (to: { name: string; email: string }) => Promise<void>;

@@ -9,27 +9,31 @@ interface EventGuestsInput {
 }
 
 export const assignGuestsToEvent =
-  ({ repos }: PeopleDeps) =>
+  ({ uow }: PeopleDeps) =>
   async (actor: Actor, input: EventGuestsInput): Promise<Result<void>> => {
     if (!actor.admin) return adminRequired();
-    if (!(await repos.events.findById(input.eventId))) return eventNotFound();
+    return uow.run(async (tx) => {
+      if (!(await tx.events.findById(input.eventId))) return eventNotFound();
 
-    const uniqueGuestIds = [...new Set(input.guestIds)];
-    if (uniqueGuestIds.length > 0) {
-      const existing = await repos.guests.findExistingIds(uniqueGuestIds);
-      if (existing.length !== uniqueGuestIds.length) {
-        return invalid("guest.unknown", "Guest not found");
+      const uniqueGuestIds = [...new Set(input.guestIds)];
+      if (uniqueGuestIds.length > 0) {
+        const existing = await tx.guests.findExistingIds(uniqueGuestIds);
+        if (existing.length !== uniqueGuestIds.length) {
+          return invalid("guest.unknown", "Guest not found");
+        }
       }
-    }
-    await repos.guests.assignToEvent(input.eventId, input.guestIds);
-    return ok(undefined);
+      await tx.guests.assignToEvent(input.eventId, input.guestIds);
+      return ok(undefined);
+    });
   };
 
 export const removeGuestsFromEvent =
-  ({ repos }: PeopleDeps) =>
+  ({ uow }: PeopleDeps) =>
   async (actor: Actor, input: EventGuestsInput): Promise<Result<void>> => {
     if (!actor.admin) return adminRequired();
-    if (!(await repos.events.findById(input.eventId))) return eventNotFound();
-    await repos.guests.removeFromEvent(input.eventId, input.guestIds);
-    return ok(undefined);
+    return uow.run(async (tx) => {
+      if (!(await tx.events.findById(input.eventId))) return eventNotFound();
+      await tx.guests.removeFromEvent(input.eventId, input.guestIds);
+      return ok(undefined);
+    });
   };

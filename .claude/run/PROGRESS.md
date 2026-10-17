@@ -92,6 +92,29 @@ openapi-check typecheck test-coverage` (or `make test`), without E2E. E2E runs
   change or notification was ever sent). Recording them would start emailing
   hosts and attendees; steps 8 (ADR 0014) and 12a decide it.
 
+- 3d: the only multi-write use case was `ensureGuest` (guest, then event
+  membership). It and the checks of `updateGuest` (email uniqueness; the
+  UNIQUE-error catch is gone), `deleteGuest`, `assignGuestsToEvent`,
+  `removeGuestsFromEvent`, `importGuests`, the profile save (avatar file
+  first, then read and write), `requestMeeting`, `respondToMeeting`,
+  `cancelMeeting`, `saveMeetingAvailability`, `subscribeToPush`,
+  `unsubscribeFromPush` and `readNotification` run in `uow.run`; notifications
+  are sent after commit. Before, a guest or event deleted meanwhile gave a
+  foreign key error (500), availability saved during an increment change kept
+  off-grid slots, a profile save could revert a photo uploaded meanwhile, and
+  an unsubscribe could delete a device that had just moved to another guest.
+  `PeopleDeps` and `NotificationDeps` take `uow`.
+- 3d: site settings need no `uow`: the update now patches the map URL only
+  when it changes (the repository merges under the write lock), so a title
+  save no longer drops a map uploaded meanwhile.
+- 3d: the auth flows (`app/actions/user-auth.ts`) write through repositories,
+  not use cases; left alone as asked (step 6 of the path).
+- 3d: guest delete removes their votes, RSVPs and host links by cascade and
+  records no session change, as before (like 3c's cascades; step 8 decides).
+- 3d: an avatar is saved before `uow.run` (as before); a save refused because
+  the guest was deleted meanwhile removes the file. If the transaction throws,
+  the old file is already replaced while the row keeps the old URL, as before.
+
 - Step 4 split into 4a1–4a4 (one commit and migration per subject family),
   then 4b.
 - 4a1: `versionConflict(subject, current, detail)` in `server/kernel/result.ts`
@@ -118,8 +141,10 @@ None.
 
 ## Questions
 
-None.
+- Deleting a guest (`deleteGuest`) leaves their avatar file in the uploads
+  directory; it was so before 3d. Delete it after the row, as `deleteLocation`
+  does for its image?
 
 ## Next step
 
-3d.
+4a2.

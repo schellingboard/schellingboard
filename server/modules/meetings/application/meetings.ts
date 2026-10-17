@@ -59,7 +59,7 @@ export async function attendees(
 }
 
 export const requestMeeting =
-  ({ repos, notifyMeetingRequested }: MeetingDeps) =>
+  ({ repos, uow, notifyMeetingRequested }: MeetingDeps) =>
   async (
     actor: Actor,
     input: MeetingRequestInput,
@@ -75,92 +75,104 @@ export const requestMeeting =
     if (!meetingPoint)
       return invalid("meeting.pointRequired", "Choose or type where to meet");
 
-    const event = await repos.events.findById(input.eventId);
-    if (!event) return eventNotFound();
-    const closed = closedFor(event, now);
-    if (closed) return closed;
-
-    const attends = await attendees(repos, event.id, [
-      requesterId,
-      input.recipientId,
-    ]);
-    if (!attends(requesterId))
-      return forbidden("guest.notInEvent", "You are not attending this event");
-    if (!attends(input.recipientId))
-      return invalid(
-        "meeting.recipientNotInEvent",
-        "They are not attending this event"
-      );
-
-    if (
-      input.slotCount >
-      maxMeetingSlots(event.slotIncrementMinutes, event.maxSessionDuration)
-    )
-      return invalid(
-        "meeting.tooLong",
-        "That 1-on-1 is longer than the event allows"
-      );
-
-    const slotStart = new Date(input.slotStart);
-    const days = await repos.days.listByEvent(event.id);
-    const day = days.find((d) => slotStart >= d.start && slotStart < d.end);
-    const run = day
-      ? meetingRun(
-          meetingSlotsForDay(day, event.slotIncrementMinutes),
-          slotStart,
-          input.slotCount
-        )
-      : null;
-    if (!run)
-      return invalid("meeting.slotUnavailable", "That slot is not available");
-
-    // A multi-day event goes on offering yesterday's slots, and the open-request
-    // cap only counts requests still ahead -- so without this, day one stays
-    // bookable on day three and every request against it is free of the cap.
-    if (slotStart <= now)
-      return conflict("meeting.slotPassed", "That slot has already passed");
-
-    // A slot they cleared is the one hard no in the feature: a clash is only a
-    // warning the requester already waved through, but this is their decision.
-    const declared = await repos.meetingAvailability.listByGuestAndEvent(
-      input.recipientId,
-      event.id
+    const requested = await uow.run((tx) =>
+      bookMeeting(tx, { ...input, requesterId, meetingPoint }, now)
     );
-    const declaredStarts = new Set(declared.map((slot) => slot.getTime()));
-    if (!run.every((slot) => declaredStarts.has(slot.start.getTime())))
-      return conflict(
-        "meeting.recipientUnavailable",
-        "They are not available at that time"
-      );
-
-    const outcome = await repos.meetings.createIfAllowed(
-      {
-        eventId: event.id,
-        requesterId,
-        recipientId: input.recipientId,
-        slotStart,
-        slotEnd: run[run.length - 1].end,
-        meetingPoint,
-        message: input.message?.trim() ?? "",
-        createdAt: now,
-      },
-      event.maxOpenMeetingRequests,
-      now
-    );
-    if ("refused" in outcome)
-      return outcome.refused === "duplicate"
-        ? conflict(
-            "meeting.duplicate",
-            "You have already asked them for that time"
-          )
-        : conflict(
-            "meeting.tooManyOpen",
-            `You already have ${event.maxOpenMeetingRequests} requests waiting for an answer. Wait for a reply, or cancel one first.`
-          );
-
-    await notifyMeetingRequested({ meeting: outcome.meeting, now });
-    return ok(outcome.meeting);
+    if (!requested.ok) return requested;
+    await notifyMeetingRequested({ meeting: requested.value, now });
+    return requested;
   };
+
+async function bookMeeting(
+  repos: MeetingDeps["repos"],
+  input: MeetingRequestInput & { requesterId: string },
+  now: Date
+): Promise<Result<Meeting>> {
+  const { requesterId, meetingPoint } = input;
+  const event = await repos.events.findById(input.eventId);
+  if (!event) return eventNotFound();
+  const closed = closedFor(event, now);
+  if (closed) return closed;
+
+  const attends = await attendees(repos, event.id, [
+    requesterId,
+    input.recipientId,
+  ]);
+  if (!attends(requesterId))
+    return forbidden("guest.notInEvent", "You are not attending this event");
+  if (!attends(input.recipientId))
+    return invalid(
+      "meeting.recipientNotInEvent",
+      "They are not attending this event"
+    );
+
+  if (
+    input.slotCount >
+    maxMeetingSlots(event.slotIncrementMinutes, event.maxSessionDuration)
+  )
+    return invalid(
+      "meeting.tooLong",
+      "That 1-on-1 is longer than the event allows"
+    );
+
+  const slotStart = new Date(input.slotStart);
+  const days = await repos.days.listByEvent(event.id);
+  const day = days.find((d) => slotStart >= d.start && slotStart < d.end);
+  const run = day
+    ? meetingRun(
+        meetingSlotsForDay(day, event.slotIncrementMinutes),
+        slotStart,
+        input.slotCount
+      )
+    : null;
+  if (!run)
+    return invalid("meeting.slotUnavailable", "That slot is not available");
+
+  // A multi-day event goes on offering yesterday's slots, and the open-request
+  // cap only counts requests still ahead -- so without this, day one stays
+  // bookable on day three and every request against it is free of the cap.
+  if (slotStart <= now)
+    return conflict("meeting.slotPassed", "That slot has already passed");
+
+  // A slot they cleared is the one hard no in the feature: a clash is only a
+  // warning the requester already waved through, but this is their decision.
+  const declared = await repos.meetingAvailability.listByGuestAndEvent(
+    input.recipientId,
+    event.id
+  );
+  const declaredStarts = new Set(declared.map((slot) => slot.getTime()));
+  if (!run.every((slot) => declaredStarts.has(slot.start.getTime())))
+    return conflict(
+      "meeting.recipientUnavailable",
+      "They are not available at that time"
+    );
+
+  const outcome = await repos.meetings.createIfAllowed(
+    {
+      eventId: event.id,
+      requesterId,
+      recipientId: input.recipientId,
+      slotStart,
+      slotEnd: run[run.length - 1].end,
+      meetingPoint,
+      message: input.message?.trim() ?? "",
+      createdAt: now,
+    },
+    event.maxOpenMeetingRequests,
+    now
+  );
+  if ("refused" in outcome)
+    return outcome.refused === "duplicate"
+      ? conflict(
+          "meeting.duplicate",
+          "You have already asked them for that time"
+        )
+      : conflict(
+          "meeting.tooManyOpen",
+          `You already have ${event.maxOpenMeetingRequests} requests waiting for an answer. Wait for a reply, or cancel one first.`
+        );
+  return ok(outcome.meeting);
+}
 
 async function standingMeeting(
   repos: MeetingDeps["repos"],
@@ -182,7 +194,7 @@ async function standingMeeting(
 const meetingNotFound = () => notFound("meeting.notFound", "1-on-1 not found");
 
 export const respondToMeeting =
-  ({ repos, notifyMeetingOutcome }: MeetingDeps) =>
+  ({ repos, uow, notifyMeetingOutcome }: MeetingDeps) =>
   async (
     actor: Actor,
     input: { meetingId: string; response: "accept" | "decline" },
@@ -190,40 +202,41 @@ export const respondToMeeting =
   ): Promise<Result<MeetingChange>> => {
     const acting = await actingGuest(actor, repos.guests);
     if (!acting.ok) return acting;
-    const meeting = await repos.meetings.findById(input.meetingId);
-    if (!meeting) return meetingNotFound();
-    if (meeting.recipientId !== acting.value)
-      return forbidden(
-        "meeting.notRecipient",
-        "Only the person asked can answer this"
-      );
-    const event = await standingMeeting(repos, meeting, now);
-    if (!event.ok) return event;
-
     const outcome = input.response === "accept" ? "accepted" : "declined";
-    const answered = await repos.meetings.updateStatus(
-      meeting.id,
-      outcome,
-      now,
-      ["pending"]
-    );
-    if (!answered)
-      return conflict(
-        "meeting.alreadyAnswered",
-        "This request has already been answered"
-      );
+    const answered = await uow.run(async (tx) => {
+      const meeting = await tx.meetings.findById(input.meetingId);
+      if (!meeting) return meetingNotFound();
+      if (meeting.recipientId !== acting.value)
+        return forbidden(
+          "meeting.notRecipient",
+          "Only the person asked can answer this"
+        );
+      const event = await standingMeeting(tx, meeting, now);
+      if (!event.ok) return event;
+
+      const updated = await tx.meetings.updateStatus(meeting.id, outcome, now, [
+        "pending",
+      ]);
+      if (!updated)
+        return conflict(
+          "meeting.alreadyAnswered",
+          "This request has already been answered"
+        );
+      return ok({ meeting: updated, eventSlug: event.value.slug });
+    });
+    if (!answered.ok) return answered;
 
     await notifyMeetingOutcome({
-      meeting: answered,
+      meeting: answered.value.meeting,
       outcome,
       actorId: acting.value,
       now,
     });
-    return ok({ meeting: answered, eventSlug: event.value.slug });
+    return answered;
   };
 
 export const cancelMeeting =
-  ({ repos, notifyMeetingOutcome }: MeetingDeps) =>
+  ({ repos, uow, notifyMeetingOutcome }: MeetingDeps) =>
   async (
     actor: Actor,
     input: { meetingId: string; note?: string },
@@ -231,44 +244,48 @@ export const cancelMeeting =
   ): Promise<Result<MeetingChange>> => {
     const acting = await actingGuest(actor, repos.guests);
     if (!acting.ok) return acting;
-    const meeting = await repos.meetings.findById(input.meetingId);
-    if (!meeting) return meetingNotFound();
-    const isRequester = meeting.requesterId === acting.value;
-    if (!isRequester && meeting.recipientId !== acting.value)
-      return forbidden("meeting.notParticipant", "This isn't your 1-on-1");
-    const event = await standingMeeting(repos, meeting, now);
-    if (!event.ok) return event;
+    const canceled = await uow.run(async (tx) => {
+      const meeting = await tx.meetings.findById(input.meetingId);
+      if (!meeting) return meetingNotFound();
+      const isRequester = meeting.requesterId === acting.value;
+      if (!isRequester && meeting.recipientId !== acting.value)
+        return forbidden("meeting.notParticipant", "This isn't your 1-on-1");
+      const event = await standingMeeting(tx, meeting, now);
+      if (!event.ok) return event;
 
-    // The person asked has Decline; "canceled" would misdescribe that.
-    if (!isRequester && meeting.status === "pending")
-      return conflict(
-        "meeting.recipientMustDecline",
-        "You were the one asked — decline it instead"
-      );
+      // The person asked has Decline; "canceled" would misdescribe that.
+      if (!isRequester && meeting.status === "pending")
+        return conflict(
+          "meeting.recipientMustDecline",
+          "You were the one asked — decline it instead"
+        );
 
-    const from: MeetingStatus[] = isRequester
-      ? ["pending", "accepted"]
-      : ["accepted"];
-    // The note goes in with the status change: a cancel the compare-and-set
-    // refuses must leave no word about it on a meeting that still stands.
-    const canceled = await repos.meetings.updateStatus(
-      meeting.id,
-      "canceled",
-      now,
-      from,
-      input.note?.trim() ?? ""
-    );
-    if (!canceled)
-      return conflict(
-        "meeting.nothingToCancel",
-        "There is nothing left to cancel"
+      const from: MeetingStatus[] = isRequester
+        ? ["pending", "accepted"]
+        : ["accepted"];
+      // The note goes in with the status change: a cancel the compare-and-set
+      // refuses must leave no word about it on a meeting that still stands.
+      const updated = await tx.meetings.updateStatus(
+        meeting.id,
+        "canceled",
+        now,
+        from,
+        input.note?.trim() ?? ""
       );
+      if (!updated)
+        return conflict(
+          "meeting.nothingToCancel",
+          "There is nothing left to cancel"
+        );
+      return ok({ meeting: updated, eventSlug: event.value.slug });
+    });
+    if (!canceled.ok) return canceled;
 
     await notifyMeetingOutcome({
-      meeting: canceled,
+      meeting: canceled.value.meeting,
       outcome: "canceled",
       actorId: acting.value,
       now,
     });
-    return ok({ meeting: canceled, eventSlug: event.value.slug });
+    return canceled;
   };

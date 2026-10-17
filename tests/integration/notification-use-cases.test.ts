@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createGuest } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
 import { createNotificationUseCases } from "@/server/modules/notifications/module";
 import type { Actor } from "@/server/kernel/actor";
 import type { Result } from "@/server/kernel/result";
@@ -17,7 +18,7 @@ const open = (id: string): Actor => ({
 const now = () => new Date();
 
 const notifications = () =>
-  createNotificationUseCases({ repos: getRepositories() });
+  createNotificationUseCases({ repos: getRepositories(), uow: unitOfWork });
 
 function value<T>(result: Result<T>): T {
   if (!result.ok) throw new Error(result.error.code);
@@ -290,6 +291,41 @@ describe("push devices", () => {
       ).toBe("ok");
       expect(
         await getRepositories().push.listSubscriptions(ada.id)
+      ).toHaveLength(1);
+    }
+  );
+
+  it(
+    "keeps a device that moved to someone else while its old owner forgot it",
+    { tags: ["013-US3", "019-US7"] },
+    async () => {
+      const ada = await createGuest();
+      const grace = await createGuest();
+      value(await notifications().subscribeToPush(open(ada.id), DEVICE, now()));
+      const repo = getRepositories().push;
+      const find = repo.findSubscription.bind(repo);
+      let moved = () => {};
+      const handedOver = new Promise<void>((resolve) => (moved = resolve));
+      const slowRead = vi
+        .spyOn(repo, "findSubscription")
+        .mockImplementationOnce(async (endpoint) => {
+          const subscription = await find(endpoint);
+          await handedOver;
+          return subscription;
+        });
+
+      const forgetting = notifications().unsubscribeFromPush(open(ada.id), {
+        endpoint: DEVICE.endpoint,
+      });
+      value(
+        await notifications().subscribeToPush(open(grace.id), DEVICE, now())
+      );
+      moved();
+      value(await forgetting);
+      slowRead.mockRestore();
+
+      expect(
+        await getRepositories().push.listSubscriptions(grace.id)
       ).toHaveLength(1);
     }
   );
