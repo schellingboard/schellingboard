@@ -8,6 +8,7 @@ import {
 } from "@/server/kernel/idempotency";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
 import { testEmail } from "@/emails/test-email";
+import { dispatchDueReminders } from "@/utils/reminder-dispatch";
 import { getImageRepositories } from "@/utils/images";
 import { sendMail } from "@/utils/mailer";
 import { generateVapidKeys } from "@/utils/push";
@@ -215,6 +216,10 @@ export function pageReads() {
     availabilityForms: (guestId: string, now: Date) =>
       availabilityForms(repos, guestId, now),
   };
+}
+
+export function dispatchReminders(now: Date) {
+  return dispatchDueReminders(now, getRepositories());
 }
 
 export function idempotentAction<R extends ActionResult>(

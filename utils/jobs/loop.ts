@@ -17,7 +17,7 @@ import {
   PRUNE_DELIVERIES,
   PRUNE_EVERY_MS,
   PRUNE_IDEMPOTENCY_KEYS,
-  SESSION_NOTIFICATIONS,
+  CHANGE_NOTIFICATIONS,
   type Job,
 } from "./job";
 
@@ -37,9 +37,9 @@ export function defaultJobs(): Job[] {
       ? DEFAULT_REMINDER_INTERVAL_MS
       : Number(configured);
   const jobs: Job[] = [
-    lazy(SESSION_NOTIFICATIONS, undefined, async () => {
-      const { sessionNotifications } = await import("./reactions");
-      return sessionNotifications;
+    lazy(CHANGE_NOTIFICATIONS, undefined, async () => {
+      const { changeNotifications } = await import("./reactions");
+      return changeNotifications;
     }),
     // After the reactions in the same pass, so what they queue goes out in it.
     lazy(DELIVERIES, undefined, async () => {
@@ -68,7 +68,8 @@ export function defaultJobs(): Job[] {
       run: async (now) => {
         const { dispatchDueReminders } =
           await import("@/utils/reminder-dispatch");
-        const summary = await dispatchDueReminders(now);
+        const { getRepositories } = await import("@/db/container");
+        const summary = await dispatchDueReminders(now, getRepositories());
         return summary.notified + summary.sent;
       },
     });
