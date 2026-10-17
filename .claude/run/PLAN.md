@@ -210,7 +210,7 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
 
 ### Built on the above
 
-- [ ] 16. **Pages through queries**: pages, layouts and server actions under `app/`
+- [x] 16. **Pages through queries**: pages, layouts and server actions under `app/`
       that call `getRepositories()` call module queries or use cases; add queries
       where missing.
   - [x] 16a. Site pages, layouts and actions (not admin) onto `pageReads()`
@@ -218,7 +218,7 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
         (`actions/user-auth.ts`, `auth/login`, `auth/reset`) stay on the repositories
         for the allow-list.
   - [x] 16b. Admin pages and layouts (12 files under `app/admin/`).
-  - [ ] 16c. A dependency-cruiser rule forbidding `app/` → `db/container`, with an
+  - [x] 16c. A dependency-cruiser rule forbidding `app/` → `db/container`, with an
         allow-list for the auth flows (step 6 of the path), and a rule allowing
         `adminReads` only from `app/admin/**` and `app/actions/admin-*`.
 - [ ] 17. **`Idempotency-Key` from the UI (#141)**: the create forms (proposal,
@@ -237,6 +237,9 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
 
 ## Next to plan
 
+- Move the `utils/` helpers that still call `getRepositories()` (`acting-guest`,
+  `meeting-views`, `meeting-options`, `meeting-availability-form`, `guest-clashes`,
+  `reminder-dispatch`) behind module queries; then extend the 16c rule to them.
 - Step 5: an ADR for the SPA (Vite and TanStack Router, how Next serves it during the
   move, commands with `command_key`, IndexedDB), then the screen-family order.
 - Inline `after()` notifications in `server/composition.ts` onto reactions.

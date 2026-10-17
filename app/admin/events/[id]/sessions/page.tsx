@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
-import { adminReads, pageReads } from "@/server/composition";
+import { adminReads } from "@/server/admin-reads";
+import { pageReads } from "@/server/composition";
 import { outOfRangePageRedirect, parsePage } from "@/utils/pagination";
 import { formatDayLabel } from "@schellingboard/domain/time";
 import { requireAdminPage } from "../../../require-admin";

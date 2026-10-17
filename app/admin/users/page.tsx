@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { adminReads } from "@/server/composition";
+import { adminReads } from "@/server/admin-reads";
 import { SECONDARY_BUTTON } from "../buttons";
 import { outOfRangePageRedirect, parsePage } from "@/utils/pagination";
 import { requireAdminPage } from "../require-admin";

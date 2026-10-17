@@ -771,6 +771,13 @@ None.
   as in 16a. Only the three auth-flow files still call `getRepositories()`.
   Not run: E2E (user's rule).
 
+## 16c
+
+- Rules `app-does-not-read-repositories` (auth flows allow-listed) and
+  `admin-reads-only-for-admin`. depcruise cannot restrict a named export, so
+  `adminReads()` moved to `server/admin-reads.ts`. The rule catches direct
+  imports only; `utils/` helpers still reach the container (follow-up in PLAN.md).
+
 ## Next step
 
-16c: the dependency-cruiser rule.
+17.
