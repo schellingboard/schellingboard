@@ -143,6 +143,51 @@ export abstract class BaseImageResourceRepository<Id extends string> {
   }
 
   /**
+   * Stores the image under a name of its own, leaving any earlier file for
+   * the ID alone until the row that names it has moved on.
+   */
+  async saveNew(id: Id, buffer: Buffer, ext: string): Promise<string> {
+    const dir = this.dirPath;
+    await fs.mkdir(dir, { recursive: true });
+    const filename = `${id}-${crypto.randomUUID()}.${ext}`;
+    await fs.writeFile(
+      path.join(/*turbopackIgnore: true*/ dir, filename),
+      buffer
+    );
+    return this.getEndpoint(filename);
+  }
+
+  async deleteByUrl(url: string): Promise<void> {
+    const filename = path.posix.basename(url.split("?")[0]);
+    if (!SAFE_FILENAME.test(filename)) return;
+    const [stem] = splitExtension(filename);
+    const dir = this.dirPath;
+    let entries: string[];
+    try {
+      entries = await fs.readdir(dir);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT")
+        console.error(`Could not delete ${filename}; delete it by hand`, error);
+      return;
+    }
+    await Promise.all(
+      entries
+        .filter((name) => name === filename || name.startsWith(`${stem}.`))
+        .map((name) =>
+          fs
+            .unlink(path.join(/*turbopackIgnore: true*/ dir, name))
+            .catch((error: NodeJS.ErrnoException) => {
+              if (error.code !== "ENOENT")
+                console.error(
+                  `Could not delete ${name}; delete it by hand`,
+                  error
+                );
+            })
+        )
+    );
+  }
+
+  /**
    * Resolves a requested filename to a stored image, guarding against path
    * traversal. Returns undefined for invalid or missing files.
    */

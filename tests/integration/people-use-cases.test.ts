@@ -14,6 +14,7 @@ import {
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createGuest } from "../helpers/factories";
 import { createImageFile } from "../helpers/utils";
+import { uowFailingAt } from "../helpers/changes";
 import { getRepositories } from "@/db/container";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
 import { createPeopleUseCases } from "@/server/modules/people/module";
@@ -32,13 +33,17 @@ const verified = (id: string): Actor => ({
 });
 const now = () => new Date();
 
-const people = () =>
+const people = (uow = unitOfWork) =>
   createPeopleUseCases({
     repos: getRepositories(),
     avatars: getImageRepositories().avatars,
     sendTestEmail: async () => {},
-    uow: unitOfWork,
+    uow,
   });
+
+const storedPhotos = () => fs.readdirSync(path.join(uploadsDir, "avatars"));
+const photoFile = (url: string | null | undefined) =>
+  path.join(uploadsDir, "avatars", path.basename(url!.split("?")[0]));
 
 function value<T>(result: Result<T>): T {
   if (!result.ok) throw new Error(result.error.code);
@@ -174,7 +179,7 @@ describe("editing one's own profile", () => {
           now()
         )
       );
-      expect(withPhoto.avatarUrl).toMatch(/^\/media\/avatars\/.+\.png\?v=\d+$/);
+      expect(withPhoto.avatarUrl).toMatch(/^\/media\/avatars\/.+\.png$/);
 
       const kept = value(
         await people().updateMyProfile(
@@ -248,6 +253,96 @@ describe("editing one's own profile", () => {
 
       expect(code(uploaded)).toBe("profile.notFound");
       expect(fs.readdirSync(path.join(uploadsDir, "avatars"))).toEqual([]);
+    }
+  );
+});
+
+describe("keeping photo files in step with profiles", () => {
+  it(
+    "keeps the old photo when an upload is refused as stale",
+    { tags: ["011-US2", "019-US7"] },
+    async () => {
+      const ada = await createGuest({ name: "Ada" });
+      const photo = value(
+        await people().replaceMyAvatar(
+          open(ada.id),
+          { image: await png(256), expectedVersion: ada.profileVersion },
+          now()
+        )
+      );
+      const before = fs.readFileSync(photoFile(photo.avatarUrl));
+
+      const lost = await people().replaceMyAvatar(
+        open(ada.id),
+        { image: await png(300), expectedVersion: ada.profileVersion },
+        now()
+      );
+
+      expect(code(lost)).toBe("profile.versionConflict");
+      expect(storedPhotos()).toEqual([
+        path.basename(photoFile(photo.avatarUrl)),
+      ]);
+      expect(fs.readFileSync(photoFile(photo.avatarUrl))).toEqual(before);
+    }
+  );
+
+  it(
+    "deletes the new file when the save fails",
+    { tags: ["011-US2", "019-US7"] },
+    async () => {
+      const ada = await createGuest({ name: "Ada" });
+      await expect(
+        people(uowFailingAt("guests", "updateProfile")).replaceMyAvatar(
+          open(ada.id),
+          { image: await png(256), expectedVersion: ada.profileVersion },
+          now()
+        )
+      ).rejects.toThrow();
+      expect(storedPhotos()).toEqual([]);
+    }
+  );
+
+  it(
+    "deletes the old file once a new photo is saved",
+    { tags: ["011-US2"] },
+    async () => {
+      const ada = await createGuest({ name: "Ada" });
+      const first = value(
+        await people().replaceMyAvatar(
+          open(ada.id),
+          { image: await png(256), expectedVersion: ada.profileVersion },
+          now()
+        )
+      );
+      const second = value(
+        await people().replaceMyAvatar(
+          open(ada.id),
+          { image: await png(300), expectedVersion: first.profileVersion },
+          now()
+        )
+      );
+      expect(storedPhotos()).toEqual([
+        path.basename(photoFile(second.avatarUrl)),
+      ]);
+    }
+  );
+
+  it(
+    "deletes a guest's photo with the guest",
+    { tags: ["016-US1"] },
+    async () => {
+      const ada = await createGuest({ name: "Ada" });
+      value(
+        await people().replaceMyAvatar(
+          open(ada.id),
+          { image: await png(256), expectedVersion: ada.profileVersion },
+          now()
+        )
+      );
+      value(
+        await people().deleteGuest({ admin: true, guest: null }, { id: ada.id })
+      );
+      expect(storedPhotos()).toEqual([]);
     }
   );
 });

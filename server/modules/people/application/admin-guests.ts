@@ -177,14 +177,18 @@ export const updateGuest =
   };
 
 export const deleteGuest =
-  ({ uow }: PeopleDeps) =>
+  ({ uow, avatars }: PeopleDeps) =>
   async (actor: Actor, input: { id: string }): Promise<Result<void>> => {
     if (!actor.admin) return adminRequired();
-    return uow.run(async (tx) => {
-      if (!(await tx.guests.findById(input.id))) return guestNotFound();
+    const deleted = await uow.run(async (tx) => {
+      const guest = await tx.guests.findById(input.id);
+      if (!guest) return guestNotFound();
       await tx.guests.delete(input.id);
-      return ok(undefined);
+      return ok(guest.avatarUrl);
     });
+    if (!deleted.ok) return deleted;
+    if (deleted.value) await avatars.deleteByUrl(deleted.value);
+    return ok(undefined);
   };
 
 export const sendTestEmail =

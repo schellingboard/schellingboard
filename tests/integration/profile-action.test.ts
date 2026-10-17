@@ -169,9 +169,13 @@ describe("updateProfileAction", () => {
       pronouns: "they/them",
     });
     expect(updated?.avatarUrl).toMatch(
-      new RegExp(`^/media/avatars/${updated?.id}\\.png\\?v=\\d+$`)
+      new RegExp(`^/media/avatars/${updated?.id}-[0-9a-f-]+\\.png$`)
     );
-    const imagePath = path.join(uploadsDir, "avatars", `${updated?.id}.png`);
+    const imagePath = path.join(
+      uploadsDir,
+      "avatars",
+      path.basename(updated!.avatarUrl!)
+    );
     expect(fs.existsSync(imagePath)).toBe(true);
   });
 
@@ -186,7 +190,11 @@ describe("updateProfileAction", () => {
     });
     expect(result).toEqual({ ok: true });
     const updated = await getRepositories().guests.findById(guest.id);
-    const imagePath = path.join(uploadsDir, "avatars", `${updated?.id}.png`);
+    const imagePath = path.join(
+      uploadsDir,
+      "avatars",
+      path.basename(updated!.avatarUrl!)
+    );
     expect(fs.existsSync(imagePath)).toBe(true);
     const imageMetadata = await sharp(fs.readFileSync(imagePath)).metadata();
     expect(imageMetadata).toMatchObject({
@@ -207,7 +215,11 @@ describe("updateProfileAction", () => {
     });
     expect(result).toEqual({ ok: true });
     const updated = await getRepositories().guests.findById(guest.id);
-    const imagePath = path.join(uploadsDir, "avatars", `${updated?.id}.png`);
+    const imagePath = path.join(
+      uploadsDir,
+      "avatars",
+      path.basename(updated!.avatarUrl!)
+    );
     const imageMetadata = await sharp(fs.readFileSync(imagePath)).metadata();
     expect(imageMetadata).toMatchObject({ width: 512, height: 512 });
   });
@@ -223,7 +235,11 @@ describe("updateProfileAction", () => {
     });
     expect(result).toEqual({ ok: true });
     const updated = await getRepositories().guests.findById(guest.id);
-    const imagePath = path.join(uploadsDir, "avatars", `${updated?.id}.png`);
+    const imagePath = path.join(
+      uploadsDir,
+      "avatars",
+      path.basename(updated!.avatarUrl!)
+    );
     const imageMetadata = await sharp(fs.readFileSync(imagePath)).metadata();
     expect(imageMetadata).toMatchObject({ width: 400, height: 400 });
   });

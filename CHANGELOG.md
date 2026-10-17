@@ -29,6 +29,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **Deleting a guest deletes their photo too**: it used to stay on the server.
 - **Edits no longer overwrite each other** (#1111): saving a session, event setting,
   profile, guest, day, room or meeting point from a form someone changed in the
   meantime now says so, instead of silently undoing their change.

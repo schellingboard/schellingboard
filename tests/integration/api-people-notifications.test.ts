@@ -221,7 +221,7 @@ describe("/api/v1 profiles", () => {
       const uploaded = await upload();
       expect(uploaded.status).toBe(200);
       const body = (await uploaded.json()) as { avatarUrl: string };
-      expect(body.avatarUrl).toMatch(/^\/media\/avatars\/.+\.png\?v=\d+$/);
+      expect(body.avatarUrl).toMatch(/^\/media\/avatars\/.+\.png$/);
       expect(await (await upload()).json()).toEqual(body);
 
       const removed = await call("DELETE", "/me/avatar?expectedVersion=2", {
