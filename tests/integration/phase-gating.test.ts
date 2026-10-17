@@ -39,7 +39,7 @@ import type { SessionParams } from "@/app/api/session-form-utils";
 import { POST as addVote } from "@/app/api/add-vote/route";
 import { POST as addSession } from "@/app/api/add-session/route";
 import { POST as toggleRsvp } from "@/app/api/toggle-rsvp/route";
-import { createProposal } from "@/app/(site)/[eventSlug]/proposals/actions";
+import { createProposal } from "@/app/legacy/(site)/[eventSlug]/proposals/actions";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 
 // Server-side phase gating mirrors the UI: voting only during the voting

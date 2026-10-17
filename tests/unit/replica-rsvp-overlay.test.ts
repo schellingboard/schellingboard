@@ -1,6 +1,6 @@
 // @module-tag 007-US8
 import { describe, it, expect } from "vitest";
-import { apply } from "@/app/(site)/[eventSlug]/replica/apply";
+import { apply } from "@/app/legacy/(site)/[eventSlug]/replica/apply";
 import {
   dropFrom,
   expirePendingRsvps,
@@ -8,7 +8,7 @@ import {
   settlePendingRsvps,
   withPendingRsvps,
   type PendingRsvp,
-} from "@/app/(site)/[eventSlug]/replica/rsvp-overlay";
+} from "@/app/legacy/(site)/[eventSlug]/replica/rsvp-overlay";
 import { snapshot } from "../helpers/snapshot-fixture";
 
 const pendingAdd: PendingRsvp = {

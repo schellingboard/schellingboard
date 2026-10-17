@@ -1,6 +1,6 @@
 // @module-tag 007-US8
 import { describe, it, expect } from "vitest";
-import { createReplicaStore } from "@/app/(site)/[eventSlug]/replica/store";
+import { createReplicaStore } from "@/app/legacy/(site)/[eventSlug]/replica/store";
 import { snapshot } from "../helpers/snapshot-fixture";
 
 describe("replica store", () => {

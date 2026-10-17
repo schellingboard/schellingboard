@@ -56,7 +56,7 @@ kept in the database, so a restored backup keeps working.
 ## Administration
 
 Events, guests, locations, and content moderation are managed through the web
-admin UI at `/admin`. Set `ADMIN_PASSWORD` (and `AUTH_SECRET`) to enable it.
+admin UI at `/legacy/admin`. Set `ADMIN_PASSWORD` (and `AUTH_SECRET`) to enable it.
 See the [Admin UI guide](../organizers/admin-guide.md) for what's configurable,
 and [How it works](../organizers/how-it-works.md) for the phase model and
 attendee-facing behavior.

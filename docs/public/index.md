@@ -26,7 +26,7 @@ The attendee guide is the page worth sharing with your attendees.
 - [How it works](organizers/how-it-works.md) — phases, who may change what,
   voting and scheduling rules, kiosk mode, multi-event installs, and which
   emails get sent.
-- [Admin UI guide](organizers/admin-guide.md) — every setting in `/admin`:
+- [Admin UI guide](organizers/admin-guide.md) — every setting in `/legacy/admin`:
   events, days, locations, guests, proposals, and sessions.
 
 ## Self-hosting

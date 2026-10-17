@@ -141,7 +141,7 @@ module.exports = {
         path: "^(app|utils)/",
         pathNot: [
           "^app/actions/user-auth\\.ts$",
-          "^app/\\(site\\)/auth/(login|reset)/page\\.tsx$",
+          "^app/legacy/\\(site\\)/auth/(login|reset)/page\\.tsx$",
           "^utils/jobs/",
           "^utils/(notifications|push)\\.ts$",
         ],
@@ -153,7 +153,7 @@ module.exports = {
       severity: "error",
       comment:
         "`adminReads()` checks nothing itself, so only admin pages and actions may use it.",
-      from: { pathNot: "^(app/admin/|app/actions/admin-)" },
+      from: { pathNot: "^(app/legacy/admin/|app/actions/admin-)" },
       to: { path: "^server/admin-reads\\.ts$" },
     },
     {

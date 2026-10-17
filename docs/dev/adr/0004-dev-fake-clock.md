@@ -60,7 +60,7 @@ that pulls the cookie via `next/headers`.
 
 ### Thread `now` into the phase logic
 
-The phase helpers in `app/(site)/utils/events.ts` take a **required**
+The phase helpers in `app/legacy/(site)/utils/events.ts` take a **required**
 `now: Date` parameter instead of calling `Date.now()` internally. A required
 parameter (rather than an optional `= new Date()` default) is intentional: the
 compiler then forces every call site to supply the effective clock, so faking
@@ -121,7 +121,7 @@ already read `EventContext.now`, they follow the fake clock for free after a
 
 ### Toolbar
 
-A client component (`app/(site)/dev-toolbar.tsx`) gated by `SB_ENABLE_DEV_TOOLS`
+A client component (`app/legacy/(site)/dev-toolbar.tsx`) gated by `SB_ENABLE_DEV_TOOLS`
 (checked in the server layout, so no `NEXT_PUBLIC_` is needed) and shown when
 `?dev=1` is present. It offers _real time_ (clear cookie), `+1h` / `+1d` /
 `+7d`, a date/time picker, and dismiss (to hide for screenshots). Each control

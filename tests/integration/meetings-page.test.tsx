@@ -36,13 +36,13 @@ vi.mock("next/navigation", () => ({
 
 // A client component that reads router search params; the page only decides
 // whether to render it.
-vi.mock("@/app/(site)/[eventSlug]/meeting-modal", () => ({
+vi.mock("@/app/legacy/(site)/[eventSlug]/meeting-modal", () => ({
   MeetingModalFromUrl: ({ readOnly }: { readOnly?: boolean }) =>
     `MEETING_MODAL_STUB${readOnly ? " READ_ONLY" : ""}`,
 }));
 // The modal reads the viewer's meetings from this provider, so the page has to
 // render it inside one for the meeting to load at all.
-vi.mock("@/app/(site)/[eventSlug]/use-meetings", () => ({
+vi.mock("@/app/legacy/(site)/[eventSlug]/use-meetings", () => ({
   MeetingsProvider: ({ children }: { children: ReactNode }) => (
     <div data-provider>{children}</div>
   ),
@@ -60,7 +60,7 @@ async function renderPage(
   searchParams: { viewMeeting?: string } = {}
 ): Promise<string> {
   const { default: MeetingsPage } =
-    await import("@/app/(site)/[eventSlug]/meetings/page");
+    await import("@/app/legacy/(site)/[eventSlug]/meetings/page");
   return renderToStaticMarkup(
     await MeetingsPage({
       params: Promise.resolve({ eventSlug }),
@@ -105,7 +105,7 @@ describe("the meetings page", () => {
     });
 
     await expect(renderPage(event.slug)).rejects.toThrow(
-      new RegExp(`NEXT_REDIRECT;/${event.slug}$`)
+      new RegExp(`NEXT_REDIRECT;/legacy/${event.slug}$`)
     );
   });
 
@@ -119,7 +119,7 @@ describe("the meetings page", () => {
 
     await expect(
       renderPage(event.slug, { viewMeeting: "any-id" })
-    ).rejects.toThrow(`NEXT_REDIRECT;/${event.slug}?viewMeeting=any-id`);
+    ).rejects.toThrow(`NEXT_REDIRECT;/legacy/${event.slug}?viewMeeting=any-id`);
   });
 
   // Before then the schedule redirects to the proposals, and the meeting

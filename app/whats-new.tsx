@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { DateTime } from "luxon";
 import { Modal } from "./components/modal";
-import { InlineMarkdown } from "./(site)/markdown";
+import { InlineMarkdown } from "@/app/legacy/(site)/markdown";
 import {
   releaseNotes,
   SHOWN_RELEASES,

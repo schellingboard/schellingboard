@@ -101,6 +101,21 @@
   `.next/BUILD_ID` (version outside a production build; untested in Docker).
 - Release notes moved to `packages/domain/src/release-notes.ts`.
 
+## Step 8 (2026-10-08)
+
+- `basePath` was refused by this Next (root rewrites to internal paths), so the user
+  chose `app/legacy/` (ADR 0015 amended in its own commit). `(login)`, `(site)` and
+  `admin` pages moved there; `proxy.ts` redirects any root path other than `/api`
+  and `/media` to `/legacy` + path (query kept) and runs its gates on the path
+  without the prefix. Static public files and `sw.js` are excluded by the matcher.
+- Notification links stay root-relative for email and push; the in-app open action
+  redirects to `/legacy` + url directly (a root hop dropped the profile modal).
+- Review: the proxy matcher also skips `one-on-one.webp` (root `<img>` path); unused
+  `next.svg`/`vercel.svg` removed; `legacy` is a reserved event slug; the manifest keeps
+  `start_url: "/"` (redirects, and the SPA will own it) and the pinned `id`. No E2E for
+  the picture: it only shows when rooms have images, which no spec sets up.
+- E2E fixes were URL assertions only (`/login`, `/guests`, a slug prefix).
+
 ## Questions
 
 - A session that loses its only room reads `"X" moved to No location (was Room A)`
@@ -112,4 +127,4 @@
 
 ## Next step
 
-8.
+9.

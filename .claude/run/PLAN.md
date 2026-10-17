@@ -1,260 +1,149 @@
-# Run plan: unit of work, the rest of step 3, the change feed and snapshot
+# Run plan: leftovers of steps 3 and 4, then the SPA schedule (path step 5)
 
-Goal: finish [step 3](../../docs/dev/target-architecture/10-path-from-here.md) and do
-step 4: the schedule updates without a reload for everyone (#1111). The rest of the UI
-does not change. The new architecture is the basis for future work: get each contract
-right once rather than keep it compatible.
+Goal: close what the feed run left open, then move the schedule and the session
+modal to the SPA as [ADR 0015](../../docs/dev/adr/0015-spa-alongside-next.md)
+says. Every step leaves the app shippable.
 
-Read first: `docs/dev/target-architecture/03-server.md` (Use cases, Change log, Change
-feed and snapshot), `04-client.md` (The replica), `05-security.md` (Authorization),
-`06-data-and-time.md`, ADRs 0011 and 0012, `docs/dev/server.md`.
+Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
+`docs/dev/server.md`, `docs/dev/testing.md`.
 
-## Settled before the run
+## Settled before the run (the user, 2026-10-08)
 
-- Order: the unit of work first; then the API contract changes (versions, pagination),
-  so change payloads are right from their first version; then the feed; then what
-  builds on the snapshot.
-- `/api/v1` may change in breaking ways. Mark each break in CHANGELOG (as 4.0.0 did),
-  in the step that makes it. User-facing steps update CHANGELOG and `docs/public/` in
-  their own commit; step 18 only checks them.
-- The feed is SSE, served by the existing Hono mount `app/api/v1/[[...route]]`. No
-  custom server, no WebSockets (D7).
-- Next and SSR stay. The schedule (grid, agenda, kiosk, session modal) reads from a
-  client replica seeded with the snapshot during SSR and kept current by the feed. No
-  other screen changes.
-- Use cases record changes with `tx.record()` in the same transaction as the state. The
-  audience is computed at write time and stored. Payloads carry the subject's full
-  state as the audience may see it.
-- Snapshot RSVPs: per-session counts plus the viewer's own RSVPs. Protected guests' RSVP
-  lists stay out of every browser; the session modal keeps fetching its attendee list.
-- Identity stays as in ADR 0012: cookies, guest and admin actors. Audiences use what
-  today's model has: everyone in the event, named guests, admins.
-- Out of scope: the SPA, commands with predictions, IndexedDB and offline (step 5);
-  proposals, votes, comments and notifications in the replica; `publicSchedule`;
-  persons and roles (step 6); moving the inline `after()` notifications to reactions.
+- ADR 0015 is accepted as written. Do not reopen its decisions.
+- `GET /guests?eventId=` stays limited to admins and the event's guests.
+- The session modal's attendee list does not update live; it refetches on open.
+- RSVPed guests are notified when a day or location delete removes or changes
+  their sessions (answers ADR 0014 open question 1).
+- #788 (upstream release check) is in this run, separate from the SPA's
+  build-id reload offer.
+- No pushes, no PRs. Commits stay local, stacked.
+- Checks per step: `make format lint arch openapi-check typecheck test`. UI
+  steps also run their E2E specs. Full `make test-e2e` where a step says so;
+  `make test-e2e-docker` where a step says so.
 
 ## Steps
 
-### Unit of work
+### Baseline
 
-- [x] 1. **ADR 0013, unit of work** (Status: Proposed; decided (a) on 2026-10-06).
-      `uow.run(async (tx) => …)`: one
-      transaction per use case; `tx` holds the repositories and `record(change)`; after
-      commit and before the writer lock is released, `publish` to in-process
-      subscribers (the jobs nudge now, the feed hub later), so subscribers see changes
-      in `seq` order. The constraint to settle: better-sqlite3 transactions are
-      synchronous and per connection, the ports are async, and an `await` inside an
-      open transaction lets other requests' statements on that connection join it.
-      Facts that bear on it: the SQLite repositories are already synchronous behind
-      async signatures; better-sqlite3 blocks the event loop, so a second connection in
-      the same process gives isolation but no parallelism; the database is not in WAL
-      mode today; the test helpers (`tests/helpers/db.ts`) restore an in-memory
-      database from a buffer, which a second connection cannot open. Options: (a) one
-      writer connection behind an in-process async mutex, queries on a separate read
-      connection (needs WAL and file-backed test databases); (b) synchronous
-      transaction callbacks with sync tx repositories; (c) one connection, one async
-      mutex: `uow.run` for writes, `uow.read` for multi-statement reads that must be
-      consistent (the snapshot), single-statement queries outside both.
-      The ADR sets out the trade-offs of each (isolation, throughput, test helpers,
-      WAL in production, effect on the snapshot's read transaction) for the user to
-      decide; until decided, record it under Questions and continue with steps that
-      do not depend on it (4 to 7).
-- [x] 2. **Kernel unit of work**: as the ADR says. The user chose option (a) on
-      2026-10-06; record it in ADR 0013's Decision (a new commit: step 1's is pushed).
-  - [x] 2a. Connections: WAL in production, one writer connection behind an in-process
-        async mutex, a read connection; file-backed test databases in
-        `tests/helpers/db.ts`. Every repository write takes the mutex. Test: a read
-        never sees uncommitted rows; concurrent writes serialize.
-  - [x] 2b. `uow.run(async (tx) => …)` with `tx.record()` and `publish` after
-        commit; `uow.read` on the read connection. Move session change logging out of
-        `SqliteSessionsRepository` into the session use cases; the nudge becomes a
-        subscriber. Test: a rollback writes neither state nor change.
-- [x] 3. **Atomic multi-repository use cases**: every use case that writes through more
-      than one repository call runs in `uow.run`. Test each by making its second write
-      fail. One commit per family; skip a family with no such use case:
-  - [x] 3a. Sessions and RSVPs (admin session create with guest and location assignment,
-        RSVP with event assignment).
-  - [x] 3b. Proposals, votes, comments (admin proposal create, …).
-  - [x] 3c. Events, days, venue.
-  - [x] 3d. People, meetings, notifications, settings.
+- [x] 1. **Full test run** on the current stack: `make test-e2e` and
+      `make test-e2e-docker` (check mailpit first). Record results in PROGRESS.md.
+      A failure caused by the last run's commits gets its own fix step, inserted
+      here, before anything else.
 
-### API contracts
+### Leftovers
 
-- [ ] 4. **`expectedVersion`**: a `version` column on editable rows (sessions,
-      proposals, events, days, locations, meeting points, guest profiles). A repository
-      update is a compare-and-set (`WHERE version = ?`, `version = version + 1`).
-  - 4a. Server: edits take `expectedVersion` (required on `/api/v1`); a mismatch is
-    `409 <subject>.versionConflict` with the current state in the problem member
-    `current` (recorded in ADR 0012). Responses carry `version`. Server actions pass
-    the version through, optional until 4b. One commit each, each with its own
-    migration; one CHANGELOG bullet, extended by each:
-    - [x] 4a1. The shared conflict failure; sessions and proposals (guest and admin).
-    - [x] 4a2. Events (edit and phases) and days.
-    - [x] 4a3. Locations and meeting points.
-    - [x] 4a4. Guest profiles (`/me/profile`, `/me/avatar`, `/admin/guests/{id}`).
-  - 4b. UI: the session and proposal edit forms send the version they loaded and say
-    "changed by someone else".
-- [ ] 5. **Pagination (#831)**: one cursor contract (`limit` and `cursor` in, `{ items,
-nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
-      proposals, guests (directory, admin), comments, notifications. Record the
-      contract in ADR 0012. UI pagination waits for step 5 of the path.
-- [ ] 6. **Location images and push key in the API**: `PUT` and `DELETE
-/api/v1/admin/locations/{id}/image` (multipart, existing images port) and
-      `GET /api/v1/push/key`. The admin location form and the settings page call the
-      same use cases.
-- [ ] 7. **Rate limiting (#679)**: in-memory token bucket per actor, else per IP; one
-      kernel function used by Hono middleware and by the login server actions; strict
-      limits on guest and admin password login; `429 rate.limited` with `Retry-After`.
-      Read the client IP from `X-Forwarded-For` only when a documented trusted-proxy
-      setting allows it.
+- [x] 2. **No "Reconnecting…" flicker** when the feed ends its 10-minute stream:
+      a planned end and an immediate successful reconnect stay `live`; only a
+      reconnect that takes longer than a short grace shows `reconnecting`. Unit
+      test in the sync-state tests.
+- [x] 3. **`utils/` helpers behind module queries**: `acting-guest`,
+      `meeting-views`, `meeting-options`, `meeting-availability-form`,
+      `guest-clashes`, `reminder-dispatch` stop calling `getRepositories()`; then
+      extend the 16c dependency-cruiser rule to `utils/` (jobs, deliveries,
+      notifications and push infrastructure allow-listed with a reason). Split
+      per helper group if one commit gets too big.
+- [x] 4. **Inline notifications onto reactions**: the `after()` notifications
+      in `server/composition.ts` (proposal joined, commented, co-hosts added,
+      meeting requested and outcome) become jobs-loop reactions to recorded
+      changes. Record the change types they need. Reactions are idempotent.
+      One commit per family (4a proposals and comments, 4b sessions, 4c
+      meetings). Test each: the use case records the change; the reaction
+      notifies once, also when run twice.
+- [x] 5. **Tell attendees about cascades**: a day or location delete that removes
+      or changes a session notifies its RSVPed guests (in-app, plus email and
+      push as their settings allow). Event and guest deletes stay silent. Mark
+      ADR 0014 open question 1 answered and document it in `docs/dev/server.md`.
+      CHANGELOG, `docs/public/`.
 
-### Change feed and snapshot (#1111)
+### SPA preparation, inside Next
 
-- [x] 8. **ADR 0014, change feed and snapshot** (Status: Proposed). Settle:
-  - the change types the replica needs and their payloads (with `version`); the feed
-    sends a per-type projection, so reaction-only fields (`before`, `rsvpGuestIds`)
-    never reach a client;
-  - who receives guest-addressed changes: the verified guest only, as
-    `verifiedCurrentUser` decides today;
-  - RSVP changes have two audiences: everyone gets the session's new count, only the
-    guest gets their own RSVP. One change per audience, or one change with a
-    per-audience projection;
-  - state derived from the clock, not from a change (a meeting lapses at its slot
-    start, `myMeetingsFor(…, now)`): derived on the client from raw data and the
-    clock, or a scheduled job records a change;
-  - change rows written before the audience column: sent to no one;
-  - one `EventSource` per tab: HTTP/1.1 allows six connections per origin, so many
-    tabs over HTTP/1.1 block each other. Say what self-hosters need (HTTP/2 at the
-    proxy) or close the feed in hidden tabs;
-  - the snapshot: today's `EventContext` (event, days, sessions, locations, room
-    unavailability, event guests' public fields; `me`: own RSVPs, own meetings);
-  - denormalized fields (host names on sessions, `numRsvps`): normalized in the replica,
-    or changes emitted for the sessions they touch;
-  - sessions removed by a day, event or location cascade: one change each, or removed by
-    `apply`;
-  - consistency: snapshot and its `seq` read in one read transaction;
-  - the feed: `GET /api/v1/events/{slug}/feed`, `Last-Event-ID` or `?since`, 25 s
-    heartbeat, `X-Accel-Buffering: no`, `410` below a prune watermark (rows are deleted
-    after 7 days, and `occurred_at` follows the fake clock, so it is not monotonic); the
-    viewer is fixed per connection, and a user switch reconnects;
-  - the hub: in-process, on `globalThis` like `nudgeJobs`;
-  - where `apply` (in `packages/domain`) and the client store live.
-- [x] 9. **Change log columns**: a migration adds `audience`, `command_key` and
-      `correlation_id`. `tx.record()` computes the audience with `audienceOf` in
-      `domain`. The idempotency middleware hands `Idempotency-Key` to the unit of work,
-      so changes carry `command_key`. The existing session changes get audiences.
-- [x] 10. **Snapshot**: contract in `packages/contracts`; a query that assembles it
-      from module queries (`server/feed/`, with a dependency-cruiser rule);
-      `GET /api/v1/events/{slug}/snapshot`; `layout-content.tsx` uses the query, not
-      the repositories. Golden-file tests per viewer: site password only, open guest,
-      open cookie naming a protected guest, verified guest, admin.
-  - [x] 10a. The query: the contract (`packages/contracts/src/snapshot.ts`),
-        module queries, `server/feed/snapshot.ts` in one `uow.read` with the
-        newest `seq`, the dependency-cruiser rule. Integration tests of the
-        query: normalized shape, event guests, `me` per viewer id, `seq`.
-  - [x] 10b. `GET /api/v1/events/{slug}/snapshot` (viewer as the SSR decides
-        it), OpenAPI; the golden-file tests per viewer.
-  - [x] 10c. `layout-content.tsx` reads through the query; selectors in
-        `app/(site)/[eventSlug]/replica/` rebuild today's `EventContext`
-        shapes (`packages/domain` may not import the contracts).
-- [x] 11. **`apply` and the sufficiency harness**: `apply(replica, change)`, pure, in
-      `app/(site)/[eventSlug]/replica/` (ADR 0014 section 12): upsert or delete per type, ignore `seq ≤ replica.seq`, skip
-      unknown types. A test helper: snapshot before, run a use case, apply the logged
-      changes, compare with the snapshot after. Property test: replay is idempotent
-      (see #1169).
-- [ ] 12. **Log every change the schedule shows**, through `tx.record()`, each type
-      with its `apply` case and a sufficiency test. Existing reactions ignore the new
-      types.
-  - [x] 12a. Sessions (create, change, delete, cascades) and RSVPs (add, remove, with the
-        session's new count).
-  - [x] 12b. Events and days (settings, phases, meeting settings, day edits, event and
-        day deletes), and the `cascade: true` marker with the session cascades they cause.
-        Split from the original 12b: every use case needs the request clock threaded in.
-  - [x] 12c. Locations and their event assignment, room unavailability, and the session
-        cascades of a location delete.
-  - [x] 12d. Guests joining or leaving an event, public profile edits; meetings (audience:
-        the two guests) and meeting points.
-- [x] 13. **Feed endpoint and hub**: replay from the table, then live from the hub in
-      `seq` order; audience filter per connection; heartbeat; `410`; cleanup on
-      disconnect. OpenAPI documents it as `text/event-stream` with the message schema.
-      Integration tests: resume, audience, `410`, order under concurrent writes.
-  - [x] 13a. Hub and feed core (no HTTP): the change-log watermark (pruning stops at
-        the first change too new), `listEventAfter`, `openFeed` (reset check, replay,
-        then live, audience filter, order under concurrent writes).
-  - [x] 13b. The route: `GET /events/{slug}/feed` as `text/event-stream` (`id`, `event`,
-        heartbeat, `reset` event, `Last-Event-ID` over `?since=`, `400` with neither,
-        headers), the 10-minute limit, cleanup on abort; OpenAPI; docs.
-  - [x] 13c. The 1 MB slow-client cap and closing a guest's connections on
-        credential changes.
-- [ ] 14. **Replica on the schedule** (split 14a-14d): a client store seeded with the SSR snapshot and
-      fed by `EventSource`; `EventContext` derives its values from it. A reconnect
-      resumes; `410` refetches the snapshot; a user switch reloads snapshot and feed.
-      The RSVP optimistic update reconciles with the feed's echo, never counts twice.
-      Selectors skip a room the replica no longer holds (`location.removed` leaves
-      sessions' links and unavailability rows); a replica test shows it.
-      E2E: two browser contexts; one creates, moves and deletes a session and RSVPs,
-      the other sees each change without a reload. Kiosk included.
-  - [x] 14a. Store (`replica/store.ts`), feed client (`replica/feed-client.ts`:
-        `EventSource`, `reset` reloads the snapshot), selectors skip a removed
-        room; no React yet.
-  - [x] 14b. `EventContext` derives from the store (`useLiveReplica`), user
-        switch, `event.deleted` state; CHANGELOG and docs (the schedule is live).
-  - [x] 14b2. Visibility close/reopen after 30 s hidden, an `EventSource` that
-        closes for good (401/404: refetch the snapshot, back off), slug change. A dead
-        stream plus a hard refresh whose seed has a lower seq stays stale: handle there.
-  - [x] 14c. RSVP echo reconciliation (replaces the count deltas), and the
-        meetings column's debounced refetch.
-  - [x] 14d. E2E: two browser contexts, kiosk included.
-- [x] 15. **Sync state**: an indicator on the schedule (live, reconnecting, stale), so
-      a stale schedule never looks current (ADR 0006). `fixes #1111`.
+- [x] 6. **RSVP rule in `packages/domain`**: the policy the RSVP use case runs
+      (phase, capacity, guest state) moves to domain as a pure function returning
+      a reason code; the server calls it. Unit tests in domain.
+- [x] 7. **API for the shell**:
+  - [x] 7a. Choosing an open guest name and signing out under `/api/v1` (a
+        protected name answers with a problem that tells the SPA to send the
+        user to the legacy login). The server actions call the same use case.
+  - [x] 7b. Server time and build id: the snapshot and the feed heartbeat carry
+        the server's `now` (the fake clock included); `GET /api/v1/health`
+        returns the build id and version. Release notes data moves out of
+        `app/` to where both Next and the SPA can import it.
+- [x] 8. **Next under `/legacy`** (decided by the user, 2026-10-08: not
+      `basePath`, which this Next cannot combine with root API rewrites and
+      whose proxy matchers it prefixes): the pages in `(login)`, `(site)` and
+      `admin` move into `app/legacy/`; `/api`, `/media`, `/sw.js`, the icons,
+      the manifest and `/locations/` stay at the root. Until the SPA exists,
+      every other root page path redirects to `/legacy` + path (query kept).
+      Fix hard-coded page paths (`<a href>`, `window.location`, `router.push`,
+      `redirect()`, `revalidatePath()`, cookie paths, `modal-nav.ts`; email and
+      push links stay at the root). `proxy.ts` gates both. Full
+      `make test-e2e` and `make test-e2e-docker`. CHANGELOG (address bar shows
+      `/legacy/`), self-hosting docs if a proxy rule changes.
 
-### Built on the above
+### SPA
 
-- [x] 16. **Pages through queries**: pages, layouts and server actions under `app/`
-      that call `getRepositories()` call module queries or use cases; add queries
-      where missing.
-  - [x] 16a. Site pages, layouts and actions (not admin) onto `pageReads()`
-        (`server/composition.ts`; per-module `page-reads.ts`). The auth flows
-        (`actions/user-auth.ts`, `auth/login`, `auth/reset`) stay on the repositories
-        for the allow-list.
-  - [x] 16b. Admin pages and layouts (12 files under `app/admin/`).
-  - [x] 16c. A dependency-cruiser rule forbidding `app/` → `db/container`, with an
-        allow-list for the auth flows (step 6 of the path), and a rule allowing
-        `adminReads` only from `app/admin/**` and `app/actions/admin-*`.
-- [x] 17. **`Idempotency-Key` from the UI (#141)**: the create forms (proposal,
-      session, comment) and the RSVP toggle send a key made per form instance; server
-      actions use the same idempotency store as the middleware (its core moves to the
-      kernel), so their changes carry `command_key` too. The replica then matches the RSVP
-      echo by `command_key` instead of by the count (step 14). `fixes #141`.
-  - [x] 17a. The claim/run/complete core moves to `server/kernel/idempotency.ts`
-        (`runIdempotent`); the HTTP middleware becomes an adapter over it.
-  - [x] 17b1. `runIdempotentAction` in the kernel (`idempotentAction()` in
-        composition); the proposal create action takes a key, its form sends one.
-  - [x] 17b2. The three comment create actions take a key; `CommentsSection` makes
-        one per compose box and renews it after a success.
-  - [x] 17b3. Session create (the form posts to an API route today): takes a key.
-  - [x] 17c1. The RSVP toggle route runs under the key; the hook sends one per
-        click, so its changes carry `command_key`.
-  - [x] 17c2. The replica records the `command_key`s the feed delivers and the
-        overlay matches the RSVP echo by key instead of by the count; CHANGELOG
-        bullet (`(#141)`), docs. `fixes #141`.
-- [x] 18. **Docs**, in parts:
-  - [x] 18a. ADRs 0013 and 0014 accepted; `10-path-from-here.md` marks steps 3
-        and 4 done.
-  - [x] 18b. `docs/dev/server.md` (feed, snapshot, unit of work, idempotency
-        from the UI, replica) matching the code.
-  - [x] 18c. Public docs (live schedule; API changes; self-hosting: proxy
-        buffering, timeouts and HTTP/2 for SSE, trusted-proxy setting) and
-        CHANGELOG (API breaks marked) against the code; release-notes
-        highlight check. `make test-e2e-docker` is left to the user: record it.
-- [ ] 19. **Finish**: summary in PROGRESS.md for review, then delete `.claude/run/`.
+- [ ] 9. **`apps/web` scaffold**: workspace package (Vite, React, TanStack Router,
+      Tailwind with the existing tokens, TS project references); build output
+      served by Next as the shell (`no-store`) for every non-rewritten root path,
+      assets under `/_spa/`; a catch-all route forwarding to `/legacy` (so the
+      app behaves as after step 8); dependency-cruiser rules from ADR 0015 §2;
+      Vitest with happy-dom for `apps/web`; `make dev` starts Vite in front of
+      Next (proxy `/legacy`, `/api`); `vite build` before `next build`;
+      Dockerfile and standalone output carry the files. Docs: getting-started,
+      `docs/dev/` on the new package. Full `make test-e2e` and
+      `make test-e2e-docker`.
+- [ ] 10. **Replica in the SPA**: `apps/web/src/replica/` from today's
+      `app/(site)/[eventSlug]/replica/` (store, `apply`, feed client, sync state
+      with step 2's fix, selectors), plus a clock offset from step 7b's server
+      time, and IndexedDB persistence keyed by (event, guest or anonymous),
+      cleared on a user switch; a persisted replica opens as `stale` and resumes
+      the feed from its `seq`. The legacy copy stays until step 16. Unit tests
+      (`fake-indexeddb`).
+- [ ] 11. **Commands and queries**: the command mechanism (predict with the
+      domain policy, pending change keyed by `Idempotency-Key`, call, reconcile by
+      `command_key` from the feed or the response, retry with the same key on a
+      network error, roll back on `4xx`); RSVP add and remove and comment create.
+      `queries/` for the attendee list and paged comments. Unit tests against a
+      fake API.
+- [ ] 12. **The shell**: `ui/` primitives, layout, nav, user picker (step 7a),
+      theme (ADR 0005 cookie), footer with version and release notes, sync
+      indicator, error boundary, the dev toolbar's time travel when dev tools are
+      on. Links to unmoved screens go to `/legacy/…` directly.
+- [ ] 13. **Schedule screens**: grid, agenda, filters, now line, day fold, drag
+      to pan, scroll restoration, and the meetings column read-only from the
+      replica (booking and the meeting modal link to legacy). Not routed yet:
+      the catch-all still forwards `/{slug}`.
+- [ ] 14. **Kiosk** on the SPA schedule, same behavior as today.
+- [ ] 15. **Session modal** as a search param over the schedule: details, RSVP,
+      attendee list, comments; edit and delete link to legacy.
+- [ ] 16. **The SPA takes the schedule**: the router owns `/{slug}` and the
+      session modal; delete the Next schedule page, its components, server
+      actions, `replica/` and the overlay; legacy pages link to the SPA schedule
+      and modal with plain `<a>` (`modal-nav.ts`). Adapt the E2E specs that break.
+      Full `make test-e2e`. CHANGELOG, `docs/public/`, release-notes highlight.
+- [ ] 17. **Offline and reload offer**: `sw.js` precaches the shell and `/_spa/`
+      assets and serves the shell for SPA navigations offline; never caches
+      `/api/**` or `/legacy/**`; push unchanged. The SPA compares the running
+      build id with `/api/v1/health` and offers a reload. E2E: open the schedule,
+      go offline, reopen it, see it marked as not current. Full `make test-e2e`
+      and `make test-e2e-docker`. CHANGELOG, `docs/public/`.
+- [ ] 18. **Upstream release check (#788)**: the server checks the GitHub
+      releases feed at most daily and caches the result (browsers never contact
+      GitHub); an endpoint returns current and latest version and date; the SPA
+      and legacy footers show a red dot with both versions and a link to the
+      update docs. Visible to admins only. Works with no network (no dot).
+      `fixes #788`.
+
+### Close
+
+- [ ] 19. **Docs**: `04-client.md`, `07-repo-and-rules.md` and `10-path-from-here.md`
+      against the code (step 5 started, schedule moved); `docs/dev/server.md`;
+      public docs and CHANGELOG checked; release-notes highlights. Final
+      `make test-e2e-docker`.
+- [ ] 20. **Finish**: summary in PROGRESS.md, then delete `.claude/run/`.
 
 ## Next to plan
 
-- Move the `utils/` helpers that still call `getRepositories()` (`acting-guest`,
-  `meeting-views`, `meeting-options`, `meeting-availability-form`, `guest-clashes`,
-  `reminder-dispatch`) behind module queries; then extend the 16c rule to them.
-- Step 5: an ADR for the SPA (Vite and TanStack Router, how Next serves it during the
-  move, commands with `command_key`, IndexedDB), then the screen-family order.
-- Inline `after()` notifications in `server/composition.ts` onto reactions.
+- Move the next screen families: proposals and voting, people and meetings,
+  settings, admin (path step 5).
 - Steps 6 (identity and roles) and 7 (retire Next).

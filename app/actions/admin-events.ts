@@ -39,9 +39,9 @@ function settled(result: Result<unknown>, eventId?: string): AdminActionResult {
   if (!result.ok) {
     return { ok: false, error: result.error.detail ?? "Something went wrong" };
   }
-  revalidatePath("/admin");
-  revalidatePath("/admin/events");
-  if (eventId) revalidatePath(`/admin/events/${eventId}`);
+  revalidatePath("/legacy/admin");
+  revalidatePath("/legacy/admin/events");
+  if (eventId) revalidatePath(`/legacy/admin/events/${eventId}`);
   return { ok: true };
 }
 

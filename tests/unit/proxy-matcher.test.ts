@@ -66,6 +66,16 @@ describe("proxy matcher", () => {
   // A browser will only deliver a push to a service worker, and it fetches
   // the worker's script without our cookie: a login page in its place takes
   // notifications with it.
+  it("skips the 1-on-1 picture", () => {
+    expect(matches("/one-on-one.webp")).toBe(false);
+  });
+
+  it("covers the legacy pages", () => {
+    for (const path of ["/legacy", "/legacy/login", "/legacy/conf/proposals"]) {
+      expect(matches(path), `${path} must reach the proxy`).toBe(true);
+    }
+  });
+
   it("skips the service worker", () => {
     expect(matches("/sw.js"), "/sw.js must skip the proxy").toBe(false);
   });

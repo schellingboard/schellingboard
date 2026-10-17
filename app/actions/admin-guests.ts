@@ -26,7 +26,7 @@ function refused({ detail }: AppError): AdminActionResult {
 
 function settled(result: Result<unknown>): AdminActionResult {
   if (!result.ok) return refused(result.error);
-  revalidatePath("/admin/users");
+  revalidatePath("/legacy/admin/users");
   return { ok: true };
 }
 

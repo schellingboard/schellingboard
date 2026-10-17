@@ -23,7 +23,7 @@ vi.mock("next/headers", () => ({
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { detectGuestClashes } from "@/app/(site)/[eventSlug]/clash-actions";
+import { detectGuestClashes } from "@/app/legacy/(site)/[eventSlug]/clash-actions";
 import { AUTH_COOKIE_NAME, createAuthCookie } from "@/utils/auth";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 

@@ -4,7 +4,7 @@ import { Fragment, useState } from "react";
 import { Combobox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/16/solid";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { LockIcon } from "@/app/(site)/lock-icon";
+import { LockIcon } from "@/app/legacy/(site)/lock-icon";
 import { containsIgnoringAccents } from "@/utils/utils";
 
 export function SelectHosts<

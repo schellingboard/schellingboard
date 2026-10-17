@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
-import { InlineMarkdown, Markdown } from "@/app/(site)/markdown";
+import { InlineMarkdown, Markdown } from "@/app/legacy/(site)/markdown";
 import { stripMarkdown } from "@/utils/markdown";
 
 function render(markdown: string): string {

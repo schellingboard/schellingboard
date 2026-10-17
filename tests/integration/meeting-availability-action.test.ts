@@ -106,7 +106,7 @@ describe("saveMeetingAvailabilityAction", () => {
       slotStarts: [SLOT_1],
     });
 
-    expect(revalidatePath).toHaveBeenCalledWith("/settings");
+    expect(revalidatePath).toHaveBeenCalledWith("/legacy/settings");
   });
 
   it("replaces the previous set rather than adding to it", async () => {

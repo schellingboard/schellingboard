@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 
-import { newEmptySession } from "@/app/(site)/session_utils";
+import { newEmptySession } from "@/app/legacy/(site)/session_utils";
 import type { MeetingView } from "@/utils/meeting-views";
 import { describeRsvpClash, findRsvpClash } from "@/utils/rsvp-clash";
 

@@ -27,7 +27,7 @@ vi.mock("next/headers", () => ({
 }));
 
 const captured: { myMeetings?: unknown } = {};
-vi.mock("@/app/(site)/[eventSlug]/event-provider-wrapper", () => ({
+vi.mock("@/app/legacy/(site)/[eventSlug]/event-provider-wrapper", () => ({
   EventProviderWrapper: ({ myMeetings }: { myMeetings: unknown }) => {
     captured.myMeetings = myMeetings;
     return "PROVIDER_STUB";
@@ -43,7 +43,7 @@ const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
 async function renderLayout(eventSlug: string): Promise<void> {
   const { EventLayoutContent } =
-    await import("@/app/(site)/[eventSlug]/layout-content");
+    await import("@/app/legacy/(site)/[eventSlug]/layout-content");
   renderToStaticMarkup(await EventLayoutContent({ eventSlug, children: null }));
 }
 

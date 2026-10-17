@@ -36,7 +36,7 @@ reason is mandatory: it is what the next reader has instead of this page.
 
 **Gotcha:** route-group and dynamic-segment paths need `**`. Flat config globs
 are minimatch, which reads `[eventSlug]` as a character class, so a literal
-`app/(site)/[eventSlug]/kiosk.tsx` silently matches nothing — and a `files`
+`app/legacy/(site)/[eventSlug]/kiosk.tsx` silently matches nothing — and a `files`
 entry that matches nothing looks exactly like one that works.
 
 When a selector can't express the rule, write a local rule inline — flat config
@@ -114,7 +114,7 @@ a use case; the rule covers `app/` and `utils/`. Exempt: the auth flows
 (`actions/user-auth.ts`, `auth/login`, `auth/reset`), which run before an actor
 exists, and the job loop, notification and push infrastructure (`utils/jobs/`,
 `utils/notifications.ts`, `utils/push.ts`). `adminReads()`
-(`server/admin-reads.ts`) is importable only from `app/admin/` and
+(`server/admin-reads.ts`) is importable only from `app/legacy/admin/` and
 `app/actions/admin-*`.
 
 `make arch-graph` renders the graph to `arch-graph.svg` (needs graphviz), which

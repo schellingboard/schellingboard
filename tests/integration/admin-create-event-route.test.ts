@@ -140,6 +140,7 @@ describe("POST /api/admin/create-event", () => {
     ["non-string name", { ...VALID_BODY, name: 123 }],
     ["name without letters or numbers", { ...VALID_BODY, name: "!!!" }],
     ["reserved slug", { ...VALID_BODY, name: "Admin" }],
+    ["reserved slug legacy", { ...VALID_BODY, name: "Legacy" }],
     ["invalid timezone", { ...VALID_BODY, timezone: "Mars/Olympus" }],
     [
       "non-positive maxSessionDuration",

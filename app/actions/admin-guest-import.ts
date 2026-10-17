@@ -28,11 +28,11 @@ export async function importGuestsAction(input: {
     };
   }
 
-  revalidatePath("/admin/users");
-  revalidatePath("/admin");
-  revalidatePath("/admin/events");
+  revalidatePath("/legacy/admin/users");
+  revalidatePath("/legacy/admin");
+  revalidatePath("/legacy/admin/events");
   for (const eventId of new Set(input.eventIds)) {
-    revalidatePath(`/admin/events/${eventId}`);
+    revalidatePath(`/legacy/admin/events/${eventId}`);
   }
   return { ok: true, ...result.value };
 }

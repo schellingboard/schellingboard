@@ -17,9 +17,9 @@ export type AdminProposalInput = {
 };
 
 function revalidateEventPaths(eventId: string) {
-  revalidatePath("/admin");
-  revalidatePath("/admin/events");
-  revalidatePath(`/admin/events/${eventId}`);
+  revalidatePath("/legacy/admin");
+  revalidatePath("/legacy/admin/events");
+  revalidatePath(`/legacy/admin/events/${eventId}`);
 }
 
 export async function adminUpdateProposalAction(

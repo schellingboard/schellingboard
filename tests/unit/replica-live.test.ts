@@ -1,6 +1,6 @@
 // @module-tag 007-US8
 import { describe, it, expect, vi } from "vitest";
-import { createLiveReplica } from "@/app/(site)/[eventSlug]/replica/live-replica";
+import { createLiveReplica } from "@/app/legacy/(site)/[eventSlug]/replica/live-replica";
 import { snapshot } from "../helpers/snapshot-fixture";
 
 class FakeSource {

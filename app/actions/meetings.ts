@@ -72,7 +72,7 @@ export async function respondToMeetingAction(
   );
   if (!result.ok)
     return refused(result, () => "Sign in to answer a 1-on-1 request");
-  revalidatePath(`/${result.value.eventSlug}`);
+  revalidatePath(`/legacy/${result.value.eventSlug}`);
   return { ok: true };
 }
 
@@ -89,7 +89,7 @@ export async function cancelMeetingAction(
     await serverNow()
   );
   if (!result.ok) return refused(result, () => "Sign in to cancel a 1-on-1");
-  revalidatePath(`/${result.value.eventSlug}`);
+  revalidatePath(`/legacy/${result.value.eventSlug}`);
   return { ok: true };
 }
 
@@ -109,6 +109,6 @@ export async function saveMeetingAvailabilityAction(
     return refused(result, (code) =>
       actingGuestRefusalMessage(code, "setting your 1-on-1 availability")
     );
-  revalidatePath("/settings");
+  revalidatePath("/legacy/settings");
   return { ok: true };
 }

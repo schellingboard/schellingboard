@@ -9,7 +9,7 @@ import {
   createSessionComment as createComment,
   deleteComment,
   toggleCommentLike,
-} from "@/app/(site)/[eventSlug]/comment-actions";
+} from "@/app/legacy/(site)/[eventSlug]/comment-actions";
 
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),

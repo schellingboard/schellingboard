@@ -108,12 +108,12 @@ graphql` commands (neither field is settable via plain `gh issue create`/`edit`)
 
 ### jj paths with special characters
 
-Paths like `app/(site)/[eventSlug]/...` break jj's default parsing: `()` are fileset grouping
+Paths like `app/legacy/(site)/[eventSlug]/...` break jj's default parsing: `()` are fileset grouping
 operators, and `[eventSlug]` is read as a glob character class (matches nothing). Fix: use `file:`
 (exact match) and quote it:
 
 ```
-jj commit -m "message" -- 'file:"app/(site)/[eventSlug]/session-block.tsx"'
+jj commit -m "message" -- 'file:"app/legacy/(site)/[eventSlug]/session-block.tsx"'
 ```
 
 ### Squashing
@@ -210,7 +210,7 @@ files is not.
 
 #### Examples from this codebase
 
-Bad — `app/(site)/context.tsx` narrates itself; every one of these should be deleted:
+Bad — `app/legacy/(site)/context.tsx` narrates itself; every one of these should be deleted:
 
 ```ts
 // update RSVPs optimistically      <- the function is named updateRsvp
@@ -222,7 +222,7 @@ Bad — `app/(site)/context.tsx` narrates itself; every one of these should be d
 ```
 
 Good — each says something the code cannot (`app/api/votes/route.ts`,
-`server/modules/proposals/application/votes.ts`, `app/(site)/guests/avatar.tsx`):
+`server/modules/proposals/application/votes.ts`, `app/legacy/(site)/guests/avatar.tsx`):
 
 ```ts
 // Without an explicit no-store, browsers heuristically cache this response

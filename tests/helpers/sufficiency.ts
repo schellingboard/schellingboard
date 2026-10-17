@@ -1,7 +1,7 @@
 import { expect } from "vitest";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { reaches } from "@schellingboard/domain/change";
-import { apply } from "@/app/(site)/[eventSlug]/replica/apply";
+import { apply } from "@/app/legacy/(site)/[eventSlug]/replica/apply";
 import { getRepositories } from "@/db/container";
 import { project } from "@/server/feed/project";
 import { snapshotFor } from "@/server/feed/snapshot";

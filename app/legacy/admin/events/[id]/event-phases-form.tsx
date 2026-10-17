@@ -1,0 +1,132 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import { Input } from "@/app/input";
+import type { Event } from "@schellingboard/domain/event";
+import {
+  updateEventPhasesAction,
+  type EventPhasesInput,
+} from "@/app/actions/admin-events";
+import { PRIMARY_BUTTON } from "@/app/legacy/admin/buttons";
+import { ActionError } from "@/app/components/action-error";
+import { utcToZonedInput, zonedInputToUtc } from "@/utils/admin-datetime";
+import { useEventSection } from "./use-event-section";
+
+type PhasesForm = Omit<EventPhasesInput, "id" | "expectedVersion">;
+
+export function EventPhasesForm({ event }: { event: Event }) {
+  const toInput = (date: Date | undefined) =>
+    utcToZonedInput(date?.toISOString(), event.timezone);
+  const { form, setForm, version, markSaved } = useEventSection<PhasesForm>(
+    {
+      proposalPhaseStart: toInput(event.proposalPhaseStart),
+      proposalPhaseEnd: toInput(event.proposalPhaseEnd),
+      votingPhaseStart: toInput(event.votingPhaseStart),
+      votingPhaseEnd: toInput(event.votingPhaseEnd),
+      schedulingPhaseStart: toInput(event.schedulingPhaseStart),
+      schedulingPhaseEnd: toInput(event.schedulingPhaseEnd),
+    },
+    event.version
+  );
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isSaving, startSave] = useTransition();
+
+  const set = (key: keyof PhasesForm, value: string) => {
+    setSaveSuccess(false);
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaveError(null);
+    startSave(async () => {
+      // Form values are in the event timezone; the action expects UTC.
+      const utcForm = Object.fromEntries(
+        Object.entries(form).map(([key, value]) => [
+          key,
+          zonedInputToUtc(value ?? "", event.timezone),
+        ])
+      ) as PhasesForm;
+      const result = await updateEventPhasesAction({
+        id: event.id,
+        ...utcForm,
+        expectedVersion: version,
+      });
+      if (!result.ok) {
+        setSaveError(result.error);
+      } else {
+        markSaved(form);
+        setSaveSuccess(true);
+      }
+    });
+  };
+
+  return (
+    <form onSubmit={handleSave} className="space-y-4">
+      <h2 className="text-lg font-semibold text-fg">Phases</h2>
+      <p className="text-sm text-fg-subtle">
+        All times are in the event timezone ({event.timezone}). Leave fields
+        empty to unset a phase. A phase with no end runs until the next phase
+        starts; set an end earlier than the next start to leave an inactive gap.
+      </p>
+      {(
+        [
+          {
+            label: "Proposal phase",
+            startKey: "proposalPhaseStart",
+            endKey: "proposalPhaseEnd",
+          },
+          {
+            label: "Voting phase",
+            startKey: "votingPhaseStart",
+            endKey: "votingPhaseEnd",
+          },
+          {
+            label: "Scheduling phase",
+            startKey: "schedulingPhaseStart",
+            endKey: "schedulingPhaseEnd",
+          },
+        ] as const
+      ).map(({ label, startKey, endKey }) => (
+        <fieldset key={label}>
+          <legend className="text-sm font-medium text-fg-muted">{label}</legend>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+            <div className="flex flex-col gap-1">
+              <label htmlFor={startKey} className="text-sm text-fg-muted">
+                Start
+              </label>
+              <Input
+                id={startKey}
+                type="datetime-local"
+                value={form[startKey] ?? ""}
+                onChange={(e) => set(startKey, e.target.value)}
+                className="w-full h-10"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label htmlFor={endKey} className="text-sm text-fg-muted">
+                End
+              </label>
+              <Input
+                id={endKey}
+                type="datetime-local"
+                value={form[endKey] ?? ""}
+                onChange={(e) => set(endKey, e.target.value)}
+                className="w-full h-10"
+              />
+            </div>
+          </div>
+        </fieldset>
+      ))}
+
+      <ActionError message={saveError} />
+      <div className="flex items-center gap-3">
+        <button type="submit" disabled={isSaving} className={PRIMARY_BUTTON}>
+          {isSaving ? "Saving..." : "Save phases"}
+        </button>
+        {saveSuccess && <span className="text-sm text-success-fg">Saved!</span>}
+      </div>
+    </form>
+  );
+}

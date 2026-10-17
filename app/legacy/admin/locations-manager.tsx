@@ -1,0 +1,599 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { isUnoptimized } from "@/utils/image-loader";
+import clsx from "clsx";
+import { Input } from "@/app/input";
+import type { Location } from "@schellingboard/domain/location";
+import {
+  IMAGE_REQUIREMENTS_HINT,
+  MAX_IMAGE_BYTES,
+} from "@/utils/location-image-constraints";
+import {
+  createLocationAction,
+  updateLocationAction,
+  deleteLocationAction,
+  moveLocationAction,
+} from "@/app/actions/admin-locations";
+import { PRIMARY_BUTTON, SECONDARY_BUTTON, DANGER_BUTTON } from "./buttons";
+import {
+  LOCATION_COLOR_NAMES,
+  DEFAULT_LOCATION_COLOR,
+  isLocationColorName,
+} from "@schellingboard/domain/location-colors";
+import { useController, useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  locationSchema,
+  updateLocationSchema,
+} from "@schellingboard/contracts/location";
+import { z } from "zod";
+import { setActionErrors } from "@/utils/forms";
+import { FormErrorSummary } from "@/app/components/form-error-summary";
+import { ActionError } from "@/app/components/action-error";
+
+export type AdminLocation = {
+  location: Location;
+  eventIds: string[];
+  sessionLinkCount: number;
+};
+
+export type EventOption = { id: string; name: string };
+
+// A file input hands react-hook-form a FileList; the action takes a single
+// Blob. `FileList` only exists in the browser and this component is also
+// rendered on the server, so the global must only be touched at parse time
+// (inside the callback), never at module scope.
+const locationFormSchema = locationSchema.extend({
+  image: z
+    .custom<FileList>((value) => value instanceof FileList)
+    .transform((list) => list.item(0))
+    .nullable()
+    .optional(),
+});
+
+function LocationForm({
+  location,
+  eventIds,
+  events,
+  submitLabel,
+  pendingLabel,
+  action,
+  onCancel,
+}: {
+  location?: Location;
+  eventIds: string[];
+  events: EventOption[];
+  submitLabel: string;
+  pendingLabel: string;
+  action: typeof createLocationAction;
+  onCancel: () => void;
+}) {
+  const defaultColor =
+    location && isLocationColorName(location.color)
+      ? location.color
+      : DEFAULT_LOCATION_COLOR;
+
+  const form = useForm({
+    resolver: zodResolver(locationFormSchema),
+    defaultValues: {
+      name: location?.name ?? "",
+      capacity: location?.capacity ?? 0,
+      description: location?.description ?? "",
+      areaDescription: location?.areaDescription ?? "",
+      color: defaultColor,
+      bookable: location?.bookable ?? false,
+      eventIds,
+      image: null,
+    },
+  });
+
+  // The swatch only mirrors the select, so watch it rather than taking over
+  // the field: `register` below stays the single owner of the input.
+  const color = useWatch({ control: form.control, name: "color" });
+
+  // `register` on a group of same-named checkboxes only collects an array when
+  // there is more than one of them: with a single event configured it yields
+  // the bare event id (or `false` when unchecked), which the schema rejects as
+  // "expected array". Driving the group explicitly keeps it an array always.
+  const eventIdsController = useController({
+    control: form.control,
+    name: "eventIds",
+  });
+  const selectedEventIds = eventIdsController.field.value ?? [];
+
+  const idPrefix = location ? `loc-${location.id}` : "loc-new";
+
+  // The resolver hands over the schema's *output*; typing it as such is what
+  // makes TypeScript check that the form really produces what the action takes.
+  const handleSubmit = async (data: z.output<typeof locationFormSchema>) => {
+    const file = data.image;
+    if (file && file.size >= MAX_IMAGE_BYTES) {
+      form.setError("image", {
+        message: `Image exceeds ${MAX_IMAGE_BYTES / 1024 / 1024} MB limit.`,
+      });
+      return;
+    }
+
+    const result = await action(data);
+    if (!result.ok) {
+      setActionErrors(form, result.error);
+    }
+  };
+
+  return (
+    <form
+      // Without this the browser's own number validation (step mismatch on
+      // Capacity) blocks submit and shows a native bubble, so the per-field
+      // message below never gets a chance to render. zod owns validation here.
+      noValidate
+      onSubmit={(e) => form.handleSubmit(handleSubmit)(e) as never}
+      className="space-y-3 rounded-md border border-line-subtle p-4"
+    >
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="flex flex-col gap-1">
+          <label htmlFor={`${idPrefix}-name`} className="text-sm text-fg-muted">
+            Name
+          </label>
+          <Input
+            id={`${idPrefix}-name`}
+            error={!!form.formState.errors.name}
+            {...form.register("name")}
+            className="w-full h-10"
+          />
+          <span className="text-xs text-danger-fg min-h-(--text-xs)">
+            {form.formState.errors.name?.message}
+          </span>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label
+            htmlFor={`${idPrefix}-capacity`}
+            className="text-sm text-fg-muted"
+          >
+            Capacity
+          </label>
+          <Input
+            id={`${idPrefix}-capacity`}
+            type="number"
+            min={0}
+            step={1}
+            error={!!form.formState.errors.capacity}
+            {...form.register("capacity", { valueAsNumber: true })}
+            className="w-full h-10"
+          />
+          <span className="text-xs text-danger-fg min-h-(--text-xs)">
+            {form.formState.errors.capacity?.message}
+          </span>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label
+          htmlFor={`${idPrefix}-description`}
+          className="text-sm text-fg-muted"
+        >
+          Description
+        </label>
+        <textarea
+          id={`${idPrefix}-description`}
+          {...form.register("description")}
+          rows={2}
+          className="rounded-md border border-line bg-surface-raised px-4 py-2 shadow-sm focus:ring-2 focus:ring-brand-accent focus:outline-0 focus:border-none"
+        />
+        <span className="text-xs text-danger-fg min-h-(--text-xs)">
+          {form.formState.errors.description?.message}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="flex flex-col gap-1">
+          <label htmlFor={`${idPrefix}-area`} className="text-sm text-fg-muted">
+            Area description
+          </label>
+          <Input
+            id={`${idPrefix}-area`}
+            error={!!form.formState.errors.areaDescription}
+            {...form.register("areaDescription")}
+            className="w-full h-10"
+          />
+          <span className="text-xs text-danger-fg min-h-(--text-xs)">
+            {form.formState.errors.areaDescription?.message}
+          </span>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label
+            htmlFor={`${idPrefix}-color`}
+            className="text-sm text-fg-muted"
+          >
+            Color
+          </label>
+          <div className="flex items-center gap-2">
+            <span
+              aria-hidden
+              className={clsx(
+                "h-10 w-10 shrink-0 rounded-md border border-line loc-swatch",
+                `loc-${color}`
+              )}
+            />
+            <select
+              id={`${idPrefix}-color`}
+              {...form.register("color")}
+              className="h-10 flex-1 rounded-md border border-line bg-surface-raised px-2 capitalize shadow-sm focus:ring-2 focus:ring-brand-accent focus:outline-0"
+            >
+              {LOCATION_COLOR_NAMES.map((name) => (
+                <option key={name} value={name} className="capitalize">
+                  {name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <span className="text-xs text-danger-fg min-h-(--text-xs)">
+            {form.formState.errors.color?.message}
+          </span>
+        </div>
+      </div>
+
+      <div className="flex gap-6">
+        <label className="flex items-center gap-2 text-sm text-fg-muted">
+          <input
+            type="checkbox"
+            {...form.register("bookable")}
+            className="rounded border-line text-brand focus:ring-brand-accent"
+          />
+          Bookable
+        </label>
+      </div>
+
+      {events.length > 0 && (
+        <fieldset className="space-y-1">
+          <legend className="text-sm text-fg-muted">Events</legend>
+          <div className="flex flex-wrap gap-x-6 gap-y-1">
+            {events.map((event) => (
+              <label
+                key={event.id}
+                className="flex items-center gap-2 text-sm text-fg-muted"
+              >
+                <input
+                  type="checkbox"
+                  value={event.id}
+                  checked={selectedEventIds.includes(event.id)}
+                  onBlur={eventIdsController.field.onBlur}
+                  onChange={(e) =>
+                    eventIdsController.field.onChange(
+                      e.target.checked
+                        ? [...selectedEventIds, event.id]
+                        : selectedEventIds.filter((id) => id !== event.id)
+                    )
+                  }
+                  className="rounded border-line text-brand focus:ring-brand-accent"
+                />
+                {event.name}
+              </label>
+            ))}
+          </div>
+          <span className="text-xs text-danger-fg min-h-(--text-xs)">
+            {form.formState.errors.eventIds?.message}
+          </span>
+        </fieldset>
+      )}
+
+      <div className="flex flex-col gap-1">
+        <label htmlFor={`${idPrefix}-image`} className="text-sm text-fg-muted">
+          Image
+        </label>
+        {location?.imageUrl && (
+          <Image
+            src={location.imageUrl}
+            alt={`Current image of ${location.name}`}
+            unoptimized={isUnoptimized(location.imageUrl)}
+            width={160}
+            height={120}
+            className="rounded border border-line-subtle"
+          />
+        )}
+        <input
+          id={`${idPrefix}-image`}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          {...form.register("image")}
+          className="text-sm text-fg-muted file:mr-3 file:rounded-md file:border-0 file:bg-surface-muted file:px-3 file:py-2 file:text-sm file:font-medium file:text-fg-muted hover:file:bg-surface-hover"
+        />
+        <p className="text-xs text-fg-subtle">{IMAGE_REQUIREMENTS_HINT}</p>
+        <span className="text-xs text-danger-fg min-h-(--text-xs)">
+          {form.formState.errors.image?.message}
+        </span>
+      </div>
+
+      <FormErrorSummary form={form} />
+
+      <div className="flex gap-2 items-baseline">
+        <button
+          type="submit"
+          disabled={form.formState.isSubmitting}
+          className={PRIMARY_BUTTON}
+        >
+          {form.formState.isSubmitting ? pendingLabel : submitLabel}
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={form.formState.isSubmitting}
+          className={SECONDARY_BUTTON}
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function DeleteConfirmation({
+  adminLocation,
+  onError,
+  onCancel,
+}: {
+  adminLocation: AdminLocation;
+  onError: (error: string | null) => void;
+  onCancel: () => void;
+}) {
+  const { location, eventIds, sessionLinkCount } = adminLocation;
+  const [typedName, setTypedName] = useState("");
+  const [isPending, startTransition] = useTransition();
+
+  const handleDelete = () => {
+    startTransition(async () => {
+      const result = await deleteLocationAction({ id: location.id });
+      onError(result.ok ? null : result.error);
+    });
+  };
+
+  return (
+    <div className="space-y-2 rounded-md border border-danger-border bg-danger-tint/50 p-3">
+      <p className="text-sm text-danger-fg">
+        Deleting “{location.name}” removes it from {sessionLinkCount}{" "}
+        {sessionLinkCount === 1 ? "session" : "sessions"} and {eventIds.length}{" "}
+        {eventIds.length === 1 ? "event" : "events"}. This cannot be undone.
+        Type the location name to confirm.
+      </p>
+      <div className="flex flex-col sm:flex-row gap-2">
+        <Input
+          aria-label="Location name confirmation"
+          value={typedName}
+          onChange={(e) => setTypedName(e.target.value)}
+          placeholder={location.name}
+          className="flex-1 h-10"
+        />
+        <div className="flex gap-2">
+          <button
+            onClick={handleDelete}
+            disabled={isPending || typedName !== location.name}
+            className={DANGER_BUTTON}
+          >
+            {isPending ? "Deleting..." : "Confirm delete"}
+          </button>
+          <button
+            onClick={onCancel}
+            disabled={isPending}
+            className={SECONDARY_BUTTON}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LocationRow({
+  adminLocation,
+  events,
+  isFirst,
+  isLast,
+}: {
+  adminLocation: AdminLocation;
+  events: EventOption[];
+  isFirst: boolean;
+  isLast: boolean;
+}) {
+  const { location, eventIds } = adminLocation;
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [mode, setMode] = useState<"view" | "edit" | "delete">("view");
+  const [editedVersion, setEditedVersion] = useState(location.version);
+  const [isMovePending, startMoveTransition] = useTransition();
+
+  const handleMove = (direction: "up" | "down") => {
+    startMoveTransition(async () => {
+      const result = await moveLocationAction({
+        id: location.id,
+        direction,
+        expectedVersion: location.version,
+      });
+      setError(result.ok ? null : result.error);
+      if (!result.ok) router.refresh();
+    });
+  };
+
+  const handleUpdate = async (formData: z.input<typeof locationSchema>) => {
+    const updateLocation: z.input<typeof updateLocationSchema> = {
+      ...formData,
+      id: location.id,
+      expectedVersion: editedVersion,
+    };
+    const result = await updateLocationAction(updateLocation);
+    if (result.ok) {
+      setError(null);
+      setMode("view");
+    } else {
+      // So the next Edit starts from the location as it is now.
+      router.refresh();
+    }
+    return result;
+  };
+
+  if (mode === "edit") {
+    return (
+      <li className="py-3">
+        <LocationForm
+          location={location}
+          eventIds={eventIds}
+          events={events}
+          submitLabel="Save"
+          pendingLabel="Saving..."
+          action={handleUpdate}
+          onCancel={() => {
+            setError(null);
+            setMode("view");
+          }}
+        />
+      </li>
+    );
+  }
+
+  return (
+    <li className="py-3 space-y-2">
+      <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+        {location.imageUrl && (
+          <Image
+            src={location.imageUrl}
+            alt={location.name}
+            unoptimized={isUnoptimized(location.imageUrl)}
+            width={80}
+            height={60}
+            className="rounded border border-line-subtle shrink-0"
+          />
+        )}
+        <div className="flex-1 min-w-0">
+          <p className="font-medium text-fg truncate flex items-center gap-2">
+            {isLocationColorName(location.color) && (
+              <span
+                aria-hidden
+                className={clsx(
+                  "inline-block w-3 h-3 rounded-full border border-line shrink-0 loc-swatch",
+                  `loc-${location.color}`
+                )}
+              />
+            )}
+            {location.name}
+          </p>
+          <p className="text-sm text-fg-subtle truncate">
+            {[
+              location.capacity ? `max ${location.capacity}` : null,
+              location.bookable ? "bookable" : null,
+              events
+                .filter((e) => eventIds.includes(e.id))
+                .map((e) => e.name)
+                .join(", ") || null,
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
+        </div>
+        <div className="flex gap-2 items-center">
+          <button
+            aria-label={`Move ${location.name} up`}
+            onClick={() => handleMove("up")}
+            disabled={isFirst || isMovePending}
+            className={SECONDARY_BUTTON}
+          >
+            ↑
+          </button>
+          <button
+            aria-label={`Move ${location.name} down`}
+            onClick={() => handleMove("down")}
+            disabled={isLast || isMovePending}
+            className={SECONDARY_BUTTON}
+          >
+            ↓
+          </button>
+          <button
+            onClick={() => {
+              setError(null);
+              setEditedVersion(location.version);
+              setMode("edit");
+            }}
+            className={SECONDARY_BUTTON}
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => {
+              setError(null);
+              setMode("delete");
+            }}
+            className={clsx(
+              SECONDARY_BUTTON,
+              "text-danger-fg hover:bg-danger-tint bg-danger-tint/50"
+            )}
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+      {mode === "delete" && (
+        <DeleteConfirmation
+          adminLocation={adminLocation}
+          onError={setError}
+          onCancel={() => {
+            setError(null);
+            setMode("view");
+          }}
+        />
+      )}
+      <ActionError message={error} />
+    </li>
+  );
+}
+
+export function LocationsManager({
+  locations,
+  events,
+}: {
+  locations: AdminLocation[];
+  events: EventOption[];
+}) {
+  const [showAddForm, setShowAddForm] = useState(false);
+
+  const handleCreate = async (formData: z.input<typeof locationSchema>) => {
+    const result = await createLocationAction(formData);
+    if (result.ok) setShowAddForm(false);
+    return result;
+  };
+
+  return (
+    <div className="space-y-4">
+      {showAddForm ? (
+        <LocationForm
+          eventIds={[]}
+          events={events}
+          submitLabel="Add location"
+          pendingLabel="Adding..."
+          action={handleCreate}
+          onCancel={() => setShowAddForm(false)}
+        />
+      ) : (
+        <button onClick={() => setShowAddForm(true)} className={PRIMARY_BUTTON}>
+          New location
+        </button>
+      )}
+
+      {locations.length === 0 ? (
+        <p className="text-sm text-fg-subtle">No locations yet.</p>
+      ) : (
+        <ul className="divide-y divide-line-subtle border-t border-b border-line-subtle">
+          {locations.map((adminLocation, index) => (
+            <LocationRow
+              key={adminLocation.location.id}
+              adminLocation={adminLocation}
+              events={events}
+              isFirst={index === 0}
+              isLast={index === locations.length - 1}
+            />
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}

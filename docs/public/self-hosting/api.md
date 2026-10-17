@@ -6,7 +6,7 @@ type: reference
 
 # HTTP API
 
-Most of what the site and the `/admin` pages do is also available as JSON over
+Most of what the site and the `/legacy/admin` pages do is also available as JSON over
 HTTP, under `/api/v1`. Use it to script event setup — events, days, locations,
 guests, sessions — or to connect another tool to sessions, proposals, RSVPs and
 votes. The `v1` in the path is the API's version.
@@ -19,7 +19,7 @@ runs:
 
 - **`/api/v1/docs`** is an interactive reference. Read the endpoints and send
   requests from the browser; they carry your login cookies, so they act as
-  you. Each endpoint shows which cookie it needs; log in at `/admin` first for
+  you. Each endpoint shows which cookie it needs; log in at `/legacy/admin` first for
   the `/api/v1/admin/` ones.
 - **`/api/v1/openapi.json`** is the document itself, for another OpenAPI
   viewer or a client generator.

@@ -154,7 +154,7 @@ test("logging out from the chip menu clears the selected name @003-US2", async (
   // Logout clears the site login too, so a password-protected site re-prompts
   // before landing on the anonymous state. Wait for the actual hard-reload
   // navigation rather than the chip's optimistic "Select your name" text.
-  await page.waitForURL((url) => url.pathname === "/login");
+  await page.waitForURL((url) => url.pathname === "/legacy/login");
   await login(page);
   await expect(
     page.getByRole("button", { name: "Your name", exact: true })

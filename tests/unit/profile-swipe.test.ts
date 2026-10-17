@@ -7,7 +7,7 @@ import {
   swipeCommit,
   swipeOffset,
   trackSwipe,
-} from "@/app/(site)/guests/swipe";
+} from "@/app/legacy/(site)/guests/swipe";
 
 const BOTH_WAYS = { canPrev: true, canNext: true };
 const WIDTH = 400;

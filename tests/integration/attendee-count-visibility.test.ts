@@ -1,6 +1,6 @@
 // @module-tag 001-US1
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
-import { eventContextFrom } from "@/app/(site)/[eventSlug]/replica/selectors";
+import { eventContextFrom } from "@/app/legacy/(site)/[eventSlug]/replica/selectors";
 import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 
@@ -24,7 +24,7 @@ vi.mock("next/headers", () => ({
 }));
 
 const captured: { sessions?: unknown } = {};
-vi.mock("@/app/(site)/[eventSlug]/event-provider-wrapper", () => ({
+vi.mock("@/app/legacy/(site)/[eventSlug]/event-provider-wrapper", () => ({
   EventProviderWrapper: ({ snapshot }: { snapshot: Snapshot }) => {
     captured.sessions = eventContextFrom(snapshot).sessions;
     return "PROVIDER_STUB";
@@ -106,7 +106,7 @@ describe("a recorded attendee count never reaches a session payload", () => {
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(attendee.id));
 
     const { EventLayoutContent } =
-      await import("@/app/(site)/[eventSlug]/layout-content");
+      await import("@/app/legacy/(site)/[eventSlug]/layout-content");
     renderToStaticMarkup(
       await EventLayoutContent({ eventSlug: event.slug, children: null })
     );
@@ -120,7 +120,7 @@ describe("a recorded attendee count never reaches a session payload", () => {
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(host.id));
 
     const { EventLayoutContent } =
-      await import("@/app/(site)/[eventSlug]/layout-content");
+      await import("@/app/legacy/(site)/[eventSlug]/layout-content");
     renderToStaticMarkup(
       await EventLayoutContent({ eventSlug: event.slug, children: null })
     );

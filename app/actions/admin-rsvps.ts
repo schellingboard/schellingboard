@@ -20,8 +20,8 @@ export async function adminRemoveRsvpAction(input: {
   if (!result.ok)
     return { ok: false, error: result.error.detail ?? "Failed to remove RSVP" };
 
-  revalidatePath("/admin");
-  revalidatePath("/admin/events");
-  revalidatePath(`/admin/events/${result.value.eventId}`);
+  revalidatePath("/legacy/admin");
+  revalidatePath("/legacy/admin/events");
+  revalidatePath(`/legacy/admin/events/${result.value.eventId}`);
   return { ok: true };
 }

@@ -1,5 +1,5 @@
 import type { Session } from "@schellingboard/domain/session";
-import { sessionsOverlap } from "@/app/(site)/session_utils";
+import { sessionsOverlap } from "@/app/legacy/(site)/session_utils";
 import type { MeetingView } from "./meeting-views";
 
 export type RsvpClash =

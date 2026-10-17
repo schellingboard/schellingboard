@@ -1,0 +1,178 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import Link from "next/link";
+import { Input } from "@/app/input";
+import type { Event } from "@schellingboard/domain/event";
+import { createEventAction, type EventInput } from "@/app/actions/admin-events";
+import { PRIMARY_BUTTON, SECONDARY_BUTTON } from "@/app/legacy/admin/buttons";
+import { ActionError } from "@/app/components/action-error";
+import { TimezoneSelect } from "@/app/legacy/admin/timezone-select";
+import { MarkdownHint } from "@/app/legacy/(site)/markdown";
+import { formatEventDates } from "@schellingboard/domain/time";
+
+const DEFAULT_FORM: EventInput = {
+  name: "",
+  description: "",
+  website: "",
+  timezone: "UTC",
+  maxSessionDuration: "60",
+  breakMinutes: "10",
+  slotIncrementMinutes: "30",
+};
+
+function AddEventForm() {
+  const [error, setError] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState<EventInput>(DEFAULT_FORM);
+  const [isPending, startTransition] = useTransition();
+
+  const set = (key: keyof EventInput, value: string) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    startTransition(async () => {
+      const result = await createEventAction(form);
+      if (!result.ok) {
+        setError(result.error);
+      } else {
+        setError(null);
+        setForm(DEFAULT_FORM);
+        setOpen(false);
+      }
+    });
+  };
+
+  if (!open) {
+    return (
+      <button onClick={() => setOpen(true)} className={PRIMARY_BUTTON}>
+        New event
+      </button>
+    );
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-3 border border-line-subtle rounded-md p-4 max-w-2xl"
+    >
+      <h2 className="font-medium text-fg">New event</h2>
+      <div className="flex flex-col gap-1">
+        <label htmlFor="ev-name" className="text-sm text-fg-muted">
+          Name *
+        </label>
+        <Input
+          id="ev-name"
+          value={form.name}
+          onChange={(e) => set("name", e.target.value)}
+          required
+          className="w-full h-10"
+        />
+      </div>
+      <div className="flex flex-col gap-1">
+        <label htmlFor="ev-description" className="text-sm text-fg-muted">
+          Description
+        </label>
+        <textarea
+          id="ev-description"
+          value={form.description}
+          onChange={(e) => set("description", e.target.value)}
+          rows={3}
+          className="w-full rounded-md border border-line px-3 py-2 text-sm shadow-sm resize-y focus:outline-none focus:ring-2 focus:ring-line"
+        />
+        <MarkdownHint />
+      </div>
+      <div className="flex flex-col gap-1">
+        <label htmlFor="ev-website" className="text-sm text-fg-muted">
+          Website
+        </label>
+        <Input
+          id="ev-website"
+          value={form.website}
+          onChange={(e) => set("website", e.target.value)}
+          className="w-full h-10"
+        />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="flex flex-col gap-1">
+          <label htmlFor="ev-timezone" className="text-sm text-fg-muted">
+            Timezone *
+          </label>
+          <TimezoneSelect
+            id="ev-timezone"
+            value={form.timezone}
+            onChange={(v) => set("timezone", v)}
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label htmlFor="ev-duration" className="text-sm text-fg-muted">
+            Max session duration (min)
+          </label>
+          <Input
+            id="ev-duration"
+            type="number"
+            min="1"
+            value={form.maxSessionDuration}
+            onChange={(e) => set("maxSessionDuration", e.target.value)}
+            required
+            className="w-full h-10"
+          />
+        </div>
+      </div>
+      <ActionError message={error} />
+      <div className="flex gap-2">
+        <button type="submit" disabled={isPending} className={PRIMARY_BUTTON}>
+          {isPending ? "Creating..." : "Create event"}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setOpen(false);
+            setError(null);
+          }}
+          disabled={isPending}
+          className={SECONDARY_BUTTON}
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+}
+
+export function EventsManager({ events }: { events: Event[] }) {
+  return (
+    <div className="space-y-4">
+      <AddEventForm />
+
+      {events.length === 0 ? (
+        <p className="text-sm text-fg-subtle">No events yet.</p>
+      ) : (
+        <ul className="divide-y divide-line-subtle border-t border-b border-line-subtle">
+          {events.map((event) => (
+            <li
+              key={event.id}
+              className="py-3 flex items-center justify-between gap-3"
+            >
+              <div className="min-w-0">
+                <p className="font-medium text-fg truncate">{event.name}</p>
+                <p className="text-sm text-fg-subtle">
+                  {formatEventDates(event, "yyyy-MM-dd") ?? "No days yet"}
+                  {" · "}
+                  {event.timezone}
+                </p>
+              </div>
+              <Link
+                href={`/legacy/admin/events/${event.id}`}
+                className={SECONDARY_BUTTON}
+              >
+                Manage
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}

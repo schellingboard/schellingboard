@@ -21,7 +21,7 @@ function settled(result: Result<unknown>): AdminActionResult {
   if (!result.ok) {
     return { ok: false, error: result.error.detail ?? "Something went wrong" };
   }
-  revalidatePath("/admin/locations");
+  revalidatePath("/legacy/admin/locations");
   return { ok: true };
 }
 

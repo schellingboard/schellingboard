@@ -356,7 +356,10 @@ describe("adminCreateSessionAction", () => {
     });
     expect(result.ok).toBe(true);
 
-    expect(revalidatePath).toHaveBeenCalledWith(`/${event.slug}`, "layout");
+    expect(revalidatePath).toHaveBeenCalledWith(
+      `/legacy/${event.slug}`,
+      "layout"
+    );
   });
 
   it("rejects a session overlapping an existing one in the same location", async () => {
@@ -970,7 +973,10 @@ describe("adminUpdateSessionAction", () => {
     });
     expect(result.ok).toBe(true);
 
-    expect(revalidatePath).toHaveBeenCalledWith(`/${event.slug}`, "layout");
+    expect(revalidatePath).toHaveBeenCalledWith(
+      `/legacy/${event.slug}`,
+      "layout"
+    );
   });
 
   it("rejects when not authenticated", async () => {
@@ -1098,7 +1104,10 @@ describe("adminDeleteSessionAction", () => {
     const result = await adminDeleteSessionAction({ id: session.id });
     expect(result.ok).toBe(true);
 
-    expect(revalidatePath).toHaveBeenCalledWith(`/${event.slug}`, "layout");
+    expect(revalidatePath).toHaveBeenCalledWith(
+      `/legacy/${event.slug}`,
+      "layout"
+    );
   });
 
   it("rejects when not authenticated", async () => {

@@ -1,6 +1,6 @@
 // @module-tag 015-US2
 import { describe, it, expect } from "vitest";
-import { followsEvent } from "@/app/admin/events/[id]/use-event-section";
+import { followsEvent } from "@/app/legacy/admin/events/[id]/use-event-section";
 
 const loaded = { values: { name: "Sent" }, version: 2 };
 

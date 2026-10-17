@@ -63,7 +63,7 @@ export async function updateProfileAction(
     };
   }
 
-  revalidatePath(`/guests/${result.value.id}`);
-  revalidatePath("/guests");
+  revalidatePath(`/legacy/guests/${result.value.id}`);
+  revalidatePath("/legacy/guests");
   return { ok: true };
 }

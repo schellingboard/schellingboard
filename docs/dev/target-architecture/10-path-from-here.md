@@ -36,7 +36,7 @@ sketch, not a plan; each step would get its own issue and ADR.
    **Done** ([ADR 0014](../adr/0014-change-feed-and-snapshot.md),
    [#1111](https://github.com/schellingboard/schellingboard/issues/1111)): the
    feed and the snapshot are served under `/api/v1`, and the schedule, agenda
-   and kiosk read from a replica in `app/(site)/[eventSlug]/replica/`.
+   and kiosk read from a replica in `app/legacy/(site)/[eventSlug]/replica/`.
 
 5. **Move screens to the SPA one family at a time.** Start with the schedule
    (biggest win: replica, filters, agenda, kiosk), then proposals and voting,

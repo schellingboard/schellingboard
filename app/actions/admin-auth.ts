@@ -23,7 +23,7 @@ export async function adminLoginAction(
   const password = formData.get("admin-password") as string;
   const redirectTo = safeRedirectPath(
     formData.get("redirect") as string,
-    "/admin"
+    "/legacy/admin"
   );
 
   if (!isAdminEnabled()) {
@@ -50,5 +50,5 @@ export async function adminLoginAction(
 
 export async function adminLogoutAction() {
   (await cookies()).set(createAdminLogoutCookie());
-  redirect("/admin/login");
+  redirect("/legacy/admin/login");
 }

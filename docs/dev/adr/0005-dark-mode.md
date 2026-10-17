@@ -37,7 +37,7 @@ Constraints that shape the decision:
 
 Per device, rather than on the guest record, because:
 
-- `app/(site)/settings/page.tsx` requires a selected guest, and the header menu
+- `app/legacy/(site)/settings/page.tsx` requires a selected guest, and the header menu
   that reaches it only renders once a name is chosen
   (`header-user-select.tsx:62`). A guest-record setting would be unreachable
   from exactly the screens a first-time visitor sees.
