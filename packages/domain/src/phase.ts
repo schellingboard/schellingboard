@@ -7,6 +7,14 @@ export enum EventPhase {
   INACTIVE = "inactive",
 }
 
+export type SchedPhaseDates = Pick<
+  Event,
+  | "proposalPhaseStart"
+  | "votingPhaseStart"
+  | "schedulingPhaseStart"
+  | "schedulingPhaseEnd"
+>;
+
 /**
  * The interval is half-open `[start, end)`: the end is exclusive so that
  * touching phases (where one phase's implicit end equals the next phase's
@@ -49,7 +57,7 @@ export function inVotingPhase(event: Event, now: Date): boolean {
   );
 }
 
-export function inSchedPhase(event: Event, now: Date): boolean {
+export function inSchedPhase(event: SchedPhaseDates, now: Date): boolean {
   const { schedulingPhaseStart, schedulingPhaseEnd } = event;
 
   // If no phases are configured, assume scheduling is always active
@@ -70,7 +78,7 @@ export function getCurrentPhase(event: Event, now: Date): EventPhase {
   return EventPhase.INACTIVE;
 }
 
-export function hasPhases(event: Event): boolean {
+export function hasPhases(event: SchedPhaseDates): boolean {
   const { proposalPhaseStart, votingPhaseStart, schedulingPhaseStart } = event;
 
   return !!(proposalPhaseStart || votingPhaseStart || schedulingPhaseStart);

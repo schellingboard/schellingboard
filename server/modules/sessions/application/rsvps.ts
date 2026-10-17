@@ -1,5 +1,9 @@
 import type { ChangeContext } from "@schellingboard/domain/change";
-import { inSchedPhase } from "@schellingboard/domain/phase";
+import {
+  rsvpRefusal,
+  type RsvpRefusal,
+} from "@schellingboard/domain/rsvp-rule";
+import type { Event } from "@schellingboard/domain/event";
 import type { Rsvp, Session } from "@schellingboard/domain/session";
 import { actingAsNamedGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
@@ -9,8 +13,10 @@ import {
   forbidden,
   notFound,
   ok,
+  type Failure,
   type Result,
 } from "@/server/kernel/result";
+import type { Tx } from "@/server/kernel/unit-of-work";
 import type { SessionDeps } from "../ports";
 import { findRsvp, recordRsvpAdded, removeRsvp } from "./session-changes";
 
@@ -21,48 +27,68 @@ export interface RsvpInput {
 
 const sessionNotFound = () => notFound("session.notFound", "Session not found");
 
-async function rsvpTarget(
-  repos: SessionDeps["repos"],
+const REFUSALS: Record<RsvpRefusal, () => Failure> = {
+  "guest.notInEvent": () =>
+    forbidden("guest.notInEvent", "Guest is not part of this event"),
+  "event.notSchedulingPhase": () =>
+    forbidden(
+      "event.notSchedulingPhase",
+      "RSVPs can only be changed during the scheduling phase"
+    ),
+  "rsvp.ownSession": () =>
+    forbidden("rsvp.ownSession", "Hosts cannot RSVP to their own session"),
+  "session.full": () => conflict("session.full", "This session is full"),
+};
+
+async function checkRsvp(
+  repos: Tx,
   actor: Actor,
   { sessionId, guestId }: RsvpInput,
+  intent: "add" | "withdraw",
   now: Date
-): Promise<Result<{ session: Session; rsvpCapacityHardLimit: boolean }>> {
+): Promise<
+  Result<{
+    session: Session;
+    event: Event | undefined;
+    existing: Rsvp | undefined;
+  }>
+> {
   const acting = await actingAsNamedGuest(actor, guestId, repos.guests);
   if (!acting.ok) return acting;
   const session = await repos.sessions.findById(sessionId);
   if (!session) return sessionNotFound();
   const event = await repos.events.findById(session.eventId);
   const eventGuests = event ? await repos.guests.listByEvent(event.id) : [];
-  if (!eventGuests.some((g) => g.id === guestId))
-    return forbidden("guest.notInEvent", "Guest is not part of this event");
-  if (!event || !inSchedPhase(event, now))
-    return forbidden(
-      "event.notSchedulingPhase",
-      "RSVPs can only be changed during the scheduling phase"
-    );
-  return ok({
+  const existing =
+    intent === "add" ? await findRsvp(repos, sessionId, guestId) : undefined;
+  const refusal = rsvpRefusal({
+    intent,
+    event,
+    now,
+    guestId,
+    guestInEvent: eventGuests.some((g) => g.id === guestId),
     session,
-    rsvpCapacityHardLimit: event.rsvpCapacityHardLimit,
+    alreadyRsvped: !!existing,
   });
+  if (refusal) return REFUSALS[refusal]();
+  return ok({ session, event, existing });
 }
 
 export const rsvp =
   ({ uow }: SessionDeps) =>
   async (actor: Actor, input: RsvpInput, now: Date): Promise<Result<Rsvp>> =>
     uow.run(async (tx) => {
-      const target = await rsvpTarget(tx, actor, input, now);
-      if (!target.ok) return target;
-      const { session, rsvpCapacityHardLimit } = target.value;
-      if (session.hosts.some((h) => h.id === input.guestId))
-        return forbidden(
-          "rsvp.ownSession",
-          "Hosts cannot RSVP to their own session"
-        );
-
-      const existing = await findRsvp(tx, input.sessionId, input.guestId);
+      const checked = await checkRsvp(tx, actor, input, "add", now);
+      if (!checked.ok) return checked;
+      const { session, event, existing } = checked.value;
       if (existing) return ok(existing);
 
-      const added = await addRsvp(tx, input, session, rsvpCapacityHardLimit);
+      const added = await addRsvp(
+        tx,
+        input,
+        session,
+        event?.rsvpCapacityHardLimit ?? false
+      );
       if (added.ok)
         await recordRsvpAdded(tx, added.value, byGuest(input.guestId, now));
       return added;
@@ -94,8 +120,8 @@ export const withdrawRsvp =
   ({ uow }: SessionDeps) =>
   async (actor: Actor, input: RsvpInput, now: Date): Promise<Result<void>> =>
     uow.run(async (tx) => {
-      const target = await rsvpTarget(tx, actor, input, now);
-      if (!target.ok) return target;
+      const checked = await checkRsvp(tx, actor, input, "withdraw", now);
+      if (!checked.ok) return checked;
       await removeRsvp(
         tx,
         input.sessionId,

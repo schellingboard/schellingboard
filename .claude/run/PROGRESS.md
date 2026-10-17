@@ -77,6 +77,14 @@
   RSVP ids were already in the `session.deleted` payload. ADR 0014 open question 1
   marked answered.
 
+## Step 6 (2026-10-08)
+
+- `rsvpRefusal` in `packages/domain/src/rsvp-rule.ts` returns the reason code
+  (guest not in event, not the scheduling phase, own session, full). The RSVP and
+  withdraw use cases call it; the repository's atomic capacity insert stays as the
+  guard against a race, mapping to the same `session.full`. The admin seeding path
+  (no phase gate) does not use it.
+
 ## Questions
 
 - A session that loses its only room reads `"X" moved to No location (was Room A)`
@@ -88,4 +96,4 @@
 
 ## Next step
 
-6.
+7a.

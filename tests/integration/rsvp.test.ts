@@ -311,3 +311,35 @@ describe("POST /api/toggle-rsvp", () => {
     expect(missing.status).toBe(400);
   });
 });
+
+describe("createIfUnderCapacity", () => {
+  beforeAll(() => setupTestDb());
+  beforeEach(() => resetTestDb());
+
+  it("refuses a full session, and returns an existing RSVP unchanged", async () => {
+    const event = await createEvent();
+    const session = await createSession(event.id, { capacity: 1 });
+    const first = await createGuest({ eventId: event.id });
+    const second = await createGuest({ eventId: event.id });
+    const { rsvps } = getRepositories();
+
+    const created = await rsvps.createIfUnderCapacity({
+      sessionId: session.id,
+      guestId: first.id,
+      capacity: 1,
+    });
+    const again = await rsvps.createIfUnderCapacity({
+      sessionId: session.id,
+      guestId: first.id,
+      capacity: 1,
+    });
+    const refused = await rsvps.createIfUnderCapacity({
+      sessionId: session.id,
+      guestId: second.id,
+      capacity: 1,
+    });
+
+    expect(again?.id).toBe(created?.id);
+    expect(refused).toBeNull();
+  });
+});
