@@ -1,7 +1,9 @@
 // @module-tag 007-US8
 import { describe, it, expect } from "vitest";
 import {
+  RECONNECT_GRACE_MS,
   STALE_AFTER_MS,
+  nextChangeAt,
   staleAt,
   syncState,
 } from "@/app/(site)/[eventSlug]/replica/sync-state";
@@ -15,13 +17,26 @@ describe("syncState", () => {
     );
   });
 
-  it("is reconnecting for a short while after the feed drops, then stale", () => {
+  it("stays live through a short grace after the feed drops, then is reconnecting, then stale", () => {
     const link = { connected: false, since: 1000 };
 
-    expect(syncState(link, 1000)).toBe("reconnecting");
+    expect(syncState(link, 1000)).toBe("live");
+    expect(syncState(link, 1000 + RECONNECT_GRACE_MS - 1)).toBe("live");
+    expect(syncState(link, 1000 + RECONNECT_GRACE_MS)).toBe("reconnecting");
     expect(syncState(link, 1000 + STALE_AFTER_MS - 1)).toBe("reconnecting");
     expect(syncState(link, 1000 + STALE_AFTER_MS)).toBe("stale");
     expect(staleAt(link)).toBe(1000 + STALE_AFTER_MS);
+  });
+
+  it("names the next moment the state changes", () => {
+    const link = { connected: false, since: 1000 };
+
+    expect(nextChangeAt(link, 1000)).toBe(1000 + RECONNECT_GRACE_MS);
+    expect(nextChangeAt(link, 1000 + RECONNECT_GRACE_MS)).toBe(
+      1000 + STALE_AFTER_MS
+    );
+    expect(nextChangeAt(link, 1000 + STALE_AFTER_MS)).toBeNull();
+    expect(nextChangeAt({ connected: true, since: 0 }, 5)).toBeNull();
   });
 });
 

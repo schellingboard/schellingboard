@@ -14,6 +14,9 @@ const HEARTBEAT_MS = 25_000;
 // A connection that never ends could outlive a credential change; the client
 // reconnects with Last-Event-ID, so the cut is invisible.
 const MAX_AGE_MS = 10 * 60_000;
+// Browsers wait 3-5 s by default before reconnecting an ended stream, longer
+// than the client's grace before it shows "Reconnecting…".
+export const RECONNECT_DELAY_MS = 1000;
 
 const getSnapshot = createRoute({
   method: "get",
@@ -33,7 +36,7 @@ const getFeed = createRoute({
   path: "/events/{slug}/feed",
   tags: ["events"],
   description:
-    "A `text/event-stream` of the event's changes after `since` (the snapshot's `seq`), filtered to what the `guest` cookie may see. Each message has `id` = its `seq`, `event` = its type and the message as JSON `data`; a browser's reconnect sends `Last-Event-ID`, which wins over `since`. An `event: reset` message, after which the stream ends, means the resume point cannot be served: load the snapshot again. An `event: ping` every 25 seconds keeps proxies from closing it and lets a client notice a dead connection; it ends after 10 minutes.",
+    "A `text/event-stream` of the event's changes after `since` (the snapshot's `seq`), filtered to what the `guest` cookie may see. Each message has `id` = its `seq`, `event` = its type and the message as JSON `data`; a browser's reconnect sends `Last-Event-ID`, which wins over `since`. An `event: reset` message, after which the stream ends, means the resume point cannot be served: load the snapshot again. An `event: ping` every 25 seconds keeps proxies from closing it and lets a client notice a dead connection; it ends after 10 minutes. The first message carries `retry: 1000`, so a client reconnects after one second.",
   request: {
     params: z.object({ slug: z.string().min(1) }),
     query: z.object({ since: z.string().optional() }),
@@ -117,9 +120,11 @@ export function addFeedRoutes(app: App, deps: { uow: UnitOfWork }): void {
         // already cancelled
       }
     }
+    let preamble = `retry: ${RECONNECT_DELAY_MS}\n`;
     const write = (text: string): boolean => {
       if (finished) return false;
-      controller.enqueue(encoder.encode(text));
+      controller.enqueue(encoder.encode(preamble + text));
+      preamble = "";
       if ((controller.desiredSize ?? 0) >= 0) return true;
       finish();
       return false;

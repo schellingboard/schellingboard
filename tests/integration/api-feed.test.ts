@@ -11,6 +11,8 @@ import {
 import { NextRequest } from "next/server";
 import { GET } from "@/app/api/v1/[[...route]]/route";
 import { getRepositories } from "@/db/container";
+import { RECONNECT_DELAY_MS } from "@/server/feed/routes";
+import { RECONNECT_GRACE_MS } from "@/app/(site)/[eventSlug]/replica/sync-state";
 import { connectionCount } from "@/server/feed/hub";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { updateLoggedSession } from "../helpers/changes";
@@ -48,16 +50,32 @@ function open(
 function reader(res: Response) {
   const r = res.body!.getReader();
   const decoder = new TextDecoder();
+  let first = true;
   return {
-    async next(): Promise<string | null> {
+    async next({ raw = false } = {}): Promise<string | null> {
       const { value, done } = await r.read();
-      return done ? null : decoder.decode(value);
+      if (done) return null;
+      const text = decoder.decode(value);
+      const wasFirst = first;
+      first = false;
+      return wasFirst && !raw ? text.replace(/^retry: \d+\n/, "") : text;
     },
     cancel: () => r.cancel(),
   };
 }
 
 describe("GET /events/{slug}/feed", () => {
+  it("tells the browser to reconnect before the client shows Reconnecting", async () => {
+    const { event } = await setup();
+    const stream = reader(await open(event.slug, "?since=0"));
+
+    const first = (await stream.next({ raw: true }))!;
+    const delay = Number(/^retry: (\d+)\n/.exec(first)![1]);
+    expect(delay).toBe(RECONNECT_DELAY_MS);
+    expect(delay).toBeLessThan(RECONNECT_GRACE_MS);
+    await stream.cancel();
+  });
+
   it("streams the logged changes after ?since=, then live ones", async () => {
     const { event, session } = await setup();
     const res = await open(event.slug, "?since=0");
