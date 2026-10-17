@@ -1,9 +1,8 @@
 import { cookies } from "next/headers";
-import { eventSnapshot } from "@/server/composition";
+import { eventSnapshot, pageReads } from "@/server/composition";
 import { resolveActor } from "@/server/kernel/actor";
 import { EventProviderWrapper } from "./event-provider-wrapper";
 import { serverNow } from "@/utils/dev-clock-server";
-import { meetingViewsFor } from "@/utils/meeting-views";
 
 export async function EventLayoutContent({
   eventSlug,
@@ -27,7 +26,7 @@ export async function EventLayoutContent({
   const myMeetings = me
     ? {
         guestId: me.guestId,
-        meetings: await meetingViewsFor(
+        meetings: await pageReads().meetingViews(
           me.guestId,
           snapshot.value.event.id,
           now

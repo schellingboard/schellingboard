@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { getRepositories, type Repositories } from "@/db/container";
+import type { Repositories } from "@/db/container";
 import type { z } from "zod";
 import type { myMeetingsSchema } from "@schellingboard/contracts/meeting";
 import { clashesForInterval, loadGuestSchedules } from "@/utils/guest-clashes";
@@ -22,10 +22,7 @@ export async function meetingViewsFor(
   viewerId: string,
   eventId: string,
   now: Date,
-  repos: Pick<
-    Repositories,
-    "events" | "guests" | "sessions" | "meetings"
-  > = getRepositories()
+  repos: Pick<Repositories, "events" | "guests" | "sessions" | "meetings">
 ): Promise<MeetingView[]> {
   const event = await repos.events.findById(eventId);
   if (!event) return [];
@@ -101,7 +98,7 @@ export async function myMeetingsFor(
   repos: Pick<
     Repositories,
     "events" | "guests" | "sessions" | "meetings" | "meetingAvailability"
-  > = getRepositories()
+  >
 ): Promise<MyMeetingsResponse> {
   const [meetings, availability] = await Promise.all([
     meetingViewsFor(viewerId, eventId, now, repos),

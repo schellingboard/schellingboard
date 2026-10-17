@@ -36,7 +36,11 @@ import {
   eventDays,
 } from "@/server/modules/events/module";
 import {
+  availabilityForms,
   createMeetingUseCases,
+  guestSchedules,
+  meetingOptions,
+  meetingViews,
   type MeetingUseCases,
 } from "@/server/modules/meetings/module";
 import {
@@ -199,6 +203,17 @@ export function pageReads() {
     sessionsOfEvent: (eventId: string) => sessionsOfEvent(repos, eventId),
     hostedSessions: (guestId: string) => hostedSessions(repos, guestId),
     eventLocations: (eventId: string) => eventLocations(repos, eventId),
+    guestSchedules: (eventId: string, guestIds: string[]) =>
+      guestSchedules(repos, eventId, guestIds),
+    meetingViews: (viewerId: string, eventId: string, now: Date) =>
+      meetingViews(repos, viewerId, eventId, now),
+    meetingOptions: (
+      viewerId: string | null,
+      recipientId: string,
+      events: Parameters<typeof meetingOptions>[3]
+    ) => meetingOptions(repos, viewerId, recipientId, events),
+    availabilityForms: (guestId: string, now: Date) =>
+      availabilityForms(repos, guestId, now),
   };
 }
 

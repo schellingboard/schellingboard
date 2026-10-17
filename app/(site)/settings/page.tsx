@@ -8,10 +8,7 @@ import {
 import { serverNow } from "@/utils/dev-clock-server";
 import { notificationUseCases } from "@/server/composition";
 import { resolveActor } from "@/server/kernel/actor";
-import {
-  availabilityFormsFor,
-  type AvailabilityFormData,
-} from "@/utils/meeting-availability-form";
+import { type AvailabilityFormData } from "@/utils/meeting-availability-form";
 import { SettingsForm } from "./settings-form";
 import { AccountSecurity } from "./account-security";
 import { PushNotifications } from "./push-notifications";
@@ -54,7 +51,7 @@ export default async function SettingsPage() {
     now
   );
   if (!pushKey.ok) throw new Error(pushKey.error.code);
-  const availability = await availabilityFormsFor(guest.id, now);
+  const availability = await pageReads().availabilityForms(guest.id, now);
 
   // Never render the stored email address here: switching the current user
   // is unauthenticated, so anyone could impersonate a guest and read it.

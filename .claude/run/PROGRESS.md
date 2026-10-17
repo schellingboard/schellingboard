@@ -27,8 +27,14 @@
   The dependency-cruiser rule now covers `utils/`; the helpers still to convert
   (3b, 3c) sit on its allow-list until then.
 
+## Step 3b (2026-10-08)
+
+- The meeting helpers and `guest-clashes` take their repositories from the caller;
+  the meetings module's page reads (`pageReads().meetingViews` and the like) bind
+  them for `app/`. Their integration tests call those. Server modules keep passing their own repos.
+
 ## Questions
 
 ## Next step
 
-3b.
+3c.
