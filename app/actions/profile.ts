@@ -33,11 +33,11 @@ const profileActionSchema = profileSchema.extend({
 
     return avatarBuffer;
   }),
-  expectedVersion: expectedVersion.optional(),
+  expectedVersion,
 });
 
 export async function updateProfileAction(
-  formData: z.input<typeof profileSchema> & { expectedVersion?: number }
+  formData: z.input<typeof profileSchema> & { expectedVersion: number }
 ): Promise<ProfileActionResult>;
 
 export async function updateProfileAction(

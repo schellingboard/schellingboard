@@ -158,11 +158,11 @@ export const updateGuest =
     return uow.run(async (tx) => {
       const current = await tx.guests.findById(id);
       if (!current) return guestNotFound();
-      if (expectedVersion !== undefined && current.version !== expectedVersion)
+      if (current.version !== expectedVersion)
         return versionConflict(
           "guest",
           await withEvents(tx.guests, current),
-          "Someone changed this guest while you edited it"
+          "Someone changed this guest while you edited it. Copy your edits somewhere safe: reloading the page discards them."
         );
       const existing = await tx.guests.findByEmail(email);
       if (existing && existing.id !== id) return emailTaken();

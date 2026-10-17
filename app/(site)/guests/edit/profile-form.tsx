@@ -119,6 +119,7 @@ export function ProfileForm({ guest }: { guest: Guest }) {
   });
   const avatar = avatarFileList === null ? null : avatarFileList?.[0];
   const [isDragging, setIsDragging] = useState(false);
+  const [loadedVersion] = useState(guest.profileVersion);
   // Field the error summary was last asked to jump to: the disclosure holding
   // it has to open before the field can be seen or focused.
   const [jumpTarget, setJumpTarget] = useState<string | null>(null);
@@ -185,7 +186,10 @@ export function ProfileForm({ guest }: { guest: Guest }) {
     }
 
     try {
-      const result = await updateProfileAction(profile);
+      const result = await updateProfileAction({
+        ...profile,
+        expectedVersion: loadedVersion,
+      });
       if (!result.ok) {
         setActionErrors(form, result.error);
       } else {

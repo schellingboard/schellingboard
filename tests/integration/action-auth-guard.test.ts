@@ -195,7 +195,7 @@ const SITE_GUARDED: Record<string, () => Promise<unknown>> = {
   },
   "actions/profile.ts:updateProfileAction": async () => {
     const { updateProfileAction } = await import("@/app/actions/profile");
-    return updateProfileAction({ name: "N" });
+    return updateProfileAction({ name: "N", expectedVersion: 1 });
   },
   "actions/notifications.ts:openNotificationAction": async () => {
     const { openNotificationAction } =

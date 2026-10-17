@@ -111,30 +111,28 @@ export const updateMeetingPoint =
   ({ uow }: MeetingDeps) =>
   async (
     actor: Actor,
-    input: MeetingPointInput & { id: string; expectedVersion?: number }
+    input: MeetingPointInput & { id: string; expectedVersion: number }
   ): Promise<Result<MeetingPoint>> => {
     if (!actor.admin) return adminRequired();
     const name = input.name.trim();
     if (!name) return nameRequired();
     return uow.run(async (tx) => {
-      const missing = await missingPoint(tx, input);
-      if (missing) return missing;
+      const current = (await tx.meetingPoints.listByEvent(input.eventId)).find(
+        (p) => p.id === input.id
+      );
+      if (!current) return pointNotFound();
+      if (current.version !== input.expectedVersion)
+        return versionConflict(
+          "meetingPoint",
+          current,
+          "Someone changed this meeting point while you edited it. Copy your edits somewhere safe: reloading the page discards them."
+        );
       const updated = await tx.meetingPoints.update(input.id, {
         name,
         description: input.description?.trim() ?? "",
         expectedVersion: input.expectedVersion,
       });
-      if (updated) return ok(updated);
-      const current = (await tx.meetingPoints.listByEvent(input.eventId)).find(
-        (p) => p.id === input.id
-      );
-      return current
-        ? versionConflict(
-            "meetingPoint",
-            current,
-            "Someone changed this meeting point while you edited it"
-          )
-        : pointNotFound();
+      return updated ? ok(updated) : pointNotFound();
     });
   };
 

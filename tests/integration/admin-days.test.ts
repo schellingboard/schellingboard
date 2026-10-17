@@ -364,6 +364,7 @@ describe("day actions", () => {
       const day = await createDay(event.id);
       const result = await updateDayAction({
         id: day.id,
+        expectedVersion: day.version,
         eventId: event.id,
         start: "2026-10-01T09:00",
         end: "2026-10-01T18:00",
@@ -399,10 +400,26 @@ describe("day actions", () => {
       );
     });
 
+    it("refuses an edit that names no version", async () => {
+      const event = await createEvent();
+      const day = await createDay(event.id);
+      const result = await updateDayAction({
+        id: day.id,
+        eventId: event.id,
+        start: "2026-10-01T09:00",
+        end: "2026-10-01T18:00",
+        startBookings: "2026-10-01T09:00",
+        endBookings: "2026-10-01T17:30",
+      } as Parameters<typeof updateDayAction>[0]);
+      expect(result.ok).toBe(false);
+      expect(await getRepositories().days.findById(day.id)).toEqual(day);
+    });
+
     it("errors for unknown id", async () => {
       const event = await createEvent();
       const result = await updateDayAction({
         id: "no-such-id",
+        expectedVersion: 1,
         eventId: event.id,
         start: "2026-10-01T09:00",
         end: "2026-10-01T18:00",
@@ -417,6 +434,7 @@ describe("day actions", () => {
       const day = await createDay(event.id);
       const result = await updateDayAction({
         id: day.id,
+        expectedVersion: day.version,
         eventId: "no-such-event-id",
         start: "2026-10-01T09:00",
         end: "2026-10-01T18:00",
@@ -432,6 +450,7 @@ describe("day actions", () => {
       const day = await createDay(event1.id);
       const result = await updateDayAction({
         id: day.id,
+        expectedVersion: day.version,
         eventId: event2.id,
         start: "2026-10-01T09:00",
         end: "2026-10-01T18:00",
@@ -455,6 +474,7 @@ describe("day actions", () => {
       });
       const result = await updateDayAction({
         id: day.id,
+        expectedVersion: day.version,
         eventId: event.id,
         start: "2026-10-02T12:00",
         end: "2026-10-02T20:00",
@@ -484,6 +504,7 @@ describe("day actions", () => {
 
       const result = await updateDayAction({
         id: day.id,
+        expectedVersion: day.version,
         eventId: event.id,
         start: "2026-10-01T09:00",
         end: "2026-10-01T12:00",
@@ -516,6 +537,7 @@ describe("day actions", () => {
 
       const result = await updateDayAction({
         id: day.id,
+        expectedVersion: day.version,
         eventId: event.id,
         start: "2026-10-01T09:00",
         end: "2026-10-01T12:00",
@@ -534,6 +556,7 @@ describe("day actions", () => {
       });
       const result = await updateDayAction({
         id: day.id,
+        expectedVersion: day.version,
         eventId: event.id,
         start: "2026-10-01T08:00",
         end: "2026-10-01T19:00",
@@ -619,6 +642,7 @@ describe("day actions", () => {
       });
       const result = await updateDayAction({
         id: day.id,
+        expectedVersion: day.version,
         eventId: event.id,
         start: "2026-10-01T09:00",
         end: "2026-10-01T17:00",

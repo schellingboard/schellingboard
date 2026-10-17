@@ -28,6 +28,7 @@ export default async function AdminEventConfigPage({
     end: d.end.toISOString(),
     startBookings: d.startBookings.toISOString(),
     endBookings: d.endBookings.toISOString(),
+    version: d.version,
     affectedSessionTitles: scheduledSessions
       .filter((s) => sessionOverlapsWindow(s, d.start, d.end))
       .map((s) => s.title),

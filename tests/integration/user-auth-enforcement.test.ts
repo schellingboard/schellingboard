@@ -266,6 +266,7 @@ describe("write enforcement for protected guests", () => {
       cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
 
       const profileResult = await updateProfileAction({
+        expectedVersion: guest.profileVersion,
         name: "After",
         aboutMe: null,
       });
@@ -297,6 +298,7 @@ describe("write enforcement for protected guests", () => {
       cookieJar.set(GUEST_COOKIE_NAME, await verifiedGuestValue(guest.id));
 
       const result = await updateProfileAction({
+        expectedVersion: guest.profileVersion,
         name: "After",
         aboutMe: null,
       });

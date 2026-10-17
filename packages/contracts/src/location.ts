@@ -40,7 +40,7 @@ export const locationSchema = z.object({
 
 export const updateLocationSchema = locationSchema.extend({
   id: z.string().nonempty(),
-  expectedVersion: expectedVersion.optional(),
+  expectedVersion,
 });
 
 const instant = z.iso.datetime({ offset: true });

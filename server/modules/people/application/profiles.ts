@@ -26,7 +26,7 @@ export interface ProfileInput {
   contacts: ProfileContact[] | null;
   /** Left out keeps the current photo; null removes it. */
   avatar?: ValidatedImage | null;
-  expectedVersion?: number;
+  expectedVersion: number;
 }
 
 const profileNotFound = () => notFound("profile.notFound", "Profile not found");
@@ -48,7 +48,7 @@ const profileConflict = (current: CompleteGuest) =>
   versionConflict(
     "profile",
     sanitizeGuest(current),
-    "Someone changed this profile while you edited it"
+    "Someone changed this profile while you edited it. Copy your edits somewhere safe: reloading the page discards them."
   );
 
 // Files first, then the row is read and written in one transaction, so a photo
@@ -59,9 +59,9 @@ async function saveProfile(
   avatar: ValidatedImage | null | undefined,
   fields: (current: CompleteGuest) => ProfileFields,
   now: Date,
-  expectedVersion?: number
+  expectedVersion: number
 ): Promise<Result<Guest>> {
-  if (avatar !== undefined && expectedVersion !== undefined) {
+  if (avatar !== undefined) {
     const current = await repos.guests.findById(guestId);
     if (!current) return profileNotFound();
     if (current.profileVersion !== expectedVersion)
@@ -131,7 +131,7 @@ export const replaceMyAvatar =
   (deps: PeopleDeps) =>
   async (
     actor: Actor,
-    { image, expectedVersion }: { image: Buffer; expectedVersion?: number },
+    { image, expectedVersion }: { image: Buffer; expectedVersion: number },
     now: Date
   ): Promise<Result<Guest>> => {
     const acting = await actingGuest(actor, deps.repos.guests);
@@ -152,7 +152,7 @@ export const removeMyAvatar =
   (deps: PeopleDeps) =>
   async (
     actor: Actor,
-    { expectedVersion }: { expectedVersion?: number },
+    { expectedVersion }: { expectedVersion: number },
     now: Date
   ): Promise<Result<Guest>> => {
     const acting = await actingGuest(actor, deps.repos.guests);

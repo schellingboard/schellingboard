@@ -94,7 +94,11 @@ describe("event use cases", () => {
         await events().updateEventPhases(NOBODY, { ...noPhases, id: event.id }),
         await events().deleteEvent(NOBODY, { id: event.id }),
         await events().createDay(NOBODY, { ...dayWindow, eventId: event.id }),
-        await events().updateDay(NOBODY, { ...dayWindow, id: day.id }),
+        await events().updateDay(NOBODY, {
+          ...dayWindow,
+          id: day.id,
+          expectedVersion: day.version,
+        }),
         await events().deleteDay(NOBODY, { id: day.id }),
       ];
       expect(refusals.map(code)).toEqual(
@@ -411,6 +415,7 @@ describe("day use cases", () => {
       const shrunk = await events().updateDay(ADMIN, {
         ...dayWindow,
         id: day.id,
+        expectedVersion: day.version,
         end: at("16:00"),
         endBookings: at("16:00"),
       });
@@ -428,12 +433,19 @@ describe("day use cases", () => {
         await events().updateDay(ADMIN, {
           ...dayWindow,
           id: day.id,
+          expectedVersion: day.version,
           end: at("19:00"),
         })
       );
       expect(grown).toMatchObject({ id: day.id, end: at("19:00") });
       expect(
-        code(await events().updateDay(ADMIN, { ...dayWindow, id: "nope" }))
+        code(
+          await events().updateDay(ADMIN, {
+            ...dayWindow,
+            id: "nope",
+            expectedVersion: 1,
+          })
+        )
       ).toBe("day.notFound");
     }
   );
@@ -466,6 +478,7 @@ describe("day use cases", () => {
         events().updateDay(ADMIN, {
           ...dayWindow,
           id: day.id,
+          expectedVersion: day.version,
           end: at("16:00"),
           endBookings: at("16:00"),
         }),
@@ -517,6 +530,7 @@ describe("venue use cases", () => {
         await venue().deleteLocation(NOBODY, { id: location.id }),
         await venue().moveLocation(NOBODY, {
           id: location.id,
+          expectedVersion: location.version,
           direction: "up",
         }),
         await venue().assignLocationsToEvent(NOBODY, {
@@ -601,7 +615,12 @@ describe("venue use cases", () => {
       expect(created.imageUrl).toBe(`/media/locations/${created.id}.png`);
       images.validate.mockResolvedValueOnce({ error: "Wrong shape" });
       expect(
-        await venue().updateLocation(ADMIN, { ...room, id: created.id, image })
+        await venue().updateLocation(ADMIN, {
+          ...room,
+          id: created.id,
+          image,
+          expectedVersion: created.version,
+        })
       ).toMatchObject({
         ok: false,
         error: { errors: [{ path: "image", message: "Wrong shape" }] },
@@ -633,15 +652,29 @@ describe("venue use cases", () => {
     const first = await createLocation({ name: "A", sortIndex: 0 });
     const second = await createLocation({ name: "B", sortIndex: 1 });
     const renamed = value(
-      await venue().updateLocation(ADMIN, { ...room, id: first.id })
+      await venue().updateLocation(ADMIN, {
+        ...room,
+        id: first.id,
+        expectedVersion: first.version,
+      })
     );
     expect(renamed).toMatchObject({ id: first.id, name: "Main Hall" });
     expect(
-      code(await venue().updateLocation(ADMIN, { ...room, id: "nope" }))
+      code(
+        await venue().updateLocation(ADMIN, {
+          ...room,
+          id: "nope",
+          expectedVersion: 1,
+        })
+      )
     ).toBe("location.notFound");
 
     value(
-      await venue().moveLocation(ADMIN, { id: second.id, direction: "up" })
+      await venue().moveLocation(ADMIN, {
+        id: second.id,
+        expectedVersion: second.version,
+        direction: "up",
+      })
     );
     const order = value(await venue().listLocations(ADMIN, {}));
     expect(order.map((l) => l.id)).toEqual([second.id, first.id]);

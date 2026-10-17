@@ -63,6 +63,7 @@ describe("updateProfileAction", () => {
     });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
     const result = await updateProfileAction({
+      expectedVersion: guest.profileVersion,
       name: "Guest",
       aboutMe: null,
     });
@@ -80,6 +81,7 @@ describe("updateProfileAction", () => {
     const guest = await createGuest({ name: "Old" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
     const result = await updateProfileAction({
+      expectedVersion: guest.profileVersion,
       name: "New Name",
       aboutMe: "Hello there",
       pronouns: "they/them",
@@ -98,9 +100,13 @@ describe("updateProfileAction", () => {
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
     const before = new Date();
 
-    expect(await updateProfileAction({ name: "Guest", aboutMe: "Hi" })).toEqual(
-      { ok: true }
-    );
+    expect(
+      await updateProfileAction({
+        name: "Guest",
+        aboutMe: "Hi",
+        expectedVersion: guest.profileVersion,
+      })
+    ).toEqual({ ok: true });
 
     const updated = await getRepositories().guests.findById(guest.id);
     expect(updated?.profileUpdatedAt?.getTime()).toBeGreaterThanOrEqual(
@@ -108,10 +114,48 @@ describe("updateProfileAction", () => {
     );
   });
 
+  it("refuses a save from a version the profile has moved past", async () => {
+    const guest = await createGuest({ name: "Guest" });
+    cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
+    const save = (aboutMe: string) =>
+      updateProfileAction({
+        name: "Guest",
+        aboutMe,
+        expectedVersion: guest.profileVersion,
+      });
+
+    expect(await save("First")).toEqual({ ok: true });
+    expect(await save("Second")).toEqual({
+      ok: false,
+      error: expect.stringMatching(
+        /^Someone changed this profile while you edited it\. Copy your edits/
+      ) as string,
+    });
+    expect((await getRepositories().guests.findById(guest.id))?.aboutMe).toBe(
+      "First"
+    );
+  });
+
+  it("refuses a save that names no version", async () => {
+    const guest = await createGuest({ name: "Guest" });
+    cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
+
+    const result = await updateProfileAction({
+      name: "Guest",
+      aboutMe: "Hi",
+    } as Parameters<typeof updateProfileAction>[0]);
+
+    expect(result.ok).toBe(false);
+    expect(
+      (await getRepositories().guests.findById(guest.id))?.aboutMe
+    ).toBeNull();
+  });
+
   it("updates name, aboutMe, pronouns and avatar for the current user", async () => {
     const guest = await createGuest({ name: "Old" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
     const result = await updateProfileAction({
+      expectedVersion: guest.profileVersion,
       name: "New Name",
       aboutMe: "Hello there",
       avatar: await createImageFile(256, 256, "avatar.png"),
@@ -135,6 +179,7 @@ describe("updateProfileAction", () => {
     const guest = await createGuest({ name: "Old" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
     const result = await updateProfileAction({
+      expectedVersion: guest.profileVersion,
       name: "New Name",
       aboutMe: "Hello there",
       avatar: await createImageFile(2048, 2048, "avatar.png"),
@@ -155,6 +200,7 @@ describe("updateProfileAction", () => {
     const guest = await createGuest({ name: "Old" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
     const result = await updateProfileAction({
+      expectedVersion: guest.profileVersion,
       name: "New Name",
       aboutMe: "Hello there",
       avatar: await createImageFile(512, 512, "avatar.png"),
@@ -170,6 +216,7 @@ describe("updateProfileAction", () => {
     const guest = await createGuest({ name: "Old" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
     const result = await updateProfileAction({
+      expectedVersion: guest.profileVersion,
       name: "New Name",
       aboutMe: "Hello there",
       avatar: await createImageFile(900, 400, "avatar.png"),
@@ -185,6 +232,7 @@ describe("updateProfileAction", () => {
     const guest = await createGuest({ name: "Guest" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
     const result = await updateProfileAction({
+      expectedVersion: guest.profileVersion,
       name: "Guest",
       aboutMe: null,
       basedIn: "Zürich",
@@ -212,6 +260,7 @@ describe("updateProfileAction", () => {
     const guest = await createGuest({ name: "Guest" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
     const result = await updateProfileAction({
+      expectedVersion: guest.profileVersion,
       name: "Guest",
       aboutMe: null,
       basedIn: "  ",
@@ -236,6 +285,7 @@ describe("updateProfileAction", () => {
     const guest = await createGuest({ name: "Guest" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
     const result = await updateProfileAction({
+      expectedVersion: guest.profileVersion,
       name: "Guest",
       aboutMe: null,
       prompts: [
@@ -254,6 +304,7 @@ describe("updateProfileAction", () => {
     const guest = await createGuest({ name: "Guest" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
     const result = await updateProfileAction({
+      expectedVersion: guest.profileVersion,
       name: "Guest",
       aboutMe: null,
       // A label typed while the type was "other" sticks around in the form
@@ -269,6 +320,7 @@ describe("updateProfileAction", () => {
     const guest = await createGuest({ name: "Guest" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
     const result = await updateProfileAction({
+      expectedVersion: guest.profileVersion,
       name: "Guest",
       aboutMe: null,
       contacts: [{ type: "other", value: "@guest:matrix.org" }],
@@ -281,6 +333,7 @@ describe("updateProfileAction", () => {
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
 
     const tooManyLanguages = await updateProfileAction({
+      expectedVersion: guest.profileVersion,
       name: "Guest",
       aboutMe: null,
       languages: Array.from({ length: 11 }, (_, i) => `Lang ${i}`),
@@ -288,6 +341,7 @@ describe("updateProfileAction", () => {
     expect(tooManyLanguages).toMatchObject({ ok: false });
 
     const answerTooLong = await updateProfileAction({
+      expectedVersion: guest.profileVersion,
       name: "Guest",
       aboutMe: null,
       prompts: [{ prompt: "Ask me about", answer: "x".repeat(501) }],
@@ -299,6 +353,7 @@ describe("updateProfileAction", () => {
     const guest = await createGuest({ name: "Old" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
     const result = await updateProfileAction({
+      expectedVersion: guest.profileVersion,
       name: "New Name",
       aboutMe: "Hello there",
       avatar: await createImageFile(128, 128, "avatar.png"),
@@ -312,6 +367,7 @@ describe("updateProfileAction", () => {
     const guest = await createGuest({ name: "Old" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
     const result = await updateProfileAction({
+      expectedVersion: guest.profileVersion,
       name: "New Name",
       aboutMe: "Hello there",
       avatar: await createImageFile(2000, 100, "avatar.png"),
