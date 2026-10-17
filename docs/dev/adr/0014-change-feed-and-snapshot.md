@@ -229,7 +229,11 @@ existing Hono mount.
 - **Command keys.** A change's `command_key` is the raw `Idempotency-Key`,
   which is unique only per actor (ADR 0012 section 5). The feed sends it only
   to the connections of the actor who made the change, and the client matches
-  its echo by key and actor, never by key alone.
+  its echo by key and actor, never by key alone. "The actor" is coarser here
+  than in ADR 0012: admins have no id, so every admin connection gets every
+  admin's keys, and a guest's keys go to any connection naming that guest,
+  whatever its cookie level. A key reveals only that someone made a request,
+  so this is accepted until persons have ids (step 6 of the path).
 - **Slow clients.** A connection whose unsent data passes 1 MB is closed. The
   browser reconnects with `Last-Event-ID` and replays from the table.
 - **Replay, then live.** A new connection registers with the hub and buffers
@@ -248,10 +252,17 @@ that matches. Because publish runs under the write lock, changes arrive in
 
 ### 12. Where the code lives
 
-- `apply(replica, change)` and the `Replica` type live in
-  `packages/domain/src/replica.ts`. `apply` is pure: it upserts or deletes per
-  type, ignores `seq ≤ replica.seq` and skips unknown types. Server tests use
-  it to check that payloads are sufficient (step 11).
+- `apply(replica, message)` lives with the client store, in
+  `app/(site)/[eventSlug]/replica/apply.ts`. The replica is the snapshot's
+  wire type (`Snapshot`) and a message the feed's (`FeedMessage`), both from
+  `packages/contracts`. `apply` is pure: it upserts or deletes per type,
+  ignores `seq ≤ replica.seq` and skips unknown types, moving `seq` past
+  them. Server tests use it to check that payloads are sufficient (step 11).
+  Rejected: `packages/domain`, which may import nothing but itself; it would
+  need its own copy of the wire types, kept in step with the schemas.
+- `reaches(audience, viewer)` (the audience filter) is in
+  `packages/domain/src/change.ts`; `project(change, viewer)` is in
+  `server/feed/project.ts` and gives `commandKey` only to the change's actor.
 - Snapshot and feed message contracts live in `packages/contracts`.
 - The client store lives in `app/(site)/[eventSlug]/replica/`: the store,
   the `EventSource` client, the sync state and the selectors, with no React.

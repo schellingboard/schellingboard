@@ -2,6 +2,7 @@ import type { LocationUnavailability } from "@schellingboard/domain/location";
 import type { Session } from "@schellingboard/domain/session";
 import type { unavailabilityViewSchema } from "@schellingboard/contracts/location";
 import type { sessionViewSchema } from "@schellingboard/contracts/session";
+import type { snapshotSessionSchema } from "@schellingboard/contracts/snapshot";
 import type { z } from "zod";
 
 export function toSessionView(s: Session): z.input<typeof sessionViewSchema> {
@@ -33,5 +34,26 @@ export function toUnavailabilityView(
     locationId: p.locationId,
     start: p.start.toISOString(),
     end: p.end.toISOString(),
+  };
+}
+
+export function toSnapshotSessionView(
+  s: Session
+): z.input<typeof snapshotSessionSchema> {
+  return {
+    id: s.id,
+    eventId: s.eventId,
+    title: s.title,
+    description: s.description,
+    startTime: s.startTime?.toISOString() ?? null,
+    endTime: s.endTime?.toISOString() ?? null,
+    capacity: s.capacity,
+    adminManaged: s.adminManaged,
+    blocker: s.blocker,
+    closed: s.closed,
+    proposalId: s.proposalId ?? null,
+    version: s.version,
+    hostIds: s.hosts.map((h) => h.id),
+    locationIds: s.locations.map((l) => l.id),
   };
 }

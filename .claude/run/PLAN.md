@@ -157,8 +157,8 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
   - [x] 10c. `layout-content.tsx` reads through the query; selectors in
         `app/(site)/[eventSlug]/replica/` rebuild today's `EventContext`
         shapes (`packages/domain` may not import the contracts).
-- [ ] 11. **`apply` and the sufficiency harness**: `apply(replica, change)`, pure, in
-      `packages/domain`: upsert or delete per type, ignore `seq ≤ replica.seq`, skip
+- [x] 11. **`apply` and the sufficiency harness**: `apply(replica, change)`, pure, in
+      `app/(site)/[eventSlug]/replica/` (ADR 0014 section 12): upsert or delete per type, ignore `seq ≤ replica.seq`, skip
       unknown types. A test helper: snapshot before, run a use case, apply the logged
       changes, compare with the snapshot after. Property test: replay is idempotent
       (see #1169).
