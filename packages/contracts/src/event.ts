@@ -3,6 +3,9 @@ import { EVENT_ICON_NAMES } from "@schellingboard/domain/event-icons";
 import { SLOT_INCREMENT_OPTIONS } from "@schellingboard/domain/slots";
 import { expectedVersion } from "./session";
 
+export const STALE_EVENT_MESSAGE =
+  "Someone changed this event while you edited it. Copy your edits somewhere safe: reloading the page discards them.";
+
 const instant = z.iso.datetime({ offset: true });
 
 export const eventSettingsBodySchema = z.object({

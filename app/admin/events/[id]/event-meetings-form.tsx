@@ -19,6 +19,7 @@ import {
   DANGER_BUTTON,
 } from "@/app/admin/buttons";
 import { ActionError } from "@/app/components/action-error";
+import { useEventSection } from "./use-event-section";
 
 type MeetingsForm = Omit<EventMeetingsInput, "id" | "expectedVersion">;
 
@@ -301,10 +302,13 @@ export function EventMeetingsForm({
   event: Event;
   points: MeetingPoint[];
 }) {
-  const [form, setForm] = useState<MeetingsForm>({
-    meetingsEnabled: event.meetingsEnabled,
-    maxOpenMeetingRequests: String(event.maxOpenMeetingRequests),
-  });
+  const { form, setForm, version, markSaved } = useEventSection<MeetingsForm>(
+    {
+      meetingsEnabled: event.meetingsEnabled,
+      maxOpenMeetingRequests: String(event.maxOpenMeetingRequests),
+    },
+    event.version
+  );
   const [error, setError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isSaving, startSave] = useTransition();
@@ -325,9 +329,13 @@ export function EventMeetingsForm({
         const result = await updateEventMeetingsAction({
           id: event.id,
           ...form,
+          expectedVersion: version,
         });
         if (!result.ok) setError(result.error);
-        else setSaveSuccess(true);
+        else {
+          markSaved(form);
+          setSaveSuccess(true);
+        }
       } catch {
         setError("Request failed");
       }

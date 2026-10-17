@@ -413,6 +413,7 @@ describe("declaring availability", () => {
     { tags: ["012-US2", "015-US2", "019-US7"] },
     async () => {
       const { event, ada } = await scenario();
+      const { version } = (await getRepositories().events.findById(event.id))!;
 
       const [, changed] = await Promise.all([
         meetings().saveMeetingAvailability(
@@ -427,6 +428,7 @@ describe("declaring availability", () => {
           { admin: true, guest: null },
           {
             id: event.id,
+            expectedVersion: version,
             name: event.name,
             description: "",
             website: "",
@@ -455,11 +457,13 @@ describe("organizer settings", () => {
     { tags: ["012-US1"] },
     async () => {
       const event = await createEvent();
-      const update = (actor: Actor, cap?: number) =>
+      const update = async (actor: Actor, cap?: number) =>
         meetings().updateEventMeetings(actor, {
           eventId: event.id,
           meetingsEnabled: true,
           maxOpenMeetingRequests: cap,
+          expectedVersion: (await getRepositories().events.findById(event.id))!
+            .version,
         });
 
       expect(code(await update(open("x"), 3))).toBe("admin.required");
@@ -475,6 +479,7 @@ describe("organizer settings", () => {
           await meetings().updateEventMeetings(ADMIN, {
             eventId: "nope",
             meetingsEnabled: false,
+            expectedVersion: 1,
           })
         )
       ).toBe("event.notFound");

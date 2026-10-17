@@ -1,3 +1,4 @@
+import { STALE_EVENT_MESSAGE } from "@schellingboard/contracts/event";
 import type { Event } from "@schellingboard/domain/event";
 import type { MeetingPoint } from "@schellingboard/domain/meeting";
 import type { Actor } from "@/server/kernel/actor";
@@ -17,7 +18,7 @@ export interface EventMeetingsInput {
   eventId: string;
   meetingsEnabled: boolean;
   maxOpenMeetingRequests?: number;
-  expectedVersion?: number;
+  expectedVersion: number;
 }
 
 export interface MeetingPointInput {
@@ -52,19 +53,15 @@ export const updateEventMeetings =
       patch = { meetingsEnabled: true, maxOpenMeetingRequests: cap };
     }
     return uow.run(async (tx) => {
+      const current = await tx.events.findById(input.eventId);
+      if (!current) return eventNotFound();
+      if (current.version !== input.expectedVersion)
+        return versionConflict("event", current, STALE_EVENT_MESSAGE);
       const updated = await tx.events.update(input.eventId, {
         ...patch,
         expectedVersion: input.expectedVersion,
       });
-      if (updated) return ok(updated);
-      const current = await tx.events.findById(input.eventId);
-      return current
-        ? versionConflict(
-            "event",
-            current,
-            "Someone changed this event while you edited it"
-          )
-        : eventNotFound();
+      return updated ? ok(updated) : eventNotFound();
     });
   };
 

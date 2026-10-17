@@ -255,6 +255,17 @@ openapi-check typecheck test-coverage` (or `make test`), without E2E. E2E runs
   another event's or subject's list is `400 cursor.invalid`. `/api/v1` is unreleased: the CHANGELOG API
   bullet already covers pages.
 
+- 4c2: the event page's details, phases and 1-on-1 forms send the event
+  version; `updateEvent`, `updateEventPhases` and `updateEventMeetings` and
+  their actions require it and compare it with the row they read, so a
+  missing one is refused. `useEventSection` holds each form's values and
+  version: on a new version from the page, a form that still holds what it
+  loaded or last sent (review: not "just saved", which dropped edits typed
+  while a save was pending) takes the new values and version; one with edits
+  keeps both, so its save is refused with the edits kept (user rule). The
+  event conflict message (`STALE_EVENT_MESSAGE`) says to copy the edits
+  before reloading.
+
 ## Problems
 
 None.
@@ -272,4 +283,4 @@ None.
 
 ## Next step
 
-4c2 (settled 2026-10-07), then 5c.
+5c.

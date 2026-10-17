@@ -90,8 +90,16 @@ describe("event use cases", () => {
       const day = await createDay(event.id);
       const refusals = [
         await events().createEvent(NOBODY, settings),
-        await events().updateEvent(NOBODY, { ...settings, id: event.id }),
-        await events().updateEventPhases(NOBODY, { ...noPhases, id: event.id }),
+        await events().updateEvent(NOBODY, {
+          ...settings,
+          id: event.id,
+          expectedVersion: event.version,
+        }),
+        await events().updateEventPhases(NOBODY, {
+          ...noPhases,
+          id: event.id,
+          expectedVersion: event.version,
+        }),
         await events().deleteEvent(NOBODY, { id: event.id }),
         await events().createDay(NOBODY, { ...dayWindow, eventId: event.id }),
         await events().updateDay(NOBODY, {
@@ -212,6 +220,7 @@ describe("event use cases", () => {
       const misaligned = await events().updateEvent(ADMIN, {
         ...settings,
         id: event.id,
+        expectedVersion: event.version,
         slotIncrementMinutes: 45,
       });
       expect(misaligned).toMatchObject({
@@ -223,6 +232,7 @@ describe("event use cases", () => {
         await events().updateEvent(ADMIN, {
           ...settings,
           id: event.id,
+          expectedVersion: event.version,
           slotIncrementMinutes: 60,
         })
       );
@@ -231,7 +241,13 @@ describe("event use cases", () => {
         await repos.meetingAvailability.listByGuestAndEvent(guest.id, event.id)
       ).toEqual([]);
       expect(
-        code(await events().updateEvent(ADMIN, { ...settings, id: "nope" }))
+        code(
+          await events().updateEvent(ADMIN, {
+            ...settings,
+            id: "nope",
+            expectedVersion: 1,
+          })
+        )
       ).toBe("event.notFound");
     }
   );
@@ -253,6 +269,7 @@ describe("event use cases", () => {
         ).updateEvent(ADMIN, {
           ...settings,
           id: event.id,
+          expectedVersion: event.version,
           slotIncrementMinutes: 60,
         })
       ).rejects.toThrow("meetingAvailability.deleteByEvent failed");
@@ -281,6 +298,7 @@ describe("event use cases", () => {
         events().updateEvent(ADMIN, {
           ...settings,
           id: event.id,
+          expectedVersion: event.version,
           slotIncrementMinutes: 60,
         }),
       ]);
@@ -300,6 +318,7 @@ describe("event use cases", () => {
         await events().updateEventPhases(ADMIN, {
           ...noPhases,
           id: event.id,
+          expectedVersion: event.version,
           proposalPhaseStart: at("08:00"),
           votingPhaseStart: at("12:00"),
         })
@@ -313,6 +332,7 @@ describe("event use cases", () => {
       const outOfOrder = await events().updateEventPhases(ADMIN, {
         ...noPhases,
         id: event.id,
+        expectedVersion: event.version,
         proposalPhaseStart: at("12:00"),
         votingPhaseStart: at("08:00"),
       });
@@ -329,13 +349,18 @@ describe("event use cases", () => {
           await events().updateEventPhases(ADMIN, {
             ...noPhases,
             id: event.id,
+            expectedVersion: event.version,
             votingPhaseEnd: new Date("nonsense"),
           })
         )
       ).toBe("event.phaseDateInvalid");
       expect(
         code(
-          await events().updateEventPhases(ADMIN, { ...noPhases, id: "nope" })
+          await events().updateEventPhases(ADMIN, {
+            ...noPhases,
+            id: "nope",
+            expectedVersion: 1,
+          })
         )
       ).toBe("event.notFound");
     }
