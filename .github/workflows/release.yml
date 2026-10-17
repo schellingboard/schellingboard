@@ -109,7 +109,7 @@ jobs:
       # the step above names are looked at.
       - name: Upload Playwright report
         if: always()
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: playwright-report
           path: |
