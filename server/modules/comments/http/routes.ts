@@ -5,7 +5,9 @@ import {
   commentListSchema,
   commentViewSchema,
 } from "@schellingboard/contracts/comment";
+import { pageQuerySchema } from "@schellingboard/contracts/cursor-page";
 import { idempotencyHeaders } from "@/server/http/idempotency";
+import { pageOf } from "@/server/http/pagination";
 import { problem, problemDefault } from "@/server/http/problem";
 import {
   body,
@@ -31,7 +33,8 @@ function subjectRoutes(kind: CommentSubjectKind, path: string) {
       method: "get",
       path,
       tags: ["comments"],
-      request: { params: idParam },
+      description: `The ${subject}'s comments and replies, oldest first; \`parentId\` places a reply in its thread.`,
+      request: { params: idParam, query: pageQuerySchema },
       responses: {
         200: json(commentListSchema, `The ${subject}'s comments`),
         ...problemDefault,
@@ -104,12 +107,20 @@ export function addCommentRoutes(app: App, comments: () => CommentUseCases) {
     const routes = subjectRoutes(kind, path);
 
     app.openapi(routes.list, async (c) => {
-      const result = await comments().listComments(c.var.actor, {
-        kind,
-        id: c.req.valid("param").id,
-      });
+      const { id } = c.req.valid("param");
+      const result = await comments().listComments(c.var.actor, { kind, id });
       if (!result.ok) return problem(result.error);
-      return c.json({ comments: result.value.map(toCommentView) }, 200);
+      const page = pageOf(
+        result.value,
+        c.req.valid("query"),
+        `${kind}Comments:${id}`,
+        (comment) => [comment.createdTime.toISOString(), comment.id]
+      );
+      if (!page.ok) return problem(page.error);
+      return c.json(
+        { ...page.value, items: page.value.items.map(toCommentView) },
+        200
+      );
     });
 
     app.openapi(routes.create, async (c) => {

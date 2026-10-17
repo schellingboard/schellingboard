@@ -160,10 +160,12 @@ export function addProposalRoutes(app: App, proposals: () => ProposalUseCases) {
       c.var.now
     );
     if (!result.ok) return problem(result.error);
-    const page = pageOf(result.value, { limit, cursor }, "proposals", (p) => [
-      p.createdTime.toISOString(),
-      p.id,
-    ]);
+    const page = pageOf(
+      result.value,
+      { limit, cursor },
+      `proposals:${eventId}`,
+      (p) => [p.createdTime.toISOString(), p.id]
+    );
     if (!page.ok) return problem(page.error);
     return c.json(
       { ...page.value, items: page.value.items.map(toProposalView) },

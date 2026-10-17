@@ -133,9 +133,8 @@ describe("/api/v1/admin guests and settings", () => {
       const listed = await call("GET", "/admin/guests");
       expect(listed.headers.get("cache-control")).toBe("no-store");
       expect(await listed.json()).toEqual({
-        guests: [
-          { ...guest, name: "Ada L.", eventIds: [event.id], version: 3 },
-        ],
+        items: [{ ...guest, name: "Ada L.", eventIds: [event.id], version: 3 }],
+        nextCursor: null,
       });
       expect(
         (
@@ -202,6 +201,32 @@ describe("/api/v1/admin guests and settings", () => {
       });
       expect(await staleAndTaken.json()).toMatchObject({
         code: "guest.versionConflict",
+      });
+    }
+  );
+
+  it(
+    "lists the guests page by page, in id order",
+    { tags: ["019-US8"] },
+    async () => {
+      const [a, b, c] = (
+        await Promise.all([createGuest(), createGuest(), createGuest()])
+      ).sort((x, y) => (x.id < y.id ? -1 : 1));
+      const page = async (query: string) =>
+        (await (await call("GET", `/admin/guests?${query}`)).json()) as {
+          items: { id: string }[];
+          nextCursor: string | null;
+        };
+
+      const first = await page("limit=2");
+      expect(first.items.map((g) => g.id)).toEqual([a.id, b.id]);
+      const second = await page(`limit=2&cursor=${first.nextCursor}`);
+      expect(second).toEqual({
+        items: [expect.objectContaining({ id: c.id })],
+        nextCursor: null,
+      });
+      expect(await page("cursor=nonsense")).toMatchObject({
+        code: "cursor.invalid",
       });
     }
   );

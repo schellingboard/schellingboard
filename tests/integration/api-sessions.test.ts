@@ -165,6 +165,14 @@ describe("GET /api/v1/sessions", () => {
         expect(refused.status).toBe(400);
         expect(await refused.json()).toMatchObject({ code: "cursor.invalid" });
       }
+      const otherEvent = await createEvent();
+      const foreign = await GET(
+        request(
+          "GET",
+          `/sessions?eventId=${otherEvent.id}&cursor=${first.nextCursor}`
+        )
+      );
+      expect(await foreign.json()).toMatchObject({ code: "cursor.invalid" });
     }
   );
 

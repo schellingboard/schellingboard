@@ -1384,9 +1384,15 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** @description The proposal's comments and replies, oldest first; `parentId` places a reply in its thread. */
     get: {
       parameters: {
-        query?: never;
+        query?: {
+          /** @description How many items to answer at most */
+          limit?: number;
+          /** @description The `nextCursor` of the previous page; left out for the first */
+          cursor?: string;
+        };
         header?: never;
         path: {
           id: string;
@@ -1402,8 +1408,9 @@ export interface paths {
           };
           content: {
             "application/json": {
-              /** @description Oldest first */
-              comments: components["schemas"]["Comment"][];
+              items: components["schemas"]["Comment"][];
+              /** @description Pass as `cursor` for the next page; null on the last */
+              nextCursor: string | null;
             };
           };
         };
@@ -1475,9 +1482,15 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** @description The session's comments and replies, oldest first; `parentId` places a reply in its thread. */
     get: {
       parameters: {
-        query?: never;
+        query?: {
+          /** @description How many items to answer at most */
+          limit?: number;
+          /** @description The `nextCursor` of the previous page; left out for the first */
+          cursor?: string;
+        };
         header?: never;
         path: {
           id: string;
@@ -1493,8 +1506,9 @@ export interface paths {
           };
           content: {
             "application/json": {
-              /** @description Oldest first */
-              comments: components["schemas"]["Comment"][];
+              items: components["schemas"]["Comment"][];
+              /** @description Pass as `cursor` for the next page; null on the last */
+              nextCursor: string | null;
             };
           };
         };
@@ -1566,9 +1580,15 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** @description The guest's profile's comments and replies, oldest first; `parentId` places a reply in its thread. */
     get: {
       parameters: {
-        query?: never;
+        query?: {
+          /** @description How many items to answer at most */
+          limit?: number;
+          /** @description The `nextCursor` of the previous page; left out for the first */
+          cursor?: string;
+        };
         header?: never;
         path: {
           id: string;
@@ -1584,8 +1604,9 @@ export interface paths {
           };
           content: {
             "application/json": {
-              /** @description Oldest first */
-              comments: components["schemas"]["Comment"][];
+              items: components["schemas"]["Comment"][];
+              /** @description Pass as `cursor` for the next page; null on the last */
+              nextCursor: string | null;
             };
           };
         };
@@ -4679,10 +4700,15 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** @description Every guest with their email and the events they belong to. */
+    /** @description Every guest with their email and the events they belong to, in id order. */
     get: {
       parameters: {
-        query?: never;
+        query?: {
+          /** @description How many items to answer at most */
+          limit?: number;
+          /** @description The `nextCursor` of the previous page; left out for the first */
+          cursor?: string;
+        };
         header?: never;
         path?: never;
         cookie?: never;
@@ -4696,7 +4722,9 @@ export interface paths {
           };
           content: {
             "application/json": {
-              guests: components["schemas"]["AdminGuest"][];
+              items: components["schemas"]["AdminGuest"][];
+              /** @description Pass as `cursor` for the next page; null on the last */
+              nextCursor: string | null;
             };
           };
         };

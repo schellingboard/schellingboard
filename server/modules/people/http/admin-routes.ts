@@ -8,7 +8,9 @@ import {
   guestImportBodySchema,
   guestImportResultSchema,
 } from "@schellingboard/contracts/guest";
+import { pageQuerySchema } from "@schellingboard/contracts/cursor-page";
 import { idempotencyHeaders } from "@/server/http/idempotency";
+import { pageOf } from "@/server/http/pagination";
 import {
   problem,
   problemDefault,
@@ -30,7 +32,9 @@ const listGuests = createRoute({
   method: "get",
   path: "/admin/guests",
   tags,
-  description: "Every guest with their email and the events they belong to.",
+  description:
+    "Every guest with their email and the events they belong to, in id order.",
+  request: { query: pageQuerySchema },
   responses: {
     200: json(adminGuestListSchema, "The guests"),
     ...problemDefault,
@@ -128,7 +132,11 @@ export function addAdminGuestRoutes(app: App, people: () => PeopleUseCases) {
   app.openapi(listGuests, async (c) => {
     const result = await people().listGuests(c.var.actor);
     if (!result.ok) return problem(result.error);
-    return c.json({ guests: result.value }, 200);
+    const page = pageOf(result.value, c.req.valid("query"), "guests", (g) => [
+      g.id,
+    ]);
+    if (!page.ok) return problem(page.error);
+    return c.json(page.value, 200);
   });
 
   app.openapi(createGuest, async (c) => {

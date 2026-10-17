@@ -5,6 +5,7 @@ import {
   MAX_LANGUAGES,
   type EmailSettings,
 } from "@schellingboard/domain/guest";
+import { pageSchema } from "./cursor-page";
 import { expectedVersion } from "./session";
 
 export const emailSettingsSchema = z.object({
@@ -188,9 +189,7 @@ export const adminGuestViewSchema = z
   })
   .meta({ id: "AdminGuest" });
 
-export const adminGuestListSchema = z.object({
-  guests: z.array(adminGuestViewSchema),
-});
+export const adminGuestListSchema = pageSchema(adminGuestViewSchema);
 
 export const eventGuestsBodySchema = z.object({
   guestIds: z.array(z.string()),
