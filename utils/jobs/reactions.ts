@@ -97,16 +97,29 @@ export const changeNotifications = reaction(
         await notifyProfileCommented({ profileId: subject.id, comment, now });
       return;
     }
-    if (
-      (change.type === "session.changed" ||
-        change.type === "session.deleted") &&
-      change.payload.cascade
-    )
+    if (change.type !== "session.changed" && change.type !== "session.deleted")
       return;
+    const { cascade, tellAttendees } = change.payload;
+    if (cascade && !tellAttendees) return;
+    const attendeesOnly = !!cascade;
     if (change.type === "session.changed") {
-      await notifySessionChanged({ ...change.payload, changedById, now });
-    } else if (change.type === "session.deleted") {
-      await notifySessionDeleted({ ...change.payload, changedById, now });
+      const { before, after } = change.payload;
+      await notifySessionChanged({
+        before,
+        after,
+        changedById,
+        attendeesOnly,
+        now,
+      });
+    } else {
+      const { session, rsvpGuestIds } = change.payload;
+      await notifySessionDeleted({
+        session,
+        rsvpGuestIds,
+        changedById,
+        attendeesOnly,
+        now,
+      });
     }
   }
 );

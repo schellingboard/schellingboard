@@ -26,6 +26,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Deleting a day or location now tells RSVPed guests**: attendees whose session is removed
+  or moved by it are notified, in the app and by email or push as their settings allow.
 - **Self-hosters behind a reverse proxy must set `SB_TRUSTED_PROXIES`** (#679): the
   app no longer trusts the forwarded address by default, so without it all visitors
   share one limit on failed logins.

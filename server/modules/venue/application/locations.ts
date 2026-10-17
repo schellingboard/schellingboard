@@ -299,7 +299,8 @@ export const deleteLocation =
           tx,
           using,
           () => tx.locations.delete(input.id),
-          by
+          by,
+          { tellAttendees: true }
         );
         for (const period of periods)
           tx.record(changes.unavailabilityRemoved(period, by));

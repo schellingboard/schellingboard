@@ -73,6 +73,10 @@ The client applies messages to its replica in
 message to replica; `store.ts`; `live-replica.ts` for the connection). A new
 message type needs a case in `apply.ts`: unknown types only move `seq`.
 
+A cascade change that carries `tellAttendees` (day and location deletes) makes
+the `changeNotifications` reaction notify the session's RSVPed guests, never its
+hosts; event and guest deletes record none.
+
 ## Keys from the UI
 
 A server action or legacy route that creates something runs under

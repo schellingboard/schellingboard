@@ -196,7 +196,8 @@ export const deleteDay =
               tx,
               sessions,
               () => tx.days.delete(input.id),
-              by
+              by,
+              { tellAttendees: true }
             ),
           by,
           sessions.flatMap((s) => s.hosts.map((h) => h.id))
