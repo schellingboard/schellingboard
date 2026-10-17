@@ -1,6 +1,7 @@
 ---
 name: implementer
 description: Implements one step of .claude/run/PLAN.md at a time, runs make precommit, commits, then acts on the reviewer's report. Use during an autonomous run; reused across steps.
+model: sonnet
 maxTurns: 200
 ---
 
