@@ -34,8 +34,8 @@ const venue = () =>
     repos: getRepositories(),
     images: {
       validate: (buffer) => Promise.resolve({ buffer, ext: "png" }),
-      save: (id) => Promise.resolve(`/media/locations/${id}.png`),
-      delete: async () => {},
+      saveNew: (id) => Promise.resolve(`/media/locations/${id}-1.png`),
+      deleteByUrl: async () => {},
     },
     uow: unitOfWork,
   });

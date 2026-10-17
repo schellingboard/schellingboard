@@ -360,6 +360,28 @@ cursor.invalid`. The use case now returns the whole list; the
   upload). Left for 7a2. A failed directory read while deleting is logged.
   The race test now covers only a stale upload: with no check before the
   file write, the race it guarded no longer exists.
+- 7a2: the file-and-row writes were guest photos, location images (create,
+  edit, replace, remove, delete) and the site map. One kernel helper,
+  `withStoredFile(files, newUrl, write)` in `server/kernel/stored-files.ts`:
+  the write reports the URL it replaced, and after it the unused file goes
+  (the old one on success, the new one on a refusal or a throw). All three
+  now store each upload under a new name (`<id>-<uuid>.<ext>`,
+  `map-<uuid>.<ext>`; no `?v=`) and delete by URL, only under their own
+  `/media/...` prefix, so seeded `/locations/...` assets are never touched.
+  The location and map version checks before the file write are gone; the
+  site settings save now runs in `uow.run` (`SettingsDeps.uow`). This
+  settles 6b's conflict and removal races. A resize finishing after its
+  original was deleted removes its own rendition (the delete removes the
+  original before listing renditions). The old fixed-name `save`/`delete`
+  adapters are gone. A test that spied on the reader's `locations.delete`
+  moved to the use-case tests (`uowFailingAt`). E2E run: admin, profile,
+  profile-photo, settings specs.
+- 7a2 review: the helper logs a failed file delete instead of throwing
+  (a committed write must not look failed); `createLocation`'s image write
+  reports the URL it replaced; the map test now saves the map, then the
+  title. Its unit test is gone (the use-case tests cover it). Rejected: a
+  CHANGELOG line for room images and the map; a failed save losing them
+  was a rare edge case, which AGENTS.md keeps out of the changelog.
 
 ## Problems
 
@@ -381,4 +403,4 @@ None.
 
 ## Next step
 
-7a2.
+8.

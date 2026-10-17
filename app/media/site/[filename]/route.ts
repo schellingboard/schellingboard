@@ -1,5 +1,5 @@
-// Serves the admin-uploaded site map from SB_UPLOADS_DIR. URLs carry a ?v=
-// cache-buster set on upload, so responses can be cached aggressively.
+// Serves the admin-uploaded site map from SB_UPLOADS_DIR. Each upload gets a
+// new filename, so responses can be cached aggressively.
 //
 // No ?w= handling, unlike the other two media routes: the map is an image of
 // unknown dimensions shown at full width in a modal, so it is rendered

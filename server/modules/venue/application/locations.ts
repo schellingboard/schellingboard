@@ -5,6 +5,7 @@ import {
 } from "@schellingboard/contracts/location";
 import type { Location } from "@schellingboard/domain/location";
 import type { Actor } from "@/server/kernel/actor";
+import { withStoredFile } from "@/server/kernel/stored-files";
 import {
   forbidden,
   invalid,
@@ -136,14 +137,20 @@ export const createLocation =
     // Saved after the commit, as the file is named by the location's id. A
     // failed save leaves the location without an image.
     const { id, eventIds } = created.value;
-    const imageUrl = await deps.images.save(id, image.buffer, image.ext);
-    const updated = await deps.uow.run(async (tx) => {
-      const location = await tx.locations.findById(id);
-      return location && tx.locations.update(id, { ...location, imageUrl });
-    });
-    if (updated) return ok({ ...updated, eventIds });
-    await deps.images.delete(id);
-    return locationNotFound();
+    const imageUrl = await deps.images.saveNew(id, image.buffer, image.ext);
+    return withStoredFile(deps.images, imageUrl, (replaces) =>
+      deps.uow.run(async (tx) => {
+        const location = await tx.locations.findById(id);
+        if (!location) return locationNotFound();
+        const updated = await tx.locations.update(id, {
+          ...location,
+          imageUrl,
+        });
+        if (!updated) return locationNotFound();
+        replaces(location.imageUrl);
+        return ok({ ...updated, eventIds });
+      })
+    );
   };
 
 export const updateLocation =
@@ -162,73 +169,51 @@ export const updateLocation =
       ...fields
     } = parsed.data;
     const eventIds = [...new Set(requested)];
+    const newImageUrl = image
+      ? await deps.images.saveNew(id, image.buffer, image.ext)
+      : null;
 
-    const saved = await saveImageIfCurrent(deps, id, expectedVersion, image);
-    if (!saved.ok) return saved;
-    const newImageUrl = saved.value;
+    return withStoredFile(deps.images, newImageUrl, (replaces) =>
+      deps.uow.run(async (tx) => {
+        const existing = await tx.locations.findById(id);
+        if (!existing) return locationNotFound();
+        const unknown = await unknownEvent(tx.events, eventIds);
+        if (unknown) return unknown;
 
-    const updated = await deps.uow.run(async (tx) => {
-      const existing = await tx.locations.findById(id);
-      if (!existing) return locationNotFound();
-      const unknown = await unknownEvent(tx.events, eventIds);
-      if (unknown) return unknown;
-
-      const updated = await tx.locations.update(id, {
-        ...fields,
-        imageUrl: newImageUrl ?? existing.imageUrl,
-        sortIndex: existing.sortIndex,
-        eventIds,
-        expectedVersion,
-      });
-      if (!updated) return locationChangedMeanwhile(tx.locations, id);
-      return ok({ ...updated, eventIds });
-    });
-    return dropOrphanedImage(deps, id, updated, newImageUrl);
+        const updated = await tx.locations.update(id, {
+          ...fields,
+          imageUrl: newImageUrl ?? existing.imageUrl,
+          sortIndex: existing.sortIndex,
+          eventIds,
+          expectedVersion,
+        });
+        if (!updated) return locationChangedMeanwhile(tx.locations, id);
+        if (newImageUrl) replaces(existing.imageUrl);
+        return ok({ ...updated, eventIds });
+      })
+    );
   };
 
-// Checked before the file is replaced, so a stale save replaces no file. The
-// check is not atomic with the write: a save conflicting in between keeps its file.
-async function saveImageIfCurrent(
-  { repos, images }: VenueDeps,
-  id: string,
-  expectedVersion: number,
-  image: { buffer: Buffer; ext: string } | undefined
-): Promise<Result<string | undefined>> {
-  const found = await repos.locations.findById(id);
-  if (!found) return locationNotFound();
-  if (outdated(found, expectedVersion))
-    return locationChangedMeanwhile(repos.locations, id);
-  return ok(image && (await images.save(id, image.buffer, image.ext)));
-}
-
-async function dropOrphanedImage<T>(
-  { images }: VenueDeps,
-  id: string,
-  result: Result<T>,
-  savedImageUrl: string | undefined
-): Promise<Result<T>> {
-  if (!result.ok && result.error.code === "location.notFound" && savedImageUrl)
-    await images.delete(id);
-  return result;
-}
-
-async function setImageUrl(
-  { uow }: VenueDeps,
+function setImageUrl(
+  { uow, images }: VenueDeps,
   id: string,
   imageUrl: string,
   expectedVersion: number
 ): Promise<Result<LocationWithEvents>> {
-  return uow.run(async (tx) => {
-    const existing = await tx.locations.findById(id);
-    if (!existing) return locationNotFound();
-    const updated = await tx.locations.update(id, {
-      ...existing,
-      imageUrl,
-      expectedVersion,
-    });
-    if (!updated) return locationChangedMeanwhile(tx.locations, id);
-    return ok({ ...updated, eventIds: await tx.locations.listEventIds(id) });
-  });
+  return withStoredFile(images, imageUrl || null, (replaces) =>
+    uow.run(async (tx) => {
+      const existing = await tx.locations.findById(id);
+      if (!existing) return locationNotFound();
+      const updated = await tx.locations.update(id, {
+        ...existing,
+        imageUrl,
+        expectedVersion,
+      });
+      if (!updated) return locationChangedMeanwhile(tx.locations, id);
+      replaces(existing.imageUrl);
+      return ok({ ...updated, eventIds: await tx.locations.listEventIds(id) });
+    })
+  );
 }
 
 export const replaceLocationImage =
@@ -245,15 +230,8 @@ export const replaceLocationImage =
     const checked = await deps.images.validate(image);
     if ("error" in checked)
       return invalid("location.imageInvalid", checked.error);
-    const saved = await saveImageIfCurrent(deps, id, expectedVersion, checked);
-    if (!saved.ok) return saved;
-    const imageUrl = saved.value ?? "";
-    return dropOrphanedImage(
-      deps,
-      id,
-      await setImageUrl(deps, id, imageUrl, expectedVersion),
-      imageUrl
-    );
+    const imageUrl = await deps.images.saveNew(id, checked.buffer, checked.ext);
+    return setImageUrl(deps, id, imageUrl, expectedVersion);
   };
 
 export const removeLocationImage =
@@ -263,19 +241,22 @@ export const removeLocationImage =
     { id, expectedVersion }: { id: string; expectedVersion: number }
   ): Promise<Result<LocationWithEvents>> => {
     if (!actor.admin) return adminRequired();
-    const removed = await setImageUrl(deps, id, "", expectedVersion);
-    if (removed.ok) await deps.images.delete(id);
-    return removed;
+    return setImageUrl(deps, id, "", expectedVersion);
   };
 
 export const deleteLocation =
-  ({ repos, images }: VenueDeps) =>
+  ({ uow, images }: VenueDeps) =>
   async (actor: Actor, input: { id: string }): Promise<Result<void>> => {
     if (!actor.admin) return adminRequired();
-    if (!(await repos.locations.findById(input.id))) return locationNotFound();
-    await repos.locations.delete(input.id);
-    await images.delete(input.id);
-    return ok(undefined);
+    return withStoredFile(images, null, (replaces) =>
+      uow.run(async (tx) => {
+        const location = await tx.locations.findById(input.id);
+        if (!location) return locationNotFound();
+        await tx.locations.delete(input.id);
+        replaces(location.imageUrl);
+        return ok(undefined);
+      })
+    );
   };
 
 export const moveLocation =

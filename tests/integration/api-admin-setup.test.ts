@@ -427,14 +427,18 @@ describe("/api/v1/admin locations", () => {
         form.set("expectedVersion", String(expectedVersion));
         return call("PUT", `/admin/locations/${room.id}/image`, { form });
       };
-      const file = path.join(uploadsDir, "locations", `${room.id}.png`);
-
       const replaced = await upload(800, room.version);
       expect(replaced.status).toBe(200);
-      expect(await replaced.json()).toMatchObject({
+      const body = (await replaced.json()) as { imageUrl: string };
+      expect(body).toMatchObject({
         imageUrl: expect.stringMatching(/^\/media\/locations\//) as string,
         version: room.version + 1,
       });
+      const file = path.join(
+        uploadsDir,
+        "locations",
+        path.basename(body.imageUrl)
+      );
       expect(fs.existsSync(file)).toBe(true);
 
       const stale = await upload(800, room.version);

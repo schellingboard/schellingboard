@@ -30,9 +30,12 @@ const images = {
       ext: "png",
     })
   ),
-  save: vi.fn((id: string) => Promise.resolve(`/media/locations/${id}.png`)),
-  delete: vi.fn(async () => {}),
+  saveNew: vi.fn((id: string) =>
+    Promise.resolve(`/media/locations/${id}-${++storedImages}.png`)
+  ),
+  deleteByUrl: vi.fn<(url: string) => Promise<void>>(() => Promise.resolve()),
 };
+let storedImages = 0;
 const events = (uow: UnitOfWork = unitOfWork) =>
   createEventUseCases({ repos: getRepositories(), uow });
 const venue = (uow: UnitOfWork = unitOfWork) =>
@@ -637,7 +640,7 @@ describe("venue use cases", () => {
       const created = value(
         await venue().createLocation(ADMIN, { ...room, image })
       );
-      expect(created.imageUrl).toBe(`/media/locations/${created.id}.png`);
+      expect(created.imageUrl).toMatch(`/media/locations/${created.id}-`);
       images.validate.mockResolvedValueOnce({ error: "Wrong shape" });
       expect(
         await venue().updateLocation(ADMIN, {
@@ -657,10 +660,9 @@ describe("venue use cases", () => {
     "keeps no image of a location deleted while its image was saved",
     { tags: ["017-US2", "019-US7"] },
     async () => {
-      images.save.mockImplementationOnce(async (id: string) => {
+      images.saveNew.mockImplementationOnce(async (id: string) => {
         value(await venue().deleteLocation(ADMIN, { id }));
-        images.delete.mockClear();
-        return `/media/locations/${id}.png`;
+        return `/media/locations/${id}-new.png`;
       });
 
       const created = await venue().createLocation(ADMIN, {
@@ -669,9 +671,108 @@ describe("venue use cases", () => {
       });
 
       expect(code(created)).toBe("location.notFound");
-      expect(images.delete).toHaveBeenCalledOnce();
+      expect(images.deleteByUrl.mock.calls).toEqual([
+        [expect.stringMatching(/-new\.png$/)],
+      ]);
     }
   );
+
+  describe("keeping image files in step with locations", () => {
+    const withImage = async () =>
+      value(
+        await venue().createLocation(ADMIN, {
+          ...room,
+          image: new Blob([new Uint8Array([1, 2, 3])]),
+        })
+      );
+    const image = Buffer.from([1, 2, 3]);
+    const stored = async (id: string) =>
+      (await getRepositories().locations.findById(id))?.imageUrl;
+
+    it(
+      "deletes the new file of an upload refused as stale",
+      { tags: ["017-US2", "019-US7"] },
+      async () => {
+        const created = await withImage();
+        value(
+          await venue().updateLocation(ADMIN, {
+            ...room,
+            id: created.id,
+            name: "Renamed",
+            expectedVersion: created.version,
+          })
+        );
+        images.deleteByUrl.mockClear();
+
+        const stale = await venue().replaceLocationImage(ADMIN, {
+          id: created.id,
+          image,
+          expectedVersion: created.version,
+        });
+
+        expect(code(stale)).toBe("location.versionConflict");
+        expect(await stored(created.id)).toBe(created.imageUrl);
+        expect(images.deleteByUrl).toHaveBeenCalledOnce();
+        expect(images.deleteByUrl).not.toHaveBeenCalledWith(created.imageUrl);
+      }
+    );
+
+    it(
+      "deletes the old file once a new one is saved, and the new one when the save fails",
+      { tags: ["017-US2", "019-US7"] },
+      async () => {
+        const created = await withImage();
+        const replaced = value(
+          await venue().updateLocation(ADMIN, {
+            ...room,
+            id: created.id,
+            image: new Blob([new Uint8Array([4])]),
+            expectedVersion: created.version,
+          })
+        );
+        expect(images.deleteByUrl.mock.calls).toEqual([[created.imageUrl]]);
+        images.deleteByUrl.mockClear();
+
+        await expect(
+          venue(uowFailingAt("locations", "update")).replaceLocationImage(
+            ADMIN,
+            { id: created.id, image, expectedVersion: replaced.version }
+          )
+        ).rejects.toThrow();
+        expect(await stored(created.id)).toBe(replaced.imageUrl);
+        expect(images.deleteByUrl).toHaveBeenCalledOnce();
+        expect(images.deleteByUrl).not.toHaveBeenCalledWith(replaced.imageUrl);
+      }
+    );
+
+    it(
+      "deletes the file after the row lets go of it",
+      { tags: ["017-US2", "019-US7"] },
+      async () => {
+        const created = await withImage();
+        await expect(
+          venue(uowFailingAt("locations", "delete")).deleteLocation(ADMIN, {
+            id: created.id,
+          })
+        ).rejects.toThrow();
+        expect(images.deleteByUrl).not.toHaveBeenCalled();
+
+        const removed = value(
+          await venue().removeLocationImage(ADMIN, {
+            id: created.id,
+            expectedVersion: created.version,
+          })
+        );
+        expect(removed.imageUrl).toBe("");
+        expect(images.deleteByUrl.mock.calls).toEqual([[created.imageUrl]]);
+
+        const again = await withImage();
+        images.deleteByUrl.mockClear();
+        value(await venue().deleteLocation(ADMIN, { id: again.id }));
+        expect(images.deleteByUrl.mock.calls).toEqual([[again.imageUrl]]);
+      }
+    );
+  });
 
   it("edits, moves and deletes a location", { tags: ["017-US1"] }, async () => {
     const first = await createLocation({ name: "A", sortIndex: 0 });
@@ -705,7 +806,7 @@ describe("venue use cases", () => {
     expect(order.map((l) => l.id)).toEqual([second.id, first.id]);
 
     value(await venue().deleteLocation(ADMIN, { id: first.id }));
-    expect(images.delete).toHaveBeenCalledWith(first.id);
+    expect(images.deleteByUrl).not.toHaveBeenCalled();
     expect(code(await venue().deleteLocation(ADMIN, { id: first.id }))).toBe(
       "location.notFound"
     );

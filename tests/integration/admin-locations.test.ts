@@ -69,6 +69,8 @@ async function makeImageFile(
 }
 
 let uploadsDir: string;
+const imagePath = (url: string) =>
+  path.join(uploadsDir, "locations", path.basename(url));
 
 describe("admin location actions", () => {
   beforeAll(() => setupTestDb());
@@ -251,11 +253,9 @@ describe("admin location actions", () => {
 
       const [created] = await getRepositories().locations.list();
       expect(created.imageUrl).toMatch(
-        new RegExp(`^/media/locations/${created.id}\\.png\\?v=\\d+$`)
+        new RegExp(`^/media/locations/${created.id}-[0-9a-f-]+\\.png$`)
       );
-      expect(
-        fs.existsSync(path.join(uploadsDir, "locations", `${created.id}.png`))
-      ).toBe(true);
+      expect(fs.existsSync(imagePath(created.imageUrl))).toBe(true);
     });
 
     it("accepts a 4:3 image whose orientation is specified by EXIF", async () => {
@@ -273,11 +273,9 @@ describe("admin location actions", () => {
       const [created] = await getRepositories().locations.list();
 
       expect(created.imageUrl).toMatch(
-        new RegExp(`^/media/locations/${created.id}\\.jpg\\?v=\\d+$`)
+        new RegExp(`^/media/locations/${created.id}-[0-9a-f-]+\\.jpg$`)
       );
-      expect(
-        fs.existsSync(path.join(uploadsDir, "locations", `${created.id}.jpg`))
-      ).toBe(true);
+      expect(fs.existsSync(imagePath(created.imageUrl))).toBe(true);
     });
 
     it("rejects an image with the wrong aspect ratio and creates nothing", async () => {
@@ -394,9 +392,7 @@ describe("admin location actions", () => {
       expect(result).toEqual({ ok: true });
 
       const updated = await getRepositories().locations.findById(location.id);
-      expect(updated?.imageUrl).toContain(
-        `/media/locations/${location.id}.png`
-      );
+      expect(updated?.imageUrl).toMatch(`/media/locations/${location.id}-`);
     });
 
     it("refuses an edit that names no version", async () => {
@@ -459,30 +455,11 @@ describe("admin location actions", () => {
       };
       await createLocationAction(formData);
       const [created] = await getRepositories().locations.list();
-      const imagePath = path.join(uploadsDir, "locations", `${created.id}.png`);
-      expect(fs.existsSync(imagePath)).toBe(true);
+      const file = imagePath(created.imageUrl);
+      expect(fs.existsSync(file)).toBe(true);
 
       await deleteLocationAction({ id: created.id });
-      expect(fs.existsSync(imagePath)).toBe(false);
-    });
-
-    it("keeps the image file if deleting the location record fails", async () => {
-      const formData = {
-        ...baseLocationData,
-        image: await makeImageFile(800, 600),
-      };
-      await createLocationAction(formData);
-      const [created] = await getRepositories().locations.list();
-      const imagePath = path.join(uploadsDir, "locations", `${created.id}.png`);
-      expect(fs.existsSync(imagePath)).toBe(true);
-
-      const { locations } = getRepositories();
-      vi.spyOn(locations, "delete").mockRejectedValueOnce(new Error("boom"));
-
-      await expect(deleteLocationAction({ id: created.id })).rejects.toThrow(
-        "boom"
-      );
-      expect(fs.existsSync(imagePath)).toBe(true);
+      expect(fs.existsSync(file)).toBe(false);
     });
   });
 

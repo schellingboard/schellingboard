@@ -49,40 +49,36 @@ export async function validateMapImage(
   return { ext };
 }
 
-/**
- * Stores the map as map.<ext>, replacing any previous map. Returns the public
- * URL (with a cache-busting version).
- */
+/** Stores the map under a new name; returns its public URL. */
 export async function saveMapImage(
   buffer: Buffer,
   ext: string
 ): Promise<string> {
   const dir = mapDir();
   await fs.mkdir(dir, { recursive: true });
-  await deleteMapImage();
-  const filename = `map.${ext}`;
+  const filename = `map-${crypto.randomUUID()}.${ext}`;
   await fs.writeFile(path.join(dir, filename), buffer);
-  // eslint-disable-next-line no-restricted-syntax -- a cache buster, not a time: it only has to differ from the last one
-  return `/media/site/${filename}?v=${Date.now()}`;
+  return `/media/site/${filename}`;
 }
 
-/** Removes any stored map image file. */
-export async function deleteMapImage(): Promise<void> {
-  const dir = mapDir();
-  let entries: string[];
+export async function deleteMapImage(url: string): Promise<void> {
+  const filename = path.posix.basename(url.split("?")[0]);
+  if (!url.startsWith("/media/site/") || !SAFE_FILENAME.test(filename)) return;
   try {
-    entries = await fs.readdir(dir);
-  } catch {
-    return;
+    await fs.unlink(path.join(mapDir(), filename));
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT")
+      console.error(`Could not delete ${filename}; delete it by hand`, error);
   }
-  await Promise.all(
-    entries
-      .filter((name) => name.startsWith("map."))
-      .map((name) => fs.unlink(path.join(dir, name)).catch(() => {}))
-  );
 }
 
-const SAFE_FILENAME = /^map\.(jpg|png|webp)$/;
+export const mapImages = {
+  validate: validateMapImage,
+  saveNew: saveMapImage,
+  deleteByUrl: deleteMapImage,
+};
+
+const SAFE_FILENAME = /^map(-[0-9a-f-]+)?\.(jpg|png|webp)$/;
 
 const CONTENT_TYPES: Record<string, string> = {
   jpg: "image/jpeg",

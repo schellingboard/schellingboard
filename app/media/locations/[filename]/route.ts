@@ -1,5 +1,5 @@
-// Serves admin-uploaded location images from SB_UPLOADS_DIR. URLs carry a ?v=
-// cache-buster set on upload, and ?w= the width next/image asked for (see
+// Serves admin-uploaded location images from SB_UPLOADS_DIR. Each upload gets
+// a new filename, and URLs carry ?w= the width next/image asked for (see
 // utils/image-loader.js), so responses can be cached aggressively.
 import { NextRequest, NextResponse } from "next/server";
 import { getImageRepositories, requestedWidth } from "@/utils/images";

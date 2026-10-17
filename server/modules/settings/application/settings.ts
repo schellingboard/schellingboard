@@ -1,5 +1,6 @@
 import type { SiteSettings } from "@schellingboard/domain/site-settings";
 import type { Actor } from "@/server/kernel/actor";
+import { withStoredFile } from "@/server/kernel/stored-files";
 import { forbidden, invalid, ok, type Result } from "@/server/kernel/result";
 import type { SettingsDeps } from "../ports";
 
@@ -20,7 +21,7 @@ export const getSiteSettings =
   };
 
 export const updateSiteSettings =
-  ({ repos, maps }: SettingsDeps) =>
+  ({ uow, maps }: SettingsDeps) =>
   async (
     actor: Actor,
     input: SiteSettingsInput
@@ -30,23 +31,26 @@ export const updateSiteSettings =
     if (!title) return invalid("settings.titleRequired", "Title is required");
     const description = input.description.trim();
 
-    let prepared: { buffer: Buffer; ext: string } | undefined;
+    let newMapUrl: string | null = null;
     if (input.image) {
       const validation = await maps.validate(input.image);
       if ("error" in validation) {
         return invalid("settings.mapInvalid", validation.error);
       }
-      prepared = { buffer: input.image, ext: validation.ext };
+      newMapUrl = await maps.saveNew(input.image, validation.ext);
     }
+    const changesMap = newMapUrl !== null || input.removeMap;
 
-    // Left out of the patch unless it changes: the update merges into the row
-    // under the write lock, so a map uploaded meanwhile survives.
-    let map: { mapImageUrl: string } | undefined;
-    if (prepared) {
-      map = { mapImageUrl: await maps.save(prepared.buffer, prepared.ext) };
-    } else if (input.removeMap) {
-      await maps.delete();
-      map = { mapImageUrl: "" };
-    }
-    return ok(await repos.settings.update({ title, description, ...map }));
+    return withStoredFile(maps, newMapUrl, (replaces) =>
+      uow.run(async (tx) => {
+        const before = await tx.settings.get();
+        const updated = await tx.settings.update({
+          title,
+          description,
+          ...(changesMap && { mapImageUrl: newMapUrl ?? "" }),
+        });
+        if (changesMap) replaces(before.mapImageUrl);
+        return ok(updated);
+      })
+    );
   };
