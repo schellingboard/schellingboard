@@ -24,3 +24,9 @@ export const pushEndpointSchema = z.object({
 });
 
 export const pushEnabledSchema = z.object({ enabled: z.boolean() });
+
+export const pushKeySchema = z.object({
+  publicKey: z
+    .string()
+    .describe("The VAPID key a browser passes to pushManager.subscribe"),
+});

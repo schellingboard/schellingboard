@@ -334,6 +334,24 @@ describe("/api/v1 profiles", () => {
 
 describe("/api/v1 notifications and settings", () => {
   it(
+    "hands out the instance's push key, the same on every call",
+    { tags: ["013-US3"] },
+    async () => {
+      const first = await call("GET", "/push/key");
+      expect(first.status).toBe(200);
+      const { publicKey } = (await first.json()) as { publicKey: string };
+      expect(publicKey).toMatch(/^[A-Za-z0-9_-]{80,}$/);
+      expect(await (await call("GET", "/push/key")).json()).toEqual({
+        publicKey,
+      });
+      const stored = await getRepositories().push.vapidKeys(() => {
+        throw new Error("already generated");
+      }, new Date());
+      expect(stored.publicKey).toBe(publicKey);
+    }
+  );
+
+  it(
     "lists, reads and deletes the caller's notifications",
     { tags: ["013-US1", "013-US2"] },
     async () => {

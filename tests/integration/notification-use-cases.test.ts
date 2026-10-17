@@ -4,6 +4,7 @@ import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createGuest } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
+import { generateVapidKeys } from "@/utils/push";
 import { createNotificationUseCases } from "@/server/modules/notifications/module";
 import type { Actor } from "@/server/kernel/actor";
 import type { Result } from "@/server/kernel/result";
@@ -18,7 +19,11 @@ const open = (id: string): Actor => ({
 const now = () => new Date();
 
 const notifications = () =>
-  createNotificationUseCases({ repos: getRepositories(), uow: unitOfWork });
+  createNotificationUseCases({
+    repos: getRepositories(),
+    uow: unitOfWork,
+    generateVapidKeys,
+  });
 
 function value<T>(result: Result<T>): T {
   if (!result.ok) throw new Error(result.error.code);

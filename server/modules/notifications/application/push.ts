@@ -55,3 +55,12 @@ export const isPushEnabledHere =
     const subscription = await repos.push.findSubscription(endpoint);
     return ok(subscription?.guestId === acting.value);
   };
+
+// Generated on the first call and never replaced: it is baked into every
+// subscription already handed out, and nothing tells a browser to ask again.
+export const getPushKey =
+  ({ repos, generateVapidKeys }: NotificationDeps) =>
+  async (_actor: Actor, now: Date): Promise<Result<{ publicKey: string }>> => {
+    const { publicKey } = await repos.push.vapidKeys(generateVapidKeys, now);
+    return ok({ publicKey });
+  };

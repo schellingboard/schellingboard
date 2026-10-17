@@ -4,6 +4,7 @@ import { unitOfWork } from "@/server/kernel/unit-of-work";
 import { testEmail } from "@/emails/test-email";
 import { getImageRepositories } from "@/utils/images";
 import { sendMail } from "@/utils/mailer";
+import { generateVapidKeys } from "@/utils/push";
 import {
   deleteMapImage,
   saveMapImage,
@@ -117,6 +118,7 @@ export function notificationUseCases(): NotificationUseCases {
   return createNotificationUseCases({
     repos: getRepositories(),
     uow: unitOfWork,
+    generateVapidKeys,
   });
 }
 
