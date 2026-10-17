@@ -42,3 +42,7 @@ export function register(connection: Connection): () => void {
   connections().add(connection);
   return () => void connections().delete(connection);
 }
+
+export function connectionCount(): number {
+  return connections().size;
+}

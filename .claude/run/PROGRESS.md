@@ -567,6 +567,18 @@ cursor.invalid`. The use case now returns the whole list; the
   at the first change too new and stores the watermark in the `changes.pruned`
   job cursor (`getPrunedThrough`, a reader method), so what remains has no gaps.
 
+- 13a review, accepted: after the replay `openFeed` re-reads the watermark and
+  answers `reset` if pruning passed `since` meanwhile; the hub drops a
+  connection whose `deliver` throws, so others still get the change.
+- 13b: `GET /events/{slug}/feed` (`server/feed/routes.ts`): the viewer is
+  `actingGuest` (else no guest) plus the admin flag; `Last-Event-ID` wins over
+  `?since=`; neither is `400 feed.sinceMissing`, a non-number
+  `feed.sinceInvalid`. A comment every 25 s, the stream ends after 10 min, and
+  a client abort or cancel closes the hub registration. Split from the
+  plan: 13c holds the 1 MB cap and closing connections on credential changes
+  (the `publicSchedule` setting is not part of this step). Replay is written
+  before the response returns, so a very long replay is held in memory first.
+
 ## Problems
 
 None.
@@ -592,4 +604,4 @@ None.
 
 ## Next step
 
-13b.
+13c.

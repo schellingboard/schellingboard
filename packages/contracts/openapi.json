@@ -777,6 +777,413 @@
           "profileVersion"
         ]
       },
+      "FeedMessage": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["event.changed"] },
+              "event": { "$ref": "#/components/schemas/Event" }
+            },
+            "required": ["seq", "commandKey", "type", "event"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["event.deleted"] }
+            },
+            "required": ["seq", "commandKey", "type"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["day.created"] },
+              "day": {
+                "type": "object",
+                "properties": {
+                  "start": { "type": "string", "format": "date-time" },
+                  "end": { "type": "string", "format": "date-time" },
+                  "startBookings": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "When sessions may start"
+                  },
+                  "endBookings": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "When sessions must end"
+                  },
+                  "id": { "type": "string" },
+                  "eventId": { "type": "string" },
+                  "version": { "type": "integer" }
+                },
+                "required": [
+                  "start",
+                  "end",
+                  "startBookings",
+                  "endBookings",
+                  "id",
+                  "eventId",
+                  "version"
+                ]
+              }
+            },
+            "required": ["seq", "commandKey", "type", "day"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["day.changed"] },
+              "day": {
+                "type": "object",
+                "properties": {
+                  "start": { "type": "string", "format": "date-time" },
+                  "end": { "type": "string", "format": "date-time" },
+                  "startBookings": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "When sessions may start"
+                  },
+                  "endBookings": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "When sessions must end"
+                  },
+                  "id": { "type": "string" },
+                  "eventId": { "type": "string" },
+                  "version": { "type": "integer" }
+                },
+                "required": [
+                  "start",
+                  "end",
+                  "startBookings",
+                  "endBookings",
+                  "id",
+                  "eventId",
+                  "version"
+                ]
+              }
+            },
+            "required": ["seq", "commandKey", "type", "day"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["day.deleted"] },
+              "dayId": { "type": "string" }
+            },
+            "required": ["seq", "commandKey", "type", "dayId"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["location.changed"] },
+              "location": { "$ref": "#/components/schemas/SnapshotLocation" }
+            },
+            "required": ["seq", "commandKey", "type", "location"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["location.removed"] },
+              "locationId": { "type": "string" }
+            },
+            "required": ["seq", "commandKey", "type", "locationId"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["unavailability.added"] },
+              "period": { "$ref": "#/components/schemas/Unavailability" }
+            },
+            "required": ["seq", "commandKey", "type", "period"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["unavailability.removed"] },
+              "periodId": { "type": "string" }
+            },
+            "required": ["seq", "commandKey", "type", "periodId"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["guest.changed"] },
+              "guest": { "$ref": "#/components/schemas/SnapshotGuest" }
+            },
+            "required": ["seq", "commandKey", "type", "guest"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["guest.removed"] },
+              "guestId": { "type": "string" }
+            },
+            "required": ["seq", "commandKey", "type", "guestId"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["meetingPoint.changed"] },
+              "meetingPoint": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "string" },
+                  "eventId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "sortIndex": { "type": "integer" },
+                  "version": { "type": "integer" }
+                },
+                "required": [
+                  "id",
+                  "eventId",
+                  "name",
+                  "description",
+                  "sortIndex",
+                  "version"
+                ]
+              }
+            },
+            "required": ["seq", "commandKey", "type", "meetingPoint"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["meetingPoint.removed"] },
+              "meetingPointId": { "type": "string" }
+            },
+            "required": ["seq", "commandKey", "type", "meetingPointId"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["meeting.changed"] },
+              "meeting": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "string" },
+                  "eventId": { "type": "string" },
+                  "requesterId": { "type": "string" },
+                  "recipientId": { "type": "string" },
+                  "slotStart": { "type": "string", "format": "date-time" },
+                  "slotEnd": { "type": "string", "format": "date-time" },
+                  "meetingPoint": { "type": "string" },
+                  "message": { "type": "string" },
+                  "cancelNote": { "type": "string" },
+                  "status": {
+                    "type": "string",
+                    "enum": ["pending", "accepted", "declined", "canceled"]
+                  },
+                  "createdAt": { "type": "string", "format": "date-time" },
+                  "respondedAt": {
+                    "type": ["string", "null"],
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "id",
+                  "eventId",
+                  "requesterId",
+                  "recipientId",
+                  "slotStart",
+                  "slotEnd",
+                  "meetingPoint",
+                  "message",
+                  "cancelNote",
+                  "status",
+                  "createdAt",
+                  "respondedAt"
+                ]
+              }
+            },
+            "required": ["seq", "commandKey", "type", "meeting"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["meeting.deleted"] },
+              "meetingId": { "type": "string" }
+            },
+            "required": ["seq", "commandKey", "type", "meetingId"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["availability.changed"] },
+              "slotStarts": {
+                "type": "array",
+                "items": { "type": "string", "format": "date-time" }
+              }
+            },
+            "required": ["seq", "commandKey", "type", "slotStarts"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["session.created"] },
+              "session": { "$ref": "#/components/schemas/SnapshotSession" }
+            },
+            "required": ["seq", "commandKey", "type", "session"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["session.changed"] },
+              "session": { "$ref": "#/components/schemas/SnapshotSession" }
+            },
+            "required": ["seq", "commandKey", "type", "session"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["session.deleted"] },
+              "sessionId": { "type": "string" }
+            },
+            "required": ["seq", "commandKey", "type", "sessionId"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["session.attendanceChanged"]
+              },
+              "sessionId": { "type": "string" },
+              "numRsvps": { "type": "integer" }
+            },
+            "required": ["seq", "commandKey", "type", "sessionId", "numRsvps"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["rsvp.added"] },
+              "rsvp": { "$ref": "#/components/schemas/Rsvp" }
+            },
+            "required": ["seq", "commandKey", "type", "rsvp"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["rsvp.removed"] },
+              "sessionId": { "type": "string" },
+              "guestId": { "type": "string" }
+            },
+            "required": ["seq", "commandKey", "type", "sessionId", "guestId"]
+          }
+        ]
+      },
       "Location": {
         "type": "object",
         "properties": {
@@ -5089,6 +5496,45 @@
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Snapshot" }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+      }
+    },
+    "/api/v1/events/{slug}/feed": {
+      "get": {
+        "tags": ["events"],
+        "description": "A `text/event-stream` of the event's changes after `since` (the snapshot's `seq`), filtered to what the `guest` cookie may see. Each message has `id` = its `seq`, `event` = its type and the message as JSON `data`; a browser's reconnect sends `Last-Event-ID`, which wins over `since`. An `event: reset` message, after which the stream ends, means the resume point cannot be served: load the snapshot again. A comment every 25 seconds keeps proxies from closing it; it ends after 10 minutes.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "slug",
+            "in": "path"
+          },
+          {
+            "schema": { "type": "string" },
+            "required": false,
+            "name": "since",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Changes as server-sent events; each `data` is a FeedMessage",
+            "content": {
+              "text/event-stream": {
+                "schema": { "$ref": "#/components/schemas/FeedMessage" }
               }
             }
           },
