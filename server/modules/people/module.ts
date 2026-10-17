@@ -9,3 +9,4 @@ export { addPeopleRoutes } from "./http/routes";
 export { addAdminGuestRoutes } from "./http/admin-routes";
 export { eventGuests } from "./application/snapshot";
 export { toEventGuestView } from "./http/view";
+export { allGuests, guestById, attendees } from "./application/page-reads";

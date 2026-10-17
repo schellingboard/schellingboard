@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
 import { ProposalActionBar } from "./proposal-action-bar";
 import { ProposalTable } from "./proposal-table";
 import { ProposalModal } from "./proposal-modal";
@@ -18,19 +18,17 @@ export default async function ProposalsPage({
   const { eventSlug } = await params;
   const { viewProposal } = await searchParams;
 
-  const repos = getRepositories();
-  const event = await repos.events.findBySlug(eventSlug);
+  const reads = pageReads();
+  const event = await reads.eventBySlug(eventSlug);
 
   if (!event) {
     return <div>Event not found</div>;
   }
 
   const [proposals, sessions, comments] = await Promise.all([
-    repos.sessionProposals.listByEvent(event.id),
-    viewProposal ? repos.sessions.listByEvent(event.id) : Promise.resolve([]),
-    viewProposal
-      ? repos.proposalComments.list(viewProposal)
-      : Promise.resolve([]),
+    reads.eventProposals(event.id),
+    viewProposal ? reads.sessionsOfEvent(event.id) : Promise.resolve([]),
+    viewProposal ? reads.proposalComments(viewProposal) : Promise.resolve([]),
   ]);
   const viewedProposal = viewProposal
     ? proposals.find((proposal) => proposal.id === viewProposal)

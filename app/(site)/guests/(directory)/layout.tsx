@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
 import { AttendeeDirectory } from "@/app/(site)/guests/directory";
 import { newSortSeed } from "@/utils/attendee-search";
 import { serverNow } from "@/utils/dev-clock-server";
@@ -22,10 +22,10 @@ export default async function AttendeeDirectoryLayout({
   // public profile fields only — `Attendee` has no `info`, so no email can
   // reach the client payload this way.
   const now = await serverNow();
-  const repos = getRepositories();
+  const reads = pageReads();
   const [attendees, events] = await Promise.all([
-    repos.guests.listAttendees(now),
-    repos.events.list(),
+    reads.attendees(now),
+    reads.allEvents(),
   ]);
   const cookieStore = await cookies();
   const currentUser = await verifiedCurrentUser(cookieStore);

@@ -5,3 +5,4 @@ export {
   type CommentUseCases,
 } from "./application/use-cases";
 export { addCommentRoutes } from "./http/routes";
+export { proposalComments } from "./application/page-reads";

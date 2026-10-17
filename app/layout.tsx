@@ -3,7 +3,7 @@ import { Montserrat, Roboto, Fira_Code } from "next/font/google";
 import { cookies } from "next/headers";
 import clsx from "clsx";
 import "./globals.css";
-import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
 import { THEME_COOKIE, normalizeTheme, themeClass } from "@/utils/theme";
 import { ThemeProvider } from "./theme-context";
 
@@ -28,7 +28,7 @@ const fontVars = [
 ].join(" ");
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getRepositories().settings.get();
+  const settings = await pageReads().siteSettings();
   return {
     title: settings.title,
     description: settings.description,

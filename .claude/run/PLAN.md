@@ -211,10 +211,15 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
 ### Built on the above
 
 - [ ] 16. **Pages through queries**: pages, layouts and server actions under `app/`
-      that call `getRepositories()` (34 files) call module queries or use cases; add
-      queries where missing. 16a site, 16b admin, then a dependency-cruiser rule
-      forbidding `app/` → `db/container`, with an allow-list for the auth flows
-      (step 6 of the path).
+      that call `getRepositories()` call module queries or use cases; add queries
+      where missing.
+  - [x] 16a. Site pages, layouts and actions (not admin) onto `pageReads()`
+        (`server/composition.ts`; per-module `page-reads.ts`). The auth flows
+        (`actions/user-auth.ts`, `auth/login`, `auth/reset`) stay on the repositories
+        for the allow-list.
+  - [ ] 16b. Admin pages and layouts (12 files under `app/admin/`).
+  - [ ] 16c. A dependency-cruiser rule forbidding `app/` → `db/container`, with an
+        allow-list for the auth flows (step 6 of the path).
 - [ ] 17. **`Idempotency-Key` from the UI (#141)**: the create forms (proposal,
       session, comment) and the RSVP toggle send a key made per form instance; server
       actions use the same idempotency store as the middleware (its core moves to the

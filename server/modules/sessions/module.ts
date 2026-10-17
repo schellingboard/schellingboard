@@ -29,3 +29,4 @@ export {
   toSnapshotSessionView,
   toUnavailabilityView,
 } from "./http/view";
+export { sessionsOfEvent, hostedSessions } from "./application/page-reads";

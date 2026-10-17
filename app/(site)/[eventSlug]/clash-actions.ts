@@ -1,6 +1,6 @@
 "use server";
 
-import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
 import { requireVerifiedGuest } from "@/utils/action-auth";
 import {
   clashesForInterval,
@@ -23,7 +23,7 @@ export async function detectGuestClashes(input: {
   const { eventId, guestIds, start, end, excludeSessionId } = input;
   if (guestIds.length === 0) return [];
 
-  const event = await getRepositories().events.findById(eventId);
+  const event = await pageReads().eventById(eventId);
   if (!event) return [];
 
   const schedules = await loadGuestSchedules(eventId, guestIds);

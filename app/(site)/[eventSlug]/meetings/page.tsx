@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { PageNotice } from "@/app/components/page-notice";
 import { EventPhase, getCurrentPhase } from "@schellingboard/domain/phase";
-import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
 import {
   unverifiedUserMessage,
   verifiedCurrentUser,
@@ -27,7 +27,7 @@ export default async function MeetingsPage({
   searchParams: Promise<{ viewMeeting?: string | string[] }>;
 }) {
   const { eventSlug } = await params;
-  const event = await getRepositories().events.findBySlug(eventSlug);
+  const event = await pageReads().eventBySlug(eventSlug);
   if (!event) notFound();
 
   const { viewMeeting } = await searchParams;

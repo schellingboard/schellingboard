@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { PageNotice } from "@/app/components/page-notice";
-import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
 import { sanitizeGuest } from "@schellingboard/domain/guest";
 import {
   unverifiedUserMessage,
@@ -20,7 +20,7 @@ export default async function EditProfilePage() {
     );
   }
 
-  const guest = await getRepositories().guests.findById(currentUser);
+  const guest = await pageReads().guestById(currentUser);
 
   if (!guest) {
     return (

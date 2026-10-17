@@ -11,3 +11,9 @@ export {
 export { addAdminEventRoutes, addEventReadRoutes } from "./http/routes";
 export { toDayView, toEventView } from "./http/view";
 export { eventScheduleBySlug } from "./application/snapshot";
+export {
+  allEvents,
+  eventBySlug,
+  eventById,
+  eventDays,
+} from "./application/page-reads";
