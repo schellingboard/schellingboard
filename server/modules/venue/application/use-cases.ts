@@ -8,6 +8,8 @@ import {
   deleteLocation,
   listLocations,
   moveLocation,
+  removeLocationImage,
+  replaceLocationImage,
   updateLocation,
 } from "./locations";
 
@@ -18,6 +20,8 @@ export function createVenueUseCases(deps: VenueDeps) {
     updateLocation: updateLocation(deps),
     deleteLocation: deleteLocation(deps),
     moveLocation: moveLocation(deps),
+    replaceLocationImage: replaceLocationImage(deps),
+    removeLocationImage: removeLocationImage(deps),
     assignLocationsToEvent: assignLocationsToEvent(deps),
     removeLocationsFromEvent: removeLocationsFromEvent(deps),
   };

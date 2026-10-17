@@ -1,3 +1,6 @@
+import fs from "fs";
+import os from "os";
+import path from "path";
 import {
   describe,
   it,
@@ -5,6 +8,7 @@ import {
   beforeAll,
   beforeEach,
   afterEach,
+  onTestFinished,
   vi,
 } from "vitest";
 
@@ -13,6 +17,7 @@ import { GET, POST, PUT, DELETE } from "@/app/api/v1/[[...route]]/route";
 import { getRepositories } from "@/db/container";
 import { createAdminAuthCookie } from "@/utils/auth";
 import { isoDay } from "../helpers/dates";
+import { createImageFile } from "../helpers/utils";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createDay, createEvent, createLocation } from "../helpers/factories";
 
@@ -29,9 +34,10 @@ function call(
   path: string,
   {
     body,
+    form,
     cookie = admin,
     key,
-  }: { body?: unknown; cookie?: string; key?: string } = {}
+  }: { body?: unknown; form?: FormData; cookie?: string; key?: string } = {}
 ) {
   const headers: Record<string, string> = {};
   if (body !== undefined) headers["content-type"] = "application/json";
@@ -41,7 +47,7 @@ function call(
     new NextRequest(`http://test/api/v1${path}`, {
       method,
       headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: form ?? (body === undefined ? undefined : JSON.stringify(body)),
     })
   );
 }
@@ -402,6 +408,63 @@ describe("/api/v1/admin locations", () => {
         code: "location.invalid",
         errors: [{ path: "eventIds", message: "Unknown event" }],
       });
+    }
+  );
+
+  it(
+    "replaces and removes a location's image, refusing an outdated copy or a bad file",
+    { tags: ["017-US2"] },
+    async () => {
+      const uploadsDir = fs.mkdtempSync(path.join(os.tmpdir(), "uploads-"));
+      onTestFinished(() =>
+        fs.rmSync(uploadsDir, { recursive: true, force: true })
+      );
+      vi.stubEnv("SB_UPLOADS_DIR", uploadsDir);
+      const room = await createLocation({ name: "Hall" });
+      const upload = async (width: number, expectedVersion: number) => {
+        const form = new FormData();
+        form.set("image", await createImageFile(width, 600, "room.png"));
+        form.set("expectedVersion", String(expectedVersion));
+        return call("PUT", `/admin/locations/${room.id}/image`, { form });
+      };
+      const file = path.join(uploadsDir, "locations", `${room.id}.png`);
+
+      const replaced = await upload(800, room.version);
+      expect(replaced.status).toBe(200);
+      expect(await replaced.json()).toMatchObject({
+        imageUrl: expect.stringMatching(/^\/media\/locations\//) as string,
+        version: room.version + 1,
+      });
+      expect(fs.existsSync(file)).toBe(true);
+
+      const stale = await upload(800, room.version);
+      expect(stale.status).toBe(409);
+      expect(await stale.json()).toMatchObject({
+        code: "location.versionConflict",
+      });
+      const wrongShape = await upload(600, room.version + 1);
+      expect(wrongShape.status).toBe(400);
+      expect(await wrongShape.json()).toMatchObject({
+        code: "location.imageInvalid",
+      });
+      const byGuest = await call(
+        "DELETE",
+        `/admin/locations/${room.id}/image?expectedVersion=${room.version + 1}`,
+        { cookie: "" }
+      );
+      expect(byGuest.status).toBe(403);
+      expect(fs.existsSync(file)).toBe(true);
+
+      const removed = await call(
+        "DELETE",
+        `/admin/locations/${room.id}/image?expectedVersion=${room.version + 1}`
+      );
+      expect(removed.status).toBe(200);
+      expect(await removed.json()).toMatchObject({
+        imageUrl: "",
+        version: room.version + 2,
+      });
+      expect(fs.existsSync(file)).toBe(false);
     }
   );
 
