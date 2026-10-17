@@ -76,9 +76,9 @@ export function eventContextFrom(snapshot: Snapshot) {
     ),
   }));
 
-  const unavailability: LocationUnavailability[] = snapshot.unavailability.map(
-    (u) => ({ ...u, start: date(u.start), end: date(u.end) })
-  );
+  const unavailability: LocationUnavailability[] = snapshot.unavailability
+    .filter((u) => locationsById.has(u.locationId))
+    .map((u) => ({ ...u, start: date(u.start), end: date(u.end) }));
 
   // The schedule's guest lists (host picker, attendee count) are members only.
   // Like the lean list they replace, they carry no admin `version`.

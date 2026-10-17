@@ -598,6 +598,16 @@ cursor.invalid`. The use case now returns the whole list; the
   reconnect (about 3 s apart for the browser), so a very late resume is slow
   but complete. Listener errors in `credentialsChanged` are logged.
 
+- Step 14 split into 14a-14d in PLAN.md. 14a: `createReplicaStore`
+  (get/subscribe/applyMessage/replace) and `connectFeed` (injected
+  `createSource`/`loadSnapshot`; one listener per message type, since a named
+  SSE event never reaches `onmessage`; invalid data is dropped; `reset`
+  closes, reloads, replaces, reopens after the new `seq`). `eventContextFrom`
+  now also drops unavailability rows of a room the replica does not hold.
+  Nothing on the schedule uses the store yet, so no CHANGELOG line. Left for
+  14b: error handling when the `EventSource` closes for good (refetch the
+  snapshot, back off), since 14a only handles `reset`.
+
 ## Problems
 
 None.
@@ -623,4 +633,4 @@ None.
 
 ## Next step
 
-14.
+14b.

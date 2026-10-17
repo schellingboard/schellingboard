@@ -1,6 +1,7 @@
 // @module-tag 007-US8
 import { describe, it, expect } from "vitest";
 import { eventContextFrom } from "@/app/(site)/[eventSlug]/replica/selectors";
+import { apply } from "@/app/(site)/[eventSlug]/replica/apply";
 import { iso, snapshot } from "../helpers/snapshot-fixture";
 
 describe("eventContextFrom", () => {
@@ -30,5 +31,20 @@ describe("eventContextFrom", () => {
     expect(context.rsvps).toEqual([
       { id: "x", sessionId: "s", guestId: "mia" },
     ]);
+  });
+
+  it("skips a room the replica no longer holds", () => {
+    const removed = apply(snapshot, {
+      seq: snapshot.seq + 1,
+      type: "location.removed",
+      commandKey: null,
+      locationId: "r",
+    });
+
+    const context = eventContextFrom(removed);
+
+    expect(context.locations).toEqual([]);
+    expect(context.sessions[0].locations).toEqual([]);
+    expect(context.unavailability).toEqual([]);
   });
 });

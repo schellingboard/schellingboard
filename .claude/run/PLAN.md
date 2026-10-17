@@ -186,7 +186,7 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
         headers), the 10-minute limit, cleanup on abort; OpenAPI; docs.
   - [x] 13c. The 1 MB slow-client cap and closing a guest's connections on
         credential changes.
-- [ ] 14. **Replica on the schedule**: a client store seeded with the SSR snapshot and
+- [ ] 14. **Replica on the schedule** (split 14a-14d): a client store seeded with the SSR snapshot and
       fed by `EventSource`; `EventContext` derives its values from it. A reconnect
       resumes; `410` refetches the snapshot; a user switch reloads snapshot and feed.
       The RSVP optimistic update reconciles with the feed's echo, never counts twice.
@@ -194,6 +194,15 @@ nextCursor }` out) on every `/api/v1` list that grows with an event: sessions,
       sessions' links and unavailability rows); a replica test shows it.
       E2E: two browser contexts; one creates, moves and deletes a session and RSVPs,
       the other sees each change without a reload. Kiosk included.
+  - [x] 14a. Store (`replica/store.ts`), feed client (`replica/feed-client.ts`:
+        `EventSource`, `reset` reloads the snapshot), selectors skip a removed
+        room; no React yet.
+  - [ ] 14b. `EventContext` derives from the store, one `EventSource` per tab,
+        visibility close/reopen, reconnect after errors, user switch;
+        `event.deleted` state; CHANGELOG and docs (the schedule is then live).
+  - [ ] 14c. RSVP echo reconciliation (replaces the count deltas), and the
+        meetings column's debounced refetch.
+  - [ ] 14d. E2E: two browser contexts, kiosk included.
 - [ ] 15. **Sync state**: an indicator on the schedule (live, reconnecting, stale), so
       a stale schedule never looks current (ADR 0006). `fixes #1111`.
 
