@@ -26,6 +26,25 @@ describe("API docs", () => {
     expect(await res.json()).toEqual(openApiDocument());
   });
 
+  it("declares which cookie each endpoint needs", () => {
+    const { paths = {}, components } = openApiDocument();
+    expect(Object.keys(components?.securitySchemes ?? {}).sort()).toEqual([
+      "adminAuth",
+      "siteAuth",
+    ]);
+    expect(paths["/api/v1/health"].get).not.toHaveProperty("security");
+    expect(paths["/api/v1/admin/events"].get?.security).toEqual([
+      { adminAuth: [] },
+    ]);
+    const attendee = Object.entries(paths).find(
+      ([path]) =>
+        !path.startsWith("/api/v1/admin/") && path !== "/api/v1/health"
+    );
+    expect(attendee?.[1].get?.security ?? attendee?.[1].post?.security).toEqual(
+      [{ siteAuth: [] }, { adminAuth: [] }]
+    );
+  });
+
   it("serves the API reference with its script from the site itself", async () => {
     const page = await getAsAttendee("/api/v1/docs");
     expect(page.status).toBe(200);
