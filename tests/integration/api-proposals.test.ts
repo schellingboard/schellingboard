@@ -120,7 +120,8 @@ describe("/api/v1 proposals", () => {
         request("GET", `/proposals?eventId=${event.id}`)
       );
       expect(await listed.json()).toMatchObject({
-        proposals: [{ id: proposal.id, hosts: expect.any(Array) as unknown }],
+        items: [{ id: proposal.id, hosts: expect.any(Array) as unknown }],
+        nextCursor: null,
       });
 
       const deleted = await DELETE(
@@ -175,6 +176,38 @@ describe("/api/v1 proposals", () => {
       expect(body.current.hosts.map((h) => h.id).sort()).toEqual(
         [host.id, joiner.id].sort()
       );
+    }
+  );
+
+  it(
+    "pages an event's proposals, oldest first, ties by id",
+    { tags: ["019-US8"] },
+    async () => {
+      const event = await createEvent();
+      const day = (d: number) => new Date(`2026-03-0${d}T10:00:00Z`);
+      const second = await createProposal(event.id, [], {
+        createdTime: day(2),
+      });
+      const first = await createProposal(event.id, [], {
+        createdTime: day(1),
+      });
+      const [third, fourth] = (
+        await Promise.all([
+          createProposal(event.id, [], { createdTime: day(3) }),
+          createProposal(event.id, [], { createdTime: day(3) }),
+        ])
+      ).sort((x, y) => (x.id < y.id ? -1 : 1));
+      const page = async (query: string) =>
+        (await (
+          await GET(request("GET", `/proposals?eventId=${event.id}${query}`))
+        ).json()) as { items: { id: string }[]; nextCursor: string | null };
+
+      const one = await page("&limit=2");
+      const two = await page(`&limit=2&cursor=${one.nextCursor}`);
+
+      expect(one.items.map((p) => p.id)).toEqual([first.id, second.id]);
+      expect(two.items.map((p) => p.id)).toEqual([third.id, fourth.id]);
+      expect(two.nextCursor).toBeNull();
     }
   );
 

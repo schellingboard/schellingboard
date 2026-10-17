@@ -198,6 +198,23 @@ openapi-check typecheck test-coverage` (or `make test`), without E2E. E2E runs
   outside 4b and still send no version (see Questions). E2E run:
   proposals, update-session, scheduling and admin specs.
 
+- Step 5 split into 5a-5d (PLAN.md). User, 2026-10-07: the guest directory
+  (no `/api/v1` route yet) gets a new route in its own commit, 5d.
+- 5a: `limit` (1-1000, default 100) and `cursor` in, `{ items, nextCursor }`
+  out; contract in `packages/contracts/src/cursor-page.ts` (`page.ts` is the
+  admin tables' `?page=` schema), recorded in ADR 0012 section 6 (old 6 is
+  now 7). `pageOf(all, query, sortKey)` in `server/http/pagination.ts` cuts
+  the page from the use case's full list in the HTTP layer; the cursor is
+  base64url JSON of the last item's sort key, so a delete between pages
+  shifts nothing; it also names its list, and a cursor that is unreadable,
+  empty, from another list or of another key shape is `400 cursor.invalid`.
+  Keys ascend by code units (5c negates the time for newest first). Orders:
+  sessions by id (review: a start time moves while organizers schedule, and a
+  sync script would skip a moved session), proposals by creation, then id.
+  `/sessions` and `/proposals` now answer `{ items, nextCursor }` (were
+  `{ sessions }`/`{ proposals }`); `/api/v1` is unreleased, so the CHANGELOG
+  API bullet is extended. New use case 019-US8.
+
 ## Problems
 
 None.
@@ -219,4 +236,4 @@ None.
 
 ## Next step
 
-5.
+5b.

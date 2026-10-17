@@ -23,6 +23,7 @@ import {
   createEvent,
   createGuest,
   createLocation,
+  createProposal,
   createSession,
   slotStart,
 } from "../helpers/factories";
@@ -111,8 +112,59 @@ describe("GET /api/v1/sessions", () => {
       });
       expect(list.status).toBe(200);
       expect(await list.json()).toMatchObject({
-        sessions: [{ id: session.id }],
+        items: [{ id: session.id }],
+        nextCursor: null,
       });
+    }
+  );
+
+  it(
+    "pages an event's sessions in id order",
+    { tags: ["019-US8"] },
+    async () => {
+      const { event, day } = await scheduledWorld();
+      const [a, b, c] = (
+        await Promise.all([
+          createSession(event.id, {}),
+          createSession(event.id, {
+            startTime: new Date(slotStart(day, 0)),
+            endTime: new Date(slotStart(day, 60)),
+          }),
+          createSession(event.id, {}),
+        ])
+      ).sort((x, y) => (x.id < y.id ? -1 : 1));
+      const list = (query: string) =>
+        GET(request("GET", `/sessions?eventId=${event.id}${query}`));
+      const page = async (query: string) =>
+        (await (await list(query)).json()) as {
+          items: { id: string }[];
+          nextCursor: string | null;
+        };
+
+      const first = await page("&limit=2");
+      expect(first.items.map((s) => s.id)).toEqual([a.id, b.id]);
+      await getRepositories().sessions.delete(b.id);
+      const second = await page(`&limit=2&cursor=${first.nextCursor}`);
+      expect(second).toEqual({
+        items: [expect.objectContaining({ id: c.id })],
+        nextCursor: null,
+      });
+
+      for (const query of ["&limit=0", "&limit=1001"]) {
+        expect(await (await list(query)).json()).toMatchObject({
+          code: "request.invalid",
+        });
+      }
+      await createProposal(event.id, []);
+      await createProposal(event.id, []);
+      const proposals = (await (
+        await GET(request("GET", `/proposals?eventId=${event.id}&limit=1`))
+      ).json()) as { nextCursor: string };
+      for (const cursor of ["nonsense", "", proposals.nextCursor]) {
+        const refused = await list(`&cursor=${cursor}`);
+        expect(refused.status).toBe(400);
+        expect(await refused.json()).toMatchObject({ code: "cursor.invalid" });
+      }
     }
   );
 

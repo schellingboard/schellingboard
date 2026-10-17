@@ -161,7 +161,24 @@ rather than shared by every anonymous client. Server actions do not use it.
 Echoing the key on the change log (`command_key`) waits for the feed that reads
 it, in step 4.
 
-### 6. A committed `openapi.json` that cannot go stale
+### 6. Lists that grow with an event come in pages
+
+Such a list (sessions, proposals, guests, comments, notifications) takes
+`limit` (1 to 1000, default 100) and an optional `cursor`, and answers
+`{ items, nextCursor }`; `nextCursor` is null on the last page. Each list has a
+fixed order, named in its description, ending in the id so it is total. Sort
+keys ascend and compare by code units (a newest-first list negates its time,
+and names are not sorted by locale); a list sorts by fields that rarely change
+(sessions by id, not by start). The cursor is opaque to the client: it holds
+the list's name and the last item's sort key, not a position, so an item
+deleted between two requests shifts nothing, while one that changes its sort
+key meanwhile may be skipped or seen twice. A cursor the server cannot read, or
+one from another list, is `400 cursor.invalid`. Lists bounded by something else
+(an event's days, its locations, a guest's votes) stay whole. The pages are cut
+in the HTTP layer from the use case's full list: the contract allows reading
+pages from the database later without a change for clients.
+
+### 7. A committed `openapi.json` that cannot go stale
 
 A script imports the Hono app and writes its OpenAPI 3.1 document to
 `packages/contracts/openapi.json`, which is committed. `make openapi` rewrites
@@ -197,6 +214,6 @@ standalone build does not carry it.
   response no longer RSVPs twice or creates two proposals (#141), for clients
   that send the key. The web app's server actions do not, so #141 stays open
   until the UI calls the API.
-- Pagination and rate limiting from the target are not part of this
-  decision. `expectedVersion` came later, with a `version` column on each
+- Rate limiting from the target is not part of this decision.
+  `expectedVersion` and pagination came later, with a `version` column on each
   editable table.

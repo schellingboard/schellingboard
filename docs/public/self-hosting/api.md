@@ -149,8 +149,10 @@ admin cookie it can read every endpoint it needs:
   every location, hidden ones included. Location names need not be unique, so
   the script decides what counts as the same location, then creates the missing
   ones with `POST /api/v1/admin/locations`.
-- **Find the existing sessions.** `GET /api/v1/sessions?eventId=…` lists every
-  session of the event, with its rooms, hosts (id and name only) and capacity.
+- **Find the existing sessions.** `GET /api/v1/sessions?eventId=…` lists the
+  event's sessions, with their rooms, hosts (id and name only) and capacity,
+  one page at a time (see [Long lists](#long-lists)); sort them by start
+  yourself.
 - **Update a session.** `PUT /api/v1/admin/sessions/{id}` replaces the
   session: send every field, taking the ones you do not change from the read,
   and its `version` as `expectedVersion`. A field left out gets `400`, so
@@ -160,6 +162,17 @@ admin cookie it can read every endpoint it needs:
 
 Send an `Idempotency-Key` with each change, so retrying one after a dropped
 connection does not create a second location or session.
+
+## Long lists
+
+Lists that grow with an event, such as sessions and proposals, come in pages.
+Ask for up to `limit` items (1 to 1000, default 100); the answer is
+`{ "items": […], "nextCursor": "…" }`. Pass `nextCursor` as `cursor` to get the
+next page, until it is `null`. Each list keeps a fixed order, given in the
+reference. An item deleted between two pages moves nothing; one changed
+meanwhile may show up twice or not at all, so read the whole list again
+when that matters. A cursor that does not come from the server is refused with
+`400` and `cursor.invalid`, and so is one from another list.
 
 ## The TypeScript client
 

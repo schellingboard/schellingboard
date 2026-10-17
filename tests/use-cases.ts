@@ -579,6 +579,11 @@ export const features = {
         actor: "self-hoster",
         priority: "P2",
       },
+      US8: {
+        title: "Organizer's script reads a long list page by page",
+        actor: "organizer",
+        priority: "P3",
+      },
     },
   },
   "020": {
