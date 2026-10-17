@@ -1,17 +1,14 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import {
   clientIp,
   loginRetryAfter,
   recordLoginFailure,
-  resetRateLimits,
   takeToken,
   LOGIN_LIMITS,
   MAX_BUCKETS,
 } from "@/server/kernel/rate-limit";
 
 const T0 = Date.parse("2026-07-25T12:00:00Z");
-
-beforeEach(() => resetRateLimits());
 
 describe("takeToken", () => {
   const limit = { capacity: 3, refillEveryMs: 10_000 };

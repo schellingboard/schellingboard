@@ -589,6 +589,12 @@ export const features = {
         actor: "attendee",
         priority: "P3",
       },
+      US10: {
+        title:
+          "Self-hoster's instance slows down a client that sends too many requests",
+        actor: "self-hoster",
+        priority: "P3",
+      },
     },
   },
   "020": {

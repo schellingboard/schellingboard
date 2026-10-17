@@ -51,11 +51,7 @@ import {
   GUEST_COOKIE_NAME,
 } from "@/utils/auth";
 import { MAX_CODE_ATTEMPTS, hashUserPassword } from "@/utils/user-credentials";
-import {
-  EMAIL_LIMIT,
-  LOGIN_LIMITS,
-  resetRateLimits,
-} from "@/server/kernel/rate-limit";
+import { EMAIL_LIMIT, LOGIN_LIMITS } from "@/server/kernel/rate-limit";
 import {
   changePasswordAction,
   disableProtectionAction,
@@ -134,7 +130,6 @@ describe("user auth actions", () => {
 
   beforeEach(async () => {
     resetTestDb();
-    resetRateLimits();
     cookieJar.clear();
     vi.mocked(sendMail).mockReset();
     vi.mocked(isMailerConfigured).mockReturnValue(true);

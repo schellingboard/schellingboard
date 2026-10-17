@@ -70,6 +70,8 @@ export function takeToken(
   return wait;
 }
 
+export const API_LIMIT: BucketLimit = { capacity: 300, refillEveryMs: 200 };
+
 export type LoginScope = "site" | "admin" | "guest";
 
 // Per scope too, which bounds guesses from rotating IPs at the cost of

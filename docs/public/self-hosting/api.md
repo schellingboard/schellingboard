@@ -90,16 +90,27 @@ match the endpoint's description gets `400` with `request.invalid` and an
 `errors` list naming each field and what is wrong with it; a few endpoints
 attach the same list to their own codes, such as `guest.invalid`.
 
-| Status | Means                                                           |
-| ------ | --------------------------------------------------------------- |
-| `400`  | The request is invalid (`request.invalid`, or a field's code)   |
-| `401`  | Not signed in (`site.unauthenticated`, `admin.unauthenticated`) |
-| `403`  | Not allowed (`admin.required`, `guest.protected`, …)            |
-| `404`  | Not found, or admin access is disabled (`admin.disabled`)       |
-| `409`  | Conflicts with the current state (`session.full`, …)            |
-| `422`  | An `Idempotency-Key` reused for a different request             |
-| `500`  | An unexpected error on the server (`server.error`)              |
-| `503`  | A service the site relies on failed, such as the mail server    |
+| Status | Means                                                               |
+| ------ | ------------------------------------------------------------------- |
+| `400`  | The request is invalid (`request.invalid`, or a field's code)       |
+| `401`  | Not signed in (`site.unauthenticated`, `admin.unauthenticated`)     |
+| `403`  | Not allowed (`admin.required`, `guest.protected`, …)                |
+| `404`  | Not found, or admin access is disabled (`admin.disabled`)           |
+| `409`  | Conflicts with the current state (`session.full`, …)                |
+| `422`  | An `Idempotency-Key` reused for a different request                 |
+| `429`  | Too many requests (`rate.limited`); see [Rate limits](#rate-limits) |
+| `500`  | An unexpected error on the server (`server.error`)                  |
+| `503`  | A service the site relies on failed, such as the mail server        |
+
+## Rate limits
+
+Each caller may send 300 requests at once, then 5 a second: the admin login
+counts as one caller, each attendee signed in to a protected name as another,
+and everyone else by their address (see
+[Behind a reverse proxy](configuration.md#behind-a-reverse-proxy)). A request
+past the limit gets `429` with `rate.limited` and a `Retry-After` header
+saying how many seconds to wait before retrying. `/api/v1/health` is never
+limited.
 
 ## Retrying safely: `Idempotency-Key`
 

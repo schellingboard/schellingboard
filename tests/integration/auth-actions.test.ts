@@ -23,7 +23,7 @@ vi.mock("next/headers", () => ({
 
 import { loginAction, logoutAction } from "@/app/actions/auth";
 import { AUTH_COOKIE_NAME, GUEST_COOKIE_NAME } from "@/utils/auth";
-import { LOGIN_LIMITS, resetRateLimits } from "@/server/kernel/rate-limit";
+import { LOGIN_LIMITS } from "@/server/kernel/rate-limit";
 
 function loginForm(password: string): FormData {
   const form = new FormData();
@@ -34,7 +34,6 @@ function loginForm(password: string): FormData {
 describe("loginAction", () => {
   beforeEach(() => {
     cookieJar.clear();
-    resetRateLimits();
     vi.stubEnv("SITE_PASSWORD", "site-pw");
     vi.stubEnv("AUTH_SECRET", "0123456789abcdef0123456789abcdef");
   });

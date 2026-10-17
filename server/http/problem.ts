@@ -18,6 +18,7 @@ const TITLES: Record<number, string> = {
   409: "Conflict",
   410: "Gone",
   422: "Unprocessable Content",
+  429: "Too Many Requests",
   500: "Internal Server Error",
   503: "Service Unavailable",
 };
