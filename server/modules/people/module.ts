@@ -1,4 +1,5 @@
 export type { AvatarStore, PeopleDeps, ValidatedImage } from "./ports";
+export type { Identity } from "./application/identity";
 export type { ProfileInput } from "./application/profiles";
 export type { AdminGuest } from "./application/admin-guests";
 export {

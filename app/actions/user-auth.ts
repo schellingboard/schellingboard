@@ -26,6 +26,10 @@ import {
 } from "@/utils/user-credentials";
 import { verifiedCurrentUser } from "@/utils/acting-guest";
 import { requireSiteAuth } from "@/utils/action-auth";
+import { peopleUseCases } from "@/server/composition";
+import { resolveActor } from "@/server/kernel/actor";
+import { ok, type Result } from "@/server/kernel/result";
+import type { Identity } from "@/server/modules/people/module";
 import {
   TOO_MANY_ATTEMPTS_ERROR,
   TOO_MANY_EMAILS_ERROR,
@@ -495,33 +499,22 @@ export async function selectUserAction(
 ): Promise<SelectUserResult> {
   await requireSiteAuth();
   const cookieStore = await cookies();
-  if (guestId === null) {
-    cookieStore.set(createGuestLogoutCookie());
-    return { ok: true };
+  const people = peopleUseCases();
+  const result: Result<Identity> =
+    guestId === null
+      ? ok(people.signOut())
+      : await people.chooseGuest(await resolveActor(cookieStore), { guestId });
+  if (!result.ok) {
+    return result.error.code === "guest.protected"
+      ? { ok: false, needsAuth: true, error: result.error.detail ?? "" }
+      : { ok: false, error: result.error.detail ?? "Unknown user" };
   }
-
-  const creds = await getRepositories().guests.getAuthCredentials(guestId);
-  if (!creds) {
-    return { ok: false, error: "Unknown user" };
-  }
-  if (creds.authProtected) {
-    const parsed = await readGuestCookie(
-      cookieStore.get(GUEST_COOKIE_NAME)?.value
-    );
-    if (parsed?.guestId !== guestId || parsed.level !== "verified") {
-      return {
-        ok: false,
-        needsAuth: true,
-        error: "This name is protected — a password or emailed code is needed",
-      };
-    }
-    // Already verified for this guest — refresh the cookie to keep them
-    // selected (and extend its lifetime).
-    cookieStore.set(await createGuestCookie(guestId, "verified"));
-    return { ok: true };
-  }
-
-  cookieStore.set(await createGuestCookie(guestId, "open"));
+  const identity = result.value;
+  cookieStore.set(
+    identity.guestId === null
+      ? createGuestLogoutCookie()
+      : await createGuestCookie(identity.guestId, identity.level)
+  );
   return { ok: true };
 }
 

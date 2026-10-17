@@ -85,6 +85,14 @@
   guard against a race, mapping to the same `session.full`. The admin seeding path
   (no phase gate) does not use it.
 
+## Step 7a (2026-10-08)
+
+- `PUT /api/v1/me/identity` (choose) and `DELETE` (sign out) return `{ guestId }`
+  and set the `guest` cookie. The use case returns an `Identity` and the adapters
+  (route, `selectUserAction`) build the cookie. Protected names answer
+  `403 guest.protected`; logging in stays on the legacy flow. The guest cookie
+  builders moved to `utils/auth-cookies.ts` (Next-free) so `server/http` can use them.
+
 ## Questions
 
 - A session that loses its only room reads `"X" moved to No location (was Room A)`
@@ -96,4 +104,4 @@
 
 ## Next step
 
-7a.
+7b.

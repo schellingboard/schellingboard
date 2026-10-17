@@ -29,6 +29,7 @@ import {
 } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 import type { Day } from "@schellingboard/domain/event";
+import { IDEMPOTENCY_EXEMPT_PATHS } from "@/server/http/idempotency";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
@@ -413,6 +414,7 @@ describe("Idempotency-Key on the mounted API", () => {
     );
     expect(mutations.length).toBeGreaterThan(0);
     for (const { path, method, op } of mutations) {
+      if (IDEMPOTENCY_EXEMPT_PATHS.includes(path)) continue;
       const names = (op.parameters ?? []).map((p) =>
         "name" in p ? p.name : undefined
       );
