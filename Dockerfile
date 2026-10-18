@@ -1,5 +1,5 @@
 # Compile native modules (better-sqlite3) against Node's ABI
-FROM node:22-bookworm AS deps
+FROM node:25-bookworm AS deps
 WORKDIR /app
 COPY --from=oven/bun:1 /usr/local/bin/bun /usr/local/bin/bun
 RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ && rm -rf /var/lib/apt/lists/*
@@ -10,7 +10,7 @@ COPY packages/contracts/package.json packages/contracts/
 COPY packages/api-client/package.json packages/api-client/
 RUN bun install --frozen-lockfile
 
-FROM node:22-bookworm AS builder
+FROM node:25-bookworm AS builder
 WORKDIR /app
 COPY --from=oven/bun:1 /usr/local/bin/bun /usr/local/bin/bun
 COPY --from=deps /app/node_modules ./node_modules
@@ -21,7 +21,7 @@ ENV APP_VERSION=$APP_VERSION
 ENV BUILD_STANDALONE=1
 RUN bun x next build
 
-FROM node:22-bookworm-slim AS runner
+FROM node:25-bookworm-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
