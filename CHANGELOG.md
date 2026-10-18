@@ -17,6 +17,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   at `/api/v1/docs`. Edits made from an outdated copy are refused, not overwritten, and
   long lists come in pages.
 
+### Security
+
+- **Fewer known vulnerabilities in the Docker image**: it now includes the latest
+  Debian security fixes and no longer contains npm or Yarn, which the app does not use.
+
 ### Fixed
 
 - **Edits no longer overwrite each other** (#1111): saving a session, profile, guest,

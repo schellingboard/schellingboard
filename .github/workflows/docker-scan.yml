@@ -1,0 +1,55 @@
+name: Image scan
+
+# Fails on fixable HIGH/CRITICAL vulnerabilities in the Docker image. Pull
+# requests that change what goes into the image scan a fresh build of it. The
+# weekly run scans the published :latest instead, because that is what
+# self-hosters run: new advisories appear without any change here, and a red
+# run means a patch release is due. Accepted exceptions go in .trivyignore,
+# each with a reason.
+on:
+  pull_request:
+    paths:
+      - "Dockerfile"
+      - ".dockerignore"
+      - ".trivyignore"
+      - "package.json"
+      - "bun.lock"
+      - "packages/*/package.json"
+      - "scripts/docker-build.sh"
+      - ".github/workflows/docker-scan.yml"
+  schedule:
+    - cron: "23 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Build the image
+        if: github.event_name == 'pull_request'
+        env:
+          APP_VERSION: scan
+        run: |
+          image="$(bash scripts/docker-build.sh)"
+          echo "IMAGE=$image" >> "$GITHUB_ENV"
+
+      - name: Use the published image
+        if: github.event_name != 'pull_request'
+        run: echo "IMAGE=schellingboard/schellingboard:latest" >> "$GITHUB_ENV"
+
+      # Findings without a fix are left out: there is nothing to do about them yet.
+      - name: Scan with Trivy
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ env.IMAGE }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
