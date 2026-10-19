@@ -33,7 +33,7 @@
     "nodemailer": "^10.1.0",
     "react": "^19",
     "react-dom": "^19",
-    "react-hook-form": "^7.89.0",
+    "react-hook-form": "^7.90.0",
     "react-markdown": "^10.1.0",
     "remark-breaks": "^4.0.0",
     "remark-gfm": "^4.0.1",
@@ -42,7 +42,7 @@
     "turndown": "^7.2.4",
     "unified": "^11.0.5",
     "web-push": "^3.6.7",
-    "zod": "^4.6.5"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@docmd/core": "^0.9.7",
@@ -64,7 +64,7 @@
     "@typescript-eslint/parser": "^8.71.1",
     "@vitest/coverage-v8": "^5",
     "@vitest/ui": "^5",
-    "dependency-cruiser": "^18.5.0",
+    "dependency-cruiser": "^18.6.0",
     "drizzle-kit": "^0.31.11",
     "eslint": "^9",
     "eslint-config-next": "^16",
