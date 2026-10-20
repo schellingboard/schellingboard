@@ -49,6 +49,8 @@ export type AttendeeSort = (typeof ATTENDEE_SORTS)[number]["value"];
 
 export const DEFAULT_ATTENDEE_SORT: AttendeeSort = "name";
 
+// Not a secret, despite CodeQL's js/insecure-randomness alert: it only orders a
+// list every viewer already sees in full, so predicting it gains nothing.
 export function newSortSeed(): string {
   return Math.random().toString(36).slice(2);
 }
