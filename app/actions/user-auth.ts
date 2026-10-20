@@ -541,7 +541,8 @@ async function notifySecurityChange(
     });
   } catch (err) {
     console.error(
-      `Failed to send security-change notification to ${guestId}:`,
+      "Failed to send security-change notification to %s:",
+      guestId,
       err
     );
   }
