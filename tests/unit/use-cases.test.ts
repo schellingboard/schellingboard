@@ -1,6 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { features, useCases } from "@/tests/use-cases";
-import { listE2eTests, summarise, type TaggedTest } from "@/scripts/use-cases";
+import {
+  listE2eTests,
+  renderReport,
+  summarise,
+  type TaggedTest,
+} from "@/scripts/use-cases";
 
 function tagged(
   tier: TaggedTest["tier"],
@@ -94,5 +99,11 @@ describe("use case summary", () => {
     expect(untagged.e2e).toEqual([untaggedE2e]);
     expect(untagged.integration.map((t) => t.title)).toEqual(["b"]);
     expect(untagged.unit).toEqual([]);
+  });
+
+  it("keeps a use case title with a pipe in its table cell", () => {
+    const piped = { ...catalogue[0], title: "Attendee picks A | B" };
+    const report = renderReport(summarise([piped], []));
+    expect(report).toContain(`| ${piped.id} | Attendee picks A \\| B |`);
   });
 });

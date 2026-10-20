@@ -117,4 +117,11 @@ describe("formatSummary", () => {
     expect(summary).toContain("tests/e2e/voting.spec.ts:42");
     expect(summary).toContain("voting › wobbly");
   });
+
+  it("keeps a title with pipes and backslashes in one cell", () => {
+    const summary = formatSummary([
+      { file: "a.spec.ts", line: 1, title: "a | b\\|c", attempts: 2 },
+    ]);
+    expect(summary).toContain("| a \\| b\\\\\\|c | `a.spec.ts:1` | 2 |");
+  });
 });

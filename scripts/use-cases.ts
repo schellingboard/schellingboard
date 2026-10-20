@@ -11,6 +11,7 @@ import { spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { escapeTableCell } from "./markdown-table";
 import { collectSpecs, specTitle, type JsonReport } from "./playwright-json";
 import { useCases, type CatalogueEntry } from "../tests/use-cases";
 
@@ -123,7 +124,12 @@ export function summarise(
 // Pruning candidates: E2E tests are meant to be few (docs/dev/testing.md).
 const MANY_E2E_TESTS = 5;
 
-function renderReport({ rows, uncovered, unknown, untagged }: Summary): string {
+export function renderReport({
+  rows,
+  uncovered,
+  unknown,
+  untagged,
+}: Summary): string {
   const active = rows.filter(({ useCase }) => !useCase.status);
   const covered = (tier: Tier) =>
     active.filter(({ counts }) => counts[tier] > 0).length;
@@ -138,7 +144,7 @@ function renderReport({ rows, uncovered, unknown, untagged }: Summary): string {
     "| --- | --- | --- | --- | --- | --: | --: | --: |",
     ...rows.map(
       ({ useCase: u, counts: c }) =>
-        `| ${u.id} | ${u.title}${u.status ? ` (${u.status})` : ""} | ${u.actor} | ` +
+        `| ${u.id} | ${escapeTableCell(u.title)}${u.status ? ` (${u.status})` : ""} | ${u.actor} | ` +
         `${u.priority} | ${u.component} | ${c.e2e} | ${c.integration} | ${c.unit} |`
     ),
   ];

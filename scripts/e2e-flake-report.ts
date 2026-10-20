@@ -16,6 +16,7 @@ import {
   specTitle,
   type JsonReport,
 } from "./playwright-json";
+import { escapeTableCell } from "./markdown-table";
 
 interface HuntReport extends JsonReport {
   // Not Playwright's: set by e2e-flake-hunt.sh when HUNT_KEEP_PASSING=0 threw
@@ -219,7 +220,7 @@ function formatDuration(ms: number): string {
 function cell(text: string, maxLength = 140): string {
   const trimmed =
     text.length > maxLength ? `${text.slice(0, maxLength - 1)}…` : text;
-  return trimmed.replace(/\|/g, "\\|");
+  return escapeTableCell(trimmed);
 }
 
 function dominantSignature(aggregate: TestAggregate): string {

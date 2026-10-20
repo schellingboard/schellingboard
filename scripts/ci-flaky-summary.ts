@@ -16,6 +16,7 @@ import {
   specTitle,
   type JsonReport,
 } from "./playwright-json";
+import { escapeTableCell } from "./markdown-table";
 
 interface FlakyTest {
   file: string;
@@ -94,7 +95,7 @@ function formatSummary(flaky: FlakyTest[]): string {
   for (const test of flaky) {
     const where = test.line ? `${test.file}:${test.line}` : test.file;
     lines.push(
-      `| ${test.title.replace(/\|/g, "\\|")} | \`${where}\` | ${test.attempts || "?"} |`
+      `| ${escapeTableCell(test.title)} | \`${where}\` | ${test.attempts || "?"} |`
     );
   }
   return `${lines.join("\n")}\n`;
