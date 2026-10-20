@@ -1,9 +1,9 @@
+import { isValidEmail } from "@/utils/email";
+
 export type UserImportRow = { name: string; email: string };
 
 export type UserImportParseResult =
   { ok: true; rows: UserImportRow[] } | { ok: false; errors: string[] };
-
-const EMAIL_PATTERN = /^\S+@\S+\.\S+$/;
 
 type CsvRecord = { cells: string[]; line: number };
 
@@ -183,7 +183,7 @@ export function parseUserImportCsv(text: string): UserImportParseResult {
       errors.push(`Line ${record.line}: name is missing`);
       continue;
     }
-    if (!EMAIL_PATTERN.test(email)) {
+    if (!isValidEmail(email)) {
       errors.push(`Line ${record.line}: invalid email "${email}"`);
       continue;
     }

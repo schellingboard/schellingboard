@@ -34,6 +34,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - **Fewer known vulnerabilities in the Docker image**: it now includes the latest
   Debian security fixes and no longer contains npm or Yarn, which the app does not use.
+- **Very long email addresses no longer stall the server**: adding or importing a guest
+  with one used to take seconds to be rejected.
 
 ### Fixed
 

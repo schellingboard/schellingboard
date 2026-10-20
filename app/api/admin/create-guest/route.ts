@@ -3,6 +3,7 @@ import { peopleUseCases } from "@/server/composition";
 import { requireProxyVerifiedAdmin } from "@/utils/auth";
 import { legacyActor, legacyRefusal } from "@/app/api/legacy";
 import { requestNow } from "@/utils/dev-clock";
+import { isValidEmail } from "@/utils/email";
 
 export const dynamic = "force-dynamic";
 
@@ -38,7 +39,7 @@ export async function POST(req: Request) {
   if (!name) {
     return NextResponse.json({ error: "Name is required" }, { status: 400 });
   }
-  if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+  if (!isValidEmail(email)) {
     return NextResponse.json(
       { error: "Invalid email address" },
       { status: 400 }
