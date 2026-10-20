@@ -65,6 +65,12 @@ const IN_APP = {
   at: NOW,
 };
 
+// React separates adjacent text nodes with `<!-- -->` comments in the
+// rendered html, which would break substring assertions.
+async function renderWithoutComments(body: ReactElement): Promise<string> {
+  return (await render(body)).replaceAll("<!-- -->", "");
+}
+
 describe("notifyGuest", () => {
   beforeAll(() => setupTestDb());
 
@@ -167,12 +173,6 @@ describe("notifySessionChanged", () => {
   });
 
   afterEach(() => vi.unstubAllEnvs());
-
-  // React separates adjacent text nodes with `<!-- -->` comments in the
-  // rendered html, which would break substring assertions.
-  async function renderWithoutComments(body: ReactElement): Promise<string> {
-    return (await render(body)).replace(/<!--.*?-->/g, "");
-  }
 
   // A scheduled session in "Room A", Saturday 1 August 10:00–11:00 UTC, with
   // one RSVP'd guest.
@@ -578,10 +578,6 @@ describe("notifySessionDeleted", () => {
 
   afterEach(() => vi.unstubAllEnvs());
 
-  async function renderWithoutComments(body: ReactElement): Promise<string> {
-    return (await render(body)).replace(/<!--.*?-->/g, "");
-  }
-
   it("emails hosts and RSVP'd attendees that the session was deleted", async () => {
     const event = await createEvent({ phase: "scheduling" });
     const room = await createLocation({ name: "Room A" });
@@ -681,10 +677,6 @@ describe("notifyCohostsAdded", () => {
   });
 
   afterEach(() => vi.unstubAllEnvs());
-
-  async function renderWithoutComments(body: ReactElement): Promise<string> {
-    return (await render(body)).replace(/<!--.*?-->/g, "");
-  }
 
   // Same shape as the notifySessionChanged setup: a scheduled session in
   // "Room A" with one RSVP'd guest, plus a guest just added as co-host.
@@ -815,10 +807,6 @@ describe("notifyProposalCommented", () => {
   });
 
   afterEach(() => vi.unstubAllEnvs());
-
-  async function renderWithoutComments(body: ReactElement): Promise<string> {
-    return (await render(body)).replace(/<!--.*?-->/g, "");
-  }
 
   // A proposal hosted by host@test.example, already carrying one comment by
   // earlier@test.example.
