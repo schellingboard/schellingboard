@@ -30,7 +30,7 @@
     "moment-timezone": "^0.6.5",
     "nanoid": "^6.0.2",
     "next": "^16",
-    "nodemailer": "^10.1.1",
+    "nodemailer": "^10.1.2",
     "react": "^19",
     "react-dom": "^19",
     "react-hook-form": "^7.90.0",
