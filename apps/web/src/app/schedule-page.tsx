@@ -12,10 +12,12 @@ import {
   ScheduleScreen,
   type ScheduleActions,
 } from "../schedule/schedule-screen";
+import { attendeeCountApi } from "../queries/attendee-count";
 import { createAttendeesQuery } from "../queries/attendees";
 import { addRsvp, removeRsvp } from "../commands/rsvp";
 import { Footer } from "./footer";
 import { hardNavigate, hardReload } from "./hard-navigate";
+import { newKey } from "./keys";
 import { useHealth } from "./health";
 import type { AppServices } from "./services";
 import { ShellFrame, ShellProviders } from "./shell";
@@ -173,6 +175,7 @@ function Loaded({
           : { ok: false, message: refusalMessage(outcome.code) };
       },
       attendees: (sessionId) => createAttendeesQuery({ api, sessionId }),
+      attendeeCount: attendeeCountApi(api, newKey),
     }),
     [runner, api]
   );

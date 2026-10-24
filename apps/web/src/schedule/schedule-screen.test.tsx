@@ -49,6 +49,10 @@ function fakeActions(
     ),
     pickName: vi.fn<ScheduleActions["pickName"]>(),
     attendees: vi.fn<ScheduleActions["attendees"]>(),
+    attendeeCount: {
+      load: vi.fn(),
+      save: vi.fn(),
+    },
   };
 }
 
