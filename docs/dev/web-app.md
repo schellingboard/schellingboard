@@ -26,6 +26,12 @@ colour tokens in `styles/tokens.css` (the Next pages import the same file).
 - Legacy pages link to the SPA with plain anchors, never Next's `Link` (`AppLink`, which
   does that for every root path outside `/legacy`): Next has nothing to fetch there.
 
+- `public/sw.js` (registered by `main.tsx` outside the dev server) caches the shell and the `/_spa/assets/`
+  files. SPA navigations go to the network first and fall back to the cached shell, so a new build shows as
+  soon as it is reachable; `/api`, `/legacy` and the other Next paths are never touched. A page compares
+  the shell's build id with `/api/v1/health` (`app/reload-offer.tsx`: on load, every 5 minutes, on `online`
+  and when the tab is shown). The viewer is remembered in `localStorage` so the saved schedule opens offline.
+
 The files are read relative to the working directory, so the same code serves
 `next start`, and the Docker image, which copies `apps/web/dist` next to
 `server.js`.

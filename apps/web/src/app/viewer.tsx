@@ -3,6 +3,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useMemo,
   useState,
   type ReactNode,
@@ -15,6 +16,27 @@ const RETRY_MS = 5_000;
 let devicePersistence: ReturnType<typeof createReplicaPersistence> | undefined;
 const defaultPersistence = {
   clear: () => (devicePersistence ??= createReplicaPersistence()).clear(),
+};
+
+const REMEMBERED = "sb-viewer";
+
+/** Who the server last said this browser acts as: the only way to open the saved schedule offline. */
+const remembered = {
+  read(): string | null | undefined {
+    try {
+      const raw = localStorage.getItem(REMEMBERED);
+      return raw === null ? undefined : (JSON.parse(raw) as string | null);
+    } catch {
+      return undefined;
+    }
+  },
+  write(guestId: string | null) {
+    try {
+      localStorage.setItem(REMEMBERED, JSON.stringify(guestId));
+    } catch {
+      // Without storage the viewer is simply unknown while offline.
+    }
+  },
 };
 
 export type ChooseResult = { ok: true } | { ok: false; code: string };
@@ -44,6 +66,9 @@ export function ViewerProvider({
   children: ReactNode;
 }) {
   const [guestId, setGuestId] = useState<string | null | undefined>(undefined);
+  // The first answer can arrive after the viewer has already taken a name,
+  // and must not take it back.
+  const decided = useRef(false);
 
   useEffect(() => {
     let stale = false;
@@ -52,11 +77,20 @@ export function ViewerProvider({
       api
         .GET("/api/v1/me/identity")
         .then(({ data }) => {
-          if (!data) throw new Error("no identity");
-          if (!stale) setGuestId(data.guestId);
+          if (stale) return;
+          if (!data) {
+            timer = setTimeout(load, RETRY_MS);
+            return;
+          }
+          if (decided.current) return;
+          remembered.write(data.guestId);
+          setGuestId(data.guestId);
         })
         .catch(() => {
-          if (!stale) timer = setTimeout(load, RETRY_MS);
+          if (stale) return;
+          // Only a request that never reached the server says we are offline.
+          setGuestId((known) => known ?? remembered.read());
+          timer = setTimeout(load, RETRY_MS);
         });
     void load();
     return () => {
@@ -75,6 +109,8 @@ export function ViewerProvider({
           return { ok: false, code: problemCode(error, response.status) };
         // A signed-in viewer taking another name must leave none of the first one's data.
         if (guestId && data.guestId !== guestId) await persistence.clear();
+        decided.current = true;
+        remembered.write(data.guestId);
         setGuestId(data.guestId);
         return { ok: true };
       } catch {
@@ -88,6 +124,8 @@ export function ViewerProvider({
     const { data } = await api.DELETE("/api/v1/me/identity");
     if (data) {
       await persistence.clear();
+      decided.current = true;
+      remembered.write(data.guestId);
       setGuestId(data.guestId);
     }
   }, [api, persistence]);

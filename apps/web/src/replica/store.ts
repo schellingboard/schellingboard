@@ -3,6 +3,9 @@ import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { apply } from "./apply";
 import { STALE_AFTER_MS, type Link } from "./sync-state";
 
+// A ping that agrees with the clock within this is network jitter, not news.
+const CLOCK_SHIFT_MS = 1_000;
+
 export type ReplicaStore = ReturnType<typeof createReplicaStore>;
 
 export function createReplicaStore(
@@ -16,9 +19,13 @@ export function createReplicaStore(
   let meetingsRevision = 0;
   // Measured at receipt, so it is off by the one-way latency; fine for minute-grained screens.
   let clockOffset = 0;
+  const listeners = new Set<() => void>();
   const observeServerTime = (iso: string) => {
     const server = Date.parse(iso);
-    if (!Number.isNaN(server)) clockOffset = server - wallClock();
+    if (Number.isNaN(server)) return;
+    const shift = server - wallClock() - clockOffset;
+    clockOffset += shift;
+    if (Math.abs(shift) >= CLOCK_SHIFT_MS) listeners.forEach((l) => l());
   };
   if (!persisted) observeServerTime(initial.now);
   let deliveredKeys: ReadonlySet<string> = new Set();
@@ -27,7 +34,6 @@ export function createReplicaStore(
   let link: Link = persisted
     ? { connected: false, since: clock() - STALE_AFTER_MS }
     : { connected: true, since: clock() };
-  const listeners = new Set<() => void>();
   const set = (next: Snapshot, nextGone: boolean, revise = true) => {
     if (next === replica && nextGone === gone) return;
     if (
@@ -55,6 +61,7 @@ export function createReplicaStore(
     deliveredKeys: () => deliveredKeys,
     link: () => link,
     serverNow: () => wallClock() + clockOffset,
+    clockOffset: () => clockOffset,
     observeServerTime,
     linkUp: () =>
       setLink(link.connected ? link : { connected: true, since: clock() }),

@@ -3822,7 +3822,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** @description A `text/event-stream` of the event's changes after `since` (the snapshot's `seq`), filtered to what the `guest` cookie may see. Each message has `id` = its `seq`, `event` = its type and the message as JSON `data`; a browser's reconnect sends `Last-Event-ID`, which wins over `since`. An `event: reset` message, after which the stream ends, means the resume point cannot be served: load the snapshot again. An `event: ping` every 25 seconds, its data the server's `now`, keeps proxies from closing it and lets a client notice a dead connection; it ends after 10 minutes. The first message carries `retry: 1000`, so a client reconnects after one second. */
+    /** @description A `text/event-stream` of the event's changes after `since` (the snapshot's `seq`), filtered to what the `guest` cookie may see. Each message has `id` = its `seq`, `event` = its type and the message as JSON `data`; a browser's reconnect sends `Last-Event-ID`, which wins over `since`. An `event: reset` message, after which the stream ends, means the resume point cannot be served: load the snapshot again. An `event: ping` as the stream opens and every 25 seconds, its data the server's `now`, keeps proxies from closing it and lets a client notice a dead connection; it ends after 10 minutes. The first message carries `retry: 1000`, so a client reconnects after one second. */
     get: {
       parameters: {
         query?: {

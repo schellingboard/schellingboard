@@ -161,6 +161,18 @@ describe("saving the replica", () => {
     expect(save).toHaveBeenCalledWith(expect.objectContaining({ seq: 9 }));
   });
 
+  it("saves a replica fresh from the network without waiting for a change", async () => {
+    vi.useFakeTimers();
+    const save = vi.fn().mockResolvedValue(undefined);
+    const store = createReplicaStore(snapshot);
+    autosaveReplica(store, { save }, { fresh: true });
+
+    await vi.advanceTimersByTimeAsync(1_000);
+
+    expect(save).toHaveBeenCalledTimes(1);
+    expect(save).toHaveBeenCalledWith(expect.objectContaining({ seq: 7 }));
+  });
+
   it("does not save a replica that has not changed, or after it is stopped", async () => {
     vi.useFakeTimers();
     const save = vi.fn().mockResolvedValue(undefined);

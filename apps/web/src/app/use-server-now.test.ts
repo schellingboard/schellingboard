@@ -19,4 +19,28 @@ describe("useServerNow", () => {
     act(() => void vi.advanceTimersByTime(60_000));
     expect(result.current.toISOString()).toBe("2026-06-02T10:01:00.000Z");
   });
+
+  it("moves at once when the server's clock is first heard, not at the next minute", () => {
+    vi.setSystemTime(new Date("2026-06-02T10:00:00.000Z"));
+    const store = createReplicaStore(snapshot, undefined, undefined, {
+      persisted: true,
+    });
+    const { result } = renderHook(() => useServerNow(store));
+    expect(result.current.toISOString()).toBe("2026-06-02T10:00:00.000Z");
+
+    act(() => store.observeServerTime("2026-06-09T16:00:00.000Z"));
+
+    expect(result.current.toISOString()).toBe("2026-06-09T16:00:00.000Z");
+  });
+
+  it("ignores the jitter of a ping that agrees with the clock", () => {
+    vi.setSystemTime(new Date("2026-06-02T10:00:00.000Z"));
+    const store = createReplicaStore(snapshot);
+    const { result } = renderHook(() => useServerNow(store));
+    const first = result.current;
+
+    act(() => store.observeServerTime("2026-06-02T10:00:00.040Z"));
+
+    expect(result.current).toBe(first);
+  });
 });
