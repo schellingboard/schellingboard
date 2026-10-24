@@ -10,6 +10,7 @@ import { useHealth } from "./health";
 import { Layout } from "./layout";
 import { NavBar, type NavItem } from "./nav-bar";
 import { ReloadOffer } from "./reload-offer";
+import { useUpdateStatus } from "./updates";
 import { ThemeProvider } from "./theme";
 import { UserMenu, type PickableGuest } from "./user-menu";
 import { useViewer, ViewerProvider } from "./viewer";
@@ -24,6 +25,7 @@ export function ShellFrame({
   children,
 }: ShellProps) {
   const health = useHealth(api);
+  const update = useUpdateStatus(api);
   const viewer = useViewer();
   const kiosk = useKioskMode(new URLSearchParams(search));
   return (
@@ -34,7 +36,7 @@ export function ShellFrame({
           <UserMenu viewer={viewer} guests={guests} />
         </NavBar>
       }
-      footer={<Footer version={health?.version} />}
+      footer={<Footer version={health?.version} update={update} />}
     >
       <ReloadOffer api={api} kiosk={kiosk} onReload={hardReload} />
       <ErrorBoundary resetKey={currentPath}>{children}</ErrorBoundary>

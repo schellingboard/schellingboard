@@ -524,3 +524,16 @@
 - Questions: scheduling.spec edit/delete/cancel flows (`openEditForm`, then a click on the legacy edit page)
   flake about 1 run in 4 under load (8 workers), with or without the service worker or the saved replica
   (measured both ways); the retry then fails on the first attempt's leftover session. Not caused by this step.
+
+## Step 18 (2026-10-16)
+
+- New module `server/modules/updates`: `GET /api/v1/updates` (not under `/admin`, so a page can ask without a
+  401 in the console; answers null for anyone but the admin). `createReleaseCheck` caches GitHub's latest
+  release in memory for a day, retries a failed look-up after an hour, keeps the last answer on failure, and
+  compares only `vX.Y.Z` against `vX.Y.Z` (a dev build never shows the dot). `SB_UPDATE_CHECK=false` turns
+  it off. Browsers never contact GitHub.
+- SPA `useUpdateStatus` + `Footer update`; legacy `WhatsNew` fetches the same endpoint. Red dot, plus the
+  latest and running release with dates and a "How to update" link (new "Updating" section in
+  `docs/public/self-hosting/deployment.md`).
+- E2E fakes the endpoint (GitHub cannot be relied on in a test run). `make test-e2e-docker` not run (user
+  decision).

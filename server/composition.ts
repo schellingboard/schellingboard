@@ -68,6 +68,13 @@ import {
   siteSettings,
 } from "@/server/modules/settings/module";
 import {
+  createReleaseCheck,
+  createUpdateUseCases,
+  fetchLatestRelease,
+  type UpdateUseCases,
+} from "@/server/modules/updates/module";
+import { getAppVersion } from "@/utils/git";
+import {
   createVenueUseCases,
   type VenueUseCases,
   eventLocations,
@@ -138,6 +145,15 @@ export function settingsUseCases(): SettingsUseCases {
     maps: mapImages,
     uow: unitOfWork,
   });
+}
+
+const releaseCheck = createReleaseCheck({
+  fetchLatest: fetchLatestRelease,
+  now: () => new Date(),
+});
+
+export function updateUseCases(): UpdateUseCases {
+  return createUpdateUseCases({ check: releaseCheck, version: getAppVersion });
 }
 
 export function eventSnapshot(actor: Actor, slug: string, now: Date) {

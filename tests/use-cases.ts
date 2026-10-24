@@ -448,6 +448,11 @@ export const features = {
         actor: "attendee",
         priority: "P2",
       },
+      US6: {
+        title: "Organizer sees that a newer release is out",
+        actor: "organizer",
+        priority: "P3",
+      },
     },
   },
   "015": {

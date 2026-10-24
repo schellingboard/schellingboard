@@ -2,10 +2,12 @@ import { useState } from "react";
 import {
   releaseNotes,
   SHOWN_RELEASES,
+  UPDATE_DOCS_URL,
 } from "@schellingboard/domain/release-notes";
 import { Dialog } from "../ui/dialog";
 import { InlineMarkdown } from "../ui/inline-markdown";
 import { ThemeSelect } from "./theme";
+import type { UpdateStatus } from "./updates";
 
 const CHANGELOG_URL =
   "https://github.com/schellingboard/schellingboard/blob/main/CHANGELOG.md";
@@ -23,14 +25,18 @@ const link = "text-link hover:underline";
 
 export function Footer({
   version,
+  update,
   inline,
 }: {
   version: string | undefined;
+  /** Only the admin is told; everyone else gets null. */
+  update?: UpdateStatus | null;
   /** A copy inside a screen's scroll content, for screens that hide the page's footer. */
   inline?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const shown = version ?? "unknown";
+  const behind = update?.updateAvailable ? update : null;
 
   return (
     <footer
@@ -44,12 +50,18 @@ export function Footer({
           <button
             type="button"
             title="What's new"
-            aria-label={`Version ${shown} — what's new`}
+            aria-label={`Version ${shown} — what's new${behind ? ", update available" : ""}`}
             onClick={() => setOpen(true)}
             className={`flex gap-1 rounded-sm ${link} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent`}
           >
             <span className="hidden sm:block">Version: </span>
             {shown}
+            {behind && (
+              <span
+                aria-hidden
+                className="mt-[3px] size-2 shrink-0 rounded-full bg-danger"
+              />
+            )}
           </button>
         </div>
         <ThemeSelect />
@@ -90,6 +102,23 @@ export function Footer({
         wide
       >
         <p className="text-sm text-fg-subtle">This site is running {shown}.</p>
+        {behind?.latest && (
+          <p className="mt-2 text-sm text-fg">
+            A newer release is out: {behind.latest.version}
+            {behind.latest.date && `, ${formatDate(behind.latest.date)}`}. This
+            site runs {behind.current.version}
+            {behind.current.date &&
+              `, ${formatDate(behind.current.date)}`}.{" "}
+            <a
+              href={UPDATE_DOCS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={link}
+            >
+              How to update
+            </a>
+          </p>
+        )}
         <div className="mt-4 space-y-4">
           {releaseNotes.slice(0, SHOWN_RELEASES).map((release) => (
             <section key={release.version}>

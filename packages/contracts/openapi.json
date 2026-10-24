@@ -7764,6 +7764,60 @@
         },
         "security": [{ "adminAuth": [] }]
       }
+    },
+    "/api/v1/updates": {
+      "get": {
+        "tags": ["admin"],
+        "description": "The running release and the newest published one; null for anyone but the admin, so a page can ask without being refused. The server looks the latest up on GitHub at most once a day (`SB_UPDATE_CHECK=false` turns that off).",
+        "responses": {
+          "200": {
+            "description": "The running and the latest release",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": ["object", "null"],
+                  "properties": {
+                    "current": {
+                      "type": "object",
+                      "properties": {
+                        "version": { "type": "string" },
+                        "date": {
+                          "type": ["string", "null"],
+                          "description": "`YYYY-MM-DD`; null when the release is not known to have one"
+                        }
+                      },
+                      "required": ["version", "date"]
+                    },
+                    "latest": {
+                      "type": ["object", "null"],
+                      "properties": {
+                        "version": { "type": "string" },
+                        "date": {
+                          "type": ["string", "null"],
+                          "description": "`YYYY-MM-DD`; null when the release is not known to have one"
+                        }
+                      },
+                      "required": ["version", "date"],
+                      "description": "Null until the latest release has been looked up, or if it cannot be"
+                    },
+                    "updateAvailable": { "type": "boolean" }
+                  },
+                  "required": ["current", "latest", "updateAvailable"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+      }
     }
   },
   "webhooks": {}

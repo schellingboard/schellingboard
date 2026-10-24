@@ -5683,6 +5683,64 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/updates": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The running release and the newest published one; null for anyone but the admin, so a page can ask without being refused. The server looks the latest up on GitHub at most once a day (`SB_UPDATE_CHECK=false` turns that off). */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The running and the latest release */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              current: {
+                version: string;
+                /** @description `YYYY-MM-DD`; null when the release is not known to have one */
+                date: string | null;
+              };
+              /** @description Null until the latest release has been looked up, or if it cannot be */
+              latest: {
+                version: string;
+                /** @description `YYYY-MM-DD`; null when the release is not known to have one */
+                date: string | null;
+              } | null;
+              updateAvailable: boolean;
+            } | null;
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
