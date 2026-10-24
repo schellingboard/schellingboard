@@ -29,6 +29,7 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ["Date"] });
   vi.stubEnv("AUTH_SECRET", "0123456789abcdef0123456789abcdef");
   vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
+  vi.stubEnv("SB_API_RATE_BURST", "");
 });
 afterEach(() => {
   vi.useRealTimers();
@@ -74,6 +75,12 @@ describe("/api/v1 rate limit", () => {
     for (let i = 0; i < API_LIMIT.capacity; i++) await from("203.0.113.9");
     expect((await from("203.0.113.9")).status).toBe(429);
     expect((await from("198.51.100.7")).status).toBe(200);
+  });
+
+  it("takes a larger burst from SB_API_RATE_BURST, for the E2E suite's shared address", async () => {
+    vi.stubEnv("SB_API_RATE_BURST", String(API_LIMIT.capacity * 2));
+    for (let i = 0; i <= API_LIMIT.capacity; i++)
+      expect((await get("/events")).status).toBe(200);
   });
 
   it("never limits the health check", async () => {

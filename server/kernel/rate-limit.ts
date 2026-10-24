@@ -70,7 +70,14 @@ export function takeToken(
   return wait;
 }
 
-export const API_LIMIT: BucketLimit = { capacity: 300, refillEveryMs: 200 };
+export const API_LIMIT: BucketLimit = { capacity: 1000, refillEveryMs: 200 };
+
+// The E2E suite's browsers all come from one address, so they share one
+// bucket; its env file raises the burst instead of the code knowing about tests.
+export const apiLimit = (): BucketLimit => ({
+  ...API_LIMIT,
+  capacity: Number(process.env.SB_API_RATE_BURST) || API_LIMIT.capacity,
+});
 
 export type LoginScope = "site" | "admin" | "guest";
 
