@@ -44,7 +44,11 @@ sketch, not a plan; each step would get its own issue and ADR.
    actions.
 
    **Started** ([ADR 0015](../adr/0015-spa-alongside-next.md)): the SPA owns
-   every URL and Next moves under `/legacy` until all screens have moved.
+   every URL and Next moves under `/legacy` until all screens have moved. The
+   schedule is moved: grid, agenda, filters, kiosk, the session modal with RSVPs,
+   attendee counts and comments, and the schedule opening offline with a reload offer
+   after an upgrade. Proposals and voting, people and meetings, settings and admin
+   are still Next pages.
 
 6. **Identity and roles.** Persons, participations, login sessions, assurance,
    join links; migrate protected guests to verified credentials; replace the admin

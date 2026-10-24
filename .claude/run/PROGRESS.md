@@ -248,7 +248,7 @@
 
 ## Next step
 
-17.
+20.
 
 ## Questions
 
@@ -537,3 +537,17 @@
   `docs/public/self-hosting/deployment.md`).
 - E2E fakes the endpoint (GitHub cannot be relied on in a test run). `make test-e2e-docker` not run (user
   decision).
+
+## Step 19 (2026-10-16)
+
+- Docs against the code: `04-client.md` (a "where the code is today" note, the PWA bullets for the real service
+  worker, the reload offer and the admin update dot), `07-repo-and-rules.md` (today's layout and the enforced
+  rules), `10-path-from-here.md` (step 5: what has moved), `web-app.md` (session links, `useUpdateStatus`),
+  `server.md` (`/updates`, `SB_UPDATE_CHECK`, `SB_API_RATE_BURST`). Release notes: the offline schedule is the
+  fifth highlight; the admin update dot is not one (CHANGELOG entries were checked against the list).
+- Every Question in this file is now numbered in `docs/dev/target-architecture/open-questions.md` (rate-limit
+  keying, comment likes, a toast in the SPA, `server/` reaching `app/`, the "No location" notice, user-menu
+  arrow keys, flaky E2E), so deleting `.claude/run/` at step 20 loses none.
+- Full `make test-e2e` (not docker): 212 passed, 1 flaky (schedule-layout:252, passed on retry and alone), 1
+  failed (settings:67, `page.goto` of `/legacy/admin` aborted with NS_BINDING_ABORTED on both attempts; passes
+  alone, twice; the same spec failed on `goto` in the step 16d runs before the update check existed).

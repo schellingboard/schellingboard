@@ -6,6 +6,13 @@ the server as files, installable as a PWA. View `web` in the
 
 <likec4-view view-id="web"><a href="https://developers.schellingboard.org/diagrams/#/view/web">L3 web app components</a></likec4-view>
 
+> **Where the code is today.** `apps/web/src/` has `app/` (router, shell, viewer, footer,
+> reload offer), `replica/`, `commands/` (RSVP and comments), `queries/` (comments, attendees,
+> attendee count), `schedule/` (the grid, agenda, kiosk and session modal; it stands in for
+> `features/`) and `ui/`. There is no `pwa/` or `i18n/` yet: the service worker is
+> `public/sw.js`, served from the site root. The rest of the layout below is where the
+> remaining screen families go. [The web app](../web-app.md) describes what exists.
+
 ## Layout
 
 ```
@@ -128,14 +135,18 @@ scroll). Notable consequences:
 
 ## PWA
 
-- Service worker precaches the shell (hashed assets) and serves it offline;
-  API responses are never cached by the worker, because the replica already is the
-  cache and knows its own staleness.
+- Service worker (`public/sw.js`) caches the shell and its hashed assets and serves the
+  shell for SPA navigations when the network is gone (network first, so a new build shows
+  as soon as it is reachable); API responses are never cached by the worker, because the
+  replica already is the cache and knows its own staleness.
 - Push: one subscription per device, bound to the person, listed in settings.
   A push carries only a notification id; the app fetches the record when opened,
   so push payloads hold no content.
-- An update check compares the served version with the running one and offers a
-  reload ([#788](https://github.com/schellingboard/schellingboard/issues/788)).
+- A page compares its build id with `/api/v1/health` and offers a reload when the
+  server runs another build; a kiosk reloads by itself, once per build.
+- The server checks GitHub for a newer release at most daily; only the admin is told,
+  by a red dot in the footer (`GET /api/v1/updates`,
+  [#788](https://github.com/schellingboard/schellingboard/issues/788)).
 
 ## UI foundations
 

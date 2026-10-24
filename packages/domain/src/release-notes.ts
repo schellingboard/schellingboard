@@ -50,6 +50,7 @@ export const releaseNotes: ReleaseNote[] = [
     version: "Unreleased",
     highlights: [
       "**A faster schedule**: the schedule loads as an app page and opens sessions at once, with RSVPs, attendees and comments in the same window.",
+      "**The schedule works offline**: it opens from what your device last saved, marked as possibly out of date, and offers a reload after the site is upgraded.",
       "**A live schedule**: sessions, RSVP counts and rooms update on everyone's screen as they change, with no reload, which suits the kiosk.",
       "**An API for scripts and integrations**: organizers can set up events, rooms, guests and sessions from a script, with a reference at `/api/v1/docs`.",
       "**Edits no longer overwrite each other**: saving a form someone else changed meanwhile now says so, instead of silently undoing their change.",
