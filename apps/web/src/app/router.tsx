@@ -6,7 +6,7 @@ import {
   useRouter,
   type RouterHistory,
 } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, type ReactElement } from "react";
 import { scheduleStaysInLegacy } from "./forwards-to-legacy";
 import { hardNavigate } from "./hard-navigate";
 import { LegacyForward } from "./legacy-forward";
@@ -49,10 +49,12 @@ export function createAppRouter(
   const event = createRoute({
     getParentRoute: () => rootRoute,
     path: "/$slug",
-    component: function EventRoute() {
+    // Inferring this return type would read the registered router while it
+    // is still being inferred, turning useRouter() into `any` in some files.
+    component: function EventRoute(): ReactElement {
       const { slug } = event.useParams();
       const { search, hash } = useRouter().history.location;
-      return scheduleStaysInLegacy(search, document.cookie) ? (
+      return scheduleStaysInLegacy(search) ? (
         <LegacySchedule where={{ pathname: `/${slug}`, search, hash }} />
       ) : (
         <SchedulePage services={services} slug={slug} />

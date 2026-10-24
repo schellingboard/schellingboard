@@ -21,8 +21,8 @@ colour tokens in `styles/tokens.css` (the Next pages import the same file).
   already under `/legacy` is left alone), and a static route per legacy root page
   (`app/legacy-pages.ts`, checked against `app/legacy/` by `tests/unit/spa-legacy-pages.test.ts`)
   keeps an event slug from shadowing `/settings`, `/guests`, and so on. While their screens are
-  not SPA yet, `?viewSession=`, `?viewMeeting=` and kiosk mode (`?kiosk=`, or the `kiosk`
-  cookie) hand the `/{slug}` address on to the legacy schedule (`forwards-to-legacy.ts`).
+  not SPA yet, `?viewSession=` and `?viewMeeting=` hand the `/{slug}` address on to the legacy
+  schedule (`forwards-to-legacy.ts`).
 - Legacy pages link to the SPA with plain anchors, never Next's `Link` (`AppLink`, which
   does that for every root path outside `/legacy`): Next has nothing to fetch there.
 

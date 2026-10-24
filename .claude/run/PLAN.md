@@ -146,7 +146,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
         links that mean "the schedule" point at `/{slug}`; the Next schedule
         page stays for the modals. E2E fixture and specs adapted; CHANGELOG,
         docs. Full `make test-e2e` and `make test-e2e-docker`.
-- [ ] 14. **Kiosk** on the SPA schedule, same behavior as today; `kiosk` stops
+- [x] 14. **Kiosk** on the SPA schedule, same behavior as today; `kiosk` stops
       forwarding to legacy.
 - [ ] 15. **Session modal** as a search param over the schedule: details, RSVP,
       attendee list, comments; edit and delete link to legacy.
@@ -160,7 +160,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
 - [ ] 17. **Offline and reload offer**: `sw.js` precaches the shell and `/_spa/`
       assets and serves the shell for SPA navigations offline; never caches
       `/api/**` or `/legacy/**`; push unchanged. The SPA compares the running
-      build id with `/api/v1/health` and offers a reload. E2E: open the schedule,
+      build id with `/api/v1/health` and offers a reload (a kiosk reloads by itself). E2E: open the schedule,
       go offline, reopen it, see it marked as not current. Full `make test-e2e`
       and `make test-e2e-docker`. CHANGELOG, `docs/public/`.
 - [ ] 18. **Upstream release check (#788)**: the server checks the GitHub
