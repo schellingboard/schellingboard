@@ -248,7 +248,7 @@
 
 ## Next step
 
-13.
+13b.
 
 ## Questions
 
@@ -303,3 +303,15 @@
   `openReplica` + `connectFeed` + `autosaveReplica` with `useViewer().guestId` as viewer and
   `newKey` from `app/keys.ts`. `onClockChange` should reload the replica.
 - Tests were written before the code; the red run was the missing modules.
+
+## Step 13a (2026-10-09)
+
+- `apps/web/src/schedule/` holds the schedule's pure logic. Judged COPY, not a move to
+  `packages/domain`: the utils take `MeetingView` (a server-side type in `utils/meeting-views`)
+  and the legacy tests live under `tests/unit`; both legacy copies go at step 16. Copied with
+  their tests: grid-layout, column (schedule-column), meeting-column, agenda, fold, filters,
+  search, meeting-rules, meeting-clash-text. `meeting-view.ts` infers the type from the
+  contract. New and tested: `meetings.ts` (`meetingViewsFrom(snapshot, now)`: the viewer's
+  1-on-1s from `snapshot.me`, clashes always empty as the replica holds no other guest's RSVPs),
+  `model.ts` (location narrowing, search/filter match, per-day entries, counts, grid and agenda
+  day-fold rules), `nowScrollTop`. `apps/web` now declares `luxon`, `@types/luxon` and `zod`.
