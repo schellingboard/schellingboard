@@ -186,7 +186,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
 
 ### Close
 
-- [ ] 19. **Docs**: `04-client.md`, `07-repo-and-rules.md` and `10-path-from-here.md`
+- [x] 19. **Docs**: `04-client.md`, `07-repo-and-rules.md` and `10-path-from-here.md`
       against the code (step 5 started, schedule moved); `docs/dev/server.md`;
       public docs and CHANGELOG checked; release-notes highlights. Final
       (No `make test-e2e-docker`; user decision, only before a release.)
