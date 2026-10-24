@@ -551,3 +551,26 @@
 - Full `make test-e2e` (not docker): 212 passed, 1 flaky (schedule-layout:252, passed on retry and alone), 1
   failed (settings:67, `page.goto` of `/legacy/admin` aborted with NS_BINDING_ABORTED on both attempts; passes
   alone, twice; the same spec failed on `goto` in the step 16d runs before the update check existed).
+
+## Summary (step 20)
+
+The schedule is now a single-page app (`apps/web`) alongside Next (ADR 0015): replica
+with snapshot, change feed and IndexedDB persistence; the grid, agenda, kiosk and
+filters; the session modal with RSVPs, attendee counts and comments (commands with
+optimistic updates); the viewer and name picker; the router owning the modal; offline
+opening through `public/sw.js` with a reload offer after an upgrade; and the admin's
+update notice (`GET /api/v1/updates`, `SB_UPDATE_CHECK`). The API rate limit's burst is
+1000 and `SB_API_RATE_BURST` sets it. Docs, CHANGELOG and the in-app release notes are
+current. Open questions are in `docs/dev/target-architecture/open-questions.md`.
+
+Unresolved flakes, honestly:
+
+- `settings.spec.ts:67` fails its `page.goto('/legacy/admin')` with NS_BINDING_ABORTED
+  (earlier NS_ERROR_FAILURE) under full-suite load; it passes alone. Cause unknown.
+- `scheduling.spec` edit, delete and cancel flows flake about one run in four at 8
+  workers; the retry then sees the first attempt's leftover session.
+- Known older load-only flakes: `profile-comments.spec.ts:95`, `profile.spec:577`,
+  `schedule-layout.spec:252` (once).
+
+`make test-e2e-docker` was last run at step 16 (209 passed); not run for steps 17 to
+19 (user decision: only before a release). Nothing was pushed.
