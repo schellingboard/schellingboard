@@ -21,6 +21,14 @@ schellingboard/
   Dockerfile, docker-compose.yml, Makefile, package.json (workspaces), bunfig.toml
 ```
 
+> **Today** the Next app and `server/` sit at the repository root; `apps/web` and
+> `packages/{domain,contracts,api-client}` exist as drawn. There is no `apps/server`,
+> `tools/` or `make new-use-case` yet. Of the rules below, these are enforced:
+> the dependency-cruiser ones (modules through `module.ts`, use cases on ports, `web`
+> imports only the shared packages), `make openapi-check` (the committed `openapi.json`
+> matches the contracts) and the ESLint ban on `new Date()` outside the request
+> boundary. See [Architecture rules](../architecture-rules.md).
+
 Bun workspaces. One `tsconfig` per package with project references so `tsc -b`
 checks the graph in dependency order and a package cannot see another's internals.
 

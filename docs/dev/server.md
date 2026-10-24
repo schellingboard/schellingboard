@@ -89,6 +89,12 @@ A cascade change that carries `tellAttendees` (day and location deletes) makes
 the `changeNotifications` reaction notify the session's RSVPed guests, never its
 hosts; event and guest deletes record none.
 
+`GET /api/v1/updates` (the `updates` module) answers the admin with the running and
+the latest release, and anyone else with null. The server asks GitHub at most daily;
+`SB_UPDATE_CHECK=false` turns that off.
+
+`SB_API_RATE_BURST` sets the burst of the per-address API rate limit (default 1000).
+
 `GET /api/v1/health` also names the `version` and the `buildId` (Next's
 `.next/BUILD_ID`, the version outside a production build). The SPA shell carries the build id it was served by (`<meta name="sb-build">`, added by `serveSpaShell`); a client that sees `health` report another one offers a reload, and a kiosk reloads by itself. It stays behind the site password.
 
