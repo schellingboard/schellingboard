@@ -25,6 +25,7 @@ import { Footer } from "./footer";
 import { hardNavigate, hardReload } from "./hard-navigate";
 import { newKey } from "./keys";
 import { useHealth } from "./health";
+import { useUpdateStatus } from "./updates";
 import type { AppServices } from "./services";
 import { ShellFrame, ShellProviders } from "./shell";
 import { SyncIndicator } from "./sync-indicator";
@@ -165,6 +166,7 @@ function Loaded({
   );
   const now = useServerNow(store);
   const health = useHealth(api);
+  const update = useUpdateStatus(api);
   const { params, change: changeParams, back, setHash } = useUrlSearchParams();
   const links = useMemo(() => legacyScheduleLinks(slug), [slug]);
   const viewer = useViewer();
@@ -244,7 +246,7 @@ function Loaded({
         onBack={back}
         onHashChange={setHash}
         sync={<SyncIndicator store={store} />}
-        footer={<Footer version={health?.version} inline />}
+        footer={<Footer version={health?.version} update={update} inline />}
         onReload={hardReload}
       />
     </>

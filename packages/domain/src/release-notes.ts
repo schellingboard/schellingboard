@@ -38,6 +38,10 @@ export type ReleaseNote = {
   highlights: string[];
 };
 
+/** Where the footer sends an admin whose site is behind. */
+export const UPDATE_DOCS_URL =
+  "https://docs.schellingboard.org/self-hosting/deployment/#updating";
+
 /** How many of the entries below the modal shows. */
 export const SHOWN_RELEASES = 3;
 

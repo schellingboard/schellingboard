@@ -177,7 +177,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
       build id with `/api/v1/health` and offers a reload (a kiosk reloads by itself). E2E: open the schedule,
       go offline, reopen it, see it marked as not current. Full `make test-e2e`.
       (`make test-e2e-docker` is not run; user decision, only shortly before a release.) CHANGELOG, `docs/public/`.
-- [ ] 18. **Upstream release check (#788)**: the server checks the GitHub
+- [x] 18. **Upstream release check (#788)**: the server checks the GitHub
       releases feed at most daily and caches the result (browsers never contact
       GitHub); an endpoint returns current and latest version and date; the SPA
       and legacy footers show a red dot with both versions and a link to the
