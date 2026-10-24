@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { IDBFactory } from "fake-indexeddb";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -86,13 +86,17 @@ async function open({
   return { calls, sources, router };
 }
 
+afterEach(() => {
+  document.cookie = "kiosk=; path=/; max-age=0";
+});
+
 beforeEach(() => {
   vi.mocked(hardNavigate).mockClear();
   Element.prototype.scrollTo = vi.fn() as never;
 });
 
 describe("the event route", () => {
-  it("sends a modal, kiosk or 1-on-1 address on to the legacy schedule", async () => {
+  it("sends a modal or 1-on-1 address on to the legacy schedule", async () => {
     await open({ path: "/conf?view=agenda&viewSession=s1" });
     await waitFor(() =>
       expect(hardNavigate).toHaveBeenCalledWith(
@@ -102,13 +106,11 @@ describe("the event route", () => {
     expect(screen.queryByRole("link", { name: "Talk" })).toBeNull();
   });
 
-  it("sends kiosk mode, remembered or asked for, on to the legacy schedule", async () => {
+  it("shows kiosk mode, asked for or remembered, itself", async () => {
     document.cookie = "kiosk=1; path=/";
     await open();
-    await waitFor(() =>
-      expect(hardNavigate).toHaveBeenCalledWith("/legacy/conf")
-    );
-    document.cookie = "kiosk=; path=/; max-age=0";
+    expect(await screen.findByRole("link", { name: "Talk" })).toBeTruthy();
+    expect(hardNavigate).not.toHaveBeenCalled();
   });
 
   it("leaves a legacy page's address to the legacy app, whatever events exist", async () => {

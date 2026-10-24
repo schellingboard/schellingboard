@@ -19,6 +19,7 @@ import { getNowOffsetPx } from "./grid-layout";
 import { getDefaultFoldedDayIds } from "./fold";
 import { GridView } from "./grid-view";
 import type { ScheduleLinks } from "./links";
+import { KioskController, useKioskMode } from "./kiosk";
 import { MatchStepper } from "./match-stepper";
 import {
   countMatches,
@@ -124,6 +125,7 @@ export function ScheduleScreen({
   const count = countMatches(entries, match);
   const { statusRef, statusHeight } = useStatusHeight();
 
+  const kiosk = useKioskMode(params);
   const nowIsOnSchedule = data.days.some(
     (day) => getNowOffsetPx(day, now, data.event.slotIncrementMinutes) !== null
   );
@@ -220,6 +222,7 @@ export function ScheduleScreen({
 
   return (
     <ScheduleProvider value={{ data, links, params, actions }}>
+      {kiosk && <KioskController nowIsOnSchedule={nowIsOnSchedule} />}
       <ScheduleMatchProvider value={stepMatch}>
         {/* Both views own the viewport below the nav bar through the same
             fixed frame, so the toolbar rests in the same spot when switching.

@@ -105,8 +105,8 @@ and is far from settled.
 Append `?kiosk=1` to a schedule URL for an unattended screen at the venue: the
 view auto-scrolls back to the red current-time line after a minute of no
 interaction (everyone else gets that line too, plus a "Now" button to jump to
-it, but no auto-scrolling), the screen is kept awake, and the page refreshes
-periodically. It stays fully interactive, and sticks as visitors browse the
+it, but no auto-scrolling), the screen is kept awake, and it stays up to
+date without reloading. It stays fully interactive, and sticks as visitors browse the
 site until you turn it off with `?kiosk=0`. Add `&loc=Main+Hall` (repeatable)
 to show only specific locations — handy for a kiosk in one room, or a
 shareable filtered link.
