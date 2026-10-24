@@ -86,9 +86,12 @@ export default tseslint.config(
   },
   {
     // Not a Next app: its links are plain anchors, to /legacy pages the router
-    // does not know.
+    // does not know, and its images are plain elements.
     files: ["apps/web/**/*.{ts,tsx}"],
-    rules: { "@next/next/no-html-link-for-pages": "off" },
+    rules: {
+      "@next/next/no-html-link-for-pages": "off",
+      "@next/next/no-img-element": "off",
+    },
   },
   {
     files: ["db/repositories/sqlite/*.ts"],

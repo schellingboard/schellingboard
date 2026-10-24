@@ -1,0 +1,40 @@
+import type { Snapshot } from "@schellingboard/contracts/snapshot";
+import type { Event } from "@schellingboard/domain/event";
+import type {
+  Location,
+  LocationUnavailability,
+} from "@schellingboard/domain/location";
+import { eventContextFrom } from "../replica/selectors";
+import type { MeetingView } from "./meeting-view";
+import { meetingViewsFrom } from "./meetings";
+import type { DayWithSessions } from "./model";
+
+/** Everything the schedule draws, read from the replica at one instant. */
+export type ScheduleData = {
+  event: Event;
+  days: DayWithSessions[];
+  locations: Location[];
+  unavailability: LocationUnavailability[];
+  now: Date;
+  guestId: string | null;
+  rsvpd: (sessionId: string) => boolean;
+  meetings: MeetingView[];
+  availability: string[];
+};
+
+export function scheduleDataFrom(snapshot: Snapshot, now: Date): ScheduleData {
+  const { event, days, locations, unavailability, rsvps } =
+    eventContextFrom(snapshot);
+  const rsvpdIds = new Set(rsvps.map((r) => r.sessionId));
+  return {
+    event,
+    days,
+    locations,
+    unavailability,
+    now,
+    guestId: snapshot.me?.guestId ?? null,
+    rsvpd: (sessionId) => rsvpdIds.has(sessionId),
+    meetings: meetingViewsFrom(snapshot, now),
+    availability: snapshot.me?.availability ?? [],
+  };
+}

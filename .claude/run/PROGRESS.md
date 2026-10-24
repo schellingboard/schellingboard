@@ -248,7 +248,7 @@
 
 ## Next step
 
-13b.
+13c.
 
 ## Questions
 
@@ -315,3 +315,18 @@
   1-on-1s from `snapshot.me`, clashes always empty as the replica holds no other guest's RSVPs),
   `model.ts` (location narrowing, search/filter match, per-day entries, counts, grid and agenda
   day-fold rules), `nowScrollTop`. `apps/web` now declares `luxon`, `@types/luxon` and `zod`.
+
+## Step 13b (2026-10-09)
+
+- Grid in `apps/web/src/schedule/`: `context.tsx` (`ScheduleProvider`/`useSchedule`: the
+  `ScheduleData` read from a snapshot at an instant, `links`, the page's search params;
+  `useScheduleMatch` for ghosting), `day-grid`, `location-col`, `session-block`, `now-line`,
+  `day-fold-bar`, `grid-view` (filter bar, footer and stepper are slots for 13c). `links.ts` is
+  the single place that sends session, meeting, add-session and booking links to `/legacy/...`.
+  Icons are copied heroicon paths in `ui/icons.tsx`; `ui/tooltip` (rest-to-open hover, focus,
+  toggleable room details), `ui/plain-text` (regex markdown strip for the session tooltip; the
+  server-side parser is not shipped to the browser).
+- Not carried over, on purpose: the RSVP badge on a block is display only (no click-to-RSVP, no
+  clash confirm, no name picker). The runner exists (11); step 15 must give the grid badge its
+  click, before step 16 routes `/{slug}`.
+- eslint: `@next/next/no-img-element` is off for `apps/web`.
