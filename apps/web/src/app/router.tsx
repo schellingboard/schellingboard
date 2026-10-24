@@ -54,7 +54,7 @@ export function createAppRouter(
     component: function EventRoute(): ReactElement {
       const { slug } = event.useParams();
       const { search, hash } = useRouter().history.location;
-      return scheduleStaysInLegacy(search, document.cookie) ? (
+      return scheduleStaysInLegacy(search) ? (
         <LegacySchedule where={{ pathname: `/${slug}`, search, hash }} />
       ) : (
         <SchedulePage services={services} slug={slug} />

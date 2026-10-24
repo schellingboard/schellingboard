@@ -248,7 +248,7 @@
 
 ## Next step
 
-13g.
+15.
 
 ## Questions
 
@@ -399,3 +399,13 @@
   (live-schedule.spec:62, passed on retry; it flaked earlier in this step too, as did voting:140 and
   live-schedule:112, specs this step does not touch).
 - Questions: user-menu roles (menu/combobox) copy the legacy markup without arrow keys; left as is.
+
+## Step 14 (2026-10-16)
+
+- Kiosk is in the SPA schedule: `schedule/kiosk.tsx` (`useKioskMode(params)`, the same `kiosk` cookie the
+  legacy pages read, and `KioskController`: wake lock, scroll to now every 3 min, paused 60 s after a
+  touch), mounted by `ScheduleScreen`. `kiosk` no longer forwards to legacy.
+- The legacy controller's 5-minute `router.refresh()` has no counterpart: the change feed (and its resync on
+  reconnect) keeps the replica current. The legacy `kiosk.tsx` stays for the legacy schedule until step 16.
+- Checked: apps/web vitest, kiosk/now-line/live-schedule:112 E2E specs.
+- Step 17: a kiosk tab no longer reloads every 5 minutes, so after a server upgrade it keeps the old bundle; the reload offer must reload a kiosk automatically.
