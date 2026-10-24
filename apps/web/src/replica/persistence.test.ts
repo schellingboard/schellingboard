@@ -96,6 +96,17 @@ describe("replica persistence", () => {
     expect(await persistence.load("other", guestId)).toEqual(otherEvent);
   });
 
+  it("clears every copy on this device", async () => {
+    const persistence = createReplicaPersistence(new IDBFactory());
+    await persistence.save(snapshot);
+    await persistence.save(otherEvent);
+
+    await persistence.clear();
+
+    expect(await persistence.load("conf", guestId)).toBeNull();
+    expect(await persistence.load("other", guestId)).toBeNull();
+  });
+
   it("works without IndexedDB, as a private window may refuse it", async () => {
     const idb = new IDBFactory();
     vi.spyOn(idb, "open").mockImplementation(() => {

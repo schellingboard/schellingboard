@@ -87,6 +87,16 @@ export function createReplicaPersistence(
         opened = undefined;
       }
     },
+    async clear(): Promise<void> {
+      try {
+        const db = await database();
+        const tx = db.transaction(REPLICA_STORE, "readwrite");
+        tx.objectStore(REPLICA_STORE).clear();
+        await finished(tx);
+      } catch {
+        opened = undefined;
+      }
+    },
     async save(snapshot: Snapshot): Promise<void> {
       try {
         const db = await database();

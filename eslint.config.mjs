@@ -85,6 +85,12 @@ export default tseslint.config(
     },
   },
   {
+    // Not a Next app: its links are plain anchors, to /legacy pages the router
+    // does not know.
+    files: ["apps/web/**/*.{ts,tsx}"],
+    rules: { "@next/next/no-html-link-for-pages": "off" },
+  },
+  {
     files: ["db/repositories/sqlite/*.ts"],
     rules: {
       "@typescript-eslint/require-await": "off",
