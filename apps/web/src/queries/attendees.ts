@@ -1,10 +1,11 @@
 import type { ApiClient } from "@schellingboard/api-client";
 import type { rsvpViewSchema } from "@schellingboard/contracts/rsvp";
-import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { problemCode } from "../commands/problem";
 import { createObservable } from "./store";
 
 type Rsvp = (typeof rsvpViewSchema)["_output"];
+
+export type AttendeesQuery = ReturnType<typeof createAttendeesQuery>;
 
 export type AttendeesState =
   | { status: "idle" | "loading" | "ready"; rsvps: Rsvp[] }
@@ -58,10 +59,10 @@ export function createAttendeesQuery({
   };
 }
 
-export function attendeeGuests(
-  rsvps: Rsvp[],
-  guests: Snapshot["guests"]
-): Snapshot["guests"] {
+export function attendeeGuests<G extends { id: string }>(
+  rsvps: { guestId: string }[],
+  guests: G[]
+): G[] {
   const byId = new Map(guests.map((g) => [g.id, g]));
   return rsvps.flatMap((r) => byId.get(r.guestId) ?? []);
 }

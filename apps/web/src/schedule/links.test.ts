@@ -11,6 +11,14 @@ describe("legacyScheduleLinks", () => {
     );
   });
 
+  it("points the modal's pages at the legacy app", () => {
+    expect(links.guest("g1")).toBe("/legacy/guests/g1");
+    expect(links.editSession("s1")).toBe(
+      "/legacy/conf/edit-session?sessionID=s1"
+    );
+    expect(links.proposal("p1")).toBe("/legacy/conf/proposals?viewProposal=p1");
+  });
+
   it("opens a 1-on-1 the same way", () => {
     expect(links.meeting(new URLSearchParams(), "m1")).toBe(
       "/legacy/conf?viewMeeting=m1"

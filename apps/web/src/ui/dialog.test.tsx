@@ -43,6 +43,23 @@ describe("Dialog", () => {
     expect(onClose).toHaveBeenCalledTimes(3);
   });
 
+  it("closes only the topmost of nested dialogs on Escape", async () => {
+    const outer = vi.fn();
+    const inner = vi.fn();
+    const ui = (innerOpen: boolean) => (
+      <Dialog open onClose={outer} title="Outer">
+        <Dialog open={innerOpen} onClose={inner} title="Inner">
+          body
+        </Dialog>
+      </Dialog>
+    );
+    const { rerender } = render(ui(false));
+    rerender(ui(true));
+    await userEvent.keyboard("{Escape}");
+    expect(inner).toHaveBeenCalledTimes(1);
+    expect(outer).not.toHaveBeenCalled();
+  });
+
   it("does not close when its own content is clicked", async () => {
     const onClose = vi.fn();
     render(

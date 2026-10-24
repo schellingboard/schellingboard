@@ -7,18 +7,24 @@ import {
   type ReactNode,
 } from "react";
 
+/** Open dialogs, innermost last: Escape closes only the one on top. */
+const openDialogs: symbol[] = [];
+
 export function Dialog({
   open,
   onClose,
   title,
   children,
   wide,
+  label,
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
   children: ReactNode;
   wide?: boolean;
+  /** The dialog's accessible name when it is not its visible title. */
+  label?: string;
 }) {
   const titleId = useId();
   const panel = useRef<HTMLDivElement>(null);
@@ -33,12 +39,16 @@ export function Dialog({
     const opener = document.activeElement as HTMLElement | null;
     if (!panel.current?.contains(document.activeElement))
       panel.current?.focus();
+    const me = Symbol();
+    openDialogs.push(me);
     const onKey = (e: globalThis.KeyboardEvent) => {
-      if (e.key === "Escape") latestOnClose.current();
+      if (e.key === "Escape" && openDialogs[openDialogs.length - 1] === me)
+        latestOnClose.current();
     };
     document.addEventListener("keydown", onKey);
     return () => {
       document.removeEventListener("keydown", onKey);
+      openDialogs.splice(openDialogs.indexOf(me), 1);
       opener?.focus?.();
     };
   }, [open]);
@@ -76,7 +86,8 @@ export function Dialog({
         ref={panel}
         role="dialog"
         aria-modal="true"
-        aria-labelledby={titleId}
+        aria-label={label}
+        aria-labelledby={label ? undefined : titleId}
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         onKeyDown={keepFocusInside}
