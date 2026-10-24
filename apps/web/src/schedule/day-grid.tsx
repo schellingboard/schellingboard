@@ -8,8 +8,11 @@ import { cx } from "../ui/cx";
 import { useSchedule } from "./context";
 import { getNowOffsetPx } from "./grid-layout";
 import { LocationCol } from "./location-col";
+import { meetingsForDay, takesPartInMeetings } from "./meeting-column";
+import { MeetingsCol } from "./meetings-col";
 import type { DayWithSessions } from "./model";
 import { NowLine } from "./now-line";
+import { OneOnOnePicture } from "./one-on-one-picture";
 
 // Width of the left time-axis gutter. The body rows show `HH:mm` labels and the
 // header corner shows the day's date, so it has to fit a short date.
@@ -37,12 +40,20 @@ export function DayGrid({
   // Null on any day that isn't today. `now` is the server's clock, the dev
   // fake clock included.
   const nowOffsetPx = getNowOffsetPx(day, data.now, slotIncrement);
+  // Decided for the whole event rather than day by day, and outside the
+  // ?loc= narrowing: the column is not a room, so the rooms line up from one
+  // day to the next whatever is shown (issue #392, section 2.6).
+  const showMeetings = takesPartInMeetings(data.meetings, data.availability);
 
   return (
     <div
       className="grid bg-surface"
       style={{
-        gridTemplateColumns: `${GUTTER} repeat(${locations.length}, minmax(120px, 240px))`,
+        // The grid lays out at these widths and scrolls, so every pixel the
+        // 1-on-1 column takes is one the rooms lose.
+        gridTemplateColumns: `${GUTTER} ${
+          showMeetings ? "minmax(96px, 160px) " : ""
+        }repeat(${locations.length}, minmax(120px, 240px))`,
       }}
     >
       {/* The corner cell carries the day's date, so the next day's replaces
@@ -56,6 +67,14 @@ export function DayGrid({
           {date.toFormat("MMM d")}
         </span>
       </div>
+      {showMeetings && (
+        <div
+          style={{ top: stickyTop }}
+          className="sticky z-20 border-b border-l border-line-subtle bg-surface p-1"
+        >
+          <h3 className="text-xs font-semibold sm:text-sm">1-on-1s</h3>
+        </div>
+      )}
       {locations.map((loc) => (
         <RoomHeader key={loc.id} location={loc} stickyTop={stickyTop} />
       ))}
@@ -63,6 +82,11 @@ export function DayGrid({
         style={{ top: stickyTop }}
         className="sticky z-20 border-r border-line-subtle bg-surface"
       />
+      {showMeetings && (
+        <div className="border-l border-line-subtle p-1">
+          <p className="text-[10px] text-fg-subtle">Only you see these</p>
+        </div>
+      )}
       {locations.map((loc) => (
         <div key={loc.id} className="border-l border-line-subtle p-1">
           <p className="text-[10px] text-fg-subtle">
@@ -76,6 +100,11 @@ export function DayGrid({
       {firstImageIndex !== -1 && (
         <>
           <div className="sticky left-0 z-20 border-r border-line-subtle bg-surface" />
+          {showMeetings && (
+            <div className="border-l border-line-subtle p-1">
+              <OneOnOnePicture />
+            </div>
+          )}
           {locations.map((loc, i) => (
             <div key={loc.id} className="border-l border-line-subtle p-1">
               {loc.imageUrl && (
@@ -113,6 +142,14 @@ export function DayGrid({
         ))}
         {nowOffsetPx !== null && <NowLine offsetPx={nowOffsetPx} anchor />}
       </div>
+      {showMeetings && (
+        <MeetingsCol
+          meetings={meetingsForDay(data.meetings, day)}
+          availability={data.availability}
+          day={day}
+          nowOffsetPx={nowOffsetPx}
+        />
+      )}
       {locations.map((location) => (
         <LocationCol
           key={location.id}

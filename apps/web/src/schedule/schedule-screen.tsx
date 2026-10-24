@@ -23,7 +23,10 @@ import {
 import { ScheduleFilters } from "./schedule-filters";
 import { ScheduleToolbar, scheduleView } from "./schedule-toolbar";
 import { matchesInReadingOrder } from "./search";
+import { PullToRefresh } from "./pull-to-refresh";
 import { useDebouncedSearch } from "./use-debounced";
+import { useDragToPan } from "./use-drag-to-pan";
+import { useScrollRestoration } from "./use-scroll-restoration";
 import { useStatusHeight } from "./use-status-height";
 
 const NO_FILTERS: ScheduleFilter[] = [];
@@ -41,6 +44,7 @@ export function ScheduleScreen({
   onParamsChange,
   sync,
   footer,
+  onReload,
 }: {
   snapshot: Snapshot;
   now: Date;
@@ -49,10 +53,15 @@ export function ScheduleScreen({
   onParamsChange: (next: URLSearchParams) => void;
   sync: ReactNode;
   footer: ReactNode;
+  /** What a deliberate pull down from the top does. */
+  onReload: () => void;
 }) {
   const data = useMemo(() => scheduleDataFrom(snapshot, now), [snapshot, now]);
   const view = scheduleView(params);
   const scrollerRef = useRef<HTMLDivElement>(null);
+  useDragToPan(scrollerRef, view === "grid");
+  // Per view: the grid and the agenda have nothing in common to scroll to.
+  useScrollRestoration(scrollerRef, `${snapshot.event.slug}:${view}`);
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedSearch(search);
@@ -251,6 +260,13 @@ export function ScheduleScreen({
               matching={count?.matching ?? 0}
             />
           )}
+          {/* Keyed on the view: each renders its own scroll surface, so the
+              gesture's listeners have to move with it. */}
+          <PullToRefresh
+            key={view}
+            scrollerRef={scrollerRef}
+            onReload={onReload}
+          />
         </div>
       </ScheduleMatchProvider>
     </ScheduleProvider>

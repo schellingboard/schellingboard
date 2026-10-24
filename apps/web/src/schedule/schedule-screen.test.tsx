@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
@@ -57,12 +57,15 @@ function screenAt(
       onParamsChange={onParamsChange}
       sync={<span>Live</span>}
       footer={<footer>Footer</footer>}
+      onReload={() => {}}
     />
   );
   return { onParamsChange };
 }
 
 const scrollIntoView = vi.fn();
+
+afterEach(() => sessionStorage.clear());
 
 beforeEach(() => {
   Element.prototype.scrollIntoView = scrollIntoView as never;
@@ -174,6 +177,20 @@ describe("ScheduleScreen search and filters", () => {
       within(stepper).getByRole("button", { name: "Next match" })
     );
     expect(within(stepper).getByText(/^2\//)).toBeTruthy();
+  });
+});
+
+describe("ScheduleScreen scrolling", () => {
+  it("returns to where each view was left", { tags: ["007-US1"] }, () => {
+    sessionStorage.setItem(
+      "schedule-scroll:conf:agenda",
+      JSON.stringify({ left: 0, top: 500 })
+    );
+    screenAt("view=agenda");
+    expect(screen.getByTestId("schedule-scroll").scrollTop).toBe(500);
+    cleanup();
+    screenAt();
+    expect(screen.getByTestId("schedule-scroll").scrollTop).toBe(0);
   });
 });
 
