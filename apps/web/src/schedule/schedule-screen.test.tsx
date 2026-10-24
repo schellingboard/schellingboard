@@ -53,6 +53,7 @@ function fakeActions(
       load: vi.fn(),
       save: vi.fn(),
     },
+    comments: vi.fn<ScheduleActions["comments"]>(),
   };
 }
 

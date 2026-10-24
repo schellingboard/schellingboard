@@ -148,7 +148,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
         docs. Full `make test-e2e` and `make test-e2e-docker`.
 - [x] 14. **Kiosk** on the SPA schedule, same behavior as today; `kiosk` stops
       forwarding to legacy.
-- [ ] 15. **Session modal** as a search param over the schedule: details, RSVP,
+- [x] 15. **Session modal** as a search param over the schedule: details, RSVP,
       attendee list, comments; edit and delete link to legacy. `viewSession` keeps
       forwarding to legacy until step 16 flips the router, so nothing here is
       reachable in the app: `ScheduleScreen` opens the modal when `viewSession` is
@@ -157,7 +157,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
   - [x] 15a. Modal: details, RSVP (the badge's logic shared), attendee list,
         edit/proposal/profile links to legacy.
   - [x] 15b. Hosts' attendee count (`record=count`), through the API.
-  - [ ] 15c. Comments: read, post, reply, like, edit, delete (commands and queries).
+  - [x] 15c. Comments: read, post, reply, like, edit, delete (commands and queries).
 - [ ] 16. **Retire the Next schedule**: the router owns the session modal
       (`viewSession` stops forwarding); delete the Next schedule page, its
       components, server actions, `replica/` and the overlay, except what the

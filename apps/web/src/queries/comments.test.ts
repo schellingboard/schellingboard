@@ -156,3 +156,28 @@ describe("paged comments", () => {
     expect(ids(query)).toEqual([]);
   });
 });
+
+describe("changing what is loaded", () => {
+  async function loaded() {
+    const { api } = fakeApi(serve);
+    const query = createCommentsQuery({
+      api,
+      subject: { kind: "session", id: "s" },
+      pageSize: 2,
+    });
+    await query.loadMore();
+    return query;
+  }
+
+  it("replaces a comment in place", async () => {
+    const query = await loaded();
+    query.update("a", (c) => ({ ...c, body: "edited" }));
+    expect(query.get().items.map((c) => c.body)).toEqual(["edited", "b"]);
+  });
+
+  it("drops a comment", async () => {
+    const query = await loaded();
+    query.remove("a");
+    expect(ids(query)).toEqual(["b"]);
+  });
+});

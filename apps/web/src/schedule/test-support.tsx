@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { render } from "@testing-library/react";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { iso, snapshot as base } from "../replica/snapshot-fixture";
-import { ScheduleProvider } from "./context";
+import { ScheduleProvider, type ScheduleActions } from "./context";
 import { scheduleDataFrom } from "./data";
 import { legacyScheduleLinks } from "./links";
 import { createScheduleMatch, scheduleEntries } from "./model";
@@ -26,7 +26,13 @@ export function renderScheduled(
     snapshot = base,
     now = new Date(iso(9)),
     params = new URLSearchParams(),
-  }: { snapshot?: Snapshot; now?: Date; params?: URLSearchParams } = {}
+    actions = {},
+  }: {
+    snapshot?: Snapshot;
+    now?: Date;
+    params?: URLSearchParams;
+    actions?: Partial<ScheduleActions>;
+  } = {}
 ) {
   const data = scheduleDataFrom(snapshot, now);
   return {
@@ -47,6 +53,10 @@ export function renderScheduled(
             attendees: () => {
               throw new Error("no attendees in this test");
             },
+            comments: () => {
+              throw new Error("no comments in this test");
+            },
+            ...actions,
           },
         }}
       >

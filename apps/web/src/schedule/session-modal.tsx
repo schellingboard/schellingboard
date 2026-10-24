@@ -11,6 +11,7 @@ import { AcademicCapIcon, CheckCircleIcon, LockIcon } from "../ui/icons";
 import { Markdown } from "../ui/markdown";
 import { useSchedule } from "./context";
 import { AttendeeCountField } from "./attendee-count-field";
+import { SessionComments } from "./session-comments";
 import { useRsvp } from "./use-rsvp";
 
 const ACTION =
@@ -226,6 +227,7 @@ function Details({ session }: { session: Session }) {
           .
         </p>
       )}
+      <SessionComments sessionId={session.id} />
     </div>
   );
 }
