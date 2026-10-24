@@ -248,7 +248,7 @@
 
 ## Next step
 
-16.
+17.
 
 ## Questions
 
@@ -443,3 +443,34 @@
 - For step 16: the permalink's hash is set with `history.replaceState`; check the router keeps it. The
   `session-comments.spec`/`profile-comments` flows that notify with `#comment-` links need the hash to survive
   the forward removal.
+
+## Step 16 (2026-10-16)
+
+- The router owns the session modal: only `viewMeeting` still hands the address to the legacy schedule.
+  Schedule links (grid block, agenda row) open it by `openSession` (history push via `useUrlSearchParams`'
+  `push`), so Back closes it; an address opened directly closes by replace. A pushed address drops the hash;
+  a direct `#comment-` address keeps it (unit-tested through the router). Comment timestamps link the full
+  `/{slug}?viewSession=..#comment-..` (permalink usable in a new tab).
+- Notification clicks redirect to `/{slug}?viewSession=` (no `/legacy`); legacy pages link to the modal with
+  `AppLink` and `viewSessionLink` (modal-nav). Deleted: the legacy session modal, `view-session/`, legacy
+  `session-comments.tsx`, the session dismiss mode in `modal-nav.ts`.
+- NOT deleted, on purpose: the rest of the legacy schedule (grid, agenda, toolbar, filters, kiosk...) still
+  renders `viewMeeting` and `bookMeeting` (the meetings column lives in the grid); it goes with the meetings
+  family (PLAN 16b). `createSessionComment` is used only by its integration tests (583 lines); PLAN 16b
+  converts them, then deletes it. `app/actions/attendee-count.ts` is deleted; its test now calls the use cases.
+- Review fixes: rsvp.spec add-session part back on `/legacy/...`; `#comment-` links set the hash through the
+  router history (`setHash`), not `window.history`; `useUrlSearchParams` returns an object.
+- E2E adapted: attendee-count intercepts the API `PUT`; view-session holds `/api/v1/sessions/*/rsvps`;
+  rsvp "No" is exact (the grid's withdraw badge matched); rsvp.spec starts on `/Conference-Gamma`
+  (session-click from legacy raced an RSC fetch; scheduling.spec stays on `/legacy/...`, SPA-first made its
+  edit form flaky); the likes hover preview and avatars are no longer asserted (SPA has neither; Questions).
+- `ConfirmDialog` got `confirmLabel` so comment delete says "Delete" as before.
+- Questions: the "Liked by" hover preview and avatars of the legacy comments are missing in the SPA.
+- Final E2E (`make test-e2e`, mailpit up): 204 passed, 1 failed + 2 flaky, all on flows this step did not
+  change: rsvp:91 (legacy add-session form's Submit stays disabled after the SPA name picker: the SPA->legacy
+  hop race of 13g), session-comments:219 (a `selectUser` picker flake, whose retry then sees the first
+  attempt's leftover comment), session-comments:289. Isolated reruns of session-comments, rsvp and
+  view-session pass. `make test-e2e-docker` not run.
+- After review: `make test-e2e` 203 passed, 2 failed (session-comments:219 whose retry sees the first attempt's
+  comment, update-session:29 "Un-RSVP" not shown; both pass in isolation, 3/3), 2 flaky. `make test-e2e-docker`
+  207 passed, 2 flaky, none failed.

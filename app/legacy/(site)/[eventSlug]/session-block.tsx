@@ -8,6 +8,7 @@ import type { DayWithSessions } from "@/app/legacy/(site)/context";
 import { Tooltip } from "./tooltip";
 import { DateTime } from "luxon";
 import Link from "next/link";
+import { AppLink } from "@/app/components/app-link";
 import { useSearchParams } from "next/navigation";
 import { useContext, useState } from "react";
 import { CurrentUserModal, ConfirmationModal, AlertModal } from "../modals";
@@ -21,7 +22,7 @@ import {
   TITLE_MIN_PX,
   type Position,
 } from "./positioned-block";
-import { viewSessionLinkFromOwner } from "./modal-nav";
+import { viewSessionLink } from "./modal-nav";
 import { stripMarkdown } from "@/utils/markdown";
 import {
   describeRsvpClash,
@@ -216,11 +217,7 @@ export function RealSessionCard(props: {
   const formattedHostNames =
     session.hosts.map((h) => h.name).join(", ") || "No hosts";
 
-  const linkProps = viewSessionLinkFromOwner(
-    searchParams,
-    eventSlug,
-    session.id
-  );
+  const linkProps = viewSessionLink(eventSlug, session.id, searchParams);
 
   const handleRSVP = () => {
     if (!currentUser) {
@@ -312,7 +309,7 @@ export function RealSessionCard(props: {
             currentMatchId === session.id && CURRENT_MATCH_CLASS
           )}
         >
-          <Link
+          <AppLink
             {...linkProps}
             className="cursor-pointer after:content-[''] after:absolute after:inset-0"
           >
@@ -334,7 +331,7 @@ export function RealSessionCard(props: {
               <span className="flex-1">{session.title}</span>
             </p>
             {ghost && <span className="sr-only"> — doesn&apos;t match</span>}
-          </Link>
+          </AppLink>
           {hostLines > 0 && (
             <p
               className={clsx(

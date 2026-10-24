@@ -15,6 +15,7 @@ export type ScheduleLinks = {
 /**
  * Where the schedule's links go until the meeting modal, the add-session form
  * and the pages around the session modal are SPA screens: the one place to switch.
+ * The session modal is the SPA's own, over `/{slug}`.
  */
 export function legacyScheduleLinks(eventSlug: string): ScheduleLinks {
   const schedule = `/legacy/${eventSlug}`;
@@ -26,7 +27,11 @@ export function legacyScheduleLinks(eventSlug: string): ScheduleLinks {
   return {
     schedule,
     proposals: `${schedule}/proposals`,
-    session: over("viewSession"),
+    session: (current, id) => {
+      const params = new URLSearchParams(current);
+      params.set("viewSession", id);
+      return `/${eventSlug}?${params.toString()}`;
+    },
     meeting: over("viewMeeting"),
     guest: (guestId) => `/legacy/guests/${guestId}`,
     editSession: (sessionId) =>

@@ -182,16 +182,6 @@ const SITE_GUARDED: Record<string, () => Promise<unknown>> = {
       await import("@/app/actions/meetings");
     return saveMeetingAvailabilityAction({ eventId: "e", slotStarts: [] });
   },
-  "actions/attendee-count.ts:getAttendeeCountAction": async () => {
-    const { getAttendeeCountAction } =
-      await import("@/app/actions/attendee-count");
-    return getAttendeeCountAction("s");
-  },
-  "actions/attendee-count.ts:setAttendeeCountAction": async () => {
-    const { setAttendeeCountAction } =
-      await import("@/app/actions/attendee-count");
-    return setAttendeeCountAction("s", 1);
-  },
   "actions/dev-reminders.ts:dispatchRemindersAction": async () => {
     const { dispatchRemindersAction } =
       await import("@/app/actions/dev-reminders");

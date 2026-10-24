@@ -46,10 +46,9 @@ const dialog = (page: Page) =>
 // Land on Gamma's schedule as `who`, with the fake clock past the first day's
 // sessions so the server-side gate is open from first paint. Also used to
 // change identity mid-test: selectUser logs out and back in on its own.
-// The session modal and the dev toolbar's "Send due reminders" are the legacy
-// schedule's until the SPA has them, so this lands there.
-async function landAs(page: Page, who: string, day = 0) {
-  await page.goto("/legacy/Conference-Gamma?dev=1");
+// "Send due reminders" is a legacy-page dev tool, so a test that needs it lands there.
+async function landAs(page: Page, who: string, day = 0, legacy = false) {
+  await page.goto(`${legacy ? "/legacy" : ""}/Conference-Gamma?dev=1`);
   await selectUser(page, who);
   await setDevClock(page, lateOnGammaDay(day));
   await page.reload();
@@ -97,7 +96,7 @@ test("saving announces that it is in progress before it confirms @001-US1", asyn
   await landAs(page, "Isabella Rossi");
   await openSession(page, /Design Systems/);
 
-  // Hold the server action open so the pending state is observable rather
+  // Hold the request open so the pending state is observable rather
   // than a race — it is a real state the control owes the user
   // (Constitution VI), not an implementation detail.
   let release = () => {};
@@ -105,9 +104,9 @@ test("saving announces that it is in progress before it confirms @001-US1", asyn
     release = resolve;
   });
   await page.route(
-    (url) => url.pathname.startsWith("/legacy/Conference-Gamma"),
+    (url) => /^\/api\/v1\/sessions\/[^/]+\/attendee-count$/.test(url.pathname),
     async (route, request) => {
-      if (request.method() !== "POST") return route.continue();
+      if (request.method() !== "PUT") return route.continue();
       await held;
       return route.continue();
     }
@@ -176,7 +175,7 @@ test("a host follows the link in the follow-up email and records the count @001-
 
   await login(page);
   // Day 2, 14:00–15:00 Berlin: by 17:00 the follow-up has long come due.
-  await landAs(page, "Carlos Silva", 1);
+  await landAs(page, "Carlos Silva", 1, true);
 
   // Reminders are off in E2E (REMINDER_DISPATCH_INTERVAL_MS=0, see
   // docs/dev/testing.md), so the dev toolbar's button stands in for the tick

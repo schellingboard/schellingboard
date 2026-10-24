@@ -35,6 +35,9 @@ export type ScheduleContextValue = {
   /** The page's search params, which links carry over. */
   params: URLSearchParams;
   actions: ScheduleActions;
+  /** Opens a session's modal as a new history entry, so Back closes it. */
+  openSession: (sessionId: string) => void;
+  setHash: (hash: string) => void;
 };
 
 const ScheduleContext = createContext<ScheduleContextValue | null>(null);

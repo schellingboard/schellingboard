@@ -22,6 +22,7 @@ import {
 import type { ColumnItem } from "./column";
 import type { DayWithSessions } from "./model";
 import { useRsvp } from "./use-rsvp";
+import { sessionLink } from "./session-link";
 import {
   PositionedBlock,
   TITLE_MIN_PX,
@@ -192,7 +193,7 @@ function RealSessionCard({
   location: Location;
 }) {
   const { height } = position;
-  const { data, links, params, timezone } = useSchedule();
+  const { data, links, params, timezone, openSession } = useSchedule();
   const hosting =
     !!data.guestId && session.hosts.some((h) => h.id === data.guestId);
   const lowerOpacity = !data.rsvpd(session.id) && !hosting;
@@ -223,7 +224,9 @@ function RealSessionCard({
           )}
         >
           <a
-            href={links.session(params, session.id)}
+            {...sessionLink(links.session(params, session.id), () =>
+              openSession(session.id)
+            )}
             className="cursor-pointer after:absolute after:inset-0 after:content-['']"
           >
             <p

@@ -26,6 +26,7 @@ import { getNowOffsetPx } from "./grid-layout";
 import { statusLine } from "./meeting-rules";
 import type { MeetingView } from "./meeting-view";
 import type { DayWithSessions } from "./model";
+import { sessionLink } from "./session-link";
 
 /**
  * One day as a list, every session under the time it starts: what a narrow
@@ -141,6 +142,7 @@ function AgendaRow({
   details,
   trailing,
   href,
+  onOpen,
 }: {
   state: TimeState;
   swatchClass: string;
@@ -148,6 +150,7 @@ function AgendaRow({
   details: ReactNode;
   trailing?: ReactNode;
   href?: string;
+  onOpen?: () => void;
 }) {
   const body = (
     <>
@@ -187,7 +190,10 @@ function AgendaRow({
   return (
     <li>
       {href ? (
-        <a href={href} className={className}>
+        <a
+          {...(onOpen ? sessionLink(href, onOpen) : { href })}
+          className={className}
+        >
           {body}
         </a>
       ) : (
@@ -209,7 +215,7 @@ function SessionRow({
   locations: Location[];
   timezone: string;
 }) {
-  const { data, links, params } = useSchedule();
+  const { data, links, params, openSession } = useSchedule();
   const state = timeState(start, session.endTime ?? start, data.now);
   const until = `until ${formatOptionalTime(session.endTime, timezone, TIME_FORMAT)}`;
   const inRooms = locations.filter((loc) =>
@@ -241,6 +247,7 @@ function SessionRow({
       state={state}
       swatchClass={cx("loc-swatch", color && `loc-${color}`)}
       href={links.session(params, session.id)}
+      onOpen={() => openSession(session.id)}
       title={
         <>
           {session.closed && (

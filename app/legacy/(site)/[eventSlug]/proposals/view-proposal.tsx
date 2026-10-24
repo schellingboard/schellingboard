@@ -2,6 +2,7 @@
 
 import { useContext, useState, useTransition } from "react";
 import Link from "next/link";
+import { AppLink } from "@/app/components/app-link";
 import { useRouter } from "next/navigation";
 import {
   PencilIcon,
@@ -33,7 +34,7 @@ import { VoteTally } from "./vote-tally";
 import type { EventInterestSummary } from "@schellingboard/domain/proposal-vote-stats";
 import { useLocalZone } from "@/utils/hooks";
 import { formatOptionalTime, TIME_FORMAT } from "@schellingboard/domain/time";
-import { viewSessionLinkFromElsewhere } from "../modal-nav";
+import { viewSessionLink } from "../modal-nav";
 import { joinProposal } from "./actions";
 
 export function ViewProposal(props: {
@@ -220,8 +221,8 @@ export function ViewProposal(props: {
           ) : sessions.length === 1 ? (
             <p>
               This proposal was scheduled on{" "}
-              <Link
-                {...viewSessionLinkFromElsewhere(eventSlug, sessions[0].id)}
+              <AppLink
+                {...viewSessionLink(eventSlug, sessions[0].id)}
                 className="text-brand-fg underline hover:text-brand-fg-hover transition-colors"
               >
                 {formatOptionalTime(
@@ -236,7 +237,7 @@ export function ViewProposal(props: {
                   TIME_FORMAT
                 )}
                 {inRooms(sessions[0])}
-              </Link>
+              </AppLink>
               .
             </p>
           ) : (
@@ -245,8 +246,8 @@ export function ViewProposal(props: {
               <ul className="mt-2 space-y-1 ml-4">
                 {sessions.map((session) => (
                   <li key={session.id}>
-                    <Link
-                      {...viewSessionLinkFromElsewhere(eventSlug, session.id)}
+                    <AppLink
+                      {...viewSessionLink(eventSlug, session.id)}
                       className="text-brand-fg underline hover:text-brand-fg-hover transition-colors"
                     >
                       {formatOptionalTime(
@@ -255,7 +256,7 @@ export function ViewProposal(props: {
                         `EEEE ${TIME_FORMAT}`
                       )}
                       {inRooms(session)}
-                    </Link>
+                    </AppLink>
                   </li>
                 ))}
               </ul>

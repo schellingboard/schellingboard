@@ -9,7 +9,6 @@ import { getDefaultFoldedDayIds } from "@/utils/schedule-fold";
 import { getNowOffsetPx } from "@/utils/grid-layout";
 import { useDebouncedSearch } from "@/utils/hooks";
 import { KioskController, useKioskMode } from "./kiosk";
-import { SessionModal } from "./session-modal";
 import { MeetingModalFromUrl } from "./meeting-modal";
 import { MeetingsProvider } from "./use-meetings";
 import { useDragToPan } from "./use-drag-to-pan";
@@ -20,7 +19,6 @@ export function EventDisplay() {
   const { event, days, locations, guests, now } = useContext(EventContext);
   const searchParams = useSearchParams();
   const view = scheduleView(searchParams);
-  const viewSession = searchParams.get("viewSession");
   const kiosk = useKioskMode();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedSearch(search);
@@ -110,9 +108,6 @@ export function EventDisplay() {
             gesture's listeners have to move with it. */}
         <PullToRefresh key={view} scrollerRef={scrollerRef} />
       </div>
-      {viewSession && (
-        <SessionModal sessionId={viewSession} eventSlug={event.slug} />
-      )}
       <MeetingModalFromUrl />
       {kiosk && <KioskController nowIsOnSchedule={nowIsOnSchedule} />}
     </MeetingsProvider>

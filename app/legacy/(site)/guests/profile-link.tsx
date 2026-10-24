@@ -1,10 +1,11 @@
 "use client";
 
 import { PropsWithChildren } from "react";
-import Link, { LinkProps } from "next/link";
+import { AppLink } from "@/app/components/app-link";
+import type { LinkProps } from "next/link";
 import {
   viewProposalLinkFromElsewhere,
-  viewSessionLinkFromElsewhere,
+  viewSessionLink,
 } from "@/app/legacy/(site)/[eventSlug]/modal-nav";
 
 export type ProfileItem = {
@@ -17,12 +18,12 @@ function ProfileItemLink({
   children,
 }: PropsWithChildren<{ props: LinkProps }>) {
   return (
-    <Link
+    <AppLink
       {...props}
       className="text-brand-fg hover:text-brand-fg-hover hover:underline"
     >
       {children}
-    </Link>
+    </AppLink>
   );
 }
 
@@ -32,7 +33,7 @@ export function SessionLink({
   children,
 }: PropsWithChildren<ProfileItem>) {
   return (
-    <ProfileItemLink props={viewSessionLinkFromElsewhere(eventSlug, id)}>
+    <ProfileItemLink props={viewSessionLink(eventSlug, id)}>
       {children}
     </ProfileItemLink>
   );

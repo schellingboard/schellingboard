@@ -64,5 +64,13 @@ export async function openNotificationAction(id: string): Promise<void> {
   if (!result.ok) return;
 
   revalidatePath("/legacy/notifications");
-  redirect(`/legacy${result.value.url}`);
+  redirect(
+    opensInSpa(result.value.url)
+      ? result.value.url
+      : `/legacy${result.value.url}`
+  );
 }
+
+// The session modal is the SPA's: `/{slug}?viewSession=…`, not under /legacy.
+const opensInSpa = (url: string) =>
+  /^\/[^/?#]+\?([^#]*&)?viewSession=/.test(url);
