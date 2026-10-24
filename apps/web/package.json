@@ -7,7 +7,7 @@
     "@schellingboard/api-client": "workspace:*",
     "@schellingboard/contracts": "workspace:*",
     "@schellingboard/domain": "workspace:*",
-    "@tanstack/react-router": "1.170.38",
+    "@tanstack/react-router": "1.170.45",
     "react": "^19",
     "react-dom": "^19"
   },
@@ -16,12 +16,12 @@
     "@types/node": "^26",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@vitejs/plugin-react": "6.1.1",
-    "fake-indexeddb": "6.2.5",
+    "@vitejs/plugin-react": "6.1.2",
+    "fake-indexeddb": "6.2.6",
     "fast-check": "4.10.2",
-    "happy-dom": "20.14.4",
+    "happy-dom": "21.0.3",
     "tailwindcss": "^4.3.3",
-    "vite": "8.3.0",
-    "vitest": "5.0.4"
+    "vite": "8.3.4",
+    "vitest": "5.0.5"
   }
 }
