@@ -498,3 +498,29 @@
   unset: bucket "unknown") share one open-name bucket, and the SPA sends every open, identity call, snapshot,
   comment, RSVP and feed reconnect through it. Should open-name guests be keyed by address plus guest cookie,
   with a cap per address? (The cookie is unsigned: any id buys a fresh bucket, hence the cap.)
+
+## Step 17 (2026-10-16)
+
+- Offline and reload offer. `public/sw.js` caches the shell (key `/_spa/shell`) and `/_spa/assets/`; SPA
+  navigations go network first, falling back to the cached shell (never a redirect or non-HTML); `/api`,
+  `/legacy` and the rest are untouched. `main.tsx` registers it unless hot reload exists (`import.meta.hot`;
+  `import.meta.env.PROD` is false in the E2E build, NODE_ENV=test). `serveSpaShell(dir, buildId)` adds
+  `<meta name="sb-build">`; `app/reload-offer.tsx` compares it with `/api/v1/health` (load, 5 min, `online`,
+  tab shown), offers a fixed bottom "Reload" note, and reloads a kiosk by itself. Mounted in `ShellFrame`.
+- Gaps the offline path exposed, fixed: (1) a replica fresh from the network was never saved unless it changed
+  (`autosaveReplica` `fresh`); (2) the viewer was unknown offline, so it is remembered in localStorage
+  (`sb-viewer`); (3) the feed sent its first bytes only after 25 s on a quiet event, so a reopened page said
+  "Not updating" for that long: it now pings at once; (4) `useServerNow` only took the server clock at the next
+  minute, so a persisted replica showed wrong dates (now-line, "ended"): it follows clock shifts >= 1 s;
+  (5) the first identity answer could overwrite a name just taken (`decided` ref).
+- `schedule-page.test` "Version" lookup used `findByRole` with two footers; now `findAllByRole`.
+- Lint note: a leftover `playwright-report/` makes `make lint` report `any` types; delete it before linting.
+- `make test-e2e-docker` not run (user decision); `sw.js` and the shell serving are path-related, so run it
+  before a release.
+- After review: the service worker drops cached assets the new shell does not name; the remembered viewer
+  is used only when the identity call fails to connect (not on 401, 429, 5xx); a kiosk reloads at most once
+  per build id (a load balancer with mixed builds cannot loop it); the offline spec no longer reads IndexedDB.
+  The reload spec still fakes the `/health` build id: a real upgrade cannot be done from a test.
+- Questions: scheduling.spec edit/delete/cancel flows (`openEditForm`, then a click on the legacy edit page)
+  flake about 1 run in 4 under load (8 workers), with or without the service worker or the saved replica
+  (measured both ways); the retry then fails on the first attempt's leftover session. Not caused by this step.

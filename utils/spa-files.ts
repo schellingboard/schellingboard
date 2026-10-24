@@ -19,10 +19,20 @@ const TYPES: Record<string, string> = {
 
 const NO_STORE = "no-store";
 
-export async function serveSpaShell(dir: string): Promise<Response> {
+const escapeAttribute = (value: string) =>
+  value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+
+/** The build id rides in the shell so a cached copy still says which build it is. */
+export async function serveSpaShell(
+  dir: string,
+  buildId: string
+): Promise<Response> {
   try {
-    const html = await readFile(path.join(dir, "index.html"));
-    return new Response(new Uint8Array(html), {
+    const html = (await readFile(path.join(dir, "index.html"), "utf8")).replace(
+      "</head>",
+      `<meta name="sb-build" content="${escapeAttribute(buildId)}"></head>`
+    );
+    return new Response(html, {
       headers: {
         "content-type": TYPES[".html"],
         "cache-control": NO_STORE,

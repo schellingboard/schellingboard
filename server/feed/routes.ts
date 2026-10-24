@@ -41,7 +41,7 @@ const getFeed = createRoute({
   path: "/events/{slug}/feed",
   tags: ["events"],
   description:
-    "A `text/event-stream` of the event's changes after `since` (the snapshot's `seq`), filtered to what the `guest` cookie may see. Each message has `id` = its `seq`, `event` = its type and the message as JSON `data`; a browser's reconnect sends `Last-Event-ID`, which wins over `since`. An `event: reset` message, after which the stream ends, means the resume point cannot be served: load the snapshot again. An `event: ping` every 25 seconds, its data the server's `now`, keeps proxies from closing it and lets a client notice a dead connection; it ends after 10 minutes. The first message carries `retry: 1000`, so a client reconnects after one second.",
+    "A `text/event-stream` of the event's changes after `since` (the snapshot's `seq`), filtered to what the `guest` cookie may see. Each message has `id` = its `seq`, `event` = its type and the message as JSON `data`; a browser's reconnect sends `Last-Event-ID`, which wins over `since`. An `event: reset` message, after which the stream ends, means the resume point cannot be served: load the snapshot again. An `event: ping` as the stream opens and every 25 seconds, its data the server's `now`, keeps proxies from closing it and lets a client notice a dead connection; it ends after 10 minutes. The first message carries `retry: 1000`, so a client reconnects after one second.",
   request: {
     params: z.object({ slug: z.string().min(1) }),
     query: z.object({ since: z.string().optional() }),
@@ -159,10 +159,14 @@ export function addFeedRoutes(app: App, deps: { uow: UnitOfWork }): void {
       feed.close();
     } else {
       stop = feed.close;
-      heartbeat = setInterval(() => {
+      const ping = () => {
         const now = nowWithOffset(offset).toISOString();
         write(`event: ping\ndata: ${JSON.stringify({ now })}\n\n`);
-      }, HEARTBEAT_MS);
+      };
+      // Headers leave with the first bytes, so a quiet event would otherwise
+      // keep the browser's stream from opening for a whole heartbeat.
+      ping();
+      heartbeat = setInterval(ping, HEARTBEAT_MS);
       deadline = setTimeout(finish, MAX_AGE_MS);
     }
     return c.body(body, 200, {

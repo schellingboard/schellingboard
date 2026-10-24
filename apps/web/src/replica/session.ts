@@ -43,7 +43,9 @@ export async function startReplicaSession({
     loadSnapshot,
   });
   const feed = connectFeed({ slug, store, loadSnapshot, createSource, delay });
-  const stopSaving = autosaveReplica(store, persistence);
+  const stopSaving = autosaveReplica(store, persistence, {
+    fresh: !persisted,
+  });
 
   let hiddenTimer: ReturnType<typeof setTimeout> | undefined;
   let hiddenStop = false;

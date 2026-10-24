@@ -11,7 +11,10 @@ beforeAll(() => {
   dir = path.join(root, "dist");
   mkdirSync(dir);
   mkdirSync(path.join(dir, "assets"));
-  writeFileSync(path.join(dir, "index.html"), "<!doctype html><p>shell");
+  writeFileSync(
+    path.join(dir, "index.html"),
+    "<!doctype html><head><title>x</title></head><p>shell"
+  );
   writeFileSync(path.join(dir, "assets", "index-abc.js"), "console.log(1)");
   writeFileSync(path.join(dir, "assets", "index-abc.css"), "a{}");
   writeFileSync(path.join(root, "secret.txt"), "secret");
@@ -23,15 +26,21 @@ afterAll(() => {
 
 describe("the SPA shell", () => {
   it("is read from disk and never cached, so a new build shows at once", async () => {
-    const res = await serveSpaShell(dir);
+    const res = await serveSpaShell(dir, "b1");
     expect(res.status).toBe(200);
     expect(res.headers.get("cache-control")).toBe("no-store");
     expect(res.headers.get("content-type")).toBe("text/html; charset=utf-8");
     expect(await res.text()).toContain("shell");
   });
 
+  it("names the build that served it, for the reload offer", async () => {
+    const html = await (await serveSpaShell(dir, 'b"1')).text();
+    expect(html).toContain('<meta name="sb-build" content="b&quot;1">');
+    expect(html.indexOf("sb-build")).toBeLessThan(html.indexOf("</head>"));
+  });
+
   it("answers 503 rather than an empty page when the app was not built", async () => {
-    const res = await serveSpaShell(path.join(dir, "missing"));
+    const res = await serveSpaShell(path.join(dir, "missing"), "b1");
     expect(res.status).toBe(503);
     expect(res.headers.get("cache-control")).toBe("no-store");
   });

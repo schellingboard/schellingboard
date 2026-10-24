@@ -69,6 +69,11 @@ test.describe("Admin site settings", () => {
   }) => {
     // No map by default: the schedule nav has no map button.
     await loginAndGoto(page, "/Conference-Alpha");
+    // A proposal-phase event hands over to the legacy proposals page, and
+    // leaving before that load lands aborts the next goto.
+    await expect(
+      page.getByRole("heading", { name: /Session Proposals/ })
+    ).toBeVisible();
     await expect(page.getByRole("button", { name: "Show map" })).toHaveCount(0);
 
     // Upload a map via the admin UI.
