@@ -3,6 +3,7 @@ import {
   DEFAULT_BREAK_MINUTES,
   DEFAULT_SLOT_INCREMENT_MINUTES,
 } from "@schellingboard/domain/slots";
+import type { AttendeeCountApi } from "../queries/attendee-count";
 import type { AttendeesQuery } from "../queries/attendees";
 import type { ScheduleData } from "./data";
 import type { ScheduleLinks } from "./links";
@@ -18,6 +19,7 @@ export type ScheduleActions = {
   pickName: () => void;
   /** The caller destroys the query when done. */
   attendees: (sessionId: string) => AttendeesQuery;
+  attendeeCount: AttendeeCountApi;
 };
 
 export type ScheduleContextValue = {

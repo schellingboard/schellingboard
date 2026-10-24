@@ -10,6 +10,7 @@ import { Dialog } from "../ui/dialog";
 import { AcademicCapIcon, CheckCircleIcon, LockIcon } from "../ui/icons";
 import { Markdown } from "../ui/markdown";
 import { useSchedule } from "./context";
+import { AttendeeCountField } from "./attendee-count-field";
 import { useRsvp } from "./use-rsvp";
 
 const ACTION =
@@ -64,12 +65,15 @@ function useAttendees(sessionId: string, numRsvps: number) {
 }
 
 function Details({ session }: { session: Session }) {
-  const { data, links, timezone } = useSchedule();
+  const { data, links, params, timezone } = useSchedule();
   const { rsvpd, busy, click, dialogs } = useRsvp(session);
   const attendeeState = useAttendees(session.id, session.numRsvps);
 
   const isHost =
     data.guestId !== null && session.hosts.some((h) => h.id === data.guestId);
+  // Admin-managed sessions count: a host records the count for one they cannot edit.
+  const canRecordAttendance =
+    isHost && session.endTime !== undefined && session.endTime <= data.now;
   const rooms = data.locations.filter((l) =>
     session.locations.some((room) => room.id === l.id)
   );
@@ -199,6 +203,13 @@ function Details({ session }: { session: Session }) {
           </span>
         </div>
       </div>
+      {canRecordAttendance && (
+        <AttendeeCountField
+          key={session.id}
+          sessionId={session.id}
+          autoFocus={params.get("record") === "count"}
+        />
+      )}
       <div className="mb-6">
         <h3 className="mb-2 font-semibold">Description</h3>
         <Markdown>{session.description}</Markdown>

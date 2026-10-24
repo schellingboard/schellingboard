@@ -40,6 +40,10 @@ export function renderScheduled(
           actions: {
             toggleRsvp: () => Promise.resolve({ ok: true }),
             pickName: () => {},
+            attendeeCount: {
+              load: () => Promise.resolve({ ok: true, count: null }),
+              save: () => Promise.resolve({ ok: true, count: null }),
+            },
             attendees: () => {
               throw new Error("no attendees in this test");
             },

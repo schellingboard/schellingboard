@@ -248,7 +248,7 @@
 
 ## Next step
 
-15b.
+15c.
 
 ## Questions
 
@@ -421,3 +421,12 @@
   session's count moves and the viewer's own RSVP is overlaid from the replica. `ScheduleData` gained `guests`.
 - For step 16: the schedule links must open the modal by client-side navigation (history push) so Back closes it;
   today the modal closes with `replace`. Links to profiles/edit/proposal stay `/legacy/...`.
+
+## Step 15b (2026-10-16)
+
+- Hosts' attendee count in the SPA modal (`schedule/attendee-count-field.tsx`), shown to a host once the
+  session has ended, admin-managed included; `record=count` focuses it. Reads and writes go through
+  `queries/attendee-count.ts` (`GET`/`PUT /api/v1/sessions/{id}/attendee-count`, an idempotency key per save),
+  reached as `ScheduleActions.attendeeCount`. The form is plain state validated with the contracts' schema.
+- For step 16: `attendee-count.spec` "saving announces..." intercepts the legacy server action's POST
+  (`/legacy/Conference-Gamma`); it has to intercept the `PUT` to the API instead. Specs also land on `/legacy/...`.
