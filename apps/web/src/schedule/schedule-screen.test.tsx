@@ -48,6 +48,7 @@ function fakeActions(
       Promise.resolve(result)
     ),
     pickName: vi.fn<ScheduleActions["pickName"]>(),
+    attendees: vi.fn<ScheduleActions["attendees"]>(),
   };
 }
 

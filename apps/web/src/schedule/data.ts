@@ -20,6 +20,7 @@ export type ScheduleData = {
   unavailability: LocationUnavailability[];
   now: Date;
   guestId: string | null;
+  guests: { id: string; name: string }[];
   rsvpd: (sessionId: string) => boolean;
   meetings: MeetingView[];
   availability: string[];
@@ -37,6 +38,7 @@ export function scheduleDataFrom(snapshot: Snapshot, now: Date): ScheduleData {
     unavailability,
     now,
     guestId: snapshot.me?.guestId ?? null,
+    guests: snapshot.guests,
     rsvpd: (sessionId) => rsvpdIds.has(sessionId),
     meetings: meetingViewsFrom(snapshot, now),
     availability: snapshot.me?.availability ?? [],

@@ -248,7 +248,7 @@
 
 ## Next step
 
-15.
+15b.
 
 ## Questions
 
@@ -409,3 +409,15 @@
   reconnect) keeps the replica current. The legacy `kiosk.tsx` stays for the legacy schedule until step 16.
 - Checked: apps/web vitest, kiosk/now-line/live-schedule:112 E2E specs.
 - Step 17: a kiosk tab no longer reloads every 5 minutes, so after a server upgrade it keeps the old bundle; the reload offer must reload a kiosk automatically.
+
+## Step 15a (2026-10-16)
+
+- PLAN 15 split into 15a-c (modal, attendee count, comments). `viewSession` still forwards to legacy,
+  so the SPA modal is not reachable in the app: `ScheduleScreen` renders `schedule/session-modal.tsx`
+  when `viewSession` is in its params, tested through it (`session-modal.test.tsx`). Step 16 flips the
+  router and runs the E2E specs, whose dialog name ("Session details") the modal keeps (`Dialog` got a `label`).
+- RSVP click logic moved from the grid badge into `schedule/use-rsvp.tsx`, shared by badge and modal.
+  `ScheduleActions.attendees(sessionId)` gives the modal an `AttendeesQuery`; the list is refetched when the
+  session's count moves and the viewer's own RSVP is overlaid from the replica. `ScheduleData` gained `guests`.
+- For step 16: the schedule links must open the modal by client-side navigation (history push) so Back closes it;
+  today the modal closes with `replace`. Links to profiles/edit/proposal stay `/legacy/...`.
