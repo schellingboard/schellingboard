@@ -6,6 +6,7 @@ import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { snapshot as base, iso } from "../replica/snapshot-fixture";
 import { createObservable } from "../queries/store";
 import type { AttendeesState } from "../queries/attendees";
+import { fakeComments } from "./comments-test-support";
 import { legacyScheduleLinks } from "./links";
 import { ScheduleScreen, type ScheduleActions } from "./schedule-screen";
 
@@ -62,6 +63,7 @@ function fakeActions(attendees = fakeAttendees(["zed", "abe"])) {
     ),
     pickName: vi.fn<ScheduleActions["pickName"]>(),
     attendees: vi.fn<ScheduleActions["attendees"]>(() => attendees),
+    comments: vi.fn<ScheduleActions["comments"]>(() => fakeComments()),
     attendeeCount: {
       load: vi.fn<ScheduleActions["attendeeCount"]["load"]>(() =>
         Promise.resolve({ ok: true, count: null })

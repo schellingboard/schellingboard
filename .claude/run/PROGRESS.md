@@ -248,7 +248,7 @@
 
 ## Next step
 
-15c.
+16.
 
 ## Questions
 
@@ -430,3 +430,16 @@
   reached as `ScheduleActions.attendeeCount`. The form is plain state validated with the contracts' schema.
 - For step 16: `attendee-count.spec` "saving announces..." intercepts the legacy server action's POST
   (`/legacy/Conference-Gamma`); it has to intercept the `PUT` to the API instead. Specs also land on `/legacy/...`.
+
+## Step 15c (2026-10-16)
+
+- Comments in the SPA session modal (`schedule/session-comments.tsx`): thread tree, collapse, post, reply,
+  edit/delete (own, delete asks first), like with a "Liked by" list, load more, `#comment-<id>` scroll and
+  highlight. Commands `editComment`/`deleteComment`/`likeComment`/`unlikeComment` in `commands/comment.ts`;
+  `queries/comments-controller.ts` runs them through the runner and applies each success to the paged query
+  (`update`/`remove` added), since comments are not in the replica. Reached as `ScheduleActions.comments`.
+- Differences from legacy: no avatars in "Liked by"; the first page shows "Load more comments" instead of
+  appending when scrolling; comments do not update live (as in legacy, loaded once per open).
+- For step 16: the permalink's hash is set with `history.replaceState`; check the router keeps it. The
+  `session-comments.spec`/`profile-comments` flows that notify with `#comment-` links need the hash to survive
+  the forward removal.
