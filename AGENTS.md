@@ -259,8 +259,10 @@ conversation, are the state of the run.
 - A step is done when `make precommit` passes. If a tier cannot run in the
   environment, say so in PROGRESS.md and in the commit message; never skip it silently.
 - One commit per step. If a step is too big for one coherent commit, split it in
-  PLAN.md first. Tick the step in PLAN.md and update PROGRESS.md (decisions, problems,
-  next step) in the step's own commit.
+  PLAN.md first. In the step's own commit, replace the finished step in PLAN.md with a
+  one-line summary and update PROGRESS.md (decisions, problems, next step).
+- Keep both files small. Fold completed steps into a short summary. Keep a PROGRESS.md
+  entry only if a later step needs it; drop the rest (jj history has them).
 - Only push if explicitly instructed to! If pushing, push every commit as its
   own stacked PR: branch `<session branch>-NN` (01, 02, …) holding exactly that
   commit on top of the branch before it. The first PR's base is the branch of
@@ -270,8 +272,10 @@ conversation, are the state of the run.
   push the branch and list it with its base in PROGRESS.md.
 - Blocked, or facing a decision the plan and ADRs do not settle: record it under
   "Questions" in PROGRESS.md, then continue with a step that does not depend on it.
-- When no step is left: write a summary in PROGRESS.md, delete `.claude/run/` in a
-  last commit, and stop.
+- When no step is left: read the next steps named at the bottom of PLAN.md. If there
+  are any, write a new PLAN.md from them and recreate PROGRESS.md from scratch, carrying
+  over only open Questions and facts the new plan needs. Do this in one commit, then
+  continue. If there are none, delete `.claude/run/` in a last commit and stop.
 
 ## Misc
 
