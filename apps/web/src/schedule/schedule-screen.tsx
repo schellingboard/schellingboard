@@ -231,6 +231,7 @@ export function ScheduleScreen({
           onClose={() => {
             const updated = new URLSearchParams(params);
             updated.delete("viewSession");
+            updated.delete("record");
             onParamsChange(updated);
           }}
         />

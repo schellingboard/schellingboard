@@ -156,7 +156,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
       the E2E specs against it.
   - [x] 15a. Modal: details, RSVP (the badge's logic shared), attendee list,
         edit/proposal/profile links to legacy.
-  - [ ] 15b. Hosts' attendee count (`record=count`), through the API.
+  - [x] 15b. Hosts' attendee count (`record=count`), through the API.
   - [ ] 15c. Comments: read, post, reply, like, edit, delete (commands and queries).
 - [ ] 16. **Retire the Next schedule**: the router owns the session modal
       (`viewSession` stops forwarding); delete the Next schedule page, its

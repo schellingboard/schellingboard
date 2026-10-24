@@ -62,18 +62,26 @@ function fakeActions(attendees = fakeAttendees(["zed", "abe"])) {
     ),
     pickName: vi.fn<ScheduleActions["pickName"]>(),
     attendees: vi.fn<ScheduleActions["attendees"]>(() => attendees),
+    attendeeCount: {
+      load: vi.fn<ScheduleActions["attendeeCount"]["load"]>(() =>
+        Promise.resolve({ ok: true, count: null })
+      ),
+      save: vi.fn<ScheduleActions["attendeeCount"]["save"]>((_id, count) =>
+        Promise.resolve({ ok: true, count })
+      ),
+    },
   };
 }
 
 function open(
   snapshot: Snapshot,
-  { params = "viewSession=s", actions = fakeActions() } = {}
+  { params = "viewSession=s", actions = fakeActions(), at = iso(9) } = {}
 ) {
   const onParamsChange = vi.fn<(params: URLSearchParams) => void>();
   render(
     <ScheduleScreen
       snapshot={snapshot}
-      now={new Date(iso(9))}
+      now={new Date(at)}
       links={legacyScheduleLinks("conf")}
       params={new URLSearchParams(params)}
       onParamsChange={onParamsChange}
@@ -317,5 +325,129 @@ describe("the proposal a session came from", () => {
     expect(
       within(dialog()).getByRole("link", { name: "here" }).getAttribute("href")
     ).toBe("/legacy/conf/proposals?viewProposal=p1");
+  });
+});
+
+describe("the attendee count", () => {
+  const host = { ...base.me!, guestId: "host", rsvps: [] };
+  const afterIt = iso(11);
+  const field = () =>
+    within(dialog()).queryByLabelText("How many people attended?");
+
+  it(
+    "is recorded by a host once the session is over",
+    { tags: ["001-US1"] },
+    async () => {
+      const actions = fakeActions();
+      actions.attendeeCount.load.mockResolvedValue({ ok: true, count: 12 });
+      open(snapshotWith({}, { me: host }), { actions, at: afterIt });
+      const input = await within(dialog()).findByLabelText(
+        "How many people attended?"
+      );
+      expect((input as HTMLInputElement).value).toBe("12");
+
+      await userEvent.clear(input);
+      await userEvent.type(input, "30");
+      await userEvent.click(
+        within(dialog()).getByRole("button", { name: "Save attendee count" })
+      );
+      expect(actions.attendeeCount.save).toHaveBeenCalledWith("s", 30);
+      expect(await within(dialog()).findByText("Saved")).toBeTruthy();
+    }
+  );
+
+  it("clears the count when saved empty", { tags: ["001-US1"] }, async () => {
+    const actions = fakeActions();
+    open(snapshotWith({}, { me: host }), { actions, at: afterIt });
+    await within(dialog()).findByLabelText("How many people attended?");
+    await userEvent.click(
+      within(dialog()).getByRole("button", { name: "Save attendee count" })
+    );
+    expect(actions.attendeeCount.save).toHaveBeenCalledWith("s", null);
+  });
+
+  it("shows nobody else, nor the host before the end", () => {
+    open(snapshotWith(), { at: afterIt });
+    expect(field()).toBeNull();
+    cleanup();
+    open(snapshotWith({}, { me: host }));
+    expect(field()).toBeNull();
+  });
+
+  it("is open to the host of an admin-managed session", async () => {
+    open(snapshotWith({ adminManaged: true }, { me: host }), { at: afterIt });
+    expect(
+      await within(dialog()).findByLabelText("How many people attended?")
+    ).toBeTruthy();
+  });
+
+  it("says saving is under way, and disables Save meanwhile", async () => {
+    const actions = fakeActions();
+    actions.attendeeCount.save.mockReturnValue(new Promise(() => {}));
+    open(snapshotWith({}, { me: host }), { actions, at: afterIt });
+    await within(dialog()).findByLabelText("How many people attended?");
+    const save = within(dialog()).getByRole("button", {
+      name: "Save attendee count",
+    });
+    await userEvent.click(save);
+    expect(within(dialog()).getByText("Saving…")).toBeTruthy();
+    expect((save as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it("reports an out-of-range value on the field without sending it", async () => {
+    const actions = fakeActions();
+    open(snapshotWith({}, { me: host }), { actions, at: afterIt });
+    const input = await within(dialog()).findByLabelText(
+      "How many people attended?"
+    );
+    await userEvent.type(input, "1001");
+    await userEvent.click(
+      within(dialog()).getByRole("button", { name: "Save attendee count" })
+    );
+    expect(input.getAttribute("aria-invalid")).toBe("true");
+    const message = document.getElementById(
+      input.getAttribute("aria-describedby")!
+    );
+    expect(message?.textContent).toContain("1000");
+    expect(actions.attendeeCount.save).not.toHaveBeenCalled();
+  });
+
+  it("shows why a save failed", async () => {
+    const actions = fakeActions();
+    actions.attendeeCount.save.mockResolvedValue({
+      ok: false,
+      message: "Could not save — try again",
+    });
+    open(snapshotWith({}, { me: host }), { actions, at: afterIt });
+    await within(dialog()).findByLabelText("How many people attended?");
+    await userEvent.click(
+      within(dialog()).getByRole("button", { name: "Save attendee count" })
+    );
+    expect(
+      await within(dialog()).findByText("Could not save — try again")
+    ).toBeTruthy();
+  });
+
+  it("takes focus when the follow-up email's link asked for it", async () => {
+    open(snapshotWith({}, { me: host }), {
+      params: "viewSession=s&record=count",
+      at: afterIt,
+    });
+    const input = await within(dialog()).findByLabelText(
+      "How many people attended?"
+    );
+    expect(document.activeElement).toBe(input);
+  });
+
+  it("leaves the follow-up link's focus request behind when closed", async () => {
+    const { onParamsChange } = open(snapshotWith({}, { me: host }), {
+      params: "view=agenda&viewSession=s&record=count",
+      at: afterIt,
+    });
+    await within(dialog()).findByLabelText("How many people attended?");
+    await userEvent.click(
+      within(dialog()).getByRole("button", { name: "Close" })
+    );
+    expect(onParamsChange.mock.calls[0][0].toString()).toBe("view=agenda");
   });
 });
