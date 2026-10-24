@@ -54,6 +54,24 @@ describe("GET /api/v1/health", () => {
     }
   );
 
+  it(
+    "tells the SPA whether the dev tools are on",
+    { tags: ["019-US1"] },
+    async () => {
+      const read = async () =>
+        (
+          (await (
+            await GET(new NextRequest("http://test/api/v1/health"))
+          ).json()) as { devTools: boolean }
+        ).devTools;
+
+      vi.stubEnv("SB_ENABLE_DEV_TOOLS", "");
+      expect(await read()).toBe(false);
+      vi.stubEnv("SB_ENABLE_DEV_TOOLS", "1");
+      expect(await read()).toBe(true);
+    }
+  );
+
   it("tells browsers not to cache it", { tags: ["019-US1"] }, async () => {
     const res = await GET(new NextRequest("http://test/api/v1/health"));
     expect(res.headers.get("cache-control")).toBe("no-store");

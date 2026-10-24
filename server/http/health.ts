@@ -1,6 +1,7 @@
 import { createRoute } from "@hono/zod-openapi";
 import { healthSchema } from "@schellingboard/contracts/health";
 import { getAppVersion } from "@/utils/git";
+import { isDevToolsEnabled } from "@/utils/dev-clock";
 import { getBuildId } from "@/utils/build-id";
 import type { createApp } from "./create-app";
 
@@ -22,6 +23,7 @@ export function addHealthRoute(app: ReturnType<typeof createApp>) {
         status: "ok" as const,
         version: getAppVersion(),
         buildId: getBuildId(),
+        devTools: isDevToolsEnabled(),
       },
       200
     )
