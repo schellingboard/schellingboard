@@ -3,6 +3,7 @@ import {
   DEFAULT_BREAK_MINUTES,
   DEFAULT_SLOT_INCREMENT_MINUTES,
 } from "@schellingboard/domain/slots";
+import type { AttendeesQuery } from "../queries/attendees";
 import type { ScheduleData } from "./data";
 import type { ScheduleLinks } from "./links";
 import { createScheduleMatch, type ScheduleMatch } from "./model";
@@ -15,6 +16,8 @@ export type ScheduleActions = {
   ) => Promise<{ ok: true } | { ok: false; message: string }>;
   /** Asks who the reader is, which an RSVP needs. */
   pickName: () => void;
+  /** The caller destroys the query when done. */
+  attendees: (sessionId: string) => AttendeesQuery;
 };
 
 export type ScheduleContextValue = {

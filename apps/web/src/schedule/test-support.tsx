@@ -40,6 +40,9 @@ export function renderScheduled(
           actions: {
             toggleRsvp: () => Promise.resolve({ ok: true }),
             pickName: () => {},
+            attendees: () => {
+              throw new Error("no attendees in this test");
+            },
           },
         }}
       >

@@ -12,6 +12,7 @@ import {
   ScheduleScreen,
   type ScheduleActions,
 } from "../schedule/schedule-screen";
+import { createAttendeesQuery } from "../queries/attendees";
 import { addRsvp, removeRsvp } from "../commands/rsvp";
 import { Footer } from "./footer";
 import { hardNavigate, hardReload } from "./hard-navigate";
@@ -171,8 +172,9 @@ function Loaded({
           ? { ok: true }
           : { ok: false, message: refusalMessage(outcome.code) };
       },
+      attendees: (sessionId) => createAttendeesQuery({ api, sessionId }),
     }),
-    [runner]
+    [runner, api]
   );
   const phase = getCurrentPhase(eventContextFrom(snapshot).event, now);
 

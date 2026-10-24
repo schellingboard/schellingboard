@@ -5,13 +5,16 @@ export type ScheduleLinks = {
   session: (current: URLSearchParams, sessionId: string) => string;
   meeting: (current: URLSearchParams, meetingId: string) => string;
   addSession: (slot: { location: string; day: string; time: string }) => string;
+  guest: (guestId: string) => string;
+  editSession: (sessionId: string) => string;
+  proposal: (proposalId: string) => string;
   /** Where a free 1-on-1 slot, by its start, is arranged. */
   bookMeeting: (slotStart: string) => string;
 };
 
 /**
- * Where the schedule's links go until the session modal, the meeting modal and
- * the add-session form are SPA screens: the one place to switch.
+ * Where the schedule's links go until the meeting modal, the add-session form
+ * and the pages around the session modal are SPA screens: the one place to switch.
  */
 export function legacyScheduleLinks(eventSlug: string): ScheduleLinks {
   const schedule = `/legacy/${eventSlug}`;
@@ -25,6 +28,11 @@ export function legacyScheduleLinks(eventSlug: string): ScheduleLinks {
     proposals: `${schedule}/proposals`,
     session: over("viewSession"),
     meeting: over("viewMeeting"),
+    guest: (guestId) => `/legacy/guests/${guestId}`,
+    editSession: (sessionId) =>
+      `${schedule}/edit-session?${new URLSearchParams({ sessionID: sessionId })}`,
+    proposal: (proposalId) =>
+      `${schedule}/proposals?${new URLSearchParams({ viewProposal: proposalId })}`,
     addSession: ({ location, day, time }) =>
       `${schedule}/add-session?${new URLSearchParams({ location, time, day })}`,
     bookMeeting: (slotStart) =>

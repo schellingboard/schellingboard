@@ -27,6 +27,7 @@ import {
   includedLocations,
   scheduleEntries,
 } from "./model";
+import { SessionModal } from "./session-modal";
 import { ScheduleFilters } from "./schedule-filters";
 import { ScheduleToolbar, scheduleView } from "./schedule-toolbar";
 import { matchesInReadingOrder } from "./search";
@@ -126,6 +127,7 @@ export function ScheduleScreen({
   const { statusRef, statusHeight } = useStatusHeight();
 
   const kiosk = useKioskMode(params);
+  const viewSession = params.get("viewSession");
   const nowIsOnSchedule = data.days.some(
     (day) => getNowOffsetPx(day, now, data.event.slotIncrementMinutes) !== null
   );
@@ -223,6 +225,16 @@ export function ScheduleScreen({
   return (
     <ScheduleProvider value={{ data, links, params, actions }}>
       {kiosk && <KioskController nowIsOnSchedule={nowIsOnSchedule} />}
+      {viewSession && (
+        <SessionModal
+          sessionId={viewSession}
+          onClose={() => {
+            const updated = new URLSearchParams(params);
+            updated.delete("viewSession");
+            onParamsChange(updated);
+          }}
+        />
+      )}
       <ScheduleMatchProvider value={stepMatch}>
         {/* Both views own the viewport below the nav bar through the same
             fixed frame, so the toolbar rests in the same spot when switching.
