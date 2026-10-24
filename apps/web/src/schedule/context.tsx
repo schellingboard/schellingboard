@@ -4,6 +4,8 @@ import {
   DEFAULT_SLOT_INCREMENT_MINUTES,
 } from "@schellingboard/domain/slots";
 import type { AttendeeCountApi } from "../queries/attendee-count";
+import type { CommentsController } from "../queries/comments-controller";
+import type { CommentsQuery } from "../queries/comments";
 import type { AttendeesQuery } from "../queries/attendees";
 import type { ScheduleData } from "./data";
 import type { ScheduleLinks } from "./links";
@@ -20,6 +22,11 @@ export type ScheduleActions = {
   /** The caller destroys the query when done. */
   attendees: (sessionId: string) => AttendeesQuery;
   attendeeCount: AttendeeCountApi;
+  /** The caller destroys the query when done. */
+  comments: (sessionId: string) => {
+    query: CommentsQuery;
+    controller: CommentsController;
+  };
 };
 
 export type ScheduleContextValue = {

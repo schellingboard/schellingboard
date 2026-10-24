@@ -77,18 +77,34 @@ export function createCommentsQuery({
   return {
     get: state.get,
     subscribe: state.subscribe,
-    loadMore(): Promise<void> {
+    loadMore: (): Promise<void> => {
       if (inFlight) return inFlight;
       if (!state.get().hasMore) return Promise.resolve();
       inFlight = load().finally(() => (inFlight = undefined));
       return inFlight;
     },
-    destroy() {
+    destroy: () => {
       destroyed = true;
     },
-    add(comment: CommentView) {
+    update: (id: string, change: (comment: CommentView) => CommentView) => {
+      const current = state.get();
+      state.set({
+        ...current,
+        items: current.items.map((c) => (c.id === id ? change(c) : c)),
+      });
+    },
+    remove: (id: string) => {
+      const current = state.get();
+      state.set({
+        ...current,
+        items: current.items.filter((c) => c.id !== id),
+      });
+    },
+    add: (comment: CommentView) => {
       const current = state.get();
       state.set({ ...current, items: merge(current.items, [comment]) });
     },
   };
 }
+
+export type CommentsQuery = ReturnType<typeof createCommentsQuery>;

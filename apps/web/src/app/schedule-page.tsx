@@ -1,6 +1,7 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
   useSyncExternalStore,
   type ReactNode,
@@ -13,6 +14,11 @@ import {
   type ScheduleActions,
 } from "../schedule/schedule-screen";
 import { attendeeCountApi } from "../queries/attendee-count";
+import { createCommentsQuery } from "../queries/comments";
+import {
+  createCommentsController,
+  type Liker,
+} from "../queries/comments-controller";
 import { createAttendeesQuery } from "../queries/attendees";
 import { addRsvp, removeRsvp } from "../commands/rsvp";
 import { Footer } from "./footer";
@@ -163,6 +169,13 @@ function Loaded({
   const links = useMemo(() => legacyScheduleLinks(slug), [slug]);
   const viewer = useViewer();
   const [picking, setPicking] = useState(false);
+  const meGuest = snapshot.guests.find((g) => g.id === snapshot.me?.guestId);
+  const meRef = useRef<Liker | null>(null);
+  useEffect(() => {
+    meRef.current = meGuest
+      ? { id: meGuest.id, name: meGuest.name, avatarUrl: meGuest.avatarUrl }
+      : null;
+  }, [meGuest]);
   const actions = useMemo<ScheduleActions>(
     () => ({
       pickName: () => setPicking(true),
@@ -176,6 +189,19 @@ function Loaded({
       },
       attendees: (sessionId) => createAttendeesQuery({ api, sessionId }),
       attendeeCount: attendeeCountApi(api, newKey),
+      comments: (sessionId) => {
+        const subject = { kind: "session", id: sessionId } as const;
+        const query = createCommentsQuery({ api, subject });
+        return {
+          query,
+          controller: createCommentsController({
+            runner,
+            query,
+            subject,
+            me: () => meRef.current,
+          }),
+        };
+      },
     }),
     [runner, api]
   );
