@@ -25,7 +25,8 @@ server/
 The modules are `sessions` (sessions, RSVPs, room unavailability, attendee
 counts), `proposals` (proposals and votes), `comments`, `meetings`, `people`
 (profiles and the admin guest list), `notifications`, `events` (events and
-days), `venue` (locations) and `settings` (site settings).
+days), `venue` (locations), `settings` (site settings) and `updates` (the
+daily GitHub look-up of the latest release, shown to the admin).
 
 The Next mount is `app/api/v1/[[...route]]/route.ts`; `proxy.ts` gates it like
 any other route (site password or admin cookie for `/api/v1`, the admin cookie for

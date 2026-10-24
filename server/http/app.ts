@@ -8,6 +8,7 @@ import {
   proposalUseCases,
   sessionUseCases,
   settingsUseCases,
+  updateUseCases,
   venueUseCases,
 } from "@/server/composition";
 import { addFeedRoutes } from "@/server/feed/routes";
@@ -37,6 +38,7 @@ import {
   addSessionRoutes,
 } from "@/server/modules/sessions/module";
 import { addAdminSettingsRoutes } from "@/server/modules/settings/module";
+import { addAdminUpdateRoutes } from "@/server/modules/updates/module";
 import { addAdminVenueRoutes } from "@/server/modules/venue/module";
 import { actorMiddleware } from "./actor";
 import { createApp } from "./create-app";
@@ -73,3 +75,4 @@ addAdminVenueRoutes(api, venueUseCases);
 addAdminUnavailabilityRoutes(api, sessionUseCases);
 addAdminGuestRoutes(api, peopleUseCases);
 addAdminSettingsRoutes(api, settingsUseCases);
+addAdminUpdateRoutes(api, updateUseCases);

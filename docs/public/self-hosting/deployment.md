@@ -53,6 +53,25 @@ Nothing needs configuring for notifications beyond the certificate: the keys
 they are signed with are generated the first time an attendee turns them on and
 kept in the database, so a restored backup keeps working.
 
+## Updating
+
+Pull the new image and start the container again; your data stays in the volume.
+With `docker compose`:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+With plain `docker`, run `docker pull schellingboard/schellingboard`, then stop and
+remove the container and `docker run` it again with the same options. Database
+changes are applied on start. Take a [backup](backup.md) first.
+
+When you are signed in as admin, a red dot beside the version in the footer says a
+newer release is out; select the version to see both releases and their dates. The
+server looks this up on GitHub at most once a day and shows nothing if it cannot
+reach it. Set `SB_UPDATE_CHECK=false` to turn the lookup off.
+
 ## Administration
 
 Events, guests, locations, and content moderation are managed through the web

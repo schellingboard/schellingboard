@@ -16,6 +16,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Admins see when a newer release is out** (#788): a red dot beside the footer's version
+  names the latest release and links to how to update. Turn the look-up off with `SB_UPDATE_CHECK=false`.
 - **The schedule opens without a connection**: it shows what your device last saved,
   marked as possibly out of date. After a site upgrade an open page offers a reload;
   kiosk screens reload by themselves.

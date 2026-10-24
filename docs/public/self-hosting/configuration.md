@@ -21,6 +21,7 @@ a feature off when unset.
 | `SB_UPLOADS_DIR`                | No       | Dir for admin-uploaded files (default: `./uploads`, `/data/uploads` in Docker)                                                                                                                    |
 | `SB_TRUSTED_PROXIES`            | No       | How many reverse proxies stand in front of the app, e.g. `1` (default: `0`). See [Behind a reverse proxy](#behind-a-reverse-proxy)                                                                |
 | `SB_API_RATE_BURST`             | No       | How many API requests one address (or one open-name attendee behind it) may make in a burst, refilled at 5 per second (default: `1000`). Raise it if many attendees share one venue Wi-Fi address |
+| `SB_UPDATE_CHECK`               | No       | Set to `false` (or `0`, `no`, `off`) to stop the daily look-up of the latest release on GitHub that powers the admin's [update notice](deployment.md#updating) (default: on)                      |
 | `HOST_PORT`                     | No       | Host port to bind (default: `3000`, compose only)                                                                                                                                                 |
 | `SCHELLINGBOARD_VERSION`        | No       | Image tag to run, e.g. a release tag (default: `latest`, compose only)                                                                                                                            |
 | `SMTP_FROM`                     | No       | Sender address for outgoing email                                                                                                                                                                 |
@@ -33,7 +34,7 @@ a feature off when unset.
 | `SITE_URL`                      | No\*     | Public base URL of the site, e.g. `https://sessions.example.org`                                                                                                                                  |
 | `SB_ENABLE_DEV_TOOLS`           | No       | Set to `1` to enable the dev fake clock on a staging/demo instance. Leave unset in production                                                                                                     |
 | `REMINDER_DISPATCH_INTERVAL_MS` | No       | How often to deliver due attendee-count reminders, in milliseconds (default: `60000`). `0` turns them off entirely — nothing else does, email or no email                                         |
-| `API_DOCS`                      | No       | Set to `false` to stop serving the [API reference](api.md#the-openapi-description) and the OpenAPI document (default: served)                                                                     |
+| `API_DOCS`                      | No       | Set to `false` (or `0`, `no`, `off`) to stop serving the [API reference](api.md#the-openapi-description) and the OpenAPI document (default: served)                                               |
 
 ## Behind a reverse proxy
 

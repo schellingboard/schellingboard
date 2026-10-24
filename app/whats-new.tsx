@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { DateTime } from "luxon";
 import { Modal } from "./components/modal";
@@ -7,8 +7,21 @@ import { InlineMarkdown } from "@/app/legacy/(site)/markdown";
 import {
   releaseNotes,
   SHOWN_RELEASES,
+  UPDATE_DOCS_URL,
 } from "@schellingboard/domain/release-notes";
+import type { UpdateStatus } from "@schellingboard/contracts/updates";
 import { getAppVersion } from "@/utils/git";
+
+function useUpdateStatus() {
+  const [status, setStatus] = useState<UpdateStatus | null>(null);
+  useEffect(() => {
+    fetch("/api/v1/updates")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((body: UpdateStatus | null) => setStatus(body))
+      .catch(() => {});
+  }, []);
+  return status?.updateAvailable ? status : null;
+}
 
 const CHANGELOG_URL =
   "https://github.com/schellingboard/schellingboard/blob/main/CHANGELOG.md";
@@ -49,6 +62,7 @@ function Highlights({ highlights }: { highlights: string[] }) {
 export function WhatsNew({ className }: { className?: string }) {
   const [open, setOpen] = useState(false);
   const appVersion = getAppVersion();
+  const behind = useUpdateStatus();
 
   return (
     <>
@@ -58,13 +72,19 @@ export function WhatsNew({ className }: { className?: string }) {
         title="What's new"
         // Spelled out for a screen reader: on a narrow phone the "Version:"
         // label is dropped, leaving a bare number that says nothing on its own.
-        aria-label={`Version ${appVersion} — what's new`}
+        aria-label={`Version ${appVersion} — what's new${behind ? ", update available" : ""}`}
         // focus-visible, not focus: closing the modal hands the focus back
         // here, and a mouse user should not be left with a ring in the footer.
         className={`flex gap-1 rounded-sm text-link hover:text-fg hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent ${className ?? ""}`}
       >
         <span className="hidden sm:block">Version: </span>
         {appVersion}
+        {behind && (
+          <span
+            aria-hidden
+            className="mt-[3px] size-2 shrink-0 rounded-full bg-danger"
+          />
+        )}
       </button>
       {/* Wider than the default: several releases of highlights, each a
           sentence long, read badly in a narrow column. Above the fixed nav bar
@@ -82,6 +102,23 @@ export function WhatsNew({ className }: { className?: string }) {
         <p className="mt-1 text-sm text-fg-subtle">
           This site is running {appVersion}.
         </p>
+        {behind?.latest && (
+          <p className="mt-2 text-sm text-fg">
+            A newer release is out: {behind.latest.version}
+            {behind.latest.date && `, ${formatDate(behind.latest.date)}`}. This
+            site runs {behind.current.version}
+            {behind.current.date &&
+              `, ${formatDate(behind.current.date)}`}.{" "}
+            <a
+              href={UPDATE_DOCS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-link hover:underline"
+            >
+              How to update
+            </a>
+          </p>
+        )}
         <div className="mt-4 space-y-4">
           {releaseNotes.slice(0, SHOWN_RELEASES).map((release) => (
             <section key={release.version}>
