@@ -1,9 +1,10 @@
-import type { ReactNode } from "react";
+import { useState } from "react";
 import { DateTime } from "luxon";
 import type { Location } from "@schellingboard/domain/location";
 import type { Session } from "@schellingboard/domain/session";
 import { isBookableSlot } from "@schellingboard/domain/session-bookable";
 import { formatOptionalTime, TIME_FORMAT } from "@schellingboard/domain/time";
+import { AlertDialog, ConfirmDialog } from "../ui/confirm-dialog";
 import { cx } from "../ui/cx";
 import {
   AcademicCapIcon,
@@ -22,6 +23,7 @@ import {
 } from "./context";
 import type { ColumnItem } from "./column";
 import type { DayWithSessions } from "./model";
+import { describeRsvpClash, findRsvpClash, type RsvpClash } from "./rsvp-clash";
 import {
   PositionedBlock,
   TITLE_MIN_PX,
@@ -273,7 +275,7 @@ function RealSessionCard({
                 <AcademicCapIcon className="h-3 w-3" />
               </div>
             )}
-            <RsvpBadge session={session} />
+            <RsvpBadge session={session} hosting={hosting} />
           </div>
         </div>
       </Tooltip>
@@ -281,12 +283,86 @@ function RealSessionCard({
   );
 }
 
-function RsvpBadge({ session }: { session: Session }): ReactNode {
-  return (
-    <div className="loc-badge flex items-center gap-0.5 rounded-tl px-1 py-[1px] text-[10px]">
+function RsvpBadge({
+  session,
+  hosting,
+}: {
+  session: Session;
+  hosting: boolean;
+}) {
+  const { data, actions } = useSchedule();
+  const [busy, setBusy] = useState(false);
+  const [clash, setClash] = useState<RsvpClash | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const rsvpd = data.rsvpd(session.id);
+
+  const toggle = async () => {
+    setBusy(true);
+    try {
+      const result = await actions.toggleRsvp(session.id, rsvpd);
+      if (!result.ok) setError(result.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  const click = () => {
+    if (!data.guestId) return actions.pickName();
+    if (busy) return;
+    if (!rsvpd) {
+      const found = findRsvpClash(
+        session,
+        data.sessions.filter(
+          (other) =>
+            data.rsvpd(other.id) ||
+            other.hosts.some((h) => h.id === data.guestId)
+        ),
+        data.meetings
+      );
+      if (found) return setClash(found);
+    }
+    void toggle();
+  };
+
+  const count = (
+    <>
       <UserIcon aria-hidden className="h-2.5 w-2.5" />
       {session.numRsvps}
       {session.capacity > 0 && `/${session.capacity}`}
-    </div>
+    </>
+  );
+  const badge =
+    "loc-badge flex items-center gap-0.5 rounded-tl px-1 py-[1px] text-[10px]";
+  if (hosting) return <div className={badge}>{count}</div>;
+  return (
+    <>
+      <button
+        type="button"
+        aria-label={`${rsvpd ? "Withdraw RSVP from" : "RSVP to"} ${session.title}`}
+        onClick={click}
+        className={cx(badge, "cursor-pointer hover:opacity-80")}
+      >
+        {count}
+      </button>
+      <ConfirmDialog
+        open={clash !== null}
+        title="Clashing commitment"
+        message={
+          clash
+            ? `This session clashes with ${describeRsvpClash(clash, data.guestId)}. Do you want to RSVP anyway?`
+            : ""
+        }
+        onConfirm={() => {
+          setClash(null);
+          void toggle();
+        }}
+        onCancel={() => setClash(null)}
+      />
+      <AlertDialog
+        open={error !== null}
+        title="RSVP"
+        message={error ?? ""}
+        onClose={() => setError(null)}
+      />
+    </>
   );
 }

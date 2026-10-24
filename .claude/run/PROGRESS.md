@@ -248,7 +248,7 @@
 
 ## Next step
 
-13f.
+13g.
 
 ## Questions
 
@@ -370,3 +370,11 @@
   need them to the legacy schedule; the Next schedule page therefore stays until step 16, and then for
   the meeting modal (`viewMeeting`) until the meetings family moves. PLAN steps 13f-g, 14, 16 changed.
 - Open: the SPA picker offers only the snapshot's guests (members and hosts).
+
+## Step 13f (2026-10-09)
+
+- The grid block's RSVP badge is a button (`RSVP to X` / `Withdraw RSVP from X`; a host's own session
+  keeps a plain badge), as in legacy: no viewer asks for a name (`NamePicker`, now exported; choosing
+  one reopens the event as them, the click is not replayed), an overlapping session or accepted 1-on-1
+  asks first (`schedule/rsvp-clash.ts`, copied with its test), a refusal shows its message. The page
+  maps the runner's outcome code to the server's wording; `ScheduleActions` is the screen's way out.

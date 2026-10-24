@@ -107,7 +107,7 @@ export function UserMenu({
   );
 }
 
-function NamePicker({
+export function NamePicker({
   open,
   onClose,
   guests,

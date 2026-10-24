@@ -1,6 +1,12 @@
 import { useMemo, useRef, useState, type ReactNode } from "react";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
-import { ScheduleMatchProvider, ScheduleProvider } from "./context";
+import {
+  ScheduleMatchProvider,
+  ScheduleProvider,
+  type ScheduleActions,
+} from "./context";
+
+export type { ScheduleActions };
 import { scheduleDataFrom } from "./data";
 import { AgendaView } from "./agenda-view";
 import {
@@ -45,6 +51,7 @@ export function ScheduleScreen({
   sync,
   footer,
   onReload,
+  actions,
 }: {
   snapshot: Snapshot;
   now: Date;
@@ -55,6 +62,7 @@ export function ScheduleScreen({
   footer: ReactNode;
   /** What a deliberate pull down from the top does. */
   onReload: () => void;
+  actions: ScheduleActions;
 }) {
   const data = useMemo(() => scheduleDataFrom(snapshot, now), [snapshot, now]);
   const view = scheduleView(params);
@@ -211,7 +219,7 @@ export function ScheduleScreen({
   );
 
   return (
-    <ScheduleProvider value={{ data, links, params }}>
+    <ScheduleProvider value={{ data, links, params, actions }}>
       <ScheduleMatchProvider value={stepMatch}>
         {/* Both views own the viewport below the nav bar through the same
             fixed frame, so the toolbar rests in the same spot when switching.
