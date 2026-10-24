@@ -3,6 +3,7 @@ import type { ApiClient } from "@schellingboard/api-client";
 import { DevToolbar } from "./dev-toolbar";
 import { ErrorBoundary } from "./error-boundary";
 import { Footer } from "./footer";
+import { HeaderLinks } from "./header-links";
 import { useHealth } from "./health";
 import { Layout } from "./layout";
 import { NavBar, type NavItem } from "./nav-bar";
@@ -25,6 +26,7 @@ export function ShellFrame({
     <Layout
       nav={
         <NavBar items={events} currentPath={currentPath}>
+          <HeaderLinks api={api} signedIn={!!viewer.guestId} />
           <UserMenu viewer={viewer} guests={guests} />
         </NavBar>
       }

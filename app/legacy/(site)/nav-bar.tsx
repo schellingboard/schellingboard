@@ -9,6 +9,7 @@ import {
 import clsx from "clsx";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { AppLink } from "@/app/components/app-link";
 import { MapModal } from "./modals";
 import { HeaderUserSelect } from "./header-user-select";
 import { EVENT_ICONS } from "@/app/event-icons";
@@ -143,7 +144,7 @@ function NavBarItem(props: { item: NavItem; highlightCurrent: boolean }) {
     highlightCurrent && pathname.includes(item.href) && item.href != null;
   const Icon = item.icon ? EVENT_ICONS[item.icon] : null;
   return (
-    <Link
+    <AppLink
       key={item.name}
       href={item.href}
       className={clsx(
@@ -155,7 +156,7 @@ function NavBarItem(props: { item: NavItem; highlightCurrent: boolean }) {
     >
       {Icon && <Icon className="block h-5 w-auto" />}
       {item.name}
-    </Link>
+    </AppLink>
   );
 }
 

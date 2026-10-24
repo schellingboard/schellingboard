@@ -20,7 +20,7 @@ export default async function Home() {
     );
   } else if (sortedEvents.length === 1) {
     const eventSlug = sortedEvents[0].slug;
-    redirect(`/legacy/${eventSlug}`);
+    redirect(`/${eventSlug}`);
   } else {
     return <p>No events found.</p>;
   }

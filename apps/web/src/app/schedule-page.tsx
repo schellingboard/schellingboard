@@ -62,7 +62,7 @@ function ScheduleHost({
   const { api } = services;
   const viewer = useViewer();
   const [, , search] = useUrlSearchParams();
-  const events = useEvents(api, (eventSlug) => `/legacy/${eventSlug}`);
+  const events = useEvents(api, (eventSlug) => `/${eventSlug}`);
   const session = useScheduleSession({
     api,
     slug,
@@ -85,7 +85,7 @@ function ScheduleHost({
         name: g.name,
         authProtected: g.authProtected,
       }))}
-      currentPath={`/legacy/${slug}`}
+      currentPath={`/${slug}`}
       search={search}
       onClockChange={hardReload}
     >

@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import {
   useEffect,
   useId,
@@ -63,10 +64,12 @@ export function Dialog({
   };
 
   if (!open) return null;
-  return (
+  // In the body: a dialog opened from the fixed nav bar would otherwise sit in
+  // its stacking context, under anything fixed further down the page.
+  return createPortal(
     <div
       data-testid="dialog-backdrop"
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4"
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4"
       onClick={onClose}
     >
       <div
@@ -92,6 +95,7 @@ export function Dialog({
         </button>
         <div className="mt-3">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

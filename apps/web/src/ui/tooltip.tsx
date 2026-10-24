@@ -19,8 +19,8 @@ const EDGE_PX = 8;
 /**
  * A panel for what its trigger has no room for. By default hover (at rest)
  * and focus open it and the trigger stays whatever it wraps; `toggleable`
- * makes the trigger a button that opens it on a tap and closes it on Escape
- * or a press outside. No `content` renders the children alone.
+ * makes the trigger a button that also opens it on a tap and closes it on a
+ * second tap, Escape or a press outside. No `content` renders the children alone.
  */
 export function Tooltip({
   content,
@@ -103,6 +103,11 @@ export function Tooltip({
       )
     : null;
 
+  const rested = () => {
+    clearTimeout(rest.current);
+    rest.current = setTimeout(show, REST_MS);
+  };
+
   if (toggleable)
     return (
       <>
@@ -112,6 +117,9 @@ export function Tooltip({
           aria-expanded={open}
           aria-describedby={open ? id : undefined}
           onClick={() => setOpen((o) => !o)}
+          onMouseEnter={rested}
+          onMouseMove={() => !open && rested()}
+          onMouseLeave={hide}
           className={triggerClassName}
         >
           {children}
@@ -125,16 +133,8 @@ export function Tooltip({
       ref={trigger as React.RefObject<HTMLDivElement>}
       className={cx(className, triggerClassName)}
       aria-describedby={open ? id : undefined}
-      onMouseEnter={() => {
-        clearTimeout(rest.current);
-        rest.current = setTimeout(show, REST_MS);
-      }}
-      onMouseMove={() => {
-        if (!open) {
-          clearTimeout(rest.current);
-          rest.current = setTimeout(show, REST_MS);
-        }
-      }}
+      onMouseEnter={rested}
+      onMouseMove={() => !open && rested()}
       onMouseLeave={hide}
       onFocus={show}
       onBlur={hide}

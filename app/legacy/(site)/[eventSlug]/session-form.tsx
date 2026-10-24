@@ -434,7 +434,7 @@ export function SessionForm(props: {
 
   return (
     <div className="flex flex-col gap-4">
-      <BackLink href={`/legacy/${event.slug}`}>Schedule</BackLink>
+      <BackLink href={`/${event.slug}`}>Schedule</BackLink>
       <div>
         <h2 className="text-2xl font-bold">
           {eventName}: {sessionID ? "Edit" : "Add a"} session
@@ -670,7 +670,7 @@ export function SessionForm(props: {
         </div>
       )}
       <FormActions
-        cancelHref={`/legacy/${event.slug}`}
+        cancelHref={`/${event.slug}`}
         deleteButton={
           sessionID && (
             <ConfirmDeletionModal

@@ -378,3 +378,24 @@
   one reopens the event as them, the click is not replayed), an overlapping session or accepted 1-on-1
   asks first (`schedule/rsvp-clash.ts`, copied with its test), a refusal shows its message. The page
   maps the runner's outcome code to the server's wording; `ScheduleActions` is the screen's way out.
+
+## Step 13g (2026-10-09)
+
+- The router owns `/{slug}` and renders the SPA schedule. `kiosk` (query or cookie), `viewSession` and
+  `viewMeeting` hand the address to the legacy schedule (`app/forwards-to-legacy.ts`); a static route per
+  legacy root page (`app/legacy-pages.ts`, checked against `app/legacy/` by a unit test) keeps a slug from
+  shadowing `/settings` etc. Legacy links to the schedule point at `/{slug}` (`AppLink`, plain anchor);
+  `POST /api/auth/logout` serves the SPA's sign-out; header links and user menu in the SPA shell.
+- E2E fixture opens `/{slug}` as the SPA's own; specs that open the legacy session modal start on
+  `/legacy/...` (attendee-count, rsvp, scheduling, update-session, add-session): arriving from the SPA,
+  a click can land before the legacy page hydrates.
+- Attendee-count after an SPA->legacy hop (reviewer 2): isolated with a probe. Host "Edit" link and the
+  dev clock (15:00 UTC, +335h) are right, and the field appears within ~200 ms. Only
+  `attendee-count.spec` "saving announces..." (with its `page.route`) stays red on the SPA path, so the
+  cause is not the clock or `isHost`; unexplained, specs start on `/legacy/...` meanwhile (Questions).
+- Saving or deleting a session still lands on `/legacy/{slug}` (reviewer 3 rejected): a hard navigation to the
+  SPA drops the confirmation toast, which is client state (11 specs failed when tried). The SPA needs its own toast first.
+- Final E2E: `make test-e2e-docker` 209 passed; `make test-e2e` 208 passed, 1 flaky
+  (live-schedule.spec:62, passed on retry; it flaked earlier in this step too, as did voting:140 and
+  live-schedule:112, specs this step does not touch).
+- Questions: user-menu roles (menu/combobox) copy the legacy markup without arrow keys; left as is.
