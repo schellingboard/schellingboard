@@ -122,6 +122,11 @@ another attendee changes a session or RSVPs, so you don't need to reload it.
 A note at the top right of the toolbar says **Live**, **Reconnecting…**, or
 **Not updating: may be out of date**. Reload the page if it stays that way.
 
+The schedule also opens without a connection, showing what your device saved
+the last time you looked, marked **Not updating: may be out of date**. Open it
+once while online first. When the site is upgraded while a page is open, a note
+at the bottom offers a **Reload**; a kiosk screen reloads by itself.
+
 ![Scheduling grid with rooms as columns and time slots as rows, and a first column holding the viewer's own 1-on-1s](../screenshots/schedule-grid.webp)
 
 A room name with an **ⓘ** next to it has more to say — tap it (or hover it)

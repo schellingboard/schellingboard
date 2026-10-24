@@ -16,6 +16,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **The schedule opens without a connection**: it shows what your device last saved,
+  marked as possibly out of date. After a site upgrade an open page offers a reload;
+  kiosk screens reload by themselves.
 - **The schedule updates without a reload** (#1111): session changes, RSVP counts, rooms
   and days appear for everyone as they happen, in the grid, agenda and kiosk. A note
   on the schedule says when it is live, reconnecting, or not updating.

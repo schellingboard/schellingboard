@@ -38,13 +38,20 @@ export async function openReplica({
   };
 }
 
-/** Saves the replica shortly after it last changed; returns the stopper. */
+/**
+ * Saves the replica shortly after it last changed; returns the stopper. A
+ * `fresh` replica came from the network and has nothing saved yet, so it is
+ * saved even if it never changes.
+ */
 export function autosaveReplica(
   store: ReplicaStore,
-  persistence: Pick<ReplicaPersistence, "save">
+  persistence: Pick<ReplicaPersistence, "save">,
+  { fresh = false }: { fresh?: boolean } = {}
 ) {
   let last = store.get();
   let timer: ReturnType<typeof setTimeout> | undefined;
+  if (fresh)
+    timer = setTimeout(() => void persistence.save(last), SAVE_AFTER_MS);
   const unsubscribe = store.subscribe(() => {
     if (store.get() === last) return;
     last = store.get();

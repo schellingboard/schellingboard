@@ -193,8 +193,8 @@ describe("the schedule page", () => {
       ).toBe("/other");
       expect(screen.getByText("Live")).toBeTruthy();
       expect(
-        await screen.findByRole("button", { name: /Version 4.1.0/ })
-      ).toBeTruthy();
+        (await screen.findAllByRole("button", { name: /Version 4.1.0/ })).length
+      ).toBeGreaterThan(0);
     }
   );
 

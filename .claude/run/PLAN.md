@@ -171,12 +171,12 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
       leftover comment, update-session:29 "Un-RSVP", rsvp:91, session-comments:289):
       suspected RSVP/Like click before the viewer or replica is ready. Investigated
       under load. Cause: the E2E browsers share one per-address API rate limit (429 on RSVP, like and comment calls); fixed with `SB_API_RATE_BURST` in `.env.test`.
-- [ ] 17. **Offline and reload offer**: `sw.js` precaches the shell and `/_spa/`
+- [x] 17. **Offline and reload offer**: `sw.js` precaches the shell and `/_spa/`
       assets and serves the shell for SPA navigations offline; never caches
       `/api/**` or `/legacy/**`; push unchanged. The SPA compares the running
       build id with `/api/v1/health` and offers a reload (a kiosk reloads by itself). E2E: open the schedule,
-      go offline, reopen it, see it marked as not current. Full `make test-e2e`
-      and `make test-e2e-docker`. CHANGELOG, `docs/public/`.
+      go offline, reopen it, see it marked as not current. Full `make test-e2e`.
+      (`make test-e2e-docker` is not run; user decision, only shortly before a release.) CHANGELOG, `docs/public/`.
 - [ ] 18. **Upstream release check (#788)**: the server checks the GitHub
       releases feed at most daily and caches the result (browsers never contact
       GitHub); an endpoint returns current and latest version and date; the SPA
@@ -189,7 +189,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
 - [ ] 19. **Docs**: `04-client.md`, `07-repo-and-rules.md` and `10-path-from-here.md`
       against the code (step 5 started, schedule moved); `docs/dev/server.md`;
       public docs and CHANGELOG checked; release-notes highlights. Final
-      `make test-e2e-docker`.
+      (No `make test-e2e-docker`; user decision, only before a release.)
 - [ ] 20. **Finish**: summary in PROGRESS.md, then delete `.claude/run/`.
 
 ## Next to plan

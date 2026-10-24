@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import { fakeApi, problem } from "../commands/fake-api";
 import { useViewer, ViewerProvider } from "./viewer";
 
@@ -21,6 +21,7 @@ const clear = vi.fn().mockResolvedValue(undefined);
 
 function setup(who: Who, handler?: Parameters<typeof fakeApi>[0]) {
   clear.mockClear();
+  localStorage.clear();
   const fake = fakeApi(
     handler ??
       ((call) => {
@@ -128,6 +129,29 @@ describe("ViewerProvider", () => {
     expect(clear).toHaveBeenCalledTimes(1);
   });
 
+  it("keeps the name taken while the first answer was still on its way", async () => {
+    let answerFirst!: () => void;
+    const slow = new Promise<void>((resolve) => (answerFirst = resolve));
+    const { viewer } = setup(null, async (call) => {
+      if (call.method === "PUT")
+        return Response.json({
+          guestId: (call.body as { guestId: string }).guestId,
+        });
+      await slow;
+      return Response.json({ guestId: null });
+    });
+
+    await act(async () => {
+      await viewer().choose("g2");
+    });
+    await act(async () => {
+      answerFirst();
+      await slow;
+    });
+
+    expect(await screen.findByText("as g2")).toBeTruthy();
+  });
+
   it("asks again when the first answer fails", async () => {
     vi.useFakeTimers();
     let calls = 0;
@@ -148,5 +172,65 @@ describe("ViewerProvider", () => {
     });
     await new Promise((r) => setTimeout(r, 20));
     expect(screen.getByText("loading")).toBeTruthy();
+  });
+
+  describe("with the server out of reach", () => {
+    const unreachable = () => {
+      throw new TypeError("offline");
+    };
+
+    const offline = () =>
+      render(
+        <ViewerProvider api={fakeApi(unreachable).api} persistence={{ clear }}>
+          <Probe onViewer={() => {}} />
+        </ViewerProvider>
+      );
+
+    it("acts as the name last known on this device", async () => {
+      setup("g1");
+      await screen.findByText("as g1");
+      cleanup();
+
+      offline();
+      expect(await screen.findByText("as g1")).toBeTruthy();
+    });
+
+    it("does not act as the remembered name when the server answers with an error", async () => {
+      setup("g1");
+      await screen.findByText("as g1");
+      cleanup();
+
+      render(
+        <ViewerProvider
+          api={fakeApi(() => new Response(null, { status: 429 })).api}
+          persistence={{ clear }}
+        >
+          <Probe onViewer={() => {}} />
+        </ViewerProvider>
+      );
+      await new Promise((r) => setTimeout(r, 20));
+      expect(screen.getByText("loading")).toBeTruthy();
+    });
+
+    it("remembers an anonymous viewer too", async () => {
+      setup(null);
+      await screen.findByText("as null");
+      cleanup();
+
+      offline();
+      expect(await screen.findByText("as null")).toBeTruthy();
+    });
+
+    it("remembers the name taken after the first answer", async () => {
+      const { viewer } = setup(null);
+      await screen.findByText("as null");
+      await act(async () => {
+        await viewer().choose("g2");
+      });
+      cleanup();
+
+      offline();
+      expect(await screen.findByText("as g2")).toBeTruthy();
+    });
   });
 });

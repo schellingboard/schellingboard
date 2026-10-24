@@ -70,7 +70,7 @@ legacy login. The `selectUserAction` server action calls the same use case.
 [ADR 0014](adr/0014-change-feed-and-snapshot.md) has the decisions.
 `GET /api/v1/events/{slug}/snapshot` returns what one viewer may see of an
 event, with the `seq` of the newest change it includes and the server's `now`
-(the dev fake clock included); the feed's `ping` events carry `now` too, so a
+(the dev fake clock included); the feed's `ping` events (one as the stream opens, so the browser sees it open at once on a quiet event, then every 25 s) carry `now` too, so a
 client keeps its clock offset current. A ping reads the `time-override` cookie once, when the stream opens; changing the fake clock takes a reconnect. `GET
 /api/v1/events/{slug}/feed?since=` is a Server-Sent Events stream: it replays
 the `changes` table after `since`, then follows live changes registered with
@@ -89,8 +89,7 @@ the `changeNotifications` reaction notify the session's RSVPed guests, never its
 hosts; event and guest deletes record none.
 
 `GET /api/v1/health` also names the `version` and the `buildId` (Next's
-`.next/BUILD_ID`, the version outside a production build). A client that sees
-the build id change offers a reload. It stays behind the site password.
+`.next/BUILD_ID`, the version outside a production build). The SPA shell carries the build id it was served by (`<meta name="sb-build">`, added by `serveSpaShell`); a client that sees `health` report another one offers a reload, and a kiosk reloads by itself. It stays behind the site password.
 
 The in-app release notes live in `packages/domain/src/release-notes.ts` so the
 Next footer and the SPA import the same data.

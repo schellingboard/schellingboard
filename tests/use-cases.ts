@@ -443,6 +443,11 @@ export const features = {
         actor: "attendee",
         priority: "P1",
       },
+      US5: {
+        title: "Attendee opens the schedule without a connection",
+        actor: "attendee",
+        priority: "P2",
+      },
     },
   },
   "015": {

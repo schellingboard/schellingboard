@@ -47,15 +47,22 @@ function open(
   );
 }
 
-function reader(res: Response) {
+// The stream opens with a ping so the browser sees it open at once; tests of
+// anything else read past it.
+function reader(res: Response, { keepOpeningPing = false } = {}) {
   const r = res.body!.getReader();
   const decoder = new TextDecoder();
   let first = true;
+  let opened = keepOpeningPing;
   return {
     async next({ raw = false } = {}): Promise<string | null> {
       const { value, done } = await r.read();
       if (done) return null;
       const text = decoder.decode(value);
+      if (!opened && text.startsWith("event: ping")) {
+        opened = true;
+        return this.next({ raw });
+      }
       const wasFirst = first;
       first = false;
       return wasFirst && !raw ? text.replace(/^retry: \d+\n/, "") : text;
@@ -178,8 +185,13 @@ describe("GET /events/{slug}/feed", () => {
       ],
     });
     vi.setSystemTime(new Date("2026-06-15T10:00:00.000Z"));
-    const stream = reader(await open(event.slug, `?since=${last.seq}`));
+    const stream = reader(await open(event.slug, `?since=${last.seq}`), {
+      keepOpeningPing: true,
+    });
 
+    expect(await stream.next({ raw: true })).toBe(
+      'retry: 1000\nevent: ping\ndata: {"now":"2026-06-15T10:00:00.000Z"}\n\n'
+    );
     const beat = stream.next();
     await vi.advanceTimersByTimeAsync(25_000);
     expect(await beat).toBe(
@@ -209,8 +221,10 @@ describe("GET /events/{slug}/feed", () => {
         `?since=${last.seq}`,
         { cookie: "time-override=3600000" },
         aborted.signal
-      )
+      ),
+      { keepOpeningPing: true }
     );
+    expect(await stream.next()).toContain("2026-06-15T11:00:00.000Z");
     const beat = stream.next();
     await vi.advanceTimersByTimeAsync(25_000);
     expect(await beat).toBe(

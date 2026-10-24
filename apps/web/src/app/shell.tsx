@@ -2,11 +2,14 @@ import type { ReactNode } from "react";
 import type { ApiClient } from "@schellingboard/api-client";
 import { DevToolbar } from "./dev-toolbar";
 import { ErrorBoundary } from "./error-boundary";
+import { useKioskMode } from "../schedule/kiosk";
 import { Footer } from "./footer";
+import { hardReload } from "./hard-navigate";
 import { HeaderLinks } from "./header-links";
 import { useHealth } from "./health";
 import { Layout } from "./layout";
 import { NavBar, type NavItem } from "./nav-bar";
+import { ReloadOffer } from "./reload-offer";
 import { ThemeProvider } from "./theme";
 import { UserMenu, type PickableGuest } from "./user-menu";
 import { useViewer, ViewerProvider } from "./viewer";
@@ -22,6 +25,7 @@ export function ShellFrame({
 }: ShellProps) {
   const health = useHealth(api);
   const viewer = useViewer();
+  const kiosk = useKioskMode(new URLSearchParams(search));
   return (
     <Layout
       nav={
@@ -32,6 +36,7 @@ export function ShellFrame({
       }
       footer={<Footer version={health?.version} />}
     >
+      <ReloadOffer api={api} kiosk={kiosk} onReload={hardReload} />
       <ErrorBoundary resetKey={currentPath}>{children}</ErrorBoundary>
       <DevToolbar
         enabled={health?.devTools ?? false}
