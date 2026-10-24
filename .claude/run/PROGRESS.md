@@ -248,7 +248,7 @@
 
 ## Next step
 
-13e.
+13f.
 
 ## Questions
 
@@ -355,3 +355,18 @@
   hover summary's clash lines are empty: the replica holds no other guest's RSVPs.
 - Legacy refetches the meetings on mount and on feed changes (`/api/meetings`); the SPA reads
   them straight from the replica, which the feed keeps current.
+
+## Step 13e (2026-10-09)
+
+- `replica/session.ts` (`startReplicaSession`): `openReplica` + `connectFeed` + `autosaveReplica` +
+  hidden-tab (30 s) and back/forward-cache handling, tested with fake sources. `app/use-schedule-session`
+  keys it by (slug, viewer from `useViewer()`, retry): a viewer change closes the feed and the runner and
+  opens the event again; 404 is `missing`, other failures `failed` with a retry. `app/schedule-page.tsx`
+  composes events nav (`GET /api/v1/events`), the snapshot's guests for the picker, `useServerNow`, the
+  proposals redirect for a non-scheduling phase, the deleted-event message; `Shell` split into
+  `ShellProviders` + `ShellFrame`. Tested through a test-local router; not routed.
+- User decision (2026-10-09): no preview route or flag. The SPA takes `/{slug}` itself (13g). Because
+  the session modal (15), kiosk (14) and the meeting modal are not SPA yet, 13g forwards the queries that
+  need them to the legacy schedule; the Next schedule page therefore stays until step 16, and then for
+  the meeting modal (`viewMeeting`) until the meetings family moves. PLAN steps 13f-g, 14, 16 changed.
+- Open: the SPA picker offers only the snapshot's guests (members and hosts).

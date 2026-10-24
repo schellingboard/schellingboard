@@ -10,7 +10,7 @@ import { ThemeProvider } from "./theme";
 import { UserMenu, type PickableGuest } from "./user-menu";
 import { useViewer, ViewerProvider } from "./viewer";
 
-function Frame({
+export function ShellFrame({
   api,
   events,
   guests,
@@ -18,7 +18,7 @@ function Frame({
   search,
   onClockChange,
   children,
-}: Props) {
+}: ShellProps) {
   const health = useHealth(api);
   const viewer = useViewer();
   return (
@@ -40,7 +40,7 @@ function Frame({
   );
 }
 
-type Props = {
+export type ShellProps = {
   api: ApiClient;
   events: NavItem[];
   guests: PickableGuest[];
@@ -50,13 +50,26 @@ type Props = {
   children: ReactNode;
 };
 
-/** Everything around a screen. Not mounted by the router until step 13. */
-export function Shell(props: Props) {
+/** The theme and the viewer, for a screen that needs the viewer to load its data. */
+export function ShellProviders({
+  api,
+  children,
+}: {
+  api: ApiClient;
+  children: ReactNode;
+}) {
   return (
     <ThemeProvider>
-      <ViewerProvider api={props.api}>
-        <Frame {...props} />
-      </ViewerProvider>
+      <ViewerProvider api={api}>{children}</ViewerProvider>
     </ThemeProvider>
+  );
+}
+
+/** Everything around a screen. */
+export function Shell(props: ShellProps) {
+  return (
+    <ShellProviders api={props.api}>
+      <ShellFrame {...props} />
+    </ShellProviders>
   );
 }
