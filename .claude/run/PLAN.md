@@ -167,6 +167,10 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
       Next schedule page and components, `replica/` and the overlay; convert
       `session-comments.test.ts`, `session-comment-likes.test.ts` and the idempotency
       and guard tests off `createSessionComment`, then delete that action.
+- [x] 16d. **E2E flakes after step 16** (session-comments:219 whose retry sees a
+      leftover comment, update-session:29 "Un-RSVP", rsvp:91, session-comments:289):
+      suspected RSVP/Like click before the viewer or replica is ready. Investigated
+      under load. Cause: the E2E browsers share one per-address API rate limit (429 on RSVP, like and comment calls); fixed with `SB_API_RATE_BURST` in `.env.test`.
 - [ ] 17. **Offline and reload offer**: `sw.js` precaches the shell and `/_spa/`
       assets and serves the shell for SPA navigations offline; never caches
       `/api/**` or `/legacy/**`; push unchanged. The SPA compares the running

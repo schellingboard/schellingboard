@@ -474,3 +474,27 @@
 - After review: `make test-e2e` 203 passed, 2 failed (session-comments:219 whose retry sees the first attempt's
   comment, update-session:29 "Un-RSVP" not shown; both pass in isolation, 3/3), 2 flaky. `make test-e2e-docker`
   207 passed, 2 flaky, none failed.
+
+## Step 16d (2026-10-16)
+
+- Hunt for the flakes seen after step 16 (session-comments:219, update-session:29, rsvp:91,
+  session-comments:289). Under load: 3 runs of those 4 specs plus view-session at 8 workers, retries off (all
+  green), and 2 full `playwright test --retries=0` runs (209 tests): 208 and 205 passed; the failures were
+  unrelated (settings:67 `NS_ERROR_FAILURE` on goto; profile-comments:95 and profile:577). None of the four
+  reproduced. `--repeat-each` is useless here: repeats share one database and collide on comments and slots.
+- Read the code for the suspected race: `useRsvp.click` opens the name picker when `data.guestId` is empty,
+  but `useScheduleSession` shows "Loading..." (no modal, no RSVP button) until the replica for the new viewer
+  is ready, and a viewer switch drops the old session at once, so a click cannot reach a half-ready viewer.
+  No app change made.
+- Questions: cause of the four flakes unknown. Likeliest left: update-session:29's RSVP meeting a clash
+  confirm (Bob RSVPs while a parallel spec holds an overlapping slot; the spec's own comment warns of it).
+  Next time one fails, keep the first attempt's trace (`--trace=retain-on-failure`, `--retries=0`).
+- Update: the cause is the API rate limit. Open-name guests share one bucket per address (burst 1000 now, was
+  300; 5/s) and every E2E browser comes from one address, so under load RSVP, like and comment calls got 429
+  ("Failed to update RSVP"). `.env.test` sets `SB_API_RATE_BURST`; the variable is documented in the
+  self-hosting configuration page. A baseline run showed 2 failed + 5 flaky; with the burst raised, 209 passed
+  - 2 flaky (unrelated).
+- Questions: at a real event all attendees on one venue Wi-Fi address (or all, with `SB_TRUSTED_PROXIES`
+  unset: bucket "unknown") share one open-name bucket, and the SPA sends every open, identity call, snapshot,
+  comment, RSVP and feed reconnect through it. Should open-name guests be keyed by address plus guest cookie,
+  with a cap per address? (The cookie is unsigned: any id buys a fresh bucket, hence the cap.)

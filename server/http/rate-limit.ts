@@ -1,6 +1,6 @@
 import { createMiddleware } from "hono/factory";
 import type { Actor } from "@/server/kernel/actor";
-import { API_LIMIT, clientIp, takeToken } from "@/server/kernel/rate-limit";
+import { apiLimit, clientIp, takeToken } from "@/server/kernel/rate-limit";
 import type { ApiEnv } from "./actor";
 import { problemResponse } from "./problem";
 
@@ -16,7 +16,7 @@ export const rateLimitMiddleware = (exempt: string[]) =>
     if (exempt.includes(c.req.path)) return next();
     const wait = takeToken(
       bucketKey(c.var.actor, c.req.raw.headers),
-      API_LIMIT
+      apiLimit()
     );
     if (wait === 0) return next();
     const res = problemResponse({
