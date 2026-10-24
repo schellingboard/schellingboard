@@ -9,9 +9,12 @@ describe("scheduleStaysInLegacy", () => {
     expect(scheduleStaysInLegacy("")).toBe(false);
   });
 
-  it("is true while a session or 1-on-1 modal is asked for", () => {
-    expect(scheduleStaysInLegacy("?viewSession=s1")).toBe(true);
+  it("is true while a 1-on-1 modal is asked for", () => {
     expect(scheduleStaysInLegacy("?view=agenda&viewMeeting=m1")).toBe(true);
+  });
+
+  it("is false for the session modal, which the SPA shows itself", () => {
+    expect(scheduleStaysInLegacy("?viewSession=s1")).toBe(false);
   });
 
   it("is false for kiosk mode, which the SPA shows itself", () => {

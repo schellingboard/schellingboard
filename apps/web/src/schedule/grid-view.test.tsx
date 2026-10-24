@@ -62,7 +62,7 @@ describe("GridView", () => {
     renderScheduled(<Grid data={dataOf()} />);
     expect(screen.getByRole("heading", { name: "Room" })).toBeTruthy();
     const link = screen.getByRole("link", { name: "Talk" });
-    expect(link.getAttribute("href")).toBe("/legacy/conf?viewSession=s");
+    expect(link.getAttribute("href")).toBe("/conf?viewSession=s");
   });
 
   it("labels the time axis in the event's zone, not the ambient one", () => {

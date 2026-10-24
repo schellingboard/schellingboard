@@ -80,6 +80,7 @@ function open(
   { params = "viewSession=s", actions = fakeActions(), at = iso(9) } = {}
 ) {
   const onParamsChange = vi.fn<(params: URLSearchParams) => void>();
+  const onBack = vi.fn();
   render(
     <ScheduleScreen
       snapshot={snapshot}
@@ -87,13 +88,15 @@ function open(
       links={legacyScheduleLinks("conf")}
       params={new URLSearchParams(params)}
       onParamsChange={onParamsChange}
+      onHashChange={() => {}}
+      onBack={onBack}
       sync={null}
       footer={null}
       onReload={() => {}}
       actions={actions}
     />
   );
-  return { onParamsChange, actions };
+  return { onParamsChange, onBack, actions };
 }
 
 const dialog = () => screen.getByRole("dialog", { name: "Session details" });

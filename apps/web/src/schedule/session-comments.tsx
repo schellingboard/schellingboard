@@ -119,6 +119,7 @@ export function SessionComments({ sessionId }: { sessionId: string }) {
           {roots.map((node) => (
             <Thread
               key={node.id}
+              sessionId={sessionId}
               node={node}
               depth={0}
               controller={handle.controller}
@@ -157,6 +158,7 @@ export function SessionComments({ sessionId }: { sessionId: string }) {
 }
 
 function Thread({
+  sessionId,
   node,
   depth,
   controller,
@@ -165,6 +167,7 @@ function Thread({
   highlighted,
   highlight,
 }: {
+  sessionId: string;
   node: Node;
   depth: number;
   controller: CommentsController;
@@ -173,7 +176,7 @@ function Thread({
   highlighted: string | null;
   highlight: (id: string) => void;
 }) {
-  const { links } = useSchedule();
+  const { links, params, setHash } = useSchedule();
   const [collapsed, setCollapsed] = useState(false);
   const [editing, setEditing] = useState(false);
   const [replying, setReplying] = useState(false);
@@ -236,11 +239,11 @@ function Thread({
                 <span className="font-medium text-fg-muted">Unknown</span>
               )}
               <a
-                href={`#comment-${node.id}`}
+                href={`${links.session(params, sessionId)}#comment-${node.id}`}
                 onClick={(e) => {
                   e.preventDefault();
                   highlight(node.id);
-                  window.history.replaceState(null, "", `#comment-${node.id}`);
+                  setHash(`#comment-${node.id}`);
                 }}
                 className="text-xs text-fg-muted hover:text-fg hover:underline"
               >
@@ -340,6 +343,7 @@ function Thread({
             {node.replies.map((reply) => (
               <Thread
                 key={reply.id}
+                sessionId={sessionId}
                 node={reply}
                 depth={depth + 1}
                 controller={controller}
@@ -357,6 +361,7 @@ function Thread({
         open={confirmingDelete}
         title="Delete comment"
         message="Delete this comment? This cannot be undone."
+        confirmLabel="Delete"
         onConfirm={() => {
           setConfirmingDelete(false);
           void run(controller.remove(node.id));

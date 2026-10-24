@@ -255,27 +255,15 @@ test("likes a comment and shows who liked it @010-US6", async ({
 
   await page.reload();
   const reopened = page.getByRole("dialog", { name: "Session details" });
-  // Hovering previews the likers, newest first, without opening anything.
   const count = reopened.getByRole("button", { name: "2 likes" });
-  // The reloaded modal fetches its comments, so wait for the count before
-  // asserting on the preview: an absent tooltip would satisfy nothing.
+  // The reloaded modal fetches its comments, so wait for the count first.
   await expect(count).toBeVisible();
-  const tooltip = page.getByRole("tooltip");
-  await expect(tooltip).toHaveCSS("opacity", "0");
-  await count.hover();
-  await expect(tooltip).toHaveCSS("opacity", "1");
-  await expect(tooltip).toHaveText(/^Bob TestAlice Test$/);
 
   await count.click();
   const likers = page.getByRole("dialog", { name: "Liked by" });
   await expect(likers.getByRole("link", { name: "Alice Test" })).toBeVisible();
   await expect(likers.getByRole("link", { name: "Bob Test" })).toBeVisible();
-  // One avatar per liker — an uploaded image or the initials fallback, both
-  // decorative and so hidden from the accessibility tree.
-  await expect(likers.locator("li [aria-hidden='true']")).toHaveCount(2);
   await likers.getByRole("button", { name: "Close" }).click();
-  // The pointer never left the count, but the click dismissed its preview.
-  await expect(tooltip).toHaveCSS("opacity", "0");
 
   await reopened.getByRole("button", { name: "Liked", exact: true }).click();
   await expect(

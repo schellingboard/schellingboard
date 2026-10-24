@@ -168,9 +168,7 @@ describe("openNotificationAction", () => {
     await openNotificationAction(notification.id);
 
     expect(await getRepositories().notifications.countUnread(guest.id)).toBe(0);
-    expect(redirect).toHaveBeenCalledExactlyOnceWith(
-      "/legacy/e?viewSession=s1"
-    );
+    expect(redirect).toHaveBeenCalledExactlyOnceWith("/e?viewSession=s1");
   });
 
   it("neither marks nor redirects for another guest's notification", async () => {

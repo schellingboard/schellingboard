@@ -200,7 +200,12 @@ describe("writing comments", () => {
     expect(
       screen.getByText("Delete this comment? This cannot be undone.")
     ).toBeTruthy();
-    await userEvent.click(screen.getByRole("button", { name: "Yes" }));
+    await userEvent.click(
+      within(screen.getByRole("dialog", { name: "Delete comment" })).getByRole(
+        "button",
+        { name: "Delete" }
+      )
+    );
     expect(handle.controller.remove).toHaveBeenCalledWith("a");
   });
 });
@@ -247,6 +252,16 @@ describe("liking comments", () => {
 });
 
 describe("a comment's permalink", () => {
+  it(
+    "links the session's address with the comment",
+    { tags: ["010-US5"] },
+    () => {
+      show(fakeComments([comment("a")]));
+      const link = screen.getByRole("link", { name: /^\d/ });
+      expect(link.getAttribute("href")).toBe("/conf?viewSession=s#comment-a");
+    }
+  );
+
   it("scrolls to the comment the address names", { tags: ["010-US5"] }, () => {
     window.location.hash = "#comment-b";
     show(fakeComments([comment("a"), comment("b")]));

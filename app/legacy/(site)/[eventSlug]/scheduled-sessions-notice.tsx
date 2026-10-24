@@ -1,12 +1,12 @@
 "use client";
 
 import { Fragment, useContext } from "react";
-import Link from "next/link";
+import { AppLink } from "@/app/components/app-link";
 
 import { EventContext } from "@/app/legacy/(site)/context";
 import { sessionRooms } from "@/app/legacy/(site)/session_utils";
 import { formatOptionalTime, TIME_FORMAT } from "@schellingboard/domain/time";
-import { viewSessionLinkFromElsewhere } from "./modal-nav";
+import { viewSessionLink } from "./modal-nav";
 
 // A session is a copy of its proposal, not a view of it: hosts keep expecting
 // the two to stay in sync, so say so wherever they would assume it.
@@ -31,8 +31,8 @@ export function ScheduledSessionsNotice({
         return (
           <Fragment key={session.id}>
             {i > 0 && "; "}
-            <Link
-              {...viewSessionLinkFromElsewhere(event.slug, session.id)}
+            <AppLink
+              {...viewSessionLink(event.slug, session.id)}
               className="text-brand-fg underline hover:text-brand-fg-hover transition-colors"
             >
               {formatOptionalTime(
@@ -41,7 +41,7 @@ export function ScheduledSessionsNotice({
                 `EEEE ${TIME_FORMAT}`
               )}
               {rooms.length > 0 && ` in ${rooms.join(", ")}`}
-            </Link>
+            </AppLink>
           </Fragment>
         );
       })}

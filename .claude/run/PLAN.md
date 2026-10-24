@@ -158,13 +158,15 @@ Read first: ADR 0015, ADR 0014, `docs/dev/target-architecture/04-client.md`,
         edit/proposal/profile links to legacy.
   - [x] 15b. Hosts' attendee count (`record=count`), through the API.
   - [x] 15c. Comments: read, post, reply, like, edit, delete (commands and queries).
-- [ ] 16. **Retire the Next schedule**: the router owns the session modal
-      (`viewSession` stops forwarding); delete the Next schedule page, its
-      components, server actions, `replica/` and the overlay, except what the
-      meeting modal (`viewMeeting`, still legacy until the meetings family moves)
-      needs; legacy pages link to the SPA modal with plain `<a>`
-      (`modal-nav.ts`). Adapt the E2E specs that break. Full `make test-e2e`.
-      CHANGELOG, `docs/public/`, release-notes highlight.
+- [x] 16. **The router owns the session modal** (`viewSession` stops forwarding;
+      schedule links push a history entry; legacy pages and notifications link to it;
+      the legacy session modal, its comments and the attendee-count action are
+      deleted). E2E adapted; CHANGELOG, release-notes highlight.
+- [ ] 16b. **Retire the rest of the Next schedule**: after the meetings family
+      moves (the legacy grid still hosts `viewMeeting` and `bookMeeting`), delete the
+      Next schedule page and components, `replica/` and the overlay; convert
+      `session-comments.test.ts`, `session-comment-likes.test.ts` and the idempotency
+      and guard tests off `createSessionComment`, then delete that action.
 - [ ] 17. **Offline and reload offer**: `sw.js` precaches the shell and `/_spa/`
       assets and serves the shell for SPA navigations offline; never caches
       `/api/**` or `/legacy/**`; push unchanged. The SPA compares the running

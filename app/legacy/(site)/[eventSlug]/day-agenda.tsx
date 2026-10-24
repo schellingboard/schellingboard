@@ -7,7 +7,8 @@ import {
   type ReactNode,
 } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
+import type Link from "next/link";
+import { AppLink } from "@/app/components/app-link";
 import clsx from "clsx";
 import {
   AcademicCapIcon,
@@ -41,10 +42,7 @@ import {
 } from "@schellingboard/domain/time";
 import { LockIcon } from "../lock-icon";
 import { sessionRooms } from "../session_utils";
-import {
-  viewMeetingLinkFromOwner,
-  viewSessionLinkFromOwner,
-} from "./modal-nav";
+import { viewMeetingLinkFromOwner, viewSessionLink } from "./modal-nav";
 
 // One day as a list, every session under the time it starts: what a narrow
 // screen can scroll through, where the grid has to be scrolled both ways.
@@ -207,9 +205,9 @@ function AgendaRow(props: {
   return (
     <li>
       {link ? (
-        <Link {...link} className={className}>
+        <AppLink {...link} className={className}>
           {body}
-        </Link>
+        </AppLink>
       ) : (
         <div className={className}>{body}</div>
       )}
@@ -259,7 +257,7 @@ function SessionRow(props: {
     <AgendaRow
       state={state}
       swatchClass={clsx("loc-swatch", color && `loc-${color}`)}
-      link={viewSessionLinkFromOwner(searchParams, eventSlug, session.id)}
+      link={viewSessionLink(eventSlug, session.id, searchParams)}
       title={
         <>
           {session.closed && (

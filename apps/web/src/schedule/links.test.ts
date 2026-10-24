@@ -7,7 +7,7 @@ const links = legacyScheduleLinks("conf");
 describe("legacyScheduleLinks", () => {
   it("opens a session over the current schedule view, keeping its params", () => {
     expect(links.session(new URLSearchParams("view=agenda"), "s1")).toBe(
-      "/legacy/conf?view=agenda&viewSession=s1"
+      "/conf?view=agenda&viewSession=s1"
     );
   });
 
