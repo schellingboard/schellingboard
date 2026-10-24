@@ -248,7 +248,7 @@
 
 ## Next step
 
-12.
+13.
 
 ## Questions
 
@@ -292,3 +292,14 @@
   (cookie + class + theme-color metas, consistent with the Next one and index.html's script),
   `app/footer.tsx` (version button, release notes dialog from domain, `ui/inline-markdown`
   for bold and code only), `app/health.tsx`, `app/dev-toolbar.tsx` (time travel only).
+
+## Step 12d (2026-10-09)
+
+- `app/sync-indicator.tsx` (`useSyncState` on the store's link, timer at `nextChangeAt`),
+  `app/error-boundary.tsx`, and `app/shell.tsx` composing all of step 12 from props. The shell
+  is not mounted; the catch-all forwards as before, so nothing user-visible changed and no
+  CHANGELOG entry. Step 13 must: fetch events (`GET /api/v1/events`) for the nav, pass the
+  snapshot's guests to the picker, mount `Shell` for SPA-owned routes, and compose
+  `openReplica` + `connectFeed` + `autosaveReplica` with `useViewer().guestId` as viewer and
+  `newKey` from `app/keys.ts`. `onClockChange` should reload the replica.
+- Tests were written before the code; the red run was the missing modules.
