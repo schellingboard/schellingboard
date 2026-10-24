@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import {
   ScheduleMatchProvider,
@@ -50,6 +50,8 @@ export function ScheduleScreen({
   links,
   params,
   onParamsChange,
+  onBack,
+  onHashChange,
   sync,
   footer,
   onReload,
@@ -59,7 +61,11 @@ export function ScheduleScreen({
   now: Date;
   links: ScheduleLinks;
   params: URLSearchParams;
-  onParamsChange: (next: URLSearchParams) => void;
+  onParamsChange: (next: URLSearchParams, how?: { push: boolean }) => void;
+  /** Undoes the history entry that opening a modal added. */
+  onBack: () => void;
+  /** Sets the address's hash in place, without a history entry. */
+  onHashChange: (hash: string) => void;
   sync: ReactNode;
   footer: ReactNode;
   /** What a deliberate pull down from the top does. */
@@ -128,6 +134,17 @@ export function ScheduleScreen({
 
   const kiosk = useKioskMode(params);
   const viewSession = params.get("viewSession");
+  // Opened here, Back closes it; reached by an address, there is no entry to pop.
+  const openedHere = useRef(false);
+  useEffect(() => {
+    if (!viewSession) openedHere.current = false;
+  }, [viewSession]);
+  const openSession = (sessionId: string) => {
+    const updated = new URLSearchParams(params);
+    updated.set("viewSession", sessionId);
+    openedHere.current = true;
+    onParamsChange(updated, { push: true });
+  };
   const nowIsOnSchedule = data.days.some(
     (day) => getNowOffsetPx(day, now, data.event.slotIncrementMinutes) !== null
   );
@@ -223,12 +240,22 @@ export function ScheduleScreen({
   );
 
   return (
-    <ScheduleProvider value={{ data, links, params, actions }}>
+    <ScheduleProvider
+      value={{
+        data,
+        links,
+        params,
+        actions,
+        openSession,
+        setHash: onHashChange,
+      }}
+    >
       {kiosk && <KioskController nowIsOnSchedule={nowIsOnSchedule} />}
       {viewSession && (
         <SessionModal
           sessionId={viewSession}
           onClose={() => {
+            if (openedHere.current) return onBack();
             const updated = new URLSearchParams(params);
             updated.delete("viewSession");
             updated.delete("record");

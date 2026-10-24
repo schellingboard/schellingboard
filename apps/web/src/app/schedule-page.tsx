@@ -70,7 +70,7 @@ function ScheduleHost({
 }) {
   const { api } = services;
   const viewer = useViewer();
-  const [, , search] = useUrlSearchParams();
+  const { search } = useUrlSearchParams();
   const events = useEvents(api, (eventSlug) => `/${eventSlug}`);
   const session = useScheduleSession({
     api,
@@ -165,7 +165,7 @@ function Loaded({
   );
   const now = useServerNow(store);
   const health = useHealth(api);
-  const [params, replaceParams] = useUrlSearchParams();
+  const { params, change: changeParams, back, setHash } = useUrlSearchParams();
   const links = useMemo(() => legacyScheduleLinks(slug), [slug]);
   const viewer = useViewer();
   const [picking, setPicking] = useState(false);
@@ -240,7 +240,9 @@ function Loaded({
         now={now}
         links={links}
         params={params}
-        onParamsChange={replaceParams}
+        onParamsChange={changeParams}
+        onBack={back}
+        onHashChange={setHash}
         sync={<SyncIndicator store={store} />}
         footer={<Footer version={health?.version} inline />}
         onReload={hardReload}

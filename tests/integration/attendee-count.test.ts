@@ -27,12 +27,39 @@ import { siteAuthenticate } from "../helpers/site-auth";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 import { getRepositories } from "@/db/container";
-import {
-  getAttendeeCountAction,
-  setAttendeeCountAction,
-} from "@/app/actions/attendee-count";
+import { cookies } from "next/headers";
+import { sessionUseCases } from "@/server/composition";
+import { resolveActor } from "@/server/kernel/actor";
 
 const HOUR_MS = 60 * 60 * 1000;
+
+type CountResult =
+  { ok: true; count: number | null } | { ok: false; code: string };
+
+async function getAttendeeCountAction(sessionId: string): Promise<CountResult> {
+  const result = await sessionUseCases().getAttendeeCount(
+    await resolveActor(await cookies()),
+    { sessionId },
+    new Date()
+  );
+  return result.ok
+    ? { ok: true, count: result.value }
+    : { ok: false, code: result.error.code };
+}
+
+async function setAttendeeCountAction(
+  sessionId: string,
+  value: unknown
+): Promise<CountResult> {
+  const result = await sessionUseCases().recordAttendeeCount(
+    await resolveActor(await cookies()),
+    { sessionId, count: value },
+    new Date()
+  );
+  return result.ok
+    ? { ok: true, count: result.value }
+    : { ok: false, code: result.error.code };
+}
 
 function actAs(guestId: string): void {
   cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guestId));
@@ -48,7 +75,7 @@ async function finishedSession(eventId: string, hostIds: string[]) {
   });
 }
 
-describe("attendee count server action", () => {
+describe("attendee count use cases", () => {
   beforeAll(() => setupTestDb());
 
   beforeEach(async () => {
@@ -163,7 +190,7 @@ describe("attendee count server action", () => {
     expect((await getAttendeeCountAction(session.id)).ok).toBe(false);
   });
 
-  it("rejects out-of-range and non-whole values with a field-level issue (FR-004)", async () => {
+  it("rejects out-of-range and non-whole values (FR-004)", async () => {
     const event = await createEvent({ phase: "scheduling" });
     const host = await createGuest({ eventId: event.id });
     const session = await finishedSession(event.id, [host.id]);
@@ -172,9 +199,7 @@ describe("attendee count server action", () => {
     for (const bad of ["-1", "1.5", "1001"]) {
       const result = await setAttendeeCountAction(session.id, bad);
       expect(result.ok).toBe(false);
-      // An array of Zod issues, not a bare string: the message has to attach
-      // to the input (ADR 0003).
-      expect(Array.isArray(result.ok === false && result.error)).toBe(true);
+      expect(result).toEqual({ ok: false, code: "attendeeCount.invalid" });
     }
 
     expect(await getAttendeeCountAction(session.id)).toEqual({

@@ -56,7 +56,7 @@ test("leaving a session modal whose RSVPs are still loading is quiet @007-US5", 
   const { promise: firstRsvpsHeld, resolve: releaseFirstRsvps } =
     Promise.withResolvers<void>();
   let heldOne = false;
-  await page.route("**/api/rsvps?session=*", async (route) => {
+  await page.route("**/api/v1/sessions/*/rsvps*", async (route) => {
     if (!heldOne) {
       heldOne = true;
       await firstRsvpsHeld;

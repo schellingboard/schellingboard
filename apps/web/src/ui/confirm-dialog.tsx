@@ -5,12 +5,14 @@ export function ConfirmDialog({
   open,
   title,
   message,
+  confirmLabel = "Yes",
   onConfirm,
   onCancel,
 }: {
   open: boolean;
   title: string;
   message: string;
+  confirmLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
 }) {
@@ -18,7 +20,7 @@ export function ConfirmDialog({
     <Dialog open={open} onClose={onCancel} title={title}>
       <p>{message}</p>
       <div className="mt-4 flex flex-wrap gap-2">
-        <Button onClick={onConfirm}>Yes</Button>
+        <Button onClick={onConfirm}>{confirmLabel}</Button>
         <Button variant="quiet" onClick={onCancel}>
           No
         </Button>

@@ -43,6 +43,10 @@ export function renderScheduled(
           data,
           links: legacyScheduleLinks(snapshot.event.slug),
           params,
+          openSession: () => {},
+          setHash: (hash) => {
+            window.location.hash = hash;
+          },
           actions: {
             toggleRsvp: () => Promise.resolve({ ok: true }),
             pickName: () => {},

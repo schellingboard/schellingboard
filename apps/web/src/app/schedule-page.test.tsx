@@ -1,6 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { IDBFactory } from "fake-indexeddb";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import {
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createMemoryHistory, RouterProvider } from "@tanstack/react-router";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
@@ -87,6 +93,7 @@ async function open({
 }
 
 afterEach(() => {
+  cleanup();
   document.cookie = "kiosk=; path=/; max-age=0";
 });
 
@@ -96,15 +103,66 @@ beforeEach(() => {
 });
 
 describe("the event route", () => {
-  it("sends a modal or 1-on-1 address on to the legacy schedule", async () => {
-    await open({ path: "/conf?view=agenda&viewSession=s1" });
+  it("sends a 1-on-1 address on to the legacy schedule", async () => {
+    await open({ path: "/conf?view=agenda&viewMeeting=m1" });
     await waitFor(() =>
       expect(hardNavigate).toHaveBeenCalledWith(
-        "/legacy/conf?view=agenda&viewSession=s1"
+        "/legacy/conf?view=agenda&viewMeeting=m1"
       )
     );
     expect(screen.queryByRole("link", { name: "Talk" })).toBeNull();
   });
+
+  it(
+    "opens a session on a new history entry, which Back closes",
+    { tags: ["007-US1"] },
+    async () => {
+      const { router } = await open();
+      await userEvent.click(await screen.findByRole("link", { name: "Talk" }));
+      expect(
+        await screen.findByRole("dialog", { name: "Session details" })
+      ).toBeTruthy();
+      expect(router.history.location.search).toBe("?viewSession=s");
+      router.history.back();
+      await waitFor(() =>
+        expect(
+          screen.queryByRole("dialog", { name: "Session details" })
+        ).toBeNull()
+      );
+      expect(router.history.location.search).toBe("");
+    }
+  );
+
+  it(
+    "closes a session reached by its address in place",
+    { tags: ["007-US1"] },
+    async () => {
+      const { router } = await open({ path: "/conf?viewSession=s" });
+      const dialog = await screen.findByRole("dialog", {
+        name: "Session details",
+      });
+      await userEvent.click(
+        within(dialog).getByRole("button", { name: "Close" })
+      );
+      await waitFor(() =>
+        expect(
+          screen.queryByRole("dialog", { name: "Session details" })
+        ).toBeNull()
+      );
+      expect(router.history.location.search).toBe("");
+      expect(router.history.length).toBe(1);
+    }
+  );
+
+  it(
+    "keeps a comment's hash when a session is reached by its address",
+    { tags: ["010-US5"] },
+    async () => {
+      const { router } = await open({ path: "/conf?viewSession=s#comment-c1" });
+      await screen.findByRole("dialog", { name: "Session details" });
+      expect(router.history.location.hash).toBe("#comment-c1");
+    }
+  );
 
   it("shows kiosk mode, asked for or remembered, itself", async () => {
     document.cookie = "kiosk=1; path=/";
@@ -135,8 +193,8 @@ describe("the schedule page", () => {
       ).toBe("/other");
       expect(screen.getByText("Live")).toBeTruthy();
       expect(
-        await screen.findByRole("button", { name: /Version 4.1.0/ })
-      ).toBeTruthy();
+        (await screen.findAllByRole("button", { name: /Version 4.1.0/ })).length
+      ).toBeGreaterThan(0);
     }
   );
 
