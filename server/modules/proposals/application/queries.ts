@@ -5,7 +5,7 @@ import {
 } from "@schellingboard/domain/proposal-vote-stats";
 import { STALE_PROPOSAL_MESSAGE } from "@schellingboard/contracts/session";
 import type { Event } from "@schellingboard/domain/event";
-import { inSchedPhase } from "@schellingboard/domain/phase";
+import { inSchedPhase, inVotingPhase } from "@schellingboard/domain/phase";
 import type { SessionProposal } from "@schellingboard/domain/session";
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
@@ -36,6 +36,8 @@ export interface ProposalView extends Pick<
   | "version"
 > {
   tally: { interested: number; maybe: number } | null;
+  /** Skips included, so only while voting: the scheduling tally leaves them out. */
+  votesCount: number | null;
   breakdown: ProposalVoteStats | null;
 }
 
@@ -53,8 +55,15 @@ export async function presenter(
   now: Date,
   known?: SessionProposal[]
 ): Promise<(p: SessionProposal) => ProposalView> {
-  if (!inSchedPhase(event, now))
-    return (p) => ({ ...fields(p), tally: null, breakdown: null });
+  if (!inSchedPhase(event, now)) {
+    const voting = inVotingPhase(event, now);
+    return (p) => ({
+      ...fields(p),
+      votesCount: voting ? p.votesCount : null,
+      tally: null,
+      breakdown: null,
+    });
+  }
   const [acting, guests, proposals] = await Promise.all([
     actingGuest(actor, repos.guests),
     repos.guests.listByEvent(event.id),
@@ -64,6 +73,7 @@ export async function presenter(
   const eventInterest = eventInterestSummary(proposals);
   return (p) => ({
     ...fields(p),
+    votesCount: null,
     tally: { interested: p.interestedVotesCount, maybe: p.maybeVotesCount },
     breakdown:
       p.hosts.length === 0 || p.hosts.some((h) => h.id === viewerId)

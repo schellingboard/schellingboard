@@ -85,7 +85,7 @@ describe("reading proposals: the vote breakdown", () => {
           breakdown: null,
         });
         expect(seen.ok && seen.value).not.toHaveProperty("skipVotesCount");
-        expect(seen.ok && seen.value).not.toHaveProperty("votesCount");
+        expect(seen.ok && seen.value).toMatchObject({ votesCount: null });
       }
 
       const listed = await proposalUseCases().listProposals(
@@ -515,6 +515,54 @@ describe("proposal mutations", () => {
         now()
       );
       expect(!gone.ok && gone.error.code).toBe("proposal.notFound");
+    }
+  );
+});
+
+describe("reading proposals: the voting order", () => {
+  it(
+    "gives every viewer the vote count the list sorts by, in the voting phase only",
+    { tags: ["005-US1", "004-US5"] },
+    async () => {
+      const event = await createEvent({ phase: "voting" });
+      const proposal = await createProposal(event.id, []);
+      const ids = await voters(event.id, 4);
+      await vote(proposal.id, ids.slice(0, 2), VoteChoice.interested);
+      await vote(proposal.id, ids.slice(2, 3), VoteChoice.maybe);
+      await vote(proposal.id, ids.slice(3), VoteChoice.skip);
+
+      const listed = await proposalUseCases().listProposals(
+        NOBODY,
+        { eventId: event.id },
+        now()
+      );
+
+      expect(listed.ok && listed.value[0]).toMatchObject({
+        tally: null,
+        votesCount: 4,
+      });
+    }
+  );
+
+  it(
+    "keeps the vote count, which includes skips, out of the scheduling phase",
+    { tags: ["005-US1", "004-US5"] },
+    async () => {
+      const event = await createEvent({ phase: "scheduling" });
+      const proposal = await createProposal(event.id, []);
+      const ids = await voters(event.id, 2);
+      await vote(proposal.id, ids, VoteChoice.skip);
+
+      const listed = await proposalUseCases().listProposals(
+        NOBODY,
+        { eventId: event.id },
+        now()
+      );
+
+      expect(listed.ok && listed.value[0]).toMatchObject({
+        tally: { interested: 0, maybe: 0 },
+        votesCount: null,
+      });
     }
   );
 });

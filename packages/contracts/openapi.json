@@ -125,6 +125,10 @@
             "required": ["interested", "maybe"],
             "description": "The public tally, from the scheduling phase on; skip votes are only in the breakdown"
           },
+          "votesCount": {
+            "type": ["integer", "null"],
+            "description": "How many votes, skips included, in the voting phase only: the list sorts by it"
+          },
           "breakdown": {
             "type": ["object", "null"],
             "properties": {
@@ -185,6 +189,7 @@
           "cohostWantedNote",
           "sessionIds",
           "tally",
+          "votesCount",
           "breakdown",
           "version"
         ]

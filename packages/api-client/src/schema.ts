@@ -5809,6 +5809,8 @@ export interface components {
         interested: number;
         maybe: number;
       } | null;
+      /** @description How many votes, skips included, in the voting phase only: the list sorts by it */
+      votesCount: number | null;
       /** @description From the scheduling phase on, shown to a proposal's hosts, and to everyone for a proposal nobody hosts */
       breakdown: {
         attendees: number;

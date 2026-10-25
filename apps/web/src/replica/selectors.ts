@@ -14,7 +14,7 @@ type DayWithSessions = Day & { sessions: Session[] };
 const date = (iso: string) => new Date(iso);
 const optionalDate = (iso: string | null) => (iso ? new Date(iso) : undefined);
 
-function toEvent(e: Snapshot["event"]): Event {
+export function toEvent(e: Snapshot["event"]): Event {
   return {
     ...e,
     firstDayStart: optionalDate(e.firstDayStart),

@@ -79,7 +79,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
 - [ ] 8. **Proposal screens**, unrouted:
   - [ ] 8a. The proposals list, split (the legacy table, cards, voting buttons, tally and
         action bar are ~1300 lines):
-    - [ ] 8a-1. The list model: filters (mine, voted, unvoted, host wanted), search
+    - [x] 8a-1 (done: `features/proposals/list-model.ts`, `queries/proposal-standings.ts`, `voteStanding` on the API's proposal view; search uses `ui/plain-text`). The list model: filters (mine, voted, unvoted, host wanted), search
           (Fuse, same keys and threshold), sort, phase texts (`dateStartDescription`),
           the vote-tally query for the scheduling phase. Pure, unit tested. Blocked on
           PROGRESS.md Questions 1 and 2.

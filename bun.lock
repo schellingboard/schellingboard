@@ -86,6 +86,7 @@
         "@schellingboard/contracts": "workspace:*",
         "@schellingboard/domain": "workspace:*",
         "@tanstack/react-router": "1.170.45",
+        "fuse.js": "^7.5.0",
         "luxon": "^3.7.2",
         "react": "^19",
         "react-dom": "^19",

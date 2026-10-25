@@ -34,12 +34,14 @@
 
 ## Questions
 
-1. Step 8a, voting-phase sort: the legacy list defaults to "Fewest votes first"
-   (`votesCount asc`) in the voting phase and has a "votes" sort (`interested*4+maybe`).
-   Those counts are secret before scheduling: the API's `tally` is null until then and
-   the replica has none. Options: (a) drop both sorts in the SPA, default to most
-   recently updated; (b) a restricted query returning per-proposal counts during
-   voting. Needs the user's call (it is a visible behavior change or a new API).
-2. Step 8a, tally source: the scheduling-phase tally comes from `GET /proposals?eventId`
-   (paged, `tally`), not the replica. Confirm a `queries/` read refetched on `vote.*`
-   is wanted, rather than adding the tally to the snapshot.
+Assumptions the user may override (set by the coordinator, 2026-10-25):
+
+1. Step 8a keeps both vote sorts. The counts reach the SPA through the proposals API
+   (`voteStanding` {total, weighted} on every `Proposal`, same visibility as the legacy
+   page's props); `tally` stays null before scheduling. No new endpoint.
+2. The tally and standings come from `queries/proposal-standings.ts` (`GET /proposals`,
+   all pages). Step 8a-2 must call `refresh()` on mount and when an own `vote.*` change
+   arrives; other guests' votes do not reach the feed, so counts update on reload only.
+3. 8a-2 builds the screen on `list-model.ts` (`rowsFrom`, `listRows`, `defaultSort`,
+   `sortOptions`, `phaseTexts`) and the vote buttons use `castVote`/`withdrawVote`.
+   `vote-display.ts` and `phase-opens-text.ts` moved to `packages/domain`.

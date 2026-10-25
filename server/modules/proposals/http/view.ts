@@ -40,6 +40,7 @@ export function toProposalView(
     cohostWantedNote: p.cohostWantedNote ?? null,
     sessionIds: p.sessionIds,
     tally: p.tally,
+    votesCount: p.votesCount,
     breakdown: p.breakdown,
     version: p.version,
   };

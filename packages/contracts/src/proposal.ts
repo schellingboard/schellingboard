@@ -49,13 +49,25 @@ export const proposalViewSchema = z
       .describe(
         "The public tally, from the scheduling phase on; skip votes are only in the breakdown"
       ),
+    votesCount: z
+      .number()
+      .int()
+      .nullable()
+      .describe(
+        "How many votes, skips included, in the voting phase only: the list sorts by it"
+      ),
     breakdown: voteBreakdownSchema.nullable(),
     version: z.number().int(),
   })
   .meta({ id: "Proposal" });
 
 export const snapshotProposalSchema = proposalViewSchema
-  .omit({ sessionIds: true, tally: true, breakdown: true })
+  .omit({
+    sessionIds: true,
+    tally: true,
+    votesCount: true,
+    breakdown: true,
+  })
   .meta({ id: "SnapshotProposal" });
 
 export const proposalListSchema = pageSchema(proposalViewSchema);
