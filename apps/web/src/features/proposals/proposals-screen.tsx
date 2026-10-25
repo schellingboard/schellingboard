@@ -6,7 +6,6 @@ import { formatDuration } from "@schellingboard/domain/time";
 import type { VoteChoice } from "@schellingboard/domain/vote";
 import {
   NO_VOTE_LABEL,
-  VOTE_CHOICES,
   voteChoiceToEmoji,
   voteChoiceToLabel,
 } from "@schellingboard/domain/vote-display";
@@ -24,11 +23,12 @@ import {
   UserIcon,
 } from "../../ui/icons";
 import { SearchInput } from "../../ui/search-input";
-import { Tooltip } from "../../ui/tooltip";
 import { Unavailable } from "../../ui/unavailable";
 import { useDebouncedSearch } from "../../ui/use-debounced";
 import { cx } from "../../ui/cx";
 import type { ProposalLinks } from "./links";
+import { VoteTally } from "./vote-tally";
+import { VotingButtons } from "./voting-buttons";
 import type { Standing } from "../../queries/proposal-standings";
 import {
   defaultSort,
@@ -447,7 +447,7 @@ function ProposalTable({
                       {yourVote(row)}
                     </td>
                     <td className="px-4 lg:px-6 py-4">
-                      <Tally
+                      <VoteTally
                         tally={standings.get(row.id)?.tally ?? null}
                         className="flex-wrap"
                       />
@@ -526,7 +526,7 @@ function ProposalTable({
                     )}
                     <div className="flex items-center gap-2">
                       Total votes:
-                      <Tally tally={standings.get(row.id)?.tally ?? null} />
+                      <VoteTally tally={standings.get(row.id)?.tally ?? null} />
                     </div>
                   </>
                 )}
@@ -555,88 +555,6 @@ function Duration({ text }: { text: string | null }) {
     </div>
   ) : (
     <div className="text-sm text-fg-subtle">-</div>
-  );
-}
-
-// Skip votes are left out on purpose: this is the public tally, and it reads as
-// interest in a proposal rather than as a scoreboard for it.
-function Tally({
-  tally,
-  className,
-}: {
-  tally: { interested: number; maybe: number } | null;
-  className?: string;
-}) {
-  return (
-    <span className={cx("inline-flex items-center gap-2", className)}>
-      {(["interested", "maybe"] as const).map((choice) => {
-        const count = tally?.[choice] ?? 0;
-        const label = voteChoiceToLabel(choice as VoteChoice).toLowerCase();
-        return (
-          <span
-            key={choice}
-            title={`${count} ${label} vote${count !== 1 ? "s" : ""}`}
-            className="inline-flex items-center gap-1 text-sm text-fg-subtle"
-          >
-            {voteChoiceToEmoji(choice as VoteChoice)}&nbsp;{count}
-          </span>
-        );
-      })}
-    </span>
-  );
-}
-
-function VotingButtons({
-  chosen,
-  enabled,
-  why,
-  onVote,
-}: {
-  chosen: VoteChoice | undefined;
-  enabled: boolean;
-  why: string;
-  onVote: (choice: VoteChoice) => void;
-}) {
-  return (
-    <div className="flex gap-1.5 flex-row flex-wrap">
-      {VOTE_CHOICES.map((choice) => {
-        const selected = chosen === choice;
-        const button = (
-          <button
-            type="button"
-            aria-pressed={selected}
-            onClick={() => onVote(choice)}
-            className={cx(
-              "relative rounded-md border shadow-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-accent px-1 py-1",
-              !enabled && "opacity-50 cursor-not-allowed grayscale",
-              selected
-                ? "bg-vote-chosen border-line-strong text-on-vote-chosen ring-2 ring-line-strong"
-                : "bg-surface-raised border-line-strong text-fg-muted",
-              !selected && enabled && "hover:bg-surface-muted"
-            )}
-          >
-            <div>{voteChoiceToEmoji(choice)}</div>
-            {selected && (
-              <span
-                aria-hidden="true"
-                className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full border border-surface-raised bg-bar text-[9px] leading-none text-bar-fg"
-              >
-                ✓
-              </span>
-            )}
-          </button>
-        );
-        return enabled ? (
-          <Tooltip key={choice} content={voteChoiceToLabel(choice)}>
-            {button}
-          </Tooltip>
-        ) : (
-          <Unavailable key={choice} blocked why={why}>
-            {button}
-          </Unavailable>
-        );
-      })}
-    </div>
   );
 }
 

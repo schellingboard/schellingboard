@@ -5,7 +5,7 @@ import {
   type commentViewSchema,
 } from "@schellingboard/contracts/comment";
 import type { Command } from "./runner";
-import { describeSessionIn } from "./subject";
+import { describeProposalIn, describeSessionIn } from "./subject";
 
 export type CommentView = (typeof commentViewSchema)["_output"];
 
@@ -20,9 +20,7 @@ type Input = { subject: CommentSubject; parentId?: string; body: string };
 export const createComment: Command<Input, CommentView> = {
   kind: "comment.create",
   describe: (replica, { subject }) =>
-    subject.kind === "session"
-      ? `post your comment on ${describeSessionIn(replica, subject.id)}`
-      : "post your comment",
+    `post your comment${onSubject(replica, { subject })}`,
   predict: (_replica, _now, { parentId, body }) =>
     commentCreateSchema.safeParse({ parentId, body }).success
       ? { project: (replica) => replica }
@@ -46,10 +44,12 @@ export const createComment: Command<Input, CommentView> = {
 
 type Target = { commentId: string; subject: CommentSubject };
 
-const onSubject = (replica: Snapshot, { subject }: Target) =>
+const onSubject = (replica: Snapshot, { subject }: Pick<Target, "subject">) =>
   subject.kind === "session"
     ? ` on ${describeSessionIn(replica, subject.id)}`
-    : "";
+    : subject.kind === "proposal"
+      ? ` on ${describeProposalIn(replica, subject.id)}`
+      : "";
 const path = ({ commentId }: Target) => ({
   params: { path: { id: commentId } },
 });

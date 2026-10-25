@@ -228,3 +228,48 @@ describe("a failed comment command", () => {
     for (const what of seen) expect(what).toMatch(/ on “.+” \(/);
   });
 });
+
+describe("a failed proposal comment command", () => {
+  it(
+    "names the proposal the comment is on",
+    { tags: ["010-US2"] },
+    async () => {
+      const seen: string[] = [];
+      const { api } = fakeApi(() => problem(403, "comment.notAuthor"));
+      const runner = createCommandRunner({
+        store: createReplicaStore({
+          ...snapshot,
+          proposals: [
+            {
+              id: "p",
+              eventId: "e",
+              title: "Rust intro",
+              description: null,
+              durationMinutes: null,
+              createdTime: iso(1),
+              updatedTime: iso(1),
+              hosts: [],
+              cohostWanted: false,
+              cohostWantedNote: null,
+              version: 1,
+            },
+          ],
+        }),
+        api,
+        newKey: () => "k",
+        onFailure: ({ what }) => seen.push(what),
+      });
+      const subject = { kind: "proposal", id: "p" } as const;
+
+      await runner.run(createComment, { subject, body: "x" });
+      await runner.run(editComment, { commentId: "c", body: "x", subject });
+      await runner.run(deleteComment, { commentId: "c", subject });
+
+      expect(seen).toEqual([
+        "post your comment on “Rust intro”",
+        "save your edit to a comment on “Rust intro”",
+        "delete your comment on “Rust intro”",
+      ]);
+    }
+  );
+});

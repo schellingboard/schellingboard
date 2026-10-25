@@ -6,7 +6,7 @@ import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { snapshot as base, iso } from "../../replica/snapshot-fixture";
 import { createObservable } from "../../queries/store";
 import type { AttendeesState } from "../../queries/attendees";
-import { fakeComments } from "./comments-test-support";
+import { fakeComments } from "../comments/comments-test-support";
 import { legacyScheduleLinks } from "./links";
 import { NoticeProvider } from "../../ui/notices";
 import { ScheduleScreen, type ScheduleActions } from "./schedule-screen";

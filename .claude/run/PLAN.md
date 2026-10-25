@@ -85,8 +85,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
           PROGRESS.md Questions 1 and 2.
     - [x] 8a-2 (done: `features/proposals/proposals-screen.tsx`, `use-standings.ts`, links to legacy addresses; rendered directly in Vitest, no router since links are plain anchors; wiring to the replica/runner/query happens in step 9). The screen: action bar, table and mobile cards, voting buttons, empty
           state, through the test router.
-  - [ ] 8b. The proposal modal (`viewProposal`): details, vote breakdown (query),
-        comments (the shared comments feature), join as host.
+  - [x] 8b. The proposal modal (done: `features/proposals/proposal-modal.tsx` with `ProposalActions`, `vote-breakdown.tsx`, `queries/proposal-detail.ts`, `commands/join-proposal.ts`; the session comments moved to `features/comments/` as the shared `Comments`).
   - [ ] 8c. Quick voting.
   - [ ] 8d. New and edit proposal forms, delete.
 - [ ] 9. **Takeover: proposals**. Router owns `/{slug}/proposals/**` and

@@ -6,6 +6,7 @@ export type ProposalLinks = {
   edit: (proposalId: string) => string;
   scheduleProposal: (proposalId: string) => string;
   guest: (guestId: string) => string;
+  session: (sessionId: string) => string;
 };
 
 /** Where the proposals list's links go until the pages they open are SPA screens. */
@@ -21,5 +22,7 @@ export function legacyProposalLinks(eventSlug: string): ProposalLinks {
     scheduleProposal: (id) =>
       `${legacy}/add-session?${new URLSearchParams({ proposalID: id })}`,
     guest: (id) => `/legacy/guests/${id}`,
+    session: (id) =>
+      `/${eventSlug}?${new URLSearchParams({ viewSession: id })}`,
   };
 }

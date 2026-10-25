@@ -55,3 +55,12 @@ link and the list's title/description match the legacy copy.
 Unavailable controls (006-US2): use `ui/unavailable.tsx` (`Unavailable blocked why`): aria-disabled,
 described by the reason, a notice on activation. The takeover must adapt `disabled-hints.spec.ts`
 to the notice region instead of the legacy toast helper if the markup differs.
+
+Step 8b, for step 9 (wiring): `ProposalModal({proposalId, snapshot, now, localZone, links, actions, setHash, onClose})`
+renders over the proposals list like `SessionModal` over the schedule: push `?viewProposal=` (Back
+closes it when opened here, else remove the param), then update `modal-nav.ts` (anchor MnpjIo7Y) and
+its legacy callers. `ProposalActions` = `vote` (castVote/withdrawVote), `join` (`joinProposal` command),
+`detail` (`createProposalDetailQuery`), `comments` (`createCommentsQuery` + `createCommentsController`
+with subject `{kind:"proposal"}`, as `schedule-page.tsx` does for sessions). Profile comments (10c) reuse
+`features/comments/Comments`. `links.view(id)#comment-<id>` is the comment permalink. The detail query
+runs only in the scheduling phase (before it both tally and breakdown are null).

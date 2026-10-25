@@ -3,7 +3,7 @@ import type { CommentView } from "../../commands/comment";
 import type { CommentsState } from "../../queries/comments";
 import type { CommentsController } from "../../queries/comments-controller";
 import { createObservable } from "../../queries/store";
-import type { ScheduleActions } from "./context";
+import type { CommentsHandle } from "./comments-section";
 
 export const comment = (
   id: string,
@@ -23,7 +23,7 @@ export const comment = (
 export function fakeComments(
   items: CommentView[] = [],
   state: Partial<CommentsState> = {}
-): ReturnType<ScheduleActions["comments"]> & {
+): CommentsHandle & {
   state: ReturnType<typeof createObservable<CommentsState>>;
 } {
   const store = createObservable<CommentsState>({
