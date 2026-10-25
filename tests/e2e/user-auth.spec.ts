@@ -40,6 +40,17 @@ const RESET_SUBJECT = "Set your password";
 const mailOnTop = async (subject: string, email: string) =>
   (await newestBySubjectTo(subject, email))?.ID;
 
+// Typing into the reset form before it hydrates shows in the field but leaves
+// the form's state, and so its submit button, empty.
+async function setPassword(page: Page, password: string) {
+  const submit = page.getByRole("button", { name: "Set password" });
+  await expect(async () => {
+    await page.getByLabel(/new password/i).fill(password);
+    await expect(submit).toBeEnabled({ timeout: 2000 });
+  }).toPass();
+  await submit.click();
+}
+
 async function newestMessageHtml(
   subject: string,
   email: string,
@@ -196,8 +207,7 @@ test("protect a name via emailed link, then log in with password and single-use 
   await expect(
     page.getByRole("heading", { name: /set a password for Priya Sharma/i })
   ).toBeVisible();
-  await page.getByLabel(/new password/i).fill(PRIYA_PASSWORD);
-  await page.getByRole("button", { name: "Set password" }).click();
+  await setPassword(page, PRIYA_PASSWORD);
   await expect(page.getByText(/password set/i)).toBeVisible();
   await page.getByRole("link", { name: /go to sign in/i }).click();
   // Still Bob: the reset granted no session.
@@ -291,8 +301,7 @@ test("forgot password: reset it via an emailed link @003-US5", async ({
   await selectUser(page, /Bob Test/i);
   await expect(headerChip(page, "Bob Test")).toBeVisible();
   await page.goto(link1);
-  await page.getByLabel(/new password/i).fill(AHMAD_PASSWORD);
-  await page.getByRole("button", { name: "Set password" }).click();
+  await setPassword(page, AHMAD_PASSWORD);
   await expect(page.getByText(/password set/i)).toBeVisible();
   await page.getByRole("link", { name: /go to sign in/i }).click();
 
@@ -307,8 +316,7 @@ test("forgot password: reset it via an emailed link @003-US5", async ({
   ).toBeVisible();
   const link2 = await newestResetLink(AHMAD_EMAIL, before2);
   await page.goto(link2);
-  await page.getByLabel(/new password/i).fill(AHMAD_NEW_PASSWORD);
-  await page.getByRole("button", { name: "Set password" }).click();
+  await setPassword(page, AHMAD_NEW_PASSWORD);
   await expect(page.getByText(/password set/i)).toBeVisible();
   await page.getByRole("link", { name: /go to sign in/i }).click();
 
@@ -349,8 +357,7 @@ test("setting a password drops the selection the same browser was holding @003-U
   // Unlike the test above, the link is opened in the browser that still holds
   // the selection — the case the bug was reported for.
   await page.goto(resetLink);
-  await page.getByLabel(/new password/i).fill(THABO_PASSWORD);
-  await page.getByRole("button", { name: "Set password" }).click();
+  await setPassword(page, THABO_PASSWORD);
   await expect(page.getByText(/password set/i)).toBeVisible();
 
   // Setting the password logs this browser out, and the header says so right
@@ -405,8 +412,7 @@ test("a name protected from another device asks this browser to log in, not to p
   await phone.getByRole("button", { name: "Enable protection" }).click();
   await expect(phone.getByText(/check your email/i)).toBeVisible();
   await phone.goto(await newestResetLink(NADIA_EMAIL, resetBefore));
-  await phone.getByLabel(/new password/i).fill(NADIA_PASSWORD);
-  await phone.getByRole("button", { name: "Set password" }).click();
+  await setPassword(phone, NADIA_PASSWORD);
   await expect(phone.getByText(/password set/i)).toBeVisible();
   await phoneContext.close();
 
