@@ -1619,6 +1619,9 @@ test.describe("Admin UI sessions", () => {
     await sessions
       .getByRole("searchbox", { name: "Search", exact: true })
       .fill(title);
+    // The new session can already be on the unfiltered first page; a search
+    // landing after Duplicate would reset the copy's form.
+    await expect(sessions.getByText("1 result", { exact: true })).toBeVisible();
     const rows = sessions.getByRole("listitem").filter({ hasText: title });
     await expect(rows).toHaveCount(1);
     await rows.getByRole("button", { name: `Duplicate ${title}` }).click();
