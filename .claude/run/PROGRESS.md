@@ -33,3 +33,13 @@
 - Step 6: snapshot `proposals` = public fields + hosts (names), no `sessionIds`/tally/breakdown; `me.votes` = `{proposalId, choice}`. Step 7 done: use `proposalsFrom`, `ownVotesFrom`, `castVote`, `withdrawVote`; `runner.view()` shows optimistic votes. Proposal comments still say only "your comment" (step 8b).
 
 ## Questions
+
+1. Step 8a, voting-phase sort: the legacy list defaults to "Fewest votes first"
+   (`votesCount asc`) in the voting phase and has a "votes" sort (`interested*4+maybe`).
+   Those counts are secret before scheduling: the API's `tally` is null until then and
+   the replica has none. Options: (a) drop both sorts in the SPA, default to most
+   recently updated; (b) a restricted query returning per-proposal counts during
+   voting. Needs the user's call (it is a visible behavior change or a new API).
+2. Step 8a, tally source: the scheduling-phase tally comes from `GET /proposals?eventId`
+   (paged, `tally`), not the replica. Confirm a `queries/` read refetched on `vote.*`
+   is wanted, rather than adding the tally to the snapshot.

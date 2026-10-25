@@ -77,7 +77,14 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
 - [x] 6. Proposals and votes in the snapshot and feed: `proposal.created/changed/deleted` (event audience, no vote counts in the payload, host renames and joins record too), `me.votes`, `vote.cast`/`vote.withdrawn` (voter only; also recorded when a vote is lost by joining as host, by an edit adding the voter as host, or with the proposal). `apply` handles all, legacy and SPA copies.
 - [x] 7. Replica and commands: `proposalsFrom`/`ownVotesFrom` selectors; the vote rule is `domain/vote-rule.ts` (phase, own proposal, membership), the server calls it and now refuses a host voting on their own proposal (`vote.ownProposal`); `castVote`/`withdrawVote` commands name the proposal in notices.
 - [ ] 8. **Proposal screens**, unrouted:
-  - [ ] 8a. The proposals list: table, filters, tally, voting buttons, phase texts.
+  - [ ] 8a. The proposals list, split (the legacy table, cards, voting buttons, tally and
+        action bar are ~1300 lines):
+    - [ ] 8a-1. The list model: filters (mine, voted, unvoted, host wanted), search
+          (Fuse, same keys and threshold), sort, phase texts (`dateStartDescription`),
+          the vote-tally query for the scheduling phase. Pure, unit tested. Blocked on
+          PROGRESS.md Questions 1 and 2.
+    - [ ] 8a-2. The screen: action bar, table and mobile cards, voting buttons, empty
+          state, through the test router.
   - [ ] 8b. The proposal modal (`viewProposal`): details, vote breakdown (query),
         comments (the shared comments feature), join as host.
   - [ ] 8c. Quick voting.
