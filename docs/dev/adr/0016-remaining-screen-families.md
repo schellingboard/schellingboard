@@ -50,8 +50,10 @@ names): not `sessionIds`, which the sessions' `proposalId` give, and not the
 tally or breakdown, which depend on votes and phase. `proposal.changed` is also
 recorded when a host joins, and when deleting or renaming a guest changes the
 hosts of their proposals (a host's name is not in the event's guests unless
-they are a member). The logged proposal carries no vote counts. A vote change reaches only the voter's connection. Other viewers
-get no vote counts from the feed.
+they are a member). The logged proposal carries no vote counts. Votes are `vote.cast` (a new or changed
+choice) and `vote.withdrawn`; both reach only the voter's connection. A vote lost
+by becoming a host or with its proposal is recorded as `vote.withdrawn`. Other
+viewers get no vote counts from the feed.
 
 ## Consequences
 

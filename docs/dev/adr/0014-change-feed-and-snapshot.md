@@ -40,6 +40,7 @@ carries only ids.
 | Proposal               | `proposal.created`, `proposal.changed`, `proposal.deleted` | event              |
 | RSVP count             | `session.attendanceChanged` (`sessionId`, `numRsvps`)      | event              |
 | Own RSVP               | `rsvp.added`, `rsvp.removed`                               | guests: the RSVPer |
+| Own vote               | `vote.cast`, `vote.withdrawn`                              | guests: the voter  |
 | Location in this event | `location.changed`, `location.removed`                     | event              |
 | Room unavailability    | `unavailability.added`, `unavailability.removed`           | event              |
 | Event guest (public)   | `guest.joined`, `guest.changed`, `guest.left`              | event              |

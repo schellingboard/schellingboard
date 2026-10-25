@@ -674,6 +674,7 @@ export interface SubjectCommentsRepository {
 
 export interface VotesRepository {
   listByGuestAndEvent(guestId: string, eventId: string): Promise<Vote[]>;
+  listByProposal(proposalId: string): Promise<Vote[]>;
   create(data: {
     proposalId: string;
     guestId: string;
@@ -684,7 +685,10 @@ export interface VotesRepository {
     guestId: string;
     choice: VoteChoice;
   }): Promise<void>;
-  deleteByGuestAndProposal(guestId: string, proposalId: string): Promise<void>;
+  deleteByGuestAndProposal(
+    guestId: string,
+    proposalId: string
+  ): Promise<boolean>;
   deleteByProposal(proposalId: string): Promise<void>;
   deleteByProposalAndGuests(
     proposalId: string,

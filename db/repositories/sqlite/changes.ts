@@ -8,6 +8,8 @@ import type {
   Audience,
   Change,
   CommentCreated,
+  VoteCast,
+  VoteWithdrawn,
   LoggedProposal,
   MeetingAnswered,
   RecordedChange,
@@ -311,6 +313,20 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
         subjectType: "rsvp",
         payload: row.payload as { sessionId: string; guestId: string },
       };
+    case "vote.cast":
+      return {
+        ...common,
+        type: "vote.cast",
+        subjectType: "vote",
+        payload: row.payload as VoteCast["payload"],
+      };
+    case "vote.withdrawn":
+      return {
+        ...common,
+        type: "vote.withdrawn",
+        subjectType: "vote",
+        payload: row.payload as VoteWithdrawn["payload"],
+      };
     default:
       throw new Error(`Unknown change type in the log: ${row.type}`);
   }
@@ -343,6 +359,8 @@ const KNOWN_TYPES: RecordedChange["type"][] = [
   "session.attendanceChanged",
   "rsvp.added",
   "rsvp.removed",
+  "vote.cast",
+  "vote.withdrawn",
   "proposal.created",
   "proposal.changed",
   "proposal.deleted",

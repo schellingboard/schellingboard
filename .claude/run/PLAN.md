@@ -74,11 +74,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
 
 ### Proposals and voting
 
-- [ ] 6. **Proposals and votes in the snapshot and feed** (server):
-  - [x] 6a. Proposals in the snapshot and feed (`proposal.created/changed/deleted`, audience event; join and guest delete record too). `apply` handles them already (legacy and SPA copies).
-  - [ ] 6b. Votes: `me.votes` in the snapshot; `vote.*` change types, audience the
-        voter only. Integration tests: each use case records; another guest's feed
-        never carries the vote.
+- [x] 6. Proposals and votes in the snapshot and feed: `proposal.created/changed/deleted` (event audience, no vote counts in the payload, host renames and joins record too), `me.votes`, `vote.cast`/`vote.withdrawn` (voter only; also recorded when a vote is lost by joining as host, by an edit adding the voter as host, or with the proposal). `apply` handles all, legacy and SPA copies.
 - [ ] 7. **Replica and commands**: `apply` and selectors for proposals and votes; the
       vote rule (phase, own proposal, …) moves to `packages/domain` as the RSVP rule did,
       and the server calls it; vote cast, change and withdraw commands with step 4's

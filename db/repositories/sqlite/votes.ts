@@ -38,8 +38,18 @@ export class SqliteVotesRepository implements VotesRepository {
           eq(schema.sessionProposals.eventId, eventId)
         )
       )
+      .orderBy(schema.votes.proposalId)
       .all();
     return rows.map(rowToVote);
+  }
+
+  async listByProposal(proposalId: string): Promise<Vote[]> {
+    return this.db
+      .select()
+      .from(schema.votes)
+      .where(eq(schema.votes.proposalId, proposalId))
+      .all()
+      .map(rowToVote);
   }
 
   async create(data: {
@@ -83,8 +93,8 @@ export class SqliteVotesRepository implements VotesRepository {
   async deleteByGuestAndProposal(
     guestId: string,
     proposalId: string
-  ): Promise<void> {
-    this.db
+  ): Promise<boolean> {
+    const result = this.db
       .delete(schema.votes)
       .where(
         and(
@@ -93,6 +103,7 @@ export class SqliteVotesRepository implements VotesRepository {
         )
       )
       .run();
+    return result.changes > 0;
   }
 
   async deleteByProposal(proposalId: string): Promise<void> {

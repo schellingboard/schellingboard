@@ -4,6 +4,7 @@ import type { SessionProposal } from "@schellingboard/domain/session";
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import { byActor } from "@/server/kernel/change-context";
+import { recordingVoteLoss } from "@/server/kernel/vote-cascade";
 import {
   conflict,
   forbidden,
@@ -128,18 +129,25 @@ export const updateProposal =
 
       // The repository clears an optional field only when its key is present,
       // so an absent duration or note has to be spelled out to clear it.
-      const updated = await tx.sessionProposals.update(proposalId, {
-        title: fields.title,
-        description: fields.description || undefined,
-        hostIds: fields.hostIds,
-        durationMinutes: fields.durationMinutes,
-        cohostWanted: fields.cohostWanted,
-        cohostWantedNote: fields.cohostWantedNote ?? null,
-        expectedVersion,
-        updatedTime: now,
-      });
+      const by = byActor(actor, now);
+      const updated = await recordingVoteLoss(
+        tx,
+        proposal,
+        () =>
+          tx.sessionProposals.update(proposalId, {
+            title: fields.title,
+            description: fields.description || undefined,
+            hostIds: fields.hostIds,
+            durationMinutes: fields.durationMinutes,
+            cohostWanted: fields.cohostWanted,
+            cohostWantedNote: fields.cohostWantedNote ?? null,
+            expectedVersion,
+            updatedTime: now,
+          }),
+        by
+      );
       if (!updated) return changedMeanwhile(actor, tx, proposalId, now);
-      tx.record(changes.proposalChanged(updated, byActor(actor, now)));
+      tx.record(changes.proposalChanged(updated, by));
       return ok(updated);
     });
     if (!result.ok) return result;
@@ -170,15 +178,21 @@ export const joinProposal =
 
       // The repository decides whether a host is still wanted, in the same
       // transaction that adds one: two volunteers can click at the same moment.
-      if (!(await tx.sessionProposals.addHost(proposalId, joinerId, now)))
-        return conflict(
-          "proposal.hostNotWanted",
-          "This proposal is not looking for a host"
-        );
       const by: ChangeContext = {
         actor: { type: "guest", id: joinerId },
         at: now,
       };
+      const added = await recordingVoteLoss(
+        tx,
+        proposal,
+        () => tx.sessionProposals.addHost(proposalId, joinerId, now),
+        by
+      );
+      if (!added)
+        return conflict(
+          "proposal.hostNotWanted",
+          "This proposal is not looking for a host"
+        );
       tx.record(
         changes.proposalJoined(proposalId, proposal.eventId, joinerId, by)
       );
@@ -200,7 +214,13 @@ export const deleteProposal =
       if (!proposal) return proposalNotFound();
       const refused = await notItsHost(actor, tx, proposal, "delete");
       if (refused) return refused;
-      await tx.sessionProposals.delete(proposalId);
-      tx.record(changes.proposalDeleted(proposal, byActor(actor, now)));
+      const by = byActor(actor, now);
+      await recordingVoteLoss(
+        tx,
+        proposal,
+        () => tx.sessionProposals.delete(proposalId),
+        by
+      );
+      tx.record(changes.proposalDeleted(proposal, by));
       return ok(proposal);
     });

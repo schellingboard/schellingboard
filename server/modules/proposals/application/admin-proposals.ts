@@ -2,6 +2,7 @@ import { changes } from "@schellingboard/domain/change";
 import type { SessionProposal } from "@schellingboard/domain/session";
 import type { Actor } from "@/server/kernel/actor";
 import { byAdmin } from "@/server/kernel/change-context";
+import { recordingVoteLoss } from "@/server/kernel/vote-cascade";
 import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import {
   forbidden,
@@ -134,16 +135,23 @@ export const adminUpdateProposal =
       const refused = await unknownHost(tx, hostIds);
       if (refused) return refused;
 
-      const updated = await tx.sessionProposals.update(input.id, {
-        title,
-        description: input.description.trim(),
-        durationMinutes,
-        hostIds,
-        expectedVersion: input.expectedVersion,
-        updatedTime: now,
-      });
+      const by = byAdmin(now);
+      const updated = await recordingVoteLoss(
+        tx,
+        proposal,
+        () =>
+          tx.sessionProposals.update(input.id, {
+            title,
+            description: input.description.trim(),
+            durationMinutes,
+            hostIds,
+            expectedVersion: input.expectedVersion,
+            updatedTime: now,
+          }),
+        by
+      );
       if (!updated) return changedMeanwhile(actor, tx, input.id, now);
-      tx.record(changes.proposalChanged(updated, byAdmin(now)));
+      tx.record(changes.proposalChanged(updated, by));
       return ok(updated);
     });
     if (!result.ok) return result;
@@ -161,8 +169,14 @@ export const adminDeleteProposal =
     return uow.run(async (tx) => {
       const proposal = await tx.sessionProposals.findById(id);
       if (!proposal) return proposalNotFound();
-      await tx.sessionProposals.delete(id);
-      tx.record(changes.proposalDeleted(proposal, byAdmin(now)));
+      const by = byAdmin(now);
+      await recordingVoteLoss(
+        tx,
+        proposal,
+        () => tx.sessionProposals.delete(id),
+        by
+      );
+      tx.record(changes.proposalDeleted(proposal, by));
       return ok(proposal);
     });
   };

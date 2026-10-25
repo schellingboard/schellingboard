@@ -2,6 +2,7 @@
 import { describe, it, expect } from "vitest";
 import fc from "fast-check";
 import type { FeedMessage } from "@schellingboard/contracts/feed";
+import { VoteChoice } from "@schellingboard/domain/vote";
 import { apply } from "./apply";
 import { snapshot } from "./snapshot-fixture";
 
@@ -242,5 +243,40 @@ describe("apply: proposals", () => {
     });
 
     expect(changed.proposals.map((p) => p.id)).toEqual(["p", "q"]);
+  });
+});
+
+describe("apply: own votes", () => {
+  const vote = (proposalId: string, choice: VoteChoice) => ({
+    proposalId,
+    choice,
+  });
+  const start = {
+    ...snapshot,
+    me: snapshot.me && {
+      ...snapshot.me,
+      votes: [vote("a", VoteChoice.interested), vote("b", VoteChoice.maybe)],
+    },
+  };
+
+  it("casts in place and withdraws", () => {
+    const changed = apply(start, {
+      seq: 9,
+      type: "vote.cast",
+      commandKey: null,
+      vote: vote("a", VoteChoice.skip),
+    });
+    const withdrawn = apply(changed, {
+      seq: 10,
+      type: "vote.withdrawn",
+      commandKey: null,
+      proposalId: "b",
+    });
+
+    expect(changed.me?.votes).toEqual([
+      vote("a", VoteChoice.skip),
+      vote("b", VoteChoice.maybe),
+    ]);
+    expect(withdrawn.me?.votes).toEqual([vote("a", VoteChoice.skip)]);
   });
 });

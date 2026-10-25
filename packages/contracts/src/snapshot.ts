@@ -5,6 +5,7 @@ import { meetingPointSchema, meetingSchema } from "./meeting";
 import { snapshotProposalSchema } from "./proposal";
 import { rsvpViewSchema } from "./rsvp";
 import { sessionViewSchema } from "./session";
+import { ownVoteSchema } from "./vote";
 
 const instant = z.iso.datetime({ offset: true });
 
@@ -53,6 +54,7 @@ export const snapshotSchema = z
       .object({
         guestId: z.string(),
         rsvps: z.array(rsvpViewSchema),
+        votes: z.array(ownVoteSchema),
         meetings: z.array(meetingSchema),
         meetingGuests: z
           .array(eventGuestSchema)

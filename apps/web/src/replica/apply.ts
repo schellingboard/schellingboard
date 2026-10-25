@@ -187,6 +187,29 @@ export function apply(replica: Snapshot, message: FeedMessage): Snapshot {
         };
       return next;
     }
+    case "vote.cast": {
+      const { me } = next;
+      if (me) {
+        const { vote } = message;
+        const held = me.votes.some((v) => v.proposalId === vote.proposalId);
+        next.me = {
+          ...me,
+          votes: held
+            ? me.votes.map((v) => (v.proposalId === vote.proposalId ? vote : v))
+            : [...me.votes, vote],
+        };
+      }
+      return next;
+    }
+    case "vote.withdrawn": {
+      const { me } = next;
+      if (me)
+        next.me = {
+          ...me,
+          votes: me.votes.filter((v) => v.proposalId !== message.proposalId),
+        };
+      return next;
+    }
     default:
       return next;
   }

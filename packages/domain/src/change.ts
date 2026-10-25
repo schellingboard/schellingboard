@@ -4,6 +4,7 @@ import type { Guest } from "./guest";
 import type { Location, LocationUnavailability } from "./location";
 import type { Meeting, MeetingPoint } from "./meeting";
 import type { Rsvp, Session, SessionProposal } from "./session";
+import type { VoteChoice } from "./vote";
 
 export type Actor =
   { type: "guest"; id: string } | { type: "admin" } | { type: "system" };
@@ -69,6 +70,20 @@ export type RsvpRemoved = ChangeOf<
   "rsvp.removed",
   "rsvp",
   { sessionId: string; guestId: string }
+>;
+
+/** Private to the voter, like the RSVP: casting again changes the choice. */
+export type VoteCast = ChangeOf<
+  "vote.cast",
+  "vote",
+  { proposalId: string; guestId: string; choice: VoteChoice }
+>;
+
+/** Also recorded when a vote is lost with its proposal or by becoming its host. */
+export type VoteWithdrawn = ChangeOf<
+  "vote.withdrawn",
+  "vote",
+  { proposalId: string; guestId: string }
 >;
 
 export type EventChanged = ChangeOf<"event.changed", "event", { event: Event }>;
@@ -253,7 +268,9 @@ export type Change =
   | SessionDeleted
   | SessionAttendanceChanged
   | RsvpAdded
-  | RsvpRemoved;
+  | RsvpRemoved
+  | VoteCast
+  | VoteWithdrawn;
 
 /**
  * Who may receive a change (ADR 0014). `guests` and `admins` stand in for the
@@ -309,6 +326,8 @@ export function audienceOf(change: Change): Audience {
     case "rsvp.added":
       return { kind: "guests", ids: [change.payload.rsvp.guestId] };
     case "rsvp.removed":
+    case "vote.cast":
+    case "vote.withdrawn":
       return { kind: "guests", ids: [change.payload.guestId] };
   }
 }
@@ -445,6 +464,39 @@ export const changes = {
       actor,
       occurredAt: at,
       payload: { sessionId, guestId },
+    };
+  },
+
+  voteCast(
+    vote: { proposalId: string; guestId: string; choice: VoteChoice },
+    eventId: string,
+    { actor, at }: ChangeContext
+  ): VoteCast {
+    return {
+      type: "vote.cast",
+      subjectType: "vote",
+      subjectId: `${vote.proposalId}:${vote.guestId}`,
+      eventId,
+      actor,
+      occurredAt: at,
+      payload: vote,
+    };
+  },
+
+  voteWithdrawn(
+    proposalId: string,
+    guestId: string,
+    eventId: string,
+    { actor, at }: ChangeContext
+  ): VoteWithdrawn {
+    return {
+      type: "vote.withdrawn",
+      subjectType: "vote",
+      subjectId: `${proposalId}:${guestId}`,
+      eventId,
+      actor,
+      occurredAt: at,
+      payload: { proposalId, guestId },
     };
   },
 

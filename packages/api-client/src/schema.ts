@@ -6054,6 +6054,7 @@ export interface components {
       me: {
         guestId: string;
         rsvps: components["schemas"]["Rsvp"][];
+        votes: components["schemas"]["OwnVote"][];
         meetings: {
           id: string;
           eventId: string;
@@ -6146,6 +6147,11 @@ export interface components {
       cohostWanted: boolean;
       cohostWantedNote: string | null;
       version: number;
+    };
+    OwnVote: {
+      proposalId: string;
+      /** @enum {string} */
+      choice: "interested" | "maybe" | "skip";
     };
     EventGuest: {
       id: string;
@@ -6417,6 +6423,22 @@ export interface components {
           type: "rsvp.removed";
           sessionId: string;
           guestId: string;
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "vote.cast";
+          vote: components["schemas"]["OwnVote"];
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "vote.withdrawn";
+          proposalId: string;
         };
     Location: {
       id: string;

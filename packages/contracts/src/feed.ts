@@ -4,6 +4,7 @@ import { unavailabilityViewSchema } from "./location";
 import { meetingPointSchema, meetingSchema } from "./meeting";
 import { snapshotProposalSchema } from "./proposal";
 import { rsvpViewSchema } from "./rsvp";
+import { ownVoteSchema } from "./vote";
 import {
   snapshotGuestSchema,
   snapshotLocationSchema,
@@ -142,6 +143,16 @@ export const feedMessageSchema = z
       type: z.literal("rsvp.removed"),
       sessionId: z.string(),
       guestId: z.string(),
+    }),
+    z.object({
+      ...common,
+      type: z.literal("vote.cast"),
+      vote: ownVoteSchema,
+    }),
+    z.object({
+      ...common,
+      type: z.literal("vote.withdrawn"),
+      proposalId: z.string(),
     }),
   ])
   .meta({ id: "FeedMessage" });

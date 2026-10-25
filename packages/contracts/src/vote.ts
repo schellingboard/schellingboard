@@ -12,6 +12,10 @@ export const voteViewSchema = z
   })
   .meta({ id: "Vote" });
 
+export const ownVoteSchema = z
+  .object({ proposalId: z.string(), choice: voteChoiceSchema })
+  .meta({ id: "OwnVote" });
+
 export const voteListSchema = z.object({ votes: z.array(voteViewSchema) });
 
 export const voteCastSchema = z.object({ choice: voteChoiceSchema });

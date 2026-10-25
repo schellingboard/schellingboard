@@ -30,13 +30,6 @@
 - Forms (step 5): legacy `app/components/form-error-summary.tsx` (list of all errors next to
   Save, jump to field) has no SPA equivalent; step 8d (proposal form) must provide it.
 
-- Forms (step 5): legacy `app/components/form-error-summary.tsx` (list of all errors next to
-  Save, jump to field) has no SPA equivalent; step 8d (proposal form) must provide it.
-
-- 6a: snapshot `proposals` = public fields + hosts (names), no `sessionIds`/tally/breakdown.
-  Step 7 only needs selectors and commands, `apply` is done. 6b: `addHost` deletes the
-  joiner's vote, so joining must also record the vote removal. `deleteProposal` and
-  `adminDeleteProposal` now take `now`; deleting a proposal cascades its votes (6b records
-  nothing for the voters' `me.votes` unless handled).
+- Step 6: snapshot `proposals` = public fields + hosts (names), no `sessionIds`/tally/breakdown; `me.votes` = `{proposalId, choice}`. Step 7 only needs selectors and commands, `apply` is done (`vote.cast` replaces in place).
 
 ## Questions

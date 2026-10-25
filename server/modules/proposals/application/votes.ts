@@ -1,7 +1,9 @@
+import { changes } from "@schellingboard/domain/change";
 import { inVotingPhase } from "@schellingboard/domain/phase";
 import type { Vote, VoteChoice } from "@schellingboard/domain/vote";
 import { actingAsNamedGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
+import { byActor } from "@/server/kernel/change-context";
 import { forbidden, notFound, ok, type Result } from "@/server/kernel/result";
 import type { ProposalDeps } from "../ports";
 
@@ -38,6 +40,13 @@ export const castVote =
       // Atomic upsert: concurrent requests for the same (guest, proposal)
       // cannot produce duplicate votes.
       await tx.votes.upsert({ proposalId, guestId, choice });
+      tx.record(
+        changes.voteCast(
+          { proposalId, guestId, choice },
+          proposal.eventId,
+          byActor(actor, now)
+        )
+      );
       return ok(undefined);
     });
 
@@ -55,7 +64,15 @@ export const withdrawVote =
       if (!proposal) return proposalNotFound();
       const event = await tx.events.findById(proposal.eventId);
       if (!event || !inVotingPhase(event, now)) return outsideVoting();
-      await tx.votes.deleteByGuestAndProposal(guestId, proposalId);
+      if (await tx.votes.deleteByGuestAndProposal(guestId, proposalId))
+        tx.record(
+          changes.voteWithdrawn(
+            proposalId,
+            guestId,
+            proposal.eventId,
+            byActor(actor, now)
+          )
+        );
       return ok(undefined);
     });
 

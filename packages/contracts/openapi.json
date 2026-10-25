@@ -593,6 +593,10 @@
                 "type": "array",
                 "items": { "$ref": "#/components/schemas/Rsvp" }
               },
+              "votes": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/OwnVote" }
+              },
               "meetings": {
                 "type": "array",
                 "items": {
@@ -646,6 +650,7 @@
             "required": [
               "guestId",
               "rsvps",
+              "votes",
               "meetings",
               "meetingGuests",
               "availability"
@@ -808,6 +813,17 @@
           "cohostWantedNote",
           "version"
         ]
+      },
+      "OwnVote": {
+        "type": "object",
+        "properties": {
+          "proposalId": { "type": "string" },
+          "choice": {
+            "type": "string",
+            "enum": ["interested", "maybe", "skip"]
+          }
+        },
+        "required": ["proposalId", "choice"]
       },
       "EventGuest": {
         "type": "object",
@@ -1271,6 +1287,32 @@
               "guestId": { "type": "string" }
             },
             "required": ["seq", "commandKey", "type", "sessionId", "guestId"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["vote.cast"] },
+              "vote": { "$ref": "#/components/schemas/OwnVote" }
+            },
+            "required": ["seq", "commandKey", "type", "vote"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["vote.withdrawn"] },
+              "proposalId": { "type": "string" }
+            },
+            "required": ["seq", "commandKey", "type", "proposalId"]
           }
         ]
       },
