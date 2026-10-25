@@ -118,7 +118,9 @@ export function GridView(props: {
         // narrower than it.
         // `cursor` inherits, so links/buttons (session cells, fold toggles, …)
         // are reset to their normal cursor rather than showing the grab hand.
-        className="flex-1 w-full overflow-auto cursor-grab grid content-start [&_a]:cursor-pointer [&_button]:cursor-pointer"
+        // No scroll anchoring: Firefox moved a restored position by a pixel
+        // once the grid re-rendered.
+        className="flex-1 w-full overflow-auto cursor-grab grid content-start [overflow-anchor:none] [&_a]:cursor-pointer [&_button]:cursor-pointer"
         style={{ gridTemplateColumns: "minmax(max-content, 1fr)" }}
       >
         {toolbar}
