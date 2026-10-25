@@ -47,7 +47,11 @@ export async function adminDeleteProposalAction(input: {
   const actor = await resolveActor(await cookies());
   let result;
   try {
-    result = await proposalUseCases().adminDeleteProposal(actor, input);
+    result = await proposalUseCases().adminDeleteProposal(
+      actor,
+      input,
+      await serverNow()
+    );
   } catch {
     return { ok: false, error: "Failed to delete proposal" };
   }

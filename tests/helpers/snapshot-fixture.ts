@@ -104,6 +104,7 @@ export const snapshot: Snapshot = {
     },
   ],
   counts: { s: 4, unscheduled: 0 },
+  proposals: [],
   meetingPoints: [],
   me: {
     guestId: "mia",

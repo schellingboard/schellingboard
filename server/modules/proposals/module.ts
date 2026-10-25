@@ -13,6 +13,7 @@ export {
   createProposalUseCases,
   type ProposalUseCases,
 } from "./application/use-cases";
+export { toSnapshotProposalView } from "./http/view";
 export { addProposalRoutes } from "./http/routes";
 export { addVoteRoutes } from "./http/vote-routes";
 export {

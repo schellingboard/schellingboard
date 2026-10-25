@@ -1,3 +1,4 @@
+import { changes } from "@schellingboard/domain/change";
 import type { SessionProposal } from "@schellingboard/domain/session";
 import type { Actor } from "@/server/kernel/actor";
 import { byAdmin } from "@/server/kernel/change-context";
@@ -107,6 +108,7 @@ export const adminCreateProposal =
         durationMinutes: durationMinutes ?? undefined,
         createdTime: now,
       });
+      tx.record(changes.proposalCreated(created, byAdmin(now)));
       return ok({ created, event });
     });
     if (!result.ok) return result;
@@ -141,6 +143,7 @@ export const adminUpdateProposal =
         updatedTime: now,
       });
       if (!updated) return changedMeanwhile(actor, tx, input.id, now);
+      tx.record(changes.proposalChanged(updated, byAdmin(now)));
       return ok(updated);
     });
     if (!result.ok) return result;
@@ -151,13 +154,15 @@ export const adminDeleteProposal =
   ({ uow }: ProposalDeps) =>
   async (
     actor: Actor,
-    { id }: { id: string }
+    { id }: { id: string },
+    now: Date
   ): Promise<Result<SessionProposal>> => {
     if (!actor.admin) return adminRequired();
     return uow.run(async (tx) => {
       const proposal = await tx.sessionProposals.findById(id);
       if (!proposal) return proposalNotFound();
       await tx.sessionProposals.delete(id);
+      tx.record(changes.proposalDeleted(proposal, byAdmin(now)));
       return ok(proposal);
     });
   };

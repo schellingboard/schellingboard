@@ -2,6 +2,7 @@ import { z } from "zod";
 import { dayViewSchema, eventViewSchema } from "./event";
 import { locationViewSchema, unavailabilityViewSchema } from "./location";
 import { meetingPointSchema, meetingSchema } from "./meeting";
+import { snapshotProposalSchema } from "./proposal";
 import { rsvpViewSchema } from "./rsvp";
 import { sessionViewSchema } from "./session";
 
@@ -42,6 +43,11 @@ export const snapshotSchema = z
     guests: z.array(snapshotGuestSchema).describe("Members and session hosts"),
     sessions: z.array(snapshotSessionSchema),
     counts: z.record(z.string(), z.number().int()).describe("RSVPs by session"),
+    proposals: z
+      .array(snapshotProposalSchema)
+      .describe(
+        "Fields every viewer sees; the tally and the vote breakdown are not here"
+      ),
     meetingPoints: z.array(meetingPointSchema),
     me: z
       .object({

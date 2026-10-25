@@ -36,7 +36,11 @@ describe("vote use cases", () => {
       const { guest, proposal } = await world();
 
       const [deleted, cast] = await Promise.all([
-        proposalUseCases().deleteProposal(NOBODY, { proposalId: proposal.id }),
+        proposalUseCases().deleteProposal(
+          NOBODY,
+          { proposalId: proposal.id },
+          new Date()
+        ),
         proposalUseCases().castVote(
           NOBODY,
           {

@@ -6041,6 +6041,8 @@ export interface components {
       counts: {
         [key: string]: number;
       };
+      /** @description Fields every viewer sees; the tally and the vote breakdown are not here */
+      proposals: components["schemas"]["SnapshotProposal"][];
       meetingPoints: {
         id: string;
         eventId: string;
@@ -6126,6 +6128,24 @@ export interface components {
       version: number;
       hostIds: string[];
       locationIds: string[];
+    };
+    SnapshotProposal: {
+      id: string;
+      eventId: string;
+      title: string;
+      description: string | null;
+      durationMinutes: number | null;
+      /** Format: date-time */
+      createdTime: string;
+      /** Format: date-time */
+      updatedTime: string;
+      hosts: {
+        id: string;
+        name: string;
+      }[];
+      cohostWanted: boolean;
+      cohostWantedNote: string | null;
+      version: number;
     };
     EventGuest: {
       id: string;
@@ -6323,6 +6343,30 @@ export interface components {
           /** @enum {string} */
           type: "availability.changed";
           slotStarts: string[];
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "proposal.created";
+          proposal: components["schemas"]["SnapshotProposal"];
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "proposal.changed";
+          proposal: components["schemas"]["SnapshotProposal"];
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "proposal.deleted";
+          proposalId: string;
         }
       | {
           seq: number;

@@ -32,19 +32,20 @@ as its audience may see it, including `version` where the row has one, so a
 form opened from the replica sends the right `expectedVersion`. A deletion
 carries only ids.
 
-| Subject                | Types                                                   | Audience           |
-| ---------------------- | ------------------------------------------------------- | ------------------ |
-| Event                  | `event.changed`, `event.deleted`                        | event              |
-| Day                    | `day.created`, `day.changed`, `day.deleted`             | event              |
-| Session                | `session.created`, `session.changed`, `session.deleted` | event              |
-| RSVP count             | `session.attendanceChanged` (`sessionId`, `numRsvps`)   | event              |
-| Own RSVP               | `rsvp.added`, `rsvp.removed`                            | guests: the RSVPer |
-| Location in this event | `location.changed`, `location.removed`                  | event              |
-| Room unavailability    | `unavailability.added`, `unavailability.removed`        | event              |
-| Event guest (public)   | `guest.joined`, `guest.changed`, `guest.left`           | event              |
-| Meeting                | `meeting.changed`, `meeting.deleted`                    | guests: the two    |
-| Own meeting slots      | `availability.changed`                                  | guests: the owner  |
-| Meeting point          | `meetingPoint.changed`, `meetingPoint.deleted`          | event              |
+| Subject                | Types                                                      | Audience           |
+| ---------------------- | ---------------------------------------------------------- | ------------------ |
+| Event                  | `event.changed`, `event.deleted`                           | event              |
+| Day                    | `day.created`, `day.changed`, `day.deleted`                | event              |
+| Session                | `session.created`, `session.changed`, `session.deleted`    | event              |
+| Proposal               | `proposal.created`, `proposal.changed`, `proposal.deleted` | event              |
+| RSVP count             | `session.attendanceChanged` (`sessionId`, `numRsvps`)      | event              |
+| Own RSVP               | `rsvp.added`, `rsvp.removed`                               | guests: the RSVPer |
+| Location in this event | `location.changed`, `location.removed`                     | event              |
+| Room unavailability    | `unavailability.added`, `unavailability.removed`           | event              |
+| Event guest (public)   | `guest.joined`, `guest.changed`, `guest.left`              | event              |
+| Meeting                | `meeting.changed`, `meeting.deleted`                       | guests: the two    |
+| Own meeting slots      | `availability.changed`                                     | guests: the owner  |
+| Meeting point          | `meetingPoint.changed`, `meetingPoint.deleted`             | event              |
 
 - **Per-type projection.** The log keeps what reactions need. The feed sends
   `project(change)`, one function per type in `server/feed/`, which drops

@@ -3,7 +3,7 @@ import type { Day, Event } from "./event";
 import type { Guest } from "./guest";
 import type { Location, LocationUnavailability } from "./location";
 import type { Meeting, MeetingPoint } from "./meeting";
-import type { Rsvp, Session } from "./session";
+import type { Rsvp, Session, SessionProposal } from "./session";
 
 export type Actor =
   { type: "guest"; id: string } | { type: "admin" } | { type: "system" };
@@ -177,6 +177,35 @@ export type SessionCohostsAdded = ChangeOf<
   { hostIds: string[] }
 >;
 
+/** A proposal as the log holds it: the votes are the voters' own business. */
+export type LoggedProposal = Omit<
+  SessionProposal,
+  | "votesCount"
+  | "interestedVotesCount"
+  | "maybeVotesCount"
+  | "skipVotesCount"
+  | "sessionIds"
+>;
+
+export type ProposalCreated = ChangeOf<
+  "proposal.created",
+  "proposal",
+  { proposal: LoggedProposal }
+>;
+
+/** Also recorded when a host joins and when a deleted guest leaves its hosts. */
+export type ProposalChanged = ChangeOf<
+  "proposal.changed",
+  "proposal",
+  { proposal: LoggedProposal }
+>;
+
+export type ProposalDeleted = ChangeOf<
+  "proposal.deleted",
+  "proposal",
+  { proposal: LoggedProposal }
+>;
+
 /** Only the reaction that notifies the other hosts reads this. */
 export type ProposalJoined = ChangeOf<
   "proposal.joined",
@@ -196,6 +225,9 @@ export type CommentCreated = ChangeOf<
 
 export type Change =
   | SessionCohostsAdded
+  | ProposalCreated
+  | ProposalChanged
+  | ProposalDeleted
   | ProposalJoined
   | CommentCreated
   | GuestChanged
@@ -240,6 +272,9 @@ export function audienceOf(change: Change): Audience {
     case "session.changed":
     case "session.deleted":
     case "session.attendanceChanged":
+    case "proposal.created":
+    case "proposal.changed":
+    case "proposal.deleted":
     case "event.changed":
     case "event.deleted":
     case "day.created":
@@ -477,6 +512,27 @@ export const changes = {
     };
   },
 
+  proposalCreated(
+    proposal: SessionProposal,
+    { actor, at }: ChangeContext
+  ): ProposalCreated {
+    return proposalChange("proposal.created", proposal, actor, at);
+  },
+
+  proposalChanged(
+    proposal: SessionProposal,
+    { actor, at }: ChangeContext
+  ): ProposalChanged {
+    return proposalChange("proposal.changed", proposal, actor, at);
+  },
+
+  proposalDeleted(
+    proposal: SessionProposal,
+    { actor, at }: ChangeContext
+  ): ProposalDeleted {
+    return proposalChange("proposal.deleted", proposal, actor, at);
+  },
+
   commentCreated(
     comment: CommentRef,
     subject: CommentCreated["payload"]["subject"],
@@ -709,6 +765,34 @@ export const changes = {
     return dayChange("day.deleted", day, actor, at);
   },
 };
+
+function proposalChange<
+  Type extends
+    ProposalCreated["type"] | ProposalChanged["type"] | ProposalDeleted["type"],
+>(type: Type, proposal: SessionProposal, actor: Actor, occurredAt: Date) {
+  const logged: LoggedProposal = {
+    id: proposal.id,
+    eventId: proposal.eventId,
+    title: proposal.title,
+    description: proposal.description,
+    durationMinutes: proposal.durationMinutes,
+    createdTime: proposal.createdTime,
+    updatedTime: proposal.updatedTime,
+    hosts: proposal.hosts,
+    cohostWanted: proposal.cohostWanted,
+    cohostWantedNote: proposal.cohostWantedNote,
+    version: proposal.version,
+  };
+  return {
+    type,
+    subjectType: "proposal" as const,
+    subjectId: proposal.id,
+    eventId: proposal.eventId,
+    actor,
+    occurredAt,
+    payload: { proposal: logged },
+  };
+}
 
 function dayChange<
   Type extends DayCreated["type"] | DayChanged["type"] | DayDeleted["type"],

@@ -188,3 +188,59 @@ describe("apply", () => {
     );
   });
 });
+
+describe("apply: proposals", () => {
+  const proposal = {
+    id: "p",
+    eventId: "e",
+    title: "Idea",
+    description: null,
+    durationMinutes: null,
+    createdTime: snapshot.now,
+    updatedTime: snapshot.now,
+    hosts: [],
+    cohostWanted: false,
+    cohostWantedNote: null,
+    version: 1,
+  };
+
+  it("adds, replaces and removes a proposal", () => {
+    const created = apply(snapshot, {
+      seq: 8,
+      type: "proposal.created",
+      commandKey: null,
+      proposal,
+    });
+    const changedOne = apply(created, {
+      seq: 9,
+      type: "proposal.changed",
+      commandKey: null,
+      proposal: { ...proposal, title: "Renamed", version: 2 },
+    });
+    const gone = apply(changedOne, {
+      seq: 10,
+      type: "proposal.deleted",
+      commandKey: null,
+      proposalId: "p",
+    });
+
+    expect(created.proposals).toEqual([proposal]);
+    expect(changedOne.proposals).toEqual([
+      { ...proposal, title: "Renamed", version: 2 },
+    ]);
+    expect(gone.proposals).toEqual([]);
+  });
+
+  it("replaces a changed proposal where it is", () => {
+    const other = { ...proposal, id: "q" };
+    const start = { ...snapshot, proposals: [proposal, other] };
+    const changed = apply(start, {
+      seq: 9,
+      type: "proposal.changed",
+      commandKey: null,
+      proposal: { ...proposal, title: "Renamed", version: 2 },
+    });
+
+    expect(changed.proposals.map((p) => p.id)).toEqual(["p", "q"]);
+  });
+});

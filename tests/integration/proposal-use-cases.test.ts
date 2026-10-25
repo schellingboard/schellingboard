@@ -422,22 +422,34 @@ describe("proposal mutations", () => {
       const hosted = await createProposal(event.id, [host.id]);
       const unhosted = await createProposal(event.id, []);
 
-      const refused = await proposalUseCases().deleteProposal(open(other.id), {
-        proposalId: hosted.id,
-      });
+      const refused = await proposalUseCases().deleteProposal(
+        open(other.id),
+        {
+          proposalId: hosted.id,
+        },
+        now()
+      );
       expect(!refused.ok && refused.error.code).toBe("proposal.notHost");
       expect(
         (
-          await proposalUseCases().deleteProposal(open(host.id), {
-            proposalId: hosted.id,
-          })
+          await proposalUseCases().deleteProposal(
+            open(host.id),
+            {
+              proposalId: hosted.id,
+            },
+            now()
+          )
         ).ok
       ).toBe(true);
       expect(
         (
-          await proposalUseCases().deleteProposal(NOBODY, {
-            proposalId: unhosted.id,
-          })
+          await proposalUseCases().deleteProposal(
+            NOBODY,
+            {
+              proposalId: unhosted.id,
+            },
+            now()
+          )
         ).ok
       ).toBe(true);
       expect(
@@ -490,14 +502,18 @@ describe("proposal mutations", () => {
 
       expect(
         (
-          await proposalUseCases().adminDeleteProposal(ADMIN, {
-            id: proposal.id,
-          })
+          await proposalUseCases().adminDeleteProposal(
+            ADMIN,
+            { id: proposal.id },
+            now()
+          )
         ).ok
       ).toBe(true);
-      const gone = await proposalUseCases().adminDeleteProposal(ADMIN, {
-        id: proposal.id,
-      });
+      const gone = await proposalUseCases().adminDeleteProposal(
+        ADMIN,
+        { id: proposal.id },
+        now()
+      );
       expect(!gone.ok && gone.error.code).toBe("proposal.notFound");
     }
   );

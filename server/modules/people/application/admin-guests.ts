@@ -8,6 +8,7 @@ import { changes } from "@schellingboard/domain/change";
 import type { CompleteGuest } from "@schellingboard/domain/guest";
 import type { Actor } from "@/server/kernel/actor";
 import { byAdmin } from "@/server/kernel/change-context";
+import { recordingProposalCascade } from "@/server/kernel/proposal-cascade";
 import { recordingSessionCascade } from "@/server/kernel/session-cascade";
 import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import { withStoredFile } from "@/server/kernel/stored-files";
@@ -183,11 +184,19 @@ export const updateGuest =
         );
       const existing = await tx.guests.findByEmail(email);
       if (existing && existing.id !== id) return emailTaken();
+      const by = byAdmin(now);
       const updated = await recordingShownGuests(
         tx,
         await tx.guests.listShownEventIds(id),
-        () => tx.guests.update(id, { name, info: { email }, expectedVersion }),
-        byAdmin(now)
+        async () =>
+          recordingProposalCascade(
+            tx,
+            await tx.sessionProposals.listByHost(id),
+            () =>
+              tx.guests.update(id, { name, info: { email }, expectedVersion }),
+            by
+          ),
+        by
       );
       if (!updated) return guestNotFound();
       return ok(await withEvents(tx.guests, updated));
@@ -214,14 +223,21 @@ export const deleteGuest =
           ].map((s) => [s.id, s])
         );
         const meetings = await tx.meetings.listByGuest(input.id);
+        const proposals = await tx.sessionProposals.listByHost(input.id);
         await recordingShownGuests(
           tx,
           await tx.guests.listShownEventIds(input.id),
           () =>
-            recordingSessionCascade(
+            recordingProposalCascade(
               tx,
-              [...sessions.values()],
-              () => tx.guests.delete(input.id),
+              proposals,
+              () =>
+                recordingSessionCascade(
+                  tx,
+                  [...sessions.values()],
+                  () => tx.guests.delete(input.id),
+                  by
+                ),
               by
             ),
           by

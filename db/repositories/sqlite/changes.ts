@@ -8,6 +8,7 @@ import type {
   Audience,
   Change,
   CommentCreated,
+  LoggedProposal,
   MeetingAnswered,
   RecordedChange,
 } from "@schellingboard/domain/change";
@@ -43,6 +44,15 @@ const EVENT_DATES = [
   "schedulingPhaseStart",
   "schedulingPhaseEnd",
 ] as const;
+
+function reviveProposal(json: LoggedProposal): LoggedProposal {
+  const raw = json as unknown as Record<string, string>;
+  return {
+    ...json,
+    createdTime: new Date(raw.createdTime),
+    updatedTime: new Date(raw.updatedTime),
+  };
+}
 
 function reviveEvent(json: Event): Event {
   const raw = json as unknown as Record<string, string | undefined>;
@@ -260,6 +270,17 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
         subjectType: "session",
         payload: row.payload as { hostIds: string[] },
       };
+    case "proposal.created":
+    case "proposal.changed":
+    case "proposal.deleted": {
+      const payload = row.payload as { proposal: LoggedProposal };
+      return {
+        ...common,
+        type: row.type,
+        subjectType: "proposal",
+        payload: { proposal: reviveProposal(payload.proposal) },
+      };
+    }
     case "proposal.joined":
       return {
         ...common,
@@ -322,6 +343,9 @@ const KNOWN_TYPES: RecordedChange["type"][] = [
   "session.attendanceChanged",
   "rsvp.added",
   "rsvp.removed",
+  "proposal.created",
+  "proposal.changed",
+  "proposal.deleted",
   "proposal.joined",
   "comment.created",
   "session.cohostsAdded",

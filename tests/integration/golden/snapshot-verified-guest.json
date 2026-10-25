@@ -113,6 +113,7 @@
   "counts": {
     "<talk>": 2
   },
+  "proposals": [],
   "meetingPoints": [
     {
       "id": "<lobby>",

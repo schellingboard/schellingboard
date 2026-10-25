@@ -204,9 +204,11 @@ export function addProposalRoutes(app: App, proposals: () => ProposalUseCases) {
   });
 
   app.openapi(deleteProposal, async (c) => {
-    const result = await proposals().deleteProposal(c.var.actor, {
-      proposalId: c.req.valid("param").id,
-    });
+    const result = await proposals().deleteProposal(
+      c.var.actor,
+      { proposalId: c.req.valid("param").id },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);
   });
@@ -233,9 +235,11 @@ export function addProposalRoutes(app: App, proposals: () => ProposalUseCases) {
   });
 
   app.openapi(adminDeleteProposal, async (c) => {
-    const result = await proposals().adminDeleteProposal(c.var.actor, {
-      id: c.req.valid("param").id,
-    });
+    const result = await proposals().adminDeleteProposal(
+      c.var.actor,
+      { id: c.req.valid("param").id },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);
   });

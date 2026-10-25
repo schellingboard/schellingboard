@@ -2,6 +2,7 @@ import { z } from "zod";
 import { dayViewSchema, eventViewSchema } from "./event";
 import { unavailabilityViewSchema } from "./location";
 import { meetingPointSchema, meetingSchema } from "./meeting";
+import { snapshotProposalSchema } from "./proposal";
 import { rsvpViewSchema } from "./rsvp";
 import {
   snapshotGuestSchema,
@@ -94,6 +95,21 @@ export const feedMessageSchema = z
       ...common,
       type: z.literal("availability.changed"),
       slotStarts: z.array(z.iso.datetime({ offset: true })),
+    }),
+    z.object({
+      ...common,
+      type: z.literal("proposal.created"),
+      proposal: snapshotProposalSchema,
+    }),
+    z.object({
+      ...common,
+      type: z.literal("proposal.changed"),
+      proposal: snapshotProposalSchema,
+    }),
+    z.object({
+      ...common,
+      type: z.literal("proposal.deleted"),
+      proposalId: z.string(),
     }),
     z.object({
       ...common,

@@ -236,7 +236,11 @@ describe("posting a comment", () => {
       const { guest, proposal } = await subjects();
 
       const [deleted, commented] = await Promise.all([
-        proposalUseCases().deleteProposal(NOBODY, { proposalId: proposal.id }),
+        proposalUseCases().deleteProposal(
+          NOBODY,
+          { proposalId: proposal.id },
+          new Date()
+        ),
         comments().createComment(
           open(guest.id),
           { subject: proposal, body: "Hello" },

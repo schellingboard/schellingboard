@@ -134,7 +134,8 @@ export async function deleteProposal(
   try {
     const result = await proposalUseCases().deleteProposal(
       await resolveActor(await cookies()),
-      { proposalId: id }
+      { proposalId: id },
+      await serverNow()
     );
     if (!result.ok) {
       return { error: result.error.detail ?? "Failed to delete proposal" };

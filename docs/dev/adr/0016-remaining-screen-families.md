@@ -44,9 +44,14 @@ votes were not in the snapshot.
 
 ### Amendment to ADR 0014
 
-The snapshot gains the event's proposals (public fields and hosts) and
-`me.votes`; the feed gains proposal and vote changes. A vote change reaches
-only the voter's connection. Other viewers get no vote counts from the feed.
+The snapshot gains the event's proposals and `me.votes`; the feed gains
+proposal and vote changes. A proposal is its public fields and hosts (with
+names): not `sessionIds`, which the sessions' `proposalId` give, and not the
+tally or breakdown, which depend on votes and phase. `proposal.changed` is also
+recorded when a host joins, and when deleting or renaming a guest changes the
+hosts of their proposals (a host's name is not in the event's guests unless
+they are a member). The logged proposal carries no vote counts. A vote change reaches only the voter's connection. Other viewers
+get no vote counts from the feed.
 
 ## Consequences
 

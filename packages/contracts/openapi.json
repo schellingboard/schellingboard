@@ -558,6 +558,11 @@
             "additionalProperties": { "type": "integer" },
             "description": "RSVPs by session"
           },
+          "proposals": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/SnapshotProposal" },
+            "description": "Fields every viewer sees; the tally and the vote breakdown are not here"
+          },
           "meetingPoints": {
             "type": "array",
             "items": {
@@ -657,6 +662,7 @@
           "guests",
           "sessions",
           "counts",
+          "proposals",
           "meetingPoints",
           "me"
         ]
@@ -762,6 +768,45 @@
           "version",
           "hostIds",
           "locationIds"
+        ]
+      },
+      "SnapshotProposal": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "eventId": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": ["string", "null"] },
+          "durationMinutes": { "type": ["number", "null"] },
+          "createdTime": { "type": "string", "format": "date-time" },
+          "updatedTime": { "type": "string", "format": "date-time" },
+          "hosts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "name": { "type": "string" }
+              },
+              "required": ["id", "name"]
+            }
+          },
+          "cohostWanted": { "type": "boolean" },
+          "cohostWantedNote": { "type": ["string", "null"] },
+          "version": { "type": "integer" }
+        },
+        "required": [
+          "id",
+          "eventId",
+          "title",
+          "description",
+          "durationMinutes",
+          "createdTime",
+          "updatedTime",
+          "hosts",
+          "cohostWanted",
+          "cohostWantedNote",
+          "version"
         ]
       },
       "EventGuest": {
@@ -1104,6 +1149,45 @@
               }
             },
             "required": ["seq", "commandKey", "type", "slotStarts"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["proposal.created"] },
+              "proposal": { "$ref": "#/components/schemas/SnapshotProposal" }
+            },
+            "required": ["seq", "commandKey", "type", "proposal"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["proposal.changed"] },
+              "proposal": { "$ref": "#/components/schemas/SnapshotProposal" }
+            },
+            "required": ["seq", "commandKey", "type", "proposal"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["proposal.deleted"] },
+              "proposalId": { "type": "string" }
+            },
+            "required": ["seq", "commandKey", "type", "proposalId"]
           },
           {
             "type": "object",

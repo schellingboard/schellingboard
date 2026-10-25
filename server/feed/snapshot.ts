@@ -14,6 +14,10 @@ import {
   toMeetingPointView,
   toMeetingView,
 } from "@/server/modules/meetings/module";
+import {
+  eventProposals,
+  toSnapshotProposalView,
+} from "@/server/modules/proposals/module";
 import { eventGuests, toEventGuestView } from "@/server/modules/people/module";
 import {
   eventSessions,
@@ -27,6 +31,7 @@ type SnapshotReads = Parameters<typeof eventScheduleBySlug>[0] &
   Parameters<typeof eventLocations>[0] &
   Parameters<typeof eventGuests>[0] &
   Parameters<typeof eventMeetings>[0] &
+  Parameters<typeof eventProposals>[0] &
   Parameters<typeof newestSeq>[0];
 
 /**
@@ -63,13 +68,15 @@ async function assemble(
   const schedule = await eventScheduleBySlug(q, slug);
   if (!schedule) return undefined;
   const eventId = schedule.event.id;
-  const [seq, sessions, locations, guests, meetings] = await Promise.all([
-    newestSeq(q),
-    eventSessions(q, eventId, viewerId),
-    eventLocations(q, eventId),
-    eventGuests(q, eventId),
-    eventMeetings(q, eventId, viewerId),
-  ]);
+  const [seq, sessions, locations, guests, meetings, proposals] =
+    await Promise.all([
+      newestSeq(q),
+      eventSessions(q, eventId, viewerId),
+      eventLocations(q, eventId),
+      eventGuests(q, eventId),
+      eventMeetings(q, eventId, viewerId),
+      eventProposals(q, eventId),
+    ]);
   return {
     seq,
     now: now.toISOString(),
@@ -82,6 +89,7 @@ async function assemble(
     counts: Object.fromEntries(
       sessions.sessions.map((s) => [s.id, s.numRsvps])
     ),
+    proposals: proposals.map(toSnapshotProposalView),
     meetingPoints: meetings.meetingPoints.map(toMeetingPointView),
     me: viewerId
       ? {

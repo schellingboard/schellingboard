@@ -75,9 +75,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
 ### Proposals and voting
 
 - [ ] 6. **Proposals and votes in the snapshot and feed** (server):
-  - [ ] 6a. Proposals: public fields and hosts in the snapshot; `proposal.*` change
-        types recorded by every use case that changes a proposal or its hosts, with
-        the audience the event's members. No field the API hides from that viewer.
+  - [x] 6a. Proposals in the snapshot and feed (`proposal.created/changed/deleted`, audience event; join and guest delete record too). `apply` handles them already (legacy and SPA copies).
   - [ ] 6b. Votes: `me.votes` in the snapshot; `vote.*` change types, audience the
         voter only. Integration tests: each use case records; another guest's feed
         never carries the vote.

@@ -8,6 +8,7 @@ import {
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import { byGuest } from "@/server/kernel/change-context";
+import { recordingProposalCascade } from "@/server/kernel/proposal-cascade";
 import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import { withStoredFile } from "@/server/kernel/stored-files";
 import {
@@ -88,21 +89,28 @@ async function saveProfile(
     uow.run(async (tx) => {
       const current = await tx.guests.findById(guestId);
       if (!current) return profileNotFound();
+      const by = byGuest(guestId, now);
       const updated = await recordingShownGuests(
         tx,
         await tx.guests.listShownEventIds(guestId),
-        () =>
-          tx.guests.updateProfile(
-            guestId,
-            {
-              ...fields(current),
-              avatarUrl:
-                avatar === undefined ? (current.avatarUrl ?? null) : newUrl,
-              expectedVersion,
-            },
-            now
+        async () =>
+          recordingProposalCascade(
+            tx,
+            await tx.sessionProposals.listByHost(guestId),
+            () =>
+              tx.guests.updateProfile(
+                guestId,
+                {
+                  ...fields(current),
+                  avatarUrl:
+                    avatar === undefined ? (current.avatarUrl ?? null) : newUrl,
+                  expectedVersion,
+                },
+                now
+              ),
+            by
           ),
-        byGuest(guestId, now)
+        by
       );
       if (!updated) {
         const after = await tx.guests.findById(guestId);

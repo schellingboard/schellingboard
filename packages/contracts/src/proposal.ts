@@ -54,6 +54,10 @@ export const proposalViewSchema = z
   })
   .meta({ id: "Proposal" });
 
+export const snapshotProposalSchema = proposalViewSchema
+  .omit({ sessionIds: true, tally: true, breakdown: true })
+  .meta({ id: "SnapshotProposal" });
+
 export const proposalListSchema = pageSchema(proposalViewSchema);
 
 export const proposalCreateSchema = sessionProposalSchema

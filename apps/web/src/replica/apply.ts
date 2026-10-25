@@ -130,6 +130,21 @@ export function apply(replica: Snapshot, message: FeedMessage): Snapshot {
     case "day.deleted":
       next.days = next.days.filter((d) => d.id !== message.dayId);
       return next;
+    case "proposal.created":
+    case "proposal.changed": {
+      const { proposal } = message;
+      const at = next.proposals.findIndex((p) => p.id === proposal.id);
+      next.proposals =
+        at === -1
+          ? [...next.proposals, proposal]
+          : next.proposals.map((p, i) => (i === at ? proposal : p));
+      return next;
+    }
+    case "proposal.deleted":
+      next.proposals = next.proposals.filter(
+        (p) => p.id !== message.proposalId
+      );
+      return next;
     case "session.created":
     case "session.changed": {
       const { session } = message;

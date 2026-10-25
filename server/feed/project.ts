@@ -5,6 +5,7 @@ import {
   toMeetingPointView,
   toMeetingView,
 } from "@/server/modules/meetings/module";
+import { toSnapshotProposalView } from "@/server/modules/proposals/module";
 import { toEventGuestView } from "@/server/modules/people/module";
 import { toLocationView } from "@/server/modules/venue/module";
 import {
@@ -95,6 +96,15 @@ export function project(
       };
     case "day.deleted":
       return { ...common, type: change.type, dayId: change.subjectId };
+    case "proposal.created":
+    case "proposal.changed":
+      return {
+        ...common,
+        type: change.type,
+        proposal: toSnapshotProposalView(change.payload.proposal),
+      };
+    case "proposal.deleted":
+      return { ...common, type: change.type, proposalId: change.subjectId };
     case "session.created":
       return {
         ...common,

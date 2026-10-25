@@ -1,8 +1,9 @@
-import { changes } from "@schellingboard/domain/change";
+import { changes, type ChangeContext } from "@schellingboard/domain/change";
 import { inSchedPhase } from "@schellingboard/domain/phase";
 import type { SessionProposal } from "@schellingboard/domain/session";
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
+import { byActor } from "@/server/kernel/change-context";
 import {
   conflict,
   forbidden,
@@ -99,6 +100,7 @@ export const createProposal =
         description: fields.description || undefined,
         createdTime: now,
       });
+      tx.record(changes.proposalCreated(created, byActor(actor, now)));
       return ok({ created, event });
     });
     if (!result.ok) return result;
@@ -137,6 +139,7 @@ export const updateProposal =
         updatedTime: now,
       });
       if (!updated) return changedMeanwhile(actor, tx, proposalId, now);
+      tx.record(changes.proposalChanged(updated, byActor(actor, now)));
       return ok(updated);
     });
     if (!result.ok) return result;
@@ -172,12 +175,15 @@ export const joinProposal =
           "proposal.hostNotWanted",
           "This proposal is not looking for a host"
         );
+      const by: ChangeContext = {
+        actor: { type: "guest", id: joinerId },
+        at: now,
+      };
       tx.record(
-        changes.proposalJoined(proposalId, proposal.eventId, joinerId, {
-          actor: { type: "guest", id: joinerId },
-          at: now,
-        })
+        changes.proposalJoined(proposalId, proposal.eventId, joinerId, by)
       );
+      const joined = await tx.sessionProposals.findById(proposalId);
+      if (joined) tx.record(changes.proposalChanged(joined, by));
       return ok(undefined);
     });
   };
@@ -186,7 +192,8 @@ export const deleteProposal =
   ({ uow }: ProposalDeps) =>
   async (
     actor: Actor,
-    { proposalId }: { proposalId: string }
+    { proposalId }: { proposalId: string },
+    now: Date
   ): Promise<Result<SessionProposal>> =>
     uow.run(async (tx) => {
       const proposal = await tx.sessionProposals.findById(proposalId);
@@ -194,5 +201,6 @@ export const deleteProposal =
       const refused = await notItsHost(actor, tx, proposal, "delete");
       if (refused) return refused;
       await tx.sessionProposals.delete(proposalId);
+      tx.record(changes.proposalDeleted(proposal, byActor(actor, now)));
       return ok(proposal);
     });
