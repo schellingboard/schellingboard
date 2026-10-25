@@ -1,7 +1,7 @@
 # ADR 0014: The change feed and the snapshot
 
 - **Status:** Accepted
-- **Date:** 2026-10-07
+- **Date:** 2026-10-07, amended 2026-10-25 (proposals and votes join the snapshot and feed, see [ADR 0016](0016-remaining-screen-families.md#amendment-to-adr-0014))
 - **Issue:** #1111
 
 ## Context

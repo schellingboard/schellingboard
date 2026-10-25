@@ -27,6 +27,7 @@ the tracking issue where there is one.
 | [0013](0013-unit-of-work.md)                         | The unit of work                                            | 2026-10-06 |
 | [0014](0014-change-feed-and-snapshot.md)             | The change feed and the snapshot                            | 2026-10-07 |
 | [0015](0015-spa-alongside-next.md)                   | The SPA alongside Next                                      | 2026-10-08 |
+| [0016](0016-remaining-screen-families.md)            | The remaining screen families                               | 2026-10-25 |
 
 Longer design work that isn't a single decision lives next door:
 [Target architecture](../target-architecture/README.md) and
