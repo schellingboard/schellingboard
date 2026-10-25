@@ -1,5 +1,5 @@
 import { useEffect, useRef, type RefObject } from "react";
-import { ArrowPathIcon } from "../ui/icons";
+import { ArrowPathIcon } from "../../ui/icons";
 
 const AXIS_PX = 8;
 // Far enough that only a pull meant as one reaches it: panning the grid around

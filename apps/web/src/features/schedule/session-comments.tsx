@@ -1,15 +1,15 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { COMMENT_MAX_LENGTH } from "@schellingboard/domain/comment";
 import { formatInLocalZone } from "@schellingboard/domain/time";
-import type { CommentView } from "../commands/comment";
-import type { CommentsState } from "../queries/comments";
+import type { CommentView } from "../../commands/comment";
+import type { CommentsState } from "../../queries/comments";
 import type {
   CommentResult,
   CommentsController,
-} from "../queries/comments-controller";
-import { ConfirmDialog } from "../ui/confirm-dialog";
-import { Dialog } from "../ui/dialog";
-import { Markdown } from "../ui/markdown";
+} from "../../queries/comments-controller";
+import { ConfirmDialog } from "../../ui/confirm-dialog";
+import { Dialog } from "../../ui/dialog";
+import { Markdown } from "../../ui/markdown";
 import { useSchedule } from "./context";
 
 type Handle = ReturnType<ReturnType<typeof useSchedule>["actions"]["comments"]>;

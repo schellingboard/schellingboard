@@ -1,4 +1,4 @@
-import { ChevronDownSmallIcon, ChevronUpSmallIcon } from "../ui/icons";
+import { ChevronDownSmallIcon, ChevronUpSmallIcon } from "../../ui/icons";
 
 const STEP_CLASS =
   "flex h-10 w-10 items-center justify-center rounded-full text-fg-muted hover:bg-surface-hover hover:text-fg focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent sm:h-8 sm:w-8";

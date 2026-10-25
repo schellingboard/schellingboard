@@ -1,6 +1,6 @@
 // @module-tag 007-US1
 import { describe, it, expect } from "vitest";
-import { snapshot } from "../replica/snapshot-fixture";
+import { snapshot } from "../../replica/snapshot-fixture";
 import { scheduleDataFrom } from "./data";
 
 describe("scheduleDataFrom", () => {

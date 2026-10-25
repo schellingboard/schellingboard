@@ -3,16 +3,16 @@ import type { Location } from "@schellingboard/domain/location";
 import type { Session } from "@schellingboard/domain/session";
 import { isBookableSlot } from "@schellingboard/domain/session-bookable";
 import { formatOptionalTime, TIME_FORMAT } from "@schellingboard/domain/time";
-import { cx } from "../ui/cx";
+import { cx } from "../../ui/cx";
 import {
   AcademicCapIcon,
   ClockIcon,
   LockIcon,
   PlusIcon,
   UserIcon,
-} from "../ui/icons";
-import { plainText } from "../ui/plain-text";
-import { Tooltip } from "../ui/tooltip";
+} from "../../ui/icons";
+import { plainText } from "../../ui/plain-text";
+import { Tooltip } from "../../ui/tooltip";
 import {
   CURRENT_MATCH_CLASS,
   GHOST_CLASS,

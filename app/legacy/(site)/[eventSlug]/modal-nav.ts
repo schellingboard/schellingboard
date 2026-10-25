@@ -6,7 +6,7 @@ import type { useRouter } from "next/navigation";
 /*
 (anchor: MnpjIo7Y)
 
-The session modal is the SPA's (apps/web/src/schedule/schedule-screen.tsx): a click on the
+The session modal is the SPA's (apps/web/src/features/schedule/schedule-screen.tsx): a click on the
 schedule pushes `?viewSession=`, Back or Close pops it, and an address opened directly is
 closed by removing the param. Legacy pages link to it with a plain anchor (`viewSessionLink`).
 

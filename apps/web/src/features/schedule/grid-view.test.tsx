@@ -11,7 +11,7 @@ import {
   renderScheduled,
   snapshotWith,
 } from "./test-support";
-import { snapshot } from "../replica/snapshot-fixture";
+import { snapshot } from "../../replica/snapshot-fixture";
 
 function Grid({
   data,

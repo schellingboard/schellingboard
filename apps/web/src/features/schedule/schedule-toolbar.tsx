@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import type { Event } from "@schellingboard/domain/event";
 import { hasPhases } from "@schellingboard/domain/phase";
 import { formatEventDates } from "@schellingboard/domain/time";
-import { Dialog } from "../ui/dialog";
+import { Dialog } from "../../ui/dialog";
 import {
   CalendarIcon,
   ClockIcon,
@@ -10,9 +10,9 @@ import {
   ProposalsIcon,
   QueueIcon,
   TableIcon,
-} from "../ui/icons";
-import { cx } from "../ui/cx";
-import { Markdown } from "../ui/markdown";
+} from "../../ui/icons";
+import { cx } from "../../ui/cx";
+import { Markdown } from "../../ui/markdown";
 import { scrollNowLineIntoView } from "./now-line";
 
 const ITEM_CLASS =

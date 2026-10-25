@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { ApiClient } from "@schellingboard/api-client";
 import { DevToolbar } from "./dev-toolbar";
 import { ErrorBoundary } from "./error-boundary";
-import { useKioskMode } from "../schedule/kiosk";
+import { useKioskMode } from "../features/schedule/kiosk";
 import { Footer } from "./footer";
 import { hardReload } from "./hard-navigate";
 import { HeaderLinks } from "./header-links";

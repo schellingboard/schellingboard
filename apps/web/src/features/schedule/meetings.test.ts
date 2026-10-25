@@ -1,6 +1,6 @@
 // @module-tag 012-US5
 import { describe, it, expect } from "vitest";
-import { snapshot } from "../replica/snapshot-fixture";
+import { snapshot } from "../../replica/snapshot-fixture";
 import { meetingViewsFrom } from "./meetings";
 
 const meeting = (patch: object) => ({

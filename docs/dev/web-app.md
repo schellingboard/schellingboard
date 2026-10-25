@@ -53,7 +53,7 @@ The files are read relative to the working directory, so the same code serves
 ## Layout and rules
 
 `apps/web/src/` follows [the client layout](target-architecture/04-client.md#layout);
-`app/` (layout, nav bar, shell, pages), `ui/` (dialog, button, tooltip, icons), `schedule/`, `replica/`, `commands/` and `queries/` exist so far (the replica: store, `apply`, feed client, sync state, a server clock offset and IndexedDB persistence keyed by event and viewer, opened as `stale`). dependency-cruiser enforces that the package imports
+`app/` (layout, nav bar, shell, pages), `ui/` (dialog, button, tooltip, icons), `features/schedule/`, `replica/`, `commands/` and `queries/` exist so far (the replica: store, `apply`, feed client, sync state, a server clock offset and IndexedDB persistence keyed by event and viewer, opened as `stale`). dependency-cruiser enforces that the package imports
 `packages/domain`, `packages/contracts` and `packages/api-client` only (never `app/`,
 `server/`, `utils/` or `next`), that nothing imports it, that `features/` never
 imports `api-client`, and that it declares what it imports. See
@@ -101,7 +101,7 @@ the frame shows. The schedule page mounts it.
 
 ## The schedule
 
-`src/schedule/` holds the schedule screens; `ScheduleScreen` is the entry: a snapshot, the
+`src/features/schedule/` holds the schedule screens; `ScheduleScreen` is the entry: a snapshot, the
 server's `now`, `links`, the page's search params (+ a setter) and slots for the sync indicator
 and footer. The view (`view=agenda`), filter chips (`filter=`) and narrowed rooms (`loc=`) live
 in the params; the search text and unfolded days are local. Everything is drawn from the

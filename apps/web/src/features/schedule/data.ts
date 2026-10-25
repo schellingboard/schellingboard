@@ -4,7 +4,7 @@ import type {
   Location,
   LocationUnavailability,
 } from "@schellingboard/domain/location";
-import { eventContextFrom } from "../replica/selectors";
+import { eventContextFrom } from "../../replica/selectors";
 import type { Session } from "@schellingboard/domain/session";
 import type { MeetingView } from "./meeting-view";
 import { meetingViewsFrom } from "./meetings";

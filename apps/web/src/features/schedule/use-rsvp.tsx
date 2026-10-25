@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import type { Session } from "@schellingboard/domain/session";
-import { AlertDialog, ConfirmDialog } from "../ui/confirm-dialog";
+import { AlertDialog, ConfirmDialog } from "../../ui/confirm-dialog";
 import { useSchedule } from "./context";
 import { describeRsvpClash, findRsvpClash, type RsvpClash } from "./rsvp-clash";
 

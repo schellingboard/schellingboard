@@ -68,9 +68,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
 
 ### Foundations
 
-- [ ] 3. **`features/` layout**: `apps/web/src/schedule/` moves to
-      `apps/web/src/features/schedule/`, so the "features never call the api-client" rule
-      covers it; fix whatever that rule then finds. Refactor only; `web-app.md` paths.
+- [x] 3. `apps/web/src/schedule/` moved to `features/schedule/`; the arch rule found nothing to fix.
 - [ ] 4. **Failure notices** (the user's request): an app-wide notice region in `ui/`
       (`role="alert"` for failures, `role="status"` for confirmations), mounted by the
       shell. The command runner reports a refusal and a given-up command with the

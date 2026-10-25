@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
-import { snapshot as base, iso } from "../replica/snapshot-fixture";
+import { snapshot as base, iso } from "../../replica/snapshot-fixture";
 import { legacyScheduleLinks } from "./links";
 import { ScheduleScreen, type ScheduleActions } from "./schedule-screen";
 

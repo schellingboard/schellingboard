@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { snapshot as base } from "../replica/snapshot-fixture";
+import { snapshot as base } from "../../replica/snapshot-fixture";
 import { comment, fakeComments } from "./comments-test-support";
 import { SessionComments } from "./session-comments";
 import { renderScheduled } from "./test-support";

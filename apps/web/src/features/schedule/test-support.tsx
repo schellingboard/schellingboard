@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { render } from "@testing-library/react";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
-import { iso, snapshot as base } from "../replica/snapshot-fixture";
+import { iso, snapshot as base } from "../../replica/snapshot-fixture";
 import { ScheduleProvider, type ScheduleActions } from "./context";
 import { scheduleDataFrom } from "./data";
 import { legacyScheduleLinks } from "./links";

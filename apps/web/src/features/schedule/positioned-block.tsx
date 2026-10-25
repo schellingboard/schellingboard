@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { cx } from "../ui/cx";
+import { cx } from "../../ui/cx";
 
 export type Position = { top: number; height: number };
 

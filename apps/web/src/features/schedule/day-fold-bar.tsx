@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { ChevronDownIcon, ChevronRightIcon } from "../ui/icons";
+import { ChevronDownIcon, ChevronRightIcon } from "../../ui/icons";
 
 /**
  * Header for a day that has passed, or that has nothing a search is looking

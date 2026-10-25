@@ -5,10 +5,10 @@ import {
   attendeeGuests,
   type AttendeesQuery,
   type AttendeesState,
-} from "../queries/attendees";
-import { Dialog } from "../ui/dialog";
-import { AcademicCapIcon, CheckCircleIcon, LockIcon } from "../ui/icons";
-import { Markdown } from "../ui/markdown";
+} from "../../queries/attendees";
+import { Dialog } from "../../ui/dialog";
+import { AcademicCapIcon, CheckCircleIcon, LockIcon } from "../../ui/icons";
+import { Markdown } from "../../ui/markdown";
 import { useSchedule } from "./context";
 import { AttendeeCountField } from "./attendee-count-field";
 import { SessionComments } from "./session-comments";

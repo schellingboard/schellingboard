@@ -8,13 +8,13 @@ import {
   formatSlotLabel,
   TIME_FORMAT,
 } from "@schellingboard/domain/time";
-import { cx } from "../ui/cx";
+import { cx } from "../../ui/cx";
 import {
   AcademicCapIcon,
   CheckCircleIcon,
   LockIcon,
   UserIcon,
-} from "../ui/icons";
+} from "../../ui/icons";
 import {
   agendaGroups,
   nowMarkerIndex,

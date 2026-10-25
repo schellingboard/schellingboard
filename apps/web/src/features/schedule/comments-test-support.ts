@@ -1,8 +1,8 @@
 import { vi } from "vitest";
-import type { CommentView } from "../commands/comment";
-import type { CommentsState } from "../queries/comments";
-import type { CommentsController } from "../queries/comments-controller";
-import { createObservable } from "../queries/store";
+import type { CommentView } from "../../commands/comment";
+import type { CommentsState } from "../../queries/comments";
+import type { CommentsController } from "../../queries/comments-controller";
+import { createObservable } from "../../queries/store";
 import type { ScheduleActions } from "./context";
 
 export const comment = (

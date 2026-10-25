@@ -2,10 +2,10 @@ import { useState } from "react";
 import { DateTime } from "luxon";
 import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
 import { getNumSlots } from "@schellingboard/domain/slots";
-import { cx } from "../ui/cx";
-import { Dialog } from "../ui/dialog";
-import { PlusIcon } from "../ui/icons";
-import { Tooltip } from "../ui/tooltip";
+import { cx } from "../../ui/cx";
+import { Dialog } from "../../ui/dialog";
+import { PlusIcon } from "../../ui/icons";
+import { Tooltip } from "../../ui/tooltip";
 import {
   CURRENT_MATCH_CLASS,
   GHOST_CLASS,

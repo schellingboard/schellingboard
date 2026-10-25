@@ -8,11 +8,11 @@ import {
 } from "react";
 import { EventPhase, getCurrentPhase } from "@schellingboard/domain/phase";
 import { eventContextFrom } from "../replica/selectors";
-import { legacyScheduleLinks } from "../schedule/links";
+import { legacyScheduleLinks } from "../features/schedule/links";
 import {
   ScheduleScreen,
   type ScheduleActions,
-} from "../schedule/schedule-screen";
+} from "../features/schedule/schedule-screen";
 import { attendeeCountApi } from "../queries/attendee-count";
 import { createCommentsQuery } from "../queries/comments";
 import {
