@@ -2,6 +2,7 @@ import { rsvpRefusal } from "@schellingboard/domain/rsvp-rule";
 import type { SessionHost } from "@schellingboard/domain/session";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import type { Command, Prediction } from "./runner";
+import { describeSessionIn } from "./subject";
 
 type Input = { sessionId: string };
 
@@ -75,6 +76,8 @@ const PATH = "/api/v1/sessions/{id}/rsvps/{guestId}" as const;
 
 export const addRsvp: Command<Input> = {
   kind: "rsvp.add",
+  describe: (replica, { sessionId }) =>
+    `RSVP to ${describeSessionIn(replica, sessionId)}`,
   target: ({ sessionId }) => `rsvp:${sessionId}`,
   predict: (replica, now, input) => predictRsvp("add", replica, now, input),
   call: (api, input, key, replica) =>
@@ -86,6 +89,8 @@ export const addRsvp: Command<Input> = {
 
 export const removeRsvp: Command<Input> = {
   kind: "rsvp.remove",
+  describe: (replica, { sessionId }) =>
+    `withdraw your RSVP to ${describeSessionIn(replica, sessionId)}`,
   target: ({ sessionId }) => `rsvp:${sessionId}`,
   predict: (replica, now, input) =>
     predictRsvp("withdraw", replica, now, input),

@@ -1,10 +1,12 @@
 // @module-tag 007-US8
 import { describe, expect, it } from "vitest";
 import { IDBFactory } from "fake-indexeddb";
-import { act, renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, screen, waitFor } from "@testing-library/react";
 import { fakeApi, problem } from "../commands/fake-api";
 import { createReplicaPersistence } from "../replica/persistence";
 import { snapshot } from "../replica/snapshot-fixture";
+import { removeRsvp } from "../commands/rsvp";
+import { NoticeProvider } from "../ui/notices";
 import { useScheduleSession } from "./use-schedule-session";
 
 class FakeSource {
@@ -37,7 +39,7 @@ function setup(
           return source as unknown as EventSource;
         },
       }),
-    { initialProps: { viewer } }
+    { initialProps: { viewer }, wrapper: NoticeProvider }
   );
   return { ...hook, calls, sources };
 }
@@ -98,5 +100,22 @@ describe("useScheduleSession", () => {
     await waitFor(() => expect(result.current.status).toBe("ready"));
     unmount();
     expect(sources[0].closed).toBe(true);
+  });
+
+  it("tells the viewer which command failed and why", async () => {
+    const { result } = setup("mia", (path) =>
+      path.endsWith("/snapshot")
+        ? Response.json(snapshot)
+        : problem(409, "event.notSchedulingPhase")
+    );
+    await waitFor(() => expect(result.current.status).toBe("ready"));
+    if (result.current.status !== "ready") throw new Error("not ready");
+
+    const { runner } = result.current;
+    await act(() => runner.run(removeRsvp, { sessionId: "s" }));
+
+    const alert = await screen.findByRole("alert");
+    expect(alert.textContent).toContain("Could not withdraw your RSVP to “");
+    expect(alert.textContent).toContain("scheduling phase");
   });
 });

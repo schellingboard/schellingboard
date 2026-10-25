@@ -40,13 +40,9 @@ const snap: Snapshot = {
   unavailability: [],
 };
 
-function fakeActions(
-  result: Awaited<ReturnType<ScheduleActions["toggleRsvp"]>> = { ok: true }
-) {
+function fakeActions() {
   return {
-    toggleRsvp: vi.fn<ScheduleActions["toggleRsvp"]>(() =>
-      Promise.resolve(result)
-    ),
+    toggleRsvp: vi.fn<ScheduleActions["toggleRsvp"]>(() => Promise.resolve()),
     pickName: vi.fn<ScheduleActions["pickName"]>(),
     attendees: vi.fn<ScheduleActions["attendees"]>(),
     attendeeCount: {
@@ -391,17 +387,5 @@ describe("ScheduleScreen RSVP badge", () => {
     await userEvent.click(screen.getByRole("button", { name: "No" }));
     expect(actions.toggleRsvp).not.toHaveBeenCalled();
     expect(screen.queryByRole("dialog")).toBeNull();
-  });
-
-  it("says why an RSVP was refused", async () => {
-    const actions = fakeActions({ ok: false, message: "This session is full" });
-    screenAt("", { actions });
-    await userEvent.click(
-      screen.getByRole("button", { name: "RSVP to Workshop" })
-    );
-    const alert = await screen.findByRole("alert");
-    expect(alert.textContent).toBe("This session is full");
-    await userEvent.click(screen.getByRole("button", { name: "OK" }));
-    expect(screen.queryByRole("alert")).toBeNull();
   });
 });

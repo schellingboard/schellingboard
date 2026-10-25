@@ -30,6 +30,7 @@ describe("attendeeCountApi", () => {
     expect(result).toEqual({
       ok: false,
       message: "Enter a whole number between 0 and 1000",
+      invalid: true,
     });
   });
 

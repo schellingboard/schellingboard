@@ -8,6 +8,7 @@ import { createObservable } from "../../queries/store";
 import type { AttendeesState } from "../../queries/attendees";
 import { fakeComments } from "./comments-test-support";
 import { legacyScheduleLinks } from "./links";
+import { NoticeProvider } from "../../ui/notices";
 import { ScheduleScreen, type ScheduleActions } from "./schedule-screen";
 
 const talk = base.sessions[0];
@@ -58,9 +59,7 @@ function fakeAttendees(guestIds: string[]) {
 
 function fakeActions(attendees = fakeAttendees(["zed", "abe"])) {
   return {
-    toggleRsvp: vi.fn<ScheduleActions["toggleRsvp"]>(() =>
-      Promise.resolve({ ok: true })
-    ),
+    toggleRsvp: vi.fn<ScheduleActions["toggleRsvp"]>(() => Promise.resolve()),
     pickName: vi.fn<ScheduleActions["pickName"]>(),
     attendees: vi.fn<ScheduleActions["attendees"]>(() => attendees),
     comments: vi.fn<ScheduleActions["comments"]>(() => fakeComments()),
@@ -82,19 +81,21 @@ function open(
   const onParamsChange = vi.fn<(params: URLSearchParams) => void>();
   const onBack = vi.fn();
   render(
-    <ScheduleScreen
-      snapshot={snapshot}
-      now={new Date(at)}
-      links={legacyScheduleLinks("conf")}
-      params={new URLSearchParams(params)}
-      onParamsChange={onParamsChange}
-      onHashChange={() => {}}
-      onBack={onBack}
-      sync={null}
-      footer={null}
-      onReload={() => {}}
-      actions={actions}
-    />
+    <NoticeProvider>
+      <ScheduleScreen
+        snapshot={snapshot}
+        now={new Date(at)}
+        links={legacyScheduleLinks("conf")}
+        params={new URLSearchParams(params)}
+        onParamsChange={onParamsChange}
+        onHashChange={() => {}}
+        onBack={onBack}
+        sync={null}
+        footer={null}
+        onReload={() => {}}
+        actions={actions}
+      />
+    </NoticeProvider>
   );
   return { onParamsChange, onBack, actions };
 }
@@ -218,19 +219,6 @@ describe("the session modal's RSVP", () => {
     );
     expect(actions.pickName).toHaveBeenCalled();
     expect(actions.toggleRsvp).not.toHaveBeenCalled();
-  });
-
-  it("shows a refusal", async () => {
-    const actions = fakeActions();
-    actions.toggleRsvp.mockResolvedValue({
-      ok: false,
-      message: "This session is full",
-    });
-    open(snapshotWith(), { actions });
-    await userEvent.click(
-      within(dialog()).getByRole("button", { name: "Un-RSVP" })
-    );
-    expect(await screen.findByText("This session is full")).toBeTruthy();
   });
 
   it(
@@ -417,7 +405,7 @@ describe("the attendee count", () => {
     expect(actions.attendeeCount.save).not.toHaveBeenCalled();
   });
 
-  it("shows why a save failed", async () => {
+  it("tells the host which session's count was not saved", async () => {
     const actions = fakeActions();
     actions.attendeeCount.save.mockResolvedValue({
       ok: false,
@@ -428,9 +416,9 @@ describe("the attendee count", () => {
     await userEvent.click(
       within(dialog()).getByRole("button", { name: "Save attendee count" })
     );
-    expect(
-      await within(dialog()).findByText("Could not save — try again")
-    ).toBeTruthy();
+    expect((await screen.findByRole("alert")).textContent).toContain(
+      "Could not save the attendee count for “"
+    );
   });
 
   it("takes focus when the follow-up email's link asked for it", async () => {

@@ -181,18 +181,11 @@ function Thread({
   const [editing, setEditing] = useState(false);
   const [replying, setReplying] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const localZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const isAuthor = viewerId !== null && node.author?.id === viewerId;
   const background = depth % 2 === 1 ? "bg-surface-muted" : "bg-surface-raised";
   const action = "cursor-pointer hover:text-fg hover:underline";
-
-  const run = async (change: Promise<CommentResult>) => {
-    setError(null);
-    const result = await change;
-    if (!result.ok) setError(result.message);
-  };
 
   return (
     <div
@@ -288,9 +281,7 @@ function Thread({
                 <Likes
                   node={node}
                   viewerId={viewerId}
-                  onToggle={(liked) =>
-                    void run(controller.setLiked(node.id, liked))
-                  }
+                  onToggle={(liked) => void controller.setLiked(node.id, liked)}
                 />
                 {viewerId && (
                   <button
@@ -321,7 +312,6 @@ function Thread({
                 )}
               </div>
             )}
-            {error && <p className="mt-1 text-sm text-danger-fg">{error}</p>}
             {replying && (
               <CommentForm
                 onSubmit={(body) => controller.create(body, node.id)}
@@ -364,7 +354,7 @@ function Thread({
         confirmLabel="Delete"
         onConfirm={() => {
           setConfirmingDelete(false);
-          void run(controller.remove(node.id));
+          void controller.remove(node.id);
         }}
         onCancel={() => setConfirmingDelete(false)}
       />
@@ -445,7 +435,6 @@ function CommentForm({
   onDone?: () => void;
 }) {
   const [body, setBody] = useState(initialBody);
-  const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const id = useId();
   const mounted = useRef(true);
@@ -458,12 +447,11 @@ function CommentForm({
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
     setSubmitting(true);
     const result = await onSubmit(body);
     if (!mounted.current) return;
     setSubmitting(false);
-    if (!result.ok) return setError(result.message);
+    if (!result.ok) return;
     if (clearOnSuccess) setBody("");
     onDone?.();
   };
@@ -503,7 +491,6 @@ function CommentForm({
           </button>
         </div>
       </div>
-      {error && <p className="mt-1 text-sm text-danger-fg">{error}</p>}
     </form>
   );
 }

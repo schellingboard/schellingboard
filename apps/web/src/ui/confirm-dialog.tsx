@@ -28,24 +28,3 @@ export function ConfirmDialog({
     </Dialog>
   );
 }
-
-export function AlertDialog({
-  open,
-  title,
-  message,
-  onClose,
-}: {
-  open: boolean;
-  title: string;
-  message: string;
-  onClose: () => void;
-}) {
-  return (
-    <Dialog open={open} onClose={onClose} title={title}>
-      <p role="alert">{message}</p>
-      <div className="mt-4">
-        <Button onClick={onClose}>OK</Button>
-      </div>
-    </Dialog>
-  );
-}

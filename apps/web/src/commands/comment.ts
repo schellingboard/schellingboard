@@ -5,6 +5,7 @@ import {
   type commentViewSchema,
 } from "@schellingboard/contracts/comment";
 import type { Command } from "./runner";
+import { describeSessionIn } from "./subject";
 
 export type CommentView = (typeof commentViewSchema)["_output"];
 
@@ -18,6 +19,10 @@ type Input = { subject: CommentSubject; parentId?: string; body: string };
 /** Comments are not in the replica: the caller adds the created comment to its query. */
 export const createComment: Command<Input, CommentView> = {
   kind: "comment.create",
+  describe: (replica, { subject }) =>
+    subject.kind === "session"
+      ? `post your comment on ${describeSessionIn(replica, subject.id)}`
+      : "post your comment",
   predict: (_replica, _now, { parentId, body }) =>
     commentCreateSchema.safeParse({ parentId, body }).success
       ? { project: (replica) => replica }
@@ -39,7 +44,12 @@ export const createComment: Command<Input, CommentView> = {
   },
 };
 
-type Target = { commentId: string };
+type Target = { commentId: string; subject: CommentSubject };
+
+const onSubject = (replica: Snapshot, { subject }: Target) =>
+  subject.kind === "session"
+    ? ` on ${describeSessionIn(replica, subject.id)}`
+    : "";
 const path = ({ commentId }: Target) => ({
   params: { path: { id: commentId } },
 });
@@ -47,6 +57,8 @@ const unchanged = { project: (replica: Snapshot) => replica };
 
 export const editComment: Command<Target & { body: string }, CommentView> = {
   kind: "comment.edit",
+  describe: (replica, input) =>
+    `save your edit to a comment${onSubject(replica, input)}`,
   target: ({ commentId }) => `comment:${commentId}`,
   predict: (_replica, _now, { body }) =>
     commentEditSchema.safeParse({ body }).success
@@ -62,6 +74,8 @@ export const editComment: Command<Target & { body: string }, CommentView> = {
 
 export const deleteComment: Command<Target> = {
   kind: "comment.delete",
+  describe: (replica, input) =>
+    `delete your comment${onSubject(replica, input)}`,
   target: ({ commentId }) => `comment:${commentId}`,
   predict: () => unchanged,
   call: (api, input, key) =>
@@ -73,6 +87,7 @@ export const deleteComment: Command<Target> = {
 
 export const likeComment: Command<Target> = {
   kind: "comment.like",
+  describe: (replica, input) => `like a comment${onSubject(replica, input)}`,
   target: ({ commentId }) => `like:${commentId}`,
   predict: () => unchanged,
   call: (api, input, key) =>
@@ -84,6 +99,8 @@ export const likeComment: Command<Target> = {
 
 export const unlikeComment: Command<Target> = {
   kind: "comment.unlike",
+  describe: (replica, input) =>
+    `remove your like from a comment${onSubject(replica, input)}`,
   target: ({ commentId }) => `like:${commentId}`,
   predict: () => unchanged,
   call: (api, input, key) =>

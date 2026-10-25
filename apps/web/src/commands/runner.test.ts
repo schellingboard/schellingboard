@@ -5,7 +5,7 @@ import { iso, snapshot as fixture } from "../replica/snapshot-fixture";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import type { FeedMessage } from "@schellingboard/contracts/feed";
 import { fakeApi, problem } from "./fake-api";
-import { createCommandRunner } from "./runner";
+import { createCommandRunner, type CommandFailure } from "./runner";
 import { addRsvp, removeRsvp } from "./rsvp";
 
 afterEach(() => vi.useRealTimers());
@@ -320,5 +320,85 @@ describe("a command", () => {
     });
     expect(calls).toEqual([]);
     expect(runner.pending()).toEqual([]);
+  });
+});
+
+describe("a failed command", () => {
+  const failures = () => {
+    const seen: CommandFailure[] = [];
+    return { seen, onFailure: (f: CommandFailure) => void seen.push(f) };
+  };
+  const make = (
+    handler: Parameters<typeof fakeApi>[0],
+    onFailure: (f: CommandFailure) => void
+  ) => {
+    const store = createReplicaStore(withoutRsvp);
+    const { api } = fakeApi(handler);
+    return createCommandRunner({
+      store,
+      api,
+      newKey: () => "k",
+      retryDelays: [1],
+      onFailure,
+    });
+  };
+
+  it("reports a refusal with the reason code and the subject", async () => {
+    const { seen, onFailure } = failures();
+    const runner = make(() => problem(409, "session.full"), onFailure);
+
+    await runner.run(addRsvp, { sessionId: "s" });
+
+    expect(seen).toEqual([
+      expect.objectContaining({
+        what: expect.stringContaining("RSVP to “") as string,
+        code: "session.full",
+        gaveUp: false,
+      }),
+    ]);
+  });
+
+  it("reports a refusal the prediction already made", async () => {
+    const { seen, onFailure } = failures();
+    const runner = make(() => new Response(null, { status: 204 }), onFailure);
+
+    await runner.run(addRsvp, { sessionId: "unknown" });
+
+    expect(seen).toEqual([
+      expect.objectContaining({ code: "guest.notInEvent", gaveUp: false }),
+    ]);
+  });
+
+  it("reports a command it gave up on", async () => {
+    const { seen, onFailure } = failures();
+    const runner = make(() => new Response(null, { status: 503 }), onFailure);
+
+    await runner.run(addRsvp, { sessionId: "s" });
+
+    expect(seen).toEqual([
+      expect.objectContaining({
+        code: "network.unreachable",
+        gaveUp: true,
+      }),
+    ]);
+  });
+
+  it("reports nothing for a command that succeeds", async () => {
+    const { seen, onFailure } = failures();
+    const runner = make(() => new Response(null, { status: 204 }), onFailure);
+
+    await runner.run(addRsvp, { sessionId: "s" });
+
+    expect(seen).toEqual([]);
+  });
+
+  it("reports nothing for a command cancelled by stopping the runner", async () => {
+    const { seen, onFailure } = failures();
+    const runner = make(() => new Response(null, { status: 204 }), onFailure);
+    runner.stop();
+
+    await runner.run(addRsvp, { sessionId: "s" });
+
+    expect(seen).toEqual([]);
   });
 });

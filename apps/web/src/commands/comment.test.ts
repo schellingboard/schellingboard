@@ -141,6 +141,7 @@ describe("changing a comment", () => {
     const outcome = await runner.run(editComment, {
       commentId: "c1",
       body: "Changed",
+      subject: { kind: "session", id: "s" },
     });
     expect(outcome).toEqual({ ok: true, data: created });
     expect(calls[0]).toMatchObject({
@@ -157,7 +158,11 @@ describe("changing a comment", () => {
     async () => {
       const { runner, calls } = setup(() => Response.json(created));
       expect(
-        await runner.run(editComment, { commentId: "c1", body: " " })
+        await runner.run(editComment, {
+          commentId: "c1",
+          body: " ",
+          subject: { kind: "session", id: "s" },
+        })
       ).toEqual({ ok: false, code: "comment.invalid" });
       expect(calls).toEqual([]);
     }
@@ -165,9 +170,18 @@ describe("changing a comment", () => {
 
   it("deletes, likes and unlikes", { tags: ["010-US4"] }, async () => {
     const { runner, calls } = setup(() => new Response(null, { status: 204 }));
-    await runner.run(deleteComment, { commentId: "c1" });
-    await runner.run(likeComment, { commentId: "c1" });
-    await runner.run(unlikeComment, { commentId: "c1" });
+    await runner.run(deleteComment, {
+      commentId: "c1",
+      subject: { kind: "session", id: "s" },
+    });
+    await runner.run(likeComment, {
+      commentId: "c1",
+      subject: { kind: "session", id: "s" },
+    });
+    await runner.run(unlikeComment, {
+      commentId: "c1",
+      subject: { kind: "session", id: "s" },
+    });
     expect(calls.map((c) => [c.method, c.path])).toEqual([
       ["DELETE", "/api/v1/comments/c1"],
       ["PUT", "/api/v1/comments/c1/like"],
@@ -180,10 +194,37 @@ describe("changing a comment", () => {
     { tags: ["010-US4"] },
     async () => {
       const { runner } = setup(() => problem(403, "comment.notAuthor"));
-      expect(await runner.run(deleteComment, { commentId: "c1" })).toEqual({
+      expect(
+        await runner.run(deleteComment, {
+          commentId: "c1",
+          subject: { kind: "session", id: "s" },
+        })
+      ).toEqual({
         ok: false,
         code: "comment.notAuthor",
       });
     }
   );
+});
+
+describe("a failed comment command", () => {
+  it("names the session the comment is on", { tags: ["010-US2"] }, async () => {
+    const seen: string[] = [];
+    const { api } = fakeApi(() => problem(403, "comment.notAuthor"));
+    const runner = createCommandRunner({
+      store: createReplicaStore(snapshot),
+      api,
+      newKey: () => "k",
+      onFailure: ({ what }) => seen.push(what),
+    });
+    const subject = { kind: "session", id: "s" } as const;
+
+    await runner.run(editComment, { commentId: "c", body: "x", subject });
+    await runner.run(deleteComment, { commentId: "c", subject });
+    await runner.run(likeComment, { commentId: "c", subject });
+    await runner.run(unlikeComment, { commentId: "c", subject });
+
+    expect(seen).toHaveLength(4);
+    for (const what of seen) expect(what).toMatch(/ on “.+” \(/);
+  });
 });

@@ -14,6 +14,8 @@ export type Prediction =
 
 export type Command<I, R = undefined> = {
   kind: string;
+  /** What the command does to what, e.g. `RSVP to “Intro” (Mon 10:00, Room A)`. */
+  describe: (replica: Snapshot, input: I) => string;
   predict: (replica: Snapshot, now: Date, input: I) => Prediction;
   /** Commands with the same target are sent one after the other, in click order. */
   target?: (input: I) => string;
@@ -28,6 +30,13 @@ export type Command<I, R = undefined> = {
 
 export type Outcome<R> =
   { ok: true; data: R | undefined } | { ok: false; code: string };
+
+export type CommandFailure = {
+  what: string;
+  code: string;
+  /** True when the retries ran out, so the server may have applied the command. */
+  gaveUp: boolean;
+};
 
 export type PendingCommand = {
   key: string;
@@ -51,11 +60,13 @@ export function createCommandRunner({
   api,
   newKey,
   retryDelays = DEFAULT_RETRY_DELAYS,
+  onFailure,
 }: {
   store: ReplicaStore;
   api: ApiClient;
   newKey: () => string;
   retryDelays?: number[];
+  onFailure?: (failure: CommandFailure) => void;
 }) {
   let entries: Entry[] = [];
   let stopped = false;
@@ -155,13 +166,23 @@ export function createCommandRunner({
     async run<I, R>(command: Command<I, R>, input: I): Promise<Outcome<R>> {
       if (stopped) return { ok: false, code: "command.cancelled" };
       const replica = view();
+      const fail = (code: string, gaveUp: boolean) => {
+        if (stopped || code === "command.cancelled") return;
+        onFailure?.({
+          what: command.describe(replica, input),
+          code,
+          gaveUp,
+        });
+      };
       const prediction = command.predict(
         replica,
         new Date(store.serverNow()),
         input
       );
-      if ("refusal" in prediction)
+      if ("refusal" in prediction) {
+        fail(prediction.refusal, false);
         return { ok: false, code: prediction.refusal };
+      }
 
       const key = newKey();
       const noop = prediction.project(replica) === replica;
@@ -188,10 +209,12 @@ export function createCommandRunner({
       const outcome = await turn;
       if (outcome === "gave up") {
         drop(key);
+        fail("network.unreachable", true);
         return { ok: false, code: "network.unreachable" };
       }
       if (!outcome.ok || noop) {
         drop(key);
+        if (!outcome.ok) fail(outcome.code, false);
         return outcome;
       }
       if (!entries.includes(entry)) return outcome;

@@ -6,7 +6,8 @@ import {
 import { problemCode } from "../commands/problem";
 
 export type AttendeeCountResult =
-  { ok: true; count: number | null } | { ok: false; message: string };
+  | { ok: true; count: number | null }
+  | { ok: false; message: string; invalid?: true };
 
 export type AttendeeCountApi = ReturnType<typeof attendeeCountApi>;
 
@@ -43,13 +44,9 @@ export function attendeeCountApi(api: ApiClient, newKey: () => string) {
           }
         );
         if (data) return { ok: true, count: data.count };
-        return {
-          ok: false,
-          message:
-            problemCode(error, response.status) === "attendeeCount.invalid"
-              ? RANGE_MESSAGE
-              : "Could not save — try again",
-        };
+        return problemCode(error, response.status) === "attendeeCount.invalid"
+          ? { ok: false, message: RANGE_MESSAGE, invalid: true }
+          : { ok: false, message: "Could not save — try again" };
       } catch {
         return { ok: false, message: "Could not save — try again" };
       }

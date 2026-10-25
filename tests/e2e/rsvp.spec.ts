@@ -61,6 +61,42 @@ test("RSVP to a session persists across reloads and can be removed again @009-US
   await expect(dialog.getByText(/Bob Test/)).toHaveCount(0);
 });
 
+test("a refused RSVP names the session and why @009-US2", async ({ page }) => {
+  await login(page);
+  await page.goto("/Conference-Gamma");
+  await selectUser(page, /Bob Test/i);
+  await page.route("**/api/v1/sessions/*/rsvps/*", (route) =>
+    route.request().method() === "PUT"
+      ? route.fulfill({
+          status: 409,
+          contentType: "application/problem+json",
+          body: JSON.stringify({
+            type: "about:blank",
+            title: "session.full",
+            status: 409,
+            code: "session.full",
+          }),
+        })
+      : route.continue()
+  );
+
+  await page
+    .getByRole("link", { name: /Opening Keynote/ })
+    .first()
+    .click();
+  const dialog = page.getByRole("dialog", { name: "Session details" });
+  await dialog.getByRole("button", { name: "RSVP", exact: true }).click();
+
+  await expect(
+    page
+      .getByRole("alert")
+      .filter({ hasText: "Could not RSVP to “Opening Keynote" })
+  ).toContainText("This session is full");
+  await expect(
+    dialog.getByRole("button", { name: "RSVP", exact: true })
+  ).toBeVisible();
+});
+
 // Zanele's seeded 1-on-1 with Rafael falls inside "API Design" on Gamma's
 // first day (scripts/seed/seed-database.ts). Only the warning is under test,
 // so it is declined and her diary is left as it was.

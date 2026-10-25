@@ -123,20 +123,14 @@ describe("the comments of a subject", () => {
   );
 
   it(
-    "says what went wrong in words and leaves the thread alone",
+    "reports a refusal and leaves the thread alone",
     { tags: ["010-US2"] },
     async () => {
       const { controller, query } = await setup(() =>
         problem(403, "comment.notAuthor")
       );
-      expect(await controller.remove("a")).toEqual({
-        ok: false,
-        message: "Only the author can change a comment",
-      });
-      expect(await controller.create("  ")).toEqual({
-        ok: false,
-        message: "Comment cannot be empty",
-      });
+      expect(await controller.remove("a")).toEqual({ ok: false });
+      expect(await controller.create("  ")).toEqual({ ok: false });
       expect(query.get().items).toHaveLength(1);
     }
   );

@@ -185,12 +185,7 @@ function Loaded({
     () => ({
       pickName: () => setPicking(true),
       toggleRsvp: async (sessionId, withdraw) => {
-        const outcome = await runner.run(withdraw ? removeRsvp : addRsvp, {
-          sessionId,
-        });
-        return outcome.ok
-          ? { ok: true }
-          : { ok: false, message: refusalMessage(outcome.code) };
+        await runner.run(withdraw ? removeRsvp : addRsvp, { sessionId });
       },
       attendees: (sessionId) => createAttendeesQuery({ api, sessionId }),
       attendeeCount: attendeeCountApi(api, newKey),
@@ -255,14 +250,3 @@ function Loaded({
     </>
   );
 }
-
-const REFUSALS: Record<string, string> = {
-  "session.full": "This session is full",
-  "rsvp.ownSession": "Hosts cannot RSVP to their own session",
-  "event.notSchedulingPhase":
-    "RSVPs can only be changed during the scheduling phase",
-  "guest.notInEvent": "You are not part of this event",
-};
-
-const refusalMessage = (code: string) =>
-  REFUSALS[code] ?? "Failed to update RSVP. Please try again.";

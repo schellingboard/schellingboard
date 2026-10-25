@@ -14,6 +14,7 @@ import { useUpdateStatus } from "./updates";
 import { ThemeProvider } from "./theme";
 import { UserMenu, type PickableGuest } from "./user-menu";
 import { useViewer, ViewerProvider } from "./viewer";
+import { NoticeProvider } from "../ui/notices";
 
 export function ShellFrame({
   api,
@@ -69,7 +70,9 @@ export function ShellProviders({
 }) {
   return (
     <ThemeProvider>
-      <ViewerProvider api={api}>{children}</ViewerProvider>
+      <NoticeProvider>
+        <ViewerProvider api={api}>{children}</ViewerProvider>
+      </NoticeProvider>
     </ThemeProvider>
   );
 }

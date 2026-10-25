@@ -48,7 +48,7 @@ export function renderScheduled(
             window.location.hash = hash;
           },
           actions: {
-            toggleRsvp: () => Promise.resolve({ ok: true }),
+            toggleRsvp: () => Promise.resolve(),
             pickName: () => {},
             attendeeCount: {
               load: () => Promise.resolve({ ok: true, count: null }),

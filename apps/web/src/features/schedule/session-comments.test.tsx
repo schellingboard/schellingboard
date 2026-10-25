@@ -128,22 +128,22 @@ describe("writing comments", () => {
     await vi.waitFor(() => expect((box as HTMLTextAreaElement).value).toBe(""));
   });
 
-  it(
-    "keeps the text and says why when posting fails",
-    { tags: ["010-US2"] },
-    async () => {
-      const handle = show();
-      vi.mocked(handle.controller.create).mockResolvedValue({
-        ok: false,
-        message: "Comment cannot be empty",
-      });
-      const box = screen.getByLabelText("Add a comment");
-      await userEvent.type(box, "x");
-      await userEvent.click(screen.getByRole("button", { name: "Comment" }));
-      expect(await screen.findByText("Comment cannot be empty")).toBeTruthy();
-      expect((box as HTMLTextAreaElement).value).toBe("x");
-    }
-  );
+  it("keeps the text when posting fails", { tags: ["010-US2"] }, async () => {
+    const handle = show();
+    vi.mocked(handle.controller.create).mockResolvedValue({
+      ok: false,
+    });
+    const box = screen.getByLabelText("Add a comment");
+    await userEvent.type(box, "x");
+    await userEvent.click(screen.getByRole("button", { name: "Comment" }));
+    await vi.waitFor(() =>
+      expect(
+        screen.getByRole<HTMLButtonElement>("button", { name: "Comment" })
+          .disabled
+      ).toBe(false)
+    );
+    expect((box as HTMLTextAreaElement).value).toBe("x");
+  });
 
   it(
     "asks who the reader is instead of offering the box",

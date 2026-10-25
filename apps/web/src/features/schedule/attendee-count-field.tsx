@@ -4,6 +4,8 @@ import {
   MAX_ATTENDEE_COUNT,
   MIN_ATTENDEE_COUNT,
 } from "@schellingboard/domain/attendee-count";
+import { describeSession } from "../../commands/subject";
+import { useNotify } from "../../ui/notices";
 import { useSchedule } from "./context";
 
 /**
@@ -18,7 +20,8 @@ export function AttendeeCountField({
   /** Set when the follow-up email's link asked for it: focusing every finished session would steal scroll. */
   autoFocus: boolean;
 }) {
-  const { actions } = useSchedule();
+  const { actions, data } = useSchedule();
+  const notify = useNotify();
   const fieldId = useId();
   const messageId = `${fieldId}-message`;
   const [loaded, setLoaded] = useState(false);
@@ -58,7 +61,17 @@ export function AttendeeCountField({
       parsed.data.count
     );
     setSaving(false);
-    if (!result.ok) return setMessage(result.message);
+    if (!result.ok) {
+      if (result.invalid) return setMessage(result.message);
+      const session = data.sessions.find((s) => s.id === sessionId);
+      const what = session
+        ? describeSession(session, data.event.timezone)
+        : "the session";
+      return notify({
+        tone: "failure",
+        message: `Could not save the attendee count for ${what}. Please try again.`,
+      });
+    }
     const stored = result.count === null ? "" : String(result.count);
     setValue(stored);
     setBaseline(stored);

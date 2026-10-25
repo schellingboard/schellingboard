@@ -9,6 +9,8 @@ import type { ReplicaPersistence } from "../replica/persistence";
 import { startReplicaSession } from "../replica/session";
 import type { ReplicaStore } from "../replica/store";
 import { newKey } from "./keys";
+import { failureMessage } from "../commands/failure-message";
+import { useNotify } from "../ui/notices";
 
 export type ScheduleSession =
   | { status: "loading" }
@@ -43,9 +45,10 @@ export function useScheduleSession({
   } | null>(null);
   const [attempt, setAttempt] = useState(0);
   // Read when a session starts, not a reason to start another.
-  const latest = useRef({ persistence, createSource });
+  const notify = useNotify();
+  const latest = useRef({ persistence, createSource, notify });
   useEffect(() => {
-    latest.current = { persistence, createSource };
+    latest.current = { persistence, createSource, notify };
   });
   const key = `${slug}\u0000${viewer ?? "-"}\u0000${attempt}`;
 
@@ -80,6 +83,11 @@ export function useScheduleSession({
           store: opened.store,
           api,
           newKey,
+          onFailure: (failure) =>
+            latest.current.notify({
+              tone: "failure",
+              message: failureMessage(failure),
+            }),
         });
         stop = () => {
           runner.stop();

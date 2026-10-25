@@ -12,11 +12,8 @@ import type { ScheduleLinks } from "./links";
 import { createScheduleMatch, type ScheduleMatch } from "./model";
 
 export type ScheduleActions = {
-  /** Resolves to a message the reader can be shown when the change was refused. */
-  toggleRsvp: (
-    sessionId: string,
-    withdraw: boolean
-  ) => Promise<{ ok: true } | { ok: false; message: string }>;
+  /** A failure is reported as a notice, not returned. */
+  toggleRsvp: (sessionId: string, withdraw: boolean) => Promise<void>;
   /** Asks who the reader is, which an RSVP needs. */
   pickName: () => void;
   /** The caller destroys the query when done. */

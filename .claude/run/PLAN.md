@@ -69,15 +69,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
 ### Foundations
 
 - [x] 3. `apps/web/src/schedule/` moved to `features/schedule/`; the arch rule found nothing to fix.
-- [ ] 4. **Failure notices** (the user's request): an app-wide notice region in `ui/`
-      (`role="alert"` for failures, `role="status"` for confirmations), mounted by the
-      shell. The command runner reports a refusal and a given-up command with the
-      subject's description and, where it helps, an action (open the session, try
-      again). RSVP add and remove, comment create, edit, delete and like, and the
-      attendee count use it; the per-block RSVP `AlertDialog` goes. Vitest against the
-      fake API, including a block that unmounts before the failure arrives. One E2E: an
-      RSVP whose request fails (`page.route`) shows a notice naming the session.
-      CHANGELOG.
+- [x] 4. Failure notices: `ui/notices.tsx`, `Command.describe`, runner `onFailure`, `failureMessage`; RSVP, comments and attendee count use them; the RSVP `AlertDialog` is gone.
 - [ ] 5. **Awaited mutations and form fields**: the helper for forms (call with
       `Idempotency-Key`, problem details onto fields, `409` handling, success notice
       through step 4's region) and the form primitives in `ui/` (text, textarea,
