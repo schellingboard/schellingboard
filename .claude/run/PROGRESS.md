@@ -30,6 +30,6 @@
 - Forms (step 5): legacy `app/components/form-error-summary.tsx` (list of all errors next to
   Save, jump to field) has no SPA equivalent; step 8d (proposal form) must provide it.
 
-- Step 6: snapshot `proposals` = public fields + hosts (names), no `sessionIds`/tally/breakdown; `me.votes` = `{proposalId, choice}`. Step 7 only needs selectors and commands, `apply` is done (`vote.cast` replaces in place).
+- Step 6: snapshot `proposals` = public fields + hosts (names), no `sessionIds`/tally/breakdown; `me.votes` = `{proposalId, choice}`. Step 7 done: use `proposalsFrom`, `ownVotesFrom`, `castVote`, `withdrawVote`; `runner.view()` shows optimistic votes. Proposal comments still say only "your comment" (step 8b).
 
 ## Questions

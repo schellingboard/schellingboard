@@ -15,6 +15,11 @@ export type SchedPhaseDates = Pick<
   | "schedulingPhaseEnd"
 >;
 
+export type VotingPhaseDates = Pick<
+  Event,
+  "votingPhaseStart" | "votingPhaseEnd" | "schedulingPhaseStart"
+>;
+
 /**
  * The interval is half-open `[start, end)`: the end is exclusive so that
  * touching phases (where one phase's implicit end equals the next phase's
@@ -49,7 +54,7 @@ export function inProposalPhase(event: Event, now: Date): boolean {
 }
 
 /** An open-ended voting phase is treated as ending when scheduling starts. */
-export function inVotingPhase(event: Event, now: Date): boolean {
+export function inVotingPhase(event: VotingPhaseDates, now: Date): boolean {
   const { votingPhaseStart, votingPhaseEnd, schedulingPhaseStart } = event;
   const effectiveEnd = votingPhaseEnd ?? schedulingPhaseStart;
   return !!(

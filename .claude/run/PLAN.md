@@ -75,10 +75,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
 ### Proposals and voting
 
 - [x] 6. Proposals and votes in the snapshot and feed: `proposal.created/changed/deleted` (event audience, no vote counts in the payload, host renames and joins record too), `me.votes`, `vote.cast`/`vote.withdrawn` (voter only; also recorded when a vote is lost by joining as host, by an edit adding the voter as host, or with the proposal). `apply` handles all, legacy and SPA copies.
-- [ ] 7. **Replica and commands**: `apply` and selectors for proposals and votes; the
-      vote rule (phase, own proposal, …) moves to `packages/domain` as the RSVP rule did,
-      and the server calls it; vote cast, change and withdraw commands with step 4's
-      notices naming the proposal. Unit tests.
+- [x] 7. Replica and commands: `proposalsFrom`/`ownVotesFrom` selectors; the vote rule is `domain/vote-rule.ts` (phase, own proposal, membership), the server calls it and now refuses a host voting on their own proposal (`vote.ownProposal`); `castVote`/`withdrawVote` commands name the proposal in notices.
 - [ ] 8. **Proposal screens**, unrouted:
   - [ ] 8a. The proposals list: table, filters, tally, voting buttons, phase texts.
   - [ ] 8b. The proposal modal (`viewProposal`): details, vote breakdown (query),

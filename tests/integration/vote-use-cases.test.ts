@@ -194,3 +194,23 @@ describe("vote use cases", () => {
     }
   );
 });
+
+describe("voting on one's own proposal", () => {
+  it("is refused for a host", { tags: ["005-US1"] }, async () => {
+    const event = await createEvent({ phase: "voting" });
+    const host = await createGuest({ eventId: event.id });
+    const proposal = await createProposal(event.id, [host.id]);
+
+    const cast = await proposalUseCases().castVote(
+      open(host.id),
+      {
+        proposalId: proposal.id,
+        guestId: host.id,
+        choice: VoteChoice.interested,
+      },
+      now()
+    );
+
+    expect(!cast.ok && cast.error.code).toBe("vote.ownProposal");
+  });
+});

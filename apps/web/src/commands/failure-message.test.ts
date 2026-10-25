@@ -11,6 +11,18 @@ describe("failureMessage", () => {
     );
   });
 
+  it("names the proposal and the voting rule", () => {
+    expect(
+      failureMessage({
+        what: "vote on “Rust intro”",
+        code: "vote.ownProposal",
+        gaveUp: false,
+      })
+    ).toBe(
+      "Could not vote on “Rust intro”. Hosts cannot vote on their own proposal."
+    );
+  });
+
   it("falls back to a generic reason for a code it does not know", () => {
     expect(failureMessage({ what, code: "http.418", gaveUp: false })).toBe(
       "Could not RSVP to “Intro” (Mon 10:00, Room A). Please try again."

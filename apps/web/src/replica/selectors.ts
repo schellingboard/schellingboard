@@ -5,7 +5,9 @@ import type {
   Location,
   LocationUnavailability,
 } from "@schellingboard/domain/location";
+import type { LoggedProposal } from "@schellingboard/domain/change";
 import type { Rsvp, Session } from "@schellingboard/domain/session";
+import type { VoteChoice } from "@schellingboard/domain/vote";
 
 type DayWithSessions = Day & { sessions: Session[] };
 
@@ -109,4 +111,37 @@ export function eventContextFrom(snapshot: Snapshot) {
     guests,
     rsvps,
   };
+}
+
+/** Oldest first, which is stable; the screens sort and filter from here. */
+export function proposalsFrom(snapshot: Snapshot): LoggedProposal[] {
+  return snapshot.proposals
+    .map(
+      ({
+        description,
+        durationMinutes,
+        cohostWantedNote,
+        createdTime,
+        updatedTime,
+        ...p
+      }): LoggedProposal => ({
+        ...p,
+        description: description ?? undefined,
+        durationMinutes: durationMinutes ?? undefined,
+        cohostWantedNote: cohostWantedNote ?? undefined,
+        createdTime: date(createdTime),
+        updatedTime: date(updatedTime),
+      })
+    )
+    .sort(
+      (a, b) =>
+        a.createdTime.getTime() - b.createdTime.getTime() ||
+        (a.id < b.id ? -1 : 1)
+    );
+}
+
+export function ownVotesFrom(snapshot: Snapshot): Map<string, VoteChoice> {
+  return new Map(
+    (snapshot.me?.votes ?? []).map((v) => [v.proposalId, v.choice])
+  );
 }

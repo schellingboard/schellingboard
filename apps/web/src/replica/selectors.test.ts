@@ -1,6 +1,7 @@
 // @module-tag 007-US8
 import { describe, it, expect } from "vitest";
-import { eventContextFrom } from "./selectors";
+import { VoteChoice } from "@schellingboard/domain/vote";
+import { eventContextFrom, ownVotesFrom, proposalsFrom } from "./selectors";
 import { apply } from "./apply";
 import { iso, snapshot } from "./snapshot-fixture";
 
@@ -46,5 +47,48 @@ describe("eventContextFrom", () => {
     expect(context.locations).toEqual([]);
     expect(context.sessions[0].locations).toEqual([]);
     expect(context.unavailability).toEqual([]);
+  });
+});
+
+describe("proposalsFrom and ownVotesFrom", () => {
+  const proposal = (id: string, createdHour: number) => ({
+    id,
+    eventId: "e",
+    title: `Idea ${id}`,
+    description: null,
+    durationMinutes: 30,
+    createdTime: iso(createdHour),
+    updatedTime: iso(createdHour),
+    hosts: [{ id: "host", name: "HOST" }],
+    cohostWanted: true,
+    cohostWantedNote: null,
+    version: 1,
+  });
+  const withProposals = {
+    ...snapshot,
+    proposals: [proposal("late", 10), proposal("early", 8)],
+    me: snapshot.me && {
+      ...snapshot.me,
+      votes: [{ proposalId: "early", choice: VoteChoice.maybe }],
+    },
+  };
+
+  it("turns the snapshot's proposals into domain shapes, oldest first", () => {
+    const proposals = proposalsFrom(withProposals);
+
+    expect(proposals.map((p) => p.id)).toEqual(["early", "late"]);
+    expect(proposals[0]).toMatchObject({
+      createdTime: new Date(iso(8)),
+      description: undefined,
+      durationMinutes: 30,
+      cohostWantedNote: undefined,
+      hosts: [{ id: "host", name: "HOST" }],
+    });
+  });
+
+  it("gives the viewer's choice per proposal, none when signed out", () => {
+    expect(ownVotesFrom(withProposals).get("early")).toBe(VoteChoice.maybe);
+    expect(ownVotesFrom(withProposals).has("late")).toBe(false);
+    expect(ownVotesFrom({ ...withProposals, me: null }).size).toBe(0);
   });
 });

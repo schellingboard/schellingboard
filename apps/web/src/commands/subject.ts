@@ -18,6 +18,11 @@ export function describeSession(
   return `“${session.title}”${details ? ` (${details})` : ""}`;
 }
 
+export function describeProposalIn(replica: Snapshot, proposalId: string) {
+  const proposal = replica.proposals.find((p) => p.id === proposalId);
+  return proposal ? `“${proposal.title}”` : "the proposal";
+}
+
 export function describeSessionIn(replica: Snapshot, sessionId: string) {
   const { sessions, event } = eventContextFrom(replica);
   const session = sessions.find((s) => s.id === sessionId);
