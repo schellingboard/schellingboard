@@ -32,7 +32,7 @@ import { ScheduleFilters } from "./schedule-filters";
 import { ScheduleToolbar, scheduleView } from "./schedule-toolbar";
 import { matchesInReadingOrder } from "./search";
 import { PullToRefresh } from "./pull-to-refresh";
-import { useDebouncedSearch } from "./use-debounced";
+import { useDebouncedSearch } from "../../ui/use-debounced";
 import { useDragToPan } from "./use-drag-to-pan";
 import { useScrollRestoration } from "./use-scroll-restoration";
 import { useStatusHeight } from "./use-status-height";

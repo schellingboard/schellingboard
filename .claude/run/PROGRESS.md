@@ -36,12 +36,22 @@
 
 Assumptions the user may override (set by the coordinator, 2026-10-25):
 
-1. Step 8a keeps both vote sorts. The counts reach the SPA through the proposals API
-   (`voteStanding` {total, weighted} on every `Proposal`, same visibility as the legacy
-   page's props); `tally` stays null before scheduling. No new endpoint.
-2. The tally and standings come from `queries/proposal-standings.ts` (`GET /proposals`,
-   all pages). Step 8a-2 must call `refresh()` on mount and when an own `vote.*` change
-   arrives; other guests' votes do not reach the feed, so counts update on reload only.
-3. 8a-2 builds the screen on `list-model.ts` (`rowsFrom`, `listRows`, `defaultSort`,
+1. Step 8a keeps both vote sorts. The proposals API sends `votesCount` (skips included) in
+   the voting phase only, null otherwise; the scheduling sort derives from `tally`
+   (interested x 4 + maybe), which is public then. Skips stay hosts-only (#370).
+2. The tally and counts come from `queries/proposal-standings.ts` (`GET /proposals`,
+   all pages), loaded once per mount by `useStandings(query)`: refetching on the viewer's
+   own vote would move the voted row under the cursor. Other guests' votes show on reload.
+3. 8a-2 built the screen on `list-model.ts` (`rowsFrom`, `listRows`, `defaultSort`,
    `sortOptions`, `phaseTexts`) and the vote buttons use `castVote`/`withdrawVote`.
    `vote-display.ts` and `phase-opens-text.ts` moved to `packages/domain`.
+
+For step 8b/9: `ProposalsScreen` takes `snapshot` (use `runner.view()`), `standings` (from
+`useStandings(createStandingsQuery(...))`), `onVote` (castVote/withdrawVote) and
+`links` (`legacyProposalLinks`; the takeover swaps them). The legacy page's pagination
+(1000 per page) was dropped: the list never exceeded one page. The "Add Proposal" empty-state
+link and the list's title/description match the legacy copy.
+
+Unavailable controls (006-US2): use `ui/unavailable.tsx` (`Unavailable blocked why`): aria-disabled,
+described by the reason, a notice on activation. The takeover must adapt `disabled-hints.spec.ts`
+to the notice region instead of the legacy toast helper if the markup differs.

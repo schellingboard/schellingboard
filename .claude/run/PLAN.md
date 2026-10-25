@@ -83,7 +83,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
           (Fuse, same keys and threshold), sort, phase texts (`dateStartDescription`),
           the vote-tally query for the scheduling phase. Pure, unit tested. Blocked on
           PROGRESS.md Questions 1 and 2.
-    - [ ] 8a-2. The screen: action bar, table and mobile cards, voting buttons, empty
+    - [x] 8a-2 (done: `features/proposals/proposals-screen.tsx`, `use-standings.ts`, links to legacy addresses; rendered directly in Vitest, no router since links are plain anchors; wiring to the replica/runner/query happens in step 9). The screen: action bar, table and mobile cards, voting buttons, empty
           state, through the test router.
   - [ ] 8b. The proposal modal (`viewProposal`): details, vote breakdown (query),
         comments (the shared comments feature), join as host.
