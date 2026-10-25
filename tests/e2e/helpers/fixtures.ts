@@ -23,6 +23,10 @@ const ALLOWED_CONSOLE_PATTERNS: RegExp[] = [
   // change feed (an EventSource) is connecting is logged as a failed
   // connection, even though the page closes the stream as it leaves.
   /can.t establish a connection to the server at \S+\/api\/v1\/events\/[^/]+\/feed/,
+  // Firefox quirk: a reload that cuts off a room photo mid-download (the dev
+  // clock helper reloads right after the SPA has) is logged as a corrupt image.
+  // The seeded photos are static files, so real damage would fail every run.
+  /Image corrupt or truncated.*\/locations\/[\w-]+\.jpg/,
 ];
 
 // Paths the server answers itself. Any other root path gets the SPA shell,
