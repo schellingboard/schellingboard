@@ -2,7 +2,7 @@ import { Page } from "@playwright/test";
 import { test, expect } from "./helpers/fixtures";
 import { uniqueSuffix } from "./helpers/unique";
 import { login } from "./helpers/auth";
-import { selectUser } from "./helpers/user";
+import { selectUser, tapUntilOpen } from "./helpers/user";
 import { dismissToast, toast } from "./helpers/toast";
 import {
   getMessage,
@@ -94,8 +94,10 @@ test("updating a session emails the RSVP'd guest and the added co-host @013-US4 
   await expect(
     page.getByRole("heading", { name: /Edit session/i })
   ).toBeVisible();
-  await listboxButton(page, /^Start Time/).click();
-  await page.getByRole("option", { name: "14:40" }).click();
+  // Edit is a full page load: a click before the form hydrates is lost.
+  const option = page.getByRole("option", { name: "14:40" });
+  await tapUntilOpen(listboxButton(page, /^Start Time/), option);
+  await option.click();
   const hostsSection = page
     .locator("div")
     .filter({ hasText: /^Hosts/ })

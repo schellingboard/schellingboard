@@ -4,7 +4,7 @@ import { test, expect } from "./helpers/fixtures";
 import { switchToView } from "./helpers/schedule";
 import { uniqueSuffix } from "./helpers/unique";
 import { login, loginAndGoto } from "./helpers/auth";
-import { selectUser } from "./helpers/user";
+import { selectUser, tapUntilOpen } from "./helpers/user";
 import { dismissToast, toast } from "./helpers/toast";
 
 // All tests run in Conference Gamma (scheduling phase). Each test creates its
@@ -71,6 +71,12 @@ async function openEditForm(page: Page, title: string) {
   await expect(
     page.getByRole("heading", { name: /Edit session/i })
   ).toBeVisible();
+  // Edit is a full page load, and typing or clicking before the form hydrates
+  // is lost. A listbox only opens once it has, so open and close one first.
+  const listbox = page.getByRole("listbox");
+  await tapUntilOpen(listboxButton(page, /^Start Time/), listbox);
+  await page.keyboard.press("Escape");
+  await expect(listbox).toBeHidden();
 }
 
 test("a host can edit a session's title and the change persists @008-US2", async ({
