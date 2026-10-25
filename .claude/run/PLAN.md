@@ -63,8 +63,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
 
 ### Baseline
 
-- [ ] 1. **Full `make test-e2e`** on the current stack. Record results in PROGRESS.md.
-      A failure caused by the last run's commits gets its own fix step, inserted here.
+- [x] 1. Full `make test-e2e` baseline: 213 passed; the one failure was the known `settings.spec.ts:67` load flake (passes alone).
 - [ ] 2. **ADR 0016: the remaining screen families**. Records the decisions above (both
       lists) with their reasons, and the amendment to ADR 0014 (proposals and votes in
       the snapshot and feed). Doc-only.
