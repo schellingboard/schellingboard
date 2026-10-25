@@ -22,7 +22,12 @@ export function VotingButtons({
   onVote: (choice: VoteChoice) => void;
 }) {
   return (
-    <div className="flex gap-1.5 flex-row flex-wrap">
+    <div
+      className={cx(
+        "flex flex-row flex-wrap",
+        large ? "justify-center gap-2 sm:gap-3" : "gap-1.5"
+      )}
+    >
       {VOTE_CHOICES.map((choice) => {
         const selected = chosen === choice;
         const button = (
@@ -32,7 +37,9 @@ export function VotingButtons({
             onClick={() => onVote(choice)}
             className={cx(
               "relative rounded-md border shadow-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-accent",
-              large ? "px-3 py-2 text-lg" : "px-1 py-1",
+              large
+                ? "flex h-16 w-16 flex-col items-center justify-center sm:h-20 sm:w-20"
+                : "px-1 py-1",
               !enabled && "opacity-50 cursor-not-allowed grayscale",
               selected
                 ? "bg-vote-chosen border-line-strong text-on-vote-chosen ring-2 ring-line-strong"
@@ -40,7 +47,14 @@ export function VotingButtons({
               !selected && enabled && "hover:bg-surface-muted"
             )}
           >
-            <div>{voteChoiceToEmoji(choice)}</div>
+            <div className={large ? "mb-1 text-sm sm:text-lg" : ""}>
+              {voteChoiceToEmoji(choice)}
+            </div>
+            {large && (
+              <div className="text-[10px] sm:text-xs">
+                {voteChoiceToLabel(choice)}
+              </div>
+            )}
             {selected && (
               <span
                 aria-hidden="true"

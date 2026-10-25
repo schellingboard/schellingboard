@@ -1,14 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { inSchedPhase, inVotingPhase } from "@schellingboard/domain/phase";
-import { durationMinusBreak } from "@schellingboard/domain/slots";
 import type { Session } from "@schellingboard/domain/session";
 import { wantsHost } from "@schellingboard/domain/session";
-import {
-  formatDuration,
-  formatOptionalTime,
-  TIME_FORMAT,
-} from "@schellingboard/domain/time";
+import { formatOptionalTime, TIME_FORMAT } from "@schellingboard/domain/time";
 import type { VoteChoice } from "@schellingboard/domain/vote";
 import {
   NO_VOTE_LABEL,
@@ -26,11 +21,11 @@ import {
 } from "../../replica/selectors";
 import { Dialog } from "../../ui/dialog";
 import { CalendarIcon, HandRaisedIcon, PencilIcon } from "../../ui/icons";
-import { Markdown } from "../../ui/markdown";
 import { Unavailable } from "../../ui/unavailable";
 import { Comments, type CommentsHandle } from "../comments/comments-section";
 import type { ProposalLinks } from "./links";
 import { phaseTexts } from "./list-model";
+import { ProposalBody } from "./proposal-body";
 import { VoteBreakdown } from "./vote-breakdown";
 import { VoteTally } from "./vote-tally";
 import { VotingButtons } from "./voting-buttons";
@@ -156,43 +151,11 @@ function Details({
 
   return (
     <div className="break-words">
-      {proposal.hosts.length === 0 ? (
-        <p className="mb-4 text-lg font-medium italic text-fg-subtle">
-          No host yet — someone would like this session to be offered
-        </p>
-      ) : (
-        <p className="mb-4 text-lg font-medium text-fg-muted">
-          {proposal.hosts.map((h, i) => (
-            <span key={h.id}>
-              {i > 0 && ", "}
-              <a
-                href={links.guest(h.id)}
-                className="text-brand-fg hover:text-brand-fg-hover hover:underline"
-              >
-                {h.name}
-              </a>
-            </span>
-          ))}
-        </p>
-      )}
-      {proposal.cohostWanted && (
-        <p className="mb-4 text-sm italic text-fg-muted">
-          Looking for a co-host
-          {proposal.cohostWantedNote && `: ${proposal.cohostWantedNote}`}
-        </p>
-      )}
-      <div className="mb-3">
-        <Markdown>{proposal.description ?? ""}</Markdown>
-      </div>
-      {proposal.durationMinutes && (
-        <p className="mb-4 text-sm text-fg-muted">
-          Duration:{" "}
-          {formatDuration(
-            durationMinusBreak(proposal.durationMinutes, breakMinutes),
-            true
-          )}
-        </p>
-      )}
+      <ProposalBody
+        proposal={proposal}
+        links={links}
+        breakMinutes={breakMinutes}
+      />
 
       {wantsHost(proposal) && !isHost && (
         <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-md border border-brand-tint-hover bg-brand-tint px-3 py-2 text-sm text-fg-muted">

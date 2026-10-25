@@ -64,3 +64,10 @@ its legacy callers. `ProposalActions` = `vote` (castVote/withdrawVote), `join` (
 with subject `{kind:"proposal"}`, as `schedule-page.tsx` does for sessions). Profile comments (10c) reuse
 `features/comments/Comments`. `links.view(id)#comment-<id>` is the comment permalink. The detail query
 runs only in the scheduling phase (before it both tally and breakdown are null).
+
+Step 8c, for step 9 (wiring): `QuickVotingScreen({snapshot, links, now, localZone, standings, onVote, comments})`
+takes the same `standings` (`useStandings`) and `onVote` as the list, and `comments: (proposalId) => CommentsHandle`
+(`Comments readOnly`). The title link is `links.view(id)`; the legacy E2E "returns to the same place" needs the router to
+push `?viewProposal=` over the quick-voting route and close back to it. Order = fewest `standing.total` first (0 until
+standings load, so the first proposal can change once). `ProposalLinks.proposals` is the list address (back link).
+`standingsStatus` = `useStandings(...).status`. Intended difference: quick voting's buttons are unavailable (with the reason) outside the voting phase; legacy never disabled them.

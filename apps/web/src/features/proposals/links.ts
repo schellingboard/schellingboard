@@ -1,5 +1,6 @@
 export type ProposalLinks = {
   schedule: string;
+  proposals: string;
   add: string;
   quickVoting: string;
   view: (proposalId: string) => string;
@@ -14,6 +15,7 @@ export function legacyProposalLinks(eventSlug: string): ProposalLinks {
   const legacy = `/legacy/${eventSlug}`;
   return {
     schedule: `/${eventSlug}`,
+    proposals: `${legacy}/proposals`,
     add: `${legacy}/proposals/new`,
     quickVoting: `${legacy}/proposals/quick-voting`,
     view: (id) =>

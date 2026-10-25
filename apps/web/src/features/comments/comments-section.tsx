@@ -24,10 +24,15 @@ export type CommentsEnv = {
   viewerId: string | null;
   timezone: string;
   guestHref: (guestId: string) => string;
-  commentHref: (commentId: string) => string;
-  /** Called with `#comment-<id>` when a comment's time is followed. */
-  setHash: (hash: string) => void;
-};
+} & (
+  | { readOnly: true }
+  | {
+      readOnly?: false;
+      commentHref: (commentId: string) => string;
+      /** Called with `#comment-<id>` when a comment's time is followed. */
+      setHash: (hash: string) => void;
+    }
+);
 
 type Node = CommentView & { replies: Node[] };
 
@@ -83,7 +88,10 @@ function useHighlighted(items: CommentView[] | undefined) {
   return [id, setId] as const;
 }
 
-export function Comments(env: CommentsEnv) {
+export function Comments(props: CommentsEnv) {
+  const env: CommentsEnv = props.readOnly
+    ? { ...props, viewerId: null }
+    : props;
   const { state, handle } = useComments(env.open);
   const [highlighted, highlight] = useHighlighted(state?.items);
   const roots = useMemo(() => buildTree(state?.items ?? []), [state?.items]);
@@ -152,7 +160,7 @@ export function Comments(env: CommentsEnv) {
           Load more comments
         </button>
       )}
-      {env.viewerId ? (
+      {props.readOnly ? null : env.viewerId ? (
         <CommentForm
           onSubmit={(body) => handle.controller.create(body)}
           clearOnSuccess
@@ -192,6 +200,11 @@ function Thread({
   const localZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const isAuthor = viewerId !== null && node.author?.id === viewerId;
   const background = depth % 2 === 1 ? "bg-surface-muted" : "bg-surface-raised";
+  const stamp = (
+    <time dateTime={node.createdTime}>
+      {formatInLocalZone(new Date(node.createdTime), timezone, localZone)}
+    </time>
+  );
   const action = "cursor-pointer hover:text-fg hover:underline";
 
   return (
@@ -238,23 +251,21 @@ function Thread({
               ) : (
                 <span className="font-medium text-fg-muted">Unknown</span>
               )}
-              <a
-                href={env.commentHref(node.id)}
-                onClick={(e) => {
-                  e.preventDefault();
-                  highlight(node.id);
-                  env.setHash(`#comment-${node.id}`);
-                }}
-                className="text-xs text-fg-muted hover:text-fg hover:underline"
-              >
-                <time dateTime={node.createdTime}>
-                  {formatInLocalZone(
-                    new Date(node.createdTime),
-                    timezone,
-                    localZone
-                  )}
-                </time>
-              </a>
+              {env.readOnly ? (
+                <span className="text-xs text-fg-muted">{stamp}</span>
+              ) : (
+                <a
+                  href={env.commentHref(node.id)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    highlight(node.id);
+                    env.setHash(`#comment-${node.id}`);
+                  }}
+                  className="text-xs text-fg-muted hover:text-fg hover:underline"
+                >
+                  {stamp}
+                </a>
+              )}
               {node.editedTime && (
                 <span
                   className="text-xs text-fg-muted"

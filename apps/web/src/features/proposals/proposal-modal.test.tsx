@@ -196,8 +196,10 @@ describe("voting in the modal", () => {
       },
     });
 
-    await userEvent.click(dialog().getByRole("button", { name: "❤️" }));
-    await userEvent.click(dialog().getByRole("button", { name: "⭐" }));
+    await userEvent.click(
+      dialog().getByRole("button", { name: /❤️ Interested/ })
+    );
+    await userEvent.click(dialog().getByRole("button", { name: /⭐ Maybe/ }));
 
     expect(actions.vote.mock.calls).toEqual([
       ["p", VoteChoice.interested],
@@ -207,7 +209,9 @@ describe("voting in the modal", () => {
 
   it("gives a host no vote buttons", { tags: ["005-US1"] }, () => {
     setup("voting", { p: proposal({ hosts: [{ id: "mia", name: "MIA" }] }) });
-    expect(dialog().queryByRole("button", { name: "❤️" })).toBeNull();
+    expect(
+      dialog().queryByRole("button", { name: /❤️ Interested/ })
+    ).toBeNull();
   });
 
   it(
@@ -215,7 +219,7 @@ describe("voting in the modal", () => {
     { tags: ["006-US2"] },
     async () => {
       setup("voting", { patch: { me: null } });
-      const button = dialog().getByRole("button", { name: "❤️" });
+      const button = dialog().getByRole("button", { name: /❤️ Interested/ });
 
       expect(button.getAttribute("aria-disabled")).toBe("true");
       await userEvent.click(button);

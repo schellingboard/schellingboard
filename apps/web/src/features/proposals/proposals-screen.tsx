@@ -239,7 +239,7 @@ function ProposalTable({
     const choice = votes.get(row.id);
     return (
       <span title={choice ? voteChoiceToLabel(choice) : NO_VOTE_LABEL}>
-        {choice ? voteChoiceToEmoji(choice) : ""}
+        {choice ? voteChoiceToEmoji(choice) : "-"}
       </span>
     );
   };
