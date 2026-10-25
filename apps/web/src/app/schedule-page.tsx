@@ -23,7 +23,7 @@ import { createAttendeesQuery } from "../queries/attendees";
 import { addRsvp, removeRsvp } from "../commands/rsvp";
 import { Footer } from "./footer";
 import { hardNavigate, hardReload } from "./hard-navigate";
-import { newKey } from "./keys";
+import { newKey } from "../commands/keys";
 import { useHealth } from "./health";
 import { useUpdateStatus } from "./updates";
 import type { AppServices } from "./services";

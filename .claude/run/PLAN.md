@@ -70,10 +70,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
 
 - [x] 3. `apps/web/src/schedule/` moved to `features/schedule/`; the arch rule found nothing to fix.
 - [x] 4. Failure notices: `ui/notices.tsx`, `Command.describe`, runner `onFailure`, `failureMessage`; RSVP, comments and attendee count use them; the RSVP `AlertDialog` is gone.
-- [ ] 5. **Awaited mutations and form fields**: the helper for forms (call with
-      `Idempotency-Key`, problem details onto fields, `409` handling, success notice
-      through step 4's region) and the form primitives in `ui/` (text, textarea,
-      select, checkbox, date and time, field error), from the legacy ones. Unit tests.
+- [x] 5. Forms: `awaitMutation`, `useFormMutation`, `validateFields` in `commands/`; `ui/form.tsx` fields.
 
 ### Proposals and voting
 

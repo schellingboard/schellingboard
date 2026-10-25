@@ -27,4 +27,10 @@
 - No "Try again"/"open the session" action: a blind re-send gets a new idempotency key and
   bypasses the caller's bookkeeping. Revisit only with same-key resend through the caller.
 
+- Forms (step 5): legacy `app/components/form-error-summary.tsx` (list of all errors next to
+  Save, jump to field) has no SPA equivalent; step 8d (proposal form) must provide it.
+
+- Forms (step 5): legacy `app/components/form-error-summary.tsx` (list of all errors next to
+  Save, jump to field) has no SPA equivalent; step 8d (proposal form) must provide it.
+
 ## Questions

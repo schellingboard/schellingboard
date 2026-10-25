@@ -10,6 +10,8 @@ const REASONS: Record<string, string> = {
   "comment.parentInvalid": "The comment you replied to no longer exists.",
 };
 
+export const reasonFor = (code: string): string | undefined => REASONS[code];
+
 export type Failure = { what: string; code: string; gaveUp: boolean };
 
 export function failureMessage({ what, code, gaveUp }: Failure): string {

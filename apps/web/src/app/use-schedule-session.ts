@@ -8,7 +8,7 @@ import { createCommandRunner, type CommandRunner } from "../commands/runner";
 import type { ReplicaPersistence } from "../replica/persistence";
 import { startReplicaSession } from "../replica/session";
 import type { ReplicaStore } from "../replica/store";
-import { newKey } from "./keys";
+import { newKey } from "../commands/keys";
 import { failureMessage } from "../commands/failure-message";
 import { useNotify } from "../ui/notices";
 

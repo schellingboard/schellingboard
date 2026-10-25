@@ -73,7 +73,7 @@ Sign-out and a switch between names clear the device's persisted replicas
 (`persistence.clear()`); a change of `guestId` also closes the feed and reopens the
 replica, the command runner and the queries (`useScheduleSession` does: the viewer is
 part of its effect key). The provider asks
-again every 5 s while the first identity fetch fails. `app/keys.ts` holds the
+again every 5 s while the first identity fetch fails. `commands/keys.ts` holds the
 `newKey` the runner needs.
 
 ## Theme, footer and dev clock
@@ -139,3 +139,14 @@ day, time and room). The runner's `onFailure` gives that, the problem code, and 
 retries ran out; `failureMessage` turns it into "Could not …" (refused, with the reason) or "might
 not have been saved" (gave up). A notice can carry an action; the runner sets none, as a blind
 re-send would use a new idempotency key.
+
+## Forms
+
+A form waits for the server, unlike a command. `useFormMutation` (`commands/`) calls
+`awaitMutation` with an idempotency key kept only after an unreachable answer, so pressing Save again
+after "might not have been saved" cannot apply it twice. Any other answer, a refusal included,
+ends the key, because the server stores it and would refuse it with changed values. The result is one of: fields (the
+problem's `errors` by path), a `409` ("changed by someone else"), a refusal with its reason, or
+unreachable. `validateFields` runs a zod schema per field before sending. `ui/form.tsx` has
+the controlled fields (`TextField`, `TextAreaField`, `SelectField`, `DateTimeField`,
+`CheckboxField`): label, hint and error are tied to the input, and an error is a `role="alert"`.
