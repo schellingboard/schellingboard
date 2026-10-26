@@ -27,8 +27,7 @@
 - No "Try again"/"open the session" action: a blind re-send gets a new idempotency key and
   bypasses the caller's bookkeeping. Revisit only with same-key resend through the caller.
 
-- Forms (step 5): legacy `app/components/form-error-summary.tsx` (list of all errors next to
-  Save, jump to field) has no SPA equivalent; step 8d (proposal form) must provide it.
+- Forms: `ui/form-error-summary.tsx` (errors next to Save, jump to field by `name`) exists; fields take `name`.
 
 - Step 6: snapshot `proposals` = public fields + hosts (names), no `sessionIds`/tally/breakdown; `me.votes` = `{proposalId, choice}`. Step 7 done: use `proposalsFrom`, `ownVotesFrom`, `castVote`, `withdrawVote`; `runner.view()` shows optimistic votes. Proposal comments still say only "your comment" (step 8b).
 
@@ -71,3 +70,11 @@ takes the same `standings` (`useStandings`) and `onVote` as the list, and `comme
 push `?viewProposal=` over the quick-voting route and close back to it. Order = fewest `standing.total` first (0 until
 standings load, so the first proposal can change once). `ProposalLinks.proposals` is the list address (back link).
 `standingsStatus` = `useStandings(...).status`. Intended difference: quick voting's buttons are unavailable (with the reason) outside the voting phase; legacy never disabled them.
+
+Step 8d, for step 9 (wiring): `ProposalForm({snapshot, proposalId?, links, actions: proposalFormCalls(api), onDone})`;
+`onDone` navigates to `links.proposals` (legacy form did the same after save and delete). Routes `add` / `edit`
+(`links.add`, `links.edit`) are the router's. Hosts are picked from the snapshot's members (the server refuses
+non-members: `proposal.hostNotInEvent`), where legacy listed every guest. A new `Button variant="danger"`,
+`ConfirmDialog cancelLabel`. Legacy `markdown-options.ts` now wraps `domain/markdown-edit.ts`; the legacy
+textarea goes at the takeovers (11, 15). Not copied: legacy's lock/phase checks (the server refuses; the
+reason shows), and the "Delete" trash icon.

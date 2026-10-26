@@ -87,7 +87,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
           state, through the test router.
   - [x] 8b. The proposal modal (done: `features/proposals/proposal-modal.tsx` with `ProposalActions`, `vote-breakdown.tsx`, `queries/proposal-detail.ts`, `commands/join-proposal.ts`; the session comments moved to `features/comments/` as the shared `Comments`).
   - [x] 8c. Quick voting (done: `features/proposals/quick-voting-screen.tsx`, `proposal-body.tsx` shared with the modal, `Comments` gained `readOnly`; `links.proposals`).
-  - [ ] 8d. New and edit proposal forms, delete.
+  - [x] 8d. New and edit proposal forms, delete (done: `features/proposals/proposal-form.tsx` with `commands/proposal-form.ts` calls, `ui/` `FormErrorSummary`, `PeopleField`, `MarkdownField`; the toolbar logic moved to `packages/domain/markdown-edit.ts`).
 - [ ] 9. **Takeover: proposals**. Router owns `/{slug}/proposals/**` and
       `viewProposal`; the schedule's proposal links and `modal-nav.ts` point at it;
       legacy proposal pages, components and `proposals/actions.ts` are deleted. E2E:

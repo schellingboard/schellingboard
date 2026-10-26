@@ -1,16 +1,24 @@
 import { useId, type ReactNode } from "react";
+import { MarkdownTextarea } from "./markdown-textarea";
+import { PeoplePicker, type Person } from "./people-picker";
 
 const CONTROL =
   "w-full rounded-md border border-line bg-surface-raised p-2 text-sm text-fg focus:border-brand-accent focus:ring-brand-accent aria-[invalid=true]:border-danger-border";
 
 type FieldProps = {
   label: string;
+  /** What the form error summary jumps to. */
+  name?: string;
   required?: boolean;
   hint?: string;
   error?: string;
 };
 
-function useField({ hint, error }: Pick<FieldProps, "hint" | "error">) {
+function useField({
+  hint,
+  error,
+  name,
+}: Pick<FieldProps, "hint" | "error" | "name">) {
   const id = useId();
   const hintId = `${id}-hint`;
   const errorId = `${id}-error`;
@@ -23,6 +31,7 @@ function useField({ hint, error }: Pick<FieldProps, "hint" | "error">) {
     errorId,
     control: {
       id,
+      name,
       "aria-invalid": error ? true : undefined,
       "aria-describedby": describedBy || undefined,
     },
@@ -36,7 +45,7 @@ function Frame({
   error,
   ids,
   children,
-}: FieldProps & {
+}: Omit<FieldProps, "name"> & {
   ids: ReturnType<typeof useField>;
   children: ReactNode;
 }) {
@@ -194,6 +203,7 @@ export function DateTimeField({
 
 export function CheckboxField({
   label,
+  name,
   hint,
   error,
   checked,
@@ -202,7 +212,7 @@ export function CheckboxField({
   checked: boolean;
   onChange: (checked: boolean) => void;
 }) {
-  const ids = useField({ hint, error });
+  const ids = useField({ hint, error, name });
   return (
     <div className="flex flex-col gap-1">
       <label className="flex items-start gap-2 text-sm">
@@ -222,5 +232,55 @@ export function CheckboxField({
       )}
       <FieldError id={ids.errorId} message={error} />
     </div>
+  );
+}
+
+export function MarkdownField({
+  value,
+  onChange,
+  placeholder,
+  ...frame
+}: FieldProps & {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+}) {
+  const hint = frame.hint ?? "Markdown supported";
+  const ids = useField({ ...frame, hint });
+  return (
+    <Frame {...frame} hint={hint} ids={ids}>
+      <MarkdownTextarea
+        {...ids.control}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+      />
+    </Frame>
+  );
+}
+
+export function PeopleField({
+  people,
+  selected,
+  onChange,
+  ...frame
+}: FieldProps & {
+  people: Person[];
+  selected: string[];
+  onChange: (ids: string[]) => void;
+}) {
+  const ids = useField(frame);
+  return (
+    <Frame {...frame} ids={ids}>
+      <PeoplePicker
+        people={people}
+        selected={selected}
+        onChange={onChange}
+        id={ids.id}
+        name={frame.name}
+        invalid={!!frame.error}
+        describedBy={ids.control["aria-describedby"]}
+      />
+    </Frame>
   );
 }

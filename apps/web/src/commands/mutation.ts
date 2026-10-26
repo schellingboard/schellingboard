@@ -15,6 +15,8 @@ export type MutationResult<R> =
 const UNREACHABLE =
   "This might not have been saved. Check that it went through, then try again.";
 
+export const FIX_FIELDS_MESSAGE = "Please fix the highlighted fields.";
+
 const isVersionConflict = (code: string) => code.endsWith(".versionConflict");
 
 /** A form waits for the answer, unlike a command: the user is looking at it. */
@@ -45,7 +47,7 @@ export async function awaitMutation<R>(
       ok: false,
       kind: "fields",
       fields: Object.fromEntries(problems.map((p) => [p.path, p.message])),
-      message: "Please fix the highlighted fields.",
+      message: FIX_FIELDS_MESSAGE,
     };
   const code = problemCode(error, response.status);
   return {
