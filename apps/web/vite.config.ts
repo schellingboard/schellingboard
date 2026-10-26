@@ -23,7 +23,13 @@ const NEXT_PATHS = [
 export default defineConfig(({ command }) => ({
   plugins: [react(), tailwindcss()],
   base: command === "build" ? "/_spa/" : "/",
-  build: { outDir: "dist", emptyOutDir: true },
+  build: {
+    outDir: "dist",
+    emptyOutDir: true,
+    // A size budget, not a silencer: the SPA is one route, so it cannot be split
+    // usefully yet. E2E builds with NODE_ENV=test, which bundles dev React.
+    chunkSizeWarningLimit: process.env.NODE_ENV === "production" ? 700 : 1000,
+  },
   server: {
     port: Number(process.env.PORT ?? 3000),
     strictPort: true,
