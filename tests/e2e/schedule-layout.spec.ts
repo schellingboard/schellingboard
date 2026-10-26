@@ -1,7 +1,7 @@
 import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
 import { swipe } from "./helpers/touch";
-import { selectUser } from "./helpers/user";
+import { selectUser, tapUntilOpen } from "./helpers/user";
 import { uniqueSuffix } from "./helpers/unique";
 import { dayRadios, listboxButton } from "./helpers/session-form";
 
@@ -312,6 +312,12 @@ test("the grid keeps its place after a session is added from it @008-US1", async
   await expect(
     page.getByRole("heading", { name: /Add a session/i })
   ).toBeVisible();
+  // Add is a full page load, and typing before the form hydrates is lost. A
+  // listbox only opens once it has, so open and close one first.
+  const listbox = page.getByRole("listbox");
+  await tapUntilOpen(listboxButton(page, /^Start Time/), listbox);
+  await page.keyboard.press("Escape");
+  await expect(listbox).toBeHidden();
   await page
     .getByRole("textbox")
     .first()

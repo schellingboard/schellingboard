@@ -3,7 +3,7 @@ import { test, expect } from "./helpers/fixtures";
 import { switchToView } from "./helpers/schedule";
 import { uniqueSuffix } from "./helpers/unique";
 import { login } from "./helpers/auth";
-import { selectUser } from "./helpers/user";
+import { selectUser, tapUntilOpen } from "./helpers/user";
 import { dayRadios, listboxButton } from "./helpers/session-form";
 import { dismissToast, toast } from "./helpers/toast";
 
@@ -24,6 +24,12 @@ async function addSession(page: Page, title: string, startTime: string) {
   await expect(
     page.getByRole("heading", { name: /Add a session/i })
   ).toBeVisible();
+  // Add is a full page load, and typing before the form hydrates is lost. A
+  // listbox only opens once it has, so open and close one first.
+  const listbox = page.getByRole("listbox");
+  await tapUntilOpen(listboxButton(page, /^Start Time/), listbox);
+  await page.keyboard.press("Escape");
+  await expect(listbox).toBeHidden();
   await page.getByRole("textbox").first().fill(title);
   await dayRadios(page).last().check();
   await listboxButton(page, /^Location/).click();
