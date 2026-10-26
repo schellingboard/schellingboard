@@ -89,11 +89,14 @@ function ScheduleHost({
     <ShellFrame
       api={api}
       events={events}
-      guests={guests.map((g) => ({
-        id: g.id,
-        name: g.name,
-        authProtected: g.authProtected,
-      }))}
+      guests={
+        store &&
+        guests.map((g) => ({
+          id: g.id,
+          name: g.name,
+          authProtected: g.authProtected,
+        }))
+      }
       currentPath={`/${slug}`}
       search={search}
       onClockChange={hardReload}

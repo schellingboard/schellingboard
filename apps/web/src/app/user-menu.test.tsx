@@ -135,4 +135,14 @@ describe("UserMenu", () => {
     );
     expect(screen.queryByRole("button")).toBeNull();
   });
+
+  it("offers no name to pick while the names are still loading", () => {
+    render(
+      <UserMenu
+        viewer={{ guestId: "g1", choose: vi.fn(), signOut: vi.fn() }}
+        guests={undefined}
+      />
+    );
+    expect(screen.queryByRole("button")).toBeNull();
+  });
 });

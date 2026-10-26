@@ -20,14 +20,14 @@ export function UserMenu({
   guests,
 }: {
   viewer: Viewer;
-  guests: PickableGuest[];
+  guests: PickableGuest[] | undefined;
 }) {
   const [picking, setPicking] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [logoutFailed, setLogoutFailed] = useState(false);
 
-  if (viewer.guestId === undefined) return null;
+  if (viewer.guestId === undefined || guests === undefined) return null;
   const current = guests.find((g) => g.id === viewer.guestId);
 
   const logOut = async () => {

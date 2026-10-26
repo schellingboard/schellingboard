@@ -45,7 +45,7 @@ export function ShellFrame({
 export type ShellProps = {
   api: ApiClient;
   events: NavItem[];
-  guests: PickableGuest[];
+  guests: PickableGuest[] | undefined;
   currentPath: string;
   search: string;
   onClockChange: () => void;
