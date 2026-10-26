@@ -9,7 +9,6 @@ import {
   commentLikeSchema,
   commentUpdateSchema,
   profileCommentSchema,
-  proposalCommentSchema,
   sessionCommentSchema,
 } from "@schellingboard/contracts/comment";
 import { commentUseCases, idempotentAction } from "@/server/composition";
@@ -115,32 +114,6 @@ async function createOnce(
       return { success: true };
     }
   );
-}
-
-export async function createProposalComment(
-  comment: z.input<typeof proposalCommentSchema>,
-  idempotencyKey?: string
-): Promise<CommentActionResult>;
-export async function createProposalComment(
-  input: unknown,
-  idempotencyKey?: string
-): Promise<CommentActionResult> {
-  await requireSiteAuth();
-  try {
-    const actor = await requireGuest("commenting");
-    const parsed = await requireParsed(proposalCommentSchema, input);
-    const { proposalId, eventSlug, ...comment } = parsed;
-    const result = await createOnce(
-      actor,
-      { kind: "proposal", id: proposalId },
-      comment,
-      { name: "createProposalComment", idempotencyKey, input: parsed }
-    );
-    if ("success" in result) revalidateEvent(eventSlug);
-    return result;
-  } catch (error) {
-    return toResult(error, "Failed to post comment");
-  }
 }
 
 export async function createSessionComment(

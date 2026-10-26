@@ -19,10 +19,10 @@ import {
 import { getRepositories } from "@/db/container";
 import { VoteChoice } from "@schellingboard/domain/vote";
 import type { SessionParams } from "@/app/api/session-form-utils";
-import { POST as addVote } from "@/app/api/add-vote/route";
+import { PUT as putV1 } from "@/app/api/v1/[[...route]]/route";
 import { POST as addSession } from "@/app/api/add-session/route";
 import { POST as toggleRsvp } from "@/app/api/toggle-rsvp/route";
-import { proposalApi } from "../helpers/proposal-api";
+import { apiRequest, proposalApi } from "../helpers/proposal-api";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 
 const cookieJar = new Map<string, string>();
@@ -54,11 +54,9 @@ async function voteOnProposalIn(phase: "proposal" | "voting" | "scheduling") {
   const guest = await createGuest({ eventId: event.id });
   const proposal = await createProposalFixture(event.id, []);
 
-  const res = await addVote(
-    makeReq("http://test/api/add-vote", {
-      proposalId: proposal.id,
-      guestId: guest.id,
-      choice: VoteChoice.interested,
+  const res = await putV1(
+    apiRequest("PUT", `/proposals/${proposal.id}/votes/${guest.id}`, {
+      body: { choice: VoteChoice.interested },
     })
   );
   const votes = await getRepositories().votes.listByGuestAndEvent(

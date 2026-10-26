@@ -42,16 +42,6 @@ export const RESERVED_EVENT_SLUGS = new Set([
 ]);
 
 /**
- * URL for fetching a guest's votes. Encodes both values so reserved URL
- * characters (e.g. in legacy slugs stored before sanitization, like "&")
- * cannot corrupt the query string.
- */
-export function votesApiUrl(user: string, eventSlug: string): string {
-  const params = new URLSearchParams({ user, event: eventSlug });
-  return `/api/votes?${params.toString()}`;
-}
-
-/**
  * Trims, transforms to lowercase and removes accents from a string. Applied to
  * both sides of a search comparison, so "jose" finds "José" and vice versa.
  *

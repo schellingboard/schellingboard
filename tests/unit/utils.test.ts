@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import {
   eventNameToSlug,
   normalizeWebsiteUrl,
-  votesApiUrl,
   normalizeForSearch,
   containsIgnoringAccents,
   equalsIgnoringAccents,
@@ -109,25 +108,6 @@ describe("normalizeWebsiteUrl", () => {
 
   it("returns an empty string for whitespace-only input", () =>
     expect(normalizeWebsiteUrl("   ")).toBe(""));
-});
-
-// ── votesApiUrl ──────────────────────────────────────────────────────────────
-
-describe("votesApiUrl", () => {
-  it("builds the votes query for plain values", () =>
-    expect(votesApiUrl("guest1", "My-Event")).toBe(
-      "/api/votes?user=guest1&event=My-Event"
-    ));
-
-  it("encodes reserved URL characters so the slug survives query parsing", () => {
-    // Legacy slugs stored before sanitization can contain "&"; unencoded,
-    // the server would parse event as "Food-" and drop "-Drinks" into a
-    // bogus param.
-    const url = votesApiUrl("guest1", "Food-&-Drinks");
-    const params = new URL(url, "http://test").searchParams;
-    expect(params.get("event")).toBe("Food-&-Drinks");
-    expect(params.get("user")).toBe("guest1");
-  });
 });
 
 // ── dateOnDay ────────────────────────────────────────────────────────────────

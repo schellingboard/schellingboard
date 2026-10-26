@@ -15,7 +15,8 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
 
-vi.mock("next/server", () => ({
+vi.mock("next/server", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("next/server")>()),
   after: (task: () => unknown) => {
     void Promise.resolve(task());
   },
@@ -45,9 +46,11 @@ import { getRepositories } from "@/db/container";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 import {
   createProfileComment,
-  createProposalComment,
   createSessionComment,
 } from "@/app/legacy/(site)/[eventSlug]/comment-actions";
+import { proposalApi } from "../helpers/proposal-api";
+
+const { createProposalComment } = proposalApi(cookieJar);
 
 describe("create comment with an idempotency key", () => {
   beforeAll(() => setupTestDb());
@@ -81,10 +84,7 @@ describe("create comment with an idempotency key", () => {
     const { event, guest } = await world();
     const proposal = await createProposalRow(event.id, [guest.id]);
     const send = () =>
-      createProposalComment(
-        { proposalId: proposal.id, eventSlug: "test-event", body: "Hi" },
-        "k1"
-      );
+      createProposalComment({ proposalId: proposal.id, body: "Hi" }, "k1");
     expect(await send()).toEqual({ success: true });
     expect(await send()).toEqual({ success: true });
     const list = await getRepositories().proposalComments.list(proposal.id);

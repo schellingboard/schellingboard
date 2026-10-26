@@ -48,7 +48,7 @@ describe("proxy: /api/admin/* auth", () => {
 
   it("still requires site auth for non-admin API routes", async () => {
     const admin = await createAdminAuthCookie();
-    const result = await throughProxy("/api/votes", {}, [admin]);
+    const result = await throughProxy("/api/rsvps", {}, [admin]);
     if (result.ok) throw new Error("expected proxy to redirect the request");
     expect(result.response.headers.get("location")).toMatch(/\/login/);
   });

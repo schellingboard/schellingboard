@@ -10,13 +10,6 @@ const body = z
     message: `Comment must be at most ${COMMENT_MAX_LENGTH} characters`,
   });
 
-export const proposalCommentSchema = z.object({
-  proposalId: z.string().min(1),
-  eventSlug: z.string().min(1),
-  parentId: z.string().min(1).optional(),
-  body,
-});
-
 export const sessionCommentSchema = z.object({
   sessionId: z.string().min(1),
   parentId: z.string().min(1).optional(),

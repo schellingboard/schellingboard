@@ -18,7 +18,11 @@ import {
   createProposal,
   createSession,
 } from "../helpers/factories";
-import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
+import {
+  GUEST_COOKIE_NAME,
+  openGuestValue,
+  verifiedGuestValue,
+} from "../helpers/guest-cookie";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
@@ -176,4 +180,40 @@ describe("/api/v1 votes", () => {
     expect(res.status).toBe(400);
     expect(await res.json()).toMatchObject({ code: "request.invalid" });
   });
+
+  it(
+    "keeps a protected guest's votes behind a verified session",
+    { tags: ["005-US1"] },
+    async () => {
+      const event = await createEvent({ phase: "voting" });
+      const guest = await createGuest({ eventId: event.id });
+      await getRepositories().guests.setAuthProtection(guest.id, {
+        authProtected: true,
+        passwordHash: null,
+      });
+      const proposal = await createProposal(event.id, []);
+      const path = `/proposals/${proposal.id}/votes/${guest.id}`;
+      const list = `/guests/${guest.id}/votes?eventId=${event.id}`;
+      const verified = `${GUEST_COOKIE_NAME}=${await verifiedGuestValue(guest.id)}`;
+      const choice = { body: { choice: "interested" } };
+
+      for (const cookie of [undefined, asGuest(guest.id)]) {
+        const put = await PUT(request("PUT", path, { ...choice, cookie }));
+        expect(put.status).toBe(403);
+        expect(await put.json()).toMatchObject({ code: "guest.protected" });
+        expect((await GET(request("GET", list, { cookie }))).status).toBe(403);
+      }
+
+      const put = await PUT(
+        request("PUT", path, { ...choice, cookie: verified })
+      );
+      expect(put.status).toBe(204);
+      expect((await DELETE(request("DELETE", path))).status).toBe(403);
+      const listed = await GET(request("GET", list, { cookie: verified }));
+      expect(await listed.json()).toMatchObject({ votes: [{}] });
+      expect(
+        (await DELETE(request("DELETE", path, { cookie: verified }))).status
+      ).toBe(204);
+    }
+  );
 });

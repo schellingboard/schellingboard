@@ -90,12 +90,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
   - [x] 8d. New and edit proposal forms, delete (done: `features/proposals/proposal-form.tsx` with `commands/proposal-form.ts` calls, `ui/` `FormErrorSummary`, `PeopleField`, `MarkdownField`; the toolbar logic moved to `packages/domain/markdown-edit.ts`).
 - [x] 9a. **Takeover: proposals** (done: router owns `/{slug}/proposals/**`; `EventPage`, `ProposalsPage`/`QuickVotingPage`/`ProposalFormPage`, `SpaLinks` + `proposal-nav.ts`; legacy proposal pages and components deleted, `actions.ts` kept; likes preview and avatars ported to `Comments`).
 - [x] 9b. Proposal legacy cleanup (done: `proposals/actions.ts` deleted; its tests now call /api/v1 through `tests/helpers/proposal-api.ts`; the proposal idempotency tests live in `api-proposals.test.ts`; `VotesProvider`, `VotesContext` and `votes.ts` deleted, `vote-display` tests moved to `tests/unit`).
-- [ ] 9c. **Legacy vote and proposal-comment leftovers**. Delete `/api/votes`, `/api/add-vote`,
-      `/api/delete-vote` (and `votesApiUrl`), `createProposalComment` in `comment-actions.ts`
-      and the `/api/proposal/[proposalId]/comments` route; convert their tests
-      (`voting.test.ts`, `phase-gating`, `user-auth-enforcement`, `mutating-surface-guard`,
-      `proxy.test.ts`, `session-comments`, `proposal-comments`, `proposal-comment-likes`,
-      `action-idempotency`, `action-auth-guard`, `comment-routes`) to /api/v1 or use cases.
+- [x] 9c. Legacy vote and proposal-comment leftovers deleted (`/api/votes`, `/api/add-vote`, `/api/delete-vote`, `votesApiUrl`, `createProposalComment`, `/api/proposal/*/comments`); their tests use /api/v1 (`voting.test.ts`, `api-rsvps-votes.test.ts`, `proposalApi().createProposalComment`).
 
 ### People and meetings
 

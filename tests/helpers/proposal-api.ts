@@ -62,6 +62,10 @@ export function proposalApi(cookies: Map<string, string>) {
       call("PUT", `/proposals/${id}`, fields),
     joinProposal: (id: string) => call("POST", `/proposals/${id}/hosts`),
     deleteProposal: (id: string) => call("DELETE", `/proposals/${id}`),
+    createProposalComment: (
+      { proposalId, ...fields }: Fields & { proposalId: string },
+      key?: string
+    ) => call("POST", `/proposals/${proposalId}/comments`, fields, key),
   };
 }
 

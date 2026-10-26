@@ -23,10 +23,13 @@ import { createEvent, createGuest, createProposal } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 import {
-  createProposalComment as createComment,
   deleteComment,
   toggleCommentLike,
 } from "@/app/legacy/(site)/[eventSlug]/comment-actions";
+
+import { proposalApi } from "../helpers/proposal-api";
+
+const { createProposalComment: createComment } = proposalApi(cookieJar);
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
@@ -41,7 +44,6 @@ async function setup() {
   act(guest.id);
   await createComment({
     proposalId: proposal.id,
-    eventSlug: event.slug,
     body: "worth liking",
   });
   const [comment] = await getRepositories().proposalComments.list(proposal.id);
@@ -208,7 +210,6 @@ describe("proposal comment likes", () => {
     act(other.id);
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       parentId: comment.id,
       body: "a surviving reply",
     });
@@ -229,7 +230,6 @@ describe("proposal comment likes", () => {
     act(other.id);
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       parentId: comment.id,
       body: "a surviving reply",
     });

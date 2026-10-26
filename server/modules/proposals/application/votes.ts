@@ -107,17 +107,11 @@ export const listGuestVotes =
   ({ repos }: ProposalDeps) =>
   async (
     actor: Actor,
-    {
-      guestId,
-      event: ref,
-    }: { guestId: string; event: { id: string } | { slug: string } }
+    { guestId, event: ref }: { guestId: string; event: { id: string } }
   ): Promise<Result<Vote[]>> => {
     const acting = await actingAsNamedGuest(actor, guestId, repos.guests);
     if (!acting.ok) return acting;
-    const event =
-      "id" in ref
-        ? await repos.events.findById(ref.id)
-        : await repos.events.findBySlug(ref.slug);
+    const event = await repos.events.findById(ref.id);
     if (!event) return notFound("event.notFound", "Event not found");
     return ok(await repos.votes.listByGuestAndEvent(guestId, event.id));
   };

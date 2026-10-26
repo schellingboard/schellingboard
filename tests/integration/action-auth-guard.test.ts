@@ -98,16 +98,6 @@ const SITE_GUARDED: Record<string, () => Promise<unknown>> = {
       await import("@/app/legacy/(site)/[eventSlug]/session-actions");
     return revalidateEvent("some-event");
   },
-  "legacy/(site)/[eventSlug]/comment-actions.ts:createProposalComment":
-    async () => {
-      const { createProposalComment } =
-        await import("@/app/legacy/(site)/[eventSlug]/comment-actions");
-      return createProposalComment({
-        proposalId: "p",
-        eventSlug: "s",
-        body: "b",
-      });
-    },
   "legacy/(site)/[eventSlug]/comment-actions.ts:createSessionComment":
     async () => {
       const { createSessionComment } =

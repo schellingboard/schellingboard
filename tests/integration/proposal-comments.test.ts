@@ -32,11 +32,14 @@ import {
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
 import {
-  createProposalComment as createComment,
   updateComment,
   deleteComment,
 } from "@/app/legacy/(site)/[eventSlug]/comment-actions";
 import { sendMail } from "@/utils/mailer";
+
+import { proposalApi } from "../helpers/proposal-api";
+
+const { createProposalComment: createComment } = proposalApi(cookieJar);
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
@@ -74,7 +77,6 @@ describe("proposal comments", () => {
 
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "Sounds great",
     });
     await runJobs();
@@ -86,13 +88,12 @@ describe("proposal comments", () => {
   });
 
   it("stores a comment and reads it back with its author and time", async () => {
-    const { event, guest, proposal } = await setup();
+    const { guest, proposal } = await setup();
     act(guest.id);
     const before = new Date();
 
     const result = await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "Sounds **great**",
     });
 
@@ -107,17 +108,15 @@ describe("proposal comments", () => {
   });
 
   it("lists comments oldest first", async () => {
-    const { event, guest, proposal } = await setup();
+    const { guest, proposal } = await setup();
     act(guest.id);
 
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "first",
     });
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "second",
     });
 
@@ -153,7 +152,6 @@ describe("proposal comments", () => {
 
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "on the first",
     });
 
@@ -163,11 +161,10 @@ describe("proposal comments", () => {
   });
 
   it("refuses to comment without a selected name", async () => {
-    const { event, proposal } = await setup();
+    const { proposal } = await setup();
 
     const result = await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "anonymous",
     });
 
@@ -178,24 +175,23 @@ describe("proposal comments", () => {
   });
 
   it("tells a commenter whose guest was deleted what to do about it", async () => {
-    const { event, guest, proposal } = await setup();
+    const { guest, proposal } = await setup();
     act(guest.id);
     await getRepositories().guests.delete(guest.id);
 
     const result = await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "ghost",
     });
 
-    expect("error" in result && result.error).toMatch(/select who you are/i);
+    expect("error" in result && result.error.code).toBe("guest.unselected");
     expect(
       await getRepositories().proposalComments.list(proposal.id)
     ).toHaveLength(0);
   });
 
   it("refuses to comment as a protected guest without a verified session", async () => {
-    const { event, guest, proposal } = await setup();
+    const { guest, proposal } = await setup();
     await getRepositories().guests.setAuthProtection(guest.id, {
       authProtected: true,
       passwordHash: null,
@@ -204,7 +200,6 @@ describe("proposal comments", () => {
 
     const result = await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "impersonated",
     });
 
@@ -215,7 +210,7 @@ describe("proposal comments", () => {
   });
 
   it("allows a verified protected guest to comment", async () => {
-    const { event, guest, proposal } = await setup();
+    const { guest, proposal } = await setup();
     await getRepositories().guests.setAuthProtection(guest.id, {
       authProtected: true,
       passwordHash: null,
@@ -224,7 +219,6 @@ describe("proposal comments", () => {
 
     const result = await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "verified",
     });
 
@@ -235,12 +229,11 @@ describe("proposal comments", () => {
   });
 
   it("rejects an empty comment", async () => {
-    const { event, guest, proposal } = await setup();
+    const { guest, proposal } = await setup();
     act(guest.id);
 
     const result = await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "   ",
     });
 
@@ -251,12 +244,11 @@ describe("proposal comments", () => {
   });
 
   it("rejects a comment on an unknown proposal", async () => {
-    const { event, guest } = await setup();
+    const { guest } = await setup();
     act(guest.id);
 
     const result = await createComment({
       proposalId: "does-not-exist",
-      eventSlug: event.slug,
       body: "hello",
     });
 
@@ -268,7 +260,6 @@ describe("proposal comments", () => {
     act(guest.id);
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "doomed",
     });
 
@@ -303,7 +294,6 @@ describe("editing a proposal comment", () => {
     act(guest.id);
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "original",
     });
     const before = await onlyComment(proposal.id);
@@ -328,7 +318,6 @@ describe("editing a proposal comment", () => {
     act(guest.id);
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "mine",
     });
     const comment = await onlyComment(proposal.id);
@@ -349,7 +338,6 @@ describe("editing a proposal comment", () => {
     act(guest.id);
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "mine",
     });
     const comment = await onlyComment(proposal.id);
@@ -379,7 +367,6 @@ describe("deleting a proposal comment", () => {
     act(guest.id);
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "never mind",
     });
     const comment = await onlyComment(proposal.id);
@@ -401,14 +388,12 @@ describe("deleting a proposal comment", () => {
     act(guest.id);
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "the question",
     });
     const parent = await onlyComment(proposal.id);
     act(other.id);
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       parentId: parent.id,
       body: "the answer",
     });
@@ -432,13 +417,11 @@ describe("deleting a proposal comment", () => {
     act(guest.id);
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "parent",
     });
     const parent = await onlyComment(proposal.id);
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       parentId: parent.id,
       body: "child",
     });
@@ -460,7 +443,6 @@ describe("deleting a proposal comment", () => {
     act(guest.id);
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "mine",
     });
     const comment = await onlyComment(proposal.id);
@@ -480,13 +462,11 @@ describe("deleting a proposal comment", () => {
     act(guest.id);
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "parent",
     });
     const parent = await onlyComment(proposal.id);
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       parentId: parent.id,
       body: "child",
     });
@@ -512,18 +492,16 @@ describe("threaded proposal replies", () => {
   });
 
   it("records the parent of a reply", async () => {
-    const { event, guest, proposal } = await setup();
+    const { guest, proposal } = await setup();
     act(guest.id);
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "top level",
     });
     const parent = await onlyComment(proposal.id);
 
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       parentId: parent.id,
       body: "a reply",
     });
@@ -538,14 +516,12 @@ describe("threaded proposal replies", () => {
     act(guest.id);
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "top level",
     });
     const parent = await onlyComment(proposal.id);
 
     const result = await createComment({
       proposalId: elsewhere.id,
-      eventSlug: event.slug,
       parentId: parent.id,
       body: "misfiled reply",
     });
@@ -557,17 +533,15 @@ describe("threaded proposal replies", () => {
   });
 
   it("deletes a whole thread with its proposal", async () => {
-    const { event, guest, proposal } = await setup();
+    const { guest, proposal } = await setup();
     act(guest.id);
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "top level",
     });
     const parent = await onlyComment(proposal.id);
     await createComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       parentId: parent.id,
       body: "a reply",
     });

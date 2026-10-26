@@ -38,12 +38,14 @@ import {
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
 import {
-  createProposalComment,
   createSessionComment as createComment,
   deleteComment,
   updateComment,
 } from "@/app/legacy/(site)/[eventSlug]/comment-actions";
 import { sendMail } from "@/utils/mailer";
+import { proposalApi } from "../helpers/proposal-api";
+
+const { createProposalComment } = proposalApi(cookieJar);
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
@@ -172,7 +174,6 @@ describe("session comments", () => {
     });
     await createProposalComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "on the proposal",
     });
 
@@ -541,7 +542,6 @@ describe("threaded session replies", () => {
     act(guest.id);
     await createProposalComment({
       proposalId: proposal.id,
-      eventSlug: event.slug,
       body: "top level on a proposal",
     });
     const parent = (

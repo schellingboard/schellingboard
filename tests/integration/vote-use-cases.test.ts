@@ -90,11 +90,11 @@ describe("vote use cases", () => {
           )
         ).ok
       ).toBe(true);
-      const bySlug = await proposalUseCases().listGuestVotes(NOBODY, {
+      const afterWithdraw = await proposalUseCases().listGuestVotes(NOBODY, {
         guestId: guest.id,
-        event: { slug: event.slug },
+        event: { id: event.id },
       });
-      expect(bySlug.ok && bySlug.value).toEqual([]);
+      expect(afterWithdraw.ok && afterWithdraw.value).toEqual([]);
     }
   );
 
@@ -188,7 +188,7 @@ describe("vote use cases", () => {
       expect(
         await proposalUseCases().listGuestVotes(NOBODY, {
           guestId: guest.id,
-          event: { slug: "missing" },
+          event: { id: "missing" },
         })
       ).toMatchObject({ error: { kind: "notFound", code: "event.notFound" } });
     }

@@ -50,8 +50,8 @@ Post-condition state is verified through a read surface, not by inspecting
 DB rows. In order of preference:
 
 1. The corresponding GET endpoint or read action a user's browser would
-   hit (e.g., create via `POST /api/add-vote`, verify via
-   `GET /api/votes`).
+   hit (e.g., create via `PUT /api/v1/proposals/{id}/votes/{guestId}`, verify via
+   `GET /api/v1/guests/{id}/votes`).
 2. The repository's read methods (e.g., `sessionsRepo.listByEvent`) — the
    same interface server components use to render the page. Use this when
    no HTTP read surface exists.

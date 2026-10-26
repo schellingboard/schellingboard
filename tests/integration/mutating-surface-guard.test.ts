@@ -87,10 +87,8 @@ const READ_ONLY = new Set([
   "meetings",
   "meetings/candidates",
   "rsvps",
-  "votes",
   "session/[sessionId]/comments",
   "profile/[profileId]/comments",
-  "proposal/[proposalId]/comments",
 ]);
 
 type Verifier = () => Promise<void>;
@@ -202,39 +200,6 @@ const VERIFIERS: Record<string, Verifier> = {
           "content-type": "application/json",
           cookie: `${GUEST_COOKIE_NAME}=${openGuestValue(guest.id)}`,
         },
-      })
-    );
-    expect(res.status).toBe(403);
-  },
-
-  "add-vote": async () => {
-    const { POST } = await import("@/app/api/add-vote/route");
-    const guest = await createGuest();
-    await protectGuest(guest.id);
-    const res = await POST(
-      new Request("http://test/api/add-vote", {
-        method: "POST",
-        body: JSON.stringify({
-          proposalId: "nonexistent",
-          guestId: guest.id,
-          choice: "interested",
-        }),
-      })
-    );
-    expect(res.status).toBe(403);
-  },
-
-  "delete-vote": async () => {
-    const { POST } = await import("@/app/api/delete-vote/route");
-    const guest = await createGuest();
-    await protectGuest(guest.id);
-    const res = await POST(
-      new Request("http://test/api/delete-vote", {
-        method: "POST",
-        body: JSON.stringify({
-          proposalId: "nonexistent",
-          guestId: guest.id,
-        }),
       })
     );
     expect(res.status).toBe(403);

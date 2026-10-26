@@ -222,7 +222,7 @@ Bad — `app/legacy/(site)/context.tsx` narrates itself; every one of these shou
 // Update existing vote / Add new vote if none exists
 ```
 
-Good — each says something the code cannot (`app/api/votes/route.ts`,
+Good — each says something the code cannot (`app/api/rsvps/route.ts`,
 `server/modules/proposals/application/votes.ts`, `app/legacy/(site)/guests/avatar.tsx`):
 
 ```ts

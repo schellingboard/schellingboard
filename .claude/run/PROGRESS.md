@@ -38,11 +38,15 @@
   `:focus-visible`. Flake: `voting.spec.ts:115` fails first try under load (queue head
   changes while parallel tests add Beta proposals), passes alone.
 
+Step 16: drop `eventSlug` and `revalidateEvent` from `comment-actions.ts` with the file (no live page needs them now that
+proposals are SPA).
+
 ## Questions
 
 0. The SPA shell has no "Show map" button (the uploaded site map); only legacy pages show it. The
-   schedule and proposals screens lost it when they moved. `settings.spec.ts:67` now checks it on
-   `/legacy/guests`. Needs a shell item and the map URL in `/me` or the snapshot.
+   schedule and proposals screens (both SPA-owned now) lost it when they moved.
+   `settings.spec.ts:67` now checks it on `/legacy/guests`. Needs a shell item and the
+   map URL in `/me` or the snapshot.
 
 Assumptions the user may override (set by the coordinator, 2026-10-25):
 
