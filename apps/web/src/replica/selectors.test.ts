@@ -34,6 +34,20 @@ describe("eventContextFrom", () => {
     ]);
   });
 
+  it("lists a session's rooms in the event's room order", () => {
+    const [room] = snapshot.locations;
+    const context = eventContextFrom({
+      ...snapshot,
+      locations: [room, { ...room, id: "r2", name: "Second" }],
+      sessions: [{ ...snapshot.sessions[0], locationIds: ["r2", "r"] }],
+    });
+
+    expect(context.sessions[0].locations.map((l) => l.name)).toEqual([
+      "Room",
+      "Second",
+    ]);
+  });
+
   it("skips a room the replica no longer holds", () => {
     const removed = apply(snapshot, {
       seq: snapshot.seq + 1,

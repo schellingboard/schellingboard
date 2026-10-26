@@ -50,6 +50,13 @@ export function eventContextFrom(snapshot: Snapshot) {
   const locations = snapshot.locations.map(toLocation);
   const locationsById = new Map(locations.map((l) => [l.id, l]));
 
+  const roomsOf = (ids: string[]) => {
+    const wanted = new Set(ids);
+    return locations
+      .filter((room) => wanted.has(room.id))
+      .map(({ id, name, color }) => ({ id, name, color }));
+  };
+
   const sessions: Session[] = snapshot.sessions.map(
     ({ hostIds, locationIds, startTime, endTime, proposalId, ...s }) => ({
       ...s,
@@ -60,10 +67,7 @@ export function eventContextFrom(snapshot: Snapshot) {
         const host = guestsById.get(id);
         return host ? [{ id, name: host.name }] : [];
       }),
-      locations: locationIds.flatMap((id) => {
-        const room = locationsById.get(id);
-        return room ? [{ id, name: room.name, color: room.color }] : [];
-      }),
+      locations: roomsOf(locationIds),
       numRsvps: snapshot.counts[s.id] ?? 0,
     })
   );
