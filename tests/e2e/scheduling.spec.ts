@@ -301,7 +301,7 @@ test("an already scheduled proposal says the schedule won't follow it @008-US1 @
   await selectUser(page, "Isabella Rossi");
   const row = page.getByRole("row", { name: new RegExp(title) });
 
-  await row.getByRole("button", { name: "Schedule" }).click();
+  await row.getByRole("link", { name: "Schedule", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: /Add a session/i })
   ).toBeVisible();
@@ -310,7 +310,7 @@ test("an already scheduled proposal says the schedule won't follow it @008-US1 @
   ).toBeVisible();
 
   await page.goBack();
-  await row.getByRole("button", { name: "Edit" }).click();
+  await row.getByRole("link", { name: "Edit", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: /Edit Session Proposal/i })
   ).toBeVisible();

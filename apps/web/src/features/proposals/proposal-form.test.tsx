@@ -6,7 +6,7 @@ import { fakeApi, problem, type FakeHandler } from "../../commands/fake-api";
 import { proposalFormCalls } from "../../commands/proposal-form";
 import { iso, snapshot as fixture } from "../../replica/snapshot-fixture";
 import { NoticeProvider } from "../../ui/notices";
-import { legacyProposalLinks } from "./links";
+import { proposalLinks } from "./links";
 import { ProposalForm } from "./proposal-form";
 
 afterEach(cleanup);
@@ -60,7 +60,7 @@ function setup(
       <ProposalForm
         proposalId={proposalId}
         snapshot={snapshot}
-        links={legacyProposalLinks("conf")}
+        links={proposalLinks("conf")}
         actions={proposalFormCalls(api)}
         onDone={onDone}
       />

@@ -45,10 +45,12 @@ const LEGACY_ROOT_PAGES = [
   "settings",
 ];
 
-// An event's own page, `/{slug}`, which the SPA serves. Its modals and kiosk
-// mode are still the legacy schedule's, which the SPA hands the address to.
+// An event's own page, `/{slug}`, and its proposals screens, which the SPA serves.
+// Its 1-on-1 modal is still the legacy schedule's, which the SPA hands the address to.
 function isEventPage(url: string): boolean {
-  const slug = /^\/([^/?#]+)(?:[?#].*)?$/.exec(url)?.[1];
+  const slug = /^\/([^/?#]+)(?:\/proposals(?:\/[^?#]*)?)?(?:[?#].*)?$/.exec(
+    url
+  )?.[1];
   return slug !== undefined && !LEGACY_ROOT_PAGES.includes(slug);
 }
 

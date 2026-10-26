@@ -167,9 +167,7 @@ test("votes from two users persist independently across reloads @005-US1", async
   // Vote "Interested". Voting updates optimistically, so wait for the server
   // to confirm before reloading.
   await Promise.all([
-    page.waitForResponse(
-      (res) => res.url().includes("/api/add-vote") && res.ok()
-    ),
+    page.waitForResponse((res) => res.url().includes("/votes/") && res.ok()),
     row.getByRole("button", { name: "❤️" }).click(),
   ]);
 
@@ -191,9 +189,7 @@ test("votes from two users persist independently across reloads @005-US1", async
     "false"
   );
   await Promise.all([
-    page.waitForResponse(
-      (res) => res.url().includes("/api/add-vote") && res.ok()
-    ),
+    page.waitForResponse((res) => res.url().includes("/votes/") && res.ok()),
     row.getByRole("button", { name: "⭐" }).click(),
   ]);
 

@@ -16,7 +16,7 @@ describe("legacyScheduleLinks", () => {
     expect(links.editSession("s1")).toBe(
       "/legacy/conf/edit-session?sessionID=s1"
     );
-    expect(links.proposal("p1")).toBe("/legacy/conf/proposals?viewProposal=p1");
+    expect(links.proposal("p1")).toBe("/conf/proposals?viewProposal=p1");
   });
 
   it("opens a 1-on-1 the same way", () => {
@@ -40,7 +40,7 @@ describe("legacyScheduleLinks", () => {
   });
 
   it("links the proposals and the schedule", () => {
-    expect(links.proposals).toBe("/legacy/conf/proposals");
+    expect(links.proposals).toBe("/conf/proposals");
     expect(links.schedule).toBe("/legacy/conf");
   });
 });

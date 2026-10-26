@@ -26,7 +26,7 @@ export function legacyScheduleLinks(eventSlug: string): ScheduleLinks {
   };
   return {
     schedule,
-    proposals: `${schedule}/proposals`,
+    proposals: `/${eventSlug}/proposals`,
     session: (current, id) => {
       const params = new URLSearchParams(current);
       params.set("viewSession", id);
@@ -37,7 +37,7 @@ export function legacyScheduleLinks(eventSlug: string): ScheduleLinks {
     editSession: (sessionId) =>
       `${schedule}/edit-session?${new URLSearchParams({ sessionID: sessionId })}`,
     proposal: (proposalId) =>
-      `${schedule}/proposals?${new URLSearchParams({ viewProposal: proposalId })}`,
+      `/${eventSlug}/proposals?${new URLSearchParams({ viewProposal: proposalId })}`,
     addSession: ({ location, day, time }) =>
       `${schedule}/add-session?${new URLSearchParams({ location, time, day })}`,
     bookMeeting: (slotStart) =>

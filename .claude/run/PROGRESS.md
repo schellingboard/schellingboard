@@ -31,7 +31,19 @@
 
 - Step 6: snapshot `proposals` = public fields + hosts (names), no `sessionIds`/tally/breakdown; `me.votes` = `{proposalId, choice}`. Step 7 done: use `proposalsFrom`, `ownVotesFrom`, `castVote`, `withdrawVote`; `runner.view()` shows optimistic votes. Proposal comments still say only "your comment" (step 8b).
 
+- Step 9a: `SpaLinks` intercepts in-event proposal links (pushes history; sets the
+  opened-by-click flag from `proposal-nav.ts` when `viewProposal` is set, so closing goes
+  Back). `tests/e2e/helpers/fixtures.ts` `isEventPage` also accepts `/{slug}/proposals…`.
+  Legacy `proposals/actions.ts` and its integration tests still exist for 9b.
+  `Tooltip` (non-toggleable) now hides on click and opens on focus only if
+  `:focus-visible`. Flake: `voting.spec.ts:115` fails first try under load (queue head
+  changes while parallel tests add Beta proposals), passes alone.
+
 ## Questions
+
+0. The SPA shell has no "Show map" button (the uploaded site map); only legacy pages show it. The
+   schedule and proposals screens lost it when they moved. `settings.spec.ts:67` now checks it on
+   `/legacy/guests`. Needs a shell item and the map URL in `/me` or the snapshot.
 
 Assumptions the user may override (set by the coordinator, 2026-10-25):
 

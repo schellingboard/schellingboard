@@ -2,7 +2,7 @@
 import { useEffect, useState, useContext } from "react";
 import { DateTime } from "luxon";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { AppLink } from "@/app/components/app-link";
 
 import { Input } from "@/app/input";
 import { newIdempotencyKey } from "@/utils/idempotency-key";
@@ -22,7 +22,7 @@ import {
 } from "@schellingboard/domain/time";
 import { slotIsFree } from "@/utils/schedule-column";
 import { MyListbox, type Option } from "./select";
-import { viewProposalLinkFromElsewhere } from "./modal-nav";
+import { viewProposalLink } from "./modal-nav";
 import type { SessionProposal, Session } from "@schellingboard/domain/session";
 import type {
   Location,
@@ -645,12 +645,12 @@ export function SessionForm(props: {
       {sessionID && session.proposalId && (
         <p className="text-sm text-fg-muted">
           This session was scheduled from a proposal. See it{" "}
-          <Link
-            {...viewProposalLinkFromElsewhere(event.slug, session.proposalId)}
+          <AppLink
+            {...viewProposalLink(event.slug, session.proposalId)}
             className="text-brand-fg underline"
           >
             here
-          </Link>
+          </AppLink>
           .
         </p>
       )}

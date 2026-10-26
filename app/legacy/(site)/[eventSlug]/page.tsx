@@ -19,7 +19,7 @@ export default async function Page(props: {
   if (phase === EventPhase.SCHEDULING) {
     return <EventPage />;
   } else if (phase === EventPhase.VOTING || phase === EventPhase.PROPOSAL) {
-    redirect(`/legacy/${eventSlug}/proposals`);
+    redirect(`/${eventSlug}/proposals`);
   } else {
     return "Event unavailable: " + event.name;
   }

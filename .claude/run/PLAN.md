@@ -88,11 +88,13 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
   - [x] 8b. The proposal modal (done: `features/proposals/proposal-modal.tsx` with `ProposalActions`, `vote-breakdown.tsx`, `queries/proposal-detail.ts`, `commands/join-proposal.ts`; the session comments moved to `features/comments/` as the shared `Comments`).
   - [x] 8c. Quick voting (done: `features/proposals/quick-voting-screen.tsx`, `proposal-body.tsx` shared with the modal, `Comments` gained `readOnly`; `links.proposals`).
   - [x] 8d. New and edit proposal forms, delete (done: `features/proposals/proposal-form.tsx` with `commands/proposal-form.ts` calls, `ui/` `FormErrorSummary`, `PeopleField`, `MarkdownField`; the toolbar logic moved to `packages/domain/markdown-edit.ts`).
-- [ ] 9. **Takeover: proposals**. Router owns `/{slug}/proposals/**` and
-      `viewProposal`; the schedule's proposal links and `modal-nav.ts` point at it;
-      legacy proposal pages, components and `proposals/actions.ts` are deleted. E2E:
-      `proposals`, `proposal-comments`, `voting`, `phases`, `disabled-hints`, then full
-      `make test-e2e`. CHANGELOG, `docs/public/`, release-notes highlight.
+- [x] 9a. **Takeover: proposals** (done: router owns `/{slug}/proposals/**`; `EventPage`, `ProposalsPage`/`QuickVotingPage`/`ProposalFormPage`, `SpaLinks` + `proposal-nav.ts`; legacy proposal pages and components deleted, `actions.ts` kept; likes preview and avatars ported to `Comments`).
+- [ ] 9b. **Proposal legacy cleanup**. Delete `proposals/actions.ts`; convert its tests
+      (`proposals.test.ts`, `delete-proposal.test.ts`, `action-idempotency`,
+      `action-site-auth`, `action-auth-guard`, `mutating-surface-guard`) to use cases or
+      the API; remove dead legacy code (`VotesProvider`/`votes.ts` in `context.tsx`,
+      `/api/votes`, `/api/add-vote`, `/api/delete-vote`, the proposal functions in
+      `comment-actions.ts`). Then full `make test-e2e`.
 
 ### People and meetings
 

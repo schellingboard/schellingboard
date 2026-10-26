@@ -257,7 +257,7 @@ describe("ScheduleScreen toolbar", () => {
     screenAt("", { snapshot: phased });
     expect(
       screen.getByRole("link", { name: "Proposals" }).getAttribute("href")
-    ).toBe("/legacy/conf/proposals");
+    ).toBe("/conf/proposals");
   });
 
   it("shows the sync slot and footer inside the scrolling content", () => {

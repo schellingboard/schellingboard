@@ -206,7 +206,9 @@ test("likes a comment and shows who liked it @010-US6", async ({
   const modal = await openProposal(page, LIKE_PROPOSAL);
   await modal.getByPlaceholder("Add a comment").fill("a likeable comment");
   await modal.getByRole("button", { name: "Comment", exact: true }).click();
-  await expect(modal.getByText("a likeable comment")).toBeVisible();
+  await expect(
+    modal.getByRole("paragraph").filter({ hasText: "a likeable comment" })
+  ).toBeVisible();
 
   const like = modal.getByRole("button", { name: "Like", exact: true });
   const liked = modal.getByRole("button", { name: "Liked", exact: true });
@@ -229,9 +231,9 @@ test("likes a comment and shows who liked it @010-US6", async ({
   // Hovering previews the likers, newest first, without opening anything.
   const count = page.getByRole("button", { name: "2 likes" });
   const tooltip = page.getByRole("tooltip");
-  await expect(tooltip).toHaveCSS("opacity", "0");
+  await expect(tooltip).toHaveCount(0);
   await count.hover();
-  await expect(tooltip).toHaveCSS("opacity", "1");
+  await expect(tooltip).toBeVisible();
   await expect(tooltip).toHaveText(/^Bob TestAlice Test$/);
 
   await count.click();
@@ -243,7 +245,7 @@ test("likes a comment and shows who liked it @010-US6", async ({
   await expect(likers.locator("li [aria-hidden='true']")).toHaveCount(2);
   await likers.getByRole("button", { name: "Close" }).click();
   // The pointer never left the count, but the click dismissed its preview.
-  await expect(tooltip).toHaveCSS("opacity", "0");
+  await expect(tooltip).toHaveCount(0);
 
   await liked.click();
   await expect(like).toBeVisible();

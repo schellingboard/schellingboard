@@ -8,7 +8,7 @@ import type { Standing } from "../../queries/proposal-standings";
 import { iso, snapshot as fixture } from "../../replica/snapshot-fixture";
 import { NoticeProvider } from "../../ui/notices";
 import { comment, fakeComments } from "../comments/comments-test-support";
-import { legacyProposalLinks } from "./links";
+import { proposalLinks } from "./links";
 import { QuickVotingScreen } from "./quick-voting-screen";
 
 afterEach(cleanup);
@@ -78,7 +78,7 @@ function setup(
     <NoticeProvider>
       <QuickVotingScreen
         snapshot={snapshot}
-        links={legacyProposalLinks("conf")}
+        links={proposalLinks("conf")}
         now={new Date(iso(10))}
         localZone="UTC"
         standings={standings}
@@ -106,7 +106,7 @@ describe("quick voting", () => {
     expect(screen.getByText("Conf Quick Voting")).toBeTruthy();
     expect(
       screen.getByRole("link", { name: /Proposals/ }).getAttribute("href")
-    ).toBe("/legacy/conf/proposals");
+    ).toBe("/conf/proposals");
     expect(screen.getByText("You have voted on 0 / 3 proposals")).toBeTruthy();
   });
 
@@ -125,7 +125,7 @@ describe("quick voting", () => {
     expect(heading()).toBe("Idea b");
     expect(
       screen.getByRole("link", { name: "Idea b" }).getAttribute("href")
-    ).toBe("/legacy/conf/proposals?viewProposal=b");
+    ).toBe("/conf/proposals?viewProposal=b");
     expect(
       screen.getAllByRole("link", { name: "HOST" }).length
     ).toBeGreaterThan(0);

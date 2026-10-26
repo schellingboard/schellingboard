@@ -12,7 +12,7 @@ import { VoteChoice } from "@schellingboard/domain/vote";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { iso, snapshot as fixture } from "../../replica/snapshot-fixture";
 import { NoticeProvider } from "../../ui/notices";
-import { legacyProposalLinks } from "./links";
+import { proposalLinks } from "./links";
 import { ProposalsScreen } from "./proposals-screen";
 import type { Standing } from "../../queries/proposal-standings";
 
@@ -82,7 +82,7 @@ function setup(
     <NoticeProvider>
       <ProposalsScreen
         snapshot={snapshot}
-        links={legacyProposalLinks("conf")}
+        links={proposalLinks("conf")}
         now={new Date(iso(10))}
         localZone="UTC"
         standings={standings}
@@ -108,11 +108,11 @@ describe("the proposals list", () => {
     );
     expect(screen.getByRole("link", { name: /Add Proposal/ })).toHaveProperty(
       "pathname",
-      "/legacy/conf/proposals/new"
+      "/conf/proposals/new"
     );
     expect(
       screen.getByRole("link", { name: /Go to Quick Voting!/ })
-    ).toHaveProperty("pathname", "/legacy/conf/proposals/quick-voting");
+    ).toHaveProperty("pathname", "/conf/proposals/quick-voting");
     expect(
       screen.getByRole("link", { name: /View Schedule/ }).getAttribute("href")
     ).toBe("#");
@@ -339,7 +339,7 @@ describe("the proposals list", () => {
     const mine = within(table).getByRole("row", { name: /Rust intro/ });
     expect(
       within(mine).getByRole("link", { name: "Edit" }).getAttribute("href")
-    ).toBe("/legacy/conf/proposals/a/edit");
+    ).toBe("/conf/proposals/a/edit");
     expect(
       within(mine).getByRole("link", { name: "Schedule" }).getAttribute("href")
     ).toBe("/legacy/conf/add-session?proposalID=a");

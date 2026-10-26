@@ -4,7 +4,7 @@ import { PropsWithChildren } from "react";
 import { AppLink } from "@/app/components/app-link";
 import type { LinkProps } from "next/link";
 import {
-  viewProposalLinkFromElsewhere,
+  viewProposalLink,
   viewSessionLink,
 } from "@/app/legacy/(site)/[eventSlug]/modal-nav";
 
@@ -45,7 +45,7 @@ export function ProposalLink({
   children,
 }: PropsWithChildren<ProfileItem>) {
   return (
-    <ProfileItemLink props={viewProposalLinkFromElsewhere(eventSlug, id)}>
+    <ProfileItemLink props={viewProposalLink(eventSlug, id)}>
       {children}
     </ProfileItemLink>
   );

@@ -58,7 +58,7 @@ test("should create a new session proposal, edit it, and add hosts @004-US1 @004
   const proposalRow = page.getByRole("row", {
     name: new RegExp(proposalTitle),
   });
-  await proposalRow.getByRole("button", { name: /Edit/i }).click();
+  await proposalRow.getByRole("link", { name: /Edit/i }).click();
   await expect(
     page.getByRole("heading", { name: /Edit Session Proposal/i })
   ).toBeVisible();
@@ -100,7 +100,7 @@ test("cancelling a proposal edit keeps it unchanged @004-US2", async ({
   ]);
 
   const row = page.getByRole("row", { name: new RegExp(proposalTitle) });
-  await row.getByRole("button", { name: /Edit/i }).click();
+  await row.getByRole("link", { name: /Edit/i }).click();
   await page.getByLabel("Title").fill(`${proposalTitle} discarded`);
   await Promise.all([
     page.waitForURL(/\/Conference-Alpha\/proposals$/),
@@ -131,7 +131,7 @@ test("should delete a proposal from its edit page @004-US3", async ({
   await expect(row).toBeVisible();
 
   // Delete lives on the edit page and requires confirmation
-  await row.getByRole("button", { name: /Edit/i }).click();
+  await row.getByRole("link", { name: /Edit/i }).click();
   await expect(
     page.getByRole("heading", { name: /Edit Session Proposal/i })
   ).toBeVisible();
@@ -170,7 +170,7 @@ test("a non-host cannot edit or delete another guest's proposal @004-US2 @004-US
   ]);
   const row = page.getByRole("row", { name: new RegExp(proposalTitle) });
   await expect(row).toBeVisible();
-  await row.getByRole("button", { name: /Edit/i }).click();
+  await row.getByRole("link", { name: /Edit/i }).click();
   await expect(
     page.getByRole("heading", { name: /Edit Session Proposal/i })
   ).toBeVisible();
@@ -421,7 +421,7 @@ test("sorts proposals by when they were last updated @004-US5", async ({
 
   await page
     .getByRole("row", { name: new RegExp(older) })
-    .getByRole("button", { name: /Edit/i })
+    .getByRole("link", { name: "Edit", exact: true })
     .click();
   await page.getByLabel("Description").fill("Now with a description.");
   await page.getByRole("button", { name: /Submit/i }).click();

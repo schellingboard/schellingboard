@@ -3,6 +3,7 @@ import {
   createRoute,
   createRouter,
   Outlet,
+  useLocation,
   useRouter,
   type RouterHistory,
 } from "@tanstack/react-router";
@@ -12,7 +13,14 @@ import { hardNavigate } from "./hard-navigate";
 import { LegacyForward } from "./legacy-forward";
 import { legacyHref } from "./legacy-href";
 import { LEGACY_ROOT_PAGES } from "./legacy-pages";
+import {
+  ProposalFormPage,
+  ProposalsPage,
+  QuickVotingPage,
+} from "./proposals-pages";
+import { EventLayout } from "./event-page";
 import { SchedulePage } from "./schedule-page";
+import { SpaLinks } from "./spa-links";
 import { defaultServices, type AppServices } from "./services";
 
 const rootRoute = createRootRoute({ component: Outlet });
@@ -53,16 +61,60 @@ export function createAppRouter(
     // is still being inferred, turning useRouter() into `any` in some files.
     component: function EventRoute(): ReactElement {
       const { slug } = event.useParams();
+      const pathname = useLocation({ select: (l) => l.pathname });
       const { search, hash } = useRouter().history.location;
-      return scheduleStaysInLegacy(search) ? (
+      return pathname.replace(/\/$/, "") === `/${slug}` &&
+        scheduleStaysInLegacy(search) ? (
         <LegacySchedule where={{ pathname: `/${slug}`, search, hash }} />
       ) : (
-        <SchedulePage services={services} slug={slug} />
+        <EventLayout services={services} slug={slug}>
+          <SpaLinks slug={slug}>
+            <Outlet />
+          </SpaLinks>
+        </EventLayout>
       );
     },
   });
+  const schedule = createRoute({
+    getParentRoute: () => event,
+    path: "/",
+    component: SchedulePage,
+  });
+  const proposals = createRoute({
+    getParentRoute: () => event,
+    path: "proposals",
+    component: ProposalsPage,
+  });
+  const quickVoting = createRoute({
+    getParentRoute: () => event,
+    path: "proposals/quick-voting",
+    component: QuickVotingPage,
+  });
+  const newProposal = createRoute({
+    getParentRoute: () => event,
+    path: "proposals/new",
+    component: ProposalFormPage,
+  });
+  const editProposal = createRoute({
+    getParentRoute: () => event,
+    path: "proposals/$proposalId/edit",
+    component: function EditProposalRoute(): ReactElement {
+      const { proposalId } = editProposal.useParams();
+      return <ProposalFormPage proposalId={proposalId} />;
+    },
+  });
   return createRouter({
-    routeTree: rootRoute.addChildren([...legacyPages, event, catchAll]),
+    routeTree: rootRoute.addChildren([
+      ...legacyPages,
+      event.addChildren([
+        schedule,
+        proposals,
+        quickVoting,
+        newProposal,
+        editProposal,
+      ]),
+      catchAll,
+    ]),
     history,
   });
 }

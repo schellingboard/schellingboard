@@ -11,7 +11,7 @@ import {
   QueueListIcon,
   TableCellsIcon,
 } from "@heroicons/react/24/outline";
-import Link from "next/link";
+import { AppLink } from "@/app/components/app-link";
 import { Modal } from "@/app/components/modal";
 import { Markdown } from "@/app/legacy/(site)/markdown";
 import { hasPhases } from "@schellingboard/domain/phase";
@@ -65,13 +65,10 @@ export function ScheduleToolbar(props: {
             Event details
           </button>
           {hasPhases(event) && (
-            <Link
-              href={`/legacy/${event.slug}/proposals`}
-              className={ITEM_CLASS}
-            >
+            <AppLink href={`/${event.slug}/proposals`} className={ITEM_CLASS}>
               <ClipboardDocumentListIcon className="h-4 w-4 stroke-2" />
               Proposals
-            </Link>
+            </AppLink>
           )}
         </div>
         <SyncIndicator />

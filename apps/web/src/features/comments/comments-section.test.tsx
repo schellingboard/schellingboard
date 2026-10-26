@@ -251,6 +251,27 @@ describe("liking comments", () => {
     );
   });
 
+  it(
+    "previews the latest likers on hover and shows their avatars",
+    { tags: ["010-US6"] },
+    async () => {
+      const likes = ["Ann", "Bob", "Cy", "Di"].map((name) => ({
+        id: name.toLowerCase(),
+        name,
+        avatarUrl: null,
+      }));
+      show(fakeComments([comment("a", { likes })]));
+      await userEvent.hover(screen.getByRole("button", { name: "4 likes" }));
+      const tip = await screen.findByRole("tooltip");
+      expect(tip.textContent).toBe("DiCyBoband 1 more");
+
+      await userEvent.click(screen.getByRole("button", { name: "4 likes" }));
+      const list = within(screen.getByRole("dialog", { name: "Liked by" }));
+      expect(list.getByText("A")).toBeTruthy();
+      expect(list.getByText("A").closest("[aria-hidden]")).toBeTruthy();
+    }
+  );
+
   it("offers no like without a name", { tags: ["010-US6"] }, () => {
     show(fakeComments([comment("a")]), { viewerId: null });
     expect(screen.queryByRole("button", { name: "Like" })).toBeNull();

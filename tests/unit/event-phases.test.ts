@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
-import { dateStartDescription } from "@/app/legacy/(site)/[eventSlug]/proposals/phase-opens-text";
+import { dateStartDescription } from "@schellingboard/domain/phase-opens-text";
 import { EventPhase, getCurrentPhase } from "@schellingboard/domain/phase";
 import type { Event } from "@schellingboard/domain/event";
 

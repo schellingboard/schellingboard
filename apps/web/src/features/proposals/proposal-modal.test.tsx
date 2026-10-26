@@ -14,7 +14,7 @@ import { createObservable } from "../../queries/store";
 import { iso, snapshot as fixture } from "../../replica/snapshot-fixture";
 import { NoticeProvider } from "../../ui/notices";
 import { comment, fakeComments } from "../comments/comments-test-support";
-import { legacyProposalLinks } from "./links";
+import { proposalLinks } from "./links";
 import { ProposalModal, type ProposalActions } from "./proposal-modal";
 
 afterEach(cleanup);
@@ -109,7 +109,7 @@ function setup(
         snapshot={current}
         now={new Date(iso(10))}
         localZone="UTC"
-        links={legacyProposalLinks("conf")}
+        links={proposalLinks("conf")}
         actions={actions}
         setHash={() => {}}
         onClose={onClose}
@@ -173,7 +173,7 @@ describe("the proposal modal", () => {
       });
       expect(
         dialog().getByRole("link", { name: "Edit" }).getAttribute("href")
-      ).toBe("/legacy/conf/proposals/p/edit");
+      ).toBe("/conf/proposals/p/edit");
       cleanup();
       setup("voting");
       expect(dialog().queryByRole("link", { name: "Edit" })).toBeNull();

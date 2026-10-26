@@ -80,7 +80,7 @@ test("voting phase: tapping a greyed-out Schedule button says when scheduling op
     .click();
   const proposal = page.getByRole("dialog");
   await expect(proposal).toBeVisible();
-  const schedule = proposal.getByRole("button", { name: /Schedule/i });
+  const schedule = proposal.getByRole("link", { name: /Schedule/i });
   await expect(schedule).toBeDisabled();
   await expect(schedule).toHaveAccessibleDescription(
     /Scheduling will be enabled at/

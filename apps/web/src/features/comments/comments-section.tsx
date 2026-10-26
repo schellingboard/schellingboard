@@ -10,6 +10,7 @@ import type {
 import { ConfirmDialog } from "../../ui/confirm-dialog";
 import { Dialog } from "../../ui/dialog";
 import { Markdown } from "../../ui/markdown";
+import { Tooltip } from "../../ui/tooltip";
 import type { CommentsQuery } from "../../queries/comments";
 
 export type CommentsHandle = {
@@ -379,6 +380,29 @@ function Thread({
   );
 }
 
+const PREVIEW_LIKERS = 3;
+
+function LikerAvatar({ name, src }: { name: string; src: string | null }) {
+  const initials = name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+  return (
+    <span
+      aria-hidden="true"
+      className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-tint-hover text-sm font-semibold text-brand-fg"
+    >
+      {src ? (
+        <img src={src} alt="" className="h-full w-full object-cover" />
+      ) : (
+        initials || "?"
+      )}
+    </span>
+  );
+}
+
 function Likes({
   node,
   viewerId,
@@ -409,13 +433,34 @@ function Likes({
         </button>
       )}
       {node.likes.length > 0 && (
-        <button
-          type="button"
-          onClick={() => setShowing(true)}
-          className="cursor-pointer hover:text-fg hover:underline"
+        <Tooltip
+          className="inline-block"
+          content={
+            <div className="px-2 py-1 text-sm whitespace-nowrap">
+              {node.likes
+                .slice(-PREVIEW_LIKERS)
+                .reverse()
+                .map((liker) => (
+                  <span key={liker.id} className="block">
+                    {liker.name}
+                  </span>
+                ))}
+              {node.likes.length > PREVIEW_LIKERS && (
+                <span className="block text-fg-muted">
+                  and {node.likes.length - PREVIEW_LIKERS} more
+                </span>
+              )}
+            </div>
+          }
         >
-          {node.likes.length} like{node.likes.length === 1 ? "" : "s"}
-        </button>
+          <button
+            type="button"
+            onClick={() => setShowing(true)}
+            className="cursor-pointer hover:text-fg hover:underline"
+          >
+            {node.likes.length} like{node.likes.length === 1 ? "" : "s"}
+          </button>
+        </Tooltip>
       )}
       <Dialog open={showing} onClose={() => setShowing(false)} title="Liked by">
         <ul className="max-h-72 overflow-y-auto text-sm">
@@ -423,8 +468,9 @@ function Likes({
             <li key={liker.id}>
               <a
                 href={guestHref(liker.id)}
-                className="block rounded-md px-2 py-1.5 font-medium text-fg hover:bg-surface-sunken"
+                className="flex items-center gap-3 rounded-md px-2 py-1.5 font-medium text-fg hover:bg-surface-sunken"
               >
+                <LikerAvatar name={liker.name} src={liker.avatarUrl} />
                 {liker.name}
               </a>
             </li>

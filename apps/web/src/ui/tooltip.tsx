@@ -16,6 +16,15 @@ const REST_MS = 500;
 const GAP_PX = 6;
 const EDGE_PX = 8;
 
+// Focus a dialog hands back on close is not the keyboard asking for the panel.
+function focusVisible(el: EventTarget): boolean {
+  try {
+    return !(el instanceof Element) || el.matches(":focus-visible");
+  } catch {
+    return true;
+  }
+}
+
 /**
  * A panel for what its trigger has no room for. By default hover (at rest)
  * and focus open it and the trigger stays whatever it wraps; `toggleable`
@@ -136,8 +145,9 @@ export function Tooltip({
       onMouseEnter={rested}
       onMouseMove={() => !open && rested()}
       onMouseLeave={hide}
-      onFocus={show}
+      onFocus={(e) => focusVisible(e.target) && show()}
       onBlur={hide}
+      onClick={hide}
     >
       {children}
       {panelNode}

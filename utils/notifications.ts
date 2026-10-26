@@ -705,8 +705,6 @@ async function guestName(guestId: string): Promise<string> {
   return guest?.name ?? "Someone";
 }
 
-// Deep link to the proposal modal, same shape as modal-nav's
-// viewProposalLinkFromElsewhere.
 function proposalPath(eventSlug: string, proposalId: string) {
   return `/${eventSlug}/proposals?viewProposal=${proposalId}`;
 }

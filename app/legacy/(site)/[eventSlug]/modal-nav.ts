@@ -1,7 +1,6 @@
 "use client";
 
 import type { MouseEvent } from "react";
-import type { useRouter } from "next/navigation";
 
 /*
 (anchor: MnpjIo7Y)
@@ -10,13 +9,15 @@ The session modal is the SPA's (apps/web/src/features/schedule/schedule-screen.t
 schedule pushes `?viewSession=`, Back or Close pops it, and an address opened directly is
 closed by removing the param. Legacy pages link to it with a plain anchor (`viewSessionLink`).
 
-The proposal and 1-on-1 modals still work as follows. Opening one pushes (or navigates to) a
-URL so the browser's Back button dismisses it; one reached from elsewhere has no history entry
-of ours to pop, so it is dismissed by removing the param.
+The proposal modal is the SPA's too (apps/web/src/app/proposals-pages.tsx); legacy pages link to
+it with a plain anchor (`viewProposalLink`).
 
-* From the owning page (proposals list, Quick Voting, the meeting column), use
-  `<Link {...viewFooLinkFromOwner(...)}>`: it sets the dismiss mode to "back".
-* From a different page, use `<Link {...viewFooLinkFromElsewhere(...)}>`: "replace".
+The 1-on-1 modal still works as follows. Opening it pushes (or navigates to) a URL so the
+browser's Back button dismisses it; one reached from elsewhere has no history entry of ours to
+pop, so it is dismissed by removing the param.
+
+* From the meeting column, use `<Link {...viewMeetingLinkFromOwner(...)}>`: it sets the dismiss
+  mode to "back".
 * When opened by a server-action redirect (the notification list), call
   `openingModalFromRedirect()` from the click that submits the action.
 */
@@ -31,33 +32,8 @@ export function viewSessionLink(
   return { href: `/${eventSlug}?${params.toString()}` };
 }
 
-export function viewProposalLinkFromOwner(
-  eventSlug: string,
-  proposalId: string
-) {
-  const href = `/legacy/${eventSlug}/proposals?viewProposal=${proposalId}`;
-  return {
-    href,
-    prefetch: false,
-    scroll: false,
-    onClick: (e: MouseEvent<HTMLAnchorElement>) => {
-      if (!isPlainLeftClick(e)) return;
-      proposalDismissMode = "back";
-      // no pushState here — unlike session modal, proposal modal is RSC-rendered, so we want normal navigation
-    },
-  };
-}
-
-export function viewProposalLinkFromElsewhere(
-  eventSlug: string,
-  proposalId: string
-) {
-  return {
-    href: `/legacy/${eventSlug}/proposals?viewProposal=${proposalId}`,
-    onClick: () => {
-      proposalDismissMode = "replace";
-    },
-  };
+export function viewProposalLink(eventSlug: string, proposalId: string) {
+  return { href: `/${eventSlug}/proposals?viewProposal=${proposalId}` };
 }
 
 /**
@@ -68,7 +44,6 @@ export function viewProposalLinkFromElsewhere(
  * the reader off the page they just landed on.
  */
 export function openingModalFromRedirect() {
-  proposalDismissMode = "replace";
   meetingDismissMode = "replace";
 }
 
@@ -108,20 +83,6 @@ export function dismissViewMeeting() {
   window.history.replaceState(null, "", url);
 }
 
-export function dismissViewProposal(router: ReturnType<typeof useRouter>) {
-  if (proposalDismissMode === "back") {
-    router.back();
-    return;
-  }
-  const params = new URLSearchParams(window.location.search);
-  params.delete("viewProposal");
-  const query = params.toString();
-  const url = query
-    ? `${window.location.pathname}?${query}`
-    : window.location.pathname;
-  router.replace(url, { scroll: false });
-}
-
 // Mirror next/link's own modifier-key check so plain clicks are handled in
 // place, but Cmd/Ctrl/Shift/middle clicks fall through to the browser's normal
 // "open in new tab/window" behavior.
@@ -136,15 +97,8 @@ export function isPlainLeftClick(e: MouseEvent<HTMLAnchorElement>) {
   );
 }
 
-// Using module-level variables rather than useState/useRef,
-// because it has to survive across the parent re-render triggered by navigation,
-// and it isn't part of any component's render output.
-//
-// Every opener (viewFooLinkFromOwner / viewFooLinkFromElsewhere /
-// openingModalFromRedirect) writes the mode, so the value is never inherited
-// from an unrelated earlier modal. The default applies only to direct/deep-link
-// opens, where "replace" is intended.
-let proposalDismissMode: "back" | "replace" = "replace";
+// Module-level rather than useState/useRef: it has to survive the parent
+// re-render triggered by navigation and is not part of any render output.
 // A meeting modal is opened in place from the schedule column, and by link
 // from a notification — where "replace" is what keeps Back on the site.
 let meetingDismissMode: "back" | "replace" = "replace";

@@ -16,7 +16,7 @@ colour tokens in `styles/tokens.css` (the Next pages import the same file).
 - Hashed files are requested as `/_spa/assets/…`. The proxy skips them; a rewrite in
   `next.config.js` hands them to `/api/spa/assets/…`, which serves them as
   immutable and answers 404 for anything missing, never the shell.
-- The router owns `/{slug}`, an event's schedule. Everything else the SPA does not own is
+- The router owns `/{slug}`, an event's schedule, and `/{slug}/proposals/**` (list, quick voting, new, edit; `?viewProposal=` opens the modal). Everything else the SPA does not own is
   forwarded: the catch-all route replaces the location with `/legacy` + path + query (a path
   already under `/legacy` is left alone), and a static route per legacy root page
   (`app/legacy-pages.ts`, checked against `app/legacy/` by `tests/unit/spa-legacy-pages.test.ts`)
@@ -47,8 +47,8 @@ The files are read relative to the working directory, so the same code serves
   A bare `next dev` answers root pages with the shell (503 until the SPA is built):
   use `/legacy/...` URLs with it, as the screenshots script does.
 - E2E specs call `page.goto` with root paths; the fixture sends them to `/legacy/...` so a
-  click never lands before hydration, except an event's own address (`/{slug}`, any query),
-  which is the SPA's schedule and is opened as it is. One spec covers the shell's forward.
+  click never lands before hydration, except an event's own address (`/{slug}`, any query, and `/{slug}/proposals/…`),
+  which the SPA owns and opens as it is. One spec covers the shell's forward.
 
 ## Layout and rules
 
