@@ -98,30 +98,6 @@ const SITE_GUARDED: Record<string, () => Promise<unknown>> = {
       await import("@/app/legacy/(site)/[eventSlug]/session-actions");
     return revalidateEvent("some-event");
   },
-  "legacy/(site)/[eventSlug]/proposals/actions.ts:createProposal": async () => {
-    const { createProposal } =
-      await import("@/app/legacy/(site)/[eventSlug]/proposals/actions");
-    return createProposal({ eventId: "e", eventSlug: "s", title: "T" });
-  },
-  "legacy/(site)/[eventSlug]/proposals/actions.ts:updateProposal": async () => {
-    const { updateProposal } =
-      await import("@/app/legacy/(site)/[eventSlug]/proposals/actions");
-    return updateProposal("p", {
-      eventSlug: "s",
-      title: "T",
-      expectedVersion: 1,
-    });
-  },
-  "legacy/(site)/[eventSlug]/proposals/actions.ts:joinProposal": async () => {
-    const { joinProposal } =
-      await import("@/app/legacy/(site)/[eventSlug]/proposals/actions");
-    return joinProposal("p", "s");
-  },
-  "legacy/(site)/[eventSlug]/proposals/actions.ts:deleteProposal": async () => {
-    const { deleteProposal } =
-      await import("@/app/legacy/(site)/[eventSlug]/proposals/actions");
-    return deleteProposal("p", "s");
-  },
   "legacy/(site)/[eventSlug]/comment-actions.ts:createProposalComment":
     async () => {
       const { createProposalComment } =

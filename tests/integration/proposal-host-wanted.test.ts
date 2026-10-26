@@ -10,29 +10,12 @@ import {
   vi,
 } from "vitest";
 
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-}));
-
 vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
 }));
 
-const cookieJar = new Map<string, string>();
-
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { runJobs } from "../helpers/jobs";
-import { siteAuthenticate } from "../helpers/site-auth";
 import {
   createEvent,
   createGuest,
@@ -40,13 +23,12 @@ import {
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
-import {
-  createProposal,
-  joinProposal,
-  updateProposal,
-} from "@/app/legacy/(site)/[eventSlug]/proposals/actions";
+import { proposalApi } from "../helpers/proposal-api";
 import { VoteChoice } from "@schellingboard/domain/vote";
 import { sendMail } from "@/utils/mailer";
+
+const cookieJar = new Map<string, string>();
+const { createProposal, joinProposal, updateProposal } = proposalApi(cookieJar);
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
@@ -60,12 +42,11 @@ async function findProposal(id: string) {
 
 describe("a proposal that wants a host", () => {
   beforeAll(() => setupTestDb());
-  beforeEach(async () => {
+  beforeEach(() => {
     resetTestDb();
     cookieJar.clear();
     vi.mocked(sendMail).mockReset();
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
-    await siteAuthenticate(cookieJar);
   });
   afterEach(() => vi.unstubAllEnvs());
 
@@ -77,7 +58,6 @@ describe("a proposal that wants a host", () => {
 
       const result = await createProposal({
         eventId: event.id,
-        eventSlug: "test-event",
         title: "Needs help",
         hostIds: [host.id],
         cohostWanted: true,
@@ -111,7 +91,6 @@ describe("a proposal that wants a host", () => {
       actAs(host.id);
 
       await updateProposal(proposal.id, {
-        eventSlug: "test-event",
         title: proposal.title,
         hostIds: [host.id],
         cohostWanted: true,
@@ -124,7 +103,6 @@ describe("a proposal that wants a host", () => {
       });
 
       await updateProposal(proposal.id, {
-        eventSlug: "test-event",
         title: proposal.title,
         hostIds: [host.id],
         cohostWanted: false,
@@ -146,7 +124,6 @@ describe("a proposal that wants a host", () => {
       actAs(host.id);
 
       await updateProposal(proposal.id, {
-        eventSlug: "test-event",
         title: proposal.title,
         hostIds: [],
         cohostWanted: true,
@@ -190,7 +167,6 @@ describe("a proposal that wants a host", () => {
 
       const result = await createProposal({
         eventId: event.id,
-        eventSlug: "test-event",
         title: "Needs help",
         hostIds: [host.id],
         cohostWanted: true,
@@ -208,7 +184,7 @@ describe("a proposal that wants a host", () => {
       const proposal = await createProposalFixture(event.id, []);
       actAs(volunteer.id);
 
-      const result = await joinProposal(proposal.id, "test-event");
+      const result = await joinProposal(proposal.id);
       expect(result).toEqual({ success: true });
 
       const after = await findProposal(proposal.id);
@@ -225,7 +201,7 @@ describe("a proposal that wants a host", () => {
       });
       actAs(volunteer.id);
 
-      const result = await joinProposal(proposal.id, "test-event");
+      const result = await joinProposal(proposal.id);
       expect(result).toEqual({ success: true });
 
       const after = await findProposal(proposal.id);
@@ -247,7 +223,7 @@ describe("a proposal that wants a host", () => {
       });
       actAs(volunteer.id);
 
-      await joinProposal(proposal.id, "test-event");
+      await joinProposal(proposal.id);
 
       expect((await findProposal(proposal.id)).votesCount).toBe(0);
     });
@@ -259,7 +235,7 @@ describe("a proposal that wants a host", () => {
       const proposal = await createProposalFixture(event.id, [host.id]);
       actAs(intruder.id);
 
-      const result = await joinProposal(proposal.id, "test-event");
+      const result = await joinProposal(proposal.id);
       expect(result).toHaveProperty("error");
 
       const after = await findProposal(proposal.id);
@@ -270,7 +246,7 @@ describe("a proposal that wants a host", () => {
       const event = await createEvent();
       const proposal = await createProposalFixture(event.id, []);
 
-      const result = await joinProposal(proposal.id, "test-event");
+      const result = await joinProposal(proposal.id);
       expect(result).toHaveProperty("error");
 
       expect((await findProposal(proposal.id)).hosts).toEqual([]);
@@ -282,7 +258,23 @@ describe("a proposal that wants a host", () => {
       const proposal = await createProposalFixture(event.id, []);
       actAs(outsider.id);
 
-      const result = await joinProposal(proposal.id, "test-event");
+      const result = await joinProposal(proposal.id);
+      expect(result).toHaveProperty("error");
+
+      expect((await findProposal(proposal.id)).hosts).toEqual([]);
+    });
+
+    it("rejects joining as a protected guest without a verified session", async () => {
+      const event = await createEvent();
+      const guest = await createGuest({ eventId: event.id });
+      await getRepositories().guests.setAuthProtection(guest.id, {
+        authProtected: true,
+        passwordHash: null,
+      });
+      const proposal = await createProposalFixture(event.id, []);
+      actAs(guest.id);
+
+      const result = await joinProposal(proposal.id);
       expect(result).toHaveProperty("error");
 
       expect((await findProposal(proposal.id)).hosts).toEqual([]);
@@ -302,7 +294,7 @@ describe("a proposal that wants a host", () => {
       });
       actAs(volunteer.id);
 
-      await joinProposal(proposal.id, event.slug);
+      await joinProposal(proposal.id);
       await runJobs();
 
       const { notifications } = getRepositories();
@@ -333,7 +325,7 @@ describe("a proposal that wants a host", () => {
       });
       actAs(volunteer.id);
 
-      await joinProposal(proposal.id, event.slug);
+      await joinProposal(proposal.id);
       await runJobs();
 
       expect(
@@ -353,11 +345,10 @@ describe("a proposal that wants a host", () => {
         createdTime: new Date("2026-01-01T00:00:00Z"),
       });
       actAs(volunteer.id);
-      await joinProposal(proposal.id, "test-event");
+      await joinProposal(proposal.id);
 
       actAs(host.id);
       const result = await updateProposal(proposal.id, {
-        eventSlug: "test-event",
         title: "Reworded",
         hostIds: [host.id],
         cohostWanted: true,
@@ -380,7 +371,6 @@ describe("a proposal that wants a host", () => {
       actAs(host.id);
 
       const result = await updateProposal(proposal.id, {
-        eventSlug: "test-event",
         title: "Reworded",
         hostIds: [host.id],
         expectedVersion: proposal.version,
@@ -398,7 +388,7 @@ describe("a proposal that wants a host", () => {
       });
       actAs(host.id);
 
-      const result = await joinProposal(proposal.id, "test-event");
+      const result = await joinProposal(proposal.id);
       expect(result).toHaveProperty("error");
 
       expect((await findProposal(proposal.id)).cohostWanted).toBe(true);

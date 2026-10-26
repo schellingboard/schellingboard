@@ -10,24 +10,7 @@ import {
   vi,
 } from "vitest";
 
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-}));
-
-const cookieJar = new Map<string, string>();
-
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
 import { setupTestDb, resetTestDb } from "../helpers/db";
-import { siteAuthenticate } from "../helpers/site-auth";
 import {
   createEvent,
   createGuest,
@@ -39,12 +22,12 @@ import {
   openGuestValue,
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
-import {
-  createProposal,
-  updateProposal,
-} from "@/app/legacy/(site)/[eventSlug]/proposals/actions";
+import { errorFields, proposalApi } from "../helpers/proposal-api";
 import { TIME_OFFSET_COOKIE } from "@/utils/dev-clock";
 import { VoteChoice } from "@schellingboard/domain/vote";
+
+const cookieJar = new Map<string, string>();
+const { createProposal, updateProposal } = proposalApi(cookieJar);
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
@@ -53,17 +36,6 @@ async function protectGuest(guestId: string): Promise<void> {
     authProtected: true,
     passwordHash: null,
   });
-}
-
-/**
- * The form reports validation errors next to the field they belong to, so the
- * actions must return issues carrying a field path rather than a bare string.
- */
-function errorFields(result: object): string[] {
-  const error = "error" in result ? result.error : undefined;
-  if (!Array.isArray(error))
-    throw new Error(`not field issues: ${String(error)}`);
-  return error.map((issue: { path: PropertyKey[] }) => issue.path.join("."));
 }
 
 describe("createProposal", () => {
@@ -78,7 +50,6 @@ describe("createProposal", () => {
       openGuestValue((await createGuest({ name: "Proposer" })).id)
     );
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
-    await siteAuthenticate(cookieJar);
   });
   afterEach(() => vi.unstubAllEnvs());
 
@@ -94,7 +65,6 @@ describe("createProposal", () => {
 
     const result = await createProposal({
       eventId: event.id,
-      eventSlug: "test-event",
       title: "My Proposal",
       description: "A description",
       hostIds: [host.id],
@@ -121,11 +91,12 @@ describe("createProposal", () => {
 
     const result = await createProposal({
       eventId: event.id,
-      eventSlug: "test-event",
       title: "My Proposal",
       hostIds: [outsider.id],
     });
-    expect(errorFields(result)).toEqual(["hostIds"]);
+    expect(result).toMatchObject({
+      error: { code: "proposal.hostNotInEvent" },
+    });
 
     const proposals = await getRepositories().sessionProposals.listByEvent(
       event.id
@@ -138,7 +109,6 @@ describe("createProposal", () => {
 
     const result = await createProposal({
       eventId: event.id,
-      eventSlug: "test-event",
       title: "",
     });
     expect(errorFields(result)).toEqual(["title"]);
@@ -154,7 +124,6 @@ describe("createProposal", () => {
 
     const result = await createProposal({
       eventId: event.id,
-      eventSlug: "test-event",
       title: "   ",
     });
     expect(errorFields(result)).toEqual(["title"]);
@@ -167,9 +136,8 @@ describe("createProposal", () => {
 
   it("rejects a missing event", async () => {
     const result = await createProposal({
-      eventSlug: "test-event",
       title: "No Event",
-    } as never);
+    });
     expect(result).toHaveProperty("error");
   });
 
@@ -181,7 +149,6 @@ describe("createProposal", () => {
 
     const result = await createProposal({
       eventId: event.id,
-      eventSlug: "test-event",
       title: "My Proposal",
       hostIds: [guest.id],
     });
@@ -201,7 +168,6 @@ describe("createProposal", () => {
 
     const result = await createProposal({
       eventId: event.id,
-      eventSlug: "test-event",
       title: "My Proposal",
       hostIds: [guest.id],
     });
@@ -225,7 +191,6 @@ describe("createProposal", () => {
 
     const result = await createProposal({
       eventId: event.id,
-      eventSlug: "test-event",
       title: "Time-travelled",
       hostIds: [],
     });
@@ -241,11 +206,10 @@ describe("createProposal", () => {
 
 describe("updateProposal", () => {
   beforeAll(() => setupTestDb());
-  beforeEach(async () => {
+  beforeEach(() => {
     resetTestDb();
     cookieJar.clear();
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
-    await siteAuthenticate(cookieJar);
   });
   afterEach(() => vi.unstubAllEnvs());
 
@@ -260,7 +224,6 @@ describe("updateProposal", () => {
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(alice.id));
 
     const result = await updateProposal(proposal.id, {
-      eventSlug: "test-event",
       expectedVersion: proposal.version,
       title: "Updated",
       description: "New description",
@@ -291,7 +254,6 @@ describe("updateProposal", () => {
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(host.id));
 
     const result = await updateProposal(proposal.id, {
-      eventSlug: "test-event",
       expectedVersion: proposal.version,
       title: proposal.title,
       durationMinutes: undefined,
@@ -320,7 +282,6 @@ describe("updateProposal", () => {
       });
       cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(alice.id));
       const unchanged = {
-        eventSlug: "test-event",
         title: "Original",
         description: "As written",
         hostIds: [alice.id],
@@ -401,7 +362,6 @@ describe("updateProposal", () => {
     });
 
     const result = await updateProposal(proposal.id, {
-      eventSlug: "test-event",
       expectedVersion: proposal.version,
       title: "",
     });
@@ -422,9 +382,8 @@ describe("updateProposal", () => {
     });
 
     const result = await updateProposal(proposal.id, {
-      eventSlug: "test-event",
       expectedVersion: proposal.version,
-    } as never);
+    });
     expect(errorFields(result)).toEqual(["title"]);
 
     const after = await getRepositories().sessionProposals.findById(
@@ -440,9 +399,8 @@ describe("updateProposal", () => {
     });
 
     const result = await updateProposal(proposal.id, {
-      eventSlug: "test-event",
       title: "Changed",
-    } as never);
+    });
     expect(errorFields(result)).toEqual(["expectedVersion"]);
 
     const after = await getRepositories().sessionProposals.findById(
@@ -459,12 +417,13 @@ describe("updateProposal", () => {
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(alice.id));
 
     const result = await updateProposal(proposal.id, {
-      eventSlug: "test-event",
       expectedVersion: proposal.version,
       title: proposal.title,
       hostIds: [outsider.id],
     });
-    expect(errorFields(result)).toEqual(["hostIds"]);
+    expect(result).toMatchObject({
+      error: { code: "proposal.hostNotInEvent" },
+    });
 
     const after = await getRepositories().sessionProposals.findById(
       proposal.id
@@ -482,7 +441,6 @@ describe("updateProposal", () => {
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(nonHost.id));
 
     const result = await updateProposal(proposal.id, {
-      eventSlug: "test-event",
       expectedVersion: proposal.version,
       title: "Hijacked",
     });
@@ -502,7 +460,6 @@ describe("updateProposal", () => {
     });
 
     const result = await updateProposal(proposal.id, {
-      eventSlug: "test-event",
       expectedVersion: proposal.version,
       title: "Hijacked",
     });
@@ -521,7 +478,6 @@ describe("updateProposal", () => {
     });
 
     const result = await updateProposal(proposal.id, {
-      eventSlug: "test-event",
       expectedVersion: proposal.version,
       title: "Claimed by nobody",
     });
@@ -543,7 +499,6 @@ describe("updateProposal", () => {
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(host.id));
 
     const result = await updateProposal(proposal.id, {
-      eventSlug: "test-event",
       expectedVersion: proposal.version,
       title: "Hijacked",
     });
@@ -565,7 +520,6 @@ describe("updateProposal", () => {
     cookieJar.set(GUEST_COOKIE_NAME, await verifiedGuestValue(host.id));
 
     const result = await updateProposal(proposal.id, {
-      eventSlug: "test-event",
       expectedVersion: proposal.version,
       title: "Renamed",
     });

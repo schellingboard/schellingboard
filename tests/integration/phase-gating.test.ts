@@ -2,28 +2,11 @@
 import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
 import { NextRequest } from "next/server";
 
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-}));
-
-const cookieJar = new Map<string, string>();
-
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
 vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
 }));
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
-import { siteAuthenticate } from "../helpers/site-auth";
 import {
   createEvent,
   createGuest,
@@ -39,8 +22,11 @@ import type { SessionParams } from "@/app/api/session-form-utils";
 import { POST as addVote } from "@/app/api/add-vote/route";
 import { POST as addSession } from "@/app/api/add-session/route";
 import { POST as toggleRsvp } from "@/app/api/toggle-rsvp/route";
-import { createProposal } from "@/app/legacy/(site)/[eventSlug]/proposals/actions";
+import { proposalApi } from "../helpers/proposal-api";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
+
+const cookieJar = new Map<string, string>();
+const { createProposal } = proposalApi(cookieJar);
 
 // Server-side phase gating mirrors the UI: voting only during the voting
 // phase, session creation only during the scheduling phase, and proposal
@@ -111,7 +97,6 @@ async function proposeIn(phase: "proposal" | "voting" | "scheduling") {
   cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
   const fd = {
     eventId: event.id,
-    eventSlug: "test-event",
     title: "Late Proposal",
   };
   const result = await createProposal(fd);
@@ -145,10 +130,9 @@ async function toggleRsvpIn(
 
 describe("server-side phase gating", () => {
   beforeAll(() => setupTestDb());
-  beforeEach(async () => {
+  beforeEach(() => {
     resetTestDb();
     cookieJar.clear();
-    await siteAuthenticate(cookieJar);
   });
 
   it("rejects voting during the proposal phase", async () => {

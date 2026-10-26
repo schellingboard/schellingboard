@@ -48,7 +48,6 @@ import { AUTH_COOKIE_NAME, createAuthCookie } from "@/utils/auth";
 import { listProfileActivity } from "@/app/legacy/(site)/guests/profile-activity";
 import { detectGuestClashes } from "@/app/legacy/(site)/[eventSlug]/clash-actions";
 import { revalidateEvent } from "@/app/legacy/(site)/[eventSlug]/session-actions";
-import { createProposal } from "@/app/legacy/(site)/[eventSlug]/proposals/actions";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
@@ -182,12 +181,10 @@ describe("server actions require site auth", () => {
   });
 });
 
-// Creation only checked that the guest cookie wasn't falsely claiming a
-// protected name, which an absent cookie passes — nothing is claimed, so
-// nothing is verified. Creating now requires a name to actually be selected.
+// Creating requires a name to actually be selected: an absent guest cookie
+// claims nothing, so nothing is verified.
 describe("creation requires a selected name", () => {
   beforeAll(() => setupTestDb());
-
   beforeEach(() => {
     resetTestDb();
     cookieJar.clear();
@@ -196,40 +193,6 @@ describe("creation requires a selected name", () => {
   });
 
   afterEach(() => vi.unstubAllEnvs());
-
-  it("createProposal refuses a caller with no name selected", async () => {
-    const event = await createEvent({ phase: "proposal" });
-    const guest = await createGuest({ eventId: event.id });
-    await siteAuthenticate();
-
-    const result = await createProposal({
-      eventId: event.id,
-      eventSlug: "test-event",
-      title: "T",
-      hostIds: [guest.id],
-    });
-
-    expect(result).toHaveProperty("error");
-    expect(
-      await getRepositories().sessionProposals.listByHost(guest.id)
-    ).toEqual([]);
-  });
-
-  it("createProposal accepts a caller with a name selected", async () => {
-    const event = await createEvent({ phase: "proposal" });
-    const guest = await createGuest({ eventId: event.id });
-    await siteAuthenticate();
-    cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
-
-    const result = await createProposal({
-      eventId: event.id,
-      eventSlug: "test-event",
-      title: "T",
-      hostIds: [guest.id],
-    });
-
-    expect(result).toEqual({ success: true });
-  });
 
   it("add-session refuses a caller with no name selected", async () => {
     const { POST } = await import("@/app/api/add-session/route");

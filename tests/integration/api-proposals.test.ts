@@ -10,7 +10,6 @@ import {
 
 vi.mock("@/utils/mailer", () => ({ sendMail: vi.fn() }));
 
-import { NextRequest } from "next/server";
 import { GET, POST, PUT, DELETE } from "@/app/api/v1/[[...route]]/route";
 import { createAdminAuthCookie } from "@/utils/auth";
 import { getRepositories } from "@/db/container";
@@ -18,26 +17,9 @@ import { VoteChoice } from "@schellingboard/domain/vote";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { runJobs } from "../helpers/jobs";
 import { createEvent, createGuest, createProposal } from "../helpers/factories";
-import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
+import { apiRequest as request, asGuest } from "../helpers/proposal-api";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
-
-function request(
-  method: string,
-  path: string,
-  { body, cookie }: { body?: unknown; cookie?: string } = {}
-) {
-  const headers: Record<string, string> = {};
-  if (body !== undefined) headers["content-type"] = "application/json";
-  if (cookie) headers.cookie = cookie;
-  return new NextRequest(`http://test/api/v1${path}`, {
-    method,
-    headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
-}
-
-const asGuest = (id: string) => `${GUEST_COOKIE_NAME}=${openGuestValue(id)}`;
 
 beforeAll(() => setupTestDb());
 beforeEach(() => {
@@ -319,4 +301,61 @@ describe("/api/v1 proposals", () => {
       ).toBeUndefined();
     }
   );
+
+  it(
+    "refuses a proposal from a caller with no name selected",
+    { tags: ["004-US1"] },
+    async () => {
+      const event = await createEvent({ phase: "proposal" });
+      const guest = await createGuest({ eventId: event.id });
+
+      const res = await POST(
+        request("POST", "/proposals", {
+          body: { eventId: event.id, title: "T", hostIds: [guest.id] },
+        })
+      );
+
+      expect(res.status).toBe(403);
+      expect(await res.json()).toMatchObject({ code: "guest.unselected" });
+      expect(
+        await getRepositories().sessionProposals.listByHost(guest.id)
+      ).toEqual([]);
+    }
+  );
+
+  describe("with an Idempotency-Key", { tags: ["004-US1"] }, () => {
+    async function world() {
+      const event = await createEvent({ phase: "voting" });
+      const guest = await createGuest({ eventId: event.id });
+      const send = (title: string, hostIds: string[], key?: string) => {
+        const req = request("POST", "/proposals", {
+          cookie: asGuest(guest.id),
+          body: { eventId: event.id, title, hostIds },
+        });
+        if (key) req.headers.set("idempotency-key", key);
+        return POST(req);
+      };
+      const count = async () =>
+        (await getRepositories().sessionProposals.listByEvent(event.id)).length;
+      return { guest, send, count };
+    }
+
+    it("creates the proposal once when the same form is sent twice", async () => {
+      const { guest, send, count } = await world();
+      expect((await send("Once", [guest.id], "form-1")).status).toBe(201);
+      expect((await send("Once", [guest.id], "form-1")).status).toBe(201);
+      expect(await count()).toBe(1);
+    });
+
+    it("refuses a key reused with different content", async () => {
+      const { guest, send, count } = await world();
+      await send("First", [guest.id], "form-1");
+      const second = await send("Second", [guest.id], "form-1");
+      expect(second.status).toBe(422);
+      expect(await second.json()).toMatchObject({
+        code: "idempotency.keyReused",
+      });
+      expect(await count()).toBe(1);
+    });
+  });
 });

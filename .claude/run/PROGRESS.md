@@ -34,7 +34,6 @@
 - Step 9a: `SpaLinks` intercepts in-event proposal links (pushes history; sets the
   opened-by-click flag from `proposal-nav.ts` when `viewProposal` is set, so closing goes
   Back). `tests/e2e/helpers/fixtures.ts` `isEventPage` also accepts `/{slug}/proposals…`.
-  Legacy `proposals/actions.ts` and its integration tests still exist for 9b.
   `Tooltip` (non-toggleable) now hides on click and opens on focus only if
   `:focus-visible`. Flake: `voting.spec.ts:115` fails first try under load (queue head
   changes while parallel tests add Beta proposals), passes alone.

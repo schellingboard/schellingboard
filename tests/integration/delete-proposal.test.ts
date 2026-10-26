@@ -9,39 +9,8 @@ import {
   vi,
 } from "vitest";
 
-const { redirects, revalidated } = vi.hoisted(() => ({
-  redirects: [] as string[],
-  revalidated: [] as string[],
-}));
-
-vi.mock("next/cache", () => ({
-  revalidatePath: (path: string) => revalidated.push(path),
-}));
-
-vi.mock("next/navigation", () => ({
-  // The real redirect() throws to abandon the rest of the action; a mock that
-  // returned would let code after it run and hide that.
-  redirect: (url: string) => {
-    redirects.push(url);
-    throw new Error(`NEXT_REDIRECT;${url}`);
-  },
-}));
-
-const cookieJar = new Map<string, string>();
-
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { BY_TEST, updateLoggedSession } from "../helpers/changes";
-import { siteAuthenticate } from "../helpers/site-auth";
 import {
   createEvent,
   createGuest,
@@ -55,7 +24,10 @@ import {
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
 import { VoteChoice } from "@schellingboard/domain/vote";
-import { deleteProposal } from "@/app/legacy/(site)/[eventSlug]/proposals/actions";
+import { proposalApi } from "../helpers/proposal-api";
+
+const cookieJar = new Map<string, string>();
+const { deleteProposal } = proposalApi(cookieJar);
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
@@ -66,30 +38,13 @@ async function protectGuest(guestId: string): Promise<void> {
   });
 }
 
-// A delete that went through ends in a redirect to the proposals list, not in
-// a returned value: the page the action ran on is the deleted proposal's own
-// edit page, and re-rendering it (which any revalidation makes Next do) hits
-// its notFound().
-async function deleteAndFollowRedirect(
-  proposalId: string,
-  eventSlug: string
-): Promise<string | undefined> {
-  await expect(deleteProposal(proposalId, eventSlug)).rejects.toThrow(
-    /NEXT_REDIRECT/
-  );
-  return redirects.at(-1);
-}
-
 describe("deleteProposal", () => {
   beforeAll(() => setupTestDb());
 
-  beforeEach(async () => {
+  beforeEach(() => {
     resetTestDb();
     cookieJar.clear();
-    redirects.length = 0;
-    revalidated.length = 0;
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
-    await siteAuthenticate(cookieJar);
   });
   afterEach(() => vi.unstubAllEnvs());
 
@@ -117,12 +72,7 @@ describe("deleteProposal", () => {
     await updateLoggedSession(session.id, { proposalId: proposal.id }, BY_TEST);
 
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(host.id));
-    expect(await deleteAndFollowRedirect(proposal.id, "test-event")).toBe(
-      "/legacy/test-event/proposals"
-    );
-    // The redirect lands on a list the router may have prefetched before the
-    // delete, so the list still has to be revalidated as well.
-    expect(revalidated).toContain("/legacy/test-event/proposals");
+    expect(await deleteProposal(proposal.id)).toEqual({ success: true });
 
     expect(await repos.sessionProposals.findById(proposal.id)).toBeUndefined();
 
@@ -152,10 +102,8 @@ describe("deleteProposal", () => {
     const proposal = await createProposal(event.id, [host.id]);
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(nonHost.id));
 
-    const result = await deleteProposal(proposal.id, "test-event");
+    const result = await deleteProposal(proposal.id);
     expect(result).toHaveProperty("error");
-    // The message has to reach the form, so a refusal must not navigate away.
-    expect(redirects).toEqual([]);
 
     expect(await repos.sessionProposals.findById(proposal.id)).toBeDefined();
   });
@@ -166,7 +114,7 @@ describe("deleteProposal", () => {
     const host = await createGuest({ name: "Host" });
     const proposal = await createProposal(event.id, [host.id]);
 
-    const result = await deleteProposal(proposal.id, "test-event");
+    const result = await deleteProposal(proposal.id);
     expect(result).toHaveProperty("error");
 
     expect(await repos.sessionProposals.findById(proposal.id)).toBeDefined();
@@ -177,9 +125,7 @@ describe("deleteProposal", () => {
     const event = await createEvent();
     const proposal = await createProposal(event.id, []);
 
-    expect(await deleteAndFollowRedirect(proposal.id, "test-event")).toBe(
-      "/legacy/test-event/proposals"
-    );
+    expect(await deleteProposal(proposal.id)).toEqual({ success: true });
 
     expect(await repos.sessionProposals.findById(proposal.id)).toBeUndefined();
   });
@@ -192,7 +138,7 @@ describe("deleteProposal", () => {
     const proposal = await createProposal(event.id, [host.id]);
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(host.id));
 
-    const result = await deleteProposal(proposal.id, "test-event");
+    const result = await deleteProposal(proposal.id);
     expect(result).toHaveProperty("error");
 
     expect(await repos.sessionProposals.findById(proposal.id)).toBeDefined();
@@ -206,9 +152,7 @@ describe("deleteProposal", () => {
     const proposal = await createProposal(event.id, [host.id]);
     cookieJar.set(GUEST_COOKIE_NAME, await verifiedGuestValue(host.id));
 
-    expect(await deleteAndFollowRedirect(proposal.id, "test-event")).toBe(
-      "/legacy/test-event/proposals"
-    );
+    expect(await deleteProposal(proposal.id)).toEqual({ success: true });
 
     expect(await repos.sessionProposals.findById(proposal.id)).toBeUndefined();
   });

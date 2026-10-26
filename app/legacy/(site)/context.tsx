@@ -16,17 +16,10 @@ import type {
 import type { Guest } from "@schellingboard/domain/guest";
 import type { Event, Day } from "@schellingboard/domain/event";
 import {
-  voteChoiceToEmoji,
-  voteChoiceToLabel,
-  NO_VOTE_LABEL,
-} from "@/app/legacy/(site)/votes";
-import type { Vote } from "@schellingboard/domain/vote";
-import {
   currentVerifiedUserAction,
   selectUserAction,
   type SelectUserResult,
 } from "@/app/actions/user-auth";
-import { votesApiUrl } from "@/utils/utils";
 import {
   DEFAULT_BREAK_MINUTES,
   DEFAULT_SLOT_INCREMENT_MINUTES,
@@ -36,10 +29,6 @@ import type { MyMeetingsResponse } from "@/utils/meeting-views";
 import type { SyncState } from "@/app/legacy/(site)/[eventSlug]/replica/sync-state";
 
 export type DayWithSessions = Day & { sessions: Session[] };
-
-// Shared "none" values, so a render with nothing loaded yields the same array
-// each time instead of a fresh one.
-const NO_VOTES: Vote[] = [];
 
 export interface UserContextType {
   user: string | null;
@@ -129,28 +118,6 @@ export function useSlotIncrement(): number {
   return event?.slotIncrementMinutes ?? DEFAULT_SLOT_INCREMENT_MINUTES;
 }
 
-export interface VotesContextType {
-  votes: Vote[];
-  addVote: (vote: Vote) => void;
-  removeVote: (proposalId: string) => void;
-  updateVote: (proposalId: string, choice: Vote["choice"]) => void;
-  hasVoted: (proposalId: string) => boolean;
-  getVote: (proposalId: string) => Vote | undefined;
-  proposalVoteEmoji: (proposalId: string) => string;
-  proposalVoteLabel: (proposalId: string) => string;
-}
-
-export const VotesContext = createContext<VotesContextType>({
-  votes: [],
-  addVote: () => {},
-  removeVote: () => {},
-  updateVote: () => {},
-  hasVoted: () => false,
-  getVote: () => undefined,
-  proposalVoteEmoji: () => "",
-  proposalVoteLabel: () => NO_VOTE_LABEL,
-});
-
 export function UserProvider({
   children,
   initialUser,
@@ -179,8 +146,7 @@ export function UserProvider({
   // each navigation instead. The first run is skipped: the render that mounted
   // this provider already carries the server's answer, and this provider sits
   // above every Suspense boundary, where an update landing during hydration
-  // can be built and never committed (see the VotesProvider comment in
-  // app/legacy/(site)/[eventSlug]/layout.tsx).
+  // can be built and never committed.
   const checkedOnce = useRef(false);
   useEffect(() => {
     if (!checkedOnce.current) {
@@ -287,134 +253,5 @@ export function EventProvider({
     <EventContext.Provider value={contextValue}>
       {children}
     </EventContext.Provider>
-  );
-}
-
-export function VotesProvider({
-  children,
-  eventSlug,
-}: {
-  children: ReactNode;
-  eventSlug: string;
-}) {
-  const { user } = useContext(UserContext);
-  // Keyed by whose votes on which event they are, so switching names or
-  // events never shows the previous answer while the new one is in flight,
-  // and logging out has nothing to clear.
-  const key = user ? `${user}:${eventSlug}` : null;
-  const [loaded, setLoaded] = useState<{ key: string; votes: Vote[] } | null>(
-    null
-  );
-  const votes = key !== null && loaded?.key === key ? loaded.votes : NO_VOTES;
-  const updateVotes = (update: (current: Vote[]) => Vote[]) => {
-    if (key === null) return;
-    setLoaded((prev) => ({
-      key,
-      votes: update(prev?.key === key ? prev.votes : NO_VOTES),
-    }));
-  };
-
-  useEffect(() => {
-    if (!user) return;
-    const fetchedFor = `${user}:${eventSlug}`;
-    const controller = new AbortController();
-    void fetch(votesApiUrl(user, eventSlug), { signal: controller.signal })
-      .then(async (response) => {
-        if (!response.ok) {
-          console.error("Failed to fetch votes");
-          return;
-        }
-        const fetchedVotes = (await response.json()) as Vote[];
-        setLoaded((prev) => {
-          // Preserve optimistic votes not yet reflected on the server
-          const optimistic = (
-            prev?.key === fetchedFor ? prev.votes : NO_VOTES
-          ).filter(
-            (pv) =>
-              !fetchedVotes.some(
-                (fv) =>
-                  fv.proposalId === pv.proposalId && fv.guestId === pv.guestId
-              )
-          );
-          return { key: fetchedFor, votes: [...fetchedVotes, ...optimistic] };
-        });
-      })
-      // Aborted on switching names or events, and the browser kills it when
-      // the page goes; either way there is nobody left to tell.
-      .catch(() => undefined);
-    return () => controller.abort();
-  }, [user, eventSlug]);
-
-  const addVote = (vote: Vote) => {
-    updateVotes((prev) => {
-      const existingIndex = prev.findIndex(
-        (v) => v.proposalId === vote.proposalId && v.guestId === vote.guestId
-      );
-      if (existingIndex >= 0) {
-        const newVotes = [...prev];
-        newVotes[existingIndex] = vote;
-        return newVotes;
-      } else {
-        return [...prev, vote];
-      }
-    });
-  };
-
-  const removeVote = (proposalId: string) => {
-    updateVotes((prev) =>
-      prev.filter((v) => !(v.proposalId === proposalId && v.guestId === user))
-    );
-  };
-
-  const updateVote = (proposalId: string, choice: Vote["choice"]) => {
-    if (!user) return;
-
-    updateVotes((prev) => {
-      const existingIndex = prev.findIndex(
-        (v) => v.proposalId === proposalId && v.guestId === user
-      );
-      if (existingIndex >= 0) {
-        const newVotes = [...prev];
-        newVotes[existingIndex] = { ...newVotes[existingIndex], choice };
-        return newVotes;
-      } else {
-        return [...prev, { id: "", proposalId, guestId: user, choice }];
-      }
-    });
-  };
-
-  const hasVoted = (proposalId: string) => {
-    return votes.some((v) => v.proposalId === proposalId && v.guestId === user);
-  };
-
-  const getVote = (proposalId: string) => {
-    return votes.find((v) => v.proposalId === proposalId && v.guestId === user);
-  };
-
-  const proposalVoteEmoji = (proposalId: string) => {
-    const choice = getVote(proposalId)?.choice;
-    return choice ? voteChoiceToEmoji(choice) : "-";
-  };
-
-  const proposalVoteLabel = (proposalId: string) => {
-    const choice = getVote(proposalId)?.choice;
-    return choice ? voteChoiceToLabel(choice) : NO_VOTE_LABEL;
-  };
-
-  const contextValue: VotesContextType = {
-    votes,
-    addVote,
-    removeVote,
-    updateVote,
-    hasVoted,
-    getVote,
-    proposalVoteEmoji,
-    proposalVoteLabel,
-  };
-
-  return (
-    <VotesContext.Provider value={contextValue}>
-      {children}
-    </VotesContext.Provider>
   );
 }

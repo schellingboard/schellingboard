@@ -17,10 +17,6 @@ import { NextRequest } from "next/server";
 // files so a newly added, unguarded handler fails the suite instead of
 // silently shipping — it must be added to VERIFIERS (with a check that
 // proves the 403) or to READ_ONLY (with a reason).
-//
-// `app/legacy/(site)/[eventSlug]/proposals/actions.ts` is covered the same way:
-// its export list is asserted below so a new export must be added to
-// PROPOSAL_ACTION_VERIFIERS too.
 
 vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
@@ -49,7 +45,6 @@ import {
   createEvent,
   createGuest,
   createLocation,
-  createProposal,
   createSession,
   slotStart,
 } from "../helpers/factories";
@@ -262,74 +257,6 @@ const VERIFIERS: Record<string, Verifier> = {
   },
 };
 
-const PROPOSAL_ACTION_EXPORTS = [
-  "createProposal",
-  "updateProposal",
-  "joinProposal",
-  "deleteProposal",
-] as const;
-
-const PROPOSAL_ACTION_VERIFIERS: Record<
-  (typeof PROPOSAL_ACTION_EXPORTS)[number],
-  Verifier
-> = {
-  createProposal: async () => {
-    const { createProposal } =
-      await import("@/app/legacy/(site)/[eventSlug]/proposals/actions");
-    const event = await createEvent();
-    const guest = await createGuest({ eventId: event.id });
-    await protectGuest(guest.id);
-    cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
-    const result = await createProposal({
-      eventId: event.id,
-      eventSlug: "test-event",
-      title: "T",
-      hostIds: [guest.id],
-    });
-    expect(result).toHaveProperty("error");
-  },
-
-  updateProposal: async () => {
-    const { updateProposal } =
-      await import("@/app/legacy/(site)/[eventSlug]/proposals/actions");
-    const event = await createEvent();
-    const host = await createGuest({ eventId: event.id });
-    await protectGuest(host.id);
-    const proposal = await createProposal(event.id, [host.id]);
-    cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(host.id));
-    const result = await updateProposal(proposal.id, {
-      eventSlug: "test-event",
-      expectedVersion: proposal.version,
-      title: "Renamed",
-    });
-    expect(result).toHaveProperty("error");
-  },
-
-  joinProposal: async () => {
-    const { joinProposal } =
-      await import("@/app/legacy/(site)/[eventSlug]/proposals/actions");
-    const event = await createEvent();
-    const guest = await createGuest({ eventId: event.id });
-    await protectGuest(guest.id);
-    const proposal = await createProposal(event.id, []);
-    cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
-    const result = await joinProposal(proposal.id, "test-event");
-    expect(result).toHaveProperty("error");
-  },
-
-  deleteProposal: async () => {
-    const { deleteProposal } =
-      await import("@/app/legacy/(site)/[eventSlug]/proposals/actions");
-    const event = await createEvent();
-    const host = await createGuest({ eventId: event.id });
-    await protectGuest(host.id);
-    const proposal = await createProposal(event.id, [host.id]);
-    cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(host.id));
-    const result = await deleteProposal(proposal.id, "test-event");
-    expect(result).toHaveProperty("error");
-  },
-};
-
 describe("mutating-surface regression guard", () => {
   beforeAll(() => setupTestDb());
   beforeEach(async () => {
@@ -359,24 +286,6 @@ describe("mutating-surface regression guard", () => {
   for (const [name, verify] of Object.entries(VERIFIERS)) {
     it(
       `app/api/${name} rejects acting as a protected guest without a verified session`,
-      verify
-    );
-  }
-
-  it("proposals/actions.ts exports exactly the known mutating actions", async () => {
-    const actions =
-      await import("@/app/legacy/(site)/[eventSlug]/proposals/actions");
-    const exported = Object.keys(actions).sort();
-    expect(
-      exported,
-      "a new export in proposals/actions.ts needs a matching entry in " +
-        "PROPOSAL_ACTION_VERIFIERS in this file"
-    ).toEqual([...PROPOSAL_ACTION_EXPORTS].sort());
-  });
-
-  for (const [name, verify] of Object.entries(PROPOSAL_ACTION_VERIFIERS)) {
-    it(
-      `${name} rejects acting as a protected guest without a verified session`,
       verify
     );
   }
