@@ -9,8 +9,11 @@ import {
   PAGE_SIZE,
 } from "@/app/legacy/(site)/guests/directory-view";
 import { openProfileLink } from "@/app/legacy/(site)/guests/profile-nav";
-import { ATTENDEE_SORTS, DEFAULT_ATTENDEE_SORT } from "@/utils/attendee-search";
-import { serializeAttendeeFilters } from "@/utils/attendee-filters";
+import {
+  ATTENDEE_SORTS,
+  DEFAULT_ATTENDEE_SORT,
+} from "@schellingboard/domain/attendee-search";
+import { serializeAttendeeFilters } from "@schellingboard/domain/attendee-filters";
 
 function AttendeeRow({
   attendee: {

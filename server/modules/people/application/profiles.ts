@@ -1,5 +1,6 @@
 import {
   sanitizeGuest,
+  type Attendee,
   type CompleteGuest,
   type Guest,
   type ProfileContact,
@@ -53,6 +54,11 @@ export const listEventProfiles =
     }
     return ok(await repos.guests.listProfilesByEvent(eventId));
   };
+
+export const listAttendees =
+  ({ repos }: PeopleDeps) =>
+  async (_actor: Actor, now: Date): Promise<Result<Attendee[]>> =>
+    ok(await repos.guests.listAttendees(now));
 
 export const getProfile =
   ({ repos }: PeopleDeps) =>

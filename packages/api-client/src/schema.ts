@@ -2838,6 +2838,60 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/attendees": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Every guest of the site with the public profile, in id order: the people directory. */
+    get: {
+      parameters: {
+        query?: {
+          /** @description How many items to answer at most */
+          limit?: number;
+          /** @description The `nextCursor` of the previous page; left out for the first */
+          cursor?: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The directory */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              items: components["schemas"]["Attendee"][];
+              /** @description Pass as `cursor` for the next page; null on the last */
+              nextCursor: string | null;
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/guests/{id}": {
     parameters: {
       query?: never;
@@ -5981,6 +6035,44 @@ export interface components {
       /** Format: date-time */
       profileUpdatedAt: string | null;
       version: number;
+    };
+    Attendee: {
+      id: string;
+      name: string;
+      aboutMe: string | null;
+      avatarUrl: string | null;
+      pronouns: string | null;
+      basedIn: string | null;
+      prompts:
+        | {
+            prompt: string;
+            answer: string;
+          }[]
+        | null;
+      languages: string[] | null;
+      contacts:
+        | {
+            /** @enum {string} */
+            type:
+              | "email"
+              | "phone"
+              | "whatsapp"
+              | "signal"
+              | "telegram"
+              | "discord"
+              | "website"
+              | "other";
+            label?: string;
+            value: string;
+          }[]
+        | null;
+      /** Format: date-time */
+      profileUpdatedAt: string | null;
+      version: number;
+      /** @description Hosts a session at any event */
+      isHost: boolean;
+      /** @description Can be asked for a 1-on-1 at some event */
+      openToMeetings: boolean;
     };
     Notification: {
       id: string;

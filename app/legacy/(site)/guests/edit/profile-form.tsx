@@ -46,7 +46,7 @@ import {
 } from "@headlessui/react";
 import { ArrowPathIcon, ChevronUpDownIcon } from "@heroicons/react/16/solid";
 import { MarkdownHint } from "@/app/legacy/(site)/markdown";
-import { containsIgnoringAccents } from "@/utils/utils";
+import { containsIgnoringAccents } from "@schellingboard/domain/search-text";
 import { MarkdownTextarea } from "@/app/components/markdown-textarea";
 import { FormErrorSummary } from "@/app/components/form-error-summary";
 import { setActionErrors } from "@/utils/forms";

@@ -5,6 +5,7 @@ import {
   identitySchema,
 } from "@schellingboard/contracts/auth";
 import {
+  attendeeListSchema,
   profileBodySchema,
   publicProfileListSchema,
   publicProfileSchema,
@@ -26,7 +27,7 @@ import {
   type App,
 } from "@/server/http/route-parts";
 import type { PeopleUseCases } from "../application/use-cases";
-import { toProfileView } from "./view";
+import { toAttendeeView, toProfileView } from "./view";
 import { setGuestCookie } from "./guest-cookie";
 
 const avatarForm = z.object({
@@ -52,6 +53,19 @@ const listEventProfiles = createRoute({
   },
   responses: {
     200: json(publicProfileListSchema, "The event's guests"),
+    ...problemDefault,
+  },
+});
+
+const listAttendees = createRoute({
+  method: "get",
+  path: "/attendees",
+  tags: ["people"],
+  description:
+    "Every guest of the site with the public profile, in id order: the people directory.",
+  request: { query: pageQuerySchema },
+  responses: {
+    200: json(attendeeListSchema, "The directory"),
     ...problemDefault,
   },
 });
@@ -181,6 +195,20 @@ export function addPeopleRoutes(app: App, people: () => PeopleUseCases) {
     if (!page.ok) return problem(page.error);
     return c.json(
       { ...page.value, items: page.value.items.map(toProfileView) },
+      200
+    );
+  });
+
+  app.openapi(listAttendees, async (c) => {
+    const { limit, cursor } = c.req.valid("query");
+    const result = await people().listAttendees(c.var.actor, c.var.now);
+    if (!result.ok) return problem(result.error);
+    const page = pageOf(result.value, { limit, cursor }, "attendees", (a) => [
+      a.id,
+    ]);
+    if (!page.ok) return problem(page.error);
+    return c.json(
+      { ...page.value, items: page.value.items.map(toAttendeeView) },
       200
     );
   });

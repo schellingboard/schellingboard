@@ -40,3 +40,14 @@ export function serializeAttendeeFilters(
   const canonical = VALUES.filter((value) => filters.includes(value));
   return canonical.length > 0 ? canonical.join(",") : null;
 }
+
+export function matchesAttendeeFilters(
+  card: { isHost: boolean; hasProfile: boolean; openToMeetings: boolean },
+  filters: readonly AttendeeFilter[]
+): boolean {
+  return (
+    (!filters.includes("isHost") || card.isHost) &&
+    (!filters.includes("hasProfile") || card.hasProfile) &&
+    (!filters.includes("openToMeetings") || card.openToMeetings)
+  );
+}

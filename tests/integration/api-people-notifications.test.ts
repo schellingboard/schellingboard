@@ -165,6 +165,55 @@ describe("/api/v1 profiles", () => {
   );
 
   it(
+    "lists every guest of the site for anyone, with host and 1-on-1 flags and no email",
+    { tags: ["011-US3"] },
+    async () => {
+      const host = await createGuest({
+        name: "Host Person",
+        email: "host@example.com",
+      });
+      await createGuest({ name: "Plain Person" });
+      const event = await createEvent();
+      await createSession(event.id, { hostIds: [host.id] });
+      await getRepositories().events.update(event.id, {
+        meetingsEnabled: true,
+      });
+      const open = await createGuest({
+        name: "Open Person",
+        eventId: event.id,
+      });
+      await getRepositories().meetingAvailability.replaceForGuest(
+        open.id,
+        event.id,
+        [new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)]
+      );
+
+      const res = await call("GET", "/attendees?limit=1");
+      expect(res.status).toBe(200);
+      type Page = {
+        items: { name: string; isHost: boolean; openToMeetings: boolean }[];
+        nextCursor: string;
+      };
+      const first = (await res.json()) as Page;
+      expect(first.items).toHaveLength(1);
+
+      const rest = await call(
+        "GET",
+        `/attendees?cursor=${encodeURIComponent(first.nextCursor)}`
+      );
+      const text = await rest.text();
+      const all = [...first.items, ...(JSON.parse(text) as Page).items];
+      expect(
+        Object.fromEntries(all.map((a) => [a.name, a.isHost]))
+      ).toMatchObject({ "Host Person": true, "Plain Person": false });
+      expect(
+        Object.fromEntries(all.map((a) => [a.name, a.openToMeetings]))
+      ).toMatchObject({ "Open Person": true, "Plain Person": false });
+      expect(text).not.toContain("host@example.com");
+    }
+  );
+
+  it(
     "saves the caller's profile, and refuses nobody as a problem",
     { tags: ["011-US1"] },
     async () => {

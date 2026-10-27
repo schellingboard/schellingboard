@@ -170,6 +170,18 @@ export const publicProfileSchema = z
 
 export const publicProfileListSchema = pageSchema(publicProfileSchema);
 
+// A directory entry: the public profile plus what the list filters on.
+export const attendeeViewSchema = publicProfileSchema
+  .extend({
+    isHost: z.boolean().describe("Hosts a session at any event"),
+    openToMeetings: z
+      .boolean()
+      .describe("Can be asked for a 1-on-1 at some event"),
+  })
+  .meta({ id: "Attendee" });
+
+export const attendeeListSchema = pageSchema(attendeeViewSchema);
+
 export const adminGuestBodySchema = z.object({
   name: z.string(),
   email: z.string(),

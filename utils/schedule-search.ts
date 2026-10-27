@@ -1,7 +1,7 @@
 import type { Session } from "@schellingboard/domain/session";
 import { meetingTitle } from "@/utils/meeting-rules";
 import type { MeetingView } from "@/utils/meeting-views";
-import { containsIgnoringAccents } from "@/utils/utils";
+import { containsIgnoringAccents } from "@schellingboard/domain/search-text";
 
 export function sessionMatchesSearch(session: Session, search: string) {
   return (

@@ -1,7 +1,13 @@
 import { describe, it, expect } from "vitest";
 
 import type { Attendee } from "@schellingboard/domain/guest";
-import { hasFilledProfile, profileExcerpt } from "@/utils/attendee-profile";
+import {
+  hasFilledProfile,
+  profileExcerpt as excerptOf,
+} from "@schellingboard/domain/attendee-profile";
+import { stripMarkdown } from "@/utils/markdown";
+
+const profileExcerpt = (a: Attendee) => excerptOf(a, stripMarkdown);
 
 let counter = 0;
 

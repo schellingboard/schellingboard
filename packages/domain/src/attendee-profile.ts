@@ -1,5 +1,15 @@
-import type { Attendee } from "@schellingboard/domain/guest";
-import { stripMarkdown } from "./markdown";
+import type { Guest } from "./guest";
+
+type ProfileFields = Pick<
+  Guest,
+  | "aboutMe"
+  | "pronouns"
+  | "basedIn"
+  | "avatarUrl"
+  | "languages"
+  | "prompts"
+  | "contacts"
+>;
 
 /**
  * Longest excerpt shipped per card. Only two clamped lines are ever visible, so
@@ -17,7 +27,7 @@ function filled(value: string | null | undefined): boolean {
  * what the CSV importer writes, so they say nothing about the guest having been
  * here; everything else is self-entered.
  */
-export function hasFilledProfile(attendee: Attendee): boolean {
+export function hasFilledProfile(attendee: ProfileFields): boolean {
   return (
     filled(attendee.aboutMe) ||
     filled(attendee.pronouns) ||
@@ -42,12 +52,15 @@ function truncate(text: string): string {
  * profile never looks as empty as an untouched one. Null when there is nothing
  * to say.
  */
-export function profileExcerpt(attendee: Attendee): string | null {
-  const aboutMe = stripMarkdown(attendee.aboutMe).replace(/\s+/g, " ").trim();
+export function profileExcerpt(
+  attendee: ProfileFields,
+  toPlainText: (markdown: string | null | undefined) => string
+): string | null {
+  const aboutMe = toPlainText(attendee.aboutMe).replace(/\s+/g, " ").trim();
   if (aboutMe) return truncate(aboutMe);
 
   const prompt = (attendee.prompts ?? []).find((p) => filled(p.answer));
   if (!prompt) return null;
-  const answer = stripMarkdown(prompt.answer).replace(/\s+/g, " ").trim();
+  const answer = toPlainText(prompt.answer).replace(/\s+/g, " ").trim();
   return truncate(`${prompt.prompt} — ${answer}`);
 }

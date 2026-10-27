@@ -1,8 +1,19 @@
-import {
-  type Attendee,
-  CONTACT_TYPE_LABELS,
-} from "@schellingboard/domain/guest";
-import { containsIgnoringAccents, equalsIgnoringAccents } from "./utils";
+import { CONTACT_TYPE_LABELS, type Guest } from "./guest";
+import { containsIgnoringAccents, equalsIgnoringAccents } from "./search-text";
+
+/** The fields a directory search reads. */
+export type Searchable = Pick<
+  Guest,
+  | "id"
+  | "name"
+  | "aboutMe"
+  | "pronouns"
+  | "basedIn"
+  | "languages"
+  | "prompts"
+  | "contacts"
+  | "profileUpdatedAt"
+>;
 
 // Rank tiers, higher wins. Exact declared-language matches must beat
 // incidental free-text mentions ("Italian" the speaker vs. "Italian food"
@@ -11,7 +22,7 @@ const NAME = 3;
 const STRUCTURED = 2;
 const FREE_TEXT = 1;
 
-function rank(attendee: Attendee, query: string): number {
+function rank(attendee: Searchable, query: string): number {
   if (containsIgnoringAccents(attendee.name, query)) return NAME;
 
   const languages = attendee.languages ?? [];
@@ -77,7 +88,7 @@ function hash(text: string): number {
  * `seed` drives the random sort. A per-attendee key rather than a shuffle, so
  * that filtering the list down never reorders what is left of it.
  */
-export function searchAttendees<A extends Attendee>(
+export function searchAttendees<A extends Searchable>(
   attendees: A[],
   query: string,
   sort: AttendeeSort = DEFAULT_ATTENDEE_SORT,

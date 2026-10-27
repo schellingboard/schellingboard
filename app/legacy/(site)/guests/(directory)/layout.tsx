@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { pageReads } from "@/server/composition";
 import { AttendeeDirectory } from "@/app/legacy/(site)/guests/directory";
-import { newSortSeed } from "@/utils/attendee-search";
+import { newSortSeed } from "@schellingboard/domain/attendee-search";
 import { serverNow } from "@/utils/dev-clock-server";
 import { verifiedCurrentUser } from "@/utils/acting-guest";
 import { meetingsOpen } from "@/utils/meeting-rules";

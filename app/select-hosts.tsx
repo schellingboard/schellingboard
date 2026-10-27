@@ -5,7 +5,7 @@ import { Combobox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/16/solid";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { LockIcon } from "@/app/legacy/(site)/lock-icon";
-import { containsIgnoringAccents } from "@/utils/utils";
+import { containsIgnoringAccents } from "@schellingboard/domain/search-text";
 
 export function SelectHosts<
   T extends { id: string; name: string; authProtected?: boolean },

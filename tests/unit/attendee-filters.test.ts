@@ -4,7 +4,7 @@ import {
   availableAttendeeFilters,
   parseAttendeeFilters,
   serializeAttendeeFilters,
-} from "@/utils/attendee-filters";
+} from "@schellingboard/domain/attendee-filters";
 
 describe("attendee filters", () => {
   it("reads several active filters from one param", () => {

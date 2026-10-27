@@ -95,7 +95,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
 ### People and meetings
 
 - [ ] 10. **People screens**, unrouted:
-  - [ ] 10a. The directory: list, search, same visibility as legacy.
+  - [x] 10a. The directory (done: `GET /attendees` site-wide, open like `GET /guests/{id}`; `queries/directory.ts`; `features/people/` model, `DirectoryScreen`, `PeopleLinks`; `ui/avatar.tsx`; attendee search, filters, profile helpers, relative time and accent-insensitive search moved to `packages/domain`).
   - [ ] 10b. The profile: details, hosting and proposals from the replica, meeting
         options; an API read for what the replica lacks replaces the
         `profile-activity.ts` server action.

@@ -465,6 +465,84 @@
           "version"
         ]
       },
+      "Attendee": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "aboutMe": { "type": ["string", "null"] },
+          "avatarUrl": { "type": ["string", "null"] },
+          "pronouns": { "type": ["string", "null"] },
+          "basedIn": { "type": ["string", "null"] },
+          "prompts": {
+            "type": ["array", "null"],
+            "items": {
+              "type": "object",
+              "properties": {
+                "prompt": { "type": "string" },
+                "answer": { "type": "string" }
+              },
+              "required": ["prompt", "answer"]
+            }
+          },
+          "languages": {
+            "type": ["array", "null"],
+            "items": { "type": "string" }
+          },
+          "contacts": {
+            "type": ["array", "null"],
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "email",
+                    "phone",
+                    "whatsapp",
+                    "signal",
+                    "telegram",
+                    "discord",
+                    "website",
+                    "other"
+                  ]
+                },
+                "label": { "type": "string" },
+                "value": { "type": "string" }
+              },
+              "required": ["type", "value"]
+            }
+          },
+          "profileUpdatedAt": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          },
+          "version": { "type": "integer" },
+          "isHost": {
+            "type": "boolean",
+            "description": "Hosts a session at any event"
+          },
+          "openToMeetings": {
+            "type": "boolean",
+            "description": "Can be asked for a 1-on-1 at some event"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "aboutMe",
+          "avatarUrl",
+          "pronouns",
+          "basedIn",
+          "prompts",
+          "languages",
+          "contacts",
+          "profileUpdatedAt",
+          "version",
+          "isHost",
+          "openToMeetings"
+        ]
+      },
       "Notification": {
         "type": "object",
         "properties": {
@@ -4737,6 +4815,69 @@
                     "items": {
                       "type": "array",
                       "items": { "$ref": "#/components/schemas/PublicProfile" }
+                    },
+                    "nextCursor": {
+                      "type": ["string", "null"],
+                      "description": "Pass as `cursor` for the next page; null on the last"
+                    }
+                  },
+                  "required": ["items", "nextCursor"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+      }
+    },
+    "/api/v1/attendees": {
+      "get": {
+        "tags": ["people"],
+        "description": "Every guest of the site with the public profile, in id order: the people directory.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 100,
+              "description": "How many items to answer at most"
+            },
+            "required": false,
+            "description": "How many items to answer at most",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "The `nextCursor` of the previous page; left out for the first"
+            },
+            "required": false,
+            "description": "The `nextCursor` of the previous page; left out for the first",
+            "name": "cursor",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The directory",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Attendee" }
                     },
                     "nextCursor": {
                       "type": ["string", "null"],

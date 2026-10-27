@@ -1,6 +1,9 @@
 import type { eventGuestSchema } from "@schellingboard/contracts/snapshot";
-import type { publicProfileSchema } from "@schellingboard/contracts/guest";
-import type { Guest } from "@schellingboard/domain/guest";
+import type {
+  attendeeViewSchema,
+  publicProfileSchema,
+} from "@schellingboard/contracts/guest";
+import type { Attendee, Guest } from "@schellingboard/domain/guest";
 import type { z } from "zod";
 
 export function toProfileView(g: Guest): z.input<typeof publicProfileSchema> {
@@ -16,6 +19,16 @@ export function toProfileView(g: Guest): z.input<typeof publicProfileSchema> {
     contacts: g.contacts ?? null,
     profileUpdatedAt: g.profileUpdatedAt?.toISOString() ?? null,
     version: g.profileVersion,
+  };
+}
+
+export function toAttendeeView(
+  a: Attendee
+): z.input<typeof attendeeViewSchema> {
+  return {
+    ...toProfileView(a),
+    isHost: a.isHost,
+    openToMeetings: a.openToMeetings,
   };
 }
 

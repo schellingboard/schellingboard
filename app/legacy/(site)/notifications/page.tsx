@@ -8,7 +8,7 @@ import {
   verifiedCurrentUser,
 } from "@/utils/acting-guest";
 import { outOfRangePageRedirect, parsePage } from "@/utils/pagination";
-import { formatRelativeTime } from "@/utils/relative-time";
+import { formatRelativeTime } from "@schellingboard/domain/relative-time";
 import { serverNow } from "@/utils/dev-clock-server";
 import { NotificationList } from "./notification-list";
 

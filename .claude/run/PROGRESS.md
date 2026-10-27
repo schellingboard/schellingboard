@@ -41,6 +41,13 @@
 Step 16: drop `eventSlug` and `revalidateEvent` from `comment-actions.ts` with the file (no live page needs them now that
 proposals are SPA).
 
+Step 10a, for step 11 (wiring): `DirectoryScreen({entries, status, now, viewerId, meetingsEnabled, randomSeed, links: PeopleLinks, params, onParams})`
+with `useDirectoryQuery`-style loading still to do (`createDirectoryQuery({api})`, `refresh()` once per mount); `params`/`onParams` come from
+`useUrlSearchParams` (`push` adds a history entry). `meetingsEnabled` = any event with meetings open (as the legacy layout). The profile modal
+(10b) renders over the list as `ProposalModal` does over proposals; `links.guest(id, listQuery)` must then point at `/guests/<id>?<listQuery>`
+(`legacyPeopleLinks` is the legacy address). Dropped: the legacy pager (never more than one page). Excerpts use `ui/plain-text`, cruder than the
+server's parser.
+
 ## Questions
 
 0. The SPA shell has no "Show map" button (the uploaded site map); only legacy pages show it. The

@@ -1,7 +1,10 @@
 import { describe, it, expect } from "vitest";
 
 import type { Attendee } from "@schellingboard/domain/guest";
-import { newSortSeed, searchAttendees } from "@/utils/attendee-search";
+import {
+  newSortSeed,
+  searchAttendees,
+} from "@schellingboard/domain/attendee-search";
 
 let counter = 0;
 

@@ -9,14 +9,19 @@ import {
   DEFAULT_ATTENDEE_SORT,
   newSortSeed,
   searchAttendees,
-} from "@/utils/attendee-search";
+} from "@schellingboard/domain/attendee-search";
 import {
   AttendeeFilter,
   availableAttendeeFilters,
+  matchesAttendeeFilters,
   parseAttendeeFilters,
-} from "@/utils/attendee-filters";
-import { hasFilledProfile, profileExcerpt } from "@/utils/attendee-profile";
-import { formatRelativeTime } from "@/utils/relative-time";
+} from "@schellingboard/domain/attendee-filters";
+import {
+  hasFilledProfile,
+  profileExcerpt,
+} from "@schellingboard/domain/attendee-profile";
+import { stripMarkdown } from "@/utils/markdown";
+import { formatRelativeTime } from "@schellingboard/domain/relative-time";
 
 // Everyone on one page: reading through who is coming is what the directory is
 // for, and at realistic attendee counts (a few hundred) a pager only gets in
@@ -77,7 +82,7 @@ export function useDirectoryView(
       attendees.map((attendee) => ({
         ...attendee,
         hasProfile: hasFilledProfile(attendee),
-        excerpt: profileExcerpt(attendee),
+        excerpt: profileExcerpt(attendee, stripMarkdown),
         profileUpdated: attendee.profileUpdatedAt
           ? formatRelativeTime(attendee.profileUpdatedAt, now)
           : null,
@@ -90,11 +95,8 @@ export function useDirectoryView(
   const everyone = useMemo(() => searchAttendees(cards, ""), [cards]);
 
   const matches = useMemo(() => {
-    const scoped = cards.filter(
-      (card) =>
-        (!filters.includes("isHost") || card.isHost) &&
-        (!filters.includes("hasProfile") || card.hasProfile) &&
-        (!filters.includes("openToMeetings") || card.openToMeetings)
+    const scoped = cards.filter((card) =>
+      matchesAttendeeFilters(card, filters)
     );
     return searchAttendees(scoped, query, sort, seed);
   }, [cards, filters, query, sort, seed]);
