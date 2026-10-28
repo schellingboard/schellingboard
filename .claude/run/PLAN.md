@@ -100,9 +100,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
   - [x] 10c. Profile comments (done: `ProfileModal` takes `comments(guestId, name)` and `setHash`, renders the shared `Comments` for the profile being read; `CommentSubject.name` names the profile in notices; `ProfileLinks.guest`).
   - [x] 10d. Edit my profile and photo (done: `features/people/profile-form.tsx`, `commands/profile-form.ts`, `ui/combobox.tsx`; the photo goes through `PUT`/`DELETE /me/avatar` before the profile).
   - [x] 10e. The 1-on-1 request form (done: `features/people/meeting-request-dialog.tsx`, `features/meetings/meeting-request-fields.tsx` shared with 12b, `commands/meeting-request.ts`; `ProfileModal` owns the dialog; `meeting-clash-text` moved to `packages/domain`). Legacy `meeting-picker.tsx` and its action are deleted at step 11.
-- [ ] 11. **Takeover: people**. Router owns `/guests/**` (the page needs a command runner and store with no event replica, and the viewer as liker from `/me`); legacy guest pages and
-      `profile-activity.ts` are deleted. E2E: `attendee-profiles`, `profile`,
-      `profile-comments`, `profile-photo`. Port the legacy "No user selected" message of `/guests/edit`. CHANGELOG if anything visible changed.
+- [x] 11. Takeover: people (done: router owns `/guests/**` through `app/people-pages.tsx`; legacy guest pages, `profile-activity.ts` and `actions/profile.ts` deleted; `GET /events` carries `now`, attendees carry `authProtected`).
 - [ ] 12. **Meeting screens**, unrouted:
   - [ ] 12a. The meetings page: my availability (`PUT /meeting-availability`).
   - [ ] 12b. Booking (`bookMeeting`): candidates query, request command.

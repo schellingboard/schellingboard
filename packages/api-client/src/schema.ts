@@ -2736,6 +2736,8 @@ export interface paths {
             "application/json": {
               /** @description The guest the browser now acts as, or null when signed out */
               guestId: string | null;
+              /** @description True when the browser holds a protected name it has not logged in to */
+              awaitingLogin?: boolean;
             };
           };
         };
@@ -3826,6 +3828,11 @@ export interface paths {
           content: {
             "application/json": {
               events: components["schemas"]["Event"][];
+              /**
+               * Format: date-time
+               * @description The server's clock, the dev fake clock included
+               */
+              now: string;
             };
           };
         };
@@ -6200,6 +6207,8 @@ export interface components {
       isHost: boolean;
       /** @description Can be asked for a 1-on-1 at some event */
       openToMeetings: boolean;
+      /** @description Taking this name asks for a password or an emailed code */
+      authProtected: boolean;
     };
     ProfileActivity: {
       /** @description Sessions, at any event */

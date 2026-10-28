@@ -178,6 +178,11 @@ describe("/api/v1 profiles", () => {
         email: "host@example.com",
       });
       await createGuest({ name: "Plain Person" });
+      const locked = await createGuest({ name: "Locked Person" });
+      await getRepositories().guests.setAuthProtection(locked.id, {
+        authProtected: true,
+        passwordHash: null,
+      });
       const event = await createEvent();
       await createSession(event.id, { hostIds: [host.id] });
       await getRepositories().events.update(event.id, {
@@ -196,7 +201,13 @@ describe("/api/v1 profiles", () => {
       const res = await call("GET", "/attendees?limit=1");
       expect(res.status).toBe(200);
       type Page = {
-        items: { name: string; isHost: boolean; openToMeetings: boolean }[];
+        items: {
+          name: string;
+          isHost: boolean;
+          openToMeetings: boolean;
+          authProtected: boolean;
+          version: number;
+        }[];
         nextCursor: string;
       };
       const first = (await res.json()) as Page;
@@ -214,6 +225,10 @@ describe("/api/v1 profiles", () => {
       expect(
         Object.fromEntries(all.map((a) => [a.name, a.openToMeetings]))
       ).toMatchObject({ "Open Person": true, "Plain Person": false });
+      expect(
+        Object.fromEntries(all.map((a) => [a.name, a.authProtected]))
+      ).toMatchObject({ "Locked Person": true, "Plain Person": false });
+      expect(all.every((a) => Number.isInteger(a.version))).toBe(true);
       expect(text).not.toContain("host@example.com");
     }
   );

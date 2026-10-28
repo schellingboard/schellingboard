@@ -17,6 +17,7 @@ const item = (id: string, profileUpdatedAt: string | null = null) => ({
   version: 1,
   isHost: false,
   openToMeetings: false,
+  authProtected: false,
 });
 
 describe("the people directory query", () => {

@@ -39,7 +39,6 @@ const SERVER_PATH =
 const LEGACY_ROOT_PAGES = [
   "admin",
   "auth",
-  "guests",
   "login",
   "notifications",
   "settings",
@@ -54,6 +53,8 @@ function isEventPage(url: string): boolean {
   return slug !== undefined && !LEGACY_ROOT_PAGES.includes(slug);
 }
 
+const isPeoplePage = (url: string) => /^\/guests(?:[/?#]|$)/.test(url);
+
 function isAllowed(text: string): boolean {
   return ALLOWED_CONSOLE_PATTERNS.some((re) => re.test(text));
 }
@@ -67,12 +68,15 @@ function formatConsoleMessage(msg: ConsoleMessage): string {
 export const test = base.extend<{ consoleGuard: void }>({
   // Specs go to a legacy page directly: through the shell, a click can land
   // before the page behind it has hydrated. The hop has its own spec (@014-US4).
-  // An event's schedule is the SPA's own, so it is opened as it is.
+  // An event's schedule and the people screens are the SPA's own, so they are opened as they are.
   page: async ({ page }, provide) => {
     const goto = page.goto.bind(page);
     page.goto = (url, options) =>
       goto(
-        url.startsWith("/") && !SERVER_PATH.test(url) && !isEventPage(url)
+        url.startsWith("/") &&
+          !SERVER_PATH.test(url) &&
+          !isEventPage(url) &&
+          !isPeoplePage(url)
           ? `/legacy${url}`
           : url,
         options

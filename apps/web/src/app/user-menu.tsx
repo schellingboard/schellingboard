@@ -84,14 +84,10 @@ export function UserMenu({
           aria-label="Your name"
           className="absolute right-0 z-40 mt-1 w-48 rounded-md bg-surface-raised py-1 shadow-lg ring-1 ring-line-subtle"
         >
-          <a
-            role="menuitem"
-            href={`/legacy/guests/${current.id}`}
-            className={item}
-          >
+          <a role="menuitem" href={`/guests/${current.id}`} className={item}>
             My profile
           </a>
-          <a role="menuitem" href="/legacy/guests/edit" className={item}>
+          <a role="menuitem" href="/guests/edit" className={item}>
             Edit profile
           </a>
           <a role="menuitem" href="/legacy/settings" className={item}>

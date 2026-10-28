@@ -2,6 +2,7 @@
 
 import { useContext, useEffect, useId, useMemo, useState } from "react";
 import Link from "next/link";
+import { AppLink } from "@/app/components/app-link";
 
 import { UserContext } from "@/app/legacy/(site)/context";
 import { Markdown, MarkdownHint } from "@/app/legacy/(site)/markdown";
@@ -252,12 +253,12 @@ function CommentThread({
           ) : (
             <>
               {node.author ? (
-                <Link
-                  href={`/legacy/guests/${node.author.id}`}
+                <AppLink
+                  href={`/guests/${node.author.id}`}
                   className="font-medium text-brand-fg hover:text-brand-fg-hover hover:underline"
                 >
                   {node.author.name}
-                </Link>
+                </AppLink>
               ) : (
                 // The author's guest was removed; there is no profile to link.
                 <span className="font-medium text-fg-muted">Unknown</span>

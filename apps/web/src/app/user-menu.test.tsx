@@ -94,8 +94,8 @@ describe("UserMenu", () => {
 
     const href = (name: string) =>
       screen.getByRole("menuitem", { name }).getAttribute("href");
-    expect(href("My profile")).toBe("/legacy/guests/g1");
-    expect(href("Edit profile")).toBe("/legacy/guests/edit");
+    expect(href("My profile")).toBe("/guests/g1");
+    expect(href("Edit profile")).toBe("/guests/edit");
     expect(href("Settings")).toBe("/legacy/settings");
   });
 

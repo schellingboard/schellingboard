@@ -36,7 +36,7 @@ import {
 } from "../helpers/guest-cookie";
 import { POST as toggleRsvp } from "@/app/api/toggle-rsvp/route";
 import { GET as getRsvps } from "@/app/api/rsvps/route";
-import { updateProfileAction } from "@/app/actions/profile";
+import { saveProfile } from "../helpers/profile-api";
 import { updateEmailSettingsAction } from "@/app/actions/settings";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
@@ -172,7 +172,7 @@ describe("write enforcement for protected guests", () => {
       await protectGuest(guest.id);
       cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
 
-      const profileResult = await updateProfileAction({
+      const profileResult = await saveProfile(cookieJar, {
         expectedVersion: guest.profileVersion,
         name: "After",
         aboutMe: null,
@@ -204,7 +204,7 @@ describe("write enforcement for protected guests", () => {
       await protectGuest(guest.id);
       cookieJar.set(GUEST_COOKIE_NAME, await verifiedGuestValue(guest.id));
 
-      const result = await updateProfileAction({
+      const result = await saveProfile(cookieJar, {
         expectedVersion: guest.profileVersion,
         name: "After",
         aboutMe: null,

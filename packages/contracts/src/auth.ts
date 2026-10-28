@@ -15,3 +15,12 @@ export const identitySchema = z.object({
     .nullable()
     .describe("The guest the browser now acts as, or null when signed out"),
 });
+
+export const currentIdentitySchema = identitySchema.extend({
+  awaitingLogin: z
+    .boolean()
+    .optional()
+    .describe(
+      "True when the browser holds a protected name it has not logged in to"
+    ),
+});

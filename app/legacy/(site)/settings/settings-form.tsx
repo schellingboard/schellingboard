@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { AppLink } from "@/app/components/app-link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -50,12 +50,12 @@ export function SettingsForm({
       <h1 className="text-2xl font-bold">Settings</h1>
       <p className="text-sm text-fg-subtle">
         Everything here is private and never shown to other attendees. Your{" "}
-        <Link
-          href="/legacy/guests/edit"
+        <AppLink
+          href="/guests/edit"
           className="text-brand-fg hover:text-brand-fg-hover underline"
         >
           public profile
-        </Link>{" "}
+        </AppLink>{" "}
         is edited separately.
       </p>
 

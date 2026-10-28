@@ -29,6 +29,7 @@ export function toAttendeeView(
     ...toProfileView(a),
     isHost: a.isHost,
     openToMeetings: a.openToMeetings,
+    authProtected: a.authProtected ?? false,
   };
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext, useEffect, useState, useTransition } from "react";
-import Link from "next/link";
+import { AppLink } from "@/app/components/app-link";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import {
@@ -122,12 +122,12 @@ function MeetingModal({
           <div className="flex flex-col gap-4">
             <h2 className="text-xl font-bold text-fg pr-8">
               1-on-1 with{" "}
-              <Link
-                href={`/legacy/guests/${meeting.otherId}`}
+              <AppLink
+                href={`/guests/${meeting.otherId}`}
                 className="text-brand-fg hover:text-brand-fg-hover hover:underline"
               >
                 {meeting.otherName}
-              </Link>
+              </AppLink>
             </h2>
 
             <dl className="flex flex-col gap-1 text-sm">

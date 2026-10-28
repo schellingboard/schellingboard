@@ -24,7 +24,7 @@ export default async function NotificationsPage({
 
   if (!currentUser) {
     return (
-      <PageNotice backHref="/legacy/guests" backLabel="Attendees">
+      <PageNotice backHref="/guests" backLabel="Attendees">
         {await unverifiedUserMessage(cookieStore, "seeing your notifications")}
       </PageNotice>
     );

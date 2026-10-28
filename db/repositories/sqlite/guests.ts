@@ -343,6 +343,8 @@ export class SqliteGuestsRepository implements GuestsRepository {
           languages: schema.guests.languages,
           contacts: schema.guests.contacts,
           profileUpdatedAt: schema.guests.profileUpdatedAt,
+          authProtected: schema.guests.authProtected,
+          profileVersion: schema.guests.profileVersion,
           // SQLite has no boolean type; this yields 0/1 at runtime despite the
           // sql<boolean> annotation, so coerce explicitly below.
           isHost: isHostExpr,

@@ -5,7 +5,6 @@
 export const LEGACY_ROOT_PAGES = [
   "admin",
   "auth",
-  "guests",
   "login",
   "notifications",
   "settings",

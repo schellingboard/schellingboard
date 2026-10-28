@@ -89,7 +89,10 @@ describe("/api/v1/me/identity", () => {
         `${GUEST_COOKIE_NAME}=${await verifiedGuestValue(grace.id)}`
       );
 
-      expect(await open.json()).toEqual({ guestId: null });
+      expect(await open.json()).toEqual({
+        guestId: null,
+        awaitingLogin: true,
+      });
       expect(await verified.json()).toEqual({ guestId: grace.id });
     }
   );

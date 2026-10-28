@@ -80,7 +80,7 @@ test("replies to a profile comment and permalinks to the reply @010-US3 @010-US5
   const timestamps = profile.getByRole("link", { name: /^\d/ });
   await expect(timestamps).toHaveCount(2);
   const permalink = await timestamps.last().getAttribute("href");
-  expect(permalink).toMatch(/^\/legacy\/guests\/[^/?]+#comment-/);
+  expect(permalink).toMatch(/^\/guests\/[^/?]+#comment-/);
 
   // The permalink is a real profile URL: opening it cold lands on this
   // profile with the reply shown (and highlighted).
@@ -202,7 +202,7 @@ test("says comments could not be loaded rather than showing an empty thread @010
 }) => {
   await login(page);
   await page.goto("/guests");
-  await page.route("**/api/profile/*/comments*", (route) =>
+  await page.route("**/api/v1/guests/*/comments*", (route) =>
     route.fulfill({ status: 500, body: "{}" })
   );
 

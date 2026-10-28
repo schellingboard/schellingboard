@@ -11,27 +11,13 @@ import {
 
 const cookieJar = new Map<string, string>();
 
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-}));
-
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { siteAuthenticate } from "../helpers/site-auth";
 import { createGuest } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 import { getRepositories } from "@/db/container";
 import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
-import { updateProfileAction } from "@/app/actions/profile";
+import { saveProfile } from "../helpers/profile-api";
 import { createImageFile } from "@/tests/helpers/utils";
 import fs from "fs";
 import path from "path";
@@ -40,7 +26,7 @@ import sharp from "sharp";
 
 let uploadsDir: string;
 
-describe("updateProfileAction", () => {
+describe("saving a profile as the edit form does", () => {
   beforeAll(() => setupTestDb());
 
   beforeEach(async () => {
@@ -62,7 +48,7 @@ describe("updateProfileAction", () => {
       emailSettings: { rsvpChange: false, hostChange: false, cohostAdd: true },
     });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
-    const result = await updateProfileAction({
+    const result = await saveProfile(cookieJar, {
       expectedVersion: guest.profileVersion,
       name: "Guest",
       aboutMe: null,
@@ -80,7 +66,7 @@ describe("updateProfileAction", () => {
   it("updates name, pronouns and aboutMe for the current user", async () => {
     const guest = await createGuest({ name: "Old" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
-    const result = await updateProfileAction({
+    const result = await saveProfile(cookieJar, {
       expectedVersion: guest.profileVersion,
       name: "New Name",
       aboutMe: "Hello there",
@@ -101,7 +87,7 @@ describe("updateProfileAction", () => {
     const before = new Date();
 
     expect(
-      await updateProfileAction({
+      await saveProfile(cookieJar, {
         name: "Guest",
         aboutMe: "Hi",
         expectedVersion: guest.profileVersion,
@@ -118,7 +104,7 @@ describe("updateProfileAction", () => {
     const guest = await createGuest({ name: "Guest" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
     const save = (aboutMe: string) =>
-      updateProfileAction({
+      saveProfile(cookieJar, {
         name: "Guest",
         aboutMe,
         expectedVersion: guest.profileVersion,
@@ -140,10 +126,10 @@ describe("updateProfileAction", () => {
     const guest = await createGuest({ name: "Guest" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
 
-    const result = await updateProfileAction({
+    const result = await saveProfile(cookieJar, {
       name: "Guest",
       aboutMe: "Hi",
-    } as Parameters<typeof updateProfileAction>[0]);
+    });
 
     expect(result.ok).toBe(false);
     expect(
@@ -154,7 +140,7 @@ describe("updateProfileAction", () => {
   it("updates name, aboutMe, pronouns and avatar for the current user", async () => {
     const guest = await createGuest({ name: "Old" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
-    const result = await updateProfileAction({
+    const result = await saveProfile(cookieJar, {
       expectedVersion: guest.profileVersion,
       name: "New Name",
       aboutMe: "Hello there",
@@ -182,7 +168,7 @@ describe("updateProfileAction", () => {
   it("resizes a large avatar to 1024 and keeps extension", async () => {
     const guest = await createGuest({ name: "Old" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
-    const result = await updateProfileAction({
+    const result = await saveProfile(cookieJar, {
       expectedVersion: guest.profileVersion,
       name: "New Name",
       aboutMe: "Hello there",
@@ -207,7 +193,7 @@ describe("updateProfileAction", () => {
   it("never upscales an avatar smaller than 1024", async () => {
     const guest = await createGuest({ name: "Old" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
-    const result = await updateProfileAction({
+    const result = await saveProfile(cookieJar, {
       expectedVersion: guest.profileVersion,
       name: "New Name",
       aboutMe: "Hello there",
@@ -227,7 +213,7 @@ describe("updateProfileAction", () => {
   it("crops a non-square avatar to its shorter side rather than upscaling", async () => {
     const guest = await createGuest({ name: "Old" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
-    const result = await updateProfileAction({
+    const result = await saveProfile(cookieJar, {
       expectedVersion: guest.profileVersion,
       name: "New Name",
       aboutMe: "Hello there",
@@ -247,7 +233,7 @@ describe("updateProfileAction", () => {
   it("saves basedIn, prompts, languages, and contacts", async () => {
     const guest = await createGuest({ name: "Guest" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
-    const result = await updateProfileAction({
+    const result = await saveProfile(cookieJar, {
       expectedVersion: guest.profileVersion,
       name: "Guest",
       aboutMe: null,
@@ -275,7 +261,7 @@ describe("updateProfileAction", () => {
   it("drops empty prompt answers, blank languages, and blank contact rows", async () => {
     const guest = await createGuest({ name: "Guest" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
-    const result = await updateProfileAction({
+    const result = await saveProfile(cookieJar, {
       expectedVersion: guest.profileVersion,
       name: "Guest",
       aboutMe: null,
@@ -300,7 +286,7 @@ describe("updateProfileAction", () => {
   it("keeps only the first answer when a prompt is repeated", async () => {
     const guest = await createGuest({ name: "Guest" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
-    const result = await updateProfileAction({
+    const result = await saveProfile(cookieJar, {
       expectedVersion: guest.profileVersion,
       name: "Guest",
       aboutMe: null,
@@ -319,7 +305,7 @@ describe("updateProfileAction", () => {
   it("strips labels from contacts that are not of type 'other'", async () => {
     const guest = await createGuest({ name: "Guest" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
-    const result = await updateProfileAction({
+    const result = await saveProfile(cookieJar, {
       expectedVersion: guest.profileVersion,
       name: "Guest",
       aboutMe: null,
@@ -335,7 +321,7 @@ describe("updateProfileAction", () => {
   it("rejects an 'other' contact without a label", async () => {
     const guest = await createGuest({ name: "Guest" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
-    const result = await updateProfileAction({
+    const result = await saveProfile(cookieJar, {
       expectedVersion: guest.profileVersion,
       name: "Guest",
       aboutMe: null,
@@ -348,7 +334,7 @@ describe("updateProfileAction", () => {
     const guest = await createGuest({ name: "Guest" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
 
-    const tooManyLanguages = await updateProfileAction({
+    const tooManyLanguages = await saveProfile(cookieJar, {
       expectedVersion: guest.profileVersion,
       name: "Guest",
       aboutMe: null,
@@ -356,7 +342,7 @@ describe("updateProfileAction", () => {
     });
     expect(tooManyLanguages).toMatchObject({ ok: false });
 
-    const answerTooLong = await updateProfileAction({
+    const answerTooLong = await saveProfile(cookieJar, {
       expectedVersion: guest.profileVersion,
       name: "Guest",
       aboutMe: null,
@@ -368,7 +354,7 @@ describe("updateProfileAction", () => {
   it("rejects images smaller than 256x256", async () => {
     const guest = await createGuest({ name: "Old" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
-    const result = await updateProfileAction({
+    const result = await saveProfile(cookieJar, {
       expectedVersion: guest.profileVersion,
       name: "New Name",
       aboutMe: "Hello there",
@@ -382,7 +368,7 @@ describe("updateProfileAction", () => {
   it("rejects a wide image whose shorter side is below the minimum", async () => {
     const guest = await createGuest({ name: "Old" });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
-    const result = await updateProfileAction({
+    const result = await saveProfile(cookieJar, {
       expectedVersion: guest.profileVersion,
       name: "New Name",
       aboutMe: "Hello there",

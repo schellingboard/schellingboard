@@ -33,7 +33,7 @@ export function legacyScheduleLinks(eventSlug: string): ScheduleLinks {
       return `/${eventSlug}?${params.toString()}`;
     },
     meeting: over("viewMeeting"),
-    guest: (guestId) => `/legacy/guests/${guestId}`,
+    guest: (guestId) => `/guests/${guestId}`,
     editSession: (sessionId) =>
       `${schedule}/edit-session?${new URLSearchParams({ sessionID: sessionId })}`,
     proposal: (proposalId) =>

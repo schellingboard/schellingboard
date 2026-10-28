@@ -16,7 +16,7 @@ import type { DirectoryEntry } from "../../queries/directory";
 import { createProfileActivityQuery } from "../../queries/profile-activity";
 import { comment, fakeComments } from "../comments/comments-test-support";
 import { cardsFrom, everyoneIn } from "./directory-model";
-import { legacyProfileLinks } from "./links";
+import { profileLinks } from "./links";
 import { ProfileModal, type ProfileModalProps } from "./profile-modal";
 
 afterEach(cleanup);
@@ -38,6 +38,7 @@ const entry = (
   version: 1,
   isHost: false,
   openToMeetings: false,
+  authProtected: false,
   ...patch,
 });
 
@@ -104,7 +105,7 @@ function Harness(
       matches={cards}
       everyone={everyoneIn(cards)}
       viewerId="cy"
-      links={legacyProfileLinks}
+      links={profileLinks}
       activity={make}
       onOpen={setGuestId}
       onClose={() => {}}
@@ -197,7 +198,7 @@ describe("the profile modal", () => {
       ).toBeNull();
       expect(
         screen.getByRole("link", { name: "Edit profile" }).getAttribute("href")
-      ).toBe("/legacy/guests/edit");
+      ).toBe("/guests/edit");
     }
   );
 
@@ -351,13 +352,11 @@ describe("the comments on a profile", () => {
       render(<Harness setHash={(h) => hashes.push(h)} />);
 
       const author = await within(dialog()).findByRole("link", { name: "Bo" });
-      expect(author.getAttribute("href")).toBe("/legacy/guests/bo");
+      expect(author.getAttribute("href")).toBe("/guests/bo");
       const permalink = within(dialog())
         .getAllByRole("link")
         .find((a) => a.getAttribute("href")?.includes("#comment-c1"))!;
-      expect(permalink.getAttribute("href")).toBe(
-        "/legacy/guests/al#comment-c1"
-      );
+      expect(permalink.getAttribute("href")).toBe("/guests/al#comment-c1");
       await userEvent.click(permalink);
       expect(hashes).toEqual(["#comment-c1"]);
     }

@@ -78,11 +78,6 @@ const PRE_AUTH = new Set([
  * it runs before anything looks at them.
  */
 const SITE_GUARDED: Record<string, () => Promise<unknown>> = {
-  "legacy/(site)/guests/profile-activity.ts:listProfileActivity": async () => {
-    const { listProfileActivity } =
-      await import("@/app/legacy/(site)/guests/profile-activity");
-    return listProfileActivity("some-guest");
-  },
   "legacy/(site)/[eventSlug]/clash-actions.ts:detectGuestClashes": async () => {
     const { detectGuestClashes } =
       await import("@/app/legacy/(site)/[eventSlug]/clash-actions");
@@ -152,10 +147,6 @@ const SITE_GUARDED: Record<string, () => Promise<unknown>> = {
     const { dispatchRemindersAction } =
       await import("@/app/actions/dev-reminders");
     return dispatchRemindersAction();
-  },
-  "actions/profile.ts:updateProfileAction": async () => {
-    const { updateProfileAction } = await import("@/app/actions/profile");
-    return updateProfileAction({ name: "N", expectedVersion: 1 });
   },
   "actions/notifications.ts:openNotificationAction": async () => {
     const { openNotificationAction } =

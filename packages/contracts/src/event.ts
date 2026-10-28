@@ -70,7 +70,10 @@ export const eventPhasesUpdateBodySchema = eventPhasesBodySchema.extend({
   expectedVersion,
 });
 
-export const eventListSchema = z.object({ events: z.array(eventViewSchema) });
+export const eventListSchema = z.object({
+  events: z.array(eventViewSchema),
+  now: instant.describe("The server's clock, the dev fake clock included"),
+});
 
 export const dayBodySchema = z.object({
   start: instant,

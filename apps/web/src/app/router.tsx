@@ -13,6 +13,7 @@ import { hardNavigate } from "./hard-navigate";
 import { LegacyForward } from "./legacy-forward";
 import { legacyHref } from "./legacy-href";
 import { LEGACY_ROOT_PAGES } from "./legacy-pages";
+import { PeoplePage } from "./people-pages";
 import {
   ProposalFormPage,
   ProposalsPage,
@@ -103,9 +104,27 @@ export function createAppRouter(
       return <ProposalFormPage proposalId={proposalId} />;
     },
   });
+  // One component for the directory, a profile over it and the edit page, so
+  // moving between them keeps the list mounted.
+  const guests = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "guests",
+    component: function GuestsRoute(): ReactElement {
+      return <PeoplePage services={services} />;
+    },
+  });
+  const guestsList = createRoute({
+    getParentRoute: () => guests,
+    path: "/",
+  });
+  const guestsPage = createRoute({
+    getParentRoute: () => guests,
+    path: "$",
+  });
   return createRouter({
     routeTree: rootRoute.addChildren([
       ...legacyPages,
+      guests.addChildren([guestsList, guestsPage]),
       event.addChildren([
         schedule,
         proposals,

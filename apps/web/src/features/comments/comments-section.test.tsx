@@ -13,7 +13,7 @@ function show(
       open={() => handle}
       viewerId={viewerId}
       timezone="UTC"
-      guestHref={(id) => `/legacy/guests/${id}`}
+      guestHref={(id) => `/guests/${id}`}
       commentHref={(id) => `/somewhere#comment-${id}`}
       setHash={(hash) => {
         window.location.hash = hash;
@@ -76,7 +76,7 @@ describe("a comment section", () => {
       expect(screen.getByRole("heading", { name: "1 comment" })).toBeTruthy();
       expect(
         screen.getByRole("link", { name: "HOST" }).getAttribute("href")
-      ).toBe("/legacy/guests/host");
+      ).toBe("/guests/host");
       expect(screen.getByText("there").tagName).toBe("STRONG");
       expect(screen.getByText("Comment deleted")).toBeTruthy();
     }
@@ -247,7 +247,7 @@ describe("liking comments", () => {
     await userEvent.click(screen.getByRole("button", { name: "2 likes" }));
     const list = within(screen.getByRole("dialog", { name: "Liked by" }));
     expect(list.getByRole("link", { name: "Zed" }).getAttribute("href")).toBe(
-      "/legacy/guests/zed"
+      "/guests/zed"
     );
   });
 

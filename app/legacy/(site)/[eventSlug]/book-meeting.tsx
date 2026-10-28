@@ -4,11 +4,11 @@ import { useEffect, useState, useTransition } from "react";
 
 import { requestMeetingAction } from "@/app/actions/meetings";
 import { PRIMARY_BUTTON, SECONDARY_BUTTON } from "@/app/components/buttons";
-import { Avatar } from "@/app/legacy/(site)/guests/avatar";
+import { Avatar } from "@/app/components/avatar";
 import { MeetingLengthChips } from "@/app/components/meeting-length-chips";
 import { MeetingRequestFields } from "@/app/components/meeting-request-fields";
 import { Modal } from "@/app/components/modal";
-import Link from "next/link";
+import { AppLink } from "@/app/components/app-link";
 import { clashLines } from "@schellingboard/domain/meeting-clash-text";
 import type { meetingCandidatesSchema } from "@schellingboard/contracts/meeting";
 import type { z } from "zod";
@@ -166,15 +166,15 @@ function CandidateStep({
                       are, and that must not cost the slot being booked -- so
                       the profile opens in its own tab, leaving this list
                       exactly where it was. */}
-                  <Link
-                    href={`/legacy/guests/${candidate.id}`}
+                  <AppLink
+                    href={`/guests/${candidate.id}`}
                     target="_blank"
                     rel="noopener"
                     prefetch={false}
                     className="font-medium text-brand-fg hover:text-brand-fg-hover"
                   >
                     {candidate.name}
-                  </Link>
+                  </AppLink>
                   {candidate.isHost && (
                     <span className="w-fit rounded-full bg-brand-tint-hover text-brand-fg text-xs font-semibold px-3 py-1">
                       Session host

@@ -132,9 +132,9 @@ describe("/api/v1/admin events and days", () => {
         days: [{ id: dayId, eventId: event.id, ...dayBody, version: 1 }],
       });
       const list = await call("GET", "/events");
-      expect(
-        ((await list.json()) as { events: unknown[] }).events
-      ).toHaveLength(1);
+      const listed = (await list.json()) as { events: unknown[]; now: string };
+      expect(listed.events).toHaveLength(1);
+      expect(Number.isNaN(Date.parse(listed.now))).toBe(false);
 
       const overlap = await call("POST", `/admin/events/${event.id}/days`, {
         body: dayBody,

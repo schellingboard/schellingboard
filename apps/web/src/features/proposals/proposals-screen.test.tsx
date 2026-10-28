@@ -365,7 +365,7 @@ describe("the proposals list", () => {
     const mine = within(table).getByRole("row", { name: /Rust intro/ });
     expect(
       within(mine).getByRole("link", { name: "Mia" }).getAttribute("href")
-    ).toBe("/legacy/guests/mia");
+    ).toBe("/guests/mia");
     expect(within(mine).getByText("1h")).toBeTruthy();
     expect(
       within(within(table).getByRole("row", { name: /Cooking/ })).getByText(

@@ -12,7 +12,7 @@ describe("legacyScheduleLinks", () => {
   });
 
   it("points the modal's pages at the legacy app", () => {
-    expect(links.guest("g1")).toBe("/legacy/guests/g1");
+    expect(links.guest("g1")).toBe("/guests/g1");
     expect(links.editSession("s1")).toBe(
       "/legacy/conf/edit-session?sessionID=s1"
     );

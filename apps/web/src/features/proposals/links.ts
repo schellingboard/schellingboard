@@ -22,7 +22,7 @@ export function proposalLinks(eventSlug: string): ProposalLinks {
     edit: (id) => `${base}/${id}/edit`,
     scheduleProposal: (id) =>
       `/legacy/${eventSlug}/add-session?${new URLSearchParams({ proposalID: id })}`,
-    guest: (id) => `/legacy/guests/${id}`,
+    guest: (id) => `/guests/${id}`,
     session: (id) =>
       `/${eventSlug}?${new URLSearchParams({ viewSession: id })}`,
   };

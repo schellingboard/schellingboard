@@ -15,7 +15,7 @@ describe("HeaderLinks", () => {
     show(true);
     expect(
       screen.getByRole("link", { name: "Attendees" }).getAttribute("href")
-    ).toBe("/legacy/guests");
+    ).toBe("/guests");
     const bell = await screen.findByRole("link", {
       name: "Notifications (3 unread)",
     });

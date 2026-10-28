@@ -121,7 +121,7 @@ describe("the session modal", () => {
     const d = within(dialog());
     expect(d.getByRole("heading", { name: "Talk" })).toBeTruthy();
     expect(d.getByRole("link", { name: "HOST" }).getAttribute("href")).toBe(
-      "/legacy/guests/host"
+      "/guests/host"
     );
     expect(d.getByText("Room")).toBeTruthy();
     expect(d.getByText("Monday 09:00 - 10:00")).toBeTruthy();
@@ -143,7 +143,7 @@ describe("the session modal", () => {
     const d = within(dialog());
     expect(await d.findByRole("link", { name: "Abe" })).toBeTruthy();
     expect(d.getByRole("link", { name: "Zed" }).getAttribute("href")).toBe(
-      "/legacy/guests/zed"
+      "/guests/zed"
     );
     expect(d.getByText("Attendees (3 / 10):")).toBeTruthy();
   });

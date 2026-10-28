@@ -2,6 +2,7 @@
 
 import type { ComponentProps } from "react";
 import Link from "next/link";
+import { AppLink } from "@/app/components/app-link";
 import type { SessionProposal } from "@schellingboard/domain/session";
 import { durationMinusBreak } from "@schellingboard/domain/slots";
 import { formatDuration } from "@schellingboard/domain/time";
@@ -34,12 +35,12 @@ export function Proposal(props: {
           {proposal.hosts.map((h, i) => (
             <span key={h.id}>
               {i > 0 && ", "}
-              <Link
-                href={`/legacy/guests/${h.id}`}
+              <AppLink
+                href={`/guests/${h.id}`}
                 className="text-brand-fg hover:text-brand-fg-hover hover:underline"
               >
                 {h.name}
-              </Link>
+              </AppLink>
             </span>
           ))}
         </p>

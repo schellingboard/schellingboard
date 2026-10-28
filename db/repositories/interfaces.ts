@@ -218,7 +218,7 @@ export interface GuestsRepository {
    * All guests as attendees (public profile fields plus whether they host any
    * session), ordered by name with id tiebreaker. Search, filtering, sorting
    * and pagination all happen in memory on top of this, in the browser (see
-   * app/legacy/(site)/guests/directory-view.ts): attendee counts don't warrant a SQL
+   * the SPA directory model): attendee counts don't warrant a SQL
    * or persisted search index. `now` bounds `openToMeetings`: availability whose
    * slots have all passed leaves nothing anyone can book.
    */

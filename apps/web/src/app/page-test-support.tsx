@@ -57,6 +57,7 @@ export async function open({
           { ...snapshot.event },
           { ...snapshot.event, id: "e2", slug: "other", name: "Other con" },
         ],
+        now: running.now,
       });
     if (call.path === "/api/v1/events/conf/snapshot")
       return snap instanceof Response ? snap : Response.json(snap);

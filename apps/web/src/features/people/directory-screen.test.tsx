@@ -31,6 +31,7 @@ const entry = (
   version: 1,
   isHost: false,
   openToMeetings: false,
+  authProtected: false,
   ...patch,
 });
 

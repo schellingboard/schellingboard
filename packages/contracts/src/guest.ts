@@ -177,6 +177,9 @@ export const attendeeViewSchema = publicProfileSchema
     openToMeetings: z
       .boolean()
       .describe("Can be asked for a 1-on-1 at some event"),
+    authProtected: z
+      .boolean()
+      .describe("Taking this name asks for a password or an emailed code"),
   })
   .meta({ id: "Attendee" });
 

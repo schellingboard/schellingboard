@@ -3,6 +3,7 @@ import {
   proposalCreateSchema,
   proposalUpdateSchema,
 } from "@schellingboard/contracts/proposal";
+import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { COHOST_WANTED_NOTE_MAX } from "@schellingboard/domain/session";
 import {
@@ -67,7 +68,7 @@ export function ProposalForm(props: ProposalFormProps) {
     if (proposalId && !proposal) return "Proposal not found.";
     const task = proposal ? "editing this proposal" : "creating a proposal";
     if (!viewer && (!proposal || proposal.hosts.length > 0))
-      return `You need to select who you are before ${task}. Pick your name via the name chip in the header at the top of the page.`;
+      return actingGuestRefusalMessage("guest.unselected", task);
     if (
       proposal &&
       proposal.hosts.length > 0 &&

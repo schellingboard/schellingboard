@@ -1,11 +1,11 @@
 "use client";
 
 import { useContext, useState, useTransition } from "react";
-import Link from "next/link";
+import { AppLink } from "@/app/components/app-link";
 import { Dialog } from "@headlessui/react";
 
 import { UserContext } from "@/app/legacy/(site)/context";
-import { Avatar } from "@/app/legacy/(site)/guests/avatar";
+import { Avatar } from "@/app/components/avatar";
 import { Modal } from "@/app/components/modal";
 import type { Comment } from "@schellingboard/domain/comment";
 import { toggleCommentLike } from "./comment-actions";
@@ -128,8 +128,8 @@ export function CommentLikes({
           <ul className="mt-3 max-h-72 overflow-y-auto text-sm">
             {likes.map((liker) => (
               <li key={liker.id}>
-                <Link
-                  href={`/legacy/guests/${liker.id}`}
+                <AppLink
+                  href={`/guests/${liker.id}`}
                   className="flex items-center gap-3 rounded-md px-2 py-1.5 font-medium text-fg hover:bg-surface-sunken"
                 >
                   <Avatar
@@ -138,7 +138,7 @@ export function CommentLikes({
                     image={liker.avatarUrl ?? undefined}
                   />
                   {liker.name}
-                </Link>
+                </AppLink>
               </li>
             ))}
           </ul>

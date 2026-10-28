@@ -2,6 +2,7 @@
 import { useContext, useState, useTransition } from "react";
 import clsx from "clsx";
 import Link from "next/link";
+import { AppLink } from "@/app/components/app-link";
 import {
   Menu,
   MenuButton,
@@ -109,19 +110,19 @@ export function HeaderUserSelect({ guests }: { guests: Guest[] }) {
         >
           <MenuItem>
             {({ focus }) => (
-              <Link
-                href={`/legacy/guests/${currentGuest.id}`}
+              <AppLink
+                href={`/guests/${currentGuest.id}`}
                 className={itemClasses(focus)}
               >
                 My profile
-              </Link>
+              </AppLink>
             )}
           </MenuItem>
           <MenuItem>
             {({ focus }) => (
-              <Link href="/legacy/guests/edit" className={itemClasses(focus)}>
+              <AppLink href="/guests/edit" className={itemClasses(focus)}>
                 Edit profile
-              </Link>
+              </AppLink>
             )}
           </MenuItem>
           <MenuItem>

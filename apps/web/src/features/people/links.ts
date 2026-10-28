@@ -4,11 +4,10 @@ export type PeopleLinks = {
   edit: string;
 };
 
-/** The profile screens are still legacy pages. */
-export const legacyPeopleLinks: PeopleLinks = {
+export const peopleLinks: PeopleLinks = {
   guest: (id, listQuery) =>
-    listQuery ? `/legacy/guests/${id}?${listQuery}` : `/legacy/guests/${id}`,
-  edit: "/legacy/guests/edit",
+    listQuery ? `/guests/${id}?${listQuery}` : `/guests/${id}`,
+  edit: "/guests/edit",
 };
 
 export type ProfileLinks = {
@@ -21,11 +20,10 @@ export type ProfileLinks = {
   proposal: (eventSlug: string, proposalId: string) => string;
 };
 
-export const legacyProfileLinks: ProfileLinks = {
-  edit: "/legacy/guests/edit",
-  guest: (id) => `/legacy/guests/${id}`,
-  list: (listQuery) =>
-    listQuery ? `/legacy/guests?${listQuery}` : "/legacy/guests",
+export const profileLinks: ProfileLinks = {
+  edit: "/guests/edit",
+  guest: (id) => `/guests/${id}`,
+  list: (listQuery) => (listQuery ? `/guests?${listQuery}` : "/guests"),
   session: (slug, id) => `/${slug}?${new URLSearchParams({ viewSession: id })}`,
   proposal: (slug, id) =>
     `/${slug}/proposals?${new URLSearchParams({ viewProposal: id })}`,

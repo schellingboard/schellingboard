@@ -64,14 +64,14 @@ Step 10d, for step 11 (wiring): `ProfileForm({profile: ProfileDraft, links: {peo
 (legacy did). The photo is sent first (`PUT /me/avatar`, then the profile against the new version): if the profile then fails, the photo stays changed and the form says so.
 Markup changes (sections are buttons with `aria-expanded`; pronoun/language fields are `ui/combobox`, role combobox/option) should not force
 `profile.spec` rewrites; the "Suggest a different prompt" button is an icon with that name. If the profile save fails after the photo saved, the form says so.
-`ui/resize-image.ts` copies `utils/images-client.ts`: delete the latter with the legacy form at step 11. `avatar-image` and
-`language-suggestions` moved to `packages/domain`. Legacy "No user selected" message (`/guests/edit` without identity) is still to port.
+`avatar-image` and
+`language-suggestions` moved to `packages/domain`.
 
 ## Questions
 
 0. The SPA shell has no "Show map" button (the uploaded site map); only legacy pages show it. The
    schedule and proposals screens (both SPA-owned now) lost it when they moved.
-   `settings.spec.ts:67` now checks it on `/legacy/guests`. Needs a shell item and the
+   `settings.spec.ts:67` now checks it on `/legacy/settings`. Needs a shell item and the
    map URL in `/me` or the snapshot.
 
 Assumptions the user may override (set by the coordinator, 2026-10-25):
@@ -121,3 +121,9 @@ textarea goes at the takeovers (11, 15). Not copied: legacy's lock/phase checks 
 reason shows), and the "Delete" trash icon.
 
 Step 10e: legacy `requestMeetingAction` stays (used by `book-meeting.tsx` until step 13). `MeetingRequestFields` lost `cancelLabel` (12b may need it back).
+
+Step 11: `/guests/**` is the SPA's (`app/people-pages.tsx`, blank store from `replica/blank.ts`, viewer from `/me`).
+`app/components/avatar.tsx` is a shared legacy file (moved out of the deleted guests directory) until the legacy pages go.
+Do not call `runner.stop()` or `query.destroy()` in a mount effect cleanup: StrictMode re-runs the effect on the same object and leaves it dead.
+`tests/e2e/helpers/fixtures.ts` opens `/guests*` as it is (not under `/legacy`). The settings map check now uses `/legacy/settings`.
+The SPA shell still lacks "Show map". A protected-but-unverified name on the edit page shows the "select who you are" copy.

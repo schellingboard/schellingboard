@@ -2,6 +2,7 @@ import { createRoute, z } from "@hono/zod-openapi";
 import { pageQuerySchema } from "@schellingboard/contracts/cursor-page";
 import {
   chooseGuestBodySchema,
+  currentIdentitySchema,
   identitySchema,
 } from "@schellingboard/contracts/auth";
 import {
@@ -152,7 +153,7 @@ const getIdentity = createRoute({
   description:
     "The guest this browser acts as, or null; a protected name counts only once logged in.",
   responses: {
-    200: json(identitySchema, "The current guest"),
+    200: json(currentIdentitySchema, "The current guest"),
     ...problemDefault,
   },
 });

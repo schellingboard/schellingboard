@@ -153,7 +153,13 @@ export function addEventReadRoutes(app: App, events: () => EventUseCases) {
   app.openapi(listEvents, async (c) => {
     const result = await events().listEvents();
     if (!result.ok) return problem(result.error);
-    return c.json({ events: result.value.map(toEventView) }, 200);
+    return c.json(
+      {
+        events: result.value.map(toEventView),
+        now: c.var.now.toISOString(),
+      },
+      200
+    );
   });
 
   app.openapi(getEvent, async (c) => {

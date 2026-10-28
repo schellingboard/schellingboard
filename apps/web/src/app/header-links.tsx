@@ -30,7 +30,7 @@ export function HeaderLinks({
 
   return (
     <>
-      <a href="/legacy/guests" className={link}>
+      <a href="/guests" className={link}>
         <UserGroupIcon className="h-5 w-5" />
         <span className="sr-only sm:not-sr-only">Attendees</span>
       </a>

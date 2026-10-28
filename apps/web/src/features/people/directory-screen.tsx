@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   ATTENDEE_SORTS,
   DEFAULT_ATTENDEE_SORT,
@@ -11,6 +11,7 @@ import { SEARCH_DEBOUNCE_MS } from "../../ui/use-debounced";
 import {
   cardsFrom,
   directoryView,
+  everyoneIn,
   withParams,
   type DirectoryCard,
 } from "./directory-model";
@@ -28,6 +29,11 @@ export type DirectoryScreenProps = {
   links: PeopleLinks;
   params: URLSearchParams;
   onParams: (next: URLSearchParams, options?: { push?: boolean }) => void;
+  /** Drawn over the list with the order the list is showing, so a profile can walk it. */
+  profile?: (lists: {
+    matches: DirectoryCard[];
+    everyone: DirectoryCard[];
+  }) => ReactNode;
 };
 
 const LINK = "font-semibold text-brand-fg hover:text-brand-fg-hover";
@@ -47,138 +53,145 @@ export function DirectoryScreen(props: DirectoryScreenProps) {
       }),
     [cards, listQuery, props.meetingsEnabled, seed]
   );
+  const everyone = useMemo(() => everyoneIn(cards), [cards]);
   const sortDisabled = query !== "";
   const onlyHasProfile =
     filters.length === 1 && filters[0] === "hasProfile" && query === "";
 
   return (
-    <div className="max-w-4xl mx-auto flex flex-col gap-6 px-4">
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold">Attendees</h1>
-        {viewerId && (
-          <a href={links.edit} className={`text-sm ${LINK}`}>
-            Edit profile
-          </a>
-        )}
-      </div>
-
-      <div className="space-y-4 pb-8">
-        <div className="flex flex-wrap items-center gap-3">
-          <SearchBox query={query} params={params} onParams={onParams} />
-          <div className="flex flex-wrap items-center gap-2">
-            {available.map((f) => {
-              const active = filters.includes(f.value);
-              return (
-                <button
-                  key={f.value}
-                  type="button"
-                  onClick={() =>
-                    onParams(
-                      withParams(params, {
-                        filter: serializeAttendeeFilters(
-                          active
-                            ? filters.filter((v) => v !== f.value)
-                            : [...filters, f.value]
-                        ),
-                      }),
-                      { push: true }
-                    )
-                  }
-                  className={`text-sm px-3 py-2 rounded-md transition-colors ${
-                    active
-                      ? "bg-info text-on-info hover:bg-info-hover"
-                      : "bg-surface-muted text-fg-muted hover:bg-surface-hover"
-                  }`}
-                  aria-pressed={active}
-                  aria-label={`Filter by ${f.label}${active ? " (active)" : ""}`}
-                >
-                  {f.label}
-                </button>
-              );
-            })}
-            <label
-              className="flex items-center gap-2 text-sm text-fg-muted"
-              // On the label: browsers suppress pointer events on a disabled
-              // control, so a title there would never show.
-              title={
-                sortDisabled
-                  ? "Search results are sorted by relevance"
-                  : undefined
-              }
-            >
-              Sort by
-              <select
-                value={sort}
-                disabled={sortDisabled}
-                onChange={(e) => {
-                  // Coming back to Random draws a new order, as a reload does.
-                  if (e.target.value === "random")
-                    setSeed(Math.random().toString(36).slice(2));
-                  onParams(
-                    withParams(params, {
-                      sort:
-                        e.target.value === DEFAULT_ATTENDEE_SORT
-                          ? null
-                          : e.target.value,
-                    }),
-                    { push: true }
-                  );
-                }}
-                className="pl-2 pr-9 py-1.5 text-sm rounded-md border border-line bg-surface-raised disabled:bg-surface-muted disabled:text-fg-subtle"
-              >
-                {ATTENDEE_SORTS.map((s) => (
-                  <option key={s.value} value={s.value}>
-                    {s.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {rows.length > 0 && (
-              <span className="text-sm text-fg-subtle">
-                {rows.length} attendee{rows.length === 1 ? "" : "s"}
-              </span>
-            )}
-          </div>
+    <>
+      <div className="max-w-4xl mx-auto flex flex-col gap-6 px-4">
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="text-3xl font-bold">Attendees</h1>
+          {viewerId && (
+            <a href={links.edit} className={`text-sm ${LINK}`}>
+              Edit profile
+            </a>
+          )}
         </div>
 
-        {rows.length > 0 ? (
-          <ul className="divide-y divide-line-subtle border-t border-b border-line-subtle">
-            {rows.map((row) => (
-              <li key={row.id} className="py-3">
-                <AttendeeRow card={row} href={links.guest(row.id, listQuery)} />
-              </li>
-            ))}
-          </ul>
-        ) : entries.length === 0 &&
-          (status === "loading" || status === "idle") ? (
-          <p role="status" className="text-sm text-fg-subtle">
-            Loading attendees…
-          </p>
-        ) : status === "error" && entries.length === 0 ? (
-          <p role="alert" className="text-sm text-fg-subtle">
-            Could not load the attendees. Reload the page to try again.
-          </p>
-        ) : (
-          <p className="text-sm text-fg-subtle">
-            {onlyHasProfile ? (
-              <>
-                Nobody has filled in a profile yet.
-                {viewerId && (
-                  <>
-                    {" "}
-                    <a href={links.edit} className={LINK}>
-                      Be the first!
-                    </a>
-                  </>
-                )}
-              </>
-            ) : (
-              "No attendees match."
-            )}
-          </p>
-        )}
+        <div className="space-y-4 pb-8">
+          <div className="flex flex-wrap items-center gap-3">
+            <SearchBox query={query} params={params} onParams={onParams} />
+            <div className="flex flex-wrap items-center gap-2">
+              {available.map((f) => {
+                const active = filters.includes(f.value);
+                return (
+                  <button
+                    key={f.value}
+                    type="button"
+                    onClick={() =>
+                      onParams(
+                        withParams(params, {
+                          filter: serializeAttendeeFilters(
+                            active
+                              ? filters.filter((v) => v !== f.value)
+                              : [...filters, f.value]
+                          ),
+                        }),
+                        { push: true }
+                      )
+                    }
+                    className={`text-sm px-3 py-2 rounded-md transition-colors ${
+                      active
+                        ? "bg-info text-on-info hover:bg-info-hover"
+                        : "bg-surface-muted text-fg-muted hover:bg-surface-hover"
+                    }`}
+                    aria-pressed={active}
+                    aria-label={`Filter by ${f.label}${active ? " (active)" : ""}`}
+                  >
+                    {f.label}
+                  </button>
+                );
+              })}
+              <label
+                className="flex items-center gap-2 text-sm text-fg-muted"
+                // On the label: browsers suppress pointer events on a disabled
+                // control, so a title there would never show.
+                title={
+                  sortDisabled
+                    ? "Search results are sorted by relevance"
+                    : undefined
+                }
+              >
+                Sort by
+                <select
+                  value={sort}
+                  disabled={sortDisabled}
+                  onChange={(e) => {
+                    // Coming back to Random draws a new order, as a reload does.
+                    if (e.target.value === "random")
+                      setSeed(Math.random().toString(36).slice(2));
+                    onParams(
+                      withParams(params, {
+                        sort:
+                          e.target.value === DEFAULT_ATTENDEE_SORT
+                            ? null
+                            : e.target.value,
+                      }),
+                      { push: true }
+                    );
+                  }}
+                  className="pl-2 pr-9 py-1.5 text-sm rounded-md border border-line bg-surface-raised disabled:bg-surface-muted disabled:text-fg-subtle"
+                >
+                  {ATTENDEE_SORTS.map((s) => (
+                    <option key={s.value} value={s.value}>
+                      {s.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {rows.length > 0 && (
+                <span className="text-sm text-fg-subtle">
+                  {rows.length} attendee{rows.length === 1 ? "" : "s"}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {rows.length > 0 ? (
+            <ul className="divide-y divide-line-subtle border-t border-b border-line-subtle">
+              {rows.map((row) => (
+                <li key={row.id} className="py-3">
+                  <AttendeeRow
+                    card={row}
+                    href={links.guest(row.id, listQuery)}
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : entries.length === 0 &&
+            (status === "loading" || status === "idle") ? (
+            <p role="status" className="text-sm text-fg-subtle">
+              Loading attendees…
+            </p>
+          ) : status === "error" && entries.length === 0 ? (
+            <p role="alert" className="text-sm text-fg-subtle">
+              Could not load the attendees. Reload the page to try again.
+            </p>
+          ) : (
+            <p className="text-sm text-fg-subtle">
+              {onlyHasProfile ? (
+                <>
+                  Nobody has filled in a profile yet.
+                  {viewerId && (
+                    <>
+                      {" "}
+                      <a href={links.edit} className={LINK}>
+                        Be the first!
+                      </a>
+                    </>
+                  )}
+                </>
+              ) : (
+                "No attendees match."
+              )}
+            </p>
+          )}
+        </div>
       </div>
-    </div>
+      {props.profile?.({ matches: rows, everyone: everyone })}
+    </>
   );
 }
 

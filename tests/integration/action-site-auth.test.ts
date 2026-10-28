@@ -45,7 +45,6 @@ import {
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
 import { AUTH_COOKIE_NAME, createAuthCookie } from "@/utils/auth";
-import { listProfileActivity } from "@/app/legacy/(site)/guests/profile-activity";
 import { detectGuestClashes } from "@/app/legacy/(site)/[eventSlug]/clash-actions";
 import { revalidateEvent } from "@/app/legacy/(site)/[eventSlug]/session-actions";
 
@@ -76,26 +75,6 @@ describe("server actions require site auth", () => {
   });
 
   afterEach(() => vi.unstubAllEnvs());
-
-  it("listProfileActivity refuses a caller with no site-auth cookie", async () => {
-    const guest = await createGuest();
-    await expect(listProfileActivity(guest.id)).rejects.toThrow();
-  });
-
-  it("listProfileActivity answers a site-authenticated caller", async () => {
-    const event = await createEvent({ phase: "scheduling" });
-    const guest = await createGuest({ eventId: event.id });
-    await createSession(event.id, {
-      title: "Their talk",
-      hostIds: [guest.id],
-      startTime: T(10),
-      endTime: T(11),
-    });
-    await siteAuthenticate();
-
-    const activity = await listProfileActivity(guest.id);
-    expect(activity.hosting.map((s) => s.title)).toEqual(["Their talk"]);
-  });
 
   it("revalidateEvent refuses a caller with no site-auth cookie", async () => {
     await expect(revalidateEvent("some-event")).rejects.toThrow();

@@ -78,13 +78,13 @@ export default function NavBar({
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
                   {showGuestsLink && (
-                    <Link
-                      href="/legacy/guests"
+                    <AppLink
+                      href="/guests"
                       className="hidden sm:flex group gap-1 cursor-pointer items-center rounded-md px-3 py-2 text-sm font-medium text-fg-subtle hover:bg-surface-muted"
                     >
                       <UserGroupIcon className="block h-5 w-auto" />
                       Attendees
-                    </Link>
+                    </AppLink>
                   )}
                   {showNotifications && (
                     <Link
@@ -118,7 +118,7 @@ export default function NavBar({
               {showGuestsLink && (
                 <Disclosure.Button
                   as="a"
-                  href="/legacy/guests"
+                  href="/guests"
                   className="flex gap-2 items-center rounded-md px-3 py-2 text-base font-medium text-fg-subtle hover:bg-surface-muted"
                 >
                   <UserGroupIcon className="block h-5 w-auto" />

@@ -143,7 +143,7 @@ describe("the proposal modal", () => {
       ).toBeTruthy();
       expect(
         dialog().getAllByRole("link", { name: "HOST" })[0].getAttribute("href")
-      ).toBe("/legacy/guests/host");
+      ).toBe("/guests/host");
       expect(dialog().getByText("Rust").tagName).toBe("STRONG");
       expect(dialog().getByText(/Duration: 1 hour 20 minutes/)).toBeTruthy();
       expect(

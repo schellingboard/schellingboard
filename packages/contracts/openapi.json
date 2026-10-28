@@ -624,6 +624,10 @@
           "openToMeetings": {
             "type": "boolean",
             "description": "Can be asked for a 1-on-1 at some event"
+          },
+          "authProtected": {
+            "type": "boolean",
+            "description": "Taking this name asks for a password or an emailed code"
           }
         },
         "required": [
@@ -639,7 +643,8 @@
           "profileUpdatedAt",
           "version",
           "isHost",
-          "openToMeetings"
+          "openToMeetings",
+          "authProtected"
         ]
       },
       "ProfileActivity": {
@@ -4833,6 +4838,10 @@
                     "guestId": {
                       "type": ["string", "null"],
                       "description": "The guest the browser now acts as, or null when signed out"
+                    },
+                    "awaitingLogin": {
+                      "type": "boolean",
+                      "description": "True when the browser holds a protected name it has not logged in to"
                     }
                   },
                   "required": ["guestId"]
@@ -5997,9 +6006,14 @@
                     "events": {
                       "type": "array",
                       "items": { "$ref": "#/components/schemas/Event" }
+                    },
+                    "now": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "The server's clock, the dev fake clock included"
                     }
                   },
-                  "required": ["events"]
+                  "required": ["events", "now"]
                 }
               }
             }

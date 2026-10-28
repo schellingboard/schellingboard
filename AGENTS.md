@@ -223,7 +223,7 @@ Bad — `app/legacy/(site)/context.tsx` narrates itself; every one of these shou
 ```
 
 Good — each says something the code cannot (`app/api/rsvps/route.ts`,
-`server/modules/proposals/application/votes.ts`, `app/legacy/(site)/guests/avatar.tsx`):
+`server/modules/proposals/application/votes.ts`, `app/components/avatar.tsx`):
 
 ```ts
 // Without an explicit no-store, browsers heuristically cache this response

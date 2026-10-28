@@ -26,7 +26,7 @@ export default async function SettingsPage() {
   if (!currentUser) {
     return (
       <div className="flex flex-col gap-8">
-        <PageNotice backHref="/legacy/guests" backLabel="Attendees">
+        <PageNotice backHref="/guests" backLabel="Attendees">
           {await unverifiedUserMessage(cookieStore, "changing your settings")}
         </PageNotice>
         <AppearanceSettings />

@@ -71,6 +71,6 @@ export async function openNotificationAction(id: string): Promise<void> {
   );
 }
 
-// The session modal is the SPA's: `/{slug}?viewSession=…`, not under /legacy.
+// The session modal and the profiles are the SPA's, not under /legacy.
 const opensInSpa = (url: string) =>
-  /^\/[^/?#]+\?([^#]*&)?viewSession=/.test(url);
+  /^\/[^/?#]+\?([^#]*&)?viewSession=/.test(url) || /^\/guests(\/|$)/.test(url);

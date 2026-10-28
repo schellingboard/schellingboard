@@ -20,7 +20,7 @@ colour tokens in `styles/tokens.css` (the Next pages import the same file).
   forwarded: the catch-all route replaces the location with `/legacy` + path + query (a path
   already under `/legacy` is left alone), and a static route per legacy root page
   (`app/legacy-pages.ts`, checked against `app/legacy/` by `tests/unit/spa-legacy-pages.test.ts`)
-  keeps an event slug from shadowing `/settings`, `/guests`, and so on. While their screens are
+  keeps an event slug from shadowing `/settings`, `/admin`, and so on. While their screens are
   not SPA yet, `?viewSession=` and `?viewMeeting=` hand the `/{slug}` address on to the legacy
   schedule (`forwards-to-legacy.ts`).
 - Legacy pages link to the SPA with plain anchors, never Next's `Link` (`AppLink`, which
@@ -47,7 +47,7 @@ The files are read relative to the working directory, so the same code serves
   A bare `next dev` answers root pages with the shell (503 until the SPA is built):
   use `/legacy/...` URLs with it, as the screenshots script does.
 - E2E specs call `page.goto` with root paths; the fixture sends them to `/legacy/...` so a
-  click never lands before hydration, except an event's own address (`/{slug}`, any query, and `/{slug}/proposals/…`),
+  click never lands before hydration, except an event's own address (`/{slug}`, any query, and `/{slug}/proposals/…`) and `/guests/…`,
   which the SPA owns and opens as it is. One spec covers the shell's forward.
 
 ## Layout and rules
@@ -67,8 +67,8 @@ Who the browser acts as comes from `GET /api/v1/me/identity` (`ViewerProvider`,
 from a persisted copy. `choose` and `signOut` call `PUT`/`DELETE` on the same path. A
 protected name answers `guest.protected` and `UserMenu` sends the user to the legacy
 login, `/legacy/auth/login?guest=<id>`; a successful login lands on `/legacy`. The picker
-lists the guests it is given (the event snapshot's `guests`: members and hosts only, since
-`GET /guests` is closed to anonymous visitors, so a non-member cannot yet pick their name).
+lists the guests it is given: the event snapshot's `guests` (members and hosts) on an event
+page, the attendee directory (`GET /attendees`, everyone) on `/guests`.
 Sign-out and a switch between names clear the device's persisted replicas
 (`persistence.clear()`); a change of `guestId` also closes the feed and reopens the
 replica, the command runner and the queries (`useScheduleSession` does: the viewer is
