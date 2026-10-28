@@ -8,7 +8,7 @@ import {
 import { serverNow } from "@/utils/dev-clock-server";
 import { notificationUseCases } from "@/server/composition";
 import { resolveActor } from "@/server/kernel/actor";
-import { type AvailabilityFormData } from "@/utils/meeting-availability-form";
+import { type AvailabilityFormData } from "@schellingboard/domain/meeting-slot-days";
 import { SettingsForm } from "./settings-form";
 import { AccountSecurity } from "./account-security";
 import { PushNotifications } from "./push-notifications";

@@ -6,7 +6,7 @@ import { PRIMARY_BUTTON } from "@/app/components/buttons";
 import type {
   AvailabilityFormData,
   SlotDay,
-} from "@/utils/meeting-availability-form";
+} from "@schellingboard/domain/meeting-slot-days";
 
 const QUIET_BUTTON =
   "px-2 py-1 text-sm rounded-md text-fg-muted bg-surface-muted hover:bg-surface-hover transition-colors";

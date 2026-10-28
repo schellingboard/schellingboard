@@ -13,7 +13,10 @@ const REASONS: Record<string, string> = {
   "proposal.alreadyHost": "You already host this proposal.",
   "guest.notInEvent": "You are not part of this event.",
   "guest.protected": "This name is protected. Sign in with its password.",
+  "guest.unselected": "Choose who you are first.",
   "avatar.invalid": "That picture cannot be used.",
+  "meeting.slotsUnavailable":
+    "Some of those slots are no longer offered. Reload the page.",
   "meeting.slotUnavailable": "That slot is not available.",
   "meeting.slotPassed": "That slot has already passed.",
   "meeting.recipientUnavailable": "They are not available at that time.",

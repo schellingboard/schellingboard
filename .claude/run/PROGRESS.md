@@ -127,3 +127,5 @@ Step 11: `/guests/**` is the SPA's (`app/people-pages.tsx`, blank store from `re
 Do not call `runner.stop()` or `query.destroy()` in a mount effect cleanup: StrictMode re-runs the effect on the same object and leaves it dead.
 `tests/e2e/helpers/fixtures.ts` opens `/guests*` as it is (not under `/legacy`). The settings map check now uses `/legacy/settings`.
 The SPA shell still lacks "Show map". A protected-but-unverified name on the edit page shows the "select who you are" copy.
+
+Step 12a, for the settings step: `AvailabilityForm({...AvailabilityFormData, calls: meetingAvailabilityCalls(api)})`; the legacy `availabilityFormsFor` (utils) still builds the data server-side. Legacy `availability-form.tsx` and `saveMeetingAvailabilityAction` go with the settings takeover.

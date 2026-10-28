@@ -102,13 +102,13 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
   - [x] 10e. The 1-on-1 request form (done: `features/people/meeting-request-dialog.tsx`, `features/meetings/meeting-request-fields.tsx` shared with 12b, `commands/meeting-request.ts`; `ProfileModal` owns the dialog; `meeting-clash-text` moved to `packages/domain`). Legacy `meeting-picker.tsx` and its action are deleted at step 11.
 - [x] 11. Takeover: people (done: router owns `/guests/**` through `app/people-pages.tsx`; legacy guest pages, `profile-activity.ts` and `actions/profile.ts` deleted; `GET /events` carries `now`, attendees carry `authProtected`).
 - [ ] 12. **Meeting screens**, unrouted:
-  - [ ] 12a. The meetings page: my availability (`PUT /meeting-availability`).
+  - [x] 12a. My availability (done: `features/meetings/availability-form.tsx`, `commands/meeting-availability.ts`; `slotDaysFor` moved to `packages/domain`). It is the legacy Settings form; `availabilityFormFor(event, days, declared, now)` (domain) builds its data per event, dropping past events and narrowing `declared` to offered slots. The settings step (17a) wires it.
   - [ ] 12b. Booking (`bookMeeting`): candidates query, request command.
   - [ ] 12c. The meeting modal (`viewMeeting`): accept, decline, cancel commands with
         notices naming the other person and the slot; the meetings column opens it.
 - [ ] 13. **Takeover: meetings**. `viewMeeting` and `bookMeeting` stop forwarding
       (`forwards-to-legacy.ts` goes); legacy meeting pages and components are deleted.
-      E2E: `meetings-*`, then full `make test-e2e`. CHANGELOG.
+      E2E: `meetings-*` (`meetings-availability.spec` stays on `/legacy/settings` until step 18), then full `make test-e2e`. CHANGELOG.
 
 ### Session forms and the end of the Next schedule
 
@@ -129,8 +129,10 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
 ### Settings and notifications
 
 - [ ] 17. **Settings and notifications**, unrouted:
-  - [ ] 17a. Settings: email settings, push subscriptions on this device, and what
-        else the legacy page has.
+  - [ ] 17a. Settings: email settings, push subscriptions on this device, one
+        `AvailabilityForm` per attended event with meetings open (`meetingsOpen`, ordered by
+        start; data from `availabilityFormFor` on the snapshot's days and `me.availability`,
+        or a new GET), and what else the legacy page has.
   - [ ] 17b. Notifications: list, mark read, delete; the nav's unread indicator.
 - [ ] 18. **Takeover: settings and notifications**. Router owns `/settings` and
       `/notifications`; legacy pages deleted. E2E: `user-settings`, `notifications`,
