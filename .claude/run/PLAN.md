@@ -104,8 +104,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
 - [ ] 12. **Meeting screens**, unrouted:
   - [x] 12a. My availability (done: `features/meetings/availability-form.tsx`, `commands/meeting-availability.ts`; `slotDaysFor` moved to `packages/domain`). It is the legacy Settings form; `availabilityFormFor(event, days, declared, now)` (domain) builds its data per event, dropping past events and narrowing `declared` to offered slots. The settings step (17a) wires it.
   - [x] 12b. Booking (done: `queries/meeting-candidates.ts` over `GET /meeting-candidates`, `features/meetings/book-meeting.tsx`; the request command is 10e's `meetingRequestCalls`, the fields its shared `MeetingRequestFields`). Step 13 wires it: `profileHref` = `/guests/<id>`, `onBooked` refreshes the meetings column.
-  - [ ] 12c. The meeting modal (`viewMeeting`): accept, decline, cancel commands with
-        notices naming the other person and the slot; the meetings column opens it.
+  - [x] 12c. The meeting modal (done: `features/meetings/meeting-modal.tsx`, `commands/meeting-answer.ts` with `answerMeeting`/`cancelMeeting`, optimistic and named in notices; the column's links already carry `viewMeeting`). Step 13 wires it.
 - [ ] 13. **Takeover: meetings**. `viewMeeting` and `bookMeeting` stop forwarding
       (`forwards-to-legacy.ts` goes); legacy meeting pages and components are deleted.
       E2E: `meetings-*` (`meetings-availability.spec` stays on `/legacy/settings` until step 18), then full `make test-e2e`. CHANGELOG.

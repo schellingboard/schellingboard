@@ -20,7 +20,7 @@ export function Dialog({
 }: {
   open: boolean;
   onClose: () => void;
-  title: string;
+  title: ReactNode;
   children: ReactNode;
   wide?: boolean;
   /** The dialog's accessible name when it is not its visible title. */
