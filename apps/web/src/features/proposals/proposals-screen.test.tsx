@@ -216,6 +216,19 @@ describe("the proposals list", () => {
     expect(await within(table).findByText("No proposals found")).toBeTruthy();
   });
 
+  it("keeps the sort menu until the search results show", async () => {
+    setup("voting");
+    const sortMenu = screen.getByLabelText<HTMLSelectElement>("Sort by");
+
+    await userEvent.type(
+      screen.getByPlaceholderText("Search proposals..."),
+      "garden"
+    );
+
+    expect(sortMenu.disabled).toBe(false);
+    await waitFor(() => expect(sortMenu.disabled).toBe(true));
+  });
+
   it("counts a filter's proposals before the search narrows them", async () => {
     setup("voting", { me: null });
     await userEvent.click(

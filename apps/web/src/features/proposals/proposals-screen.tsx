@@ -177,8 +177,8 @@ function ProposalTable({
     defaultSort(snapshot.event, now)
   );
   const effective = effectiveFilter(filter, guestId);
-  const searching = query.trim() !== "";
   const searched = useDebouncedSearch(query);
+  const searching = searched.trim() !== "";
   const filteredCount = useMemo(
     () => filteredRows(rows, { filter, guestId, votes }).length,
     [rows, filter, guestId, votes]
