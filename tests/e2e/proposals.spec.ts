@@ -7,9 +7,13 @@ import { selectUser } from "./helpers/user";
 // Parallel tests add proposals above this one, and a row that moves between
 // mouse down and up is not clicked. Searching keeps the others out; the sort
 // menu turns off once the debounced results show.
-async function editFromList(page: Page, title: string) {
+async function searchList(page: Page, title: string) {
   await page.getByPlaceholder("Search proposals").fill(title);
   await expect(page.getByRole("combobox", { name: "Sort by" })).toBeDisabled();
+}
+
+async function editFromList(page: Page, title: string) {
+  await searchList(page, title);
   await page
     .getByRole("row", { name: new RegExp(title) })
     .getByRole("link", { name: /Edit/i })
@@ -213,25 +217,12 @@ test("should open proposal detail page when clicking on a proposal @004-US4", as
 }) => {
   await login(page);
 
-  // Go to proposals list
   await page.goto("/Conference-Alpha/proposals");
 
-  // Find any existing proposal in the table (should have some from test data).
-  // Exclude throwaway "Playwright ..." proposals: other tests in this file
-  // create, rename, and delete them in parallel workers, so picking one here
-  // races with their deletion and breaks the final "still in the list" check.
-  const firstProposalRow = page
-    .getByRole("row")
-    .filter({ hasNotText: "Playwright" })
-    .nth(1); // Skip header row
-  await expect(firstProposalRow).toBeVisible();
-
-  // Get the proposal title for verification
-  const proposalTitleCell = firstProposalRow.locator("td").first();
-  const proposalTitle = (await proposalTitleCell.textContent()) || "";
-  expect(proposalTitle).toBeTruthy();
-
-  await proposalTitleCell.click();
+  const proposalTitle = "Hands-on Docker and Kubernetes";
+  const proposalLink = page.getByRole("link", { name: proposalTitle });
+  await searchList(page, proposalTitle);
+  await proposalLink.click();
 
   // Verify the modal is open using the proper ARIA role
   const modal = page.getByRole("dialog");
@@ -268,7 +259,8 @@ test("should open proposal detail page when clicking on a proposal @004-US4", as
   await expect(page).toHaveURL(/\/Conference-Alpha\/proposals$/);
 
   // Test opening the modal again to verify it can be reopened
-  await proposalTitleCell.click();
+  await searchList(page, proposalTitle);
+  await proposalLink.click();
   await expect(modal).toBeVisible();
 
   // Test closing by clicking outside the modal content (common user behavior)
