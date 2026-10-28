@@ -6,6 +6,7 @@ import {
 } from "@schellingboard/contracts/auth";
 import {
   attendeeListSchema,
+  profileActivitySchema,
   profileBodySchema,
   publicProfileListSchema,
   publicProfileSchema,
@@ -78,6 +79,19 @@ const getProfile = createRoute({
   request: { params: idParam },
   responses: {
     200: json(publicProfileSchema, "The public profile"),
+    ...problemDefault,
+  },
+});
+
+const getProfileActivity = createRoute({
+  method: "get",
+  path: "/guests/{id}/activity",
+  tags: ["people"],
+  description:
+    "What a guest hosts and has proposed, at every event: the profile's Hosting and Proposals.",
+  request: { params: idParam },
+  responses: {
+    200: json(profileActivitySchema, "The guest's sessions and proposals"),
     ...problemDefault,
   },
 });
@@ -219,6 +233,14 @@ export function addPeopleRoutes(app: App, people: () => PeopleUseCases) {
     });
     if (!result.ok) return problem(result.error);
     return c.json(toProfileView(result.value), 200);
+  });
+
+  app.openapi(getProfileActivity, async (c) => {
+    const result = await people().getProfileActivity(c.var.actor, {
+      guestId: c.req.valid("param").id,
+    });
+    if (!result.ok) return problem(result.error);
+    return c.json(result.value, 200);
   });
 
   app.openapi(updateMyProfile, async (c) => {

@@ -8,11 +8,12 @@ import {
 import { saveMeetingAvailability } from "./availability";
 import { listMeetingCandidates } from "./candidates";
 import { cancelMeeting, requestMeeting, respondToMeeting } from "./meetings";
-import { listMyMeetings } from "./queries";
+import { listMeetingOptions, listMyMeetings } from "./queries";
 
 export function createMeetingUseCases(deps: MeetingDeps) {
   return {
     listMyMeetings: listMyMeetings(deps),
+    listMeetingOptions: listMeetingOptions(deps),
     listMeetingCandidates: listMeetingCandidates(deps),
     requestMeeting: requestMeeting(deps),
     respondToMeeting: respondToMeeting(deps),

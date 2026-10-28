@@ -15,7 +15,10 @@ export interface AvatarStore {
 
 export interface PeopleDeps {
   uow: UnitOfWork;
-  repos: Pick<Repositories, "events" | "guests">;
+  repos: Pick<
+    Repositories,
+    "events" | "guests" | "sessions" | "sessionProposals"
+  >;
   avatars: AvatarStore;
   sendTestEmail: (to: { name: string; email: string }) => Promise<void>;
 }

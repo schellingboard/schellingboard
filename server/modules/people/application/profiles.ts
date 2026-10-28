@@ -20,6 +20,7 @@ import {
   versionConflict,
   type Result,
 } from "@/server/kernel/result";
+import { eventNameToSlug } from "@/utils/utils";
 import type { PeopleDeps, ValidatedImage } from "../ports";
 
 export interface ProfileInput {
@@ -69,6 +70,41 @@ export const getProfile =
     const guest = await repos.guests.findById(guestId);
     if (!guest) return profileNotFound();
     return ok(sanitizeGuest(guest));
+  };
+
+export interface ProfileActivity {
+  hosting: ActivityItem[];
+  proposals: ActivityItem[];
+}
+
+interface ActivityItem {
+  id: string;
+  title: string;
+  eventSlug: string;
+}
+
+export const getProfileActivity =
+  ({ repos }: PeopleDeps) =>
+  async (
+    _actor: Actor,
+    { guestId }: { guestId: string }
+  ): Promise<Result<ProfileActivity>> => {
+    if (!(await repos.guests.findById(guestId))) return profileNotFound();
+    const [events, hosted, proposals] = await Promise.all([
+      repos.events.list(),
+      repos.sessions.listHostedByGuest(guestId),
+      repos.sessionProposals.listByHost(guestId),
+    ]);
+    const item = (x: { id: string; title: string; eventId: string }) => {
+      const event = events.find((e) => e.id === x.eventId);
+      return event
+        ? [{ id: x.id, title: x.title, eventSlug: eventNameToSlug(event.name) }]
+        : [];
+    };
+    return ok({
+      hosting: hosted.flatMap(item),
+      proposals: proposals.flatMap(item),
+    });
   };
 
 type ProfileFields = Omit<ProfileInput, "avatar" | "expectedVersion">;

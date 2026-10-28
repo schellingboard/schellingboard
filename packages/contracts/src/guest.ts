@@ -182,6 +182,19 @@ export const attendeeViewSchema = publicProfileSchema
 
 export const attendeeListSchema = pageSchema(attendeeViewSchema);
 
+const activityItemSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  eventSlug: z.string().describe("The address segment of the item's event"),
+});
+
+export const profileActivitySchema = z
+  .object({
+    hosting: z.array(activityItemSchema).describe("Sessions, at any event"),
+    proposals: z.array(activityItemSchema).describe("Proposals, at any event"),
+  })
+  .meta({ id: "ProfileActivity" });
+
 export const adminGuestBodySchema = z.object({
   name: z.string(),
   email: z.string(),

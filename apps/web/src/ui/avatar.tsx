@@ -1,6 +1,6 @@
 import { cx } from "./cx";
 
-function initials(name: string): string {
+export function initials(name: string): string {
   return name
     .trim()
     .split(/\s+/)

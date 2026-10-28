@@ -319,6 +319,105 @@
           "clashes"
         ]
       },
+      "MeetingOptions": {
+        "type": "object",
+        "properties": {
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "eventId": { "type": "string" },
+                "eventName": { "type": "string" },
+                "meetingPoints": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "string" },
+                      "name": { "type": "string" },
+                      "description": { "type": "string" }
+                    },
+                    "required": ["id", "name", "description"]
+                  }
+                },
+                "lengths": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "slotCount": { "type": "integer" },
+                      "minutes": { "type": "number" },
+                      "days": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "label": { "type": "string" },
+                            "slots": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "start": { "type": "string" },
+                                  "label": { "type": "string" },
+                                  "state": {
+                                    "type": "string",
+                                    "enum": ["available", "busy", "unavailable"]
+                                  },
+                                  "clashes": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "guestName": { "type": "string" },
+                                        "kind": {
+                                          "type": "string",
+                                          "enum": [
+                                            "hosting",
+                                            "attending",
+                                            "meeting",
+                                            "busy"
+                                          ]
+                                        },
+                                        "title": { "type": ["string", "null"] },
+                                        "isViewer": { "type": "boolean" }
+                                      },
+                                      "required": [
+                                        "guestName",
+                                        "kind",
+                                        "title",
+                                        "isViewer"
+                                      ],
+                                      "description": "Only the caller's own commitment is named; another's is busy"
+                                    },
+                                    "description": "Empty unless the slot is busy"
+                                  }
+                                },
+                                "required": [
+                                  "start",
+                                  "label",
+                                  "state",
+                                  "clashes"
+                                ]
+                              }
+                            }
+                          },
+                          "required": ["label", "slots"]
+                        }
+                      }
+                    },
+                    "required": ["slotCount", "minutes", "days"]
+                  }
+                }
+              },
+              "required": ["eventId", "eventName", "meetingPoints", "lengths"]
+            },
+            "description": "One per event the caller and the guest share where 1-on-1s are open and the guest is bookable"
+          }
+        },
+        "required": ["options"]
+      },
       "Event": {
         "type": "object",
         "properties": {
@@ -542,6 +641,44 @@
           "isHost",
           "openToMeetings"
         ]
+      },
+      "ProfileActivity": {
+        "type": "object",
+        "properties": {
+          "hosting": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "title": { "type": "string" },
+                "eventSlug": {
+                  "type": "string",
+                  "description": "The address segment of the item's event"
+                }
+              },
+              "required": ["id", "title", "eventSlug"]
+            },
+            "description": "Sessions, at any event"
+          },
+          "proposals": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "title": { "type": "string" },
+                "eventSlug": {
+                  "type": "string",
+                  "description": "The address segment of the item's event"
+                }
+              },
+              "required": ["id", "title", "eventSlug"]
+            },
+            "description": "Proposals, at any event"
+          }
+        },
+        "required": ["hosting", "proposals"]
       },
       "Notification": {
         "type": "object",
@@ -3890,6 +4027,39 @@
         "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
       }
     },
+    "/api/v1/guests/{id}/meeting-options": {
+      "get": {
+        "tags": ["meetings"],
+        "description": "When the acting guest could ask this guest for a 1-on-1, per shared event; empty for yourself or without a chosen name.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The bookable slots, by event and length",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MeetingOptions" }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+      }
+    },
     "/api/v1/meetings/{id}/accept": {
       "post": {
         "tags": ["meetings"],
@@ -4919,6 +5089,39 @@
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/PublicProfile" }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+      }
+    },
+    "/api/v1/guests/{id}/activity": {
+      "get": {
+        "tags": ["people"],
+        "description": "What a guest hosts and has proposed, at every event: the profile's Hosting and Proposals.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The guest's sessions and proposals",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProfileActivity" }
               }
             }
           },

@@ -2039,6 +2039,53 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/guests/{id}/meeting-options": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description When the acting guest could ask this guest for a 1-on-1, per shared event; empty for yourself or without a chosen name. */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The bookable slots, by event and length */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["MeetingOptions"];
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/meetings/{id}/accept": {
     parameters: {
       query?: never;
@@ -2918,6 +2965,53 @@ export interface paths {
           };
           content: {
             "application/json": components["schemas"]["PublicProfile"];
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/guests/{id}/activity": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description What a guest hosts and has proposed, at every event: the profile's Hosting and Proposals. */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The guest's sessions and proposals */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["ProfileActivity"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -5952,6 +6046,39 @@ export interface components {
         isViewer: boolean;
       }[];
     };
+    MeetingOptions: {
+      /** @description One per event the caller and the guest share where 1-on-1s are open and the guest is bookable */
+      options: {
+        eventId: string;
+        eventName: string;
+        meetingPoints: {
+          id: string;
+          name: string;
+          description: string;
+        }[];
+        lengths: {
+          slotCount: number;
+          minutes: number;
+          days: {
+            label: string;
+            slots: {
+              start: string;
+              label: string;
+              /** @enum {string} */
+              state: "available" | "busy" | "unavailable";
+              /** @description Empty unless the slot is busy */
+              clashes: {
+                guestName: string;
+                /** @enum {string} */
+                kind: "hosting" | "attending" | "meeting" | "busy";
+                title: string | null;
+                isViewer: boolean;
+              }[];
+            }[];
+          }[];
+        }[];
+      }[];
+    };
     Event: {
       id: string;
       slug: string;
@@ -6073,6 +6200,22 @@ export interface components {
       isHost: boolean;
       /** @description Can be asked for a 1-on-1 at some event */
       openToMeetings: boolean;
+    };
+    ProfileActivity: {
+      /** @description Sessions, at any event */
+      hosting: {
+        id: string;
+        title: string;
+        /** @description The address segment of the item's event */
+        eventSlug: string;
+      }[];
+      /** @description Proposals, at any event */
+      proposals: {
+        id: string;
+        title: string;
+        /** @description The address segment of the item's event */
+        eventSlug: string;
+      }[];
     };
     Notification: {
       id: string;

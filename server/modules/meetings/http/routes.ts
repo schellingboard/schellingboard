@@ -4,6 +4,7 @@ import {
   meetingCancelBodySchema,
   meetingCandidatesQuerySchema,
   meetingCandidatesSchema,
+  meetingOptionsSchema,
   meetingRequestSchema,
   meetingSchema,
   myMeetingsSchema,
@@ -42,6 +43,19 @@ const listCandidates = createRoute({
   request: { query: meetingCandidatesQuerySchema },
   responses: {
     200: json(meetingCandidatesSchema, "The slot and who is free in it"),
+    ...problemDefault,
+  },
+});
+
+const listMeetingOptions = createRoute({
+  method: "get",
+  path: "/guests/{id}/meeting-options",
+  tags: ["meetings"],
+  description:
+    "When the acting guest could ask this guest for a 1-on-1, per shared event; empty for yourself or without a chosen name.",
+  request: { params: idParam },
+  responses: {
+    200: json(meetingOptionsSchema, "The bookable slots, by event and length"),
     ...problemDefault,
   },
 });
@@ -121,6 +135,16 @@ export function addMeetingRoutes(app: App, meetings: () => MeetingUseCases) {
     );
     if (!result.ok) return problem(result.error);
     return c.json(result.value, 200);
+  });
+
+  app.openapi(listMeetingOptions, async (c) => {
+    const result = await meetings().listMeetingOptions(
+      c.var.actor,
+      { guestId: c.req.valid("param").id },
+      c.var.now
+    );
+    if (!result.ok) return problem(result.error);
+    return c.json({ options: result.value }, 200);
   });
 
   app.openapi(requestMeeting, async (c) => {

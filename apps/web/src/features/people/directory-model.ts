@@ -68,6 +68,11 @@ export function directoryView({
   };
 }
 
+/** The canonical order, for a profile opened with no list behind it, or one the filters exclude. */
+export function everyoneIn(cards: DirectoryCard[]): DirectoryCard[] {
+  return searchAttendees(cards, "");
+}
+
 export type { AttendeeFilter };
 
 /** `params` with each update applied; null or an empty value removes the key. */

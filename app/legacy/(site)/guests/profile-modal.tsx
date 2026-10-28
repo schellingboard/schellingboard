@@ -28,7 +28,7 @@ import {
   type SwipeEnds,
   swipeOffset,
   trackSwipe,
-} from "@/app/legacy/(site)/guests/swipe";
+} from "@schellingboard/domain/swipe";
 
 /** How long the profile takes to finish a swipe the finger has let go of. */
 const SETTLE_MS = 200;

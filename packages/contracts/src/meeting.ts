@@ -120,6 +120,47 @@ export const meetingCandidatesSchema = z.object({
   ),
 });
 
+const optionSlotSchema = z.object({
+  start: z.string(),
+  label: z.string(),
+  state: z.enum(["available", "busy", "unavailable"]),
+  clashes: z.array(clashSchema).describe("Empty unless the slot is busy"),
+});
+
+export const meetingOptionsSchema = z
+  .object({
+    options: z
+      .array(
+        z.object({
+          eventId: z.string(),
+          eventName: z.string(),
+          meetingPoints: z.array(
+            z.object({
+              id: z.string(),
+              name: z.string(),
+              description: z.string(),
+            })
+          ),
+          lengths: z.array(
+            z.object({
+              slotCount: z.number().int(),
+              minutes: z.number(),
+              days: z.array(
+                z.object({
+                  label: z.string(),
+                  slots: z.array(optionSlotSchema),
+                })
+              ),
+            })
+          ),
+        })
+      )
+      .describe(
+        "One per event the caller and the guest share where 1-on-1s are open and the guest is bookable"
+      ),
+  })
+  .meta({ id: "MeetingOptions" });
+
 export const meetingCancelBodySchema = meetingCancelSchema.omit({
   meetingId: true,
 });

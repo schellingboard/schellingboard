@@ -96,11 +96,13 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
 
 - [ ] 10. **People screens**, unrouted:
   - [x] 10a. The directory (done: `GET /attendees` site-wide, open like `GET /guests/{id}`; `queries/directory.ts`; `features/people/` model, `DirectoryScreen`, `PeopleLinks`; `ui/avatar.tsx`; attendee search, filters, profile helpers, relative time and accent-insensitive search moved to `packages/domain`).
-  - [ ] 10b. The profile: details, hosting and proposals from the replica, meeting
-        options; an API read for what the replica lacks replaces the
-        `profile-activity.ts` server action.
+  - [x] 10b. The profile (done: `features/people/profile-modal.tsx`, `profile-body.tsx`, `profile-photo.tsx`; `queries/profile-activity.ts` over new `GET /guests/{id}/activity` and `GET /guests/{id}/meeting-options`; `swipe.ts` moved to `packages/domain`). Hosting, proposals and meeting options come from the API, not the replica: the directory is site-wide, so there is no event replica on `/guests`, and they span every event.
   - [ ] 10c. Profile comments (the shared comments feature).
   - [ ] 10d. Edit my profile and photo (`PUT /me/profile`, avatar upload).
+  - [ ] 10e. The 1-on-1 request form behind the profile's "Schedule a 1-on-1" buttons
+        (`onSchedule(guestId, option)`): length chips, slot list, meeting point and
+        message fields (the fields are shared with 12b), `POST /meetings`. Legacy
+        `meeting-picker.tsx` and its action are deleted at step 11.
 - [ ] 11. **Takeover: people**. Router owns `/guests/**`; legacy guest pages and
       `profile-activity.ts` are deleted. E2E: `attendee-profiles`, `profile`,
       `profile-comments`, `profile-photo`. CHANGELOG if anything visible changed.

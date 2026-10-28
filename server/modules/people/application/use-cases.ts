@@ -12,6 +12,7 @@ import { importGuests } from "./guest-import";
 import { chooseGuest, currentGuest, signOut } from "./identity";
 import {
   getProfile,
+  getProfileActivity,
   listAttendees,
   listEventProfiles,
   removeMyAvatar,
@@ -25,6 +26,7 @@ export function createPeopleUseCases(deps: PeopleDeps) {
     currentGuest: currentGuest(deps),
     signOut,
     getProfile: getProfile(deps),
+    getProfileActivity: getProfileActivity(deps),
     listAttendees: listAttendees(deps),
     listEventProfiles: listEventProfiles(deps),
     updateMyProfile: updateMyProfile(deps),

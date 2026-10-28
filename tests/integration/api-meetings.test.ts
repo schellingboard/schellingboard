@@ -74,6 +74,48 @@ afterEach(() => vi.unstubAllEnvs());
 
 describe("/api/v1 meetings", () => {
   it(
+    "lists what the caller could ask a guest for, and nothing for yourself",
+    { tags: ["012-US3"] },
+    async () => {
+      const { event, ada, grace } = await scenario();
+
+      const res = await call("GET", `/guests/${grace.id}/meeting-options`, {
+        cookie: asGuest(ada.id),
+      });
+
+      expect(res.status).toBe(200);
+      const { options } = (await res.json()) as {
+        options: {
+          eventId: string;
+          eventName: string;
+          lengths: {
+            slotCount: number;
+            days: { slots: { start: string; state: string }[] }[];
+          }[];
+        }[];
+      };
+      expect(options).toHaveLength(1);
+      expect(options[0]).toMatchObject({
+        eventId: event.id,
+        eventName: event.name,
+      });
+      const slots = options[0].lengths[0].days.flatMap((d) => d.slots);
+      expect(slots.find((s) => s.start === SLOT)?.state).toBe("available");
+      expect(slots.find((s) => s.start !== SLOT)?.state).toBe("unavailable");
+
+      const own = await call("GET", `/guests/${ada.id}/meeting-options`, {
+        cookie: asGuest(ada.id),
+      });
+      expect(await own.json()).toEqual({ options: [] });
+      const anonymous = await call(
+        "GET",
+        `/guests/${grace.id}/meeting-options`
+      );
+      expect(await anonymous.json()).toEqual({ options: [] });
+    }
+  );
+
+  it(
     "asks for a 1-on-1 once per key, accepts it, and lists it to its pair",
     { tags: ["012-US3", "012-US4", "012-US5", "019-US2"] },
     async () => {

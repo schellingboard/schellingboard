@@ -16,7 +16,12 @@ import { GET, POST, PUT, DELETE } from "@/app/api/v1/[[...route]]/route";
 import { getRepositories } from "@/db/container";
 import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
 import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createEvent, createGuest, createSession } from "../helpers/factories";
+import {
+  createEvent,
+  createGuest,
+  createProposal,
+  createSession,
+} from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 import { createImageFile } from "../helpers/utils";
 import { createAdminAuthCookie } from "@/utils/auth";
@@ -210,6 +215,38 @@ describe("/api/v1 profiles", () => {
         Object.fromEntries(all.map((a) => [a.name, a.openToMeetings]))
       ).toMatchObject({ "Open Person": true, "Plain Person": false });
       expect(text).not.toContain("host@example.com");
+    }
+  );
+
+  it(
+    "lists what a guest hosts and proposes across events, with the event's address",
+    { tags: ["011-US4"] },
+    async () => {
+      const ada = await createGuest({ name: "Ada" });
+      const one = await createEvent({ name: "Spring Camp" });
+      const two = await createEvent({ name: "Autumn Camp" });
+      const session = await createSession(one.id, {
+        title: "Hosted talk",
+        hostIds: [ada.id],
+      });
+      await createSession(one.id, { title: "Someone else's" });
+      const proposal = await createProposal(two.id, [ada.id], {
+        title: "Proposed talk",
+      });
+
+      const res = await call("GET", `/guests/${ada.id}/activity`);
+
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({
+        hosting: [
+          { id: session.id, title: "Hosted talk", eventSlug: "Spring-Camp" },
+        ],
+        proposals: [
+          { id: proposal.id, title: "Proposed talk", eventSlug: "Autumn-Camp" },
+        ],
+      });
+      const missing = await call("GET", "/guests/nope/activity");
+      expect(missing.status).toBe(404);
     }
   );
 

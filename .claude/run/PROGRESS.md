@@ -48,6 +48,13 @@ with `useDirectoryQuery`-style loading still to do (`createDirectoryQuery({api})
 (`legacyPeopleLinks` is the legacy address). Dropped: the legacy pager (never more than one page). Excerpts use `ui/plain-text`, cruder than the
 server's parser.
 
+Step 10b, for step 11 (wiring): `ProfileModal({guestId, matches, everyone, viewerId, links, activity, onOpen, onClose, onSchedule})`
+renders over `DirectoryScreen`. `matches` = `directoryView(...).rows`, `everyone` = `everyoneIn(cards)`, computed by the page with the
+screen's `seed`/`params` (lift the memo or share a hook). `activity` = stable `(id) => createProfileActivityQuery({api, guestId: id})`.
+`onOpen(id)` pushes `/guests/<id>?<listQuery>` (keep the list query); `onClose` pushes the list, not Back. `onSchedule` is inert until 10e.
+`legacyProfileLinks` = today's addresses. `brand-icons` exist twice until step 11. `ui/markdown` gained bare-URL/e-mail links, mailto/tel,
+numbered lists and quotes (still no headings; `#` is stripped, no react-markdown by choice). `meetingOptionsFor` takes an optional `now`.
+
 ## Questions
 
 0. The SPA shell has no "Show map" button (the uploaded site map); only legacy pages show it. The
