@@ -20,7 +20,7 @@ import {
   useSlotIncrement,
 } from "@/app/legacy/(site)/context";
 import { Modal } from "@/app/components/modal";
-import { clashLines } from "@/utils/meeting-clash-text";
+import { clashLines } from "@schellingboard/domain/meeting-clash-text";
 import {
   blockStatus,
   blockTimeLabel,

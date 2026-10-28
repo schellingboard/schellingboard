@@ -9,7 +9,7 @@ import { MeetingLengthChips } from "@/app/components/meeting-length-chips";
 import { MeetingRequestFields } from "@/app/components/meeting-request-fields";
 import { Modal } from "@/app/components/modal";
 import Link from "next/link";
-import { clashLines } from "@/utils/meeting-clash-text";
+import { clashLines } from "@schellingboard/domain/meeting-clash-text";
 import type { meetingCandidatesSchema } from "@schellingboard/contracts/meeting";
 import type { z } from "zod";
 

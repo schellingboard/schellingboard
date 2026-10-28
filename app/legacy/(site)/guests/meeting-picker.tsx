@@ -6,7 +6,7 @@ import { requestMeetingAction } from "@/app/actions/meetings";
 import { PRIMARY_BUTTON, SECONDARY_BUTTON } from "@/app/components/buttons";
 import { MeetingLengthChips } from "@/app/components/meeting-length-chips";
 import { MeetingRequestFields } from "@/app/components/meeting-request-fields";
-import { clashLines } from "@/utils/meeting-clash-text";
+import { clashLines } from "@schellingboard/domain/meeting-clash-text";
 import type { MeetingDayOption, MeetingOption } from "@/utils/meeting-options";
 
 function SlotList({

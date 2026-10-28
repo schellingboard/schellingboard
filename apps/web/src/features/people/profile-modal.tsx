@@ -22,6 +22,8 @@ import type {
 import { Comments, type CommentsHandle } from "../comments/comments-section";
 import { ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from "../../ui/icons";
 import type { DirectoryCard } from "./directory-model";
+import type { MeetingRequestCalls } from "../../commands/meeting-request";
+import { MeetingRequestDialog } from "./meeting-request-dialog";
 import type { ProfileLinks } from "./links";
 import { ProfileBody } from "./profile-body";
 
@@ -43,7 +45,8 @@ export type ProfileModalProps = {
   /** Must change `guestId` in the same update, or a slide aims at the old profile. */
   onOpen: (guestId: string) => void;
   onClose: () => void;
-  onSchedule: (guestId: string, option: ProfileMeetingOption) => void;
+  /** The 1-on-1 request form's call, for "Schedule a 1-on-1". */
+  meetingRequests: MeetingRequestCalls;
   /** Must be stable; called once per profile read, with the name notices use. */
   comments: (guestId: string, name: string) => CommentsHandle;
   setHash: (hash: string) => void;
@@ -66,6 +69,10 @@ export function ProfileModal(props: ProfileModalProps) {
   const index = collection.findIndex((a) => a.id === guestId);
   const guest = index >= 0 ? collection[index] : null;
 
+  const [scheduling, setScheduling] = useState<{
+    id: string;
+    option: ProfileMeetingOption;
+  } | null>(null);
   const [zoomedFor, setZoomedFor] = useState<string | null>(null);
   const zoomed = zoomedFor === guestId;
   const activity = useProfileActivity(props.activity, guestId);
@@ -192,6 +199,7 @@ export function ProfileModal(props: ProfileModalProps) {
   useEffect(() => {
     document.documentElement.style.overflow = "hidden";
     const onKeyDown = (e: KeyboardEvent) => {
+      if (scheduling) return;
       if (e.key === "Escape") {
         // One layer at a time: the enlarged photo first, so Escape never
         // closes the profile out from under someone looking closely.
@@ -210,7 +218,7 @@ export function ProfileModal(props: ProfileModalProps) {
       document.documentElement.style.overflow = "";
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [onClose, goToAnimated, zoomed]);
+  }, [onClose, goToAnimated, zoomed, scheduling]);
 
   const sliding =
     drag !== null && (drag.phase === "settling" || drag.swipe.axis === "x");
@@ -321,7 +329,7 @@ export function ProfileModal(props: ProfileModalProps) {
                       links={links}
                       zoomed={current && zoomed}
                       onToggleZoom={() => setZoomedFor(zoomed ? null : guestId)}
-                      onSchedule={props.onSchedule}
+                      onSchedule={(id, option) => setScheduling({ id, option })}
                       comments={
                         current && (
                           <Comments
@@ -350,6 +358,17 @@ export function ProfileModal(props: ProfileModalProps) {
           )}
         </div>
       </div>
+      {scheduling && (
+        <MeetingRequestDialog
+          option={scheduling.option}
+          recipientId={scheduling.id}
+          recipientName={
+            collection.find((a) => a.id === scheduling.id)?.name ?? ""
+          }
+          actions={props.meetingRequests}
+          onClose={() => setScheduling(null)}
+        />
+      )}
     </div>
   );
 }

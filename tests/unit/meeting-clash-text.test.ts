@@ -5,7 +5,7 @@ import {
   clashLines,
   toMeetingClashes,
   type MeetingClash,
-} from "@/utils/meeting-clash-text";
+} from "@schellingboard/domain/meeting-clash-text";
 
 describe("toMeetingClashes", () => {
   const hosting = {

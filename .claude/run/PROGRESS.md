@@ -50,7 +50,7 @@ server's parser.
 Step 10b, for step 11 (wiring): `ProfileModal({guestId, matches, everyone, viewerId, links, activity, onOpen, onClose, onSchedule})`
 renders over `DirectoryScreen`. `matches` = `directoryView(...).rows`, `everyone` = `everyoneIn(cards)`, computed by the page with the
 screen's `seed`/`params` (lift the memo or share a hook). `activity` = stable `(id) => createProfileActivityQuery({api, guestId: id})`.
-`onOpen(id)` pushes `/guests/<id>?<listQuery>` (keep the list query); `onClose` pushes the list, not Back. `onSchedule` is inert until 10e.
+`onOpen(id)` pushes `/guests/<id>?<listQuery>` (keep the list query); `onClose` pushes the list, not Back. `onSchedule` was replaced in 10e by `meetingRequests: meetingRequestCalls(api)`; the modal opens the request dialog itself.
 `legacyProfileLinks` = today's addresses. `brand-icons` exist twice until step 11. `ui/markdown` gained bare-URL/e-mail links, mailto/tel,
 numbered lists, quotes and headings as bold lines (no react-markdown by choice). `meetingOptionsFor` takes an optional `now`.
 
@@ -119,3 +119,5 @@ non-members: `proposal.hostNotInEvent`), where legacy listed every guest. A new 
 `ConfirmDialog cancelLabel`. Legacy `markdown-options.ts` now wraps `domain/markdown-edit.ts`; the legacy
 textarea goes at the takeovers (11, 15). Not copied: legacy's lock/phase checks (the server refuses; the
 reason shows), and the "Delete" trash icon.
+
+Step 10e: legacy `requestMeetingAction` stays (used by `book-meeting.tsx` until step 13). `MeetingRequestFields` lost `cancelLabel` (12b may need it back).

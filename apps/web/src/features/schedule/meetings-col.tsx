@@ -13,7 +13,7 @@ import {
   useScheduleMatch,
 } from "./context";
 import { SLOT_HEIGHT_PX } from "./grid-layout";
-import { clashLines } from "./meeting-clash-text";
+import { clashLines } from "@schellingboard/domain/meeting-clash-text";
 import { meetingColumnRows } from "./meeting-column";
 import {
   blockStatus,

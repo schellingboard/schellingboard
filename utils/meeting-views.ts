@@ -3,7 +3,7 @@ import type { Repositories } from "@/db/container";
 import type { z } from "zod";
 import type { myMeetingsSchema } from "@schellingboard/contracts/meeting";
 import { clashesForInterval, loadGuestSchedules } from "@/utils/guest-clashes";
-import { toMeetingClashes } from "@/utils/meeting-clash-text";
+import { toMeetingClashes } from "@schellingboard/domain/meeting-clash-text";
 import { slotTimeLabel } from "@schellingboard/domain/meeting-slots";
 
 export type MyMeetingsResponse = z.infer<typeof myMeetingsSchema>;

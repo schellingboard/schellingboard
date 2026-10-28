@@ -11,6 +11,7 @@ import userEvent from "@testing-library/user-event";
 import { useCallback, useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { fakeApi } from "../../commands/fake-api";
+import { meetingRequestCalls } from "../../commands/meeting-request";
 import type { DirectoryEntry } from "../../queries/directory";
 import { createProfileActivityQuery } from "../../queries/profile-activity";
 import { comment, fakeComments } from "../comments/comments-test-support";
@@ -68,6 +69,7 @@ const activity = {
   hosting: [{ id: "s1", title: "Hosted talk", eventSlug: "Camp" }],
   proposals: [{ id: "p1", title: "Proposed talk", eventSlug: "Camp" }],
 };
+const requests = meetingRequestCalls(fakeApi(() => Response.json({})).api);
 const NO_OPTIONS: unknown[] = [];
 const option = {
   eventId: "e1",
@@ -106,7 +108,7 @@ function Harness(
       activity={make}
       onOpen={setGuestId}
       onClose={() => {}}
-      onSchedule={() => {}}
+      meetingRequests={requests}
       comments={() =>
         fakeComments([comment("c1", { author: { id: "bo", name: "Bo" } })])
       }
@@ -170,11 +172,9 @@ describe("the profile modal", () => {
     "offers a 1-on-1 for each event it could be booked at, to someone else only",
     { tags: ["012-US3"] },
     async () => {
-      const picked: string[] = [];
       render(
         <Harness
           options={[option, { ...option, eventId: "e2", eventName: "Fest" }]}
-          onSchedule={(id, o) => picked.push(`${id}:${o.eventName}`)}
         />
       );
 
@@ -182,7 +182,13 @@ describe("the profile modal", () => {
         await screen.findByRole("button", { name: "Schedule a 1-on-1 at Fest" })
       );
 
-      expect(picked).toEqual(["al:Fest"]);
+      const request = screen.getByRole("dialog", { name: "1-on-1 with Al" });
+      expect(within(request).getByText("Fest")).toBeTruthy();
+      await userEvent.keyboard("{Escape}");
+      expect(
+        screen.queryByRole("dialog", { name: "1-on-1 with Al" })
+      ).toBeNull();
+      expect(screen.getByRole("dialog", { name: "Al" })).toBeTruthy();
       cleanup();
       render(<Harness start="cy" options={[option]} />);
       await screen.findByRole("link", { name: "Hosted talk" });

@@ -8,8 +8,8 @@ import {
   slotTimeLabel,
 } from "@schellingboard/domain/meeting-slots";
 import { clashesForInterval, loadGuestSchedules } from "@/utils/guest-clashes";
-import { toMeetingClashes } from "@/utils/meeting-clash-text";
-import type { MeetingClash } from "@/utils/meeting-clash-text";
+import { toMeetingClashes } from "@schellingboard/domain/meeting-clash-text";
+import type { MeetingClash } from "@schellingboard/domain/meeting-clash-text";
 import { DateTime } from "luxon";
 import type { MeetingPoint } from "@schellingboard/domain/meeting";
 import type { Event } from "@schellingboard/domain/event";

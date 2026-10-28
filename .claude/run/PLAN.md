@@ -99,10 +99,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
   - [x] 10b. The profile (done: `features/people/profile-modal.tsx`, `profile-body.tsx`, `profile-photo.tsx`; `queries/profile-activity.ts` over new `GET /guests/{id}/activity` and `GET /guests/{id}/meeting-options`; `swipe.ts` moved to `packages/domain`). Hosting, proposals and meeting options come from the API, not the replica: the directory is site-wide, so there is no event replica on `/guests`, and they span every event.
   - [x] 10c. Profile comments (done: `ProfileModal` takes `comments(guestId, name)` and `setHash`, renders the shared `Comments` for the profile being read; `CommentSubject.name` names the profile in notices; `ProfileLinks.guest`).
   - [x] 10d. Edit my profile and photo (done: `features/people/profile-form.tsx`, `commands/profile-form.ts`, `ui/combobox.tsx`; the photo goes through `PUT`/`DELETE /me/avatar` before the profile).
-  - [ ] 10e. The 1-on-1 request form behind the profile's "Schedule a 1-on-1" buttons
-        (`onSchedule(guestId, option)`): length chips, slot list, meeting point and
-        message fields (the fields are shared with 12b), `POST /meetings`. Legacy
-        `meeting-picker.tsx` and its action are deleted at step 11.
+  - [x] 10e. The 1-on-1 request form (done: `features/people/meeting-request-dialog.tsx`, `features/meetings/meeting-request-fields.tsx` shared with 12b, `commands/meeting-request.ts`; `ProfileModal` owns the dialog; `meeting-clash-text` moved to `packages/domain`). Legacy `meeting-picker.tsx` and its action are deleted at step 11.
 - [ ] 11. **Takeover: people**. Router owns `/guests/**` (the page needs a command runner and store with no event replica, and the viewer as liker from `/me`); legacy guest pages and
       `profile-activity.ts` are deleted. E2E: `attendee-profiles`, `profile`,
       `profile-comments`, `profile-photo`. Port the legacy "No user selected" message of `/guests/edit`. CHANGELOG if anything visible changed.

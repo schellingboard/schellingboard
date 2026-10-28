@@ -17,7 +17,7 @@ import {
 import { Input } from "@/app/input";
 import { ModalCloseButton } from "@/app/components/modal-close-button";
 import { EventContext } from "@/app/legacy/(site)/context";
-import { clashLines } from "@/utils/meeting-clash-text";
+import { clashLines } from "@schellingboard/domain/meeting-clash-text";
 import { canCancel, statusLine } from "@/utils/meeting-rules";
 import { dismissViewMeeting } from "./modal-nav";
 import { useMyMeetings } from "./use-meetings";

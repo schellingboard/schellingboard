@@ -12,7 +12,7 @@ import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import { notFound, ok, type Result } from "@/server/kernel/result";
 import { clashesForInterval, loadGuestSchedules } from "@/utils/guest-clashes";
-import { toMeetingClashes } from "@/utils/meeting-clash-text";
+import { toMeetingClashes } from "@schellingboard/domain/meeting-clash-text";
 import { meetingsOpen } from "@/utils/meeting-rules";
 import type { MeetingDeps } from "../ports";
 
