@@ -60,14 +60,13 @@ export async function setDevClock(page: Page, target: DateTime) {
 
 /**
  * Land the browser on `path` with the fake clock already inside Gamma's first
- * day, so anything keyed to "now" is present from first paint. The clock is
- * set first, then a reload replays the page with the override cookie in place
- * — a full navigation, so it can't abort an in-flight refresh.
+ * day, so anything keyed to "now" is present from first paint. `path` must be
+ * an SPA page: its toolbar reloads it under the new clock, and a second reload
+ * right after that one sometimes never reaches "load" in Firefox.
  */
 export async function openGammaScheduleDuringEvent(page: Page, path: string) {
   await login(page);
   const url = path.includes("?") ? `${path}&dev=1` : `${path}?dev=1`;
   await page.goto(url);
   await setDevClock(page, duringGammaDayOne);
-  await page.reload();
 }
