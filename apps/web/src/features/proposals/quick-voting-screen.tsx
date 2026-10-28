@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { inVotingPhase } from "@schellingboard/domain/phase";
 import type { VoteChoice } from "@schellingboard/domain/vote";
@@ -41,6 +41,7 @@ export function QuickVotingScreen({
   comments,
 }: QuickVotingProps) {
   const guestId = snapshot.me?.guestId ?? null;
+  const [shownId, setShownId] = useState<string | null>(null);
   const back = (
     <a href={links.proposals} className={BACK}>
       ← Proposals
@@ -58,12 +59,17 @@ export function QuickVotingScreen({
   const votable = proposalsFrom(snapshot).filter(
     (p) => !p.hosts.some((h) => h.id === guestId)
   );
-  const next = votable
-    .filter((p) => !votes.has(p.id))
-    .sort(
+  const unvoted = votable.filter((p) => !votes.has(p.id));
+  const loading = standingsStatus === "idle" || standingsStatus === "loading";
+  // Stays put until voted on: a proposal someone adds meanwhile has the
+  // fewest votes and would otherwise replace the one being read.
+  const next =
+    unvoted.find((p) => p.id === shownId) ??
+    unvoted.sort(
       (a, b) =>
         (standings.get(a.id)?.total ?? 0) - (standings.get(b.id)?.total ?? 0)
     )[0];
+  if (!loading && next && next.id !== shownId) setShownId(next.id);
   const votedCount = votable.filter((p) => votes.has(p.id)).length;
   const texts = phaseTexts(snapshot.event, now, true, localZone);
   const votingEnabled = inVotingPhase(toEvent(snapshot.event), now);
@@ -75,12 +81,15 @@ export function QuickVotingScreen({
       <div className="mb-6 text-fg-muted">
         You have voted on {votedCount} / {votable.length} proposals
       </div>
-      {standingsStatus === "idle" || standingsStatus === "loading" ? (
+      {loading ? (
         <p>Loading proposals...</p>
       ) : next ? (
         <>
           <h1 className="mb-2 mt-5 text-xl font-semibold">
-            <a href={links.view(next.id)} className="hover:underline">
+            <a
+              href={`${links.quickVoting}?${new URLSearchParams({ viewProposal: next.id })}`}
+              className="hover:underline"
+            >
               {next.title}
             </a>
           </h1>

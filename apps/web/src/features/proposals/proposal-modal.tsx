@@ -42,7 +42,7 @@ export type ProposalActions = {
 const ACTION =
   "inline-flex items-center justify-center rounded-md border border-brand-accent px-2 py-1 text-xs font-medium text-brand-fg hover:bg-brand-tint focus:outline-none focus:ring-2 focus:ring-brand-accent";
 
-/** A proposal's details over the proposals list, opened by `?viewProposal=`. */
+/** A proposal's details over the proposals list or quick voting, opened by `?viewProposal=`. */
 export function ProposalModal({
   proposalId,
   snapshot,

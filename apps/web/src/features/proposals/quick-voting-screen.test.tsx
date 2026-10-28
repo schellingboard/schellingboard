@@ -125,7 +125,7 @@ describe("quick voting", () => {
     expect(heading()).toBe("Idea b");
     expect(
       screen.getByRole("link", { name: "Idea b" }).getAttribute("href")
-    ).toBe("/conf/proposals?viewProposal=b");
+    ).toBe("/conf/proposals/quick-voting?viewProposal=b");
     expect(
       screen.getAllByRole("link", { name: "HOST" }).length
     ).toBeGreaterThan(0);
@@ -157,6 +157,23 @@ describe("quick voting", () => {
     });
     expect(heading()).toBe("Idea b");
     expect(screen.getByText("You have voted on 1 / 3 proposals")).toBeTruthy();
+  });
+
+  it("keeps the proposal being read when one with fewer votes arrives", () => {
+    const { update } = setup(
+      "voting",
+      {},
+      new Map([
+        ["a", standing(1)],
+        ["b", standing(2)],
+        ["c", standing(3)],
+      ])
+    );
+    expect(heading()).toBe("Idea a");
+
+    update({ proposals: [...proposals, proposal("new")] });
+
+    expect(heading()).toBe("Idea a");
   });
 
   it("says so when everything is voted on", () => {

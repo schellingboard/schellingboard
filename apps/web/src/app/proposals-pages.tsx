@@ -5,7 +5,7 @@ import { joinProposal } from "../commands/join-proposal";
 import { proposalFormCalls } from "../commands/proposal-form";
 import { castVote, withdrawVote } from "../commands/vote";
 import { ProposalForm } from "../features/proposals/proposal-form";
-import { proposalLinks } from "../features/proposals/links";
+import { proposalLinks, type ProposalLinks } from "../features/proposals/links";
 import { ProposalModal } from "../features/proposals/proposal-modal";
 import { ProposalsScreen } from "../features/proposals/proposals-screen";
 import { QuickVotingScreen } from "../features/proposals/quick-voting-screen";
@@ -47,11 +47,44 @@ export function ProposalsPage() {
 
 function List(view: EventView) {
   const { api, slug, runner, snapshot, now } = view;
-  const { params, change, back, setHash } = useUrlSearchParams();
   const links = useMemo(() => proposalLinks(slug), [slug]);
   const { standings } = useEventStandings(view);
   const vote = useVoting(view);
   const openComments = useCommentSource(api, runner, likerFrom(snapshot));
+
+  return (
+    <>
+      <ProposalsScreen
+        snapshot={snapshot}
+        links={links}
+        now={now}
+        localZone={LOCAL_ZONE}
+        standings={standings}
+        onVote={vote}
+      />
+      <ViewedProposal
+        view={view}
+        links={links}
+        vote={vote}
+        openComments={openComments}
+      />
+    </>
+  );
+}
+
+/** The proposal `?viewProposal=` names, over the page that opened it. */
+function ViewedProposal({
+  view: { api, runner, snapshot, now },
+  links,
+  vote,
+  openComments,
+}: {
+  view: EventView;
+  links: ProposalLinks;
+  vote: ReturnType<typeof useVoting>;
+  openComments: ReturnType<typeof useCommentSource>;
+}) {
+  const { params, change, back, setHash } = useUrlSearchParams();
   const actions = useMemo(
     () => ({
       vote,
@@ -70,34 +103,23 @@ function List(view: EventView) {
     if (!viewed) proposalOpenedByClick(false);
   }, [viewed]);
 
+  if (!viewed) return null;
   return (
-    <>
-      <ProposalsScreen
-        snapshot={snapshot}
-        links={links}
-        now={now}
-        localZone={LOCAL_ZONE}
-        standings={standings}
-        onVote={vote}
-      />
-      {viewed && (
-        <ProposalModal
-          proposalId={viewed}
-          snapshot={snapshot}
-          now={now}
-          localZone={LOCAL_ZONE}
-          links={links}
-          actions={actions}
-          setHash={setHash}
-          onClose={() => {
-            if (takeProposalOpenedByClick()) return back();
-            const updated = new URLSearchParams(params);
-            updated.delete("viewProposal");
-            change(updated);
-          }}
-        />
-      )}
-    </>
+    <ProposalModal
+      proposalId={viewed}
+      snapshot={snapshot}
+      now={now}
+      localZone={LOCAL_ZONE}
+      links={links}
+      actions={actions}
+      setHash={setHash}
+      onClose={() => {
+        if (takeProposalOpenedByClick()) return back();
+        const updated = new URLSearchParams(params);
+        updated.delete("viewProposal");
+        change(updated);
+      }}
+    />
   );
 }
 
@@ -117,16 +139,24 @@ function QuickVoting(view: EventView) {
     [openComments]
   );
   return (
-    <QuickVotingScreen
-      snapshot={snapshot}
-      links={links}
-      now={now}
-      localZone={LOCAL_ZONE}
-      standings={standings}
-      standingsStatus={status}
-      onVote={vote}
-      comments={comments}
-    />
+    <>
+      <QuickVotingScreen
+        snapshot={snapshot}
+        links={links}
+        now={now}
+        localZone={LOCAL_ZONE}
+        standings={standings}
+        standingsStatus={status}
+        onVote={vote}
+        comments={comments}
+      />
+      <ViewedProposal
+        view={view}
+        links={links}
+        vote={vote}
+        openComments={openComments}
+      />
+    </>
   );
 }
 
