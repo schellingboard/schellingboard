@@ -1,4 +1,4 @@
-.PHONY: help dev mailpit build start lint typecheck arch openapi openapi-check arch-graph arch-diagrams arch-diagrams-check lint-watch test test-unit test-integration test-watch test-coverage use-cases test-e2e test-e2e-headed test-e2e-docker format format-check precommit dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed dump-release-db screenshots install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate docs-dev docs-dev-build docs-dev-validate www
+.PHONY: help dev mailpit build start lint typecheck commit-check arch openapi openapi-check arch-graph arch-diagrams arch-diagrams-check lint-watch test test-unit test-integration test-watch test-coverage use-cases test-e2e test-e2e-headed test-e2e-docker format format-check precommit dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed dump-release-db screenshots install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate docs-dev docs-dev-build docs-dev-validate www
 
 SHELL := /usr/bin/env bash
 
@@ -25,6 +25,7 @@ help:
 	@printf "  %-28s %s\n" "make lint"               "Run linter"
 	@printf "  %-28s %s\n" "make lint-watch"         "Run linter in watch mode"
 	@printf "  %-28s %s\n" "make typecheck"          "Run TypeScript type checking"
+	@printf "  %-28s %s\n" "make commit-check"       "Check commit messages (RANGE=base..head, default origin/main..HEAD)"
 	@printf "  %-28s %s\n" "make arch"               "Check architecture rules (cycles, layer boundaries)"
 	@printf "  %-28s %s\n" "make openapi"            "Regenerate openapi.json and the api-client types"
 	@printf "  %-28s %s\n" "make openapi-check"      "Check openapi.json and the api-client match the API"
@@ -94,6 +95,11 @@ typecheck: install
 	bun x tsc -b apps/web
 
 DEPCRUISE := bun x depcruise app apps db packages server utils emails tests scripts instrumentation.ts proxy.ts --config .dependency-cruiser.cjs
+
+# Commit messages: conventional prefix, subject <= 72, body wrapped at 80.
+# Pipe a draft message to `bun scripts/check-commit-messages.ts --stdin` first.
+commit-check: install
+	bun scripts/check-commit-messages.ts $(RANGE)
 
 # Module-graph rules (cycles, layer boundaries) — the constraints eslint can't
 # see, since it reads one file at a time. See docs/dev/architecture-rules.md.

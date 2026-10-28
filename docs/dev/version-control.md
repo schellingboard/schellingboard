@@ -4,6 +4,10 @@
 
 - Use conventional commits (`feat:`, `fix:`, `docs:`, `refactor:`, etc.)
 - Subject line ≤ 72 chars; explain WHY in the body if not obvious
+- Wrap the body at 80 chars; a line with a URL, or one unbreakable word, may exceed it
+- `make commit-check` verifies the commits since `origin/main` (`RANGE=a..b` for another
+  range); CI runs it on pull requests. Check a draft first with
+  `echo "<message>" | bun scripts/check-commit-messages.ts --stdin`
 - Before committing, run `make precommit`
 - When working on a GitHub issue, add a footer: `issue #123` (partial work) or
   `fixes #123` (fully resolves it)
