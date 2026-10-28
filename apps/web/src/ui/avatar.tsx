@@ -9,6 +9,17 @@ export function initials(name: string): string {
     .join("");
 }
 
+const SAFE_SCHEMES = ["blob:", "http:", "https:"];
+
+function safeSrc(url: string): string | undefined {
+  try {
+    const parsed = new URL(url, "http://localhost");
+    return SAFE_SCHEMES.includes(parsed.protocol) ? url : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 const SIZES = {
   lg: "h-28 w-28 text-3xl",
   md: "h-16 w-16 text-lg",
@@ -27,6 +38,7 @@ export function Avatar({
   size?: keyof typeof SIZES;
   className?: string;
 }) {
+  const src = image ? safeSrc(image) : undefined;
   return (
     <div
       aria-hidden="true"
@@ -36,10 +48,10 @@ export function Avatar({
         className
       )}
     >
-      {image ? (
+      {src ? (
         <img
           className="h-full w-full object-cover"
-          src={image}
+          src={src}
           alt={`Profile avatar of ${name}`}
         />
       ) : (

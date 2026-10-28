@@ -11,7 +11,7 @@ import {
   publicProfileListSchema,
   publicProfileSchema,
 } from "@schellingboard/contracts/guest";
-import { MIN_AVATAR_WIDTH } from "@/utils/avatar-image-constraints";
+import { MIN_AVATAR_WIDTH } from "@schellingboard/domain/avatar-image";
 import { MAX_IMAGE_BYTES } from "@/utils/images";
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import { pageOf } from "@/server/http/pagination";

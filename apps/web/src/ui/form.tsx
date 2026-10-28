@@ -1,4 +1,5 @@
 import { useId, type ReactNode } from "react";
+import { Combobox } from "./combobox";
 import { MarkdownTextarea } from "./markdown-textarea";
 import { PeoplePicker, type Person } from "./people-picker";
 
@@ -12,6 +13,8 @@ type FieldProps = {
   required?: boolean;
   hint?: string;
   error?: string;
+  /** For a control in a row whose other cells already say what it is. */
+  hideLabel?: boolean;
 };
 
 function useField({
@@ -43,6 +46,7 @@ function Frame({
   required,
   hint,
   error,
+  hideLabel,
   ids,
   children,
 }: Omit<FieldProps, "name"> & {
@@ -51,7 +55,7 @@ function Frame({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="font-medium" htmlFor={ids.id}>
+      <label className={hideLabel ? "sr-only" : "font-medium"} htmlFor={ids.id}>
         {label}
         {required && <span className="mx-1 text-brand-fg">*</span>}
       </label>
@@ -278,6 +282,35 @@ export function PeopleField({
         onChange={onChange}
         id={ids.id}
         name={frame.name}
+        invalid={!!frame.error}
+        describedBy={ids.control["aria-describedby"]}
+      />
+    </Frame>
+  );
+}
+
+export function ComboboxField({
+  value,
+  onChange,
+  options,
+  placeholder,
+  ...frame
+}: FieldProps & {
+  value: string;
+  onChange: (value: string) => void;
+  options: string[];
+  placeholder?: string;
+}) {
+  const ids = useField(frame);
+  return (
+    <Frame {...frame} ids={ids}>
+      <Combobox
+        id={ids.id}
+        name={frame.name}
+        value={value}
+        onChange={onChange}
+        options={options}
+        placeholder={placeholder}
         invalid={!!frame.error}
         describedBy={ids.control["aria-describedby"]}
       />

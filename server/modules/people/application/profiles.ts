@@ -14,7 +14,7 @@ import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import { withStoredFile } from "@/server/kernel/stored-files";
 import {
   forbidden,
-  invalid,
+  invalidFields,
   notFound,
   ok,
   versionConflict,
@@ -204,7 +204,10 @@ export const replaceMyAvatar =
     const acting = await actingGuest(actor, deps.repos.guests);
     if (!acting.ok) return acting;
     const validated = await deps.avatars.validate(image);
-    if ("error" in validated) return invalid("avatar.invalid", validated.error);
+    if ("error" in validated)
+      return invalidFields("avatar.invalid", [
+        { path: "avatar", message: validated.error },
+      ]);
     return saveProfile(
       deps,
       acting.value,

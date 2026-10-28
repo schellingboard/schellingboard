@@ -1,5 +1,5 @@
 import "client-only";
-import { coverSquareSize } from "@/utils/avatar-image-constraints";
+import { coverSquareSize } from "@schellingboard/domain/avatar-image";
 
 function drawCover(
   ctx: CanvasRenderingContext2D,

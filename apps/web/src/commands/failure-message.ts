@@ -12,6 +12,8 @@ const REASONS: Record<string, string> = {
   "event.proposalsClosed": "The proposal phase is over.",
   "proposal.alreadyHost": "You already host this proposal.",
   "guest.notInEvent": "You are not part of this event.",
+  "guest.protected": "This name is protected. Sign in with its password.",
+  "avatar.invalid": "That picture cannot be used.",
   "comment.invalid": "A comment cannot be empty.",
   "comment.notAuthor": "Only the author can change a comment.",
   "comment.notFound": "This comment no longer exists.",

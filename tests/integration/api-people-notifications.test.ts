@@ -400,7 +400,10 @@ describe("/api/v1 profiles", () => {
         form: await avatarForm(64),
       });
       expect(res.status).toBe(400);
-      expect(await res.json()).toMatchObject({ code: "avatar.invalid" });
+      expect(await res.json()).toMatchObject({
+        code: "avatar.invalid",
+        errors: [expect.objectContaining({ path: "avatar" })],
+      });
 
       const garbled = await PUT(
         new NextRequest("http://test/api/v1/me/avatar", {

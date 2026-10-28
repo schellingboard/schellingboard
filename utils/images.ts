@@ -10,7 +10,7 @@ import {
   AVATAR_MAX_SIZE,
   MIN_AVATAR_WIDTH,
   coverSquareSize,
-} from "@/utils/avatar-image-constraints";
+} from "@schellingboard/domain/avatar-image";
 import { uploadsDir } from "@/utils/uploads-dir";
 
 // Images are stored on the filesystem under SB_UPLOADS_DIR

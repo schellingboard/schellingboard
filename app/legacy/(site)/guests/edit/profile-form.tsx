@@ -23,7 +23,7 @@ import {
   MAX_LANGUAGES,
 } from "@schellingboard/domain/guest";
 import { resizeImage } from "@/utils/images-client";
-import { AVATAR_MAX_SIZE } from "@/utils/avatar-image-constraints";
+import { AVATAR_MAX_SIZE } from "@schellingboard/domain/avatar-image";
 import clsx from "clsx";
 import {
   Controller,
@@ -34,7 +34,7 @@ import {
 } from "react-hook-form";
 import { profileSchema } from "@schellingboard/contracts/guest";
 import { CORE_PROMPTS, PROMPT_POOL } from "@schellingboard/domain/prompt-pool";
-import { languageSuggestions } from "./languages";
+import { languageSuggestions } from "@schellingboard/domain/language-suggestions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {

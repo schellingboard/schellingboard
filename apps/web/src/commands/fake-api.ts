@@ -20,12 +20,26 @@ export function fakeApi(handler: FakeHandler) {
   const api = createApiClient({
     baseUrl: "http://api.test",
     fetch: async (request: Request) => {
-      const text = await request.clone().text();
+      const multipart = request.headers
+        .get("content-type")
+        ?.startsWith("multipart/form-data");
+      const text = multipart ? "" : await request.clone().text();
       const call = {
         method: request.method,
         path: new URL(request.url).pathname + new URL(request.url).search,
         key: request.headers.get("idempotency-key"),
-        body: text ? (JSON.parse(text) as unknown) : undefined,
+        body: multipart
+          ? Object.fromEntries(
+              [...(await request.clone().formData()).entries()].map(
+                ([k, v]) => [
+                  k,
+                  typeof v === "string" ? v : { file: v.name, type: v.type },
+                ]
+              )
+            )
+          : text
+            ? (JSON.parse(text) as unknown)
+            : undefined,
       };
       calls.push(call);
       return handler(call);

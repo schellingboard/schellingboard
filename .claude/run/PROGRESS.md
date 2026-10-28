@@ -59,6 +59,14 @@ Step 10c, for step 11 (wiring): pass `comments={(id, name) => open({kind: "profi
 proposals. `links.guest(id)` is the bare profile address: comment authors link to it, so the router must keep the list query across it
 (E2E "opens a comment author's profile": closing lands on the list it started from). Timestamps are UTC-anchored, as legacy.
 
+Step 10d, for step 11 (wiring): `ProfileForm({profile: ProfileDraft, links: {people, settings}, actions: profileFormCalls(api), onDone})`;
+`profile` = the viewer's `DirectoryEntry` (needs `version`; load it fresh, e.g. `GET /guests/{id}`). `onDone` navigates to the viewer's profile
+(legacy did). The photo is sent first (`PUT /me/avatar`, then the profile against the new version): if the profile then fails, the photo stays changed and the form says so.
+Markup changes (sections are buttons with `aria-expanded`; pronoun/language fields are `ui/combobox`, role combobox/option) should not force
+`profile.spec` rewrites; the "Suggest a different prompt" button is an icon with that name. If the profile save fails after the photo saved, the form says so.
+`ui/resize-image.ts` copies `utils/images-client.ts`: delete the latter with the legacy form at step 11. `avatar-image` and
+`language-suggestions` moved to `packages/domain`. Legacy "No user selected" message (`/guests/edit` without identity) is still to port.
+
 ## Questions
 
 0. The SPA shell has no "Show map" button (the uploaded site map); only legacy pages show it. The
