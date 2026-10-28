@@ -7,7 +7,7 @@ import type { MeetingView } from "./meeting-view";
 /**
  * The viewer's own 1-on-1s as the schedule shows them, from the replica.
  * Clashes rest on other guests' RSVPs, which the replica never holds
- * (ADR 0014 section 4), so they come back empty.
+ * (ADR 0014 section 4); `withClashes` adds what the server says.
  */
 export function meetingViewsFrom(snapshot: Snapshot, now: Date): MeetingView[] {
   const me = snapshot.me;
@@ -45,4 +45,14 @@ export function meetingViewsFrom(snapshot: Snapshot, now: Date): MeetingView[] {
       };
     })
     .sort(compareMeetings);
+}
+
+export function withClashes(
+  views: MeetingView[],
+  clashes: ReadonlyMap<string, MeetingView["clashes"]>
+): MeetingView[] {
+  return views.map((view) => ({
+    ...view,
+    clashes: clashes.get(view.id) ?? [],
+  }));
 }

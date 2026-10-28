@@ -133,3 +133,5 @@ Step 12a, for the settings step: `AvailabilityForm({...AvailabilityFormData, cal
 Step 12b, for 13: `BookMeeting({query, calls, eventId, slotStart, profileHref, onBooked, onClose})`; `query` = stable `createMeetingCandidatesQuery`, `calls` = `meetingRequestCalls(api)`. 10e's dialog failure text does not name the person/slot (12b's does); revisit if wanted.
 
 Step 12c, for 13: `MeetingModal({meeting, now, readOnly, profileHref, onAnswer, onCancel, onClose})`, rendered with `key={meetingId}` and only once the replica and `me` are loaded (before that it would say "1-on-1 not found."); `meeting` = `meetingViewsFrom(runner.view(), now)` merged with clashes (12d) `.find(id)`, `onAnswer = r => runner.run(answerMeeting, {meetingId, response: r})`, `onCancel = note => runner.run(cancelMeeting, {meetingId, note})`; close drops `viewMeeting` (`SpaLinks` must stop forwarding it). `commands/meeting-answer.ts` imports from `features/schedule` (known layering exception).
+
+Step 12d: `useMeetingClashes(api, snapshot)` feeds `ScheduleScreen`'s `clashes` prop (the column). For the modal in 13, merge the same map: `withClashes(meetingViewsFrom(...), clashes)`.

@@ -14,6 +14,7 @@ import { Message, useEventView, type EventView } from "./event-page";
 import { Footer } from "./footer";
 import { hardReload } from "./hard-navigate";
 import { newKey } from "../commands/keys";
+import { useMeetingClashes } from "./use-meeting-clashes";
 import { useHealth } from "./health";
 import { useUpdateStatus } from "./updates";
 import { likerFrom, useCommentSource } from "./use-comment-actions";
@@ -33,6 +34,7 @@ function Loaded({ api, slug, runner, store, snapshot, now }: EventView) {
   const { params, change: changeParams, back, setHash } = useUrlSearchParams();
   const links = useMemo(() => legacyScheduleLinks(slug), [slug]);
   const viewer = useViewer();
+  const clashes = useMeetingClashes(api, store);
   const { history } = useRouter();
   const [picking, setPicking] = useState(false);
   const openComments = useCommentSource(api, runner, likerFrom(snapshot));
@@ -70,6 +72,7 @@ function Loaded({ api, slug, runner, store, snapshot, now }: EventView) {
       />
       <ScheduleScreen
         actions={actions}
+        clashes={clashes}
         snapshot={snapshot}
         now={now}
         links={links}

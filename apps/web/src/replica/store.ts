@@ -34,11 +34,17 @@ export function createReplicaStore(
   let link: Link = persisted
     ? { connected: false, since: clock() - STALE_AFTER_MS }
     : { connected: true, since: clock() };
-  const set = (next: Snapshot, nextGone: boolean, revise = true) => {
+  const set = (
+    next: Snapshot,
+    nextGone: boolean,
+    revise = true,
+    attendance = false
+  ) => {
     if (next === replica && nextGone === gone) return;
     if (
       revise &&
-      (next.sessions !== replica.sessions ||
+      (attendance ||
+        next.sessions !== replica.sessions ||
         next.me?.rsvps !== replica.me?.rsvps ||
         next.me?.meetings !== replica.me?.meetings)
     )
@@ -82,7 +88,13 @@ export function createReplicaStore(
         message.type === "session.attendanceChanged"
       )
         deliveredKeys = new Set([...deliveredKeys, message.commandKey]);
-      set(apply(replica, message), gone || message.type === "event.deleted");
+      set(
+        apply(replica, message),
+        gone || message.type === "event.deleted",
+        true,
+        // Other guests' RSVPs reach us only as a count, yet can start a clash.
+        message.type === "session.attendanceChanged"
+      );
     },
     replace: (next: Snapshot) => {
       deliveredKeys = new Set();

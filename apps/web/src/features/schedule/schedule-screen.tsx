@@ -8,6 +8,8 @@ import {
 
 export type { ScheduleActions };
 import { scheduleDataFrom } from "./data";
+import { withClashes } from "./meetings";
+import type { MeetingClashes } from "../../queries/meeting-clashes";
 import { AgendaView } from "./agenda-view";
 import {
   parseScheduleFilters,
@@ -56,6 +58,7 @@ export function ScheduleScreen({
   footer,
   onReload,
   actions,
+  clashes,
 }: {
   snapshot: Snapshot;
   now: Date;
@@ -71,8 +74,13 @@ export function ScheduleScreen({
   /** What a deliberate pull down from the top does. */
   onReload: () => void;
   actions: ScheduleActions;
+  /** What else is on during the viewer's 1-on-1s, by meeting id. */
+  clashes: MeetingClashes;
 }) {
-  const data = useMemo(() => scheduleDataFrom(snapshot, now), [snapshot, now]);
+  const data = useMemo(() => {
+    const base = scheduleDataFrom(snapshot, now);
+    return { ...base, meetings: withClashes(base.meetings, clashes) };
+  }, [snapshot, now, clashes]);
   const view = scheduleView(params);
   const scrollerRef = useRef<HTMLDivElement>(null);
   useDragToPan(scrollerRef, view === "grid");

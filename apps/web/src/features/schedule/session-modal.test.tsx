@@ -83,6 +83,7 @@ function open(
   render(
     <NoticeProvider>
       <ScheduleScreen
+        clashes={new Map()}
         snapshot={snapshot}
         now={new Date(at)}
         links={legacyScheduleLinks("conf")}

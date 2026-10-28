@@ -99,3 +99,16 @@ describe("a 1-on-1 in full", { tags: ["012-US4"] }, () => {
     expect(screen.getByText("1-on-1 not found.")).toBeTruthy();
   });
 });
+
+describe("a request that clashes", { tags: ["012-US4"] }, () => {
+  it("tells the person asked what else is on during the slot", () => {
+    setup(
+      meeting({
+        clashes: [
+          { guestName: "Mia", kind: "hosting", title: "Rust", isViewer: true },
+        ],
+      })
+    );
+    expect(screen.getByText(/during this slot/)).toBeTruthy();
+  });
+});

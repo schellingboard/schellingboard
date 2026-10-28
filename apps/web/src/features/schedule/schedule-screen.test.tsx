@@ -64,6 +64,7 @@ function screenAt(
   const onParamsChange = vi.fn<(params: URLSearchParams) => void>();
   render(
     <ScheduleScreen
+      clashes={new Map()}
       snapshot={snapshot}
       now={now}
       links={legacyScheduleLinks(snapshot.event.slug)}

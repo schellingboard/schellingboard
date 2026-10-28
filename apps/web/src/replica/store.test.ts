@@ -65,7 +65,7 @@ describe("replica store", () => {
     expect(store.get().seq).toBe(11);
   });
 
-  it("moves the meetings revision only for what the meetings column depends on", () => {
+  it("moves the meetings revision for what the meetings column depends on", () => {
     const store = createReplicaStore(snapshot);
     const start = store.meetingsRevision();
 
@@ -76,7 +76,7 @@ describe("replica store", () => {
       sessionId: "s",
       numRsvps: 9,
     });
-    expect(store.meetingsRevision()).toBe(start);
+    expect(store.meetingsRevision()).toBe(start + 1);
 
     store.applyMessage({
       seq: snapshot.seq + 2,
@@ -85,7 +85,7 @@ describe("replica store", () => {
       sessionId: "s",
       guestId: "mia",
     });
-    expect(store.meetingsRevision()).toBe(start + 1);
+    expect(store.meetingsRevision()).toBe(start + 2);
 
     store.applyMessage({
       seq: snapshot.seq + 3,
@@ -93,7 +93,7 @@ describe("replica store", () => {
       commandKey: null,
       meetingId: "none",
     });
-    expect(store.meetingsRevision()).toBe(start + 2);
+    expect(store.meetingsRevision()).toBe(start + 3);
   });
 
   it("leaves the meetings revision alone when a seed is adopted", () => {

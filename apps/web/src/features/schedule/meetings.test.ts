@@ -1,7 +1,7 @@
 // @module-tag 012-US5
 import { describe, it, expect } from "vitest";
 import { snapshot } from "../../replica/snapshot-fixture";
-import { meetingViewsFrom } from "./meetings";
+import { meetingViewsFrom, withClashes } from "./meetings";
 
 const meeting = (patch: object) => ({
   id: "m1",
@@ -79,5 +79,22 @@ describe("meetingViewsFrom", () => {
       new Date("2026-06-10T00:00:00Z")
     );
     expect(views.map((v) => v.id)).toEqual(["a", "b"]);
+  });
+});
+
+describe("withClashes", () => {
+  it("sets each view's clashes from the map and leaves unknown ones empty", () => {
+    const views = meetingViewsFrom(
+      withMeetings([meeting({}), meeting({ id: "m2" })]),
+      new Date("2026-06-10T00:00:00Z")
+    );
+    const clash = {
+      guestName: "Kai",
+      kind: "busy" as const,
+      title: null,
+      isViewer: false,
+    };
+    const merged = withClashes(views, new Map([["m1", [clash]]]));
+    expect(merged.map((v) => v.clashes)).toEqual([[clash], []]);
   });
 });
