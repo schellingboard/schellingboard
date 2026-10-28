@@ -34,16 +34,16 @@ export function HeaderLinks({
         <UserGroupIcon className="h-5 w-5" />
         <span className="sr-only sm:not-sr-only">Attendees</span>
       </a>
-      {signedIn && unread !== undefined && (
+      {signedIn && (
         <a
           href="/legacy/notifications"
           aria-label={
-            unread > 0 ? `Notifications (${unread} unread)` : "Notifications"
+            unread ? `Notifications (${unread} unread)` : "Notifications"
           }
           className="relative flex items-center rounded-md p-2 text-fg-subtle hover:bg-surface-muted"
         >
           <BellIcon className="h-5 w-5" />
-          {unread > 0 && (
+          {!!unread && (
             <span className="absolute -right-0.5 -top-0.5 min-w-4 rounded-full bg-brand-accent px-1 text-center text-xs font-medium leading-4 text-fg-inverse">
               {unread > 9 ? "9+" : unread}
             </span>

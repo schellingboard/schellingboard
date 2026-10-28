@@ -30,6 +30,12 @@ describe("HeaderLinks", () => {
     ).toBeTruthy();
   });
 
+  it("shows the bell before the count is in, so nothing moves when it lands", async () => {
+    show(true);
+    expect(screen.getByRole("link", { name: "Notifications" })).toBeTruthy();
+    await screen.findByRole("link", { name: "Notifications (3 unread)" });
+  });
+
   it("has no notifications for nobody", () => {
     show(false);
     expect(screen.getByRole("link", { name: "Attendees" })).toBeTruthy();
