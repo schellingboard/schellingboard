@@ -2,13 +2,11 @@
 
 Profile pictures used by `scripts/seed/seed-database.ts` for dev/test seed data.
 
-Generated with the [DiceBear](https://www.dicebear.com) HTTP API using the
-"Lorelei" style by Lisa Wischofsky, licensed under
-[CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) (public domain,
-no attribution required — credited here anyway).
+Generated with the [DiceBear](https://www.dicebear.com) HTTP API using the "Lorelei" style by Lisa
+Wischofsky, licensed under [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) (public
+domain, no attribution required — credited here anyway).
 
-Each file is a 256×256 WebP (~8 KB), matching the size the app itself
-produces for uploaded avatars.
+Each file is a 256×256 WebP (~8 KB), matching the size the app itself produces for uploaded avatars.
 
 To regenerate:
 

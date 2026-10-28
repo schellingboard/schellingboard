@@ -8,11 +8,19 @@
   </picture>
 </p>
 
-A web app for managing event scheduling — attendees can propose sessions, vote on them, and view the final schedule. Built with Next.js and SQLite.
+A web app for managing event scheduling — attendees can propose sessions, vote on them, and view the
+final schedule. Built with Next.js and SQLite.
 
-The name is a tongue-in-cheek reference to [**Schelling points**](<https://en.wikipedia.org/wiki/Focal_point_(game_theory)>) — focal points that people naturally converge on _without_ explicit coordination. SchellingBoard is the ironic opposite: a tool that enables explicit coordination. Attendees propose sessions and vote, creating a concrete consensus that wouldn't emerge on its own.
+The name is a tongue-in-cheek reference to
+[**Schelling points**](<https://en.wikipedia.org/wiki/Focal_point_(game_theory)>) — focal points
+that people naturally converge on _without_ explicit coordination. SchellingBoard is the ironic
+opposite: a tool that enables explicit coordination. Attendees propose sessions and vote, creating a
+concrete consensus that wouldn't emerge on its own.
 
-This is a public open-source fork of [rachelweinberg12/scheduling-app](https://github.com/rachelweinberg12/scheduling-app). Rachel Weinberg, the original author, does not wish to maintain a public open-source project herself but agreed to this fork serving that role. See [LICENSING_HISTORY.md](LICENSING_HISTORY.md) for details.
+This is a public open-source fork of
+[rachelweinberg12/scheduling-app](https://github.com/rachelweinberg12/scheduling-app). Rachel
+Weinberg, the original author, does not wish to maintain a public open-source project herself but
+agreed to this fork serving that role. See [LICENSING_HISTORY.md](LICENSING_HISTORY.md) for details.
 
 ## Features
 
@@ -22,7 +30,11 @@ This is a public open-source fork of [rachelweinberg12/scheduling-app](https://g
 - **1-on-1s** — attendees mark when they are free and book short meetings with each other
 - **Event phases** — proposal, voting, and scheduling phases with configurable date ranges
 - **Multi-event support** — host multiple events from one deployment
-- **Kiosk mode** — append `?kiosk=1` to a schedule URL for large screens at the venue: a red line marks the current time, the schedule auto-scrolls to it and refreshes periodically, and the screen is kept awake. The schedule stays fully interactive. Kiosk mode sticks across navigation once set — turn it off with `?kiosk=0`. Combine with `loc` filters (e.g. `?kiosk=1&loc=Main+Hall`) to show only some rooms.
+- **Kiosk mode** — append `?kiosk=1` to a schedule URL for large screens at the venue: a red line
+  marks the current time, the schedule auto-scrolls to it and refreshes periodically, and the screen
+  is kept awake. The schedule stays fully interactive. Kiosk mode sticks across navigation once set
+  — turn it off with `?kiosk=0`. Combine with `loc` filters (e.g. `?kiosk=1&loc=Main+Hall`) to show
+  only some rooms.
 - **Site password protection** — optional single-password gate for the whole app
 
 ![Scheduling board](docs/screenshots/schedule-grid.webp)
@@ -31,11 +43,14 @@ More screenshots at [schellingboard.org](https://schellingboard.org).
 
 ## Hosting
 
-See [docs.schellingboard.org](https://docs.schellingboard.org/self-hosting/deployment/) for deployment and administration instructions. Docker images are published on [Docker Hub](https://hub.docker.com/r/schellingboard/schellingboard).
+See [docs.schellingboard.org](https://docs.schellingboard.org/self-hosting/deployment/) for
+deployment and administration instructions. Docker images are published on
+[Docker Hub](https://hub.docker.com/r/schellingboard/schellingboard).
 
 ## Attendees
 
-See the [attendee guide](https://docs.schellingboard.org/attendee-guide/) for how to propose, vote, and use the schedule — worth sharing with your event's attendees.
+See the [attendee guide](https://docs.schellingboard.org/attendee-guide/) for how to propose, vote,
+and use the schedule — worth sharing with your event's attendees.
 
 ## Changelog
 
@@ -44,9 +59,9 @@ See [CHANGELOG.md](CHANGELOG.md).
 ## Development
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) to get started, and
-[developers.schellingboard.org](https://developers.schellingboard.org) for the
-full developer documentation (the same documentation but as _plain_ markdown
-files lives under [`docs/dev/`](docs/dev/README.md)).
+[developers.schellingboard.org](https://developers.schellingboard.org) for the full developer
+documentation (the same documentation but as _plain_ markdown files lives under
+[`docs/dev/`](docs/dev/README.md)).
 
 ## License
 

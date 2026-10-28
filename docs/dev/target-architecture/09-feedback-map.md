@@ -1,8 +1,7 @@
 # 9 · Feedback and issues, mapped to the design
 
-Every piece of attendee feedback from the 2026 event and every open-issue theme,
-and the element of this design that serves it. Where the design changes what was
-asked for, the row says so.
+Every piece of attendee feedback from the 2026 event and every open-issue theme, and the element of
+this design that serves it. Where the design changes what was asked for, the row says so.
 
 ## Attendee feedback
 
@@ -57,16 +56,15 @@ asked for, the row says so.
 
 ## Things nobody asked for that the design provides for
 
-- **Calendar export**: an ICS feed of the agenda, signed per person, is a query
-  over `agenda()`; attendees will ask for it the first time they open their phone
-  calendar.
-- **Organizer announcements**: a `fixture`-like notification to everyone in the
-  event over all channels; a use case in `notifications` with organizer role.
+- **Calendar export**: an ICS feed of the agenda, signed per person, is a query over `agenda()`;
+  attendees will ask for it the first time they open their phone calendar.
+- **Organizer announcements**: a `fixture`-like notification to everyone in the event over all
+  channels; a use case in `notifications` with organizer role.
 - **Waitlists** when capacity is hard: an RSVP state, not a new concept.
-- **Reporting** a comment or profile to organizers: a change with audience
-  `organizers` and a queue in the admin section.
-- **Import** of people and sessions from CSV or a call-for-papers tool through the
-  API with an organizer token.
-- **Session feedback after the fact** (in the backlog): a `feedback` module
-  reacting to `SessionEnded`, private to hosts by audience.
+- **Reporting** a comment or profile to organizers: a change with audience `organizers` and a queue
+  in the admin section.
+- **Import** of people and sessions from CSV or a call-for-papers tool through the API with an
+  organizer token.
+- **Session feedback after the fact** (in the backlog): a `feedback` module reacting to
+  `SessionEnded`, private to hosts by audience.
 - **A second language**: strings are keys and policies return codes from day one.

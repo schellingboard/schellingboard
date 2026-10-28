@@ -6,21 +6,19 @@ type: guide
 
 # Backup and restore
 
-Everything SchellingBoard stores lives in one Docker volume, mounted at
-`/data`: the database (`/data/data.db`) and any files uploaded through the
-admin UI, such as guest avatars and the venue map (`/data/uploads`).
+Everything SchellingBoard stores lives in one Docker volume, mounted at `/data`: the database
+(`/data/data.db`) and any files uploaded through the admin UI, such as guest avatars and the venue
+map (`/data/uploads`).
 
-:::warning "Back up your `.env` separately"
-It is **not** in that volume, and it holds `AUTH_SECRET`, `SITE_PASSWORD`,
-`ADMIN_PASSWORD` and your SMTP credentials. Restoring the data without the
-same `AUTH_SECRET` logs everyone out.
-:::
+:::warning "Back up your `.env` separately" It is **not** in that volume, and it holds
+`AUTH_SECRET`, `SITE_PASSWORD`, `ADMIN_PASSWORD` and your SMTP credentials. Restoring the data
+without the same `AUTH_SECRET` logs everyone out. :::
 
 ## Find the volume
 
-The examples below use `$VOL` for the volume name. With `docker compose` it is
-your project directory plus `_data`; with the plain `docker run` command from
-[Deployment](deployment.md) it is `schellingboard_data`.
+The examples below use `$VOL` for the volume name. With `docker compose` it is your project
+directory plus `_data`; with the plain `docker run` command from [Deployment](deployment.md) it is
+`schellingboard_data`.
 
 ```bash
 docker volume ls | grep data
@@ -29,13 +27,11 @@ VOL=schellingboard_data
 
 ## Back up without stopping the site
 
-:::warning "Never `cp` or `tar` a live `data.db`"
-A write in progress leaves you with a truncated file that looks fine until you
-try to restore it.
-:::
+:::warning "Never `cp` or `tar` a live `data.db`" A write in progress leaves you with a truncated
+file that looks fine until you try to restore it. :::
 
-Use SQLite's own backup command instead, which takes a consistent snapshot of
-a database that is being written to:
+Use SQLite's own backup command instead, which takes a consistent snapshot of a database that is
+being written to:
 
 ```bash
 mkdir -p ./backups
@@ -49,18 +45,16 @@ docker run --rm \
     tar czf /backup/uploads-$STAMP.tar.gz -C /data uploads"
 ```
 
-This leaves `backups/data-<stamp>.db` and `backups/uploads-<stamp>.tar.gz` on
-the host. It runs against the live volume, so no downtime and no dropped
-requests.
+This leaves `backups/data-<stamp>.db` and `backups/uploads-<stamp>.tar.gz` on the host. It runs
+against the live volume, so no downtime and no dropped requests.
 
-Run it from `cron` to get regular backups, and copy the results somewhere off
-the machine — a backup that only exists on the server it came from does not
-survive losing the server.
+Run it from `cron` to get regular backups, and copy the results somewhere off the machine — a backup
+that only exists on the server it came from does not survive losing the server.
 
 ## Back up with the site stopped
 
-If a few seconds of downtime is fine, stopping the app first means a plain
-archive of the whole volume is safe, and there is nothing to keep in sync:
+If a few seconds of downtime is fine, stopping the app first means a plain archive of the whole
+volume is safe, and there is nothing to keep in sync:
 
 ```bash
 docker compose stop app
@@ -85,12 +79,10 @@ docker run --rm -v "$VOL:/data" -v "$PWD/backups:/backup" alpine sh -c "
 docker compose start app
 ```
 
-- **The `chown` matters.** SchellingBoard runs as user `1001` inside the
-  container but the helper above writes as `root`, so without it the app
-  cannot open its own database.
-- **Restoring into a newer version works** — it migrates the database on
-  startup. Restoring into an **older** one does not, so pin
-  `SCHELLINGBOARD_VERSION` to the version the backup came from if you are
-  rolling back.
-- **Check afterwards** by opening the site: events, proposals and sessions
-  should be there, and the venue map and guest avatars should load.
+- **The `chown` matters.** SchellingBoard runs as user `1001` inside the container but the helper
+  above writes as `root`, so without it the app cannot open its own database.
+- **Restoring into a newer version works** — it migrates the database on startup. Restoring into an
+  **older** one does not, so pin `SCHELLINGBOARD_VERSION` to the version the backup came from if you
+  are rolling back.
+- **Check afterwards** by opening the site: events, proposals and sessions should be there, and the
+  venue map and guest avatars should load.

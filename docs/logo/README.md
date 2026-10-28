@@ -1,13 +1,12 @@
 # Logo
 
-The project's only copy of the logo, shared the same way `docs/screenshots/` is:
-the landing page, the documentation site and the app all reference these files
-rather than keeping their own.
+The project's only copy of the logo, shared the same way `docs/screenshots/` is: the landing page,
+the documentation site and the app all reference these files rather than keeping their own.
 
 ## The mark
 
-Two schedule grid lines crossing, with the one slot everybody converged on
-filled in — the board, and the focal point the name refers to.
+Two schedule grid lines crossing, with the one slot everybody converged on filled in — the board,
+and the focal point the name refers to.
 
 ## Files
 
@@ -26,21 +25,20 @@ filled in — the board, and the focal point the name refers to.
 
 ## The two cuts
 
-`icon.svg` is drawn with a 5.5-unit stroke, which matches the stem weight of
-Montserrat Bold beside it in the lockup. That stroke turns to grey mush below
-about 32px, so `favicon.svg` redraws the same mark at 8 units on coordinates
-that land on whole pixels at 16px. **Use `favicon.svg` for browser chrome and
-`icon.svg` everywhere else.**
+`icon.svg` is drawn with a 5.5-unit stroke, which matches the stem weight of Montserrat Bold beside
+it in the lockup. That stroke turns to grey mush below about 32px, so `favicon.svg` redraws the same
+mark at 8 units on coordinates that land on whole pixels at 16px. **Use `favicon.svg` for browser
+chrome and `icon.svg` everywhere else.**
 
 ## Dark mode
 
-`favicon.svg` carries its own `prefers-color-scheme: dark` rule, turning the ink
-grid white the way `icon-reversed.svg` does — a tab strip is dark in dark mode
-and the ink mark vanishes into it. The other files have separate reversed cuts
-instead, because the background they sit on is the page's, not the browser's.
+`favicon.svg` carries its own `prefers-color-scheme: dark` rule, turning the ink grid white the way
+`icon-reversed.svg` does — a tab strip is dark in dark mode and the ink mark vanishes into it. The
+other files have separate reversed cuts instead, because the background they sit on is the page's,
+not the browser's.
 
-`public/favicon.ico` can't do this (ICO has no media queries), so it stays the
-light cut for browsers with no SVG icon support.
+`public/favicon.ico` can't do this (ICO has no media queries), so it stays the light cut for
+browsers with no SVG icon support.
 
 ## Colours
 
@@ -53,15 +51,14 @@ Unchanged from the landing page, which already used them.
 
 ## Type
 
-The wordmark is Montserrat Bold — the font the app loads — converted to
-outlines, so nothing here needs a webfont. Retype it only by setting Montserrat
-Bold at `letter-spacing: -3` per 120px and converting to paths again; do not
-substitute another font.
+The wordmark is Montserrat Bold — the font the app loads — converted to outlines, so nothing here
+needs a webfont. Retype it only by setting Montserrat Bold at `letter-spacing: -3` per 120px and
+converting to paths again; do not substitute another font.
 
 ## Derived files
 
-`public/` needs real files for Next.js to serve, so three are copies rather
-than references. Regenerate them after any change to the mark:
+`public/` needs real files for Next.js to serve, so three are copies rather than references.
+Regenerate them after any change to the mark:
 
 ```sh
 for s in 16 32 48; do inkscape docs/logo/favicon.svg -o "/tmp/ico-$s.png" -w $s -h $s; done
@@ -72,10 +69,9 @@ convert -size 180x180 xc:white /tmp/at.png -gravity center -composite public/app
 cp public/apple-touch-icon.png docs/logo/apple-touch-icon.png
 ```
 
-The PWA icons in `public/` (`icon-192.png`, `icon-512.png` and
-`icon-maskable-512.png`) come from the same mark, but a launcher crops whatever
-shape it likes out of the maskable one — so that cut is drawn smaller, well
-inside the safe area. A script rather than a one-liner, since that inset is the
+The PWA icons in `public/` (`icon-192.png`, `icon-512.png` and `icon-maskable-512.png`) come from
+the same mark, but a launcher crops whatever shape it likes out of the maskable one — so that cut is
+drawn smaller, well inside the safe area. A script rather than a one-liner, since that inset is the
 whole point:
 
 ```sh
@@ -86,6 +82,6 @@ bun scripts/pwa-icons.ts
 
 - Keep clear space around the logo of at least the height of the coral cell.
 - Don't recolour, stretch, rotate, outline or add effects to it.
-- Don't rebuild the lockup by placing `icon.svg` next to live text — the
-  spacing and the cap-height alignment are baked into `logo.svg`.
+- Don't rebuild the lockup by placing `icon.svg` next to live text — the spacing and the cap-height
+  alignment are baked into `logo.svg`.
 - Below 32px use `favicon.svg`; the mark alone, never the lockup.

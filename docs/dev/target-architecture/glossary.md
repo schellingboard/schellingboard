@@ -1,8 +1,7 @@
 # Glossary
 
-The words used across this design. Where a word already means something to attendees,
-the design keeps that meaning; where the code needs a word attendees never see, it is
-marked _(internal)_.
+The words used across this design. Where a word already means something to attendees, the design
+keeps that meaning; where the code needs a word attendees never see, it is marked _(internal)_.
 
 | Term                      | Meaning                                                                                                                                                                                                                            |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

@@ -1,9 +1,9 @@
 # Creating and Reading GitHub Issues
 
-This repo uses two conventions beyond GitHub's built-in issue fields: an **Issue Type**
-(`Task` / `Bug` / `Feature`) and a custom single-select **Priority** field (`Urgent` / `High` /
-`Medium` / `Low`). Type and Priority carry that information instead of labels — the only labels
-in regular use are the `component: *` ones below.
+This repo uses two conventions beyond GitHub's built-in issue fields: an **Issue Type** (`Task` /
+`Bug` / `Feature`) and a custom single-select **Priority** field (`Urgent` / `High` / `Medium` /
+`Low`). Type and Priority carry that information instead of labels — the only labels in regular use
+are the `component: *` ones below.
 
 ## Component labels
 
@@ -29,9 +29,9 @@ Each issue should get one `component: *` label indicating the area it touches:
 gh issue edit 123 -R schellingboard/schellingboard --add-label "component: scheduling"
 ```
 
-**Always pass `-R schellingboard/schellingboard`** to `gh issue`/`gh pr` commands. Without it
-`gh` infers the repo from git remotes and fails (`not a git repository`) when run from a
-workspace, a jj-only checkout or a subdirectory.
+**Always pass `-R schellingboard/schellingboard`** to `gh issue`/`gh pr` commands. Without it `gh`
+infers the repo from git remotes and fails (`not a git repository`) when run from a workspace, a
+jj-only checkout or a subdirectory.
 
 Neither field is exposed by `gh issue create`/`gh issue edit`/`gh issue view` — both require the
 GraphQL API (`gh api graphql`).
@@ -122,8 +122,9 @@ mutation($issue: ID!, $field: ID!, $opt: ID!) {
 
 Match existing issues' style:
 
-- Sections as needed, in this rough order: `## Overview` / `## Current behavior` / `## Proposed
-behavior` (or `## Proposed change`/`## Proposed fix`) / `## Why` / `## Impact` / `## Notes`
+- Sections as needed, in this rough order: `## Overview` / `## Current behavior` /
+  `## Proposed behavior` (or `## Proposed change`/`## Proposed fix`) / `## Why` / `## Impact` /
+  `## Notes`
 - Small bugs/tasks can just be a short paragraph — headers aren't mandatory.
 - Reference file:line for code-specific bugs (e.g. `` `app/actions/user-auth.ts:130` ``).
 - Keep it succinct; this is a scheduling app issue tracker, not a spec document.

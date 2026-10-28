@@ -28,54 +28,51 @@ cp .env.docker.example .env
 docker compose up -d
 ```
 
-`docker compose` automatically reads a `.env` file in the same directory as
-`docker-compose.yml`, so you don't need to pass variables on the command line.
+`docker compose` automatically reads a `.env` file in the same directory as `docker-compose.yml`, so
+you don't need to pass variables on the command line.
 
-See [Configuration](configuration.md) for every environment variable, including
-how to set up email, and [Backup and restore](backup.md) for keeping a copy of
-your data.
+See [Configuration](configuration.md) for every environment variable, including how to set up email,
+and [Backup and restore](backup.md) for keeping a copy of your data.
 
 ## Serve it over HTTPS
 
-Put the container behind a reverse proxy with a certificate. Set `SB_TRUSTED_PROXIES`
-so the app can tell visitors apart (see
-[Behind a reverse proxy](configuration.md#behind-a-reverse-proxy)). Two attendee-facing
-features only work on an `https://` address, because browsers refuse them
-anywhere else:
+Put the container behind a reverse proxy with a certificate. Set `SB_TRUSTED_PROXIES` so the app can
+tell visitors apart (see [Behind a reverse proxy](configuration.md#behind-a-reverse-proxy)). Two
+attendee-facing features only work on an `https://` address, because browsers refuse them anywhere
+else:
 
 - **Adding the site to a phone's home screen**, and with it
 - **notifications on a phone or laptop** while the site isn't open.
 
-Everything else works over plain HTTP, so a laptop on the venue's wifi is fine
-for a trial run — just not for an event people will install.
+Everything else works over plain HTTP, so a laptop on the venue's wifi is fine for a trial run —
+just not for an event people will install.
 
-Nothing needs configuring for notifications beyond the certificate: the keys
-they are signed with are generated the first time an attendee turns them on and
-kept in the database, so a restored backup keeps working.
+Nothing needs configuring for notifications beyond the certificate: the keys they are signed with
+are generated the first time an attendee turns them on and kept in the database, so a restored
+backup keeps working.
 
 ## Updating
 
-Pull the new image and start the container again; your data stays in the volume.
-With `docker compose`:
+Pull the new image and start the container again; your data stays in the volume. With
+`docker compose`:
 
 ```bash
 docker compose pull
 docker compose up -d
 ```
 
-With plain `docker`, run `docker pull schellingboard/schellingboard`, then stop and
-remove the container and `docker run` it again with the same options. Database
-changes are applied on start. Take a [backup](backup.md) first.
+With plain `docker`, run `docker pull schellingboard/schellingboard`, then stop and remove the
+container and `docker run` it again with the same options. Database changes are applied on start.
+Take a [backup](backup.md) first.
 
-When you are signed in as admin, a red dot beside the version in the footer says a
-newer release is out; select the version to see both releases and their dates. The
-server looks this up on GitHub at most once a day and shows nothing if it cannot
-reach it. Set `SB_UPDATE_CHECK=false` to turn the lookup off.
+When you are signed in as admin, a red dot beside the version in the footer says a newer release is
+out; select the version to see both releases and their dates. The server looks this up on GitHub at
+most once a day and shows nothing if it cannot reach it. Set `SB_UPDATE_CHECK=false` to turn the
+lookup off.
 
 ## Administration
 
-Events, guests, locations, and content moderation are managed through the web
-admin UI at `/legacy/admin`. Set `ADMIN_PASSWORD` (and `AUTH_SECRET`) to enable it.
-See the [Admin UI guide](../organizers/admin-guide.md) for what's configurable,
-and [How it works](../organizers/how-it-works.md) for the phase model and
-attendee-facing behavior.
+Events, guests, locations, and content moderation are managed through the web admin UI at
+`/legacy/admin`. Set `ADMIN_PASSWORD` (and `AUTH_SECRET`) to enable it. See the
+[Admin UI guide](../organizers/admin-guide.md) for what's configurable, and
+[How it works](../organizers/how-it-works.md) for the phase model and attendee-facing behavior.

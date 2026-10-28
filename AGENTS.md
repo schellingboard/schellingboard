@@ -1,14 +1,16 @@
 # Project Instructions
 
-Read [docs/dev/README.md](docs/dev/README.md) for architecture, code style, common patterns, and version control conventions. It indexes the developer docs.
+Read [docs/dev/README.md](docs/dev/README.md) for architecture, code style, common patterns, and
+version control conventions. It indexes the developer docs.
 
-**Never fetch or read developers.schellingboard.org.** It is a published copy of `docs/dev/`;
-always use the local files, which are current with your checkout. This includes links to the site
-inside the docs (e.g. the diagram explorer): find the source under `docs/dev/` instead.
+**Never fetch or read developers.schellingboard.org.** It is a published copy of `docs/dev/`; always
+use the local files, which are current with your checkout. This includes links to the site inside
+the docs (e.g. the diagram explorer): find the source under `docs/dev/` instead.
 
 ## Project Overview
 
-Next.js scheduling app for managing conference/event sessions with three phases: proposal, voting, and scheduling. Uses SQLite as the database backend.
+Next.js scheduling app for managing conference/event sessions with three phases: proposal, voting,
+and scheduling. Uses SQLite as the database backend.
 
 ## Key Considerations
 
@@ -16,37 +18,38 @@ Next.js scheduling app for managing conference/event sessions with three phases:
 2. **Phase Management**: Event phases control available features
 3. **Time Zones**: Use proper timezone handling for scheduling
 4. **Mobile Responsive**: All UI must work on mobile
-5. **E2E Testing**: Tests must imitate real user behavior — navigate through the UI by clicking visible elements and following links, not by constructing URLs with internal IDs (e.g. `?sessionID=`, `?proposalId=`). Never extract IDs from URLs or replay raw API payloads. Use semantic locators (`getByRole`, `getByLabel`, `getByText`) instead of CSS ID/class selectors.
+5. **E2E Testing**: Tests must imitate real user behavior — navigate through the UI by clicking
+   visible elements and following links, not by constructing URLs with internal IDs (e.g.
+   `?sessionID=`, `?proposalId=`). Never extract IDs from URLs or replay raw API payloads. Use
+   semantic locators (`getByRole`, `getByLabel`, `getByText`) instead of CSS ID/class selectors.
 
 ## Changelog
 
-Update `CHANGELOG.md` under `[Unreleased]` for any user-facing change. The audience is
-event organizers and attendees, so keep it non-technical. Dev-only changes go under
-`Internal`. See [docs/dev/changelog.md](docs/dev/changelog.md) for the section
-types.
+Update `CHANGELOG.md` under `[Unreleased]` for any user-facing change. The audience is event
+organizers and attendees, so keep it non-technical. Dev-only changes go under `Internal`. See
+[docs/dev/changelog.md](docs/dev/changelog.md) for the section types.
 
-**Format**: `- **Bold lead phrase** (#123): what changed, and — only where it isn't
-obvious — what was wrong before.`
+**Format**:
+`- **Bold lead phrase** (#123): what changed, and — only where it isn't obvious — what was wrong before.`
 
 **Hard limits** — limits, not targets:
 
-- One bullet per change. **Two lines of prose, ~40 words, maximum.** No sub-bullets, no
-  second paragraph. If it doesn't fit, you are explaining too much.
-- Reference the GitHub issue where one exists — `(#123)`, straight after the lead
-  phrase. Take the number from the commit's `fixes #123` / `issue #123` footer, never
-  from the PR number GitHub appends to a squashed subject. No issue, no reference.
+- One bullet per change. **Two lines of prose, ~40 words, maximum.** No sub-bullets, no second
+  paragraph. If it doesn't fit, you are explaining too much.
+- Reference the GitHub issue where one exists — `(#123)`, straight after the lead phrase. Take the
+  number from the commit's `fixes #123` / `issue #123` footer, never from the PR number GitHub
+  appends to a squashed subject. No issue, no reference.
 - Several commits that together deliver one feature get **one** bullet, not one each.
-- `Internal` is **not a second commit history** — git already has that, in more detail
-  and better indexed. It lists only internal changes that are particularly valuable,
-  disruptive, or otherwise a highlight of the release: roughly **3 entries per release,
-  one line each (~25 words)**. Everything else — test and flake fixes, refactors,
-  dependency bumps, perf tweaks, lint config, tidy-ups — gets **no entry at all**. If
-  you are unsure whether it qualifies, it doesn't.
+- `Internal` is **not a second commit history** — git already has that, in more detail and better
+  indexed. It lists only internal changes that are particularly valuable, disruptive, or otherwise a
+  highlight of the release: roughly **3 entries per release, one line each (~25 words)**. Everything
+  else — test and flake fixes, refactors, dependency bumps, perf tweaks, lint config, tidy-ups —
+  gets **no entry at all**. If you are unsure whether it qualifies, it doesn't.
 
-**Never in the changelog**: rationale and trade-offs; how it was implemented; file,
-function, library or framework names (outside `Internal`); edge cases; the story of how
-a bug was found; future plans; anything the lead phrase already said. Those belong in
-the commit message, an ADR or `docs/dev/`.
+**Never in the changelog**: rationale and trade-offs; how it was implemented; file, function,
+library or framework names (outside `Internal`); edge cases; the story of how a bug was found;
+future plans; anything the lead phrase already said. Those belong in the commit message, an ADR or
+`docs/dev/`.
 
 ```
 Bad  - **Interrupting a profile slide no longer restarts it**: pressing Next or Prev
@@ -61,52 +64,47 @@ Good - **Interrupting a profile slide no longer restarts it** (#123): pressing N
 
 ## In-app release notes
 
-`packages/domain/src/release-notes.ts` backs the footer's version button. Its first entry is the release
-being prepared, and it holds **3–5 highlights of that release — no more**.
+`packages/domain/src/release-notes.ts` backs the footer's version button. Its first entry is the
+release being prepared, and it holds **3–5 highlights of that release — no more**.
 
 - A highlight is something a reader would want announced. If it wouldn't open a release
   announcement, it doesn't belong: bug fixes, polish and internal work almost never do.
 - One sentence each, ~25 words, `**bold lead phrase**` first. No issue references.
-- **The list is not append-only.** Add yours when the change lands, knowing what else is
-  coming may displace it; when it is full, replace the weakest highlight rather than
-  adding a sixth.
-- Before finalizing a release, read the entry against `CHANGELOG.md` and check these
-  really are the release's most representative changes for attendees and organizers.
-  See [docs/dev/releasing.md](docs/dev/releasing.md).
+- **The list is not append-only.** Add yours when the change lands, knowing what else is coming may
+  displace it; when it is full, replace the weakest highlight rather than adding a sixth.
+- Before finalizing a release, read the entry against `CHANGELOG.md` and check these really are the
+  release's most representative changes for attendees and organizers. See
+  [docs/dev/releasing.md](docs/dev/releasing.md).
 
 ## Documentation
 
-- **Attendee/organizer docs**: `docs/public/` — one copy, documenting the _next_
-  release. Edit in the same commit as the change they describe, and run
-  `make docs-validate` after changing links.
-- **Developer docs**: `docs/dev/` (ADRs, design notes, the guideline chapters),
-  published from `main` to developers.schellingboard.org. Links to files outside
-  `docs/dev/` must be absolute GitHub URLs — the site can't resolve them. Run
-  `make docs-dev-validate` after changing links.
-- **Screenshots**: `docs/screenshots/` — the project's only copy. Reference them
-  relatively from markdown (`../screenshots/x.webp`), never root-relative.
-- **The landing page** (schellingboard.org): hand-written HTML in `www/`. Don't
-  move it to docmd.
+- **Attendee/organizer docs**: `docs/public/` — one copy, documenting the _next_ release. Edit in
+  the same commit as the change they describe, and run `make docs-validate` after changing links.
+- **Developer docs**: `docs/dev/` (ADRs, design notes, the guideline chapters), published from
+  `main` to developers.schellingboard.org. Links to files outside `docs/dev/` must be absolute
+  GitHub URLs — the site can't resolve them. Run `make docs-dev-validate` after changing links.
+- **Screenshots**: `docs/screenshots/` — the project's only copy. Reference them relatively from
+  markdown (`../screenshots/x.webp`), never root-relative.
+- **The landing page** (schellingboard.org): hand-written HTML in `www/`. Don't move it to docmd.
 - Details: [docs/dev/documentation.md](docs/dev/documentation.md).
 
 ## GitHub Issues
 
 When creating or editing GitHub issues, set Issue Type and the Priority field to match existing
-conventions — see [docs/dev/github-issues.md](docs/dev/github-issues.md) for the required `gh api
-graphql` commands (neither field is settable via plain `gh issue create`/`edit`).
+conventions — see [docs/dev/github-issues.md](docs/dev/github-issues.md) for the required
+`gh api graphql` commands (neither field is settable via plain `gh issue create`/`edit`).
 
 ## Version Control
 
 - Use `jj` (jujutsu) if available, otherwise `git`
 - Pre-commit: run `make precommit` to format, lint, type check, and run tests
-- Commit messages: conventional prefix, subject ≤ 72 chars, body wrapped at 80. Check
-  with `make commit-check` after committing (see docs/dev/version-control.md)
+- Commit messages: conventional prefix, subject ≤ 72 chars, body wrapped at 80. Check with
+  `make commit-check` after committing (see docs/dev/version-control.md)
 - Work on a GitHub issue ends with a footer naming it: `fixes #123` when the commit fully resolves
   the issue (GitHub then closes it), `issue #123` when it is only part of the work
 - See [docs/dev/migrations.md](docs/dev/migrations.md) for resolving `drizzle` migration conflicts
-- NEVER push to a remote server unless explicitly told to do so, in which case
-  it's a one time ask, not a general permission. This also applies to any kind
-  of agents.
+- NEVER push to a remote server unless explicitly told to do so, in which case it's a one time ask,
+  not a general permission. This also applies to any kind of agents.
 
 ### jj paths with special characters
 
@@ -144,72 +142,82 @@ jj squash --from <commit> --to @ -m "message" -- <path>
   - `bun set-env.ts test bun x playwright test -g "creates a proposal"` (by title substring)
   - add `--no-deps` for a spec in the `firefox-globals` project (`settings.spec.ts`), or the whole
     project it depends on runs first
-- Full test strategy and TDD rules are in [docs/dev/testing.md](docs/dev/testing.md) — read it before writing any test
-- Tests run on Windows too: `path.relative` and `path.join` return backslash-separated paths there, so normalize with `.split(path.sep).join("/")` before comparing against `/`-separated strings.
-- Before running tests for the first time in a session, check whether mailpit is running (`docker compose -f docker-compose.dev.yml $(test -f .env.dev.local && echo --env-file .env.dev.local) ps mailpit` — mirrors the `mailpit` Makefile target, including its `--env-file` conditional, since `.env.dev.local` can set a per-clone `COMPOSE_PROJECT_NAME`); if not, ask the user whether to start it. `make mailpit` stays attached and blocks the shell, so
-  agents start it detached with the same command and `up -d mailpit`
+- Full test strategy and TDD rules are in [docs/dev/testing.md](docs/dev/testing.md) — read it
+  before writing any test
+- Tests run on Windows too: `path.relative` and `path.join` return backslash-separated paths there,
+  so normalize with `.split(path.sep).join("/")` before comparing against `/`-separated strings.
+- Before running tests for the first time in a session, check whether mailpit is running
+  (`docker compose -f docker-compose.dev.yml $(test -f .env.dev.local && echo --env-file .env.dev.local) ps mailpit`
+  — mirrors the `mailpit` Makefile target, including its `--env-file` conditional, since
+  `.env.dev.local` can set a per-clone `COMPOSE_PROJECT_NAME`); if not, ask the user whether to
+  start it. `make mailpit` stays attached and blocks the shell, so agents start it detached with the
+  same command and `up -d mailpit`
 
 ### Test tiers (short form)
 
 - **E2E** (Playwright): important user workflows only — quality over quantity
-- **E2E against the Docker image** (`make test-e2e-docker`): the same suite against a container. Not part of `make precommit`; the release workflow runs it against the image it is about to publish, so run it by hand after touching the `Dockerfile`, the standalone build, or anything path-, upload- or migration-related — well before a release. The container runs in UTC, so it catches dates formatted in the ambient time zone; format in the event's zone
+- **E2E against the Docker image** (`make test-e2e-docker`): the same suite against a container. Not
+  part of `make precommit`; the release workflow runs it against the image it is about to publish,
+  so run it by hand after touching the `Dockerfile`, the standalone build, or anything path-,
+  upload- or migration-related — well before a release. The container runs in UTC, so it catches
+  dates formatted in the ambient time zone; format in the event's zone
 - **Integration** (Vitest, real DB): high coverage of business logic via repositories/server actions
-- **Release upgrade** (Vitest, part of `make test`): migrates a released version's seeded database forward and exercises CRUD on it. Add a fixture only when releasing (`make dump-release-db VERSION=vX.Y.Z`), never by hand
+- **Release upgrade** (Vitest, part of `make test`): migrates a released version's seeded database
+  forward and exercises CRUD on it. Add a fixture only when releasing
+  (`make dump-release-db VERSION=vX.Y.Z`), never by hand
 - **Unit** (Vitest): only for complex isolated functions; never duplicate integration-test coverage
 
 ### Mandatory TDD for agents
 
 Follow red → green → refactor strictly. **No skipping steps.**
 
-1. Find the use case in `tests/use-cases.ts` (add it if missing) and write the failing test,
-   tagged with its ID — see [Use cases](docs/dev/testing.md#use-cases).
+1. Find the use case in `tests/use-cases.ts` (add it if missing) and write the failing test, tagged
+   with its ID — see [Use cases](docs/dev/testing.md#use-cases).
 2. Run `make test` or `make test-e2e` and **confirm the failure output**.
 3. Implement the minimum code to pass.
 4. Run again and confirm green.
 5. Refactor without touching the test.
 
-Exceptions (be very conservative): pure UI/styling-only changes; refactors where existing tests already give full coverage.
+Exceptions (be very conservative): pure UI/styling-only changes; refactors where existing tests
+already give full coverage.
 
-For those exceptions, **don't write a test at all** — no E2E test asserting layout,
-spacing, scroll height or which chrome is on the page. Keep the existing suite passing
-instead, adapting the tests that the change genuinely breaks and nothing more.
+For those exceptions, **don't write a test at all** — no E2E test asserting layout, spacing, scroll
+height or which chrome is on the page. Keep the existing suite passing instead, adapting the tests
+that the change genuinely breaks and nothing more.
 
 ## Coding Guidelines
 
 ### Comments
 
-**Read [docs/dev/coding-guidelines.md](docs/dev/coding-guidelines.md#comments) before
-writing any comment.** The rule is: comment the WHY, not the WHAT. The short version,
-with the limits agents keep overshooting:
+**Read [docs/dev/coding-guidelines.md](docs/dev/coding-guidelines.md#comments) before writing any
+comment.** The rule is: comment the WHY, not the WHAT. The short version, with the limits agents
+keep overshooting:
 
-**Default to zero.** Most changes should add no comments at all. Adding none is a normal,
-correct outcome — not a gap to fill. Never add a comment merely because a function is long,
-because you touched the file, or to summarise what you just wrote.
+**Default to zero.** Most changes should add no comments at all. Adding none is a normal, correct
+outcome — not a gap to fill. Never add a comment merely because a function is long, because you
+touched the file, or to summarise what you just wrote.
 
 **Hard limits** — limits, not targets:
 
-- **At most one comment per ~50 lines of new code**, and **two lines each, maximum**. Over
-  either limit, delete the weakest until you are under it. A longer comment needs a reason
-  a reader could not reconstruct (a subtle race, a spec constraint) and should be rare.
+- **At most one comment per ~50 lines of new code**, and **two lines each, maximum**. Over either
+  limit, delete the weakest until you are under it. A longer comment needs a reason a reader could
+  not reconstruct (a subtle race, a spec constraint) and should be rare.
 - **Never narrate the blocks of a function.** `// validation`, `// Add RSVP`,
-  `// Make the actual API call`, `// Revert optimistic update on error` are all
-  forbidden: the code under them says exactly that.
-- **No doc blocks or `@param`/`@returns` that restate the signature.** TypeScript types are
-  the documentation.
-- **No section banners** (`// ---- helpers ----`), commented-out code, or notes about the
-  change you are making (`// now also handles X`, `// new in v2`) — that goes in the commit
-  message.
-- **No comment that duplicates a value or behaviour defined elsewhere** — it goes stale
-  silently.
+  `// Make the actual API call`, `// Revert optimistic update on error` are all forbidden: the code
+  under them says exactly that.
+- **No doc blocks or `@param`/`@returns` that restate the signature.** TypeScript types are the
+  documentation.
+- **No section banners** (`// ---- helpers ----`), commented-out code, or notes about the change you
+  are making (`// now also handles X`, `// new in v2`) — that goes in the commit message.
+- **No comment that duplicates a value or behaviour defined elsewhere** — it goes stale silently.
 
-**The delete test**: cover the comment and read the code under it. If the code tells you
-the same thing, delete the comment. Apply this to every comment before you finish, and
-again before committing.
+**The delete test**: cover the comment and read the code under it. If the code tells you the same
+thing, delete the comment. Apply this to every comment before you finish, and again before
+committing.
 
 This rule **overrides consistency with surrounding code**. Parts of this codebase are
-over-commented; do not match their density, write the sparse version. Removing a redundant
-comment from code you are already changing is welcome; a sweeping cleanup of untouched
-files is not.
+over-commented; do not match their density, write the sparse version. Removing a redundant comment
+from code you are already changing is welcome; a sweeping cleanup of untouched files is not.
 
 #### Examples from this codebase
 
@@ -244,51 +252,55 @@ const renderedSize = { lg: 112, md: 64, sm: 48 }[size];
 
 ## Autonomous runs
 
-Applies only while `.claude/run/PLAN.md` exists. A hook prints it and
-`.claude/run/PROGRESS.md` at session start and after compaction; those files, not the
-conversation, are the state of the run.
+Applies only while `.claude/run/PLAN.md` exists. A hook prints it and `.claude/run/PROGRESS.md` at
+session start and after compaction; those files, not the conversation, are the state of the run.
 
-- Do one PLAN.md step at a time in an `implementer` subagent. Keep the same one for
-  the next step (`SendMessage`), with the step and the PROGRESS.md entries it needs.
-  Start a fresh one only when its context is at or above 200k tokens at the end of a
-  step, as the Agent result's usage shows; a fresh one shares no memory with you.
-- After every step, run a fresh `reviewer` subagent on its commit. It changes nothing.
-  Pass its report verbatim to the implementer, which evaluates each finding
-  critically, fixes those it accepts, amends the commit, and gives a reason for each
-  finding it rejects. Push only after that, so the amend needs no force-push.
-- Delegate searches that read more than a few files to the `Explore` agent. Do not
-  read large files, logs or full test output in the main session.
-- A step is done when `make precommit` passes. If a tier cannot run in the
-  environment, say so in PROGRESS.md and in the commit message; never skip it silently.
-- One commit per step. If a step is too big for one coherent commit, split it in
-  PLAN.md first. In the step's own commit, replace the finished step in PLAN.md with a
-  one-line summary and update PROGRESS.md (decisions, problems, next step).
-- Keep both files small. Fold completed steps into a short summary. Keep a PROGRESS.md
-  entry only if a later step needs it; drop the rest (jj history has them).
-- Only push if explicitly instructed to! If pushing, push every commit as its
-  own stacked PR: branch `<session branch>-NN` (01, 02, …) holding exactly that
-  commit on top of the branch before it. The first PR's base is the branch of
-  the commit below it if that has an open PR, otherwise `main`. PR title and
-  body are the commit message. Never push to `main`.
-- Never rewrite a pushed commit; a fix to it is a new step. If `gh` cannot open a PR,
-  push the branch and list it with its base in PROGRESS.md.
-- Blocked, or facing a decision the plan and ADRs do not settle: record it under
-  "Questions" in PROGRESS.md, then continue with a step that does not depend on it.
-- When no step is left: read the next steps named at the bottom of PLAN.md. If there
-  are any, write a new PLAN.md from them and recreate PROGRESS.md from scratch, carrying
-  over only open Questions and facts the new plan needs. Do this in one commit, then
-  continue. If there are none, delete `.claude/run/` in a last commit and stop.
+- Do one PLAN.md step at a time in an `implementer` subagent. Keep the same one for the next step
+  (`SendMessage`), with the step and the PROGRESS.md entries it needs. Start a fresh one only when
+  its context is at or above 200k tokens at the end of a step, as the Agent result's usage shows; a
+  fresh one shares no memory with you.
+- After every step, run a fresh `reviewer` subagent on its commit. It changes nothing. Pass its
+  report verbatim to the implementer, which evaluates each finding critically, fixes those it
+  accepts, amends the commit, and gives a reason for each finding it rejects. Push only after that,
+  so the amend needs no force-push.
+- Delegate searches that read more than a few files to the `Explore` agent. Do not read large files,
+  logs or full test output in the main session.
+- A step is done when `make precommit` passes. If a tier cannot run in the environment, say so in
+  PROGRESS.md and in the commit message; never skip it silently.
+- One commit per step. If a step is too big for one coherent commit, split it in PLAN.md first. In
+  the step's own commit, replace the finished step in PLAN.md with a one-line summary and update
+  PROGRESS.md (decisions, problems, next step).
+- Keep both files small. Fold completed steps into a short summary. Keep a PROGRESS.md entry only if
+  a later step needs it; drop the rest (jj history has them).
+- Only push if explicitly instructed to! If pushing, push every commit as its own stacked PR: branch
+  `<session branch>-NN` (01, 02, …) holding exactly that commit on top of the branch before it. The
+  first PR's base is the branch of the commit below it if that has an open PR, otherwise `main`. PR
+  title and body are the commit message. Never push to `main`.
+- Never rewrite a pushed commit; a fix to it is a new step. If `gh` cannot open a PR, push the
+  branch and list it with its base in PROGRESS.md.
+- Blocked, or facing a decision the plan and ADRs do not settle: record it under "Questions" in
+  PROGRESS.md, then continue with a step that does not depend on it.
+- When no step is left: read the next steps named at the bottom of PLAN.md. If there are any, write
+  a new PLAN.md from them and recreate PROGRESS.md from scratch, carrying over only open Questions
+  and facts the new plan needs. Do this in one commit, then continue. If there are none, delete
+  `.claude/run/` in a last commit and stop.
 
 ## Misc
 
-When adding a link to session/proposal modal, see `modal-nav.ts`, there are gotchas (anchor: MnpjIo7Y).
+When adding a link to session/proposal modal, see `modal-nav.ts`, there are gotchas (anchor:
+MnpjIo7Y).
 
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+This version has breaking changes — APIs, conventions, and file structure may all differ from your
+training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's
+directory; in monorepos the `next` package may not be visible from the repo root) before writing any
+code. Heed deprecation notices.
 
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+This block is written and re-added by `next dev` — verify at
+`node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates
+the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->

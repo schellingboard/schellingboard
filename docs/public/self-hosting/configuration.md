@@ -6,9 +6,8 @@ type: reference
 
 # Configuration
 
-SchellingBoard is configured entirely through environment variables. Only
-`AUTH_SECRET` is required; everything else has a sensible default or switches
-a feature off when unset.
+SchellingBoard is configured entirely through environment variables. Only `AUTH_SECRET` is required;
+everything else has a sensible default or switches a feature off when unset.
 
 ## Environment variables
 
@@ -38,56 +37,45 @@ a feature off when unset.
 
 ## Behind a reverse proxy
 
-SchellingBoard limits failed logins per visitor, and tells visitors apart by
-their address. Behind a reverse proxy, every request comes from the proxy, so
-set `SB_TRUSTED_PROXIES` to the number of proxies in front of the app (usually
-`1`). The app then reads the visitor's address from the `X-Forwarded-For`
-header, which each proxy must append to (Caddy and Traefik do by default; in
-nginx use `proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for`).
+SchellingBoard limits failed logins per visitor, and tells visitors apart by their address. Behind a
+reverse proxy, every request comes from the proxy, so set `SB_TRUSTED_PROXIES` to the number of
+proxies in front of the app (usually `1`). The app then reads the visitor's address from the
+`X-Forwarded-For` header, which each proxy must append to (Caddy and Traefik do by default; in nginx
+use `proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for`).
 
-Leave it at `0` when nothing stands in front of the app: a visitor could then
-fake the header to dodge the limit. Without it, all visitors share one limit,
-so a few people mistyping the site password can lock everyone out for some
-minutes.
+Leave it at `0` when nothing stands in front of the app: a visitor could then fake the header to
+dodge the limit. Without it, all visitors share one limit, so a few people mistyping the site
+password can lock everyone out for some minutes.
 
 ### Live updates through a proxy
 
-The live schedule is a stream the browser keeps open, and the app sends a
-small message on it every 25 seconds. A proxy must pass it on as it arrives and
-not hold it back:
+The live schedule is a stream the browser keeps open, and the app sends a small message on it every
+25 seconds. A proxy must pass it on as it arrives and not hold it back:
 
-- Turn off response buffering for `/api/v1/events/` (nginx:
-  `proxy_buffering off`; the app already sends `X-Accel-Buffering: no`, which
-  nginx honours unless you override it).
-- Allow a read timeout above 25 seconds (nginx: `proxy_read_timeout 60s`). The
-  app ends each stream after 10 minutes and the browser reconnects by itself.
-- Use HTTP/2 or HTTP/3 to the browser if you can. Over HTTP/1.1 a browser opens
-  at most six connections to one site, and each open tab with the schedule uses
-  one.
+- Turn off response buffering for `/api/v1/events/` (nginx: `proxy_buffering off`; the app already
+  sends `X-Accel-Buffering: no`, which nginx honours unless you override it).
+- Allow a read timeout above 25 seconds (nginx: `proxy_read_timeout 60s`). The app ends each stream
+  after 10 minutes and the browser reconnects by itself.
+- Use HTTP/2 or HTTP/3 to the browser if you can. Over HTTP/1.1 a browser opens at most six
+  connections to one site, and each open tab with the schedule uses one.
 
-When the stream cannot get through, the schedule shows **Reconnecting…** and
-then **Not updating: may be out of date**; the pages still work and show the
-state at the last load.
+When the stream cannot get through, the schedule shows **Reconnecting…** and then **Not updating:
+may be out of date**; the pages still work and show the state at the last load.
 
 ## Email
 
-Email is optional — leave the SMTP variables unset to disable it. To enable
-email, set `SMTP_FROM` plus either `SMTP_URL` (a single connection string,
-e.g. `smtp://user:pass@localhost:1025`, which already includes the host,
-port, user, password, and security settings) **or** `SMTP_HOST` together
+Email is optional — leave the SMTP variables unset to disable it. To enable email, set `SMTP_FROM`
+plus either `SMTP_URL` (a single connection string, e.g. `smtp://user:pass@localhost:1025`, which
+already includes the host, port, user, password, and security settings) **or** `SMTP_HOST` together
 with `SMTP_PORT`/`SMTP_USER`/`SMTP_PASSWORD`/`SMTP_SECURE` — not both.
 
-\* `SITE_URL` is required when email is enabled, so that emails can link back
-to the site.
+\* `SITE_URL` is required when email is enabled, so that emails can link back to the site.
 
-Notification emails go out a few seconds after whatever they announce, not as
-part of it, so a slow mail server never slows the site down. One that fails is
-retried for up to a day.
+Notification emails go out a few seconds after whatever they announce, not as part of it, so a slow
+mail server never slows the site down. One that fails is retried for up to a day.
 
 Leaving email unconfigured also disables
-[attendee name protection](../organizers/how-it-works.md#attendee-identity),
-since it relies on emailed login codes. It does **not** disable in-app
-notifications, including the reminders to record attendance: those are
-delivered whether or not the instance can send mail. For which messages
-SchellingBoard sends and when, see
-[How it works § Email](../organizers/how-it-works.md#email).
+[attendee name protection](../organizers/how-it-works.md#attendee-identity), since it relies on
+emailed login codes. It does **not** disable in-app notifications, including the reminders to record
+attendance: those are delivered whether or not the instance can send mail. For which messages
+SchellingBoard sends and when, see [How it works § Email](../organizers/how-it-works.md#email).

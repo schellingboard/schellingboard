@@ -1,14 +1,13 @@
 # Architecture decision records
 
-One record per decision that was expensive to make and would be expensive to
-revisit: what the situation was, what was chosen, and what that costs. They are
-not updated as the code moves on — a decision that no longer holds gets a new
-ADR superseding it, so the reasoning at the time stays readable.
+One record per decision that was expensive to make and would be expensive to revisit: what the
+situation was, what was chosen, and what that costs. They are not updated as the code moves on — a
+decision that no longer holds gets a new ADR superseding it, so the reasoning at the time stays
+readable.
 
-Write one when a choice constrains later work (a dependency, a data model, a
-protocol, a deployment shape), not for every design discussion. Number it after
-the highest existing ADR and give it the same header block: status, date, and
-the tracking issue where there is one.
+Write one when a choice constrains later work (a dependency, a data model, a protocol, a deployment
+shape), not for every design discussion. Number it after the highest existing ADR and give it the
+same header block: status, date, and the tracking issue where there is one.
 
 | ADR                                                  | Decision                                                    | Date       |
 | ---------------------------------------------------- | ----------------------------------------------------------- | ---------- |

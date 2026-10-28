@@ -1,7 +1,7 @@
 # Database Migrations
 
-`make dev-migrate-create` (`drizzle-kit generate`) diffs `db/schema.ts` against the latest
-snapshot in `drizzle/meta/` and writes a new `NNNN_*.sql` file plus an updated
+`make dev-migrate-create` (`drizzle-kit generate`) diffs `db/schema.ts` against the latest snapshot
+in `drizzle/meta/` and writes a new `NNNN_*.sql` file plus an updated
 `drizzle/meta/NNNN_snapshot.json` and `drizzle/meta/_journal.json`.
 
 `make test` applies every migration to each released version's database as well as to an empty one,
@@ -11,8 +11,8 @@ so a migration that only fails against populated data fails there — see
 ## Resolving migration conflicts
 
 When two branches each add a migration, `drizzle/meta/_journal.json` and the latest
-`drizzle/meta/NNNN_snapshot.json` conflict — both branches claim the same index. Don't hand-edit
-the conflicted JSON; regenerate it instead:
+`drizzle/meta/NNNN_snapshot.json` conflict — both branches claim the same index. Don't hand-edit the
+conflicted JSON; regenerate it instead:
 
 1. Move your own new `.sql` migration file out of the way (e.g. to `/tmp`) so it doesn't confuse
    `drizzle-kit`. Note its name.
@@ -44,8 +44,8 @@ the conflicted JSON; regenerate it instead:
    mechanical schema change they'll match — delete the moved-aside copy. But if your original
    migration had hand-written SQL beyond what `schema.ts` alone implies (a data backfill, a value
    transform, choosing "rename" over "create+drop"), the regenerated file won't reproduce it —
-   drizzle-kit only knows what it can infer from the schema diff. In that case keep the _regenerated_
-   `drizzle/meta/*_snapshot.json` and journal entry (they carry the correct index), but replace the
-   regenerated file's SQL body with your original hand-written SQL.
+   drizzle-kit only knows what it can infer from the schema diff. In that case keep the
+   _regenerated_ `drizzle/meta/*_snapshot.json` and journal entry (they carry the correct index),
+   but replace the regenerated file's SQL body with your original hand-written SQL.
 5. Run `make dev-migrate-up` to confirm the migration applies cleanly, then continue resolving the
    rest of the conflict as usual.
