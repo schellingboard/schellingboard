@@ -1,7 +1,20 @@
+import type { Page } from "@playwright/test";
 import { test, expect } from "./helpers/fixtures";
 import { uniqueSuffix } from "./helpers/unique";
 import { loginAndGoto, login } from "./helpers/auth";
 import { selectUser } from "./helpers/user";
+
+// Parallel tests add proposals above this one, and a row that moves between
+// mouse down and up is not clicked. Searching keeps the others out; the sort
+// menu turns off once the debounced results show.
+async function editFromList(page: Page, title: string) {
+  await page.getByPlaceholder("Search proposals").fill(title);
+  await expect(page.getByRole("combobox", { name: "Sort by" })).toBeDisabled();
+  await page
+    .getByRole("row", { name: new RegExp(title) })
+    .getByRole("link", { name: /Edit/i })
+    .click();
+}
 
 test("should auto-focus the title input for new proposals @004-US1", async ({
   page,
@@ -54,11 +67,7 @@ test("should create a new session proposal, edit it, and add hosts @004-US1 @004
     page.getByRole("row", { name: new RegExp(proposalTitle) })
   ).toBeVisible();
 
-  // Click the edit button directly (rather than clicking the row to navigate first)
-  const proposalRow = page.getByRole("row", {
-    name: new RegExp(proposalTitle),
-  });
-  await proposalRow.getByRole("link", { name: /Edit/i }).click();
+  await editFromList(page, proposalTitle);
   await expect(
     page.getByRole("heading", { name: /Edit Session Proposal/i })
   ).toBeVisible();
@@ -100,7 +109,7 @@ test("cancelling a proposal edit keeps it unchanged @004-US2", async ({
   ]);
 
   const row = page.getByRole("row", { name: new RegExp(proposalTitle) });
-  await row.getByRole("link", { name: /Edit/i }).click();
+  await editFromList(page, proposalTitle);
   await page.getByLabel("Title").fill(`${proposalTitle} discarded`);
   await Promise.all([
     page.waitForURL(/\/Conference-Alpha\/proposals$/),
@@ -127,11 +136,12 @@ test("should delete a proposal from its edit page @004-US3", async ({
     page.waitForURL(/\/Conference-Alpha\/proposals$/),
     page.getByRole("button", { name: /Submit/i }).click(),
   ]);
-  const row = page.getByRole("row", { name: new RegExp(proposalTitle) });
-  await expect(row).toBeVisible();
+  await expect(
+    page.getByRole("row", { name: new RegExp(proposalTitle) })
+  ).toBeVisible();
 
   // Delete lives on the edit page and requires confirmation
-  await row.getByRole("link", { name: /Edit/i }).click();
+  await editFromList(page, proposalTitle);
   await expect(
     page.getByRole("heading", { name: /Edit Session Proposal/i })
   ).toBeVisible();
@@ -170,7 +180,7 @@ test("a non-host cannot edit or delete another guest's proposal @004-US2 @004-US
   ]);
   const row = page.getByRole("row", { name: new RegExp(proposalTitle) });
   await expect(row).toBeVisible();
-  await row.getByRole("link", { name: /Edit/i }).click();
+  await editFromList(page, proposalTitle);
   await expect(
     page.getByRole("heading", { name: /Edit Session Proposal/i })
   ).toBeVisible();
@@ -381,7 +391,10 @@ test("sorts proposals by title in both directions @004-US5", async ({
 
   await titleHeader.click();
   const descending = await titles();
-  expect(descending).toEqual([...ascending].reverse());
+  // Not the reverse of `ascending`: a parallel test may add a proposal between.
+  expect(descending).toEqual(
+    [...descending].sort((a, b) => b.localeCompare(a))
+  );
 });
 
 test("sorts proposals by when they were last updated @004-US5", async ({

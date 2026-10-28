@@ -9,8 +9,7 @@
 
 - Known load-only E2E flakes: `settings.spec.ts:67` (`goto('/legacy/admin')` aborts),
   `scheduling.spec` edit, delete and cancel (about one run in four at 8 workers),
-  `profile-comments.spec.ts:95`, `profile.spec:569` (a parallel test edits Alice's
-  profile: the save gets 409), `schedule-layout.spec:252`.
+  `profile-comments.spec.ts:95`, `schedule-layout.spec:252`.
   Rerun alone before blaming a change.
 - Open questions 1 to 8 in `docs/dev/target-architecture/open-questions.md`; this run
   answers 3 (step 14) and maybe 7 (step 15).

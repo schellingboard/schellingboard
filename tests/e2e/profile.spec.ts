@@ -1,17 +1,9 @@
 import { test, expect } from "./helpers/fixtures";
 import { uniqueSuffix } from "./helpers/unique";
 import { login } from "./helpers/auth";
+import { selectUser } from "./helpers/user";
 import { PROMPT_POOL } from "@schellingboard/domain/prompt-pool";
 import sharp from "sharp";
-
-async function selectCurrentUser(page: import("@playwright/test").Page) {
-  // The current identity lives in the header: a chip (accessible name starts
-  // with "Your name") opens a modal with the "My name is:" combobox.
-  await page.getByRole("button", { name: /your name/i }).click();
-  await page.getByRole("combobox", { name: /My name is/i }).click();
-  await page.getByRole("combobox", { name: /My name is/i }).fill("Alice Test");
-  await page.getByRole("option", { name: /Alice Test/i }).click();
-}
 
 /**
  * Opens one of the optional profile sections, which sit behind expandable
@@ -51,7 +43,7 @@ test.describe("Edit profile", () => {
     await page.goto("/Conference-Alpha/proposals");
 
     // Identify as Alice, then reach the attendees page via the header link.
-    await selectCurrentUser(page);
+    await selectUser(page, "Alice Test");
     await page.getByRole("link", { name: "Attendees", exact: true }).click();
     await expect(page).toHaveURL(/\/guests$/);
 
@@ -103,7 +95,7 @@ test.describe("Edit profile", () => {
     await page.goto("/Conference-Alpha/proposals");
 
     // Identify as Alice, then reach the attendees page via the header link.
-    await selectCurrentUser(page);
+    await selectUser(page, "Alice Test");
     await page.getByRole("link", { name: "Attendees", exact: true }).click();
 
     // Edit profile always targets the current user (Alice).
@@ -134,7 +126,7 @@ test.describe("Edit profile", () => {
     await page.goto("/Conference-Alpha/proposals");
 
     // Identify as Alice, then reach the attendees page via the header link.
-    await selectCurrentUser(page);
+    await selectUser(page, "Alice Test");
     await page.getByRole("link", { name: "Attendees", exact: true }).click();
 
     // Edit profile always targets the current user (Alice).
@@ -154,7 +146,7 @@ test.describe("Edit profile", () => {
     await login(page);
     await page.goto("/Conference-Alpha/proposals");
 
-    await selectCurrentUser(page);
+    await selectUser(page, "Alice Test");
     await page.getByRole("link", { name: "Attendees", exact: true }).click();
     await page.getByRole("link", { name: /Edit profile/i }).click();
 
@@ -203,7 +195,7 @@ test.describe("Edit profile", () => {
     await login(page);
     await page.goto("/Conference-Alpha/proposals");
 
-    await selectCurrentUser(page);
+    await selectUser(page, "Alice Test");
     await page.getByRole("link", { name: "Attendees", exact: true }).click();
     await page.getByRole("link", { name: /Edit profile/i }).click();
 
@@ -330,7 +322,7 @@ test.describe("Edit profile", () => {
     await page.goto("/Conference-Alpha/proposals");
 
     // Identify as Alice, then reach the attendees page via the header link.
-    await selectCurrentUser(page);
+    await selectUser(page, "Alice Test");
     await page.getByRole("link", { name: "Attendees", exact: true }).click();
 
     // Edit profile always targets the current user (Alice).
@@ -352,7 +344,7 @@ test.describe("Edit profile", () => {
     await login(page);
     await page.goto("/Conference-Alpha/proposals");
 
-    await selectCurrentUser(page);
+    await selectUser(page, "Alice Test");
     await page.getByRole("link", { name: "Attendees", exact: true }).click();
     await page.getByRole("link", { name: /Edit profile/i }).click();
 
@@ -386,7 +378,7 @@ test("summarizes validation errors next to the Save button @011-US1", async ({
   await login(page);
   await page.goto("/Conference-Alpha/proposals");
 
-  await selectCurrentUser(page);
+  await selectUser(page, "Alice Test");
   await page.getByRole("link", { name: "Attendees", exact: true }).click();
   await page.getByRole("link", { name: /Edit profile/i }).click();
 
@@ -427,7 +419,7 @@ test("sends a rejected picture back to the picker that chose it @011-US2", async
   await login(page);
   await page.goto("/Conference-Alpha/proposals");
 
-  await selectCurrentUser(page);
+  await selectUser(page, "Alice Test");
   await page.getByRole("link", { name: "Attendees", exact: true }).click();
   await page.getByRole("link", { name: /Edit profile/i }).click();
 
@@ -574,13 +566,18 @@ test("searches, filters and sorts without going back to the server @011-US3", as
   await expect(page).toHaveURL(/[?&]sort=updated/);
 });
 
+// Samuel is edited here and by no other test, so the 409 that two parallel
+// saves of one profile produce cannot happen.
+const firstOfSamuelOrPriya = (attendees: import("@playwright/test").Locator) =>
+  attendees.filter({ hasText: /Samuel Adeyemi|Priya Sharma/ }).first();
+
 test("sorts the attendee directory by recently updated @011-US3", async ({
   page,
 }) => {
   await login(page);
   await page.goto("/Conference-Alpha/proposals");
 
-  await selectCurrentUser(page);
+  await selectUser(page, "Samuel Adeyemi");
   await page.getByRole("link", { name: "Attendees", exact: true }).click();
   await page.getByRole("link", { name: /Edit profile/i }).click();
   await page.getByLabel("About me").fill(`Freshly edited ${uniqueSuffix()}`);
@@ -598,24 +595,24 @@ test("sorts the attendee directory by recently updated @011-US3", async ({
 
   const attendees = page
     .getByRole("list")
-    .filter({ has: page.getByRole("link", { name: "Alice Test" }) })
+    .filter({ has: page.getByRole("link", { name: "Samuel Adeyemi" }) })
     .getByRole("listitem");
 
   // The seeded update times are all hours or days old, so the edit above makes
-  // Alice the most recently updated of the two — and alphabetically she is the
+  // Samuel the most recently updated of the two — and alphabetically they are the
   // later one.
-  await expect(firstOfAliceOrAhmad(attendees)).toContainText("Ahmad Karimi");
+  await expect(firstOfSamuelOrPriya(attendees)).toContainText("Priya Sharma");
 
   await page.getByLabel("Sort by").selectOption("Recently updated");
-  await expect(firstOfAliceOrAhmad(attendees)).toContainText("Alice Test");
-  await expect(firstOfAliceOrAhmad(attendees)).toContainText(
+  await expect(firstOfSamuelOrPriya(attendees)).toContainText("Samuel Adeyemi");
+  await expect(firstOfSamuelOrPriya(attendees)).toContainText(
     "updated just now"
   );
 
   // A search is ranked by relevance, so sorting is off the table while one is
   // active.
-  await page.getByLabel("Search", { exact: true }).fill("Alice");
-  await expect(page).toHaveURL(/[?&]q=Alice/);
+  await page.getByLabel("Search", { exact: true }).fill("Samuel");
+  await expect(page).toHaveURL(/[?&]q=Samuel/);
   await expect(page.getByLabel("Sort by")).toBeDisabled();
 });
 
