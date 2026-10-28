@@ -20,8 +20,7 @@
 
 ## For later steps
 
-- Failure notices (step 4): proposal and profile comments say only "your comment"; steps 8
-  and 10 add the proposal title or profile name to `createComment`/`Target.describe`. New
+- Failure notices (step 4): comments name their proposal or profile (`CommentSubject.name`); New
   commands must give `describe` (subject by name); 1-on-1 commands name the other person
   and slot.
 - No "Try again"/"open the session" action: a blind re-send gets a new idempotency key and
@@ -29,7 +28,7 @@
 
 - Forms: `ui/form-error-summary.tsx` (errors next to Save, jump to field by `name`) exists; fields take `name`.
 
-- Step 6: snapshot `proposals` = public fields + hosts (names), no `sessionIds`/tally/breakdown; `me.votes` = `{proposalId, choice}`. Step 7 done: use `proposalsFrom`, `ownVotesFrom`, `castVote`, `withdrawVote`; `runner.view()` shows optimistic votes. Proposal comments still say only "your comment" (step 8b).
+- Step 6: snapshot `proposals` = public fields + hosts (names), no `sessionIds`/tally/breakdown; `me.votes` = `{proposalId, choice}`. Step 7 done: use `proposalsFrom`, `ownVotesFrom`, `castVote`, `withdrawVote`; `runner.view()` shows optimistic votes.
 
 - Step 9a: `SpaLinks` intercepts in-event proposal links (pushes history; sets the
   opened-by-click flag from `proposal-nav.ts` when `viewProposal` is set, so closing goes
@@ -53,7 +52,12 @@ renders over `DirectoryScreen`. `matches` = `directoryView(...).rows`, `everyone
 screen's `seed`/`params` (lift the memo or share a hook). `activity` = stable `(id) => createProfileActivityQuery({api, guestId: id})`.
 `onOpen(id)` pushes `/guests/<id>?<listQuery>` (keep the list query); `onClose` pushes the list, not Back. `onSchedule` is inert until 10e.
 `legacyProfileLinks` = today's addresses. `brand-icons` exist twice until step 11. `ui/markdown` gained bare-URL/e-mail links, mailto/tel,
-numbered lists and quotes (still no headings; `#` is stripped, no react-markdown by choice). `meetingOptionsFor` takes an optional `now`.
+numbered lists, quotes and headings as bold lines (no react-markdown by choice). `meetingOptionsFor` takes an optional `now`.
+
+Step 10c, for step 11 (wiring): pass `comments={(id, name) => open({kind: "profile", id, name})}` (stable; `useCommentSource` with a runner).
+`/guests` has no event replica: the runner still needs a store (any snapshot; profile notices do not read it), and `useCommentSource(api, runner, liker)` now takes the liker, from `likerFrom(snapshot)` or from `/me` there. `setHash` as for
+proposals. `links.guest(id)` is the bare profile address: comment authors link to it, so the router must keep the list query across it
+(E2E "opens a comment author's profile": closing lands on the list it started from). Timestamps are UTC-anchored, as legacy.
 
 ## Questions
 

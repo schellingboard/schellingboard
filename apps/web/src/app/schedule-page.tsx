@@ -16,7 +16,7 @@ import { hardReload } from "./hard-navigate";
 import { newKey } from "../commands/keys";
 import { useHealth } from "./health";
 import { useUpdateStatus } from "./updates";
-import { useCommentSource } from "./use-comment-actions";
+import { likerFrom, useCommentSource } from "./use-comment-actions";
 import { useUrlSearchParams } from "./use-url-search-params";
 import { NamePicker } from "./user-menu";
 import { useViewer } from "./viewer";
@@ -35,7 +35,7 @@ function Loaded({ api, slug, runner, store, snapshot, now }: EventView) {
   const viewer = useViewer();
   const { history } = useRouter();
   const [picking, setPicking] = useState(false);
-  const openComments = useCommentSource(api, runner, snapshot);
+  const openComments = useCommentSource(api, runner, likerFrom(snapshot));
   const actions = useMemo<ScheduleActions>(
     () => ({
       pickName: () => setPicking(true),

@@ -13,6 +13,8 @@ export const legacyPeopleLinks: PeopleLinks = {
 
 export type ProfileLinks = {
   edit: string;
+  /** A profile on its own, as a comment author or a comment permalink points at it. */
+  guest: (guestId: string) => string;
   /** The directory, carrying the search, filters and sort a profile was opened over. */
   list: (listQuery: string) => string;
   session: (eventSlug: string, sessionId: string) => string;
@@ -21,6 +23,7 @@ export type ProfileLinks = {
 
 export const legacyProfileLinks: ProfileLinks = {
   edit: "/legacy/guests/edit",
+  guest: (id) => `/legacy/guests/${id}`,
   list: (listQuery) =>
     listQuery ? `/legacy/guests?${listQuery}` : "/legacy/guests",
   session: (slug, id) => `/${slug}?${new URLSearchParams({ viewSession: id })}`,

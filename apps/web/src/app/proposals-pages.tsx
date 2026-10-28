@@ -17,7 +17,7 @@ import {
   proposalOpenedByClick,
   takeProposalOpenedByClick,
 } from "./proposal-nav";
-import { useCommentSource } from "./use-comment-actions";
+import { likerFrom, useCommentSource } from "./use-comment-actions";
 import { useUrlSearchParams } from "./use-url-search-params";
 
 const LOCAL_ZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -51,7 +51,7 @@ function List(view: EventView) {
   const links = useMemo(() => proposalLinks(slug), [slug]);
   const { standings } = useEventStandings(view);
   const vote = useVoting(view);
-  const openComments = useCommentSource(api, runner, snapshot);
+  const openComments = useCommentSource(api, runner, likerFrom(snapshot));
   const actions = useMemo(
     () => ({
       vote,
@@ -111,7 +111,7 @@ function QuickVoting(view: EventView) {
   const links = useMemo(() => proposalLinks(slug), [slug]);
   const { standings, status } = useEventStandings(view);
   const vote = useVoting(view);
-  const openComments = useCommentSource(api, runner, snapshot);
+  const openComments = useCommentSource(api, runner, likerFrom(snapshot));
   const comments = useCallback(
     (proposalId: string) => openComments({ kind: "proposal", id: proposalId }),
     [openComments]

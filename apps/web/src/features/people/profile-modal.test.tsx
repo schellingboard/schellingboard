@@ -4,14 +4,16 @@ import {
   fireEvent,
   render,
   screen,
+  waitFor,
   within,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useCallback, useState } from "react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { fakeApi } from "../../commands/fake-api";
 import type { DirectoryEntry } from "../../queries/directory";
 import { createProfileActivityQuery } from "../../queries/profile-activity";
+import { comment, fakeComments } from "../comments/comments-test-support";
 import { cardsFrom, everyoneIn } from "./directory-model";
 import { legacyProfileLinks } from "./links";
 import { ProfileModal, type ProfileModalProps } from "./profile-modal";
@@ -105,6 +107,10 @@ function Harness(
       onOpen={setGuestId}
       onClose={() => {}}
       onSchedule={() => {}}
+      comments={() =>
+        fakeComments([comment("c1", { author: { id: "bo", name: "Bo" } })])
+      }
+      setHash={() => {}}
       {...rest}
     />
   );
@@ -310,4 +316,44 @@ describe("the profile modal", () => {
     expect(await screen.findByRole("dialog", { name: "Bo" })).toBeTruthy();
     delete (HTMLElement.prototype as { clientWidth?: number }).clientWidth;
   });
+});
+
+describe("the comments on a profile", () => {
+  it(
+    "opens the thread of the profile being read, named, and no neighbour's",
+    { tags: ["010-US3"] },
+    async () => {
+      const comments = vi.fn(() => fakeComments([comment("c1")]));
+      render(<Harness comments={comments} />);
+
+      expect(await within(dialog()).findByText("body of c1")).toBeTruthy();
+      expect(comments).toHaveBeenCalledWith("al", "Al");
+      expect(comments).toHaveBeenCalledTimes(1);
+
+      await userEvent.click(
+        screen.getByRole("button", { name: "Next attendee" })
+      );
+      await waitFor(() => expect(comments).toHaveBeenCalledWith("bo", "Bo"));
+    }
+  );
+
+  it(
+    "links an author to their own profile and a comment's time to its permalink",
+    { tags: ["010-US3", "010-US5"] },
+    async () => {
+      const hashes: string[] = [];
+      render(<Harness setHash={(h) => hashes.push(h)} />);
+
+      const author = await within(dialog()).findByRole("link", { name: "Bo" });
+      expect(author.getAttribute("href")).toBe("/legacy/guests/bo");
+      const permalink = within(dialog())
+        .getAllByRole("link")
+        .find((a) => a.getAttribute("href")?.includes("#comment-c1"))!;
+      expect(permalink.getAttribute("href")).toBe(
+        "/legacy/guests/al#comment-c1"
+      );
+      await userEvent.click(permalink);
+      expect(hashes).toEqual(["#comment-c1"]);
+    }
+  );
 });

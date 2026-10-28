@@ -12,6 +12,8 @@ export type CommentView = (typeof commentViewSchema)["_output"];
 export type CommentSubject = {
   kind: "session" | "proposal" | "profile";
   id: string;
+  /** Names a profile in notices: a profile is not in the replica. */
+  name?: string;
 };
 
 type Input = { subject: CommentSubject; parentId?: string; body: string };
@@ -49,7 +51,9 @@ const onSubject = (replica: Snapshot, { subject }: Pick<Target, "subject">) =>
     ? ` on ${describeSessionIn(replica, subject.id)}`
     : subject.kind === "proposal"
       ? ` on ${describeProposalIn(replica, subject.id)}`
-      : "";
+      : subject.name
+        ? ` on ${subject.name}’s profile`
+        : " on a profile";
 const path = ({ commentId }: Target) => ({
   params: { path: { id: commentId } },
 });

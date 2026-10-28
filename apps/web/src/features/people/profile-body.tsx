@@ -1,4 +1,4 @@
-import type { ComponentType, SVGProps } from "react";
+import type { ComponentType, ReactNode, SVGProps } from "react";
 import {
   CONTACT_TYPE_LABELS,
   type ContactType,
@@ -61,6 +61,7 @@ export function ProfileBody({
   zoomed,
   onToggleZoom,
   onSchedule,
+  comments,
 }: {
   guest: DirectoryEntry;
   isOwnProfile: boolean;
@@ -70,6 +71,8 @@ export function ProfileBody({
   zoomed: boolean;
   onToggleZoom: () => void;
   onSchedule: (guestId: string, option: ProfileMeetingOption) => void;
+  /** Only the profile being read has a thread. */
+  comments: ReactNode;
 }) {
   const options = activity?.meetingOptions ?? [];
   return (
@@ -212,6 +215,8 @@ export function ProfileBody({
             <div className="h-4 w-56 rounded bg-surface-muted" />
           </div>
         )}
+
+        {comments}
       </div>
     </div>
   );

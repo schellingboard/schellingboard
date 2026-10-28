@@ -273,3 +273,29 @@ describe("a failed proposal comment command", () => {
     }
   );
 });
+
+describe("a failed profile comment command", () => {
+  it("names the profile the comment is on", { tags: ["010-US3"] }, async () => {
+    const seen: string[] = [];
+    const { api } = fakeApi(() => problem(403, "comment.notAuthor"));
+    const runner = createCommandRunner({
+      store: createReplicaStore(snapshot),
+      api,
+      newKey: () => "k",
+      onFailure: ({ what }) => seen.push(what),
+    });
+    const subject = { kind: "profile", id: "g", name: "Ada" } as const;
+
+    await runner.run(createComment, { subject, body: "x" });
+    await runner.run(editComment, { commentId: "c", body: "x", subject });
+    await runner.run(deleteComment, { commentId: "c", subject });
+    await runner.run(likeComment, { commentId: "c", subject });
+
+    expect(seen).toEqual([
+      "post your comment on Ada’s profile",
+      "save your edit to a comment on Ada’s profile",
+      "delete your comment on Ada’s profile",
+      "like a comment on Ada’s profile",
+    ]);
+  });
+});

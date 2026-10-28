@@ -19,6 +19,7 @@ import type {
   ProfileActivityState,
   ProfileMeetingOption,
 } from "../../queries/profile-activity";
+import { Comments, type CommentsHandle } from "../comments/comments-section";
 import { ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from "../../ui/icons";
 import type { DirectoryCard } from "./directory-model";
 import type { ProfileLinks } from "./links";
@@ -43,6 +44,9 @@ export type ProfileModalProps = {
   onOpen: (guestId: string) => void;
   onClose: () => void;
   onSchedule: (guestId: string, option: ProfileMeetingOption) => void;
+  /** Must be stable; called once per profile read, with the name notices use. */
+  comments: (guestId: string, name: string) => CommentsHandle;
+  setHash: (hash: string) => void;
 };
 
 /**
@@ -65,6 +69,12 @@ export function ProfileModal(props: ProfileModalProps) {
   const [zoomedFor, setZoomedFor] = useState<string | null>(null);
   const zoomed = zoomedFor === guestId;
   const activity = useProfileActivity(props.activity, guestId);
+  const { comments, setHash } = props;
+  const name = guest?.name ?? "";
+  const openComments = useCallback(
+    () => comments(guestId, name),
+    [comments, guestId, name]
+  );
 
   const ends: SwipeEnds = {
     canPrev: index > 0,
@@ -312,6 +322,20 @@ export function ProfileModal(props: ProfileModalProps) {
                       zoomed={current && zoomed}
                       onToggleZoom={() => setZoomedFor(zoomed ? null : guestId)}
                       onSchedule={props.onSchedule}
+                      comments={
+                        current && (
+                          <Comments
+                            open={openComments}
+                            viewerId={viewerId}
+                            timezone="UTC"
+                            guestHref={links.guest}
+                            commentHref={(id) =>
+                              `${links.guest(guestId)}#comment-${id}`
+                            }
+                            setHash={setHash}
+                          />
+                        )
+                      }
                     />
                   </div>
                 );

@@ -10,19 +10,24 @@ import {
 
 type Subject = Parameters<typeof createCommentsQuery>[0]["subject"];
 
-/** Opens the comments of a session or proposal: the query and the controller that writes to it. */
+/** The reader as a liker, from an event replica. */
+export function likerFrom(snapshot: Snapshot): Liker | null {
+  const guest = snapshot.guests.find((g) => g.id === snapshot.me?.guestId);
+  return guest
+    ? { id: guest.id, name: guest.name, avatarUrl: guest.avatarUrl }
+    : null;
+}
+
+/** Opens the comments of a session, proposal or profile: the query and the controller that writes to it. */
 export function useCommentSource(
   api: ApiClient,
   runner: CommandRunner,
-  snapshot: Snapshot
+  liker: Liker | null
 ) {
-  const guest = snapshot.guests.find((g) => g.id === snapshot.me?.guestId);
   const me = useRef<Liker | null>(null);
   useEffect(() => {
-    me.current = guest
-      ? { id: guest.id, name: guest.name, avatarUrl: guest.avatarUrl }
-      : null;
-  }, [guest]);
+    me.current = liker;
+  }, [liker]);
   return useCallback(
     (subject: Subject) => {
       const query = createCommentsQuery({ api, subject });
