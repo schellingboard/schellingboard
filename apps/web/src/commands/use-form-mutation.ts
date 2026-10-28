@@ -29,6 +29,7 @@ export function useFormMutation<R>({
   const [pending, setPending] = useState(false);
   const [fields, setFields] = useState<FieldErrors>({});
   const [error, setError] = useState<string | null>(null);
+  const [unreachable, setUnreachable] = useState(false);
 
   const submit = async (): Promise<MutationResult<R> | undefined> => {
     if (inFlight.current) return undefined;
@@ -36,6 +37,7 @@ export function useFormMutation<R>({
     setPending(true);
     setFields({});
     setError(null);
+    setUnreachable(false);
     const result = await awaitMutation(call, key.current);
     inFlight.current = false;
     setPending(false);
@@ -52,9 +54,10 @@ export function useFormMutation<R>({
       setError(unmatched.length ? unmatched.join(" ") : result.message);
     } else {
       setError(result.message);
+      setUnreachable(result.kind === "unreachable");
     }
     return result;
   };
 
-  return { submit, pending, fields, error };
+  return { submit, pending, fields, error, unreachable };
 }

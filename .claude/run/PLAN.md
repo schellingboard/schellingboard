@@ -103,7 +103,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`,
 - [x] 11. Takeover: people (done: router owns `/guests/**` through `app/people-pages.tsx`; legacy guest pages, `profile-activity.ts` and `actions/profile.ts` deleted; `GET /events` carries `now`, attendees carry `authProtected`).
 - [ ] 12. **Meeting screens**, unrouted:
   - [x] 12a. My availability (done: `features/meetings/availability-form.tsx`, `commands/meeting-availability.ts`; `slotDaysFor` moved to `packages/domain`). It is the legacy Settings form; `availabilityFormFor(event, days, declared, now)` (domain) builds its data per event, dropping past events and narrowing `declared` to offered slots. The settings step (17a) wires it.
-  - [ ] 12b. Booking (`bookMeeting`): candidates query, request command.
+  - [x] 12b. Booking (done: `queries/meeting-candidates.ts` over `GET /meeting-candidates`, `features/meetings/book-meeting.tsx`; the request command is 10e's `meetingRequestCalls`, the fields its shared `MeetingRequestFields`). Step 13 wires it: `profileHref` = `/guests/<id>`, `onBooked` refreshes the meetings column.
   - [ ] 12c. The meeting modal (`viewMeeting`): accept, decline, cancel commands with
         notices naming the other person and the slot; the meetings column opens it.
 - [ ] 13. **Takeover: meetings**. `viewMeeting` and `bookMeeting` stop forwarding

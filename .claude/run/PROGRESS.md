@@ -129,3 +129,5 @@ Do not call `runner.stop()` or `query.destroy()` in a mount effect cleanup: Stri
 The SPA shell still lacks "Show map". A protected-but-unverified name on the edit page shows the "select who you are" copy.
 
 Step 12a, for the settings step: `AvailabilityForm({...AvailabilityFormData, calls: meetingAvailabilityCalls(api)})`; the legacy `availabilityFormsFor` (utils) still builds the data server-side. Legacy `availability-form.tsx` and `saveMeetingAvailabilityAction` go with the settings takeover.
+
+Step 12b, for 13: `BookMeeting({query, calls, eventId, slotStart, profileHref, onBooked, onClose})`; `query` = stable `createMeetingCandidatesQuery`, `calls` = `meetingRequestCalls(api)`. 10e's dialog failure text does not name the person/slot (12b's does); revisit if wanted.

@@ -3,11 +3,13 @@ import { clashLines } from "@schellingboard/domain/meeting-clash-text";
 import type { MeetingRequestCalls } from "../../commands/meeting-request";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import type { ProfileMeetingOption } from "../../queries/profile-activity";
-import { Button } from "../../ui/button";
 import { Dialog } from "../../ui/dialog";
 import {
+  MeetingClashNotice,
   MeetingLengthChips,
+  MeetingRequestError,
   MeetingRequestFields,
+  MeetingRequestSent,
 } from "../meetings/meeting-request-fields";
 
 type Day = ProfileMeetingOption["lengths"][number]["days"][number];
@@ -86,6 +88,7 @@ export function MeetingRequestDialog({
   const [sent, setSent] = useState(false);
 
   const mutation = useFormMutation({
+    fieldNames: ["meetingPoint", "message"],
     call: (key) =>
       actions.request(
         {
@@ -115,22 +118,17 @@ export function MeetingRequestDialog({
     <Dialog open wide onClose={onClose} title={`1-on-1 with ${recipientName}`}>
       <p className="-mt-2 mb-3 text-sm text-fg-muted">{option.eventName}</p>
       {sent ? (
-        <div className="flex flex-col gap-4">
-          <p className="text-fg">
-            Asked {recipientName} for {slot?.label} on {day?.label}. You&apos;ll
-            hear when they answer.
-          </p>
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={onClose}>Done</Button>
-          </div>
-        </div>
+        <MeetingRequestSent
+          what={`${recipientName} for ${slot?.label} on ${day?.label}`}
+          onClose={onClose}
+        />
       ) : (
         <form onSubmit={(e) => void submit(e)} className="flex flex-col gap-4">
-          {mutation.error && (
-            <p role="alert" className="text-sm text-danger-fg">
-              {mutation.error}
-            </p>
-          )}
+          <MeetingRequestError
+            what={`${recipientName} for ${slot?.label ?? "that slot"} on ${day?.label ?? "that day"}`}
+            error={mutation.error}
+            unreachable={mutation.unreachable}
+          />
           <MeetingLengthChips
             lengths={option.lengths}
             slotCount={slotCount}
@@ -146,12 +144,9 @@ export function MeetingRequestDialog({
               onSelect={setSlotStart}
             />
           </div>
-          {/* A clash is raised, never enforced: the pair decide for themselves. */}
-          {slot?.state === "busy" && (
-            <p className="rounded-md bg-warning-tint p-3 text-sm text-fg">
-              {clashLines(slot.clashes)} during this time — book it anyway?
-            </p>
-          )}
+          <MeetingClashNotice
+            lines={slot?.state === "busy" ? [clashLines(slot.clashes)] : []}
+          />
           <MeetingRequestFields
             meetingPoints={option.meetingPoints}
             meetingPoint={meetingPoint}

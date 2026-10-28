@@ -57,6 +57,7 @@ export function MeetingRequestFields({
   isSending,
   submitDisabled,
   onCancel,
+  cancelLabel = "Cancel",
   errors = {},
 }: {
   meetingPoints: MeetingPointChoice[];
@@ -67,6 +68,7 @@ export function MeetingRequestFields({
   isSending: boolean;
   submitDisabled?: boolean;
   onCancel: () => void;
+  cancelLabel?: string;
   errors?: Record<string, string>;
 }) {
   const described = meetingPoints.filter((p) => p.description);
@@ -139,9 +141,59 @@ export function MeetingRequestFields({
           {isSending ? "Sending..." : "Send request"}
         </Button>
         <Button type="button" variant="quiet" onClick={onCancel}>
-          Cancel
+          {cancelLabel}
         </Button>
       </div>
     </>
+  );
+}
+
+/** "Asked Al for 09:10 – 09:40 on Sat 9 May." with the way out. */
+export function MeetingRequestSent({
+  what,
+  onClose,
+}: {
+  what: string;
+  onClose: () => void;
+}) {
+  return (
+    <div className="flex flex-col gap-4">
+      <p className="text-fg">
+        Asked {what}. You&apos;ll hear when they answer.
+      </p>
+      <div className="flex flex-wrap gap-2">
+        <Button onClick={onClose}>Done</Button>
+      </div>
+    </div>
+  );
+}
+
+/** Names who and when; an unreachable answer must not claim it failed. */
+export function MeetingRequestError({
+  what,
+  error,
+  unreachable,
+}: {
+  what: string;
+  error: string | null;
+  unreachable: boolean;
+}) {
+  if (!error) return null;
+  return (
+    <p role="alert" className="text-sm text-danger-fg">
+      {unreachable
+        ? `Your request to ask ${what}: ${error}`
+        : `Could not ask ${what}. ${error}`}
+    </p>
+  );
+}
+
+/** A clash is raised, never enforced: the pair decide for themselves. */
+export function MeetingClashNotice({ lines }: { lines: string[] }) {
+  if (lines.length === 0) return null;
+  return (
+    <p className="rounded-md bg-warning-tint p-3 text-sm text-fg">
+      {lines.join("; ")} during this time — book it anyway?
+    </p>
   );
 }
