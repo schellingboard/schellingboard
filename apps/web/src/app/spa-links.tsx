@@ -17,6 +17,7 @@ export function SpaLinks({
     <InAppLinks
       owns={({ pathname }) =>
         pathname === `/${slug}` ||
+        pathname === `/${slug}/meetings` ||
         pathname === `/${slug}/proposals` ||
         pathname.startsWith(`/${slug}/proposals/`)
       }

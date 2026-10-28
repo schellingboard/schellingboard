@@ -29,6 +29,7 @@ import {
   includedLocations,
   scheduleEntries,
 } from "./model";
+import { MeetingModals } from "./meeting-modals";
 import { SessionModal } from "./session-modal";
 import { ScheduleFilters } from "./schedule-filters";
 import { ScheduleToolbar, scheduleView } from "./schedule-toolbar";
@@ -271,6 +272,14 @@ export function ScheduleScreen({
           }}
         />
       )}
+      <MeetingModals
+        params={params}
+        onParamsChange={onParamsChange}
+        onBack={onBack}
+        data={data}
+        links={links}
+        actions={actions}
+      />
       <ScheduleMatchProvider value={stepMatch}>
         {/* Both views own the viewport below the nav bar through the same
             fixed frame, so the toolbar rests in the same spot when switching.

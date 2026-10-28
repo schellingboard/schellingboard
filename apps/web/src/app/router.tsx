@@ -3,16 +3,12 @@ import {
   createRoute,
   createRouter,
   Outlet,
-  useLocation,
-  useRouter,
   type RouterHistory,
 } from "@tanstack/react-router";
-import { useEffect, type ReactElement } from "react";
-import { scheduleStaysInLegacy } from "./forwards-to-legacy";
-import { hardNavigate } from "./hard-navigate";
+import type { ReactElement } from "react";
 import { LegacyForward } from "./legacy-forward";
-import { legacyHref } from "./legacy-href";
 import { LEGACY_ROOT_PAGES } from "./legacy-pages";
+import { MeetingsPage } from "./meetings-page";
 import { PeoplePage } from "./people-pages";
 import {
   ProposalFormPage,
@@ -41,16 +37,6 @@ const legacyPages = LEGACY_ROOT_PAGES.map((name) =>
   })
 );
 
-function LegacySchedule({
-  where,
-}: {
-  where: Parameters<typeof legacyHref>[0];
-}) {
-  const href = legacyHref(where);
-  useEffect(() => hardNavigate(href), [href]);
-  return null;
-}
-
 export function createAppRouter(
   history?: RouterHistory,
   services: AppServices = defaultServices()
@@ -62,12 +48,7 @@ export function createAppRouter(
     // is still being inferred, turning useRouter() into `any` in some files.
     component: function EventRoute(): ReactElement {
       const { slug } = event.useParams();
-      const pathname = useLocation({ select: (l) => l.pathname });
-      const { search, hash } = useRouter().history.location;
-      return pathname.replace(/\/$/, "") === `/${slug}` &&
-        scheduleStaysInLegacy(search) ? (
-        <LegacySchedule where={{ pathname: `/${slug}`, search, hash }} />
-      ) : (
+      return (
         <EventLayout services={services} slug={slug}>
           <SpaLinks slug={slug}>
             <Outlet />
@@ -80,6 +61,11 @@ export function createAppRouter(
     getParentRoute: () => event,
     path: "/",
     component: SchedulePage,
+  });
+  const meetings = createRoute({
+    getParentRoute: () => event,
+    path: "meetings",
+    component: MeetingsPage,
   });
   const proposals = createRoute({
     getParentRoute: () => event,
@@ -127,6 +113,7 @@ export function createAppRouter(
       guests.addChildren([guestsList, guestsPage]),
       event.addChildren([
         schedule,
+        meetings,
         proposals,
         quickVoting,
         newProposal,

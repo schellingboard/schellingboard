@@ -20,9 +20,7 @@ colour tokens in `styles/tokens.css` (the Next pages import the same file).
   forwarded: the catch-all route replaces the location with `/legacy` + path + query (a path
   already under `/legacy` is left alone), and a static route per legacy root page
   (`app/legacy-pages.ts`, checked against `app/legacy/` by `tests/unit/spa-legacy-pages.test.ts`)
-  keeps an event slug from shadowing `/settings`, `/admin`, and so on. While their screens are
-  not SPA yet, `?viewSession=` and `?viewMeeting=` hand the `/{slug}` address on to the legacy
-  schedule (`forwards-to-legacy.ts`).
+  keeps an event slug from shadowing `/settings`, `/admin`, and so on.
 - Legacy pages link to the SPA with plain anchors, never Next's `Link` (`AppLink`, which
   does that for every root path outside `/legacy`): Next has nothing to fetch there.
 
@@ -106,16 +104,19 @@ server's `now`, `links`, the page's search params (+ a setter) and slots for the
 and footer. The view (`view=agenda`), filter chips (`filter=`) and narrowed rooms (`loc=`) live
 in the params; the search text and unfolded days are local. Everything is drawn from the
 replica: sessions, rooms and RSVPs from the snapshot, the viewer's own 1-on-1s from
-`snapshot.me.meetings` (`meetingViewsFrom`; clash lines stay empty, the replica holds no other
-guest's RSVPs). Times use the event's zone, never the ambient one; the now line follows
+`snapshot.me.meetings` (`meetingViewsFrom`). Clash lines rest on other guests' RSVPs, which the
+replica lacks: `queries/meeting-clashes.ts` fetches them from `GET /meetings` (debounced, after
+any change in `store.meetingsRevision()`) and `withClashes` merges them in. Times use the event's zone, never the ambient one; the now line follows
 `store.serverNow()` (`useServerNow`).
 
 The pure parts (`grid-layout`, `column`, `meeting-column`, `agenda`, `fold`, `filters`,
 `search`, `meeting-rules`, `meeting-clash-text`) are copies of `utils/` with their tests: the
-legacy copies stay until the meeting modal moves, since the legacy schedule still renders
-it. `model.ts` has the new pure rules (narrowing by room, matching, day folds). `links.ts`
+legacy copies stay until the Next schedule goes, since it still renders them. `model.ts` has the new pure rules (narrowing by room, matching, day folds). `links.ts`
 is the one place that decides where a session, a 1-on-1, add-session or booking link
-goes: a session opens in the SPA's own modal, the other links go to `/legacy/...`.
+goes: a session and a 1-on-1 (`?viewMeeting=`, `?bookMeeting=`) open in the SPA's own modals
+over the schedule, the add and edit session links go to `/legacy/...`. `/{slug}/meetings`
+(`app/meetings-page.tsx`) is where a meeting notification lands: it hands the meeting to the
+schedule, or opens it read-only outside the scheduling phase.
 
 `app/schedule-page.tsx` composes it: `useScheduleSession` (`replica/session.ts`: `openReplica`,
 `connectFeed`, `autosaveReplica`, hidden-tab and back/forward-cache handling, plus a command

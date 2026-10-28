@@ -171,6 +171,24 @@ describe("openNotificationAction", () => {
     expect(redirect).toHaveBeenCalledExactlyOnceWith("/e?viewSession=s1");
   });
 
+  it("opens a 1-on-1 notification in the app, not under /legacy", async () => {
+    const guest = await createGuest();
+    cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
+    const notification = await getRepositories().notifications.create({
+      guestId: guest.id,
+      type: "sessionComment",
+      text: "Anna asked you for a 1-on-1",
+      url: "/e/meetings?viewMeeting=m1",
+      createdAt: new Date(),
+    });
+
+    await openNotificationAction(notification.id);
+
+    expect(redirect).toHaveBeenCalledExactlyOnceWith(
+      "/e/meetings?viewMeeting=m1"
+    );
+  });
+
   it("neither marks nor redirects for another guest's notification", async () => {
     const guest = await createGuest();
     const other = await createGuest();

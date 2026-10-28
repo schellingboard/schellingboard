@@ -12,14 +12,13 @@ closed by removing the param. Legacy pages link to it with a plain anchor (`view
 The proposal modal is the SPA's too (apps/web/src/app/proposals-pages.tsx); legacy pages link to
 it with a plain anchor (`viewProposalLink`).
 
-The 1-on-1 modal still works as follows. Opening it pushes (or navigates to) a URL so the
-browser's Back button dismisses it; one reached from elsewhere has no history entry of ours to
-pop, so it is dismissed by removing the param.
+The 1-on-1 modal is the SPA's too (the schedule's `?viewMeeting=`); the legacy schedule keeps
+its own until the Next schedule goes. Opening it pushes a URL so the browser's Back button
+dismisses it; one reached from elsewhere has no history entry of ours to pop, so it is dismissed
+by removing the param.
 
 * From the meeting column, use `<Link {...viewMeetingLinkFromOwner(...)}>`: it sets the dismiss
   mode to "back".
-* When opened by a server-action redirect (the notification list), call
-  `openingModalFromRedirect()` from the click that submits the action.
 */
 
 export function viewSessionLink(
@@ -34,17 +33,6 @@ export function viewSessionLink(
 
 export function viewProposalLink(eventSlug: string, proposalId: string) {
   return { href: `/${eventSlug}/proposals?viewProposal=${proposalId}` };
-}
-
-/**
- * Dismiss mode for a modal reached without going through one of the links
- * above: the notification list opens one by submitting a server action that
- * redirects into it, so no opener's onClick runs and a "back" armed by an
- * earlier schedule or proposal click would still be in force — and would pop
- * the reader off the page they just landed on.
- */
-export function openingModalFromRedirect() {
-  meetingDismissMode = "replace";
 }
 
 export function viewMeetingLinkFromOwner(

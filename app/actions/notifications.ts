@@ -71,6 +71,8 @@ export async function openNotificationAction(id: string): Promise<void> {
   );
 }
 
-// The session modal and the profiles are the SPA's, not under /legacy.
+// The session and 1-on-1 modals and the profiles are the SPA's, not under /legacy.
 const opensInSpa = (url: string) =>
-  /^\/[^/?#]+\?([^#]*&)?viewSession=/.test(url) || /^\/guests(\/|$)/.test(url);
+  /^\/[^/?#]+\?([^#]*&)?viewSession=/.test(url) ||
+  /^\/[^/?#]+\/meetings\?/.test(url) ||
+  /^\/guests(\/|$)/.test(url);

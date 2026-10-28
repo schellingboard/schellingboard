@@ -3,6 +3,8 @@ import {
   DEFAULT_BREAK_MINUTES,
   DEFAULT_SLOT_INCREMENT_MINUTES,
 } from "@schellingboard/domain/slots";
+import type { MeetingRequestCalls } from "../../commands/meeting-request";
+import type { MeetingCandidatesQuery } from "../../queries/meeting-candidates";
 import type { AttendeeCountApi } from "../../queries/attendee-count";
 import type { CommentsController } from "../../queries/comments-controller";
 import type { CommentsQuery } from "../../queries/comments";
@@ -19,6 +21,16 @@ export type ScheduleActions = {
   /** The caller destroys the query when done. */
   attendees: (sessionId: string) => AttendeesQuery;
   attendeeCount: AttendeeCountApi;
+  /** Whether the reader's name is protected by a password they have not given. */
+  awaitingLogin: () => Promise<boolean>;
+  answerMeeting: (
+    meetingId: string,
+    response: "accept" | "decline"
+  ) => Promise<void>;
+  cancelMeeting: (meetingId: string, note: string) => Promise<void>;
+  /** The booking screen's query for one slot; the caller loads it. */
+  meetingCandidates: (slotStart: string) => MeetingCandidatesQuery;
+  meetingRequest: MeetingRequestCalls;
   /** The caller destroys the query when done. */
   comments: (sessionId: string) => {
     query: CommentsQuery;

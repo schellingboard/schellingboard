@@ -23,16 +23,6 @@ beforeEach(() => {
 });
 
 describe("the event route", () => {
-  it("sends a 1-on-1 address on to the legacy schedule", async () => {
-    await open({ path: "/conf?view=agenda&viewMeeting=m1" });
-    await waitFor(() =>
-      expect(hardNavigate).toHaveBeenCalledWith(
-        "/legacy/conf?view=agenda&viewMeeting=m1"
-      )
-    );
-    expect(screen.queryByRole("link", { name: "Talk" })).toBeNull();
-  });
-
   it(
     "opens a session on a new history entry, which Back closes",
     { tags: ["007-US1"] },

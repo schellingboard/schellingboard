@@ -21,7 +21,7 @@ describe("legacyScheduleLinks", () => {
 
   it("opens a 1-on-1 the same way", () => {
     expect(links.meeting(new URLSearchParams(), "m1")).toBe(
-      "/legacy/conf?viewMeeting=m1"
+      "/conf?viewMeeting=m1"
     );
   });
 
@@ -33,9 +33,9 @@ describe("legacyScheduleLinks", () => {
     );
   });
 
-  it("books a free 1-on-1 slot on the legacy schedule, which opens the request", () => {
+  it("books a free 1-on-1 slot on the schedule, which opens the request", () => {
     expect(links.bookMeeting("2026-06-15T10:00:00.000Z")).toBe(
-      "/legacy/conf?bookMeeting=2026-06-15T10%3A00%3A00.000Z"
+      "/conf?bookMeeting=2026-06-15T10%3A00%3A00.000Z"
     );
   });
 

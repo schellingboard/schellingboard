@@ -10,6 +10,7 @@ import { fakeComments } from "../comments/comments-test-support";
 import { legacyScheduleLinks } from "./links";
 import { NoticeProvider } from "../../ui/notices";
 import { ScheduleScreen, type ScheduleActions } from "./schedule-screen";
+import { noMeetingActions } from "./test-support";
 
 const talk = base.sessions[0];
 
@@ -61,6 +62,7 @@ function fakeActions(attendees = fakeAttendees(["zed", "abe"])) {
   return {
     toggleRsvp: vi.fn<ScheduleActions["toggleRsvp"]>(() => Promise.resolve()),
     pickName: vi.fn<ScheduleActions["pickName"]>(),
+    ...noMeetingActions,
     attendees: vi.fn<ScheduleActions["attendees"]>(() => attendees),
     comments: vi.fn<ScheduleActions["comments"]>(() => fakeComments()),
     attendeeCount: {

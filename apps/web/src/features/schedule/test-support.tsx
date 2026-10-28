@@ -60,6 +60,7 @@ export function renderScheduled(
             comments: () => {
               throw new Error("no comments in this test");
             },
+            ...noMeetingActions,
             ...actions,
           },
         }}
@@ -82,3 +83,17 @@ export function entriesOf(data: ReturnType<typeof scheduleDataFrom>) {
     match: noMatch,
   });
 }
+
+export const noMeetingActions = {
+  awaitingLogin: () => Promise.resolve(false),
+  answerMeeting: () => Promise.resolve(),
+  cancelMeeting: () => Promise.resolve(),
+  meetingCandidates: () => {
+    throw new Error("no booking in this test");
+  },
+  meetingRequest: {
+    request: () => {
+      throw new Error("no booking in this test");
+    },
+  },
+};

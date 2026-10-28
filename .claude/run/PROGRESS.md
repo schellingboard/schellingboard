@@ -135,3 +135,5 @@ Step 12b, for 13: `BookMeeting({query, calls, eventId, slotStart, profileHref, o
 Step 12c, for 13: `MeetingModal({meeting, now, readOnly, profileHref, onAnswer, onCancel, onClose})`, rendered with `key={meetingId}` and only once the replica and `me` are loaded (before that it would say "1-on-1 not found."); `meeting` = `meetingViewsFrom(runner.view(), now)` merged with clashes (12d) `.find(id)`, `onAnswer = r => runner.run(answerMeeting, {meetingId, response: r})`, `onCancel = note => runner.run(cancelMeeting, {meetingId, note})`; close drops `viewMeeting` (`SpaLinks` must stop forwarding it). `commands/meeting-answer.ts` imports from `features/schedule` (known layering exception).
 
 Step 12d: `useMeetingClashes(api, snapshot)` feeds `ScheduleScreen`'s `clashes` prop (the column). For the modal in 13, merge the same map: `withClashes(meetingViewsFrom(...), clashes)`.
+
+Step 13: legacy schedule keeps its own meeting components until the Next schedule is deleted. A visitor with no `me` who opens `?viewMeeting=` on the schedule sees no modal (legacy said 'select who you are'); `/{slug}/meetings` does show that message.

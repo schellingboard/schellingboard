@@ -5,6 +5,7 @@ import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { snapshot as base, iso } from "../../replica/snapshot-fixture";
 import { legacyScheduleLinks } from "./links";
 import { ScheduleScreen, type ScheduleActions } from "./schedule-screen";
+import { noMeetingActions } from "./test-support";
 
 const sessionOf = (
   id: string,
@@ -44,6 +45,7 @@ function fakeActions() {
   return {
     toggleRsvp: vi.fn<ScheduleActions["toggleRsvp"]>(() => Promise.resolve()),
     pickName: vi.fn<ScheduleActions["pickName"]>(),
+    ...noMeetingActions,
     attendees: vi.fn<ScheduleActions["attendees"]>(),
     attendeeCount: {
       load: vi.fn(),

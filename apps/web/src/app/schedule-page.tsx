@@ -9,6 +9,9 @@ import {
 } from "../features/schedule/schedule-screen";
 import { attendeeCountApi } from "../queries/attendee-count";
 import { createAttendeesQuery } from "../queries/attendees";
+import { answerMeeting, cancelMeeting } from "../commands/meeting-answer";
+import { meetingRequestCalls } from "../commands/meeting-request";
+import { createMeetingCandidatesQuery } from "../queries/meeting-candidates";
 import { addRsvp, removeRsvp } from "../commands/rsvp";
 import { Message, useEventView, type EventView } from "./event-page";
 import { Footer } from "./footer";
@@ -46,9 +49,26 @@ function Loaded({ api, slug, runner, store, snapshot, now }: EventView) {
       },
       attendees: (sessionId) => createAttendeesQuery({ api, sessionId }),
       attendeeCount: attendeeCountApi(api, newKey),
+      awaitingLogin: async () => {
+        const { data } = await api.GET("/api/v1/me/identity");
+        return data?.awaitingLogin === true;
+      },
+      answerMeeting: async (meetingId, response) => {
+        await runner.run(answerMeeting, { meetingId, response });
+      },
+      cancelMeeting: async (meetingId, note) => {
+        await runner.run(cancelMeeting, { meetingId, note });
+      },
+      meetingCandidates: (slotStart) =>
+        createMeetingCandidatesQuery({
+          api,
+          eventId: snapshot.event.id,
+          slotStart,
+        }),
+      meetingRequest: meetingRequestCalls(api),
       comments: (sessionId) => openComments({ kind: "session", id: sessionId }),
     }),
-    [runner, api, openComments]
+    [runner, api, openComments, snapshot.event.id]
   );
   const phase = getCurrentPhase(eventContextFrom(snapshot).event, now);
 
