@@ -8,6 +8,7 @@ import {
   index,
   type AnySQLiteColumn,
 } from "drizzle-orm/sqlite-core";
+import type { LoginAssurance } from "@schellingboard/domain/auth";
 import type {
   ProfileContact,
   ProfilePrompt,
@@ -181,6 +182,30 @@ export const events = sqliteTable(
     version: integer("version").notNull().default(1),
   },
   (table) => [uniqueIndex("events_slug_unique").on(table.slug)]
+);
+
+// One row per signed-in browser; the guest cookie holds a random token and
+// only its hash is stored here. Revoking a session is deleting its row.
+export const loginSessions = sqliteTable(
+  "login_sessions",
+  {
+    id: text("id").primaryKey(),
+    guestId: text("guest_id")
+      .notNull()
+      .references(() => guests.id, { onDelete: "cascade" }),
+    eventId: text("event_id").references(() => events.id, {
+      onDelete: "cascade",
+    }),
+    assurance: text("assurance").$type<LoginAssurance>().notNull(),
+    createdAt: text("created_at").notNull(),
+    expiresAt: text("expires_at").notNull(),
+    lastSeenAt: text("last_seen_at").notNull(),
+    device: text("device"),
+  },
+  (t) => [
+    index("login_sessions_guest_idx").on(t.guestId),
+    index("login_sessions_expires_idx").on(t.expiresAt),
+  ]
 );
 
 export const eventGuests = sqliteTable(

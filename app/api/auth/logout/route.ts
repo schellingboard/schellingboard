@@ -1,3 +1,5 @@
+import { peopleUseCases } from "@/server/composition";
+import { actorOf } from "@/server/kernel/session-actor";
 import { cookies } from "next/headers";
 import { createGuestLogoutCookie, createLogoutCookie } from "@/utils/auth";
 
@@ -6,6 +8,7 @@ import { createGuestLogoutCookie, createLogoutCookie } from "@/utils/auth";
 export async function POST() {
   const cookieStore = await cookies();
   cookieStore.set(createLogoutCookie());
+  await peopleUseCases().signOut(await actorOf(cookieStore));
   cookieStore.set(createGuestLogoutCookie());
   return new Response(null, { status: 204 });
 }

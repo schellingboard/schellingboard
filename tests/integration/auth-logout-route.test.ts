@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 
 const set = vi.fn();
-vi.mock("next/headers", () => ({ cookies: () => Promise.resolve({ set }) }));
+vi.mock("next/headers", () => ({
+  cookies: () => Promise.resolve({ set, get: () => undefined }),
+}));
 
 import { POST } from "@/app/api/auth/logout/route";
 import { createGuestLogoutCookie, createLogoutCookie } from "@/utils/auth";

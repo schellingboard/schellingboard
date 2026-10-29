@@ -17,7 +17,7 @@ export interface PeopleDeps {
   uow: UnitOfWork;
   repos: Pick<
     Repositories,
-    "events" | "guests" | "sessions" | "sessionProposals"
+    "events" | "guests" | "loginSessions" | "sessions" | "sessionProposals"
   >;
   avatars: AvatarStore;
   sendTestEmail: (to: { name: string; email: string }) => Promise<void>;

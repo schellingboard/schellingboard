@@ -23,6 +23,13 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
   `--use-destination-message`; no `jj split`.
 - Next serves `apps/web/dist`: rebuild the SPA (`make build` or the E2E web server does) before E2E.
 
+- Login sessions (step 3): the `guest` cookie holds a 32-byte token without dots; values with a dot
+  are legacy. `LoginAssurance` (`claimed`|`verified`) replaces `open`|`verified` everywhere. Resolve
+  actors with `actorOf(cookies)` / `guestOfCookie(value)` (`server/kernel/session-actor.ts`), never
+  `resolveActor` directly. Each sign-in deletes the browser's old row and writes a new one. Sessions
+  age in real time (`utils/real-clock.ts`). `eventId` and `device` exist; `device` is the user agent
+  from `PUT /me/identity` only. Tests make rows with `sessionGuestValue`.
+
 ## Known E2E flakes
 
 `settings.spec.ts:67`, `profile-comments.spec.ts:95`, `schedule-layout.spec:252`,

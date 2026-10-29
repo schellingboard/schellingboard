@@ -186,14 +186,17 @@ export function addPeopleRoutes(app: App, people: () => PeopleUseCases) {
   );
 
   app.openapi(chooseIdentity, async (c) => {
-    const result = await people().chooseGuest(c.var.actor, c.req.valid("json"));
+    const result = await people().chooseGuest(c.var.actor, {
+      ...c.req.valid("json"),
+      device: c.req.header("user-agent")?.slice(0, 200) ?? null,
+    });
     if (!result.ok) return problem(result.error);
-    await setGuestCookie(c, result.value);
+    setGuestCookie(c, result.value);
     return c.json({ guestId: result.value.guestId }, 200);
   });
 
   app.openapi(signOutIdentity, async (c) => {
-    await setGuestCookie(c, people().signOut());
+    setGuestCookie(c, await people().signOut(c.var.actor));
     return c.json({ guestId: null }, 200);
   });
 

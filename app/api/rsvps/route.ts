@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sessionUseCases } from "@/server/composition";
-import { resolveActor } from "@/server/kernel/actor";
+import { actorOf } from "@/server/kernel/session-actor";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const actor = await resolveActor(request.cookies);
+    const actor = await actorOf(request.cookies);
     const result = user
       ? await sessionUseCases().listGuestRsvps(actor, { guestId: user })
       : await sessionUseCases().listSessionRsvps(actor, {

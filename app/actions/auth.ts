@@ -1,5 +1,7 @@
 "use server";
 
+import { peopleUseCases } from "@/server/composition";
+import { actorOf } from "@/server/kernel/session-actor";
 import {
   verifyPassword,
   createAuthCookie,
@@ -64,5 +66,6 @@ export async function loginAction(
 export async function logoutAction() {
   const cookieStore = await cookies();
   cookieStore.set(createLogoutCookie());
+  await peopleUseCases().signOut(await actorOf(cookieStore));
   cookieStore.set(createGuestLogoutCookie());
 }
