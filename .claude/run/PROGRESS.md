@@ -75,36 +75,17 @@ are `ui/combobox`, role combobox/option) should not force `profile.spec` rewrite
 different prompt" button is an icon with that name. If the profile save fails after the photo saved,
 the form says so. `avatar-image` and `language-suggestions` moved to `packages/domain`.
 
-Step 17a, for step 18 (wiring):
-`SettingsScreen({state, calls: settingsCalls(api), availability: meetingAvailabilityCalls(api), links: {profile: "/guests/edit"}})`;
-`state` = `createSettingsQuery({api})` (call `load()` once; an `error` state carries the problem
-`code`, e.g. `guest.unselected`/`guest.protected`: the page shows the `actingGuestRefusalMessage`
-notice "changing your settings" and the exported `Appearance` section, as legacy did, instead of the
-screen, as `EditProfile` in `people-pages.tsx` does). The `/settings` takeover must also keep the
-legacy settings E2E "select who you are" text. `Appearance` omits the legacy `labelled` look.
-
-Step 17b, for step 18 (wiring):
-`NotificationsScreen({query: createNotificationsQuery({calls: notificationCalls(api)}), now, onOpen, onUnreadChange})`;
-call `query.load()` once. `onUnreadChange` = the setter from `useUnread()[1]` (stable; the bell,
-`HeaderLinks`, reads the same store from `UnreadProvider`, now in `ShellProviders`). `onOpen(url)`:
-the notification is already marked read; the url is site-relative and may be an SPA address
-(`/slug?viewSession=`, `/slug/meetings?…`, `/guests/…`): navigate with `history.push` when the SPA
-owns it, else a hard navigation (legacy `opensInSpa`). The unselected/protected viewer gets the
-`actingGuestRefusalMessage(…, "seeing your notifications")` notice instead (the query's error code).
-`HeaderLinks` still links `/legacy/notifications`: step 18 changes it to `/notifications`. Paging:
-the legacy Newer/Older links became one "Older →" button that appends (the API is cursor-paged).
+Steps 17-18: `PageNotice` (`app/page-notice.tsx`) is the shared "select who you are" notice. The
+legacy layout still has a dev toolbar and nav bar, so E2E specs that need them (a legacy-only dev
+tool, "Show map") land on `/legacy/account-security`. `AccountSecurity` must go when path step 6
+brings passwords to the SPA.
 
 ## Questions
 
-4. The legacy settings page ends with `AccountSecurity` (enable/disable protection, change password,
-   email a link): server actions in `actions/user-auth`, and ADR "no API for passwords" until path
-   step 6. 17a leaves it out. Step 18 needs a decision: keep it as a small legacy page
-   (`/legacy/account-security`) the SPA settings links to, or add the API. Not decided here.
-
 5. The SPA shell has no "Show map" button (the uploaded site map); only legacy pages show it. The
    schedule and proposals screens (both SPA-owned now) lost it when they moved.
-   `settings.spec.ts:67` now checks it on `/legacy/settings`. Needs a shell item and the map URL in
-   `/me` or the snapshot.
+   `settings.spec.ts:67` now checks it on `/legacy/account-security`. Needs a shell item and the map
+   URL in `/me` or the snapshot.
 
 Assumptions the user may override (set by the coordinator, 2026-10-25):
 
@@ -167,13 +148,8 @@ viewer from `/me`). `app/components/avatar.tsx` is a shared legacy file (moved o
 guests directory) until the legacy pages go. Do not call `runner.stop()` or `query.destroy()` in a
 mount effect cleanup: StrictMode re-runs the effect on the same object and leaves it dead.
 `tests/e2e/helpers/fixtures.ts` opens `/guests*` as it is (not under `/legacy`). The settings map
-check now uses `/legacy/settings`. The SPA shell still lacks "Show map". A protected-but-unverified
-name on the edit page shows the "select who you are" copy.
-
-Step 12a, for the settings step:
-`AvailabilityForm({...AvailabilityFormData, calls: meetingAvailabilityCalls(api)})`; the legacy
-`availabilityFormsFor` (utils) still builds the data server-side. Legacy `availability-form.tsx` and
-`saveMeetingAvailabilityAction` go with the settings takeover.
+check uses `/legacy/account-security`. The SPA shell still lacks "Show map". A
+protected-but-unverified name on the edit page shows the "select who you are" copy.
 
 Step 12b, for 13: `BookMeeting({query, calls, eventId, slotStart, profileHref, onBooked, onClose})`;
 `query` = stable `createMeetingCandidatesQuery`, `calls` = `meetingRequestCalls(api)`. 10e's dialog

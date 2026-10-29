@@ -8,7 +8,6 @@ import {
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { usePathname } from "next/navigation";
-import Link from "next/link";
 import { AppLink } from "@/app/components/app-link";
 import { MapModal } from "./modals";
 import { HeaderUserSelect } from "./header-user-select";
@@ -87,8 +86,8 @@ export default function NavBar({
                     </AppLink>
                   )}
                   {showNotifications && (
-                    <Link
-                      href="/legacy/notifications"
+                    <AppLink
+                      href="/notifications"
                       aria-label={notificationsLabel(unreadNotifications)}
                       className="relative flex cursor-pointer items-center rounded-md p-2 text-fg-subtle hover:bg-surface-muted"
                     >
@@ -98,7 +97,7 @@ export default function NavBar({
                           {unreadNotifications > 9 ? "9+" : unreadNotifications}
                         </span>
                       )}
-                    </Link>
+                    </AppLink>
                   )}
                   {mapImageUrl && <MapModal mapImageUrl={mapImageUrl} />}
                   {guests.length > 0 && <HeaderUserSelect guests={guests} />}

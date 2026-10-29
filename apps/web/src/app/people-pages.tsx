@@ -1,12 +1,5 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  useSyncExternalStore,
-  type ReactNode,
-} from "react";
-import { useLocation, useRouter } from "@tanstack/react-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "@tanstack/react-router";
 import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
 import { newSortSeed } from "@schellingboard/domain/attendee-search";
 import { failureMessage } from "../commands/failure-message";
@@ -20,7 +13,6 @@ import { ProfileForm } from "../features/people/profile-form";
 import { ProfileModal } from "../features/people/profile-modal";
 import { meetingsOpen } from "../features/schedule/meeting-rules";
 import {
-  createDirectoryQuery,
   type DirectoryEntry,
   type DirectoryQuery,
   type DirectoryState,
@@ -31,12 +23,12 @@ import { blankSnapshot } from "../replica/blank";
 import { createReplicaStore } from "../replica/store";
 import { toEvent } from "../replica/selectors";
 import { useNotify } from "../ui/notices";
-import { hardReload } from "./hard-navigate";
 import { InAppLinks } from "./in-app-links";
+import { PageNotice } from "./page-notice";
 import type { AppServices } from "./services";
 import { ShellFrame, ShellProviders } from "./shell";
 import { useCommentSource } from "./use-comment-actions";
-import { useEventList } from "./use-events";
+import { useDirectoryShell } from "./use-directory-shell";
 import { useUrlSearchParams } from "./use-url-search-params";
 import { useViewer } from "./viewer";
 
@@ -57,20 +49,9 @@ export function PeoplePage({ services }: { services: AppServices }) {
 function Host({ api }: { api: AppServices["api"] }) {
   const viewer = useViewer();
   const notify = useNotify();
-  const { search, params } = useUrlSearchParams();
-  const pathname = useLocation({ select: (l) => l.pathname });
-  const { events, now: serverNow } = useEventList(api);
-  const [loadedAt] = useState(() => new Date());
-  const now = serverNow ?? loadedAt;
-
-  const directory = useMemo(() => createDirectoryQuery({ api }), [api]);
-  useEffect(() => {
-    void directory.refresh();
-  }, [directory]);
-  const { status, entries } = useSyncExternalStore(
-    directory.subscribe,
-    directory.get
-  );
+  const { params } = useUrlSearchParams();
+  const { events, now, directory, status, entries, pathname, frame } =
+    useDirectoryShell(api);
 
   const runner = useMemo(
     () =>
@@ -113,22 +94,7 @@ function Host({ api }: { api: AppServices["api"] }) {
     : pathname.match(/^\/guests\/([^/]+)\/?$/)?.[1];
 
   return (
-    <ShellFrame
-      api={api}
-      events={events.map((e) => ({ name: e.name, href: `/${e.slug}` }))}
-      guests={
-        status === "ready" || entries.length > 0
-          ? entries.map((e) => ({
-              id: e.id,
-              name: e.name,
-              authProtected: e.authProtected,
-            }))
-          : undefined
-      }
-      currentPath={pathname}
-      search={search}
-      onClockChange={hardReload}
-    >
+    <ShellFrame api={api} {...frame}>
       <InAppLinks
         owns={(url) => isPeoplePath(url.pathname)}
         onFollow={(url) => {
@@ -212,20 +178,6 @@ function Directory({
   );
 }
 
-function Notice({ children }: { children: ReactNode }) {
-  return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-4 px-4 sm:px-0">
-      <a
-        href={LIST}
-        className="-my-1 inline-block py-1 text-sm text-fg-subtle hover:text-fg-muted"
-      >
-        ← Attendees
-      </a>
-      <p className="text-fg-muted">{children}</p>
-    </div>
-  );
-}
-
 function EditProfile({
   api,
   directory,
@@ -261,12 +213,12 @@ function EditProfile({
 
   if (viewerKnown && !viewerId && awaitingLogin !== undefined)
     return (
-      <Notice>
+      <PageNotice>
         {actingGuestRefusalMessage(
           awaitingLogin ? "guest.protected" : "guest.unselected",
           "editing your profile"
         )}
-      </Notice>
+      </PageNotice>
     );
   if (
     !viewerKnown ||

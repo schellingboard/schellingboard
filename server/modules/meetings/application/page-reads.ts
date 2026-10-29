@@ -2,7 +2,6 @@ import type { Repositories } from "@/db/container";
 import { loadGuestSchedules } from "@/utils/guest-clashes";
 import { meetingViewsFor } from "@/utils/meeting-views";
 import { meetingOptionsFor } from "@/utils/meeting-options";
-import { availabilityFormsFor } from "@/utils/meeting-availability-form";
 
 export const meetingPointsOfEvent = (
   q: Pick<Repositories, "meetingPoints">,
@@ -28,9 +27,3 @@ export const meetingOptions = (
   recipientId: string,
   events: Parameters<typeof meetingOptionsFor>[2]
 ) => meetingOptionsFor(viewerId, recipientId, events, q);
-
-export const availabilityForms = (
-  q: Parameters<typeof availabilityFormsFor>[2],
-  guestId: string,
-  now: Date
-) => availabilityFormsFor(guestId, now, q);

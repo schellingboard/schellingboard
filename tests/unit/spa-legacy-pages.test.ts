@@ -4,10 +4,14 @@ import { describe, expect, it } from "vitest";
 
 // Read as text: nothing outside apps/web may import it.
 const listed = [
-  ...readFileSync(
-    join(process.cwd(), "apps/web/src/app/legacy-pages.ts"),
-    "utf8"
-  ).matchAll(/"([a-z-]+)",/g),
+  ...(
+    /LEGACY_ROOT_PAGES = \[([^\]]*)\]/.exec(
+      readFileSync(
+        join(process.cwd(), "apps/web/src/app/legacy-pages.ts"),
+        "utf8"
+      )
+    )?.[1] ?? ""
+  ).matchAll(/"([a-z-]+)"/g),
 ].map((m) => m[1]);
 
 const legacy = join(process.cwd(), "app/legacy");

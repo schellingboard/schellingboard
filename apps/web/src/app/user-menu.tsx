@@ -90,7 +90,7 @@ export function UserMenu({
           <a role="menuitem" href="/guests/edit" className={item}>
             Edit profile
           </a>
-          <a role="menuitem" href="/legacy/settings" className={item}>
+          <a role="menuitem" href="/settings" className={item}>
             Settings
           </a>
           <div className="my-1 h-px bg-surface-muted" />

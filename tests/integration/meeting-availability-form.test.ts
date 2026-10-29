@@ -4,7 +4,7 @@ import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest, createDay } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { pageReads } from "@/server/composition";
+import { availabilityFormsFor } from "@/utils/meeting-availability-form";
 
 const NOW = new Date("2026-10-01T08:00:00.000Z");
 const DAY = {
@@ -46,7 +46,7 @@ describe("availabilityFormsFor", () => {
       [new Date("2026-10-02T09:30:00.000Z")]
     );
 
-    const forms = await pageReads().availabilityForms(guest.id, NOW);
+    const forms = await availabilityFormsFor(guest.id, NOW, getRepositories());
 
     expect(forms).toHaveLength(1);
     expect(forms[0]).toMatchObject({
@@ -72,7 +72,9 @@ describe("availabilityFormsFor", () => {
     await createDay(notOffering.id, DAY);
     const guest = await createGuest({ eventId: notOffering.id });
 
-    expect(await pageReads().availabilityForms(guest.id, NOW)).toEqual([]);
+    expect(
+      await availabilityFormsFor(guest.id, NOW, getRepositories())
+    ).toEqual([]);
   });
 
   it("leaves out an event that is not in its scheduling phase yet", async () => {
@@ -82,7 +84,9 @@ describe("availabilityFormsFor", () => {
     await createDay(event.id, DAY);
     const guest = await createGuest({ eventId: event.id });
 
-    expect(await pageReads().availabilityForms(guest.id, NOW)).toEqual([]);
+    expect(
+      await availabilityFormsFor(guest.id, NOW, getRepositories())
+    ).toEqual([]);
   });
 
   // Nothing is left to be booked into once every day has passed. An event
@@ -97,7 +101,7 @@ describe("availabilityFormsFor", () => {
     const guest = await createGuest({ eventId: over.id });
     await getRepositories().guests.assignToEvent(notYet.id, [guest.id]);
 
-    const forms = await pageReads().availabilityForms(guest.id, NOW);
+    const forms = await availabilityFormsFor(guest.id, NOW, getRepositories());
 
     expect(forms.map((f) => f.eventName)).toEqual(["Not Planned"]);
     expect(forms[0].days).toEqual([]);
@@ -120,7 +124,7 @@ describe("availabilityFormsFor", () => {
       ]
     );
 
-    const [form] = await pageReads().availabilityForms(guest.id, NOW);
+    const [form] = await availabilityFormsFor(guest.id, NOW, getRepositories());
 
     expect(form.declared).toEqual(["2026-10-02T09:30:00.000Z"]);
   });
@@ -136,7 +140,7 @@ describe("availabilityFormsFor", () => {
     });
     const guest = await createGuest({ eventId: event.id });
 
-    const [form] = await pageReads().availabilityForms(guest.id, NOW);
+    const [form] = await availabilityFormsFor(guest.id, NOW, getRepositories());
 
     expect(form.days.map((d) => d.label)).toEqual([
       "Fri 2 Oct, 09:00–11:00",

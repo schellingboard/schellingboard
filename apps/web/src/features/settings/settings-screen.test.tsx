@@ -40,7 +40,10 @@ function show(state: SettingsState) {
         state={state}
         calls={settingsCalls(api)}
         availability={meetingAvailabilityCalls(api)}
-        links={{ profile: "/guests/edit" }}
+        links={{
+          profile: "/guests/edit",
+          security: "/legacy/account-security",
+        }}
       />
     </NoticeProvider>
   );
@@ -68,6 +71,16 @@ describe("the settings page", { tags: ["013-US5"] }, () => {
     expect(screen.getByText("Autumn Camp")).toBeTruthy();
     expect(screen.getByText("Spring Camp")).toBeTruthy();
     expect(screen.getByRole("group", { name: "Colour theme" })).toBeTruthy();
+  });
+
+  it("links to the account security page", () => {
+    show(readyWith([]));
+
+    expect(
+      screen
+        .getByRole("link", { name: "Account security" })
+        .getAttribute("href")
+    ).toBe("/legacy/account-security");
   });
 
   it("says when no event offers 1-on-1s", () => {

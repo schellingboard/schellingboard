@@ -19,7 +19,7 @@ describe("HeaderLinks", () => {
     const bell = await screen.findByRole("link", {
       name: "Notifications (3 unread)",
     });
-    expect(bell.getAttribute("href")).toBe("/legacy/notifications");
+    expect(bell.getAttribute("href")).toBe("/notifications");
     expect(bell.textContent).toBe("3");
   });
 

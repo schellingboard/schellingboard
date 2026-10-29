@@ -192,6 +192,7 @@ test("protect a name via emailed link, then log in with password and single-use 
   // Enable protection: this emails a link to set the first password.
   await page.getByRole("button", { name: /your name/i }).click();
   await page.getByRole("menuitem", { name: /settings/i }).click();
+  await page.getByRole("link", { name: "Account security" }).click();
   await expect(
     page.getByText(/anyone can currently act under your name/i)
   ).toBeVisible();
@@ -250,6 +251,7 @@ test("protect a name via emailed link, then log in with password and single-use 
   // Change the password from settings using the current one.
   await page.getByRole("button", { name: /your name/i }).click();
   await page.getByRole("menuitem", { name: /settings/i }).click();
+  await page.getByRole("link", { name: "Account security" }).click();
   await page.getByRole("button", { name: "Change password" }).click();
   await page.getByLabel("Current password").fill(PRIYA_PASSWORD);
   await page.getByLabel(/new password/i).fill(PRIYA_NEW_PASSWORD);
@@ -266,6 +268,7 @@ test("protect a name via emailed link, then log in with password and single-use 
   // Turn protection off with the current password; anyone can switch again.
   await page.getByRole("button", { name: /your name/i }).click();
   await page.getByRole("menuitem", { name: /settings/i }).click();
+  await page.getByRole("link", { name: "Account security" }).click();
   await page.getByRole("button", { name: "Turn off protection" }).click();
   await page.getByLabel("Current password").fill(PRIYA_NEW_PASSWORD);
   await page.getByRole("button", { name: "Turn off protection" }).click();
@@ -293,6 +296,7 @@ test("forgot password: reset it via an emailed link @003-US5", async ({
   // Protect Ahmad and set the first password via the emailed link.
   await page.getByRole("button", { name: /your name/i }).click();
   await page.getByRole("menuitem", { name: /settings/i }).click();
+  await page.getByRole("link", { name: "Account security" }).click();
   const before1 = await mailOnTop(RESET_SUBJECT, AHMAD_EMAIL);
   await page.getByRole("button", { name: "Enable protection" }).click();
   const link1 = await newestResetLink(AHMAD_EMAIL, before1);
@@ -349,6 +353,7 @@ test("setting a password drops the selection the same browser was holding @003-U
 
   await page.getByRole("button", { name: /your name/i }).click();
   await page.getByRole("menuitem", { name: /settings/i }).click();
+  await page.getByRole("link", { name: "Account security" }).click();
   const resetBefore = await mailOnTop(RESET_SUBJECT, THABO_EMAIL);
   await page.getByRole("button", { name: "Enable protection" }).click();
   await expect(page.getByText(/check your email/i)).toBeVisible();
@@ -408,6 +413,7 @@ test("a name protected from another device asks this browser to log in, not to p
   await pickName(phone, "Nadia Haddad");
   await phone.getByRole("button", { name: /your name/i }).click();
   await phone.getByRole("menuitem", { name: /settings/i }).click();
+  await phone.getByRole("link", { name: "Account security" }).click();
   const resetBefore = await mailOnTop(RESET_SUBJECT, NADIA_EMAIL);
   await phone.getByRole("button", { name: "Enable protection" }).click();
   await expect(phone.getByText(/check your email/i)).toBeVisible();

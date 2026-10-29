@@ -78,60 +78,10 @@ const PRE_AUTH = new Set([
  * it runs before anything looks at them.
  */
 const SITE_GUARDED: Record<string, () => Promise<unknown>> = {
-  "actions/meetings.ts:saveMeetingAvailabilityAction": async () => {
-    const { saveMeetingAvailabilityAction } =
-      await import("@/app/actions/meetings");
-    return saveMeetingAvailabilityAction({ eventId: "e", slotStarts: [] });
-  },
   "actions/dev-reminders.ts:dispatchRemindersAction": async () => {
     const { dispatchRemindersAction } =
       await import("@/app/actions/dev-reminders");
     return dispatchRemindersAction();
-  },
-  "actions/notifications.ts:openNotificationAction": async () => {
-    const { openNotificationAction } =
-      await import("@/app/actions/notifications");
-    return openNotificationAction("n");
-  },
-  "actions/notifications.ts:markNotificationsReadAction": async () => {
-    const { markNotificationsReadAction } =
-      await import("@/app/actions/notifications");
-    return markNotificationsReadAction(["n"]);
-  },
-  "actions/notifications.ts:deleteNotificationsAction": async () => {
-    const { deleteNotificationsAction } =
-      await import("@/app/actions/notifications");
-    return deleteNotificationsAction(["n"]);
-  },
-  "actions/push.ts:subscribeToPushAction": async () => {
-    const { subscribeToPushAction } = await import("@/app/actions/push");
-    return subscribeToPushAction({});
-  },
-  "actions/push.ts:unsubscribeFromPushAction": async () => {
-    const { unsubscribeFromPushAction } = await import("@/app/actions/push");
-    return unsubscribeFromPushAction("https://push.example/device");
-  },
-  "actions/push.ts:pushEnabledHereAction": async () => {
-    const { pushEnabledHereAction } = await import("@/app/actions/push");
-    return pushEnabledHereAction("https://push.example/device");
-  },
-  "actions/settings.ts:updateEmailSettingsAction": async () => {
-    const { updateEmailSettingsAction } =
-      await import("@/app/actions/settings");
-    return updateEmailSettingsAction({
-      rsvpChange: true,
-      hostChange: true,
-      cohostAdd: true,
-      proposalJoin: true,
-      proposalComment: true,
-      sessionComment: true,
-      profileComment: true,
-      commentThread: true,
-      meetingRequest: true,
-      meetingResponse: true,
-      sessionHeadsUp: true,
-      attendeeCountReminder: true,
-    });
   },
   "actions/user-auth.ts:requestLoginCodeAction": async () => {
     const { requestLoginCodeAction } = await import("@/app/actions/user-auth");

@@ -34,15 +34,9 @@ const ALLOWED_CONSOLE_PATTERNS: RegExp[] = [
 const SERVER_PATH =
   /^\/(legacy|api|media|locations|_next|_spa|sw\.js|manifest\.webmanifest|favicon\.ico|icon|apple-touch-icon|one-on-one)(\/|\.|-|$)/;
 
-// Legacy pages directly under the root: `/settings` is never an event. Kept in
+// Legacy pages directly under the root: `/login` is never an event. Kept in
 // step with apps/web/src/app/legacy-pages.ts (tests/unit/spa-legacy-pages.test.ts).
-const LEGACY_ROOT_PAGES = [
-  "admin",
-  "auth",
-  "login",
-  "notifications",
-  "settings",
-];
+const LEGACY_ROOT_PAGES = ["account-security", "admin", "auth", "login"];
 
 // An event's own page, `/{slug}`, and its proposals screens, which the SPA serves.
 // Its 1-on-1 modal is still the legacy schedule's, which the SPA hands the address to.
@@ -54,6 +48,9 @@ function isEventPage(url: string): boolean {
 }
 
 const isPeoplePage = (url: string) => /^\/guests(?:[/?#]|$)/.test(url);
+
+const isAccountPage = (url: string) =>
+  /^\/(?:settings|notifications)(?:[?#]|$)/.test(url);
 
 function isAllowed(text: string): boolean {
   return ALLOWED_CONSOLE_PATTERNS.some((re) => re.test(text));
@@ -68,7 +65,8 @@ function formatConsoleMessage(msg: ConsoleMessage): string {
 export const test = base.extend<{ consoleGuard: void }>({
   // Specs go to a legacy page directly: through the shell, a click can land
   // before the page behind it has hydrated. The hop has its own spec (@014-US4).
-  // An event's schedule and the people screens are the SPA's own, so they are opened as they are.
+  // An event's schedule and the people, settings and notification screens are
+  // the SPA's own, so they are opened as they are.
   page: async ({ page }, provide) => {
     const goto = page.goto.bind(page);
     page.goto = (url, options) =>
@@ -76,7 +74,8 @@ export const test = base.extend<{ consoleGuard: void }>({
         url.startsWith("/") &&
           !SERVER_PATH.test(url) &&
           !isEventPage(url) &&
-          !isPeoplePage(url)
+          !isPeoplePage(url) &&
+          !isAccountPage(url)
           ? `/legacy${url}`
           : url,
         options
