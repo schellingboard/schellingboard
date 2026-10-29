@@ -54,7 +54,7 @@ async function meetingCandidatesFor(
   slotCount = 1
 ) {
   const result = await meetingUseCases().listMeetingCandidates(
-    { admin: false, guest: { id: viewerId, level: "open" } },
+    { admin: false, guest: { id: viewerId, level: "claimed" } },
     { eventId, slotStart, slotCount },
     now
   );

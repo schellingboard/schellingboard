@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { meetingUseCases } from "@/server/composition";
-import { resolveActor } from "@/server/kernel/actor";
+import { actorOf } from "@/server/kernel/session-actor";
 import { requestNow } from "@/utils/dev-clock";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const result = await meetingUseCases().listMeetingCandidates(
-      await resolveActor(request.cookies),
+      await actorOf(request.cookies),
       { eventId, slotStart, slotCount },
       requestNow(request)
     );

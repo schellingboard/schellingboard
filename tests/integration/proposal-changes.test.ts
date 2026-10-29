@@ -16,7 +16,7 @@ const NOBODY: Actor = { admin: false, guest: null };
 const ADMIN: Actor = { admin: true, guest: null };
 const open = (id: string): Actor => ({
   admin: false,
-  guest: { id, level: "open" },
+  guest: { id, level: "claimed" },
 });
 const now = () => new Date();
 

@@ -15,3 +15,18 @@ export type AuthCode = {
   expiresAt: Date;
   attempts: number;
 };
+
+/** What a login session proves: a picked name, or a checked credential. */
+export type LoginAssurance = "claimed" | "verified";
+
+export type LoginSession = {
+  /** sha256 of the cookie's token; the token itself is never stored. */
+  id: string;
+  guestId: string;
+  eventId: string | null;
+  assurance: LoginAssurance;
+  createdAt: Date;
+  expiresAt: Date;
+  lastSeenAt: Date;
+  device: string | null;
+};

@@ -1,4 +1,8 @@
-import type { AuthCodePurpose, AuthCode } from "@schellingboard/domain/auth";
+import type {
+  AuthCodePurpose,
+  AuthCode,
+  LoginSession,
+} from "@schellingboard/domain/auth";
 import type { Change, RecordedChange } from "@schellingboard/domain/change";
 import type { Comment } from "@schellingboard/domain/comment";
 import type {
@@ -132,6 +136,18 @@ export type NewAuthCode = {
   createdAt: Date;
   expiresAt: Date;
 };
+
+export interface LoginSessionsRepository {
+  create(session: LoginSession): Promise<void>;
+  get(id: string): Promise<LoginSession | null>;
+  /** The unexpired row; refreshes `lastSeenAt` at most once an hour. */
+  findLive(id: string, now: Date): Promise<LoginSession | null>;
+  delete(id: string): Promise<void>;
+  /** Revokes the guest's sessions, all but `exceptId`. */
+  deleteForGuest(guestId: string, exceptId?: string): Promise<void>;
+  deleteVerifiedForGuest(guestId: string): Promise<void>;
+  deleteExpired(now: Date): Promise<void>;
+}
 
 export interface AuthCodesRepository {
   /**

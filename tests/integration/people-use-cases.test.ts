@@ -25,7 +25,7 @@ import { getImageRepositories } from "@/utils/images";
 const NOBODY: Actor = { admin: false, guest: null };
 const open = (id: string): Actor => ({
   admin: false,
-  guest: { id, level: "open" },
+  guest: { id, level: "claimed" },
 });
 const verified = (id: string): Actor => ({
   admin: false,

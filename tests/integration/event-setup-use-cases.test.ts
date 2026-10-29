@@ -637,7 +637,7 @@ describe("day use cases", () => {
           NOW
         ),
         sessions().createSession(
-          { admin: false, guest: { id: host.id, level: "open" } },
+          { admin: false, guest: { id: host.id, level: "claimed" } },
           {
             dayId: day.id,
             locationId: room.id,

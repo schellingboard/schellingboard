@@ -10,7 +10,7 @@ to add to it. The user-facing description of the API is
 
 ```
 server/
-  kernel/              Result and error kinds, Actor and resolveActor, actingGuest, the unit of work
+  kernel/              Result and error kinds, Actor and resolveActor (`actorOf` binds it to the session rows), actingGuest, the unit of work
   http/                the Hono app (app.ts), middleware, problem details, OpenAPI document and its reference page (docs.ts)
   feed/                the snapshot and the SSE change feed (routes.ts), the hub of open connections, projection of a change to a viewer
   composition.ts       builds each module's use cases from the repositories and adapters
@@ -135,9 +135,9 @@ prediction knows its command has arrived and drops it.
    use case with `c.var.actor` and `c.var.now`, and returns `problem(result.error)` on failure.
    Admin routes go under `/admin/`, or the proxy will not gate them. Register a new route function
    in `server/http/app.ts`.
-4. **Callers.** A server action resolves the actor with `resolveActor(await cookies())` and calls
-   the use case from `server/composition.ts`. A legacy route uses `legacyActor` and `legacyRefusal`
-   from `app/api/legacy.ts` and keeps its old response body.
+4. **Callers.** A server action resolves the actor with `actorOf(await cookies())` and calls the use
+   case from `server/composition.ts`. A legacy route uses `legacyActor` and `legacyRefusal` from
+   `app/api/legacy.ts` and keeps its old response body.
 5. **`make openapi`.** It rewrites `packages/contracts/openapi.json` and the client's types in
    `packages/api-client/src/schema.ts`; commit both. `make openapi-check`, in `make precommit` and
    CI, fails while either is stale.

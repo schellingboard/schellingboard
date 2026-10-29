@@ -1,8 +1,8 @@
 import type { NextRequest } from "next/server";
 import { SESSION_PLACEMENT_CODES } from "@schellingboard/domain/session-booking";
 import { idempotentAction, sessionUseCases } from "@/server/composition";
+import { actorOf } from "@/server/kernel/session-actor";
 import { HTTP_STATUS_BY_KIND } from "@/server/kernel/result";
-import { resolveActor } from "@/server/kernel/actor";
 import { actingGuestRefusalMessage } from "@/utils/acting-guest";
 import { requestNow } from "@/utils/dev-clock";
 import { legacyBooking, type SessionParams } from "../session-form-utils";
@@ -15,7 +15,7 @@ type Outcome =
   | { error: ""; networkError: true };
 
 export async function POST(req: NextRequest) {
-  const actor = await resolveActor(req.cookies);
+  const actor = await actorOf(req.cookies);
   const params = (await req.json()) as SessionParams;
   const now = requestNow(req);
   const outcome = await idempotentAction(

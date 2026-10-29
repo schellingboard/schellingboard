@@ -1,11 +1,12 @@
 import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
 export { actingGuestRefusalMessage };
 import { pageReads } from "@/server/composition";
-import { readGuestCookie, GUEST_COOKIE_NAME } from "./auth";
+import { guestOfCookie } from "@/server/kernel/session-actor";
+import { GUEST_COOKIE_NAME } from "./auth";
 
 // Server-side enforcement for guest account security (issue #370): a request
-// acting as an auth-protected guest must carry that guest's signed, verified
-// guest cookie. Unprotected guests stay freely impersonable by design.
+// acting as an auth-protected guest must carry that guest's verified
+// login session. Unprotected guests stay freely impersonable by design.
 //
 // Kept separate from utils/auth.ts because these helpers hit the database.
 
@@ -21,8 +22,8 @@ export async function isVerifiedAsGuest(
 ): Promise<boolean> {
   const creds = await pageReads().guestAuthProtection(guestId);
   if (!creds || !creds.authProtected) return true;
-  const parsed = await readGuestCookie(guestCookieValue);
-  return parsed?.guestId === guestId && parsed.level === "verified";
+  const parsed = await guestOfCookie(guestCookieValue);
+  return parsed?.id === guestId && parsed.level === "verified";
 }
 
 // Shared 403 body for writes attempted as a protected guest without a
@@ -75,11 +76,9 @@ export async function verifiedCurrentUser(
 export async function currentGuestSelection(
   cookieStore: ReadonlyCookies
 ): Promise<string | null> {
-  const parsed = await readGuestCookie(
-    cookieStore.get(GUEST_COOKIE_NAME)?.value
-  );
+  const parsed = await guestOfCookie(cookieStore.get(GUEST_COOKIE_NAME)?.value);
   if (!parsed) return null;
-  return (await guestExists(parsed.guestId)) ? parsed.guestId : null;
+  return (await guestExists(parsed.id)) ? parsed.id : null;
 }
 
 /**

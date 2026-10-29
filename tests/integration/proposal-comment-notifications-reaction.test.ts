@@ -14,7 +14,7 @@ import { commentUseCases, proposalUseCases } from "@/server/composition";
 
 const open = (id: string) => ({
   admin: false,
-  guest: { id, level: "open" as const },
+  guest: { id, level: "claimed" as const },
 });
 const AT = new Date("2026-06-01T10:00:00.000Z");
 

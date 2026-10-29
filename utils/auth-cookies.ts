@@ -1,19 +1,14 @@
 // Cookie verification without Next, so the server kernel can resolve the actor
 // from it; utils/auth.ts adds the Next request and response helpers.
 
+import type { LoginAssurance } from "@schellingboard/domain/auth";
+
 export const ADMIN_COOKIE_NAME = "admin-auth";
-// The single cookie that names the current guest AND, when applicable, proves
-// it. Its value carries a level (issue #370):
-//   - "open"     — a mere name selection. Unsigned and forgeable, exactly like
-//                  the old plain `user` cookie: unprotected guests are freely
-//                  impersonable by design, so an open cookie needs no secret
-//                  and grants nothing a protected guest's identity relies on.
-//   - "verified" — a signed proof that the guest's password/code was checked.
-// Reads go only through readGuestCookie (here) and the acting-guest helpers,
-// so no caller ever trusts a raw guest id: a protected guest is honoured only
-// with a "verified" cookie (see isVerifiedAsGuest).
+// The guest cookie holds an opaque login-session token (see login_sessions in
+// db/schema.ts). Values with a dot are the cookies this server issued before
+// that, kept readable until they expire: `open.<guestId>` (a mere name
+// selection, unsigned) and a signed `verified.<guestId>.<issuedAt>.<sig>`.
 export const GUEST_COOKIE_NAME = "guest";
-export type GuestAuthLevel = "open" | "verified";
 
 export const ADMIN_SCOPE = "admin";
 export const COOKIE_MAX_AGE_SEC = 7 * 24 * 60 * 60;
@@ -146,15 +141,13 @@ export function verifiedScope(guestId: string): string {
 }
 
 /**
- * Parses and validates the guest cookie into its guest id and level, or null
- * if absent/malformed. A "verified" value must carry a valid, unexpired
- * signature; an "open" value is accepted as-is (it is only ever honoured for
- * an unprotected guest — see isVerifiedAsGuest). Never trust the returned id
- * for a protected guest without also checking the level is "verified".
+ * Parses and validates a legacy guest cookie into its guest id and assurance,
+ * or null if absent/malformed. A "verified" value must carry a valid,
+ * unexpired signature; an "open" one is accepted as-is and reads as "claimed".
  */
 export async function readGuestCookie(
   value: string | undefined
-): Promise<{ guestId: string; level: GuestAuthLevel } | null> {
+): Promise<{ guestId: string; level: LoginAssurance } | null> {
   if (!value) return null;
   const firstDot = value.indexOf(".");
   if (firstDot < 0) return null;
@@ -163,7 +156,7 @@ export async function readGuestCookie(
   if (level === "open") {
     const guestId = value.slice(firstDot + 1);
     if (!guestId || guestId.includes(".")) return null;
-    return { guestId, level: "open" };
+    return { guestId, level: "claimed" };
   }
 
   if (level === "verified") {
@@ -200,18 +193,10 @@ export function cookieOptions(maxAge: number) {
   };
 }
 
-// Signing (the "verified" path) needs AUTH_SECRET; the "open" path never does,
-// so a passwordless site with no protected guests still runs without a secret.
-export async function createGuestCookie(
-  guestId: string,
-  level: GuestAuthLevel
-) {
+export function createGuestCookie(sessionToken: string) {
   return {
     name: GUEST_COOKIE_NAME,
-    value:
-      level === "verified"
-        ? await signCookieValue(verifiedScope(guestId))
-        : `open.${guestId}`,
+    value: sessionToken,
     ...cookieOptions(COOKIE_MAX_AGE_SEC),
   };
 }

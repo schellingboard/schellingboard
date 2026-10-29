@@ -43,13 +43,12 @@ vi.mock("@/utils/mailer", () => ({
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createGuest } from "../helpers/factories";
+import { sessionGuestValue } from "../helpers/guest-cookie";
 import { getRepositories } from "@/db/container";
+import { hashSessionToken } from "@/utils/login-session-token";
+import { guestOfCookie } from "@/server/kernel/session-actor";
 import { sendMail, isMailerConfigured } from "@/utils/mailer";
-import {
-  createAuthCookie,
-  readGuestCookie,
-  GUEST_COOKIE_NAME,
-} from "@/utils/auth";
+import { createAuthCookie, GUEST_COOKIE_NAME } from "@/utils/auth";
 import { MAX_CODE_ATTEMPTS, hashUserPassword } from "@/utils/user-credentials";
 import { EMAIL_LIMIT, LOGIN_LIMITS } from "@/server/kernel/rate-limit";
 import {
@@ -102,14 +101,17 @@ async function lastResetToken(): Promise<string> {
 
 /** The selected guest id from the single guest cookie, or null if none. */
 async function currentUserId(): Promise<string | null> {
-  const parsed = await readGuestCookie(cookieJar.get(GUEST_COOKIE_NAME)?.value);
-  return parsed?.guestId ?? null;
+  const parsed = await guestOfCookie(cookieJar.get(GUEST_COOKIE_NAME)?.value);
+  return parsed?.id ?? null;
 }
+
+const sessionRow = (token: string) =>
+  getRepositories().loginSessions.get(hashSessionToken(token));
 
 /** Whether the guest cookie is a verified proof issued for `guestId`. */
 async function userAuthCookieValidFor(guestId: string): Promise<boolean> {
-  const parsed = await readGuestCookie(cookieJar.get(GUEST_COOKIE_NAME)?.value);
-  return parsed?.guestId === guestId && parsed.level === "verified";
+  const parsed = await guestOfCookie(cookieJar.get(GUEST_COOKIE_NAME)?.value);
+  return parsed?.id === guestId && parsed.level === "verified";
 }
 
 /**
@@ -578,6 +580,43 @@ describe("user auth actions", () => {
       expect(await currentUserId()).toBeNull();
     });
 
+    it("revokes every login session of a guest resetting their password", async () => {
+      const { guest } = await guestWithResetToken();
+      await setPasswordWithTokenAction(
+        guest.id,
+        await lastResetToken(),
+        "correct horse"
+      );
+      const elsewhere = await sessionGuestValue(guest.id, "verified");
+      await requestPasswordLinkAction(guest.id);
+
+      await setPasswordWithTokenAction(
+        guest.id,
+        await lastResetToken(),
+        "another horse"
+      );
+
+      expect(await sessionRow(elsewhere)).toBeNull();
+    });
+
+    it("revokes verified sessions when protection starts: they must not act as the newly protected name", async () => {
+      const { guest, token } = await guestWithResetToken();
+      const stale = await sessionGuestValue(guest.id, "verified");
+
+      await setPasswordWithTokenAction(guest.id, token, "correct horse");
+
+      expect(await sessionRow(stale)).toBeNull();
+    });
+
+    it("keeps the claimed sessions of other browsers when protection starts, so they are told the name is protected", async () => {
+      const { guest, token } = await guestWithResetToken();
+      const elsewhere = await sessionGuestValue(guest.id, "claimed");
+
+      await setPasswordWithTokenAction(guest.id, token, "correct horse");
+
+      expect(await sessionRow(elsewhere)).not.toBeNull();
+    });
+
     it("leaves another guest's selection alone", async () => {
       const { guest, token } = await guestWithResetToken();
       const other = await createGuest();
@@ -705,6 +744,19 @@ describe("user auth actions", () => {
       expect(
         (await loginAsGuestAction(guest.id, "new password entirely")).ok
       ).toBe(true);
+    });
+
+    it("revokes the other login sessions but keeps this one", async () => {
+      const guest = await loggedInProtectedGuest();
+      const elsewhere = await sessionGuestValue(guest.id, "verified");
+
+      await changePasswordAction(
+        "correct horse battery",
+        "new password entirely"
+      );
+
+      expect(await sessionRow(elsewhere)).toBeNull();
+      expect(await userAuthCookieValidFor(guest.id)).toBe(true);
     });
 
     it("rejects a wrong current password and leaves it unchanged", async () => {

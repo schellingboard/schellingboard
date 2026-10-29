@@ -16,7 +16,7 @@ import type { Actor } from "@/server/kernel/actor";
 
 const open = (id: string): Actor => ({
   admin: false,
-  guest: { id, level: "open" },
+  guest: { id, level: "claimed" },
 });
 const SLOT = `${isoDay(30)}T10:00:00.000Z`;
 

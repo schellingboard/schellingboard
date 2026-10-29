@@ -16,6 +16,7 @@ import { SqliteDeliveriesRepository } from "./repositories/sqlite/deliveries";
 import { SqliteEventsRepository } from "./repositories/sqlite/events";
 import { SqliteGuestsRepository } from "./repositories/sqlite/guests";
 import { SqliteIdempotencyRepository } from "./repositories/sqlite/idempotency";
+import { SqliteLoginSessionsRepository } from "./repositories/sqlite/login-sessions";
 import { SqliteJobsRepository } from "./repositories/sqlite/jobs";
 import { SqliteLocationsRepository } from "./repositories/sqlite/locations";
 import { SqliteLocationUnavailabilityRepository } from "./repositories/sqlite/location-unavailability";
@@ -41,6 +42,7 @@ import type {
   IdempotencyRepository,
   JobsRepository,
   LocationsRepository,
+  LoginSessionsRepository,
   LocationUnavailabilityRepository,
   MeetingAvailabilityRepository,
   MeetingPointsRepository,
@@ -71,6 +73,7 @@ export type Repositories = {
   idempotency: IdempotencyRepository;
   jobs: JobsRepository;
   locations: LocationsRepository;
+  loginSessions: LoginSessionsRepository;
   locationUnavailability: LocationUnavailabilityRepository;
   meetingPoints: MeetingPointsRepository;
   meetingAvailability: MeetingAvailabilityRepository;
@@ -113,6 +116,7 @@ function buildRepositories(sqlite: Database.Database): Repositories {
     guests: new SqliteGuestsRepository(db),
     idempotency: new SqliteIdempotencyRepository(db),
     jobs: new SqliteJobsRepository(db),
+    loginSessions: new SqliteLoginSessionsRepository(db),
     locations: new SqliteLocationsRepository(db),
     locationUnavailability: new SqliteLocationUnavailabilityRepository(db),
     meetingPoints: new SqliteMeetingPointsRepository(db),
