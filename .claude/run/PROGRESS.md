@@ -24,11 +24,12 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
 - Next serves `apps/web/dist`: rebuild the SPA (`make build` or the E2E web server does) before E2E.
 
 - Login sessions (step 3): the `guest` cookie holds a 32-byte token without dots; values with a dot
-  are legacy. `LoginAssurance` (`claimed`|`verified`) replaces `open`|`verified` everywhere. Resolve
-  actors with `actorOf(cookies)` / `guestOfCookie(value)` (`server/kernel/session-actor.ts`), never
-  `resolveActor` directly. Each sign-in deletes the browser's old row and writes a new one. Sessions
-  age in real time (`utils/real-clock.ts`). `eventId` and `device` exist; `device` is the user agent
-  from `PUT /me/identity` only. Tests make rows with `sessionGuestValue`.
+  are legacy (step 5 stops reading them). `LoginAssurance` (`claimed`|`verified`) replaces
+  `open`|`verified` everywhere. Resolve actors with `actorOf(cookies)` / `guestOfCookie(value)`
+  (`server/kernel/session-actor.ts`), never `resolveActor` directly. Each sign-in deletes the
+  browser's old row and writes a new one. Sessions age in real time (`utils/real-clock.ts`).
+  `eventId` and `device` exist; `device` is the user agent from `PUT /me/identity` only. Tests make
+  rows with `sessionGuestValue`.
 
 - Sign-in API (step 4): `matchToken`/`recentlyIssued` live in `people/application/auth-tokens.ts`
   (exported by the module for `setPasswordWithTokenAction` until step 5). `PeopleDeps.loginMail`
@@ -49,7 +50,7 @@ after the wait made it pass, so the notifications view is stale after switching 
 an app bug (query loaded before the new identity). The "mid-click navigation to /admin/users" in the
 log is afterEach cleanup after the timeout, not the cause. Unresolved.
 
-## Left alone (step 14 removes them)
+## Left alone (step 16 removes them)
 
 - Repository methods only removed page reads used (`guests.search`, `searchForEventAssignment`,
   `sessions.searchByEvent`, `proposals` search, ...) and `tests/integration/admin-*-search.test.ts`.
@@ -60,18 +61,7 @@ log is afterEach cleanup after the timeout, not the cause. Unresolved.
 
 - `/legacy` itself has no page now; the error boundary and "Back to the events" link to `/`.
 
-- ADR 0017 is `Proposed`: set it to `Accepted` when the user answers Q7 and Q8 (before step 8).
-
 ## Questions
 
-5. The SPA shell has no "Show map" button (open-questions item 9). `GET /site` (step 1) carries the
-   map URL; the button needs the user's yes. Recommendation: a shell item.
-6. An admin mutation refused with 401/403 later (session expired) shows the refusal in place
-   (open-questions item 10). Recommendation: send to the sign-in as the gate does; step 10.
-7. **Admin bootstrap** (steps 9, 10). Recommendation: `ADMIN_PASSWORD` goes. While no site admin
-   exists, the server logs a single-use bootstrap link at start (24 h; a script prints a new one for
-   recovery, e.g. `docker exec … node scripts/admin-link.js`); a set `ADMIN_PASSWORD` only logs a
-   deprecation warning. The admin UI is then always on (no 404 when unset).
-8. **Site password** (step 8). D2 says no shared site password, but nothing replaces it until reads
-   need a participation. Recommendation: keep `SITE_PASSWORD` as an optional gate through step 7,
-   its screen in the SPA, the gate in Hono; decide removal with participation-gated reads.
+None open. Q5 to Q8 were answered on 2026-10-29 and are in ADR 0017 and PLAN.md (map item: step 14;
+401/403 to sign-in: step 11).
