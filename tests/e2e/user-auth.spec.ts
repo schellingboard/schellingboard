@@ -45,7 +45,9 @@ const mailOnTop = async (subject: string, email: string) =>
 async function setPassword(page: Page, password: string) {
   const submit = page.getByRole("button", { name: "Set password" });
   await expect(async () => {
-    await page.getByLabel(/new password/i).fill(password);
+    const field = page.getByLabel(/new password/i);
+    await field.fill("");
+    await field.fill(password);
     await expect(submit).toBeEnabled({ timeout: 2000 });
   }).toPass();
   await submit.click();
@@ -112,9 +114,17 @@ const headerChip = (page: Page, name: string) =>
   page.getByRole("button", { name: new RegExp(`Your name: ${name}`, "i") });
 
 // Fills the credential prompt for a protected name and submits.
+// Filling twice per attempt: a value typed before hydration shows in the field
+// but not in the form's state, and filling it again unchanged sends no event.
 async function logInAs(page: Page, credential: string) {
-  await page.getByLabel("Password or emailed code").fill(credential);
-  await page.getByRole("button", { name: "Log in" }).click();
+  const submit = page.getByRole("button", { name: "Log in" });
+  await expect(async () => {
+    const field = page.getByLabel("Password or emailed code");
+    await field.fill("");
+    await field.fill(credential);
+    await expect(submit).toBeEnabled({ timeout: 2000 });
+  }).toPass();
+  await submit.click();
 }
 
 test("the name switcher focuses its search, and clearing it keeps the modal open @003-US1", async ({
@@ -217,9 +227,7 @@ test("protect a name via emailed link, then log in with password and single-use 
   // Switching to Priya now demands the password; a wrong one is rejected.
   const priyaOption = page.getByRole("option", { name: /Priya Sharma/i });
   await openFilteredNameSwitcher(page, "Priya");
-  await expect(
-    priyaOption.getByRole("img", { name: /protected/i })
-  ).toBeVisible();
+  await expect(priyaOption).toContainText("(password)");
   await priyaOption.click();
   await expect(page.getByText(/has protected their account/i)).toBeVisible();
   // The credential field says whose credential it wants.

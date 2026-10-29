@@ -15,8 +15,8 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
   gate. `tests/helpers/admin-api.ts`, `proposal-api.ts`, `comment-api.ts` call `/api/v1` for
   integration tests.
 - `app/legacy-pages.ts` keeps "admin" (login is legacy); the router filters it out.
-- The SPA picker sends a protected name to `/legacy/auth/login?guest=<id>`; login lands on
-  `/legacy`. Account security is `/legacy/account-security`, linked from Settings.
+- The SPA picker sends a protected name to `/legacy/auth/login?guest=<id>`; login lands on `/`.
+  Account security is `/legacy/account-security`, linked from Settings.
 - Native `<option>` is not "visible" in Firefox: E2E use `toBeAttached()` / `toBeDisabled()`.
 - Do not call `runner.stop()` or `query.destroy()` in a mount effect cleanup (StrictMode).
 - jj: paths with `(site)`/`[id]` need `'file:"…"'`; `jj squash` needs `-m` or
@@ -37,10 +37,12 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
 - AGENTS.md "Misc" still names `modal-nav.ts`; the anchor MnpjIo7Y lives in `docs/dev/web-app.md`
   (needs the user's edit).
 
+- `/legacy` itself has no page now; the error boundary and "Back to the events" link to `/`.
+
 ## Questions
 
-5. The SPA shell has no "Show map" button (open-questions item 9). Step 1 adds the map URL to
-   `GET /site`; the button needs the user's yes. Recommendation: a shell item.
+5. The SPA shell has no "Show map" button (open-questions item 9). `GET /site` (step 1) carries the
+   map URL; the button needs the user's yes. Recommendation: a shell item.
 6. An admin mutation refused with 401/403 later (session expired) shows the refusal in place
    (open-questions item 10). Recommendation: send to the sign-in as the gate does; step 10.
 7. **Admin bootstrap** (steps 9, 10). Recommendation: `ADMIN_PASSWORD` goes. While no site admin

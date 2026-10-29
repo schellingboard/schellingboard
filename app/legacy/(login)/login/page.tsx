@@ -10,7 +10,7 @@ import { loginAction } from "@/app/actions/auth";
 
 function LoginForm() {
   const searchParams = useSearchParams();
-  const redirectTo = searchParams?.get("redirect") || "/legacy";
+  const redirectTo = searchParams?.get("redirect") || "/";
   const [state, formAction] = useActionState(loginAction, null);
 
   // Hard reload rather than a client-side transition: a soft navigation can

@@ -9,22 +9,26 @@ export type EventSummary = Snapshot["event"];
 export function useEventList(api: ApiClient): {
   events: EventSummary[];
   now: Date | undefined;
+  loaded: boolean;
+  failed: boolean;
 } {
   const [list, setList] = useState<{ events: EventSummary[]; now: Date }>();
+  const [failed, setFailed] = useState(false);
   useEffect(() => {
     let stale = false;
     api
       .GET("/api/v1/events")
       .then(({ data }) => {
-        if (!stale && data)
-          setList({ events: data.events, now: new Date(data.now) });
+        if (stale) return;
+        if (data) setList({ events: data.events, now: new Date(data.now) });
+        else setFailed(true);
       })
-      .catch(() => {});
+      .catch(() => setFailed(true));
     return () => {
       stale = true;
     };
   }, [api]);
-  return { events: list?.events ?? [], now: list?.now };
+  return { events: list?.events ?? [], now: list?.now, loaded: !!list, failed };
 }
 
 /** The events for the nav bar, linking to each event's page. */

@@ -20,6 +20,11 @@ export const getSiteSettings =
     return ok(await repos.settings.get());
   };
 
+export const getPublicSiteSettings =
+  ({ repos }: SettingsDeps) =>
+  async (): Promise<Result<SiteSettings>> =>
+    ok(await repos.settings.get());
+
 export const updateSiteSettings =
   ({ uow, maps }: SettingsDeps) =>
   async (

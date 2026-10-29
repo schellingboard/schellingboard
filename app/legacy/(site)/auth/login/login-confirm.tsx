@@ -1,6 +1,5 @@
 "use client";
 import { useContext } from "react";
-import { useRouter } from "next/navigation";
 import { UserContext } from "../../context";
 import { GuestLoginForm } from "../../guest-login-form";
 
@@ -13,7 +12,6 @@ export function LoginConfirm({
   guestName: string;
   code: string;
 }) {
-  const router = useRouter();
   const { applyUser } = useContext(UserContext);
 
   return (
@@ -23,8 +21,7 @@ export function LoginConfirm({
       initialCredential={code}
       onSuccess={() => {
         applyUser?.(guestId);
-        router.push("/legacy");
-        router.refresh();
+        window.location.assign("/");
       }}
     />
   );

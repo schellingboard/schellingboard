@@ -9,6 +9,7 @@ import {
 } from "vitest";
 import { NextRequest } from "next/server";
 import { GET } from "@/app/api/v1/[[...route]]/route";
+import { getRepositories } from "@/db/container";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createDay, createEvent } from "../helpers/factories";
 
@@ -49,4 +50,27 @@ describe("GET /api/v1/events", () => {
     expect(res.status).toBe(404);
     expect(await res.json()).toMatchObject({ code: "event.notFound" });
   });
+});
+
+describe("GET /api/v1/site", () => {
+  it(
+    "tells anyone the site's title, description and map",
+    { tags: ["002-US2"] },
+    async () => {
+      await getRepositories().settings.update({
+        title: "Unconf Hub",
+        description: "All our events",
+        mapImageUrl: "/media/maps/venue.webp",
+      });
+
+      const res = await get("/site");
+
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({
+        title: "Unconf Hub",
+        description: "All our events",
+        mapImageUrl: "/media/maps/venue.webp",
+      });
+    }
+  );
 });

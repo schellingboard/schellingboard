@@ -64,11 +64,9 @@ Steps 8 to 10 need Q7 (admin bootstrap) and Q8 (site password). Steps 1 to 7 and
 
 ### The root event list
 
-- [ ] 1. **The root event list is an SPA page.** New open `GET /api/v1/site` (title, description,
-      map URL: Q5 can use it later). `features/events/` lists events (dates, website, markdown
-      description, link) or sends to the only event, "No events found." otherwise; the router owns
-      `/`; `page.tsx` and `summary-page.tsx` deleted; post-login landings go to `/`. Unit test the
-      screen; adapt the spec that covers `/`.
+- [x] 1. The root event list is the SPA's (`app/home-page.tsx`, `features/events/`);
+      `GET /api/v1/site` is open; `page.tsx` and `summary-page.tsx` are gone; post-login landings go
+      to `/`.
 
 ### Identity (path step 6)
 

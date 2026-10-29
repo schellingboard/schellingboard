@@ -17,14 +17,15 @@ going.
 - Hashed files are requested as `/_spa/assets/…`. The proxy skips them; a rewrite in
   `next.config.js` hands them to `/api/spa/assets/…`, which serves them as immutable and answers 404
   for anything missing, never the shell.
-- The router owns `/{slug}` (an event's schedule), `/{slug}/proposals/**` (list, quick voting, new,
-  edit; `?viewProposal=` opens the modal), the session forms, `/{slug}/meetings`, `/guests/**`,
-  `/settings`, `/notifications` and `/admin/**` (`app/admin-pages.tsx`). Still Next pages: the
-  sign-in screens (`/login`, guest login and reset, `/account-security`, `/legacy/admin/login`) and
-  the root event list (`/`). Everything else the SPA does not own is forwarded: the catch-all route
-  replaces the location with `/legacy` + path + query (a path already under `/legacy` is left
-  alone), and a static route per legacy root page (`app/legacy-pages.ts`, checked against
-  `app/legacy/` by `tests/unit/spa-legacy-pages.test.ts`) keeps an event slug from shadowing
+- The router owns `/` (`app/home-page.tsx`: the event list from `GET /api/v1/events` and
+  `GET /api/v1/site`, or a redirect to the only event), `/{slug}` (an event's schedule),
+  `/{slug}/proposals/**` (list, quick voting, new, edit; `?viewProposal=` opens the modal), the
+  session forms, `/{slug}/meetings`, `/guests/**`, `/settings`, `/notifications` and `/admin/**`
+  (`app/admin-pages.tsx`). Still Next pages: the sign-in screens (`/login`, guest login and reset,
+  `/account-security`, `/legacy/admin/login`). Everything else the SPA does not own is forwarded:
+  the catch-all route replaces the location with `/legacy` + path + query (a path already under
+  `/legacy` is left alone), and a static route per legacy root page (`app/legacy-pages.ts`, checked
+  against `app/legacy/` by `tests/unit/spa-legacy-pages.test.ts`) keeps an event slug from shadowing
   `/login`, and so on (`admin` is in the list for its login only; the router leaves it out).
 - Legacy pages link to the SPA with plain anchors, never Next's `Link` (`AppLink`, which does that
   for every root path outside `/legacy`): Next has nothing to fetch there.

@@ -17,6 +17,7 @@ import {
   AdminUsersPage,
 } from "./admin-pages";
 import { NotificationsPage, SettingsPage } from "./account-pages";
+import { HomePage } from "./home-page";
 import { LegacyForward } from "./legacy-forward";
 import { LEGACY_ROOT_PAGES } from "./legacy-pages";
 import { MeetingsPage } from "./meetings-page";
@@ -55,6 +56,13 @@ export function createAppRouter(
   history?: RouterHistory,
   services: AppServices = defaultServices()
 ) {
+  const home = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/",
+    component: function HomeRoute(): ReactElement {
+      return <HomePage services={services} />;
+    },
+  });
   const event = createRoute({
     getParentRoute: () => rootRoute,
     path: "/$slug",
@@ -193,6 +201,7 @@ export function createAppRouter(
   });
   return createRouter({
     routeTree: rootRoute.addChildren([
+      home,
       ...legacyPages,
       adminSection.addChildren([
         adminHome,

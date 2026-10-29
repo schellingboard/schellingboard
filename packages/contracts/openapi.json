@@ -8376,6 +8376,42 @@
         "security": [{ "adminAuth": [] }]
       }
     },
+    "/api/v1/site": {
+      "get": {
+        "tags": ["site"],
+        "description": "The site's title, description and venue map.",
+        "responses": {
+          "200": {
+            "description": "The site settings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": { "type": "string" },
+                    "description": { "type": "string" },
+                    "mapImageUrl": {
+                      "type": "string",
+                      "description": "Empty when there is no map"
+                    }
+                  },
+                  "required": ["title", "description", "mapImageUrl"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+      }
+    },
     "/api/v1/admin/settings": {
       "get": {
         "tags": ["admin"],
