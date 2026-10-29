@@ -70,8 +70,7 @@ Steps 8 to 10 need Q7 (admin bootstrap) and Q8 (site password). Steps 1 to 7 and
 
 ### Identity (path step 6)
 
-- [ ] 2. **ADR 0017: identity and roles.** Records the decisions above, the API shapes, the cookie
-      migration and Q7/Q8 as proposed. Amends ADR 0016 point 4. Doc only.
+- [x] 2. ADR 0017 (identity and roles) records the decisions, with Q7 and Q8 as proposed.
 - [ ] 3. **Login sessions.** Migration, repository, `resolveActor` reads the row (assurance =
       level), `PUT`/`DELETE /me/identity` create and delete rows, legacy logins write rows too, old
       cookies still read. Expired rows pruned by the jobs loop. Integration tests first: a revoked
