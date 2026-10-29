@@ -1,4 +1,5 @@
 import type { ApiClient } from "@schellingboard/api-client";
+import type { adminSessionUpdateSchema } from "@schellingboard/contracts/session";
 import type {
   dayBodySchema,
   eventPhasesBodySchema,
@@ -7,6 +8,10 @@ import type {
 
 export type EventSettingsBody = (typeof eventSettingsBodySchema)["_input"];
 export type DayBody = (typeof dayBodySchema)["_input"];
+export type AdminSessionBody = Omit<
+  (typeof adminSessionUpdateSchema)["_input"],
+  "expectedVersion"
+>;
 export type EventPhasesBody = (typeof eventPhasesBodySchema)["_input"];
 
 /** The admin events screens' calls; they wait for each answer, so none is a command. */
@@ -157,6 +162,35 @@ export function adminEventCalls(api: ApiClient) {
     deleteProposal: (id: string, key: string) =>
       api.DELETE("/api/v1/admin/proposals/{id}", {
         params: { path: { id } },
+        headers: { "Idempotency-Key": key },
+      }),
+    createSession: (
+      body: AdminSessionBody & { eventId: string },
+      key: string
+    ) =>
+      api.POST("/api/v1/admin/sessions", {
+        body,
+        headers: { "Idempotency-Key": key },
+      }),
+    updateSession: (
+      id: string,
+      body: AdminSessionBody,
+      expectedVersion: number,
+      key: string
+    ) =>
+      api.PUT("/api/v1/admin/sessions/{id}", {
+        params: { path: { id } },
+        body: { ...body, expectedVersion },
+        headers: { "Idempotency-Key": key },
+      }),
+    deleteSession: (id: string, key: string) =>
+      api.DELETE("/api/v1/admin/sessions/{id}", {
+        params: { path: { id } },
+        headers: { "Idempotency-Key": key },
+      }),
+    removeRsvp: (sessionId: string, guestId: string, key: string) =>
+      api.DELETE("/api/v1/admin/sessions/{id}/rsvps/{guestId}", {
+        params: { path: { id: sessionId, guestId } },
         headers: { "Idempotency-Key": key },
       }),
     deleteDay: (id: string, key: string) =>

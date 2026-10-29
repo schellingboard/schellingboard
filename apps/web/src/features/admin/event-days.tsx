@@ -9,7 +9,7 @@ import type { FieldErrors } from "../../commands/mutation";
 import type { CommandResponse } from "../../commands/runner";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import type { AdminEventDay } from "../../queries/admin-event";
-import type { ScheduledSession } from "../../queries/admin-scheduled-sessions";
+import type { ScheduledSession } from "../../queries/admin-sessions";
 import { Button } from "../../ui/button";
 import { DateTimeField } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";

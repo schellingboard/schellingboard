@@ -34,3 +34,24 @@ export const byTitleThenId =
   (a: T, b: T) =>
     title(a).localeCompare(title(b), undefined, { sensitivity: "base" }) ||
     a.id.localeCompare(b.id);
+
+export const plural = (n: number, one: string, many: string) =>
+  `${n} ${n === 1 ? one : many}`;
+
+/** The rows whose title or a host name has the search text, sorted by title. */
+export function searchByTitleOrHost<
+  T extends { id: string; title: string; hosts: { name: string }[] },
+>(rows: T[], params: URLSearchParams) {
+  const query = params.get("q")?.trim() ?? "";
+  const needle = query.toLowerCase();
+  const matching = rows
+    .filter(
+      (row) =>
+        !needle ||
+        [row.title, ...row.hosts.map((h) => h.name)].some((text) =>
+          text.toLowerCase().includes(needle)
+        )
+    )
+    .sort(byTitleThenId((row) => row.title));
+  return { query, matching };
+}

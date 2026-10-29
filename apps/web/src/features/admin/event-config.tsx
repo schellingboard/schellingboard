@@ -6,7 +6,6 @@ import {
 import { isEventIconName } from "@schellingboard/domain/event-icons";
 import { SLOT_INCREMENT_OPTIONS } from "@schellingboard/domain/slots";
 import type { AdminEventCalls } from "../../commands/admin-events";
-import { useFormMutation } from "../../commands/use-form-mutation";
 import type { AdminEvent } from "../../queries/admin-events";
 import { Button } from "../../ui/button";
 import {
@@ -19,7 +18,8 @@ import {
 import { FormErrorSummary } from "../../ui/form-error-summary";
 import type { AdminEventDay } from "../../queries/admin-event";
 import type { MeetingPoint } from "../../queries/admin-meeting-points";
-import type { ScheduledSession } from "../../queries/admin-scheduled-sessions";
+import type { ScheduledSession } from "../../queries/admin-sessions";
+import { ConfirmByTyping } from "./confirm-by-typing";
 import { EventDaysManager } from "./event-days";
 import { EventMeetingsForm } from "./event-meetings";
 import { EventIconPicker } from "./event-icon-picker";
@@ -308,20 +308,6 @@ function DangerZone({
   onDeleted: () => void;
 }) {
   const [confirming, setConfirming] = useState(false);
-  const [typed, setTyped] = useState("");
-  const mutation = useFormMutation({
-    call: (key) => calls.remove(event.id, key),
-    explainRefusals: true,
-  });
-
-  const close = () => {
-    setConfirming(false);
-    setTyped("");
-    mutation.reset();
-  };
-  const remove = async () => {
-    if ((await mutation.submit())?.ok) onDeleted();
-  };
 
   return (
     <section
@@ -334,34 +320,15 @@ function DangerZone({
           Delete event
         </Button>
       ) : (
-        <div className="space-y-3 rounded-md border border-danger-border p-4">
-          <p className="text-sm text-danger-fg">
-            This will permanently delete the event and all associated days,
-            proposals, sessions, RSVPs, and assignments.
-          </p>
-          <TextField
+        <div className="rounded-md border border-danger-border p-4">
+          <ConfirmByTyping
             label="Type the event name to confirm"
-            placeholder={event.name}
-            value={typed}
-            onChange={setTyped}
+            expected={event.name}
+            warning="This will permanently delete the event and all associated days, proposals, sessions, RSVPs, and assignments."
+            call={(key) => calls.remove(event.id, key)}
+            onDeleted={onDeleted}
+            onCancel={() => setConfirming(false)}
           />
-          <FormErrorSummary
-            fields={{}}
-            error={mutation.error}
-            onJump={jumpTo}
-          />
-          <div className="flex gap-2">
-            <Button
-              variant="danger"
-              disabled={mutation.pending || typed !== event.name}
-              onClick={() => void remove()}
-            >
-              {mutation.pending ? "Deleting..." : "Confirm delete"}
-            </Button>
-            <Button variant="quiet" disabled={mutation.pending} onClick={close}>
-              Cancel
-            </Button>
-          </div>
         </div>
       )}
     </section>

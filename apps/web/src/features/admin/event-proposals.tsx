@@ -10,17 +10,16 @@ import { FormErrorSummary } from "../../ui/form-error-summary";
 import type { Person } from "../../ui/people-picker";
 import {
   LIST_PAGE_SIZE,
-  byTitleThenId,
   pageOf,
+  plural,
+  searchByTitleOrHost,
   tableHandlers,
   type OnParams,
 } from "./list-paging";
+import { ConfirmByTyping } from "./confirm-by-typing";
 import { shown, useJumpWithin } from "./use-section-save";
 
 const FIELDS = ["title", "description", "durationMinutes", "hostIds"];
-
-const plural = (n: number, one: string, many: string) =>
-  `${n} ${n === 1 ? one : many}`;
 
 function parseDuration(text: string): { value: number | null; bad: boolean } {
   const trimmed = text.trim();
@@ -117,6 +116,7 @@ function EditForm({
         name="durationMinutes"
         type="number"
         min={0}
+        step={5}
         value={duration}
         onChange={setDuration}
         error={errors.durationMinutes}
@@ -163,54 +163,20 @@ function DeleteConfirm({
   onChanged: () => void;
   onClose: () => void;
 }) {
-  const [typed, setTyped] = useState("");
-  const mutation = useFormMutation({
-    call: (key) => calls.deleteProposal(proposal.id, key),
-    explainRefusals: true,
-  });
-  const votes =
-    proposal.votesCount === null
-      ? "its votes"
-      : `its ${plural(proposal.votesCount, "vote", "votes")}`;
   const sessions =
     proposal.sessionCount > 0
       ? ` ${plural(proposal.sessionCount, "derived session", "derived sessions")} will be kept (unlinked from this proposal).`
       : "";
-  const remove = async () => {
-    if ((await mutation.submit())?.ok) onChanged();
-  };
-
   return (
-    <div className="space-y-2">
-      <p className="font-medium text-fg">{proposal.title}</p>
-      <p className="text-sm text-danger-fg">
-        This will permanently delete the proposal, {votes} and{" "}
-        {plural(proposal.hosts.length, "host link", "host links")}.{sessions}
-      </p>
-      <TextField
-        label="Type the proposal title to confirm"
-        value={typed}
-        onChange={setTyped}
-        placeholder={proposal.title}
-      />
-      <FormErrorSummary
-        fields={{}}
-        error={shown(mutation.error)}
-        onJump={() => {}}
-      />
-      <div className="flex gap-2">
-        <Button
-          variant="danger"
-          disabled={mutation.pending || typed !== proposal.title}
-          onClick={() => void remove()}
-        >
-          {mutation.pending ? "Deleting..." : "Confirm delete"}
-        </Button>
-        <Button variant="quiet" disabled={mutation.pending} onClick={onClose}>
-          Cancel
-        </Button>
-      </div>
-    </div>
+    <ConfirmByTyping
+      heading={proposal.title}
+      label="Type the proposal title to confirm"
+      expected={proposal.title}
+      warning={`This will permanently delete the proposal, its ${plural(proposal.votesCount, "vote", "votes")} and ${plural(proposal.hosts.length, "host link", "host links")}.${sessions}`}
+      call={(key) => calls.deleteProposal(proposal.id, key)}
+      onDeleted={onChanged}
+      onCancel={onClose}
+    />
   );
 }
 
@@ -261,8 +227,7 @@ function ProposalItem({
           {proposal.hosts.length > 0
             ? proposal.hosts.map((h) => h.name).join(", ")
             : "—"}
-          {proposal.votesCount !== null &&
-            ` · ${plural(proposal.votesCount, "vote", "votes")}`}
+          {` · ${plural(proposal.votesCount, "vote", "votes")}`}
         </p>
       </div>
       <div className="flex shrink-0 gap-2">
@@ -301,17 +266,7 @@ export function EventProposalsManager({
   calls: AdminEventCalls;
   onChanged: () => void;
 }) {
-  const query = params.get("q")?.trim() ?? "";
-  const needle = query.toLowerCase();
-  const matching = proposals
-    .filter(
-      (p) =>
-        !needle ||
-        [p.title, ...p.hosts.map((h) => h.name)].some((text) =>
-          text.toLowerCase().includes(needle)
-        )
-    )
-    .sort(byTitleThenId((p) => p.title));
+  const { query, matching } = searchByTitleOrHost(proposals, params);
   const { page, visible } = pageOf(matching, params);
 
   return (

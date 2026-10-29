@@ -92,6 +92,7 @@ export function TextField({
   autoFocus,
   maxLength,
   min,
+  step,
   type = "text",
   ...frame
 }: FieldProps & {
@@ -101,6 +102,7 @@ export function TextField({
   autoFocus?: boolean;
   maxLength?: number;
   min?: number;
+  step?: number;
   type?: "text" | "email" | "url" | "number";
 }) {
   const ids = useField(frame);
@@ -116,6 +118,7 @@ export function TextField({
         autoFocus={autoFocus}
         maxLength={maxLength}
         min={min}
+        step={step}
         onChange={(e) => onChange(e.target.value)}
       />
     </Frame>
@@ -187,11 +190,13 @@ export function DateTimeField({
   kind,
   value,
   onChange,
+  disabled,
   ...frame
 }: FieldProps & {
   kind: "date" | "time" | "datetime-local";
   value: string;
   onChange: (value: string) => void;
+  disabled?: boolean;
 }) {
   const ids = useField(frame);
   return (
@@ -202,6 +207,7 @@ export function DateTimeField({
         className={CONTROL}
         value={value}
         required={frame.required}
+        disabled={disabled}
         onChange={(e) => onChange(e.target.value)}
       />
     </Frame>
