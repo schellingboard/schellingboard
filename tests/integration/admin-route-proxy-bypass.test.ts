@@ -7,6 +7,7 @@ import { POST as createGuest } from "@/app/api/admin/create-guest/route";
 import { POST as createLocation } from "@/app/api/admin/create-location/route";
 import { POST as createProposal } from "@/app/api/admin/create-proposal/route";
 import { POST as createRsvp } from "@/app/api/admin/create-rsvp/route";
+import { POST as logout } from "@/app/api/admin/logout/route";
 import { POST as createSession } from "@/app/api/admin/create-session/route";
 import { GET as listUsers } from "@/app/api/admin/users/route";
 import { ADMIN_VERIFIED_HEADER } from "@/utils/auth";
@@ -26,6 +27,7 @@ const routes: [string, (req: Request) => Promise<Response>][] = [
   ["create-proposal", createProposal],
   ["create-rsvp", createRsvp],
   ["create-session", createSession],
+  ["logout", logout],
   ["users", listUsers],
 ];
 
