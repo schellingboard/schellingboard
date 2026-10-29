@@ -195,7 +195,7 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`, `docs/dev/target-architec
 
 - [x] 19. Admin section shell (done: `app/admin-frame.tsx` `AdminFrame`, `queries/admin-gate.ts`,
       `ui/data-table.tsx`, `POST /api/admin/logout`).
-- [ ] 20. **Admin screens**, unrouted, one commit each:
+- [x] 20. **Admin screens**, unrouted, one commit each:
   - [x] 20a. Events list and create (done: `features/admin/events-screen.tsx`,
         `queries/admin-events.ts`, `commands/admin-events.ts`). Delete stays in the event detail's
         danger zone (legacy has it only there): 20b.
@@ -212,16 +212,18 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`, `docs/dev/target-architec
           `queries/admin-proposals.ts`.
     - [x] 20d-2. Done: `features/admin/event-sessions.tsx`, `admin-session-model.ts`,
           `queries/admin-sessions.ts`.
-  - [ ] 20e. Split by page group:
+  - [x] 20e. Split by page group:
     - [x] 20e-1. Done: `features/admin/locations-screen.tsx`, `commands/admin-locations.ts`,
           `sessionCount` in `GET /admin/locations`.
     - [x] 20e-2. Done: `features/admin/guests-screen.tsx`, `guest-import.tsx`,
           `commands/admin-guests.ts`.
-    - [ ] 20e-3. Site settings and test email.
+    - [x] 20e-3. Done: `features/admin/settings-screen.tsx`, `commands/admin-settings.ts`,
+          `queries/admin-settings.ts` (the test email went with the users list in 20e-2).
 - [ ] 21. **Takeover: admin**. Router owns `/admin/**` except the login; `proxy.ts` keeps the admin
       gate on `/legacy/admin/login` and on the API; legacy admin pages are deleted, the login stays.
-      E2E: `admin`, `meetings-admin`, `room-availability`, `settings`, then full `make test-e2e`.
-      Self-hosting docs if a proxy rule changes. CHANGELOG.
+      `SettingsScreen.onSaved` must also reload the `AdminFrame` gate (site title). E2E: `admin`,
+      `meetings-admin`, `room-availability`, `settings`, then full `make test-e2e`. Self-hosting
+      docs if a proxy rule changes. CHANGELOG.
 
 ### Close
 

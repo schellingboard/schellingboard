@@ -4,7 +4,7 @@ import { useRef, useState, useTransition } from "react";
 import Image from "next/image";
 import { Input } from "@/app/input";
 import type { SiteSettings } from "@schellingboard/domain/site-settings";
-import { MAP_REQUIREMENTS_HINT } from "@/utils/map-image-constraints";
+import { MAP_REQUIREMENTS_HINT } from "@schellingboard/domain/map-image-constraints";
 import { updateSettingsAction } from "@/app/actions/admin-settings";
 import { PRIMARY_BUTTON } from "./buttons";
 import { MarkdownHint } from "@/app/legacy/(site)/markdown";

@@ -1,6 +1,6 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import { siteSettingsSchema } from "@schellingboard/contracts/settings";
-import { MAX_MAP_BYTES } from "@/utils/map-image-constraints";
+import { MAX_MAP_BYTES } from "@schellingboard/domain/map-image-constraints";
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import { problem, problemDefault } from "@/server/http/problem";
 import { json, type App } from "@/server/http/route-parts";

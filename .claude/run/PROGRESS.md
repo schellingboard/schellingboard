@@ -193,6 +193,15 @@ shows "This might not have been saved…" (a 5xx is always "unreachable" in `awa
 showed the mail error); e2e `getByLabel("Name")` on the add form is fine, the CSV field is
 `getByLabel("CSV file")`. Step 21 deletes `guests-manager.tsx`, `users/**`.
 
+Step 20e-3, for 21: `/admin/settings`.
+`SettingsScreen({status, settings, calls: adminSettingsCalls(api), onSaved})` (own h1; the page owns
+`createAdminSettingsQuery`, `onSaved` = reload it AND reload the `AdminFrame` gate, whose title
+shows in the admin header: settings.spec expects the new title there). The form is `noValidate`;
+`getByLabel("Title")` and `"Map"` still match. `map-image-constraints` moved to `packages/domain`.
+Step 21 deletes `settings-manager.tsx`, `settings/**`, `locations/**`, `users/**`,
+`admin-header.tsx`, `layout.tsx`, `data-table.tsx`, `timezone-select.tsx`, `icon-picker.tsx`,
+`buttons.ts` once nothing imports them.
+
 Step 21 must delete the legacy `use-event-section.ts` (untested now; the SPA copy has the test).
 
 ## Questions
