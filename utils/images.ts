@@ -5,7 +5,7 @@ import {
   ASPECT_RATIO_TOLERANCE,
   MIN_IMAGE_WIDTH,
   REQUIRED_ASPECT_RATIO,
-} from "@/utils/location-image-constraints";
+} from "@schellingboard/domain/location-image-constraints";
 import {
   AVATAR_MAX_SIZE,
   MIN_AVATAR_WIDTH,

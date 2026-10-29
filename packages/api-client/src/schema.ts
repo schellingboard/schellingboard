@@ -6847,6 +6847,8 @@ export interface components {
       imageUrl: string;
       sortIndex: number;
       eventIds: string[];
+      /** @description How many sessions use it; only in GET /admin/locations */
+      sessionCount?: number;
       /** @description Goes up with every change, its events and place included */
       version: number;
     };

@@ -189,8 +189,15 @@ describe("the event locations manager", { tags: ["017-US3"] }, () => {
     const loc: AdminLocation = {
       id: "l1",
       name: "Hall",
+      description: "",
+      areaDescription: null,
       capacity: 30,
+      color: "slate",
+      bookable: true,
+      imageUrl: "",
       eventIds: [],
+      sessionCount: 0,
+      version: 1,
     };
     render(
       <NoticeProvider>

@@ -759,6 +759,23 @@ describe("venue use cases", () => {
     }
   );
 
+  it(
+    "counts the sessions that use each location in the list",
+    { tags: ["017-US1"] },
+    async () => {
+      const event = await createEvent();
+      const hall = await createLocation();
+      const store = await createLocation();
+      await createSession(event.id, { locationIds: [hall.id] });
+      await createSession(event.id, { locationIds: [hall.id] });
+
+      const listed = value(await venue().listLocations(ADMIN, {}));
+
+      expect(listed.find((l) => l.id === hall.id)?.sessionCount).toBe(2);
+      expect(listed.find((l) => l.id === store.id)?.sessionCount).toBe(0);
+    }
+  );
+
   it("reports every invalid field at once", { tags: ["017-US1"] }, async () => {
     const result = await venue().createLocation(
       ADMIN,

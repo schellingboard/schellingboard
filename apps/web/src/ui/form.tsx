@@ -186,6 +186,28 @@ export function SelectField({
   );
 }
 
+export function FileField({
+  accept,
+  onChange,
+  ...frame
+}: FieldProps & {
+  accept: string;
+  onChange: (file: File | undefined) => void;
+}) {
+  const ids = useField(frame);
+  return (
+    <Frame {...frame} ids={ids}>
+      <input
+        {...ids.control}
+        type="file"
+        accept={accept}
+        className="text-sm text-fg-muted file:mr-3 file:rounded-md file:border-0 file:bg-surface-muted file:px-3 file:py-2 file:text-sm file:font-medium file:text-fg-muted hover:file:bg-surface-hover"
+        onChange={(e) => onChange(e.target.files?.[0])}
+      />
+    </Frame>
+  );
+}
+
 export function DateTimeField({
   kind,
   value,

@@ -5,8 +5,15 @@ import { createObservable } from "./store";
 export type AdminLocation = {
   id: string;
   name: string;
+  description: string;
+  areaDescription: string | null;
   capacity: number;
+  color: string;
+  bookable: boolean;
+  imageUrl: string;
   eventIds: string[];
+  sessionCount: number;
+  version: number;
 };
 
 export type AdminLocationsState =
@@ -38,8 +45,15 @@ export function createAdminLocationsQuery({ api }: { api: ApiClient }) {
                 locations: data.locations.map((l) => ({
                   id: l.id,
                   name: l.name,
+                  description: l.description,
+                  areaDescription: l.areaDescription,
                   capacity: l.capacity,
+                  color: l.color,
+                  bookable: l.bookable,
+                  imageUrl: l.imageUrl,
                   eventIds: l.eventIds,
+                  sessionCount: l.sessionCount ?? 0,
+                  version: l.version,
                 })),
               }
             : { status: "error", code: problemCode(error, response.status) }

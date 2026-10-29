@@ -37,9 +37,21 @@ describe("the admin guests query", { tags: ["016-US3"] }, () => {
 
 describe("the admin locations query", { tags: ["017-US3"] }, () => {
   it("reads the locations with their events", async () => {
+    const hall = {
+      id: "l1",
+      name: "Hall",
+      description: "Big",
+      areaDescription: null,
+      capacity: 20,
+      color: "blue",
+      bookable: true,
+      imageUrl: "/media/hall.png",
+      eventIds: ["e1"],
+      version: 3,
+    };
     const { api } = fakeApi(() =>
       Response.json({
-        locations: [{ id: "l1", name: "Hall", capacity: 20, eventIds: ["e1"] }],
+        locations: [{ ...hall, sortIndex: 0, sessionCount: 2 }],
       })
     );
     const query = createAdminLocationsQuery({ api });
@@ -48,7 +60,7 @@ describe("the admin locations query", { tags: ["017-US3"] }, () => {
 
     expect(query.get()).toEqual({
       status: "ready",
-      locations: [{ id: "l1", name: "Hall", capacity: 20, eventIds: ["e1"] }],
+      locations: [{ ...hall, sessionCount: 2 }],
     });
   });
 });

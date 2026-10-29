@@ -1557,6 +1557,10 @@
           "imageUrl": { "type": "string" },
           "sortIndex": { "type": "integer" },
           "eventIds": { "type": "array", "items": { "type": "string" } },
+          "sessionCount": {
+            "type": "integer",
+            "description": "How many sessions use it; only in GET /admin/locations"
+          },
           "version": {
             "type": "integer",
             "description": "Goes up with every change, its events and place included"
