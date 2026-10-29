@@ -207,7 +207,11 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`, `docs/dev/target-architec
   - [x] 20c. Done: `features/admin/` `assignment-manager.tsx` (shared by `event-guests.tsx`,
         `event-locations.tsx`), `location-availability.tsx`;
         `queries/admin-guests|locations|unavailability`.
-  - [ ] 20d. Event proposals and sessions managers.
+  - [ ] 20d. Event proposals and sessions managers (split: sessions is ~880 legacy lines):
+    - [x] 20d-1. Done: `features/admin/event-proposals.tsx`, `list-paging.ts`,
+          `queries/admin-proposals.ts`.
+    - [ ] 20d-2. Sessions manager (`GET /sessions`, `POST/PUT/DELETE /admin/sessions`, admin RSVP
+          removal).
   - [ ] 20e. Locations (image, order), guests and import, site settings, test email.
 - [ ] 21. **Takeover: admin**. Router owns `/admin/**` except the login; `proxy.ts` keeps the admin
       gate on `/legacy/admin/login` and on the API; legacy admin pages are deleted, the login stays.

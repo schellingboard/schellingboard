@@ -138,6 +138,27 @@ export function adminEventCalls(api: ApiClient) {
         params: { path: { id } },
         headers: { "Idempotency-Key": key },
       }),
+    updateProposal: (
+      id: string,
+      body: {
+        title: string;
+        description: string;
+        durationMinutes: number | null;
+        hostIds: string[];
+      },
+      expectedVersion: number,
+      key: string
+    ) =>
+      api.PUT("/api/v1/admin/proposals/{id}", {
+        params: { path: { id } },
+        body: { ...body, expectedVersion },
+        headers: { "Idempotency-Key": key },
+      }),
+    deleteProposal: (id: string, key: string) =>
+      api.DELETE("/api/v1/admin/proposals/{id}", {
+        params: { path: { id } },
+        headers: { "Idempotency-Key": key },
+      }),
     deleteDay: (id: string, key: string) =>
       api.DELETE("/api/v1/admin/days/{id}", {
         params: { path: { id } },

@@ -59,7 +59,7 @@ export async function presenter(
     const voting = inVotingPhase(event, now);
     return (p) => ({
       ...fields(p),
-      votesCount: voting ? p.votesCount : null,
+      votesCount: voting || actor.admin ? p.votesCount : null,
       tally: null,
       breakdown: null,
     });
@@ -73,7 +73,7 @@ export async function presenter(
   const eventInterest = eventInterestSummary(proposals);
   return (p) => ({
     ...fields(p),
-    votesCount: null,
+    votesCount: actor.admin ? p.votesCount : null,
     tally: { interested: p.interestedVotesCount, maybe: p.maybeVotesCount },
     breakdown:
       p.hosts.length === 0 || p.hosts.some((h) => h.id === viewerId)

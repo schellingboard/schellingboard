@@ -1,17 +1,17 @@
 import { useState, type ReactNode } from "react";
 import type { CommandResponse } from "../../commands/runner";
 import { useFormMutation } from "../../commands/use-form-mutation";
-import {
-  BulkActionsBar,
-  DataTable,
-  searchParamUpdates,
-  type Column,
-} from "../../ui/data-table";
+import { BulkActionsBar, DataTable, type Column } from "../../ui/data-table";
 import { FormErrorSummary } from "../../ui/form-error-summary";
 import { cx } from "../../ui/cx";
+import {
+  LIST_PAGE_SIZE,
+  pageOf,
+  tableHandlers,
+  byTitleThenId,
+  type OnParams,
+} from "./list-paging";
 import { jumpTo, shown } from "./use-section-save";
-
-export const ASSIGNMENT_PAGE_SIZE = 25;
 
 export type AssignFilter = "all" | "assigned" | "not-assigned";
 
@@ -20,8 +20,6 @@ const FILTERS: { value: AssignFilter; label: string }[] = [
   { value: "assigned", label: "Assigned" },
   { value: "not-assigned", label: "Not assigned" },
 ];
-
-export type ParamUpdates = Record<string, string | null>;
 
 type Row = { id: string; name: string };
 
@@ -88,7 +86,7 @@ export function AssignmentManager<T extends Row>({
   columns: Column<T>[];
   detail: (row: T) => ReactNode;
   params: URLSearchParams;
-  onParams: (updates: ParamUpdates, options: { push: boolean }) => void;
+  onParams: OnParams;
   assign: (ids: string[], key: string) => Promise<CommandResponse<unknown>>;
   remove: (ids: string[], key: string) => Promise<CommandResponse<unknown>>;
   onChanged: () => void;
@@ -123,23 +121,8 @@ export function AssignmentManager<T extends Row>({
         (!needle ||
           searchText(row).some((text) => text.toLowerCase().includes(needle)))
     )
-    .sort(
-      (a, b) =>
-        a.name.localeCompare(b.name, undefined, { sensitivity: "base" }) ||
-        a.id.localeCompare(b.id)
-    );
-  const lastPage = Math.max(
-    1,
-    Math.ceil(matching.length / ASSIGNMENT_PAGE_SIZE)
-  );
-  const page = Math.min(
-    Math.max(1, Math.trunc(Number(params.get("page"))) || 1),
-    lastPage
-  );
-  const visible = matching.slice(
-    (page - 1) * ASSIGNMENT_PAGE_SIZE,
-    page * ASSIGNMENT_PAGE_SIZE
-  );
+    .sort(byTitleThenId((row) => row.name));
+  const { page, visible } = pageOf(matching, params);
 
   const settled = (message: string | null) => {
     setError(message);
@@ -184,14 +167,9 @@ export function AssignmentManager<T extends Row>({
         rowKey={(row) => row.id}
         total={matching.length}
         page={page}
-        pageSize={ASSIGNMENT_PAGE_SIZE}
+        pageSize={LIST_PAGE_SIZE}
         searchQuery={query}
-        onSearch={(q, { replace }) =>
-          onParams(searchParamUpdates(q), { push: !replace })
-        }
-        onPage={(p) =>
-          onParams({ page: p > 1 ? String(p) : null }, { push: true })
-        }
+        {...tableHandlers(onParams)}
         searchPlaceholder={searchPlaceholder}
         toolbar={
           <div className="flex gap-2">

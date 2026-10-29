@@ -1,6 +1,7 @@
 import type { AdminEventCalls } from "../../commands/admin-events";
 import type { AdminLocation } from "../../queries/admin-locations";
-import { AssignmentManager, type ParamUpdates } from "./assignment-manager";
+import { AssignmentManager } from "./assignment-manager";
+import type { OnParams } from "./list-paging";
 
 export function EventLocationsManager({
   eventId,
@@ -13,7 +14,7 @@ export function EventLocationsManager({
   eventId: string;
   locations: AdminLocation[];
   params: URLSearchParams;
-  onParams: (updates: ParamUpdates, options: { push: boolean }) => void;
+  onParams: OnParams;
   calls: AdminEventCalls;
   onChanged: () => void;
 }) {

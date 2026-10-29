@@ -127,7 +127,7 @@
           },
           "votesCount": {
             "type": ["integer", "null"],
-            "description": "How many votes, skips included, in the voting phase only: the list sorts by it"
+            "description": "How many votes, skips included: the list sorts by it. Sent in the voting phase, and to admins in every phase"
           },
           "breakdown": {
             "type": ["object", "null"],

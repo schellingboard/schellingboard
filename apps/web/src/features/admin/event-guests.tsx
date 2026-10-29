@@ -1,6 +1,7 @@
 import type { AdminEventCalls } from "../../commands/admin-events";
 import type { AdminGuest } from "../../queries/admin-guests";
-import { AssignmentManager, type ParamUpdates } from "./assignment-manager";
+import { AssignmentManager } from "./assignment-manager";
+import type { OnParams } from "./list-paging";
 
 export function EventGuestsManager({
   eventId,
@@ -13,7 +14,7 @@ export function EventGuestsManager({
   eventId: string;
   guests: AdminGuest[];
   params: URLSearchParams;
-  onParams: (updates: ParamUpdates, options: { push: boolean }) => void;
+  onParams: OnParams;
   calls: AdminEventCalls;
   onChanged: () => void;
 }) {
