@@ -1,6 +1,6 @@
 import type { FeedMessage } from "@schellingboard/contracts/feed";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
-import { apply } from "./apply";
+import { apply } from "@schellingboard/contracts/feed-apply";
 import { STALE_AFTER_MS, type Link } from "./sync-state";
 
 // A ping that agrees with the clock within this is network jitter, not news.

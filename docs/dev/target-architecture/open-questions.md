@@ -13,9 +13,8 @@ settled answers folded into the chapters they affect.
    snapshot already.
 3. **A toast in the SPA.** Answered: the `NoticeProvider` sits above the router, so a session form's
    confirmation (`autoDismissMs`) survives the navigation back to the schedule.
-4. **`server/` reaching `app/`.** `utils/guest-clashes.ts` imports `@/app/(site)/session_utils`,
-   which `server-does-not-reach-into-app` does not catch. Recommendation: move the two helpers to
-   `packages/domain`.
+4. **`server/` reaching `app/`.** Answered: `newEmptySession` and `sessionsOverlap` live in
+   `packages/domain`, and `utils/guest-clashes.ts` imports them from there.
 5. **A session that loses its only room** reads `moved to No location (was Room A)` in notices.
    Recommendation: reword to "no longer has a location (was Room A)".
 6. **User menu** roles copy the legacy markup without arrow-key support. Recommendation: use the

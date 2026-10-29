@@ -37,9 +37,6 @@
   `tests/e2e/helpers/fixtures.ts` `isEventPage` also accepts `/{slug}/proposals…`. `Tooltip`
   (non-toggleable) now hides on click and opens on focus only if `:focus-visible`.
 
-Step 16: drop `eventSlug` and `revalidateEvent` from `comment-actions.ts` with the file (no live
-page needs them now that proposals are SPA).
-
 Step 10a, for step 11 (wiring):
 `DirectoryScreen({entries, status, now, viewerId, meetingsEnabled, randomSeed, links: PeopleLinks, params, onParams})`
 with `useDirectoryQuery`-style loading still to do (`createDirectoryQuery({api})`, `refresh()` once
@@ -182,6 +179,9 @@ use `toBeAttached()` / `toBeDisabled()` on `startTimeOption`. The legacy API rou
 `/api/add-session` and `/api/update-session` stay (tests use them). The pwa "old root link" test now
 uses `/settings`, since no event-scoped legacy page is left to forward to.
 
-Step 16: `utils/guest-clashes.ts` still imports `newEmptySession` and `sessionsOverlap` from the
-legacy `session_utils` (open question 4); move those two helpers to `packages/domain` when the
-legacy `session_utils` goes. `GET /host-clashes` takes at most 20 guest ids.
+Step 16: `GET /host-clashes` takes at most 20 guest ids. Dead leftovers left alone (own step if
+wanted): `revalidatePath("/legacy/<slug>", "layout")` calls in `app/actions/admin-*.ts` (asserted by
+`admin-sessions.test.ts`), the `toggleCommentLike` use case (still unit tested), and the legacy
+`/api/toggle-rsvp`, `/api/add-session`, `/api/update-session` routes (tests use them). The legacy
+meeting request/respond/cancel actions went; `modal-nav` anchor MnpjIo7Y now lives in
+`docs/dev/web-app.md` (AGENTS.md "Misc" still names `modal-nav.ts`: needs the user's edit).

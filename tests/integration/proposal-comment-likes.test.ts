@@ -22,12 +22,11 @@ import { siteAuthenticate } from "../helpers/site-auth";
 import { createEvent, createGuest, createProposal } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
-import {
-  deleteComment,
-  toggleCommentLike,
-} from "@/app/legacy/(site)/[eventSlug]/comment-actions";
+import { commentApi } from "../helpers/comment-api";
 
 import { proposalApi } from "../helpers/proposal-api";
+
+const { deleteComment, likeComment, unlikeComment } = commentApi(cookieJar);
 
 const { createProposalComment: createComment } = proposalApi(cookieJar);
 
@@ -71,21 +70,20 @@ describe("proposal comment likes", () => {
   });
 
   it("records who liked the comment", async () => {
-    const { event, guest, proposal, comment } = await setup();
+    const { guest, proposal, comment } = await setup();
 
-    const result = await toggleCommentLike({
+    const result = await likeComment({
       commentId: comment.id,
-      eventSlug: event.slug,
     });
 
-    expect(result).toEqual({ success: true, liked: true });
+    expect(result).toEqual({ success: true });
     expect(await likesOn(proposal.id, comment.id)).toEqual([
       { id: guest.id, name: guest.name, avatarUrl: null },
     ]);
   });
 
   it("carries each liker's avatar, so it can be shown next to their name", async () => {
-    const { event, guest, proposal, comment } = await setup();
+    const { guest, proposal, comment } = await setup();
     await getRepositories().guests.updateProfile(
       guest.id,
       {
@@ -101,23 +99,20 @@ describe("proposal comment likes", () => {
       new Date()
     );
 
-    await toggleCommentLike({ commentId: comment.id, eventSlug: event.slug });
+    await likeComment({ commentId: comment.id });
 
     expect(await likesOn(proposal.id, comment.id)).toEqual([
       { id: guest.id, name: guest.name, avatarUrl: "/uploads/avatar.webp" },
     ]);
   });
 
-  it("takes the like back when pressed again", async () => {
-    const { event, proposal, comment } = await setup();
-    await toggleCommentLike({ commentId: comment.id, eventSlug: event.slug });
+  it("takes the like back when unliked", async () => {
+    const { proposal, comment } = await setup();
+    await likeComment({ commentId: comment.id });
 
-    const result = await toggleCommentLike({
-      commentId: comment.id,
-      eventSlug: event.slug,
-    });
+    const result = await unlikeComment({ commentId: comment.id });
 
-    expect(result).toEqual({ success: true, liked: false });
+    expect(result).toEqual({ success: true });
     expect(await likesOn(proposal.id, comment.id)).toEqual([]);
   });
 
@@ -125,9 +120,9 @@ describe("proposal comment likes", () => {
     const { event, guest, proposal, comment } = await setup();
     const other = await createGuest({ eventId: event.id });
 
-    await toggleCommentLike({ commentId: comment.id, eventSlug: event.slug });
+    await likeComment({ commentId: comment.id });
     act(other.id);
-    await toggleCommentLike({ commentId: comment.id, eventSlug: event.slug });
+    await likeComment({ commentId: comment.id });
 
     expect(await likesOn(proposal.id, comment.id)).toEqual([
       { id: guest.id, name: guest.name, avatarUrl: null },
@@ -164,13 +159,12 @@ describe("proposal comment likes", () => {
   });
 
   it("refuses to like without a selected name", async () => {
-    const { event, proposal, comment } = await setup();
+    const { proposal, comment } = await setup();
     // Drop only the name, not site auth: this is about the identity gate.
     cookieJar.delete(GUEST_COOKIE_NAME);
 
-    const result = await toggleCommentLike({
+    const result = await likeComment({
       commentId: comment.id,
-      eventSlug: event.slug,
     });
 
     expect(result).toHaveProperty("error");
@@ -178,15 +172,14 @@ describe("proposal comment likes", () => {
   });
 
   it("refuses to like as a protected guest without a verified session", async () => {
-    const { event, guest, proposal, comment } = await setup();
+    const { guest, proposal, comment } = await setup();
     await getRepositories().guests.setAuthProtection(guest.id, {
       authProtected: true,
       passwordHash: null,
     });
 
-    const result = await toggleCommentLike({
+    const result = await likeComment({
       commentId: comment.id,
-      eventSlug: event.slug,
     });
 
     expect(result).toHaveProperty("error");
@@ -194,11 +187,10 @@ describe("proposal comment likes", () => {
   });
 
   it("refuses to like a comment that does not exist", async () => {
-    const { event } = await setup();
+    await setup();
 
-    const result = await toggleCommentLike({
+    const result = await likeComment({
       commentId: "does-not-exist",
-      eventSlug: event.slug,
     });
 
     expect(result).toHaveProperty("error");
@@ -214,11 +206,10 @@ describe("proposal comment likes", () => {
       body: "a surviving reply",
     });
     act(guest.id);
-    await deleteComment({ commentId: comment.id, eventSlug: event.slug });
+    await deleteComment({ commentId: comment.id });
 
-    const result = await toggleCommentLike({
+    const result = await likeComment({
       commentId: comment.id,
-      eventSlug: event.slug,
     });
 
     expect(result).toHaveProperty("error");
@@ -233,20 +224,20 @@ describe("proposal comment likes", () => {
       parentId: comment.id,
       body: "a surviving reply",
     });
-    await toggleCommentLike({ commentId: comment.id, eventSlug: event.slug });
+    await likeComment({ commentId: comment.id });
     expect(await likesOn(proposal.id, comment.id)).toHaveLength(1);
 
     act(guest.id);
-    await deleteComment({ commentId: comment.id, eventSlug: event.slug });
+    await deleteComment({ commentId: comment.id });
 
     expect(await likesOn(proposal.id, comment.id)).toEqual([]);
   });
 
   it("discards the likes of a comment removed outright", async () => {
-    const { event, proposal, comment } = await setup();
-    await toggleCommentLike({ commentId: comment.id, eventSlug: event.slug });
+    const { proposal, comment } = await setup();
+    await likeComment({ commentId: comment.id });
 
-    await deleteComment({ commentId: comment.id, eventSlug: event.slug });
+    await deleteComment({ commentId: comment.id });
 
     expect(await getRepositories().proposalComments.list(proposal.id)).toEqual(
       []

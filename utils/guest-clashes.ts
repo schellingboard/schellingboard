@@ -1,10 +1,7 @@
 import type { Repositories } from "@/db/container";
 import type { Meeting } from "@schellingboard/domain/meeting";
-import type { Session } from "@schellingboard/domain/session";
-import {
-  newEmptySession,
-  sessionsOverlap,
-} from "@/app/legacy/(site)/session_utils";
+import { newEmptySession, type Session } from "@schellingboard/domain/session";
+import { sessionsOverlap } from "@schellingboard/domain/session-overlap";
 import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
 
 // A schedule clash for one guest, computed server-side so their RSVPs and

@@ -178,10 +178,11 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`, `docs/dev/target-architec
       at them; legacy form, page wrappers, `session-actions.ts`, `clash-actions.ts` and their
       orphans deleted; `guest-clashes.test.ts` calls `GET /host-clashes`; E2E helpers use
       `selectOption`).
-- [ ] 16. **Retire the Next schedule** (old step 16b): the Next schedule page and its components,
-      `replica/`, the RSVP overlay and `comment-actions.ts` are deleted; `session-comments.test.ts`,
-      `session-comment-likes.test.ts` and the idempotency and guard tests move off
-      `createSessionComment`. Utils only the legacy schedule used go too. Full `make test-e2e`.
+- [x] 16. Retire the Next schedule (done: `[eventSlug]` directory, `replica/` and
+      `comment-actions.ts` deleted; the comment tests call `/api/v1` through
+      `tests/helpers/comment-api.ts`; `apply` moved to `packages/contracts/feed-apply.ts` and
+      `RECONNECT_GRACE_MS` to `contracts/feed`; `newEmptySession`/`sessionsOverlap` to
+      `packages/domain`; legacy utils, `EventContext` and their unit tests deleted).
 
 ### Settings and notifications
 

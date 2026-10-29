@@ -33,7 +33,7 @@ test("updating a session emails the RSVP'd guest and the added co-host @013-US4 
   // RSVPs to it below and never withdraws, so no parallel spec may make him
   // RSVP anything overlapping this time in any room: he'd get a clash warning
   // to confirm, here or there.
-  await page.goto("/legacy/Conference-Gamma");
+  await page.goto("/Conference-Gamma");
   await selectUser(page, /Charlie Test/i);
   await page.getByRole("link", { name: "Add session" }).first().click();
   await expect(
@@ -68,7 +68,7 @@ test("updating a session emails the RSVP'd guest and the added co-host @013-US4 
   await expect(dialog.getByRole("button", { name: "Un-RSVP" })).toBeVisible();
 
   // Charlie moves the session and adds Alice as a co-host.
-  await page.goto("/legacy/Conference-Gamma");
+  await page.goto("/Conference-Gamma");
   await selectUser(page, /Charlie Test/i);
   await page.getByRole("link", { name: title }).click();
   await expect(dialog).toBeVisible();
@@ -148,7 +148,7 @@ test("a host can fix a session placed where they could never have booked one @00
   page,
 }) => {
   await login(page);
-  await page.goto("/legacy/Conference-Gamma");
+  await page.goto("/Conference-Gamma");
   // "Evening Wrap-up" sits in day 2's tail after bookings close at 17:30, so
   // its slot is one the form never offers — but it is Charlie's session, not
   // an organizer-managed one (see scripts/seed/data/gamma-schedule.ts).

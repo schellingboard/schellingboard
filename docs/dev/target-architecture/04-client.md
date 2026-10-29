@@ -18,7 +18,7 @@ web app components</a></likec4-view>
 ```
 apps/web/src/
   app/            router, layout shell, auth gate, theme, error boundary. Knows no domain.
-  replica/        store (applies changes with domain's apply), snapshot loader, feed client, IndexedDB persistence, sync status
+  replica/        store (applies changes with contracts' `feed-apply`), snapshot loader, feed client, IndexedDB persistence, sync status
   commands/       one file per mutation: predict → call api-client → reconcile / roll back
   features/       one folder per screen family: schedule, agenda, proposals, voting, people, meetings, notifications, settings, admin, venue
   ui/             design system: tokens, primitives, form fields, modal stack, toasts

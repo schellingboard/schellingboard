@@ -8,7 +8,7 @@ import {
 import type { Session } from "@schellingboard/domain/session";
 import type { Location } from "@schellingboard/domain/location";
 import type { MeetingView } from "./meeting-view";
-import { newEmptySession } from "./session-fixture";
+import { newEmptySession } from "@schellingboard/domain/session";
 
 const at = (hour: number, minute = 0) =>
   new Date(Date.UTC(2026, 9, 1, hour, minute));

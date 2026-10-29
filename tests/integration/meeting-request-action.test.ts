@@ -36,7 +36,7 @@ import { siteAuthenticate } from "../helpers/site-auth";
 import { createEvent, createGuest, createDay } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, verifiedGuestValue } from "../helpers/guest-cookie";
 import { getRepositories } from "@/db/container";
-import { requestMeetingAction } from "@/app/actions/meetings";
+import { meetingApi } from "../helpers/meeting-api";
 import type { Guest } from "@schellingboard/domain/guest";
 import type { Event } from "@schellingboard/domain/event";
 
@@ -82,12 +82,14 @@ async function scenario(
   return { event: reloaded, requester, recipient };
 }
 
+const { requestMeeting } = meetingApi(cookieJar);
+
 const request = (
   event: Event,
   recipient: Guest,
-  patch?: Partial<Parameters<typeof requestMeetingAction>[0]>
+  patch?: Record<string, unknown>
 ) =>
-  requestMeetingAction({
+  requestMeeting({
     eventId: event.id,
     recipientId: recipient.id,
     slotStart: SLOT,
@@ -96,7 +98,7 @@ const request = (
     ...patch,
   });
 
-describe("requestMeetingAction", () => {
+describe("requesting a 1-on-1", () => {
   beforeAll(() => setupTestDb());
 
   beforeEach(async () => {
@@ -275,19 +277,6 @@ describe("requestMeetingAction", () => {
     const result = await request(event, recipient, { slotStart: PAST_SLOT });
 
     expect(result.ok).toBe(false);
-  });
-
-  // A "use server" export is a public endpoint: the declared types are
-  // advisory, so a hand-made payload has to come back as a result rather than
-  // a 500.
-  it("answers a malformed payload instead of throwing", async () => {
-    const { event, recipient } = await scenario();
-
-    const result = await request(event, recipient, {
-      meetingPoint: 123 as unknown as string,
-    });
-
-    expect(result).toEqual({ ok: false, error: "Invalid request" });
   });
 
   it("refuses a message longer than the field allows", async () => {

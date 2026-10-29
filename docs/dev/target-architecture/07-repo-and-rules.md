@@ -5,8 +5,8 @@
 ```
 schellingboard/
   packages/
-    domain/          src/<module>/{entities,policies,changes,views}.ts, src/time/, src/apply.ts
-    contracts/       src/<module>/*.ts (zod), src/feed.ts, src/snapshot.ts, openapi.json (generated, committed)
+    domain/          src/<module>/{entities,policies,changes,views}.ts, src/time/
+    contracts/       src/<module>/*.ts (zod), src/feed.ts, src/snapshot.ts, src/feed-apply.ts (the replica reducer, shared by the client and the server's sufficiency test), openapi.json (generated, committed)
     api-client/      generated; do not edit
   apps/
     server/          see 03-server.md

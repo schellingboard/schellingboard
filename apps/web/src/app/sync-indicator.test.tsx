@@ -2,7 +2,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, render, screen } from "@testing-library/react";
 import { createReplicaStore } from "../replica/store";
-import { RECONNECT_GRACE_MS, STALE_AFTER_MS } from "../replica/sync-state";
+import { RECONNECT_GRACE_MS } from "@schellingboard/contracts/feed";
+import { STALE_AFTER_MS } from "../replica/sync-state";
 import { snapshot } from "../replica/snapshot-fixture";
 import { SyncIndicator } from "./sync-indicator";
 

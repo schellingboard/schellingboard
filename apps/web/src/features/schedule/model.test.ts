@@ -11,7 +11,7 @@ import {
   scheduleEntries,
 } from "./model";
 import type { MeetingView } from "./meeting-view";
-import { newEmptySession } from "./session-fixture";
+import { newEmptySession } from "@schellingboard/domain/session";
 
 const room = (id: string, name: string) =>
   ({ id, name, color: "blue" }) satisfies Session["locations"][number];

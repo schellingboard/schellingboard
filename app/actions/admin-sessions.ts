@@ -24,8 +24,6 @@ export type AdminSessionInput = {
   expectedVersion: number;
 };
 
-// The legacy schedule's session list is fetched in the shared [eventSlug]
-// layout, so it must be revalidated alongside the admin pages.
 async function revalidateEventPaths(eventId: string) {
   revalidatePath("/legacy/admin");
   revalidatePath("/legacy/admin/events");

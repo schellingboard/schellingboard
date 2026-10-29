@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 
-import { newEmptySession } from "./session-fixture";
+import { newEmptySession } from "@schellingboard/domain/session";
 import type { MeetingView } from "./meeting-view";
 import { describeRsvpClash, findRsvpClash } from "./rsvp-clash";
 

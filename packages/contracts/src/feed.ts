@@ -158,3 +158,7 @@ export const feedMessageSchema = z
   .meta({ id: "FeedMessage" });
 
 export type FeedMessage = z.infer<typeof feedMessageSchema>;
+
+// The server ends each stream on purpose and tells the browser to reconnect
+// after 1 s (`retry:`); that gap must not flash "Reconnecting…".
+export const RECONNECT_GRACE_MS = 2_000;

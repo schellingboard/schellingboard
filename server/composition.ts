@@ -1,6 +1,4 @@
 import { getRepositories } from "@/db/container";
-import { snapshotFor } from "@/server/feed/snapshot";
-import type { Actor } from "@/server/kernel/actor";
 import {
   type ActionResult,
   runIdempotentAction,
@@ -154,10 +152,6 @@ const releaseCheck = createReleaseCheck({
 
 export function updateUseCases(): UpdateUseCases {
   return createUpdateUseCases({ check: releaseCheck, version: getAppVersion });
-}
-
-export function eventSnapshot(actor: Actor, slug: string, now: Date) {
-  return snapshotFor(unitOfWork, actor, slug, now);
 }
 
 // What server-rendered pages read. No actor: these sit behind the site

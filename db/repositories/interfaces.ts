@@ -456,7 +456,7 @@ export interface SessionsRepository {
    * must have already established that the requester hosts this session.
    *
    * Deliberately not a field of `Session`, which is serialised to every
-   * visitor by the [eventSlug] layout — see docs/dev/adr/0007.
+   * visitor in the snapshot — see docs/dev/adr/0007.
    */
   getAttendeeCount(sessionId: string): Promise<number | null>;
   /** Records, changes (a number) or clears (null) the attendee count. */

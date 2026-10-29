@@ -5,9 +5,11 @@ import {
   hasFilledProfile,
   profileExcerpt as excerptOf,
 } from "@schellingboard/domain/attendee-profile";
-import { stripMarkdown } from "@/utils/markdown";
 
-const profileExcerpt = (a: Attendee) => excerptOf(a, stripMarkdown);
+const plainText = (text: string | null | undefined) =>
+  (text ?? "").replaceAll("**", "").replace(/\[([^\]]+)\]\([^)]*\)/g, "$1");
+
+const profileExcerpt = (a: Attendee) => excerptOf(a, plainText);
 
 let counter = 0;
 

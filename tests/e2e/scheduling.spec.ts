@@ -25,7 +25,7 @@ async function createSessionViaForm(
   location: RegExp,
   startTime: string
 ) {
-  await page.goto("/legacy/Conference-Gamma");
+  await page.goto("/Conference-Gamma");
   await selectUser(page, /Alice Test/i);
 
   // Reach the form the way a real user does: click a free "+" slot, then
@@ -137,7 +137,7 @@ test("a host can cap attendance below the room's own maximum @008-US4", async ({
   await login(page);
   const title = `E2E Capped Session ${uniqueSuffix()}`;
 
-  await page.goto("/legacy/Conference-Gamma");
+  await page.goto("/Conference-Gamma");
   await selectUser(page, /Alice Test/i);
   await page.getByRole("link", { name: "Add session" }).first().click();
   await expect(
@@ -197,7 +197,7 @@ test("a day running past midnight says so, and its late slots name the day @008-
   page,
 }) => {
   await login(page);
-  await page.goto("/legacy/Conference-Gamma");
+  await page.goto("/Conference-Gamma");
   await selectUser(page, /Alice Test/i);
   await page.getByRole("link", { name: "Add session" }).first().click();
   await expect(
@@ -223,7 +223,7 @@ test("occupied start times are not offered in the same location but are in other
   page,
 }) => {
   await login(page);
-  await page.goto("/legacy/Conference-Gamma");
+  await page.goto("/Conference-Gamma");
   await selectUser(page, /Alice Test/i);
   await page.getByRole("link", { name: "Add session" }).first().click();
   await expect(

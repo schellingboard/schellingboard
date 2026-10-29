@@ -453,7 +453,7 @@ test.describe("1-on-1 meetings", () => {
       })
     ).toBeVisible();
 
-    // Opening one from the schedule arms "dismiss by going back" (modal-nav.ts,
+    // Opening one from the schedule arms "dismiss by going back" (docs/dev/web-app.md,
     // anchor MnpjIo7Y). A meeting reached from a notification afterwards must
     // not inherit it, or closing that one would pop back to the list.
     await page.goto(`/${slug}`);

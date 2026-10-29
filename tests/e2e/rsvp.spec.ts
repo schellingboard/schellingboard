@@ -132,7 +132,7 @@ test("a full session blocks further RSVPs when the event enforces capacity @009-
 
   // Site: Alice hosts a fresh session, so it deterministically has no RSVPs.
   await login(page);
-  await page.goto("/legacy/Conference-Gamma");
+  await page.goto("/Conference-Gamma");
   await selectUser(page, /Alice Test/i);
   const sessionTitle = "Tiny Room Tasting";
   await page.getByRole("link", { name: "Add session" }).first().click();

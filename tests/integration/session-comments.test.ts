@@ -37,13 +37,15 @@ import {
   openGuestValue,
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
-import {
-  createSessionComment as createComment,
-  deleteComment,
-  updateComment,
-} from "@/app/legacy/(site)/[eventSlug]/comment-actions";
+import { commentApi } from "../helpers/comment-api";
 import { sendMail } from "@/utils/mailer";
 import { proposalApi } from "../helpers/proposal-api";
+
+const {
+  createSessionComment: createComment,
+  deleteComment,
+  updateComment,
+} = commentApi(cookieJar);
 
 const { createProposalComment } = proposalApi(cookieJar);
 

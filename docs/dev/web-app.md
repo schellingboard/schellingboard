@@ -53,11 +53,12 @@ Docker image, which copies `apps/web/dist` next to `server.js`.
 `apps/web/src/` follows [the client layout](target-architecture/04-client.md#layout); `app/`
 (layout, nav bar, shell, pages), `ui/` (dialog, button, tooltip, icons, notices),
 `features/schedule/`, `replica/`, `commands/` and `queries/` exist so far (the replica: store,
-`apply`, feed client, sync state, a server clock offset and IndexedDB persistence keyed by event and
-viewer, opened as `stale`). dependency-cruiser enforces that the package imports `packages/domain`,
-`packages/contracts` and `packages/api-client` only (never `app/`, `server/`, `utils/` or `next`),
-that nothing imports it, that `features/` never imports `api-client`, and that it declares what it
-imports. See [Architecture rules](architecture-rules.md).
+`apply` from `packages/contracts/src/feed-apply.ts`, feed client, sync state, a server clock offset
+and IndexedDB persistence keyed by event and viewer, opened as `stale`). dependency-cruiser enforces
+that the package imports `packages/domain`, `packages/contracts` and `packages/api-client` only
+(never `app/`, `server/`, `utils/` or `next`), that nothing imports it, that `features/` never
+imports `api-client`, and that it declares what it imports. See
+[Architecture rules](architecture-rules.md).
 
 ## The viewer and the user picker
 
@@ -107,14 +108,14 @@ rooms and RSVPs from the snapshot, the viewer's own 1-on-1s from `snapshot.me.me
 ambient one; the now line follows `store.serverNow()` (`useServerNow`).
 
 The pure parts (`grid-layout`, `column`, `meeting-column`, `agenda`, `fold`, `filters`, `search`,
-`meeting-rules`, `meeting-clash-text`) are copies of `utils/` with their tests: the legacy copies
-stay until the Next schedule goes, since it still renders them. `model.ts` has the new pure rules
-(narrowing by room, matching, day folds). `links.ts` is the one place that decides where a session,
-a 1-on-1, add-session or booking link goes: a session and a 1-on-1 (`?viewMeeting=`,
-`?bookMeeting=`) open in the SPA's own modals over the schedule, the add and edit session links go
-to the session form (`app/sessions-pages.tsx`, `/{slug}/add-session`, `/{slug}/edit-session`).
-`/{slug}/meetings` (`app/meetings-page.tsx`) is where a meeting notification lands: it hands the
-meeting to the schedule, or opens it read-only outside the scheduling phase.
+`meeting-rules`, `meeting-clash-text`) are the schedule's own; the legacy copies went with the Next
+schedule. `model.ts` has the new pure rules (narrowing by room, matching, day folds). `links.ts` is
+the one place that decides where a session, a 1-on-1, add-session or booking link goes: a session
+and a 1-on-1 (`?viewMeeting=`, `?bookMeeting=`) open in the SPA's own modals over the schedule, the
+add and edit session links go to the session form (`app/sessions-pages.tsx`, `/{slug}/add-session`,
+`/{slug}/edit-session`). `/{slug}/meetings` (`app/meetings-page.tsx`) is where a meeting
+notification lands: it hands the meeting to the schedule, or opens it read-only outside the
+scheduling phase.
 
 `app/schedule-page.tsx` composes it: `useScheduleSession` (`replica/session.ts`: `openReplica`,
 `connectFeed`, `autosaveReplica`, hidden-tab and back/forward-cache handling, plus a command runner)
@@ -128,6 +129,18 @@ Unit tests sit next to the code (`*.test.ts(x)`) and run in the `web` Vitest pro
 as part of `make test`. Components are tested with `@testing-library/react` and `user-event`
 (cleanup is registered in `src/test-setup.ts`), through roles and names, never styling. Screens are
 covered by the E2E suite; there is no browser component runner.
+
+## Opening a modal and closing it
+
+(anchor: MnpjIo7Y)
+
+The session, proposal and 1-on-1 modals are `?viewSession=`, `?viewProposal=` and `?viewMeeting=` on
+the page behind them. A click on a link inside the SPA pushes the address, so Back closes the modal
+(`SpaLinks` arms this; `app/proposal-nav.ts` holds the flag). An address opened directly, or reached
+from a notification or an email, has no entry of ours to pop, so closing it removes the parameter.
+The flag must be taken when the modal closes and cleared when none is open, or a later modal
+inherits "close by going back" (two E2E specs cover it). Links from legacy pages and emails are
+plain anchors: build them with `links.ts` and `utils/notifications.ts`, never a second copy.
 
 ## Failure notices
 

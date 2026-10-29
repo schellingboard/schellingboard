@@ -76,9 +76,10 @@ table after `since`, then follows live changes registered with the hub. `project
 new change type needs a case there and in `audienceOf`. The message carries the `command_key` only
 for the actor who made the change.
 
-The client applies messages to its replica in `app/legacy/(site)/[eventSlug]/replica/` (`apply.ts`,
-a pure function from replica and message to replica; `store.ts`; `live-replica.ts` for the
-connection). A new message type needs a case in `apply.ts`: unknown types only move `seq`.
+The client applies messages to its replica in `apps/web/src/replica/`
+(`packages/contracts/src/feed-apply.ts`, a pure function from replica and message to replica;
+`store.ts`; `live-replica.ts` for the connection). A new message type needs a case in
+`feed-apply.ts`: unknown types only move `seq`.
 
 A cascade change that carries `tellAttendees` (day and location deletes) makes the
 `changeNotifications` reaction notify the session's RSVPed guests, never its hosts; event and guest
@@ -108,12 +109,12 @@ prefix.
 
 ## Keys from the UI
 
-A server action or legacy route that creates something runs under `idempotentAction()` from
-`composition.ts`, with a key the form made when it opened (`newIdempotencyKey()` in
-`utils/idempotency-key.ts`) and sent as the `Idempotency-Key` header or an argument outside the zod
-schema. A success is stored and replayed for a repeat; a refusal frees the key. The changes it
-records carry the key, and the feed echoes it to the sender, which is how the RSVP overlay
-(`replica/rsvp-overlay.ts`) knows its toggle has arrived.
+A server action or route that creates something runs under `idempotentAction()` from
+`composition.ts`, with a key the caller made for the attempt, sent as the `Idempotency-Key` header
+or an argument outside the zod schema. The SPA's command runner makes one per command and reuses it
+on a retry. A success is stored and replayed for a repeat; a refusal frees the key. The changes it
+records carry the key, and the feed echoes it to the sender, which is how the runner's optimistic
+prediction knows its command has arrived and drops it.
 
 ## Adding a use case and its route
 

@@ -1,39 +1,18 @@
 // @module-tag 001-US1
-import type { Snapshot } from "@schellingboard/contracts/snapshot";
-import { eventContextFrom } from "@/app/legacy/(site)/[eventSlug]/replica/selectors";
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
+import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 
 // FR-005/FR-020: a recorded attendee count is host-only. The enforcement is
 // structural — `attendeeCount` is absent from the `Session` type, which the
-// event layout serialises into every visitor's browser (docs/dev/adr/0007).
+// snapshot serialises into every visitor's browser (docs/dev/adr/0007).
 // "Structurally impossible" is a claim a test should hold, not something a
 // reviewer has to remember, so this pins both payloads that carry sessions:
-// the attendee-facing event layout and the admin session list.
-
-const cookieJar = new Map<string, string>();
-
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
-const captured: { sessions?: unknown } = {};
-vi.mock("@/app/legacy/(site)/[eventSlug]/event-provider-wrapper", () => ({
-  EventProviderWrapper: ({ snapshot }: { snapshot: Snapshot }) => {
-    captured.sessions = eventContextFrom(snapshot).sessions;
-    return "PROVIDER_STUB";
-  },
-}));
+// the attendee-facing snapshot and the admin session list.
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
-import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
+import { snapshotFor } from "@/server/feed/snapshot";
+import type { Actor } from "@/server/kernel/actor";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
 import { getRepositories } from "@/db/container";
 
 const HOUR_MS = 60 * 60 * 1000;
@@ -78,6 +57,16 @@ function expectNoCount(payload: unknown): void {
   }
 }
 
+async function snapshotAs(guestId: string, slug: string) {
+  const actor: Actor = {
+    admin: false,
+    guest: { id: guestId, level: "verified" },
+  };
+  const result = await snapshotFor(unitOfWork, actor, slug, new Date());
+  if (!result.ok) throw new Error(`No snapshot of ${slug}`);
+  return result.value;
+}
+
 async function seed() {
   const event = await createEvent({ phase: "scheduling" });
   const host = await createGuest({ eventId: event.id });
@@ -95,40 +84,26 @@ async function seed() {
 describe("a recorded attendee count never reaches a session payload", () => {
   beforeAll(() => setupTestDb());
 
-  beforeEach(() => {
-    resetTestDb();
-    cookieJar.clear();
-    captured.sessions = undefined;
-  });
+  beforeEach(() => resetTestDb());
 
-  it("is absent from the event layout payload served to a non-host (FR-005)", async () => {
+  it("is absent from the snapshot served to a non-host (FR-005)", async () => {
     const { event, attendee } = await seed();
-    cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(attendee.id));
 
-    const { EventLayoutContent } =
-      await import("@/app/legacy/(site)/[eventSlug]/layout-content");
-    renderToStaticMarkup(
-      await EventLayoutContent({ eventSlug: event.slug, children: null })
-    );
+    const { sessions } = await snapshotAs(attendee.id, event.slug);
 
-    expect(captured.sessions).toBeDefined();
-    expectNoCount(captured.sessions);
+    expect(sessions.length).toBeGreaterThan(0);
+    expectNoCount(sessions);
   });
 
-  it("is absent even from the payload served to the host who recorded it", async () => {
+  it("is absent even from the snapshot served to the host who recorded it", async () => {
     const { event, host } = await seed();
-    cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(host.id));
 
-    const { EventLayoutContent } =
-      await import("@/app/legacy/(site)/[eventSlug]/layout-content");
-    renderToStaticMarkup(
-      await EventLayoutContent({ eventSlug: event.slug, children: null })
-    );
+    // The host reads their count through its own endpoint, never off the
+    // shared snapshot — otherwise every other visitor would receive it too.
+    const { sessions } = await snapshotAs(host.id, event.slug);
 
-    // The host reads their count through the server action, never off the
-    // shared payload — otherwise the field would exist on `Session` and every
-    // other visitor would receive it too.
-    expectNoCount(captured.sessions);
+    expect(sessions.length).toBeGreaterThan(0);
+    expectNoCount(sessions);
   });
 
   it("is absent from the admin session read surface (FR-020)", async () => {

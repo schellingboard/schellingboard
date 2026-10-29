@@ -1,12 +1,7 @@
 // @module-tag 007-US8
 import { describe, it, expect } from "vitest";
-import {
-  RECONNECT_GRACE_MS,
-  STALE_AFTER_MS,
-  nextChangeAt,
-  staleAt,
-  syncState,
-} from "./sync-state";
+import { RECONNECT_GRACE_MS } from "@schellingboard/contracts/feed";
+import { STALE_AFTER_MS, nextChangeAt, staleAt, syncState } from "./sync-state";
 import { createReplicaStore } from "./store";
 import { snapshot } from "./snapshot-fixture";
 

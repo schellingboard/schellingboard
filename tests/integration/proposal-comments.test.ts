@@ -31,13 +31,12 @@ import {
   openGuestValue,
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
-import {
-  updateComment,
-  deleteComment,
-} from "@/app/legacy/(site)/[eventSlug]/comment-actions";
+import { commentApi } from "../helpers/comment-api";
 import { sendMail } from "@/utils/mailer";
 
 import { proposalApi } from "../helpers/proposal-api";
+
+const { updateComment, deleteComment } = commentApi(cookieJar);
 
 const { createProposalComment: createComment } = proposalApi(cookieJar);
 
@@ -290,7 +289,7 @@ describe("editing a proposal comment", () => {
   });
 
   it("replaces the body and records when it was edited", async () => {
-    const { event, guest, proposal } = await setup();
+    const { guest, proposal } = await setup();
     act(guest.id);
     await createComment({
       proposalId: proposal.id,
@@ -301,7 +300,6 @@ describe("editing a proposal comment", () => {
 
     const result = await updateComment({
       commentId: before.id,
-      eventSlug: event.slug,
       body: "revised",
     });
 
@@ -325,7 +323,6 @@ describe("editing a proposal comment", () => {
     act(other.id);
     const result = await updateComment({
       commentId: comment.id,
-      eventSlug: event.slug,
       body: "hijacked",
     });
 
@@ -334,7 +331,7 @@ describe("editing a proposal comment", () => {
   });
 
   it("rejects an empty edit", async () => {
-    const { event, guest, proposal } = await setup();
+    const { guest, proposal } = await setup();
     act(guest.id);
     await createComment({
       proposalId: proposal.id,
@@ -344,7 +341,6 @@ describe("editing a proposal comment", () => {
 
     const result = await updateComment({
       commentId: comment.id,
-      eventSlug: event.slug,
       body: "  ",
     });
 
@@ -363,7 +359,7 @@ describe("deleting a proposal comment", () => {
   });
 
   it("removes a childless comment outright", async () => {
-    const { event, guest, proposal } = await setup();
+    const { guest, proposal } = await setup();
     act(guest.id);
     await createComment({
       proposalId: proposal.id,
@@ -373,7 +369,6 @@ describe("deleting a proposal comment", () => {
 
     const result = await deleteComment({
       commentId: comment.id,
-      eventSlug: event.slug,
     });
 
     expect(result).toEqual({ success: true });
@@ -399,7 +394,7 @@ describe("deleting a proposal comment", () => {
     });
 
     act(guest.id);
-    await deleteComment({ commentId: parent.id, eventSlug: event.slug });
+    await deleteComment({ commentId: parent.id });
 
     const comments = await getRepositories().proposalComments.list(proposal.id);
     expect(comments).toHaveLength(2);
@@ -413,7 +408,7 @@ describe("deleting a proposal comment", () => {
   });
 
   it("clears a tombstone once its last reply goes", async () => {
-    const { event, guest, proposal } = await setup();
+    const { guest, proposal } = await setup();
     act(guest.id);
     await createComment({
       proposalId: proposal.id,
@@ -429,8 +424,8 @@ describe("deleting a proposal comment", () => {
       await getRepositories().proposalComments.list(proposal.id)
     ).find((c) => c.id !== parent.id)!;
 
-    await deleteComment({ commentId: parent.id, eventSlug: event.slug });
-    await deleteComment({ commentId: child.id, eventSlug: event.slug });
+    await deleteComment({ commentId: parent.id });
+    await deleteComment({ commentId: child.id });
 
     expect(await getRepositories().proposalComments.list(proposal.id)).toEqual(
       []
@@ -450,7 +445,6 @@ describe("deleting a proposal comment", () => {
     act(other.id);
     const result = await deleteComment({
       commentId: comment.id,
-      eventSlug: event.slug,
     });
 
     expect(result).toHaveProperty("error");
@@ -458,7 +452,7 @@ describe("deleting a proposal comment", () => {
   });
 
   it("refuses to edit a tombstone", async () => {
-    const { event, guest, proposal } = await setup();
+    const { guest, proposal } = await setup();
     act(guest.id);
     await createComment({
       proposalId: proposal.id,
@@ -470,11 +464,10 @@ describe("deleting a proposal comment", () => {
       parentId: parent.id,
       body: "child",
     });
-    await deleteComment({ commentId: parent.id, eventSlug: event.slug });
+    await deleteComment({ commentId: parent.id });
 
     const result = await updateComment({
       commentId: parent.id,
-      eventSlug: event.slug,
       body: "back from the dead",
     });
 

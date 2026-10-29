@@ -37,13 +37,12 @@ import { createEvent, createGuest } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, verifiedGuestValue } from "../helpers/guest-cookie";
 import { getRepositories } from "@/db/container";
 import { sendMail } from "@/utils/mailer";
-import {
-  cancelMeetingAction,
-  respondToMeetingAction,
-} from "@/app/actions/meetings";
+import { meetingApi } from "../helpers/meeting-api";
 import type { Meeting } from "@schellingboard/domain/meeting";
 import type { Guest } from "@schellingboard/domain/guest";
 import type { Event } from "@schellingboard/domain/event";
+
+const { respondToMeeting, cancelMeeting } = meetingApi(cookieJar);
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
@@ -89,7 +88,7 @@ async function scenario(opts?: {
   };
 }
 
-describe("respondToMeetingAction", () => {
+describe("answering a 1-on-1", () => {
   beforeAll(() => setupTestDb());
 
   beforeEach(async () => {
@@ -104,7 +103,7 @@ describe("respondToMeetingAction", () => {
   it("accepts a pending request", async () => {
     const { meeting } = await scenario();
 
-    const result = await respondToMeetingAction({
+    const result = await respondToMeeting({
       meetingId: meeting.id,
       response: "accept",
     });
@@ -118,7 +117,7 @@ describe("respondToMeetingAction", () => {
   it("declines a pending request", async () => {
     const { meeting } = await scenario();
 
-    const result = await respondToMeetingAction({
+    const result = await respondToMeeting({
       meetingId: meeting.id,
       response: "decline",
     });
@@ -132,7 +131,7 @@ describe("respondToMeetingAction", () => {
   it("tells the requester what was answered", async () => {
     const { requester, meeting } = await scenario();
 
-    await respondToMeetingAction({ meetingId: meeting.id, response: "accept" });
+    await respondToMeeting({ meetingId: meeting.id, response: "accept" });
     await runJobs();
 
     const [notification] = await getRepositories().notifications.listByGuest(
@@ -147,7 +146,7 @@ describe("respondToMeetingAction", () => {
     const { requester, meeting } = await scenario();
     await signIn(requester.id);
 
-    const result = await respondToMeetingAction({
+    const result = await respondToMeeting({
       meetingId: meeting.id,
       response: "accept",
     });
@@ -162,9 +161,9 @@ describe("respondToMeetingAction", () => {
   // the first answer stands rather than being overwritten.
   it("refuses to answer a request twice", async () => {
     const { meeting } = await scenario();
-    await respondToMeetingAction({ meetingId: meeting.id, response: "accept" });
+    await respondToMeeting({ meetingId: meeting.id, response: "accept" });
 
-    const again = await respondToMeetingAction({
+    const again = await respondToMeeting({
       meetingId: meeting.id,
       response: "decline",
     });
@@ -184,7 +183,7 @@ describe("respondToMeetingAction", () => {
       meetingsEnabled: false,
     });
 
-    const result = await respondToMeetingAction({
+    const result = await respondToMeeting({
       meetingId: meeting.id,
       response: "accept",
     });
@@ -198,7 +197,7 @@ describe("respondToMeetingAction", () => {
   it("refuses an answer outside the scheduling phase", async () => {
     const { meeting } = await scenario({ phase: "proposal" });
 
-    const result = await respondToMeetingAction({
+    const result = await respondToMeeting({
       meetingId: meeting.id,
       response: "accept",
     });
@@ -212,7 +211,7 @@ describe("respondToMeetingAction", () => {
   it("refuses a request whose slot has already started", async () => {
     const { meeting } = await scenario({ slotStart: PAST_SLOT });
 
-    const result = await respondToMeetingAction({
+    const result = await respondToMeeting({
       meetingId: meeting.id,
       response: "accept",
     });
@@ -228,7 +227,7 @@ describe("respondToMeetingAction", () => {
     cookieJar.clear();
     await siteAuthenticate(cookieJar);
 
-    const result = await respondToMeetingAction({
+    const result = await respondToMeeting({
       meetingId: meeting.id,
       response: "accept",
     });
@@ -239,29 +238,16 @@ describe("respondToMeetingAction", () => {
   it("refuses an unknown meeting", async () => {
     await scenario();
 
-    const result = await respondToMeetingAction({
+    const result = await respondToMeeting({
       meetingId: "no-such-meeting",
       response: "accept",
     });
 
     expect(result.ok).toBe(false);
   });
-
-  // A "use server" export is a public endpoint: the declared types are
-  // advisory, so a hand-made payload has to come back as a result, not a 500.
-  it("answers a malformed payload instead of throwing", async () => {
-    const { meeting } = await scenario();
-
-    const result = await respondToMeetingAction({
-      meetingId: meeting.id,
-      response: "maybe" as unknown as "accept",
-    });
-
-    expect(result).toEqual({ ok: false, error: "Invalid request" });
-  });
 });
 
-describe("cancelMeetingAction", () => {
+describe("canceling a 1-on-1", () => {
   beforeAll(() => setupTestDb());
 
   beforeEach(async () => {
@@ -275,7 +261,7 @@ describe("cancelMeetingAction", () => {
 
   async function accepted() {
     const scene = await scenario();
-    await respondToMeetingAction({
+    await respondToMeeting({
       meetingId: scene.meeting.id,
       response: "accept",
     });
@@ -286,7 +272,7 @@ describe("cancelMeetingAction", () => {
     const { requester, recipient, meeting } = await scenario();
     await signIn(requester.id);
 
-    const result = await cancelMeetingAction({ meetingId: meeting.id });
+    const result = await cancelMeeting({ meetingId: meeting.id });
 
     expect(result.ok).toBe(true);
     expect(
@@ -302,7 +288,7 @@ describe("cancelMeetingAction", () => {
   it("lets either party call off a confirmed meeting", async () => {
     const { requester, meeting } = await accepted();
 
-    const result = await cancelMeetingAction({ meetingId: meeting.id });
+    const result = await cancelMeeting({ meetingId: meeting.id });
 
     expect(result.ok).toBe(true);
     expect(
@@ -322,7 +308,7 @@ describe("cancelMeetingAction", () => {
     const { requester, meeting } = await scenario();
     await signIn(requester.id);
 
-    const result = await cancelMeetingAction({
+    const result = await cancelMeeting({
       meetingId: meeting.id,
       note: "  sorry, my session moved  ",
     });
@@ -337,7 +323,7 @@ describe("cancelMeetingAction", () => {
     const { requester, meeting } = await scenario();
     await signIn(requester.id);
 
-    await cancelMeetingAction({ meetingId: meeting.id });
+    await cancelMeeting({ meetingId: meeting.id });
 
     expect(
       (await getRepositories().meetings.findById(meeting.id))?.cancelNote
@@ -349,9 +335,9 @@ describe("cancelMeetingAction", () => {
   it("writes no note when there is nothing left to cancel", async () => {
     const { requester, meeting } = await scenario();
     await signIn(requester.id);
-    await cancelMeetingAction({ meetingId: meeting.id, note: "first" });
+    await cancelMeeting({ meetingId: meeting.id, note: "first" });
 
-    const again = await cancelMeetingAction({
+    const again = await cancelMeeting({
       meetingId: meeting.id,
       note: "second",
     });
@@ -368,7 +354,7 @@ describe("cancelMeetingAction", () => {
     const { requester, recipient, meeting } = await scenario();
     await signIn(requester.id);
 
-    await cancelMeetingAction({
+    await cancelMeeting({
       meetingId: meeting.id,
       note: "my session moved",
     });
@@ -390,7 +376,7 @@ describe("cancelMeetingAction", () => {
   it("refuses the recipient a pending request", async () => {
     const { meeting } = await scenario();
 
-    const result = await cancelMeetingAction({ meetingId: meeting.id });
+    const result = await cancelMeeting({ meetingId: meeting.id });
 
     // Not "nothing left to cancel": there is, and the real answer is which
     // button to use.
@@ -408,20 +394,20 @@ describe("cancelMeetingAction", () => {
     const bystander = await createGuest({ eventId: event.id });
     await signIn(bystander.id);
 
-    const result = await cancelMeetingAction({ meetingId: meeting.id });
+    const result = await cancelMeeting({ meetingId: meeting.id });
 
     expect(result.ok).toBe(false);
   });
 
   it("refuses a meeting that is already declined", async () => {
     const { requester, meeting } = await scenario();
-    await respondToMeetingAction({
+    await respondToMeeting({
       meetingId: meeting.id,
       response: "decline",
     });
     await signIn(requester.id);
 
-    const result = await cancelMeetingAction({ meetingId: meeting.id });
+    const result = await cancelMeeting({ meetingId: meeting.id });
 
     expect(result.ok).toBe(false);
   });
@@ -430,7 +416,7 @@ describe("cancelMeetingAction", () => {
     const { requester, meeting } = await scenario({ phase: "proposal" });
     await signIn(requester.id);
 
-    const result = await cancelMeetingAction({ meetingId: meeting.id });
+    const result = await cancelMeeting({ meetingId: meeting.id });
 
     expect(result.ok).toBe(false);
     expect(
@@ -442,7 +428,7 @@ describe("cancelMeetingAction", () => {
     const { requester, meeting } = await scenario({ slotStart: PAST_SLOT });
     await signIn(requester.id);
 
-    const result = await cancelMeetingAction({ meetingId: meeting.id });
+    const result = await cancelMeeting({ meetingId: meeting.id });
 
     expect(result.ok).toBe(false);
   });
@@ -452,18 +438,8 @@ describe("cancelMeetingAction", () => {
     cookieJar.clear();
     await siteAuthenticate(cookieJar);
 
-    const result = await cancelMeetingAction({ meetingId: meeting.id });
+    const result = await cancelMeeting({ meetingId: meeting.id });
 
     expect(result.ok).toBe(false);
-  });
-
-  it("answers a malformed payload instead of throwing", async () => {
-    await accepted();
-
-    const result = await cancelMeetingAction({
-      meetingId: 42 as unknown as string,
-    });
-
-    expect(result).toEqual({ ok: false, error: "Invalid request" });
   });
 });

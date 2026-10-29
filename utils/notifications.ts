@@ -717,8 +717,8 @@ function proposalCommentPath(
   return `${proposalPath(eventSlug, proposalId)}#comment-${commentId}`;
 }
 
-// Deep link to the session, same shape as modal-nav's
-// viewSessionLinkFromElsewhere (anchor MnpjIo7Y). Exported because reminder
+// Deep link to the session, the shape the SPA's schedule opens (anchor
+// MnpjIo7Y in docs/dev/web-app.md). Exported because reminder
 // dispatch builds the same link for its notification and its email: one
 // definition, not three copies.
 export function sessionPath(eventSlug: string, sessionId: string) {

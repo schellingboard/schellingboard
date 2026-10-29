@@ -3,7 +3,7 @@ import { describe, it, expect } from "vitest";
 import fc from "fast-check";
 import type { FeedMessage } from "@schellingboard/contracts/feed";
 import { VoteChoice } from "@schellingboard/domain/vote";
-import { apply } from "./apply";
+import { apply } from "@schellingboard/contracts/feed-apply";
 import { snapshot } from "./snapshot-fixture";
 
 const [talk] = snapshot.sessions;

@@ -287,7 +287,7 @@ session start and after compaction; those files, not the conversation, are the s
 
 ## Misc
 
-When adding a link to session/proposal modal, see `modal-nav.ts`, there are gotchas (anchor:
+When adding a link to session/proposal modal, see `docs/dev/web-app.md`, there are gotchas (anchor:
 MnpjIo7Y).
 
 <!-- BEGIN:nextjs-agent-rules -->

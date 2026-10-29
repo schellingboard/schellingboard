@@ -176,7 +176,7 @@ test("closing a session opened from a notification stays on the schedule @013-US
   await actAs(page, "Carlos Silva");
 
   // Opening a session from the schedule arms "dismiss by going back" (see
-  // modal-nav.ts, anchor MnpjIo7Y). That must not still be armed for the modal
+  // docs/dev/web-app.md, anchor MnpjIo7Y). That must not still be armed for the modal
   // the notification opens, whose own history entry is the notification list.
   const fromSchedule = await openSession(page, GREEN_SESSION);
   await page.keyboard.press("Escape");
@@ -235,7 +235,7 @@ test.describe("attendee-count reminders", () => {
   }) => {
     await login(page);
     // "Send due reminders" below is a legacy-page dev tool.
-    await page.goto("/legacy/Conference-Gamma?dev=1");
+    await page.goto("/legacy/settings?dev=1");
     await selectUser(page, "Charlie Test");
     await setDevClock(page, lateOnGammaDay(1));
     await page.reload();

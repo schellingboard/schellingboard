@@ -31,12 +31,14 @@ import {
   openGuestValue,
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
-import {
-  createProfileComment as createComment,
+import { commentApi } from "../helpers/comment-api";
+import { sendMail } from "@/utils/mailer";
+
+const {
+  createProfileComment: createComment,
   deleteComment,
   updateComment,
-} from "@/app/legacy/(site)/[eventSlug]/comment-actions";
-import { sendMail } from "@/utils/mailer";
+} = commentApi(cookieJar);
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 

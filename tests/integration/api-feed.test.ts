@@ -12,7 +12,7 @@ import { NextRequest } from "next/server";
 import { GET } from "@/app/api/v1/[[...route]]/route";
 import { getRepositories } from "@/db/container";
 import { RECONNECT_DELAY_MS } from "@/server/feed/routes";
-import { RECONNECT_GRACE_MS } from "@/app/legacy/(site)/[eventSlug]/replica/sync-state";
+import { RECONNECT_GRACE_MS } from "@schellingboard/contracts/feed";
 import { connectionCount } from "@/server/feed/hub";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { updateLoggedSession } from "../helpers/changes";

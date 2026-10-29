@@ -78,51 +78,6 @@ const PRE_AUTH = new Set([
  * it runs before anything looks at them.
  */
 const SITE_GUARDED: Record<string, () => Promise<unknown>> = {
-  "legacy/(site)/[eventSlug]/comment-actions.ts:createSessionComment":
-    async () => {
-      const { createSessionComment } =
-        await import("@/app/legacy/(site)/[eventSlug]/comment-actions");
-      return createSessionComment({ sessionId: "s", body: "b" });
-    },
-  "legacy/(site)/[eventSlug]/comment-actions.ts:createProfileComment":
-    async () => {
-      const { createProfileComment } =
-        await import("@/app/legacy/(site)/[eventSlug]/comment-actions");
-      return createProfileComment({ profileId: "g", body: "b" });
-    },
-  "legacy/(site)/[eventSlug]/comment-actions.ts:updateComment": async () => {
-    const { updateComment } =
-      await import("@/app/legacy/(site)/[eventSlug]/comment-actions");
-    return updateComment({ commentId: "c", eventSlug: "s", body: "b" });
-  },
-  "legacy/(site)/[eventSlug]/comment-actions.ts:toggleCommentLike":
-    async () => {
-      const { toggleCommentLike } =
-        await import("@/app/legacy/(site)/[eventSlug]/comment-actions");
-      return toggleCommentLike({ commentId: "c", eventSlug: "s" });
-    },
-  "legacy/(site)/[eventSlug]/comment-actions.ts:deleteComment": async () => {
-    const { deleteComment } =
-      await import("@/app/legacy/(site)/[eventSlug]/comment-actions");
-    return deleteComment({ commentId: "c", eventSlug: "s" });
-  },
-  "actions/meetings.ts:requestMeetingAction": async () => {
-    const { requestMeetingAction } = await import("@/app/actions/meetings");
-    return requestMeetingAction({
-      eventId: "e",
-      recipientId: "g",
-      slotStart: new Date().toISOString(),
-      meetingPoint: "Coffee bar",
-    });
-  },
-  "actions/meetings.ts:cancelMeetingAction": async () => {
-    const { cancelMeetingAction } = await import("@/app/actions/meetings");
-    return cancelMeetingAction({ meetingId: "m" });
-  },
-  "actions/meetings.ts:respondToMeetingAction": async () => {
-    const { respondToMeetingAction } = await import("@/app/actions/meetings");
-    return respondToMeetingAction({ meetingId: "m", response: "accept" });
-  },
   "actions/meetings.ts:saveMeetingAvailabilityAction": async () => {
     const { saveMeetingAvailabilityAction } =
       await import("@/app/actions/meetings");

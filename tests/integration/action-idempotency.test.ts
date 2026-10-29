@@ -44,11 +44,10 @@ import {
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
-import {
-  createProfileComment,
-  createSessionComment,
-} from "@/app/legacy/(site)/[eventSlug]/comment-actions";
+import { commentApi } from "../helpers/comment-api";
 import { proposalApi } from "../helpers/proposal-api";
+
+const { createProfileComment, createSessionComment } = commentApi(cookieJar);
 
 const { createProposalComment } = proposalApi(cookieJar);
 

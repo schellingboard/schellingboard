@@ -21,13 +21,13 @@ const noAmbientClock = [
   {
     selector: "NewExpression[callee.name='Date'][arguments.length=0]",
     message:
-      "`new Date()` reads an ambient clock. Take `now` from serverNow(), requestNow(req) or EventContext.now and pass it down (ADR 0004).",
+      "`new Date()` reads an ambient clock. Take `now` from serverNow(), requestNow(req) or the replica's server clock and pass it down (ADR 0004).",
   },
   {
     selector:
       "CallExpression[callee.object.name='Date'][callee.property.name='now']",
     message:
-      "`Date.now()` reads an ambient clock. Take `now` from serverNow(), requestNow(req) or EventContext.now (ADR 0004). For elapsed time, use performance.now().",
+      "`Date.now()` reads an ambient clock. Take `now` from serverNow(), requestNow(req) or the replica's server clock (ADR 0004). For elapsed time, use performance.now().",
   },
   {
     selector:

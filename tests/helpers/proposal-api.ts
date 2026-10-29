@@ -1,16 +1,16 @@
-import { NextRequest } from "next/server";
-import { DELETE, POST, PUT } from "@/app/api/v1/[[...route]]/route";
 import { GUEST_COOKIE_NAME, openGuestValue } from "./guest-cookie";
 
-export type Problem = {
-  code: string;
-  detail?: string;
-  errors?: { path: string; message: string }[];
-};
+import { NextRequest } from "next/server";
+import {
+  callApi,
+  type ApiResult,
+  type Fields,
+  type Method,
+  type Problem,
+} from "./api";
 
-export type ProposalResult = { success: true } | { error: Problem };
-
-type Fields = Record<string, unknown>;
+export type { Problem };
+export type ProposalResult = ApiResult;
 
 export function apiRequest(
   method: string,
@@ -32,28 +32,8 @@ export const asGuest = (id: string) =>
 
 /** The proposal routes of /api/v1 as a guest holding `cookies` calls them. */
 export function proposalApi(cookies: Map<string, string>) {
-  async function call(
-    method: string,
-    path: string,
-    body?: Fields,
-    key?: string
-  ): Promise<ProposalResult> {
-    const headers: Record<string, string> = {
-      cookie: [...cookies].map(([k, v]) => `${k}=${v}`).join("; "),
-    };
-    if (body) headers["content-type"] = "application/json";
-    if (key) headers["idempotency-key"] = key;
-    const handle = { POST, PUT, DELETE }[method as "POST" | "PUT" | "DELETE"];
-    const res = await handle(
-      new NextRequest(`http://test/api/v1${path}`, {
-        method,
-        headers,
-        body: body && JSON.stringify(body),
-      })
-    );
-    if (res.ok) return { success: true };
-    return { error: (await res.json()) as Problem };
-  }
+  const call = (method: Method, path: string, body?: Fields, key?: string) =>
+    callApi(cookies, method, path, body, key);
 
   return {
     createProposal: (fields: Fields, key?: string) =>

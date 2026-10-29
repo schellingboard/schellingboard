@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { InlineMarkdown, Markdown } from "@/app/legacy/(site)/markdown";
-import { stripMarkdown } from "@/utils/markdown";
 
 function render(markdown: string): string {
   return renderToStaticMarkup(<Markdown>{markdown}</Markdown>);
@@ -135,48 +134,5 @@ describe("InlineMarkdown component", () => {
     const html = renderInline("@alice_the_bee");
     expect(html).not.toContain("<em>");
     expect(html).toContain("@alice_the_bee");
-  });
-});
-
-describe("stripMarkdown", () => {
-  it("strips formatting down to plain text", () => {
-    expect(stripMarkdown("Some **bold** and [a link](https://x.com).")).toBe(
-      "Some bold and a link."
-    );
-  });
-
-  it("strips headings and separates blocks with newlines", () => {
-    expect(stripMarkdown("# Title\n\nBody text")).toBe("Title\nBody text");
-  });
-
-  it("keeps literal special characters unescaped", () => {
-    expect(stripMarkdown("2 * 3 = 6 and snake_case")).toBe(
-      "2 * 3 = 6 and snake_case"
-    );
-  });
-
-  it("keeps inline code content", () => {
-    expect(stripMarkdown("run `make test` now")).toBe("run make test now");
-  });
-
-  it("drops images but keeps alt text", () => {
-    expect(stripMarkdown("![alt text](https://x.com/i.png)")).toBe("alt text");
-  });
-
-  it("flattens list items onto separate lines", () => {
-    expect(stripMarkdown("- one\n- two")).toBe("one\ntwo");
-  });
-
-  it("returns empty string for empty input", () => {
-    expect(stripMarkdown("")).toBe("");
-  });
-
-  it("returns empty string for null or undefined input", () => {
-    expect(stripMarkdown(null)).toBe("");
-    expect(stripMarkdown(undefined)).toBe("");
-  });
-
-  it("drops raw HTML tags instead of showing their literal text", () => {
-    expect(stripMarkdown("Some <div>text</div> here")).toBe("Some text here");
   });
 });

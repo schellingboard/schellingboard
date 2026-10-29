@@ -2,7 +2,7 @@
 import { describe, it, expect } from "vitest";
 import { VoteChoice } from "@schellingboard/domain/vote";
 import { eventContextFrom, ownVotesFrom, proposalsFrom } from "./selectors";
-import { apply } from "./apply";
+import { apply } from "@schellingboard/contracts/feed-apply";
 import { iso, snapshot } from "./snapshot-fixture";
 
 describe("eventContextFrom", () => {

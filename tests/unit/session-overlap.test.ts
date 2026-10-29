@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { sessionsOverlap } from "@/app/legacy/(site)/session_utils";
+import { sessionsOverlap } from "@schellingboard/domain/session-overlap";
 import type { Session } from "@schellingboard/domain/session";
 
 function makeSession(id: string, start?: Date, end?: Date): Session {

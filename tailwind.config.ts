@@ -18,14 +18,6 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
-      // Session cards span one grid row per slot; a 24h day of 15-minute
-      // slots needs up to 96. Must stay in sync with class-constants.tsx.
-      gridRow: Object.fromEntries(
-        Array.from({ length: 96 - 12 }, (_, i) => {
-          const n = i + 13;
-          return [`span-${n}`, `span ${n} / span ${n}`];
-        })
-      ),
     },
   },
   plugins: [require("@tailwindcss/forms")],
