@@ -204,7 +204,9 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`, `docs/dev/target-architec
           `queries/admin-event.ts`.
     - [x] 20b-2. Done: `features/admin/event-days.tsx`, `event-meetings.tsx`, new
           `GET /admin/events/{id}/meeting-points`.
-  - [ ] 20c. Event guests, event locations, room availability.
+  - [x] 20c. Done: `features/admin/` `assignment-manager.tsx` (shared by `event-guests.tsx`,
+        `event-locations.tsx`), `location-availability.tsx`;
+        `queries/admin-guests|locations|unavailability`.
   - [ ] 20d. Event proposals and sessions managers.
   - [ ] 20e. Locations (image, order), guests and import, site settings, test email.
 - [ ] 21. **Takeover: admin**. Router owns `/admin/**` except the login; `proxy.ts` keeps the admin

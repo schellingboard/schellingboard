@@ -99,6 +99,45 @@ export function adminEventCalls(api: ApiClient) {
         body: { ...body, expectedVersion },
         headers: { "Idempotency-Key": key },
       }),
+    assignGuests: (eventId: string, guestIds: string[], key: string) =>
+      api.POST("/api/v1/admin/events/{id}/guests/assign", {
+        params: { path: { id: eventId } },
+        body: { guestIds },
+        headers: { "Idempotency-Key": key },
+      }),
+    removeGuests: (eventId: string, guestIds: string[], key: string) =>
+      api.POST("/api/v1/admin/events/{id}/guests/remove", {
+        params: { path: { id: eventId } },
+        body: { guestIds },
+        headers: { "Idempotency-Key": key },
+      }),
+    assignLocations: (eventId: string, locationIds: string[], key: string) =>
+      api.POST("/api/v1/admin/events/{id}/locations/assign", {
+        params: { path: { id: eventId } },
+        body: { locationIds },
+        headers: { "Idempotency-Key": key },
+      }),
+    removeLocations: (eventId: string, locationIds: string[], key: string) =>
+      api.POST("/api/v1/admin/events/{id}/locations/remove", {
+        params: { path: { id: eventId } },
+        body: { locationIds },
+        headers: { "Idempotency-Key": key },
+      }),
+    addUnavailability: (
+      eventId: string,
+      body: { locationIds: string[]; start: string; end: string },
+      key: string
+    ) =>
+      api.POST("/api/v1/admin/events/{id}/location-unavailability", {
+        params: { path: { id: eventId } },
+        body,
+        headers: { "Idempotency-Key": key },
+      }),
+    deleteUnavailability: (id: string, key: string) =>
+      api.DELETE("/api/v1/admin/location-unavailability/{id}", {
+        params: { path: { id } },
+        headers: { "Idempotency-Key": key },
+      }),
     deleteDay: (id: string, key: string) =>
       api.DELETE("/api/v1/admin/days/{id}", {
         params: { path: { id } },

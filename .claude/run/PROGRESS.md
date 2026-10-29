@@ -130,6 +130,21 @@ holds `useSectionSave`, `jumpTo`, `useJumpWithin`, `shown`. E2E label changes fo
 labels "Start", "Name" etc. now carry a trailing star without a space (use a `getByLabel("Start")`
 regex).
 
+Step 20c, for 21: the Guests and Locations tabs. Pages own `createAdminGuestsQuery({api})` (all
+pages of `GET /admin/guests`), `createAdminLocationsQuery({api})` (`GET /admin/locations`) and
+`createAdminUnavailabilityQuery({api,eventId})`; each `load()`s on mount and in `onChanged`. Search,
+the Assigned filter and 25-row paging run in memory (no server paging). Props:
+`EventGuestsManager({eventId, guests, params, onParams, calls, onChanged})` and
+`EventLocationsManager` alike: `params` = `useUrlSearchParams().params`, `onParams(updates, {push})`
+applies `updates` (null deletes) to them and calls `change(next, {push})`. The Locations tab also
+renders `LocationAvailabilityManager({eventId, periods, rooms, days, timezone, calls, onChanged})`:
+`rooms` = locations whose `eventIds` has the event, `days` from the event query, `periods` from the
+unavailability query. Rows sort by name (case-insensitive) then id; a page past the end is clamped
+to the last (legacy redirected). `admin.spec.ts:877` expects "Request failed" when a bulk action
+cannot reach the server; the SPA says "This might not have been saved…". Step 21: the legacy
+`room-checkboxes.tsx` stays for the sessions manager (20d may reuse the SPA copy in
+`features/admin/room-checkboxes.tsx`).
+
 Step 21 must delete the legacy `use-event-section.ts` (untested now; the SPA copy has the test).
 
 ## Questions
