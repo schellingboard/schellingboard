@@ -33,8 +33,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
-- **Pages now live under `/legacy/`**: the address bar shows `/legacy/…` for the pages not yet
-  moved; the schedule, proposals and admin area keep their plain address. Old links still work.
+- **Pages now live under `/legacy/`**: only the sign-in screens and the event list still show
+  `/legacy/…` in the address bar; every other page keeps its plain address. Old links still work.
 - **The schedule, session forms, attendee profiles, settings, notifications and the admin area are
   now faster-loading app pages**: all work as before; Back closes a session. Password protection
   moved to an Account security page linked from Settings.

@@ -10,17 +10,22 @@ going.
 
 - The Next pages live under `/legacy`. Every other root path that is not `/api`, `/media`,
   `/locations`, `/sw.js`, an icon or the manifest is a page of the SPA.
-- `proxy.ts` applies the site password to those paths, then rewrites them to `/api/spa/shell`, which
-  reads `apps/web/dist/index.html` from disk on each request and answers `no-store`.
+- `proxy.ts` applies the site password to those paths (not to `/admin/**`, which answers 404 when
+  the admin UI is disabled and otherwise gets the shell: the admin API holds the gate), then
+  rewrites them to `/api/spa/shell`, which reads `apps/web/dist/index.html` from disk on each
+  request and answers `no-store`.
 - Hashed files are requested as `/_spa/assets/…`. The proxy skips them; a rewrite in
   `next.config.js` hands them to `/api/spa/assets/…`, which serves them as immutable and answers 404
   for anything missing, never the shell.
-- The router owns `/{slug}`, an event's schedule, and `/{slug}/proposals/**` (list, quick voting,
-  new, edit; `?viewProposal=` opens the modal). Everything else the SPA does not own is forwarded:
-  the catch-all route replaces the location with `/legacy` + path + query (a path already under
-  `/legacy` is left alone), and a static route per legacy root page (`app/legacy-pages.ts`, checked
-  against `app/legacy/` by `tests/unit/spa-legacy-pages.test.ts`) keeps an event slug from shadowing
-  `/settings`, `/admin`, and so on.
+- The router owns `/{slug}` (an event's schedule), `/{slug}/proposals/**` (list, quick voting, new,
+  edit; `?viewProposal=` opens the modal), the session forms, `/{slug}/meetings`, `/guests/**`,
+  `/settings`, `/notifications` and `/admin/**` (`app/admin-pages.tsx`). Still Next pages: the
+  sign-in screens (`/login`, guest login and reset, `/account-security`, `/legacy/admin/login`) and
+  the root event list (`/`). Everything else the SPA does not own is forwarded: the catch-all route
+  replaces the location with `/legacy` + path + query (a path already under `/legacy` is left
+  alone), and a static route per legacy root page (`app/legacy-pages.ts`, checked against
+  `app/legacy/` by `tests/unit/spa-legacy-pages.test.ts`) keeps an event slug from shadowing
+  `/login`, and so on (`admin` is in the list for its login only; the router leaves it out).
 - Legacy pages link to the SPA with plain anchors, never Next's `Link` (`AppLink`, which does that
   for every root path outside `/legacy`): Next has nothing to fetch there.
 
@@ -44,9 +49,9 @@ Docker image, which copies `apps/web/dist` next to `server.js`.
   Next. The shell gate does not apply in dev. A bare `next dev` answers root pages with the shell
   (503 until the SPA is built): use `/legacy/...` URLs with it, as the screenshots script does.
 - E2E specs call `page.goto` with root paths; the fixture sends them to `/legacy/...` so a click
-  never lands before hydration, except an event's own address (`/{slug}`, any query, and
-  `/{slug}/proposals/…`) and `/guests/…`, which the SPA owns and opens as it is. One spec covers the
-  shell's forward.
+  never lands before hydration, except these SPA addresses (an event's `/{slug}` and
+  `/{slug}/proposals/…`, `/guests/…`, `/settings`, `/notifications`, `/admin/…` but not
+  `/admin/login`), which open as they are. One spec covers the shell's forward.
 
 ## Layout and rules
 

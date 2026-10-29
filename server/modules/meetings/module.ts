@@ -11,6 +11,5 @@ export { toMeetingPointView, toMeetingView } from "./http/view";
 export {
   guestSchedules,
   meetingOptions,
-  meetingPointsOfEvent,
   meetingViews,
 } from "./application/page-reads";
