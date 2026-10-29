@@ -45,6 +45,21 @@ const updateEventMeetings = createRoute({
   },
 });
 
+const listPoints = createRoute({
+  method: "get",
+  path: "/admin/events/{id}/meeting-points",
+  tags: ["admin"],
+  description: "The event's suggested meeting points, in order.",
+  request: { params: idParam },
+  responses: {
+    200: json(
+      z.object({ meetingPoints: z.array(meetingPointSchema) }),
+      "The meeting points"
+    ),
+    ...problemDefault,
+  },
+});
+
 const createPoint = createRoute({
   method: "post",
   path: "/admin/events/{id}/meeting-points",
@@ -100,6 +115,15 @@ export function addAdminMeetingRoutes(
     );
     if (!result.ok) return problem(result.error, toEventView);
     return c.json(toEventView(result.value), 200);
+  });
+
+  app.openapi(listPoints, async (c) => {
+    const result = await meetings().listMeetingPoints(
+      c.var.actor,
+      c.req.valid("param").id
+    );
+    if (!result.ok) return problem(result.error);
+    return c.json({ meetingPoints: result.value }, 200);
   });
 
   app.openapi(createPoint, async (c) => {

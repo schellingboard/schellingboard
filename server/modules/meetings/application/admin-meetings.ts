@@ -154,3 +154,11 @@ export const deleteMeetingPoint =
       return ok(undefined);
     });
   };
+
+export const listMeetingPoints =
+  ({ repos }: MeetingDeps) =>
+  async (actor: Actor, eventId: string): Promise<Result<MeetingPoint[]>> => {
+    if (!actor.admin) return adminRequired();
+    if (!(await repos.events.findById(eventId))) return eventNotFound();
+    return ok(await repos.meetingPoints.listByEvent(eventId));
+  };

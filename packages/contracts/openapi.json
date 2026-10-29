@@ -4638,6 +4638,64 @@
       }
     },
     "/api/v1/admin/events/{id}/meeting-points": {
+      "get": {
+        "tags": ["admin"],
+        "description": "The event's suggested meeting points, in order.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The meeting points",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meetingPoints": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "eventId": { "type": "string" },
+                          "name": { "type": "string" },
+                          "description": { "type": "string" },
+                          "sortIndex": { "type": "integer" },
+                          "version": { "type": "integer" }
+                        },
+                        "required": [
+                          "id",
+                          "eventId",
+                          "name",
+                          "description",
+                          "sortIndex",
+                          "version"
+                        ]
+                      }
+                    }
+                  },
+                  "required": ["meetingPoints"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "adminAuth": [] }]
+      },
       "post": {
         "tags": ["admin"],
         "description": "Adds a suggested place to meet, after the event's others.",

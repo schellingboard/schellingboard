@@ -82,6 +82,49 @@ describe("awaitMutation", () => {
     });
   });
 
+  describe("explaining refusals", () => {
+    const refusal = (code: string, detail?: unknown) =>
+      call(() =>
+        Response.json(
+          { type: "about:blank", title: "x", status: 400, code, detail },
+          {
+            status: 400,
+            headers: { "content-type": "application/problem+json" },
+          }
+        )
+      ).send;
+
+    it("passes on the server's explanation only when asked to", async () => {
+      const send = refusal("day.overlap", "Days cannot overlap");
+
+      expect(await awaitMutation(send, "k")).toMatchObject({
+        message: "The server refused this. Please try again.",
+      });
+      expect(
+        await awaitMutation(send, "k", { explainRefusals: true })
+      ).toMatchObject({ kind: "refused", message: "Days cannot overlap" });
+    });
+
+    it("prefers this app's wording to the explanation", async () => {
+      const send = refusal("session.full", "developer wording");
+
+      expect(
+        await awaitMutation(send, "k", { explainRefusals: true })
+      ).toMatchObject({ message: "This session is full." });
+    });
+
+    it("falls back when the explanation is empty or not text", async () => {
+      for (const detail of ["", 42, undefined])
+        expect(
+          await awaitMutation(refusal("day.overlap", detail), "k", {
+            explainRefusals: true,
+          })
+        ).toMatchObject({
+          message: "The server refused this. Please try again.",
+        });
+    });
+  });
+
   it("says it might not have been saved when the server or network failed", async () => {
     const server = call(() => new Response(null, { status: 503 }));
     const network = call(() => {

@@ -48,6 +48,7 @@ function NewEventForm({
   const mutation = useFormMutation({
     call: (key) => calls.create(body, key),
     fieldNames: FIELD_NAMES,
+    explainRefusals: true,
   });
   const fields = { ...(checking ? invalid : {}), ...mutation.fields };
 

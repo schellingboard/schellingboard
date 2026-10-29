@@ -202,9 +202,8 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`, `docs/dev/target-architec
   - [ ] 20b. Event detail (legacy `events/[id]` is ~1500 lines for these, so split):
     - [x] 20b-1. Done: `features/admin/event-layout.tsx`, `event-config.tsx`,
           `queries/admin-event.ts`.
-    - [ ] 20b-2. Days (`event-days-manager.tsx`, `/admin/events/{id}/days`, `/admin/days/{id}`) and
-          the meetings form with meeting points (`event-meetings-form.tsx`,
-          `/admin/events/{id}/meetings`, `.../meeting-points`).
+    - [x] 20b-2. Done: `features/admin/event-days.tsx`, `event-meetings.tsx`, new
+          `GET /admin/events/{id}/meeting-points`.
   - [ ] 20c. Event guests, event locations, room availability.
   - [ ] 20d. Event proposals and sessions managers.
   - [ ] 20e. Locations (image, order), guests and import, site settings, test email.

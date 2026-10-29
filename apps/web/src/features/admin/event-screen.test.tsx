@@ -61,6 +61,10 @@ const setup = (
     <NoticeProvider>
       <EventConfigTab
         event={ev}
+        days={[]}
+        points={[]}
+        sessions={[]}
+        onPointsChanged={vi.fn()}
         calls={adminEventCalls(api)}
         onChanged={onChanged}
         onDeleted={onDeleted}
