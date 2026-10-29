@@ -68,7 +68,7 @@ async function meetingsEvent(page: Page, eventName: string, names: string[]) {
   // React attaches their handlers, and a click in that window is silently
   // dropped. Re-checking first keeps a retry from acting twice.
   // (helpers/user.ts hits the same hazard in the header.)
-  const nameField = page.getByLabel("Name *");
+  const nameField = page.getByLabel("Name*");
   await expect(async () => {
     if (!(await nameField.isVisible())) {
       await page.getByRole("button", { name: "New event" }).click();
@@ -92,7 +92,7 @@ async function meetingsEvent(page: Page, eventName: string, names: string[]) {
   const meetings = page.getByRole("form", { name: "Meetings" });
   await meetings.getByLabel("Enable meetings").check();
   await meetings.getByRole("button", { name: /add meeting point/i }).click();
-  await meetings.getByLabel("Name *").fill("Coffee bar");
+  await meetings.getByLabel("Name*").fill("Coffee bar");
   await meetings.getByLabel("Description").fill(POINT_DESCRIPTION);
   await meetings.getByRole("button", { name: /add meeting point/i }).click();
   await meetings.getByRole("button", { name: "Save meetings" }).click();
@@ -107,10 +107,10 @@ async function meetingsEvent(page: Page, eventName: string, names: string[]) {
   await expect(page.getByText("Saved!").last()).toBeVisible();
 
   await page.getByRole("button", { name: "Add day" }).click();
-  await page.getByLabel("Start *").last().fill(`${EVENT_START}T09:00`);
-  await page.getByLabel("End *").last().fill(`${EVENT_START}T10:00`);
-  await page.getByLabel("Bookings open *").fill(`${EVENT_START}T09:00`);
-  await page.getByLabel("Bookings close *").fill(`${EVENT_START}T10:00`);
+  await page.getByLabel("Start*").last().fill(`${EVENT_START}T09:00`);
+  await page.getByLabel("End*").last().fill(`${EVENT_START}T10:00`);
+  await page.getByLabel("Bookings open*").fill(`${EVENT_START}T09:00`);
+  await page.getByLabel("Bookings close*").fill(`${EVENT_START}T10:00`);
   await page.getByRole("button", { name: "Add day" }).last().click();
   await expect(page.getByText(`${EVENT_START}T09:00`)).toBeVisible();
 

@@ -9,45 +9,25 @@ import {
   vi,
 } from "vitest";
 
-const cookieJar = new Map<string, string>();
-
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-}));
-
+import {
+  createDayAction,
+  deleteDayAction,
+  loginAsAdmin,
+  logoutAdmin,
+  updateDayAction,
+} from "../helpers/admin-api";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { BY_TEST, updateLoggedSession } from "../helpers/changes";
 import { createEvent, createDay, createSession } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { createAdminAuthCookie } from "@/utils/auth";
-import {
-  createDayAction,
-  updateDayAction,
-  deleteDayAction,
-} from "@/app/actions/admin-days";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
-
-async function loginAsAdmin() {
-  const c = await createAdminAuthCookie();
-  cookieJar.set(c.name, c.value);
-}
 
 describe("days repo", () => {
   beforeAll(() => setupTestDb());
   beforeEach(async () => {
     resetTestDb();
-    cookieJar.clear();
+    logoutAdmin();
     vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
@@ -215,7 +195,7 @@ describe("day actions", () => {
   beforeAll(() => setupTestDb());
   beforeEach(async () => {
     resetTestDb();
-    cookieJar.clear();
+    logoutAdmin();
     vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
@@ -239,7 +219,7 @@ describe("day actions", () => {
     });
 
     it("rejects without admin cookie", async () => {
-      cookieJar.clear();
+      logoutAdmin();
       const event = await createEvent();
       const result = await createDayAction({
         eventId: event.id,
@@ -577,7 +557,7 @@ describe("day actions", () => {
     });
 
     it("rejects without admin cookie", async () => {
-      cookieJar.clear();
+      logoutAdmin();
       const event = await createEvent();
       const day = await createDay(event.id);
       const result = await deleteDayAction({ id: day.id, eventId: event.id });

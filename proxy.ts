@@ -42,11 +42,15 @@ function refuseApiV1(problem: Problem): NextResponse {
 // Any other path is a page of the SPA, which forwards it to /legacy when it
 // does not own it. The shell is the same for everyone, but who may open the
 // app is still decided here, as it is for the legacy pages. The admin pages
-// are independent of the site password, so their paths get the shell and the
-// forwarded /legacy/admin request meets the admin gate.
+// are independent of the site password: they get the shell, and the admin API
+// they call holds the gate.
 async function serveShell(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
-  if (!underRoot(pathname, "/admin")) {
+  if (underRoot(pathname, "/admin")) {
+    if (!isAdminEnabled()) {
+      return new NextResponse(ADMIN_DISABLED_MESSAGE, { status: 404 });
+    }
+  } else {
     const refusal = await requireAuth(request);
     if (refusal) return refusal;
   }

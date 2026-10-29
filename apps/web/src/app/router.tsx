@@ -6,6 +6,16 @@ import {
   type RouterHistory,
 } from "@tanstack/react-router";
 import type { ReactElement } from "react";
+import {
+  AdminEventPage,
+  AdminEventsPage,
+  AdminHome,
+  AdminLocationsPage,
+  AdminSection,
+  AdminSettingsPage,
+  AdminUserImportPage,
+  AdminUsersPage,
+} from "./admin-pages";
 import { NotificationsPage, SettingsPage } from "./account-pages";
 import { LegacyForward } from "./legacy-forward";
 import { LEGACY_ROOT_PAGES } from "./legacy-pages";
@@ -31,12 +41,14 @@ const catchAll = createRoute({
 });
 
 // A static route wins over `/$slug`, so no event can shadow a legacy page.
-const legacyPages = LEGACY_ROOT_PAGES.map((name) =>
-  createRoute({
-    getParentRoute: () => rootRoute,
-    path: `/${name}`,
-    component: LegacyForward,
-  })
+// The admin pages are the SPA's; only the login under /admin is still legacy.
+const legacyPages = LEGACY_ROOT_PAGES.filter((name) => name !== "admin").map(
+  (name) =>
+    createRoute({
+      getParentRoute: () => rootRoute,
+      path: `/${name}`,
+      component: LegacyForward,
+    })
 );
 
 export function createAppRouter(
@@ -133,9 +145,64 @@ export function createAppRouter(
       return <NotificationsPage services={services} />;
     },
   });
+  const adminSection = createRoute({
+    getParentRoute: () => rootRoute,
+    id: "admin-section",
+    component: function AdminSectionRoute(): ReactElement {
+      return <AdminSection services={services} />;
+    },
+  });
+  const adminChild = (path: string, component: () => ReactElement) =>
+    createRoute({ getParentRoute: () => adminSection, path, component });
+  const api = services.api;
+  const adminEvents = adminChild("admin/events", () => (
+    <AdminEventsPage api={api} />
+  ));
+  const adminUsers = adminChild("admin/users", () => (
+    <AdminUsersPage api={api} />
+  ));
+  const adminUserImport = adminChild("admin/users/import", () => (
+    <AdminUserImportPage api={api} />
+  ));
+  const adminLocations = adminChild("admin/locations", () => (
+    <AdminLocationsPage api={api} />
+  ));
+  const adminSettings = adminChild("admin/settings", () => (
+    <AdminSettingsPage api={api} />
+  ));
+  const adminHome = createRoute({
+    getParentRoute: () => adminSection,
+    path: "admin",
+    component: AdminHome,
+  });
+  const adminEvent = createRoute({
+    getParentRoute: () => adminSection,
+    path: "admin/events/$id",
+    component: function AdminEventRoute(): ReactElement {
+      const { id } = adminEvent.useParams();
+      return <AdminEventPage key={id} api={services.api} id={id} />;
+    },
+  });
+  const adminEventConfig = createRoute({
+    getParentRoute: () => adminEvent,
+    path: "/",
+  });
+  const adminEventTab = createRoute({
+    getParentRoute: () => adminEvent,
+    path: "$",
+  });
   return createRouter({
     routeTree: rootRoute.addChildren([
       ...legacyPages,
+      adminSection.addChildren([
+        adminHome,
+        adminEvents,
+        adminEvent.addChildren([adminEventConfig, adminEventTab]),
+        adminUsers,
+        adminUserImport,
+        adminLocations,
+        adminSettings,
+      ]),
       settings,
       notifications,
       guests.addChildren([guestsList, guestsPage]),

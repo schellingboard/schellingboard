@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { fakeApi, problem, type FakeCall } from "../commands/fake-api";
-import { AdminFrame } from "./admin-frame";
+import { AdminFrame, useReloadAdminGate } from "./admin-frame";
 
 const hardNavigate = vi.hoisted(() => vi.fn());
 vi.mock("./hard-navigate", () => ({ hardNavigate, hardReload: vi.fn() }));
@@ -78,6 +78,41 @@ describe("the admin frame", { tags: ["015-US1"] }, () => {
       expect(screen.queryByRole("heading", { name: "Events" })).toBeNull();
     }
   );
+
+  it("shows the new site title when a page asks the gate to reload", async () => {
+    const user = userEvent.setup();
+    let title = "Con";
+    const { api } = fakeApi((call) =>
+      call.path === "/api/v1/admin/settings"
+        ? Response.json({ title, description: "", mapImageUrl: "" })
+        : problem(404, "not.found")
+    );
+    function Rename() {
+      const reload = useReloadAdminGate();
+      return (
+        <button
+          type="button"
+          onClick={() => {
+            title = "Renamed";
+            reload();
+          }}
+        >
+          Rename
+        </button>
+      );
+    }
+    render(
+      <AdminFrame api={api} currentPath="/admin/settings" search="">
+        <Rename />
+      </AdminFrame>
+    );
+
+    await user.click(await screen.findByRole("button", { name: "Rename" }));
+
+    expect(
+      await screen.findByRole("link", { name: "Renamed Admin" })
+    ).toBeTruthy();
+  });
 
   it("says so, and does not redirect, when the gate cannot be read", async () => {
     open(problem(500, "internal"));

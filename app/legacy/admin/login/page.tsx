@@ -10,7 +10,7 @@ import { adminLoginAction } from "@/app/actions/admin-auth";
 
 function AdminLoginForm() {
   const searchParams = useSearchParams();
-  const redirectTo = searchParams?.get("redirect") || "/legacy/admin";
+  const redirectTo = searchParams?.get("redirect") || "/admin";
   const [state, formAction] = useActionState(adminLoginAction, null);
 
   return (

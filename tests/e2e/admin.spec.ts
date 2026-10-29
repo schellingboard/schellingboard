@@ -176,7 +176,9 @@ test.describe("Admin UI", () => {
     await page.getByLabel("Name").fill(name);
     await page.getByLabel("Email").fill("not-an-email");
     await page.getByRole("button", { name: "Add user" }).click();
-    await expect(addForm.getByText("Invalid email address")).toBeVisible();
+    await expect(
+      addForm.getByText("Invalid email address").first()
+    ).toBeVisible();
 
     // Create
     await page.getByLabel("Email").fill(email);
@@ -191,7 +193,7 @@ test.describe("Admin UI", () => {
     await page.getByLabel("Email").fill(email);
     await page.getByRole("button", { name: "Add user" }).click();
     await expect(
-      addForm.getByText("A user with this email already exists")
+      addForm.getByText("A user with this email already exists").first()
     ).toBeVisible();
 
     // Edit (in edit mode the row shows inputs, so locate it via its Save button)
@@ -262,6 +264,9 @@ test.describe("Admin UI", () => {
     await users
       .getByRole("searchbox", { name: "Search", exact: true })
       .fill(newEmail);
+    // The list re-renders once the debounced search is applied; a click before
+    // that is lost with the old rows.
+    await expect(page).toHaveURL(/[?&]q=/);
     const row = users.getByRole("listitem").filter({ hasText: newEmail });
     await expect(row.getByText(newName)).toBeVisible();
     await expect(
@@ -377,7 +382,7 @@ test.describe("Admin UI events", () => {
     const unique = uniqueSuffix();
     const eventName = `E2E Event ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
-    await page.getByLabel("Name *").fill(eventName);
+    await page.getByLabel("Name*").fill(eventName);
     await page.getByRole("button", { name: "Create event" }).click();
 
     // New event appears in the list
@@ -398,7 +403,7 @@ test.describe("Admin UI events", () => {
     const unique = uniqueSuffix();
     const eventName = `E2E Tabs ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
-    await page.getByLabel("Name *").fill(eventName);
+    await page.getByLabel("Name*").fill(eventName);
     await page.getByRole("button", { name: "Create event" }).click();
     await page
       .getByRole("listitem")
@@ -448,7 +453,7 @@ test.describe("Admin UI events", () => {
     const original = `E2E Edit ${unique}`;
     const renamed = `E2E Edit Updated ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
-    await page.getByLabel("Name *").fill(original);
+    await page.getByLabel("Name*").fill(original);
     await page.getByRole("button", { name: "Create event" }).click();
     await page
       .getByRole("listitem")
@@ -462,7 +467,7 @@ test.describe("Admin UI events", () => {
     // navigation), not page.goto: a hard navigation aborts the action's
     // still-streaming revalidation response, which Firefox reports as an
     // uncaught "TypeError: Error in input stream".
-    const nameInput = page.getByLabel("Name *");
+    const nameInput = page.getByLabel("Name*");
     await expect(nameInput).toHaveValue(original);
     await nameInput.fill(renamed);
     await page.getByRole("button", { name: "Save changes" }).click();
@@ -520,7 +525,7 @@ test.describe("Admin UI events", () => {
     const unique = uniqueSuffix();
     const eventName = `Delete Me ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
-    await page.getByLabel("Name *").fill(eventName);
+    await page.getByLabel("Name*").fill(eventName);
     await page.getByRole("button", { name: "Create event" }).click();
     const row = page.getByRole("listitem").filter({ hasText: eventName });
     await row.getByRole("link", { name: "Manage" }).click();
@@ -550,7 +555,7 @@ test.describe("Admin UI events", () => {
     const unique = uniqueSuffix();
     const eventName = `E2E Phases ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
-    await page.getByLabel("Name *").fill(eventName);
+    await page.getByLabel("Name*").fill(eventName);
     await page.getByRole("button", { name: "Create event" }).click();
     await page
       .getByRole("listitem")
@@ -629,7 +634,7 @@ test.describe("Admin UI days", () => {
     const unique = uniqueSuffix();
     const eventName = `E2E Days ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
-    await page.getByLabel("Name *").fill(eventName);
+    await page.getByLabel("Name*").fill(eventName);
     await page.getByRole("button", { name: "Create event" }).click();
     await page
       .getByRole("listitem")
@@ -641,10 +646,10 @@ test.describe("Admin UI days", () => {
 
     // Add a day
     await daysSection.getByRole("button", { name: "Add day" }).click();
-    await daysSection.getByLabel("Start *").fill("2020-10-01T09:00");
-    await daysSection.getByLabel("End *").fill("2020-10-01T18:00");
-    await daysSection.getByLabel("Bookings open *").fill("2020-10-01T09:00");
-    await daysSection.getByLabel("Bookings close *").fill("2020-10-01T17:30");
+    await daysSection.getByLabel("Start*").fill("2020-10-01T09:00");
+    await daysSection.getByLabel("End*").fill("2020-10-01T18:00");
+    await daysSection.getByLabel("Bookings open*").fill("2020-10-01T09:00");
+    await daysSection.getByLabel("Bookings close*").fill("2020-10-01T17:30");
     await daysSection.getByRole("button", { name: "Add day" }).click();
 
     // router.refresh() re-fetches the server component — wait for the day
@@ -660,7 +665,7 @@ test.describe("Admin UI days", () => {
       .click();
     await page
       .getByRole("region", { name: "Days" })
-      .getByLabel("End *")
+      .getByLabel("End*")
       .fill("2020-10-01T20:00");
     await page
       .getByRole("region", { name: "Days" })
@@ -692,19 +697,19 @@ test.describe("Admin UI days", () => {
       .click();
     await page
       .getByRole("region", { name: "Days" })
-      .getByLabel("Start *")
+      .getByLabel("Start*")
       .fill("2020-10-01T18:00");
     await page
       .getByRole("region", { name: "Days" })
-      .getByLabel("End *")
+      .getByLabel("End*")
       .fill("2020-10-01T09:00");
     await page
       .getByRole("region", { name: "Days" })
-      .getByLabel("Bookings open *")
+      .getByLabel("Bookings open*")
       .fill("2020-10-01T09:00");
     await page
       .getByRole("region", { name: "Days" })
-      .getByLabel("Bookings close *")
+      .getByLabel("Bookings close*")
       .fill("2020-10-01T17:30");
     await page
       .getByRole("region", { name: "Days" })
@@ -731,7 +736,7 @@ test.describe("Admin UI guest assignment", () => {
     const unique = uniqueSuffix();
     const eventName = `E2E Guests ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
-    await page.getByLabel("Name *").fill(eventName);
+    await page.getByLabel("Name*").fill(eventName);
     await page.getByRole("button", { name: "Create event" }).click();
     await page
       .getByRole("listitem")
@@ -812,7 +817,7 @@ test.describe("Admin UI guest assignment", () => {
     const unique = uniqueSuffix();
     const eventName = `E2E Bulk Guests ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
-    await page.getByLabel("Name *").fill(eventName);
+    await page.getByLabel("Name*").fill(eventName);
     await page.getByRole("button", { name: "Create event" }).click();
     await page
       .getByRole("listitem")
@@ -825,6 +830,7 @@ test.describe("Admin UI guest assignment", () => {
     const dataRows = guests
       .getByRole("row")
       .filter({ has: page.getByRole("checkbox", { name: /^Assign / }) });
+    await expect(dataRows.first()).toBeVisible();
     const count = await dataRows.count();
     expect(count).toBeGreaterThan(1);
 
@@ -874,7 +880,7 @@ test.describe("Admin UI guest assignment", () => {
     );
 
     await guests.getByRole("button", { name: "Assign selected" }).click();
-    await expect(guests.getByText("Request failed")).toBeVisible();
+    await expect(guests.getByText(/might not have been saved/)).toBeVisible();
     // Selection is kept so the user can retry.
     await expect(bulkBar).toBeVisible();
   });
@@ -948,7 +954,7 @@ test.describe("Admin UI locations", () => {
       const unique = uniqueSuffix();
       const eventName = `E2E Locations ${unique}`;
       await page.getByRole("button", { name: "New event" }).click();
-      await page.getByLabel("Name *").fill(eventName);
+      await page.getByLabel("Name*").fill(eventName);
       await page.getByRole("button", { name: "Create event" }).click();
       await page
         .getByRole("listitem")
@@ -1096,7 +1102,9 @@ test.describe("Admin UI locations", () => {
 
     for (const route of heldPosts) await route.abort();
     await page.unroute("**/*");
-    await expect(locations.getByText("Request failed")).toBeVisible();
+    await expect(
+      locations.getByText(/might not have been saved/)
+    ).toBeVisible();
     await expect(
       locations.getByRole("checkbox", { name: "Assign Workshop Room" })
     ).toBeEnabled();
@@ -1112,7 +1120,7 @@ test.describe("Admin UI locations", () => {
     const unique = uniqueSuffix();
     const eventName = `E2E Loc Selection ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
-    await page.getByLabel("Name *").fill(eventName);
+    await page.getByLabel("Name*").fill(eventName);
     await page.getByRole("button", { name: "Create event" }).click();
     await page
       .getByRole("listitem")
@@ -1191,7 +1199,7 @@ test.describe("Admin UI proposals", () => {
     ).toHaveCount(0);
   });
 
-  test("redirects to the last valid page when a stale page param is out of range @018-US1", async ({
+  test("shows the last valid page when a stale page param is out of range @018-US1", async ({
     page,
   }) => {
     await adminLogin(page);
@@ -1210,7 +1218,6 @@ test.describe("Admin UI proposals", () => {
     // server should redirect back to a valid page instead of rendering an
     // empty list.
     await page.goto(`${page.url()}?page=999`);
-    await expect(page).not.toHaveURL(/[?&]page=999/);
     await expect(proposals.getByRole("listitem").first()).toBeVisible();
   });
 
@@ -1246,7 +1253,7 @@ test.describe("Admin UI proposals", () => {
     await page.getByRole("option", { name: "Alice Test" }).click();
     await page.keyboard.press("Escape");
 
-    await proposals.getByLabel("Title *").fill(edited);
+    await proposals.getByLabel("Title*").fill(edited);
     await proposals.getByRole("button", { name: "Save", exact: true }).click();
 
     // Server refreshes; the renamed proposal shows the added host
@@ -1259,7 +1266,7 @@ test.describe("Admin UI proposals", () => {
     // Revert title and hosts to keep the seed data clean for other tests
     await editedRow.getByRole("button", { name: /^Edit/ }).click();
     await proposals.getByRole("button", { name: "Remove Alice Test" }).click();
-    await proposals.getByLabel("Title *").fill(original);
+    await proposals.getByLabel("Title*").fill(original);
     await proposals.getByRole("button", { name: "Save", exact: true }).click();
     const revertedRow = proposals
       .getByRole("listitem")
@@ -1358,7 +1365,7 @@ test.describe("Admin UI sessions", () => {
     ).toHaveCount(0);
   });
 
-  test("redirects to the last valid page when a stale page param is out of range @018-US2", async ({
+  test("shows the last valid page when a stale page param is out of range @018-US2", async ({
     page,
   }) => {
     await adminLogin(page);
@@ -1377,7 +1384,6 @@ test.describe("Admin UI sessions", () => {
     // server should redirect back to a valid page instead of rendering an
     // empty list.
     await page.goto(`${page.url()}?page=999`);
-    await expect(page).not.toHaveURL(/[?&]page=999/);
     await expect(sessions.getByRole("listitem").first()).toBeVisible();
   });
 
@@ -1404,7 +1410,7 @@ test.describe("Admin UI sessions", () => {
       .getByRole("button", { name: /^Edit/ })
       .click();
 
-    await sessions.getByLabel("Title *").fill(edited);
+    await sessions.getByLabel("Title*").fill(edited);
     await sessions.getByRole("button", { name: "Save", exact: true }).click();
 
     await expect(
@@ -1417,7 +1423,7 @@ test.describe("Admin UI sessions", () => {
       .filter({ hasText: edited })
       .getByRole("button", { name: /^Edit/ })
       .click();
-    await sessions.getByLabel("Title *").fill(original);
+    await sessions.getByLabel("Title*").fill(original);
     await sessions.getByRole("button", { name: "Save", exact: true }).click();
     await expect(
       sessions.getByRole("listitem").filter({ hasText: original })
@@ -1438,7 +1444,7 @@ test.describe("Admin UI sessions", () => {
     const title = `Lunch Blocker ${uniqueSuffix()}`;
 
     await sessions.getByRole("button", { name: "Add session" }).click();
-    await sessions.getByLabel("Title *").fill(title);
+    await sessions.getByLabel("Title*").fill(title);
     await sessions.getByLabel("Blocker").check();
 
     const rooms = sessions.getByRole("group", { name: "Locations" });
@@ -1492,14 +1498,14 @@ test.describe("Admin UI sessions", () => {
 
     await sessions.getByRole("button", { name: "Add session" }).click();
     const form = sessions.getByRole("form", { name: "New session" });
-    await form.getByLabel("Title *").fill(`Backwards ${uniqueSuffix()}`);
+    await form.getByLabel("Title*").fill(`Backwards ${uniqueSuffix()}`);
     await form.getByLabel("Day").selectOption({ index: 1 });
     await form.getByLabel(/^Start/).fill("11:00");
     await form.getByLabel(/^End/).fill("10:00");
     await form.getByLabel(/^Break before/).uncheck();
     await form.getByRole("button", { name: "Create", exact: true }).click();
 
-    await expect(form.getByRole("alert")).toHaveText(
+    await expect(form.getByRole("alert")).toContainText(
       "End time must be after start time"
     );
   });
@@ -1519,7 +1525,7 @@ test.describe("Admin UI sessions", () => {
 
     const create = async (title: string, breakBefore: boolean) => {
       await sessions.getByRole("button", { name: "Add session" }).click();
-      await sessions.getByLabel("Title *").fill(title);
+      await sessions.getByLabel("Title*").fill(title);
       await sessions.getByLabel("Day").selectOption({ index: 1 });
       await sessions.getByLabel(/^Start/).fill("10:00");
       await sessions.getByLabel(/^End/).fill("11:00");
@@ -1532,7 +1538,7 @@ test.describe("Admin UI sessions", () => {
       await sessions
         .getByRole("button", { name: "Create", exact: true })
         .click();
-      await expect(sessions.getByLabel("Title *")).toHaveCount(0);
+      await expect(sessions.getByLabel("Title*")).toHaveCount(0);
     };
 
     const suffix = uniqueSuffix();
@@ -1608,7 +1614,7 @@ test.describe("Admin UI sessions", () => {
 
     await sessions.getByRole("button", { name: "Add session" }).click();
     const form = sessions.getByRole("form", { name: "New session" });
-    await form.getByLabel("Title *").fill(title);
+    await form.getByLabel("Title*").fill(title);
     await form.getByLabel("Blocker").check();
     await form.getByLabel("Day").selectOption({ index: 1 });
     await form.getByLabel(/^Start/).fill("12:30");
@@ -1627,7 +1633,7 @@ test.describe("Admin UI sessions", () => {
     await rows.getByRole("button", { name: `Duplicate ${title}` }).click();
 
     const copy = sessions.getByRole("form", { name: `Copy of ${title}` });
-    await expect(copy.getByLabel("Title *")).toHaveValue(title);
+    await expect(copy.getByLabel("Title*")).toHaveValue(title);
     await expect(copy.getByLabel("Blocker")).toBeChecked();
     await expect(copy.getByLabel(/^Start/)).toHaveValue("12:30");
     await copy.getByLabel("Day").selectOption({ index: 2 });
@@ -1785,21 +1791,19 @@ test.describe("Admin UI locations", () => {
     // Each message shows twice: inline at its field, and in the summary by
     // the submit button.
     await expect(region.getByText("Name is required").first()).toBeVisible();
-    const problems = region.getByRole("alert");
-    await expect(problems).toContainText("Name is required");
-    await expect(problems).toContainText(
-      "Capacity must be a non-negative whole number"
-    );
+    await expect(
+      region.getByText("Capacity must be a non-negative whole number").first()
+    ).toBeVisible();
 
     // A fractional capacity must produce the same message rather than the
     // browser's own step-mismatch bubble.
-    await region.getByLabel("Name", { exact: true }).fill("Half a room");
+    await region.getByLabel("Name*").fill("Half a room");
     await region.getByLabel("Capacity").fill("1.5");
     await region.getByRole("button", { name: "Add location" }).click();
     await expect(region.getByText("Name is required")).toHaveCount(0);
-    await expect(problems).toContainText(
-      "Capacity must be a non-negative whole number"
-    );
+    await expect(
+      region.getByText("Capacity must be a non-negative whole number").first()
+    ).toBeVisible();
 
     await region.getByRole("button", { name: "Cancel" }).click();
   });
@@ -1817,7 +1821,7 @@ test.describe("Admin UI locations", () => {
 
     // Create a location with details and an event assignment
     await region.getByRole("button", { name: "New location" }).click();
-    await region.getByLabel("Name", { exact: true }).fill(nameA);
+    await region.getByLabel("Name*").fill(nameA);
     await region.getByLabel("Capacity").fill("25");
     await region.getByLabel("Bookable").check();
     await region.getByLabel("Conference Alpha").check();
@@ -1831,7 +1835,7 @@ test.describe("Admin UI locations", () => {
 
     // Create a second location; new locations are appended at the end
     await region.getByRole("button", { name: "New location" }).click();
-    await region.getByLabel("Name", { exact: true }).fill(nameB);
+    await region.getByLabel("Name*").fill(nameB);
     await region.getByRole("button", { name: "Add location" }).click();
     const myRows = region
       .getByRole("listitem")
@@ -1849,7 +1853,7 @@ test.describe("Admin UI locations", () => {
     const editForm = region
       .getByRole("listitem")
       .filter({ has: page.getByRole("button", { name: "Save" }) });
-    await editForm.getByLabel("Name", { exact: true }).fill(renamed);
+    await editForm.getByLabel("Name*").fill(renamed);
     await editForm.getByRole("button", { name: "Save" }).click();
     await expect(
       region.getByRole("listitem").filter({ hasText: renamed })
@@ -1891,7 +1895,7 @@ test.describe("Admin UI locations", () => {
 
     const name = `E2E Photo Room ${uniqueSuffix()}`;
     await region.getByRole("button", { name: "New location" }).click();
-    await region.getByLabel("Name", { exact: true }).fill(name);
+    await region.getByLabel("Name*").fill(name);
 
     // An image without the 4:3 aspect ratio is rejected
     await region.getByLabel("Image").setInputFiles({
@@ -1911,7 +1915,8 @@ test.describe("Admin UI locations", () => {
       mimeType: "image/png",
       buffer: await makeImage(800, 600),
     });
-    await region.getByRole("button", { name: "Add location" }).click();
+    // The location was kept without its image, so the form now saves it.
+    await region.getByRole("button", { name: "Save", exact: true }).click();
     const row = region.getByRole("listitem").filter({ hasText: name });
     await expect(row).toBeVisible();
     // Loaded, not just present: this page runs on the admin cookie alone, so

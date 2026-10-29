@@ -6,9 +6,9 @@ type: guide
 
 # Admin UI guide
 
-The admin UI lives at `/legacy/admin`, gated by a single shared `ADMIN_PASSWORD` (no per-admin
-accounts). It is completely independent from `SITE_PASSWORD` — neither password grants access to the
-other side. Unset, `/legacy/admin` returns a 404 rather than a login prompt.
+The admin UI lives at `/admin`, gated by a single shared `ADMIN_PASSWORD` (no per-admin accounts).
+It is completely independent from `SITE_PASSWORD` — neither password grants access to the other
+side. Unset, `/admin` returns a 404 rather than a login prompt.
 
 :::warning "Changing a password does not log anyone out" Both gates sign their cookies with
 `AUTH_SECRET`, and existing sessions stay valid for up to a week. To revoke access immediately,

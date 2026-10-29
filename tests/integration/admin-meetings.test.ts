@@ -9,40 +9,20 @@ import {
   vi,
 } from "vitest";
 
-const cookieJar = new Map<string, string>();
-
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-}));
-
+import {
+  createMeetingPointAction,
+  deleteMeetingPointAction,
+  loginAsAdmin,
+  logoutAdmin,
+  type EventMeetingsInput,
+  updateEventMeetingsAction,
+  updateMeetingPointAction,
+} from "../helpers/admin-api";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { createAdminAuthCookie } from "@/utils/auth";
-import {
-  updateEventMeetingsAction,
-  createMeetingPointAction,
-  updateMeetingPointAction,
-  deleteMeetingPointAction,
-  type EventMeetingsInput,
-} from "@/app/actions/admin-meetings";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
-
-async function loginAsAdmin() {
-  const c = await createAdminAuthCookie();
-  cookieJar.set(c.name, c.value);
-}
 
 const SETTINGS: Omit<EventMeetingsInput, "id" | "expectedVersion"> = {
   meetingsEnabled: true,
@@ -53,7 +33,7 @@ describe("admin meetings settings", () => {
   beforeAll(() => setupTestDb());
   beforeEach(async () => {
     resetTestDb();
-    cookieJar.clear();
+    logoutAdmin();
     vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
@@ -163,7 +143,7 @@ describe("admin meetings settings", () => {
 
   it("refuses a caller who is not an admin", async () => {
     const event = await createEvent();
-    cookieJar.clear();
+    logoutAdmin();
 
     const result = await updateEventMeetingsAction({
       id: event.id,
@@ -181,7 +161,7 @@ describe("admin meeting points", () => {
   beforeAll(() => setupTestDb());
   beforeEach(async () => {
     resetTestDb();
-    cookieJar.clear();
+    logoutAdmin();
     vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
@@ -329,7 +309,7 @@ describe("admin meeting points", () => {
 
   it("refuses a caller who is not an admin", async () => {
     const event = await createEvent();
-    cookieJar.clear();
+    logoutAdmin();
 
     const result = await createMeetingPointAction({
       eventId: event.id,

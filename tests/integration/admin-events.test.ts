@@ -9,23 +9,15 @@ import {
   vi,
 } from "vitest";
 
-const cookieJar = new Map<string, string>();
-
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-}));
-
-import { updateEventMeetingsAction } from "@/app/actions/admin-meetings";
+import {
+  createEventAction,
+  deleteEventAction,
+  loginAsAdmin,
+  logoutAdmin,
+  updateEventAction,
+  updateEventMeetingsAction,
+  updateEventPhasesAction,
+} from "../helpers/admin-api";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { BY_TEST, updateLoggedSession } from "../helpers/changes";
 import {
@@ -38,20 +30,8 @@ import {
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { VoteChoice } from "@schellingboard/domain/vote";
-import { createAdminAuthCookie } from "@/utils/auth";
-import {
-  createEventAction,
-  updateEventAction,
-  deleteEventAction,
-  updateEventPhasesAction,
-} from "@/app/actions/admin-events";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
-
-async function loginAsAdmin() {
-  const c = await createAdminAuthCookie();
-  cookieJar.set(c.name, c.value);
-}
 
 const VALID_EVENT_INPUT = {
   name: "Test Event",
@@ -68,7 +48,7 @@ describe("events repo", () => {
 
   beforeEach(async () => {
     resetTestDb();
-    cookieJar.clear();
+    logoutAdmin();
     vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
@@ -277,7 +257,7 @@ describe("event actions", () => {
 
   beforeEach(async () => {
     resetTestDb();
-    cookieJar.clear();
+    logoutAdmin();
     vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
@@ -287,13 +267,13 @@ describe("event actions", () => {
 
   describe("authorization", () => {
     it("rejects createEventAction without admin cookie", async () => {
-      cookieJar.clear();
+      logoutAdmin();
       const result = await createEventAction(VALID_EVENT_INPUT);
       expect(!result.ok && result.error).toBe("Unauthorized");
     });
 
     it("rejects updateEventAction without admin cookie", async () => {
-      cookieJar.clear();
+      logoutAdmin();
       const event = await createEvent();
       const result = await updateEventAction({
         id: event.id,
@@ -304,7 +284,7 @@ describe("event actions", () => {
     });
 
     it("rejects deleteEventAction without admin cookie", async () => {
-      cookieJar.clear();
+      logoutAdmin();
       const event = await createEvent();
       const result = await deleteEventAction({ id: event.id });
       expect(!result.ok && result.error).toBe("Unauthorized");
@@ -1040,7 +1020,7 @@ describe("event actions", () => {
     });
 
     it("rejects without admin cookie", async () => {
-      cookieJar.clear();
+      logoutAdmin();
       const event = await createEvent();
       const result = await updateEventPhasesAction({
         id: event.id,
