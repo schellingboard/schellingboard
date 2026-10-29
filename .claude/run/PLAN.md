@@ -170,9 +170,9 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`, `docs/dev/target-architec
 
 ### Session forms and the end of the Next schedule
 
-- [ ] 14. **Session form**, unrouted: add and edit (rooms, real times on the minute grid, the break
-      rule, co-hosts), scheduling a proposal into a session, delete and cancel. A saved session
-      lands on the schedule with a confirmation notice (answers open question 3).
+- [x] 14. Session form (done: `features/sessions/` `SessionForm`, `session-model.ts`,
+      `use-host-clashes.ts`; `commands/session-form.ts`; new `GET /host-clashes`; `Notice` gained
+      `autoDismissMs`; `ui/back-link.tsx`).
 - [ ] 15. **Takeover: session forms**. Router owns `add-session` and `edit-session`; the legacy
       form, `session-actions.ts` and `clash-actions.ts` are deleted. E2E: `add-session`,
       `scheduling`, `update-session`. Record in PROGRESS.md whether the `scheduling.spec` flakes

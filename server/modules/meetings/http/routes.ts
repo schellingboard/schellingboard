@@ -1,5 +1,7 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import {
+  hostClashesQuerySchema,
+  hostClashesSchema,
   meetingAvailabilitySchema,
   meetingCancelBodySchema,
   meetingCandidatesQuerySchema,
@@ -43,6 +45,19 @@ const listCandidates = createRoute({
   request: { query: meetingCandidatesQuerySchema },
   responses: {
     200: json(meetingCandidatesSchema, "The slot and who is free in it"),
+    ...problemDefault,
+  },
+});
+
+const listHostClashes = createRoute({
+  method: "get",
+  path: "/host-clashes",
+  tags: ["meetings"],
+  description:
+    "Where the named guests are already hosting or busy in an interval, for a session about to be booked. Only the hosting is named; other commitments are busy.",
+  request: { query: hostClashesQuerySchema },
+  responses: {
+    200: json(hostClashesSchema, "The overlapping commitments, if any"),
     ...problemDefault,
   },
 });
@@ -135,6 +150,17 @@ export function addMeetingRoutes(app: App, meetings: () => MeetingUseCases) {
     );
     if (!result.ok) return problem(result.error);
     return c.json(result.value, 200);
+  });
+
+  app.openapi(listHostClashes, async (c) => {
+    const { start, end, ...query } = c.req.valid("query");
+    const result = await meetings().listHostClashes(c.var.actor, {
+      ...query,
+      start: new Date(start),
+      end: new Date(end),
+    });
+    if (!result.ok) return problem(result.error);
+    return c.json({ clashes: result.value }, 200);
   });
 
   app.openapi(listMeetingOptions, async (c) => {

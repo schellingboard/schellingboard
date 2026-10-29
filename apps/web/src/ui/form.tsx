@@ -158,7 +158,7 @@ export function SelectField({
 }: FieldProps & {
   value: string;
   onChange: (value: string) => void;
-  options: { value: string; label: string }[];
+  options: { value: string; label: string; disabled?: boolean }[];
 }) {
   const ids = useField(frame);
   return (
@@ -171,7 +171,7 @@ export function SelectField({
         onChange={(e) => onChange(e.target.value)}
       >
         {options.map((o) => (
-          <option key={o.value} value={o.value}>
+          <option key={o.value} value={o.value} disabled={o.disabled}>
             {o.label}
           </option>
         ))}

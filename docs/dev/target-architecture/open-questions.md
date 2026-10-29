@@ -11,9 +11,8 @@ settled answers folded into the chapters they affect.
 2. **Comment likes.** The SPA has neither the "Liked by" hover preview nor the avatars the legacy
    comments show. Recommendation: add both when comments are next touched; the data is in the
    snapshot already.
-3. **A toast in the SPA.** Saving or deleting a session still lands on `/legacy/{slug}`: a hard
-   navigation drops the confirmation toast, which is client state. Recommendation: give the SPA its
-   own toast, then move the session forms.
+3. **A toast in the SPA.** Answered: the `NoticeProvider` sits above the router, so a session form's
+   confirmation (`autoDismissMs`) survives the navigation back to the schedule.
 4. **`server/` reaching `app/`.** `utils/guest-clashes.ts` imports `@/app/(site)/session_utils`,
    which `server-does-not-reach-into-app` does not catch. Recommendation: move the two helpers to
    `packages/domain`.

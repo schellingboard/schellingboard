@@ -16,7 +16,12 @@ import { getRepositories } from "@/db/container";
 import { createAdminAuthCookie } from "@/utils/auth";
 import { isoDay } from "../helpers/dates";
 import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createDay, createEvent, createGuest } from "../helpers/factories";
+import {
+  createDay,
+  createEvent,
+  createGuest,
+  createSession,
+} from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
@@ -239,6 +244,56 @@ describe("/api/v1 meetings", () => {
         slotCount: 1,
         candidates: [{ id: grace.id, name: "Grace", busy: false }],
       });
+    }
+  );
+
+  it(
+    "reports where hosts are busy for a session being booked",
+    { tags: ["008-US1"] },
+    async () => {
+      const { event, ada, grace } = await scenario();
+      await createSession(event.id, {
+        title: "Their talk",
+        hostIds: [grace.id],
+        startTime: new Date(SLOT),
+        endTime: new Date(`${DAY}T11:00:00.000Z`),
+      });
+      const clashes = (query: string, cookie?: string) =>
+        call("GET", `/host-clashes?eventId=${event.id}&${query}`, { cookie });
+      const interval = `start=${SLOT}&end=${DAY}T10:30:00.000Z`;
+
+      const anonymous = await clashes(`guestIds=${grace.id}&${interval}`);
+      expect(anonymous.status).toBe(403);
+
+      const found = await clashes(
+        `guestIds=${grace.id},${ada.id}&${interval}`,
+        asGuest(ada.id)
+      );
+      expect(found.status).toBe(200);
+      expect(await found.json()).toEqual({
+        clashes: [
+          {
+            guestId: grace.id,
+            guestName: "Grace",
+            kind: "hosting",
+            title: "Their talk",
+            start: SLOT,
+            end: `${DAY}T11:00:00.000Z`,
+          },
+        ],
+      });
+
+      const tooMany = await clashes(
+        `guestIds=${Array.from({ length: 21 }, (_, i) => `g${i}`).join(",")}&${interval}`,
+        asGuest(ada.id)
+      );
+      expect(tooMany.status).toBe(400);
+
+      const free = await clashes(
+        `guestIds=${grace.id}&start=${DAY}T12:00:00.000Z&end=${DAY}T13:00:00.000Z`,
+        asGuest(ada.id)
+      );
+      expect(await free.json()).toEqual({ clashes: [] });
     }
   );
 

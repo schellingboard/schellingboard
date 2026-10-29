@@ -4032,6 +4032,103 @@
         "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
       }
     },
+    "/api/v1/host-clashes": {
+      "get": {
+        "tags": ["meetings"],
+        "description": "Where the named guests are already hosting or busy in an interval, for a session about to be booked. Only the hosting is named; other commitments are busy.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "eventId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Comma-separated, at most 20"
+            },
+            "required": true,
+            "description": "Comma-separated, at most 20",
+            "name": "guestIds",
+            "in": "query"
+          },
+          {
+            "schema": { "type": "string", "format": "date-time" },
+            "required": true,
+            "name": "start",
+            "in": "query"
+          },
+          {
+            "schema": { "type": "string", "format": "date-time" },
+            "required": true,
+            "name": "end",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The session being edited, which cannot clash with itself"
+            },
+            "required": false,
+            "description": "The session being edited, which cannot clash with itself",
+            "name": "excludeSessionId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The overlapping commitments, if any",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "clashes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "guestId": { "type": "string" },
+                          "guestName": { "type": "string" },
+                          "kind": {
+                            "type": "string",
+                            "enum": ["hosting", "attending", "meeting", "busy"]
+                          },
+                          "title": { "type": ["string", "null"] },
+                          "start": { "type": "string", "format": "date-time" },
+                          "end": { "type": "string", "format": "date-time" }
+                        },
+                        "required": [
+                          "guestId",
+                          "guestName",
+                          "kind",
+                          "title",
+                          "start",
+                          "end"
+                        ]
+                      }
+                    }
+                  },
+                  "required": ["clashes"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+      }
+    },
     "/api/v1/guests/{id}/meeting-options": {
       "get": {
         "tags": ["meetings"],

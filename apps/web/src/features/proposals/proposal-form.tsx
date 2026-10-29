@@ -22,6 +22,7 @@ import type {
   ProposalUpdateBody,
 } from "../../commands/proposal-form";
 import { useFormMutation } from "../../commands/use-form-mutation";
+import { BackLink } from "../../ui/back-link";
 import { Button } from "../../ui/button";
 import { ConfirmDialog } from "../../ui/confirm-dialog";
 import {
@@ -42,9 +43,6 @@ const FIELD_NAMES = [
   "cohostWanted",
   "cohostWantedNote",
 ];
-
-const BACK =
-  "inline-block py-1 -my-1 text-sm text-fg-subtle hover:text-fg-muted";
 
 export type ProposalFormProps = {
   snapshot: Snapshot;
@@ -81,9 +79,7 @@ export function ProposalForm(props: ProposalFormProps) {
   if (refusal)
     return (
       <div className="mx-auto max-w-2xl px-4">
-        <a href={links.proposals} className={BACK}>
-          ← Proposals
-        </a>
+        <BackLink href={links.proposals}>Proposals</BackLink>
         <div className="mt-6">{refusal}</div>
       </div>
     );
@@ -197,9 +193,7 @@ function Fields({
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-4 px-4 pb-24">
-      <a href={links.proposals} className={BACK}>
-        ← Proposals
-      </a>
+      <BackLink href={links.proposals}>Proposals</BackLink>
       <div>
         <h2 className="text-2xl font-bold">
           {proposal ? "Edit" : "Add"} Session Proposal

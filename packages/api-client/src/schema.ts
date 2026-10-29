@@ -2039,6 +2039,71 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/host-clashes": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Where the named guests are already hosting or busy in an interval, for a session about to be booked. Only the hosting is named; other commitments are busy. */
+    get: {
+      parameters: {
+        query: {
+          eventId: string;
+          /** @description Comma-separated, at most 20 */
+          guestIds: string;
+          start: string;
+          end: string;
+          /** @description The session being edited, which cannot clash with itself */
+          excludeSessionId?: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The overlapping commitments, if any */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              clashes: {
+                guestId: string;
+                guestName: string;
+                /** @enum {string} */
+                kind: "hosting" | "attending" | "meeting" | "busy";
+                title: string | null;
+                /** Format: date-time */
+                start: string;
+                /** Format: date-time */
+                end: string;
+              }[];
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/guests/{id}/meeting-options": {
     parameters: {
       query?: never;

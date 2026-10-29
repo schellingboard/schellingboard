@@ -1,6 +1,8 @@
 import {
   createContext,
   useCallback,
+  useEffect,
+  useRef,
   useContext,
   useState,
   type ReactNode,
@@ -10,6 +12,8 @@ export type Notice = {
   tone: "failure" | "info";
   message: string;
   action?: { label: string; run: () => void };
+  /** For routine news; a failure should stay until dismissed. */
+  autoDismissMs?: number;
 };
 
 type Shown = Notice & { id: number };
@@ -22,11 +26,29 @@ export const useNotify = () => useContext(NoticeContext);
 
 export function NoticeProvider({ children }: { children: ReactNode }) {
   const [shown, setShown] = useState<Shown[]>([]);
-  const notify = useCallback<Notify>((notice) => {
-    setShown((current) => [...current, { ...notice, id: nextId++ }]);
+  const dismiss = useCallback(
+    (id: number) => setShown((current) => current.filter((n) => n.id !== id)),
+    []
+  );
+  const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
+  useEffect(() => {
+    const pending = timers.current;
+    return () => pending.forEach(clearTimeout);
   }, []);
-  const dismiss = (id: number) =>
-    setShown((current) => current.filter((n) => n.id !== id));
+  const notify = useCallback<Notify>(
+    (notice) => {
+      const id = nextId++;
+      setShown((current) => [...current, { ...notice, id }]);
+      if (notice.autoDismissMs) {
+        const timer = setTimeout(() => {
+          timers.current.delete(timer);
+          dismiss(id);
+        }, notice.autoDismissMs);
+        timers.current.add(timer);
+      }
+    },
+    [dismiss]
+  );
 
   return (
     <NoticeContext.Provider value={notify}>

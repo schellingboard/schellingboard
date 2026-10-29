@@ -195,3 +195,35 @@ export const meetingPointSchema = z.object({
   sortIndex: z.number().int(),
   version: z.number().int(),
 });
+
+const HOST_CLASH_MAX_GUESTS = 20;
+
+export const hostClashesQuerySchema = z.object({
+  eventId: z.string().min(1),
+  guestIds: z
+    .string()
+    .min(1)
+    .transform((ids) => ids.split(",").filter(Boolean))
+    .pipe(z.array(z.string()).max(HOST_CLASH_MAX_GUESTS))
+    .describe("Comma-separated, at most 20"),
+  start: instant,
+  end: instant,
+  excludeSessionId: z
+    .string()
+    .min(1)
+    .optional()
+    .describe("The session being edited, which cannot clash with itself"),
+});
+
+export const hostClashesSchema = z.object({
+  clashes: z.array(
+    z.object({
+      guestId: z.string(),
+      guestName: z.string(),
+      kind: z.enum(["hosting", "attending", "meeting", "busy"]),
+      title: z.string().nullable(),
+      start: instant,
+      end: instant,
+    })
+  ),
+});

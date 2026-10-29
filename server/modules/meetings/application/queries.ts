@@ -1,6 +1,11 @@
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import { ok, type Result } from "@/server/kernel/result";
+import {
+  clashesForInterval,
+  loadGuestSchedules,
+  type GuestClash,
+} from "@/utils/guest-clashes";
 import { meetingOptionsFor, type MeetingOption } from "@/utils/meeting-options";
 import { myMeetingsFor, type MyMeetingsResponse } from "@/utils/meeting-views";
 import type { MeetingDeps } from "../ports";
@@ -39,5 +44,35 @@ export const listMeetingOptions =
         repos,
         now
       )
+    );
+  };
+
+// Site auth is shared with every attendee, so only an acting guest may ask:
+// the reply reports when another guest is privately busy.
+export const listHostClashes =
+  ({ repos }: MeetingDeps) =>
+  async (
+    actor: Actor,
+    input: {
+      eventId: string;
+      guestIds: string[];
+      start: Date;
+      end: Date;
+      excludeSessionId?: string;
+    }
+  ): Promise<Result<GuestClash[]>> => {
+    const acting = await actingGuest(actor, repos.guests);
+    if (!acting.ok) return acting;
+    const event = await repos.events.findById(input.eventId);
+    if (!event) return eventNotFound();
+    const schedules = await loadGuestSchedules(event.id, input.guestIds, repos);
+    return ok(
+      clashesForInterval(schedules, {
+        eventId: event.id,
+        start: input.start,
+        end: input.end,
+        breakMinutes: event.breakMinutes,
+        excludeSessionId: input.excludeSessionId,
+      })
     );
   };

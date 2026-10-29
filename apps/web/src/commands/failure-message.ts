@@ -1,3 +1,5 @@
+import { CAPACITY_ERROR } from "@schellingboard/domain/session-booking";
+
 const REASONS: Record<string, string> = {
   "session.full": "This session is full.",
   "rsvp.ownSession": "Hosts cannot RSVP to their own session.",
@@ -34,6 +36,21 @@ const REASONS: Record<string, string> = {
   "meeting.notParticipant": "You are not part of this 1-on-1.",
   "meeting.nothingToCancel": "There is nothing left to cancel.",
   "meeting.recipientMustDecline": "Decline it instead of canceling.",
+  "session.clash": "Another session already uses that room at that time.",
+  "session.startsInPast": "That start time has already passed.",
+  "session.outsideBookingWindow":
+    "That time is outside the hours sessions can be booked.",
+  "session.durationNotAllowed": "That length is not allowed for this event.",
+  "session.locationUnavailable": "That room is unavailable at that time.",
+  "session.locationNotBookable": "That room cannot be booked.",
+  "session.dayUnknown": "That day is no longer part of this event.",
+  "session.hostNotInEvent": "A host is not part of this event.",
+  "session.notHost": "Only a host of this session can change it.",
+  "session.started":
+    "This session has already started, so it can no longer be moved.",
+  "session.managedByOrganizer": "An organizer manages this session.",
+  "session.notFound": "This session no longer exists.",
+  "session.capacityInvalid": CAPACITY_ERROR,
   "comment.invalid": "A comment cannot be empty.",
   "comment.notAuthor": "Only the author can change a comment.",
   "comment.notFound": "This comment no longer exists.",

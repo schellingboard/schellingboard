@@ -1,5 +1,5 @@
 // @module-tag 009-US1
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -85,6 +85,27 @@ describe("notices", () => {
     await go();
 
     expect(screen.getByRole("status").textContent).toContain("Saved");
+  });
+
+  it("clears a notice by itself when it asks to", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      render(
+        <NoticeProvider>
+          <Raiser
+            notice={{ tone: "info", message: "Saved", autoDismissMs: 5000 }}
+          />
+        </NoticeProvider>
+      );
+
+      await go();
+      expect(screen.getByRole("status")).toBeTruthy();
+      await act(() => vi.advanceTimersByTimeAsync(5000));
+
+      expect(screen.queryByRole("status")).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("runs an action and closes the notice, or just dismisses it", async () => {
