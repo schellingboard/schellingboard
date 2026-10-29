@@ -340,6 +340,44 @@ describe("/api/v1 meetings", () => {
   );
 
   it(
+    "lists the availability forms of the events the caller attends",
+    { tags: ["012-US2"] },
+    async () => {
+      const { event, ada } = await scenario();
+      await call("PUT", "/meeting-availability", {
+        cookie: asGuest(ada.id),
+        body: { eventId: event.id, slotStarts: [SLOT] },
+      });
+
+      const anonymous = await call("GET", "/meeting-availability");
+      expect(anonymous.status).toBe(403);
+
+      const res = await call("GET", "/meeting-availability", {
+        cookie: asGuest(ada.id),
+      });
+      expect(res.status).toBe(200);
+      const { forms } = (await res.json()) as {
+        forms: { eventId: string; eventName: string; declared: string[] }[];
+      };
+      expect(forms).toHaveLength(1);
+      expect(forms[0]).toMatchObject({
+        eventId: event.id,
+        eventName: event.name,
+        declared: [SLOT],
+      });
+
+      await getRepositories().guests.setAuthProtection(ada.id, {
+        authProtected: true,
+        passwordHash: null,
+      });
+      const unverified = await call("GET", "/meeting-availability", {
+        cookie: asGuest(ada.id),
+      });
+      expect(unverified.status).toBe(403);
+    }
+  );
+
+  it(
     "lets an organizer set up 1-on-1s under /admin",
     { tags: ["012-US1", "019-US3"] },
     async () => {

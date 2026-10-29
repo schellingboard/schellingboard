@@ -75,9 +75,22 @@ are `ui/combobox`, role combobox/option) should not force `profile.spec` rewrite
 different prompt" button is an icon with that name. If the profile save fails after the photo saved,
 the form says so. `avatar-image` and `language-suggestions` moved to `packages/domain`.
 
+Step 17a, for step 18 (wiring):
+`SettingsScreen({state, calls: settingsCalls(api), availability: meetingAvailabilityCalls(api), links: {profile: "/guests/edit"}})`;
+`state` = `createSettingsQuery({api})` (call `load()` once; an `error` state carries the problem
+`code`, e.g. `guest.unselected`/`guest.protected`: the page shows the `actingGuestRefusalMessage`
+notice "changing your settings" and the exported `Appearance` section, as legacy did, instead of the
+screen, as `EditProfile` in `people-pages.tsx` does). The `/settings` takeover must also keep the
+legacy settings E2E "select who you are" text. `Appearance` omits the legacy `labelled` look.
+
 ## Questions
 
-0. The SPA shell has no "Show map" button (the uploaded site map); only legacy pages show it. The
+4. The legacy settings page ends with `AccountSecurity` (enable/disable protection, change password,
+   email a link): server actions in `actions/user-auth`, and ADR "no API for passwords" until path
+   step 6. 17a leaves it out. Step 18 needs a decision: keep it as a small legacy page
+   (`/legacy/account-security`) the SPA settings links to, or add the API. Not decided here.
+
+5. The SPA shell has no "Show map" button (the uploaded site map); only legacy pages show it. The
    schedule and proposals screens (both SPA-owned now) lost it when they moved.
    `settings.spec.ts:67` now checks it on `/legacy/settings`. Needs a shell item and the map URL in
    `/me` or the snapshot.

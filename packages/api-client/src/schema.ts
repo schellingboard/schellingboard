@@ -2039,6 +2039,103 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/meeting-availability": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description One form per event the acting guest attends that offers 1-on-1s: its slots and the ones they declared. */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The caller's availability forms */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              forms: {
+                eventId: string;
+                eventName: string;
+                timezone: string;
+                days: {
+                  id: string;
+                  label: string;
+                  slots: {
+                    start: string;
+                    label: string;
+                  }[];
+                }[];
+                declared: string[];
+              }[];
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    /** @description Replaces the slots the acting guest declares themselves free for 1-on-1s at an event. */
+    put: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            eventId: string;
+            slotStarts: string[];
+          };
+        };
+      };
+      responses: {
+        /** @description Saved */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/host-clashes": {
     parameters: {
       query?: never;
@@ -2355,59 +2452,6 @@ export interface paths {
         };
       };
     };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/meeting-availability": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    /** @description Replaces the slots the acting guest declares themselves free for 1-on-1s at an event. */
-    put: {
-      parameters: {
-        query?: never;
-        header?: {
-          /** @description Retries with the same key get the first response (24 h) */
-          "idempotency-key"?: string;
-        };
-        path?: never;
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": {
-            eventId: string;
-            slotStarts: string[];
-          };
-        };
-      };
-      responses: {
-        /** @description Saved */
-        204: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-        /** @description Problem details (RFC 9457); clients branch on `code` */
-        default: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/problem+json": components["schemas"]["Problem"];
-          };
-        };
-      };
-    };
-    post?: never;
     delete?: never;
     options?: never;
     head?: never;

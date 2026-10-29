@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import webpush from "web-push";
 
-import { urlBase64ToUint8Array } from "@/utils/push-key";
+import { urlBase64ToUint8Array } from "@schellingboard/domain/push-key";
 
 describe("urlBase64ToUint8Array", () => {
   // A real VAPID public key is 65 bytes, which is not a multiple of 3 — so it
@@ -25,5 +25,9 @@ describe("urlBase64ToUint8Array", () => {
     expect(Array.from(urlBase64ToUint8Array(withBothCharacters))).toEqual([
       0xfb, 0xff, 0xbf,
     ]);
+  });
+
+  it("refuses text that is not base64url", () => {
+    expect(() => urlBase64ToUint8Array("ab$d")).toThrow();
   });
 });

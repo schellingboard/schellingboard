@@ -6,6 +6,7 @@ import {
   loadGuestSchedules,
   type GuestClash,
 } from "@/utils/guest-clashes";
+import { availabilityFormsFor } from "@/utils/meeting-availability-form";
 import { meetingOptionsFor, type MeetingOption } from "@/utils/meeting-options";
 import { myMeetingsFor, type MyMeetingsResponse } from "@/utils/meeting-views";
 import type { MeetingDeps } from "../ports";
@@ -75,4 +76,12 @@ export const listHostClashes =
         excludeSessionId: input.excludeSessionId,
       })
     );
+  };
+
+export const listAvailabilityForms =
+  ({ repos }: MeetingDeps) =>
+  async (actor: Actor, now: Date) => {
+    const acting = await actingGuest(actor, repos.guests);
+    if (!acting.ok) return acting;
+    return ok(await availabilityFormsFor(acting.value, now, repos));
   };

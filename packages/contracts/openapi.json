@@ -4032,6 +4032,128 @@
         "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
       }
     },
+    "/api/v1/meeting-availability": {
+      "get": {
+        "tags": ["meetings"],
+        "description": "One form per event the acting guest attends that offers 1-on-1s: its slots and the ones they declared.",
+        "responses": {
+          "200": {
+            "description": "The caller's availability forms",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "forms": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "eventId": { "type": "string" },
+                          "eventName": { "type": "string" },
+                          "timezone": { "type": "string" },
+                          "days": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": { "type": "string" },
+                                "label": { "type": "string" },
+                                "slots": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "start": { "type": "string" },
+                                      "label": { "type": "string" }
+                                    },
+                                    "required": ["start", "label"]
+                                  }
+                                }
+                              },
+                              "required": ["id", "label", "slots"]
+                            }
+                          },
+                          "declared": {
+                            "type": "array",
+                            "items": { "type": "string" }
+                          }
+                        },
+                        "required": [
+                          "eventId",
+                          "eventName",
+                          "timezone",
+                          "days",
+                          "declared"
+                        ]
+                      }
+                    }
+                  },
+                  "required": ["forms"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+      },
+      "put": {
+        "tags": ["meetings"],
+        "description": "Replaces the slots the acting guest declares themselves free for 1-on-1s at an event.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "eventId": { "type": "string" },
+                  "slotStarts": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                },
+                "required": ["eventId", "slotStarts"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Saved" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+      }
+    },
     "/api/v1/host-clashes": {
       "get": {
         "tags": ["meetings"],
@@ -4406,56 +4528,6 @@
               }
             }
           },
-          "default": {
-            "description": "Problem details (RFC 9457); clients branch on `code`",
-            "content": {
-              "application/problem+json": {
-                "schema": { "$ref": "#/components/schemas/Problem" }
-              }
-            }
-          }
-        },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
-      }
-    },
-    "/api/v1/meeting-availability": {
-      "put": {
-        "tags": ["meetings"],
-        "description": "Replaces the slots the acting guest declares themselves free for 1-on-1s at an event.",
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 255,
-              "description": "Retries with the same key get the first response (24 h)"
-            },
-            "required": false,
-            "description": "Retries with the same key get the first response (24 h)",
-            "name": "idempotency-key",
-            "in": "header"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "eventId": { "type": "string" },
-                  "slotStarts": {
-                    "type": "array",
-                    "items": { "type": "string" }
-                  }
-                },
-                "required": ["eventId", "slotStarts"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": { "description": "Saved" },
           "default": {
             "description": "Problem details (RFC 9457); clients branch on `code`",
             "content": {

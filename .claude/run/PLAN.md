@@ -187,10 +187,10 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`, `docs/dev/target-architec
 ### Settings and notifications
 
 - [ ] 17. **Settings and notifications**, unrouted:
-  - [ ] 17a. Settings: email settings, push subscriptions on this device, one `AvailabilityForm` per
-        attended event with meetings open (`meetingsOpen`, ordered by start; data from
-        `availabilityFormFor` on the snapshot's days and `me.availability`, or a new GET), and what
-        else the legacy page has.
+  - [x] 17a. Settings (done: `features/settings/` `SettingsScreen`, `EmailSettingsForm`,
+        `PushNotifications`; `queries/settings.ts`; `commands/settings.ts`; new
+        `GET /meeting-availability` answers the per-event forms; `push-key` moved to
+        `packages/domain`). Account security (passwords) is not in it: see PROGRESS Questions 4.
   - [ ] 17b. Notifications: list, mark read, delete; the nav's unread indicator.
 - [ ] 18. **Takeover: settings and notifications**. Router owns `/settings` and `/notifications`;
       legacy pages deleted. E2E: `user-settings`, `notifications`, `pwa`. CHANGELOG if anything

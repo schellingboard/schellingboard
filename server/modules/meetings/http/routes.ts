@@ -1,5 +1,6 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import {
+  availabilityFormsSchema,
   hostClashesQuerySchema,
   hostClashesSchema,
   meetingAvailabilitySchema,
@@ -118,6 +119,18 @@ const cancelMeeting = createRoute({
   },
 });
 
+const listAvailability = createRoute({
+  method: "get",
+  path: "/meeting-availability",
+  tags: ["meetings"],
+  description:
+    "One form per event the acting guest attends that offers 1-on-1s: its slots and the ones they declared.",
+  responses: {
+    200: json(availabilityFormsSchema, "The caller's availability forms"),
+    ...problemDefault,
+  },
+});
+
 const saveAvailability = createRoute({
   method: "put",
   path: "/meeting-availability",
@@ -150,6 +163,15 @@ export function addMeetingRoutes(app: App, meetings: () => MeetingUseCases) {
     );
     if (!result.ok) return problem(result.error);
     return c.json(result.value, 200);
+  });
+
+  app.openapi(listAvailability, async (c) => {
+    const result = await meetings().listAvailabilityForms(
+      c.var.actor,
+      c.var.now
+    );
+    if (!result.ok) return problem(result.error);
+    return c.json({ forms: result.value }, 200);
   });
 
   app.openapi(listHostClashes, async (c) => {

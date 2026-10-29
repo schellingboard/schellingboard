@@ -27,6 +27,24 @@ export const meetingAvailabilitySchema = z.object({
   slotStarts: z.array(z.string()),
 });
 
+export const availabilityFormsSchema = z.object({
+  forms: z.array(
+    z.object({
+      eventId: z.string(),
+      eventName: z.string(),
+      timezone: z.string(),
+      days: z.array(
+        z.object({
+          id: z.string(),
+          label: z.string(),
+          slots: z.array(z.object({ start: z.string(), label: z.string() })),
+        })
+      ),
+      declared: z.array(z.string()),
+    })
+  ),
+});
+
 const instant = z.iso.datetime({ offset: true });
 const meetingStatus = z.enum(["pending", "accepted", "declined", "canceled"]);
 

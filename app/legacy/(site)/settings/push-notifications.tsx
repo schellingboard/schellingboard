@@ -7,7 +7,7 @@ import {
   subscribeToPushAction,
   unsubscribeFromPushAction,
 } from "@/app/actions/push";
-import { urlBase64ToUint8Array } from "@/utils/push-key";
+import { urlBase64ToUint8Array } from "@schellingboard/domain/push-key";
 
 type State =
   | "checking"
