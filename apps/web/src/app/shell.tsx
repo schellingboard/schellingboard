@@ -12,6 +12,7 @@ import { NavBar, type NavItem } from "./nav-bar";
 import { ReloadOffer } from "./reload-offer";
 import { useUpdateStatus } from "./updates";
 import { ThemeProvider } from "./theme";
+import { UnreadProvider } from "./unread-count";
 import { UserMenu, type PickableGuest } from "./user-menu";
 import { useViewer, ViewerProvider } from "./viewer";
 import { NoticeProvider } from "../ui/notices";
@@ -71,7 +72,9 @@ export function ShellProviders({
   return (
     <ThemeProvider>
       <NoticeProvider>
-        <ViewerProvider api={api}>{children}</ViewerProvider>
+        <ViewerProvider api={api}>
+          <UnreadProvider>{children}</UnreadProvider>
+        </ViewerProvider>
       </NoticeProvider>
     </ThemeProvider>
   );
