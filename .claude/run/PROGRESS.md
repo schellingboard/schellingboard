@@ -93,6 +93,16 @@ history rules: a search resets `page`, the first one pushes a history entry, ref
 Step 21 must delete `app/legacy/admin/data-table.tsx`. A page that gets 401/403 later from a
 mutation should do what the gate does (not built yet).
 
+Step 20a, for 20b/21: `AdminEventsScreen({status, events, calls: adminEventCalls(api), onCreated})`
+inside `AdminFrame`; the page owns `createAdminEventsQuery` (`load()` on mount and in `onCreated`;
+`status` = its state's). The list reads `GET /events` (public, all events) and is the legacy plain
+list: no search or paging. The delete (type the name to confirm, `DELETE /admin/events/{id}`)
+belongs to 20b. `parseSettings`/`createEvent` now refuse with `errors[]` (`name`, `timezone`,
+`maxSessionDuration`, `breakMinutes`, `slotIncrementMinutes`, `icon`; a taken URL is a 409 with
+`errors` on `name`), so `useFormMutation` puts the reason next to the field; 20b's update reuses it.
+`features/admin/timezones.ts` has the zone list. `ui/form` labels render "Name*" where legacy said
+"Name *": `admin.spec.ts` uses `getByLabel("Name *")` and needs `getByLabel("Name")` at step 21.
+
 ## Questions
 
 5. The SPA shell has no "Show map" button (the uploaded site map); only legacy pages show it. The
