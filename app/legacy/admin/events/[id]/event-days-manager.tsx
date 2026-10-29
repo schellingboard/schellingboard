@@ -15,7 +15,10 @@ import {
   DANGER_BUTTON,
 } from "@/app/legacy/admin/buttons";
 import { ActionError } from "@/app/components/action-error";
-import { utcToZonedInput, zonedInputToUtc } from "@/utils/admin-datetime";
+import {
+  utcToZonedInput,
+  zonedInputToUtc,
+} from "@schellingboard/domain/admin-datetime";
 
 // Dates are pre-serialized to ISO strings in the server component to avoid
 // any RSC Date serialization ambiguity (Day.start is Date on server, but

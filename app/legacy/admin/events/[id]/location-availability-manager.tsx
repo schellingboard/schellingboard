@@ -15,7 +15,10 @@ import {
 } from "@/app/legacy/admin/buttons";
 import { ActionError } from "@/app/components/action-error";
 import { RoomCheckboxes } from "@/app/legacy/admin/room-checkboxes";
-import { utcToZonedInput, zonedInputToUtc } from "@/utils/admin-datetime";
+import {
+  utcToZonedInput,
+  zonedInputToUtc,
+} from "@schellingboard/domain/admin-datetime";
 
 export type SerializedUnavailability = {
   id: string;

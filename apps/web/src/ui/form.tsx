@@ -91,6 +91,7 @@ export function TextField({
   placeholder,
   autoFocus,
   maxLength,
+  min,
   type = "text",
   ...frame
 }: FieldProps & {
@@ -99,6 +100,7 @@ export function TextField({
   placeholder?: string;
   autoFocus?: boolean;
   maxLength?: number;
+  min?: number;
   type?: "text" | "email" | "url" | "number";
 }) {
   const ids = useField(frame);
@@ -113,6 +115,7 @@ export function TextField({
         placeholder={placeholder}
         autoFocus={autoFocus}
         maxLength={maxLength}
+        min={min}
         onChange={(e) => onChange(e.target.value)}
       />
     </Frame>

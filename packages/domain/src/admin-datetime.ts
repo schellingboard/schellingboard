@@ -35,6 +35,15 @@ export function zonedInputToUtc(value: string, timezone: string): string {
   return dt.toUTC().toFormat(INPUT_FORMAT);
 }
 
+/** `datetime-local` value in the zone → ISO instant for the API; null when empty. */
+export function zonedInputToInstant(
+  value: string,
+  timezone: string
+): string | null {
+  const utc = zonedInputToUtc(value, timezone);
+  return utc ? (DateTime.fromISO(utc, { zone: "utc" }).toISO() ?? null) : null;
+}
+
 export type DayRange = { start: string; end: string };
 
 /**

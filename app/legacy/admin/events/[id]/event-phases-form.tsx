@@ -9,7 +9,10 @@ import {
 } from "@/app/actions/admin-events";
 import { PRIMARY_BUTTON } from "@/app/legacy/admin/buttons";
 import { ActionError } from "@/app/components/action-error";
-import { utcToZonedInput, zonedInputToUtc } from "@/utils/admin-datetime";
+import {
+  utcToZonedInput,
+  zonedInputToUtc,
+} from "@schellingboard/domain/admin-datetime";
 import { useEventSection } from "./use-event-section";
 
 type PhasesForm = Omit<EventPhasesInput, "id" | "expectedVersion">;
