@@ -6,6 +6,7 @@ export type AdminGuest = {
   name: string;
   email: string;
   eventIds: string[];
+  version: number;
 };
 
 export type AdminGuestsState = PagedState<"guests", AdminGuest>;
@@ -23,6 +24,7 @@ export function createAdminGuestsQuery({ api }: { api: ApiClient }) {
       name: g.name,
       email: g.email,
       eventIds: g.eventIds,
+      version: g.version,
     }),
   });
 }

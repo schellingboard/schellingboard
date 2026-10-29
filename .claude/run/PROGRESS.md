@@ -184,6 +184,15 @@ stays open, says why, and the next Save updates it); legacy refused it all. The 
 none). `location-image-constraints` moved to `packages/domain`. Step 21 deletes
 `app/legacy/admin/locations-manager.tsx`; `room-checkboxes.tsx` stays until the sessions page goes.
 
+Step 20e-2, for 21: `/admin/users` and `/admin/users/import`.
+`AdminGuestsScreen({status, guests, events, params, onParams, calls: adminGuestCalls(api), onChanged})`
+(h1, "Import CSV" link, add form, list; the page owns `createAdminGuestsQuery`, now with `version`,
+and the events as `{id,name}[]`; search and 25-row paging in memory) and
+`UserImportScreen({events, calls})` (own h1 and back link). Differences: the test-email failure
+shows "This might not have been saved…" (a 5xx is always "unreachable" in `awaitMutation`; legacy
+showed the mail error); e2e `getByLabel("Name")` on the add form is fine, the CSV field is
+`getByLabel("CSV file")`. Step 21 deletes `guests-manager.tsx`, `users/**`.
+
 Step 21 must delete the legacy `use-event-section.ts` (untested now; the SPA copy has the test).
 
 ## Questions

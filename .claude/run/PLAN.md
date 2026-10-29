@@ -215,7 +215,8 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`, `docs/dev/target-architec
   - [ ] 20e. Split by page group:
     - [x] 20e-1. Done: `features/admin/locations-screen.tsx`, `commands/admin-locations.ts`,
           `sessionCount` in `GET /admin/locations`.
-    - [ ] 20e-2. Guests list and import.
+    - [x] 20e-2. Done: `features/admin/guests-screen.tsx`, `guest-import.tsx`,
+          `commands/admin-guests.ts`.
     - [ ] 20e-3. Site settings and test email.
 - [ ] 21. **Takeover: admin**. Router owns `/admin/**` except the login; `proxy.ts` keeps the admin
       gate on `/legacy/admin/login` and on the API; legacy admin pages are deleted, the login stays.

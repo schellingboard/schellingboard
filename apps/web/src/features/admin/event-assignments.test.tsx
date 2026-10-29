@@ -27,6 +27,7 @@ const guest = (
   name,
   email: `${id}@x.org`,
   eventIds,
+  version: 1,
 });
 
 const setupGuests = (

@@ -7,7 +7,13 @@ export type FieldErrors = Record<string, string>;
 
 export type MutationResult<R> =
   | { ok: true; data: R | undefined }
-  | { ok: false; kind: "fields"; fields: FieldErrors; message: string }
+  | {
+      ok: false;
+      kind: "fields";
+      fields: FieldErrors;
+      message: string;
+      problem: unknown;
+    }
   | { ok: false; kind: "conflict"; message: string }
   | { ok: false; kind: "refused"; code: string; message: string }
   | { ok: false; kind: "unreachable"; message: string };
@@ -33,8 +39,18 @@ export async function awaitMutation<R>(
   }
   const { response, data, error } = result;
   if (response.ok) return { ok: true, data };
-  if (response.status >= 500)
+  const detail = (error as { detail?: unknown } | undefined)?.detail;
+  if (response.status >= 500) {
+    const code = problemCode(error, response.status);
+    if (
+      explainRefusals &&
+      !code.startsWith("http.") &&
+      typeof detail === "string" &&
+      detail
+    )
+      return { ok: false, kind: "refused", code, message: detail };
     return { ok: false, kind: "unreachable", message: UNREACHABLE };
+  }
   if (isVersionConflict(problemCode(error, response.status)))
     return {
       ok: false,
@@ -49,9 +65,9 @@ export async function awaitMutation<R>(
       kind: "fields",
       fields: Object.fromEntries(problems.map((p) => [p.path, p.message])),
       message: FIX_FIELDS_MESSAGE,
+      problem: error,
     };
   const code = problemCode(error, response.status);
-  const detail = (error as { detail?: unknown } | undefined)?.detail;
   return {
     ok: false,
     kind: "refused",
