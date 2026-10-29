@@ -229,6 +229,22 @@ describe("proxy: /api/v1", () => {
   });
 
   it.each([
+    ["a foreign Origin", { origin: "https://evil.example" }],
+    ["Sec-Fetch-Site: cross-site", { "sec-fetch-site": "cross-site" }],
+  ])("refuses a sign-in request with %s", async (_, headers) => {
+    const result = await throughProxy(
+      "/api/v1/auth/login",
+      { method: "POST", headers },
+      [await createAuthCookie()]
+    );
+    if (result.ok) throw new Error("expected proxy to reject the request");
+    expect(result.response.status).toBe(403);
+    expect(await result.response.json()).toMatchObject({
+      code: "request.crossSite",
+    });
+  });
+
+  it.each([
     [
       "only the site cookie",
       createAuthCookie,

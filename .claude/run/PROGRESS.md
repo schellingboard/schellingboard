@@ -30,10 +30,24 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
   age in real time (`utils/real-clock.ts`). `eventId` and `device` exist; `device` is the user agent
   from `PUT /me/identity` only. Tests make rows with `sessionGuestValue`.
 
+- Sign-in API (step 4): `matchToken`/`recentlyIssued` live in `people/application/auth-tokens.ts`
+  (exported by the module for `setPasswordWithTokenAction` until step 5). `PeopleDeps.loginMail`
+  sends the code. Expired, spent and wrong credentials all answer `auth.credentialWrong` (the repo
+  has no lookup of dead codes; the old action did the same). `/auth/*` is exempt from idempotency
+  keys; `/auth/login*` has a per-address limit (30 burst, `SB_AUTH_RATE_BURST`, set high in
+  `.env.test`), skipped when `SB_TRUSTED_PROXIES` is unset. The proxy refuses cross-site
+  `/api/v1/auth/*`. First protection keeps other browsers' claimed rows (they are told "protected");
+  a password reset or change revokes all.
+
 ## Known E2E flakes
 
 `settings.spec.ts:67`, `profile-comments.spec.ts:95`, `schedule-layout.spec:252`,
 `user-auth.spec.ts:392`, `rsvp.spec.ts:111`, `admin.spec.ts:442` (under load; rerun alone).
+`meetings-request.spec.ts:296` fails most solo runs, at varying lines (notification list shows
+"Nothing yet" after `actAs`, or a button click times out). Not a clear test race: a `page.reload()`
+after the wait made it pass, so the notifications view is stale after switching name, which may be
+an app bug (query loaded before the new identity). The "mid-click navigation to /admin/users" in the
+log is afterEach cleanup after the timeout, not the cause. Unresolved.
 
 ## Left alone (step 14 removes them)
 

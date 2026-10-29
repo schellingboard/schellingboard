@@ -25,6 +25,7 @@ import {
 import { addNotificationRoutes } from "@/server/modules/notifications/module";
 import {
   addAdminGuestRoutes,
+  addAuthRoutes,
   addPeopleRoutes,
 } from "@/server/modules/people/module";
 import {
@@ -48,13 +49,15 @@ import { createApp } from "./create-app";
 import { addApiDocsRoutes } from "./docs";
 import { addHealthRoute } from "./health";
 import { idempotencyMiddleware } from "./idempotency";
-import { rateLimitMiddleware } from "./rate-limit";
+import { authRateLimitMiddleware, rateLimitMiddleware } from "./rate-limit";
 
 export const API_BASE_PATH = "/api/v1";
 
 export const api = createApp(API_BASE_PATH);
 api.use("*", actorMiddleware);
 api.use("*", rateLimitMiddleware([`${API_BASE_PATH}/health`]));
+api.use("/auth/login", authRateLimitMiddleware);
+api.use("/auth/login-code", authRateLimitMiddleware);
 api.use(
   "*",
   idempotencyMiddleware({ store: () => getRepositories().idempotency })
@@ -70,6 +73,7 @@ addMeetingRoutes(api, meetingUseCases);
 addAdminMeetingRoutes(api, meetingUseCases);
 addAttendeeCountRoutes(api, sessionUseCases);
 addPeopleRoutes(api, peopleUseCases);
+addAuthRoutes(api, peopleUseCases);
 addNotificationRoutes(api, notificationUseCases);
 addEventReadRoutes(api, eventUseCases);
 addFeedRoutes(api, { uow: unitOfWork });

@@ -13,12 +13,29 @@ export interface AvatarStore {
   deleteByUrl(url: string): Promise<void>;
 }
 
+export interface LoginMail {
+  configured(): boolean;
+  send(input: {
+    guestId: string;
+    name: string;
+    email: string;
+    code: string;
+    validMinutes: number;
+  }): Promise<void>;
+}
+
 export interface PeopleDeps {
   uow: UnitOfWork;
   repos: Pick<
     Repositories,
-    "events" | "guests" | "loginSessions" | "sessions" | "sessionProposals"
+    | "authCodes"
+    | "events"
+    | "guests"
+    | "loginSessions"
+    | "sessions"
+    | "sessionProposals"
   >;
   avatars: AvatarStore;
+  loginMail: LoginMail;
   sendTestEmail: (to: { name: string; email: string }) => Promise<void>;
 }

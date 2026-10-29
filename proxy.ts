@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { problemResponse, type Problem } from "./server/http/problem";
 import {
   adminApiRefusal,
+  isTrustedOrigin,
   ADMIN_DISABLED_MESSAGE,
   ADMIN_VERIFIED_HEADER,
   forwardAsVerifiedAdmin,
@@ -120,6 +121,9 @@ export async function proxy(request: NextRequest) {
   }
   // An admin script then needs one cookie for the whole API, not two.
   if (pathname === "/api/v1" || pathname.startsWith("/api/v1/")) {
+    if (pathname.startsWith("/api/v1/auth/") && !isTrustedOrigin(request)) {
+      return refuseApiV1({ status: 403, code: "request.crossSite" });
+    }
     if (
       isPasswordProtectionEnabled() &&
       !(await isAuthenticated(request)) &&

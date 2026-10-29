@@ -4,10 +4,12 @@ import {
   runIdempotentAction,
 } from "@/server/kernel/idempotency";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
+import { authCodeEmail } from "@/emails/auth-code";
 import { testEmail } from "@/emails/test-email";
 import { dispatchDueReminders } from "@/utils/reminder-dispatch";
 import { getImageRepositories } from "@/utils/images";
-import { sendMail } from "@/utils/mailer";
+import { isMailerConfigured, sendMail } from "@/utils/mailer";
+import { siteUrl } from "@/utils/site-url";
 import { generateVapidKeys } from "@/utils/push";
 import { mapImages } from "@/utils/map-image";
 import {
@@ -108,6 +110,21 @@ export function peopleUseCases(): PeopleUseCases {
   return createPeopleUseCases({
     repos: getRepositories(),
     avatars: getImageRepositories().avatars,
+    loginMail: {
+      configured: () => isMailerConfigured(),
+      send: ({ guestId, name, email, code, validMinutes }) =>
+        sendMail({
+          to: email,
+          ...authCodeEmail({
+            name,
+            code,
+            loginUrl: `${siteUrl()}/auth/login?guest=${encodeURIComponent(
+              guestId
+            )}&code=${encodeURIComponent(code)}`,
+            validMinutes,
+          }),
+        }),
+    },
     sendTestEmail: ({ name, email }) =>
       sendMail({ to: email, ...testEmail({ name }) }),
     uow: unitOfWork,

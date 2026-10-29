@@ -7,6 +7,8 @@ export {
   type PeopleUseCases,
 } from "./application/use-cases";
 export { addPeopleRoutes } from "./http/routes";
+export { addAuthRoutes } from "./http/auth-routes";
+export { matchToken, recentlyIssued } from "./application/auth-tokens";
 export { addAdminGuestRoutes } from "./http/admin-routes";
 export { eventGuests } from "./application/snapshot";
 export { toEventGuestView } from "./http/view";
