@@ -3,8 +3,8 @@ import { test, expect } from "./helpers/fixtures";
 import { switchToView } from "./helpers/schedule";
 import { uniqueSuffix } from "./helpers/unique";
 import { login } from "./helpers/auth";
-import { selectUser, tapUntilOpen } from "./helpers/user";
-import { dayRadios, listboxButton } from "./helpers/session-form";
+import { selectUser } from "./helpers/user";
+import { dayRadios, selectOption } from "./helpers/session-form";
 import { dismissToast, toast } from "./helpers/toast";
 
 // Alice works in `page`; a second context is another attendee's screen or the
@@ -24,18 +24,10 @@ async function addSession(page: Page, title: string, startTime: string) {
   await expect(
     page.getByRole("heading", { name: /Add a session/i })
   ).toBeVisible();
-  // Add is a full page load, and typing before the form hydrates is lost. A
-  // listbox only opens once it has, so open and close one first.
-  const listbox = page.getByRole("listbox");
-  await tapUntilOpen(listboxButton(page, /^Start Time/), listbox);
-  await page.keyboard.press("Escape");
-  await expect(listbox).toBeHidden();
   await page.getByRole("textbox").first().fill(title);
   await dayRadios(page).last().check();
-  await listboxButton(page, /^Location/).click();
-  await page.getByRole("option", { name: /Workshop Room/ }).click();
-  await listboxButton(page, /^Start Time/).click();
-  await page.getByRole("option", { name: startTime }).click();
+  await selectOption(page, /^Location/, /Workshop Room/);
+  await selectOption(page, /^Start Time/, startTime);
   const submit = page.getByRole("button", { name: "Submit" });
   await expect(submit).toBeEnabled();
   await submit.click();
@@ -89,8 +81,7 @@ test("another attendee's screen follows a session being created, moved and delet
     ).toBeVisible();
 
     await openEditForm(page, title);
-    await listboxButton(page, /^Start Time/).click();
-    await page.getByRole("option", { name: "19:40" }).click();
+    await selectOption(page, /^Start Time/, "19:40");
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(toast(page)).toContainText(
       /Your session .* has been updated successfully/i

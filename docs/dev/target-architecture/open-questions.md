@@ -20,11 +20,10 @@ settled answers folded into the chapters they affect.
    Recommendation: reword to "no longer has a location (was Room A)".
 6. **User menu** roles copy the legacy markup without arrow-key support. Recommendation: use the
    ARIA menu pattern with arrow keys when the menu is next changed.
-7. **Flaky E2E.** `scheduling.spec` edit, delete and cancel flows flake about one run in four at 8
-   workers (the retry sees the first attempt's leftover session); `settings.spec:67` can abort its
-   first `goto`; `attendee-count.spec` after an SPA to legacy hop stays red unless the spec starts
-   on `/legacy/...`. Recommendation: move the scheduling forms into the SPA, which removes the hop,
-   and keep each attempt's trace (`--trace=retain-on-failure`) to find the rest.
+7. **Flaky E2E.** `settings.spec:67` can abort its first `goto`, and `attendee-count.spec` after an
+   SPA to legacy hop stays red unless the spec starts on `/legacy/...`. The `scheduling.spec` flakes
+   did not recur once the forms moved into the SPA. Recommendation: keep each attempt's trace
+   (`--trace=retain-on-failure`) to find the rest.
 8. **Picking a name without being a member.** The SPA picker offers only the snapshot's guests
    (members and hosts), because `GET /guests` is closed to anonymous visitors, so a non-member
    cannot pick their name. Recommendation: a public guest-name list for the picker that exposes

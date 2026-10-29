@@ -1,26 +1,10 @@
-import { Page } from "@playwright/test";
 import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
 import { selectUser } from "./helpers/user";
 import { toast } from "./helpers/toast";
+import { dayRadios, selectOption } from "./helpers/session-form";
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admintest";
-
-// The add-session form's labels are not wired to their inputs, so locate each
-// listbox through its labelled section (same approach as scheduling.spec.ts).
-function listboxButton(page: Page, section: RegExp) {
-  return page
-    .locator("div")
-    .filter({ hasText: section })
-    .first()
-    .getByRole("button")
-    .first();
-}
-
-const dayRadios = (page: Page) =>
-  page.getByRole("radio", {
-    name: /Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday/,
-  });
 
 test("RSVP to a session persists across reloads and can be removed again @009-US1", async ({
   page,
@@ -166,10 +150,8 @@ test("a full session blocks further RSVPs when the event enforces capacity @009-
   // slot would, since update-session.spec.ts RSVPs Bob to a 15:00 slot in a
   // parallel worker.
   await dayRadios(page).last().check();
-  await listboxButton(page, /^Location/).click();
-  await page.getByRole("option", { name: /Workshop Room/ }).click();
-  await listboxButton(page, /^Start Time/).click();
-  await page.getByRole("option", { name: "20:10" }).click();
+  await selectOption(page, /^Location/, /Workshop Room/);
+  await selectOption(page, /^Start Time/, "20:10");
   await page.getByRole("button", { name: "Submit" }).click();
   // Let the post-submit navigation to the overview land fully before leaving
   // for /admin: aborting its in-flight RSC fetch logs a console error, which

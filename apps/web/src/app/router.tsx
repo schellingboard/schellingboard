@@ -17,6 +17,7 @@ import {
 } from "./proposals-pages";
 import { EventLayout } from "./event-page";
 import { SchedulePage } from "./schedule-page";
+import { SessionFormPage } from "./sessions-pages";
 import { SpaLinks } from "./spa-links";
 import { defaultServices, type AppServices } from "./services";
 
@@ -90,6 +91,16 @@ export function createAppRouter(
       return <ProposalFormPage proposalId={proposalId} />;
     },
   });
+  const addSession = createRoute({
+    getParentRoute: () => event,
+    path: "add-session",
+    component: SessionFormPage,
+  });
+  const editSession = createRoute({
+    getParentRoute: () => event,
+    path: "edit-session",
+    component: SessionFormPage,
+  });
   // One component for the directory, a profile over it and the edit page, so
   // moving between them keeps the list mounted.
   const guests = createRoute({
@@ -118,6 +129,8 @@ export function createAppRouter(
         quickVoting,
         newProposal,
         editProposal,
+        addSession,
+        editSession,
       ]),
       catchAll,
     ]),

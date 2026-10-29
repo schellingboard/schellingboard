@@ -7,7 +7,7 @@ import { snapshot as base, iso } from "../../replica/snapshot-fixture";
 import { createObservable } from "../../queries/store";
 import type { AttendeesState } from "../../queries/attendees";
 import { fakeComments } from "../comments/comments-test-support";
-import { legacyScheduleLinks } from "./links";
+import { scheduleLinks } from "./links";
 import { NoticeProvider } from "../../ui/notices";
 import { ScheduleScreen, type ScheduleActions } from "./schedule-screen";
 import { noMeetingActions } from "./test-support";
@@ -88,7 +88,7 @@ function open(
         clashes={new Map()}
         snapshot={snapshot}
         now={new Date(at)}
-        links={legacyScheduleLinks("conf")}
+        links={scheduleLinks("conf")}
         params={new URLSearchParams(params)}
         onParamsChange={onParamsChange}
         onHashChange={() => {}}
@@ -286,7 +286,7 @@ describe("the session modal's RSVP", () => {
     const d = within(dialog());
     expect(d.queryByRole("button", { name: "RSVP" })).toBeNull();
     expect(d.getByRole("link", { name: "Edit" }).getAttribute("href")).toBe(
-      "/legacy/conf/edit-session?sessionID=s"
+      "/conf/edit-session?sessionID=s"
     );
   });
 

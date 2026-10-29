@@ -1,9 +1,9 @@
 import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
 import { swipe } from "./helpers/touch";
-import { selectUser, tapUntilOpen } from "./helpers/user";
+import { selectUser } from "./helpers/user";
 import { uniqueSuffix } from "./helpers/unique";
-import { dayRadios, listboxButton } from "./helpers/session-form";
+import { dayRadios, selectOption } from "./helpers/session-form";
 
 // The grid view is an "app frame": below the nav bar a single scroll
 // container owns the viewport, with a slim toolbar as its first row. The
@@ -312,12 +312,6 @@ test("the grid keeps its place after a session is added from it @008-US1", async
   await expect(
     page.getByRole("heading", { name: /Add a session/i })
   ).toBeVisible();
-  // Add is a full page load, and typing before the form hydrates is lost. A
-  // listbox only opens once it has, so open and close one first.
-  const listbox = page.getByRole("listbox");
-  await tapUntilOpen(listboxButton(page, /^Start Time/), listbox);
-  await page.keyboard.press("Escape");
-  await expect(listbox).toBeHidden();
   await page
     .getByRole("textbox")
     .first()
@@ -335,10 +329,8 @@ test("the grid keeps its place after a session is added from it @008-US1", async
   // earlier than rsvp.spec.ts's 20:00 one, whose "the other specs all book
   // earlier" this must not break.
   await dayRadios(page).last().check();
-  await listboxButton(page, /^Location/).click();
-  await page.getByRole("option", { name: /Workshop Room/ }).click();
-  await listboxButton(page, /^Start Time/).click();
-  await page.getByRole("option", { name: "18:10", exact: true }).click();
+  await selectOption(page, /^Location/, /Workshop Room/);
+  await selectOption(page, /^Start Time/, "18:10");
 
   await page.getByRole("button", { name: "Submit" }).click();
 

@@ -27,9 +27,9 @@ describe("the catch-all route", () => {
   afterEach(() => vi.clearAllMocks());
 
   it("sends a path the SPA does not own to /legacy, query kept", async () => {
-    await open("/conf/add-session?proposalID=p1");
+    await open("/conf/kiosk?x=p1");
     expect(hardNavigate).toHaveBeenCalledExactlyOnceWith(
-      "/legacy/conf/add-session?proposalID=p1"
+      "/legacy/conf/kiosk?x=p1"
     );
   });
 

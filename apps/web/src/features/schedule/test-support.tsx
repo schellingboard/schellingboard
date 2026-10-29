@@ -4,7 +4,7 @@ import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { iso, snapshot as base } from "../../replica/snapshot-fixture";
 import { ScheduleProvider, type ScheduleActions } from "./context";
 import { scheduleDataFrom } from "./data";
-import { legacyScheduleLinks } from "./links";
+import { scheduleLinks } from "./links";
 import { createScheduleMatch, scheduleEntries } from "./model";
 
 export { iso };
@@ -41,7 +41,7 @@ export function renderScheduled(
       <ScheduleProvider
         value={{
           data,
-          links: legacyScheduleLinks(snapshot.event.slug),
+          links: scheduleLinks(snapshot.event.slug),
           params,
           openSession: () => {},
           setHash: (hash) => {

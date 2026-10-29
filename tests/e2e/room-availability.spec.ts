@@ -2,7 +2,11 @@ import { Page } from "@playwright/test";
 import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
 import { selectUser } from "./helpers/user";
-import { dayRadios, listboxButton } from "./helpers/session-form";
+import {
+  dayRadios,
+  startTimeOption,
+  selectOption,
+} from "./helpers/session-form";
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admintest";
 
@@ -58,22 +62,12 @@ test("a room marked unavailable cannot be booked then @017-US4", async ({
 
   // The form is server-rendered: a day checked before hydration is undone
   // by the next render. The listbox opens only once hydrated.
-  await listboxButton(page, /^Location/).click();
-  await page.getByRole("option", { name: /Rooftop Terrace/ }).click();
+  await selectOption(page, /^Location/, /Rooftop Terrace/);
   await dayRadios(page).nth(1).check();
-  await listboxButton(page, /^Start Time/).click();
-  await expect(page.getByRole("option", { name: "15:10" })).toHaveAttribute(
-    "aria-disabled",
-    "true"
-  );
-  await page.keyboard.press("Escape");
+  await expect(startTimeOption(page, "15:10")).toBeDisabled();
 
   await dayRadios(page).first().check();
-  await listboxButton(page, /^Start Time/).click();
-  await expect(page.getByRole("option", { name: "15:10" })).not.toHaveAttribute(
-    "aria-disabled",
-    "true"
-  );
+  await expect(startTimeOption(page, "15:10")).not.toBeDisabled();
 
   availability = await openGammaLocations(page);
   await availability

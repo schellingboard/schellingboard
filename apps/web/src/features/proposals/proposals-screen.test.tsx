@@ -355,7 +355,7 @@ describe("the proposals list", () => {
     ).toBe("/conf/proposals/a/edit");
     expect(
       within(mine).getByRole("link", { name: "Schedule" }).getAttribute("href")
-    ).toBe("/legacy/conf/add-session?proposalID=a");
+    ).toBe("/conf/add-session?proposalID=a");
     expect(
       within(within(table).getByRole("row", { name: /Cooking/ })).queryByRole(
         "link",

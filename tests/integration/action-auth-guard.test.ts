@@ -78,21 +78,6 @@ const PRE_AUTH = new Set([
  * it runs before anything looks at them.
  */
 const SITE_GUARDED: Record<string, () => Promise<unknown>> = {
-  "legacy/(site)/[eventSlug]/clash-actions.ts:detectGuestClashes": async () => {
-    const { detectGuestClashes } =
-      await import("@/app/legacy/(site)/[eventSlug]/clash-actions");
-    return detectGuestClashes({
-      eventId: "e",
-      guestIds: ["g"],
-      start: new Date().toISOString(),
-      end: new Date().toISOString(),
-    });
-  },
-  "legacy/(site)/[eventSlug]/session-actions.ts:revalidateEvent": async () => {
-    const { revalidateEvent } =
-      await import("@/app/legacy/(site)/[eventSlug]/session-actions");
-    return revalidateEvent("some-event");
-  },
   "legacy/(site)/[eventSlug]/comment-actions.ts:createSessionComment":
     async () => {
       const { createSessionComment } =

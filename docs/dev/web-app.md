@@ -112,8 +112,9 @@ stay until the Next schedule goes, since it still renders them. `model.ts` has t
 (narrowing by room, matching, day folds). `links.ts` is the one place that decides where a session,
 a 1-on-1, add-session or booking link goes: a session and a 1-on-1 (`?viewMeeting=`,
 `?bookMeeting=`) open in the SPA's own modals over the schedule, the add and edit session links go
-to `/legacy/...`. `/{slug}/meetings` (`app/meetings-page.tsx`) is where a meeting notification
-lands: it hands the meeting to the schedule, or opens it read-only outside the scheduling phase.
+to the session form (`app/sessions-pages.tsx`, `/{slug}/add-session`, `/{slug}/edit-session`).
+`/{slug}/meetings` (`app/meetings-page.tsx`) is where a meeting notification lands: it hands the
+meeting to the schedule, or opens it read-only outside the scheduling phase.
 
 `app/schedule-page.tsx` composes it: `useScheduleSession` (`replica/session.ts`: `openReplica`,
 `connectFeed`, `autosaveReplica`, hidden-tab and back/forward-cache handling, plus a command runner)

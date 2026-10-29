@@ -18,6 +18,8 @@ export function SpaLinks({
       owns={({ pathname }) =>
         pathname === `/${slug}` ||
         pathname === `/${slug}/meetings` ||
+        pathname === `/${slug}/add-session` ||
+        pathname === `/${slug}/edit-session` ||
         pathname === `/${slug}/proposals` ||
         pathname.startsWith(`/${slug}/proposals/`)
       }

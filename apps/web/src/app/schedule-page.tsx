@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { EventPhase, getCurrentPhase } from "@schellingboard/domain/phase";
 import { eventContextFrom } from "../replica/selectors";
-import { legacyScheduleLinks } from "../features/schedule/links";
+import { scheduleLinks } from "../features/schedule/links";
 import {
   ScheduleScreen,
   type ScheduleActions,
@@ -35,7 +35,7 @@ function Loaded({ api, slug, runner, store, snapshot, now }: EventView) {
   const health = useHealth(api);
   const update = useUpdateStatus(api);
   const { params, change: changeParams, back, setHash } = useUrlSearchParams();
-  const links = useMemo(() => legacyScheduleLinks(slug), [slug]);
+  const links = useMemo(() => scheduleLinks(slug), [slug]);
   const viewer = useViewer();
   const clashes = useMeetingClashes(api, store);
   const { history } = useRouter();

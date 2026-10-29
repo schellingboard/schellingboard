@@ -3,7 +3,7 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { snapshot as base, iso } from "../../replica/snapshot-fixture";
-import { legacyScheduleLinks } from "./links";
+import { scheduleLinks } from "./links";
 import { ScheduleScreen, type ScheduleActions } from "./schedule-screen";
 import { noMeetingActions } from "./test-support";
 
@@ -69,7 +69,7 @@ function screenAt(
       clashes={new Map()}
       snapshot={snapshot}
       now={now}
-      links={legacyScheduleLinks(snapshot.event.slug)}
+      links={scheduleLinks(snapshot.event.slug)}
       params={new URLSearchParams(params)}
       onParamsChange={onParamsChange}
       onHashChange={() => {}}

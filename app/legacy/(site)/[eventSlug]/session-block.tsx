@@ -7,7 +7,6 @@ import type { Guest } from "@schellingboard/domain/guest";
 import type { DayWithSessions } from "@/app/legacy/(site)/context";
 import { Tooltip } from "./tooltip";
 import { DateTime } from "luxon";
-import Link from "next/link";
 import { AppLink } from "@/app/components/app-link";
 import { useSearchParams } from "next/navigation";
 import { useContext, useState } from "react";
@@ -98,16 +97,16 @@ export function BookableSessionCard(props: {
   const { filtering } = useScheduleMatch();
   return (
     <PositionedBlock position={position}>
-      <Link
+      <a
         aria-label="Add session"
         className={clsx(
           "rounded font-roboto h-full w-full bg-surface-muted hover:bg-surface-hover flex items-center justify-center",
           filtering && GHOST_CLASS
         )}
-        href={`/legacy/${eventSlug}/add-session?location=${location.name}&time=${timeParam}&day=${dayParam}`}
+        href={`/${eventSlug}/add-session?${new URLSearchParams({ location: location.name, time: timeParam, day: dayParam })}`}
       >
         <PlusIcon aria-hidden="true" className="h-4 w-4 text-fg-subtle" />
-      </Link>
+      </a>
     </PositionedBlock>
   );
 }

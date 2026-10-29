@@ -173,10 +173,11 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`, `docs/dev/target-architec
 - [x] 14. Session form (done: `features/sessions/` `SessionForm`, `session-model.ts`,
       `use-host-clashes.ts`; `commands/session-form.ts`; new `GET /host-clashes`; `Notice` gained
       `autoDismissMs`; `ui/back-link.tsx`).
-- [ ] 15. **Takeover: session forms**. Router owns `add-session` and `edit-session`; the legacy
-      form, `session-actions.ts` and `clash-actions.ts` are deleted. E2E: `add-session`,
-      `scheduling`, `update-session`. Record in PROGRESS.md whether the `scheduling.spec` flakes
-      (open question 7) are gone.
+- [x] 15. Takeover: session forms (done: router owns `/{slug}/add-session` and
+      `/{slug}/edit-session` through `app/sessions-pages.tsx`; `scheduleLinks`/`proposalLinks` point
+      at them; legacy form, page wrappers, `session-actions.ts`, `clash-actions.ts` and their
+      orphans deleted; `guest-clashes.test.ts` calls `GET /host-clashes`; E2E helpers use
+      `selectOption`).
 - [ ] 16. **Retire the Next schedule** (old step 16b): the Next schedule page and its components,
       `replica/`, the RSVP overlay and `comment-actions.ts` are deleted; `session-comments.test.ts`,
       `session-comment-likes.test.ts` and the idempotency and guard tests move off

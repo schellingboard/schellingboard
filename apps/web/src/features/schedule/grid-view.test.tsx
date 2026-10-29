@@ -126,7 +126,7 @@ describe("GridView", () => {
     const add = screen.getAllByRole("link", { name: "Add session" });
     const hrefs = add.map((a) => a.getAttribute("href"));
     expect(hrefs).toContain(
-      "/legacy/conf/add-session?location=Room&time=10%3A00&day=2026-06-15"
+      "/conf/add-session?location=Room&time=10%3A00&day=2026-06-15"
     );
     // The booked 09:00 slot and the room's unavailable 12:00 hour offer none.
     expect(hrefs.join()).not.toContain("time=09%3A00");

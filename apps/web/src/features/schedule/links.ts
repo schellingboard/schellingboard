@@ -12,13 +12,9 @@ export type ScheduleLinks = {
   bookMeeting: (slotStart: string) => string;
 };
 
-/**
- * Where the schedule's links go until the add-session form
- * and the pages around the session modal are SPA screens: the one place to switch.
- * The session and 1-on-1 modals are the SPA's own, over `/{slug}`.
- */
-export function legacyScheduleLinks(eventSlug: string): ScheduleLinks {
-  const schedule = `/legacy/${eventSlug}`;
+/** Every address is the SPA's own; the session and 1-on-1 modals sit over `/{slug}`. */
+export function scheduleLinks(eventSlug: string): ScheduleLinks {
+  const schedule = `/${eventSlug}`;
   return {
     schedule,
     proposals: `/${eventSlug}/proposals`,

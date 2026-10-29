@@ -1,30 +1,14 @@
-import { Page } from "@playwright/test";
 import { test, expect } from "./helpers/fixtures";
 import { uniqueSuffix } from "./helpers/unique";
 import { login } from "./helpers/auth";
-import { selectUser, tapUntilOpen } from "./helpers/user";
+import { selectUser } from "./helpers/user";
 import { dismissToast, toast } from "./helpers/toast";
+import { dayRadios, selectOption } from "./helpers/session-form";
 import {
   getMessage,
   searchBySubject,
   skipWithoutMailpit,
 } from "../helpers/mailpit";
-
-// Form idioms shared with scheduling.spec.ts: the form's labels are not wired
-// to their inputs, so locate each listbox through its labelled section.
-function listboxButton(page: Page, section: RegExp) {
-  return page
-    .locator("div")
-    .filter({ hasText: section })
-    .first()
-    .getByRole("button")
-    .first();
-}
-
-const dayRadios = (page: Page) =>
-  page.getByRole("radio", {
-    name: /Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday/,
-  });
 
 test("updating a session emails the RSVP'd guest and the added co-host @013-US4 @008-US2", async ({
   page,
@@ -58,10 +42,8 @@ test("updating a session emails the RSVP'd guest and the added co-host @013-US4 
   await page.getByRole("textbox").first().fill(title);
   // Hosts are prefilled with the selected user (Charlie).
   await dayRadios(page).last().check();
-  await listboxButton(page, /^Location/).click();
-  await page.getByRole("option", { name: /Garden Terrace/ }).click();
-  await listboxButton(page, /^Start Time/).click();
-  await page.getByRole("option", { name: "15:10" }).click();
+  await selectOption(page, /^Location/, /Garden Terrace/);
+  await selectOption(page, /^Start Time/, "15:10");
   await page.getByRole("radio", { name: "50 minutes", exact: true }).check();
   await expect(
     page.getByText("Your session runs 15:10 – 16:00.")
@@ -94,10 +76,7 @@ test("updating a session emails the RSVP'd guest and the added co-host @013-US4 
   await expect(
     page.getByRole("heading", { name: /Edit session/i })
   ).toBeVisible();
-  // Edit is a full page load: a click before the form hydrates is lost.
-  const option = page.getByRole("option", { name: "14:40" });
-  await tapUntilOpen(listboxButton(page, /^Start Time/), option);
-  await option.click();
+  await selectOption(page, /^Start Time/, "14:40");
   const hostsSection = page
     .locator("div")
     .filter({ hasText: /^Hosts/ })
@@ -184,11 +163,17 @@ test("a host can fix a session placed where they could never have booked one @00
 
   // The slot it already holds is offered, so keeping it is possible at all.
   // Labels carry the 10-minute break, so 17:30 reads as 17:40.
-  await expect(listboxButton(page, /^Start Time/)).toContainText("17:40");
+  await expect(
+    page
+      .getByLabel(/^Start Time/)
+      .getByRole("option", { name: "17:40", selected: true })
+  ).toBeAttached();
   // So are the two rooms an organizer gave it, which a host can only book one of.
-  await expect(listboxButton(page, /^Location/)).toContainText(
-    "Main Hall, Auditorium"
-  );
+  await expect(
+    page
+      .getByLabel(/^Location/)
+      .getByRole("option", { name: "Main Hall, Auditorium", selected: true })
+  ).toBeAttached();
 
   const description = `Loose ends ${uniqueSuffix()}`;
   await page.getByRole("textbox").nth(1).fill(description);
@@ -205,8 +190,7 @@ test("a host can fix a session placed where they could never have booked one @00
 
   // Settling on one of the rooms is the host's to do as well.
   await dialog.getByRole("link", { name: "Edit" }).click();
-  await listboxButton(page, /^Location/).click();
-  await page.getByRole("option", { name: /^Main Hall\b(?!,)/ }).click();
+  await selectOption(page, /^Location/, /^Main Hall\b(?!,)/);
   await page.getByRole("button", { name: "Submit" }).click();
   await page.waitForURL(/\/Conference-Gamma$/);
   await dismissToast(page);

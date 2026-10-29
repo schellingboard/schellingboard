@@ -58,10 +58,12 @@ test("settings offers notifications on this device @013-US3", async ({
 
 test("an old root link reaches its page @014-US4", async ({ page }) => {
   await login(page);
-  await page.evaluate(() =>
-    window.location.assign("/Conference-Alpha/add-session")
-  );
+  await page.evaluate(() => window.location.assign("/settings"));
 
-  await expect(page).toHaveURL(/\/legacy\/Conference-Alpha\/add-session$/);
-  await expect(page.getByRole("link", { name: /← Schedule/ })).toBeVisible();
+  await expect(page).toHaveURL(/\/legacy\/settings$/);
+  await expect(
+    page.getByText(
+      /You need to select who you are before changing your settings/
+    )
+  ).toBeVisible();
 });

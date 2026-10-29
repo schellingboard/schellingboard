@@ -8,44 +8,58 @@ import {
   vi,
 } from "vitest";
 
-const cookieJar = new Map<string, string>();
-
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
+import { NextRequest } from "next/server";
+import { GET } from "@/app/api/v1/[[...route]]/route";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { detectGuestClashes } from "@/app/legacy/(site)/[eventSlug]/clash-actions";
-import { AUTH_COOKIE_NAME, createAuthCookie } from "@/utils/auth";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
+let caller = "";
+
+type GuestClash = {
+  kind: "hosting" | "busy";
+  title: string | null;
+  start: string;
+  end: string;
+};
 
 // A host's own hosted sessions are public, so a clash may name them; the
 // sessions a host merely RSVP'd to are private, so a clash must only report
 // that they are "busy" at that time — never which session.
-describe("detectGuestClashes", () => {
+async function detectGuestClashes(input: {
+  eventId: string;
+  guestIds: string[];
+  start: string;
+  end: string;
+  excludeSessionId?: string;
+}) {
+  const query = new URLSearchParams({
+    eventId: input.eventId,
+    guestIds: input.guestIds.join(","),
+    start: input.start,
+    end: input.end,
+  });
+  if (input.excludeSessionId)
+    query.set("excludeSessionId", input.excludeSessionId);
+  const res = await GET(
+    new NextRequest(`http://test/api/v1/host-clashes?${query}`, {
+      headers: { cookie: `${GUEST_COOKIE_NAME}=${caller}` },
+    })
+  );
+  expect(res.status).toBe(200);
+  return ((await res.json()) as { clashes: GuestClash[] }).clashes;
+}
+
+describe("GET /host-clashes", () => {
   beforeAll(() => setupTestDb());
-  // Clash detection reports when a host is privately busy, so it needs both
-  // site auth and a guest the caller may act as; these tests are about what
-  // it then discloses. See action-site-auth.test.ts for the gate itself.
+  // Clash detection needs a guest the caller may act as; these tests are about
+  // what it then discloses. api-meetings.test.ts covers the gate.
   beforeEach(async () => {
     resetTestDb();
-    cookieJar.clear();
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
-    cookieJar.set(AUTH_COOKIE_NAME, (await createAuthCookie()).value);
-    cookieJar.set(
-      GUEST_COOKIE_NAME,
-      openGuestValue((await createGuest({ name: "Organiser" })).id)
-    );
+    caller = openGuestValue((await createGuest({ name: "Organiser" })).id);
   });
   afterEach(() => vi.unstubAllEnvs());
 

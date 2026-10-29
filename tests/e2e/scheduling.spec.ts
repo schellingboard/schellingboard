@@ -4,30 +4,18 @@ import { test, expect } from "./helpers/fixtures";
 import { switchToView } from "./helpers/schedule";
 import { uniqueSuffix } from "./helpers/unique";
 import { login, loginAndGoto } from "./helpers/auth";
-import { selectUser, tapUntilOpen } from "./helpers/user";
+import { selectUser } from "./helpers/user";
 import { dismissToast, toast } from "./helpers/toast";
+import {
+  dayRadios,
+  selectOption,
+  startTimeOption,
+} from "./helpers/session-form";
 
 // All tests run in Conference Gamma (scheduling phase). Each test creates its
 // own uniquely-titled session on the LAST event day at a fixed location and
 // start time, so parallel tests (including add-session.spec.ts, which takes
 // the first free "+" slot on day 1) never compete for the same slot.
-
-// The form's labels are not wired to their inputs, so locate each listbox
-// through its labelled section (same approach as the hosts combobox in
-// add-session.spec.ts).
-function listboxButton(page: Page, section: RegExp) {
-  return page
-    .locator("div")
-    .filter({ hasText: section })
-    .first()
-    .getByRole("button")
-    .first();
-}
-
-const dayRadios = (page: Page) =>
-  page.getByRole("radio", {
-    name: /Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday/,
-  });
 
 // Start-time options are labelled with the *displayed* start (slot start plus
 // the event's 10-minute break), so slots are ":10"/":40", not ":00"/":30".
@@ -51,10 +39,8 @@ async function createSessionViaForm(
   // Hosts are prefilled with the selected user (Alice), so only the slot
   // needs adjusting.
   await dayRadios(page).last().check();
-  await listboxButton(page, /^Location/).click();
-  await page.getByRole("option", { name: location }).click();
-  await listboxButton(page, /^Start Time/).click();
-  await page.getByRole("option", { name: startTime }).click();
+  await selectOption(page, /^Location/, location);
+  await selectOption(page, /^Start Time/, startTime);
 
   const submit = page.getByRole("button", { name: "Submit" });
   await expect(submit).toBeEnabled();
@@ -71,12 +57,6 @@ async function openEditForm(page: Page, title: string) {
   await expect(
     page.getByRole("heading", { name: /Edit session/i })
   ).toBeVisible();
-  // Edit is a full page load, and typing or clicking before the form hydrates
-  // is lost. A listbox only opens once it has, so open and close one first.
-  const listbox = page.getByRole("listbox");
-  await tapUntilOpen(listboxButton(page, /^Start Time/), listbox);
-  await page.keyboard.press("Escape");
-  await expect(listbox).toBeHidden();
 }
 
 test("a host can edit a session's title and the change persists @008-US2", async ({
@@ -166,10 +146,8 @@ test("a host can cap attendance below the room's own maximum @008-US4", async ({
 
   await page.getByRole("textbox").first().fill(title);
   await dayRadios(page).last().check();
-  await listboxButton(page, /^Location/).click();
-  await page.getByRole("option", { name: /Workshop Room/ }).click();
-  await listboxButton(page, /^Start Time/).click();
-  await page.getByRole("option", { name: "17:10" }).click();
+  await selectOption(page, /^Location/, /Workshop Room/);
+  await selectOption(page, /^Start Time/, "17:10");
 
   // Defaults to the room's own maximum. Going above it is allowed — standing
   // room is the host's call — but says so.
@@ -235,15 +213,10 @@ test("a day running past midnight says so, and its late slots name the day @008-
   );
 
   await dayRadios(page).last().check();
-  await listboxButton(page, /^Start Time/).click();
   // Times before midnight stand alone; the ones after it carry their weekday,
   // so "01:10" can't be read as an hour earlier in the day than "23:10".
-  await expect(
-    page.getByRole("option", { name: "23:10", exact: true })
-  ).toBeVisible();
-  await expect(
-    page.getByRole("option", { name: /^[A-Z][a-z]{2} 01:10$/ })
-  ).toBeVisible();
+  await expect(startTimeOption(page, "23:10")).toBeAttached();
+  await expect(startTimeOption(page, /^[A-Z][a-z]{2} 01:10$/)).toBeAttached();
 });
 
 test("occupied start times are not offered in the same location but are in others @008-US1", async ({
@@ -261,35 +234,19 @@ test("occupied start times are not offered in the same location but are in other
   // Lunch Break blocker (12:30–14:00, all rooms). Option labels show the
   // displayed start (slot + 10-minute break), so 09:00 appears as "09:10".
   await dayRadios(page).first().check();
-  await listboxButton(page, /^Location/).click();
-  await page.getByRole("option", { name: /Main Hall/ }).click();
+  await selectOption(page, /^Location/, /Main Hall/);
 
-  await listboxButton(page, /^Start Time/).click();
   // Overlapping the keynote in the same location is not offered...
-  await expect(page.getByRole("option", { name: "09:10" })).toHaveAttribute(
-    "aria-disabled",
-    "true"
-  );
+  await expect(startTimeOption(page, "09:10")).toBeDisabled();
   // ...nor is the blocker slot...
-  await expect(page.getByRole("option", { name: "12:40" })).toHaveAttribute(
-    "aria-disabled",
-    "true"
-  );
+  await expect(startTimeOption(page, "12:40")).toBeDisabled();
   // ...while a free slot in the same location is.
-  await expect(page.getByRole("option", { name: "16:10" })).not.toHaveAttribute(
-    "aria-disabled",
-    "true"
-  );
+  await expect(startTimeOption(page, "16:10")).not.toBeDisabled();
   await page.keyboard.press("Escape");
 
   // The keynote's slot IS offered in a different location.
-  await listboxButton(page, /^Location/).click();
-  await page.getByRole("option", { name: /Garden Terrace/ }).click();
-  await listboxButton(page, /^Start Time/).click();
-  await expect(page.getByRole("option", { name: "09:10" })).not.toHaveAttribute(
-    "aria-disabled",
-    "true"
-  );
+  await selectOption(page, /^Location/, /Garden Terrace/);
+  await expect(startTimeOption(page, "09:10")).not.toBeDisabled();
 });
 
 test("an already scheduled proposal says the schedule won't follow it @008-US1 @004-US2", async ({

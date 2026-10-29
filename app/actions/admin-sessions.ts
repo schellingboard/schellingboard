@@ -24,9 +24,8 @@ export type AdminSessionInput = {
   expectedVersion: number;
 };
 
-// The attendee-facing schedule fetches the session list in the shared
-// [eventSlug] layout (see app/legacy/(site)/[eventSlug]/session-actions.ts), so the
-// public layout must be revalidated alongside the admin pages.
+// The legacy schedule's session list is fetched in the shared [eventSlug]
+// layout, so it must be revalidated alongside the admin pages.
 async function revalidateEventPaths(eventId: string) {
   revalidatePath("/legacy/admin");
   revalidatePath("/legacy/admin/events");

@@ -1,16 +1,21 @@
 import { Page } from "@playwright/test";
 
-// The session form's labels are not wired to their inputs, so locate each
-// listbox through its labelled section (same approach as the hosts combobox in
-// add-session.spec.ts).
-export function listboxButton(page: Page, section: RegExp) {
-  return page
-    .locator("div")
-    .filter({ hasText: section })
+/** Picks the option whose text matches in the select with this label. */
+export async function selectOption(
+  page: Page,
+  label: RegExp,
+  option: string | RegExp
+) {
+  const select = page.getByLabel(label);
+  const value = await select
+    .getByRole("option", { name: option })
     .first()
-    .getByRole("button")
-    .first();
+    .getAttribute("value");
+  await select.selectOption(value ?? "");
 }
+
+export const startTimeOption = (page: Page, name: string | RegExp) =>
+  page.getByLabel(/^Start Time/).getByRole("option", { name });
 
 export const dayRadios = (page: Page) =>
   page.getByRole("radio", {

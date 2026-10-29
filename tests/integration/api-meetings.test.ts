@@ -22,7 +22,11 @@ import {
   createGuest,
   createSession,
 } from "../helpers/factories";
-import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
+import {
+  GUEST_COOKIE_NAME,
+  openGuestValue,
+  verifiedGuestValue,
+} from "../helpers/guest-cookie";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 const DAY = isoDay(30);
@@ -281,6 +285,25 @@ describe("/api/v1 meetings", () => {
             end: `${DAY}T11:00:00.000Z`,
           },
         ],
+      });
+
+      await getRepositories().guests.setAuthProtection(ada.id, {
+        authProtected: true,
+        passwordHash: null,
+      });
+      const unverified = await clashes(
+        `guestIds=${grace.id}&${interval}`,
+        asGuest(ada.id)
+      );
+      expect(unverified.status).toBe(403);
+      const verified = await clashes(
+        `guestIds=${grace.id}&${interval}`,
+        `${GUEST_COOKIE_NAME}=${await verifiedGuestValue(ada.id)}`
+      );
+      expect(verified.status).toBe(200);
+      await getRepositories().guests.setAuthProtection(ada.id, {
+        authProtected: false,
+        passwordHash: null,
       });
 
       const tooMany = await clashes(

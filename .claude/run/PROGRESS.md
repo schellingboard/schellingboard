@@ -174,21 +174,13 @@ Step 13: legacy schedule keeps its own meeting components until the Next schedul
 visitor with no `me` who opens `?viewMeeting=` on the schedule sees no modal (legacy said 'select
 who you are'); `/{slug}/meetings` does show that message.
 
-Step 14, for step 15 (wiring) and the answer to open question 3:
-`SessionForm({snapshot, now, sessionId?, prefill?: {day, time, location, proposalId}, links: {schedule, proposal(id), session(id)}, actions: sessionFormCalls(api), onDone})`.
-`actions` must be one stable object (the host-clash effect depends on `actions.hostClashes`).
-`prefill` takes the legacy `?day=&time=&location=&proposalID=` params; `sessionID` is the edit
-route's id. `now` comes from `useServerNow`. The form raises the "has been added/updated/deleted
-successfully" notice itself (`useNotify`, `autoDismissMs: 10_000`, as the legacy toast) and then
-calls `onDone`, which should navigate to the schedule: the `NoticeProvider` sits above the router,
-so the notice survives the navigation (question 3 answered). `proposalLinks.scheduleProposal` still
-points at the legacy form; point it at the SPA route. New API `GET /host-clashes` replaces legacy
-`detectGuestClashes` (`clash-actions.ts`, and its `guest-clashes.test.ts` assertions, move to
-`api-meetings.test.ts` at step 15). Intended differences: pickers are native selects (E2E
-`listboxButton` helpers become `selectOption`; a start time taken in the chosen room is a disabled
-option), labels are wired to inputs, session refusals show the reason (`failure-message.ts`). The
-shape of the legacy hosts list (every guest) is now members plus current hosts.
-`ScheduledSessionsNotice` is imported from `features/proposals`.
+Step 15: `legacyScheduleLinks` is now `scheduleLinks` (all addresses are the SPA's; `schedule` is
+`/{slug}`). Open question 3 is answered (notice survives navigation); `scheduling.spec` flakes
+(question 7): not seen in three runs of the touched specs, which is encouraging but not conclusive;
+the hop from the SPA to a legacy form is gone. Native `<option>` is not "visible" in Firefox: E2E
+use `toBeAttached()` / `toBeDisabled()` on `startTimeOption`. The legacy API routes
+`/api/add-session` and `/api/update-session` stay (tests use them). The pwa "old root link" test now
+uses `/settings`, since no event-scoped legacy page is left to forward to.
 
 Step 16: `utils/guest-clashes.ts` still imports `newEmptySession` and `sessionsOverlap` from the
 legacy `session_utils` (open question 4); move those two helpers to `packages/domain` when the
