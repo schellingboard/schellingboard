@@ -24,3 +24,16 @@ export const currentIdentitySchema = identitySchema.extend({
       "True when the browser holds a protected name it has not logged in to"
     ),
 });
+
+export const loginCodeBodySchema = z.object({
+  guestId: z.string().min(1).describe("The protected guest to email a code"),
+});
+
+export const loginBodySchema = z.object({
+  guestId: z.string().min(1).describe("The guest to log in as"),
+  credential: z
+    .string()
+    .min(1)
+    .max(200)
+    .describe("The guest's password or a login code they were emailed"),
+});

@@ -79,6 +79,18 @@ export const apiLimit = (): BucketLimit => ({
   capacity: Number(process.env.SB_API_RATE_BURST) || API_LIMIT.capacity,
 });
 
+// Sign-in routes cost an email or a password hash per call, so one address gets
+// far fewer of them than the general API allows. Like the API limit, the burst
+// can be raised by env for the E2E suite, whose browsers share an address.
+export const AUTH_API_LIMIT: BucketLimit = {
+  capacity: 30,
+  refillEveryMs: 6_000,
+};
+export const authApiLimit = (): BucketLimit => ({
+  ...AUTH_API_LIMIT,
+  capacity: Number(process.env.SB_AUTH_RATE_BURST) || AUTH_API_LIMIT.capacity,
+});
+
 export type LoginScope = "site" | "admin" | "guest";
 
 // Per scope too, which bounds guesses from rotating IPs at the cost of
@@ -131,6 +143,9 @@ export function isEmailIssuanceBlocked(
 ): boolean {
   return retryAfter(emailBucket(guestId), EMAIL_LIMIT, now) > 0;
 }
+
+export const emailRetryAfter = (guestId: string, now: number = Date.now()) =>
+  retryAfter(emailBucket(guestId), EMAIL_LIMIT, now);
 
 export function recordEmailIssued(
   guestId: string,

@@ -207,7 +207,7 @@ export async function requireAdminAuth(
 // that drops `X-Forwarded-Proto` could make this reject legitimate
 // same-origin browser requests (e.g. nextUrl resolves to http:// while the
 // browser's real Origin is https://).
-function isTrustedOrigin(request: NextRequest): boolean {
+export function isTrustedOrigin(request: NextRequest): boolean {
   const origin = request.headers.get("origin");
   if (origin && origin !== request.nextUrl.origin) {
     return false;

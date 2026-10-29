@@ -4,22 +4,16 @@ import { cookies } from "next/headers";
 import { newPasswordSchema } from "@schellingboard/contracts/auth";
 import { getRepositories } from "@/db/container";
 import { credentialsChanged } from "@/server/kernel/credential-changes";
-import type { AuthCode, AuthCodePurpose } from "@schellingboard/domain/auth";
 import {
   createGuestCookie,
   createGuestLogoutCookie,
   GUEST_COOKIE_NAME,
 } from "@/utils/auth";
 import {
-  AUTH_CODE_VALID_MINUTES,
-  MAX_CODE_ATTEMPTS,
   RESET_TOKEN_VALID_MINUTES,
-  generateAuthCode,
   generateAuthCodeSalt,
   generateResetToken,
   hashAuthCode,
-  isAuthCodeShaped,
-  normalizeAuthCode,
   hashUserPassword,
   verifyUserPassword,
 } from "@/utils/user-credentials";
@@ -28,7 +22,11 @@ import { requireSiteAuth } from "@/utils/action-auth";
 import { peopleUseCases } from "@/server/composition";
 import { actorOf, guestOfCookie } from "@/server/kernel/session-actor";
 import { ok, type Result } from "@/server/kernel/result";
-import type { Identity } from "@/server/modules/people/module";
+import {
+  matchToken,
+  recentlyIssued,
+  type Identity,
+} from "@/server/modules/people/module";
 import {
   TOO_MANY_ATTEMPTS_ERROR,
   TOO_MANY_EMAILS_ERROR,
@@ -39,11 +37,8 @@ import {
 } from "@/server/kernel/rate-limit";
 import { isMailerConfigured, sendMail } from "@/utils/mailer";
 import { siteUrl } from "@/utils/site-url";
-import { authCodeEmail } from "@/emails/auth-code";
 import { authPasswordResetEmail } from "@/emails/auth-password-reset";
 import { authSecurityChangedEmail } from "@/emails/auth-security-changed";
-
-const REQUEST_THROTTLE_SECONDS = 60;
 
 export type UserAuthResult =
   | { ok: true }
@@ -56,164 +51,18 @@ export type SelectUserResult =
   // password or emailed code (loginAsGuestAction) instead.
   | { ok: false; needsAuth?: boolean; error: string };
 
-async function setAuthenticatedIdentity(guestId: string): Promise<void> {
-  const cookieStore = await cookies();
-  const identity = await peopleUseCases().signIn(await actorOf(cookieStore), {
-    guestId,
-    level: "verified",
-  });
-  cookieStore.set(createGuestCookie(identity.sessionToken));
-}
-
-/**
- * Returns the guest's active token of `purpose` if `input` matches it, or null
- * otherwise — counting a failed guess at a login code so it dies after
- * MAX_CODE_ATTEMPTS tries. The caller is responsible for consuming a returned
- * token: matching alone changes nothing, so a match never replays.
- *
- * Login codes are hand-typed, so case and stray whitespace are forgiven; reset
- * tokens travel only inside a link and are matched verbatim.
- */
-async function matchToken(
-  guestId: string,
-  purpose: AuthCodePurpose,
-  input: string
-): Promise<AuthCode | null> {
-  const { authCodes } = getRepositories();
-  const active = await authCodes.findActive(
-    guestId,
-    purpose,
-    // eslint-disable-next-line no-restricted-syntax -- codes expire on real time (ADR 0004): they are emailed in real time, and a forged time-override cookie must not revive a dead one
-    new Date()
-  );
-  if (!active || active.attempts >= MAX_CODE_ATTEMPTS) return null;
-  const candidate =
-    purpose === "login" ? normalizeAuthCode(input) : input.trim();
-  if (hashAuthCode(candidate, active.salt) === active.codeHash) return active;
-  // Only login codes are metered. A reset token carries 256 bits, so guessing
-  // it is infeasible and counting the guesses buys nothing — while retiring it
-  // after a bounded number of tries would hand anyone who knows a guest id a
-  // way to knock out the link that guest was just emailed.
-  if (purpose !== "login") return null;
-  // A login code shares one input field with the permanent password, so only
-  // input that could have been a code counts as a guess at it — otherwise a
-  // guest fumbling their password would burn the code they were emailed.
-  if (!isAuthCodeShaped(candidate)) return null;
-  await authCodes.recordFailedAttempt(active.id);
-  if (active.attempts + 1 === MAX_CODE_ATTEMPTS) {
-    console.warn(
-      `Login code of guest ${guestId} hit the guess cap — retiring it`
-    );
-  }
-  return null;
-}
-
-/**
- * The token of `purpose` emailed within the throttle window, if one is still
- * valid. Null means a fresh one should be emailed.
- *
- * A login code whose guess cap is spent still counts as recently issued:
- * replacing it on demand would let anyone who knows a guest name mint a new
- * code (and a new guess budget, and a new email to that guest) every
- * MAX_CODE_ATTEMPTS tries, which is both an unbounded oracle again and an inbox
- * flood. The guest waits out the window instead, and is told the code is spent
- * rather than sent to their inbox for one that can no longer work.
- */
-async function recentlyIssued(
-  guestId: string,
-  purpose: AuthCodePurpose,
-  now: Date
-): Promise<AuthCode | null> {
-  const existing = await getRepositories().authCodes.findActive(
-    guestId,
-    purpose,
-    now
-  );
-  if (
-    !existing ||
-    now.getTime() - existing.createdAt.getTime() >=
-      REQUEST_THROTTLE_SECONDS * 1000
-  ) {
-    return null;
-  }
-  return existing;
-}
-
-/** Whether `token` has no guesses left, so only a replacement can help. */
-function isSpent(token: AuthCode): boolean {
-  return token.attempts >= MAX_CODE_ATTEMPTS;
-}
-
 /** Emails the guest a single-use login code (link + typeable code). */
 export async function requestLoginCodeAction(
   guestId: string
 ): Promise<UserAuthResult> {
   await requireSiteAuth();
-  if (!isMailerConfigured()) {
-    return {
-      ok: false,
-      error: "This server cannot send email, so codes are unavailable",
-    };
-  }
-  const { guests, authCodes } = getRepositories();
-  const guest = await guests.findById(guestId);
-  if (!guest) {
-    return { ok: false, error: "Unknown user" };
-  }
-
-  // eslint-disable-next-line no-restricted-syntax -- the throttle and the code's lifetime are real time by design (ADR 0004)
-  const now = new Date();
-  if (isEmailIssuanceBlocked(guestId, now.getTime())) {
-    return { ok: false, error: TOO_MANY_EMAILS_ERROR };
-  }
-  const recent = await recentlyIssued(guestId, "login", now);
-  if (recent) {
-    // A spent code is not `throttled`: nothing usable is waiting in the inbox,
-    // so this is a plain failure rather than reassurance.
-    return isSpent(recent)
-      ? {
-          ok: false,
-          error:
-            "Too many wrong codes were entered, so the one you were emailed is used up — ask for a new one in a minute",
-        }
-      : {
-          ok: false,
-          throttled: true,
-          error:
-            "A code was emailed to you moments ago — check your inbox and spam folder",
-        };
-  }
-
-  const code = generateAuthCode();
-  const salt = generateAuthCodeSalt();
-  await authCodes.replace({
-    guestId,
-    purpose: "login",
-    salt,
-    codeHash: hashAuthCode(code, salt),
-    createdAt: now,
-    expiresAt: new Date(now.getTime() + AUTH_CODE_VALID_MINUTES * 60 * 1000),
-  });
-
-  const loginUrl = `${siteUrl()}/auth/login?guest=${encodeURIComponent(
-    guestId
-  )}&code=${encodeURIComponent(code)}`;
-  try {
-    await sendMail({
-      to: guest.info.email,
-      ...authCodeEmail({
-        name: guest.name,
-        code,
-        loginUrl,
-        validMinutes: AUTH_CODE_VALID_MINUTES,
-      }),
-    });
-  } catch (err) {
-    console.error("Failed to send login code email:", err);
-    return { ok: false, error: "The email could not be sent — try again" };
-  }
-  recordEmailIssued(guestId, now.getTime());
-  return { ok: true };
+  const result = await peopleUseCases().requestLoginCode(guestId);
+  if (result.ok) return { ok: true };
+  return {
+    ok: false,
+    error: result.error.detail ?? result.error.code,
+    ...(result.error.code === "auth.codeRecentlySent" && { throttled: true }),
+  };
 }
 
 /**
@@ -243,7 +92,7 @@ export async function requestPasswordLinkAction(
   if (isEmailIssuanceBlocked(guestId, now.getTime())) {
     return { ok: false, error: TOO_MANY_EMAILS_ERROR };
   }
-  if (await recentlyIssued(guestId, "reset", now)) {
+  if (await recentlyIssued(getRepositories(), guestId, "reset", now)) {
     return {
       ok: false,
       throttled: true,
@@ -284,62 +133,24 @@ export async function requestPasswordLinkAction(
 }
 
 /**
- * Authenticates as a (protected) guest with either the permanent password or a
- * currently valid emailed login code, and makes them the current user. A code
- * is consumed on success, so it can never be replayed — it grants a session but
- * never changes credentials.
- *
- * The password path is rate limited per guest: after too many failures the
- * password is refused for a while even if right. The emailed-code path stays
- * open, so an attacker hammering someone's password can't lock the real person
- * out — they get in by proving inbox access. Guessing at the code instead costs
- * its owner only a wait, since a spent code is replaced once the request
- * throttle lapses (see MAX_CODE_ATTEMPTS and recentlyIssued) — not nothing,
- * though: an attacker willing to keep spending 100 guesses a minute can hold
- * the code path shut for as long as they keep it up. Countering that needs
- * defences this app doesn't have (a CAPTCHA, a real IP reputation store); the
- * reset link, which is never metered, stays open meanwhile. Both escape hatches
- * need a configured mailer; without one the password lockout is the whole
- * story.
+ * Authenticates as a (protected) guest with the permanent password or a
+ * currently valid emailed login code, and makes them the current user. The
+ * rules live in `logIn` in the people module.
  */
 export async function loginAsGuestAction(
   guestId: string,
   credential: string
 ): Promise<UserAuthResult> {
   await requireSiteAuth();
-  const { guests, authCodes } = getRepositories();
-  const creds = await guests.getAuthCredentials(guestId);
-  if (!creds) {
-    return { ok: false, error: "Unknown user" };
-  }
-  const passwordBlocked = loginRetryAfter("guest", guestId) > 0;
-  if (
-    !passwordBlocked &&
-    (await verifyUserPassword(credential, creds.passwordHash))
-  ) {
-    await setAuthenticatedIdentity(guestId);
-    return { ok: true };
-  }
-  const matched = await matchToken(guestId, "login", credential);
-  if (matched) {
-    await authCodes.consume(matched.id);
-    await setAuthenticatedIdentity(guestId);
-    return { ok: true };
-  }
-  recordLoginFailure("guest", guestId);
-  if (!passwordBlocked) {
-    return { ok: false, error: "Wrong password or code" };
-  }
-  // The generic lockout message would be a lie here: only the *password* is
-  // refused, and an emailed code gets in throughout — which is the whole point
-  // of the lockout not being an account lockout. Say so, unless this server
-  // can't send the mail that would make it true.
-  return {
-    ok: false,
-    error: isMailerConfigured()
-      ? "Too many failed attempts — the password won't work for a few minutes, but a code emailed to you still will"
-      : TOO_MANY_ATTEMPTS_ERROR,
-  };
+  const cookieStore = await cookies();
+  const result = await peopleUseCases().logIn(await actorOf(cookieStore), {
+    guestId,
+    credential,
+  });
+  if (!result.ok)
+    return { ok: false, error: result.error.detail ?? result.error.code };
+  cookieStore.set(createGuestCookie(result.value.sessionToken));
+  return { ok: true };
 }
 
 async function setProtection(
@@ -375,7 +186,7 @@ export async function setPasswordWithTokenAction(
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid" };
   }
   const { guests, authCodes, loginSessions } = getRepositories();
-  const matched = await matchToken(guestId, "reset", token);
+  const matched = await matchToken(getRepositories(), guestId, "reset", token);
   if (!matched) {
     return { ok: false, error: "This link is invalid or has expired" };
   }
