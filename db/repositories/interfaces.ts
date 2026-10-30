@@ -140,8 +140,10 @@ export type NewAuthCode = {
 export interface LoginSessionsRepository {
   create(session: LoginSession): Promise<void>;
   get(id: string): Promise<LoginSession | null>;
-  /** The unexpired row; refreshes `lastSeenAt` at most once an hour. */
+  /** The unexpired row. */
   findLive(id: string, now: Date): Promise<LoginSession | null>;
+  /** Records a use at `now` and moves the expiry. */
+  refresh(id: string, now: Date, expiresAt: Date): Promise<void>;
   delete(id: string): Promise<void>;
   /** Revokes the guest's sessions, all but `exceptId`. */
   deleteForGuest(guestId: string, exceptId?: string): Promise<void>;

@@ -1,8 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
 
-import { COOKIE_MAX_AGE_SEC } from "./auth-cookies";
-
-export const SESSION_LIFETIME_MS = COOKIE_MAX_AGE_SEC * 1000;
+export const SESSION_LIFETIME_MS = 30 * 24 * 60 * 60 * 1000;
 
 export function generateSessionToken(): string {
   return randomBytes(32).toString("base64url");

@@ -1,4 +1,12 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import {
+  describe,
+  it,
+  expect,
+  beforeAll,
+  beforeEach,
+  afterEach,
+  vi,
+} from "vitest";
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { createRoute } from "@hono/zod-openapi";
@@ -11,6 +19,8 @@ import {
   createAdminAuthCookie,
   createAuthCookie,
 } from "@/utils/auth";
+import { setupTestDb, resetTestDb } from "../helpers/db";
+import { createGuest } from "../helpers/factories";
 import { throughProxy } from "../helpers/through-proxy";
 import {
   GUEST_COOKIE_NAME,
@@ -20,7 +30,9 @@ import {
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef"; // 32 chars
 
+beforeAll(() => setupTestDb());
 beforeEach(() => {
+  resetTestDb();
   vi.stubEnv("SITE_PASSWORD", "site-pw");
   vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
   vi.stubEnv("AUTH_SECRET", VALID_SECRET);
@@ -168,22 +180,32 @@ describe("actor middleware", () => {
   });
 
   it("resolves the guest and level the guest cookie names", async () => {
+    const g1 = (await createGuest()).id;
+    const g2 = (await createGuest()).id;
     const open = await actorApp().request("/me", {
-      headers: { cookie: `${GUEST_COOKIE_NAME}=${openGuestValue("g1")}` },
+      headers: { cookie: `${GUEST_COOKIE_NAME}=${openGuestValue(g1)}` },
     });
     expect(await open.json()).toEqual({
       admin: false,
-      guest: { id: "g1", level: "claimed" },
+      guest: {
+        id: g1,
+        level: "claimed",
+        sessionId: expect.any(String) as string,
+      },
     });
 
     const verified = await actorApp().request("/me", {
       headers: {
-        cookie: `${GUEST_COOKIE_NAME}=${await verifiedGuestValue("g2")}`,
+        cookie: `${GUEST_COOKIE_NAME}=${await verifiedGuestValue(g2)}`,
       },
     });
     expect(await verified.json()).toEqual({
       admin: false,
-      guest: { id: "g2", level: "verified" },
+      guest: {
+        id: g2,
+        level: "verified",
+        sessionId: expect.any(String) as string,
+      },
     });
   });
 });

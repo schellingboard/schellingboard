@@ -18,7 +18,6 @@ export {
   isAdminEnabled,
   isAuthCookieValid,
   isPasswordProtectionEnabled,
-  readGuestCookie,
   createGuestCookie,
   createGuestLogoutCookie,
 } from "@/utils/auth-cookies";

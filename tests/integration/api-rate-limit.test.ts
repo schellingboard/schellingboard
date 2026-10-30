@@ -55,11 +55,14 @@ describe("/api/v1 rate limit", () => {
   });
 
   it("does not give each unproven name a bucket of its own", async () => {
-    for (let i = 0; i < API_LIMIT.capacity; i++)
-      await get("/events", `${GUEST_COOKIE_NAME}=${openGuestValue(`g${i}`)}`);
+    for (let i = 0; i < API_LIMIT.capacity; i++) {
+      const guest = await createGuest();
+      await get("/events", `${GUEST_COOKIE_NAME}=${openGuestValue(guest.id)}`);
+    }
+    const fresh = await createGuest();
     const limited = await get(
       "/events",
-      `${GUEST_COOKIE_NAME}=${openGuestValue("fresh")}`
+      `${GUEST_COOKIE_NAME}=${openGuestValue(fresh.id)}`
     );
     expect(limited.status).toBe(429);
   });

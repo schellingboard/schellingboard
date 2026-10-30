@@ -17,6 +17,8 @@ import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createGuest } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, sessionGuestValue } from "../helpers/guest-cookie";
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
 beforeAll(() => setupTestDb());
@@ -182,6 +184,67 @@ describe("login sessions", () => {
         await getRepositories().loginSessions.get(hashSessionToken(old))
       ).toBeNull();
       expect(await row(live)).not.toBeNull();
+    }
+  );
+
+  it("a new session lasts 30 days", { tags: ["003-US1"] }, async () => {
+    const ada = await createGuest({ name: "Ada" });
+
+    const token = issuedToken(await choose(ada.id));
+
+    const found = await row(token);
+    const lifetime = found!.expiresAt.getTime() - found!.createdAt.getTime();
+    expect(lifetime).toBe(30 * DAY_MS);
+  });
+
+  it(
+    "use after a day moves the expiry to 30 days from now; use within a day does not",
+    { tags: ["003-US1"] },
+    async () => {
+      const ada = await createGuest({ name: "Ada" });
+      const repo = getRepositories().loginSessions;
+      const before = realNow();
+      const aged = async (lastSeenAgoMs: number) => {
+        const token = await sessionGuestValue(ada.id, "claimed");
+        const id = hashSessionToken(token);
+        const created = (await repo.get(id))!;
+        const lastSeenAt = new Date(before.getTime() - lastSeenAgoMs);
+        await repo.delete(id);
+        await repo.create({
+          ...created,
+          lastSeenAt,
+          expiresAt: new Date(lastSeenAt.getTime() + 30 * DAY_MS),
+        });
+        return { token, id, lastSeenAt };
+      };
+      const stale = await aged(2 * DAY_MS);
+      const fresh = await aged(60 * 60 * 1000);
+
+      expect(await whoAmI(stale.token)).toEqual({ guestId: ada.id });
+      expect(await whoAmI(fresh.token)).toEqual({ guestId: ada.id });
+
+      const touched = (await repo.get(stale.id))!;
+      expect(touched.lastSeenAt.getTime()).toBeGreaterThanOrEqual(
+        before.getTime()
+      );
+      expect(touched.expiresAt.getTime()).toBe(
+        touched.lastSeenAt.getTime() + 30 * DAY_MS
+      );
+      const untouched = (await repo.get(fresh.id))!;
+      expect(untouched.lastSeenAt).toEqual(fresh.lastSeenAt);
+    }
+  );
+
+  it(
+    "an old open. or verified. cookie is no identity",
+    { tags: ["003-US1"] },
+    async () => {
+      const ada = await createGuest({ name: "Ada" });
+
+      expect(await whoAmI(`open.${ada.id}`)).toEqual({ guestId: null });
+      expect(await whoAmI(`verified.${ada.id}.1.sig`)).toEqual({
+        guestId: null,
+      });
     }
   );
 });
