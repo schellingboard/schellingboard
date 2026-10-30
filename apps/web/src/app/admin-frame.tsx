@@ -78,9 +78,15 @@ function LogoutButton() {
     setPending(true);
     setFailed(false);
     try {
+      await fetch("/api/v1/auth/sign-out", { method: "POST" });
       const response = await fetch("/api/admin/logout", { method: "POST" });
       // Already signed out (an expired cookie) is the state logging out aims for.
-      if (!response.ok && response.status !== 401 && response.status !== 403)
+      if (
+        !response.ok &&
+        response.status !== 401 &&
+        response.status !== 403 &&
+        response.status !== 404
+      )
         throw new Error(`logout ${response.status}`);
       hardNavigate(LOGIN);
     } catch {

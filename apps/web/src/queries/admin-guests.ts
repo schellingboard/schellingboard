@@ -7,6 +7,7 @@ export type AdminGuest = {
   email: string;
   eventIds: string[];
   siteAdmin: boolean;
+  hasPassword: boolean;
   version: number;
 };
 
@@ -26,6 +27,7 @@ export function createAdminGuestsQuery({ api }: { api: ApiClient }) {
       email: g.email,
       eventIds: g.eventIds,
       siteAdmin: g.siteAdmin,
+      hasPassword: g.hasPassword,
       version: g.version,
     }),
   });

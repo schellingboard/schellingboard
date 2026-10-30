@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { problemResponse, type Problem } from "./server/http/problem";
 import {
-  adminApiRefusal,
+  adminApiV1Refusal,
   isTrustedOrigin,
   ADMIN_DISABLED_MESSAGE,
   ADMIN_VERIFIED_HEADER,
@@ -48,11 +48,7 @@ function refuseApiV1(problem: Problem): NextResponse {
 // they call holds the gate.
 async function serveShell(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
-  if (underRoot(pathname, "/admin")) {
-    if (!isAdminEnabled()) {
-      return new NextResponse(ADMIN_DISABLED_MESSAGE, { status: 404 });
-    }
-  } else if (pathname !== "/login") {
+  if (!underRoot(pathname, "/admin") && pathname !== "/login") {
     const refusal = await requireAuth(request);
     if (refusal) return refusal;
   }
@@ -111,10 +107,16 @@ export async function proxy(request: NextRequest) {
   // The versioned API gates like the legacy routes, but refuses as problem
   // details: its clients read a status and a code, never a login page.
   if (pathname === "/api/v1/admin" || pathname.startsWith("/api/v1/admin/")) {
-    const refusal = await adminApiRefusal(request);
-    return refusal
-      ? refuseApiV1({ status: refusal.status, code: refusal.code })
-      : forwardAsVerifiedAdmin(request);
+    const result = await adminApiV1Refusal(request);
+    if ("refusal" in result) {
+      return refuseApiV1({
+        status: result.refusal.status,
+        code: result.refusal.code,
+      });
+    }
+    return result.passwordVerified
+      ? forwardAsVerifiedAdmin(request)
+      : forwardWithoutAdminHeader(request);
   }
   // An admin script then needs one cookie for the whole API, not two.
   if (pathname === "/api/v1" || pathname.startsWith("/api/v1/")) {

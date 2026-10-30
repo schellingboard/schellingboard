@@ -516,6 +516,15 @@ export class SqliteGuestsRepository implements GuestsRepository {
     return row?.siteAdmin ?? false;
   }
 
+  async listPasswordIds(): Promise<string[]> {
+    return this.db
+      .select({ id: schema.guests.id })
+      .from(schema.guests)
+      .where(isNotNull(schema.guests.passwordHash))
+      .all()
+      .map((row) => row.id);
+  }
+
   async listSiteAdminIds(): Promise<string[]> {
     return this.db
       .select({ id: schema.guests.id })

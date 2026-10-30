@@ -7703,6 +7703,7 @@ export interface components {
       email: string;
       authProtected: boolean;
       siteAdmin: boolean;
+      hasPassword: boolean;
       eventIds: string[];
       version: number;
     };

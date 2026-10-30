@@ -1,8 +1,12 @@
 import type { ChangeContext } from "@schellingboard/domain/change";
 import type { Actor } from "./actor";
 
-export const byAdmin = (at: Date): ChangeContext => ({
-  actor: { type: "admin" },
+/** A site admin is named in the log; the admin password has no person. */
+export const byAdmin = (actor: Actor, at: Date): ChangeContext => ({
+  actor:
+    actor.guest?.siteAdmin && actor.guest.level === "verified"
+      ? { type: "admin", id: actor.guest.id }
+      : { type: "admin" },
   at,
 });
 
@@ -16,5 +20,5 @@ export const byActor = (actor: Actor, at: Date): ChangeContext =>
   actor.guest
     ? byGuest(actor.guest.id, at)
     : actor.admin
-      ? byAdmin(at)
+      ? byAdmin(actor, at)
       : { actor: { type: "system" }, at };

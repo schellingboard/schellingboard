@@ -31,6 +31,7 @@ export interface AdminGuest {
   email: string;
   authProtected: boolean;
   siteAdmin: boolean;
+  hasPassword: boolean;
   eventIds: string[];
   version: number;
 }
@@ -86,7 +87,8 @@ function parseGuest<T extends GuestInput>(
 function toAdminGuest(
   guest: CompleteGuest,
   eventIds: string[],
-  siteAdmin: boolean
+  siteAdmin: boolean,
+  hasPassword: boolean
 ): AdminGuest {
   return {
     id: guest.id,
@@ -94,6 +96,7 @@ function toAdminGuest(
     email: guest.info.email,
     authProtected: guest.authProtected ?? false,
     siteAdmin,
+    hasPassword,
     eventIds,
     version: guest.version,
   };
@@ -107,7 +110,8 @@ async function withEvents(
   return toAdminGuest(
     guest,
     (events.get(guest.id) ?? []).map((e) => e.id),
-    await guests.getSiteAdmin(guest.id)
+    await guests.getSiteAdmin(guest.id),
+    !!(await guests.getAuthCredentials(guest.id))?.passwordHash
   );
 }
 
@@ -120,12 +124,14 @@ export const listGuests =
       guests.map((g) => g.id)
     );
     const admins = new Set(await repos.guests.listSiteAdminIds());
+    const withPassword = new Set(await repos.guests.listPasswordIds());
     return ok(
       guests.map((g) =>
         toAdminGuest(
           g,
           (events.get(g.id) ?? []).map((e) => e.id),
-          admins.has(g.id)
+          admins.has(g.id),
+          withPassword.has(g.id)
         )
       )
     );
@@ -145,7 +151,7 @@ export const createGuest =
       info: { email },
     });
     if (!created) return emailTaken();
-    return ok(toAdminGuest(guest, [], false));
+    return ok(toAdminGuest(guest, [], false, false));
   };
 
 // For seeding scripts: re-running one must not fail on guests it already made.
@@ -177,7 +183,7 @@ export const ensureGuest =
           tx,
           [eventId],
           () => tx.guests.assignToEvent(eventId, [guest.id]),
-          byAdmin(now)
+          byAdmin(actor, now)
         );
       return ok({ id: guest.id, created });
     });
@@ -206,7 +212,7 @@ export const updateGuest =
         );
       const existing = await tx.guests.findByEmail(email);
       if (existing && existing.id !== id) return emailTaken();
-      const by = byAdmin(now);
+      const by = byAdmin(actor, now);
       const updated = await recordingShownGuests(
         tx,
         await tx.guests.listShownEventIds(id),
@@ -238,7 +244,7 @@ export const deleteGuest =
         const guest = await tx.guests.findById(input.id);
         if (!guest) return guestNotFound();
         if (await isLastSiteAdmin(tx.guests, input.id)) return lastSiteAdmin();
-        const by = byAdmin(now);
+        const by = byAdmin(actor, now);
         const sessions = new Map(
           [
             ...(await tx.sessions.listHostedByGuest(input.id)),
@@ -291,7 +297,7 @@ export const setSiteAdmin =
         tx,
         await tx.guests.listShownEventIds(input.id),
         () => tx.guests.setSiteAdmin(input.id, input.siteAdmin),
-        byAdmin(now)
+        byAdmin(actor, now)
       );
       if (!done) return guestNotFound();
       const guest = await tx.guests.findById(input.id);

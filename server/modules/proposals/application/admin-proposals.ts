@@ -99,7 +99,7 @@ export const adminCreateProposal =
           tx,
           [event.id],
           () => tx.guests.assignToEvent(event.id, hostIds),
-          byAdmin(now)
+          byAdmin(actor, now)
         );
       const created = await tx.sessionProposals.create({
         eventId: event.id,
@@ -109,7 +109,7 @@ export const adminCreateProposal =
         durationMinutes: durationMinutes ?? undefined,
         createdTime: now,
       });
-      tx.record(changes.proposalCreated(created, byAdmin(now)));
+      tx.record(changes.proposalCreated(created, byAdmin(actor, now)));
       return ok({ created, event });
     });
     if (!result.ok) return result;
@@ -135,7 +135,7 @@ export const adminUpdateProposal =
       const refused = await unknownHost(tx, hostIds);
       if (refused) return refused;
 
-      const by = byAdmin(now);
+      const by = byAdmin(actor, now);
       const updated = await recordingVoteLoss(
         tx,
         proposal,
@@ -169,7 +169,7 @@ export const adminDeleteProposal =
     return uow.run(async (tx) => {
       const proposal = await tx.sessionProposals.findById(id);
       if (!proposal) return proposalNotFound();
-      const by = byAdmin(now);
+      const by = byAdmin(actor, now);
       await recordingVoteLoss(
         tx,
         proposal,

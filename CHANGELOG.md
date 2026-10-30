@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Site admins**: organizers can make people site admins, who open the admin pages after signing in
+  with a password or email code. The first one is made through a one-time link the server logs.
 - **Failed changes now say what failed**: a refused or unsaved RSVP, comment or attendee count names
   the session and the reason, and says when it might not have been saved.
 - **Admins see when a newer release is out** (#788): a red dot beside the footer's version names the

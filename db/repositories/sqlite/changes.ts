@@ -97,7 +97,10 @@ function actorOf(row: ChangeRow): Actor {
   if (row.actorType === "guest" && row.actorId) {
     return { type: "guest", id: row.actorId };
   }
-  return row.actorType === "admin" ? { type: "admin" } : { type: "system" };
+  if (row.actorType === "admin") {
+    return row.actorId ? { type: "admin", id: row.actorId } : { type: "admin" };
+  }
+  return { type: "system" };
 }
 
 function toRecordedChange(row: ChangeRow): RecordedChange {
@@ -388,7 +391,8 @@ export class SqliteChangesRepository implements ChangesRepository {
         subjectType: change.subjectType,
         subjectId: change.subjectId,
         actorType: change.actor.type,
-        actorId: change.actor.type === "guest" ? change.actor.id : null,
+        actorId:
+          change.actor.type === "system" ? null : (change.actor.id ?? null),
         occurredAt: change.occurredAt.toISOString(),
         payload: change.payload,
         audience: meta.audience,

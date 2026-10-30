@@ -214,14 +214,19 @@ function GuestRow({
     <div>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="min-w-0 flex-1">
-          <p className="truncate font-medium text-fg">
-            {guest.name}
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <p className="min-w-0 truncate font-medium text-fg">{guest.name}</p>
             {guest.siteAdmin && (
-              <span className="ml-2 rounded-md bg-surface-muted px-1.5 py-0.5 text-xs font-normal text-fg-muted">
+              <span className="rounded-md bg-surface-muted px-1.5 py-0.5 text-xs font-normal text-fg-muted">
                 Site admin
               </span>
             )}
-          </p>
+            {guest.siteAdmin && !guest.hasPassword && (
+              <span className="rounded-md bg-surface-muted px-1.5 py-0.5 text-xs font-normal text-fg-muted">
+                No password yet
+              </span>
+            )}
+          </div>
           <p className="truncate text-sm text-fg-subtle">{guest.email}</p>
           {memberOf.length > 0 && (
             <p className="truncate text-sm text-fg-subtle">

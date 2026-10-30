@@ -39,7 +39,7 @@ export const importGuests =
         tx,
         eventIds,
         () => tx.guests.importAndAssign(rows, eventIds),
-        byAdmin(now)
+        byAdmin(actor, now)
       );
       return ok({ created, existing: rows.length - created });
     });

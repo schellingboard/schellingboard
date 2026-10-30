@@ -1,6 +1,7 @@
-import { changes, type ChangeContext } from "@schellingboard/domain/change";
+import { changes } from "@schellingboard/domain/change";
 import type { LocationUnavailability } from "@schellingboard/domain/location";
 import type { Actor } from "@/server/kernel/actor";
+import { byAdmin } from "@/server/kernel/change-context";
 import {
   forbidden,
   invalid,
@@ -17,10 +18,6 @@ export interface LocationUnavailabilityInput {
   end: Date | undefined;
 }
 
-const byAdmin = (at: Date): ChangeContext => ({
-  actor: { type: "admin" },
-  at,
-});
 const adminRequired = () => forbidden("admin.required", "Unauthorized");
 const eventNotFound = () => notFound("event.notFound", "Event not found");
 const valid = (d: Date | undefined): d is Date =>
@@ -79,7 +76,7 @@ export const addLocationUnavailability =
         }))
       );
       for (const period of created)
-        tx.record(changes.unavailabilityAdded(period, byAdmin(now)));
+        tx.record(changes.unavailabilityAdded(period, byAdmin(actor, now)));
       return ok(created);
     });
   };
@@ -96,7 +93,7 @@ export const deleteLocationUnavailability =
       const period = await tx.locationUnavailability.findById(input.id);
       if (!period) return notFound("unavailability.notFound", "Not found");
       await tx.locationUnavailability.delete(input.id);
-      tx.record(changes.unavailabilityRemoved(period, byAdmin(now)));
+      tx.record(changes.unavailabilityRemoved(period, byAdmin(actor, now)));
       return ok(period);
     });
   };

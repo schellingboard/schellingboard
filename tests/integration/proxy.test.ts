@@ -172,12 +172,11 @@ describe("proxy: pages live under /legacy", () => {
     expect(rewriteTarget(result.response)?.pathname).toBe("/api/spa/shell");
   });
 
-  it("answers 404 for the admin paths when the admin UI is disabled", async () => {
+  it("serves the shell for the admin paths with no admin password set", async () => {
     vi.stubEnv("ADMIN_PASSWORD", "");
     const result = await throughProxy("/admin/events", {}, []);
-    if (result.ok) throw new Error("expected a refusal");
-    expect(result.response.status).toBe(404);
-    expect(rewriteTarget(result.response)).toBeNull();
+    if (result.ok) throw new Error("expected a rewrite");
+    expect(rewriteTarget(result.response)?.pathname).toBe("/api/spa/shell");
   });
 
   it("gates /legacy pages with the site password and returns to the same page", async () => {
