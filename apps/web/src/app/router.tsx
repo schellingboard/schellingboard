@@ -21,6 +21,7 @@ import {
   LoginPage,
   NotificationsPage,
   ResetPage,
+  BootstrapPage,
   SettingsPage,
   SiteLoginPage,
 } from "./account-pages";
@@ -169,6 +170,13 @@ export function createAppRouter(
       return <LoginPage services={services} />;
     },
   });
+  const authBootstrap = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "auth/bootstrap",
+    component: function AuthBootstrapRoute(): ReactElement {
+      return <BootstrapPage services={services} />;
+    },
+  });
   const authReset = createRoute({
     getParentRoute: () => rootRoute,
     path: "auth/reset",
@@ -240,6 +248,7 @@ export function createAppRouter(
       accountSecurity,
       authLogin,
       authReset,
+      authBootstrap,
       guests.addChildren([guestsList, guestsPage]),
       event.addChildren([
         schedule,

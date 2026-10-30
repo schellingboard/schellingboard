@@ -93,6 +93,13 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
   script fails its FK check there (pre-existing). Use cases: 015-US6, 016-US4. No changelog or docs
   yet (10b). Checks and commit id: see the log.
 
+- Step 10b: the SPA half is done (`/auth/bootstrap`, role toggle; no E2E for the bootstrap page
+  since a test cannot read the logged link). Recording which admin made a change is split out as
+  10c. The users screen does not yet show an admin without a password as such (the admin view has no
+  `hasPassword`); see Questions. Checks: all of `make precommit` green; E2E 213 passed, 1 skipped, 1
+  flaky (`attendee-count.spec.ts:61`, known; `make` exits 1 on a flaky test). Commit id: see the
+  log.
+
 ## Known E2E flakes
 
 `attendee-count.spec.ts:64` (fails ~half of solo runs on the base too), `settings.spec.ts:67`,
@@ -117,5 +124,11 @@ the timeout, not the cause. Unresolved.
 
 ## Questions
 
-None open. Q5 to Q8 were answered on 2026-10-29 and are in ADR 0017 and PLAN.md (map item: step 14;
-401/403 to sign-in: step 11).
+Open: should the admin users view show whether a site admin has set a password (needs a
+`hasPassword` field)? Otherwise none. Q5 to Q8 were answered on 2026-10-29 and are in ADR 0017 and
+PLAN.md (map item: step 14; 401/403 to sign-in: step 11).
+
+- Step 10b review: fixed the button wrap, the duplicate doc comment, and the untrue changelog and
+  admin-guide claims (moved to step 11 with the proxy change that makes them true). Rejected: a
+  confirm step for granting or revoking the role (both are one click to undo, and the last admin is
+  protected by the server). `hasPassword` and recording the admin: step 11.
