@@ -1,5 +1,5 @@
 import { STALE_EVENT_MESSAGE } from "@schellingboard/contracts/event";
-import { changes, type ChangeContext } from "@schellingboard/domain/change";
+import { changes } from "@schellingboard/domain/change";
 import type { Day, Event } from "@schellingboard/domain/event";
 import { isEventIconName } from "@schellingboard/domain/event-icons";
 import {
@@ -8,6 +8,7 @@ import {
   isValidSlotIncrement,
 } from "@schellingboard/domain/slots";
 import type { Actor } from "@/server/kernel/actor";
+import { byAdmin } from "@/server/kernel/change-context";
 import { recordingSessionCascade } from "@/server/kernel/session-cascade";
 import {
   conflict,
@@ -57,11 +58,6 @@ export type EventPhasesInput = {
 } & Record<PhaseField, Date | undefined>;
 
 type EventPhases = Partial<Record<PhaseField, Date | undefined>>;
-
-export const byAdmin = (at: Date): ChangeContext => ({
-  actor: { type: "admin" },
-  at,
-});
 
 export const adminRequired = () => forbidden("admin.required", "Unauthorized");
 export const eventNotFound = () =>
@@ -292,7 +288,7 @@ export const updateEvent =
       if (incrementChanged) {
         await tx.meetingAvailability.deleteByEvent(input.id);
       }
-      tx.record(changes.eventChanged(updated, byAdmin(now)));
+      tx.record(changes.eventChanged(updated, byAdmin(actor, now)));
       return ok(updated);
     });
   };
@@ -373,7 +369,7 @@ export const updateEventPhases =
         expectedVersion,
       });
       if (!updated) return eventChangedMeanwhile(tx, id);
-      tx.record(changes.eventChanged(updated, byAdmin(now)));
+      tx.record(changes.eventChanged(updated, byAdmin(actor, now)));
       return ok(updated);
     });
   };
@@ -386,7 +382,7 @@ export const deleteEvent =
     now: Date
   ): Promise<Result<void>> => {
     if (!actor.admin) return adminRequired();
-    const by = byAdmin(now);
+    const by = byAdmin(actor, now);
     return uow.run(async (tx) => {
       const event = await tx.events.findById(input.id);
       if (!event) return eventNotFound();

@@ -1588,6 +1588,7 @@
           "email": { "type": "string" },
           "authProtected": { "type": "boolean" },
           "siteAdmin": { "type": "boolean" },
+          "hasPassword": { "type": "boolean" },
           "eventIds": { "type": "array", "items": { "type": "string" } },
           "version": { "type": "integer" }
         },
@@ -1597,6 +1598,7 @@
           "email",
           "authProtected",
           "siteAdmin",
+          "hasPassword",
           "eventIds",
           "version"
         ]

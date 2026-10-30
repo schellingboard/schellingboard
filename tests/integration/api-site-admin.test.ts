@@ -6,7 +6,8 @@ import { peopleUseCases } from "@/server/composition";
 import { hashSessionToken } from "@/utils/login-session-token";
 import { verifyUserPassword } from "@/utils/user-credentials";
 import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createGuest } from "../helpers/factories";
+import { openApiDocument } from "@/server/http/openapi";
+import { createEvent, createGuest } from "../helpers/factories";
 import {
   GUEST_COOKIE_NAME,
   openGuestValue,
@@ -95,6 +96,96 @@ describe("the site-admin role", () => {
 
     expect(res.status).toBe(403);
     expect(await code(res)).toBe("siteAdmin.protected");
+  });
+});
+
+describe("admin views and records", () => {
+  it(
+    "shows whether a site admin has a password",
+    { tags: ["016-US4"] },
+    async () => {
+      const admin = await siteAdmin();
+      const token = await verifiedGuestValue(admin.id);
+      const hasPassword = async () => {
+        const res = await call("GET", "/admin/guests", undefined, token);
+        const page = (await res.json()) as {
+          items: { id: string; hasPassword: boolean }[];
+        };
+        return page.items.find((g) => g.id === admin.id)?.hasPassword;
+      };
+
+      expect(await hasPassword()).toBe(false);
+      await getRepositories().guests.setAuthProtection(admin.id, {
+        authProtected: true,
+        passwordHash: "hash",
+      });
+      expect(await hasPassword()).toBe(true);
+    }
+  );
+
+  it(
+    "records which site admin made a change",
+    { tags: ["016-US4"] },
+    async () => {
+      const admin = await siteAdmin();
+      const event = await createEvent();
+
+      const res = await call(
+        "POST",
+        `/admin/events/${event.id}/days`,
+        {
+          start: "2030-06-01T09:00:00.000Z",
+          end: "2030-06-01T17:00:00.000Z",
+          startBookings: "2030-06-01T09:00:00.000Z",
+          endBookings: "2030-06-01T17:00:00.000Z",
+        },
+        await verifiedGuestValue(admin.id)
+      );
+
+      expect(res.status).toBe(201);
+      const logged = await getRepositories().changes.listAfter(0);
+      expect(logged.at(-1)?.actor).toEqual({ type: "admin", id: admin.id });
+    }
+  );
+});
+
+describe("every admin operation", () => {
+  const operations = Object.entries(openApiDocument().paths ?? {})
+    .filter(([path]) => path.startsWith("/api/v1/admin"))
+    .flatMap(([path, item]) =>
+      (["get", "post", "put", "delete"] as const)
+        .filter((method) => item?.[method])
+        .map((method) => [method, path.replace("/api/v1", "")] as const)
+    );
+
+  it.each([
+    ["a verified guest who is no site admin", "verified"],
+    ["a claimed session of a site admin", "claimed"],
+  ])("refuses %s", { tags: ["016-US4"] }, async (_, kind) => {
+    const guest = await createGuest();
+    if (kind === "claimed") {
+      await getRepositories().guests.setSiteAdmin(guest.id, true);
+    }
+    const token =
+      kind === "claimed"
+        ? openGuestValue(guest.id)
+        : await verifiedGuestValue(guest.id);
+
+    expect(operations.length).toBeGreaterThan(40);
+    for (const [method, path] of operations) {
+      const res = await call(
+        method.toUpperCase() as keyof typeof handlers,
+        path.replace(/\{[^}]+\}/g, "x"),
+        method === "get" || method === "delete" ? undefined : {},
+        token
+      );
+      // An empty or non-form body may be refused before the role is checked.
+      expect([method, path, [400, 403, 415].includes(res.status)]).toEqual([
+        method,
+        path,
+        true,
+      ]);
+    }
   });
 });
 

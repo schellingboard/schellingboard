@@ -19,7 +19,8 @@ import {
   type Result,
 } from "@/server/kernel/result";
 import type { EventDeps } from "../ports";
-import { adminRequired, byAdmin, eventNotFound } from "./events";
+import { byAdmin } from "@/server/kernel/change-context";
+import { adminRequired, eventNotFound } from "./events";
 
 export interface DayWindowInput {
   start: Date | undefined;
@@ -112,8 +113,8 @@ export const createDay =
       } catch {
         return conflict("day.saveFailed", "Failed to create day");
       }
-      tx.record(changes.dayCreated(created, byAdmin(now)));
-      await recordEventDates(tx, event, byAdmin(now));
+      tx.record(changes.dayCreated(created, byAdmin(actor, now)));
+      await recordEventDates(tx, event, byAdmin(actor, now));
       return ok(created);
     });
   };
@@ -167,8 +168,8 @@ export const updateDay =
         return conflict("day.saveFailed", "Failed to update day");
       }
       if (!updated) return dayChangedMeanwhile(tx, input.id);
-      tx.record(changes.dayChanged(updated, byAdmin(now)));
-      await recordEventDates(tx, event, byAdmin(now));
+      tx.record(changes.dayChanged(updated, byAdmin(actor, now)));
+      await recordEventDates(tx, event, byAdmin(actor, now));
       return ok(updated);
     });
   };
@@ -185,7 +186,7 @@ export const deleteDay =
       const day = await tx.days.findById(input.id);
       if (!day) return dayNotFound();
       const event = await tx.events.findById(day.eventId);
-      const by = byAdmin(now);
+      const by = byAdmin(actor, now);
       try {
         const sessions = await tx.sessions.listByEvent(day.eventId);
         await recordingShownGuests(

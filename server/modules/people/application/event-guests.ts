@@ -32,7 +32,7 @@ export const assignGuestsToEvent =
         tx,
         [input.eventId],
         () => tx.guests.assignToEvent(input.eventId, input.guestIds),
-        byAdmin(now)
+        byAdmin(actor, now)
       );
       return ok(undefined);
     });
@@ -52,7 +52,7 @@ export const removeGuestsFromEvent =
         tx,
         [input.eventId],
         () => tx.guests.removeFromEvent(input.eventId, input.guestIds),
-        byAdmin(now)
+        byAdmin(actor, now)
       );
       return ok(undefined);
     });

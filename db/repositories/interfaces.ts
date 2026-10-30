@@ -294,6 +294,7 @@ export interface GuestsRepository {
   findLoginId(identifier: string): Promise<string | null>;
   getSiteAdmin(id: string): Promise<boolean>;
   listSiteAdminIds(): Promise<string[]>;
+  listPasswordIds(): Promise<string[]>;
   /** False when the guest does not exist. Raises the version, since the role protects the name. */
   setSiteAdmin(id: string, siteAdmin: boolean): Promise<boolean>;
   getUsername(id: string): Promise<string | null>;

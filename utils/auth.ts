@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   ADMIN_COOKIE_NAME,
   ADMIN_SCOPE,
+  GUEST_COOKIE_NAME,
   COOKIE_MAX_AGE_SEC,
   isAdminCookieValid,
   isAdminEnabled,
@@ -215,6 +216,35 @@ export async function adminApiRefusal(
     };
   }
   return null;
+}
+
+/**
+ * The versioned admin API: the admin cookie is verified here, while a guest's
+ * login session is left to the API, whose use cases check the site-admin role
+ * (the proxy has no database). Only a request with neither is refused.
+ */
+export async function adminApiV1Refusal(
+  request: NextRequest
+): Promise<{ refusal: AdminApiRefusal } | { passwordVerified: boolean }> {
+  if (!isTrustedOrigin(request)) {
+    return {
+      refusal: {
+        status: 403,
+        code: "request.crossSite",
+        message: "Cross-site request rejected",
+      },
+    };
+  }
+  if (await isAdminAuthenticated(request)) return { passwordVerified: true };
+  if (request.cookies.has(GUEST_COOKIE_NAME))
+    return { passwordVerified: false };
+  return {
+    refusal: {
+      status: 401,
+      code: "admin.unauthenticated",
+      message: "Unauthorized",
+    },
+  };
 }
 
 export function forwardAsVerifiedAdmin(request: NextRequest): NextResponse {

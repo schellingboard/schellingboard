@@ -298,13 +298,22 @@ describe("proxy: /api/v1", () => {
     }
   );
 
-  it("answers 404 admin.disabled when the admin feature is off", async () => {
+  it("refuses with 401 when no admin password is set and nobody signed in", async () => {
     vi.stubEnv("ADMIN_PASSWORD", "");
     const result = await throughProxy("/api/v1/admin/events", {}, []);
     if (result.ok) throw new Error("expected proxy to reject the request");
-    expect(result.response.status).toBe(404);
+    expect(result.response.status).toBe(401);
     expect(await result.response.json()).toMatchObject({
-      code: "admin.disabled",
+      code: "admin.unauthenticated",
     });
+  });
+
+  it("leaves a signed-in guest's admin request to the API, which checks the role", async () => {
+    vi.stubEnv("ADMIN_PASSWORD", "");
+    const result = await throughProxy("/api/v1/admin/events", {}, [
+      { name: GUEST_COOKIE_NAME, value: "token" },
+    ]);
+    if (!result.ok) throw new Error("expected proxy to forward the request");
+    expect(result.request.headers.get(ADMIN_VERIFIED_HEADER)).toBeNull();
   });
 });

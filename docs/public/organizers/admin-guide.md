@@ -6,14 +6,27 @@ type: guide
 
 # Admin UI guide
 
-The admin UI lives at `/admin`, gated by a single shared `ADMIN_PASSWORD` (no per-admin accounts).
-It is completely independent from `SITE_PASSWORD` — neither password grants access to the other
-side. Unset, `/admin` returns a 404 rather than a login prompt.
+The admin UI lives at `/admin`. It opens for [site admins](#site-admins), or with the shared
+`ADMIN_PASSWORD` if one is set. It is independent of `SITE_PASSWORD` — neither password grants
+access to the other side.
 
 :::warning "Changing a password does not log anyone out" Both gates sign their cookies with
 `AUTH_SECRET`, and existing sessions stay valid for up to a week. To revoke access immediately,
 rotate `AUTH_SECRET` too — which logs out the site and admin gates. Attendees stay signed in (their
 sessions last 30 days from last use), and no organizer action signs them out yet. :::
+
+## Site admins
+
+A site admin is a person who opens `/admin` after signing in with a password or an emailed code, in
+place of the shared `ADMIN_PASSWORD`. Their name is protected, and changes they make are recorded
+under their name.
+
+- **The first site admin**: while the site has none, the server logs a one-time link at start (valid
+  24 hours). Open it, choose your name or enter a name and email, and set a username and password.
+  To get a new link later, set `SB_BOOTSTRAP_LINK=1` for one start.
+- **Make site admin / Remove site admin**: on the Users page, per user. The last site admin cannot
+  be removed. A site admin who has not set a password yet is marked "No password yet" and signs in
+  with a reset link.
 
 ## Site settings
 

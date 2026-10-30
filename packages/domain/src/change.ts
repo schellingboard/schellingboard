@@ -7,7 +7,10 @@ import type { Rsvp, Session, SessionProposal } from "./session";
 import type { VoteChoice } from "./vote";
 
 export type Actor =
-  { type: "guest"; id: string } | { type: "admin" } | { type: "system" };
+  | { type: "guest"; id: string }
+  /** `id` is the site admin's guest; absent for the admin password. */
+  | { type: "admin"; id?: string }
+  | { type: "system" };
 
 /** Who made a change, and when by their clock (which may be the dev fake clock). */
 export type ChangeContext = {

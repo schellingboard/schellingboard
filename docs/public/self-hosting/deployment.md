@@ -73,6 +73,7 @@ lookup off.
 ## Administration
 
 Events, guests, locations, and content moderation are managed through the web admin UI at `/admin`.
-Set `ADMIN_PASSWORD` (and `AUTH_SECRET`) to enable it. See the
-[Admin UI guide](../organizers/admin-guide.md) for what's configurable, and
-[How it works](../organizers/how-it-works.md) for the phase model and attendee-facing behavior.
+Sign in as a site admin (the first one is made through a link the server logs at start), or set
+`ADMIN_PASSWORD` (and `AUTH_SECRET`). See the [Admin UI guide](../organizers/admin-guide.md) for
+what's configurable, and [How it works](../organizers/how-it-works.md) for the phase model and
+attendee-facing behavior.

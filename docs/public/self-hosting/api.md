@@ -39,9 +39,9 @@ login's, and the one choosing your name. There are no API tokens yet; they are p
 
 - **Site password.** When `SITE_PASSWORD` is set, every `/api/v1` endpoint outside `/api/v1/admin/`
   needs the site cookie or the admin cookie.
-- **Admin password.** `/api/v1/admin/` needs the admin cookie, and only that: the site password is
-  not asked for there, as in the admin UI. With `ADMIN_PASSWORD` unset, these endpoints answer
-  `404`.
+- **Admin.** `/api/v1/admin/` needs the admin cookie or the sign-in of a site admin, and nothing
+  else: the site password is not asked for there, as in the admin UI. Without either, these
+  endpoints answer `401`, or `403` for a guest who is not a site admin.
 
 Scripts should use `/api/v1/admin/` with the admin cookie, which they get by exchanging the admin
 password at `/api/auth/login`:
@@ -87,7 +87,7 @@ attach the same list to their own codes, such as `guest.invalid`.
 | `400`  | The request is invalid (`request.invalid`, or a field's code)       |
 | `401`  | Not signed in (`site.unauthenticated`, `admin.unauthenticated`)     |
 | `403`  | Not allowed (`admin.required`, `guest.protected`, …)                |
-| `404`  | Not found, or admin access is disabled (`admin.disabled`)           |
+| `404`  | Not found                                                           |
 | `409`  | Conflicts with the current state (`session.full`, …)                |
 | `422`  | An `Idempotency-Key` reused for a different request                 |
 | `429`  | Too many requests (`rate.limited`); see [Rate limits](#rate-limits) |

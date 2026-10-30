@@ -28,6 +28,7 @@ const guest = (
   email: `${id}@x.org`,
   eventIds,
   siteAdmin: false,
+  hasPassword: true,
   version: 1,
 });
 

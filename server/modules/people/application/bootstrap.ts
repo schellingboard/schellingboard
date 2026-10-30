@@ -121,7 +121,7 @@ export const bootstrapAdmin = (deps: PeopleDeps) => {
           await tx.guests.setSiteAdmin(id, true);
           return stored;
         },
-        byAdmin(realNow())
+        byAdmin(actor, realNow())
       );
       if (username === "taken")
         return conflict("username.taken", "That username is taken");
