@@ -27,7 +27,7 @@ async function createEvent(page: Page, eventName: string) {
 
   // The list is server-rendered, so "New event" is clickable a moment before
   // React attaches its handler, and a click in that window is simply dropped.
-  const nameField = page.getByLabel("Name *");
+  const nameField = page.getByLabel("Name*");
   await expect(async () => {
     if (!(await nameField.isVisible())) {
       await page.getByRole("button", { name: "New event" }).click();
@@ -81,10 +81,10 @@ test.describe("attendee meeting availability", () => {
 
     // One day, so the slot list is short and predictable.
     await page.getByRole("button", { name: "Add day" }).click();
-    await page.getByLabel("Start *").last().fill(`${DAY}T09:00`);
-    await page.getByLabel("End *").last().fill(`${DAY}T11:00`);
-    await page.getByLabel("Bookings open *").fill(`${DAY}T09:00`);
-    await page.getByLabel("Bookings close *").fill(`${DAY}T11:00`);
+    await page.getByLabel("Start*").last().fill(`${DAY}T09:00`);
+    await page.getByLabel("End*").last().fill(`${DAY}T11:00`);
+    await page.getByLabel("Bookings open*").fill(`${DAY}T09:00`);
+    await page.getByLabel("Bookings close*").fill(`${DAY}T11:00`);
     await page.getByRole("button", { name: "Add day" }).last().click();
     await expect(page.getByText(`${DAY}T09:00`)).toBeVisible();
 
@@ -140,9 +140,9 @@ test.describe("attendee meeting availability", () => {
     // Scoped to Days: the event's own "End *" date sits on this page too.
     const days = page.getByRole("region", { name: "Days" });
     await days.getByRole("button", { name: /^Edit day / }).click();
-    await days.getByLabel("End *").fill(`${DAY}T10:00`);
+    await days.getByLabel("End*").fill(`${DAY}T10:00`);
     // The bookings window has to stay inside the day's own.
-    await days.getByLabel("Bookings close *").fill(`${DAY}T10:00`);
+    await days.getByLabel("Bookings close*").fill(`${DAY}T10:00`);
     await days.getByRole("button", { name: "Save", exact: true }).click();
     await expect(page.getByText(`${DAY}T09:00 – ${DAY}T10:00`)).toBeVisible();
 

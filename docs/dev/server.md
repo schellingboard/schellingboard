@@ -49,9 +49,9 @@ several reads on one consistent view.
 ## Reading for pages
 
 Site pages do not call the repositories. `pageReads()` in `composition.ts` gives plain reads (no
-actor: the pages sit behind the site password only), and `adminReads()` in `server/admin-reads.ts`
-the admin pages' reads. Each is a function in a module's `application/page-reads.ts` taking a `Pick`
-of the repositories. `make arch` enforces it, with the auth flows allow-listed.
+actor: the pages sit behind the site password only). Each is a function in a module's
+`application/page-reads.ts` taking a `Pick` of the repositories. `make arch` enforces it, with the
+auth flows allow-listed.
 
 ## Choosing a name
 

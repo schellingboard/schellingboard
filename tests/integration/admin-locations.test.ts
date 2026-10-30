@@ -12,22 +12,14 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 
-const cookieJar = new Map<string, string>();
-
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-}));
-
+import {
+  createLocationAction,
+  deleteLocationAction,
+  loginAsAdmin,
+  logoutAdmin,
+  moveLocationAction,
+  updateLocationAction,
+} from "../helpers/admin-api";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import {
   createEvent,
@@ -35,23 +27,11 @@ import {
   createSession,
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { createAdminAuthCookie } from "@/utils/auth";
-import {
-  createLocationAction,
-  updateLocationAction,
-  deleteLocationAction,
-  moveLocationAction,
-} from "@/app/actions/admin-locations";
 import { createImageFile } from "@/tests/helpers/utils";
 import { locationSchema } from "@schellingboard/contracts/location";
 import { z } from "zod";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef"; // 32 chars
-
-async function loginAsAdmin() {
-  const c = await createAdminAuthCookie();
-  cookieJar.set(c.name, c.value);
-}
 
 const baseLocationData = {
   name: "Main Hall",
@@ -77,7 +57,7 @@ describe("admin location actions", () => {
 
   beforeEach(async () => {
     resetTestDb();
-    cookieJar.clear();
+    logoutAdmin();
     uploadsDir = fs.mkdtempSync(path.join(os.tmpdir(), "uploads-test-"));
     vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
@@ -93,7 +73,7 @@ describe("admin location actions", () => {
   describe("authorization", () => {
     it("rejects all actions without an admin cookie", async () => {
       const location = await createLocation();
-      cookieJar.clear();
+      logoutAdmin();
       expect(await createLocationAction(baseLocationData)).toEqual({
         ok: false,
         error: "Unauthorized",
@@ -278,23 +258,14 @@ describe("admin location actions", () => {
       expect(fs.existsSync(imagePath(created.imageUrl))).toBe(true);
     });
 
-    it("rejects an image with the wrong aspect ratio and creates nothing", async () => {
-      const formData = {
+    it("keeps the location and says why the image was refused", async () => {
+      const result = await createLocationAction({
         ...baseLocationData,
         image: await makeImageFile(800, 800),
-      };
-      const result = await createLocationAction(formData);
-      expect(result.ok).toBe(false);
-      if (!result.ok) {
-        expect(result.error).toMatchObject([
-          {
-            code: "custom",
-            message: /4:3/,
-            path: ["image"],
-          },
-        ]);
-      }
-      expect(await getRepositories().locations.list()).toEqual([]);
+      });
+      expect(!result.ok && result.error).toMatch(/4:3/);
+      const [saved] = await getRepositories().locations.list();
+      expect(saved.imageUrl).toBeFalsy();
     });
   });
 

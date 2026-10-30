@@ -21,7 +21,7 @@ test("configures the meetings section and keeps it across a reload @012-US1", as
   const eventName = `E2E Meetings ${uniqueSuffix()}`;
 
   await page.getByRole("button", { name: "New event" }).click();
-  await page.getByLabel("Name *").fill(eventName);
+  await page.getByLabel("Name*").fill(eventName);
   await page.getByRole("button", { name: "Create event" }).click();
   await page
     .getByRole("listitem")
@@ -42,7 +42,7 @@ test("configures the meetings section and keeps it across a reload @012-US1", as
   await meetings.getByLabel("Maximum open requests per attendee").fill("3");
 
   await meetings.getByRole("button", { name: /add meeting point/i }).click();
-  await meetings.getByLabel("Name *").fill("Coffee bar");
+  await meetings.getByLabel("Name*").fill("Coffee bar");
   await meetings.getByLabel("Description").fill("Ground floor, by reception");
   await meetings.getByRole("button", { name: /add meeting point/i }).click();
   await expect(meetings.getByText("Ground floor, by reception")).toBeVisible();

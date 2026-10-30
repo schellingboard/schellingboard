@@ -171,7 +171,6 @@ module.exports = {
         pathNot: [
           "^server/modules/[^/]+/module\\.ts$",
           "^server/composition\\.ts$",
-          "^server/admin-reads\\.ts$",
           "^server/kernel/",
           "^server/http/app\\.ts$",
         ],
@@ -195,14 +194,6 @@ module.exports = {
         ],
       },
       to: { path: "^db/container\\.ts$", dependencyTypesNot: ["type-only"] },
-    },
-    {
-      name: "admin-reads-only-for-admin",
-      severity: "error",
-      comment:
-        "`adminReads()` checks nothing itself, so only admin pages and actions may use it.",
-      from: { pathNot: "^(app/legacy/admin/|app/actions/admin-)" },
-      to: { path: "^server/admin-reads\\.ts$" },
     },
     {
       name: "kernel-reaches-no-module",

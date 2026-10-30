@@ -9,28 +9,18 @@ import {
   vi,
 } from "vitest";
 
-const cookieJar = new Map<string, string>();
-
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-}));
-
 vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
 }));
 
 import { sendMail } from "@/utils/mailer";
-import { revalidatePath } from "next/cache";
+import {
+  adminCreateSessionAction,
+  adminDeleteSessionAction,
+  adminUpdateSessionAction,
+  loginAsAdmin,
+  logoutAdmin,
+} from "../helpers/admin-api";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { runJobs } from "../helpers/jobs";
 import {
@@ -41,26 +31,15 @@ import {
   createSession,
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { createAdminAuthCookie } from "@/utils/auth";
-import {
-  adminCreateSessionAction,
-  adminUpdateSessionAction,
-  adminDeleteSessionAction,
-} from "@/app/actions/admin-sessions";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
-
-async function loginAsAdmin() {
-  const c = await createAdminAuthCookie();
-  cookieJar.set(c.name, c.value);
-}
 
 describe("adminCreateSessionAction", () => {
   beforeAll(() => setupTestDb());
 
   beforeEach(async () => {
     resetTestDb();
-    cookieJar.clear();
+    logoutAdmin();
     vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
@@ -226,10 +205,11 @@ describe("adminCreateSessionAction", () => {
         hostIds: [],
         locationIds: [],
       });
-      expect(!result.ok && result.error).toBe(
-        "Capacity must be a non-negative whole number"
-      );
+      expect(!result.ok && result.code).toBe("request.invalid");
     }
+    expect(await getRepositories().sessions.listByEvent(event.id)).toHaveLength(
+      0
+    );
   });
 
   it("accepts times at any minute, off the day's slot grid", async () => {
@@ -337,31 +317,6 @@ describe("adminCreateSessionAction", () => {
     );
   });
 
-  it("revalidates the public event layout so attendees see the new session", async () => {
-    const event = await createEvent();
-    vi.mocked(revalidatePath).mockClear();
-
-    const result = await adminCreateSessionAction({
-      eventId: event.id,
-      title: "Title",
-      description: "",
-      startTime: null,
-      endTime: null,
-      capacity: 0,
-      adminManaged: true,
-      blocker: false,
-      closed: false,
-      hostIds: [],
-      locationIds: [],
-    });
-    expect(result.ok).toBe(true);
-
-    expect(revalidatePath).toHaveBeenCalledWith(
-      `/legacy/${event.slug}`,
-      "layout"
-    );
-  });
-
   it("rejects a session overlapping an existing one in the same location", async () => {
     const event = await createEvent();
     const loc = await createLocation({ name: "Room A" });
@@ -440,7 +395,7 @@ describe("adminCreateSessionAction", () => {
 
   it("rejects when not authenticated", async () => {
     const event = await createEvent();
-    cookieJar.clear();
+    logoutAdmin();
 
     const result = await adminCreateSessionAction({
       eventId: event.id,
@@ -464,7 +419,7 @@ describe("adminUpdateSessionAction", () => {
 
   beforeEach(async () => {
     resetTestDb();
-    cookieJar.clear();
+    logoutAdmin();
     vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
@@ -763,7 +718,7 @@ describe("adminUpdateSessionAction", () => {
       hostIds: [],
       locationIds: [],
     });
-    expect(!result.ok && result.error).toBe("Invalid start or end time");
+    expect(!result.ok && result.code).toBe("request.invalid");
   });
 
   it("rejects a capacity that is not a non-negative whole number", async () => {
@@ -786,9 +741,7 @@ describe("adminUpdateSessionAction", () => {
 
     for (const capacity of [-1, 2.5, Number.NaN]) {
       const result = await adminUpdateSessionAction({ ...base, capacity });
-      expect(!result.ok && result.error).toBe(
-        "Capacity must be a non-negative whole number"
-      );
+      expect(!result.ok && result.code).toBe("request.invalid");
     }
 
     // session is unchanged
@@ -952,37 +905,10 @@ describe("adminUpdateSessionAction", () => {
     expect(updated?.title).toBe("Old title");
   });
 
-  it("revalidates the public event layout so attendees see the change", async () => {
-    const event = await createEvent();
-    const session = await createSession(event.id);
-    vi.mocked(revalidatePath).mockClear();
-
-    const result = await adminUpdateSessionAction({
-      id: session.id,
-      expectedVersion: session.version,
-      title: "New title",
-      description: "",
-      startTime: null,
-      endTime: null,
-      capacity: 30,
-      adminManaged: false,
-      blocker: false,
-      closed: false,
-      hostIds: [],
-      locationIds: [],
-    });
-    expect(result.ok).toBe(true);
-
-    expect(revalidatePath).toHaveBeenCalledWith(
-      `/legacy/${event.slug}`,
-      "layout"
-    );
-  });
-
   it("rejects when not authenticated", async () => {
     const event = await createEvent();
     const session = await createSession(event.id);
-    cookieJar.clear();
+    logoutAdmin();
 
     const result = await adminUpdateSessionAction({
       id: session.id,
@@ -1025,7 +951,7 @@ describe("adminDeleteSessionAction", () => {
 
   beforeEach(async () => {
     resetTestDb();
-    cookieJar.clear();
+    logoutAdmin();
     vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
@@ -1096,24 +1022,10 @@ describe("adminDeleteSessionAction", () => {
     ).toBe(true);
   });
 
-  it("revalidates the public event layout so attendees see the removal", async () => {
-    const event = await createEvent();
-    const session = await createSession(event.id);
-    vi.mocked(revalidatePath).mockClear();
-
-    const result = await adminDeleteSessionAction({ id: session.id });
-    expect(result.ok).toBe(true);
-
-    expect(revalidatePath).toHaveBeenCalledWith(
-      `/legacy/${event.slug}`,
-      "layout"
-    );
-  });
-
   it("rejects when not authenticated", async () => {
     const event = await createEvent();
     const session = await createSession(event.id);
-    cookieJar.clear();
+    logoutAdmin();
 
     const result = await adminDeleteSessionAction({ id: session.id });
     expect(!result.ok && result.error).toBe("Unauthorized");

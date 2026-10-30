@@ -9,22 +9,12 @@ import {
   vi,
 } from "vitest";
 
-const cookieJar = new Map<string, string>();
-
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-}));
-
+import {
+  adminDeleteProposalAction,
+  adminUpdateProposalAction,
+  loginAsAdmin,
+  logoutAdmin,
+} from "../helpers/admin-api";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { BY_TEST, updateLoggedSession } from "../helpers/changes";
 import {
@@ -35,26 +25,16 @@ import {
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { VoteChoice } from "@schellingboard/domain/vote";
-import { createAdminAuthCookie } from "@/utils/auth";
 import { STALE_PROPOSAL_MESSAGE } from "@schellingboard/contracts/session";
-import {
-  adminUpdateProposalAction,
-  adminDeleteProposalAction,
-} from "@/app/actions/admin-proposals";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
-
-async function loginAsAdmin() {
-  const c = await createAdminAuthCookie();
-  cookieJar.set(c.name, c.value);
-}
 
 describe("adminUpdateProposalAction", () => {
   beforeAll(() => setupTestDb());
 
   beforeEach(async () => {
     resetTestDb();
-    cookieJar.clear();
+    logoutAdmin();
     vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
@@ -132,7 +112,7 @@ describe("adminUpdateProposalAction", () => {
     const event = await createEvent();
     const h1 = await createGuest();
     const proposal = await createProposal(event.id, [h1.id]);
-    cookieJar.clear();
+    logoutAdmin();
 
     const result = await adminUpdateProposalAction({
       id: proposal.id,
@@ -196,7 +176,7 @@ describe("adminDeleteProposalAction", () => {
 
   beforeEach(async () => {
     resetTestDb();
-    cookieJar.clear();
+    logoutAdmin();
     vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
@@ -233,7 +213,7 @@ describe("adminDeleteProposalAction", () => {
   it("rejects when not authenticated", async () => {
     const event = await createEvent();
     const proposal = await createProposal(event.id, []);
-    cookieJar.clear();
+    logoutAdmin();
 
     const result = await adminDeleteProposalAction({ id: proposal.id });
     expect(!result.ok && result.error).toBe("Unauthorized");

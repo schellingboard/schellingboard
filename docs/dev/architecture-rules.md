@@ -103,8 +103,7 @@ kernel and the API mount. See [The server and the API](server.md).
 `utils/` helpers they call read through `pageReads()` or a use case; the rule covers `app/` and
 `utils/`. Exempt: the auth flows (`actions/user-auth.ts`, `auth/login`, `auth/reset`), which run
 before an actor exists, and the job loop, notification and push infrastructure (`utils/jobs/`,
-`utils/notifications.ts`, `utils/push.ts`). `adminReads()` (`server/admin-reads.ts`) is importable
-only from `app/legacy/admin/` and `app/actions/admin-*`.
+`utils/notifications.ts`, `utils/push.ts`).
 
 `apps/web` ([ADR 0015](adr/0015-spa-alongside-next.md)) imports `packages/domain`,
 `packages/contracts` and `packages/api-client` only: never `app/`, `server/`, `utils/`, `db/` or

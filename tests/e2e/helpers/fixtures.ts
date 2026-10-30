@@ -52,6 +52,9 @@ const isPeoplePage = (url: string) => /^\/guests(?:[/?#]|$)/.test(url);
 const isAccountPage = (url: string) =>
   /^\/(?:settings|notifications)(?:[?#]|$)/.test(url);
 
+const isAdminPage = (url: string) =>
+  /^\/admin(?:[/?#]|$)/.test(url) && !/^\/admin\/login(?:[/?#]|$)/.test(url);
+
 function isAllowed(text: string): boolean {
   return ALLOWED_CONSOLE_PATTERNS.some((re) => re.test(text));
 }
@@ -75,7 +78,8 @@ export const test = base.extend<{ consoleGuard: void }>({
           !SERVER_PATH.test(url) &&
           !isEventPage(url) &&
           !isPeoplePage(url) &&
-          !isAccountPage(url)
+          !isAccountPage(url) &&
+          !isAdminPage(url)
           ? `/legacy${url}`
           : url,
         options

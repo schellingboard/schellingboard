@@ -33,11 +33,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
-- **Pages now live under `/legacy/`**: the address bar shows `/legacy/…` for admin pages; the
-  schedule and proposals keep their plain address. Old links, bookmarks and emails still work.
-- **The schedule, session forms, attendee profiles, settings and notifications are now
-  faster-loading app pages**: all work as before; Back closes a session. Password protection moved
-  to an Account security page linked from Settings.
+- **Pages now live under `/legacy/`**: the address bar shows `/legacy/…` for the pages not yet
+  moved; the schedule, proposals and admin area keep their plain address. Old links still work.
+- **The schedule, session forms, attendee profiles, settings, notifications and the admin area are
+  now faster-loading app pages**: all work as before; Back closes a session. Password protection
+  moved to an Account security page linked from Settings.
 - **Deleting a day or location now tells RSVPed guests**: attendees whose session is removed or
   moved by it are notified, in the app and by email or push as their settings allow.
 - **Self-hosters behind a reverse proxy must set `SB_TRUSTED_PROXIES`** (#679): the app no longer

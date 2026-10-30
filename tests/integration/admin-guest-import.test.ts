@@ -9,34 +9,16 @@ import {
   vi,
 } from "vitest";
 
-const cookieJar = new Map<string, string>();
-
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-}));
-
+import {
+  importGuestsAction,
+  loginAsAdmin,
+  logoutAdmin,
+} from "../helpers/admin-api";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { createAdminAuthCookie } from "@/utils/auth";
-import { importGuestsAction } from "@/app/actions/admin-guest-import";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
-
-async function loginAsAdmin() {
-  const c = await createAdminAuthCookie();
-  cookieJar.set(c.name, c.value);
-}
 
 describe("guests.findByEmails", () => {
   beforeAll(() => setupTestDb());
@@ -85,7 +67,7 @@ describe("importGuestsAction", () => {
 
   beforeEach(async () => {
     resetTestDb();
-    cookieJar.clear();
+    logoutAdmin();
     vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
@@ -186,7 +168,7 @@ describe("importGuestsAction", () => {
   });
 
   it("rejects when not authenticated", async () => {
-    cookieJar.clear();
+    logoutAdmin();
     const result = await importGuestsAction({
       csvText: "name,email\nAlice,alice@example.com\n",
       eventIds: [],

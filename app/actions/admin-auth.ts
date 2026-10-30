@@ -3,7 +3,6 @@
 import {
   verifyAdminPassword,
   createAdminAuthCookie,
-  createAdminLogoutCookie,
   isAdminEnabled,
   safeRedirectPath,
 } from "@/utils/auth";
@@ -23,7 +22,7 @@ export async function adminLoginAction(
   const password = formData.get("admin-password") as string;
   const redirectTo = safeRedirectPath(
     formData.get("redirect") as string,
-    "/legacy/admin"
+    "/admin"
   );
 
   if (!isAdminEnabled()) {
@@ -46,9 +45,4 @@ export async function adminLoginAction(
 
   recordLoginFailure("admin", clientKey);
   return { error: "Invalid password" };
-}
-
-export async function adminLogoutAction() {
-  (await cookies()).set(createAdminLogoutCookie());
-  redirect("/legacy/admin/login");
 }

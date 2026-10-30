@@ -193,37 +193,9 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`, `docs/dev/target-architec
 
 ### Admin
 
-- [x] 19. Admin section shell (done: `app/admin-frame.tsx` `AdminFrame`, `queries/admin-gate.ts`,
-      `ui/data-table.tsx`, `POST /api/admin/logout`).
-- [x] 20. **Admin screens**, unrouted, one commit each:
-  - [x] 20a. Events list and create (done: `features/admin/events-screen.tsx`,
-        `queries/admin-events.ts`, `commands/admin-events.ts`). Delete stays in the event detail's
-        danger zone (legacy has it only there): 20b.
-  - [ ] 20b. Event detail (legacy `events/[id]` is ~1500 lines for these, so split):
-    - [x] 20b-1. Done: `features/admin/event-layout.tsx`, `event-config.tsx`,
-          `queries/admin-event.ts`.
-    - [x] 20b-2. Done: `features/admin/event-days.tsx`, `event-meetings.tsx`, new
-          `GET /admin/events/{id}/meeting-points`.
-  - [x] 20c. Done: `features/admin/` `assignment-manager.tsx` (shared by `event-guests.tsx`,
-        `event-locations.tsx`), `location-availability.tsx`;
-        `queries/admin-guests|locations|unavailability`.
-  - [x] 20d. Event proposals and sessions managers (split: sessions is ~880 legacy lines):
-    - [x] 20d-1. Done: `features/admin/event-proposals.tsx`, `list-paging.ts`,
-          `queries/admin-proposals.ts`.
-    - [x] 20d-2. Done: `features/admin/event-sessions.tsx`, `admin-session-model.ts`,
-          `queries/admin-sessions.ts`.
-  - [x] 20e. Split by page group:
-    - [x] 20e-1. Done: `features/admin/locations-screen.tsx`, `commands/admin-locations.ts`,
-          `sessionCount` in `GET /admin/locations`.
-    - [x] 20e-2. Done: `features/admin/guests-screen.tsx`, `guest-import.tsx`,
-          `commands/admin-guests.ts`.
-    - [x] 20e-3. Done: `features/admin/settings-screen.tsx`, `commands/admin-settings.ts`,
-          `queries/admin-settings.ts` (the test email went with the users list in 20e-2).
-- [ ] 21. **Takeover: admin**. Router owns `/admin/**` except the login; `proxy.ts` keeps the admin
-      gate on `/legacy/admin/login` and on the API; legacy admin pages are deleted, the login stays.
-      `SettingsScreen.onSaved` must also reload the `AdminFrame` gate (site title). E2E: `admin`,
-      `meetings-admin`, `room-availability`, `settings`, then full `make test-e2e`. Self-hosting
-      docs if a proxy rule changes. CHANGELOG.
+- [x] 19-21. Admin: `AdminFrame` gate, screens in `features/admin/`, and the takeover (`/admin/**`
+      is the SPA's in `app/admin-pages.tsx`; legacy admin pages and actions deleted, only
+      `/legacy/admin/login` stays; the gate reloads when settings are saved).
 
 ### Close
 

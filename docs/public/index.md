@@ -22,8 +22,8 @@ vote on the ones they want, and place them on a shared schedule.
 
 - [How it works](organizers/how-it-works.md) — phases, who may change what, voting and scheduling
   rules, kiosk mode, multi-event installs, and which emails get sent.
-- [Admin UI guide](organizers/admin-guide.md) — every setting in `/legacy/admin`: events, days,
-  locations, guests, proposals, and sessions.
+- [Admin UI guide](organizers/admin-guide.md) — every setting in `/admin`: events, days, locations,
+  guests, proposals, and sessions.
 
 ## Self-hosting
 

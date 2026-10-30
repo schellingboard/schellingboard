@@ -1,4 +1,7 @@
 import {
+  createContext,
+  useCallback,
+  useContext,
   useEffect,
   useState,
   useSyncExternalStore,
@@ -18,6 +21,11 @@ import { hardNavigate } from "./hard-navigate";
 import { useHealth } from "./health";
 import { ThemeProvider } from "./theme";
 import { useUpdateStatus } from "./updates";
+
+const ReloadGate = createContext<() => void>(() => {});
+
+/** Reads the gate again, so the header shows a title that a page just changed. */
+export const useReloadAdminGate = () => useContext(ReloadGate);
 
 const LOGIN = "/legacy/admin/login";
 
@@ -162,6 +170,7 @@ export function AdminFrame({
     void gate.load();
   }, [gate]);
   const state = useSyncExternalStore(gate.subscribe, gate.get);
+  const reload = useCallback(() => void gate.load(), [gate]);
   const health = useHealth(api);
   const update = useUpdateStatus(api);
 
@@ -180,7 +189,11 @@ export function AdminFrame({
             <AdminHeader title={state.title} currentPath={currentPath} />
           )}
           <main className="flex flex-1 flex-col px-3 py-6 lg:px-8 lg:pb-16">
-            {state.status === "open" && children}
+            {state.status === "open" && (
+              <ReloadGate.Provider value={reload}>
+                {children}
+              </ReloadGate.Provider>
+            )}
             {state.status === "error" && (
               <p role="alert" className="text-sm text-danger-fg">
                 Could not open the admin area ({state.code}).

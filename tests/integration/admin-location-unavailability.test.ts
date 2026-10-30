@@ -9,43 +9,23 @@ import {
   vi,
 } from "vitest";
 
-const cookieJar = new Map<string, string>();
-
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-}));
-
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createEvent, createLocation } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
-import { createAdminAuthCookie } from "@/utils/auth";
 import {
   addLocationUnavailabilityAction,
   deleteLocationUnavailabilityAction,
-} from "@/app/actions/admin-location-unavailability";
+  loginAsAdmin,
+  logoutAdmin,
+} from "../helpers/admin-api";
+import { setupTestDb, resetTestDb } from "../helpers/db";
+import { createEvent, createLocation } from "../helpers/factories";
+import { getRepositories } from "@/db/container";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
-
-async function loginAsAdmin() {
-  const c = await createAdminAuthCookie();
-  cookieJar.set(c.name, c.value);
-}
 
 describe("location unavailability actions", () => {
   beforeAll(() => setupTestDb());
   beforeEach(async () => {
     resetTestDb();
-    cookieJar.clear();
+    logoutAdmin();
     vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
@@ -185,7 +165,7 @@ describe("location unavailability actions", () => {
   it("turns away anyone who is not an organizer", async () => {
     const event = await createEvent();
     const room = await createLocation({ eventId: event.id });
-    cookieJar.clear();
+    logoutAdmin();
 
     const result = await addLocationUnavailabilityAction({
       eventId: event.id,

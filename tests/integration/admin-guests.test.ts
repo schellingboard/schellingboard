@@ -9,26 +9,18 @@ import {
   vi,
 } from "vitest";
 
-const cookieJar = new Map<string, string>();
-
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-}));
-
 vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
 }));
 
+import {
+  createGuestAction,
+  deleteGuestAction,
+  loginAsAdmin,
+  logoutAdmin,
+  sendTestEmailAction,
+  updateGuestAction,
+} from "../helpers/admin-api";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import {
   createEvent,
@@ -37,31 +29,19 @@ import {
   createSession,
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { createAdminAuthCookie } from "@/utils/auth";
 import { testEmail } from "@/emails/test-email";
 import { sendMail } from "@/utils/mailer";
 import { VoteChoice } from "@schellingboard/domain/vote";
 import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
-import {
-  createGuestAction,
-  updateGuestAction,
-  deleteGuestAction,
-  sendTestEmailAction,
-} from "@/app/actions/admin-guests";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef"; // 32 chars
-
-async function loginAsAdmin() {
-  const c = await createAdminAuthCookie();
-  cookieJar.set(c.name, c.value);
-}
 
 describe("admin guest actions", () => {
   beforeAll(() => setupTestDb());
 
   beforeEach(async () => {
     resetTestDb();
-    cookieJar.clear();
+    logoutAdmin();
     vi.mocked(sendMail).mockReset();
     vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
@@ -72,7 +52,7 @@ describe("admin guest actions", () => {
 
   describe("authorization", () => {
     it("rejects createGuestAction without an admin cookie", async () => {
-      cookieJar.clear();
+      logoutAdmin();
       const result = await createGuestAction({
         name: "Eve",
         email: "eve@test.example",
@@ -94,7 +74,7 @@ describe("admin guest actions", () => {
 
     it("rejects updateGuestAction and deleteGuestAction without an admin cookie", async () => {
       const guest = await createGuest();
-      cookieJar.clear();
+      logoutAdmin();
       expect(
         await updateGuestAction({
           id: guest.id,
@@ -112,7 +92,7 @@ describe("admin guest actions", () => {
 
     it("rejects sendTestEmailAction without an admin cookie", async () => {
       const guest = await createGuest();
-      cookieJar.clear();
+      logoutAdmin();
       expect(await sendTestEmailAction({ id: guest.id })).toEqual({
         ok: false,
         error: "Unauthorized",
