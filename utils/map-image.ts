@@ -10,7 +10,7 @@ import sharp from "sharp";
 // Unlike location images (utils/location-images.ts), a map may have any aspect
 // ratio, so we validate only format and size.
 
-import { MAX_MAP_BYTES } from "./map-image-constraints";
+import { MAX_MAP_BYTES } from "@schellingboard/domain/map-image-constraints";
 import { uploadsDir } from "./uploads-dir";
 
 const FORMAT_EXTENSIONS: Record<string, string> = {
