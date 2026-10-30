@@ -37,7 +37,7 @@ export function recordCohostsAdded(
   by: ChangeContext
 ): void {
   const known = new Set(previousHostIds);
-  if (by.actor.type === "guest") known.add(by.actor.id);
+  if (by.actor.type !== "system" && by.actor.id) known.add(by.actor.id);
   const added = session.hosts.map((h) => h.id).filter((id) => !known.has(id));
   if (added.length > 0)
     tx.record(changes.sessionCohostsAdded(session, added, by));

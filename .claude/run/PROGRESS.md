@@ -100,6 +100,19 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
   flaky (`attendee-count.spec.ts:61`, known; `make` exits 1 on a flaky test). Commit id: see the
   log.
 
+- Step 11 (part one of the admin sign-in; removal is 11b): the proxy cannot read the database, so
+  for `/api/v1/admin` it only checks the admin cookie and the presence of a `guest` cookie; the use
+  cases decide (`admin.required` 403). Without any cookie: 401 `admin.unauthenticated`, also when
+  `ADMIN_PASSWORD` is unset (no more `admin.disabled`). Legacy `/api/admin/*` and `/legacy/admin`
+  are unchanged. `byAdmin(actor, at)` lives only in `server/kernel/change-context.ts`; the changes
+  table keeps the admin's guest in `actor_id`. No E2E for a site admin opening `/admin` (needs a
+  reset-link sign-in); covered by integration tests (`api-site-admin.test.ts`, `proxy.test.ts`).
+  Checks: format, lint, arch, openapi, typecheck, unit and integration green; E2E 214 passed, 1
+  skipped. Change id lwyrznto (jj; stable under amend). Step 11 review: all 7 findings accepted.
+  Admin routes refuse a non-admin guest (test over every `/admin` operation: 400/403/415, never
+  success; validation can run before the role check). Admin logout now also calls
+  `/api/v1/auth/sign-out`. Self-hosting docs corrected for 11b's full rewrite.
+
 ## Known E2E flakes
 
 `attendee-count.spec.ts:64` (fails ~half of solo runs on the base too), `settings.spec.ts:67`,
@@ -124,9 +137,8 @@ the timeout, not the cause. Unresolved.
 
 ## Questions
 
-Open: should the admin users view show whether a site admin has set a password (needs a
-`hasPassword` field)? Otherwise none. Q5 to Q8 were answered on 2026-10-29 and are in ADR 0017 and
-PLAN.md (map item: step 14; 401/403 to sign-in: step 11).
+None open. Q5 to Q8 were answered on 2026-10-29 and are in ADR 0017 and PLAN.md (map item: step 14;
+401/403 to sign-in: step 11b).
 
 - Step 10b review: fixed the button wrap, the duplicate doc comment, and the untrue changelog and
   admin-guide claims (moved to step 11 with the proxy change that makes them true). Rejected: a

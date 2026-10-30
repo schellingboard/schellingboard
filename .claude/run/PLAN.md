@@ -77,17 +77,17 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
 - [x] 10b. Site admin in the SPA: `/auth/bootstrap` (`BootstrapScreen`), "Make/Remove site admin" on
       the admin users screen, changelog, admin guide, `SB_BOOTSTRAP_LINK` in configuration,
       server.md.
-- [ ] 11. **Admin sign-in in the SPA.** Also: the proxy lets `/admin` and `/api/v1/admin` through
-      for a verified site-admin session, and `/admin` no longer 404s when `ADMIN_PASSWORD` is unset
-      (today only the password cookie passes, so the bootstrap page's redirect to `/admin/events`
-      fails); admin changes record which admin (`ChangeContext` admin gets the guest id; the 31
-      `byAdmin(at)` callers pass the actor); show whether a site admin has a password
-      (`hasPassword`); the changelog entry for site admins and the admin-guide "Site admins" section
-      (first admin by the logged link, `SB_BOOTSTRAP_LINK=1`, Make/Remove site admin) land here.
-      `AdminFrame` sends a guest without the role to the sign-in; a later 401/403 does the same.
-      `/legacy/admin/login`, the admin cookie and `/api/auth/login` go; a set `ADMIN_PASSWORD` logs
-      a deprecation warning; the admin UI is always on. Self-hosting docs and `api.md` rewritten.
-      Full `make test-e2e`.
+- [x] 11. Site-admin sessions open the admin: `/admin` shell is served whatever `ADMIN_PASSWORD`;
+      `/api/v1/admin` passes a guest cookie through to the use cases (the role check) and answers
+      401 only with no cookie at all; `byAdmin(actor, at)` records the site admin's guest id
+      (`Actor` admin has `id?`); `hasPassword` on the admin guest view ("No password yet" badge);
+      changelog and admin-guide "Site admins". Split: the removal is step 11b.
+- [ ] 11b. **Admin password goes.** `AdminFrame` sends a guest without the role to the sign-in; a
+      later 401/403 does the same. `/legacy/admin/login`, the admin cookie (`ADMIN_COOKIE_NAME`,
+      `requireAdminAuth*`, `ADMIN_VERIFIED_HEADER`, `/api/admin/logout`, `/api/auth/login`) and the
+      legacy `/api/admin/*` gate go; a set `ADMIN_PASSWORD` logs a deprecation warning; the admin UI
+      is always on; E2E and integration helpers sign in as a site admin instead of the cookie.
+      Self-hosting docs and `api.md` rewritten; admin-guide intro. Full `make test-e2e`.
 - [ ] 12. **Join links.** `join_tokens(hash, guest, event, created)`, no expiry, one live per guest
       and event; valid to sign in while the guest set no password after `created`, otherwise it asks
       for a sign-in as that guest. `POST /api/v1/auth/join` (verified session, joins the event); SPA

@@ -1,3 +1,4 @@
+import { byAdmin } from "@/server/kernel/change-context";
 import { changes, type ChangeContext } from "@schellingboard/domain/change";
 import type { Session } from "@schellingboard/domain/session";
 import type { Actor } from "@/server/kernel/actor";
@@ -158,7 +159,7 @@ export const adminCreateSession =
     if (!actor.admin) return adminRequired();
     const fields = checked(input);
     if (!fields.ok) return fields;
-    const by: ChangeContext = { actor: { type: "admin" }, at: now };
+    const by = byAdmin(actor, now);
     return deps.uow.run(async (tx) => {
       if (!(await tx.events.findById(eventId)))
         return notFound("event.notFound", "Event not found");
@@ -182,7 +183,7 @@ export const adminUpdateSession =
     if (!actor.admin) return adminRequired();
     const fields = checked(input);
     if (!fields.ok) return fields;
-    const by: ChangeContext = { actor: { type: "admin" }, at: now };
+    const by = byAdmin(actor, now);
     return deps.uow.run(async (tx) => {
       const session = await tx.sessions.findById(id);
       if (!session) return sessionNotFound();
@@ -215,7 +216,7 @@ export const adminDeleteSession =
     now: Date
   ): Promise<Result<Session>> => {
     if (!actor.admin) return adminRequired();
-    const by: ChangeContext = { actor: { type: "admin" }, at: now };
+    const by = byAdmin(actor, now);
     return uow.run(async (tx) => {
       const session = await tx.sessions.findById(id);
       if (!session) return sessionNotFound();
@@ -247,7 +248,7 @@ export const adminSeedSession =
     if (endTime <= startTime)
       return timeInvalid("End time must be after start time");
 
-    const by: ChangeContext = { actor: { type: "admin" }, at: now };
+    const by = byAdmin(actor, now);
     return uow.run((tx) =>
       seeded(tx, { ...input, title, startTime, endTime }, by)
     );

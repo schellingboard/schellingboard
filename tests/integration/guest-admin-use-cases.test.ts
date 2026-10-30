@@ -139,6 +139,7 @@ describe("guest admin use cases", () => {
           email: "ada@x.org",
           authProtected: true,
           siteAdmin: false,
+          hasPassword: true,
           eventIds: [event.id],
           version: 3,
         },

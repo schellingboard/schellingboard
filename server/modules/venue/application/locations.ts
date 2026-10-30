@@ -19,9 +19,9 @@ import {
   type Failure,
   type Result,
 } from "@/server/kernel/result";
+import { byAdmin } from "@/server/kernel/change-context";
 import type { VenueDeps } from "../ports";
 import {
-  byAdmin,
   recordLocationChanged,
   recordLocationRemoved,
 } from "./location-changes";
@@ -115,7 +115,7 @@ export const createLocation =
     now: Date
   ): Promise<Result<LocationWithEvents>> => {
     if (!actor.admin) return adminRequired();
-    const by = byAdmin(now);
+    const by = byAdmin(actor, now);
     const parsed = await locationSchema
       .extend({ ...validations(deps), eventSlug: z.string().optional() })
       .safeParseAsync(input);
@@ -179,7 +179,7 @@ export const updateLocation =
     now: Date
   ): Promise<Result<LocationWithEvents>> => {
     if (!actor.admin) return adminRequired();
-    const by = byAdmin(now);
+    const by = byAdmin(actor, now);
     const parsed = await updateLocationSchema
       .extend(validations(deps))
       .safeParseAsync(input);
@@ -227,6 +227,7 @@ export const updateLocation =
 
 function setImageUrl(
   { uow, images }: VenueDeps,
+  actor: Actor,
   id: string,
   imageUrl: string,
   expectedVersion: number,
@@ -244,7 +245,7 @@ function setImageUrl(
       if (!updated) return locationChangedMeanwhile(tx.locations, id);
       replaces(existing.imageUrl);
       const eventIds = await tx.locations.listEventIds(id);
-      await recordLocationChanged(tx, id, eventIds, byAdmin(now));
+      await recordLocationChanged(tx, id, eventIds, byAdmin(actor, now));
       return ok({ ...updated, eventIds });
     })
   );
@@ -266,7 +267,7 @@ export const replaceLocationImage =
     if ("error" in checked)
       return invalid("location.imageInvalid", checked.error);
     const imageUrl = await deps.images.saveNew(id, checked.buffer, checked.ext);
-    return setImageUrl(deps, id, imageUrl, expectedVersion, now);
+    return setImageUrl(deps, actor, id, imageUrl, expectedVersion, now);
   };
 
 export const removeLocationImage =
@@ -277,7 +278,7 @@ export const removeLocationImage =
     now: Date
   ): Promise<Result<LocationWithEvents>> => {
     if (!actor.admin) return adminRequired();
-    return setImageUrl(deps, id, "", expectedVersion, now);
+    return setImageUrl(deps, actor, id, "", expectedVersion, now);
   };
 
 export const deleteLocation =
@@ -288,7 +289,7 @@ export const deleteLocation =
     now: Date
   ): Promise<Result<void>> => {
     if (!actor.admin) return adminRequired();
-    const by = byAdmin(now);
+    const by = byAdmin(actor, now);
     return withStoredFile(images, null, (replaces) =>
       uow.run(async (tx) => {
         const location = await tx.locations.findById(input.id);
@@ -336,7 +337,7 @@ export const moveLocation =
             tx,
             after.id,
             await tx.locations.listEventIds(after.id),
-            byAdmin(now)
+            byAdmin(actor, now)
           );
       }
       return ok(undefined);

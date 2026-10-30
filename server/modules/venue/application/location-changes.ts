@@ -2,11 +2,6 @@ import { changes, type ChangeContext } from "@schellingboard/domain/change";
 import type { Location } from "@schellingboard/domain/location";
 import type { Tx } from "@/server/kernel/unit-of-work";
 
-export const byAdmin = (at: Date): ChangeContext => ({
-  actor: { type: "admin" },
-  at,
-});
-
 /** One change per event: a location belongs to several, each with its own feed. */
 export async function recordLocationChanged(
   tx: Tx,

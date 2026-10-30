@@ -130,6 +130,20 @@ describe("change log", () => {
     expect(change.actor).toEqual({ type: "admin" });
   });
 
+  it("records which site admin made the change", async () => {
+    const { session } = await world();
+    const { changes } = getRepositories();
+
+    await updateLoggedSession(
+      session.id,
+      { title: "By a site admin" },
+      { actor: { type: "admin", id: "g-admin" }, at: AT }
+    );
+
+    const [change] = await changes.listAfter(0);
+    expect(change.actor).toEqual({ type: "admin", id: "g-admin" });
+  });
+
   it("records nothing for a save that changes nothing, nor bumps the version", async () => {
     const { session, by } = await world();
     const { changes } = getRepositories();

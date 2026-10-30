@@ -215,6 +215,7 @@ export const adminGuestViewSchema = z
     email: z.string(),
     authProtected: z.boolean(),
     siteAdmin: z.boolean(),
+    hasPassword: z.boolean(),
     eventIds: z.array(z.string()),
     version: z.number().int(),
   })

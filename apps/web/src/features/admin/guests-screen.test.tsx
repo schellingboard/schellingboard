@@ -26,6 +26,7 @@ const guest = (
   email: `${id}@x.org`,
   eventIds: [],
   siteAdmin: false,
+  hasPassword: true,
   version: 3,
   ...extra,
 });
@@ -274,6 +275,15 @@ describe("the site-admin role", { tags: ["016-US4"] }, () => {
     await waitFor(() =>
       expect(calls[0]).toMatchObject({ body: { siteAdmin: false } })
     );
+  });
+
+  it("says when a site admin has no password yet", () => {
+    const { region } = setup([
+      guest("g1", "Alice", { siteAdmin: true, hasPassword: false }),
+      guest("g2", "Bob", { hasPassword: false }),
+    ]);
+
+    expect(within(region).getAllByText("No password yet")).toHaveLength(1);
   });
 
   it("says why the last site admin cannot be removed", async () => {

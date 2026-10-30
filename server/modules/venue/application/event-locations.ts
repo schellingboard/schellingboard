@@ -1,8 +1,8 @@
 import type { Actor } from "@/server/kernel/actor";
+import { byAdmin } from "@/server/kernel/change-context";
 import { ok, type Result } from "@/server/kernel/result";
 import type { VenueDeps } from "../ports";
 import {
-  byAdmin,
   recordLocationChanged,
   recordLocationRemoved,
 } from "./location-changes";
@@ -33,7 +33,12 @@ export const assignLocationsToEvent =
       );
       await tx.locations.assignToEvent(input.eventId, unique);
       for (const id of unique.filter((id) => !had.has(id)))
-        await recordLocationChanged(tx, id, [input.eventId], byAdmin(now));
+        await recordLocationChanged(
+          tx,
+          id,
+          [input.eventId],
+          byAdmin(actor, now)
+        );
       return ok(undefined);
     });
   };
@@ -55,7 +60,12 @@ export const removeLocationsFromEvent =
       for (const id of new Set(input.locationIds)) {
         const location = had.has(id) && (await tx.locations.findById(id));
         if (location)
-          recordLocationRemoved(tx, location, [input.eventId], byAdmin(now));
+          recordLocationRemoved(
+            tx,
+            location,
+            [input.eventId],
+            byAdmin(actor, now)
+          );
       }
       return ok(undefined);
     });

@@ -1,3 +1,4 @@
+import { byAdmin } from "@/server/kernel/change-context";
 import type { ChangeContext } from "@schellingboard/domain/change";
 import {
   rsvpRefusal,
@@ -165,10 +166,7 @@ export const adminRemoveRsvp =
     return uow.run(async (tx) => {
       const session = await tx.sessions.findById(input.sessionId);
       if (!session) return sessionNotFound();
-      await removeRsvp(tx, input.sessionId, input.guestId, {
-        actor: { type: "admin" },
-        at: now,
-      });
+      await removeRsvp(tx, input.sessionId, input.guestId, byAdmin(actor, now));
       return ok(session);
     });
   };
@@ -201,13 +199,13 @@ export const adminAddRsvp =
         );
         if (!added.ok) return added;
         rsvp = added.value;
-        await recordRsvpAdded(tx, rsvp, { actor: { type: "admin" }, at: now });
+        await recordRsvpAdded(tx, rsvp, byAdmin(actor, now));
       }
       await recordingShownGuests(
         tx,
         [session.eventId],
         () => tx.guests.assignToEvent(session.eventId, [input.guestId]),
-        { actor: { type: "admin" }, at: now }
+        byAdmin(actor, now)
       );
       return ok({ rsvp, created: !existing });
     });

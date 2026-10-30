@@ -67,9 +67,7 @@ export const updateEventMeetings =
         expectedVersion: input.expectedVersion,
       });
       if (!updated) return eventNotFound();
-      tx.record(
-        changes.eventChanged(updated, { actor: { type: "admin" }, at: now })
-      );
+      tx.record(changes.eventChanged(updated, byAdmin(actor, now)));
       return ok(updated);
     });
   };
@@ -96,7 +94,7 @@ export const createMeetingPoint =
         sortIndex:
           existing.reduce((max, p) => Math.max(max, p.sortIndex), -1) + 1,
       });
-      tx.record(changes.meetingPointChanged(created, byAdmin(now)));
+      tx.record(changes.meetingPointChanged(created, byAdmin(actor, now)));
       return ok(created);
     });
   };
@@ -131,7 +129,7 @@ export const updateMeetingPoint =
         expectedVersion: input.expectedVersion,
       });
       if (!updated) return pointNotFound();
-      tx.record(changes.meetingPointChanged(updated, byAdmin(now)));
+      tx.record(changes.meetingPointChanged(updated, byAdmin(actor, now)));
       return ok(updated);
     });
   };
@@ -150,7 +148,7 @@ export const deleteMeetingPoint =
       );
       if (!point) return pointNotFound();
       await tx.meetingPoints.delete(point.id);
-      tx.record(changes.meetingPointRemoved(point, byAdmin(now)));
+      tx.record(changes.meetingPointRemoved(point, byAdmin(actor, now)));
       return ok(undefined);
     });
   };
