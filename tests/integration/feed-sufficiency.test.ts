@@ -54,7 +54,12 @@ const people = () =>
       saveNew: (id) => Promise.resolve(`/media/avatars/${id}-1.png`),
       deleteByUrl: async () => {},
     },
-    loginMail: { configured: () => false, send: async () => {} },
+    loginMail: {
+      configured: () => false,
+      send: async () => {},
+      sendResetLink: async () => {},
+      sendSecurityChanged: async () => {},
+    },
     sendTestEmail: async () => {},
     uow: unitOfWork,
   });

@@ -68,3 +68,16 @@ export async function recentlyIssued(
 }
 
 export const isSpent = (token: AuthCode) => token.attempts >= MAX_CODE_ATTEMPTS;
+
+/** What a request names: a guest id, or an email or username that may match nobody. */
+export type GuestTarget = string | { identifier: string };
+
+/** The named guest's id; null for an identifier nobody holds. */
+export async function resolveTarget(
+  { guests }: Pick<PeopleDeps["repos"], "guests">,
+  target: GuestTarget
+): Promise<string | null> {
+  return typeof target === "string"
+    ? target
+    : guests.findLoginId(target.identifier);
+}

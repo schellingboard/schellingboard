@@ -32,18 +32,22 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
   rows with `sessionGuestValue`.
 
 - Sign-in API (step 4): `matchToken`/`recentlyIssued` live in `people/application/auth-tokens.ts`
-  (exported by the module for `setPasswordWithTokenAction` until step 5). `PeopleDeps.loginMail`
-  sends the code. Expired, spent and wrong credentials all answer `auth.credentialWrong` (the repo
-  has no lookup of dead codes; the old action did the same). `/auth/*` is exempt from idempotency
-  keys; `/auth/login*` has a per-address limit (30 burst, `SB_AUTH_RATE_BURST`, set high in
-  `.env.test`), skipped when `SB_TRUSTED_PROXIES` is unset. The proxy refuses cross-site
-  `/api/v1/auth/*`. First protection keeps other browsers' claimed rows (they are told "protected");
-  a password reset or change revokes all.
+  (internal to the module). `PeopleDeps.loginMail` sends the code. Expired, spent and wrong
+  credentials all answer `auth.credentialWrong` (the repo has no lookup of dead codes; the old
+  action did the same). `/auth/*` is exempt from idempotency keys; `/auth/login*` has a per-address
+  limit (30 burst, `SB_AUTH_RATE_BURST`, set high in `.env.test`), skipped when `SB_TRUSTED_PROXIES`
+  is unset. The proxy refuses cross-site `/api/v1/auth/*`. First protection keeps other browsers'
+  claimed rows (they are told "protected"); a password reset or change revokes all.
 
 - Sessions (step 5): `findLive` is a pure read; `refresh` (a write) runs from `session-actor.ts` at
   most daily. Repository methods named `find*`/`get*`/`list*` go to the read-only connection, so a
   write must not carry those prefixes. The browser cookie lives 400 days; the row decides. Test
   helper `openGuestValue` inserts a row on its own connection (sync); the guest must exist.
+- Credentials (step 6): `LoginMail` also sends the reset link and the security-change mail. Reset
+  and change/unprotect answer `auth.credentialWrong` (403) and the password path shares the
+  per-guest login limiter; an unknown login `identifier` is limited per spelling. Protecting a name
+  is a reset link (no separate endpoint). Usernames: 3-32 chars `[a-z0-9._-]`, lowercased, never an
+  email.
 
 ## Known E2E flakes
 
