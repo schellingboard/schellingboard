@@ -1,4 +1,4 @@
-.PHONY: help dev mailpit build start lint typecheck commit-check arch openapi openapi-check arch-graph arch-diagrams arch-diagrams-check lint-watch test test-unit test-integration test-watch test-coverage use-cases test-e2e test-e2e-headed test-e2e-docker format format-check precommit dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed dump-release-db screenshots install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate docs-dev docs-dev-build docs-dev-validate www
+.PHONY: help dev mailpit build start lint typecheck commit-check arch openapi openapi-check arch-graph arch-diagrams arch-diagrams-check lint-watch test test-unit test-integration test-watch test-coverage use-cases test-e2e test-e2e-headed test-e2e-docker format format-check precommit dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed bootstrap-link dump-release-db screenshots install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate docs-dev docs-dev-build docs-dev-validate www
 
 SHELL := /usr/bin/env bash
 
@@ -40,6 +40,7 @@ help:
 	@printf "  %-28s %s\n" "make dev-migrate-create" "Generate new migration"
 	@printf "  %-28s %s\n" "make dev-db-seed"        "Reset dev database and seed dummy data (SEED_PROFILE=small|large)"
 	@printf "  %-28s %s\n" "make screenshots"        "Recapture docs/screenshots/ (ARGS=\"name ...\" for some)"
+	@printf "  %-28s %s\n" "make bootstrap-link"      "Print a single-use link that makes its visitor a site admin"
 	@printf "  %-28s %s\n" "make dump-release-db"    "Record VERSION=vX.Y.Z's seeded DB as an upgrade-test fixture"
 	@printf "\nDocumentation sites:\n"
 	@printf "  %-28s %s\n" "make docs"               "Preview the docs in docs/public"
@@ -193,6 +194,9 @@ dev-migrate-status: install
 
 dev-migrate-create: install
 	bun set-env.ts dev bun x drizzle-kit generate $(if $(NAME),--name $(NAME),)
+
+bootstrap-link: install
+	bun set-env.ts dev bun x tsx scripts/bootstrap-link.ts
 
 dev-db-seed: install
 	bun set-env.ts dev bun x tsx scripts/seed/seed-database.ts

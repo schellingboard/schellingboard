@@ -1587,6 +1587,7 @@
           "name": { "type": "string" },
           "email": { "type": "string" },
           "authProtected": { "type": "boolean" },
+          "siteAdmin": { "type": "boolean" },
           "eventIds": { "type": "array", "items": { "type": "string" } },
           "version": { "type": "integer" }
         },
@@ -1595,6 +1596,7 @@
           "name",
           "email",
           "authProtected",
+          "siteAdmin",
           "eventIds",
           "version"
         ]
@@ -5919,6 +5921,83 @@
         "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
       }
     },
+    "/api/v1/auth/bootstrap": {
+      "post": {
+        "tags": ["auth"],
+        "description": "Spends a bootstrap link: the guest named by `guestId`, or a new one made from `name` and `email`, becomes a site admin with the given username and password, and the browser is signed in as them. `bootstrap.tokenWrong` (403) for a wrong, expired or used link; `guest.emailTaken` and `username.taken` (409).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200,
+                    "description": "The token in the bootstrap link"
+                  },
+                  "guestId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "An existing guest to make the site admin"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "email": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "username": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9][a-z0-9._-]{2,31}$"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 200
+                  }
+                },
+                "required": ["token", "username", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The site admin the browser now acts as",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "guestId": {
+                      "type": ["string", "null"],
+                      "description": "The guest the browser now acts as, or null when signed out"
+                    }
+                  },
+                  "required": ["guestId"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+      }
+    },
     "/api/v1/auth/sign-out": {
       "post": {
         "tags": ["auth"],
@@ -8751,6 +8830,63 @@
         ],
         "responses": {
           "204": { "description": "Deleted" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "adminAuth": [] }]
+      }
+    },
+    "/api/v1/admin/guests/{id}/site-admin": {
+      "put": {
+        "tags": ["admin"],
+        "description": "Grants or revokes the site-admin role, which also protects the guest's name. Revoking the last site admin is 409 siteAdmin.last.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "siteAdmin": { "type": "boolean" } },
+                "required": ["siteAdmin"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated guest",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AdminGuest" }
+              }
+            }
+          },
           "default": {
             "description": "Problem details (RFC 9457); clients branch on `code`",
             "content": {

@@ -153,6 +153,17 @@ export interface LoginSessionsRepository {
   deleteExpired(now: Date): Promise<void>;
 }
 
+export interface BootstrapTokensRepository {
+  /** Stores the one token, dropping any earlier one. */
+  replace(token: {
+    hash: string;
+    createdAt: Date;
+    expiresAt: Date;
+  }): Promise<void>;
+  findLive(hash: string, now: Date): Promise<{ hash: string } | null>;
+  delete(hash: string): Promise<void>;
+}
+
 export interface AuthCodesRepository {
   /**
    * Stores a new token for the guest, replacing any previous one of the same
@@ -281,6 +292,10 @@ export interface GuestsRepository {
   setAuthProtection(id: string, creds: GuestAuthCredentials): Promise<boolean>;
   /** The guest whose email or (lowercase) username is `identifier`, matched case-insensitively. */
   findLoginId(identifier: string): Promise<string | null>;
+  getSiteAdmin(id: string): Promise<boolean>;
+  listSiteAdminIds(): Promise<string[]>;
+  /** False when the guest does not exist. Raises the version, since the role protects the name. */
+  setSiteAdmin(id: string, siteAdmin: boolean): Promise<boolean>;
   getUsername(id: string): Promise<string | null>;
   /** `taken` when another guest holds it; `username` is stored as given (lowercase). */
   setUsername(id: string, username: string | null): Promise<"ok" | "taken">;

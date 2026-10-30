@@ -1,5 +1,6 @@
 import { createRoute } from "@hono/zod-openapi";
 import {
+  bootstrapBodySchema,
   identitySchema,
   loginBodySchema,
   loginCodeBodySchema,
@@ -71,6 +72,19 @@ const signOut = createRoute({
   responses: { 204: noContent("Signed out"), ...problemDefault },
 });
 
+const bootstrap = createRoute({
+  method: "post",
+  path: "/auth/bootstrap",
+  tags: ["auth"],
+  description:
+    "Spends a bootstrap link: the guest named by `guestId`, or a new one made from `name` and `email`, becomes a site admin with the given username and password, and the browser is signed in as them. `bootstrap.tokenWrong` (403) for a wrong, expired or used link; `guest.emailTaken` and `username.taken` (409).",
+  request: { body: body(bootstrapBodySchema) },
+  responses: {
+    200: json(identitySchema, "The site admin the browser now acts as"),
+    ...problemDefault,
+  },
+});
+
 export function addAuthRoutes(app: App, people: () => PeopleUseCases) {
   app.openapi(requestLoginCode, async (c) => {
     const result = await people().requestLoginCode(
@@ -99,6 +113,16 @@ export function addAuthRoutes(app: App, people: () => PeopleUseCases) {
 
   app.openapi(logIn, async (c) => {
     const result = await people().logIn(c.var.actor, {
+      ...c.req.valid("json"),
+      device: c.req.header("user-agent")?.slice(0, 200) ?? null,
+    });
+    if (!result.ok) return problem(result.error);
+    setGuestCookie(c, result.value);
+    return c.json({ guestId: result.value.guestId }, 200);
+  });
+
+  app.openapi(bootstrap, async (c) => {
+    const result = await people().bootstrapAdmin(c.var.actor, {
       ...c.req.valid("json"),
       device: c.req.header("user-agent")?.slice(0, 200) ?? null,
     });

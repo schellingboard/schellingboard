@@ -13,6 +13,7 @@ import { recordingSessionCascade } from "@/server/kernel/session-cascade";
 import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import { withStoredFile } from "@/server/kernel/stored-files";
 import {
+  conflict,
   forbidden,
   invalidFields,
   notFound,
@@ -29,6 +30,7 @@ export interface AdminGuest {
   name: string;
   email: string;
   authProtected: boolean;
+  siteAdmin: boolean;
   eventIds: string[];
   version: number;
 }
@@ -39,6 +41,18 @@ export interface GuestInput {
 }
 
 export const adminRequired = () => forbidden("admin.required", "Unauthorized");
+const lastSiteAdmin = () =>
+  conflict(
+    "siteAdmin.last",
+    "This is the last site admin — make someone else one first"
+  );
+const isLastSiteAdmin = async (
+  guests: PeopleDeps["repos"]["guests"],
+  id: string
+) => {
+  const admins = await guests.listSiteAdminIds();
+  return admins.length === 1 && admins[0] === id;
+};
 const guestNotFound = () => notFound("guest.notFound", "User not found");
 export const eventNotFound = () =>
   notFound("event.notFound", "Event not found");
@@ -69,12 +83,17 @@ function parseGuest<T extends GuestInput>(
   );
 }
 
-function toAdminGuest(guest: CompleteGuest, eventIds: string[]): AdminGuest {
+function toAdminGuest(
+  guest: CompleteGuest,
+  eventIds: string[],
+  siteAdmin: boolean
+): AdminGuest {
   return {
     id: guest.id,
     name: guest.name,
     email: guest.info.email,
     authProtected: guest.authProtected ?? false,
+    siteAdmin,
     eventIds,
     version: guest.version,
   };
@@ -87,7 +106,8 @@ async function withEvents(
   const events = await guests.listEventsByGuests([guest.id]);
   return toAdminGuest(
     guest,
-    (events.get(guest.id) ?? []).map((e) => e.id)
+    (events.get(guest.id) ?? []).map((e) => e.id),
+    await guests.getSiteAdmin(guest.id)
   );
 }
 
@@ -99,11 +119,13 @@ export const listGuests =
     const events = await repos.guests.listEventsByGuests(
       guests.map((g) => g.id)
     );
+    const admins = new Set(await repos.guests.listSiteAdminIds());
     return ok(
       guests.map((g) =>
         toAdminGuest(
           g,
-          (events.get(g.id) ?? []).map((e) => e.id)
+          (events.get(g.id) ?? []).map((e) => e.id),
+          admins.has(g.id)
         )
       )
     );
@@ -123,7 +145,7 @@ export const createGuest =
       info: { email },
     });
     if (!created) return emailTaken();
-    return ok(toAdminGuest(guest, []));
+    return ok(toAdminGuest(guest, [], false));
   };
 
 // For seeding scripts: re-running one must not fail on guests it already made.
@@ -215,6 +237,7 @@ export const deleteGuest =
       uow.run(async (tx) => {
         const guest = await tx.guests.findById(input.id);
         if (!guest) return guestNotFound();
+        if (await isLastSiteAdmin(tx.guests, input.id)) return lastSiteAdmin();
         const by = byAdmin(now);
         const sessions = new Map(
           [
@@ -248,6 +271,32 @@ export const deleteGuest =
         return ok(undefined);
       })
     );
+    if (result.ok) credentialsChanged(input.id);
+    return result;
+  };
+
+/** Never the last admin: the site would have none left to sign in as. */
+export const setSiteAdmin =
+  ({ uow }: PeopleDeps) =>
+  async (
+    actor: Actor,
+    input: { id: string; siteAdmin: boolean },
+    now: Date
+  ): Promise<Result<AdminGuest>> => {
+    if (!actor.admin) return adminRequired();
+    const result = await uow.run(async (tx) => {
+      if (!input.siteAdmin && (await isLastSiteAdmin(tx.guests, input.id)))
+        return lastSiteAdmin();
+      const done = await recordingShownGuests(
+        tx,
+        await tx.guests.listShownEventIds(input.id),
+        () => tx.guests.setSiteAdmin(input.id, input.siteAdmin),
+        byAdmin(now)
+      );
+      if (!done) return guestNotFound();
+      const guest = await tx.guests.findById(input.id);
+      return guest ? ok(await withEvents(tx.guests, guest)) : guestNotFound();
+    });
     if (result.ok) credentialsChanged(input.id);
     return result;
   };

@@ -94,6 +94,36 @@ export const usernameBodySchema = z.object({
   username: usernameSchema.nullable(),
 });
 
+const bootstrapTarget = (body: {
+  guestId?: string;
+  name?: string;
+  email?: string;
+}) =>
+  body.guestId === undefined
+    ? Boolean(body.name && body.email)
+    : body.name === undefined && body.email === undefined;
+
+export const bootstrapBodySchema = z
+  .object({
+    token: z
+      .string()
+      .min(1)
+      .max(200)
+      .describe("The token in the bootstrap link"),
+    guestId: z
+      .string()
+      .min(1)
+      .optional()
+      .describe("An existing guest to make the site admin"),
+    name: z.string().trim().min(1).max(200).optional(),
+    email: z.string().trim().min(1).max(200).optional(),
+    username: usernameSchema,
+    password: newPasswordSchema,
+  })
+  .refine(bootstrapTarget, {
+    message: "Send either guestId, or both name and email",
+  });
+
 export const usernameResultSchema = z.object({
   username: z.string().nullable(),
 });

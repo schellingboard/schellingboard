@@ -112,6 +112,11 @@ export const guests = sqliteTable(
     passwordHash: text("password_hash"),
     // Lowercase, optional; password sign-in takes it or the email.
     username: text("username"),
+    // Verified sessions of a site admin act with admin rights; the role also
+    // protects the name, whatever authProtected says.
+    siteAdmin: integer("site_admin", { mode: "boolean" })
+      .notNull()
+      .default(false),
     version: integer("version").notNull().default(1),
     // The public profile's version, apart from `version` (the admin view):
     // assigning a guest to an event must not refuse their profile edit.
@@ -145,6 +150,14 @@ export const authCodes = sqliteTable("auth_codes", {
   createdAt: text("created_at").notNull(),
   expiresAt: text("expires_at").notNull(),
   attempts: integer("attempts").notNull().default(0),
+});
+
+// At most one row: the single-use link that makes a site admin, replaced at
+// every start. Only the sha256 of the token is stored.
+export const bootstrapTokens = sqliteTable("bootstrap_tokens", {
+  hash: text("hash").primaryKey(),
+  createdAt: text("created_at").notNull(),
+  expiresAt: text("expires_at").notNull(),
 });
 
 export const events = sqliteTable(

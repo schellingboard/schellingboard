@@ -191,6 +191,7 @@ describe("actor middleware", () => {
         id: g1,
         level: "claimed",
         sessionId: expect.any(String) as string,
+        siteAdmin: false,
       },
     });
 
@@ -205,6 +206,7 @@ describe("actor middleware", () => {
         id: g2,
         level: "verified",
         sessionId: expect.any(String) as string,
+        siteAdmin: false,
       },
     });
   });
