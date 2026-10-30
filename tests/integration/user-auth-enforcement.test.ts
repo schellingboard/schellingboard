@@ -37,7 +37,8 @@ import {
 import { POST as toggleRsvp } from "@/app/api/toggle-rsvp/route";
 import { GET as getRsvps } from "@/app/api/rsvps/route";
 import { saveProfile } from "../helpers/profile-api";
-import { updateEmailSettingsAction } from "@/app/actions/settings";
+import { callApi } from "../helpers/api";
+import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
@@ -166,7 +167,7 @@ describe("write enforcement for protected guests", () => {
     });
   });
 
-  describe("profile and settings actions", () => {
+  describe("profile and settings edits", () => {
     it("rejects edits as a protected guest without a verified session", async () => {
       const guest = await createGuest({ name: "Before" });
       await protectGuest(guest.id);
@@ -182,21 +183,15 @@ describe("write enforcement for protected guests", () => {
         "Before"
       );
 
-      const settingsResult = await updateEmailSettingsAction({
-        rsvpChange: false,
-        hostChange: false,
-        cohostAdd: false,
-        proposalJoin: false,
-        proposalComment: false,
-        sessionComment: false,
-        profileComment: false,
-        commentThread: false,
-        meetingRequest: false,
-        meetingResponse: false,
-        sessionHeadsUp: false,
-        attendeeCountReminder: false,
+      const settingsResult = await callApi(
+        cookieJar,
+        "PUT",
+        "/me/email-settings",
+        { ...DEFAULT_EMAIL_SETTINGS, rsvpChange: false }
+      );
+      expect(settingsResult).toMatchObject({
+        error: { code: "guest.protected" },
       });
-      expect(settingsResult.ok).toBe(false);
     });
 
     it("accepts edits with a verified session", async () => {

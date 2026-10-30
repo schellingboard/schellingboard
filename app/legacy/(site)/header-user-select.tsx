@@ -1,7 +1,6 @@
 "use client";
 import { useContext, useState, useTransition } from "react";
 import clsx from "clsx";
-import Link from "next/link";
 import { AppLink } from "@/app/components/app-link";
 import {
   Menu,
@@ -127,9 +126,9 @@ export function HeaderUserSelect({ guests }: { guests: Guest[] }) {
           </MenuItem>
           <MenuItem>
             {({ focus }) => (
-              <Link href="/legacy/settings" className={itemClasses(focus)}>
+              <AppLink href="/settings" className={itemClasses(focus)}>
                 Settings
-              </Link>
+              </AppLink>
             )}
           </MenuItem>
           <MenuSeparator className="my-1 h-px bg-surface-muted" />

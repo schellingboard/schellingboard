@@ -147,8 +147,8 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`, `docs/dev/target-architec
   - [x] 12a. My availability (done: `features/meetings/availability-form.tsx`,
         `commands/meeting-availability.ts`; `slotDaysFor` moved to `packages/domain`). It is the
         legacy Settings form; `availabilityFormFor(event, days, declared, now)` (domain) builds its
-        data per event, dropping past events and narrowing `declared` to offered slots. The settings
-        step (17a) wires it.
+        data per event, dropping past events and narrowing `declared` to offered slots. Wired by the
+        settings step.
   - [x] 12b. Booking (done: `queries/meeting-candidates.ts` over `GET /meeting-candidates`,
         `features/meetings/book-meeting.tsx`; the request command is 10e's `meetingRequestCalls`,
         the fields its shared `MeetingRequestFields`). Step 13 wires it: `profileHref` =
@@ -186,17 +186,10 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`, `docs/dev/target-architec
 
 ### Settings and notifications
 
-- [ ] 17. **Settings and notifications**, unrouted:
-  - [x] 17a. Settings (done: `features/settings/` `SettingsScreen`, `EmailSettingsForm`,
-        `PushNotifications`; `queries/settings.ts`; `commands/settings.ts`; new
-        `GET /meeting-availability` answers the per-event forms; `push-key` moved to
-        `packages/domain`). Account security (passwords) is not in it: see PROGRESS Questions 4.
-  - [x] 17b. Notifications (done: `features/notifications/` `NotificationsScreen`,
-        `queries/notifications.ts`, `commands/notifications.ts`; `app/unread-count.tsx` shares the
-        bell's count with the list).
-- [ ] 18. **Takeover: settings and notifications**. Router owns `/settings` and `/notifications`;
-      legacy pages deleted. E2E: `user-settings`, `notifications`, `pwa`. CHANGELOG if anything
-      visible changed.
+- [x] 17-18. **Settings and notifications** (done: `features/settings/`, `features/notifications/`,
+      `app/account-pages.tsx`; the router owns `/settings` and `/notifications`; legacy pages and
+      their actions deleted. Account security stays a small legacy page, `/legacy/account-security`,
+      linked from Settings; the E2E dev toolbar's "Send due reminders" now lands there).
 
 ### Admin
 

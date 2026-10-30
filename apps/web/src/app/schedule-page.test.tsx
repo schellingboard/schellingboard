@@ -82,9 +82,9 @@ describe("the event route", () => {
   });
 
   it("leaves a legacy page's address to the legacy app, whatever events exist", async () => {
-    await open({ path: "/settings" });
+    await open({ path: "/login" });
     await waitFor(() =>
-      expect(hardNavigate).toHaveBeenCalledWith("/legacy/settings")
+      expect(hardNavigate).toHaveBeenCalledWith("/legacy/login")
     );
   });
 });

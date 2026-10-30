@@ -37,7 +37,7 @@ export function HeaderLinks({
       </a>
       {signedIn && (
         <a
-          href="/legacy/notifications"
+          href="/notifications"
           aria-label={
             unread ? `Notifications (${unread} unread)` : "Notifications"
           }

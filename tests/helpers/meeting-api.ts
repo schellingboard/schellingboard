@@ -5,7 +5,7 @@ export type MeetingResult = { ok: true } | { ok: false; error: string };
 /** The 1-on-1 routes of /api/v1 as a guest holding `cookies` calls them. */
 export function meetingApi(cookies: Map<string, string>) {
   async function call(
-    method: "POST",
+    method: "POST" | "PUT",
     path: string,
     body?: Fields
   ): Promise<MeetingResult> {
@@ -16,6 +16,8 @@ export function meetingApi(cookies: Map<string, string>) {
 
   return {
     requestMeeting: (fields: Fields) => call("POST", "/meetings", fields),
+    saveAvailability: (fields: Fields) =>
+      call("PUT", "/meeting-availability", fields),
     respondToMeeting: ({
       meetingId,
       response,

@@ -24,7 +24,6 @@ import {
   eventDays,
 } from "@/server/modules/events/module";
 import {
-  availabilityForms,
   createMeetingUseCases,
   guestSchedules,
   meetingOptions,
@@ -34,8 +33,6 @@ import {
 import {
   createNotificationUseCases,
   type NotificationUseCases,
-  notificationCount,
-  notificationPage,
   unreadNotificationCount,
 } from "@/server/modules/notifications/module";
 import {
@@ -168,11 +165,6 @@ export function pageReads() {
     guestById: (id: string) => guestById(repos, id),
     guestAuthProtection: (id: string) => guestAuthProtection(repos, id),
     attendees: (now: Date) => attendees(repos, now),
-    notificationPage: (
-      guestId: string,
-      page: { limit: number; offset: number }
-    ) => notificationPage(repos, guestId, page),
-    notificationCount: (guestId: string) => notificationCount(repos, guestId),
     unreadNotificationCount: (guestId: string) =>
       unreadNotificationCount(repos, guestId),
     eventProposals: (eventId: string) => eventProposals(repos, eventId),
@@ -194,8 +186,6 @@ export function pageReads() {
       recipientId: string,
       events: Parameters<typeof meetingOptions>[3]
     ) => meetingOptions(repos, viewerId, recipientId, events),
-    availabilityForms: (guestId: string, now: Date) =>
-      availabilityForms(repos, guestId, now),
   };
 }
 

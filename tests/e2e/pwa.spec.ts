@@ -58,12 +58,10 @@ test("settings offers notifications on this device @013-US3", async ({
 
 test("an old root link reaches its page @014-US4", async ({ page }) => {
   await login(page);
-  await page.evaluate(() => window.location.assign("/settings"));
+  await page.evaluate(() => window.location.assign("/admin"));
 
-  await expect(page).toHaveURL(/\/legacy\/settings$/);
+  await expect(page).toHaveURL(/\/legacy\/admin\/login\?/);
   await expect(
-    page.getByText(
-      /You need to select who you are before changing your settings/
-    )
+    page.getByRole("heading", { name: "Admin Access" })
   ).toBeVisible();
 });

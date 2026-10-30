@@ -6,6 +6,7 @@ import {
   type RouterHistory,
 } from "@tanstack/react-router";
 import type { ReactElement } from "react";
+import { NotificationsPage, SettingsPage } from "./account-pages";
 import { LegacyForward } from "./legacy-forward";
 import { LEGACY_ROOT_PAGES } from "./legacy-pages";
 import { MeetingsPage } from "./meetings-page";
@@ -118,9 +119,25 @@ export function createAppRouter(
     getParentRoute: () => guests,
     path: "$",
   });
+  const settings = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "settings",
+    component: function SettingsRoute(): ReactElement {
+      return <SettingsPage services={services} />;
+    },
+  });
+  const notifications = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "notifications",
+    component: function NotificationsRoute(): ReactElement {
+      return <NotificationsPage services={services} />;
+    },
+  });
   return createRouter({
     routeTree: rootRoute.addChildren([
       ...legacyPages,
+      settings,
+      notifications,
       guests.addChildren([guestsList, guestsPage]),
       event.addChildren([
         schedule,

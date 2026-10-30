@@ -96,7 +96,7 @@ describe("UserMenu", () => {
       screen.getByRole("menuitem", { name }).getAttribute("href");
     expect(href("My profile")).toBe("/guests/g1");
     expect(href("Edit profile")).toBe("/guests/edit");
-    expect(href("Settings")).toBe("/legacy/settings");
+    expect(href("Settings")).toBe("/settings");
   });
 
   it("logs out and reloads the page", async () => {

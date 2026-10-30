@@ -11,20 +11,6 @@ import {
 
 const cookieJar = new Map<string, string>();
 
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-}));
-
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { siteAuthenticate } from "../helpers/site-auth";
 import { createEvent, createGuest, createDay } from "../helpers/factories";
@@ -34,7 +20,7 @@ import {
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
 import { getRepositories } from "@/db/container";
-import { saveMeetingAvailabilityAction } from "@/app/actions/meetings";
+import { meetingApi } from "../helpers/meeting-api";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
@@ -58,11 +44,14 @@ async function meetingsEvent(
   return event;
 }
 
+const saveMeetingAvailability = (fields: Record<string, unknown>) =>
+  meetingApi(cookieJar).saveAvailability(fields);
+
 async function signIn(guestId: string) {
   cookieJar.set(GUEST_COOKIE_NAME, await verifiedGuestValue(guestId));
 }
 
-describe("saveMeetingAvailabilityAction", () => {
+describe("PUT /api/v1/meeting-availability", () => {
   beforeAll(() => setupTestDb());
 
   beforeEach(async () => {
@@ -79,7 +68,7 @@ describe("saveMeetingAvailabilityAction", () => {
     const guest = await createGuest({ eventId: event.id });
     await signIn(guest.id);
 
-    const result = await saveMeetingAvailabilityAction({
+    const result = await saveMeetingAvailability({
       eventId: event.id,
       slotStarts: [SLOT_1, SLOT_3],
     });
@@ -93,32 +82,16 @@ describe("saveMeetingAvailabilityAction", () => {
     expect(saved.map((d) => d.toISOString())).toEqual([SLOT_1, SLOT_3]);
   });
 
-  // Settings is where the form is rendered; the event's own pages never show
-  // the declaration back.
-  it("refreshes the settings page it was saved from", async () => {
-    const { revalidatePath } = await import("next/cache");
-    const event = await meetingsEvent();
-    const guest = await createGuest({ eventId: event.id });
-    await signIn(guest.id);
-
-    await saveMeetingAvailabilityAction({
-      eventId: event.id,
-      slotStarts: [SLOT_1],
-    });
-
-    expect(revalidatePath).toHaveBeenCalledWith("/legacy/settings");
-  });
-
   it("replaces the previous set rather than adding to it", async () => {
     const event = await meetingsEvent();
     const guest = await createGuest({ eventId: event.id });
     await signIn(guest.id);
-    await saveMeetingAvailabilityAction({
+    await saveMeetingAvailability({
       eventId: event.id,
       slotStarts: [SLOT_1, SLOT_2],
     });
 
-    await saveMeetingAvailabilityAction({
+    await saveMeetingAvailability({
       eventId: event.id,
       slotStarts: [SLOT_3],
     });
@@ -137,12 +110,12 @@ describe("saveMeetingAvailabilityAction", () => {
     const event = await meetingsEvent();
     const guest = await createGuest({ eventId: event.id });
     await signIn(guest.id);
-    await saveMeetingAvailabilityAction({
+    await saveMeetingAvailability({
       eventId: event.id,
       slotStarts: [SLOT_1],
     });
 
-    const result = await saveMeetingAvailabilityAction({
+    const result = await saveMeetingAvailability({
       eventId: event.id,
       slotStarts: [],
     });
@@ -163,11 +136,11 @@ describe("saveMeetingAvailabilityAction", () => {
     const guest = await createGuest({ eventId: event.id });
     await signIn(guest.id);
 
-    const offGrid = await saveMeetingAvailabilityAction({
+    const offGrid = await saveMeetingAvailability({
       eventId: event.id,
       slotStarts: ["2026-10-01T09:17:00.000Z"],
     });
-    const outsideDay = await saveMeetingAvailabilityAction({
+    const outsideDay = await saveMeetingAvailability({
       eventId: event.id,
       slotStarts: ["2026-10-02T09:00:00.000Z"],
     });
@@ -189,11 +162,11 @@ describe("saveMeetingAvailabilityAction", () => {
     const guest = await createGuest({ eventId: event.id });
     await signIn(guest.id);
 
-    const onGrid = await saveMeetingAvailabilityAction({
+    const onGrid = await saveMeetingAvailability({
       eventId: event.id,
       slotStarts: [SLOT_1],
     });
-    const offGrid = await saveMeetingAvailabilityAction({
+    const offGrid = await saveMeetingAvailability({
       eventId: event.id,
       slotStarts: [SLOT_2],
     });
@@ -207,7 +180,7 @@ describe("saveMeetingAvailabilityAction", () => {
     const guest = await createGuest({ eventId: event.id });
     await signIn(guest.id);
 
-    const result = await saveMeetingAvailabilityAction({
+    const result = await saveMeetingAvailability({
       eventId: event.id,
       slotStarts: [SLOT_1],
     });
@@ -220,7 +193,7 @@ describe("saveMeetingAvailabilityAction", () => {
     const guest = await createGuest({ eventId: event.id });
     await signIn(guest.id);
 
-    const result = await saveMeetingAvailabilityAction({
+    const result = await saveMeetingAvailability({
       eventId: event.id,
       slotStarts: [SLOT_1],
     });
@@ -233,7 +206,7 @@ describe("saveMeetingAvailabilityAction", () => {
     const outsider = await createGuest();
     await signIn(outsider.id);
 
-    const result = await saveMeetingAvailabilityAction({
+    const result = await saveMeetingAvailability({
       eventId: event.id,
       slotStarts: [SLOT_1],
     });
@@ -251,7 +224,7 @@ describe("saveMeetingAvailabilityAction", () => {
     const guest = await createGuest({ eventId: event.id });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
 
-    const result = await saveMeetingAvailabilityAction({
+    const result = await saveMeetingAvailability({
       eventId: event.id,
       slotStarts: [SLOT_1],
     });
@@ -268,7 +241,7 @@ describe("saveMeetingAvailabilityAction", () => {
     });
     cookieJar.set(GUEST_COOKIE_NAME, openGuestValue(guest.id));
 
-    const result = await saveMeetingAvailabilityAction({
+    const result = await saveMeetingAvailability({
       eventId: event.id,
       slotStarts: [SLOT_1],
     });
@@ -285,7 +258,7 @@ describe("saveMeetingAvailabilityAction", () => {
   it("refuses when nobody is signed in", async () => {
     const event = await meetingsEvent();
 
-    const result = await saveMeetingAvailabilityAction({
+    const result = await saveMeetingAvailability({
       eventId: event.id,
       slotStarts: [SLOT_1],
     });
@@ -293,8 +266,6 @@ describe("saveMeetingAvailabilityAction", () => {
     expect(result.ok).toBe(false);
   });
 
-  // A "use server" export is reachable with any payload, so a malformed one
-  // has to come back as a result rather than throwing out of the action.
   it("refuses a malformed payload instead of throwing", async () => {
     const event = await meetingsEvent();
     const guest = await createGuest({ eventId: event.id });
@@ -306,9 +277,7 @@ describe("saveMeetingAvailabilityAction", () => {
       { eventId: 7, slotStarts: [] },
       {},
     ]) {
-      const result = await saveMeetingAvailabilityAction(
-        bad as unknown as Parameters<typeof saveMeetingAvailabilityAction>[0]
-      );
+      const result = await saveMeetingAvailability(bad);
       expect(result.ok).toBe(false);
     }
   });
@@ -318,7 +287,7 @@ describe("saveMeetingAvailabilityAction", () => {
     const guest = await createGuest({ eventId: event.id });
     await signIn(guest.id);
 
-    const result = await saveMeetingAvailabilityAction({
+    const result = await saveMeetingAvailability({
       eventId: "no-such-event",
       slotStarts: [],
     });
@@ -331,13 +300,13 @@ describe("saveMeetingAvailabilityAction", () => {
     const alice = await createGuest({ eventId: event.id });
     const bob = await createGuest({ eventId: event.id });
     await signIn(alice.id);
-    await saveMeetingAvailabilityAction({
+    await saveMeetingAvailability({
       eventId: event.id,
       slotStarts: [SLOT_1],
     });
 
     await signIn(bob.id);
-    await saveMeetingAvailabilityAction({
+    await saveMeetingAvailability({
       eventId: event.id,
       slotStarts: [SLOT_3],
     });

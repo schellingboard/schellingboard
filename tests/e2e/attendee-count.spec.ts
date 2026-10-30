@@ -48,7 +48,9 @@ const dialog = (page: Page) =>
 // change identity mid-test: selectUser logs out and back in on its own.
 // "Send due reminders" is a legacy-page dev tool, so a test that needs it lands there.
 async function landAs(page: Page, who: string, day = 0, legacy = false) {
-  await page.goto(`${legacy ? "/legacy/settings" : "/Conference-Gamma"}?dev=1`);
+  await page.goto(
+    `${legacy ? "/legacy/account-security" : "/Conference-Gamma"}?dev=1`
+  );
   await selectUser(page, who);
   await setDevClock(page, lateOnGammaDay(day));
   await page.reload();

@@ -21,9 +21,9 @@ function rowToNotification(
   };
 }
 
-// Enforced here rather than trusted from producers: openNotificationAction
-// hands the stored link straight to redirect(), where anything a browser
-// resolves to another origin sends the guest off the site.
+// Enforced here rather than trusted from producers: the app follows the stored
+// link as an address, where anything a browser resolves to another origin
+// sends the guest off the site.
 //
 // Asking the URL parser rather than pattern-matching is what makes this hold:
 // "//host/x", "/\\host/x" and "/<tab>/host/x" all start with a slash and all

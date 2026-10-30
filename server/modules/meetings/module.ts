@@ -9,7 +9,6 @@ export { addAdminMeetingRoutes } from "./http/admin-routes";
 export { eventMeetings } from "./application/snapshot";
 export { toMeetingPointView, toMeetingView } from "./http/view";
 export {
-  availabilityForms,
   guestSchedules,
   meetingOptions,
   meetingPointsOfEvent,

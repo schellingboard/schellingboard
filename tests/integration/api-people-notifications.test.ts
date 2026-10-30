@@ -25,6 +25,7 @@ import {
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 import { createImageFile } from "../helpers/utils";
 import { createAdminAuthCookie } from "@/utils/auth";
+import { TIME_OFFSET_COOKIE } from "@/utils/dev-clock";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 const HANDLERS = { GET, POST, PUT, DELETE } as const;
@@ -520,6 +521,110 @@ describe("/api/v1 notifications and settings", () => {
   );
 
   it(
+    "marks only the listed notifications read, skipping another guest's",
+    { tags: ["013-US2"] },
+    async () => {
+      const ada = await createGuest();
+      const grace = await createGuest();
+      const repo = getRepositories().notifications;
+      const make = (guestId: string) =>
+        repo.create({
+          guestId,
+          type: "sessionComment",
+          text: "Anna commented on your session",
+          url: "/e?viewSession=s1",
+          createdAt: new Date(),
+        });
+      const first = await make(ada.id);
+      await make(ada.id);
+      const theirs = await make(grace.id);
+
+      const marked = await call("POST", "/me/notifications/read", {
+        cookie: asGuest(ada.id),
+        body: { ids: [first.id, theirs.id] },
+      });
+
+      expect(marked.status).toBe(204);
+      expect(await repo.countUnread(ada.id)).toBe(1);
+      expect(await repo.countUnread(grace.id)).toBe(1);
+    }
+  );
+
+  it(
+    "tells where a notification leads, a 1-on-1 included, once it is read",
+    { tags: ["013-US2"] },
+    async () => {
+      const ada = await createGuest();
+      const meeting = await getRepositories().notifications.create({
+        guestId: ada.id,
+        type: "sessionComment",
+        text: "Anna asked you for a 1-on-1",
+        url: "/e/meetings?viewMeeting=m1",
+        createdAt: new Date(),
+      });
+
+      const read = await call("POST", `/me/notifications/${meeting.id}/read`, {
+        cookie: asGuest(ada.id),
+      });
+
+      expect(await read.json()).toMatchObject({
+        url: "/e/meetings?viewMeeting=m1",
+      });
+      expect(await getRepositories().notifications.countUnread(ada.id)).toBe(0);
+    }
+  );
+
+  it("changes no notification for nobody", { tags: ["013-US2"] }, async () => {
+    const ada = await createGuest();
+    const repo = getRepositories().notifications;
+    const mine = await repo.create({
+      guestId: ada.id,
+      type: "sessionComment",
+      text: "Anna commented on your session",
+      url: "/e?viewSession=s1",
+      createdAt: new Date(),
+    });
+
+    const attempts = await Promise.all([
+      call("POST", "/me/notifications/read", { body: { ids: [mine.id] } }),
+      call("POST", "/me/notifications/delete", { body: { ids: [mine.id] } }),
+      call("POST", `/me/notifications/${mine.id}/read`),
+    ]);
+
+    expect(attempts.map((r) => r.status)).toEqual([403, 403, 403]);
+    expect(await repo.countUnread(ada.id)).toBe(1);
+    expect(await repo.countByGuest(ada.id)).toBe(1);
+  });
+
+  it(
+    "stamps a read with the offset the dev toolbar is holding",
+    { tags: ["013-US2"] },
+    async () => {
+      vi.stubEnv("SB_ENABLE_DEV_TOOLS", "1");
+      const ada = await createGuest();
+      const notification = await getRepositories().notifications.create({
+        guestId: ada.id,
+        type: "sessionComment",
+        text: "Anna commented on your session",
+        url: "/e?viewSession=s1",
+        createdAt: new Date(),
+      });
+      const threeDays = 3 * 24 * 60 * 60 * 1000;
+
+      await call("POST", `/me/notifications/${notification.id}/read`, {
+        cookie: `${asGuest(ada.id)}; ${TIME_OFFSET_COOKIE}=${threeDays}`,
+      });
+
+      const [listed] = await getRepositories().notifications.listByGuest(
+        ada.id
+      );
+      expect(listed.readAt!.getTime() - Date.now()).toBeGreaterThan(
+        threeDays - 60_000
+      );
+    }
+  );
+
+  it(
     "lists the caller's notifications page by page, newest first",
     { tags: ["013-US1", "019-US8"] },
     async () => {
@@ -587,6 +692,87 @@ describe("/api/v1 notifications and settings", () => {
       expect(put.status).toBe(204);
       const got = await call("GET", "/me/email-settings", { cookie });
       expect(await got.json()).toEqual(changed);
+    }
+  );
+
+  it(
+    "keeps the two host reminders independent, both on by default",
+    { tags: ["013-US5"] },
+    async () => {
+      const ada = await createGuest();
+      const cookie = asGuest(ada.id);
+      const reminders = async () => {
+        const got = await call("GET", "/me/email-settings", { cookie });
+        const settings = (await got.json()) as typeof DEFAULT_EMAIL_SETTINGS;
+        return {
+          sessionHeadsUp: settings.sessionHeadsUp,
+          attendeeCountReminder: settings.attendeeCountReminder,
+        };
+      };
+      expect(await reminders()).toEqual({
+        sessionHeadsUp: true,
+        attendeeCountReminder: true,
+      });
+
+      await call("PUT", "/me/email-settings", {
+        cookie,
+        body: { ...DEFAULT_EMAIL_SETTINGS, attendeeCountReminder: false },
+      });
+      expect(await reminders()).toEqual({
+        sessionHeadsUp: true,
+        attendeeCountReminder: false,
+      });
+
+      await call("PUT", "/me/email-settings", {
+        cookie,
+        body: { ...DEFAULT_EMAIL_SETTINGS, sessionHeadsUp: false },
+      });
+      expect(await reminders()).toEqual({
+        sessionHeadsUp: false,
+        attendeeCountReminder: true,
+      });
+    }
+  );
+
+  it(
+    "refuses to change email settings for nobody, leaving them as they were",
+    { tags: ["013-US5"] },
+    async () => {
+      const ada = await createGuest();
+
+      const put = await call("PUT", "/me/email-settings", {
+        body: { ...DEFAULT_EMAIL_SETTINGS, rsvpChange: false },
+      });
+
+      expect(put.status).toBe(403);
+      expect(await put.json()).toMatchObject({ code: "guest.unselected" });
+      const unchanged = await getRepositories().guests.findById(ada.id);
+      expect(unchanged?.info.emailSettings).toEqual(DEFAULT_EMAIL_SETTINGS);
+    }
+  );
+
+  it(
+    "refuses a push subscription for nobody, and will not turn off another guest's device",
+    { tags: ["013-US3"] },
+    async () => {
+      const ada = await createGuest();
+      const grace = await createGuest();
+      const push = getRepositories().push;
+      await call("POST", "/me/push-subscriptions", {
+        cookie: asGuest(ada.id),
+        body: DEVICE,
+      });
+
+      const anonymous = await call("POST", "/me/push-subscriptions", {
+        body: DEVICE,
+      });
+      await call("POST", "/me/push-subscriptions/remove", {
+        cookie: asGuest(grace.id),
+        body: { endpoint: DEVICE.endpoint },
+      });
+
+      expect(anonymous.status).toBe(403);
+      expect(await push.listSubscriptions(ada.id)).toHaveLength(1);
     }
   );
 

@@ -430,7 +430,7 @@ Normally anyone on the site can pick your name and act as you. To require a logi
 **Settings → Account security** and click **Enable protection**. You'll be emailed an 8-character
 code, valid for 10 minutes; type it in to confirm. You can set a password at the same time.
 
-![Settings page in dark mode, one of the supported themes, with email notification checkboxes and an Enable protection button](../screenshots/user-settings.webp)
+![Settings page in dark mode, one of the supported themes, with email notification checkboxes](../screenshots/user-settings.webp)
 
 Once protected, picking your name asks for that password or a fresh emailed code. The login lasts a
 week, or until you switch to a different name, and covers everything done as you: voting, RSVPing,
@@ -501,6 +501,8 @@ reach your phone or laptop when the site isn't open.
   descriptions and comment text stay on the site rather than going out to your email provider.
 - **1-on-1s** — one panel per event you're attending that offers them, with the switch and the slots
   you're keeping free. See [1-on-1s](#1-on-1s).
+- **Account security** — a link to the page where you protect your name, change your password or
+  turn protection off. See [Protect your name](#protect-your-name).
 - **Appearance** — System, Light or Dark, also available at the very bottom of every page.
   **System** follows your phone or laptop, so the site turns dark in the evening if your device
   does. The choice is remembered per device, not per name, and works before you've picked a name.
