@@ -19,7 +19,7 @@ export function isApiDocsEnabled(): boolean {
   return value !== "false" && value !== "0";
 }
 
-const PUBLIC_PATHS = new Set(["/health"]);
+const PUBLIC_PATHS = new Set(["/health", "/auth/site"]);
 const HTTP_METHODS = ["get", "put", "post", "delete", "patch"] as const;
 
 export function openApiDocumentOf(app: App, basePath = "/api/v1") {

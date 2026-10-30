@@ -59,8 +59,9 @@ auth flows allow-listed.
 `GET` answers who the browser acts as now (null for a protected name not yet logged in, the SPA's
 viewer); all three set the `guest` cookie, which the route adapter builds from the use case's
 `Identity` (`people/application/identity.ts`). A protected name answers `403 guest.protected`: the
-SPA sends the user to the legacy login. The `selectUserAction` server action calls the same use
-case.
+SPA sends the user to the sign-in. `POST /auth/site` takes the shared site password (open to
+visitors without the cookie; `site.passwordWrong`, and `auth.tooManyAttempts` per address) and sets
+the site cookie.
 
 ## Signing in
 

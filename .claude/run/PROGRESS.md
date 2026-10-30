@@ -58,8 +58,7 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
 
 - Step 7 checks: all of `make precommit` green; E2E 214 passed, 1 flaky
   (`meetings-request.spec.ts:296`, known; passes alone, and `make` still exits 1 on a flaky test).
-  Commit id: see the log. Review: finding 1 fixed (API tests for the lockout, code-guess,
-  reset-token and email rules); 2-6 fixed. None rejected.
+  Commit id: see the log.
 
 - Step 7 review: all 8 findings accepted. The login form keeps the legacy copy when a guest is
   named.
@@ -70,8 +69,16 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
   button was the legacy layout's, the SPA shell has none). Checks: `make precommit` green up to E2E;
   E2E 213 passed, 1 skipped (the fixme), 1 flaky (`theme.spec.ts:11`, passes on retry; `make` exits
   1 on a flaky test). `Viewer.refresh` re-reads the identity after a reset. Commit id: see the log.
-  Review: finding 1 fixed (API tests for the lockout, code-guess, reset-token and email rules); 2-6
-  fixed. None rejected.
+  Step 8 review: all 6 findings fixed (API tests for the deleted action rules, `Viewer.refresh`
+  error handling, directory-failure states); none rejected.
+
+- Step 9: `LEGACY_ROOT_PAGES` is `admin` only and the router has no static legacy routes left; an
+  unauthenticated `/legacy/...` redirects to `/login?redirect=`. `/api/v1/health` and
+  `/api/v1/auth/site` skip the site gate (not under `/legacy`). `/api/auth/logout` (Next route) is
+  still how the SPA ends the site login. Checks: format, lint, arch, openapi, typecheck, test green;
+  E2E 213 passed, 1 skipped (map fixme), 1 flaky (`release-notes.spec.ts:11`, passes on retry). Step
+  9 review: all 3 findings fixed (the redirect check is `safeRedirectPath` in `packages/domain`,
+  used by the SPA and `utils/auth.ts`); none rejected. Commit id: see the log.
 
 ## Known E2E flakes
 

@@ -162,7 +162,7 @@ describe("proxy: pages live under /legacy", () => {
     if (result.ok) throw new Error("expected a redirect");
     expect(rewriteTarget(result.response)).toBeNull();
     const location = new URL(result.response.headers.get("location")!);
-    expect(location.pathname).toBe("/legacy/login");
+    expect(location.pathname).toBe("/login");
     expect(location.searchParams.get("redirect")).toBe("/conf?x=1");
   });
 
@@ -184,12 +184,22 @@ describe("proxy: pages live under /legacy", () => {
     const result = await throughProxy("/legacy/conf", {}, []);
     if (result.ok) throw new Error("expected a redirect");
     const location = new URL(result.response.headers.get("location")!);
-    expect(location.pathname).toBe("/legacy/login");
+    expect(location.pathname).toBe("/login");
     expect(location.searchParams.get("redirect")).toBe("/legacy/conf");
   });
 
-  it("lets the login page through and gates /legacy/admin with the admin cookie", async () => {
-    expect((await throughProxy("/legacy/login", {}, [])).ok).toBe(true);
+  it("serves the site password screen's shell without the cookie", async () => {
+    const result = await throughProxy("/login?redirect=%2Fconf", {}, []);
+    if (result.ok) throw new Error("expected a rewrite");
+    expect(rewriteTarget(result.response)?.pathname).toBe("/api/spa/shell");
+  });
+
+  it("lets a visitor without the cookie reach the site password route and the health route", async () => {
+    for (const path of ["/api/v1/auth/site", "/api/v1/health"])
+      expect((await throughProxy(path, {}, [])).ok, path).toBe(true);
+  });
+
+  it("gates /legacy/admin with the admin cookie", async () => {
     const gated = await throughProxy("/legacy/admin/events", {}, []);
     if (gated.ok) throw new Error("expected a redirect");
     expect(new URL(gated.response.headers.get("location")!).pathname).toBe(
@@ -232,7 +242,7 @@ describe("proxy: pages live under /legacy", () => {
         "http://test"
       );
       expect(location.origin, path).toBe("http://test");
-      expect(location.pathname, path).toBe("/legacy/login");
+      expect(location.pathname, path).toBe("/login");
     }
   });
 

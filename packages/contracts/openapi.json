@@ -5937,6 +5937,41 @@
         "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
       }
     },
+    "/api/v1/auth/site": {
+      "post": {
+        "tags": ["auth"],
+        "description": "Enters the site with the shared site password and sets the site cookie. Open to visitors who have not entered yet. `site.passwordWrong` (403); `auth.tooManyAttempts` (429) after repeated failures from one address.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The site password"
+                  }
+                },
+                "required": ["password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "The site cookie is set" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/me/credentials": {
       "get": {
         "tags": ["auth"],
