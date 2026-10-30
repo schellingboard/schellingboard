@@ -37,6 +37,7 @@ const people = (uow = unitOfWork) =>
   createPeopleUseCases({
     repos: getRepositories(),
     avatars: getImageRepositories().avatars,
+    loginMail: { configured: () => false, send: async () => {} },
     sendTestEmail: async () => {},
     uow,
   });

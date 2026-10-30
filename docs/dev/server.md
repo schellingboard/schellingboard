@@ -62,6 +62,19 @@ viewer); all three set the `guest` cookie, which the route adapter builds from t
 SPA sends the user to the legacy login. The `selectUserAction` server action calls the same use
 case.
 
+## Signing in
+
+`POST /api/v1/auth/login-code` emails a code, `POST /auth/login` takes the password or that code and
+sets a `verified` session cookie, `POST /auth/sign-out` ends it (`people/application/sign-in.ts`).
+`/auth/*` has its own per-address rate limit on top of the per-guest password limit and the daily
+email cap, and a limit answers `429` (kind `limited`). Problem codes: `auth.credentialWrong` (wrong,
+spent or expired password or code, indistinguishable on purpose), `auth.tooManyAttempts`,
+`auth.codeRecentlySent`, `auth.codeSpent`, `auth.tooManyEmails`, `auth.mailUnavailable`,
+`auth.mailFailed`. A `limited` refusal carries `Retry-After`. The proxy refuses a cross-site
+`/api/v1/auth/*` request like the admin API's (403 `request.crossSite`). The per-address limit
+applies only with `SB_TRUSTED_PROXIES` set; its burst is `SB_AUTH_RATE_BURST` (default 30), and
+sign-out is not limited. The legacy `loginAsGuestAction` calls the same use cases.
+
 ## The feed and the snapshot
 
 [ADR 0014](adr/0014-change-feed-and-snapshot.md) has the decisions.

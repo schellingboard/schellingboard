@@ -78,6 +78,16 @@ export function hashAuthCode(code: string, salt: string): string {
     .digest("hex");
 }
 
+export function authCodeMatches(
+  code: string,
+  salt: string,
+  storedHash: string
+): boolean {
+  const a = Buffer.from(hashAuthCode(code, salt));
+  const b = Buffer.from(storedHash);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
 const SCRYPT_PARAMS = { N: 16384, r: 8, p: 1 };
 const SCRYPT_KEYLEN = 32;
 

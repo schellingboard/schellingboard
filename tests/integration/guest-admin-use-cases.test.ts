@@ -26,6 +26,7 @@ const guests = (uow: UnitOfWork = unitOfWork) =>
   createPeopleUseCases({
     repos: getRepositories(),
     avatars: getImageRepositories().avatars,
+    loginMail: { configured: () => false, send: async () => {} },
     sendTestEmail,
     uow,
   });

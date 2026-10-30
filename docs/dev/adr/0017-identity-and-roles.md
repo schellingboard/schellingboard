@@ -32,9 +32,10 @@ point 4.
    plan.
 5. **Sign-in API** under `/api/v1/auth/` (request a code, log in with code or password, reset, sign
    out) and `/api/v1/me/credentials`, `/api/v1/me/login-sessions`. Strict rate limits and Origin
-   checks, as for the admin API. Problem codes name wrong code, expired code and too many attempts.
-   **This amends ADR 0016 point 4** ("no API for passwords"): the API now exists, because the SPA's
-   sign-in screens use it.
+   checks, as for the admin API. Problem codes name a wrong credential (a wrong, expired or spent
+   password or code are one code, so a guess learns nothing) and too many attempts. **This amends
+   ADR 0016 point 4** ("no API for passwords"): the API now exists, because the SPA's sign-in
+   screens use it.
 6. **Token rules.** Login-session ids, codes, reset tokens and join tokens are random and stored
    only as sha256 hashes: 32 random bytes for ids and reset or join tokens; the emailed code is 8
    characters (~40 bits, per-code salt) and retires after 100 wrong tries. Each expires. "Request a

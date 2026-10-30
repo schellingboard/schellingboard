@@ -9,6 +9,7 @@ import {
 } from "./admin-guests";
 import { assignGuestsToEvent, removeGuestsFromEvent } from "./event-guests";
 import { importGuests } from "./guest-import";
+import { logIn, requestLoginCode } from "./sign-in";
 import { chooseGuest, currentGuest, signIn, signOut } from "./identity";
 import {
   getProfile,
@@ -26,6 +27,8 @@ export function createPeopleUseCases(deps: PeopleDeps) {
     currentGuest: currentGuest(deps),
     signIn: signIn(deps),
     signOut: signOut(deps),
+    requestLoginCode: requestLoginCode(deps),
+    logIn: logIn(deps),
     getProfile: getProfile(deps),
     getProfileActivity: getProfileActivity(deps),
     listAttendees: listAttendees(deps),

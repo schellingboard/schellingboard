@@ -54,7 +54,7 @@ export function problemFromError(
   error: AppError,
   present?: (current: never) => unknown
 ): Response {
-  return problemResponse({
+  const res = problemResponse({
     status: HTTP_STATUS_BY_KIND[error.kind],
     code: error.code,
     ...(error.detail === undefined ? {} : { detail: error.detail }),
@@ -63,6 +63,9 @@ export function problemFromError(
       ? {}
       : { current: present(error.current as never) }),
   });
+  if (error.retryAfter !== undefined)
+    res.headers.set("retry-after", String(error.retryAfter));
+  return res;
 }
 
 type ProblemStatus = (typeof HTTP_STATUS_BY_KIND)[ErrorKind];

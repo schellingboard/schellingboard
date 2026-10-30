@@ -73,10 +73,9 @@ Steps 8 to 10 need Q7 (admin bootstrap) and Q8 (site password). Steps 1 to 7 and
 - [x] 2. ADR 0017 (identity and roles) records the decisions, with Q7 and Q8 as proposed.
 - [x] 3. Login sessions are rows (`login_sessions`, `signIn`/`signOut` in `people`, `actorOf` in
       `server/kernel/session-actor.ts`); old cookies still read; the jobs loop prunes expired rows.
-- [ ] 4. **Sign-in API**: request a login code, log in with code or password, sign out; use cases in
-      `server/modules/people` (or a new `identity` module if the arch rules prefer it), moved out of
-      `app/actions/user-auth.ts`, which delegates. Rate limits; problem codes for wrong code,
-      expired, too many attempts.
+- [x] 4. Sign-in API: `POST /api/v1/auth/login-code`, `/auth/login`, `/auth/sign-out`
+      (`people/application/sign-in.ts`, `http/auth-routes.ts`); `user-auth.ts` delegates for code
+      and login; kind `limited` (429); per-address limit on `/auth/*`.
 - [ ] 5. **Credentials API**: request a reset link, set a password with it, change it, protect and
       unprotect a name, list and revoke own login sessions (`/me/login-sessions`). The rest of
       `user-auth.ts` delegates.
