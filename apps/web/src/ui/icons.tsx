@@ -175,3 +175,10 @@ export const PhoneIcon = solid(
 );
 
 export const CheckIcon = outline(["m4.5 12.75 6 6 9-13.5"]);
+export const Bars3Icon = outline([
+  "M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5",
+]);
+export const XMarkOutlineIcon = outline(["M6 18 18 6M6 6l12 12"]);
+export const ArrowRightOnRectangleIcon = outline([
+  "M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9",
+]);

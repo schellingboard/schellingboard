@@ -193,9 +193,8 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`, `docs/dev/target-architec
 
 ### Admin
 
-- [ ] 19. **Admin section shell**, unrouted: `/admin` layout and nav from the legacy admin header;
-      the gate (an admin read answering `401`/`403` sends the browser to `/legacy/admin/login`); a
-      data-table primitive in `ui/`.
+- [x] 19. Admin section shell (done: `app/admin-frame.tsx` `AdminFrame`, `queries/admin-gate.ts`,
+      `ui/data-table.tsx`, `POST /api/admin/logout`).
 - [ ] 20. **Admin screens**, unrouted, one commit each:
   - [ ] 20a. Events list: create, delete.
   - [ ] 20b. Event detail: details, phases, days, meeting settings and meeting points.

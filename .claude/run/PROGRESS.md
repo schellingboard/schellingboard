@@ -80,6 +80,19 @@ legacy layout still has a dev toolbar and nav bar, so E2E specs that need them (
 tool, "Show map") land on `/legacy/account-security`. `AccountSecurity` must go when path step 6
 brings passwords to the SPA.
 
+Step 19, for 20/21: `AdminFrame({api, currentPath, search, children})` wraps every admin page: it
+makes the gate read (`GET /admin/settings`), renders children only once open, sends 401/403 to
+`/legacy/admin/login?redirect=<path+search>` (`hardNavigate`) and shows the site title and the nav
+(`/admin/events|users|locations|settings`, plain anchors; the router must pass `currentPath`).
+Logout is `POST /api/admin/logout` (new route; the legacy server action cannot be called). The
+`DataTable` is controlled: `searchQuery`/`onSearch`/`page`/`onPage` come from the page's URL params
+(`useUrlSearchParams`), not from the table; `Selection` and `BulkActionsBar` moved with it. The
+legacy `useTableParams` has no copy; its `shallow` mode is just "the page filters rows in memory".
+`onSearch(query, {replace})` and `searchParamUpdates(query)` (`ui/data-table`) carry the legacy
+history rules: a search resets `page`, the first one pushes a history entry, refinements replace.
+Step 21 must delete `app/legacy/admin/data-table.tsx`. A page that gets 401/403 later from a
+mutation should do what the gate does (not built yet).
+
 ## Questions
 
 5. The SPA shell has no "Show map" button (the uploaded site map); only legacy pages show it. The
