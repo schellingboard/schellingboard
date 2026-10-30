@@ -94,8 +94,12 @@ export function TextField({
   min,
   step,
   type = "text",
+  autoComplete,
+  readOnly,
   ...frame
 }: FieldProps & {
+  autoComplete?: string;
+  readOnly?: boolean;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -103,7 +107,7 @@ export function TextField({
   maxLength?: number;
   min?: number;
   step?: number;
-  type?: "text" | "email" | "url" | "number";
+  type?: "text" | "email" | "url" | "number" | "password";
 }) {
   const ids = useField(frame);
   return (
@@ -116,6 +120,8 @@ export function TextField({
         required={frame.required}
         placeholder={placeholder}
         autoFocus={autoFocus}
+        autoComplete={autoComplete}
+        readOnly={readOnly}
         maxLength={maxLength}
         min={min}
         step={step}

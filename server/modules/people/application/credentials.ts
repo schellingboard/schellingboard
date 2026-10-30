@@ -305,6 +305,20 @@ export const setUsername =
       : conflict("username.taken", "That username is taken");
   };
 
+export const getCredentials =
+  (deps: PeopleDeps) =>
+  async (
+    actor: Actor
+  ): Promise<Result<{ authProtected: boolean; username: string | null }>> => {
+    const acting = await actingOrRefuse(actor, deps);
+    if (!acting.ok) return acting;
+    const creds = await deps.repos.guests.getAuthCredentials(acting.value);
+    return ok({
+      authProtected: creds?.authProtected ?? false,
+      username: await deps.repos.guests.getUsername(acting.value),
+    });
+  };
+
 export type OwnLoginSession = LoginSession & { current: boolean };
 
 export const listLoginSessions =

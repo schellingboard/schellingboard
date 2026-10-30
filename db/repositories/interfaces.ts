@@ -281,6 +281,7 @@ export interface GuestsRepository {
   setAuthProtection(id: string, creds: GuestAuthCredentials): Promise<boolean>;
   /** The guest whose email or (lowercase) username is `identifier`, matched case-insensitively. */
   findLoginId(identifier: string): Promise<string | null>;
+  getUsername(id: string): Promise<string | null>;
   /** `taken` when another guest holds it; `username` is stored as given (lowercase). */
   setUsername(id: string, username: string | null): Promise<"ok" | "taken">;
   // Matches the email case-insensitively.

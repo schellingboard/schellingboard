@@ -59,9 +59,9 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
       `/me/credentials/{password,unprotect,     username}`, `/me/login-sessions`; `guests.username`
       (unique, lowercase); `/auth/login` takes `identifier`; `user-auth.ts` delegates
       (`people/application/credentials.ts`).
-- [ ] 7. **Sign-in screens, unrouted**: guest login (code, password by email or username, forgot),
-      reset, account security (protection, username, password, login sessions with "sign out").
-      `features/sign-in/`, forms through `useFormMutation`.
+- [x] 7. Sign-in screens, unrouted: `features/sign-in/` (`LoginScreen`, `ResetScreen`,
+      `AccountSecurityScreen`), `commands/sign-in.ts`, `queries/account-security.ts`;
+      `GET /me/credentials` added for the screen.
 - [ ] 8. **Takeover: sign-in screens.** Router owns `/auth/login`, `/auth/reset`,
       `/account-security`; `UserMenu` and Settings link in-app; legacy pages, forms and
       `user-auth.ts` deleted, their tests on the API. Adapt `user-auth.spec.ts`, `settings.spec.ts`.

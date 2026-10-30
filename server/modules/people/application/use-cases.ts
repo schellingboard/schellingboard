@@ -9,6 +9,7 @@ import {
 } from "./admin-guests";
 import {
   changePassword,
+  getCredentials,
   listLoginSessions,
   requestResetLink,
   resetPassword,
@@ -40,6 +41,7 @@ export function createPeopleUseCases(deps: PeopleDeps) {
     logIn: logIn(deps),
     requestResetLink: requestResetLink(deps),
     resetPassword: resetPassword(deps),
+    getCredentials: getCredentials(deps),
     changePassword: changePassword(deps),
     unprotect: unprotect(deps),
     setUsername: setUsername(deps),
