@@ -736,3 +736,27 @@ describe("credential changes retire emailed tokens and this browser's claimed ro
     }
   );
 });
+
+describe("GET /api/v1/me/credentials", () => {
+  it(
+    "tells whether the name is protected and what its username is",
+    { tags: ["003-US3"] },
+    async () => {
+      const guest = await protectedGuest();
+      const mine = asSession(await sessionGuestValue(guest.id, "verified"));
+      await call("PUT", "/me/credentials/username", { username: "ada" }, mine);
+
+      const res = await call("GET", "/me/credentials", undefined, mine);
+
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({
+        authProtected: true,
+        username: "ada",
+      });
+    }
+  );
+
+  it("needs a session", { tags: ["003-US3"] }, async () => {
+    expect((await call("GET", "/me/credentials")).status).toBe(403);
+  });
+});

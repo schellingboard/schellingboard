@@ -48,6 +48,20 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
   per-guest login limiter; an unknown login `identifier` is limited per spelling. Protecting a name
   is a reset link (no separate endpoint). Usernames: 3-32 chars `[a-z0-9._-]`, lowercased, never an
   email.
+- Sign-in screens (step 7): they take `calls`, a `guest` and (security) a `state`; the router in
+  step 8 supplies the guest (from the directory for the link's `?guest=`) and `reload`. The login
+  form's guest is `undefined` for a plain sign-in and `null` for a link naming nobody. `getUsername`
+  is back (step 6 review item 3 removed it unused; `GET /me/credentials` uses it).
+- Step 6 review, minor 3-7: all fixed except 5 (`unprotect` and `resetPassword` outside one
+  transaction): rejected, since unprotect needs the current password and a raced reset link only
+  lets two holders of the same link each pick a password.
+
+- Step 7 checks: all of `make precommit` green; E2E 214 passed, 1 flaky
+  (`meetings-request.spec.ts:296`, known; passes alone, and `make` still exits 1 on a flaky test).
+  Commit id: see the log.
+
+- Step 7 review: all 8 findings accepted. The login form keeps the legacy copy when a guest is
+  named.
 
 ## Known E2E flakes
 

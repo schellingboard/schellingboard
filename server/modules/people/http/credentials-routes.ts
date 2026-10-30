@@ -1,6 +1,7 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import {
   changePasswordBodySchema,
+  credentialsSchema,
   identitySchema,
   loginSessionSchema,
   unprotectBodySchema,
@@ -18,6 +19,18 @@ import {
 } from "@/server/http/route-parts";
 import type { PeopleUseCases } from "../application/use-cases";
 import { setGuestCookie } from "./guest-cookie";
+
+const getCredentials = createRoute({
+  method: "get",
+  path: "/me/credentials",
+  tags: ["auth"],
+  description:
+    "Whether the name this browser acts as is protected, and its username.",
+  responses: {
+    200: json(credentialsSchema, "The sign-in settings"),
+    ...problemDefault,
+  },
+});
 
 const changePassword = createRoute({
   method: "put",
@@ -80,6 +93,12 @@ const revokeLoginSession = createRoute({
 });
 
 export function addCredentialRoutes(app: App, people: () => PeopleUseCases) {
+  app.openapi(getCredentials, async (c) => {
+    const result = await people().getCredentials(c.var.actor);
+    if (!result.ok) return problem(result.error);
+    return c.json(result.value, 200);
+  });
+
   app.openapi(changePassword, async (c) => {
     const result = await people().changePassword(
       c.var.actor,

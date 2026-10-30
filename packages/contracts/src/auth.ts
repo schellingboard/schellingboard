@@ -103,3 +103,10 @@ export const loginSessionSchema = z.object({
   lastSeenAt: z.string().describe("ISO instant"),
   expiresAt: z.string().describe("ISO instant"),
 });
+
+export const credentialsSchema = z.object({
+  authProtected: z
+    .boolean()
+    .describe("Whether switching to the name asks for a login"),
+  username: z.string().nullable(),
+});

@@ -55,7 +55,9 @@ describe("/api/v1 rate limit", () => {
   });
 
   it("does not give each unproven name a bucket of its own", async () => {
-    for (let i = 0; i < API_LIMIT.capacity; i++) {
+    const burst = 20;
+    vi.stubEnv("SB_API_RATE_BURST", String(burst));
+    for (let i = 0; i < burst; i++) {
       const guest = await createGuest();
       await get("/events", `${GUEST_COOKIE_NAME}=${openGuestValue(guest.id)}`);
     }
