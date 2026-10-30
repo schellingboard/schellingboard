@@ -28,8 +28,20 @@ describe("the admin guests query", { tags: ["016-US3"] }, () => {
     expect(query.get()).toEqual({
       status: "ready",
       guests: [
-        { id: "g1", name: "Guest g1", email: "g1@x.org", eventIds: ["e1"] },
-        { id: "g2", name: "Guest g2", email: "g2@x.org", eventIds: ["e1"] },
+        {
+          id: "g1",
+          name: "Guest g1",
+          email: "g1@x.org",
+          eventIds: ["e1"],
+          version: 1,
+        },
+        {
+          id: "g2",
+          name: "Guest g2",
+          email: "g2@x.org",
+          eventIds: ["e1"],
+          version: 1,
+        },
       ],
     });
   });

@@ -42,7 +42,7 @@ describe("awaitMutation", () => {
       )
     );
 
-    expect(await awaitMutation(send, "k")).toEqual({
+    expect(await awaitMutation(send, "k")).toMatchObject({
       ok: false,
       kind: "fields",
       fields: { title: "Title is required", "hosts.0": "Unknown host" },
@@ -111,6 +111,34 @@ describe("awaitMutation", () => {
       expect(
         await awaitMutation(send, "k", { explainRefusals: true })
       ).toMatchObject({ message: "This session is full." });
+    });
+
+    it("explains a server failure that carries a reason", async () => {
+      const send = call(() =>
+        Response.json(
+          {
+            type: "about:blank",
+            title: "x",
+            status: 503,
+            code: "mail.failed",
+            detail: "Failed to send test email: connection refused",
+          },
+          {
+            status: 503,
+            headers: { "content-type": "application/problem+json" },
+          }
+        )
+      ).send;
+
+      expect(
+        await awaitMutation(send, "k", { explainRefusals: true })
+      ).toMatchObject({
+        kind: "refused",
+        message: "Failed to send test email: connection refused",
+      });
+      expect(await awaitMutation(send, "k")).toMatchObject({
+        kind: "unreachable",
+      });
     });
 
     it("falls back when the explanation is empty or not text", async () => {
