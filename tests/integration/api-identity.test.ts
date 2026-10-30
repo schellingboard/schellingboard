@@ -104,11 +104,11 @@ describe("/api/v1/me/identity", () => {
   );
 
   it("tells nobody for a deleted guest", { tags: ["003-US1"] }, async () => {
-    expect(
-      await (
-        await whoAmI(`${GUEST_COOKIE_NAME}=${openGuestValue("gone")}`)
-      ).json()
-    ).toEqual({ guestId: null });
+    const gone = await createGuest({ name: "Gone" });
+    const cookie = `${GUEST_COOKIE_NAME}=${openGuestValue(gone.id)}`;
+    await getRepositories().guests.delete(gone.id);
+
+    expect(await (await whoAmI(cookie)).json()).toEqual({ guestId: null });
   });
 
   it(

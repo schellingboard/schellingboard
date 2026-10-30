@@ -44,6 +44,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   trusts the forwarded address by default, so without it all visitors share one limit on failed
   logins.
 
+- **Everyone signs in again once; sessions then last 30 days from last use**: you stay signed in
+  while you visit at least monthly. Before, a sign-in expired after 7 days.
+
 ### Security
 
 - **Fewer known vulnerabilities in the Docker image**: it now includes the latest Debian security

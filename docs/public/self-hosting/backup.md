@@ -12,7 +12,7 @@ map (`/data/uploads`).
 
 :::warning "Back up your `.env` separately" It is **not** in that volume, and it holds
 `AUTH_SECRET`, `SITE_PASSWORD`, `ADMIN_PASSWORD` and your SMTP credentials. Restoring the data
-without the same `AUTH_SECRET` logs everyone out. :::
+without the same `AUTH_SECRET` logs out the site and admin gates (attendees stay signed in). :::
 
 ## Find the volume
 

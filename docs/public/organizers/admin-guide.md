@@ -12,7 +12,8 @@ side. Unset, `/admin` returns a 404 rather than a login prompt.
 
 :::warning "Changing a password does not log anyone out" Both gates sign their cookies with
 `AUTH_SECRET`, and existing sessions stay valid for up to a week. To revoke access immediately,
-rotate `AUTH_SECRET` too — which logs out everyone, attendees included. :::
+rotate `AUTH_SECRET` too — which logs out the site and admin gates. Attendees stay signed in (their
+sessions last 30 days from last use), and no organizer action signs them out yet. :::
 
 ## Site settings
 

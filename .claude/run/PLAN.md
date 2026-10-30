@@ -53,10 +53,8 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
 - [x] 4. Sign-in API: `POST /api/v1/auth/login-code`, `/auth/login`, `/auth/sign-out`
       (`people/application/sign-in.ts`, `http/auth-routes.ts`); `user-auth.ts` delegates for code
       and login; kind `limited` (429); per-address limit on `/auth/*`.
-- [ ] 5. **Sessions last 30 days from last use; old cookies go.** `lastSeen` refreshed at most once
-      a day and the expiry moves with it; the legacy cookie reader and `utils/auth-cookies` guest
-      parts deleted (an `open.`/`verified.` value is no identity). Changelog: everyone signs in
-      again once.
+- [x] 5. Sessions last 30 days from last use (`lastSeen` refreshed daily, expiry moves with it); old
+      `open.`/`verified.` cookies are no identity; their parsing is deleted.
 - [ ] 6. **Credentials API**: request a reset link, set a password with it (nothing changes before
       that), change it, protect and unprotect a name, list and revoke own login sessions
       (`/me/login-sessions`). Optional unique `guests.username`; password login takes email or

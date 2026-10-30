@@ -6,6 +6,7 @@ import { actorMiddleware } from "@/server/http/actor";
 import { idempotencyMiddleware } from "@/server/http/idempotency";
 import { pruneIdempotencyKeys } from "@/utils/jobs/idempotency";
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { createGuest } from "../helpers/factories";
 import {
   GUEST_COOKIE_NAME,
   openGuestValue,
@@ -19,6 +20,8 @@ let now = T0;
 let calls = 0;
 let gate: Promise<void> | null = null;
 let failNext = false;
+let g1 = "";
+let g2 = "";
 
 function testApp() {
   const app = createApp();
@@ -57,7 +60,7 @@ function post(
   app: ReturnType<typeof testApp>,
   key: string | null,
   body: unknown = { name: "a" },
-  { path = "/things", guest = "g1", cookie = openGuestValue(guest) } = {}
+  { path = "/things", guest = g1, cookie = openGuestValue(guest) } = {}
 ) {
   const headers: Record<string, string> = {
     "content-type": "application/json",
@@ -73,8 +76,10 @@ function post(
 
 describe("Idempotency-Key", () => {
   beforeAll(() => setupTestDb());
-  beforeEach(() => {
+  beforeEach(async () => {
     resetTestDb();
+    g1 = (await createGuest()).id;
+    g2 = (await createGuest()).id;
     now = T0;
     calls = 0;
     gate = null;
@@ -101,7 +106,7 @@ describe("Idempotency-Key", () => {
       method: "DELETE",
       headers: {
         "idempotency-key": "k1",
-        cookie: `${GUEST_COOKIE_NAME}=${openGuestValue("g1")}`,
+        cookie: `${GUEST_COOKIE_NAME}=${openGuestValue(g1)}`,
       },
     };
     await app.request("/things/1", init);
@@ -128,18 +133,18 @@ describe("Idempotency-Key", () => {
 
   it("keeps one actor's key apart from another's", async () => {
     const app = testApp();
-    await post(app, "k1", { name: "a" }, { guest: "g1" });
-    const other = await post(app, "k1", { name: "b" }, { guest: "g2" });
+    await post(app, "k1", { name: "a" }, { guest: g1 });
+    const other = await post(app, "k1", { name: "b" }, { guest: g2 });
     expect(other.status).toBe(201);
     expect(calls).toBe(2);
   });
 
-  it("keeps a verified guest's key apart from an open cookie naming them", async () => {
+  it("keeps a verified guest's key apart from a claimed session of the same guest", async () => {
     const app = testApp();
-    const cookie = await verifiedGuestValue("g1");
+    const cookie = await verifiedGuestValue(g1);
     await post(app, "k1", { name: "a" }, { cookie });
-    const forged = await post(app, "k1");
-    expect(forged.status).toBe(201);
+    const claimed = await post(app, "k1");
+    expect(claimed.status).toBe(201);
     expect(calls).toBe(2);
   });
 
@@ -168,7 +173,7 @@ describe("Idempotency-Key", () => {
         headers: {
           "content-type": `multipart/form-data; boundary=${boundary}`,
           "idempotency-key": "k1",
-          cookie: `${GUEST_COOKIE_NAME}=${openGuestValue("g1")}`,
+          cookie: `${GUEST_COOKIE_NAME}=${openGuestValue(g1)}`,
         },
         body: [
           `--${boundary}`,
@@ -201,7 +206,7 @@ describe("Idempotency-Key", () => {
       method: "DELETE",
       headers: {
         "idempotency-key": "k1",
-        cookie: `${GUEST_COOKIE_NAME}=${openGuestValue("g1")}`,
+        cookie: `${GUEST_COOKIE_NAME}=${openGuestValue(g1)}`,
       },
     });
     expect(reused.status).toBe(422);

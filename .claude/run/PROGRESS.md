@@ -24,8 +24,8 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
 - Next serves `apps/web/dist`: rebuild the SPA (`make build` or the E2E web server does) before E2E.
 
 - Login sessions (step 3): the `guest` cookie holds a 32-byte token without dots; values with a dot
-  are legacy (step 5 stops reading them). `LoginAssurance` (`claimed`|`verified`) replaces
-  `open`|`verified` everywhere. Resolve actors with `actorOf(cookies)` / `guestOfCookie(value)`
+  are no identity (step 5). `LoginAssurance` (`claimed`|`verified`) replaces `open`|`verified`
+  everywhere. Resolve actors with `actorOf(cookies)` / `guestOfCookie(value)`
   (`server/kernel/session-actor.ts`), never `resolveActor` directly. Each sign-in deletes the
   browser's old row and writes a new one. Sessions age in real time (`utils/real-clock.ts`).
   `eventId` and `device` exist; `device` is the user agent from `PUT /me/identity` only. Tests make
@@ -40,15 +40,21 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
   `/api/v1/auth/*`. First protection keeps other browsers' claimed rows (they are told "protected");
   a password reset or change revokes all.
 
+- Sessions (step 5): `findLive` is a pure read; `refresh` (a write) runs from `session-actor.ts` at
+  most daily. Repository methods named `find*`/`get*`/`list*` go to the read-only connection, so a
+  write must not carry those prefixes. The browser cookie lives 400 days; the row decides. Test
+  helper `openGuestValue` inserts a row on its own connection (sync); the guest must exist.
+
 ## Known E2E flakes
 
-`settings.spec.ts:67`, `profile-comments.spec.ts:95`, `schedule-layout.spec:252`,
-`user-auth.spec.ts:392`, `rsvp.spec.ts:111`, `admin.spec.ts:442` (under load; rerun alone).
-`meetings-request.spec.ts:296` fails most solo runs, at varying lines (notification list shows
-"Nothing yet" after `actAs`, or a button click times out). Not a clear test race: a `page.reload()`
-after the wait made it pass, so the notifications view is stale after switching name, which may be
-an app bug (query loaded before the new identity). The "mid-click navigation to /admin/users" in the
-log is afterEach cleanup after the timeout, not the cause. Unresolved.
+`attendee-count.spec.ts:64` (fails ~half of solo runs on the base too), `settings.spec.ts:67`,
+`profile-comments.spec.ts:95`, `schedule-layout.spec:252`, `user-auth.spec.ts:392`,
+`rsvp.spec.ts:111`, `admin.spec.ts:442` (under load; rerun alone). `meetings-request.spec.ts:296`
+fails most solo runs, at varying lines (notification list shows "Nothing yet" after `actAs`, or a
+button click times out). Not a clear test race: a `page.reload()` after the wait made it pass, so
+the notifications view is stale after switching name, which may be an app bug (query loaded before
+the new identity). The "mid-click navigation to /admin/users" in the log is afterEach cleanup after
+the timeout, not the cause. Unresolved.
 
 ## Left alone (step 16 removes them)
 

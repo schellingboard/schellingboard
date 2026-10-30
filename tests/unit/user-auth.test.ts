@@ -1,9 +1,7 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
-import { openGuestValue, verifiedGuestValue } from "../helpers/guest-cookie";
 import {
   createGuestCookie,
   createGuestLogoutCookie,
-  readGuestCookie,
   GUEST_COOKIE_NAME,
 } from "@/utils/auth";
 import {
@@ -21,51 +19,6 @@ const VALID_SECRET = "0123456789abcdef0123456789abcdef"; // 32 chars
 
 describe("guest cookie", () => {
   afterEach(() => vi.unstubAllEnvs());
-
-  it("reads back the guest id and level it was issued for", async () => {
-    vi.stubEnv("AUTH_SECRET", VALID_SECRET);
-    const verified = { value: await verifiedGuestValue("guest-1") };
-    expect(await readGuestCookie(verified.value)).toEqual({
-      guestId: "guest-1",
-      level: "verified",
-    });
-
-    const open = { value: openGuestValue("guest-1") };
-    expect(await readGuestCookie(open.value)).toEqual({
-      guestId: "guest-1",
-      level: "claimed",
-    });
-  });
-
-  it("rejects a tampered or forged verified cookie", async () => {
-    vi.stubEnv("AUTH_SECRET", VALID_SECRET);
-    const cookie = { value: await verifiedGuestValue("guest-1") };
-    // Truncated signature.
-    expect(await readGuestCookie(cookie.value.slice(0, -2))).toBeNull();
-    // A "verified" claim without a real signature can't be forged.
-    expect(await readGuestCookie("verified.guest-1.123.notasig")).toBeNull();
-    expect(await readGuestCookie(undefined)).toBeNull();
-  });
-
-  it("an open cookie is unsigned and needs no secret", async () => {
-    // No AUTH_SECRET stubbed on purpose.
-    const cookie = { value: openGuestValue("guest-1") };
-    expect(cookie.value).toBe("open.guest-1");
-    expect(await readGuestCookie(cookie.value)).toEqual({
-      guestId: "guest-1",
-      level: "claimed",
-    });
-  });
-
-  it("fails closed (never throws) on a forged verified cookie with no secret", async () => {
-    // A passwordless site with no protected guests: AUTH_SECRET is unset (the
-    // test env otherwise provides one). A client-forged `verified` value with a
-    // current timestamp reaches the signature check — which needs a secret it
-    // doesn't have. That must be treated as an invalid cookie, not crash.
-    vi.stubEnv("AUTH_SECRET", "");
-    const forged = `verified.guest-1.${Date.now()}.AAAA`;
-    expect(await readGuestCookie(forged)).toBeNull();
-  });
 
   it("is httpOnly and long-lived; the logout cookie expires immediately", () => {
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
