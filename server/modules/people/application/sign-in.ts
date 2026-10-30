@@ -1,6 +1,7 @@
 import {
   conflict,
   forbidden,
+  invalid,
   limited,
   notFound,
   ok,
@@ -22,20 +23,33 @@ import {
   generateAuthCode,
   generateAuthCodeSalt,
   hashAuthCode,
+  hashUserPassword,
   verifyUserPassword,
 } from "@/utils/user-credentials";
 import type { PeopleDeps } from "../ports";
-import { isSpent, matchToken, recentlyIssued } from "./auth-tokens";
+import {
+  isSpent,
+  matchToken,
+  recentlyIssued,
+  resolveTarget,
+  type GuestTarget,
+} from "./auth-tokens";
 import { signIn, type SignedIn } from "./identity";
+
+let dummy: Promise<string> | undefined;
+const dummyHash = () => (dummy ??= hashUserPassword("no such guest"));
 
 export const requestLoginCode =
   ({ repos, loginMail }: PeopleDeps) =>
-  async (guestId: string): Promise<Result<null>> => {
+  async (target: GuestTarget): Promise<Result<null>> => {
     if (!loginMail.configured())
       return unavailable(
         "auth.mailUnavailable",
         "This server cannot send email, so codes are unavailable"
       );
+    const guestId = await resolveTarget(repos, target);
+    // An identifier nobody holds answers like one that sent a code.
+    if (guestId === null) return ok(null);
     const guest = await repos.guests.findById(guestId);
     if (!guest) return notFound("guest.notFound", "Unknown user");
 
@@ -93,14 +107,49 @@ export const requestLoginCode =
 export const logIn = (deps: PeopleDeps) => {
   const start = signIn(deps);
   const { repos, loginMail } = deps;
+  // Only the password is refused; saying a code still works is true only
+  // where this server can send one.
+  const lockedOut = (wait: number) =>
+    limited(
+      "auth.tooManyAttempts",
+      loginMail.configured()
+        ? "Too many failed attempts — the password won't work for a few minutes, but a code emailed to you still will"
+        : TOO_MANY_ATTEMPTS_ERROR,
+      wait
+    );
   return async (
     actor: Actor,
     {
-      guestId,
+      guestId: named,
+      identifier,
       credential,
       device,
-    }: { guestId: string; credential: string; device?: string | null }
+    }: {
+      guestId?: string;
+      identifier?: string;
+      credential: string;
+      device?: string | null;
+    }
   ): Promise<Result<SignedIn>> => {
+    let guestId = named;
+    if (identifier !== undefined) {
+      // Unknown identifiers share a bucket per spelling, so guessing them is
+      // limited and the answer never says whether one exists.
+      const key = `identifier:${identifier.toLowerCase()}`;
+      const found = await repos.guests.findLoginId(identifier);
+      if (!found) {
+        const wait = loginRetryAfter("guest", key);
+        // Same work and same answers as a known guest with a wrong password.
+        if (wait <= 0) await verifyUserPassword(credential, await dummyHash());
+        recordLoginFailure("guest", key);
+        return wait > 0
+          ? lockedOut(wait)
+          : forbidden("auth.credentialWrong", "Wrong password or code");
+      }
+      guestId = found;
+    }
+    if (guestId === undefined)
+      return invalid("login.target", "Name the guest or give an identifier");
     const creds = await repos.guests.getAuthCredentials(guestId);
     if (!creds) return notFound("guest.notFound", "Unknown user");
     const passwordWait = loginRetryAfter("guest", guestId);
@@ -118,14 +167,6 @@ export const logIn = (deps: PeopleDeps) => {
     recordLoginFailure("guest", guestId);
     if (!passwordBlocked)
       return forbidden("auth.credentialWrong", "Wrong password or code");
-    // Only the password is refused; saying a code still works is true only
-    // where this server can send one.
-    return limited(
-      "auth.tooManyAttempts",
-      loginMail.configured()
-        ? "Too many failed attempts — the password won't work for a few minutes, but a code emailed to you still will"
-        : TOO_MANY_ATTEMPTS_ERROR,
-      passwordWait
-    );
+    return lockedOut(passwordWait);
   };
 };

@@ -7,6 +7,15 @@ import {
   sendTestEmail,
   updateGuest,
 } from "./admin-guests";
+import {
+  changePassword,
+  listLoginSessions,
+  requestResetLink,
+  resetPassword,
+  revokeLoginSession,
+  setUsername,
+  unprotect,
+} from "./credentials";
 import { assignGuestsToEvent, removeGuestsFromEvent } from "./event-guests";
 import { importGuests } from "./guest-import";
 import { logIn, requestLoginCode } from "./sign-in";
@@ -29,6 +38,13 @@ export function createPeopleUseCases(deps: PeopleDeps) {
     signOut: signOut(deps),
     requestLoginCode: requestLoginCode(deps),
     logIn: logIn(deps),
+    requestResetLink: requestResetLink(deps),
+    resetPassword: resetPassword(deps),
+    changePassword: changePassword(deps),
+    unprotect: unprotect(deps),
+    setUsername: setUsername(deps),
+    listLoginSessions: listLoginSessions(deps),
+    revokeLoginSession: revokeLoginSession(deps),
     getProfile: getProfile(deps),
     getProfileActivity: getProfileActivity(deps),
     listAttendees: listAttendees(deps),

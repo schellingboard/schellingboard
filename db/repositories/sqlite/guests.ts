@@ -490,6 +490,35 @@ export class SqliteGuestsRepository implements GuestsRepository {
     return row ? rowToGuest(row) : undefined;
   }
 
+  async findLoginId(identifier: string): Promise<string | null> {
+    const row = this.db
+      .select({ id: schema.guests.id })
+      .from(schema.guests)
+      .where(
+        sql`lower(${schema.guests.email}) = lower(${identifier}) or ${schema.guests.username} = lower(${identifier})`
+      )
+      .get();
+    return row?.id ?? null;
+  }
+
+  async setUsername(
+    id: string,
+    username: string | null
+  ): Promise<"ok" | "taken"> {
+    try {
+      this.db
+        .update(schema.guests)
+        .set({ username })
+        .where(eq(schema.guests.id, id))
+        .run();
+      return "ok";
+    } catch (e) {
+      if ((e as { code?: string }).code === "SQLITE_CONSTRAINT_UNIQUE")
+        return "taken";
+      throw e;
+    }
+  }
+
   async findByEmail(email: string): Promise<CompleteGuest | undefined> {
     const row = this.db
       .select()

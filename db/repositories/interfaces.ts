@@ -142,6 +142,8 @@ export interface LoginSessionsRepository {
   get(id: string): Promise<LoginSession | null>;
   /** The unexpired row. */
   findLive(id: string, now: Date): Promise<LoginSession | null>;
+  /** The guest's rows, oldest first. */
+  listForGuest(guestId: string): Promise<LoginSession[]>;
   /** Records a use at `now` and moves the expiry. */
   refresh(id: string, now: Date, expiresAt: Date): Promise<void>;
   delete(id: string): Promise<void>;
@@ -277,6 +279,10 @@ export interface GuestsRepository {
    * `authProtected` changes: the hash is in no read.
    */
   setAuthProtection(id: string, creds: GuestAuthCredentials): Promise<boolean>;
+  /** The guest whose email or (lowercase) username is `identifier`, matched case-insensitively. */
+  findLoginId(identifier: string): Promise<string | null>;
+  /** `taken` when another guest holds it; `username` is stored as given (lowercase). */
+  setUsername(id: string, username: string | null): Promise<"ok" | "taken">;
   // Matches the email case-insensitively.
   findByEmail(email: string): Promise<CompleteGuest | undefined>;
   /** Guests whose email matches any of `emails`, compared case-insensitively. */

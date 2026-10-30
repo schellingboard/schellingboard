@@ -48,6 +48,16 @@ export class SqliteLoginSessionsRepository implements LoginSessionsRepository {
     return session && session.expiresAt > now ? session : null;
   }
 
+  async listForGuest(guestId: string): Promise<LoginSession[]> {
+    return this.db
+      .select()
+      .from(schema.loginSessions)
+      .where(eq(schema.loginSessions.guestId, guestId))
+      .orderBy(schema.loginSessions.createdAt)
+      .all()
+      .map(toSession);
+  }
+
   async refresh(id: string, now: Date, expiresAt: Date): Promise<void> {
     this.db
       .update(schema.loginSessions)

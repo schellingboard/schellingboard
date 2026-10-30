@@ -110,6 +110,8 @@ export const guests = sqliteTable(
     // The salt is mandatory: never derive this without one. Never leaves the
     // server.
     passwordHash: text("password_hash"),
+    // Lowercase, optional; password sign-in takes it or the email.
+    username: text("username"),
     version: integer("version").notNull().default(1),
     // The public profile's version, apart from `version` (the admin view):
     // assigning a guest to an event must not refuse their profile edit.
@@ -118,6 +120,7 @@ export const guests = sqliteTable(
   (table) => [
     // Case-insensitive: two guests must never share an email up to case.
     uniqueIndex("guests_email_unique").on(sql`lower(${table.email})`),
+    uniqueIndex("guests_username_unique").on(table.username),
   ]
 );
 
