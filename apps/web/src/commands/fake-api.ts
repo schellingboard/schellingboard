@@ -9,9 +9,9 @@ export type FakeCall = {
 
 export type FakeHandler = (call: FakeCall) => Response | Promise<Response>;
 
-export const problem = (status: number, code: string) =>
+export const problem = (status: number, code: string, detail?: string) =>
   Response.json(
-    { type: "about:blank", title: code, status, code },
+    { type: "about:blank", title: code, status, code, detail },
     { status, headers: { "content-type": "application/problem+json" } }
   );
 

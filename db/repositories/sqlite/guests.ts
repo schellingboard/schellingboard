@@ -501,6 +501,15 @@ export class SqliteGuestsRepository implements GuestsRepository {
     return row?.id ?? null;
   }
 
+  async getUsername(id: string): Promise<string | null> {
+    const row = this.db
+      .select({ username: schema.guests.username })
+      .from(schema.guests)
+      .where(eq(schema.guests.id, id))
+      .get();
+    return row?.username ?? null;
+  }
+
   async setUsername(
     id: string,
     username: string | null

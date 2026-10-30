@@ -5894,6 +5894,41 @@
         "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
       }
     },
+    "/api/v1/me/credentials": {
+      "get": {
+        "tags": ["auth"],
+        "description": "Whether the name this browser acts as is protected, and its username.",
+        "responses": {
+          "200": {
+            "description": "The sign-in settings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "authProtected": {
+                      "type": "boolean",
+                      "description": "Whether switching to the name asks for a login"
+                    },
+                    "username": { "type": ["string", "null"] }
+                  },
+                  "required": ["authProtected", "username"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+      }
+    },
     "/api/v1/me/credentials/password": {
       "put": {
         "tags": ["auth"],

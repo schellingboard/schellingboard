@@ -101,6 +101,15 @@ the picker's guests, location). `ShellProviders` (theme and viewer) and `ShellFr
 exported, for a screen that needs the viewer before it can say what the frame shows. The schedule
 page mounts it.
 
+## The sign-in screens
+
+`src/features/sign-in/` holds `LoginScreen` (an emailed code link, or an email or username),
+`ResetScreen` (the reset link) and `AccountSecurityScreen` (protection, username, signed-in
+browsers). They take `signInCalls(api)` and, for the last, an `AccountSecurityState` from
+`createAccountSecurityQuery`; forms wait for the answer (`useFormMutation` with `explainRefusals`,
+since the server's wording "Wrong password" is the message). Nothing routes to them yet: the Next
+pages still serve `/auth/login`, `/auth/reset` and `/account-security` until the takeover.
+
 ## The schedule
 
 `src/features/schedule/` holds the schedule screens; `ScheduleScreen` is the entry: a snapshot, the
