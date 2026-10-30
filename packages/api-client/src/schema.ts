@@ -3735,6 +3735,56 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/auth/site": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Enters the site with the shared site password and sets the site cookie. Open to visitors who have not entered yet. `site.passwordWrong` (403); `auth.tooManyAttempts` (429) after repeated failures from one address. */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            /** @description The site password */
+            password: string;
+          };
+        };
+      };
+      responses: {
+        /** @description The site cookie is set */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/me/credentials": {
     parameters: {
       query?: never;

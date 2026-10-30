@@ -42,7 +42,8 @@ function refuseApiV1(problem: Problem): NextResponse {
 
 // Any other path is a page of the SPA, which forwards it to /legacy when it
 // does not own it. The shell is the same for everyone, but who may open the
-// app is still decided here, as it is for the legacy pages. The admin pages
+// app is still decided here, as it is for the legacy pages. The site password
+// screen, `/login`, is how a visitor gets past that. The admin pages
 // are independent of the site password: they get the shell, and the admin API
 // they call holds the gate.
 async function serveShell(request: NextRequest): Promise<NextResponse> {
@@ -51,7 +52,7 @@ async function serveShell(request: NextRequest): Promise<NextResponse> {
     if (!isAdminEnabled()) {
       return new NextResponse(ADMIN_DISABLED_MESSAGE, { status: 404 });
     }
-  } else {
+  } else if (pathname !== "/login") {
     const refusal = await requireAuth(request);
     if (refusal) return refusal;
   }
@@ -80,11 +81,7 @@ export async function proxy(request: NextRequest) {
     : requested;
 
   // Allow access to login page, health check, and auth API routes
-  if (
-    pathname === "/login" ||
-    pathname === "/api/health" ||
-    pathname.startsWith("/api/auth/")
-  ) {
+  if (pathname === "/api/health" || pathname.startsWith("/api/auth/")) {
     return forwardWithoutAdminHeader(request);
   }
 
@@ -124,7 +121,13 @@ export async function proxy(request: NextRequest) {
     if (pathname.startsWith("/api/v1/auth/") && !isTrustedOrigin(request)) {
       return refuseApiV1({ status: 403, code: "request.crossSite" });
     }
+    // Visitors need the site password's own route and the build's version
+    // (the login screen's footer) before they have the cookie.
+    const open =
+      !isLegacy &&
+      (pathname === "/api/v1/auth/site" || pathname === "/api/v1/health");
     if (
+      !open &&
       isPasswordProtectionEnabled() &&
       !(await isAuthenticated(request)) &&
       !(await isAdminAuthenticated(request))

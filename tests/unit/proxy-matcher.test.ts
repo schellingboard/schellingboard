@@ -71,7 +71,11 @@ describe("proxy matcher", () => {
   });
 
   it("covers the legacy pages", () => {
-    for (const path of ["/legacy", "/legacy/login", "/legacy/conf/proposals"]) {
+    for (const path of [
+      "/legacy",
+      "/legacy/admin/login",
+      "/legacy/conf/proposals",
+    ]) {
       expect(matches(path), `${path} must reach the proxy`).toBe(true);
     }
   });

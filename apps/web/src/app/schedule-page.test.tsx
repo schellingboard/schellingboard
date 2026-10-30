@@ -80,13 +80,6 @@ describe("the event route", () => {
     expect(await screen.findByRole("link", { name: "Talk" })).toBeTruthy();
     expect(hardNavigate).not.toHaveBeenCalled();
   });
-
-  it("leaves a legacy page's address to the legacy app, whatever events exist", async () => {
-    await open({ path: "/login" });
-    await waitFor(() =>
-      expect(hardNavigate).toHaveBeenCalledWith("/legacy/login")
-    );
-  });
 });
 
 describe("the schedule page", () => {

@@ -36,6 +36,10 @@ const exactlyOneTarget = (body: { guestId?: string; identifier?: string }) =>
   (body.guestId === undefined) !== (body.identifier === undefined);
 const targetMessage = { message: "Send exactly one of guestId and identifier" };
 
+export const siteLoginBodySchema = z.object({
+  password: z.string().min(1).describe("The site password"),
+});
+
 export const loginCodeBodySchema = z
   .object({
     guestId: z.string().min(1).optional().describe("The guest to email a code"),

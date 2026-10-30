@@ -12,6 +12,11 @@ describe("safeRedirectPath", () => {
     );
   });
 
+  it("rejects a tab or newline that the browser strips into //", () => {
+    expect(safeRedirectPath("/\t/evil.example", "/")).toBe("/");
+    expect(safeRedirectPath("/\n/evil.example", "/")).toBe("/");
+  });
+
   it("returns the fallback for empty/missing values", () => {
     expect(safeRedirectPath("", "/")).toBe("/");
     expect(safeRedirectPath(null, "/admin")).toBe("/admin");

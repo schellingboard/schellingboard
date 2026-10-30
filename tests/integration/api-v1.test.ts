@@ -212,7 +212,7 @@ describe("actor middleware", () => {
 
 describe("proxy: /api/v1", () => {
   it("refuses a request without the site cookie with a problem-details 401", async () => {
-    const result = await throughProxy("/api/v1/health", {}, []);
+    const result = await throughProxy("/api/v1/events", {}, []);
     if (result.ok) throw new Error("expected proxy to reject the request");
     expect(result.response.status).toBe(401);
     expect(result.response.headers.get("location")).toBeNull();

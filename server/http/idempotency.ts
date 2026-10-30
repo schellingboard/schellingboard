@@ -16,6 +16,7 @@ const MUTATIONS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 // just runs again (a login then issues another session; the old one is revoked).
 export const IDEMPOTENCY_EXEMPT_PATHS = [
   "/api/v1/me/identity",
+  "/api/v1/auth/site",
   "/api/v1/auth/login",
   "/api/v1/auth/login-code",
   "/api/v1/auth/sign-out",
