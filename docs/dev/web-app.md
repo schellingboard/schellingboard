@@ -20,13 +20,14 @@ going.
 - The router owns `/` (`app/home-page.tsx`: the event list from `GET /api/v1/events` and
   `GET /api/v1/site`, or a redirect to the only event), `/{slug}` (an event's schedule),
   `/{slug}/proposals/**` (list, quick voting, new, edit; `?viewProposal=` opens the modal), the
-  session forms, `/{slug}/meetings`, `/guests/**`, `/settings`, `/notifications` and `/admin/**`
-  (`app/admin-pages.tsx`). Still Next pages: the sign-in screens (`/login`, guest login and reset,
-  `/account-security`, `/legacy/admin/login`). Everything else the SPA does not own is forwarded:
-  the catch-all route replaces the location with `/legacy` + path + query (a path already under
-  `/legacy` is left alone), and a static route per legacy root page (`app/legacy-pages.ts`, checked
-  against `app/legacy/` by `tests/unit/spa-legacy-pages.test.ts`) keeps an event slug from shadowing
-  `/login`, and so on (`admin` is in the list for its login only; the router leaves it out).
+  session forms, `/{slug}/meetings`, `/guests/**`, `/settings`, `/notifications`, `/auth/login`,
+  `/auth/reset`, `/account-security` (`app/account-pages.tsx`) and `/admin/**`
+  (`app/admin-pages.tsx`). Still Next pages: `/login` and `/legacy/admin/login`. Everything else the
+  SPA does not own is forwarded: the catch-all route replaces the location with `/legacy` + path +
+  query (a path already under `/legacy` is left alone), and a static route per legacy root page
+  (`app/legacy-pages.ts`, checked against `app/legacy/` by `tests/unit/spa-legacy-pages.test.ts`)
+  keeps an event slug from shadowing `/login`, and so on (`admin` is in the list for its login only;
+  the router leaves it out).
 - Legacy pages link to the SPA with plain anchors, never Next's `Link` (`AppLink`, which does that
   for every root path outside `/legacy`): Next has nothing to fetch there.
 
@@ -72,11 +73,11 @@ Who the browser acts as comes from `GET /api/v1/me/identity` (`ViewerProvider`, 
 `guestId` is `undefined` until the server answers, then a guest id or `null`. The replica and the
 command runner are opened for that guest, never for one read from a persisted copy. `choose` and
 `signOut` call `PUT`/`DELETE` on the same path. A protected name answers `guest.protected` and
-`UserMenu` sends the user to the legacy login, `/legacy/auth/login?guest=<id>`; a successful login
-lands on `/legacy`. The picker lists the guests it is given: the event snapshot's `guests` (members
-and hosts) on an event page, the attendee directory (`GET /attendees`, everyone) on `/guests`.
-Sign-out and a switch between names clear the device's persisted replicas (`persistence.clear()`); a
-change of `guestId` also closes the feed and reopens the replica, the command runner and the queries
+`UserMenu` sends the user to the sign-in, `/auth/login?guest=<id>`; a successful login reloads `/`.
+The picker lists the guests it is given: the event snapshot's `guests` (members and hosts) on an
+event page, the attendee directory (`GET /attendees`, everyone) on `/guests`. Sign-out and a switch
+between names clear the device's persisted replicas (`persistence.clear()`); a change of `guestId`
+also closes the feed and reopens the replica, the command runner and the queries
 (`useScheduleSession` does: the viewer is part of its effect key). The provider asks again every 5 s
 while the first identity fetch fails. `commands/keys.ts` holds the `newKey` the runner needs.
 
@@ -107,8 +108,8 @@ page mounts it.
 `ResetScreen` (the reset link) and `AccountSecurityScreen` (protection, username, signed-in
 browsers). They take `signInCalls(api)` and, for the last, an `AccountSecurityState` from
 `createAccountSecurityQuery`; forms wait for the answer (`useFormMutation` with `explainRefusals`,
-since the server's wording "Wrong password" is the message). Nothing routes to them yet: the Next
-pages still serve `/auth/login`, `/auth/reset` and `/account-security` until the takeover.
+since the server's wording "Wrong password" is the message). `app/account-pages.tsx` routes them:
+the guest named by `?guest=` comes from the attendee directory, and a login reloads the app on `/`.
 
 ## The schedule
 

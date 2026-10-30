@@ -20,7 +20,7 @@ export const AUTH_CODE_VALID_MINUTES = 10;
 // attacker denies it to its owner — anyone can guess against a name they know,
 // so a low cap made shutting the emailed-code path, the path that must survive
 // a password lockout, cheap. See matchToken and recentlyIssued in
-// app/actions/user-auth.ts for the two halves of that balance. Reset tokens are
+// people/application/auth-tokens.ts for the two halves of that balance. Reset tokens are
 // deliberately *not* metered — see matchToken.
 export const MAX_CODE_ATTEMPTS = 100;
 // Password-reset links live longer than login codes: the recipient may open

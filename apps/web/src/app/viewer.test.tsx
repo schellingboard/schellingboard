@@ -54,6 +54,35 @@ describe("ViewerProvider", () => {
     expect(await screen.findByText("as null")).toBeTruthy();
   });
 
+  it("asks the server again who the browser acts as", async () => {
+    let who: Who = "g1";
+    const { viewer } = setup(null, () => Response.json({ guestId: who }));
+    await screen.findByText("as g1");
+    who = null;
+
+    await act(async () => {
+      await viewer().refresh();
+    });
+
+    expect(await screen.findByText("as null")).toBeTruthy();
+  });
+
+  it("keeps the known viewer when asking again fails", async () => {
+    let offline = false;
+    const { viewer } = setup(null, () => {
+      if (offline) throw new TypeError("offline");
+      return Response.json({ guestId: "g1" });
+    });
+    await screen.findByText("as g1");
+    offline = true;
+
+    await act(async () => {
+      await viewer().refresh();
+    });
+
+    expect(screen.getByText("as g1")).toBeTruthy();
+  });
+
   it("takes the name the server accepts", async () => {
     const { viewer, calls } = setup(null);
     await screen.findByText("as null");

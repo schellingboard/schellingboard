@@ -77,48 +77,7 @@ const PRE_AUTH = new Set([
  * site-auth cookie is present. The arguments only have to reach the guard —
  * it runs before anything looks at them.
  */
-const SITE_GUARDED: Record<string, () => Promise<unknown>> = {
-  "actions/dev-reminders.ts:dispatchRemindersAction": async () => {
-    const { dispatchRemindersAction } =
-      await import("@/app/actions/dev-reminders");
-    return dispatchRemindersAction();
-  },
-  "actions/user-auth.ts:requestLoginCodeAction": async () => {
-    const { requestLoginCodeAction } = await import("@/app/actions/user-auth");
-    return requestLoginCodeAction("g");
-  },
-  "actions/user-auth.ts:requestPasswordLinkAction": async () => {
-    const { requestPasswordLinkAction } =
-      await import("@/app/actions/user-auth");
-    return requestPasswordLinkAction("g");
-  },
-  "actions/user-auth.ts:loginAsGuestAction": async () => {
-    const { loginAsGuestAction } = await import("@/app/actions/user-auth");
-    return loginAsGuestAction("g", "pw");
-  },
-  "actions/user-auth.ts:setPasswordWithTokenAction": async () => {
-    const { setPasswordWithTokenAction } =
-      await import("@/app/actions/user-auth");
-    return setPasswordWithTokenAction("g", "t", "password123");
-  },
-  "actions/user-auth.ts:changePasswordAction": async () => {
-    const { changePasswordAction } = await import("@/app/actions/user-auth");
-    return changePasswordAction("old", "password123");
-  },
-  "actions/user-auth.ts:disableProtectionAction": async () => {
-    const { disableProtectionAction } = await import("@/app/actions/user-auth");
-    return disableProtectionAction("pw");
-  },
-  "actions/user-auth.ts:currentVerifiedUserAction": async () => {
-    const { currentVerifiedUserAction } =
-      await import("@/app/actions/user-auth");
-    return currentVerifiedUserAction();
-  },
-  "actions/user-auth.ts:selectUserAction": async () => {
-    const { selectUserAction } = await import("@/app/actions/user-auth");
-    return selectUserAction("g");
-  },
-};
+const SITE_GUARDED: Record<string, () => Promise<unknown>> = {};
 
 describe("server-action auth guard", () => {
   beforeAll(() => setupTestDb());

@@ -138,7 +138,7 @@ export function NamePicker({
     const result = await choose(guest.id);
     if (result.ok) return onClose();
     if (result.code === "guest.protected")
-      return hardNavigate(`/legacy/auth/login?guest=${guest.id}`);
+      return hardNavigate(`/auth/login?guest=${guest.id}`);
     setError("Could not select that name — try again");
   };
 

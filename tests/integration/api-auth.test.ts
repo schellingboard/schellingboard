@@ -260,6 +260,159 @@ describe("POST /api/v1/auth/login", () => {
   );
 });
 
+describe("POST /api/v1/auth/login codes", () => {
+  afterEach(() => vi.useRealTimers());
+
+  it(
+    "an outstanding code survives a burst of wrong guesses",
+    { tags: ["003-US4"] },
+    async () => {
+      const guest = await protectedGuest();
+      await post("login-code", { guestId: guest.id });
+      const credential = await emailedCode();
+      for (let i = 0; i < MAX_CODE_ATTEMPTS - 1; i++)
+        await post("login", { guestId: guest.id, credential: "ABCDEFGH" });
+
+      const res = await post("login", { guestId: guest.id, credential });
+
+      expect(res.status).toBe(200);
+    }
+  );
+
+  it("refuses an expired code", { tags: ["003-US4"] }, async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-07-18T12:00:00Z"));
+    const guest = await protectedGuest();
+    await post("login-code", { guestId: guest.id });
+    const credential = await emailedCode();
+    vi.setSystemTime(new Date("2026-07-18T12:10:01Z"));
+
+    const res = await post("login", { guestId: guest.id, credential });
+
+    expect(res.status).toBe(403);
+  });
+
+  it(
+    "counts login codes and reset links against one email budget",
+    { tags: ["003-US4"] },
+    async () => {
+      const guest = await protectedGuest();
+      for (let i = 0; i < EMAIL_LIMIT.capacity; i++)
+        recordEmailIssued(guest.id);
+
+      const res = await post("reset-link", { guestId: guest.id });
+
+      expect(res.status).toBe(429);
+      expect(await codeOf(res)).toBe("auth.tooManyEmails");
+    }
+  );
+});
+
+describe("POST /api/v1/auth/login lockouts", () => {
+  const lockOut = async (guestId: string) => {
+    for (let i = 0; i < LOGIN_LIMITS.perClient.capacity; i++)
+      await post("login", { guestId, credential: "wrong" });
+  };
+  const detailOf = async (res: Response) =>
+    ((await res.json()) as { detail?: string }).detail ?? "";
+
+  it(
+    "a fresh emailed code still logs in after a password lockout",
+    { tags: ["003-US4"] },
+    async () => {
+      const guest = await protectedGuest();
+      await lockOut(guest.id);
+      await post("login-code", { guestId: guest.id });
+
+      const res = await post("login", {
+        guestId: guest.id,
+        credential: await emailedCode(),
+      });
+
+      expect(res.status).toBe(200);
+    }
+  );
+
+  it(
+    "wrong passwords are not code guesses",
+    { tags: ["003-US4"] },
+    async () => {
+      const guest = await protectedGuest();
+      await post("login-code", { guestId: guest.id });
+      const { authCodes } = getRepositories();
+      for (let i = 0; i < 3; i++)
+        await post("login", { guestId: guest.id, credential: "not it" });
+      const attempts = async () =>
+        (await authCodes.findActive(guest.id, "login", new Date()))?.attempts;
+      expect(await attempts()).toBe(0);
+
+      await post("login", { guestId: guest.id, credential: "ABCDEFGH" });
+
+      expect(await attempts()).toBe(1);
+    }
+  );
+
+  it(
+    "one guest's lockout does not affect another",
+    { tags: ["003-US4"] },
+    async () => {
+      const locked = await protectedGuest();
+      const other = await createGuest({ email: "bo@test.example" });
+      await getRepositories().guests.setAuthProtection(other.id, {
+        authProtected: true,
+        passwordHash: await hashUserPassword("hunter2 forever"),
+      });
+      await lockOut(locked.id);
+
+      const res = await post("login", {
+        guestId: other.id,
+        credential: "hunter2 forever",
+      });
+
+      expect(res.status).toBe(200);
+    }
+  );
+
+  it(
+    "the lockout message points at the emailed code, only where one can be sent",
+    { tags: ["003-US4"] },
+    async () => {
+      const guest = await protectedGuest();
+      await lockOut(guest.id);
+      const withMailer = await post("login", {
+        guestId: guest.id,
+        credential: "hunter2 forever",
+      });
+      expect(await detailOf(withMailer)).toMatch(/code/i);
+
+      vi.mocked(isMailerConfigured).mockReturnValue(false);
+      const without = await post("login", {
+        guestId: guest.id,
+        credential: "hunter2 forever",
+      });
+      expect(await detailOf(without)).not.toMatch(/code/i);
+    }
+  );
+
+  it(
+    "each guest has a separate email budget",
+    { tags: ["003-US4"] },
+    async () => {
+      const flooded = await protectedGuest();
+      const other = await createGuest({ email: "bo@test.example" });
+      for (let i = 0; i < EMAIL_LIMIT.capacity; i++)
+        recordEmailIssued(flooded.id);
+
+      expect((await post("login-code", { guestId: flooded.id })).status).toBe(
+        429
+      );
+      expect((await post("login-code", { guestId: other.id })).status).toBe(
+        204
+      );
+    }
+  );
+});
+
 describe("POST /api/v1/auth/sign-out", () => {
   it(
     "revokes the session row and clears the cookie",

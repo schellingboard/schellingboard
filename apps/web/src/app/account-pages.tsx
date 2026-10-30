@@ -7,21 +7,29 @@ import {
 } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
+import { signInCalls } from "../commands/sign-in";
 import { meetingAvailabilityCalls } from "../commands/meeting-availability";
 import { notificationCalls } from "../commands/notifications";
 import { settingsCalls } from "../commands/settings";
 import { NotificationsScreen } from "../features/notifications/notifications-screen";
+import { AccountSecurityScreen } from "../features/sign-in/account-security";
+import { LoginScreen } from "../features/sign-in/guest-login-form";
+import { ResetScreen } from "../features/sign-in/reset-password-form";
 import {
   Appearance,
   SettingsScreen,
 } from "../features/settings/settings-screen";
+import { createAccountSecurityQuery } from "../queries/account-security";
 import { createNotificationsQuery } from "../queries/notifications";
 import { createSettingsQuery } from "../queries/settings";
+import { hardNavigate } from "./hard-navigate";
 import { PageNotice } from "./page-notice";
 import type { AppServices } from "./services";
 import { ShellFrame, ShellProviders } from "./shell";
 import { useUnread } from "./unread-count";
 import { useDirectoryShell } from "./use-directory-shell";
+import { useUrlSearchParams } from "./use-url-search-params";
+import { useViewer } from "./viewer";
 
 const REFUSALS = ["guest.unselected", "guest.protected"];
 
@@ -38,17 +46,51 @@ export function SettingsPage({ services }: { services: AppServices }) {
 export function NotificationsPage({ services }: { services: AppServices }) {
   return (
     <AccountFrame services={services}>
-      {(now) => <Notifications api={services.api} now={now} />}
+      {({ now }) => <Notifications api={services.api} now={now} />}
     </AccountFrame>
   );
 }
+
+/** The emailed login link's landing page, or a plain sign-in. */
+export function LoginPage({ services }: { services: AppServices }) {
+  return (
+    <AccountFrame services={services}>
+      {(shell) => <Login api={services.api} {...shell} />}
+    </AccountFrame>
+  );
+}
+
+/** The emailed link that sets a password. */
+export function ResetPage({ services }: { services: AppServices }) {
+  return (
+    <AccountFrame services={services}>
+      {(shell) => <Reset api={services.api} {...shell} />}
+    </AccountFrame>
+  );
+}
+
+/** Protection, username and signed-in browsers of the signed-in guest. */
+export function AccountSecurityPage({ services }: { services: AppServices }) {
+  return (
+    <AccountFrame services={services}>
+      {(shell) => <Security api={services.api} {...shell} />}
+    </AccountFrame>
+  );
+}
+
+type Shell = {
+  now: Date;
+  entries: { id: string; name: string }[];
+  loaded: boolean;
+  failed: boolean;
+};
 
 function AccountFrame({
   services,
   children,
 }: {
   services: AppServices;
-  children: (now: Date) => ReactNode;
+  children: (shell: Shell) => ReactNode;
 }) {
   const { api } = services;
   return (
@@ -63,12 +105,17 @@ function Frame({
   children,
 }: {
   api: AppServices["api"];
-  children: (now: Date) => ReactNode;
+  children: (shell: Shell) => ReactNode;
 }) {
-  const { now, frame } = useDirectoryShell(api);
+  const { now, frame, entries, status } = useDirectoryShell(api);
   return (
     <ShellFrame api={api} {...frame}>
-      {children(now)}
+      {children({
+        now,
+        entries,
+        loaded: status === "ready",
+        failed: status === "error",
+      })}
     </ShellFrame>
   );
 }
@@ -98,7 +145,7 @@ function Settings({ api }: { api: AppServices["api"] }) {
       availability={availability}
       links={{
         profile: "/guests/edit",
-        security: "/legacy/account-security",
+        security: "/account-security",
       }}
     />
   );
@@ -127,6 +174,87 @@ function Notifications({ api, now }: { api: AppServices["api"]; now: Date }) {
       now={now}
       onOpen={(url) => history.push(url)}
       onUnreadChange={setUnread}
+    />
+  );
+}
+
+function DirectoryWait({ failed }: { failed: boolean }) {
+  return failed ? (
+    <p role="alert" className="text-danger-fg">
+      Could not load the names. Reload the page to try again.
+    </p>
+  ) : (
+    <p role="status">Loading…</p>
+  );
+}
+
+function Login({
+  api,
+  entries,
+  loaded,
+  failed,
+}: { api: AppServices["api"] } & Pick<Shell, "entries" | "loaded" | "failed">) {
+  const { params } = useUrlSearchParams();
+  const calls = useMemo(() => signInCalls(api), [api]);
+  const guestId = params.get("guest");
+  const named = entries.find((e) => e.id === guestId);
+  if (guestId && !named && !loaded) return <DirectoryWait failed={failed} />;
+  return (
+    <LoginScreen
+      calls={calls}
+      guest={guestId ? (named ?? null) : undefined}
+      code={params.get("code") ?? undefined}
+      onSignedIn={() => hardNavigate("/")}
+    />
+  );
+}
+
+function Reset({
+  api,
+  entries,
+  loaded,
+  failed,
+}: { api: AppServices["api"] } & Pick<Shell, "entries" | "loaded" | "failed">) {
+  const { refresh } = useViewer();
+  const { params } = useUrlSearchParams();
+  const calls = useMemo(() => signInCalls(api), [api]);
+  const guestId = params.get("guest");
+  const named = entries.find((e) => e.id === guestId);
+  if (guestId && !named && !loaded) return <DirectoryWait failed={failed} />;
+  return (
+    <ResetScreen
+      calls={calls}
+      guest={named ?? null}
+      token={params.get("token") ?? undefined}
+      signInHref={`/auth/login?guest=${encodeURIComponent(guestId ?? "")}`}
+      onPasswordSet={() => void refresh()}
+    />
+  );
+}
+
+function Security({
+  api,
+  entries,
+  loaded,
+  failed,
+}: { api: AppServices["api"] } & Pick<Shell, "entries" | "loaded" | "failed">) {
+  const viewer = useViewer();
+  const [query] = useState(() => createAccountSecurityQuery({ api }));
+  useEffect(() => {
+    void query.load();
+  }, [query, viewer.guestId]);
+  const state = useSyncExternalStore(query.subscribe, query.get);
+  const calls = useMemo(() => signInCalls(api), [api]);
+  const guest = entries.find((e) => e.id === viewer.guestId);
+  if (viewer.guestId && !guest && !loaded)
+    return <DirectoryWait failed={failed} />;
+  return (
+    <AccountSecurityScreen
+      state={state}
+      calls={calls}
+      guest={guest ?? { id: viewer.guestId ?? "", name: "" }}
+      reload={() => void query.load()}
+      backHref="/settings"
     />
   );
 }
