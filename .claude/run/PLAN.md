@@ -10,34 +10,11 @@ assurance, transport), `02-domain.md` (Person, Participation), `08-decisions.md`
 0014, 0015, 0016; `docs/dev/web-app.md`, `docs/dev/server.md`, `docs/dev/testing.md`,
 `docs/dev/target-architecture/open-questions.md`.
 
-## Settled by the planner (the user may override)
+## Settled
 
-- **No rename.** `guests` stays the person table and `event_guests` the participation; the code
-  keeps the word "guest". The glossary's terms are used in docs only.
-- **Login sessions are rows**:
-  `login_sessions(id hash, guest, assurance, created, expires, lastSeen, device)`. The `guest`
-  cookie holds only the opaque id. Picking a name creates a `claimed` row; a code, password or join
-  link a `verified` one. Old `open.`/`verified.` cookies are honoured until they expire (7 days at
-  most); their reader goes in step 16.
-- **Credentials**: password (scrypt stays: `node:crypto`, no native module; amend 05, which says
-  argon2id), emailed login code, reset link, join link. Passkeys and API tokens wait for a later
-  plan.
-- **Sign-in API** under `/api/v1/auth/` (code, password, reset, sign-out) and
-  `/api/v1/me/credentials`, `/api/v1/me/login-sessions`; strict rate limits; Origin checks as the
-  admin API has them. ADR 0016 point 4 ("no API for passwords") ends with step 6.
-- **Roles**: `siteAdmin` on the guest. The `organizer` participation role waits for a later plan:
-  what an organizer may do per event is a product question of its own.
-- **Join links**: per guest per event, single-use, expiring (05). The organizer gets them as a CSV
-  from the admin guests screen. QR sheet and bulk email wait.
-- **Identity mode**: a column on events. Existing events migrate to `open` (behaviour unchanged);
-  new events default to `verified` (product decision, 08).
-- **Retiring Next goes through Hono first**: the proxy, media and SPA serving move into the Hono app
-  while Next still runs it from one catch-all route; then a Node entry replaces Next. `/api/health`
-  stays as an alias of `/api/v1/health` (monitors and the Docker healthcheck call it).
-
-## Open (see PROGRESS.md Questions)
-
-Steps 8 to 10 need Q7 (admin bootstrap) and Q8 (site password). Steps 1 to 7 and 11 to 15 do not.
+ADR 0017 (accepted) holds the decisions: login sessions as rows (30 days from last use), no old
+cookies, credentials and username, token rules, the site-admin role and bootstrap link, personal
+join links, identity mode, the read setting (next plan) and retiring Next through Hono.
 
 ## How to work (every step)
 
@@ -57,7 +34,7 @@ Steps 8 to 10 need Q7 (admin bootstrap) and Q8 (site password). Steps 1 to 7 and
   that changes them.
 - **Checks per step**: `make format lint arch openapi-check typecheck test`; then the step's E2E
   specs (full `make test-e2e` where the step says). Doc-only steps skip E2E. Never
-  `make test-e2e-docker` (the user runs it before a release; step 18 says so in its commit).
+  `make test-e2e-docker` (the user runs it before a release; step 20 says so in its commit).
 - A step whose diff grows past ~1500 lines outside tests is split in PLAN.md first.
 
 ## Steps
@@ -70,65 +47,80 @@ Steps 8 to 10 need Q7 (admin bootstrap) and Q8 (site password). Steps 1 to 7 and
 
 ### Identity (path step 6)
 
-- [x] 2. ADR 0017 (identity and roles) records the decisions, with Q7 and Q8 as proposed.
+- [x] 2. ADR 0017 (identity and roles) records the decisions.
 - [x] 3. Login sessions are rows (`login_sessions`, `signIn`/`signOut` in `people`, `actorOf` in
       `server/kernel/session-actor.ts`); old cookies still read; the jobs loop prunes expired rows.
 - [x] 4. Sign-in API: `POST /api/v1/auth/login-code`, `/auth/login`, `/auth/sign-out`
       (`people/application/sign-in.ts`, `http/auth-routes.ts`); `user-auth.ts` delegates for code
       and login; kind `limited` (429); per-address limit on `/auth/*`.
-- [ ] 5. **Credentials API**: request a reset link, set a password with it, change it, protect and
-      unprotect a name, list and revoke own login sessions (`/me/login-sessions`). The rest of
-      `user-auth.ts` delegates.
-- [ ] 6. **Sign-in screens, unrouted**: guest login (code, password, forgot), reset, account
-      security (protection, password, login sessions with "sign out"). `features/sign-in/`, forms
-      through `useFormMutation`.
-- [ ] 7. **Takeover: sign-in screens.** Router owns `/auth/login`, `/auth/reset`,
+- [ ] 5. **Sessions last 30 days from last use; old cookies go.** `lastSeen` refreshed at most once
+      a day and the expiry moves with it; the legacy cookie reader and `utils/auth-cookies` guest
+      parts deleted (an `open.`/`verified.` value is no identity). Changelog: everyone signs in
+      again once.
+- [ ] 6. **Credentials API**: request a reset link, set a password with it (nothing changes before
+      that), change it, protect and unprotect a name, list and revoke own login sessions
+      (`/me/login-sessions`). Optional unique `guests.username`; password login takes email or
+      username. The rest of `user-auth.ts` delegates.
+- [ ] 7. **Sign-in screens, unrouted**: guest login (code, password by email or username, forgot),
+      reset, account security (protection, username, password, login sessions with "sign out").
+      `features/sign-in/`, forms through `useFormMutation`.
+- [ ] 8. **Takeover: sign-in screens.** Router owns `/auth/login`, `/auth/reset`,
       `/account-security`; `UserMenu` and Settings link in-app; legacy pages, forms and
       `user-auth.ts` deleted, their tests on the API. Adapt `user-auth.spec.ts`, `settings.spec.ts`.
       Full `make test-e2e`.
-- [ ] 8. **Site password screen** (needs Q8). If kept: `POST /api/v1/auth/site` and an SPA `/login`
-      exempt from the gate; the `(login)` group and `app/actions/auth.ts` deleted. The gate stays in
-      `proxy.ts` until step 15.
-- [ ] 9. **Site admin role and bootstrap link** (needs Q7). `guests.site_admin`; the actor is admin
-      only through a verified session of a site admin; a single-use bootstrap token (hashed, 24 h)
-      logged at start while no site admin exists, and a script that prints a new one; the bootstrap
-      page signs the visitor in as a chosen or new guest, asks for a password, grants the role.
-      Admin users screen grants and revokes it (never the last one).
-- [ ] 10. **Admin sign-in in the SPA** (needs Q7). `AdminFrame` sends a guest without the role to
-      the sign-in; a later 401/403 does the same (Q6, if the user agrees). `/legacy/admin/login`,
-      the admin cookie, `ADMIN_PASSWORD` and `/api/auth/login` go; self-hosting docs and `api.md`
-      rewritten. Full `make test-e2e`.
-- [ ] 11. **Join links.** `join_tokens` table; `POST /api/v1/auth/join` (verified session, joins the
-      event); SPA `/join/{token}` exchanges it, replaces the history entry and opens the event;
-      admin guests screen issues links and exports them as CSV. Attendee and organizer docs.
-- [ ] 12. **Identity mode.** `events.identity_mode`; `assuranceRequired` in `packages/domain` (mode,
-      raised by protection); every acting use case checks it; the SPA predicts it and the user
-      picker offers the verification step; admin event config sets it. Full `make test-e2e`.
-- [ ] 13. **Docs: step 6 done.** 10-path, 05, 02, web-app, server.md, open-questions. Doc only.
+- [ ] 9. **Site password screen.** `POST /api/v1/auth/site` and an SPA `/login` exempt from the
+      gate; the `(login)` group and `app/actions/auth.ts` deleted. The gate stays in `proxy.ts`
+      until step 17.
+- [ ] 10. **Site admin role and bootstrap link.** `guests.site_admin`; the actor is admin only
+      through a verified session of a site admin; the role protects the name and blocks
+      unprotecting; changes by an admin record which one. A single-use bootstrap token (hashed, 24
+      h, replaced at each start) logged while no site admin exists, and a script that prints a new
+      one; the bootstrap page signs the visitor in as a chosen or new guest, asks for username and
+      password, grants the role. Admin users screen grants and revokes it (never the last one).
+- [ ] 11. **Admin sign-in in the SPA.** `AdminFrame` sends a guest without the role to the sign-in;
+      a later 401/403 does the same. `/legacy/admin/login`, the admin cookie and `/api/auth/login`
+      go; a set `ADMIN_PASSWORD` logs a deprecation warning; the admin UI is always on. Self-hosting
+      docs and `api.md` rewritten. Full `make test-e2e`.
+- [ ] 12. **Join links.** `join_tokens(hash, guest, event, created)`, no expiry, one live per guest
+      and event; valid to sign in while the guest set no password after `created`, otherwise it asks
+      for a sign-in as that guest. `POST /api/v1/auth/join` (verified session, joins the event); SPA
+      `/join/{token}` exchanges it, replaces the history entry and opens the event. Admin guests
+      screen: "new link" for one guest (copy) and "mail new links" to all or selected guests with an
+      email; the guest is emailed that a new link exists. Attendee and organizer docs. Split if past
+      the size limit.
+- [ ] 13. **Identity mode.** `events.identity_mode` (`open`|`verified`); a guest is protected if
+      they chose it, are a site admin, or take part in a `verified` event; `assuranceRequired` in
+      `packages/domain` (mode, protection); every acting use case checks it; the SPA predicts it and
+      the user picker offers the verification step; admin event config sets it. Full
+      `make test-e2e`.
+- [ ] 14. **Show map in the shell.** The SPA shell gets the "Show map" item from `GET /site`'s map
+      URL (open-questions item 9).
+- [ ] 15. **Docs: step 6 done.** 10-path, 05 (scrypt, personal join links, the two settings), 02,
+      web-app, server.md, open-questions. Doc only.
 
 ### Retire Next (path step 7)
 
-- [ ] 14. **Legacy API routes go**: `/api/toggle-rsvp`, `add-`/`update-`/`delete-session`,
+- [ ] 16. **Legacy API routes go**: `/api/toggle-rsvp`, `add-`/`update-`/`delete-session`,
       `/api/rsvps`, `/api/meetings` (+ candidates), the comment routes, `/api/admin/create-*`; their
       tests move to `/api/v1` or go. Also the leftovers in PROGRESS.md ("Left alone").
-- [ ] 15. **Hono serves everything.** The proxy's gates and header stripping become Hono middleware;
+- [ ] 17. **Hono serves everything.** The proxy's gates and header stripping become Hono middleware;
       Hono serves `/media`, `/locations`, the shell, `/_spa/`, `sw.js`, icons, manifest, and
       `/api/health`. Next keeps one catch-all route handler that calls Hono; `proxy.ts` and the
       other route handlers deleted. Port `tests/integration/proxy.test.ts` to the Hono app.
-- [ ] 16. **Hono's own process.** `server/main.ts` on `@hono/node-server` starts the mailer and jobs
+- [ ] 18. **Hono's own process.** `server/main.ts` on `@hono/node-server` starts the mailer and jobs
       loop (`instrumentation.ts` goes); a Node bundle (`bun build --target=node`, native modules
       external); `make dev` (Vite proxies to it), `make start`, the E2E web server and the
-      Dockerfile run it. The old cookie reader goes. Full `make test-e2e`.
-- [ ] 17. **`next` leaves.** Dependencies, config, `app/`, `next-env.d.ts`, eslint and arch rules,
+      Dockerfile run it. Full `make test-e2e`.
+- [ ] 19. **`next` leaves.** Dependencies, config, `app/`, `next-env.d.ts`, eslint and arch rules,
       the SPA's legacy forward (catch-all → not found), `legacy-pages.ts`, the E2E fixture's
       `/legacy` mapping, AGENTS.md's Next notice. Full `make test-e2e`.
-- [ ] 18. **Docs: step 7 done.** ADR 0015 note, web-app, server.md, 07, 10-path, self-hosting,
+- [ ] 20. **Docs: step 7 done.** ADR 0015 note, web-app, server.md, 07, 10-path, self-hosting,
       testing. The commit message asks the user to run `make test-e2e-docker`.
-- [ ] 19. **Finish**: summary in PROGRESS.md, then delete `.claude/run/`.
+- [ ] 21. **Finish**: summary in PROGRESS.md, then delete `.claude/run/`.
 
 ## Next to plan
 
 - The `organizer` participation role and per-event admin rights.
-- Passkeys, API tokens, QR sheet and bulk email of join links.
-- Participation-gated reads and the `publicSchedule` setting (05), and then whether the site
-  password can go (D2).
+- Passkeys, API tokens, QR sheet of join links.
+- The read setting (ADR 0017 point 11): `public`, `link` (secret event link, rotatable, hidden from
+  the root list), `participants` (default); a kiosk device link; then `SITE_PASSWORD` goes (D2).
