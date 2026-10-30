@@ -26,6 +26,12 @@ export function adminGuestCalls(api: ApiClient) {
         params: { path: { id } },
         headers: { "Idempotency-Key": key },
       }),
+    setSiteAdmin: (id: string, siteAdmin: boolean, key: string) =>
+      api.PUT("/api/v1/admin/guests/{id}/site-admin", {
+        params: { path: { id } },
+        body: { siteAdmin },
+        headers: { "Idempotency-Key": key },
+      }),
     sendTestEmail: (id: string, key: string) =>
       api.POST("/api/v1/admin/guests/{id}/test-email", {
         params: { path: { id } },

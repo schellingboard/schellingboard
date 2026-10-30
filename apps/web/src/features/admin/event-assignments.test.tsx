@@ -27,6 +27,7 @@ const guest = (
   name,
   email: `${id}@x.org`,
   eventIds,
+  siteAdmin: false,
   version: 1,
 });
 

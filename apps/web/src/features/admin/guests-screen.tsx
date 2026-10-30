@@ -172,6 +172,10 @@ function GuestRow({
     call: (key) => calls.sendTestEmail(guest.id, key),
     explainRefusals: true,
   });
+  const role = useFormMutation({
+    call: (key) => calls.setSiteAdmin(guest.id, !guest.siteAdmin, key),
+    explainRefusals: true,
+  });
   const close = () => setMode("view");
 
   useEffect(() => {
@@ -200,14 +204,24 @@ function GuestRow({
   const confirmDelete = async () => {
     if ((await remove.submit())?.ok) onChanged();
   };
+  const toggleRole = async () => {
+    if ((await role.submit())?.ok) onChanged();
+  };
   const memberOf = events.filter((e) => guest.eventIds.includes(e.id));
-  const error = email.error ?? remove.error;
+  const error = email.error ?? remove.error ?? role.error;
 
   return (
     <div>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="min-w-0 flex-1">
-          <p className="truncate font-medium text-fg">{guest.name}</p>
+          <p className="truncate font-medium text-fg">
+            {guest.name}
+            {guest.siteAdmin && (
+              <span className="ml-2 rounded-md bg-surface-muted px-1.5 py-0.5 text-xs font-normal text-fg-muted">
+                Site admin
+              </span>
+            )}
+          </p>
           <p className="truncate text-sm text-fg-subtle">{guest.email}</p>
           {memberOf.length > 0 && (
             <p className="truncate text-sm text-fg-subtle">
@@ -240,7 +254,7 @@ function GuestRow({
             </Button>
           </div>
         ) : (
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button variant="quiet" onClick={() => setMode("edit")}>
               Edit
             </Button>
@@ -254,6 +268,13 @@ function GuestRow({
                 : sent
                   ? "Sent!"
                   : "Send test email"}
+            </Button>
+            <Button
+              variant="quiet"
+              disabled={role.pending}
+              onClick={() => void toggleRole()}
+            >
+              {guest.siteAdmin ? "Remove site admin" : "Make site admin"}
             </Button>
             <Button variant="danger" onClick={() => setMode("delete")}>
               Delete

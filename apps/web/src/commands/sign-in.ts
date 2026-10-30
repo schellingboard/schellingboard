@@ -1,5 +1,6 @@
 import type { ApiClient } from "@schellingboard/api-client";
 import type {
+  bootstrapBodySchema,
   changePasswordBodySchema,
   loginBodySchema,
   loginCodeBodySchema,
@@ -13,6 +14,7 @@ export type SiteLoginBody = (typeof siteLoginBodySchema)["_input"];
 export type LoginBody = (typeof loginBodySchema)["_input"];
 export type TargetBody = (typeof loginCodeBodySchema)["_input"];
 export type ResetBody = (typeof resetBodySchema)["_input"];
+export type BootstrapBody = (typeof bootstrapBodySchema)["_input"];
 export type ChangePasswordBody = (typeof changePasswordBodySchema)["_input"];
 export type UnprotectBody = (typeof unprotectBodySchema)["_input"];
 export type UsernameBody = (typeof usernameBodySchema)["_input"];
@@ -25,6 +27,8 @@ export function signInCalls(api: ApiClient) {
   const keyed = (key: string) => ({ "Idempotency-Key": key });
   return {
     enterSite: (body: SiteLoginBody) => api.POST("/api/v1/auth/site", { body }),
+    bootstrap: (body: BootstrapBody) =>
+      api.POST("/api/v1/auth/bootstrap", { body }),
     logIn: (body: LoginBody) => api.POST("/api/v1/auth/login", { body }),
     requestLoginCode: (body: TargetBody) =>
       api.POST("/api/v1/auth/login-code", { body }),

@@ -13,6 +13,7 @@ import { meetingAvailabilityCalls } from "../commands/meeting-availability";
 import { notificationCalls } from "../commands/notifications";
 import { settingsCalls } from "../commands/settings";
 import { NotificationsScreen } from "../features/notifications/notifications-screen";
+import { BootstrapScreen } from "../features/sign-in/bootstrap-screen";
 import { AccountSecurityScreen } from "../features/sign-in/account-security";
 import { SiteLoginScreen } from "../features/sign-in/site-login-screen";
 import { LoginScreen } from "../features/sign-in/guest-login-form";
@@ -84,6 +85,14 @@ export function LoginPage({ services }: { services: AppServices }) {
   return (
     <AccountFrame services={services}>
       {(shell) => <Login api={services.api} {...shell} />}
+    </AccountFrame>
+  );
+}
+
+export function BootstrapPage({ services }: { services: AppServices }) {
+  return (
+    <AccountFrame services={services}>
+      {(shell) => <Bootstrap api={services.api} {...shell} />}
     </AccountFrame>
   );
 }
@@ -233,6 +242,25 @@ function Login({
       guest={guestId ? (named ?? null) : undefined}
       code={params.get("code") ?? undefined}
       onSignedIn={() => hardNavigate("/")}
+    />
+  );
+}
+
+function Bootstrap({
+  api,
+  entries,
+  loaded,
+  failed,
+}: { api: AppServices["api"] } & Pick<Shell, "entries" | "loaded" | "failed">) {
+  const { params } = useUrlSearchParams();
+  const calls = useMemo(() => signInCalls(api), [api]);
+  if (!loaded) return <DirectoryWait failed={failed} />;
+  return (
+    <BootstrapScreen
+      calls={calls}
+      token={params.get("token") ?? undefined}
+      guests={entries}
+      onBootstrapped={() => hardNavigate("/admin/events")}
     />
   );
 }
