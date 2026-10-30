@@ -117,6 +117,19 @@ inside the same `max-w-3xl` column except the wide days table. Each form wraps `
 heroicons; legacy showed glyphs with the same accessible names. Step 21: `admin.spec` needs
 `getByLabel("Name")` for the "Name *" label, and "Timezone *"/"Max session duration" similar.
 
+Step 20b-2, for 21: the Config tab is complete.
+`EventConfigTab({event, days, points, sessions, calls, onChanged, onPointsChanged, onDeleted})`; the
+page owns three queries: `createAdminEventQuery` (event + days),
+`createAdminMeetingPointsQuery({api,id})` (new `GET /admin/events/{id}/meeting-points`, admin only,
+integration tested) and `createAdminScheduledSessionsQuery({api,eventId})` (pages `GET /sessions`;
+feeds the day-delete warning). `onChanged` must `load()` the event and the sessions queries (a day
+delete removes sessions); `onPointsChanged` loads the points. Render the Config tab only once all
+three are ready. `useFormMutation({explainRefusals: true})` (opt-in, admin screens) shows the
+server's `detail` for a refusal with no wording of its own; `features/admin/use-section-save.ts`
+holds `useSectionSave`, `jumpTo`, `useJumpWithin`, `shown`. E2E label changes for step 21: the
+labels "Start", "Name" etc. now carry a trailing star without a space (use a `getByLabel("Start")`
+regex).
+
 Step 21 must delete the legacy `use-event-section.ts` (untested now; the SPA copy has the test).
 
 ## Questions

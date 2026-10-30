@@ -2,6 +2,7 @@ import type { MeetingDeps } from "../ports";
 import {
   createMeetingPoint,
   deleteMeetingPoint,
+  listMeetingPoints,
   updateEventMeetings,
   updateMeetingPoint,
 } from "./admin-meetings";
@@ -27,6 +28,7 @@ export function createMeetingUseCases(deps: MeetingDeps) {
     cancelMeeting: cancelMeeting(deps),
     saveMeetingAvailability: saveMeetingAvailability(deps),
     updateEventMeetings: updateEventMeetings(deps),
+    listMeetingPoints: listMeetingPoints(deps),
     createMeetingPoint: createMeetingPoint(deps),
     updateMeetingPoint: updateMeetingPoint(deps),
     deleteMeetingPoint: deleteMeetingPoint(deps),

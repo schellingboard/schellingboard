@@ -5,6 +5,8 @@ import { createObservable } from "./store";
 
 export type AdminEventDetail = (typeof eventDetailSchema)["_output"];
 
+export type AdminEventDay = AdminEventDetail["days"][number];
+
 export type AdminEventState =
   | { status: "loading" }
   | { status: "error"; code: string }

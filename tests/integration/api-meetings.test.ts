@@ -460,6 +460,35 @@ describe("/api/v1 meetings", () => {
   );
 
   it(
+    "lists an event's meeting points in order for an organizer only",
+    { tags: ["012-US1", "019-US3"] },
+    async () => {
+      const event = await createEvent();
+      const adminCookie = await createAdminAuthCookie();
+      const admin = `${adminCookie.name}=${adminCookie.value}`;
+      const points = `/admin/events/${event.id}/meeting-points`;
+      for (const name of ["Coffee bar", "Lobby"])
+        await call("POST", points, { cookie: admin, body: { name } });
+
+      const refused = await call("GET", points);
+      expect(refused.status).toBe(403);
+
+      const listed = await call("GET", points, { cookie: admin });
+      expect(listed.status).toBe(200);
+      expect(await listed.json()).toMatchObject({
+        meetingPoints: [
+          { name: "Coffee bar", sortIndex: 0 },
+          { name: "Lobby", sortIndex: 1 },
+        ],
+      });
+      const missing = await call("GET", "/admin/events/nope/meeting-points", {
+        cookie: admin,
+      });
+      expect(missing.status).toBe(404);
+    }
+  );
+
+  it(
     "keeps one of two concurrent meeting point edits made from the same version",
     { tags: ["012-US1", "019-US3", "019-US7"] },
     async () => {

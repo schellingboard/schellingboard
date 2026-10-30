@@ -22,7 +22,8 @@ const isVersionConflict = (code: string) => code.endsWith(".versionConflict");
 /** A form waits for the answer, unlike a command: the user is looking at it. */
 export async function awaitMutation<R>(
   call: (key: string) => Promise<CommandResponse<R>>,
-  key: string
+  key: string,
+  { explainRefusals = false }: { explainRefusals?: boolean } = {}
 ): Promise<MutationResult<R>> {
   let result: CommandResponse<R>;
   try {
@@ -50,11 +51,16 @@ export async function awaitMutation<R>(
       message: FIX_FIELDS_MESSAGE,
     };
   const code = problemCode(error, response.status);
+  const detail = (error as { detail?: unknown } | undefined)?.detail;
   return {
     ok: false,
     kind: "refused",
     code,
-    message: reasonFor(code) ?? "The server refused this. Please try again.",
+    message:
+      reasonFor(code) ??
+      (explainRefusals && typeof detail === "string" && detail
+        ? detail
+        : "The server refused this. Please try again."),
   };
 }
 

@@ -1,5 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react";
-import { STALE_EVENT_MESSAGE } from "@schellingboard/contracts/event";
+import { useMemo, useState } from "react";
 import {
   utcToZonedInput,
   zonedInputToInstant,
@@ -7,8 +6,6 @@ import {
 import { isEventIconName } from "@schellingboard/domain/event-icons";
 import { SLOT_INCREMENT_OPTIONS } from "@schellingboard/domain/slots";
 import type { AdminEventCalls } from "../../commands/admin-events";
-import { FIX_FIELDS_MESSAGE, type FieldErrors } from "../../commands/mutation";
-import type { CommandResponse } from "../../commands/runner";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import type { AdminEvent } from "../../queries/admin-events";
 import { Button } from "../../ui/button";
@@ -20,59 +17,15 @@ import {
   TextField,
 } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
+import type { AdminEventDay } from "../../queries/admin-event";
+import type { MeetingPoint } from "../../queries/admin-meeting-points";
+import type { ScheduledSession } from "../../queries/admin-scheduled-sessions";
+import { EventDaysManager } from "./event-days";
+import { EventMeetingsForm } from "./event-meetings";
 import { EventIconPicker } from "./event-icon-picker";
 import { timezones } from "./timezones";
 import { useEventSection } from "./use-event-section";
-
-const jumpTo = (name: string) =>
-  document.querySelector<HTMLElement>(`[name="${name}"]`)?.focus();
-
-function useSectionSave({
-  call,
-  fieldNames,
-  onSaved,
-  onChanged,
-}: {
-  call: (key: string) => Promise<CommandResponse<unknown>>;
-  fieldNames: string[];
-  onSaved: () => void;
-  onChanged: () => void;
-}) {
-  const mutation = useFormMutation({ call, fieldNames });
-  const [stale, setStale] = useState(false);
-  const [saved, setSaved] = useState(false);
-
-  const save = async (e: FormEvent) => {
-    e.preventDefault();
-    setStale(false);
-    setSaved(false);
-    const result = await mutation.submit();
-    if (!result) return;
-    if (result.ok) {
-      onSaved();
-      setSaved(true);
-      onChanged();
-    } else if (result.kind === "conflict") {
-      setStale(true);
-      onChanged();
-    }
-  };
-
-  const error = stale
-    ? STALE_EVENT_MESSAGE
-    : mutation.error === FIX_FIELDS_MESSAGE
-      ? null
-      : mutation.error;
-  const fields: FieldErrors = stale ? {} : mutation.fields;
-  return {
-    save,
-    saved,
-    clearSaved: () => setSaved(false),
-    pending: mutation.pending,
-    fields,
-    error,
-  };
-}
+import { jumpTo, useSectionSave } from "./use-section-save";
 
 function SaveRow({
   pending,
@@ -358,6 +311,7 @@ function DangerZone({
   const [typed, setTyped] = useState("");
   const mutation = useFormMutation({
     call: (key) => calls.remove(event.id, key),
+    explainRefusals: true,
   });
 
   const close = () => {
@@ -416,24 +370,53 @@ function DangerZone({
 
 export function EventConfigTab({
   event,
+  days,
+  points,
+  sessions,
   calls,
   onChanged,
+  onPointsChanged,
   onDeleted,
 }: {
   event: AdminEvent;
+  days: AdminEventDay[];
+  points: MeetingPoint[];
+  sessions: ScheduledSession[];
   calls: AdminEventCalls;
-  /** The event is out of date: load it again. */
+  /** The event, its days and its sessions are out of date: load them again. */
   onChanged: () => void;
+  onPointsChanged: () => void;
   onDeleted: () => void;
 }) {
   return (
-    <div className="max-w-3xl space-y-6">
-      <div className="space-y-8">
+    <div className="space-y-6">
+      <div className="max-w-3xl space-y-8">
         <DetailsForm event={event} calls={calls} onChanged={onChanged} />
         <DangerZone event={event} calls={calls} onDeleted={onDeleted} />
       </div>
       <hr className="border-line-subtle" />
-      <PhasesForm event={event} calls={calls} onChanged={onChanged} />
+      <div className="max-w-3xl">
+        <PhasesForm event={event} calls={calls} onChanged={onChanged} />
+      </div>
+      <hr className="border-line-subtle" />
+      <div className="max-w-3xl">
+        <EventMeetingsForm
+          event={event}
+          points={points}
+          calls={calls}
+          onChanged={onChanged}
+          onPointsChanged={onPointsChanged}
+        />
+      </div>
+      <hr className="border-line-subtle" />
+      <EventDaysManager
+        eventId={event.id}
+        timezone={event.timezone}
+        days={days}
+        sessions={sessions}
+        calls={calls}
+        onChanged={onChanged}
+      />
     </div>
   );
 }

@@ -17,11 +17,14 @@ export function useFormMutation<R>({
   call,
   successMessage,
   fieldNames,
+  explainRefusals,
 }: {
   call: (key: string) => Promise<CommandResponse<R>>;
   successMessage?: string;
   /** Server errors on a path outside these go into the form error. */
   fieldNames?: string[];
+  /** Show the server's own wording for a refusal this app has none for; for organizer screens. */
+  explainRefusals?: boolean;
 }) {
   const notify = useNotify();
   const key = useRef(newKey());
@@ -38,7 +41,7 @@ export function useFormMutation<R>({
     setFields({});
     setError(null);
     setUnreachable(false);
-    const result = await awaitMutation(call, key.current);
+    const result = await awaitMutation(call, key.current, { explainRefusals });
     inFlight.current = false;
     setPending(false);
     // The server stores every answer but a 5xx, and refuses a stored key sent with other values.
