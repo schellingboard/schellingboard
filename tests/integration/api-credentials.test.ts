@@ -223,6 +223,71 @@ describe("POST /api/v1/auth/reset", () => {
   });
 
   it(
+    "a reset link survives any number of wrong tokens",
+    { tags: ["003-US5"] },
+    async () => {
+      const guest = await createGuest();
+      await call("POST", "/auth/reset-link", { guestId: guest.id });
+      const token = await emailedResetToken();
+      for (let i = 0; i < 101; i++)
+        await call("POST", "/auth/reset", {
+          guestId: guest.id,
+          token: "nope",
+          newPassword: "long enough",
+        });
+
+      const res = await call("POST", "/auth/reset", {
+        guestId: guest.id,
+        token,
+        newPassword: "correct horse battery",
+      });
+
+      expect(res.status).toBe(204);
+    }
+  );
+
+  it(
+    "a too-short password does not use up the token",
+    { tags: ["003-US3"] },
+    async () => {
+      const guest = await createGuest();
+      await call("POST", "/auth/reset-link", { guestId: guest.id });
+      const token = await emailedResetToken();
+      await call("POST", "/auth/reset", {
+        guestId: guest.id,
+        token,
+        newPassword: "short",
+      });
+
+      const res = await call("POST", "/auth/reset", {
+        guestId: guest.id,
+        token,
+        newPassword: "correct horse battery",
+      });
+
+      expect(res.status).toBe(204);
+    }
+  );
+
+  it(
+    "setting the first password sends no security email",
+    { tags: ["003-US3"] },
+    async () => {
+      const guest = await createGuest();
+      await call("POST", "/auth/reset-link", { guestId: guest.id });
+      const token = await emailedResetToken();
+
+      await call("POST", "/auth/reset", {
+        guestId: guest.id,
+        token,
+        newPassword: "correct horse battery",
+      });
+
+      expect(sendMail).toHaveBeenCalledTimes(1);
+    }
+  );
+
+  it(
     "a reset of a protected name signs out its sessions, this browser's included, and emails the owner",
     { tags: ["003-US5"] },
     async () => {
@@ -357,6 +422,29 @@ describe("PUT /api/v1/me/credentials/password", () => {
 });
 
 describe("POST /api/v1/me/credentials/unprotect", () => {
+  it(
+    "succeeds even if the security email fails to send",
+    { tags: ["003-US3"] },
+    async () => {
+      const guest = await protectedGuest();
+      const mine = await sessionGuestValue(guest.id, "verified");
+      vi.mocked(sendMail).mockRejectedValueOnce(new Error("smtp down"));
+
+      const res = await call(
+        "POST",
+        "/me/credentials/unprotect",
+        { currentPassword: PASSWORD },
+        asSession(mine)
+      );
+
+      expect(res.status).toBe(200);
+      expect(
+        (await getRepositories().guests.getAuthCredentials(guest.id))
+          ?.authProtected
+      ).toBe(false);
+    }
+  );
+
   it(
     "removes the protection and keeps the browser on the name, unverified",
     { tags: ["003-US3"] },

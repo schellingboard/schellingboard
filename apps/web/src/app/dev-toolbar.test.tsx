@@ -9,15 +9,17 @@ const clear = () => (document.cookie = "time-override=; path=/; max-age=0");
 
 function show(search = "?dev=1", enabled = true) {
   const onChange = vi.fn();
+  const sendReminders = vi.fn(() => Promise.resolve("sent 2 reminders"));
   render(
     <DevToolbar
       enabled={enabled}
       search={search}
       clock={() => NOW}
       onChange={onChange}
+      sendReminders={sendReminders}
     />
   );
-  return { onChange, user: userEvent.setup() };
+  return { onChange, sendReminders, user: userEvent.setup() };
 }
 
 describe("DevToolbar", () => {
@@ -71,6 +73,19 @@ describe("DevToolbar", () => {
       )
     ).toBeLessThan(1);
     expect(onChange).toHaveBeenCalled();
+  });
+
+  it("sends the due reminders and says how many went out", async () => {
+    const { sendReminders, user } = show();
+
+    await user.click(
+      screen.getByRole("button", { name: "Send due reminders" })
+    );
+
+    expect(sendReminders).toHaveBeenCalled();
+    expect((await screen.findByRole("status")).textContent).toBe(
+      "sent 2 reminders"
+    );
   });
 
   it("can be dismissed", async () => {

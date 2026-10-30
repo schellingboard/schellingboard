@@ -42,7 +42,7 @@ function show(state: SettingsState) {
         availability={meetingAvailabilityCalls(api)}
         links={{
           profile: "/guests/edit",
-          security: "/legacy/account-security",
+          security: "/account-security",
         }}
       />
     </NoticeProvider>
@@ -80,7 +80,7 @@ describe("the settings page", { tags: ["013-US5"] }, () => {
       screen
         .getByRole("link", { name: "Account security" })
         .getAttribute("href")
-    ).toBe("/legacy/account-security");
+    ).toBe("/account-security");
   });
 
   it("says when no event offers 1-on-1s", () => {

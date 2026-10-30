@@ -46,6 +46,12 @@ export function ShellFrame({
         enabled={health?.devTools ?? false}
         search={search}
         onChange={onClockChange}
+        sendReminders={async () => {
+          const { data } = await api.POST("/api/v1/dev/reminders", {
+            headers: { "Idempotency-Key": crypto.randomUUID() },
+          });
+          return data ? `sent ${data.sent} reminders` : "dispatch failed";
+        }}
       />
     </Layout>
   );

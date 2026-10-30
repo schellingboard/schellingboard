@@ -62,6 +62,90 @@ const answers = (call: FakeCall): Response | undefined => {
   return undefined;
 };
 
+const bo = {
+  id: "bo",
+  name: "Bo",
+  aboutMe: null,
+  avatarUrl: null,
+  pronouns: null,
+  basedIn: null,
+  prompts: null,
+  languages: null,
+  contacts: null,
+  profileUpdatedAt: null,
+  version: 1,
+  isHost: false,
+  openToMeetings: false,
+  authProtected: true,
+};
+
+const withBo = (call: FakeCall): Response | undefined =>
+  call.path.startsWith("/api/v1/attendees")
+    ? Response.json({ items: [bo], nextCursor: null })
+    : answers(call);
+
+describe("the sign-in pages", { tags: ["003-US4"] }, () => {
+  it("names the guest an emailed login link is for", async () => {
+    await open({
+      handler: withBo,
+      path: "/auth/login?guest=bo&code=ABCD2345",
+      identity: null,
+    });
+
+    expect(
+      await screen.findByRole("heading", { name: "Log in as Bo" })
+    ).toBeTruthy();
+  });
+
+  it("says a login link naming nobody is invalid", async () => {
+    await open({
+      handler: withBo,
+      path: "/auth/login?guest=nobody",
+      identity: null,
+    });
+
+    expect(await screen.findByText(/login link is invalid/)).toBeTruthy();
+  });
+
+  it("opens the password form from a reset link", async () => {
+    await open({
+      handler: withBo,
+      path: "/auth/reset?guest=bo&token=t",
+      identity: null,
+    });
+
+    expect(
+      await screen.findByRole("heading", { name: "Set a password for Bo" })
+    ).toBeTruthy();
+  });
+
+  it("says so when the names cannot be loaded for a login link", async () => {
+    await open({
+      handler: (call) =>
+        call.path.startsWith("/api/v1/attendees")
+          ? problem(500, "server.error")
+          : answers(call),
+      path: "/auth/login?guest=bo",
+      identity: null,
+    });
+
+    expect(await screen.findByText(/Could not load the names/)).toBeTruthy();
+  });
+
+  it("asks to select a name before showing account security", async () => {
+    await open({
+      handler: (call) =>
+        call.path.startsWith("/api/v1/me/")
+          ? problem(403, "guest.unselected")
+          : answers(call),
+      path: "/account-security",
+      identity: null,
+    });
+
+    expect(await screen.findByText(/Choose who you are/)).toBeTruthy();
+  });
+});
+
 describe("the settings page", { tags: ["013-US5"] }, () => {
   it("shows the signed-in guest's settings", async () => {
     await open({ handler: answers, path: "/settings", identity: "al" });

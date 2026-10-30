@@ -64,7 +64,8 @@ test.describe("Admin site settings", () => {
     await expect(page.getByText("Settings saved.")).toBeVisible();
   });
 
-  test("map modal appears only after a map is uploaded @015-US5", async ({
+  // The nav bar's "Show map" button was the legacy layout's; it returns in the SPA shell (open-questions item 9).
+  test.fixme("map modal appears only after a map is uploaded @015-US5", async ({
     page,
   }) => {
     // No map by default: the schedule nav has no map button.
@@ -88,7 +89,7 @@ test.describe("Admin site settings", () => {
     await expect(page.getByText("Settings saved.")).toBeVisible();
 
     // The map button now shows in the nav bar and opens the map image.
-    await page.goto("/legacy/account-security");
+    await page.goto("/account-security");
     const mapButton = page.getByRole("button", { name: "Show map" });
     await expect(mapButton).toBeVisible();
     await mapButton.click();

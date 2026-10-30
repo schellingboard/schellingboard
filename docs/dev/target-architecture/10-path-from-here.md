@@ -47,8 +47,9 @@ get its own issue and ADR.
    session modal with RSVPs, attendee counts and comments, and the schedule opening offline with a
    reload offer after an upgrade. Proposals and voting, people and meetings, the session forms,
    settings, notifications and admin have moved too; the legacy copies and their server actions are
-   deleted. Still Next pages: the sign-in screens (`/login`, guest login and reset,
-   `/account-security`, the admin login), which step 6 replaces, and the root event list (`/`).
+   deleted. The root event list and the guest sign-in screens (login, reset, account security) have
+   moved too. Still Next pages: the site password (`/login`) and the admin login, which step 6
+   replaces.
 
 6. **Identity and roles.** Persons, participations, login sessions, assurance, join links; migrate
    protected guests to verified credentials; replace the admin password with a site-admin role and

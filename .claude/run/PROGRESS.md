@@ -15,8 +15,8 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
   gate. `tests/helpers/admin-api.ts`, `proposal-api.ts`, `comment-api.ts` call `/api/v1` for
   integration tests.
 - `app/legacy-pages.ts` keeps "admin" (login is legacy); the router filters it out.
-- The SPA picker sends a protected name to `/legacy/auth/login?guest=<id>`; login lands on `/`.
-  Account security is `/legacy/account-security`, linked from Settings.
+- The SPA picker sends a protected name to `/auth/login?guest=<id>`; login lands on `/`. Account
+  security is `/account-security`, linked from Settings.
 - Native `<option>` is not "visible" in Firefox: E2E use `toBeAttached()` / `toBeDisabled()`.
 - Do not call `runner.stop()` or `query.destroy()` in a mount effect cleanup (StrictMode).
 - jj: paths with `(site)`/`[id]` need `'file:"…"'`; `jj squash` needs `-m` or
@@ -58,10 +58,20 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
 
 - Step 7 checks: all of `make precommit` green; E2E 214 passed, 1 flaky
   (`meetings-request.spec.ts:296`, known; passes alone, and `make` still exits 1 on a flaky test).
-  Commit id: see the log.
+  Commit id: see the log. Review: finding 1 fixed (API tests for the lockout, code-guess,
+  reset-token and email rules); 2-6 fixed. None rejected.
 
 - Step 7 review: all 8 findings accepted. The login form keeps the legacy copy when a guest is
   named.
+
+- Step 8: `app/legacy/(site)/` keeps only `lock-icon.tsx` and `markdown.tsx` (imported by
+  `select-hosts`/`whats-new`); `LEGACY_ROOT_PAGES` is `admin`, `login`. The `/auth/*` slug is no
+  longer reserved. `settings.spec.ts` "map modal" is `test.fixme` until step 14 (the "Show map"
+  button was the legacy layout's, the SPA shell has none). Checks: `make precommit` green up to E2E;
+  E2E 213 passed, 1 skipped (the fixme), 1 flaky (`theme.spec.ts:11`, passes on retry; `make` exits
+  1 on a flaky test). `Viewer.refresh` re-reads the identity after a reset. Commit id: see the log.
+  Review: finding 1 fixed (API tests for the lockout, code-guess, reset-token and email rules); 2-6
+  fixed. None rejected.
 
 ## Known E2E flakes
 

@@ -34,15 +34,18 @@ export function DevToolbar({
   enabled,
   search,
   onChange,
+  sendReminders,
   clock = Date.now,
 }: {
   enabled: boolean;
   search: string;
   onChange: () => void;
+  sendReminders: () => Promise<string>;
   clock?: () => number;
 }) {
   const [offset, setOffset] = useState(readOffset);
   const [dismissed, setDismissed] = useState(false);
+  const [dispatched, setDispatched] = useState<string | null>(null);
 
   if (!enabled || dismissed || new URLSearchParams(search).get("dev") !== "1")
     return null;
@@ -89,6 +92,22 @@ export function DevToolbar({
           }}
         />
       </label>
+      <button
+        className={button}
+        onClick={() => {
+          setDispatched(null);
+          sendReminders().then(setDispatched, () =>
+            setDispatched("dispatch interrupted")
+          );
+        }}
+      >
+        Send due reminders
+      </button>
+      {dispatched && (
+        <span role="status" className="tabular-nums">
+          {dispatched}
+        </span>
+      )}
       <button
         className={`${button} ml-auto`}
         aria-label="Dismiss dev clock toolbar"

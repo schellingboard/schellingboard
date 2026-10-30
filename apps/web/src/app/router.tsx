@@ -16,7 +16,13 @@ import {
   AdminUserImportPage,
   AdminUsersPage,
 } from "./admin-pages";
-import { NotificationsPage, SettingsPage } from "./account-pages";
+import {
+  AccountSecurityPage,
+  LoginPage,
+  NotificationsPage,
+  ResetPage,
+  SettingsPage,
+} from "./account-pages";
 import { HomePage } from "./home-page";
 import { LegacyForward } from "./legacy-forward";
 import { LEGACY_ROOT_PAGES } from "./legacy-pages";
@@ -153,6 +159,27 @@ export function createAppRouter(
       return <NotificationsPage services={services} />;
     },
   });
+  const accountSecurity = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "account-security",
+    component: function AccountSecurityRoute(): ReactElement {
+      return <AccountSecurityPage services={services} />;
+    },
+  });
+  const authLogin = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "auth/login",
+    component: function AuthLoginRoute(): ReactElement {
+      return <LoginPage services={services} />;
+    },
+  });
+  const authReset = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "auth/reset",
+    component: function AuthResetRoute(): ReactElement {
+      return <ResetPage services={services} />;
+    },
+  });
   const adminSection = createRoute({
     getParentRoute: () => rootRoute,
     id: "admin-section",
@@ -214,6 +241,9 @@ export function createAppRouter(
       ]),
       settings,
       notifications,
+      accountSecurity,
+      authLogin,
+      authReset,
       guests.addChildren([guestsList, guestsPage]),
       event.addChildren([
         schedule,

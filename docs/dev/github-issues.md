@@ -126,5 +126,6 @@ Match existing issues' style:
   `## Proposed behavior` (or `## Proposed change`/`## Proposed fix`) / `## Why` / `## Impact` /
   `## Notes`
 - Small bugs/tasks can just be a short paragraph — headers aren't mandatory.
-- Reference file:line for code-specific bugs (e.g. `` `app/actions/user-auth.ts:130` ``).
+- Reference file:line for code-specific bugs (e.g.
+  `` `server/modules/people/application/sign-in.ts:130` ``).
 - Keep it succinct; this is a scheduling app issue tracker, not a spec document.
