@@ -4,10 +4,12 @@ import type {
   loginBodySchema,
   loginCodeBodySchema,
   resetBodySchema,
+  siteLoginBodySchema,
   unprotectBodySchema,
   usernameBodySchema,
 } from "@schellingboard/contracts/auth";
 
+export type SiteLoginBody = (typeof siteLoginBodySchema)["_input"];
 export type LoginBody = (typeof loginBodySchema)["_input"];
 export type TargetBody = (typeof loginCodeBodySchema)["_input"];
 export type ResetBody = (typeof resetBodySchema)["_input"];
@@ -22,6 +24,7 @@ export type UsernameBody = (typeof usernameBodySchema)["_input"];
 export function signInCalls(api: ApiClient) {
   const keyed = (key: string) => ({ "Idempotency-Key": key });
   return {
+    enterSite: (body: SiteLoginBody) => api.POST("/api/v1/auth/site", { body }),
     logIn: (body: LoginBody) => api.POST("/api/v1/auth/login", { body }),
     requestLoginCode: (body: TargetBody) =>
       api.POST("/api/v1/auth/login-code", { body }),

@@ -66,8 +66,6 @@ const ADMIN_FILE = /^actions\/admin-(?!auth)/;
 // Deliberately reachable before site auth. A login action cannot require
 // being logged in, and logout only ever clears the caller's own cookie.
 const PRE_AUTH = new Set([
-  "actions/auth.ts:loginAction",
-  "actions/auth.ts:logoutAction",
   "actions/admin-auth.ts:adminLoginAction",
   "actions/admin-auth.ts:adminLogoutAction",
 ]);

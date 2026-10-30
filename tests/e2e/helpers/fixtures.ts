@@ -10,8 +10,8 @@ const ALLOWED_CONSOLE_PATTERNS: RegExp[] = [
   // Firefox quirk: a hard navigation that starts while a server action's
   // response is still streaming aborts that stream, which Firefox reports
   // as an uncaught "TypeError: Error in input stream" (see the comment at
-  // admin.spec.ts's event-rename test for the same issue). logoutAction's
-  // caller deliberately hard-reloads right after the action resolves, so
+  // admin.spec.ts's event-rename test for the same issue). the SPA's
+  // sign-out deliberately hard-reloads right after the request resolves, so
   // this can happen there too.
   /Error in input stream/,
   // Same root cause as above, different wording: a hard reload can also
@@ -36,7 +36,7 @@ const SERVER_PATH =
 
 // Legacy pages directly under the root: `/login` is never an event. Kept in
 // step with apps/web/src/app/legacy-pages.ts (tests/unit/spa-legacy-pages.test.ts).
-const LEGACY_ROOT_PAGES = ["admin", "login"];
+const LEGACY_ROOT_PAGES = ["admin"];
 
 // An event's own page, `/{slug}`, and its proposals screens, which the SPA serves.
 // Its 1-on-1 modal is still the legacy schedule's, which the SPA hands the address to.
@@ -52,7 +52,7 @@ const isRootPage = (url: string) => /^\/(?:[?#]|$)/.test(url);
 const isPeoplePage = (url: string) => /^\/guests(?:[/?#]|$)/.test(url);
 
 const isAccountPage = (url: string) =>
-  /^\/(?:settings|notifications|account-security|auth\/(?:login|reset))(?:[?#]|$)/.test(
+  /^\/(?:settings|notifications|account-security|auth\/(?:login|reset)|login)(?:[?#]|$)/.test(
     url
   );
 

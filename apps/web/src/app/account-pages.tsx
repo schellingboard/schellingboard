@@ -7,12 +7,14 @@ import {
 } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
+import { safeRedirectPath } from "@schellingboard/domain/safe-redirect";
 import { signInCalls } from "../commands/sign-in";
 import { meetingAvailabilityCalls } from "../commands/meeting-availability";
 import { notificationCalls } from "../commands/notifications";
 import { settingsCalls } from "../commands/settings";
 import { NotificationsScreen } from "../features/notifications/notifications-screen";
 import { AccountSecurityScreen } from "../features/sign-in/account-security";
+import { SiteLoginScreen } from "../features/sign-in/site-login-screen";
 import { LoginScreen } from "../features/sign-in/guest-login-form";
 import { ResetScreen } from "../features/sign-in/reset-password-form";
 import {
@@ -22,7 +24,12 @@ import {
 import { createAccountSecurityQuery } from "../queries/account-security";
 import { createNotificationsQuery } from "../queries/notifications";
 import { createSettingsQuery } from "../queries/settings";
+import { Footer } from "./footer";
 import { hardNavigate } from "./hard-navigate";
+import { useHealth } from "./health";
+import { Layout } from "./layout";
+import { ThemeProvider } from "./theme";
+import { NoticeProvider } from "../ui/notices";
 import { PageNotice } from "./page-notice";
 import type { AppServices } from "./services";
 import { ShellFrame, ShellProviders } from "./shell";
@@ -48,6 +55,27 @@ export function NotificationsPage({ services }: { services: AppServices }) {
     <AccountFrame services={services}>
       {({ now }) => <Notifications api={services.api} now={now} />}
     </AccountFrame>
+  );
+}
+
+/** The shared site password, asked of a visitor who has no site cookie yet. */
+export function SiteLoginPage({ services }: { services: AppServices }) {
+  const { api } = services;
+  const { params } = useUrlSearchParams();
+  const health = useHealth(api);
+  const calls = useMemo(() => signInCalls(api), [api]);
+  const target = safeRedirectPath(params.get("redirect"), "/");
+  return (
+    <ThemeProvider>
+      <NoticeProvider>
+        <Layout nav={null} footer={<Footer version={health?.version} />}>
+          <SiteLoginScreen
+            calls={calls}
+            onEntered={() => hardNavigate(target)}
+          />
+        </Layout>
+      </NoticeProvider>
+    </ThemeProvider>
   );
 }
 

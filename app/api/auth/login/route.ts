@@ -18,9 +18,9 @@ export const dynamic = "force-dynamic";
 
 type LoginBody = { password?: string; scope?: "site" | "admin" };
 
-// Exchanges a password for an auth cookie. Mirrors the browser login server
-// actions (loginAction / adminLoginAction) but over plain HTTP, so scripts can
-// authenticate without replaying Next's server-action wire protocol. Lives
+// Exchanges a password for an auth cookie. Mirrors the admin login server
+// action (adminLoginAction) but over plain HTTP, so scripts can authenticate
+// without replaying Next's server-action wire protocol. Lives
 // under /api/auth/, which the middleware allows through without a prior cookie.
 export async function POST(req: Request) {
   let parsed: unknown;

@@ -66,9 +66,9 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
       `/account-security` (`app/account-pages.tsx`); legacy pages, `(site)` layout, `user-auth.ts`
       and its action tests deleted (rules covered in `api-auth.test.ts`); "Send due reminders" is
       `POST /api/v1/dev/reminders` in the SPA's dev toolbar.
-- [ ] 9. **Site password screen.** `POST /api/v1/auth/site` and an SPA `/login` exempt from the
-      gate; the `(login)` group and `app/actions/auth.ts` deleted. The gate stays in `proxy.ts`
-      until step 17.
+- [x] 9. Site password screen: SPA `/login` (open in `proxy.ts`), `POST /api/v1/auth/site`
+      (`server/http/site-auth.ts`); `/api/v1/health` is open too; `(login)` group and
+      `actions/auth.ts` deleted. The gate stays in `proxy.ts` until step 17.
 - [ ] 10. **Site admin role and bootstrap link.** `guests.site_admin`; the actor is admin only
       through a verified session of a site admin; the role protects the name and blocks
       unprotecting; changes by an admin record which one. A single-use bootstrap token (hashed, 24

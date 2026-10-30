@@ -40,14 +40,14 @@ export async function openNameSwitcher(page: Page): Promise<Locator> {
   await tapUntilOpen(chip, logOut.or(nameBox));
   if (await logOut.isVisible()) {
     await logOut.click();
-    // Logging out clears the site login too (see logoutAction), and the
+    // Logging out clears the site login too (see /api/auth/logout), and the
     // chip's optimistic UI update makes "Select your name" appear instantly
-    // on the *old* page — well before logoutAction's hard reload actually
+    // on the *old* page — well before the sign-out's hard reload actually
     // lands. Wait for the real navigation, not that transient text, or a
     // click below can land on a page mid-navigation-away. The test env
     // always sets SITE_PASSWORD, so the reload's destination is always
     // /login.
-    await page.waitForURL((url) => url.pathname === "/legacy/login");
+    await page.waitForURL((url) => url.pathname === "/login");
     await login(page);
     // Not getByText("Select your name"): some pages show a paragraph with
     // that same phrase (e.g. "select who you are before editing this...

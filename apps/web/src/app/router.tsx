@@ -22,10 +22,10 @@ import {
   NotificationsPage,
   ResetPage,
   SettingsPage,
+  SiteLoginPage,
 } from "./account-pages";
 import { HomePage } from "./home-page";
 import { LegacyForward } from "./legacy-forward";
-import { LEGACY_ROOT_PAGES } from "./legacy-pages";
 import { MeetingsPage } from "./meetings-page";
 import { PeoplePage } from "./people-pages";
 import {
@@ -46,17 +46,6 @@ const catchAll = createRoute({
   path: "$",
   component: LegacyForward,
 });
-
-// A static route wins over `/$slug`, so no event can shadow a legacy page.
-// The admin pages are the SPA's; only the login under /admin is still legacy.
-const legacyPages = LEGACY_ROOT_PAGES.filter((name) => name !== "admin").map(
-  (name) =>
-    createRoute({
-      getParentRoute: () => rootRoute,
-      path: `/${name}`,
-      component: LegacyForward,
-    })
-);
 
 export function createAppRouter(
   history?: RouterHistory,
@@ -159,6 +148,13 @@ export function createAppRouter(
       return <NotificationsPage services={services} />;
     },
   });
+  const siteLogin = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "login",
+    component: function SiteLoginRoute(): ReactElement {
+      return <SiteLoginPage services={services} />;
+    },
+  });
   const accountSecurity = createRoute({
     getParentRoute: () => rootRoute,
     path: "account-security",
@@ -229,7 +225,7 @@ export function createAppRouter(
   return createRouter({
     routeTree: rootRoute.addChildren([
       home,
-      ...legacyPages,
+      siteLogin,
       adminSection.addChildren([
         adminHome,
         adminEvents,
