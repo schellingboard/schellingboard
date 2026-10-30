@@ -103,6 +103,22 @@ belongs to 20b. `parseSettings`/`createEvent` now refuse with `errors[]` (`name`
 `features/admin/timezones.ts` has the zone list. `ui/form` labels render "Name*" where legacy said
 "Name *": `admin.spec.ts` uses `getByLabel("Name *")` and needs `getByLabel("Name")` at step 21.
 
+Step 20b-1, for 20b-2/21: `createAdminEventQuery({api,id})` (`GET /events/{id}`; state `ready`
+spreads `{event, days}`; `load()` keeps the old state while reloading, so forms stay mounted).
+`AdminEventLayout({status, event, currentPath, children})` is the page frame (back link, name, tabs
+as plain anchors to `/admin/events/{id}[/guests|locations|proposals|sessions]`). Config tab:
+`EventConfigTab({event, calls: adminEventCalls(api), onChanged: query.load, onDeleted})`; the page
+sends `onDeleted` to `/admin/events`. Add the meetings form and `EventDaysManager` to it (20b-2),
+inside the same `max-w-3xl` column except the wide days table. Each form wraps `useEventSection`
+(copy of legacy; sections share the event version) and `useSectionSave` (a 409 shows
+`STALE_EVENT_MESSAGE` and calls `onChanged`; reuse it for meetings/days). `admin-datetime` moved to
+`packages/domain/src/admin-datetime.ts` (+ `zonedInputToInstant`), `eventIconLabel` to
+`domain/event-icons`. The icon picker is text-labelled radios ("Rocket Launch"): the SPA has no
+heroicons; legacy showed glyphs with the same accessible names. Step 21: `admin.spec` needs
+`getByLabel("Name")` for the "Name *" label, and "Timezone *"/"Max session duration" similar.
+
+Step 21 must delete the legacy `use-event-section.ts` (untested now; the SPA copy has the test).
+
 ## Questions
 
 5. The SPA shell has no "Show map" button (the uploaded site map); only legacy pages show it. The

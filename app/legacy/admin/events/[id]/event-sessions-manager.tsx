@@ -24,7 +24,7 @@ import {
   dayTimeToUtc,
   utcToZonedInput,
   type DayRange,
-} from "@/utils/admin-datetime";
+} from "@schellingboard/domain/admin-datetime";
 import { MarkdownHint } from "@/app/legacy/(site)/markdown";
 import { DateTime } from "luxon";
 

@@ -35,3 +35,11 @@ export type EventIconName = (typeof EVENT_ICON_NAMES)[number];
 export function isEventIconName(name: string): name is EventIconName {
   return (EVENT_ICON_NAMES as readonly string[]).includes(name);
 }
+
+/** "AcademicCapIcon" -> "Academic Cap" */
+export function eventIconLabel(name: string): string {
+  return name
+    .replace(/Icon$/, "")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/([A-Z])([A-Z][a-z])/g, "$1 $2");
+}

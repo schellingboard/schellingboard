@@ -31,11 +31,12 @@ import {
 } from "@heroicons/react/24/outline";
 import { ForwardRefExoticComponent, RefAttributes, SVGProps } from "react";
 import {
+  eventIconLabel,
   isEventIconName,
   type EventIconName,
 } from "@schellingboard/domain/event-icons";
 
-export { isEventIconName };
+export { eventIconLabel, isEventIconName };
 
 export type HeroIcon = ForwardRefExoticComponent<
   Omit<SVGProps<SVGSVGElement>, "ref"> & {
@@ -85,12 +86,4 @@ export function normalizeEventIconName(
   name: string | null | undefined
 ): string {
   return name && isEventIconName(name) ? name : "";
-}
-
-/** "AcademicCapIcon" -> "Academic Cap" */
-export function eventIconLabel(name: string): string {
-  return name
-    .replace(/Icon$/, "")
-    .replace(/([a-z])([A-Z])/g, "$1 $2")
-    .replace(/([A-Z])([A-Z][a-z])/g, "$1 $2");
 }

@@ -4,8 +4,9 @@ import {
   dayIndexOf,
   dayTimeToUtc,
   utcToZonedInput,
+  zonedInputToInstant,
   zonedInputToUtc,
-} from "@/utils/admin-datetime";
+} from "@schellingboard/domain/admin-datetime";
 
 // ── utcToZonedInput ──────────────────────────────────────────────────────────
 
@@ -138,4 +139,26 @@ describe("calendarDayOf", () => {
       start: "2026-10-02T22:00:00.000Z",
       end: "2026-10-03T22:00:00.000Z",
     }));
+});
+
+describe("zonedInputToUtc around daylight saving", () => {
+  it("moves a time in the spring gap forward", () =>
+    expect(zonedInputToUtc("2026-03-29T02:30", "Europe/Berlin")).toBe(
+      "2026-03-29T01:30"
+    ));
+
+  it("takes the later of an autumn time that happens twice", () =>
+    expect(zonedInputToUtc("2026-10-25T02:30", "Europe/Berlin")).toBe(
+      "2026-10-25T01:30"
+    ));
+});
+
+describe("zonedInputToInstant", () => {
+  it("gives the API's instant for a zoned input", () =>
+    expect(zonedInputToInstant("2026-10-01T11:00", "Europe/Berlin")).toBe(
+      "2026-10-01T09:00:00.000Z"
+    ));
+
+  it("gives null for an empty input", () =>
+    expect(zonedInputToInstant(" ", "Europe/Berlin")).toBeNull());
 });

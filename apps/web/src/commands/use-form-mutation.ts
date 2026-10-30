@@ -59,5 +59,11 @@ export function useFormMutation<R>({
     return result;
   };
 
-  return { submit, pending, fields, error, unreachable };
+  const reset = () => {
+    setFields({});
+    setError(null);
+    setUnreachable(false);
+  };
+
+  return { submit, reset, pending, fields, error, unreachable };
 }
