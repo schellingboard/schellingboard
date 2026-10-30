@@ -85,6 +85,14 @@ answers `auth.credentialWrong`. `GET /me/login-sessions` lists the guest's sessi
 `DELETE /me/login-sessions/{id}` ends one (`loginSession.notFound`). Also `username.taken`,
 `auth.notProtected`.
 
+Site admins ([ADR 0017](adr/0017-identity-and-roles.md) point 7, 8): `guests.site_admin`;
+`actor.admin` is also true for a verified session of one (`SessionLookup.siteAdmin`), and the role
+makes the guest read as protected (`isProtected` in the guests repository).
+`PUT /admin/guests/{id}/site-admin` never removes the last one (`siteAdmin.last`, also on delete).
+`bootstrap_tokens` holds the hash of one 24 h link, logged at start by `server/bootstrap-link.ts`
+while no site admin exists (`SB_BOOTSTRAP_LINK=1` forces one); `POST /auth/bootstrap` spends it
+(`people/application/bootstrap.ts`).
+
 ## The feed and the snapshot
 
 [ADR 0014](adr/0014-change-feed-and-snapshot.md) has the decisions.

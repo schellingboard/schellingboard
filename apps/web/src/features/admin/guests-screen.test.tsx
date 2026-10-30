@@ -25,6 +25,7 @@ const guest = (
   name,
   email: `${id}@x.org`,
   eventIds: [],
+  siteAdmin: false,
   version: 3,
   ...extra,
 });
@@ -240,6 +241,57 @@ describe("the admin users screen", { tags: ["016-US1"] }, () => {
 
     expect((await within(region).findByRole("alert")).textContent).toContain(
       "connection refused"
+    );
+  });
+});
+
+describe("the site-admin role", { tags: ["016-US4"] }, () => {
+  it("grants the role to a user", async () => {
+    const { calls, region, onChanged } = setup([guest("g1", "Alice")]);
+
+    await userEvent.click(
+      within(region).getByRole("button", { name: "Make site admin" })
+    );
+
+    await waitFor(() => expect(onChanged).toHaveBeenCalled());
+    expect(calls[0]).toMatchObject({
+      method: "PUT",
+      path: "/api/v1/admin/guests/g1/site-admin",
+      body: { siteAdmin: true },
+    });
+  });
+
+  it("marks a site admin and revokes the role", async () => {
+    const { calls, region } = setup([
+      guest("g1", "Alice", { siteAdmin: true }),
+    ]);
+
+    expect(within(region).getByText("Site admin")).toBeTruthy();
+    await userEvent.click(
+      within(region).getByRole("button", { name: "Remove site admin" })
+    );
+
+    await waitFor(() =>
+      expect(calls[0]).toMatchObject({ body: { siteAdmin: false } })
+    );
+  });
+
+  it("says why the last site admin cannot be removed", async () => {
+    const { region } = setup([guest("g1", "Alice", { siteAdmin: true })], {
+      handler: () =>
+        problem(
+          409,
+          "siteAdmin.last",
+          "This is the last site admin — make someone else one first"
+        ),
+    });
+
+    await userEvent.click(
+      within(region).getByRole("button", { name: "Remove site admin" })
+    );
+
+    expect((await within(region).findByRole("alert")).textContent).toContain(
+      "last site admin"
     );
   });
 });
