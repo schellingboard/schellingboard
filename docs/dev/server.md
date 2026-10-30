@@ -73,7 +73,7 @@ spent or expired password or code, indistinguishable on purpose), `auth.tooManyA
 `auth.mailFailed`. A `limited` refusal carries `Retry-After`. The proxy refuses a cross-site
 `/api/v1/auth/*` request like the admin API's (403 `request.crossSite`). The per-address limit
 applies only with `SB_TRUSTED_PROXIES` set; its burst is `SB_AUTH_RATE_BURST` (default 30), and
-sign-out is not limited. The legacy actions in `user-auth.ts` call the same use cases.
+sign-out is not limited. The SPA's sign-in screens call these routes.
 
 Credentials (`people/application/credentials.ts`): `POST /auth/reset-link` emails a reset link
 (`auth.linkRecentlySent`), `POST /auth/reset` sets the password and protects the name without

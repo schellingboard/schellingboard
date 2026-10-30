@@ -62,10 +62,10 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
 - [x] 7. Sign-in screens, unrouted: `features/sign-in/` (`LoginScreen`, `ResetScreen`,
       `AccountSecurityScreen`), `commands/sign-in.ts`, `queries/account-security.ts`;
       `GET /me/credentials` added for the screen.
-- [ ] 8. **Takeover: sign-in screens.** Router owns `/auth/login`, `/auth/reset`,
-      `/account-security`; `UserMenu` and Settings link in-app; legacy pages, forms and
-      `user-auth.ts` deleted, their tests on the API. Adapt `user-auth.spec.ts`, `settings.spec.ts`.
-      Full `make test-e2e`.
+- [x] 8. Sign-in screens taken over: the router owns `/auth/login`, `/auth/reset`,
+      `/account-security` (`app/account-pages.tsx`); legacy pages, `(site)` layout, `user-auth.ts`
+      and its action tests deleted (rules covered in `api-auth.test.ts`); "Send due reminders" is
+      `POST /api/v1/dev/reminders` in the SPA's dev toolbar.
 - [ ] 9. **Site password screen.** `POST /api/v1/auth/site` and an SPA `/login` exempt from the
       gate; the `(login)` group and `app/actions/auth.ts` deleted. The gate stays in `proxy.ts`
       until step 17.
@@ -92,7 +92,7 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
       the user picker offers the verification step; admin event config sets it. Full
       `make test-e2e`.
 - [ ] 14. **Show map in the shell.** The SPA shell gets the "Show map" item from `GET /site`'s map
-      URL (open-questions item 9).
+      URL (open-questions item 9). Remove the `test.fixme` from the map test in `settings.spec.ts`.
 - [ ] 15. **Docs: step 6 done.** 10-path, 05 (scrypt, personal join links, the two settings), 02,
       web-app, server.md, open-questions. Doc only.
 

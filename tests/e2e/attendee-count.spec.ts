@@ -46,11 +46,8 @@ const dialog = (page: Page) =>
 // Land on Gamma's schedule as `who`, with the fake clock past the first day's
 // sessions so the server-side gate is open from first paint. Also used to
 // change identity mid-test: selectUser logs out and back in on its own.
-// "Send due reminders" is a legacy-page dev tool, so a test that needs it lands there.
-async function landAs(page: Page, who: string, day = 0, legacy = false) {
-  await page.goto(
-    `${legacy ? "/legacy/account-security" : "/Conference-Gamma"}?dev=1`
-  );
+async function landAs(page: Page, who: string, day = 0) {
+  await page.goto("/Conference-Gamma?dev=1");
   await selectUser(page, who);
   await setDevClock(page, lateOnGammaDay(day));
   await page.reload();
@@ -177,7 +174,7 @@ test("a host follows the link in the follow-up email and records the count @001-
 
   await login(page);
   // Day 2, 14:00–15:00 Berlin: by 17:00 the follow-up has long come due.
-  await landAs(page, "Carlos Silva", 1, true);
+  await landAs(page, "Carlos Silva", 1);
 
   // Reminders are off in E2E (REMINDER_DISPATCH_INTERVAL_MS=0, see
   // docs/dev/testing.md), so the dev toolbar's button stands in for the tick

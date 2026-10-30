@@ -46,6 +46,8 @@ export type Viewer = {
   guestId: string | null | undefined;
   choose: (guestId: string) => Promise<ChooseResult>;
   signOut: () => Promise<void>;
+  /** Asks the server again, for a change it made without this page: a password reset ends the session. */
+  refresh: () => Promise<void>;
 };
 
 const ViewerContext = createContext<Viewer | null>(null);
@@ -130,9 +132,22 @@ export function ViewerProvider({
     }
   }, [api, persistence]);
 
+  const refresh = useCallback(async () => {
+    try {
+      const { data } = await api.GET("/api/v1/me/identity");
+      if (!data) return;
+      if (guestId && data.guestId !== guestId) await persistence.clear();
+      decided.current = true;
+      remembered.write(data.guestId);
+      setGuestId(data.guestId);
+    } catch {
+      // Offline: the known viewer stands until the next load asks again.
+    }
+  }, [api, persistence, guestId]);
+
   const value = useMemo(
-    () => ({ guestId, choose, signOut }),
-    [guestId, choose, signOut]
+    () => ({ guestId, choose, signOut, refresh }),
+    [guestId, choose, signOut, refresh]
   );
   return (
     <ViewerContext.Provider value={value}>{children}</ViewerContext.Provider>

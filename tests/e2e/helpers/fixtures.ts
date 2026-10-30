@@ -36,7 +36,7 @@ const SERVER_PATH =
 
 // Legacy pages directly under the root: `/login` is never an event. Kept in
 // step with apps/web/src/app/legacy-pages.ts (tests/unit/spa-legacy-pages.test.ts).
-const LEGACY_ROOT_PAGES = ["account-security", "admin", "auth", "login"];
+const LEGACY_ROOT_PAGES = ["admin", "login"];
 
 // An event's own page, `/{slug}`, and its proposals screens, which the SPA serves.
 // Its 1-on-1 modal is still the legacy schedule's, which the SPA hands the address to.
@@ -52,7 +52,9 @@ const isRootPage = (url: string) => /^\/(?:[?#]|$)/.test(url);
 const isPeoplePage = (url: string) => /^\/guests(?:[/?#]|$)/.test(url);
 
 const isAccountPage = (url: string) =>
-  /^\/(?:settings|notifications)(?:[?#]|$)/.test(url);
+  /^\/(?:settings|notifications|account-security|auth\/(?:login|reset))(?:[?#]|$)/.test(
+    url
+  );
 
 const isAdminPage = (url: string) =>
   /^\/admin(?:[/?#]|$)/.test(url) && !/^\/admin\/login(?:[/?#]|$)/.test(url);

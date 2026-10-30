@@ -26,7 +26,12 @@ function setup({
   choose = vi.fn<Choose>().mockResolvedValue({ ok: true }),
   signOut = vi.fn().mockResolvedValue(undefined),
 } = {}) {
-  render(<UserMenu viewer={{ guestId, choose, signOut }} guests={guests} />);
+  render(
+    <UserMenu
+      viewer={{ guestId, choose, signOut, refresh: vi.fn() }}
+      guests={guests}
+    />
+  );
   return { choose, signOut, user: userEvent.setup() };
 }
 
@@ -68,7 +73,7 @@ describe("UserMenu", () => {
     await user.click(screen.getByRole("option", { name: /Grace/ }));
 
     expect(choose).toHaveBeenCalledWith("g2");
-    expect(hardNavigate).toHaveBeenCalledWith("/legacy/auth/login?guest=g2");
+    expect(hardNavigate).toHaveBeenCalledWith("/auth/login?guest=g2");
   });
 
   it("says so when the name cannot be chosen", async () => {
@@ -129,7 +134,12 @@ describe("UserMenu", () => {
   it("shows nothing while the viewer is unknown", () => {
     render(
       <UserMenu
-        viewer={{ guestId: undefined, choose: vi.fn(), signOut: vi.fn() }}
+        viewer={{
+          guestId: undefined,
+          choose: vi.fn(),
+          signOut: vi.fn(),
+          refresh: vi.fn(),
+        }}
         guests={guests}
       />
     );
@@ -139,7 +149,12 @@ describe("UserMenu", () => {
   it("offers no name to pick while the names are still loading", () => {
     render(
       <UserMenu
-        viewer={{ guestId: "g1", choose: vi.fn(), signOut: vi.fn() }}
+        viewer={{
+          guestId: "g1",
+          choose: vi.fn(),
+          signOut: vi.fn(),
+          refresh: vi.fn(),
+        }}
         guests={undefined}
       />
     );
