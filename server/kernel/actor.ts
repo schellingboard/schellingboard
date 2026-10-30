@@ -3,12 +3,10 @@ import {
   ADMIN_COOKIE_NAME,
   GUEST_COOKIE_NAME,
   isAdminCookieValid,
-  readGuestCookie,
 } from "@/utils/auth-cookies";
 
 export interface Actor {
   admin: boolean;
-  /** `sessionId` is absent for a legacy cookie, which has no row to revoke. */
   guest: { id: string; level: LoginAssurance; sessionId?: string } | null;
 }
 
@@ -28,14 +26,11 @@ export async function readGuestIdentity(
   lookup: SessionLookup
 ): Promise<GuestIdentity | null> {
   if (!value) return null;
-  if (!value.includes(".")) {
-    const session = await lookup(value);
-    return session
-      ? { id: session.guestId, level: session.level, sessionId: session.id }
-      : null;
-  }
-  const legacy = await readGuestCookie(value);
-  return legacy ? { id: legacy.guestId, level: legacy.level } : null;
+  if (value.includes(".")) return null;
+  const session = await lookup(value);
+  return session
+    ? { id: session.guestId, level: session.level, sessionId: session.id }
+    : null;
 }
 
 // What the cookies prove, nothing more: whether a protected guest may be acted

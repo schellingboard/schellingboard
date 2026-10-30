@@ -6,8 +6,6 @@ import type { LoginSessionsRepository } from "../interfaces";
 
 type DB = BetterSQLite3Database<typeof schema>;
 
-const TOUCH_AFTER_MS = 60 * 60 * 1000;
-
 function toSession(row: typeof schema.loginSessions.$inferSelect) {
   return {
     id: row.id,
@@ -47,15 +45,18 @@ export class SqliteLoginSessionsRepository implements LoginSessionsRepository {
 
   async findLive(id: string, now: Date): Promise<LoginSession | null> {
     const session = await this.get(id);
-    if (!session || session.expiresAt <= now) return null;
-    if (now.getTime() - session.lastSeenAt.getTime() < TOUCH_AFTER_MS)
-      return session;
+    return session && session.expiresAt > now ? session : null;
+  }
+
+  async refresh(id: string, now: Date, expiresAt: Date): Promise<void> {
     this.db
       .update(schema.loginSessions)
-      .set({ lastSeenAt: now.toISOString() })
+      .set({
+        lastSeenAt: now.toISOString(),
+        expiresAt: expiresAt.toISOString(),
+      })
       .where(eq(schema.loginSessions.id, id))
       .run();
-    return { ...session, lastSeenAt: now };
   }
 
   async delete(id: string): Promise<void> {

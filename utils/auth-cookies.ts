@@ -1,17 +1,15 @@
 // Cookie verification without Next, so the server kernel can resolve the actor
 // from it; utils/auth.ts adds the Next request and response helpers.
 
-import type { LoginAssurance } from "@schellingboard/domain/auth";
-
 export const ADMIN_COOKIE_NAME = "admin-auth";
 // The guest cookie holds an opaque login-session token (see login_sessions in
-// db/schema.ts). Values with a dot are the cookies this server issued before
-// that, kept readable until they expire: `open.<guestId>` (a mere name
-// selection, unsigned) and a signed `verified.<guestId>.<issuedAt>.<sig>`.
+// db/schema.ts); the row decides how long it lives.
 export const GUEST_COOKIE_NAME = "guest";
 
 export const ADMIN_SCOPE = "admin";
 export const COOKIE_MAX_AGE_SEC = 7 * 24 * 60 * 60;
+// The longest a browser keeps a cookie; the session row expires first.
+const GUEST_COOKIE_MAX_AGE_SEC = 400 * 24 * 60 * 60;
 const COOKIE_MAX_AGE_MS = COOKIE_MAX_AGE_SEC * 1000;
 
 export function isPasswordProtectionEnabled(): boolean {
@@ -131,58 +129,6 @@ export async function isAdminCookieValid(
   return isSignedCookieValid(value, ADMIN_SCOPE);
 }
 
-// Guest ids are nanoids (no dots), so the dot-delimited value stays parseable.
-// A "verified" value is `verified.<guestId>.<issuedAt>.<sig>`, signed via the
-// scoped signCookieValue so it can't be forged; an "open" value is just
-// `open.<guestId>` and isn't. Folding the guest id into the signed scope means
-// a proof issued for one guest can never validate for another.
-export function verifiedScope(guestId: string): string {
-  return `verified.${guestId}`;
-}
-
-/**
- * Parses and validates a legacy guest cookie into its guest id and assurance,
- * or null if absent/malformed. A "verified" value must carry a valid,
- * unexpired signature; an "open" one is accepted as-is and reads as "claimed".
- */
-export async function readGuestCookie(
-  value: string | undefined
-): Promise<{ guestId: string; level: LoginAssurance } | null> {
-  if (!value) return null;
-  const firstDot = value.indexOf(".");
-  if (firstDot < 0) return null;
-  const level = value.slice(0, firstDot);
-
-  if (level === "open") {
-    const guestId = value.slice(firstDot + 1);
-    if (!guestId || guestId.includes(".")) return null;
-    return { guestId, level: "claimed" };
-  }
-
-  if (level === "verified") {
-    // `verified.<guestId>.<issuedAt>.<sig>`: exactly four parts, so the guest
-    // id can't smuggle an extra dot. Signature and expiry are delegated to the
-    // shared scoped verifier.
-    const parts = value.split(".");
-    if (parts.length !== 4) return null;
-    const guestId = parts[1];
-    if (!guestId) return null;
-    try {
-      return (await isSignedCookieValid(value, verifiedScope(guestId)))
-        ? { guestId, level: "verified" }
-        : null;
-    } catch {
-      // No AUTH_SECRET configured (or another crypto error): this can't be a
-      // genuine proof, so treat it as an invalid cookie rather than throwing.
-      // A passwordless site with no protected guests has no secret and must
-      // still survive a client that sends a forged `verified` value.
-      return null;
-    }
-  }
-
-  return null;
-}
-
 export function cookieOptions(maxAge: number) {
   return {
     maxAge,
@@ -197,7 +143,7 @@ export function createGuestCookie(sessionToken: string) {
   return {
     name: GUEST_COOKIE_NAME,
     value: sessionToken,
-    ...cookieOptions(COOKIE_MAX_AGE_SEC),
+    ...cookieOptions(GUEST_COOKIE_MAX_AGE_SEC),
   };
 }
 
