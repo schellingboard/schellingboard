@@ -1,7 +1,7 @@
 # ADR 0016: The remaining screen families
 
 - **Status:** Accepted
-- **Date:** 2026-10-25
+- **Date:** 2026-10-25, amended 2026-10-28 (point 4, see [ADR 0017](0017-identity-and-roles.md))
 
 ## Context
 

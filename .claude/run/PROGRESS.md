@@ -39,6 +39,8 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
 
 - `/legacy` itself has no page now; the error boundary and "Back to the events" link to `/`.
 
+- ADR 0017 is `Proposed`: set it to `Accepted` when the user answers Q7 and Q8 (before step 8).
+
 ## Questions
 
 5. The SPA shell has no "Show map" button (open-questions item 9). `GET /site` (step 1) carries the
