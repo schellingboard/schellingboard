@@ -191,7 +191,9 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`, `docs/dev/target-architec
         `PushNotifications`; `queries/settings.ts`; `commands/settings.ts`; new
         `GET /meeting-availability` answers the per-event forms; `push-key` moved to
         `packages/domain`). Account security (passwords) is not in it: see PROGRESS Questions 4.
-  - [ ] 17b. Notifications: list, mark read, delete; the nav's unread indicator.
+  - [x] 17b. Notifications (done: `features/notifications/` `NotificationsScreen`,
+        `queries/notifications.ts`, `commands/notifications.ts`; `app/unread-count.tsx` shares the
+        bell's count with the list).
 - [ ] 18. **Takeover: settings and notifications**. Router owns `/settings` and `/notifications`;
       legacy pages deleted. E2E: `user-settings`, `notifications`, `pwa`. CHANGELOG if anything
       visible changed.

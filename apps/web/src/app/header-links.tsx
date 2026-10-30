@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import type { ApiClient } from "@schellingboard/api-client";
 import { BellIcon, UserGroupIcon } from "../ui/icons";
+import { useUnread } from "./unread-count";
 
 const link =
   "flex items-center gap-1 rounded-md px-2 py-2 text-sm font-medium text-fg-subtle hover:bg-surface-muted sm:px-3";
@@ -13,7 +14,7 @@ export function HeaderLinks({
   api: ApiClient;
   signedIn: boolean;
 }) {
-  const [unread, setUnread] = useState<number>();
+  const [unread, setUnread] = useUnread();
   useEffect(() => {
     if (!signedIn) return;
     let stale = false;
@@ -26,7 +27,7 @@ export function HeaderLinks({
     return () => {
       stale = true;
     };
-  }, [api, signedIn]);
+  }, [api, signedIn, setUnread]);
 
   return (
     <>

@@ -83,6 +83,17 @@ notice "changing your settings" and the exported `Appearance` section, as legacy
 screen, as `EditProfile` in `people-pages.tsx` does). The `/settings` takeover must also keep the
 legacy settings E2E "select who you are" text. `Appearance` omits the legacy `labelled` look.
 
+Step 17b, for step 18 (wiring):
+`NotificationsScreen({query: createNotificationsQuery({calls: notificationCalls(api)}), now, onOpen, onUnreadChange})`;
+call `query.load()` once. `onUnreadChange` = the setter from `useUnread()[1]` (stable; the bell,
+`HeaderLinks`, reads the same store from `UnreadProvider`, now in `ShellProviders`). `onOpen(url)`:
+the notification is already marked read; the url is site-relative and may be an SPA address
+(`/slug?viewSession=`, `/slug/meetings?…`, `/guests/…`): navigate with `history.push` when the SPA
+owns it, else a hard navigation (legacy `opensInSpa`). The unselected/protected viewer gets the
+`actingGuestRefusalMessage(…, "seeing your notifications")` notice instead (the query's error code).
+`HeaderLinks` still links `/legacy/notifications`: step 18 changes it to `/notifications`. Paging:
+the legacy Newer/Older links became one "Older →" button that appends (the API is cursor-paged).
+
 ## Questions
 
 4. The legacy settings page ends with `AccountSecurity` (enable/disable protection, change password,

@@ -173,3 +173,5 @@ export const PhoneIcon = solid(
   ],
   20
 );
+
+export const CheckIcon = outline(["m4.5 12.75 6 6 9-13.5"]);
