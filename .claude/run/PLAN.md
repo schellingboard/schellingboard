@@ -1,210 +1,140 @@
-# Run plan: the remaining screen families move to the SPA (path step 5)
+# Run plan: identity and roles, then retire Next (path steps 6 and 7)
 
-Goal: proposals and voting, people and meetings, the session forms, settings and notifications, and
-admin move from Next to `apps/web`, as [ADR 0015](../../docs/dev/adr/0015-spa-alongside-next.md) did
-for the schedule. At the end, only the sign-in screens are Next pages. Every step leaves the app
-shippable.
+Goal: the root event list and the sign-in screens move to the SPA; sign-in becomes server-side login
+sessions with assurance, join links and a site-admin role instead of the admin password (path step
+6). Then Hono serves everything in its own Node process and `next` leaves the repository (path step
+7). Every step leaves the app shippable.
 
-Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`, `docs/dev/target-architecture/04-client.md`,
-`docs/dev/server.md`, `docs/dev/testing.md`.
-
-## Settled before the run (the user, 2026-10-24)
-
-- ADR 0015 stays as written. Do not reopen its decisions.
-- **Proposals and votes are in the replica**: public proposal fields and hosts in the snapshot and
-  the feed; the viewer's own votes in `me.votes`, visible only to the voter. The vote breakdown
-  stays an on-demand query (02-domain).
-- **Failed commands tell the user what failed**, so that they can recover: the notice names the
-  subject (a session by title, day, time and room; a proposal by title; a 1-on-1 by the other person
-  and slot). It tells "refused" (a `4xx`, with the reason) apart from "might not have been saved"
-  (retries given up). It stays visible after the control that started it unmounts. First RSVPs and
-  comments, then every new command.
-- **The session forms move in this run**, after meetings; then the Next schedule goes.
-- **The sign-in screens stay legacy** (guest password login, reset, `/login`, admin login) until
-  path step 6 replaces them. No API for passwords.
-- No pushes, no PRs. Commits stay local, stacked.
+Read first: `docs/dev/target-architecture/10-path-from-here.md`, `05-security.md` (identity,
+assurance, transport), `02-domain.md` (Person, Participation), `08-decisions.md` D1, D2, D11; ADR
+0014, 0015, 0016; `docs/dev/web-app.md`, `docs/dev/server.md`, `docs/dev/testing.md`,
+`docs/dev/target-architecture/open-questions.md`.
 
 ## Settled by the planner (the user may override)
 
-- **Admin uses `queries/` and awaited mutations**, not the replica: admin data spans events and is
-  not in any snapshot. A mutation waits for the response, maps problem details onto fields, shows
-  `409` as "changed by someone else", then refetches.
-- **Forms** (proposal, profile, session, settings, admin) use the same awaited mutation helper and
-  the zod contracts per field (ADR 0003, #639). Votes, RSVPs, comments, likes and 1-on-1 answers are
-  optimistic commands.
-- **Addresses do not change**: the SPA keeps the legacy paths and query params (`viewProposal`,
-  `viewMeeting`, `bookMeeting`, …), so emails, push, QR codes and bookmarks keep working.
+- **No rename.** `guests` stays the person table and `event_guests` the participation; the code
+  keeps the word "guest". The glossary's terms are used in docs only.
+- **Login sessions are rows**:
+  `login_sessions(id hash, guest, assurance, created, expires, lastSeen, device)`. The `guest`
+  cookie holds only the opaque id. Picking a name creates a `claimed` row; a code, password or join
+  link a `verified` one. Old `open.`/`verified.` cookies are honoured until they expire (7 days at
+  most); their reader goes in step 16.
+- **Credentials**: password (scrypt stays: `node:crypto`, no native module; amend 05, which says
+  argon2id), emailed login code, reset link, join link. Passkeys and API tokens wait for a later
+  plan.
+- **Sign-in API** under `/api/v1/auth/` (code, password, reset, sign-out) and
+  `/api/v1/me/credentials`, `/api/v1/me/login-sessions`; strict rate limits; Origin checks as the
+  admin API has them. ADR 0016 point 4 ("no API for passwords") ends with step 6.
+- **Roles**: `siteAdmin` on the guest. The `organizer` participation role waits for a later plan:
+  what an organizer may do per event is a product question of its own.
+- **Join links**: per guest per event, single-use, expiring (05). The organizer gets them as a CSV
+  from the admin guests screen. QR sheet and bulk email wait.
+- **Identity mode**: a column on events. Existing events migrate to `open` (behaviour unchanged);
+  new events default to `verified` (product decision, 08).
+- **Retiring Next goes through Hono first**: the proxy, media and SPA serving move into the Hono app
+  while Next still runs it from one catch-all route; then a Node entry replaces Next. `/api/health`
+  stays as an alias of `/api/v1/health` (monitors and the Docker healthcheck call it).
+
+## Open (see PROGRESS.md Questions)
+
+Steps 8 to 10 need Q7 (admin bootstrap) and Q8 (site password). Steps 1 to 7 and 11 to 15 do not.
 
 ## How to work (every step)
 
-- **The legacy screen and its E2E specs are the specification.** Before a screen step, read the
-  legacy components and the specs that cover them. Same behavior, copy and accessible names, unless
-  this plan says otherwise. No redesign, no new features.
-- **Build unrouted, then take over**, as steps 13 to 16 of the last run did: screens are built and
-  tested through a test router (Vitest) while the catch-all still forwards to legacy. The takeover
-  step routes them, points legacy links at them, deletes the Next pages, components and server
-  actions (convert their tests to use cases or the API), and adapts the E2E specs only where URLs or
-  markup really changed.
-- **One copy of everything**: a piece two families need goes to `ui/` or a shared feature folder
-  (comments serve sessions, proposals and profiles). A rule the server also runs goes to
-  `packages/domain`, never a third copy.
-- **Data**: features read the replica through selectors and call commands; `queries/` for paged,
-  restricted or admin reads. Features never import `api-client` (the arch rule enforces it).
+- **The legacy screen and its E2E specs are the specification** for a screen move: same behaviour,
+  copy and accessible names. No redesign.
+- **Build unrouted, then take over** (as the last run did) where a step says so.
+- **TDD**: tag the test with its use case in `tests/use-cases.ts` (add it if missing), see it fail,
+  then implement. Screens get Vitest tests by role and name; takeovers adapt E2E specs only where
+  URLs or markup changed. Doc and pure-move steps need no new test.
+- **The server first, through use cases**: a new use case gets integration tests against the API
+  (`tests/integration/api-*.test.ts`); legacy server actions that remain delegate to it until their
+  screen moves.
+- **One copy of everything**: rules the client predicts go to `packages/domain`; shapes to
+  `packages/contracts`.
 - Times in the event's zone. Every screen works at phone width.
-- **Checks per step**: `make format lint arch openapi-check typecheck test`. Then, once the
-  reviewer's findings are dealt with, the step's E2E specs (or full `make test-e2e` where the step
-  says so). Doc-only steps skip E2E. Never `make test-e2e-docker` (user decision: only before a
-  release). Check mailpit first.
+- Update `CHANGELOG.md`, `docs/public/` (attendee guide, self-hosting) and `docs/dev/` in the step
+  that changes them.
+- **Checks per step**: `make format lint arch openapi-check typecheck test`; then the step's E2E
+  specs (full `make test-e2e` where the step says). Doc-only steps skip E2E. Never
+  `make test-e2e-docker` (the user runs it before a release; step 18 says so in its commit).
 - A step whose diff grows past ~1500 lines outside tests is split in PLAN.md first.
 
 ## Steps
 
-### Baseline
+### The root event list
 
-- [x] 1. Full `make test-e2e` baseline: 213 passed; the one failure was the known
-      `settings.spec.ts:67` load flake (passes alone).
-- [x] 2. ADR 0016 written (remaining screen families, ADR 0014 amendment).
+- [ ] 1. **The root event list is an SPA page.** New open `GET /api/v1/site` (title, description,
+      map URL: Q5 can use it later). `features/events/` lists events (dates, website, markdown
+      description, link) or sends to the only event, "No events found." otherwise; the router owns
+      `/`; `page.tsx` and `summary-page.tsx` deleted; post-login landings go to `/`. Unit test the
+      screen; adapt the spec that covers `/`.
 
-### Foundations
+### Identity (path step 6)
 
-- [x] 3. `apps/web/src/schedule/` moved to `features/schedule/`; the arch rule found nothing to fix.
-- [x] 4. Failure notices: `ui/notices.tsx`, `Command.describe`, runner `onFailure`,
-      `failureMessage`; RSVP, comments and attendee count use them; the RSVP `AlertDialog` is gone.
-- [x] 5. Forms: `awaitMutation`, `useFormMutation`, `validateFields` in `commands/`; `ui/form.tsx`
-      fields.
+- [ ] 2. **ADR 0017: identity and roles.** Records the decisions above, the API shapes, the cookie
+      migration and Q7/Q8 as proposed. Amends ADR 0016 point 4. Doc only.
+- [ ] 3. **Login sessions.** Migration, repository, `resolveActor` reads the row (assurance =
+      level), `PUT`/`DELETE /me/identity` create and delete rows, legacy logins write rows too, old
+      cookies still read. Expired rows pruned by the jobs loop. Integration tests first: a revoked
+      row acts as nobody; a claimed row cannot act as a protected guest.
+- [ ] 4. **Sign-in API**: request a login code, log in with code or password, sign out; use cases in
+      `server/modules/people` (or a new `identity` module if the arch rules prefer it), moved out of
+      `app/actions/user-auth.ts`, which delegates. Rate limits; problem codes for wrong code,
+      expired, too many attempts.
+- [ ] 5. **Credentials API**: request a reset link, set a password with it, change it, protect and
+      unprotect a name, list and revoke own login sessions (`/me/login-sessions`). The rest of
+      `user-auth.ts` delegates.
+- [ ] 6. **Sign-in screens, unrouted**: guest login (code, password, forgot), reset, account
+      security (protection, password, login sessions with "sign out"). `features/sign-in/`, forms
+      through `useFormMutation`.
+- [ ] 7. **Takeover: sign-in screens.** Router owns `/auth/login`, `/auth/reset`,
+      `/account-security`; `UserMenu` and Settings link in-app; legacy pages, forms and
+      `user-auth.ts` deleted, their tests on the API. Adapt `user-auth.spec.ts`, `settings.spec.ts`.
+      Full `make test-e2e`.
+- [ ] 8. **Site password screen** (needs Q8). If kept: `POST /api/v1/auth/site` and an SPA `/login`
+      exempt from the gate; the `(login)` group and `app/actions/auth.ts` deleted. The gate stays in
+      `proxy.ts` until step 15.
+- [ ] 9. **Site admin role and bootstrap link** (needs Q7). `guests.site_admin`; the actor is admin
+      only through a verified session of a site admin; a single-use bootstrap token (hashed, 24 h)
+      logged at start while no site admin exists, and a script that prints a new one; the bootstrap
+      page signs the visitor in as a chosen or new guest, asks for a password, grants the role.
+      Admin users screen grants and revokes it (never the last one).
+- [ ] 10. **Admin sign-in in the SPA** (needs Q7). `AdminFrame` sends a guest without the role to
+      the sign-in; a later 401/403 does the same (Q6, if the user agrees). `/legacy/admin/login`,
+      the admin cookie, `ADMIN_PASSWORD` and `/api/auth/login` go; self-hosting docs and `api.md`
+      rewritten. Full `make test-e2e`.
+- [ ] 11. **Join links.** `join_tokens` table; `POST /api/v1/auth/join` (verified session, joins the
+      event); SPA `/join/{token}` exchanges it, replaces the history entry and opens the event;
+      admin guests screen issues links and exports them as CSV. Attendee and organizer docs.
+- [ ] 12. **Identity mode.** `events.identity_mode`; `assuranceRequired` in `packages/domain` (mode,
+      raised by protection); every acting use case checks it; the SPA predicts it and the user
+      picker offers the verification step; admin event config sets it. Full `make test-e2e`.
+- [ ] 13. **Docs: step 6 done.** 10-path, 05, 02, web-app, server.md, open-questions. Doc only.
 
-### Proposals and voting
+### Retire Next (path step 7)
 
-- [x] 6. Proposals and votes in the snapshot and feed: `proposal.created/changed/deleted` (event
-      audience, no vote counts in the payload, host renames and joins record too), `me.votes`,
-      `vote.cast`/`vote.withdrawn` (voter only; also recorded when a vote is lost by joining as
-      host, by an edit adding the voter as host, or with the proposal). `apply` handles all, legacy
-      and SPA copies.
-- [x] 7. Replica and commands: `proposalsFrom`/`ownVotesFrom` selectors; the vote rule is
-      `domain/vote-rule.ts` (phase, own proposal, membership), the server calls it and now refuses a
-      host voting on their own proposal (`vote.ownProposal`); `castVote`/`withdrawVote` commands
-      name the proposal in notices.
-- [ ] 8. **Proposal screens**, unrouted:
-  - [ ] 8a. The proposals list, split (the legacy table, cards, voting buttons, tally and action bar
-        are ~1300 lines):
-    - [x] 8a-1 (done: `features/proposals/list-model.ts`, `queries/proposal-standings.ts`,
-          `voteStanding` on the API's proposal view; search uses `ui/plain-text`). The list model:
-          filters (mine, voted, unvoted, host wanted), search (Fuse, same keys and threshold), sort,
-          phase texts (`dateStartDescription`), the vote-tally query for the scheduling phase. Pure,
-          unit tested. Blocked on PROGRESS.md Questions 1 and 2.
-    - [x] 8a-2 (done: `features/proposals/proposals-screen.tsx`, `use-standings.ts`, links to legacy
-          addresses; rendered directly in Vitest, no router since links are plain anchors; wiring to
-          the replica/runner/query happens in step 9). The screen: action bar, table and mobile
-          cards, voting buttons, empty state, through the test router.
-  - [x] 8b. The proposal modal (done: `features/proposals/proposal-modal.tsx` with
-        `ProposalActions`, `vote-breakdown.tsx`, `queries/proposal-detail.ts`,
-        `commands/join-proposal.ts`; the session comments moved to `features/comments/` as the
-        shared `Comments`).
-  - [x] 8c. Quick voting (done: `features/proposals/quick-voting-screen.tsx`, `proposal-body.tsx`
-        shared with the modal, `Comments` gained `readOnly`; `links.proposals`).
-  - [x] 8d. New and edit proposal forms, delete (done: `features/proposals/proposal-form.tsx` with
-        `commands/proposal-form.ts` calls, `ui/` `FormErrorSummary`, `PeopleField`, `MarkdownField`;
-        the toolbar logic moved to `packages/domain/markdown-edit.ts`).
-- [x] 9a. **Takeover: proposals** (done: router owns `/{slug}/proposals/**`; `EventPage`,
-      `ProposalsPage`/`QuickVotingPage`/`ProposalFormPage`, `SpaLinks` + `proposal-nav.ts`; legacy
-      proposal pages and components deleted, `actions.ts` kept; likes preview and avatars ported to
-      `Comments`).
-- [x] 9b. Proposal legacy cleanup (done: `proposals/actions.ts` deleted; its tests now call /api/v1
-      through `tests/helpers/proposal-api.ts`; the proposal idempotency tests live in
-      `api-proposals.test.ts`; `VotesProvider`, `VotesContext` and `votes.ts` deleted,
-      `vote-display` tests moved to `tests/unit`).
-- [x] 9c. Legacy vote and proposal-comment leftovers deleted (`/api/votes`, `/api/add-vote`,
-      `/api/delete-vote`, `votesApiUrl`, `createProposalComment`, `/api/proposal/*/comments`); their
-      tests use /api/v1 (`voting.test.ts`, `api-rsvps-votes.test.ts`,
-      `proposalApi().createProposalComment`).
-
-### People and meetings
-
-- [ ] 10. **People screens**, unrouted:
-  - [x] 10a. The directory (done: `GET /attendees` site-wide, open like `GET /guests/{id}`;
-        `queries/directory.ts`; `features/people/` model, `DirectoryScreen`, `PeopleLinks`;
-        `ui/avatar.tsx`; attendee search, filters, profile helpers, relative time and
-        accent-insensitive search moved to `packages/domain`).
-  - [x] 10b. The profile (done: `features/people/profile-modal.tsx`, `profile-body.tsx`,
-        `profile-photo.tsx`; `queries/profile-activity.ts` over new `GET /guests/{id}/activity` and
-        `GET /guests/{id}/meeting-options`; `swipe.ts` moved to `packages/domain`). Hosting,
-        proposals and meeting options come from the API, not the replica: the directory is
-        site-wide, so there is no event replica on `/guests`, and they span every event.
-  - [x] 10c. Profile comments (done: `ProfileModal` takes `comments(guestId, name)` and `setHash`,
-        renders the shared `Comments` for the profile being read; `CommentSubject.name` names the
-        profile in notices; `ProfileLinks.guest`).
-  - [x] 10d. Edit my profile and photo (done: `features/people/profile-form.tsx`,
-        `commands/profile-form.ts`, `ui/combobox.tsx`; the photo goes through
-        `PUT`/`DELETE /me/avatar` before the profile).
-  - [x] 10e. The 1-on-1 request form (done: `features/people/meeting-request-dialog.tsx`,
-        `features/meetings/meeting-request-fields.tsx` shared with 12b,
-        `commands/meeting-request.ts`; `ProfileModal` owns the dialog; `meeting-clash-text` moved to
-        `packages/domain`). Legacy `meeting-picker.tsx` and its action are deleted at step 11.
-- [x] 11. Takeover: people (done: router owns `/guests/**` through `app/people-pages.tsx`; legacy
-      guest pages, `profile-activity.ts` and `actions/profile.ts` deleted; `GET /events` carries
-      `now`, attendees carry `authProtected`).
-- [ ] 12. **Meeting screens**, unrouted:
-  - [x] 12a. My availability (done: `features/meetings/availability-form.tsx`,
-        `commands/meeting-availability.ts`; `slotDaysFor` moved to `packages/domain`). It is the
-        legacy Settings form; `availabilityFormFor(event, days, declared, now)` (domain) builds its
-        data per event, dropping past events and narrowing `declared` to offered slots. Wired by the
-        settings step.
-  - [x] 12b. Booking (done: `queries/meeting-candidates.ts` over `GET /meeting-candidates`,
-        `features/meetings/book-meeting.tsx`; the request command is 10e's `meetingRequestCalls`,
-        the fields its shared `MeetingRequestFields`). Step 13 wires it: `profileHref` =
-        `/guests/<id>`, `onBooked` refreshes the meetings column.
-  - [x] 12c. The meeting modal (done: `features/meetings/meeting-modal.tsx`,
-        `commands/meeting-answer.ts` with `answerMeeting`/`cancelMeeting`, optimistic and named in
-        notices; the column's links already carry `viewMeeting`). Step 13 wires it.
-  - [x] 12d. Clashes (done: `queries/meeting-clashes.ts` over `GET /meetings`, debounced refetch
-        after a session, RSVP or meeting change; `app/use-meeting-clashes.ts`; `withClashes` merges
-        into the column's and the modal's views).
-- [x] 13. Takeover: meetings (done: the SPA schedule opens `?viewMeeting=`/`?bookMeeting=`
-      (`features/schedule/meeting-modals.tsx`) and `/{slug}/meetings` is the notification landing
-      (`app/meetings-page.tsx`); `forwards-to-legacy.ts`, the Next `meetings/page.tsx` and its test
-      are gone. The legacy schedule's own meeting components (`meeting-modal`, `meetings-col`,
-      `book-meeting`, `use-meetings`) stay until the Next schedule goes, step 16, with the legacy
-      `readOnly` prop of `MeetingModalFromUrl`. Decisions: no CHANGELOG bullet, 1-on-1s added to the
-      app-pages bullet; the booking's `onBooked` stays a no-op, the feed delivers the request and
-      replays what a reconnect missed.)
-
-### Session forms and the end of the Next schedule
-
-- [x] 14. Session form (done: `features/sessions/` `SessionForm`, `session-model.ts`,
-      `use-host-clashes.ts`; `commands/session-form.ts`; new `GET /host-clashes`; `Notice` gained
-      `autoDismissMs`; `ui/back-link.tsx`).
-- [x] 15. Takeover: session forms (done: router owns `/{slug}/add-session` and
-      `/{slug}/edit-session` through `app/sessions-pages.tsx`; `scheduleLinks`/`proposalLinks` point
-      at them; legacy form, page wrappers, `session-actions.ts`, `clash-actions.ts` and their
-      orphans deleted; `guest-clashes.test.ts` calls `GET /host-clashes`; E2E helpers use
-      `selectOption`).
-- [x] 16. Retire the Next schedule (done: `[eventSlug]` directory, `replica/` and
-      `comment-actions.ts` deleted; the comment tests call `/api/v1` through
-      `tests/helpers/comment-api.ts`; `apply` moved to `packages/contracts/feed-apply.ts` and
-      `RECONNECT_GRACE_MS` to `contracts/feed`; `newEmptySession`/`sessionsOverlap` to
-      `packages/domain`; legacy utils, `EventContext` and their unit tests deleted).
-
-### Settings and notifications
-
-- [x] 17-18. **Settings and notifications** (done: `features/settings/`, `features/notifications/`,
-      `app/account-pages.tsx`; the router owns `/settings` and `/notifications`; legacy pages and
-      their actions deleted. Account security stays a small legacy page, `/legacy/account-security`,
-      linked from Settings; the E2E dev toolbar's "Send due reminders" now lands there).
-
-### Admin
-
-- [x] 19-21. Admin: `AdminFrame` gate, screens in `features/admin/`, and the takeover (`/admin/**`
-      is the SPA's in `app/admin-pages.tsx`; legacy admin pages and actions deleted, only
-      `/legacy/admin/login` stays; the gate reloads when settings are saved).
-
-### Close
-
-- [x] 22. Docs: web-app, 04-client, 07, 10, open-questions, ADR 0015, server.md; dead page reads
-      removed.
-- [ ] 23. **Finish**: summary in PROGRESS.md, then delete `.claude/run/`.
+- [ ] 14. **Legacy API routes go**: `/api/toggle-rsvp`, `add-`/`update-`/`delete-session`,
+      `/api/rsvps`, `/api/meetings` (+ candidates), the comment routes, `/api/admin/create-*`; their
+      tests move to `/api/v1` or go. Also the leftovers in PROGRESS.md ("Left alone").
+- [ ] 15. **Hono serves everything.** The proxy's gates and header stripping become Hono middleware;
+      Hono serves `/media`, `/locations`, the shell, `/_spa/`, `sw.js`, icons, manifest, and
+      `/api/health`. Next keeps one catch-all route handler that calls Hono; `proxy.ts` and the
+      other route handlers deleted. Port `tests/integration/proxy.test.ts` to the Hono app.
+- [ ] 16. **Hono's own process.** `server/main.ts` on `@hono/node-server` starts the mailer and jobs
+      loop (`instrumentation.ts` goes); a Node bundle (`bun build --target=node`, native modules
+      external); `make dev` (Vite proxies to it), `make start`, the E2E web server and the
+      Dockerfile run it. The old cookie reader goes. Full `make test-e2e`.
+- [ ] 17. **`next` leaves.** Dependencies, config, `app/`, `next-env.d.ts`, eslint and arch rules,
+      the SPA's legacy forward (catch-all → not found), `legacy-pages.ts`, the E2E fixture's
+      `/legacy` mapping, AGENTS.md's Next notice. Full `make test-e2e`.
+- [ ] 18. **Docs: step 7 done.** ADR 0015 note, web-app, server.md, 07, 10-path, self-hosting,
+      testing. The commit message asks the user to run `make test-e2e-docker`.
+- [ ] 19. **Finish**: summary in PROGRESS.md, then delete `.claude/run/`.
 
 ## Next to plan
 
-- Path step 6: identity and roles, the sign-in screens with it. The root event list (`/`,
-  `app/legacy/(site)/page.tsx`) is the one other Next page: move it to the SPA first.
-- Path step 7: retire Next.
+- The `organizer` participation role and per-event admin rights.
+- Passkeys, API tokens, QR sheet and bulk email of join links.
+- Participation-gated reads and the `publicSchedule` setting (05), and then whether the site
+  password can go (D2).
