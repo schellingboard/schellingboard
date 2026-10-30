@@ -171,8 +171,9 @@ export const resetPassword = (deps: PeopleDeps) => {
         "auth.credentialWrong",
         "This link is invalid or has expired"
       );
+    // A site admin without a password is protected by the role, not by one.
     const wasProtected =
-      (await repos.guests.getAuthCredentials(guestId))?.authProtected ?? false;
+      (await repos.guests.getAuthCredentials(guestId))?.passwordHash != null;
     const passwordHash = await hashUserPassword(newPassword);
     await uow.run(async (tx) => {
       await tx.guests.setAuthProtection(guestId, {
@@ -264,6 +265,13 @@ export const unprotect = (deps: PeopleDeps) => {
       device,
     }: { currentPassword: string; device?: string | null }
   ): Promise<Result<SignedIn>> => {
+    const acting = await actingOrRefuse(actor, deps);
+    if (!acting.ok) return acting;
+    if (await deps.repos.guests.getSiteAdmin(acting.value))
+      return forbidden(
+        "siteAdmin.protected",
+        "A site admin's name stays protected"
+      );
     const confirmed = await confirmedPassword(actor, deps, currentPassword);
     if (!confirmed.ok) return confirmed;
     const guestId = confirmed.value;
@@ -314,7 +322,7 @@ export const getCredentials =
     if (!acting.ok) return acting;
     const creds = await deps.repos.guests.getAuthCredentials(acting.value);
     return ok({
-      authProtected: creds?.authProtected ?? false,
+      authProtected: creds?.passwordHash != null,
       username: await deps.repos.guests.getUsername(acting.value),
     });
   };

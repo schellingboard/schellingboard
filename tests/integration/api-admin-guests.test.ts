@@ -104,6 +104,7 @@ describe("/api/v1/admin guests and settings", () => {
         name: "Ada",
         email: "ada@x.org",
         authProtected: false,
+        siteAdmin: false,
         eventIds: [],
         version: 1,
       });

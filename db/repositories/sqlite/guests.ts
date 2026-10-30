@@ -72,6 +72,12 @@ function publicProfileChanged(
   );
 }
 
+// The role protects the name, whatever the guest chose.
+const isProtected =
+  sql<boolean>`(${schema.guests.authProtected} OR ${schema.guests.siteAdmin})`.mapWith(
+    Boolean
+  );
+
 function rowToGuest(row: typeof schema.guests.$inferSelect): CompleteGuest {
   return {
     id: row.id,
@@ -86,7 +92,7 @@ function rowToGuest(row: typeof schema.guests.$inferSelect): CompleteGuest {
     profileUpdatedAt: row.profileUpdatedAt
       ? new Date(row.profileUpdatedAt)
       : null,
-    authProtected: row.authProtected,
+    authProtected: row.authProtected || row.siteAdmin,
     version: row.version,
     profileVersion: row.profileVersion,
     info: {
@@ -114,7 +120,7 @@ const LEAN_FIELDS = {
   name: schema.guests.name,
   avatarUrl: schema.guests.avatarUrl,
   aboutMe: schema.guests.aboutMe,
-  authProtected: schema.guests.authProtected,
+  authProtected: isProtected,
   version: schema.guests.version,
   profileVersion: schema.guests.profileVersion,
 };
@@ -165,7 +171,7 @@ export class SqliteGuestsRepository implements GuestsRepository {
         name: schema.guests.name,
         avatarUrl: schema.guests.avatarUrl,
         aboutMe: schema.guests.aboutMe,
-        authProtected: schema.guests.authProtected,
+        authProtected: isProtected,
       })
       .from(schema.guests)
       .innerJoin(
@@ -243,7 +249,7 @@ export class SqliteGuestsRepository implements GuestsRepository {
         languages: g.languages,
         contacts: g.contacts,
         profileUpdatedAt: g.profileUpdatedAt,
-        authProtected: g.authProtected,
+        authProtected: isProtected,
         version: g.version,
         profileVersion: g.profileVersion,
       })
@@ -343,7 +349,7 @@ export class SqliteGuestsRepository implements GuestsRepository {
           languages: schema.guests.languages,
           contacts: schema.guests.contacts,
           profileUpdatedAt: schema.guests.profileUpdatedAt,
-          authProtected: schema.guests.authProtected,
+          authProtected: isProtected,
           profileVersion: schema.guests.profileVersion,
           // SQLite has no boolean type; this yields 0/1 at runtime despite the
           // sql<boolean> annotation, so coerce explicitly below.
@@ -501,6 +507,36 @@ export class SqliteGuestsRepository implements GuestsRepository {
     return row?.id ?? null;
   }
 
+  async getSiteAdmin(id: string): Promise<boolean> {
+    const row = this.db
+      .select({ siteAdmin: schema.guests.siteAdmin })
+      .from(schema.guests)
+      .where(eq(schema.guests.id, id))
+      .get();
+    return row?.siteAdmin ?? false;
+  }
+
+  async listSiteAdminIds(): Promise<string[]> {
+    return this.db
+      .select({ id: schema.guests.id })
+      .from(schema.guests)
+      .where(eq(schema.guests.siteAdmin, true))
+      .all()
+      .map((row) => row.id);
+  }
+
+  async setSiteAdmin(id: string, siteAdmin: boolean): Promise<boolean> {
+    const result = this.db
+      .update(schema.guests)
+      .set({
+        siteAdmin,
+        version: sql`${schema.guests.version} + (${schema.guests.siteAdmin} != ${siteAdmin ? 1 : 0})`,
+      })
+      .where(eq(schema.guests.id, id))
+      .run();
+    return result.changes > 0;
+  }
+
   async getUsername(id: string): Promise<string | null> {
     const row = this.db
       .select({ username: schema.guests.username })
@@ -551,7 +587,7 @@ export class SqliteGuestsRepository implements GuestsRepository {
   async getAuthCredentials(id: string): Promise<GuestAuthCredentials | null> {
     const row = this.db
       .select({
-        authProtected: schema.guests.authProtected,
+        authProtected: isProtected,
         passwordHash: schema.guests.passwordHash,
       })
       .from(schema.guests)

@@ -80,6 +80,19 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
   9 review: all 3 findings fixed (the redirect check is `safeRedirectPath` in `packages/domain`,
   used by the SPA and `utils/auth.ts`); none rejected. Commit id: see the log.
 
+- Step 10 (server half; the SPA half is 10b): `guests.site_admin`. The guests repository's
+  `isProtected` (`authProtected OR siteAdmin`) is what every read returns as `authProtected`;
+  `setAuthProtection`'s stored flag stays separate. `actor.admin` is also true for a verified
+  session of a site admin (`SessionLookup.siteAdmin`, one extra guest read per request). Bootstrap
+  link: `/auth/bootstrap?token=`, 24 h, one row in `bootstrap_tokens`, logged at start by
+  `server/bootstrap-link.ts` (`instrumentation.ts`) while no site admin exists;
+  `make bootstrap-link` prints a new one (dev only; the image has no scripts/ or tsx: a deployed
+  site sets `SB_BOOTSTRAP_LINK=1` and restarts, which logs a link even when admins exist; 10b
+  documents it in self-hosting). `POST /auth/bootstrap` takes `guestId` or `name`+`email`,
+  `username`, `password`. The dev database of this checkout has orphan `login_sessions` rows, so the
+  script fails its FK check there (pre-existing). Use cases: 015-US6, 016-US4. No changelog or docs
+  yet (10b). Checks and commit id: see the log.
+
 ## Known E2E flakes
 
 `attendee-count.spec.ts:64` (fails ~half of solo runs on the base too), `settings.spec.ts:67`,

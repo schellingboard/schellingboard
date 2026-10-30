@@ -484,6 +484,11 @@ export const features = {
         actor: "organizer",
         priority: "P3",
       },
+      US6: {
+        title: "Organizer becomes the first site admin with the bootstrap link",
+        actor: "organizer",
+        priority: "P1",
+      },
     },
   },
   "016": {
@@ -502,6 +507,11 @@ export const features = {
       },
       US3: {
         title: "Organizer assigns guests to an event",
+        actor: "organizer",
+        priority: "P1",
+      },
+      US4: {
+        title: "Organizer grants and revokes the site-admin role",
         actor: "organizer",
         priority: "P1",
       },

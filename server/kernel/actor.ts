@@ -7,7 +7,12 @@ import {
 
 export interface Actor {
   admin: boolean;
-  guest: { id: string; level: LoginAssurance; sessionId?: string } | null;
+  guest: {
+    id: string;
+    level: LoginAssurance;
+    sessionId?: string;
+    siteAdmin?: boolean;
+  } | null;
 }
 
 export interface CookieReader {
@@ -17,9 +22,12 @@ export interface CookieReader {
 export type GuestIdentity = NonNullable<Actor["guest"]>;
 
 /** Finds the live login session a cookie token names. */
-export type SessionLookup = (
-  token: string
-) => Promise<{ guestId: string; level: LoginAssurance; id: string } | null>;
+export type SessionLookup = (token: string) => Promise<{
+  guestId: string;
+  level: LoginAssurance;
+  id: string;
+  siteAdmin?: boolean;
+} | null>;
 
 export async function readGuestIdentity(
   value: string | undefined,
@@ -29,7 +37,12 @@ export async function readGuestIdentity(
   if (value.includes(".")) return null;
   const session = await lookup(value);
   return session
-    ? { id: session.guestId, level: session.level, sessionId: session.id }
+    ? {
+        id: session.guestId,
+        level: session.level,
+        sessionId: session.id,
+        siteAdmin: session.siteAdmin,
+      }
     : null;
 }
 
@@ -43,5 +56,7 @@ export async function resolveActor(
     isAdminCookieValid(cookies.get(ADMIN_COOKIE_NAME)?.value),
     readGuestIdentity(cookies.get(GUEST_COOKIE_NAME)?.value, lookup),
   ]);
-  return { admin, guest };
+  // A claimed session proves nothing, so the role needs a verified one.
+  const siteAdmin = guest?.level === "verified" && guest.siteAdmin === true;
+  return { admin: admin || siteAdmin, guest };
 }

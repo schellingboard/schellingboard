@@ -22,6 +22,7 @@ export const IDEMPOTENCY_EXEMPT_PATHS = [
   "/api/v1/auth/sign-out",
   "/api/v1/auth/reset-link",
   "/api/v1/auth/reset",
+  "/api/v1/auth/bootstrap",
   "/api/v1/me/credentials/unprotect",
 ];
 

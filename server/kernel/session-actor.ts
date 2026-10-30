@@ -25,7 +25,15 @@ const lookupSession: SessionLookup = async (token) => {
       new Date(now.getTime() + SESSION_LIFETIME_MS)
     );
   }
-  return row ? { id, guestId: row.guestId, level: row.assurance } : null;
+  if (!row) return null;
+  return {
+    id,
+    guestId: row.guestId,
+    level: row.assurance,
+    siteAdmin:
+      row.assurance === "verified" &&
+      (await getRepositories().guests.getSiteAdmin(row.guestId)),
+  };
 };
 
 export const actorOf = (cookies: CookieReader) =>

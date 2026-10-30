@@ -7,6 +7,7 @@ import {
   eventGuestsBodySchema,
   guestImportBodySchema,
   guestImportResultSchema,
+  siteAdminBodySchema,
 } from "@schellingboard/contracts/guest";
 import { pageQuerySchema } from "@schellingboard/contracts/cursor-page";
 import { idempotencyHeaders } from "@/server/http/idempotency";
@@ -81,6 +82,23 @@ const deleteGuest = createRoute({
   responses: { 204: noContent("Deleted"), ...problemDefault },
 });
 
+const setSiteAdmin = createRoute({
+  method: "put",
+  path: "/admin/guests/{id}/site-admin",
+  tags,
+  description:
+    "Grants or revokes the site-admin role, which also protects the guest's name. Revoking the last site admin is 409 siteAdmin.last.",
+  request: {
+    headers: idempotencyHeaders,
+    params: idParam,
+    body: body(siteAdminBodySchema),
+  },
+  responses: {
+    200: json(adminGuestViewSchema, "The updated guest"),
+    ...problemDefault,
+  },
+});
+
 const sendTestEmail = createRoute({
   method: "post",
   path: "/admin/guests/{id}/test-email",
@@ -152,6 +170,16 @@ export function addAdminGuestRoutes(app: App, people: () => PeopleUseCases) {
       c.var.now
     );
     if (!result.ok) return problem(result.error, (g: AdminGuest) => g);
+    return c.json(result.value, 200);
+  });
+
+  app.openapi(setSiteAdmin, async (c) => {
+    const result = await people().setSiteAdmin(
+      c.var.actor,
+      { id: c.req.valid("param").id, ...c.req.valid("json") },
+      c.var.now
+    );
+    if (!result.ok) return problem(result.error);
     return c.json(result.value, 200);
   });
 
