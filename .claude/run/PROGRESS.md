@@ -121,14 +121,14 @@ Step 20b-2, for 21: the Config tab is complete.
 `EventConfigTab({event, days, points, sessions, calls, onChanged, onPointsChanged, onDeleted})`; the
 page owns three queries: `createAdminEventQuery` (event + days),
 `createAdminMeetingPointsQuery({api,id})` (new `GET /admin/events/{id}/meeting-points`, admin only,
-integration tested) and `createAdminScheduledSessionsQuery({api,eventId})` (pages `GET /sessions`;
-feeds the day-delete warning). `onChanged` must `load()` the event and the sessions queries (a day
-delete removes sessions); `onPointsChanged` loads the points. Render the Config tab only once all
-three are ready. `useFormMutation({explainRefusals: true})` (opt-in, admin screens) shows the
-server's `detail` for a refusal with no wording of its own; `features/admin/use-section-save.ts`
-holds `useSectionSave`, `jumpTo`, `useJumpWithin`, `shown`. E2E label changes for step 21: the
-labels "Start", "Name" etc. now carry a trailing star without a space (use a `getByLabel("Start")`
-regex).
+integration tested) and the sessions of 20d-2 (`scheduledOf(sessions)` feeds the day-delete warning;
+the separate scheduled-sessions query is gone). `onChanged` must `load()` the event and the sessions
+queries (a day delete removes sessions); `onPointsChanged` loads the points. Render the Config tab
+only once all three are ready. `useFormMutation({explainRefusals: true})` (opt-in, admin screens)
+shows the server's `detail` for a refusal with no wording of its own;
+`features/admin/use-section-save.ts` holds `useSectionSave`, `jumpTo`, `useJumpWithin`, `shown`. E2E
+label changes for step 21: the labels "Start", "Name" etc. now carry a trailing star without a space
+(use a `getByLabel("Start")` regex).
 
 Step 20c, for 21: the Guests and Locations tabs. Pages own `createAdminGuestsQuery({api})` (all
 pages of `GET /admin/guests`), `createAdminLocationsQuery({api})` (`GET /admin/locations`) and
@@ -154,8 +154,24 @@ by title (case-insensitive) then id, search on title or host name, as legacy. E2
 labels "Title *" and "Hosts" become `getByLabel("Title")` (the star has no space) and the title
 field is a plain `ui/form` field; the stale-page redirect test (`?page=999`) now clamps without a
 redirect, so its `not.toHaveURL(page=999)` assertion fails: assert the first row shows instead. The
-delete warning names the vote count only in the voting phase (the API sends `votesCount` then only);
-otherwise it says "its votes". Question for the user: have the admin API send the count always?
+delete warning and the row always name the vote count: the API sends `votesCount` to admins in every
+phase (integration tested). `AdminProposal.votesCount` is a number.
+
+Step 20d-2, for 21: the Sessions tab. The page owns `createAdminSessionsQuery({api,eventId})`
+(`GET /sessions`, all pages, scheduled or not) and passes
+`loadRsvps = (id) => loadSessionRsvpGuests(api, id)` (RSVPs load when the "RSVPs (n)" details open).
+`EventSessionsManager({eventId, sessions, guests, locations, guestNames, loadRsvps, timezone, days, breakMinutes, params, onParams, calls, onChanged})`:
+`guests` = event guests `{id,name}`, `locations` = locations assigned to the event with `capacity`
+(admin locations query), `guestNames` = id to name over all guests (the 20c guests query),
+`days: DayOption[]` =
+`{key: day.id, label: formatDayLabel({start: new Date(..), end: new Date(..)}, tz), start, end}`.
+`onChanged` must reload the sessions query. E2E changes: `getByLabel("Title *")` becomes
+`getByLabel("Title")`; time inputs are labelled "Start (Zone)_" / "End (Zone)_" (star, no space);
+`ui/form`'s `DateTimeField` gained `disabled`. Search and paging are in memory as in 20d-1.
+
+Shared pieces: `queries/paged-query.ts` (`createPagedQuery`, every admin list query),
+`features/admin/confirm-by-typing.tsx` (all three type-to-confirm deletes), `plural` and
+`searchByTitleOrHost` in `list-paging.ts`.
 
 Step 21 must delete the legacy `use-event-section.ts` (untested now; the SPA copy has the test).
 

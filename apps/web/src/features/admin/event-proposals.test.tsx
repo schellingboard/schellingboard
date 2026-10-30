@@ -65,11 +65,6 @@ const setup = (
   };
 };
 
-const row = (region: HTMLElement, title: string) =>
-  within(region)
-    .getAllByRole("listitem")
-    .find((li) => li.textContent?.includes(title)) as HTMLElement;
-
 describe("the event proposals manager", { tags: ["018-US1"] }, () => {
   it("lists proposals by title, ignoring case, with hosts and votes", () => {
     const { region } = setup([
@@ -211,16 +206,5 @@ describe("the event proposals manager", { tags: ["018-US1"] }, () => {
       method: "DELETE",
       path: "/api/v1/admin/proposals/p1",
     });
-  });
-
-  it("leaves the vote count out of the delete warning when it is not known", async () => {
-    const { region } = setup([proposal("p1", "Talk", { votesCount: null })]);
-
-    await userEvent.click(
-      within(region).getByRole("button", { name: "Delete Talk" })
-    );
-
-    expect(within(region).getByText(/its votes and 0 host links/)).toBeTruthy();
-    expect(row(region, "Talk")).toBeTruthy();
   });
 });

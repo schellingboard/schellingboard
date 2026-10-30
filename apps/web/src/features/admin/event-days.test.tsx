@@ -10,7 +10,7 @@ import userEvent from "@testing-library/user-event";
 import { adminEventCalls } from "../../commands/admin-events";
 import { fakeApi, problem, type FakeCall } from "../../commands/fake-api";
 import type { AdminEventDay } from "../../queries/admin-event";
-import type { ScheduledSession } from "../../queries/admin-scheduled-sessions";
+import type { ScheduledSession } from "../../queries/admin-sessions";
 import { NoticeProvider } from "../../ui/notices";
 import { EventDaysManager } from "./event-days";
 
