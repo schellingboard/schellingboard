@@ -13,10 +13,6 @@ export { toEventGuestView } from "./http/view";
 export {
   allGuests,
   attendees,
-  eventsOfGuests,
   guestAuthProtection,
   guestById,
-  guestsForEventAssignment,
-  guestsOfEvent,
-  searchGuests,
 } from "./application/page-reads";

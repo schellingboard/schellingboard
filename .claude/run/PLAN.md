@@ -199,13 +199,12 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`, `docs/dev/target-architec
 
 ### Close
 
-- [ ] 22. **Docs**: `web-app.md`, `04-client.md`, `07-repo-and-rules.md`, `10-path-from-here.md`
-      (step 5 done but for the sign-in screens), `docs/dev/server.md`, `open-questions.md` (resolve
-      what this run answered); `docs/public/` and CHANGELOG read through; release notes kept to 3–5
-      highlights.
+- [x] 22. Docs: web-app, 04-client, 07, 10, open-questions, ADR 0015, server.md; dead page reads
+      removed.
 - [ ] 23. **Finish**: summary in PROGRESS.md, then delete `.claude/run/`.
 
 ## Next to plan
 
-- Path step 6: identity and roles, the sign-in screens with it.
+- Path step 6: identity and roles, the sign-in screens with it. The root event list (`/`,
+  `app/legacy/(site)/page.tsx`) is the one other Next page: move it to the SPA first.
 - Path step 7: retire Next.

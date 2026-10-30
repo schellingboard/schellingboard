@@ -30,11 +30,4 @@ export {
   toSnapshotSessionView,
   toUnavailabilityView,
 } from "./http/view";
-export {
-  hostedSessions,
-  rsvpsOfSessions,
-  scheduledSessions,
-  searchSessions,
-  sessionsOfEvent,
-  unavailabilityOfEvent,
-} from "./application/page-reads";
+export { hostedSessions, sessionsOfEvent } from "./application/page-reads";

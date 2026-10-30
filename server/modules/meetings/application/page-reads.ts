@@ -1,12 +1,6 @@
-import type { Repositories } from "@/db/container";
 import { loadGuestSchedules } from "@/utils/guest-clashes";
 import { meetingViewsFor } from "@/utils/meeting-views";
 import { meetingOptionsFor } from "@/utils/meeting-options";
-
-export const meetingPointsOfEvent = (
-  q: Pick<Repositories, "meetingPoints">,
-  eventId: string
-) => q.meetingPoints.listByEvent(eventId);
 
 export const guestSchedules = (
   q: Parameters<typeof loadGuestSchedules>[2],

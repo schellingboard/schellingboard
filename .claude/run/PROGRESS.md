@@ -19,10 +19,9 @@
 
 ## Left alone (own step if wanted)
 
-- `server/modules/*/page-reads` exports no page uses now (`searchSessions`, `searchProposals`,
-  `guestsForEventAssignment`, `locationsForEventAssignment`, `guestsOfEvent`, `locationIdsOfEvent`,
-  `rsvpsOfSessions`, `scheduledSessions`, `unavailabilityOfEvent`, `allLocations`,
-  `meetingPointsOfEvent`) and their `tests/integration/admin-*-search.test.ts`.
+- Repository methods only the removed page reads used (`guests.search`, `searchForEventAssignment`,
+  `sessions.searchByEvent`, `proposals` search, ...) and their
+  `tests/integration/admin-*-search.test.ts` stay; remove them with the repositories' next cleanup.
 - Legacy `/api/toggle-rsvp`, `/api/add-session`, `/api/update-session`; the `toggleCommentLike` use
   case.
 - A new location whose image is refused (wrong aspect ratio) is now kept without the image and the
