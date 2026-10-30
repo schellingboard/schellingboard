@@ -12,8 +12,8 @@ import { problemResponse } from "./problem";
 
 const MUTATIONS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
-// Their effect is a Set-Cookie, which a replay would not repeat; PUT and DELETE
-// on them are naturally idempotent, so a retry just runs again.
+// Their effect is a Set-Cookie, which a replay would not repeat, so a retry
+// just runs again (a PUT then issues another session; the old one is revoked).
 export const IDEMPOTENCY_EXEMPT_PATHS = ["/api/v1/me/identity"];
 
 // Declared on each mutating route so the OpenAPI document shows it.

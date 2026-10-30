@@ -1,8 +1,8 @@
 import type { NextRequest } from "next/server";
 import { SESSION_PLACEMENT_CODES } from "@schellingboard/domain/session-booking";
 import { sessionUseCases } from "@/server/composition";
+import { actorOf } from "@/server/kernel/session-actor";
 import { HTTP_STATUS_BY_KIND } from "@/server/kernel/result";
-import { resolveActor } from "@/server/kernel/actor";
 import { requestNow } from "@/utils/dev-clock";
 import { legacyBooking, type SessionParams } from "../session-form-utils";
 
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       { error: "Reload the page and redo your edit" },
       { status: 400 }
     );
-  const actor = await resolveActor(req.cookies);
+  const actor = await actorOf(req.cookies);
   let result;
   try {
     result = await sessionUseCases().updateSession(

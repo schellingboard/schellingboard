@@ -22,7 +22,7 @@ const TEN = new Date("2026-06-02T10:00:00.000Z");
 const NOBODY: Actor = { admin: false, guest: null };
 const openGuest = (id: string): Actor => ({
   admin: false,
-  guest: { id, level: "open" },
+  guest: { id, level: "claimed" },
 });
 
 async function read(slug: string, actor: Actor) {

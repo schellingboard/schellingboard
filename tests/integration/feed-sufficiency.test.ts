@@ -66,7 +66,7 @@ const meetings = () =>
 
 const open = (id: string): Actor => ({
   admin: false,
-  guest: { id, level: "open" },
+  guest: { id, level: "claimed" },
 });
 
 describe("the logged changes suffice to keep a replica current", () => {
@@ -89,7 +89,7 @@ describe("the logged changes suffice to keep a replica current", () => {
     const elsewhere = await createSession(other.id, { title: "Other" });
     const viewer: Actor = {
       admin: false,
-      guest: { id: host.id, level: "open" },
+      guest: { id: host.id, level: "claimed" },
     };
     return { event, host, room, hall, session, elsewhere, viewer };
   }
@@ -171,7 +171,7 @@ describe("the logged changes suffice to keep a replica current", () => {
       });
       const actor = (id: string): Actor => ({
         admin: false,
-        guest: { id, level: "open" },
+        guest: { id, level: "claimed" },
       });
       return { ...w, scheduling, talk, guest, watcher, actor };
     }
@@ -271,7 +271,7 @@ describe("the logged changes suffice to keep a replica current", () => {
       });
       const viewer: Actor = {
         admin: false,
-        guest: { id: guest.id, level: "open" },
+        guest: { id: guest.id, level: "claimed" },
       };
       return { scheduling, guest, day, talk, viewer };
     }

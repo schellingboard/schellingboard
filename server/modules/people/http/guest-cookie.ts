@@ -6,10 +6,10 @@ import {
 } from "@/utils/auth-cookies";
 import type { Identity } from "../application/identity";
 
-export async function setGuestCookie(c: Context, identity: Identity) {
+export function setGuestCookie(c: Context, identity: Identity) {
   const { name, value, ...options } =
     identity.guestId === null
       ? createGuestLogoutCookie()
-      : await createGuestCookie(identity.guestId, identity.level);
+      : createGuestCookie(identity.sessionToken);
   setCookie(c, name, value, options);
 }

@@ -1,14 +1,14 @@
 import type { NextRequest } from "next/server";
 import { sessionUseCases } from "@/server/composition";
+import { actorOf } from "@/server/kernel/session-actor";
 import { HTTP_STATUS_BY_KIND } from "@/server/kernel/result";
-import { resolveActor } from "@/server/kernel/actor";
 import { requestNow } from "@/utils/dev-clock";
 
 export const dynamic = "force-dynamic"; // defaults to auto
 
 export async function POST(req: NextRequest) {
   const { id } = (await req.json()) as { id: string };
-  const actor = await resolveActor(req.cookies);
+  const actor = await actorOf(req.cookies);
   let result;
   try {
     result = await sessionUseCases().deleteSession(

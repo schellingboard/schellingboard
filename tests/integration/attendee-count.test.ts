@@ -29,7 +29,7 @@ import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 import { getRepositories } from "@/db/container";
 import { cookies } from "next/headers";
 import { sessionUseCases } from "@/server/composition";
-import { resolveActor } from "@/server/kernel/actor";
+import { actorOf } from "@/server/kernel/session-actor";
 
 const HOUR_MS = 60 * 60 * 1000;
 
@@ -38,7 +38,7 @@ type CountResult =
 
 async function getAttendeeCountAction(sessionId: string): Promise<CountResult> {
   const result = await sessionUseCases().getAttendeeCount(
-    await resolveActor(await cookies()),
+    await actorOf(await cookies()),
     { sessionId },
     new Date()
   );
@@ -52,7 +52,7 @@ async function setAttendeeCountAction(
   value: unknown
 ): Promise<CountResult> {
   const result = await sessionUseCases().recordAttendeeCount(
-    await resolveActor(await cookies()),
+    await actorOf(await cookies()),
     { sessionId, count: value },
     new Date()
   );

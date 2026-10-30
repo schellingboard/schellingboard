@@ -21,7 +21,6 @@ export {
   readGuestCookie,
   createGuestCookie,
   createGuestLogoutCookie,
-  type GuestAuthLevel,
 } from "@/utils/auth-cookies";
 
 export const AUTH_COOKIE_NAME = "site-auth";

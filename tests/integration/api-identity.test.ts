@@ -54,6 +54,12 @@ beforeEach(() => {
 });
 afterEach(() => vi.unstubAllEnvs());
 
+function expectSessionCookie(res: Response) {
+  const cookie = res.headers.get("set-cookie") ?? "";
+  expect(cookie).toMatch(new RegExp(`${GUEST_COOKIE_NAME}=[^;]+;`));
+  expect(cookie).not.toMatch(/Max-Age=0/i);
+}
+
 const whoAmI = (cookie?: string) =>
   GET(
     new NextRequest("http://test/api/v1/me/identity", {
@@ -115,9 +121,7 @@ describe("/api/v1/me/identity", () => {
 
       expect(res.status).toBe(200);
       expect(await res.json()).toEqual({ guestId: ada.id });
-      expect(res.headers.get("set-cookie")).toContain(
-        `${GUEST_COOKIE_NAME}=open.${ada.id}`
-      );
+      expectSessionCookie(res);
     }
   );
 
@@ -165,8 +169,7 @@ describe("/api/v1/me/identity", () => {
 
       expect(res.status).toBe(200);
       expect(await res.json()).toEqual({ guestId: grace.id });
-      expect(res.headers.get("set-cookie")).toContain(`${GUEST_COOKIE_NAME}=`);
-      expect(res.headers.get("set-cookie")).not.toContain("open.");
+      expectSessionCookie(res);
     }
   );
 
@@ -188,7 +191,7 @@ describe("/api/v1/me/identity", () => {
       const retry = await choose(ada.id, undefined, "k1");
 
       expect(retry.status).toBe(200);
-      expect(retry.headers.get("set-cookie")).toContain(`open.${ada.id}`);
+      expectSessionCookie(retry);
     }
   );
 });

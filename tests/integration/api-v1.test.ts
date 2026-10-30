@@ -173,7 +173,7 @@ describe("actor middleware", () => {
     });
     expect(await open.json()).toEqual({
       admin: false,
-      guest: { id: "g1", level: "open" },
+      guest: { id: "g1", level: "claimed" },
     });
 
     const verified = await actorApp().request("/me", {

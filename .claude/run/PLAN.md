@@ -71,10 +71,8 @@ Steps 8 to 10 need Q7 (admin bootstrap) and Q8 (site password). Steps 1 to 7 and
 ### Identity (path step 6)
 
 - [x] 2. ADR 0017 (identity and roles) records the decisions, with Q7 and Q8 as proposed.
-- [ ] 3. **Login sessions.** Migration, repository, `resolveActor` reads the row (assurance =
-      level), `PUT`/`DELETE /me/identity` create and delete rows, legacy logins write rows too, old
-      cookies still read. Expired rows pruned by the jobs loop. Integration tests first: a revoked
-      row acts as nobody; a claimed row cannot act as a protected guest.
+- [x] 3. Login sessions are rows (`login_sessions`, `signIn`/`signOut` in `people`, `actorOf` in
+      `server/kernel/session-actor.ts`); old cookies still read; the jobs loop prunes expired rows.
 - [ ] 4. **Sign-in API**: request a login code, log in with code or password, sign out; use cases in
       `server/modules/people` (or a new `identity` module if the arch rules prefer it), moved out of
       `app/actions/user-auth.ts`, which delegates. Rate limits; problem codes for wrong code,

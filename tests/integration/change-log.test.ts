@@ -463,7 +463,7 @@ describe("change log", () => {
       });
 
       const asked = await meetings.requestMeeting(
-        { admin: false, guest: { id: ada.id, level: "open" } },
+        { admin: false, guest: { id: ada.id, level: "claimed" } },
         {
           eventId: event.id,
           recipientId: grace.id,

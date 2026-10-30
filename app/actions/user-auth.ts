@@ -8,7 +8,6 @@ import type { AuthCode, AuthCodePurpose } from "@schellingboard/domain/auth";
 import {
   createGuestCookie,
   createGuestLogoutCookie,
-  readGuestCookie,
   GUEST_COOKIE_NAME,
 } from "@/utils/auth";
 import {
@@ -27,7 +26,7 @@ import {
 import { verifiedCurrentUser } from "@/utils/acting-guest";
 import { requireSiteAuth } from "@/utils/action-auth";
 import { peopleUseCases } from "@/server/composition";
-import { resolveActor } from "@/server/kernel/actor";
+import { actorOf, guestOfCookie } from "@/server/kernel/session-actor";
 import { ok, type Result } from "@/server/kernel/result";
 import type { Identity } from "@/server/modules/people/module";
 import {
@@ -59,7 +58,11 @@ export type SelectUserResult =
 
 async function setAuthenticatedIdentity(guestId: string): Promise<void> {
   const cookieStore = await cookies();
-  cookieStore.set(await createGuestCookie(guestId, "verified"));
+  const identity = await peopleUseCases().signIn(await actorOf(cookieStore), {
+    guestId,
+    level: "verified",
+  });
+  cookieStore.set(createGuestCookie(identity.sessionToken));
 }
 
 /**
@@ -371,7 +374,7 @@ export async function setPasswordWithTokenAction(
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid" };
   }
-  const { guests, authCodes } = getRepositories();
+  const { guests, authCodes, loginSessions } = getRepositories();
   const matched = await matchToken(guestId, "reset", token);
   if (!matched) {
     return { ok: false, error: "This link is invalid or has expired" };
@@ -383,11 +386,15 @@ export async function setPasswordWithTokenAction(
     passwordHash: await hashUserPassword(parsed.data),
   });
   await authCodes.consume(matched.id);
+  // First protection keeps other browsers' claimed rows: they are refused as
+  // "protected", which tells their user what happened.
+  if (wasProtected) await loginSessions.deleteForGuest(guestId);
+  else await loginSessions.deleteVerifiedForGuest(guestId);
   const cookieStore = await cookies();
-  const selected = await readGuestCookie(
+  const selected = await guestOfCookie(
     cookieStore.get(GUEST_COOKIE_NAME)?.value
   );
-  if (selected?.guestId === guestId) {
+  if (selected?.id === guestId) {
     cookieStore.set(createGuestLogoutCookie());
   }
   if (wasProtected) {
@@ -433,6 +440,10 @@ export async function changePasswordAction(
     authProtected: true,
     passwordHash: await hashUserPassword(parsed.data),
   });
+  await getRepositories().loginSessions.deleteForGuest(
+    guestId,
+    (await actorOf(await cookies())).guest?.sessionId
+  );
   await notifySecurityChange(guestId, "password-changed");
   return { ok: true };
 }
@@ -471,7 +482,11 @@ export async function disableProtectionAction(
   // Drop the now-moot verified proof but keep the guest selected: the name is
   // unprotected now, so an "open" cookie is all it needs (and re-enabling
   // protection later will correctly require a fresh login).
-  cookieStore.set(await createGuestCookie(guestId, "open"));
+  const identity = await peopleUseCases().signIn(await actorOf(cookieStore), {
+    guestId,
+    level: "claimed",
+  });
+  cookieStore.set(createGuestCookie(identity.sessionToken));
   await notifySecurityChange(guestId, "disabled");
   return { ok: true };
 }
@@ -502,8 +517,8 @@ export async function selectUserAction(
   const people = peopleUseCases();
   const result: Result<Identity> =
     guestId === null
-      ? ok(people.signOut())
-      : await people.chooseGuest(await resolveActor(cookieStore), { guestId });
+      ? ok(await people.signOut(await actorOf(cookieStore)))
+      : await people.chooseGuest(await actorOf(cookieStore), { guestId });
   if (!result.ok) {
     return result.error.code === "guest.protected"
       ? { ok: false, needsAuth: true, error: result.error.detail ?? "" }
@@ -513,7 +528,7 @@ export async function selectUserAction(
   cookieStore.set(
     identity.guestId === null
       ? createGuestLogoutCookie()
-      : await createGuestCookie(identity.guestId, identity.level)
+      : createGuestCookie(identity.sessionToken)
   );
   return { ok: true };
 }
