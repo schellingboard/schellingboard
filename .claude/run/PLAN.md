@@ -199,8 +199,14 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`, `docs/dev/target-architec
   - [x] 20a. Events list and create (done: `features/admin/events-screen.tsx`,
         `queries/admin-events.ts`, `commands/admin-events.ts`). Delete stays in the event detail's
         danger zone (legacy has it only there): 20b.
-  - [ ] 20b. Event detail: details, phases, days, meeting settings and meeting points, delete
-        (danger zone).
+  - [ ] 20b. Event detail (legacy `events/[id]` is ~1500 lines for these, so split):
+    - [ ] 20b-1. The event layout (title, "Event sections" tabs Config/Guests/Locations/Proposals/
+          Sessions, back link), the Config tab's details form (`event-detail-form.tsx`, with
+          `PUT /admin/events/{id}` and `expectedVersion`), the danger zone (delete, type the name),
+          and the phases form (`event-phases-form.tsx`, `PUT .../phases`).
+    - [ ] 20b-2. Days (`event-days-manager.tsx`, `/admin/events/{id}/days`, `/admin/days/{id}`) and
+          the meetings form with meeting points (`event-meetings-form.tsx`,
+          `/admin/events/{id}/meetings`, `.../meeting-points`).
   - [ ] 20c. Event guests, event locations, room availability.
   - [ ] 20d. Event proposals and sessions managers.
   - [ ] 20e. Locations (image, order), guests and import, site settings, test email.
