@@ -15,7 +15,7 @@ export const snapshotSessionSchema = sessionViewSchema
   .meta({ id: "SnapshotSession" });
 
 export const snapshotLocationSchema = locationViewSchema
-  .omit({ eventIds: true })
+  .omit({ eventIds: true, sessionCount: true })
   .meta({ id: "SnapshotLocation" });
 
 export const eventGuestSchema = z

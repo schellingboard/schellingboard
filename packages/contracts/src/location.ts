@@ -63,6 +63,11 @@ export const locationViewSchema = z
     imageUrl: z.string(),
     sortIndex: z.number().int(),
     eventIds: z.array(z.string()),
+    sessionCount: z
+      .number()
+      .int()
+      .optional()
+      .describe("How many sessions use it; only in GET /admin/locations"),
     version: z
       .number()
       .int()

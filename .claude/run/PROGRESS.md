@@ -173,6 +173,17 @@ Shared pieces: `queries/paged-query.ts` (`createPagedQuery`, every admin list qu
 `features/admin/confirm-by-typing.tsx` (all three type-to-confirm deletes), `plural` and
 `searchByTitleOrHost` in `list-paging.ts`.
 
+Step 20e-1, for 21: the Locations page. Page owns `createAdminLocationsQuery({api})` (now with every
+field and `sessionCount`, only in this list) and the events (`createAdminEventsQuery`, as
+`{id,name}[]`);
+`LocationsScreen({status, locations, events, calls: adminLocationCalls(api), onChanged})` inside
+`AdminFrame`, `onChanged` = reload the locations. The image is a second call (`PUT .../image`
+against the new version), so a refused image after a create leaves the location created (the form
+stays open, says why, and the next Save updates it); legacy refused it all. The "Image" field takes
+`getByLabel("Image")`, "Name*" labels: use `getByLabel(/^Name/)`. No image removal (legacy had
+none). `location-image-constraints` moved to `packages/domain`. Step 21 deletes
+`app/legacy/admin/locations-manager.tsx`; `room-checkboxes.tsx` stays until the sessions page goes.
+
 Step 21 must delete the legacy `use-event-section.ts` (untested now; the SPA copy has the test).
 
 ## Questions

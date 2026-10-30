@@ -1,5 +1,4 @@
-// Client-safe constraints for location images. Validation itself lives in
-// location-images.ts, which is server-only (it uses sharp and fs).
+// Constraints for location images, shared by the server and the forms.
 
 export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 export const MIN_IMAGE_WIDTH = 400;

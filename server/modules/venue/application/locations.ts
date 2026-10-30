@@ -26,7 +26,10 @@ import {
   recordLocationRemoved,
 } from "./location-changes";
 
-export type LocationWithEvents = Location & { eventIds: string[] };
+export type LocationWithEvents = Location & {
+  eventIds: string[];
+  sessionCount?: number;
+};
 
 export const adminRequired = () => forbidden("admin.required", "Unauthorized");
 export const locationNotFound = () =>
@@ -354,11 +357,17 @@ export const listLocations =
     const locations = input.eventId
       ? await repos.locations.listByEvent(input.eventId)
       : await repos.locations.list();
-    const eventIds = await repos.locations.listEventIdsByLocations(
-      locations.map((l) => l.id)
-    );
+    const ids = locations.map((l) => l.id);
+    const [eventIds, sessionCounts] = await Promise.all([
+      repos.locations.listEventIdsByLocations(ids),
+      repos.locations.countSessionLinksByLocations(ids),
+    ]);
     return ok(
-      locations.map((l) => ({ ...l, eventIds: eventIds.get(l.id) ?? [] }))
+      locations.map((l) => ({
+        ...l,
+        eventIds: eventIds.get(l.id) ?? [],
+        sessionCount: sessionCounts.get(l.id) ?? 0,
+      }))
     );
   };
 

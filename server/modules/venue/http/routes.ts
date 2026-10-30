@@ -24,7 +24,7 @@ import {
 import {
   MAX_IMAGE_BYTES,
   MIN_IMAGE_WIDTH,
-} from "@/utils/location-image-constraints";
+} from "@schellingboard/domain/location-image-constraints";
 import type { LocationWithEvents } from "../application/locations";
 import type { VenueUseCases } from "../application/use-cases";
 import { toLocationView } from "./view";
@@ -34,7 +34,11 @@ const tags = ["admin"];
 function toLocationWithEventsView(
   l: LocationWithEvents
 ): z.input<typeof locationViewSchema> {
-  return { ...toLocationView(l), eventIds: l.eventIds };
+  return {
+    ...toLocationView(l),
+    eventIds: l.eventIds,
+    sessionCount: l.sessionCount,
+  };
 }
 
 const listLocations = createRoute({

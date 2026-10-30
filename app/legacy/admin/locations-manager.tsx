@@ -10,7 +10,7 @@ import type { Location } from "@schellingboard/domain/location";
 import {
   IMAGE_REQUIREMENTS_HINT,
   MAX_IMAGE_BYTES,
-} from "@/utils/location-image-constraints";
+} from "@schellingboard/domain/location-image-constraints";
 import {
   createLocationAction,
   updateLocationAction,

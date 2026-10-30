@@ -366,7 +366,9 @@ describe("/api/v1/admin locations", () => {
       expect(assigned.status).toBe(204);
       const listed = await call("GET", `/admin/locations?eventId=${event.id}`);
       expect(await listed.json()).toEqual({
-        locations: [{ ...store, eventIds: [event.id], version: 2 }],
+        locations: [
+          { ...store, eventIds: [event.id], sessionCount: 0, version: 2 },
+        ],
       });
 
       const unknown = await call(
