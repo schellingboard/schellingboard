@@ -22,6 +22,18 @@ export interface LoginMail {
     code: string;
     validMinutes: number;
   }): Promise<void>;
+  sendResetLink(input: {
+    guestId: string;
+    name: string;
+    email: string;
+    token: string;
+    validMinutes: number;
+  }): Promise<void>;
+  sendSecurityChanged(input: {
+    name: string;
+    email: string;
+    change: "disabled" | "password-changed";
+  }): Promise<void>;
 }
 
 export interface PeopleDeps {

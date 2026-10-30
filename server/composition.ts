@@ -5,6 +5,8 @@ import {
 } from "@/server/kernel/idempotency";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
 import { authCodeEmail } from "@/emails/auth-code";
+import { authPasswordResetEmail } from "@/emails/auth-password-reset";
+import { authSecurityChangedEmail } from "@/emails/auth-security-changed";
 import { testEmail } from "@/emails/test-email";
 import { dispatchDueReminders } from "@/utils/reminder-dispatch";
 import { getImageRepositories } from "@/utils/images";
@@ -124,6 +126,19 @@ export function peopleUseCases(): PeopleUseCases {
             validMinutes,
           }),
         }),
+      sendResetLink: ({ guestId, name, email, token, validMinutes }) =>
+        sendMail({
+          to: email,
+          ...authPasswordResetEmail({
+            name,
+            resetUrl: `${siteUrl()}/auth/reset?guest=${encodeURIComponent(
+              guestId
+            )}&token=${encodeURIComponent(token)}`,
+            validMinutes,
+          }),
+        }),
+      sendSecurityChanged: ({ name, email, change }) =>
+        sendMail({ to: email, ...authSecurityChangedEmail({ name, change }) }),
     },
     sendTestEmail: ({ name, email }) =>
       sendMail({ to: email, ...testEmail({ name }) }),

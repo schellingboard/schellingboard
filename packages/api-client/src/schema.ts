@@ -3436,7 +3436,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** @description Emails the guest a single-use login code and link. `auth.codeRecentlySent` (409) while a code sent within the last minute is still valid; `auth.codeSpent` (409) when it has no guesses left; `auth.tooManyEmails` (429); `auth.mailUnavailable` (503) when the server cannot send email; `auth.mailFailed` (503) when sending failed. */
+    /** @description Emails the guest, named by `guestId` or by `identifier` (email or username; exactly one), a single-use login code and link. An identifier nobody holds answers 204 too. `auth.codeRecentlySent` (409) while a code sent within the last minute is still valid; `auth.codeSpent` (409) when it has no guesses left; `auth.tooManyEmails` (429); `auth.mailUnavailable` (503) when the server cannot send email; `auth.mailFailed` (503) when sending failed. */
     post: {
       parameters: {
         query?: never;
@@ -3447,13 +3447,119 @@ export interface paths {
       requestBody: {
         content: {
           "application/json": {
-            /** @description The protected guest to email a code */
-            guestId: string;
+            /** @description The guest to email a code */
+            guestId?: string;
+            /** @description The guest's email or username, instead of `guestId` */
+            identifier?: string;
           };
         };
       };
       responses: {
         /** @description The code was emailed */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/auth/reset-link": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Emails the guest, named by `guestId` or by `identifier` (exactly one; an unknown identifier answers 204 too), a single-use link to set a password; it both protects a name and recovers a forgotten password, and changes nothing until used. `auth.linkRecentlySent` (409) while a link sent within the last minute is still valid; `auth.tooManyEmails` (429); `auth.mailUnavailable` (503); `auth.mailFailed` (503). */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            /** @description The guest to email a link */
+            guestId?: string;
+            /** @description The guest's email or username, instead of `guestId` */
+            identifier?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description The link was emailed */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/auth/reset": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Sets the password the emailed link allows and protects the name; signs no one in. Other browsers' sessions of the guest end (all of them when the name was already protected). `auth.credentialWrong` (403) for a wrong, expired or used token; `password.invalid` (400). */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            guestId: string;
+            /** @description The token in the emailed link */
+            token: string;
+            newPassword: string;
+          };
+        };
+      };
+      responses: {
+        /** @description The password is set */
         204: {
           headers: {
             [name: string]: unknown;
@@ -3486,7 +3592,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** @description Logs in as a guest with the password or an emailed login code, and sets the guest cookie. `auth.credentialWrong` (403) for a wrong or expired password or code; `auth.tooManyAttempts` (429) while the password is locked, when a code still works. */
+    /** @description Logs in as a guest, named by `guestId` or by `identifier` (email or username; exactly one), with the password or an emailed login code, and sets the guest cookie. `auth.credentialWrong` (403) for a wrong or expired password or code; `auth.tooManyAttempts` (429) while the password is locked, when a code still works. */
     post: {
       parameters: {
         query?: never;
@@ -3498,7 +3604,9 @@ export interface paths {
         content: {
           "application/json": {
             /** @description The guest to log in as */
-            guestId: string;
+            guestId?: string;
+            /** @description The guest's email or username, instead of `guestId` */
+            identifier?: string;
             /** @description The guest's password or a login code they were emailed */
             credential: string;
           };
@@ -3572,6 +3680,277 @@ export interface paths {
       };
     };
     delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/credentials/password": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Changes the password of the protected name this browser is logged in to; this session stays, the others end. `auth.credentialWrong` (403) for a wrong current password; `auth.notProtected` (409); `auth.tooManyAttempts` (429). */
+    put: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            currentPassword: string;
+            newPassword: string;
+          };
+        };
+      };
+      responses: {
+        /** @description The password changed */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/credentials/unprotect": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Removes the password protection. This browser keeps the name through a new claimed session (sets the guest cookie). Errors as for the password change. */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            currentPassword: string;
+          };
+        };
+      };
+      responses: {
+        /** @description The guest the browser still acts as */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              /** @description The guest the browser now acts as, or null when signed out */
+              guestId: string | null;
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/credentials/username": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Sets or, with null, removes the username that password sign-in accepts besides the email. Usernames are lowercase. `username.taken` (409); `username.invalid` (400). */
+    put: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            username: string | null;
+          };
+        };
+      };
+      responses: {
+        /** @description The username now stored */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              username: string | null;
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/login-sessions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The signed-in browsers of the guest this browser acts as. */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The live login sessions */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              /** @description Names the session in DELETE; not the cookie value */
+              id: string;
+              /** @description True for this browser's own session */
+              current: boolean;
+              /** @enum {string} */
+              assurance: "claimed" | "verified";
+              /** @description The browser's user agent, if known */
+              device: string | null;
+              /** @description ISO instant */
+              createdAt: string;
+              /** @description ISO instant */
+              lastSeenAt: string;
+              /** @description ISO instant */
+              expiresAt: string;
+            }[];
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/login-sessions/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** @description Signs one browser of the guest out. Revoking this browser's own session also clears its cookie. `loginSession.notFound` (404) for an id that is not the guest's. */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The session ended */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
     options?: never;
     head?: never;
     patch?: never;

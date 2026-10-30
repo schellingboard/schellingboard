@@ -73,7 +73,16 @@ spent or expired password or code, indistinguishable on purpose), `auth.tooManyA
 `auth.mailFailed`. A `limited` refusal carries `Retry-After`. The proxy refuses a cross-site
 `/api/v1/auth/*` request like the admin API's (403 `request.crossSite`). The per-address limit
 applies only with `SB_TRUSTED_PROXIES` set; its burst is `SB_AUTH_RATE_BURST` (default 30), and
-sign-out is not limited. The legacy `loginAsGuestAction` calls the same use cases.
+sign-out is not limited. The legacy actions in `user-auth.ts` call the same use cases.
+
+Credentials (`people/application/credentials.ts`): `POST /auth/reset-link` emails a reset link
+(`auth.linkRecentlySent`), `POST /auth/reset` sets the password and protects the name without
+signing anyone in, `PUT /me/credentials/password`, `POST /me/credentials/unprotect` and
+`PUT /me/credentials/username` need the acting session and, where protected, its verified level.
+`/auth/login` also takes an `identifier` (email or lowercase username) for `guestId`; an unknown one
+answers `auth.credentialWrong`. `GET /me/login-sessions` lists the guest's sessions and
+`DELETE /me/login-sessions/{id}` ends one (`loginSession.notFound`). Also `username.taken`,
+`auth.notProtected`.
 
 ## The feed and the snapshot
 

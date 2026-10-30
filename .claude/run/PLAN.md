@@ -55,10 +55,10 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
       and login; kind `limited` (429); per-address limit on `/auth/*`.
 - [x] 5. Sessions last 30 days from last use (`lastSeen` refreshed daily, expiry moves with it); old
       `open.`/`verified.` cookies are no identity; their parsing is deleted.
-- [ ] 6. **Credentials API**: request a reset link, set a password with it (nothing changes before
-      that), change it, protect and unprotect a name, list and revoke own login sessions
-      (`/me/login-sessions`). Optional unique `guests.username`; password login takes email or
-      username. The rest of `user-auth.ts` delegates.
+- [x] 6. Credentials API: `/auth/reset-link`, `/auth/reset`,
+      `/me/credentials/{password,unprotect,     username}`, `/me/login-sessions`; `guests.username`
+      (unique, lowercase); `/auth/login` takes `identifier`; `user-auth.ts` delegates
+      (`people/application/credentials.ts`).
 - [ ] 7. **Sign-in screens, unrouted**: guest login (code, password by email or username, forgot),
       reset, account security (protection, username, password, login sessions with "sign out").
       `features/sign-in/`, forms through `useFormMutation`.
