@@ -13,6 +13,7 @@ import {
   conflict,
   forbidden,
   invalid,
+  invalidFields,
   notFound,
   ok,
   versionConflict,
@@ -103,50 +104,72 @@ function isKnownTimeZone(timeZone: string): boolean {
   }
 }
 
+const nameTaken = (detail: string): Failure => ({
+  ok: false,
+  error: {
+    kind: "conflict",
+    code: "event.slugTaken",
+    detail,
+    errors: [{ path: "name", message: detail }],
+  },
+});
+
+const fieldInvalid = (code: string, path: string, message: string): Failure =>
+  invalidFields(code, [{ path, message }]);
+
 function parseSettings(
   input: EventSettingsInput
 ): { data: EventSettings } | Failure {
   const name = input.name.trim();
-  if (!name) return invalid("event.nameRequired", "Name is required");
+  if (!name)
+    return fieldInvalid("event.nameRequired", "name", "Name is required");
 
   // The form only offers known zones; a script's typo would break every page
   // that formats the event's times.
   const timezone = input.timezone.trim() || "UTC";
   if (!isKnownTimeZone(timezone)) {
-    return invalid("event.timezoneUnknown", "Unknown timezone");
+    return fieldInvalid(
+      "event.timezoneUnknown",
+      "timezone",
+      "Unknown timezone"
+    );
   }
 
   const { maxSessionDuration, breakMinutes, slotIncrementMinutes } = input;
   if (isNaN(maxSessionDuration) || maxSessionDuration <= 0) {
-    return invalid(
+    return fieldInvalid(
       "event.durationInvalid",
+      "maxSessionDuration",
       "Max session duration must be a positive number"
     );
   }
   if (isNaN(breakMinutes) || breakMinutes < 0) {
-    return invalid(
+    return fieldInvalid(
       "event.breakInvalid",
+      "breakMinutes",
       "Break must be zero or a positive number"
     );
   }
   if (!isValidSlotIncrement(slotIncrementMinutes)) {
-    return invalid(
+    return fieldInvalid(
       "event.slotIncrementInvalid",
+      "slotIncrementMinutes",
       `Slot increment must be one of ${SLOT_INCREMENT_OPTIONS.join(", ")} minutes`
     );
   }
   // Seeding scripts send raw JSON, so the type isn't guaranteed at runtime.
   const rsvpCapacityHardLimit = input.rsvpCapacityHardLimit ?? false;
   if (typeof rsvpCapacityHardLimit !== "boolean") {
-    return invalid(
+    return fieldInvalid(
       "event.rsvpCapacityHardLimitInvalid",
+      "rsvpCapacityHardLimit",
       "RSVP capacity hard limit must be a boolean"
     );
   }
 
   const icon = input.icon?.trim() || undefined;
   if (icon && !isEventIconName(icon)) {
-    return invalid("event.iconUnknown", "Unknown icon");
+    return fieldInvalid("event.iconUnknown", "icon", "Unknown icon");
   }
 
   return {
@@ -194,18 +217,22 @@ export const createEvent =
 
     const slug = eventNameToSlug(parsed.data.name);
     if (!slug) {
-      return invalid("event.slugEmpty", "Name must contain a letter or number");
+      return fieldInvalid(
+        "event.slugEmpty",
+        "name",
+        "Name must contain a letter or number"
+      );
     }
     if (RESERVED_EVENT_SLUGS.has(slug.toLowerCase())) {
-      return invalid(
+      return fieldInvalid(
         "event.slugReserved",
+        "name",
         `"${slug}" is a reserved URL and cannot be used as an event name`
       );
     }
     const existing = await repos.events.findBySlug(slug);
     if (existing) {
-      return conflict(
-        "event.slugTaken",
+      return nameTaken(
         `An event with the URL "${slug}" already exists ("${existing.name}")`
       );
     }
@@ -219,10 +246,7 @@ export const createEvent =
         e instanceof Error &&
         e.message.includes("UNIQUE constraint failed: events.slug")
       ) {
-        return conflict(
-          "event.slugTaken",
-          `An event with the URL "${slug}" already exists`
-        );
+        return nameTaken(`An event with the URL "${slug}" already exists`);
       }
       throw e;
     }

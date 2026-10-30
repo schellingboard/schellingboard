@@ -196,8 +196,11 @@ Read first: ADR 0015, ADR 0014, `docs/dev/web-app.md`, `docs/dev/target-architec
 - [x] 19. Admin section shell (done: `app/admin-frame.tsx` `AdminFrame`, `queries/admin-gate.ts`,
       `ui/data-table.tsx`, `POST /api/admin/logout`).
 - [ ] 20. **Admin screens**, unrouted, one commit each:
-  - [ ] 20a. Events list: create, delete.
-  - [ ] 20b. Event detail: details, phases, days, meeting settings and meeting points.
+  - [x] 20a. Events list and create (done: `features/admin/events-screen.tsx`,
+        `queries/admin-events.ts`, `commands/admin-events.ts`). Delete stays in the event detail's
+        danger zone (legacy has it only there): 20b.
+  - [ ] 20b. Event detail: details, phases, days, meeting settings and meeting points, delete
+        (danger zone).
   - [ ] 20c. Event guests, event locations, room availability.
   - [ ] 20d. Event proposals and sessions managers.
   - [ ] 20e. Locations (image, order), guests and import, site settings, test email.

@@ -201,8 +201,32 @@ describe("event use cases", () => {
           kind: "conflict",
           code: "event.slugTaken",
           detail: `An event with the URL "Unconference" already exists ("Unconference")`,
+          errors: [
+            {
+              path: "name",
+              message: `An event with the URL "Unconference" already exists ("Unconference")`,
+            },
+          ],
         },
       });
+      const paths = async (input: Partial<typeof settings>) => {
+        const result = await events().createEvent(ADMIN, {
+          ...settings,
+          ...input,
+        });
+        return result.ok ? [] : result.error.errors?.map((e) => e.path);
+      };
+      expect(await paths({ name: "admin" })).toEqual(["name"]);
+      expect(await paths({ name: "!!" })).toEqual(["name"]);
+      expect(await paths({ name: " " })).toEqual(["name"]);
+      expect(await paths({ timezone: "Mars/Base" })).toEqual(["timezone"]);
+      expect(await paths({ maxSessionDuration: 0 })).toEqual([
+        "maxSessionDuration",
+      ]);
+      expect(await paths({ breakMinutes: -1 })).toEqual(["breakMinutes"]);
+      expect(await paths({ slotIncrementMinutes: 7 })).toEqual([
+        "slotIncrementMinutes",
+      ]);
       expect(
         code(await events().createEvent(ADMIN, { ...settings, name: "admin" }))
       ).toBe("event.slugReserved");
