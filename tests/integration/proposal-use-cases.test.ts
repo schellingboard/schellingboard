@@ -85,7 +85,9 @@ describe("reading proposals: the vote breakdown", () => {
           breakdown: null,
         });
         expect(seen.ok && seen.value).not.toHaveProperty("skipVotesCount");
-        expect(seen.ok && seen.value).toMatchObject({ votesCount: null });
+        expect(seen.ok && seen.value).toMatchObject({
+          votesCount: actor.admin ? 4 : null,
+        });
       }
 
       const listed = await proposalUseCases().listProposals(
@@ -563,6 +565,27 @@ describe("reading proposals: the voting order", () => {
         tally: { interested: 0, maybe: 0 },
         votesCount: null,
       });
+    }
+  );
+
+  it(
+    "shows an admin the vote count in every phase",
+    { tags: ["005-US1", "004-US5"] },
+    async () => {
+      for (const phase of ["voting", "scheduling"] as const) {
+        const event = await createEvent({ phase });
+        const proposal = await createProposal(event.id, []);
+        const ids = await voters(event.id, 2);
+        await vote(proposal.id, ids, VoteChoice.skip);
+
+        const listed = await proposalUseCases().listProposals(
+          ADMIN,
+          { eventId: event.id },
+          now()
+        );
+
+        expect(listed.ok && listed.value[0]).toMatchObject({ votesCount: 2 });
+      }
     }
   );
 });

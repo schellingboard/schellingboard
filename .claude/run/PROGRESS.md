@@ -145,6 +145,18 @@ cannot reach the server; the SPA says "This might not have been saved…". Step 
 `room-checkboxes.tsx` stays for the sessions manager (20d may reuse the SPA copy in
 `features/admin/room-checkboxes.tsx`).
 
+Step 20d-1, for 21: the Proposals tab. The page owns `createAdminProposalsQuery({api,eventId})`
+(`GET /proposals`, all pages; `load()` on mount and in `onChanged`) and the guests query of 20c;
+`EventProposalsManager({proposals, guests, params, onParams, calls, onChanged})` with `guests` = the
+guests whose `eventIds` has the event, as `{id,name}`. `list-paging.ts` holds the shared pieces
+(`pageOf`, `tableHandlers`, `byTitleThenId`, `OnParams`); assignment-manager uses them too. Sorted
+by title (case-insensitive) then id, search on title or host name, as legacy. E2E changes: the
+labels "Title *" and "Hosts" become `getByLabel("Title")` (the star has no space) and the title
+field is a plain `ui/form` field; the stale-page redirect test (`?page=999`) now clamps without a
+redirect, so its `not.toHaveURL(page=999)` assertion fails: assert the first row shows instead. The
+delete warning names the vote count only in the voting phase (the API sends `votesCount` then only);
+otherwise it says "its votes". Question for the user: have the admin API send the count always?
+
 Step 21 must delete the legacy `use-event-section.ts` (untested now; the SPA copy has the test).
 
 ## Questions

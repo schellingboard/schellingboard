@@ -54,7 +54,7 @@ export const proposalViewSchema = z
       .int()
       .nullable()
       .describe(
-        "How many votes, skips included, in the voting phase only: the list sorts by it"
+        "How many votes, skips included: the list sorts by it. Sent in the voting phase, and to admins in every phase"
       ),
     breakdown: voteBreakdownSchema.nullable(),
     version: z.number().int(),
