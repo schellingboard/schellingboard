@@ -69,12 +69,16 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
 - [x] 9. Site password screen: SPA `/login` (open in `proxy.ts`), `POST /api/v1/auth/site`
       (`server/http/site-auth.ts`); `/api/v1/health` is open too; `(login)` group and
       `actions/auth.ts` deleted. The gate stays in `proxy.ts` until step 17.
-- [ ] 10. **Site admin role and bootstrap link.** `guests.site_admin`; the actor is admin only
-      through a verified session of a site admin; the role protects the name and blocks
-      unprotecting; changes by an admin record which one. A single-use bootstrap token (hashed, 24
-      h, replaced at each start) logged while no site admin exists, and a script that prints a new
-      one; the bootstrap page signs the visitor in as a chosen or new guest, asks for username and
-      password, grants the role. Admin users screen grants and revokes it (never the last one).
+- [x] 10. Site admin role, server side: `guests.site_admin` (protects the name through `isProtected`
+      in the guests repository; `unprotect` refused); `actor.admin` is also a verified session of a
+      site admin; `PUT /admin/guests/{id}/site-admin` (never the last admin); `bootstrap_tokens`
+      (hashed, 24 h, replaced), `POST /auth/bootstrap`, `logBootstrapLink` at start
+      (`instrumentation.ts`) and `make bootstrap-link`. Split: the SPA half is step 10b.
+- [ ] 10b. **Site admin in the SPA.** The bootstrap page (`/auth/bootstrap?token=`: choose or make a
+      guest, username, password); the admin users screen grants and revokes the role; changes by an
+      admin record which one (`ChangeContext` admin gets the guest id; `byAdmin(at)` callers pass
+      the actor). `CHANGELOG.md`, `docs/public/` (admin guide), `docs/dev/` (server.md);
+      self-hosting docs name `SB_BOOTSTRAP_LINK=1` as the recovery path.
 - [ ] 11. **Admin sign-in in the SPA.** `AdminFrame` sends a guest without the role to the sign-in;
       a later 401/403 does the same. `/legacy/admin/login`, the admin cookie and `/api/auth/login`
       go; a set `ADMIN_PASSWORD` logs a deprecation warning; the admin UI is always on. Self-hosting

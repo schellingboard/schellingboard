@@ -41,6 +41,7 @@ export interface PeopleDeps {
   repos: Pick<
     Repositories,
     | "authCodes"
+    | "bootstrapTokens"
     | "events"
     | "guests"
     | "loginSessions"

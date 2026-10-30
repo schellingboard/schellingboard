@@ -3692,6 +3692,67 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/auth/bootstrap": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Spends a bootstrap link: the guest named by `guestId`, or a new one made from `name` and `email`, becomes a site admin with the given username and password, and the browser is signed in as them. `bootstrap.tokenWrong` (403) for a wrong, expired or used link; `guest.emailTaken` and `username.taken` (409). */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            /** @description The token in the bootstrap link */
+            token: string;
+            /** @description An existing guest to make the site admin */
+            guestId?: string;
+            name?: string;
+            email?: string;
+            username: string;
+            password: string;
+          };
+        };
+      };
+      responses: {
+        /** @description The site admin the browser now acts as */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              /** @description The guest the browser now acts as, or null when signed out */
+              guestId: string | null;
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/auth/sign-out": {
     parameters: {
       query?: never;
@@ -6347,6 +6408,62 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/admin/guests/{id}/site-admin": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Grants or revokes the site-admin role, which also protects the guest's name. Revoking the last site admin is 409 siteAdmin.last. */
+    put: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            siteAdmin: boolean;
+          };
+        };
+      };
+      responses: {
+        /** @description The updated guest */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["AdminGuest"];
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/admin/guests/{id}/test-email": {
     parameters: {
       query?: never;
@@ -7585,6 +7702,7 @@ export interface components {
       name: string;
       email: string;
       authProtected: boolean;
+      siteAdmin: boolean;
       eventIds: string[];
       version: number;
     };

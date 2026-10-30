@@ -214,6 +214,7 @@ export const adminGuestViewSchema = z
     name: z.string(),
     email: z.string(),
     authProtected: z.boolean(),
+    siteAdmin: z.boolean(),
     eventIds: z.array(z.string()),
     version: z.number().int(),
   })
@@ -241,3 +242,5 @@ export const guestImportResultSchema = z.object({
     .int()
     .describe("Rows matching a guest by email, left unchanged but assigned"),
 });
+
+export const siteAdminBodySchema = z.object({ siteAdmin: z.boolean() });

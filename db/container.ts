@@ -6,6 +6,7 @@ import * as schema from "./schema";
 import { resolveDbPath, runMigrations } from "./migrate";
 import { createLock, withWriteLock, type Lock } from "./write-lock";
 import { SqliteAuthCodesRepository } from "./repositories/sqlite/auth-codes";
+import { SqliteBootstrapTokensRepository } from "./repositories/sqlite/bootstrap-tokens";
 import { SqliteChangesRepository } from "./repositories/sqlite/changes";
 import {
   SqliteCommentsRepository,
@@ -33,6 +34,7 @@ import { SqliteSessionsRepository } from "./repositories/sqlite/sessions";
 import { SqliteVotesRepository } from "./repositories/sqlite/votes";
 import type {
   AuthCodesRepository,
+  BootstrapTokensRepository,
   ChangesRepository,
   CommentsRepository,
   DaysRepository,
@@ -60,6 +62,7 @@ import type {
 
 export type Repositories = {
   authCodes: AuthCodesRepository;
+  bootstrapTokens: BootstrapTokensRepository;
   changes: ChangesRepository;
   /** Scope-agnostic comment operations (find, edit, like, delete). */
   comments: CommentsRepository;
@@ -105,6 +108,7 @@ function buildRepositories(sqlite: Database.Database): Repositories {
   const db = drizzle(sqlite, { schema });
   return {
     authCodes: new SqliteAuthCodesRepository(db),
+    bootstrapTokens: new SqliteBootstrapTokensRepository(db),
     changes: new SqliteChangesRepository(db),
     comments: new SqliteCommentsRepository(db),
     proposalComments: sqliteSubjectCommentsRepository(db, "proposal"),

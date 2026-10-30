@@ -5,8 +5,14 @@ import {
   ensureGuest,
   listGuests,
   sendTestEmail,
+  setSiteAdmin,
   updateGuest,
 } from "./admin-guests";
+import {
+  announceBootstrap,
+  bootstrapAdmin,
+  issueBootstrapToken,
+} from "./bootstrap";
 import {
   changePassword,
   getCredentials,
@@ -60,6 +66,10 @@ export function createPeopleUseCases(deps: PeopleDeps) {
     updateGuest: updateGuest(deps),
     deleteGuest: deleteGuest(deps),
     sendTestEmail: sendTestEmail(deps),
+    setSiteAdmin: setSiteAdmin(deps),
+    issueBootstrapToken: issueBootstrapToken(deps),
+    announceBootstrap: announceBootstrap(deps),
+    bootstrapAdmin: bootstrapAdmin(deps),
     assignGuestsToEvent: assignGuestsToEvent(deps),
     removeGuestsFromEvent: removeGuestsFromEvent(deps),
     importGuests: importGuests(deps),
