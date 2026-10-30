@@ -24,6 +24,17 @@ const settingsForm = z.object({
     .describe("Removes the map when no image is sent"),
 });
 
+const getSite = createRoute({
+  method: "get",
+  path: "/site",
+  tags: ["site"],
+  description: "The site's title, description and venue map.",
+  responses: {
+    200: json(siteSettingsSchema, "The site settings"),
+    ...problemDefault,
+  },
+});
+
 const getSettings = createRoute({
   method: "get",
   path: "/admin/settings",
@@ -53,6 +64,14 @@ const updateSettings = createRoute({
     ...problemDefault,
   },
 });
+
+export function addSiteRoutes(app: App, settings: () => SettingsUseCases) {
+  app.openapi(getSite, async (c) => {
+    const result = await settings().getPublicSiteSettings();
+    if (!result.ok) return problem(result.error);
+    return c.json(result.value, 200);
+  });
+}
 
 export function addAdminSettingsRoutes(
   app: App,

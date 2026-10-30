@@ -37,7 +37,10 @@ import {
   addRsvpRoutes,
   addSessionRoutes,
 } from "@/server/modules/sessions/module";
-import { addAdminSettingsRoutes } from "@/server/modules/settings/module";
+import {
+  addAdminSettingsRoutes,
+  addSiteRoutes,
+} from "@/server/modules/settings/module";
 import { addAdminUpdateRoutes } from "@/server/modules/updates/module";
 import { addAdminVenueRoutes } from "@/server/modules/venue/module";
 import { actorMiddleware } from "./actor";
@@ -74,5 +77,6 @@ addAdminEventRoutes(api, eventUseCases);
 addAdminVenueRoutes(api, venueUseCases);
 addAdminUnavailabilityRoutes(api, sessionUseCases);
 addAdminGuestRoutes(api, peopleUseCases);
+addSiteRoutes(api, settingsUseCases);
 addAdminSettingsRoutes(api, settingsUseCases);
 addAdminUpdateRoutes(api, updateUseCases);

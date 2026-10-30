@@ -33,11 +33,6 @@ describe("the catch-all route", () => {
     );
   });
 
-  it("sends the root to /legacy", async () => {
-    await open("/");
-    expect(hardNavigate).toHaveBeenCalledExactlyOnceWith("/legacy");
-  });
-
   it("does not forward a path already under /legacy", async () => {
     await open("/legacy/conf");
     expect(hardNavigate).not.toHaveBeenCalled();

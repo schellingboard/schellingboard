@@ -44,10 +44,10 @@ export class ErrorBoundary extends Component<
             Reload
           </button>
           <a
-            href="/legacy"
+            href="/"
             className="rounded-md px-3 py-1.5 text-sm font-medium text-link hover:underline"
           >
-            Open the classic site
+            Go to the events
           </a>
         </div>
       </div>

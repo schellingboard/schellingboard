@@ -1,6 +1,6 @@
 "use client";
 import { useContext, useState } from "react";
-import Link from "next/link";
+import { AppLink } from "@/app/components/app-link";
 import { setPasswordWithTokenAction } from "@/app/actions/user-auth";
 import { UserContext } from "@/app/legacy/(site)/context";
 import { PasswordManagerHint } from "@/app/password-manager-hint";
@@ -55,12 +55,12 @@ export function ResetPasswordForm({
           Password set. Your name is now protected — log in with your new
           password.
         </p>
-        <Link
-          href="/legacy"
+        <AppLink
+          href="/"
           className="bg-brand text-on-brand font-semibold px-4 py-2 rounded shadow text-sm hover:bg-brand-hover self-start"
         >
           Go to sign in
-        </Link>
+        </AppLink>
       </div>
     );
   }

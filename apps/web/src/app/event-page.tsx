@@ -154,7 +154,7 @@ function Body({
     return (
       <Message>
         <p>Event not found</p>
-        <a href="/legacy" className="underline">
+        <a href="/" className="underline">
           Back to the events
         </a>
       </Message>
@@ -201,7 +201,7 @@ function Ready({
     return (
       <Message>
         <p>This event has been deleted.</p>
-        <a href="/legacy" className="underline">
+        <a href="/" className="underline">
           Back to the events
         </a>
       </Message>

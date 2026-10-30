@@ -45,9 +45,9 @@ describe("ErrorBoundary", () => {
     expect(screen.queryByText("all fine")).toBeNull();
     expect(
       screen
-        .getByRole("link", { name: "Open the classic site" })
+        .getByRole("link", { name: "Go to the events" })
         .getAttribute("href")
-    ).toBe("/legacy");
+    ).toBe("/");
   });
 
   it("tries again without reloading", async () => {
