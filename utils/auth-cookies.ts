@@ -1,12 +1,10 @@
 // Cookie verification without Next, so the server kernel can resolve the actor
 // from it; utils/auth.ts adds the Next request and response helpers.
 
-export const ADMIN_COOKIE_NAME = "admin-auth";
 // The guest cookie holds an opaque login-session token (see login_sessions in
 // db/schema.ts); the row decides how long it lives.
 export const GUEST_COOKIE_NAME = "guest";
 
-export const ADMIN_SCOPE = "admin";
 export const COOKIE_MAX_AGE_SEC = 7 * 24 * 60 * 60;
 // The longest a browser keeps a cookie; the session row expires first.
 const GUEST_COOKIE_MAX_AGE_SEC = 400 * 24 * 60 * 60;
@@ -16,17 +14,13 @@ export function isPasswordProtectionEnabled(): boolean {
   return !!process.env.SITE_PASSWORD;
 }
 
-export function isAdminEnabled(): boolean {
-  return !!process.env.ADMIN_PASSWORD;
-}
-
 const MIN_AUTH_SECRET_LENGTH = 32;
 
 function getAuthSecret(): string {
   const secret = process.env.AUTH_SECRET;
   if (!secret) {
     throw new Error(
-      "AUTH_SECRET environment variable must be set when SITE_PASSWORD or ADMIN_PASSWORD is set or guests protect their name"
+      "AUTH_SECRET environment variable must be set when SITE_PASSWORD is set or guests protect their name"
     );
   }
   if (secret.length < MIN_AUTH_SECRET_LENGTH) {
@@ -120,13 +114,6 @@ export async function isAuthCookieValid(
 ): Promise<boolean> {
   if (!isPasswordProtectionEnabled()) return true;
   return isSignedCookieValid(value, "");
-}
-
-export async function isAdminCookieValid(
-  value: string | undefined
-): Promise<boolean> {
-  if (!isAdminEnabled()) return false;
-  return isSignedCookieValid(value, ADMIN_SCOPE);
 }
 
 export function cookieOptions(maxAge: number) {

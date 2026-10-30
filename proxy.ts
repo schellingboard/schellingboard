@@ -1,36 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { problemResponse, type Problem } from "./server/http/problem";
 import {
-  adminApiV1Refusal,
+  adminApiRefusal,
   isTrustedOrigin,
-  ADMIN_DISABLED_MESSAGE,
-  ADMIN_VERIFIED_HEADER,
-  forwardAsVerifiedAdmin,
-  isAdminAuthenticated,
-  isAdminEnabled,
   isAuthenticated,
   isPasswordProtectionEnabled,
-  requireAdminAuth,
-  requireAdminAuthApi,
   requireAuth,
 } from "./utils/auth";
 import { requireMediaAuth } from "./utils/media-auth";
-
-// Only the admin API branches (via forwardAsVerifiedAdmin) may grant
-// ADMIN_VERIFIED_HEADER (and only ever set it to "1"); every other forwarded
-// request must have any client-supplied copy of it removed so a route added
-// outside the admin prefixes can never be tricked into trusting a forged value.
-function withoutAdminHeader(request: NextRequest): Headers {
-  const headers = new Headers(request.headers);
-  headers.delete(ADMIN_VERIFIED_HEADER);
-  return headers;
-}
-
-function forwardWithoutAdminHeader(request: NextRequest): NextResponse {
-  return NextResponse.next({
-    request: { headers: withoutAdminHeader(request) },
-  });
-}
 
 function refuseApiV1(problem: Problem): NextResponse {
   const res = problemResponse(problem);
@@ -43,9 +20,8 @@ function refuseApiV1(problem: Problem): NextResponse {
 // Any other path is a page of the SPA, which forwards it to /legacy when it
 // does not own it. The shell is the same for everyone, but who may open the
 // app is still decided here, as it is for the legacy pages. The site password
-// screen, `/login`, is how a visitor gets past that. The admin pages
-// are independent of the site password: they get the shell, and the admin API
-// they call holds the gate.
+// screen, `/login`, is how a visitor gets past that. The admin pages get the
+// shell too: the admin API they call holds the gate.
 async function serveShell(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
   if (!underRoot(pathname, "/admin") && pathname !== "/login") {
@@ -54,9 +30,7 @@ async function serveShell(request: NextRequest): Promise<NextResponse> {
   }
   const target = request.nextUrl.clone();
   target.pathname = "/api/spa/shell";
-  return NextResponse.rewrite(target, {
-    request: { headers: withoutAdminHeader(request) },
-  });
+  return NextResponse.rewrite(target);
 }
 
 // Roots that are not pages: the API and uploaded media keep their URLs.
@@ -76,49 +50,18 @@ export async function proxy(request: NextRequest) {
     ? requested.slice("/legacy".length) || "/"
     : requested;
 
-  // Allow access to login page, health check, and auth API routes
+  // Allow access to the health check and the site logout
   if (pathname === "/api/health" || pathname.startsWith("/api/auth/")) {
-    return forwardWithoutAdminHeader(request);
+    return NextResponse.next();
   }
 
-  // Admin UI routes are independent of site auth: they require only admin
-  // authentication (and return 404 when the admin UI is disabled)
-  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
-    if (!isAdminEnabled()) {
-      return new NextResponse(ADMIN_DISABLED_MESSAGE, { status: 404 });
-    }
-    if (pathname !== "/admin/login") {
-      const adminResponse = await requireAdminAuth(request);
-      if (adminResponse) {
-        return adminResponse;
-      }
-    }
-    return forwardWithoutAdminHeader(request);
-  }
-
-  // Admin API routes are likewise independent of site auth: they require
-  // only the admin cookie, checked here (route handlers trust the resulting
-  // ADMIN_VERIFIED_HEADER instead of re-checking the cookie themselves, but
-  // do require its presence — see requireProxyVerifiedAdmin).
-  if (pathname === "/api/admin" || pathname.startsWith("/api/admin/")) {
-    return requireAdminAuthApi(request);
-  }
-
-  // The versioned API gates like the legacy routes, but refuses as problem
-  // details: its clients read a status and a code, never a login page.
+  // The versioned API refuses as problem details: its clients read a status
+  // and a code, never a login page. The admin API is independent of the site
+  // password; a script signs in as a site admin.
   if (pathname === "/api/v1/admin" || pathname.startsWith("/api/v1/admin/")) {
-    const result = await adminApiV1Refusal(request);
-    if ("refusal" in result) {
-      return refuseApiV1({
-        status: result.refusal.status,
-        code: result.refusal.code,
-      });
-    }
-    return result.passwordVerified
-      ? forwardAsVerifiedAdmin(request)
-      : forwardWithoutAdminHeader(request);
+    const refusal = adminApiRefusal(request);
+    return refusal ? refuseApiV1(refusal) : NextResponse.next();
   }
-  // An admin script then needs one cookie for the whole API, not two.
   if (pathname === "/api/v1" || pathname.startsWith("/api/v1/")) {
     if (pathname.startsWith("/api/v1/auth/") && !isTrustedOrigin(request)) {
       return refuseApiV1({ status: 403, code: "request.crossSite" });
@@ -131,19 +74,17 @@ export async function proxy(request: NextRequest) {
     if (
       !open &&
       isPasswordProtectionEnabled() &&
-      !(await isAuthenticated(request)) &&
-      !(await isAdminAuthenticated(request))
+      !(await isAuthenticated(request))
     ) {
       return refuseApiV1({ status: 401, code: "site.unauthenticated" });
     }
-    return forwardWithoutAdminHeader(request);
+    return NextResponse.next();
   }
 
-  // Uploaded images are shown to attendees and previewed in the admin UI, so
-  // either cookie opens them; the route handlers apply the same rule again.
+  // The route handlers apply the same rule again.
   if (pathname.startsWith("/media/")) {
     const mediaResponse = await requireMediaAuth(request);
-    return mediaResponse ?? forwardWithoutAdminHeader(request);
+    return mediaResponse ?? NextResponse.next();
   }
 
   // Check authentication for all other routes
@@ -152,7 +93,7 @@ export async function proxy(request: NextRequest) {
     return authResponse;
   }
 
-  return forwardWithoutAdminHeader(request);
+  return NextResponse.next();
 }
 
 export const config = {
@@ -165,7 +106,8 @@ export const config = {
      * - the three icons app/layout.tsx loads, which the login page needs
      *   before anyone has a cookie
      * - locations/  — the seeded room photos in public/, which the admin UI
-     *   renders with the admin cookie alone (uploads live under /media)
+     *   renders before the site password may have been entered (uploads
+     *   live under /media)
      * - the manifest and its icons — installing has to work before anyone
      *   has logged in, and Safari fetches the manifest without our cookie
      *   either way. Both are build assets naming the instance, which the

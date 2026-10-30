@@ -7,15 +7,7 @@ import {
   startTimeOption,
   selectOption,
 } from "./helpers/session-form";
-
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admintest";
-
-async function adminLogin(page: Page) {
-  await page.goto("/admin");
-  await page.getByLabel("Password").fill(ADMIN_PASSWORD);
-  await page.getByRole("button", { name: "Access Admin" }).click();
-  await expect(page).toHaveURL(/\/admin\/events$/);
-}
+import { adminLogin } from "./helpers/admin";
 
 async function openGammaLocations(page: Page) {
   await page.goto("/admin");
@@ -69,6 +61,7 @@ test("a room marked unavailable cannot be booked then @017-US4", async ({
   await dayRadios(page).first().check();
   await expect(startTimeOption(page, "15:10")).not.toBeDisabled();
 
+  await adminLogin(page);
   availability = await openGammaLocations(page);
   await availability
     .getByRole("listitem")

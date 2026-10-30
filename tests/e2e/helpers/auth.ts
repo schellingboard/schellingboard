@@ -8,6 +8,8 @@ export async function login(page: Page, password: string = DEFAULT_PASSWORD) {
   const passwordInput = page.getByLabel("Password", { exact: true });
   if (!(await passwordInput.isVisible())) {
     await page.goto("/");
+    // Already through the site password, e.g. by signing in to /admin first.
+    if (new URL(page.url()).pathname !== "/login") return;
   }
   await passwordInput.fill(password);
   await page.click('button[type="submit"]');

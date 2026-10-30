@@ -15,7 +15,7 @@ vi.mock("@/utils/mailer", () => ({
 
 import { GET, POST, PUT, DELETE } from "@/app/api/v1/[[...route]]/route";
 import { openApiDocument } from "@/server/http/openapi";
-import { createAdminAuthCookie } from "@/utils/auth";
+import { createAdminAuthCookie } from "../helpers/admin-cookie";
 import { getRepositories } from "@/db/container";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import {
@@ -80,7 +80,6 @@ async function scheduledWorld() {
 beforeAll(() => setupTestDb());
 beforeEach(() => {
   resetTestDb();
-  vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
   vi.stubEnv("AUTH_SECRET", VALID_SECRET);
 });
 afterEach(() => vi.unstubAllEnvs());

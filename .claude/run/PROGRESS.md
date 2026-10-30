@@ -113,6 +113,17 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
   success; validation can run before the role check). Admin logout now also calls
   `/api/v1/auth/sign-out`. Self-hosting docs corrected for 11b's full rewrite.
 
+- Step 11b: no admin password or cookie any more; `actor.admin` is only a verified site-admin
+  session. The proxy lets `/api/v1/admin` through for any request with a `guest` cookie
+  (`adminApiRefusal` in `utils/auth.ts`); use cases check the role. `/api/admin/*` and
+  `/api/auth/login` are deleted (step 16 no longer lists them). The seed adds a site admin outside
+  `guestRows` (seeded hosts and RSVPs index modulo its length): username `site-admin`, password
+  `seed-password`. E2E signs in with `adminLogin` (`tests/e2e/helpers/admin.ts`); one browser has
+  one guest session, so a spec that switches to an attendee and back must sign in as the admin
+  again. `login()` returns early when the site password was already entered. Integration tests get
+  an admin from `tests/helpers/admin-cookie.ts` (a new "Site Admin" guest per call: list tests
+  filter it). `LEGACY_ROOT_PAGES` and its unit test are gone (no legacy root page is left).
+
 ## Known E2E flakes
 
 `attendee-count.spec.ts:64` (fails ~half of solo runs on the base too), `settings.spec.ts:67`,

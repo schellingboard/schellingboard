@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
-  ADMIN_COOKIE_NAME,
-  ADMIN_SCOPE,
   GUEST_COOKIE_NAME,
   COOKIE_MAX_AGE_SEC,
-  isAdminCookieValid,
-  isAdminEnabled,
   isAuthCookieValid,
   isPasswordProtectionEnabled,
   signCookieValue,
@@ -13,10 +9,7 @@ import {
 } from "@/utils/auth-cookies";
 
 export {
-  ADMIN_COOKIE_NAME,
   GUEST_COOKIE_NAME,
-  isAdminCookieValid,
-  isAdminEnabled,
   isAuthCookieValid,
   isPasswordProtectionEnabled,
   createGuestCookie,
@@ -24,25 +17,11 @@ export {
 } from "@/utils/auth-cookies";
 
 export const AUTH_COOKIE_NAME = "site-auth";
-export const ADMIN_DISABLED_MESSAGE =
-  "Admin UI is disabled: set the ADMIN_PASSWORD environment variable on the server to enable it. See the project documentation.";
-// Set by the proxy on requests it has verified carry a valid admin cookie,
-// and only then — route handlers trust its presence instead of
-// re-validating the cookie themselves. Safe because the proxy always runs
-// ahead of the route for real traffic and strips any client-supplied copy of
-// this header from every forwarded request before checking auth.
-export const ADMIN_VERIFIED_HEADER = "x-admin-verified";
-const ADMIN_VERIFIED_VALUE = "1";
-// Without an explicit no-store, browsers heuristically cache admin API
-// responses; some carry sensitive data (e.g. user emails) and must never be
-// served stale or from cache.
-export const NO_STORE = { headers: { "cache-control": "no-store" } };
-
 export { safeRedirectPath } from "@schellingboard/domain/safe-redirect";
 
 const encoder = new TextEncoder();
 
-// Constant-time string comparison for the shared site/admin passwords. This
+// Constant-time string comparison for the shared site password. This
 // file must stay free of node:crypto (see utils/user-credentials.ts), so no
 // timingSafeEqual: instead XOR every byte and fold the result, always walking
 // the longer input so timing reveals nothing beyond the secret's length.
@@ -63,14 +42,6 @@ export function verifyPassword(inputPassword: string): boolean {
     return true; // No protection if password not set
   }
   return timingSafeEqualString(inputPassword, sitePassword);
-}
-
-export function verifyAdminPassword(inputPassword: string): boolean {
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  if (!adminPassword) {
-    return false; // Admin access disabled entirely when no password is set
-  }
-  return timingSafeEqualString(inputPassword, adminPassword);
 }
 
 export async function isAuthenticated(request: NextRequest): Promise<boolean> {
@@ -100,22 +71,6 @@ export function createLogoutCookie() {
   };
 }
 
-export async function createAdminAuthCookie() {
-  return {
-    name: ADMIN_COOKIE_NAME,
-    value: await signCookieValue(ADMIN_SCOPE),
-    ...cookieOptions(COOKIE_MAX_AGE_SEC),
-  };
-}
-
-export function createAdminLogoutCookie() {
-  return {
-    name: ADMIN_COOKIE_NAME,
-    value: "",
-    ...cookieOptions(0),
-  };
-}
-
 export async function requireAuth(
   request: NextRequest
 ): Promise<NextResponse | null> {
@@ -127,31 +82,6 @@ export async function requireAuth(
   }
 
   const loginUrl = new URL("/login", request.url);
-  loginUrl.searchParams.set(
-    "redirect",
-    request.nextUrl.pathname + request.nextUrl.search
-  );
-  return NextResponse.redirect(loginUrl);
-}
-
-export async function isAdminAuthenticated(
-  request: NextRequest
-): Promise<boolean> {
-  const cookie = request.cookies.get(ADMIN_COOKIE_NAME)?.value;
-  return isAdminCookieValid(cookie);
-}
-
-export async function requireAdminAuth(
-  request: NextRequest
-): Promise<NextResponse | null> {
-  if (!isAdminEnabled()) {
-    return new NextResponse(ADMIN_DISABLED_MESSAGE, { status: 404 });
-  }
-  if (await isAdminAuthenticated(request)) {
-    return null;
-  }
-
-  const loginUrl = new URL("/legacy/admin/login", request.url);
   loginUrl.searchParams.set(
     "redirect",
     request.nextUrl.pathname + request.nextUrl.search
@@ -186,124 +116,20 @@ export function isTrustedOrigin(request: NextRequest): boolean {
 }
 
 export type AdminApiRefusal = {
-  status: 401 | 403 | 404;
-  code: "admin.disabled" | "request.crossSite" | "admin.unauthenticated";
-  message: string;
+  status: 401 | 403;
+  code: "request.crossSite" | "admin.unauthenticated";
 };
 
-export async function adminApiRefusal(
-  request: NextRequest
-): Promise<AdminApiRefusal | null> {
-  if (!isAdminEnabled()) {
-    return {
-      status: 404,
-      code: "admin.disabled",
-      message: "Admin API is disabled",
-    };
-  }
+/**
+ * The proxy has no database, so it only turns away a cross-site request or one
+ * with no guest cookie at all; the use cases check the site-admin role.
+ */
+export function adminApiRefusal(request: NextRequest): AdminApiRefusal | null {
   if (!isTrustedOrigin(request)) {
-    return {
-      status: 403,
-      code: "request.crossSite",
-      message: "Cross-site request rejected",
-    };
+    return { status: 403, code: "request.crossSite" };
   }
-  if (!(await isAdminAuthenticated(request))) {
-    return {
-      status: 401,
-      code: "admin.unauthenticated",
-      message: "Unauthorized",
-    };
+  if (!request.cookies.has(GUEST_COOKIE_NAME)) {
+    return { status: 401, code: "admin.unauthenticated" };
   }
   return null;
-}
-
-/**
- * The versioned admin API: the admin cookie is verified here, while a guest's
- * login session is left to the API, whose use cases check the site-admin role
- * (the proxy has no database). Only a request with neither is refused.
- */
-export async function adminApiV1Refusal(
-  request: NextRequest
-): Promise<{ refusal: AdminApiRefusal } | { passwordVerified: boolean }> {
-  if (!isTrustedOrigin(request)) {
-    return {
-      refusal: {
-        status: 403,
-        code: "request.crossSite",
-        message: "Cross-site request rejected",
-      },
-    };
-  }
-  if (await isAdminAuthenticated(request)) return { passwordVerified: true };
-  if (request.cookies.has(GUEST_COOKIE_NAME))
-    return { passwordVerified: false };
-  return {
-    refusal: {
-      status: 401,
-      code: "admin.unauthenticated",
-      message: "Unauthorized",
-    },
-  };
-}
-
-export function forwardAsVerifiedAdmin(request: NextRequest): NextResponse {
-  const headers = new Headers(request.headers);
-  headers.set(ADMIN_VERIFIED_HEADER, ADMIN_VERIFIED_VALUE);
-  return NextResponse.next({ request: { headers } });
-}
-
-/**
- * Admin-API counterpart of {@link requireAdminAuth}: same admin-cookie check,
- * plus a CSRF check the UI branch doesn't need (see {@link isTrustedOrigin}
- * — the UI relies on Next's built-in server-action Origin check instead). On
- * failure this returns JSON (matching the API's contract) instead of a
- * redirect to the admin login page; on success it forwards the request with
- * {@link ADMIN_VERIFIED_HEADER} set so the route handler doesn't need to
- * re-check the cookie — it only checks that header, via
- * {@link requireProxyVerifiedAdmin}.
- *
- * Deliberate contract change from the routes' previous per-route checks:
- * those always returned 401 regardless of why auth failed, whereas this
- * returns 404 when the admin API is disabled (mirroring the /admin UI
- * branch), 403 for a cross-site request, and 401 only for a missing/invalid
- * admin cookie. External clients that only branched on 401 need to handle
- * 404 and 403 too.
- */
-export async function requireAdminAuthApi(
-  request: NextRequest
-): Promise<NextResponse> {
-  const refusal = await adminApiRefusal(request);
-  if (refusal) {
-    return NextResponse.json(
-      { error: refusal.message },
-      { ...NO_STORE, status: refusal.status }
-    );
-  }
-  return forwardAsVerifiedAdmin(request);
-}
-
-/**
- * Route-handler half of the {@link requireAdminAuthApi} contract: returns a
- * 401 response unless the request carries the header the proxy sets after a
- * successful admin-cookie check, or `null` to proceed.
- *
- * This is not a second authentication — the proxy already decided that, and
- * a client can't reach a route with this header set because the proxy strips
- * any client-supplied copy from every forwarded request. It exists so the
- * routes fail *closed* rather than open if the proxy ever doesn't run ahead
- * of them (a matcher edit, a route moved outside `/api/admin/`, a
- * middleware-bypass bug in Next). Without it these seeding endpoints have no
- * auth of their own at all.
- */
-export function requireProxyVerifiedAdmin(
-  request: Request
-): NextResponse | null {
-  if (request.headers.get(ADMIN_VERIFIED_HEADER) === ADMIN_VERIFIED_VALUE) {
-    return null;
-  }
-  return NextResponse.json(
-    { error: "Unauthorized" },
-    { ...NO_STORE, status: 401 }
-  );
 }

@@ -66,13 +66,13 @@ describe("the admin frame", { tags: ["015-US1"] }, () => {
   });
 
   it.each([401, 403])(
-    "sends the browser to the admin login, back to this page after, on %i",
+    "sends the browser to the sign-in, back to this page after, on %i",
     async (status) => {
       open(problem(status, "admin.required"));
 
       await waitFor(() =>
         expect(hardNavigate).toHaveBeenCalledWith(
-          "/legacy/admin/login?redirect=%2Fadmin%2Fevents%2Fconf%3Fq%3Dx"
+          "/auth/login?redirect=%2Fadmin%2Fevents%2Fconf%3Fq%3Dx"
         )
       );
       expect(screen.queryByRole("heading", { name: "Events" })).toBeNull();
@@ -123,7 +123,7 @@ describe("the admin frame", { tags: ["015-US1"] }, () => {
     expect(hardNavigate).not.toHaveBeenCalled();
   });
 
-  it("logs out and lands on the admin login", async () => {
+  it("signs out and lands on the sign-in", async () => {
     const user = userEvent.setup();
     const fetchMock = vi.fn(() =>
       Promise.resolve(new Response(null, { status: 204 }))
@@ -136,15 +136,15 @@ describe("the admin frame", { tags: ["015-US1"] }, () => {
     );
 
     await waitFor(() =>
-      expect(hardNavigate).toHaveBeenCalledWith("/legacy/admin/login")
+      expect(hardNavigate).toHaveBeenCalledWith("/auth/login")
     );
-    expect(fetchMock).toHaveBeenCalledWith("/api/admin/logout", {
+    expect(fetchMock).toHaveBeenCalledWith("/api/v1/auth/sign-out", {
       method: "POST",
     });
   });
 
   it.each([401, 403])(
-    "counts a logout answered %i as done: the admin was already signed out",
+    "counts a logout answered %i as done: nobody was signed in",
     async (status) => {
       const user = userEvent.setup();
       vi.stubGlobal(
@@ -158,7 +158,7 @@ describe("the admin frame", { tags: ["015-US1"] }, () => {
       );
 
       await waitFor(() =>
-        expect(hardNavigate).toHaveBeenCalledWith("/legacy/admin/login")
+        expect(hardNavigate).toHaveBeenCalledWith("/auth/login")
       );
     }
   );

@@ -151,6 +151,32 @@ describe("the sign-in pages", { tags: ["003-US4"] }, () => {
     ).toBeTruthy();
   });
 
+  it.each([
+    ["/admin", "/admin"],
+    ["https://evil.example/", "/"],
+  ])("after signing in, goes to the redirect %s", async (redirect, target) => {
+    await open({
+      handler: (call) =>
+        call.path === "/api/v1/auth/login"
+          ? Response.json({ guestId: "bo", level: "verified" })
+          : withBo(call),
+      path: `/auth/login?redirect=${encodeURIComponent(redirect)}`,
+      identity: null,
+    });
+
+    await userEvent.type(
+      await screen.findByLabelText("Email or username"),
+      "bo"
+    );
+    await userEvent.type(
+      screen.getByLabelText("Password or emailed code"),
+      "pw"
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Log in" }));
+
+    await waitFor(() => expect(hardNavigate).toHaveBeenCalledWith(target));
+  });
+
   it("says a login link naming nobody is invalid", async () => {
     await open({
       handler: withBo,

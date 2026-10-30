@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { proxy } from "@/proxy";
-import { createAdminAuthCookie } from "@/utils/auth";
 
 type ProxyResult =
   { ok: true; request: Request } | { ok: false; response: NextResponse };
@@ -10,8 +9,7 @@ type ProxyResult =
  * request continue, reconstructs the forwarded request the way Next.js does
  * for `NextResponse.next({ request: { headers } })` (via the
  * `x-middleware-override-headers` / `x-middleware-request-*` response
- * headers). This is what lets route handler tests exercise proxy-set trust
- * headers (e.g. ADMIN_VERIFIED_HEADER) instead of bypassing the proxy.
+ * headers).
  */
 export async function throughProxy(
   path: string,
@@ -58,20 +56,4 @@ export async function throughProxy(
     ok: true,
     request: new Request(`http://test${path}`, { ...init, headers }),
   };
-}
-
-/**
- * Drives a request through the real proxy, authenticated as admin unless
- * `authed: false` is passed, and dispatches to `handler` if the proxy lets
- * it through.
- */
-export async function callThroughProxy(
-  handler: (req: Request) => Response | Promise<Response>,
-  path: string,
-  init: RequestInit = {},
-  opts: { authed?: boolean } = {}
-): Promise<Response> {
-  const cookies = opts.authed === false ? [] : [await createAdminAuthCookie()];
-  const result = await throughProxy(path, init, cookies);
-  return result.ok ? handler(result.request) : result.response;
 }

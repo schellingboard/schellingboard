@@ -4,7 +4,6 @@ import { login } from "../../tests/e2e/helpers/auth";
 import { selectUser } from "../../tests/e2e/helpers/user";
 
 export const SITE_PASSWORD = "screenshots";
-export const ADMIN_PASSWORD = "admin-screenshots";
 export const ATTENDEE = "Hana Kobayashi";
 
 export type Env = { baseURL: string; browser: Browser; tmp: string };

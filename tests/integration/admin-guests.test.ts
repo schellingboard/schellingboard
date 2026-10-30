@@ -43,7 +43,6 @@ describe("admin guest actions", () => {
     resetTestDb();
     logoutAdmin();
     vi.mocked(sendMail).mockReset();
-    vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
   });
@@ -61,15 +60,6 @@ describe("admin guest actions", () => {
       expect(
         await getRepositories().guests.findByEmail("eve@test.example")
       ).toBeUndefined();
-    });
-
-    it("rejects actions when admin is disabled, even with a cookie", async () => {
-      vi.stubEnv("ADMIN_PASSWORD", "");
-      const result = await createGuestAction({
-        name: "Eve",
-        email: "eve@test.example",
-      });
-      expect(result).toEqual({ ok: false, error: "Unauthorized" });
     });
 
     it("rejects updateGuestAction and deleteGuestAction without an admin cookie", async () => {

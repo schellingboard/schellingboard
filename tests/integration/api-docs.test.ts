@@ -8,7 +8,6 @@ import { throughProxy } from "../helpers/through-proxy";
 
 beforeEach(() => {
   vi.stubEnv("SITE_PASSWORD", "site-pw");
-  vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
   vi.stubEnv("AUTH_SECRET", "0123456789abcdef0123456789abcdef");
 });
 afterEach(() => vi.unstubAllEnvs());
@@ -29,13 +28,13 @@ describe("API docs", () => {
   it("declares which cookie each endpoint needs", () => {
     const { paths = {}, components } = openApiDocument();
     expect(Object.keys(components?.securitySchemes ?? {}).sort()).toEqual([
-      "adminAuth",
+      "guestAuth",
       "siteAuth",
     ]);
     expect(paths["/api/v1/health"].get).not.toHaveProperty("security");
     expect(paths["/api/v1/auth/site"].post).not.toHaveProperty("security");
     expect(paths["/api/v1/admin/events"].post?.security).toEqual([
-      { adminAuth: [] },
+      { guestAuth: [] },
     ]);
     const attendee = Object.entries(paths).find(
       ([path]) =>
@@ -44,7 +43,7 @@ describe("API docs", () => {
         path !== "/api/v1/auth/site"
     );
     expect(attendee?.[1].get?.security ?? attendee?.[1].post?.security).toEqual(
-      [{ siteAuth: [] }, { adminAuth: [] }]
+      [{ siteAuth: [] }]
     );
   });
 

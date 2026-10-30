@@ -58,7 +58,9 @@ describe("guests.importAndAssign", () => {
       )
     ).rejects.toThrow();
 
-    expect(await guests.list()).toHaveLength(0);
+    expect(
+      (await guests.list()).filter((g) => g.name !== "Site Admin")
+    ).toHaveLength(0);
   });
 });
 
@@ -68,7 +70,6 @@ describe("importGuestsAction", () => {
   beforeEach(async () => {
     resetTestDb();
     logoutAdmin();
-    vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
   });
@@ -135,7 +136,7 @@ describe("importGuestsAction", () => {
     expect(result).toEqual({ ok: true, created: 0, existing: 1 });
 
     const { guests } = getRepositories();
-    const all = await guests.list();
+    const all = (await guests.list()).filter((g) => g.name !== "Site Admin");
     expect(all).toHaveLength(1);
     const assigned = await guests.listByEvent(event.id);
     expect(assigned).toHaveLength(1);
@@ -153,7 +154,9 @@ describe("importGuestsAction", () => {
     }
 
     const { guests } = getRepositories();
-    expect(await guests.list()).toHaveLength(0);
+    expect(
+      (await guests.list()).filter((g) => g.name !== "Site Admin")
+    ).toHaveLength(0);
   });
 
   it("errors for an unknown event without importing", async () => {
@@ -164,7 +167,9 @@ describe("importGuestsAction", () => {
     expect(!result.ok && result.error).toBe("Event not found");
 
     const { guests } = getRepositories();
-    expect(await guests.list()).toHaveLength(0);
+    expect(
+      (await guests.list()).filter((g) => g.name !== "Site Admin")
+    ).toHaveLength(0);
   });
 
   it("rejects when not authenticated", async () => {

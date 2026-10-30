@@ -241,7 +241,9 @@ function Login({
       calls={calls}
       guest={guestId ? (named ?? null) : undefined}
       code={params.get("code") ?? undefined}
-      onSignedIn={() => hardNavigate("/")}
+      onSignedIn={() =>
+        hardNavigate(safeRedirectPath(params.get("redirect"), "/"))
+      }
     />
   );
 }

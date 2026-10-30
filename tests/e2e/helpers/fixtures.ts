@@ -34,17 +34,13 @@ const ALLOWED_CONSOLE_PATTERNS: RegExp[] = [
 const SERVER_PATH =
   /^\/(legacy|api|media|locations|_next|_spa|sw\.js|manifest\.webmanifest|favicon\.ico|icon|apple-touch-icon|one-on-one)(\/|\.|-|$)/;
 
-// Legacy pages directly under the root: `/login` is never an event. Kept in
-// step with apps/web/src/app/legacy-pages.ts (tests/unit/spa-legacy-pages.test.ts).
-const LEGACY_ROOT_PAGES = ["admin"];
-
 // An event's own page, `/{slug}`, and its proposals screens, which the SPA serves.
 // Its 1-on-1 modal is still the legacy schedule's, which the SPA hands the address to.
 function isEventPage(url: string): boolean {
   const slug = /^\/([^/?#]+)(?:\/proposals(?:\/[^?#]*)?)?(?:[?#].*)?$/.exec(
     url
   )?.[1];
-  return slug !== undefined && !LEGACY_ROOT_PAGES.includes(slug);
+  return slug !== undefined && slug !== "admin";
 }
 
 const isRootPage = (url: string) => /^\/(?:[?#]|$)/.test(url);
@@ -56,8 +52,7 @@ const isAccountPage = (url: string) =>
     url
   );
 
-const isAdminPage = (url: string) =>
-  /^\/admin(?:[/?#]|$)/.test(url) && !/^\/admin\/login(?:[/?#]|$)/.test(url);
+const isAdminPage = (url: string) => /^\/admin(?:[/?#]|$)/.test(url);
 
 function isAllowed(text: string): boolean {
   return ALLOWED_CONSOLE_PATTERNS.some((re) => re.test(text));

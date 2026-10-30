@@ -11,7 +11,7 @@ import {
 vi.mock("@/utils/mailer", () => ({ sendMail: vi.fn() }));
 
 import { GET, POST, PUT, DELETE } from "@/app/api/v1/[[...route]]/route";
-import { createAdminAuthCookie } from "@/utils/auth";
+import { createAdminAuthCookie } from "../helpers/admin-cookie";
 import { getRepositories } from "@/db/container";
 import { VoteChoice } from "@schellingboard/domain/vote";
 import { setupTestDb, resetTestDb } from "../helpers/db";
@@ -24,7 +24,6 @@ const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 beforeAll(() => setupTestDb());
 beforeEach(() => {
   resetTestDb();
-  vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
   vi.stubEnv("AUTH_SECRET", VALID_SECRET);
 });
 afterEach(() => vi.unstubAllEnvs());

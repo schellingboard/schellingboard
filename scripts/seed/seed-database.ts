@@ -18,6 +18,7 @@ import { generateBulkGuests, generateBulkProposals } from "./bulk";
 import {
   guestConfigs,
   hasProfileFields,
+  SEED_PROTECTED_PASSWORD,
   type GuestConfig,
 } from "./data/guests";
 import { gammaSessionConfigs } from "./data/gamma-schedule";
@@ -355,6 +356,19 @@ async function seedTestData(profile: SeedProfile) {
     })
   );
   insertChunked(guestRows, (chunk) => db.insert(schema.guests).values(chunk));
+  // Apart from guestRows: seeded hosts and RSVPs are picked by index modulo
+  // its length, which another row would shift.
+  db.insert(schema.guests)
+    .values({
+      id: nanoid(),
+      name: "Site Admin",
+      email: "site.admin@example.com",
+      username: "site-admin",
+      siteAdmin: true,
+      authProtected: true,
+      passwordHash: await hashUserPassword(SEED_PROTECTED_PASSWORD),
+    })
+    .run();
   const avatarCount = guestRows.filter((g) => g.avatarUrl).length;
   const protectedCount = guestRows.filter((g) => g.authProtected).length;
   console.log(

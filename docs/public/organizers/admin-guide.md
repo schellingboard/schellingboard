@@ -6,20 +6,19 @@ type: guide
 
 # Admin UI guide
 
-The admin UI lives at `/admin`. It opens for [site admins](#site-admins), or with the shared
-`ADMIN_PASSWORD` if one is set. It is independent of `SITE_PASSWORD` — neither password grants
-access to the other side.
+The admin UI lives at `/admin`. It opens for [site admins](#site-admins), who sign in there with
+their username or email and a password. When the site has a `SITE_PASSWORD`, enter that first.
 
-:::warning "Changing a password does not log anyone out" Both gates sign their cookies with
-`AUTH_SECRET`, and existing sessions stay valid for up to a week. To revoke access immediately,
-rotate `AUTH_SECRET` too — which logs out the site and admin gates. Attendees stay signed in (their
-sessions last 30 days from last use), and no organizer action signs them out yet. :::
+A site admin keeps the access until the role is removed or their sessions are ended; changing their
+password signs them out everywhere. The site password's cookie stays valid for up to a week: rotate
+`AUTH_SECRET` to end it sooner, which logs out the site gate only.
 
 ## Site admins
 
-A site admin is a person who opens `/admin` after signing in with a password or an emailed code, in
-place of the shared `ADMIN_PASSWORD`. Their name is protected, and changes they make are recorded
-under their name.
+A site admin is a person who opens `/admin` after signing in with a password or an emailed code.
+There is no shared admin password any more; a server that still sets `ADMIN_PASSWORD` logs a
+warning, and the setting does nothing. A site admin's name is protected, and changes they make are
+recorded under their name.
 
 - **The first site admin**: while the site has none, the server logs a one-time link at start (valid
   24 hours). Open it, choose your name or enter a name and email, and set a username and password.

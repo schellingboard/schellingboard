@@ -24,7 +24,7 @@ import {
 } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 import { createImageFile } from "../helpers/utils";
-import { createAdminAuthCookie } from "@/utils/auth";
+import { createAdminAuthCookie } from "../helpers/admin-cookie";
 import { TIME_OFFSET_COOKIE } from "@/utils/dev-clock";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
@@ -131,7 +131,6 @@ describe("/api/v1 profiles", () => {
     "lists an event's guests to its guests and admins only",
     { tags: ["019-US8"] },
     async () => {
-      vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
       const event = await createEvent();
       const member = await createGuest({ eventId: event.id });
       const outsider = await createGuest();

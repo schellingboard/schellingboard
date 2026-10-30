@@ -1,10 +1,9 @@
 import { test, expect } from "./helpers/fixtures";
+import { adminLogin } from "./helpers/admin";
 import { login } from "./helpers/auth";
 import { selectUser } from "./helpers/user";
 import { toast } from "./helpers/toast";
 import { dayRadios, selectOption } from "./helpers/session-form";
-
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admintest";
 
 test("RSVP to a session persists across reloads and can be removed again @009-US1", async ({
   page,
@@ -117,9 +116,7 @@ test("a full session blocks further RSVPs when the event enforces capacity @009-
   test.slow();
 
   // Admin: enable the capacity hard limit on Conference Gamma.
-  await page.goto("/admin");
-  await page.getByLabel("Password").fill(ADMIN_PASSWORD);
-  await page.getByRole("button", { name: "Access Admin" }).click();
+  await adminLogin(page);
   await page
     .getByRole("listitem")
     .filter({ hasText: "Conference Gamma" })
@@ -162,7 +159,7 @@ test("a full session blocks further RSVPs when the event enforces capacity @009-
   await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
 
   // Admin: shrink the new session to a single seat.
-  await page.goto("/admin/events");
+  await adminLogin(page);
   await page
     .getByRole("listitem")
     .filter({ hasText: "Conference Gamma" })

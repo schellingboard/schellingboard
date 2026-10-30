@@ -91,7 +91,7 @@ export const authApiLimit = (): BucketLimit => ({
   capacity: Number(process.env.SB_AUTH_RATE_BURST) || AUTH_API_LIMIT.capacity,
 });
 
-export type LoginScope = "site" | "admin" | "guest";
+export type LoginScope = "site" | "guest";
 
 // Per scope too, which bounds guesses from rotating IPs at the cost of
 // blocking everyone's logins in that scope while an attack is under way.

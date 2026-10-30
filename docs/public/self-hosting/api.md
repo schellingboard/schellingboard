@@ -30,30 +30,35 @@ Both need the same login as the rest of `/api/v1` (see below). To stop serving t
 Endpoints under `/api/v1/admin/` are for organizers; the rest are what attendees do in the app.
 
 Endpoints that take an `eventId` need an event's ID. `GET /api/v1/events` lists the events and
-`GET /api/v1/events/{id}` reads one with its days; neither needs the admin cookie.
+`GET /api/v1/events/{id}` reads one with its days; neither needs a site admin.
 
 ## Signing in
 
-A request carries the same cookies the site sets in a browser: the site password's, the admin
-login's, and the one choosing your name. There are no API tokens yet; they are planned.
+A request carries the same cookies the site sets in a browser: the site password's and the login
+session's. There are no API tokens yet; they are planned.
 
 - **Site password.** When `SITE_PASSWORD` is set, every `/api/v1` endpoint outside `/api/v1/admin/`
-  needs the site cookie or the admin cookie.
-- **Admin.** `/api/v1/admin/` needs the admin cookie or the sign-in of a site admin, and nothing
-  else: the site password is not asked for there, as in the admin UI. Without either, these
-  endpoints answer `401`, or `403` for a guest who is not a site admin.
+  needs the site cookie.
+- **Site admin.** `/api/v1/admin/` needs the login session of a
+  [site admin](../organizers/admin-guide.md#site-admins), and nothing else: the site password is not
+  asked for there. Without a session these endpoints answer `401`, and `403` for a guest who is not
+  a site admin.
 
-Scripts should use `/api/v1/admin/` with the admin cookie, which they get by exchanging the admin
-password at `/api/auth/login`:
+Scripts sign in as a site admin with a username and password (the user's page in the admin UI sets
+them), then send the cookies on each request:
 
 ```bash
 SITE=https://sessions.example.org
 
 curl -c cookies.txt -H 'content-type: application/json' \
-  -d '{"password": "your admin password", "scope": "admin"}' \
-  "$SITE/api/auth/login"
+  -d '{"password": "your site password"}' \
+  "$SITE/api/v1/auth/site"
 
-curl -b cookies.txt "$SITE/api/v1/events"
+curl -b cookies.txt -c cookies.txt -H 'content-type: application/json' \
+  -d '{"identifier": "your-username", "credential": "your password"}' \
+  "$SITE/api/v1/auth/login"
+
+curl -b cookies.txt "$SITE/api/v1/admin/events"
 ```
 
 Endpoints that act as an attendee — RSVPs, votes, your own profile and notifications — act as the
@@ -96,8 +101,8 @@ attach the same list to their own codes, such as `guest.invalid`.
 
 ## Rate limits
 
-Each caller may send 300 requests at once, then 5 a second: the admin login counts as one caller,
-each attendee signed in to a protected name as another, and everyone else by their address (see
+Each caller may send 300 requests at once, then 5 a second: a site admin counts as one caller, each
+attendee signed in to a protected name as another, and everyone else by their address (see
 [Behind a reverse proxy](configuration.md#behind-a-reverse-proxy)). A request past the limit gets
 `429` with `rate.limited` and a `Retry-After` header saying how many seconds to wait before
 retrying. `/api/v1/health` is never limited.
@@ -118,7 +123,7 @@ then made once.
 - An answer of `500` or above is not kept, so a retry runs the request again.
 
 Keys are kept for 24 hours and are separate for each signed-in user, so two scripts cannot collide
-on a key. A key must be 1 to 255 characters. A request with neither the admin cookie nor a selected
+on a key. A key must be 1 to 255 characters. A request with neither a site admin nor a selected
 attendee has its key ignored.
 
 ## Caching
@@ -143,8 +148,7 @@ Nothing is overwritten unseen.
 ## Syncing from a script
 
 A script that keeps an event in step with an outside plan, such as a list of shifts, reads what is
-there first and then changes only what differs. With the admin cookie it can read every endpoint it
-needs:
+there first and then changes only what differs. As a site admin it can read every endpoint it needs:
 
 - **Check times before booking.** `GET /api/v1/events/{id}` answers the event's settings and its
   days, so the script can check session times first.

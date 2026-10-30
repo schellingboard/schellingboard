@@ -65,18 +65,16 @@ describe("login limits", () => {
 
   it("keeps other clients and scopes unaffected", () => {
     for (let i = 0; i < perClient; i++)
-      recordLoginFailure("admin", "1.2.3.4", T0);
-    expect(loginRetryAfter("admin", "1.2.3.4", T0)).toBeGreaterThan(0);
-    expect(loginRetryAfter("admin", "5.6.7.8", T0)).toBe(0);
-    expect(loginRetryAfter("site", "1.2.3.4", T0)).toBe(0);
+      recordLoginFailure("site", "1.2.3.4", T0);
+    expect(loginRetryAfter("site", "1.2.3.4", T0)).toBeGreaterThan(0);
+    expect(loginRetryAfter("site", "5.6.7.8", T0)).toBe(0);
+    expect(loginRetryAfter("guest", "1.2.3.4", T0)).toBe(0);
   });
 
   it("blocks a whole scope when failures spread across many clients", () => {
     for (let i = 0; i < LOGIN_LIMITS.perScope.capacity; i++)
-      recordLoginFailure("admin", `10.0.${i >> 8}.${i & 255}`, T0);
-    expect(loginRetryAfter("admin", "never-seen-before", T0)).toBeGreaterThan(
-      0
-    );
+      recordLoginFailure("site", `10.0.${i >> 8}.${i & 255}`, T0);
+    expect(loginRetryAfter("site", "never-seen-before", T0)).toBeGreaterThan(0);
   });
 });
 

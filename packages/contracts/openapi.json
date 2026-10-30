@@ -1612,11 +1612,11 @@
         "name": "site-auth",
         "description": "Set by the site's password page. Only needed when the site has a password."
       },
-      "adminAuth": {
+      "guestAuth": {
         "type": "apiKey",
         "in": "cookie",
-        "name": "admin-auth",
-        "description": "Set by logging in at /admin, or by POST /api/auth/login with scope admin. The browser sends it by itself."
+        "name": "guest",
+        "description": "A login session, set by POST /api/v1/auth/login. The admin endpoints also need the signed-in guest to be a site admin."
       }
     }
   },
@@ -1693,7 +1693,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/sessions/{id}": {
@@ -1725,7 +1725,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       },
       "put": {
         "tags": ["sessions"],
@@ -1848,7 +1848,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       },
       "delete": {
         "tags": ["sessions"],
@@ -1884,7 +1884,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/sessions": {
@@ -1953,7 +1953,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       },
       "post": {
         "tags": ["sessions"],
@@ -2031,7 +2031,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/admin/sessions": {
@@ -2107,7 +2107,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/sessions/{id}": {
@@ -2229,7 +2229,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       },
       "delete": {
         "tags": ["admin"],
@@ -2264,7 +2264,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/sessions/{id}/rsvps": {
@@ -2305,7 +2305,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/guests/{id}/rsvps": {
@@ -2347,7 +2347,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/sessions/{id}/rsvps/{guestId}": {
@@ -2391,7 +2391,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       },
       "delete": {
         "tags": ["rsvps"],
@@ -2433,7 +2433,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/admin/sessions/{id}/rsvps/{guestId}": {
@@ -2492,7 +2492,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       },
       "delete": {
         "tags": ["admin"],
@@ -2533,7 +2533,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/proposals/{id}": {
@@ -2565,7 +2565,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       },
       "put": {
         "tags": ["proposals"],
@@ -2665,7 +2665,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       },
       "delete": {
         "tags": ["proposals"],
@@ -2701,7 +2701,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/proposals": {
@@ -2770,7 +2770,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       },
       "post": {
         "tags": ["proposals"],
@@ -2831,7 +2831,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/proposals/{id}/hosts": {
@@ -2869,7 +2869,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/admin/proposals": {
@@ -2934,7 +2934,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/proposals/{id}": {
@@ -3037,7 +3037,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       },
       "delete": {
         "tags": ["admin"],
@@ -3072,7 +3072,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/guests/{id}/votes": {
@@ -3120,7 +3120,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/proposals/{id}/votes/{guestId}": {
@@ -3181,7 +3181,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       },
       "delete": {
         "tags": ["votes"],
@@ -3223,7 +3223,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/proposals/{id}/comments": {
@@ -3292,7 +3292,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       },
       "post": {
         "tags": ["comments"],
@@ -3358,7 +3358,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/sessions/{id}/comments": {
@@ -3427,7 +3427,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       },
       "post": {
         "tags": ["comments"],
@@ -3493,7 +3493,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/guests/{id}/comments": {
@@ -3562,7 +3562,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       },
       "post": {
         "tags": ["comments"],
@@ -3628,7 +3628,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/comments/{id}": {
@@ -3691,7 +3691,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       },
       "delete": {
         "tags": ["comments"],
@@ -3727,7 +3727,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/comments/{id}/like": {
@@ -3765,7 +3765,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       },
       "delete": {
         "tags": ["comments"],
@@ -3801,7 +3801,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/meetings": {
@@ -3849,7 +3849,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       },
       "post": {
         "tags": ["meetings"],
@@ -3950,7 +3950,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/meeting-candidates": {
@@ -4080,7 +4080,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/meeting-availability": {
@@ -4154,7 +4154,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       },
       "put": {
         "tags": ["meetings"],
@@ -4202,7 +4202,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/host-clashes": {
@@ -4299,7 +4299,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/guests/{id}/meeting-options": {
@@ -4332,7 +4332,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/meetings/{id}/accept": {
@@ -4413,7 +4413,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/meetings/{id}/decline": {
@@ -4494,7 +4494,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/meetings/{id}/cancel": {
@@ -4588,7 +4588,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/admin/events/{id}/meetings": {
@@ -4685,7 +4685,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/events/{id}/meeting-points": {
@@ -4745,7 +4745,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       },
       "post": {
         "tags": ["admin"],
@@ -4821,7 +4821,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/events/{eventId}/meeting-points/{id}": {
@@ -4956,7 +4956,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       },
       "delete": {
         "tags": ["admin"],
@@ -4997,7 +4997,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/sessions/{id}/attendee-count": {
@@ -5034,7 +5034,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       },
       "put": {
         "tags": ["sessions"],
@@ -5098,7 +5098,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/me/identity": {
@@ -5136,7 +5136,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       },
       "put": {
         "tags": ["people"],
@@ -5186,7 +5186,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       },
       "delete": {
         "tags": ["people"],
@@ -5218,7 +5218,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/guests": {
@@ -5292,7 +5292,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/attendees": {
@@ -5355,7 +5355,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/guests/{id}": {
@@ -5388,7 +5388,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/guests/{id}/activity": {
@@ -5421,7 +5421,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/me/profile": {
@@ -5561,7 +5561,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/me/avatar": {
@@ -5653,7 +5653,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       },
       "delete": {
         "tags": ["people"],
@@ -5731,7 +5731,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/auth/login-code": {
@@ -5772,7 +5772,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/auth/reset-link": {
@@ -5813,7 +5813,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/auth/reset": {
@@ -5856,7 +5856,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/auth/login": {
@@ -5920,7 +5920,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/auth/bootstrap": {
@@ -5997,7 +5997,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/auth/sign-out": {
@@ -6015,7 +6015,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/auth/site": {
@@ -6085,7 +6085,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/me/credentials/password": {
@@ -6140,7 +6140,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/me/credentials/unprotect": {
@@ -6192,7 +6192,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/me/credentials/username": {
@@ -6252,7 +6252,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/me/login-sessions": {
@@ -6321,7 +6321,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/me/login-sessions/{id}": {
@@ -6359,7 +6359,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/push/key": {
@@ -6393,7 +6393,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/me/notifications": {
@@ -6460,7 +6460,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/me/notifications/read": {
@@ -6510,7 +6510,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/me/notifications/delete": {
@@ -6560,7 +6560,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/me/notifications/{id}/read": {
@@ -6605,7 +6605,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/me/email-settings": {
@@ -6660,7 +6660,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       },
       "put": {
         "tags": ["notifications"],
@@ -6728,7 +6728,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/me/push-subscriptions": {
@@ -6784,7 +6784,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/me/push-subscriptions/remove": {
@@ -6834,7 +6834,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/me/push-subscriptions/check": {
@@ -6895,7 +6895,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/events": {
@@ -6933,7 +6933,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/events/{id}": {
@@ -7004,7 +7004,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/events/{slug}/snapshot": {
@@ -7037,7 +7037,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/events/{slug}/feed": {
@@ -7076,7 +7076,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/admin/events": {
@@ -7192,7 +7192,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/events/{id}": {
@@ -7349,7 +7349,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       },
       "delete": {
         "tags": ["admin"],
@@ -7385,7 +7385,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/events/{id}/phases": {
@@ -7514,7 +7514,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/events/{id}/days": {
@@ -7611,7 +7611,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/days/{id}": {
@@ -7777,7 +7777,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       },
       "delete": {
         "tags": ["admin"],
@@ -7813,7 +7813,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/locations": {
@@ -7855,7 +7855,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       },
       "post": {
         "tags": ["admin"],
@@ -7916,7 +7916,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/locations/{id}": {
@@ -8019,7 +8019,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       },
       "delete": {
         "tags": ["admin"],
@@ -8054,7 +8054,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/locations/{id}/image": {
@@ -8152,7 +8152,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       },
       "delete": {
         "tags": ["admin"],
@@ -8236,7 +8236,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/locations/{id}/move": {
@@ -8338,7 +8338,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/events/{id}/locations/assign": {
@@ -8392,7 +8392,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/events/{id}/locations/remove": {
@@ -8446,7 +8446,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/events/{id}/location-unavailability": {
@@ -8488,7 +8488,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       },
       "post": {
         "tags": ["admin"],
@@ -8559,7 +8559,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/location-unavailability/{id}": {
@@ -8596,7 +8596,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/guests": {
@@ -8659,7 +8659,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       },
       "post": {
         "tags": ["admin"],
@@ -8711,7 +8711,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/guests/{id}": {
@@ -8805,7 +8805,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       },
       "delete": {
         "tags": ["admin"],
@@ -8841,7 +8841,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/guests/{id}/site-admin": {
@@ -8898,7 +8898,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/guests/{id}/test-email": {
@@ -8936,7 +8936,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/guests/import": {
@@ -9003,7 +9003,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/events/{id}/guests/assign": {
@@ -9054,7 +9054,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/admin/events/{id}/guests/remove": {
@@ -9105,7 +9105,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/site": {
@@ -9141,7 +9141,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/admin/settings": {
@@ -9177,7 +9177,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       },
       "put": {
         "tags": ["admin"],
@@ -9250,7 +9250,7 @@
             }
           }
         },
-        "security": [{ "adminAuth": [] }]
+        "security": [{ "guestAuth": [] }]
       }
     },
     "/api/v1/updates": {
@@ -9304,7 +9304,7 @@
             }
           }
         },
-        "security": [{ "siteAuth": [] }, { "adminAuth": [] }]
+        "security": [{ "siteAuth": [] }]
       }
     }
   },

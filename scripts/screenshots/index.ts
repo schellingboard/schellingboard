@@ -18,7 +18,7 @@ import { firefox, type Browser } from "@playwright/test";
 import sharp from "sharp";
 
 import { shots, type Shot } from "./shots";
-import { ADMIN_PASSWORD, SITE_PASSWORD, type Env } from "./env";
+import { SITE_PASSWORD, type Env } from "./env";
 
 const repoRoot = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -94,7 +94,6 @@ async function main() {
     SB_UPLOADS_DIR: path.join(work, "uploads") + "/",
     SITE_URL: baseURL,
     SITE_PASSWORD,
-    ADMIN_PASSWORD,
     AUTH_SECRET: "screenshots-only-not-a-secret-0123456789",
     SB_ENABLE_DEV_TOOLS: "1",
     REMINDER_DISPATCH_INTERVAL_MS: "0",

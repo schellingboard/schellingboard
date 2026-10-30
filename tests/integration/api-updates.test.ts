@@ -1,12 +1,22 @@
 // @module-tag 014-US6
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import {
+  describe,
+  it,
+  expect,
+  beforeAll,
+  beforeEach,
+  afterEach,
+  vi,
+} from "vitest";
 import { NextRequest } from "next/server";
 import { GET } from "@/app/api/v1/[[...route]]/route";
-import { createAdminAuthCookie } from "@/utils/auth";
+import { createAdminAuthCookie } from "../helpers/admin-cookie";
+import { setupTestDb, resetTestDb } from "../helpers/db";
 
+beforeAll(() => setupTestDb());
 beforeEach(() => {
+  resetTestDb();
   vi.stubEnv("SB_UPDATE_CHECK", "");
-  vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
   vi.stubEnv("AUTH_SECRET", "0123456789abcdef0123456789abcdef");
   vi.stubEnv("NEXT_PUBLIC_APP_VERSION", "v4.0.0");
   vi.stubGlobal(

@@ -1,12 +1,12 @@
 import type { Page } from "@playwright/test";
 import { test, expect } from "./helpers/fixtures";
 import { uniqueSuffix } from "./helpers/unique";
+import { adminLogin } from "./helpers/admin";
 import { loginAndGoto } from "./helpers/auth";
 import { selectUser } from "./helpers/user";
 import { openAvailability } from "./helpers/meetings";
 import { isoDay } from "../helpers/dates";
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admintest";
 const DAY = isoDay(30);
 
 async function manage(page: Page, eventName: string) {
@@ -20,10 +20,7 @@ async function manage(page: Page, eventName: string) {
 // A throwaway event, left on its admin page. Never a seeded one: those come
 // with 1-on-1s on, and switching that about would change what other specs see.
 async function createEvent(page: Page, eventName: string) {
-  await page.goto("/admin");
-  await page.getByLabel("Password").fill(ADMIN_PASSWORD);
-  await page.getByRole("button", { name: "Access Admin" }).click();
-  await expect(page).toHaveURL(/\/admin\/events$/);
+  await adminLogin(page);
 
   // The list is server-rendered, so "New event" is clickable a moment before
   // React attaches its handler, and a click in that window is simply dropped.
@@ -55,7 +52,7 @@ test.describe("attendee meeting availability", () => {
       // A test may end on an event page with its votes and RSVPs still loading;
       // a hard goto aborts those, and the console guard fails on the abort.
       await page.waitForLoadState("networkidle");
-      await page.goto("/admin/events");
+      await adminLogin(page);
       await manage(page, eventName);
       await page.getByRole("button", { name: "Delete event" }).click();
       await page.getByLabel("Type the event name to confirm").fill(eventName);
@@ -135,7 +132,7 @@ test.describe("attendee meeting availability", () => {
     // A day the organizer later shortens drops slots the guest had declared.
     // Those must not linger in the form's selection, or every later save is
     // refused for slots it never renders and the guest cannot untick.
-    await page.goto("/admin/events");
+    await adminLogin(page);
     await manage(page, eventName);
     // Scoped to Days: the event's own "End *" date sits on this page too.
     const days = page.getByRole("region", { name: "Days" });
@@ -146,6 +143,9 @@ test.describe("attendee meeting availability", () => {
     await days.getByRole("button", { name: "Save", exact: true }).click();
     await expect(page.getByText(`${DAY}T09:00 – ${DAY}T10:00`)).toBeVisible();
 
+    // Signing in as the admin ended Alice's session in this browser.
+    await loginAndGoto(page, "/guests");
+    await selectUser(page, /Alice Test/i);
     await page.goto("/settings");
     form = await openAvailability(page, eventName);
     await expect(form.getByRole("listitem")).toHaveCount(2);
@@ -184,7 +184,7 @@ test.describe("attendee meeting availability", () => {
     await expect(panels).toBeVisible();
     await expect(panels.getByText(eventName, { exact: true })).toBeHidden();
 
-    await page.goto("/admin/events");
+    await adminLogin(page);
     await manage(page, eventName);
     await page.getByRole("link", { name: "Guests" }).click();
     const alice = page
@@ -195,16 +195,22 @@ test.describe("attendee meeting availability", () => {
     await alice.click();
     await expect(alice).toBeChecked();
 
+    // Signing in as the admin ended Alice's session in this browser.
+    await loginAndGoto(page, "/guests");
+    await selectUser(page, /Alice Test/i);
     await page.goto("/settings");
     await expect(panels.getByText(eventName, { exact: true })).toBeVisible();
 
     // Switching 1-on-1s off takes the panel away again.
-    await page.goto("/admin/events");
+    await adminLogin(page);
     await manage(page, eventName);
     await meetings.getByLabel("Enable meetings").uncheck();
     await meetings.getByRole("button", { name: "Save meetings" }).click();
     await expect(meetings.getByText("Saved!")).toBeVisible();
 
+    // Signing in as the admin ended Alice's session in this browser.
+    await loginAndGoto(page, "/guests");
+    await selectUser(page, /Alice Test/i);
     await page.goto("/settings");
     await expect(panels.getByText(eventName, { exact: true })).toBeHidden();
   });

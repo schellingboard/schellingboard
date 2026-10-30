@@ -5,20 +5,7 @@ import { uniqueSuffix } from "./helpers/unique";
 import { loginAndGoto } from "./helpers/auth";
 import { expectImageLoaded } from "./helpers/images";
 import { selectUser } from "./helpers/user";
-
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admintest";
-
-async function adminLogin(page: Page) {
-  await page.goto("/admin");
-  await expect(
-    page.getByRole("heading", { name: "Admin Access" })
-  ).toBeVisible();
-  await page.getByLabel("Password").fill(ADMIN_PASSWORD);
-  await page.getByRole("button", { name: "Access Admin" }).click();
-  // /admin redirects to the events list, which is the admin landing page.
-  await expect(page).toHaveURL(/\/admin\/events$/);
-  await expect(page.getByRole("heading", { name: "Events" })).toBeVisible();
-}
+import { adminLogin, enterSitePassword } from "./helpers/admin";
 
 async function gotoUsers(page: Page) {
   await page
@@ -51,17 +38,13 @@ async function openEventTab(
 }
 
 test.describe("Admin UI", () => {
-  // Note: no site login here. The admin UI is independent of the normal
-  // user UI and must be reachable with only the admin password.
-
-  test("redirects to the admin login when not admin-authenticated @015-US1", async ({
+  test("sends a visitor to sign in, past the site password @015-US1", async ({
     page,
   }) => {
     await page.goto("/admin");
-    await expect(
-      page.getByRole("heading", { name: "Admin Access" })
-    ).toBeVisible();
-    await expect(page).toHaveURL(/\/admin\/login/);
+    await enterSitePassword(page);
+    await expect(page.getByRole("heading", { name: "Log in" })).toBeVisible();
+    await expect(page).toHaveURL(/\/auth\/login\?redirect=%2Fadmin$/);
   });
 
   test("shows only admin chrome and can log out @015-US1", async ({ page }) => {
@@ -75,9 +58,7 @@ test.describe("Admin UI", () => {
       page.getByRole("button", { name: "Logout", exact: true })
     ).toHaveCount(0);
     await page.getByRole("button", { name: "Admin logout" }).click();
-    await expect(
-      page.getByRole("heading", { name: "Admin Access" })
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Log in" })).toBeVisible();
   });
 
   test("header title links back to the admin home @015-US1", async ({
@@ -137,24 +118,40 @@ test.describe("Admin UI", () => {
   test("guards new admin routes when not authenticated @015-US1", async ({
     page,
   }) => {
+    await page.goto("/admin/users");
+    await enterSitePassword(page);
     for (const path of ["/admin/users", "/admin/locations", "/admin/events"]) {
       await page.goto(path);
-      await expect(
-        page.getByRole("heading", { name: "Admin Access" })
-      ).toBeVisible();
-      await expect(page).toHaveURL(/\/admin\/login/);
+      await expect(page.getByRole("heading", { name: "Log in" })).toBeVisible();
+      await expect(page).toHaveURL(/\/auth\/login\?redirect=/);
     }
   });
 
   test("rejects a wrong admin password @015-US1", async ({ page }) => {
     await page.goto("/admin");
-    await page.getByLabel("Password").fill("definitely-wrong");
-    await page.getByRole("button", { name: "Access Admin" }).click();
-    await expect(page.getByText("Invalid password")).toBeVisible();
-    // Stays on the login page; the admin UI is not reached.
-    await expect(
-      page.getByRole("heading", { name: "Admin Access" })
-    ).toBeVisible();
+    await enterSitePassword(page);
+    await page.getByLabel("Email or username").fill("site-admin");
+    const password = page.getByLabel("Password or emailed code");
+    const submit = page.getByRole("button", { name: "Log in" });
+    await expect(async () => {
+      await password.fill("");
+      await password.fill("definitely-wrong");
+      await expect(submit).toBeEnabled({ timeout: 2000 });
+    }).toPass();
+    await submit.click();
+    await expect(page.getByText("Wrong password or code")).toBeVisible();
+    // Stays on the sign-in; the admin UI is not reached.
+    await expect(page.getByRole("heading", { name: "Log in" })).toBeVisible();
+  });
+
+  test("keeps a signed-in guest who is no site admin out @015-US1", async ({
+    page,
+  }) => {
+    await loginAndGoto(page, "/");
+    await selectUser(page, /Alice Test/i);
+    await page.goto("/admin");
+    await expect(page.getByRole("heading", { name: "Log in" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Events" })).toHaveCount(0);
   });
 
   test("can create, edit, and delete a user @016-US1", async ({ page }) => {

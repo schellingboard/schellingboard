@@ -44,13 +44,12 @@ The design the codebase is moving towards is written up separately in
    ```bash
    DATABASE_URL=file:./data.db
    SITE_PASSWORD=your-password
-   ADMIN_PASSWORD=your-admin-password
    AUTH_SECRET=<generated via openssl rand -base64 32>
    ```
 
    See [Environment variables](#environment-variables) below for all options. Note: `AUTH_SECRET` is
-   required only when `SITE_PASSWORD` or `ADMIN_PASSWORD` is set or guests protect their name (it
-   signs their session cookies). Omitting this file uses sensible defaults.
+   required only when `SITE_PASSWORD` is set or guests protect their name (it signs their session
+   cookies). Omitting this file uses sensible defaults.
 
 3. (Optional) Seed the database with test data:
 
@@ -95,10 +94,10 @@ make precommit  # Format, lint, type check, and run all tests (incl. e2e)
 A web admin UI is available at `/admin` for managing all core records: events (basic info, phases,
 days), the global pools of users and locations, event↔guest and event↔location assignments,
 moderation of proposals, sessions, and RSVPs, and site settings (title, description, and the
-optional venue map). It requires `ADMIN_PASSWORD` (and `AUTH_SECRET`) to be set; without
-`ADMIN_PASSWORD` the admin routes are disabled and return a diagnostic message explaining how to
-enable them. It is fully separate from the normal user UI: it has its own layout and only requires
-the admin password (not `SITE_PASSWORD`).
+optional venue map). It is for site admins, who sign in at `/admin`; `make dev-db-seed` seeds one
+(username `site-admin`, password `seed-password`), and `make bootstrap-link` prints a link that
+makes another. It has its own layout, and the sign-in asks for `SITE_PASSWORD` first when one is
+set.
 
 ## Dev fake clock
 
@@ -115,9 +114,8 @@ See
 for the full list and descriptions.
 
 For local development, `DATABASE_URL` is the only required variable — unlike Docker, no default is
-provided (e.g. `file:./data.db`). `AUTH_SECRET` is additionally required when `SITE_PASSWORD` or
-`ADMIN_PASSWORD` is set or guests protect their name (it signs their session cookies); generate one
-with:
+provided (e.g. `file:./data.db`). `AUTH_SECRET` is additionally required when `SITE_PASSWORD` is set
+or guests protect their name (it signs their session cookies); generate one with:
 
 ```bash
 openssl rand -base64 32

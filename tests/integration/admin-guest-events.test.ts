@@ -27,7 +27,6 @@ describe("guests.assignToEvent / removeFromEvent", () => {
   beforeEach(async () => {
     resetTestDb();
     logoutAdmin();
-    vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
   });
@@ -88,7 +87,6 @@ describe("assignGuestsToEventAction", () => {
   beforeEach(async () => {
     resetTestDb();
     logoutAdmin();
-    vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
   });
@@ -161,7 +159,6 @@ describe("removeGuestsFromEventAction", () => {
   beforeEach(async () => {
     resetTestDb();
     logoutAdmin();
-    vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
   });

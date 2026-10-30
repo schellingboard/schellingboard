@@ -40,7 +40,6 @@ describe("adminCreateSessionAction", () => {
   beforeEach(async () => {
     resetTestDb();
     logoutAdmin();
-    vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
   });
@@ -420,7 +419,6 @@ describe("adminUpdateSessionAction", () => {
   beforeEach(async () => {
     resetTestDb();
     logoutAdmin();
-    vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
   });
@@ -952,7 +950,6 @@ describe("adminDeleteSessionAction", () => {
   beforeEach(async () => {
     resetTestDb();
     logoutAdmin();
-    vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
   });

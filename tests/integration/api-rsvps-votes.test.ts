@@ -9,7 +9,7 @@ import {
 } from "vitest";
 import { NextRequest } from "next/server";
 import { GET, PUT, DELETE } from "@/app/api/v1/[[...route]]/route";
-import { createAdminAuthCookie } from "@/utils/auth";
+import { createAdminAuthCookie } from "../helpers/admin-cookie";
 import { getRepositories } from "@/db/container";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import {
@@ -46,7 +46,6 @@ const asGuest = (id: string) => `${GUEST_COOKIE_NAME}=${openGuestValue(id)}`;
 beforeAll(() => setupTestDb());
 beforeEach(() => {
   resetTestDb();
-  vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
   vi.stubEnv("AUTH_SECRET", VALID_SECRET);
 });
 afterEach(() => vi.unstubAllEnvs());

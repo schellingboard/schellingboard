@@ -27,8 +27,8 @@ The modules are `sessions` (sessions, RSVPs, room unavailability, attendee count
 `updates` (the daily GitHub look-up of the latest release, shown to the admin).
 
 The Next mount is `app/api/v1/[[...route]]/route.ts`; `proxy.ts` gates it like any other route (site
-password or admin cookie for `/api/v1`, the admin cookie for `/api/v1/admin/`). Repositories stay in
-`db/`.
+password for `/api/v1`, a guest cookie for `/api/v1/admin/`, whose use cases check the site-admin
+role). Repositories stay in `db/`.
 
 `db/container.ts` opens the database in WAL mode with two connections. Repository methods named
 `find…` (but not `findOrCreate…`), `list…`, `search…`, `count…` or `get…` run on a read-only

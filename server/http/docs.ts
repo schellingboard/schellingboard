@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { Scalar } from "@scalar/hono-api-reference";
 import type { MiddlewareHandler } from "hono";
-import { ADMIN_COOKIE_NAME } from "@/utils/auth-cookies";
+import { GUEST_COOKIE_NAME } from "@/utils/auth-cookies";
 import { AUTH_COOKIE_NAME } from "@/utils/auth";
 import type { createApp } from "./create-app";
 
@@ -31,8 +31,8 @@ export function openApiDocumentOf(app: App, basePath = "/api/v1") {
     const relative = path.slice(basePath.length);
     if (PUBLIC_PATHS.has(relative)) continue;
     const security: Record<string, string[]>[] = relative.startsWith("/admin/")
-      ? [{ adminAuth: [] }]
-      : [{ siteAuth: [] }, { adminAuth: [] }];
+      ? [{ guestAuth: [] }]
+      : [{ siteAuth: [] }];
     for (const method of HTTP_METHODS) {
       const operation = item[method];
       if (operation) operation.security = security;
@@ -48,12 +48,12 @@ export function openApiDocumentOf(app: App, basePath = "/api/v1") {
         description:
           "Set by the site's password page. Only needed when the site has a password.",
       },
-      adminAuth: {
+      guestAuth: {
         type: "apiKey",
         in: "cookie",
-        name: ADMIN_COOKIE_NAME,
+        name: GUEST_COOKIE_NAME,
         description:
-          "Set by logging in at /admin, or by POST /api/auth/login with scope admin. The browser sends it by itself.",
+          "A login session, set by POST /api/v1/auth/login. The admin endpoints also need the signed-in guest to be a site admin.",
       },
     },
   };

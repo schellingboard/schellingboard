@@ -5,8 +5,7 @@ import { loginAndGoto } from "./helpers/auth";
 import { selectUser } from "./helpers/user";
 import { openAvailability } from "./helpers/meetings";
 import { isoDay } from "../helpers/dates";
-
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admintest";
+import { adminLogin } from "./helpers/admin";
 
 const EVENT_START = isoDay(30);
 
@@ -27,13 +26,6 @@ const DAY_HEADING = new RegExp(
  * other specs then trip over -- admin.spec.ts warns about exactly this kind of
  * global guest state.
  */
-async function adminLogin(page: Page) {
-  await page.goto("/admin");
-  await page.getByLabel("Password").fill(ADMIN_PASSWORD);
-  await page.getByRole("button", { name: "Access Admin" }).click();
-  await expect(page).toHaveURL(/\/admin\/events$/);
-}
-
 // The list searches as you type; a row clicked before the results land is
 // wherever the list shifts it to by the time the click arrives.
 async function expectSearched(page: Page, query: string) {
@@ -62,7 +54,7 @@ async function createGuests(page: Page, names: string[]) {
  * attendees — set up the way an organizer would, through the admin UI.
  */
 async function meetingsEvent(page: Page, eventName: string, names: string[]) {
-  await page.goto("/admin/events");
+  await adminLogin(page);
 
   // The list is server-rendered, so its buttons are clickable a moment before
   // React attaches their handlers, and a click in that window is silently
@@ -185,7 +177,7 @@ test.describe("1-on-1 meetings", () => {
 
   test.afterEach(async ({ page }) => {
     for (const eventName of leftBehind.events.splice(0)) {
-      await page.goto("/admin/events");
+      await adminLogin(page);
       await page
         .getByRole("listitem")
         .filter({ hasText: eventName })
@@ -198,6 +190,7 @@ test.describe("1-on-1 meetings", () => {
     }
 
     for (const name of leftBehind.guests.splice(0)) {
+      await adminLogin(page);
       await page.goto("/admin/users");
       // The table is paginated, so a guest created mid-run is rarely on page one.
       await page.getByPlaceholder("Search name or email…").fill(name);

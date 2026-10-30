@@ -14,7 +14,6 @@ docker run -d \
   -p 3000:3000 \
   -v schellingboard_data:/data \
   -e SITE_PASSWORD=changeme \
-  -e ADMIN_PASSWORD=changeme \
   -e AUTH_SECRET=$(openssl rand -hex 32) \
   schellingboard/schellingboard
 ```
@@ -24,7 +23,7 @@ Or with `docker compose` — copy `docker-compose.yml` and `.env.docker.example`
 
 ```bash
 cp .env.docker.example .env
-# edit .env and fill in SITE_PASSWORD, ADMIN_PASSWORD, AUTH_SECRET, etc.
+# edit .env and fill in SITE_PASSWORD, AUTH_SECRET, etc.
 docker compose up -d
 ```
 
@@ -73,7 +72,7 @@ lookup off.
 ## Administration
 
 Events, guests, locations, and content moderation are managed through the web admin UI at `/admin`.
-Sign in as a site admin (the first one is made through a link the server logs at start), or set
-`ADMIN_PASSWORD` (and `AUTH_SECRET`). See the [Admin UI guide](../organizers/admin-guide.md) for
-what's configurable, and [How it works](../organizers/how-it-works.md) for the phase model and
-attendee-facing behavior.
+Sign in as a site admin; the first one is made through a link the server logs at start (see
+[Site admins](../organizers/admin-guide.md#site-admins)). See the
+[Admin UI guide](../organizers/admin-guide.md) for what's configurable, and
+[How it works](../organizers/how-it-works.md) for the phase model and attendee-facing behavior.

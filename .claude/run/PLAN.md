@@ -82,12 +82,11 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
       401 only with no cookie at all; `byAdmin(actor, at)` records the site admin's guest id
       (`Actor` admin has `id?`); `hasPassword` on the admin guest view ("No password yet" badge);
       changelog and admin-guide "Site admins". Split: the removal is step 11b.
-- [ ] 11b. **Admin password goes.** `AdminFrame` sends a guest without the role to the sign-in; a
-      later 401/403 does the same. `/legacy/admin/login`, the admin cookie (`ADMIN_COOKIE_NAME`,
-      `requireAdminAuth*`, `ADMIN_VERIFIED_HEADER`, `/api/admin/logout`, `/api/auth/login`) and the
-      legacy `/api/admin/*` gate go; a set `ADMIN_PASSWORD` logs a deprecation warning; the admin UI
-      is always on; E2E and integration helpers sign in as a site admin instead of the cookie.
-      Self-hosting docs and `api.md` rewritten; admin-guide intro. Full `make test-e2e`.
+- [x] 11b. The admin password is gone: `AdminFrame` sends a refused guest to `/auth/login?redirect=`
+      (the sign-in honours `redirect`); `/legacy/admin/login`, the admin cookie, `/api/auth/login`,
+      `/api/admin/*` (create-*, users, logout) and the `ADMIN_VERIFIED_HEADER` are deleted; a set
+      `ADMIN_PASSWORD` logs a warning; the OpenAPI scheme is `guestAuth`; E2E signs in as the seeded
+      site admin (`site-admin`, `tests/e2e/helpers/admin.ts`); docs and changelog rewritten.
 - [ ] 12. **Join links.** `join_tokens(hash, guest, event, created)`, no expiry, one live per guest
       and event; valid to sign in while the guest set no password after `created`, otherwise it asks
       for a sign-in as that guest. `POST /api/v1/auth/join` (verified session, joins the event); SPA
@@ -108,8 +107,8 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
 ### Retire Next (path step 7)
 
 - [ ] 16. **Legacy API routes go**: `/api/toggle-rsvp`, `add-`/`update-`/`delete-session`,
-      `/api/rsvps`, `/api/meetings` (+ candidates), the comment routes, `/api/admin/create-*`; their
-      tests move to `/api/v1` or go. Also the leftovers in PROGRESS.md ("Left alone").
+      `/api/rsvps`, `/api/meetings` (+ candidates) and the comment routes; their tests move to
+      `/api/v1` or go. Also the leftovers in PROGRESS.md ("Left alone").
 - [ ] 17. **Hono serves everything.** The proxy's gates and header stripping become Hono middleware;
       Hono serves `/media`, `/locations`, the shell, `/_spa/`, `sw.js`, icons, manifest, and
       `/api/health`. Next keeps one catch-all route handler that calls Hono; `proxy.ts` and the

@@ -34,7 +34,6 @@ describe("admin meetings settings", () => {
   beforeEach(async () => {
     resetTestDb();
     logoutAdmin();
-    vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
   });
@@ -162,7 +161,6 @@ describe("admin meeting points", () => {
   beforeEach(async () => {
     resetTestDb();
     logoutAdmin();
-    vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     await loginAsAdmin();
   });

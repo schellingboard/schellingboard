@@ -41,14 +41,12 @@ type Api = AppServices["api"];
 
 const OWNED = /^\/admin(\/|$)/;
 
-/** Every admin page but the login, which the legacy app still serves. */
+/** The admin pages, for a signed-in site admin. */
 export function AdminSection({ services }: { services: AppServices }) {
   const pathname = useLocation({ select: (l) => l.pathname });
   const { search } = useUrlSearchParams();
   return (
-    <InAppLinks
-      owns={({ pathname: to }) => OWNED.test(to) && to !== "/admin/login"}
-    >
+    <InAppLinks owns={({ pathname: to }) => OWNED.test(to)}>
       <AdminFrame api={services.api} currentPath={pathname} search={search}>
         <Outlet />
       </AdminFrame>

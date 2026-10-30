@@ -16,7 +16,7 @@ vi.mock("@/utils/mailer", () => ({ sendMail: vi.fn() }));
 import { NextRequest } from "next/server";
 import { GET, POST, PUT, DELETE } from "@/app/api/v1/[[...route]]/route";
 import { getRepositories } from "@/db/container";
-import { createAdminAuthCookie } from "@/utils/auth";
+import { createAdminAuthCookie } from "../helpers/admin-cookie";
 import { sendMail } from "@/utils/mailer";
 import { createImageFile } from "../helpers/utils";
 import { setupTestDb, resetTestDb } from "../helpers/db";
@@ -57,7 +57,6 @@ beforeEach(async () => {
   vi.mocked(sendMail).mockReset();
   uploadsDir = fs.mkdtempSync(path.join(os.tmpdir(), "uploads-test-"));
   vi.stubEnv("AUTH_SECRET", VALID_SECRET);
-  vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
   vi.stubEnv("SB_UPLOADS_DIR", uploadsDir);
   const c = await createAdminAuthCookie();
   admin = `${c.name}=${c.value}`;
@@ -134,10 +133,17 @@ describe("/api/v1/admin guests and settings", () => {
       expect(assigned.status).toBe(204);
       const listed = await call("GET", "/admin/guests");
       expect(listed.headers.get("cache-control")).toBe("no-store");
-      expect(await listed.json()).toEqual({
-        items: [{ ...guest, name: "Ada L.", eventIds: [event.id], version: 3 }],
+      const listedBody = (await listed.json()) as {
+        items: { siteAdmin: boolean }[];
+        nextCursor: string | null;
+      };
+      expect(listedBody).toEqual({
+        items: expect.arrayContaining([
+          { ...guest, name: "Ada L.", eventIds: [event.id], version: 3 },
+        ]) as unknown[],
         nextCursor: null,
       });
+      expect(listedBody.items.filter((g) => !g.siteAdmin)).toHaveLength(1);
       expect(
         (
           await call("POST", `/admin/events/${event.id}/guests/remove`, {
@@ -211,9 +217,14 @@ describe("/api/v1/admin guests and settings", () => {
     "lists the guests page by page, in id order",
     { tags: ["019-US8"] },
     async () => {
-      const [a, b, c] = (
+      const adminGuest = (await getRepositories().guests.list()).find(
+        (g) => g.name === "Site Admin"
+      )!;
+      const [a, b, c, d] = (
         await Promise.all([createGuest(), createGuest(), createGuest()])
-      ).sort((x, y) => (x.id < y.id ? -1 : 1));
+      )
+        .concat(adminGuest)
+        .sort((x, y) => (x.id < y.id ? -1 : 1));
       const page = async (query: string) =>
         (await (await call("GET", `/admin/guests?${query}`)).json()) as {
           items: { id: string }[];
@@ -224,7 +235,10 @@ describe("/api/v1/admin guests and settings", () => {
       expect(first.items.map((g) => g.id)).toEqual([a.id, b.id]);
       const second = await page(`limit=2&cursor=${first.nextCursor}`);
       expect(second).toEqual({
-        items: [expect.objectContaining({ id: c.id })],
+        items: [
+          expect.objectContaining({ id: c.id }),
+          expect.objectContaining({ id: d.id }),
+        ],
         nextCursor: null,
       });
       expect(await page("cursor=nonsense")).toMatchObject({

@@ -35,6 +35,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Site admins replace the admin password**: sign in at `/admin` as a site admin; the server logs a
+  link for the first one at start, and `ADMIN_PASSWORD` now only logs a warning. Scripts sign in
+  through `/api/v1/auth/login` instead of `/api/auth/login`.
 - **Pages now live under `/legacy/`**: only the sign-in screens and the event list still show
   `/legacy/…` in the address bar; every other page keeps its plain address. Old links still work.
 - **The schedule, session forms, attendee profiles, settings, notifications and the admin area are

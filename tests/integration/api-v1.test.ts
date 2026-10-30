@@ -14,13 +14,10 @@ import { GET } from "@/app/api/v1/[[...route]]/route";
 import { createApp } from "@/server/http/create-app";
 import { actorMiddleware } from "@/server/http/actor";
 import { openApiDocument } from "@/server/http/openapi";
-import {
-  ADMIN_VERIFIED_HEADER,
-  createAdminAuthCookie,
-  createAuthCookie,
-} from "@/utils/auth";
+import { createAuthCookie } from "@/utils/auth";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createGuest } from "../helpers/factories";
+import { createAdminAuthCookie } from "../helpers/admin-cookie";
 import { throughProxy } from "../helpers/through-proxy";
 import {
   GUEST_COOKIE_NAME,
@@ -34,7 +31,6 @@ beforeAll(() => setupTestDb());
 beforeEach(() => {
   resetTestDb();
   vi.stubEnv("SITE_PASSWORD", "site-pw");
-  vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
   vi.stubEnv("AUTH_SECRET", VALID_SECRET);
 });
 afterEach(() => vi.unstubAllEnvs());
@@ -171,12 +167,12 @@ describe("actor middleware", () => {
     expect(await res.json()).toEqual({ admin: false, guest: null });
   });
 
-  it("resolves the admin from a valid admin cookie", async () => {
+  it("resolves the admin from a verified site admin's session", async () => {
     const admin = await createAdminAuthCookie();
     const res = await actorApp().request("/me", {
       headers: { cookie: `${admin.name}=${admin.value}` },
     });
-    expect(await res.json()).toEqual({ admin: true, guest: null });
+    expect(await res.json()).toMatchObject({ admin: true });
   });
 
   it("resolves the guest and level the guest cookie names", async () => {
@@ -227,31 +223,6 @@ describe("proxy: /api/v1", () => {
     });
   });
 
-  it("lets the admin cookie stand in for the site cookie", async () => {
-    const admin = await createAdminAuthCookie();
-    const result = await throughProxy("/api/v1/sessions", {}, [admin]);
-    if (!result.ok) throw new Error("expected proxy to forward the request");
-    expect(result.request.headers.get(ADMIN_VERIFIED_HEADER)).toBeNull();
-  });
-
-  it("gates /api/v1/admin/* by the admin cookie alone", async () => {
-    const admin = await createAdminAuthCookie();
-    const result = await throughProxy("/api/v1/admin/events", {}, [admin]);
-    if (!result.ok) throw new Error("expected proxy to forward the request");
-    expect(result.request.headers.get(ADMIN_VERIFIED_HEADER)).toBe("1");
-  });
-
-  it("strips a forged admin-verified header outside /api/v1/admin", async () => {
-    const site = await createAuthCookie();
-    const result = await throughProxy(
-      "/api/v1/health",
-      { headers: { [ADMIN_VERIFIED_HEADER]: "1" } },
-      [site]
-    );
-    if (!result.ok) throw new Error("expected proxy to forward the request");
-    expect(result.request.headers.get(ADMIN_VERIFIED_HEADER)).toBeNull();
-  });
-
   it.each([
     ["a foreign Origin", { origin: "https://evil.example" }],
     ["Sec-Fetch-Site: cross-site", { "sec-fetch-site": "cross-site" }],
@@ -268,52 +239,38 @@ describe("proxy: /api/v1", () => {
     });
   });
 
-  it.each([
-    [
-      "only the site cookie",
-      createAuthCookie,
-      {},
-      401,
-      "admin.unauthenticated",
-    ],
-    [
-      "a cross-site request",
-      createAdminAuthCookie,
-      { headers: { "sec-fetch-site": "cross-site" } },
-      403,
-      "request.crossSite",
-    ],
-  ] as const)(
-    "refuses an admin request with %s as problem details",
-    async (_, createCookie, init, status, code) => {
-      const result = await throughProxy("/api/v1/admin/events", init, [
-        await createCookie(),
-      ]);
-      if (result.ok) throw new Error("expected proxy to reject the request");
-      expect(result.response.status).toBe(status);
-      expect(result.response.headers.get("content-type")).toBe(
-        "application/problem+json"
-      );
-      expect(await result.response.json()).toMatchObject({ status, code });
-    }
-  );
-
-  it("refuses with 401 when no admin password is set and nobody signed in", async () => {
-    vi.stubEnv("ADMIN_PASSWORD", "");
-    const result = await throughProxy("/api/v1/admin/events", {}, []);
+  it("refuses an admin request with only the site cookie as problem details", async () => {
+    const result = await throughProxy("/api/v1/admin/events", {}, [
+      await createAuthCookie(),
+    ]);
     if (result.ok) throw new Error("expected proxy to reject the request");
     expect(result.response.status).toBe(401);
+    expect(result.response.headers.get("content-type")).toBe(
+      "application/problem+json"
+    );
     expect(await result.response.json()).toMatchObject({
+      status: 401,
       code: "admin.unauthenticated",
     });
   });
 
-  it("leaves a signed-in guest's admin request to the API, which checks the role", async () => {
-    vi.stubEnv("ADMIN_PASSWORD", "");
+  it("refuses a cross-site admin request", async () => {
+    const result = await throughProxy(
+      "/api/v1/admin/events",
+      { headers: { "sec-fetch-site": "cross-site" } },
+      [{ name: GUEST_COOKIE_NAME, value: "token" }]
+    );
+    if (result.ok) throw new Error("expected proxy to reject the request");
+    expect(result.response.status).toBe(403);
+    expect(await result.response.json()).toMatchObject({
+      code: "request.crossSite",
+    });
+  });
+
+  it("leaves a signed-in guest's admin request to the API, without asking for the site password", async () => {
     const result = await throughProxy("/api/v1/admin/events", {}, [
       { name: GUEST_COOKIE_NAME, value: "token" },
     ]);
-    if (!result.ok) throw new Error("expected proxy to forward the request");
-    expect(result.request.headers.get(ADMIN_VERIFIED_HEADER)).toBeNull();
+    expect(result.ok).toBe(true);
   });
 });

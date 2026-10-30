@@ -5,12 +5,7 @@ import sharp from "sharp";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { NextRequest } from "next/server";
 
-import {
-  ADMIN_COOKIE_NAME,
-  AUTH_COOKIE_NAME,
-  createAdminAuthCookie,
-  createAuthCookie,
-} from "@/utils/auth";
+import { AUTH_COOKIE_NAME, createAuthCookie } from "@/utils/auth";
 import { GET as avatarGET } from "@/app/media/avatars/[filename]/route";
 import { GET as locationGET } from "@/app/media/locations/[filename]/route";
 import { GET as siteGET } from "@/app/media/site/[filename]/route";
@@ -58,7 +53,6 @@ describe("media routes", () => {
     vi.stubEnv("SB_UPLOADS_DIR", uploadsDir);
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     vi.stubEnv("SITE_PASSWORD", "site-pw");
-    vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
     siteCookieValue = (await createAuthCookie()).value;
   });
 
@@ -94,19 +88,6 @@ describe("media routes", () => {
       expect(res.status).toBe(200);
       expect(res.headers.get("content-type")).toBe("image/webp");
       expect((await res.arrayBuffer()).byteLength).toBeGreaterThan(0);
-    });
-
-    // The admin UI is reachable with the admin cookie alone (see
-    // tests/e2e/admin.spec.ts), and it previews the very images it uploads.
-    it("serves the image to an admin with no site-auth cookie", async () => {
-      const name = await writeImage(dir, file, 300);
-      const request = new NextRequest(`http://test/media/${dir}/${name}`);
-      request.cookies.set(
-        ADMIN_COOKIE_NAME,
-        (await createAdminAuthCookie()).value
-      );
-      const res = await GET(request, params(name));
-      expect(res.status).toBe(200);
     });
 
     it("404s a missing file rather than leaking the difference", async () => {

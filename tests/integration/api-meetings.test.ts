@@ -13,7 +13,7 @@ vi.mock("@/utils/mailer", () => ({ sendMail: vi.fn() }));
 import { NextRequest } from "next/server";
 import { GET, POST, PUT, DELETE } from "@/app/api/v1/[[...route]]/route";
 import { getRepositories } from "@/db/container";
-import { createAdminAuthCookie } from "@/utils/auth";
+import { createAdminAuthCookie } from "../helpers/admin-cookie";
 import { isoDay } from "../helpers/dates";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import {
@@ -77,7 +77,6 @@ beforeAll(() => setupTestDb());
 beforeEach(() => {
   resetTestDb();
   vi.stubEnv("AUTH_SECRET", VALID_SECRET);
-  vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
 });
 afterEach(() => vi.unstubAllEnvs());
 

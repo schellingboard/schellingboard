@@ -60,8 +60,6 @@ test("an old root link reaches its page @014-US4", async ({ page }) => {
   await login(page);
   await page.evaluate(() => window.location.assign("/admin"));
 
-  await expect(page).toHaveURL(/\/legacy\/admin\/login\?/);
-  await expect(
-    page.getByRole("heading", { name: "Admin Access" })
-  ).toBeVisible();
+  await expect(page).toHaveURL(/\/auth\/login\?redirect=%2Fadmin$/);
+  await expect(page.getByRole("heading", { name: "Log in" })).toBeVisible();
 });

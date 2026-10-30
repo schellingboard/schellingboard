@@ -11,7 +11,7 @@ import {
 import { NextRequest } from "next/server";
 import { GET } from "@/app/api/v1/[[...route]]/route";
 import { API_LIMIT } from "@/server/kernel/rate-limit";
-import { createAdminAuthCookie } from "@/utils/auth";
+import { createAdminAuthCookie } from "../helpers/admin-cookie";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createGuest } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
@@ -28,7 +28,6 @@ beforeEach(() => {
   resetTestDb();
   vi.useFakeTimers({ toFake: ["Date"] });
   vi.stubEnv("AUTH_SECRET", "0123456789abcdef0123456789abcdef");
-  vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
   vi.stubEnv("SB_API_RATE_BURST", "");
 });
 afterEach(() => {

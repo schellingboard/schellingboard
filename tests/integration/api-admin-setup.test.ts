@@ -15,7 +15,7 @@ import {
 import { NextRequest } from "next/server";
 import { GET, POST, PUT, DELETE } from "@/app/api/v1/[[...route]]/route";
 import { getRepositories } from "@/db/container";
-import { createAdminAuthCookie } from "@/utils/auth";
+import { createAdminAuthCookie } from "../helpers/admin-cookie";
 import { isoDay } from "../helpers/dates";
 import { createImageFile } from "../helpers/utils";
 import { setupTestDb, resetTestDb } from "../helpers/db";
@@ -69,7 +69,6 @@ beforeAll(() => setupTestDb());
 beforeEach(async () => {
   resetTestDb();
   vi.stubEnv("AUTH_SECRET", VALID_SECRET);
-  vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
   const c = await createAdminAuthCookie();
   admin = `${c.name}=${c.value}`;
 });

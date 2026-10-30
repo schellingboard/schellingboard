@@ -10,7 +10,7 @@ import {
 
 import { NextRequest } from "next/server";
 import { POST, PUT } from "@/app/api/v1/[[...route]]/route";
-import { createAdminAuthCookie } from "@/utils/auth";
+import { createAdminAuthCookie } from "../helpers/admin-cookie";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
 
@@ -40,7 +40,6 @@ beforeAll(() => setupTestDb());
 beforeEach(async () => {
   resetTestDb();
   vi.stubEnv("AUTH_SECRET", VALID_SECRET);
-  vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
   const c = await createAdminAuthCookie();
   admin = `${c.name}=${c.value}`;
 });

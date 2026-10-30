@@ -2,14 +2,8 @@ import { expect, type Page } from "@playwright/test";
 
 import { DateTime } from "luxon";
 
-import {
-  ADMIN_PASSWORD,
-  capture,
-  openSite,
-  setTheme,
-  type Env,
-  type Viewport,
-} from "./env";
+import { adminLogin } from "../../tests/e2e/helpers/admin";
+import { capture, openSite, setTheme, type Env, type Viewport } from "./env";
 
 export type Shot = {
   name: string;
@@ -81,14 +75,6 @@ const scrollGridTo = async (page: Page, hour: string) => {
     .first()
     .evaluate((el) => el.scrollIntoView({ block: "start" }));
   await page.evaluate(() => window.scrollBy(0, -150));
-};
-
-const adminLogin = async (page: Page) => {
-  await page.goto("/legacy/admin/login");
-  const password = page.getByLabel("Password");
-  await password.fill(ADMIN_PASSWORD);
-  await password.press("Enter");
-  await page.waitForURL(/\/admin\/events/);
 };
 
 const manageGamma = async (page: Page) => {

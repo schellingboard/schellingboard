@@ -10,7 +10,6 @@ import {
 } from "vitest";
 import { NextRequest } from "next/server";
 import { GET } from "@/app/api/v1/[[...route]]/route";
-import { createAdminAuthCookie } from "@/utils/auth";
 import { getRepositories } from "@/db/container";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import {
@@ -35,7 +34,6 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ["Date"] });
   vi.setSystemTime(new Date("2026-06-15T10:00:00.000Z"));
   resetTestDb();
-  vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
   vi.stubEnv("AUTH_SECRET", VALID_SECRET);
 });
 afterEach(() => {
@@ -180,14 +178,6 @@ describe("GET /api/v1/events/{slug}/snapshot", () => {
     await expect(await snapshotAs(w, cookie)).toMatchFileSnapshot(
       golden("verified-guest")
     );
-  });
-
-  it("gives an admin without a guest no `me`", async () => {
-    const w = await world();
-    const admin = await createAdminAuthCookie();
-    await expect(
-      await snapshotAs(w, `${admin.name}=${admin.value}`)
-    ).toMatchFileSnapshot(golden("admin"));
   });
 
   it("carries the server's now, the fake clock included", async () => {

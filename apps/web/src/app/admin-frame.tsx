@@ -27,7 +27,7 @@ const ReloadGate = createContext<() => void>(() => {});
 /** Reads the gate again, so the header shows a title that a page just changed. */
 export const useReloadAdminGate = () => useContext(ReloadGate);
 
-const LOGIN = "/legacy/admin/login";
+const LOGIN = "/auth/login";
 
 const LINKS = [
   { href: "/admin/events", label: "Events" },
@@ -78,15 +78,11 @@ function LogoutButton() {
     setPending(true);
     setFailed(false);
     try {
-      await fetch("/api/v1/auth/sign-out", { method: "POST" });
-      const response = await fetch("/api/admin/logout", { method: "POST" });
+      const response = await fetch("/api/v1/auth/sign-out", {
+        method: "POST",
+      });
       // Already signed out (an expired cookie) is the state logging out aims for.
-      if (
-        !response.ok &&
-        response.status !== 401 &&
-        response.status !== 403 &&
-        response.status !== 404
-      )
+      if (!response.ok && response.status !== 401 && response.status !== 403)
         throw new Error(`logout ${response.status}`);
       hardNavigate(LOGIN);
     } catch {
@@ -158,7 +154,7 @@ function AdminHeader({
 
 /**
  * The admin section's header, footer and gate. A refused admin read sends the
- * browser to the admin login, which brings it back to `currentPath` after.
+ * browser to the sign-in, which brings it back to `currentPath` after.
  */
 export function AdminFrame({
   api,

@@ -1,9 +1,5 @@
 import type { LoginAssurance } from "@schellingboard/domain/auth";
-import {
-  ADMIN_COOKIE_NAME,
-  GUEST_COOKIE_NAME,
-  isAdminCookieValid,
-} from "@/utils/auth-cookies";
+import { GUEST_COOKIE_NAME } from "@/utils/auth-cookies";
 
 export interface Actor {
   admin: boolean;
@@ -52,11 +48,11 @@ export async function resolveActor(
   cookies: CookieReader,
   lookup: SessionLookup
 ): Promise<Actor> {
-  const [admin, guest] = await Promise.all([
-    isAdminCookieValid(cookies.get(ADMIN_COOKIE_NAME)?.value),
-    readGuestIdentity(cookies.get(GUEST_COOKIE_NAME)?.value, lookup),
-  ]);
+  const guest = await readGuestIdentity(
+    cookies.get(GUEST_COOKIE_NAME)?.value,
+    lookup
+  );
   // A claimed session proves nothing, so the role needs a verified one.
-  const siteAdmin = guest?.level === "verified" && guest.siteAdmin === true;
-  return { admin: admin || siteAdmin, guest };
+  const admin = guest?.level === "verified" && guest.siteAdmin === true;
+  return { admin, guest };
 }

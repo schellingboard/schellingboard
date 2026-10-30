@@ -1,15 +1,6 @@
-import { Page } from "@playwright/test";
 import { test, expect } from "./helpers/fixtures";
 import { uniqueSuffix } from "./helpers/unique";
-
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admintest";
-
-async function adminLogin(page: Page) {
-  await page.goto("/admin");
-  await page.getByLabel("Password").fill(ADMIN_PASSWORD);
-  await page.getByRole("button", { name: "Access Admin" }).click();
-  await expect(page).toHaveURL(/\/admin\/events$/);
-}
+import { adminLogin } from "./helpers/admin";
 
 // One event, one lifecycle: the section's rules are covered by
 // tests/integration/admin-meetings.test.ts, so the browser is here for what

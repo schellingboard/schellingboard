@@ -10,7 +10,7 @@ import {
 import { NextRequest } from "next/server";
 import { createApiClient } from "@schellingboard/api-client";
 import { GET, POST, PUT, PATCH, DELETE } from "@/app/api/v1/[[...route]]/route";
-import { createAdminAuthCookie } from "@/utils/auth";
+import { createAuthCookie } from "@/utils/auth";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent } from "../helpers/factories";
 import { throughProxy } from "../helpers/through-proxy";
@@ -43,7 +43,6 @@ beforeAll(() => setupTestDb());
 beforeEach(() => {
   resetTestDb();
   vi.stubEnv("SITE_PASSWORD", "site-pw");
-  vi.stubEnv("ADMIN_PASSWORD", "admin-pw");
   vi.stubEnv("AUTH_SECRET", VALID_SECRET);
 });
 afterEach(() => vi.unstubAllEnvs());
@@ -54,7 +53,7 @@ describe("@schellingboard/api-client", () => {
     { tags: ["019-US3"] },
     async () => {
       const event = await createEvent({ name: "Unconf" });
-      const client = clientWithCookies([await createAdminAuthCookie()]);
+      const client = clientWithCookies([await createAuthCookie()]);
       const { data, error } = await client.GET("/api/v1/events");
       expect(error).toBeUndefined();
       expect(data?.events.map(({ id, name }) => ({ id, name }))).toEqual([

@@ -65,7 +65,7 @@ env_args=()
 # Only the variables named here reach the container, so a new one the suite
 # depends on must be added — REMINDER_DISPATCH_INTERVAL_MS=0 in particular,
 # without which the container ticks live against a configured mailpit.
-for var in SITE_PASSWORD ADMIN_PASSWORD AUTH_SECRET SB_ENABLE_DEV_TOOLS \
+for var in SITE_PASSWORD AUTH_SECRET SB_ENABLE_DEV_TOOLS \
   REMINDER_DISPATCH_INTERVAL_MS \
   SMTP_FROM SMTP_PORT SMTP_USER SMTP_PASSWORD SMTP_SECURE; do
   if [ -n "${!var:-}" ]; then

@@ -111,12 +111,4 @@ describe("the admin pages", { tags: ["015-US1"] }, () => {
       await screen.findByRole("link", { name: "Renamed Admin" })
     ).toBeTruthy();
   });
-
-  it("hands the admin login to the legacy app", async () => {
-    await open({ handler: answers, path: "/admin/login" });
-
-    await vi.waitFor(() =>
-      expect(hardNavigate).toHaveBeenCalledWith("/legacy/admin/login")
-    );
-  });
 });

@@ -3,24 +3,7 @@ import sharp from "sharp";
 import { test, expect } from "./helpers/fixtures";
 import { uniqueSuffix } from "./helpers/unique";
 import { loginAndGoto } from "./helpers/auth";
-
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admintest";
-
-async function adminLogin(page: Page) {
-  await page.goto("/admin");
-  // Already authenticated (cookie set earlier in the test): /admin redirects
-  // straight to the events list, with no login form. Wait for whichever of
-  // the two landed before branching — a single isVisible() sample takes the
-  // "already logged in" branch on a login form that has yet to render.
-  const password = page.getByLabel("Password");
-  const eventsHeading = page.getByRole("heading", { name: "Events" });
-  await expect(password.or(eventsHeading)).toBeVisible();
-  if (await password.isVisible()) {
-    await password.fill(ADMIN_PASSWORD);
-    await page.getByRole("button", { name: "Access Admin" }).click();
-  }
-  await expect(page).toHaveURL(/\/admin\/events$/);
-}
+import { adminLogin } from "./helpers/admin";
 
 async function gotoSettings(page: Page) {
   await page

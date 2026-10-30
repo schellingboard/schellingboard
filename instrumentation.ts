@@ -1,11 +1,13 @@
 import { initMailer } from "@/utils/mailer";
 import { startJobsLoop } from "@/utils/jobs/loop";
+import { warnAboutAdminPassword } from "@/server/admin-password-notice";
 
 export function register() {
   // If we run this app in an edge runtime[1] in future, it won't support email.
   // So don't init in that case.
   // [1]: https://nextjs.org/docs/app/api-reference/edge
   if (process.env.NEXT_RUNTIME === "nodejs") {
+    warnAboutAdminPassword();
     initMailer();
     // After the mailer: a pass that ran first would find it uninitialised.
     startJobsLoop();
