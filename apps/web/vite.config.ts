@@ -27,8 +27,8 @@ export default defineConfig(({ command }) => ({
     outDir: "dist",
     emptyOutDir: true,
     // A size budget, not a silencer: the SPA is one route, so it cannot be split
-    // usefully yet. E2E builds with NODE_ENV=test, which bundles dev React.
-    chunkSizeWarningLimit: process.env.NODE_ENV === "production" ? 700 : 1000,
+    // usefully yet.
+    chunkSizeWarningLimit: 700,
   },
   server: {
     port: Number(process.env.PORT ?? 3000),

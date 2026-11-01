@@ -95,6 +95,9 @@ bun set-env.ts test bun x playwright test tests/e2e/proposals.spec.ts:42   # sin
 bun set-env.ts test bun x playwright test -g "creates a proposal"          # by title substring
 ```
 
+The SPA is built with `NODE_ENV=production` here, as in the image. Without it, `set-env.ts`'s `test`
+bundles dev React, which takes the suite almost twice as long.
+
 The suite runs as two projects. `firefox` holds everything and runs in parallel; `firefox-globals`
 holds the specs that change site-wide settings — one row every other test reads — and depends on
 `firefox`, so it starts only once the parallel bulk is done and has the site to itself. It runs on a

@@ -83,7 +83,7 @@ cleanup() {
 trap cleanup EXIT
 
 echo "==> Building the app"
-bun set-env.ts test "bun x vite build apps/web && next build"
+bun set-env.ts test "NODE_ENV=production bun x vite build apps/web && next build"
 
 echo "==> Starting the server on $BASE_URL"
 # SITE_URL ends up in the links of sent mail; a real environment variable beats
