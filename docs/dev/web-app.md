@@ -34,18 +34,19 @@ going.
   on load, every 5 minutes, on `online` and when the tab is shown). The viewer is remembered in
   `localStorage` so the saved schedule opens offline.
 
-The files are read relative to the working directory, so the same code serves `next start`, and the
-Docker image, which copies `apps/web/dist` next to `server.js`.
+The files are read relative to the working directory, so the same code serves `make start`, and the
+Docker image, which copies `apps/web/dist` next to `dist/server`.
 
 ## Build and run
 
-- `make build` and the E2E web server run `vite build apps/web` before `next build`; the Dockerfile
-  does the same. Next serves what is in `apps/web/dist`, so rebuild the SPA after changing it when
-  testing through Next.
-- `make dev` runs Next on `PORT + 1` and Vite on `PORT` (default 3000). Open the Vite port: it
-  serves the SPA with hot reload and proxies `/legacy`, `/api`, `/media` and the other Next paths to
-  Next. The shell gate does not apply in dev. A bare `next dev` answers root pages with the shell
-  (503 until the SPA is built): use `/legacy/...` URLs with it, as the screenshots script does.
+- `make build` and the E2E web server run `vite build apps/web` and `scripts/build-server.ts` (one
+  esbuild bundle, `dist/server/main.mjs`; the native addons stay external); the Dockerfile does the
+  same. The server serves what is in `apps/web/dist`, so rebuild the SPA after changing it when
+  testing through the server.
+- `make dev` rebuilds the bundle on change, runs it on `PORT + 1` with `node --watch`, and runs Vite
+  on `PORT` (default 3000). Open the Vite port: it serves the SPA with hot reload and proxies
+  `/api`, `/media` and the other server paths to the Node server. The shell gate does not apply in
+  dev.
 - E2E specs call `page.goto` with root paths; the fixture sends them to `/legacy/...` so a click
   never lands before hydration, except these SPA addresses (an event's `/{slug}` and
   `/{slug}/proposals/…`, `/guests/…`, `/settings`, `/notifications`, `/admin/…`), which open as they

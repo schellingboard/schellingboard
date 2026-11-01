@@ -4,7 +4,7 @@ import { getAppVersion } from "./git";
 
 let cached: string | undefined;
 
-/** Next writes the id of a production build to `.next/BUILD_ID`. */
+/** The server build (scripts/build-server.ts) writes its id to `dist/server/BUILD_ID`. */
 export function getBuildId(): string {
   cached ??= readBuildFile() ?? getAppVersion();
   return cached;
@@ -13,7 +13,7 @@ export function getBuildId(): string {
 function readBuildFile(): string | null {
   try {
     const id = readFileSync(
-      path.join(process.cwd(), ".next", "BUILD_ID"),
+      path.join(process.cwd(), "dist", "server", "BUILD_ID"),
       "utf8"
     ).trim();
     return id || null;

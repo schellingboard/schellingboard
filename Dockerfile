@@ -19,8 +19,7 @@ COPY . .
 # Passed by scripts/docker-build.sh; empty builds show no version in the footer.
 ARG APP_VERSION
 ENV APP_VERSION=$APP_VERSION
-ENV BUILD_STANDALONE=1
-RUN bun x vite build apps/web && bun x next build
+RUN bun x vite build apps/web && bun scripts/build-server.ts
 
 FROM node:25-bookworm-slim AS runner
 WORKDIR /app
@@ -37,18 +36,21 @@ RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/* && \
 RUN groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 --gid nodejs nextjs
 
-# Standalone output bundles only the required node_modules
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+# The server is one bundle; only the native addons and what is read by path stay outside it
+COPY --from=builder --chown=nextjs:nodejs /app/dist/server ./dist/server
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 # The SPA shell and assets are read from disk, relative to the working directory
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/dist ./apps/web/dist
 # Migrations are loaded at runtime relative to process.cwd()
 COPY --from=builder --chown=nextjs:nodejs /app/drizzle ./drizzle
-# sharp's native addon loads libvips via dlopen, which Next's file-tracer
-# can't detect, so the standalone output omits it; copy it in explicitly
+# The bundle's externals (scripts/build-server.ts) with their dependencies, and
+# the API reference script that is served by path
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/better-sqlite3 ./node_modules/better-sqlite3
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/sharp ./node_modules/sharp
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@img ./node_modules/@img
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/detect-libc ./node_modules/detect-libc
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/semver ./node_modules/semver
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@scalar/api-reference/dist/browser/standalone.js ./node_modules/@scalar/api-reference/dist/browser/standalone.js
 
 RUN mkdir -p /data && chown nextjs:nodejs /data
 
@@ -56,7 +58,6 @@ USER nextjs
 
 EXPOSE 3000
 ENV PORT=3000
-ENV HOSTNAME=0.0.0.0
 ENV DATABASE_URL=file:/data/data.db
 # Uploaded files must live on the persistent /data volume
 ENV SB_UPLOADS_DIR=/data/uploads
@@ -64,4 +65,4 @@ ENV SB_UPLOADS_DIR=/data/uploads
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD node -e "fetch('http://localhost:3000/api/health').then(r=>r.ok?process.exit(0):process.exit(1)).catch(()=>process.exit(1))"
 
-CMD ["node", "server.js"]
+CMD ["node", "dist/server/main.mjs"]

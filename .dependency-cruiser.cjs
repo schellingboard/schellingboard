@@ -96,7 +96,7 @@ module.exports = {
       // The test config reads the use-case catalogue to register its tags.
       from: { path: "^apps/web/", pathNot: "^apps/web/vitest\\.config\\.ts$" },
       to: {
-        path: "^(app|server|utils|db|emails|tests|scripts)/|^(proxy|instrumentation)\\.ts$|node_modules/(next|hono|@hono|better-sqlite3|drizzle-orm)/",
+        path: "^(app|server|utils|db|emails|tests|scripts)/|node_modules/(next|hono|@hono|better-sqlite3|drizzle-orm)/",
       },
     },
     {
@@ -280,7 +280,7 @@ module.exports = {
   options: {
     doNotFollow: { path: "node_modules" },
     exclude: {
-      path: "(^|/)(\\.next|coverage|site|playwright-report|test-results|apps/web/dist)/",
+      path: "(^|/)(\\.next|coverage|site|playwright-report|test-results|apps/web/dist|dist/server)/",
     },
     tsPreCompilationDeps: true,
     tsConfig: { fileName: "tsconfig.json" },
