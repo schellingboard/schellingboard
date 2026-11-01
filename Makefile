@@ -5,7 +5,7 @@ SHELL := /usr/bin/env bash
 help:
 	@printf "Available commands:\n"
 	@printf "\nDevelopment:\n"
-	@printf "  %-28s %s\n" "make dev"                "Start development server (Vite on PORT in front of Next)"
+	@printf "  %-28s %s\n" "make dev"                "Start development server (Vite on PORT in front of the server)"
 	@printf "  %-28s %s\n" "make mailpit"            "Start local mail server (for email in dev and tests)"
 	@printf "  %-28s %s\n" "make precommit"          "Format, lint, typecheck, and run all tests (incl. e2e)"
 	@printf "\nBuilding:\n"
@@ -87,15 +87,13 @@ lint: install
 	bun x eslint --max-warnings 0 .
 
 typecheck: install
-	rm -rf .next/dev/types
-	bun x next typegen
 	bun x tsc --noEmit
 	bun x tsc -p packages/domain
 	bun x tsc -p packages/contracts
 	bun x tsc -p packages/api-client
 	bun x tsc -b apps/web
 
-DEPCRUISE := bun x depcruise app apps db packages server utils emails tests scripts --config .dependency-cruiser.cjs
+DEPCRUISE := bun x depcruise apps db packages server utils emails tests scripts --config .dependency-cruiser.cjs
 
 # Commit messages: conventional prefix, subject <= 72, body wrapped at 80.
 # Pipe a draft message to `bun scripts/check-commit-messages.ts --stdin` first.
@@ -128,7 +126,7 @@ arch-graph: install
 	$(DEPCRUISE) --output-type dot | dot -T svg > arch-graph.svg
 
 lint-watch: install
-	watchexec -c -w app -w db -w packages -w utils -w tests "bun x eslint --fix ."
+	watchexec -c -w apps -w server -w db -w packages -w utils -w tests "bun x eslint --fix ."
 
 test: install
 	bun set-env.ts test bun x vitest run
@@ -170,9 +168,8 @@ format-check: install
 precommit: format lint arch openapi-check typecheck test-coverage test-e2e
 
 clean:
-	rm -rf .next dist
+	rm -rf dist
 	rm -f arch-graph.svg
-	rm -f next-env.d.ts
 	rm -f data.db data.db-wal data.db-shm data.test.db data.test.db-wal data.test.db-shm
 	rm -rf playwright-report test-results playwright-results.json .e2e-docker
 	rm -f tsconfig.tsbuildinfo

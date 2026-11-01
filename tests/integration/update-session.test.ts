@@ -9,7 +9,6 @@ import {
   afterEach,
   vi,
 } from "vitest";
-import { NextRequest } from "next/server";
 
 vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
@@ -52,11 +51,11 @@ async function protectGuest(guestId: string): Promise<void> {
   });
 }
 
-function makeAddReq(payload: unknown): NextRequest {
+function makeAddReq(payload: unknown): Request {
   // Creating requires a name to be selected; these fixtures only seed a
   // session, so act as its first host.
   const hostId = (payload as SessionParams).hosts[0].id;
-  return new NextRequest("http://test/session-form", {
+  return new Request("http://test/session-form", {
     method: "POST",
     body: JSON.stringify(payload),
     headers: { cookie: `${GUEST_COOKIE_NAME}=${openGuestValue(hostId)}` },
@@ -66,8 +65,8 @@ function makeAddReq(payload: unknown): NextRequest {
 function makeUpdateReq(
   payload: unknown,
   opts?: { editorGuestId?: string }
-): NextRequest {
-  return new NextRequest("http://test/session-form", {
+): Request {
+  return new Request("http://test/session-form", {
     method: "POST",
     body: JSON.stringify(payload),
     // The guest cookie identifies the acting guest, like the site sets it.
@@ -80,8 +79,8 @@ function makeUpdateReq(
 async function makeUpdateReqWithAuthCookie(
   payload: unknown,
   editorGuestId: string
-): Promise<NextRequest> {
-  return new NextRequest("http://test/session-form", {
+): Promise<Request> {
+  return new Request("http://test/session-form", {
     method: "POST",
     body: JSON.stringify(payload),
     headers: {

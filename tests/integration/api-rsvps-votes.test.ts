@@ -7,7 +7,6 @@ import {
   afterEach,
   vi,
 } from "vitest";
-import { NextRequest } from "next/server";
 import { GET, PUT, DELETE } from "@/tests/helpers/v1-route";
 import { createAdminAuthCookie } from "../helpers/admin-cookie";
 import { getRepositories } from "@/db/container";
@@ -34,7 +33,7 @@ function request(
   const headers: Record<string, string> = {};
   if (body !== undefined) headers["content-type"] = "application/json";
   if (cookie) headers.cookie = cookie;
-  return new NextRequest(`http://test/api/v1${path}`, {
+  return new Request(`http://test/api/v1${path}`, {
     method,
     headers,
     body: body === undefined ? undefined : JSON.stringify(body),

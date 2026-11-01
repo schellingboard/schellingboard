@@ -1,4 +1,3 @@
-.next
 dist
 node_modules
 *.db
@@ -10,7 +9,7 @@ node_modules
 .git
 .jj
 tests
-# vitest.config.ts and scripts/use-cases.ts import it, and next build type-checks them.
+# vitest.config.ts and scripts/use-cases.ts import it.
 !tests/use-cases.ts
 # Dev-only; imports the E2E helpers excluded above.
 scripts/screenshots

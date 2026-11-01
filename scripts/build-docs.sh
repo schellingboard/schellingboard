@@ -24,8 +24,8 @@ cd "$(dirname "$0")/.."
 REPO_ROOT="$PWD"
 
 # Reading tags and adding worktrees needs git. Workspaces created with
-# `jj workspace add` have no .git at all (see the same caveat in
-# next.config.js), where every git command below would fail one by one.
+# `jj workspace add` have no .git at all, where every git command below would
+# fail one by one.
 if [ ! -e ".git" ]; then
   echo "$REPO_ROOT has no .git — building the site needs a git checkout, because" >&2
   echo "every published version is read from a release tag. Run this from the" >&2

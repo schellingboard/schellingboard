@@ -177,7 +177,7 @@ export abstract class BaseImageResourceRepository<Id extends string> {
   /**
    * {@link read}, downscaled to `width`. Does the job next/image's optimizer
    * would, because it can't reach these files once /media needs a cookie
-   * (see utils/image-loader.js).
+   * (a gated /media cannot be fetched by a third-party optimizer).
    *
    * The rendition is cached beside the original as `<stem>.<width>.<ext>`, so
    * {@link deleteByUrl}, which removes everything starting with `<stem>.`,

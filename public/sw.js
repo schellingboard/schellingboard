@@ -2,7 +2,7 @@
  * SchellingBoard's service worker. It delivers push notifications (a browser
  * only hands them to a worker) and keeps the SPA openable offline: the shell
  * and its hashed assets are cached, and the shell answers SPA navigations when
- * the network does not. Nothing under /api or /legacy is ever cached or
+ * the network does not. Nothing under /api is ever cached or
  * intercepted: the schedule's own copy on the device knows how stale it is,
  * and a schedule that keeps changing is worse than useless served stale.
  *
@@ -13,14 +13,7 @@
 const CACHE = "sb-spa-v1";
 const SHELL_KEY = "/_spa/shell";
 const ASSET_PATTERN = /\/_spa\/assets\/[^"'\s)]+/g;
-const NOT_SPA_PAGES = [
-  "/legacy",
-  "/api",
-  "/media",
-  "/locations",
-  "/_next",
-  "/_spa",
-];
+const NOT_SPA_PAGES = ["/api", "/media", "/locations", "/_spa"];
 
 const isSpaPage = (url) =>
   url.origin === self.location.origin &&

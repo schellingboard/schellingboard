@@ -1,13 +1,12 @@
 // @module-tag 002-US1
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
 import { POST } from "@/tests/helpers/v1-route";
 import { AUTH_COOKIE_NAME, isAuthCookieValid } from "@/utils/auth";
 import { LOGIN_LIMITS, resetRateLimits } from "@/server/kernel/rate-limit";
 
 const enter = (password: unknown) =>
   POST(
-    new NextRequest("http://test/api/v1/auth/site", {
+    new Request("http://test/api/v1/auth/site", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ password }),

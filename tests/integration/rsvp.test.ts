@@ -1,7 +1,6 @@
 // @module-tag 009-US1
 // @module-tag 009-US2
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
-import { NextRequest } from "next/server";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
@@ -21,10 +20,10 @@ function toggleRsvp({ sessionId, guestId, remove, key }: RsvpCall) {
   };
   if (key) headers["idempotency-key"] = key;
   return (remove ? DELETE : PUT)(
-    new NextRequest(
-      `http://test/api/v1/sessions/${sessionId}/rsvps/${guestId}`,
-      { method: remove ? "DELETE" : "PUT", headers }
-    )
+    new Request(`http://test/api/v1/sessions/${sessionId}/rsvps/${guestId}`, {
+      method: remove ? "DELETE" : "PUT",
+      headers,
+    })
   );
 }
 

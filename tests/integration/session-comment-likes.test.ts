@@ -7,21 +7,7 @@ import { getRepositories } from "@/db/container";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 import { commentApi } from "../helpers/comment-api";
 
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-}));
-
 const cookieJar = new Map<string, string>();
-
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
 
 const {
   createSessionComment: createComment,

@@ -1,6 +1,5 @@
 import { GUEST_COOKIE_NAME, openGuestValue } from "./guest-cookie";
 
-import { NextRequest } from "next/server";
 import {
   callApi,
   type ApiResult,
@@ -20,7 +19,7 @@ export function apiRequest(
   const headers: Record<string, string> = {};
   if (body !== undefined) headers["content-type"] = "application/json";
   if (cookie) headers.cookie = cookie;
-  return new NextRequest(`http://test/api/v1${path}`, {
+  return new Request(`http://test/api/v1${path}`, {
     method,
     headers,
     body: body === undefined ? undefined : JSON.stringify(body),

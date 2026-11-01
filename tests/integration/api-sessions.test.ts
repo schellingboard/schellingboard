@@ -7,7 +7,6 @@ import {
   afterEach,
   vi,
 } from "vitest";
-import { NextRequest } from "next/server";
 
 vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
@@ -42,7 +41,7 @@ function request(
   if (body !== undefined) headers["content-type"] = "application/json";
   if (cookie) headers.cookie = cookie;
   if (key) headers["idempotency-key"] = key;
-  return new NextRequest(`http://test/api/v1${path}`, {
+  return new Request(`http://test/api/v1${path}`, {
     method,
     headers,
     body: body === undefined ? undefined : JSON.stringify(body),

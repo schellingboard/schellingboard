@@ -1,4 +1,3 @@
-import { NextRequest } from "next/server";
 import { PUT } from "@/tests/helpers/v1-route";
 
 type Problem = { code: string; detail?: string };
@@ -16,7 +15,7 @@ export async function saveProfile(
   let expectedVersion = fields.expectedVersion;
   const send = (path: string, init: { body: BodyInit; json?: boolean }) =>
     PUT(
-      new NextRequest(`http://test/api/v1${path}`, {
+      new Request(`http://test/api/v1${path}`, {
         method: "PUT",
         headers: {
           cookie: [...cookies].map(([k, v]) => `${k}=${v}`).join("; "),
