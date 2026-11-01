@@ -20,3 +20,15 @@ export const myNotificationsSchema = pageSchema(notificationSchema).extend({
 export const notificationIdsSchema = z.object({
   ids: z.array(z.string().min(1)).max(1000),
 });
+
+// Ids travel in the URL, and Node refuses request lines past about 16 KiB.
+export const NOTIFICATION_IDS_MAX = 100;
+
+export const notificationIdsQuerySchema = z.object({
+  ids: z
+    .string()
+    .min(1)
+    .describe("Comma-separated notification ids, at most 100")
+    .transform((ids) => ids.split(",").filter(Boolean))
+    .pipe(z.array(z.string().min(1)).max(NOTIFICATION_IDS_MAX)),
+});

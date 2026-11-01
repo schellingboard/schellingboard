@@ -16,15 +16,13 @@ export function settingsCalls(api: ApiClient) {
         body,
         headers: keyed(key),
       }),
-    unsubscribe: (endpoint: string, key: string) =>
-      api.POST("/api/v1/me/push-subscriptions/remove", {
-        body: { endpoint },
-        headers: keyed(key),
+    unsubscribe: (endpoint: string) =>
+      api.DELETE("/api/v1/me/push-subscriptions", {
+        params: { query: { endpoint } },
       }),
-    isEnabledHere: (endpoint: string, key: string) =>
-      api.POST("/api/v1/me/push-subscriptions/check", {
-        body: { endpoint },
-        headers: keyed(key),
+    isEnabledHere: (endpoint: string) =>
+      api.GET("/api/v1/me/push-subscriptions", {
+        params: { query: { endpoint } },
       }),
   };
 }
