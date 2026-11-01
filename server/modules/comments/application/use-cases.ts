@@ -5,7 +5,6 @@ import {
   editComment,
   listComments,
   setCommentLike,
-  toggleCommentLike,
 } from "./comments";
 
 export function createCommentUseCases(deps: CommentDeps) {
@@ -14,7 +13,6 @@ export function createCommentUseCases(deps: CommentDeps) {
     createComment: createComment(deps),
     editComment: editComment(deps),
     deleteComment: deleteComment(deps),
-    toggleCommentLike: toggleCommentLike(deps),
     setCommentLike: setCommentLike(deps),
   };
 }

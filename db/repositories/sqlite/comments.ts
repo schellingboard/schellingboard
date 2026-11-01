@@ -138,36 +138,6 @@ export class SqliteCommentsRepository implements CommentsRepository {
     );
   }
 
-  async toggleLike(data: {
-    commentId: string;
-    guestId: string;
-    createdTime: Date;
-  }): Promise<boolean> {
-    return this.db.transaction((tx) => {
-      const match = and(
-        eq(schema.commentLikes.commentId, data.commentId),
-        eq(schema.commentLikes.guestId, data.guestId)
-      );
-      const existing = tx
-        .select({ commentId: schema.commentLikes.commentId })
-        .from(schema.commentLikes)
-        .where(match)
-        .get();
-      if (existing) {
-        tx.delete(schema.commentLikes).where(match).run();
-        return false;
-      }
-      tx.insert(schema.commentLikes)
-        .values({
-          commentId: data.commentId,
-          guestId: data.guestId,
-          createdTime: data.createdTime.toISOString(),
-        })
-        .run();
-      return true;
-    });
-  }
-
   async setLike(data: {
     commentId: string;
     guestId: string;

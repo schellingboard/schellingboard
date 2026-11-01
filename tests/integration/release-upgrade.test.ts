@@ -204,9 +204,10 @@ describe.each(dumps)("upgrading from $version", (dump) => {
       body: "Upgraded comment",
       createdTime: new Date(),
     });
-    await comments.toggleLike({
+    await comments.setLike({
       commentId: comment.id,
       guestId: author.id,
+      liked: true,
       createdTime: new Date(),
     });
     await comments.update(comment.id, {

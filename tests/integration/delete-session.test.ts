@@ -29,9 +29,9 @@ import {
   openGuestValue,
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
-import { POST as addPOST } from "@/app/api/add-session/route";
-import { POST } from "@/app/api/delete-session/route";
-import type { SessionParams } from "@/app/api/session-form-utils";
+import { addSession as addPOST } from "../helpers/session-form";
+import { deleteSession as POST } from "../helpers/session-form";
+import type { SessionParams } from "../helpers/session-form";
 import type { Location } from "@schellingboard/domain/location";
 import type { Guest } from "@schellingboard/domain/guest";
 import type { Day } from "@schellingboard/domain/event";
@@ -50,7 +50,7 @@ function makeAddReq(payload: unknown): NextRequest {
   // Creating requires a name to be selected; these fixtures only seed a
   // session, so act as its first host.
   const hostId = (payload as SessionParams).hosts[0].id;
-  return new NextRequest("http://test/api/add-session", {
+  return new NextRequest("http://test/session-form", {
     method: "POST",
     body: JSON.stringify(payload),
     headers: { cookie: `${GUEST_COOKIE_NAME}=${openGuestValue(hostId)}` },
@@ -61,7 +61,7 @@ function makeDeleteReq(
   id: string,
   opts?: { editorGuestId?: string }
 ): NextRequest {
-  return new NextRequest("http://test/api/delete-session", {
+  return new NextRequest("http://test/session-form", {
     method: "POST",
     body: JSON.stringify({ id }),
     headers: opts?.editorGuestId
@@ -74,7 +74,7 @@ async function makeDeleteReqWithAuthCookie(
   id: string,
   editorGuestId: string
 ): Promise<NextRequest> {
-  return new NextRequest("http://test/api/delete-session", {
+  return new NextRequest("http://test/session-form", {
     method: "POST",
     body: JSON.stringify({ id }),
     headers: {
@@ -108,7 +108,7 @@ async function createScheduledSession(
   return sessions.find((s) => s.title === title)!.id;
 }
 
-describe("POST /api/delete-session", () => {
+describe("session form: delete session", () => {
   beforeAll(() => setupTestDb());
   beforeEach(() => {
     resetTestDb();

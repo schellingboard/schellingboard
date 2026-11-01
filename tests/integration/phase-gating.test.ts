@@ -18,10 +18,11 @@ import {
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { VoteChoice } from "@schellingboard/domain/vote";
-import type { SessionParams } from "@/app/api/session-form-utils";
-import { PUT as putV1 } from "@/app/api/v1/[[...route]]/route";
-import { POST as addSession } from "@/app/api/add-session/route";
-import { POST as toggleRsvp } from "@/app/api/toggle-rsvp/route";
+import { addSession, type SessionParams } from "../helpers/session-form";
+import {
+  DELETE as deleteV1,
+  PUT as putV1,
+} from "@/app/api/v1/[[...route]]/route";
 import { apiRequest, proposalApi } from "../helpers/proposal-api";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 
@@ -83,7 +84,7 @@ async function addSessionIn(phase: "proposal" | "voting" | "scheduling") {
     duration: 60,
   };
   const res = await addSession(
-    makeReq("http://test/api/add-session", payload, guest.id)
+    makeReq("http://test/session-form", payload, guest.id)
   );
   const sessions = await getRepositories().sessions.listByEvent(event.id);
   return { res, sessions };
@@ -115,12 +116,11 @@ async function toggleRsvpIn(
   if (opts?.remove) {
     await repos.rsvps.create({ sessionId: session.id, guestId: guest.id });
   }
-  const res = await toggleRsvp(
-    makeReq("http://test/api/toggle-rsvp", {
-      sessionId: session.id,
-      guestId: guest.id,
-      remove: opts?.remove,
-    })
+  const res = await (opts?.remove ? deleteV1 : putV1)(
+    apiRequest(
+      opts?.remove ? "DELETE" : "PUT",
+      `/sessions/${session.id}/rsvps/${guest.id}`
+    )
   );
   const rsvps = await repos.rsvps.listBySession(session.id);
   return { res, rsvps };
