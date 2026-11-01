@@ -7,10 +7,10 @@ Each in ADR form: context, decision, alternatives, consequences. When one is ado
 
 ## D1 · API server plus static SPA, no server-side rendering
 
-**Context.** Today's app is Next.js App Router with server components and server actions as the
-primary data path, plus some route handlers. The requirements that motivated this redesign, live
-updates, bots, an admin API, an OpenAPI document, a clear frontend/backend line, all need a real
-HTTP API. The question was whether to keep SSR alongside it.
+**Context.** The app was Next.js (retired in step 7), App Router with server components and server
+actions as the primary data path, plus some route handlers. The requirements that motivated this
+redesign, live updates, bots, an admin API, an OpenAPI document, a clear frontend/backend line, all
+need a real HTTP API. The question was whether to keep SSR alongside it.
 
 **What SSR is and what it buys.** The server runs the React tree per request and returns finished
 HTML; the browser shows it, then downloads the JavaScript and hydrates. React Server Components
