@@ -144,3 +144,17 @@ export const credentialsSchema = z.object({
     .describe("Whether switching to the name asks for a login"),
   username: z.string().nullable(),
 });
+
+export const joinBodySchema = z.object({
+  token: z.string().min(1).max(200).describe("The token in the join link"),
+});
+
+export const joinResultSchema = z.object({
+  guestId: z.string().describe("The guest the link belongs to"),
+  eventSlug: z.string().describe("The event the link opens"),
+  joined: z
+    .boolean()
+    .describe(
+      "False when the guest set a password after the link was made: sign in as them, then send the token again. Nothing changed."
+    ),
+});

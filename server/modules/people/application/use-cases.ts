@@ -25,6 +25,7 @@ import {
 } from "./credentials";
 import { assignGuestsToEvent, removeGuestsFromEvent } from "./event-guests";
 import { importGuests } from "./guest-import";
+import { createJoinLink, joinWithLink, mailJoinLinks } from "./join-links";
 import { logIn, requestLoginCode } from "./sign-in";
 import { chooseGuest, currentGuest, signIn, signOut } from "./identity";
 import {
@@ -70,6 +71,9 @@ export function createPeopleUseCases(deps: PeopleDeps) {
     issueBootstrapToken: issueBootstrapToken(deps),
     announceBootstrap: announceBootstrap(deps),
     bootstrapAdmin: bootstrapAdmin(deps),
+    createJoinLink: createJoinLink(deps),
+    mailJoinLinks: mailJoinLinks(deps),
+    joinWithLink: joinWithLink(deps),
     assignGuestsToEvent: assignGuestsToEvent(deps),
     removeGuestsFromEvent: removeGuestsFromEvent(deps),
     importGuests: importGuests(deps),

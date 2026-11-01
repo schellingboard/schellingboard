@@ -93,6 +93,13 @@ makes the guest read as protected (`isProtected` in the guests repository).
 while no site admin exists (`SB_BOOTSTRAP_LINK=1` forces one); `POST /auth/bootstrap` spends it
 (`people/application/bootstrap.ts`).
 
+Join links ([ADR 0017](adr/0017-identity-and-roles.md) point 9): `join_tokens` (hash, guest, event,
+created; one per guest and event, no expiry) and `guests.password_set_at`, which `setAuthProtection`
+stamps when the hash changes. `POST /auth/join` signs in and joins while the password predates the
+link; later it answers `joined: false` unless the browser is already verified as that guest
+(`people/application/join-links.ts`). `POST /admin/events/{id}/guests/{guestId}/join-link` returns
+the token once; `POST /admin/events/{id}/join-links/mail` mails new links.
+
 ## The feed and the snapshot
 
 [ADR 0014](adr/0014-change-feed-and-snapshot.md) has the decisions.

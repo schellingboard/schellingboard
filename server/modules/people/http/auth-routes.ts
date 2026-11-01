@@ -2,6 +2,8 @@ import { createRoute } from "@hono/zod-openapi";
 import {
   bootstrapBodySchema,
   identitySchema,
+  joinBodySchema,
+  joinResultSchema,
   loginBodySchema,
   loginCodeBodySchema,
   resetBodySchema,
@@ -85,6 +87,19 @@ const bootstrap = createRoute({
   },
 });
 
+const join = createRoute({
+  method: "post",
+  path: "/auth/join",
+  tags: ["auth"],
+  description:
+    "Exchanges a personal join link. While its guest set no password since the link was made, signs the browser in as them (verified), joins the event and sets the guest cookie. Afterwards it joins only a browser already signed in as that guest; otherwise `joined` is false and nothing changes, so the client asks for a sign-in and sends the token again. `join.tokenWrong` (403) for an unknown or replaced link.",
+  request: { body: body(joinBodySchema) },
+  responses: {
+    200: json(joinResultSchema, "The guest and event the link names"),
+    ...problemDefault,
+  },
+});
+
 export function addAuthRoutes(app: App, people: () => PeopleUseCases) {
   app.openapi(requestLoginCode, async (c) => {
     const result = await people().requestLoginCode(
@@ -129,6 +144,17 @@ export function addAuthRoutes(app: App, people: () => PeopleUseCases) {
     if (!result.ok) return problem(result.error);
     setGuestCookie(c, result.value);
     return c.json({ guestId: result.value.guestId }, 200);
+  });
+
+  app.openapi(join, async (c) => {
+    const result = await people().joinWithLink(c.var.actor, {
+      ...c.req.valid("json"),
+      device: c.req.header("user-agent")?.slice(0, 200) ?? null,
+    });
+    if (!result.ok) return problem(result.error);
+    const { session, ...outcome } = result.value;
+    if (session) setGuestCookie(c, session);
+    return c.json(outcome, 200);
   });
 
   app.openapi(signOut, async (c) => {

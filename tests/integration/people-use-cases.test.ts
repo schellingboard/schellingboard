@@ -41,6 +41,8 @@ const people = (uow = unitOfWork) =>
       configured: () => false,
       send: async () => {},
       sendResetLink: async () => {},
+      sendJoinLink: async () => {},
+      sendJoinLinkMade: async () => {},
       sendSecurityChanged: async () => {},
     },
     sendTestEmail: async () => {},

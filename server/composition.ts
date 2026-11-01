@@ -7,6 +7,7 @@ import { unitOfWork } from "@/server/kernel/unit-of-work";
 import { authCodeEmail } from "@/emails/auth-code";
 import { authPasswordResetEmail } from "@/emails/auth-password-reset";
 import { authSecurityChangedEmail } from "@/emails/auth-security-changed";
+import { joinLinkEmail, joinLinkMadeEmail } from "@/emails/join-link";
 import { testEmail } from "@/emails/test-email";
 import { dispatchDueReminders } from "@/utils/reminder-dispatch";
 import { getImageRepositories } from "@/utils/images";
@@ -137,6 +138,17 @@ export function peopleUseCases(): PeopleUseCases {
             validMinutes,
           }),
         }),
+      sendJoinLink: ({ name, email, eventName, token }) =>
+        sendMail({
+          to: email,
+          ...joinLinkEmail({
+            name,
+            eventName,
+            joinUrl: `${siteUrl()}/join/${encodeURIComponent(token)}`,
+          }),
+        }),
+      sendJoinLinkMade: ({ name, email, eventName }) =>
+        sendMail({ to: email, ...joinLinkMadeEmail({ name, eventName }) }),
       sendSecurityChanged: ({ name, email, change }) =>
         sendMail({ to: email, ...authSecurityChangedEmail({ name, change }) }),
     },

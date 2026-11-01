@@ -87,13 +87,17 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
       `/api/admin/*` (create-*, users, logout) and the `ADMIN_VERIFIED_HEADER` are deleted; a set
       `ADMIN_PASSWORD` logs a warning; the OpenAPI scheme is `guestAuth`; E2E signs in as the seeded
       site admin (`site-admin`, `tests/e2e/helpers/admin.ts`); docs and changelog rewritten.
-- [ ] 12. **Join links.** `join_tokens(hash, guest, event, created)`, no expiry, one live per guest
-      and event; valid to sign in while the guest set no password after `created`, otherwise it asks
-      for a sign-in as that guest. `POST /api/v1/auth/join` (verified session, joins the event); SPA
-      `/join/{token}` exchanges it, replaces the history entry and opens the event. Admin guests
-      screen: "new link" for one guest (copy) and "mail new links" to all or selected guests with an
-      email; the guest is emailed that a new link exists. Attendee and organizer docs. Split if past
-      the size limit.
+- [x] 12. Join links, server side: `join_tokens`, `guests.password_set_at`, `POST /auth/join`
+      (`joined: false` once a password postdates the link),
+      `POST /admin/events/{id}/guests/{guestId}/join-link` (token once; the guest is emailed a
+      notice) and `.../join-links/mail`; emails in `emails/join-link.tsx`; use cases 003-US6,
+      016-US5. Split: the SPA half is step 12b.
+- [ ] 12b. **Join links in the SPA.** `/join/{token}` exchanges the token, replaces the history
+      entry and opens the event; when `joined` is false it sends the guest to sign in as that guest
+      (`/auth/login?guest=&redirect=/join/{token}`). Admin guests screen: "New link" for one guest
+      (shows it to copy once) and "Mail new links" to all or selected guests of the event.
+      Changelog, in-app release notes if it qualifies, attendee and organizer docs (`docs/public/`).
+      E2E.
 - [ ] 13. **Identity mode.** `events.identity_mode` (`open`|`verified`); a guest is protected if
       they chose it, are a site admin, or take part in a `verified` event; `assuranceRequired` in
       `packages/domain` (mode, protection); every acting use case checks it; the SPA predicts it and

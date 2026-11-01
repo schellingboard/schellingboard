@@ -30,6 +30,8 @@ const guests = (uow: UnitOfWork = unitOfWork) =>
       configured: () => false,
       send: async () => {},
       sendResetLink: async () => {},
+      sendJoinLink: async () => {},
+      sendJoinLinkMade: async () => {},
       sendSecurityChanged: async () => {},
     },
     sendTestEmail,
