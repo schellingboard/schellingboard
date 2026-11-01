@@ -2,7 +2,7 @@
 
 ## Technology stack
 
-- **Framework**: Next.js 16 (App Router)
+- **Server**: Hono on Node; **web app**: React, Vite and TanStack Router
 - **Language**: TypeScript (strict mode)
 - **Styling**: Tailwind CSS
 - **Database**: SQLite (better-sqlite3) with Drizzle ORM
@@ -11,10 +11,9 @@
 
 Where things live:
 
-- **Frontend**: React components in `app/` using App Router (pages under `app/legacy/`), and the
-  single-page app in `apps/web` that is replacing them; see [The web app](web-app.md)
+- **Frontend**: the single-page app in `apps/web`; see [The web app](web-app.md)
 - **Database layer**: `db/` — `schema.ts`, `container.ts`, repositories in `db/repositories/sqlite/`
-- **API routes**: Server actions in `app/actions/`, the HTTP surface in `server/http/`
+- **Server**: use cases in `server/modules/`, the HTTP surface in `server/http/`
 - **Utils**: Shared utilities in `utils/`
 - **Domain and contracts**: workspace packages — `packages/domain` (vocabulary, constants, pure
   rules) and `packages/contracts` (zod schemas); see [ADR 0010](adr/0010-workspace-packages.md)
@@ -69,7 +68,7 @@ The design the codebase is moving towards is written up separately in
    ```
 
    Open [http://localhost:3000](http://localhost:3000) in your browser. That is the Vite dev server
-   for the SPA; it proxies the Next pages, which run on the next port (3001).
+   for the SPA; it proxies the API to the server, which runs on the next port (3001).
 
 ## Development commands
 
@@ -120,8 +119,6 @@ or guests protect their name (it signs their session cookies); generate one with
 ```bash
 openssl rand -base64 32
 ```
-
-`NEXT_PUBLIC_` variables are exposed to the browser; all others are server-side only.
 
 A new variable a self-hoster can set has to reach three files: the reference table above,
 `docker-compose.yml` (which forwards it into the container) and `.env.docker.example` (where they

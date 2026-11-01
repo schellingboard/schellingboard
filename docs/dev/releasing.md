@@ -75,10 +75,10 @@ passed:
   or `git describe` and can't be trusted on a CI checkout.
 - **Runs the E2E suite against that image** (`make test-e2e-docker`, with `IMAGE` naming the image
   just built, so it is not rebuilt). This is the only tier that runs the artifact we ship, and the
-  last chance to catch a fault that exists only in it — a file the standalone build didn't copy, a
-  path that resolves differently under `/data`, a date rendered in the server's timezone rather than
-  the event's. See [Testing the Docker image](testing.md#testing-the-docker-image). The report and
-  the traces of failed attempts are uploaded as an artifact.
+  last chance to catch a fault that exists only in it — a file the Dockerfile didn't copy, a path
+  that resolves differently under `/data`, a date rendered in the server's timezone rather than the
+  event's. See [Testing the Docker image](testing.md#testing-the-docker-image). The report and the
+  traces of failed attempts are uploaded as an artifact.
 - **Pushes four tags** to `schellingboard/schellingboard`: the full version, `major.minor`, `major`,
   and `latest`. `scripts/release-tags.ts` decides the last one from the repository's tags —
   `:latest` has to keep meaning the newest published release, so a patch cut from an older line

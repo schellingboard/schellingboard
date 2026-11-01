@@ -71,23 +71,22 @@ while the first identity fetch fails. `commands/keys.ts` holds the `newKey` the 
 ## Theme, footer and dev clock
 
 `app/theme.tsx` keeps the ADR 0005 `sb-theme` cookie (read at start, written with the `light`/`dark`
-class on `<html>`; `index.html`'s inline script applies it before first paint, as the Next layout
-does). The footer's version and build come from `GET /api/v1/health` (`useHealth`); for the admin,
-`GET /api/v1/updates` (`useUpdateStatus`) adds a red dot and the latest release; its release notes
-are `packages/domain`'s. The dev clock toolbar needs `devTools` from the same endpoint
+class on `<html>`; `index.html`'s inline script applies it before first paint). The footer's version
+and build come from `GET /api/v1/health` (`useHealth`); for the admin, `GET /api/v1/updates`
+(`useUpdateStatus`) adds a red dot and the latest release; its release notes are
+`packages/domain`'s. The dev clock toolbar needs `devTools` from the same endpoint
 (`SB_ENABLE_DEV_TOOLS`) and `?dev=1`; it writes the `time-override` cookie and calls `onChange`,
-which the shell makes reload the app so the replica is read under the new time. The legacy toolbar's
-"Send due reminders" button has no SPA counterpart.
+which the shell makes reload the app so the replica is read under the new time.
 
 ## Sync indicator, error boundary and the shell
 
 `SyncIndicator` shows the replica's link state (`useSyncState`: live, reconnecting after a short
 grace, stale) and re-renders at the instant it next changes. `ErrorBoundary` keeps the nav and
-footer when one screen crashes (try again, reload, or open `/legacy`). `Shell` (`app/shell.tsx`)
-composes theme, viewer, layout, nav, map button (`MapButton`, from `GET /site`), user menu, footer,
-boundary and dev clock from props (events, the picker's guests, location). `ShellProviders` (theme
-and viewer) and `ShellFrame` are also exported, for a screen that needs the viewer before it can say
-what the frame shows. The schedule page mounts it.
+footer when one screen crashes (try again, reload, or go to the home page). `Shell`
+(`app/shell.tsx`) composes theme, viewer, layout, nav, map button (`MapButton`, from `GET /site`),
+user menu, footer, boundary and dev clock from props (events, the picker's guests, location).
+`ShellProviders` (theme and viewer) and `ShellFrame` are also exported, for a screen that needs the
+viewer before it can say what the frame shows. The schedule page mounts it.
 
 ## The sign-in screens
 
