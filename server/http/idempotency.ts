@@ -23,8 +23,18 @@ export const IDEMPOTENCY_EXEMPT_PATHS = [
   "/api/v1/auth/reset-link",
   "/api/v1/auth/reset",
   "/api/v1/auth/bootstrap",
+  "/api/v1/auth/join",
   "/api/v1/me/credentials/unprotect",
 ];
+
+// A replay stores the response body, so a route whose answer holds a secret
+// (the join-link token) must not be remembered.
+const IDEMPOTENCY_EXEMPT_PATTERN =
+  /^(\/api\/v1)?\/admin\/events\/[^/]+\/guests\/[^/]+\/join-link$/;
+
+export const isIdempotencyExempt = (path: string) =>
+  IDEMPOTENCY_EXEMPT_PATHS.includes(path) ||
+  IDEMPOTENCY_EXEMPT_PATTERN.test(path);
 
 // Declared on each mutating route so the OpenAPI document shows it.
 export const idempotencyHeaders = z.object({
@@ -80,8 +90,7 @@ export function idempotencyMiddleware({
   return createMiddleware<ApiEnv>(async (c, next) => {
     const key = c.req.header("idempotency-key");
     if (key === undefined || !MUTATIONS.has(c.req.method)) return next();
-    if (IDEMPOTENCY_EXEMPT_PATHS.includes(new URL(c.req.url).pathname))
-      return next();
+    if (isIdempotencyExempt(new URL(c.req.url).pathname)) return next();
     if (key === "" || key.length > MAX_KEY_LENGTH) {
       return problemResponse({
         status: 400,

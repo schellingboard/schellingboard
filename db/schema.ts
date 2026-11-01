@@ -112,6 +112,9 @@ export const guests = sqliteTable(
     passwordHash: text("password_hash"),
     // Lowercase, optional; password sign-in takes it or the email.
     username: text("username"),
+    // When the password last changed to a non-empty one; a join link made
+    // before it asks for a sign-in instead. NULL for passwords set earlier.
+    passwordSetAt: text("password_set_at"),
     // Verified sessions of a site admin act with admin rights; the role also
     // protects the name, whatever authProtected says.
     siteAdmin: integer("site_admin", { mode: "boolean" })
@@ -159,6 +162,23 @@ export const bootstrapTokens = sqliteTable("bootstrap_tokens", {
   createdAt: text("created_at").notNull(),
   expiresAt: text("expires_at").notNull(),
 });
+
+// One live link per guest and event; a new one replaces it. Only the sha256
+// of the token is stored.
+export const joinTokens = sqliteTable(
+  "join_tokens",
+  {
+    hash: text("hash").primaryKey(),
+    guestId: text("guest_id")
+      .notNull()
+      .references(() => guests.id, { onDelete: "cascade" }),
+    eventId: text("event_id")
+      .notNull()
+      .references(() => events.id, { onDelete: "cascade" }),
+    createdAt: text("created_at").notNull(),
+  },
+  (t) => [uniqueIndex("join_tokens_guest_event").on(t.guestId, t.eventId)]
+);
 
 export const events = sqliteTable(
   "events",

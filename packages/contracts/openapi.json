@@ -6000,6 +6000,67 @@
         "security": [{ "siteAuth": [] }]
       }
     },
+    "/api/v1/auth/join": {
+      "post": {
+        "tags": ["auth"],
+        "description": "Exchanges a personal join link. While its guest set no password since the link was made, signs the browser in as them (verified), joins the event and sets the guest cookie. Afterwards it joins only a browser already signed in as that guest; otherwise `joined` is false and nothing changes, so the client asks for a sign-in and sends the token again. `join.tokenWrong` (403) for an unknown or replaced link.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200,
+                    "description": "The token in the join link"
+                  }
+                },
+                "required": ["token"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The guest and event the link names",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "guestId": {
+                      "type": "string",
+                      "description": "The guest the link belongs to"
+                    },
+                    "eventSlug": {
+                      "type": "string",
+                      "description": "The event the link opens"
+                    },
+                    "joined": {
+                      "type": "boolean",
+                      "description": "False when the guest set a password after the link was made: sign in as them, then send the token again. Nothing changed."
+                    }
+                  },
+                  "required": ["guestId", "eventSlug", "joined"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }]
+      }
+    },
     "/api/v1/auth/sign-out": {
       "post": {
         "tags": ["auth"],
@@ -9045,6 +9106,124 @@
         },
         "responses": {
           "204": { "description": "Assigned" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "guestAuth": [] }]
+      }
+    },
+    "/api/v1/admin/events/{id}/guests/{guestId}/join-link": {
+      "post": {
+        "tags": ["admin"],
+        "description": "Makes a personal join link for the guest, ending their earlier one for this event, and emails the guest that a new link exists (never the link). The token is shown only in this answer.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": { "type": "string" },
+            "required": true,
+            "name": "guestId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The new link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "Shown once; put it in `/join/{token}`. Ends the earlier link."
+                    }
+                  },
+                  "required": ["token"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "guestAuth": [] }]
+      }
+    },
+    "/api/v1/admin/events/{id}/join-links/mail": {
+      "post": {
+        "tags": ["admin"],
+        "description": "Makes a new join link for each of the `guestIds` (every guest of the event when omitted) and mails it to them, ending their earlier ones. Guests without an email are counted, not mailed. A link is made before its mail is sent, so a failed send leaves the guest with a link they never got: mail again. Unknown ids are 400 `guest.unknown`. `auth.mailUnavailable` (503) when the server cannot send email.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "guestIds": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Omit to mail every guest of the event"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "How many were mailed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sent": { "type": "integer" },
+                    "withoutEmail": { "type": "integer" },
+                    "failed": { "type": "integer" }
+                  },
+                  "required": ["sent", "withoutEmail", "failed"]
+                }
+              }
+            }
+          },
           "default": {
             "description": "Problem details (RFC 9457); clients branch on `code`",
             "content": {

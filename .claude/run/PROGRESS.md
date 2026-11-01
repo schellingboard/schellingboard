@@ -124,6 +124,13 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
   an admin from `tests/helpers/admin-cookie.ts` (a new "Site Admin" guest per call: list tests
   filter it). `LEGACY_ROOT_PAGES` and its unit test are gone (no legacy root page is left).
 
+- Step 12 (server half): the join response is 200 `{guestId, eventSlug, joined}`; `joined: false`
+  means sign in as `guestId` and send the token again (no session, no change). A link is trusted
+  while `password_set_at` is null or not after its `created`. Creating a link for one guest mails
+  the guest a notice only when the mailer is configured (best effort); "mail all" without `guestIds`
+  means the event's members, and is 503 `auth.mailUnavailable` without a mailer. Mock `loginMail` in
+  tests needs `sendJoinLink` and `sendJoinLinkMade`.
+
 ## Known E2E flakes
 
 `attendee-count.spec.ts:64` (fails ~half of solo runs on the base too), `settings.spec.ts:67`,

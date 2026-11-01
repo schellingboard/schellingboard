@@ -29,6 +29,17 @@ export interface LoginMail {
     token: string;
     validMinutes: number;
   }): Promise<void>;
+  sendJoinLink(input: {
+    name: string;
+    email: string;
+    eventName: string;
+    token: string;
+  }): Promise<void>;
+  sendJoinLinkMade(input: {
+    name: string;
+    email: string;
+    eventName: string;
+  }): Promise<void>;
   sendSecurityChanged(input: {
     name: string;
     email: string;
@@ -44,6 +55,7 @@ export interface PeopleDeps {
     | "bootstrapTokens"
     | "events"
     | "guests"
+    | "joinTokens"
     | "loginSessions"
     | "sessions"
     | "sessionProposals"

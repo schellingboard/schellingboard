@@ -7,8 +7,12 @@ import {
   eventGuestsBodySchema,
   guestImportBodySchema,
   guestImportResultSchema,
+  joinLinkViewSchema,
+  mailJoinLinksBodySchema,
+  mailJoinLinksResultSchema,
   siteAdminBodySchema,
 } from "@schellingboard/contracts/guest";
+import { z } from "@hono/zod-openapi";
 import { pageQuerySchema } from "@schellingboard/contracts/cursor-page";
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import { pageOf } from "@/server/http/pagination";
@@ -146,6 +150,36 @@ const remove = createRoute({
   responses: { 204: noContent("Removed"), ...problemDefault },
 });
 
+const createJoinLink = createRoute({
+  method: "post",
+  path: "/admin/events/{id}/guests/{guestId}/join-link",
+  tags,
+  description:
+    "Makes a personal join link for the guest, ending their earlier one for this event, and emails the guest that a new link exists (never the link). The token is shown only in this answer.",
+  request: { params: idParam.extend({ guestId: z.string() }) },
+  responses: {
+    201: json(joinLinkViewSchema, "The new link"),
+    ...problemDefault,
+  },
+});
+
+const mailJoinLinks = createRoute({
+  method: "post",
+  path: "/admin/events/{id}/join-links/mail",
+  tags,
+  description:
+    "Makes a new join link for each of the `guestIds` (every guest of the event when omitted) and mails it to them, ending their earlier ones. Guests without an email are counted, not mailed. A link is made before its mail is sent, so a failed send leaves the guest with a link they never got: mail again. Unknown ids are 400 `guest.unknown`. `auth.mailUnavailable` (503) when the server cannot send email.",
+  request: {
+    headers: idempotencyHeaders,
+    params: idParam,
+    body: body(mailJoinLinksBodySchema),
+  },
+  responses: {
+    200: json(mailJoinLinksResultSchema, "How many were mailed"),
+    ...problemDefault,
+  },
+});
+
 export function addAdminGuestRoutes(app: App, people: () => PeopleUseCases) {
   app.openapi(listGuests, async (c) => {
     const result = await people().listGuests(c.var.actor);
@@ -220,6 +254,25 @@ export function addAdminGuestRoutes(app: App, people: () => PeopleUseCases) {
     );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);
+  });
+
+  app.openapi(createJoinLink, async (c) => {
+    const { id, guestId } = c.req.valid("param");
+    const result = await people().createJoinLink(c.var.actor, {
+      eventId: id,
+      guestId,
+    });
+    if (!result.ok) return problem(result.error);
+    return c.json(result.value, 201);
+  });
+
+  app.openapi(mailJoinLinks, async (c) => {
+    const result = await people().mailJoinLinks(c.var.actor, {
+      ...c.req.valid("json"),
+      eventId: c.req.valid("param").id,
+    });
+    if (!result.ok) return problem(result.error);
+    return c.json(result.value, 200);
   });
 
   app.openapi(remove, async (c) => {

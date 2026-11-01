@@ -101,6 +101,11 @@ export const features = {
         actor: "attendee",
         priority: "P2",
       },
+      US6: {
+        title: "Attendee joins an event with a personal link",
+        actor: "attendee",
+        priority: "P1",
+      },
     },
   },
   "004": {
@@ -512,6 +517,11 @@ export const features = {
       },
       US4: {
         title: "Organizer grants and revokes the site-admin role",
+        actor: "organizer",
+        priority: "P1",
+      },
+      US5: {
+        title: "Organizer makes and mails personal join links",
         actor: "organizer",
         priority: "P1",
       },

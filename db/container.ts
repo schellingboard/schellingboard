@@ -6,6 +6,7 @@ import * as schema from "./schema";
 import { resolveDbPath, runMigrations } from "./migrate";
 import { createLock, withWriteLock, type Lock } from "./write-lock";
 import { SqliteAuthCodesRepository } from "./repositories/sqlite/auth-codes";
+import { SqliteJoinTokensRepository } from "./repositories/sqlite/join-tokens";
 import { SqliteBootstrapTokensRepository } from "./repositories/sqlite/bootstrap-tokens";
 import { SqliteChangesRepository } from "./repositories/sqlite/changes";
 import {
@@ -35,6 +36,7 @@ import { SqliteVotesRepository } from "./repositories/sqlite/votes";
 import type {
   AuthCodesRepository,
   BootstrapTokensRepository,
+  JoinTokensRepository,
   ChangesRepository,
   CommentsRepository,
   DaysRepository,
@@ -63,6 +65,7 @@ import type {
 export type Repositories = {
   authCodes: AuthCodesRepository;
   bootstrapTokens: BootstrapTokensRepository;
+  joinTokens: JoinTokensRepository;
   changes: ChangesRepository;
   /** Scope-agnostic comment operations (find, edit, like, delete). */
   comments: CommentsRepository;
@@ -120,6 +123,7 @@ function buildRepositories(sqlite: Database.Database): Repositories {
     guests: new SqliteGuestsRepository(db),
     idempotency: new SqliteIdempotencyRepository(db),
     jobs: new SqliteJobsRepository(db),
+    joinTokens: new SqliteJoinTokensRepository(db),
     loginSessions: new SqliteLoginSessionsRepository(db),
     locations: new SqliteLocationsRepository(db),
     locationUnavailability: new SqliteLocationUnavailabilityRepository(db),

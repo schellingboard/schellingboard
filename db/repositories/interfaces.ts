@@ -164,6 +164,19 @@ export interface BootstrapTokensRepository {
   delete(hash: string): Promise<void>;
 }
 
+export type JoinToken = {
+  hash: string;
+  guestId: string;
+  eventId: string;
+  createdAt: Date;
+};
+
+export interface JoinTokensRepository {
+  /** Stores the token, dropping the guest's earlier one for that event. */
+  replace(token: JoinToken): Promise<void>;
+  findByHash(hash: string): Promise<JoinToken | null>;
+}
+
 export interface AuthCodesRepository {
   /**
    * Stores a new token for the guest, replacing any previous one of the same
@@ -292,6 +305,8 @@ export interface GuestsRepository {
   setAuthProtection(id: string, creds: GuestAuthCredentials): Promise<boolean>;
   /** The guest whose email or (lowercase) username is `identifier`, matched case-insensitively. */
   findLoginId(identifier: string): Promise<string | null>;
+  /** When the password last changed; null when unknown or never set. */
+  getPasswordSetAt(id: string): Promise<Date | null>;
   getSiteAdmin(id: string): Promise<boolean>;
   listSiteAdminIds(): Promise<string[]>;
   listPasswordIds(): Promise<string[]>;

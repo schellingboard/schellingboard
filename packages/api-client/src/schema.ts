@@ -3753,6 +3753,65 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/auth/join": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Exchanges a personal join link. While its guest set no password since the link was made, signs the browser in as them (verified), joins the event and sets the guest cookie. Afterwards it joins only a browser already signed in as that guest; otherwise `joined` is false and nothing changes, so the client asks for a sign-in and sends the token again. `join.tokenWrong` (403) for an unknown or replaced link. */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            /** @description The token in the join link */
+            token: string;
+          };
+        };
+      };
+      responses: {
+        /** @description The guest and event the link names */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              /** @description The guest the link belongs to */
+              guestId: string;
+              /** @description The event the link opens */
+              eventSlug: string;
+              /** @description False when the guest set a password after the link was made: sign in as them, then send the token again. Nothing changed. */
+              joined: boolean;
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/auth/sign-out": {
     parameters: {
       query?: never;
@@ -6607,6 +6666,118 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/events/{id}/guests/{guestId}/join-link": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Makes a personal join link for the guest, ending their earlier one for this event, and emails the guest that a new link exists (never the link). The token is shown only in this answer. */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+          guestId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The new link */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              /** @description Shown once; put it in `/join/{token}`. Ends the earlier link. */
+              token: string;
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/events/{id}/join-links/mail": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Makes a new join link for each of the `guestIds` (every guest of the event when omitted) and mails it to them, ending their earlier ones. Guests without an email are counted, not mailed. A link is made before its mail is sent, so a failed send leaves the guest with a link they never got: mail again. Unknown ids are 400 `guest.unknown`. `auth.mailUnavailable` (503) when the server cannot send email. */
+    post: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            /** @description Omit to mail every guest of the event */
+            guestIds?: string[];
+          };
+        };
+      };
+      responses: {
+        /** @description How many were mailed */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              sent: number;
+              withoutEmail: number;
+              failed: number;
+            };
+          };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
         default: {

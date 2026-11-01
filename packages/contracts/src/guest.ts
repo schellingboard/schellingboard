@@ -245,3 +245,22 @@ export const guestImportResultSchema = z.object({
 });
 
 export const siteAdminBodySchema = z.object({ siteAdmin: z.boolean() });
+
+export const joinLinkViewSchema = z.object({
+  token: z
+    .string()
+    .describe("Shown once; put it in `/join/{token}`. Ends the earlier link."),
+});
+
+export const mailJoinLinksBodySchema = z.object({
+  guestIds: z
+    .array(z.string())
+    .optional()
+    .describe("Omit to mail every guest of the event"),
+});
+
+export const mailJoinLinksResultSchema = z.object({
+  sent: z.number().int(),
+  withoutEmail: z.number().int(),
+  failed: z.number().int(),
+});

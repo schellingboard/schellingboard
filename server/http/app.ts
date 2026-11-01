@@ -65,6 +65,7 @@ api.use("/auth/login", authRateLimitMiddleware);
 api.use("/auth/login-code", authRateLimitMiddleware);
 api.use("/auth/reset-link", authRateLimitMiddleware);
 api.use("/auth/reset", authRateLimitMiddleware);
+api.use("/auth/join", authRateLimitMiddleware);
 api.use(
   "*",
   idempotencyMiddleware({ store: () => getRepositories().idempotency })
