@@ -5,7 +5,7 @@ import { NextRequest } from "next/server";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { DELETE, PUT } from "@/app/api/v1/[[...route]]/route";
+import { DELETE, PUT } from "@/tests/helpers/v1-route";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 
 type RsvpCall = {

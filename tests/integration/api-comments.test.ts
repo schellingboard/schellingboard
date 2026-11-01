@@ -11,7 +11,7 @@ import {
 vi.mock("@/utils/mailer", () => ({ sendMail: vi.fn() }));
 
 import { NextRequest } from "next/server";
-import { GET, POST, PUT, DELETE } from "@/app/api/v1/[[...route]]/route";
+import { GET, POST, PUT, DELETE } from "@/tests/helpers/v1-route";
 import { getRepositories } from "@/db/container";
 import { sendMail } from "@/utils/mailer";
 import { setupTestDb, resetTestDb } from "../helpers/db";

@@ -7,7 +7,7 @@
  * and a schedule that keeps changing is worse than useless served stale.
  *
  * Served from the site root so its scope covers the whole app, and exempted
- * from the site password in proxy.ts (a 404 here takes notifications with it).
+ * from the site password in server/http/web.ts (a 404 here takes notifications with it).
  */
 
 const CACHE = "sb-spa-v1";

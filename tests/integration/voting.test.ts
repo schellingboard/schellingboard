@@ -4,7 +4,7 @@ import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest, createProposal } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { VoteChoice, type Vote } from "@schellingboard/domain/vote";
-import { DELETE, GET, PUT } from "@/app/api/v1/[[...route]]/route";
+import { DELETE, GET, PUT } from "@/tests/helpers/v1-route";
 import { apiRequest } from "../helpers/proposal-api";
 
 const votePath = (proposalId: string, guestId: string) =>

@@ -95,7 +95,7 @@ typecheck: install
 	bun x tsc -p packages/api-client
 	bun x tsc -b apps/web
 
-DEPCRUISE := bun x depcruise app apps db packages server utils emails tests scripts instrumentation.ts proxy.ts --config .dependency-cruiser.cjs
+DEPCRUISE := bun x depcruise app apps db packages server utils emails tests scripts instrumentation.ts --config .dependency-cruiser.cjs
 
 # Commit messages: conventional prefix, subject <= 72, body wrapped at 80.
 # Pipe a draft message to `bun scripts/check-commit-messages.ts --stdin` first.

@@ -14,6 +14,8 @@ const TYPES: Record<string, string> = {
   ".svg": "image/svg+xml",
   ".png": "image/png",
   ".webp": "image/webp",
+  ".jpg": "image/jpeg",
+  ".ico": "image/x-icon",
   ".woff2": "font/woff2",
 };
 
@@ -57,7 +59,8 @@ const IMMUTABLE = "public, max-age=31536000, immutable";
 
 export async function serveSpaAsset(
   dir: string,
-  segments: string[]
+  segments: string[],
+  cacheControl = IMMUTABLE
 ): Promise<Response> {
   const safe =
     segments.length > 0 &&
@@ -69,7 +72,7 @@ export async function serveSpaAsset(
       headers: {
         "content-type":
           TYPES[path.extname(segments.at(-1)!)] ?? "application/octet-stream",
-        "cache-control": IMMUTABLE,
+        "cache-control": cacheControl,
       },
     });
   } catch {

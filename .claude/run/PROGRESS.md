@@ -177,6 +177,17 @@ the timeout, not the cause. Unresolved.
   comment-route tests were deleted (`api-meetings`, `api-comments` cover the same use cases). Rules
   the page reads had needed went with the repository searches and their four tests.
 
+- Step 17: tests call `/api/v1` handlers without gates through `tests/helpers/v1-route.ts`
+  (`api.fetch`), and with gates through `tests/helpers/through-web.ts` (`web.fetch`). The
+  mutating-surface guard enumerates `web.routes` under `/api/`. Next still serves `public/` files
+  itself until step 18; `app/layout.tsx` and `app/legacy` stay until step 19. E2E: 217 passed, 1
+  flaky (`update-session.spec.ts:147`, 30 s timeout; passes alone in 29.6 s).
+
+- Step 18 must fix: `isTrustedOrigin` (`server/http/gates.ts`) compares `Origin` with
+  `new URL(req.url).origin`. Under `@hono/node-server` the URL ignores `X-Forwarded-Proto`, so
+  behind a TLS-ending proxy every `/api/v1/auth/*` and `/admin/*` request would get 403. Derive the
+  origin from the forwarded headers (only with `SB_TRUSTED_PROXIES`), with a test.
+
 ## Questions
 
 None open. Q5 to Q8 were answered on 2026-10-29 and are in ADR 0017 and PLAN.md (map item: step 14;

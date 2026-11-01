@@ -10,7 +10,7 @@ import {
 
 vi.mock("@/utils/mailer", () => ({ sendMail: vi.fn() }));
 
-import { GET, POST, PUT, DELETE } from "@/app/api/v1/[[...route]]/route";
+import { GET, POST, PUT, DELETE } from "@/tests/helpers/v1-route";
 import { createAdminAuthCookie } from "../helpers/admin-cookie";
 import { getRepositories } from "@/db/container";
 import { VoteChoice } from "@schellingboard/domain/vote";
