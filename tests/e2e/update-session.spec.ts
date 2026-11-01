@@ -18,7 +18,7 @@ test("updating a session emails the RSVP'd guest and the added co-host @013-US4 
     "mail env vars unset — start Mailpit (make mailpit) and set them in .env.test.local to run this test (see docs/dev/testing.md § Running tests)"
   );
   // Three identity switches, each now a real logout-then-login round trip
-  // (see /api/auth/logout), add up to just over the 30s default once parallel
+  // (see DELETE /api/v1/auth/site), add up to just over the 30s default once parallel
   // workers compete for the server.
   test.slow();
 
@@ -58,7 +58,7 @@ test("updating a session emails the RSVP'd guest and the added co-host @013-US4 
   await dismissToast(page);
 
   // Bob RSVPs to it. Wait for the navigation above to land before switching:
-  // switching now hard-reloads the *current* page (see /api/auth/logout), so a
+  // switching now hard-reloads the *current* page (see DELETE /api/v1/auth/site), so a
   // click that's still mid-navigation would resurrect the wrong page.
   await selectUser(page, /Bob Test/i);
   await page.getByRole("link", { name: title }).click();

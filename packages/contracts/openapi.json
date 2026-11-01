@@ -2310,48 +2310,6 @@
         "security": [{ "siteAuth": [] }]
       }
     },
-    "/api/v1/guests/{id}/rsvps": {
-      "get": {
-        "tags": ["rsvps"],
-        "description": "A protected guest's RSVPs need that guest's verified cookie.",
-        "parameters": [
-          {
-            "schema": { "type": "string", "minLength": 1 },
-            "required": true,
-            "name": "id",
-            "in": "path"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The guest's RSVPs in every event",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "rsvps": {
-                      "type": "array",
-                      "items": { "$ref": "#/components/schemas/Rsvp" }
-                    }
-                  },
-                  "required": ["rsvps"]
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Problem details (RFC 9457); clients branch on `code`",
-            "content": {
-              "application/problem+json": {
-                "schema": { "$ref": "#/components/schemas/Problem" }
-              }
-            }
-          }
-        },
-        "security": [{ "siteAuth": [] }]
-      }
-    },
     "/api/v1/sessions/{id}/rsvps/{guestId}": {
       "put": {
         "tags": ["rsvps"],
@@ -5189,38 +5147,6 @@
           }
         },
         "security": [{ "siteAuth": [] }]
-      },
-      "delete": {
-        "tags": ["people"],
-        "description": "Signs the browser out of its guest name (clears the guest cookie).",
-        "responses": {
-          "200": {
-            "description": "Signed out",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "guestId": {
-                      "type": ["string", "null"],
-                      "description": "The guest the browser now acts as, or null when signed out"
-                    }
-                  },
-                  "required": ["guestId"]
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Problem details (RFC 9457); clients branch on `code`",
-            "content": {
-              "application/problem+json": {
-                "schema": { "$ref": "#/components/schemas/Problem" }
-              }
-            }
-          }
-        },
-        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/guests": {
@@ -6105,6 +6031,21 @@
         },
         "responses": {
           "204": { "description": "The site cookie is set" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["auth"],
+        "description": "Leaves the site: clears the site cookie and ends this browser's login session; harmless when signed out. `POST /auth/site` enters it.",
+        "responses": {
+          "204": { "description": "Signed out of the site" },
           "default": {
             "description": "Problem details (RFC 9457); clients branch on `code`",
             "content": {

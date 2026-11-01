@@ -171,15 +171,6 @@ const chooseIdentity = createRoute({
   },
 });
 
-const signOutIdentity = createRoute({
-  method: "delete",
-  path: "/me/identity",
-  tags: ["people"],
-  description:
-    "Signs the browser out of its guest name (clears the guest cookie).",
-  responses: { 200: json(identitySchema, "Signed out"), ...problemDefault },
-});
-
 export function addPeopleRoutes(app: App, people: () => PeopleUseCases) {
   app.openapi(getIdentity, async (c) =>
     c.json(await people().currentGuest(c.var.actor), 200)
@@ -193,11 +184,6 @@ export function addPeopleRoutes(app: App, people: () => PeopleUseCases) {
     if (!result.ok) return problem(result.error);
     setGuestCookie(c, result.value);
     return c.json({ guestId: result.value.guestId }, 200);
-  });
-
-  app.openapi(signOutIdentity, async (c) => {
-    setGuestCookie(c, await people().signOut(c.var.actor));
-    return c.json({ guestId: null }, 200);
   });
 
   app.openapi(listEventProfiles, async (c) => {

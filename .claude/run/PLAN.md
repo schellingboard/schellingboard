@@ -137,10 +137,8 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
       cost nobody; the 4.0.0 `/api/*` routes are the real break), the compatibility policy and the
       contract notes for #1383 and #1331. Steps 23a-23e apply it; each updates the contracts,
       `openapi.json`, `packages/api-client`, the SPA, tests and `docs/public/self-hosting/api.md`.
-- [ ] 23a. Remove `GET /guests/{id}/rsvps` and `DELETE /me/identity` (the SPA signs out through
-      `POST /auth/sign-out`); `POST /api/auth/logout` becomes `DELETE /api/v1/auth/site` (ends the
-      site login and the login session; `site-session.ts` follows). Integration tests move with
-      them.
+- [x] 23a. `GET /guests/{id}/rsvps` and `DELETE /me/identity` are gone; `POST /api/auth/logout` is
+      `DELETE /api/v1/auth/site`. The CHANGELOG line waits for 23e (all of it is unreleased).
 - [ ] 23b. Methods for removal: `DELETE /me/notifications?ids=`,
       `DELETE /me/push-subscriptions?endpoint=`, `GET /me/push-subscriptions?endpoint=` (replaces
       `/check`). Old `POST` routes go. Tests first (use cases for notifications and push).

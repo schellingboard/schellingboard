@@ -599,55 +599,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/guests/{id}/rsvps": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** @description A protected guest's RSVPs need that guest's verified cookie. */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description The guest's RSVPs in every event */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              rsvps: components["schemas"]["Rsvp"][];
-            };
-          };
-        };
-        /** @description Problem details (RFC 9457); clients branch on `code` */
-        default: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/problem+json": components["schemas"]["Problem"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/api/v1/sessions/{id}/rsvps/{guestId}": {
     parameters: {
       query?: never;
@@ -2992,39 +2943,7 @@ export interface paths {
       };
     };
     post?: never;
-    /** @description Signs the browser out of its guest name (clears the guest cookie). */
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description Signed out */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              /** @description The guest the browser now acts as, or null when signed out */
-              guestId: string | null;
-            };
-          };
-        };
-        /** @description Problem details (RFC 9457); clients branch on `code` */
-        default: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/problem+json": components["schemas"]["Problem"];
-          };
-        };
-      };
-    };
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -3899,7 +3818,34 @@ export interface paths {
         };
       };
     };
-    delete?: never;
+    /** @description Leaves the site: clears the site cookie and ends this browser's login session; harmless when signed out. `POST /auth/site` enters it. */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Signed out of the site */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
     options?: never;
     head?: never;
     patch?: never;

@@ -58,10 +58,10 @@ describe("RSVP use cases", () => {
       expect(
         (await sessionUseCases().withdrawRsvp(NOBODY, input, now())).ok
       ).toBe(true);
-      const mine = await sessionUseCases().listGuestRsvps(NOBODY, {
-        guestId: guest.id,
+      const left = await sessionUseCases().listSessionRsvps(NOBODY, {
+        sessionId: session.id,
       });
-      expect(mine.ok && mine.value).toEqual([]);
+      expect(left.ok && left.value).toEqual([]);
     }
   );
 
@@ -78,7 +78,7 @@ describe("RSVP use cases", () => {
           { ok: false, error: { code: "guest.protected" } }
         );
         expect(
-          await sessionUseCases().listGuestRsvps(actor, { guestId: guest.id })
+          await sessionUseCases().withdrawRsvp(actor, input, now())
         ).toMatchObject({ ok: false, error: { code: "guest.protected" } });
       }
       expect(
