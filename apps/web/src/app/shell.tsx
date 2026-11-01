@@ -8,6 +8,7 @@ import { hardReload } from "./hard-navigate";
 import { HeaderLinks } from "./header-links";
 import { useHealth } from "./health";
 import { Layout } from "./layout";
+import { MapButton } from "./map-button";
 import { NavBar, type NavItem } from "./nav-bar";
 import { ReloadOffer } from "./reload-offer";
 import { useUpdateStatus } from "./updates";
@@ -35,6 +36,7 @@ export function ShellFrame({
       nav={
         <NavBar items={events} currentPath={currentPath}>
           <HeaderLinks api={api} signedIn={!!viewer.guestId} />
+          <MapButton api={api} />
           <UserMenu viewer={viewer} guests={guests} />
         </NavBar>
       }

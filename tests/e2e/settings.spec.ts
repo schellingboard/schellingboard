@@ -47,14 +47,14 @@ test.describe("Admin site settings", () => {
     await expect(page.getByText("Settings saved.")).toBeVisible();
   });
 
-  // The nav bar's "Show map" button was the legacy layout's; it returns in the SPA shell (open-questions item 9).
-  test.fixme("map modal appears only after a map is uploaded @015-US5", async ({
+  test("map modal appears only after a map is uploaded @015-US5", async ({
     page,
   }) => {
     // No map by default: the schedule nav has no map button.
+    // Leaving before the proposals page has loaded aborts the next goto.
+    const site = page.waitForResponse("**/api/v1/site");
     await loginAndGoto(page, "/Conference-Alpha");
-    // A proposal-phase event hands over to the legacy proposals page, and
-    // leaving before that load lands aborts the next goto.
+    await site;
     await expect(
       page.getByRole("heading", { name: /Session Proposals/ })
     ).toBeVisible();
