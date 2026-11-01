@@ -13,6 +13,7 @@ import { meetingAvailabilityCalls } from "../commands/meeting-availability";
 import { notificationCalls } from "../commands/notifications";
 import { settingsCalls } from "../commands/settings";
 import { NotificationsScreen } from "../features/notifications/notifications-screen";
+import { JoinScreen } from "../features/sign-in/join-screen";
 import { BootstrapScreen } from "../features/sign-in/bootstrap-screen";
 import { AccountSecurityScreen } from "../features/sign-in/account-security";
 import { SiteLoginScreen } from "../features/sign-in/site-login-screen";
@@ -93,6 +94,20 @@ export function BootstrapPage({ services }: { services: AppServices }) {
   return (
     <AccountFrame services={services}>
       {(shell) => <Bootstrap api={services.api} {...shell} />}
+    </AccountFrame>
+  );
+}
+
+export function JoinPage({
+  services,
+  token,
+}: {
+  services: AppServices;
+  token: string;
+}) {
+  return (
+    <AccountFrame services={services}>
+      {(shell) => <Join api={services.api} token={token} {...shell} />}
     </AccountFrame>
   );
 }
@@ -263,6 +278,22 @@ function Bootstrap({
       token={params.get("token") ?? undefined}
       guests={entries}
       onBootstrapped={() => hardNavigate("/admin/events")}
+    />
+  );
+}
+
+function Join({
+  api,
+  token,
+  entries,
+}: { api: AppServices["api"]; token: string } & Pick<Shell, "entries">) {
+  const calls = useMemo(() => signInCalls(api), [api]);
+  return (
+    <JoinScreen
+      calls={calls}
+      token={token}
+      guests={entries}
+      onJoined={(slug) => hardNavigate(`/${encodeURIComponent(slug)}`)}
     />
   );
 }

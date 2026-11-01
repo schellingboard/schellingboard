@@ -1,5 +1,6 @@
 import type { AdminEventCalls } from "../../commands/admin-events";
 import type { AdminGuest } from "../../queries/admin-guests";
+import { MailLinks, NewLink } from "./join-links";
 import { AssignmentManager } from "./assignment-manager";
 import type { OnParams } from "./list-paging";
 
@@ -34,11 +35,19 @@ export function EventGuestsManager({
           cell: (g) => g.email,
           cellClassName: "text-fg-subtle",
         },
+        {
+          header: "Join link",
+          cell: (g) => <NewLink eventId={eventId} guest={g} calls={calls} />,
+        },
       ]}
+      extra={(selectedIds) => (
+        <MailLinks eventId={eventId} selectedIds={selectedIds} calls={calls} />
+      )}
       detail={(g) => (
         <>
           <p className="font-medium text-fg">{g.name}</p>
           <p className="truncate text-fg-subtle">{g.email}</p>
+          <NewLink eventId={eventId} guest={g} calls={calls} />
         </>
       )}
       params={params}

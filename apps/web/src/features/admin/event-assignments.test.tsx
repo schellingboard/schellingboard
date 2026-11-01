@@ -60,6 +60,97 @@ const region = () => screen.getByRole("region", { name: "Guests" });
 const assignBoxes = (name: string) =>
   within(region()).getAllByRole("checkbox", { name: `Assign ${name}` });
 
+describe(
+  "join links in the event guests manager",
+  { tags: ["016-US5"] },
+  () => {
+    const linkHandler = (call: FakeCall) =>
+      call.path.endsWith("/join-link")
+        ? Response.json({ token: "TOK123" }, { status: 201 })
+        : Response.json({ sent: 2, withoutEmail: 1, failed: 0 });
+
+    it("makes a link for one guest and shows it to copy", async () => {
+      const { calls } = setupGuests([guest("g1", "Alice")], "", linkHandler);
+
+      await userEvent.click(
+        within(region()).getAllByRole("button", {
+          name: "New link for Alice",
+        })[0]
+      );
+
+      const box = await within(region()).findAllByRole("textbox", {
+        name: "Join link for Alice",
+      });
+      expect((box[0] as HTMLInputElement).value).toBe(
+        `${window.location.origin}/join/TOK123`
+      );
+      expect(calls[0]).toMatchObject({
+        method: "POST",
+        path: "/api/v1/admin/events/e1/guests/g1/join-link",
+      });
+      expect(
+        within(region()).getAllByRole("button", { name: "Copy link for Alice" })
+      ).not.toHaveLength(0);
+    });
+
+    it("explains a refusal", async () => {
+      setupGuests([guest("g1", "Alice")], "", () =>
+        problem(404, "guest.notFound", "User not found")
+      );
+
+      await userEvent.click(
+        within(region()).getAllByRole("button", {
+          name: "New link for Alice",
+        })[0]
+      );
+
+      expect(await screen.findByText("User not found")).toBeTruthy();
+    });
+
+    it("mails new links to every guest of the event", async () => {
+      const { calls } = setupGuests([guest("g1", "Alice")], "", linkHandler);
+
+      await userEvent.click(
+        screen.getByRole("button", { name: "Mail new links to all guests" })
+      );
+      expect(calls).toHaveLength(0);
+      await userEvent.click(
+        screen.getByRole("button", { name: "Yes, mail all guests" })
+      );
+
+      expect(await screen.findByRole("status")).toHaveProperty(
+        "textContent",
+        "Mailed 2 guests. 1 has no email. 0 failed."
+      );
+      expect(calls[0]).toMatchObject({
+        path: "/api/v1/admin/events/e1/join-links/mail",
+        body: {},
+      });
+    });
+
+    it("mails only the selected guests", async () => {
+      const { calls } = setupGuests(
+        [guest("g1", "Alice"), guest("g2", "Bob")],
+        "",
+        linkHandler
+      );
+
+      await userEvent.click(
+        screen.getAllByRole("checkbox", { name: "Select Bob" })[0]
+      );
+      await userEvent.click(
+        screen.getByRole("button", { name: "Mail new links to 1 selected" })
+      );
+      await userEvent.click(
+        screen.getByRole("button", { name: "Yes, mail 1 selected guest" })
+      );
+
+      await waitFor(() => expect(calls).toHaveLength(1));
+      expect(calls[0].body).toEqual({ guestIds: ["g2"] });
+    });
+  }
+);
+
 describe("the event guests manager", { tags: ["016-US3"] }, () => {
   it("assigns a guest with one request and refetches", async () => {
     const { calls, onChanged } = setupGuests([guest("g1", "Alice")]);

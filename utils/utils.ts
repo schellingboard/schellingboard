@@ -34,6 +34,7 @@ export const RESERVED_EVENT_SLUGS = new Set([
   "admin",
   "api",
   "guests",
+  "join",
   "legacy",
   "login",
   "media",

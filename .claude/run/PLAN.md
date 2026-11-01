@@ -92,12 +92,10 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
       `POST /admin/events/{id}/guests/{guestId}/join-link` (token once; the guest is emailed a
       notice) and `.../join-links/mail`; emails in `emails/join-link.tsx`; use cases 003-US6,
       016-US5. Split: the SPA half is step 12b.
-- [ ] 12b. **Join links in the SPA.** `/join/{token}` exchanges the token, replaces the history
-      entry and opens the event; when `joined` is false it sends the guest to sign in as that guest
-      (`/auth/login?guest=&redirect=/join/{token}`). Admin guests screen: "New link" for one guest
-      (shows it to copy once) and "Mail new links" to all or selected guests of the event.
-      Changelog, in-app release notes if it qualifies, attendee and organizer docs (`docs/public/`).
-      E2E.
+- [x] 12b. Join links in the SPA: `/join/{token}` (`JoinScreen`, `JoinPage`; `join` is a reserved
+      slug), "New link" and "Mail new links" on the event Guests tab
+      (`features/admin/join-links.tsx`), docs, changelog, `tests/e2e/join-links.spec.ts`. Not a
+      release highlight: no release-notes entry.
 - [ ] 13. **Identity mode.** `events.identity_mode` (`open`|`verified`); a guest is protected if
       they chose it, are a site admin, or take part in a `verified` event; `assuranceRequired` in
       `packages/domain` (mode, protection); every acting use case checks it; the SPA predicts it and

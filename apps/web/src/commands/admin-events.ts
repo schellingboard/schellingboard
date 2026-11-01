@@ -116,6 +116,20 @@ export function adminEventCalls(api: ApiClient) {
         body: { guestIds },
         headers: { "Idempotency-Key": key },
       }),
+    createJoinLink: (eventId: string, guestId: string) =>
+      api.POST("/api/v1/admin/events/{id}/guests/{guestId}/join-link", {
+        params: { path: { id: eventId, guestId } },
+      }),
+    mailJoinLinks: (
+      eventId: string,
+      guestIds: string[] | undefined,
+      key: string
+    ) =>
+      api.POST("/api/v1/admin/events/{id}/join-links/mail", {
+        params: { path: { id: eventId } },
+        body: guestIds ? { guestIds } : {},
+        headers: { "Idempotency-Key": key },
+      }),
     assignLocations: (eventId: string, locationIds: string[], key: string) =>
       api.POST("/api/v1/admin/events/{id}/locations/assign", {
         params: { path: { id: eventId } },

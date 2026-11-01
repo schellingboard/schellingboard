@@ -22,6 +22,7 @@ import {
   NotificationsPage,
   ResetPage,
   BootstrapPage,
+  JoinPage,
   SettingsPage,
   SiteLoginPage,
 } from "./account-pages";
@@ -177,6 +178,14 @@ export function createAppRouter(
       return <BootstrapPage services={services} />;
     },
   });
+  const join = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "join/$token",
+    component: function JoinRoute(): ReactElement {
+      const { token } = join.useParams();
+      return <JoinPage services={services} token={token} />;
+    },
+  });
   const authReset = createRoute({
     getParentRoute: () => rootRoute,
     path: "auth/reset",
@@ -249,6 +258,7 @@ export function createAppRouter(
       authLogin,
       authReset,
       authBootstrap,
+      join,
       guests.addChildren([guestsList, guestsPage]),
       event.addChildren([
         schedule,

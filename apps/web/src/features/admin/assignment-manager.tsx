@@ -76,6 +76,7 @@ export function AssignmentManager<T extends Row>({
   assign,
   remove,
   onChanged,
+  extra,
 }: {
   title: string;
   rows: T[];
@@ -90,6 +91,8 @@ export function AssignmentManager<T extends Row>({
   assign: (ids: string[], key: string) => Promise<CommandResponse<unknown>>;
   remove: (ids: string[], key: string) => Promise<CommandResponse<unknown>>;
   onChanged: () => void;
+  /** Rendered above the list with the ids of the selected rows. */
+  extra?: (selectedIds: string[]) => ReactNode;
 }) {
   const query = params.get("q")?.trim() ?? "";
   const filter = asFilter(params.get("filter"));
@@ -161,6 +164,7 @@ export function AssignmentManager<T extends Row>({
     <section aria-label={title} className="space-y-4">
       <h2 className="text-lg font-semibold text-fg">{title}</h2>
       <FormErrorSummary fields={{}} error={shown(error)} onJump={jumpTo} />
+      {extra?.([...selected])}
       <DataTable
         rows={visible}
         columns={[...columns, { header: "Assigned", cell: box }]}

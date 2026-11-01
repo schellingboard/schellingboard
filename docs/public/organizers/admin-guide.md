@@ -121,6 +121,18 @@ any event. Per-event participation is a separate assignment on the event's "Gues
 - Attendees edit their own About me/Pronouns/Avatar from a profile page once they've picked their
   name; admins don't set these.
 
+### Personal join links
+
+On an event's **Guests** tab, **New link** makes a personal link for one guest: copy it into a
+messenger and send it. **Mail new links** emails a link to every guest of the event, or only to the
+ones you ticked; guests without an email are counted and skipped.
+
+- **A link signs its guest in and adds them to the event.** It asks for a sign-in instead once the
+  guest has set a password after the link was made, and always for a site admin.
+- **A new link replaces the guest's earlier one** for that event, and the guest is emailed that a
+  new link exists. A link is shown once; make a new one if you lost it.
+- **A guest without email who forgot their password** gets back in with a new link.
+
 ### Attendees who protect their name
 
 Any attendee can opt into [name protection](how-it-works.md#attendee-identity) from their own
