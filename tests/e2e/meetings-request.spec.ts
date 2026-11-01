@@ -2,6 +2,7 @@ import { Page } from "@playwright/test";
 import { test, expect } from "./helpers/fixtures";
 import { uniqueSuffix } from "./helpers/unique";
 import { loginAndGoto } from "./helpers/auth";
+import { openNotifications } from "./helpers/notifications";
 import { selectUser } from "./helpers/user";
 import { openAvailability } from "./helpers/meetings";
 import { isoDay } from "../helpers/dates";
@@ -352,7 +353,12 @@ test.describe("1-on-1 meetings", () => {
     // The askee is told, and answers from the notification.
     await page.goto("/guests");
     await actAs(page, new RegExp(askee));
-    await page.getByRole("link", { name: /^Notifications/ }).click();
+    await openNotifications(
+      page,
+      page.getByRole("button", {
+        name: new RegExp(`${asker} asked you for a 1-on-1`),
+      })
+    );
     await page
       .getByRole("button", {
         name: new RegExp(`${asker} asked you for a 1-on-1`),
@@ -371,7 +377,12 @@ test.describe("1-on-1 meetings", () => {
     const profile = page.getByRole("dialog", { name: asker });
     await expect(profile.getByRole("heading", { name: asker })).toBeVisible();
     await profile.getByRole("button", { name: "Close" }).click();
-    await page.getByRole("link", { name: /^Notifications/ }).click();
+    await openNotifications(
+      page,
+      page.getByRole("button", {
+        name: new RegExp(`${asker} asked you for a 1-on-1`),
+      })
+    );
     await page
       .getByRole("button", {
         name: new RegExp(`${asker} asked you for a 1-on-1`),
@@ -401,12 +412,12 @@ test.describe("1-on-1 meetings", () => {
     // And the asker hears back, then asks for the day's other slot.
     await leaveForAttendees(page);
     await actAs(page, new RegExp(asker));
-    await page.getByRole("link", { name: /^Notifications/ }).click();
-    await expect(
+    await openNotifications(
+      page,
       page.getByRole("button", {
         name: new RegExp(`${askee} accepted your 1-on-1`),
       })
-    ).toBeVisible();
+    );
 
     await openProfile(page, askee);
     await page.getByRole("button", { name: /schedule a 1-on-1/i }).click();
@@ -424,13 +435,12 @@ test.describe("1-on-1 meetings", () => {
     // Declining takes no explanation, and says so in the reader's own words.
     await page.goto("/guests");
     await actAs(page, new RegExp(askee));
-    await page.getByRole("link", { name: /^Notifications/ }).click();
-    await page
-      .getByRole("button", {
-        name: new RegExp(`${asker} asked you for a 1-on-1`),
-      })
-      .first()
-      .click();
+    // The earlier request's row is already there; this one's makes it two.
+    const requests = page.getByRole("button", {
+      name: new RegExp(`${asker} asked you for a 1-on-1`),
+    });
+    await openNotifications(page, requests.nth(1));
+    await requests.first().click();
     await expect(meeting).toBeVisible();
     await meeting.getByRole("button", { name: "Decline" }).click();
     await expect(meeting.getByText("You declined this.")).toBeVisible();
@@ -439,12 +449,12 @@ test.describe("1-on-1 meetings", () => {
 
     await leaveForAttendees(page);
     await actAs(page, new RegExp(asker));
-    await page.getByRole("link", { name: /^Notifications/ }).click();
-    await expect(
+    await openNotifications(
+      page,
       page.getByRole("button", {
         name: new RegExp(`${askee} declined your 1-on-1`),
       })
-    ).toBeVisible();
+    );
 
     // Opening one from the schedule arms "dismiss by going back" (docs/dev/web-app.md,
     // anchor MnpjIo7Y). A meeting reached from a notification afterwards must

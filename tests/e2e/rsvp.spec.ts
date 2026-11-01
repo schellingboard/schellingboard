@@ -47,7 +47,7 @@ test("RSVP to a session persists across reloads and can be removed again @009-US
 test("a refused RSVP names the session and why @009-US2", async ({ page }) => {
   await login(page);
   await page.goto("/Conference-Gamma");
-  await selectUser(page, /Bob Test/i);
+  await selectUser(page, "Maria Papadopoulou");
   await page.route("**/api/v1/sessions/*/rsvps/*", (route) =>
     route.request().method() === "PUT"
       ? route.fulfill({

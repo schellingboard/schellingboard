@@ -50,7 +50,6 @@ async function landAs(page: Page, who: string, day = 0) {
   await page.goto("/Conference-Gamma?dev=1");
   await selectUser(page, who);
   await setDevClock(page, lateOnGammaDay(day));
-  await page.reload();
 }
 
 async function openSession(page: Page, title: RegExp) {

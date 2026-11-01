@@ -3,6 +3,7 @@ import { DateTime } from "luxon";
 import { expect, test } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
 import { setDevClock } from "./helpers/dev-clock";
+import { openNotifications } from "./helpers/notifications";
 import { selectUser } from "./helpers/user";
 
 // The suite shares one database, so each test notifies a different guest:
@@ -45,18 +46,13 @@ test("a comment on your profile becomes a notification you can open @013-US1 @01
   // Isabella hosts a session other specs comment on, so this test reads its
   // own row rather than the badge's count: unread is not hers alone.
   await actAs(page, "Isabella Rossi");
-  await expect(bell(page)).toHaveAccessibleName(/unread/);
-
-  await bell(page).click();
-  await expect(
-    page.getByRole("heading", { name: "Notifications" })
-  ).toBeVisible();
   // .first(): a retry of this test comments a second time, and the earlier
   // notification is still in the shared database.
   const notification = page
     .getByRole("button", { name: /Anna Kowalska commented on your profile/ })
     .first();
-  await expect(notification).toBeVisible();
+  await openNotifications(page, notification);
+  await expect(bell(page)).toHaveAccessibleName(/unread/);
   const row = page
     .getByRole("listitem")
     .filter({ hasText: "Anna Kowalska commented on your profile" })
@@ -84,12 +80,11 @@ test("marks a notification read without opening it @013-US2", async ({
   // Hana hosts proposals other specs comment on, so this test reads its own
   // row rather than the badge: the count is not hers alone.
   await actAs(page, "Hana Kobayashi");
-  await bell(page).click();
   const row = page
     .getByRole("listitem")
     .filter({ hasText: "Anna Kowalska commented on your profile" })
     .first();
-  await expect(row).toBeVisible();
+  await openNotifications(page, row);
 
   await row.getByRole("button", { name: "Mark as read" }).click();
 
@@ -114,7 +109,10 @@ test("acts on the ticked notifications and nothing else @013-US2", async ({
   await commentOnProfile(page, "Freya Nielsen", "Isabella says hello");
 
   await actAs(page, "Freya Nielsen");
-  await bell(page).click();
+  await openNotifications(
+    page,
+    page.getByRole("button", { name: /commented on your profile/ }).nth(1)
+  );
   const actions = page.getByRole("group", { name: "Notification actions" });
 
   // With nothing ticked the buttons do nothing rather than everything.
@@ -182,8 +180,11 @@ test("closing a session opened from a notification stays on the schedule @013-US
   await page.keyboard.press("Escape");
   await expect(fromSchedule).toBeHidden();
 
-  await bell(page).click();
   // .first(): a retry comments again, and the earlier notification remains.
+  await openNotifications(
+    page,
+    page.getByRole("button", { name: /Anna Kowalska commented on/ })
+  );
   await page
     .getByRole("button", { name: /Anna Kowalska commented on/ })
     .first()

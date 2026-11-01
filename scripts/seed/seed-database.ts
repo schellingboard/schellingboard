@@ -999,9 +999,10 @@ async function seedTestData(profile: SeedProfile) {
 
   // RSVPs (Conference Gamma only — the server rejects RSVP changes outside
   // the scheduling phase). Guests skip sessions they host and sessions
-  // overlapping one they already RSVP'd to. Bob Test and Yuki Tanaka never
-  // RSVP the Opening Keynote: rsvp.spec.ts (Bob) and the admin RSVP-moderation
-  // test (Yuki) use it as their clean "no prior RSVP" target.
+  // overlapping one they already RSVP'd to. Bob Test, Maria Papadopoulou and Yuki
+  // Tanaka never RSVP the Opening Keynote: rsvp.spec.ts (Bob, Maria) and the
+  // admin RSVP-moderation test (Yuki) use it as their clean "no prior RSVP"
+  // target, one guest per test because the tests run in parallel.
   console.log("  🙋 Creating test RSVPs...");
   type SessionRow = (typeof sessionRows)[number];
   const overlaps = (a: SessionRow, b: SessionRow) =>
@@ -1023,7 +1024,9 @@ async function seedTestData(profile: SeedProfile) {
       const isKeynote = session.title.startsWith("Opening Keynote");
       if (
         isKeynote &&
-        (guest.name === "Bob Test" || guest.name === "Yuki Tanaka")
+        (guest.name === "Bob Test" ||
+          guest.name === "Maria Papadopoulou" ||
+          guest.name === "Yuki Tanaka")
       ) {
         continue;
       }
