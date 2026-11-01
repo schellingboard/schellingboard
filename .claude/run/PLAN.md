@@ -103,8 +103,7 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
       015-US7.
 - [x] 14. Show map in the shell: `MapButton` (`apps/web/src/app/map-button.tsx`) reads `GET /site`
       and opens the map in a dialog; the `settings.spec.ts` map test runs again.
-- [ ] 15. **Docs: step 6 done.** 10-path, 05 (scrypt, personal join links, the two settings), 02,
-      web-app, server.md, open-questions. Doc only.
+- [x] 15. Docs: step 6 done (10-path, 05, web-app, open-questions); 02 and server.md need no change.
 
 ### Retire Next (path step 7)
 
