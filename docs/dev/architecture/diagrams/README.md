@@ -1,6 +1,6 @@
 # Diagrams
 
-The C4 model of the target architecture as [LikeC4](https://likec4.dev) sources.
+The C4 model of the architecture as [LikeC4](https://likec4.dev) sources.
 
 | File       | Holds                                                                              |
 | ---------- | ---------------------------------------------------------------------------------- |
@@ -25,11 +25,10 @@ Views, in reading order:
 
 1. `index` — who uses the system and what it talks to
 2. `containers` — web app, server, database, file store
-3. `server` — HTTP, feed, jobs, kernel and the nine modules
-4. `modules` — which module may call which; dashed edges are reactions
+3. `server` — HTTP, feed, jobs, kernel and the ten modules
+4. `modules` — the modules and the one dependency among them
 5. `web` — shell, replica, commands, features, PWA runtime
-6. `flowRsvp`, `flowSessionMoved`, `flowJoin`, `flowReconnect` — the four flows the rest of the
-   design keeps referring to
+6. `flowRsvp`, `flowSessionChanged`, `flowJoin`, `flowReconnect` — the four flows
 
 Keep the model honest: when a document here changes a boundary, change `model.c4` in the same
 commit.

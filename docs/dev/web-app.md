@@ -3,7 +3,7 @@
 `apps/web` is the single-page app that replaced the Next pages
 ([ADR 0015](adr/0015-spa-alongside-next.md)). It is a workspace package built with Vite, React and
 TanStack Router, styled with Tailwind and the colour tokens in `styles/tokens.css`.
-[Client design](target-architecture/04-client.md) describes where it is going.
+[Architecture](architecture/README.md) has the whole picture.
 
 ## How it reaches the browser
 
@@ -45,11 +45,10 @@ Docker image, which copies `apps/web/dist` next to `dist/server`.
 
 ## Layout and rules
 
-`apps/web/src/` follows [the client layout](target-architecture/04-client.md#layout); `app/`
-(layout, nav bar, shell, pages), `ui/` (dialog, button, tooltip, icons, notices),
-`features/schedule/`, `replica/`, `commands/` and `queries/` exist so far (the replica: store,
-`apply` from `packages/contracts/src/feed-apply.ts`, feed client, sync state, a server clock offset
-and IndexedDB persistence keyed by event and viewer, opened as `stale`). dependency-cruiser enforces
+`apps/web/src/` holds `app/` (layout, nav bar, shell, pages), `ui/` (dialog, button, tooltip, icons,
+notices), `features/schedule/`, `replica/`, `commands/` and `queries/` (the replica: store, `apply`
+from `packages/contracts/src/feed-apply.ts`, feed client, sync state, a server clock offset and
+IndexedDB persistence keyed by event and viewer, opened as `stale`). dependency-cruiser enforces
 that the package imports `packages/domain`, `packages/contracts` and `packages/api-client` only
 (never `server/`, `utils/` or `db/`), that nothing imports it, that `features/` never imports
 `api-client`, and that it declares what it imports. See [Architecture rules](architecture-rules.md).

@@ -1,0 +1,133 @@
+model {
+
+  attendee = person 'Attendee' {
+    description 'Proposes and votes on sessions, RSVPs, books slots, arranges 1-on-1s.'
+  }
+  siteAdmin = person 'Site admin' {
+    description 'Runs the installation: site settings, guests, events.'
+  }
+  smtp = external 'Email provider' {
+    description 'Any SMTP relay.'
+  }
+  pushService = external 'Browser push services' {
+    description 'Web Push endpoints operated by browser vendors.'
+  }
+  reverseProxy = external 'Reverse proxy' {
+    description 'Terminates TLS. Not part of the app; documented for self-hosters.'
+  }
+
+  sb = system 'SchellingBoard' {
+    description 'Unconference scheduling: propose → vote → schedule.'
+
+    web = container 'Web app' {
+      technology 'React, Vite, TypeScript, PWA'
+      description 'Static single-page app. Holds a per-event replica and renders every view from it.'
+
+      shell = component 'Shell & router' {
+        description 'Routes, layout, auth gate, theme. Nothing here knows the domain.'
+      }
+      replica = component 'Replica' {
+        description 'Copy of one event as the viewer may see it. Snapshot + change feed, persisted in IndexedDB.'
+      }
+      commands = component 'Commands' {
+        description 'Every mutation: predict with a domain policy, call the API, reconcile with the confirmed change.'
+      }
+      features = component 'Feature views' {
+        description 'Schedule, proposals, voting, people, meetings, notifications, settings, admin. Pure functions of replica + local UI state.'
+      }
+      pwa = component 'PWA runtime' {
+        technology 'Service worker'
+        description 'Cached shell, push notifications, kiosk keep-awake.'
+      }
+    }
+
+    server = container 'Server' {
+      technology 'Node, Hono, TypeScript'
+      description 'One Node process: HTTP API, change feed, background jobs. Serves the web app as static files.'
+
+      http = component 'HTTP API' {
+        technology 'OpenAPI 3.1'
+        description 'Versioned REST endpoints generated from the contracts package. Gates, rate limiting, problem-details errors.'
+      }
+      feed = component 'Change feed' {
+        technology 'SSE'
+        description 'Per-viewer stream of changes filtered by audience, resumable by sequence number. Also builds snapshots.'
+      }
+      jobs = component 'Jobs' {
+        description 'Single leased loop: reactions to changes, deliveries (email, push), reminders, pruning. Idempotent.'
+      }
+      kernel = component 'Kernel' {
+        description 'Unit of work, change log, actor, Result. The shared code every module may import.'
+      }
+
+      mEvents = module 'events' {
+        description 'Events, days, phases, time zone, per-event settings including the identity mode.'
+      }
+      mVenue = module 'venue' {
+        description 'Locations (rooms, areas), their images, colours and unavailable times.'
+      }
+      mPeople = module 'people' {
+        description 'Guests, profiles, sign-in, passwords, login sessions, join links, the site-admin role.'
+      }
+      mProposals = module 'proposals' {
+        description 'Proposals, hosts and votes.'
+      }
+      mSessions = module 'sessions' {
+        description 'Sessions, RSVPs, room unavailability, attendee counts.'
+      }
+      mComments = module 'comments' {
+        description 'Comments on proposals, sessions and profiles, and their likes.'
+      }
+      mMeetings = module 'meetings' {
+        description '1-on-1 requests, availability, meeting points.'
+      }
+      mNotifications = module 'notifications' {
+        description 'In-app notifications and push subscriptions. Email and push delivery run in the jobs loop.'
+      }
+      mSettings = module 'settings' {
+        description 'Site settings.'
+      }
+      mUpdates = module 'updates' {
+        description 'The daily look-up of the latest release, shown to the admin.'
+      }
+    }
+
+    db = datastore 'SQLite database' {
+      technology 'SQLite, WAL mode'
+      description 'State tables plus the append-only change log. One file to back up.'
+    }
+    files = datastore 'File store' {
+      technology 'Directory on disk'
+      description 'Avatars, location images and the venue map, re-encoded on upload.'
+    }
+  }
+
+  attendee -> sb.web 'uses, installs on phone'
+  siteAdmin -> sb.web 'administers installation'
+
+  reverseProxy -> sb.server 'forwards HTTPS'
+
+  sb.web.commands -[http]-> sb.server.http 'commands and queries'
+  sb.web.replica -[sse]-> sb.server.feed 'snapshot, then changes since seq'
+  sb.web.replica -> sb.web.features 'renders from'
+  sb.web.commands -> sb.web.replica 'predicts, then reconciles'
+  sb.web.shell -> sb.web.features 'routes to'
+  sb.web.pwa -> sb.web.shell 'installs, delivers push'
+
+  sb.server.http -> sb.server.mSessions 'invokes use cases'
+  sb.server.http -> sb.server.mProposals 'invokes use cases'
+  sb.server.http -> sb.server.mPeople 'signs in, resolves the actor'
+  sb.server.feed -> sb.server.kernel 'reads change log'
+  sb.server.jobs -> sb.server.mNotifications 'runs reactions and deliveries'
+  sb.server.mSessions -> sb.server.kernel 'records changes'
+  sb.server.mNotifications -[changes]-> sb.server.mSessions 'reacts to'
+  sb.server.mNotifications -[changes]-> sb.server.mMeetings 'reacts to'
+  sb.server.mNotifications -[changes]-> sb.server.mProposals 'reacts to'
+  sb.server.mMeetings -> sb.server.mEvents 'reads phases and days'
+
+  sb.server -[sql]-> sb.db 'reads and writes'
+  sb.server -> sb.files 'stores uploads'
+  sb.server.jobs -> smtp 'sends email'
+  sb.server.jobs -> pushService 'sends Web Push'
+  pushService -> sb.web.pwa 'delivers push'
+}

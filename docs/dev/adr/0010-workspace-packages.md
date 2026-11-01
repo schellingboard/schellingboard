@@ -12,11 +12,10 @@ it that way, and it held half the picture. The entity types still lived in
 `db/repositories/interfaces.ts` (#965), and `model/` itself mixed two things: domain vocabulary
 (contact types, length caps, the prompt pool) and the zod schemas for what forms and routes accept.
 
-The [target architecture](../target-architecture/README.md) splits these into `packages/domain` and
+The [target architecture](../architecture/README.md) splits these into `packages/domain` and
 `packages/contracts`, with workspace package manifests as the boundary
-([D5](../target-architecture/08-decisions.md#d5)). Its
-[path from here](../target-architecture/10-path-from-here.md) makes that split the first step,
-because it pays off even if nothing after it happens.
+([D5](../architecture/decisions.md#d5)). Its path from here makes that split the first step, because
+it pays off even if nothing after it happens.
 
 ## Decision
 

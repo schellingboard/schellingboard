@@ -7,10 +7,8 @@ sessions with assurance, join links and a site-admin role instead of the admin p
 its last breaking changes for a long time, and the remaining v5.0.0 issues are done. Every step
 leaves the app shippable.
 
-Read first: `docs/dev/target-architecture/10-path-from-here.md`, `05-security.md` (identity,
-assurance, transport), `02-domain.md` (Person, Participation), `08-decisions.md` D1, D2, D11; ADR
-0014, 0015, 0016; `docs/dev/web-app.md`, `docs/dev/server.md`, `docs/dev/testing.md`,
-`docs/dev/target-architecture/open-questions.md`.
+Read first: `docs/dev/architecture/README.md`, `decisions.md` D1, D2, D11, `not-built.md`; ADR 0014,
+0015, 0016; `docs/dev/web-app.md`, `docs/dev/server.md`, `docs/dev/testing.md`.
 
 ## Settled
 
@@ -129,16 +127,9 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
 
 ### Current architecture
 
-- [ ] 21. **The target architecture becomes the current architecture.** Move
-      `docs/dev/target-architecture/` to `docs/dev/architecture/` and cut it from about 1500 lines
-      to about 500. Each statement describes what the code does now; check it against the code. Link
-      to `server.md`, `web-app.md` and `architecture-rules.md` instead of repeating them. Keep the
-      one-screen summary, the glossary, the decisions (D1–D11) and the diagrams, cut to what exists.
-      Delete `09-feedback-map.md` and `10-path-from-here.md` (jj history has them). Designs that are
-      not built, the open questions and "Not in this run" below go to one page,
-      `architecture/not-built.md`. Update every link (ADRs, `docs/dev/` pages, `documentation.md`,
-      the Makefile's `LIKEC4_DIR`, this plan's "Read first"). Run `make docs-dev-validate` and
-      `make arch`.
+- [x] 21. `docs/dev/target-architecture/` is `docs/dev/architecture/` (README, glossary, decisions,
+      not-built, diagrams cut to what exists; 381 lines). "Not in this run" now lives in
+      `not-built.md`.
 
 ### The API for 5.0.0
 
@@ -205,10 +196,4 @@ Contract changes first, so the rest build on the final API.
 
 ## Not in this run
 
-Step 21 moves this list to `docs/dev/architecture/not-built.md`. These are not next steps of this
-run.
-
-- The `organizer` participation role and per-event admin rights.
-- Passkeys, API tokens, QR sheet of join links.
-- The read setting (ADR 0017 point 11): `public`, `link` (secret event link, rotatable, hidden from
-  the root list), `participants` (default); a kiosk device link; then `SITE_PASSWORD` goes (D2).
+See `docs/dev/architecture/not-built.md`. These are not next steps of this run.

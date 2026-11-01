@@ -14,7 +14,8 @@ the session forms, settings and notifications, and admin. It also amends
 
 1. **Proposals and votes are in the replica.** Public proposal fields and hosts are in the snapshot
    and the feed. The viewer's own votes are in `me.votes`, visible only to the voter. The vote
-   breakdown stays an on-demand query ([02](../target-architecture/02-domain.md)).
+   breakdown stays an on-demand query
+   ([02](https://github.com/schellingboard/schellingboard/blob/fb2a2cba1d05ab0421aee2985bc0d75db3c41323/docs/dev/target-architecture/02-domain.md)).
 2. **Failed commands name what failed**, so that the user can recover. The notice names the subject:
    a session by title, day, time and room; a proposal by title; a 1-on-1 by the other person and
    slot. It tells "refused" (a `4xx`, with the reason) apart from "might not have been saved"
@@ -22,8 +23,8 @@ the session forms, settings and notifications, and admin. It also amends
    comments first, then every new command.
 3. **The session forms move in this run**, after meetings. Then the Next schedule goes.
 4. **The sign-in screens stay legacy** (guest password login, reset, `/login`, admin login) until
-   [path step 6](../target-architecture/10-path-from-here.md) replaces them. No API for passwords:
-   step 6 replaces identity, so it would be thrown away.
+   path step 6 replaces them. No API for passwords: step 6 replaces identity, so it would be thrown
+   away.
 5. **Admin uses `queries/` and awaited mutations**, not the replica: admin data spans events and is
    in no snapshot. A mutation waits for the response, maps problem details onto fields, shows `409`
    as "changed by someone else", then refetches.

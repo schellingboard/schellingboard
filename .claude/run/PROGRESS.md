@@ -197,6 +197,9 @@ the timeout, not the cause. Unresolved.
   `utils/hooks.ts`, `utils/markdown.ts` may be dead too. Not pruned (out of step). `theme-contrast`
   now scans `apps/web/src`; `ui/dialog.tsx` uses `bg-overlay` (darker in the dark theme).
 
+- Step 21: `architecture/` has no module-level or domain chapters; `server.md` and `web-app.md` are
+  the detail. Dropped open questions 3, 4 (answered), 7 (flakes: see Known E2E flakes), 9 (done in
+  step 11b).
 - Step 20: docs only. `make test-e2e-docker` has not been run since step 18; the user runs it.
   `target-architecture/` still has deeper Next text in D1 and ADR 0015 body (history); step 21 cuts
   it.
