@@ -6465,6 +6465,47 @@
           }
         },
         "security": [{ "siteAuth": [] }]
+      },
+      "delete": {
+        "tags": ["notifications"],
+        "description": "Deletes the acting guest's notifications; ids that are not theirs are skipped.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Comma-separated notification ids, at most 100"
+            },
+            "required": true,
+            "description": "Comma-separated notification ids, at most 100",
+            "name": "ids",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Deleted" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/me/notifications/read": {
@@ -6505,56 +6546,6 @@
         },
         "responses": {
           "204": { "description": "Marked read" },
-          "default": {
-            "description": "Problem details (RFC 9457); clients branch on `code`",
-            "content": {
-              "application/problem+json": {
-                "schema": { "$ref": "#/components/schemas/Problem" }
-              }
-            }
-          }
-        },
-        "security": [{ "siteAuth": [] }]
-      }
-    },
-    "/api/v1/me/notifications/delete": {
-      "post": {
-        "tags": ["notifications"],
-        "description": "Deletes the acting guest's notifications; ids that are not theirs are skipped.",
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 255,
-              "description": "Retries with the same key get the first response (24 h)"
-            },
-            "required": false,
-            "description": "Retries with the same key get the first response (24 h)",
-            "name": "idempotency-key",
-            "in": "header"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "ids": {
-                    "type": "array",
-                    "items": { "type": "string", "minLength": 1 },
-                    "maxItems": 1000
-                  }
-                },
-                "required": ["ids"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": { "description": "Deleted" },
           "default": {
             "description": "Problem details (RFC 9457); clients branch on `code`",
             "content": {
@@ -6789,13 +6780,17 @@
           }
         },
         "security": [{ "siteAuth": [] }]
-      }
-    },
-    "/api/v1/me/push-subscriptions/remove": {
-      "post": {
+      },
+      "delete": {
         "tags": ["notifications"],
         "description": "Forgets the acting guest's subscription with this endpoint; anyone else's is left alone, and the answer is the same.",
         "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1, "maxLength": 2000 },
+            "required": true,
+            "name": "endpoint",
+            "in": "query"
+          },
           {
             "schema": {
               "type": "string",
@@ -6809,24 +6804,6 @@
             "in": "header"
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "endpoint": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 2000
-                  }
-                },
-                "required": ["endpoint"]
-              }
-            }
-          }
-        },
         "responses": {
           "204": { "description": "Forgotten" },
           "default": {
@@ -6839,44 +6816,18 @@
           }
         },
         "security": [{ "siteAuth": [] }]
-      }
-    },
-    "/api/v1/me/push-subscriptions/check": {
-      "post": {
+      },
+      "get": {
         "tags": ["notifications"],
         "description": "Whether the subscription with this endpoint is the acting guest's. Changes nothing.",
         "parameters": [
           {
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 255,
-              "description": "Retries with the same key get the first response (24 h)"
-            },
-            "required": false,
-            "description": "Retries with the same key get the first response (24 h)",
-            "name": "idempotency-key",
-            "in": "header"
+            "schema": { "type": "string", "minLength": 1, "maxLength": 2000 },
+            "required": true,
+            "name": "endpoint",
+            "in": "query"
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "endpoint": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 2000
-                  }
-                },
-                "required": ["endpoint"]
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Whether this device notifies the caller",

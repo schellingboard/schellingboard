@@ -4269,7 +4269,40 @@ export interface paths {
     };
     put?: never;
     post?: never;
-    delete?: never;
+    /** @description Deletes the acting guest's notifications; ids that are not theirs are skipped. */
+    delete: {
+      parameters: {
+        query: {
+          /** @description Comma-separated notification ids, at most 100 */
+          ids: string;
+        };
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Deleted */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
     options?: never;
     head?: never;
     patch?: never;
@@ -4304,58 +4337,6 @@ export interface paths {
       };
       responses: {
         /** @description Marked read */
-        204: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-        /** @description Problem details (RFC 9457); clients branch on `code` */
-        default: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/problem+json": components["schemas"]["Problem"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/me/notifications/delete": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** @description Deletes the acting guest's notifications; ids that are not theirs are skipped. */
-    post: {
-      parameters: {
-        query?: never;
-        header?: {
-          /** @description Retries with the same key get the first response (24 h) */
-          "idempotency-key"?: string;
-        };
-        path?: never;
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": {
-            ids: string[];
-          };
-        };
-      };
-      responses: {
-        /** @description Deleted */
         204: {
           headers: {
             [name: string]: unknown;
@@ -4541,7 +4522,40 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /** @description Whether the subscription with this endpoint is the acting guest's. Changes nothing. */
+    get: {
+      parameters: {
+        query: {
+          endpoint: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Whether this device notifies the caller */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              enabled: boolean;
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
     put?: never;
     /** @description Remembers a browser's push subscription for the acting guest. Subscriptions are never sent back. */
     post: {
@@ -4583,25 +4597,12 @@ export interface paths {
         };
       };
     };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/me/push-subscriptions/remove": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
     /** @description Forgets the acting guest's subscription with this endpoint; anyone else's is left alone, and the answer is the same. */
-    post: {
+    delete: {
       parameters: {
-        query?: never;
+        query: {
+          endpoint: string;
+        };
         header?: {
           /** @description Retries with the same key get the first response (24 h) */
           "idempotency-key"?: string;
@@ -4609,13 +4610,7 @@ export interface paths {
         path?: never;
         cookie?: never;
       };
-      requestBody: {
-        content: {
-          "application/json": {
-            endpoint: string;
-          };
-        };
-      };
+      requestBody?: never;
       responses: {
         /** @description Forgotten */
         204: {
@@ -4635,63 +4630,6 @@ export interface paths {
         };
       };
     };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/me/push-subscriptions/check": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** @description Whether the subscription with this endpoint is the acting guest's. Changes nothing. */
-    post: {
-      parameters: {
-        query?: never;
-        header?: {
-          /** @description Retries with the same key get the first response (24 h) */
-          "idempotency-key"?: string;
-        };
-        path?: never;
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": {
-            endpoint: string;
-          };
-        };
-      };
-      responses: {
-        /** @description Whether this device notifies the caller */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              enabled: boolean;
-            };
-          };
-        };
-        /** @description Problem details (RFC 9457); clients branch on `code` */
-        default: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/problem+json": components["schemas"]["Problem"];
-          };
-        };
-      };
-    };
-    delete?: never;
     options?: never;
     head?: never;
     patch?: never;

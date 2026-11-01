@@ -3,6 +3,7 @@ import { pageQuerySchema } from "@schellingboard/contracts/cursor-page";
 import { emailSettingsSchema } from "@schellingboard/contracts/guest";
 import {
   myNotificationsSchema,
+  notificationIdsQuerySchema,
   notificationIdsSchema,
   notificationSchema,
 } from "@schellingboard/contracts/notification";
@@ -57,12 +58,12 @@ const markRead = createRoute({
 });
 
 const deleteMany = createRoute({
-  method: "post",
-  path: "/me/notifications/delete",
+  method: "delete",
+  path: "/me/notifications",
   tags: ["notifications"],
   description:
     "Deletes the acting guest's notifications; ids that are not theirs are skipped.",
-  request: { headers: idempotencyHeaders, body: body(notificationIdsSchema) },
+  request: { headers: idempotencyHeaders, query: notificationIdsQuerySchema },
   responses: { 204: noContent("Deleted"), ...problemDefault },
 });
 
@@ -109,22 +110,22 @@ const subscribe = createRoute({
 });
 
 const unsubscribe = createRoute({
-  method: "post",
-  path: "/me/push-subscriptions/remove",
+  method: "delete",
+  path: "/me/push-subscriptions",
   tags: ["notifications"],
   description:
     "Forgets the acting guest's subscription with this endpoint; anyone else's is left alone, and the answer is the same.",
-  request: { headers: idempotencyHeaders, body: body(pushEndpointSchema) },
+  request: { headers: idempotencyHeaders, query: pushEndpointSchema },
   responses: { 204: noContent("Forgotten"), ...problemDefault },
 });
 
 const checkEnabled = createRoute({
-  method: "post",
-  path: "/me/push-subscriptions/check",
+  method: "get",
+  path: "/me/push-subscriptions",
   tags: ["notifications"],
   description:
     "Whether the subscription with this endpoint is the acting guest's. Changes nothing.",
-  request: { headers: idempotencyHeaders, body: body(pushEndpointSchema) },
+  request: { query: pushEndpointSchema },
   responses: {
     200: json(pushEnabledSchema, "Whether this device notifies the caller"),
     ...problemDefault,
@@ -187,7 +188,7 @@ export function addNotificationRoutes(
   app.openapi(deleteMany, async (c) => {
     const result = await notifications().deleteNotifications(
       c.var.actor,
-      c.req.valid("json")
+      c.req.valid("query")
     );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);
@@ -231,7 +232,7 @@ export function addNotificationRoutes(
   app.openapi(unsubscribe, async (c) => {
     const result = await notifications().unsubscribeFromPush(
       c.var.actor,
-      c.req.valid("json")
+      c.req.valid("query")
     );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);
@@ -240,7 +241,7 @@ export function addNotificationRoutes(
   app.openapi(checkEnabled, async (c) => {
     const result = await notifications().isPushEnabledHere(
       c.var.actor,
-      c.req.valid("json")
+      c.req.valid("query")
     );
     if (!result.ok) return problem(result.error);
     return c.json({ enabled: result.value }, 200);

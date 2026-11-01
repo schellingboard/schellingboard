@@ -122,9 +122,7 @@ describe("notifications on this device", { tags: ["013-US3"] }, () => {
   it("turns off: the server first, then the browser", async () => {
     const current = browser({ subscribed: true });
     const calls = setup((call) =>
-      call.path.endsWith("/check")
-        ? Response.json({ enabled: true })
-        : noContent()
+      call.method === "GET" ? Response.json({ enabled: true }) : noContent()
     );
 
     await userEvent.click(
@@ -133,8 +131,8 @@ describe("notifications on this device", { tags: ["013-US3"] }, () => {
 
     await waitFor(() => expect(current()).toBeNull());
     expect(calls[1]).toMatchObject({
-      path: "/api/v1/me/push-subscriptions/remove",
-      body: { endpoint: ENDPOINT },
+      method: "DELETE",
+      path: `/api/v1/me/push-subscriptions?endpoint=${encodeURIComponent(ENDPOINT)}`,
     });
   });
 });
