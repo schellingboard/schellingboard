@@ -116,14 +116,16 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
 - [x] 17. Hono serves everything: `server/http/web.ts` (gates in `gates.ts`) serves `/api/v1`,
       `/api/health`, logout, `/media`, public files, the manifest, `/_spa/` and the shell; Next
       keeps only `app/[[...path]]/route.ts`; `proxy.ts` and the other handlers are gone.
-- [ ] 18. **Hono's own process.** `server/main.ts` on `@hono/node-server` starts the mailer and jobs
-      loop (`instrumentation.ts` goes); a Node bundle (`bun build --target=node`, native modules
-      external); `make dev` (Vite proxies to it), `make start`, the E2E web server and the
-      Dockerfile run it. Full `make test-e2e`.
+- [x] 18. Hono's own process: `server/main.ts` on `@hono/node-server` starts the mailer and jobs
+      loop (`instrumentation.ts` gone); `scripts/build-server.ts` (esbuild) bundles it to
+      `dist/server/main.mjs`; `make dev`/`start`, the E2E web server, the flake hunt and the
+      Dockerfile run it. `withForwardedProto` carries `X-Forwarded-Proto` into the request URL.
 - [ ] 19. **`next` leaves.** Dependencies, config, `app/`, `next-env.d.ts`, eslint and arch rules,
       the SPA's legacy forward (catch-all → not found), `legacy-pages.ts`, the E2E fixture's
-      `/legacy` mapping, AGENTS.md's Next notice; `docs/dev/server.md` and `web-app.md` still say
-      "The Next pages live in `app/legacy/`". Full `make test-e2e`.
+      `/legacy` mapping, AGENTS.md's Next notice; the bundle still pulls in `next/headers` through
+      `utils/dev-clock-server.ts` and `utils/action-auth.ts` (`pageReads().meetingOptions` would
+      throw outside Next); `docs/dev/server.md` and `web-app.md` still say "The Next pages live in
+      `app/legacy/`". Full `make test-e2e`.
 - [ ] 20. **Docs: step 7 done.** ADR 0015 note, web-app, server.md, 07, 10-path, self-hosting,
       testing. The commit message asks the user to run `make test-e2e-docker` and has the footer
       `fixes #1339`.

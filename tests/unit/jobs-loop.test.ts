@@ -28,7 +28,6 @@ function job(
 describe("jobs loop", () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    vi.stubEnv("NEXT_RUNTIME", "nodejs");
     acquireLease.mockReset().mockResolvedValue(true);
   });
 
@@ -122,15 +121,6 @@ describe("jobs loop", () => {
 
     await vi.advanceTimersByTimeAsync(1000);
     expect(reminders.run).toHaveBeenCalledTimes(1);
-  });
-
-  it("starts nothing outside the nodejs runtime", async () => {
-    vi.stubEnv("NEXT_RUNTIME", "edge");
-    const reminders = job("reminders", 1000);
-    startJobsLoop([reminders]);
-
-    await vi.advanceTimersByTimeAsync(10_000);
-    expect(reminders.run).not.toHaveBeenCalled();
   });
 
   it("leaves the work to whichever process holds the lease", async () => {

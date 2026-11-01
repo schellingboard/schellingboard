@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Run the E2E suite against the production Docker image.
 #
-# `make test-e2e` exercises a `next build && next start` server, which is not
-# what we ship: the image runs the standalone output as `node server.js`, with
+# `make test-e2e` exercises the server bundle on the host, which is not what
+# we ship: the image runs it as `node dist/server/main.mjs`, with
 # migrations, uploads and the SQLite file on a mounted /data volume. Bugs that
-# only exist there (a file the standalone tracer failed to copy, a path that
+# only exist there (a file the image forgot to copy, a path that
 # resolves differently under a different working directory) are invisible to
 # every other test tier, which is why the release workflow runs this against the
 # image it is about to publish — see docs/dev/testing.md § Testing the Docker
@@ -146,7 +146,6 @@ docker run -d \
   --user "$(id -u):$(id -g)" \
   -p "127.0.0.1:$PORT:3000" \
   -v "$DATA_DIR:/data" \
-  --tmpfs "/app/.next/cache:uid=$(id -u),gid=$(id -g)" \
   --add-host host.docker.internal:host-gateway \
   "${env_args[@]}" \
   "$IMAGE" >/dev/null

@@ -43,6 +43,9 @@ proxies in front of the app (usually `1`). The app then reads the visitor's addr
 `X-Forwarded-For` header, which each proxy must append to (Caddy and Traefik do by default; in nginx
 use `proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for`).
 
+Behind a proxy that ends TLS, the proxy must also send `X-Forwarded-Proto` (Caddy and Traefik do by
+default; in nginx use `proxy_set_header X-Forwarded-Proto $scheme`). Without it, sign-in is refused.
+
 Leave it at `0` when nothing stands in front of the app: a visitor could then fake the header to
 dodge the limit. Without it, all visitors share one limit, so a few people mistyping the site
 password can lock everyone out for some minutes.
