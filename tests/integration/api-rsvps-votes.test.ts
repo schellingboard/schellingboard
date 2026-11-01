@@ -70,10 +70,6 @@ describe("/api/v1 RSVPs", () => {
       expect(await bySession.json()).toMatchObject({
         rsvps: [{ sessionId: session.id, guestId: guest.id }],
       });
-      const byGuest = await GET(request("GET", `/guests/${guest.id}/rsvps`));
-      expect(await byGuest.json()).toMatchObject({
-        rsvps: [{ sessionId: session.id }],
-      });
 
       const del = await DELETE(request("DELETE", path));
       expect(del.status).toBe(204);

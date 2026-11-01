@@ -1,12 +1,6 @@
 import { Hono, type Context } from "hono";
-import { getCookie, setCookie } from "hono/cookie";
-import { peopleUseCases, pageReads } from "@/server/composition";
-import { actorOf } from "@/server/kernel/session-actor";
-import {
-  createGuestLogoutCookie,
-  createLogoutCookie,
-  isPasswordProtectionEnabled,
-} from "@/utils/auth";
+import { pageReads } from "@/server/composition";
+import { isPasswordProtectionEnabled } from "@/utils/auth";
 import { getBuildId } from "@/utils/build-id";
 import { getImageRepositories, requestedWidth } from "@/utils/images";
 import { readMapImage } from "@/utils/map-image";
@@ -46,25 +40,6 @@ web.use("*", async (c, next) => {
 });
 
 web.get("/api/health", (c) => c.json({ status: "ok" }));
-
-web.post("/api/auth/logout", async (c) => {
-  const cookies = {
-    get: (name: string) => {
-      const value = getCookie(c, name);
-      return value === undefined ? undefined : { value };
-    },
-  };
-  const clear = ({
-    name,
-    value,
-    ...options
-  }: ReturnType<typeof createLogoutCookie>) =>
-    setCookie(c, name, value, options);
-  clear(createLogoutCookie());
-  await peopleUseCases().signOut(await actorOf(cookies));
-  clear(createGuestLogoutCookie());
-  return c.body(null, 204);
-});
 
 web.all("/api/v1/*", async (c) => {
   const { pathname } = new URL(c.req.url);

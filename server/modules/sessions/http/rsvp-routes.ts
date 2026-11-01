@@ -21,18 +21,6 @@ const listSessionRsvps = createRoute({
   },
 });
 
-const listGuestRsvps = createRoute({
-  method: "get",
-  path: "/guests/{id}/rsvps",
-  tags: ["rsvps"],
-  description: "A protected guest's RSVPs need that guest's verified cookie.",
-  request: { params: idParam },
-  responses: {
-    200: json(rsvpListSchema, "The guest's RSVPs in every event"),
-    ...problemDefault,
-  },
-});
-
 const rsvp = createRoute({
   method: "put",
   path: "/sessions/{id}/rsvps/{guestId}",
@@ -78,14 +66,6 @@ export function addRsvpRoutes(app: App, sessions: () => SessionUseCases) {
   app.openapi(listSessionRsvps, async (c) => {
     const result = await sessions().listSessionRsvps(c.var.actor, {
       sessionId: c.req.valid("param").id,
-    });
-    if (!result.ok) return problem(result.error);
-    return c.json({ rsvps: result.value }, 200);
-  });
-
-  app.openapi(listGuestRsvps, async (c) => {
-    const result = await sessions().listGuestRsvps(c.var.actor, {
-      guestId: c.req.valid("param").id,
     });
     if (!result.ok) return problem(result.error);
     return c.json({ rsvps: result.value }, 200);

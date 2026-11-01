@@ -60,7 +60,7 @@ export const API_BASE_PATH = "/api/v1";
 export const api = createApp(API_BASE_PATH);
 api.use("*", actorMiddleware);
 api.use("*", rateLimitMiddleware([`${API_BASE_PATH}/health`]));
-api.use("/auth/site", authRateLimitMiddleware);
+api.on("POST", "/auth/site", authRateLimitMiddleware);
 api.use("/auth/login", authRateLimitMiddleware);
 api.use("/auth/login-code", authRateLimitMiddleware);
 api.use("/auth/reset-link", authRateLimitMiddleware);

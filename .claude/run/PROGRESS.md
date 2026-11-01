@@ -206,6 +206,8 @@ the timeout, not the cause. Unresolved.
 
 - Step 22: `/api/v1` was never released (4.0.0 had only the ad hoc `/api/*` routes), so ADR 0018
   breaks nothing on v1. The CHANGELOG breaking note still lacks the removed 4.0.0 routes: step 23e.
+- Step 23a: `DELETE /auth/site` (in `server/http/site-auth.ts`, not rate limited) clears the site
+  cookie and ends the session; the SPA signs out through `POST /auth/sign-out`.
 
 ## Questions
 

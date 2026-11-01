@@ -56,13 +56,13 @@ auth flows allow-listed.
 
 ## Choosing a name
 
-`PUT /api/v1/me/identity` makes the browser act as an open guest name and `DELETE` signs it out;
-`GET` answers who the browser acts as now (null for a protected name not yet logged in, the SPA's
-viewer); all three set the `guest` cookie, which the route adapter builds from the use case's
-`Identity` (`people/application/identity.ts`). A protected name answers `403 guest.protected`: the
-SPA sends the user to the sign-in. `POST /auth/site` takes the shared site password (open to
-visitors without the cookie; `site.passwordWrong`, and `auth.tooManyAttempts` per address) and sets
-the site cookie.
+`PUT /api/v1/me/identity` makes the browser act as an open guest name; `GET` answers who the browser
+acts as now (null for a protected name not yet logged in, the SPA's viewer); `PUT` sets the `guest`
+cookie, which the route adapter builds from the use case's `Identity`
+(`people/application/identity.ts`). A protected name answers `403 guest.protected`: the SPA sends
+the user to the sign-in. `POST /auth/site` takes the shared site password (open to visitors without
+the cookie; `site.passwordWrong`, and `auth.tooManyAttempts` per address) and sets the site cookie;
+`DELETE /auth/site` clears it and ends the login session (not rate limited).
 
 ## Signing in
 

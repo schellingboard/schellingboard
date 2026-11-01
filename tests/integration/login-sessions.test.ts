@@ -8,7 +8,7 @@ import {
   vi,
 } from "vitest";
 
-import { GET, PUT, DELETE } from "@/tests/helpers/v1-route";
+import { GET, PUT, POST } from "@/tests/helpers/v1-route";
 import { getRepositories } from "@/db/container";
 import { hashSessionToken } from "@/utils/login-session-token";
 import { realNow } from "@/utils/real-clock";
@@ -125,9 +125,9 @@ describe("login sessions", () => {
     const ada = await createGuest({ name: "Ada" });
     const token = await sessionGuestValue(ada.id, "claimed");
 
-    await DELETE(
-      new Request("http://test/api/v1/me/identity", {
-        method: "DELETE",
+    await POST(
+      new Request("http://test/api/v1/auth/sign-out", {
+        method: "POST",
         headers: { cookie: asSession(token) },
       })
     );

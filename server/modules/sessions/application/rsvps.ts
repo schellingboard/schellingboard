@@ -143,18 +143,6 @@ export const listSessionRsvps =
     return ok(await repos.rsvps.listBySession(sessionId));
   };
 
-// A guest's RSVPs across sessions are private to a protected guest.
-export const listGuestRsvps =
-  ({ repos }: SessionDeps) =>
-  async (
-    actor: Actor,
-    { guestId }: { guestId: string }
-  ): Promise<Result<Rsvp[]>> => {
-    const acting = await actingAsNamedGuest(actor, guestId, repos.guests);
-    if (!acting.ok) return acting;
-    return ok(await repos.rsvps.listByGuest(guestId));
-  };
-
 export const adminRemoveRsvp =
   ({ uow }: SessionDeps) =>
   async (

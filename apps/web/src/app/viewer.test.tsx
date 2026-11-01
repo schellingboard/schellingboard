@@ -128,8 +128,8 @@ describe("ViewerProvider", () => {
 
     await waitFor(() => expect(screen.getByText("as null")).toBeTruthy());
     expect(calls.at(-1)).toMatchObject({
-      method: "DELETE",
-      path: "/api/v1/me/identity",
+      method: "POST",
+      path: "/api/v1/auth/sign-out",
     });
   });
 
