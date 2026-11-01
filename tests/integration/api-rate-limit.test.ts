@@ -9,7 +9,7 @@ import {
   vi,
 } from "vitest";
 import { NextRequest } from "next/server";
-import { GET } from "@/app/api/v1/[[...route]]/route";
+import { GET } from "@/tests/helpers/v1-route";
 import { API_LIMIT } from "@/server/kernel/rate-limit";
 import { createAdminAuthCookie } from "../helpers/admin-cookie";
 import { setupTestDb, resetTestDb } from "../helpers/db";

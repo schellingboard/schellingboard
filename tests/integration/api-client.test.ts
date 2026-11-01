@@ -7,23 +7,20 @@ import {
   afterEach,
   vi,
 } from "vitest";
-import { NextRequest } from "next/server";
 import { createApiClient } from "@schellingboard/api-client";
-import { GET, POST, PUT, PATCH, DELETE } from "@/app/api/v1/[[...route]]/route";
 import { createAuthCookie } from "@/utils/auth";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent } from "../helpers/factories";
-import { throughProxy } from "../helpers/through-proxy";
+import { throughWeb } from "../helpers/through-web";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
-const handlers = { GET, POST, PUT, PATCH, DELETE };
 
 function clientWithCookies(cookies: { name: string; value: string }[]) {
   return createApiClient({
     baseUrl: "http://test",
     fetch: async (request: Request) => {
       const url = new URL(request.url);
-      const result = await throughProxy(
+      return throughWeb(
         url.pathname + url.search,
         {
           method: request.method,
@@ -32,9 +29,6 @@ function clientWithCookies(cookies: { name: string; value: string }[]) {
         },
         cookies
       );
-      if (!result.ok) return result.response;
-      const handle = handlers[request.method as keyof typeof handlers];
-      return handle(new NextRequest(result.request));
     },
   });
 }

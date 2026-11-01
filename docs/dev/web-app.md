@@ -10,13 +10,11 @@ going.
 
 - The Next pages live under `/legacy`. Every other root path that is not `/api`, `/media`,
   `/locations`, `/sw.js`, an icon or the manifest is a page of the SPA.
-- `proxy.ts` applies the site password to those paths (not to `/admin/**`, which gets the shell: the
-  admin API holds the gate, and the sign-in follows from it), then rewrites them to
-  `/api/spa/shell`, which reads `apps/web/dist/index.html` from disk on each request and answers
-  `no-store`.
-- Hashed files are requested as `/_spa/assets/…`. The proxy skips them; a rewrite in
-  `next.config.js` hands them to `/api/spa/assets/…`, which serves them as immutable and answers 404
-  for anything missing, never the shell.
+- `server/http/web.ts` applies the site password to those paths (not to `/admin/**`, which gets the
+  shell: the admin API holds the gate, and the sign-in follows from it), then serves the shell: it
+  reads `apps/web/dist/index.html` from disk on each request and answers `no-store`.
+- Hashed files are requested as `/_spa/assets/…`, served without the password as immutable; a
+  missing one is a 404, never the shell.
 - The router owns `/` (`app/home-page.tsx`: the event list from `GET /api/v1/events` and
   `GET /api/v1/site`, or a redirect to the only event), `/{slug}` (an event's schedule),
   `/{slug}/proposals/**` (list, quick voting, new, edit; `?viewProposal=` opens the modal), the

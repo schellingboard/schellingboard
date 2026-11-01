@@ -34,8 +34,8 @@ otherwise ordinary file. The `--` reason is mandatory: it is what the next reade
 this page.
 
 **Gotcha:** route-group and dynamic-segment paths need `**`. Flat config globs are minimatch, which
-reads `[[...route]]` as a character class, so a literal `app/api/v1/[[...route]]/route.ts` silently
-matches nothing — and a `files` entry that matches nothing looks exactly like one that works.
+reads `[[...route]]` as a character class, so a literal `app/[[...path]]/route.ts` silently matches
+nothing — and a `files` entry that matches nothing looks exactly like one that works.
 
 When a selector can't express the rule, write a local rule inline — flat config takes a plugin
 object literally, so there is no package to publish and no build step:

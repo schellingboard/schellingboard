@@ -25,9 +25,10 @@ The modules are `sessions` (sessions, RSVPs, room unavailability, attendee count
 `notifications`, `events` (events and days), `venue` (locations), `settings` (site settings) and
 `updates` (the daily GitHub look-up of the latest release, shown to the admin).
 
-The Next mount is `app/api/v1/[[...route]]/route.ts`; `proxy.ts` gates it like any other route (site
-password for `/api/v1`, a guest cookie for `/api/v1/admin/`, whose use cases check the site-admin
-role). Repositories stay in `db/`.
+Next mounts one catch-all, `app/[[...path]]/route.ts`, which calls the Hono app in
+`server/http/web.ts`. That app gates `/api/v1` (site password; a guest cookie for `/api/v1/admin/`,
+whose use cases check the site-admin role), serves `/media`, the public files, the manifest and the
+SPA, and adds the security headers. Repositories stay in `db/`.
 
 `db/container.ts` opens the database in WAL mode with two connections. Repository methods named
 `find…` (but not `findOrCreate…`), `list…`, `search…`, `count…` or `get…` run on a read-only
@@ -140,10 +141,9 @@ SPA import the same data.
 
 The Next pages live in `app/legacy/` ([ADR 0015](adr/0015-spa-alongside-next.md)), so a page path in
 code is written `/legacy/…` (`<a href>`, `router.push`, `redirect()`, `revalidatePath()`). `/api`
-and `/media` stay at the root. `proxy.ts` rewrites every other root path to the SPA shell, whose
+and `/media` stay at the root. `web.ts` answers every other root path with the SPA shell, whose
 router owns most of them and forwards the rest to `/legacy` + path, so emails and push links keep
-their root URLs ([web app](web-app.md)). The proxy applies its gates to a `/legacy` path without the
-prefix.
+their root URLs ([web app](web-app.md)). A `/legacy` path passes the same site-password gate.
 
 ## Keys from the UI
 

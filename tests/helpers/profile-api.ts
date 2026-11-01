@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { PUT } from "@/app/api/v1/[[...route]]/route";
+import { PUT } from "@/tests/helpers/v1-route";
 
 type Problem = { code: string; detail?: string };
 type ProfileFields = Record<string, unknown> & {

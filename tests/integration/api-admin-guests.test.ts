@@ -14,7 +14,7 @@ import path from "path";
 vi.mock("@/utils/mailer", () => ({ sendMail: vi.fn() }));
 
 import { NextRequest } from "next/server";
-import { GET, POST, PUT, DELETE } from "@/app/api/v1/[[...route]]/route";
+import { GET, POST, PUT, DELETE } from "@/tests/helpers/v1-route";
 import { getRepositories } from "@/db/container";
 import { createAdminAuthCookie } from "../helpers/admin-cookie";
 import { sendMail } from "@/utils/mailer";

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
-import { DELETE, GET, POST, PUT } from "@/app/api/v1/[[...route]]/route";
+import { DELETE, GET, POST, PUT } from "@/tests/helpers/v1-route";
 import { getRepositories } from "@/db/container";
 import { peopleUseCases } from "@/server/composition";
 import { hashSessionToken } from "@/utils/login-session-token";
