@@ -106,11 +106,10 @@ the reasoning, including why it isn't a path under docs.schellingboard.org.
 | `make docs-dev-build`    | Build the published site into `dev-site/`            |
 | `make docs-dev-validate` | Check for broken internal links (runs in CI)         |
 
-The config's top level is hand-written, but the children under Decision records, Target architecture
-and Attendance model are read off disk at build time: a new ADR gets its sidebar entry, breadcrumbs
-and prev/next links from its own `# ` heading, with no config edit. Only a page listed in
-`navigation` has a place in the structure, so a directory added next to those needs a `pagesIn` call
-of its own.
+The config's top level is hand-written, but the children under Decision records, Architecture and
+Attendance model are read off disk at build time: a new ADR gets its sidebar entry, breadcrumbs and
+prev/next links from its own `# ` heading, with no config edit. Only a page listed in `navigation`
+has a place in the structure, so a directory added next to those needs a `pagesIn` call of its own.
 
 It is not versioned. `.github/workflows/developers.yml` publishes on pushes to `main` that touch
 `docs/dev/`, so the site always describes the default branch; a contributor on a release branch
@@ -134,7 +133,7 @@ which holds nothing else, using the same organization-owned deploy app the landi
 
 ### The architecture diagrams
 
-The C4 model in `docs/dev/target-architecture/diagrams/` reaches the site twice:
+The C4 model in `docs/dev/architecture/diagrams/` reaches the site twice:
 
 - **`/diagrams/`** — the full LikeC4 explorer, every view with drill-down between levels, built by
   `likec4 build`. It uses hash history (`/diagrams/#/…`) because GitHub Pages can't route deep links

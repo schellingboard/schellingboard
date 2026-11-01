@@ -161,10 +161,10 @@ export default {
           children: pagesIn("adr"),
         },
         {
-          title: "Target architecture",
-          path: "/target-architecture/",
+          title: "Architecture",
+          path: "/architecture/",
           icon: "layers",
-          children: pagesIn("target-architecture"),
+          children: pagesIn("architecture"),
         },
         {
           title: "Diagram explorer",

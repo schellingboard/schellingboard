@@ -21,7 +21,7 @@ REPO_ROOT="$PWD"
 
 CONFIG="docmd.dev.config.mjs"
 OUT="dev-site"
-DIAGRAMS="docs/dev/target-architecture/diagrams"
+DIAGRAMS="docs/dev/architecture/diagrams"
 
 # A <likec4-view> naming a view that no longer exists renders an empty box
 # rather than failing, which is exactly the silent staleness the PNGs used to

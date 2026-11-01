@@ -5,12 +5,13 @@
 
 ## Context
 
-[Path step 6](../target-architecture/10-path-from-here.md) replaces the cookies that say who a
-browser is, and the shared admin password, with server-side login sessions, a site-admin role and
-join links ([05](../target-architecture/05-security.md), D1, D2, D11 in
-[08](../target-architecture/08-decisions.md)). The sign-in screens are the last Next pages. This ADR
-settles the shapes before the work starts, and amends [ADR 0016](0016-remaining-screen-families.md)
-point 4.
+Path step 6 replaces the cookies that say who a browser is, and the shared admin password, with
+server-side login sessions, a site-admin role and join links
+([05](https://github.com/schellingboard/schellingboard/blob/fb2a2cba1d05ab0421aee2985bc0d75db3c41323/docs/dev/target-architecture/05-security.md),
+D1, D2, D11 in
+[08](https://github.com/schellingboard/schellingboard/blob/fb2a2cba1d05ab0421aee2985bc0d75db3c41323/docs/dev/target-architecture/08-decisions.md)).
+The sign-in screens are the last Next pages. This ADR settles the shapes before the work starts, and
+amends [ADR 0016](0016-remaining-screen-families.md) point 4.
 
 ## Decision
 
@@ -29,9 +30,10 @@ point 4.
 4. **Credentials:** password, emailed login code, reset link, join link. Email is optional per
    person, since a deployment need not send mail. A person may hold an optional unique `username`;
    password sign-in takes the email or the username. The password hash stays scrypt (`node:crypto`,
-   no native module); [05](../target-architecture/05-security.md) says argon2id and is updated. The
-   stored format (`scrypt$salt$key`) holds no cost parameters; it will carry N/r/p so cost can rise
-   later. Passkeys and API tokens wait for a later plan.
+   no native module);
+   [05](https://github.com/schellingboard/schellingboard/blob/fb2a2cba1d05ab0421aee2985bc0d75db3c41323/docs/dev/target-architecture/05-security.md)
+   says argon2id and is updated. The stored format (`scrypt$salt$key`) holds no cost parameters; it
+   will carry N/r/p so cost can rise later. Passkeys and API tokens wait for a later plan.
 5. **Sign-in API** under `/api/v1/auth/` (request a code, log in with code or password, reset, sign
    out) and `/api/v1/me/credentials`, `/api/v1/me/login-sessions`. Strict rate limits and Origin
    checks, as for the admin API. Problem codes name a wrong credential (a wrong, expired or spent
