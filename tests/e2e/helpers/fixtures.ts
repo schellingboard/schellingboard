@@ -48,7 +48,7 @@ const isRootPage = (url: string) => /^\/(?:[?#]|$)/.test(url);
 const isPeoplePage = (url: string) => /^\/guests(?:[/?#]|$)/.test(url);
 
 const isAccountPage = (url: string) =>
-  /^\/(?:settings|notifications|account-security|auth\/(?:login|reset)|login)(?:[?#]|$)/.test(
+  /^\/(?:settings|notifications|account-security|auth\/(?:login|reset)|join\/[^/?#]+|login)(?:[?#]|$)/.test(
     url
   );
 

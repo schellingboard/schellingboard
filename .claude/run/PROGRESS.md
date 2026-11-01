@@ -131,6 +131,13 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
   means the event's members, and is 503 `auth.mailUnavailable` without a mailer. Mock `loginMail` in
   tests needs `sendJoinLink` and `sendJoinLinkMade`.
 
+- Step 12b: the join page reuses the sign-in route for `joined:false`
+  (`/auth/login?guest=&redirect= /join/{token}`). The E2E reads the link from the admin screen's
+  read-only box. The guests table gets a "Join link" column; `AssignmentManager` takes an `extra`
+  render prop. Review: "mail" asks for confirmation; the join page links to `/` on failure. Known
+  limit: a guest who signs in through the emailed login-code or a password reset (no `redirect`)
+  lands on `/` and must open the join link again.
+
 ## Known E2E flakes
 
 `attendee-count.spec.ts:64` (fails ~half of solo runs on the base too), `settings.spec.ts:67`,

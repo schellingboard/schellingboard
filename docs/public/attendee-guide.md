@@ -27,6 +27,13 @@ voting is not a promise to attend. [RSVPs are the exception](#rsvp). :::
 By default this isn't a login — anyone can pick any name — so please pick only your own. If you'd
 rather it _were_ a login, see [Protect your name](#protect-your-name).
 
+### Join with a personal link
+
+Organizers may send you a personal link, by email or message. Opening it signs you in as yourself
+and adds you to the event, with no name to pick and no password. Keep it to yourself: whoever opens
+it acts as you. Once you set a password, the link asks you to sign in first, and a newer link from
+the organizers replaces an older one.
+
 ## Propose a session
 
 During the **proposal** phase, click **Add Proposal** and give a title, a description, and
