@@ -5,7 +5,7 @@ import sharp from "sharp";
 // The site map is uploaded through the admin UI and stored on the filesystem
 // under SB_UPLOADS_DIR (a persistent volume in production), not in public/, because
 // public/ is baked into the build and lost on redeploy. It is served by
-// app/media/site/[filename]/route.ts.
+// server/http/web.ts.
 //
 // Unlike location images (utils/location-images.ts), a map may have any aspect
 // ratio, so we validate only format and size.

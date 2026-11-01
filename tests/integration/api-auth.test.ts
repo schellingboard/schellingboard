@@ -11,7 +11,7 @@ import {
 } from "vitest";
 import { render } from "@react-email/render";
 import { NextRequest } from "next/server";
-import { GET, POST } from "@/app/api/v1/[[...route]]/route";
+import { GET, POST } from "@/tests/helpers/v1-route";
 
 vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),

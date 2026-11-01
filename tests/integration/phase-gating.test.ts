@@ -19,10 +19,7 @@ import {
 import { getRepositories } from "@/db/container";
 import { VoteChoice } from "@schellingboard/domain/vote";
 import { addSession, type SessionParams } from "../helpers/session-form";
-import {
-  DELETE as deleteV1,
-  PUT as putV1,
-} from "@/app/api/v1/[[...route]]/route";
+import { DELETE as deleteV1, PUT as putV1 } from "@/tests/helpers/v1-route";
 import { apiRequest, proposalApi } from "../helpers/proposal-api";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 

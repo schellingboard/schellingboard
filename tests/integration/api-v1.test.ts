@@ -10,7 +10,7 @@ import {
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { createRoute } from "@hono/zod-openapi";
-import { GET } from "@/app/api/v1/[[...route]]/route";
+import { GET } from "@/tests/helpers/v1-route";
 import { createApp } from "@/server/http/create-app";
 import { actorMiddleware } from "@/server/http/actor";
 import { openApiDocument } from "@/server/http/openapi";
@@ -18,7 +18,7 @@ import { createAuthCookie } from "@/utils/auth";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createGuest } from "../helpers/factories";
 import { createAdminAuthCookie } from "../helpers/admin-cookie";
-import { throughProxy } from "../helpers/through-proxy";
+import { throughWeb } from "../helpers/through-web";
 import {
   GUEST_COOKIE_NAME,
   openGuestValue,
@@ -41,9 +41,7 @@ describe("GET /api/v1/health", () => {
     { tags: ["019-US1"] },
     async () => {
       const site = await createAuthCookie();
-      const result = await throughProxy("/api/v1/health", {}, [site]);
-      if (!result.ok) throw new Error("expected proxy to forward the request");
-      const res = await GET(new NextRequest(result.request));
+      const res = await throughWeb("/api/v1/health", {}, [site]);
       expect(res.status).toBe(200);
       expect(await res.json()).toMatchObject({ status: "ok" });
     }
@@ -208,16 +206,13 @@ describe("actor middleware", () => {
   });
 });
 
-describe("proxy: /api/v1", () => {
+describe("web gates: /api/v1", () => {
   it("refuses a request without the site cookie with a problem-details 401", async () => {
-    const result = await throughProxy("/api/v1/events", {}, []);
-    if (result.ok) throw new Error("expected proxy to reject the request");
-    expect(result.response.status).toBe(401);
-    expect(result.response.headers.get("location")).toBeNull();
-    expect(result.response.headers.get("content-type")).toBe(
-      "application/problem+json"
-    );
-    expect(await result.response.json()).toMatchObject({
+    const res = await throughWeb("/api/v1/events", {}, []);
+    expect(res.status).toBe(401);
+    expect(res.headers.get("location")).toBeNull();
+    expect(res.headers.get("content-type")).toBe("application/problem+json");
+    expect(await res.json()).toMatchObject({
       status: 401,
       code: "site.unauthenticated",
     });
@@ -227,50 +222,44 @@ describe("proxy: /api/v1", () => {
     ["a foreign Origin", { origin: "https://evil.example" }],
     ["Sec-Fetch-Site: cross-site", { "sec-fetch-site": "cross-site" }],
   ])("refuses a sign-in request with %s", async (_, headers) => {
-    const result = await throughProxy(
+    const res = await throughWeb(
       "/api/v1/auth/login",
       { method: "POST", headers },
       [await createAuthCookie()]
     );
-    if (result.ok) throw new Error("expected proxy to reject the request");
-    expect(result.response.status).toBe(403);
-    expect(await result.response.json()).toMatchObject({
-      code: "request.crossSite",
-    });
+    expect(res.status).toBe(403);
+    expect(await res.json()).toMatchObject({ code: "request.crossSite" });
   });
 
   it("refuses an admin request with only the site cookie as problem details", async () => {
-    const result = await throughProxy("/api/v1/admin/events", {}, [
+    const res = await throughWeb("/api/v1/admin/events", {}, [
       await createAuthCookie(),
     ]);
-    if (result.ok) throw new Error("expected proxy to reject the request");
-    expect(result.response.status).toBe(401);
-    expect(result.response.headers.get("content-type")).toBe(
-      "application/problem+json"
-    );
-    expect(await result.response.json()).toMatchObject({
+    expect(res.status).toBe(401);
+    expect(res.headers.get("content-type")).toBe("application/problem+json");
+    expect(await res.json()).toMatchObject({
       status: 401,
       code: "admin.unauthenticated",
     });
   });
 
   it("refuses a cross-site admin request", async () => {
-    const result = await throughProxy(
+    const res = await throughWeb(
       "/api/v1/admin/events",
       { headers: { "sec-fetch-site": "cross-site" } },
       [{ name: GUEST_COOKIE_NAME, value: "token" }]
     );
-    if (result.ok) throw new Error("expected proxy to reject the request");
-    expect(result.response.status).toBe(403);
-    expect(await result.response.json()).toMatchObject({
-      code: "request.crossSite",
-    });
+    expect(res.status).toBe(403);
+    expect(await res.json()).toMatchObject({ code: "request.crossSite" });
   });
 
   it("leaves a signed-in guest's admin request to the API, without asking for the site password", async () => {
-    const result = await throughProxy("/api/v1/admin/events", {}, [
+    const res = await throughWeb("/api/v1/admin/events", {}, [
       { name: GUEST_COOKIE_NAME, value: "token" },
     ]);
-    expect(result.ok).toBe(true);
+    const body = (await res.json()) as { code: string };
+    expect(body.code).not.toBe("admin.unauthenticated");
+    expect(body.code).not.toBe("site.unauthenticated");
+    expect(body.code).not.toBe("request.crossSite");
   });
 });

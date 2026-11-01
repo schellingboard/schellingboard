@@ -18,7 +18,7 @@ import { uploadsDir } from "@/utils/uploads-dir";
 // because public/ is baked into the build and lost on redeploy.
 
 // Avatar images are uploaded through the /guests/edit UI
-// They are served by app/media/avatar/[filename]/route.ts.
+// They are served by server/http/web.ts.
 
 const FORMAT_EXTENSIONS: Partial<Record<keyof FormatEnum, string>> = {
   jpeg: "jpg",

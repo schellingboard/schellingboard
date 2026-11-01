@@ -14,7 +14,7 @@ Where things live:
 - **Frontend**: React components in `app/` using App Router (pages under `app/legacy/`), and the
   single-page app in `apps/web` that is replacing them; see [The web app](web-app.md)
 - **Database layer**: `db/` — `schema.ts`, `container.ts`, repositories in `db/repositories/sqlite/`
-- **API routes**: Server actions in `app/actions/`, API routes in `app/api/`
+- **API routes**: Server actions in `app/actions/`, the HTTP surface in `server/http/`
 - **Utils**: Shared utilities in `utils/`
 - **Domain and contracts**: workspace packages — `packages/domain` (vocabulary, constants, pure
   rules) and `packages/contracts` (zod schemas); see [ADR 0010](adr/0010-workspace-packages.md)

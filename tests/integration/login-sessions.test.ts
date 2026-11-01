@@ -9,7 +9,7 @@ import {
 } from "vitest";
 
 import { NextRequest } from "next/server";
-import { GET, PUT, DELETE } from "@/app/api/v1/[[...route]]/route";
+import { GET, PUT, DELETE } from "@/tests/helpers/v1-route";
 import { getRepositories } from "@/db/container";
 import { hashSessionToken } from "@/utils/login-session-token";
 import { realNow } from "@/utils/real-clock";

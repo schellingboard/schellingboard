@@ -1,10 +1,8 @@
 // @module-tag 019-US6
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { NextRequest } from "next/server";
-import { GET } from "@/app/api/v1/[[...route]]/route";
 import { openApiDocument } from "@/server/http/openapi";
 import { createAuthCookie } from "@/utils/auth";
-import { throughProxy } from "../helpers/through-proxy";
+import { throughWeb } from "../helpers/through-web";
 
 beforeEach(() => {
   vi.stubEnv("SITE_PASSWORD", "site-pw");
@@ -13,9 +11,7 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllEnvs());
 
 async function getAsAttendee(path: string) {
-  const result = await throughProxy(path, {}, [await createAuthCookie()]);
-  if (!result.ok) throw new Error("expected proxy to forward the request");
-  return GET(new NextRequest(result.request));
+  return throughWeb(path, {}, [await createAuthCookie()]);
 }
 
 describe("API docs", () => {

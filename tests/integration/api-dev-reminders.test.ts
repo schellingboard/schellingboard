@@ -9,7 +9,7 @@ import {
   vi,
 } from "vitest";
 import { NextRequest } from "next/server";
-import { POST } from "@/app/api/v1/[[...route]]/route";
+import { POST } from "@/tests/helpers/v1-route";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 
 const dispatch = () =>

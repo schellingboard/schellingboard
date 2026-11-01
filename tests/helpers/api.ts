@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { DELETE, POST, PUT } from "@/app/api/v1/[[...route]]/route";
+import { DELETE, POST, PUT } from "@/tests/helpers/v1-route";
 
 export type Problem = {
   code: string;

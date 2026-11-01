@@ -172,7 +172,7 @@ module.exports = {
           "^server/modules/[^/]+/module\\.ts$",
           "^server/composition\\.ts$",
           "^server/kernel/",
-          "^server/http/app\\.ts$",
+          "^server/http/(app|web)\\.ts$",
         ],
       },
     },

@@ -9,7 +9,7 @@ import {
 } from "vitest";
 
 import { NextRequest } from "next/server";
-import { POST, PUT } from "@/app/api/v1/[[...route]]/route";
+import { POST, PUT } from "@/tests/helpers/v1-route";
 import { createAdminAuthCookie } from "../helpers/admin-cookie";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
