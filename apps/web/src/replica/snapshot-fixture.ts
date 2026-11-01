@@ -28,6 +28,7 @@ export const snapshot: Snapshot = {
     slotIncrementMinutes: 30,
     rsvpCapacityHardLimit: false,
     icon: null,
+    identityMode: "open",
     meetingsEnabled: false,
     maxOpenMeetingRequests: 5,
     firstDayStart: iso(8),

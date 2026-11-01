@@ -201,7 +201,7 @@ async function confirmedPassword(
   if (!acting.ok) return acting;
   const guestId = acting.value;
   const creds = await deps.repos.guests.getAuthCredentials(guestId);
-  if (!creds?.authProtected)
+  if (!creds?.passwordHash)
     return conflict("auth.notProtected", "Your name isn't protected");
   // A stolen session must not guess the current password at unlimited speed.
   const wait = loginRetryAfter("guest", guestId);
@@ -255,6 +255,7 @@ export const changePassword = (deps: PeopleDeps) => {
 /**
  * Turns protection off. The verified session is replaced by a claimed one, so
  * the browser keeps the name, and protecting it again will ask for a login.
+ * A verified event still protects its members, so theirs stays verified.
  */
 export const unprotect = (deps: PeopleDeps) => {
   const start = signIn(deps);
@@ -281,7 +282,13 @@ export const unprotect = (deps: PeopleDeps) => {
     });
     await retireTokens(deps, guestId);
     credentialsChanged(guestId);
-    const identity = await start(actor, { guestId, level: "claimed", device });
+    const stillProtected = (await deps.repos.guests.getAuthCredentials(guestId))
+      ?.authProtected;
+    const identity = await start(actor, {
+      guestId,
+      level: stillProtected ? "verified" : "claimed",
+      device,
+    });
     await notifySecurityChange(deps, guestId, "disabled");
     return ok(identity);
   };

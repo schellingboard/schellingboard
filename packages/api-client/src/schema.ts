@@ -5039,6 +5039,11 @@ export interface paths {
               | "UserGroupIcon"
               | "WrenchIcon"
               | null;
+            /**
+             * @description open: picking a name is enough to act; verified: a checked login is needed. Omitted: unchanged on edit, verified on create
+             * @enum {string}
+             */
+            identityMode?: "open" | "verified";
           };
         };
       };
@@ -5143,6 +5148,11 @@ export interface paths {
               | "UserGroupIcon"
               | "WrenchIcon"
               | null;
+            /**
+             * @description open: picking a name is enough to act; verified: a checked login is needed. Omitted: unchanged on edit, verified on create
+             * @enum {string}
+             */
+            identityMode?: "open" | "verified";
             /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
             expectedVersion: number;
           };
@@ -7263,6 +7273,8 @@ export interface components {
       slotIncrementMinutes: number;
       rsvpCapacityHardLimit: boolean;
       icon: string | null;
+      /** @enum {string} */
+      identityMode: "open" | "verified";
       meetingsEnabled: boolean;
       maxOpenMeetingRequests: number;
       /** Format: date-time */
