@@ -133,50 +133,51 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
 
 ### The API for 5.0.0
 
-- [ ] 22. **API review: ADR 0018.** Doc-only. Goal: after 5.0.0, no breaking release for a long
-      time, so accept a break now where it removes a future one. Review
-      `packages/contracts/openapi.json`, the snapshot and feed shapes, problem kinds, and auth. Also
-      review the other things a self-hoster depends on: environment variables, public URLs, data
-      paths. For each change, state the benefit and who it breaks. Start from these candidates;
-      reject those that do not earn a break: - Endpoints that nothing uses now that the SPA reads
-      the replica (`/updates`, `/attendees`, `/host-clashes`, `/sessions/{id}/rsvps`,
-      `/guests/{id}/rsvps`): each is a promise to keep. - Verbs in paths instead of methods
-      (`/me/notifications/delete`, `/me/push-subscriptions/remove`,
-      `/admin/events/{id}/guests/remove`, `.../locations/remove`). - `/admin/sessions` and
-      `/admin/proposals` next to `/sessions` and `/proposals`, now that the role is on the actor.
-      The future organizer role must fit without a break. - Events addressed by `{id}` and by
-      `{slug}`. `/dev/reminders` in the public document. - Whether the path stays `/api/v1` (check
-      what 4.0.0 shipped and what `docs/public/self-hosting/api.md` promises). - Everything in "Not
-      in this run" must arrive without a break. Decide now how `SITE_PASSWORD` and `/auth/site` end,
-      or that they stay. API tokens must fit the auth scheme. - The contract changes that #1383 and
-      #1331 need. - A written compatibility policy: what counts as breaking, how an endpoint is
-      deprecated, what clients must tolerate (unknown fields, new problem kinds, new feed change
-      types).
-
-      Decide each item. Put only a real product trade-off under "Questions" in PROGRESS.md, and go
-      on with the rest. Replace step 23 with one step per coherent change.
-
-- [ ] 23. **Apply ADR 0018** (the review splits this step). Each change updates the contracts,
-      `openapi.json`, the SPA, tests, `docs/public/self-hosting/api.md`, and a line in the breaking
-      change note of `CHANGELOG.md`. Full `make test-e2e` after the last one.
+- [x] 22. API review: ADR 0018 records the decisions (v1 unreleased, so `/api/v1` stays and breaks
+      cost nobody; the 4.0.0 `/api/*` routes are the real break), the compatibility policy and the
+      contract notes for #1383 and #1331. Steps 23a-23e apply it; each updates the contracts,
+      `openapi.json`, `packages/api-client`, the SPA, tests and `docs/public/self-hosting/api.md`.
+- [ ] 23a. Remove `GET /guests/{id}/rsvps` and `DELETE /me/identity` (the SPA signs out through
+      `POST /auth/sign-out`); `POST /api/auth/logout` becomes `DELETE /api/v1/auth/site` (ends the
+      site login and the login session; `site-session.ts` follows). Integration tests move with
+      them.
+- [ ] 23b. Methods for removal: `DELETE /me/notifications?ids=`,
+      `DELETE /me/push-subscriptions?endpoint=`, `GET /me/push-subscriptions?endpoint=` (replaces
+      `/check`). Old `POST` routes go. Tests first (use cases for notifications and push).
+- [ ] 23c. `POST /dev/reminders` becomes `/api/dev/reminders`, outside `/api/v1` and `openapi.json`;
+      still 404 without `SB_ENABLE_DEV_TOOLS`. The SPA's dev toolbar follows. Also `API_DOCS`
+      becomes `SB_API_DOCS` (code, `.env` files, `configuration.md`, `api.md`).
+- [ ] 23d. `api.md`: the command-versus-DELETE rule, the `/admin/` privilege rule, `{id}` versus
+      `{slug}`, `/attendees` versus `/guests`, `Authorization` reserved for `Bearer sb_` tokens and
+      ignored today, and the full Compatibility section from ADR 0018 (breaking, not breaking,
+      deprecation, what clients tolerate, self-hoster promises). Mark in `configuration.md` that new
+      variables are `SB_`-prefixed. `make docs-validate`.
+- [ ] 23e. `CHANGELOG.md` breaking note for 5.0.0: the 4.0.0 `/api/*` routes (`/api/admin/*`,
+      `toggle-rsvp`, `rsvps`, `add-`/`update-`/`delete-session`, votes, comments, meetings;
+      `/api/auth/login` is already named) are gone and `/api/v1` replaces them; everyone signs in
+      again once; `ADMIN_PASSWORD` warns. Keep the `SB_TRUSTED_PROXIES` line. Then run the full
+      `make test-e2e`.
 
 ### Issues of milestone v5.0.0
 
 One step and one commit per issue, footer `fixes #N`. The issue text is the specification, but its
 paths can be old: `app/(site)/` is now `apps/web/src/`. Read it with
 `gh issue view -R schellingboard/schellingboard N` (`gh` needs `-R`: this checkout has no `.git`).
-Contract changes first, so the rest build on the final API.
+Contract changes first, so the rest build on the final API (ADR 0018 point 15).
 
 - [ ] 24. #1383 Hosts see the vote breakdown of their own proposals during voting; the server sends
-      the counts to nobody else. E2E.
+      the counts to nobody else. No new shape: `breakdown` is already nullable and stays out of the
+      snapshot and feed. E2E.
 - [ ] 25. #1331 Events without email, following ADR 0017 points 4 and 9. Email is optional per
       person: `guests.email` becomes nullable, unique when set, and the contracts follow. The guest
-      id is the identity; names need not be unique, and `username` is the unique sign-in name.
-      Protection stays available, which replaces the issue's "disable account protection": a
-      verified session with no password may set one without an emailed link (today only a reset link
-      can, so this is new), and a new join link is the recovery. Only the options that need mail are
-      disabled or hidden. Guest import: a row without an email matches an existing guest without an
-      email by exact name, so a second import adds no duplicates.
+      id is the identity; contracts per ADR 0018 point 15 (admin guest `email` nullable,
+      `emailEnabled` on `GET /site`, skipped guests in the join-link mailing); names need not be
+      unique, and `username` is the unique sign-in name. Protection stays available, which replaces
+      the issue's "disable account protection": a verified session with no password may set one
+      without an emailed link (today only a reset link can, so this is new), and a new join link is
+      the recovery. Only the options that need mail are disabled or hidden. Guest import: a row
+      without an email matches an existing guest without an email by exact name, so a second import
+      adds no duplicates.
 - [ ] 26. #1335 Admin: assign attendees to events in the add and edit forms.
 - [ ] 27. #1361 Dismissing a dialog with unsaved text asks first. E2E.
 - [ ] 28. #1330 Admin: a new day's booking window defaults to the day's start and end.
