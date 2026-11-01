@@ -150,6 +150,9 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
   members in every event they attend (`recordingModeLocks`). `unprotect` keeps a verified-event
   member's session verified.
 
+- Steps 14-15: `MapButton` fetches `GET /site` on its own (the home page does too). Open-questions
+  item 9 is resolved and removed; the old item 10 is now 9.
+
 ## Known E2E flakes
 
 `attendee-count.spec.ts:64` (fails ~half of solo runs on the base too), `settings.spec.ts:67`,

@@ -95,10 +95,10 @@ which the shell makes reload the app so the replica is read under the new time. 
 `SyncIndicator` shows the replica's link state (`useSyncState`: live, reconnecting after a short
 grace, stale) and re-renders at the instant it next changes. `ErrorBoundary` keeps the nav and
 footer when one screen crashes (try again, reload, or open `/legacy`). `Shell` (`app/shell.tsx`)
-composes theme, viewer, layout, nav, user menu, footer, boundary and dev clock from props (events,
-the picker's guests, location). `ShellProviders` (theme and viewer) and `ShellFrame` are also
-exported, for a screen that needs the viewer before it can say what the frame shows. The schedule
-page mounts it.
+composes theme, viewer, layout, nav, map button (`MapButton`, from `GET /site`), user menu, footer,
+boundary and dev clock from props (events, the picker's guests, location). `ShellProviders` (theme
+and viewer) and `ShellFrame` are also exported, for a screen that needs the viewer before it can say
+what the frame shows. The schedule page mounts it.
 
 ## The sign-in screens
 
@@ -108,6 +108,11 @@ browsers). They take `signInCalls(api)` and, for the last, an `AccountSecuritySt
 `createAccountSecurityQuery`; forms wait for the answer (`useFormMutation` with `explainRefusals`,
 since the server's wording "Wrong password" is the message). `app/account-pages.tsx` routes them:
 the guest named by `?guest=` comes from the attendee directory, and a login reloads the app on `/`.
+
+`features/sign-in/` also holds `JoinScreen` (`/join/$token`: a personal join link signs the person
+in and opens the event) and `BootstrapScreen` (`/auth/bootstrap`: the site-admin bootstrap link).
+The admin guests screen has the join-link actions (`features/admin/join-links.tsx`), and the event
+form (`event-config.tsx`) has the Identity select.
 
 ## The schedule
 

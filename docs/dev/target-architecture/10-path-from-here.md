@@ -48,12 +48,13 @@ get its own issue and ADR.
    reload offer after an upgrade. Proposals and voting, people and meetings, the session forms,
    settings, notifications and admin have moved too; the legacy copies and their server actions are
    deleted. The root event list and the guest sign-in screens (login, reset, account security) have
-   moved too. The site password screen (`/login`) has moved too. The only Next page left is the
-   admin login, which step 6 replaces.
+   moved too. The site password screen (`/login`) has moved too. The admin login went with step 6.
 
-6. **Identity and roles.** Persons, participations, login sessions, assurance, join links; migrate
-   protected guests to verified credentials; replace the admin password with a site-admin role and
-   the bootstrap link.
+6. **Identity and roles.** Done ([ADR 0017](../adr/0017-identity-and-roles.md)): server-side login
+   sessions with assurance, passwords, emailed codes and reset links, personal join links, the
+   site-admin role with a bootstrap link instead of the admin password, and an identity mode per
+   event. Persons stay the `guests` table. Left for later plans: the reading setting, passkeys, API
+   tokens, the QR sheet for join links and the organizer participation role.
 7. **Retire Next.** The server serves the SPA's static files; `next` leaves `package.json`; the
    Dockerfile shrinks.
 

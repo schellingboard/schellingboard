@@ -18,13 +18,15 @@ by construction of the audience model, not by remembering a filter.
 
 ## Identity and assurance
 
-- A **Person** may hold zero or more credentials: password (argon2id), passkeys (WebAuthn), and a
-  verified email for codes. **Join tokens** are per person per event, single-use, expiring,
-  delivered by the organizer as a link or QR code.
+- A **Person** may hold zero or more credentials: password (scrypt; passkeys come later), a verified
+  email for codes, and an optional username. **Join links** are personal, one per person per event
+  and without expiry; a new link ends the old one, and setting a password ends the link's power to
+  sign in. The organizer copies a link or mails them.
 - A browser **login session** is a server-side row
-  (`login_sessions(id, person, event?, assurance, created, expires, device)`; `sessions` is the
-  schedule's table) referenced by an httpOnly, Secure, SameSite=Lax cookie. Nothing about the person
-  is in the cookie; revocation is a row delete. Login sessions are listed and revocable in settings.
+  (`login_sessions(id, person, event?, assurance, created, expires, lastSeen, device)`; `sessions`
+  is the schedule's table) referenced by an httpOnly, Secure, SameSite=Lax cookie. Nothing about the
+  person is in the cookie; revocation is a row delete. A session lasts 30 days from its last use.
+  Login sessions are listed and revocable in settings.
 - **Assurance** is per login session: `claimed` (the person picked their name), `verified` (join
   token, emailed code, password or passkey). A verified session is the only way to act as a person
   who has **protected** their name.
@@ -35,10 +37,12 @@ by construction of the audience model, not by remembering a filter.
   | `open`     | enough to act               | optional, per person ("protect my name")                     | available, with a one-time notice that a claimed name is not a lock |
   | `verified` | shows the verification step | required; passwordless by default (join link, code, passkey) | available                                                           |
 
-  Organizers choose the mode per event. A new event defaults to `verified`: the organizer imports
-  the participants and sends everyone their join link (or a QR sheet), and can lower the mode to
-  `open` for an event that wants zero friction. Nobody has to remember a password in either mode,
-  because a join link or an emailed code is always an option.
+  A person who takes part in any `verified` event is protected everywhere, and a non-member needs a
+  verified login to act in a `verified` event. Reading is a second setting (`public`, `link`,
+  `participants`), built in a later plan. Organizers choose the mode per event. A new event defaults
+  to `verified`: the organizer imports the participants and sends everyone their join link (or a QR
+  sheet), and can lower the mode to `open` for an event that wants zero friction. Nobody has to
+  remember a password in either mode, because a join link or an emailed code is always an option.
 
 <likec4-view view-id="flowJoin" dynamic-variant="sequence"><a href="https://developers.schellingboard.org/diagrams/#/view/flowJoin">Sequence
 diagram: first login through a personal join link</a></likec4-view>
