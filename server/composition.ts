@@ -31,7 +31,6 @@ import {
 import {
   createMeetingUseCases,
   guestSchedules,
-  meetingOptions,
   meetingViews,
   type MeetingUseCases,
 } from "@/server/modules/meetings/module";
@@ -225,11 +224,6 @@ export function pageReads() {
       guestSchedules(repos, eventId, guestIds),
     meetingViews: (viewerId: string, eventId: string, now: Date) =>
       meetingViews(repos, viewerId, eventId, now),
-    meetingOptions: (
-      viewerId: string | null,
-      recipientId: string,
-      events: Parameters<typeof meetingOptions>[3]
-    ) => meetingOptions(repos, viewerId, recipientId, events),
   };
 }
 

@@ -4,7 +4,6 @@ import tailwindcss from "@tailwindcss/vite";
 
 // Everything that is not a page of the SPA is answered by the server, in dev too.
 const SERVER_PATHS = [
-  "/legacy",
   "/api",
   "/media",
   "/locations",

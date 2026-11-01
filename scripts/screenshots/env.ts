@@ -33,7 +33,7 @@ export async function openSite(
   });
   const page = await context.newPage();
   page.setDefaultTimeout(30_000);
-  await page.goto("/legacy");
+  await page.goto("/");
   await login(page, SITE_PASSWORD);
   if (!opts.anonymous) await selectUser(page, ATTENDEE);
   await setTheme(page, "Light");

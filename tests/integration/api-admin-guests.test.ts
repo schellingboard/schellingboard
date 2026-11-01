@@ -13,7 +13,6 @@ import path from "path";
 
 vi.mock("@/utils/mailer", () => ({ sendMail: vi.fn() }));
 
-import { NextRequest } from "next/server";
 import { GET, POST, PUT, DELETE } from "@/tests/helpers/v1-route";
 import { getRepositories } from "@/db/container";
 import { createAdminAuthCookie } from "../helpers/admin-cookie";
@@ -43,7 +42,7 @@ function call(
   if (cookie) headers.cookie = cookie;
   if (key) headers["idempotency-key"] = key;
   return HANDLERS[method](
-    new NextRequest(`http://test/api/v1${path}`, {
+    new Request(`http://test/api/v1${path}`, {
       method,
       headers,
       body: form ?? (body === undefined ? undefined : JSON.stringify(body)),

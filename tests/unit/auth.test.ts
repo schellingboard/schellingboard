@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { NextResponse } from "next/server";
+import { Hono } from "hono";
+import { setCookie } from "hono/cookie";
 import {
   isAuthCookieValid,
   createAuthCookie,
@@ -8,21 +9,19 @@ import {
   AUTH_COOKIE_NAME,
 } from "@/utils/auth";
 
-// Serialize a cookie object the exact way the app does at runtime:
-//   (await cookies()).set(await createAuthCookie())
-// This is the seam where attributes are dropped if the cookie object's shape
-// does not match what Next's ResponseCookies.set() expects (flat attributes,
-// not a nested `options` key). Asserting on the resulting Set-Cookie header
-// catches that; asserting on the helper's return shape does not.
-//
-// We go through the public `NextResponse` API (whose `.cookies` is the same
-// ResponseCookies surface the runtime `cookies()` helper exposes)
-function emittedSetCookieHeader(cookie: {
+// Serialize the cookie the way the server does (server/http/site-auth.ts), so
+// a dropped attribute shows in the Set-Cookie header.
+async function emittedSetCookieHeader(cookie: {
   name: string;
   value: string;
-}): string {
-  const res = new NextResponse();
-  res.cookies.set(cookie);
+}): Promise<string> {
+  const { name, value, ...options } = cookie;
+  const app = new Hono();
+  app.get("/", (c) => {
+    setCookie(c, name, value, options);
+    return c.body(null);
+  });
+  const res = await app.request("/");
   return res.headers.get("set-cookie") ?? "";
 }
 
@@ -114,12 +113,12 @@ describe("createAuthCookie — emitted Set-Cookie header", () => {
   afterEach(() => vi.unstubAllEnvs());
 
   it("is a persistent cookie (carries Max-Age), not a session cookie", async () => {
-    const header = emittedSetCookieHeader(await createAuthCookie());
+    const header = await emittedSetCookieHeader(await createAuthCookie());
     expect(header).toMatch(/Max-Age=604800/);
   });
 
   it("is HttpOnly and SameSite=Lax", async () => {
-    const header = emittedSetCookieHeader(await createAuthCookie());
+    const header = await emittedSetCookieHeader(await createAuthCookie());
     expect(header).toMatch(/HttpOnly/i);
     expect(header).toMatch(/SameSite=lax/i);
   });
@@ -130,7 +129,7 @@ describe("createAuthCookie — emitted Set-Cookie header", () => {
       AUTH_SECRET: VALID_SECRET,
       NODE_ENV: "production",
     });
-    const header = emittedSetCookieHeader(await createAuthCookie());
+    const header = await emittedSetCookieHeader(await createAuthCookie());
     expect(header).toMatch(/Secure/);
   });
 });

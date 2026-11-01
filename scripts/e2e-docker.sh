@@ -134,9 +134,6 @@ fi
 # --user: the image's own uid (1001) would own the files it writes into the
 #   bind mount, leaving directories the host user cannot clean up afterwards.
 #   The app itself is uid-agnostic.
-# --tmpfs: consequence of the above — /app is owned by 1001, so Next's image
-#   optimizer cannot create its cache directory and every optimized image logs
-#   an unhandled EACCES. A writable tmpfs at that path keeps the run quiet.
 echo "==> Starting $CONTAINER on $BASE_URL"
 # Set before `docker run`, which leaves the container behind even when it fails
 # to start.

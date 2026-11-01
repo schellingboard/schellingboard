@@ -1,15 +1,14 @@
 # The web app (`apps/web`)
 
-`apps/web` is the single-page app that is replacing the Next pages one screen family at a time
+`apps/web` is the single-page app that replaced the Next pages
 ([ADR 0015](adr/0015-spa-alongside-next.md)). It is a workspace package built with Vite, React and
-TanStack Router, styled with Tailwind and the colour tokens in `styles/tokens.css` (the Next pages
-import the same file). [Client design](target-architecture/04-client.md) describes where it is
-going.
+TanStack Router, styled with Tailwind and the colour tokens in `styles/tokens.css`.
+[Client design](target-architecture/04-client.md) describes where it is going.
 
 ## How it reaches the browser
 
-- The Next pages live under `/legacy`. Every other root path that is not `/api`, `/media`,
-  `/locations`, `/sw.js`, an icon or the manifest is a page of the SPA.
+- Every root path that is not `/api`, `/media`, `/locations`, `/sw.js`, an icon or the manifest is a
+  page of the SPA.
 - `server/http/web.ts` applies the site password to those paths (not to `/admin/**`, which gets the
   shell: the admin API holds the gate, and the sign-in follows from it), then serves the shell: it
   reads `apps/web/dist/index.html` from disk on each request and answers `no-store`.
@@ -21,15 +20,11 @@ going.
   session forms, `/{slug}/meetings`, `/guests/**`, `/settings`, `/notifications`, `/auth/login`,
   `/auth/reset`, `/account-security`, `/login` (the site password, open to visitors without the
   cookie; `POST /api/v1/auth/site`) (`app/account-pages.tsx`) and `/admin/**`
-  (`app/admin-pages.tsx`). No Next page is left. Everything else the SPA does not own is forwarded:
-  the catch-all route replaces the location with `/legacy` + path + query (a path already under
-  `/legacy` is left alone).
-- Legacy pages link to the SPA with plain anchors, never Next's `Link` (`AppLink`, which does that
-  for every root path outside `/legacy`): Next has nothing to fetch there.
+  (`app/admin-pages.tsx`). Anything else is "Page not found".
 
 - `public/sw.js` (registered by `main.tsx` outside the dev server) caches the shell and the
   `/_spa/assets/` files. SPA navigations go to the network first and fall back to the cached shell,
-  so a new build shows as soon as it is reachable; `/api`, `/legacy` and the other Next paths are
+  so a new build shows as soon as it is reachable; `/api`, `/media` and the other server paths are
   never touched. A page compares the shell's build id with `/api/v1/health` (`app/reload-offer.tsx`:
   on load, every 5 minutes, on `online` and when the tab is shown). The viewer is remembered in
   `localStorage` so the saved schedule opens offline.
@@ -47,10 +42,6 @@ Docker image, which copies `apps/web/dist` next to `dist/server`.
   on `PORT` (default 3000). Open the Vite port: it serves the SPA with hot reload and proxies
   `/api`, `/media` and the other server paths to the Node server. The shell gate does not apply in
   dev.
-- E2E specs call `page.goto` with root paths; the fixture sends them to `/legacy/...` so a click
-  never lands before hydration, except these SPA addresses (an event's `/{slug}` and
-  `/{slug}/proposals/…`, `/guests/…`, `/settings`, `/notifications`, `/admin/…`), which open as they
-  are. One spec covers the shell's forward.
 
 ## Layout and rules
 
@@ -60,9 +51,8 @@ Docker image, which copies `apps/web/dist` next to `dist/server`.
 `apply` from `packages/contracts/src/feed-apply.ts`, feed client, sync state, a server clock offset
 and IndexedDB persistence keyed by event and viewer, opened as `stale`). dependency-cruiser enforces
 that the package imports `packages/domain`, `packages/contracts` and `packages/api-client` only
-(never `app/`, `server/`, `utils/` or `next`), that nothing imports it, that `features/` never
-imports `api-client`, and that it declares what it imports. See
-[Architecture rules](architecture-rules.md).
+(never `server/`, `utils/` or `db/`), that nothing imports it, that `features/` never imports
+`api-client`, and that it declares what it imports. See [Architecture rules](architecture-rules.md).
 
 ## The viewer and the user picker
 

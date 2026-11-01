@@ -8,7 +8,6 @@ import {
   afterEach,
   vi,
 } from "vitest";
-import { NextRequest } from "next/server";
 import { GET } from "@/tests/helpers/v1-route";
 import { API_LIMIT } from "@/server/kernel/rate-limit";
 import { createAdminAuthCookie } from "../helpers/admin-cookie";
@@ -18,7 +17,7 @@ import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 
 const get = (path: string, cookie = "") =>
   GET(
-    new NextRequest(`http://test/api/v1${path}`, {
+    new Request(`http://test/api/v1${path}`, {
       headers: cookie ? { cookie } : {},
     })
   );
@@ -72,7 +71,7 @@ describe("/api/v1 rate limit", () => {
     vi.stubEnv("SB_TRUSTED_PROXIES", "1");
     const from = (ip: string) =>
       GET(
-        new NextRequest("http://test/api/v1/events", {
+        new Request("http://test/api/v1/events", {
           headers: { "x-forwarded-for": ip },
         })
       );

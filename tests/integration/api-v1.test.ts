@@ -7,7 +7,6 @@ import {
   afterEach,
   vi,
 } from "vitest";
-import { NextRequest } from "next/server";
 import { z } from "zod";
 import { createRoute } from "@hono/zod-openapi";
 import { GET } from "@/tests/helpers/v1-route";
@@ -52,7 +51,7 @@ describe("GET /api/v1/health", () => {
     { tags: ["019-US1"] },
     async () => {
       vi.stubEnv("NEXT_PUBLIC_APP_VERSION", "v9.9.9");
-      const res = await GET(new NextRequest("http://test/api/v1/health"));
+      const res = await GET(new Request("http://test/api/v1/health"));
       const body = (await res.json()) as { version: string; buildId: string };
       expect(body.version).toBe("v9.9.9");
       expect(body.buildId).toEqual(expect.any(String));
@@ -67,7 +66,7 @@ describe("GET /api/v1/health", () => {
       const read = async () =>
         (
           (await (
-            await GET(new NextRequest("http://test/api/v1/health"))
+            await GET(new Request("http://test/api/v1/health"))
           ).json()) as { devTools: boolean }
         ).devTools;
 
@@ -79,7 +78,7 @@ describe("GET /api/v1/health", () => {
   );
 
   it("tells browsers not to cache it", { tags: ["019-US1"] }, async () => {
-    const res = await GET(new NextRequest("http://test/api/v1/health"));
+    const res = await GET(new Request("http://test/api/v1/health"));
     expect(res.headers.get("cache-control")).toBe("no-store");
   });
 
@@ -95,7 +94,7 @@ describe("GET /api/v1/health", () => {
 
 describe("/api/v1 errors", () => {
   it("answers an unknown path with a problem-details 404", async () => {
-    const res = await GET(new NextRequest("http://test/api/v1/no-such-thing"));
+    const res = await GET(new Request("http://test/api/v1/no-such-thing"));
     expect(res.status).toBe(404);
     expect(res.headers.get("content-type")).toBe("application/problem+json");
     expect(await res.json()).toEqual({

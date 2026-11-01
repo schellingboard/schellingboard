@@ -7,23 +7,8 @@ import {
   afterEach,
   vi,
 } from "vitest";
-import { NextRequest } from "next/server";
 
 const cookieJar = new Map<string, string>();
-
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-}));
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { siteAuthenticate } from "../helpers/site-auth";
@@ -52,8 +37,8 @@ async function authCookieHeader(guestId: string): Promise<string> {
   return `${GUEST_COOKIE_NAME}=${await verifiedGuestValue(guestId)}`;
 }
 
-function v1(method: string, path: string, cookie?: string): NextRequest {
-  return new NextRequest(`http://test/api/v1${path}`, {
+function v1(method: string, path: string, cookie?: string): Request {
+  return new Request(`http://test/api/v1${path}`, {
     method,
     headers: cookie ? { cookie } : {},
   });

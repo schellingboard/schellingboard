@@ -5,9 +5,7 @@
 // `time-override` cookie and only honoured when SB_ENABLE_DEV_TOOLS is set, so
 // the cookie is inert on a normal deployment even if a client forges it.
 //
-// This module is client-safe: it must not import `next/headers`. The
-// request-scoped Server Component / Server Action reader lives in
-// `dev-clock-server.ts`.
+// This module is client-safe: it reads no request state.
 
 export const TIME_OFFSET_COOKIE = "time-override";
 

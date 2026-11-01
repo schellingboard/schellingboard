@@ -6,7 +6,7 @@ tsconfig.json
 docs/dev/attendance-model/attendance-2025.md
 docs/dev/attendance-model/.venv/
 
-# Claude Code worktrees carry their own .next/ and source trees
+# Claude Code worktrees carry their own source trees
 .claude/worktrees/
 
 # Written by vitest (toMatchFileSnapshot); formatting them makes the tests fail

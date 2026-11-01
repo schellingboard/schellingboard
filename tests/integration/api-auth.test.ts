@@ -10,7 +10,6 @@ import {
   vi,
 } from "vitest";
 import { render } from "@react-email/render";
-import { NextRequest } from "next/server";
 import { GET, POST } from "@/tests/helpers/v1-route";
 
 vi.mock("@/utils/mailer", () => ({
@@ -35,7 +34,7 @@ import { GUEST_COOKIE_NAME, sessionGuestValue } from "../helpers/guest-cookie";
 
 const post = (path: string, body?: unknown, cookie?: string) =>
   POST(
-    new NextRequest(`http://test/api/v1/auth/${path}`, {
+    new Request(`http://test/api/v1/auth/${path}`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -47,7 +46,7 @@ const post = (path: string, body?: unknown, cookie?: string) =>
 
 const whoAmI = (cookie: string) =>
   GET(
-    new NextRequest("http://test/api/v1/me/identity", {
+    new Request("http://test/api/v1/me/identity", {
       headers: { cookie },
     })
   );
@@ -434,7 +433,7 @@ describe("POST /api/v1/auth/sign-out", () => {
 describe("the sign-in routes' own rate limit", () => {
   const fromAddress = () =>
     POST(
-      new NextRequest("http://test/api/v1/auth/login", {
+      new Request("http://test/api/v1/auth/login", {
         method: "POST",
         headers: {
           "content-type": "application/json",

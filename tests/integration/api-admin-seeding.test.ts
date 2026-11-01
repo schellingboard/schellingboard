@@ -8,7 +8,6 @@ import {
   vi,
 } from "vitest";
 
-import { NextRequest } from "next/server";
 import { POST, PUT } from "@/tests/helpers/v1-route";
 import { createAdminAuthCookie } from "../helpers/admin-cookie";
 import { setupTestDb, resetTestDb } from "../helpers/db";
@@ -28,7 +27,7 @@ function call(
   if (body !== undefined) headers["content-type"] = "application/json";
   if (cookie) headers.cookie = cookie;
   return HANDLERS[method](
-    new NextRequest(`http://test/api/v1${path}`, {
+    new Request(`http://test/api/v1${path}`, {
       method,
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),

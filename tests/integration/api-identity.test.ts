@@ -8,7 +8,6 @@ import {
   vi,
 } from "vitest";
 
-import { NextRequest } from "next/server";
 import { GET, PUT, DELETE } from "@/tests/helpers/v1-route";
 import { getRepositories } from "@/db/container";
 import { setupTestDb, resetTestDb } from "../helpers/db";
@@ -23,7 +22,7 @@ const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 
 function choose(guestId: string | null, cookie?: string, key?: string) {
   return PUT(
-    new NextRequest("http://test/api/v1/me/identity", {
+    new Request("http://test/api/v1/me/identity", {
       method: "PUT",
       headers: {
         "content-type": "application/json",
@@ -36,9 +35,7 @@ function choose(guestId: string | null, cookie?: string, key?: string) {
 }
 
 const signOut = () =>
-  DELETE(
-    new NextRequest("http://test/api/v1/me/identity", { method: "DELETE" })
-  );
+  DELETE(new Request("http://test/api/v1/me/identity", { method: "DELETE" }));
 
 async function protect(guestId: string) {
   await getRepositories().guests.setAuthProtection(guestId, {
@@ -62,7 +59,7 @@ function expectSessionCookie(res: Response) {
 
 const whoAmI = (cookie?: string) =>
   GET(
-    new NextRequest("http://test/api/v1/me/identity", {
+    new Request("http://test/api/v1/me/identity", {
       headers: cookie ? { cookie } : {},
     })
   );

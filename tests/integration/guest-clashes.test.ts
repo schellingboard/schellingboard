@@ -8,7 +8,6 @@ import {
   vi,
 } from "vitest";
 
-import { NextRequest } from "next/server";
 import { GET } from "@/tests/helpers/v1-route";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
@@ -44,7 +43,7 @@ async function detectGuestClashes(input: {
   if (input.excludeSessionId)
     query.set("excludeSessionId", input.excludeSessionId);
   const res = await GET(
-    new NextRequest(`http://test/api/v1/host-clashes?${query}`, {
+    new Request(`http://test/api/v1/host-clashes?${query}`, {
       headers: { cookie: `${GUEST_COOKIE_NAME}=${caller}` },
     })
   );

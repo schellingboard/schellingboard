@@ -11,19 +11,12 @@ import {
 
 const cookieJar = new Map<string, string>();
 
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-}));
+const cookieStore = () => ({
+  get: (name: string) => {
+    const value = cookieJar.get(name);
+    return value === undefined ? undefined : { name, value };
+  },
+});
 
 import { isoDay } from "../helpers/dates";
 import { setupTestDb, resetTestDb } from "../helpers/db";
@@ -36,9 +29,7 @@ import {
 } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, verifiedGuestValue } from "../helpers/guest-cookie";
 import { getRepositories } from "@/db/container";
-import { cookies } from "next/headers";
-import { pageReads } from "@/server/composition";
-import type { MeetingOption } from "@/utils/meeting-options";
+import { meetingOptionsFor, type MeetingOption } from "@/utils/meeting-options";
 import { verifiedCurrentUser } from "@/utils/acting-guest";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
@@ -82,10 +73,12 @@ type Option = MeetingOption;
 // The profile resolves the viewer from their cookie before calling, so the
 // signed-out case stays a real one.
 const listMeetingOptions = async (recipientId: string): Promise<Option[]> =>
-  pageReads().meetingOptions(
-    await verifiedCurrentUser(await cookies()),
+  meetingOptionsFor(
+    await verifiedCurrentUser(cookieStore()),
     recipientId,
-    await getRepositories().events.list()
+    await getRepositories().events.list(),
+    getRepositories(),
+    new Date()
   );
 
 const allSlots = (option: Option, slotCount = 1) =>
