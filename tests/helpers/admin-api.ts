@@ -1,4 +1,3 @@
-import { NextRequest } from "next/server";
 import { DELETE, GET, POST, PUT } from "@/tests/helpers/v1-route";
 import { createAdminAuthCookie } from "./admin-cookie";
 
@@ -45,7 +44,7 @@ async function sendRaw<T = unknown>(
   const form = body instanceof FormData;
   if (body !== undefined && !form) headers["content-type"] = "application/json";
   const res = await HANDLERS[method](
-    new NextRequest(`http://test/api/v1${path}`, {
+    new Request(`http://test/api/v1${path}`, {
       method,
       headers,
       body: body === undefined ? undefined : form ? body : JSON.stringify(body),

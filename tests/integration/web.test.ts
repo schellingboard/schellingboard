@@ -101,13 +101,6 @@ describe("web: pages are the SPA's", () => {
     expect((await throughWeb("/api/v1/auth/site")).status).not.toBe(401);
   });
 
-  it("gates /legacy like any page, then finds nothing there", async () => {
-    const anonymous = await throughWeb("/legacy/conf");
-    expect(new URL(anonymous.headers.get("location")!).pathname).toBe("/login");
-    const cookie = await createAuthCookie();
-    expect((await throughWeb("/legacy/conf", {}, [cookie])).status).toBe(404);
-  });
-
   it("answers an unknown /api path with problem details, not the shell", async () => {
     const cookie = await createAuthCookie();
     const res = await throughWeb("/api/nothing", {}, [cookie]);
@@ -125,11 +118,14 @@ describe("web: pages are the SPA's", () => {
     }
   });
 
-  it("denies framing and sniffing on every response", async () => {
+  it("denies framing and sniffing and trims the referrer on every response", async () => {
     for (const p of ["/api/health", "/media/site/x.webp", "/conf"]) {
       const res = await throughWeb(p);
       expect(res.headers.get("x-frame-options"), p).toBe("DENY");
       expect(res.headers.get("x-content-type-options"), p).toBe("nosniff");
+      expect(res.headers.get("referrer-policy"), p).toBe(
+        "strict-origin-when-cross-origin"
+      );
     }
   });
 });

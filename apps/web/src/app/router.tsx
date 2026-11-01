@@ -27,7 +27,7 @@ import {
   SiteLoginPage,
 } from "./account-pages";
 import { HomePage } from "./home-page";
-import { LegacyForward } from "./legacy-forward";
+import { NotFound } from "./not-found";
 import { MeetingsPage } from "./meetings-page";
 import { PeoplePage } from "./people-pages";
 import {
@@ -46,7 +46,7 @@ const rootRoute = createRootRoute({ component: Outlet });
 const catchAll = createRoute({
   getParentRoute: () => rootRoute,
   path: "$",
-  component: LegacyForward,
+  component: NotFound,
 });
 
 export function createAppRouter(

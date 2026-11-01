@@ -8,7 +8,6 @@ import {
   afterEach,
   vi,
 } from "vitest";
-import { NextRequest } from "next/server";
 import { GET } from "@/tests/helpers/v1-route";
 import { getRepositories } from "@/db/container";
 import { setupTestDb, resetTestDb } from "../helpers/db";
@@ -136,7 +135,7 @@ async function snapshotAs(
   cookie?: string
 ) {
   const res = await GET(
-    new NextRequest(`http://test/api/v1/events/${w.event.slug}/snapshot`, {
+    new Request(`http://test/api/v1/events/${w.event.slug}/snapshot`, {
       headers: cookie ? { cookie } : {},
     })
   );
@@ -184,7 +183,7 @@ describe("GET /api/v1/events/{slug}/snapshot", () => {
     const w = await world();
     const now = async (headers: Record<string, string>) => {
       const res = await GET(
-        new NextRequest(`http://test/api/v1/events/${w.event.slug}/snapshot`, {
+        new Request(`http://test/api/v1/events/${w.event.slug}/snapshot`, {
           headers,
         })
       );
@@ -200,7 +199,7 @@ describe("GET /api/v1/events/{slug}/snapshot", () => {
 
   it("answers an unknown event with event.notFound", async () => {
     const res = await GET(
-      new NextRequest("http://test/api/v1/events/nope/snapshot")
+      new Request("http://test/api/v1/events/nope/snapshot")
     );
     expect(res.status).toBe(404);
     expect(await res.json()).toMatchObject({

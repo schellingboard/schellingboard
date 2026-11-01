@@ -1,5 +1,4 @@
 import type { Repositories } from "@/db/container";
-import { serverNow } from "@/utils/dev-clock-server";
 import {
   maxMeetingSlots,
   meetingMinutes,
@@ -71,7 +70,7 @@ export async function meetingOptionsFor(
   recipientId: string,
   events: Event[],
   repos: MeetingOptionRepos,
-  now?: Date
+  now: Date
 ): Promise<MeetingOption[]> {
   // Booking yourself is not a thing, and an unidentified visitor has no
   // schedule to compare against.
@@ -86,7 +85,6 @@ export async function meetingOptionsFor(
     (attending.get(recipientId) ?? []).map((e) => e.id)
   );
 
-  now ??= await serverNow();
   const options: MeetingOption[] = [];
   for (const { id: eventId } of viewerEvents) {
     if (!sharedIds.has(eventId)) continue;

@@ -8,13 +8,12 @@ import {
   afterEach,
   vi,
 } from "vitest";
-import { NextRequest } from "next/server";
 import { POST } from "@/tests/helpers/v1-route";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 
 const dispatch = () =>
   POST(
-    new NextRequest("http://test/api/v1/dev/reminders", {
+    new Request("http://test/api/v1/dev/reminders", {
       method: "POST",
       headers: { "Idempotency-Key": crypto.randomUUID() },
     })

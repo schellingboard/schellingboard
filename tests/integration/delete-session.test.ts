@@ -8,7 +8,6 @@ import {
   afterEach,
   vi,
 } from "vitest";
-import { NextRequest } from "next/server";
 
 vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
@@ -46,22 +45,19 @@ async function protectGuest(guestId: string): Promise<void> {
   });
 }
 
-function makeAddReq(payload: unknown): NextRequest {
+function makeAddReq(payload: unknown): Request {
   // Creating requires a name to be selected; these fixtures only seed a
   // session, so act as its first host.
   const hostId = (payload as SessionParams).hosts[0].id;
-  return new NextRequest("http://test/session-form", {
+  return new Request("http://test/session-form", {
     method: "POST",
     body: JSON.stringify(payload),
     headers: { cookie: `${GUEST_COOKIE_NAME}=${openGuestValue(hostId)}` },
   });
 }
 
-function makeDeleteReq(
-  id: string,
-  opts?: { editorGuestId?: string }
-): NextRequest {
-  return new NextRequest("http://test/session-form", {
+function makeDeleteReq(id: string, opts?: { editorGuestId?: string }): Request {
+  return new Request("http://test/session-form", {
     method: "POST",
     body: JSON.stringify({ id }),
     headers: opts?.editorGuestId
@@ -73,8 +69,8 @@ function makeDeleteReq(
 async function makeDeleteReqWithAuthCookie(
   id: string,
   editorGuestId: string
-): Promise<NextRequest> {
-  return new NextRequest("http://test/session-form", {
+): Promise<Request> {
+  return new Request("http://test/session-form", {
     method: "POST",
     body: JSON.stringify({ id }),
     headers: {

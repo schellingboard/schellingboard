@@ -191,7 +191,7 @@ describe("components", () => {
   });
 
   it("name a token rather than a literal colour", () => {
-    const root = path.join(__dirname, "../../app");
+    const root = path.join(__dirname, "../../apps/web/src");
     const offenders = [...sources(root)].flatMap((file) =>
       [...readFileSync(file, "utf8").matchAll(LITERAL_COLOR)].map(
         ([match]) => `${path.relative(root, file)}: ${match}`

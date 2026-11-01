@@ -1,4 +1,3 @@
-import { NextRequest } from "next/server";
 import { DELETE, POST, PUT } from "@/tests/helpers/v1-route";
 
 export type Problem = {
@@ -27,7 +26,7 @@ export async function callApi(
   if (body) headers["content-type"] = "application/json";
   if (key) headers["idempotency-key"] = key;
   const res = await { POST, PUT, DELETE }[method](
-    new NextRequest(`http://test/api/v1${path}`, {
+    new Request(`http://test/api/v1${path}`, {
       method,
       headers,
       body: body && JSON.stringify(body),

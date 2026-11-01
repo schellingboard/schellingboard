@@ -1,6 +1,5 @@
 // @module-tag 006-US1
 import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
-import { NextRequest } from "next/server";
 
 vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
@@ -37,8 +36,8 @@ function makeReq(
   url: string,
   payload: unknown,
   actingGuestId?: string
-): NextRequest {
-  return new NextRequest(url, {
+): Request {
+  return new Request(url, {
     method: "POST",
     body: JSON.stringify(payload),
     headers: actingGuestId

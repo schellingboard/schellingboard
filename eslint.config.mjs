@@ -1,18 +1,5 @@
-import coreWebVitals from "eslint-config-next/core-web-vitals";
-import nextTypescript from "eslint-config-next/typescript";
+import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
-
-// eslint-config-next bundles its own typescript-eslint, so it registers
-// @typescript-eslint from a different module instance than our top-level dep.
-// Strip that registration here so tseslint.configs.recommendedTypeChecked
-// below is the sole registrar — one instance, no flat-config plugin conflict.
-function dropTsPlugin(configs) {
-  return configs.map((cfg) => {
-    if (!cfg.plugins?.["@typescript-eslint"]) return cfg;
-    const { "@typescript-eslint": _, ...rest } = cfg.plugins;
-    return { ...cfg, plugins: rest };
-  });
-}
 
 // "Now" enters at the request boundary and is passed down; reading an ambient
 // clock deeper in silences the dev fake clock. See docs/dev/adr/0004-dev-fake-clock.md.
@@ -45,9 +32,7 @@ export default tseslint.config(
     // is big enough to run eslint out of heap, so an E2E run would otherwise
     // leave `make lint` crashing until the report is deleted.
     ignores: [
-      "tailwind.config.ts",
       ".dependency-cruiser.cjs",
-      ".next/**",
       "apps/web/dist/**",
       "dist/**",
       "**/*.mjs",
@@ -64,9 +49,8 @@ export default tseslint.config(
       ".claude/worktrees/**",
     ],
   },
-  ...dropTsPlugin(coreWebVitals),
-  ...dropTsPlugin(nextTypescript),
   ...tseslint.configs.recommendedTypeChecked,
+  reactHooks.configs.flat.recommended,
   {
     languageOptions: {
       parserOptions: {
@@ -86,15 +70,6 @@ export default tseslint.config(
     },
   },
   {
-    // Not a Next app: its links are plain anchors, to /legacy pages the router
-    // does not know, and its images are plain elements.
-    files: ["apps/web/**/*.{ts,tsx}"],
-    rules: {
-      "@next/next/no-html-link-for-pages": "off",
-      "@next/next/no-img-element": "off",
-    },
-  },
-  {
     files: ["db/repositories/sqlite/*.ts"],
     rules: {
       "@typescript-eslint/require-await": "off",
@@ -102,7 +77,6 @@ export default tseslint.config(
   },
   {
     files: [
-      "app/**/*.{ts,tsx,js,jsx}",
       "db/**/*.{ts,js}",
       "emails/**/*.{ts,tsx,js,jsx}",
       "packages/*/src/**/*.ts",

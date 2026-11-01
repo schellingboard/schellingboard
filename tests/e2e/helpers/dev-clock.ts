@@ -37,19 +37,7 @@ export async function setDevClock(page: Page, target: DateTime) {
   // A test that lands on the same simulated moment twice hits exactly this —
   // the override cookie survives the user switch in between.
   if ((await picker.inputValue()) === value) return;
-  // The legacy pages refresh in place (wait for that RSC response, or aborting
-  // it fails the console guard); the SPA reloads instead. Whichever comes first.
-  const moved = Promise.race([
-    page
-      .waitForResponse(
-        (res) =>
-          res.ok() &&
-          res.request().headers()["rsc"] === "1" &&
-          !res.request().headers()["next-router-prefetch"]
-      )
-      .then((res) => res.finished()),
-    page.waitForEvent("load"),
-  ]).catch(() => undefined);
+  const moved = page.waitForEvent("load").catch(() => undefined);
   await picker.fill(value);
   // The toolbar prints the simulated instant in UTC; for the afternoon targets
   // these tests use, the calendar date is the same as Berlin's, so match on

@@ -8,7 +8,6 @@ import {
   afterEach,
   vi,
 } from "vitest";
-import { NextRequest } from "next/server";
 
 vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
@@ -50,7 +49,7 @@ async function protectGuest(guestId: string): Promise<void> {
 function makeReq(
   payload: unknown,
   opts?: { editorGuestId?: string; verified?: boolean; key?: string }
-): NextRequest {
+): Request {
   // Creating requires a name to be selected, so default to the payload's
   // first host: the ordinary case of a host booking their own session.
   const actingGuestId =
@@ -58,7 +57,7 @@ function makeReq(
   const cookies: string[] = [];
   if (actingGuestId)
     cookies.push(`${GUEST_COOKIE_NAME}=${openGuestValue(actingGuestId)}`);
-  return new NextRequest("http://test/session-form", {
+  return new Request("http://test/session-form", {
     method: "POST",
     body: JSON.stringify(payload),
     // The guest cookie identifies the acting guest, like the site sets it.
@@ -72,8 +71,8 @@ function makeReq(
 async function makeReqWithAuthCookie(
   payload: unknown,
   editorGuestId: string
-): Promise<NextRequest> {
-  return new NextRequest("http://test/session-form", {
+): Promise<Request> {
+  return new Request("http://test/session-form", {
     method: "POST",
     body: JSON.stringify(payload),
     headers: {

@@ -174,9 +174,7 @@ web.all("*", async (c) => {
   const open = underRoot(pathname, "/admin") || pathname === "/login";
   const refusal = open ? null : await requireSiteCookie(c);
   if (refusal) return refusal;
-  const served = ["/api", "/media", "/legacy"].some((r) =>
-    underRoot(pathname, r)
-  );
+  const served = ["/api", "/media"].some((r) => underRoot(pathname, r));
   if (served || (c.req.method !== "GET" && c.req.method !== "HEAD"))
     return problemResponse({ status: 404, code: "route.notFound" });
   return serveSpaShell(spaDir(), getBuildId());

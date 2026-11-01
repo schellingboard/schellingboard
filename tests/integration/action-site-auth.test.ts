@@ -8,26 +8,6 @@ import {
   afterEach,
   vi,
 } from "vitest";
-import { NextRequest } from "next/server";
-
-const cookieJar = new Map<string, string>();
-
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
-const revalidatePath = vi.fn();
-vi.mock("next/cache", () => ({
-  revalidatePath: (...args: unknown[]) => {
-    revalidatePath(...args);
-  },
-}));
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import {
@@ -47,7 +27,6 @@ describe("creation requires a selected name", () => {
   beforeAll(() => setupTestDb());
   beforeEach(() => {
     resetTestDb();
-    cookieJar.clear();
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
     vi.stubEnv("SITE_PASSWORD", "site-pw");
   });
@@ -62,7 +41,7 @@ describe("creation requires a selected name", () => {
     const day = await createDay(event.id);
 
     const res = await addSession(
-      new NextRequest("http://test/session-form", {
+      new Request("http://test/session-form", {
         method: "POST",
         body: JSON.stringify({
           title: "T",

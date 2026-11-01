@@ -14,11 +14,6 @@ const ALLOWED_CONSOLE_PATTERNS: RegExp[] = [
   // sign-out deliberately hard-reloads right after the request resolves, so
   // this can happen there too.
   /Error in input stream/,
-  // Same root cause as above, different wording: a hard reload can also
-  // abort an in-flight background prefetch of another page's RSC payload,
-  // which Next's client runtime reports as an uncaught "Error: Connection
-  // closed" while reading that stream.
-  /Error: Connection closed\./,
   // Firefox quirk: a reload or navigation that lands while the schedule's
   // change feed (an EventSource) is connecting is logged as a failed
   // connection, even though the page closes the stream as it leaves.
@@ -28,31 +23,6 @@ const ALLOWED_CONSOLE_PATTERNS: RegExp[] = [
   // The seeded photos are static files, so real damage would fail every run.
   /Image corrupt or truncated.*\/locations\/[\w-]+\.jpg/,
 ];
-
-// Paths the server answers itself. Any other root path gets the SPA shell,
-// which forwards to /legacy once it has loaded.
-const SERVER_PATH =
-  /^\/(legacy|api|media|locations|_next|_spa|sw\.js|manifest\.webmanifest|favicon\.ico|icon|apple-touch-icon|one-on-one)(\/|\.|-|$)/;
-
-// An event's own page, `/{slug}`, and its proposals screens, which the SPA serves.
-// Its 1-on-1 modal is still the legacy schedule's, which the SPA hands the address to.
-function isEventPage(url: string): boolean {
-  const slug = /^\/([^/?#]+)(?:\/proposals(?:\/[^?#]*)?)?(?:[?#].*)?$/.exec(
-    url
-  )?.[1];
-  return slug !== undefined && slug !== "admin";
-}
-
-const isRootPage = (url: string) => /^\/(?:[?#]|$)/.test(url);
-
-const isPeoplePage = (url: string) => /^\/guests(?:[/?#]|$)/.test(url);
-
-const isAccountPage = (url: string) =>
-  /^\/(?:settings|notifications|account-security|auth\/(?:login|reset)|join\/[^/?#]+|login)(?:[?#]|$)/.test(
-    url
-  );
-
-const isAdminPage = (url: string) => /^\/admin(?:[/?#]|$)/.test(url);
 
 function isAllowed(text: string): boolean {
   return ALLOWED_CONSOLE_PATTERNS.some((re) => re.test(text));
@@ -65,27 +35,6 @@ function formatConsoleMessage(msg: ConsoleMessage): string {
 }
 
 export const test = base.extend<{ consoleGuard: void }>({
-  // Specs go to a legacy page directly: through the shell, a click can land
-  // before the page behind it has hydrated. The hop has its own spec (@014-US4).
-  // The root list, an event's schedule and the people, settings and
-  // notification screens are the SPA's own, so they are opened as they are.
-  page: async ({ page }, provide) => {
-    const goto = page.goto.bind(page);
-    page.goto = (url, options) =>
-      goto(
-        url.startsWith("/") &&
-          !SERVER_PATH.test(url) &&
-          !isRootPage(url) &&
-          !isEventPage(url) &&
-          !isPeoplePage(url) &&
-          !isAccountPage(url) &&
-          !isAdminPage(url)
-          ? `/legacy${url}`
-          : url,
-        options
-      );
-    await provide(page);
-  },
   consoleGuard: [
     async ({ page }, use) => {
       const consoleErrors: string[] = [];

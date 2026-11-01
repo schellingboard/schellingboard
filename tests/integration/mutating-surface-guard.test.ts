@@ -19,24 +19,7 @@ vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
 }));
 
-const cookieJar = new Map<string, string>();
-
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-}));
-
 import { setupTestDb, resetTestDb } from "../helpers/db";
-import { siteAuthenticate } from "../helpers/site-auth";
 import {
   createDay,
   createEvent,
@@ -107,11 +90,9 @@ const VERIFIERS: Record<string, Verifier> = {
 
 describe("mutating-surface regression guard", () => {
   beforeAll(() => setupTestDb());
-  beforeEach(async () => {
+  beforeEach(() => {
     resetTestDb();
-    cookieJar.clear();
     vi.stubEnv("AUTH_SECRET", VALID_SECRET);
-    await siteAuthenticate(cookieJar);
   });
   afterEach(() => vi.unstubAllEnvs());
 

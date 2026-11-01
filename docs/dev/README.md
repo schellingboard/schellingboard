@@ -1,8 +1,8 @@
 # SchellingBoard developer documentation
 
-SchellingBoard is a Next.js scheduling app for participant-driven events — attendees propose
-sessions, vote on them, and the accepted ones are scheduled onto a grid of rooms and time slots. It
-is self-hosted, backed by a single SQLite file, and documented for its users at
+SchellingBoard is a scheduling app for participant-driven events — attendees propose sessions, vote
+on them, and the accepted ones are scheduled onto a grid of rooms and time slots. It is self-hosted,
+backed by a single SQLite file, and documented for its users at
 [docs.schellingboard.org](https://docs.schellingboard.org).
 
 This site is for people working _on_ it. It tracks `main`, so it describes the code as it is now
@@ -21,16 +21,16 @@ the repository.
 
 ## Reference
 
-| Chapter                                             | For                                                      |
-| --------------------------------------------------- | -------------------------------------------------------- |
-| [Architecture rules](architecture-rules.md)         | the conventions the build enforces, and how to add one   |
-| [The server and the API](server.md)                 | `server/` and `/api/v1`: adding a use case and its route |
-| [The web app](web-app.md)                           | `apps/web`: the SPA, how Next serves it, running it      |
-| [Database migrations](migrations.md)                | generating migrations, resolving drizzle conflicts       |
-| [Running multiple instances](multiple-instances.md) | ports and env files when several clones share a machine  |
-| [Documentation and the sites](documentation.md)     | how the three published sites are built                  |
-| [Releasing a new version](releasing.md)             | tagging, the release checklist, publishing Docker images |
-| [GitHub issues](github-issues.md)                   | setting Issue Type and Priority via `gh api graphql`     |
+| Chapter                                             | For                                                       |
+| --------------------------------------------------- | --------------------------------------------------------- |
+| [Architecture rules](architecture-rules.md)         | the conventions the build enforces, and how to add one    |
+| [The server and the API](server.md)                 | `server/` and `/api/v1`: adding a use case and its route  |
+| [The web app](web-app.md)                           | `apps/web`: the SPA, how the server serves it, running it |
+| [Database migrations](migrations.md)                | generating migrations, resolving drizzle conflicts        |
+| [Running multiple instances](multiple-instances.md) | ports and env files when several clones share a machine   |
+| [Documentation and the sites](documentation.md)     | how the three published sites are built                   |
+| [Releasing a new version](releasing.md)             | tagging, the release checklist, publishing Docker images  |
+| [GitHub issues](github-issues.md)                   | setting Issue Type and Priority via `gh api graphql`      |
 
 ## Design
 

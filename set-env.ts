@@ -44,7 +44,7 @@ const nodeEnvMap: Record<string, string> = {
 };
 const env: NodeJS.ProcessEnv = {
   ...process.env,
-  NODE_ENV: (nodeEnvMap[mode] ?? mode) as NodeJS.ProcessEnv["NODE_ENV"],
+  NODE_ENV: nodeEnvMap[mode] ?? mode,
 };
 const spawnResult = spawnSync(cmd, args, {
   stdio: "inherit",
