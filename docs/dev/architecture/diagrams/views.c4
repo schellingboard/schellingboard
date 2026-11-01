@@ -11,7 +11,7 @@ views {
   view containers of sb {
     title 'L2 · Containers'
     description 'One process, one static bundle, one database file.'
-    include *, attendee, bot, smtp, pushService, chatPlatform
+    include *, attendee, smtp, pushService
     autoLayout LeftRight
   }
 
@@ -23,11 +23,11 @@ views {
   }
 
   view modules of sb.server {
-    title 'L3 · Server: module dependencies'
-    description 'Solid arrows are direct use-case calls (allowed only downward). Dashed arrows are reactions to recorded changes: the reacting module depends on the other, never the reverse.'
-    include sb.server.mEvents, sb.server.mVenue, sb.server.mPeople, sb.server.mIdentity,
-            sb.server.mProposals, sb.server.mScheduling, sb.server.mMeetings,
-            sb.server.mPersonal, sb.server.mNotifications
+    title 'L3 · Server: modules'
+    description 'Modules hold the business rules and import each other only through module.ts; meetings reads events. Notifications are created by the jobs loop reacting to recorded changes.'
+    include sb.server.mEvents, sb.server.mVenue, sb.server.mPeople, sb.server.mProposals,
+            sb.server.mSessions, sb.server.mComments, sb.server.mMeetings,
+            sb.server.mNotifications, sb.server.mSettings, sb.server.mUpdates
     autoLayout BottomTop
   }
 
@@ -43,33 +43,30 @@ views {
     attendee -> sb.web.features 'taps RSVP on a session'
     sb.web.features -> sb.web.commands 'rsvp(sessionId)'
     sb.web.commands -> sb.web.replica 'apply predicted change (policy says allowed, capacity not exceeded)'
-    sb.web.commands -> sb.server.http 'POST /events/{slug}/sessions/{id}/rsvp (Idempotency-Key)'
-    sb.server.http -> sb.server.mScheduling 'rsvp use case: authorize, check phase and capacity, write, record change'
-    sb.server.mScheduling -> sb.server.kernel 'commit state + change in one transaction'
+    sb.web.commands -> sb.server.http 'PUT /sessions/{id}/rsvps/{guestId} (Idempotency-Key)'
+    sb.server.http -> sb.server.mSessions 'rsvp use case: check phase and capacity, write, record change'
+    sb.server.mSessions -> sb.server.kernel 'commit state + change in one transaction'
     sb.server.kernel -> sb.server.feed 'publish change seq N'
     sb.server.feed -> sb.web.replica 'change seq N to every viewer of the event (this one matches it to the prediction by command_key)'
-    sb.server.http -> sb.web.commands '201 with the recorded change'
+    sb.server.http -> sb.web.commands 'the result, with the recorded change'
   }
 
-  dynamic view flowSessionMoved {
-    title 'Flow · Organizer moves a session; attendees are told'
-    organizer -> sb.server.http 'POST /sessions/{id}/move'
-    sb.server.http -> sb.server.mScheduling 'move use case: booking rules, reserved windows, clash check'
-    sb.server.mScheduling -> sb.server.kernel 'record SessionMoved'
-    sb.server.kernel -> sb.server.feed 'publish to event audience'
-    sb.server.jobs -> sb.server.mNotifications "reaction: SessionMoved -> notifications for hosts and RSVP'd attendees"
-    sb.server.mNotifications -> sb.server.kernel 'record NotificationCreated (audience: one person each)'
-    sb.server.jobs -> sb.server.mNotifications 'delivery per bound channel with attempt log'
-    sb.server.mNotifications -> smtp 'email'
-    sb.server.mNotifications -> pushService 'push'
-    sb.server.mNotifications -> chatPlatform 'chat message'
+  dynamic view flowSessionChanged {
+    title 'Flow · Site admin edits a session; attendees are told'
+    siteAdmin -> sb.server.http 'PUT /sessions/{id}'
+    sb.server.http -> sb.server.mSessions 'update use case: clash check'
+    sb.server.mSessions -> sb.server.kernel 'record session.changed'
+    sb.server.kernel -> sb.server.feed 'publish to the event audience'
+    sb.server.jobs -> sb.server.mNotifications "reaction: session.changed -> notifications for hosts and RSVP'd attendees"
+    sb.server.jobs -> smtp 'delivery: email'
+    sb.server.jobs -> pushService 'delivery: push'
   }
 
   dynamic view flowJoin {
     title 'Flow · First login through a personal join link'
-    attendee -> sb.web.shell 'opens /join/{token} from email or QR'
+    attendee -> sb.web.shell 'opens /join/{token} from email'
     sb.web.shell -> sb.server.http 'POST /auth/join {token}'
-    sb.server.http -> sb.server.mIdentity 'validate token, create a verified login session'
+    sb.server.http -> sb.server.mPeople 'validate token, create a verified login session'
     sb.server.http -> sb.web.shell 'Set-Cookie (httpOnly, SameSite=Lax) + actor context'
     sb.web.shell -> sb.web.replica 'load event'
     sb.web.replica -> sb.server.feed 'GET snapshot, then subscribe since seq'
@@ -80,7 +77,7 @@ views {
     sb.web.pwa -> sb.web.shell 'app opened offline: shell from precache'
     sb.web.shell -> sb.web.replica 'load persisted replica (seq 4120), show "last synced 14:02"'
     sb.web.replica -> sb.server.feed 'GET feed?since=4120'
-    sb.server.feed -> sb.web.replica 'changes 4121..4187, or 410 Gone if pruned → full snapshot'
+    sb.server.feed -> sb.web.replica 'changes 4121..4187, or a reset message if pruned → full snapshot'
     sb.web.replica -> sb.web.features 're-render, banner disappears'
   }
 }

@@ -8,12 +8,13 @@
 ## Context
 
 A schedule shows what the server sent at render time. Nobody sees another person's edit or RSVP
-until they reload (#1111). The
-[target architecture](../target-architecture/03-server.md#change-feed-and-snapshot) solves this with
-a snapshot of the event and a feed of changes after it. The browser keeps a replica: it loads the
-snapshot and applies each change ([04](../target-architecture/04-client.md#the-replica)).
-[Step 4 of the path](../target-architecture/10-path-from-here.md) brings this to today's schedule
-(grid, agenda, kiosk, session modal) in the Next app.
+until they reload (#1111). The [target architecture](../server.md) solves this with a snapshot of
+the event and a feed of changes after it. The browser keeps a replica: it loads the snapshot and
+applies each change
+([04](https://github.com/schellingboard/schellingboard/blob/fb2a2cba1d05ab0421aee2985bc0d75db3c41323/docs/dev/target-architecture/04-client.md)).
+Step 4 of the
+[path](https://github.com/schellingboard/schellingboard/blob/fb2a2cba1d05ab0421aee2985bc0d75db3c41323/docs/dev/target-architecture/10-path-from-here.md)
+brings this to today's schedule (grid, agenda, kiosk, session modal) in the Next app.
 
 What exists: the change log (ADR 0011), logging only `session.changed` and `session.deleted`, whose
 payloads hold reaction fields (`before`, `rsvpGuestIds`). The unit of work (ADR 0013) records
@@ -56,8 +57,9 @@ it, including `version` where the row has one, so a form opened from the replica
   so a change to one is recorded once for each event that shows it, with that `event_id`. A location
   taken out of an event is `location.removed` for that event. The feed's resume query stays
   `WHERE event_id = ? AND seq > ?`. This supersedes the target's `NULL` `event_id` for site-level
-  changes ([06](../target-architecture/06-data-and-time.md#the-change-log-table)): a per-event feed
-  cannot resume over such rows.
+  changes
+  ([06](https://github.com/schellingboard/schellingboard/blob/fb2a2cba1d05ab0421aee2985bc0d75db3c41323/docs/dev/target-architecture/06-data-and-time.md)):
+  a per-event feed cannot resume over such rows.
 - **Event guests** are the guests the event shows everyone: its members and its sessions' hosts (a
   host need not be a member, and leaving keeps hosted sessions). `guest.joined` and `guest.left`
   mean entering and leaving that set, so `hostIds` always resolve. Each carries `member`, since the
@@ -69,8 +71,11 @@ it, including `version` where the row has one, so a form opened from the replica
 - **Audiences** are the three that today's model has: `{ kind: "event" }`, `{ kind: "guests", ids }`
   and `{ kind: "admins" }`. `event` means anyone who may open the event page today, which is anyone
   past the site password. No schedule type needs `admins` yet. The target's `persons` and
-  `organizers` ([03](../target-architecture/03-server.md#change-log)) are deliberately not used: the
-  ids are guest ids, and a stored `persons` row would name the wrong kind of id. Step 6 of the path
+  `organizers`
+  ([03](https://github.com/schellingboard/schellingboard/blob/fb2a2cba1d05ab0421aee2985bc0d75db3c41323/docs/dev/target-architecture/03-server.md))
+  are deliberately not used: the ids are guest ids, and a stored `persons` row would name the wrong
+  kind of id. Step 6 of the
+  [path](https://github.com/schellingboard/schellingboard/blob/fb2a2cba1d05ab0421aee2985bc0d75db3c41323/docs/dev/target-architecture/10-path-from-here.md)
   maps the stored kinds when persons arrive.
 
 ### 2. Who receives guest-addressed changes
@@ -237,7 +242,9 @@ connection that closes unregisters.
 - Snapshot and feed message contracts live in `packages/contracts`.
 - The client store lives in `app/legacy/(site)/[eventSlug]/replica/`: the store, the `EventSource`
   client, the sync state and the selectors, with no React. One hook connects them to `EventContext`.
-  Step 5 of the path moves the store to the SPA unchanged.
+  Step 5 of the
+  [path](https://github.com/schellingboard/schellingboard/blob/fb2a2cba1d05ab0421aee2985bc0d75db3c41323/docs/dev/target-architecture/10-path-from-here.md)
+  moves the store to the SPA unchanged.
 
 ## Consequences
 

@@ -8,12 +8,14 @@
 
 ## Context
 
-[Step 5 of the path](../target-architecture/10-path-from-here.md) moves the screens from Next to a
-single-page app, one family at a time, starting with the schedule.
-[D1](../target-architecture/08-decisions.md#d1) and [D9](../target-architecture/08-decisions.md#d9)
-already chose the stack: a static React SPA built with Vite, TanStack Router, a small reactive
-store, Tailwind with the existing tokens, no server-side rendering.
-[04](../target-architecture/04-client.md) describes the end state.
+Step 5 of the
+[path](https://github.com/schellingboard/schellingboard/blob/fb2a2cba1d05ab0421aee2985bc0d75db3c41323/docs/dev/target-architecture/10-path-from-here.md)
+moves the screens from Next to a single-page app, one family at a time, starting with the schedule.
+[D1](../architecture/decisions.md#d1) and [D9](../architecture/decisions.md#d9) already chose the
+stack: a static React SPA built with Vite, TanStack Router, a small reactive store, Tailwind with
+the existing tokens, no server-side rendering.
+[04](https://github.com/schellingboard/schellingboard/blob/fb2a2cba1d05ab0421aee2985bc0d75db3c41323/docs/dev/target-architecture/04-client.md)
+describes the end state.
 
 What exists: the schedule (grid, agenda, kiosk, session modal) reads from a replica seeded by SSR
 and kept current by the feed (ADR 0014), in `app/legacy/(site)/[eventSlug]/replica/`. RSVPs
@@ -52,9 +54,10 @@ itself.
 
 `apps/web` is a new workspace package: `app/`, `replica/`, `commands/`, `queries/` (paged or
 restricted reads such as comments and attendee lists), `features/`, `ui/`, `pwa/`, as in
-[04](../target-architecture/04-client.md#layout). It imports `packages/domain`, `packages/contracts`
-and `packages/api-client` only: never `app/`, `server/`, `utils/` or `next/*`. Nothing imports
-`apps/web`. `features/` never imports `api-client`. dependency-cruiser enforces these rules.
+[04](https://github.com/schellingboard/schellingboard/blob/fb2a2cba1d05ab0421aee2985bc0d75db3c41323/docs/dev/target-architecture/04-client.md).
+It imports `packages/domain`, `packages/contracts` and `packages/api-client` only: never `app/`,
+`server/`, `utils/` or `next/*`. Nothing imports `apps/web`. `features/` never imports `api-client`.
+dependency-cruiser enforces these rules.
 
 The SPA writes its own `ui/` (nav bar, user picker, modal, toast, markdown, form fields). Legacy
 pages keep theirs until they move. A moved screen's Next code (page, components, server actions,
@@ -73,12 +76,12 @@ as full page loads.
 ### 4. Commands
 
 One mechanism in `commands/` for every mutation, as in
-[04](../target-architecture/04-client.md#commands-and-optimistic-updates): predict with the domain
-policy, apply a pending change keyed by a new `Idempotency-Key`, call the API, and reconcile when
-the feed or the response brings the `command_key`. A network error retries with the same key; a
-`4xx` removes the prediction and shows the problem code. The first commands are RSVP add and remove
-and comment create. The RSVP rule moves into `packages/domain` so that the server and the client run
-the same policy. Today's `rsvp-overlay` is deleted with the Next schedule.
+[04](https://github.com/schellingboard/schellingboard/blob/fb2a2cba1d05ab0421aee2985bc0d75db3c41323/docs/dev/target-architecture/04-client.md):
+predict with the domain policy, apply a pending change keyed by a new `Idempotency-Key`, call the
+API, and reconcile when the feed or the response brings the `command_key`. A network error retries
+with the same key; a `4xx` removes the prediction and shows the problem code. The first commands are
+RSVP add and remove and comment create. The RSVP rule moves into `packages/domain` so that the
+server and the client run the same policy. Today's `rsvp-overlay` is deleted with the Next schedule.
 
 ### 5. Persistence and offline
 

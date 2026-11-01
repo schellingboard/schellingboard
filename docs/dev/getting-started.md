@@ -19,9 +19,8 @@ Where things live:
   rules) and `packages/contracts` (zod schemas); see [ADR 0010](adr/0010-workspace-packages.md)
 - **Migrations**: Drizzle-managed SQL migrations in `drizzle/`
 
-The design the codebase is moving towards is written up separately in
-[Target architecture](target-architecture/README.md); the rules the build enforces today are in
-[Architecture rules](architecture-rules.md).
+The architecture is written up separately in [Architecture](architecture/README.md); the rules the
+build enforces today are in [Architecture rules](architecture-rules.md).
 
 ## Prerequisites
 
