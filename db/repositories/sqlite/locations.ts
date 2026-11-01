@@ -1,18 +1,12 @@
-import { and, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
 import * as schema from "../../schema";
-import type { EventLocationPage, LocationsRepository } from "../interfaces";
+import type { LocationsRepository } from "../interfaces";
 import type { Location } from "@schellingboard/domain/location";
 
 type DB = BetterSQLite3Database<typeof schema>;
 type Tx = Parameters<Parameters<DB["transaction"]>[0]>[0];
-
-// Escape LIKE meta-characters so user input is matched literally. Pairs with an
-// explicit `ESCAPE '\'` clause in the query below.
-function escapeLike(value: string): string {
-  return value.replace(/[\\%_]/g, (ch) => `\\${ch}`);
-}
 
 function rowToLocation(row: typeof schema.locations.$inferSelect): Location {
   return {
@@ -39,71 +33,6 @@ export class SqliteLocationsRepository implements LocationsRepository {
       .orderBy(schema.locations.sortIndex, schema.locations.id)
       .all()
       .map(rowToLocation);
-  }
-
-  async searchForEventAssignment(
-    eventId: string,
-    opts: {
-      query?: string;
-      assigned?: boolean;
-      limit: number;
-      offset: number;
-    }
-  ): Promise<EventLocationPage> {
-    // A location is "assigned" when the event-scoped left join matches a row.
-    const joinCondition = and(
-      eq(schema.locations.id, schema.eventLocations.locationId),
-      eq(schema.eventLocations.eventId, eventId)
-    );
-
-    const conditions = [];
-    if (opts.assigned === true) {
-      conditions.push(isNotNull(schema.eventLocations.locationId));
-    } else if (opts.assigned === false) {
-      conditions.push(isNull(schema.eventLocations.locationId));
-    }
-    if (opts.query) {
-      const pattern = `%${escapeLike(opts.query)}%`;
-      conditions.push(
-        sql`${schema.locations.name} like ${pattern} escape '\\'`
-      );
-    }
-    const where = conditions.length > 0 ? and(...conditions) : undefined;
-
-    const totalRow = this.db
-      .select({ count: sql<number>`count(*)` })
-      .from(schema.locations)
-      .leftJoin(schema.eventLocations, joinCondition)
-      .where(where)
-      .get();
-
-    const rows = this.db
-      .select({
-        id: schema.locations.id,
-        name: schema.locations.name,
-        capacity: schema.locations.capacity,
-        assigned: sql<number>`(${schema.eventLocations.locationId} is not null)`,
-      })
-      .from(schema.locations)
-      .leftJoin(schema.eventLocations, joinCondition)
-      .where(where)
-      // id as tiebreaker: name is not unique, and without a deterministic
-      // order LIMIT/OFFSET pagination can duplicate or skip rows.
-      .orderBy(
-        sql`${schema.locations.name} collate nocase`,
-        schema.locations.id
-      )
-      .limit(opts.limit)
-      .offset(opts.offset)
-      .all()
-      .map((r) => ({
-        id: r.id,
-        name: r.name,
-        capacity: r.capacity,
-        assigned: Boolean(r.assigned),
-      }));
-
-    return { rows, total: totalRow?.count ?? 0 };
   }
 
   async listByEvent(eventId: string): Promise<Location[]> {

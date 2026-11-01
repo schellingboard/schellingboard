@@ -402,25 +402,6 @@ describe("liking a comment", () => {
     }
   );
 
-  it("toggles the acting guest's like", { tags: ["010-US6"] }, async () => {
-    const { guest, proposal } = await subjects();
-    const comment = await posted(guest.id, proposal);
-
-    const first = await comments().toggleCommentLike(
-      open(guest.id),
-      { commentId: comment.id },
-      now()
-    );
-    const second = await comments().toggleCommentLike(
-      open(guest.id),
-      { commentId: comment.id },
-      now()
-    );
-
-    expect(first).toEqual({ ok: true, value: true });
-    expect(second).toEqual({ ok: true, value: false });
-  });
-
   it(
     "sets a like idempotently and takes it back",
     { tags: ["010-US6"] },
@@ -470,9 +451,9 @@ describe("liking a comment", () => {
       await comments().deleteComment(open(guest.id), {
         commentId: comment.id,
       });
-      const gone = await comments().toggleCommentLike(
+      const gone = await comments().setCommentLike(
         open(guest.id),
-        { commentId: comment.id },
+        { commentId: comment.id, liked: true },
         now()
       );
 

@@ -206,26 +206,6 @@ export type NewGuest = {
   info: { email: string };
 };
 
-/** A guest paired with their email and whether they are assigned to a given event. */
-export type EventGuestRow = {
-  id: string;
-  name: string;
-  email: string;
-  assigned: boolean;
-};
-
-/** A page of guests plus the total count of rows matching the same filter. */
-export type EventGuestPage = {
-  rows: EventGuestRow[];
-  total: number;
-};
-
-/** A page of complete guests plus the total count matching the same filter. */
-export type GuestPage = {
-  rows: CompleteGuest[];
-  total: number;
-};
-
 export interface GuestsRepository {
   /**
    * Every guest with basic public fields only — no extended profile
@@ -252,16 +232,6 @@ export interface GuestsRepository {
   /** One event's guests with their whole public profile. */
   listProfilesByEvent(eventId: string): Promise<Guest[]>;
   /**
-   * Server-side paginated + searchable global user list. `query` matches name
-   * or email (case-insensitive substring, LIKE metacharacters matched
-   * literally). Ordered by name with id tiebreaker.
-   */
-  search(opts: {
-    query?: string;
-    limit: number;
-    offset: number;
-  }): Promise<GuestPage>;
-  /**
    * All guests as attendees (public profile fields plus whether they host any
    * session), ordered by name with id tiebreaker. Search, filtering, sorting
    * and pagination all happen in memory on top of this, in the browser (see
@@ -284,20 +254,6 @@ export interface GuestsRepository {
   listEventsByGuests(
     guestIds: string[]
   ): Promise<Map<string, { id: string; name: string }[]>>;
-  /**
-   * Server-side paginated + searchable guest list scoped to an event's
-   * assignment. `assigned` filters by membership (undefined = all); `query`
-   * matches name or email (case-insensitive substring). Ordered by name.
-   */
-  searchForEventAssignment(
-    eventId: string,
-    opts: {
-      query?: string;
-      assigned?: boolean;
-      limit: number;
-      offset: number;
-    }
-  ): Promise<EventGuestPage>;
   findById(id: string): Promise<CompleteGuest | undefined>;
   /** Server-only: protection flag + password hash, for credential checks. */
   getAuthCredentials(id: string): Promise<GuestAuthCredentials | null>;
@@ -382,37 +338,9 @@ export interface GuestsRepository {
   ): Promise<{ created: number }>;
 }
 
-/** A location paired with whether it is assigned to a given event. */
-export type EventLocationRow = {
-  id: string;
-  name: string;
-  capacity: number;
-  assigned: boolean;
-};
-
-/** A page of locations plus the total count of rows matching the same filter. */
-export type EventLocationPage = {
-  rows: EventLocationRow[];
-  total: number;
-};
-
 export interface LocationsRepository {
   /** All locations, ordered by sortIndex. */
   list(): Promise<Location[]>;
-  /**
-   * Server-side paginated + searchable location list scoped to an event's
-   * assignment. `assigned` filters by membership (undefined = all); `query`
-   * matches the name (case-insensitive substring). Ordered by name.
-   */
-  searchForEventAssignment(
-    eventId: string,
-    opts: {
-      query?: string;
-      assigned?: boolean;
-      limit: number;
-      offset: number;
-    }
-  ): Promise<EventLocationPage>;
   /** Locations assigned to the given event, ordered by sortIndex. */
   listByEvent(eventId: string): Promise<Location[]>;
   /**
@@ -486,12 +414,6 @@ export type SessionUpdateInput = Partial<
   expectedVersion?: number;
 };
 
-/** A page of sessions plus the total count of rows matching the same filter. */
-export type SessionPage = {
-  rows: Session[];
-  total: number;
-};
-
 export interface SessionsRepository {
   list(): Promise<Session[]>;
   listScheduled(): Promise<Session[]>;
@@ -499,15 +421,6 @@ export interface SessionsRepository {
   listScheduledByEvent(eventId: string): Promise<Session[]>;
   listHostedByGuest(guestId: string): Promise<Session[]>;
   listRsvpdByGuest(guestId: string): Promise<Session[]>;
-  /**
-   * Server-side paginated + searchable session list for an event. `query`
-   * matches the title or a host name (case-insensitive substring). Ordered by
-   * title.
-   */
-  searchByEvent(
-    eventId: string,
-    opts: { query?: string; limit: number; offset: number }
-  ): Promise<SessionPage>;
   findById(id: string): Promise<Session | undefined>;
   /**
    * How many people attended, or null when nobody has recorded it (0 is a
@@ -646,24 +559,9 @@ export type SessionProposalUpdateInput = {
   updatedTime: Date;
 };
 
-/** A page of proposals plus the total count of rows matching the same filter. */
-export type SessionProposalPage = {
-  rows: SessionProposal[];
-  total: number;
-};
-
 export interface SessionProposalsRepository {
   listByEvent(eventId: string): Promise<SessionProposal[]>;
   listByHost(guestId: string): Promise<SessionProposal[]>;
-  /**
-   * Server-side paginated + searchable proposal list for an event. `query`
-   * matches the title or a host name (case-insensitive substring). Ordered by
-   * title.
-   */
-  searchByEvent(
-    eventId: string,
-    opts: { query?: string; limit: number; offset: number }
-  ): Promise<SessionProposalPage>;
   findById(id: string): Promise<SessionProposal | undefined>;
   create(data: SessionProposalCreateInput): Promise<SessionProposal>;
   /**
@@ -688,11 +586,6 @@ export interface SessionProposalsRepository {
 export interface CommentsRepository {
   findById(commentId: string): Promise<Comment | undefined>;
   update(id: string, data: { body: string; editedTime: Date }): Promise<void>;
-  toggleLike(data: {
-    commentId: string;
-    guestId: string;
-    createdTime: Date;
-  }): Promise<boolean>;
   /** A like already there keeps its original time. */
   setLike(data: {
     commentId: string;
