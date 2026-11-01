@@ -1,12 +1,5 @@
-// The jobs loop: one per process, started from instrumentation.ts, doing
+// The jobs loop: one per process, started from server/main.ts, doing
 // everything that happens after a request has answered. See ADR 0011.
-//
-// The database and the jobs are imported inside a pass, not at the top of
-// this module: Next compiles instrumentation.ts for the Edge runtime as well,
-// and a static import would pull db/container — and with it better-sqlite3,
-// `path` and `process.cwd()` — into a bundle that supports none of them. Each
-// function holding such an import starts with the NEXT_RUNTIME check: Next
-// inlines that variable per bundle, which makes the import dead code there.
 
 import { nanoid } from "nanoid";
 import { subscribeToChanges } from "@/server/kernel/change-subscribers";
@@ -31,7 +24,6 @@ const LEASE = "jobs";
 const DEFAULT_REMINDER_INTERVAL_MS = 60_000;
 
 export function defaultJobs(): Job[] {
-  if (process.env.NEXT_RUNTIME !== "nodejs") return [];
   const configured = process.env.REMINDER_DISPATCH_INTERVAL_MS;
   const reminderMs =
     configured === undefined || configured === ""
@@ -106,7 +98,6 @@ type Loop = {
 const g = globalThis as typeof globalThis & { __jobsLoop?: Loop };
 
 export function startJobsLoop(jobs: Job[] = defaultJobs()): void {
-  if (process.env.NEXT_RUNTIME !== "nodejs") return;
   if (g.__jobsLoop || jobs.length === 0) return;
 
   // eslint-disable-next-line no-restricted-syntax -- the loop runs outside any request, so there is no time-override cookie to read; the dev toolbar's button is how reminders meet the fake clock
@@ -150,7 +141,6 @@ export function stopJobsLoop(): void {
 }
 
 async function pass(): Promise<void> {
-  if (process.env.NEXT_RUNTIME !== "nodejs") return;
   const loop = g.__jobsLoop;
   // A heartbeat during a slow pass is dropped: a slow mail server must not
   // stack passes.

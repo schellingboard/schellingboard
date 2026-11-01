@@ -19,7 +19,7 @@
 #                       it drops is what the duration-outlier section needs.
 #
 # The server is built and started once for the whole hunt, not per run: a
-# `next build` per iteration would dominate the runtime, while the part that
+# server build per iteration would dominate the runtime, while the part that
 # actually has to repeat — reseeding the database in globalSetup — still runs
 # once per iteration.
 #
@@ -83,13 +83,13 @@ cleanup() {
 trap cleanup EXIT
 
 echo "==> Building the app"
-bun set-env.ts test "NODE_ENV=production bun x vite build apps/web && next build"
+bun set-env.ts test "NODE_ENV=production bun x vite build apps/web && bun scripts/build-server.ts"
 
 echo "==> Starting the server on $BASE_URL"
 # SITE_URL ends up in the links of sent mail; a real environment variable beats
 # the .env.test value (see set-env.ts), so the email specs follow links back to
 # this hunt's server.
-SITE_URL="$BASE_URL" setsid bun set-env.ts test "next start -p $PORT" \
+SITE_URL="$BASE_URL" setsid bun set-env.ts test "PORT=$PORT node dist/server/main.mjs" \
   >"$OUT/server.log" 2>&1 &
 SERVER_PID=$!
 

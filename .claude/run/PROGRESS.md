@@ -183,10 +183,12 @@ the timeout, not the cause. Unresolved.
   itself until step 18; `app/layout.tsx` and `app/legacy` stay until step 19. E2E: 217 passed, 1
   flaky (`update-session.spec.ts:147`, 30 s timeout; passes alone in 29.6 s).
 
-- Step 18 must fix: `isTrustedOrigin` (`server/http/gates.ts`) compares `Origin` with
-  `new URL(req.url).origin`. Under `@hono/node-server` the URL ignores `X-Forwarded-Proto`, so
-  behind a TLS-ending proxy every `/api/v1/auth/*` and `/admin/*` request would get 403. Derive the
-  origin from the forwarded headers (only with `SB_TRUSTED_PROXIES`), with a test.
+- Step 18: the server is `dist/server/main.mjs` (esbuild; `better-sqlite3` and `sharp` external,
+  copied into the image with their dependencies, plus `@scalar/api-reference`'s standalone.js). It
+  listens on all interfaces at `PORT`; `HOSTNAME` is ignored. The build id is
+  `dist/server/BUILD_ID`. The image was built and its `/api/health`, icons and native modules
+  checked by hand; `make test-e2e-docker` was not run (step 20). `next.config.js` and
+  `make typecheck`'s `next typegen` still exist until step 19.
 
 ## Questions
 

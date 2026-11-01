@@ -82,10 +82,10 @@ each other — each tracks a different one:
 - `MAILPIT_API_URL` (`tests/helpers/mailpit.ts`) is how the **test suite** reads mail back out of
   mailpit to assert on it. It is test-only and mailpit-specific; the app itself never reads it.
 
-`PORT` is read by `next dev`. Without it a second `make dev` won't fail — it quietly retries the
-next free port (3001, 3002, …), which is easy to miss. `SITE_URL` must then agree with `PORT`, since
-it's the base URL emails use to link back to the site; a stale value sends readers to the _other_
-instance.
+`PORT` is the port `make dev` serves the SPA on; the server runs on the next one. Set it for a
+second instance, or the second `make dev` fails on the taken port. `SITE_URL` must agree with
+`PORT`, since it's the base URL emails use to link back to the site; a stale value sends readers to
+the _other_ instance.
 
 `COMPOSE_PROJECT_NAME` only matters when two clones share a directory name — compose derives the
 project from the directory, so `~/a/sb` and `~/b/sb` would otherwise fight over a single mailpit

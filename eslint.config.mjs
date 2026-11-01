@@ -49,6 +49,7 @@ export default tseslint.config(
       ".dependency-cruiser.cjs",
       ".next/**",
       "apps/web/dist/**",
+      "dist/**",
       "**/*.mjs",
       ".jj/**",
       "site/**",

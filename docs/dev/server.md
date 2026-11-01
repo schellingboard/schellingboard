@@ -129,10 +129,11 @@ turns that off.
 
 `SB_API_RATE_BURST` sets the burst of the per-address API rate limit (default 1000).
 
-`GET /api/v1/health` also names the `version` and the `buildId` (Next's `.next/BUILD_ID`, the
-version outside a production build). The SPA shell carries the build id it was served by
-(`<meta name="sb-build">`, added by `serveSpaShell`); a client that sees `health` report another one
-offers a reload, and a kiosk reloads by itself. It stays behind the site password.
+`GET /api/v1/health` also names the `version` and the `buildId` (`dist/server/BUILD_ID`, written by
+`scripts/build-server.ts`; the version outside a production build). The SPA shell carries the build
+id it was served by (`<meta name="sb-build">`, added by `serveSpaShell`); a client that sees
+`health` report another one offers a reload, and a kiosk reloads by itself. It stays behind the site
+password.
 
 The in-app release notes live in `packages/domain/src/release-notes.ts` so the Next footer and the
 SPA import the same data.

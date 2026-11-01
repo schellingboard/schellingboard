@@ -183,14 +183,12 @@ export default defineConfig({
     // },
   ],
 
-  /* Run a production build before starting the tests. Testing against
-   * `next dev` is flaky: chunks are compiled on demand and parallel
-   * workers can race, causing intermittent ChunkLoadErrors. The SPA needs its
+  /* Run a production build before starting the tests; the SPA needs its
    * NODE_ENV set here, or set-env's "test" bundles dev React. */
   webServer: externalServer
     ? undefined
     : {
-        command: `bun set-env.ts test "NODE_ENV=production bun x vite build apps/web && next build && next start -p ${port}"`,
+        command: `bun set-env.ts test "NODE_ENV=production bun x vite build apps/web && bun scripts/build-server.ts && PORT=${port} node dist/server/main.mjs"`,
         url: baseURL,
         reuseExistingServer: !process.env.CI,
         timeout: 180_000,
