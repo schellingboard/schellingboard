@@ -1,3 +1,5 @@
+import type { IdentityMode } from "./event";
+
 /** Which flow an emailed token belongs to (see the `authCodes` table in db/schema.ts). */
 export type AuthCodePurpose = "login" | "reset";
 
@@ -18,6 +20,14 @@ export type AuthCode = {
 
 /** What a login session proves: a picked name, or a checked credential. */
 export type LoginAssurance = "claimed" | "verified";
+
+/** The assurance an action needs: a verified event or a protected name asks for a checked login. */
+export function assuranceRequired(
+  mode: IdentityMode,
+  personProtected: boolean
+): LoginAssurance {
+  return mode === "verified" || personProtected ? "verified" : "claimed";
+}
 
 export type LoginSession = {
   /** sha256 of the cookie's token; the token itself is never stored. */

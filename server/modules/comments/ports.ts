@@ -19,5 +19,6 @@ export interface CommentDeps {
     | "sessionProposals"
     | "sessions"
     | "guests"
+    | "events"
   >;
 }

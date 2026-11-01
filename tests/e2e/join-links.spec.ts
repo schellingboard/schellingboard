@@ -12,6 +12,7 @@ test("an organizer's personal link signs a guest in and opens the event @003-US6
   const eventName = `E2E Join ${uniqueSuffix()}`;
   await page.getByRole("button", { name: "New event" }).click();
   await page.getByLabel("Name*").fill(eventName);
+  await page.getByLabel("Identity").selectOption("open");
   await page.getByRole("button", { name: "Create event" }).click();
   await page
     .getByRole("listitem")

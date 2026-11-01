@@ -45,6 +45,10 @@ One global row shown when there's more than one event (see
 - **Max session duration**, **break before each session** (attendees' sessions start this long into
   their slot; changing it affects only sessions booked afterwards), **schedule increment** (15/30/60
   min grid granularity — can't be changed if it would misalign existing days).
+- **Identity** — _Verified_ (the default for new events): everyone taking part must prove who they
+  are, with their personal join link, an emailed code or a password, and picking a name is not
+  enough. _Open_: anyone can pick any name and act as that person. Existing events stay _Open_.
+  Someone who takes part in any verified event needs proof in all of their events.
 - **Enforce session capacity as a hard limit** — when on, RSVPs are rejected once a session's
   capacity is reached; otherwise capacity is advisory only.
 - **Phases** — the three phase date ranges, see [How it works](how-it-works.md#the-three-phases).

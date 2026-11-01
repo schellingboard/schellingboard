@@ -19,6 +19,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - **Site admins**: organizers can make people site admins, who open the admin pages after signing in
   with a password or email code. The first one is made through a one-time link the server logs.
+- **Verified events**: organizers choose per event whether attendees must prove who they are. New
+  events are verified; existing events stay open.
 - **Personal join links**: organizers make a link for a guest, or mail new links to all or chosen
   guests. Opening it signs the guest in and adds them to the event.
 - **Failed changes now say what failed**: a refused or unsaved RSVP, comment or attendee count names

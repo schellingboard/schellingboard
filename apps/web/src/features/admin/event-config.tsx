@@ -3,6 +3,7 @@ import {
   utcToZonedInput,
   zonedInputToInstant,
 } from "@schellingboard/domain/admin-datetime";
+import type { IdentityMode } from "@schellingboard/domain/event";
 import { isEventIconName } from "@schellingboard/domain/event-icons";
 import { SLOT_INCREMENT_OPTIONS } from "@schellingboard/domain/slots";
 import type { AdminEventCalls } from "../../commands/admin-events";
@@ -23,6 +24,10 @@ import { ConfirmByTyping } from "./confirm-by-typing";
 import { EventDaysManager } from "./event-days";
 import { EventMeetingsForm } from "./event-meetings";
 import { EventIconPicker } from "./event-icon-picker";
+import {
+  IDENTITY_MODE_HINT,
+  IDENTITY_MODE_OPTIONS,
+} from "./identity-mode-options";
 import { timezones } from "./timezones";
 import { useEventSection } from "./use-event-section";
 import { jumpTo, useSectionSave } from "./use-section-save";
@@ -55,6 +60,7 @@ const DETAIL_FIELDS = [
   "breakMinutes",
   "slotIncrementMinutes",
   "icon",
+  "identityMode",
 ];
 
 const detailsOf = (event: AdminEvent) => ({
@@ -66,6 +72,7 @@ const detailsOf = (event: AdminEvent) => ({
   breakMinutes: String(event.breakMinutes),
   slotIncrementMinutes: String(event.slotIncrementMinutes),
   rsvpCapacityHardLimit: event.rsvpCapacityHardLimit,
+  identityMode: event.identityMode,
   icon: event.icon && isEventIconName(event.icon) ? event.icon : "",
 });
 
@@ -178,6 +185,15 @@ function DetailsForm({
           error={fields.slotIncrementMinutes}
         />
       </div>
+      <SelectField
+        label="Identity"
+        name="identityMode"
+        value={form.identityMode}
+        onChange={(v) => set("identityMode")(v as IdentityMode)}
+        options={IDENTITY_MODE_OPTIONS}
+        hint={IDENTITY_MODE_HINT}
+        error={fields.identityMode}
+      />
       <CheckboxField
         label="Enforce session capacity as a hard limit — reject RSVPs once a session is full (capacity 0 means unlimited)"
         name="rsvpCapacityHardLimit"

@@ -96,11 +96,11 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
       slug), "New link" and "Mail new links" on the event Guests tab
       (`features/admin/join-links.tsx`), docs, changelog, `tests/e2e/join-links.spec.ts`. Not a
       release highlight: no release-notes entry.
-- [ ] 13. **Identity mode.** `events.identity_mode` (`open`|`verified`); a guest is protected if
-      they chose it, are a site admin, or take part in a `verified` event; `assuranceRequired` in
-      `packages/domain` (mode, protection); every acting use case checks it; the SPA predicts it and
-      the user picker offers the verification step; admin event config sets it. Full
-      `make test-e2e`.
+- [x] 13. Identity mode: `events.identity_mode` (`open`|`verified`; existing events `open`, new ones
+      `verified`); `assuranceRequired` in `packages/domain`; a guest's `authProtected` also holds
+      when they take part in any `verified` event (one SQL expression in the guests repository), and
+      use cases on one event take its mode; admin Identity select on create and edit; use case
+      015-US7.
 - [ ] 14. **Show map in the shell.** The SPA shell gets the "Show map" item from `GET /site`'s map
       URL (open-questions item 9). Remove the `test.fixme` from the map test in `settings.spec.ts`.
 - [ ] 15. **Docs: step 6 done.** 10-path, 05 (scrypt, personal join links, the two settings), 02,

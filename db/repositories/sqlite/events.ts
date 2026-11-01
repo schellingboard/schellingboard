@@ -60,6 +60,7 @@ function rowToEvent(row: EventSelectRow): Event {
     timezone: row.timezone,
     rsvpCapacityHardLimit: row.rsvpCapacityHardLimit,
     icon: row.icon ?? undefined,
+    identityMode: row.identityMode,
     meetingsEnabled: row.meetingsEnabled,
     maxOpenMeetingRequests: row.maxOpenMeetingRequests,
     version: row.version,
@@ -134,6 +135,7 @@ export class SqliteEventsRepository implements EventsRepository {
         timezone: data.timezone,
         rsvpCapacityHardLimit: data.rsvpCapacityHardLimit,
         icon: data.icon ?? null,
+        ...(data.identityMode && { identityMode: data.identityMode }),
         ...(data.meetingsEnabled !== undefined && {
           meetingsEnabled: data.meetingsEnabled,
         }),
@@ -181,6 +183,7 @@ export class SqliteEventsRepository implements EventsRepository {
     if (patch.rsvpCapacityHardLimit !== undefined)
       set.rsvpCapacityHardLimit = patch.rsvpCapacityHardLimit;
     if ("icon" in patch) set.icon = patch.icon ?? null;
+    if (patch.identityMode !== undefined) set.identityMode = patch.identityMode;
     if (patch.meetingsEnabled !== undefined)
       set.meetingsEnabled = patch.meetingsEnabled;
     if (patch.maxOpenMeetingRequests !== undefined)

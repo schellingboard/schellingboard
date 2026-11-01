@@ -1,3 +1,5 @@
+import { assuranceRequired } from "@schellingboard/domain/auth";
+import type { IdentityMode } from "@schellingboard/domain/event";
 import type { Actor } from "./actor";
 import { forbidden, ok, type Result } from "./result";
 
@@ -7,15 +9,21 @@ export interface GuestProtectionLookup {
 
 // ADR 0012 section 3 (#370): an unprotected guest may be acted as by whoever
 // names it, a protected one only with that guest's verified cookie. A cookie
-// naming a guest that no longer exists counts as no selection (#931).
+// naming a guest that no longer exists counts as no selection (#931). Use cases
+// on one event pass its mode: a verified event needs a verified login from
+// whoever acts, member or not (ADR 0017 section 10).
 export async function actingGuest(
   actor: Actor,
-  guests: GuestProtectionLookup
+  guests: GuestProtectionLookup,
+  eventMode: IdentityMode = "open"
 ): Promise<Result<string>> {
   if (!actor.guest) return forbidden("guest.unselected");
   const creds = await guests.getAuthCredentials(actor.guest.id);
   if (!creds) return forbidden("guest.unselected");
-  if (creds.authProtected && actor.guest.level !== "verified")
+  if (
+    assuranceRequired(eventMode, creds.authProtected) === "verified" &&
+    actor.guest.level !== "verified"
+  )
     return forbidden("guest.protected");
   return ok(actor.guest.id);
 }
