@@ -1,5 +1,6 @@
 import { changes } from "@schellingboard/domain/change";
 import type { Comment } from "@schellingboard/domain/comment";
+import type { IdentityMode } from "@schellingboard/domain/event";
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import {
@@ -41,6 +42,26 @@ async function missingSubject(
   return (await repos.guests.findById(id))
     ? null
     : notFound("profile.notFound", "Profile not found");
+}
+
+async function modeOfEvent(
+  repos: CommentDeps["repos"],
+  eventId: string | null
+): Promise<IdentityMode> {
+  const event = eventId ? await repos.events.findById(eventId) : null;
+  return event?.identityMode ?? "open";
+}
+
+async function eventIdOfComment(
+  repos: CommentDeps["repos"],
+  commentId: string
+): Promise<string | null> {
+  const proposalId = await repos.proposalComments.findSubjectId(commentId);
+  if (proposalId) return eventIdOf(repos, { kind: "proposal", id: proposalId });
+  const sessionId = await repos.sessionComments.findSubjectId(commentId);
+  return sessionId
+    ? eventIdOf(repos, { kind: "session", id: sessionId })
+    : null;
 }
 
 async function eventIdOf(
@@ -96,6 +117,13 @@ export const createComment =
       if (!acting.ok) return acting;
       const missing = await missingSubject(tx, subject);
       if (missing) return missing;
+      const eventId = await eventIdOf(tx, subject);
+      const inEvent = await actingGuest(
+        actor,
+        tx.guests,
+        await modeOfEvent(tx, eventId)
+      );
+      if (!inEvent.ok) return inEvent;
       const comments = thread(tx, subject.kind);
       if (parentId && (await comments.findSubjectId(parentId)) !== subject.id)
         return invalid(
@@ -114,7 +142,7 @@ export const createComment =
         changes.commentCreated(
           created,
           { kind: subject.kind, id: subject.id },
-          await eventIdOf(tx, subject),
+          eventId,
           { actor: { type: "guest", id: acting.value }, at: now }
         )
       );
@@ -161,6 +189,12 @@ export const toggleCommentLike =
       if (!acting.ok) return acting;
       const comment = await liveComment(tx, commentId);
       if (!comment.ok) return comment;
+      const inEvent = await actingGuest(
+        actor,
+        tx.guests,
+        await modeOfEvent(tx, await eventIdOfComment(tx, commentId))
+      );
+      if (!inEvent.ok) return inEvent;
       return ok(
         await tx.comments.toggleLike({
           commentId,
@@ -182,6 +216,12 @@ export const setCommentLike =
       if (!acting.ok) return acting;
       const comment = await liveComment(tx, commentId);
       if (!comment.ok) return comment;
+      const inEvent = await actingGuest(
+        actor,
+        tx.guests,
+        await modeOfEvent(tx, await eventIdOfComment(tx, commentId))
+      );
+      if (!inEvent.ok) return inEvent;
       await tx.comments.setLike({
         commentId,
         guestId: acting.value,

@@ -25,7 +25,7 @@ import { hashSessionToken } from "@/utils/login-session-token";
 import { hashUserPassword } from "@/utils/user-credentials";
 import { isMailerConfigured, sendMail } from "@/utils/mailer";
 import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createGuest } from "../helpers/factories";
+import { createEvent, createGuest } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, sessionGuestValue } from "../helpers/guest-cookie";
 
 const handlers = { GET, POST, PUT, DELETE };
@@ -419,6 +419,26 @@ describe("PUT /api/v1/me/credentials/password", () => {
       expect(await codeOf(res)).toBe("auth.notProtected");
     }
   );
+  it(
+    "answers 409 for a verified-event member who never set a password",
+    { tags: ["015-US7"] },
+    async () => {
+      const guest = await createGuest();
+      const event = await createEvent({ identityMode: "verified" });
+      await getRepositories().guests.assignToEvent(event.id, [guest.id]);
+      const mine = await sessionGuestValue(guest.id, "verified");
+
+      const res = await call(
+        "PUT",
+        "/me/credentials/password",
+        { currentPassword: "anything", newPassword: "a long new password" },
+        asSession(mine)
+      );
+
+      expect(res.status).toBe(409);
+      expect(await codeOf(res)).toBe("auth.notProtected");
+    }
+  );
 });
 
 describe("POST /api/v1/me/credentials/unprotect", () => {
@@ -467,6 +487,29 @@ describe("POST /api/v1/me/credentials/unprotect", () => {
       const rows = await rowsOf(guest.id);
       expect(rows.map((r) => r.assurance)).toEqual(["claimed"]);
       expect(rows[0].id).toBe(hashSessionToken(cookieOf(res).split("=")[1]));
+    }
+  );
+
+  it(
+    "keeps the session verified for a member of a verified event",
+    { tags: ["015-US7"] },
+    async () => {
+      const guest = await protectedGuest();
+      const event = await createEvent({ identityMode: "verified" });
+      await getRepositories().guests.assignToEvent(event.id, [guest.id]);
+      const mine = await sessionGuestValue(guest.id, "verified");
+
+      const res = await call(
+        "POST",
+        "/me/credentials/unprotect",
+        { currentPassword: PASSWORD },
+        asSession(mine)
+      );
+
+      expect(res.status).toBe(200);
+      expect((await rowsOf(guest.id)).map((r) => r.assurance)).toEqual([
+        "verified",
+      ]);
     }
   );
 

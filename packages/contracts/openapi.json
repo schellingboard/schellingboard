@@ -432,6 +432,7 @@
           "slotIncrementMinutes": { "type": "integer" },
           "rsvpCapacityHardLimit": { "type": "boolean" },
           "icon": { "type": ["string", "null"] },
+          "identityMode": { "type": "string", "enum": ["open", "verified"] },
           "meetingsEnabled": { "type": "boolean" },
           "maxOpenMeetingRequests": { "type": "integer" },
           "firstDayStart": {
@@ -483,6 +484,7 @@
           "slotIncrementMinutes",
           "rsvpCapacityHardLimit",
           "icon",
+          "identityMode",
           "meetingsEnabled",
           "maxOpenMeetingRequests",
           "firstDayStart",
@@ -7223,6 +7225,11 @@
                       "WrenchIcon",
                       null
                     ]
+                  },
+                  "identityMode": {
+                    "type": "string",
+                    "enum": ["open", "verified"],
+                    "description": "open: picking a name is enough to act; verified: a checked login is needed. Omitted: unchanged on edit, verified on create"
                   }
                 },
                 "required": [
@@ -7345,6 +7352,11 @@
                       "WrenchIcon",
                       null
                     ]
+                  },
+                  "identityMode": {
+                    "type": "string",
+                    "enum": ["open", "verified"],
+                    "description": "open: picking a name is enough to act; verified: a checked login is needed. Omitted: unchanged on edit, verified on create"
                   },
                   "expectedVersion": {
                     "type": "integer",

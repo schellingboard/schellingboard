@@ -20,6 +20,7 @@ export function toEventView(e: Event): z.input<typeof eventViewSchema> {
     slotIncrementMinutes: e.slotIncrementMinutes,
     rsvpCapacityHardLimit: e.rsvpCapacityHardLimit,
     icon: e.icon ?? null,
+    identityMode: e.identityMode,
     meetingsEnabled: e.meetingsEnabled,
     maxOpenMeetingRequests: e.maxOpenMeetingRequests,
     firstDayStart: iso(e.firstDayStart),

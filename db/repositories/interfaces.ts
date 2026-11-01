@@ -101,8 +101,11 @@ export interface EventsRepository {
    * optional and fall back to the schema's defaults.
    */
   create(
-    data: Omit<Event, EventDerivedFields | keyof EventMeetingSettings> &
-      Partial<EventMeetingSettings>
+    data: Omit<
+      Event,
+      EventDerivedFields | keyof EventMeetingSettings | "identityMode"
+    > &
+      Partial<EventMeetingSettings & Pick<Event, "identityMode">>
   ): Promise<Event>;
   /**
    * Undefined, changing nothing, if the event is gone or not at

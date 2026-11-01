@@ -494,6 +494,11 @@ export const features = {
         actor: "organizer",
         priority: "P1",
       },
+      US7: {
+        title: "Organizer chooses how an event identifies its attendees",
+        actor: "organizer",
+        priority: "P1",
+      },
     },
   },
   "016": {

@@ -13,6 +13,7 @@
     "slotIncrementMinutes": 30,
     "rsvpCapacityHardLimit": false,
     "icon": null,
+    "identityMode": "open",
     "meetingsEnabled": false,
     "maxOpenMeetingRequests": 5,
     "firstDayStart": "2026-06-15T08:00:00.000Z",

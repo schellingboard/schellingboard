@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react";
+import type { IdentityMode } from "@schellingboard/domain/event";
 import { formatEventDates } from "@schellingboard/domain/time";
 import type { AdminEventCalls } from "../../commands/admin-events";
 import { FIX_FIELDS_MESSAGE, type FieldErrors } from "../../commands/mutation";
@@ -7,6 +8,10 @@ import type { AdminEvent } from "../../queries/admin-events";
 import { Button } from "../../ui/button";
 import { MarkdownField, SelectField, TextField } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
+import {
+  IDENTITY_MODE_HINT,
+  IDENTITY_MODE_OPTIONS,
+} from "./identity-mode-options";
 import { timezones } from "./timezones";
 
 const DEFAULTS = {
@@ -15,6 +20,7 @@ const DEFAULTS = {
   website: "",
   timezone: "UTC",
   maxSessionDuration: "60",
+  identityMode: "verified" as IdentityMode,
 };
 
 const FIELD_NAMES = Object.keys(DEFAULTS);
@@ -31,8 +37,10 @@ function NewEventForm({
   const [form, setForm] = useState(DEFAULTS);
   const [checking, setChecking] = useState(false);
   const zones = useMemo(() => timezones(), []);
-  const set = (key: keyof typeof DEFAULTS) => (value: string) =>
-    setForm((prev) => ({ ...prev, [key]: value }));
+  const set =
+    <K extends keyof typeof DEFAULTS>(key: K) =>
+    (value: (typeof DEFAULTS)[K]) =>
+      setForm((prev) => ({ ...prev, [key]: value }));
 
   const body = {
     ...form,
@@ -111,6 +119,15 @@ function NewEventForm({
           error={fields.maxSessionDuration}
         />
       </div>
+      <SelectField
+        label="Identity"
+        name="identityMode"
+        value={form.identityMode}
+        onChange={(v) => set("identityMode")(v as IdentityMode)}
+        options={IDENTITY_MODE_OPTIONS}
+        hint={IDENTITY_MODE_HINT}
+        error={fields.identityMode}
+      />
       <FormErrorSummary
         fields={fields}
         error={mutation.error === FIX_FIELDS_MESSAGE ? null : mutation.error}

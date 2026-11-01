@@ -433,9 +433,11 @@ the page, and make them again.
 
 ## Protect your name
 
-Normally anyone on the site can pick your name and act as you. To require a login instead, open
-**Settings → Account security** and click **Enable protection**. You'll be emailed an 8-character
-code, valid for 10 minutes; type it in to confirm. You can set a password at the same time.
+In an event whose organizers chose _Open_ identity, anyone on the site can pick your name and act as
+you. In a _Verified_ event you always need your personal join link, an emailed code or a password,
+and that applies in all your events. To protect your name in open events too, open **Settings →
+Account security** and click **Enable protection**. You'll be emailed an 8-character code, valid for
+10 minutes; type it in to confirm. You can set a password at the same time.
 
 ![Settings page in dark mode, one of the supported themes, with email notification checkboxes](../screenshots/user-settings.webp)
 

@@ -75,6 +75,7 @@ async function meetingsEvent(page: Page, eventName: string, names: string[]) {
   await expect(async () => {
     // The form closes on success, which is what stops a retry re-submitting.
     if (await nameField.isVisible()) {
+      await page.getByLabel("Identity").selectOption("open");
       await page.getByRole("button", { name: "Create event" }).click();
     }
     await expect(row).toBeVisible({ timeout: 3000 });

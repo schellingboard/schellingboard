@@ -13,6 +13,7 @@ test("configures the meetings section and keeps it across a reload @012-US1", as
 
   await page.getByRole("button", { name: "New event" }).click();
   await page.getByLabel("Name*").fill(eventName);
+  await page.getByLabel("Identity").selectOption("open");
   await page.getByRole("button", { name: "Create event" }).click();
   await page
     .getByRole("listitem")

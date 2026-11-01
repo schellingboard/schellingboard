@@ -138,6 +138,18 @@ votes are in the snapshot and feed (ADR 0016); failed commands name their subjec
   limit: a guest who signs in through the emailed login-code or a password reset (no `redirect`)
   lands on `/` and must open the join link again.
 
+- Step 13: `assuranceRequired(mode, protected)` is in `packages/domain/src/auth.ts`.
+  `actingGuest(actor, guests, eventMode?)` uses it; `isProtected` (guests repository SQL: chosen OR
+  site admin OR member of a verified event) feeds the flag, and the picker and snapshot use the same
+  SQL. Use cases without a membership check (comment create and likes, `createSession`) pass the
+  subject event's mode, so non-members need a verified login there; membership-checking use cases
+  are covered by `isProtected`. The SPA does not predict the rule (the snapshot carries the flag).
+  `rowToGuest` (admin views) shows chosen/admin only on purpose: that is what an admin can reset.
+  Strictest wins across events, so every E2E spec that creates an event and assigns shared guests
+  picks "Open" in the form; seeded events are `open`. A mode change records guest changes for the
+  members in every event they attend (`recordingModeLocks`). `unprotect` keeps a verified-event
+  member's session verified.
+
 ## Known E2E flakes
 
 `attendee-count.spec.ts:64` (fails ~half of solo runs on the base too), `settings.spec.ts:67`,

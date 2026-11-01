@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { EVENT_ICON_NAMES } from "@schellingboard/domain/event-icons";
+import { IDENTITY_MODES } from "@schellingboard/domain/event";
 import { SLOT_INCREMENT_OPTIONS } from "@schellingboard/domain/slots";
 import { expectedVersion } from "./session";
 
@@ -27,6 +28,12 @@ export const eventSettingsBodySchema = z.object({
     .describe(`One of ${SLOT_INCREMENT_OPTIONS.join(", ")}`),
   rsvpCapacityHardLimit: z.boolean().default(false),
   icon: z.enum(EVENT_ICON_NAMES).nullable().optional(),
+  identityMode: z
+    .enum(IDENTITY_MODES)
+    .optional()
+    .describe(
+      "open: picking a name is enough to act; verified: a checked login is needed. Omitted: unchanged on edit, verified on create"
+    ),
 });
 
 const phaseDate = instant.nullable().describe("null clears it");
@@ -53,6 +60,7 @@ export const eventViewSchema = z
     slotIncrementMinutes: z.number().int(),
     rsvpCapacityHardLimit: z.boolean(),
     icon: z.string().nullable(),
+    identityMode: z.enum(IDENTITY_MODES),
     meetingsEnabled: z.boolean(),
     maxOpenMeetingRequests: z.number().int(),
     firstDayStart: instant.nullable(),
