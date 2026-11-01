@@ -38,7 +38,7 @@ A request carries the same cookies the site sets in a browser: the site password
 session's. There are no API tokens yet; they are planned.
 
 - **Site password.** When `SITE_PASSWORD` is set, every `/api/v1` endpoint outside `/api/v1/admin/`
-  needs the site cookie.
+  needs the site cookie. `DELETE /api/v1/auth/site` clears it and ends the login session.
 - **Site admin.** `/api/v1/admin/` needs the login session of a
   [site admin](../organizers/admin-guide.md#site-admins), and nothing else: the site password is not
   asked for there. Without a session these endpoints answer `401`, and `403` for a guest who is not

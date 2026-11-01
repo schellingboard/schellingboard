@@ -196,14 +196,25 @@ describe("web: manifest", () => {
   });
 });
 
-describe("web: POST /api/auth/logout", () => {
-  it("clears the site login and the guest name", async () => {
-    const res = await throughWeb("/api/auth/logout", { method: "POST" });
+describe("web: DELETE /api/v1/auth/site", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  it("opens without the site cookie, so a visitor can always leave", async () => {
+    vi.stubEnv("SITE_PASSWORD", "site-pw");
+    vi.stubEnv("AUTH_SECRET", "0123456789abcdef0123456789abcdef");
+
+    const res = await throughWeb("/api/v1/auth/site", { method: "DELETE" });
+
     expect(res.status).toBe(204);
-    const cookies = res.headers.getSetCookie();
-    expect(cookies.some((c) => c.startsWith("site-auth=;"))).toBe(true);
-    expect(cookies.some((c) => c.startsWith("guest=;"))).toBe(true);
-    expect(cookies.every((c) => /Max-Age=0/i.test(c))).toBe(true);
+  });
+
+  it("refuses a cross-site request", async () => {
+    const res = await throughWeb("/api/v1/auth/site", {
+      method: "DELETE",
+      headers: { origin: "https://evil.example" },
+    });
+
+    expect(res.status).toBe(403);
   });
 });
 

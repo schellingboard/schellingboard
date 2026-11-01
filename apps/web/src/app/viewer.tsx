@@ -123,12 +123,12 @@ export function ViewerProvider({
   );
 
   const signOut = useCallback(async () => {
-    const { data } = await api.DELETE("/api/v1/me/identity");
-    if (data) {
+    const { response } = await api.POST("/api/v1/auth/sign-out");
+    if (response.ok) {
       await persistence.clear();
       decided.current = true;
-      remembered.write(data.guestId);
-      setGuestId(data.guestId);
+      remembered.write(null);
+      setGuestId(null);
     }
   }, [api, persistence]);
 

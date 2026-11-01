@@ -53,9 +53,6 @@ function mutatingApiRoutes(): string[] {
   ].sort();
 }
 
-// Signing out acts on the caller's own session, not on a named guest.
-const OUT_OF_SCOPE = new Set(["POST /api/auth/logout"]);
-
 type Verifier = () => Promise<void>;
 
 const VERIFIERS: Record<string, Verifier> = {
@@ -96,7 +93,7 @@ describe("mutating-surface regression guard", () => {
   });
   afterEach(() => vi.unstubAllEnvs());
 
-  for (const route of mutatingApiRoutes().filter((r) => !OUT_OF_SCOPE.has(r))) {
+  for (const route of mutatingApiRoutes()) {
     it(`${route} is guarded`, () => {
       expect(
         route in VERIFIERS,
