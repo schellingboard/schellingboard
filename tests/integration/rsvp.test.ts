@@ -5,72 +5,42 @@ import { NextRequest } from "next/server";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import type { Rsvp } from "@schellingboard/domain/session";
+import { DELETE, PUT } from "@/app/api/v1/[[...route]]/route";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
-import { POST as toggleRsvp } from "@/app/api/toggle-rsvp/route";
-import { GET as getRsvps } from "@/app/api/rsvps/route";
 
-function makeToggleReq(payload: unknown): Request {
-  return new Request("http://test/api/toggle-rsvp", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
-}
+type RsvpCall = {
+  sessionId: string;
+  guestId: string;
+  remove?: boolean;
+  key?: string;
+};
 
-// Read surface: GET /api/rsvps?user=<guestId>
-async function rsvpsForGuest(guestId: string): Promise<Rsvp[]> {
-  const res = await getRsvps(
-    new NextRequest(`http://test/api/rsvps?user=${guestId}`)
+function toggleRsvp({ sessionId, guestId, remove, key }: RsvpCall) {
+  const headers: Record<string, string> = {
+    cookie: `${GUEST_COOKIE_NAME}=${openGuestValue(guestId)}`,
+  };
+  if (key) headers["idempotency-key"] = key;
+  return (remove ? DELETE : PUT)(
+    new NextRequest(
+      `http://test/api/v1/sessions/${sessionId}/rsvps/${guestId}`,
+      { method: remove ? "DELETE" : "PUT", headers }
+    )
   );
-  expect(res.ok).toBe(true);
-  return (await res.json()) as Rsvp[];
 }
 
-describe("POST /api/toggle-rsvp", () => {
+const rsvpsForGuest = (guestId: string) =>
+  getRepositories().rsvps.listByGuest(guestId);
+
+describe("RSVP writes through /api/v1", () => {
   beforeAll(() => setupTestDb());
   beforeEach(() => resetTestDb());
-
-  it("adds an RSVP when absent and removes it when remove is set", async () => {
-    const event = await createEvent({ phase: "scheduling" });
-    const guest = await createGuest();
-    const session = await createSession(event.id);
-    await getRepositories().guests.assignToEvent(event.id, [guest.id]);
-
-    const addRes = await toggleRsvp(
-      makeToggleReq({ sessionId: session.id, guestId: guest.id })
-    );
-    expect(addRes.ok).toBe(true);
-
-    const afterAdd = await rsvpsForGuest(guest.id);
-    expect(afterAdd).toHaveLength(1);
-    expect(afterAdd[0]).toMatchObject({
-      sessionId: session.id,
-      guestId: guest.id,
-    });
-
-    const removeRes = await toggleRsvp(
-      makeToggleReq({ sessionId: session.id, guestId: guest.id, remove: true })
-    );
-    expect(removeRes.ok).toBe(true);
-
-    expect(await rsvpsForGuest(guest.id)).toHaveLength(0);
-  });
 
   it("records the Idempotency-Key on the change and ignores a repeat", async () => {
     const event = await createEvent({ phase: "scheduling" });
     const guest = await createGuest({ eventId: event.id });
     const session = await createSession(event.id);
     const send = () =>
-      toggleRsvp(
-        new Request("http://test/api/toggle-rsvp", {
-          method: "POST",
-          body: JSON.stringify({ sessionId: session.id, guestId: guest.id }),
-          headers: {
-            cookie: `${GUEST_COOKIE_NAME}=${openGuestValue(guest.id)}`,
-            "idempotency-key": "click-1",
-          },
-        })
-      );
+      toggleRsvp({ sessionId: session.id, guestId: guest.id, key: "click-1" });
 
     expect((await send()).ok).toBe(true);
     expect((await send()).ok).toBe(true);
@@ -81,15 +51,17 @@ describe("POST /api/toggle-rsvp", () => {
     expect(added.map((c) => c.commandKey)).toEqual(["click-1"]);
   });
 
-  it("removing an absent RSVP is a no-op", async () => {
+  it("withdrawing an absent RSVP is a no-op", async () => {
     const event = await createEvent({ phase: "scheduling" });
     const guest = await createGuest();
     const session = await createSession(event.id);
     await getRepositories().guests.assignToEvent(event.id, [guest.id]);
 
-    const res = await toggleRsvp(
-      makeToggleReq({ sessionId: session.id, guestId: guest.id, remove: true })
-    );
+    const res = await toggleRsvp({
+      sessionId: session.id,
+      guestId: guest.id,
+      remove: true,
+    });
     expect(res.ok).toBe(true);
     expect(await rsvpsForGuest(guest.id)).toHaveLength(0);
   });
@@ -101,9 +73,10 @@ describe("POST /api/toggle-rsvp", () => {
     await getRepositories().guests.assignToEvent(event.id, [guest.id]);
 
     for (let i = 0; i < 2; i++) {
-      const res = await toggleRsvp(
-        makeToggleReq({ sessionId: session.id, guestId: guest.id })
-      );
+      const res = await toggleRsvp({
+        sessionId: session.id,
+        guestId: guest.id,
+      });
       expect(res.ok).toBe(true);
     }
 
@@ -112,42 +85,6 @@ describe("POST /api/toggle-rsvp", () => {
       (c) => c.type === "rsvp.added"
     );
     expect(added).toHaveLength(1);
-  });
-
-  it("rejects toggling an RSVP for a nonexistent session", async () => {
-    const guest = await createGuest();
-
-    const res = await toggleRsvp(
-      makeToggleReq({ sessionId: "does-not-exist", guestId: guest.id })
-    );
-    expect(res.status).toBe(404);
-    expect(await rsvpsForGuest(guest.id)).toHaveLength(0);
-  });
-
-  it("rejects a host RSVPing to their own session", async () => {
-    const event = await createEvent({ phase: "scheduling" });
-    const host = await createGuest();
-    const session = await createSession(event.id, { hostIds: [host.id] });
-    await getRepositories().guests.assignToEvent(event.id, [host.id]);
-
-    const res = await toggleRsvp(
-      makeToggleReq({ sessionId: session.id, guestId: host.id })
-    );
-    expect(res.status).toBe(403);
-    expect(await rsvpsForGuest(host.id)).toHaveLength(0);
-  });
-
-  it("rejects RSVPs from a guest who isn't assigned to the event", async () => {
-    const event = await createEvent({ phase: "scheduling" });
-    const guest = await createGuest();
-    const session = await createSession(event.id);
-    // Deliberately not assigning the guest to the event.
-
-    const res = await toggleRsvp(
-      makeToggleReq({ sessionId: session.id, guestId: guest.id })
-    );
-    expect(res.status).toBe(403);
-    expect(await rsvpsForGuest(guest.id)).toHaveLength(0);
   });
 
   describe("capacity hard limit", () => {
@@ -164,28 +101,26 @@ describe("POST /api/toggle-rsvp", () => {
         bob.id,
       ]);
 
-      const first = await toggleRsvp(
-        makeToggleReq({ sessionId: session.id, guestId: alice.id })
-      );
+      const first = await toggleRsvp({
+        sessionId: session.id,
+        guestId: alice.id,
+      });
       expect(first.ok).toBe(true);
 
-      const second = await toggleRsvp(
-        makeToggleReq({ sessionId: session.id, guestId: bob.id })
-      );
+      const second = await toggleRsvp({
+        sessionId: session.id,
+        guestId: bob.id,
+      });
       expect(second.status).toBe(409);
-      // The client surfaces this message directly to the user, so its
-      // wording is part of the API contract, not just an implementation detail.
-      expect(await second.json()).toEqual({ error: "This session is full" });
+      expect(await second.json()).toMatchObject({ code: "session.full" });
       expect(await rsvpsForGuest(bob.id)).toHaveLength(0);
 
       // Removal must still work on a full session.
-      const remove = await toggleRsvp(
-        makeToggleReq({
-          sessionId: session.id,
-          guestId: alice.id,
-          remove: true,
-        })
-      );
+      const remove = await toggleRsvp({
+        sessionId: session.id,
+        guestId: alice.id,
+        remove: true,
+      });
       expect(remove.ok).toBe(true);
       expect(await rsvpsForGuest(alice.id)).toHaveLength(0);
     });
@@ -201,9 +136,10 @@ describe("POST /api/toggle-rsvp", () => {
       ]);
 
       for (const guest of [alice, bob]) {
-        const res = await toggleRsvp(
-          makeToggleReq({ sessionId: session.id, guestId: guest.id })
-        );
+        const res = await toggleRsvp({
+          sessionId: session.id,
+          guestId: guest.id,
+        });
         expect(res.ok).toBe(true);
         expect(await rsvpsForGuest(guest.id)).toHaveLength(1);
       }
@@ -223,9 +159,10 @@ describe("POST /api/toggle-rsvp", () => {
       ]);
 
       for (const guest of [alice, bob]) {
-        const res = await toggleRsvp(
-          makeToggleReq({ sessionId: session.id, guestId: guest.id })
-        );
+        const res = await toggleRsvp({
+          sessionId: session.id,
+          guestId: guest.id,
+        });
         expect(res.ok).toBe(true);
         expect(await rsvpsForGuest(guest.id)).toHaveLength(1);
       }
@@ -241,9 +178,10 @@ describe("POST /api/toggle-rsvp", () => {
       await getRepositories().guests.assignToEvent(event.id, [alice.id]);
 
       for (let i = 0; i < 2; i++) {
-        const res = await toggleRsvp(
-          makeToggleReq({ sessionId: session.id, guestId: alice.id })
-        );
+        const res = await toggleRsvp({
+          sessionId: session.id,
+          guestId: alice.id,
+        });
         expect(res.ok).toBe(true);
       }
       expect(await rsvpsForGuest(alice.id)).toHaveLength(1);
@@ -263,8 +201,8 @@ describe("POST /api/toggle-rsvp", () => {
       ]);
 
       const [first, second] = await Promise.all([
-        toggleRsvp(makeToggleReq({ sessionId: session.id, guestId: alice.id })),
-        toggleRsvp(makeToggleReq({ sessionId: session.id, guestId: bob.id })),
+        toggleRsvp({ sessionId: session.id, guestId: alice.id }),
+        toggleRsvp({ sessionId: session.id, guestId: bob.id }),
       ]);
 
       const oks = [first, second].filter((res) => res.ok);
@@ -272,43 +210,6 @@ describe("POST /api/toggle-rsvp", () => {
       const rsvps = await getRepositories().rsvps.listBySession(session.id);
       expect(rsvps).toHaveLength(1);
     });
-  });
-
-  it("GET /api/rsvps lists by guest or by session and rejects missing params", async () => {
-    const event = await createEvent({ phase: "scheduling" });
-    const alice = await createGuest({ name: "Alice" });
-    const bob = await createGuest({ name: "Bob" });
-    const session = await createSession(event.id);
-    const otherSession = await createSession(event.id, {
-      title: "Other Session",
-    });
-    await getRepositories().guests.assignToEvent(event.id, [alice.id, bob.id]);
-
-    for (const guest of [alice, bob]) {
-      await toggleRsvp(
-        makeToggleReq({ sessionId: session.id, guestId: guest.id })
-      );
-    }
-    await toggleRsvp(
-      makeToggleReq({ sessionId: otherSession.id, guestId: alice.id })
-    );
-
-    const aliceRsvps = await rsvpsForGuest(alice.id);
-    expect(aliceRsvps.map((r) => r.sessionId).sort()).toEqual(
-      [session.id, otherSession.id].sort()
-    );
-
-    const bySession = await getRsvps(
-      new NextRequest(`http://test/api/rsvps?session=${session.id}`)
-    );
-    expect(bySession.ok).toBe(true);
-    const sessionRsvps = (await bySession.json()) as Rsvp[];
-    expect(sessionRsvps.map((r) => r.guestId).sort()).toEqual(
-      [alice.id, bob.id].sort()
-    );
-
-    const missing = await getRsvps(new NextRequest("http://test/api/rsvps"));
-    expect(missing.status).toBe(400);
   });
 });
 

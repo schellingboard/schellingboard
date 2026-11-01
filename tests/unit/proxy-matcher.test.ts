@@ -26,7 +26,12 @@ describe("proxy matcher", () => {
   });
 
   it("covers pages and API routes", () => {
-    for (const path of ["/", "/guests", "/api/rsvps", "/Conference-Alpha"]) {
+    for (const path of [
+      "/",
+      "/guests",
+      "/api/v1/sessions",
+      "/Conference-Alpha",
+    ]) {
       expect(matches(path), `${path} must reach the proxy`).toBe(true);
     }
   });

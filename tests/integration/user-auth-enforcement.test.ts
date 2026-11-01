@@ -34,8 +34,7 @@ import {
   openGuestValue,
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
-import { POST as toggleRsvp } from "@/app/api/toggle-rsvp/route";
-import { GET as getRsvps } from "@/app/api/rsvps/route";
+import { GET, PUT } from "@/app/api/v1/[[...route]]/route";
 import { saveProfile } from "../helpers/profile-api";
 import { callApi } from "../helpers/api";
 import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
@@ -53,10 +52,9 @@ async function authCookieHeader(guestId: string): Promise<string> {
   return `${GUEST_COOKIE_NAME}=${await verifiedGuestValue(guestId)}`;
 }
 
-function postReq(path: string, payload: unknown, cookie?: string): NextRequest {
-  return new NextRequest(`http://test${path}`, {
-    method: "POST",
-    body: JSON.stringify(payload),
+function v1(method: string, path: string, cookie?: string): NextRequest {
+  return new NextRequest(`http://test/api/v1${path}`, {
+    method,
     headers: cookie ? { cookie } : {},
   });
 }
@@ -73,7 +71,7 @@ describe("write enforcement for protected guests", () => {
 
   afterEach(() => vi.unstubAllEnvs());
 
-  describe("POST /api/toggle-rsvp", () => {
+  describe("PUT /api/v1/sessions/{id}/rsvps/{guestId}", () => {
     async function setup() {
       const event = await createEvent({ phase: "scheduling" });
       const guest = await createGuest({ eventId: event.id });
@@ -84,11 +82,8 @@ describe("write enforcement for protected guests", () => {
 
     it("rejects an RSVP for a protected guest without a verified session", async () => {
       const { guest, session } = await setup();
-      const res = await toggleRsvp(
-        postReq("/api/toggle-rsvp", {
-          sessionId: session.id,
-          guestId: guest.id,
-        })
+      const res = await PUT(
+        v1("PUT", `/sessions/${session.id}/rsvps/${guest.id}`)
       );
       expect(res.status).toBe(403);
       expect(await getRepositories().rsvps.listByGuest(guest.id)).toHaveLength(
@@ -98,10 +93,10 @@ describe("write enforcement for protected guests", () => {
 
     it("accepts an RSVP with a verified session", async () => {
       const { guest, session } = await setup();
-      const res = await toggleRsvp(
-        postReq(
-          "/api/toggle-rsvp",
-          { sessionId: session.id, guestId: guest.id },
+      const res = await PUT(
+        v1(
+          "PUT",
+          `/sessions/${session.id}/rsvps/${guest.id}`,
           await authCookieHeader(guest.id)
         )
       );
@@ -114,10 +109,10 @@ describe("write enforcement for protected guests", () => {
     it("rejects a session verified for a different guest", async () => {
       const { guest, session } = await setup();
       const other = await createGuest();
-      const res = await toggleRsvp(
-        postReq(
-          "/api/toggle-rsvp",
-          { sessionId: session.id, guestId: guest.id },
+      const res = await PUT(
+        v1(
+          "PUT",
+          `/sessions/${session.id}/rsvps/${guest.id}`,
           await authCookieHeader(other.id)
         )
       );
@@ -125,7 +120,7 @@ describe("write enforcement for protected guests", () => {
     });
   });
 
-  describe("GET /api/rsvps", () => {
+  describe("GET /api/v1/guests/{id}/rsvps", () => {
     async function setup() {
       const event = await createEvent({ phase: "scheduling" });
       const guest = await createGuest({ eventId: event.id });
@@ -141,29 +136,27 @@ describe("write enforcement for protected guests", () => {
       const { guest } = await setup();
       await protectGuest(guest.id);
 
-      const unverified = await getRsvps(
-        new NextRequest(`http://test/api/rsvps?user=${guest.id}`)
-      );
+      const unverified = await GET(v1("GET", `/guests/${guest.id}/rsvps`));
       expect(unverified.status).toBe(403);
 
-      const verified = await getRsvps(
-        new NextRequest(`http://test/api/rsvps?user=${guest.id}`, {
-          headers: { cookie: await authCookieHeader(guest.id) },
-        })
+      const verified = await GET(
+        v1("GET", `/guests/${guest.id}/rsvps`, await authCookieHeader(guest.id))
       );
       expect(verified.ok).toBe(true);
-      expect(await verified.json()).toHaveLength(1);
+      expect(
+        ((await verified.json()) as { rsvps: unknown[] }).rsvps
+      ).toHaveLength(1);
     });
 
     it("still lists RSVPs per session without auth", async () => {
       const { guest, session } = await setup();
       await protectGuest(guest.id);
 
-      const res = await getRsvps(
-        new NextRequest(`http://test/api/rsvps?session=${session.id}`)
-      );
+      const res = await GET(v1("GET", `/sessions/${session.id}/rsvps`));
       expect(res.ok).toBe(true);
-      expect(await res.json()).toHaveLength(1);
+      expect(((await res.json()) as { rsvps: unknown[] }).rsvps).toHaveLength(
+        1
+      );
     });
   });
 

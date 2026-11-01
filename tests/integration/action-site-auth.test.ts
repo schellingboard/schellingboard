@@ -54,15 +54,15 @@ describe("creation requires a selected name", () => {
 
   afterEach(() => vi.unstubAllEnvs());
 
-  it("add-session refuses a caller with no name selected", async () => {
-    const { POST } = await import("@/app/api/add-session/route");
+  it("booking a session refuses a caller with no name selected", async () => {
+    const { addSession } = await import("../helpers/session-form");
     const event = await createEvent({ phase: "scheduling" });
     const guest = await createGuest({ eventId: event.id });
     const location = await createLocation({ eventId: event.id });
     const day = await createDay(event.id);
 
-    const res = await POST(
-      new NextRequest("http://test/api/add-session", {
+    const res = await addSession(
+      new NextRequest("http://test/session-form", {
         method: "POST",
         body: JSON.stringify({
           title: "T",

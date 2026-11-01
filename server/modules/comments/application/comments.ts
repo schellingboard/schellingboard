@@ -177,33 +177,6 @@ export const deleteComment =
       return ok(undefined);
     });
 
-export const toggleCommentLike =
-  ({ uow }: CommentDeps) =>
-  async (
-    actor: Actor,
-    { commentId }: { commentId: string },
-    now: Date
-  ): Promise<Result<boolean>> =>
-    uow.run(async (tx) => {
-      const acting = await actingGuest(actor, tx.guests);
-      if (!acting.ok) return acting;
-      const comment = await liveComment(tx, commentId);
-      if (!comment.ok) return comment;
-      const inEvent = await actingGuest(
-        actor,
-        tx.guests,
-        await modeOfEvent(tx, await eventIdOfComment(tx, commentId))
-      );
-      if (!inEvent.ok) return inEvent;
-      return ok(
-        await tx.comments.toggleLike({
-          commentId,
-          guestId: acting.value,
-          createdTime: now,
-        })
-      );
-    });
-
 export const setCommentLike =
   ({ uow }: CommentDeps) =>
   async (
