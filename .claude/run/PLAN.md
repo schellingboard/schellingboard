@@ -101,8 +101,8 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
       when they take part in any `verified` event (one SQL expression in the guests repository), and
       use cases on one event take its mode; admin Identity select on create and edit; use case
       015-US7.
-- [ ] 14. **Show map in the shell.** The SPA shell gets the "Show map" item from `GET /site`'s map
-      URL (open-questions item 9). Remove the `test.fixme` from the map test in `settings.spec.ts`.
+- [x] 14. Show map in the shell: `MapButton` (`apps/web/src/app/map-button.tsx`) reads `GET /site`
+      and opens the map in a dialog; the `settings.spec.ts` map test runs again.
 - [ ] 15. **Docs: step 6 done.** 10-path, 05 (scrypt, personal join links, the two settings), 02,
       web-app, server.md, open-questions. Doc only.
 
