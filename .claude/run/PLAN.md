@@ -139,9 +139,9 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
       `openapi.json`, `packages/api-client`, the SPA, tests and `docs/public/self-hosting/api.md`.
 - [x] 23a. `GET /guests/{id}/rsvps` and `DELETE /me/identity` are gone; `POST /api/auth/logout` is
       `DELETE /api/v1/auth/site`. The CHANGELOG line waits for 23e (all of it is unreleased).
-- [ ] 23b. Methods for removal: `DELETE /me/notifications?ids=`,
-      `DELETE /me/push-subscriptions?endpoint=`, `GET /me/push-subscriptions?endpoint=` (replaces
-      `/check`). Old `POST` routes go. Tests first (use cases for notifications and push).
+- [x] 23b. `DELETE /me/notifications?ids=` (comma-separated),
+      `DELETE /me/push-subscriptions?endpoint=` and `GET /me/push-subscriptions?endpoint=` replace
+      the three `POST` verb routes.
 - [ ] 23c. `POST /dev/reminders` becomes `/api/dev/reminders`, outside `/api/v1` and `openapi.json`;
       still 404 without `SB_ENABLE_DEV_TOOLS`. The SPA's dev toolbar follows. Also `API_DOCS`
       becomes `SB_API_DOCS` (code, `.env` files, `configuration.md`, `api.md`).

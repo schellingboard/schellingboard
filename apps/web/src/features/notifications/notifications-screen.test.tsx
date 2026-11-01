@@ -126,9 +126,20 @@ describe("the notification list", { tags: ["013-US2"] }, () => {
 
     expect(await screen.findByText(/Nothing yet/)).toBeTruthy();
     expect(calls[1]).toMatchObject({
-      path: "/api/v1/me/notifications/delete",
-      body: { ids: ["Anna", "Bo"] },
+      method: "DELETE",
+      path: "/api/v1/me/notifications?ids=Anna%2CBo",
     });
+  });
+
+  it("deletes a long selection in batches the URL can hold", async () => {
+    const { api, calls } = fakeApi(() => new Response(null, { status: 204 }));
+    const ids = Array.from({ length: 230 }, (_, i) => `n${i}`);
+
+    await notificationCalls(api).remove(ids, "k");
+
+    expect(calls.map((c) => c.path.split("=")[1].split("%2C").length)).toEqual([
+      100, 100, 30,
+    ]);
   });
 
   it("opens a notification: marks it read, then follows where it leads", async () => {

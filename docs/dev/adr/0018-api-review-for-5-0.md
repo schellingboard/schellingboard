@@ -47,7 +47,10 @@ Benefit and who breaks are given for each change. Since `/api/v1` is unreleased,
    `DELETE /me/notifications?ids=…`; `POST /me/push-subscriptions/remove` becomes
    `DELETE /me/push-subscriptions?endpoint=…`; `POST /me/push-subscriptions/check` becomes
    `GET /me/push-subscriptions?endpoint=…` (it changes nothing). Benefit: HTTP methods say what
-   happens, so proxies, clients and the retry rules treat them right. Breaks nobody.
+   happens, so proxies, clients and the retry rules treat them right. Breaks nobody. The push
+   endpoint now appears in proxy access logs; accepted, since it is useless without the keys, and
+   the SPA sends no idempotency key with that `DELETE` (it is idempotent), so the server does not
+   store the endpoint either. Ids in the URL are capped at 100 per call.
 7. **Keep the command pairs `…/guests/assign|remove` and `…/locations/assign|remove`** under an
    event. They set membership from a list in one transaction; `remove` as `DELETE` would need a
    body. The rule written into `api.md`: a `POST` with a verb is a command that is not a plain
