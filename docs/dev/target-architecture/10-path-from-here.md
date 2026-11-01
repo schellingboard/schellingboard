@@ -55,8 +55,10 @@ get its own issue and ADR.
    site-admin role with a bootstrap link instead of the admin password, and an identity mode per
    event. Persons stay the `guests` table. Left for later plans: the reading setting, passkeys, API
    tokens, the QR sheet for join links and the organizer participation role.
-7. **Retire Next.** The server serves the SPA's static files; `next` leaves `package.json`; the
-   Dockerfile shrinks.
+7. **Retire Next.** Done ([ADR 0015](../adr/0015-spa-alongside-next.md)): Hono serves the SPA's
+   static files, the API, `/media` and the public files in its own Node process
+   (`dist/server/main.mjs`); `next`, `app/` and `/legacy` are gone; the Dockerfile copies the
+   bundle, `apps/web/dist` and a few native modules.
 
 Steps 1 and 2 are valuable even if nothing else happens. Steps 3 to 5 are where the attendee-visible
 wins land, and they can be paced by event calendar: the feed and the schedule screen before the next

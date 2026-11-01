@@ -1,6 +1,6 @@
 # ADR 0012: A versioned HTTP API in the Next process
 
-- **Status:** Accepted
+- **Status:** Accepted (the API now runs in Hono's own Node process, not in Next; ADR 0015)
 - **Date:** 2026-10-04
 - **Issue:** #677
 

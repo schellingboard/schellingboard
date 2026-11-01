@@ -3,7 +3,7 @@
 ## Code style
 
 - TypeScript strict mode throughout
-- Prefer server components; use server actions for mutations
+- Mutations go through a use case in `server/modules/` and the `/api/v1` API
 - Tailwind CSS for all styling
 - All UI must be mobile-responsive
 

@@ -8,11 +8,11 @@ distinct role:
 **Unit tests** (Vitest, `tests/unit/`) — pure functions and isolated business rules only. No DB, no
 I/O.
 
-**Integration tests** (Vitest, `tests/integration/`) — server actions and API route handlers against
-a real SQLite database file, restored from a migrated template before each test. Verify
-post-condition state through a read surface in order of preference: (1) the corresponding GET
-endpoint, (2) repo read methods, (3) direct DB rows (last resort). Only `redirect()` and
-`revalidatePath()` are mocked.
+**Integration tests** (Vitest, `tests/integration/`) — use cases and API route handlers against a
+real SQLite database file, restored from a migrated template before each test. Verify post-condition
+state through a read surface in order of preference: (1) the corresponding GET endpoint, (2) repo
+read methods, (3) direct DB rows (last resort). Only external I/O is mocked (the mailer, push, the
+SPA files).
 
 **E2E tests** (Playwright, `tests/e2e/`) — behavior that only manifests in a browser: routing,
 phase-dependent UI, modals, form interaction, mobile layout. Prefer fewer, high-confidence tests
@@ -172,10 +172,10 @@ oldest version still covered.
 
 ## Testing the Docker image
 
-`make test-e2e` runs the suite against `next build && next start`, which is not what we ship. The
-image runs the standalone build as `node server.js`, as a different user, with the database,
-migrations and uploads on a mounted `/data` volume. `make test-e2e-docker` runs the same suite
-against a container built from the working tree, which is the only tier that covers that gap:
+`make test-e2e` runs the suite against the server built on the host, which is not what we ship. The
+image runs `node dist/server/main.mjs`, as a different user, with the database, migrations and
+uploads on a mounted `/data` volume. `make test-e2e-docker` runs the same suite against a container
+built from the working tree, which is the only tier that covers that gap:
 
 ```bash
 make test-e2e-docker                     # build the image, then run the suite against it
@@ -189,8 +189,8 @@ bun set-env.ts test bash scripts/e2e-docker.sh tests/e2e/proposals.spec.ts
 It is not part of `make precommit` — it builds an image and takes a few minutes. The release
 workflow runs it against the image it is about to publish and refuses to publish if it fails (see
 [Releasing a New Version](releasing.md)), so the reason to run it by hand is a change to the
-`Dockerfile`, the standalone build, or anything touching paths, uploads or migrations — well before
-a release rather than at one.
+`Dockerfile`, the server bundle, or anything touching paths, uploads or migrations — well before a
+release rather than at one.
 
 What it does, and why each piece is there:
 
@@ -208,8 +208,7 @@ What it does, and why each piece is there:
   migrations to an empty database.
 - **Runs the container as your own uid** (`--user`), so the files it writes into the bind mount
   don't end up owned by the image's uid 1001 and unremovable. As a consequence `/app` isn't
-  writable, so Next's image optimizer gets a tmpfs for its cache — otherwise every optimized image
-  logs an `EACCES`.
+  writable; the app writes only to `/data`.
 - **Starts mailpit if it isn't already running**, because once the mail variables are set the email
   specs fail rather than skip. One it started itself is stopped again afterwards, unless the run
   failed — then it is left up, since its web UI is where a failing email test is diagnosed.
@@ -219,10 +218,10 @@ What it does, and why each piece is there:
 Playwright starts no server of its own here: the script sets `E2E_EXTERNAL_SERVER=1` and `E2E_PORT`,
 and `playwright.config.ts` omits its `webServer` when it sees them.
 
-**The container runs in UTC.** That is what makes this tier worth having: with `next start`, the
-server and the browser share your machine's timezone, so a component that formats a date in the
-ambient zone renders identically on both sides and its hydration mismatch stays invisible. In the
-image it does not. Dates must be formatted in an explicit zone — the event's — never the process's.
+**The container runs in UTC.** That is what makes this tier worth having: on the host, the server
+and the browser share your machine's timezone, so code that formats a date in the ambient zone gives
+the same text on both sides and the fault stays invisible. In the image it does not. Dates must be
+formatted in an explicit zone — the event's — never the process's.
 
 ## Flake hunting
 
@@ -242,10 +241,10 @@ report), its console log, and traces of whatever failed. Traces are recorded wit
 `--trace=retain-on-failure`, so a failure comes with network log, console and per-action DOM
 snapshots — open one with `bun x playwright show-trace <path>`.
 
-The app is built and started **once** for the whole hunt, not per run: a `next build` per iteration
-would dominate the runtime, while the part that has to repeat — reseeding the database in
-`globalSetup` — still happens once per run. Retries are forced to 0: the hunt wants raw failure
-rates, not Playwright's own flake classification.
+The app is built and started **once** for the whole hunt, not per run: a build per iteration would
+dominate the runtime, while the part that has to repeat — reseeding the database in `globalSetup` —
+still happens once per run. Retries are forced to 0: the hunt wants raw failure rates, not
+Playwright's own flake classification.
 
 Two knobs, both environment variables:
 

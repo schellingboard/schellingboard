@@ -1,8 +1,4 @@
 import { getRepositories } from "@/db/container";
-import {
-  type ActionResult,
-  runIdempotentAction,
-} from "@/server/kernel/idempotency";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
 import { authCodeEmail } from "@/emails/auth-code";
 import { authPasswordResetEmail } from "@/emails/auth-password-reset";
@@ -229,11 +225,4 @@ export function pageReads() {
 
 export function dispatchReminders(now: Date) {
   return dispatchDueReminders(now, getRepositories());
-}
-
-export function idempotentAction<R extends ActionResult>(
-  call: Parameters<typeof runIdempotentAction>[1],
-  run: () => Promise<R>
-) {
-  return runIdempotentAction(getRepositories().idempotency, call, run);
 }

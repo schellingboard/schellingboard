@@ -2,6 +2,9 @@
 
 - **Status:** Accepted
 - **Date:** 2026-10-08
+- **Update:** step 7 is done. Next, `app/` and `/legacy` are gone; Hono serves everything in its own
+  Node process (`server/main.ts`), and `make dev` runs Vite in front of it. The text below says how
+  the migration went.
 
 ## Context
 
