@@ -100,8 +100,7 @@ export default defineConfig({
    * that before the suite is stable would only make CI red noise. */
   retries: process.env.CI ? 2 : 1,
   failOnFlakyTests: !process.env.CI,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 2 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters
    * On CI the run is only worth as much as the record it leaves behind: the
    * JSON report is what scripts/ci-flaky-summary.ts reads to name the tests
