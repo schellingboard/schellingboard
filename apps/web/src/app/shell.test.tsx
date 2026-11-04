@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { fakeApi } from "../commands/fake-api";
 import { Shell } from "./shell";
 
@@ -75,5 +76,52 @@ describe("Shell", () => {
     );
     expect(screen.getByRole("alert")).toBeTruthy();
     expect(screen.getByRole("contentinfo")).toBeTruthy();
+  });
+
+  describe("the site map", { tags: ["015-US5"] }, () => {
+    const showWith = (mapImageUrl: string) => {
+      const { api, calls } = fakeApi((call) =>
+        call.path === "/api/v1/site"
+          ? Response.json({ title: "T", description: "", mapImageUrl })
+          : Response.json({ guestId: null })
+      );
+      render(
+        <Shell
+          api={api}
+          events={[]}
+          guests={[]}
+          currentPath="/"
+          search=""
+          onClockChange={() => {}}
+        >
+          <p>the page</p>
+        </Shell>
+      );
+      return calls;
+    };
+
+    it("opens the uploaded map from a nav button", async () => {
+      showWith("/media/map.png");
+
+      await userEvent.click(
+        await screen.findByRole("button", { name: "Show map" })
+      );
+
+      expect(screen.getByRole("img", { name: "Map" }).getAttribute("src")).toBe(
+        "/media/map.png"
+      );
+      await userEvent.click(screen.getByRole("button", { name: "Close" }));
+      expect(screen.queryByRole("img", { name: "Map" })).toBeNull();
+    });
+
+    it("offers no map button when none is uploaded", async () => {
+      const calls = showWith("");
+
+      await waitFor(() =>
+        expect(calls.some((c) => c.path === "/api/v1/site")).toBe(true)
+      );
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      expect(screen.queryByRole("button", { name: "Show map" })).toBeNull();
+    });
   });
 });
