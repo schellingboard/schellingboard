@@ -143,11 +143,8 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
       `DELETE /me/push-subscriptions?endpoint=` and `GET /me/push-subscriptions?endpoint=` replace
       the three `POST` verb routes.
 - [x] 23c. `POST /api/dev/reminders` (a web route, not in `openapi.json`) and `SB_API_DOCS`.
-- [ ] 23d. `api.md`: the command-versus-DELETE rule, the `/admin/` privilege rule, `{id}` versus
-      `{slug}`, `/attendees` versus `/guests`, `Authorization` reserved for `Bearer sb_` tokens and
-      ignored today, and the full Compatibility section from ADR 0018 (breaking, not breaking,
-      deprecation, what clients tolerate, self-hoster promises). Mark in `configuration.md` that new
-      variables are `SB_`-prefixed. `make docs-validate`.
+- [x] 23d. `api.md` has Conventions and Compatibility sections (ADR 0018); `configuration.md` says
+      new variables are `SB_`-prefixed.
 - [ ] 23e. `CHANGELOG.md` breaking note for 5.0.0: the 4.0.0 `/api/*` routes (`/api/admin/*`,
       `toggle-rsvp`, `rsvps`, `add-`/`update-`/`delete-session`, votes, comments, meetings;
       `/api/auth/login` is already named) are gone and `/api/v1` replaces them; everyone signs in
