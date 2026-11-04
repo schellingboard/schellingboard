@@ -5,8 +5,6 @@ import {
   gt,
   inArray,
   isNotNull,
-  isNull,
-  or,
   sql,
   type SQL,
 } from "drizzle-orm";
@@ -15,10 +13,8 @@ import { nanoid } from "nanoid";
 import { realNow } from "@/utils/real-clock";
 import * as schema from "../../schema";
 import {
-  type EventGuestPage,
   type GuestAuthCredentials,
   type GuestsRepository,
-  type GuestPage,
   type NewGuest,
 } from "../interfaces";
 import {
@@ -34,12 +30,6 @@ import {
 } from "@schellingboard/domain/guest";
 
 type DB = BetterSQLite3Database<typeof schema>;
-
-// Escape LIKE meta-characters so user input is matched literally. Pairs with an
-// explicit `ESCAPE '\'` clause in the query below.
-function escapeLike(value: string): string {
-  return value.replace(/[\\%_]/g, (ch) => `\\${ch}`);
-}
 
 // The fields whose change makes a profile "recently updated" — everything the
 // guest edits about themselves in public. Email settings and credentials are
@@ -273,41 +263,6 @@ export class SqliteGuestsRepository implements GuestsRepository {
       }));
   }
 
-  async search(opts: {
-    query?: string;
-    limit: number;
-    offset: number;
-  }): Promise<GuestPage> {
-    let where = undefined;
-    if (opts.query) {
-      const pattern = `%${escapeLike(opts.query)}%`;
-      where = or(
-        sql`${schema.guests.name} like ${pattern} escape '\\'`,
-        sql`${schema.guests.email} like ${pattern} escape '\\'`
-      );
-    }
-
-    const totalRow = this.db
-      .select({ count: sql<number>`count(*)` })
-      .from(schema.guests)
-      .where(where)
-      .get();
-
-    const rows = this.db
-      .select()
-      .from(schema.guests)
-      .where(where)
-      // id as tiebreaker: name is not unique, and without a deterministic
-      // order LIMIT/OFFSET pagination can duplicate or skip rows.
-      .orderBy(sql`${schema.guests.name} collate nocase`, schema.guests.id)
-      .limit(opts.limit)
-      .offset(opts.offset)
-      .all()
-      .map(rowToGuest);
-
-    return { rows, total: totalRow?.count ?? 0 };
-  }
-
   async listAttendees(now: Date): Promise<Attendee[]> {
     const isHostExpr = exists(
       this.db
@@ -434,68 +389,6 @@ export class SqliteGuestsRepository implements GuestsRepository {
       result.get(row.guestId)?.push({ id: row.eventId, name: row.eventName });
     }
     return result;
-  }
-
-  async searchForEventAssignment(
-    eventId: string,
-    opts: {
-      query?: string;
-      assigned?: boolean;
-      limit: number;
-      offset: number;
-    }
-  ): Promise<EventGuestPage> {
-    // A guest is "assigned" when the event-scoped left join matches a row.
-    const joinCondition = and(
-      eq(schema.guests.id, schema.eventGuests.guestId),
-      eq(schema.eventGuests.eventId, eventId)
-    );
-
-    const conditions = [];
-    if (opts.assigned === true) {
-      conditions.push(isNotNull(schema.eventGuests.guestId));
-    } else if (opts.assigned === false) {
-      conditions.push(isNull(schema.eventGuests.guestId));
-    }
-    if (opts.query) {
-      const pattern = `%${escapeLike(opts.query)}%`;
-      conditions.push(
-        sql`((${schema.guests.name} like ${pattern} escape '\\') or (${schema.guests.email} like ${pattern} escape '\\'))`
-      );
-    }
-    const where = conditions.length > 0 ? and(...conditions) : undefined;
-
-    const totalRow = this.db
-      .select({ count: sql<number>`count(*)` })
-      .from(schema.guests)
-      .leftJoin(schema.eventGuests, joinCondition)
-      .where(where)
-      .get();
-
-    const rows = this.db
-      .select({
-        id: schema.guests.id,
-        name: schema.guests.name,
-        email: schema.guests.email,
-        assigned: sql<number>`(${schema.eventGuests.guestId} is not null)`,
-      })
-      .from(schema.guests)
-      .leftJoin(schema.eventGuests, joinCondition)
-      .where(where)
-      // id as tiebreaker: name is not unique, and without a deterministic
-      // order LIMIT/OFFSET pagination can duplicate or skip rows.
-      .orderBy(sql`${schema.guests.name} collate nocase`, schema.guests.id)
-      .limit(opts.limit)
-      .offset(opts.offset)
-      .all()
-      .map((r) => ({
-        id: r.id,
-        name: r.name,
-        email: r.email,
-        assigned: Boolean(r.assigned),
-      }));
-
-    return { rows, total: totalRow?.count ?? 0 };
   }
 
   async findById(id: string): Promise<CompleteGuest | undefined> {

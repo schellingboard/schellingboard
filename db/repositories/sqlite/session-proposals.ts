@@ -1,19 +1,9 @@
-import {
-  and,
-  count,
-  eq,
-  exists,
-  inArray,
-  isNotNull,
-  or,
-  sql,
-} from "drizzle-orm";
+import { and, count, eq, inArray, isNotNull, sql } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
 import * as schema from "../../schema";
 import type {
   SessionProposalCreateInput,
-  SessionProposalPage,
   SessionProposalUpdateInput,
   SessionProposalsRepository,
 } from "../interfaces";
@@ -24,12 +14,6 @@ import type {
 
 type DB = BetterSQLite3Database<typeof schema>;
 type ProposalRow = typeof schema.sessionProposals.$inferSelect;
-
-// Escape LIKE meta-characters so user input is matched literally. Pairs with an
-// explicit `ESCAPE '\'` clause in the query below.
-function escapeLike(value: string): string {
-  return value.replace(/[\\%_]/g, (ch) => `\\${ch}`);
-}
 
 export class SqliteSessionProposalsRepository implements SessionProposalsRepository {
   constructor(private readonly db: DB) {}
@@ -160,61 +144,6 @@ export class SqliteSessionProposalsRepository implements SessionProposalsReposit
       .all()
       .map((r) => r.proposal);
     return this.enrichProposals(rows);
-  }
-
-  async searchByEvent(
-    eventId: string,
-    opts: { query?: string; limit: number; offset: number }
-  ): Promise<SessionProposalPage> {
-    const conditions = [eq(schema.sessionProposals.eventId, eventId)];
-    if (opts.query) {
-      const pattern = `%${escapeLike(opts.query)}%`;
-      // Match the title or any host's name.
-      const hostMatch = exists(
-        this.db
-          .select({ one: sql`1` })
-          .from(schema.proposalHosts)
-          .innerJoin(
-            schema.guests,
-            eq(schema.proposalHosts.guestId, schema.guests.id)
-          )
-          .where(
-            and(
-              eq(schema.proposalHosts.proposalId, schema.sessionProposals.id),
-              sql`${schema.guests.name} like ${pattern} escape '\\'`
-            )
-          )
-      );
-      conditions.push(
-        or(
-          sql`${schema.sessionProposals.title} like ${pattern} escape '\\'`,
-          hostMatch
-        )!
-      );
-    }
-    const where = and(...conditions);
-
-    const totalRow = this.db
-      .select({ count: count() })
-      .from(schema.sessionProposals)
-      .where(where)
-      .get();
-
-    const rows = this.db
-      .select()
-      .from(schema.sessionProposals)
-      .where(where)
-      // id as tiebreaker: title is not unique, and without a deterministic
-      // order LIMIT/OFFSET pagination can duplicate or skip rows.
-      .orderBy(
-        sql`${schema.sessionProposals.title} collate nocase`,
-        schema.sessionProposals.id
-      )
-      .limit(opts.limit)
-      .offset(opts.offset)
-      .all();
-
-    return { rows: this.enrichProposals(rows), total: totalRow?.count ?? 0 };
   }
 
   async findById(id: string): Promise<SessionProposal | undefined> {

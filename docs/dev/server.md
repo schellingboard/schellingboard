@@ -1,10 +1,9 @@
 # The server and the API
 
-`server/` holds the use cases and the `/api/v1` HTTP API in front of them. Server actions, the
-legacy `/api/*` routes and `/api/v1` all call the same use cases, so a rule is written once.
-[ADR 0012](adr/0012-http-api-v1.md) has the decisions; this page is how the code is laid out and how
-to add to it. The user-facing description of the API is
-[HTTP API](https://docs.schellingboard.org/self-hosting/api/).
+`server/` holds the use cases and the `/api/v1` HTTP API in front of them. Server actions and
+`/api/v1` call the same use cases, so a rule is written once. [ADR 0012](adr/0012-http-api-v1.md)
+has the decisions; this page is how the code is laid out and how to add to it. The user-facing
+description of the API is [HTTP API](https://docs.schellingboard.org/self-hosting/api/).
 
 ## Layout
 
@@ -174,8 +173,7 @@ prediction knows its command has arrived and drops it.
    Admin routes go under `/admin/`, or the proxy will not gate them. Register a new route function
    in `server/http/app.ts`.
 4. **Callers.** A server action resolves the actor with `actorOf(await cookies())` and calls the use
-   case from `server/composition.ts`. A legacy route uses `legacyActor` and `legacyRefusal` from
-   `app/api/legacy.ts` and keeps its old response body.
+   case from `server/composition.ts`.
 5. **`make openapi`.** It rewrites `packages/contracts/openapi.json` and the client's types in
    `packages/api-client/src/schema.ts`; commit both. `make openapi-check`, in `make precommit` and
    CI, fails while either is stale.

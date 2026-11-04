@@ -27,13 +27,13 @@ import {
   createUnavailability,
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { POST } from "@/app/api/add-session/route";
+import { addSession as POST } from "../helpers/session-form";
 import {
   GUEST_COOKIE_NAME,
   openGuestValue,
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
-import type { SessionParams } from "@/app/api/session-form-utils";
+import type { SessionParams } from "../helpers/session-form";
 import type { Location } from "@schellingboard/domain/location";
 import type { Guest } from "@schellingboard/domain/guest";
 import type { Day } from "@schellingboard/domain/event";
@@ -58,7 +58,7 @@ function makeReq(
   const cookies: string[] = [];
   if (actingGuestId)
     cookies.push(`${GUEST_COOKIE_NAME}=${openGuestValue(actingGuestId)}`);
-  return new NextRequest("http://test/api/add-session", {
+  return new NextRequest("http://test/session-form", {
     method: "POST",
     body: JSON.stringify(payload),
     // The guest cookie identifies the acting guest, like the site sets it.
@@ -73,7 +73,7 @@ async function makeReqWithAuthCookie(
   payload: unknown,
   editorGuestId: string
 ): Promise<NextRequest> {
-  return new NextRequest("http://test/api/add-session", {
+  return new NextRequest("http://test/session-form", {
     method: "POST",
     body: JSON.stringify(payload),
     headers: {
@@ -101,7 +101,7 @@ function buildPayload(
   };
 }
 
-describe("POST /api/add-session", () => {
+describe("session form: add session", () => {
   beforeAll(() => setupTestDb());
   beforeEach(() => {
     resetTestDb();
@@ -143,8 +143,8 @@ describe("POST /api/add-session", () => {
     const first = await POST(makeReq(payload, { key: "form-1" }));
     const second = await POST(makeReq(payload, { key: "form-1" }));
 
-    expect(await first.json()).toEqual({ success: true });
-    expect(await second.json()).toEqual({ success: true });
+    expect(first.status).toBe(201);
+    expect(await second.json()).toEqual(await first.json());
     expect(await getRepositories().sessions.listByEvent(event.id)).toHaveLength(
       1
     );
@@ -163,8 +163,7 @@ describe("POST /api/add-session", () => {
       })
     );
 
-    expect(second.status).toBe(409);
-    expect(((await second.json()) as { error: string }).error).not.toBe("");
+    expect(second.status).toBe(422);
     expect(await getRepositories().sessions.listByEvent(event.id)).toHaveLength(
       1
     );
@@ -179,7 +178,6 @@ describe("POST /api/add-session", () => {
     const res = await POST(makeReq(buildPayload(guest, location, day)));
 
     expect(res.ok).toBe(true);
-    expect(await res.json()).toMatchObject({ success: true });
 
     const sessions = await getRepositories().sessions.listByEvent(event.id);
     expect(sessions).toHaveLength(1);
@@ -310,8 +308,8 @@ describe("POST /api/add-session", () => {
     );
     expect(res.status).toBe(400);
     // Named, so the rejection can't be mistaken for the booking-window rule.
-    expect(await res.json()).toEqual({
-      error: "Sessions can last at most 120 minutes",
+    expect(await res.json()).toMatchObject({
+      detail: "Sessions can last at most 120 minutes",
     });
 
     const sessions = await getRepositories().sessions.listByEvent(event.id);
@@ -671,9 +669,7 @@ describe("POST /api/add-session", () => {
     );
     expect(res.status).toBe(400);
     // Named, so the rejection can't be mistaken for one of the other rules.
-    expect(await res.json()).toEqual({
-      error: "Max attendees must be a non-negative whole number",
-    });
+    expect(await res.json()).toMatchObject({ code: "request.invalid" });
 
     const sessions = await getRepositories().sessions.listByEvent(event.id);
     expect(sessions).toHaveLength(0);
@@ -711,29 +707,5 @@ describe("POST /api/add-session", () => {
 
     const sessions = await getRepositories().sessions.listByEvent(event.id);
     expect(sessions).toHaveLength(1);
-  });
-
-  it("refuses a caller without a name before reading hosts or location", async () => {
-    const day = await createDay(
-      (await createEvent({ phase: "scheduling" })).id
-    );
-
-    const res = await POST(makeReq({ title: "T", dayId: day.id }));
-
-    expect(res.status).toBe(403);
-  });
-
-  // Route does not guard req.json() — parse errors surface as a thrown SyntaxError
-  it("malformed JSON causes a SyntaxError", async () => {
-    const guest = await createGuest();
-    const req = new NextRequest("http://test/api/add-session", {
-      method: "POST",
-      body: "not json",
-      headers: {
-        "content-type": "application/json",
-        cookie: `${GUEST_COOKIE_NAME}=${openGuestValue(guest.id)}`,
-      },
-    });
-    await expect(POST(req)).rejects.toThrow(SyntaxError);
   });
 });

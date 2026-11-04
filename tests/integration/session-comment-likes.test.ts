@@ -142,9 +142,10 @@ describe("session comment likes", () => {
     const sameMillisecond = new Date();
 
     for (const liker of likers) {
-      await getRepositories().comments.toggleLike({
+      await getRepositories().comments.setLike({
         commentId: comment.id,
         guestId: liker.id,
+        liked: true,
         createdTime: sameMillisecond,
       });
     }

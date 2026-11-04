@@ -164,16 +164,18 @@ the notifications view is stale after switching name, which may be an app bug (q
 the new identity). The "mid-click navigation to /admin/users" in the log is afterEach cleanup after
 the timeout, not the cause. Unresolved.
 
-## Left alone (step 16 removes them)
+## Left alone
 
-- Repository methods only removed page reads used (`guests.search`, `searchForEventAssignment`,
-  `sessions.searchByEvent`, `proposals` search, ...) and `tests/integration/admin-*-search.test.ts`.
-- Legacy `/api/toggle-rsvp`, `/api/add-session`, `/api/update-session`; the `toggleCommentLike` use
-  case.
-- AGENTS.md "Misc" still names `modal-nav.ts`; the anchor MnpjIo7Y lives in `docs/dev/web-app.md`
-  (needs the user's edit).
-
+- AGENTS.md "Misc" still names `modal-nav.ts`, and its comment examples cite deleted files
+  (`app/api/rsvps/route.ts`, `fetch("/api/toggle-rsvp")`); both need the user's edit.
 - `/legacy` itself has no page now; the error boundary and "Back to the events" link to `/`.
+
+- Step 16: `/api` has only `auth/logout`, `health`, `spa/*` and `v1` left in Next. The route tests
+  became `/api/v1` calls: `tests/helpers/session-form.ts` translates the old booking-form payload
+  (the v1 refusals differ: 403 `session.managedByOrganizer`, 422 key reuse,
+  `session.versionConflict`, `request.invalid` for a bad capacity). Meetings, candidates and
+  comment-route tests were deleted (`api-meetings`, `api-comments` cover the same use cases). Rules
+  the page reads had needed went with the repository searches and their four tests.
 
 ## Questions
 

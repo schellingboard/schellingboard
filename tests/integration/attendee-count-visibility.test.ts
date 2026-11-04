@@ -106,18 +106,6 @@ describe("a recorded attendee count never reaches a session payload", () => {
     expectNoCount(sessions);
   });
 
-  it("is absent from the admin session read surface (FR-020)", async () => {
-    const { event } = await seed();
-
-    const page = await getRepositories().sessions.searchByEvent(event.id, {
-      limit: 50,
-      offset: 0,
-    });
-
-    expect(page.rows).toHaveLength(1);
-    expectNoCount(page.rows);
-  });
-
   it("is absent from every other session listing", async () => {
     const { event, host } = await seed();
     const { sessions } = getRepositories();

@@ -107,9 +107,10 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
 
 ### Retire Next (path step 7)
 
-- [ ] 16. **Legacy API routes go**: `/api/toggle-rsvp`, `add-`/`update-`/`delete-session`,
-      `/api/rsvps`, `/api/meetings` (+ candidates) and the comment routes; their tests move to
-      `/api/v1` or go. Also the leftovers in PROGRESS.md ("Left alone").
+- [x] 16. Legacy API routes gone: `/api/toggle-rsvp`, `add-`/`update-`/`delete-session`,
+      `/api/rsvps`, `/api/meetings` (+ candidates), the comment routes, `app/api/legacy.ts`,
+      `session-form-utils.ts`; the `toggleCommentLike` use case; the unused repository searches.
+      Session-form tests call `/api/v1` through `tests/helpers/session-form.ts`.
 - [ ] 17. **Hono serves everything.** The proxy's gates and header stripping become Hono middleware;
       Hono serves `/media`, `/locations`, the shell, `/_spa/`, `sw.js`, icons, manifest, and
       `/api/health`. Next keeps one catch-all route handler that calls Hono; `proxy.ts` and the

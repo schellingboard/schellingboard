@@ -16,7 +16,7 @@ import { NextRequest } from "next/server";
 // guest without a verified session. This file enumerates app/api route
 // files so a newly added, unguarded handler fails the suite instead of
 // silently shipping — it must be added to VERIFIERS (with a check that
-// proves the 403) or to READ_ONLY (with a reason).
+// proves the 403).
 
 vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
@@ -45,7 +45,6 @@ import {
   createEvent,
   createGuest,
   createLocation,
-  createSession,
   slotStart,
 } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
@@ -79,103 +78,12 @@ function apiRouteFiles(): string[] {
 // Independent auth layers (admin/site gates), not the acting-guest
 // invariant this guard covers; and the unauthenticated health check.
 // The SPA's static files are not acting-guest surfaces either.
-const OUT_OF_SCOPE_PREFIXES = ["admin/", "auth/", "spa/"];
+const OUT_OF_SCOPE_PREFIXES = ["auth/", "spa/"];
 const OUT_OF_SCOPE_EXACT = new Set(["health"]);
-
-// Read-only surfaces are exempt from the invariant per the coding guidelines.
-const READ_ONLY = new Set([
-  "meetings",
-  "meetings/candidates",
-  "rsvps",
-  "session/[sessionId]/comments",
-  "profile/[profileId]/comments",
-]);
 
 type Verifier = () => Promise<void>;
 
 const VERIFIERS: Record<string, Verifier> = {
-  "add-session": async () => {
-    const { POST } = await import("@/app/api/add-session/route");
-    const event = await createEvent({ phase: "scheduling" });
-    const guest = await createGuest({ eventId: event.id });
-    await protectGuest(guest.id);
-    const location = await createLocation({ eventId: event.id });
-    const day = await createDay(event.id);
-    const res = await POST(
-      new NextRequest("http://test/api/add-session", {
-        method: "POST",
-        body: JSON.stringify({
-          title: "T",
-          description: "",
-          closed: false,
-          hosts: [guest],
-          location,
-          dayId: day.id,
-          startTime: slotStart(day, 60),
-          duration: 60,
-        }),
-        headers: { cookie: `${GUEST_COOKIE_NAME}=${openGuestValue(guest.id)}` },
-      })
-    );
-    expect(res.status).toBe(403);
-  },
-
-  "update-session": async () => {
-    const { POST } = await import("@/app/api/update-session/route");
-    const event = await createEvent({ phase: "scheduling" });
-    const host = await createGuest({ eventId: event.id });
-    const location = await createLocation({ eventId: event.id });
-    const day = await createDay(event.id);
-    const session = await createSession(event.id, {
-      hostIds: [host.id],
-      locationIds: [location.id],
-      startTime: new Date(Date.now() + 60 * 60 * 1000),
-      endTime: new Date(Date.now() + 2 * 60 * 60 * 1000),
-    });
-    await protectGuest(host.id);
-    const res = await POST(
-      new NextRequest("http://test/api/update-session", {
-        method: "POST",
-        body: JSON.stringify({
-          id: session.id,
-          title: "Renamed",
-          description: "",
-          closed: false,
-          hosts: [host],
-          location,
-          dayId: day.id,
-          startTime: slotStart(day, 60),
-          duration: 60,
-          expectedVersion: session.version,
-        }),
-        headers: { cookie: `${GUEST_COOKIE_NAME}=${openGuestValue(host.id)}` },
-      })
-    );
-    expect(res.status).toBe(403);
-  },
-
-  "delete-session": async () => {
-    const { POST } = await import("@/app/api/delete-session/route");
-    const event = await createEvent({ phase: "scheduling" });
-    const host = await createGuest({ eventId: event.id });
-    const location = await createLocation({ eventId: event.id });
-    const session = await createSession(event.id, {
-      hostIds: [host.id],
-      locationIds: [location.id],
-      startTime: new Date(Date.now() + 60 * 60 * 1000),
-      endTime: new Date(Date.now() + 2 * 60 * 60 * 1000),
-    });
-    await protectGuest(host.id);
-    const res = await POST(
-      new NextRequest("http://test/api/delete-session", {
-        method: "POST",
-        body: JSON.stringify({ id: session.id }),
-        headers: { cookie: `${GUEST_COOKIE_NAME}=${openGuestValue(host.id)}` },
-      })
-    );
-    expect(res.status).toBe(403);
-  },
-
   "v1/[[...route]]": async () => {
     const { POST } = await import("@/app/api/v1/[[...route]]/route");
     const event = await createEvent({ phase: "scheduling" });
@@ -204,22 +112,6 @@ const VERIFIERS: Record<string, Verifier> = {
     );
     expect(res.status).toBe(403);
   },
-
-  "toggle-rsvp": async () => {
-    const { POST } = await import("@/app/api/toggle-rsvp/route");
-    const guest = await createGuest();
-    await protectGuest(guest.id);
-    const res = await POST(
-      new Request("http://test/api/toggle-rsvp", {
-        method: "POST",
-        body: JSON.stringify({
-          sessionId: "nonexistent",
-          guestId: guest.id,
-        }),
-      })
-    );
-    expect(res.status).toBe(403);
-  },
 };
 
 describe("mutating-surface regression guard", () => {
@@ -241,9 +133,9 @@ describe("mutating-surface regression guard", () => {
   for (const f of files) {
     it(`app/api/${f}/route.ts is guarded or explicitly read-only`, () => {
       expect(
-        READ_ONLY.has(f) || f in VERIFIERS,
-        `app/api/${f}/route.ts is neither in READ_ONLY nor VERIFIERS in ` +
-          `tests/integration/mutating-surface-guard.test.ts — add it to one`
+        f in VERIFIERS,
+        `app/api/${f}/route.ts is not in VERIFIERS in ` +
+          `tests/integration/mutating-surface-guard.test.ts — add it`
       ).toBe(true);
     });
   }

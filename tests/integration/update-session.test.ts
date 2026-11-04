@@ -35,9 +35,9 @@ import {
   openGuestValue,
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
-import { POST as addPOST } from "@/app/api/add-session/route";
-import { POST } from "@/app/api/update-session/route";
-import type { SessionParams } from "@/app/api/session-form-utils";
+import { addSession as addPOST } from "../helpers/session-form";
+import { updateSession as POST } from "../helpers/session-form";
+import type { SessionParams } from "../helpers/session-form";
 import type { Session } from "@schellingboard/domain/session";
 import type { Location } from "@schellingboard/domain/location";
 import type { Guest } from "@schellingboard/domain/guest";
@@ -56,7 +56,7 @@ function makeAddReq(payload: unknown): NextRequest {
   // Creating requires a name to be selected; these fixtures only seed a
   // session, so act as its first host.
   const hostId = (payload as SessionParams).hosts[0].id;
-  return new NextRequest("http://test/api/add-session", {
+  return new NextRequest("http://test/session-form", {
     method: "POST",
     body: JSON.stringify(payload),
     headers: { cookie: `${GUEST_COOKIE_NAME}=${openGuestValue(hostId)}` },
@@ -67,7 +67,7 @@ function makeUpdateReq(
   payload: unknown,
   opts?: { editorGuestId?: string }
 ): NextRequest {
-  return new NextRequest("http://test/api/update-session", {
+  return new NextRequest("http://test/session-form", {
     method: "POST",
     body: JSON.stringify(payload),
     // The guest cookie identifies the acting guest, like the site sets it.
@@ -81,7 +81,7 @@ async function makeUpdateReqWithAuthCookie(
   payload: unknown,
   editorGuestId: string
 ): Promise<NextRequest> {
-  return new NextRequest("http://test/api/update-session", {
+  return new NextRequest("http://test/session-form", {
     method: "POST",
     body: JSON.stringify(payload),
     headers: {
@@ -178,7 +178,7 @@ async function createScheduledSession(
   return sessions.find((s) => s.title === title)!.id;
 }
 
-describe("POST /api/update-session", () => {
+describe("session form: update session", () => {
   beforeAll(() => setupTestDb());
   beforeEach(() => {
     resetTestDb();
@@ -328,10 +328,8 @@ describe("POST /api/update-session", () => {
       const stale = await edit("Second");
 
       expect(stale.status).toBe(409);
-      expect(await stale.json()).toEqual({
-        error: expect.stringMatching(
-          /^Someone changed this session while you edited it\. Copy your edits/
-        ) as string,
+      expect(await stale.json()).toMatchObject({
+        code: "session.versionConflict",
       });
       expect(await getRepositories().sessions.findById(id)).toMatchObject({
         title: "First",
@@ -539,8 +537,8 @@ describe("POST /api/update-session", () => {
     );
     expect(res.status).toBe(400);
     // Named, so the rejection can't be mistaken for the booking-window rule.
-    expect(await res.json()).toEqual({
-      error: "Sessions can last at most 120 minutes",
+    expect(await res.json()).toMatchObject({
+      detail: "Sessions can last at most 120 minutes",
     });
 
     const unchanged = (await getRepositories().sessions.findById(id))!;
@@ -589,9 +587,7 @@ describe("POST /api/update-session", () => {
     );
     expect(res.status).toBe(403);
     // Named, so it can't pass on one of the handler's other 403s.
-    expect(await res.json()).toEqual({
-      error: "Only a host may edit this session",
-    });
+    expect(await res.json()).toMatchObject({ code: "session.notHost" });
   });
 
   it("rejects a host who is not part of the event", async () => {
@@ -1468,7 +1464,10 @@ describe("POST /api/update-session", () => {
         }
       )
     );
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(403);
+    expect(await res.json()).toMatchObject({
+      code: "session.managedByOrganizer",
+    });
 
     const unchanged = (await getRepositories().sessions.findById(keynote.id))!;
     expect(unchanged.title).toBe("Keynote");
@@ -1496,7 +1495,10 @@ describe("POST /api/update-session", () => {
         }
       )
     );
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(403);
+    expect(await res.json()).toMatchObject({
+      code: "session.managedByOrganizer",
+    });
 
     const unchanged = (await getRepositories().sessions.findById(lunch.id))!;
     expect(unchanged.title).toBe("Lunch Break");
