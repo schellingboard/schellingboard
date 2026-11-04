@@ -9,6 +9,7 @@ import {
   type AnySQLiteColumn,
 } from "drizzle-orm/sqlite-core";
 import type { LoginAssurance } from "@schellingboard/domain/auth";
+import type { IdentityMode } from "@schellingboard/domain/event";
 import type {
   ProfileContact,
   ProfilePrompt,
@@ -209,6 +210,10 @@ export const events = sqliteTable(
       .notNull()
       .default(false),
     icon: text("icon"),
+    identityMode: text("identity_mode")
+      .$type<IdentityMode>()
+      .notNull()
+      .default("open"),
     meetingsEnabled: integer("meetings_enabled", { mode: "boolean" })
       .notNull()
       .default(false),
@@ -254,7 +259,10 @@ export const eventGuests = sqliteTable(
       .notNull()
       .references(() => guests.id, { onDelete: "cascade" }),
   },
-  (t) => [primaryKey({ columns: [t.eventId, t.guestId] })]
+  (t) => [
+    primaryKey({ columns: [t.eventId, t.guestId] }),
+    index("event_guests_guest_idx").on(t.guestId),
+  ]
 );
 
 export const locations = sqliteTable("locations", {

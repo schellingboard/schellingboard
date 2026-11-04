@@ -69,7 +69,7 @@ describe("the admin events screen", { tags: ["015-US2"] }, () => {
     expect(screen.getByText("No events yet.")).toBeTruthy();
   });
 
-  it("creates an event with the legacy defaults and reloads the list", async () => {
+  it("creates an event with its defaults and reloads the list", async () => {
     const user = userEvent.setup();
     const { calls, onCreated } = setup([], () =>
       Response.json({ id: "e9" }, { status: 201 })
@@ -90,6 +90,7 @@ describe("the admin events screen", { tags: ["015-US2"] }, () => {
       maxSessionDuration: 60,
       breakMinutes: 10,
       slotIncrementMinutes: 30,
+      identityMode: "verified",
     });
     expect(screen.queryByRole("button", { name: "Create event" })).toBeNull();
     expect(screen.getByRole("button", { name: "New event" })).toBeTruthy();

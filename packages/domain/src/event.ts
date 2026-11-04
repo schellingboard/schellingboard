@@ -1,3 +1,6 @@
+export const IDENTITY_MODES = ["open", "verified"] as const;
+export type IdentityMode = (typeof IDENTITY_MODES)[number];
+
 export type Event = {
   id: string;
   name: string;
@@ -24,6 +27,7 @@ export type Event = {
   /** When true, a session's capacity (> 0) rejects further RSVPs once reached. */
   rsvpCapacityHardLimit: boolean;
   icon?: string | null;
+  identityMode: IdentityMode;
   /** Whether attendees can book 1-on-1 meetings with each other. */
   meetingsEnabled: boolean;
   /** How many unanswered requests one attendee may have outstanding. */

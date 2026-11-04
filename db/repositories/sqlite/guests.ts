@@ -73,11 +73,17 @@ function publicProfileChanged(
   );
 }
 
-// The role protects the name, whatever the guest chose.
-const isProtected =
-  sql<boolean>`(${schema.guests.authProtected} OR ${schema.guests.siteAdmin})`.mapWith(
-    Boolean
-  );
+// The role, and taking part in a verified event, protect the name whatever the
+// guest chose; the strictest event wins.
+// Table names are written out: Drizzle renders a column without its table in
+// a single-table select, which would bind `id` to the subquery's own table.
+const isProtected = sql<boolean>`(${schema.guests.authProtected}
+  OR ${schema.guests.siteAdmin}
+  OR EXISTS (
+    SELECT 1 FROM event_guests eg JOIN events ev ON ev.id = eg.event_id
+    WHERE eg.guest_id = guests.id AND ev.identity_mode = 'verified'))`.mapWith(
+  Boolean
+);
 
 function rowToGuest(row: typeof schema.guests.$inferSelect): CompleteGuest {
   return {

@@ -30,6 +30,7 @@ export async function createEvent(opts?: {
   schedulingPhaseEnd?: Date;
   slotIncrementMinutes?: number;
   rsvpCapacityHardLimit?: boolean;
+  identityMode?: "open" | "verified";
 }): Promise<Event> {
   const { events } = getRepositories();
   const now = new Date();
@@ -80,6 +81,7 @@ export async function createEvent(opts?: {
     slotIncrementMinutes: opts?.slotIncrementMinutes ?? 30,
     timezone: "UTC",
     rsvpCapacityHardLimit: opts?.rsvpCapacityHardLimit ?? false,
+    identityMode: opts?.identityMode,
   });
 }
 

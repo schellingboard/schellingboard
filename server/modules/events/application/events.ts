@@ -1,6 +1,11 @@
 import { STALE_EVENT_MESSAGE } from "@schellingboard/contracts/event";
-import { changes } from "@schellingboard/domain/change";
-import type { Day, Event } from "@schellingboard/domain/event";
+import { changes, type ChangeContext } from "@schellingboard/domain/change";
+import {
+  IDENTITY_MODES,
+  type Day,
+  type Event,
+  type IdentityMode,
+} from "@schellingboard/domain/event";
 import { isEventIconName } from "@schellingboard/domain/event-icons";
 import {
   SLOT_INCREMENT_OPTIONS,
@@ -10,6 +15,8 @@ import {
 import type { Actor } from "@/server/kernel/actor";
 import { byAdmin } from "@/server/kernel/change-context";
 import { recordingSessionCascade } from "@/server/kernel/session-cascade";
+import { recordingShownGuests } from "@/server/kernel/shown-guests";
+import type { Tx } from "@/server/kernel/unit-of-work";
 import {
   conflict,
   forbidden,
@@ -38,6 +45,7 @@ export interface EventSettingsInput {
   slotIncrementMinutes: number;
   rsvpCapacityHardLimit?: boolean;
   icon?: string | null;
+  identityMode?: IdentityMode;
 }
 
 export const PHASE_FIELDS = [
@@ -89,7 +97,7 @@ type EventSettings = Pick<
   | "slotIncrementMinutes"
   | "rsvpCapacityHardLimit"
   | "icon"
->;
+> & { identityMode?: IdentityMode };
 
 function isKnownTimeZone(timeZone: string): boolean {
   try {
@@ -168,6 +176,15 @@ function parseSettings(
     return fieldInvalid("event.iconUnknown", "icon", "Unknown icon");
   }
 
+  const { identityMode } = input;
+  if (identityMode !== undefined && !IDENTITY_MODES.includes(identityMode)) {
+    return fieldInvalid(
+      "event.identityModeInvalid",
+      "identityMode",
+      `Identity mode must be one of ${IDENTITY_MODES.join(", ")}`
+    );
+  }
+
   return {
     data: {
       name,
@@ -179,6 +196,7 @@ function parseSettings(
       slotIncrementMinutes,
       rsvpCapacityHardLimit,
       icon,
+      identityMode,
     },
   };
 }
@@ -234,7 +252,13 @@ export const createEvent =
     }
 
     try {
-      return ok(await repos.events.create({ ...parsed.data, ...phases }));
+      return ok(
+        await repos.events.create({
+          ...parsed.data,
+          identityMode: parsed.data.identityMode ?? "verified",
+          ...phases,
+        })
+      );
     } catch (e) {
       // A concurrent create can win the race between the findBySlug check
       // above and this insert.
@@ -275,10 +299,18 @@ export const updateEvent =
         if (misaligned) return misaligned;
       }
 
-      const updated = await tx.events.update(input.id, {
-        ...parsed.data,
-        expectedVersion: input.expectedVersion,
-      });
+      const by = byAdmin(actor, now);
+      const update = () =>
+        tx.events.update(input.id, {
+          ...parsed.data,
+          expectedVersion: input.expectedVersion,
+        });
+      const modeChanged =
+        parsed.data.identityMode !== undefined &&
+        parsed.data.identityMode !== existing.identityMode;
+      const updated = modeChanged
+        ? await recordingModeLocks(tx, input.id, update, by)
+        : await update();
       if (!updated) return eventChangedMeanwhile(tx, input.id);
 
       // 1-on-1 slots are this same grid, so a new increment re-reads what people
@@ -288,10 +320,26 @@ export const updateEvent =
       if (incrementChanged) {
         await tx.meetingAvailability.deleteByEvent(input.id);
       }
-      tx.record(changes.eventChanged(updated, byAdmin(actor, now)));
+      tx.record(changes.eventChanged(updated, by));
       return ok(updated);
     });
   };
+
+// A mode change moves the lock on every event the members take part in.
+async function recordingModeLocks<T>(
+  tx: Tx,
+  eventId: string,
+  work: () => Promise<T>,
+  by: ChangeContext
+): Promise<T> {
+  const memberIds = (await tx.guests.listByEvent(eventId)).map((g) => g.id);
+  const attending = await tx.guests.listEventsByGuests(memberIds);
+  const eventIds = [
+    eventId,
+    ...[...attending.values()].flat().map((e) => e.id),
+  ];
+  return recordingShownGuests(tx, eventIds, work, by, memberIds);
+}
 
 function phaseOrderError(p: EventPhases) {
   const {

@@ -68,8 +68,10 @@ point 4.
     `verified`. Existing events migrate to `open` (behaviour unchanged); new events default to
     `verified` (product decision, 08). A person is protected if they chose it, are a site admin, or
     take part in any `verified` event, so the strictest event wins. A domain function
-    `assuranceRequired` (mode, protection) is the one copy; every acting use case checks it and the
-    SPA predicts it.
+    `assuranceRequired` (mode, protection) in `packages/domain` is the one copy. Use cases on one
+    event pass that event's mode to the acting check, so a non-member needs a verified login there
+    too; the rest use the person's protection. The SPA does not predict it: the snapshot carries
+    each guest's protected flag.
 11. **Reading** is a second, separate setting, decided here and built in the next plan: `public`,
     `link` (a secret event link that sets a cookie and redirects to the plain URL; rotatable;
     `Referrer-Policy: no-referrer`; the event is hidden from the root list) or `participants`

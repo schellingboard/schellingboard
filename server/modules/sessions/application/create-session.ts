@@ -44,6 +44,8 @@ export const createSession =
       if (!day) return dayUnknown();
       const event = await tx.events.findById(day.eventId);
       if (!event || !inSchedPhase(event, now)) return outsidePhase("created");
+      const inEvent = await actingGuest(actor, tx.guests, event.identityMode);
+      if (!inEvent.ok) return inEvent;
 
       const { slot, session } = placed(input, day, event.breakMinutes, [
         input.locationId,

@@ -380,6 +380,7 @@ test.describe("Admin UI events", () => {
     const eventName = `E2E Event ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
     await page.getByLabel("Name*").fill(eventName);
+    await page.getByLabel("Identity").selectOption("open");
     await page.getByRole("button", { name: "Create event" }).click();
 
     // New event appears in the list
@@ -401,6 +402,7 @@ test.describe("Admin UI events", () => {
     const eventName = `E2E Tabs ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
     await page.getByLabel("Name*").fill(eventName);
+    await page.getByLabel("Identity").selectOption("open");
     await page.getByRole("button", { name: "Create event" }).click();
     await page
       .getByRole("listitem")
@@ -451,6 +453,7 @@ test.describe("Admin UI events", () => {
     const renamed = `E2E Edit Updated ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
     await page.getByLabel("Name*").fill(original);
+    await page.getByLabel("Identity").selectOption("open");
     await page.getByRole("button", { name: "Create event" }).click();
     await page
       .getByRole("listitem")
@@ -523,6 +526,7 @@ test.describe("Admin UI events", () => {
     const eventName = `Delete Me ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
     await page.getByLabel("Name*").fill(eventName);
+    await page.getByLabel("Identity").selectOption("open");
     await page.getByRole("button", { name: "Create event" }).click();
     const row = page.getByRole("listitem").filter({ hasText: eventName });
     await row.getByRole("link", { name: "Manage" }).click();
@@ -553,6 +557,7 @@ test.describe("Admin UI events", () => {
     const eventName = `E2E Phases ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
     await page.getByLabel("Name*").fill(eventName);
+    await page.getByLabel("Identity").selectOption("open");
     await page.getByRole("button", { name: "Create event" }).click();
     await page
       .getByRole("listitem")
@@ -632,6 +637,7 @@ test.describe("Admin UI days", () => {
     const eventName = `E2E Days ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
     await page.getByLabel("Name*").fill(eventName);
+    await page.getByLabel("Identity").selectOption("open");
     await page.getByRole("button", { name: "Create event" }).click();
     await page
       .getByRole("listitem")
@@ -734,6 +740,7 @@ test.describe("Admin UI guest assignment", () => {
     const eventName = `E2E Guests ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
     await page.getByLabel("Name*").fill(eventName);
+    await page.getByLabel("Identity").selectOption("open");
     await page.getByRole("button", { name: "Create event" }).click();
     await page
       .getByRole("listitem")
@@ -815,6 +822,7 @@ test.describe("Admin UI guest assignment", () => {
     const eventName = `E2E Bulk Guests ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
     await page.getByLabel("Name*").fill(eventName);
+    await page.getByLabel("Identity").selectOption("open");
     await page.getByRole("button", { name: "Create event" }).click();
     await page
       .getByRole("listitem")
@@ -952,6 +960,7 @@ test.describe("Admin UI locations", () => {
       const eventName = `E2E Locations ${unique}`;
       await page.getByRole("button", { name: "New event" }).click();
       await page.getByLabel("Name*").fill(eventName);
+      await page.getByLabel("Identity").selectOption("open");
       await page.getByRole("button", { name: "Create event" }).click();
       await page
         .getByRole("listitem")
@@ -1118,6 +1127,7 @@ test.describe("Admin UI locations", () => {
     const eventName = `E2E Loc Selection ${unique}`;
     await page.getByRole("button", { name: "New event" }).click();
     await page.getByLabel("Name*").fill(eventName);
+    await page.getByLabel("Identity").selectOption("open");
     await page.getByRole("button", { name: "Create event" }).click();
     await page
       .getByRole("listitem")
