@@ -67,6 +67,7 @@ const DEVICE = {
     "BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtUbVlUls0VJXg7A8u-Ts1XbjhazAkj7I99e8QcYP7DkM",
   auth: "tBHItJI5svbpez7KI4CCXg",
 };
+const endpointQuery = `endpoint=${encodeURIComponent(DEVICE.endpoint)}`;
 
 let uploadsDir: string;
 
@@ -508,10 +509,11 @@ describe("/api/v1 notifications and settings", () => {
       );
       expect(foreign.status).toBe(404);
 
-      const deleted = await call("POST", "/me/notifications/delete", {
-        cookie: asGuest(ada.id),
-        body: { ids: [mine.id, theirs.id] },
-      });
+      const deleted = await call(
+        "DELETE",
+        `/me/notifications?ids=${mine.id},${theirs.id}`,
+        { cookie: asGuest(ada.id) }
+      );
       expect(deleted.status).toBe(204);
       expect(await repo.countByGuest(ada.id)).toBe(0);
       expect(await repo.countByGuest(grace.id)).toBe(1);
@@ -572,6 +574,25 @@ describe("/api/v1 notifications and settings", () => {
     }
   );
 
+  it(
+    "refuses to delete more than 100 notifications in one call",
+    { tags: ["013-US1"] },
+    async () => {
+      const ada = await createGuest();
+      const ids = Array.from({ length: 101 }, (_, i) => `n${i}`).join(",");
+
+      const tooMany = await call("DELETE", `/me/notifications?ids=${ids}`, {
+        cookie: asGuest(ada.id),
+      });
+      const none = await call("DELETE", "/me/notifications?ids=,,", {
+        cookie: asGuest(ada.id),
+      });
+
+      expect(tooMany.status).toBe(400);
+      expect(none.status).toBe(204);
+    }
+  );
+
   it("changes no notification for nobody", { tags: ["013-US2"] }, async () => {
     const ada = await createGuest();
     const repo = getRepositories().notifications;
@@ -585,11 +606,12 @@ describe("/api/v1 notifications and settings", () => {
 
     const attempts = await Promise.all([
       call("POST", "/me/notifications/read", { body: { ids: [mine.id] } }),
-      call("POST", "/me/notifications/delete", { body: { ids: [mine.id] } }),
+      call("DELETE", `/me/notifications?ids=${mine.id}`),
       call("POST", `/me/notifications/${mine.id}/read`),
     ]);
 
     expect(attempts.map((r) => r.status)).toEqual([403, 403, 403]);
+
     expect(await repo.countUnread(ada.id)).toBe(1);
     expect(await repo.countByGuest(ada.id)).toBe(1);
   });
@@ -764,9 +786,8 @@ describe("/api/v1 notifications and settings", () => {
       const anonymous = await call("POST", "/me/push-subscriptions", {
         body: DEVICE,
       });
-      await call("POST", "/me/push-subscriptions/remove", {
+      await call("DELETE", `/me/push-subscriptions?${endpointQuery}`, {
         cookie: asGuest(grace.id),
-        body: { endpoint: DEVICE.endpoint },
       });
 
       expect(anonymous.status).toBe(403);
@@ -789,9 +810,8 @@ describe("/api/v1 notifications and settings", () => {
       expect(await subscribed.text()).toBe("");
 
       const check = (id: string) =>
-        call("POST", "/me/push-subscriptions/check", {
+        call("GET", `/me/push-subscriptions?${endpointQuery}`, {
           cookie: asGuest(id),
-          body: { endpoint: DEVICE.endpoint },
         });
       expect(await (await check(ada.id)).json()).toEqual({ enabled: true });
       expect(await (await check(grace.id)).json()).toEqual({ enabled: false });
@@ -802,10 +822,13 @@ describe("/api/v1 notifications and settings", () => {
       });
       expect(notHttps.status).toBe(400);
 
-      const removed = await call("POST", "/me/push-subscriptions/remove", {
-        cookie: asGuest(ada.id),
-        body: { endpoint: DEVICE.endpoint },
-      });
+      const removed = await call(
+        "DELETE",
+        `/me/push-subscriptions?${endpointQuery}`,
+        {
+          cookie: asGuest(ada.id),
+        }
+      );
       expect(removed.status).toBe(204);
       expect(await (await check(ada.id)).json()).toEqual({ enabled: false });
     }

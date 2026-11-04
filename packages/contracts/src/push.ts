@@ -17,8 +17,6 @@ export const pushSubscriptionSchema = z.object({
   auth: z.string().min(1).max(200),
 });
 
-// An endpoint names a device to its push service: sent in a body, never a
-// URL, so it stays out of access logs.
 export const pushEndpointSchema = z.object({
   endpoint: z.string().min(1).max(2000),
 });

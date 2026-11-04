@@ -86,7 +86,7 @@ export function PushNotifications({
       }
       // The browser's subscription survives a name switch on a shared
       // device, so the server must confirm it is ours.
-      const answer = await calls.isEnabledHere(subscription.endpoint, newKey());
+      const answer = await calls.isEnabledHere(subscription.endpoint);
       if (answer.data?.enabled === false) await subscription.unsubscribe();
       setState(answer.data?.enabled === true ? "on" : "off");
     };
@@ -141,7 +141,7 @@ export function PushNotifications({
       const subscription = await registration?.pushManager.getSubscription();
       if (subscription) {
         const result = await awaitMutation(
-          (key) => calls.unsubscribe(subscription.endpoint, key),
+          () => calls.unsubscribe(subscription.endpoint),
           newKey()
         );
         if (!result.ok) {

@@ -218,3 +218,6 @@ None open. Q5 to Q8 were answered on 2026-10-29 and are in ADR 0017 and PLAN.md 
   admin-guide claims (moved to step 11 with the proxy change that makes them true). Rejected: a
   confirm step for granting or revoking the role (both are one click to undo, and the last admin is
   protected by the server). `hasPassword` and recording the admin: step 11.
+
+- Step 23b: ids and endpoint now travel in the query (comma-separated ids); `isEnabledHere` is a GET
+  with no idempotency key. `api.md` named none of these routes, so no doc change.
