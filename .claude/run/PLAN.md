@@ -120,12 +120,10 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
       loop (`instrumentation.ts` gone); `scripts/build-server.ts` (esbuild) bundles it to
       `dist/server/main.mjs`; `make dev`/`start`, the E2E web server, the flake hunt and the
       Dockerfile run it. `withForwardedProto` carries `X-Forwarded-Proto` into the request URL.
-- [ ] 19. **`next` leaves.** Dependencies, config, `app/`, `next-env.d.ts`, eslint and arch rules,
-      the SPA's legacy forward (catch-all → not found), `legacy-pages.ts`, the E2E fixture's
-      `/legacy` mapping, AGENTS.md's Next notice; the bundle still pulls in `next/headers` through
-      `utils/dev-clock-server.ts` and `utils/action-auth.ts` (`pageReads().meetingOptions` would
-      throw outside Next); `docs/dev/server.md` and `web-app.md` still say "The Next pages live in
-      `app/legacy/`". Full `make test-e2e`.
+- [x] 19. `next` leaves: dependencies, config, `app/`, `next-env.d.ts`, the Next eslint config (the
+      react-hooks plugin stays), arch rules for `app/`, the SPA's legacy forward (the catch-all is
+      "Page not found"), `/legacy` everywhere, `utils/dev-clock-server.ts`, `utils/action-auth.ts`,
+      `utils/image-loader.js`, `utils/forms.ts`; `meetingOptions` takes `now`; tests use `Request`.
 - [ ] 20. **Docs: step 7 done.** ADR 0015 note, web-app, server.md, 07, 10-path, self-hosting,
       testing. The commit message asks the user to run `make test-e2e-docker` and has the footer
       `fixes #1339`.

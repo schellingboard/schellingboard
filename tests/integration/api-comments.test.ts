@@ -10,7 +10,6 @@ import {
 
 vi.mock("@/utils/mailer", () => ({ sendMail: vi.fn() }));
 
-import { NextRequest } from "next/server";
 import { GET, POST, PUT, DELETE } from "@/tests/helpers/v1-route";
 import { getRepositories } from "@/db/container";
 import { sendMail } from "@/utils/mailer";
@@ -34,7 +33,7 @@ function request(
   const headers: Record<string, string> = {};
   if (body !== undefined) headers["content-type"] = "application/json";
   if (cookie) headers.cookie = cookie;
-  return new NextRequest(`http://test/api/v1${path}`, {
+  return new Request(`http://test/api/v1${path}`, {
     method,
     headers,
     body: body === undefined ? undefined : JSON.stringify(body),

@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
-import { NextRequest } from "next/server";
 import { DELETE, GET, POST, PUT } from "@/tests/helpers/v1-route";
 import { getRepositories } from "@/db/container";
 import { peopleUseCases } from "@/server/composition";
@@ -23,7 +22,7 @@ const call = (
   token?: string
 ) =>
   handlers[method](
-    new NextRequest(`http://test/api/v1${path}`, {
+    new Request(`http://test/api/v1${path}`, {
       method,
       headers: {
         "content-type": "application/json",

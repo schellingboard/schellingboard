@@ -8,7 +8,6 @@ import {
   afterEach,
   vi,
 } from "vitest";
-import { NextRequest } from "next/server";
 import { GET } from "@/tests/helpers/v1-route";
 import { createAdminAuthCookie } from "../helpers/admin-cookie";
 import { setupTestDb, resetTestDb } from "../helpers/db";
@@ -44,7 +43,7 @@ describe("GET /api/v1/updates", () => {
       const admin = await createAdminAuthCookie();
       const ask = () =>
         GET(
-          new NextRequest("http://test/api/v1/updates", {
+          new Request("http://test/api/v1/updates", {
             headers: { cookie: `${admin.name}=${admin.value}` },
           })
         );
@@ -65,7 +64,7 @@ describe("GET /api/v1/updates", () => {
     "tells anyone else nothing, and never asks GitHub for them",
     { tags: ["014-US6"] },
     async () => {
-      const res = await GET(new NextRequest("http://test/api/v1/updates"));
+      const res = await GET(new Request("http://test/api/v1/updates"));
 
       expect(res.status).toBe(200);
       expect(await res.json()).toBeNull();

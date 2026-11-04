@@ -190,6 +190,13 @@ the timeout, not the cause. Unresolved.
   checked by hand; `make test-e2e-docker` was not run (step 20). `next.config.js` and
   `make typecheck`'s `next typegen` still exist until step 19.
 
+- Step 19: `app/` and `next` are gone. The Docker user is still named `nextjs` (uid 1001, renaming
+  would change nothing for volumes). Root dependencies with no user left in the root code:
+  `react-hook-form`, `@hookform/resolvers`, `react-markdown`, `remark-*`, `unified`, `js-cookie`,
+  `lodash`, `fuse.js`, `moment-timezone`, `turndown`, `react-dom` and their `@types`;
+  `utils/hooks.ts`, `utils/markdown.ts` may be dead too. Not pruned (out of step). `theme-contrast`
+  now scans `apps/web/src`; `ui/dialog.tsx` uses `bg-overlay` (darker in the dark theme).
+
 ## Questions
 
 None open. Q5 to Q8 were answered on 2026-10-29 and are in ADR 0017 and PLAN.md (map item: step 14;

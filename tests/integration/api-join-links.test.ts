@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
 import { render } from "@react-email/render";
-import { NextRequest } from "next/server";
 import { GET, POST } from "@/tests/helpers/v1-route";
 
 vi.mock("@/utils/mailer", () => ({
@@ -20,7 +19,7 @@ const cookieHeader = (value: string) => `${GUEST_COOKIE_NAME}=${value}`;
 
 const post = (path: string, body?: unknown, cookie?: string) =>
   POST(
-    new NextRequest(`http://test/api/v1${path}`, {
+    new Request(`http://test/api/v1${path}`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -79,7 +78,7 @@ describe("a personal join link", () => {
       expect(await members(event.id)).toEqual([guest.id]);
       const cookie = (res.headers.get("set-cookie") ?? "").split(";")[0];
       const who = await GET(
-        new NextRequest("http://test/api/v1/me/identity", {
+        new Request("http://test/api/v1/me/identity", {
           headers: { cookie },
         })
       );
@@ -264,7 +263,7 @@ describe("POST /admin/events/{id}/guests/{guestId}/join-link", () => {
       const path = `/admin/events/${event.id}/guests/${guest.id}/join-link`;
       const send = () =>
         POST(
-          new NextRequest(`http://test/api/v1${path}`, {
+          new Request(`http://test/api/v1${path}`, {
             method: "POST",
             headers: { cookie: admin, "idempotency-key": "same-key" },
           })

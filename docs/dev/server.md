@@ -135,16 +135,7 @@ id it was served by (`<meta name="sb-build">`, added by `serveSpaShell`); a clie
 `health` report another one offers a reload, and a kiosk reloads by itself. It stays behind the site
 password.
 
-The in-app release notes live in `packages/domain/src/release-notes.ts` so the Next footer and the
-SPA import the same data.
-
-## Pages under `/legacy`
-
-The Next pages live in `app/legacy/` ([ADR 0015](adr/0015-spa-alongside-next.md)), so a page path in
-code is written `/legacy/…` (`<a href>`, `router.push`, `redirect()`, `revalidatePath()`). `/api`
-and `/media` stay at the root. `web.ts` answers every other root path with the SPA shell, whose
-router owns most of them and forwards the rest to `/legacy` + path, so emails and push links keep
-their root URLs ([web app](web-app.md)). A `/legacy` path passes the same site-password gate.
+The in-app release notes live in `packages/domain/src/release-notes.ts` so the footer imports it.
 
 ## Keys from the UI
 

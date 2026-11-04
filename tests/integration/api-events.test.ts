@@ -7,13 +7,12 @@ import {
   afterEach,
   vi,
 } from "vitest";
-import { NextRequest } from "next/server";
 import { GET } from "@/tests/helpers/v1-route";
 import { getRepositories } from "@/db/container";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createDay, createEvent } from "../helpers/factories";
 
-const get = (path: string) => GET(new NextRequest(`http://test/api/v1${path}`));
+const get = (path: string) => GET(new Request(`http://test/api/v1${path}`));
 
 beforeAll(() => setupTestDb());
 beforeEach(() => {

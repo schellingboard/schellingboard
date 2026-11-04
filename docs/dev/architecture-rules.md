@@ -26,16 +26,15 @@ you want the author to read:
 ```
 
 Scope it with a config block listing the enforced areas in `files`. The ambient-clock ban (ADR 0004)
-is the worked example: it covers `app/`, `db/`, `emails/`, `packages/` and `utils/`.
+is the worked example: it covers `db/`, `emails/`, `packages/` and `utils/`.
 
 Exempt a line, not a file, with `eslint-disable-next-line <rule> -- <reason>`. A file-wide `ignores`
 entry would stop checking the other hundred lines too, and an exemption is usually one call in an
 otherwise ordinary file. The `--` reason is mandatory: it is what the next reader has instead of
 this page.
 
-**Gotcha:** route-group and dynamic-segment paths need `**`. Flat config globs are minimatch, which
-reads `[[...route]]` as a character class, so a literal `app/[[...path]]/route.ts` silently matches
-nothing — and a `files` entry that matches nothing looks exactly like one that works.
+**Gotcha:** a `files` entry that matches nothing looks exactly like one that works. Flat config
+globs are minimatch, so `[` and `(` in a path are glob syntax, not literal characters.
 
 When a selector can't express the rule, write a local rule inline — flat config takes a plugin
 object literally, so there is no package to publish and no build step:
@@ -81,12 +80,12 @@ its own (`use-cases-take-only-container-types`, ADR 0012). Otherwise an import t
 still points the wrong way, and a boundary that holds only at runtime is one nobody can reason about
 from the import list.
 
-The direction that matters is inward. `db/` and `app/` are adapters and may depend on the workspace
-packages; the packages may not depend on them ([ADR 0010](adr/0010-workspace-packages.md)).
-`packages/domain` imports nothing but itself and `luxon`, and `packages/contracts` only `domain` and
-`zod`. Types follow the same direction: an entity type is domain vocabulary and belongs in `domain`,
-where both adapters can import it. A type that only means something to the database — a row shape, a
-driver's handle — stays in `db/` and is used only inside `db/`.
+The direction that matters is inward. `db/` is an adapter and may depend on the workspace packages;
+the packages may not depend on it ([ADR 0010](adr/0010-workspace-packages.md)). `packages/domain`
+imports nothing but itself and `luxon`, and `packages/contracts` only `domain` and `zod`. Types
+follow the same direction: an entity type is domain vocabulary and belongs in `domain`, where both
+adapters can import it. A type that only means something to the database — a row shape, a driver's
+handle — stays in `db/` and is used only inside `db/`.
 
 `db/repositories/` holds the repository ports and their SQLite adapters, and nothing outside `db/`
 imports from it (`repositories-stay-in-db`); the rest of the app reaches the repositories through
@@ -95,20 +94,17 @@ code outside `db/` needs to name it, it is vocabulary and moves to `domain`.
 
 `server/` follows [ADR 0012](adr/0012-http-api-v1.md): `server/kernel/` reaches no module, no HTTP
 and no framework, not even through a helper it imports; a module's `application/` imports no HTTP,
-framework or `db/` code; a module is imported only through its `module.ts`, by other modules, tests
-and `app/` alike; and `app/` reaches `server/` only through `module.ts`, `composition.ts`, the
-kernel and the API mount. See [The server and the API](server.md).
+framework or `db/` code; a module is imported only through its `module.ts`, by other modules and
+tests alike. See [The server and the API](server.md).
 
-`app/` does not import the repository container (`@/db/container`) directly: pages, actions and the
-`utils/` helpers they call read through `pageReads()` or a use case; the rule covers `app/` and
-`utils/`. Exempt: the job loop, notification and push infrastructure (`utils/jobs/`,
-`utils/notifications.ts`, `utils/push.ts`).
+`utils/` does not import the repository container (`@/db/container`) directly: it reads through
+`pageReads()` or a use case. Exempt: the job loop, notification and push infrastructure
+(`utils/jobs/`, `utils/notifications.ts`, `utils/push.ts`).
 
 `apps/web` ([ADR 0015](adr/0015-spa-alongside-next.md)) imports `packages/domain`,
-`packages/contracts` and `packages/api-client` only: never `app/`, `server/`, `utils/`, `db/` or
-`next`. Nothing imports it, `features/` never imports `api-client` (screens call `commands/` and
-`queries/`), and it may import only what its own `package.json` declares. See
-[The web app](web-app.md).
+`packages/contracts` and `packages/api-client` only: never `server/`, `utils/` or `db/`. Nothing
+imports it, `features/` never imports `api-client` (screens call `commands/` and `queries/`), and it
+may import only what its own `package.json` declares. See [The web app](web-app.md).
 
 `make arch-graph` renders the graph to `arch-graph.svg` (needs graphviz), which is usually faster
 than arguing about where a boundary should go.

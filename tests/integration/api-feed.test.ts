@@ -8,7 +8,6 @@ import {
   afterEach,
   vi,
 } from "vitest";
-import { NextRequest } from "next/server";
 import { GET } from "@/tests/helpers/v1-route";
 import { getRepositories } from "@/db/container";
 import { RECONNECT_DELAY_MS } from "@/server/feed/routes";
@@ -40,7 +39,7 @@ function open(
   signal?: AbortSignal
 ) {
   return GET(
-    new NextRequest(`http://test/api/v1/events/${slug}/feed${query}`, {
+    new Request(`http://test/api/v1/events/${slug}/feed${query}`, {
       headers,
       signal,
     })

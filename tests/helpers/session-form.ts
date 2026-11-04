@@ -1,4 +1,3 @@
-import { NextRequest } from "next/server";
 import { DELETE, POST, PUT } from "@/tests/helpers/v1-route";
 import type { Day } from "@schellingboard/domain/event";
 import type { Guest } from "@schellingboard/domain/guest";
@@ -28,7 +27,7 @@ function v1(req: Request, method: string, path: string, body?: unknown) {
     if (value) headers[name] = value;
   }
   if (body !== undefined) headers["content-type"] = "application/json";
-  return new NextRequest(`http://test/api/v1${path}`, {
+  return new Request(`http://test/api/v1${path}`, {
     method,
     headers,
     body: body === undefined ? undefined : JSON.stringify(body),

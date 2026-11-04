@@ -11,7 +11,6 @@ import {
   vi,
 } from "vitest";
 import { render } from "@react-email/render";
-import { NextRequest } from "next/server";
 import { DELETE, GET, POST, PUT } from "@/tests/helpers/v1-route";
 
 vi.mock("@/utils/mailer", () => ({
@@ -37,7 +36,7 @@ const call = (
   cookie?: string
 ) =>
   handlers[method](
-    new NextRequest(`http://test/api/v1${path}`, {
+    new Request(`http://test/api/v1${path}`, {
       method,
       headers: {
         "content-type": "application/json",

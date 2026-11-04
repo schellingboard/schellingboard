@@ -178,6 +178,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Internal
 
+- **Next.js is gone** (#1339): the server is its own Node process serving the API and the web app.
 - **Developer docs are published** at developers.schellingboard.org from `main`, with interactive
   architecture diagrams; `CONTRIBUTING.md` is now a short entry point into them.
 - **Tests name the use cases they cover** (#1084): every E2E test is tagged from a catalogue of use

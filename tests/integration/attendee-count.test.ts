@@ -1,21 +1,14 @@
 // @module-tag 001-US1
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 
 const cookieJar = new Map<string, string>();
 
-vi.mock("next/headers", () => ({
-  cookies: () =>
-    Promise.resolve({
-      get: (name: string) => {
-        const value = cookieJar.get(name);
-        return value === undefined ? undefined : { name, value };
-      },
-    }),
-}));
-
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-}));
+const cookieStore = () => ({
+  get: (name: string) => {
+    const value = cookieJar.get(name);
+    return value === undefined ? undefined : { name, value };
+  },
+});
 
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import {
@@ -27,7 +20,6 @@ import { siteAuthenticate } from "../helpers/site-auth";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 import { getRepositories } from "@/db/container";
-import { cookies } from "next/headers";
 import { sessionUseCases } from "@/server/composition";
 import { actorOf } from "@/server/kernel/session-actor";
 
@@ -38,7 +30,7 @@ type CountResult =
 
 async function getAttendeeCountAction(sessionId: string): Promise<CountResult> {
   const result = await sessionUseCases().getAttendeeCount(
-    await actorOf(await cookies()),
+    await actorOf(cookieStore()),
     { sessionId },
     new Date()
   );
@@ -52,7 +44,7 @@ async function setAttendeeCountAction(
   value: unknown
 ): Promise<CountResult> {
   const result = await sessionUseCases().recordAttendeeCount(
-    await actorOf(await cookies()),
+    await actorOf(cookieStore()),
     { sessionId, count: value },
     new Date()
   );

@@ -91,12 +91,12 @@ module.exports = {
       severity: "error",
       comment:
         "`apps/web` is a static bundle that talks to the server over `/api/v1`. It may import " +
-        "`packages/domain`, `packages/contracts` and `packages/api-client`, never the Next " +
-        "app, the server, the database or Next itself. See ADR 0015 section 2.",
+        "`packages/domain`, `packages/contracts` and `packages/api-client`, never " +
+        "the server or the database. See ADR 0015 section 2.",
       // The test config reads the use-case catalogue to register its tags.
       from: { path: "^apps/web/", pathNot: "^apps/web/vitest\\.config\\.ts$" },
       to: {
-        path: "^(app|server|utils|db|emails|tests|scripts)/|node_modules/(next|hono|@hono|better-sqlite3|drizzle-orm)/",
+        path: "^(server|utils|db|emails|tests|scripts)/|node_modules/(hono|@hono|better-sqlite3|drizzle-orm)/",
       },
     },
     {
@@ -130,15 +130,6 @@ module.exports = {
       to: { dependencyTypes: ["npm-no-pkg", "npm-unknown"] },
     },
     {
-      name: "persistence-does-not-reach-up",
-      severity: "error",
-      comment:
-        "`db/` is a driven adapter. If it needs something from the web layer, the dependency " +
-        "is pointing the wrong way — pass the value in instead.",
-      from: { path: "^db/" },
-      to: { path: "^app/" },
-    },
-    {
       name: "repositories-stay-in-db",
       severity: "error",
       comment:
@@ -150,48 +141,15 @@ module.exports = {
       to: { path: "^db/repositories/" },
     },
     {
-      name: "server-does-not-reach-into-app",
+      name: "utils-does-not-read-repositories",
       severity: "error",
       comment:
-        "`server/` holds the use cases and the API that outlive Next (step 7 of the target " +
-        "architecture); `app/` is a client of it, never the other way round. See ADR 0012.",
-      from: { path: "^server/" },
-      to: { path: "^app/" },
-    },
-    {
-      name: "app-reaches-server-through-module-ts",
-      severity: "error",
-      comment:
-        "`app/` calls the server through a module's `module.ts`, the use cases wired in " +
-        "`composition.ts`, the kernel's actor and Result, or the API mount; a module's " +
-        "internals are private. See ADR 0012.",
-      from: { path: "^app/" },
-      to: {
-        path: "^server/",
-        pathNot: [
-          "^server/modules/[^/]+/module\\.ts$",
-          "^server/composition\\.ts$",
-          "^server/kernel/",
-          "^server/http/(app|web)\\.ts$",
-        ],
-      },
-    },
-    {
-      name: "app-does-not-read-repositories",
-      severity: "error",
-      comment:
-        "Pages, layouts, actions and the `utils/` helpers they call read through " +
-        "`pageReads()` or a use case, not the repository container. The allow-list: the " +
-        "auth flows, which run before an actor exists, and the job loop, deliveries, " +
-        "notification and push infrastructure, which are server plumbing, not reads.",
+        "The `utils/` helpers read through `pageReads()` or a use case, not the repository " +
+        "container. The allow-list: the job loop, deliveries, notification and push " +
+        "infrastructure, which are server plumbing, not reads.",
       from: {
-        path: "^(app|utils)/",
-        pathNot: [
-          "^app/actions/user-auth\\.ts$",
-          "^app/legacy/\\(site\\)/auth/(login|reset)/page\\.tsx$",
-          "^utils/jobs/",
-          "^utils/(notifications|push)\\.ts$",
-        ],
+        path: "^utils/",
+        pathNot: ["^utils/jobs/", "^utils/(notifications|push)\\.ts$"],
       },
       to: { path: "^db/container\\.ts$", dependencyTypesNot: ["type-only"] },
     },
@@ -204,7 +162,7 @@ module.exports = {
         "See ADR 0012.",
       from: { path: "^server/kernel/" },
       to: {
-        path: "^(server/(modules|http)/|server/composition\\.ts$|app/|node_modules/(next|hono|@hono)/)",
+        path: "^(server/(modules|http)/|server/composition\\.ts$|node_modules/hono/|node_modules/@hono/)",
         reachable: true,
       },
     },
@@ -216,7 +174,7 @@ module.exports = {
         "imports no HTTP, framework or `db/` code beyond the container's types. See ADR 0012.",
       from: { path: "^server/modules/[^/]+/application/" },
       to: {
-        path: "^(server/http/|server/modules/[^/]+/http/|server/composition\\.ts$|db/|node_modules/(next|hono|@hono)/)",
+        path: "^(server/http/|server/modules/[^/]+/http/|server/composition\\.ts$|db/|node_modules/(hono|@hono)/)",
         pathNot: "^db/container\\.ts$",
       },
     },
@@ -280,7 +238,7 @@ module.exports = {
   options: {
     doNotFollow: { path: "node_modules" },
     exclude: {
-      path: "(^|/)(\\.next|coverage|site|playwright-report|test-results|apps/web/dist|dist/server)/",
+      path: "(^|/)(coverage|site|playwright-report|test-results|apps/web/dist|dist/server)/",
     },
     tsPreCompilationDeps: true,
     tsConfig: { fileName: "tsconfig.json" },
@@ -292,7 +250,7 @@ module.exports = {
     },
     reporterOptions: {
       dot: {
-        collapsePattern: "^(app|db|server|utils|tests)/[^/]+|^packages/[^/]+",
+        collapsePattern: "^(db|server|utils|tests)/[^/]+|^packages/[^/]+",
       },
     },
   },

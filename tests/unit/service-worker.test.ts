@@ -87,8 +87,7 @@ const site = (pathname: string) => {
     return new Response("js", {
       headers: { "content-type": "text/javascript" },
     });
-  if (pathname.startsWith("/api") || pathname.startsWith("/legacy"))
-    return html("dynamic");
+  if (pathname.startsWith("/api")) return html("dynamic");
   return html(shell);
 };
 
@@ -172,17 +171,15 @@ describe("the service worker", () => {
     expect(kept(broken)).toBe(0);
   });
 
-  it.each([
-    "/legacy/Conference-Gamma",
-    "/api/v1/health",
-    "/media/x",
-    "/manifest.webmanifest",
-  ])("leaves %s to the network", async (pathname) => {
-    await worker.navigate("/Conference-Gamma");
-    const { answered } = await worker.navigate(pathname);
+  it.each(["/api/v1/health", "/media/x", "/manifest.webmanifest"])(
+    "leaves %s to the network",
+    async (pathname) => {
+      await worker.navigate("/Conference-Gamma");
+      const { answered } = await worker.navigate(pathname);
 
-    expect(answered).toBe(false);
-  });
+      expect(answered).toBe(false);
+    }
+  );
 
   it("leaves requests that are not navigations or assets alone", async () => {
     const { answered } = await worker.dispatch("fetch", {

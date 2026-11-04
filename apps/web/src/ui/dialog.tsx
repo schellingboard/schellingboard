@@ -79,7 +79,7 @@ export function Dialog({
   return createPortal(
     <div
       data-testid="dialog-backdrop"
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4"
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-overlay p-0 sm:items-center sm:p-4"
       onClick={onClose}
     >
       <div

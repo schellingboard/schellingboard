@@ -8,7 +8,6 @@ import {
   vi,
 } from "vitest";
 
-import { NextRequest } from "next/server";
 import { GET, PUT, DELETE } from "@/tests/helpers/v1-route";
 import { getRepositories } from "@/db/container";
 import { hashSessionToken } from "@/utils/login-session-token";
@@ -33,7 +32,7 @@ const asSession = (token: string) => `${GUEST_COOKIE_NAME}=${token}`;
 const whoAmI = async (token: string) =>
   (await (
     await GET(
-      new NextRequest("http://test/api/v1/me/identity", {
+      new Request("http://test/api/v1/me/identity", {
         headers: { cookie: asSession(token) },
       })
     )
@@ -41,7 +40,7 @@ const whoAmI = async (token: string) =>
 
 function choose(guestId: string, token?: string) {
   return PUT(
-    new NextRequest("http://test/api/v1/me/identity", {
+    new Request("http://test/api/v1/me/identity", {
       method: "PUT",
       headers: {
         "content-type": "application/json",
@@ -127,7 +126,7 @@ describe("login sessions", () => {
     const token = await sessionGuestValue(ada.id, "claimed");
 
     await DELETE(
-      new NextRequest("http://test/api/v1/me/identity", {
+      new Request("http://test/api/v1/me/identity", {
         method: "DELETE",
         headers: { cookie: asSession(token) },
       })

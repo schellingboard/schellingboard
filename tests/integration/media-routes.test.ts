@@ -95,9 +95,6 @@ describe("media routes", () => {
     });
   });
 
-  // The built-in optimizer can't fetch these (its upstream request carries no
-  // cookies), so the routes resize themselves and the loader asks for a width.
-  // See utils/image-loader.js.
   describe("resizing", () => {
     it("serves a smaller rendition for a requested width", async () => {
       const name = await writeImage("avatars", "big.webp", 1024);
