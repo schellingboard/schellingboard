@@ -204,6 +204,9 @@ the timeout, not the cause. Unresolved.
   `target-architecture/` still has deeper Next text in D1 and ADR 0015 body (history); step 21 cuts
   it.
 
+- Step 22: `/api/v1` was never released (4.0.0 had only the ad hoc `/api/*` routes), so ADR 0018
+  breaks nothing on v1. The CHANGELOG breaking note still lacks the removed 4.0.0 routes: step 23e.
+
 ## Questions
 
 None open. Q5 to Q8 were answered on 2026-10-29 and are in ADR 0017 and PLAN.md (map item: step 14;
