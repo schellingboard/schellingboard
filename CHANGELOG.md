@@ -14,6 +14,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > **Breaking change**: behind a reverse proxy, set `SB_TRUSTED_PROXIES` (usually `1`) when
 > upgrading. Without it, everyone shares one limit on failed logins, so a few mistyped site
 > passwords can lock all visitors out for some minutes.
+>
+> **Breaking change**: the old `/api/…` addresses for scripts (seeding, RSVPs, sessions, proposals,
+> votes, comments, meetings) are gone; use the documented `/api/v1` API.
 
 ### Added
 

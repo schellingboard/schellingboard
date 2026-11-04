@@ -14,7 +14,7 @@ the ad hoc routes `/api/admin/*` (seeding), `/api/toggle-rsvp`, `/api/add-sessio
 `/api/auth/login` and `/api/health`. The 5.0.0 steps already deleted all of them except
 `/api/health` and `POST /api/auth/logout` (point 4). So **`/api/v1` has never been released**: any
 change to it breaks nobody, and the one break that does reach users (the 4.0.0 routes are gone) is
-not yet in the `CHANGELOG.md` breaking note.
+named in the `CHANGELOG.md` breaking note.
 
 ## Decision
 

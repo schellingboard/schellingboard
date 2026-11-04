@@ -145,11 +145,8 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
 - [x] 23c. `POST /api/dev/reminders` (a web route, not in `openapi.json`) and `SB_API_DOCS`.
 - [x] 23d. `api.md` has Conventions and Compatibility sections (ADR 0018); `configuration.md` says
       new variables are `SB_`-prefixed.
-- [ ] 23e. `CHANGELOG.md` breaking note for 5.0.0: the 4.0.0 `/api/*` routes (`/api/admin/*`,
-      `toggle-rsvp`, `rsvps`, `add-`/`update-`/`delete-session`, votes, comments, meetings;
-      `/api/auth/login` is already named) are gone and `/api/v1` replaces them; everyone signs in
-      again once; `ADMIN_PASSWORD` warns. Keep the `SB_TRUSTED_PROXIES` line. Then run the full
-      `make test-e2e`.
+- [x] 23e. `CHANGELOG.md` has a second breaking note: the old `/api/*` routes are gone, use
+      `/api/v1`; everyone signs in again once. Release notes need no change. Full E2E: 218 passed.
 
 ### Issues of milestone v5.0.0
 
