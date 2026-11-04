@@ -27,10 +27,24 @@ Both need the same login as the rest of `/api/v1` (see below). To stop serving t
 `SB_API_DOCS=false` ([Configuration](configuration.md)). The document is also in the repository, at
 `packages/contracts/openapi.json` in the tag of each release.
 
-Endpoints under `/api/v1/admin/` are for organizers; the rest are what attendees do in the app.
+## Conventions
 
-Endpoints that take an `eventId` need an event's ID. `GET /api/v1/events` lists the events and
-`GET /api/v1/events/{id}` reads one with its days; neither needs a site admin.
+- **`/admin/` is about privilege.** An endpoint under `/api/v1/admin/` does something the plain one,
+  where one exists, does not (any phase, on behalf of hosts), not only for a different caller. Today
+  it needs a site admin; the role shows in the endpoint's description, never in its path, so a later
+  organizer role fits without a change.
+- **`POST` with a verb is a command** that is not a plain create, update or removal of one resource
+  (such as `accept`, `decline`, `cancel`, `move`, `assign`, `remove` and `read`). Removing one
+  resource is `DELETE`.
+- **Events: `{id}` or `{slug}`.** Resources use the event's `id`; the schedule (snapshot and feed)
+  uses the `slug`, the address people see. Neither changes after the event is created.
+- **`/attendees` and `/guests`.** `GET /api/v1/attendees` lists every guest of the site;
+  `GET /api/v1/guests?eventId=…` lists one event's guests.
+- **`Authorization` is reserved** for API tokens of the form `Bearer sb_…`. The server ignores the
+  header today and never reads `Basic`, so a reverse proxy with basic authentication may forward it.
+- **Cookie names and values are not part of the API.** Use a cookie jar.
+- **Finding an event's ID.** Endpoints that take an `eventId` need it. `GET /api/v1/events` lists
+  the events and `GET /api/v1/events/{id}` reads one with its days; neither needs a site admin.
 
 ## Signing in
 
@@ -67,6 +81,39 @@ are only sent over HTTPS in production.
 
 Admin endpoints refuse a request that a browser sends from another website; scripts, which send no
 `Origin` header, are not affected.
+
+## Compatibility
+
+These rules bind `/api/v1`, the snapshot and the feed from release 5.0.0.
+
+**Not breaking**, in any release: a new endpoint, method, query parameter or optional request field;
+a new response field; a new value of an enum a response already has; a new problem `code`; a new
+feed change `type`; a new error status for a new condition; wider access; a changed rate limit; a
+different `detail` text; an ordering that was not documented.
+
+**Breaking**: removing or renaming an endpoint, field, enum value or problem `code`; making an
+optional field required or a nullable one non-null; changing a type, an id format or what a field
+means; narrowing access; changing the meaning of an existing status; ending a documented behaviour.
+A break comes as a new major path, `/api/v2`, served beside `/api/v1` for at least one more major
+release.
+
+**Deprecation.** An endpoint or field to be removed is marked `deprecated` in `openapi.json`, named
+in the changelog, answered with `Deprecation` and `Sunset` headers, and kept for at least one major
+release. `SITE_PASSWORD` follows the same rule: once it is deprecated it logs a warning and keeps
+working until a major release removes it.
+
+**Clients must tolerate** unknown response fields; unknown enum values (treat them as "other");
+unknown problem `code`s (fall back to the status); unknown feed `type`s (ignore them, and read the
+snapshot again on the next `seq` gap); a reference to a guest that no longer exists; and nullable
+fields becoming set. Do not parse `detail`. The server never adds a feed type whose data an existing
+type must now also carry.
+
+**Self-hosters.** Environment variables keep their names and meaning within a major release; a new
+one is prefixed `SB_`, and the existing unprefixed names stay. `/api/health` is not versioned and
+never changes meaning. The data paths (`DATABASE_URL`, `/data/uploads`) and the URLs people hold,
+such as `/join/{token}`, `/auth/reset` and event addresses, keep working for the life of the data.
+So do `/api/v1/docs`, `/api/v1/openapi.json`, `/legacy/…` (old links keep redirecting), and
+`/media/…` and `/locations/…` file addresses.
 
 ## Errors
 

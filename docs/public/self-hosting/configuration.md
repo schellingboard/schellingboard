@@ -7,7 +7,8 @@ type: reference
 # Configuration
 
 SchellingBoard is configured entirely through environment variables. Only `AUTH_SECRET` is required;
-everything else has a sensible default or switches a feature off when unset.
+everything else has a sensible default or switches a feature off when unset. New variables are
+prefixed `SB_`; the older ones keep their names.
 
 ## Environment variables
 
