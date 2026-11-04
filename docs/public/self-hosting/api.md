@@ -24,7 +24,7 @@ document. The site serves the document of the version it runs:
   generator.
 
 Both need the same login as the rest of `/api/v1` (see below). To stop serving them, set
-`API_DOCS=false` ([Configuration](configuration.md)). The document is also in the repository, at
+`SB_API_DOCS=false` ([Configuration](configuration.md)). The document is also in the repository, at
 `packages/contracts/openapi.json` in the tag of each release.
 
 Endpoints under `/api/v1/admin/` are for organizers; the rest are what attendees do in the app.

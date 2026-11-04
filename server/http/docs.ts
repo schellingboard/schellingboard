@@ -15,7 +15,7 @@ const SCALAR_BUNDLE = path.join(
 );
 
 export function isApiDocsEnabled(): boolean {
-  const value = process.env.API_DOCS?.trim().toLowerCase();
+  const value = process.env.SB_API_DOCS?.trim().toLowerCase();
   return value !== "false" && value !== "0";
 }
 

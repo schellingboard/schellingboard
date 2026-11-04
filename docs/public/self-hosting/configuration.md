@@ -33,7 +33,7 @@ everything else has a sensible default or switches a feature off when unset.
 | `SITE_URL`                      | No\*     | Public base URL of the site, e.g. `https://sessions.example.org`                                                                                                                                  |
 | `SB_ENABLE_DEV_TOOLS`           | No       | Set to `1` to enable the dev fake clock on a staging/demo instance. Leave unset in production                                                                                                     |
 | `REMINDER_DISPATCH_INTERVAL_MS` | No       | How often to deliver due attendee-count reminders, in milliseconds (default: `60000`). `0` turns them off entirely — nothing else does, email or no email                                         |
-| `API_DOCS`                      | No       | Set to `false` (or `0`, `no`, `off`) to stop serving the [API reference](api.md#the-openapi-description) and the OpenAPI document (default: served)                                               |
+| `SB_API_DOCS`                   | No       | Set to `false` (or `0`, `no`, `off`) to stop serving the [API reference](api.md#the-openapi-description) and the OpenAPI document (default: served)                                               |
 
 ## Behind a reverse proxy
 

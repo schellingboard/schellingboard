@@ -1,5 +1,5 @@
 import { Hono, type Context } from "hono";
-import { pageReads } from "@/server/composition";
+import { dispatchReminders, pageReads } from "@/server/composition";
 import { isPasswordProtectionEnabled } from "@/utils/auth";
 import { getBuildId } from "@/utils/build-id";
 import { getImageRepositories, requestedWidth } from "@/utils/images";
@@ -7,6 +7,7 @@ import { readMapImage } from "@/utils/map-image";
 import { serveSpaAsset, serveSpaShell, spaDir } from "@/utils/spa-files";
 import { LIGHT_SURFACE } from "@/utils/theme";
 import { api } from "./app";
+import { addDevRoutes } from "./dev";
 import { adminApiRefusal, hasSiteCookie, siteApiRefusal } from "./gates";
 import { problemResponse } from "./problem";
 
@@ -38,6 +39,8 @@ web.use("*", async (c, next) => {
   res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   c.res = res;
 });
+
+addDevRoutes(web, dispatchReminders);
 
 web.get("/api/health", (c) => c.json({ status: "ok" }));
 

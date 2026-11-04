@@ -56,6 +56,19 @@ function mutatingApiRoutes(): string[] {
 type Verifier = () => Promise<void>;
 
 const VERIFIERS: Record<string, Verifier> = {
+  // Acts as no guest, and is absent unless the dev tools are on.
+  "POST /api/dev/reminders": async () => {
+    vi.stubEnv("SB_ENABLE_DEV_TOOLS", "");
+    const res = await web.fetch(
+      new Request("http://test/api/dev/reminders", { method: "POST" })
+    );
+    expect(res.status).toBe(404);
+    vi.stubEnv("SB_ENABLE_DEV_TOOLS", "1");
+    const open = await web.fetch(
+      new Request("http://test/api/dev/reminders", { method: "POST" })
+    );
+    expect(open.status).toBe(401);
+  },
   "ALL /api/v1/*": async () => {
     const event = await createEvent({ phase: "scheduling" });
     const guest = await createGuest({ eventId: event.id });

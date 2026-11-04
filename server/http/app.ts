@@ -1,7 +1,6 @@
 import { getRepositories } from "@/db/container";
 import {
   commentUseCases,
-  dispatchReminders,
   eventUseCases,
   meetingUseCases,
   notificationUseCases,
@@ -49,7 +48,6 @@ import { addAdminVenueRoutes } from "@/server/modules/venue/module";
 import { actorMiddleware } from "./actor";
 import { createApp } from "./create-app";
 import { addApiDocsRoutes } from "./docs";
-import { addDevRoutes } from "./dev";
 import { addSiteAuthRoute } from "./site-auth";
 import { addHealthRoute } from "./health";
 import { idempotencyMiddleware } from "./idempotency";
@@ -71,7 +69,6 @@ api.use(
   idempotencyMiddleware({ store: () => getRepositories().idempotency })
 );
 addHealthRoute(api);
-addDevRoutes(api, dispatchReminders);
 addApiDocsRoutes(api, API_BASE_PATH);
 addSessionRoutes(api, sessionUseCases);
 addRsvpRoutes(api, sessionUseCases);

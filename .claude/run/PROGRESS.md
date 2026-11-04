@@ -221,3 +221,7 @@ None open. Q5 to Q8 were answered on 2026-10-29 and are in ADR 0017 and PLAN.md 
 
 - Step 23b: ids and endpoint now travel in the query (comma-separated ids); `isEnabledHere` is a GET
   with no idempotency key. `api.md` named none of these routes, so no doc change.
+
+- Step 23c: `addDevRoutes(web, dispatch)` mounts `POST /api/dev/reminders` on `web` (404 without dev
+  tools; then cross-site and site-cookie checks; no idempotency key). The mutating-surface guard has
+  a verifier for it. The SPA toolbar uses plain `fetch`.
