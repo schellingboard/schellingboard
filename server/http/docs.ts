@@ -8,7 +8,7 @@ import type { createApp } from "./create-app";
 
 type App = ReturnType<typeof createApp>;
 
-// next.config.js traces this file into the standalone build.
+// The Dockerfile copies this file into the image.
 const SCALAR_BUNDLE = path.join(
   process.cwd(),
   "node_modules/@scalar/api-reference/dist/browser/standalone.js"

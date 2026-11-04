@@ -100,7 +100,6 @@ async function main() {
     SEED_PROFILE: "large",
     // The footer shows this; the working tree's own version would say "…-dirty".
     APP_VERSION: process.env.APP_VERSION ?? newestChangelogVersion(),
-    NEXT_TELEMETRY_DISABLED: "1",
   };
 
   const run = (script: string) =>
@@ -110,11 +109,24 @@ async function main() {
       stdio: "inherit",
     });
 
+  const build = () => {
+    execFileSync("bun", ["x", "vite", "build", "apps/web"], {
+      cwd: repoRoot,
+      env: { ...serverEnv, NODE_ENV: "production" },
+      stdio: "inherit",
+    });
+    execFileSync("bun", ["scripts/build-server.ts"], {
+      cwd: repoRoot,
+      env: serverEnv,
+      stdio: "inherit",
+    });
+  };
+
   const spawnServer = () =>
-    spawn("bun", ["x", "next", "dev", "-p", String(port)], {
+    spawn("node", ["dist/server/main.mjs"], {
       cwd: repoRoot,
       detached: true,
-      env: serverEnv,
+      env: { ...serverEnv, PORT: String(port) },
       stdio: ["ignore", "ignore", "inherit"],
     });
 
@@ -142,6 +154,7 @@ async function main() {
     if (!existing) {
       run("scripts/run-migrations.ts");
       run("scripts/seed/seed-database.ts");
+      build();
       server = spawnServer();
       await waitFor(`${baseURL}/login`, server);
     }

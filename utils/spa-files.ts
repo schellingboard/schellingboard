@@ -2,7 +2,7 @@ import { readFile } from "fs/promises";
 import path from "path";
 
 // Read relative to the working directory, as the migrations are, so the same
-// path holds under `next start` and in the standalone image.
+// path holds under `make start` and in the image.
 export const spaDir = () => path.join(process.cwd(), "apps/web/dist");
 
 const TYPES: Record<string, string> = {

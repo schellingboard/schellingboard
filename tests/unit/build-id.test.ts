@@ -16,10 +16,10 @@ async function buildIdIn(cwd: string) {
 }
 
 describe("getBuildId", () => {
-  it("reads Next's BUILD_ID file", async () => {
+  it("reads the server build's BUILD_ID file", async () => {
     const dir = mkdtempSync(path.join(tmpdir(), "build-id-"));
-    mkdirSync(path.join(dir, ".next"));
-    writeFileSync(path.join(dir, ".next", "BUILD_ID"), "abc123\n");
+    mkdirSync(path.join(dir, "dist", "server"), { recursive: true });
+    writeFileSync(path.join(dir, "dist", "server", "BUILD_ID"), "abc123\n");
     expect(await buildIdIn(dir)).toBe("abc123");
   });
 

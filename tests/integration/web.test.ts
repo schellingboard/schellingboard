@@ -13,6 +13,8 @@ import {
 import { createAuthCookie } from "@/utils/auth";
 import { getRepositories } from "@/db/container";
 import { setupTestDb, resetTestDb } from "../helpers/db";
+import { withForwardedProto } from "@/server/http/forwarded";
+import { web } from "@/server/http/web";
 import { throughWeb } from "../helpers/through-web";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef"; // 32 chars
@@ -206,5 +208,29 @@ describe("web: POST /api/auth/logout", () => {
     expect(cookies.some((c) => c.startsWith("site-auth=;"))).toBe(true);
     expect(cookies.some((c) => c.startsWith("guest=;"))).toBe(true);
     expect(cookies.every((c) => /Max-Age=0/i.test(c))).toBe(true);
+  });
+});
+
+describe("web: behind a TLS-ending proxy", () => {
+  const signIn = async (forwarded: boolean) => {
+    const req = new Request("http://test/api/v1/auth/login", {
+      method: "POST",
+      headers: {
+        origin: "https://test",
+        "x-forwarded-proto": "https",
+        cookie: `site-auth=${(await createAuthCookie()).value}`,
+      },
+    });
+    return web.fetch(forwarded ? withForwardedProto(req) : req);
+  };
+  const codeOf = async (res: Response) =>
+    ((await res.json().catch(() => ({}))) as { code?: string }).code;
+
+  it("accepts a sign-in whose Origin is the https address the proxy serves", async () => {
+    expect(await codeOf(await signIn(true))).not.toBe("request.crossSite");
+  });
+
+  it("refuses the same request when the scheme is not carried over", async () => {
+    expect(await codeOf(await signIn(false))).toBe("request.crossSite");
   });
 });

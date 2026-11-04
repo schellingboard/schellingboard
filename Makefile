@@ -78,10 +78,10 @@ mailpit:
 
 build: install
 	bun x vite build apps/web
-	bun x next build
+	bun scripts/build-server.ts
 
 start: install
-	bun set-env.ts production bun x next start
+	bun set-env.ts production node dist/server/main.mjs
 
 lint: install
 	bun x eslint --max-warnings 0 .
@@ -95,7 +95,7 @@ typecheck: install
 	bun x tsc -p packages/api-client
 	bun x tsc -b apps/web
 
-DEPCRUISE := bun x depcruise app apps db packages server utils emails tests scripts instrumentation.ts --config .dependency-cruiser.cjs
+DEPCRUISE := bun x depcruise app apps db packages server utils emails tests scripts --config .dependency-cruiser.cjs
 
 # Commit messages: conventional prefix, subject <= 72, body wrapped at 80.
 # Pipe a draft message to `bun scripts/check-commit-messages.ts --stdin` first.
@@ -154,7 +154,7 @@ test-e2e: install-playwright
 test-e2e-headed: install-playwright
 	bun set-env.ts test bun x playwright test --headed
 
-# Runs the suite against the production image instead of `next start` — the
+# Runs the suite against the production image instead of the host server — the
 # release sanity check. Builds the image first unless IMAGE names one.
 # Through set-env.ts so the script inherits the test credentials it has to
 # hand to the container.
@@ -170,7 +170,7 @@ format-check: install
 precommit: format lint arch openapi-check typecheck test-coverage test-e2e
 
 clean:
-	rm -rf .next
+	rm -rf .next dist
 	rm -f arch-graph.svg
 	rm -f next-env.d.ts
 	rm -f data.db data.db-wal data.db-shm data.test.db data.test.db-wal data.test.db-shm
