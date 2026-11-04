@@ -124,9 +124,8 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
       react-hooks plugin stays), arch rules for `app/`, the SPA's legacy forward (the catch-all is
       "Page not found"), `/legacy` everywhere, `utils/dev-clock-server.ts`, `utils/action-auth.ts`,
       `utils/image-loader.js`, `utils/forms.ts`; `meetingOptions` takes `now`; tests use `Request`.
-- [ ] 20. **Docs: step 7 done.** ADR 0015 note, web-app, server.md, 07, 10-path, self-hosting,
-      testing. The commit message asks the user to run `make test-e2e-docker` and has the footer
-      `fixes #1339`.
+- [x] 20. Docs: step 7 done (ADR 0012/0015 notes, web-app, server, getting-started, testing, 07,
+      10-path, 04, coding-guidelines, releasing). The user should run `make test-e2e-docker`.
 
 ### Current architecture
 

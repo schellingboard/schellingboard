@@ -131,8 +131,8 @@ consequences:
   It uses the same commands. Today the admin pages are not in the replica: `AdminFrame` reads
   `GET /api/v1/admin/settings` as its gate (a 401 or 403 sends the browser to the admin login), and
   each screen in `features/admin/` loads its own `queries/` and sends awaited mutations that map
-  problem details onto fields and show a `409` as "changed by someone else". The admin login is
-  still a Next page.
+  problem details onto fields and show a `409` as "changed by someone else". The admin login is the
+  sign-in screen.
 
 ## PWA
 

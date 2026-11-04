@@ -197,6 +197,13 @@ the timeout, not the cause. Unresolved.
   `utils/hooks.ts`, `utils/markdown.ts` may be dead too. Not pruned (out of step). `theme-contrast`
   now scans `apps/web/src`; `ui/dialog.tsx` uses `bg-overlay` (darker in the dark theme).
 
+- Step 20: docs only. `make test-e2e-docker` has not been run since step 18; the user runs it.
+  `target-architecture/` still has deeper Next text in D1 and ADR 0015 body (history); step 21 cuts
+  it.
+
+- `runIdempotentAction` in `server/kernel/idempotency.ts` has no caller now (the middleware uses its
+  own path); check for dead code.
+
 ## Questions
 
 None open. Q5 to Q8 were answered on 2026-10-29 and are in ADR 0017 and PLAN.md (map item: step 14;
