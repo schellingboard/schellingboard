@@ -3,7 +3,9 @@
 Goal: the root event list and the sign-in screens move to the SPA; sign-in becomes server-side login
 sessions with assurance, join links and a site-admin role instead of the admin password (path step
 6). Then Hono serves everything in its own Node process and `next` leaves the repository (path step
-7). Every step leaves the app shippable.
+7). Then the run prepares release 5.0.0: the architecture docs describe what exists, the API gets
+its last breaking changes for a long time, and the remaining v5.0.0 issues are done. Every step
+leaves the app shippable.
 
 Read first: `docs/dev/target-architecture/10-path-from-here.md`, `05-security.md` (identity,
 assurance, transport), `02-domain.md` (Person, Participation), `08-decisions.md` D1, D2, D11; ADR
@@ -123,10 +125,89 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
       the SPA's legacy forward (catch-all → not found), `legacy-pages.ts`, the E2E fixture's
       `/legacy` mapping, AGENTS.md's Next notice. Full `make test-e2e`.
 - [ ] 20. **Docs: step 7 done.** ADR 0015 note, web-app, server.md, 07, 10-path, self-hosting,
-      testing. The commit message asks the user to run `make test-e2e-docker`.
-- [ ] 21. **Finish**: summary in PROGRESS.md, then delete `.claude/run/`.
+      testing. The commit message asks the user to run `make test-e2e-docker` and has the footer
+      `fixes #1339`.
 
-## Next to plan
+### Current architecture
+
+- [ ] 21. **The target architecture becomes the current architecture.** Move
+      `docs/dev/target-architecture/` to `docs/dev/architecture/` and cut it from about 1500 lines
+      to about 500. Each statement describes what the code does now; check it against the code. Link
+      to `server.md`, `web-app.md` and `architecture-rules.md` instead of repeating them. Keep the
+      one-screen summary, the glossary, the decisions (D1–D11) and the diagrams, cut to what exists.
+      Delete `09-feedback-map.md` and `10-path-from-here.md` (jj history has them). Designs that are
+      not built, the open questions and "Not in this run" below go to one page,
+      `architecture/not-built.md`. Update every link (ADRs, `docs/dev/` pages, `documentation.md`,
+      the Makefile's `LIKEC4_DIR`, this plan's "Read first"). Run `make docs-dev-validate` and
+      `make arch`.
+
+### The API for 5.0.0
+
+- [ ] 22. **API review: ADR 0018.** Doc-only. Goal: after 5.0.0, no breaking release for a long
+      time, so accept a break now where it removes a future one. Review
+      `packages/contracts/openapi.json`, the snapshot and feed shapes, problem kinds, and auth. Also
+      review the other things a self-hoster depends on: environment variables, public URLs, data
+      paths. For each change, state the benefit and who it breaks. Start from these candidates;
+      reject those that do not earn a break: - Endpoints that nothing uses now that the SPA reads
+      the replica (`/updates`, `/attendees`, `/host-clashes`, `/sessions/{id}/rsvps`,
+      `/guests/{id}/rsvps`): each is a promise to keep. - Verbs in paths instead of methods
+      (`/me/notifications/delete`, `/me/push-subscriptions/remove`,
+      `/admin/events/{id}/guests/remove`, `.../locations/remove`). - `/admin/sessions` and
+      `/admin/proposals` next to `/sessions` and `/proposals`, now that the role is on the actor.
+      The future organizer role must fit without a break. - Events addressed by `{id}` and by
+      `{slug}`. `/dev/reminders` in the public document. - Whether the path stays `/api/v1` (check
+      what 4.0.0 shipped and what `docs/public/self-hosting/api.md` promises). - Everything in "Not
+      in this run" must arrive without a break. Decide now how `SITE_PASSWORD` and `/auth/site` end,
+      or that they stay. API tokens must fit the auth scheme. - The contract changes that #1383 and
+      #1331 need. - A written compatibility policy: what counts as breaking, how an endpoint is
+      deprecated, what clients must tolerate (unknown fields, new problem kinds, new feed change
+      types).
+
+      Decide each item. Put only a real product trade-off under "Questions" in PROGRESS.md, and go
+      on with the rest. Replace step 23 with one step per coherent change.
+
+- [ ] 23. **Apply ADR 0018** (the review splits this step). Each change updates the contracts,
+      `openapi.json`, the SPA, tests, `docs/public/self-hosting/api.md`, and a line in the breaking
+      change note of `CHANGELOG.md`. Full `make test-e2e` after the last one.
+
+### Issues of milestone v5.0.0
+
+One step and one commit per issue, footer `fixes #N`. The issue text is the specification, but its
+paths can be old: `app/(site)/` is now `apps/web/src/`. Read it with
+`gh issue view -R schellingboard/schellingboard N` (`gh` needs `-R`: this checkout has no `.git`).
+Contract changes first, so the rest build on the final API.
+
+- [ ] 24. #1383 Hosts see the vote breakdown of their own proposals during voting; the server sends
+      the counts to nobody else. E2E.
+- [ ] 25. #1331 Events without email, following ADR 0017 points 4 and 9. Email is optional per
+      person: `guests.email` becomes nullable, unique when set, and the contracts follow. The guest
+      id is the identity; names need not be unique, and `username` is the unique sign-in name.
+      Protection stays available, which replaces the issue's "disable account protection": a
+      verified session with no password may set one without an emailed link (today only a reset link
+      can, so this is new), and a new join link is the recovery. Only the options that need mail are
+      disabled or hidden. Guest import: a row without an email matches an existing guest without an
+      email by exact name, so a second import adds no duplicates.
+- [ ] 26. #1335 Admin: assign attendees to events in the add and edit forms.
+- [ ] 27. #1361 Dismissing a dialog with unsaved text asks first. E2E.
+- [ ] 28. #1330 Admin: a new day's booking window defaults to the day's start and end.
+- [ ] 29. #1329 Admin: searchable time zone combobox on a new event.
+- [ ] 30. #1334 Placeholder image for a location without an image.
+- [ ] 31. #1333 Input fields do not move on focus (styling: no new test).
+- [ ] 32. #1338 Proposal page says "proposal", not "session".
+- [ ] 33. **Milestone check.** `gh issue list -R schellingboard/schellingboard --milestone v5.0.0`.
+      An issue that no commit closes and that has no step gets a new step here. Full
+      `make test-e2e`.
+
+### Finish
+
+- [ ] 34. **Finish**: summary in PROGRESS.md, including open Questions, then delete `.claude/run/`.
+      Do not start the items in "Not in this run". Do not make the release. The commit message asks
+      the user to run `make test-e2e-docker`.
+
+## Not in this run
+
+Step 21 moves this list to `docs/dev/architecture/not-built.md`. These are not next steps of this
+run.
 
 - The `organizer` participation role and per-event admin rights.
 - Passkeys, API tokens, QR sheet of join links.
