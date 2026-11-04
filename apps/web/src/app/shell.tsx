@@ -49,10 +49,12 @@ export function ShellFrame({
         search={search}
         onChange={onClockChange}
         sendReminders={async () => {
-          const { data } = await api.POST("/api/v1/dev/reminders", {
-            headers: { "Idempotency-Key": crypto.randomUUID() },
+          const response = await fetch("/api/dev/reminders", {
+            method: "POST",
           });
-          return data ? `sent ${data.sent} reminders` : "dispatch failed";
+          if (!response.ok) return "dispatch failed";
+          const { sent } = (await response.json()) as { sent: number };
+          return `sent ${sent} reminders`;
         }}
       />
     </Layout>

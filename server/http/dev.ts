@@ -1,36 +1,25 @@
-import { createRoute, z } from "@hono/zod-openapi";
-import { notFound } from "@/server/kernel/result";
+import type { Hono } from "hono";
 import {
   isDevToolsEnabled,
   nowWithOffset,
   parseTimeOffset,
   readTimeOffsetCookie,
 } from "@/utils/dev-clock";
-import { idempotencyHeaders } from "./idempotency";
-import { problem, problemDefault } from "./problem";
-import { json, type App } from "./route-parts";
-
-const route = createRoute({
-  method: "post",
-  path: "/dev/reminders",
-  tags: ["dev"],
-  description:
-    "Runs one reminder tick against the dev clock. `route.notFound` (404) unless the dev tools are on.",
-  request: { headers: idempotencyHeaders },
-  responses: {
-    200: json(z.object({ sent: z.number().int() }), "The reminders sent"),
-    ...problemDefault,
-  },
-});
+import { isTrustedOrigin, siteApiRefusal } from "./gates";
+import { problemResponse } from "./problem";
 
 export function addDevRoutes(
-  app: App,
+  web: Hono,
   dispatch: (now: Date) => Promise<{ sent: number }>
 ) {
-  app.openapi(route, async (c) => {
+  web.post("/api/dev/reminders", async (c) => {
     if (!isDevToolsEnabled())
-      return problem(notFound("route.notFound", "Not found").error);
+      return problemResponse({ status: 404, code: "route.notFound" });
+    const refusal = isTrustedOrigin(c.req.raw)
+      ? await siteApiRefusal(c.req.raw)
+      : { status: 403, code: "request.crossSite" };
+    if (refusal) return problemResponse(refusal);
     const now = nowWithOffset(parseTimeOffset(readTimeOffsetCookie(c.req.raw)));
-    return c.json({ sent: (await dispatch(now)).sent }, 200);
+    return c.json({ sent: (await dispatch(now)).sent });
   });
 }

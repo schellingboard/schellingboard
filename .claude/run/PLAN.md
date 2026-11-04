@@ -65,7 +65,7 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
 - [x] 8. Sign-in screens taken over: the router owns `/auth/login`, `/auth/reset`,
       `/account-security` (`app/account-pages.tsx`); legacy pages, `(site)` layout, `user-auth.ts`
       and its action tests deleted (rules covered in `api-auth.test.ts`); "Send due reminders" is
-      `POST /api/v1/dev/reminders` in the SPA's dev toolbar.
+      `POST /api/dev/reminders` in the SPA's dev toolbar.
 - [x] 9. Site password screen: SPA `/login` (open in `proxy.ts`), `POST /api/v1/auth/site`
       (`server/http/site-auth.ts`); `/api/v1/health` is open too; `(login)` group and
       `actions/auth.ts` deleted. The gate stays in `proxy.ts` until step 17.
@@ -142,9 +142,7 @@ join links, identity mode, the read setting (next plan) and retiring Next throug
 - [x] 23b. `DELETE /me/notifications?ids=` (comma-separated),
       `DELETE /me/push-subscriptions?endpoint=` and `GET /me/push-subscriptions?endpoint=` replace
       the three `POST` verb routes.
-- [ ] 23c. `POST /dev/reminders` becomes `/api/dev/reminders`, outside `/api/v1` and `openapi.json`;
-      still 404 without `SB_ENABLE_DEV_TOOLS`. The SPA's dev toolbar follows. Also `API_DOCS`
-      becomes `SB_API_DOCS` (code, `.env` files, `configuration.md`, `api.md`).
+- [x] 23c. `POST /api/dev/reminders` (a web route, not in `openapi.json`) and `SB_API_DOCS`.
 - [ ] 23d. `api.md`: the command-versus-DELETE rule, the `/admin/` privilege rule, `{id}` versus
       `{slug}`, `/attendees` versus `/guests`, `Authorization` reserved for `Bearer sb_` tokens and
       ignored today, and the full Compatibility section from ADR 0018 (breaking, not breaking,

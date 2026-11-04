@@ -59,9 +59,9 @@ describe("API docs", () => {
   });
 
   it.each(["false", "0"])(
-    "serves none of it with API_DOCS=%s",
+    "serves none of it with SB_API_DOCS=%s",
     async (value) => {
-      vi.stubEnv("API_DOCS", value);
+      vi.stubEnv("SB_API_DOCS", value);
       for (const path of [
         "/api/v1/openapi.json",
         "/api/v1/docs",
