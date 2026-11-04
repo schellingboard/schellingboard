@@ -27,12 +27,9 @@ settled answers folded into the chapters they affect.
    (members and hosts), because `GET /guests` is closed to anonymous visitors, so a non-member
    cannot pick their name. Recommendation: a public guest-name list for the picker that exposes
    names only.
-9. **"Show map" in the SPA shell.** The uploaded site map has a footer button on the legacy pages
-   only; the schedule and proposals lost it when they moved. Recommendation: a shell item, with the
-   map URL in `/me` or the snapshot.
-10. **An admin session that expires mid-edit.** Only the `AdminFrame` gate read sends the browser to
-    the admin login; a mutation refused with 401 or 403 later shows the refusal in place.
-    Recommendation: treat it as the gate does.
+9. **An admin session that expires mid-edit.** Only the `AdminFrame` gate read sends the browser to
+   the admin login; a mutation refused with 401 or 403 later shows the refusal in place.
+   Recommendation: treat it as the gate does.
 
 Add new questions here as numbered items with a recommendation; when one is decided, move the
 outcome into the relevant chapter and, if it is a design decision rather than a product detail, into
