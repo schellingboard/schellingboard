@@ -218,3 +218,7 @@ None open. Q5 to Q8 were answered on 2026-10-29 and are in ADR 0017 and PLAN.md 
   admin-guide claims (moved to step 11 with the proxy change that makes them true). Rejected: a
   confirm step for granting or revoking the role (both are one click to undo, and the last admin is
   protected by the server). `hasPassword` and recording the admin: step 11.
+
+- Step 23e: full `make test-e2e` 218 passed, no flakes. Mailpit was not running (not started), so
+  the mail E2E tests (`user-auth.spec.ts`, via `skipWithoutMailpit`) were skipped: "218 passed"
+  excludes them. The user decides whether to start it and rerun.
