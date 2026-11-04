@@ -1,6 +1,11 @@
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createEvent, createGuest, createProposal } from "../helpers/factories";
+import {
+  createEvent,
+  createGuest,
+  createProposal,
+  createSession,
+} from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
 import { createEventUseCases } from "@/server/modules/events/module";
@@ -84,8 +89,13 @@ describe("an event's identity mode", { tags: ["015-US7"] }, () => {
     const event = await createEvent({ phase: "scheduling" });
     const member = await createGuest({ eventId: event.id });
     const stranger = await createGuest();
+    const session = await createSession(event.id);
     const list = (actor: Actor, guestId: string) =>
-      sessionUseCases().listGuestRsvps(actor, { guestId });
+      sessionUseCases().withdrawRsvp(
+        actor,
+        { sessionId: session.id, guestId },
+        new Date()
+      );
     const setMode = async (identityMode: "open" | "verified") => {
       const current = await getRepositories().events.findById(event.id);
       return events().updateEvent(
@@ -107,7 +117,9 @@ describe("an event's identity mode", { tags: ["015-US7"] }, () => {
       "guest.protected"
     );
     expect(code(await list(verified(member.id), member.id))).toBe("ok");
-    expect(code(await list(claimed(stranger.id), stranger.id))).toBe("ok");
+    expect(code(await list(claimed(stranger.id), stranger.id))).toBe(
+      "guest.notInEvent"
+    );
     const shown = await getRepositories().guests.listByEvent(event.id);
     expect(shown.map((g) => g.authProtected)).toEqual([true]);
 

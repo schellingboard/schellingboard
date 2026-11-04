@@ -105,7 +105,7 @@ describe("write enforcement for protected guests", () => {
     });
   });
 
-  describe("GET /api/v1/guests/{id}/rsvps", () => {
+  describe("GET /api/v1/sessions/{id}/rsvps", () => {
     async function setup() {
       const event = await createEvent({ phase: "scheduling" });
       const guest = await createGuest({ eventId: event.id });
@@ -116,22 +116,6 @@ describe("write enforcement for protected guests", () => {
       });
       return { guest, session };
     }
-
-    it("hides a protected guest's RSVPs from unverified readers", async () => {
-      const { guest } = await setup();
-      await protectGuest(guest.id);
-
-      const unverified = await GET(v1("GET", `/guests/${guest.id}/rsvps`));
-      expect(unverified.status).toBe(403);
-
-      const verified = await GET(
-        v1("GET", `/guests/${guest.id}/rsvps`, await authCookieHeader(guest.id))
-      );
-      expect(verified.ok).toBe(true);
-      expect(
-        ((await verified.json()) as { rsvps: unknown[] }).rsvps
-      ).toHaveLength(1);
-    });
 
     it("still lists RSVPs per session without auth", async () => {
       const { guest, session } = await setup();

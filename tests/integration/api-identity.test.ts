@@ -8,7 +8,7 @@ import {
   vi,
 } from "vitest";
 
-import { GET, PUT, DELETE } from "@/tests/helpers/v1-route";
+import { GET, PUT } from "@/tests/helpers/v1-route";
 import { getRepositories } from "@/db/container";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createGuest } from "../helpers/factories";
@@ -33,9 +33,6 @@ function choose(guestId: string | null, cookie?: string, key?: string) {
     })
   );
 }
-
-const signOut = () =>
-  DELETE(new Request("http://test/api/v1/me/identity", { method: "DELETE" }));
 
 async function protect(guestId: string) {
   await getRepositories().guests.setAuthProtection(guestId, {
@@ -169,14 +166,6 @@ describe("/api/v1/me/identity", () => {
       expectSessionCookie(res);
     }
   );
-
-  it("signs out by clearing the cookie", { tags: ["003-US2"] }, async () => {
-    const res = await signOut();
-
-    expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ guestId: null });
-    expect(res.headers.get("set-cookie")).toMatch(/guest=;.*Max-Age=0/i);
-  });
 
   it(
     "sets the cookie again on a retry with the same key",

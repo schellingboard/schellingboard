@@ -17,7 +17,6 @@ import {
 import {
   adminAddRsvp,
   adminRemoveRsvp,
-  listGuestRsvps,
   listSessionRsvps,
   rsvp,
   withdrawRsvp,
@@ -38,7 +37,6 @@ export function createSessionUseCases(deps: SessionDeps) {
     rsvp: rsvp(deps),
     withdrawRsvp: withdrawRsvp(deps),
     listSessionRsvps: listSessionRsvps(deps),
-    listGuestRsvps: listGuestRsvps(deps),
     adminAddRsvp: adminAddRsvp(deps),
     adminRemoveRsvp: adminRemoveRsvp(deps),
     getAttendeeCount: getAttendeeCount(deps),
