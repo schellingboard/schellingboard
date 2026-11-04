@@ -37,7 +37,7 @@ the repository.
 | Chapter                                                             | For                                                                      |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | [ADRs](adr/README.md)                                               | why the significant decisions were made                                  |
-| [Target architecture](target-architecture/README.md)                | the from-scratch design proposal: levels 0–3, decisions, C4 diagrams     |
+| [Architecture](architecture/README.md)                              | the design on one screen, decisions, C4 diagrams, what is not built      |
 | [Diagram explorer](https://developers.schellingboard.org/diagrams/) | the same C4 model, browsable — every view, with drill-down               |
 | [Attendance model](attendance-model/README.md)                      | predicting how many people show up to a session, from its voting results |
 | [Matrix chat feasibility](exploration/matrix-chat.md)               | exploratory notes on integrating a Matrix chat server — not yet decided  |

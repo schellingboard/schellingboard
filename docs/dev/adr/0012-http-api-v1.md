@@ -11,12 +11,12 @@ reads its own cookies, validates its own body, calls the repositories and shapes
 the same rule (who may RSVP, who may edit a session) is written once per path, and nothing describes
 the routes to a client: #677 asks for an OpenAPI document, #1006 for an admin API a script can call.
 
-The [target architecture](../target-architecture/03-server.md#http-api) puts a REST API under
-`/api/v1` in front of use cases, typed by the zod contracts in `packages/contracts` (ADR 0010), with
-RFC 9457 errors and idempotent mutations.
-[Step 3 of the path](../target-architecture/10-path-from-here.md) brings that API into today's Next
-process, with server actions and the legacy routes calling the same use cases. Identity stays as it
-is until step 6.
+The [target architecture](../server.md) puts a REST API under `/api/v1` in front of use cases, typed
+by the zod contracts in `packages/contracts` (ADR 0010), with RFC 9457 errors and idempotent
+mutations. Step 3 of the
+[path](https://github.com/schellingboard/schellingboard/blob/fb2a2cba1d05ab0421aee2985bc0d75db3c41323/docs/dev/target-architecture/10-path-from-here.md)
+brings that API into today's Next process, with server actions and the legacy routes calling the
+same use cases. Identity stays as it is until step 6.
 
 ## Decision
 
@@ -37,8 +37,8 @@ only the OpenAPI document needs is added where a route is declared.
 
 ### 2. Where the code lives
 
-A top-level `server/` directory, next to `app/` and `db/`, follows the
-[target layout](../target-architecture/03-server.md#layout) as far as today's app allows:
+A top-level `server/` directory, next to `app/` and `db/`, follows the [target layout](../server.md)
+as far as today's app allows:
 
 ```
 server/
@@ -163,11 +163,12 @@ request and response contracts, so the document covers the whole API.
 `packages/api-client` (`@schellingboard/api-client`) is a thin wrapper over `openapi-fetch` with
 types that `openapi-typescript` generates from this file. The generated types are committed too:
 `make openapi` writes both from the same document and `make openapi-check` fails when either is
-stale. This departs from the target ([03](../target-architecture/03-server.md#http-api): "generated
-from it in the build"): generating at build time would need a step before every `tsc`, ESLint,
-dependency-cruiser, Vitest and `next build` run, the Dockerfile included, and leave editors without
-types. One source and no staleness, the target's intent, hold either way. The app does not import
-the client, so the standalone build does not carry it.
+stale. This departs from the target
+([03](https://github.com/schellingboard/schellingboard/blob/fb2a2cba1d05ab0421aee2985bc0d75db3c41323/docs/dev/target-architecture/03-server.md):
+"generated from it in the build"): generating at build time would need a step before every `tsc`,
+ESLint, dependency-cruiser, Vitest and `next build` run, the Dockerfile included, and leave editors
+without types. One source and no staleness, the target's intent, hold either way. The app does not
+import the client, so the standalone build does not carry it.
 
 ## Consequences
 

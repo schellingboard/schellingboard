@@ -114,7 +114,7 @@ module.exports = {
       comment:
         "Screens read the replica and call `commands/` or `queries/`; only those reach the " +
         "wire, so every request is predicted, keyed and reconciled in one place. See " +
-        "docs/dev/target-architecture/04-client.md.",
+        "docs/dev/web-app.md.",
       from: { path: "^apps/web/src/features/" },
       to: {
         path: "^packages/api-client/|node_modules/@schellingboard/api-client/",

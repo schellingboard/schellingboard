@@ -30,5 +30,4 @@ same header block: status, date, and the tracking issue where there is one.
 | [0017](0017-identity-and-roles.md)                   | Identity and roles                                          | 2026-10-28 |
 
 Longer design work that isn't a single decision lives next door:
-[Target architecture](../target-architecture/README.md) and
-[Attendance model](../attendance-model/README.md).
+[Architecture](../architecture/README.md) and [Attendance model](../attendance-model/README.md).

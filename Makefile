@@ -30,7 +30,7 @@ help:
 	@printf "  %-28s %s\n" "make openapi"            "Regenerate openapi.json and the api-client types"
 	@printf "  %-28s %s\n" "make openapi-check"      "Check openapi.json and the api-client match the API"
 	@printf "  %-28s %s\n" "make arch-graph"         "Render the dependency graph to arch-graph.svg"
-	@printf "  %-28s %s\n" "make arch-diagrams"      "Browse the target-architecture C4 diagrams (LikeC4)"
+	@printf "  %-28s %s\n" "make arch-diagrams"      "Browse the architecture C4 diagrams (LikeC4)"
 	@printf "  %-28s %s\n" "make arch-diagrams-check" "Check the LikeC4 diagram sources parse"
 	@printf "  %-28s %s\n" "make format"             "Format code"
 	@printf "  %-28s %s\n" "make format-check"       "Check code formatting"
@@ -113,7 +113,7 @@ openapi: install
 openapi-check: install
 	bun x tsx scripts/openapi.ts --check
 
-LIKEC4_DIR := docs/dev/target-architecture/diagrams
+LIKEC4_DIR := docs/dev/architecture/diagrams
 
 arch-diagrams: install
 	bun x likec4 start $(LIKEC4_DIR)
