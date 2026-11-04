@@ -59,7 +59,7 @@ function actionFiles(): string[] {
 }
 
 // Admin actions live behind the admin cookie, which is independent of site
-// auth by design (see proxy.ts). Each checks isAdminRequest() itself; that
+// auth by design (see server/http/web.ts). Each checks isAdminRequest() itself; that
 // contract is covered by the admin-* integration tests.
 const ADMIN_FILE = /^actions\/admin-(?!auth)/;
 

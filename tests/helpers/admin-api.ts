@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { DELETE, GET, POST, PUT } from "@/app/api/v1/[[...route]]/route";
+import { DELETE, GET, POST, PUT } from "@/tests/helpers/v1-route";
 import { createAdminAuthCookie } from "./admin-cookie";
 
 type Problem = {

@@ -9,7 +9,7 @@ import {
   vi,
 } from "vitest";
 import { NextRequest } from "next/server";
-import { GET } from "@/app/api/v1/[[...route]]/route";
+import { GET } from "@/tests/helpers/v1-route";
 import { getRepositories } from "@/db/container";
 import { RECONNECT_DELAY_MS } from "@/server/feed/routes";
 import { RECONNECT_GRACE_MS } from "@schellingboard/contracts/feed";

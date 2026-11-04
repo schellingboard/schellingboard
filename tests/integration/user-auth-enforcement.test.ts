@@ -34,7 +34,7 @@ import {
   openGuestValue,
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
-import { GET, PUT } from "@/app/api/v1/[[...route]]/route";
+import { GET, PUT } from "@/tests/helpers/v1-route";
 import { saveProfile } from "../helpers/profile-api";
 import { callApi } from "../helpers/api";
 import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";

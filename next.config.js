@@ -12,7 +12,7 @@ const nextConfig = {
   allowedDevOrigins: ["*.trycloudflare.com"],
   // The API reference page serves this bundle by path, which tracing can't see.
   outputFileTracingIncludes: {
-    "/api/v1/\\[\\[\\.\\.\\.route\\]\\]": [
+    "/\\[\\[\\.\\.\\.path\\]\\]": [
       "./node_modules/@scalar/api-reference/dist/browser/standalone.js",
     ],
   },
@@ -20,12 +20,6 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: "5mb",
     },
-  },
-  // The SPA's build output is read from disk by a route handler, so it is the
-  // same files `next start` and the standalone image serve.
-  // eslint-disable-next-line @typescript-eslint/require-await -- Next requires an async function here
-  async rewrites() {
-    return [{ source: "/_spa/:path*", destination: "/api/spa/assets/:path*" }];
   },
   // Baseline browser-side hardening for every response. No frame ever embeds
   // this app, so framing is denied outright (blocks clickjacking on the
