@@ -31,6 +31,7 @@
     "luxon": "^3.7.2",
     "moment-timezone": "^0.6.6",
     "nanoid": "^6.0.2",
+    "next": "^16",
     "nodemailer": "^10.3.1",
     "react": "^19",
     "react-dom": "^19",
