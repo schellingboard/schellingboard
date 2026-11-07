@@ -183,6 +183,11 @@ export default {
           path: "/exploration/matrix-chat/",
           icon: "message-circle",
         },
+        {
+          title: "Statistics proposal",
+          path: "/statistics-proposal/",
+          icon: "chart-bar",
+        },
       ],
     },
     {
