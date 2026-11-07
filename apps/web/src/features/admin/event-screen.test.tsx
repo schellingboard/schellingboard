@@ -99,6 +99,7 @@ describe("the admin event layout", { tags: ["015-US2"] }, () => {
       "Locations",
       "Proposals",
       "Sessions",
+      "Statistics",
     ]);
     expect(tabs[1].getAttribute("href")).toBe("/admin/events/e1/guests");
     expect(

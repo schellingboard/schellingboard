@@ -20,6 +20,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Event statistics** (#389): site admins get a Statistics tab per event: sortable tables with CSV
+  download and "Download all", with locations, hosts and kinds of session left out on request. each
+  as a sortable table with CSV download, plus "Download all". Locations, hosts and kinds of session
+  can be left out.
 - **Site admins**: organizers can make people site admins, who open the admin pages after signing in
   with a password or email code. The first one is made through a one-time link the server logs.
 - **Verified events**: organizers choose per event whether attendees must prove who they are. New

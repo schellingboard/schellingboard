@@ -84,7 +84,9 @@ turns its session into "spontaneous" (`proposal_id` is set null); an admin can u
 
 - **Contract**: a generic `StatsTable` (`id`, `title`, `columns: {key, label, type}[]`, `rows`),
   with column types `text | integer | number | percent | minutes | datetime | boolean`. One table
-  component renders all of them; charts are bound by table id.
+  component renders all of them; charts are bound by table id. A `datetime` cell is a string the
+  server already formatted in the event's zone (`YYYY-MM-DD HH:mm`, as in the CSV), so the payload
+  needs no zone and the table shows it as given.
 - **API**: `GET /api/v1/admin/events/{id}/stats?{filter}` (JSON, all tables) and
   `GET /api/v1/admin/events/{id}/stats/{table}.csv?{filter}`. The server writes the CSV, so one
   encoder serves the button, a script and `curl`.

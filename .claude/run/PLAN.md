@@ -59,10 +59,9 @@ database and use the page themselves. The run checks old data through the releas
       test.
 - [x] 6. Dev seed (large profile, Conference Gamma): "Volunteers 1/2" locations with 12 organizer
       shifts hosted by "Olga Organizer", attendee reports on 10 sessions, 1-on-1s in every status.
-- [ ] 7. SPA skeleton: "Statistics" tab (`features/admin/event-stats.tsx`, in the admin chunk),
-      section navigation, generic sortable table, "Download CSV", "Download all", the filter panel
-      in the URL query with its one-line summary, `queries/admin-stats.ts`. E2E: open the tab,
-      exclude the volunteer locations and the organizer host, download a CSV and the ZIP.
+- [x] 7. SPA skeleton: Statistics tab (`features/admin/event-stats.tsx`, `stats-table.tsx`,
+      `queries/admin-stats.ts`), sections nav, sortable tables, CSV/ZIP links, filter panel in the
+      URL, `statistics.spec.ts`.
 - [ ] 8. Chart wrappers in `apps/web/src/ui/charts/` over the chosen library: ranked bars,
       histogram, scatter with ρ and the `n < 15` note, stacked bars, heatmap, lines; Plot is
       imported dynamically there, so only a chart-showing tab fetches it. Colour tokens, dark mode,

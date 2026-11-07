@@ -33,6 +33,18 @@
   although they have not happened; use the dev clock to view them as past. Shifts are origin
   `organizer`, as are the curated admin-managed sessions; the shift locations are
   `loc-volunteers-1/2`. The seed test is `tests/integration/seed-statistics.test.ts`.
+- Step 7 done. Add figures by adding tables on the server: the SPA groups tables into sections by
+  the id prefix before the first `-` (labels in `SECTION_LABELS` in `event-stats.tsx`, `?section=`)
+  and renders any table generically. Downloads are plain `<a download>` links to the API (cookie
+  auth), so the file name comes from the server (`<event>-<table>[-filtered].csv`). The filter is
+  URL-only (`excludeLocations`, `excludeHosts`, `excludeOrigins`, same format as the API; absent
+  origins = blockers); changing it refetches while the old figures stay on screen. `datetime` cells
+  are strings the server formats in the event's zone (`YYYY-MM-DD HH:mm`, like the CSV); the SPA
+  shows them as given. Per-table cards, "Show table" toggles and charts come in step 8. The E2E runs
+  on the small profile (no volunteers), so it excludes Garden Terrace and Yuki Tanaka on Conference
+  Gamma; it does not exercise the origin filter. The server bundle banner import was renamed in its
+  own `fix:` commit (fflate broke it); run `make test-e2e-docker` in the Finish step, since the
+  bundle changed.
 
 ## Questions
 

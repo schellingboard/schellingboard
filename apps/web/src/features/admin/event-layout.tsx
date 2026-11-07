@@ -9,6 +9,7 @@ const SECTIONS = [
   { path: "/locations", label: "Locations" },
   { path: "/proposals", label: "Proposals" },
   { path: "/sessions", label: "Sessions" },
+  { path: "/stats", label: "Statistics" },
 ];
 
 function EventTabs({

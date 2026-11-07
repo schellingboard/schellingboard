@@ -1,4 +1,11 @@
-import { useEffect, useMemo, type ReactNode } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
+import type { EventStatistics } from "@schellingboard/contracts/stats";
 import { Outlet, useLocation, useRouter } from "@tanstack/react-router";
 import { formatDayLabel } from "@schellingboard/domain/time";
 import { adminEventCalls } from "../commands/admin-events";
@@ -10,6 +17,7 @@ import { EventGuestsManager } from "../features/admin/event-guests";
 import { AdminEventLayout } from "../features/admin/event-layout";
 import { EventLocationsManager } from "../features/admin/event-locations";
 import { EventProposalsManager } from "../features/admin/event-proposals";
+import { EventStatsScreen } from "../features/admin/event-stats";
 import { EventSessionsManager } from "../features/admin/event-sessions";
 import { AdminEventsScreen } from "../features/admin/events-screen";
 import { UserImportScreen } from "../features/admin/guest-import";
@@ -29,6 +37,11 @@ import {
   loadSessionRsvpGuests,
   scheduledOf,
 } from "../queries/admin-sessions";
+import {
+  createAdminStatsQuery,
+  filterFromParams,
+  type StatsFilter,
+} from "../queries/admin-stats";
 import { createAdminSettingsQuery } from "../queries/admin-settings";
 import { createAdminUnavailabilityQuery } from "../queries/admin-unavailability";
 import { AdminFrame, useReloadAdminGate } from "./admin-frame";
@@ -152,7 +165,7 @@ export function AdminSettingsPage({ api }: { api: Api }) {
   );
 }
 
-const TABS = ["guests", "locations", "proposals", "sessions"];
+const TABS = ["guests", "locations", "proposals", "sessions", "stats"];
 
 export function AdminEventPage({ api, id }: { api: Api; id: string }) {
   const pathname = useLocation({ select: (l) => l.pathname });
@@ -253,6 +266,8 @@ function Tab({
       return <LocationsTab api={api} id={id} state={state} />;
     case "proposals":
       return <ProposalsTab api={api} id={id} />;
+    case "stats":
+      return <StatsTab key={id} api={api} id={id} />;
     default:
       return <SessionsTab api={api} id={id} state={state} />;
   }
@@ -320,6 +335,37 @@ function LocationsTab({
         onChanged={loadPeriods}
       />
     </div>
+  );
+}
+
+function StatsTab({ api, id }: { api: Api; id: string }) {
+  const { params, onParams } = useParamUpdates();
+  const filter = filterFromParams(params);
+  const key = JSON.stringify(filter);
+  const query = useMemo(
+    () =>
+      createAdminStatsQuery({
+        api,
+        eventId: id,
+        filter: JSON.parse(key) as StatsFilter,
+      }),
+    [api, id, key]
+  );
+  useEffect(() => {
+    void query.load();
+  }, [query]);
+  const state = useSyncExternalStore(query.subscribe, query.get);
+  // Figures stay on screen while a changed filter loads, so the panel keeps its place.
+  const [shown, setShown] = useState<EventStatistics>();
+  if (state.status === "ready" && state.stats !== shown) setShown(state.stats);
+  return (
+    <EventStatsScreen
+      eventId={id}
+      status={state.status === "error" ? "error" : shown ? "ready" : "loading"}
+      stats={shown}
+      params={params}
+      onParams={onParams}
+    />
   );
 }
 
