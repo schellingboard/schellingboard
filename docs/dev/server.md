@@ -23,7 +23,9 @@ server/
 The modules are `sessions` (sessions, RSVPs, room unavailability, attendee counts), `proposals`
 (proposals and votes), `comments`, `meetings`, `people` (profiles and the admin guest list),
 `notifications`, `events` (events and days), `venue` (locations), `settings` (site settings) and
-`updates` (the daily GitHub look-up of the latest release, shown to the admin).
+`updates` (the daily GitHub look-up of the latest release, shown to the admin) and `stats` (the
+read-only admin statistics, [ADR 0019](adr/0019-statistics.md): one `StatsRepository.getEventFacts`
+read, tables computed in the use case, CSV and ZIP from the routes).
 
 `server/main.ts` runs the Hono app in `server/http/web.ts` on `@hono/node-server`, in its own Node
 process, and starts the mailer and the jobs loop. `scripts/build-server.ts` bundles it with esbuild

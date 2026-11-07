@@ -15,7 +15,7 @@ const options: BuildOptions = {
   // Native addons are loaded from node_modules at run time.
   external: ["better-sqlite3", "sharp"],
   banner: {
-    js: "import { createRequire } from 'module'; const require = createRequire(import.meta.url);",
+    js: "import { createRequire as bundleCreateRequire } from 'module'; const require = bundleCreateRequire(import.meta.url);",
   },
   define: {
     "process.env.NEXT_PUBLIC_APP_VERSION": JSON.stringify(version),

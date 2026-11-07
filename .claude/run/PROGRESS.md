@@ -19,6 +19,15 @@
   only (no ids) and sorts them, so ties cannot leak an id order. `encodeCsv` guards `= + - @ tab CR`
   in text. `predictAttendance` returns null for share 0, no voters or no mean share. Use cases
   021-US1..US4 are `planned` until the UI exists; drop `planned` as steps 7+ land.
+- Step 5 done. Add a section by adding tables in `application/` and fields to `EventFacts`
+  (`packages/domain/src/stats/facts.ts`) and `db/repositories/sqlite/stats.ts`. Filter logic is
+  `packages/domain/src/stats/filter.ts` (`applyFilter`). Percent cells are 0-100 numbers; a null
+  cell is No data. The CSV route is `/stats/{file}` with `file` = `<table>.csv` (Hono cannot match
+  `{table}.csv`). Hosts are listed for the filter by guest id and name (hosts are public). The
+  integration test builds its event in `tests/integration/api-stats.test.ts`.
+- Decisions (step 5): the filter drops proposals whose hosts are all excluded. Only session hosts
+  can be excluded, so an organizer account that only proposes cannot leave the people figures;
+  accepted for now. Hosts and Hosted both count excluded-host-free members who host a kept session.
 
 ## Questions
 

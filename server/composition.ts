@@ -63,6 +63,10 @@ import {
   siteSettings,
 } from "@/server/modules/settings/module";
 import {
+  createStatsUseCases,
+  type StatsUseCases,
+} from "@/server/modules/stats/module";
+import {
   createReleaseCheck,
   createUpdateUseCases,
   fetchLatestRelease,
@@ -179,6 +183,13 @@ export function settingsUseCases(): SettingsUseCases {
     maps: mapImages,
     mailConfigured: isMailerConfigured,
     uow: unitOfWork,
+  });
+}
+
+export function statsUseCases(): StatsUseCases {
+  return createStatsUseCases({
+    repos: getRepositories(),
+    version: getAppVersion,
   });
 }
 
