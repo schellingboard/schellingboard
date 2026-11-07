@@ -11,6 +11,8 @@
   chunk.
 - Environment: `make arch` fails with 26 violations on a clean tree (node_modules/.bun paths);
   `make lint` needs `NODE_OPTIONS=--max-old-space-size=8192`.
+- Step 2 done: chart library is Observable Plot 0.6.19. Plot needs a ResizeObserver wrapper, token
+  colours read via `getComputedStyle` for colour scales, no canvas legend under happy-dom.
 
 ## Questions
 

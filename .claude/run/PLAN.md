@@ -47,9 +47,8 @@ database and use the page themselves. The run checks old data through the releas
 
 - [x] 1. Lazy chunk: admin pages load via `lazyRouteComponent` in `router.tsx`; main bundle 930.7 kB
       -> 838.4 kB (gzip 282.0 -> 261.6), admin chunk 94.9 kB.
-- [ ] 2. Chart spike, unrouted and thrown away: the heatmap and the predicted-vs-real scatter in
-      Observable Plot and in Recharts. Compare as `docs/dev/statistics-proposal.md` says. Commit
-      only the findings, in the proposal doc. Stop and ask the user if neither library passes.
+- [x] 2. Chart spike: Observable Plot chosen (+94 kB gzip vs Recharts +107; native heatmap,
+      regression, bins); findings in `docs/dev/statistics-proposal.md`.
 - [ ] 3. ADR 0019 (statistics) records the decisions above, the filter semantics, the session origin
       heuristic, the table contract, CSV and ZIP rules and the chart library with the spike's
       findings; ADR 0007 §3 gets a note that 0019 supersedes it in part; the proposal doc points to

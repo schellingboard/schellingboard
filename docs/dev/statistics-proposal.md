@@ -252,10 +252,32 @@ Thus a library, unless the spike finds a blocker. Candidates:
 | Recharts        | React, the most used; tooltips, legends                                                                             | no heatmap, no binning; `ResponsiveContainer` needs `ResizeObserver` in tests; larger      |
 | Others          | Chart.js and ECharts draw on canvas (no CSS colours, poor accessibility); Nivo and visx: more packages, more wiring | —                                                                                          |
 
-Favourite: **Observable Plot**. The spike draws the heatmap and the predicted-vs-real scatter in
-Plot and Recharts and compares: gzip size of the lazy chunk, dark mode with the tokens, a render
-test in Vitest (happy-dom), phone width, tooltips, accessible names, release activity. The ADR
-records the result.
+### Spike result
+
+Both libraries drew the location × hour heatmap and the predicted-vs-real scatter (with a `y = x`
+line and, in Plot, a regression line) in a scratch project outside the repo, thrown away. Plot
+0.6.19 (ISC), Recharts 3.10.1 (MIT); both released within the last week. Release history (npm):
+Recharts ships a minor about every one to three months (3.9.0 in June, 3.10.0 in July 2026); Plot is
+slower and bursty (0.6.17 in February 2025, then 0.6.18 and 0.6.19 in November 2026), a mature API
+with few breaking changes.
+
+| Criterion          | Observable Plot                                                                                                                                                             | Recharts                                                                                                   |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| gzip, both charts  | +94 kB over a React baseline (162 kB vs 68.6 kB; all of d3 comes with it)                                                                                                   | +107 kB (176 kB vs 68.6 kB)                                                                                |
+| Heatmap            | `Plot.cell`, one line, tooltip with `tip: true`                                                                                                                             | none: a `Scatter` with a custom rect `shape`, scales and tick labels by hand                               |
+| Scatter, trend     | `Plot.dot` + `Plot.linearRegressionY`, `Plot.line` for `y = x`                                                                                                              | `Scatter` + `ReferenceLine`; no regression, no binning (histogram needs a pre-binned bar chart)            |
+| Dark mode, tokens  | fills and strokes accept `var(--token)`; the data-driven colour scale emits fixed rgb, so it needs token values read with `getComputedStyle`, re-rendered on a theme change | fills and strokes accept `var(--token)`; the heatmap cell colour is computed by us anyway                  |
+| Vitest (happy-dom) | works; the SVG is queryable. A continuous colour `legend` needs canvas and throws, so draw the legend ourselves                                                             | works with a fixed `width`/`height`; `ResponsiveContainer` renders nothing without a `ResizeObserver` mock |
+| Phone width        | `width` is a number: the wrapper measures the container with a `ResizeObserver` and re-renders                                                                              | `ResponsiveContainer` does it                                                                              |
+| Tooltips           | `tip: true` on a mark: built in, plain SVG, pointer only (no keyboard)                                                                                                      | `<Tooltip />` component: built in, follows pointer and keyboard focus with `accessibilityLayer`            |
+| Accessible names   | `ariaLabel` on the SVG; marks are plain SVG, so the table next to the chart carries the detail                                                                              | `accessibilityLayer` (keyboard stepping, ARIA) on by default in 3.x                                        |
+| Fit                | covers every needed chart (bin, stack, facet, cell, regression); imperative, so a ~30-line React wrapper with a ref                                                         | declarative React, but heatmap and histogram are workarounds                                               |
+
+**Choice: Observable Plot.** It is smaller, it has the statistical marks the catalogue needs
+(heatmap, histogram, regression, facets for the per-day small multiples) where Recharts needs
+workarounds, and nothing found blocks it. Costs to accept: the `ResizeObserver` wrapper, token
+colours read at render time for scales, an own legend. The chunk is only fetched on the Statistics
+tab (the admin lazy chunk), not by attendees. The ADR records this.
 
 ## Later: what to collect for better statistics
 
