@@ -102,6 +102,12 @@
 
   --overlay: #00000080;
 
+  /* Chart series, in their fixed order; each theme's steps are validated against its own surface. */
+  --chart-1: #2a78d6;
+  --chart-2: #eb6834;
+  --chart-3: #1baf7a;
+  --chart-4: #eda100;
+
   /*
    * Chrome that is dark in both themes — the admin header, toasts. Not
    * `surface-inverse`, which flips to light and would turn the admin bar white
@@ -169,6 +175,11 @@
     --vote-chosen: #2563eb;
 
     --overlay: #000000b3;
+
+    --chart-1: #3987e5;
+    --chart-2: #d95926;
+    --chart-3: #199e70;
+    --chart-4: #c98500;
 
     --bar: #0f1114;
 

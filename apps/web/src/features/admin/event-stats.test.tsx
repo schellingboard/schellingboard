@@ -1,5 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen, within } from "@testing-library/react";
+import {
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { EventStatistics } from "@schellingboard/contracts/stats";
 import { EventStatsScreen } from "./event-stats";
@@ -35,9 +41,13 @@ const stats: EventStatistics = {
       title: "Participation funnel",
       columns: [
         { key: "step", label: "Step", type: "text" },
+        { key: "members", label: "Members", type: "integer" },
         { key: "share", label: "Share of members (%)", type: "percent" },
       ],
-      rows: [["Voted", 41.6666]],
+      rows: [
+        ["Members", 12, 100],
+        ["Voted", 5, 41.6666],
+      ],
     },
   ],
 };
@@ -82,6 +92,15 @@ describe("the statistics screen", { tags: ["021-US1"] }, () => {
     ]);
     expect(within(table).getByText("No data")).toBeTruthy();
     expect(screen.getByText("41.7%")).toBeTruthy();
+  });
+
+  it("draws the participation funnel as a chart named by its figures", async () => {
+    renderScreen();
+
+    const chart = await screen.findByRole("img", {
+      name: "Participation funnel: Members 12, Voted 5",
+    });
+    await waitFor(() => expect(chart.querySelector("svg")).toBeTruthy());
   });
 
   it("sorts a table by a column, both ways", async () => {

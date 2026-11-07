@@ -146,6 +146,8 @@ workarounds, and nothing found blocks it. Costs to accept: the `ResizeObserver` 
 colours read at render time for scales, an own legend. Loading rule: the chart wrappers in
 `apps/web/src/ui/charts/` import Plot with a dynamic import, so Plot (about 94 kB gzip) is fetched
 only when a Statistics tab shows a chart. Neither attendees nor the other admin pages download it.
+Measured in the app: 93 kB gzip (278 kB raw) in its own chunk, because `ui/charts/plot.ts`
+re-exports only the marks used.
 
 ## Consequences
 

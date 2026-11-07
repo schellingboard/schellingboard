@@ -45,6 +45,15 @@
   Gamma; it does not exercise the origin filter. The server bundle banner import was renamed in its
   own `fix:` commit (fflate broke it); run `make test-e2e-docker` in the Finish step, since the
   bundle changed.
+- Step 8 done. Bind a chart to a table in `features/admin/stats-charts.tsx` (`chartFor`, by table
+  id); the chart sits above its table, which stays visible (no "Show table" toggle: the table is the
+  accessible detail and the contrast relief). Wrappers take plain data plus a `summary` (the
+  accessible name); colours are `--chart-1..4` tokens (validated, light and dark), used as
+  `var(--chart-n)` in the SVG so a theme change needs no redraw; the heatmap is one hue with the
+  value as opacity. No tooltips. Plot chunk is 93 kB gzip (`ui/charts/plot.ts` re-exports only the
+  marks used: add a mark there before using it); main bundle 839.6 kB (+1.2 kB since step 1, from
+  earlier steps; this step adds nothing to it), admin chunk 103 kB. `Scatter` shows rho and `n < 15`
+  note; `Histogram` takes bins from `stats/binning`.
 
 ## Questions
 

@@ -8,6 +8,7 @@ import {
 } from "../../queries/admin-stats";
 import { cx } from "../../ui/cx";
 import type { OnParams } from "./list-paging";
+import { chartFor } from "./stats-charts";
 import { SortableStatsTable } from "./stats-table";
 
 const SECTION_LABELS: Record<string, string> = { overview: "Overview" };
@@ -216,6 +217,7 @@ export function EventStatsScreen({
                 Download CSV
               </a>
             </div>
+            {chartFor(table)}
             <SortableStatsTable table={table} />
           </section>
         ))}

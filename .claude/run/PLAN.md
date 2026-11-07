@@ -62,10 +62,8 @@ database and use the page themselves. The run checks old data through the releas
 - [x] 7. SPA skeleton: Statistics tab (`features/admin/event-stats.tsx`, `stats-table.tsx`,
       `queries/admin-stats.ts`), sections nav, sortable tables, CSV/ZIP links, filter panel in the
       URL, `statistics.spec.ts`.
-- [ ] 8. Chart wrappers in `apps/web/src/ui/charts/` over the chosen library: ranked bars,
-      histogram, scatter with ρ and the `n < 15` note, stacked bars, heatmap, lines; Plot is
-      imported dynamically there, so only a chart-showing tab fetches it. Colour tokens, dark mode,
-      accessible summary. Charts on the Overview.
+- [x] 8. Chart wrappers in `ui/charts/` (ranked bars, histogram, scatter, stacked bars, heatmap,
+      lines) over a lazily imported Plot; chart tokens; the funnel chart on the Overview.
 
 ### Sections
 
