@@ -32,6 +32,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   adding a user, so several users can join the same events quickly.
 - **New days default their booking window** (#1330): "Bookings open" and "Bookings close" follow the
   day's start and end until you edit them.
+- **Placeholder for locations without an image** (#1334): the admin list and the schedule show a
+  picture stand-in instead of a blank space.
 - **Failed changes now say what failed**: a refused or unsaved RSVP, comment or attendee count names
   the session and the reason, and says when it might not have been saved.
 - **Admins see when a newer release is out** (#788): a red dot beside the footer's version names the

@@ -169,7 +169,8 @@ Contract changes first, so the rest build on the final API (ADR 0018 point 15).
 - [x] 28. #1330 A new day's booking window follows its start and end until edited
       (`event-days.tsx`).
 - [x] 29. #1329 The new-event form's time zone is a searchable combobox (`events-screen.tsx`).
-- [ ] 30. #1334 Placeholder image for a location without an image.
+- [x] 30. #1334 `LocationPlaceholder` for a location without an image (admin list, schedule image
+      row).
 - [ ] 31. #1333 Input fields do not move on focus (styling: no new test).
 - [ ] 32. #1338 Proposal page says "proposal", not "session".
 - [ ] 33. **Milestone check.** `gh issue list -R schellingboard/schellingboard --milestone v5.0.0`.

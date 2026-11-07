@@ -83,6 +83,8 @@ describe("the admin locations screen", { tags: ["017-US1"] }, () => {
     expect(hall.textContent).toContain("max 25 · bookable · Conference Alpha");
     expect(within(hall).getByRole("img", { name: "Hall" })).toBeTruthy();
     expect(store.textContent).not.toContain("max");
+    expect(within(store).getByTestId("location-placeholder")).toBeTruthy();
+    expect(within(hall).queryByTestId("location-placeholder")).toBeNull();
     expect(
       within(hall)
         .getByRole("button", { name: "Move Hall up" })

@@ -22,6 +22,7 @@ import {
   TextField,
 } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
+import { LocationPlaceholder } from "../../ui/location-placeholder";
 import { ConfirmByTyping } from "./confirm-by-typing";
 import { plural } from "./list-paging";
 import { shown, useJumpWithin } from "./use-section-save";
@@ -338,10 +339,16 @@ function LocationRow({
   return (
     <li className="space-y-2 py-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        {location.imageUrl && (
+        {location.imageUrl ? (
           <img
             src={location.imageUrl}
             alt={location.name}
+            width={80}
+            height={60}
+            className="shrink-0 rounded border border-line-subtle"
+          />
+        ) : (
+          <LocationPlaceholder
             width={80}
             height={60}
             className="shrink-0 rounded border border-line-subtle"
