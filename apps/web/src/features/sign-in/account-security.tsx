@@ -4,6 +4,7 @@ import type {
   AccountSecurityState,
   LoginSessionView,
 } from "../../queries/account-security";
+import { useEmailEnabled } from "../../queries/email-enabled";
 import { Button } from "../../ui/button";
 import { TextField } from "../../ui/form";
 import { PasswordManagerHint } from "../../ui/password-manager-hint";
@@ -11,7 +12,7 @@ import { isRecentlySent, useCredentialForm } from "./use-credential-form";
 
 type Ready = Extract<AccountSecurityState, { status: "ready" }>;
 type Guest = { id: string; name: string };
-type Mode = "password" | "disable";
+type Mode = "password" | "disable" | "first";
 
 const SECTION = "flex flex-col gap-2";
 
@@ -76,10 +77,16 @@ function Protection({
   const [done, setDone] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
 
+  const emailEnabled = useEmailEnabled(calls.emailEnabled);
+  const canResetByMail = emailEnabled === true && state.hasEmail;
+  const canSetDirectly = state.canSetPassword;
+
   const change = useCredentialForm((key) =>
     mode === "disable"
       ? calls.unprotect({ currentPassword })
-      : calls.changePassword({ currentPassword, newPassword }, key)
+      : mode === "first"
+        ? calls.setPassword({ newPassword }, key)
+        : calls.changePassword({ currentPassword, newPassword }, key)
   );
   const link = useCredentialForm(() =>
     calls.requestResetLink({ guestId: guest.id })
@@ -107,7 +114,13 @@ function Protection({
     e.preventDefault();
     const result = await change.submit();
     if (!result?.ok) return;
-    setDone(mode === "disable" ? "Protection turned off" : "Password changed");
+    setDone(
+      mode === "disable"
+        ? "Protection turned off"
+        : mode === "first"
+          ? "Password set"
+          : "Password changed"
+    );
     setMode(null);
     reload();
   };
@@ -119,8 +132,12 @@ function Protection({
       </h2>
       <p className="text-sm text-fg-subtle">
         {state.authProtected
-          ? "Your name is protected: switching to it requires your password or a single-use code emailed to you. Forgot your password? Reset it with an emailed link."
-          : "Anyone can currently act under your name. Enable protection so switching to your name requires your password. We'll email you a link to set it."}
+          ? canResetByMail
+            ? "Your name is protected: switching to it requires your password or a single-use code emailed to you. Forgot your password? Reset it with an emailed link."
+            : "Your name is protected: switching to it requires your password. Forgot it? Ask an organizer for a new link, then set a new password here."
+          : canResetByMail
+            ? "Anyone can currently act under your name. Enable protection so switching to your name requires your password. We'll email you a link to set it."
+            : "Anyone can currently act under your name. Protect it so switching to your name requires your password."}
       </p>
       {done && (
         <p role="status" className="text-sm text-success-fg">
@@ -135,21 +152,32 @@ function Protection({
                 <Button onClick={() => start("password")}>
                   Change password
                 </Button>
-                <Button
-                  variant="quiet"
-                  disabled={link.pending}
-                  onClick={() => void sendLink()}
-                >
-                  Forgot your password?
-                </Button>
+                {canResetByMail && (
+                  <Button
+                    variant="quiet"
+                    disabled={link.pending}
+                    onClick={() => void sendLink()}
+                  >
+                    Forgot your password?
+                  </Button>
+                )}
+                {canSetDirectly && (
+                  <Button variant="quiet" onClick={() => start("first")}>
+                    Set a new password
+                  </Button>
+                )}
                 <Button variant="quiet" onClick={() => start("disable")}>
                   Turn off protection
                 </Button>
               </>
+            ) : canSetDirectly ? (
+              <Button onClick={() => start("first")}>Set a password</Button>
             ) : (
-              <Button disabled={link.pending} onClick={() => void sendLink()}>
-                Enable protection
-              </Button>
+              canResetByMail && (
+                <Button disabled={link.pending} onClick={() => void sendLink()}>
+                  Enable protection
+                </Button>
+              )
             )}
           </div>
           {info && (
@@ -166,19 +194,23 @@ function Protection({
       ) : (
         <form onSubmit={(e) => void submit(e)} className={SECTION}>
           <p className="text-sm text-fg-muted">
-            {mode === "password"
-              ? "Enter your current password and choose a new one."
-              : "Enter your current password to turn off protection. This also removes your password."}
+            {mode === "first"
+              ? "Choose a password. You are signed in with your personal link, so the old one is not needed."
+              : mode === "password"
+                ? "Enter your current password and choose a new one."
+                : "Enter your current password to turn off protection. This also removes your password."}
           </p>
           <PasswordManagerHint username={guest.name} />
-          <TextField
-            label="Current password"
-            type="password"
-            value={currentPassword}
-            onChange={setCurrentPassword}
-            autoComplete="current-password"
-          />
-          {mode === "password" && (
+          {mode !== "first" && (
+            <TextField
+              label="Current password"
+              type="password"
+              value={currentPassword}
+              onChange={setCurrentPassword}
+              autoComplete="current-password"
+            />
+          )}
+          {mode !== "disable" && (
             <TextField
               label="New password (at least 8 characters)"
               type="password"
@@ -198,11 +230,15 @@ function Protection({
               type="submit"
               disabled={
                 change.pending ||
-                currentPassword.length === 0 ||
-                (mode === "password" && newPassword.length === 0)
+                (mode !== "first" && currentPassword.length === 0) ||
+                (mode !== "disable" && newPassword.length === 0)
               }
             >
-              {mode === "password" ? "Change password" : "Turn off protection"}
+              {mode === "disable"
+                ? "Turn off protection"
+                : mode === "first"
+                  ? "Set password"
+                  : "Change password"}
             </Button>
             <Button
               variant="quiet"

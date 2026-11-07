@@ -111,16 +111,19 @@ should see on their schedule, such as lunch, stays a blocker.
 
 ## Guests / Users
 
-Guests are also a **global pool** (Name, Email — unique, About me, Pronouns, Avatar), independent of
-any event. Per-event participation is a separate assignment on the event's "Guests" tab.
+Guests are also a **global pool** (Name, Email — unique when set, Username, About me, Pronouns,
+Avatar), independent of any event. The email may be left empty, which suits a site that sends no
+mail; such a guest gets no emails and signs in with a personal join link. A **username** lets a
+guest sign in with it and a password instead of their email. Per-event participation is a separate
+assignment on the event's "Guests" tab.
 
 - **A guest must be assigned to an event before they can vote, RSVP, or add a proposal/session in
   it** — being in the global list isn't enough. This is enforced server-side.
 - There are no roles — every assigned guest has identical capabilities.
 - **CSV import**: header row needs `name` and `email` columns (any order, delimiter auto-detected:
   comma, semicolon, or tab). The whole file is rejected if any row is invalid (line numbers given).
-  Existing users (matched by email) aren't recreated but are still assigned to the events selected
-  in the import.
+  An empty email makes a user without one. Existing users (matched by email, or by exact name when
+  the email is empty) aren't recreated but are still assigned to the events selected in the import.
 - **Send test email** — see [How it works § Email](how-it-works.md#email).
 - Attendees edit their own About me/Pronouns/Avatar from a profile page once they've picked their
   name; admins don't set these.
@@ -135,7 +138,10 @@ ones you ticked; guests without an email are counted and skipped.
   guest has set a password after the link was made, and always for a site admin.
 - **A new link replaces the guest's earlier one** for that event, and the guest is emailed that a
   new link exists. A link is shown once; make a new one if you lost it.
-- **A guest without email who forgot their password** gets back in with a new link.
+- **A guest who forgot their password and cannot get email** (no address on file, or a site that
+  sends none) gets back in with a new link, then sets a new password under **Settings → Account
+  security** without the old one. Only a link login can do this, and never for a site admin. Whoever
+  has the link can do it, so share it privately. Other guests reset by email.
 
 ### Attendees who protect their name
 

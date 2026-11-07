@@ -147,6 +147,12 @@ export const credentialsSchema = z.object({
     .boolean()
     .describe("Whether switching to the name asks for a login"),
   username: z.string().nullable(),
+  hasEmail: z.boolean().describe("False for a guest without an email address"),
+  canSetPassword: z
+    .boolean()
+    .describe(
+      "Whether this login may set the password without the old one: a verified one for a name with none, or a join-link one where no mail can reset it"
+    ),
 });
 
 export const joinBodySchema = z.object({

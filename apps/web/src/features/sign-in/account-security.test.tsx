@@ -25,13 +25,16 @@ const ready = (
   status: "ready",
   authProtected: true,
   username: "ada",
+  hasEmail: true,
+  canSetPassword: false,
   sessions: [session("s1", true, "Firefox"), session("s2", false, "Safari")],
   ...over,
 });
 
 function setup(
   state: AccountSecurityState,
-  handler: FakeHandler = () => new Response(null, { status: 204 })
+  handler: FakeHandler = () => new Response(null, { status: 204 }),
+  emailEnabled = true
 ) {
   const { api, calls } = fakeApi(handler);
   const reload = vi.fn();
@@ -39,7 +42,10 @@ function setup(
     <NoticeProvider>
       <AccountSecurityScreen
         state={state}
-        calls={signInCalls(api)}
+        calls={{
+          ...signInCalls(api),
+          emailEnabled: () => Promise.resolve(emailEnabled),
+        }}
         guest={{ id: "g1", name: "Ada" }}
         reload={reload}
         backHref="/settings"
@@ -54,7 +60,7 @@ describe("account security: protection", { tags: ["003-US3"] }, () => {
     const { calls } = setup(ready({ authProtected: false }));
 
     await userEvent.click(
-      screen.getByRole("button", { name: "Enable protection" })
+      await screen.findByRole("button", { name: "Enable protection" })
     );
 
     expect(calls[0]).toMatchObject({
@@ -64,6 +70,53 @@ describe("account security: protection", { tags: ["003-US3"] }, () => {
     expect((await screen.findByRole("status")).textContent).toBe(
       "Check your email for a link to set your password"
     );
+  });
+
+  it("sets a first password from a verified login without any mail", async () => {
+    const { calls, reload } = setup(
+      ready({ authProtected: false, hasEmail: false, canSetPassword: true }),
+      undefined,
+      false
+    );
+    expect(
+      screen.queryByRole("button", { name: "Enable protection" })
+    ).toBeNull();
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Set a password" })
+    );
+    expect(screen.queryByLabelText("Current password")).toBeNull();
+    await userEvent.type(
+      screen.getByLabelText("New password (at least 8 characters)"),
+      "new password!"
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Set password" }));
+
+    expect((await screen.findByRole("status")).textContent).toBe(
+      "Password set"
+    );
+    expect(calls[0]).toMatchObject({
+      method: "POST",
+      path: "/api/v1/me/credentials/password",
+      body: { newPassword: "new password!" },
+    });
+    expect(reload).toHaveBeenCalled();
+  });
+
+  it("offers a new password without the old one only when the server allows it", async () => {
+    setup(ready({ hasEmail: false, canSetPassword: true }), undefined, false);
+    expect(
+      await screen.findByRole("button", { name: "Set a new password" })
+    ).toBeTruthy();
+    expect(
+      screen.queryByRole("button", { name: "Forgot your password?" })
+    ).toBeNull();
+    cleanup();
+    setup(ready({ canSetPassword: false }));
+    await screen.findByRole("button", { name: "Forgot your password?" });
+    expect(
+      screen.queryByRole("button", { name: "Set a new password" })
+    ).toBeNull();
   });
 
   it("changes the password with the current one", async () => {

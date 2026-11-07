@@ -160,11 +160,20 @@ export const logIn = (deps: PeopleDeps) => {
       !passwordBlocked &&
       (await verifyUserPassword(credential, creds.passwordHash))
     )
-      return ok(await start(actor, { guestId, level: "verified", device }));
+      return ok(
+        await start(actor, {
+          guestId,
+          level: "verified",
+          via: "password",
+          device,
+        })
+      );
     const matched = await matchToken(repos, guestId, "login", credential);
     if (matched) {
       await repos.authCodes.consume(matched.id);
-      return ok(await start(actor, { guestId, level: "verified", device }));
+      return ok(
+        await start(actor, { guestId, level: "verified", via: "code", device })
+      );
     }
     recordLoginFailure("guest", guestId);
     if (!passwordBlocked)

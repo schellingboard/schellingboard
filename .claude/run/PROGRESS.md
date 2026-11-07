@@ -211,10 +211,10 @@ the timeout, not the cause. Unresolved.
 
 ## Questions
 
-Open, for step 25b: a guest without an email who forgets their password can sign in with a new join
-link, but `setFirstPassword` refuses once a password exists and `changePassword` needs the old one,
-so they can never set a new one. Proposed fix: a verified join-link session may set a new password
-without the old one.
+Step 25b (for the user to know, decided by the coordinator): a verified session replaces a forgotten
+password without the old one only if it began with a join link (`login_sessions.via`, migration
+0059; old rows read as "name"), the guest cannot reset by mail (no email, or the site sends none)
+and is not a site admin.
 
 Q5 to Q8 were answered on 2026-10-29 and are in ADR 0017 and PLAN.md (map item: step 14; 401/403 to
 sign-in: step 11b).

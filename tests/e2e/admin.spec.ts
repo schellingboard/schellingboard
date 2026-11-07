@@ -170,7 +170,7 @@ test.describe("Admin UI", () => {
       .filter({ has: page.getByRole("button", { name: "Add user" }) });
 
     // A bad email is reported on the field itself, not as a browser popup
-    await page.getByLabel("Name").fill(name);
+    await page.getByLabel("Name", { exact: true }).fill(name);
     await page.getByLabel("Email").fill("not-an-email");
     await page.getByRole("button", { name: "Add user" }).click();
     await expect(
@@ -186,7 +186,7 @@ test.describe("Admin UI", () => {
 
     // A duplicate email — rejected by the server, not the schema — lands on
     // the email field too
-    await page.getByLabel("Name").fill(name);
+    await page.getByLabel("Name", { exact: true }).fill(name);
     await page.getByLabel("Email").fill(email);
     await page.getByRole("button", { name: "Add user" }).click();
     await expect(
@@ -198,13 +198,15 @@ test.describe("Admin UI", () => {
     const editRow = page
       .getByRole("listitem")
       .filter({ has: page.getByRole("button", { name: "Save" }) });
-    await editRow.getByLabel("Name").fill(renamed);
+    await editRow.getByLabel("Name", { exact: true }).fill(renamed);
     await editRow.getByRole("button", { name: "Save" }).click();
     await expect(row.getByText(renamed)).toBeVisible();
 
     // Re-opening the editor shows what was saved, not the pre-edit values
     await row.getByRole("button", { name: "Edit" }).click();
-    await expect(editRow.getByLabel("Name")).toHaveValue(renamed);
+    await expect(editRow.getByLabel("Name", { exact: true })).toHaveValue(
+      renamed
+    );
     await editRow.getByRole("button", { name: "Cancel" }).click();
 
     // Delete requires confirmation and can be cancelled

@@ -187,23 +187,14 @@ describe("guests without an email", () => {
       const creds = await getRepositories().guests.getAuthCredentials(guest.id);
       expect(creds).toMatchObject({ authProtected: true });
       expect(creds?.passwordHash).toBeTruthy();
-
-      const again = await call(
-        "POST",
-        "/me/credentials/password",
-        password,
-        verified
-      );
-      expect(again.status).toBe(409);
-      expect(await again.json()).toMatchObject({ code: "auth.passwordSet" });
     }
   );
 
   it(
-    "leave a password alone: the first-password route refuses a guest who has one",
+    "leave a password alone when the guest has an email to reset it with",
     { tags: ["003-US3"] },
     async () => {
-      const guest = await createGuest({ email: null });
+      const guest = await createGuest({ email: "ada@x.org" });
       await getRepositories().guests.setAuthProtection(guest.id, {
         authProtected: true,
         passwordHash: await hashUserPassword("hunter2 forever"),
@@ -215,6 +206,129 @@ describe("guests without an email", () => {
         asGuest(await verifiedGuestValue(guest.id))
       );
       expect(res.status).toBe(409);
+      expect(await res.json()).toMatchObject({ code: "auth.passwordSet" });
+    }
+  );
+
+  it(
+    "may replace a forgotten password only from a join-link session, as no mail can reset it",
+    { tags: ["003-US3"] },
+    async () => {
+      const guest = await createGuest({ email: null });
+      const old = await hashUserPassword("hunter2 forever");
+      await getRepositories().guests.setAuthProtection(guest.id, {
+        authProtected: true,
+        passwordHash: old,
+      });
+      const replace = async (via: "password" | "code" | "link") =>
+        call(
+          "POST",
+          "/me/credentials/password",
+          { newPassword: "another long password" },
+          asGuest(await verifiedGuestValue(guest.id, via))
+        );
+
+      for (const via of ["password", "code"] as const) {
+        const refused = await replace(via);
+        expect(refused.status).toBe(409);
+        expect(await refused.json()).toMatchObject({
+          code: "auth.passwordSet",
+        });
+      }
+      const res = await replace("link");
+      expect(res.status).toBe(204);
+      const creds = await getRepositories().guests.getAuthCredentials(guest.id);
+      expect(creds?.passwordHash).not.toBe(old);
+    }
+  );
+
+  it(
+    "lets a guest back in with a fresh join link and set a new password",
+    { tags: ["003-US6"] },
+    async () => {
+      const event = await createEvent();
+      const guest = await createGuest({ email: null, eventId: event.id });
+      await getRepositories().guests.setAuthProtection(guest.id, {
+        authProtected: true,
+        passwordHash: await hashUserPassword("hunter2 forever"),
+      });
+      await new Promise((r) => setTimeout(r, 5));
+      const { token } = (await (
+        await call(
+          "POST",
+          `/admin/events/${event.id}/guests/${guest.id}/join-link`
+        )
+      ).json()) as { token: string };
+
+      const joined = await call("POST", "/auth/join", { token }, "");
+      const cookie = (joined.headers.get("set-cookie") ?? "").split(";")[0];
+      const res = await call(
+        "POST",
+        "/me/credentials/password",
+        { newPassword: "another long password" },
+        cookie
+      );
+
+      expect(res.status).toBe(204);
+    }
+  );
+
+  it(
+    "never replaces the password of a site admin from a join link",
+    { tags: ["003-US3"] },
+    async () => {
+      const guest = await createGuest({ email: null });
+      await getRepositories().guests.setSiteAdmin(guest.id, true);
+      await getRepositories().guests.setAuthProtection(guest.id, {
+        authProtected: true,
+        passwordHash: await hashUserPassword("hunter2 forever"),
+      });
+      const res = await call(
+        "POST",
+        "/me/credentials/password",
+        { newPassword: "another long password" },
+        asGuest(await verifiedGuestValue(guest.id, "link"))
+      );
+      expect(res.status).toBe(409);
+    }
+  );
+
+  it(
+    "replaces a password from a join link when the guest has an email but the site sends no mail",
+    { tags: ["003-US3"] },
+    async () => {
+      vi.mocked(isMailerConfigured).mockReturnValue(false);
+      const guest = await createGuest({ email: "ada@x.org" });
+      await getRepositories().guests.setAuthProtection(guest.id, {
+        authProtected: true,
+        passwordHash: await hashUserPassword("hunter2 forever"),
+      });
+      const res = await call(
+        "POST",
+        "/me/credentials/password",
+        { newPassword: "another long password" },
+        asGuest(await verifiedGuestValue(guest.id, "link"))
+      );
+      expect(res.status).toBe(204);
+    }
+  );
+
+  it(
+    "tell the security screen whether the guest has an email and may set a password",
+    { tags: ["003-US3"] },
+    async () => {
+      const guest = await createGuest({ email: null });
+      const read = async (cookie: string): Promise<unknown> =>
+        (await call("GET", "/me/credentials", undefined, cookie)).json();
+      expect(await read(asGuest(await verifiedGuestValue(guest.id)))).toEqual({
+        authProtected: false,
+        username: null,
+        hasEmail: false,
+        canSetPassword: true,
+      });
+      expect(await read(asGuest(openGuestValue(guest.id)))).toMatchObject({
+        canSetPassword: false,
+      });
     }
   );
 

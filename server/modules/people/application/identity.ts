@@ -1,4 +1,4 @@
-import type { LoginAssurance } from "@schellingboard/domain/auth";
+import type { LoginAssurance, LoginVia } from "@schellingboard/domain/auth";
 import type { Actor } from "@/server/kernel/actor";
 import { forbidden, notFound, ok, type Result } from "@/server/kernel/result";
 import {
@@ -25,8 +25,14 @@ export const signIn =
     {
       guestId,
       level,
+      via,
       device = null,
-    }: { guestId: string; level: LoginAssurance; device?: string | null }
+    }: {
+      guestId: string;
+      level: LoginAssurance;
+      via: LoginVia;
+      device?: string | null;
+    }
   ): Promise<SignedIn> => {
     const token = generateSessionToken();
     const now = realNow();
@@ -38,6 +44,7 @@ export const signIn =
         guestId,
         eventId: null,
         assurance: level,
+        via,
         createdAt: now,
         expiresAt: new Date(now.getTime() + SESSION_LIFETIME_MS),
         lastSeenAt: now,
@@ -56,11 +63,20 @@ export const chooseGuest = (deps: PeopleDeps) => {
     const creds = await deps.repos.guests.getAuthCredentials(guestId);
     if (!creds) return notFound("guest.notFound", "Unknown user");
     if (!creds.authProtected)
-      return ok(await start(actor, { guestId, level: "claimed", device }));
+      return ok(
+        await start(actor, { guestId, level: "claimed", via: "name", device })
+      );
     // A protected name is kept only for a session already verified as it;
     // otherwise the user has to log in (password or emailed code) first.
     if (actor.guest?.id === guestId && actor.guest.level === "verified")
-      return ok(await start(actor, { guestId, level: "verified", device }));
+      return ok(
+        await start(actor, {
+          guestId,
+          level: "verified",
+          via: actor.guest.via ?? "password",
+          device,
+        })
+      );
     return forbidden(
       "guest.protected",
       "This name is protected — a password or emailed code is needed"

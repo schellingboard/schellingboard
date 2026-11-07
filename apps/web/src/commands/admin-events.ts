@@ -1,4 +1,5 @@
 import type { ApiClient } from "@schellingboard/api-client";
+import { fetchEmailEnabled } from "../queries/email-enabled";
 import type { adminSessionUpdateSchema } from "@schellingboard/contracts/session";
 import type {
   dayBodySchema,
@@ -17,6 +18,7 @@ export type EventPhasesBody = (typeof eventPhasesBodySchema)["_input"];
 /** The admin events screens' calls; they wait for each answer, so none is a command. */
 export function adminEventCalls(api: ApiClient) {
   return {
+    emailEnabled: () => fetchEmailEnabled(api),
     create: (body: EventSettingsBody, key: string) =>
       api.POST("/api/v1/admin/events", {
         body,

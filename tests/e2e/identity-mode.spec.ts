@@ -14,7 +14,7 @@ test("a verified event asks its attendees to sign in, an open one does not @015-
 
   await adminLogin(page);
   await page.goto("/admin/users");
-  await page.getByLabel("Name").fill(guestName);
+  await page.getByLabel("Name", { exact: true }).fill(guestName);
   await page.getByLabel("Email").fill(`e2e-identity-${unique}@test.example`);
   await page.getByRole("button", { name: "Add user" }).click();
   await expect(

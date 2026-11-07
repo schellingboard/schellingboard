@@ -216,7 +216,24 @@ async function confirmedPassword(
   return ok(guestId);
 }
 
-/** Sets a first password for a verified session, as a site without mail has no reset link. */
+/**
+ * A forgotten password is replaced without the old one only where no mail can
+ * reset it, and only by a join-link login: a stolen password or code session
+ * must not take the name over, and site admins sign in with credentials.
+ */
+function mayReplacePassword(
+  { loginMail }: PeopleDeps,
+  actor: Actor,
+  hasEmail: boolean
+): boolean {
+  return (
+    actor.guest?.via === "link" &&
+    actor.guest.siteAdmin !== true &&
+    !(hasEmail && loginMail.configured())
+  );
+}
+
+/** Sets a password for a verified session; see `mayReplacePassword` for replacing one. */
 export const setFirstPassword = (deps: PeopleDeps) => {
   return async (
     actor: Actor,
@@ -234,8 +251,14 @@ export const setFirstPassword = (deps: PeopleDeps) => {
       );
     const passwordHash = await hashUserPassword(newPassword);
     const stored = await deps.uow.run(async (tx) => {
-      if ((await tx.guests.getAuthCredentials(guestId))?.passwordHash)
-        return conflict("auth.passwordSet", "This name already has a password");
+      const guest = await tx.guests.findById(guestId);
+      const hasPassword = (await tx.guests.getAuthCredentials(guestId))
+        ?.passwordHash;
+      if (hasPassword && !mayReplacePassword(deps, actor, !!guest?.info.email))
+        return conflict(
+          "auth.passwordSet",
+          "This name already has a password. Change it with the old one, reset it by email, or ask an organizer for a new link."
+        );
       await tx.guests.setAuthProtection(guestId, {
         authProtected: true,
         passwordHash,
@@ -324,6 +347,7 @@ export const unprotect = (deps: PeopleDeps) => {
     const identity = await start(actor, {
       guestId,
       level: stillProtected ? "verified" : "claimed",
+      via: stillProtected ? "password" : "name",
       device,
     });
     await notifySecurityChange(deps, guestId, "disabled");
@@ -361,13 +385,26 @@ export const getCredentials =
   (deps: PeopleDeps) =>
   async (
     actor: Actor
-  ): Promise<Result<{ authProtected: boolean; username: string | null }>> => {
+  ): Promise<
+    Result<{
+      authProtected: boolean;
+      username: string | null;
+      hasEmail: boolean;
+      canSetPassword: boolean;
+    }>
+  > => {
     const acting = await actingOrRefuse(actor, deps);
     if (!acting.ok) return acting;
     const creds = await deps.repos.guests.getAuthCredentials(acting.value);
+    const guest = await deps.repos.guests.findById(acting.value);
+    const hasEmail = Boolean(guest?.info.email);
     return ok({
       authProtected: creds?.passwordHash != null,
       username: await deps.repos.guests.getUsername(acting.value),
+      hasEmail,
+      canSetPassword:
+        actor.guest?.level === "verified" &&
+        (!creds?.passwordHash || mayReplacePassword(deps, actor, hasEmail)),
     });
   };
 

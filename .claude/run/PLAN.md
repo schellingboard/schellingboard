@@ -159,10 +159,9 @@ Contract changes first, so the rest build on the final API (ADR 0018 point 15).
       modal; the tally stays scheduling-only). E2E in Conference Beta.
 - [x] 25. #1331 server half: `guests.email` is nullable (migration 0058), contracts, `emailEnabled`
       on `GET /site`, `guest.noEmail`, first password from a verified session, import by name.
-- [ ] 25b. #1331 (SPA, docs, CHANGELOG, E2E; footer `fixes #1331`): the admin guest forms and import
-      take an optional email and a username; the screens hide or disable what needs mail
-      (`emailEnabled` from `GET /site`: test email, email settings, emailed sign-in and reset
-      options); a verified session without a password may set one in Account security.
+- [x] 25b. #1331 SPA: admin forms with optional email and username, mail options hidden by
+      `emailEnabled`, password from a verified session (also a replacement for a guest without
+      email), docs, CHANGELOG, E2E.
 - [ ] 26. #1335 Admin: assign attendees to events in the add and edit forms.
 - [ ] 27. #1361 Dismissing a dialog with unsaved text asks first. E2E.
 - [ ] 28. #1330 Admin: a new day's booking window defaults to the day's start and end.

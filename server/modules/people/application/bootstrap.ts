@@ -135,6 +135,7 @@ export const bootstrapAdmin = (deps: PeopleDeps) => {
       await start(actor, {
         guestId: done.value,
         level: "verified",
+        via: "code",
         device: input.device,
       })
     );

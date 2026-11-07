@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { AdminEventCalls } from "../../commands/admin-events";
 import { useFormMutation } from "../../commands/use-form-mutation";
+import { useEmailEnabled } from "../../queries/email-enabled";
 import { Button } from "../../ui/button";
 
 export function NewLink({
@@ -83,6 +84,7 @@ export function MailLinks({
   selectedIds: string[];
   calls: AdminEventCalls;
 }) {
+  const emailEnabled = useEmailEnabled(calls.emailEnabled);
   const [summary, setSummary] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
   const mutation = useFormMutation({
@@ -105,6 +107,14 @@ export function MailLinks({
       );
     }
   };
+  if (emailEnabled === null) return null;
+  if (!emailEnabled)
+    return (
+      <p className="text-sm text-fg-muted">
+        This server cannot send email. Copy a personal link for each guest and
+        share it yourself.
+      </p>
+    );
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center gap-3">

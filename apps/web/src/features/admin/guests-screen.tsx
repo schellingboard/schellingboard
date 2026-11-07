@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState, type FormEvent } from "react";
 import type { AdminGuestCalls } from "../../commands/admin-guests";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import type { AdminGuest } from "../../queries/admin-guests";
+import { useEmailEnabled } from "../../queries/email-enabled";
 import { Button } from "../../ui/button";
 import { DataTable } from "../../ui/data-table";
 import { TextField } from "../../ui/form";
@@ -15,7 +16,7 @@ import {
 } from "./list-paging";
 import { shown, useJumpWithin } from "./use-section-save";
 
-const FIELDS = ["name", "email"];
+const FIELDS = ["name", "email", "username"];
 
 type EventOption = { id: string; name: string };
 
@@ -29,8 +30,9 @@ function AddGuestForm({
   const { ref, jump } = useJumpWithin<HTMLFormElement>();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const mutation = useFormMutation({
-    call: (key) => calls.create({ name, email }, key),
+    call: (key) => calls.create({ name, email, username }, key),
     fieldNames: FIELDS,
     explainRefusals: true,
   });
@@ -40,6 +42,7 @@ function AddGuestForm({
     if (!(await mutation.submit())?.ok) return;
     setName("");
     setEmail("");
+    setUsername("");
     onChanged();
   };
 
@@ -70,6 +73,15 @@ function AddGuestForm({
             error={mutation.fields.email}
           />
         </div>
+        <div className="flex-1">
+          <TextField
+            label="Username"
+            name="username"
+            value={username}
+            onChange={setUsername}
+            error={mutation.fields.username}
+          />
+        </div>
         <Button type="submit" disabled={mutation.pending} className="sm:mt-7">
           {mutation.pending ? "Adding..." : "Add user"}
         </Button>
@@ -97,8 +109,10 @@ function EditForm({
   const { ref, jump } = useJumpWithin<HTMLFormElement>();
   const [name, setName] = useState(guest.name);
   const [email, setEmail] = useState(guest.email);
+  const [username, setUsername] = useState(guest.username);
   const mutation = useFormMutation({
-    call: (key) => calls.update(guest.id, { name, email }, guest.version, key),
+    call: (key) =>
+      calls.update(guest.id, { name, email, username }, guest.version, key),
     fieldNames: FIELDS,
     explainRefusals: true,
   });
@@ -133,6 +147,14 @@ function EditForm({
           onChange={setEmail}
           error={mutation.fields.email}
         />
+        <TextField
+          label="Username"
+          name="username"
+          hideLabel
+          value={username}
+          onChange={setUsername}
+          error={mutation.fields.username}
+        />
         <div className="flex gap-2">
           <Button type="submit" disabled={mutation.pending}>
             {mutation.pending ? "Saving..." : "Save"}
@@ -156,11 +178,13 @@ function GuestRow({
   events,
   calls,
   onChanged,
+  emailEnabled,
 }: {
   guest: AdminGuest;
   events: EventOption[];
   calls: AdminGuestCalls;
   onChanged: () => void;
+  emailEnabled: boolean | null;
 }) {
   const [mode, setMode] = useState<"view" | "edit" | "delete">("view");
   const [sent, setSent] = useState(false);
@@ -227,7 +251,10 @@ function GuestRow({
               </span>
             )}
           </div>
-          <p className="truncate text-sm text-fg-subtle">{guest.email}</p>
+          <p className="truncate text-sm text-fg-subtle">
+            {guest.email || "No email"}
+            {guest.username && ` · @${guest.username}`}
+          </p>
           {memberOf.length > 0 && (
             <p className="truncate text-sm text-fg-subtle">
               {memberOf.map((event, i) => (
@@ -265,7 +292,9 @@ function GuestRow({
             </Button>
             <Button
               variant="quiet"
-              disabled={email.pending || sent}
+              disabled={
+                email.pending || sent || emailEnabled !== true || !guest.email
+              }
               onClick={() => void sendTestEmail()}
             >
               {email.pending
@@ -314,6 +343,7 @@ export function AdminGuestsScreen({
   /** The users are out of date: load them again. */
   onChanged: () => void;
 }) {
+  const emailEnabled = useEmailEnabled(calls.emailEnabled);
   if (status === "error")
     return (
       <p role="alert" className="text-sm text-danger-fg">
@@ -328,7 +358,9 @@ export function AdminGuestsScreen({
     .filter(
       (g) =>
         !needle ||
-        [g.name, g.email].some((text) => text.toLowerCase().includes(needle))
+        [g.name, g.email, g.username].some((text) =>
+          text.toLowerCase().includes(needle)
+        )
     )
     .sort(byTitleThenId((g) => g.name));
   const { page, visible } = pageOf(matching, params);
@@ -362,6 +394,7 @@ export function AdminGuestsScreen({
               events={events}
               calls={calls}
               onChanged={onChanged}
+              emailEnabled={emailEnabled}
             />
           )}
         />

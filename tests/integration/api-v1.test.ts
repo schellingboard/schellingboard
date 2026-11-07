@@ -183,6 +183,7 @@ describe("actor middleware", () => {
       guest: {
         id: g1,
         level: "claimed",
+        via: "name",
         sessionId: expect.any(String) as string,
         siteAdmin: false,
       },
@@ -198,6 +199,7 @@ describe("actor middleware", () => {
       guest: {
         id: g2,
         level: "verified",
+        via: "password",
         sessionId: expect.any(String) as string,
         siteAdmin: false,
       },

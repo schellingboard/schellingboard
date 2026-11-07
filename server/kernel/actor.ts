@@ -1,4 +1,4 @@
-import type { LoginAssurance } from "@schellingboard/domain/auth";
+import type { LoginAssurance, LoginVia } from "@schellingboard/domain/auth";
 import { GUEST_COOKIE_NAME } from "@/utils/auth-cookies";
 
 export interface Actor {
@@ -6,6 +6,7 @@ export interface Actor {
   guest: {
     id: string;
     level: LoginAssurance;
+    via?: LoginVia;
     sessionId?: string;
     siteAdmin?: boolean;
   } | null;
@@ -21,6 +22,7 @@ export type GuestIdentity = NonNullable<Actor["guest"]>;
 export type SessionLookup = (token: string) => Promise<{
   guestId: string;
   level: LoginAssurance;
+  via?: LoginVia;
   id: string;
   siteAdmin?: boolean;
 } | null>;
@@ -36,6 +38,7 @@ export async function readGuestIdentity(
     ? {
         id: session.guestId,
         level: session.level,
+        via: session.via,
         sessionId: session.id,
         siteAdmin: session.siteAdmin,
       }

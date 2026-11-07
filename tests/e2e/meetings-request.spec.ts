@@ -39,14 +39,14 @@ async function createGuests(page: Page, names: string[]) {
   await adminLogin(page);
   await page.goto("/admin/users");
   for (const name of names) {
-    await page.getByLabel("Name").fill(name);
+    await page.getByLabel("Name", { exact: true }).fill(name);
     await page
       .getByLabel("Email")
       .fill(`${name.toLowerCase().replace(/[^a-z0-9]/g, "-")}@test.example`);
     await page.getByRole("button", { name: "Add user" }).click();
     // The users table is paginated, so the new row isn't on screen; the form
     // clearing itself is what says the create landed.
-    await expect(page.getByLabel("Name")).toHaveValue("");
+    await expect(page.getByLabel("Name", { exact: true })).toHaveValue("");
   }
 }
 

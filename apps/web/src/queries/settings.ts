@@ -2,6 +2,7 @@ import type { ApiClient } from "@schellingboard/api-client";
 import type { emailSettingsSchema } from "@schellingboard/contracts/guest";
 import type { availabilityFormsSchema } from "@schellingboard/contracts/meeting";
 import { problemCode } from "../commands/problem";
+import { fetchEmailEnabled } from "./email-enabled";
 import { createObservable } from "./store";
 
 export type EmailSettings = (typeof emailSettingsSchema)["_output"];
@@ -15,6 +16,8 @@ export type SettingsState =
   | {
       status: "ready";
       emailSettings: EmailSettings;
+      /** False when the server sends no mail or this guest has no address. */
+      emailEnabled: boolean;
       forms: AvailabilityForms;
       publicKey: string;
     };
@@ -35,11 +38,14 @@ export function createSettingsQuery({ api }: { api: ApiClient }) {
     async load() {
       const mine = ++latest;
       try {
-        const [email, availability, key] = await Promise.all([
-          api.GET("/api/v1/me/email-settings"),
-          api.GET("/api/v1/meeting-availability"),
-          api.GET("/api/v1/push/key"),
-        ]);
+        const [email, availability, key, siteEmail, credentials] =
+          await Promise.all([
+            api.GET("/api/v1/me/email-settings"),
+            api.GET("/api/v1/meeting-availability"),
+            api.GET("/api/v1/push/key"),
+            fetchEmailEnabled(api),
+            api.GET("/api/v1/me/credentials").catch(() => null),
+          ]);
         if (destroyed || mine !== latest) return;
         if (!email.data || !availability.data || !key.data) {
           const failed = [email, availability, key].find((r) => !r.data);
@@ -54,6 +60,7 @@ export function createSettingsQuery({ api }: { api: ApiClient }) {
         state.set({
           status: "ready",
           emailSettings: email.data,
+          emailEnabled: siteEmail && (credentials?.data?.hasEmail ?? true),
           forms: availability.data.forms,
           publicKey: key.data.publicKey,
         });

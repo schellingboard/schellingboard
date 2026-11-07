@@ -24,6 +24,7 @@ const guest = (
   id,
   name,
   email: `${id}@x.org`,
+  username: "",
   eventIds: [],
   siteAdmin: false,
   hasPassword: true,
@@ -44,7 +45,12 @@ const setup = (
   {
     query = "",
     handler = () => Response.json(guest("g9", "Saved")),
-  }: { query?: string; handler?: (call: FakeCall) => Response } = {}
+    emailEnabled = true,
+  }: {
+    query?: string;
+    handler?: (call: FakeCall) => Response;
+    emailEnabled?: boolean;
+  } = {}
 ) => {
   const { api, calls } = fakeApi(handler);
   const onChanged = vi.fn();
@@ -57,7 +63,10 @@ const setup = (
         events={events}
         params={new URLSearchParams(query)}
         onParams={onParams}
-        calls={adminGuestCalls(api)}
+        calls={{
+          ...adminGuestCalls(api),
+          emailEnabled: () => Promise.resolve(emailEnabled),
+        }}
         onChanged={onChanged}
       />
     </NoticeProvider>
@@ -88,6 +97,30 @@ describe("the admin users screen", { tags: ["016-US1"] }, () => {
     expect(
       screen.getByRole("link", { name: "Import CSV" }).getAttribute("href")
     ).toBe("/admin/users/import");
+  });
+
+  it("shows a user without an email and cannot send them a test email", () => {
+    const { region } = setup([
+      guest("g1", "Alice", { email: "", username: "alice" }),
+    ]);
+
+    const [alice] = within(region).getAllByRole("listitem");
+    expect(alice.textContent).toContain("No email");
+    expect(alice.textContent).toContain("@alice");
+    expect(
+      within(alice)
+        .getByRole("button", { name: "Send test email" })
+        .hasAttribute("disabled")
+    ).toBe(true);
+  });
+
+  it("disables the test email where the server sends no mail", async () => {
+    const { region } = setup([guest("g1", "Alice")], { emailEnabled: false });
+
+    const button = within(region).getByRole("button", {
+      name: "Send test email",
+    });
+    await waitFor(() => expect(button.hasAttribute("disabled")).toBe(true));
   });
 
   it("searches name and email", () => {
