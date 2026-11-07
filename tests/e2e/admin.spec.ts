@@ -15,6 +15,15 @@ async function gotoUsers(page: Page) {
   await expect(page.getByRole("heading", { name: "Users" })).toBeVisible();
 }
 
+async function findUser(page: Page, name: string) {
+  const users = page.getByRole("region", { name: "Users" });
+  await users
+    .getByRole("searchbox", { name: "Search", exact: true })
+    .fill(name);
+  await expect(page).toHaveURL(/[?&]q=/);
+  return users.getByRole("listitem").filter({ hasText: name });
+}
+
 async function gotoLocations(page: Page) {
   await page
     .getByRole("navigation", { name: "Admin" })
@@ -221,6 +230,58 @@ test.describe("Admin UI", () => {
     await expect(
       page.getByRole("listitem").filter({ hasText: email })
     ).toHaveCount(0);
+  });
+
+  test("assigns users to events while adding and editing them @016-US3", async ({
+    page,
+  }) => {
+    await adminLogin(page);
+    await gotoUsers(page);
+
+    const unique = uniqueSuffix();
+    const first = `E2E Assigned ${unique} One`;
+    const second = `E2E Assigned ${unique} Two`;
+    const addForm = page
+      .locator("form")
+      .filter({ has: page.getByRole("button", { name: "Add user" }) });
+    const alpha = addForm.getByRole("checkbox", { name: "Conference Alpha" });
+
+    await alpha.check();
+    for (const name of [first, second]) {
+      await page.getByLabel("Name", { exact: true }).fill(name);
+      await addForm.getByRole("button", { name: "Add user" }).click();
+      const row = await findUser(page, name);
+      await expect(
+        row.getByRole("link", { name: "Conference Alpha" })
+      ).toBeVisible();
+      await expect(alpha).toBeChecked();
+    }
+
+    const row = await findUser(page, second);
+    await row.getByRole("button", { name: "Edit" }).click();
+    const editRow = page
+      .getByRole("listitem")
+      .filter({ has: page.getByRole("button", { name: "Save" }) });
+    await expect(
+      editRow.getByRole("checkbox", { name: "Conference Alpha" })
+    ).toBeChecked();
+    await editRow.getByRole("checkbox", { name: "Conference Alpha" }).uncheck();
+    await editRow.getByRole("checkbox", { name: "Conference Beta" }).check();
+    await editRow.getByRole("button", { name: "Save" }).click();
+
+    await expect(
+      row.getByRole("link", { name: "Conference Beta" })
+    ).toBeVisible();
+    await expect(
+      row.getByRole("link", { name: "Conference Alpha" })
+    ).toHaveCount(0);
+
+    for (const name of [first, second]) {
+      const mine = await findUser(page, name);
+      await mine.getByRole("button", { name: "Delete", exact: true }).click();
+      await mine.getByRole("button", { name: "Confirm delete" }).click();
+      await expect(mine).toHaveCount(0);
+    }
   });
 
   test("imports users from CSV and assigns them to an event @016-US2 @016-US3", async ({

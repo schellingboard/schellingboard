@@ -162,7 +162,8 @@ Contract changes first, so the rest build on the final API (ADR 0018 point 15).
 - [x] 25b. #1331 SPA: admin forms with optional email and username, mail options hidden by
       `emailEnabled`, password from a verified session (also a replacement for a guest without
       email), docs, CHANGELOG, E2E.
-- [ ] 26. #1335 Admin: assign attendees to events in the add and edit forms.
+- [x] 26. #1335 `eventIds` on guest create and update (an edit sets the events); event checkboxes in
+      the users add and edit forms, kept after adding. E2E in admin.spec.ts.
 - [ ] 27. #1361 Dismissing a dialog with unsaved text asks first. E2E.
 - [ ] 28. #1330 Admin: a new day's booking window defaults to the day's start and end.
 - [ ] 29. #1329 Admin: searchable time zone combobox on a new event.

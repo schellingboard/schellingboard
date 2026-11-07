@@ -171,6 +171,73 @@ describe("/api/v1/admin guests and settings", () => {
   );
 
   it(
+    "assigns a guest to events when creating it and sets its events when editing",
+    { tags: ["016-US3", "019-US4"] },
+    async () => {
+      const [a, b, c] = [
+        await createEvent({ name: "A" }),
+        await createEvent({ name: "B" }),
+        await createEvent({ name: "C" }),
+      ];
+      const created = await call("POST", "/admin/guests", {
+        body: { name: "Ada", email: "ada@x.org", eventIds: [a.id, b.id] },
+      });
+      expect(created.status).toBe(201);
+      const guest = (await created.json()) as {
+        id: string;
+        eventIds: string[];
+        version: number;
+      };
+      expect([...guest.eventIds].sort()).toEqual([a.id, b.id].sort());
+
+      const edit = (body: object, expectedVersion: number) =>
+        call("PUT", `/admin/guests/${guest.id}`, {
+          body: { name: "Ada", email: "ada@x.org", expectedVersion, ...body },
+        });
+      const moved = await edit({ eventIds: [b.id, c.id] }, guest.version);
+      expect(moved.status).toBe(200);
+      const movedBody = (await moved.json()) as {
+        eventIds: string[];
+        version: number;
+      };
+      expect([...movedBody.eventIds].sort()).toEqual([b.id, c.id].sort());
+
+      const logged = (await getRepositories().changes.listAfter(0)).filter(
+        (change) => change.subjectId === guest.id
+      );
+      expect(logged.map((c) => `${c.type}:${c.eventId}`).sort()).toEqual(
+        [
+          `guest.changed:${a.id}`,
+          `guest.changed:${b.id}`,
+          `guest.changed:${b.id}`,
+          `guest.removed:${a.id}`,
+          `guest.changed:${c.id}`,
+        ].sort()
+      );
+
+      const kept = await edit({}, movedBody.version);
+      expect(
+        [...((await kept.json()) as { eventIds: string[] }).eventIds].sort()
+      ).toEqual([b.id, c.id].sort());
+    }
+  );
+
+  it(
+    "refuses a guest for an unknown event without creating it",
+    { tags: ["016-US3", "019-US4"] },
+    async () => {
+      const res = await call("POST", "/admin/guests", {
+        body: { name: "Ada", email: "ada@x.org", eventIds: ["nope"] },
+      });
+      expect(res.status).toBe(404);
+      expect(await res.json()).toMatchObject({ code: "event.notFound" });
+      expect(
+        await getRepositories().guests.findByEmail("ada@x.org")
+      ).toBeUndefined();
+    }
+  );
+
+  it(
     "refuses a guest edit made from an outdated version, answering with the guest as it is",
     { tags: ["019-US4", "019-US7"] },
     async () => {

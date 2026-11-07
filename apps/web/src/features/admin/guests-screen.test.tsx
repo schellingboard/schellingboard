@@ -338,3 +338,50 @@ describe("the site-admin role", { tags: ["016-US4"] }, () => {
     );
   });
 });
+
+describe("assigning users to events", { tags: ["016-US3"] }, () => {
+  it("keeps the chosen events selected after adding a user", async () => {
+    const { region, calls, onChanged } = setup([], {
+      handler: () => Response.json(guest("g9", "Zed"), { status: 201 }),
+    });
+
+    await userEvent.click(
+      within(region).getByRole("checkbox", { name: "Conference Alpha" })
+    );
+    await userEvent.type(within(region).getByLabelText("Name"), "Zed");
+    await userEvent.click(
+      within(region).getByRole("button", { name: "Add user" })
+    );
+
+    await waitFor(() => expect(onChanged).toHaveBeenCalled());
+    expect(calls[0]).toMatchObject({
+      body: { name: "Zed", eventIds: ["e1"] },
+    });
+    expect(
+      within(region).getByRole<HTMLInputElement>("checkbox", {
+        name: "Conference Alpha",
+      }).checked
+    ).toBe(true);
+  });
+
+  it("shows a user's events in the edit form and saves the change", async () => {
+    const { region, calls, onChanged } = setup([
+      guest("g1", "Alice", { eventIds: ["e1"] }),
+    ]);
+
+    await userEvent.click(within(region).getByRole("button", { name: "Edit" }));
+    const row = within(region.querySelector("li")!);
+    const box = row.getByRole<HTMLInputElement>("checkbox", {
+      name: "Conference Alpha",
+    });
+    expect(box.checked).toBe(true);
+    await userEvent.click(box);
+    await userEvent.click(row.getByRole("button", { name: "Save" }));
+
+    await waitFor(() => expect(onChanged).toHaveBeenCalled());
+    expect(calls[0]).toMatchObject({
+      method: "PUT",
+      body: { eventIds: [], expectedVersion: 3 },
+    });
+  });
+});

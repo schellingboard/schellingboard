@@ -67,7 +67,11 @@ describe("guest admin use cases", () => {
       const guest = await createGuest();
       const refusals = [
         await guests().listGuests(NOBODY),
-        await guests().createGuest(NOBODY, { name: "A", email: "a@x.org" }),
+        await guests().createGuest(
+          NOBODY,
+          { name: "A", email: "a@x.org" },
+          new Date()
+        ),
         await guests().ensureGuest(
           NOBODY,
           { name: "A", email: "a@x.org" },
@@ -161,10 +165,11 @@ describe("guest admin use cases", () => {
     { tags: ["016-US1"] },
     async () => {
       const taken = await createGuest({ email: "taken@x.org" });
-      const invalid = await guests().createGuest(ADMIN, {
-        name: " ",
-        email: "nope",
-      });
+      const invalid = await guests().createGuest(
+        ADMIN,
+        { name: " ", email: "nope" },
+        new Date()
+      );
       expect(invalid).toMatchObject({
         ok: false,
         error: {
@@ -189,17 +194,19 @@ describe("guest admin use cases", () => {
         },
       };
       expect(
-        await guests().createGuest(ADMIN, {
-          name: "Ada",
-          email: "TAKEN@x.org",
-        })
+        await guests().createGuest(
+          ADMIN,
+          { name: "Ada", email: "TAKEN@x.org" },
+          new Date()
+        )
       ).toEqual(duplicate);
 
       const ada = value(
-        await guests().createGuest(ADMIN, {
-          name: " Ada ",
-          email: " ada@x.org ",
-        })
+        await guests().createGuest(
+          ADMIN,
+          { name: " Ada ", email: " ada@x.org " },
+          new Date()
+        )
       );
       expect(ada).toMatchObject({ name: "Ada", email: "ada@x.org" });
       expect(

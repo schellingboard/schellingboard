@@ -5,7 +5,7 @@ import type { AdminGuest } from "../../queries/admin-guests";
 import { useEmailEnabled } from "../../queries/email-enabled";
 import { Button } from "../../ui/button";
 import { DataTable } from "../../ui/data-table";
-import { TextField } from "../../ui/form";
+import { CheckboxField, TextField } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
 import {
   LIST_PAGE_SIZE,
@@ -20,10 +20,48 @@ const FIELDS = ["name", "email", "username"];
 
 type EventOption = { id: string; name: string };
 
+function EventChoices({
+  events,
+  selected,
+  onChange,
+}: {
+  events: EventOption[];
+  selected: string[];
+  onChange: (ids: string[]) => void;
+}) {
+  if (events.length === 0) return null;
+  return (
+    <fieldset className="space-y-1">
+      <legend className="text-sm font-medium text-fg">Events</legend>
+      <div className="flex flex-wrap gap-x-4 gap-y-1">
+        {events.map((event) => (
+          <CheckboxField
+            key={event.id}
+            label={event.name}
+            name={`event-${event.id}`}
+            checked={selected.includes(event.id)}
+            onChange={(on) =>
+              onChange(
+                events
+                  .map((e) => e.id)
+                  .filter((id) =>
+                    id === event.id ? on : selected.includes(id)
+                  )
+              )
+            }
+          />
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
 function AddGuestForm({
+  events,
   calls,
   onChanged,
 }: {
+  events: EventOption[];
   calls: AdminGuestCalls;
   onChanged: () => void;
 }) {
@@ -31,8 +69,9 @@ function AddGuestForm({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
+  const [eventIds, setEventIds] = useState<string[]>([]);
   const mutation = useFormMutation({
-    call: (key) => calls.create({ name, email, username }, key),
+    call: (key) => calls.create({ name, email, username, eventIds }, key),
     fieldNames: FIELDS,
     explainRefusals: true,
   });
@@ -82,10 +121,15 @@ function AddGuestForm({
             error={mutation.fields.username}
           />
         </div>
-        <Button type="submit" disabled={mutation.pending} className="sm:mt-7">
-          {mutation.pending ? "Adding..." : "Add user"}
-        </Button>
       </div>
+      <EventChoices
+        events={events}
+        selected={eventIds}
+        onChange={setEventIds}
+      />
+      <Button type="submit" disabled={mutation.pending}>
+        {mutation.pending ? "Adding..." : "Add user"}
+      </Button>
       <FormErrorSummary
         fields={mutation.fields}
         error={shown(mutation.error)}
@@ -97,11 +141,13 @@ function AddGuestForm({
 
 function EditForm({
   guest,
+  events,
   calls,
   onChanged,
   onClose,
 }: {
   guest: AdminGuest;
+  events: EventOption[];
   calls: AdminGuestCalls;
   onChanged: () => void;
   onClose: () => void;
@@ -110,9 +156,15 @@ function EditForm({
   const [name, setName] = useState(guest.name);
   const [email, setEmail] = useState(guest.email);
   const [username, setUsername] = useState(guest.username);
+  const [eventIds, setEventIds] = useState(guest.eventIds);
   const mutation = useFormMutation({
     call: (key) =>
-      calls.update(guest.id, { name, email, username }, guest.version, key),
+      calls.update(
+        guest.id,
+        { name, email, username, eventIds },
+        guest.version,
+        key
+      ),
     fieldNames: FIELDS,
     explainRefusals: true,
   });
@@ -155,14 +207,19 @@ function EditForm({
           onChange={setUsername}
           error={mutation.fields.username}
         />
-        <div className="flex gap-2">
-          <Button type="submit" disabled={mutation.pending}>
-            {mutation.pending ? "Saving..." : "Save"}
-          </Button>
-          <Button variant="quiet" disabled={mutation.pending} onClick={onClose}>
-            Cancel
-          </Button>
-        </div>
+      </div>
+      <EventChoices
+        events={events}
+        selected={eventIds}
+        onChange={setEventIds}
+      />
+      <div className="flex gap-2">
+        <Button type="submit" disabled={mutation.pending}>
+          {mutation.pending ? "Saving..." : "Save"}
+        </Button>
+        <Button variant="quiet" disabled={mutation.pending} onClick={onClose}>
+          Cancel
+        </Button>
       </div>
       <FormErrorSummary
         fields={mutation.fields}
@@ -212,6 +269,7 @@ function GuestRow({
     return (
       <EditForm
         guest={guest}
+        events={events}
         calls={calls}
         onChanged={onChanged}
         onClose={() => {
@@ -377,7 +435,7 @@ export function AdminGuestsScreen({
         </a>
       </div>
       <section aria-label="Users" className="space-y-4">
-        <AddGuestForm calls={calls} onChanged={onChanged} />
+        <AddGuestForm events={events} calls={calls} onChanged={onChanged} />
         <DataTable
           rows={visible}
           rowKey={(g) => g.id}
