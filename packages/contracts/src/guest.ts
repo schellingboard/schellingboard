@@ -5,6 +5,7 @@ import {
   MAX_LANGUAGES,
   type EmailSettings,
 } from "@schellingboard/domain/guest";
+import { usernameSchema } from "./auth";
 import { pageSchema } from "./cursor-page";
 import { expectedVersion } from "./session";
 
@@ -124,13 +125,21 @@ export const profileSchema = z.object({
     }),
 });
 
+// Blank means no email: a site that sends none has guests without one.
+const optionalEmail = z
+  .string()
+  .trim()
+  .nullish()
+  .transform((value) => value || null)
+  .pipe(z.email({ pattern: /^\S+@\S+\.\S+$/ }).nullable());
+
 export const createGuestSchema = z.object({
-  email: z
-    .string()
-    .trim()
-    .min(1, { message: "Email is required" })
-    .pipe(z.email({ pattern: /^\S+@\S+\.\S+$/ })),
+  email: optionalEmail,
   name: z.string().trim().min(1, { message: "Name is required" }),
+  username: z.preprocess(
+    (value) => (typeof value === "string" && !value.trim() ? null : value),
+    usernameSchema.nullish()
+  ),
 });
 
 export const updateGuestSchema = createGuestSchema.extend({
@@ -200,7 +209,16 @@ export const profileActivitySchema = z
 
 export const adminGuestBodySchema = z.object({
   name: z.string(),
-  email: z.string(),
+  email: z
+    .string()
+    .nullish()
+    .describe("Omit, null or blank for a guest without an email"),
+  username: z
+    .string()
+    .nullish()
+    .describe(
+      "The sign-in name, unique; null clears it, and an edit that omits it keeps it"
+    ),
 });
 
 export const adminGuestUpdateBodySchema = adminGuestBodySchema.extend({
@@ -212,7 +230,8 @@ export const adminGuestViewSchema = z
   .object({
     id: z.string(),
     name: z.string(),
-    email: z.string(),
+    email: z.string().nullable(),
+    username: z.string().nullable(),
     authProtected: z.boolean(),
     siteAdmin: z.boolean(),
     hasPassword: z.boolean(),
@@ -231,7 +250,7 @@ export const guestImportBodySchema = z.object({
   csv: z
     .string()
     .describe(
-      "A header row naming `name` and `email` columns, then one guest per row"
+      "A header row naming `name` and `email` columns, then one guest per row; a blank email is a guest without one"
     ),
   eventIds: z.array(z.string()),
 });
@@ -241,7 +260,9 @@ export const guestImportResultSchema = z.object({
   existing: z
     .number()
     .int()
-    .describe("Rows matching a guest by email, left unchanged but assigned"),
+    .describe(
+      "Rows matching a guest by email, or by exact name when blank, left unchanged but assigned"
+    ),
 });
 
 export const siteAdminBodySchema = z.object({ siteAdmin: z.boolean() });

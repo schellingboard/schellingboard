@@ -157,16 +157,12 @@ Contract changes first, so the rest build on the final API (ADR 0018 point 15).
 
 - [x] 24. #1383 Hosts see the vote breakdown of their own proposals during voting (server presenter,
       modal; the tally stays scheduling-only). E2E in Conference Beta.
-- [ ] 25. #1331 Events without email, following ADR 0017 points 4 and 9. Email is optional per
-      person: `guests.email` becomes nullable, unique when set, and the contracts follow. The guest
-      id is the identity; contracts per ADR 0018 point 15 (admin guest `email` nullable,
-      `emailEnabled` on `GET /site`, skipped guests in the join-link mailing); names need not be
-      unique, and `username` is the unique sign-in name. Protection stays available, which replaces
-      the issue's "disable account protection": a verified session with no password may set one
-      without an emailed link (today only a reset link can, so this is new), and a new join link is
-      the recovery. Only the options that need mail are disabled or hidden. Guest import: a row
-      without an email matches an existing guest without an email by exact name, so a second import
-      adds no duplicates.
+- [x] 25. #1331 server half: `guests.email` is nullable (migration 0058), contracts, `emailEnabled`
+      on `GET /site`, `guest.noEmail`, first password from a verified session, import by name.
+- [ ] 25b. #1331 (SPA, docs, CHANGELOG, E2E; footer `fixes #1331`): the admin guest forms and import
+      take an optional email and a username; the screens hide or disable what needs mail
+      (`emailEnabled` from `GET /site`: test email, email settings, emailed sign-in and reset
+      options); a verified session without a password may set one in Account security.
 - [ ] 26. #1335 Admin: assign attendees to events in the add and edit forms.
 - [ ] 27. #1361 Dismissing a dialog with unsaved text asks first. E2E.
 - [ ] 28. #1330 Admin: a new day's booking window defaults to the day's start and end.

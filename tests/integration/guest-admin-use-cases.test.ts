@@ -38,7 +38,12 @@ const guests = (uow: UnitOfWork = unitOfWork) =>
     uow,
   });
 const site = () =>
-  createSettingsUseCases({ repos: getRepositories(), maps, uow: unitOfWork });
+  createSettingsUseCases({
+    repos: getRepositories(),
+    maps,
+    mailConfigured: () => true,
+    uow: unitOfWork,
+  });
 
 function value<T>(result: Result<T>): T {
   if (!result.ok) throw new Error(result.error.code);
@@ -139,6 +144,7 @@ describe("guest admin use cases", () => {
           id: guest.id,
           name: "Ada",
           email: "ada@x.org",
+          username: null,
           authProtected: true,
           siteAdmin: false,
           hasPassword: true,
@@ -294,6 +300,9 @@ describe("guest admin use cases", () => {
       expect(
         (await getRepositories().guests.listByEvent(event.id)).map((g) => g.id)
       ).toEqual([first.id]);
+      expect(
+        code(await guests().ensureGuest(ADMIN, { name: "Bo" }, new Date()))
+      ).toBe("guest.invalid");
       expect(
         code(
           await guests().ensureGuest(

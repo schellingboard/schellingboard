@@ -77,6 +77,10 @@ export const changePasswordBodySchema = z.object({
   newPassword: newPasswordSchema,
 });
 
+export const firstPasswordBodySchema = z.object({
+  newPassword: newPasswordSchema,
+});
+
 export const unprotectBodySchema = z.object({
   currentPassword: z.string().min(1).max(200),
 });
@@ -100,7 +104,7 @@ const bootstrapTarget = (body: {
   email?: string;
 }) =>
   body.guestId === undefined
-    ? Boolean(body.name && body.email)
+    ? Boolean(body.name)
     : body.name === undefined && body.email === undefined;
 
 export const bootstrapBodySchema = z
@@ -121,7 +125,7 @@ export const bootstrapBodySchema = z
     password: newPasswordSchema,
   })
   .refine(bootstrapTarget, {
-    message: "Send either guestId, or both name and email",
+    message: "Send either guestId, or name (and optionally email)",
   });
 
 export const usernameResultSchema = z.object({

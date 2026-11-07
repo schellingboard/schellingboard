@@ -21,9 +21,9 @@ export const getSiteSettings =
   };
 
 export const getPublicSiteSettings =
-  ({ repos }: SettingsDeps) =>
-  async (): Promise<Result<SiteSettings>> =>
-    ok(await repos.settings.get());
+  ({ repos, mailConfigured }: SettingsDeps) =>
+  async (): Promise<Result<SiteSettings & { emailEnabled: boolean }>> =>
+    ok({ ...(await repos.settings.get()), emailEnabled: mailConfigured() });
 
 export const updateSiteSettings =
   ({ uow, maps }: SettingsDeps) =>

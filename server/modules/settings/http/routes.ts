@@ -1,5 +1,8 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import { siteSettingsSchema } from "@schellingboard/contracts/settings";
+import {
+  publicSiteSchema,
+  siteSettingsSchema,
+} from "@schellingboard/contracts/settings";
 import { MAX_MAP_BYTES } from "@schellingboard/domain/map-image-constraints";
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import { problem, problemDefault } from "@/server/http/problem";
@@ -28,9 +31,10 @@ const getSite = createRoute({
   method: "get",
   path: "/site",
   tags: ["site"],
-  description: "The site's title, description and venue map.",
+  description:
+    "The site's title, description and venue map, and whether the server can send email.",
   responses: {
-    200: json(siteSettingsSchema, "The site settings"),
+    200: json(publicSiteSchema, "The site settings"),
     ...problemDefault,
   },
 });

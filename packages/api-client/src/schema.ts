@@ -3896,7 +3896,43 @@ export interface paths {
         };
       };
     };
-    post?: never;
+    /** @description Sets the first password of a name that has none, and protects it. Needs a verified login (a join link or a code), not a picked name: `auth.verificationRequired` (403); `auth.passwordSet` (409) when there is a password already, which `PUT` changes. */
+    post: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            newPassword: string;
+          };
+        };
+      };
+      responses: {
+        /** @description The password is set */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
     delete?: never;
     options?: never;
     head?: never;
@@ -6169,7 +6205,10 @@ export interface paths {
         content: {
           "application/json": {
             name: string;
-            email: string;
+            /** @description Omit, null or blank for a guest without an email */
+            email?: string | null;
+            /** @description The sign-in name, unique; null clears it, and an edit that omits it keeps it */
+            username?: string | null;
           };
         };
       };
@@ -6225,7 +6264,10 @@ export interface paths {
         content: {
           "application/json": {
             name: string;
-            email: string;
+            /** @description Omit, null or blank for a guest without an email */
+            email?: string | null;
+            /** @description The sign-in name, unique; null clears it, and an edit that omits it keeps it */
+            username?: string | null;
             /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
             expectedVersion: number;
           };
@@ -6438,7 +6480,7 @@ export interface paths {
       requestBody: {
         content: {
           "application/json": {
-            /** @description A header row naming `name` and `email` columns, then one guest per row */
+            /** @description A header row naming `name` and `email` columns, then one guest per row; a blank email is a guest without one */
             csv: string;
             eventIds: string[];
           };
@@ -6453,7 +6495,7 @@ export interface paths {
           content: {
             "application/json": {
               created: number;
-              /** @description Rows matching a guest by email, left unchanged but assigned */
+              /** @description Rows matching a guest by email, or by exact name when blank, left unchanged but assigned */
               existing: number;
             };
           };
@@ -6700,7 +6742,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** @description The site's title, description and venue map. */
+    /** @description The site's title, description and venue map, and whether the server can send email. */
     get: {
       parameters: {
         query?: never;
@@ -6721,6 +6763,8 @@ export interface paths {
               description: string;
               /** @description Empty when there is no map */
               mapImageUrl: string;
+              /** @description False when the server cannot send email */
+              emailEnabled: boolean;
             };
           };
         };
@@ -7717,7 +7761,8 @@ export interface components {
     AdminGuest: {
       id: string;
       name: string;
-      email: string;
+      email: string | null;
+      username: string | null;
       authProtected: boolean;
       siteAdmin: boolean;
       hasPassword: boolean;

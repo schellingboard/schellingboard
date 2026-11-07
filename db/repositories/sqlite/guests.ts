@@ -1,5 +1,6 @@
 import {
   and,
+  isNull,
   eq,
   exists,
   gt,
@@ -425,6 +426,15 @@ export class SqliteGuestsRepository implements GuestsRepository {
       .map((row) => row.id);
   }
 
+  async listUsernames(): Promise<Map<string, string>> {
+    const rows = this.db
+      .select({ id: schema.guests.id, username: schema.guests.username })
+      .from(schema.guests)
+      .where(isNotNull(schema.guests.username))
+      .all();
+    return new Map(rows.map((r) => [r.id, r.username ?? ""]));
+  }
+
   async listSiteAdminIds(): Promise<string[]> {
     return this.db
       .select({ id: schema.guests.id })
@@ -462,7 +472,10 @@ export class SqliteGuestsRepository implements GuestsRepository {
     try {
       this.db
         .update(schema.guests)
-        .set({ username })
+        .set({
+          username,
+          version: sql`${schema.guests.version} + (${schema.guests.username} IS NOT ${username})`,
+        })
         .where(eq(schema.guests.id, id))
         .run();
       return "ok";
@@ -565,6 +578,8 @@ export class SqliteGuestsRepository implements GuestsRepository {
 
     // Atomic under concurrency: the unique index on lower(email) makes the
     // insert the single source of truth, instead of racing a prior read.
+    if (email === null)
+      return { guest: await this.create(data), created: true };
     const inserted = this.db
       .insert(schema.guests)
       .values({ id, name, email })
@@ -603,7 +618,11 @@ export class SqliteGuestsRepository implements GuestsRepository {
 
   async update(
     id: string,
-    data: { name: string; info: { email: string }; expectedVersion?: number }
+    data: {
+      name: string;
+      info: { email: string | null };
+      expectedVersion?: number;
+    }
   ): Promise<CompleteGuest | undefined> {
     const {
       name,
@@ -742,33 +761,42 @@ export class SqliteGuestsRepository implements GuestsRepository {
   }
 
   async importAndAssign(
-    rows: { name: string; email: string }[],
+    rows: { name: string; email: string | null }[],
     eventIds: string[]
   ): Promise<{ created: number }> {
     let created = 0;
     this.db.transaction((tx) => {
+      const emails = rows.flatMap((r) =>
+        r.email ? [r.email.toLowerCase()] : []
+      );
       const existingByEmail = new Map(
-        (rows.length === 0
+        (emails.length === 0
           ? []
           : tx
               .select()
               .from(schema.guests)
-              .where(
-                inArray(
-                  sql`lower(${schema.guests.email})`,
-                  rows.map((r) => r.email.toLowerCase())
-                )
-              )
+              .where(inArray(sql`lower(${schema.guests.email})`, emails))
               .all()
               .map(rowToGuest)
-        ).map((g) => [g.info.email.toLowerCase(), g])
+        ).map((g) => [g.info.email?.toLowerCase(), g.id])
       );
 
       const guestIds: string[] = [];
       for (const row of rows) {
-        const existing = existingByEmail.get(row.email.toLowerCase());
+        const existing = row.email
+          ? existingByEmail.get(row.email.toLowerCase())
+          : tx
+              .select({ id: schema.guests.id })
+              .from(schema.guests)
+              .where(
+                and(
+                  isNull(schema.guests.email),
+                  eq(schema.guests.name, row.name)
+                )
+              )
+              .get()?.id;
         if (existing) {
-          guestIds.push(existing.id);
+          guestIds.push(existing);
         } else {
           const id = nanoid();
           tx.insert(schema.guests)

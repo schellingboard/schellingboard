@@ -203,7 +203,7 @@ export interface AuthCodesRepository {
 /** Input for creating a guest. Everything else is filled in after creation. */
 export type NewGuest = {
   name: string;
-  info: { email: string };
+  info: { email: string | null };
 };
 
 export interface GuestsRepository {
@@ -269,6 +269,7 @@ export interface GuestsRepository {
   getSiteAdmin(id: string): Promise<boolean>;
   listSiteAdminIds(): Promise<string[]>;
   listPasswordIds(): Promise<string[]>;
+  listUsernames(): Promise<Map<string, string>>;
   /** False when the guest does not exist. Raises the version, since the role protects the name. */
   setSiteAdmin(id: string, siteAdmin: boolean): Promise<boolean>;
   getUsername(id: string): Promise<string | null>;
@@ -281,7 +282,8 @@ export interface GuestsRepository {
   create(data: NewGuest): Promise<CompleteGuest>;
   /**
    * Atomically creates a guest, or returns the existing one if a guest with
-   * the same email (case-insensitive) already exists. Safe under concurrent
+   * the same email (case-insensitive) already exists; without an email it
+   * always creates. Safe under concurrent
    * calls with the same email (backed by a DB-level unique index).
    */
   findOrCreateByEmail(
@@ -292,7 +294,11 @@ export interface GuestsRepository {
   // nothing, if the guest is gone or not at `expectedVersion`.
   update(
     id: string,
-    data: { name: string; info: { email: string }; expectedVersion?: number }
+    data: {
+      name: string;
+      info: { email: string | null };
+      expectedVersion?: number;
+    }
   ): Promise<CompleteGuest | undefined>;
   // Usage: a user updates their own public profile (name and profile fields).
   // `profileUpdatedAt` is set to `now` only if a public profile field actually
@@ -327,13 +333,14 @@ export interface GuestsRepository {
   assignToEvent(eventId: string, guestIds: string[]): Promise<void>;
   removeFromEvent(eventId: string, guestIds: string[]): Promise<void>;
   /**
-   * Matches `rows` to existing guests by email (case-insensitive), creates
-   * the missing ones, and assigns every resulting guest to each event in
+   * Matches `rows` to existing guests by email (case-insensitive), or, for a
+   * row without one, by exact name among guests without one; creates the
+   * missing ones, and assigns every resulting guest to each event in
    * `eventIds`. Existing guests are left unchanged. Runs in a single
    * transaction so a failure partway through leaves no partial writes.
    */
   importAndAssign(
-    rows: { name: string; email: string }[],
+    rows: { name: string; email: string | null }[],
     eventIds: string[]
   ): Promise<{ created: number }>;
 }

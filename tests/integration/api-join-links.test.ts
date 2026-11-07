@@ -335,7 +335,7 @@ describe("POST /admin/events/{id}/join-links/mail", () => {
     async () => {
       const event = await createEvent();
       const ada = await createGuest({ email: "ada@test.example" });
-      const nobody = await createGuest({ email: "  " });
+      const nobody = await createGuest({ email: null });
       await createGuest({ email: "bo@test.example", eventId: event.id });
 
       const res = await post(

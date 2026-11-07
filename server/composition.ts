@@ -177,6 +177,7 @@ export function settingsUseCases(): SettingsUseCases {
   return createSettingsUseCases({
     repos: getRepositories(),
     maps: mapImages,
+    mailConfigured: isMailerConfigured,
     uow: unitOfWork,
   });
 }

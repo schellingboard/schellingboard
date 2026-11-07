@@ -87,7 +87,7 @@ export async function createEvent(opts?: {
 
 export async function createGuest(opts?: {
   name?: string;
-  email?: string;
+  email?: string | null;
   emailSettings?: Partial<EmailSettings>;
   /** When set, the guest is also assigned to this event. */
   eventId?: string;
@@ -97,7 +97,12 @@ export async function createGuest(opts?: {
   const guest = await guests
     .create({
       name: opts?.name ?? `Test Guest ${unique}`,
-      info: { email: opts?.email ?? `guest-${unique}@test.example` },
+      info: {
+        email:
+          opts?.email === undefined
+            ? `guest-${unique}@test.example`
+            : opts.email,
+      },
     })
     .then((g) => g && sanitizeGuest(g));
   if (opts?.emailSettings) {

@@ -211,8 +211,13 @@ the timeout, not the cause. Unresolved.
 
 ## Questions
 
-None open. Q5 to Q8 were answered on 2026-10-29 and are in ADR 0017 and PLAN.md (map item: step 14;
-401/403 to sign-in: step 11b).
+Open, for step 25b: a guest without an email who forgets their password can sign in with a new join
+link, but `setFirstPassword` refuses once a password exists and `changePassword` needs the old one,
+so they can never set a new one. Proposed fix: a verified join-link session may set a new password
+without the old one.
+
+Q5 to Q8 were answered on 2026-10-29 and are in ADR 0017 and PLAN.md (map item: step 14; 401/403 to
+sign-in: step 11b).
 
 - Step 10b review: fixed the button wrap, the duplicate doc comment, and the untrue changelog and
   admin-guide claims (moved to step 11 with the proxy change that makes them true). Rejected: a
@@ -228,3 +233,10 @@ None open. Q5 to Q8 were answered on 2026-10-29 and are in ADR 0017 and PLAN.md 
   precommit but the full E2E; voting.spec.ts 12 passed.
 - Step 24 limits: a failed detail fetch for a host during voting shows nothing (no retry), and the
   breakdown is not refetched while the modal is open. The "others see none" check is API-level only.
+- Step 25 (server half of #1331): a guest without email is `info.email === null` (blank means none;
+  the migration turns old blank emails into NULL). Mail flows answer 409 `guest.noEmail` (login
+  code, reset link, test email); job deliveries to such a guest are dropped; join-link mailing
+  already counted `withoutEmail`. `POST /me/credentials/password` (verified session, no password
+  yet) sets the first password: `auth.verificationRequired`, `auth.passwordSet`. Admin guest view,
+  create and update carry `username`. `GET /site` has `emailEnabled`. The SPA only maps null to ""
+  for now (25b does the screens). No CHANGELOG yet (25b).

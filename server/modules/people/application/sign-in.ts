@@ -34,6 +34,7 @@ import {
   resolveTarget,
   type GuestTarget,
 } from "./auth-tokens";
+import { noEmail } from "./admin-guests";
 import { signIn, type SignedIn } from "./identity";
 
 let dummy: Promise<string> | undefined;
@@ -52,6 +53,7 @@ export const requestLoginCode =
     if (guestId === null) return ok(null);
     const guest = await repos.guests.findById(guestId);
     if (!guest) return notFound("guest.notFound", "Unknown user");
+    if (!guest.info.email) return noEmail();
 
     const now = realNow();
     const emailWait = emailRetryAfter(guestId, now.getTime());

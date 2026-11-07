@@ -344,6 +344,24 @@ describe("POST /api/v1/auth/bootstrap", () => {
     }
   );
 
+  it(
+    "makes a new guest without an email the site admin",
+    { tags: ["015-US6"] },
+    async () => {
+      const res = await call("POST", "/auth/bootstrap", {
+        token: await issue(),
+        name: "Ada",
+        username: "ada",
+        password: "correct horse",
+      });
+
+      expect(res.status).toBe(200);
+      const { guests } = getRepositories();
+      const id = [...(await guests.listUsernames()).keys()][0];
+      expect(await guests.getSiteAdmin(id)).toBe(true);
+    }
+  );
+
   it("works once, then the link is spent", { tags: ["015-US6"] }, async () => {
     const token = await issue();
     const body = {

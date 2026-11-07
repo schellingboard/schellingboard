@@ -11,7 +11,10 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 
-vi.mock("@/utils/mailer", () => ({ sendMail: vi.fn() }));
+vi.mock("@/utils/mailer", () => ({
+  sendMail: vi.fn(),
+  isMailerConfigured: vi.fn(() => true),
+}));
 
 import { GET, POST, PUT, DELETE } from "@/tests/helpers/v1-route";
 import { getRepositories } from "@/db/container";
@@ -101,6 +104,7 @@ describe("/api/v1/admin guests and settings", () => {
         id: expect.any(String) as string,
         name: "Ada",
         email: "ada@x.org",
+        username: null,
         authProtected: false,
         siteAdmin: false,
         hasPassword: false,

@@ -2,6 +2,7 @@ import { createRoute, z } from "@hono/zod-openapi";
 import {
   changePasswordBodySchema,
   credentialsSchema,
+  firstPasswordBodySchema,
   identitySchema,
   loginSessionSchema,
   unprotectBodySchema,
@@ -43,6 +44,19 @@ const changePassword = createRoute({
     body: body(changePasswordBodySchema),
   },
   responses: { 204: noContent("The password changed"), ...problemDefault },
+});
+
+const setFirstPassword = createRoute({
+  method: "post",
+  path: "/me/credentials/password",
+  tags: ["auth"],
+  description:
+    "Sets the first password of a name that has none, and protects it. Needs a verified login (a join link or a code), not a picked name: `auth.verificationRequired` (403); `auth.passwordSet` (409) when there is a password already, which `PUT` changes.",
+  request: {
+    headers: idempotencyHeaders,
+    body: body(firstPasswordBodySchema),
+  },
+  responses: { 204: noContent("The password is set"), ...problemDefault },
 });
 
 const unprotect = createRoute({
@@ -101,6 +115,15 @@ export function addCredentialRoutes(app: App, people: () => PeopleUseCases) {
 
   app.openapi(changePassword, async (c) => {
     const result = await people().changePassword(
+      c.var.actor,
+      c.req.valid("json")
+    );
+    if (!result.ok) return problem(result.error);
+    return c.body(null, 204);
+  });
+
+  app.openapi(setFirstPassword, async (c) => {
+    const result = await people().setFirstPassword(
       c.var.actor,
       c.req.valid("json")
     );

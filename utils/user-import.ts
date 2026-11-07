@@ -1,6 +1,6 @@
 import { isValidEmail } from "@/utils/email";
 
-export type UserImportRow = { name: string; email: string };
+export type UserImportRow = { name: string; email: string | null };
 
 export type UserImportParseResult =
   { ok: true; rows: UserImportRow[] } | { ok: false; errors: string[] };
@@ -136,7 +136,8 @@ function readCsvRecords(text: string, delimiter: string): CsvReadResult {
 
 /**
  * Parses a user-import CSV. Requires a header row containing `name` and
- * `email` columns (any order, case-insensitive, extra columns ignored).
+ * `email` columns (any order, case-insensitive, extra columns ignored). An
+ * email may be blank.
  * All-or-nothing: any invalid row rejects the whole file, and every problem
  * is reported with its line number.
  */
@@ -181,6 +182,10 @@ export function parseUserImportCsv(text: string): UserImportParseResult {
 
     if (!name) {
       errors.push(`Line ${record.line}: name is missing`);
+      continue;
+    }
+    if (email === "") {
+      rows.push({ name, email: null });
       continue;
     }
     if (!isValidEmail(email)) {

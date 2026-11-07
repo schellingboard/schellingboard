@@ -24,7 +24,7 @@ export function createAdminGuestsQuery({ api }: { api: ApiClient }) {
     map: (g): AdminGuest => ({
       id: g.id,
       name: g.name,
-      email: g.email,
+      email: g.email ?? "",
       eventIds: g.eventIds,
       siteAdmin: g.siteAdmin,
       hasPassword: g.hasPassword,

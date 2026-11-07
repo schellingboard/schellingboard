@@ -109,6 +109,20 @@ describe("parseUserImportCsv", () => {
     expect(errors[0]).toMatch(/not-an-email/);
   });
 
+  it("takes a blank email as a row without one", () => {
+    const parsed = parseUserImportCsv(
+      "name,email\nAlice,\nBob,bob@example.com\nAlice,\n"
+    );
+    expect(parsed).toEqual({
+      ok: true,
+      rows: [
+        { name: "Alice", email: null },
+        { name: "Bob", email: "bob@example.com" },
+        { name: "Alice", email: null },
+      ],
+    });
+  });
+
   it("rejects empty names with the line number", () => {
     const errors = expectErrors(
       parseUserImportCsv("name,email\n,alice@example.com\n")

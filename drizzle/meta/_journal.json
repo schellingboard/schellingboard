@@ -407,6 +407,13 @@
       "when": 1793535062449,
       "tag": "0057_identity_mode",
       "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "6",
+      "when": 1793785630020,
+      "tag": "0058_guest_email_optional",
+      "breakpoints": true
     }
   ]
 }
