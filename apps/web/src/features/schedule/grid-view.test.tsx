@@ -65,6 +65,25 @@ describe("GridView", () => {
     expect(link.getAttribute("href")).toBe("/conf?viewSession=s");
   });
 
+  it(
+    "shows a placeholder for a room without an image beside one with an image",
+    { tags: ["017-US1"] },
+    () => {
+      const room = snapshot.locations[0];
+      const mixed = snapshotWith({
+        locations: [
+          { ...room, imageUrl: "/media/hall.png", name: "Hall" },
+          { ...room, id: "r2", name: "Store", sortIndex: 1 },
+        ],
+      });
+      renderScheduled(<Grid data={dataOf(mixed)} />, { snapshot: mixed });
+
+      expect(screen.getByRole("img", { name: "Hall" })).toBeTruthy();
+      expect(screen.queryByRole("img", { name: "Store" })).toBeNull();
+      expect(screen.getAllByTestId("location-placeholder")).toHaveLength(1);
+    }
+  );
+
   it("labels the time axis in the event's zone, not the ambient one", () => {
     const tokyo = snapshotWith({
       event: { ...snapshot.event, timezone: "Asia/Tokyo" },

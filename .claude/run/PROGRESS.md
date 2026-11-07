@@ -223,6 +223,10 @@ the timeout, not the cause. Unresolved.
   ignored), all shown when the value is an exact zone. The new-event form checks the zone against
   the list; the edit form (also a combobox, `strict`) leaves an unknown zone to the server.
 
+- Step 30: the schedule's image row still appears only when some room has an image (a schedule where
+  no room has one is unchanged); the placeholder fills the gaps. The edit form's current-image
+  preview shows nothing without an image.
+
 ## Questions
 
 Step 27 follow-up: Prev/Next and swiping in the profile modal still drop a typed comment without

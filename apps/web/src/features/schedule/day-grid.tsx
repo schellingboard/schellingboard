@@ -5,6 +5,7 @@ import { TIME_FORMAT } from "@schellingboard/domain/time";
 import { InformationCircleIcon } from "../../ui/icons";
 import { Tooltip } from "../../ui/tooltip";
 import { cx } from "../../ui/cx";
+import { LocationPlaceholder } from "../../ui/location-placeholder";
 import { useSchedule } from "./context";
 import { getNowOffsetPx } from "./grid-layout";
 import { LocationCol } from "./location-col";
@@ -107,12 +108,19 @@ export function DayGrid({
           )}
           {locations.map((loc, i) => (
             <div key={loc.id} className="border-l border-line-subtle p-1">
-              {loc.imageUrl && (
+              {loc.imageUrl ? (
                 <img
                   src={loc.imageUrl}
                   alt={loc.name}
                   loading={i === firstImageIndex ? "eager" : "lazy"}
                   className="aspect-[4/3] w-full object-cover"
+                  style={{ maxHeight: 200 }}
+                  width={500}
+                  height={375}
+                />
+              ) : (
+                <LocationPlaceholder
+                  className="aspect-[4/3] h-auto w-full"
                   style={{ maxHeight: 200 }}
                   width={500}
                   height={375}
