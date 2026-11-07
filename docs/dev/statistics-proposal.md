@@ -238,8 +238,8 @@ trend, stacked bars, heatmap (location × hour), lines, small multiples per day.
 
 Own SVG components were the first idea. The reasons do not hold up:
 
-- _Bundle size_: the SPA has no code splitting yet, so a library would reach every attendee. A lazy
-  import of the Statistics screen fixes that, and is worth doing anyway.
+- _Bundle size_: the admin pages are a lazy chunk, so a library imported from them does not reach
+  attendees.
 - _Theming and dark mode_: a library that renders SVG can take the colours of the tokens.
 - _Few chart types_: true, but scales, ticks, label overlap, tooltips and resizing are most of the
   work, and a library has solved them.

@@ -24,8 +24,8 @@ export default defineConfig(({ command }) => ({
   build: {
     outDir: "dist",
     emptyOutDir: true,
-    // A size budget, not a silencer: the SPA is one route, so it cannot be split
-    // usefully yet.
+    // A size budget, not a silencer: the admin pages are split off, the rest is
+    // one bundle.
     chunkSizeWarningLimit: 700,
   },
   server: {

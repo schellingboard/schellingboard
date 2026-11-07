@@ -45,8 +45,8 @@ database and use the page themselves. The run checks old data through the releas
 
 ### Foundation
 
-- [ ] 1. Lazy chunk: the admin pages load with a dynamic import, so attendees do not download them
-      (the SPA's first code split). Measure the main bundle before and after.
+- [x] 1. Lazy chunk: admin pages load via `lazyRouteComponent` in `router.tsx`; main bundle 930.7 kB
+      -> 838.4 kB (gzip 282.0 -> 261.6), admin chunk 94.9 kB.
 - [ ] 2. Chart spike, unrouted and thrown away: the heatmap and the predicted-vs-real scatter in
       Observable Plot and in Recharts. Compare as `docs/dev/statistics-proposal.md` says. Commit
       only the findings, in the proposal doc. Stop and ask the user if neither library passes.
