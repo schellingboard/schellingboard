@@ -11,7 +11,7 @@ export type ProposalDetailState = {
   status: "idle" | "loading" | "ready" | "error";
   /** From the scheduling phase on. */
   tally: { interested: number; maybe: number } | null;
-  /** Only for the proposal's hosts, or anyone's when nobody hosts it. */
+  /** Hosts' from voting on; anyone's for a hostless proposal in scheduling. */
   breakdown: VoteBreakdown | null;
   code?: string;
 };

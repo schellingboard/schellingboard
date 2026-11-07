@@ -155,9 +155,8 @@ paths can be old: `app/(site)/` is now `apps/web/src/`. Read it with
 `gh issue view -R schellingboard/schellingboard N` (`gh` needs `-R`: this checkout has no `.git`).
 Contract changes first, so the rest build on the final API (ADR 0018 point 15).
 
-- [ ] 24. #1383 Hosts see the vote breakdown of their own proposals during voting; the server sends
-      the counts to nobody else. No new shape: `breakdown` is already nullable and stays out of the
-      snapshot and feed. E2E.
+- [x] 24. #1383 Hosts see the vote breakdown of their own proposals during voting (server presenter,
+      modal; the tally stays scheduling-only). E2E in Conference Beta.
 - [ ] 25. #1331 Events without email, following ADR 0017 points 4 and 9. Email is optional per
       person: `guests.email` becomes nullable, unique when set, and the contracts follow. The guest
       id is the identity; contracts per ADR 0018 point 15 (admin guest `email` nullable,

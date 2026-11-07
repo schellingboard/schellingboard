@@ -42,6 +42,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Hosts see the vote breakdown of their own proposals during voting** (#1383): turnout and the
+  split across the three choices, for hosts only; it stays hidden from everyone else until
+  scheduling.
 - **Site admins replace the admin password**: sign in at `/admin` as a site admin; the server logs a
   link for the first one at start, and `ADMIN_PASSWORD` now only logs a warning. Scripts sign in
   through `/api/v1/auth/login` instead of `/api/auth/login`.
@@ -55,7 +58,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Self-hosters behind a reverse proxy must set `SB_TRUSTED_PROXIES`** (#679): the app no longer
   trusts the forwarded address by default, so without it all visitors share one limit on failed
   logins.
-
 - **Everyone signs in again once; sessions then last 30 days from last use**: you stay signed in
   while you visit at least monthly. Before, a sign-in expired after 7 days.
 

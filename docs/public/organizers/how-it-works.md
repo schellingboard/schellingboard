@@ -73,10 +73,10 @@ Each event has three independent, optional phase windows (start/end), set in the
 
 ### The attendance prediction
 
-During scheduling, a host opening their own proposal sees a vote breakdown: turnout among the
-event's attendees, the split across the three choices, and a predicted range of attendees (withheld
-below 10% turnout, or with no ❤️ votes). Proposals with no host show the breakdown to everybody,
-since anyone may still take them on.
+From voting on, a host opening their own proposal sees a vote breakdown: turnout among the event's
+attendees, the split across the three choices, and a predicted range of attendees (withheld below
+10% turnout, or with no ❤️ votes). Proposals with no host show the breakdown to everybody during
+scheduling, since anyone may still take them on.
 
 :::warning "Treat the prediction as a very rough guess, and say so if attendees ask" It rests on one
 event where thirteen hosts recalled roughly how many people came, and it can be well out either way.

@@ -245,8 +245,8 @@ test("should show voting disabled state when not logged in as a user @005-US1", 
 const HOSTED_PROPOSAL = "Writing Documentation People Actually Read";
 const HOSTLESS_PROPOSAL = "Ask Me Anything: Migrating a Legacy Monolith";
 
-async function openGammaProposal(page: Page, title: string) {
-  await page.goto("/Conference-Gamma/proposals");
+async function openProposal(page: Page, event: string, title: string) {
+  await page.goto(`/${event}/proposals`);
   await page.getByPlaceholder("Search proposals").fill(title);
   // The search is debounced; a click before it lands hits a row the
   // re-render then replaces, and the click is lost.
@@ -256,6 +256,9 @@ async function openGammaProposal(page: Page, title: string) {
   await expect(modal).toBeVisible();
   return modal;
 }
+
+const openGammaProposal = (page: Page, title: string) =>
+  openProposal(page, "Conference-Gamma", title);
 
 test("a host sees the vote breakdown of their own proposal @005-US3", async ({
   page,
@@ -319,4 +322,27 @@ test("a proposal hardly anyone voted on gets no attendance guess @005-US4", asyn
   await expect(
     breakdown.getByText(/If you decide to host this as a session/)
   ).toHaveCount(0);
+});
+
+// Conference Beta is in the voting phase; Charlie Test hosts this proposal.
+const BETA_HOSTED_PROPOSAL =
+  "Networking & Coffee Chat: Connect with Conference Beta Peers";
+
+test("a host sees the vote breakdown of their own proposal while voting @005-US3", async ({
+  page,
+}) => {
+  await loginAndGoto(page, "/Conference-Beta/proposals");
+  await selectUser(page, "Charlie Test");
+
+  const modal = await openProposal(
+    page,
+    "Conference-Beta",
+    BETA_HOSTED_PROPOSAL
+  );
+
+  await expect(
+    modal
+      .getByRole("region", { name: "Vote breakdown" })
+      .getByText(/of \d+ attendees/)
+  ).toBeVisible();
 });
