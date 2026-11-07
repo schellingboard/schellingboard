@@ -81,17 +81,46 @@ const valuesOf = (table: HTMLElement) =>
     .map((row) => within(row).getAllByRole("cell")[0].textContent);
 
 describe("the statistics screen", { tags: ["021-US1"] }, () => {
-  it("shows each table with formatted cells and No data", () => {
+  it("shows the headline numbers as tiles, with No data", () => {
     renderScreen();
 
-    const table = screen.getByRole("table", { name: "Headline numbers" });
-    expect(valuesOf(table)).toEqual([
-      "Members",
-      "Sessions",
-      "Sessions with an attendee report",
+    const tiles = within(
+      screen.getByRole("list", { name: "Headline numbers" })
+    ).getAllByRole("listitem");
+    expect(tiles.map((tile) => tile.textContent)).toEqual([
+      "12Members",
+      "3Sessions",
+      "No dataSessions with an attendee report",
     ]);
-    expect(within(table).getByText("No data")).toBeTruthy();
-    expect(screen.getByText("41.7%")).toBeTruthy();
+  });
+
+  it("switches a figure between its chart and its table", async () => {
+    renderScreen();
+    const card = screen.getByRole("region", { name: "Participation funnel" });
+    expect(await within(card).findByRole("img")).toBeTruthy();
+    expect(within(card).queryByRole("table")).toBeNull();
+
+    await userEvent.click(within(card).getByRole("button", { name: "Table" }));
+
+    const table = within(card).getByRole("table", {
+      name: "Participation funnel",
+    });
+    expect(valuesOf(table)).toEqual(["Members", "Voted"]);
+    expect(within(table).getByText("41.7%")).toBeTruthy();
+    expect(within(card).queryByRole("img")).toBeNull();
+  });
+
+  it("explains a figure in a dialog", async () => {
+    renderScreen();
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "About Participation funnel" })
+    );
+
+    const dialog = screen.getByRole("dialog", { name: "Participation funnel" });
+    expect(
+      within(dialog).getByText(/How many members took each step/)
+    ).toBeTruthy();
   });
 
   it("draws the participation funnel as a chart named by its figures", async () => {
@@ -154,32 +183,39 @@ describe("the statistics screen", { tags: ["021-US1"] }, () => {
     expect(
       screen.getByRole("img", { name: /RSVPs against Parallel sessions/ })
     ).toBeTruthy();
-    const duration = screen.getByRole("table", { name: "Session duration" });
+    const duration = screen.getByRole("region", { name: "Session duration" });
     expect(within(duration).getByText("No data")).toBeTruthy();
+    expect(within(duration).queryByRole("table")).toBeNull();
+
+    const popular = screen.getByRole("region", {
+      name: "Most RSVPed sessions",
+    });
+    expect(within(popular).queryByRole("link", { name: /CSV/ })).toBeNull();
+    expect(
+      within(screen.getByRole("region", { name: "Sessions" })).getByRole(
+        "link",
+        { name: "Download CSV of Sessions" }
+      )
+    ).toBeTruthy();
   });
 
   it("sorts a table by a column, both ways", async () => {
     renderScreen();
-    const table = screen.getByRole("table", { name: "Headline numbers" });
+    await userEvent.click(screen.getByRole("button", { name: "Table" }));
+    const table = screen.getByRole("table", { name: "Participation funnel" });
+    const members = () =>
+      within(table).getByRole("button", { name: "Members" });
 
-    await userEvent.click(within(table).getByRole("button", { name: "Value" }));
-    expect(valuesOf(table)).toEqual([
-      "Sessions",
-      "Members",
-      "Sessions with an attendee report",
-    ]);
+    await userEvent.click(members());
+    expect(valuesOf(table)).toEqual(["Voted", "Members"]);
     expect(
-      sortOf(within(table).getByRole("columnheader", { name: "Value" }))
+      sortOf(within(table).getByRole("columnheader", { name: "Members" }))
     ).toBe("ascending");
 
-    await userEvent.click(within(table).getByRole("button", { name: "Value" }));
-    expect(valuesOf(table)).toEqual([
-      "Members",
-      "Sessions",
-      "Sessions with an attendee report",
-    ]);
+    await userEvent.click(members());
+    expect(valuesOf(table)).toEqual(["Members", "Voted"]);
     expect(
-      sortOf(within(table).getByRole("columnheader", { name: "Value" }))
+      sortOf(within(table).getByRole("columnheader", { name: "Members" }))
     ).toBe("descending");
   });
 
@@ -199,9 +235,7 @@ describe("the statistics screen", { tags: ["021-US1"] }, () => {
     expect(screen.getByRole("alert").textContent).toBe(
       "Could not load the statistics."
     );
-    expect(
-      screen.getByRole("table", { name: "Headline numbers" })
-    ).toBeTruthy();
+    expect(screen.getByRole("list", { name: "Headline numbers" })).toBeTruthy();
     expect(
       screen.getByRole("combobox", { name: "Locations to leave out" })
     ).toBeTruthy();
@@ -392,7 +426,7 @@ describe("proposal charts", { tags: ["021-US1"] }, () => {
     for (const name of [
       "Most popular proposals: Talk A 5, Talk B 3",
       "Voters against Days after the first proposal, 2 proposals",
-      "Proposals created per day",
+      /^Proposals created per day: /,
       "Votes per voter, 2 voters",
       "Share interested per voter, 2 voters",
       "Share that became a session: Top quarter 100",
@@ -625,7 +659,7 @@ describe("profile and comment charts", { tags: ["021-US1"] }, () => {
     });
 
     expect(
-      await screen.findByRole("img", { name: "Comments per day" })
+      await screen.findByRole("img", { name: /^Comments per day: / })
     ).toBeTruthy();
     expect(
       await screen.findByRole("img", {
@@ -739,5 +773,98 @@ describe("the statistics filter panel", { tags: ["021-US3"] }, () => {
       { excludeLocations: null, excludeHosts: null, excludeOrigins: null },
       { push: false }
     );
+  });
+});
+
+describe("figures with gaps in their data", { tags: ["021-US1"] }, () => {
+  const table = (
+    id: string,
+    columns: [string, "text" | "integer" | "percent"][],
+    rows: (string | number | null)[][]
+  ) => ({
+    id,
+    title: id,
+    columns: columns.map(([key, type]) => ({ key, label: key, type })),
+    rows,
+  });
+
+  it("says No data for a chart whose rows hold no values", () => {
+    renderScreen("section=locations", {
+      stats: {
+        ...stats,
+        tables: [
+          table(
+            "locations-table",
+            [
+              ["location", "text"],
+              ["utilization", "percent"],
+            ],
+            [["Main Hall", null]]
+          ),
+        ],
+      },
+    });
+
+    const card = screen.getByRole("region", {
+      name: "How full was each location?",
+    });
+    expect(within(card).getByText("No data")).toBeTruthy();
+  });
+
+  it("draws the choice mix from the votes only", async () => {
+    renderScreen("section=proposals", {
+      stats: {
+        ...stats,
+        tables: [
+          table(
+            "proposals-choice-mix",
+            [
+              ["figure", "text"],
+              ["value", "integer"],
+              ["share", "percent"],
+            ],
+            [
+              ["Interested", 5, 50],
+              ["Maybe", 3, 30],
+              ["Skip", 2, 20],
+              ["Voters who voted on every proposal", 1, 25],
+            ]
+          ),
+        ],
+      },
+    });
+
+    expect(
+      await screen.findByRole("img", {
+        name: "proposals-choice-mix: Interested 5, Maybe 3, Skip 2",
+      })
+    ).toBeTruthy();
+  });
+
+  it("draws the days without comments as empty columns", async () => {
+    renderScreen("section=comments", {
+      stats: {
+        ...stats,
+        tables: [
+          table(
+            "comments-per-day",
+            [
+              ["day", "text"],
+              ["comments", "integer"],
+            ],
+            [
+              ["2026-05-01", 2],
+              ["2026-05-03", 1],
+            ]
+          ),
+        ],
+      },
+    });
+
+    expect(
+      await screen.findByRole("img", {
+        name: "Comments per day: 2026-05-01 2, 2026-05-02 0, 2026-05-03 1",
+      })
+    ).toBeTruthy();
   });
 });

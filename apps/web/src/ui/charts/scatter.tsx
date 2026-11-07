@@ -41,7 +41,7 @@ export function Scatter({
             strokeWidth: 2,
             r: 5,
           }),
-          ...(tooFew
+          ...(tooFew || rho === null
             ? []
             : [
                 plot.linearRegressionY(points, {
@@ -52,7 +52,7 @@ export function Scatter({
               ]),
         ],
       }),
-    [points, xLabel, yLabel, tooFew]
+    [points, xLabel, yLabel, tooFew, rho]
   );
   return (
     <div className="space-y-2">

@@ -10,8 +10,8 @@ import { useId, type ReactNode } from "react";
 import { cx } from "../../ui/cx";
 import { PeoplePicker } from "../../ui/people-picker";
 import type { OnParams } from "./list-paging";
-import { chartFor } from "./stats-charts";
-import { SortableStatsTable } from "./stats-table";
+import { FigureCard, figureHeadingId, figureTitle } from "./stats-figure-card";
+import { figuresFor } from "./stats-figures";
 
 const SECTION_LABELS: Record<string, string> = {
   overview: "Overview",
@@ -179,6 +179,10 @@ export function EventStatsScreen({
   const requested = params.get("section");
   const section =
     requested && sections.includes(requested) ? requested : sections[0];
+  const tables = new Map(stats.tables.map((t) => [t.id, t]));
+  const figures = figuresFor(
+    stats.tables.filter((t) => sectionOf(t.id) === section)
+  ).map((figure) => ({ figure, table: tables.get(figure.table)! }));
   const sectionHref = (key: string) => {
     const next = new URLSearchParams(params);
     next.set("section", key);
@@ -205,26 +209,51 @@ export function EventStatsScreen({
       />
 
       <div className="space-y-6 lg:grid lg:grid-cols-[11rem_minmax(0,1fr)] lg:gap-8 lg:space-y-0">
-        <nav
-          aria-label="Statistics sections"
-          className="flex gap-1 overflow-x-auto border-b border-line-subtle lg:sticky lg:top-4 lg:flex-col lg:self-start lg:overflow-visible lg:border-b-0"
-        >
-          {sections.map((key) => (
-            <a
-              key={key}
-              href={sectionHref(key)}
-              aria-current={key === section ? "page" : undefined}
-              className={cx(
-                "-mb-px whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium lg:mb-0 lg:rounded-md lg:border-b-0",
-                key === section
-                  ? "border-line-strong text-fg lg:bg-surface-sunken"
-                  : "border-transparent text-fg-subtle hover:border-line hover:text-fg-muted lg:hover:bg-surface-sunken"
-              )}
-            >
-              {SECTION_LABELS[key] ?? key[0].toUpperCase() + key.slice(1)}
-            </a>
-          ))}
-        </nav>
+        <div className="space-y-6 lg:sticky lg:top-4 lg:max-h-[calc(100dvh-2rem)] lg:self-start lg:overflow-y-auto">
+          <nav
+            aria-label="Statistics sections"
+            className="flex gap-1 overflow-x-auto border-b border-line-subtle lg:flex-col lg:overflow-visible lg:border-b-0"
+          >
+            {sections.map((key) => (
+              <a
+                key={key}
+                href={sectionHref(key)}
+                aria-current={key === section ? "page" : undefined}
+                className={cx(
+                  "-mb-px whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium lg:mb-0 lg:rounded-md lg:border-b-0",
+                  key === section
+                    ? "border-line-strong text-fg lg:bg-surface-sunken"
+                    : "border-transparent text-fg-subtle hover:border-line hover:text-fg-muted lg:hover:bg-surface-sunken"
+                )}
+              >
+                {SECTION_LABELS[key] ?? key[0].toUpperCase() + key.slice(1)}
+              </a>
+            ))}
+          </nav>
+          <nav aria-label="Figures in this section" className="hidden lg:block">
+            <ul className="space-y-0.5 border-l border-line-subtle">
+              {figures.map(({ figure, table }) => (
+                <li key={figure.key}>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      document
+                        .getElementById(figureHeadingId(figure))
+                        ?.closest("section")
+                        ?.scrollIntoView?.({
+                          behavior: "smooth",
+                          block: "start",
+                        })
+                    }
+                    className="block w-full px-3 py-1 text-left text-xs text-fg-subtle hover:text-fg"
+                  >
+                    {figureTitle(figure, table)}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
 
         <div className="min-w-0 space-y-6">
           {section === "attendees" && (
@@ -234,34 +263,20 @@ export function EventStatsScreen({
             </p>
           )}
 
-          {stats.tables
-            .filter((t) => sectionOf(t.id) === section)
-            .map((table) => (
-              <section key={table.id} className="space-y-2">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <h2
-                    id={`stats-${table.id}`}
-                    className="text-lg font-semibold"
-                  >
-                    {table.title}
-                  </h2>
-                  <a
-                    href={statsDownloadUrl(
-                      eventId,
-                      `stats/${table.id}.csv`,
-                      filter
-                    )}
-                    download
-                    aria-label={`Download CSV of ${table.title}`}
-                    className={download}
-                  >
-                    Download CSV
-                  </a>
-                </div>
-                {chartFor(table)}
-                <SortableStatsTable table={table} />
-              </section>
+          <div className="grid items-start gap-6 xl:grid-cols-2 min-[2200px]:grid-cols-3">
+            {figures.map(({ figure, table }) => (
+              <FigureCard
+                key={figure.key}
+                figure={figure}
+                table={table}
+                csvUrl={statsDownloadUrl(
+                  eventId,
+                  `stats/${table.id}.csv`,
+                  filter
+                )}
+              />
             ))}
+          </div>
         </div>
       </div>
     </div>

@@ -60,7 +60,13 @@ export function searchRows(rows: StatsTable["rows"], query: string) {
 const pagerButton =
   "rounded-md border border-line bg-surface-raised px-3 py-1 hover:bg-surface-sunken disabled:cursor-not-allowed disabled:opacity-40";
 
-export function SortableStatsTable({ table }: { table: StatsTable }) {
+export function SortableStatsTable({
+  table,
+  labelledBy,
+}: {
+  table: StatsTable;
+  labelledBy: string;
+}) {
   const [sort, setSort] = useState<{
     column: number;
     direction: "asc" | "desc";
@@ -79,7 +85,6 @@ export function SortableStatsTable({ table }: { table: StatsTable }) {
   const rows = sorted.slice(first, first + pageSize);
   const searchable = table.rows.length > SEARCH_FROM;
   const pageable = table.rows.length > PAGE_SIZES[0];
-  const headingId = `stats-${table.id}`;
 
   return (
     <div className="space-y-3">
@@ -101,7 +106,7 @@ export function SortableStatsTable({ table }: { table: StatsTable }) {
         />
       )}
       <div className="overflow-x-auto">
-        <table aria-labelledby={headingId} className="w-full text-sm">
+        <table aria-labelledby={labelledBy} className="w-full text-sm">
           <thead>
             <tr className="border-b border-line-subtle text-left text-fg-muted">
               {table.columns.map((column, index) => {

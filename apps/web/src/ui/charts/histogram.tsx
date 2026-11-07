@@ -7,11 +7,13 @@ import { SERIES, SURFACE, baseOptions } from "./style";
 export function Histogram({
   bins,
   summary,
-  label,
+  xLabel,
+  yLabel,
 }: {
   bins: Bin[];
   summary: string;
-  label?: string;
+  xLabel: string;
+  yLabel: string;
 }) {
   const draw = useCallback(
     (plot: Plot, width: number) =>
@@ -19,8 +21,8 @@ export function Histogram({
         ...baseOptions,
         width,
         height: 220,
-        x: { label: label ?? null },
-        y: { grid: true, label: null },
+        x: { label: xLabel },
+        y: { grid: true, label: yLabel },
         marks: [
           plot.rectY(bins, {
             x1: "from",
@@ -30,11 +32,12 @@ export function Histogram({
             stroke: SURFACE,
             strokeWidth: 2,
             rx: 4,
+            tip: true,
           }),
           plot.ruleY([0]),
         ],
       }),
-    [bins, label]
+    [bins, xLabel, yLabel]
   );
   return <PlotFrame summary={summary} draw={draw} />;
 }

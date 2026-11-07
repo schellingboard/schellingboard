@@ -1,5 +1,6 @@
 export {
   barX,
+  barY,
   cell,
   dot,
   line,

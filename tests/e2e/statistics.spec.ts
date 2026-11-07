@@ -16,8 +16,17 @@ test("reads the statistics, leaves a location and a host out and downloads the t
     .selectOption({ label: "Conference Gamma" });
 
   await expect(page.getByText("Excluding blockers")).toBeVisible();
-  const headline = page.getByRole("table", { name: "Headline numbers" });
-  await expect(headline.getByRole("row", { name: /^Members/ })).toBeVisible();
+  const headline = page.getByRole("list", { name: "Headline numbers" });
+  await expect(
+    headline.getByRole("listitem").filter({ hasText: "Members" }).first()
+  ).toBeVisible();
+
+  await page
+    .getByRole("button", { name: "About Participation funnel" })
+    .click();
+  const about = page.getByRole("dialog", { name: "Participation funnel" });
+  await expect(about.getByText(/took each step/)).toBeVisible();
+  await about.getByRole("button", { name: "Close" }).click();
 
   await page
     .getByRole("combobox", { name: "Locations to leave out" })

@@ -11,21 +11,29 @@ export type LineSeries = {
 export function LineChart({
   series,
   summary,
+  xLabel,
+  yLabel,
+  timeFormat,
 }: {
   series: LineSeries[];
   summary: string;
+  xLabel: string;
+  yLabel: string;
+  /** A d3 time format for Date ticks, such as "%H:%M". */
+  timeFormat?: string;
 }) {
   const draw = useCallback(
     (plot: Plot, width: number) => {
       const points = series.flatMap((s) =>
         s.points.map((p) => ({ ...p, series: s.name }))
       );
+      const top = Math.max(1, ...points.map((p) => p.y));
       return plot.plot({
         ...baseOptions,
         width,
         height: 240,
-        x: { label: null },
-        y: { grid: true, label: null },
+        x: { label: xLabel, tickFormat: timeFormat },
+        y: { grid: true, label: yLabel, domain: [0, top] },
         color: {
           domain: series.map((s) => s.name),
           range: SERIES.slice(0, series.length),
@@ -44,11 +52,12 @@ export function LineChart({
             stroke: SURFACE,
             strokeWidth: 2,
             r: 4,
+            tip: true,
           }),
         ],
       });
     },
-    [series]
+    [series, xLabel, yLabel, timeFormat]
   );
   return (
     <div className="space-y-2">

@@ -53,7 +53,7 @@ export const releaseNotes: ReleaseNote[] = [
       "**The schedule works offline**: it opens from what your device last saved, marked as possibly out of date, and offers a reload after the site is upgraded.",
       "**A live schedule**: sessions, RSVP counts and rooms update on everyone's screen as they change, with no reload, which suits the kiosk.",
       "**An API for scripts and integrations**: organizers can set up events, rooms, guests and sessions from a script, with a reference at `/api/v1/docs`.",
-      "**Event statistics**: admins see how an event went in sortable tables and charts, with CSV download, and can leave out volunteer shifts or other sessions.",
+      "**Event statistics**: admins see how an event went in explained charts and searchable tables, with CSV download, and can leave out volunteer shifts or other sessions.",
     ],
   },
   {

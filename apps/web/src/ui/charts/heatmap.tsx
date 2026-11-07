@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { PlotFrame, type Plot } from "./plot-frame";
-import { SERIES, baseOptions } from "./style";
+import { SERIES, baseOptions, labelMargin, shorten } from "./style";
 
 export type HeatCell = { x: string; y: string; value: number };
 
@@ -9,20 +9,33 @@ export function Heatmap({
   cells,
   summary,
   valueLabel,
+  xLabel,
+  yLabel,
 }: {
   cells: HeatCell[];
   summary: string;
   valueLabel: string;
+  xLabel: string;
+  yLabel: string;
 }) {
   const max = Math.max(0, ...cells.map((c) => c.value));
   const draw = useCallback(
-    (plot: Plot, width: number) =>
-      plot.plot({
+    (plot: Plot, width: number) => {
+      const marginLeft = labelMargin(
+        cells.map((c) => c.y),
+        width
+      );
+      return plot.plot({
         ...baseOptions,
         width,
-        marginLeft: 100,
-        x: { label: null },
-        y: { label: null },
+        marginLeft,
+        x: { type: "band", label: xLabel },
+        y: {
+          type: "band",
+          label: yLabel,
+          labelAnchor: "top",
+          tickFormat: shorten(marginLeft),
+        },
         marks: [
           plot.cell(cells, {
             x: "x",
@@ -32,10 +45,12 @@ export function Heatmap({
               c.value === 0 ? 0 : 0.1 + (0.9 * c.value) / max,
             stroke: "var(--line-subtle)",
             inset: 1,
+            tip: true,
           }),
         ],
-      }),
-    [cells, max]
+      });
+    },
+    [cells, max, xLabel, yLabel]
   );
   return (
     <div className="space-y-2">

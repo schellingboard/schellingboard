@@ -36,7 +36,9 @@ migrated release.
 ## Figures
 
 Each section is a set of figures. A figure is: a table (sortable, CSV) and, where it helps, a chart.
-**Bold** marks the figures we think matter most.
+The SPA shows each as a card with an explanation (`features/admin/stats-figures.tsx`, the
+catalogue); a big table's charts get cards of their own there. **Bold** marks the figures we think
+matter most.
 
 ### 1. Overview
 
