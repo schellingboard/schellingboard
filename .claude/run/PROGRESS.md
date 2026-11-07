@@ -28,6 +28,11 @@
 - Decisions (step 5): the filter drops proposals whose hosts are all excluded. Only session hosts
   can be excluded, so an organizer account that only proposes cannot leave the people figures;
   accepted for now. Hosts and Hosted both count excluded-host-free members who host a kept session.
+- Step 6 done. Large profile only (`SEED_PROFILE=large make dev-db-seed`), so the small profile and
+  E2E are unchanged. Gamma is not ended, so the attendee counts sit on its first 10 curated sessions
+  although they have not happened; use the dev clock to view them as past. Shifts are origin
+  `organizer`, as are the curated admin-managed sessions; the shift locations are
+  `loc-volunteers-1/2`. The seed test is `tests/integration/seed-statistics.test.ts`.
 
 ## Questions
 

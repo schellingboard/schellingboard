@@ -57,9 +57,8 @@ database and use the page themselves. The run checks old data through the releas
 - [x] 5. Server skeleton: `server/modules/stats`, `StatsRepository`, filter, `StatsTable` contract,
       `/stats`, `/stats/{file}` (CSV), `/stats.zip`, Overview headline and funnel, release-upgrade
       test.
-- [ ] 6. Dev seed: one seeded event gets "Volunteers 1" and "Volunteers 2" locations with shift
-      sessions hosted by an organizer account, attendee counts on some ended sessions, and 1-on-1
-      requests, so the filter and every section can be tried and tested.
+- [x] 6. Dev seed (large profile, Conference Gamma): "Volunteers 1/2" locations with 12 organizer
+      shifts hosted by "Olga Organizer", attendee reports on 10 sessions, 1-on-1s in every status.
 - [ ] 7. SPA skeleton: "Statistics" tab (`features/admin/event-stats.tsx`, in the admin chunk),
       section navigation, generic sortable table, "Download CSV", "Download all", the filter panel
       in the URL query with its one-line summary, `queries/admin-stats.ts`. E2E: open the tab,

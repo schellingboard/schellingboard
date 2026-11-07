@@ -56,9 +56,11 @@ build enforces today are in [Architecture rules](architecture-rules.md).
    ```
 
    This seeds the `large` profile: the hand-curated fixtures the E2E suite uses plus a few hundred
-   generated guests, proposals and sessions for realistic manual testing.
-   `SEED_PROFILE=small make dev-db-seed` seeds only the curated fixtures (what the E2E suite always
-   runs against).
+   generated guests, proposals and sessions for realistic manual testing. Conference Gamma also gets
+   volunteer shifts (locations "Volunteers 1" and "Volunteers 2", hosted by an organizer account),
+   attendee reports and 1-on-1 requests in every status, to try the admin statistics (move the dev
+   clock past Gamma to see it as an ended event). `SEED_PROFILE=small make dev-db-seed` seeds only
+   the curated fixtures (what the E2E suite always runs against).
 
 4. Start the dev server:
 
