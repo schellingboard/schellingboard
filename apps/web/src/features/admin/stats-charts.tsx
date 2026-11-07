@@ -263,6 +263,51 @@ function VoterHistograms({ table }: { table: StatsTable }) {
   );
 }
 
+function RsvpHistogram({ table }: { table: StatsTable }) {
+  const bins = useMemo(() => {
+    const rsvps = table.rows.map((r) => Number(column(table, "rsvps")(r)));
+    const step = Math.max(1, Math.ceil(Math.max(0, ...rsvps) / 12));
+    const edges = [1];
+    while (edges[edges.length - 1] <= Math.max(0, ...rsvps))
+      edges.push(edges[edges.length - 1] + step);
+    return { bins: histogram(rsvps, edges), people: rsvps.length };
+  }, [table]);
+  if (bins.people === 0) return null;
+  return (
+    <Histogram
+      bins={bins.bins}
+      label="RSVPs per attendee"
+      summary={`RSVPs per attendee, ${bins.people} people`}
+    />
+  );
+}
+
+function CountBars({
+  table,
+  labelKey,
+  valueKey,
+}: {
+  table: StatsTable;
+  labelKey: string;
+  valueKey: string;
+}) {
+  const data = useMemo(() => {
+    const label = column(table, labelKey);
+    const value = column(table, valueKey);
+    return table.rows.map((row) => ({
+      label: String(label(row)),
+      value: Number(value(row)),
+    }));
+  }, [table, labelKey, valueKey]);
+  if (data.length === 0) return null;
+  return (
+    <RankedBars
+      data={data}
+      summary={`${table.title}: ${data.map((d) => `${d.label} ${d.value}`).join(", ")}`}
+    />
+  );
+}
+
 function ConversionChart({ table }: { table: StatsTable }) {
   const data = useMemo(() => {
     const group = column(table, "group");
@@ -294,6 +339,10 @@ export function chartFor(table: StatsTable): ReactNode {
       return <VoterHistograms table={table} />;
     case "proposals-conversion":
       return <ConversionChart table={table} />;
+    case "attendees-table":
+      return <RsvpHistogram table={table} />;
+    case "attendees-gaps":
+      return <CountBars table={table} labelKey="gap" valueKey="gaps" />;
     case "sessions-table":
       return <SessionCharts table={table} />;
     case "sessions-duration":

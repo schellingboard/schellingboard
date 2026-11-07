@@ -665,3 +665,152 @@ describe("proposal statistics", { tags: ["021-US1"] }, () => {
     }
   });
 });
+
+describe("who did what", { tags: ["021-US1"] }, () => {
+  it("splits the members by voting and RSVPing, with mean RSVPs", async () => {
+    const t = (await stats()).tables.find(
+      (x) => x.id === "overview-who-did-what"
+    );
+    expect(t?.rows).toEqual([
+      ["Voted only", 1, 20, 0],
+      ["RSVPed only", 1, 20, 1],
+      ["Voted and RSVPed", 2, 40, 1.5],
+      ["Neither", 1, 20, 0],
+      ["All voters", 3, 60, 1],
+      ["All other members", 2, 40, 0.5],
+    ]);
+  });
+});
+
+describe("attendee statistics", { tags: ["021-US1"] }, () => {
+  const at = (hour: number, minute = 0) =>
+    new Date(Date.UTC(2020, 2, 10, hour, minute));
+
+  beforeEach(async () => {
+    const { sessions, rsvps } = getRepositories();
+    await sessions.update(ids.s1, { startTime: at(9), endTime: at(10) });
+    await sessions.update(ids.s2, { startTime: at(9, 30), endTime: at(11) });
+    await sessions.update(ids.s3, { startTime: at(13), endTime: at(14) });
+    await rsvps.create({ sessionId: ids.s2, guestId: ids.d });
+  });
+
+  const rowsOf = (s: Stats, id: string) => {
+    const t = s.tables.find((x) => x.id === id);
+    expect(t, id).toBeDefined();
+    return t!.rows.map((r) =>
+      Object.fromEntries(t!.columns.map((c, i) => [c.key, r[i]]))
+    );
+  };
+
+  it("describes each attendee's RSVPs under a pseudonym", async () => {
+    const rows = rowsOf(await stats(), "attendees-table");
+    expect(rows).toHaveLength(3);
+    expect(rows.map((r) => r.attendee)).toEqual(["P001", "P002", "P003"]);
+    expect(rows[0]).toMatchObject({
+      rsvps: 2,
+      days: 1,
+      hours: 2.5,
+      backToBack: 0,
+      overlapping: 1,
+      medianGap: null,
+    });
+    expect(rows[1]).toMatchObject({ rsvps: 2, overlapping: 0, medianGap: 120 });
+    expect(rows[2]).toMatchObject({ rsvps: 1, hours: 1 });
+  });
+
+  it("counts the gaps between RSVPed sessions on a day", async () => {
+    const rows = rowsOf(await stats(), "attendees-gaps");
+    expect(rows.reduce((sum, r) => sum + Number(r.gaps), 0)).toBe(1);
+    expect(rows.find((r) => r.gap === "Up to 2 h")).toMatchObject({ gaps: 1 });
+  });
+
+  it("counts people with double bookings", async () => {
+    const rows = rowsOf(await stats(), "attendees-double-bookings");
+    expect(rows[0]).toMatchObject({ value: 3 });
+    expect(rows[1]).toMatchObject({ value: 1, share: 33.3 });
+  });
+
+  it("counts hosts who RSVP to other sessions", async () => {
+    const rows = rowsOf(await stats(), "attendees-hosts");
+    expect(rows[0]).toMatchObject({ value: 3 });
+    expect(rows[1]).toMatchObject({ value: 1, share: 33.3 });
+  });
+
+  const onDay = (day: number, hour: number, minute = 0) =>
+    new Date(Date.UTC(2020, 2, day, hour, minute));
+  const attendeeOf = async (name: string, windows: [Date, Date][]) => {
+    const guest = await createGuest({ name, eventId });
+    for (const [startTime, endTime] of windows) {
+      const session = await createSession(eventId, { startTime, endTime });
+      await getRepositories().rsvps.create({
+        sessionId: session.id,
+        guestId: guest.id,
+      });
+    }
+    return guest;
+  };
+
+  it("records no gap while a longer session is still running", async () => {
+    await attendeeOf("Nested Nina", [
+      [onDay(11, 9), onDay(11, 12)],
+      [onDay(11, 10), onDay(11, 11)],
+      [onDay(11, 11, 30), onDay(11, 12, 30)],
+    ]);
+    const rows = rowsOf(await stats(), "attendees-gaps");
+    expect(rows.reduce((sum, r) => sum + Number(r.gaps), 0)).toBe(1);
+  });
+
+  it("treats a gap within the break as back to back", async () => {
+    await attendeeOf("Break Bea", [
+      [onDay(12, 9), onDay(12, 10)],
+      [onDay(12, 10, 5), onDay(12, 11)],
+    ]);
+    const s = await stats();
+    expect(rowsOf(s, "attendees-table").some((r) => r.backToBack === 1)).toBe(
+      true
+    );
+    expect(
+      rowsOf(s, "attendees-gaps").find((r) => r.gap === "Up to the break")
+    ).toMatchObject({ gaps: 1 });
+  });
+
+  it("counts RSVPs to sessions without a time", async () => {
+    const guest = await createGuest({ name: "Untimed Uri", eventId });
+    const open = await createSession(eventId, {});
+    await getRepositories().rsvps.create({
+      sessionId: open.id,
+      guestId: guest.id,
+    });
+    const s = await stats();
+    expect(rowsOf(s, "attendees-double-bookings")[0].value).toBe(
+      rowsOf(s, "overview-headline")[3].value
+    );
+    expect(
+      rowsOf(s, "attendees-table").some((r) => r.rsvps === 1 && r.days === 0)
+    ).toBe(true);
+  });
+
+  it("leaves an excluded host out of the people figures", async () => {
+    const rows = rowsOf(
+      await stats(`?excludeHosts=${ids.b}`),
+      "attendees-table"
+    );
+    expect(rows).toHaveLength(2);
+    expect(rows.every((r) => r.rsvps === 1)).toBe(true);
+  });
+
+  it("carries no guest id and no name in the attendee tables", async () => {
+    const json = JSON.stringify(
+      (await stats()).tables.filter((t) => t.id.startsWith("attendees-"))
+    );
+    const csv = await (
+      await get(`/admin/events/${eventId}/stats/attendees-table.csv`)
+    ).text();
+    for (const text of [json, csv]) {
+      for (const id of [ids.a, ids.b, ids.c, ids.d, ids.v])
+        expect(text).not.toContain(id);
+      for (const name of [...hostNames, ...nonHostNames])
+        expect(text).not.toContain(name);
+    }
+  });
+});

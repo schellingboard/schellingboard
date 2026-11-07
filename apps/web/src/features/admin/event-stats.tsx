@@ -199,6 +199,12 @@ export function EventStatsScreen({
         ))}
       </nav>
 
+      {section === "attendees" && (
+        <p className="text-sm text-fg-muted">
+          RSVPs are intent, not attendance: people book more than they attend.
+        </p>
+      )}
+
       {stats.tables
         .filter((t) => sectionOf(t.id) === section)
         .map((table) => (

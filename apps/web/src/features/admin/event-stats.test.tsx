@@ -318,6 +318,51 @@ describe("proposal charts", { tags: ["021-US1"] }, () => {
   });
 });
 
+describe("attendee charts", { tags: ["021-US1"] }, () => {
+  it("draws RSVPs per attendee and the gaps between sessions", async () => {
+    const c = (key: string, type: "text" | "integer" = "integer") => ({
+      key,
+      label: key,
+      type,
+    });
+    renderScreen("section=attendees", {
+      stats: {
+        ...stats,
+        tables: [
+          {
+            id: "attendees-table",
+            title: "RSVPs per attendee",
+            columns: [c("attendee", "text"), c("rsvps")],
+            rows: [
+              ["P001", 5],
+              ["P002", 1],
+            ],
+          },
+          {
+            id: "attendees-gaps",
+            title: "Gaps between RSVPed sessions",
+            columns: [c("gap", "text"), c("gaps")],
+            rows: [
+              ["Back to back", 4],
+              ["More than 2 h", 2],
+            ],
+          },
+        ],
+      },
+    });
+
+    expect(screen.getByText(/RSVPs are intent, not attendance/)).toBeTruthy();
+    expect(
+      await screen.findByRole("img", { name: "RSVPs per attendee, 2 people" })
+    ).toBeTruthy();
+    expect(
+      await screen.findByRole("img", {
+        name: "Gaps between RSVPed sessions: Back to back 4, More than 2 h 2",
+      })
+    ).toBeTruthy();
+  });
+});
+
 describe("downloading statistics", { tags: ["021-US2"] }, () => {
   it("links each table's CSV and the ZIP, with the filter in the address", () => {
     renderScreen("excludeLocations=l1");

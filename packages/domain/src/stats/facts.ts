@@ -1,6 +1,7 @@
 export interface EventFacts {
   event: { id: string; name: string; slug: string };
   timezone: string;
+  breakMinutes: number;
   members: string[];
   locations: { id: string; name: string }[];
   hosts: { id: string; name: string }[];

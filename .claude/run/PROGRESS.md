@@ -74,7 +74,14 @@
   filter drops; RSVPs and reports come from the kept session only. Interest quarters split the
   proposals ranked by interested votes into four equal groups, ties broken by title. "Proposals over
   time" fills empty days; no phase bands. Per-voter table: pseudonyms, not joinable.
+- Step 12 done. `EventFacts.breakMinutes` added. Attendee gaps only pair consecutive RSVPs on the
+  same day (event zone); overlapping pairs are counted as double bookings, not gaps. Per-attendee
+  rows exist only for people with an RSVP to a kept, timed session; the median gap uses -1 inside
+  `pseudonymize` and is mapped back to null. The "RSVPs are intent" note is a line in the SPA.
+  Per-attendee RSVPs count all kept sessions; days, hours and gaps use the timed ones.
 
 ## Questions
 
-None.
+- "Who did what" (Overview) can show a group of one member (e.g. "Neither: 1"). With the RSVP lists
+  an admin already sees, that can reveal whether one named person voted. ADR 0019 §4 suppresses only
+  free text, so it is not a violation; do you want groups under 3 suppressed?

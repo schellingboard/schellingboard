@@ -27,12 +27,13 @@ export class SqliteStatsRepository implements StatsRepository {
         name: schema.events.name,
         slug: schema.events.slug,
         timezone: schema.events.timezone,
+        breakMinutes: schema.events.breakMinutes,
       })
       .from(schema.events)
       .where(eq(schema.events.id, eventId))
       .get();
     if (!event) return null;
-    const { timezone, ...eventIdentity } = event;
+    const { timezone, breakMinutes, ...eventIdentity } = event;
 
     const members = db
       .select({ id: schema.eventGuests.guestId })
@@ -258,6 +259,7 @@ export class SqliteStatsRepository implements StatsRepository {
     return {
       event: eventIdentity,
       timezone,
+      breakMinutes,
       members,
       locations,
       hosts,

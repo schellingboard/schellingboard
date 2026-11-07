@@ -5,8 +5,7 @@ import {
   type StatsFilterInput,
 } from "@schellingboard/domain/stats/filter";
 
-const percent = (part: number, whole: number) =>
-  whole === 0 ? null : Math.round((part / whole) * 1000) / 10;
+import { percent, round } from "./cells";
 
 export function overviewTables(
   facts: EventFacts,
@@ -74,5 +73,60 @@ export function overviewTables(
       percent(count, people.size),
     ]),
   };
-  return [headline, funnel];
+
+  const rsvpCounts = new Map<string, number>();
+  for (const r of facts.rsvps)
+    if (keptSessions.has(r.sessionId) && people.has(r.guestId))
+      rsvpCounts.set(r.guestId, (rsvpCounts.get(r.guestId) ?? 0) + 1);
+  const members = [...people];
+  const mean = (ids: string[]) =>
+    ids.length === 0
+      ? null
+      : round(
+          ids.reduce((sum, id) => sum + (rsvpCounts.get(id) ?? 0), 0) /
+            ids.length,
+          2
+        );
+  const group = (label: string, ids: string[]) => [
+    label,
+    ids.length,
+    percent(ids.length, people.size),
+    mean(ids),
+  ];
+  const voted = (id: string) => voters.has(id);
+  const rsvped = (id: string) => rsvpers.has(id);
+  const whoDidWhat: StatsTable = {
+    id: "overview-who-did-what",
+    title: "Who did what",
+    columns: [
+      { key: "group", label: "Group", type: "text" },
+      { key: "members", label: "Members", type: "integer" },
+      { key: "share", label: "Share of members (%)", type: "percent" },
+      { key: "meanRsvps", label: "Mean RSVPs per member", type: "number" },
+    ],
+    rows: [
+      group(
+        "Voted only",
+        members.filter((id) => voted(id) && !rsvped(id))
+      ),
+      group(
+        "RSVPed only",
+        members.filter((id) => !voted(id) && rsvped(id))
+      ),
+      group(
+        "Voted and RSVPed",
+        members.filter((id) => voted(id) && rsvped(id))
+      ),
+      group(
+        "Neither",
+        members.filter((id) => !voted(id) && !rsvped(id))
+      ),
+      group("All voters", members.filter(voted)),
+      group(
+        "All other members",
+        members.filter((id) => !voted(id))
+      ),
+    ],
+  };
+  return [headline, funnel, whoDidWhat];
 }

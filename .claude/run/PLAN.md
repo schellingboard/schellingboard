@@ -77,8 +77,8 @@ then its cards in the SPA. Skip a figure whose chart adds nothing to its table.
       `sessions-calibration` table and `PredictionScatter` (ranges, y = x).
 - [x] 11. Proposals section: 8 `proposals-*` tables (`proposals.ts`), stacked-bar, scatter, line and
       histogram charts.
-- [ ] 12. Attendees: RSVPs per attendee, gaps, double bookings, hosts who attend. Overview gains
-      "who did what".
+- [x] 12. Attendees section (`attendees.ts`: per-attendee pseudonymous table, gaps, double bookings,
+      hosts who attend) and the Overview "Who did what" table.
 - [ ] 13. Locations and schedule: location table, gaps and fragments, utilization heatmap, supply
       and demand by hour; excluded sessions occupy time but are no sessions.
 - [ ] 14. 1-on-1s: adoption, requests by status, per person, response time, when, meeting points.
