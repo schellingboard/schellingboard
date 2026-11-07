@@ -76,6 +76,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **Closing a window no longer loses what you typed** (#1361): Esc, the close button or a click
+  outside asks before discarding an unsent comment or message.
 - **A double click or double submit no longer repeats the action** (#141): proposals, sessions,
   comments and RSVPs sent twice by a slow connection or a retry count once.
 - **Deleting a guest deletes their photo too**: it used to stay on the server.

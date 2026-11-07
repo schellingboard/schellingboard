@@ -213,7 +213,14 @@ the timeout, not the cause. Unresolved.
   given means the guest's exact membership (adds and removes). Unknown event: 404 `event.notFound`.
   `createGuest` now takes `now`.
 
+- Step 27: the guard is `ui/use-discard-guard.tsx`, used by `Dialog` and the profile modal. A text
+  field counts once focused and now differing from its value then; number, search and combobox
+  fields are exempt. Failed saves keep the text, so they still prompt.
+
 ## Questions
+
+Step 27 follow-up: Prev/Next and swiping in the profile modal still drop a typed comment without
+asking.
 
 Step 25b (for the user to know, decided by the coordinator): a verified session replaces a forgotten
 password without the old one only if it began with a join link (`login_sessions.via`, migration

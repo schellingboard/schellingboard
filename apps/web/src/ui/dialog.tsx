@@ -6,6 +6,7 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from "react";
+import { useDiscardGuard } from "./use-discard-guard";
 
 /** Open dialogs, innermost last: Escape closes only the one on top. */
 const openDialogs: symbol[] = [];
@@ -29,10 +30,8 @@ export function Dialog({
   const titleId = useId();
   const panel = useRef<HTMLDivElement>(null);
 
-  const latestOnClose = useRef(onClose);
-  useEffect(() => {
-    latestOnClose.current = onClose;
-  });
+  const guard = useDiscardGuard(panel, onClose);
+  const { escape, reset } = guard;
 
   useEffect(() => {
     if (!open) return;
@@ -43,15 +42,16 @@ export function Dialog({
     openDialogs.push(me);
     const onKey = (e: globalThis.KeyboardEvent) => {
       if (e.key === "Escape" && openDialogs[openDialogs.length - 1] === me)
-        latestOnClose.current();
+        escape();
     };
     document.addEventListener("keydown", onKey);
     return () => {
       document.removeEventListener("keydown", onKey);
+      reset();
       openDialogs.splice(openDialogs.indexOf(me), 1);
       opener?.focus?.();
     };
-  }, [open]);
+  }, [open, escape, reset]);
 
   const keepFocusInside = (e: KeyboardEvent) => {
     if (e.key !== "Tab" || !panel.current) return;
@@ -80,7 +80,7 @@ export function Dialog({
     <div
       data-testid="dialog-backdrop"
       className="fixed inset-0 z-[60] flex items-end justify-center bg-overlay p-0 sm:items-center sm:p-4"
-      onClick={onClose}
+      onClick={guard.requestClose}
     >
       <div
         ref={panel}
@@ -91,6 +91,7 @@ export function Dialog({
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         onKeyDown={keepFocusInside}
+        onFocus={guard.noteFocus}
         className={`relative max-h-[90dvh] w-full overflow-y-auto rounded-t-lg bg-surface-raised p-4 shadow-xl focus:outline-none sm:rounded-lg sm:p-6 ${wide ? "sm:max-w-2xl" : "sm:max-w-md"}`}
       >
         <h2 id={titleId} className="pr-8 text-lg font-semibold text-fg">
@@ -99,11 +100,12 @@ export function Dialog({
         <button
           type="button"
           aria-label="Close"
-          onClick={onClose}
+          onClick={guard.requestClose}
           className="absolute right-3 top-3 rounded-md p-1 text-fg-subtle hover:bg-surface-muted focus:outline-none focus:ring-2 focus:ring-brand-accent"
         >
           <span aria-hidden>✕</span>
         </button>
+        {guard.prompt}
         <div className="mt-3">{children}</div>
       </div>
     </div>,

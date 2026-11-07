@@ -281,6 +281,26 @@ describe("the profile modal", () => {
   );
 
   it(
+    "asks before Escape or Close discards a typed comment",
+    { tags: ["010-US7"] },
+    async () => {
+      let closed = 0;
+      render(<Harness onClose={() => closed++} />);
+      await userEvent.type(
+        await screen.findByPlaceholderText("Add a comment"),
+        "draft"
+      );
+
+      await userEvent.keyboard("{Escape}");
+      await userEvent.click(screen.getByRole("button", { name: "Close" }));
+
+      expect(closed).toBe(0);
+      await userEvent.click(screen.getByRole("button", { name: "Discard" }));
+      expect(closed).toBe(1);
+    }
+  );
+
+  it(
     "leaves the arrow keys to a field being typed in",
     { tags: ["011-US4"] },
     () => {

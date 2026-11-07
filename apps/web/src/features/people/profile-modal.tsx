@@ -26,6 +26,7 @@ import type { MeetingRequestCalls } from "../../commands/meeting-request";
 import { MeetingRequestDialog } from "./meeting-request-dialog";
 import type { ProfileLinks } from "./links";
 import { ProfileBody } from "./profile-body";
+import { useDiscardGuard } from "../../ui/use-discard-guard";
 
 /** How long the profile takes to finish a swipe the finger has let go of. */
 const SETTLE_MS = 200;
@@ -96,6 +97,9 @@ export function ProfileModal(props: ProfileModalProps) {
   }, [guestId]);
 
   const viewport = useRef<HTMLDivElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
+  const guard = useDiscardGuard(panel, onClose);
+  const { escape } = guard;
   const row = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   useEffect(() => {
@@ -204,7 +208,7 @@ export function ProfileModal(props: ProfileModalProps) {
         // One layer at a time: the enlarged photo first, so Escape never
         // closes the profile out from under someone looking closely.
         if (zoomed) setZoomedFor(null);
-        else onClose();
+        else escape();
         return;
       }
       if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
@@ -218,7 +222,7 @@ export function ProfileModal(props: ProfileModalProps) {
       document.documentElement.style.overflow = "";
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [onClose, goToAnimated, zoomed, scheduling]);
+  }, [escape, goToAnimated, zoomed, scheduling]);
 
   const sliding =
     drag !== null && (drag.phase === "settling" || drag.swipe.axis === "x");
@@ -242,12 +246,14 @@ export function ProfileModal(props: ProfileModalProps) {
     // items-start: a centred panel puts Prev/Next at a different height for
     // every profile, so they would jump under the pointer while reading on.
     <div
+      ref={panel}
+      onFocus={guard.noteFocus}
       className="fixed inset-0 z-50 flex justify-center sm:items-start sm:py-8"
       role="dialog"
       aria-modal="true"
       aria-label={guest ? guest.name : "Profile"}
     >
-      <div className="fixed inset-0 bg-overlay" onClick={onClose} />
+      <div className="fixed inset-0 bg-overlay" onClick={guard.requestClose} />
       <div className="relative flex h-full w-full flex-col overflow-hidden bg-surface-raised shadow-xl sm:mx-4 sm:h-auto sm:max-h-full sm:max-w-4xl sm:rounded-lg">
         <div className="flex shrink-0 items-center gap-2 border-b border-line-subtle px-2 py-2 sm:px-4">
           <NavButton
@@ -276,12 +282,13 @@ export function ProfileModal(props: ProfileModalProps) {
           <button
             type="button"
             aria-label="Close"
-            onClick={onClose}
+            onClick={guard.requestClose}
             className="rounded-md bg-surface-raised p-1.5 text-fg-subtle hover:bg-surface-sunken hover:text-fg-muted focus:outline-none focus:ring-2 focus:ring-brand-accent"
           >
             <XMarkIcon className="h-6 w-6" />
           </button>
         </div>
+        {guard.prompt && <div className="shrink-0 px-4">{guard.prompt}</div>}
 
         {/* touch-pan-y hands vertical scrolling to the browser and keeps
             horizontal panning, the back gesture included, for this handler;

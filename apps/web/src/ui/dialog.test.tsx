@@ -140,3 +140,158 @@ describe("Dialog", () => {
     act(() => {});
   });
 });
+
+describe("Dialog with unsaved text", { tags: ["010-US7"] }, () => {
+  const setup = () => {
+    const onClose = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <Dialog open onClose={onClose} title="Hello">
+        <textarea aria-label="Comment" />
+      </Dialog>
+    );
+    return { onClose, user };
+  };
+
+  it("closes at once while nothing was typed", async () => {
+    const { onClose, user } = setup();
+    await user.keyboard("{Escape}");
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    [
+      "Escape",
+      (u: ReturnType<typeof userEvent.setup>) => u.keyboard("{Escape}"),
+    ],
+    [
+      "the close button",
+      (u: ReturnType<typeof userEvent.setup>) =>
+        u.click(screen.getByRole("button", { name: "Close" })),
+    ],
+    [
+      "a backdrop click",
+      (u: ReturnType<typeof userEvent.setup>) =>
+        u.click(screen.getByTestId("dialog-backdrop")),
+    ],
+  ])("asks before %s discards typed text", async (_name, dismiss) => {
+    const { onClose, user } = setup();
+    await user.type(screen.getByLabelText("Comment"), "draft");
+
+    await dismiss(user);
+
+    expect(onClose).not.toHaveBeenCalled();
+    expect(
+      screen.getByRole("alertdialog", { name: "Discard what you have typed?" })
+    ).toBeTruthy();
+  });
+
+  it("keeps the dialog and the text on Keep editing", async () => {
+    const { onClose, user } = setup();
+    await user.type(screen.getByLabelText("Comment"), "draft");
+    await user.keyboard("{Escape}");
+
+    await user.click(screen.getByRole("button", { name: "Keep editing" }));
+
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(screen.getByLabelText<HTMLTextAreaElement>("Comment").value).toBe(
+      "draft"
+    );
+  });
+
+  it("closes on Discard", async () => {
+    const { onClose, user } = setup();
+    await user.type(screen.getByLabelText("Comment"), "draft");
+    await user.keyboard("{Escape}");
+
+    await user.click(screen.getByRole("button", { name: "Discard" }));
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("closes at once once the typed text is gone", async () => {
+    const { onClose, user } = setup();
+    const field = screen.getByLabelText("Comment");
+    await user.type(field, "draft");
+    await user.clear(field);
+
+    await user.keyboard("{Escape}");
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not ask about a pre-filled field the user left alone", async () => {
+    const onClose = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <Dialog open onClose={onClose} title="Hello">
+        <textarea aria-label="Edit" defaultValue="saved text" />
+        <input aria-label="Other" />
+      </Dialog>
+    );
+    await user.type(screen.getByLabelText("Other"), "x");
+    await user.clear(screen.getByLabelText("Other"));
+
+    await user.keyboard("{Escape}");
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("asks when a pre-filled field was changed", async () => {
+    const onClose = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <Dialog open onClose={onClose} title="Hello">
+        <textarea aria-label="Edit" defaultValue="saved text" />
+      </Dialog>
+    );
+    await user.type(screen.getByLabelText("Edit"), " more");
+
+    await user.keyboard("{Escape}");
+
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByRole("alertdialog")).toBeTruthy();
+  });
+
+  it("does not ask about a search box", async () => {
+    const onClose = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <Dialog open onClose={onClose} title="Hello">
+        <input role="combobox" aria-label="Name" />
+      </Dialog>
+    );
+    await user.type(screen.getByLabelText("Name"), "ali");
+
+    await user.keyboard("{Escape}");
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("Escape on the question keeps editing and returns focus", async () => {
+    const { onClose, user } = setup();
+    const field = screen.getByLabelText("Comment");
+    await user.type(field, "draft");
+    await user.keyboard("{Escape}");
+
+    await user.keyboard("{Escape}");
+
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(document.activeElement).toBe(field);
+  });
+
+  it("keeps the focus target when the backdrop is clicked during the question", async () => {
+    const { onClose, user } = setup();
+    const field = screen.getByLabelText("Comment");
+    await user.type(field, "draft");
+    await user.keyboard("{Escape}");
+    await user.click(screen.getByTestId("dialog-backdrop"));
+
+    await user.click(screen.getByRole("button", { name: "Keep editing" }));
+
+    expect(onClose).not.toHaveBeenCalled();
+    expect(document.activeElement).toBe(field);
+  });
+});

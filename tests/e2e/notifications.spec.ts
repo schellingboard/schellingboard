@@ -25,6 +25,7 @@ async function commentOnProfile(page: Page, name: string, body: string) {
   await profile.getByPlaceholder("Add a comment").fill(body);
   await profile.getByRole("button", { name: "Comment", exact: true }).click();
   await expect(profile.getByText(body).first()).toBeVisible();
+  await expect(profile.getByPlaceholder("Add a comment")).toHaveValue("");
   // The modal covers the header, and switching names goes through the header.
   await page.keyboard.press("Escape");
   await expect(profile).toBeHidden();
