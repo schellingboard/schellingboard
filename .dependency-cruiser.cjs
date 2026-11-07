@@ -27,7 +27,10 @@ module.exports = {
         "`packages/contracts`; a type that only means something to the database stays in " +
         "`db/`. See docs/dev/adr/0010-workspace-packages.md.",
       from: { path: "^packages/domain/" },
-      to: { pathNot: "^(packages/domain/|node_modules/luxon/)" },
+      to: {
+        pathNot:
+          "^(packages/domain/|node_modules/(luxon|\\.bun/luxon@[^/]+/node_modules/luxon)/)",
+      },
     },
     {
       name: "contracts-import-only-domain-and-zod",
@@ -37,7 +40,10 @@ module.exports = {
         "domain's types and constants. Anything else it reached for would ship to every " +
         "client that validates a form. See docs/dev/adr/0010-workspace-packages.md.",
       from: { path: "^packages/contracts/" },
-      to: { pathNot: "^(packages/(contracts|domain)/|node_modules/zod/)" },
+      to: {
+        pathNot:
+          "^(packages/(contracts|domain)/|node_modules/(zod|\\.bun/zod@[^/]+/node_modules/zod)/)",
+      },
     },
     {
       name: "api-client-imports-only-openapi-fetch",
@@ -47,7 +53,10 @@ module.exports = {
         "thin `openapi-fetch` wrapper. Its types come from the document, not from the " +
         "server's code or the contracts, so it describes only what goes over the wire.",
       from: { path: "^packages/api-client/" },
-      to: { pathNot: "^(packages/api-client/|node_modules/openapi-fetch/)" },
+      to: {
+        pathNot:
+          "^(packages/api-client/|node_modules/(openapi-fetch|\\.bun/openapi-fetch@[^/]+/node_modules/openapi-fetch)/)",
+      },
     },
     {
       name: "packages-declare-their-dependencies",

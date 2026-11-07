@@ -9,8 +9,8 @@
 
 - Step 1 done. New admin code goes in `admin-pages.tsx`'s module graph so it stays in the lazy
   chunk.
-- Environment: `make arch` fails with 26 violations on a clean tree (node_modules/.bun paths);
-  `make lint` needs `NODE_OPTIONS=--max-old-space-size=8192`.
+- Environment: fixed (26 `make arch` false violations from the .bun layout, `make lint` heap); done
+  outside the plan, commit 67e4a948.
 - Step 2 done: chart library is Observable Plot 0.6.19. Plot needs a ResizeObserver wrapper, token
   colours read via `getComputedStyle` for colour scales, no canvas legend under happy-dom.
 
