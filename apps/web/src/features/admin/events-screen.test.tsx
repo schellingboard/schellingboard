@@ -96,6 +96,43 @@ describe("the admin events screen", { tags: ["015-US2"] }, () => {
     expect(screen.getByRole("button", { name: "New event" })).toBeTruthy();
   });
 
+  it("searches the time zones and sends the one picked", async () => {
+    const user = userEvent.setup();
+    const { calls } = setup([], () =>
+      Response.json({ id: "e9" }, { status: 201 })
+    );
+
+    await user.click(screen.getByRole("button", { name: "New event" }));
+    await user.type(screen.getByLabelText(/^Name/), "Summit");
+    const zone = screen.getByRole("combobox", { name: /^Timezone/ });
+    await user.clear(zone);
+    await user.type(zone, "berlin");
+    expect(screen.queryByText("Pick one or type any text")).toBeNull();
+    expect(screen.queryByRole("option", { name: "Asia/Tokyo" })).toBeNull();
+    await user.click(screen.getByRole("option", { name: "Europe/Berlin" }));
+    await user.click(screen.getByRole("button", { name: "Create event" }));
+
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect(calls[0].body).toMatchObject({ timezone: "Europe/Berlin" });
+  });
+
+  it("refuses a time zone that is not in the list", async () => {
+    const user = userEvent.setup();
+    const { calls } = setup([]);
+
+    await user.click(screen.getByRole("button", { name: "New event" }));
+    await user.type(screen.getByLabelText(/^Name/), "Summit");
+    const zone = screen.getByRole("combobox", { name: /^Timezone/ });
+    await user.clear(zone);
+    await user.type(zone, "Nowhere");
+    await user.click(screen.getByRole("button", { name: "Create event" }));
+
+    expect(
+      (await screen.findAllByText("Pick a time zone from the list")).length
+    ).toBeGreaterThan(0);
+    expect(calls).toHaveLength(0);
+  });
+
   it("shows the server's reason next to the name when the URL is taken", async () => {
     const user = userEvent.setup();
     const message = 'An event with the URL "Summit" already exists ("Summit")';

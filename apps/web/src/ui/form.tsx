@@ -334,12 +334,14 @@ export function ComboboxField({
   onChange,
   options,
   placeholder,
+  strict,
   ...frame
 }: FieldProps & {
   value: string;
   onChange: (value: string) => void;
   options: string[];
   placeholder?: string;
+  strict?: boolean;
 }) {
   const ids = useField(frame);
   return (
@@ -351,6 +353,7 @@ export function ComboboxField({
         onChange={onChange}
         options={options}
         placeholder={placeholder}
+        strict={strict}
         invalid={!!frame.error}
         describedBy={ids.control["aria-describedby"]}
       />

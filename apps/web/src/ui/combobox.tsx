@@ -19,6 +19,7 @@ export function Combobox({
   placeholder,
   invalid,
   describedBy,
+  strict = false,
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -30,6 +31,8 @@ export function Combobox({
   placeholder?: string;
   invalid?: boolean;
   describedBy?: string;
+  /** Only the listed options are valid, so the footer does not invite free text. */
+  strict?: boolean;
 }) {
   const listId = useId();
   const [open, setOpen] = useState(false);
@@ -122,12 +125,14 @@ export function Combobox({
             {option}
           </li>
         ))}
-        <li
-          role="presentation"
-          className="border-t border-line-subtle px-4 py-2 text-xs text-fg-subtle"
-        >
-          Pick one or type any text
-        </li>
+        {!strict && (
+          <li
+            role="presentation"
+            className="border-t border-line-subtle px-4 py-2 text-xs text-fg-subtle"
+          >
+            Pick one or type any text
+          </li>
+        )}
       </ul>
     </div>
   );

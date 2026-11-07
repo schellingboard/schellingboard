@@ -128,8 +128,8 @@ function parseSettings(
   if (!name)
     return fieldInvalid("event.nameRequired", "name", "Name is required");
 
-  // The form only offers known zones; a script's typo would break every page
-  // that formats the event's times.
+  // A typo from a script or API client would break every page that formats
+  // the event's times.
   const timezone = input.timezone.trim() || "UTC";
   if (!isKnownTimeZone(timezone)) {
     return fieldInvalid(
