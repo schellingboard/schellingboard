@@ -40,8 +40,8 @@ One global row shown when there's more than one event (see
 - **Name** (required) — the URL slug is derived from the name once, at creation, and never changes
   afterwards even if you rename the event later. This keeps existing links/bookmarks working.
   `admin`, `api`, `login`, and `media` can't be used as event names.
-- **Description** (Markdown), **Website**, **Timezone** (required — all dates/times for this event
-  are edited in this zone), **Icon** (decorative).
+- **Description** (Markdown), **Website**, **Timezone** (required, type to search — all dates/times
+  for this event are edited in this zone), **Icon** (decorative).
 - **Max session duration**, **break before each session** (attendees' sessions start this long into
   their slot; changing it affects only sessions booked afterwards), **schedule increment** (15/30/60
   min grid granularity — can't be changed if it would misalign existing days).

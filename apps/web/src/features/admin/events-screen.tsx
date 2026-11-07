@@ -6,13 +6,18 @@ import { FIX_FIELDS_MESSAGE, type FieldErrors } from "../../commands/mutation";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import type { AdminEvent } from "../../queries/admin-events";
 import { Button } from "../../ui/button";
-import { MarkdownField, SelectField, TextField } from "../../ui/form";
+import {
+  ComboboxField,
+  MarkdownField,
+  SelectField,
+  TextField,
+} from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
 import {
   IDENTITY_MODE_HINT,
   IDENTITY_MODE_OPTIONS,
 } from "./identity-mode-options";
-import { timezones } from "./timezones";
+import { matchingZones, timezones } from "./timezones";
 
 const DEFAULTS = {
   name: "",
@@ -53,6 +58,8 @@ function NewEventForm({
   if (!(body.maxSessionDuration > 0))
     invalid.maxSessionDuration =
       "Max session duration must be a positive number";
+  if (!zones.includes(form.timezone))
+    invalid.timezone = "Pick a time zone from the list";
   const mutation = useFormMutation({
     call: (key) => calls.create(body, key),
     fieldNames: FIELD_NAMES,
@@ -100,13 +107,14 @@ function NewEventForm({
         error={fields.website}
       />
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <SelectField
+        <ComboboxField
           label="Timezone"
           name="timezone"
           required
           value={form.timezone}
           onChange={set("timezone")}
-          options={zones.map((tz) => ({ value: tz, label: tz }))}
+          strict
+          options={matchingZones(zones, form.timezone)}
           error={fields.timezone}
         />
         <TextField

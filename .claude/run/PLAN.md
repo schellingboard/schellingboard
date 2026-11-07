@@ -168,7 +168,7 @@ Contract changes first, so the rest build on the final API (ADR 0018 point 15).
       field the user typed in still holds text. E2E in session-comments.spec.ts.
 - [x] 28. #1330 A new day's booking window follows its start and end until edited
       (`event-days.tsx`).
-- [ ] 29. #1329 Admin: searchable time zone combobox on a new event.
+- [x] 29. #1329 The new-event form's time zone is a searchable combobox (`events-screen.tsx`).
 - [ ] 30. #1334 Placeholder image for a location without an image.
 - [ ] 31. #1333 Input fields do not move on focus (styling: no new test).
 - [ ] 32. #1338 Proposal page says "proposal", not "session".

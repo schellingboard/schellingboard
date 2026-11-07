@@ -48,6 +48,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Search for a time zone** (#1329): an event's time zone is a searchable field instead of a long
+  list.
 - **Hosts see the vote breakdown of their own proposals during voting** (#1383): turnout and the
   split across the three choices, for hosts only; it stays hidden from everyone else until
   scheduling.

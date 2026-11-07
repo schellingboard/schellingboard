@@ -219,6 +219,10 @@ the timeout, not the cause. Unresolved.
 
 - Step 28: only the add-day form follows (edit forms keep stored values); `edited` is a ref.
 
+- Step 29: the zone field is `ComboboxField`; zones filter by typed text (spaces/underscores
+  ignored), all shown when the value is an exact zone. The new-event form checks the zone against
+  the list; the edit form (also a combobox, `strict`) leaves an unknown zone to the server.
+
 ## Questions
 
 Step 27 follow-up: Prev/Next and swiping in the profile modal still drop a typed comment without

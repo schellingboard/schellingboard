@@ -10,6 +10,7 @@ import type { AdminEventCalls } from "../../commands/admin-events";
 import type { AdminEvent } from "../../queries/admin-events";
 import { Button } from "../../ui/button";
 import {
+  ComboboxField,
   CheckboxField,
   DateTimeField,
   MarkdownField,
@@ -28,7 +29,7 @@ import {
   IDENTITY_MODE_HINT,
   IDENTITY_MODE_OPTIONS,
 } from "./identity-mode-options";
-import { timezones } from "./timezones";
+import { matchingZones, timezones } from "./timezones";
 import { useEventSection } from "./use-event-section";
 import { jumpTo, useSectionSave } from "./use-section-save";
 
@@ -143,13 +144,14 @@ function DetailsForm({
         error={fields.website}
       />
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <SelectField
+        <ComboboxField
           label="Timezone"
           name="timezone"
           required
+          strict
           value={form.timezone}
           onChange={set("timezone")}
-          options={zones.map((tz) => ({ value: tz, label: tz }))}
+          options={matchingZones(zones, form.timezone)}
           error={fields.timezone}
         />
         <TextField
