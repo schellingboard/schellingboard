@@ -67,10 +67,12 @@ describe("the days manager", { tags: ["015-US4"] }, () => {
     await user.click(screen.getByRole("button", { name: "Add day" }));
     await user.type(screen.getByLabelText(/^Start/), "2030-06-01T09:00");
     await user.type(screen.getByLabelText(/^End/), "2030-06-01T19:00");
+    await user.clear(screen.getByLabelText(/^Bookings open/));
     await user.type(
       screen.getByLabelText(/^Bookings open/),
       "2030-06-01T10:00"
     );
+    await user.clear(screen.getByLabelText(/^Bookings close/));
     await user.type(
       screen.getByLabelText(/^Bookings close/),
       "2030-06-01T18:00"
@@ -86,6 +88,36 @@ describe("the days manager", { tags: ["015-US4"] }, () => {
       endBookings: "2030-06-01T16:00:00.000Z",
     });
     expect(screen.queryByText("New day")).toBeNull();
+  });
+
+  it("fills the booking window from the day until it is edited", async () => {
+    const user = userEvent.setup();
+    const { calls } = setup([]);
+
+    await user.click(screen.getByRole("button", { name: "Add day" }));
+    await user.type(screen.getByLabelText(/^Start/), "2030-06-01T09:00");
+    await user.type(screen.getByLabelText(/^End/), "2030-06-01T19:00");
+
+    expect(
+      screen.getByLabelText<HTMLInputElement>(/^Bookings open/).value
+    ).toBe("2030-06-01T09:00");
+    expect(
+      screen.getByLabelText<HTMLInputElement>(/^Bookings close/).value
+    ).toBe("2030-06-01T19:00");
+
+    const close = screen.getByLabelText(/^Bookings close/);
+    await user.clear(close);
+    await user.type(close, "2030-06-01T18:00");
+    const end = screen.getByLabelText(/^End/);
+    await user.clear(end);
+    await user.type(end, "2030-06-01T20:00");
+    await user.click(screen.getAllByRole("button", { name: "Add day" })[0]);
+
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect(calls[0].body).toMatchObject({
+      startBookings: "2030-06-01T07:00:00.000Z",
+      endBookings: "2030-06-01T16:00:00.000Z",
+    });
   });
 
   it("asks for the missing fields without calling the server", async () => {

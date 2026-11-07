@@ -30,6 +30,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   or a username only. Such guests sign in with a join link and can set a password themselves.
 - **Choose events when adding or editing a user** (#1335): the event checkboxes stay ticked after
   adding a user, so several users can join the same events quickly.
+- **New days default their booking window** (#1330): "Bookings open" and "Bookings close" follow the
+  day's start and end until you edit them.
 - **Failed changes now say what failed**: a refused or unsaved RSVP, comment or attendee count names
   the session and the reason, and says when it might not have been saved.
 - **Admins see when a newer release is out** (#788): a red dot beside the footer's version names the

@@ -217,6 +217,8 @@ the timeout, not the cause. Unresolved.
   field counts once focused and now differing from its value then; number, search and combobox
   fields are exempt. Failed saves keep the text, so they still prompt.
 
+- Step 28: only the add-day form follows (edit forms keep stored values); `edited` is a ref.
+
 ## Questions
 
 Step 27 follow-up: Prev/Next and swiping in the profile modal still drop a typed comment without
