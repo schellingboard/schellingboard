@@ -5,9 +5,9 @@ download, most with a chart. A filter removes locations, hosts and session origi
 shifts) from all figures. The same page works for a past event after an upgrade. Every step leaves
 the app shippable.
 
-Read first: `docs/dev/statistics-proposal.md` (the design and the figure catalogue), ADR 0007
-(attendee count), 0012, 0017, 0018; `docs/dev/server.md`, `docs/dev/web-app.md`,
-`docs/dev/testing.md`; `docs/dev/attendance-model/README.md` (why correlations need caution).
+Read first: `docs/dev/statistics.md` (the figure catalogue), ADR 0019, ADR 0007 (attendee count),
+0012, 0017, 0018; `docs/dev/server.md`, `docs/dev/web-app.md`, `docs/dev/testing.md`;
+`docs/dev/attendance-model/README.md` (why correlations need caution).
 
 ## Settled
 
@@ -17,7 +17,7 @@ table and request, sorted by value, not joinable; free-text values only with k �
 the server, in the URL only; an excluded host also leaves the people figures; CSV and ZIP (fflate)
 from the server; the attendance model's prediction next to the reported attendance (site admins see
 the reported count per session, which supersedes part of ADR 0007 §3); a mature chart library,
-chosen by the spike in step 2, in a lazy chunk.
+chosen by the spike in step 2, loaded by dynamic import from the chart wrappers.
 
 No real database is available (privacy). The real data is the user's: they upgrade their 3.8.1
 database and use the page themselves. The run checks old data through the release-upgrade fixtures
@@ -48,11 +48,9 @@ database and use the page themselves. The run checks old data through the releas
 - [x] 1. Lazy chunk: admin pages load via `lazyRouteComponent` in `router.tsx`; main bundle 930.7 kB
       -> 838.4 kB (gzip 282.0 -> 261.6), admin chunk 94.9 kB.
 - [x] 2. Chart spike: Observable Plot chosen (+94 kB gzip vs Recharts +107; native heatmap,
-      regression, bins); findings in `docs/dev/statistics-proposal.md`.
-- [ ] 3. ADR 0019 (statistics) records the decisions above, the filter semantics, the session origin
-      heuristic, the table contract, CSV and ZIP rules and the chart library with the spike's
-      findings; ADR 0007 §3 gets a note that 0019 supersedes it in part; the proposal doc points to
-      it and keeps only "Later". Doc only.
+      regression, bins); findings in ADR 0019.
+- [x] 3. ADR 0019 (statistics) written; ADR 0007 §3 noted; figures moved to
+      `docs/dev/statistics.md`; the proposal doc keeps only "Later".
 - [ ] 4. Pure functions in `packages/domain/src/stats/`: intervals (overlap, gaps inside windows,
       utilization, concurrency, back-to-back), Spearman ρ, binning, pseudonyms, k-suppression,
       session origin, CSV encoding (RFC 4180, BOM, formula-injection guard), the attendance
@@ -68,18 +66,19 @@ database and use the page themselves. The run checks old data through the releas
 - [ ] 6. Dev seed: one seeded event gets "Volunteers 1" and "Volunteers 2" locations with shift
       sessions hosted by an organizer account, attendee counts on some ended sessions, and 1-on-1
       requests, so the filter and every section can be tried and tested.
-- [ ] 7. SPA skeleton: "Statistics" tab (`features/admin/event-stats.tsx`, in the admin lazy chunk),
+- [ ] 7. SPA skeleton: "Statistics" tab (`features/admin/event-stats.tsx`, in the admin chunk),
       section navigation, generic sortable table, "Download CSV", "Download all", the filter panel
       in the URL query with its one-line summary, `queries/admin-stats.ts`. E2E: open the tab,
       exclude the volunteer locations and the organizer host, download a CSV and the ZIP.
 - [ ] 8. Chart wrappers in `apps/web/src/ui/charts/` over the chosen library: ranked bars,
-      histogram, scatter with ρ and the `n < 15` note, stacked bars, heatmap, lines. Colour tokens,
-      dark mode, accessible summary. Charts on the Overview.
+      histogram, scatter with ρ and the `n < 15` note, stacked bars, heatmap, lines; Plot is
+      imported dynamically there, so only a chart-showing tab fetches it. Colour tokens, dark mode,
+      accessible summary. Charts on the Overview.
 
 ### Sections
 
-Each step: the section's figures from the proposal on the server (integration tests), then its cards
-in the SPA. Skip a figure whose chart adds nothing to its table.
+Each step: the section's figures from `docs/dev/statistics.md` on the server (integration tests),
+then its cards in the SPA. Skip a figure whose chart adds nothing to its table.
 
 - [ ] 9. Sessions: session table, popularity, origins, hosts, did hosts report, attendance, votes →
       RSVPs, duration, time and competition, closed, capacity.

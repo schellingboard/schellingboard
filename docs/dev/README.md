@@ -41,7 +41,8 @@ the repository.
 | [Diagram explorer](https://developers.schellingboard.org/diagrams/) | the same C4 model, browsable — every view, with drill-down               |
 | [Attendance model](attendance-model/README.md)                      | predicting how many people show up to a session, from its voting results |
 | [Matrix chat feasibility](exploration/matrix-chat.md)               | exploratory notes on integrating a Matrix chat server — not yet decided  |
-| [Statistics proposal](statistics-proposal.md)                       | statistics in the admin: figures, privacy rules, filter — not yet built  |
+| [Statistics: figures](statistics.md)                                | the admin statistics: data and figures (decisions in ADR 0019)           |
+| [Statistics: later](statistics-proposal.md)                         | what to collect for better statistics — not built                        |
 
 ## Elsewhere
 

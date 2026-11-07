@@ -1,6 +1,7 @@
 # ADR 0007: Attendee count storage and in-process reminder dispatch
 
-- **Status:** Accepted; decision 1 superseded by [ADR 0011](0011-change-log-and-jobs-loop.md)
+- **Status:** Accepted; decision 1 superseded by [ADR 0011](0011-change-log-and-jobs-loop.md);
+  decision 3 superseded in part by [ADR 0019](0019-statistics.md)
 - **Date:** 2026-08-25, amended 2026-09-02 (see
   [Amendment](#amendment-2026-09-02--the-in-app-channel))
 
@@ -87,6 +88,10 @@ close the window, and is more machinery than a single-process self-hosted app wa
 here rather than left to be rediscovered.
 
 ### 3. The attendee count is deliberately absent from the `Session` type
+
+> Note: [ADR 0019](0019-statistics.md) supersedes the part that keeps the count out of exports: the
+> admin statistics page, its CSV and its ZIP carry it per session. The rest stands, including the
+> test that the admin session read surface has no count.
 
 `sessions.attendee_count` is a nullable column with **no default**, so `NULL` ("not recorded") stays
 distinguishable from `0` ("held, nobody came"). It is read and written through host-scoped methods
