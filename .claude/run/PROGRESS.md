@@ -13,6 +13,8 @@
   outside the plan, commit 67e4a948.
 - Step 2 done: chart library is Observable Plot 0.6.19. Plot needs a ResizeObserver wrapper, token
   colours read via `getComputedStyle` for colour scales, no canvas legend under happy-dom.
+- Step 3 done: decisions in ADR 0019, the figure catalogue in `docs/dev/statistics.md` (split from
+  the proposal so the catalogue survives; the plan said the proposal keeps only "Later").
 
 ## Questions
 
