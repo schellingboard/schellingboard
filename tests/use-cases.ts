@@ -318,6 +318,11 @@ export const features = {
         actor: "attendee",
         priority: "P3",
       },
+      US7: {
+        title: "Attendee is asked before a dialog discards what they typed",
+        actor: "attendee",
+        priority: "P2",
+      },
     },
   },
   "011": {

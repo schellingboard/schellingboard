@@ -164,7 +164,8 @@ Contract changes first, so the rest build on the final API (ADR 0018 point 15).
       email), docs, CHANGELOG, E2E.
 - [x] 26. #1335 `eventIds` on guest create and update (an edit sets the events); event checkboxes in
       the users add and edit forms, kept after adding. E2E in admin.spec.ts.
-- [ ] 27. #1361 Dismissing a dialog with unsaved text asks first. E2E.
+- [x] 27. #1361 `Dialog` asks "Discard what you have typed?" on Esc, backdrop and close when a text
+      field the user typed in still holds text. E2E in session-comments.spec.ts.
 - [ ] 28. #1330 Admin: a new day's booking window defaults to the day's start and end.
 - [ ] 29. #1329 Admin: searchable time zone combobox on a new event.
 - [ ] 30. #1334 Placeholder image for a location without an image.

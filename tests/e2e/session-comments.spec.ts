@@ -317,3 +317,29 @@ test("nests sibling replies under the comment they answer @010-US5", async ({
   await expect(postedComment(modal, "I'd like to join.")).toBeHidden();
   await expect(postedComment(modal, "So would I.")).toBeHidden();
 });
+
+test("asks before Escape discards an unsent comment @010-US7", async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto("/Conference-Gamma");
+  await actAs(page, /Bob Test/i);
+
+  const modal = await openSession(page, CLOSING_SESSION);
+  const draft = modal.getByPlaceholder("Add a comment");
+  await draft.fill("a thought I have not sent");
+
+  await page.keyboard.press("Escape");
+  await expect(modal.getByText("Discard what you have typed?")).toBeVisible();
+  await modal.getByRole("button", { name: "Keep editing" }).click();
+  await expect(modal).toBeVisible();
+  await expect(draft).toHaveValue("a thought I have not sent");
+
+  await page.keyboard.press("Escape");
+  await modal.getByRole("button", { name: "Discard" }).click();
+  await expect(modal).toBeHidden();
+
+  const reopened = await openSession(page, CLOSING_SESSION);
+  await page.keyboard.press("Escape");
+  await expect(reopened).toBeHidden();
+});
