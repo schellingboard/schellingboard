@@ -1,4 +1,5 @@
 import Database from "better-sqlite3";
+import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import fs from "fs";
 import { nanoid } from "nanoid";
@@ -1071,7 +1072,7 @@ async function seedTestData(profile: SeedProfile) {
   type SeededMeeting = {
     other: string;
     role: "requester" | "recipient";
-    status: "accepted" | "pending";
+    status: "accepted" | "pending" | "declined" | "canceled";
     slotStart: string;
     slotEnd: string;
     meetingPoint: string;
@@ -1087,7 +1088,7 @@ async function seedTestData(profile: SeedProfile) {
         role === "requester" ? guestIdByName(other) : guestIdByName(guestName),
       status,
       createdAt: new Date().toISOString(),
-      respondedAt: status === "accepted" ? new Date().toISOString() : null,
+      respondedAt: status === "pending" ? null : new Date().toISOString(),
       ...rest,
     }));
 
@@ -1166,11 +1167,151 @@ async function seedTestData(profile: SeedProfile) {
         ])
       : [];
 
-  const meetingRows = [...parallelRows, ...screenshotRows];
+  // Every status and a few busy people, for the statistics' 1-on-1 figures.
+  const statisticsRows =
+    profile === "large"
+      ? [
+          ...meetingsOf("Marta Horvat", [
+            {
+              other: "Dmitri Volkov",
+              role: "requester",
+              status: "accepted",
+              ...slotAt(14, 0),
+              meetingPoint: "Coffee bar",
+              message: "Let's talk about hiring.",
+            },
+            {
+              other: "Chiara Bianchi",
+              role: "requester",
+              status: "declined",
+              ...slotAt(14, 30),
+              meetingPoint: "Garden bench",
+              message: "Could we chat about design systems?",
+            },
+            {
+              other: "Samuel Adeyemi",
+              role: "requester",
+              status: "canceled",
+              ...slotAt(15, 0),
+              meetingPoint: "Coffee bar",
+              message: "Mentoring session?",
+            },
+          ]),
+          ...meetingsOf("Dmitri Volkov", [
+            {
+              other: "Leilani Kahale",
+              role: "requester",
+              status: "pending",
+              ...slotAt(16, 30),
+              meetingPoint: "Coffee bar",
+              message: "Free later?",
+            },
+          ]),
+        ]
+      : [];
+
+  const meetingRows = [...parallelRows, ...screenshotRows, ...statisticsRows];
   db.insert(schema.meetings).values(meetingRows).run();
   console.log(`  ✅ Created ${meetingRows.length} 1-on-1s`);
 
+  if (profile === "large")
+    seedVolunteerShifts(db, gammaEvent.id, gammaConfig.start);
+
   console.log("✅ Test data seeded successfully");
+}
+
+// A volunteer rota run by an organizer account, plus reported attendance on
+// the first curated sessions. Draws nothing from the seeded random streams.
+function seedVolunteerShifts(
+  db: ReturnType<typeof openDb>,
+  eventId: string,
+  eventStart: Date
+) {
+  console.log("  🧺 Creating volunteer shifts and attendee reports...");
+  const organizerId = nanoid();
+  db.insert(schema.guests)
+    .values({
+      id: organizerId,
+      name: "Olga Organizer",
+      email: "olga.organizer@example.com",
+    })
+    .run();
+  db.insert(schema.eventGuests).values({ eventId, guestId: organizerId }).run();
+
+  const shiftLocations = ["Volunteers 1", "Volunteers 2"].map(
+    (name, index) => ({
+      id: `loc-volunteers-${index + 1}`,
+      name,
+      capacity: 6,
+      bookable: true,
+      sortIndex: 100 + index,
+      color: "gray",
+      description: "",
+      areaDescription: "",
+      imageUrl: "",
+    })
+  );
+  db.insert(schema.locations).values(shiftLocations).run();
+  db.insert(schema.eventLocations)
+    .values(shiftLocations.map((l) => ({ eventId, locationId: l.id })))
+    .run();
+
+  const sessionRows: (typeof schema.sessions.$inferInsert)[] = [];
+  const hostRows: (typeof schema.sessionHosts.$inferInsert)[] = [];
+  const locationLinks: (typeof schema.sessionLocations.$inferInsert)[] = [];
+  for (const day of [0, 1, 2]) {
+    for (const [index, location] of shiftLocations.entries()) {
+      for (const [hour, minute] of [
+        [9, 30],
+        [15, 0],
+      ]) {
+        const id = nanoid();
+        sessionRows.push({
+          id,
+          title: `${location.name} shift, day ${day + 1}, ${hour}:${String(minute).padStart(2, "0")}`,
+          description: "",
+          startTime: berlinTime(eventStart, day, hour, minute).toISOString(),
+          endTime: berlinTime(
+            eventStart,
+            day,
+            hour + 2,
+            minute + index * 30
+          ).toISOString(),
+          eventId,
+          capacity: 6,
+          adminManaged: true,
+          blocker: false,
+          closed: false,
+          proposalId: null,
+        });
+        hostRows.push({ sessionId: id, guestId: organizerId });
+        locationLinks.push({ sessionId: id, locationId: location.id });
+      }
+    }
+  }
+  db.insert(schema.sessions).values(sessionRows).run();
+  db.insert(schema.sessionHosts).values(hostRows).run();
+  db.insert(schema.sessionLocations).values(locationLinks).run();
+
+  const reported = db
+    .select({ id: schema.sessions.id, capacity: schema.sessions.capacity })
+    .from(schema.sessions)
+    .where(
+      and(
+        eq(schema.sessions.eventId, eventId),
+        eq(schema.sessions.blocker, false),
+        eq(schema.sessions.adminManaged, false)
+      )
+    )
+    .orderBy(schema.sessions.startTime)
+    .limit(10)
+    .all();
+  reported.forEach((session, index) => {
+    db.update(schema.sessions)
+      .set({ attendeeCount: Math.min(session.capacity ?? 30, 4 + index * 3) })
+      .where(eq(schema.sessions.id, session.id))
+      .run();
+  });
 }
 
 function scheduleBulkGammaSessions(
