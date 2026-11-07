@@ -7,6 +7,16 @@ import type {
 // (issue #370). Not a security boundary — dev/e2e seed data only.
 export const SEED_PROTECTED_PASSWORD = "seed-password";
 
+// The attendee the documentation screenshots are taken as, so the large
+// profile gives her the 1-on-1s to photograph (docs/screenshots/README.md).
+export const SCREENSHOT_GUEST = "Hana Kobayashi";
+
+export const SEED_SITE_ADMIN = {
+  name: "Site Admin",
+  email: "site.admin@example.com",
+  username: "site-admin",
+};
+
 export interface GuestConfig {
   name: string;
   email: string;

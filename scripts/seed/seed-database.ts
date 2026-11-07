@@ -20,6 +20,8 @@ import {
   guestConfigs,
   hasProfileFields,
   SEED_PROTECTED_PASSWORD,
+  SEED_SITE_ADMIN,
+  SCREENSHOT_GUEST,
   type GuestConfig,
 } from "./data/guests";
 import { gammaSessionConfigs } from "./data/gamma-schedule";
@@ -41,10 +43,6 @@ const TZ = "Europe/Berlin";
 // derives 1-on-1 slots from it, and so does the availability seeding below.
 const SLOT_INCREMENT_MINUTES = 30;
 const BREAK_MINUTES = 10;
-
-// The attendee the documentation screenshots are taken as, so the large
-// profile gives her the 1-on-1s to photograph (docs/screenshots/README.md).
-const SCREENSHOT_GUEST = "Hana Kobayashi";
 
 // The attendee whose Gamma morning is crowded with 1-on-1s, for
 // tests/e2e/meetings-column.spec.ts. Nothing else changes her diary: those
@@ -361,9 +359,7 @@ async function seedTestData(profile: SeedProfile, now = new Date()) {
   db.insert(schema.guests)
     .values({
       id: nanoid(),
-      name: "Site Admin",
-      email: "site.admin@example.com",
-      username: "site-admin",
+      ...SEED_SITE_ADMIN,
       siteAdmin: true,
       authProtected: true,
       passwordHash: await hashUserPassword(SEED_PROTECTED_PASSWORD),

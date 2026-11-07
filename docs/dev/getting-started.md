@@ -69,7 +69,9 @@ build enforces today are in [Architecture rules](architecture-rules.md).
    ```
 
    Open [http://localhost:3000](http://localhost:3000) in your browser. That is the Vite dev server
-   for the SPA; it proxies the API to the server, which runs on the next port (3001).
+   for the SPA; it proxies the API to the server, which runs on the next port (3001). When it is
+   ready, it prints the test credentials: the site password, the seeded site admin and guests, and
+   Mailpit.
 
 ## Development commands
 
