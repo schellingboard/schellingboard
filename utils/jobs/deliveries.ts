@@ -38,7 +38,7 @@ async function send(delivery: Delivery): Promise<void> {
   // The address is read now rather than when queued, so a guest who just
   // corrected it gets the mail at the new one.
   const guest = await getRepositories().guests.findById(delivery.guestId);
-  if (!guest) return;
+  if (!guest?.info.email) return;
   const { recipe } = delivery.payload as EmailPayload;
   await sendMail({ to: guest.info.email, ...buildEmail(recipe) });
 }

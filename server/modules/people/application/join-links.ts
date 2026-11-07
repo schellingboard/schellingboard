@@ -23,8 +23,6 @@ const tokenWrong = () =>
 
 const guestMissing = () => notFound("guest.notFound", "User not found");
 
-const hasEmail = (email: string) => email.trim() !== "";
-
 async function issue(
   { repos }: PeopleDeps,
   guestId: string,
@@ -54,7 +52,7 @@ export const createJoinLink = (deps: PeopleDeps) => {
     const token = await issue(deps, guest.id, event.id);
     // Best effort: a failed heads-up never blocks the link the organizer
     // is about to hand over.
-    if (loginMail.configured() && hasEmail(guest.info.email)) {
+    if (loginMail.configured() && guest.info.email) {
       try {
         await loginMail.sendJoinLinkMade({
           name: guest.name,
@@ -97,7 +95,7 @@ export const mailJoinLinks =
     const guests = everyone.filter((g) => wanted.has(g.id));
     const result = { sent: 0, withoutEmail: 0, failed: 0 };
     for (const guest of guests) {
-      if (!hasEmail(guest.info.email)) {
+      if (!guest.info.email) {
         result.withoutEmail++;
         continue;
       }

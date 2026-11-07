@@ -40,6 +40,7 @@ import {
   resolveTarget,
   type GuestTarget,
 } from "./auth-tokens";
+import { noEmail } from "./admin-guests";
 import { signIn, type SignedIn } from "./identity";
 
 const NO_USER = "No user is selected";
@@ -72,7 +73,7 @@ async function notifySecurityChange(
 ) {
   try {
     const guest = await repos.guests.findById(guestId);
-    if (guest)
+    if (guest?.info.email)
       await loginMail.sendSecurityChanged({
         name: guest.name,
         email: guest.info.email,
@@ -104,6 +105,7 @@ export const requestResetLink =
     if (guestId === null) return ok(null);
     const guest = await repos.guests.findById(guestId);
     if (!guest) return notFound("guest.notFound", "Unknown user");
+    if (!guest.info.email) return noEmail();
 
     const now = realNow();
     const emailWait = emailRetryAfter(guestId, now.getTime());
@@ -213,6 +215,41 @@ async function confirmedPassword(
   }
   return ok(guestId);
 }
+
+/** Sets a first password for a verified session, as a site without mail has no reset link. */
+export const setFirstPassword = (deps: PeopleDeps) => {
+  return async (
+    actor: Actor,
+    { newPassword }: { newPassword: string }
+  ): Promise<Result<null>> => {
+    const weak = weakPassword(newPassword);
+    if (weak) return weak;
+    const acting = await actingOrRefuse(actor, deps);
+    if (!acting.ok) return acting;
+    const guestId = acting.value;
+    if (actor.guest?.level !== "verified")
+      return forbidden(
+        "auth.verificationRequired",
+        "Sign in with a link or a code before setting a password"
+      );
+    const passwordHash = await hashUserPassword(newPassword);
+    const stored = await deps.uow.run(async (tx) => {
+      if ((await tx.guests.getAuthCredentials(guestId))?.passwordHash)
+        return conflict("auth.passwordSet", "This name already has a password");
+      await tx.guests.setAuthProtection(guestId, {
+        authProtected: true,
+        passwordHash,
+      });
+      await tx.loginSessions.deleteForGuest(guestId, actor.guest?.sessionId);
+      return ok(null);
+    });
+    if (!stored.ok) return stored;
+    await retireTokens(deps, guestId);
+    credentialsChanged(guestId);
+    await notifySecurityChange(deps, guestId, "password-changed");
+    return stored;
+  };
+};
 
 /** A changed credential retires whatever was emailed before it. */
 async function retireTokens({ repos }: PeopleDeps, guestId: string) {

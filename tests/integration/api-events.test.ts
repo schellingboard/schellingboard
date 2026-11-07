@@ -8,6 +8,8 @@ import {
   vi,
 } from "vitest";
 import { GET } from "@/tests/helpers/v1-route";
+
+vi.mock("@/utils/mailer", () => ({ isMailerConfigured: () => false }));
 import { getRepositories } from "@/db/container";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { createDay, createEvent } from "../helpers/factories";
@@ -69,6 +71,7 @@ describe("GET /api/v1/site", () => {
         title: "Unconf Hub",
         description: "All our events",
         mapImageUrl: "/media/maps/venue.webp",
+        emailEnabled: false,
       });
     }
   );

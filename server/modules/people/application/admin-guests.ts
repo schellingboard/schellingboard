@@ -28,7 +28,8 @@ import type { PeopleDeps } from "../ports";
 export interface AdminGuest {
   id: string;
   name: string;
-  email: string;
+  email: string | null;
+  username: string | null;
   authProtected: boolean;
   siteAdmin: boolean;
   hasPassword: boolean;
@@ -38,7 +39,8 @@ export interface AdminGuest {
 
 export interface GuestInput {
   name: string;
-  email: string;
+  email?: string | null;
+  username?: string | null;
 }
 
 export const adminRequired = () => forbidden("admin.required", "Unauthorized");
@@ -84,16 +86,23 @@ function parseGuest<T extends GuestInput>(
   );
 }
 
+export const noEmail = (): Failure =>
+  conflict("guest.noEmail", "This guest has no email address");
+const usernameTaken = (): Failure =>
+  conflict("username.taken", "That username is taken");
+
 function toAdminGuest(
   guest: CompleteGuest,
   eventIds: string[],
   siteAdmin: boolean,
-  hasPassword: boolean
+  hasPassword: boolean,
+  username: string | null
 ): AdminGuest {
   return {
     id: guest.id,
     name: guest.name,
     email: guest.info.email,
+    username,
     authProtected: guest.authProtected ?? false,
     siteAdmin,
     hasPassword,
@@ -111,7 +120,8 @@ async function withEvents(
     guest,
     (events.get(guest.id) ?? []).map((e) => e.id),
     await guests.getSiteAdmin(guest.id),
-    !!(await guests.getAuthCredentials(guest.id))?.passwordHash
+    !!(await guests.getAuthCredentials(guest.id))?.passwordHash,
+    await guests.getUsername(guest.id)
   );
 }
 
@@ -125,33 +135,43 @@ export const listGuests =
     );
     const admins = new Set(await repos.guests.listSiteAdminIds());
     const withPassword = new Set(await repos.guests.listPasswordIds());
+    const usernames = await repos.guests.listUsernames();
     return ok(
       guests.map((g) =>
         toAdminGuest(
           g,
           (events.get(g.id) ?? []).map((e) => e.id),
           admins.has(g.id),
-          withPassword.has(g.id)
+          withPassword.has(g.id),
+          usernames.get(g.id) ?? null
         )
       )
     );
   };
 
 export const createGuest =
-  (deps: PeopleDeps) =>
+  ({ uow }: PeopleDeps) =>
   async (actor: Actor, input: unknown): Promise<Result<AdminGuest>> => {
     if (!actor.admin) return adminRequired();
     const parsed = parseGuest(createGuestSchema, input);
     if (!parsed.ok) return parsed;
-    const { name, email } = parsed.value;
-    // findOrCreateByEmail is atomic (unique index on lower(email)), so a
-    // concurrent create with the same email can't slip past this check.
-    const { guest, created } = await deps.repos.guests.findOrCreateByEmail({
-      name,
-      info: { email },
+    const { name, email, username = null } = parsed.value;
+    return uow.run(async (tx) => {
+      // findOrCreateByEmail is atomic (unique index on lower(email)), so a
+      // concurrent create with the same email can't slip past this check.
+      const { guest, created } = await tx.guests.findOrCreateByEmail({
+        name,
+        info: { email },
+      });
+      if (!created) return emailTaken();
+      if (
+        username !== null &&
+        (await tx.guests.setUsername(guest.id, username)) === "taken"
+      )
+        return usernameTaken();
+      const stored = (await tx.guests.findById(guest.id)) ?? guest;
+      return ok(toAdminGuest(stored, [], false, false, username));
     });
-    if (!created) return emailTaken();
-    return ok(toAdminGuest(guest, [], false, false));
   };
 
 // For seeding scripts: re-running one must not fail on guests it already made.
@@ -166,6 +186,10 @@ export const ensureGuest =
     const parsed = parseGuest(createGuestSchema, input);
     if (!parsed.ok) return parsed;
     const { name, email } = parsed.value;
+    if (email === null)
+      return invalidFields("guest.invalid", [
+        { path: "email", message: "Email is required" },
+      ]);
 
     return uow.run(async (tx) => {
       let eventId: string | undefined;
@@ -199,7 +223,7 @@ export const updateGuest =
     if (!actor.admin) return adminRequired();
     const parsed = parseGuest(updateGuestSchema, input);
     if (!parsed.ok) return parsed;
-    const { id, name, email, expectedVersion } = parsed.value;
+    const { id, name, email, username, expectedVersion } = parsed.value;
 
     return uow.run(async (tx) => {
       const current = await tx.guests.findById(id);
@@ -210,9 +234,10 @@ export const updateGuest =
           await withEvents(tx.guests, current),
           "Someone changed this guest while you edited it. Copy your edits somewhere safe: reloading the page discards them."
         );
-      const existing = await tx.guests.findByEmail(email);
+      const existing = email ? await tx.guests.findByEmail(email) : undefined;
       if (existing && existing.id !== id) return emailTaken();
       const by = byAdmin(actor, now);
+      let taken = false;
       const updated = await recordingShownGuests(
         tx,
         await tx.guests.listShownEventIds(id),
@@ -220,12 +245,23 @@ export const updateGuest =
           recordingProposalCascade(
             tx,
             await tx.sessionProposals.listByHost(id),
-            () =>
-              tx.guests.update(id, { name, info: { email }, expectedVersion }),
+            async () => {
+              const row = await tx.guests.update(id, {
+                name,
+                info: { email },
+                expectedVersion,
+              });
+              if (row && username !== undefined) {
+                taken = (await tx.guests.setUsername(id, username)) === "taken";
+                return taken ? row : await tx.guests.findById(id);
+              }
+              return row;
+            },
             by
           ),
         by
       );
+      if (taken) return usernameTaken();
       if (!updated) return guestNotFound();
       return ok(await withEvents(tx.guests, updated));
     });
@@ -313,6 +349,7 @@ export const sendTestEmail =
     if (!actor.admin) return adminRequired();
     const guest = await repos.guests.findById(input.id);
     if (!guest) return guestNotFound();
+    if (!guest.info.email) return noEmail();
     try {
       await send({ name: guest.name, email: guest.info.email });
     } catch (err) {

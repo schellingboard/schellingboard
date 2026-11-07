@@ -31,7 +31,7 @@ export const guests = sqliteTable(
   {
     id: text("id").primaryKey(),
     name: text("name").notNull(),
-    email: text("email").notNull(),
+    email: text("email"),
     aboutMe: text("about_me"),
     pronouns: text("pronouns"),
     basedIn: text("based_in"),

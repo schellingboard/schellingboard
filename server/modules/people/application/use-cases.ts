@@ -15,6 +15,7 @@ import {
 } from "./bootstrap";
 import {
   changePassword,
+  setFirstPassword,
   getCredentials,
   listLoginSessions,
   requestResetLink,
@@ -50,6 +51,7 @@ export function createPeopleUseCases(deps: PeopleDeps) {
     resetPassword: resetPassword(deps),
     getCredentials: getCredentials(deps),
     changePassword: changePassword(deps),
+    setFirstPassword: setFirstPassword(deps),
     unprotect: unprotect(deps),
     setUsername: setUsername(deps),
     listLoginSessions: listLoginSessions(deps),

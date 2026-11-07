@@ -134,6 +134,7 @@ describe("admin settings actions", () => {
         createSettingsUseCases({
           repos: getRepositories(),
           maps: mapImages,
+          mailConfigured: () => true,
           uow,
         });
       const image = async () =>

@@ -1587,7 +1587,8 @@
         "properties": {
           "id": { "type": "string" },
           "name": { "type": "string" },
-          "email": { "type": "string" },
+          "email": { "type": ["string", "null"] },
+          "username": { "type": ["string", "null"] },
           "authProtected": { "type": "boolean" },
           "siteAdmin": { "type": "boolean" },
           "hasPassword": { "type": "boolean" },
@@ -1598,6 +1599,7 @@
           "id",
           "name",
           "email",
+          "username",
           "authProtected",
           "siteAdmin",
           "hasPassword",
@@ -6102,6 +6104,54 @@
           }
         },
         "security": [{ "siteAuth": [] }]
+      },
+      "post": {
+        "tags": ["auth"],
+        "description": "Sets the first password of a name that has none, and protects it. Needs a verified login (a join link or a code), not a picked name: `auth.verificationRequired` (403); `auth.passwordSet` (409) when there is a password already, which `PUT` changes.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "newPassword": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 200
+                  }
+                },
+                "required": ["newPassword"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "The password is set" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }]
       }
     },
     "/api/v1/me/credentials/unprotect": {
@@ -8608,9 +8658,16 @@
                 "type": "object",
                 "properties": {
                   "name": { "type": "string" },
-                  "email": { "type": "string" }
+                  "email": {
+                    "type": ["string", "null"],
+                    "description": "Omit, null or blank for a guest without an email"
+                  },
+                  "username": {
+                    "type": ["string", "null"],
+                    "description": "The sign-in name, unique; null clears it, and an edit that omits it keeps it"
+                  }
                 },
-                "required": ["name", "email"]
+                "required": ["name"]
               }
             }
           }
@@ -8668,13 +8725,20 @@
                 "type": "object",
                 "properties": {
                   "name": { "type": "string" },
-                  "email": { "type": "string" },
+                  "email": {
+                    "type": ["string", "null"],
+                    "description": "Omit, null or blank for a guest without an email"
+                  },
+                  "username": {
+                    "type": ["string", "null"],
+                    "description": "The sign-in name, unique; null clears it, and an edit that omits it keeps it"
+                  },
                   "expectedVersion": {
                     "type": "integer",
                     "description": "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
                   }
                 },
-                "required": ["name", "email", "expectedVersion"]
+                "required": ["name", "expectedVersion"]
               }
             }
           }
@@ -8888,7 +8952,7 @@
                 "properties": {
                   "csv": {
                     "type": "string",
-                    "description": "A header row naming `name` and `email` columns, then one guest per row"
+                    "description": "A header row naming `name` and `email` columns, then one guest per row; a blank email is a guest without one"
                   },
                   "eventIds": { "type": "array", "items": { "type": "string" } }
                 },
@@ -8908,7 +8972,7 @@
                     "created": { "type": "integer" },
                     "existing": {
                       "type": "integer",
-                      "description": "Rows matching a guest by email, left unchanged but assigned"
+                      "description": "Rows matching a guest by email, or by exact name when blank, left unchanged but assigned"
                     }
                   },
                   "required": ["created", "existing"]
@@ -9151,7 +9215,7 @@
     "/api/v1/site": {
       "get": {
         "tags": ["site"],
-        "description": "The site's title, description and venue map.",
+        "description": "The site's title, description and venue map, and whether the server can send email.",
         "responses": {
           "200": {
             "description": "The site settings",
@@ -9165,9 +9229,18 @@
                     "mapImageUrl": {
                       "type": "string",
                       "description": "Empty when there is no map"
+                    },
+                    "emailEnabled": {
+                      "type": "boolean",
+                      "description": "False when the server cannot send email"
                     }
                   },
-                  "required": ["title", "description", "mapImageUrl"]
+                  "required": [
+                    "title",
+                    "description",
+                    "mapImageUrl",
+                    "emailEnabled"
+                  ]
                 }
               }
             }

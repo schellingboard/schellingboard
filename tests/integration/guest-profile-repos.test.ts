@@ -45,7 +45,7 @@ describe("guest profile repositories", () => {
       expect(guest.name).toBe("Existing");
       const all = await guests.listFull();
       expect(
-        all.filter((g) => g.info.email.toLowerCase() === "dup@test.example")
+        all.filter((g) => g.info.email?.toLowerCase() === "dup@test.example")
       ).toHaveLength(1);
     });
   });
