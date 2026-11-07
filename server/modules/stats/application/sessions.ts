@@ -237,8 +237,11 @@ function reportsTable(
   now: Date,
   anyReported: boolean
 ): StatsTable {
+  // A report stays when its session is moved to a later time.
   const asked = rows.filter(
-    (r) => r.end && r.end.toMillis() < now.getTime() && r.hostIds.length > 0
+    (r) =>
+      r.hostIds.length > 0 &&
+      (r.reported !== null || (r.end && r.end.toMillis() < now.getTime()))
   );
   const line = (label: string, list: Row[]): Cell[] => [
     label,

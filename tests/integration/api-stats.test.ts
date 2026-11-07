@@ -407,6 +407,18 @@ describe("session statistics", { tags: ["021-US1"] }, () => {
     });
   });
 
+  it("counts a report on a session moved into the future", async () => {
+    await getRepositories().sessions.update(ids.s1, {
+      startTime: new Date(Date.UTC(2999, 0, 1, 9)),
+      endTime: new Date(Date.UTC(2999, 0, 1, 10)),
+    });
+    const s = await stats();
+    expect(row(s, "sessions-reports", "Sessions")).toMatchObject({
+      asked: 3,
+      reported: 1,
+    });
+  });
+
   it("says No data for report shares when no session has a report", async () => {
     await getRepositories().sessions.setAttendeeCount(ids.s1, null);
     const s = await stats();
