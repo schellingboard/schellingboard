@@ -9,7 +9,6 @@ const SECTIONS = [
   { path: "/locations", label: "Locations" },
   { path: "/proposals", label: "Proposals" },
   { path: "/sessions", label: "Sessions" },
-  { path: "/stats", label: "Statistics" },
 ];
 
 function EventTabs({
@@ -75,7 +74,15 @@ export function AdminEventLayout({
       <div>
         <BackLink href="/admin/events">Events</BackLink>
       </div>
-      <h1 className="text-2xl font-bold text-fg">{event.name}</h1>
+      <div className="flex flex-wrap items-baseline justify-between gap-3">
+        <h1 className="text-2xl font-bold text-fg">{event.name}</h1>
+        <a
+          href={`/admin/statistics/${event.id}`}
+          className="text-sm font-medium text-fg-muted underline-offset-4 hover:text-fg hover:underline"
+        >
+          Statistics
+        </a>
+      </div>
       <EventTabs eventId={event.id} currentPath={currentPath} />
       {children}
     </div>

@@ -29,6 +29,15 @@ const event = {
   version: 1,
 };
 
+const pastEvent = {
+  ...event,
+  id: "e0",
+  slug: "old",
+  name: "Old Con",
+  firstDayStart: "2020-05-01T08:00:00Z",
+  lastDayStart: "2020-05-03T08:00:00Z",
+};
+
 const guest = (id: string, name: string, eventIds: string[]) => ({
   id,
   name,
@@ -48,7 +57,17 @@ const answers = (call: FakeCall): Response | undefined => {
     return Response.json({ title, description: "", mapImageUrl: "" });
   }
   if (call.path === "/api/v1/events")
-    return Response.json({ events: [event], now: "2030-01-01T00:00:00Z" });
+    return Response.json({
+      events: [event, pastEvent],
+      now: "2030-01-01T00:00:00Z",
+    });
+  if (/^\/api\/v1\/admin\/events\/e\d\/stats$/.test(call.path))
+    return Response.json({
+      event: { id: "e1", name: "Spring Con", slug: "con" },
+      filterSummary: "Excluding blockers",
+      filterOptions: { locations: [], hosts: [] },
+      tables: [],
+    });
   if (call.path === "/api/v1/events/e1")
     return Response.json({ event, days: [] });
   if (call.path === "/api/v1/admin/guests")
@@ -110,5 +129,66 @@ describe("the admin pages", { tags: ["015-US1"] }, () => {
     expect(
       await screen.findByRole("link", { name: "Renamed Admin" })
     ).toBeTruthy();
+  });
+});
+
+describe("the statistics area", { tags: ["021-US1"] }, () => {
+  it("opens the statistics of the event that ran last", async () => {
+    const { router } = await open({
+      handler: answers,
+      path: "/admin/statistics",
+    });
+
+    expect(
+      await screen.findByRole("heading", { name: "Statistics" })
+    ).toBeTruthy();
+    expect(router.history.location.pathname).toBe("/admin/statistics/e0");
+  });
+
+  it("opens the event running at the server's time, not the browser's", async () => {
+    vi.useFakeTimers({ toFake: ["Date"], now: new Date("2026-01-01") });
+    try {
+      const { router } = await open({
+        handler: (call) =>
+          call.path === "/api/v1/events"
+            ? Response.json({
+                events: [event, pastEvent],
+                now: "2030-05-02T00:00:00Z",
+              })
+            : answers(call),
+        path: "/admin/statistics",
+      });
+
+      await screen.findByRole("heading", { name: "Statistics" });
+      expect(router.history.location.pathname).toBe("/admin/statistics/e1");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("switches to another event's statistics, without the old filter", async () => {
+    const { router } = await open({
+      handler: answers,
+      path: "/admin/statistics/e0?section=sessions&excludeHosts=g1",
+    });
+
+    await userEvent.selectOptions(
+      await screen.findByRole("combobox", { name: "Event" }),
+      "Spring Con"
+    );
+
+    expect(router.history.location.pathname).toBe("/admin/statistics/e1");
+    expect(router.history.location.search).toBe("?section=sessions");
+  });
+
+  it("sends the event's old Statistics tab to the statistics area", async () => {
+    const { router } = await open({
+      handler: answers,
+      path: "/admin/events/e1/stats?section=sessions",
+    });
+
+    await screen.findByRole("heading", { name: "Statistics" });
+    expect(router.history.location.pathname).toBe("/admin/statistics/e1");
+    expect(router.history.location.search).toBe("?section=sessions");
   });
 });

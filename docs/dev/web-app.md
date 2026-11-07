@@ -55,8 +55,8 @@ that the package imports `packages/domain`, `packages/contracts` and `packages/a
 
 The admin pages are the SPA's one lazy chunk (`lazyRouteComponent` over `app/admin-pages.tsx` in
 `router.tsx`). The chart wrappers (`ui/charts/`) import `@observablehq/plot` dynamically, so Plot is
-a third chunk, fetched when a Statistics tab shows a chart. Import admin code only from that
-module's graph, and never import `admin-pages` statically elsewhere, or attendees download it again.
+a third chunk, fetched when the statistics show a chart. Import admin code only from that module's
+graph, and never import `admin-pages` statically elsewhere, or attendees download it again.
 
 ## The viewer and the user picker
 

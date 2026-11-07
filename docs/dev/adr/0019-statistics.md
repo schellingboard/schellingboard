@@ -95,7 +95,8 @@ turns its session into "spontaneous" (`proposal_id` is set null); an admin can u
 - **CSV**: RFC 4180, UTF-8 with BOM (Excel), times in the event's zone as `YYYY-MM-DD HH:mm`,
   durations in minutes, plain numbers. A cell starting with `= + - @` gets a leading `'`: titles are
   user input (formula injection).
-- **SPA**: a "Statistics" tab in the admin event layout, sections as sub-navigation, a filter panel,
+- **SPA**: a "Statistics" tab in the admin event layout (since moved to its own admin area,
+  `/admin/statistics/{event}`, for the screen width), sections as sub-navigation, a filter panel,
   each figure as a card with chart, "Show table", "Download CSV".
 - **Charts**: Observable Plot (next section), loaded as described there.
 

@@ -1,7 +1,8 @@
 # Statistics in the admin: figures
 
-The design of the "Statistics" tab. The decisions (privacy rules, filter, table contract, CSV, chart
-library) are in [ADR 0019](adr/0019-statistics.md); this note lists the data and the figures.
+The design of the admin's "Statistics" area (`/admin/statistics/{event}`). The decisions (privacy
+rules, filter, table contract, CSV, chart library) are in [ADR 0019](adr/0019-statistics.md); this
+note lists the data and the figures.
 
 ## Goal
 

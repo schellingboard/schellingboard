@@ -56,6 +56,14 @@ const AdminSettingsPage = lazyRouteComponent(
   () => import("./admin-pages"),
   "AdminSettingsPage"
 );
+const AdminStatisticsHome = lazyRouteComponent(
+  () => import("./admin-pages"),
+  "AdminStatisticsHome"
+);
+const AdminStatisticsPage = lazyRouteComponent(
+  () => import("./admin-pages"),
+  "AdminStatisticsPage"
+);
 const AdminUserImportPage = lazyRouteComponent(
   () => import("./admin-pages"),
   "AdminUserImportPage"
@@ -72,6 +80,8 @@ const adminPages = [
   AdminLocationsPage,
   AdminSection,
   AdminSettingsPage,
+  AdminStatisticsHome,
+  AdminStatisticsPage,
   AdminUserImportPage,
   AdminUsersPage,
 ];
@@ -261,6 +271,17 @@ export function createAppRouter(
   const adminSettings = adminChild("admin/settings", () => (
     <AdminSettingsPage api={api} />
   ));
+  const adminStatisticsHome = adminChild("admin/statistics", () => (
+    <AdminStatisticsHome api={api} />
+  ));
+  const adminStatistics = createRoute({
+    getParentRoute: () => adminSection,
+    path: "admin/statistics/$id",
+    component: function AdminStatisticsRoute(): ReactElement {
+      const { id } = adminStatistics.useParams();
+      return <AdminStatisticsPage api={services.api} id={id} />;
+    },
+  });
   const adminHome = createRoute({
     getParentRoute: () => adminSection,
     path: "admin",
@@ -294,6 +315,8 @@ export function createAppRouter(
         adminUserImport,
         adminLocations,
         adminSettings,
+        adminStatisticsHome,
+        adminStatistics,
       ]),
       settings,
       notifications,

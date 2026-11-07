@@ -12,7 +12,11 @@ describe("the admin events list", { tags: ["015-US2"] }, () => {
     expect(query.get()).toEqual({ status: "loading" });
 
     await query.load();
-    expect(query.get()).toEqual({ status: "ready", events: [{ id: "e1" }] });
+    expect(query.get()).toEqual({
+      status: "ready",
+      events: [{ id: "e1" }],
+      now: "2030-01-01T00:00:00Z",
+    });
 
     events = [{ id: "e1" }, { id: "e2" }];
     await query.load();

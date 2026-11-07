@@ -8,12 +8,12 @@ test("reads the statistics, leaves a location and a host out and downloads the t
 }) => {
   await adminLogin(page);
   await page
-    .getByRole("listitem")
-    .filter({ hasText: "Conference Gamma" })
-    .getByRole("link", { name: "Manage" })
+    .getByRole("navigation", { name: "Admin" })
+    .getByRole("link", { name: "Statistics" })
     .click();
-  const tabs = page.getByRole("navigation", { name: "Event sections" });
-  await tabs.getByRole("link", { name: "Statistics" }).click();
+  await page
+    .getByRole("combobox", { name: "Event" })
+    .selectOption({ label: "Conference Gamma" });
 
   await expect(page.getByText("Excluding blockers")).toBeVisible();
   const headline = page.getByRole("table", { name: "Headline numbers" });

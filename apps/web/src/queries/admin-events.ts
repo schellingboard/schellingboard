@@ -8,7 +8,7 @@ export type AdminEvent = (typeof eventViewSchema)["_output"];
 export type AdminEventsState =
   | { status: "loading" }
   | { status: "error"; code: string }
-  | { status: "ready"; events: AdminEvent[] };
+  | { status: "ready"; events: AdminEvent[]; now: string };
 
 export type AdminEventsQuery = ReturnType<typeof createAdminEventsQuery>;
 
@@ -26,7 +26,7 @@ export function createAdminEventsQuery({ api }: { api: ApiClient }) {
         if (mine !== latest) return;
         state.set(
           data
-            ? { status: "ready", events: data.events }
+            ? { status: "ready", events: data.events, now: data.now }
             : { status: "error", code: problemCode(error, response.status) }
         );
       } catch {

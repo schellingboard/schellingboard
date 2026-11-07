@@ -33,6 +33,7 @@ const LINKS = [
   { href: "/admin/events", label: "Events" },
   { href: "/admin/users", label: "Users" },
   { href: "/admin/locations", label: "Locations" },
+  { href: "/admin/statistics", label: "Statistics" },
   { href: "/admin/settings", label: "Settings" },
 ];
 

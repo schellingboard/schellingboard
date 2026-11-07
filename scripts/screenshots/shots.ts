@@ -235,7 +235,10 @@ export const shots: Shot[] = [
   }),
   shot("admin-statistics", async (page) => {
     await manageGamma(page);
-    await page.getByRole("link", { name: "Statistics" }).click();
+    await page
+      .getByRole("link", { name: "Statistics", exact: true })
+      .last()
+      .click();
     await page.getByRole("heading", { name: "Headline numbers" }).waitFor();
     await page.getByRole("img").first().waitFor();
   }),

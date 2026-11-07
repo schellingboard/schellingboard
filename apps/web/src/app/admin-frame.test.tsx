@@ -56,6 +56,7 @@ describe("the admin frame", { tags: ["015-US1"] }, () => {
       ["Events", "/admin/events"],
       ["Users", "/admin/users"],
       ["Locations", "/admin/locations"],
+      ["Statistics", "/admin/statistics"],
       ["Settings", "/admin/settings"],
     ]);
     expect(

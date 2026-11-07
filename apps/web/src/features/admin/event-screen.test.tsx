@@ -99,8 +99,10 @@ describe("the admin event layout", { tags: ["015-US2"] }, () => {
       "Locations",
       "Proposals",
       "Sessions",
-      "Statistics",
     ]);
+    expect(
+      screen.getByRole("link", { name: "Statistics" }).getAttribute("href")
+    ).toBe("/admin/statistics/e1");
     expect(tabs[1].getAttribute("href")).toBe("/admin/events/e1/guests");
     expect(
       [...tabs].filter((a) => a.getAttribute("aria-current") === "page")

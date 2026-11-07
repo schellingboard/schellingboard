@@ -26,6 +26,7 @@ import { LocationAvailabilityManager } from "../features/admin/location-availabi
 import { LocationsScreen } from "../features/admin/locations-screen";
 import type { OnParams } from "../features/admin/list-paging";
 import { SettingsScreen } from "../features/admin/settings-screen";
+import { defaultStatsEvent } from "../features/admin/stats-event";
 import { createAdminEventQuery } from "../queries/admin-event";
 import { createAdminEventsQuery } from "../queries/admin-events";
 import { createAdminGuestsQuery } from "../queries/admin-guests";
@@ -68,9 +69,7 @@ export function AdminSection({ services }: { services: AppServices }) {
 }
 
 export function AdminHome() {
-  const { history } = useRouter();
-  useEffect(() => history.replace("/admin/events"), [history]);
-  return null;
+  return <Redirect to="/admin/events" />;
 }
 
 function useParamUpdates() {
@@ -166,6 +165,57 @@ export function AdminSettingsPage({ api }: { api: Api }) {
 }
 
 const TABS = ["guests", "locations", "proposals", "sessions", "stats"];
+
+function Redirect({ to }: { to: string }) {
+  const { history } = useRouter();
+  useEffect(() => history.replace(to), [history, to]);
+  return null;
+}
+
+export function AdminStatisticsHome({ api }: { api: Api }) {
+  const [events] = useQuery(() => createAdminEventsQuery({ api }));
+  if (events.status === "error") return <Failed>the events</Failed>;
+  if (events.status === "loading") return <p className="text-sm">Loading…</p>;
+  const event = defaultStatsEvent(events.events, new Date(events.now));
+  if (!event)
+    return <p className="text-sm text-fg-muted">There are no events yet.</p>;
+  return <Redirect to={`/admin/statistics/${event.id}`} />;
+}
+
+export function AdminStatisticsPage({ api, id }: { api: Api; id: string }) {
+  const [events] = useQuery(() => createAdminEventsQuery({ api }));
+  const { history } = useRouter();
+  const { params } = useUrlSearchParams();
+  const section = params.get("section");
+  return (
+    <div className="mx-auto w-full max-w-[120rem] space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <h1 className="text-2xl font-bold text-fg">Statistics</h1>
+        {events.status === "ready" && (
+          <label className="flex items-center gap-2 text-sm font-medium text-fg-muted">
+            Event
+            <select
+              value={id}
+              onChange={(e) =>
+                history.push(
+                  `/admin/statistics/${e.target.value}${section ? `?section=${encodeURIComponent(section)}` : ""}`
+                )
+              }
+              className="rounded-md border border-line bg-surface-raised py-1.5 pl-3 pr-8 text-base text-fg sm:text-sm"
+            >
+              {events.events.map((event) => (
+                <option key={event.id} value={event.id}>
+                  {event.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+      </div>
+      <StatsTab key={id} api={api} id={id} />
+    </div>
+  );
+}
 
 export function AdminEventPage({ api, id }: { api: Api; id: string }) {
   const pathname = useLocation({ select: (l) => l.pathname });
@@ -267,10 +317,15 @@ function Tab({
     case "proposals":
       return <ProposalsTab api={api} id={id} />;
     case "stats":
-      return <StatsTab key={id} api={api} id={id} />;
+      return <StatsRedirect id={id} />;
     default:
       return <SessionsTab api={api} id={id} state={state} />;
   }
+}
+
+function StatsRedirect({ id }: { id: string }) {
+  const { search } = useUrlSearchParams();
+  return <Redirect to={`/admin/statistics/${id}${search}`} />;
 }
 
 function GuestsTab({ api, id }: { api: Api; id: string }) {

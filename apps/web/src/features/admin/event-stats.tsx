@@ -179,58 +179,66 @@ export function EventStatsScreen({
         />
       </div>
 
-      <nav
-        aria-label="Statistics sections"
-        className="flex gap-1 overflow-x-auto border-b border-line-subtle"
-      >
-        {sections.map((key) => (
-          <a
-            key={key}
-            href={sectionHref(key)}
-            aria-current={key === section ? "page" : undefined}
-            className={cx(
-              "-mb-px whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium",
-              key === section
-                ? "border-line-strong text-fg"
-                : "border-transparent text-fg-subtle hover:border-line hover:text-fg-muted"
-            )}
-          >
-            {SECTION_LABELS[key] ?? key[0].toUpperCase() + key.slice(1)}
-          </a>
-        ))}
-      </nav>
+      <div className="space-y-6 lg:grid lg:grid-cols-[11rem_minmax(0,1fr)] lg:gap-8 lg:space-y-0">
+        <nav
+          aria-label="Statistics sections"
+          className="flex gap-1 overflow-x-auto border-b border-line-subtle lg:sticky lg:top-4 lg:flex-col lg:self-start lg:overflow-visible lg:border-b-0"
+        >
+          {sections.map((key) => (
+            <a
+              key={key}
+              href={sectionHref(key)}
+              aria-current={key === section ? "page" : undefined}
+              className={cx(
+                "-mb-px whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium lg:mb-0 lg:rounded-md lg:border-b-0",
+                key === section
+                  ? "border-line-strong text-fg lg:bg-surface-sunken"
+                  : "border-transparent text-fg-subtle hover:border-line hover:text-fg-muted lg:hover:bg-surface-sunken"
+              )}
+            >
+              {SECTION_LABELS[key] ?? key[0].toUpperCase() + key.slice(1)}
+            </a>
+          ))}
+        </nav>
 
-      {section === "attendees" && (
-        <p className="text-sm text-fg-muted">
-          RSVPs are intent, not attendance: people book more than they attend.
-        </p>
-      )}
+        <div className="min-w-0 space-y-6">
+          {section === "attendees" && (
+            <p className="text-sm text-fg-muted">
+              RSVPs are intent, not attendance: people book more than they
+              attend.
+            </p>
+          )}
 
-      {stats.tables
-        .filter((t) => sectionOf(t.id) === section)
-        .map((table) => (
-          <section key={table.id} className="space-y-2">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 id={`stats-${table.id}`} className="text-lg font-semibold">
-                {table.title}
-              </h2>
-              <a
-                href={statsDownloadUrl(
-                  eventId,
-                  `stats/${table.id}.csv`,
-                  filter
-                )}
-                download
-                aria-label={`Download CSV of ${table.title}`}
-                className={download}
-              >
-                Download CSV
-              </a>
-            </div>
-            {chartFor(table)}
-            <SortableStatsTable table={table} />
-          </section>
-        ))}
+          {stats.tables
+            .filter((t) => sectionOf(t.id) === section)
+            .map((table) => (
+              <section key={table.id} className="space-y-2">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <h2
+                    id={`stats-${table.id}`}
+                    className="text-lg font-semibold"
+                  >
+                    {table.title}
+                  </h2>
+                  <a
+                    href={statsDownloadUrl(
+                      eventId,
+                      `stats/${table.id}.csv`,
+                      filter
+                    )}
+                    download
+                    aria-label={`Download CSV of ${table.title}`}
+                    className={download}
+                  >
+                    Download CSV
+                  </a>
+                </div>
+                {chartFor(table)}
+                <SortableStatsTable table={table} />
+              </section>
+            ))}
+        </div>
+      </div>
     </div>
   );
 }
