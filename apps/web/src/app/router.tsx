@@ -2,20 +2,11 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
+  lazyRouteComponent,
   Outlet,
   type RouterHistory,
 } from "@tanstack/react-router";
-import type { ReactElement } from "react";
-import {
-  AdminEventPage,
-  AdminEventsPage,
-  AdminHome,
-  AdminLocationsPage,
-  AdminSection,
-  AdminSettingsPage,
-  AdminUserImportPage,
-  AdminUsersPage,
-} from "./admin-pages";
+import { Suspense, type ReactElement } from "react";
 import {
   AccountSecurityPage,
   LoginPage,
@@ -40,6 +31,50 @@ import { SchedulePage } from "./schedule-page";
 import { SessionFormPage } from "./sessions-pages";
 import { SpaLinks } from "./spa-links";
 import { defaultServices, type AppServices } from "./services";
+
+const AdminEventPage = lazyRouteComponent(
+  () => import("./admin-pages"),
+  "AdminEventPage"
+);
+const AdminEventsPage = lazyRouteComponent(
+  () => import("./admin-pages"),
+  "AdminEventsPage"
+);
+const AdminHome = lazyRouteComponent(
+  () => import("./admin-pages"),
+  "AdminHome"
+);
+const AdminLocationsPage = lazyRouteComponent(
+  () => import("./admin-pages"),
+  "AdminLocationsPage"
+);
+const AdminSection = lazyRouteComponent(
+  () => import("./admin-pages"),
+  "AdminSection"
+);
+const AdminSettingsPage = lazyRouteComponent(
+  () => import("./admin-pages"),
+  "AdminSettingsPage"
+);
+const AdminUserImportPage = lazyRouteComponent(
+  () => import("./admin-pages"),
+  "AdminUserImportPage"
+);
+const AdminUsersPage = lazyRouteComponent(
+  () => import("./admin-pages"),
+  "AdminUsersPage"
+);
+
+const adminPages = [
+  AdminEventPage,
+  AdminEventsPage,
+  AdminHome,
+  AdminLocationsPage,
+  AdminSection,
+  AdminSettingsPage,
+  AdminUserImportPage,
+  AdminUsersPage,
+];
 
 const rootRoute = createRootRoute({ component: Outlet });
 
@@ -196,8 +231,16 @@ export function createAppRouter(
   const adminSection = createRoute({
     getParentRoute: () => rootRoute,
     id: "admin-section",
+    loader: async () => {
+      await Promise.all(adminPages.map(async (page) => page.preload?.()));
+      return null;
+    },
     component: function AdminSectionRoute(): ReactElement {
-      return <AdminSection services={services} />;
+      return (
+        <Suspense fallback={null}>
+          <AdminSection services={services} />
+        </Suspense>
+      );
     },
   });
   const adminChild = (path: string, component: () => ReactElement) =>

@@ -53,6 +53,10 @@ that the package imports `packages/domain`, `packages/contracts` and `packages/a
 (never `server/`, `utils/` or `db/`), that nothing imports it, that `features/` never imports
 `api-client`, and that it declares what it imports. See [Architecture rules](architecture-rules.md).
 
+The admin pages are the SPA's one lazy chunk (`lazyRouteComponent` over `app/admin-pages.tsx` in
+`router.tsx`). Import admin code only from that module's graph, and never import `admin-pages`
+statically elsewhere, or attendees download it again.
+
 ## The viewer and the user picker
 
 Who the browser acts as comes from `GET /api/v1/me/identity` (`ViewerProvider`, `app/viewer.tsx`):
