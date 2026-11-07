@@ -24,7 +24,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "6.1.2",
-    "fake-indexeddb": "6.2.6",
+    "fake-indexeddb": "6.2.7",
     "fast-check": "4.10.2",
     "happy-dom": "21.0.4",
     "tailwindcss": "^4.3.3",
