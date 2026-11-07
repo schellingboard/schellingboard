@@ -173,7 +173,7 @@ Contract changes first, so the rest build on the final API (ADR 0018 point 15).
       row).
 - [x] 31. #1333 Form controls use `text-base sm:text-sm` (no focus zoom on phones); layout shift not
       reproduced.
-- [ ] 32. #1338 Proposal page says "proposal", not "session".
+- [x] 32. #1338 The hosting prompt and button on a proposal say "proposal" (`proposal-modal.tsx`).
 - [ ] 33. **Milestone check.** `gh issue list -R schellingboard/schellingboard --milestone v5.0.0`.
       An issue that no commit closes and that has no step gets a new step here. Full
       `make test-e2e`.

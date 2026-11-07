@@ -358,11 +358,11 @@ describe("taking on a proposal that wants a host", () => {
   it("joins as a host", { tags: ["004-US6"] }, async () => {
     const { actions } = setup("voting", { p: wanted });
     expect(
-      dialog().getByText(/Nobody is offering this session yet/)
+      dialog().getByText(/Nobody is offering to host this proposal yet/)
     ).toBeTruthy();
 
     await userEvent.click(
-      dialog().getByRole("button", { name: "Host this session" })
+      dialog().getByRole("button", { name: "Host this proposal" })
     );
 
     expect(actions.join).toHaveBeenCalledWith("p");
@@ -377,7 +377,7 @@ describe("taking on a proposal that wants a host", () => {
 
   it("needs a user, and says so", { tags: ["004-US6"] }, async () => {
     const { actions } = setup("voting", { p: wanted, patch: { me: null } });
-    const join = dialog().getByRole("button", { name: "Host this session" });
+    const join = dialog().getByRole("button", { name: "Host this proposal" });
 
     await userEvent.click(join);
 
