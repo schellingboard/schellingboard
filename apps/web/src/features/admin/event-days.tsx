@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import {
   utcToZonedInput,
   zonedInputToInstant,
@@ -30,6 +30,11 @@ const LABELS: DayForm = {
   end: "End",
   startBookings: "Bookings open",
   endBookings: "Bookings close",
+};
+
+const FOLLOWERS: Partial<Record<keyof DayForm, keyof DayForm>> = {
+  start: "startBookings",
+  end: "endBookings",
 };
 
 const formOf = (day: AdminEventDay, timezone: string): DayForm => ({
@@ -87,15 +92,18 @@ function useDayForm({
   call,
   onChanged,
   onDone,
+  followDay = false,
 }: {
   initial: DayForm;
   timezone: string;
   call: (body: DayBody, key: string) => Promise<CommandResponse<unknown>>;
   onChanged: () => void;
   onDone: () => void;
+  followDay?: boolean;
 }) {
   const [form, setForm] = useState(initial);
   const [checking, setChecking] = useState(false);
+  const edited = useRef(new Set<keyof DayForm>());
   const parsed = bodyOf(form, timezone);
   const mutation = useFormMutation({
     call: (key) => call(parsed.body as DayBody, key),
@@ -122,8 +130,17 @@ function useDayForm({
     submit,
     pending: mutation.pending,
     error: shown(mutation.error),
-    change: (key: keyof DayForm, value: string) =>
-      setForm((prev) => ({ ...prev, [key]: value })),
+    change: (key: keyof DayForm, value: string) => {
+      const follower = FOLLOWERS[key];
+      if (Object.values(FOLLOWERS).includes(key)) edited.current.add(key);
+      setForm((prev) => ({
+        ...prev,
+        [key]: value,
+        ...(followDay && follower && !edited.current.has(follower)
+          ? { [follower]: value }
+          : {}),
+      }));
+    },
   };
 }
 
@@ -167,6 +184,7 @@ function AddDayFields({
   const { ref, jump } = useJumpWithin<HTMLFormElement>();
   const f = useDayForm({
     initial: EMPTY,
+    followDay: true,
     timezone,
     call: (body, key) => calls.createDay(eventId, body, key),
     onChanged,

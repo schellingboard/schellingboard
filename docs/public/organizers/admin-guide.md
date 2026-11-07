@@ -63,12 +63,13 @@ One global row shown when there's more than one event (see
   or deleting one never changes a meeting already arranged there.
 - **Days** — per-day schedule windows, which also make up the event's dates: visible Start/End time
   range, plus a separate Bookings open/close window controlling when attendees can self-book a blank
-  bookable slot on that day. Deleting a day also deletes any sessions scheduled inside it (warned
-  before confirming); guests who RSVPed to them are notified. A day may end after midnight (e.g.
-  Friday 09:00 → Saturday 03:00). Since a session always belongs to exactly one day, that is how you
-  allow late-night sessions: extend the evening's day into the small hours instead of adding a
-  separate day for them. Hosts then pick that day and a time such as 01:00, and the session is
-  scheduled on the following calendar date.
+  bookable slot on that day (a new day starts with the same window as its Start/End until you change
+  it). Deleting a day also deletes any sessions scheduled inside it (warned before confirming);
+  guests who RSVPed to them are notified. A day may end after midnight (e.g. Friday 09:00 → Saturday
+  03:00). Since a session always belongs to exactly one day, that is how you allow late-night
+  sessions: extend the evening's day into the small hours instead of adding a separate day for them.
+  Hosts then pick that day and a time such as 01:00, and the session is scheduled on the following
+  calendar date.
 - **Deleting an event** requires typing the event name to confirm, and cascades to its days,
   proposals, sessions, RSVPs, and guest/location assignments.
 
