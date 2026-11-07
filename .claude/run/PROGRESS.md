@@ -219,6 +219,12 @@ None open. Q5 to Q8 were answered on 2026-10-29 and are in ADR 0017 and PLAN.md 
   confirm step for granting or revoking the role (both are one click to undo, and the last admin is
   protected by the server). `hasPassword` and recording the admin: step 11.
 
-- Step 23e: full `make test-e2e` 218 passed, no flakes. Mailpit was not running (not started), so
-  the mail E2E tests (`user-auth.spec.ts`, via `skipWithoutMailpit`) were skipped: "218 passed"
-  excludes them. The user decides whether to start it and rerun.
+- Step 23e: full `make test-e2e` 218 passed. Mailpit was off then; with it on, `user-auth`,
+  `attendee-count` and `update-session` specs (the `skipWithoutMailpit` ones) ran: 15 passed, none
+  skipped.
+
+- Step 24: hosts get `breakdown` while voting (presenter in `proposals/application/queries.ts`);
+  `tally` stays null then. The modal fetches the detail for a host during voting. Checks: all of
+  precommit but the full E2E; voting.spec.ts 12 passed.
+- Step 24 limits: a failed detail fetch for a host during voting shows nothing (no retry), and the
+  breakdown is not refetched while the modal is open. The "others see none" check is API-level only.

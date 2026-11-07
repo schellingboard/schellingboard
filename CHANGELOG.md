@@ -42,6 +42,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Hosts see the vote breakdown of their own proposals during voting** (#1383): turnout and the
+  split across the three choices, for hosts only; it stays hidden from everyone else until
+  scheduling.
+
 - **Site admins replace the admin password**: sign in at `/admin` as a site admin; the server logs a
   link for the first one at start, and `ADMIN_PASSWORD` now only logs a warning. Scripts sign in
   through `/api/v1/auth/login` instead of `/api/auth/login`.

@@ -46,8 +46,9 @@ export const proposalNotFound = () =>
 
 const eventNotFound = () => notFound("event.notFound", "Event not found");
 
-// As in the UI, votes stay secret until scheduling; then the breakdown is the
-// hosts' business (#370 rule), or everyone's for a proposal nobody hosts.
+// The breakdown is the hosts' business (#370 rule) from voting on, and
+// everyone's for a proposal nobody hosts once scheduling begins; the tally is
+// public only in scheduling.
 export async function presenter(
   actor: Actor,
   repos: ProposalDeps["repos"],
@@ -55,28 +56,40 @@ export async function presenter(
   now: Date,
   known?: SessionProposal[]
 ): Promise<(p: SessionProposal) => ProposalView> {
-  if (!inSchedPhase(event, now)) {
-    const voting = inVotingPhase(event, now);
+  const scheduling = inSchedPhase(event, now);
+  const voting = !scheduling && inVotingPhase(event, now);
+  if (!scheduling && !voting) {
     return (p) => ({
       ...fields(p),
-      votesCount: voting || actor.admin ? p.votesCount : null,
+      votesCount: actor.admin ? p.votesCount : null,
       tally: null,
       breakdown: null,
     });
   }
-  const [acting, guests, proposals] = await Promise.all([
-    actingGuest(actor, repos.guests),
+  const acting = await actingGuest(actor, repos.guests);
+  const viewerId = acting.ok ? acting.value : null;
+  if (voting && viewerId === null) {
+    return (p) => ({
+      ...fields(p),
+      votesCount: p.votesCount,
+      tally: null,
+      breakdown: null,
+    });
+  }
+  const [guests, proposals] = await Promise.all([
     repos.guests.listByEvent(event.id),
     known ?? repos.sessionProposals.listByEvent(event.id),
   ]);
-  const viewerId = acting.ok ? acting.value : null;
   const eventInterest = eventInterestSummary(proposals);
   return (p) => ({
     ...fields(p),
-    votesCount: actor.admin ? p.votesCount : null,
-    tally: { interested: p.interestedVotesCount, maybe: p.maybeVotesCount },
+    votesCount: voting || actor.admin ? p.votesCount : null,
+    tally: scheduling
+      ? { interested: p.interestedVotesCount, maybe: p.maybeVotesCount }
+      : null,
     breakdown:
-      p.hosts.length === 0 || p.hosts.some((h) => h.id === viewerId)
+      (scheduling && p.hosts.length === 0) ||
+      p.hosts.some((h) => h.id === viewerId)
         ? proposalVoteStats({
             attendees: guests.length,
             eventInterest,

@@ -155,7 +155,7 @@ describe("reading proposals: the vote breakdown", () => {
   );
 
   it(
-    "shows no tally or breakdown to anyone until scheduling starts",
+    "shows no tally before scheduling, and no breakdown before voting",
     { tags: ["005-US3"] },
     async () => {
       for (const phase of ["proposal", "voting"] as const) {
@@ -170,10 +170,10 @@ describe("reading proposals: the vote breakdown", () => {
           { proposalId: hosted.id },
           now()
         );
-        expect(asHost.ok && asHost.value).toMatchObject({
-          tally: null,
-          breakdown: null,
-        });
+        expect(asHost.ok && asHost.value).toMatchObject({ tally: null });
+        expect(asHost.ok && asHost.value.breakdown === null).toBe(
+          phase === "proposal"
+        );
         const listed = await proposalUseCases().listProposals(
           NOBODY,
           { eventId: event.id },

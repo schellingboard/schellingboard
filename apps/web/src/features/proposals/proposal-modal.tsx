@@ -126,11 +126,12 @@ function Details({
   const canEdit = proposal.hosts.length === 0 || isHost;
   const votingEnabled = !!guestId && inVotingPhase(event, now);
   const schedEnabled = inSchedPhase(event, now);
+  const hostVoting = isHost && inVotingPhase(event, now);
   const myVote = ownVotesFrom(snapshot).get(proposal.id);
   const { detail, retry } = useDetail(
     actions,
     proposal.id,
-    schedEnabled,
+    schedEnabled || hostVoting,
     guestId,
     proposal.hosts.map((h) => h.id).join(",")
   );
@@ -240,6 +241,11 @@ function Details({
               </p>
             )
           )}
+        </div>
+      )}
+      {hostVoting && detail?.breakdown && (
+        <div className="mt-6">
+          <VoteBreakdown stats={detail.breakdown} />
         </div>
       )}
       {schedEnabled && (

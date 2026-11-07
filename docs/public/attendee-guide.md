@@ -187,9 +187,9 @@ it stays yours to change for as long as the scheduling phase runs.
 Vote counts show how much interest there is, not how many people will walk in — voters didn't know
 what would end up running against your session.
 
-Open your own proposal during scheduling to see a **vote breakdown**: how many attendees voted and
-how many didn't, how the votes split across ❤️ ⭐ 👋, and how many people to expect if you host it —
-a range, like "expect 8–17 people".
+Open your own proposal during voting or scheduling to see a **vote breakdown**: how many attendees
+voted and how many didn't, how the votes split across ❤️ ⭐ 👋, and how many people to expect if you
+host it — a range, like "expect 8–17 people".
 
 ![Proposal popup in the scheduling phase, showing a vote breakdown with turnout, the split across Interested, Maybe and Skip, and a range of how many people to expect](../screenshots/proposal-vote-breakdown.webp)
 
@@ -201,8 +201,8 @@ on the proposal, or if nobody voted ❤️. :::
 **Keep voting ⭐ Maybe.** Today's formula happens not to use ⭐ votes, but that rests on the same
 thirteen sessions — and hosts read your ⭐ as real interest regardless.
 
-The breakdown is for the hosts; on a proposal nobody hosts yet, anyone can see it, since anyone may
-still take it on.
+The breakdown is for the hosts; during scheduling, on a proposal nobody hosts yet, anyone can see
+it, since anyone may still take it on.
 
 ![Proposals list in the scheduling phase, with a Your vote column and heart and star vote counts per proposal](../screenshots/proposals-results.webp)
 

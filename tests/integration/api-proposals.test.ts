@@ -242,6 +242,44 @@ describe("/api/v1 proposals", () => {
   );
 
   it(
+    "shows the breakdown to a proposal's hosts while voting, and to nobody else",
+    { tags: ["005-US3"] },
+    async () => {
+      const event = await createEvent({ phase: "voting" });
+      const host = await createGuest({ eventId: event.id });
+      const voter = await createGuest({ eventId: event.id });
+      const hosted = await createProposal(event.id, [host.id]);
+      const hostless = await createProposal(event.id, []);
+      for (const proposal of [hosted, hostless]) {
+        await getRepositories().votes.upsert({
+          proposalId: proposal.id,
+          guestId: voter.id,
+          choice: VoteChoice.skip,
+        });
+      }
+      const read = async (id: string, guestId: string) =>
+        (await (
+          await GET(
+            request("GET", `/proposals/${id}`, { cookie: asGuest(guestId) })
+          )
+        ).json()) as unknown;
+
+      expect(await read(hosted.id, host.id)).toMatchObject({
+        breakdown: { skip: 1, votes: 1 },
+      });
+      const others = [
+        await read(hosted.id, voter.id),
+        await read(hostless.id, host.id),
+        await read(hostless.id, voter.id),
+      ];
+      for (const seen of others) {
+        expect(seen).toMatchObject({ breakdown: null });
+        expect(JSON.stringify(seen)).not.toMatch(/skip/i);
+      }
+    }
+  );
+
+  it(
     "lets an organizer edit and delete a proposal under /admin",
     { tags: ["018-US1"] },
     async () => {
