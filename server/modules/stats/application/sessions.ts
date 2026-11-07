@@ -21,20 +21,14 @@ import {
   type SessionOrigin,
 } from "@schellingboard/domain/stats/session-origin";
 import { DateTime } from "luxon";
-
-type Column = StatsTable["columns"][number];
-type Cell = StatsTable["rows"][number][number];
-
-const col = (key: string, label: string, type: Column["type"]): Column => ({
-  key,
-  label,
-  type,
-});
-
-const round = (value: number | null, places = 1) =>
-  value === null ? null : Math.round(value * 10 ** places) / 10 ** places;
-const percent = (part: number, whole: number) =>
-  whole === 0 ? null : round((part / whole) * 100);
+import {
+  col,
+  percent,
+  round,
+  tallyVotes,
+  type Cell,
+  type Column,
+} from "./cells";
 
 interface Row {
   id: string;
@@ -70,14 +64,7 @@ function sessionRows(facts: EventFacts, filter: StatsFilterInput) {
   for (const r of facts.rsvps)
     if (people.has(r.guestId))
       rsvps.set(r.sessionId, (rsvps.get(r.sessionId) ?? 0) + 1);
-  const votes = new Map<string, { interested: number; total: number }>();
-  for (const v of facts.votes) {
-    if (!people.has(v.guestId)) continue;
-    const tally = votes.get(v.proposalId) ?? { interested: 0, total: 0 };
-    tally.total++;
-    if (v.choice === "interested") tally.interested++;
-    votes.set(v.proposalId, tally);
-  }
+  const votes = tallyVotes(facts.votes.filter((v) => people.has(v.guestId)));
   const names = new Map(
     [...facts.hosts, ...facts.locations].map((x) => [x.id, x.name])
   );

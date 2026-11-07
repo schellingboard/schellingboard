@@ -105,6 +105,8 @@ async function build() {
     s1: s1.id,
     s2: s2.id,
     s3: s3.id,
+    p1: p1.id,
+    p2: p2.id,
   };
   hostNames = ["Ada Host", "Bob Host", "Vera Volunteer"];
   nonHostNames = ["Cleo Attendee", "Dan Attendee"];
@@ -544,5 +546,122 @@ describe("session statistics", { tags: ["021-US1"] }, () => {
       for (const name of nonHostNames) expect(text).not.toContain(name);
     }
     expect(csv).toContain("Ada Host");
+  });
+});
+
+describe("proposal statistics", { tags: ["021-US1"] }, () => {
+  let p3 = "";
+
+  beforeEach(async () => {
+    const { votes } = getRepositories();
+    const { p1, p2 } = ids;
+    const b = ids.b;
+    const d = ids.d;
+    const vote = (proposalId: string, guestId: string, choice: VoteChoice) =>
+      votes.upsert({ proposalId, guestId, choice });
+    p3 = (await createProposal(eventId, [ids.v])).id;
+    await vote(p1, d, VoteChoice.interested);
+    await vote(p2, d, VoteChoice.interested);
+    await vote(p2, ids.c, VoteChoice.skip);
+    await vote(p3, b, VoteChoice.interested);
+    await vote(p3, d, VoteChoice.interested);
+  });
+
+  const table = (s: Stats, id: string) => {
+    const t = s.tables.find((x) => x.id === id);
+    expect(t, id).toBeDefined();
+    return t!;
+  };
+  const rowsOf = (s: Stats, id: string) => {
+    const t = table(s, id);
+    return t.rows.map((r) =>
+      Object.fromEntries(t.columns.map((c, i) => [c.key, r[i]]))
+    );
+  };
+  const figure = (s: Stats, id: string, label: string) =>
+    rowsOf(s, id).find((r) => Object.values(r)[0] === label)!;
+
+  it("lists each proposal with its votes, rank and what became of it", async () => {
+    const rows = rowsOf(await stats(), "proposals-table");
+    expect(rows).toHaveLength(3);
+    const first = rows.find((r) => r.hosts === "Ada Host")!;
+    expect(first).toMatchObject({
+      interested: 2,
+      maybe: 1,
+      skip: 0,
+      voters: 3,
+      interest: 66.7,
+      rank: 1,
+      session: true,
+      rsvps: 2,
+      reported: 20,
+    });
+    expect(first.created).toMatch(/^\d{4}-\d\d-\d\d \d\d:\d\d$/);
+    const second = rows.find((r) => r.hosts === "Bob Host")!;
+    expect(second).toMatchObject({ rank: 3, session: false, rsvps: null });
+  });
+
+  it("lists popular proposals that were never scheduled", async () => {
+    const rows = rowsOf(await stats(), "proposals-unscheduled");
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ hosts: "Vera Volunteer", interested: 2 });
+  });
+
+  it("counts proposals per day", async () => {
+    const days = rowsOf(await stats(), "proposals-over-time");
+    expect(days.reduce((sum, r) => sum + Number(r.proposals), 0)).toBe(3);
+  });
+
+  it("describes each voter under a pseudonym", async () => {
+    const s = await stats();
+    const rows = rowsOf(s, "proposals-voters");
+    expect(rows).toHaveLength(4);
+    expect(rows.map((r) => r.voter)).toEqual(["P001", "P002", "P003", "P004"]);
+    expect(rows.reduce((sum, r) => sum + Number(r.total), 0)).toBe(8);
+    expect(rows[0]).toMatchObject({ total: 3, coverage: 100 });
+    expect(figure(s, "proposals-choice-mix", "Interested")).toMatchObject({
+      value: 5,
+    });
+    expect(
+      figure(s, "proposals-choice-mix", "Voters who voted on every proposal")
+    ).toMatchObject({ value: 1, share: 25 });
+  });
+
+  it("summarises the hosts of proposals", async () => {
+    const s = await stats();
+    expect(figure(s, "proposals-hosts", "Hosts")).toMatchObject({ value: 3 });
+    expect(
+      figure(s, "proposals-hosts", "Proposals with more than one host")
+    ).toMatchObject({ value: 0 });
+    expect(rowsOf(s, "proposals-per-host")[0]).toMatchObject({
+      proposals: "1",
+      hosts: 3,
+    });
+  });
+
+  it("converts proposals into sessions by interest quarter", async () => {
+    const rows = rowsOf(await stats(), "proposals-conversion");
+    expect(rows[0]).toMatchObject({ proposals: 1, sessions: 1, share: 100 });
+    expect(rows.reduce((sum, r) => sum + Number(r.proposals), 0)).toBe(3);
+  });
+
+  it("drops proposals of an excluded host", async () => {
+    const s = await stats(`?excludeHosts=${ids.v}`);
+    expect(rowsOf(s, "proposals-table")).toHaveLength(2);
+    expect(rowsOf(s, "proposals-unscheduled")).toEqual([]);
+  });
+
+  it("carries no guest id and no non-host name in a per-person table", async () => {
+    const json = JSON.stringify(
+      (await stats()).tables.filter((t) => t.id.startsWith("proposals-"))
+    );
+    const csv = await (
+      await get(`/admin/events/${eventId}/stats/proposals-voters.csv`)
+    ).text();
+    for (const text of [json, csv]) {
+      for (const id of [ids.a, ids.b, ids.c, ids.d, ids.v])
+        expect(text).not.toContain(id);
+      for (const name of nonHostNames) expect(text).not.toContain(name);
+    }
   });
 });

@@ -52,25 +52,39 @@ export class SqliteStatsRepository implements StatsRepository {
       .all();
 
     const proposalRows = db
-      .select({ id: schema.sessionProposals.id })
+      .select({
+        id: schema.sessionProposals.id,
+        title: schema.sessionProposals.title,
+        createdTime: schema.sessionProposals.createdTime,
+        durationMinutes: schema.sessionProposals.durationMinutes,
+        cohostWanted: schema.sessionProposals.cohostWanted,
+      })
       .from(schema.sessionProposals)
       .where(eq(schema.sessionProposals.eventId, eventId))
       .all();
+    const proposalHostRows = db
+      .select({
+        proposalId: schema.proposalHosts.proposalId,
+        guestId: schema.proposalHosts.guestId,
+        name: schema.guests.name,
+      })
+      .from(schema.proposalHosts)
+      .innerJoin(
+        schema.sessionProposals,
+        eq(schema.proposalHosts.proposalId, schema.sessionProposals.id)
+      )
+      .innerJoin(
+        schema.guests,
+        eq(schema.proposalHosts.guestId, schema.guests.id)
+      )
+      .where(eq(schema.sessionProposals.eventId, eventId))
+      .all();
     const proposalHosts = grouped(
-      db
-        .select({
-          proposalId: schema.proposalHosts.proposalId,
-          guestId: schema.proposalHosts.guestId,
-        })
-        .from(schema.proposalHosts)
-        .innerJoin(
-          schema.sessionProposals,
-          eq(schema.proposalHosts.proposalId, schema.sessionProposals.id)
-        )
-        .where(eq(schema.sessionProposals.eventId, eventId))
-        .all()
-        .map((r) => [r.proposalId, r.guestId] as [string, string])
+      proposalHostRows.map((r) => [r.proposalId, r.guestId] as [string, string])
     );
+    const proposalHostNames = [
+      ...new Map(proposalHostRows.map((r) => [r.guestId, r.name])),
+    ].map(([id, name]) => ({ id, name }));
 
     const votes = db
       .select({
@@ -168,7 +182,10 @@ export class SqliteStatsRepository implements StatsRepository {
       .all();
 
     const proposalCommenters = db
-      .select({ id: schema.comments.authorId })
+      .select({
+        id: schema.comments.authorId,
+        proposalId: schema.proposalComments.proposalId,
+      })
       .from(schema.proposalComments)
       .innerJoin(
         schema.comments,
@@ -207,6 +224,12 @@ export class SqliteStatsRepository implements StatsRepository {
       )
       .all();
 
+    const proposalCommentCounts = new Map<string, number>();
+    for (const c of proposalCommenters)
+      proposalCommentCounts.set(
+        c.proposalId,
+        (proposalCommentCounts.get(c.proposalId) ?? 0) + 1
+      );
     const commentCounts = new Map<string, number>();
     for (const c of sessionCommenters)
       commentCounts.set(c.sessionId, (commentCounts.get(c.sessionId) ?? 0) + 1);
@@ -238,8 +261,10 @@ export class SqliteStatsRepository implements StatsRepository {
       members,
       locations,
       hosts,
+      proposalHosts: proposalHostNames,
       proposals: proposalRows.map((p) => ({
-        id: p.id,
+        ...p,
+        commentCount: proposalCommentCounts.get(p.id) ?? 0,
         hostIds: proposalHosts.get(p.id) ?? [],
       })),
       votes,

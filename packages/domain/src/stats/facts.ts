@@ -4,7 +4,16 @@ export interface EventFacts {
   members: string[];
   locations: { id: string; name: string }[];
   hosts: { id: string; name: string }[];
-  proposals: { id: string; hostIds: string[] }[];
+  proposalHosts: { id: string; name: string }[];
+  proposals: {
+    id: string;
+    title: string;
+    createdTime: string;
+    durationMinutes: number | null;
+    cohostWanted: boolean;
+    commentCount: number;
+    hostIds: string[];
+  }[];
   votes: { proposalId: string; guestId: string; choice: string }[];
   sessions: {
     id: string;

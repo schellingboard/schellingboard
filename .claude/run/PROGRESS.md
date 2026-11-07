@@ -68,6 +68,12 @@
   without votes, share 0 or no timed sessions gets no prediction. The reported count is a point, so
   "inside" means the count lies in the range. The scatter title states the report is a point, and
   the calibration table title carries "fitted on one event, n = 13".
+- Step 11 done. Shared cell helpers are in `application/cells.ts`. `EventFacts.proposals` has title,
+  created time, duration, cohost flag, comment count; `proposalHosts` holds the names of proposal
+  hosts (public). "Became a session" counts any non-blocker session of the proposal, even one the
+  filter drops; RSVPs and reports come from the kept session only. Interest quarters split the
+  proposals ranked by interested votes into four equal groups, ties broken by title. "Proposals over
+  time" fills empty days; no phase bands. Per-voter table: pseudonyms, not joinable.
 
 ## Questions
 

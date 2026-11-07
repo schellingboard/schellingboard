@@ -75,8 +75,8 @@ then its cards in the SPA. Skip a figure whose chart adds nothing to its table.
       scatters) and the two histograms.
 - [x] 10. Prediction columns in the session table (`predicted`, `low50`..`high80`), the
       `sessions-calibration` table and `PredictionScatter` (ranges, y = x).
-- [ ] 11. Proposals and voting: proposal funnel table, popular but never scheduled, late proposals,
-      proposals over time, votes per voter, choice mix, hosts and proposals, conversion.
+- [x] 11. Proposals section: 8 `proposals-*` tables (`proposals.ts`), stacked-bar, scatter, line and
+      histogram charts.
 - [ ] 12. Attendees: RSVPs per attendee, gaps, double bookings, hosts who attend. Overview gains
       "who did what".
 - [ ] 13. Locations and schedule: location table, gaps and fragments, utilization heatmap, supply

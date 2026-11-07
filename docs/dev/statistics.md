@@ -56,14 +56,15 @@ Each section is a set of figures. A figure is: a table (sortable, CSV) and, wher
   value.
 - **Late proposals get fewer votes?** Scatter: created time vs voters, ρ. Tells the organizer
   whether the proposal phase or the voting phase was too short.
-- **Proposals over time**: proposals created per day across the phases (bars, phase bands).
+- **Proposals over time**: proposals created per day per day (line; no phase bands).
 - **Votes per voter** (per-person, pseudonymous): total, interested, maybe, skip, share of proposals
   covered. Chart: histogram of totals. Also: share of voters who voted on every proposal.
 - **Choice mix**: interested / maybe / skip overall, and a histogram of each voter's interested
   share ("picky vs generous" voters).
 - **Hosts and proposals**: proposals per host (histogram), co-hosted proposals, cohost wanted vs
   cohost found.
-- **Conversion**: proposals → sessions, by interest quartile.
+- **Conversion**: proposals → sessions, by interest quartile. A proposal "became a session" if it
+  has any session, even one the filter removes; its RSVPs and report come from a kept session only.
 
 ### 3. Sessions
 

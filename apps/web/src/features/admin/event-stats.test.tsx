@@ -243,6 +243,81 @@ describe("predicted attendance", { tags: ["021-US4"] }, () => {
   });
 });
 
+describe("proposal charts", { tags: ["021-US1"] }, () => {
+  it("draws interest, lateness, timeline, voter and conversion charts", async () => {
+    const c = (
+      key: string,
+      type: "text" | "integer" | "number" | "boolean" = "integer"
+    ) => ({
+      key,
+      label: key,
+      type,
+    });
+    renderScreen("section=proposals", {
+      stats: {
+        ...stats,
+        tables: [
+          {
+            id: "proposals-table",
+            title: "Proposals",
+            columns: [
+              c("title", "text"),
+              c("daysIn", "number"),
+              c("interested"),
+              c("voters"),
+              c("session", "boolean"),
+            ],
+            rows: [
+              ["Talk A", 0, 5, 8, true],
+              ["Talk B", 2, 3, 6, false],
+            ],
+          },
+          {
+            id: "proposals-over-time",
+            title: "Proposals over time",
+            columns: [c("day", "text"), c("proposals")],
+            rows: [
+              ["2026-01-01", 1],
+              ["2026-01-02", 0],
+              ["2026-01-03", 1],
+            ],
+          },
+          {
+            id: "proposals-voters",
+            title: "Votes per voter",
+            columns: [c("voter", "text"), c("total"), c("interestedShare")],
+            rows: [
+              ["P001", 3, 100],
+              ["P002", 1, 0],
+            ],
+          },
+          {
+            id: "proposals-conversion",
+            title: "Conversion to sessions by interest",
+            columns: [
+              c("group", "text"),
+              c("proposals"),
+              c("sessions"),
+              c("share"),
+            ],
+            rows: [["Top quarter", 1, 1, 100]],
+          },
+        ],
+      },
+    });
+
+    for (const name of [
+      "Most popular proposals: Talk A 5, Talk B 3",
+      "Voters against Days after the first proposal, 2 proposals",
+      "Proposals created per day",
+      "Votes per voter, 2 voters",
+      "Share interested per voter, 2 voters",
+      "Share that became a session: Top quarter 100",
+    ])
+      expect(await screen.findByRole("img", { name })).toBeTruthy();
+  });
+});
+
 describe("downloading statistics", { tags: ["021-US2"] }, () => {
   it("links each table's CSV and the ZIP, with the filter in the address", () => {
     renderScreen("excludeLocations=l1");
