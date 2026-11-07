@@ -229,6 +229,11 @@ the timeout, not the cause. Unresolved.
 
 ## Questions
 
+Step 31 (#1333): could not reproduce a layout shift on focus (Firefox, desktop: element tops and
+heights identical before and after; no focus rule changes border width). Best guess is iOS focus
+zoom from 14px fields, so controls are 16px on phones. If the user still sees it, they must say
+which form and browser; the commit says `issue #1333`, not `fixes`.
+
 Step 27 follow-up: Prev/Next and swiping in the profile modal still drop a typed comment without
 asking.
 

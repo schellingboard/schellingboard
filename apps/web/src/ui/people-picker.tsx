@@ -102,7 +102,7 @@ export function PeoplePicker({
           aria-invalid={invalid ? true : undefined}
           aria-describedby={describedBy}
           autoComplete="off"
-          className="min-w-8 flex-1 border-none bg-transparent px-0 py-1 text-sm outline-none placeholder:text-fg-subtle focus:ring-0"
+          className="min-w-8 flex-1 border-none bg-transparent px-0 py-1 text-base sm:text-sm outline-none placeholder:text-fg-subtle focus:ring-0"
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);

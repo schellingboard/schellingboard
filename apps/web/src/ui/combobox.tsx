@@ -3,7 +3,7 @@ import { cx } from "./cx";
 import { ChevronDownIcon } from "./icons";
 
 const INPUT =
-  "w-full rounded-md border border-line bg-surface-raised p-2 text-sm text-fg focus:border-brand-accent focus:ring-brand-accent aria-[invalid=true]:border-danger-border";
+  "w-full rounded-md border border-line bg-surface-raised p-2 text-base text-fg sm:text-sm focus:border-brand-accent focus:ring-brand-accent aria-[invalid=true]:border-danger-border";
 
 /**
  * A text field with suggestions that never insists on one: whatever is typed

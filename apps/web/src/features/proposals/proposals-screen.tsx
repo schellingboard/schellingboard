@@ -320,7 +320,7 @@ function ProposalTable({
         <div className="lg:w-80">
           <SearchInput
             placeholder="Search proposals..."
-            inputClassName="p-3 border border-line rounded-md focus:ring-2 focus:ring-brand-accent focus:border-transparent"
+            inputClassName="p-3 text-base border border-line rounded-md focus:ring-2 focus:ring-brand-accent focus:border-transparent"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onClear={() => setQuery("")}
