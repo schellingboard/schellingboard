@@ -482,6 +482,76 @@ describe("1-on-1 charts", { tags: ["021-US1"] }, () => {
   });
 });
 
+describe("profile and comment charts", { tags: ["021-US1"] }, () => {
+  const c = (key: string, type: "text" | "integer" | "number" = "integer") => ({
+    key,
+    label: key,
+    type,
+  });
+
+  it("draws how many members filled in each profile field", async () => {
+    renderScreen("section=profiles", {
+      stats: {
+        ...stats,
+        tables: [
+          {
+            id: "profiles-fields",
+            title: "Members with each profile field",
+            columns: [c("field", "text"), c("members")],
+            rows: [
+              ["Photo", 1],
+              ["About me", 2],
+            ],
+          },
+        ],
+      },
+    });
+
+    expect(
+      await screen.findByRole("img", {
+        name: "Members with each profile field: Photo 1, About me 2",
+      })
+    ).toBeTruthy();
+  });
+
+  it("draws comments per day and comments per author", async () => {
+    renderScreen("section=comments", {
+      stats: {
+        ...stats,
+        tables: [
+          {
+            id: "comments-per-day",
+            title: "Comments per day",
+            columns: [c("day", "text"), c("comments")],
+            rows: [
+              ["2026-05-01", 4],
+              ["2026-05-02", 2],
+            ],
+          },
+          {
+            id: "comments-per-author",
+            title: "Comments per author",
+            columns: [c("from"), c("to"), c("authors")],
+            rows: [
+              [1, 2, 3],
+              [2, 4, 1],
+            ],
+          },
+        ],
+      },
+    });
+
+    expect(
+      await screen.findByRole("img", { name: "Comments per day" })
+    ).toBeTruthy();
+    expect(
+      await screen.findByRole("img", {
+        name: "Comments per author: 1 to 2: 3, 2 to 4: 1",
+      })
+    ).toBeTruthy();
+  });
+});
+
 describe("downloading statistics", { tags: ["021-US2"] }, () => {
   it("links each table's CSV and the ZIP, with the filter in the address", () => {
     renderScreen("excludeLocations=l1");

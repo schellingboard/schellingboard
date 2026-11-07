@@ -1,6 +1,7 @@
 import { unzipSync, strFromU8 } from "fflate";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { StatsTable } from "@schellingboard/contracts/stats";
+import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
 import { VoteChoice } from "@schellingboard/domain/vote";
 import { getRepositories } from "@/db/container";
 import { GUEST_COOKIE_NAME, verifiedGuestValue } from "../helpers/guest-cookie";
@@ -1253,3 +1254,367 @@ describe("1-on-1 statistics", { tags: ["021-US1"] }, () => {
     expect(rowsOf(s, "meetings-per-person")).toHaveLength(4);
   });
 });
+
+describe(
+  "profile, comment and notification statistics",
+  {
+    tags: ["021-US1"],
+  },
+  () => {
+    const rowsOf = (s: Stats, id: string) => {
+      const t = s.tables.find((x) => x.id === id);
+      expect(t, id).toBeDefined();
+      return t!.rows.map((r) =>
+        Object.fromEntries(t!.columns.map((c, i) => [c.key, r[i]]))
+      );
+    };
+    const row = (s: Stats, id: string, label: string) =>
+      rowsOf(s, id).find((r) => Object.values(r)[0] === label);
+    const has = (s: Stats, prefix: string) =>
+      s.tables.some((t) => t.id.startsWith(prefix));
+    const profile = (
+      id: string,
+      name: string,
+      fields: Partial<{
+        aboutMe: string;
+        avatarUrl: string;
+        pronouns: string;
+        basedIn: string;
+        languages: string[];
+        prompts: { prompt: string; answer: string }[];
+        contacts: { type: "signal"; value: string }[];
+      }>
+    ) =>
+      getRepositories().guests.updateProfile(
+        id,
+        {
+          name,
+          aboutMe: null,
+          avatarUrl: null,
+          pronouns: null,
+          basedIn: null,
+          prompts: null,
+          languages: null,
+          contacts: null,
+          ...fields,
+        },
+        new Date()
+      );
+
+    const withProfiles = async () => {
+      await profile(ids.a, "Ada Host", {
+        aboutMe: "Hello",
+        avatarUrl: "/a.png",
+        pronouns: "she/her",
+        basedIn: "Berlin",
+        languages: ["English", "German"],
+        prompts: [{ prompt: "Ask me about", answer: "bees" }],
+        contacts: [{ type: "signal", value: "+49 secret" }],
+      });
+      await profile(ids.b, "Bob Host", {
+        basedIn: "Berlin",
+        languages: ["english"],
+      });
+      await profile(ids.c, "Cleo Attendee", {
+        aboutMe: "Hi",
+        basedIn: "berlin",
+        languages: ["English", "Klingon"],
+      });
+      await profile(ids.v, "Vera Volunteer", { basedIn: "Atlantis" });
+    };
+
+    it("has no profile tables when nobody filled in a profile", async () => {
+      expect(has(await stats(), "profiles-")).toBe(false);
+    });
+
+    it("counts members with each profile field", async () => {
+      await withProfiles();
+      const s = await stats();
+      expect(row(s, "profiles-fields", "About me")).toMatchObject({
+        members: 2,
+        share: 40,
+      });
+      expect(row(s, "profiles-fields", "Based in")).toMatchObject({
+        members: 4,
+      });
+      expect(row(s, "profiles-fields", "Photo")).toMatchObject({ members: 1 });
+      expect(row(s, "profiles-fields", "Contacts")).toMatchObject({
+        members: 1,
+      });
+      expect(rowsOf(s, "profiles-filled").map((r) => r.people)).toEqual([
+        1, 1, 1, 1, 0, 0, 0, 1,
+      ]);
+      expect(rowsOf(s, "profiles-contacts")).toEqual([
+        { type: "Signal", members: 1 },
+      ]);
+    });
+
+    it("shows a language or place only when three members share it", async () => {
+      await withProfiles();
+      const s = await stats();
+      const lower = (id: string) =>
+        rowsOf(s, id).map((r) => [String(r.value).toLowerCase(), r.members]);
+      expect(lower("profiles-languages")).toEqual([
+        ["english", 3],
+        ["other", 2],
+      ]);
+      expect(lower("profiles-based-in")).toEqual([
+        ["berlin", 3],
+        ["other", 1],
+      ]);
+      const zip = await get(`/admin/events/${eventId}/stats.zip`);
+      const everything =
+        JSON.stringify(s) +
+        Object.values(unzipSync(new Uint8Array(await zip.arrayBuffer())))
+          .map((d) => strFromU8(d))
+          .join("\n");
+      for (const secret of ["Atlantis", "German", "Klingon", "+49", "bees"])
+        expect(everything).not.toContain(secret);
+    });
+
+    it("leaves an excluded host out of the profile figures", async () => {
+      await withProfiles();
+      const s = await stats(`?excludeHosts=${ids.a}`);
+      expect(row(s, "profiles-fields", "About me")).toMatchObject({
+        members: 1,
+      });
+      expect(rowsOf(s, "profiles-languages")).toEqual([
+        { value: "Other", members: 3 },
+      ]);
+    });
+
+    it("has no comment tables when nobody commented", async () => {
+      expect(has(await stats(), "comments-")).toBe(false);
+    });
+
+    describe("comments", () => {
+      beforeEach(async () => {
+        const { proposalComments, sessionComments, profileComments, comments } =
+          getRepositories();
+        const day = (hour: number) => new Date(Date.UTC(2020, 2, 10, hour));
+        const c1 = await proposalComments.create({
+          subjectId: ids.p1,
+          authorId: ids.c,
+          body: "one",
+          createdTime: day(23),
+        });
+        await proposalComments.create({
+          subjectId: ids.p1,
+          authorId: ids.a,
+          parentId: c1.id,
+          body: "reply",
+          createdTime: day(23),
+        });
+        for (const guestId of [ids.b, ids.d])
+          await comments.setLike({
+            commentId: c1.id,
+            guestId,
+            liked: true,
+            createdTime: day(23),
+          });
+        const c2 = await sessionComments.create({
+          subjectId: ids.s1,
+          authorId: ids.d,
+          body: "two",
+          createdTime: day(9),
+        });
+        await comments.update(c2.id, { body: "two!", editedTime: day(10) });
+        await sessionComments.create({
+          subjectId: ids.s3,
+          authorId: ids.c,
+          body: "three",
+          createdTime: day(9),
+        });
+        const c5 = await sessionComments.create({
+          subjectId: ids.s2,
+          authorId: ids.b,
+          body: "five",
+          createdTime: day(9),
+        });
+        await sessionComments.create({
+          subjectId: ids.s2,
+          authorId: ids.c,
+          parentId: c5.id,
+          body: "reply",
+          createdTime: day(9),
+        });
+        await comments.delete(c5.id);
+        await profileComments.create({
+          subjectId: ids.a,
+          authorId: ids.b,
+          body: "nice profile",
+          createdTime: day(9),
+        });
+      });
+
+      it("counts comments, authors, replies, likes, edits and deletions per target", async () => {
+        const s = await stats();
+        expect(row(s, "comments-targets", "Proposals")).toMatchObject({
+          comments: 2,
+          authors: 2,
+          replies: 1,
+          likes: 2,
+          edited: 0,
+          deleted: 0,
+        });
+        expect(row(s, "comments-targets", "Sessions")).toMatchObject({
+          comments: 3,
+          authors: 2,
+          replies: 1,
+          edited: 1,
+          deleted: 1,
+        });
+        expect(row(s, "comments-targets", "Profiles")).toMatchObject({
+          comments: 1,
+          authors: 1,
+        });
+      });
+
+      it("leaves out comments on filtered sessions and by excluded hosts", async () => {
+        let s = await stats(`?excludeHosts=${ids.v}`);
+        expect(row(s, "comments-targets", "Sessions")).toMatchObject({
+          comments: 2,
+        });
+        s = await stats(`?excludeHosts=${ids.b}`);
+        expect(row(s, "comments-targets", "Sessions")).toMatchObject({
+          comments: 2,
+          deleted: 0,
+        });
+        expect(row(s, "comments-targets", "Profiles")).toMatchObject({
+          comments: 0,
+        });
+        expect(row(s, "comments-targets", "Proposals")).toMatchObject({
+          likes: 1,
+        });
+      });
+
+      it("does not count a deleted account as an author", async () => {
+        await getRepositories().guests.delete(ids.d);
+        const s = await stats();
+        expect(row(s, "comments-targets", "Sessions")).toMatchObject({
+          comments: 3,
+          authors: 1,
+        });
+      });
+
+      it("counts comments per day in the event's zone", async () => {
+        await getRepositories().events.update(eventId, {
+          timezone: "Asia/Kolkata",
+        });
+        expect(rowsOf(await stats(), "comments-per-day")).toEqual([
+          { day: "2020-03-10", comments: 4 },
+          { day: "2020-03-11", comments: 2 },
+        ]);
+      });
+
+      it("groups authors by how much they commented without ids or names", async () => {
+        const s = await stats();
+        const bins = rowsOf(s, "comments-per-author");
+        expect(bins.reduce((sum, r) => sum + Number(r.authors), 0)).toBe(4);
+        expect(bins[0]).toMatchObject({ from: 1, authors: 3 });
+        expect(
+          JSON.stringify(s.tables.filter((t) => t.id.startsWith("comments-")))
+        ).not.toContain(ids.c);
+      });
+    });
+
+    describe("notifications", () => {
+      it("still lists notification tables when every member is an excluded host", async () => {
+        const solo = await createEvent({ phase: "scheduling" });
+        const host = await createGuest({ name: "Solo Host", eventId: solo.id });
+        await createSession(solo.id, { hostIds: [host.id] });
+        const res = await get(
+          `/admin/events/${solo.id}/stats?excludeHosts=${host.id}`
+        );
+        const body = (await res.json()) as Stats;
+        expect(body.tables.some((t) => t.id === "notifications-email")).toBe(
+          true
+        );
+      });
+
+      it("shows how many members have each email setting on", async () => {
+        const { guests } = getRepositories();
+        await guests.updateEmailSettings(ids.c, {
+          ...DEFAULT_EMAIL_SETTINGS,
+          rsvpChange: false,
+          commentThread: true,
+        });
+        await guests.update(ids.v, {
+          name: "Vera Volunteer",
+          info: { email: null },
+        });
+        const s = await stats();
+        expect(row(s, "notifications-email", "RSVP changes")).toMatchObject({
+          members: 4,
+          share: 80,
+        });
+        expect(
+          row(s, "notifications-email", "Replies in a thread")
+        ).toMatchObject({
+          members: 1,
+          share: 20,
+        });
+        expect(
+          row(s, "notifications-email", "Members without an email address")
+        ).toMatchObject({ members: 1, share: 20 });
+      });
+
+      it("counts members with a push subscription", async () => {
+        const { push } = getRepositories();
+        for (const [guestId, n] of [
+          [ids.a, 1],
+          [ids.a, 2],
+          [ids.b, 3],
+        ] as const)
+          await push.saveSubscription({
+            guestId,
+            endpoint: `https://push.example/${n}`,
+            p256dh: "k",
+            auth: "a",
+            createdAt: new Date(),
+          });
+        expect(
+          row(await stats(), "notifications-push", "Members with push")
+        ).toMatchObject({ members: 2, share: 40 });
+      });
+
+      it("counts notifications sent and read per type", async () => {
+        const { notifications } = getRepositories();
+        const send = async (
+          guestId: string,
+          type: "proposalComment" | "sessionComment",
+          read: boolean
+        ) => {
+          const n = await notifications.create({
+            guestId,
+            type,
+            text: "x",
+            url: "/x",
+            createdAt: new Date(),
+          });
+          if (read) await notifications.markRead(guestId, n.id, new Date());
+        };
+        await send(ids.a, "proposalComment", true);
+        await send(ids.a, "proposalComment", false);
+        await send(ids.b, "sessionComment", true);
+        let s = await stats();
+        expect(
+          row(s, "notifications-inapp", "Comment on a proposal")
+        ).toMatchObject({
+          sent: 2,
+          read: 1,
+          share: 50,
+        });
+        s = await stats(`?excludeHosts=${ids.a}`);
+        expect(
+          row(s, "notifications-inapp", "Comment on a proposal")
+        ).toBeUndefined();
+        expect(
+          row(s, "notifications-inapp", "Comment on a session")
+        ).toMatchObject({
+          sent: 1,
+        });
+      });
+    });
+  }
+);

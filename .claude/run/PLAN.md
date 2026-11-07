@@ -82,7 +82,8 @@ then its cards in the SPA. Skip a figure whose chart adds nothing to its table.
 - [x] 13. Locations section (`locations.ts`: location table with gaps and fragments, hour heatmap
       per day, supply and demand by hour); filtered sessions and blockers still occupy their room.
 - [x] 14. 1-on-1s section (`meetings.ts`, 8 `meetings-*` tables; charts for status and slots).
-- [ ] 15. Profiles, comments, notifications (one step: all three are counts over members).
+- [x] 15. Profiles, comments and notifications sections (`profiles.ts`, `comments.ts`,
+      `notifications.ts`; 11 tables; absent when no profile/comment data).
 
 ### Finish
 

@@ -51,4 +51,27 @@ export interface EventFacts {
     respondedAt: string | null;
     meetingPoint: string;
   }[];
+  profiles: {
+    guestId: string;
+    photo: boolean;
+    aboutMe: boolean;
+    pronouns: boolean;
+    basedIn: string;
+    languages: string[];
+    prompts: number;
+    contactTypes: string[];
+  }[];
+  comments: {
+    kind: "proposal" | "session" | "profile";
+    targetId: string;
+    authorId: string | null;
+    replyTo: string | null;
+    createdTime: string;
+    edited: boolean;
+    deleted: boolean;
+    likerIds: string[];
+  }[];
+  emailSettings: { guestId: string; hasEmail: boolean; on: string[] }[];
+  pushGuestIds: string[];
+  notifications: { guestId: string; type: string; read: boolean }[];
 }

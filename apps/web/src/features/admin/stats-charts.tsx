@@ -220,22 +220,27 @@ function ProposalCharts({ table }: { table: StatsTable }) {
   );
 }
 
-function ProposalTimeline({ table }: { table: StatsTable }) {
+function DayTimeline({
+  table,
+  valueKey,
+  name,
+  summary,
+}: {
+  table: StatsTable;
+  valueKey: string;
+  name: string;
+  summary: string;
+}) {
   const points = useMemo(() => {
     const day = column(table, "day");
-    const count = column(table, "proposals");
+    const count = column(table, valueKey);
     return table.rows.map((row) => ({
       x: new Date(`${day(row)}T00:00:00`),
       y: Number(count(row)),
     }));
-  }, [table]);
+  }, [table, valueKey]);
   if (points.length === 0) return null;
-  return (
-    <LineChart
-      series={[{ name: "Proposals created", points }]}
-      summary="Proposals created per day"
-    />
-  );
+  return <LineChart series={[{ name, points }]} summary={summary} />;
 }
 
 function VoterHistograms({ table }: { table: StatsTable }) {
@@ -430,7 +435,14 @@ export function chartFor(table: StatsTable): ReactNode {
     case "proposals-table":
       return <ProposalCharts table={table} />;
     case "proposals-over-time":
-      return <ProposalTimeline table={table} />;
+      return (
+        <DayTimeline
+          table={table}
+          valueKey="proposals"
+          name="Proposals created"
+          summary="Proposals created per day"
+        />
+      );
     case "proposals-voters":
       return <VoterHistograms table={table} />;
     case "proposals-conversion":
@@ -445,6 +457,19 @@ export function chartFor(table: StatsTable): ReactNode {
       return <UtilizationHeatmaps table={table} />;
     case "locations-supply-demand":
       return <SupplyDemand table={table} />;
+    case "profiles-fields":
+      return <CountBars table={table} labelKey="field" valueKey="members" />;
+    case "comments-per-day":
+      return (
+        <DayTimeline
+          table={table}
+          valueKey="comments"
+          name="Comments"
+          summary="Comments per day"
+        />
+      );
+    case "comments-per-author":
+      return <BinChart table={table} label="Comments" countKey="authors" />;
     case "meetings-status":
       return <CountBars table={table} labelKey="status" valueKey="requests" />;
     case "meetings-slots":

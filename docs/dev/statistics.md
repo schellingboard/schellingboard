@@ -145,13 +145,18 @@ availability, requests or the switch, the section has no tables.
 
 Over the event's members: share with photo, about me, pronouns, based in, languages, prompts,
 contacts; profile fields filled per person (histogram); top languages and based-in values (k ≥ 3);
-contact types used (counts by type, never values).
+contact types used (counts by type, never values). Languages and based-in values show only when at
+least 3 members share them; the rest is "Other". Section absent when nobody filled in a profile.
 
 ### 8. Comments
 
 Per target (proposal, session, profile): comments, distinct authors, replies, likes, edited,
 deleted. Comments per day. Comments per author (histogram). The most discussed proposals and
-sessions are a column in their tables, not a separate list.
+sessions are a column in their tables, not a separate list. Comments by an excluded host and
+comments on filtered sessions or proposals leave; a deleted comment keeps no author, so only its
+target filters it. Deleted counts only tombstones: a deleted comment without replies is removed from
+the database. Profile comments have no event, so on a multi-event site they count in every event the
+member belongs to. Section absent when the event has no comments.
 
 ### 9. Notifications
 
@@ -159,4 +164,5 @@ sessions are a column in their tables, not a separate list.
 - **Push**: members with at least one push subscription.
 - **In-app**: notifications sent per type and share read. Tells which notifications people act on.
   Notifications carry no event, so on a multi-event site this counts all events of the members, and
-  a guest can delete one unread: the read share is a lower bound.
+  a guest can delete one unread: the read share is a lower bound. Only members of the event count.
+  Not built: a count of members who switched notifications off after receiving them (not stored).

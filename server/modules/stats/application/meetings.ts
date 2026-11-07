@@ -7,7 +7,7 @@ import {
 } from "@schellingboard/domain/stats/filter";
 import { pseudonymize } from "@schellingboard/domain/stats/pseudonyms";
 import { DateTime } from "luxon";
-import { col, percent } from "./cells";
+import { col, doublingEdges, percent } from "./cells";
 
 const MINUTE = 60_000;
 
@@ -25,13 +25,6 @@ function statusOf(meeting: Meeting, now: Date) {
 
 const minutesBetween = (from: string, to: string) =>
   (new Date(to).getTime() - new Date(from).getTime()) / MINUTE;
-
-function slotEdges(max: number) {
-  const edges = [1];
-  while (edges[edges.length - 1] <= max)
-    edges.push(edges[edges.length - 1] * 2);
-  return edges;
-}
 
 export function meetingTables(
   facts: EventFacts,
@@ -81,7 +74,7 @@ export function meetingTables(
         ? []
         : histogram(
             offered.map((c) => c.slots),
-            slotEdges(Math.max(...offered.map((c) => c.slots)))
+            doublingEdges(Math.max(...offered.map((c) => c.slots)))
           ).map((b) => [b.from, b.to, b.count]),
   };
 

@@ -12,9 +12,12 @@ import type { Actor } from "@/server/kernel/actor";
 import { forbidden, notFound, ok, type Result } from "@/server/kernel/result";
 import type { StatsDeps } from "../ports";
 import { attendeeTables } from "./attendees";
+import { commentTables } from "./comments";
 import { locationTables } from "./locations";
 import { meetingTables } from "./meetings";
+import { notificationTables } from "./notifications";
 import { overviewTables } from "./overview";
+import { profileTables } from "./profiles";
 import { proposalTables } from "./proposals";
 import { sessionTables } from "./sessions";
 
@@ -44,6 +47,9 @@ export const eventStatistics =
         ...attendeeTables(facts, filter),
         ...locationTables(facts, filter),
         ...meetingTables(facts, filter, deps.now()),
+        ...profileTables(facts, filter),
+        ...commentTables(facts, filter),
+        ...notificationTables(facts, filter),
       ],
     });
   };

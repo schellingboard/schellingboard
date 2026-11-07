@@ -5,7 +5,7 @@
 - No pushes, no PRs (the user's rule); commits stay local. No real event database is available
   (privacy): old data is checked through the release-upgrade fixtures and the dev seed. The user's
   past event runs 3.8.1 and is upgraded to 5.0.0 before they use the page.
-- Steps 1-14 done (see PLAN.md). How to add a figure: add tables in
+- Steps 1-15 done (see PLAN.md). How to add a figure: add tables in
   `server/modules/stats/application/<section>.ts` (helpers `col`, `percent`, `round`, `tallyVotes`
   in `cells.ts`), facts in `packages/domain/src/stats/facts.ts` and
   `db/repositories/sqlite/stats.ts`, register in `statistics.ts`. The SPA groups tables into
@@ -37,6 +37,10 @@
   expired = pending with slot ended; free-text meeting points are only counted as "Other" (never
   shown); empty rows = No data when no availability and no requests; hours merge across a clock
   change.
+- Step 15: profile/comment tables are absent (not empty) when the event has no such data;
+  notification tables show whenever members exist. Languages/based-in use `suppressSmall` (display
+  casing of a group follows member order, so tests compare lowercase). Comment tombstones have no
+  author, so only target filters them. `doublingEdges` lives in `cells.ts`.
 - Fragment rule (locations): a gap is usable when a grid slot S >= gapStart - break fits a whole
   slot increment before the gap ends, grid anchored at the day's booking start.
 - Not run yet: `make test-e2e-docker` (the bundle changed with fflate; run in the Finish step).

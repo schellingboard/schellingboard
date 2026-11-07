@@ -44,3 +44,10 @@ export function tallyVotes(
   }
   return tallies;
 }
+
+export function doublingEdges(max: number) {
+  const edges = [1];
+  while (edges[edges.length - 1] <= max)
+    edges.push(edges[edges.length - 1] * 2);
+  return edges;
+}

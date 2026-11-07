@@ -1,9 +1,17 @@
-import { and, eq, isNotNull, or } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, or } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import type { EventFacts } from "@schellingboard/domain/stats/facts";
 import { meetingSlotsForDay } from "@schellingboard/domain/meeting-slots";
+import {
+  DEFAULT_EMAIL_SETTINGS,
+  type EmailSettings,
+} from "@schellingboard/domain/guest";
 import * as schema from "../../schema";
 import type { StatsRepository } from "../interfaces";
+
+const EMAIL_SETTINGS = Object.keys(
+  DEFAULT_EMAIL_SETTINGS
+) as (keyof EmailSettings)[];
 
 type DB = BetterSQLite3Database<typeof schema>;
 
@@ -325,6 +333,180 @@ export class SqliteStatsRepository implements StatsRepository {
       .where(eq(schema.meetings.eventId, eventId))
       .all();
 
+    const memberProfiles = db
+      .select({
+        guestId: schema.guests.id,
+        avatarUrl: schema.guests.avatarUrl,
+        aboutMe: schema.guests.aboutMe,
+        pronouns: schema.guests.pronouns,
+        basedIn: schema.guests.basedIn,
+        languages: schema.guests.languages,
+        prompts: schema.guests.prompts,
+        contacts: schema.guests.contacts,
+        email: schema.guests.email,
+        rsvpChange: schema.guests.emailOnRsvpChange,
+        hostChange: schema.guests.emailOnHostChange,
+        cohostAdd: schema.guests.emailOnCohostAdd,
+        proposalJoin: schema.guests.emailOnProposalJoin,
+        proposalComment: schema.guests.emailOnProposalComment,
+        sessionComment: schema.guests.emailOnSessionComment,
+        profileComment: schema.guests.emailOnProfileComment,
+        commentThread: schema.guests.emailOnCommentThread,
+        meetingRequest: schema.guests.emailOnMeetingRequest,
+        meetingResponse: schema.guests.emailOnMeetingResponse,
+        sessionHeadsUp: schema.guests.emailOnSessionHeadsUp,
+        attendeeCountReminder: schema.guests.emailOnAttendeeCountReminder,
+      })
+      .from(schema.eventGuests)
+      .innerJoin(
+        schema.guests,
+        eq(schema.eventGuests.guestId, schema.guests.id)
+      )
+      .where(eq(schema.eventGuests.eventId, eventId))
+      .all();
+    const filled = (text: string | null) => (text ?? "").trim() !== "";
+    const profiles = memberProfiles.map((g) => ({
+      guestId: g.guestId,
+      photo: filled(g.avatarUrl),
+      aboutMe: filled(g.aboutMe),
+      pronouns: filled(g.pronouns),
+      basedIn: (g.basedIn ?? "").trim(),
+      languages: (g.languages ?? []).filter(filled),
+      prompts: (g.prompts ?? []).filter((p) => filled(p.answer)).length,
+      contactTypes: (g.contacts ?? [])
+        .filter((c) => filled(c.value))
+        .map((c) => c.type),
+    }));
+    const emailSettings = memberProfiles.map((g) => ({
+      guestId: g.guestId,
+      hasEmail: filled(g.email),
+      on: EMAIL_SETTINGS.filter((key) => g[key]),
+    }));
+
+    const commentFields = {
+      id: schema.comments.id,
+      authorId: schema.comments.authorId,
+      parentId: schema.comments.parentId,
+      createdTime: schema.comments.createdTime,
+      editedTime: schema.comments.editedTime,
+      deleted: schema.comments.deleted,
+    };
+    const commentRows = [
+      ...db
+        .select({
+          ...commentFields,
+          targetId: schema.proposalComments.proposalId,
+        })
+        .from(schema.proposalComments)
+        .innerJoin(
+          schema.comments,
+          eq(schema.proposalComments.commentId, schema.comments.id)
+        )
+        .innerJoin(
+          schema.sessionProposals,
+          eq(schema.proposalComments.proposalId, schema.sessionProposals.id)
+        )
+        .where(eq(schema.sessionProposals.eventId, eventId))
+        .all()
+        .map((r) => ({ ...r, kind: "proposal" as const })),
+      ...db
+        .select({
+          ...commentFields,
+          targetId: schema.sessionComments.sessionId,
+        })
+        .from(schema.sessionComments)
+        .innerJoin(
+          schema.comments,
+          eq(schema.sessionComments.commentId, schema.comments.id)
+        )
+        .innerJoin(
+          schema.sessions,
+          eq(schema.sessionComments.sessionId, schema.sessions.id)
+        )
+        .where(eq(schema.sessions.eventId, eventId))
+        .all()
+        .map((r) => ({ ...r, kind: "session" as const })),
+      ...db
+        .select({
+          ...commentFields,
+          targetId: schema.profileComments.profileId,
+        })
+        .from(schema.profileComments)
+        .innerJoin(
+          schema.comments,
+          eq(schema.profileComments.commentId, schema.comments.id)
+        )
+        .innerJoin(
+          schema.eventGuests,
+          and(
+            eq(schema.eventGuests.guestId, schema.profileComments.profileId),
+            eq(schema.eventGuests.eventId, eventId)
+          )
+        )
+        .all()
+        .map((r) => ({ ...r, kind: "profile" as const })),
+    ];
+    const likers = new Map<string, string[]>();
+    const commentIds = commentRows.map((r) => r.id);
+    for (let i = 0; i < commentIds.length; i += 500)
+      for (const like of db
+        .select({
+          commentId: schema.commentLikes.commentId,
+          guestId: schema.commentLikes.guestId,
+        })
+        .from(schema.commentLikes)
+        .where(
+          inArray(schema.commentLikes.commentId, commentIds.slice(i, i + 500))
+        )
+        .all())
+        likers.set(like.commentId, [
+          ...(likers.get(like.commentId) ?? []),
+          like.guestId,
+        ]);
+    const comments = commentRows.map((r) => ({
+      kind: r.kind,
+      targetId: r.targetId,
+      authorId: r.authorId,
+      replyTo: r.parentId,
+      createdTime: r.createdTime,
+      edited: r.editedTime !== null,
+      deleted: r.deleted,
+      likerIds: likers.get(r.id) ?? [],
+    }));
+
+    const pushGuestIds = db
+      .selectDistinct({ id: schema.pushSubscriptions.guestId })
+      .from(schema.pushSubscriptions)
+      .innerJoin(
+        schema.eventGuests,
+        and(
+          eq(schema.eventGuests.guestId, schema.pushSubscriptions.guestId),
+          eq(schema.eventGuests.eventId, eventId)
+        )
+      )
+      .all()
+      .map((r) => r.id);
+    const notifications = db
+      .select({
+        guestId: schema.notifications.guestId,
+        type: schema.notifications.type,
+        readAt: schema.notifications.readAt,
+      })
+      .from(schema.notifications)
+      .innerJoin(
+        schema.eventGuests,
+        and(
+          eq(schema.eventGuests.guestId, schema.notifications.guestId),
+          eq(schema.eventGuests.eventId, eventId)
+        )
+      )
+      .all()
+      .map((r) => ({
+        guestId: r.guestId,
+        type: r.type,
+        read: r.readAt !== null,
+      }));
+
     const hosts = db
       .selectDistinct({ id: schema.guests.id, name: schema.guests.name })
       .from(schema.sessionHosts)
@@ -379,6 +561,11 @@ export class SqliteStatsRepository implements StatsRepository {
         .map((r) => r.id)
         .filter((id): id is string => id !== null),
       meetingSlotCounts: slotCounts,
+      profiles,
+      comments,
+      emailSettings,
+      pushGuestIds,
+      notifications,
       meetingPoints,
       meetings,
     };
