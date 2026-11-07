@@ -681,7 +681,6 @@ export const features = {
         title: "Organizer compares predicted and reported attendance",
         actor: "organizer",
         priority: "P3",
-        status: "planned",
       },
     },
   },

@@ -87,3 +87,14 @@ export function backToBackPairs(
   }
   return pairs;
 }
+
+export function meanConcurrency(list: readonly Interval[]): number | null {
+  const booked = mergeIntervals(list).reduce(
+    (sum, i) => sum + i.end - i.start,
+    0
+  );
+  if (booked === 0) return null;
+  return (
+    list.reduce((sum, i) => sum + Math.max(0, i.end - i.start), 0) / booked
+  );
+}

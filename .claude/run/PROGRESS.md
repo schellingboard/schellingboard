@@ -63,6 +63,11 @@
   sections. Not run: `statistics.spec.ts` (only a section tab was added; no covered workflow
   changed). Cuts: the popularity chart has no capacity tick or second mark; a host counts as
   reporting when any ended session of theirs has a count (the count is per session).
+- Step 10 done. Model inputs per event: N = members after the filter, P = `meanConcurrency` of the
+  kept timed sessions, s-bar = mean interest share of proposal sessions with votes; a session
+  without votes, share 0 or no timed sessions gets no prediction. The reported count is a point, so
+  "inside" means the count lies in the range. The scatter title states the report is a point, and
+  the calibration table title carries "fitted on one event, n = 13".
 
 ## Questions
 

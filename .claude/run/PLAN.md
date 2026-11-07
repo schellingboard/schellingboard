@@ -73,8 +73,8 @@ then its cards in the SPA. Skip a figure whose chart adds nothing to its table.
 - [x] 9. Sessions section: 11 tables (`sessions-*`) in
       `server/modules/stats/application/sessions.ts`, charts for the session table (popularity, 3
       scatters) and the two histograms.
-- [ ] 10. Predicted vs real attendance: prediction columns in the session table, the scatter with
-      ranges, calibration. Split from step 9 if that grows too big.
+- [x] 10. Prediction columns in the session table (`predicted`, `low50`..`high80`), the
+      `sessions-calibration` table and `PredictionScatter` (ranges, y = x).
 - [ ] 11. Proposals and voting: proposal funnel table, popular but never scheduled, late proposals,
       proposals over time, votes per voter, choice mix, hosts and proposals, conversion.
 - [ ] 12. Attendees: RSVPs per attendee, gaps, double bookings, hosts who attend. Overview gains

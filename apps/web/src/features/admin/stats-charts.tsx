@@ -2,6 +2,10 @@ import { useMemo, type ReactNode } from "react";
 import type { StatsTable } from "@schellingboard/contracts/stats";
 import { Histogram } from "../../ui/charts/histogram";
 import { RankedBars } from "../../ui/charts/ranked-bars";
+import {
+  PredictionScatter,
+  type PredictionPoint,
+} from "../../ui/charts/prediction-scatter";
 import { Scatter } from "../../ui/charts/scatter";
 
 const POPULAR_SHOWN = 12;
@@ -79,10 +83,46 @@ function SessionScatter({
   );
 }
 
+function PredictedVsReported({ table }: { table: StatsTable }) {
+  const points = useMemo(() => {
+    const get = (key: string) => column(table, key);
+    const [reported, predicted, low50, high50, low80, high80] = [
+      "reported",
+      "predicted",
+      "low50",
+      "high50",
+      "low80",
+      "high80",
+    ].map(get);
+    return table.rows.flatMap((row): PredictionPoint[] =>
+      reported(row) === null || predicted(row) === null
+        ? []
+        : [
+            {
+              reported: Number(reported(row)),
+              predicted: Number(predicted(row)),
+              low50: Number(low50(row)),
+              high50: Number(high50(row)),
+              low80: Number(low80(row)),
+              high80: Number(high80(row)),
+            },
+          ]
+    );
+  }, [table]);
+  if (points.length === 0) return null;
+  return (
+    <PredictionScatter
+      points={points}
+      summary={`Predicted against reported attendance, ${points.length} ${points.length === 1 ? "session" : "sessions"}`}
+    />
+  );
+}
+
 function SessionCharts({ table }: { table: StatsTable }) {
   return (
     <div className="space-y-4">
       <PopularSessions table={table} />
+      <PredictedVsReported table={table} />
       <SessionScatter
         table={table}
         x="rsvps"

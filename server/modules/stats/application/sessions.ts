@@ -5,7 +5,17 @@ import {
   applyFilter,
   type StatsFilterInput,
 } from "@schellingboard/domain/stats/filter";
-import { overlappingCounts } from "@schellingboard/domain/stats/intervals";
+import { TOO_FEW_TO_SAY } from "@schellingboard/domain/stats/correlation";
+import {
+  meanConcurrency,
+  overlappingCounts,
+} from "@schellingboard/domain/stats/intervals";
+import {
+  meanInterestShare,
+  predictAttendance,
+  rangeCovers,
+  type Prediction,
+} from "@schellingboard/domain/stats/attendance-prediction";
 import {
   sessionOrigin,
   type SessionOrigin,
@@ -44,8 +54,13 @@ interface Row {
   parallel: number | null;
   interest: number | null;
   votes: number | null;
+  proposalId: string | null;
   followUpSent: boolean;
   comments: number;
+  share: number | null;
+  voters: number;
+  p50: Prediction | null;
+  p80: Prediction | null;
 }
 
 function sessionRows(facts: EventFacts, filter: StatsFilterInput) {
@@ -92,8 +107,13 @@ function sessionRows(facts: EventFacts, filter: StatsFilterInput) {
       parallel: null,
       interest: tally ? percent(tally.interested, tally.total) : null,
       votes: tally?.total ?? (s.proposalId ? 0 : null),
+      proposalId: s.proposalId,
       followUpSent: s.followUpSent,
       comments: s.commentCount,
+      share: tally && tally.total > 0 ? tally.interested / tally.total : null,
+      voters: tally?.total ?? 0,
+      p50: null,
+      p80: null,
     };
   });
 
@@ -102,6 +122,31 @@ function sessionRows(facts: EventFacts, filter: StatsFilterInput) {
     timed.map((r) => ({ start: r.start!.toMillis(), end: r.end!.toMillis() }))
   );
   timed.forEach((r, i) => (r.parallel = counts[i]));
+  const competing = facts.sessions.flatMap((s) => {
+    const start = parse(s.startTime);
+    const end = parse(s.endTime);
+    return s.blocker || !start || !end
+      ? []
+      : [{ start: start.toMillis(), end: end.toMillis() }];
+  });
+  const meanParallel = meanConcurrency(competing);
+  const shareByProposal = new Map<string, number>();
+  for (const r of rows)
+    if (r.proposalId && r.share !== null)
+      shareByProposal.set(r.proposalId, r.share);
+  if (meanParallel !== null && shareByProposal.size > 0) {
+    const input = {
+      attendees: people.size,
+      parallel: meanParallel,
+      meanShare: meanInterestShare([...shareByProposal.values()]),
+    };
+    for (const r of rows) {
+      if (r.share === null) continue;
+      const own = { ...input, share: r.share, voters: r.voters };
+      r.p50 = predictAttendance(own, 0.5);
+      r.p80 = predictAttendance(own, 0.8);
+    }
+  }
   rows.sort(
     (a, b) =>
       (a.start?.toMillis() ?? Infinity) - (b.start?.toMillis() ?? Infinity) ||
@@ -298,6 +343,15 @@ export function sessionTables(
       col("interest", "Proposal interest", "percent"),
       col("votes", "Proposal votes", "integer"),
       col("comments", "Comments", "integer"),
+      col(
+        "predicted",
+        "Predicted attendance (model fitted on one event)",
+        "number"
+      ),
+      col("low50", "Predicted, 50% range from", "number"),
+      col("high50", "Predicted, 50% range to", "number"),
+      col("low80", "Predicted, 80% range from", "number"),
+      col("high80", "Predicted, 80% range to", "number"),
     ],
     rows: rows.map((r) => [
       r.title,
@@ -318,6 +372,11 @@ export function sessionTables(
       r.interest,
       r.votes,
       r.comments,
+      round(r.p50?.mid ?? null, 2),
+      round(r.p50?.low ?? null, 2),
+      round(r.p50?.high ?? null, 2),
+      round(r.p80?.low ?? null, 2),
+      round(r.p80?.high ?? null, 2),
     ]),
   };
 
@@ -409,8 +468,40 @@ export function sessionTables(
     (r) => r.reported! / r.rsvps
   );
 
+  const compared = rows.filter((r) => r.reported !== null && r.p50 && r.p80);
+  const calibrate = (label: string, expected: number, key: "p50" | "p80") => {
+    const inside = compared.filter((r) =>
+      rangeCovers(r[key]!, { min: r.reported!, max: r.reported! })
+    ).length;
+    return [
+      label,
+      compared.length,
+      inside,
+      percent(inside, compared.length),
+      expected,
+      compared.length < TOO_FEW_TO_SAY ? "too few to say" : null,
+    ];
+  };
+  const calibration: StatsTable = {
+    id: "sessions-calibration",
+    title:
+      "Predicted attendance: how often the report falls in the range (model fitted on one event, n = 13)",
+    columns: [
+      col("range", "Range", "text"),
+      col("compared", "Sessions compared", "integer"),
+      col("inside", "Reports inside", "integer"),
+      col("share", "Share inside", "percent"),
+      col("expected", "Expected share", "percent"),
+      col("note", "Note", "text"),
+    ],
+    rows: compared.length
+      ? [calibrate("50% range", 50, "p50"), calibrate("80% range", 80, "p80")]
+      : [],
+  };
+
   return [
     table,
+    calibration,
     groupedTable(
       "sessions-origins",
       "Session origins",

@@ -122,10 +122,15 @@ describe("the statistics screen", { tags: ["021-US1"] }, () => {
             col("reported"),
             col("interest"),
             col("parallel"),
+            col("predicted"),
+            col("low50"),
+            col("high50"),
+            col("low80"),
+            col("high80"),
           ],
           rows: [
-            ["Opening", 30, 20, 50, 1],
-            ["Closing", 10, null, null, 2],
+            ["Opening", 30, 20, 50, 1, 18, 12, 26, 8, 40],
+            ["Closing", 10, null, null, 2, null, null, null, null, null],
           ],
         },
         {
@@ -198,6 +203,43 @@ describe("the statistics screen", { tags: ["021-US1"] }, () => {
       screen.getByRole("table", { name: "Headline numbers" })
     ).toBeTruthy();
     expect(screen.getByRole("group", { name: "Locations" })).toBeTruthy();
+  });
+});
+
+describe("predicted attendance", { tags: ["021-US4"] }, () => {
+  it("draws predicted against reported attendance with its basis", async () => {
+    const col = (key: string) => ({
+      key,
+      label: key,
+      type: "integer" as const,
+    });
+    renderScreen("section=sessions", {
+      stats: {
+        ...stats,
+        tables: [
+          {
+            id: "sessions-table",
+            title: "Sessions",
+            columns: [
+              "reported",
+              "predicted",
+              "low50",
+              "high50",
+              "low80",
+              "high80",
+            ].map(col),
+            rows: [[20, 18, 12, 26, 8, 40]],
+          },
+        ],
+      },
+    });
+
+    expect(
+      await screen.findByRole("img", {
+        name: "Predicted against reported attendance, 1 session",
+      })
+    ).toBeTruthy();
+    expect(screen.getByText(/fitted on one event, n = 13/)).toBeTruthy();
   });
 });
 

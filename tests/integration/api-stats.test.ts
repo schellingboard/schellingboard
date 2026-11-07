@@ -468,6 +468,69 @@ describe("session statistics", { tags: ["021-US1"] }, () => {
     expect(table(s, "sessions-duration").rows.at(-1)?.[1]).toBe(240);
   });
 
+  describe("attendance prediction", { tags: ["021-US4"] }, () => {
+    it("predicts the attendance of a proposal session from its votes", async () => {
+      const s = await stats();
+      const t = table(s, "sessions-table");
+      const at = (key: string, origin: string) =>
+        t.rows.find((r) => r[1] === origin)![
+          t.columns.findIndex((c) => c.key === key)
+        ] as number | null;
+      expect(at("predicted", "proposal")).toBeCloseTo(2.83, 2);
+      expect(at("low50", "proposal")).toBeCloseTo(1.54, 2);
+      expect(at("high50", "proposal")).toBeCloseTo(5.2, 1);
+      expect(at("low80", "proposal")!).toBeLessThan(at("low50", "proposal")!);
+      expect(at("high80", "proposal")!).toBeGreaterThan(
+        at("high50", "proposal")!
+      );
+      expect(at("predicted", "organizer")).toBeNull();
+      expect(at("predicted", "spontaneous")).toBeNull();
+    });
+
+    it("checks how often the reported count lies in the predicted ranges", async () => {
+      let s = await stats();
+      expect(row(s, "sessions-calibration", "50% range")).toMatchObject({
+        note: "too few to say",
+        compared: 1,
+        inside: 0,
+        share: 0,
+        expected: 50,
+      });
+      await getRepositories().sessions.setAttendeeCount(ids.s1, 3);
+      s = await stats();
+      expect(row(s, "sessions-calibration", "80% range")).toMatchObject({
+        inside: 1,
+        share: 100,
+        expected: 80,
+      });
+    });
+
+    it("has no calibration without a report, and no prediction without votes", async () => {
+      const { sessions } = getRepositories();
+      await sessions.setAttendeeCount(ids.s1, null);
+      expect(table(await stats(), "sessions-calibration").rows).toEqual([]);
+      await sessions.setAttendeeCount(ids.s1, 20);
+      const s = await stats(`?excludeHosts=${ids.b}`);
+      const t = table(s, "sessions-table");
+      const proposal = t.rows.find((r) => r[1] === "proposal")!;
+      expect(proposal[t.columns.findIndex((c) => c.key === "predicted")]).toBe(
+        null
+      );
+    });
+
+    it("does not move a prediction when a room is excluded", async () => {
+      const base = await stats();
+      const filtered = await stats(`?excludeLocations=${ids.vol}`);
+      const predicted = (s: Stats) => {
+        const t = table(s, "sessions-table");
+        return t.rows.find((r) => r[1] === "proposal")![
+          t.columns.findIndex((c) => c.key === "predicted")
+        ];
+      };
+      expect(predicted(filtered)).toBe(predicted(base));
+    });
+  });
+
   it("carries no guest id and no non-host name in any session table", async () => {
     const json = JSON.stringify(
       (await stats()).tables.filter((t) => t.id.startsWith("sessions-"))

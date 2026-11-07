@@ -4,6 +4,7 @@ import {
   backToBackPairs,
   gapsWithin,
   maxConcurrency,
+  meanConcurrency,
   mergeIntervals,
   overlapPairs,
   overlappingCounts,
@@ -116,6 +117,31 @@ describe("intervals", { tags: ["021-US1"] }, () => {
         merged
           .slice(1)
           .forEach((m, i) => expect(m.start).toBeGreaterThan(merged[i].end));
+      })
+    );
+  });
+});
+
+describe("meanConcurrency", { tags: ["021-US4"] }, () => {
+  it("averages the sessions running over the booked time", () => {
+    expect(meanConcurrency([iv(0, 10), iv(5, 10)])).toBe(1.5);
+    expect(meanConcurrency([iv(0, 10), iv(20, 30)])).toBe(1);
+  });
+
+  it("ignores intervals that end before they start", () => {
+    expect(meanConcurrency([iv(0, 10), iv(8, 2)])).toBe(1);
+  });
+
+  it("is null without any booked time", () => {
+    expect(meanConcurrency([])).toBeNull();
+  });
+
+  it("lies between 1 and the peak", () => {
+    fc.assert(
+      fc.property(fc.array(intervalArb, { minLength: 1 }), (list) => {
+        const mean = meanConcurrency(list)!;
+        expect(mean).toBeGreaterThanOrEqual(1 - 1e-9);
+        expect(mean).toBeLessThanOrEqual(maxConcurrency(list) + 1e-9);
       })
     );
   });
