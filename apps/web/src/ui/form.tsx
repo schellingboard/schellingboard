@@ -4,7 +4,7 @@ import { MarkdownTextarea } from "./markdown-textarea";
 import { PeoplePicker, type Person } from "./people-picker";
 
 const CONTROL =
-  "w-full rounded-md border border-line bg-surface-raised p-2 text-sm text-fg focus:border-brand-accent focus:ring-brand-accent aria-[invalid=true]:border-danger-border";
+  "w-full rounded-md border border-line bg-surface-raised p-2 text-base text-fg sm:text-sm focus:border-brand-accent focus:ring-brand-accent aria-[invalid=true]:border-danger-border";
 
 type FieldProps = {
   label: string;

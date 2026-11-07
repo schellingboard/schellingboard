@@ -171,7 +171,8 @@ Contract changes first, so the rest build on the final API (ADR 0018 point 15).
 - [x] 29. #1329 The new-event form's time zone is a searchable combobox (`events-screen.tsx`).
 - [x] 30. #1334 `LocationPlaceholder` for a location without an image (admin list, schedule image
       row).
-- [ ] 31. #1333 Input fields do not move on focus (styling: no new test).
+- [x] 31. #1333 Form controls use `text-base sm:text-sm` (no focus zoom on phones); layout shift not
+      reproduced.
 - [ ] 32. #1338 Proposal page says "proposal", not "session".
 - [ ] 33. **Milestone check.** `gh issue list -R schellingboard/schellingboard --milestone v5.0.0`.
       An issue that no commit closes and that has no step gets a new step here. Full

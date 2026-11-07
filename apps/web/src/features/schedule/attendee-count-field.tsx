@@ -109,7 +109,7 @@ export function AttendeeCountField({
             onChange={(e) => setValue(e.target.value)}
             aria-invalid={message ? true : undefined}
             aria-describedby={message ? messageId : undefined}
-            className="w-24 rounded-md border border-line bg-surface-raised px-2 py-1 text-sm text-fg focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-accent"
+            className="w-24 rounded-md border border-line bg-surface-raised px-2 py-1 text-base sm:text-sm text-fg focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-accent"
           />
           <button
             type="submit"

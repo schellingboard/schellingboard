@@ -532,7 +532,7 @@ function CommentForm({
         maxLength={COMMENT_MAX_LENGTH}
         onChange={(e) => setBody(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-md border border-line p-2 text-sm focus:border-brand-accent focus:ring-brand-accent"
+        className="w-full rounded-md border border-line p-2 text-base sm:text-sm focus:border-brand-accent focus:ring-brand-accent"
       />
       <div className="mt-1 flex items-center justify-between gap-2">
         <p className="text-xs text-fg-subtle">Markdown supported</p>

@@ -80,6 +80,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **Form fields no longer zoom the page on phones** (#1333): tapping a text field used to zoom in on
+  some phones.
 - **Closing a window no longer loses what you typed** (#1361): Esc, the close button or a click
   outside asks before discarding an unsent comment or message.
 - **A double click or double submit no longer repeats the action** (#141): proposals, sessions,

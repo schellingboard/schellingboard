@@ -98,7 +98,7 @@ export function MarkdownTextarea({
             applyToTextarea(option.template, textarea.current);
           }
         }}
-        className="h-40 w-full resize-y rounded-b-md border-none bg-surface-raised px-4 py-2 font-mono text-sm outline-none ring-0 placeholder:text-fg-subtle"
+        className="h-40 w-full resize-y rounded-b-md border-none bg-surface-raised px-4 py-2 font-mono text-base sm:text-sm outline-none ring-0 placeholder:text-fg-subtle"
       />
       {previewing && (
         <div className="h-40 w-full overflow-y-auto px-4 py-2">

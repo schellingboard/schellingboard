@@ -134,7 +134,7 @@ function SearchForm({
         }}
         placeholder={placeholder}
         aria-label="Search"
-        inputClassName="px-3 py-1.5 text-sm rounded-md border border-line focus:border-line-strong focus:outline-none"
+        inputClassName="px-3 py-1.5 text-base sm:text-sm rounded-md border border-line focus:border-line-strong focus:outline-none"
       />
     </form>
   );
