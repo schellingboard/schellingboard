@@ -51,11 +51,9 @@ database and use the page themselves. The run checks old data through the releas
       regression, bins); findings in ADR 0019.
 - [x] 3. ADR 0019 (statistics) written; ADR 0007 §3 noted; figures moved to
       `docs/dev/statistics.md`; the proposal doc keeps only "Later".
-- [ ] 4. Pure functions in `packages/domain/src/stats/`: intervals (overlap, gaps inside windows,
-      utilization, concurrency, back-to-back), Spearman ρ, binning, pseudonyms, k-suppression,
-      session origin, CSV encoding (RFC 4180, BOM, formula-injection guard), the attendance
-      prediction (`attendance-prediction.ts`; a test reproduces the 2025 figures from
-      `docs/dev/attendance-model/data-2025.csv`). Unit and property tests.
+- [x] 4. Pure functions in `packages/domain/src/stats/` (intervals, correlation, binning,
+      pseudonyms, suppression, session origin, CSV, attendance prediction) with tests in
+      `tests/unit/stats/`; use case 021 added.
 - [ ] 5. Server skeleton: `server/modules/stats` (module, ports, `eventStatistics` use case, site
       admin only), `StatsRepository` read port and SQLite adapter, the filter (locations, hosts,
       origins; blockers excluded by default), `StatsTable` in `packages/contracts`,
