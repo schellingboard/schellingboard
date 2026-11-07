@@ -11,7 +11,10 @@ import type { OnParams } from "./list-paging";
 import { chartFor } from "./stats-charts";
 import { SortableStatsTable } from "./stats-table";
 
-const SECTION_LABELS: Record<string, string> = { overview: "Overview" };
+const SECTION_LABELS: Record<string, string> = {
+  overview: "Overview",
+  sessions: "Sessions",
+};
 
 const ORIGIN_LABELS = {
   blocker: "Blockers",

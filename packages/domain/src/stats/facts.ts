@@ -1,18 +1,26 @@
 export interface EventFacts {
   event: { id: string; name: string; slug: string };
+  timezone: string;
   members: string[];
   locations: { id: string; name: string }[];
   hosts: { id: string; name: string }[];
   proposals: { id: string; hostIds: string[] }[];
-  votes: { proposalId: string; guestId: string }[];
+  votes: { proposalId: string; guestId: string; choice: string }[];
   sessions: {
     id: string;
+    title: string;
+    startTime: string | null;
+    endTime: string | null;
+    capacity: number;
+    closed: boolean;
+    attendeeCount: number | null;
+    followUpSent: boolean;
+    commentCount: number;
     blocker: boolean;
     proposalId: string | null;
     adminManaged: boolean;
     hostIds: string[];
     locationIds: string[];
-    attendeeReported: boolean;
   }[];
   rsvps: { sessionId: string; guestId: string }[];
   commenterIds: string[];

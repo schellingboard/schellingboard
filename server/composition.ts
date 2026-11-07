@@ -190,6 +190,7 @@ export function statsUseCases(): StatsUseCases {
   return createStatsUseCases({
     repos: getRepositories(),
     version: getAppVersion,
+    now: () => new Date(),
   });
 }
 

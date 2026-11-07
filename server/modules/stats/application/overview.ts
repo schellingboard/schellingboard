@@ -32,7 +32,7 @@ export function overviewTables(
       ...set,
     ])
   );
-  const reported = sessions.filter((s) => s.attendeeReported).length;
+  const reported = sessions.filter((s) => s.attendeeCount !== null).length;
 
   const headline: StatsTable = {
     id: "overview-headline",

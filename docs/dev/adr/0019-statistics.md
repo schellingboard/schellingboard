@@ -31,8 +31,8 @@ in [Statistics: figures](../statistics.md). No real event database is available 
 4. **Small numbers are suppressed in free text.** Values of free-text fields (based in, meeting
    point, languages) appear only when at least 3 people share them; the rest is "Other".
 5. **Honest correlations.** A correlation shows Spearman's ρ with `n`, and below `n = 15` the text
-   "too few to say". No trend line implies cause. (See the attendance model: 13 sessions gave p ≈
-   0.07.)
+   "too few to say". A trend line is drawn only from `n = 15` and does not imply cause. (See the
+   attendance model: 13 sessions gave p ≈ 0.07.)
 
 ### Read-only, on the server
 

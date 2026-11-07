@@ -12,6 +12,7 @@ import type { Actor } from "@/server/kernel/actor";
 import { forbidden, notFound, ok, type Result } from "@/server/kernel/result";
 import type { StatsDeps } from "../ports";
 import { overviewTables } from "./overview";
+import { sessionTables } from "./sessions";
 
 export interface StatsFile {
   name: string;
@@ -19,20 +20,23 @@ export interface StatsFile {
 }
 
 export const eventStatistics =
-  ({ repos }: StatsDeps) =>
+  (deps: StatsDeps) =>
   async (
     actor: Actor,
     eventId: string,
     filter: StatsFilter
   ): Promise<Result<EventStatistics>> => {
     if (!actor.admin) return forbidden("admin.required", "Unauthorized");
-    const facts = await repos.stats.getEventFacts(eventId);
+    const facts = await deps.repos.stats.getEventFacts(eventId);
     if (!facts) return notFound("event.notFound", "Event not found");
     return ok({
       event: facts.event,
       filterSummary: filterSummary(filter),
       filterOptions: { locations: facts.locations, hosts: facts.hosts },
-      tables: overviewTables(facts, filter),
+      tables: [
+        ...overviewTables(facts, filter),
+        ...sessionTables(facts, filter, deps.now()),
+      ],
     });
   };
 

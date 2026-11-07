@@ -95,7 +95,17 @@ async function build() {
   await rsvps.create({ sessionId: s1.id, guestId: c.id });
   await rsvps.create({ sessionId: s2.id, guestId: c.id });
   await rsvps.create({ sessionId: s3.id, guestId: d.id });
-  ids = { a: a.id, vol: vol.id, v: v.id, c: c.id, d: d.id, s1: s1.id };
+  ids = {
+    a: a.id,
+    b: b.id,
+    vol: vol.id,
+    v: v.id,
+    c: c.id,
+    d: d.id,
+    s1: s1.id,
+    s2: s2.id,
+    s3: s3.id,
+  };
   hostNames = ["Ada Host", "Bob Host", "Vera Volunteer"];
   nonHostNames = ["Cleo Attendee", "Dan Attendee"];
 }
@@ -278,5 +288,198 @@ describe("statistics access and privacy", { tags: ["021-US1"] }, () => {
       expect(text).not.toContain(ids.d);
       for (const name of nonHostNames) expect(text).not.toContain(name);
     }
+  });
+});
+
+describe("session statistics", { tags: ["021-US1"] }, () => {
+  const at = (hour: number, minute = 0) =>
+    new Date(Date.UTC(2020, 2, 10, hour, minute));
+
+  beforeEach(async () => {
+    const { sessions } = getRepositories();
+    await getRepositories().sessionComments.create({
+      subjectId: ids.s1,
+      authorId: ids.c,
+      body: "See you there",
+      createdTime: new Date(),
+    });
+    await sessions.update(ids.s1, {
+      startTime: at(9),
+      endTime: at(10),
+      capacity: 1,
+    });
+    await sessions.update(ids.s2, { startTime: at(9, 30), endTime: at(11) });
+    await sessions.update(ids.s3, {
+      startTime: at(13),
+      endTime: at(14),
+      closed: true,
+    });
+  });
+
+  const table = (s: Stats, id: string) => {
+    const t = s.tables.find((x) => x.id === id);
+    expect(t, id).toBeDefined();
+    return t!;
+  };
+  const row = (s: Stats, id: string, first: string) => {
+    const t = table(s, id);
+    const found = t.rows.find((r) => r[0] === first);
+    expect(found, `${id}/${first}`).toBeDefined();
+    return Object.fromEntries(t.columns.map((c, i) => [c.key, found![i]]));
+  };
+
+  it("shows start, day and start hour in the event's time zone", async () => {
+    const { events, sessions } = getRepositories();
+    await events.update(eventId, { timezone: "America/New_York" });
+    await sessions.update(ids.s3, { startTime: at(2), endTime: at(3) });
+    const s = await stats();
+    const rows = table(s, "sessions-table").rows;
+    const late = rows.find((r) => r[1] === "organizer")!;
+    expect(late.slice(2, 5)).toEqual([
+      "2020-03-09",
+      "2020-03-09 22:00",
+      "2020-03-09 23:00",
+    ]);
+    expect(row(s, "sessions-by-hour", "22:00")).toMatchObject({ sessions: 1 });
+    expect(row(s, "sessions-by-day", "2020-03-09")).toMatchObject({
+      sessions: 1,
+    });
+  });
+
+  it("lists one row per session with its figures", async () => {
+    const s = await stats();
+    expect(table(s, "sessions-table").rows).toHaveLength(3);
+    const titled = table(s, "sessions-table").rows.find(
+      (r) => r[1] === "proposal"
+    )!;
+    const first = Object.fromEntries(
+      table(s, "sessions-table").columns.map((c, i) => [c.key, titled[i]])
+    );
+    expect(first).toMatchObject({
+      origin: "proposal",
+      start: "2020-03-10 09:00",
+      end: "2020-03-10 10:00",
+      duration: 60,
+      locations: "Main Hall",
+      hosts: "Ada Host",
+      capacity: 1,
+      rsvps: 2,
+      fill: 200,
+      reported: 20,
+      perRsvp: 10,
+      closed: false,
+      parallel: 1,
+      interest: 50,
+      votes: 2,
+      comments: 1,
+    });
+  });
+
+  it("counts figures by origin", async () => {
+    const s = await stats();
+    expect(row(s, "sessions-origins", "proposal")).toMatchObject({
+      sessions: 1,
+      medianRsvps: 2,
+      medianDuration: 60,
+    });
+    expect(row(s, "sessions-origins", "organizer")).toMatchObject({
+      sessions: 1,
+      medianRsvps: 1,
+    });
+  });
+
+  it("tells how many ended sessions got an attendee report", async () => {
+    const s = await stats();
+    expect(row(s, "sessions-reports", "Sessions")).toMatchObject({
+      asked: 3,
+      reported: 1,
+      share: 33.3,
+    });
+    expect(row(s, "sessions-reports", "Hosts")).toMatchObject({
+      asked: 3,
+      reported: 1,
+    });
+  });
+
+  it("says No data for report shares when no session has a report", async () => {
+    await getRepositories().sessions.setAttendeeCount(ids.s1, null);
+    const s = await stats();
+    expect(row(s, "sessions-reports", "Sessions")).toMatchObject({
+      reported: null,
+      share: null,
+    });
+  });
+
+  it("counts sessions over capacity per location", async () => {
+    const s = await stats();
+    expect(row(s, "sessions-capacity", "Main Hall")).toMatchObject({
+      sessions: 2,
+      limited: 2,
+      over: 1,
+    });
+    expect(table(s, "sessions-capacity").columns[3].label).toBe(
+      "Sessions over capacity"
+    );
+  });
+
+  it("compares closed and open sessions", async () => {
+    const s = await stats();
+    expect(row(s, "sessions-closed", "Closed")).toMatchObject({ sessions: 1 });
+    expect(row(s, "sessions-closed", "Open")).toMatchObject({
+      sessions: 2,
+      medianRsvps: 1.5,
+    });
+  });
+
+  it("groups by start hour and by day", async () => {
+    const s = await stats();
+    expect(row(s, "sessions-by-hour", "09:00")).toMatchObject({ sessions: 2 });
+    expect(row(s, "sessions-by-day", "2020-03-10")).toMatchObject({
+      sessions: 3,
+    });
+  });
+
+  it("summarises the hosts", async () => {
+    const s = await stats();
+    expect(row(s, "sessions-hosts", "Hosts")).toMatchObject({ value: 3 });
+    expect(
+      row(s, "sessions-hosts", "Share of members who hosted (%)")
+    ).toMatchObject({ value: 60 });
+    expect(row(s, "sessions-per-host", "1")).toMatchObject({ hosts: 3 });
+  });
+
+  it("bins the durations and the attendance per RSVP", async () => {
+    const s = await stats();
+    const total = (id: string) =>
+      table(s, id).rows.reduce((sum, r) => sum + Number(r[2]), 0);
+    expect(total("sessions-duration")).toBe(3);
+    expect(total("sessions-attendance-ratio")).toBe(1);
+  });
+
+  it("leaves out sessions of an excluded host and their RSVPs", async () => {
+    const s = await stats(`?excludeHosts=${ids.b}`);
+    const rows = table(s, "sessions-table").rows;
+    expect(rows).toHaveLength(2);
+    expect(rows.find((r) => r[1] === "proposal")![9]).toBe(1);
+  });
+
+  it("adds no empty bin above the last duration step", async () => {
+    const s = await stats();
+    expect(table(s, "sessions-duration").rows.at(-1)?.[1]).toBe(240);
+  });
+
+  it("carries no guest id and no non-host name in any session table", async () => {
+    const json = JSON.stringify(
+      (await stats()).tables.filter((t) => t.id.startsWith("sessions-"))
+    );
+    const csv = await (
+      await get(`/admin/events/${eventId}/stats/sessions-table.csv`)
+    ).text();
+    for (const text of [json, csv]) {
+      expect(text).not.toContain(ids.c);
+      expect(text).not.toContain(ids.d);
+      for (const name of nonHostNames) expect(text).not.toContain(name);
+    }
+    expect(csv).toContain("Ada Host");
   });
 });

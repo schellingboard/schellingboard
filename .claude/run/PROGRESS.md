@@ -54,6 +54,15 @@
   marks used: add a mark there before using it); main bundle 839.6 kB (+1.2 kB since step 1, from
   earlier steps; this step adds nothing to it), admin chunk 103 kB. `Scatter` shows rho and `n < 15`
   note; `Histogram` takes bins from `stats/binning`.
+- Step 9 done. `EventFacts` gained `timezone`, session title/times/capacity/closed/attendeeCount/
+  followUpSent (`attendeeReported` removed) and vote `choice`; `StatsDeps` gained `now`. Session
+  table keys: title, origin, day, start, end, duration, locations, hosts, capacity, rsvps, fill,
+  reported, perRsvp, closed, parallel, interest (interested / votes, 0-100), votes. Step 10 adds
+  prediction columns to it and the scatter. RSVP and vote counts exclude excluded hosts. An empty
+  table shows "No data" (SPA). `sessions.ts` has `groupedTable`/`binTable` helpers for later
+  sections. Not run: `statistics.spec.ts` (only a section tab was added; no covered workflow
+  changed). Cuts: the popularity chart has no capacity tick or second mark; a host counts as
+  reporting when any ended session of theirs has a count (the count is per session).
 
 ## Questions
 

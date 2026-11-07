@@ -70,8 +70,9 @@ database and use the page themselves. The run checks old data through the releas
 Each step: the section's figures from `docs/dev/statistics.md` on the server (integration tests),
 then its cards in the SPA. Skip a figure whose chart adds nothing to its table.
 
-- [ ] 9. Sessions: session table, popularity, origins, hosts, did hosts report, attendance, votes →
-      RSVPs, duration, time and competition, closed, capacity.
+- [x] 9. Sessions section: 11 tables (`sessions-*`) in
+      `server/modules/stats/application/sessions.ts`, charts for the session table (popularity, 3
+      scatters) and the two histograms.
 - [ ] 10. Predicted vs real attendance: prediction columns in the session table, the scatter with
       ranges, calibration. Split from step 9 if that grows too big.
 - [ ] 11. Proposals and voting: proposal funnel table, popular but never scheduled, late proposals,

@@ -103,6 +103,56 @@ describe("the statistics screen", { tags: ["021-US1"] }, () => {
     await waitFor(() => expect(chart.querySelector("svg")).toBeTruthy());
   });
 
+  it("shows the Sessions section with its charts and a No data state", async () => {
+    const col = (key: string, type: "text" | "integer" = "integer") => ({
+      key,
+      label: key,
+      type,
+    });
+    const sessionStats: EventStatistics = {
+      ...stats,
+      tables: [
+        ...stats.tables,
+        {
+          id: "sessions-table",
+          title: "Sessions",
+          columns: [
+            col("title", "text"),
+            col("rsvps"),
+            col("reported"),
+            col("interest"),
+            col("parallel"),
+          ],
+          rows: [
+            ["Opening", 30, 20, 50, 1],
+            ["Closing", 10, null, null, 2],
+          ],
+        },
+        {
+          id: "sessions-duration",
+          title: "Session duration",
+          columns: [col("from"), col("to"), col("sessions")],
+          rows: [],
+        },
+      ],
+    };
+    renderScreen("section=sessions", { stats: sessionStats });
+
+    expect(
+      await screen.findByRole("img", {
+        name: "Most RSVPed sessions: Opening 30, Closing 10",
+      })
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("img", { name: /Reported attendees against RSVPs/ })
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("img", { name: /RSVPs against Parallel sessions/ })
+    ).toBeTruthy();
+    const duration = screen.getByRole("table", { name: "Session duration" });
+    expect(within(duration).getByText("No data")).toBeTruthy();
+  });
+
   it("sorts a table by a column, both ways", async () => {
     renderScreen();
     const table = screen.getByRole("table", { name: "Headline numbers" });

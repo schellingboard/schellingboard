@@ -93,6 +93,16 @@ export function SortableStatsTable({ table }: { table: StatsTable }) {
           </tr>
         </thead>
         <tbody>
+          {rows.length === 0 && (
+            <tr>
+              <td
+                colSpan={table.columns.length}
+                className="py-2 text-fg-subtle"
+              >
+                No data
+              </td>
+            </tr>
+          )}
           {rows.map((row, rowIndex) => (
             <tr key={rowIndex} className="border-b border-line-subtle">
               {row.map((cell, index) => (
