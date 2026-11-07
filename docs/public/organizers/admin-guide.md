@@ -198,10 +198,11 @@ Admins can create/edit/delete sessions directly, outside the normal proposal →
 **Statistics** in the admin menu answers how an event went: did proposals turn into sessions, did
 the venue work, which features did people use. It opens the event running or run last; choose
 another in **Event**. An event's admin page links to its statistics too. Every figure is a table you
-can sort by clicking a column, and **Download CSV** saves it. **Download all** saves every table as
-a ZIP. Most tables have a chart above them. A figure the database cannot supply, such as attendee
-counts for an event that ran before they existed, says "No data" instead of 0. The page counts what
-the database holds now, so it works for a past event after an upgrade.
+can sort by clicking a column; a long table shows 25 rows at a time, and its search box finds rows
+by their text. **Download CSV** saves the whole table. **Download all** saves every table as a ZIP.
+Most tables have a chart above them. A figure the database cannot supply, such as attendee counts
+for an event that ran before they existed, says "No data" instead of 0. The page counts what the
+database holds now, so it works for a past event after an upgrade.
 
 ![The statistics with the filter, the section navigation and the headline numbers](../../screenshots/admin-statistics.webp)
 
