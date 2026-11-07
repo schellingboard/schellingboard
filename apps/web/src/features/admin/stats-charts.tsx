@@ -1,6 +1,7 @@
 import { useMemo, type ReactNode } from "react";
 import type { StatsTable } from "@schellingboard/contracts/stats";
 import { histogram } from "@schellingboard/domain/stats/binning";
+import { Heatmap } from "../../ui/charts/heatmap";
 import { Histogram } from "../../ui/charts/histogram";
 import { LineChart } from "../../ui/charts/line-chart";
 import { RankedBars } from "../../ui/charts/ranked-bars";
@@ -308,6 +309,93 @@ function CountBars({
   );
 }
 
+function UtilizationBars({ table }: { table: StatsTable }) {
+  const data = useMemo(() => {
+    const name = column(table, "location");
+    const value = column(table, "utilization");
+    return table.rows.flatMap((row) =>
+      value(row) === null
+        ? []
+        : [{ label: String(name(row)), value: Number(value(row)) }]
+    );
+  }, [table]);
+  if (data.length === 0) return null;
+  return (
+    <RankedBars
+      data={data}
+      summary={`Utilization by location: ${data.map((d) => `${d.label} ${d.value}`).join(", ")}`}
+    />
+  );
+}
+
+function UtilizationHeatmaps({ table }: { table: StatsTable }) {
+  const days = useMemo(() => {
+    const day = column(table, "day");
+    const location = column(table, "location");
+    const hour = column(table, "hour");
+    const booked = column(table, "booked");
+    const byDay = new Map<string, { x: string; y: string; value: number }[]>();
+    for (const row of table.rows) {
+      const list = byDay.get(String(day(row))) ?? [];
+      list.push({
+        x: String(hour(row)),
+        y: String(location(row)),
+        value: Number(booked(row)),
+      });
+      byDay.set(String(day(row)), list);
+    }
+    return [...byDay.entries()];
+  }, [table]);
+  return (
+    <div className="space-y-4">
+      {days.map(([day, cells]) => (
+        <div key={day} className="space-y-1">
+          <h3 className="text-sm font-medium text-fg-muted">{day}</h3>
+          <Heatmap
+            cells={cells}
+            valueLabel="Booked share (%)"
+            summary={`Utilization on ${day}`}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SupplyDemand({ table }: { table: StatsTable }) {
+  const days = useMemo(() => {
+    const day = column(table, "day");
+    const hour = column(table, "hour");
+    const sessions = column(table, "sessions");
+    const rsvps = column(table, "rsvps");
+    const byDay = new Map<string, { x: Date; y: number }[]>();
+    for (const row of table.rows) {
+      if (Number(sessions(row)) <= 0) continue;
+      const key = String(day(row));
+      const list = byDay.get(key) ?? [];
+      list.push({
+        x: new Date(`${key}T${String(hour(row)).slice(0, 5)}:00`),
+        y: Math.round((Number(rsvps(row)) / Number(sessions(row))) * 10) / 10,
+      });
+      byDay.set(key, list);
+    }
+    return [...byDay.entries()];
+  }, [table]);
+  return (
+    <div className="space-y-4">
+      {days.map(([day, points]) => (
+        <div key={day} className="space-y-1">
+          <h3 className="text-sm font-medium text-fg-muted">{day}</h3>
+          <LineChart
+            series={[{ name: "RSVPs per running session", points }]}
+            summary={`RSVPs per running session on ${day}`}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function ConversionChart({ table }: { table: StatsTable }) {
   const data = useMemo(() => {
     const group = column(table, "group");
@@ -343,6 +431,12 @@ export function chartFor(table: StatsTable): ReactNode {
       return <RsvpHistogram table={table} />;
     case "attendees-gaps":
       return <CountBars table={table} labelKey="gap" valueKey="gaps" />;
+    case "locations-table":
+      return <UtilizationBars table={table} />;
+    case "locations-heatmap":
+      return <UtilizationHeatmaps table={table} />;
+    case "locations-supply-demand":
+      return <SupplyDemand table={table} />;
     case "sessions-table":
       return <SessionCharts table={table} />;
     case "sessions-duration":

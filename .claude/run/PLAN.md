@@ -79,8 +79,8 @@ then its cards in the SPA. Skip a figure whose chart adds nothing to its table.
       histogram charts.
 - [x] 12. Attendees section (`attendees.ts`: per-attendee pseudonymous table, gaps, double bookings,
       hosts who attend) and the Overview "Who did what" table.
-- [ ] 13. Locations and schedule: location table, gaps and fragments, utilization heatmap, supply
-      and demand by hour; excluded sessions occupy time but are no sessions.
+- [x] 13. Locations section (`locations.ts`: location table with gaps and fragments, hour heatmap
+      per day, supply and demand by hour); filtered sessions and blockers still occupy their room.
 - [ ] 14. 1-on-1s: adoption, requests by status, per person, response time, when, meeting points.
 - [ ] 15. Profiles, comments, notifications (one step: all three are counts over members).
 

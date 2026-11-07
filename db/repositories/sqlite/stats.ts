@@ -28,12 +28,14 @@ export class SqliteStatsRepository implements StatsRepository {
         slug: schema.events.slug,
         timezone: schema.events.timezone,
         breakMinutes: schema.events.breakMinutes,
+        slotIncrementMinutes: schema.events.slotIncrementMinutes,
       })
       .from(schema.events)
       .where(eq(schema.events.id, eventId))
       .get();
     if (!event) return null;
-    const { timezone, breakMinutes, ...eventIdentity } = event;
+    const { timezone, breakMinutes, slotIncrementMinutes, ...eventIdentity } =
+      event;
 
     const members = db
       .select({ id: schema.eventGuests.guestId })
@@ -42,8 +44,13 @@ export class SqliteStatsRepository implements StatsRepository {
       .all()
       .map((r) => r.id);
 
-    const locations = db
-      .select({ id: schema.locations.id, name: schema.locations.name })
+    const locationRows = db
+      .select({
+        id: schema.locations.id,
+        name: schema.locations.name,
+        capacity: schema.locations.capacity,
+        bookable: schema.locations.bookable,
+      })
       .from(schema.eventLocations)
       .innerJoin(
         schema.locations,
@@ -51,6 +58,31 @@ export class SqliteStatsRepository implements StatsRepository {
       )
       .where(eq(schema.eventLocations.eventId, eventId))
       .all();
+
+    const days = db
+      .select({
+        startBookings: schema.days.startBookings,
+        endBookings: schema.days.endBookings,
+      })
+      .from(schema.days)
+      .where(eq(schema.days.eventId, eventId))
+      .all();
+    const unavailability = db
+      .select({
+        locationId: schema.locationUnavailability.locationId,
+        start: schema.locationUnavailability.start,
+        end: schema.locationUnavailability.end,
+      })
+      .from(schema.locationUnavailability)
+      .where(eq(schema.locationUnavailability.eventId, eventId))
+      .all();
+
+    const locations = locationRows.map(({ id, name }) => ({ id, name }));
+    const locationDetails = locationRows.map(({ id, capacity, bookable }) => ({
+      id,
+      capacity,
+      bookable,
+    }));
 
     const proposalRows = db
       .select({
@@ -260,6 +292,10 @@ export class SqliteStatsRepository implements StatsRepository {
       event: eventIdentity,
       timezone,
       breakMinutes,
+      slotIncrementMinutes,
+      days,
+      unavailability,
+      locationDetails,
       members,
       locations,
       hosts,

@@ -12,6 +12,7 @@ import type { Actor } from "@/server/kernel/actor";
 import { forbidden, notFound, ok, type Result } from "@/server/kernel/result";
 import type { StatsDeps } from "../ports";
 import { attendeeTables } from "./attendees";
+import { locationTables } from "./locations";
 import { overviewTables } from "./overview";
 import { proposalTables } from "./proposals";
 import { sessionTables } from "./sessions";
@@ -40,6 +41,7 @@ export const eventStatistics =
         ...proposalTables(facts, filter),
         ...sessionTables(facts, filter, deps.now()),
         ...attendeeTables(facts, filter),
+        ...locationTables(facts, filter),
       ],
     });
   };

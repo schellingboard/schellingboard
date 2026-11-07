@@ -2,6 +2,10 @@ export interface EventFacts {
   event: { id: string; name: string; slug: string };
   timezone: string;
   breakMinutes: number;
+  slotIncrementMinutes: number;
+  days: { startBookings: string; endBookings: string }[];
+  unavailability: { locationId: string; start: string; end: string }[];
+  locationDetails: { id: string; capacity: number; bookable: boolean }[];
   members: string[];
   locations: { id: string; name: string }[];
   hosts: { id: string; name: string }[];

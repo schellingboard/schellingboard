@@ -114,8 +114,9 @@ RSVPs are intent, not attendance; the section says so once.
 - **Location table**: sessions, booked hours, available hours (the days' booking windows minus
   location unavailability), utilization, gaps, total gap time, longest gap, median RSVPs, capacity,
   sessions over capacity, bookable.
-- **Gaps**: a gap is free time inside the booking window. Gaps shorter than the slot increment plus
-  break are counted apart as "unusable fragments" — they show where the grid wastes time.
+- **Gaps**: a gap is free time inside the booking window. A gap that holds no whole grid slot (a
+  session booked from slot S starts at S + break, so S must be at or after the gap start minus the
+  break) is counted apart as an "unusable fragment" — they show where the grid wastes time.
 - **Utilization heatmap**: location × hour, per day.
 - **Supply and demand by hour**: parallel sessions per hour vs RSVPs per hour (two lines). The input
   for next year's grid: where were there too many sessions for too few people.

@@ -363,6 +363,78 @@ describe("attendee charts", { tags: ["021-US1"] }, () => {
   });
 });
 
+describe("location charts", { tags: ["021-US1"] }, () => {
+  it("draws utilization, the heatmap of a day and supply against demand", async () => {
+    const c = (
+      key: string,
+      type: "text" | "integer" | "number" = "integer"
+    ) => ({ key, label: key, type });
+    renderScreen("section=locations", {
+      stats: {
+        ...stats,
+        tables: [
+          {
+            id: "locations-table",
+            title: "Locations",
+            columns: [c("location", "text"), c("utilization", "number")],
+            rows: [
+              ["Main Hall", 62.5],
+              ["Garden", null],
+            ],
+          },
+          {
+            id: "locations-heatmap",
+            title: "Utilization by hour",
+            columns: [
+              c("day", "text"),
+              c("location", "text"),
+              c("hour", "text"),
+              c("booked", "number"),
+            ],
+            rows: [
+              ["2026-05-01", "Main Hall", "09:00", 100],
+              ["2026-05-01", "Garden", "09:00", 0],
+              ["2026-05-02", "Main Hall", "09:00", 50],
+            ],
+          },
+          {
+            id: "locations-supply-demand",
+            title: "Parallel sessions and RSVPs by hour",
+            columns: [
+              c("day", "text"),
+              c("hour", "text"),
+              c("sessions", "number"),
+              c("rsvps", "number"),
+            ],
+            rows: [
+              ["2026-05-01", "09:00", 2, 30],
+              ["2026-05-01", "10:00", 3, 25],
+              ["2026-05-02", "09:00", 0, 0],
+            ],
+          },
+        ],
+      },
+    });
+
+    expect(
+      await screen.findByRole("img", {
+        name: "Utilization by location: Main Hall 62.5",
+      })
+    ).toBeTruthy();
+    expect(
+      await screen.findByRole("img", { name: "Utilization on 2026-05-01" })
+    ).toBeTruthy();
+    expect(
+      await screen.findByRole("img", { name: "Utilization on 2026-05-02" })
+    ).toBeTruthy();
+    expect(
+      await screen.findByRole("img", {
+        name: "RSVPs per running session on 2026-05-01",
+      })
+    ).toBeTruthy();
+  });
+});
+
 describe("downloading statistics", { tags: ["021-US2"] }, () => {
   it("links each table's CSV and the ZIP, with the filter in the address", () => {
     renderScreen("excludeLocations=l1");

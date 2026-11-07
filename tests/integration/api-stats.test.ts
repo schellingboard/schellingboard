@@ -10,7 +10,9 @@ import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createEvent,
   createGuest,
+  createDay,
   createLocation,
+  createUnavailability,
   createProposal,
   createSession,
 } from "../helpers/factories";
@@ -107,6 +109,7 @@ async function build() {
     s3: s3.id,
     p1: p1.id,
     p2: p2.id,
+    room: room.id,
   };
   hostNames = ["Ada Host", "Bob Host", "Vera Volunteer"];
   nonHostNames = ["Cleo Attendee", "Dan Attendee"];
@@ -812,5 +815,178 @@ describe("attendee statistics", { tags: ["021-US1"] }, () => {
       for (const name of [...hostNames, ...nonHostNames])
         expect(text).not.toContain(name);
     }
+  });
+});
+
+describe("location statistics", { tags: ["021-US1"] }, () => {
+  const at = (hour: number, minute = 0) =>
+    new Date(Date.UTC(2020, 2, 10, hour, minute));
+
+  beforeEach(async () => {
+    const { sessions } = getRepositories();
+    await sessions.update(ids.s1, { startTime: at(9), endTime: at(10) });
+    await sessions.update(ids.s2, { startTime: at(9, 30), endTime: at(11) });
+    await sessions.update(ids.s3, { startTime: at(13), endTime: at(14) });
+  });
+
+  const withDay = () =>
+    createDay(eventId, {
+      start: at(0),
+      end: at(23),
+      startBookings: at(8),
+      endBookings: at(18),
+    });
+
+  const rowsOf = (s: Stats, id: string) => {
+    const t = s.tables.find((x) => x.id === id);
+    expect(t, id).toBeDefined();
+    return t!.rows.map((r) =>
+      Object.fromEntries(t!.columns.map((c, i) => [c.key, r[i]]))
+    );
+  };
+  const location = (s: Stats, name: string) =>
+    rowsOf(s, "locations-table").find((r) => r.location === name);
+
+  it("measures booked time, gaps and utilization per location", async () => {
+    await withDay();
+    const hall = location(await stats(), "Main Hall");
+    expect(hall).toMatchObject({
+      sessions: 2,
+      bookedHours: 2,
+      availableHours: 10,
+      utilization: 20,
+      gaps: 2,
+      fragments: 0,
+      gapMinutes: 480,
+      longestGap: 420,
+      bookable: true,
+    });
+  });
+
+  it("leaves unavailable time out of the available hours", async () => {
+    await withDay();
+    await createUnavailability(eventId, ids.room, at(17), at(18));
+    const hall = location(await stats(), "Main Hall");
+    expect(hall).toMatchObject({
+      availableHours: 9,
+      utilization: 22.2,
+      gapMinutes: 420,
+      longestGap: 360,
+    });
+  });
+
+  it("counts a gap at the end of the window that fits a slot as usable", async () => {
+    await withDay();
+    await createSession(eventId, {
+      locationIds: [ids.room],
+      startTime: at(11),
+      endTime: at(17, 30),
+    });
+    const hall = location(await stats(), "Main Hall");
+    expect(hall).toMatchObject({ gaps: 2, fragments: 0, longestGap: 60 });
+  });
+
+  it("reports capacity, median RSVPs and sessions over capacity", async () => {
+    await withDay();
+    await getRepositories().sessions.update(ids.s1, { capacity: 1 });
+    const hall = location(await stats(), "Main Hall");
+    expect(hall).toMatchObject({ medianRsvps: 1.5, over: 1 });
+    expect(hall?.capacity).toEqual(expect.any(Number));
+  });
+
+  it("buckets hours in the event's time zone", async () => {
+    await getRepositories().events.update(eventId, {
+      timezone: "Asia/Kolkata",
+    });
+    await withDay();
+    const rows = rowsOf(await stats(), "locations-heatmap").filter(
+      (r) => r.location === "Main Hall"
+    );
+    expect(rows[0]).toMatchObject({ day: "2020-03-10", hour: "13:00" });
+    expect(rows.find((r) => r.hour === "14:00")?.booked).toBe(50);
+  });
+
+  it("keeps the repeated hour of a clock change apart", async () => {
+    await getRepositories().events.update(eventId, {
+      timezone: "America/New_York",
+    });
+    await createDay(eventId, {
+      start: new Date(Date.UTC(2020, 10, 1, 4)),
+      end: new Date(Date.UTC(2020, 10, 1, 12)),
+      startBookings: new Date(Date.UTC(2020, 10, 1, 4)),
+      endBookings: new Date(Date.UTC(2020, 10, 1, 8)),
+    });
+    const hours = rowsOf(await stats(), "locations-heatmap")
+      .filter((r) => r.location === "Main Hall")
+      .map((r) => r.hour);
+    expect(hours).toEqual(["00:00", "01:00", "01:00 (again)", "02:00"]);
+  });
+
+  it("counts a gap shorter than a slot plus the break as a fragment", async () => {
+    await withDay();
+    await createSession(eventId, {
+      locationIds: [ids.room],
+      startTime: at(11, 20),
+      endTime: at(12),
+    });
+    const hall = location(await stats(), "Main Hall");
+    expect(hall).toMatchObject({ gaps: 2, fragments: 1 });
+  });
+
+  it("keeps excluded sessions and blockers as occupied time", async () => {
+    await withDay();
+    await createSession(eventId, {
+      locationIds: [ids.room],
+      blocker: true,
+      startTime: at(15),
+      endTime: at(16),
+    });
+    const hall = location(await stats(`?excludeHosts=${ids.b}`), "Main Hall");
+    expect(hall).toMatchObject({
+      sessions: 1,
+      bookedHours: 3,
+      utilization: 30,
+    });
+  });
+
+  it("drops an excluded location from the location tables", async () => {
+    await withDay();
+    const s = await stats(`?excludeLocations=${ids.vol}`);
+    expect(location(s, "Volunteers 1")).toBeUndefined();
+    expect(
+      rowsOf(s, "locations-heatmap").some((r) => r.location === "Volunteers 1")
+    ).toBe(false);
+  });
+
+  it("says No data for utilization without booking days", async () => {
+    expect(location(await stats(), "Main Hall")).toMatchObject({
+      sessions: 2,
+      utilization: null,
+      gaps: null,
+    });
+    expect(rowsOf(await stats(), "locations-heatmap")).toEqual([]);
+  });
+
+  it("shows how booked each location is by hour of each day", async () => {
+    await withDay();
+    const rows = rowsOf(await stats(), "locations-heatmap").filter(
+      (r) => r.location === "Main Hall"
+    );
+    const booked = (hour: string) => rows.find((r) => r.hour === hour)?.booked;
+    expect(rows[0]).toMatchObject({ day: "2020-03-10" });
+    expect(booked("08:00")).toBe(0);
+    expect(booked("09:00")).toBe(100);
+    expect(booked("10:00")).toBe(100);
+    expect(booked("11:00")).toBe(0);
+  });
+
+  it("compares parallel sessions with RSVPs by hour", async () => {
+    await withDay();
+    const rows = rowsOf(await stats(), "locations-supply-demand");
+    expect(rows.find((r) => r.hour === "09:00")).toMatchObject({
+      day: "2020-03-10",
+      sessions: 1.5,
+      rsvps: 2.5,
+    });
   });
 });

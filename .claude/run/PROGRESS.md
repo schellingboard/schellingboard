@@ -2,83 +2,40 @@
 
 ## Facts for this run
 
-- No pushes, no PRs (the user's rule); commits stay local.
-- No real event database is available (privacy). Old data is checked through the release-upgrade
-  fixtures and the dev seed only.
-- The user's past event runs 3.8.1 and is upgraded to 5.0.0 before they use the page.
-
-- Step 1 done. New admin code goes in `admin-pages.tsx`'s module graph so it stays in the lazy
-  chunk.
-- Environment: fixed (26 `make arch` false violations from the .bun layout, `make lint` heap); done
-  outside the plan, commit 67e4a948.
-- Step 2 done: chart library is Observable Plot 0.6.19. Plot needs a ResizeObserver wrapper, token
-  colours read via `getComputedStyle` for colour scales, no canvas legend under happy-dom.
-- Step 3 done: decisions in ADR 0019, the figure catalogue in `docs/dev/statistics.md` (split from
-  the proposal so the catalogue survives; the plan said the proposal keeps only "Later").
-- Step 4 done. Import as `@schellingboard/domain/stats/<file>`. `pseudonymize` takes number rows
-  only (no ids) and sorts them, so ties cannot leak an id order. `encodeCsv` guards `= + - @ tab CR`
-  in text. `predictAttendance` returns null for share 0, no voters or no mean share. Use cases
-  021-US1..US4 are `planned` until the UI exists; drop `planned` as steps 7+ land.
-- Step 5 done. Add a section by adding tables in `application/` and fields to `EventFacts`
-  (`packages/domain/src/stats/facts.ts`) and `db/repositories/sqlite/stats.ts`. Filter logic is
-  `packages/domain/src/stats/filter.ts` (`applyFilter`). Percent cells are 0-100 numbers; a null
-  cell is No data. The CSV route is `/stats/{file}` with `file` = `<table>.csv` (Hono cannot match
-  `{table}.csv`). Hosts are listed for the filter by guest id and name (hosts are public). The
-  integration test builds its event in `tests/integration/api-stats.test.ts`.
-- Decisions (step 5): the filter drops proposals whose hosts are all excluded. Only session hosts
-  can be excluded, so an organizer account that only proposes cannot leave the people figures;
-  accepted for now. Hosts and Hosted both count excluded-host-free members who host a kept session.
-- Step 6 done. Large profile only (`SEED_PROFILE=large make dev-db-seed`), so the small profile and
-  E2E are unchanged. Gamma is not ended, so the attendee counts sit on its first 10 curated sessions
-  although they have not happened; use the dev clock to view them as past. Shifts are origin
-  `organizer`, as are the curated admin-managed sessions; the shift locations are
-  `loc-volunteers-1/2`. The seed test is `tests/integration/seed-statistics.test.ts`.
-- Step 7 done. Add figures by adding tables on the server: the SPA groups tables into sections by
-  the id prefix before the first `-` (labels in `SECTION_LABELS` in `event-stats.tsx`, `?section=`)
-  and renders any table generically. Downloads are plain `<a download>` links to the API (cookie
-  auth), so the file name comes from the server (`<event>-<table>[-filtered].csv`). The filter is
-  URL-only (`excludeLocations`, `excludeHosts`, `excludeOrigins`, same format as the API; absent
-  origins = blockers); changing it refetches while the old figures stay on screen. `datetime` cells
-  are strings the server formats in the event's zone (`YYYY-MM-DD HH:mm`, like the CSV); the SPA
-  shows them as given. Per-table cards, "Show table" toggles and charts come in step 8. The E2E runs
-  on the small profile (no volunteers), so it excludes Garden Terrace and Yuki Tanaka on Conference
-  Gamma; it does not exercise the origin filter. The server bundle banner import was renamed in its
-  own `fix:` commit (fflate broke it); run `make test-e2e-docker` in the Finish step, since the
-  bundle changed.
-- Step 8 done. Bind a chart to a table in `features/admin/stats-charts.tsx` (`chartFor`, by table
-  id); the chart sits above its table, which stays visible (no "Show table" toggle: the table is the
-  accessible detail and the contrast relief). Wrappers take plain data plus a `summary` (the
-  accessible name); colours are `--chart-1..4` tokens (validated, light and dark), used as
-  `var(--chart-n)` in the SVG so a theme change needs no redraw; the heatmap is one hue with the
-  value as opacity. No tooltips. Plot chunk is 93 kB gzip (`ui/charts/plot.ts` re-exports only the
-  marks used: add a mark there before using it); main bundle 839.6 kB (+1.2 kB since step 1, from
-  earlier steps; this step adds nothing to it), admin chunk 103 kB. `Scatter` shows rho and `n < 15`
-  note; `Histogram` takes bins from `stats/binning`.
-- Step 9 done. `EventFacts` gained `timezone`, session title/times/capacity/closed/attendeeCount/
-  followUpSent (`attendeeReported` removed) and vote `choice`; `StatsDeps` gained `now`. Session
-  table keys: title, origin, day, start, end, duration, locations, hosts, capacity, rsvps, fill,
-  reported, perRsvp, closed, parallel, interest (interested / votes, 0-100), votes. Step 10 adds
-  prediction columns to it and the scatter. RSVP and vote counts exclude excluded hosts. An empty
-  table shows "No data" (SPA). `sessions.ts` has `groupedTable`/`binTable` helpers for later
-  sections. Not run: `statistics.spec.ts` (only a section tab was added; no covered workflow
-  changed). Cuts: the popularity chart has no capacity tick or second mark; a host counts as
-  reporting when any ended session of theirs has a count (the count is per session).
-- Step 10 done. Model inputs per event: N = members after the filter, P = `meanConcurrency` of the
-  kept timed sessions, s-bar = mean interest share of proposal sessions with votes; a session
-  without votes, share 0 or no timed sessions gets no prediction. The reported count is a point, so
-  "inside" means the count lies in the range. The scatter title states the report is a point, and
-  the calibration table title carries "fitted on one event, n = 13".
-- Step 11 done. Shared cell helpers are in `application/cells.ts`. `EventFacts.proposals` has title,
-  created time, duration, cohost flag, comment count; `proposalHosts` holds the names of proposal
-  hosts (public). "Became a session" counts any non-blocker session of the proposal, even one the
-  filter drops; RSVPs and reports come from the kept session only. Interest quarters split the
-  proposals ranked by interested votes into four equal groups, ties broken by title. "Proposals over
-  time" fills empty days; no phase bands. Per-voter table: pseudonyms, not joinable.
-- Step 12 done. `EventFacts.breakMinutes` added. Attendee gaps only pair consecutive RSVPs on the
-  same day (event zone); overlapping pairs are counted as double bookings, not gaps. Per-attendee
-  rows exist only for people with an RSVP to a kept, timed session; the median gap uses -1 inside
-  `pseudonymize` and is mapped back to null. The "RSVPs are intent" note is a line in the SPA.
-  Per-attendee RSVPs count all kept sessions; days, hours and gaps use the timed ones.
+- No pushes, no PRs (the user's rule); commits stay local. No real event database is available
+  (privacy): old data is checked through the release-upgrade fixtures and the dev seed. The user's
+  past event runs 3.8.1 and is upgraded to 5.0.0 before they use the page.
+- Steps 1-13 done (see PLAN.md). How to add a figure: add tables in
+  `server/modules/stats/application/<section>.ts` (helpers `col`, `percent`, `round`, `tallyVotes`
+  in `cells.ts`), facts in `packages/domain/src/stats/facts.ts` and
+  `db/repositories/sqlite/stats.ts`, register in `statistics.ts`. The SPA groups tables into
+  sections by the id prefix before the first `-` and renders any table generically; bind a chart in
+  `features/admin/stats-charts.tsx` (`chartFor`, by table id); new Plot marks go in
+  `ui/charts/plot.ts` first. Column keys are read by the charts, so keep them stable.
+- Conventions: percent cells are 0-100; a null cell is No data; `datetime` cells are strings
+  formatted server-side in the event zone; the CSV route is `/stats/<table>.csv`; downloads are
+  plain `<a download>` links; the filter is URL-only. Per-person tables use `pseudonymize` (number
+  rows, sorted, no ids). The integration test event is built in
+  `tests/integration/api-stats.test.ts`; large dev seed (`SEED_PROFILE=large`) has Conference Gamma
+  with volunteer shifts and reports.
+- Filter: sessions with all hosts / all locations excluded, or an excluded origin, leave the session
+  figures; an excluded host leaves the people figures; filtered sessions and blockers still occupy
+  their room in location figures; "became a session" counts any non-blocker session.
+- Charts: Observable Plot 0.6.19 behind `PlotFrame`; colours are `--chart-1..4` tokens; no tooltips;
+  the table always stays visible under its chart.
+- Attendance model: inputs per event are N = members after the filter, P = mean concurrency of all
+  non-blocker timed sessions (not filtered), s-bar = mean interest share per proposal; the report is
+  a point, so "inside the range" means the count lies in it; label every use "model fitted on one
+  event, n = 13". Step 9 cuts: no capacity tick on the popularity chart; a host counts as reporting
+  when any ended session of theirs has a count.
+- Only session hosts can be excluded in the filter (proposal-only hosts cannot). The E2E runs on the
+  small profile and does not exercise the origin filter. Gamma's counts sit on sessions that have
+  not happened: use the dev clock to view them as past.
+- Test notes: Plot under happy-dom has no canvas legend; charts are found by role `img` and their
+  `summary`. Admin code must stay in `admin-pages.tsx`'s module graph (lazy chunk).
+- Fragment rule (locations): a gap is usable when a grid slot S >= gapStart - break fits a whole
+  slot increment before the gap ends, grid anchored at the day's booking start.
+- Not run yet: `make test-e2e-docker` (the bundle changed with fflate; run in the Finish step).
 
 ## Questions
 
