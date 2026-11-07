@@ -1,3 +1,4 @@
+import type { EventFacts } from "@schellingboard/domain/stats/facts";
 import type {
   AuthCodePurpose,
   AuthCode,
@@ -949,4 +950,9 @@ export interface DeliveriesRepository {
   ): Promise<void>;
   /** Deletes sent and abandoned deliveries settled before `before`. */
   pruneSettled(before: Date): Promise<void>;
+}
+
+export interface StatsRepository {
+  /** Everything the statistics count for one event; null when it does not exist. */
+  getEventFacts(eventId: string): Promise<EventFacts | null>;
 }

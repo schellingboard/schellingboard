@@ -6957,6 +6957,210 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/admin/events/{id}/stats": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The event's statistics: every table, the active filter in one line and the locations and hosts a filter can leave out. Site admins only. */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Comma-separated location ids to leave out */
+          excludeLocations?: string;
+          /** @description Comma-separated guest ids of hosts to leave out */
+          excludeHosts?: string;
+          /** @description Comma-separated session origins to leave out: blocker, proposal, organizer, spontaneous. Absent means blocker; empty means none */
+          excludeOrigins?: string;
+        };
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The statistics */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              event: {
+                id: string;
+                name: string;
+                slug: string;
+              };
+              /** @description The active filter in one line */
+              filterSummary: string;
+              filterOptions: {
+                locations: {
+                  id: string;
+                  name: string;
+                }[];
+                hosts: {
+                  id: string;
+                  name: string;
+                }[];
+              };
+              tables: {
+                /** @description Stable name of the table, also its CSV file name */
+                id: string;
+                title: string;
+                columns: {
+                  key: string;
+                  label: string;
+                  /**
+                   * @description A percent is a number from 0 to 100. A null cell means No data
+                   * @enum {string}
+                   */
+                  type:
+                    | "text"
+                    | "integer"
+                    | "number"
+                    | "percent"
+                    | "minutes"
+                    | "datetime"
+                    | "boolean";
+                }[];
+                rows: (string | number | boolean | null)[][];
+              }[];
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/events/{id}/stats/{file}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description One statistics table as CSV (UTF-8 with a byte order mark). */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Comma-separated location ids to leave out */
+          excludeLocations?: string;
+          /** @description Comma-separated guest ids of hosts to leave out */
+          excludeHosts?: string;
+          /** @description Comma-separated session origins to leave out: blocker, proposal, organizer, spontaneous. Absent means blocker; empty means none */
+          excludeOrigins?: string;
+        };
+        header?: never;
+        path: {
+          id: string;
+          /** @description The table id and `.csv`, e.g. `overview-funnel.csv` */
+          file: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The table as CSV */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "text/csv": string;
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/events/{id}/stats.zip": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Every statistics table as CSV, plus an `about.txt` with the filter and the caveats. */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Comma-separated location ids to leave out */
+          excludeLocations?: string;
+          /** @description Comma-separated guest ids of hosts to leave out */
+          excludeHosts?: string;
+          /** @description Comma-separated session origins to leave out: blocker, proposal, organizer, spontaneous. Absent means blocker; empty means none */
+          excludeOrigins?: string;
+        };
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The ZIP archive */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/zip": string;
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {

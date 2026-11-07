@@ -28,6 +28,7 @@ import {
 } from "@/scripts/release-dumps";
 import { getRepositories } from "@/db/container";
 import { VoteChoice } from "@schellingboard/domain/vote";
+import { statsUseCases } from "@/server/composition";
 
 const dumps = listReleaseDumps();
 const manifest = readManifest();
@@ -114,6 +115,38 @@ describe.each(dumps)("upgrading from $version", (dump) => {
     expect(allSessions.some((s) => s.hosts.length > 0)).toBe(true);
     expect(allSessions.some((s) => s.locations.length > 0)).toBe(true);
     expect(allSessions.some((s) => s.numRsvps > 0)).toBe(true);
+  });
+
+  it("computes the statistics, with No data where the release had none", async () => {
+    const { events, sessions } = getRepositories();
+    const admin = { admin: true, guest: null };
+    const filter = {
+      excludeLocations: [],
+      excludeHosts: [],
+      excludeOrigins: ["blocker" as const],
+    };
+    for (const event of await events.list()) {
+      const result = await statsUseCases().eventStatistics(
+        admin,
+        event.id,
+        filter
+      );
+      expect(result.ok).toBe(true);
+      if (!result.ok) continue;
+      const headline = result.value.tables.find(
+        (t) => t.id === "overview-headline"
+      );
+      const reports = headline?.rows.find(
+        (r) => r[0] === "Sessions with an attendee report"
+      )?.[1];
+      const counts = await Promise.all(
+        (await sessions.listByEvent(event.id))
+          .filter((s) => !s.blocker)
+          .map((s) => sessions.getAttendeeCount(s.id))
+      );
+      const recorded = counts.filter((count) => count !== null);
+      expect(reports === null).toBe(recorded.length === 0);
+    }
   });
 
   it("supports CRUD on proposals and votes", async () => {

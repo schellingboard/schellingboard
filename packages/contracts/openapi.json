@@ -9442,6 +9442,307 @@
         },
         "security": [{ "siteAuth": [] }]
       }
+    },
+    "/api/v1/admin/events/{id}/stats": {
+      "get": {
+        "tags": ["admin"],
+        "description": "The event's statistics: every table, the active filter in one line and the locations and hosts a filter can leave out. Site admins only.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated location ids to leave out"
+            },
+            "required": false,
+            "description": "Comma-separated location ids to leave out",
+            "name": "excludeLocations",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated guest ids of hosts to leave out"
+            },
+            "required": false,
+            "description": "Comma-separated guest ids of hosts to leave out",
+            "name": "excludeHosts",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated session origins to leave out: blocker, proposal, organizer, spontaneous. Absent means blocker; empty means none"
+            },
+            "required": false,
+            "description": "Comma-separated session origins to leave out: blocker, proposal, organizer, spontaneous. Absent means blocker; empty means none",
+            "name": "excludeOrigins",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "event": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string" },
+                        "name": { "type": "string" },
+                        "slug": { "type": "string" }
+                      },
+                      "required": ["id", "name", "slug"]
+                    },
+                    "filterSummary": {
+                      "type": "string",
+                      "description": "The active filter in one line"
+                    },
+                    "filterOptions": {
+                      "type": "object",
+                      "properties": {
+                        "locations": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": { "type": "string" },
+                              "name": { "type": "string" }
+                            },
+                            "required": ["id", "name"]
+                          }
+                        },
+                        "hosts": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": { "type": "string" },
+                              "name": { "type": "string" }
+                            },
+                            "required": ["id", "name"]
+                          }
+                        }
+                      },
+                      "required": ["locations", "hosts"]
+                    },
+                    "tables": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Stable name of the table, also its CSV file name"
+                          },
+                          "title": { "type": "string" },
+                          "columns": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "key": { "type": "string" },
+                                "label": { "type": "string" },
+                                "type": {
+                                  "type": "string",
+                                  "enum": [
+                                    "text",
+                                    "integer",
+                                    "number",
+                                    "percent",
+                                    "minutes",
+                                    "datetime",
+                                    "boolean"
+                                  ],
+                                  "description": "A percent is a number from 0 to 100. A null cell means No data"
+                                }
+                              },
+                              "required": ["key", "label", "type"]
+                            }
+                          },
+                          "rows": {
+                            "type": "array",
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "anyOf": [
+                                  { "type": "string" },
+                                  { "type": "number" },
+                                  { "type": "boolean" },
+                                  { "type": "null" }
+                                ]
+                              }
+                            }
+                          }
+                        },
+                        "required": ["id", "title", "columns", "rows"]
+                      }
+                    }
+                  },
+                  "required": [
+                    "event",
+                    "filterSummary",
+                    "filterOptions",
+                    "tables"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "guestAuth": [] }]
+      }
+    },
+    "/api/v1/admin/events/{id}/stats/{file}": {
+      "get": {
+        "tags": ["admin"],
+        "description": "One statistics table as CSV (UTF-8 with a byte order mark).",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9-]+\\.csv$",
+              "description": "The table id and `.csv`, e.g. `overview-funnel.csv`"
+            },
+            "required": true,
+            "description": "The table id and `.csv`, e.g. `overview-funnel.csv`",
+            "name": "file",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated location ids to leave out"
+            },
+            "required": false,
+            "description": "Comma-separated location ids to leave out",
+            "name": "excludeLocations",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated guest ids of hosts to leave out"
+            },
+            "required": false,
+            "description": "Comma-separated guest ids of hosts to leave out",
+            "name": "excludeHosts",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated session origins to leave out: blocker, proposal, organizer, spontaneous. Absent means blocker; empty means none"
+            },
+            "required": false,
+            "description": "Comma-separated session origins to leave out: blocker, proposal, organizer, spontaneous. Absent means blocker; empty means none",
+            "name": "excludeOrigins",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The table as CSV",
+            "content": {
+              "text/csv": { "schema": { "type": "string", "format": "binary" } }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "guestAuth": [] }]
+      }
+    },
+    "/api/v1/admin/events/{id}/stats.zip": {
+      "get": {
+        "tags": ["admin"],
+        "description": "Every statistics table as CSV, plus an `about.txt` with the filter and the caveats.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated location ids to leave out"
+            },
+            "required": false,
+            "description": "Comma-separated location ids to leave out",
+            "name": "excludeLocations",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated guest ids of hosts to leave out"
+            },
+            "required": false,
+            "description": "Comma-separated guest ids of hosts to leave out",
+            "name": "excludeHosts",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated session origins to leave out: blocker, proposal, organizer, spontaneous. Absent means blocker; empty means none"
+            },
+            "required": false,
+            "description": "Comma-separated session origins to leave out: blocker, proposal, organizer, spontaneous. Absent means blocker; empty means none",
+            "name": "excludeOrigins",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The ZIP archive",
+            "content": {
+              "application/zip": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "guestAuth": [] }]
+      }
     }
   },
   "webhooks": {}

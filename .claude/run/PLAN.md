@@ -54,13 +54,9 @@ database and use the page themselves. The run checks old data through the releas
 - [x] 4. Pure functions in `packages/domain/src/stats/` (intervals, correlation, binning,
       pseudonyms, suppression, session origin, CSV, attendance prediction) with tests in
       `tests/unit/stats/`; use case 021 added.
-- [ ] 5. Server skeleton: `server/modules/stats` (module, ports, `eventStatistics` use case, site
-      admin only), `StatsRepository` read port and SQLite adapter, the filter (locations, hosts,
-      origins; blockers excluded by default), `StatsTable` in `packages/contracts`,
-      `GET /admin/events/{id}/stats`, `/stats/{table}.csv` and `/stats.zip` (with `about.txt`),
-      `openapi.json`, `api-client`. First figures: Overview headline numbers and the participation
-      funnel. An integration test runs the statistics on every release-upgrade fixture after
-      migration: no error, "No data" where the release had none.
+- [x] 5. Server skeleton: `server/modules/stats`, `StatsRepository`, filter, `StatsTable` contract,
+      `/stats`, `/stats/{file}` (CSV), `/stats.zip`, Overview headline and funnel, release-upgrade
+      test.
 - [ ] 6. Dev seed: one seeded event gets "Volunteers 1" and "Volunteers 2" locations with shift
       sessions hosted by an organizer account, attendee counts on some ended sessions, and 1-on-1
       requests, so the filter and every section can be tried and tested.

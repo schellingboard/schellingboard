@@ -1,5 +1,11 @@
-export type SessionOrigin =
-  "blocker" | "proposal" | "organizer" | "spontaneous";
+export const SESSION_ORIGINS = [
+  "blocker",
+  "proposal",
+  "organizer",
+  "spontaneous",
+] as const;
+
+export type SessionOrigin = (typeof SESSION_ORIGINS)[number];
 
 export function sessionOrigin(session: {
   blocker: boolean;

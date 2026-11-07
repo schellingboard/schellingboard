@@ -32,6 +32,7 @@ import { SqliteRsvpsRepository } from "./repositories/sqlite/rsvps";
 import { SqliteSettingsRepository } from "./repositories/sqlite/settings";
 import { SqliteSessionProposalsRepository } from "./repositories/sqlite/session-proposals";
 import { SqliteSessionsRepository } from "./repositories/sqlite/sessions";
+import { SqliteStatsRepository } from "./repositories/sqlite/stats";
 import { SqliteVotesRepository } from "./repositories/sqlite/votes";
 import type {
   AuthCodesRepository,
@@ -59,6 +60,7 @@ import type {
   SessionProposalsRepository,
   SessionsRepository,
   SubjectCommentsRepository,
+  StatsRepository,
   VotesRepository,
 } from "./repositories/interfaces";
 
@@ -91,6 +93,7 @@ export type Repositories = {
   rsvps: RsvpsRepository;
   settings: SettingsRepository;
   sessionProposals: SessionProposalsRepository;
+  stats: StatsRepository;
   votes: VotesRepository;
 };
 
@@ -137,6 +140,7 @@ function buildRepositories(sqlite: Database.Database): Repositories {
     rsvps: new SqliteRsvpsRepository(db),
     settings: new SqliteSettingsRepository(db),
     sessionProposals: new SqliteSessionProposalsRepository(db),
+    stats: new SqliteStatsRepository(db),
     votes: new SqliteVotesRepository(db),
   };
 }
