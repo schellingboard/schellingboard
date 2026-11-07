@@ -162,7 +162,7 @@ function Details({
         <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-md border border-brand-tint-hover bg-brand-tint px-3 py-2 text-sm text-fg-muted">
           <p className="flex-1 basis-64">
             {proposal.hosts.length === 0
-              ? "Nobody is offering this session yet. If you could give it, take it on."
+              ? "Nobody is offering to host this proposal yet. If you could run it, take it on."
               : "The hosts would like a co-host. Joining lets you edit this proposal with them."}
           </p>
           <Unavailable blocked={!guestId} why="Select a user first">
@@ -173,7 +173,7 @@ function Details({
             >
               <HandRaisedIcon className="mr-1 h-4 w-4" />
               {proposal.hosts.length === 0
-                ? "Host this session"
+                ? "Host this proposal"
                 : "Join as co-host"}
             </button>
           </Unavailable>

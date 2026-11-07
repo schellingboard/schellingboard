@@ -80,6 +80,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **A proposal says "proposal", not "session"** (#1338): the hosting prompt and its button on a
+  proposal now read "Host this proposal".
 - **Form fields no longer zoom the page on phones** (#1333): tapping a text field used to zoom in on
   some phones.
 - **Closing a window no longer loses what you typed** (#1361): Esc, the close button or a click

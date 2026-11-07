@@ -42,7 +42,7 @@ becomes a real session once someone puts it on the schedule.
 
 - **A proposal doesn't need a host.** An empty host field says "I'd like someone to offer this"
   rather than "I'll give this". Anyone who can give such a session takes it on by opening the
-  proposal and clicking **Host this session** — nobody's permission needed.
+  proposal and clicking **Host this proposal** — nobody's permission needed.
 - **Hosting but want help?** Tick **Looking for a co-host** on your proposal and say who you are
   looking for — someone to take over, a second facilitator. Anyone can then click **Join as
   co-host**, which also lets them edit the proposal. You are told when someone joins, and the

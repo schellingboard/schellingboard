@@ -23,7 +23,7 @@ export function ProposalBody({
     <>
       {proposal.hosts.length === 0 ? (
         <p className="mb-4 text-lg font-medium italic text-fg-subtle">
-          No host yet — someone would like this session to be offered
+          No host yet — someone would like to see this offered
         </p>
       ) : (
         <p className="mb-4 text-lg font-medium text-fg-muted">
