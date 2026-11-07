@@ -192,7 +192,11 @@ export function addAdminGuestRoutes(app: App, people: () => PeopleUseCases) {
   });
 
   app.openapi(createGuest, async (c) => {
-    const result = await people().createGuest(c.var.actor, c.req.valid("json"));
+    const result = await people().createGuest(
+      c.var.actor,
+      c.req.valid("json"),
+      c.var.now
+    );
     if (!result.ok) return problem(result.error);
     return c.json(result.value, 201);
   });

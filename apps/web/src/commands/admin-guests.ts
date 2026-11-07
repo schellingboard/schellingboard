@@ -1,7 +1,12 @@
 import type { ApiClient } from "@schellingboard/api-client";
 import { fetchEmailEnabled } from "../queries/email-enabled";
 
-type GuestBody = { name: string; email: string; username: string };
+type GuestBody = {
+  name: string;
+  email: string;
+  username: string;
+  eventIds: string[];
+};
 
 /** The admin users screens' calls; they wait for each answer, so none is a command. */
 export function adminGuestCalls(api: ApiClient) {

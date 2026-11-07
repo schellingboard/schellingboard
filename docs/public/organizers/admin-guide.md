@@ -115,7 +115,9 @@ Guests are also a **global pool** (Name, Email — unique when set, Username, Ab
 Avatar), independent of any event. The email may be left empty, which suits a site that sends no
 mail; such a guest gets no emails and signs in with a personal join link. A **username** lets a
 guest sign in with it and a password instead of their email. Per-event participation is a separate
-assignment on the event's "Guests" tab.
+assignment on the event's "Guests" tab, or by ticking events in the add and edit forms on the Users
+page. The ticked events stay ticked after "Add user", so adding several guests to the same events is
+quick; saving an edit sets the guest's events to those ticked.
 
 - **A guest must be assigned to an event before they can vote, RSVP, or add a proposal/session in
   it** — being in the global list isn't enough. This is enforced server-side.

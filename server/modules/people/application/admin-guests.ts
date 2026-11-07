@@ -41,6 +41,7 @@ export interface GuestInput {
   name: string;
   email?: string | null;
   username?: string | null;
+  eventIds?: string[];
 }
 
 export const adminRequired = () => forbidden("admin.required", "Unauthorized");
@@ -151,12 +152,19 @@ export const listGuests =
 
 export const createGuest =
   ({ uow }: PeopleDeps) =>
-  async (actor: Actor, input: unknown): Promise<Result<AdminGuest>> => {
+  async (
+    actor: Actor,
+    input: unknown,
+    now: Date
+  ): Promise<Result<AdminGuest>> => {
     if (!actor.admin) return adminRequired();
     const parsed = parseGuest(createGuestSchema, input);
     if (!parsed.ok) return parsed;
     const { name, email, username = null } = parsed.value;
+    const eventIds = [...new Set(parsed.value.eventIds ?? [])];
     return uow.run(async (tx) => {
+      for (const eventId of eventIds)
+        if (!(await tx.events.findById(eventId))) return eventNotFound();
       // findOrCreateByEmail is atomic (unique index on lower(email)), so a
       // concurrent create with the same email can't slip past this check.
       const { guest, created } = await tx.guests.findOrCreateByEmail({
@@ -169,8 +177,17 @@ export const createGuest =
         (await tx.guests.setUsername(guest.id, username)) === "taken"
       )
         return usernameTaken();
+      await recordingShownGuests(
+        tx,
+        eventIds,
+        async () => {
+          for (const eventId of eventIds)
+            await tx.guests.assignToEvent(eventId, [guest.id]);
+        },
+        byAdmin(actor, now)
+      );
       const stored = (await tx.guests.findById(guest.id)) ?? guest;
-      return ok(toAdminGuest(stored, [], false, false, username));
+      return ok(toAdminGuest(stored, eventIds, false, false, username));
     });
   };
 
@@ -224,6 +241,7 @@ export const updateGuest =
     const parsed = parseGuest(updateGuestSchema, input);
     if (!parsed.ok) return parsed;
     const { id, name, email, username, expectedVersion } = parsed.value;
+    const wanted = parsed.value.eventIds && [...new Set(parsed.value.eventIds)];
 
     return uow.run(async (tx) => {
       const current = await tx.guests.findById(id);
@@ -236,11 +254,16 @@ export const updateGuest =
         );
       const existing = email ? await tx.guests.findByEmail(email) : undefined;
       if (existing && existing.id !== id) return emailTaken();
+      for (const eventId of wanted ?? [])
+        if (!(await tx.events.findById(eventId))) return eventNotFound();
+      const memberOf = (await tx.guests.listEventsByGuests([id]))
+        .get(id)
+        ?.map((e) => e.id);
       const by = byAdmin(actor, now);
       let taken = false;
       const updated = await recordingShownGuests(
         tx,
-        await tx.guests.listShownEventIds(id),
+        [...(await tx.guests.listShownEventIds(id)), ...(wanted ?? [])],
         async () =>
           recordingProposalCascade(
             tx,
@@ -251,11 +274,17 @@ export const updateGuest =
                 info: { email },
                 expectedVersion,
               });
-              if (row && username !== undefined) {
-                taken = (await tx.guests.setUsername(id, username)) === "taken";
-                return taken ? row : await tx.guests.findById(id);
+              if (row && wanted) {
+                for (const eventId of memberOf ?? [])
+                  if (!wanted.includes(eventId))
+                    await tx.guests.removeFromEvent(eventId, [id]);
+                for (const eventId of wanted)
+                  if (!memberOf?.includes(eventId))
+                    await tx.guests.assignToEvent(eventId, [id]);
               }
-              return row;
+              if (row && username !== undefined)
+                taken = (await tx.guests.setUsername(id, username)) === "taken";
+              return row && !taken ? await tx.guests.findById(id) : row;
             },
             by
           ),

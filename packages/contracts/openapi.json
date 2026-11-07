@@ -8670,6 +8670,11 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "eventIds": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "The events the guest belongs to. On an edit it replaces the guest's events; omit it to keep them"
+                  },
                   "name": { "type": "string" },
                   "email": {
                     "type": ["string", "null"],
@@ -8737,6 +8742,11 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "eventIds": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "The events the guest belongs to. On an edit it replaces the guest's events; omit it to keep them"
+                  },
                   "name": { "type": "string" },
                   "email": {
                     "type": ["string", "null"],

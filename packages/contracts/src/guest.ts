@@ -133,7 +133,15 @@ const optionalEmail = z
   .transform((value) => value || null)
   .pipe(z.email({ pattern: /^\S+@\S+\.\S+$/ }).nullable());
 
+const eventIdsField = z
+  .array(z.string())
+  .optional()
+  .describe(
+    "The events the guest belongs to. On an edit it replaces the guest's events; omit it to keep them"
+  );
+
 export const createGuestSchema = z.object({
+  eventIds: eventIdsField,
   email: optionalEmail,
   name: z.string().trim().min(1, { message: "Name is required" }),
   username: z.preprocess(
@@ -208,6 +216,7 @@ export const profileActivitySchema = z
   .meta({ id: "ProfileActivity" });
 
 export const adminGuestBodySchema = z.object({
+  eventIds: eventIdsField,
   name: z.string(),
   email: z
     .string()

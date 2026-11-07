@@ -6208,6 +6208,8 @@ export interface paths {
       requestBody: {
         content: {
           "application/json": {
+            /** @description The events the guest belongs to. On an edit it replaces the guest's events; omit it to keep them */
+            eventIds?: string[];
             name: string;
             /** @description Omit, null or blank for a guest without an email */
             email?: string | null;
@@ -6267,6 +6269,8 @@ export interface paths {
       requestBody: {
         content: {
           "application/json": {
+            /** @description The events the guest belongs to. On an edit it replaces the guest's events; omit it to keep them */
+            eventIds?: string[];
             name: string;
             /** @description Omit, null or blank for a guest without an email */
             email?: string | null;

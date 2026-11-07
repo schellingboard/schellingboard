@@ -209,6 +209,10 @@ the timeout, not the cause. Unresolved.
 - Step 23a: `DELETE /auth/site` (in `server/http/site-auth.ts`, not rate limited) clears the site
   cookie and ends the session; the SPA signs out through `POST /auth/sign-out`.
 
+- Step 26: `POST/PUT /admin/guests` take optional `eventIds`; on an edit omitted means unchanged,
+  given means the guest's exact membership (adds and removes). Unknown event: 404 `event.notFound`.
+  `createGuest` now takes `now`.
+
 ## Questions
 
 Step 25b (for the user to know, decided by the coordinator): a verified session replaces a forgotten
