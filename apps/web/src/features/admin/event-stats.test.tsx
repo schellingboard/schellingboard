@@ -435,6 +435,53 @@ describe("location charts", { tags: ["021-US1"] }, () => {
   });
 });
 
+describe("1-on-1 charts", { tags: ["021-US1"] }, () => {
+  it("names the section and draws requests by status and slots per person", async () => {
+    const c = (
+      key: string,
+      type: "text" | "integer" | "number" = "integer"
+    ) => ({ key, label: key, type });
+    renderScreen("section=meetings", {
+      stats: {
+        ...stats,
+        tables: [
+          {
+            id: "meetings-status",
+            title: "Requests by status",
+            columns: [c("status", "text"), c("requests")],
+            rows: [
+              ["Accepted", 4],
+              ["Declined", 1],
+            ],
+          },
+          {
+            id: "meetings-slots",
+            title: "Slots offered per person",
+            columns: [c("from"), c("to"), c("people")],
+            rows: [
+              [1, 2, 3],
+              [2, 4, 1],
+            ],
+          },
+        ],
+      },
+    });
+
+    const nav = screen.getByRole("navigation", { name: "Statistics sections" });
+    expect(within(nav).getByRole("link", { name: "1-on-1s" })).toBeTruthy();
+    expect(
+      await screen.findByRole("img", {
+        name: "Requests by status: Accepted 4, Declined 1",
+      })
+    ).toBeTruthy();
+    expect(
+      await screen.findByRole("img", {
+        name: "Slots offered per person: 1 to 2: 3, 2 to 4: 1",
+      })
+    ).toBeTruthy();
+  });
+});
+
 describe("downloading statistics", { tags: ["021-US2"] }, () => {
   it("links each table's CSV and the ZIP, with the filter in the address", () => {
     renderScreen("excludeLocations=l1");

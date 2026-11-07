@@ -154,17 +154,25 @@ function SessionCharts({ table }: { table: StatsTable }) {
   );
 }
 
-function BinChart({ table, label }: { table: StatsTable; label: string }) {
+function BinChart({
+  table,
+  label,
+  countKey = "sessions",
+}: {
+  table: StatsTable;
+  label: string;
+  countKey?: string;
+}) {
   const bins = useMemo(() => {
     const from = column(table, "from");
     const to = column(table, "to");
-    const count = column(table, "sessions");
+    const count = column(table, countKey);
     return table.rows.map((row) => ({
       from: Number(from(row)),
       to: Number(to(row)),
       count: Number(count(row)),
     }));
-  }, [table]);
+  }, [table, countKey]);
   if (bins.length === 0) return null;
   return (
     <Histogram
@@ -437,6 +445,10 @@ export function chartFor(table: StatsTable): ReactNode {
       return <UtilizationHeatmaps table={table} />;
     case "locations-supply-demand":
       return <SupplyDemand table={table} />;
+    case "meetings-status":
+      return <CountBars table={table} labelKey="status" valueKey="requests" />;
+    case "meetings-slots":
+      return <BinChart table={table} label="Slots" countKey="people" />;
     case "sessions-table":
       return <SessionCharts table={table} />;
     case "sessions-duration":

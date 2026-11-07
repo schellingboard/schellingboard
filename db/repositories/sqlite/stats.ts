@@ -1,6 +1,7 @@
 import { and, eq, isNotNull, or } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import type { EventFacts } from "@schellingboard/domain/stats/facts";
+import { meetingSlotsForDay } from "@schellingboard/domain/meeting-slots";
 import * as schema from "../../schema";
 import type { StatsRepository } from "../interfaces";
 
@@ -29,13 +30,19 @@ export class SqliteStatsRepository implements StatsRepository {
         timezone: schema.events.timezone,
         breakMinutes: schema.events.breakMinutes,
         slotIncrementMinutes: schema.events.slotIncrementMinutes,
+        meetingsEnabled: schema.events.meetingsEnabled,
       })
       .from(schema.events)
       .where(eq(schema.events.id, eventId))
       .get();
     if (!event) return null;
-    const { timezone, breakMinutes, slotIncrementMinutes, ...eventIdentity } =
-      event;
+    const {
+      timezone,
+      breakMinutes,
+      slotIncrementMinutes,
+      meetingsEnabled,
+      ...eventIdentity
+    } = event;
 
     const members = db
       .select({ id: schema.eventGuests.guestId })
@@ -267,12 +274,56 @@ export class SqliteStatsRepository implements StatsRepository {
     for (const c of sessionCommenters)
       commentCounts.set(c.sessionId, (commentCounts.get(c.sessionId) ?? 0) + 1);
 
-    const meetingOffererIds = db
-      .selectDistinct({ id: schema.meetingAvailability.guestId })
-      .from(schema.meetingAvailability)
-      .where(eq(schema.meetingAvailability.eventId, eventId))
+    const offeredSlots = new Set(
+      db
+        .select({ start: schema.days.start, end: schema.days.end })
+        .from(schema.days)
+        .where(eq(schema.days.eventId, eventId))
+        .all()
+        .flatMap((day) =>
+          meetingSlotsForDay(
+            { start: new Date(day.start), end: new Date(day.end) },
+            slotIncrementMinutes
+          ).map((slot) => slot.start.toISOString())
+        )
+    );
+    const slotCounts = [
+      ...db
+        .select({
+          guestId: schema.meetingAvailability.guestId,
+          slotStart: schema.meetingAvailability.slotStart,
+        })
+        .from(schema.meetingAvailability)
+        .where(eq(schema.meetingAvailability.eventId, eventId))
+        .all()
+        .filter((r) => offeredSlots.has(new Date(r.slotStart).toISOString()))
+        .reduce(
+          (counts, r) =>
+            counts.set(r.guestId, (counts.get(r.guestId) ?? 0) + 1),
+          new Map<string, number>()
+        ),
+    ].map(([guestId, slots]) => ({ guestId, slots }));
+    const meetingPoints = db
+      .select({ name: schema.meetingPoints.name })
+      .from(schema.meetingPoints)
+      .where(eq(schema.meetingPoints.eventId, eventId))
+      .orderBy(schema.meetingPoints.sortIndex)
       .all()
-      .map((r) => r.id);
+      .map((r) => r.name);
+    const meetings = db
+      .select({
+        requesterId: schema.meetings.requesterId,
+        recipientId: schema.meetings.recipientId,
+        status: schema.meetings.status,
+        slotStart: schema.meetings.slotStart,
+        slotEnd: schema.meetings.slotEnd,
+        createdAt: schema.meetings.createdAt,
+        respondedAt: schema.meetings.respondedAt,
+        meetingPoint: schema.meetings.meetingPoint,
+      })
+      .from(schema.meetings)
+      .where(eq(schema.meetings.eventId, eventId))
+      .all();
 
     const hosts = db
       .selectDistinct({ id: schema.guests.id, name: schema.guests.name })
@@ -293,6 +344,7 @@ export class SqliteStatsRepository implements StatsRepository {
       timezone,
       breakMinutes,
       slotIncrementMinutes,
+      meetingsEnabled,
       days,
       unavailability,
       locationDetails,
@@ -326,7 +378,9 @@ export class SqliteStatsRepository implements StatsRepository {
       commenterIds: [...proposalCommenters, ...sessionCommenters]
         .map((r) => r.id)
         .filter((id): id is string => id !== null),
-      meetingOffererIds,
+      meetingSlotCounts: slotCounts,
+      meetingPoints,
+      meetings,
     };
   }
 }

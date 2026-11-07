@@ -3,6 +3,7 @@ export interface EventFacts {
   timezone: string;
   breakMinutes: number;
   slotIncrementMinutes: number;
+  meetingsEnabled: boolean;
   days: { startBookings: string; endBookings: string }[];
   unavailability: { locationId: string; start: string; end: string }[];
   locationDetails: { id: string; capacity: number; bookable: boolean }[];
@@ -38,5 +39,16 @@ export interface EventFacts {
   }[];
   rsvps: { sessionId: string; guestId: string }[];
   commenterIds: string[];
-  meetingOffererIds: string[];
+  meetingSlotCounts: { guestId: string; slots: number }[];
+  meetingPoints: string[];
+  meetings: {
+    requesterId: string;
+    recipientId: string;
+    status: "pending" | "accepted" | "declined" | "canceled";
+    slotStart: string;
+    slotEnd: string;
+    createdAt: string;
+    respondedAt: string | null;
+    meetingPoint: string;
+  }[];
 }

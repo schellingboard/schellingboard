@@ -25,7 +25,7 @@ export function overviewTables(
   const proposers = only(proposals.flatMap((p) => p.hostIds));
   const hosts = only(sessions.flatMap((s) => s.hostIds));
   const commenters = only(facts.commenterIds);
-  const offerers = only(facts.meetingOffererIds);
+  const offerers = only(facts.meetingSlotCounts.map((c) => c.guestId));
   const active = new Set(
     [voters, rsvpers, proposers, hosts, commenters, offerers].flatMap((set) => [
       ...set,

@@ -125,17 +125,21 @@ RSVPs are intent, not attendance; the section says so once.
 
 ### 6. 1-on-1s
 
-Only when the event has 1-on-1s enabled.
+Only when the event has 1-on-1s enabled, or has availability or requests from when it did.
 
 - **Adoption**: members with availability, share; availability slots per person (histogram).
-- **Requests**: total, by status (pending, accepted, declined, canceled, expired), distinct
-  requesters, distinct recipients, people with at least one accepted meeting.
+- **Requests**: by status (pending, accepted, declined, canceled, expired), distinct requesters,
+  distinct recipients, people with at least one accepted meeting.
 - **Per person** (pseudonymous): requests sent, received, accepted.
-- **Response time**: median and distribution of `responded_at − created_at`, for accepted and
-  declined requests only. Every status change overwrites `responded_at`, so a cancel hides the
-  response time; the page says so.
+- **Response time**: median of `responded_at − created_at`, for accepted and declined requests only.
+  Every status change overwrites `responded_at`, so a cancel hides the response time; the page says
+  so.
 - **When**: accepted meetings by hour and day.
 - **Meeting points**: the organizer's points by use; free-text points only as "Other".
+
+A meeting with an excluded host on either side leaves every 1-on-1 figure. A pending request whose
+slot has started counts as expired. Availability outside the current days is not counted. Without
+availability, requests or the switch, the section has no tables.
 
 ### 7. Profiles
 

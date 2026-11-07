@@ -14,6 +14,7 @@ import { SortableStatsTable } from "./stats-table";
 const SECTION_LABELS: Record<string, string> = {
   overview: "Overview",
   sessions: "Sessions",
+  meetings: "1-on-1s",
 };
 
 const ORIGIN_LABELS = {

@@ -5,7 +5,7 @@
 - No pushes, no PRs (the user's rule); commits stay local. No real event database is available
   (privacy): old data is checked through the release-upgrade fixtures and the dev seed. The user's
   past event runs 3.8.1 and is upgraded to 5.0.0 before they use the page.
-- Steps 1-13 done (see PLAN.md). How to add a figure: add tables in
+- Steps 1-14 done (see PLAN.md). How to add a figure: add tables in
   `server/modules/stats/application/<section>.ts` (helpers `col`, `percent`, `round`, `tallyVotes`
   in `cells.ts`), facts in `packages/domain/src/stats/facts.ts` and
   `db/repositories/sqlite/stats.ts`, register in `statistics.ts`. The SPA groups tables into
@@ -33,6 +33,10 @@
   not happened: use the dev clock to view them as past.
 - Test notes: Plot under happy-dom has no canvas legend; charts are found by role `img` and their
   `summary`. Admin code must stay in `admin-pages.tsx`'s module graph (lazy chunk).
+- 1-on-1s (`meetings.ts`): a meeting with an excluded host on either side leaves all figures;
+  expired = pending with slot ended; free-text meeting points are only counted as "Other" (never
+  shown); empty rows = No data when no availability and no requests; hours merge across a clock
+  change.
 - Fragment rule (locations): a gap is usable when a grid slot S >= gapStart - break fits a whole
   slot increment before the gap ends, grid anchored at the day's booking start.
 - Not run yet: `make test-e2e-docker` (the bundle changed with fflate; run in the Finish step).

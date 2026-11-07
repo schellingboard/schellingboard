@@ -81,7 +81,7 @@ then its cards in the SPA. Skip a figure whose chart adds nothing to its table.
       hosts who attend) and the Overview "Who did what" table.
 - [x] 13. Locations section (`locations.ts`: location table with gaps and fragments, hour heatmap
       per day, supply and demand by hour); filtered sessions and blockers still occupy their room.
-- [ ] 14. 1-on-1s: adoption, requests by status, per person, response time, when, meeting points.
+- [x] 14. 1-on-1s section (`meetings.ts`, 8 `meetings-*` tables; charts for status and slots).
 - [ ] 15. Profiles, comments, notifications (one step: all three are counts over members).
 
 ### Finish

@@ -990,3 +990,266 @@ describe("location statistics", { tags: ["021-US1"] }, () => {
     });
   });
 });
+
+describe("1-on-1 statistics", { tags: ["021-US1"] }, () => {
+  const at = (hour: number, minute = 0, day = 10) =>
+    new Date(Date.UTC(2020, 2, day, hour, minute));
+  const FAR = new Date(Date.UTC(2099, 0, 1, 9));
+
+  const rowsOf = (s: Stats, id: string) => {
+    const t = s.tables.find((x) => x.id === id);
+    expect(t, id).toBeDefined();
+    return t!.rows.map((r) =>
+      Object.fromEntries(t!.columns.map((c, i) => [c.key, r[i]]))
+    );
+  };
+  const row = (s: Stats, id: string, label: string) =>
+    rowsOf(s, id).find((r) => Object.values(r)[0] === label);
+
+  const meet = async (
+    from: string,
+    to: string,
+    slot: Date,
+    point: string,
+    outcome:
+      | { status: "pending" }
+      | { status: "accepted" | "declined" | "canceled"; after: number },
+    created = at(8)
+  ) => {
+    const { meetings } = getRepositories();
+    const m = await meetings.create({
+      eventId,
+      requesterId: from,
+      recipientId: to,
+      slotStart: slot,
+      slotEnd: new Date(slot.getTime() + 30 * 60_000),
+      meetingPoint: point,
+      message: "",
+      createdAt: created,
+    });
+    if (outcome.status !== "pending")
+      await meetings.updateStatus(
+        m.id,
+        outcome.status,
+        new Date(created.getTime() + outcome.after * 60_000),
+        ["pending"]
+      );
+  };
+
+  const withMeetings = async () => {
+    const { meetingAvailability, meetingPoints } = getRepositories();
+    await createDay(eventId, {
+      start: at(8),
+      end: at(18),
+      startBookings: at(8),
+      endBookings: at(18),
+    });
+    await meetingPoints.create({
+      eventId,
+      name: "Lobby",
+      description: "",
+      sortIndex: 0,
+    });
+    await meetingPoints.create({
+      eventId,
+      name: "Garden",
+      description: "",
+      sortIndex: 1,
+    });
+    await meetingAvailability.replaceForGuest(ids.a, eventId, [
+      at(9),
+      at(10),
+      at(11),
+    ]);
+    await meetingAvailability.replaceForGuest(ids.c, eventId, [at(9)]);
+    await meet(ids.c, ids.a, at(9), "Lobby", { status: "accepted", after: 30 });
+    await meet(ids.d, ids.a, at(10), "lobby", {
+      status: "declined",
+      after: 120,
+    });
+    await meet(ids.c, ids.b, at(11), "Secret cafe", {
+      status: "canceled",
+      after: 10,
+    });
+    await meet(ids.d, ids.b, FAR, "Secret cafe", { status: "pending" });
+    await meet(ids.c, ids.d, at(14), "Secret cafe", {
+      status: "accepted",
+      after: 60,
+    });
+    await meet(ids.d, ids.v, at(15), "Lobby", { status: "pending" });
+  };
+
+  it("has no 1-on-1 tables when the event never used them", async () => {
+    const s = await stats();
+    expect(s.tables.some((t) => t.id.startsWith("meetings-"))).toBe(false);
+  });
+
+  it("says No data when 1-on-1s are on but nobody used them", async () => {
+    await getRepositories().events.update(eventId, { meetingsEnabled: true });
+    const s = await stats();
+    for (const id of [
+      "meetings-slots",
+      "meetings-status",
+      "meetings-people",
+      "meetings-per-person",
+      "meetings-response",
+      "meetings-when",
+      "meetings-points",
+    ])
+      expect(rowsOf(s, id), id).toEqual([]);
+  });
+
+  it("counts a pending request as expired once its slot has started", async () => {
+    await meet(ids.c, ids.a, new Date(Date.now() - 10 * 60_000), "Lobby", {
+      status: "pending",
+    });
+    const s = await stats();
+    expect(row(s, "meetings-status", "Expired")).toMatchObject({ requests: 1 });
+    expect(row(s, "meetings-status", "Pending")).toMatchObject({ requests: 0 });
+  });
+
+  it("does not count availability outside the current days", async () => {
+    await getRepositories().meetingAvailability.replaceForGuest(
+      ids.a,
+      eventId,
+      [at(9), at(9, 30), at(20)]
+    );
+    await createDay(eventId, {
+      start: at(8),
+      end: at(10),
+      startBookings: at(8),
+      endBookings: at(10),
+    });
+    const s = await stats();
+    expect(row(s, "meetings-adoption", "Slots offered")).toMatchObject({
+      value: 2,
+    });
+  });
+
+  it("merges organizer points that differ only in case", async () => {
+    await getRepositories().meetingPoints.create({
+      eventId,
+      name: "lobby",
+      description: "",
+      sortIndex: 5,
+    });
+    await withMeetings();
+    const points = rowsOf(await stats(), "meetings-points");
+    expect(
+      points.filter((r) => String(r.point).toLowerCase() === "lobby")
+    ).toHaveLength(1);
+    expect(points.reduce((sum, r) => sum + Number(r.share), 0)).toBe(100);
+  });
+
+  it("measures adoption of availability", async () => {
+    await withMeetings();
+    const s = await stats();
+    expect(
+      row(s, "meetings-adoption", "Members with availability")
+    ).toMatchObject({ value: 2, share: 40 });
+    expect(row(s, "meetings-adoption", "Slots offered")).toMatchObject({
+      value: 4,
+    });
+    const slots = rowsOf(s, "meetings-slots");
+    expect(slots.reduce((sum, r) => sum + Number(r.people), 0)).toBe(2);
+  });
+
+  it("counts requests by status, deriving expired ones", async () => {
+    await withMeetings();
+    const s = await stats();
+    const status = (name: string) => row(s, "meetings-status", name);
+    expect(status("Accepted")).toMatchObject({ requests: 2 });
+    expect(status("Declined")).toMatchObject({ requests: 1 });
+    expect(status("Canceled")).toMatchObject({ requests: 1 });
+    expect(status("Pending")).toMatchObject({ requests: 1 });
+    expect(status("Expired")).toMatchObject({ requests: 1, share: 16.7 });
+    expect(row(s, "meetings-people", "Requested")).toMatchObject({ people: 2 });
+    expect(row(s, "meetings-people", "Asked")).toMatchObject({ people: 4 });
+    expect(row(s, "meetings-people", "With an accepted meeting")).toMatchObject(
+      { people: 3, share: 60 }
+    );
+  });
+
+  it("lists sent, received and accepted per person without ids or names", async () => {
+    await withMeetings();
+    const t = (await stats()).tables.find(
+      (x) => x.id === "meetings-per-person"
+    )!;
+    const rows = t.rows.map((r) =>
+      Object.fromEntries(t.columns.map((c, i) => [c.key, r[i]]))
+    );
+    expect(rows.map((r) => [r.sent, r.received, r.accepted])).toEqual([
+      [3, 1, 1],
+      [3, 0, 2],
+      [0, 2, 1],
+      [0, 2, 0],
+      [0, 1, 0],
+    ]);
+    const res = await get(
+      `/admin/events/${eventId}/stats/meetings-per-person.csv`
+    );
+    const text = JSON.stringify(rows) + (await res.text());
+    for (const id of Object.values(ids)) expect(text).not.toContain(id);
+    for (const name of [...hostNames, ...nonHostNames])
+      expect(text).not.toContain(name);
+  });
+
+  it("times responses to accepted and declined requests", async () => {
+    await withMeetings();
+    const s = await stats();
+    expect(row(s, "meetings-response", "Accepted")).toMatchObject({
+      requests: 2,
+      median: 45,
+    });
+    expect(row(s, "meetings-response", "Declined")).toMatchObject({
+      requests: 1,
+      median: 120,
+    });
+    expect(row(s, "meetings-response", "Accepted and declined")).toMatchObject({
+      requests: 3,
+      median: 60,
+    });
+  });
+
+  it("shows accepted meetings by day and hour in the event's zone", async () => {
+    await getRepositories().events.update(eventId, {
+      timezone: "Asia/Kolkata",
+    });
+    await withMeetings();
+    expect(rowsOf(await stats(), "meetings-when")).toEqual([
+      { day: "2020-03-10", hour: "14:00", meetings: 1 },
+      { day: "2020-03-10", hour: "19:00", meetings: 1 },
+    ]);
+  });
+
+  it("counts organizer points by use and never shows typed places", async () => {
+    await withMeetings();
+    const s = await stats();
+    expect(rowsOf(s, "meetings-points")).toEqual([
+      { point: "Lobby", requests: 3, share: 50 },
+      { point: "Garden", requests: 0, share: 0 },
+      { point: "Other", requests: 3, share: 50 },
+    ]);
+    expect(JSON.stringify(s)).not.toContain("Secret");
+    const csv = await get(`/admin/events/${eventId}/stats.zip`);
+    expect(csv.status).toBe(200);
+    const files = unzipSync(new Uint8Array(await csv.arrayBuffer()));
+    for (const data of Object.values(files))
+      expect(strFromU8(data)).not.toContain("Secret");
+  });
+
+  it("drops meetings of an excluded host from all figures", async () => {
+    await withMeetings();
+    const s = await stats(`?excludeHosts=${ids.a}`);
+    expect(row(s, "meetings-status", "Accepted")).toMatchObject({
+      requests: 1,
+    });
+    expect(row(s, "meetings-status", "Declined")).toMatchObject({
+      requests: 0,
+    });
+    expect(
+      row(s, "meetings-adoption", "Members with availability")
+    ).toMatchObject({ value: 1 });
+    expect(rowsOf(s, "meetings-per-person")).toHaveLength(4);
+  });
+});
