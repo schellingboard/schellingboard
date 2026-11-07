@@ -19,9 +19,12 @@ test("reads the statistics, leaves a location and a host out and downloads the t
   const headline = page.getByRole("table", { name: "Headline numbers" });
   await expect(headline.getByRole("row", { name: /^Members/ })).toBeVisible();
 
-  await page.getByText("Filter", { exact: true }).click();
-  await page.getByRole("checkbox", { name: "Garden Terrace" }).check();
-  await page.getByRole("checkbox", { name: "Yuki Tanaka" }).check();
+  await page
+    .getByRole("combobox", { name: "Locations to leave out" })
+    .fill("garden");
+  await page.getByRole("option", { name: "Garden Terrace" }).click();
+  await page.getByRole("combobox", { name: "Hosts to leave out" }).fill("yuki");
+  await page.getByRole("option", { name: "Yuki Tanaka" }).click();
   await expect(
     page.getByText("Excluding 1 location, 1 host, blockers")
   ).toBeVisible();

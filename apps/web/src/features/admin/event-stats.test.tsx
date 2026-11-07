@@ -202,7 +202,9 @@ describe("the statistics screen", { tags: ["021-US1"] }, () => {
     expect(
       screen.getByRole("table", { name: "Headline numbers" })
     ).toBeTruthy();
-    expect(screen.getByRole("group", { name: "Locations" })).toBeTruthy();
+    expect(
+      screen.getByRole("combobox", { name: "Locations to leave out" })
+    ).toBeTruthy();
   });
 });
 
@@ -659,17 +661,44 @@ describe("the statistics filter panel", { tags: ["021-US3"] }, () => {
     );
   });
 
-  it("offers every location, host and origin, with blockers left out", () => {
-    renderScreen();
+  it("finds a host to leave out by typing, sorted by name", async () => {
+    const { onParams } = renderScreen("excludeLocations=l1", {
+      stats: {
+        ...stats,
+        filterOptions: {
+          ...stats.filterOptions,
+          hosts: [
+            { id: "g2", name: "Zoe Zed" },
+            { id: "g1", name: "Olga Organizer" },
+            { id: "g3", name: "Anna Able" },
+          ],
+        },
+      },
+    });
+    const hosts = screen.getByRole("combobox", { name: "Hosts to leave out" });
+
+    await userEvent.click(hosts);
+    expect(
+      screen.getAllByRole("option").map((option) => option.textContent)
+    ).toEqual(["Anna Able", "Olga Organizer", "Zoe Zed"]);
+
+    await userEvent.type(hosts, "olg");
+    await userEvent.click(
+      screen.getByRole("option", { name: "Olga Organizer" })
+    );
+
+    expect(onParams).toHaveBeenCalledWith(
+      { excludeLocations: "l1", excludeHosts: "g1", excludeOrigins: null },
+      { push: false }
+    );
+  });
+
+  it("shows what is left out, with blockers by default", () => {
+    renderScreen("excludeLocations=l1");
 
     expect(
-      within(screen.getByRole("group", { name: "Locations" })).getAllByRole(
-        "checkbox"
-      )
-    ).toHaveLength(2);
-    expect(
-      checked(screen.getByRole("checkbox", { name: "Olga Organizer" }))
-    ).toBe(false);
+      screen.getByRole("button", { name: "Remove Volunteers 1" })
+    ).toBeTruthy();
     const origins = screen.getByRole("group", { name: "Session origins" });
     expect(
       checked(within(origins).getByRole("checkbox", { name: "Blockers" }))
@@ -681,32 +710,33 @@ describe("the statistics filter panel", { tags: ["021-US3"] }, () => {
     ).toBe(false);
   });
 
-  it("puts an excluded location in the address", async () => {
-    const { onParams } = renderScreen("excludeHosts=g1");
+  it("takes an exclusion back out", async () => {
+    const { onParams } = renderScreen("excludeLocations=l1");
 
     await userEvent.click(
-      screen.getByRole("checkbox", { name: "Volunteers 1" })
+      screen.getByRole("button", { name: "Remove Volunteers 1" })
+    );
+    expect(onParams).toHaveBeenLastCalledWith(
+      { excludeLocations: null, excludeHosts: null, excludeOrigins: null },
+      { push: false }
     );
 
-    expect(onParams).toHaveBeenCalledWith(
-      { excludeLocations: "l1", excludeHosts: "g1", excludeOrigins: null },
+    await userEvent.click(screen.getByRole("checkbox", { name: "Blockers" }));
+    expect(onParams).toHaveBeenLastCalledWith(
+      { excludeLocations: "l1", excludeHosts: null, excludeOrigins: "" },
       { push: false }
     );
   });
 
-  it("takes an exclusion back out", async () => {
-    const { onParams } = renderScreen("excludeLocations=l1");
-    expect(
-      checked(screen.getByRole("checkbox", { name: "Volunteers 1" }))
-    ).toBe(true);
-
-    await userEvent.click(
-      screen.getByRole("checkbox", { name: "Volunteers 1" })
+  it("goes back to the default filter in one click", async () => {
+    const { onParams } = renderScreen(
+      "excludeLocations=l1&excludeHosts=g1&excludeOrigins="
     );
-    await userEvent.click(screen.getByRole("checkbox", { name: "Blockers" }));
 
-    expect(onParams).toHaveBeenLastCalledWith(
-      { excludeLocations: "l1", excludeHosts: null, excludeOrigins: "" },
+    await userEvent.click(screen.getByRole("button", { name: "Reset filter" }));
+
+    expect(onParams).toHaveBeenCalledWith(
+      { excludeLocations: null, excludeHosts: null, excludeOrigins: null },
       { push: false }
     );
   });

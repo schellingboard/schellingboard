@@ -208,9 +208,11 @@ database holds now, so it works for a past event after an upgrade.
 
 ### Filter
 
-Open **Filter** to leave things out of every figure: locations, hosts and kinds of session (blockers
-are left out by default). A typical use is leaving out volunteer shifts so that they do not skew
-attendance. The filter lives only in the page address, so a link keeps it and nothing is saved.
+The filter above the figures leaves things out of every figure: type in **Locations to leave out**
+or **Hosts to leave out** to find one, and tick kinds of session (blockers are left out by default).
+**Reset filter** goes back to the default. A typical use is leaving out volunteer shifts so that
+they do not skew attendance. The filter lives only in the page address, so a link keeps it and
+nothing is saved.
 
 - A session or proposal leaves when all of its hosts are left out; a session also leaves when all of
   its locations, or its kind, are.

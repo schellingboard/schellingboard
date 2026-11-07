@@ -6,7 +6,9 @@ import {
   statsDownloadUrl,
   type StatsFilter,
 } from "../../queries/admin-stats";
+import { useId, type ReactNode } from "react";
 import { cx } from "../../ui/cx";
+import { PeoplePicker } from "../../ui/people-picker";
 import type { OnParams } from "./list-paging";
 import { chartFor } from "./stats-charts";
 import { SortableStatsTable } from "./stats-table";
@@ -33,96 +35,121 @@ function toggled<T>(list: T[], item: T, on: boolean) {
   return on ? [...list, item] : list.filter((x) => x !== item);
 }
 
-function FilterGroup({
-  legend,
+function Picker({
+  label,
   options,
   excluded,
   onChange,
 }: {
-  legend: string;
+  label: string;
   options: { id: string; name: string }[];
   excluded: string[];
-  onChange: (id: string, excluded: boolean) => void;
+  onChange: (ids: string[]) => void;
 }) {
+  const id = useId();
   return (
-    <fieldset className="min-w-0 space-y-1">
-      <legend className="text-sm font-medium text-fg">{legend}</legend>
-      <div className="max-h-48 space-y-1 overflow-y-auto">
-        {options.map((option) => (
-          <label key={option.id} className="flex items-start gap-2 text-sm">
-            <input
-              type="checkbox"
-              className="mt-0.5 h-4 w-4 rounded border-line"
-              checked={excluded.includes(option.id)}
-              onChange={(e) => onChange(option.id, e.target.checked)}
-            />
-            <span>{option.name}</span>
-          </label>
-        ))}
-      </div>
-    </fieldset>
+    <div className="min-w-0 space-y-1">
+      <label htmlFor={id} className="block text-sm font-medium text-fg">
+        {label}
+      </label>
+      <PeoplePicker
+        id={id}
+        people={options}
+        selected={excluded}
+        onChange={onChange}
+        placeholder="Type to find, or pick from the list"
+      />
+    </div>
   );
 }
 
 function FilterPanel({
   options,
   filter,
+  summary,
   onChange,
+  download,
 }: {
   options: EventStatistics["filterOptions"];
   filter: StatsFilter;
+  summary: string;
   onChange: (filter: StatsFilter) => void;
+  download: ReactNode;
 }) {
+  const isDefault = Object.values(filterToParams(filter)).every(
+    (value) => value === null
+  );
   return (
-    <details className="rounded-md border border-line-subtle p-3">
-      <summary className="cursor-pointer text-sm font-medium text-fg">
-        Filter
-      </summary>
-      <p className="mt-2 text-sm text-fg-subtle">
-        Ticked locations, hosts and kinds of session are left out of every
-        figure.
-      </p>
-      <div className="mt-3 grid gap-4 sm:grid-cols-3">
-        <FilterGroup
-          legend="Locations"
+    <section
+      aria-label="Filter"
+      className="space-y-3 rounded-md border border-line-subtle p-3"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-fg-muted">
+          <span className="font-medium text-fg">Filter: </span>
+          {summary}
+        </p>
+        <div className="flex items-center gap-3">
+          {!isDefault && (
+            <button
+              type="button"
+              onClick={() => onChange(filterFromParams(new URLSearchParams()))}
+              className="text-sm font-medium text-fg-muted underline-offset-4 hover:text-fg hover:underline"
+            >
+              Reset filter
+            </button>
+          )}
+          {download}
+        </div>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
+        <Picker
+          label="Locations to leave out"
           options={options.locations}
           excluded={filter.excludeLocations}
-          onChange={(id, on) =>
-            onChange({
-              ...filter,
-              excludeLocations: toggled(filter.excludeLocations, id, on),
-            })
-          }
+          onChange={(ids) => onChange({ ...filter, excludeLocations: ids })}
         />
-        <FilterGroup
-          legend="Hosts"
+        <Picker
+          label="Hosts to leave out"
           options={options.hosts}
           excluded={filter.excludeHosts}
-          onChange={(id, on) =>
-            onChange({
-              ...filter,
-              excludeHosts: toggled(filter.excludeHosts, id, on),
-            })
-          }
+          onChange={(ids) => onChange({ ...filter, excludeHosts: ids })}
         />
-        <FilterGroup
-          legend="Session origins"
-          options={SESSION_ORIGINS.map((id) => ({
-            id,
-            name: ORIGIN_LABELS[id],
-          }))}
-          excluded={filter.excludeOrigins}
-          onChange={(id, on) =>
-            onChange({
-              ...filter,
-              excludeOrigins: SESSION_ORIGINS.filter((o) =>
-                toggled<string>(filter.excludeOrigins, id, on).includes(o)
-              ),
-            })
-          }
-        />
+        <fieldset className="min-w-0 space-y-1 md:col-span-2 xl:col-span-1">
+          <legend className="text-sm font-medium text-fg">
+            Session origins
+          </legend>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 xl:flex-col">
+            {SESSION_ORIGINS.map((origin) => (
+              <label key={origin} className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-line"
+                  checked={filter.excludeOrigins.includes(origin)}
+                  onChange={(e) =>
+                    onChange({
+                      ...filter,
+                      excludeOrigins: SESSION_ORIGINS.filter((o) =>
+                        toggled<string>(
+                          filter.excludeOrigins,
+                          origin,
+                          e.target.checked
+                        ).includes(o)
+                      ),
+                    })
+                  }
+                />
+                {ORIGIN_LABELS[origin]}
+              </label>
+            ))}
+          </div>
+        </fieldset>
       </div>
-    </details>
+      <p className="text-xs text-fg-subtle">
+        What you leave out leaves every figure and download. A host also leaves
+        the figures about people.
+      </p>
+    </section>
   );
 }
 
@@ -161,9 +188,12 @@ export function EventStatsScreen({
   return (
     <div className="space-y-6">
       {alert}
-      <div className="space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-fg-muted">{stats.filterSummary}</p>
+      <FilterPanel
+        options={stats.filterOptions}
+        filter={filter}
+        summary={stats.filterSummary}
+        onChange={(next) => onParams(filterToParams(next), { push: false })}
+        download={
           <a
             href={statsDownloadUrl(eventId, "stats.zip", filter)}
             download
@@ -171,13 +201,8 @@ export function EventStatsScreen({
           >
             Download all
           </a>
-        </div>
-        <FilterPanel
-          options={stats.filterOptions}
-          filter={filter}
-          onChange={(next) => onParams(filterToParams(next), { push: false })}
-        />
-      </div>
+        }
+      />
 
       <div className="space-y-6 lg:grid lg:grid-cols-[11rem_minmax(0,1fr)] lg:gap-8 lg:space-y-0">
         <nav

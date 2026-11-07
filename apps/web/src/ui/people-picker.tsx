@@ -20,6 +20,7 @@ export function PeoplePicker({
   name,
   invalid,
   describedBy,
+  placeholder,
 }: {
   people: Person[];
   selected: string[];
@@ -28,6 +29,7 @@ export function PeoplePicker({
   name?: string;
   invalid?: boolean;
   describedBy?: string;
+  placeholder?: string;
 }) {
   const listId = useId();
   const root = useRef<HTMLDivElement>(null);
@@ -104,6 +106,7 @@ export function PeoplePicker({
           autoComplete="off"
           className="min-w-8 flex-1 border-none bg-transparent px-0 py-1 text-base sm:text-sm outline-none placeholder:text-fg-subtle focus:ring-0"
           value={query}
+          placeholder={chips.length === 0 ? placeholder : undefined}
           onChange={(e) => {
             setQuery(e.target.value);
             setActive(0);
