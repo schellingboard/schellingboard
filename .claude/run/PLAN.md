@@ -87,9 +87,8 @@ then its cards in the SPA. Skip a figure whose chart adds nothing to its table.
 
 ### Finish
 
-- [ ] 16. Docs: admin guide "Statistics" (filter, CSV, what each section means, the caveats),
-      `CHANGELOG.md`, a release-notes highlight, a screenshot in `docs/screenshots/`. Full
-      `make test-e2e`.
+- [x] 16. Docs: admin guide Statistics section, CHANGELOG bullet fixed, release-notes highlight
+      (replaced "Edits no longer overwrite each other"), `admin-statistics.webp` shot.
 - [ ] 17. **Finish**: summary in PROGRESS.md, including open Questions, then delete `.claude/run/`.
 
 ## Not in this run

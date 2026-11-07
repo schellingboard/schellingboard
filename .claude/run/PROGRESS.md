@@ -5,7 +5,7 @@
 - No pushes, no PRs (the user's rule); commits stay local. No real event database is available
   (privacy): old data is checked through the release-upgrade fixtures and the dev seed. The user's
   past event runs 3.8.1 and is upgraded to 5.0.0 before they use the page.
-- Steps 1-15 done (see PLAN.md). How to add a figure: add tables in
+- Steps 1-16 done (see PLAN.md). How to add a figure: add tables in
   `server/modules/stats/application/<section>.ts` (helpers `col`, `percent`, `round`, `tallyVotes`
   in `cells.ts`), facts in `packages/domain/src/stats/facts.ts` and
   `db/repositories/sqlite/stats.ts`, register in `statistics.ts`. The SPA groups tables into
@@ -43,7 +43,9 @@
   author, so only target filters them. `doublingEdges` lives in `cells.ts`.
 - Fragment rule (locations): a gap is usable when a grid slot S >= gapStart - break fits a whole
   slot increment before the gap ends, grid anchored at the day's booking start.
-- Not run yet: `make test-e2e-docker` (the bundle changed with fflate; run in the Finish step).
+- Not run: full `make test-e2e` and `make test-e2e-docker` (user runs them at the end). Bundle
+  changes to check in the Docker image: fflate banner in `scripts/build-server.ts`, the lazy
+  Observable Plot chunk and admin chunk in the web build.
 
 ## Questions
 

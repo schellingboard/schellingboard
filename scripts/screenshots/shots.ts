@@ -233,6 +233,12 @@ export const shots: Shot[] = [
     await form.evaluate((el) => el.scrollIntoView({ block: "start" }));
     await page.evaluate(() => window.scrollBy(0, -80));
   }),
+  shot("admin-statistics", async (page) => {
+    await manageGamma(page);
+    await page.getByRole("link", { name: "Statistics" }).click();
+    await page.getByRole("heading", { name: "Headline numbers" }).waitFor();
+    await page.getByRole("img").first().waitFor();
+  }),
   shot("mobile-schedule", (page) => openGammaOnPhone(page), {
     kind: "mobile",
   }),

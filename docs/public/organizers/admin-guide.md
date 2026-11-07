@@ -192,3 +192,72 @@ Admins can create/edit/delete sessions directly, outside the normal proposal →
   for event settings, days, locations, meeting points and guests. On the event page, save a section
   before you edit the next one: saving one section refuses the save of another section that already
   has unsaved edits.
+
+## Statistics
+
+The **Statistics** tab of an event answers how the event went: did proposals turn into sessions, did
+the venue work, which features did people use. Every figure is a table you can sort by clicking a
+column, and **Download CSV** saves it. **Download all** saves every table as a ZIP. Most tables have
+a chart above them. A figure the database cannot supply, such as attendee counts for an event that
+ran before they existed, says "No data" instead of 0. The page counts what the database holds now,
+so it works for a past event after an upgrade.
+
+![The Statistics tab with the filter, the section navigation and the headline numbers](../../screenshots/admin-statistics.webp)
+
+### Filter
+
+Open **Filter** to leave things out of every figure: locations, hosts and kinds of session (blockers
+are left out by default). A typical use is leaving out volunteer shifts so that they do not skew
+attendance. The filter lives only in the page address, so a link keeps it and nothing is saved.
+
+- A session or proposal leaves when all of its hosts are left out; a session also leaves when all of
+  its locations, or its kind, are.
+- A host you leave out also leaves the figures about people: their votes, RSVPs, comments, profile
+  and 1-on-1s. Only people who host sessions appear in the host list.
+- A room still counts as occupied by a left-out session or blocker, so the gaps in the Locations
+  figures stay true.
+- Downloads carry the filter, and their file names say "filtered".
+
+### Sections
+
+- **Overview**: headline numbers, the participation funnel from members to hosts, and how many
+  members voted, RSVPed, both or neither.
+- **Proposals**: one row per proposal with its votes, rank and what became of it, popular proposals
+  that were never scheduled, whether late proposals got fewer votes, and votes per voter.
+- **Sessions**: RSVPs, fill, reported attendees, duration, start hour and day, parallel sessions,
+  and whether hosts reported attendance. It also compares the attendance model's prediction with the
+  reported counts.
+- **Attendees**: RSVPs per attendee, the gaps between RSVPed sessions and double bookings.
+- **Locations**: booked and free hours, gaps, utilization by hour and day, and parallel sessions
+  against RSVPs by hour. Use it to plan next year's grid.
+- **1-on-1s**: availability offered, requests by status, response time, accepted meetings by hour
+  and meeting points. This section appears only if the event uses, or used, 1-on-1s.
+- **Profiles**, **Comments** and **Notifications**: how many members filled in which profile fields,
+  comments by what they are on and per day, and email, push and in-app notification use. Profiles
+  and Comments appear only when the event has such data.
+
+### Read the figures with care
+
+- **RSVPs are intent, not attendance.** Attendee counts are typed in by hosts, are rough, and exist
+  only for sessions whose host reported one. Check "did hosts report?" in Sessions first: it tells
+  you how far to trust every attendance figure.
+- **The prediction is a rough guide.** The attendance model was fitted on one event (13 sessions).
+  The page labels it so, and shows how often the reported counts fell inside its ranges.
+- **Correlations need many sessions.** With fewer than 15 sessions (pairs) the page says it is too
+  few to say anything. A correlation does not show that one thing caused the other.
+- **Votes and RSVPs have no history.** The page cannot show how either grew over time, and a
+  cancelled RSVP leaves no trace.
+- **Response times for 1-on-1s are partial.** A later cancel overwrites the time of the answer, so
+  only requests still accepted or declined are timed. A pending request counts as expired once its
+  slot has started.
+- **Comments on a profile have no event.** On a site with several events they count in every event
+  the member belongs to. In-app notifications likewise count all events of the members, and a
+  notification someone deleted unread is not counted, so the read share is a lower bound.
+
+### Privacy
+
+Tables about people list rows without names or ids: each person is "P001", "P002", and so on, sorted
+by value. The numbering changes with every table and every request, so rows cannot be joined across
+tables or matched to a person. Free text, such as languages and places in profiles, is shown only
+when at least three members share it; the rest is "Other". Contact details and meeting places people
+typed are never shown. Statistics are visible to site admins only.
