@@ -84,7 +84,7 @@ start: install
 	bun set-env.ts production node dist/server/main.mjs
 
 lint: install
-	bun x eslint --max-warnings 0 .
+	NODE_OPTIONS=--max-old-space-size=8192 bun x eslint --max-warnings 0 .
 
 typecheck: install
 	bun x tsc --noEmit
@@ -126,7 +126,7 @@ arch-graph: install
 	$(DEPCRUISE) --output-type dot | dot -T svg > arch-graph.svg
 
 lint-watch: install
-	watchexec -c -w apps -w server -w db -w packages -w utils -w tests "bun x eslint --fix ."
+	watchexec -c -w apps -w server -w db -w packages -w utils -w tests "NODE_OPTIONS=--max-old-space-size=8192 bun x eslint --fix ."
 
 test: install
 	bun set-env.ts test bun x vitest run
