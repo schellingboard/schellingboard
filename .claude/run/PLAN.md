@@ -1,0 +1,108 @@
+# Run plan: statistics in the admin
+
+Goal: a "Statistics" tab per event in the admin. Every figure is a sortable table with a CSV
+download, most with a chart. A filter removes locations, hosts and session origins (volunteer
+shifts) from all figures. The same page works for a past event after an upgrade. Every step leaves
+the app shippable.
+
+Read first: `docs/dev/statistics-proposal.md` (the design and the figure catalogue), ADR 0007
+(attendee count), 0012, 0017, 0018; `docs/dev/server.md`, `docs/dev/web-app.md`,
+`docs/dev/testing.md`; `docs/dev/attendance-model/README.md` (why correlations need caution).
+
+## Settled
+
+Decided with the user; step 3 records them in ADR 0019: read-only, computed on read, no migration;
+names only where already public; per-person tables have rows (CSV needs them), pseudonymous per
+table and request, sorted by value, not joinable; free-text values only with k ≥ 3; the filter on
+the server, in the URL only; an excluded host also leaves the people figures; CSV and ZIP (fflate)
+from the server; the attendance model's prediction next to the reported attendance (site admins see
+the reported count per session, which supersedes part of ADR 0007 §3); a mature chart library,
+chosen by the spike in step 2, in a lazy chunk.
+
+No real database is available (privacy). The real data is the user's: they upgrade their 3.8.1
+database and use the page themselves. The run checks old data through the release-upgrade fixtures
+(`v3.6.0.sql` covers 3.8.1) and the dev seed.
+
+## How to work (every step)
+
+- **TDD**: tag the test with its use case in `tests/use-cases.ts` (add `0xx-USn` for statistics),
+  see it fail, then implement. Pure functions get unit tests (property tests for interval math);
+  each section gets integration tests against the API (`tests/integration/api-stats.test.ts`) with a
+  small hand-built event whose figures are known; screens get Vitest tests by role and name.
+- **One E2E spec** (`tests/e2e/statistics.spec.ts`), grown per step only for workflows: open the
+  tab, read a figure, exclude a location, download a CSV. No E2E for charts.
+- **Privacy check per section**: the integration test asserts that no guest id and no non-host name
+  is in the JSON or CSV of a per-person table.
+- Figures that need data the database does not have are left out, not faked.
+- Times in the event's zone. Every screen works at phone width (tables in `overflow-x: auto`).
+- Update `CHANGELOG.md`, `docs/public/organizers/admin-guide.md` and `docs/dev/` in the step that
+  changes them.
+- **Checks per step**: `make format lint arch openapi-check typecheck test`, then
+  `statistics.spec.ts`. Full `make test-e2e` only in the last step. Never `make test-e2e-docker`.
+- A step whose diff grows past ~1500 lines outside tests is split in PLAN.md first.
+
+## Steps
+
+### Foundation
+
+- [ ] 1. Lazy chunk: the admin pages load with a dynamic import, so attendees do not download them
+      (the SPA's first code split). Measure the main bundle before and after.
+- [ ] 2. Chart spike, unrouted and thrown away: the heatmap and the predicted-vs-real scatter in
+      Observable Plot and in Recharts. Compare as `docs/dev/statistics-proposal.md` says. Commit
+      only the findings, in the proposal doc. Stop and ask the user if neither library passes.
+- [ ] 3. ADR 0019 (statistics) records the decisions above, the filter semantics, the session origin
+      heuristic, the table contract, CSV and ZIP rules and the chart library with the spike's
+      findings; ADR 0007 §3 gets a note that 0019 supersedes it in part; the proposal doc points to
+      it and keeps only "Later". Doc only.
+- [ ] 4. Pure functions in `packages/domain/src/stats/`: intervals (overlap, gaps inside windows,
+      utilization, concurrency, back-to-back), Spearman ρ, binning, pseudonyms, k-suppression,
+      session origin, CSV encoding (RFC 4180, BOM, formula-injection guard), the attendance
+      prediction (`attendance-prediction.ts`; a test reproduces the 2025 figures from
+      `docs/dev/attendance-model/data-2025.csv`). Unit and property tests.
+- [ ] 5. Server skeleton: `server/modules/stats` (module, ports, `eventStatistics` use case, site
+      admin only), `StatsRepository` read port and SQLite adapter, the filter (locations, hosts,
+      origins; blockers excluded by default), `StatsTable` in `packages/contracts`,
+      `GET /admin/events/{id}/stats`, `/stats/{table}.csv` and `/stats.zip` (with `about.txt`),
+      `openapi.json`, `api-client`. First figures: Overview headline numbers and the participation
+      funnel. An integration test runs the statistics on every release-upgrade fixture after
+      migration: no error, "No data" where the release had none.
+- [ ] 6. Dev seed: one seeded event gets "Volunteers 1" and "Volunteers 2" locations with shift
+      sessions hosted by an organizer account, attendee counts on some ended sessions, and 1-on-1
+      requests, so the filter and every section can be tried and tested.
+- [ ] 7. SPA skeleton: "Statistics" tab (`features/admin/event-stats.tsx`, in the admin lazy chunk),
+      section navigation, generic sortable table, "Download CSV", "Download all", the filter panel
+      in the URL query with its one-line summary, `queries/admin-stats.ts`. E2E: open the tab,
+      exclude the volunteer locations and the organizer host, download a CSV and the ZIP.
+- [ ] 8. Chart wrappers in `apps/web/src/ui/charts/` over the chosen library: ranked bars,
+      histogram, scatter with ρ and the `n < 15` note, stacked bars, heatmap, lines. Colour tokens,
+      dark mode, accessible summary. Charts on the Overview.
+
+### Sections
+
+Each step: the section's figures from the proposal on the server (integration tests), then its cards
+in the SPA. Skip a figure whose chart adds nothing to its table.
+
+- [ ] 9. Sessions: session table, popularity, origins, hosts, did hosts report, attendance, votes →
+      RSVPs, duration, time and competition, closed, capacity.
+- [ ] 10. Predicted vs real attendance: prediction columns in the session table, the scatter with
+      ranges, calibration. Split from step 9 if that grows too big.
+- [ ] 11. Proposals and voting: proposal funnel table, popular but never scheduled, late proposals,
+      proposals over time, votes per voter, choice mix, hosts and proposals, conversion.
+- [ ] 12. Attendees: RSVPs per attendee, gaps, double bookings, hosts who attend. Overview gains
+      "who did what".
+- [ ] 13. Locations and schedule: location table, gaps and fragments, utilization heatmap, supply
+      and demand by hour; excluded sessions occupy time but are no sessions.
+- [ ] 14. 1-on-1s: adoption, requests by status, per person, response time, when, meeting points.
+- [ ] 15. Profiles, comments, notifications (one step: all three are counts over members).
+
+### Finish
+
+- [ ] 16. Docs: admin guide "Statistics" (filter, CSV, what each section means, the caveats),
+      `CHANGELOG.md`, a release-notes highlight, a screenshot in `docs/screenshots/`. Full
+      `make test-e2e`.
+- [ ] 17. **Finish**: summary in PROGRESS.md, including open Questions, then delete `.claude/run/`.
+
+## Not in this run
+
+The "Later" section of `docs/dev/statistics-proposal.md` (new data to collect), session kinds,
+anonymous feedback (#1053), a site-wide (all events) statistics page.
