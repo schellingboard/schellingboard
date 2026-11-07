@@ -658,6 +658,36 @@ export const features = {
       },
     },
   },
+  "021": {
+    slug: "admin-statistics",
+    component: "admin",
+    stories: {
+      US1: {
+        title: "Organizer reads figures about how an event went",
+        actor: "organizer",
+        priority: "P2",
+        status: "planned",
+      },
+      US2: {
+        title: "Organizer downloads a statistics table as CSV",
+        actor: "organizer",
+        priority: "P2",
+        status: "planned",
+      },
+      US3: {
+        title: "Organizer leaves volunteer shifts out of the statistics",
+        actor: "organizer",
+        priority: "P2",
+        status: "planned",
+      },
+      US4: {
+        title: "Organizer compares predicted and reported attendance",
+        actor: "organizer",
+        priority: "P3",
+        status: "planned",
+      },
+    },
+  },
 } as const satisfies Record<string, Feature>;
 
 type Features = typeof features;
