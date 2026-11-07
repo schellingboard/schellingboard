@@ -160,6 +160,7 @@ export const joinWithLink = (deps: PeopleDeps) => {
     const session = await start(actor, {
       guestId: link.guestId,
       level: "verified",
+      via: "link",
       device: input.device,
     });
     return ok({ ...base, joined: true, session });

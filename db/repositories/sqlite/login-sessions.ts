@@ -16,6 +16,7 @@ function toSession(row: typeof schema.loginSessions.$inferSelect) {
     expiresAt: new Date(row.expiresAt),
     lastSeenAt: new Date(row.lastSeenAt),
     device: row.device,
+    via: row.via,
   } satisfies LoginSession;
 }
 

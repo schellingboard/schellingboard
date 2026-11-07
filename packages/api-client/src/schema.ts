@@ -3828,6 +3828,10 @@ export interface paths {
               /** @description Whether switching to the name asks for a login */
               authProtected: boolean;
               username: string | null;
+              /** @description False for a guest without an email address */
+              hasEmail: boolean;
+              /** @description Whether this login may set the password without the old one: a verified one for a name with none, or a join-link one where no mail can reset it */
+              canSetPassword: boolean;
             };
           };
         };
@@ -3896,7 +3900,7 @@ export interface paths {
         };
       };
     };
-    /** @description Sets the first password of a name that has none, and protects it. Needs a verified login (a join link or a code), not a picked name: `auth.verificationRequired` (403); `auth.passwordSet` (409) when there is a password already, which `PUT` changes. */
+    /** @description Sets the password of a name without needing the old one, and protects it. Needs a verified login (a join link or a code), not a picked name: `auth.verificationRequired` (403). A name that has a password gets `auth.passwordSet` (409): `PUT` changes it, or a reset link replaces it. Only a join-link login may replace a forgotten password here, and only where no mail can reset it (no email on file, or the site sends none); never for a site admin. */
     post: {
       parameters: {
         query?: never;

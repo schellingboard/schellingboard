@@ -43,10 +43,11 @@ export function UserImportScreen({
       <h1 className="text-2xl font-bold text-fg">Import users</h1>
       <p className="text-sm text-fg-muted">
         Upload a CSV file with a header row containing <code>name</code> and{" "}
-        <code>email</code> columns (extra columns are ignored). Users are
-        matched by email: existing users are left unchanged, new ones are
-        created. Both are assigned to the selected events, so re-running an
-        import is safe.
+        <code>email</code> columns (extra columns are ignored). The email may be
+        left blank for a user without one. Users are matched by email, or by
+        exact name when the email is blank: existing users are left unchanged,
+        new ones are created. Both are assigned to the selected events, so
+        re-running an import is safe.
       </p>
       <form onSubmit={(e) => void submit(e)} className="space-y-4">
         <FileField

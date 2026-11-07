@@ -52,6 +52,7 @@ function show(state: SettingsState) {
 const readyWith = (forms: ReturnType<typeof form>[]): SettingsState => ({
   status: "ready",
   emailSettings,
+  emailEnabled: true,
   forms,
   publicKey: "AQAB",
 });

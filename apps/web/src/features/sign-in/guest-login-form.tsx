@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import type { SignInCalls } from "../../commands/sign-in";
 import { Button } from "../../ui/button";
 import { TextField } from "../../ui/form";
+import { useEmailEnabled } from "../../queries/email-enabled";
 import { isRecentlySent, useCredentialForm } from "./use-credential-form";
 
 /** With `guest` the form names whose login it is; without, the person types an email or username. */
@@ -16,6 +17,7 @@ export function GuestLoginForm({
   initialCredential?: string;
   onSignedIn: (guestId: string) => void;
 }) {
+  const emailEnabled = useEmailEnabled(calls.emailEnabled);
   const [identifier, setIdentifier] = useState("");
   const [credential, setCredential] = useState(initialCredential);
   const [info, setInfo] = useState<string | null>(null);
@@ -57,9 +59,13 @@ export function GuestLoginForm({
   return (
     <form onSubmit={(e) => void onSubmit(e)} className="flex flex-col gap-2">
       <p className="text-sm text-fg-muted">
-        {guest
-          ? "This user has protected their account. Enter their password, or use a single-use code emailed to them. Forgot the password? Reset it instead."
-          : "Enter your password, or a single-use code emailed to you. Forgot the password? Reset it instead."}
+        {emailEnabled === false
+          ? guest
+            ? "This user has protected their account. Enter their password. Forgot it? Ask an organizer for a new link."
+            : "Enter your password. Forgot it? Ask an organizer for a new link."
+          : guest
+            ? "This user has protected their account. Enter their password, or use a single-use code emailed to them. Forgot the password? Reset it instead."
+            : "Enter your password, or a single-use code emailed to you. Forgot the password? Reset it instead."}
       </p>
       {guest ? (
         <TextField
@@ -103,25 +109,29 @@ export function GuestLoginForm({
         >
           Log in
         </Button>
-        <Button
-          variant="quiet"
-          disabled={busy || !named}
-          onClick={() => void run(code, "Code sent — check your email")}
-        >
-          Email me a code
-        </Button>
-        <Button
-          variant="quiet"
-          disabled={busy || !named}
-          onClick={() =>
-            void run(
-              link,
-              "Reset link sent — check your email to set a new password"
-            )
-          }
-        >
-          Forgot your password?
-        </Button>
+        {emailEnabled === true && (
+          <>
+            <Button
+              variant="quiet"
+              disabled={busy || !named}
+              onClick={() => void run(code, "Code sent — check your email")}
+            >
+              Email me a code
+            </Button>
+            <Button
+              variant="quiet"
+              disabled={busy || !named}
+              onClick={() =>
+                void run(
+                  link,
+                  "Reset link sent — check your email to set a new password"
+                )
+              }
+            >
+              Forgot your password?
+            </Button>
+          </>
+        )}
       </div>
     </form>
   );

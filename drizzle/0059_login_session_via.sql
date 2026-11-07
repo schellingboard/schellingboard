@@ -1,0 +1,1 @@
+ALTER TABLE `login_sessions` ADD `via` text DEFAULT 'name' NOT NULL;

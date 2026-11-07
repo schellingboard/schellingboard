@@ -447,9 +447,12 @@ editing your profile, creating or changing sessions. Turning protection off or c
 needs either the current password or a fresh code, and you'll get an email telling you it happened.
 
 - **Codes go to the email address the organizers have on file for you.** If you can't receive it,
-  ask them to check the address. If the event has no email set up, protection isn't available.
+  ask them to check the address. If the site sends no email, see the next point.
 - **Protection is what makes your sessions yours.** Only a session's hosts can edit or delete it —
   but an unprotected name can be picked by anyone, who then edits as you.
+- **No email address on file, or a site that sends no email?** Open your personal join link, then
+  set a password under **Account security** without a code. Forgot it later? Ask an organizer for a
+  new link and set a new password the same way. A password or code login cannot do this.
 - **Lost both your password and your email?** Ask an organizer to update the address on file; codes
   then go to the new one.
 

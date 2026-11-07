@@ -1,7 +1,9 @@
 import type { ApiClient } from "@schellingboard/api-client";
+import { fetchEmailEnabled } from "../queries/email-enabled";
 import type {
   bootstrapBodySchema,
   changePasswordBodySchema,
+  firstPasswordBodySchema,
   joinBodySchema,
   loginBodySchema,
   loginCodeBodySchema,
@@ -18,6 +20,7 @@ export type ResetBody = (typeof resetBodySchema)["_input"];
 export type BootstrapBody = (typeof bootstrapBodySchema)["_input"];
 export type JoinBody = (typeof joinBodySchema)["_input"];
 export type ChangePasswordBody = (typeof changePasswordBodySchema)["_input"];
+export type FirstPasswordBody = (typeof firstPasswordBodySchema)["_input"];
 export type UnprotectBody = (typeof unprotectBodySchema)["_input"];
 export type UsernameBody = (typeof usernameBodySchema)["_input"];
 
@@ -28,6 +31,7 @@ export type UsernameBody = (typeof usernameBodySchema)["_input"];
 export function signInCalls(api: ApiClient) {
   const keyed = (key: string) => ({ "Idempotency-Key": key });
   return {
+    emailEnabled: () => fetchEmailEnabled(api),
     enterSite: (body: SiteLoginBody) => api.POST("/api/v1/auth/site", { body }),
     bootstrap: (body: BootstrapBody) =>
       api.POST("/api/v1/auth/bootstrap", { body }),
@@ -41,6 +45,11 @@ export function signInCalls(api: ApiClient) {
       api.POST("/api/v1/auth/reset", { body }),
     changePassword: (body: ChangePasswordBody, key: string) =>
       api.PUT("/api/v1/me/credentials/password", {
+        body,
+        headers: keyed(key),
+      }),
+    setPassword: (body: FirstPasswordBody, key: string) =>
+      api.POST("/api/v1/me/credentials/password", {
         body,
         headers: keyed(key),
       }),

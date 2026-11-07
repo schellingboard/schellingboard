@@ -185,7 +185,11 @@ describe("POST /api/v1/auth/login", () => {
       const token = cookieOf(res).split("=")[1];
       expect(
         await getRepositories().loginSessions.get(hashSessionToken(token))
-      ).toMatchObject({ guestId: guest.id, assurance: "verified" });
+      ).toMatchObject({
+        guestId: guest.id,
+        assurance: "verified",
+        via: "code",
+      });
     }
   );
 

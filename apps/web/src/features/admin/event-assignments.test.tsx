@@ -26,6 +26,7 @@ const guest = (
   id,
   name,
   email: `${id}@x.org`,
+  username: "",
   eventIds,
   siteAdmin: false,
   hasPassword: true,
@@ -48,7 +49,10 @@ const setupGuests = (
         guests={guests}
         params={new URLSearchParams(query)}
         onParams={onParams}
-        calls={adminEventCalls(api)}
+        calls={{
+          ...adminEventCalls(api),
+          emailEnabled: () => Promise.resolve(true),
+        }}
         onChanged={onChanged}
       />
     </NoticeProvider>
@@ -111,7 +115,9 @@ describe(
       const { calls } = setupGuests([guest("g1", "Alice")], "", linkHandler);
 
       await userEvent.click(
-        screen.getByRole("button", { name: "Mail new links to all guests" })
+        await screen.findByRole("button", {
+          name: "Mail new links to all guests",
+        })
       );
       expect(calls).toHaveLength(0);
       await userEvent.click(
@@ -139,7 +145,9 @@ describe(
         screen.getAllByRole("checkbox", { name: "Select Bob" })[0]
       );
       await userEvent.click(
-        screen.getByRole("button", { name: "Mail new links to 1 selected" })
+        await screen.findByRole("button", {
+          name: "Mail new links to 1 selected",
+        })
       );
       await userEvent.click(
         screen.getByRole("button", { name: "Yes, mail 1 selected guest" })
@@ -300,7 +308,10 @@ describe("the event locations manager", { tags: ["017-US3"] }, () => {
           locations={[loc]}
           params={new URLSearchParams()}
           onParams={vi.fn()}
-          calls={adminEventCalls(api)}
+          calls={{
+            ...adminEventCalls(api),
+            emailEnabled: () => Promise.resolve(true),
+          }}
           onChanged={vi.fn()}
         />
       </NoticeProvider>

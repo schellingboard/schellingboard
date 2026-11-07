@@ -29,6 +29,9 @@ export function assuranceRequired(
   return mode === "verified" || personProtected ? "verified" : "claimed";
 }
 
+/** How a login session began; only a join link may replace a forgotten password. */
+export type LoginVia = "name" | "password" | "code" | "link";
+
 export type LoginSession = {
   /** sha256 of the cookie's token; the token itself is never stored. */
   id: string;
@@ -39,4 +42,5 @@ export type LoginSession = {
   expiresAt: Date;
   lastSeenAt: Date;
   device: string | null;
+  via: LoginVia;
 };

@@ -30,6 +30,7 @@ const lookupSession: SessionLookup = async (token) => {
     id,
     guestId: row.guestId,
     level: row.assurance,
+    via: row.via,
     siteAdmin:
       row.assurance === "verified" &&
       (await getRepositories().guests.getSiteAdmin(row.guestId)),

@@ -24,9 +24,23 @@ describe("the settings page's data", { tags: ["013-US5"] }, () => {
     expect(query.get()).toEqual({
       status: "ready",
       emailSettings,
+      emailEnabled: true,
       forms,
       publicKey: "key",
     });
+  });
+
+  it("learns that the server cannot send email", async () => {
+    const { api } = fakeApi((call) =>
+      call.path === "/api/v1/site"
+        ? Response.json({ emailEnabled: false })
+        : answer(call.path)
+    );
+    const query = createSettingsQuery({ api });
+
+    await query.load();
+
+    expect(query.get()).toMatchObject({ status: "ready", emailEnabled: false });
   });
 
   it("reports why the viewer cannot have settings", async () => {

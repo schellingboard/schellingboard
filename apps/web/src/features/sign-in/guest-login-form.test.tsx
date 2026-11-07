@@ -10,14 +10,18 @@ afterEach(cleanup);
 
 function setup(
   handler: FakeHandler,
-  props: Partial<Parameters<typeof GuestLoginForm>[0]> = {}
+  props: Partial<Parameters<typeof GuestLoginForm>[0]> = {},
+  emailEnabled = true
 ) {
   const { api, calls } = fakeApi(handler);
   const onSignedIn = vi.fn();
   render(
     <NoticeProvider>
       <GuestLoginForm
-        calls={signInCalls(api)}
+        calls={{
+          ...signInCalls(api),
+          emailEnabled: () => Promise.resolve(emailEnabled),
+        }}
         onSignedIn={onSignedIn}
         {...props}
       />
@@ -29,6 +33,18 @@ function setup(
 const ada = { id: "g1", name: "Ada" };
 
 describe("logging in to a protected name", { tags: ["003-US4"] }, () => {
+  it("offers no mailed code or reset where the server sends no mail", async () => {
+    setup(() => Response.json({ guestId: "g1" }), { guest: ada }, false);
+
+    await screen.findByText(/Ask an organizer for a new link/);
+    expect(
+      screen.queryByRole("button", { name: "Email me a code" })
+    ).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: "Forgot your password?" })
+    ).toBeNull();
+  });
+
   it("names the guest a link points at and logs in with a typed code", async () => {
     const { calls, onSignedIn } = setup(
       () => Response.json({ guestId: "g1" }),
@@ -87,13 +103,13 @@ describe("logging in to a protected name", { tags: ["003-US4"] }, () => {
     });
 
     await userEvent.click(
-      screen.getByRole("button", { name: "Email me a code" })
+      await screen.findByRole("button", { name: "Email me a code" })
     );
     expect((await screen.findByRole("status")).textContent).toBe(
       "Code sent — check your email"
     );
     await userEvent.click(
-      screen.getByRole("button", { name: "Forgot your password?" })
+      await screen.findByRole("button", { name: "Forgot your password?" })
     );
 
     expect(calls.map((c) => [c.path, c.body])).toEqual([
@@ -114,7 +130,7 @@ describe("logging in to a protected name", { tags: ["003-US4"] }, () => {
     );
 
     await userEvent.click(
-      screen.getByRole("button", { name: "Email me a code" })
+      await screen.findByRole("button", { name: "Email me a code" })
     );
 
     expect((await screen.findByRole("status")).textContent).toBe(
@@ -127,11 +143,11 @@ describe("logging in to a protected name", { tags: ["003-US4"] }, () => {
     const { calls } = setup(() => new Response(null, { status: 204 }));
 
     expect(
-      screen.getByRole("button", { name: "Email me a code" })
+      await screen.findByRole("button", { name: "Email me a code" })
     ).toHaveProperty("disabled", true);
     await userEvent.type(screen.getByLabelText("Email or username"), "ada");
     await userEvent.click(
-      screen.getByRole("button", { name: "Email me a code" })
+      await screen.findByRole("button", { name: "Email me a code" })
     );
 
     expect(calls[0].body).toEqual({ identifier: "ada" });
@@ -142,7 +158,7 @@ describe("logging in to a protected name", { tags: ["003-US4"] }, () => {
 
     await userEvent.type(screen.getByLabelText("Email or username"), "ada");
     await userEvent.click(
-      screen.getByRole("button", { name: "Forgot your password?" })
+      await screen.findByRole("button", { name: "Forgot your password?" })
     );
 
     expect(calls[0]).toMatchObject({

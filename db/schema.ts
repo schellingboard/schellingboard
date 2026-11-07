@@ -8,7 +8,7 @@ import {
   index,
   type AnySQLiteColumn,
 } from "drizzle-orm/sqlite-core";
-import type { LoginAssurance } from "@schellingboard/domain/auth";
+import type { LoginAssurance, LoginVia } from "@schellingboard/domain/auth";
 import type { IdentityMode } from "@schellingboard/domain/event";
 import type {
   ProfileContact,
@@ -242,6 +242,7 @@ export const loginSessions = sqliteTable(
     expiresAt: text("expires_at").notNull(),
     lastSeenAt: text("last_seen_at").notNull(),
     device: text("device"),
+    via: text("via").$type<LoginVia>().notNull().default("name"),
   },
   (t) => [
     index("login_sessions_guest_idx").on(t.guestId),

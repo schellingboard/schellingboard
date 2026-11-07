@@ -49,7 +49,9 @@ export function SettingsScreen({
               </a>{" "}
               is edited separately.
             </p>
-            <EmailSettingsForm initial={state.emailSettings} calls={calls} />
+            {state.emailEnabled && (
+              <EmailSettingsForm initial={state.emailSettings} calls={calls} />
+            )}
           </div>
           <div className={SECTION}>
             <PushNotifications publicKey={state.publicKey} calls={calls} />

@@ -882,6 +882,8 @@ describe("GET /api/v1/me/credentials", () => {
       expect(await res.json()).toEqual({
         authProtected: true,
         username: "ada",
+        hasEmail: true,
+        canSetPassword: false,
       });
     }
   );

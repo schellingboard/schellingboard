@@ -26,6 +26,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   events are verified; existing events stay open.
 - **Personal join links**: organizers make a link for a guest, or mail new links to all or chosen
   guests. Opening it signs the guest in and adds them to the event.
+- **Guests without an email** (#1331): organizers can add guests and import CSV rows with no email
+  or a username only. Such guests sign in with a join link and can set a password themselves.
 - **Failed changes now say what failed**: a refused or unsaved RSVP, comment or attendee count names
   the session and the reason, and says when it might not have been saved.
 - **Admins see when a newer release is out** (#788): a red dot beside the footer's version names the
