@@ -311,7 +311,8 @@ then shows their slots day by day:
 
 Then say **where to meet** — one of the organizer's suggestions, or anywhere you type yourself.
 Nothing is reserved and no place is ever "full": a meeting point is just where to find each other.
-You can add one line of context, and that's the whole message — this is a request, not a chat.
+You can add one line of context, and that's the whole message — this is a request, not a chat. A
+short message at the bottom of the screen confirms who was asked.
 
 The organizer sets how many requests you may have waiting for an answer at once. Once you are at
 that number, wait for a reply or cancel one first.

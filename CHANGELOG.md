@@ -53,9 +53,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
-- **Admin pages no longer shift between tabs**: the header, titles, back links and tabs sit in the
-  same place on every admin page, and pulling the page down past the top no longer shows a grey band
-  above the black header.
+- **Admin pages no longer shift between tabs**: header, titles and tabs stay in the same place, and
+  pulling the page down no longer shows a grey band above the header.
 - **Account security is part of Settings**: protecting your name, changing your password and signing
   out other browsers now sit at the end of the Settings page; the old address still works.
 - **1-on-1 requests confirm with a message that fades**: after sending a request the pop-up closes
@@ -98,8 +97,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   list was still loading. A photo that is slow or broken now shows initials, not its description.
 - **Scrolling inside a pop-up no longer moves the page behind it**: reaching the end of a long
   pop-up used to scroll the page underneath.
-- **Choose your name with the keyboard**: in "Who are you?", the arrow keys move through the names
-  and Enter picks one; typing makes the first match ready to pick.
 - **Hosts are told when deleting a day or location removes or moves their session**: until now only
   guests who RSVPed were.
 - **A proposal says "proposal", not "session"** (#1338): the hosting prompt and its button on a
