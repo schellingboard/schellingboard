@@ -1,8 +1,8 @@
 import { Page } from "@playwright/test";
-import { DateTime } from "luxon";
 import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
 import { setDevClock } from "./helpers/dev-clock";
+import { gammaDay } from "./helpers/seed";
 import { selectUser } from "./helpers/user";
 import {
   getMessage,
@@ -31,11 +31,7 @@ test.use({ timezoneId: "Europe/Berlin" });
 // (scripts/seed/seed-database.ts, scripts/seed/data/gamma-schedule.ts). 17:00
 // is after every session scheduled on a day, and before the day itself ends —
 // a day that has ended folds shut, taking its session links with it.
-const lateOnGammaDay = (day: number) =>
-  DateTime.now()
-    .setZone("Europe/Berlin")
-    .plus({ days: 14 + day })
-    .set({ hour: 17, minute: 0, second: 0, millisecond: 0 });
+const lateOnGammaDay = (day: number) => gammaDay(day).set({ hour: 17 });
 
 const countInput = (page: Page) => page.getByLabel("How many people attended?");
 const saveButton = (page: Page) =>

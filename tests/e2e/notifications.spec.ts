@@ -1,8 +1,8 @@
 import type { Page } from "@playwright/test";
-import { DateTime } from "luxon";
 import { expect, test } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
 import { setDevClock } from "./helpers/dev-clock";
+import { gammaDay } from "./helpers/seed";
 import { openNotifications } from "./helpers/notifications";
 import { selectUser } from "./helpers/user";
 
@@ -219,11 +219,7 @@ test.describe("attendee-count reminders", () => {
 
   // Gamma's days run 09:00–18:00 Berlin from today+14; 17:00 on day 1 is after
   // both sessions and before the day folds shut.
-  const lateOnGammaDay = (day: number) =>
-    DateTime.now()
-      .setZone("Europe/Berlin")
-      .plus({ days: 14 + day })
-      .set({ hour: 17, minute: 0, second: 0, millisecond: 0 });
+  const lateOnGammaDay = (day: number) => gammaDay(day).set({ hour: 17 });
 
   const KEYNOTE = /Opening Keynote/;
   const REACT = /Building Scalable Web Applications/;

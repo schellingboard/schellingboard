@@ -1,18 +1,15 @@
-import { DateTime } from "luxon";
 import { test, expect } from "./helpers/fixtures";
 import { loginAndGoto } from "./helpers/auth";
 import { selectUser } from "./helpers/user";
 import { filterChip, switchToView } from "./helpers/schedule";
+import { gammaDay } from "./helpers/seed";
 
 // The grid keeps every session where it is while searching or filtering —
 // an empty cell there means a free slot — and fades out what doesn't match.
 
 const NO_MATCH = /doesn't match/;
 // Seeded at today+14 (see helpers/dev-clock.ts); API Design is on day one.
-const gammaDayTwo = DateTime.now()
-  .setZone("Europe/Berlin")
-  .plus({ days: 15 })
-  .toFormat("EEEE, MMMM d");
+const gammaDayTwo = gammaDay(1).toFormat("EEEE, MMMM d");
 
 test("searching the grid fades what doesn't match and folds days without a match @007-US3", async ({
   page,

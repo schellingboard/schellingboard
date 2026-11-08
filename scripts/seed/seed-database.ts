@@ -134,8 +134,7 @@ function insertChunked<T>(
   }
 }
 
-function generateEventDates() {
-  const today = new Date();
+function generateEventDates(today: Date) {
   const phaseDuration = 14;
   const middleOffset = 7;
   // Lead time between the start of scheduling work and the event itself.
@@ -293,13 +292,13 @@ function clearAll() {
   console.log("  ✅ All tables cleared");
 }
 
-async function seedTestData(profile: SeedProfile) {
+async function seedTestData(profile: SeedProfile, now = new Date()) {
   console.log(`🌱 Seeding test data (${profile} profile)...`);
   const db = openDb();
 
-  const eventConfigs = generateEventDates();
+  const eventConfigs = generateEventDates(now);
   console.log(`📅 Generated dynamic dates for ${eventConfigs.length} events`);
-  console.log(`🗓️  Today is: ${new Date().toISOString().split("T")[0]}`);
+  console.log(`🗓️  Today is: ${now.toISOString().split("T")[0]}`);
 
   // Guests: curated fixtures first — E2E host assignment is index-based, so
   // bulk guests must only ever be appended.
@@ -1316,7 +1315,10 @@ function scheduleBulkGammaSessions(
   return created;
 }
 
-async function resetDatabase(profile: SeedProfile = resolveProfile()) {
+async function resetDatabase(
+  profile: SeedProfile = resolveProfile(),
+  now = new Date()
+) {
   try {
     console.log("🔄 Resetting test database to known state...");
     console.log(`📍 Database: ${resolveDbPath()}`);
@@ -1324,7 +1326,7 @@ async function resetDatabase(profile: SeedProfile = resolveProfile()) {
     console.log(`📦 Seed profile: ${profile}`);
 
     clearAll();
-    await seedTestData(profile);
+    await seedTestData(profile, now);
 
     console.log("🎉 Database reset completed successfully!");
   } catch (error: unknown) {

@@ -2,6 +2,7 @@ import { Page } from "@playwright/test";
 import { expect } from "./fixtures";
 import { DateTime } from "luxon";
 import { login } from "./auth";
+import { gammaDay } from "./seed";
 
 // Time travel for specs that need the app to think an event is running right
 // now. It goes through the dev fake clock (?dev=1), not the browser clock:
@@ -18,10 +19,7 @@ import { login } from "./auth";
  * Specs using this must run in Europe/Berlin (`test.use({ timezoneId })`), so
  * the toolbar's datetime-local picker maps 16:00 to 16:00 Berlin.
  */
-export const duringGammaDayOne = DateTime.now()
-  .setZone("Europe/Berlin")
-  .plus({ days: 14 })
-  .set({ hour: 16, minute: 0, second: 0, millisecond: 0 });
+export const duringGammaDayOne = gammaDay(0).set({ hour: 16 });
 
 /**
  * Move the dev fake clock to `target` via the toolbar's datetime picker, then
