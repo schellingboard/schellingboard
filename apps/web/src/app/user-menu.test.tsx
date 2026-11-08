@@ -62,6 +62,113 @@ describe("UserMenu", () => {
     expect(screen.getByRole("option", { name: /Grace/ })).toBeTruthy();
   });
 
+  describe("name picker keyboard", () => {
+    const open = async () => {
+      const ctx = setup();
+      await ctx.user.click(screen.getByRole("button", { name: "Your name" }));
+      return {
+        ...ctx,
+        input: screen.getByRole("combobox", { name: "My name is:" }),
+      };
+    };
+    const activeName = (input: HTMLElement) => {
+      const id = input.getAttribute("aria-activedescendant");
+      return id ? document.getElementById(id)?.textContent : undefined;
+    };
+
+    it("moves through the names with the arrow keys, wrapping at the ends", async () => {
+      const { user, input } = await open();
+
+      await user.keyboard("{ArrowDown}");
+      expect(activeName(input)).toBe("Ada");
+      await user.keyboard("{ArrowDown}{ArrowDown}");
+      expect(activeName(input)).toBe("Alan");
+      await user.keyboard("{ArrowDown}");
+      expect(activeName(input)).toBe("Ada");
+      await user.keyboard("{ArrowUp}");
+      expect(activeName(input)).toBe("Alan");
+    });
+
+    it("jumps to the first and last name with Home and End", async () => {
+      const { user, input } = await open();
+
+      await user.keyboard("{End}");
+      expect(activeName(input)).toBe("Alan");
+      await user.keyboard("{Home}");
+      expect(activeName(input)).toBe("Ada");
+    });
+
+    it("picks the active name with Enter", async () => {
+      const { user, choose } = await open();
+
+      await user.keyboard("{ArrowDown}{ArrowDown}{ArrowDown}{Enter}");
+
+      expect(choose).toHaveBeenCalledWith("g3");
+    });
+
+    it("makes the first match active as soon as something is typed", async () => {
+      const { user, input, choose } = await open();
+
+      await user.type(input, "gr");
+      expect(activeName(input)).toBe("Grace(password)");
+      await user.keyboard("{Enter}");
+
+      expect(choose).toHaveBeenCalledWith("g2");
+    });
+
+    it("marks the active option selected and keeps options out of the tab order", async () => {
+      const { user } = await open();
+
+      await user.keyboard("{ArrowDown}");
+
+      const options = screen.getAllByRole("option");
+      expect(options[0].getAttribute("aria-selected")).toBe("true");
+      expect(options[1].getAttribute("aria-selected")).toBe("false");
+      for (const o of options) expect(o.getAttribute("tabindex")).toBe("-1");
+    });
+
+    it("makes the hovered option active", async () => {
+      const { user, input } = await open();
+
+      await user.hover(screen.getByRole("option", { name: "Alan" }));
+
+      expect(activeName(input)).toBe("Alan");
+    });
+
+    it("ignores the arrow keys when nothing matches", async () => {
+      const { user, input, choose } = await open();
+
+      await user.type(input, "zzz");
+      await user.keyboard("{ArrowDown}{End}{Enter}");
+
+      expect(input.getAttribute("aria-activedescendant")).toBeNull();
+      expect(choose).not.toHaveBeenCalled();
+    });
+
+    it("starts with no active name when the picker is opened again", async () => {
+      const { user, input } = await open();
+      await user.keyboard("{ArrowDown}");
+      await user.keyboard("{Escape}");
+
+      await user.click(screen.getByRole("button", { name: "Your name" }));
+
+      expect(
+        screen
+          .getByRole("combobox", { name: "My name is:" })
+          .getAttribute("aria-activedescendant")
+      ).toBeNull();
+      expect(input.isConnected).toBe(false);
+    });
+
+    it("does nothing on Enter when no name is active", async () => {
+      const { user, choose } = await open();
+
+      await user.keyboard("{Enter}");
+
+      expect(choose).not.toHaveBeenCalled();
+    });
+  });
+
   it("sends a protected name to the legacy login", async () => {
     const { user, choose } = setup({
       choose: vi

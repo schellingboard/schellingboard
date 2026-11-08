@@ -31,12 +31,7 @@ section 9 for step 1.
 ## Steps
 
 - [x] 1. Hosts told of day/location deletes (done: reaction, docs, delete confirmations).
-- [ ] 2. **"Who are you?" keyboard selection** (`apps/web/src/app/user-menu.tsx`). Combobox pattern
-      as in `ui/people-picker.tsx:56`: `aria-activedescendant`, ArrowUp/Down move (wrap), Home/End,
-      Enter picks the active name, active option scrolls into view, hover sets active, the active
-      option has a visible style and `aria-selected`. When the search has text, the first match is
-      active, so "type, Enter" works. Options leave the tab order (`tabIndex=-1`); focus stays in
-      the input. Red first in `user-menu.test.tsx`.
+- [x] 2. "Who are you?" keyboard selection (done: combobox in `NamePicker`).
 - [ ] 3. **Modal scroll does not move the page.** A shared `useScrollLock` (in `ui/`): while any
       modal is open, `html` gets `overflow: hidden` (ref-counted for nested dialogs, restored on
       close; `scrollbar-gutter: stable` already prevents a width jump). Use it in `ui/dialog.tsx`

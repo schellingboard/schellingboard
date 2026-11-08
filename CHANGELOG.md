@@ -53,6 +53,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Choose your name with the keyboard**: in "Who are you?", the arrow keys move through the names
+  and Enter picks one; typing makes the first match ready to pick.
 - **Search for a time zone** (#1329): an event's time zone is a searchable field instead of a long
   list.
 - **Hosts see the vote breakdown of their own proposals during voting** (#1383): turnout and the
@@ -83,6 +85,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **Choose your name with the keyboard**: in "Who are you?", the arrow keys move through the names
+  and Enter picks one; typing makes the first match ready to pick.
 - **Hosts are told when deleting a day or location removes or moves their session**: until now only
   guests who RSVPed were.
 - **A proposal says "proposal", not "session"** (#1338): the hosting prompt and its button on a

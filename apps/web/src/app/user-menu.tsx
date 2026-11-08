@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useEffect, useId, useState, type KeyboardEvent } from "react";
 import { Dialog } from "../ui/dialog";
 import { hardNavigate, hardReload } from "./hard-navigate";
 import { endSiteSession } from "./site-session";
@@ -14,6 +14,8 @@ const chip =
   "flex min-w-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-accent";
 const item =
   "block w-full px-4 py-2 text-left text-sm text-fg-muted hover:bg-surface-muted hover:text-fg";
+
+const optionBase = "block w-full cursor-pointer px-4 py-2 text-left text-sm";
 
 export function UserMenu({
   viewer,
@@ -129,9 +131,21 @@ export function NamePicker({
   const [error, setError] = useState<string | null>(null);
   const inputId = useId();
   const listId = useId();
+  const [active, setActive] = useState(-1);
+  const [wasOpen, setWasOpen] = useState(open);
+  if (wasOpen !== open) {
+    setWasOpen(open);
+    setActive(-1);
+  }
   const shown = guests.filter((g) =>
     g.name.toLowerCase().includes(query.trim().toLowerCase())
   );
+  const activeId = shown[active] ? `${listId}-${active}` : undefined;
+
+  useEffect(() => {
+    if (activeId)
+      document.getElementById(activeId)?.scrollIntoView?.({ block: "nearest" });
+  }, [activeId]);
 
   const pick = async (guest: PickableGuest) => {
     setError(null);
@@ -140,6 +154,28 @@ export function NamePicker({
     if (result.code === "guest.protected")
       return hardNavigate(`/auth/login?guest=${guest.id}`);
     setError("Could not select that name — try again");
+  };
+
+  const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    const last = shown.length - 1;
+    if (last < 0) return;
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      const step = e.key === "ArrowDown" ? 1 : -1;
+      setActive((a) =>
+        a < 0 ? (step > 0 ? 0 : last) : (a + step + shown.length) % shown.length
+      );
+    } else if (e.key === "Home" || e.key === "End") {
+      e.preventDefault();
+      setActive(e.key === "Home" ? 0 : last);
+    } else if (
+      e.key === "Enter" &&
+      shown[active] &&
+      !e.nativeEvent.isComposing
+    ) {
+      e.preventDefault();
+      void pick(shown[active]);
+    }
   };
 
   return (
@@ -152,9 +188,15 @@ export function NamePicker({
         role="combobox"
         aria-expanded
         aria-controls={listId}
+        aria-autocomplete="list"
+        aria-activedescendant={activeId}
         autoFocus
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onKeyDown={onKeyDown}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setActive(e.target.value.trim() ? 0 : -1);
+        }}
         className="mt-1 w-full rounded-md border border-line bg-surface-raised px-3 py-2 text-sm"
       />
       {error && (
@@ -168,20 +210,16 @@ export function NamePicker({
         aria-label="Names"
         className="mt-2 max-h-72 overflow-y-auto"
       >
-        {shown.map((guest) => (
+        {shown.map((guest, i) => (
           <li
             key={guest.id}
+            id={`${listId}-${i}`}
             role="option"
-            aria-selected={false}
-            tabIndex={0}
+            aria-selected={i === active}
+            tabIndex={-1}
             onClick={() => void pick(guest)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                void pick(guest);
-              }
-            }}
-            className={`${item} cursor-pointer`}
+            onMouseMove={() => setActive(i)}
+            className={`${optionBase} ${i === active ? "bg-surface-muted text-fg" : "text-fg-muted"}`}
           >
             {guest.name}
             {guest.authProtected && (
