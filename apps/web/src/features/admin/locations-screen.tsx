@@ -398,7 +398,7 @@ function LocationRow({
         <ConfirmByTyping
           label="Location name confirmation"
           expected={location.name}
-          warning={`Deleting “${location.name}” removes it from ${plural(location.sessionCount, "session", "sessions")} and ${plural(location.eventIds.length, "event", "events")}. This cannot be undone. Type the location name to confirm.`}
+          warning={`Deleting “${location.name}” removes it from ${plural(location.sessionCount, "session", "sessions")} and ${plural(location.eventIds.length, "event", "events")}.${location.sessionCount > 0 ? " Hosts and RSVPed guests of those sessions are told." : ""} This cannot be undone. Type the location name to confirm.`}
           call={(key) => calls.remove(location.id, key)}
           onDeleted={onChanged}
           onCancel={close}

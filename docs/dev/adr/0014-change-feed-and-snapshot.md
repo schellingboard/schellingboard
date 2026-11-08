@@ -177,8 +177,8 @@ session they hosted, `session.attendanceChanged` for each session they had an RS
 `meeting.deleted` for each of their meetings (audience: the other guest) and `guest.left`. `apply`
 stays one subject per change, and the log answers "where did this session go". The
 session-notification reaction skips changes marked `cascade: true`, except those a day or location
-delete records with `tellAttendees: true`: for those it notifies the RSVPed guests, not the hosts.
-Event and guest deletes stay silent.
+delete records with `tellAttendees: true`: for those it notifies the session's hosts and RSVPed
+guests. Event and guest deletes stay silent.
 
 ### 10. The feed
 
@@ -261,7 +261,8 @@ connection that closes unregisters.
 
 ## Open questions
 
-1. **Cascades and notifications.** _Answered:_ RSVPed guests are told when a day or location delete
-   removes or changes their session (section 9). Event and guest deletes stay silent.
+1. **Cascades and notifications.** _Answered:_ Hosts and RSVPed guests are told when a day or
+   location delete removes or changes their session (section 9). Event and guest deletes stay
+   silent.
 2. **Hidden tabs.** Closing the feed after 30 seconds hidden is the recommendation. The alternative
    is to keep every tab connected and rely only on HTTP/2.

@@ -11,7 +11,7 @@ const hostsOf = (s: Session) => s.hosts.map((h) => h.id).join();
  * Runs `work`, which removes or edits `sessions` as a side effect (deleting a
  * day, location, event or guest), and records a change for each one it touched (ADR 0014
  * section 9). The changes are marked `cascade`, so no one is emailed for them
- * unless `tellAttendees` asks for the RSVPed guests to be.
+ * unless `tellAttendees` asks for the hosts and RSVPed guests to be.
  */
 export async function recordingSessionCascade<T>(
   tx: Tx,

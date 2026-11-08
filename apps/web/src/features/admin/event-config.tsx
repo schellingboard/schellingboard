@@ -342,7 +342,7 @@ function DangerZone({
           <ConfirmByTyping
             label="Type the event name to confirm"
             expected={event.name}
-            warning="This will permanently delete the event and all associated days, proposals, sessions, RSVPs, and assignments."
+            warning="This will permanently delete the event and all associated days, proposals, sessions, RSVPs, and assignments. No one is notified."
             call={(key) => calls.remove(event.id, key)}
             onDeleted={onDeleted}
             onCancel={() => setConfirming(false)}

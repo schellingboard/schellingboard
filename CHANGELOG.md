@@ -83,6 +83,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **Hosts are told when deleting a day or location removes or moves their session**: until now only
+  guests who RSVPed were.
 - **A proposal says "proposal", not "session"** (#1338): the hosting prompt and its button on a
   proposal now read "Host this proposal".
 - **Form fields no longer zoom the page on phones** (#1333): tapping a text field used to zoom in on

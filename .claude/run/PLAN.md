@@ -30,14 +30,7 @@ section 9 for step 1.
 
 ## Steps
 
-- [ ] 1. **Hosts told of day/location deletes.** `utils/jobs/reactions.ts`: `tellAttendees` cascades
-      notify hosts too (drop `attendeesOnly` if nothing else needs it). Red first: extend
-      `tests/integration/cascade-notifications-reaction.test.ts` (host gets mail and in-app notice;
-      a host who also RSVPed gets one, not two; event and guest deletes still send nothing). Update
-      ADR 0014 section 9 and open question 1, `docs/public/organizers/admin-guide.md` (day, location
-      lines 68 and 95), the `tellAttendees` doc comment in `packages/domain/src/change.ts` and
-      `server/kernel/session-cascade.ts`. Check the admin delete confirmations: day/location must
-      say who is notified; event delete must say that no one is.
+- [x] 1. Hosts told of day/location deletes (done: reaction, docs, delete confirmations).
 - [ ] 2. **"Who are you?" keyboard selection** (`apps/web/src/app/user-menu.tsx`). Combobox pattern
       as in `ui/people-picker.tsx:56`: `aria-activedescendant`, ArrowUp/Down move (wrap), Home/End,
       Enter picks the active name, active option scrolls into view, hover sets active, the active

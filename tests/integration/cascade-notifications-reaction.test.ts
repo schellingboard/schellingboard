@@ -33,7 +33,11 @@ const sessionChanges = async () =>
     (c) => c.type === "session.changed" || c.type === "session.deleted"
   );
 
-const recipients = () => vi.mocked(sendMail).mock.calls.map(([m]) => m.to);
+const recipients = () =>
+  vi
+    .mocked(sendMail)
+    .mock.calls.map(([m]) => m.to)
+    .sort();
 
 async function sessionWithAnRsvp() {
   const event = await createEvent();
@@ -63,7 +67,7 @@ async function sessionWithAnRsvp() {
   return { event, day, room, session, host, rsvper };
 }
 
-describe("telling attendees about cascades", () => {
+describe("telling hosts and RSVPed guests about cascades", () => {
   beforeAll(() => setupTestDb());
   beforeEach(() => {
     resetTestDb();
@@ -71,8 +75,8 @@ describe("telling attendees about cascades", () => {
     vi.stubEnv("SITE_URL", "https://site.example");
   });
 
-  it("tells RSVPed guests once when deleting a location changes their session", async () => {
-    const { room, rsvper } = await sessionWithAnRsvp();
+  it("tells hosts and RSVPed guests once when deleting a location changes their session", async () => {
+    const { room, host, rsvper } = await sessionWithAnRsvp();
 
     const result = await venueUseCases().deleteLocation(
       ADMIN,
@@ -83,14 +87,35 @@ describe("telling attendees about cascades", () => {
     await runJobs();
     await runJobs();
 
-    expect(recipients()).toEqual(["rsvper@test.example"]);
-    const notices = await getRepositories().notifications.listByGuest(
-      rsvper.id
-    );
-    expect(notices).toHaveLength(1);
+    expect(recipients()).toEqual(["host@test.example", "rsvper@test.example"]);
+    const { notifications } = getRepositories();
+    expect(await notifications.listByGuest(rsvper.id)).toHaveLength(1);
+    expect(await notifications.listByGuest(host.id)).toHaveLength(1);
   });
 
-  it("tells RSVPed guests once when deleting a day removes their session", async () => {
+  it("tells a host who also RSVPed once", async () => {
+    const { room, session, host } = await sessionWithAnRsvp();
+    await getRepositories().rsvps.create({
+      sessionId: session.id,
+      guestId: host.id,
+    });
+
+    const result = await venueUseCases().deleteLocation(
+      ADMIN,
+      { id: room.id },
+      AT
+    );
+    expect(result.ok).toBe(true);
+    await runJobs();
+    await runJobs();
+
+    expect(recipients()).toEqual(["host@test.example", "rsvper@test.example"]);
+    expect(
+      await getRepositories().notifications.listByGuest(host.id)
+    ).toHaveLength(1);
+  });
+
+  it("tells hosts and RSVPed guests once when deleting a day removes their session", async () => {
     const { day, session } = await sessionWithAnRsvp();
 
     const result = await eventUseCases().deleteDay(ADMIN, { id: day.id }, AT);
@@ -101,7 +126,7 @@ describe("telling attendees about cascades", () => {
     expect(await getRepositories().sessions.findById(session.id)).toBe(
       undefined
     );
-    expect(recipients()).toEqual(["rsvper@test.example"]);
+    expect(recipients()).toEqual(["host@test.example", "rsvper@test.example"]);
   });
 
   it("stays silent when an event is deleted", async () => {

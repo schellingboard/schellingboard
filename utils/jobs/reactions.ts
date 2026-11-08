@@ -101,14 +101,12 @@ export const changeNotifications = reaction(
       return;
     const { cascade, tellAttendees } = change.payload;
     if (cascade && !tellAttendees) return;
-    const attendeesOnly = !!cascade;
     if (change.type === "session.changed") {
       const { before, after } = change.payload;
       await notifySessionChanged({
         before,
         after,
         changedById,
-        attendeesOnly,
         now,
       });
     } else {
@@ -117,7 +115,6 @@ export const changeNotifications = reaction(
         session,
         rsvpGuestIds,
         changedById,
-        attendeesOnly,
         now,
       });
     }

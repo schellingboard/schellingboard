@@ -18,7 +18,7 @@ export type ChangeContext = {
   at: Date;
   /** Set when the change follows from deleting or editing something else. */
   cascade?: true;
-  /** With `cascade`: the session's RSVPed guests are told (not its hosts). */
+  /** With `cascade`: the session's hosts and RSVPed guests are told. */
   tellAttendees?: true;
 };
 

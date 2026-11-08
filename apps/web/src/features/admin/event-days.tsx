@@ -296,6 +296,11 @@ function DeleteDay({
           ))}
         </ul>
       )}
+      {affected.length > 0 && (
+        <p className="text-sm text-fg-muted">
+          Their hosts and RSVPed guests are told.
+        </p>
+      )}
       <FormErrorSummary fields={{}} error={mutation.error} onJump={jumpTo} />
       <div className="flex gap-2">
         <Button
