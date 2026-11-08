@@ -117,8 +117,10 @@ describe("asking for a 1-on-1", { tags: ["012-US3"] }, () => {
         message: "Hi",
       },
     });
-    await userEvent.click(screen.getByRole("button", { name: "Done" }));
     expect(closed()).toBe(1);
+    expect(screen.getByRole("status").textContent).toContain(
+      "You'll hear when they answer"
+    );
   });
 
   it("needs a slot and a place, and cannot pick a slot they are unavailable at", async () => {

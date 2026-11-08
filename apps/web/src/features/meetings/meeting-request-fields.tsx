@@ -1,3 +1,4 @@
+import type { Notice } from "../../ui/notices";
 import { Button } from "../../ui/button";
 import { TextField } from "../../ui/form";
 
@@ -148,25 +149,12 @@ export function MeetingRequestFields({
   );
 }
 
-/** "Asked Al for 09:10 – 09:40 on Sat 9 May." with the way out. */
-export function MeetingRequestSent({
-  what,
-  onClose,
-}: {
-  what: string;
-  onClose: () => void;
-}) {
-  return (
-    <div className="flex flex-col gap-4">
-      <p className="text-fg">
-        Asked {what}. You&apos;ll hear when they answer.
-      </p>
-      <div className="flex flex-wrap gap-2">
-        <Button onClick={onClose}>Done</Button>
-      </div>
-    </div>
-  );
-}
+/** The toast after a request is sent: "Asked Al for 09:10 – 09:40 on Sat 9 May." */
+export const requestSentNotice = (what: string): Notice => ({
+  tone: "info",
+  message: `Asked ${what}. You'll hear when they answer.`,
+  autoDismissMs: 10_000,
+});
 
 /** Names who and when; an unreachable answer must not claim it failed. */
 export function MeetingRequestError({

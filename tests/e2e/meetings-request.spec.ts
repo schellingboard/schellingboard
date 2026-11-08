@@ -275,9 +275,9 @@ test.describe("1-on-1 meetings", () => {
 
     await send.click();
     await expect(
-      picker.getByText(new RegExp(`Asked ${askee} for 09:10 – 10:00`))
+      page.getByText(new RegExp(`Asked ${askee} for 09:10 – 10:00`))
     ).toBeVisible();
-    await picker.getByRole("button", { name: "Done" }).click();
+    await expect(picker).toBeHidden();
 
     // The column behind it is already showing the request, without a reload.
     await expect(

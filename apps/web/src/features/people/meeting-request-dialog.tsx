@@ -4,12 +4,13 @@ import type { MeetingRequestCalls } from "../../commands/meeting-request";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import type { ProfileMeetingOption } from "../../queries/profile-activity";
 import { Dialog } from "../../ui/dialog";
+import { useNotify } from "../../ui/notices";
 import {
   MeetingClashNotice,
   MeetingLengthChips,
   MeetingRequestError,
   MeetingRequestFields,
-  MeetingRequestSent,
+  requestSentNotice,
 } from "../meetings/meeting-request-fields";
 
 type Day = ProfileMeetingOption["lengths"][number]["days"][number];
@@ -85,7 +86,7 @@ export function MeetingRequestDialog({
   const [slotStart, setSlotStart] = useState<string | null>(null);
   const [meetingPoint, setMeetingPoint] = useState("");
   const [message, setMessage] = useState("");
-  const [sent, setSent] = useState(false);
+  const notify = useNotify();
 
   const mutation = useFormMutation({
     fieldNames: ["meetingPoint", "message"],
@@ -111,55 +112,48 @@ export function MeetingRequestDialog({
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     if (!slotStart) return;
-    if ((await mutation.submit())?.ok) setSent(true);
+    if (!(await mutation.submit())?.ok) return;
+    notify(
+      requestSentNotice(`${recipientName} for ${slot?.label} on ${day?.label}`)
+    );
+    onClose();
   };
 
   return (
     <Dialog open wide onClose={onClose} title={`1-on-1 with ${recipientName}`}>
       <p className="-mt-2 mb-3 text-sm text-fg-muted">{option.eventName}</p>
-      {sent ? (
-        <MeetingRequestSent
-          what={`${recipientName} for ${slot?.label} on ${day?.label}`}
-          onClose={onClose}
+      <form onSubmit={(e) => void submit(e)} className="flex flex-col gap-4">
+        <MeetingRequestError
+          what={`${recipientName} for ${slot?.label ?? "that slot"} on ${day?.label ?? "that day"}`}
+          error={mutation.error}
+          unreachable={mutation.unreachable}
         />
-      ) : (
-        <form onSubmit={(e) => void submit(e)} className="flex flex-col gap-4">
-          <MeetingRequestError
-            what={`${recipientName} for ${slot?.label ?? "that slot"} on ${day?.label ?? "that day"}`}
-            error={mutation.error}
-            unreachable={mutation.unreachable}
-          />
-          <MeetingLengthChips
-            lengths={option.lengths}
-            slotCount={slotCount}
-            onSlotCount={(count) => {
-              setSlotCount(count);
-              setSlotStart(null);
-            }}
-          />
-          <div className="max-h-64 overflow-y-auto">
-            <SlotList
-              days={days}
-              selected={slotStart}
-              onSelect={setSlotStart}
-            />
-          </div>
-          <MeetingClashNotice
-            lines={slot?.state === "busy" ? [clashLines(slot.clashes)] : []}
-          />
-          <MeetingRequestFields
-            meetingPoints={option.meetingPoints}
-            meetingPoint={meetingPoint}
-            onMeetingPoint={setMeetingPoint}
-            message={message}
-            onMessage={setMessage}
-            isSending={mutation.pending}
-            submitDisabled={!slotStart}
-            onCancel={onClose}
-            errors={mutation.fields}
-          />
-        </form>
-      )}
+        <MeetingLengthChips
+          lengths={option.lengths}
+          slotCount={slotCount}
+          onSlotCount={(count) => {
+            setSlotCount(count);
+            setSlotStart(null);
+          }}
+        />
+        <div className="max-h-64 overflow-y-auto">
+          <SlotList days={days} selected={slotStart} onSelect={setSlotStart} />
+        </div>
+        <MeetingClashNotice
+          lines={slot?.state === "busy" ? [clashLines(slot.clashes)] : []}
+        />
+        <MeetingRequestFields
+          meetingPoints={option.meetingPoints}
+          meetingPoint={meetingPoint}
+          onMeetingPoint={setMeetingPoint}
+          message={message}
+          onMessage={setMessage}
+          isSending={mutation.pending}
+          submitDisabled={!slotStart}
+          onCancel={onClose}
+          errors={mutation.fields}
+        />
+      </form>
     </Dialog>
   );
 }

@@ -108,6 +108,42 @@ describe("notices", () => {
     }
   });
 
+  it("holds off dismissing while the pointer or focus is on the notice", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      render(
+        <NoticeProvider>
+          <Raiser
+            notice={{ tone: "info", message: "Saved", autoDismissMs: 5000 }}
+          />
+        </NoticeProvider>
+      );
+      await go();
+      const toast = screen.getByRole("status");
+
+      await userEvent.hover(toast);
+      await act(() => vi.advanceTimersByTimeAsync(20_000));
+      expect(screen.getByRole("status")).toBeTruthy();
+
+      await userEvent.unhover(toast);
+      await act(() => vi.advanceTimersByTimeAsync(5000));
+      expect(screen.queryByRole("status")).toBeNull();
+
+      await go();
+      await userEvent.tab();
+      expect(document.activeElement?.textContent).toBe("Dismiss");
+      await act(() => vi.advanceTimersByTimeAsync(20_000));
+      expect(screen.getByRole("status")).toBeTruthy();
+
+      await userEvent.hover(screen.getByRole("status"));
+      await userEvent.unhover(screen.getByRole("status"));
+      await act(() => vi.advanceTimersByTimeAsync(20_000));
+      expect(screen.getByRole("status")).toBeTruthy();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("runs an action and closes the notice, or just dismisses it", async () => {
     const run = vi.fn();
     render(

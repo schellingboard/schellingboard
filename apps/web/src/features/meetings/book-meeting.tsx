@@ -15,12 +15,13 @@ import type {
 import { Avatar } from "../../ui/avatar";
 import { Button } from "../../ui/button";
 import { Dialog } from "../../ui/dialog";
+import { useNotify } from "../../ui/notices";
 import {
   MeetingClashNotice,
   MeetingLengthChips,
   MeetingRequestError,
   MeetingRequestFields,
-  MeetingRequestSent,
+  requestSentNotice,
 } from "./meeting-request-fields";
 
 /** Booking a 1-on-1 from the schedule: the slot is known, the person is not. */
@@ -207,7 +208,7 @@ function RequestStep({
 }) {
   const [meetingPoint, setMeetingPoint] = useState("");
   const [message, setMessage] = useState("");
-  const [sent, setSent] = useState(false);
+  const notify = useNotify();
   const mutation = useFormMutation({
     fieldNames: ["meetingPoint", "message"],
     call: (key) =>
@@ -228,14 +229,11 @@ function RequestStep({
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     if ((await mutation.submit())?.ok) {
-      setSent(true);
       onBooked();
+      notify(requestSentNotice(what));
+      onClose();
     }
   };
-
-  if (sent) {
-    return <MeetingRequestSent what={what} onClose={onClose} />;
-  }
 
   return (
     <form onSubmit={(e) => void submit(e)} className="flex flex-col gap-4">

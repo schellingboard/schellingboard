@@ -99,7 +99,7 @@ describe("booking a 1-on-1 from a slot", { tags: ["012-US6"] }, () => {
         meetingPoint: "Coffee bar",
       },
     });
-    expect(events).toEqual(["booked"]);
+    expect(events).toEqual(["booked", "closed"]);
   });
 
   it("lists again for another length, and goes back to choose someone else", async () => {

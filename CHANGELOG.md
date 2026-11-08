@@ -53,6 +53,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **1-on-1 requests confirm with a message that fades**: after sending a request the pop-up closes
+  and a short message says who was asked, instead of a "Done" step. It stays while you hover it.
 - **Choose your name with the keyboard**: in "Who are you?", the arrow keys move through the names
   and Enter picks one; typing makes the first match ready to pick.
 - **Search for a time zone** (#1329): an event's time zone is a searchable field instead of a long

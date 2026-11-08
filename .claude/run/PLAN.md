@@ -36,13 +36,7 @@ section 9 for step 1.
       `fixed inset-0` modals).
 - [x] 4. Profile loading state (done: `status` prop, placeholder, `Avatar` initials under the
       image).
-- [ ] 5. **1-on-1 request confirmation as a toast.** Both entry points
-      (`features/people/     meeting-request-dialog.tsx`, `features/meetings/book-meeting.tsx`): on
-      success close the dialog and
-      `notify({ tone: "info", message: "Asked … You'll hear when they answer.",     autoDismissMs: 10_000 })`;
-      remove `MeetingRequestSent` if unused. In `ui/notices.tsx`, pause the dismiss timer while the
-      pointer is over the toast or focus is in it. Check that the toast is not hidden behind the
-      schedule's bottom bar. Red first: component tests; adapt E2E that clicked "Done".
+- [x] 5. 1-on-1 request toast (done: both entry points notify; toasts pause on hover/focus).
 - [ ] 6. **Schedule room headers stay out of the time column.** Reproduce first with screenshots
       (scroll right, then also down). Suspected cause: in `features/schedule/day-grid.tsx` the
       gutter cell of the room-description row (line ~83) is `sticky` with `top` but no `left-0`, so
