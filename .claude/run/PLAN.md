@@ -32,13 +32,8 @@ section 9 for step 1.
 
 - [x] 1. Hosts told of day/location deletes (done: reaction, docs, delete confirmations).
 - [x] 2. "Who are you?" keyboard selection (done: combobox in `NamePicker`).
-- [ ] 3. **Modal scroll does not move the page.** A shared `useScrollLock` (in `ui/`): while any
-      modal is open, `html` gets `overflow: hidden` (ref-counted for nested dialogs, restored on
-      close; `scrollbar-gutter: stable` already prevents a width jump). Use it in `ui/dialog.tsx`
-      and `features/people/profile-modal.tsx`; find other `fixed inset-0` modals and use it there.
-      Add `overscroll-contain` to the modal scroll containers. Red first: a Vitest test of the hook
-      (lock, nested lock, restore). Check by hand: proposal modal, profile modal, session modal, on
-      a long page, desktop and phone width.
+- [x] 3. Modal scroll lock (done: `useScrollLock` in `Dialog` and `ProfileModal`; no other
+      `fixed inset-0` modals).
 - [ ] 4. **Profile opens without a false error.** `ProfileModal` shows "This person is no longer
       listed" while the directory is still loading. Pass the directory `status` from
       `app/people-pages.tsx`; while loading, show a quiet placeholder (name and avatar skeleton, no

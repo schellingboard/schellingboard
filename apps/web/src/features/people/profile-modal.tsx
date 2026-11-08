@@ -27,6 +27,7 @@ import { MeetingRequestDialog } from "./meeting-request-dialog";
 import type { ProfileLinks } from "./links";
 import { ProfileBody } from "./profile-body";
 import { useDiscardGuard } from "../../ui/use-discard-guard";
+import { useScrollLock } from "../../ui/use-scroll-lock";
 
 /** How long the profile takes to finish a swipe the finger has let go of. */
 const SETTLE_MS = 200;
@@ -200,8 +201,9 @@ export function ProfileModal(props: ProfileModalProps) {
     [collection, index, drag, width, onOpen]
   );
 
+  useScrollLock(true);
+
   useEffect(() => {
-    document.documentElement.style.overflow = "hidden";
     const onKeyDown = (e: KeyboardEvent) => {
       if (scheduling) return;
       if (e.key === "Escape") {
@@ -219,7 +221,6 @@ export function ProfileModal(props: ProfileModalProps) {
     };
     document.addEventListener("keydown", onKeyDown);
     return () => {
-      document.documentElement.style.overflow = "";
       document.removeEventListener("keydown", onKeyDown);
     };
   }, [escape, goToAnimated, zoomed, scheduling]);
@@ -326,7 +327,7 @@ export function ProfileModal(props: ProfileModalProps) {
                     ref={current ? body : undefined}
                     aria-hidden={!current}
                     inert={!current}
-                    className="w-full shrink-0 overflow-y-auto px-4 py-6 sm:px-6"
+                    className="w-full shrink-0 overflow-y-auto overscroll-contain px-4 py-6 sm:px-6"
                     style={{ width: width || undefined }}
                   >
                     <ProfileBody
@@ -359,7 +360,7 @@ export function ProfileModal(props: ProfileModalProps) {
           ) : (
             // Not a 404: a stale link from an old session or comment lands
             // here, and the list behind is more use than an error.
-            <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6">
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-6 sm:px-6">
               <p className="text-fg-muted">This person is no longer listed.</p>
             </div>
           )}

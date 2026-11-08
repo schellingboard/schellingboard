@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import { useDiscardGuard } from "./use-discard-guard";
+import { useScrollLock } from "./use-scroll-lock";
 
 /** Open dialogs, innermost last: Escape closes only the one on top. */
 const openDialogs: symbol[] = [];
@@ -30,6 +31,7 @@ export function Dialog({
   const titleId = useId();
   const panel = useRef<HTMLDivElement>(null);
 
+  useScrollLock(open);
   const guard = useDiscardGuard(panel, onClose);
   const { escape, reset } = guard;
 
@@ -92,7 +94,7 @@ export function Dialog({
         onClick={(e) => e.stopPropagation()}
         onKeyDown={keepFocusInside}
         onFocus={guard.noteFocus}
-        className={`relative max-h-[90dvh] w-full overflow-y-auto rounded-t-lg bg-surface-raised p-4 shadow-xl focus:outline-none sm:rounded-lg sm:p-6 ${wide ? "sm:max-w-2xl" : "sm:max-w-md"}`}
+        className={`relative max-h-[90dvh] w-full overflow-y-auto overscroll-contain rounded-t-lg bg-surface-raised p-4 shadow-xl focus:outline-none sm:rounded-lg sm:p-6 ${wide ? "sm:max-w-2xl" : "sm:max-w-md"}`}
       >
         <h2 id={titleId} className="pr-8 text-lg font-semibold text-fg">
           {title}

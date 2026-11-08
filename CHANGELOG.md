@@ -85,6 +85,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **Scrolling inside a pop-up no longer moves the page behind it**: reaching the end of a long
+  pop-up used to scroll the page underneath.
 - **Choose your name with the keyboard**: in "Who are you?", the arrow keys move through the names
   and Enter picks one; typing makes the first match ready to pick.
 - **Hosts are told when deleting a day or location removes or moves their session**: until now only
