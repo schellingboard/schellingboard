@@ -40,17 +40,8 @@ section 9 for step 1.
 - [x] 6. Schedule gutter fix (done: description-row gutter cell is `sticky left-0`).
 - [x] 7. Account security in Settings (done: `AccountSecuritySection`; `/account-security`
       redirects).
-- [ ] 8. **Admin: one frame, no jumps, black top overscroll.** One container for the admin header
-      and `main` (max ~120rem, centered as a whole, same side padding). Every page left-aligned in
-      it: the title, back link and tabs sit at the same place on every page. Forms and prose cap at
-      a readable width (~48rem) but stay left; tables, the sessions grid and statistics use the full
-      frame. Remove the per-page `mx-auto max-w-*` wrappers (`event-layout.tsx`, `admin-pages.tsx`
-      statistics, others). Overscroll: the bounce above the black header shows the body's grey. Fix
-      with a root background that is the bar colour at the top and the footer colour at the bottom
-      (e.g. `html:has([data-admin-frame])` with a two-stop gradient), in light and dark; check the
-      attendee shell has no such mismatch. Check on macOS-style elastic scroll if possible (Safari
-      or Chrome on a trackpad); else say so in PROGRESS.md. Styling: no new test; keep existing E2E
-      green.
+- [x] 8. Admin frame (done: one `FRAME` container for header and pages; root gradient behind
+      `[data-admin-frame]`; overscroll not verified on macOS).
 - [ ] 9. **Wrap up.** Read every `[Unreleased]` bullet from this run against AGENTS.md limits; run
       `make precommit` minus E2E; tell the user which E2E specs to run. Delete `.claude/run/` in the
       last commit.

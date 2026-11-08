@@ -70,7 +70,7 @@ export function AdminEventLayout({
     return <p className="text-sm">Loading…</p>;
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-6">
+    <div className="w-full space-y-6">
       <div>
         <BackLink href="/admin/events">Events</BackLink>
       </div>

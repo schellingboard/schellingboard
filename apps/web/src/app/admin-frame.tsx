@@ -27,6 +27,9 @@ const ReloadGate = createContext<() => void>(() => {});
 /** Reads the gate again, so the header shows a title that a page just changed. */
 export const useReloadAdminGate = () => useContext(ReloadGate);
 
+/** One centred frame for the header and every page, so nothing shifts between pages. */
+const FRAME = "mx-auto w-full max-w-[120rem] px-3 lg:px-8";
+
 const LOGIN = "/auth/login";
 
 const LINKS = [
@@ -121,7 +124,9 @@ function AdminHeader({
   const [open, setOpen] = useState(false);
   return (
     <header className="bg-bar text-bar-fg">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-3 py-3 lg:px-8">
+      <div
+        className={cx(FRAME, "flex items-center justify-between gap-4 py-3")}
+      >
         <a href="/admin" className="font-semibold hover:text-bar-fg-subtle">
           {title} Admin
         </a>
@@ -187,21 +192,26 @@ export function AdminFrame({
   return (
     <ThemeProvider>
       <NoticeProvider>
-        <div className="flex min-h-dvh flex-col bg-surface text-fg">
+        <div
+          data-admin-frame
+          className="flex min-h-dvh flex-col bg-surface text-fg"
+        >
           {state.status === "open" && (
             <AdminHeader title={state.title} currentPath={currentPath} />
           )}
-          <main className="flex flex-1 flex-col px-3 py-6 lg:px-8 lg:pb-16">
-            {state.status === "open" && (
-              <ReloadGate.Provider value={reload}>
-                {children}
-              </ReloadGate.Provider>
-            )}
-            {state.status === "error" && (
-              <p role="alert" className="text-sm text-danger-fg">
-                Could not open the admin area ({state.code}).
-              </p>
-            )}
+          <main className="flex-1 py-6 lg:pb-16">
+            <div className={cx(FRAME, "flex flex-col")}>
+              {state.status === "open" && (
+                <ReloadGate.Provider value={reload}>
+                  {children}
+                </ReloadGate.Provider>
+              )}
+              {state.status === "error" && (
+                <p role="alert" className="text-sm text-danger-fg">
+                  Could not open the admin area ({state.code}).
+                </p>
+              )}
+            </div>
           </main>
           <Footer version={health?.version} update={update} />
         </div>

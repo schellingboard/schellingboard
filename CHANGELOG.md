@@ -53,6 +53,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Admin pages no longer shift between tabs**: the header, titles, back links and tabs sit in the
+  same place on every admin page, and pulling the page down past the top no longer shows a grey band
+  above the black header.
 - **Account security is part of Settings**: protecting your name, changing your password and signing
   out other browsers now sit at the end of the Settings page; the old address still works.
 - **1-on-1 requests confirm with a message that fades**: after sending a request the pop-up closes

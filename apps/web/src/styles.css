@@ -11,6 +11,23 @@ body {
 }
 
 /*
+ * Elastic overscroll and a classic scrollbar's gutter show the root background:
+ * bar colour behind the header, page colour beside the content, footer colour
+ * at the bottom. Where `fixed` is ignored the bar colour is the fallback.
+ */
+html:has([data-admin-frame]) {
+  background-color: var(--bar);
+  background-image: linear-gradient(
+    var(--bar) 3.75rem,
+    var(--surface) 3.75rem,
+    var(--surface) calc(100% - 2.7rem),
+    var(--surface-sunken) calc(100% - 2.7rem)
+  );
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/*
  * The schedule owns the viewport (see ScheduleScreen): while its frame is
  * mounted the window must not scroll and the page's footer is hidden, the
  * schedule rendering its own copy at the bottom of its scroll content.

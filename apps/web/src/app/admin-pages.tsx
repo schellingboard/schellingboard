@@ -188,7 +188,7 @@ export function AdminStatisticsPage({ api, id }: { api: Api; id: string }) {
   const { params } = useUrlSearchParams();
   const section = params.get("section");
   return (
-    <div className="mx-auto w-full max-w-[120rem] space-y-6">
+    <div className="w-full space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <h1 className="text-2xl font-bold text-fg">Statistics</h1>
         {events.status === "ready" && (
