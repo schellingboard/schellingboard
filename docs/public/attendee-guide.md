@@ -515,8 +515,8 @@ reach your phone or laptop when the site isn't open.
   descriptions and comment text stay on the site rather than going out to your email provider.
 - **1-on-1s** — one panel per event you're attending that offers them, with the switch and the slots
   you're keeping free. See [1-on-1s](#1-on-1s).
-- **Account security** — a link to the page where you protect your name, change your password or
-  turn protection off. See [Protect your name](#protect-your-name).
+- **Account security** — where you protect your name, change your password or turn protection off,
+  and sign out other browsers. See [Protect your name](#protect-your-name).
 - **Appearance** — System, Light or Dark, also available at the very bottom of every page.
   **System** follows your phone or laptop, so the site turns dark in the evening if your device
   does. The choice is remembered per device, not per name, and works before you've picked a name.

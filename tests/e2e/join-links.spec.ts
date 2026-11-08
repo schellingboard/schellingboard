@@ -116,7 +116,6 @@ test("a guest without an email gets a link from the organizer and sets a passwor
 
   await visitor.getByRole("button", { name: /your name/i }).click();
   await visitor.getByRole("menuitem", { name: /settings/i }).click();
-  await visitor.getByRole("link", { name: "Account security" }).click();
   await visitor.getByRole("button", { name: "Set a password" }).click();
   await visitor
     .getByLabel("New password (at least 8 characters)")

@@ -232,7 +232,7 @@ test.describe("attendee-count reminders", () => {
     page,
   }) => {
     await login(page);
-    await page.goto("/account-security?dev=1");
+    await page.goto("/settings?dev=1");
     await selectUser(page, "Charlie Test");
     await setDevClock(page, lateOnGammaDay(1));
     await page.reload();

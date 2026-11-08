@@ -47,6 +47,14 @@ const answers = (call: FakeCall): Response | undefined => {
     return Response.json(emailSettings);
   if (call.path === "/api/v1/meeting-availability")
     return Response.json({ forms: [] });
+  if (call.path === "/api/v1/me/credentials")
+    return Response.json({
+      authProtected: false,
+      username: null,
+      hasEmail: true,
+      canSetPassword: true,
+    });
+  if (call.path === "/api/v1/me/login-sessions") return Response.json([]);
   if (call.path === "/api/v1/push/key")
     return Response.json({ publicKey: "AQAB" });
   if (
@@ -212,17 +220,24 @@ describe("the sign-in pages", { tags: ["003-US4"] }, () => {
     expect(await screen.findByText(/Could not load the names/)).toBeTruthy();
   });
 
-  it("asks to select a name before showing account security", async () => {
-    await open({
-      handler: (call) =>
-        call.path.startsWith("/api/v1/me/")
-          ? problem(403, "guest.unselected")
-          : answers(call),
+  it("sends the old account security address to the security section of settings", async () => {
+    const { router } = await open({
+      handler: answers,
       path: "/account-security",
-      identity: null,
+      identity: "al",
     });
 
-    expect(await screen.findByText(/Choose who you are/)).toBeTruthy();
+    expect(
+      await screen.findByRole("heading", { name: "Settings" })
+    ).toBeTruthy();
+    expect(router.history.location.pathname).toBe("/settings");
+    expect(router.history.location.hash).toBe("#security");
+    expect(
+      screen.getByRole("heading", { name: "Account security" })
+    ).toBeTruthy();
+    expect(
+      await screen.findByRole("button", { name: "Set a password" })
+    ).toBeTruthy();
   });
 });
 

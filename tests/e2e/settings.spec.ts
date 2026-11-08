@@ -72,7 +72,7 @@ test.describe("Admin site settings", () => {
     await expect(page.getByText("Settings saved.")).toBeVisible();
 
     // The map button now shows in the nav bar and opens the map image.
-    await page.goto("/account-security");
+    await page.goto("/settings");
     const mapButton = page.getByRole("button", { name: "Show map" });
     await expect(mapButton).toBeVisible();
     await mapButton.click();

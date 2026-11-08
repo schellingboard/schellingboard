@@ -1,11 +1,11 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fakeApi, problem, type FakeHandler } from "../../commands/fake-api";
 import { signInCalls } from "../../commands/sign-in";
 import type { AccountSecurityState } from "../../queries/account-security";
 import { NoticeProvider } from "../../ui/notices";
-import { AccountSecurityScreen } from "./account-security";
+import { AccountSecuritySection } from "./account-security";
 
 afterEach(cleanup);
 
@@ -40,7 +40,7 @@ function setup(
   const reload = vi.fn();
   render(
     <NoticeProvider>
-      <AccountSecurityScreen
+      <AccountSecuritySection
         state={state}
         calls={{
           ...signInCalls(api),
@@ -48,7 +48,6 @@ function setup(
         }}
         guest={{ id: "g1", name: "Ada" }}
         reload={reload}
-        backHref="/settings"
       />
     </NoticeProvider>
   );
@@ -268,5 +267,30 @@ describe("account security: loading", { tags: ["003-US3"] }, () => {
     expect(screen.getByRole("alert").textContent).toMatch(
       /Choose who you are/i
     );
+  });
+});
+
+describe("account security: placement", { tags: ["013-US5"] }, () => {
+  let original: typeof Element.prototype.scrollIntoView;
+  beforeEach(() => {
+    // eslint-disable-next-line @typescript-eslint/unbound-method -- restored as is
+    original = Element.prototype.scrollIntoView;
+  });
+  afterEach(() => {
+    Element.prototype.scrollIntoView = original;
+    window.location.hash = "";
+  });
+
+  it("scrolls into view for #security, as a titled section", () => {
+    const scroll = vi.fn();
+    Element.prototype.scrollIntoView = scroll;
+    window.location.hash = "#security";
+
+    setup(ready());
+
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Account security" })
+    ).toBeTruthy();
+    expect(scroll).toHaveBeenCalled();
   });
 });

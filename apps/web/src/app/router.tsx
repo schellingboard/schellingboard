@@ -2,13 +2,13 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
+  redirect,
   lazyRouteComponent,
   Outlet,
   type RouterHistory,
 } from "@tanstack/react-router";
 import { Suspense, type ReactElement } from "react";
 import {
-  AccountSecurityPage,
   LoginPage,
   NotificationsPage,
   ResetPage,
@@ -205,8 +205,9 @@ export function createAppRouter(
   const accountSecurity = createRoute({
     getParentRoute: () => rootRoute,
     path: "account-security",
-    component: function AccountSecurityRoute(): ReactElement {
-      return <AccountSecurityPage services={services} />;
+    beforeLoad: () => {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error -- how TanStack Router redirects
+      throw redirect({ to: "/settings", hash: "security", replace: true });
     },
   });
   const authLogin = createRoute({

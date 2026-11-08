@@ -38,14 +38,8 @@ section 9 for step 1.
       image).
 - [x] 5. 1-on-1 request toast (done: both entry points notify; toasts pause on hover/focus).
 - [x] 6. Schedule gutter fix (done: description-row gutter cell is `sticky left-0`).
-- [ ] 7. **Account security in Settings.** Move the sections of
-      `features/sign-in/account-security.tsx` into `features/settings/settings-screen.tsx` as a
-      "Security" section with `id="security"`. It must work in every state the old page handled
-      (unprotected name, protected name not logged in, password set; settings `REFUSALS` in
-      `app/account-pages.tsx`). `/account-security` redirects (replace) to `/settings#security`;
-      remove the old route component and link text. Update `docs/public/attendee-guide.md` (lines
-      ~441, 456, 518), `docs/dev/web-app.md` route list, and the 2 E2E specs that use the old URL
-      (reach it through the UI). Test the redirect.
+- [x] 7. Account security in Settings (done: `AccountSecuritySection`; `/account-security`
+      redirects).
 - [ ] 8. **Admin: one frame, no jumps, black top overscroll.** One container for the admin header
       and `main` (max ~120rem, centered as a whole, same side padding). Every page left-aligned in
       it: the title, back link and tabs sit at the same place on every page. Forms and prose cap at

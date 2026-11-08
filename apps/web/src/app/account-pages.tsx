@@ -15,7 +15,7 @@ import { settingsCalls } from "../commands/settings";
 import { NotificationsScreen } from "../features/notifications/notifications-screen";
 import { JoinScreen } from "../features/sign-in/join-screen";
 import { BootstrapScreen } from "../features/sign-in/bootstrap-screen";
-import { AccountSecurityScreen } from "../features/sign-in/account-security";
+import { AccountSecuritySection } from "../features/sign-in/account-security";
 import { SiteLoginScreen } from "../features/sign-in/site-login-screen";
 import { LoginScreen } from "../features/sign-in/guest-login-form";
 import { ResetScreen } from "../features/sign-in/reset-password-form";
@@ -46,7 +46,7 @@ const REFUSALS = ["guest.unselected", "guest.protected"];
 export function SettingsPage({ services }: { services: AppServices }) {
   return (
     <AccountFrame services={services}>
-      {() => <Settings api={services.api} />}
+      {(shell) => <Settings api={services.api} {...shell} />}
     </AccountFrame>
   );
 }
@@ -121,15 +121,6 @@ export function ResetPage({ services }: { services: AppServices }) {
   );
 }
 
-/** Protection, username and signed-in browsers of the signed-in guest. */
-export function AccountSecurityPage({ services }: { services: AppServices }) {
-  return (
-    <AccountFrame services={services}>
-      {(shell) => <Security api={services.api} {...shell} />}
-    </AccountFrame>
-  );
-}
-
 type Shell = {
   now: Date;
   entries: { id: string; name: string }[];
@@ -172,7 +163,12 @@ function Frame({
   );
 }
 
-function Settings({ api }: { api: AppServices["api"] }) {
+function Settings({
+  api,
+  entries,
+  loaded,
+  failed,
+}: { api: AppServices["api"] } & Pick<Shell, "entries" | "loaded" | "failed">) {
   const [query] = useState(() => createSettingsQuery({ api }));
   useEffect(() => {
     void query.load();
@@ -195,10 +191,10 @@ function Settings({ api }: { api: AppServices["api"] }) {
       state={state}
       calls={calls}
       availability={availability}
-      links={{
-        profile: "/guests/edit",
-        security: "/account-security",
-      }}
+      links={{ profile: "/guests/edit" }}
+      security={
+        <Security api={api} entries={entries} loaded={loaded} failed={failed} />
+      }
     />
   );
 }
@@ -338,12 +334,11 @@ function Security({
   if (viewer.guestId && !guest && !loaded)
     return <DirectoryWait failed={failed} />;
   return (
-    <AccountSecurityScreen
+    <AccountSecuritySection
       state={state}
       calls={calls}
       guest={guest ?? { id: viewer.guestId ?? "", name: "" }}
       reload={() => void query.load()}
-      backHref="/settings"
     />
   );
 }

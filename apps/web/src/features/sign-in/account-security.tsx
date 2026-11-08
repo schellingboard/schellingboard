@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { SignInCalls } from "../../commands/sign-in";
 import type {
   AccountSecurityState,
@@ -17,25 +17,33 @@ type Mode = "password" | "disable" | "first";
 const SECTION = "flex flex-col gap-2";
 
 /** Protection, username and signed-in browsers of the guest this browser acts as. */
-export function AccountSecurityScreen({
+export function AccountSecuritySection({
   state,
   calls,
   guest,
   reload,
-  backHref,
 }: {
   state: AccountSecurityState;
   calls: SignInCalls;
   guest: Guest;
   reload: () => void;
-  backHref: string;
 }) {
+  const root = useRef<HTMLElement>(null);
+  // Again once loaded: what lands above the section while it loads moves it.
+  useEffect(() => {
+    if (window.location.hash === "#security") root.current?.scrollIntoView();
+  }, [state.status]);
+
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 sm:px-0">
-      <a href={backHref} className="text-sm text-fg-subtle hover:text-fg-muted">
-        ← Settings
-      </a>
-      <h1 className="text-2xl font-bold">Account security</h1>
+    <section
+      ref={root}
+      id="security"
+      aria-labelledby="security-heading"
+      className="mx-auto flex w-full max-w-2xl scroll-mt-20 flex-col gap-6 px-4 sm:px-0"
+    >
+      <h2 id="security-heading" className="text-xl font-bold">
+        Account security
+      </h2>
       {state.status === "loading" && <p role="status">Loading…</p>}
       {state.status === "error" && (
         <p role="alert" className="text-danger-fg">
@@ -56,7 +64,7 @@ export function AccountSecurityScreen({
           <LoginSessions state={state} calls={calls} reload={reload} />
         </>
       )}
-    </div>
+    </section>
   );
 }
 
@@ -127,9 +135,9 @@ function Protection({
 
   return (
     <section className={SECTION} aria-labelledby="protection-heading">
-      <h2 id="protection-heading" className="text-lg font-semibold">
+      <h3 id="protection-heading" className="text-lg font-semibold">
         Protection
-      </h2>
+      </h3>
       <p className="text-sm text-fg-subtle">
         {state.authProtected
           ? canResetByMail
@@ -284,7 +292,7 @@ function Username({
       className={SECTION}
       aria-label="Username settings"
     >
-      <h2 className="text-lg font-semibold">Username</h2>
+      <h3 className="text-lg font-semibold">Username</h3>
       <TextField
         label="Username"
         value={username}
@@ -346,9 +354,9 @@ function LoginSessions({
 
   return (
     <section className={SECTION} aria-labelledby="sessions-heading">
-      <h2 id="sessions-heading" className="text-lg font-semibold">
+      <h3 id="sessions-heading" className="text-lg font-semibold">
         Signed-in browsers
-      </h2>
+      </h3>
       <p className="text-sm text-fg-subtle">
         Each browser you chose your name in stays signed in for 30 days after
         you last used it.

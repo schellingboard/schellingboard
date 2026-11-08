@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { MeetingAvailabilityCalls } from "../../commands/meeting-availability";
 import type { SettingsCalls } from "../../commands/settings";
 import type { SettingsState } from "../../queries/settings";
@@ -8,7 +9,7 @@ import { PushNotifications } from "./push-notifications";
 
 const SECTION = "mx-auto flex w-full max-w-2xl flex-col gap-3 px-4 sm:px-0";
 
-export type SettingsLinks = { profile: string; security: string };
+export type SettingsLinks = { profile: string };
 
 /** The signed-in guest's private settings, and the device's own appearance. */
 export function SettingsScreen({
@@ -16,11 +17,13 @@ export function SettingsScreen({
   calls,
   availability,
   links,
+  security,
 }: {
   state: SettingsState;
   calls: SettingsCalls;
   availability: MeetingAvailabilityCalls;
   links: SettingsLinks;
+  security: ReactNode;
 }) {
   return (
     <div className="flex flex-col gap-8">
@@ -34,6 +37,7 @@ export function SettingsScreen({
           Could not load your settings. Reload the page to try again.
         </p>
       )}
+      {state.status === "error" && security}
       {state.status === "ready" && (
         <>
           <div className={`${SECTION} gap-6`}>
@@ -57,18 +61,7 @@ export function SettingsScreen({
             <PushNotifications publicKey={state.publicKey} calls={calls} />
           </div>
           <OneOnOnes forms={state.forms} calls={availability} />
-          <div className={SECTION}>
-            <p className="text-sm text-fg-subtle">
-              Protecting your name with a password is managed on the{" "}
-              <a
-                href={links.security}
-                className="text-brand-fg underline hover:text-brand-fg-hover"
-              >
-                Account security
-              </a>{" "}
-              page.
-            </p>
-          </div>
+          {security}
         </>
       )}
       <Appearance />
