@@ -79,10 +79,7 @@ export function DayGrid({
       {locations.map((loc) => (
         <RoomHeader key={loc.id} location={loc} stickyTop={stickyTop} />
       ))}
-      <div
-        style={{ top: stickyTop }}
-        className="sticky z-20 border-r border-line-subtle bg-surface"
-      />
+      <div className="sticky left-0 z-20 border-r border-line-subtle bg-surface" />
       {showMeetings && (
         <div className="border-l border-line-subtle p-1">
           <p className="text-[10px] text-fg-subtle">Only you see these</p>

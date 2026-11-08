@@ -37,11 +37,7 @@ section 9 for step 1.
 - [x] 4. Profile loading state (done: `status` prop, placeholder, `Avatar` initials under the
       image).
 - [x] 5. 1-on-1 request toast (done: both entry points notify; toasts pause on hover/focus).
-- [ ] 6. **Schedule room headers stay out of the time column.** Reproduce first with screenshots
-      (scroll right, then also down). Suspected cause: in `features/schedule/day-grid.tsx` the
-      gutter cell of the room-description row (line ~83) is `sticky` with `top` but no `left-0`, so
-      that row slides into the gutter. Check every gutter cell is `sticky left-0` with a z-index
-      above the room columns, and the corner above both. Styling: no new test.
+- [x] 6. Schedule gutter fix (done: description-row gutter cell is `sticky left-0`).
 - [ ] 7. **Account security in Settings.** Move the sections of
       `features/sign-in/account-security.tsx` into `features/settings/settings-screen.tsx` as a
       "Security" section with `id="security"`. It must work in every state the old page handled

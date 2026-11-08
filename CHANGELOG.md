@@ -87,6 +87,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **Room descriptions no longer slide over the time column**: scrolling the schedule sideways showed
+  a room's location text across the times on the left.
 - **Opening a profile no longer flashes "no longer listed"**: the message showed while the attendee
   list was still loading. A photo that is slow or broken now shows initials, not its description.
 - **Scrolling inside a pop-up no longer moves the page behind it**: reaching the end of a long
