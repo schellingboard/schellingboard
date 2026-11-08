@@ -10,3 +10,9 @@
 ## Questions
 
 (none)
+
+## Follow-ups
+
+- `features/people/profile-photo.tsx` (the large profile photo) has the same
+  alt-text-on-broken-image problem `ui/avatar.tsx` had; E2E rely on its alt text. Not done in
+  step 4.

@@ -164,6 +164,7 @@ function Directory({
             matches={matches}
             everyone={everyone}
             viewerId={viewerId}
+            status={status}
             links={profileLinks}
             activity={activity}
             onOpen={(id) => history.push(peopleLinks.guest(id, listQuery))}

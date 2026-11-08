@@ -44,18 +44,17 @@ export function Avatar({
       aria-hidden="true"
       className={cx(
         SIZES[size],
-        "flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-tint-hover font-semibold text-brand-fg",
+        "relative flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-tint-hover font-semibold text-brand-fg",
         className
       )}
     >
-      {src ? (
+      {initials(name) || "?"}
+      {src && (
         <img
-          className="h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
           src={src}
-          alt={`Profile avatar of ${name}`}
+          alt=""
         />
-      ) : (
-        initials(name) || "?"
       )}
     </div>
   );

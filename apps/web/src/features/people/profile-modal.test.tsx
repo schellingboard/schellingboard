@@ -105,6 +105,7 @@ function Harness(
       matches={cards}
       everyone={everyoneIn(cards)}
       viewerId="cy"
+      status="ready"
       links={profileLinks}
       activity={make}
       onOpen={setGuestId}
@@ -245,6 +246,32 @@ describe("the profile modal", () => {
       render(<Harness start="nobody" />);
 
       expect(screen.getByText("This person is no longer listed.")).toBeTruthy();
+    }
+  );
+
+  it(
+    "does not claim the person is gone when the list could not load",
+    { tags: ["011-US4"] },
+    () => {
+      render(<Harness start="nobody" status="error" />);
+
+      expect(screen.queryByText("This person is no longer listed.")).toBeNull();
+      expect(
+        screen.getByText("Could not load the attendee list.")
+      ).toBeTruthy();
+    }
+  );
+
+  it(
+    "shows no false error while the directory is still loading",
+    { tags: ["011-US4"] },
+    () => {
+      render(<Harness start="nobody" status="loading" />);
+
+      expect(screen.queryByText("This person is no longer listed.")).toBeNull();
+      expect(
+        screen.getByRole("status", { name: "Loading profile" })
+      ).toBeTruthy();
     }
   );
 

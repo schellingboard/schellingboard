@@ -34,12 +34,8 @@ section 9 for step 1.
 - [x] 2. "Who are you?" keyboard selection (done: combobox in `NamePicker`).
 - [x] 3. Modal scroll lock (done: `useScrollLock` in `Dialog` and `ProfileModal`; no other
       `fixed inset-0` modals).
-- [ ] 4. **Profile opens without a false error.** `ProfileModal` shows "This person is no longer
-      listed" while the directory is still loading. Pass the directory `status` from
-      `app/people-pages.tsx`; while loading, show a quiet placeholder (name and avatar skeleton, no
-      text); the "no longer listed" text only when loaded and absent. `ui/avatar.tsx`: the wrapper
-      is `aria-hidden`, so `alt=""`; render the initials under the image so a loading or broken
-      image shows initials, never alt text. Red first: component test for the loading state.
+- [x] 4. Profile loading state (done: `status` prop, placeholder, `Avatar` initials under the
+      image).
 - [ ] 5. **1-on-1 request confirmation as a toast.** Both entry points
       (`features/people/     meeting-request-dialog.tsx`, `features/meetings/book-meeting.tsx`): on
       success close the dialog and

@@ -22,6 +22,7 @@ import type {
 import { Comments, type CommentsHandle } from "../comments/comments-section";
 import { ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from "../../ui/icons";
 import type { DirectoryCard } from "./directory-model";
+import type { DirectoryState } from "../../queries/directory";
 import type { MeetingRequestCalls } from "../../commands/meeting-request";
 import { MeetingRequestDialog } from "./meeting-request-dialog";
 import type { ProfileLinks } from "./links";
@@ -41,6 +42,8 @@ export type ProfileModalProps = {
   /** Everyone, alphabetically: the walk for a profile the filters exclude. */
   everyone: DirectoryCard[];
   viewerId: string | null;
+  /** While the directory loads, a missing person is not yet "no longer listed". */
+  status: DirectoryState["status"];
   links: ProfileLinks;
   /** Stable between renders; the modal calls it once per profile read. */
   activity: (guestId: string) => ProfileActivityQuery;
@@ -357,11 +360,24 @@ export function ProfileModal(props: ProfileModalProps) {
                 );
               })}
             </div>
+          ) : props.status === "idle" || props.status === "loading" ? (
+            <div
+              role="status"
+              aria-label="Loading profile"
+              className="flex flex-col items-center gap-2 px-4 py-6 sm:px-6 md:items-start"
+            >
+              <div className="aspect-square w-full max-w-64 animate-pulse rounded-2xl bg-surface-muted" />
+              <div className="h-9 w-48 animate-pulse rounded bg-surface-muted" />
+            </div>
           ) : (
             // Not a 404: a stale link from an old session or comment lands
             // here, and the list behind is more use than an error.
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-6 sm:px-6">
-              <p className="text-fg-muted">This person is no longer listed.</p>
+              <p className="text-fg-muted">
+                {props.status === "error"
+                  ? "Could not load the attendee list."
+                  : "This person is no longer listed."}
+              </p>
             </div>
           )}
         </div>
