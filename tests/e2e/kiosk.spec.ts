@@ -33,7 +33,7 @@ test("kiosk mode persists via cookie after navigating without the parameter @007
   // the now line is scrolled to again rather than left where the day starts.
   await page.getByRole("link", { name: "Proposals" }).click();
   await page.getByRole("link", { name: "View Schedule" }).click();
-  await expect(page).toHaveURL(/\/Conference-Gamma$/);
+  await expect(page).toHaveURL(/\/Conference-Gamma\/schedule$/);
 
   await expect(page.getByTestId("now-line")).toBeInViewport();
 });

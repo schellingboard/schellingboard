@@ -12,30 +12,30 @@ export type ScheduleLinks = {
   bookMeeting: (slotStart: string) => string;
 };
 
-/** Every address is the SPA's own; the session and 1-on-1 modals sit over `/{slug}`. */
+/** Every address is the SPA's own; the session and 1-on-1 modals sit over `/{slug}/schedule`. */
 export function scheduleLinks(eventSlug: string): ScheduleLinks {
-  const schedule = `/${eventSlug}`;
+  const schedule = `/${eventSlug}/schedule`;
   return {
     schedule,
     proposals: `/${eventSlug}/proposals`,
     session: (current, id) => {
       const params = new URLSearchParams(current);
       params.set("viewSession", id);
-      return `/${eventSlug}?${params.toString()}`;
+      return `${schedule}?${params.toString()}`;
     },
     meeting: (current, id) => {
       const params = new URLSearchParams(current);
       params.set("viewMeeting", id);
-      return `/${eventSlug}?${params.toString()}`;
+      return `${schedule}?${params.toString()}`;
     },
     guest: (guestId) => `/guests/${guestId}`,
     editSession: (sessionId) =>
-      `${schedule}/edit-session?${new URLSearchParams({ sessionID: sessionId })}`,
+      `/${eventSlug}/edit-session?${new URLSearchParams({ sessionID: sessionId })}`,
     proposal: (proposalId) =>
       `/${eventSlug}/proposals?${new URLSearchParams({ viewProposal: proposalId })}`,
     addSession: ({ location, day, time }) =>
-      `${schedule}/add-session?${new URLSearchParams({ location, time, day })}`,
+      `/${eventSlug}/add-session?${new URLSearchParams({ location, time, day })}`,
     bookMeeting: (slotStart) =>
-      `/${eventSlug}?${new URLSearchParams({ bookMeeting: slotStart })}`,
+      `${schedule}?${new URLSearchParams({ bookMeeting: slotStart })}`,
   };
 }
