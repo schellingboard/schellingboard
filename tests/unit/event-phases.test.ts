@@ -1,6 +1,10 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { dateStartDescription } from "@schellingboard/domain/phase-opens-text";
-import { EventPhase, getCurrentPhase } from "@schellingboard/domain/phase";
+import {
+  EventPhase,
+  getCurrentPhase,
+  schedulingEnded,
+} from "@schellingboard/domain/phase";
 import type { Event } from "@schellingboard/domain/event";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -131,6 +135,34 @@ describe("getCurrentPhase with implicit phase ends", () => {
 
       expect(getCurrentPhase(event, NOW())).toBe(EventPhase.VOTING);
     });
+  });
+});
+
+describe("schedulingEnded", { tags: ["007-US1"] }, () => {
+  it("is true once the scheduling phase end has passed", () => {
+    const event = makeEvent({
+      schedulingPhaseStart: ago(5),
+      schedulingPhaseEnd: ago(1),
+    });
+    expect(schedulingEnded(event, NOW())).toBe(true);
+  });
+
+  it("is false while scheduling runs, in a gap before it, and without an end", () => {
+    expect(
+      schedulingEnded(
+        makeEvent({
+          schedulingPhaseStart: ago(1),
+          schedulingPhaseEnd: ahead(1),
+        }),
+        NOW()
+      )
+    ).toBe(false);
+    expect(
+      schedulingEnded(makeEvent({ schedulingPhaseStart: ahead(1) }), NOW())
+    ).toBe(false);
+    expect(
+      schedulingEnded(makeEvent({ schedulingPhaseStart: ago(1) }), NOW())
+    ).toBe(false);
   });
 });
 

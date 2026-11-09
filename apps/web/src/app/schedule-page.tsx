@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "@tanstack/react-router";
-import { EventPhase, getCurrentPhase } from "@schellingboard/domain/phase";
+import {
+  EventPhase,
+  getCurrentPhase,
+  schedulingEnded,
+} from "@schellingboard/domain/phase";
 import { eventContextFrom } from "../replica/selectors";
 import { scheduleLinks } from "../features/schedule/links";
 import {
@@ -70,14 +74,18 @@ function Loaded({ api, slug, runner, store, snapshot, now }: EventView) {
     }),
     [runner, api, openComments, snapshot.event.id]
   );
-  const phase = getCurrentPhase(eventContextFrom(snapshot).event, now);
+  const event = eventContextFrom(snapshot).event;
+  const phase = getCurrentPhase(event, now);
+  const showSchedule =
+    phase === EventPhase.SCHEDULING ||
+    (phase === EventPhase.INACTIVE && schedulingEnded(event, now));
 
   useEffect(() => {
     if (phase === EventPhase.PROPOSAL || phase === EventPhase.VOTING)
       history.replace(`/${slug}/proposals`);
   }, [phase, slug, history]);
 
-  if (phase !== EventPhase.SCHEDULING)
+  if (!showSchedule)
     return phase === EventPhase.INACTIVE ? (
       <Message>Event unavailable: {snapshot.event.name}</Message>
     ) : null;

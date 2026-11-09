@@ -76,6 +76,17 @@ export function inSchedPhase(event: SchedPhaseDates, now: Date): boolean {
   );
 }
 
+/** Past events stay readable: the schedule remains visible after scheduling closes. */
+export function schedulingEnded(
+  event: Pick<Event, "schedulingPhaseEnd">,
+  now: Date
+): boolean {
+  return (
+    !!event.schedulingPhaseEnd &&
+    now.getTime() >= event.schedulingPhaseEnd.getTime()
+  );
+}
+
 export function getCurrentPhase(event: Event, now: Date): EventPhase {
   if (inProposalPhase(event, now)) return EventPhase.PROPOSAL;
   if (inVotingPhase(event, now)) return EventPhase.VOTING;

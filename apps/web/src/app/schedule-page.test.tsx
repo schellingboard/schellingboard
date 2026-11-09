@@ -159,6 +159,20 @@ describe("the schedule page", () => {
     expect(await screen.findByText("Event not found")).toBeTruthy();
   });
 
+  it(
+    "keeps showing the schedule once scheduling has ended",
+    { tags: ["007-US1"] },
+    async () => {
+      const ended: Snapshot = {
+        ...running,
+        event: { ...snapshot.event, schedulingPhaseEnd: iso(5) },
+      };
+      await open({ snapshot: ended });
+      expect(await screen.findByRole("link", { name: "Talk" })).toBeTruthy();
+      expect(screen.queryByText(/Event unavailable/)).toBeNull();
+    }
+  );
+
   it("sends an event still taking proposals to its proposals page", async () => {
     const proposing: Snapshot = {
       ...running,
