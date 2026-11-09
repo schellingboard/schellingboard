@@ -14,7 +14,7 @@ export type ProposalLinks = {
 export function proposalLinks(eventSlug: string): ProposalLinks {
   const base = `/${eventSlug}/proposals`;
   return {
-    schedule: `/${eventSlug}`,
+    schedule: `/${eventSlug}/schedule`,
     proposals: base,
     add: `${base}/new`,
     quickVoting: `${base}/quick-voting`,
@@ -24,6 +24,6 @@ export function proposalLinks(eventSlug: string): ProposalLinks {
       `/${eventSlug}/add-session?${new URLSearchParams({ proposalID: id })}`,
     guest: (id) => `/guests/${id}`,
     session: (id) =>
-      `/${eventSlug}?${new URLSearchParams({ viewSession: id })}`,
+      `/${eventSlug}/schedule?${new URLSearchParams({ viewSession: id })}`,
   };
 }

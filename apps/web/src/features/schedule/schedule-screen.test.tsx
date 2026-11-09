@@ -128,7 +128,9 @@ describe("ScheduleScreen views", () => {
     ).toBeTruthy();
     const nine = screen.getByRole("region", { name: "09:00" });
     const link = within(nine).getByRole("link", { name: /Talk/ });
-    expect(link.getAttribute("href")).toBe("/conf?view=agenda&viewSession=s");
+    expect(link.getAttribute("href")).toBe(
+      "/conf/schedule?view=agenda&viewSession=s"
+    );
     expect(within(nine).getByText(/Room · until 10:00/)).toBeTruthy();
     expect(screen.getByText("Now · 09:00")).toBeTruthy();
   });

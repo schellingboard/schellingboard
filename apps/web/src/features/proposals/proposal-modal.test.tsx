@@ -284,7 +284,7 @@ describe("the votes after voting closed", () => {
       },
     });
     const link = dialog().getByRole("link", { name: /at .*in Room/ });
-    expect(link.getAttribute("href")).toBe("/conf?viewSession=s");
+    expect(link.getAttribute("href")).toBe("/conf/schedule?viewSession=s");
   });
 
   it("says when it was not scheduled", { tags: ["004-US4"] }, () => {

@@ -31,9 +31,11 @@ export function MeetingsPage() {
     EventPhase.SCHEDULING;
 
   useEffect(() => {
-    if (!meetingId) history.replace(`/${slug}`);
+    if (!meetingId) history.replace(`/${slug}/schedule`);
     else if (scheduling && !missing)
-      history.replace(`/${slug}?viewMeeting=${encodeURIComponent(meetingId)}`);
+      history.replace(
+        `/${slug}/schedule?viewMeeting=${encodeURIComponent(meetingId)}`
+      );
   }, [history, slug, meetingId, scheduling, missing]);
 
   if (!meetingId) return null;
@@ -63,7 +65,7 @@ export function MeetingsPage() {
         profileHref={(id) => `/guests/${id}`}
         onAnswer={() => {}}
         onCancel={() => {}}
-        onClose={() => history.push(`/${slug}`)}
+        onClose={() => history.push(`/${slug}/schedule`)}
       />
     </>
   );

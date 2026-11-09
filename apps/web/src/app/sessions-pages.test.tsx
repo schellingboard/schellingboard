@@ -36,7 +36,9 @@ describe("the session form pages", { tags: ["008-US1"] }, () => {
     );
     await userEvent.click(screen.getByRole("button", { name: /Submit/ }));
 
-    await waitFor(() => expect(router.history.location.pathname).toBe("/conf"));
+    await waitFor(() =>
+      expect(router.history.location.pathname).toBe("/conf/schedule")
+    );
     expect(
       calls.some((c) => c.method === "POST" && c.path === "/api/v1/sessions")
     ).toBe(true);
