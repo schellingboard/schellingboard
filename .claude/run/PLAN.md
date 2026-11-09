@@ -25,10 +25,9 @@ overview, deep links, an early read-only schedule), and a session never gets stu
 
 ## Steps
 
-- [ ] **1. fix: RSVP clash dialog lists every clash** — `fixes #1042`. Replace `findRsvpClash` with
-      a function that returns all overlapping commitments (sessions and accepted 1-on-1s), in
-      start-time order. The dialog lists each one ("…, which you are hosting", "your 1-on-1 with
-      X"). Bookmarks never trigger the dialog. Keep the function reusable: step 9 uses it.
+- [x] **1. RSVP clash dialog lists every clash**: findClashes/describeClash/Clash
+      (apps/web/src/features/schedule/clashes.ts) return all overlapping commitments in start order;
+      takes busy sessions + meetings.
 
 - [ ] **2. fix: "now the host" email for a sole host** — `fixes #954`. When the recipient is the
       only host after the change, subject "You are now the host of: X" and matching body; otherwise
