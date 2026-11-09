@@ -18,7 +18,7 @@ function credentials() {
   const guest = guestConfigs.find((g) => g.name === SCREENSHOT_GUEST);
   const protectedGuest = guestConfigs.find((g) => g.password);
   const lines: [string, string | false | undefined][] = [
-    ["App", app],
+    ["App", `${app}  (open this one; ${apiPort} is the API server behind it)`],
     ["Site password", env.SITE_PASSWORD],
     [
       "Site admin",
@@ -36,7 +36,7 @@ function credentials() {
     [
       "Mailpit",
       env.SMTP_URL &&
-        `http://localhost:${env.MAILPIT_UI_PORT ?? 8025}  (sign-in codes)`,
+        `http://localhost:${env.MAILPIT_UI_PORT ?? 8025}  (sign-in codes; needs "make mailpit" running)`,
     ],
     [
       "Dev toolbar",
