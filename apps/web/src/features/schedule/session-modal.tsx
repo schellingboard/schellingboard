@@ -192,6 +192,17 @@ function Details({ session }: { session: Session }) {
           </span>
         )}
       </div>
+      {data.guestId && !isHost && !rsvpd && (
+        <button
+          type="button"
+          onClick={() =>
+            void actions.setHidden(session.id, !data.hidden(session.id))
+          }
+          className="-mt-4 mb-6 text-xs text-fg-subtle underline hover:text-fg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+        >
+          {data.hidden(session.id) ? "Show again" : "Not interested"}
+        </button>
+      )}
       <div className="mb-6 space-y-2 text-sm text-fg-muted">
         <div className="flex gap-2">
           <span className="font-medium">Hosts(s):</span>

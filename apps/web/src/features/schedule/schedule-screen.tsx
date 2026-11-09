@@ -127,6 +127,7 @@ export function ScheduleScreen({
         guestId: data.guestId,
         rsvpd: data.rsvpd,
         bookmarked: data.bookmarked,
+        hidden: data.hidden,
       }),
     [debouncedSearch, filters, data]
   );
@@ -173,7 +174,7 @@ export function ScheduleScreen({
     of: number;
   } | null>(null);
   // Changes whenever the set of matches may have, which ends any stepping.
-  const matchKey = `${debouncedSearch}|${filters.mine?.join() ?? ""}`;
+  const matchKey = `${debouncedSearch}|${filters.mine?.join() ?? ""}|${filters.hidden ?? false}`;
   const current = stepped?.key === matchKey ? stepped : null;
   const step = (direction: 1 | -1) => {
     const scroller = scrollerRef.current;
@@ -238,6 +239,15 @@ export function ScheduleScreen({
             }
           : null
       }
+      hidden={
+        data.guestId && (data.hasHidden || filters.hidden)
+          ? { active: !!filters.hidden }
+          : null
+      }
+      onToggleHidden={() => {
+        if (filters.mine) setKeptKinds(filters.mine);
+        setFilters({ mine: null, hidden: !filters.hidden });
+      }}
       onToggleMine={() => {
         if (filters.mine) setKeptKinds(filters.mine);
         setFilters({ mine: filters.mine ? null : mineKinds });

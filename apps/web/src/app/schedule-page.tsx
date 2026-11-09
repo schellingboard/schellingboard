@@ -18,7 +18,12 @@ import { meetingRequestCalls } from "../commands/meeting-request";
 import { createMeetingCandidatesQuery } from "../queries/meeting-candidates";
 import { claimSession } from "../commands/claim-session";
 import { addRsvp, removeRsvp } from "../commands/rsvp";
-import { addBookmark, removeBookmark } from "../commands/session-mark";
+import {
+  addBookmark,
+  addHidden,
+  removeBookmark,
+  removeHidden,
+} from "../commands/session-mark";
 import { Message, useEventView, type EventView } from "./event-page";
 import { Footer } from "./footer";
 import { hardReload } from "./hard-navigate";
@@ -60,6 +65,9 @@ function Loaded({ api, slug, runner, store, snapshot, now }: EventView) {
         await runner.run(bookmarked ? addBookmark : removeBookmark, {
           sessionId,
         });
+      },
+      setHidden: async (sessionId, hidden) => {
+        await runner.run(hidden ? addHidden : removeHidden, { sessionId });
       },
       attendees: (sessionId) => createAttendeesQuery({ api, sessionId }),
       attendeeCount: attendeeCountApi(api, newKey),

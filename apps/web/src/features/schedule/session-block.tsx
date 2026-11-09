@@ -198,18 +198,21 @@ function RealSessionCard({
   const hosting =
     !!data.guestId && session.hosts.some((h) => h.id === data.guestId);
   const lowerOpacity = !data.rsvpd(session.id) && !hosting;
-  const { filtering, matchesSession, currentMatchId } = useScheduleMatch();
-  const ghost = filtering && !matchesSession(session);
+  const { filtering, matchesSession, hides, currentMatchId } =
+    useScheduleMatch();
+  const hiddenByYou = hides(session);
+  const ghost = hiddenByYou || (filtering && !matchesSession(session));
   const hosts = session.hosts.map((h) => h.name).join(", ") || "No hosts";
-  const showTitle = height >= TITLE_MIN_PX;
-  const hostLines =
-    height >= 150 ? 3 : height >= 100 ? 2 : height >= 56 ? 1 : 0;
+  const showTitle = height >= TITLE_MIN_PX && !hiddenByYou;
+  const hostLines = hiddenByYou ? 0 : hostLinesFor(height);
 
   return (
     <PositionedBlock position={position}>
       <Tooltip
         content={
-          <SessionInfo session={session} hosts={hosts} timezone={timezone} />
+          hiddenByYou ? undefined : (
+            <SessionInfo session={session} hosts={hosts} timezone={timezone} />
+          )
         }
         className="group h-full overflow-hidden"
       >
@@ -255,7 +258,11 @@ function RealSessionCard({
               )}
               <span className="flex-1">{session.title}</span>
             </p>
-            {ghost && <span className="sr-only"> — doesn&apos;t match</span>}
+            {hiddenByYou ? (
+              <span className="sr-only"> — hidden by you</span>
+            ) : (
+              ghost && <span className="sr-only"> — doesn&apos;t match</span>
+            )}
           </a>
           {hostLines > 0 && (
             <p
@@ -291,6 +298,10 @@ function RealSessionCard({
       </Tooltip>
     </PositionedBlock>
   );
+}
+
+function hostLinesFor(height: number) {
+  return height >= 150 ? 3 : height >= 100 ? 2 : height >= 56 ? 1 : 0;
 }
 
 function RsvpBadge({

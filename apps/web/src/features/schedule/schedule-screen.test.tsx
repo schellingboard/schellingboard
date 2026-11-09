@@ -47,6 +47,7 @@ function fakeActions() {
     toggleRsvp: vi.fn<ScheduleActions["toggleRsvp"]>(() => Promise.resolve()),
     becomeHost: vi.fn<ScheduleActions["becomeHost"]>(() => Promise.resolve()),
     setBookmark: vi.fn<ScheduleActions["setBookmark"]>(() => Promise.resolve()),
+    setHidden: vi.fn<ScheduleActions["setHidden"]>(() => Promise.resolve()),
     pickName: vi.fn<ScheduleActions["pickName"]>(),
     ...noMeetingActions,
     attendees: vi.fn<ScheduleActions["attendees"]>(),
@@ -573,5 +574,78 @@ describe("ScheduleScreen RSVP badge", () => {
     await userEvent.click(screen.getByRole("button", { name: "No" }));
     expect(actions.toggleRsvp).not.toHaveBeenCalled();
     expect(screen.queryByRole("dialog")).toBeNull();
+  });
+});
+
+describe("hiding sessions", { tags: ["007-US10"] }, () => {
+  const withHidden = (ids: string[]): Snapshot => ({
+    ...snap,
+    me: {
+      ...snap.me!,
+      marks: ids.map((sessionId) => ({ sessionId, kind: "hidden" as const })),
+    },
+  });
+  const chip = () => screen.queryByRole("button", { name: "Hidden" });
+
+  it("offers the Hidden chip only while something is hidden", () => {
+    screenAt();
+    expect(chip()).toBeNull();
+    cleanup();
+    screenAt("", { snapshot: withHidden(["w"]) });
+    expect(chip()).toBeTruthy();
+  });
+
+  it("shows a hidden session on the grid as a ghost that still opens", () => {
+    screenAt("", { snapshot: withHidden(["w"]) });
+    const link = screen.getByRole("link", { name: /Workshop/ });
+    expect(link.textContent).toContain("hidden by you");
+    expect(link.getAttribute("href")).toContain("viewSession=w");
+  });
+
+  it("ignores a hidden mark on a session the viewer RSVP'd to", () => {
+    screenAt("view=agenda", { snapshot: withHidden(["s"]) });
+    expect(screen.getByRole("link", { name: /Talk/ })).toBeTruthy();
+    expect(chip()).toBeNull();
+  });
+
+  it("filters to the hidden sessions and turns My schedule off", async () => {
+    const { onParamsChange } = screenAt("view=agenda&filter=mine", {
+      snapshot: withHidden(["w"]),
+    });
+    await userEvent.click(screen.getByRole("button", { name: "Hidden" }));
+    const params = onParamsChange.mock.calls.at(-1)![0];
+    expect(params.get("filter")).toBe("hidden");
+    expect(screen.getByRole("link", { name: /Workshop/ })).toBeTruthy();
+    expect(screen.queryByRole("link", { name: /Talk/ })).toBeNull();
+    expect(
+      screen
+        .getByRole("button", { name: "My schedule" })
+        .getAttribute("aria-pressed")
+    ).toBe("false");
+  });
+
+  it("turns the Hidden chip off when My schedule is turned on", async () => {
+    screenAt("view=agenda&filter=hidden", { snapshot: withHidden(["w"]) });
+    await userEvent.click(screen.getByRole("button", { name: "My schedule" }));
+    expect(
+      screen
+        .getByRole("button", { name: "Hidden" })
+        .getAttribute("aria-pressed")
+    ).toBe("false");
+    expect(screen.queryByRole("link", { name: /Workshop/ })).toBeNull();
+  });
+
+  it("remembers the My schedule kinds across the Hidden chip", async () => {
+    const { onParamsChange } = screenAt("filter=mine&mine=hosting", {
+      snapshot: withHidden(["w"]),
+    });
+    await userEvent.click(screen.getByRole("button", { name: "Hidden" }));
+    await userEvent.click(screen.getByRole("button", { name: "My schedule" }));
+    expect(onParamsChange.mock.calls.at(-1)![0].get("mine")).toBe("hosting");
+  });
+
+  it("keeps the Hidden chip while it is on, though nothing is hidden any more", () => {
+    screenAt("filter=hidden");
+    expect(chip()).toBeTruthy();
   });
 });

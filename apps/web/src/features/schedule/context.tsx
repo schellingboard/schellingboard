@@ -20,6 +20,7 @@ export type ScheduleActions = {
   becomeHost: (sessionId: string) => Promise<void>;
   /** A failure is reported as a notice, not returned. */
   setBookmark: (sessionId: string, bookmarked: boolean) => Promise<void>;
+  setHidden: (sessionId: string, hidden: boolean) => Promise<void>;
   /** Asks who the reader is, which an RSVP needs. */
   pickName: () => void;
   /** The caller destroys the query when done. */
@@ -88,6 +89,7 @@ const NO_MATCH: ScheduleMatch & { currentMatchId?: string | null } =
     guestId: null,
     rsvpd: () => false,
     bookmarked: () => false,
+    hidden: () => false,
   });
 
 const MatchContext = createContext<

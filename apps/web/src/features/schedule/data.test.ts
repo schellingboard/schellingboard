@@ -17,6 +17,43 @@ describe("scheduleDataFrom", () => {
     expect(data.meetings).toEqual([]);
   });
 
+  it("hides a session the viewer marked, unless they RSVP'd or host it", () => {
+    const marked = (sessionId: string, patch = {}) =>
+      scheduleDataFrom(
+        {
+          ...snapshot,
+          me: {
+            ...snapshot.me!,
+            marks: [{ sessionId, kind: "hidden" as const }],
+            ...patch,
+          },
+        },
+        new Date()
+      );
+    const rsvpd = marked("s");
+    expect(rsvpd.rsvpd("s")).toBe(true);
+    expect(rsvpd.hidden("s")).toBe(false);
+    expect(rsvpd.hasHidden).toBe(false);
+
+    const free = marked("s", { rsvps: [] });
+    expect(free.hidden("s")).toBe(true);
+    expect(free.hasHidden).toBe(true);
+
+    const hosting = scheduleDataFrom(
+      {
+        ...snapshot,
+        sessions: snapshot.sessions.map((s) => ({ ...s, hostIds: ["mia"] })),
+        me: {
+          ...snapshot.me!,
+          rsvps: [],
+          marks: [{ sessionId: "s", kind: "hidden" as const }],
+        },
+      },
+      new Date()
+    );
+    expect(hosting.hidden("s")).toBe(false);
+  });
+
   it("has no viewer without one", () => {
     const data = scheduleDataFrom({ ...snapshot, me: null }, new Date());
     expect(data.guestId).toBeNull();
