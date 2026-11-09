@@ -102,10 +102,12 @@ test("a filter chosen in the agenda carries over to the grid @007-US3", async ({
   await selectUser(page, "Charlie Test");
   await page.getByRole("link", { name: "Conference Gamma" }).first().click();
   await switchToView(page, "Agenda");
-  await filterChip(page, "Hosting").click();
+  await filterChip(page, "My schedule").click();
+  await filterChip(page, "Choose what My schedule shows").click();
+  await page.getByRole("checkbox", { name: "RSVP'd" }).uncheck();
 
   await switchToView(page, "Grid");
-  await expect(filterChip(page, "Hosting")).toHaveAttribute(
+  await expect(filterChip(page, "My schedule")).toHaveAttribute(
     "aria-pressed",
     "true"
   );
@@ -115,4 +117,21 @@ test("a filter chosen in the agenda carries over to the grid @007-US3", async ({
   await expect(
     page.getByRole("link", { name: /Open Source Sustainability/ })
   ).toHaveAccessibleName(NO_MATCH);
+});
+
+test("the My schedule menu opens over the grid and its options can be clicked @007-US3", async ({
+  page,
+}) => {
+  await loginAndGoto(page, "/guests");
+  await selectUser(page, "Charlie Test");
+  await page.getByRole("link", { name: "Conference Gamma" }).first().click();
+
+  await filterChip(page, "My schedule").click();
+  await filterChip(page, "Choose what My schedule shows").click();
+  await page.getByRole("checkbox", { name: "Hosting" }).uncheck();
+
+  await expect(
+    page.getByRole("checkbox", { name: "Hosting" })
+  ).not.toBeChecked();
+  await expect(page.getByText(/My schedule \(RSVP'd\)/)).toBeVisible();
 });

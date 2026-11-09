@@ -19,7 +19,7 @@ None.
 
 ## Next step
 
-6
+7
 
 ## Questions
 

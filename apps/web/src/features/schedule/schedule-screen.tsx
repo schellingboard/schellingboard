@@ -13,9 +13,10 @@ import { useDebouncedSearch } from "../../ui/use-debounced";
 import { AgendaView } from "./agenda-view";
 import { scheduleDataFrom } from "./data";
 import {
+  ALL_KINDS,
+  type MineKind,
   parseScheduleFilters,
-  SCHEDULE_FILTERS,
-  type ScheduleFilter,
+  type ScheduleFilterState,
   serializeScheduleFilters,
 } from "./filters";
 import { getDefaultFoldedDayIds } from "./fold";
@@ -41,7 +42,7 @@ import { useDragToPan } from "./use-drag-to-pan";
 import { useScrollRestoration } from "./use-scroll-restoration";
 import { useStatusHeight } from "./use-status-height";
 
-const NO_FILTERS: ScheduleFilter[] = [];
+const NO_FILTERS: ScheduleFilterState = { mine: null };
 
 /**
  * The schedule of one event, drawn from its replica at `now`. The view, the
@@ -103,15 +104,19 @@ export function ScheduleScreen({
     });
   const defaultFolded = getDefaultFoldedDayIds(data.days, now);
 
-  const chosen = parseScheduleFilters(params.get("filter"));
+  const chosen = parseScheduleFilters(params.get("filter"), params.get("mine"));
   const filters = data.guestId ? chosen : NO_FILTERS;
-  const setFilters = (next: ScheduleFilter[]) => {
+  const [keptKinds, setKeptKinds] = useState<readonly MineKind[]>(ALL_KINDS);
+  const setFilters = (next: ScheduleFilterState) => {
     const updated = new URLSearchParams(params);
-    const serialized = serializeScheduleFilters(next);
-    if (serialized) updated.set("filter", serialized);
+    const { filter, mine } = serializeScheduleFilters(next);
+    if (filter) updated.set("filter", filter);
     else updated.delete("filter");
+    if (mine) updated.set("mine", mine);
+    else updated.delete("mine");
     onParamsChange(updated);
   };
+  const mineKinds = filters.mine ?? keptKinds;
 
   const match = useMemo(
     () =>
@@ -166,7 +171,7 @@ export function ScheduleScreen({
     of: number;
   } | null>(null);
   // Changes whenever the set of matches may have, which ends any stepping.
-  const matchKey = `${debouncedSearch}|${filters.join()}`;
+  const matchKey = `${debouncedSearch}|${filters.mine?.join() ?? ""}`;
   const current = stepped?.key === matchKey ? stepped : null;
   const step = (direction: 1 | -1) => {
     const scroller = scrollerRef.current;
@@ -222,25 +227,26 @@ export function ScheduleScreen({
       layout={view === "grid" ? "grid" : "centered"}
       search={search}
       onSearchChange={setSearch}
-      filters={
+      mine={
         data.guestId
-          ? SCHEDULE_FILTERS.map((f) => ({
-              ...f,
-              active: filters.includes(f.value),
-            }))
+          ? { active: filters.mine !== null, kinds: mineKinds }
           : null
       }
-      onToggleFilter={(value) =>
-        setFilters(
-          filters.includes(value)
-            ? filters.filter((f) => f !== value)
-            : [...filters, value]
-        )
-      }
+      onToggleMine={() => {
+        if (filters.mine) setKeptKinds(filters.mine);
+        setFilters({ mine: filters.mine ? null : mineKinds });
+      }}
+      onToggleKind={(kind) => {
+        const next = mineKinds.includes(kind)
+          ? mineKinds.filter((k) => k !== kind)
+          : ALL_KINDS.filter((k) => k === kind || mineKinds.includes(k));
+        if (next.length > 0) setFilters({ mine: next });
+      }}
       count={count}
       onShowAll={() => {
         setSearch("");
-        setFilters([]);
+        setKeptKinds(ALL_KINDS);
+        setFilters(NO_FILTERS);
       }}
       onBackToTop={() =>
         scrollerRef.current?.scrollTo({ top: 0, behavior: "smooth" })

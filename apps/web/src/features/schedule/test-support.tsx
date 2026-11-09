@@ -12,7 +12,7 @@ export { iso };
 
 export const noMatch = createScheduleMatch({
   search: "",
-  filters: [],
+  filters: { mine: null },
   guestId: null,
   rsvpd: () => false,
 });

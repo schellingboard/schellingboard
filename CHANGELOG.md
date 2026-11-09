@@ -18,6 +18,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Hover hints match the app's style**: they replace the browser's plain tooltips, and on phones a
   tap on a vote count, your vote or a badge shows its meaning.
 
+### Changed
+
+- **One "My schedule" filter on the schedule** (#865): replaces My sessions, RSVP'd and Hosting. A
+  menu beside it picks which of your RSVP'd and hosted sessions it shows.
+
 ## [5.1.0] - 2026-11-18
 
 ### Added
