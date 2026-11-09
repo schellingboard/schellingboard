@@ -310,6 +310,83 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/sessions/{id}/hosts": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Makes the acting guest the only host of a session nobody hosts; refused with `session.versionConflict` once it has a host. */
+    post: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
+            expectedVersion: number;
+          };
+        };
+      };
+      responses: {
+        /** @description The session, now hosted */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["Session"];
+          };
+        };
+        /** @description A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion` */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": {
+              type: string;
+              title: string;
+              status: number;
+              code: string;
+              detail?: string;
+              errors?: {
+                path: string;
+                message: string;
+              }[];
+              current?: components["schemas"]["Session"];
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/admin/sessions": {
     parameters: {
       query?: never;

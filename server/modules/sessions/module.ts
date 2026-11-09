@@ -5,6 +5,7 @@ export type {
   AdminUpdateSessionInput,
 } from "./application/admin-sessions";
 export type { CreateSessionInput } from "./application/create-session";
+export type { ClaimSessionInput } from "./application/claim-session";
 export type { UpdateSessionInput } from "./application/update-session";
 export type { RsvpInput } from "./application/rsvps";
 export type { LocationUnavailabilityInput } from "./application/room-unavailability";

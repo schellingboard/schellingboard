@@ -261,6 +261,11 @@ export const features = {
         actor: "host",
         priority: "P3",
       },
+      US5: {
+        title: "Attendee becomes the host of a session nobody hosts",
+        actor: "attendee",
+        priority: "P2",
+      },
     },
   },
   "009": {

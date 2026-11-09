@@ -20,6 +20,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Become the host of a session nobody hosts** (#714): attendees can take over a session left
+  without a host; organizers can filter the sessions list by "No hosts".
 - **Event statistics** (#389): a Statistics area in the admin shows how an event went in explained
   charts and searchable tables, downloadable as CSV or ZIP; locations, hosts or session kinds can be
   left out.

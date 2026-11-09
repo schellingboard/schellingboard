@@ -185,6 +185,8 @@ Admins can create/edit/delete sessions directly, outside the normal proposal →
   admin-managed session themselves, only the admin panel can.
 - **Duplicate** opens a new session form filled in from an existing session. To put lunch on every
   day, create it once, then duplicate it and change the Day.
+- The **No hosts** box above the list shows only the sessions nobody hosts. Any attendee can take
+  over such a session, unless it is admin-managed.
 - Deleting a session removes its RSVPs but only unlinks (doesn't delete) hosts/locations. Admins can
   also remove a single guest's RSVP from the session's RSVP list.
 - If a host or another admin saved the session or proposal while you had its form open, your save is

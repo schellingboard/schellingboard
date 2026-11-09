@@ -9,6 +9,7 @@ import {
 import { Dialog } from "../../ui/dialog";
 import { AcademicCapIcon, CheckCircleIcon, LockIcon } from "../../ui/icons";
 import { Markdown } from "../../ui/markdown";
+import { claimRefusal } from "@schellingboard/domain/session-claim";
 import { useSchedule } from "./context";
 import { AttendeeCountField } from "./attendee-count-field";
 import { SessionComments } from "./session-comments";
@@ -66,12 +67,20 @@ function useAttendees(sessionId: string, numRsvps: number) {
 }
 
 function Details({ session }: { session: Session }) {
-  const { data, links, params, timezone } = useSchedule();
+  const { data, links, params, timezone, actions } = useSchedule();
   const { rsvpd, busy, click, dialogs } = useRsvp(session);
   const attendeeState = useAttendees(session.id, session.numRsvps);
 
   const isHost =
     data.guestId !== null && session.hosts.some((h) => h.id === data.guestId);
+  const canBecomeHost =
+    data.guestId !== null &&
+    claimRefusal({
+      event: data.event,
+      now: data.now,
+      guestInEvent: data.isMember,
+      session,
+    }) === undefined;
   // Admin-managed sessions count: a host records the count for one they cannot edit.
   const canRecordAttendance =
     isHost && session.endTime !== undefined && session.endTime <= data.now;
@@ -121,6 +130,15 @@ function Details({ session }: { session: Session }) {
             className={ACTION}
           >
             {busy ? "..." : rsvpd ? "Un-RSVP" : full ? "Session full" : "RSVP"}
+          </button>
+        )}
+        {canBecomeHost && (
+          <button
+            type="button"
+            onClick={() => void actions.becomeHost(session.id)}
+            className={ACTION}
+          >
+            Become host
           </button>
         )}
         {isHost && !session.adminManaged && (

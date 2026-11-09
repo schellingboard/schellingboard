@@ -97,6 +97,8 @@ export const sessionUpdateSchema = z.object({
   expectedVersion,
 });
 
+export const sessionClaimSchema = z.object({ expectedVersion });
+
 const adminFields = {
   title: z.string(),
   description: z.string(),

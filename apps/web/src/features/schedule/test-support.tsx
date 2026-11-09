@@ -49,6 +49,7 @@ export function renderScheduled(
           },
           actions: {
             toggleRsvp: () => Promise.resolve(),
+            becomeHost: () => Promise.resolve(),
             pickName: () => {},
             attendeeCount: {
               load: () => Promise.resolve({ ok: true, count: null }),

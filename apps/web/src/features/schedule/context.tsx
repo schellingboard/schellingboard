@@ -16,6 +16,8 @@ import { createScheduleMatch, type ScheduleMatch } from "./model";
 export type ScheduleActions = {
   /** A failure is reported as a notice, not returned. */
   toggleRsvp: (sessionId: string, withdraw: boolean) => Promise<void>;
+  /** A failure is reported as a notice, not returned. */
+  becomeHost: (sessionId: string) => Promise<void>;
   /** Asks who the reader is, which an RSVP needs. */
   pickName: () => void;
   /** The caller destroys the query when done. */

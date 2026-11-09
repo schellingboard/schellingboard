@@ -2,6 +2,7 @@ import { createRoute, z } from "@hono/zod-openapi";
 import {
   adminSessionCreateSchema,
   adminSessionUpdateSchema,
+  sessionClaimSchema,
   sessionCreateSchema,
   sessionListSchema,
   sessionUpdateSchema,
@@ -74,6 +75,24 @@ const updateSession = createRoute({
   },
   responses: {
     200: json(sessionViewSchema, "The updated session"),
+    ...versionConflictResponse(sessionViewSchema),
+    ...problemDefault,
+  },
+});
+
+const claimSession = createRoute({
+  method: "post",
+  path: "/sessions/{id}/hosts",
+  tags: ["sessions"],
+  description:
+    "Makes the acting guest the only host of a session nobody hosts; refused with `session.versionConflict` once it has a host.",
+  request: {
+    headers: idempotencyHeaders,
+    params: idParam,
+    body: body(sessionClaimSchema),
+  },
+  responses: {
+    200: json(sessionViewSchema, "The session, now hosted"),
     ...versionConflictResponse(sessionViewSchema),
     ...problemDefault,
   },
@@ -172,6 +191,19 @@ export function addSessionRoutes(app: App, sessions: () => SessionUseCases) {
         ...input,
         sessionId: c.req.valid("param").id,
         startTime: new Date(startTime),
+      },
+      c.var.now
+    );
+    if (!result.ok) return problem(result.error, toSessionView);
+    return c.json(toSessionView(result.value), 200);
+  });
+
+  app.openapi(claimSession, async (c) => {
+    const result = await sessions().claimSession(
+      c.var.actor,
+      {
+        sessionId: c.req.valid("param").id,
+        expectedVersion: c.req.valid("json").expectedVersion,
       },
       c.var.now
     );

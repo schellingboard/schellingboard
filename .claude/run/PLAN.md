@@ -33,12 +33,10 @@ overview, deep links, an early read-only schedule), and a session never gets stu
       (notifyCohostsAdded in utils/notifications.ts sets it when the session has one host); in-app
       text matches.
 
-- [ ] **3. feat: claim a hostless session** — `fixes #714`. Session modal shows "Become host" when
-      the session has no hosts, is not admin-managed, the viewer is an event member, and hosts may
-      edit sessions now (same rule as Edit). New server use case + `/api/v1` route (see
-      `docs/dev/server.md`): adds the actor as the only host only if the session is still hostless
-      (version check, else the usual "changed meanwhile" problem), records `session.changed`. No
-      email to the claimer. Admin sessions list gets a "No hosts" filter.
+- [x] **3. claim a hostless session**: claimRefusal (packages/domain/src/session-claim.ts) is the
+      shared rule; use case claimSession, `POST /api/v1/sessions/{id}/hosts` `{expectedVersion}`;
+      command claimSession; `ScheduleActions.becomeHost`, `ScheduleData.isMember`; admin sessions
+      `hostless=1` param.
 
 - [ ] **4. feat: tell RSVPers when a session loses its last host** — `fixes #953`. Reaction on
       `session.changed` where `before` had hosts and `after` has none, whatever the cause (host

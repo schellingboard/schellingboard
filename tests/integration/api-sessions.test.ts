@@ -321,6 +321,34 @@ describe("guest session mutations", () => {
     });
   });
 
+  it(
+    "lets a member claim a hostless session, once",
+    { tags: ["008-US5"] },
+    async () => {
+      const { event, host } = await scheduledWorld();
+      const session = await createSession(event.id);
+      const claim = (guestId: string) =>
+        POST(
+          request("POST", `/sessions/${session.id}/hosts`, {
+            body: { expectedVersion: session.version },
+            cookie: asGuest(guestId),
+          })
+        );
+
+      const first = await claim(host.id);
+      const second = await claim(host.id);
+
+      expect(first.status).toBe(200);
+      expect(await first.json()).toMatchObject({
+        hosts: [expect.objectContaining({ id: host.id })],
+      });
+      expect(second.status).toBe(409);
+      expect(await second.json()).toMatchObject({
+        code: "session.versionConflict",
+      });
+    }
+  );
+
   it("refuses an edit by a guest who does not host the session", async () => {
     const { event, host, location } = await scheduledWorld();
     const stranger = await createGuest({ eventId: event.id });

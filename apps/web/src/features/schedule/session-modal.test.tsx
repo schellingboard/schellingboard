@@ -61,6 +61,7 @@ function fakeAttendees(guestIds: string[]) {
 function fakeActions(attendees = fakeAttendees(["zed", "abe"])) {
   return {
     toggleRsvp: vi.fn<ScheduleActions["toggleRsvp"]>(() => Promise.resolve()),
+    becomeHost: vi.fn<ScheduleActions["becomeHost"]>(() => Promise.resolve()),
     pickName: vi.fn<ScheduleActions["pickName"]>(),
     ...noMeetingActions,
     attendees: vi.fn<ScheduleActions["attendees"]>(() => attendees),
@@ -296,6 +297,46 @@ describe("the session modal's RSVP", () => {
     expect(within(dialog()).queryByRole("link", { name: "Edit" })).toBeNull();
   });
 });
+
+describe(
+  "becoming the host of a hostless session",
+  { tags: ["008-US5"] },
+  () => {
+    const hostless = { hostIds: [] };
+    const button = () =>
+      within(dialog()).queryByRole("button", { name: "Become host" });
+
+    it("offers it to a member, who takes over on a click", async () => {
+      const { actions } = open(snapshotWith(hostless, { me: notMe }));
+      await userEvent.click(button()!);
+      expect(actions.becomeHost).toHaveBeenCalledWith("s");
+    });
+
+    it("is not offered for a session with a host", () => {
+      open(snapshotWith({}, { me: notMe }));
+      expect(button()).toBeNull();
+    });
+
+    it("is not offered for an organizer-managed session", () => {
+      open(snapshotWith({ ...hostless, adminManaged: true }, { me: notMe }));
+      expect(button()).toBeNull();
+    });
+
+    it("is not offered to someone outside the event", () => {
+      const snap = snapshotWith(hostless, { me: notMe });
+      open({
+        ...snap,
+        guests: snap.guests.map((g) => ({ ...g, member: false })),
+      });
+      expect(button()).toBeNull();
+    });
+
+    it("is not offered when nobody has picked a name", () => {
+      open(snapshotWith(hostless, { me: null }));
+      expect(button()).toBeNull();
+    });
+  }
+);
 
 describe("closing the session modal", () => {
   it("drops viewSession and keeps the rest", async () => {

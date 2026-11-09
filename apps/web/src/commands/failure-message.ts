@@ -50,6 +50,9 @@ const REASONS: Record<string, string> = {
     "This session has already started, so it can no longer be moved.",
   "session.managedByOrganizer": "An organizer manages this session.",
   "session.notFound": "This session no longer exists.",
+  "session.hasHost": "This session already has a host.",
+  "session.versionConflict":
+    "This session changed meanwhile. Check it and try again.",
   "session.capacityInvalid": CAPACITY_ERROR,
   "comment.invalid": "A comment cannot be empty.",
   "comment.notAuthor": "Only the author can change a comment.",

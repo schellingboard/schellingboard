@@ -6,6 +6,7 @@ import {
   adminUpdateSession,
 } from "./admin-sessions";
 import { getAttendeeCount, recordAttendeeCount } from "./attendee-count";
+import { claimSession } from "./claim-session";
 import { createSession } from "./create-session";
 import { deleteSession } from "./delete-session";
 import { getSession, listSessions } from "./queries";
@@ -29,6 +30,7 @@ export function createSessionUseCases(deps: SessionDeps) {
     listSessions: listSessions(deps),
     createSession: createSession(deps),
     updateSession: updateSession(deps),
+    claimSession: claimSession(deps),
     deleteSession: deleteSession(deps),
     adminCreateSession: adminCreateSession(deps),
     adminUpdateSession: adminUpdateSession(deps),

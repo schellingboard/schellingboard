@@ -44,6 +44,7 @@ const snap: Snapshot = {
 function fakeActions() {
   return {
     toggleRsvp: vi.fn<ScheduleActions["toggleRsvp"]>(() => Promise.resolve()),
+    becomeHost: vi.fn<ScheduleActions["becomeHost"]>(() => Promise.resolve()),
     pickName: vi.fn<ScheduleActions["pickName"]>(),
     ...noMeetingActions,
     attendees: vi.fn<ScheduleActions["attendees"]>(),

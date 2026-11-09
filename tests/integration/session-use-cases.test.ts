@@ -393,6 +393,125 @@ describe("updateSession and deleteSession", () => {
   });
 });
 
+describe("claimSession", () => {
+  async function hostless() {
+    const world = await scheduledWorld();
+    const session = await createSession(world.event.id, {
+      title: "Orphan",
+      locationIds: [world.location.id],
+      startTime: new Date(slotStart(world.day, 60)),
+      endTime: new Date(slotStart(world.day, 120)),
+    });
+    const member = await createGuest({ eventId: world.event.id });
+    return { ...world, session, member };
+  }
+  const claim = (actor: Actor, sessionId: string, expectedVersion: number) =>
+    sessionUseCases().claimSession(
+      actor,
+      { sessionId, expectedVersion },
+      now()
+    );
+
+  it(
+    "makes a member the only host of a hostless session",
+    { tags: ["008-US5"] },
+    async () => {
+      const { session, member, event } = await hostless();
+      const other = await createGuest({ eventId: event.id });
+      const rsvps = getRepositories().rsvps;
+      await rsvps.create({ sessionId: session.id, guestId: member.id });
+      await rsvps.create({ sessionId: session.id, guestId: other.id });
+      const fresh = (await getRepositories().sessions.findById(session.id))!;
+
+      const result = await claim(open(member.id), session.id, fresh.version);
+
+      if (!result.ok) throw new Error(result.error.code);
+      expect(result.value.hosts.map((h) => h.id)).toEqual([member.id]);
+      expect(
+        (await rsvps.listBySession(session.id)).map((r) => r.guestId)
+      ).toEqual([other.id]);
+      const types = (await getRepositories().changes.listAfter(0)).map(
+        (c) => c.type
+      );
+      expect(types).toContain("session.changed");
+      expect(types).toContain("rsvp.removed");
+      expect(types).not.toContain("session.cohostsAdded");
+    }
+  );
+
+  it("refuses a session that has a host", async () => {
+    const { event, member } = await hostless();
+    const hosted = await createSession(event.id, {
+      hostIds: [(await createGuest({ eventId: event.id })).id],
+    });
+    const result = await claim(open(member.id), hosted.id, hosted.version);
+    expect(result).toMatchObject({
+      ok: false,
+      error: { kind: "conflict", code: "session.versionConflict" },
+    });
+  });
+
+  it("loses to a claim made first", async () => {
+    const { session, member, event } = await hostless();
+    const other = await createGuest({ eventId: event.id });
+    await claim(open(other.id), session.id, session.version);
+
+    const result = await claim(open(member.id), session.id, session.version);
+
+    expect(result).toMatchObject({
+      ok: false,
+      error: { kind: "conflict", code: "session.versionConflict" },
+    });
+  });
+
+  it("refuses a guest who is not in the event", async () => {
+    const { session } = await hostless();
+    const outsider = await createGuest({ eventId: (await createEvent()).id });
+    const result = await claim(open(outsider.id), session.id, session.version);
+    expect(result).toMatchObject({
+      ok: false,
+      error: { kind: "forbidden", code: "guest.notInEvent" },
+    });
+  });
+
+  it("refuses an organizer-managed session", async () => {
+    const { event, member } = await hostless();
+    const managed = await createSession(event.id, { adminManaged: true });
+    const result = await claim(open(member.id), managed.id, managed.version);
+    expect(result).toMatchObject({
+      ok: false,
+      error: { code: "session.managedByOrganizer" },
+    });
+  });
+
+  it("refuses outside the scheduling phase", async () => {
+    const event = await createEvent({ phase: "voting" });
+    const member = await createGuest({ eventId: event.id });
+    const session = await createSession(event.id);
+    const result = await claim(open(member.id), session.id, session.version);
+    expect(result).toMatchObject({
+      ok: false,
+      error: { kind: "forbidden" },
+    });
+  });
+
+  it("needs a guest, and a verified one for a protected name", async () => {
+    const { session, member } = await hostless();
+    expect(await claim(NOBODY, session.id, session.version)).toMatchObject({
+      ok: false,
+      error: { code: "guest.unselected" },
+    });
+
+    await protect(member.id);
+    expect(
+      await claim(open(member.id), session.id, session.version)
+    ).toMatchObject({ ok: false, error: { code: "guest.protected" } });
+    expect(
+      (await claim(verified(member.id), session.id, session.version)).ok
+    ).toBe(true);
+  });
+});
+
 describe("organizer session use cases", () => {
   const fields = {
     title: "Lunch",

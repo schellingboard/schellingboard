@@ -20,6 +20,8 @@ export type ScheduleData = {
   unavailability: LocationUnavailability[];
   now: Date;
   guestId: string | null;
+  /** Whether the viewer belongs to the event, not just hosts in it. */
+  isMember: boolean;
   guests: { id: string; name: string }[];
   rsvpd: (sessionId: string) => boolean;
   meetings: MeetingView[];
@@ -38,6 +40,9 @@ export function scheduleDataFrom(snapshot: Snapshot, now: Date): ScheduleData {
     unavailability,
     now,
     guestId: snapshot.me?.guestId ?? null,
+    isMember: snapshot.guests.some(
+      (g) => g.id === snapshot.me?.guestId && g.member
+    ),
     guests: snapshot.guests,
     rsvpd: (sessionId) => rsvpdIds.has(sessionId),
     meetings: meetingViewsFrom(snapshot, now),

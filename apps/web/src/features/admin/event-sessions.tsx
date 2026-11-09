@@ -596,7 +596,11 @@ export function EventSessionsManager({
   params: URLSearchParams;
   onParams: OnParams;
 }) {
-  const { query, matching } = searchByTitleOrHost(sessions, params);
+  const hostless = params.get("hostless") === "1";
+  const { query, matching } = searchByTitleOrHost(
+    hostless ? sessions.filter((s) => s.hosts.length === 0) : sessions,
+    params
+  );
   const { page, visible } = pageOf(matching, params);
 
   return (
@@ -615,6 +619,21 @@ export function EventSessionsManager({
         searchQuery={query}
         {...tableHandlers(onParams)}
         searchPlaceholder="Search title or host…"
+        toolbar={
+          <label className="flex items-center gap-2 text-sm text-fg-muted">
+            <input
+              type="checkbox"
+              checked={hostless}
+              onChange={() =>
+                onParams(
+                  { hostless: hostless ? null : "1", page: null },
+                  { push: true }
+                )
+              }
+            />
+            No hosts
+          </label>
+        }
         emptyMessage="No sessions match."
         listItem={(s) => <SessionItem session={s} ctx={ctx} />}
       />

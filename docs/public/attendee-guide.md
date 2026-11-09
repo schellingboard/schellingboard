@@ -184,6 +184,13 @@ it stays yours to change for as long as the scheduling phase runs.
 - **If a co-host or an organizer saved the session while you had the form open**, your save is
   refused rather than undoing their change. Copy your edits, reload the page, and make them again.
 
+### A session nobody hosts
+
+If a session has no host left, anyone attending the event sees **Become host** in its details, once
+you have picked your name and while scheduling is open. One click makes you its only host, with the
+same rights as any host. If you had RSVP'd, that RSVP becomes hosting; other RSVPs stay. Nobody is
+emailed. If two people click at once, the first one wins.
+
 ### How many people to expect
 
 Vote counts show how much interest there is, not how many people will walk in — voters didn't know

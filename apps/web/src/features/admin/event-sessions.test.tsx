@@ -125,6 +125,24 @@ describe("the event sessions manager", { tags: ["018-US2"] }, () => {
     expect(within(region).queryByText("Panel")).toBeNull();
   });
 
+  it("narrows to sessions without a host", async () => {
+    const { onParams } = setup([session("s1", "Talk", { hosts: [alice] })]);
+    await userEvent.click(screen.getByRole("checkbox", { name: "No hosts" }));
+    expect(onParams).toHaveBeenCalledWith(
+      { hostless: "1", page: null },
+      { push: true }
+    );
+
+    cleanup();
+    setup(
+      [session("s1", "Talk", { hosts: [alice] }), session("s2", "Orphan")],
+      { query: "hostless=1" }
+    );
+    const region = screen.getByRole("region", { name: "Sessions" });
+    expect(within(region).getByText("Orphan")).toBeTruthy();
+    expect(within(region).queryByText("Talk")).toBeNull();
+  });
+
   it("creates an admin-managed blocker on a day", async () => {
     const { region, calls, onChanged } = setup([]);
 

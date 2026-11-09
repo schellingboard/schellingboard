@@ -16,6 +16,7 @@ import { createAttendeesQuery } from "../queries/attendees";
 import { answerMeeting, cancelMeeting } from "../commands/meeting-answer";
 import { meetingRequestCalls } from "../commands/meeting-request";
 import { createMeetingCandidatesQuery } from "../queries/meeting-candidates";
+import { claimSession } from "../commands/claim-session";
 import { addRsvp, removeRsvp } from "../commands/rsvp";
 import { Message, useEventView, type EventView } from "./event-page";
 import { Footer } from "./footer";
@@ -50,6 +51,9 @@ function Loaded({ api, slug, runner, store, snapshot, now }: EventView) {
       pickName: () => setPicking(true),
       toggleRsvp: async (sessionId, withdraw) => {
         await runner.run(withdraw ? removeRsvp : addRsvp, { sessionId });
+      },
+      becomeHost: async (sessionId) => {
+        await runner.run(claimSession, { sessionId });
       },
       attendees: (sessionId) => createAttendeesQuery({ api, sessionId }),
       attendeeCount: attendeeCountApi(api, newKey),
