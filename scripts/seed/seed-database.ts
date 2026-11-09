@@ -356,9 +356,10 @@ async function seedTestData(profile: SeedProfile, now = new Date()) {
   insertChunked(guestRows, (chunk) => db.insert(schema.guests).values(chunk));
   // Apart from guestRows: seeded hosts and RSVPs are picked by index modulo
   // its length, which another row would shift.
+  const siteAdminId = nanoid();
   db.insert(schema.guests)
     .values({
-      id: nanoid(),
+      id: siteAdminId,
       ...SEED_SITE_ADMIN,
       siteAdmin: true,
       authProtected: true,
@@ -406,9 +407,12 @@ async function seedTestData(profile: SeedProfile, now = new Date()) {
   db.insert(schema.events).values(eventRows).run();
   console.log(`  ✅ Created ${eventRows.length} events`);
 
-  // Link all guests and locations to all events
+  // Link all guests (the site admin too) and locations to all events
   const eventGuestRows = eventRows.flatMap((ev) =>
-    guestRows.map((g) => ({ eventId: ev.id, guestId: g.id }))
+    [...guestRows.map((g) => g.id), siteAdminId].map((guestId) => ({
+      eventId: ev.id,
+      guestId,
+    }))
   );
   const eventLocationRows = eventRows.flatMap((ev) =>
     locationRows.map((l) => ({ eventId: ev.id, locationId: l.id }))
