@@ -145,6 +145,7 @@ function AgendaRow({
   trailing,
   href,
   onOpen,
+  sessionId,
 }: {
   state: TimeState;
   swatchClass: string;
@@ -153,6 +154,7 @@ function AgendaRow({
   trailing?: ReactNode;
   href?: string;
   onOpen?: () => void;
+  sessionId?: string;
 }) {
   const body = (
     <>
@@ -190,7 +192,7 @@ function AgendaRow({
     state === "ended" && "text-fg-muted"
   );
   return (
-    <li>
+    <li data-session-id={sessionId}>
       {href ? (
         <a
           {...(onOpen ? sessionLink(href, onOpen) : { href })}
@@ -250,6 +252,7 @@ function SessionRow({
       swatchClass={cx("loc-swatch", color && `loc-${color}`)}
       href={links.session(params, session.id)}
       onOpen={() => openSession(session.id)}
+      sessionId={session.id}
       title={
         <>
           {session.closed && (

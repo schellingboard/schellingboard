@@ -7,6 +7,8 @@ import { snapshot as base, iso } from "../../replica/snapshot-fixture";
 import { scheduleLinks } from "./links";
 import { ScheduleScreen, type ScheduleActions } from "./schedule-screen";
 import { noMeetingActions } from "./test-support";
+import { createObservable } from "../../queries/store";
+import { fakeComments } from "../comments/comments-test-support";
 
 const sessionOf = (
   id: string,
@@ -722,4 +724,93 @@ describe("clashes in your schedule", { tags: ["007-US11"] }, () => {
       "mine,clashes"
     );
   });
+});
+
+describe("opening the schedule from a session link", () => {
+  const modalActions = () => {
+    const state = createObservable({ status: "idle" as const, rsvps: [] });
+    return {
+      ...fakeActions(),
+      attendees: vi.fn(() => ({
+        get: state.get,
+        subscribe: state.subscribe,
+        refresh: vi.fn(() => Promise.resolve()),
+        destroy: vi.fn(),
+      })) as unknown as ScheduleActions["attendees"],
+      comments: vi.fn(() => fakeComments()),
+    };
+  };
+  const twoDays: Snapshot = {
+    ...snap,
+    days: [
+      ...snap.days,
+      {
+        ...snap.days[0],
+        id: "d2",
+        start: "2026-06-16T08:00:00.000Z",
+        end: "2026-06-16T18:00:00.000Z",
+      },
+    ],
+  };
+  const dayTwo = new Date("2026-06-16T10:00:00Z");
+
+  it(
+    "unfolds the session's passed day and brings the session to the middle",
+    { tags: ["007-US12"] },
+    () => {
+      scrollIntoView.mockClear();
+      screenAt("view=agenda&viewSession=s", {
+        snapshot: twoDays,
+        now: dayTwo,
+        actions: modalActions(),
+      });
+      expect(screen.getByRole("link", { name: /Talk/ })).toBeTruthy();
+      const options: unknown = scrollIntoView.mock.calls.at(-1)?.[0];
+      expect(options).toMatchObject({
+        block: "center",
+        inline: "center",
+        behavior: "instant",
+      });
+      expect(
+        (scrollIntoView.mock.contexts.at(-1) as HTMLElement).getAttribute(
+          "data-session-id"
+        )
+      ).toBe("s");
+    }
+  );
+
+  it(
+    "leaves the scroll alone without a session link",
+    { tags: ["007-US12"] },
+    () => {
+      scrollIntoView.mockClear();
+      screenAt("view=agenda", { snapshot: twoDays, now: dayTwo });
+      expect(scrollIntoView).not.toHaveBeenCalled();
+    }
+  );
+
+  it(
+    "brings the session to the middle of the grid too",
+    { tags: ["007-US12"] },
+    () => {
+      scrollIntoView.mockClear();
+      screenAt("viewSession=w", { actions: modalActions() });
+      expect(
+        (scrollIntoView.mock.contexts.at(-1) as HTMLElement).getAttribute(
+          "data-session-id"
+        )
+      ).toBe("w");
+    }
+  );
+
+  it(
+    "does not move the schedule when a session is opened from it",
+    { tags: ["007-US12"] },
+    async () => {
+      screenAt("", { actions: modalActions() });
+      scrollIntoView.mockClear();
+      await userEvent.click(screen.getByRole("link", { name: /Workshop/ }));
+      expect(scrollIntoView).not.toHaveBeenCalled();
+    }
+  );
 });

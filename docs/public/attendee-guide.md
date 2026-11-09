@@ -152,6 +152,9 @@ warning icon; point at it (or read its label) to see what they clash with. Bookm
 icon. Once something clashes, a **Clashes** filter appears: it lists the clashing sessions and
 1-on-1s, bookmarks included, and combines with **My schedule** to narrow to the kinds ticked there.
 
+When you open a link to a session (from an email or a chat message, say), the schedule behind the
+session window is scrolled to that session, and its day is unfolded if it had already passed.
+
 To tidy away a session you do not care about, open it and tap **Not interested** below the RSVP
 button. On the grid it turns into a faint, empty block that still opens when tapped, and the agenda
 leaves it out. A **Hidden** filter appears next to **My schedule** while you have one: it shows only
