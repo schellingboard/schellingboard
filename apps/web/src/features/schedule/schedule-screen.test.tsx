@@ -816,3 +816,30 @@ describe("opening the schedule from a session link", () => {
     }
   );
 });
+
+describe("the schedule before scheduling opens", { tags: ["007-US14"] }, () => {
+  const early = (schedulingPhaseStart: string | null): Snapshot => ({
+    ...snap,
+    event: {
+      ...snap.event,
+      timezone: "Asia/Tokyo",
+      proposalPhaseStart: iso(0),
+      schedulingPhaseStart,
+    },
+  });
+
+  it("says when scheduling opens, in the event's time zone", () => {
+    screenAt("", { snapshot: early("2026-07-01T00:30:00.000Z") });
+    expect(
+      screen.getByText(/Scheduling opens on .*1 July 2026.*09:30 (JST|GMT\+9)/)
+    ).toBeTruthy();
+  });
+
+  it("says nothing when no opening is set or scheduling is open", () => {
+    screenAt("", { snapshot: early(null) });
+    expect(screen.queryByText(/Scheduling opens/)).toBeNull();
+    cleanup();
+    screenAt("");
+    expect(screen.queryByText(/Scheduling opens/)).toBeNull();
+  });
+});

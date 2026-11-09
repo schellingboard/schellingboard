@@ -1,11 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "@tanstack/react-router";
-import {
-  EventPhase,
-  getCurrentPhase,
-  schedulingEnded,
-} from "@schellingboard/domain/phase";
-import { eventContextFrom } from "../replica/selectors";
+import { useMemo, useState } from "react";
 import { scheduleLinks } from "../features/schedule/links";
 import {
   ScheduleScreen,
@@ -24,7 +17,7 @@ import {
   removeBookmark,
   removeHidden,
 } from "../commands/session-mark";
-import { Message, useEventView, type EventView } from "./event-page";
+import { useEventView, type EventView } from "./event-page";
 import { Footer } from "./footer";
 import { hardReload } from "./hard-navigate";
 import { newKey } from "../commands/keys";
@@ -49,7 +42,6 @@ function Loaded({ api, slug, runner, store, snapshot, now }: EventView) {
   const links = useMemo(() => scheduleLinks(slug), [slug]);
   const viewer = useViewer();
   const clashes = useMeetingClashes(api, store);
-  const { history } = useRouter();
   const [picking, setPicking] = useState(false);
   const openComments = useCommentSource(api, runner, likerFrom(snapshot));
   const actions = useMemo<ScheduleActions>(
@@ -92,22 +84,6 @@ function Loaded({ api, slug, runner, store, snapshot, now }: EventView) {
     }),
     [runner, api, openComments, snapshot.event.id]
   );
-  const event = eventContextFrom(snapshot).event;
-  const phase = getCurrentPhase(event, now);
-  const showSchedule =
-    phase === EventPhase.SCHEDULING ||
-    (phase === EventPhase.INACTIVE && schedulingEnded(event, now));
-
-  useEffect(() => {
-    if (phase === EventPhase.PROPOSAL || phase === EventPhase.VOTING)
-      history.replace(`/${slug}/proposals`);
-  }, [phase, slug, history]);
-
-  if (!showSchedule)
-    return phase === EventPhase.INACTIVE ? (
-      <Message>Event unavailable: {snapshot.event.name}</Message>
-    ) : null;
-
   return (
     <>
       <NamePicker

@@ -4,6 +4,7 @@ import type {
   Location,
   LocationUnavailability,
 } from "@schellingboard/domain/location";
+import { scheduleReadOnly } from "@schellingboard/domain/phase";
 import { eventContextFrom } from "../../replica/selectors";
 import type { Session } from "@schellingboard/domain/session";
 import type { MeetingView } from "./meeting-view";
@@ -20,6 +21,8 @@ export type ScheduleData = {
   locations: Location[];
   unavailability: LocationUnavailability[];
   now: Date;
+  /** Browsing only: no RSVP, free slots, Edit or Become host. */
+  readOnly: boolean;
   guestId: string | null;
   /** Whether the viewer belongs to the event, not just hosts in it. */
   isMember: boolean;
@@ -85,6 +88,7 @@ export function scheduleDataFrom(snapshot: Snapshot, now: Date): ScheduleData {
     locations,
     unavailability,
     now,
+    readOnly: scheduleReadOnly(event, now),
     guestId: snapshot.me?.guestId ?? null,
     isMember: snapshot.guests.some(
       (g) => g.id === snapshot.me?.guestId && g.member

@@ -43,7 +43,7 @@ test("proposal phase: proposing is open, voting is not yet available @006-US1", 
   ).not.toHaveClass(/cursor-not-allowed/);
 });
 
-test("voting phase: proposing and voting are open, scheduling is not @006-US1", async ({
+test("voting phase: proposing and voting are open, the schedule is read-only @006-US1 @007-US14", async ({
   page,
 }) => {
   await login(page);
@@ -62,11 +62,10 @@ test("voting phase: proposing and voting are open, scheduling is not @006-US1", 
   });
   await expect(row.getByRole("button", { name: "❤️" })).toBeEnabled();
 
-  // No path to session creation: the schedule link is disabled and no
-  // "Add session" slots are offered anywhere
-  await expect(page.getByRole("link", { name: /View Schedule/i })).toHaveClass(
-    /opacity-50|cursor-not-allowed/
-  );
+  // The schedule can be read before scheduling opens, but offers no way to
+  // create a session
+  await page.getByRole("link", { name: /View Schedule/i }).click();
+  await expect(page.getByText(/Scheduling opens on/)).toBeVisible();
   await expect(page.getByRole("link", { name: "Add session" })).toHaveCount(0);
 });
 

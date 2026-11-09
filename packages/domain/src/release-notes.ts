@@ -48,7 +48,9 @@ export const SHOWN_RELEASES = 3;
 export const releaseNotes: ReleaseNote[] = [
   {
     version: "Unreleased",
-    highlights: [],
+    highlights: [
+      "**See the schedule early**: attendees can browse, bookmark and hide sessions before scheduling opens, with RSVPs and booking switched on when it does.",
+    ],
   },
   {
     version: "5.0.0",

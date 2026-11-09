@@ -19,8 +19,7 @@ None.
 
 ## Next step
 
-12 (the schedule page still redirects proposal/voting to proposals and shows "Event unavailable" in
-a gap; step 12 replaces both)
+None: the plan is done.
 
 ## Questions
 

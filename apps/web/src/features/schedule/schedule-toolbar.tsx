@@ -41,6 +41,7 @@ export function ScheduleToolbar({
   onViewChange,
   showJumpToNow,
   proposalsHref,
+  notice,
   sync,
 }: {
   event: Event;
@@ -49,6 +50,7 @@ export function ScheduleToolbar({
   /** Whether to offer "Now": only while the view has a line to jump to. */
   showJumpToNow: boolean;
   proposalsHref: string;
+  notice: string | null;
   sync: ReactNode;
 }) {
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -110,6 +112,11 @@ export function ScheduleToolbar({
         </div>
         {sync}
       </div>
+      {notice && (
+        <p className="sticky left-0 max-w-[100dvw] px-2 pb-1.5 text-xs text-fg-muted sm:px-3 sm:text-sm">
+          {notice}
+        </p>
+      )}
       <Dialog
         open={detailsOpen}
         onClose={() => setDetailsOpen(false)}
