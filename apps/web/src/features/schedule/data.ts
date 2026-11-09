@@ -8,6 +8,7 @@ import { eventContextFrom } from "../../replica/selectors";
 import type { Session } from "@schellingboard/domain/session";
 import type { MeetingView } from "./meeting-view";
 import { meetingViewsFrom } from "./meetings";
+import { clashesAmong, meetingClashes, type Clash } from "./clashes";
 import type { DayWithSessions } from "./model";
 
 /** Everything the schedule draws, read from the replica at one instant. */
@@ -29,6 +30,11 @@ export type ScheduleData = {
   /** Marked hidden by the viewer, who has neither RSVP'd to nor hosts it. */
   hidden: (sessionId: string) => boolean;
   hasHidden: boolean;
+  /** What a commitment (RSVP'd or hosted session) overlaps; bookmarks have none. */
+  clashes: (sessionId: string) => Clash[];
+  /** Whether the Clashes chip lists a session or 1-on-1, bookmarks included. */
+  clashing: (id: string) => boolean;
+  hasClashes: boolean;
   meetings: MeetingView[];
   availability: string[];
 };
@@ -55,6 +61,23 @@ export function scheduleDataFrom(snapshot: Snapshot, now: Date): ScheduleData {
           )
       )
   );
+  const meetings = meetingViewsFrom(snapshot, now);
+  const guestId = snapshot.me?.guestId ?? null;
+  const committed = sessions.filter(
+    (s) => rsvpdIds.has(s.id) || s.hosts.some((h) => h.id === guestId)
+  );
+  const clashesOf = clashesAmong(committed, meetings);
+  const listed = [
+    ...committed,
+    ...sessions.filter(
+      (s) => bookmarkedIds.has(s.id) && !committed.includes(s)
+    ),
+  ];
+  const clashingSessions = new Set(clashesAmong(listed, meetings).keys());
+  const clashingIds = new Set([
+    ...clashingSessions,
+    ...meetingClashes(listed, meetings),
+  ]);
   return {
     event,
     days,
@@ -72,7 +95,10 @@ export function scheduleDataFrom(snapshot: Snapshot, now: Date): ScheduleData {
     hasBookmarks: bookmarkedIds.size > 0,
     hidden: (sessionId) => hiddenIds.has(sessionId),
     hasHidden: hiddenIds.size > 0,
-    meetings: meetingViewsFrom(snapshot, now),
+    meetings,
+    clashes: (sessionId) => clashesOf.get(sessionId) ?? [],
+    clashing: (id) => clashingIds.has(id),
+    hasClashes: clashingSessions.size > 0,
     availability: snapshot.me?.availability ?? [],
   };
 }

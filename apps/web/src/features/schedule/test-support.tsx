@@ -16,6 +16,7 @@ export const noMatch = createScheduleMatch({
   rsvpd: () => false,
   bookmarked: () => false,
   hidden: () => false,
+  clashing: () => false,
 });
 
 export function snapshotWith(patch: Partial<Snapshot>): Snapshot {

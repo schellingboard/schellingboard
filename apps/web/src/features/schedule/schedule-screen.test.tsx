@@ -649,3 +649,77 @@ describe("hiding sessions", { tags: ["007-US10"] }, () => {
     expect(chip()).toBeTruthy();
   });
 });
+
+describe("clashes in your schedule", { tags: ["007-US11"] }, () => {
+  const clashing: Snapshot = {
+    ...snap,
+    sessions: [...snap.sessions, sessionOf("x", "Panel", ["host"], ["r2"], 9)],
+    counts: { ...snap.counts, x: 1 },
+    me: {
+      ...snap.me!,
+      rsvps: ["s", "x"].map((sessionId) => ({
+        id: sessionId,
+        sessionId,
+        guestId: "mia",
+      })),
+    },
+  };
+  const row = (id: string) =>
+    screen
+      .queryAllByRole("link")
+      .find((l) => l.getAttribute("href")?.endsWith(`viewSession=${id}`)) ??
+    null;
+  const chip = () => screen.queryByRole("button", { name: "Clashes" });
+
+  it("offers the Clashes chip only with a clash", () => {
+    screenAt("view=agenda");
+    expect(chip()).toBeNull();
+    cleanup();
+    screenAt("view=agenda", { snapshot: clashing });
+    expect(chip()).toBeTruthy();
+  });
+
+  it("marks clashing commitments with a warning naming the clash", () => {
+    screenAt("view=agenda", { snapshot: clashing });
+    const mark = within(row("s")!).getByRole("img", { name: "Clash" });
+    expect(
+      document.getElementById(mark.getAttribute("aria-describedby")!)
+        ?.textContent
+    ).toMatch(/Clashes with "Panel"/);
+    expect(
+      within(row("w")!).queryByRole("img", {
+        name: /Clashes/,
+      })
+    ).toBeNull();
+  });
+
+  it("never marks a bookmark, though the chip counts it", () => {
+    const bookmarked: Snapshot = {
+      ...clashing,
+      me: {
+        ...clashing.me!,
+        rsvps: clashing.me!.rsvps.filter((r) => r.sessionId === "s"),
+        marks: [{ sessionId: "x", kind: "bookmark" }],
+      },
+    };
+    screenAt("view=agenda", { snapshot: bookmarked });
+    expect(chip()).toBeTruthy();
+    expect(screen.queryByRole("img", { name: "Clash" })).toBeNull();
+  });
+
+  it("lists only clashing sessions, and keeps My schedule on beside it", async () => {
+    const { onParamsChange } = screenAt("view=agenda", {
+      snapshot: clashing,
+    });
+    await userEvent.click(chip()!);
+    expect(onParamsChange.mock.calls.at(-1)![0].get("filter")).toBe("clashes");
+    expect(row("s")!).toBeTruthy();
+    expect(row("x")!).toBeTruthy();
+    expect(row("w")).toBeNull();
+
+    await userEvent.click(screen.getByRole("button", { name: "My schedule" }));
+    expect(onParamsChange.mock.calls.at(-1)![0].get("filter")).toBe(
+      "mine,clashes"
+    );
+  });
+});

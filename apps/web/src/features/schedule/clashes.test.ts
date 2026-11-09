@@ -2,7 +2,13 @@ import { describe, it, expect } from "vitest";
 
 import { newEmptySession } from "@schellingboard/domain/session";
 import type { MeetingView } from "./meeting-view";
-import { clashMessage, describeClash, findClashes } from "./clashes";
+import {
+  clashMessage,
+  clashesAmong,
+  describeClash,
+  findClashes,
+  meetingClashes,
+} from "./clashes";
 
 const at = (hour: number, minute = 0) =>
   new Date(Date.UTC(2026, 9, 1, hour, minute));
@@ -130,5 +136,37 @@ describe("clashMessage", () => {
     expect(clashMessage([other("A"), other("B"), other("C")], "me")).toBe(
       'This session clashes with "A", which you are attending; "B", which you are attending; "C", which you are attending. Do you want to RSVP anyway?'
     );
+  });
+});
+
+describe("clashesAmong", { tags: ["007-US11"] }, () => {
+  const a = session("a", at(10), at(11));
+  const b = session("b", at(10, 30), at(12));
+  const c = session("c", at(13), at(14));
+
+  it("maps each overlapping session to what it overlaps, not itself", () => {
+    const found = clashesAmong([a, b, c], null);
+    expect([...found.keys()]).toEqual(["a", "b"]);
+    expect(found.get("a")).toEqual([{ kind: "session", session: b }]);
+    expect(found.get("b")).toEqual([{ kind: "session", session: a }]);
+  });
+
+  it("includes a session that only meets a confirmed 1-on-1", () => {
+    const m = meeting("m", at(13, 30));
+    expect([...clashesAmong([c], [m]).keys()]).toEqual(["c"]);
+  });
+
+  it("leaves out blockers", () => {
+    const blocker = { ...b, blocker: true };
+    expect(clashesAmong([a, blocker], null).size).toBe(0);
+  });
+});
+
+describe("meetingClashes", { tags: ["007-US11"] }, () => {
+  it("lists the confirmed 1-on-1s that overlap any of the sessions", () => {
+    const hit = meeting("hit", at(10, 15));
+    const miss = meeting("miss", at(12));
+    const pending = meeting("pending", at(10, 15), { status: "pending" });
+    expect(meetingClashes([candidate], [hit, miss, pending])).toEqual(["hit"]);
   });
 });

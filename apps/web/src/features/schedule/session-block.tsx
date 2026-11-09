@@ -20,6 +20,7 @@ import {
   useSchedule,
   useScheduleMatch,
 } from "./context";
+import { ClashMark } from "./clash-mark";
 import type { ColumnItem } from "./column";
 import type { DayWithSessions } from "./model";
 import { useRsvp } from "./use-rsvp";
@@ -248,6 +249,10 @@ function RealSessionCard({
               {session.closed && (
                 <LockIcon className="mt-0 h-3 w-3 flex-shrink-0" />
               )}
+              <ClashMark
+                sessionId={session.id}
+                className="h-3 w-3 text-warning-fg"
+              />
               {data.bookmarked(session.id) && (
                 <BookmarkSolidIcon
                   aria-hidden={false}

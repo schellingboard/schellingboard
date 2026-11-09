@@ -22,6 +22,7 @@ import {
   timeState,
   type TimeState,
 } from "./agenda";
+import { ClashMark } from "./clash-mark";
 import { useSchedule } from "./context";
 import { getNowOffsetPx } from "./grid-layout";
 import { statusLine } from "./meeting-rules";
@@ -254,6 +255,10 @@ function SessionRow({
           {session.closed && (
             <LockIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-fg-muted" />
           )}
+          <ClashMark
+            sessionId={session.id}
+            className="h-3.5 w-3.5 text-warning-fg"
+          />
           {data.bookmarked(session.id) && (
             <BookmarkSolidIcon
               aria-hidden={false}
