@@ -63,6 +63,18 @@ describe("logging in to a protected name", { tags: ["003-US4"] }, () => {
     expect(onSignedIn).toHaveBeenCalledWith("g1");
   });
 
+  it("focuses the first field the person has to fill in", () => {
+    setup(() => Response.json({}));
+    expect(document.activeElement).toBe(
+      screen.getByLabelText("Email or username")
+    );
+    cleanup();
+    setup(() => Response.json({}), { guest: ada });
+    expect(document.activeElement).toBe(
+      screen.getByLabelText("Password or emailed code")
+    );
+  });
+
   it("takes an email or username when no guest is named", async () => {
     const { calls, onSignedIn } = setup(() => Response.json({ guestId: "g1" }));
     await userEvent.type(

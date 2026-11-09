@@ -82,6 +82,7 @@ export function GuestLoginForm({
           name="username"
           value={identifier}
           onChange={setIdentifier}
+          autoFocus
           autoComplete="username"
         />
       )}
@@ -90,6 +91,7 @@ export function GuestLoginForm({
         type="password"
         value={credential}
         onChange={setCredential}
+        autoFocus={guest !== undefined}
         autoComplete="current-password"
       />
       {error && (
