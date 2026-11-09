@@ -40,6 +40,7 @@ import type {
 } from "@schellingboard/domain/reminder";
 import type {
   Rsvp,
+  SessionMark,
   SessionProposal,
   Session,
   SessionCreateInput,
@@ -520,6 +521,12 @@ export interface RemindersRepository {
     now: Date,
     abandonAfterMs: number
   ): Promise<{ abandoned: boolean }>;
+}
+
+export interface SessionMarksRepository {
+  listByGuest(guestId: string): Promise<SessionMark[]>;
+  upsert(mark: SessionMark, now: Date): Promise<void>;
+  delete(sessionId: string, guestId: string): Promise<boolean>;
 }
 
 export interface RsvpsRepository {

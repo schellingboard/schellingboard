@@ -130,6 +130,16 @@ export function project(
       return { ...common, type: change.type, rsvp: change.payload.rsvp };
     case "rsvp.removed":
       return { ...common, type: change.type, ...change.payload };
+    case "mark.set": {
+      const { sessionId, kind } = change.payload.mark;
+      return { ...common, type: change.type, mark: { sessionId, kind } };
+    }
+    case "mark.cleared":
+      return {
+        ...common,
+        type: change.type,
+        sessionId: change.payload.sessionId,
+      };
     case "vote.cast": {
       const { proposalId, choice } = change.payload;
       return { ...common, type: change.type, vote: { proposalId, choice } };

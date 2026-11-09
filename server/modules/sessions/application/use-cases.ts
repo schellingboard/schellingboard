@@ -22,6 +22,7 @@ import {
   rsvp,
   withdrawRsvp,
 } from "./rsvps";
+import { clearSessionMark, setSessionMark } from "./session-marks";
 import { updateSession } from "./update-session";
 
 export function createSessionUseCases(deps: SessionDeps) {
@@ -41,6 +42,8 @@ export function createSessionUseCases(deps: SessionDeps) {
     listSessionRsvps: listSessionRsvps(deps),
     adminAddRsvp: adminAddRsvp(deps),
     adminRemoveRsvp: adminRemoveRsvp(deps),
+    setSessionMark: setSessionMark(deps),
+    clearSessionMark: clearSessionMark(deps),
     getAttendeeCount: getAttendeeCount(deps),
     recordAttendeeCount: recordAttendeeCount(deps),
     listLocationUnavailability: listLocationUnavailability(deps),

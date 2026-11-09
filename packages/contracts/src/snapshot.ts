@@ -4,6 +4,7 @@ import { locationViewSchema, unavailabilityViewSchema } from "./location";
 import { meetingPointSchema, meetingSchema } from "./meeting";
 import { snapshotProposalSchema } from "./proposal";
 import { rsvpViewSchema } from "./rsvp";
+import { sessionMarkSchema } from "./session-mark";
 import { sessionViewSchema } from "./session";
 import { ownVoteSchema } from "./vote";
 
@@ -54,6 +55,9 @@ export const snapshotSchema = z
       .object({
         guestId: z.string(),
         rsvps: z.array(rsvpViewSchema),
+        marks: z
+          .array(sessionMarkSchema)
+          .describe("Private bookmarks and hidden sessions"),
         votes: z.array(ownVoteSchema),
         meetings: z.array(meetingSchema),
         meetingGuests: z
