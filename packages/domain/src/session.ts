@@ -31,6 +31,16 @@ export type Rsvp = {
   guestId: string;
 };
 
+export const SESSION_MARK_KINDS = ["bookmark", "hidden"] as const;
+export type SessionMarkKind = (typeof SESSION_MARK_KINDS)[number];
+
+/** A guest's private note on a session; one per guest and session. */
+export type SessionMark = {
+  sessionId: string;
+  guestId: string;
+  kind: SessionMarkKind;
+};
+
 export type SessionCreateInput = {
   title: string;
   description: string;

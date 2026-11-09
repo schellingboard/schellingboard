@@ -801,6 +801,95 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/sessions/{id}/marks/{guestId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Bookmarks the session for the named guest, or hides it. Replaces an earlier mark. Private to the guest, in any phase. */
+    put: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path: {
+          id: string;
+          guestId: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            /** @enum {string} */
+            kind: "bookmark" | "hidden";
+          };
+        };
+      };
+      responses: {
+        /** @description Marked */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    post?: never;
+    /** @description Removes the named guest's mark from the session, if any. */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path: {
+          id: string;
+          guestId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Cleared */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/proposals/{id}": {
     parameters: {
       query?: never;
@@ -7693,6 +7782,8 @@ export interface components {
       me: {
         guestId: string;
         rsvps: components["schemas"]["Rsvp"][];
+        /** @description Private bookmarks and hidden sessions */
+        marks: components["schemas"]["SessionMark"][];
         votes: components["schemas"]["OwnVote"][];
         meetings: {
           id: string;
@@ -7786,6 +7877,11 @@ export interface components {
       cohostWanted: boolean;
       cohostWantedNote: string | null;
       version: number;
+    };
+    SessionMark: {
+      sessionId: string;
+      /** @enum {string} */
+      kind: "bookmark" | "hidden";
     };
     OwnVote: {
       proposalId: string;
@@ -8062,6 +8158,22 @@ export interface components {
           type: "rsvp.removed";
           sessionId: string;
           guestId: string;
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "mark.set";
+          mark: components["schemas"]["SessionMark"];
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "mark.cleared";
+          sessionId: string;
         }
       | {
           seq: number;

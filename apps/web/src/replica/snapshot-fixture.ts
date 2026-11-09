@@ -110,6 +110,7 @@ export const snapshot: Snapshot = {
   me: {
     guestId: "mia",
     rsvps: [{ id: "x", sessionId: "s", guestId: "mia" }],
+    marks: [],
     votes: [],
     meetings: [],
     meetingGuests: [],

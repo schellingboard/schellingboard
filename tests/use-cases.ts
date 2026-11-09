@@ -235,6 +235,11 @@ export const features = {
         actor: "attendee",
         priority: "P1",
       },
+      US9: {
+        title: "Attendee bookmarks a session privately",
+        actor: "attendee",
+        priority: "P3",
+      },
     },
   },
   "008": {

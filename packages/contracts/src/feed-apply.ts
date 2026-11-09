@@ -162,6 +162,11 @@ export function apply(replica: Snapshot, message: FeedMessage): Snapshot {
       next.counts = Object.fromEntries(
         Object.entries(next.counts).filter(([id]) => id !== message.sessionId)
       );
+      if (next.me)
+        next.me = {
+          ...next.me,
+          marks: next.me.marks.filter((m) => m.sessionId !== message.sessionId),
+        };
       return next;
     }
     case "session.attendanceChanged": {
@@ -184,6 +189,27 @@ export function apply(replica: Snapshot, message: FeedMessage): Snapshot {
         next.me = {
           ...me,
           rsvps: me.rsvps.filter((r) => r.sessionId !== message.sessionId),
+        };
+      return next;
+    }
+    case "mark.set": {
+      const { me } = next;
+      if (me)
+        next.me = {
+          ...me,
+          marks: [
+            ...me.marks.filter((m) => m.sessionId !== message.mark.sessionId),
+            message.mark,
+          ],
+        };
+      return next;
+    }
+    case "mark.cleared": {
+      const { me } = next;
+      if (me)
+        next.me = {
+          ...me,
+          marks: me.marks.filter((m) => m.sessionId !== message.sessionId),
         };
       return next;
     }

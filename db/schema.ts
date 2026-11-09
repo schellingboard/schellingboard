@@ -446,6 +446,21 @@ export const sessionReminders = sqliteTable(
   ]
 );
 
+export const sessionMarks = sqliteTable(
+  "session_marks",
+  {
+    guestId: text("guest_id")
+      .notNull()
+      .references(() => guests.id, { onDelete: "cascade" }),
+    sessionId: text("session_id")
+      .notNull()
+      .references(() => sessions.id, { onDelete: "cascade" }),
+    kind: text("kind", { enum: ["bookmark", "hidden"] }).notNull(),
+    createdAt: text("created_at").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.guestId, t.sessionId] })]
+);
+
 export const rsvps = sqliteTable(
   "rsvps",
   {

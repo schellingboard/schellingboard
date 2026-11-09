@@ -5,6 +5,7 @@ import { unavailabilityViewSchema } from "./location";
 import { meetingPointSchema, meetingSchema } from "./meeting";
 import { snapshotProposalSchema } from "./proposal";
 import { rsvpViewSchema } from "./rsvp";
+import { sessionMarkSchema } from "./session-mark";
 import {
   snapshotGuestSchema,
   snapshotLocationSchema,
@@ -144,6 +145,16 @@ export const feedMessageSchema = z
       type: z.literal("rsvp.removed"),
       sessionId: z.string(),
       guestId: z.string(),
+    }),
+    z.object({
+      ...common,
+      type: z.literal("mark.set"),
+      mark: sessionMarkSchema,
+    }),
+    z.object({
+      ...common,
+      type: z.literal("mark.cleared"),
+      sessionId: z.string(),
     }),
     z.object({
       ...common,
