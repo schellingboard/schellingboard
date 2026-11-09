@@ -69,6 +69,15 @@ describe("web: pages are the SPA's", () => {
     }
   });
 
+  it("sends developers to the Vite server instead of a stale build", async () => {
+    vi.stubEnv("SB_DEV_SPA_ORIGIN", "http://localhost:3000");
+    const cookie = await createAuthCookie();
+    const res = await throughWeb("/conf", {}, [cookie]);
+    expect(res.status).toBe(404);
+    expect(await res.text()).toContain("http://localhost:3000");
+    expect((await throughWeb("/_spa/assets/app.js")).status).toBe(404);
+  });
+
   it("answers HEAD for a page like GET", async () => {
     const res = await throughWeb("/conf", { method: "HEAD" }, [
       await createAuthCookie(),

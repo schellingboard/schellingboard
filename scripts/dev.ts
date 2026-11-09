@@ -67,7 +67,12 @@ const server = spawn(
   ["--watch", "--watch-preserve-output", "dist/server/main.mjs"],
   {
     stdio: ["inherit", "pipe", "inherit"],
-    env: { ...process.env, ...color, PORT: String(apiPort) },
+    env: {
+      ...process.env,
+      ...color,
+      PORT: String(apiPort),
+      SB_DEV_SPA_ORIGIN: app,
+    },
   }
 );
 const vite = spawn("bun", ["x", "vite", "apps/web"], {

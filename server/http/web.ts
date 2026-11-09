@@ -140,6 +140,15 @@ web.get("/locations/:file", (c) =>
     PUBLIC_FILE_CACHE_CONTROL
   )
 );
+// In development the Vite server owns the pages; a built copy here goes stale.
+web.use("*", async (c, next) => {
+  const origin = process.env.SB_DEV_SPA_ORIGIN;
+  if (!origin) return next();
+  return c.text(`In development, open ${origin} instead.`, 404, {
+    "cache-control": "no-store",
+  });
+});
+
 web.get("/_spa/*", (c) =>
   serveSpaAsset(spaDir(), c.req.path.slice("/_spa/".length).split("/"))
 );
