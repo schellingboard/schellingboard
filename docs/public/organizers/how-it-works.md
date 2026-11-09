@@ -49,6 +49,9 @@ Each event has three independent, optional phase windows (start/end), set in the
   earlier explicit end creates a dead gap where nothing is active.
 - **No phase dates at all** means the event is always in the scheduling phase — useful for a fixed
   schedule with no proposal/voting step.
+- Outside the scheduling phase (before it, in a gap, or after it) attendees can still open the
+  schedule, read-only: no RSVPs, free slots, editing or claiming a session. Opening an event without
+  a link lands on the proposals until scheduling starts, then on the schedule.
 - All gating is enforced server-side, so attendees can't act out of phase via an old bookmarked
   link.
 

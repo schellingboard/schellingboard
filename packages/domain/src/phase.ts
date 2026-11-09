@@ -94,6 +94,11 @@ export function getCurrentPhase(event: Event, now: Date): EventPhase {
   return EventPhase.INACTIVE;
 }
 
+/** Whether the schedule can be viewed but not acted on: any time outside the scheduling phase. */
+export function scheduleReadOnly(event: SchedPhaseDates, now: Date): boolean {
+  return !inSchedPhase(event, now);
+}
+
 export function hasPhases(event: SchedPhaseDates): boolean {
   const { proposalPhaseStart, votingPhaseStart, schedulingPhaseStart } = event;
 

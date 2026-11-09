@@ -13,6 +13,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Read the schedule before scheduling opens**
+  ([#1336](https://github.com/schellingboard/schellingboard/issues/1336)): **View Schedule** now
+  works in every phase, read-only, with a note saying when scheduling opens.
 - **A session link shows the session on the schedule**
   ([#994](https://github.com/schellingboard/schellingboard/issues/994)): opening one (from an email,
   say) unfolds its day and scrolls the grid or agenda to it behind the session window.

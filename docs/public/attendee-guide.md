@@ -19,6 +19,10 @@ Buttons belonging to another phase are greyed out rather than hidden — hover o
 opens. Organizers can skip phases, and an event with no phase dates at all is always in the
 scheduling phase.
 
+The schedule can be read in every phase, from **View Schedule** on the proposals page. Before
+scheduling opens, and after it closes, it is read-only: you can look at sessions, bookmark them and
+hide them, but not RSVP or book slots. A note at the top says when scheduling opens.
+
 :::info "Only an RSVP commits you to anything" Proposing a session is not a promise to give it, and
 voting is not a promise to attend. [RSVPs are the exception](#rsvp). :::
 

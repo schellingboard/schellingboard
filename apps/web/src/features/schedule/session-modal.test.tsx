@@ -294,6 +294,38 @@ describe("the session modal's RSVP", () => {
     );
   });
 
+  it(
+    "disables RSVP and gives no edit link while the schedule is read-only, but still bookmarks",
+    { tags: ["007-US14"] },
+    () => {
+      const early = (me: Snapshot["me"]) => {
+        const snap = snapshotWith({}, { me });
+        return {
+          ...snap,
+          event: {
+            ...snap.event,
+            proposalPhaseStart: iso(0),
+            schedulingPhaseStart: new Date(Date.UTC(2026, 6, 1)).toISOString(),
+          },
+        };
+      };
+      open(early(notMe));
+      const d = within(dialog());
+      const rsvp = d.getByRole("button", { name: "RSVP" });
+      expect(rsvp.getAttribute("aria-disabled")).toBe("true");
+      expect(rsvp.getAttribute("aria-describedby")).toBeTruthy();
+      expect(
+        d.getByText(/^Scheduling will be enabled at /, { selector: ".sr-only" })
+      ).toBeTruthy();
+      expect(
+        d.getByRole("button", { name: "Bookmark this session" })
+      ).toBeTruthy();
+      cleanup();
+      open(early({ ...base.me!, guestId: "host", rsvps: [] }));
+      expect(within(dialog()).queryByRole("link", { name: "Edit" })).toBeNull();
+    }
+  );
+
   it("gives no edit link for an admin-managed session", () => {
     const hosting = { ...base.me!, guestId: "host", rsvps: [] };
     open(snapshotWith({ adminManaged: true }, { me: hosting }));

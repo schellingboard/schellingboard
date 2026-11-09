@@ -1,10 +1,4 @@
-import {
-  EventPhase,
-  getCurrentPhase,
-  schedulingEnded,
-} from "@schellingboard/domain/phase";
-import { useRouter } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { claimSession } from "../commands/claim-session";
 import { newKey } from "../commands/keys";
@@ -25,8 +19,7 @@ import {
 import { attendeeCountApi } from "../queries/attendee-count";
 import { createAttendeesQuery } from "../queries/attendees";
 import { createMeetingCandidatesQuery } from "../queries/meeting-candidates";
-import { eventContextFrom } from "../replica/selectors";
-import { type EventView, Message, useEventView } from "./event-page";
+import { type EventView, useEventView } from "./event-page";
 import { Footer } from "./footer";
 import { hardReload } from "./hard-navigate";
 import { useHealth } from "./health";
@@ -50,7 +43,6 @@ function Loaded({ api, slug, runner, store, snapshot, now }: EventView) {
   const links = useMemo(() => scheduleLinks(slug), [slug]);
   const viewer = useViewer();
   const clashes = useMeetingClashes(api, store);
-  const { history } = useRouter();
   const [picking, setPicking] = useState(false);
   const openComments = useCommentSource(api, runner, likerFrom(snapshot));
   const actions = useMemo<ScheduleActions>(
@@ -93,22 +85,6 @@ function Loaded({ api, slug, runner, store, snapshot, now }: EventView) {
     }),
     [runner, api, openComments, snapshot.event.id]
   );
-  const event = eventContextFrom(snapshot).event;
-  const phase = getCurrentPhase(event, now);
-  const showSchedule =
-    phase === EventPhase.SCHEDULING ||
-    (phase === EventPhase.INACTIVE && schedulingEnded(event, now));
-
-  useEffect(() => {
-    if (phase === EventPhase.PROPOSAL || phase === EventPhase.VOTING)
-      history.replace(`/${slug}/proposals`);
-  }, [phase, slug, history]);
-
-  if (!showSchedule)
-    return phase === EventPhase.INACTIVE ? (
-      <Message>Event unavailable: {snapshot.event.name}</Message>
-    ) : null;
-
   return (
     <>
       <NamePicker

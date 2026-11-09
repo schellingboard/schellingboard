@@ -1,3 +1,5 @@
+import { schedulingEnded } from "@schellingboard/domain/phase";
+import { dateStartDescription } from "@schellingboard/domain/phase-opens-text";
 import type { Session } from "@schellingboard/domain/session";
 import { claimRefusal } from "@schellingboard/domain/session-claim";
 import { formatOptionalTime, TIME_FORMAT } from "@schellingboard/domain/time";
@@ -18,6 +20,7 @@ import {
 } from "../../ui/icons";
 import { Markdown } from "../../ui/markdown";
 import { Tooltip } from "../../ui/tooltip";
+import { Unavailable } from "../../ui/unavailable";
 import { AttendeeCountField } from "./attendee-count-field";
 import { useSchedule } from "./context";
 import { SessionComments } from "./session-comments";
@@ -26,7 +29,7 @@ import { useRsvp } from "./use-rsvp";
 const BOOKMARK_NOTE = "Only you see your bookmarks. This is not an RSVP.";
 
 const ACTION =
-  "inline-flex items-center justify-center rounded-md border border-brand-accent px-2 py-1 text-xs font-medium text-brand-fg hover:bg-brand-tint focus:outline-none focus:ring-2 focus:ring-brand-accent disabled:opacity-50";
+  "inline-flex items-center justify-center rounded-md border border-brand-accent px-2 py-1 text-xs font-medium text-brand-fg hover:bg-brand-tint focus:outline-none focus:ring-2 focus:ring-brand-accent disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50";
 
 /** A session's details over the schedule, opened by `?viewSession=`. */
 export function SessionModal({
@@ -107,6 +110,9 @@ function Details({ session }: { session: Session }) {
   const { rsvpd, busy, click, dialogs } = useRsvp(session);
   const attendeeState = useAttendees(session.id, session.numRsvps);
 
+  const rsvpWhy = schedulingEnded(data.event, data.now)
+    ? "Scheduling has ended"
+    : `Scheduling ${dateStartDescription(data.event.schedulingPhaseStart, timezone, null)}`;
   const isHost =
     data.guestId !== null && session.hosts.some((h) => h.id === data.guestId);
   const canBecomeHost =
@@ -159,14 +165,22 @@ function Details({ session }: { session: Session }) {
       )}
       <div className="mb-6 flex flex-wrap items-center gap-2">
         {!isHost && (
-          <button
-            type="button"
-            onClick={click}
-            disabled={busy || (!rsvpd && full)}
-            className={ACTION}
-          >
-            {busy ? "..." : rsvpd ? "Un-RSVP" : full ? "Session full" : "RSVP"}
-          </button>
+          <Unavailable blocked={data.readOnly} why={rsvpWhy}>
+            <button
+              type="button"
+              onClick={click}
+              disabled={!data.readOnly && (busy || (!rsvpd && full))}
+              className={ACTION}
+            >
+              {busy
+                ? "..."
+                : rsvpd
+                  ? "Un-RSVP"
+                  : full
+                    ? "Session full"
+                    : "RSVP"}
+            </button>
+          </Unavailable>
         )}
         {canBecomeHost && (
           <button
@@ -177,7 +191,7 @@ function Details({ session }: { session: Session }) {
             Become host
           </button>
         )}
-        {isHost && !session.adminManaged && (
+        {isHost && !session.adminManaged && !data.readOnly && (
           <a href={links.editSession(session.id)} className={ACTION}>
             Edit
           </a>

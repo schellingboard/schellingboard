@@ -83,17 +83,9 @@ overview, deep links, an early read-only schedule), and a session never gets stu
       forwards with replace; `scheduleLinks(slug).schedule`, `sessionPath` (utils/notifications.ts)
       use `/schedule`; use case 007-US13.
 
-- [ ] **12. feat: read-only schedule before scheduling opens** — `fixes #1336`.
-  - Landing: step 11's redirect keeps opening the event on the proposals list before scheduling
-    starts (discovery). The schedule shows only when the attendee chooses it (its nav link, a
-    session link). The Schedule nav link shows in every phase.
-  - Read-only: one domain helper decides it: the event has phases and scheduling has not started
-    (any phase or inactive gap before it, e.g. voting ended but scheduling not open) or has ended.
-    Today an inactive gap shows "Event unavailable"; make before, gap and after consistent. No
-    bookable free slots, no RSVP, Edit or Become host; 1-on-1s stay off. Notice at the top:
-    "Scheduling opens on <date in the event's time zone>." — only when `schedulingPhaseStart` is set
-    and in the future. Bookmarks and hiding work.
-  - Candidate in-app release note.
+- [x] **12. read-only schedule before scheduling opens** (`fixes #1336`): `scheduleReadOnly` (domain
+      phase.ts), `ScheduleData.readOnly`, `schedulingNotice` (schedule/scheduling-notice.ts), View
+      Schedule always enabled; use case 007-US14; in-app release note replaced "A faster schedule".
 
 ## Not in this batch
 

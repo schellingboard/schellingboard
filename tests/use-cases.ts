@@ -260,6 +260,11 @@ export const features = {
         actor: "attendee",
         priority: "P2",
       },
+      US14: {
+        title: "Attendee browses the schedule before scheduling opens",
+        actor: "attendee",
+        priority: "P2",
+      },
     },
   },
   "008": {
