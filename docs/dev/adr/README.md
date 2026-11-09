@@ -30,6 +30,7 @@ same header block: status, date, and the tracking issue where there is one.
 | [0017](0017-identity-and-roles.md)                   | Identity and roles                                          | 2026-10-28 |
 | [0018](0018-api-review-for-5-0.md)                   | The API review for 5.0.0                                    | 2026-11-01 |
 | [0019](0019-statistics.md)                           | Statistics in the admin                                     | 2026-11-07 |
+| [0020](0020-side-panel-for-linked-views.md)          | A side panel for linked views                               | 2026-11-09 |
 
 Longer design work that isn't a single decision lives next door:
 [Architecture](../architecture/README.md) and [Attendance model](../attendance-model/README.md).
