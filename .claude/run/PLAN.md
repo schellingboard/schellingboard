@@ -38,12 +38,9 @@ overview, deep links, an early read-only schedule), and a session never gets stu
       command claimSession; `ScheduleActions.becomeHost`, `ScheduleData.isMember`; admin sessions
       `hostless=1` param.
 
-- [ ] **4. feat: tell RSVPers when a session loses its last host** — `fixes #953`. Reaction on
-      `session.changed` where `before` had hosts and `after` has none, whatever the cause (host
-      edit, admin edit, guest deletion — which already records `session.changed`). Email + in-app
-      notification to the RSVPers, under the same preference as session-changed. Text: the session
-      has no host now; it may be cancelled or taken over; link to the session, where a member can
-      become its host.
+- [x] **4. tell RSVPers when a session loses its last host**: notifySessionLostHost
+      (utils/notifications.ts) called from the changeNotifications reaction before the cascade
+      check; email `sessionLostHost`, setting rsvpChange.
 
 - [ ] **5. feat: confirm before moving a session people RSVP'd to** — `fixes #289`. In the session
       form, when editing a session with RSVPs and its time or room changed, Save first opens a

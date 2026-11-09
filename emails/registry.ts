@@ -5,6 +5,7 @@ import { meetingOutcomeEmail, meetingRequestEmail } from "./meeting";
 import { proposalJoinedEmail } from "./proposal-joined";
 import { sessionChangedEmail } from "./session-changed";
 import { sessionDeletedEmail } from "./session-deleted";
+import { sessionLostHostEmail } from "./session-lost-host";
 
 // The emails a notification may send. A queued email is stored as which of
 // these to build and with what, since a built message holds a React element:
@@ -17,6 +18,7 @@ const templates = {
   proposalJoined: proposalJoinedEmail,
   sessionChanged: sessionChangedEmail,
   sessionDeleted: sessionDeletedEmail,
+  sessionLostHost: sessionLostHostEmail,
 };
 
 type Templates = typeof templates;

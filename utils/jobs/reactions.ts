@@ -9,6 +9,7 @@ import {
   notifyProposalJoined,
   notifySessionChanged,
   notifySessionDeleted,
+  notifySessionLostHost,
   notifySessionCommented,
 } from "@/utils/notifications";
 import { PRUNE_CHANGES, CHANGE_NOTIFICATIONS, type Job } from "./job";
@@ -99,6 +100,10 @@ export const changeNotifications = reaction(
     }
     if (change.type !== "session.changed" && change.type !== "session.deleted")
       return;
+    if (change.type === "session.changed") {
+      const { before, after } = change.payload;
+      await notifySessionLostHost({ before, after, now });
+    }
     const { cascade, tellAttendees } = change.payload;
     if (cascade && !tellAttendees) return;
     if (change.type === "session.changed") {

@@ -147,7 +147,7 @@ describe("telling hosts and RSVPed guests about cascades", () => {
     expect(sendMail).not.toHaveBeenCalled();
   });
 
-  it("stays silent when a host's guest record is deleted", async () => {
+  it("only tells RSVPers the session lost its host when a host's guest record is deleted", async () => {
     const { host } = await sessionWithAnRsvp();
 
     const result = await peopleUseCases().deleteGuest(
@@ -162,6 +162,8 @@ describe("telling hosts and RSVPed guests about cascades", () => {
     expect(recorded.length).toBeGreaterThan(0);
     for (const change of recorded)
       expect(change.payload).not.toHaveProperty("tellAttendees");
-    expect(sendMail).not.toHaveBeenCalled();
+    expect(vi.mocked(sendMail).mock.calls.map((c) => c[0].subject)).toEqual([
+      expect.stringContaining("No host for:"),
+    ]);
   });
 });

@@ -175,6 +175,55 @@ async function notifySessionChangedUnsafe({
   });
 }
 
+// Tell the RSVP'd guests of a session that lost its last host, whatever the
+// cause.
+//
+// Never throws: as above.
+export async function notifySessionLostHost(args: {
+  before: Session;
+  after: Session;
+  now: Date;
+}): Promise<void> {
+  try {
+    await notifySessionLostHostUnsafe(args);
+  } catch (err) {
+    console.error("Failed to send session-lost-host notifications:", err);
+  }
+}
+
+async function notifySessionLostHostUnsafe({
+  before,
+  after,
+  now,
+}: {
+  before: Session;
+  after: Session;
+  now: Date;
+}): Promise<void> {
+  if (before.hosts.length === 0 || after.hosts.length > 0) return;
+  if (after.endTime && after.endTime <= now) return;
+
+  const { events, rsvps, sessions } = getRepositories();
+  // The reaction runs after commit: someone may have claimed it since.
+  const current = await sessions.findById(after.id);
+  if (!current || current.hosts.length > 0) return;
+  const event = await events.findById(after.eventId);
+  if (!event) return;
+
+  const path = sessionPath(event.slug, after.id);
+  const message: EmailRecipe = {
+    template: "sessionLostHost",
+    props: { title: after.title, sessionUrl: emailBase() + path },
+  };
+  const inApp = {
+    text: `"${after.title}" has no host now`,
+    url: path,
+    at: now,
+  };
+  for (const rsvp of await rsvps.listBySession(after.id))
+    await tryNotifyGuest(rsvp.guestId, "rsvpChange", message, inApp);
+}
+
 // What to say happened, given only what actually changed. The old value is
 // named too: someone told their session moved wants to know which slot just
 // freed up, to fill it or to host in it.

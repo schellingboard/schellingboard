@@ -43,6 +43,7 @@ import {
   notifyMeetingRequested,
   notifySessionChanged,
   notifySessionDeleted,
+  notifySessionLostHost,
 } from "@/utils/notifications";
 
 const MESSAGE: EmailRecipe = {
@@ -801,6 +802,131 @@ describe("notifyCohostsAdded", () => {
       addedIds: [optedOut.id],
       now: NOW,
     });
+
+    await deliverQueued();
+    expect(sendMail).not.toHaveBeenCalled();
+  });
+});
+
+describe("notifySessionLostHost", { tags: ["013-US4"] }, () => {
+  beforeAll(() => setupTestDb());
+
+  beforeEach(() => {
+    resetTestDb();
+    vi.mocked(sendMail).mockReset();
+    vi.stubEnv("SITE_URL", "https://site.example");
+  });
+
+  afterEach(() => vi.unstubAllEnvs());
+
+  async function setup() {
+    const event = await createEvent({ phase: "scheduling" });
+    const host = await createGuest({ email: "host@test.example" });
+    const rsvper = await createGuest({ email: "rsvper@test.example" });
+    const session = await createSession(event.id, {
+      title: "Fun Workshop",
+      hostIds: [host.id],
+    });
+    await getRepositories().rsvps.create({
+      sessionId: session.id,
+      guestId: rsvper.id,
+    });
+    return { event, host, rsvper, session };
+  }
+
+  it("tells RSVPers the session has no host now", async () => {
+    const { event, rsvper, session } = await setup();
+    const after = await updateSession(session.id, { hostIds: [] }, BY_TEST);
+
+    await notifySessionLostHost({ before: session, after, now: NOW });
+
+    await deliverQueued();
+    expect(sendMail).toHaveBeenCalledOnce();
+    const message = vi.mocked(sendMail).mock.calls[0][0];
+    expect(message.to).toBe("rsvper@test.example");
+    expect(message.subject).toBe("No host for: Fun Workshop");
+    const html = await renderWithoutComments(message.body);
+    expect(html).toContain("has no host");
+    expect(html).toContain("cancelled");
+    expect(html).toContain(
+      `href="https://site.example/${event.slug}?viewSession=${session.id}"`
+    );
+    const [notification] = await getRepositories().notifications.listByGuest(
+      rsvper.id
+    );
+    expect(notification.text).toBe('"Fun Workshop" has no host now');
+  });
+
+  it("says nothing while a host is left, or if there was none", async () => {
+    const { session } = await setup();
+    const co = await createGuest();
+    const both = await updateSession(
+      session.id,
+      { hostIds: [...session.hosts.map((h) => h.id), co.id] },
+      BY_TEST
+    );
+    const one = await updateSession(session.id, { hostIds: [co.id] }, BY_TEST);
+    const none = await updateSession(session.id, { hostIds: [] }, BY_TEST);
+
+    await notifySessionLostHost({ before: session, after: both, now: NOW });
+    await notifySessionLostHost({ before: both, after: one, now: NOW });
+    await notifySessionLostHost({ before: none, after: none, now: NOW });
+
+    await deliverQueued();
+    expect(sendMail).not.toHaveBeenCalled();
+  });
+
+  it("says nothing about a session that is over", async () => {
+    const { rsvper, session } = await setup();
+    const over = await updateSession(
+      session.id,
+      {
+        startTime: new Date("2026-07-01T10:00:00Z"),
+        endTime: new Date("2026-07-01T11:00:00Z"),
+      },
+      BY_TEST
+    );
+    const after = await updateSession(over.id, { hostIds: [] }, BY_TEST);
+
+    await notifySessionLostHost({ before: over, after, now: NOW });
+
+    await deliverQueued();
+    expect(sendMail).not.toHaveBeenCalled();
+    expect(
+      await getRepositories().notifications.listByGuest(rsvper.id)
+    ).toEqual([]);
+  });
+
+  it("says nothing when someone has taken the session over meanwhile", async () => {
+    const { session } = await setup();
+
+    await notifySessionLostHost({
+      before: session,
+      after: { ...session, hosts: [] },
+      now: NOW,
+    });
+
+    await deliverQueued();
+    expect(sendMail).not.toHaveBeenCalled();
+  });
+
+  it("follows the RSVP-change preference", async () => {
+    const { rsvper, session } = await setup();
+    const quiet = await createGuest({
+      email: "quiet@test.example",
+      emailSettings: { rsvpChange: false },
+    });
+    await getRepositories().rsvps.create({
+      sessionId: session.id,
+      guestId: quiet.id,
+    });
+    await getRepositories().rsvps.deleteBySessionAndGuest(
+      session.id,
+      rsvper.id
+    );
+    const after = await updateSession(session.id, { hostIds: [] }, BY_TEST);
+
+    await notifySessionLostHost({ before: session, after, now: NOW });
 
     await deliverQueued();
     expect(sendMail).not.toHaveBeenCalled();

@@ -7,7 +7,8 @@ import { CheckboxField } from "../../ui/form";
 const OPTIONS: { name: keyof EmailSettingsBody; label: string }[] = [
   {
     name: "rsvpChange",
-    label: "a session I’ve RSVP’d to changes time or location, or is deleted",
+    label:
+      "a session I’ve RSVP’d to changes time or location, loses its host, or is deleted",
   },
   {
     name: "hostChange",
