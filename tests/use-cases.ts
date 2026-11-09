@@ -266,6 +266,11 @@ export const features = {
         actor: "attendee",
         priority: "P2",
       },
+      US6: {
+        title: "Host confirms before moving a session people RSVP'd to",
+        actor: "host",
+        priority: "P2",
+      },
     },
   },
   "009": {

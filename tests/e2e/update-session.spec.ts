@@ -90,6 +90,11 @@ test("updating a session emails the RSVP'd guest and the added co-host @013-US4 
   await page.getByRole("option", { name: /Alice Test/i }).click();
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Submit" }).click();
+  const moveDialog = page.getByRole("dialog", {
+    name: "Change this session's time or room?",
+  });
+  await expect(moveDialog.getByText(/1 person RSVP'd/)).toBeVisible();
+  await moveDialog.getByRole("button", { name: "Yes", exact: true }).click();
   await expect(toast(page)).toContainText(
     /Your session .* has been updated successfully/i
   );
@@ -192,6 +197,11 @@ test("a host can fix a session placed where they could never have booked one @00
   await dialog.getByRole("link", { name: "Edit" }).click();
   await selectOption(page, /^Location/, /^Main Hall\b(?!,)/);
   await page.getByRole("button", { name: "Submit" }).click();
+  const moveDialog = page.getByRole("dialog", {
+    name: "Change this session's time or room?",
+  });
+  await expect(moveDialog.getByText(/RSVP'd to this session/)).toBeVisible();
+  await moveDialog.getByRole("button", { name: "Yes", exact: true }).click();
   await page.waitForURL(/\/Conference-Gamma$/);
   await dismissToast(page);
 

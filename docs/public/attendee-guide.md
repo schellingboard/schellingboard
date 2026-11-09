@@ -175,6 +175,8 @@ so, with a link to the session.
 Open your session and click **"Edit"**. Title, description, room, max attendees, co-hosts — all of
 it stays yours to change for as long as the scheduling phase runs.
 
+- **If people have RSVP'd** and you change the time, length or room, you are asked to confirm first,
+  with how many RSVP'd. They are told about the change.
 - **Once it has started** you can no longer move it, though how long it runs is still up to you.
 - **If an organizer put it somewhere you couldn't have booked it yourself** — outside the day's
   bookable hours, in a room that isn't open to bookings, in several rooms at once, longer than

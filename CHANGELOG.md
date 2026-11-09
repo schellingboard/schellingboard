@@ -20,6 +20,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Confirm before moving a session people RSVP'd to** (#289): saving a new time or room shows how
+  many people RSVP'd and that they will be told.
 - **Told when a session loses its last host** (#953): attendees who RSVP'd get an email and a
   notification, and can take the session over themselves.
 - **Become the host of a session nobody hosts** (#714): attendees can take over a session left

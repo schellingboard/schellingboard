@@ -306,6 +306,7 @@ function Fields({
   }, [snapshot.guests, hostIds]);
 
   const [confirming, setConfirming] = useState(false);
+  const [confirmingMove, setConfirmingMove] = useState(false);
   const [last, setLast] = useState<"save" | "remove">("save");
   const [checkingFields, setChecking] = useState(false);
 
@@ -403,17 +404,35 @@ function Fields({
       autoDismissMs: CONFIRMATION_MS,
     });
 
+  const rsvps = session ? (snapshot.counts[session.id] ?? 0) : 0;
+  const sameRooms =
+    rooms.length === ownRooms.length &&
+    rooms.every((r) => ownRooms.includes(r));
+  const moves =
+    !!session &&
+    !!interval &&
+    (runsFrom!.getTime() !== ownStart?.getTime() ||
+      interval.end.getTime() !== ownEnd?.getTime() ||
+      !sameRooms);
+
+  const saveNow = async () => {
+    setConfirmingMove(false);
+    setLast("save");
+    body.current = next;
+    if ((await save.submit())?.ok) {
+      confirmation(editing ? "updated successfully!" : "added successfully!");
+      onDone();
+    }
+  };
+
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (busy || !complete) return;
     setChecking(!!invalid);
     setLast("save");
     if (invalid) return;
-    body.current = next;
-    if ((await save.submit())?.ok) {
-      confirmation(editing ? "updated successfully!" : "added successfully!");
-      onDone();
-    }
+    if (moves && rsvps > 0) return setConfirmingMove(true);
+    await saveNow();
   };
 
   const onDelete = async () => {
@@ -699,6 +718,13 @@ function Fields({
           </div>
         </div>
       </form>
+      <ConfirmDialog
+        open={confirmingMove}
+        title="Change this session's time or room?"
+        message={`${rsvps === 1 ? "1 person" : `${rsvps} people`} RSVP'd to this session. They will be told about the change.`}
+        onConfirm={() => void saveNow()}
+        onCancel={() => setConfirmingMove(false)}
+      />
       <ConfirmDialog
         open={confirming}
         title="Delete session?"

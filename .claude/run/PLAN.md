@@ -42,11 +42,9 @@ overview, deep links, an early read-only schedule), and a session never gets stu
       (utils/notifications.ts) called from the changeNotifications reaction before the cascade
       check; email `sessionLostHost`, setting rsvpChange.
 
-- [ ] **5. feat: confirm before moving a session people RSVP'd to** — `fixes #289`. In the session
-      form, when editing a session with RSVPs and its time or room changed, Save first opens a
-      confirm dialog: "N people RSVP'd to this session." plus whether they will be notified — check
-      what `session-changed` really sends (e.g. duration-only changes) and say exactly that. No
-      clash counting (others' RSVPs are private).
+- [x] **5. confirm before moving a session people RSVP'd to**: session form
+      (features/sessions/session-form.tsx) opens a ConfirmDialog when start, end or rooms change and
+      `snapshot.counts[id] > 0`.
 
 - [ ] **6. feat: "My schedule" filter** — `issue #865`. Replace the chips My sessions / RSVP'd /
       Hosting with one chip **My schedule**. Its label toggles it; a chevron beside it opens a small

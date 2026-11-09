@@ -321,6 +321,68 @@ describe("editing a session", { tags: ["008-US2"] }, () => {
     );
   });
 
+  describe("when people RSVP'd", { tags: ["008-US6"] }, () => {
+    const withRsvps = (n: number) => ({ counts: { ...base.counts, mine: n } });
+    const dialog = () => screen.queryByRole("dialog");
+
+    it("asks before moving the session, then saves on yes", async () => {
+      const { writes, onDone } = setup({
+        sessionId: "mine",
+        patch: withRsvps(3),
+      });
+      await userEvent.click(
+        screen.getByRole("radio", { name: "1 hour 30 minutes" })
+      );
+      await settled();
+      await userEvent.click(submit());
+
+      expect(dialog()?.textContent).toContain(
+        "3 people RSVP'd to this session. They will be told about the change."
+      );
+      expect(writes()).toEqual([]);
+
+      await userEvent.click(screen.getByRole("button", { name: "Yes" }));
+      await waitFor(() => expect(onDone).toHaveBeenCalled());
+      expect(writes()).toHaveLength(1);
+    });
+
+    it("saves nothing when the host says no", async () => {
+      const { writes } = setup({ sessionId: "mine", patch: withRsvps(1) });
+      await userEvent.click(
+        screen.getByRole("radio", { name: "1 hour 30 minutes" })
+      );
+      await settled();
+      await userEvent.click(submit());
+
+      expect(dialog()?.textContent).toContain(
+        "1 person RSVP'd to this session."
+      );
+      await userEvent.click(screen.getByRole("button", { name: "No" }));
+      expect(dialog()).toBeNull();
+      expect(writes()).toEqual([]);
+    });
+
+    it("does not ask when only the text changes", async () => {
+      const text = setup({ sessionId: "mine", patch: withRsvps(3) });
+      await userEvent.type(screen.getByLabelText(/Session title/), " 2");
+      await settled();
+      await userEvent.click(submit());
+      await waitFor(() => expect(text.writes()).toHaveLength(1));
+      expect(dialog()).toBeNull();
+    });
+
+    it("does not ask when nobody RSVP'd", async () => {
+      const none = setup({ sessionId: "mine", patch: withRsvps(0) });
+      await userEvent.click(
+        screen.getByRole("radio", { name: "1 hour 30 minutes" })
+      );
+      await settled();
+      await userEvent.click(submit());
+      await waitFor(() => expect(none.writes()).toHaveLength(1));
+      expect(dialog()).toBeNull();
+    });
+  });
+
   it("links the proposal a session came from", () => {
     setup({
       sessionId: "mine",

@@ -19,8 +19,9 @@ None.
 
 ## Next step
 
-5
+6
 
 ## Questions
 
-None.
+- Follow-up: the admin session form has no RSVP'd-move confirmation (step 5 covers the host form
+  only).
