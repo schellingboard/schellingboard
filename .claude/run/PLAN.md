@@ -74,10 +74,9 @@ overview, deep links, an early read-only schedule), and a session never gets stu
       `ScheduleFilterState.clashes` (`filter=clashes`, combines with `mine`, excluded by `hidden`);
       `ClashMark` icon on blocks and agenda rows; use case 007-US11.
 
-- [ ] **10. feat: a session link shows the session on the schedule** — `fixes #994`. When the
-      schedule opens with `viewSession` from an address (not opened in-app), unfold the session's
-      day if folded and scroll the grid or agenda so the session is centred behind the modal
-      (instant). This wins over scroll restoration for that load. In-app opening is unchanged.
+- [x] **10. a session link shows the session on the schedule** (`fixes #994`): reveal-session.ts
+      (`useRevealSession`, `dayOfSession`); `data-session-id` on grid blocks and agenda rows; use
+      case 007-US12; E2E in view-session.spec.ts (click, reload).
 
 - [ ] **11. refactor: the schedule moves to `/<slug>/schedule`** — `issue #1336`. `/<slug>` only
       redirects (replace, no history entry): to `/<slug>/schedule` with the same search params if it

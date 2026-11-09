@@ -35,6 +35,7 @@ import {
   scheduleEntries,
 } from "./model";
 import { PullToRefresh } from "./pull-to-refresh";
+import { dayOfSession, useRevealSession } from "./reveal-session";
 import { ScheduleFilters } from "./schedule-filters";
 import { ScheduleToolbar, scheduleView } from "./schedule-toolbar";
 import { matchesInReadingOrder } from "./search";
@@ -90,12 +91,16 @@ export function ScheduleScreen({
   useDragToPan(scrollerRef, view === "grid");
   // Per view: the grid and the agenda have nothing in common to scroll to.
   useScrollRestoration(scrollerRef, `${snapshot.event.slug}:${view}`);
+  const [addressed] = useState(() => params.get("viewSession"));
+  // After restoration, so the address wins over the remembered position.
+  useRevealSession(scrollerRef, addressed);
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedSearch(search);
-  const [unfolded, setUnfolded] = useState<ReadonlySet<string>>(
-    () => new Set()
-  );
+  const [unfolded, setUnfolded] = useState<ReadonlySet<string>>(() => {
+    const day = dayOfSession(data.days, addressed);
+    return new Set(day ? [day] : []);
+  });
   const toggleFold = (dayId: string) =>
     setUnfolded((prev) => {
       const next = new Set(prev);

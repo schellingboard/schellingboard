@@ -250,6 +250,11 @@ export const features = {
         actor: "attendee",
         priority: "P2",
       },
+      US12: {
+        title: "Attendee following a session link lands on that session",
+        actor: "attendee",
+        priority: "P2",
+      },
     },
   },
   "008": {

@@ -42,6 +42,35 @@ test("hard-navigating to a session URL renders the modal without hydration error
   await page.waitForLoadState("networkidle");
 });
 
+test("an opened session link brings the session into view @007-US12", async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto("/Conference-Gamma");
+
+  const block = page.getByRole("link", { name: /Evening Wrap-up/ }).first();
+  await block.click();
+  await expect(
+    page.getByRole("dialog", { name: "Session details" })
+  ).toBeVisible();
+  await page.waitForLoadState("networkidle");
+
+  // The stored scroll position is somewhere else than the session: the address
+  // has to win over it.
+  await block.evaluate((el) => {
+    for (let n = el.parentElement; n; n = n.parentElement) {
+      n.scrollTo(0, 0);
+    }
+  });
+  await expect(block).not.toBeInViewport();
+
+  await page.reload();
+  await expect(
+    page.getByRole("dialog", { name: "Session details" })
+  ).toBeVisible();
+  await expect(block).toBeInViewport();
+});
+
 test("leaving a session modal whose RSVPs are still loading is quiet @007-US5", async ({
   page,
 }) => {
