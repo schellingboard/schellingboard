@@ -134,7 +134,7 @@ test("searching the agenda narrows it to sessions and 1-on-1s that match @007-US
 
 // Charlie hosts the React session and has an RSVP for Open Source
 // Sustainability in the seed; API Design is neither.
-test("filters narrow the agenda to the viewer's own sessions, each one further @007-US3", async ({
+test("My schedule narrows the agenda to the viewer's own sessions @007-US3", async ({
   page,
 }) => {
   await loginAndGoto(page, "/Conference-Gamma");
@@ -149,49 +149,40 @@ test("filters narrow the agenda to the viewer's own sessions, each one further @
   const rsvpd = page.getByRole("link", { name: /Open Source Sustainability/ });
   const neither = page.getByRole("link", { name: /API Design/ });
 
-  await filterChip(page, "Hosting").click();
-  await expect(filterChip(page, "Hosting")).toHaveAttribute(
+  await filterChip(page, "My schedule").click();
+  await expect(filterChip(page, "My schedule")).toHaveAttribute(
     "aria-pressed",
     "true"
   );
   await expect(hosted).toBeVisible();
-  await expect(rsvpd).toBeHidden();
-  await expect(neither).toBeHidden();
-
-  // Chips combine like the attendee directory's: a host doesn't RSVP to
-  // their own session, so hosting and RSVP'd together leaves nothing.
-  await filterChip(page, "RSVP'd").click();
-  await expect(hosted).toBeHidden();
-  await expect(page.getByText(/^0 of \d+ match/)).toBeVisible();
-
-  await filterChip(page, "Hosting").click();
   await expect(rsvpd).toBeVisible();
+  await expect(neither).toBeHidden();
+  await expect(page.getByText(/My schedule \(RSVP'd, hosting\)/)).toBeVisible();
+
+  // The kinds combine with OR; the last one ticked stays.
+  await filterChip(page, "Choose what My schedule shows").click();
+  await page.getByRole("checkbox", { name: "Hosting" }).uncheck();
   await expect(hosted).toBeHidden();
+  await expect(rsvpd).toBeVisible();
 
   // The filter is part of the address, so it survives a reload.
   await page.reload();
-  await expect(filterChip(page, "RSVP'd")).toHaveAttribute(
+  await expect(filterChip(page, "My schedule")).toHaveAttribute(
     "aria-pressed",
     "true"
   );
   await expect(rsvpd).toBeVisible();
   await expect(hosted).toBeHidden();
 
-  await filterChip(page, "RSVP'd").click();
-  await filterChip(page, "My sessions").click();
-  await expect(rsvpd).toBeVisible();
-  await expect(hosted).toBeVisible();
-  await expect(neither).toBeHidden();
-
   await page.getByRole("button", { name: "Show all" }).click();
   await expect(neither).toBeVisible();
-  await expect(filterChip(page, "My sessions")).toHaveAttribute(
+  await expect(filterChip(page, "My schedule")).toHaveAttribute(
     "aria-pressed",
     "false"
   );
 });
 
-test("the viewer's own 1-on-1s stay listed under every filter @007-US3 @012-US5", async ({
+test("the viewer's own 1-on-1s stay listed under My schedule @007-US3 @012-US5", async ({
   page,
 }) => {
   await loginAndGoto(page, "/guests");
@@ -199,11 +190,12 @@ test("the viewer's own 1-on-1s stay listed under every filter @007-US3 @012-US5"
   await page.getByRole("link", { name: "Conference Gamma" }).first().click();
   await switchToView(page, "Agenda");
 
-  await filterChip(page, "Hosting").click();
+  await filterChip(page, "My schedule").click();
   await expect(
     page.getByRole("link", { name: /1-on-1 with Leilani Kahale/ })
   ).toBeVisible();
-  await filterChip(page, "RSVP'd").click();
+  await filterChip(page, "Choose what My schedule shows").click();
+  await page.getByRole("checkbox", { name: "Hosting" }).uncheck();
   await expect(
     page.getByRole("link", { name: /1-on-1 with Leilani Kahale/ })
   ).toBeVisible();

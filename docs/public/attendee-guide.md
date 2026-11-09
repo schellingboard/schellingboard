@@ -133,13 +133,13 @@ running down) and **Agenda** (every session under the time it starts, all rooms 
 a phone).
 
 Above the Grid and the Agenda, a search box finds sessions by title, description, host or room, and
-your 1-on-1s by the other person's name. Next to it, **My sessions**, **RSVP'd** and **Hosting**
-narrow the schedule to your own sessions; pick more than one and each narrows it further. Your
-1-on-1s pass all of them. The agenda then lists only what matches, while the grid keeps everything
-in place, greys out the rest and folds away days without a match. A line at the top says what
-matches and by what: tap it to get back to the search, or tap **Show all** to clear it. On the grid,
-the arrows in the bottom right corner (or Enter in the search box) take you from one match to the
-next.
+your 1-on-1s by the other person's name. Next to it, **My schedule** narrows the schedule to the
+sessions you RSVP'd to or host. The arrow beside it opens a menu to show only the ones you RSVP'd to
+or only the ones you host. It combines with the search. Your 1-on-1s always show. The agenda then
+lists only what matches, while the grid keeps everything in place, greys out the rest and folds away
+days without a match. A line at the top says what matches and by what: tap it to get back to the
+search, or tap **Show all** to clear it. On the grid, the arrows in the bottom right corner (or
+Enter in the search box) take you from one match to the next.
 
 While the event is running, a red line marks the current time in the grid and the agenda, and
 **"Now"** at the top of the schedule jumps straight to it.

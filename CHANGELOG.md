@@ -11,6 +11,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- **One "My schedule" filter on the schedule** (#865): replaces My sessions, RSVP'd and Hosting. A
+  menu beside it picks which of your RSVP'd and hosted sessions it shows.
+
 ## [5.0.0] - 2026-11-11
 
 > **Breaking change**: behind a reverse proxy, set `SB_TRUSTED_PROXIES` (usually `1`) when

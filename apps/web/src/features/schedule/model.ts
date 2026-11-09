@@ -1,7 +1,7 @@
 import type { Day } from "@schellingboard/domain/event";
 import type { Location } from "@schellingboard/domain/location";
 import type { Session } from "@schellingboard/domain/session";
-import { sessionPassesFilters, type ScheduleFilter } from "./filters";
+import { sessionPassesFilters, type ScheduleFilterState } from "./filters";
 import { meetingsForDay } from "./meeting-column";
 import type { MeetingView } from "./meeting-view";
 import { meetingMatchesSearch, sessionMatchesSearch } from "./search";
@@ -30,15 +30,15 @@ export function includedLocations(
  */
 export function createScheduleMatch(input: {
   search: string;
-  filters: readonly ScheduleFilter[];
+  filters: ScheduleFilterState;
   guestId: string | null;
   rsvpd: (sessionId: string) => boolean;
 }): ScheduleMatch {
   const { search, guestId, rsvpd } = input;
-  const filters = guestId ? input.filters : [];
+  const filters = guestId ? input.filters : { mine: null };
   const searching = search.trim() !== "";
   return {
-    filtering: searching || filters.length > 0,
+    filtering: searching || filters.mine !== null,
     matchesSession: (session) =>
       !session.blocker &&
       (!searching || sessionMatchesSearch(session, search)) &&

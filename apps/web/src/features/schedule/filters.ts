@@ -1,41 +1,48 @@
-// As in the attendee directory: one comma-separated `filter` search param, and
-// every active filter narrows the list further.
-export const SCHEDULE_FILTERS = [
-  { value: "mine", label: "My sessions" },
-  { value: "rsvpd", label: "RSVP'd" },
-  { value: "hosting", label: "Hosting" },
+export const MINE_KINDS = [
+  { value: "rsvpd", label: "RSVP'd", summary: "RSVP'd" },
+  { value: "hosting", label: "Hosting", summary: "hosting" },
 ] as const;
 
-export type ScheduleFilter = (typeof SCHEDULE_FILTERS)[number]["value"];
+export type MineKind = (typeof MINE_KINDS)[number]["value"];
 
-const VALUES: readonly ScheduleFilter[] = SCHEDULE_FILTERS.map((f) => f.value);
+/** `mine` is null while the My schedule chip is off, else the kinds it shows. */
+export type ScheduleFilterState = { mine: readonly MineKind[] | null };
 
-export function parseScheduleFilters(
-  param: string | null | undefined
-): ScheduleFilter[] {
-  const requested = new Set((param ?? "").split(","));
-  return VALUES.filter((value) => requested.has(value));
+export const ALL_KINDS: readonly MineKind[] = MINE_KINDS.map((k) => k.value);
+
+function inCanonicalOrder(kinds: Iterable<string>): MineKind[] {
+  const requested = new Set(kinds);
+  return ALL_KINDS.filter((kind) => requested.has(kind));
 }
 
-export function serializeScheduleFilters(
-  filters: readonly ScheduleFilter[]
-): string | null {
-  const canonical = VALUES.filter((value) => filters.includes(value));
-  return canonical.length > 0 ? canonical.join(",") : null;
+// Older links used `filter=rsvpd` and `filter=hosting` as chips of their own.
+export function parseScheduleFilters(
+  filterParam: string | null | undefined,
+  mineParam: string | null | undefined
+): ScheduleFilterState {
+  const tokens = (filterParam ?? "").split(",");
+  const legacy = inCanonicalOrder(tokens);
+  if (!tokens.includes("mine") && legacy.length === 0) return { mine: null };
+  const narrowed = inCanonicalOrder((mineParam ?? "").split(","));
+  if (narrowed.length > 0) return { mine: narrowed };
+  return { mine: legacy.length > 0 ? legacy : ALL_KINDS };
+}
+
+export function serializeScheduleFilters(state: ScheduleFilterState): {
+  filter: string | null;
+  mine: string | null;
+} {
+  if (!state.mine) return { filter: null, mine: null };
+  const kinds = inCanonicalOrder(state.mine);
+  return {
+    filter: "mine",
+    mine: kinds.length === ALL_KINDS.length ? null : kinds.join(","),
+  };
 }
 
 export function sessionPassesFilters(
-  filters: readonly ScheduleFilter[],
+  state: ScheduleFilterState,
   viewer: { rsvpd: boolean; hosting: boolean }
 ): boolean {
-  return filters.every((filter) => {
-    switch (filter) {
-      case "mine":
-        return viewer.rsvpd || viewer.hosting;
-      case "rsvpd":
-        return viewer.rsvpd;
-      case "hosting":
-        return viewer.hosting;
-    }
-  });
+  return !state.mine || state.mine.some((kind) => viewer[kind]);
 }

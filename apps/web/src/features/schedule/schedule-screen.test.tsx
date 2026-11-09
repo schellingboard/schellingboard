@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
+import { useState } from "react";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
@@ -65,22 +66,29 @@ function screenAt(
   }: { snapshot?: Snapshot; now?: Date; actions?: ScheduleActions } = {}
 ) {
   const onParamsChange = vi.fn<(params: URLSearchParams) => void>();
-  render(
-    <ScheduleScreen
-      clashes={new Map()}
-      snapshot={snapshot}
-      now={now}
-      links={scheduleLinks(snapshot.event.slug)}
-      params={new URLSearchParams(params)}
-      onParamsChange={onParamsChange}
-      onHashChange={() => {}}
-      onBack={() => {}}
-      sync={<span>Live</span>}
-      footer={<footer>Footer</footer>}
-      onReload={() => {}}
-      actions={actions}
-    />
-  );
+  const Harness = () => {
+    const [current, setCurrent] = useState(new URLSearchParams(params));
+    return (
+      <ScheduleScreen
+        clashes={new Map()}
+        snapshot={snapshot}
+        now={now}
+        links={scheduleLinks(snapshot.event.slug)}
+        params={current}
+        onParamsChange={(next) => {
+          onParamsChange(next);
+          setCurrent(next);
+        }}
+        onHashChange={() => {}}
+        onBack={() => {}}
+        sync={<span>Live</span>}
+        footer={<footer>Footer</footer>}
+        onReload={() => {}}
+        actions={actions}
+      />
+    );
+  };
+  render(<Harness />);
   return { onParamsChange };
 }
 
@@ -159,24 +167,129 @@ describe("ScheduleScreen search and filters", () => {
     }
   );
 
-  it("filters to the viewer's own sessions from the params", () => {
-    screenAt("filter=rsvpd");
-    expect(screen.getByText(/1 of 2 match · RSVP'd/)).toBeTruthy();
+  it(
+    "filters to My schedule, with the kinds from the params",
+    { tags: ["007-US3"] },
+    () => {
+      screenAt("filter=mine&mine=rsvpd");
+      expect(
+        screen.getByText(/1 of 2 match · My schedule \(RSVP'd\)/)
+      ).toBeTruthy();
+      expect(
+        screen
+          .getByRole("button", { name: "My schedule" })
+          .getAttribute("aria-pressed")
+      ).toBe("true");
+    }
+  );
+
+  it(
+    "maps an old filter=rsvpd link to My schedule",
+    { tags: ["007-US3"] },
+    () => {
+      screenAt("filter=rsvpd");
+      expect(
+        screen.getByText(/1 of 2 match · My schedule \(RSVP'd\)/)
+      ).toBeTruthy();
+    }
+  );
+
+  it("turns the chip into a param", { tags: ["007-US3"] }, async () => {
+    const { onParamsChange } = screenAt();
+    await userEvent.click(screen.getByRole("button", { name: "My schedule" }));
+    const params = onParamsChange.mock.calls[0][0];
+    expect(params.get("filter")).toBe("mine");
+    expect(params.has("mine")).toBe(false);
+  });
+
+  it(
+    "unticks a kind in the menu, which turns the chip on",
+    { tags: ["007-US3"] },
+    async () => {
+      const { onParamsChange } = screenAt();
+      await userEvent.click(
+        screen.getByRole("button", { name: "Choose what My schedule shows" })
+      );
+      const rsvpd = screen.getByRole("checkbox", { name: "RSVP'd" });
+      const hosting = screen.getByRole("checkbox", { name: "Hosting" });
+      expect((rsvpd as HTMLInputElement).checked).toBe(true);
+      await userEvent.click(hosting);
+      const params = onParamsChange.mock.calls[0][0];
+      expect(params.get("filter")).toBe("mine");
+      expect(params.get("mine")).toBe("rsvpd");
+    }
+  );
+
+  it(
+    "remembers the kinds while off, and ticking one turns the chip on",
+    { tags: ["007-US3"] },
+    async () => {
+      const { onParamsChange } = screenAt("filter=mine&mine=hosting");
+      await userEvent.click(
+        screen.getByRole("button", { name: "My schedule" })
+      );
+      await userEvent.click(
+        screen.getByRole("button", { name: "Choose what My schedule shows" })
+      );
+      expect(
+        screen.getByRole<HTMLInputElement>("checkbox", { name: "RSVP'd" })
+          .checked
+      ).toBe(false);
+      await userEvent.click(screen.getByRole("checkbox", { name: "RSVP'd" }));
+      const params = onParamsChange.mock.calls.at(-1)![0];
+      expect(params.get("filter")).toBe("mine");
+      expect(params.has("mine")).toBe(false);
+    }
+  );
+
+  it(
+    "forgets the remembered kinds on Show all",
+    { tags: ["007-US3"] },
+    async () => {
+      screenAt("filter=mine&mine=hosting");
+      await userEvent.click(
+        screen.getByRole("button", { name: "My schedule" })
+      );
+      await userEvent.type(
+        screen.getByRole("searchbox", { name: "Search sessions" }),
+        "work"
+      );
+      await userEvent.click(
+        await screen.findByRole("button", { name: "Show all" })
+      );
+      await userEvent.click(
+        screen.getByRole("button", { name: "Choose what My schedule shows" })
+      );
+      expect(
+        screen.getByRole<HTMLInputElement>("checkbox", { name: "RSVP'd" })
+          .checked
+      ).toBe(true);
+    }
+  );
+
+  it("cannot untick the last kind", { tags: ["007-US3"] }, async () => {
+    screenAt("filter=mine&mine=hosting");
+    await userEvent.click(
+      screen.getByRole("button", { name: "Choose what My schedule shows" })
+    );
     expect(
       screen
-        .getByRole("button", { name: "RSVP'd" })
-        .getAttribute("aria-pressed")
+        .getByRole<HTMLInputElement>("checkbox", { name: "Hosting" })
+        .getAttribute("aria-disabled")
     ).toBe("true");
   });
 
-  it("turns a chip into a param", async () => {
-    const { onParamsChange } = screenAt();
-    await userEvent.click(screen.getByRole("button", { name: "Hosting" }));
-    expect(onParamsChange.mock.calls[0][0].get("filter")).toBe("hosting");
+  it("closes the menu on Escape", { tags: ["007-US3"] }, async () => {
+    screenAt();
+    await userEvent.click(
+      screen.getByRole("button", { name: "Choose what My schedule shows" })
+    );
+    await userEvent.keyboard("{Escape}");
+    expect(screen.queryByRole("checkbox", { name: "Hosting" })).toBeNull();
   });
 
   it("offers no chips without a viewer", () => {
-    screenAt("filter=hosting", { snapshot: { ...snap, me: null } });
+    screenAt("filter=mine", { snapshot: { ...snap, me: null } });
     expect(screen.queryByRole("group", { name: "Filter sessions" })).toBeNull();
     expect(screen.queryByText(/match/)).toBeNull();
   });
