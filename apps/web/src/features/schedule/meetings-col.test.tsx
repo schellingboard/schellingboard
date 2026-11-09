@@ -5,6 +5,7 @@ import userEvent from "@testing-library/user-event";
 import { createRef } from "react";
 import { describe, expect, it } from "vitest";
 
+import type { MeetingClashes } from "../../queries/meeting-clashes";
 import { snapshot as base } from "../../replica/snapshot-fixture";
 import { GridView } from "./grid-view";
 import {
@@ -78,10 +79,15 @@ function Grid({ snapshot, now }: { snapshot: Snapshot; now: Date }) {
 
 const at9 = new Date(iso(9));
 
-function show(snapshot: Snapshot, now = at9) {
+function show(
+  snapshot: Snapshot,
+  now = at9,
+  clashes: MeetingClashes = new Map()
+) {
   return renderScheduled(<Grid snapshot={snapshot} now={now} />, {
     snapshot,
     now,
+    meetingClashes: clashes,
   });
 }
 
@@ -170,5 +176,27 @@ describe("the 1-on-1 column", () => {
     expect(within(dialog).getAllByRole("link")[0].getAttribute("href")).toBe(
       "/conf?viewMeeting=m-a"
     );
+  });
+});
+
+describe("a clashing 1-on-1", () => {
+  it("carries a warning naming what it clashes with", () => {
+    const clash = {
+      guestName: "Mia",
+      kind: "attending" as const,
+      title: "Talk",
+      isViewer: true,
+    };
+    show(
+      withMe([meeting("m1", 10), meeting("m2", 12)]),
+      at9,
+      new Map([["m1", [clash]]])
+    );
+    const marks = screen.getAllByRole("img", { name: "Clash" });
+    expect(marks).toHaveLength(1);
+    expect(
+      document.getElementById(marks[0].getAttribute("aria-describedby")!)
+        ?.textContent
+    ).toBe("You are attending Talk during this slot");
   });
 });

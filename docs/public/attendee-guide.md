@@ -147,6 +147,11 @@ schedule** can list them too (tick **Bookmarked** in its menu). A bookmark is no
 told and it is not counted. Other attendees and organizers do not see it, though in an event where
 anyone can pick any name, anyone using your name could.
 
+Sessions you RSVP'd to or host that overlap another of them, or one of your 1-on-1s, get a small
+warning icon; point at it (or read its label) to see what they clash with. Bookmarks never get the
+icon. Once something clashes, a **Clashes** filter appears: it lists the clashing sessions and
+1-on-1s, bookmarks included, and combines with **My schedule** to narrow to the kinds ticked there.
+
 To tidy away a session you do not care about, open it and tap **Not interested** below the RSVP
 button. On the grid it turns into a faint, empty block that still opens when tapped, and the agenda
 leaves it out. A **Hidden** filter appears next to **My schedule** while you have one: it shows only

@@ -245,6 +245,11 @@ export const features = {
         actor: "attendee",
         priority: "P3",
       },
+      US11: {
+        title: "Attendee sees the clashes in their schedule",
+        actor: "attendee",
+        priority: "P2",
+      },
     },
   },
   "008": {

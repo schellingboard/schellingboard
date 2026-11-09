@@ -9,12 +9,15 @@ import {
   AcademicCapIcon,
   BookmarkSolidIcon,
   ClockIcon,
+  ExclamationTriangleIcon,
   LockIcon,
   PlusIcon,
   UserIcon,
 } from "../../ui/icons";
 import { plainText } from "../../ui/plain-text";
 import { Tooltip } from "../../ui/tooltip";
+import { ClashMark } from "./clash-mark";
+import { clashSummary } from "./clashes";
 import type { ColumnItem } from "./column";
 import {
   CURRENT_MATCH_CLASS,
@@ -151,7 +154,9 @@ function SessionInfo({
   hosts: string;
   timezone: string;
 }) {
+  const { data } = useSchedule();
   const description = plainText(session.description);
+  const clashes = data.clashes(session.id);
   return (
     <div className="p-2">
       <h4 className="flex items-center gap-1 text-lg font-bold leading-tight">
@@ -166,6 +171,12 @@ function SessionInfo({
           ? description.substring(0, 200) + "..."
           : description}
       </p>
+      {clashes.length > 0 && (
+        <p className="mt-2 flex items-start gap-1 text-xs font-medium text-warning-fg">
+          <ExclamationTriangleIcon className="mt-px h-3 w-3 flex-shrink-0" />
+          {clashSummary(clashes, data.guestId)}
+        </p>
+      )}
       <div className="mt-2 flex justify-between gap-4 text-xs text-fg-subtle">
         <div className="flex gap-1">
           <UserIcon className="h-4 w-4" />
@@ -249,6 +260,10 @@ function RealSessionCard({
               {session.closed && (
                 <LockIcon className="mt-0 h-3 w-3 flex-shrink-0" />
               )}
+              <ClashMark
+                sessionId={session.id}
+                className="h-3 w-3 text-warning-fg"
+              />
               {data.bookmarked(session.id) && (
                 <BookmarkSolidIcon
                   aria-hidden={false}

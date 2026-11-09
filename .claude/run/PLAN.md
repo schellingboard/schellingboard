@@ -69,12 +69,10 @@ overview, deep links, an early read-only schedule), and a session never gets stu
       `mine`), `ScheduleMatch.hides`; use case 007-US10. Step 9: Clashes chip can reuse the chip row
       (`hidden` prop pattern in schedule-filters.tsx); hidden sessions must stay out of its set.
 
-- [ ] **9. feat: show clashes in your schedule** — `fixes #1104`. A **Clashes** chip, shown when the
-      viewer has at least one clash or the chip is on. It matches sessions in RSVP'd ∪ hosting ∪
-      bookmarks (not hidden) that overlap another of those or an accepted 1-on-1, and those 1-on-1s.
-      With My schedule on, it narrows to its ticked kinds. Blocks of commitments that clash with
-      another commitment get a small warning icon (tooltip / sr text names the clashes, via step 1's
-      function); bookmarks never get the icon. URL `filter=clashes`.
+- [x] **9. show clashes in your schedule** (`fixes #1104`): clashes.ts has
+      `clashesAmong`/`meetingClashes`; `ScheduleData.clashes/clashing/hasClashes`;
+      `ScheduleFilterState.clashes` (`filter=clashes`, combines with `mine`, excluded by `hidden`);
+      `ClashMark` icon on blocks and agenda rows; use case 007-US11.
 
 - [ ] **10. feat: a session link shows the session on the schedule** — `fixes #994`. When the
       schedule opens with `viewSession` from an address (not opened in-app), unfold the session's

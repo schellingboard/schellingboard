@@ -6,6 +6,7 @@ import { iso, snapshot as base } from "../../replica/snapshot-fixture";
 import { type ScheduleActions, ScheduleProvider } from "./context";
 import { scheduleDataFrom } from "./data";
 import { scheduleLinks } from "./links";
+import { withClashes } from "./meetings";
 import { createScheduleMatch, scheduleEntries } from "./model";
 
 export { iso };
@@ -17,6 +18,7 @@ export const noMatch = createScheduleMatch({
   rsvpd: () => false,
   bookmarked: () => false,
   hidden: () => false,
+  clashing: () => false,
 });
 
 export function snapshotWith(patch: Partial<Snapshot>): Snapshot {
@@ -30,14 +32,18 @@ export function renderScheduled(
     now = new Date(iso(9)),
     params = new URLSearchParams(),
     actions = {},
+    meetingClashes,
   }: {
     snapshot?: Snapshot;
     now?: Date;
     params?: URLSearchParams;
     actions?: Partial<ScheduleActions>;
+    meetingClashes?: Parameters<typeof withClashes>[1];
   } = {}
 ) {
   const data = scheduleDataFrom(snapshot, now);
+  if (meetingClashes)
+    data.meetings = withClashes(data.meetings, meetingClashes);
   return {
     data,
     ...render(

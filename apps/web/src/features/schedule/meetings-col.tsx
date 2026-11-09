@@ -8,6 +8,7 @@ import { cx } from "../../ui/cx";
 import { Dialog } from "../../ui/dialog";
 import { PlusIcon } from "../../ui/icons";
 import { Tooltip } from "../../ui/tooltip";
+import { ClashIcon } from "./clash-mark";
 import {
   CURRENT_MATCH_CLASS,
   GHOST_CLASS,
@@ -148,6 +149,16 @@ function SlotSummary({ meetings }: { meetings: MeetingView[] }) {
   );
 }
 
+function MeetingClashMark({ meeting }: { meeting: MeetingView }) {
+  if (meeting.clashes.length === 0) return null;
+  return (
+    <ClashIcon
+      text={`${clashLines(meeting.clashes)} during this slot`}
+      className="h-3 w-3 text-warning-fg"
+    />
+  );
+}
+
 /**
  * One 1-on-1, alone in its slot: room for the place and the state as well,
  * unless the block is short, when a dot marks one waiting on the reader.
@@ -184,6 +195,7 @@ function MeetingBlock({
       >
         {heightPx >= TITLE_MIN_PX && (
           <p className="flex items-center gap-1 text-xs font-medium leading-[1.15] text-fg">
+            <MeetingClashMark meeting={meeting} />
             <span className="truncate">{meeting.otherName}</span>
             {heightPx < 38 && needsReply(meeting) && (
               <span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-warning-fg" />
@@ -242,6 +254,7 @@ function StackEntry({ meeting }: { meeting: MeetingView }) {
           currentMatchId === meeting.id && CURRENT_MATCH_CLASS
         )}
       >
+        <MeetingClashMark meeting={meeting} />
         <span className="truncate text-[11px] font-medium leading-none text-fg">
           {meeting.otherName}
         </span>
