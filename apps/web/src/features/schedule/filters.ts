@@ -1,6 +1,7 @@
 export const MINE_KINDS = [
   { value: "rsvpd", label: "RSVP'd", summary: "RSVP'd" },
   { value: "hosting", label: "Hosting", summary: "hosting" },
+  { value: "bookmarked", label: "Bookmarked", summary: "bookmarked" },
 ] as const;
 
 export type MineKind = (typeof MINE_KINDS)[number]["value"];
@@ -9,6 +10,12 @@ export type MineKind = (typeof MINE_KINDS)[number]["value"];
 export type ScheduleFilterState = { mine: readonly MineKind[] | null };
 
 export const ALL_KINDS: readonly MineKind[] = MINE_KINDS.map((k) => k.value);
+
+export const DEFAULT_KINDS: readonly MineKind[] = ["rsvpd", "hosting"];
+
+function sameKinds(a: readonly MineKind[], b: readonly MineKind[]) {
+  return a.length === b.length && a.every((kind) => b.includes(kind));
+}
 
 function inCanonicalOrder(kinds: Iterable<string>): MineKind[] {
   const requested = new Set(kinds);
@@ -25,7 +32,7 @@ export function parseScheduleFilters(
   if (!tokens.includes("mine") && legacy.length === 0) return { mine: null };
   const narrowed = inCanonicalOrder((mineParam ?? "").split(","));
   if (narrowed.length > 0) return { mine: narrowed };
-  return { mine: legacy.length > 0 ? legacy : ALL_KINDS };
+  return { mine: legacy.length > 0 ? legacy : DEFAULT_KINDS };
 }
 
 export function serializeScheduleFilters(state: ScheduleFilterState): {
@@ -36,13 +43,13 @@ export function serializeScheduleFilters(state: ScheduleFilterState): {
   const kinds = inCanonicalOrder(state.mine);
   return {
     filter: "mine",
-    mine: kinds.length === ALL_KINDS.length ? null : kinds.join(","),
+    mine: sameKinds(kinds, DEFAULT_KINDS) ? null : kinds.join(","),
   };
 }
 
 export function sessionPassesFilters(
   state: ScheduleFilterState,
-  viewer: { rsvpd: boolean; hosting: boolean }
+  viewer: Record<MineKind, boolean>
 ): boolean {
   return !state.mine || state.mine.some((kind) => viewer[kind]);
 }

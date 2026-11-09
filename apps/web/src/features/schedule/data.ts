@@ -25,6 +25,8 @@ export type ScheduleData = {
   isMember: boolean;
   guests: { id: string; name: string }[];
   rsvpd: (sessionId: string) => boolean;
+  bookmarked: (sessionId: string) => boolean;
+  hasBookmarks: boolean;
   meetings: MeetingView[];
   availability: string[];
 };
@@ -33,6 +35,11 @@ export function scheduleDataFrom(snapshot: Snapshot, now: Date): ScheduleData {
   const { event, days, sessions, locations, unavailability, rsvps } =
     eventContextFrom(snapshot);
   const rsvpdIds = new Set(rsvps.map((r) => r.sessionId));
+  const bookmarkedIds = new Set(
+    (snapshot.me?.marks ?? [])
+      .filter((m) => m.kind === "bookmark")
+      .map((m) => m.sessionId)
+  );
   return {
     event,
     days,
@@ -46,6 +53,8 @@ export function scheduleDataFrom(snapshot: Snapshot, now: Date): ScheduleData {
     ),
     guests: snapshot.guests,
     rsvpd: (sessionId) => rsvpdIds.has(sessionId),
+    bookmarked: (sessionId) => bookmarkedIds.has(sessionId),
+    hasBookmarks: bookmarkedIds.size > 0,
     meetings: meetingViewsFrom(snapshot, now),
     availability: snapshot.me?.availability ?? [],
   };

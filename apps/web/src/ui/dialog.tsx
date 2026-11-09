@@ -20,6 +20,7 @@ export function Dialog({
   children,
   wide,
   label,
+  titleAction,
 }: {
   open: boolean;
   onClose: () => void;
@@ -28,6 +29,8 @@ export function Dialog({
   wide?: boolean;
   /** The dialog's accessible name when it is not its visible title. */
   label?: string;
+  /** Sits beside the title, outside the heading, so it stays out of the dialog's name. */
+  titleAction?: ReactNode;
 }) {
   const titleId = useId();
   const panel = useRef<HTMLDivElement>(null);
@@ -97,9 +100,15 @@ export function Dialog({
         onFocus={guard.noteFocus}
         className={`relative max-h-[90dvh] w-full overflow-y-auto overscroll-contain rounded-t-lg bg-surface-raised p-4 shadow-xl focus:outline-none sm:rounded-lg sm:p-6 ${wide ? "sm:max-w-2xl" : "sm:max-w-md"}`}
       >
-        <h2 id={titleId} className="pr-8 text-lg font-semibold text-fg">
-          {title}
-        </h2>
+        <div className="flex items-start gap-2 pr-8">
+          <h2
+            id={titleId}
+            className="min-w-0 flex-1 text-lg font-semibold text-fg"
+          >
+            {title}
+          </h2>
+          {titleAction}
+        </div>
         <button
           type="button"
           aria-label="Close"
