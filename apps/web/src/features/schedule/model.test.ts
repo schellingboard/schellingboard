@@ -46,6 +46,7 @@ const none = createScheduleMatch({
   filters: { mine: null },
   guestId: "mia",
   rsvpd: () => false,
+  bookmarked: () => false,
 });
 
 describe("includedLocations", () => {
@@ -67,6 +68,7 @@ describe("createScheduleMatch", () => {
       filters: { mine: null },
       guestId: null,
       rsvpd: () => false,
+      bookmarked: () => false,
     });
     expect(m.filtering).toBe(true);
     expect(m.matchesSession(session("s", { title: "A TALK" }))).toBe(true);
@@ -83,6 +85,7 @@ describe("createScheduleMatch", () => {
       filters: { mine: ["hosting"] },
       guestId: "mia",
       rsvpd: () => false,
+      bookmarked: () => false,
     });
     expect(m.matchesSession(hosted)).toBe(true);
     expect(m.matchesSession(session("x", {}))).toBe(false);
@@ -91,6 +94,7 @@ describe("createScheduleMatch", () => {
       filters: { mine: ["hosting"] },
       guestId: null,
       rsvpd: () => false,
+      bookmarked: () => false,
     });
     expect(anonymous.filtering).toBe(false);
   });
@@ -101,6 +105,7 @@ describe("createScheduleMatch", () => {
       filters: { mine: ["hosting"] },
       guestId: "mia",
       rsvpd: () => false,
+      bookmarked: () => false,
     });
     expect(m.matchesMeeting(meeting as unknown as MeetingView)).toBe(true);
     expect(
@@ -136,6 +141,7 @@ describe("scheduleEntries", () => {
       filters: { mine: null },
       guestId: null,
       rsvpd: () => false,
+      bookmarked: () => false,
     });
     const entries = scheduleEntries({
       days,

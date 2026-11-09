@@ -33,8 +33,9 @@ export function createScheduleMatch(input: {
   filters: ScheduleFilterState;
   guestId: string | null;
   rsvpd: (sessionId: string) => boolean;
+  bookmarked: (sessionId: string) => boolean;
 }): ScheduleMatch {
-  const { search, guestId, rsvpd } = input;
+  const { search, guestId, rsvpd, bookmarked } = input;
   const filters = guestId ? input.filters : { mine: null };
   const searching = search.trim() !== "";
   return {
@@ -45,6 +46,7 @@ export function createScheduleMatch(input: {
       sessionPassesFilters(filters, {
         rsvpd: rsvpd(session.id),
         hosting: session.hosts.some((h) => h.id === guestId),
+        bookmarked: bookmarked(session.id),
       }),
     matchesMeeting: (meeting) =>
       !searching || meetingMatchesSearch(meeting, search),

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Session } from "@schellingboard/domain/session";
 import { formatOptionalTime, TIME_FORMAT } from "@schellingboard/domain/time";
 import {
@@ -7,13 +7,22 @@ import {
   type AttendeesState,
 } from "../../queries/attendees";
 import { Dialog } from "../../ui/dialog";
-import { AcademicCapIcon, CheckCircleIcon, LockIcon } from "../../ui/icons";
+import {
+  AcademicCapIcon,
+  BookmarkIcon,
+  BookmarkSolidIcon,
+  CheckCircleIcon,
+  LockIcon,
+} from "../../ui/icons";
+import { Tooltip } from "../../ui/tooltip";
 import { Markdown } from "../../ui/markdown";
 import { claimRefusal } from "@schellingboard/domain/session-claim";
 import { useSchedule } from "./context";
 import { AttendeeCountField } from "./attendee-count-field";
 import { SessionComments } from "./session-comments";
 import { useRsvp } from "./use-rsvp";
+
+const BOOKMARK_NOTE = "Only you see your bookmarks. This is not an RSVP.";
 
 const ACTION =
   "inline-flex items-center justify-center rounded-md border border-brand-accent px-2 py-1 text-xs font-medium text-brand-fg hover:bg-brand-tint focus:outline-none focus:ring-2 focus:ring-brand-accent disabled:opacity-50";
@@ -34,10 +43,36 @@ export function SessionModal({
       wide
       onClose={onClose}
       label="Session details"
-      title={session?.title ?? "Session details"}
+      title={session ? session.title : "Session details"}
+      titleAction={session && <BookmarkToggle sessionId={session.id} />}
     >
       {session ? <Details session={session} /> : <p>Session not found.</p>}
     </Dialog>
+  );
+}
+
+function BookmarkToggle({ sessionId }: { sessionId: string }) {
+  const { data, actions } = useSchedule();
+  const noteId = useId();
+  if (!data.guestId) return null;
+  const marked = data.bookmarked(sessionId);
+  const Icon = marked ? BookmarkSolidIcon : BookmarkIcon;
+  return (
+    <Tooltip content={<p className="px-2 py-1 text-xs">{BOOKMARK_NOTE}</p>}>
+      <button
+        type="button"
+        aria-pressed={marked}
+        aria-label={marked ? "Remove bookmark" : "Bookmark this session"}
+        aria-describedby={noteId}
+        onClick={() => void actions.setBookmark(sessionId, !marked)}
+        className="-my-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-fg-muted hover:bg-surface-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+      >
+        <Icon className="h-5 w-5" />
+      </button>
+      <span id={noteId} className="sr-only">
+        {BOOKMARK_NOTE}
+      </span>
+    </Tooltip>
   );
 }
 

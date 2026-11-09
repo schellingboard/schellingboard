@@ -62,6 +62,7 @@ function fakeActions(attendees = fakeAttendees(["zed", "abe"])) {
   return {
     toggleRsvp: vi.fn<ScheduleActions["toggleRsvp"]>(() => Promise.resolve()),
     becomeHost: vi.fn<ScheduleActions["becomeHost"]>(() => Promise.resolve()),
+    setBookmark: vi.fn<ScheduleActions["setBookmark"]>(() => Promise.resolve()),
     pickName: vi.fn<ScheduleActions["pickName"]>(),
     ...noMeetingActions,
     attendees: vi.fn<ScheduleActions["attendees"]>(() => attendees),
@@ -486,5 +487,42 @@ describe("the attendee count", () => {
       within(dialog()).getByRole("button", { name: "Close" })
     );
     expect(onParamsChange.mock.calls[0][0].toString()).toBe("view=agenda");
+  });
+});
+
+describe("bookmarking from the session modal", { tags: ["007-US9"] }, () => {
+  it("bookmarks the session", async () => {
+    const { actions } = open(snapshotWith());
+    await userEvent.click(
+      within(dialog()).getByRole("button", { name: "Bookmark this session" })
+    );
+    expect(actions.setBookmark).toHaveBeenCalledWith("s", true);
+  });
+
+  it("shows a bookmarked session as bookmarked", async () => {
+    const { actions } = open(
+      snapshotWith(
+        {},
+        { me: { ...base.me!, marks: [{ sessionId: "s", kind: "bookmark" }] } }
+      )
+    );
+    const toggle = within(dialog()).getByRole("button", {
+      name: "Remove bookmark",
+    });
+    expect(toggle.getAttribute("aria-pressed")).toBe("true");
+    expect(toggle.getAttribute("aria-describedby")).toBeTruthy();
+    expect(
+      document.getElementById(toggle.getAttribute("aria-describedby")!)
+        ?.textContent
+    ).toBe("Only you see your bookmarks. This is not an RSVP.");
+    await userEvent.click(toggle);
+    expect(actions.setBookmark).toHaveBeenCalledWith("s", false);
+  });
+
+  it("is not offered without a name", () => {
+    open(snapshotWith({}, { me: null }));
+    expect(
+      within(dialog()).queryByRole("button", { name: /bookmark/i })
+    ).toBeNull();
   });
 });

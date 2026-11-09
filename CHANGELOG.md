@@ -11,6 +11,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **Bookmark sessions privately** (#864, #264, #865): a bookmark icon in the session window keeps a
+  session in view, and "My schedule" can list your bookmarks. Not an RSVP; others do not see it.
+
 ### Changed
 
 - **One "My schedule" filter on the schedule** (#865): replaces My sessions, RSVP'd and Hosting. A

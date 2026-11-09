@@ -141,6 +141,12 @@ days without a match. A line at the top says what matches and by what: tap it to
 search, or tap **Show all** to clear it. On the grid, the arrows in the bottom right corner (or
 Enter in the search box) take you from one match to the next.
 
+To keep a session in view without RSVPing, open it and tap the bookmark icon next to its title.
+Bookmarked sessions show a small bookmark in the grid and the agenda, and once you have one, **My
+schedule** can list them too (tick **Bookmarked** in its menu). A bookmark is not an RSVP: nobody is
+told and it is not counted. Other attendees and organizers do not see it, though in an event where
+anyone can pick any name, anyone using your name could.
+
 While the event is running, a red line marks the current time in the grid and the agenda, and
 **"Now"** at the top of the schedule jumps straight to it.
 

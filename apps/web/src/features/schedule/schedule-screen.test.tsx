@@ -46,6 +46,7 @@ function fakeActions() {
   return {
     toggleRsvp: vi.fn<ScheduleActions["toggleRsvp"]>(() => Promise.resolve()),
     becomeHost: vi.fn<ScheduleActions["becomeHost"]>(() => Promise.resolve()),
+    setBookmark: vi.fn<ScheduleActions["setBookmark"]>(() => Promise.resolve()),
     pickName: vi.fn<ScheduleActions["pickName"]>(),
     ...noMeetingActions,
     attendees: vi.fn<ScheduleActions["attendees"]>(),
@@ -264,6 +265,74 @@ describe("ScheduleScreen search and filters", () => {
         screen.getByRole<HTMLInputElement>("checkbox", { name: "RSVP'd" })
           .checked
       ).toBe(true);
+    }
+  );
+
+  it(
+    "lists Bookmarked only with a bookmark, and filters to it",
+    { tags: ["007-US3", "007-US9"] },
+    async () => {
+      const { onParamsChange } = screenAt();
+      await userEvent.click(
+        screen.getByRole("button", { name: "Choose what My schedule shows" })
+      );
+      expect(screen.queryByRole("checkbox", { name: "Bookmarked" })).toBeNull();
+      cleanup();
+
+      const marked = {
+        ...snap,
+        me: {
+          ...snap.me!,
+          marks: [{ sessionId: "w", kind: "bookmark" as const }],
+        },
+      };
+      const second = screenAt("filter=mine&mine=bookmarked", {
+        snapshot: marked,
+      });
+      expect(
+        screen.getByText(/1 of 2 match · My schedule \(bookmarked\)/)
+      ).toBeTruthy();
+      await userEvent.click(
+        screen.getByRole("button", { name: "Choose what My schedule shows" })
+      );
+      expect(
+        screen.getByRole<HTMLInputElement>("checkbox", { name: "Bookmarked" })
+          .checked
+      ).toBe(true);
+      await userEvent.click(screen.getByRole("checkbox", { name: "RSVP'd" }));
+      expect(second.onParamsChange.mock.calls[0][0].get("mine")).toBe(
+        "rsvpd,bookmarked"
+      );
+      expect(onParamsChange).not.toHaveBeenCalled();
+      cleanup();
+
+      // The last bookmark is gone while Bookmarked is still ticked.
+      screenAt("filter=mine&mine=bookmarked");
+      await userEvent.click(
+        screen.getByRole("button", { name: "Choose what My schedule shows" })
+      );
+      expect(
+        screen.getByRole<HTMLInputElement>("checkbox", { name: "Bookmarked" })
+          .checked
+      ).toBe(true);
+    }
+  );
+
+  it(
+    "shows a bookmark icon on a bookmarked session",
+    { tags: ["007-US9"] },
+    () => {
+      const marked = {
+        ...snap,
+        me: {
+          ...snap.me!,
+          marks: [{ sessionId: "w", kind: "bookmark" as const }],
+        },
+      };
+      screenAt("view=agenda", { snapshot: marked });
+      expect(screen.getAllByRole("img", { name: "Bookmarked" })).toHaveLength(
+        1
+      );
     }
   );
 

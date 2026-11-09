@@ -57,18 +57,11 @@ overview, deep links, an early read-only schedule), and a session never gets stu
       (`{kind}`), changes `mark.set`/`mark.cleared` (owner-only), snapshot
       `me.marks: {sessionId, kind}[]`, use case 007-US9; session.deleted drops marks in feed-apply.
 
-- [ ] **7b. feat: private session bookmarks, UI** — `fixes #864`, `fixes #264`, `fixes #865`. Needs
-      7a.
-  - Replica command to set/clear a mark (like the RSVP command); UI reads `snapshot.me.marks`.
-  - UI: in the session modal only, an icon-only bookmark toggle (heroicons `BookmarkIcon`: outline =
-    not bookmarked, solid = bookmarked) next to the title, not in the action row. Label "Bookmark
-    this session" / "Remove bookmark", tooltip "Only you see your bookmarks. This is not an RSVP."
-    No bookmark button on grid blocks or agenda rows (too little space, looks like the RSVP badge,
-    mis-taps on phones). Bookmarked blocks and agenda rows show a small solid bookmark icon before
-    the title; no other style change (an un-RSVP'd bookmark stays dimmed).
-  - My schedule menu gets a "Bookmarked" kind, unticked by default, listed only when the viewer has
-    at least one bookmark (or it is ticked). URL kind `bookmarked`.
-  - Not in the in-app release notes (keep discovery low); the changelog bullet is fine.
+- [x] **7b. private session bookmarks, UI**: commands addBookmark/removeBookmark
+      (commands/session-mark.ts), `ScheduleActions.setBookmark`,
+      `ScheduleData.bookmarked`/`hasBookmarks`; filters.ts `MINE_KINDS` has `bookmarked` (not
+      default, `DEFAULT_KINDS`); modal `BookmarkToggle`; `BookmarkSolidIcon` marks blocks/rows. Step
+      8 reuses `snapshot.me.marks` kind `hidden`.
 
 - [ ] **8. feat: hide sessions you are not interested in** — `fixes #1103`. Session modal: a quiet
       text button "Not interested" / "Show again", below the main actions; not offered when the

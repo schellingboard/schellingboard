@@ -14,6 +14,7 @@ import {
   CheckCircleIcon,
   LockIcon,
   UserIcon,
+  BookmarkSolidIcon,
 } from "../../ui/icons";
 import {
   agendaGroups,
@@ -252,6 +253,14 @@ function SessionRow({
         <>
           {session.closed && (
             <LockIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-fg-muted" />
+          )}
+          {data.bookmarked(session.id) && (
+            <BookmarkSolidIcon
+              aria-hidden={false}
+              role="img"
+              aria-label="Bookmarked"
+              className="mt-0.5 h-3.5 w-3.5 shrink-0 text-fg-muted"
+            />
           )}
           <span className="line-clamp-2">{session.title}</span>
         </>
