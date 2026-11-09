@@ -476,7 +476,7 @@ The bell in the header counts what is waiting for you, and the notifications pag
 newest first. You'll be told when:
 
 - a session you host or have RSVP'd to is moved or deleted
-- someone adds you as a co-host
+- someone adds you as a host or co-host
 - someone joins a proposal you host as a co-host
 - someone comments on a proposal or session you host, or on your profile
 - someone else comments on something you commented on

@@ -301,10 +301,7 @@ async function notifySessionRecipients({
 }
 
 // Email the guests newly added as co-hosts of the session (who have opted
-// in). `previousHostIds` are the session's hosts from before the change —
-// empty for a freshly created session. The guest who made the change
-// (`changedById`; null when unknown or not a guest) isn't emailed about
-// adding themselves.
+// in).
 //
 // Never throws: any failure (including a bad SITE_URL, or a lookup error) is
 // logged and must not break the change it trails, nor the sends to the other
@@ -337,22 +334,24 @@ async function notifyCohostsAddedUnsafe({
   if (!event) return;
 
   const path = sessionPath(event.slug, session.id);
-  const message: EmailRecipe = {
-    template: "cohostAdded",
-    props: {
-      title: session.title,
-      time: formatSessionTime(session, event.timezone),
-      location: formatLocations(session),
-      sessionUrl: emailBase() + path,
-    },
+  const props = {
+    title: session.title,
+    time: formatSessionTime(session, event.timezone),
+    location: formatLocations(session),
+    sessionUrl: emailBase() + path,
   };
 
-  const inApp = {
-    text: `You were added as a co-host of "${session.title}"`,
-    url: path,
-    at: now,
-  };
+  const soleHost = session.hosts.length === 1;
   for (const host of added) {
+    const message: EmailRecipe = {
+      template: "cohostAdded",
+      props: { ...props, soleHost },
+    };
+    const inApp = {
+      text: `You were added as ${soleHost ? "the host" : "a co-host"} of "${session.title}"`,
+      url: path,
+      at: now,
+    };
     await tryNotifyGuest(host.id, "cohostAdd", message, inApp);
   }
 }

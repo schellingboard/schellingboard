@@ -91,6 +91,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **"Now the host" email for a sole host** (#954): when you become a session's only host, the email
+  says you are the host instead of a co-host.
 - **The RSVP clash warning lists every clash** (#1042): it used to name only the first session or
   1-on-1 it overlaps.
 - **The schedule stays visible after an event ends**: it used to be replaced by "Event unavailable"

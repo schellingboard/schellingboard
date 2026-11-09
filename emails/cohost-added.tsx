@@ -11,13 +11,17 @@ export function cohostAddedEmail(props: {
   time: string;
   location: string;
   sessionUrl: string;
+  soleHost?: boolean;
 }): EmailMessage {
   return {
-    subject: `You are now a co-host of: ${props.title}`,
+    subject: `You are now ${props.soleHost ? "the host" : "a co-host"} of: ${props.title}`,
     body: (
       <>
         <h1>{props.title}</h1>
-        <p>You&rsquo;ve been added as a co-host of this session.</p>
+        <p>
+          You&rsquo;ve been added as {props.soleHost ? "the host" : "a co-host"}{" "}
+          of this session.
+        </p>
         <p>
           <strong>Time:</strong> {props.time}
         </p>

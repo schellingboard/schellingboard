@@ -685,13 +685,14 @@ describe("notifyCohostsAdded", () => {
     const roomA = await createLocation({ name: "Room A" });
     const rsvper = await createGuest({ email: "rsvper@test.example" });
     const cohost = await createGuest({ email: "cohost@test.example" });
+    const owner = await createGuest({ email: "owner@test.example" });
     const session = await createSession(event.id, {
       title: "Fun Workshop",
       description: "A *hands-on* session.",
       locationIds: [roomA.id],
       startTime: new Date("2026-08-01T10:00:00Z"),
       endTime: new Date("2026-08-01T11:00:00Z"),
-      hostIds: [cohost.id],
+      hostIds: [owner.id, cohost.id],
     });
     await getRepositories().rsvps.create({
       sessionId: session.id,
@@ -717,11 +718,11 @@ describe("notifyCohostsAdded", () => {
   });
 
   it("emails newly added co-hosts the session details", async () => {
-    const { event, session } = await setupWithCohost();
+    const { event, cohost, session } = await setupWithCohost();
 
     await notifyCohostsAdded({
       session,
-      addedIds: session.hosts.map((h) => h.id),
+      addedIds: [cohost.id],
       now: NOW,
     });
 
@@ -738,6 +739,33 @@ describe("notifyCohostsAdded", () => {
     expect(html).toContain("Room A");
     expect(html).toContain(
       `href="https://site.example/${event.slug}?viewSession=${session.id}"`
+    );
+  });
+
+  it("tells a sole host they are now the host, not a co-host", async () => {
+    const { event, cohost } = await setupWithCohost();
+    const session = await createSession(event.id, {
+      title: "Fun Workshop",
+      hostIds: [cohost.id],
+    });
+
+    await notifyCohostsAdded({
+      session,
+      addedIds: [cohost.id],
+      now: NOW,
+    });
+
+    await deliverQueued();
+    const message = vi.mocked(sendMail).mock.calls[0][0];
+    expect(message.subject).toBe("You are now the host of: Fun Workshop");
+    const html = await renderWithoutComments(message.body);
+    expect(html).toContain("added as the host");
+    expect(html).not.toContain("co-host");
+    const [notification] = await getRepositories().notifications.listByGuest(
+      cohost.id
+    );
+    expect(notification.text).toBe(
+      'You were added as the host of "Fun Workshop"'
     );
   });
 

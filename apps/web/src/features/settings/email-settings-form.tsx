@@ -13,7 +13,7 @@ const OPTIONS: { name: keyof EmailSettingsBody; label: string }[] = [
     name: "hostChange",
     label: "a session I’m hosting changes time or location, or is deleted",
   },
-  { name: "cohostAdd", label: "someone adds me as a session co-host" },
+  { name: "cohostAdd", label: "someone adds me as a session host or co-host" },
   {
     name: "proposalJoin",
     label: "someone joins a proposal I’m hosting as a co-host",

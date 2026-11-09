@@ -29,9 +29,9 @@ overview, deep links, an early read-only schedule), and a session never gets stu
       (apps/web/src/features/schedule/clashes.ts) return all overlapping commitments in start order;
       takes busy sessions + meetings.
 
-- [ ] **2. fix: "now the host" email for a sole host** — `fixes #954`. When the recipient is the
-      only host after the change, subject "You are now the host of: X" and matching body; otherwise
-      keep the co-host wording.
+- [x] **2. "now the host" email for a sole host**: cohostAdded email takes `soleHost`
+      (notifyCohostsAdded in utils/notifications.ts sets it when the session has one host); in-app
+      text matches.
 
 - [ ] **3. feat: claim a hostless session** — `fixes #714`. Session modal shows "Become host" when
       the session has no hosts, is not admin-managed, the viewer is an event member, and hosts may
