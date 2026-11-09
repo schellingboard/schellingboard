@@ -13,6 +13,8 @@ export function ScheduleFilters({
   mine,
   onToggleMine,
   onToggleKind,
+  hidden,
+  onToggleHidden,
   count,
   onShowAll,
   onBackToTop,
@@ -31,6 +33,9 @@ export function ScheduleFilters({
   } | null;
   onToggleMine: () => void;
   onToggleKind: (kind: MineKind) => void;
+  /** Null while the viewer has nothing hidden and the chip is off. */
+  hidden: { active: boolean } | null;
+  onToggleHidden: () => void;
   /** How many entries match out of how many, or null when nothing narrows them. */
   count: { matching: number; total: number } | null;
   onShowAll: () => void;
@@ -46,6 +51,7 @@ export function ScheduleFilters({
             .join(", ")})`,
         ]
       : []),
+    ...(hidden?.active ? ["Hidden"] : []),
     ...(search.trim() === "" ? [] : [`"${search.trim()}"`]),
   ];
   // Lifted only while the menu is open: always-on, the bar would paint over
@@ -78,12 +84,31 @@ export function ScheduleFilters({
             }}
           />
           {mine && (
-            <div role="group" aria-label="Filter sessions" className="flex">
+            <div
+              role="group"
+              aria-label="Filter sessions"
+              className="flex flex-wrap gap-2"
+            >
               <MyScheduleChip
                 mine={mine}
                 onToggle={onToggleMine}
                 onToggleKind={onToggleKind}
               />
+              {hidden && (
+                <button
+                  type="button"
+                  aria-pressed={hidden.active}
+                  onClick={onToggleHidden}
+                  className={cx(
+                    "h-9 rounded-md px-3 text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent",
+                    hidden.active
+                      ? "bg-info text-on-info hover:bg-info-hover"
+                      : "bg-surface-muted text-fg-muted hover:bg-surface-hover"
+                  )}
+                >
+                  Hidden
+                </button>
+              )}
             </div>
           )}
         </div>

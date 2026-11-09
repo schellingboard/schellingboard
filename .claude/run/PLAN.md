@@ -63,14 +63,11 @@ overview, deep links, an early read-only schedule), and a session never gets stu
       default, `DEFAULT_KINDS`); modal `BookmarkToggle`; `BookmarkSolidIcon` marks blocks/rows. Step
       8 reuses `snapshot.me.marks` kind `hidden`.
 
-- [ ] **8. feat: hide sessions you are not interested in** — `fixes #1103`. Session modal: a quiet
-      text button "Not interested" / "Show again", below the main actions; not offered when the
-      viewer RSVP'd or hosts. A hidden mark is ignored while the viewer RSVP'd or hosts. Hidden
-      sessions: grid shows them as ghosts (existing ghost style, no text, still open the modal,
-      screen-reader text "hidden by you"), never count as matches; agenda leaves them out. A
-      **Hidden** chip, shown only while the viewer has a hidden session or the chip is on, shows
-      only hidden sessions; turning it on turns the other chips off and the other way round. URL
-      `filter=hidden`.
+- [x] **8. hide sessions you are not interested in** (`fixes #1103`): commands
+      addHidden/removeHidden, `ScheduleActions.setHidden`, `ScheduleData.hidden`/`hasHidden`
+      (ignored while RSVP'd or hosting), `ScheduleFilterState.hidden` (`filter=hidden`, excludes
+      `mine`), `ScheduleMatch.hides`; use case 007-US10. Step 9: Clashes chip can reuse the chip row
+      (`hidden` prop pattern in schedule-filters.tsx); hidden sessions must stay out of its set.
 
 - [ ] **9. feat: show clashes in your schedule** — `fixes #1104`. A **Clashes** chip, shown when the
       viewer has at least one clash or the chip is on. It matches sessions in RSVP'd ∪ hosting ∪

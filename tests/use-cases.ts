@@ -240,6 +240,11 @@ export const features = {
         actor: "attendee",
         priority: "P3",
       },
+      US10: {
+        title: "Attendee hides sessions they are not interested in",
+        actor: "attendee",
+        priority: "P3",
+      },
     },
   },
   "008": {

@@ -11,7 +11,12 @@ import { newKey } from "../commands/keys";
 import { answerMeeting, cancelMeeting } from "../commands/meeting-answer";
 import { meetingRequestCalls } from "../commands/meeting-request";
 import { addRsvp, removeRsvp } from "../commands/rsvp";
-import { addBookmark, removeBookmark } from "../commands/session-mark";
+import {
+  addBookmark,
+  addHidden,
+  removeBookmark,
+  removeHidden,
+} from "../commands/session-mark";
 import { scheduleLinks } from "../features/schedule/links";
 import {
   type ScheduleActions,
@@ -61,6 +66,9 @@ function Loaded({ api, slug, runner, store, snapshot, now }: EventView) {
         await runner.run(bookmarked ? addBookmark : removeBookmark, {
           sessionId,
         });
+      },
+      setHidden: async (sessionId, hidden) => {
+        await runner.run(hidden ? addHidden : removeHidden, { sessionId });
       },
       attendees: (sessionId) => createAttendeesQuery({ api, sessionId }),
       attendeeCount: attendeeCountApi(api, newKey),
