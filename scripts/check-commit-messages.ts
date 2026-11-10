@@ -29,8 +29,11 @@ const SUBJECT = new RegExp(`^(${TYPES.join("|")})(\\([^)\\s]+\\))?!?: \\S`);
 const MAX_SUBJECT = 72;
 const MAX_BODY_LINE = 80;
 const GENERATED = /^(Merge |Revert "|fixup! |squash! )/;
+const DEPENDABOT = /^Signed-off-by: dependabot\[bot\] </m;
 
 export function commitMessageProblems(message: string): string[] {
+  if (DEPENDABOT.test(message)) return [];
+
   const lines = message
     .split("\n")
     .filter((line) => !line.startsWith("#"))

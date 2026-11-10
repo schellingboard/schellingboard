@@ -63,4 +63,18 @@ describe("commitMessageProblems", () => {
     expect(commitMessageProblems("Merge branch 'x' into main")).toEqual([]);
     expect(commitMessageProblems('Revert "feat: a"')).toEqual([]);
   });
+
+  it("skips Dependabot commits, which we cannot reword", () => {
+    const message = [
+      `deps(deps): ${"bump the all-dependencies group ".repeat(3)}`,
+      "… updates",
+      "Bumps the group.",
+      "",
+      "Signed-off-by: dependabot[bot] <support@github.com>",
+    ].join("\n");
+    expect(commitMessageProblems(message)).toEqual([]);
+    expect(
+      commitMessageProblems(message.replace("dependabot", "mallory"))
+    ).not.toEqual([]);
+  });
 });
