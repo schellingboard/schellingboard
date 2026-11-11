@@ -24,6 +24,14 @@ export function settingsCalls(api: ApiClient) {
       api.GET("/api/v1/me/push-subscriptions", {
         params: { query: { endpoint } },
       }),
+    listDevices: (endpoint?: string) =>
+      api.GET("/api/v1/me/push-devices", {
+        params: { query: { endpoint } },
+      }),
+    removeDevice: (id: string) =>
+      api.DELETE("/api/v1/me/push-devices/{id}", {
+        params: { path: { id } },
+      }),
   };
 }
 

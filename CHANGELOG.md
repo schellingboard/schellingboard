@@ -30,6 +30,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Hover over a name to see who it is**
   ([#789](https://github.com/schellingboard/schellingboard/issues/789)): with a mouse, a small card
   shows the person's photo and short summary; clicking still opens the profile.
+- **See and turn off the devices that get your notifications**
+  ([#969](https://github.com/schellingboard/schellingboard/issues/969)): Settings lists each phone
+  or laptop with notifications on, so a lost one can be switched off from another.
 
 ### Changed
 
