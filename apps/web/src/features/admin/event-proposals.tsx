@@ -8,17 +8,17 @@ import { Button } from "../../ui/button";
 import { DataTable } from "../../ui/data-table";
 import { PeopleField, TextAreaField, TextField } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
-import type { Person } from "../../ui/people-picker";
-import { type DayOption, EMPTY_SESSION } from "./admin-session-model";
-import { ConfirmByTyping } from "./confirm-by-typing";
-import { type EventLocation, SessionForm } from "./event-sessions";
 import {
   type OnParams,
   pageOf,
   plural,
   searchByTitleOrHost,
   tableHandlers,
-} from "./list-paging";
+} from "../../ui/list-paging";
+import type { Person } from "../../ui/people-picker";
+import { type DayOption, EMPTY_SESSION } from "./admin-session-model";
+import { ConfirmByTyping } from "./confirm-by-typing";
+import { type EventLocation, SessionForm } from "./event-sessions";
 import { shown, useJumpWithin } from "./use-section-save";
 
 const FIELDS = ["title", "description", "durationMinutes", "hostIds"];

@@ -384,6 +384,11 @@ export const features = {
         actor: "attendee",
         priority: "P3",
       },
+      US9: {
+        title: "Attendee finds every comment they have written",
+        actor: "attendee",
+        priority: "P3",
+      },
     },
   },
   "011": {

@@ -23,7 +23,6 @@ import { EventStatsScreen } from "../features/admin/event-stats";
 import { AdminEventsScreen } from "../features/admin/events-screen";
 import { UserImportScreen } from "../features/admin/guest-import";
 import { AdminGuestsScreen } from "../features/admin/guests-screen";
-import type { OnParams } from "../features/admin/list-paging";
 import { LocationAvailabilityManager } from "../features/admin/location-availability";
 import { LocationsScreen } from "../features/admin/locations-screen";
 import { SettingsScreen } from "../features/admin/settings-screen";
@@ -49,6 +48,7 @@ import { createAdminUnavailabilityQuery } from "../queries/admin-unavailability"
 import { AdminFrame, useReloadAdminGate } from "./admin-frame";
 import { InAppLinks } from "./in-app-links";
 import type { AppServices } from "./services";
+import { useParamUpdates } from "./use-param-updates";
 import { jointStatus, useQuery } from "./use-query";
 import { useUrlSearchParams } from "./use-url-search-params";
 
@@ -71,18 +71,6 @@ export function AdminSection({ services }: { services: AppServices }) {
 
 export function AdminHome() {
   return <Redirect to="/admin/events" />;
-}
-
-function useParamUpdates() {
-  const { params, change } = useUrlSearchParams();
-  const onParams: OnParams = (updates, { push }) => {
-    const next = new URLSearchParams(params);
-    for (const [key, value] of Object.entries(updates))
-      if (value === null) next.delete(key);
-      else next.set(key, value);
-    change(next, { push });
-  };
-  return { params, onParams };
 }
 
 const named = ({ id, name }: { id: string; name: string }) => ({ id, name });

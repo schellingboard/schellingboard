@@ -11,9 +11,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { adminGuestCalls } from "../../commands/admin-guests";
 import { fakeApi, type FakeCall, problem } from "../../commands/fake-api";
 import type { AdminGuest } from "../../queries/admin-guests";
+import type { ParamUpdates } from "../../ui/list-paging";
 import { NoticeProvider } from "../../ui/notices";
 import { AdminGuestsScreen } from "./guests-screen";
-import type { ParamUpdates } from "./list-paging";
 
 afterEach(cleanup);
 

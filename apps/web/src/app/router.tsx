@@ -14,6 +14,7 @@ import {
   BootstrapPage,
   JoinPage,
   LoginPage,
+  MyCommentsPage,
   NotificationsPage,
   ResetPage,
   SettingsPage,
@@ -261,6 +262,13 @@ export function createAppRouter(
       return <SettingsPage services={services} />;
     },
   });
+  const myComments = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "comments",
+    component: function MyCommentsRoute(): ReactElement {
+      return <MyCommentsPage services={services} />;
+    },
+  });
   const notifications = createRoute({
     getParentRoute: () => rootRoute,
     path: "notifications",
@@ -393,6 +401,7 @@ export function createAppRouter(
         adminStatistics,
       ]),
       settings,
+      myComments,
       notifications,
       accountSecurity,
       authLogin,

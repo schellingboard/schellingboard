@@ -11,10 +11,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { adminEventCalls } from "../../commands/admin-events";
 import { fakeApi, type FakeCall, problem } from "../../commands/fake-api";
 import type { AdminSession } from "../../queries/admin-sessions";
+import type { ParamUpdates } from "../../ui/list-paging";
 import { NoticeProvider } from "../../ui/notices";
 import type { DayOption } from "./admin-session-model";
 import { EventSessionsManager } from "./event-sessions";
-import type { ParamUpdates } from "./list-paging";
 
 afterEach(cleanup);
 

@@ -12,10 +12,10 @@ import { adminEventCalls } from "../../commands/admin-events";
 import { fakeApi, type FakeCall, problem } from "../../commands/fake-api";
 import type { AdminGuest } from "../../queries/admin-guests";
 import type { AdminLocation } from "../../queries/admin-locations";
+import type { ParamUpdates } from "../../ui/list-paging";
 import { NoticeProvider } from "../../ui/notices";
 import { EventGuestsManager } from "./event-guests";
 import { EventLocationsManager } from "./event-locations";
-import type { ParamUpdates } from "./list-paging";
 
 afterEach(cleanup);
 
