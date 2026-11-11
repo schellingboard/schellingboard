@@ -9,6 +9,8 @@ import { LOCALES } from "../../i18n/locales";
 import { LanguageSetting } from "./language-setting";
 import { EmailSettingsForm } from "./email-settings-form";
 import { PushNotifications } from "./push-notifications";
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 
 const SECTION = "mx-auto flex w-full max-w-2xl flex-col gap-3 px-4 sm:px-0";
 
@@ -32,29 +34,31 @@ export function SettingsScreen({
     <div className="flex flex-col gap-8">
       {state.status === "loading" && (
         <p role="status" className="px-4 text-fg-muted">
-          Loading…
+          {t`Loading…`}
         </p>
       )}
       {state.status === "error" && (
         <p role="alert" className="px-4 text-danger-fg">
-          Could not load your settings. Reload the page to try again.
+          {t`Could not load your settings. Reload the page to try again.`}
         </p>
       )}
       {state.status === "error" && security}
       {state.status === "ready" && (
         <>
           <div className={`${SECTION} gap-6`}>
-            <h1 className="text-2xl font-bold">Settings</h1>
+            <h1 className="text-2xl font-bold">{t`Settings`}</h1>
             <p className="text-sm text-fg-subtle">
-              Everything here is private and never shown to other attendees.
-              Your{" "}
-              <a
-                href={links.profile}
-                className="text-brand-fg underline hover:text-brand-fg-hover"
-              >
-                public profile
-              </a>{" "}
-              is edited separately.
+              <Trans>
+                Everything here is private and never shown to other attendees.
+                Your{" "}
+                <a
+                  href={links.profile}
+                  className="text-brand-fg underline hover:text-brand-fg-hover"
+                >
+                  public profile
+                </a>{" "}
+                is edited separately.
+              </Trans>
             </p>
             {LOCALES.length > 1 && <LanguageSetting calls={calls} />}
             {state.emailEnabled && (
@@ -85,15 +89,17 @@ function OneOnOnes({
   return (
     <section aria-labelledby="one-on-ones" className={SECTION}>
       <h2 id="one-on-ones" className="text-lg font-semibold">
-        1-on-1s
+        {t`1-on-1s`}
       </h2>
       <p className="text-sm text-fg-subtle">
-        When you&apos;re free to meet other attendees, event by event. Only the
-        events you&apos;re attending that offer 1-on-1s are listed.
+        <Trans>
+          When you&apos;re free to meet other attendees, event by event. Only
+          the events you&apos;re attending that offer 1-on-1s are listed.
+        </Trans>
       </p>
       {forms.length === 0 ? (
         <p className="text-sm text-fg-muted">
-          None of your events offers 1-on-1s at the moment.
+          {t`None of your events offers 1-on-1s at the moment.`}
         </p>
       ) : (
         forms.map((form) => (
@@ -120,18 +126,20 @@ export function Appearance() {
   return (
     <section aria-labelledby="appearance-heading" className={SECTION}>
       <h2 id="appearance-heading" className="text-lg font-semibold">
-        Appearance (this device)
+        {t`Appearance (this device)`}
       </h2>
       <p className="text-sm text-fg-subtle">
-        Following the system means the site is dark whenever your phone or
-        laptop is.
+        <Trans>
+          Following the system means the site is dark whenever your phone or
+          laptop is.
+        </Trans>
       </p>
       <div>
         <ThemeSelect />
       </div>
-      <h3 className="text-sm font-medium">Time format</h3>
+      <h3 className="text-sm font-medium">{t`Time format`}</h3>
       <p className="text-sm text-fg-subtle">
-        Automatic follows your browser's language.
+        {t`Automatic follows your browser's language.`}
       </p>
       <div>
         <TimeFormatSelect />

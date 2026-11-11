@@ -11,6 +11,8 @@ import { ConfirmDialog } from "../../ui/confirm-dialog";
 import { CheckIcon } from "../../ui/icons";
 import { pageOf, requestedPage, type OnParams } from "../../ui/list-paging";
 import { usePaging } from "../../ui/use-paging";
+import { plural, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 
 /** The signed-in guest's notifications: tick rows to mark or delete them, click one to open it. */
 export function NotificationsScreen({
@@ -71,13 +73,13 @@ export function NotificationsScreen({
   if (state.status === "loading")
     return (
       <p role="status" className="px-4 text-fg-muted">
-        Loading…
+        {t`Loading…`}
       </p>
     );
   if (state.status === "error")
     return (
       <p role="alert" className="px-4 text-danger-fg">
-        Could not load your notifications. Reload the page to try again.
+        {t`Could not load your notifications. Reload the page to try again.`}
       </p>
     );
 
@@ -121,18 +123,20 @@ export function NotificationsScreen({
       ref={top}
       className="mx-auto flex max-w-2xl flex-col gap-4 px-4 sm:px-0"
     >
-      <h1 className="text-2xl font-bold">Notifications</h1>
+      <h1 className="text-2xl font-bold">{t`Notifications`}</h1>
 
       {items.length === 0 ? (
         <p className="text-fg-muted">
-          Nothing yet. When someone comments on your session or changes
-          something you have RSVP&apos;d to, it will show up here.
+          <Trans>
+            Nothing yet. When someone comments on your session or changes
+            something you have RSVP&apos;d to, it will show up here.
+          </Trans>
         </p>
       ) : (
         <>
           <div
             role="group"
-            aria-label="Notification actions"
+            aria-label={t`Notification actions`}
             className="flex flex-wrap items-center gap-3"
           >
             <label className="flex items-center gap-2 text-sm text-fg-muted">
@@ -149,7 +153,7 @@ export function NotificationsScreen({
                 }
                 className="h-4 w-4 cursor-pointer"
               />
-              Select page
+              <Trans>Select page</Trans>
             </label>
             <div className="ml-auto flex gap-2">
               <Button
@@ -158,21 +162,21 @@ export function NotificationsScreen({
                 disabled={!someSelected || busy}
                 onClick={() => void act(query.markRead, chosen)}
               >
-                Mark as read
+                {t`Mark as read`}
               </Button>
               <Button
                 variant="danger"
                 disabled={!someSelected || busy}
                 onClick={() => setConfirming(true)}
               >
-                Delete
+                {t`Delete`}
               </Button>
             </div>
           </div>
 
           {waiting ? (
             <p role="status" className="text-fg-muted">
-              Loading…
+              {t`Loading…`}
             </p>
           ) : (
             <ul className="flex flex-col gap-2">
@@ -208,7 +212,7 @@ export function NotificationsScreen({
             setError(null);
           }}
         >
-          Try again
+          {t`Try again`}
         </Button>
       )}
 
@@ -216,15 +220,14 @@ export function NotificationsScreen({
 
       <ConfirmDialog
         open={confirming}
-        title="Delete notifications"
-        message={
-          chosen.length === 1
-            ? "Delete this notification? This cannot be undone."
-            : `Delete these ${chosen.length} notifications? This cannot be undone.`
-        }
-        confirmLabel="Delete"
+        title={t`Delete notifications`}
+        message={plural(chosen.length, {
+          one: "Delete this notification? This cannot be undone.",
+          other: "Delete these # notifications? This cannot be undone.",
+        })}
+        confirmLabel={t`Delete`}
         destructive
-        cancelLabel="Cancel"
+        cancelLabel={t`Cancel`}
         onCancel={() => setConfirming(false)}
         onConfirm={() => {
           setConfirming(false);
@@ -254,6 +257,7 @@ function Row({
 }) {
   const locale = useFormatLocale();
   const read = item.readAt !== null;
+  const text = item.text;
   return (
     <li
       className={
@@ -267,7 +271,7 @@ function Row({
         <input
           type="checkbox"
           checked={ticked}
-          aria-label={`Select ${item.text}`}
+          aria-label={t`Select ${text}`}
           onChange={onTick}
           className="mt-1 h-4 w-4 shrink-0 cursor-pointer self-start"
         />
@@ -287,8 +291,8 @@ function Row({
         {!read && (
           <button
             type="button"
-            title="Mark as read"
-            aria-label="Mark as read"
+            title={t`Mark as read`}
+            aria-label={t`Mark as read`}
             disabled={busy}
             onClick={onMarkRead}
             className="shrink-0 cursor-pointer rounded-md p-2 text-fg-subtle hover:bg-surface-muted disabled:opacity-50"
