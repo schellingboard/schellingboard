@@ -23,6 +23,7 @@ const event = {
   name: "Spring Con",
   description: "",
   website: "",
+  proposalHelp: "",
   timezone: "Europe/Berlin",
   firstDayStart: "2030-05-01T08:00:00Z",
   lastDayStart: "2030-05-03T08:00:00Z",

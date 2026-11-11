@@ -39,6 +39,8 @@ export interface EventSettingsInput {
   name: string;
   description: string;
   website: string;
+  /** Left out, an edit keeps the stored text. */
+  proposalHelp?: string;
   timezone: string;
   maxSessionDuration: number;
   breakMinutes: number;
@@ -97,7 +99,7 @@ type EventSettings = Pick<
   | "slotIncrementMinutes"
   | "rsvpCapacityHardLimit"
   | "icon"
-> & { identityMode?: IdentityMode };
+> & { identityMode?: IdentityMode; proposalHelp?: string };
 
 function isKnownTimeZone(timeZone: string): boolean {
   try {
@@ -190,6 +192,7 @@ function parseSettings(
       name,
       description: input.description.trim(),
       website: normalizeWebsiteUrl(input.website),
+      proposalHelp: input.proposalHelp?.trim(),
       timezone,
       maxSessionDuration,
       breakMinutes,
@@ -255,6 +258,7 @@ export const createEvent =
       return ok(
         await repos.events.create({
           ...parsed.data,
+          proposalHelp: parsed.data.proposalHelp ?? "",
           identityMode: parsed.data.identityMode ?? "verified",
           ...phases,
         })

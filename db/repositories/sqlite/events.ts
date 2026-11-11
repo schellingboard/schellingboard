@@ -34,6 +34,7 @@ function rowToEvent(row: EventSelectRow): Event {
     slug: row.slug,
     description: row.description,
     website: row.website,
+    proposalHelp: row.proposalHelp,
     firstDayStart: row.firstDayStart ? new Date(row.firstDayStart) : undefined,
     lastDayStart: row.lastDayStart ? new Date(row.lastDayStart) : undefined,
     proposalPhaseStart: row.proposalPhaseStart
@@ -123,6 +124,7 @@ export class SqliteEventsRepository implements EventsRepository {
         slug,
         description: data.description,
         website: data.website,
+        proposalHelp: data.proposalHelp,
         proposalPhaseStart: data.proposalPhaseStart?.toISOString() ?? null,
         proposalPhaseEnd: data.proposalPhaseEnd?.toISOString() ?? null,
         votingPhaseStart: data.votingPhaseStart?.toISOString() ?? null,
@@ -161,6 +163,7 @@ export class SqliteEventsRepository implements EventsRepository {
     if (patch.name !== undefined) set.name = patch.name;
     if (patch.description !== undefined) set.description = patch.description;
     if (patch.website !== undefined) set.website = patch.website;
+    if (patch.proposalHelp !== undefined) set.proposalHelp = patch.proposalHelp;
     if ("proposalPhaseStart" in patch)
       set.proposalPhaseStart = patch.proposalPhaseStart?.toISOString() ?? null;
     if ("proposalPhaseEnd" in patch)

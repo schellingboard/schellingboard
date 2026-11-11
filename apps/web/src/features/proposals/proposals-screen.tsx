@@ -22,6 +22,7 @@ import {
   PlusIcon,
   UserIcon,
 } from "../../ui/icons";
+import { ProposalHelp } from "./proposal-help";
 import { SearchInput } from "../../ui/search-input";
 import { Unavailable } from "../../ui/unavailable";
 import { useSearchParamText } from "../../ui/use-search-param-text";
@@ -89,6 +90,7 @@ export function ProposalsScreen(props: ProposalsScreenProps) {
             icon={PlusIcon}
             label="Add Proposal"
           />
+          {!schedEnabled && <ProposalHelp event={snapshot.event} />}
           <ActionLink
             href={links.quickVoting}
             enabled={votingEnabled}

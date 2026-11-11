@@ -504,6 +504,43 @@ test.describe("Admin UI events", () => {
     await expect(page).toHaveURL(/\/admin\/events$/);
   });
 
+  test("organizer writes the help for proposers and an attendee opens it @015-US8 @004-US8", async ({
+    page,
+  }) => {
+    await adminLogin(page);
+    await page.goto("/admin/events");
+    const eventName = `E2E Help ${uniqueSuffix()}`;
+    await page.getByRole("button", { name: "New event" }).click();
+    await page.getByLabel("Name*").fill(eventName);
+    await page.getByLabel("Identity").selectOption("open");
+    await page.getByRole("button", { name: "Create event" }).click();
+    await page
+      .getByRole("listitem")
+      .filter({ hasText: eventName })
+      .getByRole("link", { name: "Manage" })
+      .click();
+
+    await page
+      .getByLabel("Help for proposers")
+      .fill("Ask the organizers about the venue.");
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await expect(page.getByText("Saved!")).toBeVisible();
+    await page
+      .getByRole("group", { name: "Proposal phase" })
+      .getByLabel("Start")
+      .fill("2020-09-01T09:00");
+    await page.getByRole("button", { name: "Save phases" }).click();
+    await expect(page.getByText("Saved!")).toHaveCount(2);
+
+    await page.goto(`/${eventName.replaceAll(" ", "-")}/proposals`);
+    await page.getByRole("button", { name: "Need ideas?" }).click();
+    await expect(
+      page
+        .getByRole("dialog", { name: "Need ideas?" })
+        .getByText("Ask the organizers about the venue.")
+    ).toBeVisible();
+  });
+
   test("can edit event basic info on detail page @015-US2", async ({
     page,
   }) => {

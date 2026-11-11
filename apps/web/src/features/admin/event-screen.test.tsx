@@ -23,6 +23,7 @@ const event = (extra: Partial<AdminEvent> = {}) =>
     name: "Con",
     description: "About",
     website: "",
+    proposalHelp: "",
     timezone: "Europe/Berlin",
     maxSessionDuration: 60,
     breakMinutes: 10,
@@ -160,6 +161,7 @@ describe("the event details form", { tags: ["015-US2"] }, () => {
       name: "Con 2",
       description: "About",
       website: "",
+      proposalHelp: "",
       timezone: "Europe/Berlin",
       maxSessionDuration: 60,
       breakMinutes: 5,
@@ -170,6 +172,36 @@ describe("the event details form", { tags: ["015-US2"] }, () => {
     });
     expect(await screen.findByText("Saved!")).toBeTruthy();
   });
+
+  it(
+    "starts from the default help text, saves a changed one, and resets it",
+    { tags: ["015-US8"] },
+    async () => {
+      const user = userEvent.setup();
+      const { calls } = setup();
+      const help = screen.getByLabelText("Help for proposers");
+      expect((help as HTMLTextAreaElement).value).toContain(
+        "explain in 20 minutes"
+      );
+
+      await user.clear(help);
+      await user.type(help, "Ask Sam");
+      await user.click(screen.getByRole("button", { name: "Save changes" }));
+      await waitFor(() => expect(calls).toHaveLength(1));
+      expect(calls[0].body).toMatchObject({ proposalHelp: "Ask Sam" });
+
+      await user.click(
+        screen.getByRole("button", { name: "Reset to default" })
+      );
+      expect((help as HTMLTextAreaElement).value).toContain(
+        "explain in 20 minutes"
+      );
+
+      await user.click(screen.getByRole("button", { name: "Save changes" }));
+      await waitFor(() => expect(calls).toHaveLength(2));
+      expect(calls[1].body).toMatchObject({ proposalHelp: "" });
+    }
+  );
 
   it("picks and clears the icon", async () => {
     const user = userEvent.setup();

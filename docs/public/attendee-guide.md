@@ -41,8 +41,9 @@ the organizers replaces an older one.
 ## Propose a session
 
 During the **proposal** phase, click **Add Proposal** and give a title, a description, and
-optionally co-hosts. You can edit your own proposals until scheduling starts. A proposal only
-becomes a real session once someone puts it on the schedule.
+optionally co-hosts. Not sure what to propose? **Need ideas?** opens prompts to start from. You can
+edit your own proposals until scheduling starts. A proposal only becomes a real session once someone
+puts it on the schedule.
 
 - **A proposal doesn't need a host.** An empty host field says "I'd like someone to offer this"
   rather than "I'll give this". Anyone who can give such a session takes it on by opening the

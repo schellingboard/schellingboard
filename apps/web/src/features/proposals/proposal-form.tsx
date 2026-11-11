@@ -33,6 +33,7 @@ import {
 } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
 import type { ProposalLinks } from "./links";
+import { ProposalHelp } from "./proposal-help";
 import { ScheduledSessionsNotice } from "./scheduled-sessions-notice";
 
 const FIELD_NAMES = [
@@ -203,6 +204,11 @@ function Fields({
           required.
         </p>
       </div>
+      {!proposal && (
+        <div className="self-start">
+          <ProposalHelp event={event} />
+        </div>
+      )}
       {proposal && (
         <ScheduledSessionsNotice
           proposalId={proposal.id}
