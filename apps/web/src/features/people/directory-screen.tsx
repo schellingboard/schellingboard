@@ -4,6 +4,7 @@ import {
   DEFAULT_ATTENDEE_SORT,
 } from "@schellingboard/domain/attendee-search";
 import { serializeAttendeeFilters } from "@schellingboard/domain/attendee-filters";
+import { useFormatLocale } from "../../i18n/format-locale";
 import type { DirectoryEntry, DirectoryState } from "../../queries/directory";
 import { Avatar } from "../../ui/avatar";
 import { ListToolbar } from "../../ui/list-toolbar";
@@ -40,7 +41,11 @@ const LINK = "font-semibold text-brand-fg hover:text-brand-fg-hover";
 export function DirectoryScreen(props: DirectoryScreenProps) {
   const { entries, status, now, viewerId, links, params, onParams } = props;
   const [seed, setSeed] = useState(props.randomSeed);
-  const cards = useMemo(() => cardsFrom(entries, now), [entries, now]);
+  const locale = useFormatLocale();
+  const cards = useMemo(
+    () => cardsFrom(entries, now, locale),
+    [entries, now, locale]
+  );
   const listQuery = params.toString();
   const { query, available, filters, sort, rows } = useMemo(
     () =>

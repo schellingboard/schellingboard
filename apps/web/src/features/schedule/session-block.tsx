@@ -102,8 +102,8 @@ function BookableSessionCard({
         )}
         href={links.addSession({
           location: location.name,
-          day: start.toFormat("yyyy-MM-dd"),
-          time: start.toFormat("HH:mm"),
+          day: start.toFormat("yyyy-MM-dd", { locale: "en" }),
+          time: start.toFormat("HH:mm", { locale: "en" }),
         })}
       >
         <PlusIcon aria-hidden="true" className="h-4 w-4 text-fg-subtle" />

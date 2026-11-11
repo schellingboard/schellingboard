@@ -66,7 +66,8 @@ the E2E specs a step touches; the user runs the full suite at the end.
     of the session, proposal, profile and 1-on-1 panels (ADR 0020 note amended).
 25. DONE **#1328b** Locale storage: `guests.locale`, `PUT /me/locale`, switcher hidden while one
     locale exists.
-26. **#1328c** Locale-aware formatting, builds on #607. Issue step 3.
+26. DONE **#1328c** Locale-aware formatting (`i18n/format.ts`, `useFormatLocale`; Luxon default
+    locale).
 27. **#1328d** Guardrails: lint rule, extract/missing-key check, pseudo-locale. Issue step 4.
 28. **#1328e** Externalize strings, one commit per area (a to g of issue step 5); split into PLAN.md
     steps when reached.

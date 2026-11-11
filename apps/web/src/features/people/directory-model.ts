@@ -27,14 +27,15 @@ export type DirectoryCard = DirectoryEntry & {
 
 export function cardsFrom(
   entries: DirectoryEntry[],
-  now: Date
+  now: Date,
+  locale = "en"
 ): DirectoryCard[] {
   return entries.map((entry) => ({
     ...entry,
     hasProfile: hasFilledProfile(entry),
     excerpt: profileExcerpt(entry, (markdown) => plainText(markdown ?? "")),
     profileUpdated: entry.profileUpdatedAt
-      ? formatRelativeTime(entry.profileUpdatedAt, now)
+      ? formatRelativeTime(entry.profileUpdatedAt, now, locale)
       : null,
   }));
 }

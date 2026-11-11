@@ -165,6 +165,20 @@
   on sign-out). Switcher: `features/settings/language-setting.tsx`, shown when `LOCALES.length > 1`.
   Still open for step 30: service worker must cache the lazy locale chunks.
 
+- 26 (#1328c): formatting follows `formatLocale(uiLocale, navigator.languages)`: the browser's
+  regional tag when it has the app's language (en + en-GB), else the app's locale; so no visible
+  change while only `en` exists. Provider sets Luxon `Settings.defaultLocale` once a locale
+  activates and offers `useFormatLocale()`; Automatic time format uses `clockStyleFor(it)`.
+  `formatRelativeTime` takes a locale (default `en`; "just now" waits for string externalizing).
+  Domain Luxon helpers (`formatDayLabel` etc.) got no locale parameter: the web relies on Luxon's
+  default; step 29 must pass the recipient's locale when the server needs it. Not converted: footer
+  date (fixed `en-GB`), `formatDuration` ("25m"), the server's `Intl` use. Components that format
+  without reading `useFormatLocale` or the time format re-render with a locale change only on their
+  next render. Review fixes: choosing a name returns `locale` (no second GET); `acceptedLanguages`
+  dropped (re-add in step 29); copy-link status region is always rendered, so the E2E `toast()`
+  helper skips empty statuses. Not run: E2E, mailer tests (mailpit down); `make test` locally needs
+  the env that `make` sets (plain vitest fails on AUTH_SECRET).
+
 ## Next step
 
-No step is open. Wait for the coordinator (step 26 onwards, 35 only on request).
+No step is open. Wait for the coordinator (step 27 onwards, 35 only on request).

@@ -10,6 +10,7 @@ import { failureMessage } from "../commands/failure-message";
 import { newKey } from "../commands/keys";
 import { meetingRequestCalls } from "../commands/meeting-request";
 import { createCommandRunner } from "../commands/runner";
+import { useFormatLocale } from "../i18n/format-locale";
 import { cardsFrom, everyoneIn } from "../features/people/directory-model";
 import { profileLinks } from "../features/people/links";
 import { ProfilePanel } from "../features/people/profile-panel";
@@ -52,9 +53,10 @@ function ProfileHost({
     directory.subscribe,
     directory.get
   );
+  const locale = useFormatLocale();
   const everyone = useMemo(
-    () => everyoneIn(cardsFrom(entries, now)),
-    [entries, now]
+    () => everyoneIn(cardsFrom(entries, now, locale)),
+    [entries, now, locale]
   );
 
   const runner = useMemo(

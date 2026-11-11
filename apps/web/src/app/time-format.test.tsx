@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { FormatLocaleContext } from "../i18n/format-locale";
 import {
   TimeFormatProvider,
   TimeFormatSelect,
@@ -40,6 +41,32 @@ describe("time format", () => {
     expect(screen.getByTestId("format").textContent).toBe("h:mm a");
     expect(document.cookie).toContain("sb-time-format=12h");
     await user.click(screen.getByRole("button", { name: "24-hour" }));
+    expect(screen.getByTestId("format").textContent).toBe("HH:mm");
+  });
+
+  it(
+    "follows the language of the app when Automatic",
+    { tags: ["014-US7", "022-US1"] },
+    () => {
+      render(
+        <FormatLocaleContext value="en-US">
+          <TimeFormatProvider>
+            <Probe />
+          </TimeFormatProvider>
+        </FormatLocaleContext>
+      );
+      expect(screen.getByTestId("format").textContent).toBe("h:mm a");
+    }
+  );
+
+  it("keeps 24 hours for German when Automatic", { tags: ["022-US1"] }, () => {
+    render(
+      <FormatLocaleContext value="de-DE">
+        <TimeFormatProvider>
+          <Probe />
+        </TimeFormatProvider>
+      </FormatLocaleContext>
+    );
     expect(screen.getByTestId("format").textContent).toBe("HH:mm");
   });
 });
