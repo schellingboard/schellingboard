@@ -28,14 +28,9 @@ test("shows the photo big enough to recognise someone, without clicking @011-US5
   // Stored avatars are square crops, so an unsquare box means a stretched face.
   expect(Math.abs(box.width - box.height)).toBeLessThanOrEqual(1);
 
-  // The photo has its own column: the text sits beside it rather than being
-  // pushed a screenful down.
   const aboutMe = profile.getByRole("heading", { name: "About me" });
-  const aboutMeBox = (await aboutMe.boundingBox())!;
-  expect(aboutMeBox.x).toBeGreaterThanOrEqual(box.x + box.width);
 
-  // A narrow laptop or tablet stacks instead: two columns here would leave the
-  // prose ~350px to wrap in, narrower than the phone layout gets.
+  // The side panel is narrow, so the text stacks below the photo.
   await page.setViewportSize({ width: 700, height: 800 });
   const tabletPhotoBox = (await photo.boundingBox())!;
   const tabletAboutMeBox = (await aboutMe.boundingBox())!;

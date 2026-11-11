@@ -7,6 +7,7 @@ export function InAppLinks({
   owns,
   onFollow,
   intercept,
+  className,
   children,
 }: {
   owns: (url: URL) => boolean;
@@ -14,6 +15,7 @@ export function InAppLinks({
   onFollow?: (url: URL) => string;
   /** Takes over a link entirely; true means it was handled. */
   intercept?: (url: URL, link: HTMLAnchorElement) => boolean;
+  className?: string;
   children: ReactNode;
 }) {
   const { history } = useRouter();
@@ -39,5 +41,9 @@ export function InAppLinks({
     history.push(onFollow?.(url) ?? `${url.pathname}${url.search}${url.hash}`);
   };
 
-  return <div onClick={onClick}>{children}</div>;
+  return (
+    <div className={className} onClick={onClick}>
+      {children}
+    </div>
+  );
 }

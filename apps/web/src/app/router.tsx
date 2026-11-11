@@ -27,6 +27,9 @@ import { NotFound } from "./not-found";
 import { PanelHost } from "./panel-host";
 import { PanelLanding } from "./panel-landing";
 import { PeoplePage } from "./people-pages";
+import { ProfilePanelHost } from "./profile-host";
+import { ProfileLinks } from "./profile-links";
+import { ProfileWalkProvider } from "./profile-walk";
 import {
   ProposalFormPage,
   ProposalsPage,
@@ -35,6 +38,7 @@ import {
 import { SchedulePage } from "./schedule-page";
 import { type AppServices, defaultServices } from "./services";
 import { SessionFormPage } from "./sessions-pages";
+import { ShellProviders } from "./shell";
 import { SpaLinks } from "./spa-links";
 
 const AdminEventPage = lazyRouteComponent(
@@ -91,18 +95,29 @@ const adminPages = [
   AdminUsersPage,
 ];
 
-const rootRoute = createRootRoute({ component: Outlet });
-
-const catchAll = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "$",
-  component: NotFound,
-});
-
 export function createAppRouter(
   history?: RouterHistory,
   services: AppServices = defaultServices()
 ) {
+  const rootRoute = createRootRoute({
+    component: function RootRoute(): ReactElement {
+      return (
+        <ShellProviders api={services.api} createSource={services.createSource}>
+          <ProfileWalkProvider>
+            <ProfileLinks>
+              <Outlet />
+              <ProfilePanelHost api={services.api} />
+            </ProfileLinks>
+          </ProfileWalkProvider>
+        </ShellProviders>
+      );
+    },
+  });
+  const catchAll = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "$",
+    component: NotFound,
+  });
   const home = createRoute({
     getParentRoute: () => rootRoute,
     path: "/",

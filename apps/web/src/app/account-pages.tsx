@@ -34,8 +34,7 @@ import { useHealth } from "./health";
 import { Layout } from "./layout";
 import { PageNotice } from "./page-notice";
 import type { AppServices } from "./services";
-import { ShellFrame, ShellProviders } from "./shell";
-import { ThemeProvider } from "./theme";
+import { ShellFrame } from "./shell";
 import { useNotificationRevision, useUnread } from "./unread-count";
 import { useDirectoryShell } from "./use-directory-shell";
 import { useUrlSearchParams } from "./use-url-search-params";
@@ -69,16 +68,11 @@ export function SiteLoginPage({ services }: { services: AppServices }) {
   const calls = useMemo(() => signInCalls(api), [api]);
   const target = safeRedirectPath(params.get("redirect"), "/");
   return (
-    <ThemeProvider>
-      <NoticeProvider>
-        <Layout nav={null} footer={<Footer version={health?.version} />}>
-          <SiteLoginScreen
-            calls={calls}
-            onEntered={() => hardNavigate(target)}
-          />
-        </Layout>
-      </NoticeProvider>
-    </ThemeProvider>
+    <NoticeProvider>
+      <Layout nav={null} footer={<Footer version={health?.version} />}>
+        <SiteLoginScreen calls={calls} onEntered={() => hardNavigate(target)} />
+      </Layout>
+    </NoticeProvider>
   );
 }
 
@@ -137,11 +131,7 @@ function AccountFrame({
   children: (shell: Shell) => ReactNode;
 }) {
   const { api } = services;
-  return (
-    <ShellProviders api={api} createSource={services.createSource}>
-      <Frame api={api}>{children}</Frame>
-    </ShellProviders>
-  );
+  return <Frame api={api}>{children}</Frame>;
 }
 
 function Frame({

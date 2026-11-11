@@ -13,8 +13,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
-- **Session details open in a side panel**: the schedule stays usable beside it, you can drag its
-  edge to resize it, and each session has its own shareable link.
+- **Sessions, proposals and profiles open in a side panel**
+  ([#1590](https://github.com/schellingboard/schellingboard/issues/1590)): the page stays usable
+  beside it, you can drag its edge to resize it, and each has its own shareable link.
 
 ### Internal
 

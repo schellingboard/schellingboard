@@ -4,15 +4,11 @@ import { useEffect, useState } from "react";
 import { EventListScreen } from "../features/events/event-list-screen";
 import { InAppLinks } from "./in-app-links";
 import type { AppServices } from "./services";
-import { ShellFrame, ShellProviders } from "./shell";
+import { ShellFrame } from "./shell";
 import { useDirectoryShell } from "./use-directory-shell";
 
 export function HomePage({ services }: { services: AppServices }) {
-  return (
-    <ShellProviders api={services.api} createSource={services.createSource}>
-      <Home api={services.api} />
-    </ShellProviders>
-  );
+  return <Home api={services.api} />;
 }
 
 function Home({ api }: { api: AppServices["api"] }) {
