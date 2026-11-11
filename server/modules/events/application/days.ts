@@ -202,6 +202,9 @@ export const deleteDay =
       if (!day) return dayNotFound();
       const event = await tx.events.findById(day.eventId);
       const by = byAdmin(actor, now);
+      const moments = (await tx.sharedMoments.listByEvent(day.eventId)).filter(
+        (m) => m.dayId === day.id
+      );
       try {
         const sessions = await tx.sessions.listByEvent(day.eventId);
         await recordingShownGuests(
@@ -221,6 +224,8 @@ export const deleteDay =
       } catch {
         return conflict("day.saveFailed", "Failed to delete day");
       }
+      for (const moment of moments)
+        tx.record(changes.momentDeleted(moment, day.eventId, by));
       tx.record(changes.dayDeleted(day, by));
       if (event) await recordEventDates(tx, event, by);
       return ok(day);

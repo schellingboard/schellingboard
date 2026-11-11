@@ -172,6 +172,9 @@ your hidden sessions (and turns My schedule off). Tap **Show again** in the sess
 is private and has no effect on anyone else; it is not offered for sessions you RSVP'd to or host,
 and RSVPing to or hosting a hidden session shows it again.
 
+A striped band across all the rooms marks a **shared moment**, such as lunch or an opening keynote.
+Tap its label for details. Sessions can still be booked inside a band; expect a smaller group there.
+
 While the event is running, a red line marks the current time in the grid and the agenda, and
 **"Now"** at the top of the schedule jumps straight to it.
 

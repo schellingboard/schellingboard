@@ -38,6 +38,7 @@ const day = (id: string, sessions: Session[], date = "2026-06-15") => ({
   endBookings: new Date(),
   version: 1,
   sessions,
+  moments: [],
 });
 const meeting = { id: "m", otherName: "Kai", meetingPoint: "", message: "" };
 

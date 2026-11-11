@@ -7,17 +7,14 @@ import { Tooltip } from "../../ui/tooltip";
 import { cx } from "../../ui/cx";
 import { LocationPlaceholder } from "../../ui/location-placeholder";
 import { useSchedule } from "./context";
-import { getNowOffsetPx } from "./grid-layout";
+import { getNowOffsetPx, GUTTER } from "./grid-layout";
 import { LocationCol } from "./location-col";
 import { meetingsForDay, takesPartInMeetings } from "./meeting-column";
 import { MeetingsCol } from "./meetings-col";
 import type { DayWithSessions } from "./model";
+import { MomentBands } from "./moment-band";
 import { NowLine } from "./now-line";
 import { OneOnOnePicture } from "./one-on-one-picture";
-
-// Width of the left time-axis gutter. The body rows show `HH:mm` labels and the
-// header corner shows the day's date, so it has to fit a short date.
-const GUTTER = "2.5rem";
 
 /**
  * One day is a single CSS grid: column 1 is the time gutter, the rest are the
@@ -45,10 +42,13 @@ export function DayGrid({
   // ?loc= narrowing: the column is not a room, so the rooms line up from one
   // day to the next whatever is shown (issue #392, section 2.6).
   const showMeetings = takesPartInMeetings(data.meetings, data.availability);
+  // Rows before the body: header, area text, and room photos if any. The
+  // bands are absolute, so they must name their row to stay out of auto-placement.
+  const bodyRow = firstImageIndex !== -1 ? 4 : 3;
 
   return (
     <div
-      className="grid bg-surface"
+      className="relative grid bg-surface"
       style={{
         // The grid lays out at these widths and scrolls, so every pixel the
         // 1-on-1 column takes is one the rooms lose.
@@ -127,6 +127,7 @@ export function DayGrid({
           ))}
         </>
       )}
+      <MomentBands day={day} column={showMeetings ? 3 : 2} row={bodyRow} />
       {/* The time gutter sticks to the left; every column places its blocks
           in pixels on the same 44px-per-slot scale. */}
       <div

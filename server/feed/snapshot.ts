@@ -8,6 +8,7 @@ import {
   eventScheduleBySlug,
   toDayView,
   toEventView,
+  toMomentView,
 } from "@/server/modules/events/module";
 import {
   eventMeetings,
@@ -85,6 +86,7 @@ async function assemble(
     now: now.toISOString(),
     event: toEventView(schedule.event),
     days: schedule.days.map(toDayView),
+    moments: schedule.moments.map(toMomentView),
     locations: locations.map(toLocationView),
     unavailability: sessions.unavailability.map(toUnavailabilityView),
     guests: guests.map((g) => ({ ...toEventGuestView(g), member: g.member })),

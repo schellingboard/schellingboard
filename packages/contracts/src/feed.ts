@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { dayViewSchema, eventViewSchema } from "./event";
+import { dayViewSchema, eventViewSchema, momentViewSchema } from "./event";
 import { unavailabilityViewSchema } from "./location";
 import { meetingPointSchema, meetingSchema } from "./meeting";
 import { snapshotProposalSchema } from "./proposal";
@@ -42,6 +42,16 @@ export const feedMessageSchema = z
       ...common,
       type: z.literal("day.deleted"),
       dayId: z.string(),
+    }),
+    z.object({
+      ...common,
+      type: z.literal("moment.changed"),
+      moment: momentViewSchema,
+    }),
+    z.object({
+      ...common,
+      type: z.literal("moment.deleted"),
+      momentId: z.string(),
     }),
     z.object({
       ...common,

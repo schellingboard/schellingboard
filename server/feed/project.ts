@@ -1,6 +1,10 @@
 import type { FeedMessage } from "@schellingboard/contracts/feed";
 import type { RecordedChange, Viewer } from "@schellingboard/domain/change";
-import { toDayView, toEventView } from "@/server/modules/events/module";
+import {
+  toDayView,
+  toEventView,
+  toMomentView,
+} from "@/server/modules/events/module";
 import {
   toMeetingPointView,
   toMeetingView,
@@ -96,6 +100,14 @@ export function project(
       };
     case "day.deleted":
       return { ...common, type: change.type, dayId: change.subjectId };
+    case "moment.changed":
+      return {
+        ...common,
+        type: change.type,
+        moment: toMomentView(change.payload.moment),
+      };
+    case "moment.deleted":
+      return { ...common, type: change.type, momentId: change.subjectId };
     case "proposal.created":
     case "proposal.changed":
       return {

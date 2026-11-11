@@ -34,6 +34,41 @@ describe("eventContextFrom", () => {
     ]);
   });
 
+  it("puts each day's shared moments on it, as dates", () => {
+    const context = eventContextFrom({
+      ...snapshot,
+      moments: [
+        {
+          id: "m",
+          dayId: "d",
+          title: "Lunch",
+          description: "Buffet",
+          start: iso(12),
+          end: iso(13),
+        },
+        {
+          id: "elsewhere",
+          dayId: "other",
+          title: "Dinner",
+          description: "",
+          start: iso(12),
+          end: iso(13),
+        },
+      ],
+    });
+
+    expect(context.days[0].moments).toEqual([
+      {
+        id: "m",
+        dayId: "d",
+        title: "Lunch",
+        description: "Buffet",
+        start: new Date(iso(12)),
+        end: new Date(iso(13)),
+      },
+    ]);
+  });
+
   it("lists a session's rooms in the event's room order", () => {
     const [room] = snapshot.locations;
     const context = eventContextFrom({

@@ -16,7 +16,7 @@ import type {
   MeetingAnswered,
   RecordedChange,
 } from "@schellingboard/domain/change";
-import type { Day, Event } from "@schellingboard/domain/event";
+import type { Day, Event, SharedMoment } from "@schellingboard/domain/event";
 import type {
   Location,
   LocationUnavailability,
@@ -77,6 +77,11 @@ function reviveDay(json: Day): Day {
     startBookings: new Date(raw.startBookings),
     endBookings: new Date(raw.endBookings),
   };
+}
+
+function reviveMoment(json: SharedMoment): SharedMoment {
+  const raw = json as unknown as Record<string, string>;
+  return { ...json, start: new Date(raw.start), end: new Date(raw.end) };
 }
 
 function revivePeriod(json: LocationUnavailability): LocationUnavailability {
@@ -174,6 +179,16 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
         type: row.type,
         subjectType: "day",
         payload: { day: reviveDay(payload.day) },
+      };
+    }
+    case "moment.changed":
+    case "moment.deleted": {
+      const payload = row.payload as { moment: SharedMoment };
+      return {
+        ...common,
+        type: row.type,
+        subjectType: "moment",
+        payload: { moment: reviveMoment(payload.moment) },
       };
     }
     case "location.changed":
@@ -372,6 +387,8 @@ const KNOWN_TYPES: RecordedChange["type"][] = [
   "day.created",
   "day.changed",
   "day.deleted",
+  "moment.changed",
+  "moment.deleted",
   "session.created",
   "session.changed",
   "session.deleted",

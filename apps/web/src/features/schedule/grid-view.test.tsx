@@ -66,6 +66,33 @@ describe("GridView", () => {
   });
 
   it(
+    "paints a shared moment as a labelled band whose pill opens its details",
+    { tags: ["007-US15"] },
+    async () => {
+      const withMoment = snapshotWith({
+        moments: [
+          {
+            id: "m",
+            dayId: "d",
+            title: "Lunch",
+            description: "Buffet in the foyer",
+            start: iso(12),
+            end: iso(13),
+          },
+        ],
+      });
+      renderScheduled(<Grid data={dataOf(withMoment)} />, {
+        snapshot: withMoment,
+      });
+
+      const pill = screen.getByRole("button", { name: "Lunch · 12:00–13:00" });
+      expect(screen.queryByText("Buffet in the foyer")).toBeNull();
+      await userEvent.setup().click(pill);
+      expect(screen.getByText("Buffet in the foyer")).toBeTruthy();
+    }
+  );
+
+  it(
     "shows a placeholder for a room without an image beside one with an image",
     { tags: ["017-US1"] },
     () => {

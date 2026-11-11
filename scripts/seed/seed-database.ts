@@ -274,6 +274,7 @@ function clearAll() {
   db.delete(schema.sessions).run();
   db.delete(schema.proposalHosts).run();
   db.delete(schema.sessionProposals).run();
+  db.delete(schema.sharedMoments).run();
   db.delete(schema.days).run();
   db.delete(schema.eventGuests).run();
   db.delete(schema.eventLocations).run();
@@ -456,6 +457,30 @@ async function seedTestData(profile: SeedProfile, now = new Date()) {
   console.log(
     `  ✅ Created ${dayRows.length} days across ${eventRows.length} events`
   );
+
+  // Conference Gamma's shared moments: an opening keynote everyone is invited
+  // to, and coffee every afternoon. The hard "Lunch Break" blockers stay.
+  const gammaConfig0 = eventConfigs[2];
+  const gammaDays = dayRows.filter((d) => d.eventId === eventRows[2].id);
+  const momentRows = [
+    {
+      id: nanoid(),
+      dayId: gammaDays[0].id,
+      title: "Opening keynote",
+      description: "Everyone in the first room",
+      start: berlinTime(gammaConfig0.start, 0, 9, 30).toISOString(),
+      end: berlinTime(gammaConfig0.start, 0, 10, 30).toISOString(),
+    },
+    ...gammaDays.map((day, dayIndex) => ({
+      id: nanoid(),
+      dayId: day.id,
+      title: "Coffee & cake",
+      description: "In the foyer",
+      start: berlinTime(gammaConfig0.start, dayIndex, 15, 30).toISOString(),
+      end: berlinTime(gammaConfig0.start, dayIndex, 16, 0).toISOString(),
+    })),
+  ];
+  db.insert(schema.sharedMoments).values(momentRows).run();
 
   console.log("  🤝 Creating test 1-on-1 availability...");
   const meetingPointRows = eventRows.flatMap((ev) =>

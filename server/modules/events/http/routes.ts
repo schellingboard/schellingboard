@@ -305,19 +305,21 @@ export function addAdminEventRoutes(app: App, events: () => EventUseCases) {
   });
 
   app.openapi(createMoments, async (c) => {
-    const result = await events().createMoments(c.var.actor, {
-      ...c.req.valid("json"),
-      eventId: c.req.valid("param").id,
-    });
+    const result = await events().createMoments(
+      c.var.actor,
+      { ...c.req.valid("json"), eventId: c.req.valid("param").id },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error);
     return c.json(result.value.map(toMomentView), 201);
   });
 
   app.openapi(updateMoment, async (c) => {
-    const result = await events().updateMoment(c.var.actor, {
-      ...c.req.valid("json"),
-      id: c.req.valid("param").id,
-    });
+    const result = await events().updateMoment(
+      c.var.actor,
+      { ...c.req.valid("json"), id: c.req.valid("param").id },
+      c.var.now
+    );
     if (!result.ok) return problem(result.error);
     return c.json(toMomentView(result.value), 200);
   });
@@ -325,7 +327,8 @@ export function addAdminEventRoutes(app: App, events: () => EventUseCases) {
   app.openapi(deleteMoment, async (c) => {
     const result = await events().deleteMoment(
       c.var.actor,
-      c.req.valid("param")
+      c.req.valid("param"),
+      c.var.now
     );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);

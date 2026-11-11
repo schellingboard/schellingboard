@@ -53,6 +53,7 @@ export const snapshot: Snapshot = {
       version: 1,
     },
   ],
+  moments: [],
   locations: [
     {
       id: "r",

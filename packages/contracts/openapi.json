@@ -773,6 +773,28 @@
               ]
             }
           },
+          "moments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "dayId": { "type": "string" },
+                "title": { "type": "string" },
+                "description": { "type": "string" },
+                "start": { "type": "string", "format": "date-time" },
+                "end": { "type": "string", "format": "date-time" }
+              },
+              "required": [
+                "id",
+                "dayId",
+                "title",
+                "description",
+                "start",
+                "end"
+              ]
+            }
+          },
           "locations": {
             "type": "array",
             "items": { "$ref": "#/components/schemas/SnapshotLocation" }
@@ -905,6 +927,7 @@
           "now",
           "event",
           "days",
+          "moments",
           "locations",
           "unavailability",
           "guests",
@@ -1216,6 +1239,50 @@
               "dayId": { "type": "string" }
             },
             "required": ["seq", "commandKey", "type", "dayId"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["moment.changed"] },
+              "moment": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "string" },
+                  "dayId": { "type": "string" },
+                  "title": { "type": "string" },
+                  "description": { "type": "string" },
+                  "start": { "type": "string", "format": "date-time" },
+                  "end": { "type": "string", "format": "date-time" }
+                },
+                "required": [
+                  "id",
+                  "dayId",
+                  "title",
+                  "description",
+                  "start",
+                  "end"
+                ]
+              }
+            },
+            "required": ["seq", "commandKey", "type", "moment"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "seq": { "type": "integer" },
+              "commandKey": {
+                "type": ["string", "null"],
+                "description": "The Idempotency-Key of your own request that made it"
+              },
+              "type": { "type": "string", "enum": ["moment.deleted"] },
+              "momentId": { "type": "string" }
+            },
+            "required": ["seq", "commandKey", "type", "momentId"]
           },
           {
             "type": "object",
