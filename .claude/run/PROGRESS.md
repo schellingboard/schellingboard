@@ -82,15 +82,10 @@
 
 ## Questions
 
-- 22f (owner): (1) Should create/edit forms become a panel kind at all, which amends ADR 0020's
-  "tasks stay dialogs"? (2) If yes, order: proposal forms, edit profile, then session forms? (3)
-  Session forms in a 320-800px panel, or keep them full-page? (4) "Need ideas?" stays a dialog, or
-  moves with the proposal form? (5) Quick Voting stays a page? Nothing implemented before answers.
+- 22f (owner, answered): all create/edit forms go into the panel (plan step 35); agenda stays one list; no 22f GitHub issue; installed-app share: text "Copy link" at the end of panel content (step 24a).
 
 - `profile-photo.spec.ts:9` fails without my changes too (about-me heading x 849 < 1184: the wide
   two-column layout is not reached at the default viewport). Separate fix.
-- 22b: the installed (standalone) app has no address bar, the reason ADR 0020 gave for the Share
-  button, so it can no longer share a link. Removal kept as decided; restore a share action there?
 - #691: the script uses the API, not a browser, so identity requests per navigation (#1148) are
   counted as one per page load only.
 
