@@ -166,7 +166,7 @@ describe("the profile modal", () => {
       expect(talk.getAttribute("href")).toBe("/Camp/sessions/s1");
       expect(
         screen.getByRole("link", { name: "Proposed talk" }).getAttribute("href")
-      ).toBe("/Camp/proposals?viewProposal=p1");
+      ).toBe("/Camp/proposals/p1");
     }
   );
 

@@ -29,12 +29,18 @@ function Loaded(view: EventView) {
   const { history } = useRouter();
   const { panel, open } = usePanel();
   const [openAtMount] = useState(() =>
-    panel?.item.slug === slug ? panel.item.id : null
+    panel?.item.kind === "session" && panel.item.slug === slug
+      ? panel.item.id
+      : null
   );
   const viewSession = params.get("viewSession");
   const redirected = useRef<string | null>(null);
   useEffect(() => {
-    if (!viewSession || redirected.current === viewSession) return;
+    if (!viewSession) {
+      redirected.current = null;
+      return;
+    }
+    if (redirected.current === viewSession) return;
     redirected.current = viewSession;
     const rest = new URLSearchParams(params);
     rest.delete("viewSession");
@@ -71,7 +77,9 @@ function Loaded(view: EventView) {
         onBack={back}
         openSession={openSession}
         revealSessionId={
-          panel?.landed && panel.item.slug === slug
+          panel?.landed &&
+          panel.item.kind === "session" &&
+          panel.item.slug === slug
             ? panel.item.id
             : openAtMount
         }

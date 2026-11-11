@@ -30,6 +30,18 @@ describe("panel history", () => {
     );
   });
 
+  it("names a proposal by its own address and stacks it on a session", () => {
+    const history = start();
+    openPanel(history, session("s1"));
+    openPanel(
+      history,
+      { kind: "proposal", slug: "conf", id: "p1" },
+      { fromPanel: true }
+    );
+    expect(history.location.pathname).toBe("/conf/proposals/p1");
+    expect(panelOf(history.location)).toMatchObject({ depth: 2 });
+  });
+
   it("opens over the page, which stays the background with its query intact", () => {
     const history = start();
     openPanel(history, session("s1"));

@@ -125,7 +125,7 @@ describe("quick voting", () => {
     expect(heading()).toBe("Idea b");
     expect(
       screen.getByRole("link", { name: "Idea b" }).getAttribute("href")
-    ).toBe("/conf/proposals/quick-voting?viewProposal=b");
+    ).toBe("/conf/proposals/b");
     expect(
       screen.getAllByRole("link", { name: "HOST" }).length
     ).toBeGreaterThan(0);

@@ -19,8 +19,8 @@ TanStack Router, styled with Tailwind and the colour tokens in `styles/tokens.cs
   forwards, replacing the entry, to `/{slug}/schedule` with the same search params and hash if it
   has params or scheduling has started, else to `/{slug}/proposals`; `app/event-landing.tsx`),
   `/{slug}/schedule` (the schedule), `/{slug}/proposals/**` (list, quick voting, new, edit;
-  `?viewProposal=` opens the modal), the session forms, `/{slug}/meetings`, `/guests/**`,
-  `/settings` (with its Account security section; `/account-security` redirects to
+  `/{slug}/proposals/:id` opens the proposal panel), the session forms, `/{slug}/meetings`,
+  `/guests/**`, `/settings` (with its Account security section; `/account-security` redirects to
   `/settings#security`), `/notifications`, `/auth/login`, `/auth/reset`, `/login` (the site
   password, open to visitors without the cookie; `POST /api/v1/auth/site`) (`app/account-pages.tsx`)
   and `/admin/**` (`app/admin-pages.tsx`). Anything else is "Page not found".
@@ -149,16 +149,14 @@ covered by the E2E suite; there is no browser component runner.
 
 (anchor: MnpjIo7Y)
 
-A session opens in the side panel (`ui/side-panel.tsx`, mounted by `app/session-panel-host.tsx`) at
-`/{slug}/sessions/:id`; `app/panel-history.ts` keeps the page behind it and the stack depth in
-`history.state`, and `?viewSession=` redirects to it. The proposal and 1-on-1 modals are
-`?viewProposal=` and `?viewMeeting=` on the page behind them. A click on a link inside the SPA
-pushes the address, so Back closes the modal (`SpaLinks` arms this; `app/proposal-nav.ts` holds the
-flag). An address opened directly, or reached from a notification or an email, has no entry of ours
-to pop, so closing it removes the parameter. The flag must be taken when the modal closes and
-cleared when none is open, or a later modal inherits "close by going back" (two E2E specs cover it).
-Links from legacy pages and emails are plain anchors: build them with `links.ts` and
-`utils/notifications.ts`, never a second copy.
+A session and a proposal open in the side panel (`ui/side-panel.tsx`, mounted by
+`app/panel-host.tsx`) at `/{slug}/sessions/:id` and `/{slug}/proposals/:id`. `app/panel-history.ts`
+keeps the page behind it and the stack depth in `history.state`; `SpaLinks` opens these links in the
+panel. An address opened directly lands on the schedule or the proposals list with the panel over
+it, and `?viewSession=` and `?viewProposal=` redirect the same way. The 1-on-1 modal is still
+`?viewMeeting=` on the page behind it, closed by Back or by removing the parameter. Links from
+legacy pages and emails are plain anchors: build them with `links.ts` and `utils/notifications.ts`,
+never a second copy.
 
 ## Failure notices
 

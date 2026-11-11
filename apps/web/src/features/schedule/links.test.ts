@@ -12,7 +12,7 @@ describe("scheduleLinks", () => {
   it("points the modal's pages at the app's own screens", () => {
     expect(links.guest("g1")).toBe("/guests/g1");
     expect(links.editSession("s1")).toBe("/conf/edit-session?sessionID=s1");
-    expect(links.proposal("p1")).toBe("/conf/proposals?viewProposal=p1");
+    expect(links.proposal("p1")).toBe("/conf/proposals/p1");
   });
 
   it("opens a 1-on-1 the same way", () => {
