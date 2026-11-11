@@ -138,3 +138,20 @@ test("a search survives opening a session, closing it and a reload @007-US3", as
   await page.reload();
   await expect(search).toHaveValue("comparative");
 });
+
+test("the My schedule menu opens over the grid and its options can be clicked @007-US3", async ({
+  page,
+}) => {
+  await loginAndGoto(page, "/guests");
+  await selectUser(page, "Charlie Test");
+  await page.getByRole("link", { name: "Conference Gamma" }).first().click();
+
+  await filterChip(page, "My schedule").click();
+  await filterChip(page, "Choose what My schedule shows").click();
+  await page.getByRole("checkbox", { name: "Hosting" }).uncheck();
+
+  await expect(
+    page.getByRole("checkbox", { name: "Hosting" })
+  ).not.toBeChecked();
+  await expect(page.getByText(/My schedule \(RSVP'd\)/)).toBeVisible();
+});

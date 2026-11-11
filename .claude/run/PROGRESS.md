@@ -92,4 +92,4 @@
 
 ## Next step
 
-Step 23 (#831).
+Step 22b (copy-link button), then 23 (#831).

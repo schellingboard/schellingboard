@@ -63,6 +63,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **"My schedule" menu works on the grid** (#1587): its options opened hidden behind the grid
+  headers.
 - **Ctrl+Z undoes Markdown toolbar formatting** (#1145): after clicking Bold, a link or a list
   button, undo used to leave the text as it was.
 - **Suggestion lists close when you tap outside** (#683): on phones, tapping beside the list in
