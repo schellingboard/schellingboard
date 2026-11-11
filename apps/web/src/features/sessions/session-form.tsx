@@ -21,7 +21,6 @@ import {
   formatDuration,
   formatOptionalTime,
   formatSlotLabel,
-  TIME_FORMAT,
 } from "@schellingboard/domain/time";
 import { overlappingMoment } from "@schellingboard/domain/shared-moment";
 import { dateOnDay } from "@schellingboard/domain/event";
@@ -58,6 +57,7 @@ import {
   minutesPastGrid,
   startTimesFor,
 } from "./session-model";
+import { useTimeFormat } from "../../app/time-format";
 import { useHostClashes } from "./use-host-clashes";
 
 const FIELD_NAMES = [
@@ -147,6 +147,7 @@ function Fields({
 }) {
   const { event } = snapshot;
   const { timezone, breakMinutes, slotIncrementMinutes } = event;
+  const timeFormat = useTimeFormat();
   const maxSessionDuration = event.maxSessionDuration;
   const notify = useNotify();
   const formRef = useRef<HTMLFormElement>(null);
@@ -238,6 +239,7 @@ function Fields({
     capacityNumber > room.capacity;
 
   const startTimes = startTimesFor({
+    timeFormat,
     day,
     sessions: snapshot.sessions,
     own: session,
@@ -592,7 +594,9 @@ function Fields({
             Day<span className="mx-1 text-brand-fg">*</span>
           </legend>
           {lockedStart !== null ? (
-            <p className="text-fg-muted">{formatDayLabel(day, timezone)}</p>
+            <p className="text-fg-muted">
+              {formatDayLabel(day, timezone, timeFormat)}
+            </p>
           ) : (
             <div className="grid gap-3">
               {days.map((d) => (
@@ -607,7 +611,7 @@ function Fields({
                     onChange={() => setDayId(d.id)}
                     className="h-4 w-4 border-line text-brand focus:ring-brand-accent"
                   />
-                  {formatDayLabel(d, timezone)}
+                  {formatDayLabel(d, timezone, timeFormat)}
                 </label>
               ))}
             </div>
@@ -623,7 +627,8 @@ function Fields({
               {formatSlotLabel(
                 new Date(lockedStart + breakMs),
                 day.start,
-                timezone
+                timezone,
+                timeFormat
               )}
             </p>
           </div>
@@ -672,8 +677,9 @@ function Fields({
         </fieldset>
         {runsFrom && interval && (
           <p className="text-sm text-fg-muted">
-            Your session runs {formatSlotLabel(runsFrom, day.start, timezone)} –{" "}
-            {formatSlotLabel(interval.end, day.start, timezone)}.
+            Your session runs{" "}
+            {formatSlotLabel(runsFrom, day.start, timezone, timeFormat)} –{" "}
+            {formatSlotLabel(interval.end, day.start, timezone, timeFormat)}.
           </p>
         )}
         {moment && (
@@ -683,8 +689,8 @@ function Fields({
           >
             <p className="text-sm font-medium">
               This slot is during {moment.title} (
-              {formatOptionalTime(moment.start, timezone, TIME_FORMAT)} –{" "}
-              {formatOptionalTime(moment.end, timezone, TIME_FORMAT)})
+              {formatOptionalTime(moment.start, timezone, timeFormat)} –{" "}
+              {formatOptionalTime(moment.end, timezone, timeFormat)})
             </p>
             {moment.description && (
               <p className="text-sm">{moment.description}</p>
@@ -710,7 +716,7 @@ function Fields({
           <div className="rounded-md border border-danger-border bg-danger-tint px-4 py-3 text-danger-fg">
             <p className="text-sm font-medium">Warning: schedule clash</p>
             {clashes.map((clash) => {
-              const line = hostClashLine(clash, timezone);
+              const line = hostClashLine(clash, timezone, timeFormat);
               return (
                 <p key={line} className="text-sm font-medium">
                   - {line}

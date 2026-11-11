@@ -42,7 +42,11 @@ export type ScheduleData = {
   availability: string[];
 };
 
-export function scheduleDataFrom(snapshot: Snapshot, now: Date): ScheduleData {
+export function scheduleDataFrom(
+  snapshot: Snapshot,
+  now: Date,
+  timeFormat?: string
+): ScheduleData {
   const { event, days, sessions, locations, unavailability, rsvps } =
     eventContextFrom(snapshot);
   const rsvpdIds = new Set(rsvps.map((r) => r.sessionId));
@@ -64,7 +68,7 @@ export function scheduleDataFrom(snapshot: Snapshot, now: Date): ScheduleData {
           )
       )
   );
-  const meetings = meetingViewsFrom(snapshot, now);
+  const meetings = meetingViewsFrom(snapshot, now, timeFormat);
   const guestId = snapshot.me?.guestId ?? null;
   const committed = sessions.filter(
     (s) => rsvpdIds.has(s.id) || s.hosts.some((h) => h.id === guestId)

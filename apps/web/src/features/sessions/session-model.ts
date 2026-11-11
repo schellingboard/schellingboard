@@ -42,6 +42,7 @@ export function startTimesFor({
   roomIds,
   staysInRooms,
   event,
+  timeFormat = TIME_FORMAT,
 }: {
   day: Day;
   sessions: SessionRow[];
@@ -49,6 +50,7 @@ export function startTimesFor({
   unavailability: Snapshot["unavailability"];
   roomIds: string[];
   staysInRooms: boolean;
+  timeFormat?: string;
   event: Pick<
     Snapshot["event"],
     "breakMinutes" | "slotIncrementMinutes" | "maxSessionDuration" | "timezone"
@@ -86,7 +88,7 @@ export function startTimesFor({
     );
   };
   const label = (slot: number) =>
-    formatSlotLabel(new Date(slot + breakMs), day.start, timezone);
+    formatSlotLabel(new Date(slot + breakMs), day.start, timezone, timeFormat);
 
   const startTimes: StartTime[] = [];
   for (
@@ -151,9 +153,13 @@ export type HostClash = {
   end: string;
 };
 
-export function hostClashLine(clash: HostClash, timezone: string): string {
+export function hostClashLine(
+  clash: HostClash,
+  timezone: string,
+  format = TIME_FORMAT
+): string {
   const time = (iso: string) =>
-    DateTime.fromISO(iso).setZone(timezone).toFormat(TIME_FORMAT);
+    DateTime.fromISO(iso).setZone(timezone).toFormat(format);
   const interval = `from ${time(clash.start)} to ${time(clash.end)}`;
   return clash.kind === "hosting"
     ? `${clash.guestName} is hosting ${clash.title} ${interval}`

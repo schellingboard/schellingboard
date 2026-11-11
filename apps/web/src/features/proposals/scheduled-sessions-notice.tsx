@@ -1,6 +1,7 @@
 import { Fragment, type ReactNode } from "react";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
-import { formatOptionalTime, TIME_FORMAT } from "@schellingboard/domain/time";
+import { formatOptionalTime } from "@schellingboard/domain/time";
+import { useTimeFormat } from "../../app/time-format";
 import type { ProposalLinks } from "./links";
 
 /**
@@ -18,6 +19,7 @@ export function ScheduledSessionsNotice({
   links: Pick<ProposalLinks, "session">;
   children: ReactNode;
 }) {
+  const timeFormat = useTimeFormat();
   const scheduled = snapshot.sessions
     .filter((s) => s.proposalId === proposalId && s.startTime)
     .sort((a, b) => a.startTime!.localeCompare(b.startTime!));
@@ -40,7 +42,7 @@ export function ScheduledSessionsNotice({
               {formatOptionalTime(
                 new Date(session.startTime!),
                 snapshot.event.timezone,
-                `EEEE ${TIME_FORMAT}`
+                `EEEE ${timeFormat}`
               )}
               {rooms.length > 0 && ` in ${rooms.join(", ")}`}
             </a>

@@ -120,6 +120,9 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL,
 
+    // Automatic time format follows the browser locale; most assertions read HH:mm.
+    locale: "en-GB",
+
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
   },

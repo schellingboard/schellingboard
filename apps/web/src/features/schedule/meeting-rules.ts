@@ -1,6 +1,7 @@
 import { DateTime } from "luxon";
 import { inSchedPhase } from "@schellingboard/domain/phase";
 import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
+import { TIME_FORMAT } from "@schellingboard/domain/time";
 
 import type { Event } from "@schellingboard/domain/event";
 import type { MeetingView } from "./meeting-view";
@@ -37,10 +38,11 @@ export function canCancel(
 export function blockTimeLabel(
   meetings: Pick<MeetingView, "slotStart" | "slotEnd">[],
   breakMinutes: number,
-  timezone: string
+  timezone: string,
+  format = TIME_FORMAT
 ): string {
   const clock = (date: Date) =>
-    DateTime.fromJSDate(date).setZone(timezone).toFormat("HH:mm");
+    DateTime.fromJSDate(date).setZone(timezone).toFormat(format);
   const starts = meetings.map((m) => m.slotStart).sort();
   const ends = meetings.map((m) => m.slotEnd).sort();
   const start = shownSlotStart(new Date(starts[0]), breakMinutes);

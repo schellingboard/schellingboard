@@ -1,7 +1,8 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Session } from "@schellingboard/domain/session";
 import { overlappingMoment } from "@schellingboard/domain/shared-moment";
-import { formatOptionalTime, TIME_FORMAT } from "@schellingboard/domain/time";
+import { formatOptionalTime } from "@schellingboard/domain/time";
+import { useTimeFormat } from "../../app/time-format";
 import {
   attendeeGuests,
   type AttendeesQuery,
@@ -107,6 +108,7 @@ function useAttendees(sessionId: string, numRsvps: number) {
 
 function Details({ session }: { session: Session }) {
   const { data, links, params, timezone, actions } = useSchedule();
+  const timeFormat = useTimeFormat();
   const { rsvpd, busy, click, dialogs } = useRsvp(session);
   const attendeeState = useAttendees(session.id, session.numRsvps);
 
@@ -251,17 +253,17 @@ function Details({ session }: { session: Session }) {
             {formatOptionalTime(
               session.startTime,
               timezone,
-              `EEEE ${TIME_FORMAT}`
+              `EEEE ${timeFormat}`
             )}
             {" - "}
-            {formatOptionalTime(session.endTime, timezone, TIME_FORMAT)}
+            {formatOptionalTime(session.endTime, timezone, timeFormat)}
           </span>
         </div>
         {moment && (
           <p className="text-fg-muted">
             During {moment.title} (
-            {formatOptionalTime(moment.start, timezone, TIME_FORMAT)}–
-            {formatOptionalTime(moment.end, timezone, TIME_FORMAT)})
+            {formatOptionalTime(moment.start, timezone, timeFormat)}–
+            {formatOptionalTime(moment.end, timezone, timeFormat)})
           </p>
         )}
         <div className="flex gap-2">

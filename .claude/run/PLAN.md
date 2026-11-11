@@ -34,7 +34,8 @@ the E2E specs a step touches; the user runs the full suite at the end.
 18. DONE **#380** ESLint 10 (dependabot ignore removed; typescript-eslint packages dropped).
 19. DONE **#1169** Property tests (`tests/unit/*.property.test.ts`) for slots, meeting-slots,
     day-window, reminder-schedule, vote stats.
-20. **#607** (Medium) 12/24-hour time display preference.
+20. DONE **#607** Time format setting (`TimeFormatProvider`, `useTimeFormat`, cookie
+    `sb-time-format`).
 21. **#993** (Medium) Attendee sees a list of their own comments.
 22. **#1046** (Medium) Ask someone to open up to 1-on-1s. Read the comment too.
 23. **#831** (Medium) Consistent pagination strategy; `Pager` (#684) exists, read the 5 comments and
@@ -45,11 +46,11 @@ the E2E specs a step touches; the user runs the full suite at the end.
     (hidden while one locale exists). Issue step 2.
 26. **#1328c** Locale-aware formatting, builds on #607. Issue step 3.
 27. **#1328d** Guardrails: lint rule, extract/missing-key check, pseudo-locale. Issue step 4.
-28. **#1328e** Externalize strings, one commit per area (a to g of issue step 5); split into
-    PLAN.md steps when reached.
+28. **#1328e** Externalize strings, one commit per area (a to g of issue step 5); split into PLAN.md
+    steps when reached.
 29. **#1328f** Server side: emails and notifications per recipient locale. Issue step 6.
-30. **#1328g** German translation, glossary, switcher on, E2E, changelog. Issue step 7. Only the last
-    commit says `fixes #1328`; earlier ones say `issue #1328`.
+30. **#1328g** German translation, glossary, switcher on, E2E, changelog. Issue step 7. Only the
+    last commit says `fixes #1328`; earlier ones say `issue #1328`.
 31. **#1585** (Low) Hover cue on duration options, toast after session save/delete.
 32. **#204** (Low) Searchable Combobox for every select with a long list.
 33. **#1108** (Low) Arrival and departure times on attendee profiles.

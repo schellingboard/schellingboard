@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { scheduleDataFrom } from "../features/schedule/data";
+import { useTimeFormat } from "./time-format";
 import { ScheduleProvider } from "../features/schedule/context";
 import { scheduleLinks } from "../features/schedule/links";
 import { SessionPanel } from "../features/schedule/session-panel";
@@ -118,7 +119,11 @@ function MeetingHost({
   const view = useEventView();
   const { close, back } = usePanel();
   const { snapshot, now, slug } = view;
-  const data = useMemo(() => scheduleDataFrom(snapshot, now), [snapshot, now]);
+  const timeFormat = useTimeFormat();
+  const data = useMemo(
+    () => scheduleDataFrom(snapshot, now, timeFormat),
+    [snapshot, now, timeFormat]
+  );
   const links = useMemo(() => scheduleLinks(slug), [slug]);
   const { actions, picker } = useScheduleActions(view);
   const shareUrl = links.meeting(item.id);
@@ -160,7 +165,11 @@ function SessionHost({
   const view = useEventView();
   const { open, close, back, setHash } = usePanel();
   const { snapshot, now, slug } = view;
-  const data = useMemo(() => scheduleDataFrom(snapshot, now), [snapshot, now]);
+  const timeFormat = useTimeFormat();
+  const data = useMemo(
+    () => scheduleDataFrom(snapshot, now, timeFormat),
+    [snapshot, now, timeFormat]
+  );
   const links = useMemo(() => scheduleLinks(slug), [slug]);
   const { actions, picker } = useScheduleActions(view);
   const params = useMemo(

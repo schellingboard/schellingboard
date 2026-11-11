@@ -573,3 +573,5 @@ reach your phone or laptop when the site isn't open.
 - **Appearance** — System, Light or Dark, also available at the very bottom of every page.
   **System** follows your phone or laptop, so the site turns dark in the evening if your device
   does. The choice is remembered per device, not per name, and works before you've picked a name.
+- **Time format** — Automatic, 12-hour (2:00 PM) or 24-hour (14:00). **Automatic** follows your
+  browser's language. Remembered per device. Emails and reminders always use 24-hour times.

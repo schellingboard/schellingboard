@@ -3,6 +3,7 @@ import type { MeetingAvailabilityCalls } from "../../commands/meeting-availabili
 import type { SettingsCalls } from "../../commands/settings";
 import type { SettingsState } from "../../queries/settings";
 import { ThemeSelect } from "../../app/theme";
+import { TimeFormatSelect } from "../../app/time-format";
 import { AvailabilityForm } from "../meetings/availability-form";
 import { EmailSettingsForm } from "./email-settings-form";
 import { PushNotifications } from "./push-notifications";
@@ -124,6 +125,13 @@ export function Appearance() {
       </p>
       <div>
         <ThemeSelect />
+      </div>
+      <h3 className="text-sm font-medium">Time format</h3>
+      <p className="text-sm text-fg-subtle">
+        Automatic follows your browser's language.
+      </p>
+      <div>
+        <TimeFormatSelect />
       </div>
     </section>
   );
