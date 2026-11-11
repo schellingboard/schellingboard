@@ -2,8 +2,9 @@ import type { z } from "zod";
 import type {
   dayViewSchema,
   eventViewSchema,
+  momentViewSchema,
 } from "@schellingboard/contracts/event";
-import type { Day, Event } from "@schellingboard/domain/event";
+import type { Day, Event, SharedMoment } from "@schellingboard/domain/event";
 
 const iso = (d: Date | undefined) => d?.toISOString() ?? null;
 
@@ -45,5 +46,18 @@ export function toDayView(d: Day): z.input<typeof dayViewSchema> {
     startBookings: d.startBookings.toISOString(),
     endBookings: d.endBookings.toISOString(),
     version: d.version,
+  };
+}
+
+export function toMomentView(
+  m: SharedMoment
+): z.input<typeof momentViewSchema> {
+  return {
+    id: m.id,
+    dayId: m.dayId,
+    title: m.title,
+    description: m.description,
+    start: m.start.toISOString(),
+    end: m.end.toISOString(),
   };
 }

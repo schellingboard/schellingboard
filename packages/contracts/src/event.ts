@@ -105,7 +105,35 @@ export const dayViewSchema = dayBodySchema.extend({
   version: z.number().int(),
 });
 
+const timeOfDay = z
+  .string()
+  .regex(/^\d{2}:\d{2}$/)
+  .describe("HH:mm in the event's time zone, on the moment's day");
+
+export const momentBodySchema = z.object({
+  title: z.string().max(100),
+  description: z.string().max(200).default(""),
+  startTime: timeOfDay,
+  endTime: timeOfDay,
+});
+
+export const momentCreateBodySchema = momentBodySchema.extend({
+  dayIds: z
+    .array(z.string())
+    .describe("One moment is made on each of these days"),
+});
+
+export const momentViewSchema = z.object({
+  id: z.string(),
+  dayId: z.string(),
+  title: z.string(),
+  description: z.string(),
+  start: instant,
+  end: instant,
+});
+
 export const eventDetailSchema = z.object({
   event: eventViewSchema,
   days: z.array(dayViewSchema),
+  moments: z.array(momentViewSchema),
 });

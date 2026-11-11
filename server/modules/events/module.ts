@@ -9,7 +9,7 @@ export {
   type EventUseCases,
 } from "./application/use-cases";
 export { addAdminEventRoutes, addEventReadRoutes } from "./http/routes";
-export { toDayView, toEventView } from "./http/view";
+export { toDayView, toEventView, toMomentView } from "./http/view";
 export { eventScheduleBySlug } from "./application/snapshot";
 export {
   allEvents,

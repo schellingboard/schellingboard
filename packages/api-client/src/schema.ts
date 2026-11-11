@@ -4888,6 +4888,16 @@ export interface paths {
                 eventId: string;
                 version: number;
               }[];
+              moments: {
+                id: string;
+                dayId: string;
+                title: string;
+                description: string;
+                /** Format: date-time */
+                start: string;
+                /** Format: date-time */
+                end: string;
+              }[];
             };
           };
         };
@@ -5596,6 +5606,180 @@ export interface paths {
     };
     post?: never;
     /** @description Deletes the day and every session overlapping it. */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Deleted */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/events/{id}/moments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Makes one shared moment on each of the days. A moment paints a band across every room and blocks nothing. Nothing is made if one day refuses the times. */
+    post: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            title: string;
+            /** @default  */
+            description?: string;
+            /** @description HH:mm in the event's time zone, on the moment's day */
+            startTime: string;
+            /** @description HH:mm in the event's time zone, on the moment's day */
+            endTime: string;
+            /** @description One moment is made on each of these days */
+            dayIds: string[];
+          };
+        };
+      };
+      responses: {
+        /** @description The new moments, one per day */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              id: string;
+              dayId: string;
+              title: string;
+              description: string;
+              /** Format: date-time */
+              start: string;
+              /** Format: date-time */
+              end: string;
+            }[];
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/moments/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            title: string;
+            /** @default  */
+            description?: string;
+            /** @description HH:mm in the event's time zone, on the moment's day */
+            startTime: string;
+            /** @description HH:mm in the event's time zone, on the moment's day */
+            endTime: string;
+          };
+        };
+      };
+      responses: {
+        /** @description The updated moment */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              id: string;
+              dayId: string;
+              title: string;
+              description: string;
+              /** Format: date-time */
+              start: string;
+              /** Format: date-time */
+              end: string;
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    post?: never;
     delete: {
       parameters: {
         query?: never;

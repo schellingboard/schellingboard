@@ -8,7 +8,10 @@ import type { AdminEventCalls, DayBody } from "../../commands/admin-events";
 import type { FieldErrors } from "../../commands/mutation";
 import type { CommandResponse } from "../../commands/runner";
 import { useFormMutation } from "../../commands/use-form-mutation";
-import type { AdminEventDay } from "../../queries/admin-event";
+import type {
+  AdminEventDay,
+  AdminEventMoment,
+} from "../../queries/admin-event";
 import type { ScheduledSession } from "../../queries/admin-sessions";
 import { Button } from "../../ui/button";
 import { DateTimeField } from "../../ui/form";
@@ -261,6 +264,7 @@ function DeleteDay({
   day,
   label,
   affected,
+  momentCount,
   calls,
   onChanged,
   onClose,
@@ -268,6 +272,7 @@ function DeleteDay({
   day: AdminEventDay;
   label: string;
   affected: string[];
+  momentCount: number;
   calls: AdminEventCalls;
   onChanged: () => void;
   onClose: () => void;
@@ -296,6 +301,13 @@ function DeleteDay({
           ))}
         </ul>
       )}
+      {momentCount > 0 && (
+        <p className="text-sm text-danger-fg">
+          {momentCount === 1
+            ? "Its shared moment will also be deleted."
+            : `Its ${momentCount} shared moments will also be deleted.`}
+        </p>
+      )}
       {affected.length > 0 && (
         <p className="text-sm text-fg-muted">
           Their hosts and RSVPed guests are told.
@@ -322,12 +334,14 @@ function DayRow({
   day,
   timezone,
   sessions,
+  momentCount,
   calls,
   onChanged,
 }: {
   day: AdminEventDay;
   timezone: string;
   sessions: ScheduledSession[];
+  momentCount: number;
   calls: AdminEventCalls;
   onChanged: () => void;
 }) {
@@ -365,6 +379,7 @@ function DayRow({
         day={day}
         label={label}
         affected={affected}
+        momentCount={momentCount}
         calls={calls}
         onChanged={onChanged}
         onClose={close}
@@ -398,6 +413,7 @@ export function EventDaysManager({
   eventId,
   timezone,
   days,
+  moments,
   sessions,
   calls,
   onChanged,
@@ -405,6 +421,7 @@ export function EventDaysManager({
   eventId: string;
   timezone: string;
   days: AdminEventDay[];
+  moments: AdminEventMoment[];
   sessions: ScheduledSession[];
   calls: AdminEventCalls;
   onChanged: () => void;
@@ -424,6 +441,7 @@ export function EventDaysManager({
               day={day}
               timezone={timezone}
               sessions={sessions}
+              momentCount={moments.filter((m) => m.dayId === day.id).length}
               calls={calls}
               onChanged={onChanged}
             />

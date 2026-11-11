@@ -7205,9 +7205,31 @@
                           "version"
                         ]
                       }
+                    },
+                    "moments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "dayId": { "type": "string" },
+                          "title": { "type": "string" },
+                          "description": { "type": "string" },
+                          "start": { "type": "string", "format": "date-time" },
+                          "end": { "type": "string", "format": "date-time" }
+                        },
+                        "required": [
+                          "id",
+                          "dayId",
+                          "title",
+                          "description",
+                          "start",
+                          "end"
+                        ]
+                      }
                     }
                   },
-                  "required": ["event", "days"]
+                  "required": ["event", "days", "moments"]
                 }
               }
             }
@@ -8017,6 +8039,232 @@
       "delete": {
         "tags": ["admin"],
         "description": "Deletes the day and every session overlapping it.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Deleted" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "guestAuth": [] }]
+      }
+    },
+    "/api/v1/admin/events/{id}/moments": {
+      "post": {
+        "tags": ["admin"],
+        "description": "Makes one shared moment on each of the days. A moment paints a band across every room and blocks nothing. Nothing is made if one day refuses the times.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string", "maxLength": 100 },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 200,
+                    "default": ""
+                  },
+                  "startTime": {
+                    "type": "string",
+                    "pattern": "^\\d{2}:\\d{2}$",
+                    "description": "HH:mm in the event's time zone, on the moment's day"
+                  },
+                  "endTime": {
+                    "type": "string",
+                    "pattern": "^\\d{2}:\\d{2}$",
+                    "description": "HH:mm in the event's time zone, on the moment's day"
+                  },
+                  "dayIds": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "One moment is made on each of these days"
+                  }
+                },
+                "required": ["title", "startTime", "endTime", "dayIds"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The new moments, one per day",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "string" },
+                      "dayId": { "type": "string" },
+                      "title": { "type": "string" },
+                      "description": { "type": "string" },
+                      "start": { "type": "string", "format": "date-time" },
+                      "end": { "type": "string", "format": "date-time" }
+                    },
+                    "required": [
+                      "id",
+                      "dayId",
+                      "title",
+                      "description",
+                      "start",
+                      "end"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "guestAuth": [] }]
+      }
+    },
+    "/api/v1/admin/moments/{id}": {
+      "put": {
+        "tags": ["admin"],
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string", "maxLength": 100 },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 200,
+                    "default": ""
+                  },
+                  "startTime": {
+                    "type": "string",
+                    "pattern": "^\\d{2}:\\d{2}$",
+                    "description": "HH:mm in the event's time zone, on the moment's day"
+                  },
+                  "endTime": {
+                    "type": "string",
+                    "pattern": "^\\d{2}:\\d{2}$",
+                    "description": "HH:mm in the event's time zone, on the moment's day"
+                  }
+                },
+                "required": ["title", "startTime", "endTime"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated moment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "dayId": { "type": "string" },
+                    "title": { "type": "string" },
+                    "description": { "type": "string" },
+                    "start": { "type": "string", "format": "date-time" },
+                    "end": { "type": "string", "format": "date-time" }
+                  },
+                  "required": [
+                    "id",
+                    "dayId",
+                    "title",
+                    "description",
+                    "start",
+                    "end"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "guestAuth": [] }]
+      },
+      "delete": {
+        "tags": ["admin"],
         "parameters": [
           {
             "schema": { "type": "string", "minLength": 1 },

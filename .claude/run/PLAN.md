@@ -18,17 +18,15 @@ the E2E specs a step touches; the user runs the full suite at the end.
 6. DONE **#1337** "Need ideas?" dialog with a default text, editable per event (`proposal_help`,
    migration 0062).
 7. DONE **#771** Phase strip on the proposals page (`phaseTimeline` in domain).
-8. **#861a** Shared moments: data and admin. Read the issue (`gh issue view 861 --comments`,
-   sections 2.1, 1.6). Table `shared_moments` (migration), `SharedMomentRepository`, `moments` on
-   `DayWithSessions`, "Shared moments" section after Days on the admin Config tab (add form with
-   day checkboxes all ticked, edit, delete, validation), day-delete warning counts moments, actions
-   in the action-auth-guard list, admin docs. Integration tests for repository and actions. No
-   changelog yet (feature incomplete). Footer `issue #861`.
-9. **#861b** Shared moments: grid band. Issue sections 1.1, 1.2, 2.2 (DayGrid). Generalise
-   `getNowOffsetPx`, unit test the maths; striped band across room columns, pill with details
-   tooltip, sticky on phone, honours `?loc=`; "+" slots inside stay clickable. Seed: Conference
-   Gamma gets a keynote and daily "Coffee & cake" moments (hard Lunch blockers unchanged). E2E:
-   attendee sees the pill. Attendee guide text and screenshot. Footer `issue #861`.
+8. DONE **#861a** Shared moments data and admin (`shared_moments`, migration 0063, admin Config
+   section, `moments` on the event detail).
+9. **#861b** Shared moments: grid band. Issue sections 1.1, 1.2, 2.2 (DayGrid). First make moments
+   live: record their changes (`audienceOf`, `project`, `feed-apply`, the three moment use cases)
+   and put moments in the snapshot and replica. Generalise `getNowOffsetPx`, unit test the maths;
+   striped band across room columns, pill with details tooltip, sticky on phone, honours `?loc=`;
+   "+" slots inside stay clickable. Seed: Conference Gamma gets a keynote and daily "Coffee & cake"
+   moments (hard Lunch blockers unchanged). E2E: attendee sees the pill. Attendee guide text and
+   screenshot. Footer `issue #861`.
 10. **#861c** Shared moments: text and RSVP'd views. Issue section 1.3 (DayText `MomentRow`, merged
     in time order, no link, no RSVP, blockers still hidden). Test the merge in a pure util; E2E in
     the existing schedule spec. Footer `issue #861`.
@@ -36,8 +34,8 @@ the E2E specs a step touches; the user runs the full suite at the end.
     2.3. Pure `overlappingMoment` (unit test), notice above submit in the attendee booking and edit
     forms (not admin, never disables), "During Lunch" popup line (the issue's open question 2:
     include, see PROGRESS.md). One E2E spec: admin adds Lunch on every day, attendee sees pill and
-    text row, books inside the band, sees the notice. One `CHANGELOG.md` Added entry, release
-    notes line. Footer `fixes #861`.
+    text row, books inside the band, sees the notice. One `CHANGELOG.md` Added entry, release notes
+    line. Footer `fixes #861`.
 12. **#789** Attendee hover card.
 13. **#683** Combobox: tap outside on mobile.
 14. **#754** Error icon so red is not rose.

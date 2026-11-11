@@ -14,6 +14,7 @@ import type {
   Event,
   EventMeetingSettings,
   Day,
+  SharedMoment,
 } from "@schellingboard/domain/event";
 import type {
   EmailSettings,
@@ -75,6 +76,18 @@ export interface DaysRepository {
     }
   ): Promise<Day | undefined>;
   /** Deletes the day and every session that overlaps the day's window. */
+  delete(id: string): Promise<void>;
+}
+
+export interface SharedMomentsRepository {
+  /** Ordered by start. */
+  listByEvent(eventId: string): Promise<SharedMoment[]>;
+  findById(id: string): Promise<SharedMoment | undefined>;
+  createMany(data: Omit<SharedMoment, "id">[]): Promise<SharedMoment[]>;
+  update(
+    id: string,
+    patch: Partial<Omit<SharedMoment, "id" | "dayId">>
+  ): Promise<SharedMoment | undefined>;
   delete(id: string): Promise<void>;
 }
 

@@ -158,6 +158,21 @@ export const updateDay =
         );
       }
 
+      const moments = (await tx.sharedMoments.listByEvent(existing.eventId))
+        .filter((m) => m.dayId === existing.id)
+        .filter((m) => m.start < window.start || m.end > window.end);
+      if (moments.length > 0) {
+        const titles = moments.map((m) => `"${m.title}"`).join(", ");
+        return conflict(
+          "day.momentsOutside",
+          `Cannot resize this day: the shared ${
+            moments.length === 1 ? "moment" : "moments"
+          } ${titles} would fall outside the new window. Edit or delete ${
+            moments.length === 1 ? "it" : "them"
+          } first.`
+        );
+      }
+
       let updated: Day | undefined;
       try {
         updated = await tx.days.update(input.id, {
