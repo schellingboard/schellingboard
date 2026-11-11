@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import type { ApiClient } from "@schellingboard/api-client";
 import { BellIcon, UserGroupIcon } from "../ui/icons";
 import { useUnread } from "./unread-count";
+import { t } from "@lingui/core/macro";
 
 const link =
   "flex items-center gap-1 rounded-md px-2 py-2 text-sm font-medium text-fg-subtle hover:bg-surface-muted sm:px-3";
@@ -33,13 +34,13 @@ export function HeaderLinks({
     <>
       <a href="/guests" className={link}>
         <UserGroupIcon className="h-5 w-5" />
-        <span className="sr-only sm:not-sr-only">Attendees</span>
+        <span className="sr-only sm:not-sr-only">{t`Attendees`}</span>
       </a>
       {signedIn && (
         <a
           href="/notifications"
           aria-label={
-            unread ? `Notifications (${unread} unread)` : "Notifications"
+            unread ? t`Notifications (${unread} unread)` : t`Notifications`
           }
           className="relative flex items-center rounded-md p-2 text-fg-subtle hover:bg-surface-muted"
         >

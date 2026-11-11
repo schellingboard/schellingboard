@@ -1,11 +1,13 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import type { ReplicaStore } from "../replica/store";
 import { nextChangeAt, syncState, type SyncState } from "../replica/sync-state";
+import { i18n, type MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 
-const COPY: Record<SyncState, string> = {
-  live: "Live",
-  reconnecting: "Reconnecting…",
-  stale: "Not updating: may be out of date",
+const COPY: Record<SyncState, MessageDescriptor> = {
+  live: msg({ message: "Live", context: "Connection status: up to date" }),
+  reconnecting: msg`Reconnecting…`,
+  stale: msg`Not updating: may be out of date`,
 };
 const TEXT: Record<SyncState, string> = {
   live: "text-fg-subtle",
@@ -53,7 +55,7 @@ export function SyncIndicator({
         aria-hidden
         className={`h-2 w-2 shrink-0 rounded-full ${DOT[state]}`}
       />
-      {COPY[state]}
+      {i18n._(COPY[state])}
     </span>
   );
 }
