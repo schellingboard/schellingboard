@@ -1,6 +1,7 @@
 import { formatRelativeTime } from "@schellingboard/domain/relative-time";
 import { useSyncExternalStore } from "react";
 
+import { useFormatLocale } from "../../i18n/format-locale";
 import type { MyComment, MyCommentsQuery } from "../../queries/my-comments";
 import { DataTable } from "../../ui/data-table";
 import {
@@ -158,6 +159,7 @@ function CommentRow({
   onOpen: (url: string) => void;
 }) {
   const url = `${commentPath(comment)}#comment-${comment.id}`;
+  const locale = useFormatLocale();
   const counts = [
     comment.replyCount > 0 && plural(comment.replyCount, "reply", "replies"),
     comment.likeCount > 0 && plural(comment.likeCount, "like", "likes"),
@@ -179,7 +181,7 @@ function CommentRow({
       <span className="text-xs text-fg-muted">
         {[
           showEvent ? comment.event?.name : null,
-          formatRelativeTime(new Date(comment.createdTime), now),
+          formatRelativeTime(new Date(comment.createdTime), now, locale),
           ...counts,
         ]
           .filter(Boolean)

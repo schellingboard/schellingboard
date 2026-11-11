@@ -19,7 +19,7 @@ export function utcToZonedInput(
   const dt = DateTime.fromISO(utcIso, { zone: "utc" });
   if (!dt.isValid) return "";
   const zoned = dt.setZone(timezone);
-  return (zoned.isValid ? zoned : dt).toFormat(INPUT_FORMAT);
+  return (zoned.isValid ? zoned : dt).toFormat(INPUT_FORMAT, { locale: "en" });
 }
 
 /**
@@ -32,7 +32,7 @@ export function zonedInputToUtc(value: string, timezone: string): string {
   let dt = DateTime.fromISO(value, { zone: timezone });
   if (!dt.isValid) dt = DateTime.fromISO(value, { zone: "utc" });
   if (!dt.isValid) return "";
-  return dt.toUTC().toFormat(INPUT_FORMAT);
+  return dt.toUTC().toFormat(INPUT_FORMAT, { locale: "en" });
 }
 
 /** `datetime-local` value in the zone → ISO instant for the API; null when empty. */
@@ -79,7 +79,9 @@ export function dayIndexOf(
   timezone: string
 ): number {
   const t = new Date(utcIso).getTime();
-  const time = DateTime.fromMillis(t, { zone: timezone }).toFormat("HH:mm");
+  const time = DateTime.fromMillis(t, { zone: timezone }).toFormat("HH:mm", {
+    locale: "en",
+  });
   return days.findIndex(
     (d) => new Date(dayTimeToUtc(d, time, timezone)).getTime() === t
   );

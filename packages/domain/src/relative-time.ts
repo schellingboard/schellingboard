@@ -14,7 +14,15 @@ const UNITS: [ms: number, unit: Intl.RelativeTimeFormatUnit][] = [
   [MINUTE, "minute"],
 ];
 
-const format = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+const formats = new Map<string, Intl.RelativeTimeFormat>();
+const formatterFor = (locale: string) => {
+  let format = formats.get(locale);
+  if (!format) {
+    format = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+    formats.set(locale, format);
+  }
+  return format;
+};
 
 /**
  * A coarse "3 days ago" / "yesterday" label for `date` seen from `now`. Both
@@ -22,10 +30,15 @@ const format = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
  * fake clock). Sub-minute and future timestamps — the two servers involved
  * need not agree to the second — collapse to "just now".
  */
-export function formatRelativeTime(date: Date, now: Date): string {
+export function formatRelativeTime(
+  date: Date,
+  now: Date,
+  locale = "en"
+): string {
   const elapsed = now.getTime() - date.getTime();
   for (const [ms, unit] of UNITS) {
-    if (elapsed >= ms) return format.format(-Math.floor(elapsed / ms), unit);
+    if (elapsed >= ms)
+      return formatterFor(locale).format(-Math.floor(elapsed / ms), unit);
   }
   return "just now";
 }

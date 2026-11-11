@@ -1,6 +1,7 @@
 import { formatRelativeTime } from "@schellingboard/domain/relative-time";
 import { useEffect, useState, useSyncExternalStore } from "react";
 
+import { useFormatLocale } from "../../i18n/format-locale";
 import type {
   NotificationAction,
   NotificationItem,
@@ -253,6 +254,7 @@ function Row({
   onOpen: () => void;
   onMarkRead: () => void;
 }) {
+  const locale = useFormatLocale();
   const read = item.readAt !== null;
   return (
     <li
@@ -281,7 +283,7 @@ function Row({
             {item.text}
           </span>
           <span className="block text-sm text-fg-muted">
-            {formatRelativeTime(new Date(item.createdAt), now)}
+            {formatRelativeTime(new Date(item.createdAt), now, locale)}
           </span>
         </button>
         {!read && (

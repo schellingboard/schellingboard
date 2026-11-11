@@ -1,6 +1,7 @@
 import { type FormEvent, useEffect, useRef, useState } from "react";
 
 import type { SignInCalls } from "../../commands/sign-in";
+import { useFormatLocale } from "../../i18n/format-locale";
 import type {
   AccountSecurityState,
   LoginSessionView,
@@ -333,6 +334,7 @@ function LoginSessions({
   calls: SignInCalls;
   reload: () => void;
 }) {
+  const locale = useFormatLocale();
   const [ended, setEnded] = useState<string[]>([]);
   const [revoking, setRevoking] = useState<string[]>([]);
   const [failure, setFailure] = useState<string | null>(null);
@@ -373,7 +375,7 @@ function LoginSessions({
               <span>
                 {label}
                 {session.current && " (This browser)"} · last used{" "}
-                {new Date(session.lastSeenAt).toLocaleDateString(undefined, {
+                {new Date(session.lastSeenAt).toLocaleDateString(locale, {
                   dateStyle: "medium",
                 })}
               </span>

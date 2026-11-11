@@ -1,6 +1,9 @@
 import { clockFormat, type ClockStyle } from "@schellingboard/domain/time";
 import { createContext, type ReactNode, useContext, useState } from "react";
 
+import { clockStyleFor } from "../i18n/format";
+import { useFormatLocale } from "../i18n/format-locale";
+
 const COOKIE = "sb-time-format";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 const PREFERENCES = ["auto", "12h", "24h"] as const;
@@ -13,16 +16,6 @@ export function readTimeFormatCookie(): Preference {
   return PREFERENCES.find((p) => p === value) ?? "auto";
 }
 
-let browserStyle: ClockStyle | undefined;
-function browserClockStyle(): ClockStyle {
-  if (browserStyle) return browserStyle;
-  const cycle = new Intl.DateTimeFormat(undefined, {
-    hour: "numeric",
-  }).resolvedOptions().hourCycle;
-  browserStyle = cycle === "h11" || cycle === "h12" ? "12h" : "24h";
-  return browserStyle;
-}
-
 // Without a provider (admin screens) times stay 24-hour.
 const TimeFormatContext = createContext<{
   preference: Preference;
@@ -33,7 +26,8 @@ const TimeFormatContext = createContext<{
 export function TimeFormatProvider({ children }: { children: ReactNode }) {
   const [preference, setStored] = useState<Preference>(readTimeFormatCookie);
 
-  const style = preference === "auto" ? browserClockStyle() : preference;
+  const locale = useFormatLocale();
+  const style = preference === "auto" ? clockStyleFor(locale) : preference;
 
   const setPreference = (next: Preference) => {
     setStored(next);

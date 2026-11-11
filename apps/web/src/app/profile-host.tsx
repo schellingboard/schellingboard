@@ -14,6 +14,7 @@ import { createCommandRunner } from "../commands/runner";
 import { cardsFrom, everyoneIn } from "../features/people/directory-model";
 import { profileLinks } from "../features/people/links";
 import { ProfilePanel } from "../features/people/profile-panel";
+import { useFormatLocale } from "../i18n/format-locale";
 import { createDirectoryQuery } from "../queries/directory";
 import { createProfileActivityQuery } from "../queries/profile-activity";
 import { blankSnapshot } from "../replica/blank";
@@ -53,9 +54,10 @@ function ProfileHost({
     directory.subscribe,
     directory.get
   );
+  const locale = useFormatLocale();
   const everyone = useMemo(
-    () => everyoneIn(cardsFrom(entries, now)),
-    [entries, now]
+    () => everyoneIn(cardsFrom(entries, now, locale)),
+    [entries, now, locale]
   );
 
   const runner = useMemo(

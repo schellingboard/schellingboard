@@ -92,7 +92,7 @@ test("times follow the chosen 12-hour or 24-hour format @014-US7", async ({
 
   await page.goto("/");
   await page.getByRole("link", { name: "Conference Gamma" }).first().click();
-  await expect(page.getByText("9 AM", { exact: true }).first()).toBeVisible();
+  await expect(page.getByText("9 am", { exact: true }).first()).toBeVisible();
 
   await page.goto("/settings");
   await page

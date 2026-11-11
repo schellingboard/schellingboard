@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { newKey } from "../../commands/keys";
 import { awaitMutation } from "../../commands/mutation";
 import type { SettingsCalls } from "../../commands/settings";
+import { useFormatLocale } from "../../i18n/format-locale";
 import { Button } from "../../ui/button";
 
 type State =
@@ -57,11 +58,11 @@ type Device = {
   current: boolean;
 };
 
-const formatDate = (iso: string) =>
-  new Date(iso).toLocaleDateString(undefined, { dateStyle: "medium" });
+const formatDate = (iso: string, locale: string) =>
+  new Date(iso).toLocaleDateString(locale, { dateStyle: "medium" });
 
-const describe = (device: Device) =>
-  `${device.host}, on since ${formatDate(device.createdAt)}${device.current ? ", this device" : ""}`;
+const describe = (device: Device, locale: string) =>
+  `${device.host}, on since ${formatDate(device.createdAt, locale)}${device.current ? ", this device" : ""}`;
 
 export function PushNotifications({
   publicKey,
@@ -77,6 +78,7 @@ export function PushNotifications({
     | "removeDevice"
   >;
 }) {
+  const locale = useFormatLocale();
   const [state, setState] = useState<State>("checking");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -214,7 +216,7 @@ export function PushNotifications({
         return;
       }
       setDevices((current) => current.filter((d) => d.id !== device.id));
-      setRemoved(`Turned off for ${describe(device)}.`);
+      setRemoved(`Turned off for ${describe(device, locale)}.`);
       heading.current?.focus();
       if (device.current) {
         const registration = await navigator.serviceWorker.getRegistration();
@@ -324,7 +326,7 @@ export function PushNotifications({
                   {device.host}
                   <span className="text-fg-subtle">
                     {" "}
-                    &middot; on since {formatDate(device.createdAt)}
+                    &middot; on since {formatDate(device.createdAt, locale)}
                   </span>
                   {device.current && (
                     <span className="ms-2 rounded-full bg-brand-tint-hover px-2 py-0.5 text-xs text-brand-fg">
@@ -336,7 +338,7 @@ export function PushNotifications({
                   variant="quiet"
                   onClick={() => void removeDevice(device)}
                   disabled={busy}
-                  aria-label={`Turn off ${describe(device)}`}
+                  aria-label={`Turn off ${describe(device, locale)}`}
                   className="border border-line px-3 py-1"
                 >
                   Turn off
