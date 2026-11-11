@@ -6,6 +6,7 @@ import { InAppLinks } from "./in-app-links";
 import type { AppServices } from "./services";
 import { ShellFrame } from "./shell";
 import { useDirectoryShell } from "./use-directory-shell";
+import { useParamUpdates } from "./use-param-updates";
 
 export function HomePage({ services }: { services: AppServices }) {
   return <Home api={services.api} />;
@@ -13,6 +14,7 @@ export function HomePage({ services }: { services: AppServices }) {
 
 function Home({ api }: { api: AppServices["api"] }) {
   const { history } = useRouter();
+  const { params, onParams } = useParamUpdates();
   const { events, loaded, failed, frame } = useDirectoryShell(api);
   const [site, setSite] = useState<{ title: string; description: string }>();
   const [siteFailed, setSiteFailed] = useState(false);
@@ -44,7 +46,12 @@ function Home({ api }: { api: AppServices["api"] }) {
         <InAppLinks
           owns={({ pathname }) => events.some((e) => pathname === `/${e.slug}`)}
         >
-          <EventListScreen site={site} events={events} />
+          <EventListScreen
+            site={site}
+            events={events}
+            params={params}
+            onParams={onParams}
+          />
         </InAppLinks>
       )}
     </ShellFrame>
