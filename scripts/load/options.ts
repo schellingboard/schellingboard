@@ -7,8 +7,8 @@ export type Options = {
   report?: string;
 };
 
-// The seed names 30 first by 34 last names, less the 40 curated guests.
-const MAX_USERS = 980;
+// The seed names 30 first by 34 last names, bulk guests only.
+const MAX_USERS = 1020;
 
 const UNIT_MS = { s: 1000, m: 60_000, h: 3_600_000 } as const;
 
