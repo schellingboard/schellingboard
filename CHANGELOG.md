@@ -30,6 +30,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   it, you can drag its edge to resize it, and each has its own shareable link.
 - **The schedule and the proposals list keep their search, filter and sort**: they are part of the
   page address, so Back and a reload bring them back.
+- **A session you add from the schedule is shown after saving**: the schedule scrolls to it, and
+  opens its day if that was folded.
 - **Back returns to where you were scrolled**: the schedule, the proposals list and the attendee
   directory come back at the same place, also after a reload.
 - **One "My schedule" filter on the schedule** (#865): replaces My sessions, RSVP'd and Hosting. A

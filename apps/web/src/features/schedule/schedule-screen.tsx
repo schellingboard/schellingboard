@@ -76,7 +76,7 @@ export function ScheduleScreen({
   onBack: () => void;
   /** Opens a session's side panel over the schedule. */
   openSession: (sessionId: string) => void;
-  /** A session an address named, which is brought into view. */
+  /** A session an address named, or one just added, which is brought into view. */
   revealSessionId: string | null;
   /** Names the history entry the page is shown at, which its scroll position is kept under. */
   historyEntry: string;
@@ -104,8 +104,6 @@ export function ScheduleScreen({
     true,
     `${snapshot.event.slug}:${view}`
   );
-  // After restoration, so the address wins over the remembered position.
-  useRevealSession(scrollerRef, revealSessionId);
 
   const [search, setSearch, debouncedSearch] = useSearchParamText(
     params,
@@ -119,6 +117,8 @@ export function ScheduleScreen({
     setRevealSeeded(revealSessionId);
     setRevealedDays((prev) => [...prev, revealedDay]);
   }
+  // After restoration, so the revealed session wins over the remembered position.
+  useRevealSession(scrollerRef, revealSessionId, revealedDay);
   const unfoldKey = params.getAll("unfold").join("\u0000");
   const unfolded: ReadonlySet<string> = useMemo(
     () =>
