@@ -40,7 +40,6 @@ import { useScrollRestoration } from "../../ui/use-scroll-restoration";
 import { useSearchParamText } from "../../ui/use-search-param-text";
 import { useDragToPan } from "./use-drag-to-pan";
 import { useTimeFormat } from "../../app/time-format";
-import { schedulingNotice } from "./scheduling-notice";
 import { dayOfSession, useRevealSession } from "./reveal-session";
 import { useStatusHeight } from "./use-status-height";
 
@@ -248,7 +247,7 @@ export function ScheduleScreen({
       }}
       showJumpToNow={nowIsOnSchedule}
       proposalsHref={links.proposals}
-      notice={schedulingNotice(data.event, data.now)}
+      now={data.now}
       sync={sync}
     />
   );

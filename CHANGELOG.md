@@ -27,8 +27,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   and short summary; clicking still opens the profile.
 - **Shared moments on the schedule** (#861): organizers mark lunch or a keynote as a striped band
   across every room. Sessions can still be booked inside it; hosts are told and can go ahead.
-- **See which phase the event is in** (#771): the proposals page shows Proposals, Voting and
-  Scheduling with the current one highlighted and each start date.
+- **See which phase the event is in** (#771, #1591): a thin bar under the menu on the proposals page
+  and the schedule shows Proposals, Voting and Scheduling, the current one highlighted, until
+  scheduling starts.
 - **"Need ideas?" help for proposers** (#1337): a button on the proposals page and the new-proposal
   form opens prompts to start from. Organizers can replace the text for each event.
 - **Remove comments left on your profile** (#901): profile owners, session and proposal hosts, and

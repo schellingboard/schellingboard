@@ -22,7 +22,6 @@ import {
   PlusIcon,
   UserIcon,
 } from "../../ui/icons";
-import { PhaseTimeline } from "./phase-timeline";
 import { ProposalHelp } from "./proposal-help";
 import { SearchInput } from "../../ui/search-input";
 import { Unavailable } from "../../ui/unavailable";
@@ -50,6 +49,7 @@ import {
   type SortKey,
 } from "./list-model";
 import { PersonLink } from "../people/person-link";
+import { PhaseBar } from "../../ui/phase-bar";
 
 export type ProposalsScreenProps = {
   snapshot: Snapshot;
@@ -76,70 +76,66 @@ export function ProposalsScreen(props: ProposalsScreenProps) {
   const proposingEnabled = !!guestId && !schedEnabled;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">
-          {snapshot.event.name}: Session Proposals
-        </h1>
-        <p className="text-fg-muted mt-2">
-          Browse session ideas or add your own proposal
-        </p>
-        <div className="mt-4">
-          <PhaseTimeline
-            event={snapshot.event}
-            now={now}
-            localZone={localZone}
-          />
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center my-6">
-          <ActionLink
-            href={links.add}
-            enabled={proposingEnabled}
-            why={texts.proposing}
-            icon={PlusIcon}
-            label="Add Proposal"
-          />
-          {!schedEnabled && <ProposalHelp event={snapshot.event} />}
-          <ActionLink
-            href={links.quickVoting}
-            enabled={votingEnabled}
-            why={texts.voting}
-            icon={ChartBarIcon}
-            label="Go to Quick Voting!"
-          />
-          <ActionLink
-            href={links.schedule}
-            enabled
-            why=""
-            icon={CalendarDaysIcon}
-            label="View Schedule"
-          />
-        </div>
-      </div>
-      {snapshot.proposals.length === 0 ? (
-        <div className="text-center py-12 bg-surface-sunken rounded-lg">
-          <h2 className="text-xl font-medium text-fg-muted">
-            No proposals yet
-          </h2>
-          <p className="text-fg-subtle mt-2">
-            Be the first to suggest a session!
+    <>
+      <PhaseBar event={event} now={now} localZone={localZone} />
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold">
+            {snapshot.event.name}: Session Proposals
+          </h1>
+          <p className="text-fg-muted mt-2">
+            Browse session ideas or add your own proposal
           </p>
-          <a
-            href={links.add}
-            className="mt-4 inline-block bg-brand text-on-brand px-4 py-2 rounded-md hover:bg-brand-hover"
-          >
-            Add Proposal
-          </a>
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center my-6">
+            <ActionLink
+              href={links.add}
+              enabled={proposingEnabled}
+              why={texts.proposing}
+              icon={PlusIcon}
+              label="Add Proposal"
+            />
+            {!schedEnabled && <ProposalHelp event={snapshot.event} />}
+            <ActionLink
+              href={links.quickVoting}
+              enabled={votingEnabled}
+              why={texts.voting}
+              icon={ChartBarIcon}
+              label="Go to Quick Voting!"
+            />
+            <ActionLink
+              href={links.schedule}
+              enabled
+              why=""
+              icon={CalendarDaysIcon}
+              label="View Schedule"
+            />
+          </div>
         </div>
-      ) : (
-        <ProposalTable
-          {...props}
-          texts={texts}
-          votingEnabled={votingEnabled}
-          schedEnabled={schedEnabled}
-        />
-      )}
-    </div>
+        {snapshot.proposals.length === 0 ? (
+          <div className="text-center py-12 bg-surface-sunken rounded-lg">
+            <h2 className="text-xl font-medium text-fg-muted">
+              No proposals yet
+            </h2>
+            <p className="text-fg-subtle mt-2">
+              Be the first to suggest a session!
+            </p>
+            <a
+              href={links.add}
+              className="mt-4 inline-block bg-brand text-on-brand px-4 py-2 rounded-md hover:bg-brand-hover"
+            >
+              Add Proposal
+            </a>
+          </div>
+        ) : (
+          <ProposalTable
+            {...props}
+            texts={texts}
+            votingEnabled={votingEnabled}
+            schedEnabled={schedEnabled}
+          />
+        )}
+      </div>
+    </>
   );
 }
 

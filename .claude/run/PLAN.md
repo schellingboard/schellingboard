@@ -57,22 +57,16 @@ the E2E specs a step touches; the user runs the full suite at the end.
     the schedule (keeps context, deep link) and for "Need ideas?" (the tips stay readable beside the
     form, a modal hides it); Quick Voting is a full-screen swipe flow and likely stays a page; long
     forms need panel width on desktop and are full-screen on mobile anyway. Put the open decisions
-    under Questions; do not implement before the user answers. 22g. **Phase bar** Replace the
-    proposals-page phase strip (looks clickable, is not) with a thin informational bar right under
-    the menu: segments `-----> =====> ----->` with the current phase highlighted, one design on
-    every page that shows phases (also the schedule, which has only text now). Consider: segment
-    length proportional to the real phase length; hiding it once the schedule phase is reached;
-    never showing it when the event has no phases. Not clickable (no link/button look, no hover).
-    Builds on #771 (`phaseTimeline`). Issue first if none exists. 22h. **Proposals toolbar
-    redesign.** The filter area has dead white space at the bottom left (chips top left, search top
-    right, Sort by alone below right). Redesign for excellent UX, same controls, no new features:
-    one compact toolbar. Row 1: search field growing to fill the width, then Sort by. Row 2 (or the
-    same row when wide): filter chips, then the result count at the far end. No empty corners at
-    390px, 768px and 1440px; chips wrap or scroll horizontally on phones; keep keyboard order
-    (search, filters, sort) and visible focus. Check the Agenda and attendee directory toolbars:
-    share one `ListToolbar` if they have the same shape. Pure layout: adapt only the tests it
-    breaks. Capture before/after screenshots at the three widths into PROGRESS.md notes (not docs).
-    Issue optional.
+    under Questions; do not implement before the user answers. 22g. DONE #1591 **Phase bar**
+    (`ui/phase-bar.tsx`, `share` on `phaseTimeline`). 22h. **Proposals toolbar redesign.** The
+    filter area has dead white space at the bottom left (chips top left, search top right, Sort by
+    alone below right). Redesign for excellent UX, same controls, no new features: one compact
+    toolbar. Row 1: search field growing to fill the width, then Sort by. Row 2 (or the same row
+    when wide): filter chips, then the result count at the far end. No empty corners at 390px, 768px
+    and 1440px; chips wrap or scroll horizontally on phones; keep keyboard order (search, filters,
+    sort) and visible focus. Check the Agenda and attendee directory toolbars: share one
+    `ListToolbar` if they have the same shape. Pure layout: adapt only the tests it breaks. Capture
+    before/after screenshots at the three widths into PROGRESS.md notes (not docs). Issue optional.
 23. **#831** (Medium) Owner decision: every long list for users and admins is paginated with the
     shared `Pager` (page numbers, First, Prev, Next, Last, configurable page size, default 50, sizes
     e.g. 25/50/100, `page`/`pageSize` URL params). Survey all lists (proposals, directory, agenda,

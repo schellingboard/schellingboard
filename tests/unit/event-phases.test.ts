@@ -288,3 +288,51 @@ describe("phaseTimeline", { tags: ["006-US3"] }, () => {
     ]);
   });
 });
+
+describe("phaseTimeline shares", { tags: ["006-US3"] }, () => {
+  const shares = (event: Event) =>
+    phaseTimeline(event, NOW()).map((s) => s.share);
+
+  it("sizes each phase by how long it runs", () => {
+    const event = makeEvent({
+      proposalPhaseStart: ago(0),
+      votingPhaseStart: ahead(4),
+      schedulingPhaseStart: ahead(8),
+      schedulingPhaseEnd: ahead(16),
+    });
+    const [a, b, c] = shares(event);
+    expect(a).toBeCloseTo(0.25);
+    expect(b).toBeCloseTo(0.25);
+    expect(c).toBeCloseTo(0.5);
+  });
+
+  it("splits evenly when no phase length is known", () => {
+    const event = makeEvent({ proposalPhaseStart: ago(2) });
+    for (const share of shares(event)) expect(share).toBeCloseTo(1 / 3);
+  });
+
+  it("gives a very short phase the minimum, keeping the others proportional", () => {
+    const event = makeEvent({
+      proposalPhaseStart: ago(0),
+      votingPhaseStart: ahead(0.01),
+      schedulingPhaseStart: ahead(30),
+      schedulingPhaseEnd: ahead(60),
+    });
+    const [a, b, c] = shares(event);
+    expect(a).toBeCloseTo(0.2);
+    expect(b).toBeCloseTo(0.4);
+    expect(c).toBeCloseTo(0.4);
+  });
+
+  it("gives a skipped phase the minimum and keeps the neighbour's length", () => {
+    const event = makeEvent({
+      proposalPhaseStart: ago(5),
+      schedulingPhaseStart: ago(1),
+      schedulingPhaseEnd: ahead(3),
+    });
+    const [a, b, c] = shares(event);
+    expect(b).toBeCloseTo(0.2);
+    expect(a).toBeCloseTo(0.4);
+    expect(c).toBeCloseTo(0.4);
+  });
+});
