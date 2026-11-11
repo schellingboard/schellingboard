@@ -24,7 +24,8 @@ the E2E specs a step touches; the user runs the full suite at the end.
    the grid band with its pill; Gamma seed moments; E2E; attendee guide text.
 10. DONE **#861c** Shared moments in the agenda (`moments` on `agendaGroups`, `showsMoments`).
 11. DONE **#861d** Shared moments: booking notice, popup line, E2E, changelog (`overlappingMoment`).
-12. **#789** Attendee hover card.
+12. DONE **#789** Attendee hover card (`PersonLink`, `PersonCardsProvider`; sessions, proposals,
+    comments, 1-on-1 title).
 13. **#683** Combobox: tap outside on mobile.
 14. **#754** Error icon so red is not rose.
 15. **#1145** Ctrl+Z after Markdown toolbar.

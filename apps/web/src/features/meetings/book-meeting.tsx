@@ -23,6 +23,7 @@ import {
   MeetingRequestFields,
   requestSentNotice,
 } from "./meeting-request-fields";
+import { PersonLink } from "../people/person-link";
 
 /** Booking a 1-on-1 from the schedule: the slot is known, the person is not. */
 export function BookMeeting({
@@ -139,14 +140,13 @@ function CandidateStep({
               <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
                   {/* A new tab, so reading who they are does not cost the slot. */}
-                  <a
+                  <PersonLink
+                    guestId={candidate.id}
                     href={profileHref(candidate.id)}
-                    target="_blank"
-                    rel="noopener"
+                    name={candidate.name}
+                    newTab
                     className="font-medium text-brand-fg hover:text-brand-fg-hover"
-                  >
-                    {candidate.name}
-                  </a>
+                  />
                   {candidate.isHost && (
                     <span className="w-fit rounded-full bg-brand-tint-hover px-3 py-1 text-xs font-semibold text-brand-fg">
                       Session host

@@ -414,6 +414,11 @@ export const features = {
         actor: "attendee",
         priority: "P3",
       },
+      US6: {
+        title: "Attendee glances at who someone is by hovering over their name",
+        actor: "attendee",
+        priority: "P3",
+      },
     },
   },
   "012": {

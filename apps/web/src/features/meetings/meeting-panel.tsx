@@ -6,6 +6,7 @@ import { SidePanel } from "../../ui/side-panel";
 import { TextField } from "../../ui/form";
 import { canCancel, statusLine } from "../schedule/meeting-rules";
 import type { MeetingView } from "../schedule/meeting-view";
+import { PersonLink } from "../people/person-link";
 
 /** One 1-on-1 in full and, for the person asked, Accept and Decline. */
 export function MeetingPanel({
@@ -43,12 +44,12 @@ export function MeetingPanel({
         meeting ? (
           <>
             1-on-1 with{" "}
-            <a
+            <PersonLink
+              guestId={meeting.otherId}
               href={profileHref(meeting.otherId)}
+              name={meeting.otherName}
               className="text-brand-fg hover:text-brand-fg-hover hover:underline"
-            >
-              {meeting.otherName}
-            </a>
+            />
           </>
         ) : (
           "1-on-1"

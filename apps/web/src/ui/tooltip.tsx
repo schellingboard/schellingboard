@@ -14,6 +14,7 @@ import { cx } from "./cx";
 // to rest on one.
 const REST_MS = 500;
 const GAP_PX = 6;
+const LINGER_MS = 150;
 const EDGE_PX = 8;
 
 // Focus a dialog hands back on close is not the keyboard asking for the panel.
@@ -30,6 +31,8 @@ function focusVisible(el: EventTarget): boolean {
  * and focus open it and the trigger stays whatever it wraps; `toggleable`
  * makes the trigger a button that also opens it on a tap and closes it on a
  * second tap, Escape or a press outside. No `content` renders the children alone.
+ * `interactive` lets the pointer travel onto the panel without closing it.
+ * `as="span"` for a trigger inside text.
  */
 export function Tooltip({
   content,
@@ -37,12 +40,18 @@ export function Tooltip({
   className,
   triggerClassName,
   toggleable,
+  interactive,
+  as: Wrapper = "div",
 }: {
   content?: ReactNode;
-  children: ReactNode;
+  /** A function gets the `aria-describedby` to put on the element that holds focus. */
+  children:
+    ReactNode | ((describedBy: { "aria-describedby"?: string }) => ReactNode);
   className?: string;
   triggerClassName?: string;
   toggleable?: boolean;
+  interactive?: boolean;
+  as?: "div" | "span";
 }) {
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState<{ top: number; left: number }>();
@@ -86,15 +95,48 @@ export function Tooltip({
 
   useEffect(() => () => clearTimeout(rest.current), []);
 
-  if (!content) return <div className={className}>{children}</div>;
+  // Content that arrives late (loaded on first hover) still opens for a
+  // pointer resting on the trigger or a keyboard already on it.
+  const over = useRef(false);
+  const hasContent = !!content;
+  useEffect(() => {
+    if (!hasContent) return;
+    const active = document.activeElement;
+    if (active && trigger.current?.contains(active) && focusVisible(active))
+      setOpen(true);
+    else if (over.current)
+      rest.current = setTimeout(() => setOpen(true), REST_MS);
+  }, [hasContent]);
+
+  const describedBy = { "aria-describedby": open ? id : undefined };
+  const kids =
+    typeof children === "function" ? children(describedBy) : children;
+
+  if (!content)
+    return (
+      <Wrapper
+        className={className}
+        onMouseEnter={() => (over.current = true)}
+        onMouseLeave={() => (over.current = false)}
+      >
+        {kids}
+      </Wrapper>
+    );
 
   const show = () => {
     clearTimeout(rest.current);
     setOpen(true);
   };
   const hide = () => {
+    over.current = false;
     clearTimeout(rest.current);
     setOpen(false);
+  };
+
+  const hideSoon = () => {
+    over.current = false;
+    clearTimeout(rest.current);
+    rest.current = setTimeout(() => setOpen(false), LINGER_MS);
   };
 
   const panelNode = open
@@ -104,7 +146,14 @@ export function Tooltip({
           id={id}
           role="tooltip"
           style={position ?? { top: 0, left: 0, visibility: "hidden" }}
-          className="pointer-events-none fixed z-50 max-w-xs rounded-md border border-line bg-surface-raised text-fg shadow-lg"
+          onMouseEnter={
+            interactive ? () => clearTimeout(rest.current) : undefined
+          }
+          onMouseLeave={interactive ? hide : undefined}
+          className={cx(
+            "fixed z-[70] max-w-xs rounded-md border border-line bg-surface-raised text-fg shadow-lg",
+            !interactive && "pointer-events-none"
+          )}
         >
           {content}
         </div>,
@@ -113,6 +162,7 @@ export function Tooltip({
     : null;
 
   const rested = () => {
+    over.current = true;
     clearTimeout(rest.current);
     rest.current = setTimeout(show, REST_MS);
   };
@@ -131,26 +181,30 @@ export function Tooltip({
           onMouseLeave={hide}
           className={triggerClassName}
         >
-          {children}
+          {kids}
         </button>
         {panelNode}
       </>
     );
 
   return (
-    <div
-      ref={trigger as React.RefObject<HTMLDivElement>}
+    <Wrapper
+      ref={trigger as React.RefObject<never>}
       className={cx(className, triggerClassName)}
-      aria-describedby={open ? id : undefined}
+      aria-describedby={
+        typeof children === "function"
+          ? undefined
+          : describedBy["aria-describedby"]
+      }
       onMouseEnter={rested}
       onMouseMove={() => !open && rested()}
-      onMouseLeave={hide}
+      onMouseLeave={interactive ? hideSoon : hide}
       onFocus={(e) => focusVisible(e.target) && show()}
       onBlur={hide}
       onClick={hide}
     >
-      {children}
+      {kids}
       {panelNode}
-    </div>
+    </Wrapper>
   );
 }
