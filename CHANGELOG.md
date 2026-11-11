@@ -19,6 +19,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   on the proposals page and the schedule shows Proposals, Voting and Scheduling, the current one
   highlighted, until scheduling starts. Hover or tap a phase to see what it is for and when it
   starts and ends.
+- **Admin lists have page numbers and a page size**
+  ([#684](https://github.com/schellingboard/schellingboard/issues/684)): jump to the first, last or
+  any page, and show 10, 25, 50, 100 or all rows.
 - **Read the schedule before scheduling opens**
   ([#1336](https://github.com/schellingboard/schellingboard/issues/1336)): **View Schedule** now
   works in every phase, read-only, with a note saying when scheduling opens.

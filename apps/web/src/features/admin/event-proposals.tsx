@@ -13,7 +13,6 @@ import { type DayOption, EMPTY_SESSION } from "./admin-session-model";
 import { ConfirmByTyping } from "./confirm-by-typing";
 import { type EventLocation, SessionForm } from "./event-sessions";
 import {
-  LIST_PAGE_SIZE,
   type OnParams,
   pageOf,
   plural,
@@ -323,7 +322,7 @@ export function EventProposalsManager({
   onChanged: () => void;
 }) {
   const { query, matching } = searchByTitleOrHost(proposals, params);
-  const { page, visible } = pageOf(matching, params);
+  const { page, pageSize, visible } = pageOf(matching, params);
 
   return (
     <section aria-label="Proposals" className="space-y-4">
@@ -333,7 +332,7 @@ export function EventProposalsManager({
         rowKey={(p) => p.id}
         total={matching.length}
         page={page}
-        pageSize={LIST_PAGE_SIZE}
+        pageSize={pageSize}
         searchQuery={query}
         {...tableHandlers(onParams)}
         searchPlaceholder="Search title or host…"

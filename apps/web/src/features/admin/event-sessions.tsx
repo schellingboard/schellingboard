@@ -32,7 +32,6 @@ import {
 } from "./admin-session-model";
 import { ConfirmByTyping } from "./confirm-by-typing";
 import {
-  LIST_PAGE_SIZE,
   type OnParams,
   pageOf,
   plural,
@@ -623,7 +622,7 @@ export function EventSessionsManager({
     hostless ? sessions.filter((s) => s.hosts.length === 0) : sessions,
     params
   );
-  const { page, visible } = pageOf(matching, params);
+  const { page, pageSize, visible } = pageOf(matching, params);
 
   return (
     <section aria-label="Sessions" className="space-y-4">
@@ -637,7 +636,7 @@ export function EventSessionsManager({
         rowKey={(s) => s.id}
         total={matching.length}
         page={page}
-        pageSize={LIST_PAGE_SIZE}
+        pageSize={pageSize}
         searchQuery={query}
         {...tableHandlers(onParams)}
         searchPlaceholder="Search title or host…"
