@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { spearman } from "@schellingboard/domain/stats/correlation";
 import { useCallback, useMemo } from "react";
 
@@ -55,13 +56,14 @@ export function Scatter({
       }),
     [points, xLabel, yLabel, tooFew, rho]
   );
+  const trend = rho === null ? t`n/a` : rho.toFixed(2);
   return (
     <div className="space-y-2">
       <PlotFrame summary={summary} draw={draw} />
       <p className="text-xs text-fg-muted">
         {tooFew
-          ? `n = ${n}: too few points to read a trend`
-          : `ρ = ${rho === null ? "n/a" : rho.toFixed(2)} (n = ${n})`}
+          ? t`n = ${n}: too few points to read a trend`
+          : t`ρ = ${trend} (n = ${n})`}
       </p>
     </div>
   );

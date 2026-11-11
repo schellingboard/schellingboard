@@ -1,3 +1,5 @@
+import { i18n, type MessageDescriptor } from "@lingui/core";
+import { msg, t } from "@lingui/core/macro";
 import type { Event } from "@schellingboard/domain/event";
 import { EventPhase, phaseTimeline } from "@schellingboard/domain/phase";
 import { formatInLocalZone } from "@schellingboard/domain/time";
@@ -7,18 +9,24 @@ import { CheckIcon } from "./icons";
 import { useNotify } from "./notices";
 import { Tooltip } from "./tooltip";
 
-const NAMES = {
-  [EventPhase.PROPOSAL]: "Proposals",
-  [EventPhase.VOTING]: "Voting",
-  [EventPhase.SCHEDULING]: "Scheduling",
+const NAMES: Record<
+  Exclude<EventPhase, typeof EventPhase.INACTIVE>,
+  MessageDescriptor
+> = {
+  [EventPhase.PROPOSAL]: msg`Proposals`,
+  [EventPhase.VOTING]: msg`Voting`,
+  [EventPhase.SCHEDULING]: msg`Scheduling`,
 };
 
-const WHAT = {
-  [EventPhase.PROPOSAL]: "Attendees propose sessions and comment on them",
-  [EventPhase.VOTING]: "Attendees vote on the proposals",
-  [EventPhase.SCHEDULING]:
-    "Vote counts show, sessions are scheduled, and attendees RSVP",
+const WHAT: Record<
+  Exclude<EventPhase, typeof EventPhase.INACTIVE>,
+  MessageDescriptor
+> = {
+  [EventPhase.PROPOSAL]: msg`Attendees propose sessions and comment on them.`,
+  [EventPhase.VOTING]: msg`Attendees vote on the proposals.`,
+  [EventPhase.SCHEDULING]: msg`Vote counts show, sessions are scheduled, and attendees RSVP.`,
 };
+const SCHEDULING_WITH_MEETINGS = msg`Vote counts show, sessions are scheduled, and attendees RSVP and book 1-on-1s.`;
 
 const ARROW =
   "polygon(0 0, calc(100% - 6px) 0, 100% 50%, calc(100% - 6px) 100%, 0 100%, 6px 50%)";
@@ -45,16 +53,26 @@ export function PhaseBar({
   }
   return (
     <ol
-      aria-label="Event phases"
+      aria-label={t`Event phases`}
       className="flex w-full gap-1 border-b border-line-subtle bg-surface px-3 py-1.5 text-xs"
     >
       {steps.map(({ phase, start, end, state, share }) => {
         const when = (date: Date) =>
           formatInLocalZone(date, event.timezone, localZone);
+        const what = i18n._(
+          phase === EventPhase.SCHEDULING && event.meetingsEnabled
+            ? SCHEDULING_WITH_MEETINGS
+            : WHAT[phase]
+        );
         const explain = [
-          `${NAMES[phase]} phase${state === "skipped" ? " (skipped)" : ""}: ${WHAT[phase]}${phase === EventPhase.SCHEDULING && event.meetingsEnabled ? " and book 1-on-1s" : ""}.`,
-          start && `${start <= now ? "Started" : "Starts"} ${when(start)}.`,
-          end && `${end <= now ? "Ended" : "Ends"} ${when(end)}.`,
+          state === "skipped"
+            ? t`${i18n._(NAMES[phase])} phase (skipped): ${what}`
+            : t`${i18n._(NAMES[phase])} phase: ${what}`,
+          start &&
+            (start <= now
+              ? t`Started ${when(start)}.`
+              : t`Starts ${when(start)}.`),
+          end && (end <= now ? t`Ended ${when(end)}.` : t`Ends ${when(end)}.`),
         ]
           .filter(Boolean)
           .join(" ");
@@ -84,11 +102,13 @@ export function PhaseBar({
                   {state === "past" && (
                     <CheckIcon className="h-3 w-3 shrink-0 stroke-2" />
                   )}
-                  <span className="truncate">{NAMES[phase]}</span>
+                  <span className="truncate">{i18n._(NAMES[phase])}</span>
                   {state === "skipped" && (
-                    <span className="truncate"> (skipped)</span>
+                    <span className="truncate"> {t`(skipped)`}</span>
                   )}
-                  {state === "past" && <span className="sr-only"> (done)</span>}
+                  {state === "past" && (
+                    <span className="sr-only"> {t`(done)`}</span>
+                  )}
                 </span>
                 {start && (
                   <span className="mb-0.5 block text-[10px] font-normal leading-tight">

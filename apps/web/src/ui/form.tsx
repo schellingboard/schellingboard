@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { type ReactNode, useId, useLayoutEffect, useRef } from "react";
 
 import { Combobox } from "./combobox";
@@ -182,7 +183,7 @@ export function GrowingTextField({
   onChange: (value: string) => void;
   placeholder?: string;
 }) {
-  const hint = frame.hint ?? "Markdown supported";
+  const hint = frame.hint ?? t`Markdown supported`;
   const ids = useField({ ...frame, hint });
   const textarea = useRef<HTMLTextAreaElement>(null);
   useLayoutEffect(() => {
@@ -340,7 +341,7 @@ export function MarkdownField({
   onChange: (value: string) => void;
   placeholder?: string;
 }) {
-  const hint = frame.hint ?? "Markdown supported";
+  const hint = frame.hint ?? t`Markdown supported`;
   const ids = useField({ ...frame, hint });
   return (
     <Frame {...frame} hint={hint} ids={ids}>

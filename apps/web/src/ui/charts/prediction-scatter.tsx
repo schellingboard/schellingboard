@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { useCallback } from "react";
 
 import { type Plot, PlotFrame } from "./plot-frame";
@@ -69,9 +70,11 @@ export function PredictionScatter({
     <div className="space-y-2">
       <PlotFrame summary={summary} draw={draw} />
       <p className="text-xs text-fg-muted">
-        Dots are the model&apos;s midpoint, thick bars its 50% range, thin bars
-        its 80% range. On the dashed line the prediction was exact. The model
-        was fitted on one event, n = 13.
+        <Trans>
+          Dots are the model&apos;s midpoint, thick bars its 50% range, thin
+          bars its 80% range. On the dashed line the prediction was exact. The
+          model was fitted on one event, n = 13.
+        </Trans>
       </p>
     </div>
   );

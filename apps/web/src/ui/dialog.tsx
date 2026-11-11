@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import {
   type KeyboardEvent,
   type ReactNode,
@@ -113,7 +114,7 @@ export function Dialog({
         </div>
         <button
           type="button"
-          aria-label="Close"
+          aria-label={t`Close`}
           onClick={guard.requestClose}
           className="absolute right-3 top-3 rounded-md p-1 text-fg-subtle hover:bg-surface-muted focus:outline-none focus:ring-2 focus:ring-brand-accent"
         >

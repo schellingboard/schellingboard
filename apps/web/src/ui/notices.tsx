@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import {
   createContext,
   type ReactNode,
@@ -102,7 +103,7 @@ function Toast({
         </button>
       )}
       <button type="button" className="underline" onClick={() => dismiss(id)}>
-        Dismiss
+        <Trans>Dismiss</Trans>
       </button>
     </div>
   );

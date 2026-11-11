@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import {
   applyTemplate,
   markdownOptions,
@@ -89,14 +90,14 @@ export function MarkdownTextarea({
           className={`${TAB} ${previewing ? "" : "bg-surface-hover"}`}
           onClick={() => setPreviewing(false)}
         >
-          Edit
+          <Trans context="Markdown field: write mode">Edit</Trans>
         </button>
         <button
           type="button"
           className={`${TAB} ${previewing ? "bg-surface-hover" : ""}`}
           onClick={() => setPreviewing(true)}
         >
-          Preview
+          <Trans>Preview</Trans>
         </button>
         <span className="flex flex-1 justify-end overflow-hidden">
           {markdownOptions.map((option) => (

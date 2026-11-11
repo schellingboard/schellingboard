@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { useEffect, useId, useRef, useState } from "react";
 
 import { cx } from "./cx";
@@ -131,7 +133,7 @@ export function Combobox({
       <button
         type="button"
         tabIndex={-1}
-        aria-label="Show suggestions"
+        aria-label={t`Show suggestions`}
         className="absolute inset-y-0 right-0 flex items-center pr-2 text-fg-subtle"
         onMouseDown={(e) => e.preventDefault()}
         onClick={() => setOpen(!open)}
@@ -165,7 +167,7 @@ export function Combobox({
             role="presentation"
             className="border-t border-line-subtle px-4 py-2 text-xs text-fg-subtle"
           >
-            Pick one or type any text
+            <Trans>Pick one or type any text</Trans>
           </li>
         )}
       </ul>

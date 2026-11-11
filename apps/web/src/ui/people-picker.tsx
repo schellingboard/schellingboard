@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { type KeyboardEvent, useId, useRef, useState } from "react";
 
 import { XMarkIcon } from "./icons";
@@ -85,7 +87,7 @@ export function PeoplePicker({
             {p.name}
             <button
               type="button"
-              aria-label={`Remove ${p.name}`}
+              aria-label={t`Remove ${p.name}`}
               onClick={() => onChange(selected.filter((s) => s !== p.id))}
             >
               <XMarkIcon className="h-4 w-4 text-fg-subtle hover:text-fg-muted" />
@@ -126,7 +128,9 @@ export function PeoplePicker({
           className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-surface-raised py-1 text-sm shadow-lg ring-1 ring-line-subtle"
         >
           {options.length === 0 && query !== "" ? (
-            <li className="px-4 py-2 text-fg-muted">Nothing found.</li>
+            <li className="px-4 py-2 text-fg-muted">
+              <Trans>Nothing found.</Trans>
+            </li>
           ) : (
             options.map((p, i) => (
               <li

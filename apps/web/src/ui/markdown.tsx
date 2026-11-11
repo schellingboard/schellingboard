@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { type ReactNode, useState } from "react";
 
 import { CheckIcon, Square2StackIcon } from "./icons";
@@ -85,6 +86,7 @@ function CodeBlock({ code }: { code: string }) {
     }
   };
   const Icon = copied ? CheckIcon : Square2StackIcon;
+  const label = copied ? t`Copied` : t`Copy code`;
   return (
     <div className="group relative">
       <pre className="overflow-x-auto rounded bg-surface-muted p-3 font-mono text-[0.875em] leading-normal">
@@ -92,8 +94,8 @@ function CodeBlock({ code }: { code: string }) {
       </pre>
       <button
         type="button"
-        aria-label={copied ? "Copied" : "Copy code"}
-        title={copied ? "Copied" : "Copy code"}
+        aria-label={label}
+        title={label}
         onClick={() => void copy()}
         className="absolute right-1.5 top-1.5 rounded border border-line bg-surface p-1 text-fg-muted opacity-0 transition-opacity hover:text-fg focus-visible:opacity-100 group-hover:opacity-100 [@media(hover:none)]:opacity-100"
       >
@@ -104,6 +106,7 @@ function CodeBlock({ code }: { code: string }) {
 }
 
 const FENCE = /^ {0,3}(`{3,})[^`]*$/;
+const CLOSE = /^ {0,3}(`{3,})\s*$/;
 
 function fenced(text: string): (string | { code: string })[] {
   const lines = text.split("\n");
@@ -115,9 +118,10 @@ function fenced(text: string): (string | { code: string })[] {
       prose.push(lines[i]);
       continue;
     }
-    const close = new RegExp(`^ {0,3}\`{${open[1].length},}\\s*$`);
+    const closes = (line: string) =>
+      (CLOSE.exec(line)?.[1].length ?? 0) >= open[1].length;
     let end = i + 1;
-    while (end < lines.length && !close.test(lines[end])) end++;
+    while (end < lines.length && !closes(lines[end])) end++;
     parts.push(prose.join("\n"), { code: lines.slice(i + 1, end).join("\n") });
     prose = [];
     i = end;

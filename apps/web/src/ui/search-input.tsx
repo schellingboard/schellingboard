@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { type ComponentPropsWithoutRef, useRef } from "react";
 
 import { cx } from "./cx";
@@ -33,7 +34,7 @@ export function SearchInput({
       {value !== "" && (
         <button
           type="button"
-          aria-label="Clear search"
+          aria-label={t`Clear search`}
           onClick={() => {
             onClear();
             inputRef.current?.focus();

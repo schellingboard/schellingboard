@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+
 import { Button } from "./button";
 import { Dialog } from "./dialog";
 
@@ -5,8 +7,8 @@ export function ConfirmDialog({
   open,
   title,
   message,
-  confirmLabel = "Yes",
-  cancelLabel = "No",
+  confirmLabel = t`Yes`,
+  cancelLabel = t`No`,
   destructive = false,
   onConfirm,
   onCancel,

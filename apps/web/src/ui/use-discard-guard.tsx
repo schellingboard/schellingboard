@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import {
   type FocusEvent,
   type RefObject,
@@ -76,7 +77,7 @@ export function useDiscardGuard(
       className="mt-3 space-y-2 rounded-md border border-line bg-surface-muted p-3"
     >
       <p id={questionId} className="text-sm font-medium text-fg">
-        Discard what you have typed?
+        <Trans>Discard what you have typed?</Trans>
       </p>
       <div className="flex flex-wrap gap-2">
         <Button
@@ -86,10 +87,10 @@ export function useDiscardGuard(
             onClose();
           }}
         >
-          Discard
+          <Trans>Discard</Trans>
         </Button>
         <Button variant="quiet" autoFocus onClick={keepEditing}>
-          Keep editing
+          <Trans>Keep editing</Trans>
         </Button>
       </div>
     </div>
