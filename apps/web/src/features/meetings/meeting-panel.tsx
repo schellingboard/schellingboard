@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
 import { clashLines } from "@schellingboard/domain/meeting-clash-text";
 import { Button } from "../../ui/button";
+import { CopyLinkButton } from "../../ui/copy-link-button";
 import { SidePanel } from "../../ui/side-panel";
 import { TextField } from "../../ui/form";
 import { canCancel, statusLine } from "../schedule/meeting-rules";
@@ -149,6 +150,7 @@ export function MeetingPanel({
             Nothing is reserved — the meeting point is just where to find each
             other.
           </p>
+          <CopyLinkButton />
         </div>
       )}
     </SidePanel>

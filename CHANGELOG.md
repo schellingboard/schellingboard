@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **"Copy link" at the end of a session, proposal, profile or 1-on-1**: for the installed app, which
+  has no address bar.
 - **Ask someone to open up to 1-on-1s** (#1046): a profile without free slots now has an "Ask them
   to open up" button; you are told when they do.
 - **"My comments" lists everything you wrote** (#993): open it from your name menu, filter and
