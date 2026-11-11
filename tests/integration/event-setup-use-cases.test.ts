@@ -183,6 +183,7 @@ describe("event use cases", () => {
           firstDayStart: day.start,
         }) as unknown,
         days: [day],
+        moments: [],
       });
       expect(code(await events().getEvent(ADMIN, { id: "nope" }))).toBe(
         "event.notFound"

@@ -8,6 +8,8 @@ export type AdminEventDetail = (typeof eventDetailSchema)["_output"];
 
 export type AdminEventDay = AdminEventDetail["days"][number];
 
+export type AdminEventMoment = AdminEventDetail["moments"][number];
+
 export type AdminEventState =
   | { status: "loading" }
   | { status: "error"; code: string }

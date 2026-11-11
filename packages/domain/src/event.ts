@@ -55,6 +55,16 @@ export type Day = {
   version: number;
 };
 
+/** A band across every room, e.g. lunch; it blocks nothing. */
+export type SharedMoment = {
+  id: string;
+  dayId: string;
+  title: string;
+  description: string;
+  start: Date;
+  end: Date;
+};
+
 // Events without days have no dates yet and sort last.
 export function compareEventsByStart(a: Event, b: Event): number {
   const [x, y] = [a, b].map((e) => e.firstDayStart?.getTime() ?? Infinity);

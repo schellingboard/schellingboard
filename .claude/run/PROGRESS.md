@@ -2,6 +2,13 @@
 
 ## Decisions
 
+- #861a: moments have no `version`; of two admin edits at once the last wins (accepted).
+
+- #861a: moments have no change-feed or snapshot support yet and `createMoments`/`updateMoment`/
+  `deleteMoment` record no change (the admin reloads the event detail). Step 9 must add the changes
+  (`audienceOf`, `project`, `feed-apply`) and put moments in the snapshot, or the grid is stale.
+  Times are sent as `HH:mm` in the event zone; the server places them on each day.
+
 ## Problems
 
 - #200: not checked in a browser at 390px (long URL, fixed vote bar); CSS read only.

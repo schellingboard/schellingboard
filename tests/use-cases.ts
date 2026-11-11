@@ -575,6 +575,11 @@ export const features = {
         actor: "organizer",
         priority: "P3",
       },
+      US9: {
+        title: "Organizer adds shared moments such as lunch to the days",
+        actor: "organizer",
+        priority: "P2",
+      },
     },
   },
   "016": {

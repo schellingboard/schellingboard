@@ -30,6 +30,7 @@ import type {
   SessionProposalsRepository,
   SessionsRepository,
   SettingsRepository,
+  SharedMomentsRepository,
   StatsRepository,
   SubjectCommentsRepository,
   VotesRepository,
@@ -62,6 +63,7 @@ import { SqliteSessionMarksRepository } from "./repositories/sqlite/session-mark
 import { SqliteSessionProposalsRepository } from "./repositories/sqlite/session-proposals";
 import { SqliteSessionsRepository } from "./repositories/sqlite/sessions";
 import { SqliteSettingsRepository } from "./repositories/sqlite/settings";
+import { SqliteSharedMomentsRepository } from "./repositories/sqlite/shared-moments";
 import { SqliteStatsRepository } from "./repositories/sqlite/stats";
 import { SqliteVotesRepository } from "./repositories/sqlite/votes";
 import * as schema from "./schema";
@@ -96,6 +98,7 @@ export type Repositories = {
   rsvps: RsvpsRepository;
   sessionMarks: SessionMarksRepository;
   settings: SettingsRepository;
+  sharedMoments: SharedMomentsRepository;
   sessionProposals: SessionProposalsRepository;
   stats: StatsRepository;
   votes: VotesRepository;
@@ -143,6 +146,7 @@ function buildRepositories(sqlite: Database.Database): Repositories {
     reminders: new SqliteRemindersRepository(db),
     rsvps: new SqliteRsvpsRepository(db),
     sessionMarks: new SqliteSessionMarksRepository(db),
+    sharedMoments: new SqliteSharedMomentsRepository(db),
     settings: new SqliteSettingsRepository(db),
     sessionProposals: new SqliteSessionProposalsRepository(db),
     stats: new SqliteStatsRepository(db),

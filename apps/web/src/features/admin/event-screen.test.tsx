@@ -64,6 +64,7 @@ const setup = (
       <EventConfigTab
         event={ev}
         days={[]}
+        moments={[]}
         points={[]}
         sessions={[]}
         onPointsChanged={vi.fn()}
