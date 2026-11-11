@@ -28,6 +28,7 @@ import { assignGuestsToEvent, removeGuestsFromEvent } from "./event-guests";
 import { importGuests } from "./guest-import";
 import { chooseGuest, currentGuest, signIn, signOut } from "./identity";
 import { createJoinLink, joinWithLink, mailJoinLinks } from "./join-links";
+import { updateMyLocale } from "./locale";
 import {
   getProfile,
   getProfileActivity,
@@ -60,6 +61,7 @@ export function createPeopleUseCases(deps: PeopleDeps) {
     getProfileActivity: getProfileActivity(deps),
     listAttendees: listAttendees(deps),
     listEventProfiles: listEventProfiles(deps),
+    updateMyLocale: updateMyLocale(deps),
     updateMyProfile: updateMyProfile(deps),
     replaceMyAvatar: replaceMyAvatar(deps),
     removeMyAvatar: removeMyAvatar(deps),

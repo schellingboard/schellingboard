@@ -1,6 +1,5 @@
+import { DEFAULT_LOCALE, resolveLocale } from "@schellingboard/domain/locales";
 import { describe, expect, it } from "vitest";
-
-import { DEFAULT_LOCALE, resolveLocale } from "./locales";
 
 describe("resolveLocale", { tags: ["022-US1"] }, () => {
   it("prefers the stored locale", () => {

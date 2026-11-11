@@ -115,7 +115,7 @@ describe("DELETE /api/v1/auth/site", () => {
             })
           )
         ).json()
-      ).toEqual({ guestId: null });
+      ).toEqual({ guestId: null, locale: null });
     }
   );
 

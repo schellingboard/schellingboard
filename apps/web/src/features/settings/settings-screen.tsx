@@ -4,9 +4,11 @@ import { ThemeSelect } from "../../app/theme";
 import { TimeFormatSelect } from "../../app/time-format";
 import type { MeetingAvailabilityCalls } from "../../commands/meeting-availability";
 import type { SettingsCalls } from "../../commands/settings";
+import { LOCALES } from "../../i18n/locales";
 import type { SettingsState } from "../../queries/settings";
 import { AvailabilityForm } from "../meetings/availability-form";
 import { EmailSettingsForm } from "./email-settings-form";
+import { LanguageSetting } from "./language-setting";
 import { PushNotifications } from "./push-notifications";
 
 const SECTION = "mx-auto flex w-full max-w-2xl flex-col gap-3 px-4 sm:px-0";
@@ -55,6 +57,7 @@ export function SettingsScreen({
               </a>{" "}
               is edited separately.
             </p>
+            {LOCALES.length > 1 && <LanguageSetting calls={calls} />}
             {state.emailEnabled && (
               <EmailSettingsForm
                 initial={state.emailSettings}

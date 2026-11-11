@@ -38,6 +38,7 @@ export const guests = sqliteTable(
     prompts: text("prompts", { mode: "json" }).$type<ProfilePrompt[]>(),
     languages: text("languages", { mode: "json" }).$type<string[]>(),
     contacts: text("contacts", { mode: "json" }).$type<ProfileContact[]>(),
+    locale: text("locale"),
     // Email notification settings; see EmailSettings in
     // packages/domain/src/guest.ts.
     emailOnRsvpChange: integer("email_on_rsvp_change", { mode: "boolean" })

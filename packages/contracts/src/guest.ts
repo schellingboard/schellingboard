@@ -4,6 +4,7 @@ import {
   MAX_CONTACTS,
   MAX_LANGUAGES,
 } from "@schellingboard/domain/guest";
+import { LOCALES } from "@schellingboard/domain/locales";
 import { z } from "zod";
 
 import { usernameSchema } from "./auth";
@@ -24,6 +25,13 @@ export const emailSettingsSchema = z.object({
   sessionHeadsUp: z.boolean(),
   attendeeCountReminder: z.boolean(),
 } satisfies Record<keyof EmailSettings, z.ZodBoolean>);
+
+export const localeBodySchema = z.object({
+  locale: z
+    .enum(LOCALES)
+    .nullable()
+    .describe("A language of the app; null follows the browser"),
+});
 
 // Length caps are sanity limits only a malicious user would hit.
 const promptEntrySchema = z.object({

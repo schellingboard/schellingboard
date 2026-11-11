@@ -83,18 +83,18 @@ describe("login sessions", () => {
         guestId: ada.id,
         assurance: "claimed",
       });
-      expect(await whoAmI(token)).toEqual({ guestId: ada.id });
+      expect(await whoAmI(token)).toEqual({ guestId: ada.id, locale: null });
     }
   );
 
   it("a revoked row acts as nobody", { tags: ["003-US2"] }, async () => {
     const ada = await createGuest({ name: "Ada" });
     const token = await sessionGuestValue(ada.id, "claimed");
-    expect(await whoAmI(token)).toEqual({ guestId: ada.id });
+    expect(await whoAmI(token)).toEqual({ guestId: ada.id, locale: null });
 
     await getRepositories().loginSessions.delete(hashSessionToken(token));
 
-    expect(await whoAmI(token)).toEqual({ guestId: null });
+    expect(await whoAmI(token)).toEqual({ guestId: null, locale: null });
   });
 
   it("an expired row acts as nobody", { tags: ["003-US1"] }, async () => {
@@ -103,7 +103,7 @@ describe("login sessions", () => {
       expiresAt: new Date(realNow().getTime() - 1000),
     });
 
-    expect(await whoAmI(token)).toEqual({ guestId: null });
+    expect(await whoAmI(token)).toEqual({ guestId: null, locale: null });
   });
 
   it(
@@ -115,10 +115,10 @@ describe("login sessions", () => {
 
       expect(
         await whoAmI(await sessionGuestValue(grace.id, "claimed"))
-      ).toEqual({ guestId: null, awaitingLogin: true });
+      ).toEqual({ guestId: null, locale: null, awaitingLogin: true });
       expect(
         await whoAmI(await sessionGuestValue(grace.id, "verified"))
-      ).toEqual({ guestId: grace.id });
+      ).toEqual({ guestId: grace.id, locale: null });
     }
   );
 
@@ -220,8 +220,14 @@ describe("login sessions", () => {
       const stale = await aged(2 * DAY_MS);
       const fresh = await aged(60 * 60 * 1000);
 
-      expect(await whoAmI(stale.token)).toEqual({ guestId: ada.id });
-      expect(await whoAmI(fresh.token)).toEqual({ guestId: ada.id });
+      expect(await whoAmI(stale.token)).toEqual({
+        guestId: ada.id,
+        locale: null,
+      });
+      expect(await whoAmI(fresh.token)).toEqual({
+        guestId: ada.id,
+        locale: null,
+      });
 
       const touched = (await repo.get(stale.id))!;
       expect(touched.lastSeenAt.getTime()).toBeGreaterThanOrEqual(
@@ -241,9 +247,13 @@ describe("login sessions", () => {
     async () => {
       const ada = await createGuest({ name: "Ada" });
 
-      expect(await whoAmI(`open.${ada.id}`)).toEqual({ guestId: null });
+      expect(await whoAmI(`open.${ada.id}`)).toEqual({
+        guestId: null,
+        locale: null,
+      });
       expect(await whoAmI(`verified.${ada.id}.1.sig`)).toEqual({
         guestId: null,
+        locale: null,
       });
     }
   );

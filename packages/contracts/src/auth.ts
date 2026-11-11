@@ -16,7 +16,14 @@ export const identitySchema = z.object({
     .describe("The guest the browser now acts as, or null when signed out"),
 });
 
-export const currentIdentitySchema = identitySchema.extend({
+export const chosenIdentitySchema = identitySchema.extend({
+  locale: z
+    .string()
+    .nullable()
+    .describe("The guest's chosen language; null follows the browser"),
+});
+
+export const currentIdentitySchema = chosenIdentitySchema.extend({
   awaitingLogin: z
     .boolean()
     .optional()

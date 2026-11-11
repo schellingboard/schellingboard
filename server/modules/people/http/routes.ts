@@ -1,12 +1,13 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import {
   chooseGuestBodySchema,
+  chosenIdentitySchema,
   currentIdentitySchema,
-  identitySchema,
 } from "@schellingboard/contracts/auth";
 import { pageQuerySchema } from "@schellingboard/contracts/cursor-page";
 import {
   attendeeListSchema,
+  localeBodySchema,
   profileActivitySchema,
   profileBodySchema,
   publicProfileListSchema,
@@ -26,6 +27,7 @@ import {
   body,
   idParam,
   json,
+  noContent,
   textExpectedVersion as expectedVersion,
 } from "@/server/http/route-parts";
 import { MAX_IMAGE_BYTES } from "@/utils/images";
@@ -168,9 +170,18 @@ const chooseIdentity = createRoute({
     "Makes this browser act as an open guest name (sets the guest cookie). A protected name answers 403 `guest.protected`: send the user to the login page.",
   request: { body: body(chooseGuestBodySchema) },
   responses: {
-    200: json(identitySchema, "The guest the browser now acts as"),
+    200: json(chosenIdentitySchema, "The guest the browser now acts as"),
     ...problemDefault,
   },
+});
+
+const updateMyLocale = createRoute({
+  method: "put",
+  path: "/me/locale",
+  tags: ["people"],
+  description: "Sets the language the acting guest reads the app in.",
+  request: { headers: idempotencyHeaders, body: body(localeBodySchema) },
+  responses: { 204: noContent("Saved"), ...problemDefault },
 });
 
 export function addPeopleRoutes(app: App, people: () => PeopleUseCases) {
@@ -185,7 +196,19 @@ export function addPeopleRoutes(app: App, people: () => PeopleUseCases) {
     });
     if (!result.ok) return problem(result.error);
     setGuestCookie(c, result.value);
-    return c.json({ guestId: result.value.guestId }, 200);
+    return c.json(
+      { guestId: result.value.guestId, locale: result.value.locale },
+      200
+    );
+  });
+
+  app.openapi(updateMyLocale, async (c) => {
+    const result = await people().updateMyLocale(
+      c.var.actor,
+      c.req.valid("json").locale
+    );
+    if (!result.ok) return problem(result.error);
+    return c.body(null, 204);
   });
 
   app.openapi(listEventProfiles, async (c) => {
