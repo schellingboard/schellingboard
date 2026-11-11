@@ -8,7 +8,7 @@ import {
   voteChoiceToEmoji,
   voteChoiceToLabel,
 } from "@schellingboard/domain/vote-display";
-import { type ComponentType, useMemo, useState } from "react";
+import { type ComponentType, useMemo } from "react";
 
 import type { Standing } from "../../queries/proposal-standings";
 import { ownVotesFrom, toEvent } from "../../replica/selectors";
@@ -30,20 +30,24 @@ import { PhaseBar } from "../../ui/phase-bar";
 import { SearchInput } from "../../ui/search-input";
 import { Tooltip } from "../../ui/tooltip";
 import { Unavailable } from "../../ui/unavailable";
-import { useDebouncedSearch } from "../../ui/use-debounced";
+import { useSearchParamText } from "../../ui/use-search-param-text";
 import type { ProposalLinks } from "./links";
 import {
   defaultSort,
   effectiveFilter,
   type Filter,
   filteredRows,
+  filterFrom,
   listRows,
   phaseTexts,
   type Row,
   rowsFrom,
   type Sort,
+  sortFrom,
   type SortKey,
   sortOptions,
+  withFilter,
+  withSort,
 } from "./list-model";
 import { VoteTally } from "./vote-tally";
 import { VotingButtons } from "./voting-buttons";
@@ -56,6 +60,9 @@ export type ProposalsScreenProps = {
   standings: ReadonlyMap<string, Standing>;
   /** Null withdraws. A failure is reported as a notice, not returned. */
   onVote: (proposalId: string, choice: VoteChoice | null) => void;
+  /** Search, filter and sort live in these, which the owner of the address bar passes in. */
+  params: URLSearchParams;
+  onParamsChange: (params: URLSearchParams) => void;
 };
 
 const LINK = "hover:text-link transition-colors";
@@ -167,6 +174,8 @@ function ProposalTable({
   now,
   standings,
   onVote,
+  params,
+  onParamsChange,
   texts,
   votingEnabled,
   schedEnabled,
@@ -178,13 +187,17 @@ function ProposalTable({
   const guestId = snapshot.me?.guestId ?? null;
   const rows = useMemo(() => rowsFrom(snapshot), [snapshot]);
   const votes = useMemo(() => ownVotesFrom(snapshot), [snapshot]);
-  const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<Filter>(undefined);
-  const [sort, setSort] = useState<Sort>(() =>
-    defaultSort(snapshot.event, now)
+  const [query, setQuery, searched] = useSearchParamText(
+    params,
+    onParamsChange
   );
+  const filter = filterFrom(params);
+  const fallbackSort = defaultSort(snapshot.event, now);
+  const sort = sortFrom(params, snapshot.event, now);
+  const setFilter = (next: Filter) => onParamsChange(withFilter(params, next));
+  const setSort = (next: Sort) =>
+    onParamsChange(withSort(params, next, fallbackSort));
   const effective = effectiveFilter(filter, guestId);
-  const searched = useDebouncedSearch(query);
   const searching = searched.trim() !== "";
   const filteredCount = useMemo(
     () => filteredRows(rows, { filter, guestId, votes }).length,
@@ -204,12 +217,12 @@ function ProposalTable({
     [rows, guestId, votes, standings, searched, filter, sort]
   );
   const toggle = (next: Filter) =>
-    setFilter((old) => (old === next ? undefined : next));
+    setFilter(filter === next ? undefined : next);
   const sortBy = (key: SortKey) =>
-    setSort((old) => ({
+    setSort({
       key,
-      direction: old.key === key && old.direction === "asc" ? "desc" : "asc",
-    }));
+      direction: sort.key === key && sort.direction === "asc" ? "desc" : "asc",
+    });
   const canEdit = (row: Row) =>
     row.hosts.length === 0 || row.hosts.some((h) => h.id === guestId);
   const duration = (row: Row) =>

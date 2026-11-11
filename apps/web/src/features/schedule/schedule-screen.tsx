@@ -1,5 +1,5 @@
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
-import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { type ReactNode, useMemo, useRef, useState } from "react";
 
 import {
   type ScheduleActions,
@@ -9,7 +9,7 @@ import {
 
 export type { ScheduleActions };
 import type { MeetingClashes } from "../../queries/meeting-clashes";
-import { useDebouncedSearch } from "../../ui/use-debounced";
+import { useSearchParamText } from "../../ui/use-search-param-text";
 import { AgendaView } from "./agenda-view";
 import { BookingDialog } from "./booking-dialog";
 import { scheduleDataFrom } from "./data";
@@ -99,21 +99,10 @@ export function ScheduleScreen({
   // After restoration, so the address wins over the remembered position.
   useRevealSession(scrollerRef, revealSessionId);
 
-  const [search, setSearch] = useState(() => params.get("q") ?? "");
-  const debouncedSearch = useDebouncedSearch(search);
-  const latest = useRef({ params, onParamsChange });
-  useEffect(() => {
-    latest.current = { params, onParamsChange };
-  });
-  useEffect(() => {
-    const { params: current, onParamsChange: change } = latest.current;
-    const text = debouncedSearch.trim();
-    if ((current.get("q") ?? "") === text) return;
-    const next = new URLSearchParams(current);
-    if (text) next.set("q", text);
-    else next.delete("q");
-    change(next);
-  }, [debouncedSearch]);
+  const [search, setSearch, debouncedSearch] = useSearchParamText(
+    params,
+    onParamsChange
+  );
 
   const [revealedDays, setRevealedDays] = useState<readonly string[]>([]);
   const [revealSeeded, setRevealSeeded] = useState<string | null>(null);
