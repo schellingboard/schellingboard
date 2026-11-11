@@ -7,6 +7,8 @@ import {
   useState,
 } from "react";
 
+import { ExclamationTriangleIcon } from "./icons";
+
 export type Notice = {
   tone: "failure" | "info";
   message: string;
@@ -83,6 +85,9 @@ function Toast({
           : "border-line bg-surface-raised text-fg"
       }`}
     >
+      {notice.tone === "failure" && (
+        <ExclamationTriangleIcon className="h-5 w-5 shrink-0 self-start" />
+      )}
       <p className="flex-1">{notice.message}</p>
       {notice.action && (
         <button
