@@ -41,6 +41,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Long links in Quick Voting now wrap**
   ([#200](https://github.com/schellingboard/schellingboard/issues/200)): they used to push the page
   wider than the screen on phones.
+- **The grid schedule has a line above each day's room names**
+  ([#1589](https://github.com/schellingboard/schellingboard/issues/1589)): days ran into each other.
 
 ### Internal
 
