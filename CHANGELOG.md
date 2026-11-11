@@ -16,6 +16,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Remove comments left on your profile**
   ([#901](https://github.com/schellingboard/schellingboard/issues/901)): profile owners, session and
   proposal hosts, and admins can now delete other people's comments.
+- **"Need ideas?" help for proposers**
+  ([#1337](https://github.com/schellingboard/schellingboard/issues/1337)): a button on the proposals
+  page and the new-proposal form opens prompts to start from. Organizers can replace the text for
+  each event.
 
 ### Changed
 

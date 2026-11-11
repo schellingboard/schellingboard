@@ -14,6 +14,7 @@ export function blankSnapshot(now: string): Snapshot {
       name: "",
       description: "",
       website: "",
+      proposalHelp: "",
       timezone: "UTC",
       maxSessionDuration: 0,
       breakMinutes: 0,

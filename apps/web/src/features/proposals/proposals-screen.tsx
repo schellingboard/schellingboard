@@ -49,6 +49,7 @@ import {
   withFilter,
   withSort,
 } from "./list-model";
+import { ProposalHelp } from "./proposal-help";
 import { VoteTally } from "./vote-tally";
 import { VotingButtons } from "./voting-buttons";
 
@@ -95,6 +96,7 @@ export function ProposalsScreen(props: ProposalsScreenProps) {
               icon={PlusIcon}
               label="Add Proposal"
             />
+            {!schedEnabled && <ProposalHelp event={snapshot.event} />}
             <ActionLink
               href={links.quickVoting}
               enabled={votingEnabled}

@@ -1,5 +1,6 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { Fragment } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Dialog } from "./dialog";
@@ -49,6 +50,34 @@ describe("SidePanel", () => {
     await user.keyboard("{Escape}");
     expect(onClose).not.toHaveBeenCalled();
   });
+
+  it(
+    "keeps one panel open: one without an address gives way to any other",
+    { tags: ["004-US8"] },
+    () => {
+      const routed = vi.fn();
+      const transient = vi.fn();
+      const routedPanel = panel({ onClose: routed });
+      const transientPanel = panel({ onClose: transient, transient: true });
+      const { rerender } = render(<Fragment key="r">{routedPanel}</Fragment>);
+      rerender(
+        <>
+          <Fragment key="r">{routedPanel}</Fragment>
+          <Fragment key="t">{transientPanel}</Fragment>
+        </>
+      );
+      expect(routed).toHaveBeenCalledTimes(1);
+      expect(transient).not.toHaveBeenCalled();
+
+      rerender(
+        <>
+          <Fragment key="t">{transientPanel}</Fragment>
+          <Fragment key="r2">{panel({ label: "Another" })}</Fragment>
+        </>
+      );
+      expect(transient).toHaveBeenCalledTimes(1);
+    }
+  );
 
   it("shows the Back arrow only when asked", async () => {
     const onBack = vi.fn();

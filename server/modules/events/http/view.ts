@@ -14,6 +14,7 @@ export function toEventView(e: Event): z.input<typeof eventViewSchema> {
     name: e.name,
     description: e.description,
     website: e.website,
+    proposalHelp: e.proposalHelp,
     timezone: e.timezone,
     maxSessionDuration: e.maxSessionDuration,
     breakMinutes: e.breakMinutes,

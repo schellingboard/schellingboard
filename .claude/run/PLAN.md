@@ -15,7 +15,8 @@ the E2E specs a step touches; the user runs the full suite at the end.
 3. DONE **#200** Quick Voting wraps long links.
 4. DONE **#1070** Multi-line profile prompt answers.
 5. DONE **#901** Owners, hosts and admins delete comments (`canDelete` in the comment view).
-6. **#1337** Configurable proposal help text.
+6. DONE **#1337** "Need ideas?" dialog with a default text, editable per event (`proposal_help`,
+   migration 0062).
 7. **#771** Show current phase at a glance.
 8. **#861** Shared moments (meals) on the schedule. Size L: split into several steps first.
 9. **#789** Attendee hover card.
