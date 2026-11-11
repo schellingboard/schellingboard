@@ -51,6 +51,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Tidier proposal and attendee filters**: search fills the width beside Sort by, filter chips and
+  the result count below it; no empty corners on phones.
 - **One "My schedule" filter on the schedule**
   ([#865](https://github.com/schellingboard/schellingboard/issues/865)): replaces My sessions,
   RSVP'd and Hosting. A menu beside it picks which of your RSVP'd and hosted sessions it shows.
