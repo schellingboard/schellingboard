@@ -15,10 +15,8 @@ describe("scheduleLinks", () => {
     expect(links.proposal("p1")).toBe("/conf/proposals/p1");
   });
 
-  it("opens a 1-on-1 the same way", () => {
-    expect(links.meeting(new URLSearchParams(), "m1")).toBe(
-      "/conf/schedule?viewMeeting=m1"
-    );
+  it("addresses a 1-on-1 by its own path too", () => {
+    expect(links.meeting("m1")).toBe("/conf/meetings/m1");
   });
 
   it("books into a free slot with its room, day and time", () => {

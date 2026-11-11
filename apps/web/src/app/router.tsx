@@ -175,6 +175,19 @@ export function createAppRouter(
     path: "meetings",
     component: MeetingsPage,
   });
+  const meeting = createRoute({
+    getParentRoute: () => event,
+    path: "meetings/$meetingId",
+    component: function MeetingRoute(): ReactElement {
+      const { slug, meetingId } = meeting.useParams();
+      return (
+        <PanelLanding
+          item={{ kind: "meeting", slug, id: meetingId }}
+          background={`/${slug}/schedule`}
+        />
+      );
+    },
+  });
   const proposals = createRoute({
     getParentRoute: () => event,
     path: "proposals",
@@ -389,6 +402,7 @@ export function createAppRouter(
         schedule,
         session,
         meetings,
+        meeting,
         proposals,
         proposal,
         quickVoting,

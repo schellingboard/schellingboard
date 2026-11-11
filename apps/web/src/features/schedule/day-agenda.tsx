@@ -309,7 +309,7 @@ function MeetingRow({
   meeting: MeetingView;
   timezone: string;
 }) {
-  const { data, links, params, breakMinutes } = useSchedule();
+  const { data, links, breakMinutes } = useSchedule();
   const start = shownSlotStart(new Date(meeting.slotStart), breakMinutes);
   const end = new Date(meeting.slotEnd);
   return (
@@ -318,7 +318,7 @@ function MeetingRow({
       swatchClass={
         meeting.status === "accepted" ? "bg-brand-accent" : "bg-line"
       }
-      href={links.meeting(params, meeting.id)}
+      href={links.meeting(meeting.id)}
       title={`1-on-1 with ${meeting.otherName}`}
       details={`${meeting.meetingPoint} · until ${formatOptionalTime(end, timezone, TIME_FORMAT)} · ${statusLine(meeting)}`}
       trailing={

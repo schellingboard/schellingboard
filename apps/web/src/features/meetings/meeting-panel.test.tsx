@@ -2,7 +2,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
 import type { MeetingView } from "../schedule/meeting-view";
-import { MeetingModal } from "./meeting-modal";
+import { MeetingPanel } from "./meeting-panel";
 
 afterEach(cleanup);
 
@@ -26,11 +26,12 @@ const meeting = (extra: Partial<MeetingView> = {}): MeetingView => ({
 function setup(m: MeetingView | undefined, readOnly = false) {
   const log: string[] = [];
   render(
-    <MeetingModal
+    <MeetingPanel
       meeting={m}
       now={new Date("2026-06-02T10:00:00Z")}
       readOnly={readOnly}
       profileHref={(id) => `/guests/${id}`}
+      shareUrl="/conf/meetings/m1"
       onAnswer={(r) => log.push(r)}
       onCancel={(note) => log.push(`cancel:${note}`)}
       onClose={() => log.push("closed")}

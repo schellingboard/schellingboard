@@ -48,7 +48,7 @@ const withMeeting = (base: typeof snapshot) => ({
 });
 const scheduling = withMeeting(running);
 
-describe("a 1-on-1 over the schedule", { tags: ["012-US4"] }, () => {
+describe("a 1-on-1 panel over the schedule", { tags: ["012-US4"] }, () => {
   it("opens from its address and answers with a command", async () => {
     const { calls } = await open({
       snapshot: scheduling,
@@ -73,10 +73,19 @@ describe("a 1-on-1 over the schedule", { tags: ["012-US4"] }, () => {
     );
   });
 
-  it("closes in place when reached by its address", async () => {
+  it("opens from its own address with the schedule behind", async () => {
     const { router } = await open({
       snapshot: scheduling,
-      path: "/conf?viewMeeting=m1",
+      path: "/conf/meetings/m1",
+    });
+    await screen.findByRole("dialog", { name: "1-on-1 details" });
+    expect(router.history.location.pathname).toBe("/conf/meetings/m1");
+  });
+
+  it("closes back to the schedule", async () => {
+    const { router } = await open({
+      snapshot: scheduling,
+      path: "/conf/meetings/m1",
     });
     const dialog = await screen.findByRole("dialog", {
       name: "1-on-1 details",
@@ -84,7 +93,10 @@ describe("a 1-on-1 over the schedule", { tags: ["012-US4"] }, () => {
     await userEvent.click(
       within(dialog).getByRole("button", { name: "Close" })
     );
-    await waitFor(() => expect(router.history.location.search).toBe(""));
+    await waitFor(() =>
+      expect(router.history.location.pathname).toBe("/conf/schedule")
+    );
+    expect(screen.queryByRole("dialog", { name: "1-on-1 details" })).toBeNull();
   });
 
   it("opens the booking dialog for a slot", async () => {
@@ -101,13 +113,13 @@ describe("a 1-on-1 over the schedule", { tags: ["012-US4"] }, () => {
 });
 
 describe("a 1-on-1 notification", { tags: ["012-US4"] }, () => {
-  it("hands the meeting to the schedule during scheduling", async () => {
+  it("opens the panel at the 1-on-1's own address", async () => {
     const { router } = await open({
       snapshot: scheduling,
       path: "/conf/meetings?viewMeeting=m1",
     });
     await screen.findByRole("dialog", { name: "1-on-1 details" });
-    expect(router.history.location.pathname).toBe("/conf/schedule");
+    expect(router.history.location.pathname).toBe("/conf/meetings/m1");
   });
 
   it("opens it read-only outside scheduling (#952)", async () => {
@@ -119,18 +131,9 @@ describe("a 1-on-1 notification", { tags: ["012-US4"] }, () => {
       name: "1-on-1 details",
     });
     expect(within(dialog).queryByRole("button", { name: "Accept" })).toBeNull();
-    expect(screen.getByText(/can only be answered or canceled/)).toBeTruthy();
-  });
-
-  it("opens it read-only over a read-only schedule", async () => {
-    await open({
-      snapshot: withMeeting(snapshot),
-      path: "/conf/schedule?viewMeeting=m1",
-    });
-    const dialog = await screen.findByRole("dialog", {
-      name: "1-on-1 details",
-    });
-    expect(within(dialog).queryByRole("button", { name: "Accept" })).toBeNull();
+    expect(
+      within(dialog).getByText(/can only be answered or canceled/)
+    ).toBeTruthy();
   });
 
   it("tells a reader with no name chosen so, instead of redirecting", async () => {
@@ -139,8 +142,8 @@ describe("a 1-on-1 notification", { tags: ["012-US4"] }, () => {
       identity: null,
       path: "/conf/meetings?viewMeeting=m1",
     });
-    expect(await screen.findByText(/1-on-1s/)).toBeTruthy();
-    expect(router.history.location.pathname).toBe("/conf/meetings");
+    expect(await screen.findByText(/select who you are/i)).toBeTruthy();
+    expect(router.history.location.pathname).toBe("/conf/meetings/m1");
   });
 
   it("asks for the password when the chosen name is protected", async () => {
