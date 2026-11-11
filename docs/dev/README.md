@@ -15,7 +15,7 @@ the repository.
 | ----------------------------------------- | ------------------------------------------------------------------------------ |
 | [Getting started](getting-started.md)     | stack, prerequisites, setup, env vars, the dev commands                        |
 | [Coding guidelines](coding-guidelines.md) | code style, when to write a comment, the colour tokens, the authorization rule |
-| [Testing](testing.md)                     | test strategy, TDD workflow, running tests, the Docker tier                    |
+| [Testing](testing.md)                     | test strategy, TDD workflow, running tests, the Docker tier, load testing      |
 | [Version control](version-control.md)     | commit conventions, pull requests, issues                                      |
 | [Changelog](changelog.md)                 | what belongs in `CHANGELOG.md` and in the in-app release notes                 |
 
