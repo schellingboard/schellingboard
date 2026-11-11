@@ -13,7 +13,7 @@ the E2E specs a step touches; the user runs the full suite at the end.
 2. DONE Fixed the 1000-attendee failure: snapshot no longer sums votes, two vote indexes (migration
    0061).
 3. DONE **#200** Quick Voting wraps long links.
-4. **#1070** Multi-line profile prompt answers.
+4. DONE **#1070** Multi-line profile prompt answers.
 5. **#901** Remove comments left on your profile.
 6. **#1337** Configurable proposal help text.
 7. **#771** Show current phase at a glance.

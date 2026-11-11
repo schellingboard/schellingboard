@@ -37,6 +37,7 @@ import {
   ComboboxField,
   MarkdownField,
   SelectField,
+  GrowingTextField,
   TextField,
 } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
@@ -415,7 +416,7 @@ export function ProfileForm({
                     </button>
                   </div>
                 )}
-                <TextField
+                <GrowingTextField
                   label={row.prompt}
                   name={`prompts.${i}.answer`}
                   value={row.answer}
@@ -440,7 +441,6 @@ export function ProfileForm({
           >
             Suggest a prompt
           </button>
-          <p className="text-sm text-fg-subtle">Markdown supported</p>
         </Section>
 
         <Section

@@ -26,6 +26,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Conversation-starter answers can have several lines** (#1070): press Enter for a new line, and
+  start lines with `-` for a list.
 - **Sessions, proposals, 1-on-1s and profiles open in a side panel**: the page stays usable beside
   it, you can drag its edge to resize it, and each has its own shareable link.
 - **The schedule and the proposals list keep their search, filter and sort**: they are part of the

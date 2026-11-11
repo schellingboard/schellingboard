@@ -101,6 +101,20 @@ describe("editing my profile", { tags: ["011-US1"] }, () => {
     ]);
   });
 
+  it("keeps the line breaks of a prompt answer", async () => {
+    const { calls } = setup();
+
+    const answer = screen.getByLabelText("Ask me about");
+    await userEvent.type(answer, "Rust{Enter}- Go");
+    await userEvent.click(save());
+
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect((calls[0].body as { prompts: unknown[] }).prompts).toContainEqual({
+      prompt: "Ask me about",
+      answer: "Rust\n- Go",
+    });
+  });
+
   it("adds a language and a contact, and asks for a label only on 'Other'", async () => {
     const { calls } = setup();
 
