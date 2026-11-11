@@ -6,6 +6,7 @@ import {
 import { serializeAttendeeFilters } from "@schellingboard/domain/attendee-filters";
 import type { DirectoryEntry, DirectoryState } from "../../queries/directory";
 import { Avatar } from "../../ui/avatar";
+import { ListToolbar } from "../../ui/list-toolbar";
 import { SearchInput } from "../../ui/search-input";
 import { SEARCH_DEBOUNCE_MS } from "../../ui/use-debounced";
 import {
@@ -71,39 +72,45 @@ export function DirectoryScreen(props: DirectoryScreenProps) {
         </div>
 
         <div className="space-y-4 pb-8">
-          <div className="flex flex-wrap items-center gap-3">
-            <SearchBox query={query} params={params} onParams={onParams} />
-            <div className="flex flex-wrap items-center gap-2">
-              {available.map((f) => {
-                const active = filters.includes(f.value);
-                return (
-                  <button
-                    key={f.value}
-                    type="button"
-                    onClick={() =>
-                      onParams(
-                        withParams(params, {
-                          filter: serializeAttendeeFilters(
-                            active
-                              ? filters.filter((v) => v !== f.value)
-                              : [...filters, f.value]
-                          ),
-                        }),
-                        { push: true }
-                      )
-                    }
-                    className={`text-sm px-3 py-2 rounded-md transition-colors ${
-                      active
-                        ? "bg-info text-on-info hover:bg-info-hover"
-                        : "bg-surface-muted text-fg-muted hover:bg-surface-hover"
-                    }`}
-                    aria-pressed={active}
-                    aria-label={`Filter by ${f.label}${active ? " (active)" : ""}`}
-                  >
-                    {f.label}
-                  </button>
-                );
-              })}
+          <ListToolbar
+            search={
+              <SearchBox query={query} params={params} onParams={onParams} />
+            }
+            filters={
+              <>
+                {available.map((f) => {
+                  const active = filters.includes(f.value);
+                  return (
+                    <button
+                      key={f.value}
+                      type="button"
+                      onClick={() =>
+                        onParams(
+                          withParams(params, {
+                            filter: serializeAttendeeFilters(
+                              active
+                                ? filters.filter((v) => v !== f.value)
+                                : [...filters, f.value]
+                            ),
+                          }),
+                          { push: true }
+                        )
+                      }
+                      className={`text-sm px-3 py-2 rounded-md transition-colors ${
+                        active
+                          ? "bg-info text-on-info hover:bg-info-hover"
+                          : "bg-surface-muted text-fg-muted hover:bg-surface-hover"
+                      }`}
+                      aria-pressed={active}
+                      aria-label={`Filter by ${f.label}${active ? " (active)" : ""}`}
+                    >
+                      {f.label}
+                    </button>
+                  );
+                })}
+              </>
+            }
+            sort={
               <label
                 className="flex items-center gap-2 text-sm text-fg-muted"
                 // On the label: browsers suppress pointer events on a disabled
@@ -141,13 +148,13 @@ export function DirectoryScreen(props: DirectoryScreenProps) {
                   ))}
                 </select>
               </label>
-              {rows.length > 0 && (
-                <span className="text-sm text-fg-subtle">
-                  {rows.length} attendee{rows.length === 1 ? "" : "s"}
-                </span>
-              )}
-            </div>
-          </div>
+            }
+            count={
+              rows.length > 0
+                ? `${rows.length} attendee${rows.length === 1 ? "" : "s"}`
+                : null
+            }
+          />
 
           {rows.length > 0 ? (
             <ul className="divide-y divide-line-subtle border-t border-b border-line-subtle">
@@ -254,7 +261,7 @@ function SearchBox({
         }}
         placeholder="Search names, languages, interests…"
         aria-label="Search"
-        inputClassName="px-3 py-1.5 text-base sm:text-sm rounded-md border border-line focus:border-line-strong focus:outline-none"
+        inputClassName="h-10 px-3 text-base sm:text-sm rounded-md border border-line bg-surface-raised placeholder-fg-subtle focus:ring-2 focus:ring-brand-accent focus:border-transparent focus:outline-none"
       />
     </form>
   );

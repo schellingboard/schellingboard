@@ -404,7 +404,7 @@ test("filters the proposal list down to your own proposals @004-US5", async ({
 
   // The badge on the button counts what the filter left, the same number the
   // list heads itself with.
-  const results = page.getByText(/^\(\d+ results?\)$/);
+  const results = page.getByText(/^\d+ results?$/);
   const count = (await results.innerText()).match(/\d+/)![0];
   await expect(mine).toHaveText(new RegExp(`My proposals\\s*${count}$`));
 

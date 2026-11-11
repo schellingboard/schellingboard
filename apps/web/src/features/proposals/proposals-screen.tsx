@@ -49,6 +49,7 @@ import {
   type SortKey,
 } from "./list-model";
 import { PersonLink } from "../people/person-link";
+import { ListToolbar } from "../../ui/list-toolbar";
 import { PhaseBar } from "../../ui/phase-bar";
 
 export type ProposalsScreenProps = {
@@ -285,15 +286,19 @@ function ProposalTable({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
-        <div className="lg:flex-1">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="text-sm font-medium text-fg-muted">Filters:</span>
-            <span className="text-xs text-fg-subtle">
-              ({shown.length} result{shown.length !== 1 ? "s" : ""})
-            </span>
-          </div>
-          <div className="flex flex-wrap gap-2">
+      <ListToolbar
+        search={
+          <SearchInput
+            placeholder="Search proposals..."
+            aria-label="Search proposals"
+            inputClassName="h-10 px-3 text-base sm:text-sm border border-line rounded-md bg-surface-raised placeholder-fg-subtle focus:ring-2 focus:ring-brand-accent focus:border-transparent"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onClear={() => setQuery("")}
+          />
+        }
+        filters={
+          <>
             {filterButton(
               "mine",
               "My proposals",
@@ -335,44 +340,39 @@ function ProposalTable({
                 Clear filters
               </button>
             )}
+          </>
+        }
+        sort={
+          <div
+            className="flex items-center gap-2"
+            title={
+              searching ? "Search results are sorted by relevance" : undefined
+            }
+          >
+            <label htmlFor="proposal-sort">Sort by</label>
+            <select
+              id="proposal-sort"
+              disabled={searching}
+              value={`${sort.key}-${sort.direction}`}
+              onChange={(e) => {
+                const [key, direction] = e.target.value.split("-") as [
+                  SortKey,
+                  Sort["direction"],
+                ];
+                setSort({ key, direction });
+              }}
+              className="pl-2 pr-9 py-1.5 text-sm rounded-md border border-line bg-surface-raised disabled:bg-surface-muted disabled:text-fg-subtle"
+            >
+              {sortOptions(snapshot.event, now).map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
           </div>
-        </div>
-        <div className="lg:w-80">
-          <SearchInput
-            placeholder="Search proposals..."
-            inputClassName="p-3 text-base border border-line rounded-md focus:ring-2 focus:ring-brand-accent focus:border-transparent"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onClear={() => setQuery("")}
-          />
-        </div>
-      </div>
-
-      <div
-        className="flex items-center justify-between md:justify-end gap-2 text-sm text-fg-muted"
-        title={searching ? "Search results are sorted by relevance" : undefined}
-      >
-        <label htmlFor="proposal-sort">Sort by</label>
-        <select
-          id="proposal-sort"
-          disabled={searching}
-          value={`${sort.key}-${sort.direction}`}
-          onChange={(e) => {
-            const [key, direction] = e.target.value.split("-") as [
-              SortKey,
-              Sort["direction"],
-            ];
-            setSort({ key, direction });
-          }}
-          className="pl-2 pr-9 py-1.5 text-sm rounded-md border border-line bg-surface-raised disabled:bg-surface-muted disabled:text-fg-subtle"
-        >
-          {sortOptions(snapshot.event, now).map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
-      </div>
+        }
+        count={`${shown.length} result${shown.length !== 1 ? "s" : ""}`}
+      />
 
       <div className="hidden md:block overflow-x-auto">
         <table className="table-fixed w-full divide-y divide-line-subtle min-w-0">

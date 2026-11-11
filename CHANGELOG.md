@@ -47,6 +47,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Tidier proposal and attendee filters**: search fills the width beside Sort by, filter chips and
+  the result count below it; no empty corners on phones.
 - **The side panel has no share button**: its icon was hard to read. A session's link is still the
   address of the open panel.
 - **Form errors and failure messages carry a warning icon** (#754): they no longer rely on red
