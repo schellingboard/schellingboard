@@ -118,3 +118,23 @@ test("a filter chosen in the agenda carries over to the grid @007-US3", async ({
     page.getByRole("link", { name: /Open Source Sustainability/ })
   ).toHaveAccessibleName(NO_MATCH);
 });
+
+test("a search survives opening a session, closing it and a reload @007-US3", async ({
+  page,
+}) => {
+  await loginAndGoto(page, "/guests");
+  await selectUser(page, "Zanele Khumalo");
+  await page.getByRole("link", { name: "Conference Gamma" }).first().click();
+  const search = page.getByRole("searchbox", { name: "Search sessions" });
+
+  await page.getByRole("link", { name: /API Design/ }).click();
+  const panel = page.getByRole("dialog", { name: "Session details" });
+  await search.fill("comparative");
+  await expect(page.getByText(/^1 of \d+ match/)).toBeVisible();
+  await panel.getByRole("button", { name: "Close" }).click();
+  await expect(panel).toBeHidden();
+  await expect(page).toHaveURL(/q=comparative/);
+
+  await page.reload();
+  await expect(search).toHaveValue("comparative");
+});

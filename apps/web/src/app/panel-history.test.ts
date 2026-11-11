@@ -87,6 +87,16 @@ describe("panel history", () => {
     expect(history.location.pathname).toBe("/conf/schedule");
   });
 
+  it("carries what the page behind changed over to the entry it returns to", async () => {
+    const history = start();
+    openPanel(history, session("s1"));
+    replaceBackground(history, "?view=agenda&q=talk");
+    closePanel(history);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(history.location.pathname).toBe("/conf/schedule");
+    expect(history.location.search).toBe("?view=agenda&q=talk");
+  });
+
   it("starts a new stack for a click on the page behind", async () => {
     const history = start();
     openPanel(history, session("s1"));

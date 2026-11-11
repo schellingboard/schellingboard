@@ -1,6 +1,12 @@
 import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
 import { useState } from "react";
-import { cleanup, render, screen, within } from "@testing-library/react";
+import {
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { snapshot as base, iso } from "../../replica/snapshot-fixture";
@@ -466,20 +472,20 @@ describe("ScheduleScreen toolbar", () => {
   });
 });
 
-describe("ScheduleScreen day folds", () => {
-  const twoDays: Snapshot = {
-    ...snap,
-    days: [
-      ...snap.days,
-      {
-        ...snap.days[0],
-        id: "d2",
-        start: new Date(Date.UTC(2026, 5, 16, 8)).toISOString(),
-        end: new Date(Date.UTC(2026, 5, 16, 18)).toISOString(),
-      },
-    ],
-  };
+const twoDays: Snapshot = {
+  ...snap,
+  days: [
+    ...snap.days,
+    {
+      ...snap.days[0],
+      id: "d2",
+      start: new Date(Date.UTC(2026, 5, 16, 8)).toISOString(),
+      end: new Date(Date.UTC(2026, 5, 16, 18)).toISOString(),
+    },
+  ],
+};
 
+describe("ScheduleScreen day folds", () => {
   it(
     "folds a passed day in both views and opens it from its bar",
     { tags: ["007-US1"] },
@@ -504,6 +510,55 @@ describe("ScheduleScreen day folds", () => {
     expect(await screen.findByRole("link", { name: /Talk/ })).toBeTruthy();
     expect(screen.queryByRole("button", { name: /day has passed/ })).toBeNull();
   });
+});
+
+describe("ScheduleScreen page state in the address", () => {
+  const now = new Date(Date.UTC(2026, 5, 16, 9));
+
+  it(
+    "writes a search into the address and reads it back",
+    { tags: ["007-US3"] },
+    async () => {
+      const { onParamsChange } = screenAt();
+      await userEvent.type(
+        screen.getByRole("searchbox", { name: "Search sessions" }),
+        "talk"
+      );
+      await waitFor(() =>
+        expect(onParamsChange.mock.lastCall?.[0].get("q")).toBe("talk")
+      );
+      cleanup();
+      screenAt("q=workshop");
+      expect(
+        screen.getByRole<HTMLInputElement>("searchbox", {
+          name: "Search sessions",
+        }).value
+      ).toBe("workshop");
+    }
+  );
+
+  it(
+    "writes an unfolded day into the address and opens it again from there",
+    { tags: ["007-US1"] },
+    async () => {
+      const { onParamsChange } = screenAt("view=agenda", {
+        snapshot: twoDays,
+        now,
+      });
+      await userEvent.click(
+        screen.getByRole("button", { name: /day has passed/ })
+      );
+      expect(onParamsChange.mock.lastCall?.[0].getAll("unfold")).toEqual([
+        twoDays.days[0].id,
+      ]);
+      cleanup();
+      screenAt(`view=agenda&unfold=${twoDays.days[0].id}`, {
+        snapshot: twoDays,
+        now,
+      });
+      expect(screen.getByRole("link", { name: /Talk/ })).toBeTruthy();
+    }
+  );
 });
 
 describe("ScheduleScreen RSVP badge", () => {
