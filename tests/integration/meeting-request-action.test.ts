@@ -129,7 +129,7 @@ describe("requesting a 1-on-1", () => {
       requester.id,
       event.id
     );
-    expect(notification.url).toContain(`/meetings?viewMeeting=${meeting.id}`);
+    expect(notification.url).toContain(`/meetings/${meeting.id}`);
   });
 
   it("requires a meeting point", async () => {
