@@ -20,6 +20,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   page address, so Back and a reload bring them back.
 - **Back returns to where you were scrolled**: the schedule, the proposals list and the attendee
   directory come back at the same place, also after a reload.
+- **A session you add from the schedule is shown after saving**: the schedule scrolls to it, and
+  opens its day if that was folded.
 
 ### Internal
 

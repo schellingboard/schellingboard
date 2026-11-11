@@ -35,7 +35,9 @@ export function SessionFormPage() {
       }}
       links={links}
       actions={actions}
-      onDone={() => history.push(links.schedule)}
+      onDone={(created) =>
+        history.push(links.schedule, created ? { revealSession: created } : {})
+      }
     />
   );
 }

@@ -96,8 +96,8 @@ export type SessionFormProps = {
   links: SessionFormLinks;
   /** Stable between renders: a new one asks the server about the hosts again. */
   actions: SessionFormCalls;
-  /** Saved or deleted: the caller leaves the form. */
-  onDone: () => void;
+  /** Saved or deleted: the caller leaves the form. `created` names a session just added. */
+  onDone: (created?: string) => void;
 };
 
 /** The add and edit session screens. */
@@ -420,9 +420,10 @@ function Fields({
     setConfirmingMove(false);
     setLast("save");
     body.current = next;
-    if ((await save.submit())?.ok) {
+    const saved = await save.submit();
+    if (saved?.ok) {
       confirmation(editing ? "updated successfully!" : "added successfully!");
-      onDone();
+      onDone(editing ? undefined : saved.data?.id);
     }
   };
 

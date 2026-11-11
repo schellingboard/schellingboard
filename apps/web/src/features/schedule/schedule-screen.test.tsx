@@ -1,5 +1,6 @@
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import {
+  act,
   cleanup,
   render,
   screen,
@@ -84,12 +85,15 @@ function screenAt(
 ) {
   const openSession = vi.fn<(sessionId: string) => void>();
   const onParamsChange = vi.fn<(params: URLSearchParams) => void>();
+  let setSnapshot: (next: Snapshot) => void = () => {};
   const Harness = () => {
+    const [shown, setShown] = useState(snapshot);
+    setSnapshot = setShown;
     const [current, setCurrent] = useState(new URLSearchParams(params));
     return (
       <ScheduleScreen
         clashes={new Map()}
-        snapshot={snapshot}
+        snapshot={shown}
         now={now}
         links={scheduleLinks(snapshot.event.slug)}
         params={current}
@@ -110,7 +114,11 @@ function screenAt(
     );
   };
   render(<Harness />);
-  return { onParamsChange, openSession };
+  return {
+    onParamsChange,
+    openSession,
+    showSnapshot: (next: Snapshot) => act(() => setSnapshot(next)),
+  };
 }
 
 const scrollIntoView = vi.fn();
@@ -845,6 +853,28 @@ describe("opening the schedule from a session link", () => {
         inline: "center",
         behavior: "instant",
       });
+      expect(
+        (scrollIntoView.mock.contexts.at(-1) as HTMLElement).getAttribute(
+          "data-session-id"
+        )
+      ).toBe("s");
+    }
+  );
+
+  it(
+    "reveals a session that only arrives after the schedule is shown",
+    { tags: ["007-US12"] },
+    () => {
+      scrollIntoView.mockClear();
+      const { showSnapshot } = screenAt("view=agenda", {
+        reveal: "s",
+        snapshot: { ...twoDays, sessions: [] },
+        now: dayTwo,
+        actions: modalActions(),
+      });
+      expect(scrollIntoView).not.toHaveBeenCalled();
+      showSnapshot(twoDays);
+      expect(screen.getByRole("link", { name: /Talk/ })).toBeTruthy();
       expect(
         (scrollIntoView.mock.contexts.at(-1) as HTMLElement).getAttribute(
           "data-session-id"
