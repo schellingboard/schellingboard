@@ -15,6 +15,22 @@ const event = (patch: Partial<EventSummary>): EventSummary => ({
 const site = { title: "Unconf Hub", description: "All **our** events" };
 
 describe("the event list", () => {
+  it("draws the icon an organizer chose beside the event's name", () => {
+    render(
+      <EventListScreen
+        site={site}
+        events={[
+          event({ slug: "a", name: "With icon", icon: "RocketLaunchIcon" }),
+          event({ slug: "b", name: "No icon", icon: null }),
+        ]}
+      />
+    );
+
+    const heading = (name: string) => screen.getByRole("heading", { name });
+    expect(heading("With icon").querySelector("svg")).toBeTruthy();
+    expect(heading("No icon").querySelector("svg")).toBeNull();
+  });
+
   it("shows the site and each event, soonest first, with a link to it", () => {
     render(
       <EventListScreen

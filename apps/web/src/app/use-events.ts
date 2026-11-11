@@ -39,5 +39,6 @@ export function useEvents(
   return useEventList(api).events.map((e) => ({
     name: e.name,
     href: href(e.slug),
+    icon: e.icon,
   }));
 }

@@ -3,6 +3,7 @@ import { formatEventDates } from "@schellingboard/domain/time";
 import type { EventSummary } from "../../app/use-events";
 import { toEvent } from "../../replica/selectors";
 import { CalendarIcon, ChevronRightIcon, LinkIcon } from "../../ui/icons";
+import { EventIcon } from "../../ui/event-icon";
 import { Markdown } from "../../ui/markdown";
 
 export interface SiteInfo {
@@ -29,7 +30,10 @@ export function EventListScreen({
       <div className="flex flex-col gap-8 sm:pl-5 mt-10">
         {sorted.map(({ summary: event, event: domain }) => (
           <div key={event.id}>
-            <h2 className="sm:text-2xl text-xl font-bold">{event.name}</h2>
+            <h2 className="flex items-center gap-2 sm:text-2xl text-xl font-bold">
+              <EventIcon name={event.icon} className="h-6 w-6 shrink-0" />
+              {event.name}
+            </h2>
             <div className="flex text-fg-subtle text-xs mt-1 gap-5 font-medium">
               {formatEventDates(domain) && (
                 <span className="flex gap-1 items-center">

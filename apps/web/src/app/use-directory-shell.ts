@@ -26,7 +26,11 @@ export function useDirectoryShell(api: AppServices["api"]) {
     directory.get
   );
   const frame: Omit<ShellProps, "api" | "children"> = {
-    events: events.map((e) => ({ name: e.name, href: `/${e.slug}` })),
+    events: events.map((e) => ({
+      name: e.name,
+      href: `/${e.slug}`,
+      icon: e.icon,
+    })),
     guests:
       status === "ready" || entries.length > 0
         ? entries.map((e) => ({

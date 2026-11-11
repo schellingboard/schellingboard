@@ -1,6 +1,16 @@
 import { useState, type ReactNode } from "react";
+import { EventIcon } from "../ui/event-icon";
 
-export type NavItem = { name: string; href: string };
+export type NavItem = { name: string; href: string; icon?: string | null };
+
+function ItemLabel({ item }: { item: NavItem }) {
+  return (
+    <span className="flex items-center gap-1.5">
+      <EventIcon name={item.icon} className="h-4 w-4 shrink-0" />
+      {item.name}
+    </span>
+  );
+}
 
 const linkClass = (current: boolean) =>
   `rounded-md px-3 py-2 text-sm font-medium ${current ? "bg-brand-tint text-brand-fg" : "text-fg-subtle hover:bg-surface-muted"}`;
@@ -40,7 +50,7 @@ export function NavBar({
               aria-current={isCurrent(item) ? "page" : undefined}
               className={linkClass(isCurrent(item))}
             >
-              {item.name}
+              <ItemLabel item={item} />
             </a>
           ))}
         </nav>
@@ -55,7 +65,7 @@ export function NavBar({
               aria-current={isCurrent(item) ? "page" : undefined}
               className={`block ${linkClass(isCurrent(item))}`}
             >
-              {item.name}
+              <ItemLabel item={item} />
             </a>
           ))}
         </nav>

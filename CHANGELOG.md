@@ -16,6 +16,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Hosting on NixOS** ([#1664](https://github.com/schellingboard/schellingboard/issues/1664)): a
   NixOS module runs SchellingBoard as a system service. See the NixOS guide under Self-hosting.
 
+### Fixed
+
+- **Event icons are shown** (#1588): the icon picker in the event settings draws each icon, and the
+  chosen icon appears beside the event's name in the menu and on the home page.
+
 ## [5.0.0] - 2026-11-11
 
 > **Breaking change**: behind a reverse proxy, set `SB_TRUSTED_PROXIES` (usually `1`) when

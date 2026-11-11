@@ -23,6 +23,25 @@ describe("NavBar", () => {
     ).toBeNull();
   });
 
+  it("draws an event's icon beside its name", () => {
+    render(
+      <NavBar
+        items={[
+          { ...items[0], icon: "RocketLaunchIcon" },
+          { ...items[1], icon: null },
+        ]}
+        currentPath="/"
+      />
+    );
+
+    const nav = screen.getByRole("navigation");
+    const [conf, retreat] = ["Conf", "Retreat"].map(
+      (name) => within(nav).getAllByRole("link", { name })[0]
+    );
+    expect(conf.querySelector("svg")).toBeTruthy();
+    expect(retreat.querySelector("svg")).toBeNull();
+  });
+
   it("marks nothing as current when there is only one event", () => {
     render(<NavBar items={[items[0]]} currentPath="/legacy/conf" />);
     expect(
