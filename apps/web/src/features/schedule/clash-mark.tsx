@@ -19,7 +19,10 @@ export function ClashIcon({
       <ExclamationTriangleIcon
         aria-hidden={false}
         role="img"
-        aria-label={t`Clash`}
+        aria-label={t({
+          message: "Clash",
+          comment: "Label of a warning icon: this overlaps another commitment",
+        })}
         aria-describedby={detailsId}
         className={className}
       />

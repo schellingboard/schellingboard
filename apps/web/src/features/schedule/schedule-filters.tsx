@@ -1,5 +1,5 @@
 import { i18n } from "@lingui/core";
-import { t } from "@lingui/core/macro";
+import { plural, t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { type Ref, useEffect, useId, useRef, useState } from "react";
 
@@ -59,13 +59,32 @@ export function ScheduleFilters({
     : "";
   const active = [
     ...(mine?.active ? [t`My schedule (${kinds})`] : []),
-    ...(clashes?.active ? [t`Clashes`] : []),
-    ...(hidden?.active ? [t`Hidden`] : []),
+    ...(clashes?.active
+      ? [
+          t({
+            message: "Clashes",
+            comment: "Filter: sessions that overlap in your schedule",
+          }),
+        ]
+      : []),
+    ...(hidden?.active
+      ? [
+          t({
+            message: "Hidden",
+            comment: "Filter: sessions you hid from your schedule",
+          }),
+        ]
+      : []),
     ...(search.trim() === "" ? [] : [`"${search.trim()}"`]),
   ];
   const matching = count?.matching ?? 0;
   const total = count?.total ?? 0;
-  const matchCount = t`${matching} of ${total} match`;
+  const matchCount = plural(matching, {
+    one: `# of ${total} match`,
+    other: `# of ${total} match`,
+  });
+  const summary = [matchCount, ...active].join(" · ");
+  const backToSearch = t`${summary}, back to the search`;
   // Lifted only while the menu is open: always-on, the bar would paint over
   // the grid's sticky headers as it scrolls away.
   const width =
@@ -110,7 +129,10 @@ export function ScheduleFilters({
                 <FilterChip
                   active={clashes.active}
                   onClick={onToggleClashes}
-                  label={t`Clashes`}
+                  label={t({
+                    message: "Clashes",
+                    comment: "Filter: sessions that overlap in your schedule",
+                  })}
                   hint={
                     clashes.meetings
                       ? t`Show only your sessions and 1-on-1s that overlap in time with another of yours, bookmarks included.`
@@ -122,7 +144,10 @@ export function ScheduleFilters({
                 <FilterChip
                   active={hidden.active}
                   onClick={onToggleHidden}
-                  label={t`Hidden`}
+                  label={t({
+                    message: "Hidden",
+                    comment: "Filter: sessions you hid from your schedule",
+                  })}
                 />
               )}
             </div>
@@ -145,13 +170,11 @@ export function ScheduleFilters({
             <button
               type="button"
               onClick={onBackToTop}
+              aria-label={backToSearch}
               className="flex min-w-0 items-center gap-1 hover:text-fg-muted"
             >
-              <span className="truncate">
-                {[matchCount, ...active].join(" · ")}
-              </span>
+              <span className="truncate">{summary}</span>
               <ArrowUpIcon aria-hidden className="h-3.5 w-3.5 shrink-0" />
-              <span className="sr-only">{t`, back to the search`}</span>
             </button>
             <span aria-hidden>·</span>
             <button
