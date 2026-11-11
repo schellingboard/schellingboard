@@ -11,6 +11,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **Remove comments left on your profile**
+  ([#901](https://github.com/schellingboard/schellingboard/issues/901)): profile owners, session and
+  proposal hosts, and admins can now delete other people's comments.
+
 ### Changed
 
 - **Sessions, proposals, 1-on-1s and profiles open in a side panel**

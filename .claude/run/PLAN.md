@@ -14,7 +14,7 @@ the E2E specs a step touches; the user runs the full suite at the end.
    0061).
 3. DONE **#200** Quick Voting wraps long links.
 4. DONE **#1070** Multi-line profile prompt answers.
-5. **#901** Remove comments left on your profile.
+5. DONE **#901** Owners, hosts and admins delete comments (`canDelete` in the comment view).
 6. **#1337** Configurable proposal help text.
 7. **#771** Show current phase at a glance.
 8. **#861** Shared moments (meals) on the schedule. Size L: split into several steps first.
