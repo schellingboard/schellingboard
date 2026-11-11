@@ -42,6 +42,13 @@ describe("panel history", () => {
     expect(panelOf(history.location)).toMatchObject({ depth: 2 });
   });
 
+  it("names a profile by its own address, over any page", () => {
+    const history = createMemoryHistory({ initialEntries: ["/settings"] });
+    openPanel(history, { kind: "profile", id: "a b" });
+    expect(history.location.pathname).toBe("/guests/a%20b");
+    expect(backgroundOf(history.location).pathname).toBe("/settings");
+  });
+
   it("opens over the page, which stays the background with its query intact", () => {
     const history = start();
     openPanel(history, session("s1"));

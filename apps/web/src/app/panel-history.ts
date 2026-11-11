@@ -2,7 +2,8 @@ import type { HistoryLocation, RouterHistory } from "@tanstack/react-router";
 
 export type PanelItem =
   | { kind: "session"; slug: string; id: string; record?: boolean }
-  | { kind: "proposal"; slug: string; id: string };
+  | { kind: "proposal"; slug: string; id: string }
+  | { kind: "profile"; id: string };
 
 export type PanelState = {
   item: PanelItem;
@@ -21,10 +22,12 @@ type Raw = {
 
 const rawState = (location: HistoryLocation) => location.state as Raw;
 
-export const panelPath = (item: PanelItem) =>
-  item.kind === "session"
-    ? `/${item.slug}/sessions/${encodeURIComponent(item.id)}${item.record ? "?record=count" : ""}`
-    : `/${item.slug}/proposals/${encodeURIComponent(item.id)}`;
+export const panelPath = (item: PanelItem) => {
+  const id = encodeURIComponent(item.id);
+  if (item.kind === "profile") return `/guests/${id}`;
+  if (item.kind === "proposal") return `/${item.slug}/proposals/${id}`;
+  return `/${item.slug}/sessions/${id}${item.record ? "?record=count" : ""}`;
+};
 
 export const panelOf = (location: HistoryLocation): PanelState | undefined =>
   rawState(location).panel;
@@ -123,6 +126,9 @@ export function landOnPanel(
 ) {
   const [pathname, query = ""] = background.split("?");
   history.replace(background);
+  // A browser history merges a replace and a push of the same tick into one
+  // push, which would leave the address being landed on under the panel.
+  history.flush();
   pushEntry(
     history,
     { item, depth: 1, landed: true },

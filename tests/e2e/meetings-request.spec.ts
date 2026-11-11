@@ -162,7 +162,7 @@ async function openProfile(page: Page, name: string) {
     .getByRole("link", { name: new RegExp(name) })
     .first()
     .click();
-  await expect(page.getByRole("heading", { name })).toBeVisible();
+  await expect(page.getByRole("heading", { name, level: 1 })).toBeVisible();
 }
 
 test.describe("1-on-1 meetings", () => {
@@ -376,7 +376,9 @@ test.describe("1-on-1 meetings", () => {
     // page still loading behind its modal.
     await meeting.getByRole("link", { name: asker }).click();
     const profile = page.getByRole("dialog", { name: asker });
-    await expect(profile.getByRole("heading", { name: asker })).toBeVisible();
+    await expect(
+      profile.getByRole("heading", { name: asker, level: 1 })
+    ).toBeVisible();
     await profile.getByRole("button", { name: "Close" }).click();
     await openNotifications(
       page,

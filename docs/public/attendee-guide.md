@@ -439,16 +439,16 @@ read who is coming without opening anything.
   left at the bottom of everybody's list when 1-on-1 requests go out.
 
 Click any name, wherever it appears, to open that person's profile — bio, proposals, and the
-sessions they're hosting. It opens _over_ the directory rather than replacing it, so closing it puts
-you back exactly where you were, search and filters intact.
+sessions they're hosting. It opens in a panel beside the page rather than replacing it, so closing
+it puts you back exactly where you were, search and filters intact. Drag the panel's edge to resize
+it.
 
 - **Prev** and **Next** at the top move through attendees without going back to the list — so do the
   arrow keys, and a sideways swipe on a phone. They follow whatever the list is showing, so a search
-  or filter narrows what you read through, and the count at the top says where you are.
+  or filter narrows what you read through, and the count at the top says where you are. They appear
+  when the profile is open over the directory, not over other pages.
 - **Escape** closes the profile.
-- The photo is shown large, since that's how you recognise someone; click it for larger still. On a
-  wide window it stays beside you as you scroll, together with name, pronouns, location and
-  languages.
+- The photo is shown large, since that's how you recognise someone; click it for larger still.
 
 A profile ends with the same comment section proposals and sessions have — a good place to say hi,
 find someone to share a ride with, or ask something before the event. Everything works as described

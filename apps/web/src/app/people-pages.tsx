@@ -1,33 +1,25 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
 import { newSortSeed } from "@schellingboard/domain/attendee-search";
-import { failureMessage } from "../commands/failure-message";
-import { newKey } from "../commands/keys";
-import { meetingRequestCalls } from "../commands/meeting-request";
 import { profileFormCalls } from "../commands/profile-form";
-import { createCommandRunner } from "../commands/runner";
 import { DirectoryScreen } from "../features/people/directory-screen";
-import { peopleLinks, profileLinks } from "../features/people/links";
+import { peopleLinks } from "../features/people/links";
 import { ProfileForm } from "../features/people/profile-form";
-import { ProfileModal } from "../features/people/profile-modal";
 import { meetingsOpen } from "../features/schedule/meeting-rules";
 import {
   type DirectoryEntry,
   type DirectoryQuery,
   type DirectoryState,
 } from "../queries/directory";
-import type { CommentsHandle } from "../features/comments/comments-section";
-import { createProfileActivityQuery } from "../queries/profile-activity";
-import { blankSnapshot } from "../replica/blank";
-import { createReplicaStore } from "../replica/store";
 import { toEvent } from "../replica/selectors";
-import { useNotify } from "../ui/notices";
 import { InAppLinks } from "./in-app-links";
 import { PageNotice } from "./page-notice";
+import { PanelLanding } from "./panel-landing";
+import { profileIdOf } from "./profile-links";
+import { useProfileWalk } from "./profile-walk";
 import type { AppServices } from "./services";
-import { ShellFrame, ShellProviders } from "./shell";
-import { useCommentSource } from "./use-comment-actions";
+import { ShellFrame } from "./shell";
 import { useDirectoryShell } from "./use-directory-shell";
 import { useUrlSearchParams } from "./use-url-search-params";
 import { useViewer } from "./viewer";
@@ -35,79 +27,41 @@ import { useViewer } from "./viewer";
 const LIST = "/guests";
 
 const isPeoplePath = (pathname: string) =>
-  pathname === "/guests" || pathname.startsWith("/guests/");
+  pathname === "/guests" || pathname === "/guests/edit";
 
 /** The attendee directory, a profile over it, and the edit-profile page. */
 export function PeoplePage({ services }: { services: AppServices }) {
-  return (
-    <ShellProviders api={services.api}>
-      <Host api={services.api} />
-    </ShellProviders>
-  );
+  return <Host api={services.api} />;
 }
 
 function Host({ api }: { api: AppServices["api"] }) {
   const viewer = useViewer();
-  const notify = useNotify();
-  const { params } = useUrlSearchParams();
+  const { search } = useUrlSearchParams();
   const { events, now, directory, status, entries, pathname, frame } =
     useDirectoryShell(api);
 
-  const runner = useMemo(
-    () =>
-      createCommandRunner({
-        store: createReplicaStore(blankSnapshot(new Date().toISOString())),
-        api,
-        newKey,
-        onFailure: (failure) =>
-          notify({ tone: "failure", message: failureMessage(failure) }),
-      }),
-    [api, notify]
-  );
-
-  const viewerId = viewer.guestId ?? null;
-  const me = entries.find((e) => e.id === viewerId);
-  const liker = useMemo(
-    () => me && { id: me.id, name: me.name, avatarUrl: me.avatarUrl },
-    [me]
-  );
-  const openComments = useCommentSource(api, runner, liker ?? null);
-  const comments = useCallback(
-    (id: string, name: string) => openComments({ kind: "profile", id, name }),
-    [openComments]
-  );
-
   const view = {
-    api,
     directory,
     entries,
     status,
     now,
-    viewerId,
+    viewerId: viewer.guestId ?? null,
     viewerKnown: viewer.guestId !== undefined,
     meetingsEnabled: events.some((e) => meetingsOpen(toEvent(e), now)),
-    comments,
+    api,
   };
   const editing = pathname.replace(/\/$/, "") === "/guests/edit";
-  const profileId = editing
-    ? undefined
-    : pathname.match(/^\/guests\/([^/]+)\/?$/)?.[1];
+  const profileId = editing ? null : profileIdOf(pathname);
 
   return (
     <ShellFrame api={api} {...frame}>
-      <InAppLinks
-        owns={(url) => isPeoplePath(url.pathname)}
-        onFollow={(url) => {
-          // A profile reached by a bare address (a comment's author) keeps the
-          // list it is read over, so closing it lands where reading started.
-          const query = url.search || (profileId ? `?${params}` : "");
-          return `${url.pathname}${query === "?" ? "" : query}${url.hash}`;
-        }}
-      >
-        {editing ? (
-          <EditProfile {...view} />
-        ) : (
-          <Directory {...view} profileId={profileId} />
+      <InAppLinks owns={(url) => isPeoplePath(url.pathname)}>
+        {editing ? <EditProfile {...view} /> : <Directory {...view} />}
+        {profileId && (
+          <PanelLanding
+            item={{ kind: "profile", id: profileId }}
+            background={`/guests${search}`}
+          />
         )}
       </InAppLinks>
     </ShellFrame>
@@ -123,28 +77,12 @@ type View = {
   viewerId: string | null;
   viewerKnown: boolean;
   meetingsEnabled: boolean;
-  comments: (id: string, name: string) => CommentsHandle;
 };
 
-function Directory({
-  api,
-  entries,
-  status,
-  now,
-  viewerId,
-  meetingsEnabled,
-  comments,
-  profileId,
-}: View & { profileId: string | undefined }) {
-  const { history } = useRouter();
-  const { params, change, setHash } = useUrlSearchParams();
-  const listQuery = params.toString();
+function Directory({ entries, status, now, viewerId, meetingsEnabled }: View) {
+  const { params, change } = useUrlSearchParams();
+  const { setRows } = useProfileWalk();
   const [randomSeed] = useState(newSortSeed);
-  const activity = useCallback(
-    (guestId: string) => createProfileActivityQuery({ api, guestId }),
-    [api]
-  );
-  const meetingRequests = useMemo(() => meetingRequestCalls(api), [api]);
 
   return (
     <DirectoryScreen
@@ -157,24 +95,7 @@ function Directory({
       links={peopleLinks}
       params={params}
       onParams={change}
-      profile={({ matches, everyone }) =>
-        profileId && (
-          <ProfileModal
-            guestId={profileId}
-            matches={matches}
-            everyone={everyone}
-            viewerId={viewerId}
-            status={status}
-            links={profileLinks}
-            activity={activity}
-            onOpen={(id) => history.push(peopleLinks.guest(id, listQuery))}
-            onClose={() => history.push(profileLinks.list(listQuery))}
-            meetingRequests={meetingRequests}
-            comments={comments}
-            setHash={setHash}
-          />
-        )
-      }
+      onRows={setRows}
     />
   );
 }
@@ -248,7 +169,7 @@ function EditProfile({
       onDone={() => {
         void directory
           .refresh()
-          .then(() => history.push(peopleLinks.guest(me.id, "")));
+          .then(() => history.push(peopleLinks.guest(me.id)));
       }}
     />
   );

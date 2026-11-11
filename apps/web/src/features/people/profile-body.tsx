@@ -76,15 +76,8 @@ export function ProfileBody({
 }) {
   const options = activity?.meetingOptions ?? [];
   return (
-    <div className="flex flex-col md:flex-row gap-8">
-      {/* A column beside the text from md up: stacked, the photo would push
-          About me off the first screen. Sticky and self-start, or a long
-          profile scrolls it away and leaves a page-tall gutter. */}
-      <header
-        className={`flex flex-col items-center md:items-start md:shrink-0 md:sticky md:top-0 md:self-start gap-2 text-center md:text-left ${
-          zoomed ? "md:w-[32rem]" : "md:w-64"
-        }`}
-      >
+    <div className="flex flex-col gap-8">
+      <header className="flex flex-col items-center gap-2 text-center">
         <ProfilePhoto
           name={guest.name}
           image={guest.avatarUrl}
@@ -95,7 +88,7 @@ export function ProfileBody({
           {guest.name}
         </h1>
         {(guest.pronouns || guest.isHost) && (
-          <div className="flex flex-row flex-wrap items-center justify-center md:justify-start gap-2">
+          <div className="flex flex-row flex-wrap items-center justify-center gap-2">
             {guest.pronouns && (
               <p className="text-fg-muted">{guest.pronouns}</p>
             )}
@@ -136,7 +129,7 @@ export function ProfileBody({
         {(guest.languages ?? []).length > 0 && (
           <section className="w-full mt-2">
             <h2 className="text-lg font-semibold mb-2">Languages</h2>
-            <ul className="flex flex-wrap justify-center md:justify-start gap-2">
+            <ul className="flex flex-wrap justify-center gap-2">
               {guest.languages!.map((language, i) => (
                 <li
                   key={i}

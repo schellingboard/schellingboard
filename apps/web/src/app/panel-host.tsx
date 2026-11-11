@@ -16,7 +16,8 @@ import { useScheduleActions } from "./use-schedule-actions";
 export function PanelHost() {
   const { panel } = usePanel();
   const { slug } = useEventView();
-  if (!panel || panel.item.slug !== slug) return null;
+  if (!panel || panel.item.kind === "profile" || panel.item.slug !== slug)
+    return null;
   const key = `${panel.item.kind}:${panel.item.id}:${panel.depth}`;
   return panel.item.kind === "session" ? (
     <SessionHost key={key} item={panel.item} depth={panel.depth} />

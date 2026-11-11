@@ -42,8 +42,7 @@ const entries = [
 ];
 
 const links = {
-  guest: (id: string, listQuery: string) =>
-    `/guests/${id}${listQuery ? `?${listQuery}` : ""}`,
+  guest: (id: string) => `/guests/${id}`,
   edit: "/guests/edit",
 };
 
@@ -90,16 +89,13 @@ describe("the directory screen", () => {
     expect(within(links[0]).getByText("Oslo")).toBeTruthy();
   });
 
-  it("searches names and profile text, and carries the view onto the profile link", async () => {
+  it("searches names and profile text", async () => {
     render(<Harness />);
 
     await userEvent.type(screen.getByLabelText("Search"), "bees");
 
     expect(await screen.findByText("1 attendee")).toBeTruthy();
     expect(screen.getByTestId("url").textContent).toBe("q=bees");
-    expect(screen.getByRole("link", { name: /Cy/ }).getAttribute("href")).toBe(
-      "/guests/cy?q=bees"
-    );
   });
 
   it("filters, and says so on the toggles", async () => {

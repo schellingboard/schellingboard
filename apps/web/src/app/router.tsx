@@ -32,6 +32,10 @@ import { EventLayout } from "./event-page";
 import { SchedulePage } from "./schedule-page";
 import { PanelLanding } from "./panel-landing";
 import { PanelHost } from "./panel-host";
+import { ShellProviders } from "./shell";
+import { ProfileLinks } from "./profile-links";
+import { ProfilePanelHost } from "./profile-host";
+import { ProfileWalkProvider } from "./profile-walk";
 import { SessionFormPage } from "./sessions-pages";
 import { SpaLinks } from "./spa-links";
 import { defaultServices, type AppServices } from "./services";
@@ -90,18 +94,29 @@ const adminPages = [
   AdminUsersPage,
 ];
 
-const rootRoute = createRootRoute({ component: Outlet });
-
-const catchAll = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "$",
-  component: NotFound,
-});
-
 export function createAppRouter(
   history?: RouterHistory,
   services: AppServices = defaultServices()
 ) {
+  const rootRoute = createRootRoute({
+    component: function RootRoute(): ReactElement {
+      return (
+        <ShellProviders api={services.api}>
+          <ProfileWalkProvider>
+            <ProfileLinks>
+              <Outlet />
+              <ProfilePanelHost api={services.api} />
+            </ProfileLinks>
+          </ProfileWalkProvider>
+        </ShellProviders>
+      );
+    },
+  });
+  const catchAll = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "$",
+    component: NotFound,
+  });
   const home = createRoute({
     getParentRoute: () => rootRoute,
     path: "/",

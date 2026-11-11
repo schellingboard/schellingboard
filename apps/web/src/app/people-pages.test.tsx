@@ -63,7 +63,7 @@ describe("the people pages", { tags: ["011-US3"] }, () => {
 
     const profile = await screen.findByRole("dialog", { name: "Bo" });
     expect(router.history.location.pathname).toBe("/guests/bo");
-    expect(router.history.location.search).toBe("?q=bo");
+    expect(screen.getByRole("link", { name: /^Bo/ })).toBeTruthy();
     await userEvent.click(
       within(profile).getByRole("button", { name: "Close" })
     );
@@ -71,6 +71,61 @@ describe("the people pages", { tags: ["011-US3"] }, () => {
       expect(router.history.location.pathname).toBe("/guests")
     );
     expect(router.history.location.search).toBe("?q=bo");
+  });
+
+  it("opens a profile address over the directory, which Prev and Next walk", async () => {
+    const { router } = await open({
+      handler: answers,
+      path: "/guests/bo?q=a",
+      identity: "al",
+    });
+
+    const profile = await screen.findByRole("dialog", { name: "Bo" });
+    expect(screen.getByRole("search")).toBeTruthy();
+    expect(router.history.location.pathname).toBe("/guests/bo");
+    expect(
+      within(profile).getByRole("button", { name: "Next attendee" })
+    ).toBeTruthy();
+    await userEvent.click(
+      within(profile).getByRole("button", { name: "Close" })
+    );
+    await waitFor(() =>
+      expect(router.history.location.pathname).toBe("/guests")
+    );
+    expect(router.history.location.search).toBe("?q=a");
+  });
+
+  it("opens a profile over a page of an event, with nothing to walk", async () => {
+    const { router } = await open({
+      handler: (call) =>
+        call.path.startsWith("/api/v1/attendees")
+          ? Response.json({
+              items: [...everyone, person("mia", "Mia")],
+              nextCursor: null,
+            })
+          : answers(call),
+      path: "/conf/proposals",
+      identity: "mia",
+    });
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: /^Your name: MIA/ })
+    );
+    await userEvent.click(
+      await screen.findByRole("menuitem", { name: "My profile" })
+    );
+
+    const profile = await screen.findByRole("dialog", { name: "Mia" });
+    expect(router.history.location.pathname).toBe("/guests/mia");
+    expect(
+      within(profile).queryByRole("button", { name: "Next attendee" })
+    ).toBeNull();
+    await userEvent.click(
+      within(profile).getByRole("button", { name: "Close" })
+    );
+    await waitFor(() =>
+      expect(router.history.location.pathname).toBe("/conf/proposals")
+    );
   });
 
   it("offers every attendee in the name picker", async () => {
@@ -122,5 +177,15 @@ describe("the edit-profile page", { tags: ["011-US1"] }, () => {
     expect(
       calls.find((c) => c.path === "/api/v1/me/profile")?.body
     ).toMatchObject({ basedIn: "Oslo", expectedVersion: 2 });
+
+    await userEvent.click(
+      within(await screen.findByRole("dialog", { name: "Al" })).getByRole(
+        "button",
+        { name: "Close" }
+      )
+    );
+    await waitFor(() =>
+      expect(router.history.location.pathname).toBe("/guests")
+    );
   });
 });
