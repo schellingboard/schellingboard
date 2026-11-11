@@ -2,9 +2,12 @@
 
 ## Decisions
 
+- #861c: the agenda lists moments except under a search, Hidden or Clashes (`showsMoments`); My
+  schedule keeps them. The text view is the Agenda view.
+
 - #861b: day bands are absolutely positioned in the day grid (`MomentBands`), so cells keep their
-  auto-placement; `DayWithSessions.moments` is ready for the text view (step 10). The attendee guide
-  screenshot `schedule-grid.webp` was not recaptured (`make screenshots`); do it at the end.
+  auto-placement; `DayWithSessions.moments` feeds the agenda too. The attendee guide screenshot
+  `schedule-grid.webp` was not recaptured (`make screenshots`); do it at the end.
 
 - #861a: moments have no `version`; of two admin edits at once the last wins (accepted).
 
@@ -30,4 +33,4 @@
 
 ## Next step
 
-Step 10.
+Step 11.

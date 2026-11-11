@@ -1,3 +1,4 @@
+import type { SharedMoment } from "@schellingboard/domain/event";
 import type { Session } from "@schellingboard/domain/session";
 import type { Location } from "@schellingboard/domain/location";
 import type { MeetingView } from "./meeting-view";
@@ -7,19 +8,22 @@ export type AgendaGroup = {
   start: Date;
   sessions: Session[];
   meetings: MeetingView[];
+  moments: SharedMoment[];
 };
 
 /**
  * A day's entries under their shown starts: sessions in room order, 1-on-1s
- * on their slot, same-titled blockers with the same times merged into one.
+ * on their slot, shared moments on their start, same-titled blockers with
+ * the same times merged into one.
  */
 export function agendaGroups(input: {
   sessions: Session[];
   meetings: MeetingView[];
+  moments: SharedMoment[];
   locations: Location[];
   breakMinutes: number;
 }): AgendaGroup[] {
-  const { sessions, meetings, locations, breakMinutes } = input;
+  const { sessions, meetings, moments, locations, breakMinutes } = input;
   const rank = new Map(locations.map((loc) => [loc.id, loc.sortIndex]));
   const roomRank = (session: Session) => {
     const ranks = session.locations.flatMap((l) => rank.get(l.id) ?? []);
@@ -31,6 +35,7 @@ export function agendaGroups(input: {
       start: new Date(start),
       sessions: [],
       meetings: [],
+      moments: [],
     };
     byStart.set(start, group);
     return group;
@@ -66,6 +71,8 @@ export function agendaGroups(input: {
       shownSlotStart(new Date(meeting.slotStart), breakMinutes).getTime()
     ).meetings.push(meeting);
   }
+  for (const moment of moments)
+    groupAt(moment.start.getTime()).moments.push(moment);
 
   const groups = [...byStart.values()];
   for (const group of groups) {

@@ -5,6 +5,7 @@ import {
   timeState,
   type AgendaGroup,
 } from "./agenda";
+import type { SharedMoment } from "@schellingboard/domain/event";
 import type { Session } from "@schellingboard/domain/session";
 import type { Location } from "@schellingboard/domain/location";
 import type { MeetingView } from "./meeting-view";
@@ -60,9 +61,11 @@ const meeting = (start: Date, otherName: string): MeetingView => ({
 const group = (input: {
   sessions?: Session[];
   meetings?: MeetingView[];
+  moments?: SharedMoment[];
   breakMinutes?: number;
 }) =>
   agendaGroups({
+    moments: input.moments ?? [],
     sessions: input.sessions ?? [],
     meetings: input.meetings ?? [],
     locations: rooms,
@@ -70,6 +73,30 @@ const group = (input: {
   });
 
 describe("agendaGroups", () => {
+  it(
+    "puts a shared moment in time order among the sessions",
+    { tags: ["007-US15"] },
+    () => {
+      const lunch: SharedMoment = {
+        id: "m",
+        dayId: "d",
+        title: "Lunch",
+        description: "",
+        start: at(12),
+        end: at(13),
+      };
+      const groups = group({
+        sessions: [session(at(9), at(10)), session(at(14), at(15))],
+        moments: [lunch],
+      });
+      expect(groups.map((g) => [g.start, g.moments.length])).toEqual([
+        [at(9), 0],
+        [at(12), 1],
+        [at(14), 0],
+      ]);
+    }
+  );
+
   it("heads sessions by their start, in room order", () => {
     const groups = group({
       sessions: [
@@ -181,9 +208,24 @@ describe("timeState", () => {
 });
 
 const groups: AgendaGroup[] = [
-  { start: at(9), sessions: [session(at(9), at(10, 30))], meetings: [] },
-  { start: at(11), sessions: [session(at(11), at(12))], meetings: [] },
-  { start: at(14), sessions: [session(at(14), at(15))], meetings: [] },
+  {
+    start: at(9),
+    sessions: [session(at(9), at(10, 30))],
+    meetings: [],
+    moments: [],
+  },
+  {
+    start: at(11),
+    sessions: [session(at(11), at(12))],
+    meetings: [],
+    moments: [],
+  },
+  {
+    start: at(14),
+    sessions: [session(at(14), at(15))],
+    meetings: [],
+    moments: [],
+  },
 ];
 
 describe("nowMarkerIndex", () => {

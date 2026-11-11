@@ -174,6 +174,7 @@ and RSVPing to or hosting a hidden session shows it again.
 
 A striped band across all the rooms marks a **shared moment**, such as lunch or an opening keynote.
 Tap its label for details. Sessions can still be booked inside a band; expect a smaller group there.
+The agenda lists a shared moment in time order, also under My schedule.
 
 While the event is running, a red line marks the current time in the grid and the agenda, and
 **"Now"** at the top of the schedule jumps straight to it.
