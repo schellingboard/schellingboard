@@ -18,6 +18,19 @@ SPA files).
 phase-dependent UI, modals, form interaction, mobile layout. Prefer fewer, high-confidence tests
 over broad coverage.
 
+### When to use a property test
+
+An optional tool in the unit tier, not a rule. Reach for `fast-check` when a pure function has many
+numeric edge cases that examples cover only a few of: slot math, window checks, eligibility rules,
+percentages. State what must hold for every input (a result is one of the options, applying it twice
+changes nothing, a count is `floor(length / step)`) and let it search. Examples live in
+`tests/unit/*.property.test.ts`; they share `tests/unit/property.ts`. The seed is random; a failure
+prints it with the counterexample, and `FC_SEED` replays it.
+
+Aim generators at the boundaries (a value exactly at a limit, a window of one slot), model what the
+code does on purpose rather than weakening the property, and prove a new property can fail by
+mutating the function once.
+
 ## Test quality guardrails
 
 - A test that breaks on an internal rename without a user-visible behavior change is a bad test.
