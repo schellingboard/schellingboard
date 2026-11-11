@@ -1,4 +1,4 @@
-.PHONY: help dev mailpit build start lint typecheck commit-check arch openapi openapi-check arch-graph arch-diagrams arch-diagrams-check lint-watch test test-unit test-integration i18n-extract i18n-compile test-watch test-coverage use-cases test-e2e test-e2e-headed test-e2e-docker format format-check precommit prepush dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed bootstrap-link dump-release-db screenshots load load-test install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate docs-dev docs-dev-build docs-dev-validate www
+.PHONY: help dev mailpit build start lint typecheck commit-check arch openapi openapi-check i18n-check arch-graph arch-diagrams arch-diagrams-check lint-watch test test-unit test-integration i18n-extract i18n-compile test-watch test-coverage use-cases test-e2e test-e2e-headed test-e2e-docker format format-check precommit prepush dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed bootstrap-link dump-release-db screenshots load load-test install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate docs-dev docs-dev-build docs-dev-validate www
 
 SHELL := /usr/bin/env bash
 
@@ -30,6 +30,7 @@ help:
 	@printf "  %-28s %s\n" "make arch"               "Check architecture rules (cycles, layer boundaries)"
 	@printf "  %-28s %s\n" "make openapi"            "Regenerate openapi.json and the api-client types"
 	@printf "  %-28s %s\n" "make openapi-check"      "Check openapi.json and the api-client match the API"
+	@printf "  %-28s %s\n" "make i18n-check"         "Check the message catalogs are extracted and fully translated"
 	@printf "  %-28s %s\n" "make arch-graph"         "Render the dependency graph to arch-graph.svg"
 	@printf "  %-28s %s\n" "make arch-diagrams"      "Browse the architecture C4 diagrams (LikeC4)"
 	@printf "  %-28s %s\n" "make arch-diagrams-check" "Check the LikeC4 diagram sources parse"
@@ -137,6 +138,9 @@ i18n-extract: install
 i18n-compile: install
 	cd apps/web && bun run i18n:compile
 
+i18n-check: install
+	bun scripts/i18n-check.ts
+
 test: install
 	bun set-env.ts test bun x vitest run
 
@@ -174,7 +178,7 @@ format: install
 format-check: install
 	bun x prettier --cache --check .
 
-prepush: format lint arch openapi-check typecheck test-coverage test-e2e
+prepush: format lint arch openapi-check i18n-check typecheck test-coverage test-e2e
 
 precommit: install-playwright
 	bun scripts/precommit.ts

@@ -15,7 +15,13 @@ import {
 import { messages as sourceMessages } from "../../locales/en/messages.po";
 import { formatLocale } from "./format";
 import { FormatLocaleContext } from "./format-locale";
-import { DEFAULT_LOCALE, type Locale, resolveLocale } from "./locales";
+import {
+  DEFAULT_LOCALE,
+  type Locale,
+  PSEUDO_LOCALE,
+  resolveLocale,
+} from "./locales";
+import { expandMessages } from "./pseudo";
 
 // The source catalog is part of the main bundle so the app starts, and works
 // offline, without a second request. Other locales load on demand.
@@ -24,13 +30,23 @@ i18n.loadAndActivate({ locale: DEFAULT_LOCALE, messages: sourceMessages });
 const lazyCatalogs = import.meta.glob<{ messages: Messages }>([
   "../../locales/*/messages.po",
   "!../../locales/en/messages.po",
+  "!../../locales/pseudo-LOCALE/messages.po",
 ]);
+const pseudoCatalog = import.meta.env.DEV
+  ? import.meta.glob<{ messages: Messages }>(
+      "../../locales/pseudo-LOCALE/messages.po"
+    )
+  : {};
 
 export async function activate(locale: string) {
   if (locale !== DEFAULT_LOCALE) {
-    const { messages } =
-      await lazyCatalogs[`../../locales/${locale}/messages.po`]();
-    i18n.loadAndActivate({ locale, messages });
+    const { messages } = await { ...lazyCatalogs, ...pseudoCatalog }[
+      `../../locales/${locale}/messages.po`
+    ]();
+    i18n.loadAndActivate({
+      locale,
+      messages: locale === PSEUDO_LOCALE ? expandMessages(messages) : messages,
+    });
   } else {
     i18n.activate(locale);
   }
@@ -44,6 +60,15 @@ export { useFormatLocale } from "./format-locale";
 export const useLocale = () => useContext(LocaleContext);
 
 const STORED = "sb-locale";
+
+// A switch of its own: the server's answer rewrites the stored locale on every load.
+const pseudoRequested = () => {
+  try {
+    return import.meta.env.DEV && localStorage.getItem("sb-pseudo") === "1";
+  } catch {
+    return false;
+  }
+};
 
 const rememberedLocale = () => {
   try {
@@ -79,7 +104,9 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     }
   }, []);
   const choice = useMemo(() => ({ stored, setStored }), [stored, setStored]);
-  const wanted = resolveLocale(stored, navigator.languages);
+  const wanted = pseudoRequested()
+    ? (PSEUDO_LOCALE as Locale)
+    : resolveLocale(stored, navigator.languages);
   const [active, setActive] = useState<Locale>(DEFAULT_LOCALE);
   useEffect(() => {
     let current = true;

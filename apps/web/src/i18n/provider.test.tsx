@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { Settings } from "luxon";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -12,6 +12,7 @@ function Probe() {
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
+  localStorage.clear();
   Settings.defaultLocale = undefined as never;
 });
 
@@ -37,5 +38,20 @@ describe("the format locale", { tags: ["022-US1"] }, () => {
     );
 
     expect(screen.getByText("formats as en-DE")).toBeTruthy();
+  });
+});
+
+describe("the pseudo-locale", { tags: ["022-US1"] }, () => {
+  it("can be chosen in development", async () => {
+    localStorage.setItem("sb-pseudo", "1");
+    render(
+      <I18nProvider>
+        <Probe />
+      </I18nProvider>
+    );
+
+    await waitFor(() =>
+      expect(document.documentElement.lang).toBe("pseudo-LOCALE")
+    );
   });
 });
