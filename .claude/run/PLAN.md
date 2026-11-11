@@ -41,6 +41,27 @@ the E2E specs a step touches; the user runs the full suite at the end.
     `meetingNudge.*` changes, `nudges` on meeting-options). 22a. DONE **#1587** "My schedule" menu
     on the grid (z-index on the sticky filter bar). 22b. DONE Share button removed from the shared
     `SidePanel` (all panels).
+22c. **Bug** Admin, editing an event: icons are shown by name only, not drawn. Show the icons (find
+    the picker/list; keep the name as accessible label). Issue first (Bug, High, `component: admin`).
+22d. **Bug** Grid schedule: no line above the room-name header row between one day and the next.
+    Add it. Issue first (Bug, Medium, `component: scheduling`).
+22e. **Bug** Side panel: "<- Profile" back link (opened from a session, then a host) has the arrow
+    too low and not aligned with the text. Issue first (Bug, Low, `component: ui/ux`).
+22f. **Analysis, no code.** Should the create session / create proposal / Quick Voting / "Need
+    ideas?" flows open in the side panel (ADR 0020) instead of a page or modal, for consistency?
+    Survey every place that opens a new page, modal or dialog (use `Explore`), and write the findings
+    in PROGRESS.md and a short issue: per spot, panel yes/no with reasons. Lean so far (check
+    against the code): panel is good for create session/proposal from the schedule (keeps context,
+    deep link) and for "Need ideas?" (the tips stay readable beside the form, a modal hides it);
+    Quick Voting is a full-screen swipe flow and likely stays a page; long forms need panel width on
+    desktop and are full-screen on mobile anyway. Put the open decisions under Questions; do not
+    implement before the user answers.
+22g. **Phase bar** Replace the proposals-page phase strip (looks clickable, is not) with a thin
+    informational bar right under the menu: segments `-----> =====> ----->` with the current phase
+    highlighted, one design on every page that shows phases (also the schedule, which has only text
+    now). Consider: segment length proportional to the real phase length; hiding it once the
+    schedule phase is reached; never showing it when the event has no phases. Not clickable (no
+    link/button look, no hover). Builds on #771 (`phaseTimeline`). Issue first if none exists.
 23. BLOCKED, see Questions. **#831** (Medium) Consistent pagination strategy; `Pager` (#684) exists,
     read the 5 comments and apply it where the issue says. Record in Questions if #684 covered it.
 24. **#1328a** (Medium) i18n foundation: Lingui, `apps/web/src/i18n/`, `en` catalog, scripts and
