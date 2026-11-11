@@ -174,9 +174,8 @@ test("closing a session opened from a notification stays on the schedule @013-US
 
   await actAs(page, "Carlos Silva");
 
-  // Opening a session from the schedule arms "dismiss by going back" (see
-  // docs/dev/web-app.md, anchor MnpjIo7Y). That must not still be armed for the modal
-  // the notification opens, whose own history entry is the notification list.
+  // Closing a session opened from the schedule must not leave the panel the
+  // notification opens, whose own history entry is the notification list, stuck.
   const fromSchedule = await openSession(page, GREEN_SESSION);
   await page.keyboard.press("Escape");
   await expect(fromSchedule).toBeHidden();

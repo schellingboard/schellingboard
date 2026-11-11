@@ -6,11 +6,8 @@ const STORAGE_PREFIX = "scroll:";
 // once scrolling has settled never records that reset.
 const SETTLE_MS = 100;
 
-/**
- * Keeps a scroll position per history entry (`key`), so Back and a reload return
- * to it; `ref` null is the window. `fallbackKey` is where the page was last left,
- * for an entry never visited. Nothing happens until `ready`.
- */
+/** Keeps a scroll position per history entry `key` (`ref` null: the window), starting from
+ * `fallbackKey` for an entry never visited. Waits for `ready`. */
 export function useScrollRestoration(
   ref: RefObject<HTMLElement | null> | null,
   key: string,

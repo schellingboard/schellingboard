@@ -125,11 +125,11 @@ The pure parts (`grid-layout`, `column`, `meeting-column`, `agenda`, `fold`, `fi
 `meeting-rules`, `meeting-clash-text`) are the schedule's own; the legacy copies went with the Next
 schedule. `model.ts` has the new pure rules (narrowing by room, matching, day folds). `links.ts` is
 the one place that decides where a session, a 1-on-1, add-session or booking link goes: a session
-(its panel address) and a 1-on-1 (`?viewMeeting=`, `?bookMeeting=`) open over the schedule, the add
-and edit session links go to the session form (`app/sessions-pages.tsx`, `/{slug}/add-session`,
-`/{slug}/edit-session`). `/{slug}/meetings` (`app/meetings-page.tsx`) is where a meeting
-notification lands: it hands the meeting to the schedule, or opens it read-only outside the
-scheduling phase.
+(`/{slug}/sessions/:id`) and a 1-on-1 (`/{slug}/meetings/:id`) open in the panel over the schedule,
+booking (`?bookMeeting=`) in a dialog, the add and edit session links go to the session form
+(`app/sessions-pages.tsx`, `/{slug}/add-session`, `/{slug}/edit-session`). `/{slug}/meetings`
+(`app/meetings-page.tsx`) only redirects an old `?viewMeeting=` address to the 1-on-1's panel;
+outside the scheduling phase the panel is read-only.
 
 `app/schedule-page.tsx` composes it: `useScheduleSession` (`replica/session.ts`: `openReplica`,
 `connectFeed`, `autosaveReplica`, hidden-tab and back/forward-cache handling, plus a command runner)
@@ -145,7 +145,7 @@ as part of `make test`. Components are tested with `@testing-library/react` and 
 (cleanup is registered in `src/test-setup.ts`), through roles and names, never styling. Screens are
 covered by the E2E suite; there is no browser component runner.
 
-## Opening a modal and closing it
+## Opening a panel and closing it
 
 (anchor: MnpjIo7Y)
 
@@ -161,6 +161,21 @@ schedule (for a session or a 1-on-1), the proposals list or the directory with t
 and `?viewMeeting=` (also at `/{slug}/meetings`) redirect the same way. Booking a 1-on-1 stays a
 dialog, `?bookMeeting=` on the schedule. Links from legacy pages and emails are plain anchors: build
 them with `links.ts` and `utils/notifications.ts`, never a second copy.
+
+Two gotchas. The panel is `role="dialog"` with `aria-modal="false"`, so `dialog` locators in E2E
+still find it while the page behind stays usable. `landOnPanel` replaces the entry with the list
+page and pushes the panel; it flushes the history after the replace, because a browser merges a
+replace and a push of one tick into one push, which left the landed address under the panel.
+
+The page behind never unmounts, and what a reader did on it survives real page changes too. Search
+text (`q`), filter, sort and opened days are search params written with `replace` (the schedule in
+`schedule-screen.tsx`, the proposals list with `filterFrom`, `sortFrom`, `withFilter` and `withSort`
+in `list-model.ts`); the typed text stays local and its debounced value goes to `q`
+(`ui/use-search-param-text.ts`). Changes made while a panel is open go to the page behind
+(`replaceBackground`), and `closePanel` carries them over Close. Scroll is kept per history entry by
+`ui/use-scroll-restoration.ts`, keyed by `useHistoryEntry` (the page's position in the stack,
+whatever panels are open over it). The router's `scrollRestoration` is `createScrollReset()`, which
+resets the window only when the page behind changes and restores nothing itself.
 
 ## Failure notices
 

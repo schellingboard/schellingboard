@@ -75,8 +75,8 @@ reply.
   it, or "Liked" again to take yours back.
 - You can edit or delete your own comments. Deleting is permanent — no history, no undo. If there
   are replies, a "Comment deleted" placeholder stays behind.
-- Closing a window with Esc, the close button or a click outside it while you have typed text asks
-  "Discard what you have typed?" first; choose Keep editing to carry on.
+- Closing the panel with Esc or the close button while you have typed text asks "Discard what you
+  have typed?" first; choose Keep editing to carry on.
 - Each timestamp links to that comment alone, so you can point someone at one particular remark.
 
 ## Vote
@@ -157,7 +157,7 @@ icon. Once something clashes, a **Clashes** filter appears: it lists the clashin
 1-on-1s, bookmarks included, and combines with **My schedule** to narrow to the kinds ticked there.
 
 When you open a link to a session (from an email or a chat message, say), the schedule behind the
-session window is scrolled to that session, and its day is unfolded if it had already passed.
+session panel is scrolled to that session, and its day is unfolded if it had already passed.
 
 To tidy away a session you do not care about, open it and tap **Not interested** below the RSVP
 button. On the grid it turns into a faint, empty block that still opens when tapped, and the agenda

@@ -1,6 +1,6 @@
 # ADR 0020: A side panel for linked views
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-09
 
 ## Context
@@ -8,8 +8,8 @@
 Session, proposal, profile and 1-on-1 details open as centred modal dialogs, each owned by one page
 (`?viewSession=` on the schedule, `?viewProposal=` on the proposals list, `/guests/:id` over the
 directory). A link from one to another (session → host → proposal) changes the page. The page behind
-unmounts and loses its search text, unfolded days, pagination and scroll position. Closing relies on
-a module flag (`proposal-nav.ts`) to decide between Back and removing a parameter.
+unmounts and loses its search text, unfolded days and scroll position. Closing relies on a module
+flag (`proposal-nav.ts`) to decide between Back and removing a parameter.
 
 Stacked dialogs and draggable windows were considered and rejected. Stacked dialogs hide each other
 and make an unclear state when a middle one is closed. Draggable windows do not work on phones,
@@ -42,8 +42,8 @@ where most attendees use the app, and need a non-drag alternative (WCAG 2.5.7).
 7. **Old addresses keep working.** `?viewSession=`, `?viewProposal=` and `?viewMeeting=` are
    replaced on arrival by the new URL with the page they were on as background. Emails already sent
    contain them.
-8. **Page state survives real page changes too.** List search, filters and page are search params,
-   written with `replace`. Scroll position is restored per history entry.
+8. **Page state survives real page changes too.** Search, filter, sort and unfolded days are search
+   params, written with `replace`. Scroll position is restored per history entry.
 
 ## Spike: route masking
 
@@ -60,4 +60,5 @@ keeps the panel's stack depth in `history.state.panel`. Close travels back over 
   replica.
 - `proposal-nav.ts` and its flag go; each history entry's state says how far the background is.
 - The profile's previous/next through search results works only with the directory behind it.
-- E2E specs that find these views as `dialog` change to the panel's role and name.
+- The panel keeps the `dialog` role, with `aria-modal="false"`, so E2E specs that find these views
+  as `dialog` keep working.
