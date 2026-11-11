@@ -28,9 +28,39 @@ function applyToTextarea(template: Template, textarea: HTMLTextAreaElement) {
     textarea.selectionStart,
     textarea.selectionEnd
   );
-  // setRangeText keeps the browser's undo stack; React hears the input event.
-  textarea.setRangeText(edit.value, 0, textarea.value.length, "preserve");
-  textarea.dispatchEvent(new Event("input", { bubbles: true }));
+  const old = textarea.value;
+  let start = 0;
+  while (
+    start < old.length &&
+    start < edit.value.length &&
+    old[start] === edit.value[start]
+  ) {
+    start++;
+  }
+  let oldEnd = old.length;
+  let newEnd = edit.value.length;
+  while (
+    oldEnd > start &&
+    newEnd > start &&
+    old[oldEnd - 1] === edit.value[newEnd - 1]
+  ) {
+    oldEnd--;
+    newEnd--;
+  }
+  const replacement = edit.value.slice(start, newEnd);
+  if (start === oldEnd && replacement === "") return;
+  textarea.focus();
+  textarea.setSelectionRange(start, oldEnd);
+  // Only execCommand keeps the browser's undo stack; it fires `input` itself.
+  const done =
+    typeof document.execCommand === "function" &&
+    (replacement === ""
+      ? document.execCommand("delete")
+      : document.execCommand("insertText", false, replacement));
+  if (!done) {
+    textarea.setRangeText(replacement, start, oldEnd, "preserve");
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+  }
   requestAnimationFrame(() => {
     textarea.focus();
     textarea.setSelectionRange(edit.selectionStart, edit.selectionEnd);
