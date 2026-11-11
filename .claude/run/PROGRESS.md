@@ -2,6 +2,10 @@
 
 ## Decisions
 
+- #861d: `schedule-grid.webp` and `og-image.jpg` recaptured (Gamma, so the keynote band shows).
+  Release note: shared moments replaced the API highlight (organizers-only). No E2E has an attendee
+  see a moment an admin made: the new event has no rooms.
+
 - #861c: the agenda lists moments except under a search, Hidden or Clashes (`showsMoments`); My
   schedule keeps them. The text view is the Agenda view.
 
@@ -33,4 +37,4 @@
 
 ## Next step
 
-Step 11.
+Step 12.

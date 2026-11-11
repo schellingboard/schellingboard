@@ -1,5 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Session } from "@schellingboard/domain/session";
+import { overlappingMoment } from "@schellingboard/domain/shared-moment";
 import { formatOptionalTime, TIME_FORMAT } from "@schellingboard/domain/time";
 import {
   attendeeGuests,
@@ -124,6 +125,14 @@ function Details({ session }: { session: Session }) {
   const rooms = data.locations.filter((l) =>
     session.locations.some((room) => room.id === l.id)
   );
+  const moment =
+    session.startTime && session.endTime
+      ? overlappingMoment(
+          data.days.flatMap((d) => d.moments),
+          session.startTime,
+          session.endTime
+        )
+      : undefined;
   const full =
     data.event.rsvpCapacityHardLimit &&
     session.capacity > 0 &&
@@ -247,6 +256,13 @@ function Details({ session }: { session: Session }) {
             {formatOptionalTime(session.endTime, timezone, TIME_FORMAT)}
           </span>
         </div>
+        {moment && (
+          <p className="text-fg-muted">
+            During {moment.title} (
+            {formatOptionalTime(moment.start, timezone, TIME_FORMAT)}–
+            {formatOptionalTime(moment.end, timezone, TIME_FORMAT)})
+          </p>
+        )}
         <div className="flex gap-2">
           <span className="font-medium">
             {`Attendees (${attendees ? attendees.length : session.numRsvps}${session.capacity > 0 ? ` / ${session.capacity}` : ""}):`}
