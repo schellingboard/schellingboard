@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import {
   ScheduleMatchProvider,
@@ -32,7 +32,6 @@ import {
   scheduleEntries,
 } from "./model";
 import { MeetingModals } from "./meeting-modals";
-import { SessionModal } from "./session-modal";
 import { ScheduleFilters } from "./schedule-filters";
 import { ScheduleToolbar, scheduleView } from "./schedule-toolbar";
 import { matchesInReadingOrder } from "./search";
@@ -58,6 +57,8 @@ export function ScheduleScreen({
   params,
   onParamsChange,
   onBack,
+  openSession,
+  revealSessionId,
   onHashChange,
   sync,
   footer,
@@ -72,6 +73,10 @@ export function ScheduleScreen({
   onParamsChange: (next: URLSearchParams, how?: { push: boolean }) => void;
   /** Undoes the history entry that opening a modal added. */
   onBack: () => void;
+  /** Opens a session's side panel over the schedule. */
+  openSession: (sessionId: string) => void;
+  /** A session an address named, which is brought into view. */
+  revealSessionId: string | null;
   /** Sets the address's hash in place, without a history entry. */
   onHashChange: (hash: string) => void;
   sync: ReactNode;
@@ -91,16 +96,20 @@ export function ScheduleScreen({
   useDragToPan(scrollerRef, view === "grid");
   // Per view: the grid and the agenda have nothing in common to scroll to.
   useScrollRestoration(scrollerRef, `${snapshot.event.slug}:${view}`);
-  const [addressed] = useState(() => params.get("viewSession"));
   // After restoration, so the address wins over the remembered position.
-  useRevealSession(scrollerRef, addressed);
+  useRevealSession(scrollerRef, revealSessionId);
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedSearch(search);
-  const [unfolded, setUnfolded] = useState<ReadonlySet<string>>(() => {
-    const day = dayOfSession(data.days, addressed);
-    return new Set(day ? [day] : []);
-  });
+  const [unfolded, setUnfolded] = useState<ReadonlySet<string>>(
+    () => new Set()
+  );
+  const [revealSeeded, setRevealSeeded] = useState<string | null>(null);
+  const revealedDay = dayOfSession(data.days, revealSessionId);
+  if (revealedDay && revealSeeded !== revealSessionId) {
+    setRevealSeeded(revealSessionId);
+    setUnfolded((prev) => new Set([...prev, revealedDay]));
+  }
   const toggleFold = (dayId: string) =>
     setUnfolded((prev) => {
       const next = new Set(prev);
@@ -158,18 +167,6 @@ export function ScheduleScreen({
   const { statusRef, statusHeight } = useStatusHeight();
 
   const kiosk = useKioskMode(params);
-  const viewSession = params.get("viewSession");
-  // Opened here, Back closes it; reached by an address, there is no entry to pop.
-  const openedHere = useRef(false);
-  useEffect(() => {
-    if (!viewSession) openedHere.current = false;
-  }, [viewSession]);
-  const openSession = (sessionId: string) => {
-    const updated = new URLSearchParams(params);
-    updated.set("viewSession", sessionId);
-    openedHere.current = true;
-    onParamsChange(updated, { push: true });
-  };
   const nowIsOnSchedule = data.days.some(
     (day) => getNowOffsetPx(day, now, data.event.slotIncrementMinutes) !== null
   );
@@ -304,18 +301,6 @@ export function ScheduleScreen({
       }}
     >
       {kiosk && <KioskController nowIsOnSchedule={nowIsOnSchedule} />}
-      {viewSession && (
-        <SessionModal
-          sessionId={viewSession}
-          onClose={() => {
-            if (openedHere.current) return onBack();
-            const updated = new URLSearchParams(params);
-            updated.delete("viewSession");
-            updated.delete("record");
-            onParamsChange(updated);
-          }}
-        />
-      )}
       <MeetingModals
         params={params}
         onParamsChange={onParamsChange}

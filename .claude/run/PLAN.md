@@ -9,15 +9,7 @@ commit. Run the E2E specs a step touches individually; the user runs the full su
 
 ## Steps
 
-1. **Panel and navigation, with the session.** Spike first: does TanStack Router's route masking
-   keep the background through a reload and back/forward? If not, write the masking with
-   `history.state` directly. Record the result in PROGRESS.md and the ADR. Build `ui/side-panel.tsx`
-   (non-modal, over the right side, full screen when narrow, resizable by drag and arrow keys with
-   the width kept per device, Back arrow, Close, Share, focus moves in and returns to the opener,
-   Escape closes) and the navigation (open from page = new stack, open from panel = add, back,
-   close; depth and background in `history.state`). Mount the panel host above the routes. Session
-   details move to it at `/{slug}/sessions/:id`; direct open shows the schedule behind.
-   `?viewSession=` redirects. Remove the module flag for sessions.
+1. Done: side panel and navigation, with the session.
 2. **Proposal panel.** `/{slug}/proposals/:id` over any event page; direct open shows the proposals
    list. `?viewProposal=` redirects. Remove `proposal-nav.ts`.
 3. **Profile panel.** `/guests/:id` opens over any page; direct open shows the directory.

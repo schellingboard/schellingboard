@@ -56,13 +56,13 @@ describe("the event address", { tags: ["007-US13"] }, () => {
 
   it("keeps the search params and hash on the schedule, even before scheduling starts", async () => {
     const { router } = await open({
-      path: "/conf?view=agenda&viewSession=s#comment-c1",
+      path: "/conf?view=agenda&filter=hidden#comment-c1",
       snapshot: between,
     });
     await waitFor(() =>
       expect(router.history.location.pathname).toBe("/conf/schedule")
     );
-    expect(router.history.location.search).toBe("?view=agenda&viewSession=s");
+    expect(router.history.location.search).toBe("?view=agenda&filter=hidden");
     expect(router.history.location.hash).toBe("#comment-c1");
   });
 });

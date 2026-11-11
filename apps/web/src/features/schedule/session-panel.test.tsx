@@ -9,7 +9,9 @@ import type { AttendeesState } from "../../queries/attendees";
 import { fakeComments } from "../comments/comments-test-support";
 import { scheduleLinks } from "./links";
 import { NoticeProvider } from "../../ui/notices";
-import { ScheduleScreen, type ScheduleActions } from "./schedule-screen";
+import { ScheduleProvider, type ScheduleActions } from "./context";
+import { scheduleDataFrom } from "./data";
+import { SessionPanel } from "./session-panel";
 import { noMeetingActions } from "./test-support";
 
 const talk = base.sessions[0];
@@ -81,29 +83,27 @@ function fakeActions(attendees = fakeAttendees(["zed", "abe"])) {
 
 function open(
   snapshot: Snapshot,
-  { params = "viewSession=s", actions = fakeActions(), at = iso(9) } = {}
+  { session = "s", record = false, actions = fakeActions(), at = iso(9) } = {}
 ) {
-  const onParamsChange = vi.fn<(params: URLSearchParams) => void>();
+  const onClose = vi.fn();
   const onBack = vi.fn();
   render(
     <NoticeProvider>
-      <ScheduleScreen
-        clashes={new Map()}
-        snapshot={snapshot}
-        now={new Date(at)}
-        links={scheduleLinks("conf")}
-        params={new URLSearchParams(params)}
-        onParamsChange={onParamsChange}
-        onHashChange={() => {}}
-        onBack={onBack}
-        sync={null}
-        footer={null}
-        onReload={() => {}}
-        actions={actions}
-      />
+      <ScheduleProvider
+        value={{
+          data: scheduleDataFrom(snapshot, new Date(at)),
+          links: scheduleLinks("conf"),
+          params: new URLSearchParams(record ? "record=count" : ""),
+          actions,
+          openSession: () => {},
+          setHash: () => {},
+        }}
+      >
+        <SessionPanel sessionId={session} onClose={onClose} onBack={onBack} />
+      </ScheduleProvider>
     </NoticeProvider>
   );
-  return { onParamsChange, onBack, actions };
+  return { onClose, onBack, actions };
 }
 
 const dialog = () => screen.getByRole("dialog", { name: "Session details" });
@@ -116,12 +116,7 @@ afterEach(() => {
   sessionStorage.clear();
 });
 
-describe("the session modal", () => {
-  it("is not there without viewSession", () => {
-    open(snapshotWith(), { params: "" });
-    expect(screen.queryByRole("dialog")).toBeNull();
-  });
-
+describe("the session panel", () => {
   it("shows the session's details over the schedule", () => {
     open(snapshotWith());
     const d = within(dialog());
@@ -135,7 +130,7 @@ describe("the session modal", () => {
   });
 
   it("says so for a session that is not there", () => {
-    open(snapshotWith(), { params: "viewSession=nope" });
+    open(snapshotWith(), { session: "nope" });
     expect(within(dialog()).getByText("Session not found.")).toBeTruthy();
   });
 
@@ -266,7 +261,7 @@ describe("the session modal's RSVP", () => {
     }
   );
 
-  it("closes only the clash question on Escape, not the modal under it", async () => {
+  it("closes only the clash question on Escape, not the panel under it", async () => {
     const snap = snapshotWith({}, { me: notMe });
     snap.sessions.push({
       ...talk,
@@ -274,13 +269,13 @@ describe("the session modal's RSVP", () => {
       title: "Other",
       hostIds: ["mia"],
     });
-    const { onParamsChange } = open(snap);
+    const { onClose } = open(snap);
     await userEvent.click(
       within(dialog()).getByRole("button", { name: "RSVP" })
     );
     await userEvent.keyboard("{Escape}");
     expect(screen.queryByRole("button", { name: "Yes" })).toBeNull();
-    expect(onParamsChange).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
   });
 
   it("has no RSVP for the host, but an edit link", () => {
@@ -367,21 +362,22 @@ describe(
   }
 );
 
-describe("closing the session modal", () => {
-  it("drops viewSession and keeps the rest", async () => {
-    const { onParamsChange } = open(snapshotWith(), {
-      params: "view=agenda&viewSession=s",
-    });
+describe("closing the session panel", () => {
+  it("closes on Close and on Escape", async () => {
+    const { onClose } = open(snapshotWith());
     await userEvent.click(
       within(dialog()).getByRole("button", { name: "Close" })
     );
-    expect(onParamsChange.mock.calls[0][0].toString()).toBe("view=agenda");
+    await userEvent.keyboard("{Escape}");
+    expect(onClose).toHaveBeenCalledTimes(2);
   });
 
-  it("closes on Escape", async () => {
-    const { onParamsChange } = open(snapshotWith());
-    await userEvent.keyboard("{Escape}");
-    expect(onParamsChange).toHaveBeenCalled();
+  it("goes back one entry from its Back arrow", async () => {
+    const { onBack } = open(snapshotWith());
+    await userEvent.click(
+      within(dialog()).getByRole("button", { name: "Back" })
+    );
+    expect(onBack).toHaveBeenCalled();
   });
 });
 
@@ -496,7 +492,7 @@ describe("the attendee count", () => {
 
   it("takes focus when the follow-up email's link asked for it", async () => {
     open(snapshotWith({}, { me: host }), {
-      params: "viewSession=s&record=count",
+      record: true,
       at: afterIt,
     });
     const input = await within(dialog()).findByLabelText(
@@ -504,21 +500,9 @@ describe("the attendee count", () => {
     );
     expect(document.activeElement).toBe(input);
   });
-
-  it("leaves the follow-up link's focus request behind when closed", async () => {
-    const { onParamsChange } = open(snapshotWith({}, { me: host }), {
-      params: "view=agenda&viewSession=s&record=count",
-      at: afterIt,
-    });
-    await within(dialog()).findByLabelText("How many people attended?");
-    await userEvent.click(
-      within(dialog()).getByRole("button", { name: "Close" })
-    );
-    expect(onParamsChange.mock.calls[0][0].toString()).toBe("view=agenda");
-  });
 });
 
-describe("bookmarking from the session modal", { tags: ["007-US9"] }, () => {
+describe("bookmarking from the session panel", { tags: ["007-US9"] }, () => {
   it("bookmarks the session", async () => {
     const { actions } = open(snapshotWith());
     await userEvent.click(
@@ -555,7 +539,7 @@ describe("bookmarking from the session modal", { tags: ["007-US9"] }, () => {
   });
 });
 
-describe("hiding from the session modal", { tags: ["007-US10"] }, () => {
+describe("hiding from the session panel", { tags: ["007-US10"] }, () => {
   const hiddenMe = {
     ...notMe,
     marks: [{ sessionId: "s", kind: "hidden" as const }],

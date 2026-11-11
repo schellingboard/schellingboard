@@ -5,10 +5,8 @@ import { scheduleLinks } from "./links";
 const links = scheduleLinks("conf");
 
 describe("scheduleLinks", () => {
-  it("opens a session over the current schedule view, keeping its params", () => {
-    expect(links.session(new URLSearchParams("view=agenda"), "s1")).toBe(
-      "/conf/schedule?view=agenda&viewSession=s1"
-    );
+  it("addresses a session by its own path, which opens its panel", () => {
+    expect(links.session("s1")).toBe("/conf/sessions/s1");
   });
 
   it("points the modal's pages at the app's own screens", () => {

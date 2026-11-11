@@ -6,11 +6,14 @@ import { useRouter } from "@tanstack/react-router";
 export function InAppLinks({
   owns,
   onFollow,
+  intercept,
   children,
 }: {
   owns: (url: URL) => boolean;
   /** Sees the address before it is pushed, and returns the one to push. */
   onFollow?: (url: URL) => string;
+  /** Takes over a link entirely; true means it was handled. */
+  intercept?: (url: URL, link: HTMLAnchorElement) => boolean;
   children: ReactNode;
 }) {
   const { history } = useRouter();
@@ -32,6 +35,7 @@ export function InAppLinks({
     const url = new URL(link.href);
     if (url.origin !== window.location.origin || !owns(url)) return;
     e.preventDefault();
+    if (intercept?.(url, link)) return;
     history.push(onFollow?.(url) ?? `${url.pathname}${url.search}${url.hash}`);
   };
 

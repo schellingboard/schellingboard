@@ -24,7 +24,7 @@ beforeEach(() => {
 
 describe("the event route", () => {
   it(
-    "opens a session on a new history entry, which Back closes",
+    "opens a session in a panel at its own address, which Back closes",
     { tags: ["007-US1"] },
     async () => {
       const { router } = await open();
@@ -32,25 +32,26 @@ describe("the event route", () => {
       expect(
         await screen.findByRole("dialog", { name: "Session details" })
       ).toBeTruthy();
-      expect(router.history.location.search).toBe("?viewSession=s");
+      expect(router.history.location.pathname).toBe("/conf/sessions/s");
       router.history.back();
       await waitFor(() =>
         expect(
           screen.queryByRole("dialog", { name: "Session details" })
         ).toBeNull()
       );
-      expect(router.history.location.search).toBe("");
+      expect(router.history.location.pathname).toBe("/conf/schedule");
     }
   );
 
   it(
-    "closes a session reached by its address in place",
+    "opens a session reached by its address over the schedule, and Close leaves the schedule",
     { tags: ["007-US1"] },
     async () => {
-      const { router } = await open({ path: "/conf?viewSession=s" });
+      const { router } = await open({ path: "/conf/sessions/s" });
       const dialog = await screen.findByRole("dialog", {
         name: "Session details",
       });
+      expect(router.history.location.pathname).toBe("/conf/sessions/s");
       await userEvent.click(
         within(dialog).getByRole("button", { name: "Close" })
       );
@@ -59,20 +60,37 @@ describe("the event route", () => {
           screen.queryByRole("dialog", { name: "Session details" })
         ).toBeNull()
       );
-      expect(router.history.location.search).toBe("");
-      expect(router.history.length).toBe(1);
+      expect(router.history.location.pathname).toBe("/conf/schedule");
     }
   );
 
   it(
-    "keeps a comment's hash when a session is reached by its address",
-    { tags: ["010-US5"] },
+    "turns the old ?viewSession= address into the panel, keeping the page's own params",
+    { tags: ["007-US1"] },
     async () => {
-      const { router } = await open({ path: "/conf?viewSession=s#comment-c1" });
+      const { router } = await open({
+        path: "/conf/schedule?view=agenda&viewSession=s#comment-c1",
+      });
       await screen.findByRole("dialog", { name: "Session details" });
+      expect(router.history.location.pathname).toBe("/conf/sessions/s");
       expect(router.history.location.hash).toBe("#comment-c1");
+      router.history.back();
+      await waitFor(() =>
+        expect(router.history.location.search).toBe("?view=agenda")
+      );
     }
   );
+
+  it("keeps the schedule's view when a filter changes with the panel open", async () => {
+    const { router } = await open({ path: "/conf/schedule?view=agenda" });
+    await userEvent.click(await screen.findByRole("link", { name: /Talk/ }));
+    await screen.findByRole("dialog", { name: "Session details" });
+    await userEvent.click(screen.getByRole("button", { name: "Grid" }));
+    expect(
+      screen.getByRole("button", { name: "Grid" }).getAttribute("aria-pressed")
+    ).toBe("true");
+    expect(router.history.location.pathname).toBe("/conf/sessions/s");
+  });
 
   it("shows kiosk mode, asked for or remembered, itself", async () => {
     document.cookie = "kiosk=1; path=/";

@@ -67,8 +67,15 @@ function screenAt(
     snapshot = snap,
     now = new Date(iso(9)),
     actions = fakeActions(),
-  }: { snapshot?: Snapshot; now?: Date; actions?: ScheduleActions } = {}
+    reveal = null,
+  }: {
+    snapshot?: Snapshot;
+    now?: Date;
+    actions?: ScheduleActions;
+    reveal?: string | null;
+  } = {}
 ) {
+  const openSession = vi.fn<(sessionId: string) => void>();
   const onParamsChange = vi.fn<(params: URLSearchParams) => void>();
   const Harness = () => {
     const [current, setCurrent] = useState(new URLSearchParams(params));
@@ -85,6 +92,8 @@ function screenAt(
         }}
         onHashChange={() => {}}
         onBack={() => {}}
+        openSession={openSession}
+        revealSessionId={reveal}
         sync={<span>Live</span>}
         footer={<footer>Footer</footer>}
         onReload={() => {}}
@@ -93,7 +102,7 @@ function screenAt(
     );
   };
   render(<Harness />);
-  return { onParamsChange };
+  return { onParamsChange, openSession };
 }
 
 const scrollIntoView = vi.fn();
@@ -128,9 +137,7 @@ describe("ScheduleScreen views", () => {
     ).toBeTruthy();
     const nine = screen.getByRole("region", { name: "09:00" });
     const link = within(nine).getByRole("link", { name: /Talk/ });
-    expect(link.getAttribute("href")).toBe(
-      "/conf/schedule?view=agenda&viewSession=s"
-    );
+    expect(link.getAttribute("href")).toBe("/conf/sessions/s");
     expect(within(nine).getByText(/Room · until 10:00/)).toBeTruthy();
     expect(screen.getByText("Now · 09:00")).toBeTruthy();
   });
@@ -603,7 +610,7 @@ describe("hiding sessions", { tags: ["007-US10"] }, () => {
     screenAt("", { snapshot: withHidden(["w"]) });
     const link = screen.getByRole("link", { name: /Workshop/ });
     expect(link.textContent).toContain("hidden by you");
-    expect(link.getAttribute("href")).toContain("viewSession=w");
+    expect(link.getAttribute("href")).toBe("/conf/sessions/w");
   });
 
   it("ignores a hidden mark on a session the viewer RSVP'd to", () => {
@@ -671,8 +678,7 @@ describe("clashes in your schedule", { tags: ["007-US11"] }, () => {
   const row = (id: string) =>
     screen
       .queryAllByRole("link")
-      .find((l) => l.getAttribute("href")?.endsWith(`viewSession=${id}`)) ??
-    null;
+      .find((l) => l.getAttribute("href")?.endsWith(`/sessions/${id}`)) ?? null;
   const chip = () => screen.queryByRole("button", { name: "Clashes" });
 
   it("offers the Clashes chip only with a clash", () => {
@@ -761,7 +767,8 @@ describe("opening the schedule from a session link", () => {
     { tags: ["007-US12"] },
     () => {
       scrollIntoView.mockClear();
-      screenAt("view=agenda&viewSession=s", {
+      screenAt("view=agenda", {
+        reveal: "s",
         snapshot: twoDays,
         now: dayTwo,
         actions: modalActions(),
@@ -796,7 +803,7 @@ describe("opening the schedule from a session link", () => {
     { tags: ["007-US12"] },
     () => {
       scrollIntoView.mockClear();
-      screenAt("viewSession=w", { actions: modalActions() });
+      screenAt("", { reveal: "w", actions: modalActions() });
       expect(
         (scrollIntoView.mock.contexts.at(-1) as HTMLElement).getAttribute(
           "data-session-id"

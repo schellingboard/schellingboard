@@ -45,6 +45,14 @@ where most attendees use the app, and need a non-drag alternative (WCAG 2.5.7).
 8. **Page state survives real page changes too.** List search, filters and page are search params,
    written with `replace`. Scroll position is restored per history entry.
 
+## Spike: route masking
+
+TanStack Router's `mask` keeps the background route mounted through a reload and Back/forward (the
+real location is kept in `history.state.__tempLocation`). But building a masked location
+re-canonicalises the query string, which breaks repeated keys such as `loc=a&loc=b`. The app
+therefore writes those entries itself (`apps/web/src/app/panel-history.ts`), in the same shape, and
+keeps the panel's stack depth in `history.state.panel`. Close travels back over the stack's depth.
+
 ## Consequences
 
 - The panel host sits above the pages, so a panel needs its data independently of the page behind.

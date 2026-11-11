@@ -219,7 +219,7 @@ function SessionRow({
   locations: Location[];
   timezone: string;
 }) {
-  const { data, links, params, openSession } = useSchedule();
+  const { data, links, openSession } = useSchedule();
   const state = timeState(start, session.endTime ?? start, data.now);
   const until = `until ${formatOptionalTime(session.endTime, timezone, TIME_FORMAT)}`;
   const inRooms = locations.filter((loc) =>
@@ -250,7 +250,7 @@ function SessionRow({
     <AgendaRow
       state={state}
       swatchClass={cx("loc-swatch", color && `loc-${color}`)}
-      href={links.session(params, session.id)}
+      href={links.session(session.id)}
       onOpen={() => openSession(session.id)}
       sessionId={session.id}
       title={

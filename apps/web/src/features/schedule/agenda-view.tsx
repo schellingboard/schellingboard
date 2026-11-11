@@ -36,7 +36,7 @@ export function AgendaView({
     <div
       data-testid={SCROLLER_ID}
       ref={scrollerRef}
-      className="flex w-full flex-1 flex-col items-stretch overflow-auto"
+      className="flex w-full flex-1 flex-col items-stretch overflow-auto pr-[var(--side-panel-inset,0px)]"
     >
       {toolbar}
       {filterBar}

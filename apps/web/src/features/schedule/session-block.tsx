@@ -197,7 +197,7 @@ function RealSessionCard({
   location: Location;
 }) {
   const { height } = position;
-  const { data, links, params, timezone, openSession } = useSchedule();
+  const { data, links, timezone, openSession } = useSchedule();
   const hosting =
     !!data.guestId && session.hosts.some((h) => h.id === data.guestId);
   const lowerOpacity = !data.rsvpd(session.id) && !hosting;
@@ -232,7 +232,7 @@ function RealSessionCard({
           )}
         >
           <a
-            {...sessionLink(links.session(params, session.id), () =>
+            {...sessionLink(links.session(session.id), () =>
               openSession(session.id)
             )}
             className="cursor-pointer after:absolute after:inset-0 after:content-['']"

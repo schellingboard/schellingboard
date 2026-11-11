@@ -244,9 +244,10 @@ it, since anyone may still take it on.
 
 ### RSVP
 
-Click a session to see its details and **RSVP**.
+Click a session to see its details in a panel beside the schedule, and **RSVP**. Drag the panel's
+left edge to resize it, or use **Share** to copy its link.
 
-![Session detail popup with host, location, time, attendee list, and full description](../screenshots/session-details.webp)
+![Session details panel with host, location, time, attendee list, and full description](../screenshots/session-details.webp)
 
 :::warning "An RSVP is a commitment" Unlike votes, hosts plan around it. If you change your mind,
 take it back with "Un-RSVP" — someone else may want the place. :::
