@@ -35,6 +35,7 @@ import { Avatar } from "../../ui/avatar";
 import { Button } from "../../ui/button";
 import {
   ComboboxField,
+  GrowingTextField,
   MarkdownField,
   SelectField,
   TextField,
@@ -418,7 +419,7 @@ export function ProfileForm({
                     </button>
                   </div>
                 )}
-                <TextField
+                <GrowingTextField
                   label={row.prompt}
                   name={`prompts.${i}.answer`}
                   value={row.answer}
@@ -443,7 +444,6 @@ export function ProfileForm({
           >
             Suggest a prompt
           </button>
-          <p className="text-sm text-fg-subtle">Markdown supported</p>
         </Section>
 
         <Section
