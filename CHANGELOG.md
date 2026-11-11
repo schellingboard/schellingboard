@@ -27,6 +27,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   ([#861](https://github.com/schellingboard/schellingboard/issues/861)): organizers mark lunch or a
   keynote as a striped band across every room. Sessions can still be booked inside it; hosts are
   told and can go ahead.
+- **Hover over a name to see who it is**
+  ([#789](https://github.com/schellingboard/schellingboard/issues/789)): with a mouse, a small card
+  shows the person's photo and short summary; clicking still opens the profile.
 
 ### Changed
 
