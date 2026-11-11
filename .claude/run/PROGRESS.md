@@ -95,6 +95,11 @@
 - 22b: the button was "Share" (⤴) in `SidePanel`, shared by all panels, so all lost it; `shareUrl`
   prop removed everywhere. No issue, no E2E or guide mention existed.
 
+- 24: Lingui 6 (pinned exactly) with `lingui({ macroTransform: true })` in `vite.config.ts` and
+  `vitest.config.ts`, so `t`/`<Trans>` macros work. The `en` catalog is imported statically in
+  `i18n/index.tsx` (works offline, no blank first paint); other locales load lazily, so step 25/7
+  must make the service worker cache those chunks. Use case 022-US1.
+
 ## Next step
 
 Step 24 (#1328a); 23 is blocked.
