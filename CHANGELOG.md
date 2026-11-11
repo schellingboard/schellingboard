@@ -13,6 +13,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **See which phase the event is in**
+  ([#771](https://github.com/schellingboard/schellingboard/issues/771),
+  [#1591](https://github.com/schellingboard/schellingboard/issues/1591)): a thin bar under the menu
+  on the proposals page and the schedule shows Proposals, Voting and Scheduling, the current one
+  highlighted, until scheduling starts. Hover or tap a phase to see what it is for and when it
+  starts and ends.
 - **Read the schedule before scheduling opens**
   ([#1336](https://github.com/schellingboard/schellingboard/issues/1336)): **View Schedule** now
   works in every phase, read-only, with a note saying when scheduling opens.

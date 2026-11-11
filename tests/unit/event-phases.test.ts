@@ -2,6 +2,7 @@ import type { Event } from "@schellingboard/domain/event";
 import {
   EventPhase,
   getCurrentPhase,
+  phaseTimeline,
   scheduleReadOnly,
   schedulingEnded,
 } from "@schellingboard/domain/phase";
@@ -230,5 +231,122 @@ describe("scheduleReadOnly", { tags: ["007-US14"] }, () => {
       scheduleReadOnly(makeEvent({ schedulingPhaseStart: ago(1) }), NOW())
     ).toBe(false);
     expect(scheduleReadOnly(makeEvent({}), NOW())).toBe(false);
+  });
+});
+
+describe("phaseTimeline", { tags: ["006-US3"] }, () => {
+  const states = (event: Event) =>
+    phaseTimeline(event, NOW()).map((s) => s.state);
+
+  it("is empty for an event without phases", () => {
+    expect(phaseTimeline(makeEvent({}), NOW())).toEqual([]);
+  });
+
+  it("marks finished phases past, the running one current, the rest upcoming", () => {
+    const event = makeEvent({
+      proposalPhaseStart: ago(5),
+      votingPhaseStart: ago(1),
+      schedulingPhaseStart: ahead(3),
+    });
+    expect(states(event)).toEqual(["past", "current", "upcoming"]);
+  });
+
+  it("ends each phase when the next starts, unless it sets its own end", () => {
+    const event = makeEvent({
+      proposalPhaseStart: ago(5),
+      proposalPhaseEnd: ago(3),
+      votingPhaseStart: ago(2),
+      schedulingPhaseStart: ahead(3),
+      schedulingPhaseEnd: ahead(9),
+    });
+    expect(phaseTimeline(event, NOW()).map((s) => s.end)).toEqual([
+      event.proposalPhaseEnd,
+      event.schedulingPhaseStart,
+      event.schedulingPhaseEnd,
+    ]);
+  });
+
+  it("highlights nothing before the first phase starts", () => {
+    const event = makeEvent({
+      proposalPhaseStart: ahead(1),
+      votingPhaseStart: ahead(2),
+      schedulingPhaseStart: ahead(3),
+    });
+    expect(states(event)).toEqual(["upcoming", "upcoming", "upcoming"]);
+  });
+
+  it("highlights the latest running phase where phases overlap", () => {
+    const event = makeEvent({
+      proposalPhaseStart: ago(5),
+      proposalPhaseEnd: ahead(2),
+      votingPhaseStart: ago(1),
+      schedulingPhaseStart: ahead(3),
+    });
+    expect(states(event)).toEqual(["past", "current", "upcoming"]);
+  });
+
+  it("marks a phase without a date skipped once a later phase started", () => {
+    const event = makeEvent({
+      proposalPhaseStart: ago(5),
+      schedulingPhaseStart: ago(1),
+    });
+    expect(states(event)).toEqual(["past", "skipped", "current"]);
+  });
+
+  it("keeps a phase without a date upcoming, with no start", () => {
+    const event = makeEvent({ proposalPhaseStart: ago(2) });
+    expect(phaseTimeline(event, NOW())).toMatchObject([
+      { state: "current" },
+      { state: "upcoming", start: undefined },
+      { state: "upcoming", start: undefined },
+    ]);
+  });
+});
+
+describe("phaseTimeline shares", { tags: ["006-US3"] }, () => {
+  const shares = (event: Event) =>
+    phaseTimeline(event, NOW()).map((s) => s.share);
+
+  it("sizes each phase by how long it runs", () => {
+    const event = makeEvent({
+      proposalPhaseStart: ago(0),
+      votingPhaseStart: ahead(4),
+      schedulingPhaseStart: ahead(8),
+      schedulingPhaseEnd: ahead(16),
+    });
+    const [a, b, c] = shares(event);
+    expect(a).toBeCloseTo(0.25);
+    expect(b).toBeCloseTo(0.25);
+    expect(c).toBeCloseTo(0.5);
+  });
+
+  it("splits evenly when no phase length is known", () => {
+    const event = makeEvent({ proposalPhaseStart: ago(2) });
+    for (const share of shares(event)) expect(share).toBeCloseTo(1 / 3);
+  });
+
+  it("gives a very short phase the minimum, keeping the others proportional", () => {
+    const event = makeEvent({
+      proposalPhaseStart: ago(0),
+      votingPhaseStart: ahead(0.01),
+      schedulingPhaseStart: ahead(30),
+      schedulingPhaseEnd: ahead(60),
+    });
+    const [a, b, c] = shares(event);
+    expect(a).toBeCloseTo(0.2);
+    expect(b).toBeCloseTo(0.4);
+    expect(c).toBeCloseTo(0.4);
+  });
+
+  it("gives a skipped phase the minimum and keeps the neighbour's length", () => {
+    const event = makeEvent({
+      proposalPhaseStart: ago(5),
+      schedulingPhaseStart: ago(1),
+      schedulingPhaseEnd: ahead(3),
+    });
+    const [a, b, c] = shares(event);
+    expect(b).toBeCloseTo(0.2);
+    expect(a).toBeCloseTo(0.4);
+    expect(c).toBeCloseTo(0.4);
   });
 });

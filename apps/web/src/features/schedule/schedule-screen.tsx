@@ -38,7 +38,6 @@ import { PullToRefresh } from "./pull-to-refresh";
 import { dayOfSession, useRevealSession } from "./reveal-session";
 import { ScheduleFilters } from "./schedule-filters";
 import { ScheduleToolbar, scheduleView } from "./schedule-toolbar";
-import { schedulingNotice } from "./scheduling-notice";
 import { matchesInReadingOrder } from "./search";
 import { SessionModal } from "./session-modal";
 import { useDragToPan } from "./use-drag-to-pan";
@@ -229,7 +228,7 @@ export function ScheduleScreen({
       }}
       showJumpToNow={nowIsOnSchedule}
       proposalsHref={links.proposals}
-      notice={schedulingNotice(data.event, data.now)}
+      now={data.now}
       sync={sync}
     />
   );

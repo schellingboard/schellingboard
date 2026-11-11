@@ -14,8 +14,11 @@ import {
   TableIcon,
 } from "../../ui/icons";
 import { Markdown } from "../../ui/markdown";
+import { PhaseBar } from "../../ui/phase-bar";
 import { Tooltip } from "../../ui/tooltip";
 import { scrollNowLineIntoView } from "./now-line";
+
+const LOCAL_ZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 const ITEM_CLASS =
   "flex items-center gap-1 rounded-md px-1 py-1.5 text-xs text-fg-subtle hover:text-brand-fg focus:outline-none focus:ring-2 focus:ring-brand-accent sm:text-sm";
@@ -43,7 +46,7 @@ export function ScheduleToolbar({
   onViewChange,
   showJumpToNow,
   proposalsHref,
-  notice,
+  now,
   sync,
 }: {
   event: Event;
@@ -52,7 +55,7 @@ export function ScheduleToolbar({
   /** Whether to offer "Now": only while the view has a line to jump to. */
   showJumpToNow: boolean;
   proposalsHref: string;
-  notice: string | null;
+  now: Date;
   sync: ReactNode;
 }) {
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -60,6 +63,9 @@ export function ScheduleToolbar({
     // The outer div spans the (possibly horizontally overflowing) grid width;
     // the inner one sticks the controls to the visible area, as the fold bars do.
     <div className="w-full border-b border-line-subtle bg-surface">
+      <div className="sticky left-0 max-w-[100dvw]">
+        <PhaseBar event={event} now={now} localZone={LOCAL_ZONE} />
+      </div>
       <div className="sticky left-0 flex max-w-[100dvw] flex-wrap items-center gap-x-4 gap-y-1 px-2 py-1.5 sm:px-3">
         <div
           role="group"
@@ -115,11 +121,6 @@ export function ScheduleToolbar({
         </div>
         {sync}
       </div>
-      {notice && (
-        <p className="sticky left-0 max-w-[100dvw] px-2 pb-1.5 text-xs text-fg-muted sm:px-3 sm:text-sm">
-          {notice}
-        </p>
-      )}
       <Dialog
         open={detailsOpen}
         onClose={() => setDetailsOpen(false)}

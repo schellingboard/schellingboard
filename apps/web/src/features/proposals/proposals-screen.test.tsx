@@ -119,6 +119,94 @@ describe("the proposals list", () => {
     ).toBe("/conf/schedule");
   });
 
+  it(
+    "shows the phase bar with the running phase marked and each start date",
+    { tags: ["006-US3"] },
+    () => {
+      setup("voting");
+
+      const strip = screen.getByRole("list", { name: "Event phases" });
+      const steps = within(strip).getAllByRole("listitem");
+      expect(steps.map((s) => s.textContent)).toEqual([
+        "Proposals (skipped)",
+        expect.stringMatching(/^Voting, \d\d:\d\d - \d\d \w{3}$/) as string,
+        expect.stringMatching(/^Scheduling, /) as string,
+      ]);
+      expect(steps.map((s) => s.getAttribute("aria-current"))).toEqual([
+        null,
+        "step",
+        null,
+      ]);
+    }
+  );
+
+  it(
+    "explains a phase in a notice when it is clicked",
+    { tags: ["006-US3"] },
+    async () => {
+      setup("voting");
+
+      await userEvent.click(screen.getByRole("button", { name: /^Voting/ }));
+
+      expect(screen.getByRole("status").textContent).toMatch(
+        /^Voting phase: Attendees vote on the proposals\. Started .*\. Ends /
+      );
+    }
+  );
+
+  it(
+    "highlights no phase before the first one starts",
+    { tags: ["006-US3"] },
+    () => {
+      setup("voting", {
+        event: {
+          ...fixture.event,
+          proposalPhaseStart: iso(20),
+          votingPhaseStart: iso(30),
+          votingPhaseEnd: null,
+          schedulingPhaseStart: iso(40),
+        },
+      });
+
+      const steps = within(
+        screen.getByRole("list", { name: "Event phases" })
+      ).getAllByRole("listitem");
+      expect(steps[0].textContent).toMatch(/^Proposals, \d\d:\d\d/);
+      expect(steps.map((s) => s.getAttribute("aria-current"))).toEqual([
+        null,
+        null,
+        null,
+      ]);
+    }
+  );
+
+  it(
+    "leaves out the phase bar for an event without phases",
+    { tags: ["006-US3"] },
+    () => {
+      setup("voting", {
+        event: {
+          ...fixture.event,
+          votingPhaseStart: null,
+          votingPhaseEnd: null,
+          schedulingPhaseStart: null,
+        },
+      });
+
+      expect(screen.queryByRole("list", { name: "Event phases" })).toBeNull();
+    }
+  );
+
+  it(
+    "leaves out the phase bar once scheduling has started",
+    { tags: ["006-US3"] },
+    () => {
+      setup("scheduling");
+
+      expect(screen.queryByRole("list", { name: "Event phases" })).toBeNull();
+    }
+  );
+
   it("disables the actions a signed-out viewer or the phase rules out", () => {
     setup("scheduling", { me: null });
 
