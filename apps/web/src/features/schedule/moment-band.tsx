@@ -1,7 +1,7 @@
 import type { SharedMoment } from "@schellingboard/domain/event";
-import { TIME_FORMAT } from "@schellingboard/domain/time";
 import { DateTime } from "luxon";
 
+import { useTimeFormat } from "../../app/time-format";
 import { Tooltip } from "../../ui/tooltip";
 import { useSchedule } from "./context";
 import { gridBlockPx, GUTTER } from "./grid-layout";
@@ -24,9 +24,10 @@ export function MomentBands({
   row: number;
 }) {
   const { slotIncrement, timezone } = useSchedule();
+  const timeFormat = useTimeFormat();
   if (day.moments.length === 0) return null;
   const time = (at: Date) =>
-    DateTime.fromJSDate(at).setZone(timezone).toFormat(TIME_FORMAT);
+    DateTime.fromJSDate(at).setZone(timezone).toFormat(timeFormat);
   return (
     <div
       className="pointer-events-none absolute inset-0 z-10"

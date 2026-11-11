@@ -1,9 +1,10 @@
 import type { Location } from "@schellingboard/domain/location";
 import type { Session } from "@schellingboard/domain/session";
 import { isBookableSlot } from "@schellingboard/domain/session-bookable";
-import { formatOptionalTime, TIME_FORMAT } from "@schellingboard/domain/time";
+import { formatOptionalTime } from "@schellingboard/domain/time";
 import { DateTime } from "luxon";
 
+import { useTimeFormat } from "../../app/time-format";
 import { cx } from "../../ui/cx";
 import {
   AcademicCapIcon,
@@ -159,6 +160,7 @@ function SessionInfo({
   const { data } = useSchedule();
   const description = plainText(session.description);
   const clashes = data.clashes(session.id);
+  const timeFormat = useTimeFormat();
   return (
     <div className="p-2">
       <h4 className="flex items-center gap-1 text-lg font-bold leading-tight">
@@ -189,8 +191,8 @@ function SessionInfo({
         <div className="flex gap-1">
           <ClockIcon className="h-4 w-4" />
           <span>
-            {formatOptionalTime(session.startTime, timezone, TIME_FORMAT)} -{" "}
-            {formatOptionalTime(session.endTime, timezone, TIME_FORMAT)}
+            {formatOptionalTime(session.startTime, timezone, timeFormat)} -{" "}
+            {formatOptionalTime(session.endTime, timezone, timeFormat)}
           </span>
         </div>
       </div>
