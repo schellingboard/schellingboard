@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { useId } from "react";
 
 import { ExclamationTriangleIcon } from "../../ui/icons";
@@ -18,7 +19,7 @@ export function ClashIcon({
       <ExclamationTriangleIcon
         aria-hidden={false}
         role="img"
-        aria-label="Clash"
+        aria-label={t`Clash`}
         aria-describedby={detailsId}
         className={className}
       />

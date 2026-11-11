@@ -1,3 +1,6 @@
+import { i18n } from "@lingui/core";
+import { msg, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import type { Event } from "@schellingboard/domain/event";
 import { hasPhases } from "@schellingboard/domain/phase";
 import { formatEventDates } from "@schellingboard/domain/time";
@@ -24,14 +27,16 @@ const ITEM_CLASS =
   "flex items-center gap-1 rounded-md px-1 py-1.5 text-xs text-fg-subtle hover:text-brand-fg focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent sm:text-sm";
 
 export type ScheduleView = "grid" | "agenda";
+const VIEW_GRID = "grid";
+const VIEW_AGENDA = "agenda";
 
 // Links to the retired Text and RSVP'd views (?view=text, ?view=rsvp) land on the grid.
 export const scheduleView = (params: Pick<URLSearchParams, "get">) =>
-  params.get("view") === "agenda" ? "agenda" : "grid";
+  params.get("view") === VIEW_AGENDA ? VIEW_AGENDA : VIEW_GRID;
 
 const VIEWS = [
-  { name: "grid", label: "Grid", icon: TableIcon },
-  { name: "agenda", label: "Agenda", icon: QueueIcon },
+  { name: VIEW_GRID, label: msg`Grid`, icon: TableIcon },
+  { name: VIEW_AGENDA, label: msg`Agenda`, icon: QueueIcon },
 ] as const;
 
 /**
@@ -69,7 +74,7 @@ export function ScheduleToolbar({
       <div className="sticky left-0 flex max-w-[100dvw] flex-wrap items-center gap-x-4 gap-y-1 px-2 py-1.5 sm:px-3">
         <div
           role="group"
-          aria-label="Schedule view"
+          aria-label={t`Schedule view`}
           className="flex flex-wrap items-center gap-2"
         >
           {VIEWS.map((v) => (
@@ -86,21 +91,21 @@ export function ScheduleToolbar({
               onClick={() => view !== v.name && onViewChange(v.name)}
             >
               <v.icon className="h-4 w-4 stroke-2" />
-              {v.label}
+              {i18n._(v.label)}
             </button>
           ))}
         </div>
         <span className="hidden h-5 w-px bg-line-subtle sm:block" aria-hidden />
         <div className="flex items-center gap-x-4 gap-y-1">
           {showJumpToNow && (
-            <Tooltip content="Jump to the current time">
+            <Tooltip content={t`Jump to the current time`}>
               <button
                 type="button"
                 onClick={() => scrollNowLineIntoView()}
                 className={ITEM_CLASS}
               >
                 <ClockIcon className="h-4 w-4 stroke-2" />
-                Now
+                <Trans>Now</Trans>
               </button>
             </Tooltip>
           )}
@@ -110,12 +115,12 @@ export function ScheduleToolbar({
             className={ITEM_CLASS}
           >
             <InformationCircleIcon className="h-4 w-4 stroke-2" />
-            Event details
+            <Trans>Event details</Trans>
           </button>
           {hasPhases(event) && (
             <a href={proposalsHref} className={ITEM_CLASS}>
               <ProposalsIcon className="h-4 w-4 stroke-2" />
-              Proposals
+              <Trans>Proposals</Trans>
             </a>
           )}
         </div>
@@ -123,7 +128,7 @@ export function ScheduleToolbar({
       </div>
       {detailsOpen && (
         <SidePanel
-          label="Event details"
+          label={t`Event details`}
           title={event.name}
           onClose={() => setDetailsOpen(false)}
           transient

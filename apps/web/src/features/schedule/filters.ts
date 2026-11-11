@@ -1,7 +1,9 @@
+import { msg } from "@lingui/core/macro";
+
 export const MINE_KINDS = [
-  { value: "rsvpd", label: "RSVP'd", summary: "RSVP'd" },
-  { value: "hosting", label: "Hosting", summary: "hosting" },
-  { value: "bookmarked", label: "Bookmarked", summary: "bookmarked" },
+  { value: "rsvpd", label: msg`RSVP'd`, summary: msg`RSVP'd` },
+  { value: "hosting", label: msg`Hosting`, summary: msg`hosting` },
+  { value: "bookmarked", label: msg`Bookmarked`, summary: msg`bookmarked` },
 ] as const;
 
 export type MineKind = (typeof MINE_KINDS)[number]["value"];

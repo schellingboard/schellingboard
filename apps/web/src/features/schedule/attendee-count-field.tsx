@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { attendeeCountFormSchema } from "@schellingboard/contracts/attendee-count";
 import {
   MAX_ATTENDEE_COUNT,
@@ -67,10 +69,12 @@ export function AttendeeCountField({
       const session = data.sessions.find((s) => s.id === sessionId);
       const what = session
         ? describeSession(session, data.event.timezone)
-        : "the session";
+        : null;
       return notify({
         tone: "failure",
-        message: `Could not save the attendee count for ${what}. Please try again.`,
+        message: what
+          ? t`Could not save the attendee count for ${what}. Please try again.`
+          : t`Could not save the attendee count for the session. Please try again.`,
       });
     }
     const stored = result.count === null ? "" : String(result.count);
@@ -89,13 +93,15 @@ export function AttendeeCountField({
         className="flex flex-col gap-2"
       >
         <label htmlFor={fieldId} className="text-sm font-medium text-fg">
-          How many people attended?
+          <Trans>How many people attended?</Trans>
         </label>
         <p className="text-xs text-fg-subtle">
-          Optional. Only you and your co-hosts will see this, not the attendees.
-          Enter <strong>0</strong> if the session was held but nobody came. If
-          it never happened at all, delete the session instead. Leave the field
-          empty to go back to no count at all.
+          <Trans>
+            Optional. Only you and your co-hosts will see this, not the
+            attendees. Enter <strong>0</strong> if the session was held but
+            nobody came. If it never happened at all, delete the session
+            instead. Leave the field empty to go back to no count at all.
+          </Trans>
         </p>
         <div className="flex flex-wrap items-center gap-2">
           <input
@@ -114,17 +120,21 @@ export function AttendeeCountField({
           />
           <button
             type="submit"
-            aria-label="Save attendee count"
+            aria-label={t`Save attendee count`}
             disabled={saving}
             className="rounded-md bg-brand px-3 py-1 text-sm font-medium text-on-brand shadow hover:bg-brand-hover disabled:bg-surface-hover disabled:text-fg-subtle disabled:shadow-none"
           >
-            Save
+            <Trans>Save</Trans>
           </button>
           <span role="status" aria-live="polite" className="text-xs">
             {saving ? (
-              <span className="text-fg-muted">Saving&hellip;</span>
+              <span className="text-fg-muted">
+                <Trans>Saving&hellip;</Trans>
+              </span>
             ) : saved && value === baseline ? (
-              <span className="text-success-fg">Saved</span>
+              <span className="text-success-fg">
+                <Trans>Saved</Trans>
+              </span>
             ) : null}
           </span>
         </div>

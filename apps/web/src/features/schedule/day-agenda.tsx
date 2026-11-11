@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import type { SharedMoment } from "@schellingboard/domain/event";
 import type { Location } from "@schellingboard/domain/location";
 import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
@@ -100,7 +102,7 @@ export function DayAgenda({
       </h2>
       {groups.length === 0 && (
         <p className="text-sm italic text-fg-subtle">
-          {filtering ? "No matching sessions" : "No sessions"}
+          {filtering ? t`No matching sessions` : t`No sessions`}
         </p>
       )}
       {groups.map((group, i) => (
@@ -152,13 +154,14 @@ export function DayAgenda({
 // id so the toolbar's "Now" scrolls to it unchanged.
 function NowMarker({ now, timezone }: { now: Date; timezone: string }) {
   const timeFormat = useTimeFormat();
+  const at = formatOptionalTime(now, timezone, timeFormat);
   return (
     <div
       data-testid="now-line"
       className="flex items-center gap-2 py-1 text-xs font-semibold text-danger-fg"
     >
       <span aria-hidden className="h-0.5 flex-1 bg-danger" />
-      Now · {formatOptionalTime(now, timezone, timeFormat)}
+      {t`Now · ${at}`}
       <span aria-hidden className="h-0.5 flex-1 bg-danger" />
     </div>
   );
@@ -200,7 +203,7 @@ function AgendaRow({
         <span className="block text-xs text-fg-subtle">
           {state === "running" && (
             <span className="mr-1 rounded bg-danger px-1 font-semibold text-on-danger">
-              Now
+              <Trans>Now</Trans>
             </span>
           )}
           {details}
@@ -249,13 +252,14 @@ function SessionRow({
   const { data, links, openSession } = useSchedule();
   const timeFormat = useTimeFormat();
   const state = timeState(start, session.endTime ?? start, data.now);
-  const until = `until ${formatOptionalTime(session.endTime, timezone, timeFormat)}`;
+  const endsAt = formatOptionalTime(session.endTime, timezone, timeFormat);
+  const until = t`until ${endsAt}`;
   const inRooms = locations.filter((loc) =>
     session.locations.some((l) => l.id === loc.id)
   );
   const rooms =
     inRooms.length === locations.length && inRooms.length > 1
-      ? "All rooms"
+      ? t`All rooms`
       : inRooms.map((r) => r.name).join(", ");
   const color = inRooms[0]?.color;
 
@@ -264,7 +268,7 @@ function SessionRow({
       <AgendaRow
         state={state}
         swatchClass="bg-line"
-        title={session.title || "Blocked"}
+        title={session.title || t`Blocked`}
         details={`${rooms} · ${until}`}
       />
     );
@@ -294,7 +298,7 @@ function SessionRow({
             <BookmarkSolidIcon
               aria-hidden={false}
               role="img"
-              aria-label="Bookmarked"
+              aria-label={t`Bookmarked`}
               className="mt-0.5 h-3.5 w-3.5 shrink-0 text-fg-muted"
             />
           )}
@@ -309,7 +313,7 @@ function SessionRow({
               className="h-4 w-4"
               aria-hidden={false}
               role="img"
-              aria-label="You are hosting this session"
+              aria-label={t`You are hosting this session`}
             />
           )}
           {rsvpd && (
@@ -317,7 +321,7 @@ function SessionRow({
               className="h-4 w-4"
               aria-hidden={false}
               role="img"
-              aria-label="You have RSVP'd to this session"
+              aria-label={t`You have RSVP'd to this session`}
             />
           )}
           <UserIcon aria-hidden className="h-3 w-3" />
@@ -350,7 +354,7 @@ function MomentRow({
             aria-hidden
             className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warning-fg"
           />
-          <span className="sr-only">Shared moment: </span>
+          <span className="sr-only">{t`Shared moment: `}</span>
           <span className="line-clamp-2">{moment.title}</span>
         </>
       }
@@ -373,6 +377,9 @@ function MeetingRow({
   const timeFormat = useTimeFormat();
   const start = shownSlotStart(new Date(meeting.slotStart), breakMinutes);
   const end = new Date(meeting.slotEnd);
+  const { otherName } = meeting;
+  const endsAt = formatOptionalTime(end, timezone, timeFormat);
+  const until = t`until ${endsAt}`;
   return (
     <AgendaRow
       state={timeState(start, end, data.now)}
@@ -380,15 +387,15 @@ function MeetingRow({
         meeting.status === "accepted" ? "bg-brand-accent" : "bg-line"
       }
       href={links.meeting(meeting.id)}
-      title={`1-on-1 with ${meeting.otherName}`}
-      details={`${meeting.meetingPoint} · until ${formatOptionalTime(end, timezone, timeFormat)} · ${statusLine(meeting)}`}
+      title={t`1-on-1 with ${otherName}`}
+      details={`${meeting.meetingPoint} · ${until} · ${statusLine(meeting)}`}
       trailing={
         meeting.status === "accepted" && (
           <CheckCircleIcon
             className="h-4 w-4"
             aria-hidden={false}
             role="img"
-            aria-label="This 1-on-1 is confirmed"
+            aria-label={t`This 1-on-1 is confirmed`}
           />
         )
       }

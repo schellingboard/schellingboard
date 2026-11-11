@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import type { Session } from "@schellingboard/domain/session";
 import { type ReactNode, useState } from "react";
 
@@ -41,7 +42,7 @@ export function useRsvp(session: Session) {
   const dialogs: ReactNode = (
     <ConfirmDialog
       open={clashes.length > 0}
-      title="Clashing commitment"
+      title={t`Clashing commitment`}
       message={clashMessage(clashes, data.guestId)}
       onConfirm={() => {
         setClashes([]);

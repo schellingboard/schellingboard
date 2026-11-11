@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import type { Location } from "@schellingboard/domain/location";
 import { schedulingEnded } from "@schellingboard/domain/phase";
 import { getNumSlots } from "@schellingboard/domain/slots";
@@ -21,6 +22,12 @@ import type { DayWithSessions } from "./model";
 import { MomentBands } from "./moment-band";
 import { NowLine } from "./now-line";
 import { OneOnOnePicture } from "./one-on-one-picture";
+
+const AXIS_24H = "HH:mm";
+const AXIS_12H_HOUR = "h a";
+const AXIS_12H = "h:mm";
+
+const maxCapacity = (capacity: number) => t`max ${capacity}`;
 
 /**
  * One day is a single CSS grid: column 1 is the time gutter, the rest are the
@@ -46,7 +53,11 @@ export function DayGrid({
   const date = DateTime.fromJSDate(day.start).setZone(timezone);
   const clockStyle = useClockStyle();
   const axisFormat = (at: DateTime) =>
-    clockStyle === "24h" ? "HH:mm" : at.minute === 0 ? "h a" : "h:mm";
+    clockStyle === "24h"
+      ? AXIS_24H
+      : at.minute === 0
+        ? AXIS_12H_HOUR
+        : AXIS_12H;
   // Null on any day that isn't today. `now` is the server's clock, the dev
   // fake clock included.
   const nowOffsetPx = getNowOffsetPx(day, data.now, slotIncrement);
@@ -66,10 +77,10 @@ export function DayGrid({
     notify({
       tone: "info",
       message: schedulingEnded(data.event, data.now)
-        ? "This event is over. You can still browse the schedule."
+        ? t`This event is over. You can still browse the schedule.`
         : start && start > data.now
-          ? `Scheduling opens ${formatInLocalZone(start, timezone, LOCAL_ZONE)}. Until then you can only browse the schedule.`
-          : "Scheduling is not open. You can only browse the schedule.",
+          ? t`Scheduling opens ${formatInLocalZone(start, timezone, LOCAL_ZONE)}. Until then you can only browse the schedule.`
+          : t`Scheduling is not open. You can only browse the schedule.`,
       autoDismissMs: 6000,
     });
   };
@@ -108,7 +119,7 @@ export function DayGrid({
             !first && "border-t"
           )}
         >
-          <h3 className="text-xs font-semibold sm:text-sm">1-on-1s</h3>
+          <h3 className="text-xs font-semibold sm:text-sm">{t`1-on-1s`}</h3>
         </div>
       )}
       {locations.map((loc) => (
@@ -122,7 +133,7 @@ export function DayGrid({
       <div className="sticky left-0 z-20 border-r border-line-subtle bg-surface" />
       {showMeetings && (
         <div className="border-l border-line-subtle p-1">
-          <p className="text-[10px] text-fg-subtle">Only you see these</p>
+          <p className="text-[10px] text-fg-subtle">{t`Only you see these`}</p>
         </div>
       )}
       {locations.map((loc) => (
@@ -131,7 +142,7 @@ export function DayGrid({
             {loc.areaDescription ?? <br />}
           </p>
           <p className="text-[10px] text-fg-subtle">
-            {loc.capacity ? `max ${loc.capacity}` : <br />}
+            {loc.capacity ? maxCapacity(loc.capacity) : <br />}
           </p>
         </div>
       ))}
@@ -223,7 +234,7 @@ function RoomHeader({
 }) {
   const whereAndSize = [
     loc.areaDescription,
-    loc.capacity ? `max ${loc.capacity}` : null,
+    loc.capacity ? maxCapacity(loc.capacity) : null,
   ]
     .filter(Boolean)
     .join(" · ");
