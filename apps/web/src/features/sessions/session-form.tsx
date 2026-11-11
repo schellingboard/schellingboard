@@ -10,6 +10,7 @@ import {
   CAPACITY_ERROR,
   sessionHasStarted,
 } from "@schellingboard/domain/session-booking";
+import { overlappingMoment } from "@schellingboard/domain/shared-moment";
 import {
   durationMinusBreak,
   gridEndingDurations,
@@ -19,7 +20,9 @@ import {
   convertParamDateTime,
   formatDayLabel,
   formatDuration,
+  formatOptionalTime,
   formatSlotLabel,
+  TIME_FORMAT,
 } from "@schellingboard/domain/time";
 import { type FormEvent, useMemo, useRef, useState } from "react";
 
@@ -338,6 +341,18 @@ function Fields({
       ? null
       : buildSessionInterval(new Date(chosenStart), effectiveDuration);
   const runsFrom = interval && new Date(interval.start.getTime() + breakMs);
+  const moment =
+    runsFrom && interval
+      ? overlappingMoment(
+          snapshot.moments.map((m) => ({
+            ...m,
+            start: new Date(m.start),
+            end: new Date(m.end),
+          })),
+          runsFrom,
+          interval.end
+        )
+      : undefined;
   const { clashes, checking: checkingClashes } = useHostClashes(
     actions.hostClashes,
     {
@@ -661,6 +676,24 @@ function Fields({
             Your session runs {formatSlotLabel(runsFrom, day.start, timezone)} –{" "}
             {formatSlotLabel(interval.end, day.start, timezone)}.
           </p>
+        )}
+        {moment && (
+          <div
+            role="status"
+            className="rounded-md border border-warning bg-warning-tint px-4 py-3 text-warning-fg"
+          >
+            <p className="text-sm font-medium">
+              This slot is during {moment.title} (
+              {formatOptionalTime(moment.start, timezone, TIME_FORMAT)} –{" "}
+              {formatOptionalTime(moment.end, timezone, TIME_FORMAT)})
+            </p>
+            {moment.description && (
+              <p className="text-sm">{moment.description}</p>
+            )}
+            <p className="text-sm">
+              You can still schedule here; just expect a smaller group.
+            </p>
+          </div>
         )}
         {session?.proposalId && (
           <p className="text-sm text-fg-muted">
