@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **See which phase the event is in** (#771): the proposals page shows Proposals, Voting and
+  Scheduling with the current one highlighted and each start date.
 - **"Need ideas?" help for proposers** (#1337): a button on the proposals page and the new-proposal
   form opens prompts to start from. Organizers can replace the text for each event.
 - **Remove comments left on your profile** (#901): profile owners, session and proposal hosts, and

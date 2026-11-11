@@ -22,6 +22,7 @@ import {
   PlusIcon,
   UserIcon,
 } from "../../ui/icons";
+import { PhaseTimeline } from "./phase-timeline";
 import { ProposalHelp } from "./proposal-help";
 import { SearchInput } from "../../ui/search-input";
 import { Unavailable } from "../../ui/unavailable";
@@ -82,6 +83,13 @@ export function ProposalsScreen(props: ProposalsScreenProps) {
         <p className="text-fg-muted mt-2">
           Browse session ideas or add your own proposal
         </p>
+        <div className="mt-4">
+          <PhaseTimeline
+            event={snapshot.event}
+            now={now}
+            localZone={localZone}
+          />
+        </div>
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center my-6">
           <ActionLink
             href={links.add}

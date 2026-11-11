@@ -194,6 +194,11 @@ export const features = {
         actor: "attendee",
         priority: "P3",
       },
+      US3: {
+        title: "Attendee sees which phase the event is in",
+        actor: "attendee",
+        priority: "P3",
+      },
     },
   },
   "007": {

@@ -3,6 +3,7 @@ import { dateStartDescription } from "@schellingboard/domain/phase-opens-text";
 import {
   EventPhase,
   getCurrentPhase,
+  phaseTimeline,
   scheduleReadOnly,
   schedulingEnded,
 } from "@schellingboard/domain/phase";
@@ -231,5 +232,59 @@ describe("scheduleReadOnly", { tags: ["007-US14"] }, () => {
       scheduleReadOnly(makeEvent({ schedulingPhaseStart: ago(1) }), NOW())
     ).toBe(false);
     expect(scheduleReadOnly(makeEvent({}), NOW())).toBe(false);
+  });
+});
+
+describe("phaseTimeline", { tags: ["006-US3"] }, () => {
+  const states = (event: Event) =>
+    phaseTimeline(event, NOW()).map((s) => s.state);
+
+  it("is empty for an event without phases", () => {
+    expect(phaseTimeline(makeEvent({}), NOW())).toEqual([]);
+  });
+
+  it("marks finished phases past, the running one current, the rest upcoming", () => {
+    const event = makeEvent({
+      proposalPhaseStart: ago(5),
+      votingPhaseStart: ago(1),
+      schedulingPhaseStart: ahead(3),
+    });
+    expect(states(event)).toEqual(["past", "current", "upcoming"]);
+  });
+
+  it("highlights nothing before the first phase starts", () => {
+    const event = makeEvent({
+      proposalPhaseStart: ahead(1),
+      votingPhaseStart: ahead(2),
+      schedulingPhaseStart: ahead(3),
+    });
+    expect(states(event)).toEqual(["upcoming", "upcoming", "upcoming"]);
+  });
+
+  it("highlights the latest running phase where phases overlap", () => {
+    const event = makeEvent({
+      proposalPhaseStart: ago(5),
+      proposalPhaseEnd: ahead(2),
+      votingPhaseStart: ago(1),
+      schedulingPhaseStart: ahead(3),
+    });
+    expect(states(event)).toEqual(["past", "current", "upcoming"]);
+  });
+
+  it("marks a phase without a date skipped once a later phase started", () => {
+    const event = makeEvent({
+      proposalPhaseStart: ago(5),
+      schedulingPhaseStart: ago(1),
+    });
+    expect(states(event)).toEqual(["past", "skipped", "current"]);
+  });
+
+  it("keeps a phase without a date upcoming, with no start", () => {
+    const event = makeEvent({ proposalPhaseStart: ago(2) });
+    expect(phaseTimeline(event, NOW())).toMatchObject([
+      { state: "current" },
+      { state: "upcoming", start: undefined },
+      { state: "upcoming", start: undefined },
+    ]);
   });
 });
