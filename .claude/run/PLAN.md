@@ -42,8 +42,8 @@ the E2E specs a step touches; the user runs the full suite at the end.
     on the grid (z-index on the sticky filter bar). 22b. DONE Share button removed from the shared
     `SidePanel` (all panels). 22c. DONE #1588 **Bug** Admin, editing an event: icons are shown by
     name only, not drawn. Show the icons (find the picker/list; keep the name as accessible label).
-    Issue first (Bug, High, `component: admin`). 22d. **Bug** Grid schedule: no line above the
-    room-name header row between one day and the next. Add it. Issue first (Bug, Medium,
+    Issue first (Bug, High, `component: admin`). 22d. DONE #1589 **Bug** Grid schedule: no line
+    above the room-name header row between one day and the next. Add it. Issue first (Bug, Medium,
     `component: scheduling`). 22e. **Bug** Side panel: "<- Profile" back link (opened from a
     session, then a host) has the arrow too low and not aligned with the text. Also: the panel title
     for a person is their name (shortened with an ellipsis when long, full name on hover/`title`)

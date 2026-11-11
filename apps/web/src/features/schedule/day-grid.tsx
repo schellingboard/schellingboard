@@ -25,9 +25,12 @@ export function DayGrid({
   day,
   locations,
   stickyTop,
+  first,
 }: {
   day: DayWithSessions;
   locations: Location[];
+  /** The first day has the toolbar above it, so no top line of its own. */
+  first: boolean;
   /** Where the room headers stick: below whatever is pinned above them. */
   stickyTop: number;
 }) {
@@ -64,7 +67,10 @@ export function DayGrid({
           it as that day scrolls into view. */}
       <div
         style={{ top: stickyTop }}
-        className="sticky left-0 z-21 flex flex-col justify-end border-b border-r border-line-subtle bg-surface p-1 leading-tight"
+        className={cx(
+          "sticky left-0 z-21 flex flex-col justify-end border-r border-b border-line-subtle bg-surface p-1 leading-tight",
+          !first && "border-t"
+        )}
       >
         <span className="text-[11px] font-bold">{date.toFormat("EEE")}</span>
         <span className="text-[10px] text-fg-subtle">
@@ -74,13 +80,21 @@ export function DayGrid({
       {showMeetings && (
         <div
           style={{ top: stickyTop }}
-          className="sticky z-20 border-b border-l border-line-subtle bg-surface p-1"
+          className={cx(
+            "sticky z-20 border-b border-l border-line-subtle bg-surface p-1",
+            !first && "border-t"
+          )}
         >
           <h3 className="text-xs font-semibold sm:text-sm">1-on-1s</h3>
         </div>
       )}
       {locations.map((loc) => (
-        <RoomHeader key={loc.id} location={loc} stickyTop={stickyTop} />
+        <RoomHeader
+          key={loc.id}
+          location={loc}
+          stickyTop={stickyTop}
+          first={first}
+        />
       ))}
       <div className="sticky left-0 z-20 border-r border-line-subtle bg-surface" />
       {showMeetings && (
@@ -178,9 +192,11 @@ export function DayGrid({
 function RoomHeader({
   location: loc,
   stickyTop,
+  first,
 }: {
   location: Location;
   stickyTop: number;
+  first: boolean;
 }) {
   const whereAndSize = [
     loc.areaDescription,
@@ -192,7 +208,10 @@ function RoomHeader({
   return (
     <div
       style={{ top: stickyTop }}
-      className="sticky z-20 border-b border-l border-line-subtle bg-surface p-1"
+      className={cx(
+        "sticky z-20 border-b border-l border-line-subtle bg-surface p-1",
+        !first && "border-t"
+      )}
     >
       {/* What a room offers is behind its name; the ⓘ is the only hint that
           there is anything to open. */}

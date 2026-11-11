@@ -66,7 +66,7 @@ export function GridView({
       >
         {toolbar}
         {filterBar}
-        {entries.map(({ day, sessions, meetings }) => {
+        {entries.map(({ day, sessions, meetings }, dayIndex) => {
           const { foldable, folded } = gridDayFold({
             dayId: day.id,
             filtering,
@@ -93,6 +93,7 @@ export function GridView({
                   day={day}
                   locations={locations}
                   stickyTop={statusHeight}
+                  first={dayIndex === 0}
                 />
               )}
             </div>
