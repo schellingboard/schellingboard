@@ -65,4 +65,4 @@
 
 ## Next step
 
-No step left; the plan has no next steps.
+Step 20 (#607).
