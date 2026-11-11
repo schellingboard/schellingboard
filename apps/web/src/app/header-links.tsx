@@ -1,4 +1,4 @@
-import { t } from "@lingui/core/macro";
+import { plural, t } from "@lingui/core/macro";
 
 import { BellIcon, UserGroupIcon } from "../ui/icons";
 import { useUnread } from "./unread-count";
@@ -20,7 +20,12 @@ export function HeaderLinks({ signedIn }: { signedIn: boolean }) {
         <a
           href="/notifications"
           aria-label={
-            unread ? t`Notifications (${unread} unread)` : t`Notifications`
+            unread
+              ? plural(unread, {
+                  one: "Notifications (# unread)",
+                  other: "Notifications (# unread)",
+                })
+              : t`Notifications`
           }
           className="relative flex items-center rounded-md p-2 text-fg-subtle hover:bg-surface-muted"
         >
