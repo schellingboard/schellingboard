@@ -31,7 +31,7 @@ the E2E specs a step touches; the user runs the full suite at the end.
 15. DONE **#1145** Toolbar edits use `execCommand` on the changed range (undoable).
 16. DONE **#969** Settings lists push devices (`/me/push-devices`) with Turn off.
 17. DONE **#684** `Pager` (numbers, First/Last, rows per page; `pageSize` URL param).
-18. **#380** ESLint 10.
+18. DONE **#380** ESLint 10 (dependabot ignore removed; typescript-eslint packages dropped).
 19. **#1169** Property-based tests for domain.
 
 ## Next steps
