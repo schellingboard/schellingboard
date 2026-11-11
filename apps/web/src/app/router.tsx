@@ -31,9 +31,9 @@ import { EventLanding } from "./event-landing";
 import { EventLayout } from "./event-page";
 import { SchedulePage } from "./schedule-page";
 import { PanelLanding } from "./panel-landing";
-import { PanelHost } from "./panel-host";
+import { ForeignPanelHost, PanelHost } from "./panel-host";
 import { ShellProviders } from "./shell";
-import { ProfileLinks } from "./profile-links";
+import { PanelLinks } from "./panel-links";
 import { ProfilePanelHost } from "./profile-host";
 import { ProfileWalkProvider } from "./profile-walk";
 import { SessionFormPage } from "./sessions-pages";
@@ -103,10 +103,11 @@ export function createAppRouter(
       return (
         <ShellProviders api={services.api}>
           <ProfileWalkProvider>
-            <ProfileLinks>
+            <PanelLinks>
               <Outlet />
               <ProfilePanelHost api={services.api} />
-            </ProfileLinks>
+              <ForeignPanelHost services={services} />
+            </PanelLinks>
           </ProfileWalkProvider>
         </ShellProviders>
       );

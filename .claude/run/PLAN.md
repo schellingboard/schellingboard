@@ -13,8 +13,8 @@ commit. Run the E2E specs a step touches individually; the user runs the full su
 2. Done: proposal panel, `?viewProposal=` redirects, `proposal-nav.ts` removed.
 3. Done: profile panel at `/guests/:id`, hosted at the root.
 4. Done: 1-on-1 panel at `/{slug}/meetings/:id`; `?viewMeeting=` redirects; booking stays a dialog.
-5. **Panels over pages of another scope.** A session, proposal or 1-on-1 over `/guests`,
-   `/notifications`, `/settings`: the host opens that event's replica, or reuses the open one.
+5. Done: panels over pages of another scope; `PanelLinks` at the root, `ForeignPanelHost` opens the
+   replica.
 6. **New links in emails and notifications.** `utils/notifications.ts` and the server's link
    builders emit the new URLs. Old URLs still redirect (keep their tests).
 7. **Page state outside panels.** Schedule search and unfolded days, directory and proposals list

@@ -16,7 +16,7 @@ import { toEvent } from "../replica/selectors";
 import { InAppLinks } from "./in-app-links";
 import { PageNotice } from "./page-notice";
 import { PanelLanding } from "./panel-landing";
-import { profileIdOf } from "./profile-links";
+import { profileIdOf } from "./panel-links";
 import { useProfileWalk } from "./profile-walk";
 import type { AppServices } from "./services";
 import { ShellFrame } from "./shell";

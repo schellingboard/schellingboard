@@ -152,14 +152,15 @@ covered by the E2E suite; there is no browser component runner.
 A session, a proposal, a 1-on-1 and a profile open in the side panel (`ui/side-panel.tsx`) at
 `/{slug}/sessions/:id`, `/{slug}/proposals/:id`, `/{slug}/meetings/:id` and `/guests/:id`. The first
 three are mounted by `app/panel-host.tsx` inside the event; a profile is mounted by
-`app/profile-host.tsx` at the root, over any page, and `ProfileLinks` opens its links.
-`app/panel-history.ts` keeps the page behind it and the stack depth in `history.state`; `SpaLinks`
-opens these links in the panel. An address opened directly lands on the schedule (for a session or a
-1-on-1), the proposals list or the directory with the panel over it (only the directory behind a
-profile gives it Prev and Next), and `?viewSession=`, `?viewProposal=` and `?viewMeeting=` (also at
-`/{slug}/meetings`) redirect the same way. Booking a 1-on-1 stays a dialog, `?bookMeeting=` on the
-schedule. Links from legacy pages and emails are plain anchors: build them with `links.ts` and
-`utils/notifications.ts`, never a second copy.
+`app/profile-host.tsx` at the root, over any page. `PanelLinks` opens its links, and those of any
+event's session, proposal or 1-on-1. `ForeignPanelHost` opens the replica of an event the page
+behind does not belong to. `app/panel-history.ts` keeps the page behind it and the stack depth in
+`history.state`; `SpaLinks` opens these links in the panel. An address opened directly lands on the
+schedule (for a session or a 1-on-1), the proposals list or the directory with the panel over it
+(only the directory behind a profile gives it Prev and Next), and `?viewSession=`, `?viewProposal=`
+and `?viewMeeting=` (also at `/{slug}/meetings`) redirect the same way. Booking a 1-on-1 stays a
+dialog, `?bookMeeting=` on the schedule. Links from legacy pages and emails are plain anchors: build
+them with `links.ts` and `utils/notifications.ts`, never a second copy.
 
 ## Failure notices
 

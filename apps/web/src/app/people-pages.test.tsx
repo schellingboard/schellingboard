@@ -2,7 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { FakeCall } from "../commands/fake-api";
-import { open } from "./page-test-support";
+import { open, running } from "./page-test-support";
+import { openPanel } from "./panel-history";
 
 vi.mock("./hard-navigate", () => ({
   hardNavigate: vi.fn(),
@@ -126,6 +127,103 @@ describe("the people pages", { tags: ["011-US3"] }, () => {
     await waitFor(() =>
       expect(router.history.location.pathname).toBe("/conf/proposals")
     );
+  });
+
+  it("opens a session from a profile over the directory, in that event's panel", async () => {
+    const { router } = await open({
+      handler: (call) =>
+        call.path.endsWith("/activity")
+          ? Response.json({
+              hosting: [{ id: "s", title: "Talk", eventSlug: "conf" }],
+              proposals: [],
+            })
+          : answers(call),
+      path: "/guests/bo",
+      identity: "al",
+    });
+
+    const profile = await screen.findByRole("dialog", { name: "Bo" });
+    await userEvent.click(
+      await within(profile).findByRole("link", { name: "Talk" })
+    );
+
+    const session = await screen.findByRole("dialog", {
+      name: "Session details",
+    });
+    expect(within(session).getByText("Talk")).toBeTruthy();
+    expect(router.history.location.pathname).toBe("/conf/sessions/s");
+    expect(screen.getByRole("search")).toBeTruthy();
+    await userEvent.click(
+      within(session).getByRole("button", { name: "Close" })
+    );
+    await waitFor(() =>
+      expect(router.history.location.pathname).toBe("/guests")
+    );
+  });
+
+  it("opens a session from a profile over a page of the same event", async () => {
+    const { router } = await open({
+      handler: (call) =>
+        call.path.endsWith("/activity")
+          ? Response.json({
+              hosting: [{ id: "s", title: "Talk", eventSlug: "conf" }],
+              proposals: [],
+            })
+          : answers(call),
+      path: "/conf/proposals",
+      identity: "al",
+    });
+    await screen.findAllByRole("heading", { name: /proposals/i });
+    openPanel(router.history, { kind: "profile", id: "bo" });
+    const profile = await screen.findByRole("dialog", { name: "Bo" });
+    await userEvent.click(
+      await within(profile).findByRole("link", { name: "Talk" })
+    );
+    await screen.findByRole("dialog", { name: "Session details" });
+    expect(router.history.location.pathname).toBe("/conf/sessions/s");
+  });
+
+  it("says so, and closes, when the event of a linked session cannot load", async () => {
+    const { router } = await open({
+      handler: (call) =>
+        call.path.endsWith("/activity")
+          ? Response.json({
+              hosting: [{ id: "s", title: "Talk", eventSlug: "conf" }],
+              proposals: [],
+            })
+          : answers(call),
+      snapshot: new Response(null, { status: 500 }),
+      path: "/guests/bo",
+      identity: "al",
+    });
+    const profile = await screen.findByRole("dialog", { name: "Bo" });
+    await userEvent.click(
+      await within(profile).findByRole("link", { name: "Talk" })
+    );
+    const panel = await screen.findByRole("dialog", { name: "Event details" });
+    expect(await within(panel).findByText(/could not be loaded/)).toBeTruthy();
+    await userEvent.click(within(panel).getByRole("button", { name: "Close" }));
+    await waitFor(() =>
+      expect(router.history.location.pathname).toBe("/guests")
+    );
+  });
+
+  it("opens an item of one event over a page of another", async () => {
+    const { router } = await open({
+      handler: (call) =>
+        call.path === "/api/v1/events/other/snapshot"
+          ? Response.json({
+              ...running,
+              event: { ...running.event, id: "e2", slug: "other" },
+            })
+          : answers(call),
+      path: "/other/proposals",
+      identity: "al",
+    });
+    await screen.findAllByRole("heading", { name: /proposals/i });
+    openPanel(router.history, { kind: "session", slug: "conf", id: "s" });
+    await screen.findByRole("dialog", { name: "Session details" });
+    expect(router.history.location.pathname).toBe("/conf/sessions/s");
   });
 
   it("offers every attendee in the name picker", async () => {
