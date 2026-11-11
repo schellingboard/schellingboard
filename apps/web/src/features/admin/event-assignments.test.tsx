@@ -243,13 +243,13 @@ describe("the event guests manager", { tags: ["016-US3"] }, () => {
     );
   });
 
-  it("pages 25 at a time", async () => {
-    const guests = Array.from({ length: 26 }, (_, i) =>
+  it("pages 50 at a time", async () => {
+    const guests = Array.from({ length: 51 }, (_, i) =>
       guest(`g${i}`, `Guest ${String(i).padStart(2, "0")}`)
     );
     const { onParams } = setupGuests(guests, "page=2");
 
-    expect(within(region()).getAllByText("Guest 25").length).toBeGreaterThan(0);
+    expect(within(region()).getAllByText("Guest 50").length).toBeGreaterThan(0);
     expect(within(region()).queryAllByText("Guest 00")).toHaveLength(0);
     await userEvent.click(
       within(region()).getByRole("button", { name: "Previous page" })

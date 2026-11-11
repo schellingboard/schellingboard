@@ -7,6 +7,8 @@ import { serializeAttendeeFilters } from "@schellingboard/domain/attendee-filter
 import type { DirectoryEntry, DirectoryState } from "../../queries/directory";
 import { Avatar } from "../../ui/avatar";
 import { ListToolbar } from "../../ui/list-toolbar";
+import { paramsUpdater } from "../../ui/list-paging";
+import { usePaging } from "../../ui/use-paging";
 import { SearchInput } from "../../ui/search-input";
 import { SEARCH_DEBOUNCE_MS } from "../../ui/use-debounced";
 import {
@@ -55,6 +57,10 @@ export function DirectoryScreen(props: DirectoryScreenProps) {
     onRows?.(rows);
     return () => onRows?.(null);
   }, [onRows, rows]);
+  const { visible, pager, top } = usePaging<
+    (typeof rows)[number],
+    HTMLDivElement
+  >(rows, params, paramsUpdater(params, onParams), { showTotal: false });
   const sortDisabled = query !== "";
   const onlyHasProfile =
     filters.length === 1 && filters[0] === "hasProfile" && query === "";
@@ -71,7 +77,7 @@ export function DirectoryScreen(props: DirectoryScreenProps) {
           )}
         </div>
 
-        <div className="space-y-4 pb-8">
+        <div ref={top} className="space-y-4 pb-8">
           <ListToolbar
             search={
               <SearchBox query={query} params={params} onParams={onParams} />
@@ -157,13 +163,16 @@ export function DirectoryScreen(props: DirectoryScreenProps) {
           />
 
           {rows.length > 0 ? (
-            <ul className="divide-y divide-line-subtle border-t border-b border-line-subtle">
-              {rows.map((row) => (
-                <li key={row.id} className="py-3">
-                  <AttendeeRow card={row} href={links.guest(row.id)} />
-                </li>
-              ))}
-            </ul>
+            <>
+              <ul className="divide-y divide-line-subtle border-t border-b border-line-subtle">
+                {visible.map((row) => (
+                  <li key={row.id} className="py-3">
+                    <AttendeeRow card={row} href={links.guest(row.id)} />
+                  </li>
+                ))}
+              </ul>
+              {pager}
+            </>
           ) : entries.length === 0 &&
             (status === "loading" || status === "idle") ? (
             <p role="status" className="text-sm text-fg-subtle">

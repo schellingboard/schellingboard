@@ -162,6 +162,7 @@ export function withFilter(
   const next = new URLSearchParams(params);
   if (filter) next.set("filter", filter);
   else next.delete("filter");
+  next.delete("page");
   return next;
 }
 
@@ -175,6 +176,7 @@ export function withSort(
   if (sort.key === fallback.key && sort.direction === fallback.direction)
     next.delete("sort");
   else next.set("sort", `${sort.key}-${sort.direction}`);
+  next.delete("page");
   return next;
 }
 

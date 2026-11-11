@@ -81,6 +81,7 @@ export function withParams(
   updates: Record<string, string | null>
 ): URLSearchParams {
   const next = new URLSearchParams(params);
+  if (!("page" in updates)) next.delete("page");
   for (const [key, value] of Object.entries(updates)) {
     if (value === null || value === "") next.delete(key);
     else next.set(key, value);

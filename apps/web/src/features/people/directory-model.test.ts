@@ -82,4 +82,12 @@ describe("withParams", () => {
     });
     expect(next.toString()).toBe("q=b&filter=isHost");
   });
+
+  it("goes back to the first page unless a page is asked for", () => {
+    const params = new URLSearchParams("page=3&pageSize=25");
+    expect(withParams(params, { q: "b" }).toString()).toBe("pageSize=25&q=b");
+    expect(withParams(params, { page: "4" }).toString()).toBe(
+      "page=4&pageSize=25"
+    );
+  });
 });

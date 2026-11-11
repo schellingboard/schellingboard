@@ -53,14 +53,18 @@ the E2E specs a step touches; the user runs the full suite at the end.
     PROGRESS.md ("22f survey"). 22g. DONE #1591 **Phase bar** (`ui/phase-bar.tsx`, `share` on
     `phaseTimeline`). 22h. DONE Proposals and attendee toolbars share `ui/list-toolbar.tsx` (grid
     areas; the Agenda bar is a sticky bar with a menu, a different shape, left as is).
-23. **#831** (Medium) Owner decision: every long list for users and admins is paginated with the
-    shared `Pager` (page numbers, First, Prev, Next, Last, configurable page size, default 50, sizes
-    e.g. 25/50/100, `page`/`pageSize` URL params). Survey all lists (proposals, directory, agenda,
-    comments, notifications, admin tables, stats table; use `Explore`), move each to the `Pager`,
-    drop `stats-table.tsx`'s own pager, and align defaults. Search/filter resets to page 1; sorting
-    keeps the page size. Keep list behaviour that needs all rows (counts, "Clashes", day grouping in
-    the agenda) correct: count and filter on the full set, page the result. If the survey shows too
-    many lists for one commit, split into 23a, 23b... here first. Footer `fixes #831`.
+23. **#831** (Medium) Owner decision: every long list is paginated with the shared `Pager` (default
+    50, sizes 25/50/100, `page`/`pageSize` URL params). Survey: already on `Pager`: admin
+    guests/proposals/sessions/assignments, My comments. Counts and "Clashes" are computed on the
+    full set, the result is paged. Search/filter resets to page 1; sort keeps the size. 23a. DONE
+    **#831a** `Pager` default 50, sizes 25/50/100; proposals list and directory paged. 23b.
+    **#831b** Other attendee lists: agenda (page the flat day entries by item, day headings and
+    moments kept per page), notifications (replace the "load more" cursor by pages over the loaded
+    rows or server pages), event list, "Load more comments" in `comments-section.tsx` stays
+    (threads, not a table; record the reason). Footer `issue #831`. 23c. **#831c** Admin rest:
+    `stats-table.tsx` own pager (state in `useState`) to `Pager` with URL params,
+    `events-screen.tsx`, `locations-screen.tsx`, `event-meetings.tsx`, event guest and location
+    lists if long; align any default of 25. Footer `fixes #831`.
 24. DONE **#1328a** (Medium) i18n foundation: Lingui, `apps/web/src/i18n/`, `en` catalog, scripts
     and Makefile targets, `<html lang>`. Issue step 1.
 25. **#1328b** Locale storage: `guests.locale`, `PATCH /me`, browser fallback, Settings switcher

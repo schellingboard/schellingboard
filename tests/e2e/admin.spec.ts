@@ -376,7 +376,8 @@ test.describe("Admin UI", () => {
     const userItem = (name: string) =>
       users.getByRole("listitem").filter({ hasText: name });
 
-    // The 40 seeded guests span two pages of 25, ordered by name.
+    // The 40 seeded guests fit one page of 50; 25 a page makes two, ordered by name.
+    await users.getByLabel("Rows per page").selectOption("25");
     await expect(
       users.getByRole("button", { name: "Page 1", exact: true })
     ).toHaveAttribute("aria-current", "page");

@@ -8,7 +8,7 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { DirectoryEntry } from "../../queries/directory";
 import { DirectoryScreen, type DirectoryScreenProps } from "./directory-screen";
 
@@ -188,5 +188,74 @@ describe("the directory screen", () => {
 
     rerender(<Harness entries={[]} status="error" />);
     expect(screen.getByRole("alert").textContent).toMatch(/Could not load/);
+  });
+});
+
+describe("paging the directory", { tags: ["011-US3"] }, () => {
+  const crowd = Array.from({ length: 120 }, (_, i) =>
+    entry(`Pers${String(i).padStart(3, "0")}`)
+  );
+  const names = () =>
+    screen
+      .getAllByRole("link", { name: /^Pers/ })
+      .map((a) => a.textContent?.replace(/^P/, ""));
+
+  it("shows 50 a page with the full count, and pages through the address", async () => {
+    const user = userEvent.setup();
+    render(<Harness entries={crowd} />);
+
+    expect(names()).toHaveLength(50);
+    expect(screen.getByText("120 attendees")).toBeTruthy();
+
+    await user.click(screen.getByRole("button", { name: "Page 3" }));
+
+    expect(screen.getByTestId("url").textContent).toBe("page=3");
+    expect(names()[0]).toBe("Pers100");
+    expect(names()).toHaveLength(20);
+  });
+
+  it("keeps the page size and goes back to page 1 on a new search", async () => {
+    const user = userEvent.setup();
+    render(<Harness entries={crowd} />);
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Rows per page" }),
+      "25"
+    );
+    await user.click(screen.getByRole("button", { name: "Page 3" }));
+
+    await user.type(
+      screen.getByRole("searchbox", { name: "Search" }),
+      "Pers0{Enter}"
+    );
+
+    await waitFor(() =>
+      expect(screen.getByTestId("url").textContent).toBe("pageSize=25&q=Pers0")
+    );
+  });
+
+  it("tells the profile walk about every attendee, not just the page", () => {
+    const seen: number[] = [];
+    render(
+      <Harness
+        entries={crowd}
+        onRows={(rows) => rows && seen.push(rows.length)}
+      />
+    );
+
+    expect(seen).toContain(120);
+  });
+
+  it("shows the last page for a page past the end, scrolling up on a change", async () => {
+    const user = userEvent.setup();
+    const scroll = vi.fn();
+    Element.prototype.scrollIntoView = scroll;
+    render(<Harness entries={crowd} />);
+    await user.click(screen.getByRole("button", { name: "Last page" }));
+    expect(scroll).toHaveBeenCalledWith({ block: "start" });
+    cleanup();
+
+    render(<Harness entries={crowd.slice(0, 60)} />);
+    await user.click(screen.getByRole("button", { name: "Page 2" }));
+    expect(names()).toHaveLength(10);
   });
 });

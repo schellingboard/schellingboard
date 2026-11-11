@@ -51,6 +51,8 @@ import {
 import { PersonLink } from "../people/person-link";
 import { ListToolbar } from "../../ui/list-toolbar";
 import { PhaseBar } from "../../ui/phase-bar";
+import { paramsUpdater } from "../../ui/list-paging";
+import { usePaging } from "../../ui/use-paging";
 
 export type ProposalsScreenProps = {
   snapshot: Snapshot;
@@ -62,7 +64,10 @@ export type ProposalsScreenProps = {
   onVote: (proposalId: string, choice: VoteChoice | null) => void;
   /** Search, filter and sort live in these, which the owner of the address bar passes in. */
   params: URLSearchParams;
-  onParamsChange: (params: URLSearchParams) => void;
+  onParamsChange: (
+    params: URLSearchParams,
+    options?: { push?: boolean }
+  ) => void;
 };
 
 const LINK = "hover:text-link transition-colors";
@@ -217,6 +222,12 @@ function ProposalTable({
       }),
     [rows, guestId, votes, standings, searched, filter, sort]
   );
+  const { visible, pager, top } = usePaging<Row, HTMLDivElement>(
+    shown,
+    params,
+    paramsUpdater(params, onParamsChange),
+    { showTotal: false }
+  );
   const toggle = (next: Filter) =>
     setFilter(filter === next ? undefined : next);
   const sortBy = (key: SortKey) =>
@@ -285,7 +296,7 @@ function ProposalTable({
   );
 
   return (
-    <div className="space-y-6">
+    <div ref={top} className="space-y-6">
       <ListToolbar
         search={
           <SearchInput
@@ -425,7 +436,7 @@ function ProposalTable({
             </tr>
           </thead>
           <tbody className="bg-surface-raised divide-y divide-line-subtle">
-            {shown.map((row) => (
+            {visible.map((row) => (
               <tr key={row.id} className="hover:bg-surface-hover">
                 <td className="px-4 lg:px-6 py-4" title={row.title}>
                   <a href={links.view(row.id)} className="block w-full">
@@ -501,7 +512,7 @@ function ProposalTable({
       </div>
 
       <div className="block md:hidden space-y-4">
-        {shown.map((row) => (
+        {visible.map((row) => (
           <div
             key={row.id}
             className="bg-surface-raised border border-line-subtle rounded-lg p-4 hover:bg-surface-sunken relative"
@@ -566,6 +577,7 @@ function ProposalTable({
           </div>
         )}
       </div>
+      {pager}
     </div>
   );
 }

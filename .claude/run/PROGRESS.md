@@ -2,6 +2,12 @@
 
 ## Decisions
 
+- 23a (#831): `Pager` default 50, sizes 25/50/100 (10 dropped; admin tables follow). Changing
+  search, filter or sort drops `page` (`withFilter`, `withSort`, `useSearchParamText`, directory
+  `withParams`); `paramsUpdater` in `list-paging.ts` adapts any param setter to `tableHandlers`.
+  Pager shows only with more than one page or a non-default size. Not run: mailer tests (mailpit
+  down) and the full E2E suite; the `admin.spec.ts` users paging test is adapted and passes.
+
 - #789: card for host/attendee names, proposal hosts, comment authors, the 1-on-1 title and the
   booking rows; not the Liked-by list (a whole-row link that already shows the avatar). The
   directory loads on first hover (retry after an error at most every 30s); the hover card has its

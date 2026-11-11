@@ -287,6 +287,13 @@ describe("the list state in the address", () => {
 
   it("writes them back, leaving out the default sort and no filter", () => {
     const params = new URLSearchParams("q=rust&sort=title-asc&filter=mine");
+    const paged = new URLSearchParams("page=3&pageSize=25&filter=mine");
+    expect(withFilter(paged, "voted").toString()).toBe(
+      "pageSize=25&filter=voted"
+    );
+    expect(withSort(paged, fallback, fallback).toString()).toBe(
+      "pageSize=25&filter=mine"
+    );
     expect(withFilter(params, undefined).toString()).toBe(
       "q=rust&sort=title-asc"
     );

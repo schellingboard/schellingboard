@@ -90,3 +90,41 @@ describe("Pager", { tags: ["016-US1"] }, () => {
     ).toHaveProperty("value", "all");
   });
 });
+
+describe("Pager extras", { tags: ["016-US1"] }, () => {
+  it("scrolls the list top into view on a page change", async () => {
+    const user = userEvent.setup();
+    const top = document.createElement("div");
+    const scroll = vi.fn();
+    top.scrollIntoView = scroll;
+    render(
+      <Pager
+        page={1}
+        totalPages={3}
+        pageSize={50}
+        total={120}
+        onPage={vi.fn()}
+        listTop={{ current: top }}
+      />
+    );
+
+    await user.click(screen.getByRole("button", { name: "Next page" }));
+
+    expect(scroll).toHaveBeenCalledWith({ block: "start" });
+  });
+
+  it("can leave out the count", () => {
+    render(
+      <Pager
+        page={1}
+        totalPages={3}
+        pageSize={50}
+        total={120}
+        onPage={vi.fn()}
+        showTotal={false}
+      />
+    );
+
+    expect(screen.queryByText("120 results")).toBeNull();
+  });
+});
