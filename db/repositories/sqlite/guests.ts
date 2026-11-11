@@ -95,6 +95,7 @@ function rowToGuest(row: typeof schema.guests.$inferSelect): CompleteGuest {
     profileVersion: row.profileVersion,
     info: {
       email: row.email,
+      locale: row.locale,
       emailSettings: {
         rsvpChange: row.emailOnRsvpChange,
         hostChange: row.emailOnHostChange,
@@ -563,7 +564,11 @@ export class SqliteGuestsRepository implements GuestsRepository {
       authProtected: false,
       version: 1,
       profileVersion: 1,
-      info: { email, emailSettings: { ...DEFAULT_EMAIL_SETTINGS } },
+      info: {
+        email,
+        locale: null,
+        emailSettings: { ...DEFAULT_EMAIL_SETTINGS },
+      },
     };
   }
 
@@ -735,6 +740,15 @@ export class SqliteGuestsRepository implements GuestsRepository {
       .run();
     if (result.changes === 0) return undefined;
     return this.findById(id);
+  }
+
+  async updateLocale(id: string, locale: string | null): Promise<boolean> {
+    const result = this.db
+      .update(schema.guests)
+      .set({ locale })
+      .where(eq(schema.guests.id, id))
+      .run();
+    return result.changes > 0;
   }
 
   async findExistingIds(ids: string[]): Promise<string[]> {

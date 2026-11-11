@@ -5,6 +5,8 @@ import type { SettingsState } from "../../queries/settings";
 import { ThemeSelect } from "../../app/theme";
 import { TimeFormatSelect } from "../../app/time-format";
 import { AvailabilityForm } from "../meetings/availability-form";
+import { LOCALES } from "../../i18n/locales";
+import { LanguageSetting } from "./language-setting";
 import { EmailSettingsForm } from "./email-settings-form";
 import { PushNotifications } from "./push-notifications";
 
@@ -54,6 +56,7 @@ export function SettingsScreen({
               </a>{" "}
               is edited separately.
             </p>
+            {LOCALES.length > 1 && <LanguageSetting calls={calls} />}
             {state.emailEnabled && (
               <EmailSettingsForm initial={state.emailSettings} calls={calls} />
             )}

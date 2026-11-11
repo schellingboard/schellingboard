@@ -5485,12 +5485,16 @@
                       "type": ["string", "null"],
                       "description": "The guest the browser now acts as, or null when signed out"
                     },
+                    "locale": {
+                      "type": ["string", "null"],
+                      "description": "The guest's chosen language; null follows the browser"
+                    },
                     "awaitingLogin": {
                       "type": "boolean",
                       "description": "True when the browser holds a protected name it has not logged in to"
                     }
                   },
-                  "required": ["guestId"]
+                  "required": ["guestId", "locale"]
                 }
               }
             }
@@ -5538,13 +5542,67 @@
                     "guestId": {
                       "type": ["string", "null"],
                       "description": "The guest the browser now acts as, or null when signed out"
+                    },
+                    "locale": {
+                      "type": ["string", "null"],
+                      "description": "The guest's chosen language; null follows the browser"
                     }
                   },
-                  "required": ["guestId"]
+                  "required": ["guestId", "locale"]
                 }
               }
             }
           },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }]
+      }
+    },
+    "/api/v1/me/locale": {
+      "put": {
+        "tags": ["people"],
+        "description": "Sets the language the acting guest reads the app in.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "locale": {
+                    "type": ["string", "null"],
+                    "enum": ["en", null],
+                    "description": "A language of the app; null follows the browser"
+                  }
+                },
+                "required": ["locale"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Saved" },
           "default": {
             "description": "Problem details (RFC 9457); clients branch on `code`",
             "content": {

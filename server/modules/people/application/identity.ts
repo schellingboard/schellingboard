@@ -56,26 +56,35 @@ export const signIn =
 
 export const chooseGuest = (deps: PeopleDeps) => {
   const start = signIn(deps);
+  const withLocale = async (signed: SignedIn) => ({
+    ...signed,
+    locale:
+      (await deps.repos.guests.findById(signed.guestId))?.info.locale ?? null,
+  });
   return async (
     actor: Actor,
     { guestId, device }: { guestId: string; device?: string | null }
-  ): Promise<Result<Identity>> => {
+  ): Promise<Result<SignedIn & { locale: string | null }>> => {
     const creds = await deps.repos.guests.getAuthCredentials(guestId);
     if (!creds) return notFound("guest.notFound", "Unknown user");
     if (!creds.authProtected)
       return ok(
-        await start(actor, { guestId, level: "claimed", via: "name", device })
+        await withLocale(
+          await start(actor, { guestId, level: "claimed", via: "name", device })
+        )
       );
     // A protected name is kept only for a session already verified as it;
     // otherwise the user has to log in (password or emailed code) first.
     if (actor.guest?.id === guestId && actor.guest.level === "verified")
       return ok(
-        await start(actor, {
-          guestId,
-          level: "verified",
-          via: actor.guest.via ?? "password",
-          device,
-        })
+        await withLocale(
+          await start(actor, {
+            guestId,
+            level: "verified",
+            via: actor.guest.via ?? "password",
+            device,
+          })
+        )
       );
     return forbidden(
       "guest.protected",
@@ -97,12 +106,16 @@ export const currentGuest =
   ({ repos }: PeopleDeps) =>
   async (
     actor: Actor
-  ): Promise<{ guestId: string | null; awaitingLogin?: true }> => {
-    if (!actor.guest) return { guestId: null };
+  ): Promise<{
+    guestId: string | null;
+    locale: string | null;
+    awaitingLogin?: true;
+  }> => {
+    if (!actor.guest) return { guestId: null, locale: null };
     const creds = await repos.guests.getAuthCredentials(actor.guest.id);
-    if (!creds) return { guestId: null };
+    if (!creds) return { guestId: null, locale: null };
     const proven = !creds.authProtected || actor.guest.level === "verified";
-    return proven
-      ? { guestId: actor.guest.id }
-      : { guestId: null, awaitingLogin: true };
+    if (!proven) return { guestId: null, locale: null, awaitingLogin: true };
+    const guest = await repos.guests.findById(actor.guest.id);
+    return { guestId: actor.guest.id, locale: guest?.info.locale ?? null };
   };

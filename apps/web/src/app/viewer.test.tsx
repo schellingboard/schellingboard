@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import { fakeApi, problem } from "../commands/fake-api";
+import { I18nProvider, useStoredLocale } from "../i18n";
 import { useViewer, ViewerProvider } from "./viewer";
 
 type Who = string | null;
@@ -94,7 +95,7 @@ describe("ViewerProvider", () => {
 
     expect(result).toEqual({ ok: true });
     expect(await screen.findByText("as g2")).toBeTruthy();
-    expect(calls.at(-1)).toMatchObject({
+    expect(calls.find((c) => c.method === "PUT")).toMatchObject({
       method: "PUT",
       path: "/api/v1/me/identity",
       body: { guestId: "g2" },
@@ -261,5 +262,40 @@ describe("ViewerProvider", () => {
       offline();
       expect(await screen.findByText("as g2")).toBeTruthy();
     });
+  });
+
+  it("hands the guest's chosen language to the app, and drops it on sign-out", async () => {
+    localStorage.clear();
+    const { api } = fakeApi((call) =>
+      call.method === "POST"
+        ? new Response(null, { status: 204 })
+        : Response.json({ guestId: "g1", locale: "en" })
+    );
+    let latest!: ReturnType<typeof useViewer>;
+    function Language() {
+      return (
+        <>
+          <Probe onViewer={(v) => (latest = v)} />
+          <p>language {useStoredLocale().stored ?? "none"}</p>
+        </>
+      );
+    }
+    render(
+      <I18nProvider>
+        <ViewerProvider api={api} persistence={{ clear }}>
+          <Language />
+        </ViewerProvider>
+      </I18nProvider>
+    );
+
+    expect(await screen.findByText("language en")).toBeTruthy();
+    expect(localStorage.getItem("sb-locale")).toBe("en");
+
+    await act(async () => {
+      await latest.signOut();
+    });
+
+    expect(await screen.findByText("language none")).toBeTruthy();
+    expect(localStorage.getItem("sb-locale")).toBeNull();
   });
 });

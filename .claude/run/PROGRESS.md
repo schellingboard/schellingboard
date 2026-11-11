@@ -82,7 +82,9 @@
 
 ## Questions
 
-- 22f (owner, answered): all create/edit forms go into the panel (plan step 35); agenda stays one list; no 22f GitHub issue; installed-app share: text "Copy link" at the end of panel content (step 24a).
+- 22f (owner, answered): all create/edit forms go into the panel (plan step 35); agenda stays one
+  list; no 22f GitHub issue; installed-app share: text "Copy link" at the end of panel content (step
+  24a).
 
 - `profile-photo.spec.ts:9` fails without my changes too (about-me heading x 849 < 1184: the wide
   two-column layout is not reached at the default viewport). Separate fix.
@@ -156,6 +158,13 @@
   `vitest.config.ts`, so `t`/`<Trans>` macros work. The `en` catalog is imported statically in
   `i18n/index.tsx` (works offline, no blank first paint); other locales load lazily, so step 25/7
   must make the service worker cache those chunks. Use case 022-US1.
+
+- 25: no `PATCH /me` exists, so the language is `PUT /me/locale` (`{locale: "en"|null}`, validated
+  against `LOCALES` in `packages/domain/src/locales.ts`, which now holds `resolveLocale` and
+  `acceptedLanguages` for the server's later emails). `GET /me/identity` returns `locale`; the
+  viewer hands it to `I18nProvider` (`useStoredLocale`, kept in `localStorage` `sb-locale`, cleared
+  on sign-out). Switcher: `features/settings/language-setting.tsx`, shown when `LOCALES.length > 1`.
+  Still open for step 30: service worker must cache the lazy locale chunks.
 
 ## Next step
 

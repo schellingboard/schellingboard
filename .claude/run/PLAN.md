@@ -59,22 +59,21 @@ the E2E specs a step touches; the user runs the full suite at the end.
     full set, the result is paged. Search/filter resets to page 1; sort keeps the size. 23a. DONE
     **#831a** `Pager` 50 default; proposals list and directory paged. 23b. DONE **#831b**
     Notifications (chunks loaded on demand) and event list. "Load more comments" stays: it is a
-    thread, not a list. 23c. **#831c** Owner decision: the agenda stays one list, the single exception to the paging rule
-    (a time-ordered schedule with search and day folds). Last #831 commit, docs only: say so in
-    docs/dev/web-app.md (or the nearest paging section) and PROGRESS.md, no code. Footer
-    `fixes #831`. 23d. DONE **#831d** Admin events, locations and
-    stats tables on `Pager`.
+    thread, not a list. 23c. **#831c** Owner decision: the agenda stays one list, the single
+    exception to the paging rule (a time-ordered schedule with search and day folds). Last #831
+    commit, docs only: say so in docs/dev/web-app.md (or the nearest paging section) and
+    PROGRESS.md, no code. Footer `fixes #831`. 23d. DONE **#831d** Admin events, locations and stats
+    tables on `Pager`.
 24. DONE **#1328a** (Medium) i18n foundation: Lingui, `apps/web/src/i18n/`, `en` catalog, scripts
-    and Makefile targets, `<html lang>`. Issue step 1.
-24a. **Copy link button** (owner decision on the installed-app gap after 22b): a text button
-    "Copy link" at the end of the panel content, before the comments, in the session, proposal and
-    profile panels (and 1-on-1 if it has comments or a similar end). Copies the panel's URL, short
-    confirmation (toast or button label), legible text, no icon-only. One shared component in
-    `SidePanel`'s content area. E2E not needed unless one exists for copy; unit test. Amend the ADR
-    0020 reversal note from 22b: the header button stays gone, the link moves to the content end.
-    No issue needed.
-25. **#1328b** Locale storage: `guests.locale`, `PATCH /me`, browser fallback, Settings switcher
-    (hidden while one locale exists). Issue step 2.
+    and Makefile targets, `<html lang>`. Issue step 1. 24a. **Copy link button** (owner decision on
+    the installed-app gap after 22b): a text button "Copy link" at the end of the panel content,
+    before the comments, in the session, proposal and profile panels (and 1-on-1 if it has comments
+    or a similar end). Copies the panel's URL, short confirmation (toast or button label), legible
+    text, no icon-only. One shared component in `SidePanel`'s content area. E2E not needed unless
+    one exists for copy; unit test. Amend the ADR 0020 reversal note from 22b: the header button
+    stays gone, the link moves to the content end. No issue needed.
+25. DONE **#1328b** Locale storage: `guests.locale`, `PUT /me/locale`, switcher hidden while one
+    locale exists.
 26. **#1328c** Locale-aware formatting, builds on #607. Issue step 3.
 27. **#1328d** Guardrails: lint rule, extract/missing-key check, pseudo-locale. Issue step 4.
 28. **#1328e** Externalize strings, one commit per area (a to g of issue step 5); split into PLAN.md
@@ -90,19 +89,16 @@ the E2E specs a step touches; the user runs the full suite at the end.
     become side-panel kinds; this amends ADR 0020's "tasks stay dialogs"; "Need ideas?" moves with
     the proposal form; Quick Voting stays a page; short task dialogs stay dialogs). Read the 22f
     survey in PROGRESS.md. Split in order, one commit each, `issue`-less (no issue; or reference
-    none):
-    35a. ADR amendment (new ADR superseding the dialogs rule for forms) and panel infrastructure for
-    a form kind: URL, `PanelLanding` background, save then close/replace (not history Back), a real
-    `useDiscardGuard` covering selects, checkboxes, dates, Back and `beforeunload`; phone full
-    screen.
-    35b. Proposal create/edit in the panel, with "Need ideas?" shown beside the form (panel or
-    inline), old routes redirect.
-    35c. Edit profile in the panel.
+    none): 35a. ADR amendment (new ADR superseding the dialogs rule for forms) and panel
+    infrastructure for a form kind: URL, `PanelLanding` background, save then close/replace (not
+    history Back), a real `useDiscardGuard` covering selects, checkboxes, dates, Back and
+    `beforeunload`; phone full screen. 35b. Proposal create/edit in the panel, with "Need ideas?"
+    shown beside the form (panel or inline), old routes redirect. 35c. Edit profile in the panel.
     35d. Session create/edit in the panel (~780 lines, inner dialogs, `edit-session?sessionID=`
-    becomes a path; keep the grid visible, check clash display at 320-800px width and phones).
-    35e. Event details dialog becomes a panel (22f survey: panel yes), if it fits.
-    Update E2E specs that open these forms, attendee guide, CHANGELOG, screenshots if affected.
-    Real E2E coverage of save, cancel with discard guard, and deep links per form.
+    becomes a path; keep the grid visible, check clash display at 320-800px width and phones). 35e.
+    Event details dialog becomes a panel (22f survey: panel yes), if it fits. Update E2E specs that
+    open these forms, attendee guide, CHANGELOG, screenshots if affected. Real E2E coverage of save,
+    cancel with discard guard, and deep links per form.
 
 ## Next steps
 

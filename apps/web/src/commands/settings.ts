@@ -1,8 +1,12 @@
 import type { ApiClient } from "@schellingboard/api-client";
-import type { emailSettingsSchema } from "@schellingboard/contracts/guest";
+import type {
+  emailSettingsSchema,
+  localeBodySchema,
+} from "@schellingboard/contracts/guest";
 import type { pushSubscriptionSchema } from "@schellingboard/contracts/push";
 
 export type EmailSettingsBody = (typeof emailSettingsSchema)["_input"];
+export type LocaleBody = (typeof localeBodySchema)["_input"];
 export type PushSubscriptionBody = (typeof pushSubscriptionSchema)["_input"];
 
 /** The settings page waits for every answer, so none of these is a command. */
@@ -11,6 +15,8 @@ export function settingsCalls(api: ApiClient) {
   return {
     saveEmailSettings: (body: EmailSettingsBody, key: string) =>
       api.PUT("/api/v1/me/email-settings", { body, headers: keyed(key) }),
+    saveLocale: (body: LocaleBody, key: string) =>
+      api.PUT("/api/v1/me/locale", { body, headers: keyed(key) }),
     subscribe: (body: PushSubscriptionBody, key: string) =>
       api.POST("/api/v1/me/push-subscriptions", {
         body,

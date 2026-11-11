@@ -181,7 +181,10 @@ describe("POST /api/v1/auth/login", () => {
       expect(res.status).toBe(200);
       expect(await res.json()).toEqual({ guestId: guest.id });
       const identity = await whoAmI(cookieOf(res));
-      expect(await identity.json()).toEqual({ guestId: guest.id });
+      expect(await identity.json()).toEqual({
+        guestId: guest.id,
+        locale: null,
+      });
       const token = cookieOf(res).split("=")[1];
       expect(
         await getRepositories().loginSessions.get(hashSessionToken(token))
@@ -429,7 +432,10 @@ describe("POST /api/v1/auth/sign-out", () => {
 
       expect(res.status).toBe(204);
       expect(res.headers.get("set-cookie")).toMatch(/Max-Age=0/i);
-      expect(await (await whoAmI(cookie)).json()).toEqual({ guestId: null });
+      expect(await (await whoAmI(cookie)).json()).toEqual({
+        guestId: null,
+        locale: null,
+      });
     }
   );
 });

@@ -68,11 +68,14 @@ describe("/api/v1/me/identity", () => {
     const res = await whoAmI(`${GUEST_COOKIE_NAME}=${openGuestValue(ada.id)}`);
 
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ guestId: ada.id });
+    expect(await res.json()).toEqual({ guestId: ada.id, locale: null });
   });
 
   it("tells nobody when no name is chosen", { tags: ["003-US1"] }, async () => {
-    expect(await (await whoAmI()).json()).toEqual({ guestId: null });
+    expect(await (await whoAmI()).json()).toEqual({
+      guestId: null,
+      locale: null,
+    });
   });
 
   it(
@@ -91,9 +94,13 @@ describe("/api/v1/me/identity", () => {
 
       expect(await open.json()).toEqual({
         guestId: null,
+        locale: null,
         awaitingLogin: true,
       });
-      expect(await verified.json()).toEqual({ guestId: grace.id });
+      expect(await verified.json()).toEqual({
+        guestId: grace.id,
+        locale: null,
+      });
     }
   );
 
@@ -102,7 +109,10 @@ describe("/api/v1/me/identity", () => {
     const cookie = `${GUEST_COOKIE_NAME}=${openGuestValue(gone.id)}`;
     await getRepositories().guests.delete(gone.id);
 
-    expect(await (await whoAmI(cookie)).json()).toEqual({ guestId: null });
+    expect(await (await whoAmI(cookie)).json()).toEqual({
+      guestId: null,
+      locale: null,
+    });
   });
 
   it(
@@ -114,10 +124,19 @@ describe("/api/v1/me/identity", () => {
       const res = await choose(ada.id);
 
       expect(res.status).toBe(200);
-      expect(await res.json()).toEqual({ guestId: ada.id });
+      expect(await res.json()).toEqual({ guestId: ada.id, locale: null });
       expectSessionCookie(res);
     }
   );
+
+  it("answers the chosen guest's language", { tags: ["022-US1"] }, async () => {
+    const ada = await createGuest({ name: "Ada" });
+    await getRepositories().guests.updateLocale(ada.id, "en");
+
+    const res = await choose(ada.id);
+
+    expect(await res.json()).toEqual({ guestId: ada.id, locale: "en" });
+  });
 
   it("refuses an unknown name", { tags: ["003-US1"] }, async () => {
     const res = await choose("nobody");
@@ -162,7 +181,7 @@ describe("/api/v1/me/identity", () => {
       );
 
       expect(res.status).toBe(200);
-      expect(await res.json()).toEqual({ guestId: grace.id });
+      expect(await res.json()).toEqual({ guestId: grace.id, locale: null });
       expectSessionCookie(res);
     }
   );
