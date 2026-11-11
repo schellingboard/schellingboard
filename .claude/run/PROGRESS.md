@@ -58,6 +58,11 @@
 - #684: `stats-table.tsx` keeps its own pager (client state, sizes 25/50/100, shown only above 10
   rows); `Pager` could replace it in a follow-up.
 
+- #1169: property tests cover instants only, so DST and time zones do not apply (epoch arithmetic);
+  seed is random as the issue decided, `FC_SEED` replays a failure.
+- ESLint 10 (#380): `tseslint.config` is deprecated in favour of `defineConfig` (eslint.config.mjs);
+  the Dockerfile runs on node 25 (odd-numbered, not an LTS line).
+
 ## Next step
 
-Step 19.
+No step left; the plan has no next steps.
