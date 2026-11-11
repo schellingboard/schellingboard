@@ -18,7 +18,7 @@ export function proposalLinks(eventSlug: string): ProposalLinks {
     proposals: base,
     add: `${base}/new`,
     quickVoting: `${base}/quick-voting`,
-    view: (id) => `${base}?${new URLSearchParams({ viewProposal: id })}`,
+    view: (id) => `${base}/${encodeURIComponent(id)}`,
     edit: (id) => `${base}/${id}/edit`,
     scheduleProposal: (id) =>
       `/${eventSlug}/add-session?${new URLSearchParams({ proposalID: id })}`,

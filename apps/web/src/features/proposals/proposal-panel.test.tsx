@@ -16,7 +16,7 @@ import { iso, snapshot as fixture } from "../../replica/snapshot-fixture";
 import { NoticeProvider } from "../../ui/notices";
 import { comment, fakeComments } from "../comments/comments-test-support";
 import { proposalLinks } from "./links";
-import { type ProposalActions, ProposalModal } from "./proposal-modal";
+import { type ProposalActions, ProposalPanel } from "./proposal-panel";
 
 afterEach(cleanup);
 
@@ -105,7 +105,7 @@ function setup(
   const onClose = vi.fn();
   const element = (current: Snapshot) => (
     <NoticeProvider>
-      <ProposalModal
+      <ProposalPanel
         proposalId="p"
         snapshot={current}
         now={new Date(iso(10))}
@@ -225,7 +225,7 @@ describe("voting in the modal", () => {
       expect(button.getAttribute("aria-disabled")).toBe("true");
       await userEvent.click(button);
 
-      expect(screen.getByRole("status").textContent).toBe(
+      expect(screen.getAllByRole("status").map((s) => s.textContent)).toContain(
         "Select a user first" + "Dismiss"
       );
     }
@@ -387,9 +387,9 @@ describe("taking on a proposal that wants a host", () => {
     await userEvent.click(join);
 
     expect(actions.join).not.toHaveBeenCalled();
-    expect(screen.getByRole("status").textContent).toContain(
-      "Select a user first"
-    );
+    expect(
+      screen.getAllByRole("status").map((s) => s.textContent?.trim())
+    ).toContain("Select a user first" + "Dismiss");
   });
 
   it(
