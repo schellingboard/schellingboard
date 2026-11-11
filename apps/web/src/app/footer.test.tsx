@@ -39,19 +39,19 @@ describe("Footer", () => {
 
   it("opens the release notes with the running version and dates", async () => {
     const user = userEvent.setup();
-    show("4.0.0");
+    show("5.0.0");
 
-    await user.click(screen.getByRole("button", { name: /Version 4.0.0/ }));
+    await user.click(screen.getByRole("button", { name: /Version 5.0.0/ }));
 
     const dialog = screen.getByRole("dialog", { name: "What's new" });
-    expect(dialog.textContent).toContain("This site is running 4.0.0.");
+    expect(dialog.textContent).toContain("This site is running 5.0.0.");
     expect(
-      within(dialog).getByRole("heading", { name: "Unreleased" })
+      within(dialog).getByRole("heading", { name: "5.0.0 — 11 November 2026" })
     ).toBeTruthy();
     expect(
       within(dialog).getByRole("heading", { name: "4.0.0 — 4 October 2026" })
     ).toBeTruthy();
-    expect(within(dialog).getByText("A live schedule")).toBeTruthy();
+    expect(within(dialog).getByText("A faster, live schedule")).toBeTruthy();
     expect(
       within(dialog).getByRole("link", { name: "Full changelog on GitHub" })
     ).toBeTruthy();

@@ -47,11 +47,12 @@ export const SHOWN_RELEASES = 3;
 
 export const releaseNotes: ReleaseNote[] = [
   {
-    version: "Unreleased",
+    version: "5.0.0",
+    date: "2026-11-11",
     highlights: [
-      "**A faster schedule**: the schedule loads as an app page and opens sessions at once, with RSVPs, attendees and comments in the same window.",
-      "**The schedule works offline**: it opens from what your device last saved, marked as possibly out of date, and offers a reload after the site is upgraded.",
-      "**A live schedule**: sessions, RSVP counts and rooms update on everyone's screen as they change, with no reload, which suits the kiosk.",
+      "**A faster, live schedule**: sessions open at once and changes to sessions, RSVP counts and rooms appear on everyone's screen without a reload. It also opens offline.",
+      "**Verified events and personal join links**: organizers choose whether attendees must prove who they are, and send each guest a link that signs them in.",
+      "**Site admins**: organizers make people site admins, who replace the shared admin password and sign in with a password or email code.",
       "**An API for scripts and integrations**: organizers can set up events, rooms, guests and sessions from a script, with a reference at `/api/v1/docs`.",
       "**Event statistics**: admins see how an event went in explained charts and searchable tables, with CSV download, and can leave out volunteer shifts or other sessions.",
     ],
