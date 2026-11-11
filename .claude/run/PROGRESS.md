@@ -1,6 +1,6 @@
 # Progress
 
-Steps 1 (c344e56d), 2, 3 and 4 done.
+Steps 1 (c344e56d), 2, 3, 4 and 5 done.
 
 - Panel: `ui/side-panel.tsx`; history: `app/panel-history.ts` (`PanelItem` union: session, proposal,
   profile, meeting); host: `app/panel-host.tsx`; links opened in the panel via the `SpaLinks`
@@ -13,13 +13,14 @@ Steps 1 (c344e56d), 2, 3 and 4 done.
   directory publishes its rows through `ProfileWalkProvider` (no rows behind = no Prev/Next).
 - `landOnPanel` flushes history after its replace: a browser history merges replace + push of one
   tick into one push, which left the landed address under the panel.
-- Session and proposal links inside a profile panel over an event page are plain page loads until
-  step 5 (the profile host is outside the event's `SpaLinks`).
 - Step 4 done: `MeetingPanel` (`features/meetings/meeting-panel.tsx`) replaces the modal; the
   schedule page and `/{slug}/meetings?viewMeeting=` land on it; always over the schedule, read-only
   note in the panel outside scheduling. `BookingDialog` keeps `?bookMeeting=`. Notification links
   still emit the old URL until step 6.
-- Next: step 5.
+- Step 5 done: `app/panel-links.tsx` (was profile-links) intercepts profile and any-event item links
+  at the root; `ForeignPanelHost` (panel-host.tsx) opens the event replica when the page behind is
+  not that event. Nothing renders while it loads.
+- Next: step 6.
 
 ## Questions
 
