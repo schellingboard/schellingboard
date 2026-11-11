@@ -1,3 +1,4 @@
+import lingui from "eslint-plugin-lingui";
 import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
 
@@ -56,6 +57,56 @@ export default tseslint.config(
       parserOptions: {
         projectService: true,
       },
+    },
+  },
+  {
+    // Files whose user-facing strings are all in the catalog. Step 5 of #1328
+    // adds one area at a time and ends with the whole of apps/web/src; see
+    // docs/dev/i18n.md.
+    files: [
+      "apps/web/src/app/panel-landing.tsx",
+      "apps/web/src/app/profile-walk.tsx",
+      "apps/web/src/app/unread-count.tsx",
+      "apps/web/src/features/people/person-cards.tsx",
+      "apps/web/src/features/proposals/voting-buttons.tsx",
+      "apps/web/src/features/schedule/agenda-view.tsx",
+      "apps/web/src/features/schedule/location-col.tsx",
+      "apps/web/src/features/schedule/positioned-block.tsx",
+      "apps/web/src/ui/back-link.tsx",
+      "apps/web/src/ui/brand-icons.tsx",
+      "apps/web/src/ui/charts/legend.tsx",
+      "apps/web/src/ui/inline-markdown.tsx",
+      "apps/web/src/ui/location-placeholder.tsx",
+      "apps/web/src/ui/password-manager-hint.tsx",
+      "apps/web/src/ui/unavailable.tsx",
+      "apps/web/src/ui/use-paging.tsx",
+    ],
+    plugins: { lingui },
+    rules: {
+      "lingui/no-unlocalized-strings": [
+        "error",
+        {
+          ignoreNames: [
+            "className",
+            "type",
+            "id",
+            "key",
+            "href",
+            "role",
+            "data-testid",
+            "name",
+            "variant",
+            "size",
+            "htmlFor",
+            "to",
+            "as",
+            "d",
+            "viewBox",
+            "fill",
+            "stroke",
+          ],
+        },
+      ],
     },
   },
   {

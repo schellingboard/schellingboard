@@ -298,4 +298,25 @@ describe("ViewerProvider", () => {
     expect(await screen.findByText("language none")).toBeTruthy();
     expect(localStorage.getItem("sb-locale")).toBeNull();
   });
+
+  it("keeps the development pseudo-locale when the server answers", async () => {
+    localStorage.clear();
+    localStorage.setItem("sb-pseudo", "1");
+    const { api } = fakeApi(() =>
+      Response.json({ guestId: "g1", locale: null })
+    );
+    render(
+      <I18nProvider>
+        <ViewerProvider api={api} persistence={{ clear }}>
+          <Probe onViewer={() => {}} />
+        </ViewerProvider>
+      </I18nProvider>
+    );
+
+    expect(await screen.findByText("as g1")).toBeTruthy();
+    await waitFor(() =>
+      expect(document.documentElement.lang).toBe("pseudo-LOCALE")
+    );
+    localStorage.clear();
+  });
 });

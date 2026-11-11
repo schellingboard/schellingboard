@@ -179,6 +179,14 @@
   helper skips empty statuses. Not run: E2E, mailer tests (mailpit down); `make test` locally needs
   the env that `make` sets (plain vitest fails on AUTH_SECRET).
 
+- 27 (#1328d): lint rule is `error` on an allowlist of 16 files that already pass (warn would break
+  `--max-warnings 0`); step 28 adds files per area, and ends by replacing the list with
+  `apps/web/src/**`. `make i18n-check` (in `precommit`, `scripts/i18n-check.ts`) re-runs
+  `lingui extract --clean` and fails on a diff or an untranslated key in a non-source locale.
+  `pseudo-LOCALE` (Lingui's accents plus ~30% `~` padding from `i18n/pseudo.ts`) is dev-only: set `sb-pseudo=1` in localStorage. For step 28: when the allowlist becomes `apps/web/src/**` set `ignoreFunctions` (Error, console.*) and exclude tests; `title=` is not flagged.
+  The pseudo `.po` is committed (extract makes it). Not in the switcher; the server's enum rejects
+  it.
+
 ## Next step
 
-No step is open. Wait for the coordinator (step 27 onwards, 35 only on request).
+No step is open. Wait for the coordinator (step 28 onwards, 35 only on request).

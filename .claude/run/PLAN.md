@@ -68,7 +68,8 @@ the E2E specs a step touches; the user runs the full suite at the end.
     locale exists.
 26. DONE **#1328c** Locale-aware formatting (`i18n/format.ts`, `useFormatLocale`; Luxon default
     locale).
-27. **#1328d** Guardrails: lint rule, extract/missing-key check, pseudo-locale. Issue step 4.
+27. DONE **#1328d** Guardrails (`lingui/no-unlocalized-strings` on an allowlist, `make i18n-check`,
+    `pseudo-LOCALE`, docs/dev/i18n.md).
 28. **#1328e** Externalize strings, one commit per area (a to g of issue step 5); split into PLAN.md
     steps when reached.
 29. **#1328f** Server side: emails and notifications per recipient locale. Issue step 6.

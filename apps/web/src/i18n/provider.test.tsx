@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { Settings } from "luxon";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { I18nProvider } from "./index";
@@ -11,11 +11,12 @@ function Probe() {
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
+  localStorage.clear();
   Settings.defaultLocale = undefined as never;
 });
 
 describe("the format locale", { tags: ["022-US1"] }, () => {
-  it("takes the browser's region and gives it to dates", async () => {
+  it("takes the browser's region and gives it to dates", () => {
     vi.stubGlobal("navigator", { languages: ["en-GB"] });
     render(
       <I18nProvider>
@@ -36,5 +37,20 @@ describe("the format locale", { tags: ["022-US1"] }, () => {
     );
 
     expect(screen.getByText("formats as en-DE")).toBeTruthy();
+  });
+});
+
+describe("the pseudo-locale", { tags: ["022-US1"] }, () => {
+  it("can be chosen in development", async () => {
+    localStorage.setItem("sb-pseudo", "1");
+    render(
+      <I18nProvider>
+        <Probe />
+      </I18nProvider>
+    );
+
+    await waitFor(() =>
+      expect(document.documentElement.lang).toBe("pseudo-LOCALE")
+    );
   });
 });
