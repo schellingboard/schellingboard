@@ -17,10 +17,15 @@ commit. Run the E2E specs a step touches individually; the user runs the full su
    replica.
 6. Done: emails and notifications link to `/{slug}/sessions|proposals|meetings/:id`; old URLs still
    redirect.
-7. **Page state outside panels.** Schedule search and unfolded days, directory and proposals list
-   search, filters and page in search params (`replace`); scroll restored per history entry.
-8. **Docs and release.** Rewrite `docs/dev/web-app.md` "Opening a modal and closing it" (anchor
-   MnpjIo7Y stays) and the AGENTS.md "Misc" note; one release-notes highlight; ADR status Accepted.
+7. **Schedule page state.** Schedule search and unfolded days in search params (`replace`), kept
+   across real page changes. The directory already does this; it has no pagination.
+8. **Proposals list page state.** Query, filter and sort in search params (`replace`), with their
+   own parse and serialize logic.
+9. **Scroll per history entry.** Replace `use-scroll-restoration.ts`' one position per `event:view`
+   (`sessionStorage`) with one per history entry, for the schedule, the proposals list and the
+   directory.
+10. **Docs and release.** Rewrite `docs/dev/web-app.md` "Opening a modal and closing it" (anchor
+    MnpjIo7Y stays) and the AGENTS.md "Misc" note; one release-notes highlight; ADR status Accepted.
 
 ## Next steps
 
