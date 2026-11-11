@@ -1,3 +1,6 @@
+import path from "node:path";
+
+import { lingui } from "@lingui/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
@@ -19,7 +22,14 @@ const SERVER_PATHS = [
 ];
 
 export default defineConfig(({ command }) => ({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    lingui({
+      configPath: path.join(import.meta.dirname, "lingui.config.ts"),
+      macroTransform: true,
+    }),
+    tailwindcss(),
+  ],
   base: command === "build" ? "/_spa/" : "/",
   build: {
     outDir: "dist",
