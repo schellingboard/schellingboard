@@ -289,7 +289,11 @@ describe("the profile panel", () => {
     () => {
       render(<Harness matches={null} />);
 
-      expect(screen.getByRole("heading", { name: "Al" })).toBeTruthy();
+      const title = within(dialog()).getByRole("heading", {
+        level: 2,
+        name: "Al",
+      });
+      expect(title.querySelector("[title='Al']")).toBeTruthy();
       expect(
         screen.queryByRole("button", { name: "Next attendee" })
       ).toBeNull();

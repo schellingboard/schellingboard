@@ -44,20 +44,20 @@ the E2E specs a step touches; the user runs the full suite at the end.
     name only, not drawn. Show the icons (find the picker/list; keep the name as accessible label).
     Issue first (Bug, High, `component: admin`). 22d. DONE #1589 **Bug** Grid schedule: no line
     above the room-name header row between one day and the next. Add it. Issue first (Bug, Medium,
-    `component: scheduling`). 22e. **Bug** Side panel: "<- Profile" back link (opened from a
-    session, then a host) has the arrow too low and not aligned with the text. Also: the panel title
-    for a person is their name (shortened with an ellipsis when long, full name on hover/`title`)
-    instead of "Profile"; the back link label should follow the same rule. Same header component as
-    the bug, so one commit; adapt the tests that assert "Profile". Issue first (Bug, Low,
-    `component: ui/ux`). 22f. **Analysis, no code.** Should the create session / create proposal /
-    Quick Voting / "Need ideas?" flows open in the side panel (ADR 0020) instead of a page or modal,
-    for consistency? Survey every place that opens a new page, modal or dialog (use `Explore`), and
-    write the findings in PROGRESS.md and a short issue: per spot, panel yes/no with reasons. Lean
-    so far (check against the code): panel is good for create session/proposal from the schedule
-    (keeps context, deep link) and for "Need ideas?" (the tips stay readable beside the form, a
-    modal hides it); Quick Voting is a full-screen swipe flow and likely stays a page; long forms
-    need panel width on desktop and are full-screen on mobile anyway. Put the open decisions under
-    Questions; do not implement before the user answers. 22g. **Phase bar** Replace the
+    `component: scheduling`). 22e. DONE #1590 **Bug** Side panel: "<- Profile" back link (opened
+    from a session, then a host) has the arrow too low and not aligned with the text. Also: the
+    panel title for a person is their name (shortened with an ellipsis when long, full name on
+    hover/`title`) instead of "Profile"; the back link label should follow the same rule. Same
+    header component as the bug, so one commit; adapt the tests that assert "Profile". Issue first
+    (Bug, Low, `component: ui/ux`). 22f. **Analysis, no code.** Should the create session / create
+    proposal / Quick Voting / "Need ideas?" flows open in the side panel (ADR 0020) instead of a
+    page or modal, for consistency? Survey every place that opens a new page, modal or dialog (use
+    `Explore`), and write the findings in PROGRESS.md and a short issue: per spot, panel yes/no with
+    reasons. Lean so far (check against the code): panel is good for create session/proposal from
+    the schedule (keeps context, deep link) and for "Need ideas?" (the tips stay readable beside the
+    form, a modal hides it); Quick Voting is a full-screen swipe flow and likely stays a page; long
+    forms need panel width on desktop and are full-screen on mobile anyway. Put the open decisions
+    under Questions; do not implement before the user answers. 22g. **Phase bar** Replace the
     proposals-page phase strip (looks clickable, is not) with a thin informational bar right under
     the menu: segments `-----> =====> ----->` with the current phase highlighted, one design on
     every page that shows phases (also the schedule, which has only text now). Consider: segment
