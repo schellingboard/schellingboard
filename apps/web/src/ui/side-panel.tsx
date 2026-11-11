@@ -8,7 +8,6 @@ import {
   type ReactNode,
 } from "react";
 import { anyDialogOpen } from "./dialog";
-import { useNotify } from "./notices";
 import { useDiscardGuard } from "./use-discard-guard";
 
 export const PANEL_WIDTH_KEY = "sb-panel-width";
@@ -37,7 +36,6 @@ export function SidePanel({
   titleAction,
   onClose,
   onBack,
-  shareUrl,
   children,
 }: {
   label: string;
@@ -46,11 +44,9 @@ export function SidePanel({
   onClose: () => void;
   /** Present from the second entry of a stack. */
   onBack?: () => void;
-  shareUrl: string;
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const notify = useNotify();
   const [width, setWidth] = useState(storedWidth);
   const closeGuard = useDiscardGuard(ref, onClose);
   const { escape, reset } = closeGuard;
@@ -114,20 +110,6 @@ export function SidePanel({
     if (e.buttons === 1) resize(window.innerWidth - e.clientX, false);
   };
 
-  const share = async () => {
-    const url = new URL(shareUrl, window.location.origin).toString();
-    try {
-      if (typeof navigator.share === "function") {
-        await navigator.share({ url, title: label });
-      } else {
-        await navigator.clipboard.writeText(url);
-        notify({ tone: "info", message: "Link copied", autoDismissMs: 3000 });
-      }
-    } catch {
-      // A dismissed share sheet is not a failure.
-    }
-  };
-
   const button =
     "rounded-md p-1 text-fg-subtle hover:bg-surface-muted focus:outline-none focus:ring-2 focus:ring-brand-accent";
 
@@ -172,14 +154,6 @@ export function SidePanel({
           {title}
         </h2>
         {titleAction}
-        <button
-          type="button"
-          aria-label="Share"
-          onClick={() => void share()}
-          className={button}
-        >
-          <span aria-hidden>⤴</span>
-        </button>
         <button
           type="button"
           aria-label="Close"

@@ -39,11 +39,8 @@ the E2E specs a step touches; the user runs the full suite at the end.
 21. DONE **#993** "My comments" (`GET /me/comments`, `/comments`, `my-comments-screen.tsx`).
 22. DONE **#1046** "Ask them to open up" (`meeting_nudges`, migration 0064, `askToOpenUp`,
     `meetingNudge.*` changes, `nudges` on meeting-options). 22a. DONE **#1587** "My schedule" menu
-    on the grid (z-index on the sticky filter bar). 22b. **Remove the copy-link button** from the
-    session side panel: its icon is not legible and copying the URL is enough. Check the other
-    panels (proposal, 1-on-1, profile) for the same button and keep them consistent; update the E2E
-    tests, attendee guide and CHANGELOG that mention it. No issue needed unless one exists
-    (`gh issue list --search "copy link"`).
+    on the grid (z-index on the sticky filter bar). 22b. DONE Share button removed from the shared
+    `SidePanel` (all panels).
 23. **#831** (Medium) Consistent pagination strategy; `Pager` (#684) exists, read the 5 comments and
     apply it where the issue says. Record in Questions if #684 covered it.
 24. **#1328a** (Medium) i18n foundation: Lingui, `apps/web/src/i18n/`, `en` catalog, scripts and

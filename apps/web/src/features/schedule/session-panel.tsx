@@ -40,7 +40,7 @@ export function SessionPanel({
   onClose: () => void;
   onBack?: () => void;
 }) {
-  const { data, links } = useSchedule();
+  const { data } = useSchedule();
   const session = data.sessions.find((s) => s.id === sessionId);
   return (
     <SidePanel
@@ -49,7 +49,6 @@ export function SessionPanel({
       titleAction={session && <BookmarkToggle sessionId={session.id} />}
       onClose={onClose}
       onBack={onBack}
-      shareUrl={links.session(sessionId)}
     >
       {session ? <Details session={session} /> : <p>Session not found.</p>}
     </SidePanel>

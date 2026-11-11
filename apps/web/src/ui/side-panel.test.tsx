@@ -11,13 +11,7 @@ afterEach(() => {
 });
 
 const panel = (props: Partial<Parameters<typeof SidePanel>[0]> = {}) => (
-  <SidePanel
-    label="Details"
-    title="A title"
-    onClose={() => {}}
-    shareUrl="/conf/sessions/s"
-    {...props}
-  >
+  <SidePanel label="Details" title="A title" onClose={() => {}} {...props}>
     body
   </SidePanel>
 );
@@ -88,19 +82,6 @@ describe("SidePanel", () => {
     unmount();
     expect(document.activeElement).toBe(opener);
     opener.remove();
-  });
-
-  it("copies the address where the browser cannot share", async () => {
-    const writeText = vi.fn().mockResolvedValue(undefined);
-    Object.defineProperty(navigator, "clipboard", {
-      value: { writeText },
-      configurable: true,
-    });
-    render(panel());
-    await userEvent.click(screen.getByRole("button", { name: "Share" }));
-    expect(writeText).toHaveBeenCalledWith(
-      `${window.location.origin}/conf/sessions/s`
-    );
   });
 
   it("resizes with the arrow keys and remembers the width", async () => {
