@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { useLocation } from "@tanstack/react-router";
 import {
@@ -148,22 +149,22 @@ function Body({
   session: ScheduleSession;
   children: (view: EventView) => ReactNode;
 }) {
-  if (session.status === "loading") return <Message>Loading…</Message>;
+  if (session.status === "loading") return <Message>{t`Loading…`}</Message>;
   if (session.status === "missing")
     return (
       <Message>
-        <p>Event not found</p>
+        <p>{t`Event not found`}</p>
         <a href="/" className="underline">
-          Back to the events
+          {t`Back to the events`}
         </a>
       </Message>
     );
   if (session.status === "failed")
     return (
       <Message>
-        <p>The event could not be loaded.</p>
+        <p>{t`The event could not be loaded.`}</p>
         <button type="button" onClick={session.retry} className="underline">
-          Try again
+          {t`Try again`}
         </button>
       </Message>
     );
@@ -199,9 +200,9 @@ export function Ready({
   if (gone)
     return (
       <Message>
-        <p>This event has been deleted.</p>
+        <p>{t`This event has been deleted.`}</p>
         <a href="/" className="underline">
-          Back to the events
+          {t`Back to the events`}
         </a>
       </Message>
     );

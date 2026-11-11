@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import type { ReactNode } from "react";
 
 export function Layout({
@@ -15,7 +16,7 @@ export function Layout({
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-surface-raised focus:p-2"
       >
-        Skip to content
+        {t`Skip to content`}
       </a>
       {nav}
       <main id="main" className="flex-1 pt-20 sm:p-3 sm:pt-24 lg:px-24">

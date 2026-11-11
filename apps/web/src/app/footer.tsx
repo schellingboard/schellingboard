@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import {
   releaseNotes,
   SHOWN_RELEASES,
@@ -16,13 +18,15 @@ const CHANGELOG_URL =
 
 // The calendar date the release carries in CHANGELOG.md, whatever the reader's zone.
 const formatDate = (date: string) =>
-  new Date(`${date}T00:00:00Z`).toLocaleDateString("en-GB", {
+  new Date(`${date}T00:00:00Z`).toLocaleDateString(DATE_LOCALE, {
     day: "numeric",
     month: "long",
     year: "numeric",
     timeZone: "UTC",
   });
 
+const DATE_LOCALE = "en-GB";
+const BRAND = "SchellingBoard";
 const link = "text-link hover:underline";
 
 export function Footer({
@@ -37,8 +41,15 @@ export function Footer({
   inline?: boolean;
 }) {
   const [open, setOpen] = useState(false);
-  const shown = version ?? "unknown";
+  const shown = version ?? t`unknown`;
   const behind = update?.updateAvailable ? update : null;
+  const latest = behind?.latest;
+  const latestVersion = latest?.version ?? "";
+  const currentVersion = behind?.current.version ?? "";
+  const latestDate = latest?.date ? formatDate(latest.date) : null;
+  const currentDate = behind?.current.date
+    ? formatDate(behind.current.date)
+    : null;
 
   return (
     <footer
@@ -49,14 +60,18 @@ export function Footer({
         className={`flex flex-wrap items-center justify-between gap-x-2 gap-y-1 px-3 text-xs text-fg-subtle md:grid md:grid-cols-[1fr_auto_1fr] ${inline ? "sticky left-0 max-w-[100dvw]" : ""}`}
       >
         <div className="md:justify-self-start">
-          <Tooltip content="What's new">
+          <Tooltip content={t`What's new`}>
             <button
               type="button"
-              aria-label={`Version ${shown} — what's new${behind ? ", update available" : ""}`}
+              aria-label={
+                behind
+                  ? t`Version ${shown} — what's new, update available`
+                  : t`Version ${shown} — what's new`
+              }
               onClick={() => setOpen(true)}
               className={`flex gap-1 rounded-sm ${link} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent`}
             >
-              <span className="hidden sm:block">Version: </span>
+              <span className="hidden sm:block">{t`Version:`} </span>
               {shown}
               {behind && (
                 <span
@@ -69,14 +84,14 @@ export function Footer({
         </div>
         <ThemeSelect />
         <div className="flex flex-wrap items-center justify-end gap-1 md:justify-self-end">
-          <span className="hidden sm:block">Powered by</span>
+          <span className="hidden sm:block">{t`Powered by`}</span>
           <a
             href="https://schellingboard.org"
             className={link}
             target="_blank"
             rel="noopener noreferrer"
           >
-            SchellingBoard
+            {BRAND}
           </a>
           <span>·</span>
           <a
@@ -85,7 +100,7 @@ export function Footer({
             target="_blank"
             rel="noopener noreferrer"
           >
-            Help
+            {t`Help`}
           </a>
           <span>·</span>
           <a
@@ -94,31 +109,34 @@ export function Footer({
             target="_blank"
             rel="noopener noreferrer"
           >
-            Report a Bug
+            {t`Report a Bug`}
           </a>
         </div>
       </div>
       <Dialog
         open={open}
         onClose={() => setOpen(false)}
-        title="What's new"
+        title={t`What's new`}
         wide
       >
-        <p className="text-sm text-fg-subtle">This site is running {shown}.</p>
-        {behind?.latest && (
+        <p className="text-sm text-fg-subtle">
+          <Trans>This site is running {shown}.</Trans>
+        </p>
+        {latest && behind && (
           <p className="mt-2 text-sm text-fg">
-            A newer release is out: {behind.latest.version}
-            {behind.latest.date && `, ${formatDate(behind.latest.date)}`}. This
-            site runs {behind.current.version}
-            {behind.current.date &&
-              `, ${formatDate(behind.current.date)}`}.{" "}
+            {latestDate
+              ? t`A newer release is out: ${latestVersion}, ${latestDate}.`
+              : t`A newer release is out: ${latestVersion}.`}{" "}
+            {currentDate
+              ? t`This site runs ${currentVersion}, ${currentDate}.`
+              : t`This site runs ${currentVersion}.`}{" "}
             <a
               href={UPDATE_DOCS_URL}
               target="_blank"
               rel="noopener noreferrer"
               className={link}
             >
-              How to update
+              {t`How to update`}
             </a>
           </p>
         )}
@@ -132,7 +150,9 @@ export function Footer({
               </h3>
               {!release.date && (
                 <p className="mt-1 text-xs text-fg-subtle">
-                  In this build, but not in a released version yet.
+                  <Trans>
+                    In this build, but not in a released version yet.
+                  </Trans>
                 </p>
               )}
               <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-fg">
@@ -151,7 +171,7 @@ export function Footer({
           rel="noopener noreferrer"
           className={`mt-4 inline-block text-sm ${link}`}
         >
-          Full changelog on GitHub
+          {t`Full changelog on GitHub`}
         </a>
       </Dialog>
     </footer>

@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+
 import { BellIcon, UserGroupIcon } from "../ui/icons";
 import { useUnread } from "./unread-count";
 
@@ -12,13 +14,13 @@ export function HeaderLinks({ signedIn }: { signedIn: boolean }) {
     <>
       <a href="/guests" className={link}>
         <UserGroupIcon className="h-5 w-5" />
-        <span className="sr-only sm:not-sr-only">Attendees</span>
+        <span className="sr-only sm:not-sr-only">{t`Attendees`}</span>
       </a>
       {signedIn && (
         <a
           href="/notifications"
           aria-label={
-            unread ? `Notifications (${unread} unread)` : "Notifications"
+            unread ? t`Notifications (${unread} unread)` : t`Notifications`
           }
           className="relative flex items-center rounded-md p-2 text-fg-subtle hover:bg-surface-muted"
         >

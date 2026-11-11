@@ -1,3 +1,5 @@
+import { i18n, type MessageDescriptor } from "@lingui/core";
+import { msg, t } from "@lingui/core/macro";
 import { clockFormat, type ClockStyle } from "@schellingboard/domain/time";
 import { createContext, type ReactNode, useContext, useState } from "react";
 
@@ -50,10 +52,18 @@ export function useTimeFormat(): string {
   return clockFormat(useClockStyle());
 }
 
-const OPTIONS: { value: Preference; label: string; hint: string }[] = [
-  { value: "auto", label: "Automatic", hint: "Follow your browser's language" },
-  { value: "12h", label: "12-hour", hint: "Times like 2:00 PM" },
-  { value: "24h", label: "24-hour", hint: "Times like 14:00" },
+const OPTIONS: {
+  value: Preference;
+  label: MessageDescriptor;
+  hint: MessageDescriptor;
+}[] = [
+  {
+    value: "auto",
+    label: msg`Automatic`,
+    hint: msg`Follow your browser's language`,
+  },
+  { value: "12h", label: msg`12-hour`, hint: msg`Times like 2:00 PM` },
+  { value: "24h", label: msg`24-hour`, hint: msg`Times like 14:00` },
 ];
 
 export function TimeFormatSelect() {
@@ -61,19 +71,19 @@ export function TimeFormatSelect() {
   return (
     <div
       role="group"
-      aria-label="Time format"
+      aria-label={t`Time format`}
       className="inline-flex overflow-hidden rounded-md border border-line"
     >
       {OPTIONS.map(({ value, label, hint }) => (
         <button
           key={value}
           type="button"
-          title={hint}
+          title={i18n._(hint)}
           aria-pressed={preference === value}
           onClick={() => setPreference(value)}
           className={`px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-accent ${preference === value ? "bg-surface-inverse text-fg-inverse" : "text-fg-muted hover:bg-surface-hover"}`}
         >
-          {label}
+          {i18n._(label)}
         </button>
       ))}
     </div>

@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { type ReactNode, useState } from "react";
 
 import { EventIcon } from "../ui/event-icon";
@@ -34,7 +35,7 @@ export function NavBar({
       <div className="flex h-16 items-center justify-between gap-2 px-2 sm:px-6 lg:px-8">
         <button
           type="button"
-          aria-label={open ? "Close menu" : "Open menu"}
+          aria-label={open ? t`Close menu` : t`Open menu`}
           aria-expanded={open}
           onClick={() => setOpen(!open)}
           className="rounded-md p-2 text-brand-fg hover:bg-brand-tint focus:outline-none focus:ring-2 focus:ring-brand-accent sm:hidden"
@@ -58,7 +59,10 @@ export function NavBar({
         <div className="flex shrink-0 items-center gap-3">{children}</div>
       </div>
       {open && (
-        <nav aria-label="Menu" className="space-y-1 px-2 pb-3 pt-2 sm:hidden">
+        <nav
+          aria-label={t`Menu`}
+          className="space-y-1 px-2 pb-3 pt-2 sm:hidden"
+        >
           {items.map((item) => (
             <a
               key={item.href}

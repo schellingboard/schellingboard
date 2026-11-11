@@ -1,3 +1,5 @@
+import { i18n, type MessageDescriptor } from "@lingui/core";
+import { msg, t } from "@lingui/core/macro";
 import { createContext, type ReactNode, useContext, useState } from "react";
 
 import { Tooltip } from "../ui/tooltip";
@@ -59,14 +61,26 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   );
 }
 
-const OPTIONS: { value: Theme; label: string; hint: string }[] = [
+const OPTIONS: {
+  value: Theme;
+  label: MessageDescriptor;
+  hint: MessageDescriptor;
+}[] = [
   {
     value: "system",
-    label: "System",
-    hint: "Follow your device's light/dark setting",
+    label: msg({ message: "System", context: "Colour theme" }),
+    hint: msg`Follow your device's light/dark setting`,
   },
-  { value: "light", label: "Light", hint: "Always use light colours" },
-  { value: "dark", label: "Dark", hint: "Always use dark colours" },
+  {
+    value: "light",
+    label: msg({ message: "Light", context: "Colour theme" }),
+    hint: msg`Always use light colours`,
+  },
+  {
+    value: "dark",
+    label: msg({ message: "Dark", context: "Colour theme" }),
+    hint: msg`Always use dark colours`,
+  },
 ];
 
 export function ThemeSelect() {
@@ -74,18 +88,18 @@ export function ThemeSelect() {
   return (
     <div
       role="group"
-      aria-label="Colour theme"
+      aria-label={t`Colour theme`}
       className="inline-flex overflow-hidden rounded-md border border-line"
     >
       {OPTIONS.map(({ value, label, hint }) => (
-        <Tooltip key={value} content={hint}>
+        <Tooltip key={value} content={i18n._(hint)}>
           <button
             type="button"
             aria-pressed={theme === value}
             onClick={() => setTheme(value)}
             className={`px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-accent ${theme === value ? "bg-surface-inverse text-fg-inverse" : "text-fg-muted hover:bg-surface-hover"}`}
           >
-            {label}
+            {i18n._(label)}
           </button>
         </Tooltip>
       ))}

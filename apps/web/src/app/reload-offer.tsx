@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import type { ApiClient } from "@schellingboard/api-client";
 import { useEffect, useState } from "react";
 
@@ -89,13 +90,13 @@ export function ReloadOffer({
       role="status"
       className="fixed inset-x-4 bottom-4 z-50 mx-auto flex max-w-md flex-wrap items-center justify-center gap-3 rounded border border-warning bg-warning-tint px-4 py-2 text-sm text-warning-fg shadow"
     >
-      A new version of SchellingBoard is available.
+      {t`A new version of SchellingBoard is available.`}
       <button
         type="button"
         onClick={onReload}
         className="font-medium underline"
       >
-        Reload
+        {t`Reload`}
       </button>
     </div>
   );

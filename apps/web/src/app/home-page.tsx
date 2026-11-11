@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
@@ -40,8 +41,8 @@ function Home({ api }: { api: AppServices["api"] }) {
 
   return (
     <ShellFrame api={api} {...frame}>
-      {(failed || siteFailed) && <p>The events could not be loaded.</p>}
-      {loaded && events.length === 0 && <p>No events found.</p>}
+      {(failed || siteFailed) && <p>{t`The events could not be loaded.`}</p>}
+      {loaded && events.length === 0 && <p>{t`No events found.`}</p>}
       {site && events.length > 1 && (
         <InAppLinks
           owns={({ pathname }) => events.some((e) => pathname === `/${e.slug}`)}

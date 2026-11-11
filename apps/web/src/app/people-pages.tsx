@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
 import { newSortSeed } from "@schellingboard/domain/attendee-search";
 import { useRouter } from "@tanstack/react-router";
@@ -158,14 +159,14 @@ function EditProfile({
   )
     return (
       <p role="status" className="px-4 text-fg-muted">
-        Loading…
+        {t`Loading…`}
       </p>
     );
   const me = entries.find((e) => e.id === viewerId);
   if (!me || status === "error")
     return (
       <p className="px-4 text-fg-muted">
-        Profile not found, please log in again.
+        {t`Profile not found, please log in again.`}
       </p>
     );
   return (
