@@ -18,6 +18,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   beside it, you can drag its edge to resize it, and each has its own shareable link.
 - **The schedule and the proposals list keep their search, filter and sort**: they are part of the
   page address, so Back and a reload bring them back.
+- **Back returns to where you were scrolled**: the schedule, the proposals list and the attendee
+  directory come back at the same place, also after a reload.
 
 ### Internal
 

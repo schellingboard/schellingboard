@@ -14,6 +14,7 @@ import {
   type DirectoryState,
 } from "../queries/directory";
 import { toEvent } from "../replica/selectors";
+import { useScrollRestoration } from "../ui/use-scroll-restoration";
 import { InAppLinks } from "./in-app-links";
 import { PageNotice } from "./page-notice";
 import { PanelLanding } from "./panel-landing";
@@ -22,6 +23,7 @@ import { useProfileWalk } from "./profile-walk";
 import type { AppServices } from "./services";
 import { ShellFrame } from "./shell";
 import { useDirectoryShell } from "./use-directory-shell";
+import { useHistoryEntry } from "./use-history-entry";
 import { useUrlSearchParams } from "./use-url-search-params";
 import { useViewer } from "./viewer";
 
@@ -84,6 +86,11 @@ function Directory({ entries, status, now, viewerId, meetingsEnabled }: View) {
   const { params, change } = useUrlSearchParams();
   const { setRows } = useProfileWalk();
   const [randomSeed] = useState(newSortSeed);
+  useScrollRestoration(
+    null,
+    useHistoryEntry(),
+    entries.length > 0 || (status !== "loading" && status !== "idle")
+  );
 
   return (
     <DirectoryScreen

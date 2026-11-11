@@ -24,6 +24,7 @@ import { EventLayout } from "./event-page";
 import { HomePage } from "./home-page";
 import { MeetingsPage } from "./meetings-page";
 import { NotFound } from "./not-found";
+import { createScrollReset } from "./panel-history";
 import { ForeignPanelHost, PanelHost } from "./panel-host";
 import { PanelLanding } from "./panel-landing";
 import { PanelLinks } from "./panel-links";
@@ -416,6 +417,7 @@ export function createAppRouter(
       catchAll,
     ]),
     history,
+    scrollRestoration: createScrollReset(),
   });
 }
 
