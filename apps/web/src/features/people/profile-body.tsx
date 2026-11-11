@@ -6,6 +6,7 @@ import {
 import { CORE_PROMPTS } from "@schellingboard/domain/prompt-pool";
 import type { ComponentType, ReactNode, SVGProps } from "react";
 
+import type { MeetingRequestCalls } from "../../commands/meeting-request";
 import type { DirectoryEntry } from "../../queries/directory";
 import type {
   ProfileActivityState,
@@ -21,6 +22,7 @@ import {
 } from "../../ui/icons";
 import { Markdown, MarkdownInline } from "../../ui/markdown";
 import type { ProfileLinks } from "./links";
+import { OpenUpNudge } from "./open-up-nudge";
 import { ProfilePhoto } from "./profile-photo";
 
 const LINK = "text-brand-fg hover:text-brand-fg-hover hover:underline";
@@ -62,6 +64,7 @@ export function ProfileBody({
   zoomed,
   onToggleZoom,
   onSchedule,
+  meetingRequests,
   comments,
 }: {
   guest: DirectoryEntry;
@@ -72,10 +75,12 @@ export function ProfileBody({
   zoomed: boolean;
   onToggleZoom: () => void;
   onSchedule: (guestId: string, option: ProfileMeetingOption) => void;
+  meetingRequests: MeetingRequestCalls;
   /** Only the profile being read has a thread. */
   comments: ReactNode;
 }) {
   const options = activity?.meetingOptions ?? [];
+  const nudges = activity?.nudges ?? [];
   return (
     <div className="flex flex-col gap-8">
       <header className="flex flex-col items-center gap-2 text-center">
@@ -124,6 +129,20 @@ export function ProfileBody({
                   ? "Schedule a 1-on-1"
                   : `Schedule a 1-on-1 at ${option.eventName}`}
               </button>
+            ))}
+          </div>
+        )}
+        {!isOwnProfile && nudges.length > 0 && (
+          <div className="flex flex-col gap-3">
+            {nudges.map((nudge) => (
+              <OpenUpNudge
+                key={nudge.eventId}
+                nudge={nudge}
+                guestId={guest.id}
+                guestName={guest.name}
+                showEvent={options.length + nudges.length > 1}
+                calls={meetingRequests}
+              />
             ))}
           </div>
         )}
