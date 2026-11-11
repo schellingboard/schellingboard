@@ -728,6 +728,27 @@ export interface MeetingAvailabilityRepository {
   deleteByEvent(eventId: string): Promise<void>;
 }
 
+export interface MeetingNudgesRepository {
+  /** False when the asker already nudged this person at this event. */
+  create(data: {
+    eventId: string;
+    askerId: string;
+    recipientId: string;
+    createdAt: Date;
+  }): Promise<boolean>;
+  /** The events at which the asker has already nudged the recipient. */
+  listEventsAsked(askerId: string, recipientId: string): Promise<string[]>;
+  /**
+   * Marks the recipient's unanswered nudges at the event answered and returns
+   * who sent them, so each asker is told once however often the guest re-saves.
+   */
+  answerOpen(
+    eventId: string,
+    recipientId: string,
+    answeredAt: Date
+  ): Promise<string[]>;
+}
+
 export type MeetingRequestOutcome =
   { meeting: Meeting } | { refused: "cap" | "duplicate" };
 

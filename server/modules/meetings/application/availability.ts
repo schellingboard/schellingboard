@@ -46,6 +46,9 @@ export const saveMeetingAvailability =
           "Those slots are no longer available"
         );
 
+      const wasOpen = (
+        await tx.meetingAvailability.listByGuestAndEvent(guestId, event.id)
+      ).some((slot) => slot > now);
       await tx.meetingAvailability.replaceForGuest(
         guestId,
         event.id,
@@ -63,6 +66,22 @@ export const saveMeetingAvailability =
           byGuest(guestId, now)
         )
       );
+      if (!wasOpen && declared.some((slot) => new Date(slot) > now)) {
+        const askerIds = await tx.meetingNudges.answerOpen(
+          event.id,
+          guestId,
+          now
+        );
+        if (askerIds.length > 0)
+          tx.record(
+            changes.meetingNudgeAnswered(
+              event,
+              guestId,
+              askerIds,
+              byGuest(guestId, now)
+            )
+          );
+      }
       return ok(undefined);
     });
   };

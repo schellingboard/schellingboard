@@ -366,6 +366,23 @@
       "MeetingOptions": {
         "type": "object",
         "properties": {
+          "nudges": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "eventId": { "type": "string" },
+                "eventName": { "type": "string" },
+                "state": {
+                  "type": "string",
+                  "enum": ["canAsk", "asked"],
+                  "description": "asked: the caller already asked them at this event"
+                }
+              },
+              "required": ["eventId", "eventName", "state"]
+            },
+            "description": "One per shared event where 1-on-1s are open but the guest has declared no slots"
+          },
           "options": {
             "type": "array",
             "items": {
@@ -460,7 +477,7 @@
             "description": "One per event the caller and the guest share where 1-on-1s are open and the guest is bookable"
           }
         },
-        "required": ["options"]
+        "required": ["nudges", "options"]
       },
       "Event": {
         "type": "object",
@@ -4624,6 +4641,56 @@
               }
             }
           },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }]
+      }
+    },
+    "/api/v1/guests/{id}/open-up-requests": {
+      "post": {
+        "tags": ["meetings"],
+        "description": "Asks a guest who has declared no free slots to open up to 1-on-1s at an event; they are notified. Once per person and event, and not counted against the open-request cap.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "eventId": { "type": "string" } },
+                "required": ["eventId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Asked" },
           "default": {
             "description": "Problem details (RFC 9457); clients branch on `code`",
             "content": {

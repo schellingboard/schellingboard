@@ -7,6 +7,7 @@ import {
   meetingCancelBodySchema,
   meetingCandidatesQuerySchema,
   meetingCandidatesSchema,
+  meetingNudgeBodySchema,
   meetingOptionsSchema,
   meetingRequestSchema,
   meetingSchema,
@@ -87,6 +88,20 @@ const requestMeeting = createRoute({
     201: json(meetingSchema, "The pending request"),
     ...problemDefault,
   },
+});
+
+const askToOpenUp = createRoute({
+  method: "post",
+  path: "/guests/{id}/open-up-requests",
+  tags: ["meetings"],
+  description:
+    "Asks a guest who has declared no free slots to open up to 1-on-1s at an event; they are notified. Once per person and event, and not counted against the open-request cap.",
+  request: {
+    headers: idempotencyHeaders,
+    params: idParam,
+    body: body(meetingNudgeBodySchema),
+  },
+  responses: { 204: noContent("Asked"), ...problemDefault },
 });
 
 const answerRoute = (response: "accept" | "decline") =>
@@ -192,7 +207,7 @@ export function addMeetingRoutes(app: App, meetings: () => MeetingUseCases) {
       c.var.now
     );
     if (!result.ok) return problem(result.error);
-    return c.json({ options: result.value }, 200);
+    return c.json(result.value, 200);
   });
 
   app.openapi(requestMeeting, async (c) => {
@@ -203,6 +218,19 @@ export function addMeetingRoutes(app: App, meetings: () => MeetingUseCases) {
     );
     if (!result.ok) return problem(result.error);
     return c.json(toMeetingView(result.value), 201);
+  });
+
+  app.openapi(askToOpenUp, async (c) => {
+    const result = await meetings().askToOpenUp(
+      c.var.actor,
+      {
+        eventId: c.req.valid("json").eventId,
+        recipientId: c.req.valid("param").id,
+      },
+      c.var.now
+    );
+    if (!result.ok) return problem(result.error);
+    return c.body(null, 204);
   });
 
   for (const response of ["accept", "decline"] as const) {

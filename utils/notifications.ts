@@ -12,6 +12,8 @@ import { type CommentSubject, commentNoticeText } from "@/emails/comment";
 import {
   type MeetingOutcome,
   meetingOutcomeNoticeText,
+  meetingNudgeAnsweredNoticeText,
+  meetingNudgeNoticeText,
   meetingRequestNoticeText,
 } from "@/emails/meeting";
 import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
@@ -668,6 +670,88 @@ export async function notifyMeetingRequested({
     );
   } catch (err) {
     console.error("Failed to send meeting-request notification:", err);
+  }
+}
+
+// Tell a guest that someone would like to book them, pointing at the panel
+// where they declare when they are free. Never throws, as above.
+export async function notifyMeetingNudged({
+  eventId,
+  askerId,
+  recipientId,
+  now,
+}: {
+  eventId: string;
+  askerId: string;
+  recipientId: string;
+  now: Date;
+}): Promise<void> {
+  try {
+    const event = await getRepositories().events.findById(eventId);
+    if (!event) return;
+    const askerName = await guestName(askerId);
+    const path = "/settings#one-on-ones";
+    await notifyGuest(
+      recipientId,
+      "meetingRequest",
+      {
+        template: "meetingNudge",
+        props: {
+          askerName,
+          eventName: event.name,
+          url: emailBase() + path,
+        },
+      },
+      {
+        text: meetingNudgeNoticeText(askerName, event.name),
+        url: path,
+        at: now,
+      }
+    );
+  } catch (err) {
+    console.error("Failed to send meeting-nudge notification:", err);
+  }
+}
+
+// Tell each asker that the guest they nudged has declared slots, so they can
+// book. Never throws, as above.
+export async function notifyMeetingNudgeAnswered({
+  eventId,
+  recipientId,
+  askerIds,
+  now,
+}: {
+  eventId: string;
+  recipientId: string;
+  askerIds: string[];
+  now: Date;
+}): Promise<void> {
+  try {
+    const event = await getRepositories().events.findById(eventId);
+    if (!event) return;
+    const recipientName = await guestName(recipientId);
+    const path = `/guests/${recipientId}`;
+    for (const askerId of askerIds) {
+      await tryNotifyGuest(
+        askerId,
+        "meetingResponse",
+        {
+          template: "meetingNudgeAnswered",
+          props: {
+            recipientName,
+            eventName: event.name,
+            url: emailBase() + path,
+          },
+        },
+        {
+          text: meetingNudgeAnsweredNoticeText(recipientName, event.name),
+          url: path,
+          at: now,
+        }
+      );
+    }
+  } catch (err) {
+    console.error("Failed to send meeting-nudge answer notifications:", err);
   }
 }
 

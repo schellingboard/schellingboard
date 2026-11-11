@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Ask someone to open up to 1-on-1s** (#1046): a profile without free slots now has an "Ask them
+  to open up" button; you are told when they do.
 - **"My comments" lists everything you wrote** (#993): open it from your name menu, filter and
   search it, and click a comment to jump to it.
 - **12-hour or 24-hour times** (#607): choose a time format in Settings; Automatic follows your

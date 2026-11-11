@@ -2,6 +2,8 @@ import { getRepositories } from "@/db/container";
 import type { Actor, RecordedChange } from "@schellingboard/domain/change";
 import {
   notifyCohostsAdded,
+  notifyMeetingNudgeAnswered,
+  notifyMeetingNudged,
   notifyMeetingOutcome,
   notifyMeetingRequested,
   notifyProfileCommented,
@@ -78,6 +80,24 @@ export const changeNotifications = reaction(
           actorId: changedById,
           now,
         });
+      return;
+    }
+    if (change.type === "meetingNudge.asked") {
+      await notifyMeetingNudged({
+        eventId: change.eventId!,
+        askerId: change.payload.askerId,
+        recipientId: change.payload.recipientId,
+        now,
+      });
+      return;
+    }
+    if (change.type === "meetingNudge.answered") {
+      await notifyMeetingNudgeAnswered({
+        eventId: change.eventId!,
+        recipientId: change.payload.recipientId,
+        askerIds: change.payload.askerIds,
+        now,
+      });
       return;
     }
     if (change.type === "proposal.joined") {

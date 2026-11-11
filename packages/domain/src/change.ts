@@ -203,6 +203,20 @@ export type MeetingAnswered = ChangeOf<
   { outcome: "accepted" | "declined" | "canceled" }
 >;
 
+/** Someone asked a guest to open up to 1-on-1s; recorded so the guest is told. */
+export type MeetingNudged = ChangeOf<
+  "meetingNudge.asked",
+  "meetingNudge",
+  { askerId: string; recipientId: string }
+>;
+
+/** A guest declared their first slots at an event; the askers are told. */
+export type MeetingNudgeAnswered = ChangeOf<
+  "meetingNudge.answered",
+  "meetingNudge",
+  { recipientId: string; askerIds: string[] }
+>;
+
 /** The slot starts a guest declared themselves free, as ISO instants. */
 export type AvailabilityChanged = ChangeOf<
   "availability.changed",
@@ -278,6 +292,8 @@ export type Change =
   | MeetingDeleted
   | MeetingRequested
   | MeetingAnswered
+  | MeetingNudged
+  | MeetingNudgeAnswered
   | AvailabilityChanged
   | LocationChanged
   | LocationRemoved
@@ -350,6 +366,8 @@ export function audienceOf(change: Change): Audience {
       return { kind: "guests", ids: [change.payload.guestId] };
     case "meeting.requested":
     case "meeting.answered":
+    case "meetingNudge.asked":
+    case "meetingNudge.answered":
     case "session.cohostsAdded":
     case "proposal.joined":
     case "comment.created":
@@ -595,6 +613,40 @@ export const changes = {
       actor,
       occurredAt: at,
       payload: { outcome },
+    };
+  },
+
+  meetingNudged(
+    event: { id: string },
+    askerId: string,
+    recipientId: string,
+    { actor, at }: ChangeContext
+  ): MeetingNudged {
+    return {
+      type: "meetingNudge.asked",
+      subjectType: "meetingNudge",
+      subjectId: `${event.id}:${askerId}:${recipientId}`,
+      eventId: event.id,
+      actor,
+      occurredAt: at,
+      payload: { askerId, recipientId },
+    };
+  },
+
+  meetingNudgeAnswered(
+    event: { id: string },
+    recipientId: string,
+    askerIds: string[],
+    { actor, at }: ChangeContext
+  ): MeetingNudgeAnswered {
+    return {
+      type: "meetingNudge.answered",
+      subjectType: "meetingNudge",
+      subjectId: `${event.id}:${recipientId}`,
+      eventId: event.id,
+      actor,
+      occurredAt: at,
+      payload: { recipientId, askerIds },
     };
   },
 

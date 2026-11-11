@@ -10,6 +10,7 @@ import { availabilityFormsFor } from "@/utils/meeting-availability-form";
 import { meetingOptionsFor, type MeetingOption } from "@/utils/meeting-options";
 import { myMeetingsFor, type MyMeetingsResponse } from "@/utils/meeting-views";
 import type { MeetingDeps } from "../ports";
+import { nudgeStatesFor, type MeetingNudgeState } from "./nudges";
 import { eventNotFound } from "./meetings";
 
 // Always the caller's own: a guest's meetings and free slots are as private as
@@ -34,18 +35,22 @@ export const listMeetingOptions =
     actor: Actor,
     { guestId }: { guestId: string },
     now: Date
-  ): Promise<Result<MeetingOption[]>> => {
+  ): Promise<
+    Result<{ options: MeetingOption[]; nudges: MeetingNudgeState[] }>
+  > => {
     const acting = await actingGuest(actor, repos.guests);
-    if (!acting.ok) return ok([]);
-    return ok(
-      await meetingOptionsFor(
+    if (!acting.ok) return ok({ options: [], nudges: [] });
+    const events = await repos.events.list();
+    return ok({
+      options: await meetingOptionsFor(
         acting.value,
         guestId,
-        await repos.events.list(),
+        events,
         repos,
         now
-      )
-    );
+      ),
+      nudges: await nudgeStatesFor(acting.value, guestId, events, repos, now),
+    });
   };
 
 // Site auth is shared with every attendee, so only an acting guest may ask:

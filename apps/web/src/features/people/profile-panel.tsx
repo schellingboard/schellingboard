@@ -329,6 +329,7 @@ export function ProfilePanel(props: ProfilePanelProps) {
                       zoomed={current && zoomed}
                       onToggleZoom={() => setZoomedFor(zoomed ? null : guestId)}
                       onSchedule={(id, option) => setScheduling({ id, option })}
+                      meetingRequests={props.meetingRequests}
                       comments={
                         current && (
                           <Comments

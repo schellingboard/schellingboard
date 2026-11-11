@@ -10,6 +10,7 @@ export interface MeetingDeps {
     | "guests"
     | "meetings"
     | "meetingAvailability"
+    | "meetingNudges"
     | "meetingPoints"
     | "sessions"
     | "rsvps"
