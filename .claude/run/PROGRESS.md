@@ -31,11 +31,44 @@
   light and dark, on the proposals and attendees pages: no empty corners (screenshots were
   temporary, not kept).
 
+- 22f survey (ADR 0020: "views open in the side panel, tasks stay dialogs"; panel kinds today are
+  read-only `session`, `proposal`, `meeting`, `profile`, each with a URL; non-modal, resizable
+  320-800px on wide screens, full screen on phones; it already has `useDiscardGuard`). Per spot:
+  - Create/edit proposal (`proposals/new`, `$id/edit`, ~360 lines): panel yes, effort M. Edit fits
+    over the proposal view in the same stack; needs a new panel kind, `PanelLanding` background,
+    save then close/replace instead of history Back.
+  - Create/edit session (`add-session`, `edit-session?sessionID=`, ~780 lines, several inner
+    dialogs): panel maybe, effort L. Keeps the grid visible (context, clash checks) but is cramped
+    at 320-800px; the id is a query param, not a path. Phones are full screen either way.
+  - Edit profile (`/guests/edit`, long): panel yes, effort M; clashes with the `/guests/$id`
+    pattern; profile host already at the root.
+  - "Need ideas?" (`ProposalHelp`, short read-only dialog, no URL): keep as a dialog per ADR, or
+    panel only if the form itself is a panel (tips stay readable beside it); effort S either way.
+  - Quick Voting (swipe mode, not a form): keep a page (M, little gain).
+  - Event details dialog (schedule toolbar, read-only): panel yes (it is a view), effort S-M.
+  - "N 1-on-1s" list dialog (meetings column): keep a dialog (short list); a panel is possible.
+  - Booking 1-on-1, meeting request, confirmations, What's new, map, who-are-you, stats figure,
+    Liked by: keep dialogs (ADR, short tasks). Settings, auth, notifications, my comments, admin
+    (own frame and nav): keep pages. Comment edit: already inline in the panels.
+  - Gaps if forms move in: `useDiscardGuard` only watches focused-and-changed text fields (not
+    selects, checkboxes, dates, browser Back, `beforeunload`); the session and proposal forms do not
+    use it yet.
+
+- 22h: before/after screenshots were not kept (temporary files outside the repo).
+- 22f issue: creating the GitHub issue was denied by the permission system. Body drafted (this
+  survey + the 5 questions); type Feature, priority Low, `component: ui/ux`. The owner or a run with
+  permission should create it.
+
 ## Problems
 
 - #200: not checked in a browser at 390px (long URL, fixed vote bar); CSS read only.
 
 ## Questions
+
+- 22f (owner): (1) Should create/edit forms become a panel kind at all, which amends ADR 0020's
+  "tasks stay dialogs"? (2) If yes, order: proposal forms, edit profile, then session forms? (3)
+  Session forms in a 320-800px panel, or keep them full-page? (4) "Need ideas?" stays a dialog, or
+  moves with the proposal form? (5) Quick Voting stays a page? Nothing implemented before answers.
 
 - `profile-photo.spec.ts:9` fails without my changes too (about-me heading x 849 < 1184: the wide
   two-column layout is not reached at the default viewport). Separate fix.
