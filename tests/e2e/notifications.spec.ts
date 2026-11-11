@@ -132,7 +132,7 @@ test("acts on the ticked notifications and nothing else @013-US2", async ({
   // Only the ticked one was read; the other is still waiting.
   await expect(bell(page)).toHaveAccessibleName(/1 unread/);
 
-  await actions.getByRole("checkbox", { name: "Select all" }).check();
+  await actions.getByRole("checkbox", { name: "Select page" }).check();
   await actions.getByRole("button", { name: "Delete" }).click();
   await page
     .getByRole("dialog")

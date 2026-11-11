@@ -534,7 +534,7 @@ It is the same site either way, signed in as the same name.
 ## Notifications
 
 The bell in the header counts what is waiting for you, and the notifications page lists everything
-newest first. You'll be told when:
+newest first, 50 to a page. You'll be told when:
 
 - a session you host or have RSVP'd to is moved or deleted
 - a session you have RSVP'd to loses its last host
@@ -548,7 +548,7 @@ newest first. You'll be told when:
 
 **Clicking a notification marks it read and takes you straight to what happened.** If you'd rather
 clear one without opening it, use the tick beside it. To handle a batch, tick the ones you mean — or
-**Select all** for everything on the page — and then **Mark as read** or **Delete**. Deleting is
+**Select page** for everything on the page — and then **Mark as read** or **Delete**. Deleting is
 permanent: the notification is gone for good, so the page keeps only what you choose to keep.
 
 Notifications appear whether or not the event has email set up, and turning an email off (below)

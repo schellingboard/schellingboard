@@ -8,7 +8,7 @@ import { createObservable } from "./store";
 type Page = (typeof myNotificationsSchema)["_output"];
 export type NotificationItem = Page["items"][number];
 
-export const PAGE_SIZE = 20;
+export const PAGE_SIZE = 50;
 
 export type NotificationsState =
   | { status: "loading" }
