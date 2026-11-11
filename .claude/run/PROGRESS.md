@@ -14,6 +14,11 @@
 - tests/unit/stats/correlation.test.ts "spearman property" failed once under fast-check in
   `make test-coverage`, passed on rerun; flaky, unrelated.
 
+- #861 open questions, defaults assumed by the split (the proposal's, owner liked it): name "Shared
+  moments" (owner unsure, no better one); amber `warning` colour; "During Lunch" popup line included
+  in step 11; closing #465 is for the maintainer. Phase 1 admin ships before attendees see anything,
+  so the changelog entry waits for step 11.
+
 ## Next step
 
 Step 7.
