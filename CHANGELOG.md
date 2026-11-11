@@ -65,6 +65,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **Icon choices in the event settings show the icons** (#1588): they were listed by name only.
 - **"My schedule" menu works on the grid** (#1587): its options opened hidden behind the grid
   headers.
 - **Ctrl+Z undoes Markdown toolbar formatting** (#1145): after clicking Bold, a link or a list
