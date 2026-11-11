@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **See and turn off the devices that get your notifications** (#969): Settings lists each phone or
+  laptop with notifications on, so a lost one can be switched off from another.
 - **Hover over a name to see who it is** (#789): with a mouse, a small card shows the person's photo
   and short summary; clicking still opens the profile.
 - **Shared moments on the schedule** (#861): organizers mark lunch or a keynote as a striped band

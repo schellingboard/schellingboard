@@ -90,7 +90,7 @@ describe("notifications on this device", { tags: ["013-US3"] }, () => {
     );
 
     expect(await screen.findByText("On for this device.")).toBeTruthy();
-    expect(calls[0]).toMatchObject({
+    expect(calls.find((c) => c.method === "POST")).toMatchObject({
       method: "POST",
       path: "/api/v1/me/push-subscriptions",
       body: { endpoint: ENDPOINT, p256dh: "p", auth: "a" },
@@ -130,9 +130,124 @@ describe("notifications on this device", { tags: ["013-US3"] }, () => {
     );
 
     await waitFor(() => expect(current()).toBeNull());
-    expect(calls[1]).toMatchObject({
+    expect(calls.find((c) => c.method === "DELETE")).toMatchObject({
       method: "DELETE",
       path: `/api/v1/me/push-subscriptions?endpoint=${encodeURIComponent(ENDPOINT)}`,
+    });
+  });
+
+  describe("the devices that have notifications on", () => {
+    const devices = {
+      items: [
+        {
+          id: "d1",
+          host: "fcm.googleapis.com",
+          createdAt: "2026-10-01T10:00:00Z",
+          current: true,
+        },
+        {
+          id: "d2",
+          host: "web.push.apple.com",
+          createdAt: "2026-10-05T10:00:00Z",
+          current: false,
+        },
+      ],
+    };
+    const server = (call: { method: string; path: string }) => {
+      if (call.path.startsWith("/api/v1/me/push-devices"))
+        return call.method === "GET" ? Response.json(devices) : noContent();
+      return call.method === "GET"
+        ? Response.json({ enabled: true })
+        : noContent();
+    };
+
+    it("lists them, marks this one and asks with this browser's endpoint", async () => {
+      browser({ subscribed: true });
+      const calls = setup(server);
+
+      const list = await screen.findByRole("list", {
+        name: "Notifications on your devices",
+      });
+
+      expect(list.textContent).toContain("fcm.googleapis.com");
+      expect(list.textContent).toContain("web.push.apple.com");
+      expect(list.textContent).toContain("This device");
+      expect(calls.map((c) => c.path)).toContain(
+        `/api/v1/me/push-devices?endpoint=${encodeURIComponent(ENDPOINT)}`
+      );
+    });
+
+    it("turns another device off by its id and leaves this browser on", async () => {
+      const current = browser({ subscribed: true });
+      const calls = setup(server);
+
+      await userEvent.click(
+        await screen.findByRole("button", {
+          name: /Turn off web\.push\.apple\.com/,
+        })
+      );
+
+      await waitFor(() =>
+        expect(calls.find((c) => c.method === "DELETE")).toMatchObject({
+          path: "/api/v1/me/push-devices/d2",
+        })
+      );
+      expect(current()).not.toBeNull();
+    });
+
+    it("says so when a device cannot be turned off", async () => {
+      browser({ subscribed: true });
+      setup((call) =>
+        call.method === "DELETE"
+          ? new Response("down", { status: 500 })
+          : server(call)
+      );
+
+      await userEvent.click(
+        await screen.findByRole("button", {
+          name: /Turn off web\.push\.apple\.com/,
+        })
+      );
+
+      expect(await screen.findByRole("alert")).toBeTruthy();
+      expect(screen.getByRole("list").textContent).toContain(
+        "web.push.apple.com"
+      );
+    });
+
+    it("announces a device turned off and drops its row", async () => {
+      browser({ subscribed: true });
+      setup(server);
+
+      await userEvent.click(
+        await screen.findByRole("button", {
+          name: /Turn off web\.push\.apple\.com/,
+        })
+      );
+
+      expect(await screen.findByRole("status")).toHaveProperty(
+        "textContent",
+        expect.stringContaining("Turned off for web.push.apple.com")
+      );
+      expect(screen.getByRole("list").textContent).not.toContain(
+        "web.push.apple.com"
+      );
+    });
+
+    it("turning this device's row off also ends the browser subscription", async () => {
+      const current = browser({ subscribed: true });
+      setup(server);
+
+      await userEvent.click(
+        await screen.findByRole("button", {
+          name: /Turn off fcm\.googleapis\.com/,
+        })
+      );
+
+      await waitFor(() => expect(current()).toBeNull());
+      expect(
+        await screen.findByRole("button", { name: "Turn on for this device" })
+      ).toBeTruthy();
     });
   });
 });

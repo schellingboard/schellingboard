@@ -28,3 +28,22 @@ export const pushKeySchema = z.object({
     .string()
     .describe("The VAPID key a browser passes to pushManager.subscribe"),
 });
+
+export const pushDeviceQuerySchema = z.object({
+  endpoint: z
+    .string()
+    .max(2000)
+    .optional()
+    .describe("This browser's endpoint, so the answer can mark its row"),
+});
+
+export const pushDeviceSchema = z.object({
+  id: z.string().describe("Opaque; the endpoint itself is never sent back"),
+  host: z.string().describe("The push service, the only hint about the device"),
+  createdAt: z.iso.datetime({ offset: true }),
+  current: z.boolean().describe("Whether this is the browser that asked"),
+});
+
+export const pushDevicesSchema = z.object({
+  items: z.array(pushDeviceSchema),
+});

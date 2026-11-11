@@ -546,6 +546,9 @@ never hides it here.
 reach your phone or laptop when the site isn't open.
 
 - **Each device is separate.** Turning it on on your phone doesn't turn it on on your laptop.
+- **Turn off a lost or old device from anywhere.** Under the switch, Settings lists every device
+  with notifications on for you: the date it was turned on and the push service it uses (there is no
+  device name). **Turn off** stops notifications reaching it; the one you are on is marked.
 - **A device gets all of them.** The email settings below only decide what is emailed; to stop the
   notifications on a device, turn it off there.
 - **On iPhone and iPad it only works once the site is

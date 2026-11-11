@@ -51,6 +51,10 @@
   every assertion of the toolbar test, undo included, passed; the test then failed only on the
   console guard (a 401 from `/api/v1/me/identity` before login, which Firefox does not log).
 
+- #969: new routes `GET /me/push-devices` and `DELETE /me/push-devices/{id}` beside the old
+  endpoint-based check/forget routes (kept: the main toggle uses them). No E2E (push). Follow-up: `isEnabledHere` could be derived
+  from `listDevices` (`some(current)`) and the old routes dropped.
+
 ## Next step
 
-Step 16.
+Step 17.

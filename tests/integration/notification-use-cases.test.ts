@@ -317,6 +317,67 @@ describe("push devices", () => {
     }
   );
 
+  it(
+    "lists only the acting guest's devices, marks this one, and removes one by id",
+    { tags: ["013-US3"] },
+    async () => {
+      const ada = await createGuest();
+      const grace = await createGuest();
+      const other = { ...DEVICE, endpoint: "https://push.example/laptop" };
+      value(await notifications().subscribeToPush(open(ada.id), DEVICE, now()));
+      value(await notifications().subscribeToPush(open(ada.id), other, now()));
+      value(
+        await notifications().subscribeToPush(
+          open(grace.id),
+          { ...DEVICE, endpoint: "https://push.example/graces" },
+          now()
+        )
+      );
+
+      const devices = value(
+        await notifications().listPushDevices(open(ada.id), {
+          endpoint: DEVICE.endpoint,
+        })
+      );
+      expect(devices).toHaveLength(2);
+      expect(devices.filter((d) => d.current).map((d) => d.host)).toEqual([
+        "push.example",
+      ]);
+      expect(JSON.stringify(devices)).not.toContain("this-phone");
+
+      const laptop = devices.find((d) => !d.current)!;
+      expect(
+        code(await notifications().removePushDevice(open(grace.id), laptop))
+      ).toBe("ok");
+      expect(
+        await getRepositories().push.listSubscriptions(ada.id)
+      ).toHaveLength(2);
+
+      value(await notifications().removePushDevice(open(ada.id), laptop));
+      expect(
+        (await getRepositories().push.listSubscriptions(ada.id)).map(
+          (s) => s.endpoint
+        )
+      ).toEqual([DEVICE.endpoint]);
+    }
+  );
+
+  it("lists a device whose stored endpoint is not a URL", async () => {
+    const ada = await createGuest();
+    await getRepositories().push.saveSubscription({
+      guestId: ada.id,
+      ...DEVICE,
+      endpoint: "not a url",
+      createdAt: now(),
+    });
+
+    const devices = value(
+      await notifications().listPushDevices(open(ada.id), {})
+    );
+
+    expect(devices.map((d) => d.host)).toEqual(["unknown"]);
+  });
+
   it("refuses nobody", { tags: ["013-US3"] }, async () => {
     expect(
       code(await notifications().subscribeToPush(NOBODY, DEVICE, now()))
