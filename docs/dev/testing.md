@@ -223,6 +223,27 @@ and the browser share your machine's timezone, so code that formats a date in th
 the same text on both sides and the fault stays invisible. In the image it does not. Dates must be
 formatted in an explicit zone — the event's — never the process's.
 
+## Load testing
+
+`scripts/load/` simulates attendees against a throwaway server with its own port and database (the
+`large` seed, as `make screenshots` does). It is not part of `make precommit` or `make test`.
+
+- `make load USERS=1000 DURATION=15m` — background load while you explore the UI by hand. The output
+  names the URL and site password.
+- `make load-test` — 200 attendees for a minute, then fails on a 5xx, a 429, a p95/p99 above the
+  thresholds in `scripts/load/index.ts`, or RSVP counts that differ from the confirmed responses.
+  `--report out.json` writes the figures; `--no-build` reuses `dist/`.
+
+Each attendee opens the app (shell, assets, identity, both snapshots), holds the change feed open,
+then acts every 5–30 s: about 90 % reads, 8 % RSVP or vote, 2 % comment. The weights are at the top
+of `scripts/load/attendee.ts`. Guests sign in through `login_sessions` rows written straight to the
+database, which gets each one its own rate-limit bucket. Opening the app is judged apart from steady
+use, since the whole crowd arriving within seconds is the worst case. No SMTP or push keys are set,
+so no notification leaves the machine.
+
+The script calls the API, not a browser, so it cannot count how many identity requests one in-app
+navigation makes: it counts one per page load.
+
 ## Flake hunting
 
 A test that fails once in twenty runs is invisible to a normal `make test-e2e`.

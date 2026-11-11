@@ -93,7 +93,8 @@ export function resolveProfile(): SeedProfile {
   return process.env.NODE_ENV === "test" ? "small" : "large";
 }
 
-const BULK_GUEST_COUNT = 360; // + 40 curated = 400 total
+// + 40 curated = 400 total; SEED_BULK_GUESTS sizes the load test (scripts/load).
+const BULK_GUEST_COUNT = Number(process.env.SEED_BULK_GUESTS) || 360;
 // Proposals per event (Alpha is mid-proposal-phase, so fewer). The small
 // numbers predate profiles and are what the E2E suite was written against.
 const PROPOSAL_COUNTS: Record<SeedProfile, number[]> = {

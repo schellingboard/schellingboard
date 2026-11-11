@@ -1,16 +1,15 @@
 # Plan: issue backlog
 
-
 Each step is one GitHub issue. The issue holds all relevant information: read it first with
 `gh issue view <n> --comments`. Follow its acceptance criteria. If the issue and the code disagree,
-or the issue leaves a decision open, record it under "Questions" in PROGRESS.md. Add `fixes #<n>`
-to the commit footer. Each step is one coherent commit with TDD, tests, `CHANGELOG.md` and
+or the issue leaves a decision open, record it under "Questions" in PROGRESS.md. Add `fixes #<n>` to
+the commit footer. Each step is one coherent commit with TDD, tests, `CHANGELOG.md` and
 `docs/public/` as AGENTS.md says. If a step is too big for one commit, split it here first. Run only
 the E2E specs a step touches; the user runs the full suite at the end.
 
 ## Steps
 
-1. **#691** Load test with N attendees.
+1. DONE **#691** Load test: `scripts/load/`, `make load`, `make load-test`, docs in testing.md.
 2. **#200** Quick Voting breaks with long links.
 3. **#1070** Multi-line profile prompt answers.
 4. **#901** Remove comments left on your profile.
