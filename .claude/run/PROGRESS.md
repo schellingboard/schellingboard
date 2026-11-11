@@ -2,10 +2,9 @@
 
 ## Decisions
 
-- 23b (#831): notifications load server chunks of 50 on demand: until the requested page plus one
-  row is loaded (deep links work), so Next stays on offer; `Pager` `more` shows "100+". "Select
-  page" and the ticks are per page. Agenda moved to its own step 23c: it needs an owner decision
-  (reveal, stepper, now line, folds across pages).
+- 23b (#831): notifications load server chunks of 50 on demand, so Next stays on offer while more
+  exist; "Select page" and the ticks are per page. Agenda: owner decided it stays one list (see
+  docs/dev/web-app.md, "Paging long lists").
 - 23d (#831): `usePaging` (ui/use-paging.tsx) bundles pageOf, handlers, ref and pager for lists;
   events, locations (reorder arrows use the absolute index) and stats tables use it. Stats tables
   keep their page in component state, not the URL: one page holds several of them, and the shared
@@ -168,4 +167,4 @@
 
 ## Next step
 
-Step 23c (docs-only, `fixes #831`), then wait for the coordinator.
+No step is open. Wait for the coordinator (step 26 onwards, 35 only on request).
