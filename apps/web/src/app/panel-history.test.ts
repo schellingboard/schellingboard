@@ -1,9 +1,11 @@
 // @module-tag 007-US5
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { createMemoryHistory } from "@tanstack/react-router";
 import {
   backgroundOf,
   closePanel,
+  createScrollReset,
+  entryIndexOf,
   landOnPanel,
   openPanel,
   panelOf,
@@ -140,5 +142,42 @@ describe("panel history", () => {
     closePanel(history);
     expect(history.location.pathname).toBe("/conf/schedule");
     expect(history.length).toBe(2);
+  });
+});
+
+describe("scroll reset", () => {
+  it("goes to the top only when the page behind changes", () => {
+    const history = start();
+    const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+    const reset = createScrollReset();
+    const at = () => reset({ location: history.location });
+
+    expect(at()).toBe(false);
+    expect(scrollTo).toHaveBeenCalledTimes(1);
+    history.replace("/conf/schedule?view=grid");
+    at();
+    openPanel(history, session("s1"));
+    at();
+    closePanel(history);
+    at();
+    expect(scrollTo).toHaveBeenCalledTimes(1);
+    history.push("/conf/proposals");
+    at();
+    expect(scrollTo).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("the entry of the page behind a panel", () => {
+  it("is the page's own position, whatever panels are open over it", () => {
+    const history = start();
+    history.push("/conf/proposals");
+    const page = entryIndexOf(history.location);
+    openPanel(history, session("s1"));
+    openPanel(
+      history,
+      { kind: "proposal", slug: "conf", id: "p1" },
+      { fromPanel: true }
+    );
+    expect(entryIndexOf(history.location)).toBe(page);
   });
 });

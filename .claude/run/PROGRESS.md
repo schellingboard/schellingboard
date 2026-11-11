@@ -1,6 +1,6 @@
 # Progress
 
-Steps 1 (c344e56d), 2, 3, 4, 5, 6, 7 and 8 done.
+Steps 1 (c344e56d), 2, 3, 4, 5, 6, 7, 8 and 9 done.
 
 - Panel: `ui/side-panel.tsx`; history: `app/panel-history.ts` (`PanelItem` union: session, proposal,
   profile, meeting); host: `app/panel-host.tsx`; links opened in the panel via the `SpaLinks`
@@ -26,7 +26,14 @@ Steps 1 (c344e56d), 2, 3, 4, 5, 6, 7 and 8 done.
   `replace`. Reveal-seeded days stay local state, merged with `unfold`.
 - Step 8 done: `filterFrom`/`sortFrom`/`withFilter`/`withSort` in `list-model.ts`; `openapi-check`
   cannot run here (needs a server on :3000).
-- Next: step 9.
+- Step 9 done: `ui/use-scroll-restoration.ts` keyed by `useHistoryEntry` (page index minus panel
+  depth, path; pinned at mount); window restored a frame after the router reset.
+  `createScrollReset()` is the router `scrollRestoration` hook: it resets the window itself on a
+  page change and always answers no, so the router restores nothing. The directory waits for its
+  rows. because the router scrolls to top after render) keyed by `useHistoryEntry` (index:path,
+  pinned at mount). Router `scrollRestoration` is `createScrollPolicy()`: no scroll reset while the
+  page behind is unchanged (panels, replaces). The directory waits for its rows (`ready`).
+- Next: step 10.
 
 ## Questions
 

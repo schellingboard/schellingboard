@@ -13,6 +13,8 @@ import {
   type DirectoryState,
 } from "../queries/directory";
 import { toEvent } from "../replica/selectors";
+import { useScrollRestoration } from "../ui/use-scroll-restoration";
+import { useHistoryEntry } from "./use-history-entry";
 import { InAppLinks } from "./in-app-links";
 import { PageNotice } from "./page-notice";
 import { PanelLanding } from "./panel-landing";
@@ -83,6 +85,11 @@ function Directory({ entries, status, now, viewerId, meetingsEnabled }: View) {
   const { params, change } = useUrlSearchParams();
   const { setRows } = useProfileWalk();
   const [randomSeed] = useState(newSortSeed);
+  useScrollRestoration(
+    null,
+    useHistoryEntry(),
+    entries.length > 0 || (status !== "loading" && status !== "idle")
+  );
 
   return (
     <DirectoryScreen

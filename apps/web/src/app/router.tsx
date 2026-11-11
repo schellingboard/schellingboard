@@ -8,6 +8,7 @@ import {
   useRouter,
   type RouterHistory,
 } from "@tanstack/react-router";
+import { createScrollReset } from "./panel-history";
 import { Suspense, type ReactElement } from "react";
 import {
   LoginPage,
@@ -415,6 +416,7 @@ export function createAppRouter(
       catchAll,
     ]),
     history,
+    scrollRestoration: createScrollReset(),
   });
 }
 

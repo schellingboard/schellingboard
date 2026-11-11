@@ -348,6 +348,34 @@ test("the proposal list keeps its search and sort through a reload and Back @004
   await expect(page.getByLabel("Sort by")).toHaveValue("title-asc");
 });
 
+test("the proposal list comes back to where it was scrolled after Back @004-US5", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 300 });
+  await loginAndGoto(page, "/Conference-Alpha/proposals");
+  await selectUser(page, /Bob Test/i);
+  await expect(
+    page.getByRole("row", { name: /Hands-on Docker and Kubernetes/ })
+  ).toBeVisible();
+
+  await page.mouse.wheel(0, 400);
+  await expect
+    .poll(() => page.evaluate(() => window.scrollY))
+    .toBeGreaterThan(0);
+  const before = await page.evaluate(() => window.scrollY);
+
+  await page.getByRole("link", { name: /Add Proposal/i }).click();
+  await expect(page.getByLabel("Title")).toBeVisible();
+  await page.goBack();
+
+  await expect(
+    page.getByRole("row", { name: /Hands-on Docker and Kubernetes/ })
+  ).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => window.scrollY))
+    .toBeGreaterThan(before - 5);
+});
+
 test("filters the proposal list down to your own proposals @004-US5", async ({
   page,
 }) => {
