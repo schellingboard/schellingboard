@@ -85,7 +85,7 @@ export function GridView({
                   onToggle={() =>
                     filtering ? toggleEmpty(day.id) : onToggleFold(day.id)
                   }
-                  reason={filtering ? "no matches" : undefined}
+                  noMatches={filtering}
                 />
               )}
               {!folded && (

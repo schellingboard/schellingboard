@@ -1,4 +1,7 @@
 import { useEffect, useId, useRef, useState, type Ref } from "react";
+import { i18n } from "@lingui/core";
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { cx } from "../../ui/cx";
 import { ArrowUpIcon, ChevronDownSmallIcon } from "../../ui/icons";
 import { SearchInput } from "../../ui/search-input";
@@ -47,18 +50,20 @@ export function ScheduleFilters({
   /** Where every match stays in place, Enter steps to the next one. */
   onStep?: (direction: 1 | -1) => void;
 }) {
+  const kinds = mine
+    ? MINE_KINDS.filter((k) => mine.kinds.includes(k.value))
+        .map((k) => i18n._(k.summary))
+        .join(", ")
+    : "";
   const active = [
-    ...(mine?.active
-      ? [
-          `My schedule (${MINE_KINDS.filter((k) => mine.kinds.includes(k.value))
-            .map((k) => k.summary)
-            .join(", ")})`,
-        ]
-      : []),
-    ...(clashes?.active ? ["Clashes"] : []),
-    ...(hidden?.active ? ["Hidden"] : []),
+    ...(mine?.active ? [t`My schedule (${kinds})`] : []),
+    ...(clashes?.active ? [t`Clashes`] : []),
+    ...(hidden?.active ? [t`Hidden`] : []),
     ...(search.trim() === "" ? [] : [`"${search.trim()}"`]),
   ];
+  const matching = count?.matching ?? 0;
+  const total = count?.total ?? 0;
+  const matchCount = t`${matching} of ${total} match`;
   // Lifted only while the menu is open: always-on, the bar would paint over
   // the grid's sticky headers as it scrolls away.
   const width =
@@ -77,8 +82,8 @@ export function ScheduleFilters({
             className="w-full sm:w-auto sm:flex-1"
             // text-base below sm: iOS zooms into inputs with smaller text.
             inputClassName="h-9 rounded-md border border-line bg-surface-raised px-3 text-base sm:text-sm placeholder-fg-subtle focus:outline-0 focus:ring-2 focus:ring-brand-accent focus:border-transparent"
-            placeholder="Search sessions"
-            aria-label="Search sessions"
+            placeholder={t`Search sessions`}
+            aria-label={t`Search sessions`}
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
             onClear={() => onSearchChange("")}
@@ -91,7 +96,7 @@ export function ScheduleFilters({
           {mine && (
             <div
               role="group"
-              aria-label="Filter sessions"
+              aria-label={t`Filter sessions`}
               className="flex flex-wrap gap-2"
             >
               <MyScheduleChip
@@ -103,14 +108,14 @@ export function ScheduleFilters({
                 <FilterChip
                   active={clashes.active}
                   onClick={onToggleClashes}
-                  label="Clashes"
+                  label={t`Clashes`}
                 />
               )}
               {hidden && (
                 <FilterChip
                   active={hidden.active}
                   onClick={onToggleHidden}
-                  label="Hidden"
+                  label={t`Hidden`}
                 />
               )}
             </div>
@@ -136,12 +141,10 @@ export function ScheduleFilters({
               className="flex min-w-0 items-center gap-1 hover:text-fg-muted"
             >
               <span className="truncate">
-                {[`${count.matching} of ${count.total} match`, ...active].join(
-                  " · "
-                )}
+                {[matchCount, ...active].join(" · ")}
               </span>
               <ArrowUpIcon aria-hidden className="h-3.5 w-3.5 shrink-0" />
-              <span className="sr-only">, back to the search</span>
+              <span className="sr-only">{t`, back to the search`}</span>
             </button>
             <span aria-hidden>·</span>
             <button
@@ -149,7 +152,7 @@ export function ScheduleFilters({
               onClick={onShowAll}
               className="shrink-0 font-semibold text-brand-fg hover:text-brand-fg-hover"
             >
-              Show all
+              <Trans>Show all</Trans>
             </button>
           </p>
         </div>
@@ -241,12 +244,12 @@ function MyScheduleChip({
           focus
         )}
       >
-        My schedule
+        <Trans>My schedule</Trans>
       </button>
       <button
         ref={chevron}
         type="button"
-        aria-label="Choose what My schedule shows"
+        aria-label={t`Choose what My schedule shows`}
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
         onClick={() => setOpen(!open)}
@@ -263,7 +266,9 @@ function MyScheduleChip({
           id={menuId}
           className="absolute left-0 top-full z-40 mt-1 w-44 rounded-md bg-surface-raised px-3 py-2 shadow-lg ring-1 ring-line-subtle"
         >
-          <legend className="sr-only">My schedule shows</legend>
+          <legend className="sr-only">
+            <Trans>My schedule shows</Trans>
+          </legend>
           {MINE_KINDS.filter(
             (kind) =>
               kind.value !== "bookmarked" ||
@@ -286,7 +291,7 @@ function MyScheduleChip({
                   }}
                   className="h-5 w-5"
                 />
-                {kind.label}
+                {i18n._(kind.label)}
               </label>
             );
           })}

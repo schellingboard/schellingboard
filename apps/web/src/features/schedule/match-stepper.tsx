@@ -1,4 +1,5 @@
 import { ChevronDownSmallIcon, ChevronUpSmallIcon } from "../../ui/icons";
+import { t } from "@lingui/core/macro";
 
 const STEP_CLASS =
   "flex h-10 w-10 items-center justify-center rounded-full text-fg-muted hover:bg-surface-hover hover:text-fg focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent sm:h-8 sm:w-8";
@@ -20,13 +21,13 @@ export function MatchStepper({
   return (
     <div
       role="group"
-      aria-label="Step through matches"
+      aria-label={t`Step through matches`}
       style={{ bottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}
       className="absolute right-4 z-30 flex items-center gap-0.5 rounded-full border border-line bg-surface-raised p-0.5 text-xs text-fg-subtle shadow-md"
     >
       <button
         type="button"
-        aria-label="Previous match"
+        aria-label={t`Previous match`}
         onClick={() => onStep(-1)}
         className={STEP_CLASS}
       >
@@ -40,7 +41,7 @@ export function MatchStepper({
       </span>
       <button
         type="button"
-        aria-label="Next match"
+        aria-label={t`Next match`}
         onClick={() => onStep(1)}
         className={STEP_CLASS}
       >

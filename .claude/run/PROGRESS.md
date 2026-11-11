@@ -213,6 +213,8 @@
 
 ## Next step
 
-Step 28d (schedule strings). Then the rest of 28, 29 onwards.
+Step 28e (session panel, session block, meetings column, 1-on-1 dialogs). Then the rest of 28, 29 onwards.
 
 - 26 follow-up: en-GB gives lowercase "9 am" on the 12-hour axis (accepted); the Settings hint is built from the formatted 14:00 example. theme.spec.ts:44 still fails (nested ThemeProvider).
+
+- 28d: allowlist grew ignoreFunctions (URLSearchParams/Map/DOM calls, toFormat), ignoreNames (layout, tone, behavior, ...), `[A-Z_0-9]` constants. `MINE_KINDS` and `describeClash` now use msg/t. `DayFoldBar` takes `noMatches` instead of a `reason` string. Not done: `statusLine` text in meeting-rules.ts (28e).

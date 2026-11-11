@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
 import { ChevronDownIcon, ChevronRightIcon } from "../../ui/icons";
+import { t } from "@lingui/core/macro";
 
 /**
  * Header for a day that has passed, or that has nothing a search is looking
@@ -11,13 +12,13 @@ export function DayFoldBar({
   timezone,
   folded,
   onToggle,
-  reason = "day has passed",
+  noMatches = false,
 }: {
   day: { start: Date };
   timezone: string;
   folded: boolean;
   onToggle: () => void;
-  reason?: string;
+  noMatches?: boolean;
 }) {
   const date = DateTime.fromJSDate(day.start).setZone(timezone);
   const Chevron = folded ? ChevronRightIcon : ChevronDownIcon;
@@ -32,7 +33,13 @@ export function DayFoldBar({
         <Chevron className="h-3.5 w-3.5 stroke-2" />
         <span className="font-medium">{date.toFormat("EEEE, MMMM d")}</span>
         <span>
-          · {reason} · {folded ? "show" : "hide"}
+          {noMatches
+            ? folded
+              ? t`· no matches · show`
+              : t`· no matches · hide`
+            : folded
+              ? t`· day has passed · show`
+              : t`· day has passed · hide`}
         </span>
       </span>
     </button>
