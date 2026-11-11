@@ -75,7 +75,7 @@ export function QuickVotingScreen({
   const votingEnabled = inVotingPhase(toEvent(snapshot.event), now);
 
   return (
-    <div className="relative mx-auto max-w-2xl px-4 pb-32">
+    <div className="relative mx-auto max-w-2xl px-4 pb-32 wrap-anywhere">
       {back}
       <p className="mb-4 mt-4 text-lg">{snapshot.event.name} Quick Voting</p>
       <div className="mb-6 text-fg-muted">
