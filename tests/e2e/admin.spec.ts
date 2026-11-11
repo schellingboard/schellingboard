@@ -1524,7 +1524,7 @@ test.describe("Admin UI sessions", () => {
     }
 
     // Pick a host through the searchable multi-select (opens on focus).
-    await sessions.getByLabel("Hosts").click();
+    await sessions.getByRole("combobox", { name: "Hosts" }).click();
     await page.keyboard.type("Alice");
     await page.getByRole("option", { name: "Alice Test" }).click();
     await page.keyboard.press("Escape");
