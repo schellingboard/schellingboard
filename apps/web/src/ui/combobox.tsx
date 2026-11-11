@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { cx } from "./cx";
 import { ChevronDownIcon } from "./icons";
 
@@ -37,6 +37,39 @@ export function Combobox({
   const listId = useId();
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
+  const wrapper = useRef<HTMLDivElement>(null);
+  const input = useRef<HTMLInputElement>(null);
+
+  // iOS Safari does not blur on a whitespace tap, so the list stays open. A
+  // touch's click must not hit a link below; a mouse's may (it blurs anyway).
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (wrapper.current?.contains(e.target as Node)) return;
+      setOpen(false);
+      setActive(-1);
+      input.current?.blur();
+      if (e.pointerType === "mouse") return;
+      const swallow = (click: Event) => {
+        click.preventDefault();
+        click.stopPropagation();
+      };
+      const disarm = () => {
+        document.removeEventListener("click", swallow, true);
+        document.removeEventListener("pointerup", onUp, true);
+        document.removeEventListener("pointercancel", disarm, true);
+        document.removeEventListener("pointerdown", disarm, true);
+      };
+      const onUp = () => setTimeout(disarm, 500);
+      document.addEventListener("click", swallow, true);
+      document.addEventListener("pointerup", onUp, true);
+      document.addEventListener("pointercancel", disarm, true);
+      document.addEventListener("pointerdown", disarm, true);
+    };
+    document.addEventListener("pointerdown", onPointerDown, true);
+    return () =>
+      document.removeEventListener("pointerdown", onPointerDown, true);
+  }, [open]);
 
   const choose = (option: string) => {
     onChange(option);
@@ -45,8 +78,9 @@ export function Combobox({
   };
 
   return (
-    <div className="relative">
+    <div ref={wrapper} className="relative">
       <input
+        ref={input}
         id={id}
         name={name}
         role="combobox"
