@@ -1,5 +1,6 @@
 import { ExclamationTriangleIcon } from "./icons";
 import type { FieldErrors } from "../commands/mutation";
+import { plural, t } from "@lingui/core/macro";
 
 /**
  * Every outstanding error, repeated next to the submit button: on a long form
@@ -19,7 +20,6 @@ export function FormErrorSummary({
   const entries = Object.entries(fields);
   const count = entries.length + (error ? 1 : 0);
   if (count === 0) return null;
-  const problems = count === 1 ? "is a problem" : `are ${count} problems`;
   return (
     <div
       role="alert"
@@ -27,8 +27,12 @@ export function FormErrorSummary({
     >
       <p className="flex items-center gap-1.5 text-sm font-medium">
         <ExclamationTriangleIcon className="h-5 w-5 shrink-0" />
-        There {problems}
-        {entries.length > 0 ? " to fix:" : ":"}
+        {entries.length > 0
+          ? plural(count, {
+              one: "There is a problem to fix:",
+              other: "There are # problems to fix:",
+            })
+          : t`There is a problem:`}
       </p>
       <ul className="mt-1 list-disc space-y-1 ps-5 text-sm">
         {entries.map(([name, message]) => (

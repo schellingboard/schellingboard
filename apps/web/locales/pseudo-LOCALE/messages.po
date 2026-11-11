@@ -6,3 +6,266 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: pseudo-LOCALE\n"
+
+#: src/ui/phase-bar.tsx:63
+msgid "(done)"
+msgstr ""
+
+#: src/ui/phase-bar.tsx:61
+msgid "(skipped)"
+msgstr ""
+
+#: src/ui/form-error-summary.tsx:31
+msgid "{count, plural, one {There is a problem to fix:} other {There are # problems to fix:}}"
+msgstr ""
+
+#: src/ui/data-table.tsx:52
+msgid "{selectedCount, plural, one {# selected} other {# selected}}"
+msgstr ""
+
+#: src/ui/pager.tsx:63
+msgid "{total, plural, one {# result} other {# results}}"
+msgstr ""
+
+#: src/ui/pager.tsx:62
+msgid "{total, plural, one {#+ result} other {#+ results}}"
+msgstr ""
+
+#: src/ui/charts/heatmap.tsx:66
+msgid "{valueLabel}: 0 to {max}"
+msgstr ""
+
+#: src/ui/pager.tsx:83
+msgctxt "Rows per page: every row"
+msgid "All"
+msgstr ""
+
+#: src/ui/data-table.tsx:60
+msgid "Assign selected"
+msgstr ""
+
+#: src/ui/side-panel.tsx:147
+msgctxt "Side panel: go to the previous panel"
+msgid "Back"
+msgstr ""
+
+#: src/ui/data-table.tsx:46
+msgid "Bulk actions"
+msgstr ""
+
+#: src/ui/data-table.tsx:75
+msgctxt "Bulk actions: clear the selection"
+msgid "Clear"
+msgstr ""
+
+#: src/ui/search-input.tsx:36
+msgid "Clear search"
+msgstr ""
+
+#: src/ui/dialog.tsx:116
+#: src/ui/side-panel.tsx:163
+msgid "Close"
+msgstr ""
+
+#: src/ui/copy-link-button.tsx:26
+msgid "Copy link"
+msgstr ""
+
+#: src/ui/copy-link-button.tsx:16
+msgid "Could not copy the link"
+msgstr ""
+
+#: src/ui/use-discard-guard.tsx:89
+msgid "Discard"
+msgstr ""
+
+#: src/ui/use-discard-guard.tsx:79
+msgid "Discard what you have typed?"
+msgstr ""
+
+#: src/ui/notices.tsx:99
+msgid "Dismiss"
+msgstr ""
+
+#: src/ui/charts/prediction-scatter.tsx:72
+msgid "Dots are the model's midpoint, thick bars its 50% range, thin bars its 80% range. On the dashed line the prediction was exact. The model was fitted on one event, n = 13."
+msgstr ""
+
+#: src/ui/markdown-textarea.tsx:91
+msgctxt "Markdown field: write mode"
+msgid "Edit"
+msgstr ""
+
+#: src/ui/phase-bar.tsx:42
+msgid "Event phases"
+msgstr ""
+
+#: src/ui/resize-image.ts:77
+msgid "Failed to draw image"
+msgstr ""
+
+#: src/ui/resize-image.ts:48
+msgid "Failed to resize image"
+msgstr ""
+
+#: src/ui/list-toolbar.tsx:21
+msgid "Filters"
+msgstr ""
+
+#: src/ui/pager.tsx:96
+msgctxt "Pager: first page"
+msgid "First"
+msgstr ""
+
+#: src/ui/pager.tsx:93
+msgid "First page"
+msgstr ""
+
+#: src/ui/use-discard-guard.tsx:92
+msgid "Keep editing"
+msgstr ""
+
+#: src/ui/pager.tsx:155
+msgctxt "Pager: last page"
+msgid "Last"
+msgstr ""
+
+#: src/ui/pager.tsx:152
+msgid "Last page"
+msgstr ""
+
+#: src/ui/copy-link-button.tsx:14
+msgid "Link copied"
+msgstr ""
+
+#: src/ui/form.tsx:185
+#: src/ui/form.tsx:343
+msgid "Markdown supported"
+msgstr ""
+
+#: src/ui/charts/scatter.tsx:64
+msgid "n = {n}: too few points to read a trend"
+msgstr ""
+
+#: src/ui/charts/scatter.tsx:58
+msgid "n/a"
+msgstr ""
+
+#: src/ui/pager.tsx:146
+msgid "Next"
+msgstr ""
+
+#: src/ui/pager.tsx:143
+msgid "Next page"
+msgstr ""
+
+#: src/ui/confirm-dialog.tsx:10
+msgid "No"
+msgstr ""
+
+#: src/ui/people-picker.tsx:131
+msgid "Nothing found."
+msgstr ""
+
+#: src/ui/data-table.tsx:200
+msgid "Nothing to show."
+msgstr ""
+
+#: src/ui/pager.tsx:129
+msgid "Page {entry}"
+msgstr ""
+
+#: src/ui/pager.tsx:113
+msgid "Page {page} of {totalPages}"
+msgstr ""
+
+#: src/ui/pager.tsx:109
+msgid "Page {page} of {totalPages}+"
+msgstr ""
+
+#: src/ui/pager.tsx:56
+msgid "Pagination"
+msgstr ""
+
+#: src/ui/combobox.tsx:169
+msgid "Pick one or type any text"
+msgstr ""
+
+#: src/ui/pager.tsx:105
+msgid "Prev"
+msgstr ""
+
+#: src/ui/markdown-textarea.tsx:98
+msgid "Preview"
+msgstr ""
+
+#: src/ui/pager.tsx:102
+msgid "Previous page"
+msgstr ""
+
+#: src/ui/phase-bar.tsx:13
+msgid "Proposals"
+msgstr ""
+
+#. placeholder {0}: p.name
+#: src/ui/people-picker.tsx:89
+msgid "Remove {0}"
+msgstr ""
+
+#: src/ui/data-table.tsx:68
+msgid "Remove selected"
+msgstr ""
+
+#: src/ui/side-panel.tsx:132
+msgid "Resize panel"
+msgstr ""
+
+#: src/ui/pager.tsx:68
+msgid "Rows per page"
+msgstr ""
+
+#: src/ui/phase-bar.tsx:15
+msgid "Scheduling"
+msgstr ""
+
+#: src/ui/data-table.tsx:136
+msgid "Search"
+msgstr ""
+
+#: src/ui/data-table.tsx:194
+msgid "Search…"
+msgstr ""
+
+#. placeholder {0}: selection.rowLabel(row)
+#: src/ui/data-table.tsx:279
+#: src/ui/data-table.tsx:308
+msgid "Select {0}"
+msgstr ""
+
+#: src/ui/data-table.tsx:250
+msgid "Select all"
+msgstr ""
+
+#: src/ui/combobox.tsx:135
+msgid "Show suggestions"
+msgstr ""
+
+#: src/ui/charts/plot-frame.tsx:51
+msgid "The chart could not load. The table below has the figures."
+msgstr ""
+
+#: src/ui/form-error-summary.tsx:35
+msgid "There is a problem:"
+msgstr ""
+
+#: src/ui/phase-bar.tsx:14
+msgid "Voting"
+msgstr ""
+
+#: src/ui/confirm-dialog.tsx:9
+msgid "Yes"
+msgstr ""
+
+#: src/ui/charts/scatter.tsx:65
+msgid "ρ = {trend} (n = {n})"
+msgstr ""

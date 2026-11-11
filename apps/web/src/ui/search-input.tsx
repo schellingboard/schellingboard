@@ -1,6 +1,7 @@
 import { useRef, type ComponentPropsWithoutRef } from "react";
 import { cx } from "./cx";
 import { XMarkIcon } from "./icons";
+import { t } from "@lingui/core/macro";
 
 export function SearchInput({
   value,
@@ -32,7 +33,7 @@ export function SearchInput({
       {value !== "" && (
         <button
           type="button"
-          aria-label="Clear search"
+          aria-label={t`Clear search`}
           onClick={() => {
             onClear();
             inputRef.current?.focus();

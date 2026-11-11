@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { t } from "@lingui/core/macro";
 
 // DOM order is the tab order: search, filters, sort.
 export function ListToolbar({
@@ -17,7 +18,7 @@ export function ListToolbar({
       <div className="min-w-0 [grid-area:search]">{search}</div>
       <div
         role="group"
-        aria-label="Filters"
+        aria-label={t`Filters`}
         className="flex min-w-0 flex-wrap items-center gap-2 [grid-area:filters]"
       >
         {filters}

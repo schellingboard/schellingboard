@@ -8,6 +8,7 @@ import {
 } from "react";
 import { useDiscardGuard } from "./use-discard-guard";
 import { useScrollLock } from "./use-scroll-lock";
+import { t } from "@lingui/core/macro";
 
 /** Open dialogs, innermost last: Escape closes only the one on top. */
 const openDialogs: symbol[] = [];
@@ -112,7 +113,7 @@ export function Dialog({
         </div>
         <button
           type="button"
-          aria-label="Close"
+          aria-label={t`Close`}
           onClick={guard.requestClose}
           className="absolute right-3 top-3 rounded-md p-1 text-fg-subtle hover:bg-surface-muted focus:outline-none focus:ring-2 focus:ring-brand-accent"
         >

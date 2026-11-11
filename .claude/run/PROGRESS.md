@@ -75,6 +75,18 @@
   survey + the 5 questions); type Feature, priority Low, `component: ui/ux`. The owner or a run with
   permission should create it.
 
+- 28a (#1328e): conventions are in docs/dev/i18n.md. `test-setup.tsx` (was `.ts`) activates `en`
+  with an empty catalog (macros compile to the source text in tests) and mocks `Trans` to render
+  inside a provider, so tests stay unchanged. Lint now covers `ui/**/*.tsx` (not `.ts`; a `.ts` with
+  user text, e.g. `resize-image.ts`, uses `t` by hand) and the config grew `ignoreFunctions`,
+  `ignore` regexes (SVG path data, Tailwind class lists, glyphs) and SVG attribute `ignoreNames`;
+  later areas should extend those, not disable the rule. Module-level labels use `msg` + `i18n._()`
+  (phase-bar). Final step 28n: allowlist becomes `apps/web/src/**/*.tsx` without tests. ICU `#`
+  formats numbers per locale ("1,000 results"): accepted. The Tailwind ignore regex needs a known
+  utility prefix, so prose with a hyphen is still flagged. The service worker still has to cache
+  lazy locale chunks (plan 30a). Not done: pseudo-locale screenshot; E2E run only for
+  proposals.spec.
+
 ## Problems
 
 - #200: not checked in a browser at 390px (long URL, fixed vote bar); CSS read only.
@@ -183,10 +195,11 @@
   `--max-warnings 0`); step 28 adds files per area, and ends by replacing the list with
   `apps/web/src/**`. `make i18n-check` (in `precommit`, `scripts/i18n-check.ts`) re-runs
   `lingui extract --clean` and fails on a diff or an untranslated key in a non-source locale.
-  `pseudo-LOCALE` (Lingui's accents plus ~30% `~` padding from `i18n/pseudo.ts`) is dev-only: set `sb-pseudo=1` in localStorage. For step 28: when the allowlist becomes `apps/web/src/**` set `ignoreFunctions` (Error, console.*) and exclude tests; `title=` is not flagged.
-  The pseudo `.po` is committed (extract makes it). Not in the switcher; the server's enum rejects
-  it.
+  `pseudo-LOCALE` (Lingui's accents plus ~30% `~` padding from `i18n/pseudo.ts`) is dev-only: set
+  `sb-pseudo=1` in localStorage. For step 28: when the allowlist becomes `apps/web/src/**` set
+  `ignoreFunctions` (Error, console.*) and exclude tests; `title=` is not flagged. The pseudo `.po`
+  is committed (extract makes it). Not in the switcher; the server's enum rejects it.
 
 ## Next step
 
-No step is open. Wait for the coordinator (step 28 onwards, 35 only on request).
+Step 28b (app shell). Then the rest of 28, 29 onwards.

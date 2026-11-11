@@ -70,11 +70,33 @@ the E2E specs a step touches; the user runs the full suite at the end.
     locale).
 27. DONE **#1328d** Guardrails (`lingui/no-unlocalized-strings` on an allowlist, `make i18n-check`,
     `pseudo-LOCALE`, docs/dev/i18n.md).
-28. **#1328e** Externalize strings, one commit per area (a to g of issue step 5); split into PLAN.md
-    steps when reached.
+28. **#1328e** Externalize strings, one commit per area, footer `issue #1328`, no CHANGELOG. Counts
+    are lint hits (an upper bound; SVG attributes and technical strings inflate them). Each substep
+    adds its files to the lint allowlist; 28n flips it to `apps/web/src/**`. 28a. **ui/** shared
+    components (~35 files, ~150 strings; `icons.tsx` and `charts/` are mostly SVG attributes: add
+    them to `ignoreNames`), plus the test setup for macros. 28b. App shell: `app/` shell, nav bar,
+    footer, user menu, header links, layout, theme, time format, sync indicator, reload offer, map
+    button, error boundary, not-found, home/event landing, panel host/links, spa-links, router (~250
+    strings, `router.tsx` 50). 28c. Settings (4 files, 77), notifications (17), events (1). 28d.
+    Schedule grid, agenda, toolbar, filters, kiosk, pull-to-refresh (~150 in 20 files). 28e. Session
+    panel, session block, meetings column, 1-on-1 dialogs (`features/meetings`,
+    `people/meeting-request-dialog`, `open-up-nudge`) (~150). 28f. Proposals (10 files, 174). 28g.
+    Comments (69), people and profile (~137). 28h. Sign-in and account (`features/sign-in` 114,
+    `app/account-pages` 17). 28i. Admin frame and pages (`app/admin-*`), events screen, event
+    layout, config, days, moments, settings (~290). 28j. Admin sessions, proposals, guests, import,
+    join links, assignments (~210). 28k. Admin locations, availability, meetings (~120). 28l. Admin
+    stats (`stats-*`, ~390, mostly `stats-figures.tsx`). 28m. Problem codes and validation messages:
+    `commands/problem.ts`, zod messages in `packages/contracts`, toasts in `commands/`. 28n.
+    Leftovers: plurals as ICU, enum labels via label functions, markdown/plain-text helpers that
+    build sentences; then the allowlist becomes `apps/web/src/**` with `ignoreFunctions` (Error,
+    console.*) and tests excluded. Conventions: docs/dev/i18n.md.
 29. **#1328f** Server side: emails and notifications per recipient locale. Issue step 6.
 30. **#1328g** German translation, glossary, switcher on, E2E, changelog. Issue step 7. Only the
-    last commit says `fixes #1328`; earlier ones say `issue #1328`.
+    last commit says `fixes #1328`; earlier ones say `issue #1328`. 30a. Before it: the service
+    worker (`public/sw.js` deletes every `/_spa/assets/` entry the shell HTML does not name, so a
+    lazily loaded locale chunk would not stay cached offline; cache the locale chunks, E2E in
+    `offline.spec.ts`) and a short ADR for the library and message format (Lingui, ICU, `.po`,
+    source strings as ids).
 31. **#1585** (Low) Hover cue on duration options, toast after session save/delete.
 32. **#204** (Low) Searchable Combobox for every select with a long list.
 33. **#1108** (Low) Arrival and departure times on attendee profiles.
