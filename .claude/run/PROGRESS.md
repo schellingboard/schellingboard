@@ -213,4 +213,6 @@
 
 ## Next step
 
-Step 28b (app shell). Then the rest of 28, 29 onwards.
+Step 28d (schedule strings). Then the rest of 28, 29 onwards.
+
+- 26 follow-up: en-GB gives lowercase "9 am" on the 12-hour axis (accepted); the Settings hint is built from the formatted 14:00 example. theme.spec.ts:44 still fails (nested ThemeProvider).

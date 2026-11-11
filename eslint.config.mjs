@@ -117,11 +117,6 @@ export default tseslint.config(
             "*.execCommand",
             "*.setRangeText",
             "*.scrollIntoView",
-            "*.GET",
-            "*.PUT",
-            "*.POST",
-            "*.PATCH",
-            "*.DELETE",
             "*.getAttribute",
             "Event",
             "URL",
@@ -133,11 +128,8 @@ export default tseslint.config(
             // Glyphs, URL schemes, units and tag names
             "^(?:[A-Z]|ul|ol|px|[a-z]+:)$",
             "^https?://",
-            "^T\\d\\d:\\d\\d:\\d\\dZ$",
             // URL paths
             "^/[A-Za-z0-9/_.?=&-]*$",
-            // KeyboardEvent.key values
-            "^(?:Arrow(?:Up|Down|Left|Right)|Home|End|Enter|Escape|Tab)$",
             // CSS selectors
             ":not\\(",
             // Tailwind class lists: only lower-case tokens, one of them a utility with a known prefix
@@ -150,9 +142,7 @@ export default tseslint.config(
           ignoreNames: [
             "paginationFooter",
             "kind",
-            "background",
             "record",
-            "fromPanel",
             "timeZone",
             "day",
             "month",

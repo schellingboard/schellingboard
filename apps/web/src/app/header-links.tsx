@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import type { ApiClient } from "@schellingboard/api-client";
 import { BellIcon, UserGroupIcon } from "../ui/icons";
 import { useUnread } from "./unread-count";
-import { t } from "@lingui/core/macro";
+import { plural, t } from "@lingui/core/macro";
 
 const link =
   "flex items-center gap-1 rounded-md px-2 py-2 text-sm font-medium text-fg-subtle hover:bg-surface-muted sm:px-3";
@@ -40,7 +40,12 @@ export function HeaderLinks({
         <a
           href="/notifications"
           aria-label={
-            unread ? t`Notifications (${unread} unread)` : t`Notifications`
+            unread
+              ? plural(unread, {
+                  one: "Notifications (# unread)",
+                  other: "Notifications (# unread)",
+                })
+              : t`Notifications`
           }
           className="relative flex items-center rounded-md p-2 text-fg-subtle hover:bg-surface-muted"
         >

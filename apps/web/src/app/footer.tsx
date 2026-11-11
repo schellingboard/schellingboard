@@ -16,7 +16,7 @@ const CHANGELOG_URL =
 
 // The calendar date the release carries in CHANGELOG.md, whatever the reader's zone.
 const formatDate = (date: string) =>
-  new Date(`${date}T00:00:00Z`).toLocaleDateString(DATE_LOCALE, {
+  new Date(date).toLocaleDateString(DATE_LOCALE, {
     day: "numeric",
     month: "long",
     year: "numeric",
