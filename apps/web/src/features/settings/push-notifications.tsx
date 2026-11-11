@@ -320,7 +320,9 @@ export function PushNotifications({
 
       {removed && (
         <p role="status" className="text-sm text-success-fg">
-          {t`Turned off for ${removedHost}, on since ${removedSince}.`}
+          {removed.current
+            ? t`Turned off for ${removedHost}, on since ${removedSince}, this device.`
+            : t`Turned off for ${removedHost}, on since ${removedSince}.`}
         </p>
       )}
 

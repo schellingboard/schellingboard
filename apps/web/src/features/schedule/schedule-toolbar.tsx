@@ -32,7 +32,14 @@ export const scheduleView = (params: Pick<URLSearchParams, "get">) =>
   params.get("view") === VIEW_AGENDA ? VIEW_AGENDA : VIEW_GRID;
 
 const VIEWS = [
-  { name: VIEW_GRID, label: msg`Grid`, icon: TableIcon },
+  {
+    name: VIEW_GRID,
+    label: msg({
+      message: "Grid",
+      comment: "Name of the schedule view that shows rooms as columns",
+    }),
+    icon: TableIcon,
+  },
   { name: VIEW_AGENDA, label: msg`Agenda`, icon: QueueIcon },
 ] as const;
 
@@ -102,7 +109,7 @@ export function ScheduleToolbar({
               className={ITEM_CLASS}
             >
               <ClockIcon className="h-4 w-4 stroke-2" />
-              <Trans>Now</Trans>
+              <Trans comment="Button: jump to the current time">Now</Trans>
             </button>
           )}
           <button

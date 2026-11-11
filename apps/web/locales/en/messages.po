@@ -7,10 +7,6 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: en\n"
 
-#: src/features/schedule/schedule-filters.tsx:147
-msgid ", back to the search"
-msgstr ", back to the search"
-
 #: src/features/schedule/day-fold-bar.tsx:42
 msgid "· day has passed · hide"
 msgstr "· day has passed · hide"
@@ -27,7 +23,7 @@ msgstr "· no matches · hide"
 msgid "· no matches · show"
 msgstr "· no matches · show"
 
-#: src/features/settings/push-notifications.tsx:347
+#: src/features/settings/push-notifications.tsx:349
 msgid "· on since {since}"
 msgstr "· on since {since}"
 
@@ -60,13 +56,17 @@ msgstr "{0, plural, one {Delete this notification? This cannot be undone.} other
 msgid "{count, plural, one {There is a problem to fix:} other {There are # problems to fix:}}"
 msgstr "{count, plural, one {There is a problem to fix:} other {There are # problems to fix:}}"
 
-#: src/features/schedule/schedule-filters.tsx:66
-msgid "{matching} of {total} match"
-msgstr "{matching} of {total} match"
+#: src/features/schedule/schedule-filters.tsx:80
+msgid "{matching, plural, one {# of {total} match} other {# of {total} match}}"
+msgstr "{matching, plural, one {# of {total} match} other {# of {total} match}}"
 
 #: src/ui/data-table.tsx:52
 msgid "{selectedCount, plural, one {# selected} other {# selected}}"
 msgstr "{selectedCount, plural, one {# selected} other {# selected}}"
+
+#: src/features/schedule/schedule-filters.tsx:85
+msgid "{summary}, back to the search"
+msgstr "{summary}, back to the search"
 
 #: src/ui/pager.tsx:63
 msgid "{total, plural, one {# result} other {# results}}"
@@ -84,7 +84,7 @@ msgstr "{unread, plural, one {Notifications (# unread)} other {Notifications (# 
 msgid "{valueLabel}: 0 to {max}"
 msgstr "{valueLabel}: 0 to {max}"
 
-#: src/features/schedule/day-agenda.tsx:389
+#: src/features/schedule/day-agenda.tsx:395
 msgid "1-on-1 with {otherName}"
 msgstr "1-on-1 with {otherName}"
 
@@ -133,7 +133,7 @@ msgstr "a session I’m hosting starts in an hour"
 msgid "a session I’ve RSVP’d to changes time or location, loses its host, or is deleted"
 msgstr "a session I’ve RSVP’d to changes time or location, loses its host, or is deleted"
 
-#: src/features/schedule/schedule-toolbar.tsx:36
+#: src/features/schedule/schedule-toolbar.tsx:43
 msgid "Agenda"
 msgstr "Agenda"
 
@@ -142,7 +142,7 @@ msgctxt "Rows per page: every row"
 msgid "All"
 msgstr "All"
 
-#: src/features/schedule/day-agenda.tsx:261
+#: src/features/schedule/day-agenda.tsx:263
 msgid "All rooms"
 msgstr "All rooms"
 
@@ -190,7 +190,7 @@ msgstr "Back"
 msgid "Back to the events"
 msgstr "Back to the events"
 
-#: src/features/schedule/day-agenda.tsx:270
+#: src/features/schedule/day-agenda.tsx:272
 msgid "Blocked"
 msgstr "Blocked"
 
@@ -198,7 +198,7 @@ msgstr "Blocked"
 msgid "bookmarked"
 msgstr "bookmarked"
 
-#: src/features/schedule/day-agenda.tsx:300
+#: src/features/schedule/day-agenda.tsx:302
 #: src/features/schedule/filters.ts:6
 msgid "Bookmarked"
 msgstr "Bookmarked"
@@ -215,16 +215,19 @@ msgstr "Cancel"
 msgid "Checking…"
 msgstr "Checking…"
 
-#: src/features/schedule/schedule-filters.tsx:252
+#: src/features/schedule/schedule-filters.tsx:275
 msgid "Choose what My schedule shows"
 msgstr "Choose what My schedule shows"
 
+#. Label of a warning icon: this overlaps another commitment
 #: src/features/schedule/clash-mark.tsx:26
 msgid "Clash"
 msgstr "Clash"
 
-#: src/features/schedule/schedule-filters.tsx:60
-#: src/features/schedule/schedule-filters.tsx:111
+#. Filter: sessions that overlap in your schedule
+#. Filter: sessions that overlap in your schedule
+#: src/features/schedule/schedule-filters.tsx:62
+#: src/features/schedule/schedule-filters.tsx:130
 msgid "Clashes"
 msgstr "Clashes"
 
@@ -359,7 +362,7 @@ msgid "Event"
 msgstr "Event"
 
 #: src/app/panel-host.tsx:80
-#: src/features/schedule/schedule-toolbar.tsx:114
+#: src/features/schedule/schedule-toolbar.tsx:121
 msgid "Event details"
 msgstr "Event details"
 
@@ -391,7 +394,7 @@ msgstr "Failed to draw image"
 msgid "Failed to resize image"
 msgstr "Failed to resize image"
 
-#: src/features/schedule/schedule-filters.tsx:99
+#: src/features/schedule/schedule-filters.tsx:118
 msgid "Filter sessions"
 msgstr "Filter sessions"
 
@@ -428,7 +431,8 @@ msgstr "Full changelog on GitHub"
 msgid "Go to the events"
 msgstr "Go to the events"
 
-#: src/features/schedule/schedule-toolbar.tsx:35
+#. Name of the schedule view that shows rooms as columns
+#: src/features/schedule/schedule-toolbar.tsx:37
 msgid "Grid"
 msgstr "Grid"
 
@@ -436,8 +440,10 @@ msgstr "Grid"
 msgid "Help"
 msgstr "Help"
 
-#: src/features/schedule/schedule-filters.tsx:61
-#: src/features/schedule/schedule-filters.tsx:118
+#. Filter: sessions you hid from your schedule
+#. Filter: sessions you hid from your schedule
+#: src/features/schedule/schedule-filters.tsx:70
+#: src/features/schedule/schedule-filters.tsx:140
 msgid "Hidden"
 msgstr "Hidden"
 
@@ -461,7 +467,7 @@ msgstr "How to update"
 msgid "In this build, but not in a released version yet."
 msgstr "In this build, but not in a released version yet."
 
-#: src/features/schedule/schedule-toolbar.tsx:101
+#: src/features/schedule/schedule-toolbar.tsx:108
 msgid "Jump to the current time"
 msgstr "Jump to the current time"
 
@@ -550,7 +556,7 @@ msgstr "My name is:"
 msgid "My profile"
 msgstr "My profile"
 
-#: src/features/schedule/schedule-filters.tsx:247
+#: src/features/schedule/schedule-filters.tsx:270
 msgid "My schedule"
 msgstr "My schedule"
 
@@ -558,7 +564,7 @@ msgstr "My schedule"
 msgid "My schedule ({kinds})"
 msgstr "My schedule ({kinds})"
 
-#: src/features/schedule/schedule-filters.tsx:270
+#: src/features/schedule/schedule-filters.tsx:293
 msgid "My schedule shows"
 msgstr "My schedule shows"
 
@@ -643,12 +649,14 @@ msgstr "Notifications go to the email address the organizers have for you. Conta
 msgid "Notifications on this device"
 msgstr "Notifications on this device"
 
-#: src/features/settings/push-notifications.tsx:330
+#: src/features/settings/push-notifications.tsx:332
 msgid "Notifications on your devices"
 msgstr "Notifications on your devices"
 
+#. Badge on a session that is running now
+#. Button: jump to the current time
 #: src/features/schedule/day-agenda.tsx:205
-#: src/features/schedule/schedule-toolbar.tsx:105
+#: src/features/schedule/schedule-toolbar.tsx:112
 msgid "Now"
 msgstr "Now"
 
@@ -724,7 +732,7 @@ msgstr "Previous page"
 msgid "Profile not found, please log in again."
 msgstr "Profile not found, please log in again."
 
-#: src/features/schedule/schedule-toolbar.tsx:119
+#: src/features/schedule/schedule-toolbar.tsx:126
 #: src/ui/phase-bar.tsx:13
 msgid "Proposals"
 msgstr "Proposals"
@@ -786,7 +794,7 @@ msgstr "Saving..."
 msgid "Saving…"
 msgstr "Saving…"
 
-#: src/features/schedule/schedule-toolbar.tsx:74
+#: src/features/schedule/schedule-toolbar.tsx:81
 msgid "Schedule view"
 msgstr "Schedule view"
 
@@ -798,8 +806,8 @@ msgstr "Scheduling"
 msgid "Search"
 msgstr "Search"
 
-#: src/features/schedule/schedule-filters.tsx:85
-#: src/features/schedule/schedule-filters.tsx:86
+#: src/features/schedule/schedule-filters.tsx:104
+#: src/features/schedule/schedule-filters.tsx:105
 msgid "Search sessions"
 msgstr "Search sessions"
 
@@ -834,11 +842,11 @@ msgstr "Select your name"
 msgid "Settings"
 msgstr "Settings"
 
-#: src/features/schedule/day-agenda.tsx:356
-msgid "Shared moment: "
-msgstr "Shared moment: "
+#: src/features/schedule/day-agenda.tsx:349
+msgid "Shared moment: {title}"
+msgstr "Shared moment: {title}"
 
-#: src/features/schedule/schedule-filters.tsx:155
+#: src/features/schedule/schedule-filters.tsx:178
 msgid "Show all"
 msgstr "Show all"
 
@@ -912,7 +920,7 @@ msgstr "The events could not be loaded."
 msgid "There is a problem:"
 msgstr "There is a problem:"
 
-#: src/features/schedule/day-agenda.tsx:397
+#: src/features/schedule/day-agenda.tsx:403
 msgid "This 1-on-1 is confirmed"
 msgstr "This 1-on-1 is confirmed"
 
@@ -920,7 +928,7 @@ msgstr "This 1-on-1 is confirmed"
 msgid "This browser can’t show notifications. You’ll still see everything on the notifications page."
 msgstr "This browser can’t show notifications. You’ll still see everything on the notifications page."
 
-#: src/features/settings/push-notifications.tsx:351
+#: src/features/settings/push-notifications.tsx:353
 msgid "This device"
 msgstr "This device"
 
@@ -965,7 +973,7 @@ msgid "Try again"
 msgstr "Try again"
 
 #: src/features/settings/push-notifications.tsx:315
-#: src/features/settings/push-notifications.tsx:362
+#: src/features/settings/push-notifications.tsx:364
 msgid "Turn off"
 msgstr "Turn off"
 
@@ -981,7 +989,11 @@ msgstr "Turn off {host}, on since {since}, this device"
 msgid "Turn on for this device"
 msgstr "Turn on for this device"
 
-#: src/features/settings/push-notifications.tsx:323
+#: src/features/settings/push-notifications.tsx:324
+msgid "Turned off for {removedHost}, on since {removedSince}, this device."
+msgstr "Turned off for {removedHost}, on since {removedSince}, this device."
+
+#: src/features/settings/push-notifications.tsx:325
 msgid "Turned off for {removedHost}, on since {removedSince}."
 msgstr "Turned off for {removedHost}, on since {removedSince}."
 
@@ -1001,8 +1013,8 @@ msgstr "Two attendees in conversation"
 msgid "unknown"
 msgstr "unknown"
 
-#: src/features/schedule/day-agenda.tsx:255
-#: src/features/schedule/day-agenda.tsx:381
+#: src/features/schedule/day-agenda.tsx:257
+#: src/features/schedule/day-agenda.tsx:387
 msgid "until {endsAt}"
 msgstr "until {endsAt}"
 
@@ -1043,11 +1055,11 @@ msgstr "Who are you?"
 msgid "Yes"
 msgstr "Yes"
 
-#: src/features/schedule/day-agenda.tsx:315
+#: src/features/schedule/day-agenda.tsx:317
 msgid "You are hosting this session"
 msgstr "You are hosting this session"
 
-#: src/features/schedule/day-agenda.tsx:323
+#: src/features/schedule/day-agenda.tsx:325
 msgid "You have RSVP'd to this session"
 msgstr "You have RSVP'd to this session"
 

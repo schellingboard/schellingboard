@@ -81,18 +81,12 @@ export function KioskController({
     const mark = () => {
       lastInteraction.current = performance.now();
     };
-    const ACTIVITY_EVENTS = [
-      "pointerdown",
-      "wheel",
-      "touchstart",
-      "keydown",
-    ] as const;
-    for (const name of ACTIVITY_EVENTS) {
+    const events = ["pointerdown", "wheel", "touchstart", "keydown"] as const;
+    for (const name of events) {
       document.addEventListener(name, mark, { passive: true });
     }
     return () => {
-      for (const name of ACTIVITY_EVENTS)
-        document.removeEventListener(name, mark);
+      for (const name of events) document.removeEventListener(name, mark);
     };
   }, []);
 

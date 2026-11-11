@@ -7,10 +7,6 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: pseudo-LOCALE\n"
 
-#: src/features/schedule/schedule-filters.tsx:147
-msgid ", back to the search"
-msgstr ""
-
 #: src/features/schedule/day-fold-bar.tsx:42
 msgid "· day has passed · hide"
 msgstr ""
@@ -27,7 +23,7 @@ msgstr ""
 msgid "· no matches · show"
 msgstr ""
 
-#: src/features/settings/push-notifications.tsx:347
+#: src/features/settings/push-notifications.tsx:349
 msgid "· on since {since}"
 msgstr ""
 
@@ -60,12 +56,16 @@ msgstr ""
 msgid "{count, plural, one {There is a problem to fix:} other {There are # problems to fix:}}"
 msgstr ""
 
-#: src/features/schedule/schedule-filters.tsx:66
-msgid "{matching} of {total} match"
+#: src/features/schedule/schedule-filters.tsx:80
+msgid "{matching, plural, one {# of {total} match} other {# of {total} match}}"
 msgstr ""
 
 #: src/ui/data-table.tsx:52
 msgid "{selectedCount, plural, one {# selected} other {# selected}}"
+msgstr ""
+
+#: src/features/schedule/schedule-filters.tsx:85
+msgid "{summary}, back to the search"
 msgstr ""
 
 #: src/ui/pager.tsx:63
@@ -84,7 +84,7 @@ msgstr ""
 msgid "{valueLabel}: 0 to {max}"
 msgstr ""
 
-#: src/features/schedule/day-agenda.tsx:389
+#: src/features/schedule/day-agenda.tsx:395
 msgid "1-on-1 with {otherName}"
 msgstr ""
 
@@ -133,7 +133,7 @@ msgstr ""
 msgid "a session I’ve RSVP’d to changes time or location, loses its host, or is deleted"
 msgstr ""
 
-#: src/features/schedule/schedule-toolbar.tsx:36
+#: src/features/schedule/schedule-toolbar.tsx:43
 msgid "Agenda"
 msgstr ""
 
@@ -142,7 +142,7 @@ msgctxt "Rows per page: every row"
 msgid "All"
 msgstr ""
 
-#: src/features/schedule/day-agenda.tsx:261
+#: src/features/schedule/day-agenda.tsx:263
 msgid "All rooms"
 msgstr ""
 
@@ -190,7 +190,7 @@ msgstr ""
 msgid "Back to the events"
 msgstr ""
 
-#: src/features/schedule/day-agenda.tsx:270
+#: src/features/schedule/day-agenda.tsx:272
 msgid "Blocked"
 msgstr ""
 
@@ -198,7 +198,7 @@ msgstr ""
 msgid "bookmarked"
 msgstr ""
 
-#: src/features/schedule/day-agenda.tsx:300
+#: src/features/schedule/day-agenda.tsx:302
 #: src/features/schedule/filters.ts:6
 msgid "Bookmarked"
 msgstr ""
@@ -215,16 +215,19 @@ msgstr ""
 msgid "Checking…"
 msgstr ""
 
-#: src/features/schedule/schedule-filters.tsx:252
+#: src/features/schedule/schedule-filters.tsx:275
 msgid "Choose what My schedule shows"
 msgstr ""
 
+#. Label of a warning icon: this overlaps another commitment
 #: src/features/schedule/clash-mark.tsx:26
 msgid "Clash"
 msgstr ""
 
-#: src/features/schedule/schedule-filters.tsx:60
-#: src/features/schedule/schedule-filters.tsx:111
+#. Filter: sessions that overlap in your schedule
+#. Filter: sessions that overlap in your schedule
+#: src/features/schedule/schedule-filters.tsx:62
+#: src/features/schedule/schedule-filters.tsx:130
 msgid "Clashes"
 msgstr ""
 
@@ -359,7 +362,7 @@ msgid "Event"
 msgstr ""
 
 #: src/app/panel-host.tsx:80
-#: src/features/schedule/schedule-toolbar.tsx:114
+#: src/features/schedule/schedule-toolbar.tsx:121
 msgid "Event details"
 msgstr ""
 
@@ -391,7 +394,7 @@ msgstr ""
 msgid "Failed to resize image"
 msgstr ""
 
-#: src/features/schedule/schedule-filters.tsx:99
+#: src/features/schedule/schedule-filters.tsx:118
 msgid "Filter sessions"
 msgstr ""
 
@@ -428,7 +431,8 @@ msgstr ""
 msgid "Go to the events"
 msgstr ""
 
-#: src/features/schedule/schedule-toolbar.tsx:35
+#. Name of the schedule view that shows rooms as columns
+#: src/features/schedule/schedule-toolbar.tsx:37
 msgid "Grid"
 msgstr ""
 
@@ -436,8 +440,10 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
-#: src/features/schedule/schedule-filters.tsx:61
-#: src/features/schedule/schedule-filters.tsx:118
+#. Filter: sessions you hid from your schedule
+#. Filter: sessions you hid from your schedule
+#: src/features/schedule/schedule-filters.tsx:70
+#: src/features/schedule/schedule-filters.tsx:140
 msgid "Hidden"
 msgstr ""
 
@@ -461,7 +467,7 @@ msgstr ""
 msgid "In this build, but not in a released version yet."
 msgstr ""
 
-#: src/features/schedule/schedule-toolbar.tsx:101
+#: src/features/schedule/schedule-toolbar.tsx:108
 msgid "Jump to the current time"
 msgstr ""
 
@@ -550,7 +556,7 @@ msgstr ""
 msgid "My profile"
 msgstr ""
 
-#: src/features/schedule/schedule-filters.tsx:247
+#: src/features/schedule/schedule-filters.tsx:270
 msgid "My schedule"
 msgstr ""
 
@@ -558,7 +564,7 @@ msgstr ""
 msgid "My schedule ({kinds})"
 msgstr ""
 
-#: src/features/schedule/schedule-filters.tsx:270
+#: src/features/schedule/schedule-filters.tsx:293
 msgid "My schedule shows"
 msgstr ""
 
@@ -643,12 +649,14 @@ msgstr ""
 msgid "Notifications on this device"
 msgstr ""
 
-#: src/features/settings/push-notifications.tsx:330
+#: src/features/settings/push-notifications.tsx:332
 msgid "Notifications on your devices"
 msgstr ""
 
+#. Badge on a session that is running now
+#. Button: jump to the current time
 #: src/features/schedule/day-agenda.tsx:205
-#: src/features/schedule/schedule-toolbar.tsx:105
+#: src/features/schedule/schedule-toolbar.tsx:112
 msgid "Now"
 msgstr ""
 
@@ -724,7 +732,7 @@ msgstr ""
 msgid "Profile not found, please log in again."
 msgstr ""
 
-#: src/features/schedule/schedule-toolbar.tsx:119
+#: src/features/schedule/schedule-toolbar.tsx:126
 #: src/ui/phase-bar.tsx:13
 msgid "Proposals"
 msgstr ""
@@ -786,7 +794,7 @@ msgstr ""
 msgid "Saving…"
 msgstr ""
 
-#: src/features/schedule/schedule-toolbar.tsx:74
+#: src/features/schedule/schedule-toolbar.tsx:81
 msgid "Schedule view"
 msgstr ""
 
@@ -798,8 +806,8 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
-#: src/features/schedule/schedule-filters.tsx:85
-#: src/features/schedule/schedule-filters.tsx:86
+#: src/features/schedule/schedule-filters.tsx:104
+#: src/features/schedule/schedule-filters.tsx:105
 msgid "Search sessions"
 msgstr ""
 
@@ -834,11 +842,11 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: src/features/schedule/day-agenda.tsx:356
-msgid "Shared moment: "
+#: src/features/schedule/day-agenda.tsx:349
+msgid "Shared moment: {title}"
 msgstr ""
 
-#: src/features/schedule/schedule-filters.tsx:155
+#: src/features/schedule/schedule-filters.tsx:178
 msgid "Show all"
 msgstr ""
 
@@ -912,7 +920,7 @@ msgstr ""
 msgid "There is a problem:"
 msgstr ""
 
-#: src/features/schedule/day-agenda.tsx:397
+#: src/features/schedule/day-agenda.tsx:403
 msgid "This 1-on-1 is confirmed"
 msgstr ""
 
@@ -920,7 +928,7 @@ msgstr ""
 msgid "This browser can’t show notifications. You’ll still see everything on the notifications page."
 msgstr ""
 
-#: src/features/settings/push-notifications.tsx:351
+#: src/features/settings/push-notifications.tsx:353
 msgid "This device"
 msgstr ""
 
@@ -965,7 +973,7 @@ msgid "Try again"
 msgstr ""
 
 #: src/features/settings/push-notifications.tsx:315
-#: src/features/settings/push-notifications.tsx:362
+#: src/features/settings/push-notifications.tsx:364
 msgid "Turn off"
 msgstr ""
 
@@ -981,7 +989,11 @@ msgstr ""
 msgid "Turn on for this device"
 msgstr ""
 
-#: src/features/settings/push-notifications.tsx:323
+#: src/features/settings/push-notifications.tsx:324
+msgid "Turned off for {removedHost}, on since {removedSince}, this device."
+msgstr ""
+
+#: src/features/settings/push-notifications.tsx:325
 msgid "Turned off for {removedHost}, on since {removedSince}."
 msgstr ""
 
@@ -1001,8 +1013,8 @@ msgstr ""
 msgid "unknown"
 msgstr ""
 
-#: src/features/schedule/day-agenda.tsx:255
-#: src/features/schedule/day-agenda.tsx:381
+#: src/features/schedule/day-agenda.tsx:257
+#: src/features/schedule/day-agenda.tsx:387
 msgid "until {endsAt}"
 msgstr ""
 
@@ -1043,11 +1055,11 @@ msgstr ""
 msgid "Yes"
 msgstr ""
 
-#: src/features/schedule/day-agenda.tsx:315
+#: src/features/schedule/day-agenda.tsx:317
 msgid "You are hosting this session"
 msgstr ""
 
-#: src/features/schedule/day-agenda.tsx:323
+#: src/features/schedule/day-agenda.tsx:325
 msgid "You have RSVP'd to this session"
 msgstr ""
 
