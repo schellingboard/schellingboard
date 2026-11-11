@@ -1,10 +1,10 @@
 # Progress
 
-Steps 1 (c344e56d), 2 and 3 done.
+Steps 1 (c344e56d), 2, 3 and 4 done.
 
-- Panel: `ui/side-panel.tsx`; history: `app/panel-history.ts` (`PanelItem` union: session,
-  proposal); host: `app/panel-host.tsx`; links opened in the panel via the `SpaLinks` intercept;
-  spike result in ADR 0020.
+- Panel: `ui/side-panel.tsx`; history: `app/panel-history.ts` (`PanelItem` union: session, proposal,
+  profile, meeting); host: `app/panel-host.tsx`; links opened in the panel via the `SpaLinks`
+  intercept; spike result in ADR 0020.
 - Landing routes (`session-landing.tsx`, `proposal-landing.tsx`) replace the entry with the list
   page and push the panel; old `?view...=` params do the same from the page components.
 - The panel is `role="dialog" aria-modal="false"`, so E2E `dialog` locators still work.
@@ -15,7 +15,11 @@ Steps 1 (c344e56d), 2 and 3 done.
   tick into one push, which left the landed address under the panel.
 - Session and proposal links inside a profile panel over an event page are plain page loads until
   step 5 (the profile host is outside the event's `SpaLinks`).
-- Next: step 4.
+- Step 4 done: `MeetingPanel` (`features/meetings/meeting-panel.tsx`) replaces the modal; the
+  schedule page and `/{slug}/meetings?viewMeeting=` land on it; always over the schedule, read-only
+  note in the panel outside scheduling. `BookingDialog` keeps `?bookMeeting=`. Notification links
+  still emit the old URL until step 6.
+- Next: step 5.
 
 ## Questions
 

@@ -11,6 +11,7 @@ export type { ScheduleActions };
 import type { MeetingClashes } from "../../queries/meeting-clashes";
 import { useDebouncedSearch } from "../../ui/use-debounced";
 import { AgendaView } from "./agenda-view";
+import { BookingDialog } from "./booking-dialog";
 import { scheduleDataFrom } from "./data";
 import {
   ALL_KINDS,
@@ -26,7 +27,6 @@ import { GridView } from "./grid-view";
 import { KioskController, useKioskMode } from "./kiosk";
 import type { ScheduleLinks } from "./links";
 import { MatchStepper } from "./match-stepper";
-import { MeetingModals } from "./meeting-modals";
 import { withClashes } from "./meetings";
 import {
   countMatches,
@@ -301,7 +301,7 @@ export function ScheduleScreen({
       }}
     >
       {kiosk && <KioskController nowIsOnSchedule={nowIsOnSchedule} />}
-      <MeetingModals
+      <BookingDialog
         params={params}
         onParamsChange={onParamsChange}
         onBack={onBack}
