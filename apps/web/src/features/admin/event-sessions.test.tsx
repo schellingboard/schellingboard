@@ -13,7 +13,7 @@ import type { AdminSession } from "../../queries/admin-sessions";
 import { NoticeProvider } from "../../ui/notices";
 import type { DayOption } from "./admin-session-model";
 import { EventSessionsManager } from "./event-sessions";
-import type { ParamUpdates } from "./list-paging";
+import type { ParamUpdates } from "../../ui/list-paging";
 
 afterEach(cleanup);
 

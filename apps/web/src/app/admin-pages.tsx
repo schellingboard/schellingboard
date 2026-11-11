@@ -7,6 +7,7 @@ import {
 } from "react";
 import type { EventStatistics } from "@schellingboard/contracts/stats";
 import { Outlet, useLocation, useRouter } from "@tanstack/react-router";
+import { useParamUpdates } from "./use-param-updates";
 import { formatDayLabel } from "@schellingboard/domain/time";
 import { adminEventCalls } from "../commands/admin-events";
 import { adminGuestCalls } from "../commands/admin-guests";
@@ -24,7 +25,6 @@ import { UserImportScreen } from "../features/admin/guest-import";
 import { AdminGuestsScreen } from "../features/admin/guests-screen";
 import { LocationAvailabilityManager } from "../features/admin/location-availability";
 import { LocationsScreen } from "../features/admin/locations-screen";
-import type { OnParams } from "../features/admin/list-paging";
 import { SettingsScreen } from "../features/admin/settings-screen";
 import { defaultStatsEvent } from "../features/admin/stats-event";
 import { createAdminEventQuery } from "../queries/admin-event";
@@ -70,18 +70,6 @@ export function AdminSection({ services }: { services: AppServices }) {
 
 export function AdminHome() {
   return <Redirect to="/admin/events" />;
-}
-
-function useParamUpdates() {
-  const { params, change } = useUrlSearchParams();
-  const onParams: OnParams = (updates, { push }) => {
-    const next = new URLSearchParams(params);
-    for (const [key, value] of Object.entries(updates))
-      if (value === null) next.delete(key);
-      else next.set(key, value);
-    change(next, { push });
-  };
-  return { params, onParams };
 }
 
 const named = ({ id, name }: { id: string; name: string }) => ({ id, name });

@@ -261,3 +261,35 @@ test("removes a comment left on your own profile @010-US8", async ({
 
   await expect(postedComment(own, "unwanted remark")).toHaveCount(0);
 });
+
+test("lists the comments one wrote and opens the one clicked @010-US9", async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto("/guests");
+  await actAs(page, "Hana Kobayashi");
+
+  const profile = await openProfile(page, "Mei-Ling Wu");
+  await profile.getByPlaceholder("Add a comment").fill("lovely talk last year");
+  await profile.getByRole("button", { name: "Comment", exact: true }).click();
+  await expect(
+    postedComment(profile, "lovely talk last year").first()
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(profile).toBeHidden();
+
+  await page.getByRole("button", { name: /your name/i }).click();
+  await page.getByRole("menuitem", { name: "My comments" }).click();
+  await expect(
+    page.getByRole("heading", { name: "My comments" })
+  ).toBeVisible();
+
+  await page
+    .getByRole("link", { name: /Profile: Mei-Ling Wu.*lovely talk last year/ })
+    .click();
+  const opened = page.getByRole("dialog", { name: "Mei-Ling Wu" });
+  await expect(opened).toBeVisible();
+  await expect(
+    postedComment(opened, "lovely talk last year").first()
+  ).toBeInViewport();
+});

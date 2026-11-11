@@ -12,6 +12,7 @@ import { signInCalls } from "../commands/sign-in";
 import { meetingAvailabilityCalls } from "../commands/meeting-availability";
 import { notificationCalls } from "../commands/notifications";
 import { settingsCalls } from "../commands/settings";
+import { MyCommentsScreen } from "../features/comments/my-comments-screen";
 import { NotificationsScreen } from "../features/notifications/notifications-screen";
 import { JoinScreen } from "../features/sign-in/join-screen";
 import { BootstrapScreen } from "../features/sign-in/bootstrap-screen";
@@ -24,6 +25,7 @@ import {
   SettingsScreen,
 } from "../features/settings/settings-screen";
 import { createAccountSecurityQuery } from "../queries/account-security";
+import { createMyCommentsQuery } from "../queries/my-comments";
 import { createNotificationsQuery } from "../queries/notifications";
 import { createSettingsQuery } from "../queries/settings";
 import { Footer } from "./footer";
@@ -37,6 +39,7 @@ import type { AppServices } from "./services";
 import { ShellFrame } from "./shell";
 import { useUnread } from "./unread-count";
 import { useDirectoryShell } from "./use-directory-shell";
+import { useParamUpdates } from "./use-param-updates";
 import { useUrlSearchParams } from "./use-url-search-params";
 import { useViewer } from "./viewer";
 
@@ -56,6 +59,15 @@ export function NotificationsPage({ services }: { services: AppServices }) {
   return (
     <AccountFrame services={services}>
       {({ now }) => <Notifications api={services.api} now={now} />}
+    </AccountFrame>
+  );
+}
+
+/** The signed-in guest's own comments. */
+export function MyCommentsPage({ services }: { services: AppServices }) {
+  return (
+    <AccountFrame services={services}>
+      {({ now }) => <MyComments api={services.api} now={now} />}
     </AccountFrame>
   );
 }
@@ -218,6 +230,32 @@ function Notifications({ api, now }: { api: AppServices["api"]; now: Date }) {
       now={now}
       onOpen={(url) => history.push(url)}
       onUnreadChange={setUnread}
+    />
+  );
+}
+
+function MyComments({ api, now }: { api: AppServices["api"]; now: Date }) {
+  const [query] = useState(() => createMyCommentsQuery({ api }));
+  const { params, onParams } = useParamUpdates();
+  const { history } = useRouter();
+  useEffect(() => {
+    void query.load();
+  }, [query]);
+  const state = useSyncExternalStore(query.subscribe, query.get);
+
+  if (state.status === "error" && REFUSALS.includes(state.code))
+    return (
+      <PageNotice>
+        {actingGuestRefusalMessage(state.code, "seeing your comments")}
+      </PageNotice>
+    );
+  return (
+    <MyCommentsScreen
+      query={query}
+      now={now}
+      params={params}
+      onParams={onParams}
+      onOpen={(url) => history.push(url)}
     />
   );
 }

@@ -4,6 +4,7 @@ import {
   deleteComment,
   editComment,
   listComments,
+  listMyComments,
   removableBy,
   setCommentLike,
 } from "./comments";
@@ -11,6 +12,7 @@ import {
 export function createCommentUseCases(deps: CommentDeps) {
   return {
     listComments: listComments(deps),
+    listMyComments: listMyComments(deps),
     removableBy: removableBy(deps),
     createComment: createComment(deps),
     editComment: editComment(deps),

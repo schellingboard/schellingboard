@@ -11,7 +11,7 @@ import { adminEventCalls } from "../../commands/admin-events";
 import { fakeApi, problem, type FakeCall } from "../../commands/fake-api";
 import type { AdminProposal } from "../../queries/admin-proposals";
 import { NoticeProvider } from "../../ui/notices";
-import type { ParamUpdates } from "./list-paging";
+import type { ParamUpdates } from "../../ui/list-paging";
 import { EventProposalsManager } from "./event-proposals";
 
 afterEach(cleanup);

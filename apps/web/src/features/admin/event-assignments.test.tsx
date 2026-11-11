@@ -12,7 +12,7 @@ import { fakeApi, problem, type FakeCall } from "../../commands/fake-api";
 import type { AdminGuest } from "../../queries/admin-guests";
 import type { AdminLocation } from "../../queries/admin-locations";
 import { NoticeProvider } from "../../ui/notices";
-import type { ParamUpdates } from "./list-paging";
+import type { ParamUpdates } from "../../ui/list-paging";
 import { EventGuestsManager } from "./event-guests";
 import { EventLocationsManager } from "./event-locations";
 

@@ -36,7 +36,7 @@ the E2E specs a step touches; the user runs the full suite at the end.
     day-window, reminder-schedule, vote stats.
 20. DONE **#607** Time format setting (`TimeFormatProvider`, `useTimeFormat`, cookie
     `sb-time-format`).
-21. **#993** (Medium) Attendee sees a list of their own comments.
+21. DONE **#993** "My comments" (`GET /me/comments`, `/comments`, `my-comments-screen.tsx`).
 22. **#1046** (Medium) Ask someone to open up to 1-on-1s. Read the comment too.
 23. **#831** (Medium) Consistent pagination strategy; `Pager` (#684) exists, read the 5 comments and
     apply it where the issue says. Record in Questions if #684 covered it.

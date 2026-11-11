@@ -75,6 +75,12 @@
   fix.
 - #607 TDD: the formatter and setting tests were written after the code (no red run).
 
+- #993: the server returns all of the guest's live comments (no page/filter params; the screen
+  filters by kind, event and text, and pages with `Pager` in the URL, as admin lists do). No access
+  filter beyond authorship: comment reads in this codebase have none. `comments` is now a reserved
+  event slug. Rows carry the server-built `url` (`#comment-<id>`). TDD: red run was 404 on
+  `/me/comments`.
+
 ## Next step
 
-Step 21 (#993).
+Step 22 (#1046).

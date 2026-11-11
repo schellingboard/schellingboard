@@ -33,6 +33,7 @@ export function normalizeWebsiteUrl(raw: string): string {
 export const RESERVED_EVENT_SLUGS = new Set([
   "admin",
   "api",
+  "comments",
   "guests",
   "join",
   "legacy",

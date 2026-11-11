@@ -35,7 +35,7 @@ import {
   searchByTitleOrHost,
   tableHandlers,
   type OnParams,
-} from "./list-paging";
+} from "../../ui/list-paging";
 import { ConfirmByTyping } from "./confirm-by-typing";
 import { RoomCheckboxes } from "./room-checkboxes";
 import { shown, useJumpWithin } from "./use-section-save";

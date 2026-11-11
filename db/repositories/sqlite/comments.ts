@@ -7,7 +7,11 @@ import type {
   CommentsRepository,
   SubjectCommentsRepository,
 } from "../interfaces";
-import type { Comment, CommentLiker } from "@schellingboard/domain/comment";
+import type {
+  AuthoredComment,
+  Comment,
+  CommentLiker,
+} from "@schellingboard/domain/comment";
 
 type DB = BetterSQLite3Database<typeof schema>;
 
@@ -125,6 +129,156 @@ function toComment(row: CommentRow, likes: CommentLiker[] = []): Comment {
 
 export class SqliteCommentsRepository implements CommentsRepository {
   constructor(private readonly db: DB) {}
+
+  async listByAuthor(guestId: string): Promise<AuthoredComment[]> {
+    const authored = and(
+      eq(schema.comments.authorId, guestId),
+      eq(schema.comments.deleted, false)
+    );
+    const mine = this.db
+      .select({
+        id: schema.comments.id,
+        body: schema.comments.body,
+        createdTime: schema.comments.createdTime,
+        seq: sql<number>`${schema.comments}.rowid`,
+      })
+      .from(schema.comments)
+      .where(authored)
+      .all();
+    if (mine.length === 0) return [];
+    const ids = this.db
+      .select({ id: schema.comments.id })
+      .from(schema.comments)
+      .where(authored);
+
+    const proposals = this.db
+      .select({
+        id: schema.proposalComments.commentId,
+        subjectId: schema.sessionProposals.id,
+        title: schema.sessionProposals.title,
+        eventName: schema.events.name,
+        eventSlug: schema.events.slug,
+      })
+      .from(schema.proposalComments)
+      .innerJoin(
+        schema.sessionProposals,
+        eq(schema.proposalComments.proposalId, schema.sessionProposals.id)
+      )
+      .innerJoin(
+        schema.events,
+        eq(schema.sessionProposals.eventId, schema.events.id)
+      )
+      .where(inArray(schema.proposalComments.commentId, ids))
+      .all();
+    const sessions = this.db
+      .select({
+        id: schema.sessionComments.commentId,
+        subjectId: schema.sessions.id,
+        title: schema.sessions.title,
+        eventName: schema.events.name,
+        eventSlug: schema.events.slug,
+      })
+      .from(schema.sessionComments)
+      .innerJoin(
+        schema.sessions,
+        eq(schema.sessionComments.sessionId, schema.sessions.id)
+      )
+      .innerJoin(schema.events, eq(schema.sessions.eventId, schema.events.id))
+      .where(inArray(schema.sessionComments.commentId, ids))
+      .all();
+    const profiles = this.db
+      .select({
+        id: schema.profileComments.commentId,
+        subjectId: schema.guests.id,
+        title: schema.guests.name,
+      })
+      .from(schema.profileComments)
+      .innerJoin(
+        schema.guests,
+        eq(schema.profileComments.profileId, schema.guests.id)
+      )
+      .where(inArray(schema.profileComments.commentId, ids))
+      .all();
+
+    const subjects = new Map<
+      string,
+      Pick<AuthoredComment, "kind" | "subjectId" | "subjectTitle" | "event">
+    >();
+    const place = (
+      kind: AuthoredComment["kind"],
+      rows: {
+        id: string;
+        subjectId: string;
+        title: string;
+        eventName?: string;
+        eventSlug?: string;
+      }[]
+    ) => {
+      for (const r of rows)
+        subjects.set(r.id, {
+          kind,
+          subjectId: r.subjectId,
+          subjectTitle: r.title,
+          event:
+            r.eventName && r.eventSlug
+              ? { name: r.eventName, slug: r.eventSlug }
+              : null,
+        });
+    };
+    place("proposal", proposals);
+    place("session", sessions);
+    place("profile", profiles);
+
+    const replies = new Map(
+      this.db
+        .select({
+          id: schema.comments.parentId,
+          n: sql<number>`count(*)`,
+        })
+        .from(schema.comments)
+        .where(
+          and(
+            inArray(schema.comments.parentId, ids),
+            eq(schema.comments.deleted, false)
+          )
+        )
+        .groupBy(schema.comments.parentId)
+        .all()
+        .map((r) => [r.id, r.n])
+    );
+    const likes = new Map(
+      this.db
+        .select({
+          id: schema.commentLikes.commentId,
+          n: sql<number>`count(*)`,
+        })
+        .from(schema.commentLikes)
+        .where(inArray(schema.commentLikes.commentId, ids))
+        .groupBy(schema.commentLikes.commentId)
+        .all()
+        .map((r) => [r.id, r.n])
+    );
+
+    return mine
+      .sort(
+        (a, b) => b.createdTime.localeCompare(a.createdTime) || b.seq - a.seq
+      )
+      .flatMap((c) => {
+        const subject = subjects.get(c.id);
+        return subject
+          ? [
+              {
+                id: c.id,
+                ...subject,
+                body: c.body,
+                createdTime: new Date(c.createdTime),
+                replyCount: replies.get(c.id) ?? 0,
+                likeCount: likes.get(c.id) ?? 0,
+              },
+            ]
+          : [];
+      });
+  }
 
   async findById(commentId: string): Promise<Comment | undefined> {
     const row = this.db

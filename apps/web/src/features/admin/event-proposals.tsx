@@ -14,7 +14,7 @@ import {
   searchByTitleOrHost,
   tableHandlers,
   type OnParams,
-} from "./list-paging";
+} from "../../ui/list-paging";
 import { ConfirmByTyping } from "./confirm-by-typing";
 import { shown, useJumpWithin } from "./use-section-save";
 

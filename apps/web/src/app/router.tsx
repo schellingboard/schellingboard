@@ -12,6 +12,7 @@ import { createScrollReset } from "./panel-history";
 import { Suspense, type ReactElement } from "react";
 import {
   LoginPage,
+  MyCommentsPage,
   NotificationsPage,
   ResetPage,
   BootstrapPage,
@@ -260,6 +261,13 @@ export function createAppRouter(
       return <SettingsPage services={services} />;
     },
   });
+  const myComments = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "comments",
+    component: function MyCommentsRoute(): ReactElement {
+      return <MyCommentsPage services={services} />;
+    },
+  });
   const notifications = createRoute({
     getParentRoute: () => rootRoute,
     path: "notifications",
@@ -392,6 +400,7 @@ export function createAppRouter(
         adminStatistics,
       ]),
       settings,
+      myComments,
       notifications,
       accountSecurity,
       authLogin,

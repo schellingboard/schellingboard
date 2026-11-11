@@ -110,6 +110,14 @@ export function UserMenu({
           >
             Settings
           </a>
+          <a
+            role="menuitem"
+            href="/comments"
+            className={item}
+            onClick={() => setMenuOpen(false)}
+          >
+            My comments
+          </a>
           <div className="my-1 h-px bg-surface-muted" />
           <button
             type="button"

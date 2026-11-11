@@ -9,7 +9,7 @@ import {
 import { useId, type ReactNode } from "react";
 import { cx } from "../../ui/cx";
 import { PeoplePicker } from "../../ui/people-picker";
-import type { OnParams } from "./list-paging";
+import type { OnParams } from "../../ui/list-paging";
 import { FigureCard, figureHeadingId, figureTitle } from "./stats-figure-card";
 import { figuresFor } from "./stats-figures";
 

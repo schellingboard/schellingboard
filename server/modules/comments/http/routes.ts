@@ -4,6 +4,7 @@ import {
   commentEditSchema,
   commentListSchema,
   commentViewSchema,
+  myCommentsSchema,
 } from "@schellingboard/contracts/comment";
 import { pageQuerySchema } from "@schellingboard/contracts/cursor-page";
 import { idempotencyHeaders } from "@/server/http/idempotency";
@@ -57,6 +58,18 @@ function subjectRoutes(kind: CommentSubjectKind, path: string) {
     }),
   };
 }
+
+const listMine = createRoute({
+  method: "get",
+  path: "/me/comments",
+  tags: ["comments"],
+  description:
+    "Every comment and reply the acting guest wrote that is still there, newest first, with where it was written.",
+  responses: {
+    200: json(myCommentsSchema, "The caller's comments"),
+    ...problemDefault,
+  },
+});
 
 const editComment = createRoute({
   method: "put",
@@ -145,6 +158,27 @@ export function addCommentRoutes(app: App, comments: () => CommentUseCases) {
       return c.json(toCommentView(result.value, true), 201);
     });
   }
+
+  app.openapi(listMine, async (c) => {
+    const result = await comments().listMyComments(c.var.actor);
+    if (!result.ok) return problem(result.error);
+    return c.json(
+      {
+        items: result.value.map((item) => ({
+          id: item.id,
+          kind: item.kind,
+          subjectTitle: item.subjectTitle,
+          subjectId: item.subjectId,
+          event: item.event,
+          body: item.body,
+          createdTime: item.createdTime.toISOString(),
+          replyCount: item.replyCount,
+          likeCount: item.likeCount,
+        })),
+      },
+      200
+    );
+  });
 
   app.openapi(editComment, async (c) => {
     const result = await comments().editComment(
