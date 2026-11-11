@@ -256,7 +256,7 @@ test("should open proposal detail page when clicking on a proposal @004-US4", as
   await expect(closeButton).not.toBeVisible();
 
   // Verify we're back on the proposals list page by checking URL
-  await expect(page).toHaveURL(/\/Conference-Alpha\/proposals$/);
+  await expect(page).toHaveURL(/\/Conference-Alpha\/proposals(\?q=.*)?$/);
 
   // Test opening the modal again to verify it can be reopened
   await searchList(page, proposalTitle);
@@ -319,6 +319,33 @@ test("filters the proposal list by search, matching whole descriptions as plain 
   await page.getByRole("button", { name: "Clear search" }).click();
   await expect(search).toHaveValue("");
   await expect(designSystems).toBeVisible();
+});
+
+test("the proposal list keeps its search and sort through a reload and Back @004-US5", async ({
+  page,
+}) => {
+  await loginAndGoto(page, "/Conference-Alpha/proposals");
+  const kubernetes = page.getByRole("row", {
+    name: /Hands-on Docker and Kubernetes/,
+  });
+  const designSystems = page.getByRole("row", { name: /Design Systems/ });
+
+  await page.getByPlaceholder("Search proposals").fill("Kubernetes");
+  await expect(designSystems).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByPlaceholder("Search proposals")).toHaveValue(
+    "Kubernetes"
+  );
+  await expect(kubernetes).toBeVisible();
+  await expect(designSystems).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Clear search" }).click();
+  await page.getByLabel("Sort by").selectOption({ label: "Title ↓" });
+  await selectUser(page, /Bob Test/i);
+  await page.getByRole("link", { name: /Add Proposal/i }).click();
+  await expect(page.getByLabel("Title")).toBeVisible();
+  await page.goBack();
+  await expect(page.getByLabel("Sort by")).toHaveValue("title-asc");
 });
 
 test("filters the proposal list down to your own proposals @004-US5", async ({

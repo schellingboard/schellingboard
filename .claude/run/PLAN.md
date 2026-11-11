@@ -18,8 +18,7 @@ commit. Run the E2E specs a step touches individually; the user runs the full su
 6. Done: emails and notifications link to `/{slug}/sessions|proposals|meetings/:id`; old URLs still
    redirect.
 7. Done: schedule search (`q`) and unfolded days (`unfold`) in search params.
-8. **Proposals list page state.** Query, filter and sort in search params (`replace`), with their
-   own parse and serialize logic.
+8. Done: proposals list search (`q`), filter and sort in search params; the default sort is omitted.
 9. **Scroll per history entry.** Replace `use-scroll-restoration.ts`' one position per `event:view`
    (`sessionStorage`) with one per history entry, for the schedule, the proposals list and the
    directory.

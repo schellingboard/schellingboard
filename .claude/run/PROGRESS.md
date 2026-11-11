@@ -1,6 +1,6 @@
 # Progress
 
-Steps 1 (c344e56d), 2, 3, 4, 5, 6 and 7 done.
+Steps 1 (c344e56d), 2, 3, 4, 5, 6, 7 and 8 done.
 
 - Panel: `ui/side-panel.tsx`; history: `app/panel-history.ts` (`PanelItem` union: session, proposal,
   profile, meeting); host: `app/panel-host.tsx`; links opened in the panel via the `SpaLinks`
@@ -24,7 +24,9 @@ Steps 1 (c344e56d), 2, 3, 4, 5, 6 and 7 done.
   addresses (`?record=count` on reminders); fixtures with old URLs left as data.
 - Step 7 done: the search box stays local while typing; the debounced text is written to `q` with
   `replace`. Reveal-seeded days stay local state, merged with `unfold`.
-- Next: step 8.
+- Step 8 done: `filterFrom`/`sortFrom`/`withFilter`/`withSort` in `list-model.ts`; `openapi-check`
+  cannot run here (needs a server on :3000).
+- Next: step 9.
 
 ## Questions
 
