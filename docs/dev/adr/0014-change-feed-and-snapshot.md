@@ -43,6 +43,7 @@ it, including `version` where the row has one, so a form opened from the replica
 | Own vote               | `vote.cast`, `vote.withdrawn`                              | guests: the voter  |
 | Location in this event | `location.changed`, `location.removed`                     | event              |
 | Room unavailability    | `unavailability.added`, `unavailability.removed`           | event              |
+| Shared moment          | `moment.changed`, `moment.deleted` (also for a day delete) | event              |
 | Event guest (public)   | `guest.joined`, `guest.changed`, `guest.left`              | event              |
 | Meeting                | `meeting.changed`, `meeting.deleted`                       | guests: the two    |
 | Own meeting slots      | `availability.changed`                                     | guests: the owner  |

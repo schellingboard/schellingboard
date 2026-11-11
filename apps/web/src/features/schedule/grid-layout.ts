@@ -1,5 +1,8 @@
 const MS_PER_MINUTE = 60 * 1000;
 
+/** Width of the left time-axis gutter. */
+export const GUTTER = "2.5rem";
+
 /** Rendered height of one slot row in the schedule grid. */
 export const SLOT_HEIGHT_PX = 44;
 

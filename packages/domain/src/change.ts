@@ -1,5 +1,5 @@
 import type { CommentRef } from "./comment";
-import type { Day, Event } from "./event";
+import type { Day, Event, SharedMoment } from "./event";
 import type { Guest } from "./guest";
 import type { Location, LocationUnavailability } from "./location";
 import type { Meeting, MeetingPoint } from "./meeting";
@@ -106,6 +106,19 @@ export type EventDeleted = ChangeOf<"event.deleted", "event", { event: Event }>;
 export type DayCreated = ChangeOf<"day.created", "day", { day: Day }>;
 export type DayChanged = ChangeOf<"day.changed", "day", { day: Day }>;
 export type DayDeleted = ChangeOf<"day.deleted", "day", { day: Day }>;
+
+/** Made or edited; the replica holds the moment as sent. */
+export type MomentChanged = ChangeOf<
+  "moment.changed",
+  "moment",
+  { moment: SharedMoment }
+>;
+
+export type MomentDeleted = ChangeOf<
+  "moment.deleted",
+  "moment",
+  { moment: SharedMoment }
+>;
 
 /** Recorded once for each event the location is assigned to. */
 export type LocationChanged = ChangeOf<
@@ -275,6 +288,8 @@ export type Change =
   | DayCreated
   | DayChanged
   | DayDeleted
+  | MomentChanged
+  | MomentDeleted
   | SessionCreated
   | SessionChanged
   | SessionDeleted
@@ -311,6 +326,8 @@ export function audienceOf(change: Change): Audience {
     case "day.created":
     case "day.changed":
     case "day.deleted":
+    case "moment.changed":
+    case "moment.deleted":
     case "location.changed":
     case "location.removed":
     case "unavailability.added":
@@ -866,6 +883,22 @@ export const changes = {
   dayDeleted(day: Day, { actor, at }: ChangeContext): DayDeleted {
     return dayChange("day.deleted", day, actor, at);
   },
+
+  momentChanged(
+    moment: SharedMoment,
+    eventId: string,
+    { actor, at }: ChangeContext
+  ): MomentChanged {
+    return momentChange("moment.changed", moment, eventId, actor, at);
+  },
+
+  momentDeleted(
+    moment: SharedMoment,
+    eventId: string,
+    { actor, at }: ChangeContext
+  ): MomentDeleted {
+    return momentChange("moment.deleted", moment, eventId, actor, at);
+  },
 };
 
 function proposalChange<
@@ -893,6 +926,26 @@ function proposalChange<
     actor,
     occurredAt,
     payload: { proposal: logged },
+  };
+}
+
+function momentChange<
+  Type extends MomentChanged["type"] | MomentDeleted["type"],
+>(
+  type: Type,
+  moment: SharedMoment,
+  eventId: string,
+  actor: Actor,
+  occurredAt: Date
+) {
+  return {
+    type,
+    subjectType: "moment" as const,
+    subjectId: moment.id,
+    eventId,
+    actor,
+    occurredAt,
+    payload: { moment },
   };
 }
 
