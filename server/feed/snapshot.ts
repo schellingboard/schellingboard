@@ -15,7 +15,7 @@ import {
   toMeetingView,
 } from "@/server/modules/meetings/module";
 import {
-  eventProposals,
+  eventLoggedProposals,
   guestVotes,
   toSnapshotProposalView,
 } from "@/server/modules/proposals/module";
@@ -32,7 +32,7 @@ type SnapshotReads = Parameters<typeof eventScheduleBySlug>[0] &
   Parameters<typeof eventLocations>[0] &
   Parameters<typeof eventGuests>[0] &
   Parameters<typeof eventMeetings>[0] &
-  Parameters<typeof eventProposals>[0] &
+  Parameters<typeof eventLoggedProposals>[0] &
   Parameters<typeof guestVotes>[0] &
   Parameters<typeof newestSeq>[0];
 
@@ -77,7 +77,7 @@ async function assemble(
       eventLocations(q, eventId),
       eventGuests(q, eventId),
       eventMeetings(q, eventId, viewerId),
-      eventProposals(q, eventId),
+      eventLoggedProposals(q, eventId),
       viewerId ? guestVotes(q, viewerId, eventId) : [],
     ]);
   return {

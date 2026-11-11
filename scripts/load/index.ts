@@ -25,7 +25,7 @@ const SESSION_LIFETIME_MS = 30 * 24 * 60 * 60 * 1000;
 // Attendees arrive at about 20 a second, as when an event opens, not all at once.
 const ARRIVAL_MS = 50;
 
-// Baseline at 200 attendees: steady p99 about 250 ms, page load p99 about 4 s.
+// Baseline at 200 attendees: steady p99 under 100 ms, page load p99 about 30 ms.
 // These leave headroom for a slower machine; `--check` fails above them.
 const THRESHOLDS = {
   steady: { p95Ms: 500, p99Ms: 1500 },

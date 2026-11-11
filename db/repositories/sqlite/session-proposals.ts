@@ -7,6 +7,7 @@ import type {
   SessionProposalUpdateInput,
   SessionProposalsRepository,
 } from "../interfaces";
+import type { LoggedProposal } from "@schellingboard/domain/change";
 import type {
   ProposalHost,
   SessionProposal,
@@ -18,11 +19,8 @@ type ProposalRow = typeof schema.sessionProposals.$inferSelect;
 export class SqliteSessionProposalsRepository implements SessionProposalsRepository {
   constructor(private readonly db: DB) {}
 
-  private enrichProposals(rows: ProposalRow[]): SessionProposal[] {
-    if (rows.length === 0) return [];
-
-    const ids = rows.map((r) => r.id);
-
+  private hostsOf(ids: string[]): Map<string, ProposalHost[]> {
+    if (ids.length === 0) return new Map();
     const hostRows = this.db
       .select({
         proposalId: schema.proposalHosts.proposalId,
@@ -36,6 +34,51 @@ export class SqliteSessionProposalsRepository implements SessionProposalsReposit
       )
       .where(inArray(schema.proposalHosts.proposalId, ids))
       .all();
+
+    const byProposal = new Map<string, ProposalHost[]>();
+    for (const r of hostRows) {
+      const list = byProposal.get(r.proposalId) ?? [];
+      list.push({ id: r.id, name: r.name });
+      byProposal.set(r.proposalId, list);
+    }
+    return byProposal;
+  }
+
+  private logged(row: ProposalRow, hosts: ProposalHost[] = []): LoggedProposal {
+    // A deleted guest takes their host row with them but leaves the request,
+    // so the last host gone is read as the request gone.
+    const cohostWanted = row.cohostWanted && hosts.length > 0;
+    return {
+      id: row.id,
+      eventId: row.eventId,
+      title: row.title,
+      description: row.description ?? undefined,
+      durationMinutes: row.durationMinutes ?? undefined,
+      createdTime: new Date(row.createdTime),
+      updatedTime: new Date(row.updatedTime ?? row.createdTime),
+      hosts,
+      cohostWanted,
+      cohostWantedNote: (cohostWanted && row.cohostWantedNote) || undefined,
+      version: row.version,
+    };
+  }
+
+  async listLoggedByEvent(eventId: string): Promise<LoggedProposal[]> {
+    const rows = this.db
+      .select()
+      .from(schema.sessionProposals)
+      .where(eq(schema.sessionProposals.eventId, eventId))
+      .all();
+    const hostsByProposal = this.hostsOf(rows.map((r) => r.id));
+    return rows.map((row) => this.logged(row, hostsByProposal.get(row.id)));
+  }
+
+  private enrichProposals(rows: ProposalRow[]): SessionProposal[] {
+    if (rows.length === 0) return [];
+
+    const ids = rows.map((r) => r.id);
+
+    const hostsByProposal = this.hostsOf(ids);
 
     const voteRows = this.db
       .select({
@@ -64,13 +107,6 @@ export class SqliteSessionProposalsRepository implements SessionProposalsReposit
       )
       .all();
 
-    const hostsByProposal = new Map<string, ProposalHost[]>();
-    for (const r of hostRows) {
-      const list = hostsByProposal.get(r.proposalId) ?? [];
-      list.push({ id: r.id, name: r.name });
-      hostsByProposal.set(r.proposalId, list);
-    }
-
     const voteCountsByProposal = new Map<
       string,
       { total: number; interested: number; maybe: number; skip: number }
@@ -98,21 +134,8 @@ export class SqliteSessionProposalsRepository implements SessionProposalsReposit
         maybe: 0,
         skip: 0,
       };
-      const hosts = hostsByProposal.get(row.id) ?? [];
-      // A deleted guest takes their host row with them but leaves the request,
-      // so the last host gone is read as the request gone.
-      const cohostWanted = row.cohostWanted && hosts.length > 0;
       return {
-        id: row.id,
-        eventId: row.eventId,
-        title: row.title,
-        description: row.description ?? undefined,
-        durationMinutes: row.durationMinutes ?? undefined,
-        createdTime: new Date(row.createdTime),
-        updatedTime: new Date(row.updatedTime ?? row.createdTime),
-        hosts,
-        cohostWanted,
-        cohostWantedNote: (cohostWanted && row.cohostWantedNote) || undefined,
+        ...this.logged(row, hostsByProposal.get(row.id)),
         votesCount: votes.total,
         interestedVotesCount: votes.interested,
         maybeVotesCount: votes.maybe,

@@ -5,6 +5,11 @@ export const eventProposals = (
   eventId: string
 ) => q.sessionProposals.listByEvent(eventId);
 
+export const eventLoggedProposals = (
+  q: Pick<Repositories, "sessionProposals">,
+  eventId: string
+) => q.sessionProposals.listLoggedByEvent(eventId);
+
 export const proposalById = async (
   q: Pick<Repositories, "sessionProposals">,
   id: string
