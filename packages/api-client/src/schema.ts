@@ -1844,7 +1844,7 @@ export interface paths {
       };
     };
     post?: never;
-    /** @description Deletes the acting guest's own comment; one with replies stays as a placeholder. */
+    /** @description Deletes a comment as its author, the owner of what it is on (a profile's person, a session's or proposal's hosts) or an admin; one with replies stays as a placeholder. */
     delete: {
       parameters: {
         query?: never;
@@ -7434,6 +7434,8 @@ export interface components {
       body: string;
       /** @description A deleted comment with replies stays in the thread, without body or author */
       deleted: boolean;
+      /** @description Whether the acting guest may delete it: its author, the owner of what it is on, or an admin */
+      canDelete: boolean;
       /** Format: date-time */
       createdTime: string;
       /** Format: date-time */

@@ -363,6 +363,11 @@ export const features = {
         actor: "attendee",
         priority: "P2",
       },
+      US8: {
+        title: "Profile owner, host or admin removes someone else's comment",
+        actor: "attendee",
+        priority: "P3",
+      },
     },
   },
   "011": {

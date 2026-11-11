@@ -52,16 +52,36 @@ async function modeOfEvent(
   return event?.identityMode ?? "open";
 }
 
+async function subjectOfComment(
+  repos: CommentDeps["repos"],
+  commentId: string
+): Promise<CommentSubject | null> {
+  for (const kind of ["proposal", "session", "profile"] as const) {
+    const id = await thread(repos, kind).findSubjectId(commentId);
+    if (id) return { kind, id };
+  }
+  return null;
+}
+
 async function eventIdOfComment(
   repos: CommentDeps["repos"],
   commentId: string
 ): Promise<string | null> {
-  const proposalId = await repos.proposalComments.findSubjectId(commentId);
-  if (proposalId) return eventIdOf(repos, { kind: "proposal", id: proposalId });
-  const sessionId = await repos.sessionComments.findSubjectId(commentId);
-  return sessionId
-    ? eventIdOf(repos, { kind: "session", id: sessionId })
-    : null;
+  const subject = await subjectOfComment(repos, commentId);
+  return subject ? eventIdOf(repos, subject) : null;
+}
+
+async function ownsSubject(
+  repos: CommentDeps["repos"],
+  guestId: string,
+  { kind, id }: CommentSubject
+): Promise<boolean> {
+  if (kind === "profile") return id === guestId;
+  const subject =
+    kind === "proposal"
+      ? await repos.sessionProposals.findById(id)
+      : await repos.sessions.findById(id);
+  return subject?.hosts.some((h) => h.id === guestId) ?? false;
 }
 
 async function eventIdOf(
@@ -98,6 +118,42 @@ async function ownComment(
     return forbidden("comment.notAuthor", "Comment owned by another guest");
   return comment;
 }
+
+async function removableComment(
+  actor: Actor,
+  repos: CommentDeps["repos"],
+  commentId: string
+): Promise<Result<Comment>> {
+  const acting = await actingGuest(actor, repos.guests);
+  if (!acting.ok) return acting;
+  const comment = await liveComment(repos, commentId);
+  if (!comment.ok) return comment;
+  const subject = await subjectOfComment(repos, commentId);
+  const allowed =
+    comment.value.author?.id === acting.value ||
+    actor.admin ||
+    (subject !== null && (await ownsSubject(repos, acting.value, subject)));
+  return allowed
+    ? comment
+    : forbidden(
+        "comment.notAllowed",
+        "Only the author, the owner of what it is on, or an admin can remove a comment"
+      );
+}
+
+export const removableBy =
+  ({ repos }: CommentDeps) =>
+  async (
+    actor: Actor,
+    subject: CommentSubject
+  ): Promise<(comment: Comment) => boolean> => {
+    const acting = await actingGuest(actor, repos.guests);
+    if (!acting.ok) return () => false;
+    const everything =
+      actor.admin || (await ownsSubject(repos, acting.value, subject));
+    return (comment) =>
+      !comment.deleted && (everything || comment.author?.id === acting.value);
+  };
 
 export const listComments =
   ({ repos }: CommentDeps) =>
@@ -171,8 +227,8 @@ export const deleteComment =
     { commentId }: { commentId: string }
   ): Promise<Result<void>> =>
     uow.run(async (tx) => {
-      const own = await ownComment(actor, tx, commentId);
-      if (!own.ok) return own;
+      const removable = await removableComment(actor, tx, commentId);
+      if (!removable.ok) return removable;
       await tx.comments.delete(commentId);
       return ok(undefined);
     });

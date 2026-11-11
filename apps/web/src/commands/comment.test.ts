@@ -16,6 +16,7 @@ const created = {
   parentId: null,
   body: "Hello",
   deleted: false,
+  canDelete: false,
   createdTime: iso(10),
   editedTime: null,
   author: { id: "mia", name: "MIA" },

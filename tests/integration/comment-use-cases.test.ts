@@ -279,7 +279,7 @@ describe("editing and deleting a comment", () => {
   );
 
   it(
-    "refuses anyone but the author, an organizer included",
+    "refuses edits by anyone but the author, and deletes by unrelated guests",
     { tags: ["010-US4"] },
     async () => {
       const { guest, session } = await subjects();
@@ -294,19 +294,13 @@ describe("editing and deleting a comment", () => {
       const remove = await comments().deleteComment(open(other.id), {
         commentId: comment.id,
       });
-      const adminRemove = await comments().deleteComment(ADMIN, {
-        commentId: comment.id,
-      });
 
       expect(!edit.ok && edit.error).toEqual({
         kind: "forbidden",
         code: "comment.notAuthor",
         detail: "Comment owned by another guest",
       });
-      expect(!remove.ok && remove.error.code).toBe("comment.notAuthor");
-      expect(!adminRemove.ok && adminRemove.error.code).toBe(
-        "guest.unselected"
-      );
+      expect(!remove.ok && remove.error.code).toBe("comment.notAllowed");
       const listed = await comments().listComments(NOBODY, session);
       expect(listed.ok && listed.value.map((c) => c.body)).toEqual(["Hello"]);
     }
@@ -376,6 +370,91 @@ describe("editing and deleting a comment", () => {
         deleted: true,
         body: "",
       });
+    }
+  );
+});
+
+describe("removing someone else's comment", () => {
+  it(
+    "lets the profile's owner, a session's host and an admin delete it, and nobody else",
+    { tags: ["010-US8"] },
+    async () => {
+      const { guest, profile, session } = await subjects();
+      const stranger = await createGuest();
+      const host = await createGuest();
+      const hostedProposal = await createProposal(
+        (await getRepositories().sessions.findById(session.id))!.eventId,
+        [host.id]
+      );
+      const hosted = await createSession(
+        (await getRepositories().sessions.findById(session.id))!.eventId,
+        { hostIds: [host.id] }
+      );
+      const admin: Actor = {
+        admin: true,
+        guest: { id: stranger.id, level: "verified", siteAdmin: true },
+      };
+
+      const onProfile = await posted(stranger.id, profile);
+      const onSession = await posted(guest.id, {
+        kind: "session",
+        id: hosted.id,
+      });
+      const onProposal = await posted(guest.id, {
+        kind: "proposal",
+        id: hostedProposal.id,
+      });
+      const adminTarget = await posted(guest.id, profile);
+
+      const refused = await comments().deleteComment(open(host.id), {
+        commentId: onProfile.id,
+      });
+      const byOwner = await comments().deleteComment(open(guest.id), {
+        commentId: onProfile.id,
+      });
+      const byHost = await comments().deleteComment(open(host.id), {
+        commentId: onSession.id,
+      });
+      const byProposalHost = await comments().deleteComment(open(host.id), {
+        commentId: onProposal.id,
+      });
+      const byAdmin = await comments().deleteComment(admin, {
+        commentId: adminTarget.id,
+      });
+
+      expect(!refused.ok && refused.error.code).toBe("comment.notAllowed");
+      expect([byOwner.ok, byHost.ok, byProposalHost.ok, byAdmin.ok]).toEqual([
+        true,
+        true,
+        true,
+        true,
+      ]);
+    }
+  );
+
+  it(
+    "marks which comments the viewer may delete",
+    { tags: ["010-US8"] },
+    async () => {
+      const { guest, profile } = await subjects();
+      const stranger = await createGuest();
+      const mine = await posted(stranger.id, profile);
+
+      const asOwner = await comments().removableBy(open(guest.id), profile);
+      const asStranger = await comments().removableBy(
+        open(stranger.id),
+        profile
+      );
+      const asNobody = await comments().removableBy(NOBODY, profile);
+
+      expect([asOwner(mine), asStranger(mine), asNobody(mine)]).toEqual([
+        true,
+        true,
+        false,
+      ]);
+      const other = await createGuest();
+      const theirs = await posted(other.id, profile);
+      expect(asStranger(theirs)).toBe(false);
     }
   );
 });

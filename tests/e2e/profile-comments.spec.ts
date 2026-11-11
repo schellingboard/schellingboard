@@ -235,3 +235,29 @@ test("asks visitors without a name to select one before commenting @010-US3 @003
   ).toBeVisible();
   await expect(profile.getByPlaceholder("Add a comment")).toHaveCount(0);
 });
+
+test("removes a comment left on your own profile @010-US8", async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto("/guests");
+  await actAs(page, /Alice Test/i);
+  const left = await openProfile(page, "Mohammed El-Sayed");
+  await left.getByPlaceholder("Add a comment").fill("unwanted remark");
+  await left.getByRole("button", { name: "Comment", exact: true }).click();
+  await expect(postedComment(left, "unwanted remark").first()).toBeVisible();
+  await left.getByRole("button", { name: "Close" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+
+  await actAs(page, /Mohammed El-Sayed/i);
+  const own = await openProfile(page, "Mohammed El-Sayed");
+  await expect(postedComment(own, "unwanted remark").first()).toBeVisible();
+  await expect(own.getByRole("button", { name: "Edit" })).toHaveCount(0);
+  await own.getByRole("button", { name: "Delete" }).click();
+  await page
+    .getByRole("dialog", { name: "Delete comment" })
+    .getByRole("button", { name: "Delete" })
+    .click();
+
+  await expect(postedComment(own, "unwanted remark")).toHaveCount(0);
+});

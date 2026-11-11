@@ -217,6 +217,10 @@
             "type": "boolean",
             "description": "A deleted comment with replies stays in the thread, without body or author"
           },
+          "canDelete": {
+            "type": "boolean",
+            "description": "Whether the acting guest may delete it: its author, the owner of what it is on, or an admin"
+          },
           "createdTime": { "type": "string", "format": "date-time" },
           "editedTime": { "type": ["string", "null"], "format": "date-time" },
           "author": {
@@ -246,6 +250,7 @@
           "parentId",
           "body",
           "deleted",
+          "canDelete",
           "createdTime",
           "editedTime",
           "author",
@@ -3846,7 +3851,7 @@
       },
       "delete": {
         "tags": ["comments"],
-        "description": "Deletes the acting guest's own comment; one with replies stays as a placeholder.",
+        "description": "Deletes a comment as its author, the owner of what it is on (a profile's person, a session's or proposal's hosts) or an admin; one with replies stays as a placeholder.",
         "parameters": [
           {
             "schema": { "type": "string", "minLength": 1 },
