@@ -77,8 +77,11 @@ const named = ({ id, name }: { id: string; name: string }) => ({ id, name });
 export function AdminEventsPage({ api }: { api: Api }) {
   const [state, load] = useQuery(() => createAdminEventsQuery({ api }));
   const calls = useMemo(() => adminEventCalls(api), [api]);
+  const { params, onParams } = useParamUpdates();
   return (
     <AdminEventsScreen
+      params={params}
+      onParams={onParams}
       status={state.status}
       events={state.status === "ready" ? state.events : []}
       calls={calls}
@@ -122,8 +125,11 @@ export function AdminLocationsPage({ api }: { api: Api }) {
   const [locations, load] = useQuery(() => createAdminLocationsQuery({ api }));
   const [events] = useQuery(() => createAdminEventsQuery({ api }));
   const calls = useMemo(() => adminLocationCalls(api), [api]);
+  const { params, onParams } = useParamUpdates();
   return (
     <LocationsScreen
+      params={params}
+      onParams={onParams}
       status={jointStatus(locations, events)}
       locations={locations.status === "ready" ? locations.locations : []}
       events={events.status === "ready" ? events.events.map(named) : []}

@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { paramsUpdater } from "../../ui/list-paging";
 import {
   cleanup,
   render,
@@ -28,21 +30,35 @@ const event = (id: string, name: string, extra: Partial<AdminEvent> = {}) =>
 const setup = (
   events: AdminEvent[],
   handler: (call: FakeCall) => Response = () => problem(404, "x"),
-  status: "loading" | "ready" | "error" = "ready"
+  status: "loading" | "ready" | "error" = "ready",
+  start = ""
 ) => {
   const { api, calls } = fakeApi(handler);
   const onCreated = vi.fn();
-  render(
-    <NoticeProvider>
+  const pushes: [Record<string, string | null>, boolean][] = [];
+  function Page() {
+    const [params, setParams] = useState(new URLSearchParams(start));
+    const change = paramsUpdater(params, (next) => setParams(next));
+    return (
       <AdminEventsScreen
         status={status}
         events={events}
         calls={adminEventCalls(api)}
         onCreated={onCreated}
+        params={params}
+        onParams={(updates, options) => {
+          pushes.push([updates, options.push]);
+          change(updates, options);
+        }}
       />
+    );
+  }
+  render(
+    <NoticeProvider>
+      <Page />
     </NoticeProvider>
   );
-  return { calls, onCreated };
+  return { calls, onCreated, pushes };
 };
 
 describe("the admin events screen", { tags: ["015-US2"] }, () => {
@@ -199,5 +215,40 @@ describe("the admin events screen", { tags: ["015-US2"] }, () => {
     setup([], undefined, "error");
 
     expect(screen.getByRole("alert").textContent).toContain("events");
+  });
+});
+
+describe("paging the admin events", { tags: ["015-US2"] }, () => {
+  const many = Array.from({ length: 120 }, (_, i) =>
+    event(`e${i}`, `Con ${String(i).padStart(3, "0")}`)
+  );
+  const first = () => screen.getAllByRole("listitem")[0].textContent;
+
+  it("shows 50 a page, pushes the page and scrolls to the top", async () => {
+    const scroll = vi.fn();
+    Element.prototype.scrollIntoView = scroll;
+    const { pushes } = setup(many);
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(50);
+    expect(screen.getByText("120 results")).toBeTruthy();
+
+    await userEvent.click(screen.getByRole("button", { name: "Page 3" }));
+
+    expect(pushes.at(-1)).toEqual([{ page: "3" }, true]);
+    expect(first()).toContain("Con 100");
+    expect(screen.getAllByRole("listitem")).toHaveLength(20);
+    expect(scroll).toHaveBeenCalledWith({ block: "start" });
+  });
+
+  it("shows the last page for a page past the end", () => {
+    setup(many, undefined, "ready", "page=99");
+
+    expect(first()).toContain("Con 100");
+  });
+
+  it("has no pager for a short list", () => {
+    setup(many.slice(0, 3));
+
+    expect(screen.queryByRole("navigation", { name: "Pagination" })).toBeNull();
   });
 });

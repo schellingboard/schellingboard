@@ -253,27 +253,26 @@ describe("long statistics tables", { tags: ["021-US1"] }, () => {
           { key: "title", label: "Title", type: "text" },
           { key: "voters", label: "Voters", type: "integer" },
         ],
-        rows: Array.from({ length: 30 }, (_, i) => [`Talk ${i + 1}`, i]),
+        rows: Array.from({ length: 120 }, (_, i) => [`Talk ${i + 1}`, i]),
       },
     ],
   };
   const proposals = () => screen.getByRole("table", { name: "Proposals" });
 
-  it("shows 25 rows at a time, and the next ones on the next page", async () => {
+  it("shows 50 rows at a time, and the next ones on the next page", async () => {
+    const scroll = vi.fn();
+    Element.prototype.scrollIntoView = scroll;
     renderScreen("section=proposals", { stats: long });
 
-    expect(valuesOf(proposals())).toHaveLength(25);
-    expect(screen.getByText("1–25 of 30")).toBeTruthy();
+    expect(valuesOf(proposals())).toHaveLength(50);
+    expect(screen.getByText("120 results")).toBeTruthy();
 
     await userEvent.click(screen.getByRole("button", { name: "Next page" }));
-    expect(valuesOf(proposals())).toEqual([
-      "Talk 26",
-      "Talk 27",
-      "Talk 28",
-      "Talk 29",
-      "Talk 30",
-    ]);
-    expect(screen.getByText("26–30 of 30")).toBeTruthy();
+    expect(valuesOf(proposals())[0]).toBe("Talk 51");
+    expect(scroll).toHaveBeenCalledWith({ block: "start" });
+
+    await userEvent.click(screen.getByRole("button", { name: "Last page" }));
+    expect(valuesOf(proposals())).toHaveLength(20);
   });
 
   it("sorts every row, not only the page, and starts on the first page", async () => {
@@ -284,23 +283,29 @@ describe("long statistics tables", { tags: ["021-US1"] }, () => {
     await userEvent.click(header);
     await userEvent.click(header);
 
-    expect(valuesOf(proposals())[0]).toBe("Talk 30");
-    expect(screen.getByText("1–25 of 30")).toBeTruthy();
+    expect(valuesOf(proposals())[0]).toBe("Talk 120");
+    expect(screen.getByRole("button", { name: "Page 1" })).toHaveProperty(
+      "disabled",
+      true
+    );
   });
 
-  it("finds rows by their text", async () => {
+  it("keeps the rows per page when searching, and finds rows by their text", async () => {
     renderScreen("section=proposals", { stats: long });
+    await userEvent.selectOptions(
+      screen.getByRole("combobox", { name: "Rows per page" }),
+      "25"
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Next page" }));
 
     await userEvent.type(
       screen.getByRole("searchbox", { name: "Search Proposals" }),
-      "talk 2"
+      "talk 1"
     );
 
-    expect(valuesOf(proposals())).toEqual([
-      "Talk 2",
-      ...Array.from({ length: 10 }, (_, i) => `Talk ${20 + i}`),
-    ]);
-    expect(screen.getByText("11 of 30 match")).toBeTruthy();
+    expect(await screen.findByText("32 results")).toBeTruthy();
+    expect(valuesOf(proposals())).toHaveLength(25);
+    expect(valuesOf(proposals())[0]).toBe("Talk 1");
   });
 
   it("shows every row on request", async () => {
@@ -311,8 +316,11 @@ describe("long statistics tables", { tags: ["021-US1"] }, () => {
       "All"
     );
 
-    expect(valuesOf(proposals())).toHaveLength(30);
-    expect(screen.queryByRole("button", { name: "Next page" })).toBeNull();
+    expect(valuesOf(proposals())).toHaveLength(120);
+    expect(screen.queryByRole("button", { name: "Next page" })).toHaveProperty(
+      "disabled",
+      true
+    );
   });
 
   it("leaves search and pages out of a short table", () => {

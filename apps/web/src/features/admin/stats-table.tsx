@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { paramsUpdater } from "../../ui/list-paging";
+import { usePaging } from "../../ui/use-paging";
 import type { StatsTable } from "@schellingboard/contracts/stats";
 import { cx } from "../../ui/cx";
 import { SearchInput } from "../../ui/search-input";
@@ -39,7 +41,6 @@ export function sortRows(
   });
 }
 
-const PAGE_SIZES = [25, 50, 100];
 const SEARCH_FROM = 10;
 
 const plain = (text: string) =>
@@ -57,9 +58,6 @@ export function searchRows(rows: StatsTable["rows"], query: string) {
   );
 }
 
-const pagerButton =
-  "rounded-md border border-line bg-surface-raised px-3 py-1 hover:bg-surface-sunken disabled:cursor-not-allowed disabled:opacity-40";
-
 export function SortableStatsTable({
   table,
   labelledBy,
@@ -72,19 +70,29 @@ export function SortableStatsTable({
     direction: "asc" | "desc";
   } | null>(null);
   const [query, setQuery] = useState("");
-  const [pageSize, setPageSize] = useState<number>(PAGE_SIZES[0]);
-  const [page, setPage] = useState(1);
+  const [paging, setPaging] = useState(new URLSearchParams());
+  const resetPage = () =>
+    setPaging((current) => {
+      const next = new URLSearchParams(current);
+      next.delete("page");
+      return next;
+    });
 
   const matching = searchRows(table.rows, query);
   const sorted = sort
     ? sortRows(matching, sort.column, sort.direction)
     : matching;
-  const pages = Math.max(1, Math.ceil(sorted.length / pageSize));
-  const current = Math.min(page, pages);
-  const first = current === 1 ? 0 : (current - 1) * pageSize;
-  const rows = sorted.slice(first, first + pageSize);
+  const {
+    visible: rows,
+    first,
+    pager,
+    top,
+  } = usePaging<StatsTable["rows"][number], HTMLDivElement>(
+    sorted,
+    paging,
+    paramsUpdater(paging, (next) => setPaging(next))
+  );
   const searchable = table.rows.length > SEARCH_FROM;
-  const pageable = table.rows.length > PAGE_SIZES[0];
 
   return (
     <div className="space-y-3">
@@ -93,11 +101,11 @@ export function SortableStatsTable({
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
-            setPage(1);
+            resetPage();
           }}
           onClear={() => {
             setQuery("");
-            setPage(1);
+            resetPage();
           }}
           aria-label={`Search ${table.title}`}
           placeholder="Search…"
@@ -105,7 +113,7 @@ export function SortableStatsTable({
           inputClassName="rounded-md border border-line bg-surface-raised px-3 py-1.5 text-base sm:text-sm focus:border-line-strong focus:outline-none"
         />
       )}
-      <div className="overflow-x-auto">
+      <div ref={top} className="overflow-x-auto">
         <table aria-labelledby={labelledBy} className="w-full text-sm">
           <thead>
             <tr className="border-b border-line-subtle text-left text-fg-muted">
@@ -136,7 +144,7 @@ export function SortableStatsTable({
                           direction:
                             active && sort.direction === "asc" ? "desc" : "asc",
                         });
-                        setPage(1);
+                        resetPage();
                       }}
                       className="font-medium hover:text-fg"
                     >
@@ -189,66 +197,7 @@ export function SortableStatsTable({
           </tbody>
         </table>
       </div>
-      {(pageable || query) && (
-        <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-fg-muted">
-          <span>
-            {query
-              ? `${sorted.length} of ${table.rows.length} match`
-              : `${sorted.length === 0 ? 0 : first + 1}–${first + rows.length} of ${sorted.length}`}
-          </span>
-          {pageable && (
-            <div className="flex flex-wrap items-center gap-3">
-              <label className="flex items-center gap-2">
-                Rows per page
-                <select
-                  value={pageSize === Infinity ? "all" : String(pageSize)}
-                  onChange={(e) => {
-                    setPageSize(
-                      e.target.value === "all"
-                        ? Infinity
-                        : Number(e.target.value)
-                    );
-                    setPage(1);
-                  }}
-                  className="rounded-md border border-line bg-surface-raised py-1 pl-2 pr-7 text-base text-fg sm:text-sm"
-                >
-                  {PAGE_SIZES.map((size) => (
-                    <option key={size} value={size}>
-                      {size}
-                    </option>
-                  ))}
-                  <option value="all">All</option>
-                </select>
-              </label>
-              {pages > 1 && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => setPage(current - 1)}
-                    disabled={current <= 1}
-                    aria-label="Previous page"
-                    className={pagerButton}
-                  >
-                    Prev
-                  </button>
-                  <span>
-                    Page {current} of {pages}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setPage(current + 1)}
-                    disabled={current >= pages}
-                    aria-label="Next page"
-                    className={pagerButton}
-                  >
-                    Next
-                  </button>
-                </>
-              )}
-            </div>
-          )}
-        </div>
-      )}
+      {pager}
     </div>
   );
 }

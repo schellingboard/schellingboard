@@ -58,13 +58,12 @@ the E2E specs a step touches; the user runs the full suite at the end.
     guests/proposals/sessions/assignments, My comments. Counts and "Clashes" are computed on the
     full set, the result is paged. Search/filter resets to page 1; sort keeps the size. 23a. DONE
     **#831a** `Pager` 50 default; proposals list and directory paged. 23b. DONE **#831b**
-    Notifications (client pages over loaded rows, "Older" kept) and event list. "Load more comments"
-    stays: it is a thread, not a list. 23c. **#831c** Agenda (`agenda-view.tsx`): page the flat
-    items by start time, days and moments kept, counts and Clashes on the full set. Hard parts:
-    reveal-session, match stepper, now line, day folds and scroll restoration must reach into the
-    right page; decide and record. `issue #831`. 23d. **#831d** Admin rest: `stats-table.tsx` own
-    pager (`useState`) to `Pager` with URL params, `events-screen.tsx`, `locations-screen.tsx`,
-    `event-meetings.tsx`, event guest and location lists if long. Footer `fixes #831`.
+    Notifications (chunks loaded on demand) and event list. "Load more comments" stays: it is a
+    thread, not a list. 23c. **#831c** Agenda (`agenda-view.tsx`): page the flat items by start
+    time, days and moments kept, counts and Clashes on the full set. Hard parts: reveal-session,
+    match stepper, now line, day folds and scroll restoration must reach into the right page; decide
+    and record. Footer `fixes #831` (the last step). 23d. DONE **#831d** Admin events, locations and
+    stats tables on `Pager`.
 24. DONE **#1328a** (Medium) i18n foundation: Lingui, `apps/web/src/i18n/`, `en` catalog, scripts
     and Makefile targets, `<html lang>`. Issue step 1.
 25. **#1328b** Locale storage: `guests.locale`, `PATCH /me`, browser fallback, Settings switcher
