@@ -5,7 +5,6 @@ import { BulkActionsBar, DataTable, type Column } from "../../ui/data-table";
 import { FormErrorSummary } from "../../ui/form-error-summary";
 import { cx } from "../../ui/cx";
 import {
-  LIST_PAGE_SIZE,
   pageOf,
   tableHandlers,
   byTitleThenId,
@@ -125,7 +124,7 @@ export function AssignmentManager<T extends Row>({
           searchText(row).some((text) => text.toLowerCase().includes(needle)))
     )
     .sort(byTitleThenId((row) => row.name));
-  const { page, visible } = pageOf(matching, params);
+  const { page, pageSize, visible } = pageOf(matching, params);
 
   const settled = (message: string | null) => {
     setError(message);
@@ -171,7 +170,7 @@ export function AssignmentManager<T extends Row>({
         rowKey={(row) => row.id}
         total={matching.length}
         page={page}
-        pageSize={LIST_PAGE_SIZE}
+        pageSize={pageSize}
         searchQuery={query}
         {...tableHandlers(onParams)}
         searchPlaceholder={searchPlaceholder}

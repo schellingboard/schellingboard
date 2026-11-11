@@ -1,6 +1,5 @@
 import { searchParamUpdates } from "../../ui/data-table";
-
-export const LIST_PAGE_SIZE = 25;
+import { DEFAULT_PAGE_SIZE, PAGE_SIZES, type PageSize } from "../../ui/pager";
 
 export type ParamUpdates = Record<string, string | null>;
 export type OnParams = (
@@ -8,16 +7,26 @@ export type OnParams = (
   options: { push: boolean }
 ) => void;
 
-/** The requested page, clamped into range, and its rows. */
+const pageSizeOf = (params: URLSearchParams): PageSize => {
+  const asked = params.get("pageSize");
+  if (asked === "all") return "all";
+  const size = PAGE_SIZES.find((n) => String(n) === asked);
+  return size ?? DEFAULT_PAGE_SIZE;
+};
+
+/** The requested page, clamped into range, its size and its rows. */
 export function pageOf<T>(rows: T[], params: URLSearchParams) {
-  const lastPage = Math.max(1, Math.ceil(rows.length / LIST_PAGE_SIZE));
+  const pageSize = pageSizeOf(params);
+  const size = pageSize === "all" ? Math.max(1, rows.length) : pageSize;
+  const lastPage = Math.max(1, Math.ceil(rows.length / size));
   const page = Math.min(
     Math.max(1, Math.trunc(Number(params.get("page"))) || 1),
     lastPage
   );
   return {
     page,
-    visible: rows.slice((page - 1) * LIST_PAGE_SIZE, page * LIST_PAGE_SIZE),
+    pageSize,
+    visible: rows.slice((page - 1) * size, page * size),
   };
 }
 
@@ -27,6 +36,14 @@ export const tableHandlers = (onParams: OnParams) => ({
     onParams(searchParamUpdates(query), { push: !replace }),
   onPage: (page: number) =>
     onParams({ page: page > 1 ? String(page) : null }, { push: true }),
+  onPageSize: (size: PageSize) =>
+    onParams(
+      {
+        pageSize: size === DEFAULT_PAGE_SIZE ? null : String(size),
+        page: null,
+      },
+      { push: true }
+    ),
 });
 
 export const byTitleThenId =

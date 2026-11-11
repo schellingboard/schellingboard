@@ -9,7 +9,6 @@ import { PeopleField, TextAreaField, TextField } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
 import type { Person } from "../../ui/people-picker";
 import {
-  LIST_PAGE_SIZE,
   pageOf,
   plural,
   searchByTitleOrHost,
@@ -267,7 +266,7 @@ export function EventProposalsManager({
   onChanged: () => void;
 }) {
   const { query, matching } = searchByTitleOrHost(proposals, params);
-  const { page, visible } = pageOf(matching, params);
+  const { page, pageSize, visible } = pageOf(matching, params);
 
   return (
     <section aria-label="Proposals" className="space-y-4">
@@ -277,7 +276,7 @@ export function EventProposalsManager({
         rowKey={(p) => p.id}
         total={matching.length}
         page={page}
-        pageSize={LIST_PAGE_SIZE}
+        pageSize={pageSize}
         searchQuery={query}
         {...tableHandlers(onParams)}
         searchPlaceholder="Search title or host…"

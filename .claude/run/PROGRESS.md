@@ -52,9 +52,12 @@
   console guard (a 401 from `/api/v1/me/identity` before login, which Firefox does not log).
 
 - #969: new routes `GET /me/push-devices` and `DELETE /me/push-devices/{id}` beside the old
-  endpoint-based check/forget routes (kept: the main toggle uses them). No E2E (push). Follow-up: `isEnabledHere` could be derived
-  from `listDevices` (`some(current)`) and the old routes dropped.
+  endpoint-based check/forget routes (kept: the main toggle uses them). No E2E (push). Follow-up:
+  `isEnabledHere` could be derived from `listDevices` (`some(current)`) and the old routes dropped.
+
+- #684: `stats-table.tsx` keeps its own pager (client state, sizes 25/50/100, shown only above 10
+  rows); `Pager` could replace it in a follow-up.
 
 ## Next step
 
-Step 17.
+Step 18.
