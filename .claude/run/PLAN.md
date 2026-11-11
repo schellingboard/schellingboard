@@ -15,8 +15,8 @@ commit. Run the E2E specs a step touches individually; the user runs the full su
 4. Done: 1-on-1 panel at `/{slug}/meetings/:id`; `?viewMeeting=` redirects; booking stays a dialog.
 5. Done: panels over pages of another scope; `PanelLinks` at the root, `ForeignPanelHost` opens the
    replica.
-6. **New links in emails and notifications.** `utils/notifications.ts` and the server's link
-   builders emit the new URLs. Old URLs still redirect (keep their tests).
+6. Done: emails and notifications link to `/{slug}/sessions|proposals|meetings/:id`; old URLs still
+   redirect.
 7. **Page state outside panels.** Schedule search and unfolded days, directory and proposals list
    search, filters and page in search params (`replace`); scroll restored per history entry.
 8. **Docs and release.** Rewrite `docs/dev/web-app.md` "Opening a modal and closing it" (anchor

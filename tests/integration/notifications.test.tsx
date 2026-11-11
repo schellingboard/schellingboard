@@ -233,7 +233,7 @@ describe("notifySessionChanged", () => {
     expect(html.match(/\(was /g)).toHaveLength(1);
     // Links to the session, prefixed with SITE_URL.
     expect(html).toContain(
-      `href="https://site.example/${event.slug}/schedule?viewSession=${session.id}"`
+      `href="https://site.example/${event.slug}/sessions/${session.id}"`
     );
   });
 
@@ -743,7 +743,7 @@ describe("notifyCohostsAdded", () => {
     expect(html).toContain("Saturday 1 August, 10:00–11:00");
     expect(html).toContain("Room A");
     expect(html).toContain(
-      `href="https://site.example/${event.slug}/schedule?viewSession=${session.id}"`
+      `href="https://site.example/${event.slug}/sessions/${session.id}"`
     );
   });
 
@@ -853,7 +853,7 @@ describe("notifySessionLostHost", { tags: ["013-US4"] }, () => {
     expect(html).toContain("has no host");
     expect(html).toContain("cancelled");
     expect(html).toContain(
-      `href="https://site.example/${event.slug}/schedule?viewSession=${session.id}"`
+      `href="https://site.example/${event.slug}/sessions/${session.id}"`
     );
     const [notification] = await getRepositories().notifications.listByGuest(
       rsvper.id
@@ -1016,7 +1016,7 @@ describe("notifyProposalCommented", () => {
     // The comment itself is not re-sent over email; the link is enough.
     expect(hostHtml).not.toContain("great");
     expect(hostHtml).toContain(
-      `href="https://site.example/${event.slug}/proposals?viewProposal=${proposal.id}#comment-${posted.id}"`
+      `href="https://site.example/${event.slug}/proposals/${proposal.id}#comment-${posted.id}"`
     );
 
     const earlierHtml = await renderWithoutComments(earlierMessage!.body);
@@ -1191,7 +1191,7 @@ describe("notifySessionCommented", () => {
     expect(hostHtml).toContain("session you");
     expect(hostHtml).not.toContain("great");
     expect(hostHtml).toContain(
-      `href="https://site.example/${event.slug}/schedule?viewSession=${session.id}#comment-${posted.id}"`
+      `href="https://site.example/${event.slug}/sessions/${session.id}#comment-${posted.id}"`
     );
   });
 
@@ -1228,7 +1228,7 @@ describe("notifySessionCommented", () => {
       host.id
     );
     expect(notification.url).toBe(
-      `/${event.slug}/schedule?viewSession=${session.id}#comment-${posted.id}`
+      `/${event.slug}/sessions/${session.id}#comment-${posted.id}`
     );
     expect(notification.text).toBe('Rosa Diaz commented on "Hallway Track"');
   });
@@ -1493,7 +1493,7 @@ describe("meeting notifications", () => {
     expect(html).toContain("Sunday 2 August, 13:10–13:30");
     expect(html).toContain("Coffee bar");
     expect(html).toContain(
-      `href="https://site.example/${event.slug}/meetings?viewMeeting=${meeting.id}"`
+      `href="https://site.example/${event.slug}/meetings/${meeting.id}"`
     );
   });
 
@@ -1533,9 +1533,7 @@ describe("meeting notifications", () => {
       recipient.id
     );
     expect(notification.text).toContain("Ada");
-    expect(notification.url).toBe(
-      `/${event.slug}/meetings?viewMeeting=${meeting.id}`
-    );
+    expect(notification.url).toBe(`/${event.slug}/meetings/${meeting.id}`);
   });
 
   it("tells the requester when the recipient answers", async () => {
