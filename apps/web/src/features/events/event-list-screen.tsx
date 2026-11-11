@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { compareEventsByStart } from "@schellingboard/domain/event";
 import { formatEventDates } from "@schellingboard/domain/time";
 
@@ -69,7 +70,7 @@ export function EventListScreen({
               href={`/${event.slug}`}
               className="font-semibold text-brand-fg hover:text-brand-fg-hover flex gap-1 items-center text-sm justify-end mt-2"
             >
-              View event
+              {t`View event`}
               <ChevronRightIcon className="h-4 w-4" />
             </a>
           </div>
