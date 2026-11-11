@@ -23,6 +23,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **A session you add from the schedule is shown after saving**: the schedule scrolls to it, and
   opens its day if that was folded.
 
+### Fixed
+
+- **Long links in Quick Voting now wrap**
+  ([#200](https://github.com/schellingboard/schellingboard/issues/200)): they used to push the page
+  wider than the screen on phones.
+
 ### Internal
 
 - **Faster `make precommit`**: checks only the last change's files, related tests and changed E2E
