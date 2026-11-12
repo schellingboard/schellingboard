@@ -1,4 +1,4 @@
-.PHONY: help dev mailpit build start lint typecheck commit-check arch openapi openapi-check arch-graph arch-diagrams arch-diagrams-check lint-watch test test-unit test-integration test-watch test-coverage use-cases test-e2e test-e2e-headed test-e2e-docker format format-check precommit dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed bootstrap-link dump-release-db screenshots install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate docs-dev docs-dev-build docs-dev-validate www
+.PHONY: help dev mailpit build start lint typecheck commit-check arch openapi openapi-check arch-graph arch-diagrams arch-diagrams-check lint-watch test test-unit test-integration test-watch test-coverage use-cases test-e2e test-e2e-headed test-e2e-docker format format-check precommit dev-migrate-up dev-migrate-status dev-migrate-create dev-db-seed bootstrap-link dump-release-db screenshots load load-test install install-playwright clean clean-all docker-build check-and-format dev-db-reset test-e2e-ci docs docs-build docs-validate docs-dev docs-dev-build docs-dev-validate www
 
 SHELL := /usr/bin/env bash
 
@@ -40,6 +40,8 @@ help:
 	@printf "  %-28s %s\n" "make dev-migrate-create" "Generate new migration"
 	@printf "  %-28s %s\n" "make dev-db-seed"        "Reset dev database and seed dummy data (SEED_PROFILE=small|large)"
 	@printf "  %-28s %s\n" "make screenshots"        "Recapture docs/screenshots/ (ARGS=\"name ...\" for some)"
+	@printf "  %-28s %s\n" "make load"               "Background load for manual testing (USERS=1000 DURATION=15m)"
+	@printf "  %-28s %s\n" "make load-test"          "~60 s load run with thresholds and consistency check"
 	@printf "  %-28s %s\n" "make bootstrap-link"      "Print a single-use link that makes its visitor a site admin"
 	@printf "  %-28s %s\n" "make dump-release-db"    "Record VERSION=vX.Y.Z's seeded DB as an upgrade-test fixture"
 	@printf "\nDocumentation sites:\n"
@@ -201,6 +203,14 @@ dev-db-seed: install
 # Recapture docs/screenshots/ against a throwaway seeded server; ARGS names shots.
 screenshots: install
 	bun x tsx scripts/screenshots/index.ts $(ARGS)
+
+# Background load against a throwaway seeded server, to explore the UI meanwhile.
+load: install
+	bun x tsx scripts/load/index.ts --users $(or $(USERS),1000) --duration $(or $(DURATION),15m) $(ARGS)
+
+# Short run with thresholds and a consistency check; not part of precommit.
+load-test: install
+	bun x tsx scripts/load/index.ts --users 200 --duration 60s --check $(ARGS)
 
 # Once per release: the fixture the release-upgrade tests migrate forward.
 # No set-env.ts — the script seeds a database of its own, in a worktree of the
