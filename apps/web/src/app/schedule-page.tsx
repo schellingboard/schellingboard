@@ -8,6 +8,7 @@ import { hardReload } from "./hard-navigate";
 import { useMeetingClashes } from "./use-meeting-clashes";
 import { useHealth } from "./health";
 import { useUpdateStatus } from "./updates";
+import { useHistoryEntry } from "./use-history-entry";
 import { useUrlSearchParams } from "./use-url-search-params";
 import { landOnPanel } from "./panel-history";
 import { useScheduleActions } from "./use-schedule-actions";
@@ -24,6 +25,7 @@ function Loaded(view: EventView) {
   const health = useHealth(api);
   const update = useUpdateStatus(api);
   const { params, change: changeParams, back, setHash } = useUrlSearchParams();
+  const historyEntry = useHistoryEntry();
   const links = useMemo(() => scheduleLinks(slug), [slug]);
   const clashes = useMeetingClashes(api, store);
   const { history } = useRouter();
@@ -80,6 +82,7 @@ function Loaded(view: EventView) {
         params={params}
         onParamsChange={changeParams}
         onBack={back}
+        historyEntry={historyEntry}
         openSession={openSession}
         revealSessionId={
           panel?.landed &&

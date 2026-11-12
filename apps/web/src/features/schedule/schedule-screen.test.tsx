@@ -100,6 +100,7 @@ function screenAt(
         onBack={() => {}}
         openSession={openSession}
         revealSessionId={reveal}
+        historyEntry="entry"
         sync={<span>Live</span>}
         footer={<footer>Footer</footer>}
         onReload={() => {}}
@@ -402,7 +403,7 @@ describe("ScheduleScreen search and filters", () => {
 describe("ScheduleScreen scrolling", () => {
   it("returns to where each view was left", { tags: ["007-US1"] }, () => {
     sessionStorage.setItem(
-      "schedule-scroll:conf:agenda",
+      "scroll:entry:agenda",
       JSON.stringify({ left: 0, top: 500 })
     );
     screenAt("view=agenda");

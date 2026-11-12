@@ -12,6 +12,8 @@ import { LOCAL_ZONE } from "./local-zone";
 import { landOnPanel } from "./panel-history";
 import { useVoting } from "./use-proposal-actions";
 import { likerFrom, useCommentSource } from "./use-comment-actions";
+import { useScrollRestoration } from "../ui/use-scroll-restoration";
+import { useHistoryEntry } from "./use-history-entry";
 import { useUrlSearchParams } from "./use-url-search-params";
 
 function useEventStandings({ api, snapshot }: EventView) {
@@ -33,6 +35,7 @@ function List(view: EventView) {
   const vote = useVoting(view);
   useViewProposalRedirect(slug, links.proposals);
   const { params, change } = useUrlSearchParams();
+  useScrollRestoration(null, useHistoryEntry());
 
   return (
     <>

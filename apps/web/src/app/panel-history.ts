@@ -21,7 +21,8 @@ type Raw = {
   __tempLocation?: Background & { href: string; state: object };
 };
 
-const rawState = (location: HistoryLocation) => location.state as Raw;
+const rawState = (location: Pick<HistoryLocation, "state">) =>
+  location.state as Raw;
 
 export const panelPath = (item: PanelItem) => {
   const id = encodeURIComponent(item.id);
@@ -146,4 +147,33 @@ export function landOnPanel(
     { pathname, search: query ? `?${query}` : "", hash: "" },
     hash
   );
+}
+
+/**
+ * The router's scroll hook, taking its scroll handling over: the window goes to
+ * the top when the page behind changes (to its hash target, if any), and stays
+ * put while only a panel or the page's own query changes. It always answers
+ * "no", so the router's own per-entry restoration never runs.
+ */
+export function createScrollReset() {
+  let shown: string | null = null;
+  return ({
+    location,
+  }: {
+    location: Pick<HistoryLocation, "pathname" | "hash" | "state">;
+  }) => {
+    const { pathname, hash } = rawState(location).__tempLocation ?? location;
+    if (pathname === shown) return false;
+    shown = pathname;
+    const target = hash ? document.getElementById(hash.slice(1)) : null;
+    if (target) target.scrollIntoView();
+    else window.scrollTo(0, 0);
+    return false;
+  };
+}
+
+/** The position of the page behind any panel in the history stack. */
+export function entryIndexOf(location: HistoryLocation) {
+  const index = (location.state as { __TSR_index?: number }).__TSR_index ?? 0;
+  return index - (panelOf(location)?.depth ?? 0);
 }

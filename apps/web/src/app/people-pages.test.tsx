@@ -74,6 +74,17 @@ describe("the people pages", { tags: ["011-US3"] }, () => {
     expect(router.history.location.search).toBe("?q=bo");
   });
 
+  it("brings the directory back to where its entry was left, once the rows are in", async () => {
+    sessionStorage.setItem("scroll:0:/guests", '{"left":0,"top":420}');
+    const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+
+    await open({ handler: answers, path: "/guests", identity: "al" });
+
+    await screen.findByRole("link", { name: /^Bo/ });
+    await waitFor(() => expect(scrollTo).toHaveBeenCalledWith(0, 420));
+    sessionStorage.clear();
+  });
+
   it("opens a profile address over the directory, which Prev and Next walk", async () => {
     const { router } = await open({
       handler: answers,

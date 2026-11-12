@@ -36,11 +36,11 @@ import { ScheduleFilters } from "./schedule-filters";
 import { ScheduleToolbar, scheduleView } from "./schedule-toolbar";
 import { matchesInReadingOrder } from "./search";
 import { PullToRefresh } from "./pull-to-refresh";
+import { useScrollRestoration } from "../../ui/use-scroll-restoration";
 import { useSearchParamText } from "../../ui/use-search-param-text";
 import { useDragToPan } from "./use-drag-to-pan";
 import { schedulingNotice } from "./scheduling-notice";
 import { dayOfSession, useRevealSession } from "./reveal-session";
-import { useScrollRestoration } from "./use-scroll-restoration";
 import { useStatusHeight } from "./use-status-height";
 
 const NO_FILTERS: ScheduleFilterState = { mine: null };
@@ -59,6 +59,7 @@ export function ScheduleScreen({
   onBack,
   openSession,
   revealSessionId,
+  historyEntry,
   onHashChange,
   sync,
   footer,
@@ -77,6 +78,8 @@ export function ScheduleScreen({
   openSession: (sessionId: string) => void;
   /** A session an address named, which is brought into view. */
   revealSessionId: string | null;
+  /** Names the history entry the page is shown at, which its scroll position is kept under. */
+  historyEntry: string;
   /** Sets the address's hash in place, without a history entry. */
   onHashChange: (hash: string) => void;
   sync: ReactNode;
@@ -95,7 +98,12 @@ export function ScheduleScreen({
   const scrollerRef = useRef<HTMLDivElement>(null);
   useDragToPan(scrollerRef, view === "grid");
   // Per view: the grid and the agenda have nothing in common to scroll to.
-  useScrollRestoration(scrollerRef, `${snapshot.event.slug}:${view}`);
+  useScrollRestoration(
+    scrollerRef,
+    `${historyEntry}:${view}`,
+    true,
+    `${snapshot.event.slug}:${view}`
+  );
   // After restoration, so the address wins over the remembered position.
   useRevealSession(scrollerRef, revealSessionId);
 
