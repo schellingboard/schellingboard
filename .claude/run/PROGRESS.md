@@ -2,6 +2,13 @@
 
 ## Decisions
 
+- 23b (#831): notifications load server chunks of 50 on demand: until the requested page plus one
+  row is loaded (deep links work), so Next stays on offer; `Pager` `more` shows "100+". "Select
+  page" and the ticks are per page. Agenda moved to its own step 23c: it needs an owner decision
+  (reveal, stepper, now line, folds across pages).
+- 23a also added to `Pager`: `listTop` (scroll on page change), `showTotal`; `pageOf` returns
+  `lastPage`, `total`; `showsPager`.
+
 - 23a (#831): `Pager` default 50, sizes 25/50/100 (10 dropped; admin tables follow). Changing
   search, filter or sort drops `page` (`withFilter`, `withSort`, `useSearchParamText`, directory
   `withParams`); `paramsUpdater` in `list-paging.ts` adapts any param setter to `tableHandlers`.
@@ -153,4 +160,4 @@
 
 ## Next step
 
-Step 24 (#1328a); 23 is blocked.
+Step 23c (agenda) waits for an owner decision; otherwise 23d, then 25 (#1328b).

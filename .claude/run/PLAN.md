@@ -57,14 +57,14 @@ the E2E specs a step touches; the user runs the full suite at the end.
     50, sizes 25/50/100, `page`/`pageSize` URL params). Survey: already on `Pager`: admin
     guests/proposals/sessions/assignments, My comments. Counts and "Clashes" are computed on the
     full set, the result is paged. Search/filter resets to page 1; sort keeps the size. 23a. DONE
-    **#831a** `Pager` default 50, sizes 25/50/100; proposals list and directory paged. 23b.
-    **#831b** Other attendee lists: agenda (page the flat day entries by item, day headings and
-    moments kept per page), notifications (replace the "load more" cursor by pages over the loaded
-    rows or server pages), event list, "Load more comments" in `comments-section.tsx` stays
-    (threads, not a table; record the reason). Footer `issue #831`. 23c. **#831c** Admin rest:
-    `stats-table.tsx` own pager (state in `useState`) to `Pager` with URL params,
-    `events-screen.tsx`, `locations-screen.tsx`, `event-meetings.tsx`, event guest and location
-    lists if long; align any default of 25. Footer `fixes #831`.
+    **#831a** `Pager` 50 default; proposals list and directory paged. 23b. DONE **#831b**
+    Notifications (client pages over loaded rows, "Older" kept) and event list. "Load more comments"
+    stays: it is a thread, not a list. 23c. **#831c** Agenda (`agenda-view.tsx`): page the flat
+    items by start time, days and moments kept, counts and Clashes on the full set. Hard parts:
+    reveal-session, match stepper, now line, day folds and scroll restoration must reach into the
+    right page; decide and record. `issue #831`. 23d. **#831d** Admin rest: `stats-table.tsx` own
+    pager (`useState`) to `Pager` with URL params, `events-screen.tsx`, `locations-screen.tsx`,
+    `event-meetings.tsx`, event guest and location lists if long. Footer `fixes #831`.
 24. DONE **#1328a** (Medium) i18n foundation: Lingui, `apps/web/src/i18n/`, `en` catalog, scripts
     and Makefile targets, `<html lang>`. Issue step 1.
 25. **#1328b** Locale storage: `guests.locale`, `PATCH /me`, browser fallback, Settings switcher

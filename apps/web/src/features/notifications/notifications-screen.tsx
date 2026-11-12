@@ -8,16 +8,22 @@ import type {
 import { Button } from "../../ui/button";
 import { ConfirmDialog } from "../../ui/confirm-dialog";
 import { CheckIcon } from "../../ui/icons";
+import { pageOf, requestedPage, type OnParams } from "../../ui/list-paging";
+import { usePaging } from "../../ui/use-paging";
 
 /** The signed-in guest's notifications: tick rows to mark or delete them, click one to open it. */
 export function NotificationsScreen({
   query,
   now,
+  params,
+  onParams,
   onOpen,
   onUnreadChange,
 }: {
   query: NotificationsQuery;
   now: Date;
+  params: URLSearchParams;
+  onParams: OnParams;
   /** Where a notification leads, once it is marked read. */
   onOpen: (url: string) => void;
   onUnreadChange: (count: number) => void;
@@ -27,7 +33,35 @@ export function NotificationsScreen({
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [failedAt, setFailedAt] = useState<number | null>(null);
   const unread = state.status === "ready" ? state.unreadCount : undefined;
+  const more = state.status === "ready" && state.hasMore;
+  const items = state.status === "ready" ? state.items : [];
+  const loaded = items.length;
+  const pageSize = pageOf([], params).pageSize;
+  const wanted =
+    pageSize === "all" ? Infinity : requestedPage(params) * pageSize;
+  const waiting = more && loaded < wanted && failedAt !== wanted;
+  const { visible, pager, top } = usePaging<NotificationItem, HTMLDivElement>(
+    items,
+    params,
+    onParams,
+    { more, disabled: waiting }
+  );
+
+  useEffect(() => {
+    if (!waiting) return;
+    let stale = false;
+    void query.loadMore().then((result) => {
+      if (!stale && !result.ok) {
+        setFailedAt(wanted);
+        setError(result.message);
+      }
+    });
+    return () => {
+      stale = true;
+    };
+  }, [waiting, loaded, wanted, query]);
 
   useEffect(() => {
     if (unread !== undefined) onUnreadChange(unread);
@@ -46,10 +80,9 @@ export function NotificationsScreen({
       </p>
     );
 
-  const { items, hasMore } = state;
-  const allSelected =
-    items.length > 0 && items.every((i) => selected.has(i.id));
-  const someSelected = selected.size > 0;
+  const chosen = visible.filter((i) => selected.has(i.id)).map((i) => i.id);
+  const allSelected = visible.length > 0 && chosen.length === visible.length;
+  const someSelected = chosen.length > 0;
 
   const toggle = (id: string) =>
     setSelected((current) => {
@@ -83,7 +116,10 @@ export function NotificationsScreen({
   };
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-4 px-4 sm:px-0">
+    <div
+      ref={top}
+      className="mx-auto flex max-w-2xl flex-col gap-4 px-4 sm:px-0"
+    >
       <h1 className="text-2xl font-bold">Notifications</h1>
 
       {items.length === 0 ? (
@@ -107,19 +143,19 @@ export function NotificationsScreen({
                 }}
                 onChange={() =>
                   setSelected(
-                    allSelected ? new Set() : new Set(items.map((i) => i.id))
+                    allSelected ? new Set() : new Set(visible.map((i) => i.id))
                   )
                 }
                 className="h-4 w-4 cursor-pointer"
               />
-              Select all
+              Select page
             </label>
             <div className="ml-auto flex gap-2">
               <Button
                 variant="quiet"
                 className="border border-line"
                 disabled={!someSelected || busy}
-                onClick={() => void act(query.markRead, [...selected])}
+                onClick={() => void act(query.markRead, chosen)}
               >
                 Mark as read
               </Button>
@@ -133,20 +169,26 @@ export function NotificationsScreen({
             </div>
           </div>
 
-          <ul className="flex flex-col gap-2">
-            {items.map((item) => (
-              <Row
-                key={item.id}
-                item={item}
-                now={now}
-                ticked={selected.has(item.id)}
-                busy={busy}
-                onTick={() => toggle(item.id)}
-                onOpen={() => void open(item.id)}
-                onMarkRead={() => void act(query.markRead, [item.id])}
-              />
-            ))}
-          </ul>
+          {waiting ? (
+            <p role="status" className="text-fg-muted">
+              Loading…
+            </p>
+          ) : (
+            <ul className="flex flex-col gap-2">
+              {visible.map((item) => (
+                <Row
+                  key={item.id}
+                  item={item}
+                  now={now}
+                  ticked={selected.has(item.id)}
+                  busy={busy}
+                  onTick={() => toggle(item.id)}
+                  onOpen={() => void open(item.id)}
+                  onMarkRead={() => void act(query.markRead, [item.id])}
+                />
+              ))}
+            </ul>
+          )}
         </>
       )}
 
@@ -156,25 +198,28 @@ export function NotificationsScreen({
         </p>
       )}
 
-      {hasMore && (
-        <div className="flex justify-end">
-          <Button
-            variant="quiet"
-            disabled={busy}
-            onClick={() => void run(query.loadMore)}
-          >
-            Older →
-          </Button>
-        </div>
+      {failedAt !== null && failedAt === wanted && (
+        <Button
+          variant="quiet"
+          className="self-start border border-line"
+          onClick={() => {
+            setFailedAt(null);
+            setError(null);
+          }}
+        >
+          Try again
+        </Button>
       )}
+
+      {pager}
 
       <ConfirmDialog
         open={confirming}
         title="Delete notifications"
         message={
-          selected.size === 1
+          chosen.length === 1
             ? "Delete this notification? This cannot be undone."
-            : `Delete these ${selected.size} notifications? This cannot be undone.`
+            : `Delete these ${chosen.length} notifications? This cannot be undone.`
         }
         confirmLabel="Delete"
         destructive
@@ -182,7 +227,7 @@ export function NotificationsScreen({
         onCancel={() => setConfirming(false)}
         onConfirm={() => {
           setConfirming(false);
-          void act(query.remove, [...selected]);
+          void act(query.remove, chosen);
         }}
       />
     </div>

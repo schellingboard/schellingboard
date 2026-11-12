@@ -210,6 +210,7 @@ function Settings({
 function Notifications({ api, now }: { api: AppServices["api"]; now: Date }) {
   const { history } = useRouter();
   const [, setUnread] = useUnread();
+  const { params, onParams } = useParamUpdates();
   const [query] = useState(() =>
     createNotificationsQuery({ calls: notificationCalls(api) })
   );
@@ -228,6 +229,8 @@ function Notifications({ api, now }: { api: AppServices["api"]; now: Date }) {
     <NotificationsScreen
       query={query}
       now={now}
+      params={params}
+      onParams={onParams}
       onOpen={(url) => history.push(url)}
       onUnreadChange={setUnread}
     />
