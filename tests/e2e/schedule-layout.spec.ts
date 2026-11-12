@@ -249,7 +249,7 @@ test.describe("pull to refresh", () => {
   });
 });
 
-test("the grid keeps its place after a session is added from it @008-US1", async ({
+test("the new session is in view after it is added from the grid @008-US1", async ({
   page,
 }) => {
   // A drag, a form round trip and a re-render, on a phone-sized viewport.
@@ -312,10 +312,8 @@ test("the grid keeps its place after a session is added from it @008-US1", async
   await expect(
     page.getByRole("heading", { name: /Add a session/i })
   ).toBeVisible();
-  await page
-    .getByRole("textbox")
-    .first()
-    .fill(`E2E Scroll Anchor Session ${uniqueSuffix()}`);
+  const title = `E2E Scroll Anchor Session ${uniqueSuffix()}`;
+  await page.getByRole("textbox").first().fill(title);
 
   // Book a slot reserved for this test rather than the one that was clicked:
   // which slot the drag lands on depends on the layout, while the grid is
@@ -334,7 +332,9 @@ test("the grid keeps its place after a session is added from it @008-US1", async
 
   await page.getByRole("button", { name: "Submit" }).click();
 
-  // Back on the schedule, still looking at the same corner of it.
+  // Back on the schedule, scrolled to the new session, which is not where the
+  // reader was looking.
   await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
-  await expect.poll(position).toEqual(before);
+  await expect(scroller.getByText(title)).toBeInViewport();
+  expect(await position()).not.toEqual(before);
 });

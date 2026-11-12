@@ -30,10 +30,12 @@ function Loaded(view: EventView) {
   const clashes = useMeetingClashes(api, store);
   const { history } = useRouter();
   const { panel, open } = usePanel();
-  const [openAtMount] = useState(() =>
-    panel?.item.kind === "session" && panel.item.slug === slug
-      ? panel.item.id
-      : null
+  const [openAtMount] = useState(
+    () =>
+      (history.location.state as { revealSession?: string }).revealSession ??
+      (panel?.item.kind === "session" && panel.item.slug === slug
+        ? panel.item.id
+        : null)
   );
   const viewSession = params.get("viewSession");
   const viewMeeting = params.get("viewMeeting");

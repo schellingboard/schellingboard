@@ -11,10 +11,11 @@ export function dayOfSession(
   );
 }
 
-/** Brings the session an address named to the middle of the schedule, once. */
+/** Brings the session an address named, or one just added, to the middle of the schedule once it is shown. */
 export function useRevealSession(
   scrollerRef: RefObject<HTMLElement | null>,
-  sessionId: string | null
+  sessionId: string | null,
+  day: string | null
 ) {
   useLayoutEffect(() => {
     if (!sessionId) return;
@@ -25,5 +26,5 @@ export function useRevealSession(
         inline: "center",
         behavior: "instant",
       });
-  }, [scrollerRef, sessionId]);
+  }, [scrollerRef, sessionId, day]);
 }
