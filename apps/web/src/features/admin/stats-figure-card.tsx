@@ -1,3 +1,4 @@
+import { i18n, type MessageDescriptor } from "@lingui/core";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import type { StatsTable } from "@schellingboard/contracts/stats";
@@ -12,12 +13,12 @@ import { formatCell, SortableStatsTable } from "./stats-table";
 export const figureHeadingId = (figure: Figure) => `stats-${figure.key}`;
 
 export const figureTitle = (figure: Figure, table: StatsTable) =>
-  figure.title ?? table.title;
+  figure.title ? i18n._(figure.title) : table.title;
 
 const switchButton =
   "px-2.5 py-1 text-sm font-medium first:rounded-l-md last:rounded-r-md";
 
-function Help({ title, help }: { title: string; help: string[] }) {
+function Help({ title, help }: { title: string; help: MessageDescriptor[] }) {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -31,9 +32,10 @@ function Help({ title, help }: { title: string; help: string[] }) {
       </button>
       <Dialog open={open} onClose={() => setOpen(false)} title={title}>
         <div className="space-y-2 text-sm text-fg-muted">
-          {help.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
+          {help.map((paragraph) => {
+            const text = i18n._(paragraph);
+            return <p key={text}>{text}</p>;
+          })}
         </div>
       </Dialog>
     </>
