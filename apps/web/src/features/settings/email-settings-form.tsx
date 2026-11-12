@@ -3,49 +3,52 @@ import { settingsCalls, type EmailSettingsBody } from "../../commands/settings";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import { Button } from "../../ui/button";
 import { CheckboxField } from "../../ui/form";
+import { i18n, type MessageDescriptor } from "@lingui/core";
+import { msg, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 
-const OPTIONS: { name: keyof EmailSettingsBody; label: string }[] = [
+const OPTIONS: { name: keyof EmailSettingsBody; label: MessageDescriptor }[] = [
   {
     name: "rsvpChange",
-    label:
-      "a session I’ve RSVP’d to changes time or location, loses its host, or is deleted",
+    label: msg`a session I’ve RSVP’d to changes time or location, loses its host, or is deleted`,
   },
   {
     name: "hostChange",
-    label: "a session I’m hosting changes time or location, or is deleted",
+    label: msg`a session I’m hosting changes time or location, or is deleted`,
   },
-  { name: "cohostAdd", label: "someone adds me as a session host or co-host" },
+  {
+    name: "cohostAdd",
+    label: msg`someone adds me as a session host or co-host`,
+  },
   {
     name: "proposalJoin",
-    label: "someone joins a proposal I’m hosting as a co-host",
+    label: msg`someone joins a proposal I’m hosting as a co-host`,
   },
   {
     name: "proposalComment",
-    label: "someone comments on a proposal I’m hosting",
+    label: msg`someone comments on a proposal I’m hosting`,
   },
   {
     name: "sessionComment",
-    label: "someone comments on a session I’m hosting",
+    label: msg`someone comments on a session I’m hosting`,
   },
-  { name: "profileComment", label: "someone comments on my profile" },
+  { name: "profileComment", label: msg`someone comments on my profile` },
   {
     name: "commentThread",
-    label:
-      "someone comments on a proposal, session or profile I’ve commented on",
+    label: msg`someone comments on a proposal, session or profile I’ve commented on`,
   },
-  { name: "meetingRequest", label: "someone asks me for a 1-on-1" },
+  { name: "meetingRequest", label: msg`someone asks me for a 1-on-1` },
   {
     name: "meetingResponse",
-    label: "a 1-on-1 of mine is accepted, declined or canceled",
+    label: msg`a 1-on-1 of mine is accepted, declined or canceled`,
   },
   {
     name: "sessionHeadsUp",
-    label: "a session I’m hosting starts in an hour",
+    label: msg`a session I’m hosting starts in an hour`,
   },
   {
     name: "attendeeCountReminder",
-    label:
-      "a session I’m hosting has ended, so I can record how many people attended",
+    label: msg`a session I’m hosting has ended, so I can record how many people attended`,
   },
 ];
 
@@ -62,6 +65,7 @@ export function EmailSettingsForm({
     call: (key) => calls.saveEmailSettings(values, key),
   });
 
+  const error = mutation.error;
   const confirmed =
     saved && OPTIONS.every(({ name }) => saved[name] === values[name]);
 
@@ -77,40 +81,42 @@ export function EmailSettingsForm({
     <form
       onSubmit={(e) => void onSubmit(e)}
       className="flex flex-col gap-4"
-      aria-label="Email settings"
+      aria-label={t`Email settings`}
     >
       <fieldset className="flex flex-col gap-2">
         <legend className="mb-1 text-lg font-semibold">
-          Email me when&hellip;
+          <Trans>Email me when…</Trans>
         </legend>
         <p className="mb-1 text-sm text-fg-subtle">
-          Notifications go to the email address the organizers have for you.
-          Contact an organizer to change it.
+          <Trans>
+            Notifications go to the email address the organizers have for you.
+            Contact an organizer to change it.
+          </Trans>
         </p>
         {OPTIONS.map(({ name, label }) => (
           <CheckboxField
             key={name}
             name={name}
-            label={label}
+            label={i18n._(label)}
             checked={values[name]}
             onChange={(checked) => setValues({ ...values, [name]: checked })}
           />
         ))}
       </fieldset>
 
-      {mutation.error && (
+      {error && (
         <p role="alert" className="text-sm text-danger-fg">
-          Error: {mutation.error}
+          <Trans>Error: {error}</Trans>
         </p>
       )}
 
       <div className="flex items-center gap-4">
         <Button type="submit" disabled={mutation.pending} className="px-12">
-          {mutation.pending ? "Saving..." : "Save"}
+          {mutation.pending ? t`Saving...` : t`Save`}
         </Button>
         {confirmed && (
           <span role="status" className="text-sm text-success-fg">
-            Saved
+            {t`Saved`}
           </span>
         )}
       </div>

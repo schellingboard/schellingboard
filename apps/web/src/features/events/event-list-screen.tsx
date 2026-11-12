@@ -6,6 +6,7 @@ import { CalendarIcon, ChevronRightIcon, LinkIcon } from "../../ui/icons";
 import { Markdown } from "../../ui/markdown";
 import type { OnParams } from "../../ui/list-paging";
 import { usePaging } from "../../ui/use-paging";
+import { t } from "@lingui/core/macro";
 
 export interface SiteInfo {
   title: string;
@@ -64,7 +65,7 @@ export function EventListScreen({
               href={`/${event.slug}`}
               className="font-semibold text-brand-fg hover:text-brand-fg-hover flex gap-1 items-center text-sm justify-end mt-2"
             >
-              View event
+              {t`View event`}
               <ChevronRightIcon className="h-4 w-4" />
             </a>
           </div>

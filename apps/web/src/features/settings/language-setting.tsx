@@ -4,6 +4,8 @@ import type { SettingsCalls } from "../../commands/settings";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import { useStoredLocale } from "../../i18n";
 import { LOCALES } from "../../i18n/locales";
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 
 const languageName = (locale: string) =>
   new Intl.DisplayNames([locale], { type: "language" }).of(locale) ?? locale;
@@ -21,6 +23,7 @@ export function LanguageSetting({
   const mutation = useFormMutation({
     call: (key) => calls.saveLocale({ locale: wanted.current }, key),
   });
+  const error = mutation.error;
   const choose = async (value: string) => {
     wanted.current = (value || null) as Locale | null;
     const result = await mutation.submit();
@@ -29,25 +32,25 @@ export function LanguageSetting({
   return (
     <section aria-labelledby="language-heading" className="flex flex-col gap-2">
       <h2 id="language-heading" className="text-lg font-semibold">
-        Language
+        <Trans>Language</Trans>
       </h2>
       <select
-        aria-label="Language"
+        aria-label={t`Language`}
         value={stored ?? ""}
         disabled={mutation.pending}
         onChange={(e) => void choose(e.target.value)}
         className="w-fit rounded-md border border-line bg-surface-raised py-1 pl-2 pr-7 text-base text-fg sm:text-sm"
       >
-        <option value="">Automatic (follow my browser)</option>
+        <option value="">{t`Automatic (follow my browser)`}</option>
         {locales.map((locale) => (
           <option key={locale} value={locale}>
             {languageName(locale)}
           </option>
         ))}
       </select>
-      {mutation.error && (
+      {error && (
         <p role="alert" className="text-sm text-danger-fg">
-          Error: {mutation.error}
+          <Trans>Error: {error}</Trans>
         </p>
       )}
     </section>

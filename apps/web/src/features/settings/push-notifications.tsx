@@ -5,6 +5,9 @@ import { awaitMutation } from "../../commands/mutation";
 import type { SettingsCalls } from "../../commands/settings";
 import { useFormatLocale } from "../../i18n/format-locale";
 import { Button } from "../../ui/button";
+import { i18n, type MessageDescriptor } from "@lingui/core";
+import { msg, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 
 type State =
   | "checking"
@@ -60,8 +63,12 @@ type Device = {
 const formatDate = (iso: string, locale: string) =>
   new Date(iso).toLocaleDateString(locale, { dateStyle: "medium" });
 
-const describe = (device: Device, locale: string) =>
-  `${device.host}, on since ${formatDate(device.createdAt, locale)}${device.current ? ", this device" : ""}`;
+const describe = ({ host, createdAt, current }: Device, locale: string) => {
+  const since = formatDate(createdAt, locale);
+  return current
+    ? t`${host}, on since ${since}, this device`
+    : t`${host}, on since ${since}`;
+};
 
 export function PushNotifications({
   publicKey,
@@ -80,9 +87,9 @@ export function PushNotifications({
   const locale = useFormatLocale();
   const [state, setState] = useState<State>("checking");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<MessageDescriptor | string | null>(null);
   const [devices, setDevices] = useState<Device[]>([]);
-  const [removed, setRemoved] = useState<string | null>(null);
+  const [removed, setRemoved] = useState<Device | null>(null);
   const heading = useRef<HTMLHeadingElement>(null);
 
   const fetchDevices = useCallback(async (): Promise<Device[]> => {
@@ -170,7 +177,7 @@ export function PushNotifications({
       }
       setState("on");
     } catch {
-      setError("Could not turn notifications on for this device.");
+      setError(msg`Could not turn notifications on for this device.`);
     } finally {
       setBusy(false);
     }
@@ -195,7 +202,7 @@ export function PushNotifications({
       }
       setState("off");
     } catch {
-      setError("Could not turn notifications off for this device.");
+      setError(msg`Could not turn notifications off for this device.`);
     } finally {
       setBusy(false);
     }
@@ -215,7 +222,7 @@ export function PushNotifications({
         return;
       }
       setDevices((current) => current.filter((d) => d.id !== device.id));
-      setRemoved(`Turned off for ${describe(device, locale)}.`);
+      setRemoved(device);
       heading.current?.focus();
       if (device.current) {
         const registration = await navigator.serviceWorker.getRegistration();
@@ -224,12 +231,13 @@ export function PushNotifications({
         setState("off");
       }
     } catch {
-      setError("Could not turn notifications off for that device.");
+      setError(msg`Could not turn notifications off for that device.`);
     } finally {
       setBusy(false);
     }
   };
 
+  const removedDescription = removed && describe(removed, locale);
   return (
     <section aria-labelledby="push-heading" className="flex flex-col gap-2">
       <h2
@@ -238,39 +246,47 @@ export function PushNotifications({
         tabIndex={-1}
         className="text-lg font-semibold outline-none"
       >
-        Notifications on this device
+        {t`Notifications on this device`}
       </h2>
       <p className="text-sm text-fg-subtle">
-        Everything the notifications page tells you, on your phone or laptop
-        while the site isn&rsquo;t open. A device gets all of them &mdash; the
-        email settings above only decide what is emailed. Each device is turned
-        on separately.
+        <Trans>
+          Everything the notifications page tells you, on your phone or laptop
+          while the site isn&rsquo;t open. A device gets all of them &mdash; the
+          email settings above only decide what is emailed. Each device is
+          turned on separately.
+        </Trans>
       </p>
 
       <div aria-live="polite" className="flex flex-col gap-2">
         {state === "checking" && (
-          <p className="text-sm text-fg-muted">Checking&hellip;</p>
+          <p className="text-sm text-fg-muted">{t`Checking…`}</p>
         )}
 
         {state === "needs-install" && (
           <p className="text-sm text-fg-muted">
-            On iPhone and iPad this works once the site is on your home screen:
-            tap the Share button, then <strong>Add to Home Screen</strong>, and
-            open it from there.
+            <Trans>
+              On iPhone and iPad this works once the site is on your home
+              screen: tap the Share button, then{" "}
+              <strong>Add to Home Screen</strong>, and open it from there.
+            </Trans>
           </p>
         )}
 
         {state === "unsupported" && (
           <p className="text-sm text-fg-muted">
-            This browser can&rsquo;t show notifications. You&rsquo;ll still see
-            everything on the notifications page.
+            <Trans>
+              This browser can&rsquo;t show notifications. You&rsquo;ll still
+              see everything on the notifications page.
+            </Trans>
           </p>
         )}
 
         {state === "blocked" && (
           <p className="text-sm text-fg-muted">
-            Notifications are blocked for this site. Allow them in your
-            browser&rsquo;s settings for this site, then reload this page.
+            <Trans>
+              Notifications are blocked for this site. Allow them in your
+              browser&rsquo;s settings for this site, then reload this page.
+            </Trans>
           </p>
         )}
 
@@ -281,76 +297,80 @@ export function PushNotifications({
               disabled={busy}
               className="px-6 py-2"
             >
-              {busy ? "Turning on..." : "Turn on for this device"}
+              {busy ? t`Turning on...` : t`Turn on for this device`}
             </Button>
           </div>
         )}
 
         {state === "on" && (
           <div className="flex items-center gap-4">
-            <span className="text-sm text-success-fg">On for this device.</span>
+            <span className="text-sm text-success-fg">{t`On for this device.`}</span>
             <Button
               variant="quiet"
               onClick={() => void disable()}
               disabled={busy}
               className="border border-line px-6 py-2"
             >
-              {busy ? "Turning off..." : "Turn off"}
+              {busy ? t`Turning off...` : t`Turn off`}
             </Button>
           </div>
         )}
       </div>
 
-      {removed && (
+      {removedDescription && (
         <p role="status" className="text-sm text-success-fg">
-          {removed}
+          {t`Turned off for ${removedDescription}.`}
         </p>
       )}
 
       {devices.length > 0 && (
         <>
           <h3 id="devices-heading" className="text-base font-semibold">
-            Notifications on your devices
+            {t`Notifications on your devices`}
           </h3>
           <ul
             aria-labelledby="devices-heading"
             className="flex flex-col divide-y divide-line-subtle rounded-md border border-line text-sm"
           >
-            {devices.map((device) => (
-              <li
-                key={device.id}
-                className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2"
-              >
-                <span className="flex-1">
-                  {device.host}
-                  <span className="text-fg-subtle">
-                    {" "}
-                    &middot; on since {formatDate(device.createdAt, locale)}
-                  </span>
-                  {device.current && (
-                    <span className="ms-2 rounded-full bg-brand-tint-hover px-2 py-0.5 text-xs text-brand-fg">
-                      This device
-                    </span>
-                  )}
-                </span>
-                <Button
-                  variant="quiet"
-                  onClick={() => void removeDevice(device)}
-                  disabled={busy}
-                  aria-label={`Turn off ${describe(device, locale)}`}
-                  className="border border-line px-3 py-1"
+            {devices.map((device) => {
+              const since = formatDate(device.createdAt, locale);
+              const description = describe(device, locale);
+              return (
+                <li
+                  key={device.id}
+                  className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2"
                 >
-                  Turn off
-                </Button>
-              </li>
-            ))}
+                  <span className="flex-1">
+                    {device.host}
+                    <span className="text-fg-subtle">
+                      {" "}
+                      <Trans>&middot; on since {since}</Trans>
+                    </span>
+                    {device.current && (
+                      <span className="ms-2 rounded-full bg-brand-tint-hover px-2 py-0.5 text-xs text-brand-fg">
+                        {t`This device`}
+                      </span>
+                    )}
+                  </span>
+                  <Button
+                    variant="quiet"
+                    onClick={() => void removeDevice(device)}
+                    disabled={busy}
+                    aria-label={t`Turn off ${description}`}
+                    className="border border-line px-3 py-1"
+                  >
+                    {t`Turn off`}
+                  </Button>
+                </li>
+              );
+            })}
           </ul>
         </>
       )}
 
       {error && (
         <p role="alert" className="text-sm text-danger-fg">
-          {error}
+          {typeof error === "string" ? error : i18n._(error)}
         </p>
       )}
     </section>

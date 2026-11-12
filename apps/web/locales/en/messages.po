@@ -7,6 +7,10 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: en\n"
 
+#: src/features/settings/push-notifications.tsx:347
+msgid "· on since {since}"
+msgstr "· on since {since}"
+
 #: src/ui/phase-bar.tsx:63
 msgid "(done)"
 msgstr "(done)"
@@ -19,9 +23,22 @@ msgstr "(password)"
 msgid "(skipped)"
 msgstr "(skipped)"
 
+#. placeholder {0}: chosen.length
+#: src/features/notifications/notifications-screen.tsx:224
+msgid "{0, plural, one {Delete this notification? This cannot be undone.} other {Delete these # notifications? This cannot be undone.}}"
+msgstr "{0, plural, one {Delete this notification? This cannot be undone.} other {Delete these # notifications? This cannot be undone.}}"
+
 #: src/ui/form-error-summary.tsx:31
 msgid "{count, plural, one {There is a problem to fix:} other {There are # problems to fix:}}"
 msgstr "{count, plural, one {There is a problem to fix:} other {There are # problems to fix:}}"
+
+#: src/features/settings/push-notifications.tsx:70
+msgid "{host}, on since {since}"
+msgstr "{host}, on since {since}"
+
+#: src/features/settings/push-notifications.tsx:69
+msgid "{host}, on since {since}, this device"
+msgstr "{host}, on since {since}, this device"
 
 #: src/ui/data-table.tsx:52
 msgid "{selectedCount, plural, one {# selected} other {# selected}}"
@@ -39,6 +56,10 @@ msgstr "{total, plural, one {#+ result} other {#+ results}}"
 msgid "{valueLabel}: 0 to {max}"
 msgstr "{valueLabel}: 0 to {max}"
 
+#: src/features/settings/settings-screen.tsx:92
+msgid "1-on-1s"
+msgstr "1-on-1s"
+
 #: src/app/time-format.tsx:64
 msgid "12-hour"
 msgstr "12-hour"
@@ -46,6 +67,10 @@ msgstr "12-hour"
 #: src/app/time-format.tsx:65
 msgid "24-hour"
 msgstr "24-hour"
+
+#: src/features/settings/email-settings-form.tsx:43
+msgid "a 1-on-1 of mine is accepted, declined or canceled"
+msgstr "a 1-on-1 of mine is accepted, declined or canceled"
 
 #: src/app/reload-offer.tsx:93
 msgid "A new version of SchellingBoard is available."
@@ -58,6 +83,22 @@ msgstr "A newer release is out: {latestVersion}, {latestDate}."
 #: src/app/footer.tsx:126
 msgid "A newer release is out: {latestVersion}."
 msgstr "A newer release is out: {latestVersion}."
+
+#: src/features/settings/email-settings-form.tsx:17
+msgid "a session I’m hosting changes time or location, or is deleted"
+msgstr "a session I’m hosting changes time or location, or is deleted"
+
+#: src/features/settings/email-settings-form.tsx:51
+msgid "a session I’m hosting has ended, so I can record how many people attended"
+msgstr "a session I’m hosting has ended, so I can record how many people attended"
+
+#: src/features/settings/email-settings-form.tsx:47
+msgid "a session I’m hosting starts in an hour"
+msgstr "a session I’m hosting starts in an hour"
+
+#: src/features/settings/email-settings-form.tsx:13
+msgid "a session I’ve RSVP’d to changes time or location, loses its host, or is deleted"
+msgstr "a session I’ve RSVP’d to changes time or location, loses its host, or is deleted"
 
 #: src/ui/pager.tsx:83
 msgctxt "Rows per page: every row"
@@ -72,6 +113,10 @@ msgstr "Always use dark colours"
 msgid "Always use light colours"
 msgstr "Always use light colours"
 
+#: src/features/settings/settings-screen.tsx:129
+msgid "Appearance (this device)"
+msgstr "Appearance (this device)"
+
 #: src/ui/data-table.tsx:60
 msgid "Assign selected"
 msgstr "Assign selected"
@@ -84,6 +129,14 @@ msgstr "Attendees"
 #: src/app/time-format.tsx:61
 msgid "Automatic"
 msgstr "Automatic"
+
+#: src/features/settings/language-setting.tsx:44
+msgid "Automatic (follow my browser)"
+msgstr "Automatic (follow my browser)"
+
+#: src/features/settings/settings-screen.tsx:142
+msgid "Automatic follows your browser's language."
+msgstr "Automatic follows your browser's language."
 
 #: src/ui/side-panel.tsx:147
 msgctxt "Side panel: go to the previous panel"
@@ -99,6 +152,14 @@ msgstr "Back to the events"
 #: src/ui/data-table.tsx:46
 msgid "Bulk actions"
 msgstr "Bulk actions"
+
+#: src/features/notifications/notifications-screen.tsx:230
+msgid "Cancel"
+msgstr "Cancel"
+
+#: src/features/settings/push-notifications.tsx:262
+msgid "Checking…"
+msgstr "Checking…"
 
 #: src/ui/data-table.tsx:75
 msgctxt "Bulk actions: clear the selection"
@@ -130,6 +191,14 @@ msgstr "Copy link"
 msgid "Could not copy the link"
 msgstr "Could not copy the link"
 
+#: src/features/notifications/notifications-screen.tsx:82
+msgid "Could not load your notifications. Reload the page to try again."
+msgstr "Could not load your notifications. Reload the page to try again."
+
+#: src/features/settings/settings-screen.tsx:42
+msgid "Could not load your settings. Reload the page to try again."
+msgstr "Could not load your settings. Reload the page to try again."
+
 #: src/app/user-menu.tsx:136
 msgid "Could not log out — try again"
 msgstr "Could not log out — try again"
@@ -138,10 +207,31 @@ msgstr "Could not log out — try again"
 msgid "Could not select that name — try again"
 msgstr "Could not select that name — try again"
 
+#: src/features/settings/push-notifications.tsx:234
+msgid "Could not turn notifications off for that device."
+msgstr "Could not turn notifications off for that device."
+
+#: src/features/settings/push-notifications.tsx:205
+msgid "Could not turn notifications off for this device."
+msgstr "Could not turn notifications off for this device."
+
+#: src/features/settings/push-notifications.tsx:180
+msgid "Could not turn notifications on for this device."
+msgstr "Could not turn notifications on for this device."
+
 #: src/app/theme.tsx:79
 msgctxt "Colour theme"
 msgid "Dark"
 msgstr "Dark"
+
+#: src/features/notifications/notifications-screen.tsx:172
+#: src/features/notifications/notifications-screen.tsx:228
+msgid "Delete"
+msgstr "Delete"
+
+#: src/features/notifications/notifications-screen.tsx:223
+msgid "Delete notifications"
+msgstr "Delete notifications"
 
 #: src/ui/use-discard-guard.tsx:89
 msgid "Discard"
@@ -168,6 +258,19 @@ msgstr "Edit"
 msgid "Edit profile"
 msgstr "Edit profile"
 
+#: src/features/settings/email-settings-form.tsx:88
+msgid "Email me when…"
+msgstr "Email me when…"
+
+#: src/features/settings/email-settings-form.tsx:84
+msgid "Email settings"
+msgstr "Email settings"
+
+#: src/features/settings/email-settings-form.tsx:109
+#: src/features/settings/language-setting.tsx:53
+msgid "Error: {error}"
+msgstr "Error: {error}"
+
 #: src/app/panel-host.tsx:80
 msgid "Event"
 msgstr "Event"
@@ -187,6 +290,14 @@ msgstr "Event not found."
 #: src/ui/phase-bar.tsx:42
 msgid "Event phases"
 msgstr "Event phases"
+
+#: src/features/settings/settings-screen.tsx:51
+msgid "Everything here is private and never shown to other attendees. Your <0>public profile</0> is edited separately."
+msgstr "Everything here is private and never shown to other attendees. Your <0>public profile</0> is edited separately."
+
+#: src/features/settings/push-notifications.tsx:252
+msgid "Everything the notifications page tells you, on your phone or laptop while the site isn’t open. A device gets all of them — the email settings above only decide what is emailed. Each device is turned on separately."
+msgstr "Everything the notifications page tells you, on your phone or laptop while the site isn’t open. A device gets all of them — the email settings above only decide what is emailed. Each device is turned on separately."
 
 #: src/ui/resize-image.ts:77
 msgid "Failed to draw image"
@@ -217,6 +328,10 @@ msgstr "Follow your browser's language"
 msgid "Follow your device's light/dark setting"
 msgstr "Follow your device's light/dark setting"
 
+#: src/features/settings/settings-screen.tsx:132
+msgid "Following the system means the site is dark whenever your phone or laptop is."
+msgstr "Following the system means the site is dark whenever your phone or laptop is."
+
 #: src/app/footer.tsx:171
 msgid "Full changelog on GitHub"
 msgstr "Full changelog on GitHub"
@@ -240,6 +355,11 @@ msgstr "In this build, but not in a released version yet."
 #: src/ui/use-discard-guard.tsx:92
 msgid "Keep editing"
 msgstr "Keep editing"
+
+#: src/features/settings/language-setting.tsx:35
+#: src/features/settings/language-setting.tsx:38
+msgid "Language"
+msgstr "Language"
 
 #: src/ui/pager.tsx:155
 msgctxt "Pager: last page"
@@ -267,6 +387,9 @@ msgstr "Live"
 #: src/app/event-page.tsx:151
 #: src/app/panel-host.tsx:81
 #: src/app/people-pages.tsx:161
+#: src/features/notifications/notifications-screen.tsx:76
+#: src/features/notifications/notifications-screen.tsx:179
+#: src/features/settings/settings-screen.tsx:37
 msgid "Loading…"
 msgstr "Loading…"
 
@@ -282,6 +405,12 @@ msgstr "Logging out..."
 #: src/app/map-button.tsx:36
 msgid "Map"
 msgstr "Map"
+
+#: src/features/notifications/notifications-screen.tsx:165
+#: src/features/notifications/notifications-screen.tsx:294
+#: src/features/notifications/notifications-screen.tsx:295
+msgid "Mark as read"
+msgstr "Mark as read"
 
 #: src/ui/form.tsx:185
 #: src/ui/form.tsx:343
@@ -332,6 +461,10 @@ msgstr "No"
 msgid "No events found."
 msgstr "No events found."
 
+#: src/features/settings/settings-screen.tsx:102
+msgid "None of your events offers 1-on-1s at the moment."
+msgstr "None of your events offers 1-on-1s at the moment."
+
 #: src/app/sync-indicator.tsx:10
 msgid "Not updating: may be out of date"
 msgstr "Not updating: may be out of date"
@@ -344,13 +477,46 @@ msgstr "Nothing found."
 msgid "Nothing to show."
 msgstr "Nothing to show."
 
+#: src/features/notifications/notifications-screen.tsx:130
+msgid "Nothing yet. When someone comments on your session or changes something you have RSVP'd to, it will show up here."
+msgstr "Nothing yet. When someone comments on your session or changes something you have RSVP'd to, it will show up here."
+
+#: src/features/notifications/notifications-screen.tsx:139
+msgid "Notification actions"
+msgstr "Notification actions"
+
 #: src/app/header-links.tsx:43
+#: src/features/notifications/notifications-screen.tsx:126
 msgid "Notifications"
 msgstr "Notifications"
 
 #: src/app/header-links.tsx:43
 msgid "Notifications ({unread} unread)"
 msgstr "Notifications ({unread} unread)"
+
+#: src/features/settings/push-notifications.tsx:286
+msgid "Notifications are blocked for this site. Allow them in your browser’s settings for this site, then reload this page."
+msgstr "Notifications are blocked for this site. Allow them in your browser’s settings for this site, then reload this page."
+
+#: src/features/settings/email-settings-form.tsx:91
+msgid "Notifications go to the email address the organizers have for you. Contact an organizer to change it."
+msgstr "Notifications go to the email address the organizers have for you. Contact an organizer to change it."
+
+#: src/features/settings/push-notifications.tsx:249
+msgid "Notifications on this device"
+msgstr "Notifications on this device"
+
+#: src/features/settings/push-notifications.tsx:329
+msgid "Notifications on your devices"
+msgstr "Notifications on your devices"
+
+#: src/features/settings/push-notifications.tsx:307
+msgid "On for this device."
+msgstr "On for this device."
+
+#: src/features/settings/push-notifications.tsx:267
+msgid "On iPhone and iPad this works once the site is on your home screen: tap the Share button, then <0>Add to Home Screen</0>, and open it from there."
+msgstr "On iPhone and iPad this works once the site is on your home screen: tap the Share button, then <0>Add to Home Screen</0>, and open it from there."
 
 #: src/app/nav-bar.tsx:27
 msgid "Open menu"
@@ -434,6 +600,18 @@ msgstr "Resize panel"
 msgid "Rows per page"
 msgstr "Rows per page"
 
+#: src/features/settings/email-settings-form.tsx:115
+msgid "Save"
+msgstr "Save"
+
+#: src/features/settings/email-settings-form.tsx:119
+msgid "Saved"
+msgstr "Saved"
+
+#: src/features/settings/email-settings-form.tsx:115
+msgid "Saving..."
+msgstr "Saving..."
+
 #: src/ui/phase-bar.tsx:15
 msgid "Scheduling"
 msgstr "Scheduling"
@@ -452,15 +630,24 @@ msgstr "Search…"
 msgid "Select {0}"
 msgstr "Select {0}"
 
+#: src/features/notifications/notifications-screen.tsx:274
+msgid "Select {text}"
+msgstr "Select {text}"
+
 #: src/ui/data-table.tsx:250
 msgid "Select all"
 msgstr "Select all"
+
+#: src/features/notifications/notifications-screen.tsx:156
+msgid "Select page"
+msgstr "Select page"
 
 #: src/app/user-menu.tsx:60
 msgid "Select your name"
 msgstr "Select your name"
 
 #: src/app/user-menu.tsx:114
+#: src/features/settings/settings-screen.tsx:49
 msgid "Settings"
 msgstr "Settings"
 
@@ -475,6 +662,34 @@ msgstr "Show suggestions"
 #: src/app/layout.tsx:19
 msgid "Skip to content"
 msgstr "Skip to content"
+
+#: src/features/settings/email-settings-form.tsx:21
+msgid "someone adds me as a session host or co-host"
+msgstr "someone adds me as a session host or co-host"
+
+#: src/features/settings/email-settings-form.tsx:40
+msgid "someone asks me for a 1-on-1"
+msgstr "someone asks me for a 1-on-1"
+
+#: src/features/settings/email-settings-form.tsx:29
+msgid "someone comments on a proposal I’m hosting"
+msgstr "someone comments on a proposal I’m hosting"
+
+#: src/features/settings/email-settings-form.tsx:38
+msgid "someone comments on a proposal, session or profile I’ve commented on"
+msgstr "someone comments on a proposal, session or profile I’ve commented on"
+
+#: src/features/settings/email-settings-form.tsx:33
+msgid "someone comments on a session I’m hosting"
+msgstr "someone comments on a session I’m hosting"
+
+#: src/features/settings/email-settings-form.tsx:35
+msgid "someone comments on my profile"
+msgstr "someone comments on my profile"
+
+#: src/features/settings/email-settings-form.tsx:25
+msgid "someone joins a proposal I’m hosting as a co-host"
+msgstr "someone joins a proposal I’m hosting as a co-host"
 
 #: src/app/error-boundary.tsx:28
 msgid "Something went wrong"
@@ -502,6 +717,14 @@ msgstr "The events could not be loaded."
 msgid "There is a problem:"
 msgstr "There is a problem:"
 
+#: src/features/settings/push-notifications.tsx:277
+msgid "This browser can’t show notifications. You’ll still see everything on the notifications page."
+msgstr "This browser can’t show notifications. You’ll still see everything on the notifications page."
+
+#: src/features/settings/push-notifications.tsx:351
+msgid "This device"
+msgstr "This device"
+
 #: src/app/event-page.tsx:202
 msgid "This event has been deleted."
 msgstr "This event has been deleted."
@@ -523,6 +746,7 @@ msgid "This site runs {currentVersion}."
 msgstr "This site runs {currentVersion}."
 
 #: src/app/time-format.tsx:73
+#: src/features/settings/settings-screen.tsx:140
 msgid "Time format"
 msgstr "Time format"
 
@@ -537,8 +761,34 @@ msgstr "Times like 2:00 PM"
 #: src/app/error-boundary.tsx:38
 #: src/app/event-page.tsx:166
 #: src/app/panel-host.tsx:87
+#: src/features/notifications/notifications-screen.tsx:215
 msgid "Try again"
 msgstr "Try again"
+
+#: src/features/settings/push-notifications.tsx:314
+#: src/features/settings/push-notifications.tsx:362
+msgid "Turn off"
+msgstr "Turn off"
+
+#: src/features/settings/push-notifications.tsx:359
+msgid "Turn off {description}"
+msgstr "Turn off {description}"
+
+#: src/features/settings/push-notifications.tsx:300
+msgid "Turn on for this device"
+msgstr "Turn on for this device"
+
+#: src/features/settings/push-notifications.tsx:322
+msgid "Turned off for {removedDescription}."
+msgstr "Turned off for {removedDescription}."
+
+#: src/features/settings/push-notifications.tsx:314
+msgid "Turning off..."
+msgstr "Turning off..."
+
+#: src/features/settings/push-notifications.tsx:300
+msgid "Turning on..."
+msgstr "Turning on..."
 
 #: src/app/footer.tsx:42
 msgid "unknown"
@@ -556,6 +806,10 @@ msgstr "Version {shown} — what's new, update available"
 msgid "Version:"
 msgstr "Version:"
 
+#: src/features/events/event-list-screen.tsx:68
+msgid "View event"
+msgstr "View event"
+
 #: src/ui/phase-bar.tsx:14
 msgid "Voting"
 msgstr "Voting"
@@ -564,6 +818,10 @@ msgstr "Voting"
 #: src/app/footer.tsx:116
 msgid "What's new"
 msgstr "What's new"
+
+#: src/features/settings/settings-screen.tsx:95
+msgid "When you're free to meet other attendees, event by event. Only the events you're attending that offer 1-on-1s are listed."
+msgstr "When you're free to meet other attendees, event by event. Only the events you're attending that offer 1-on-1s are listed."
 
 #: src/app/user-menu.tsx:208
 msgid "Who are you?"

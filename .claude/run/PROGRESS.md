@@ -94,6 +94,10 @@
   release-note highlights come from `packages/domain` and are not translated (28n or later).
   `theme.spec.ts:81` (9 AM not found) fails on the previous commit too.
 
+- 28c: `push-notifications.tsx` messages are done; it stays off the allowlist (state literals like
+  `setState("on")`), to fix in 28n. Errors stored in state are `msg` descriptors (or the server's
+  string); the removed device is stored and its sentence built at render.
+
 ## Problems
 
 - #200: not checked in a browser at 390px (long URL, fixed vote bar); CSS read only.
