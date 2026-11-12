@@ -734,9 +734,7 @@ async function meetingContext(
   const end = DateTime.fromJSDate(meeting.slotEnd).setZone(event.timezone);
   return {
     time: `${start.toFormat("cccc d LLLL, HH:mm")}–${end.toFormat("HH:mm")}`,
-    // The meetings page rather than the schedule: it asks an unidentified
-    // reader who they are, and outside scheduling the schedule redirects away.
-    path: `/${event.slug}/meetings?viewMeeting=${meeting.id}`,
+    path: `/${event.slug}/meetings/${meeting.id}`,
   };
 }
 
@@ -748,7 +746,7 @@ async function guestName(guestId: string): Promise<string> {
 }
 
 function proposalPath(eventSlug: string, proposalId: string) {
-  return `/${eventSlug}/proposals?viewProposal=${proposalId}`;
+  return `/${eventSlug}/proposals/${proposalId}`;
 }
 
 function proposalCommentPath(
@@ -759,12 +757,12 @@ function proposalCommentPath(
   return `${proposalPath(eventSlug, proposalId)}#comment-${commentId}`;
 }
 
-// Deep link to the session, the shape the SPA's schedule opens (anchor
+// Deep link to the session's own address, which opens its side panel (anchor
 // MnpjIo7Y in docs/dev/web-app.md). Exported because reminder
 // dispatch builds the same link for its notification and its email: one
 // definition, not three copies.
 export function sessionPath(eventSlug: string, sessionId: string) {
-  return `/${eventSlug}/schedule?viewSession=${sessionId}`;
+  return `/${eventSlug}/sessions/${sessionId}`;
 }
 
 // Emails need an absolute link; in-app notifications keep the path, so they

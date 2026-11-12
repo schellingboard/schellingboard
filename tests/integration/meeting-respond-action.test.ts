@@ -125,7 +125,7 @@ describe("answering a 1-on-1", () => {
     );
     expect(notification.type).toBe("meetingResponse");
     expect(notification.text).toMatch(/accepted/);
-    expect(notification.url).toContain(`/meetings?viewMeeting=${meeting.id}`);
+    expect(notification.url).toContain(`/meetings/${meeting.id}`);
   });
 
   it("refuses an answer from anyone but the recipient", async () => {

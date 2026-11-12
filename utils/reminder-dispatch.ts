@@ -186,7 +186,7 @@ function eligible(candidate: DueReminderCandidate, now: Date): boolean {
 // it uses; see research.md §8.
 function recordPath(candidate: DueReminderCandidate): string {
   const path = sessionPath(candidate.eventSlug, candidate.sessionId);
-  return candidate.kind === "headsUp" ? path : `${path}&record=count`;
+  return candidate.kind === "headsUp" ? path : `${path}?record=count`;
 }
 
 function message(candidate: DueReminderCandidate, base: string) {

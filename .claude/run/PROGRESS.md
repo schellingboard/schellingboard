@@ -1,6 +1,6 @@
 # Progress
 
-Steps 1 (c344e56d), 2, 3, 4 and 5 done.
+Steps 1 (c344e56d), 2, 3, 4, 5 and 6 done.
 
 - Panel: `ui/side-panel.tsx`; history: `app/panel-history.ts` (`PanelItem` union: session, proposal,
   profile, meeting); host: `app/panel-host.tsx`; links opened in the panel via the `SpaLinks`
@@ -20,7 +20,9 @@ Steps 1 (c344e56d), 2, 3, 4 and 5 done.
 - Step 5 done: `app/panel-links.tsx` (was profile-links) intercepts profile and any-event item links
   at the root; `ForeignPanelHost` (panel-host.tsx) opens the event replica when the page behind is
   not that event. Nothing renders while it loads.
-- Next: step 6.
+- Step 6 done: link builders in `utils/notifications.ts` and `reminder-dispatch.ts` emit panel
+  addresses (`?record=count` on reminders); fixtures with old URLs left as data.
+- Next: step 7.
 
 ## Questions
 

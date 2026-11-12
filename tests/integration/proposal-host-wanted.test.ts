@@ -302,7 +302,7 @@ describe("a proposal that wants a host", () => {
         {
           type: "proposalJoin",
           text: 'Vol joined "Shared Session" as a co-host',
-          url: `/${event.slug}/proposals?viewProposal=${proposal.id}`,
+          url: `/${event.slug}/proposals/${proposal.id}`,
         },
       ]);
       expect(await notifications.listByGuest(volunteer.id)).toEqual([]);
