@@ -17,9 +17,9 @@ import { MomentBands } from "./moment-band";
 import { NowLine } from "./now-line";
 import { OneOnOnePicture } from "./one-on-one-picture";
 
-const AXIS_24H = "HH:mm";
-const AXIS_12H_HOUR = "h a";
-const AXIS_12H = "h:mm";
+const AXIS_CLOCK = "HH:mm";
+const AXIS_HOUR_MERIDIEM = "h a";
+const AXIS_TIME_MERIDIEM = "h:mm";
 
 const maxCapacity = (capacity: number) => t`max ${capacity}`;
 
@@ -48,10 +48,10 @@ export function DayGrid({
   const clockStyle = useClockStyle();
   const axisFormat = (at: DateTime) =>
     clockStyle === "24h"
-      ? AXIS_24H
+      ? AXIS_CLOCK
       : at.minute === 0
-        ? AXIS_12H_HOUR
-        : AXIS_12H;
+        ? AXIS_HOUR_MERIDIEM
+        : AXIS_TIME_MERIDIEM;
   // Null on any day that isn't today. `now` is the server's clock, the dev
   // fake clock included.
   const nowOffsetPx = getNowOffsetPx(day, data.now, slotIncrement);

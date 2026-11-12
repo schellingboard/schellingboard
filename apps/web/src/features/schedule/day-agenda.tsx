@@ -202,7 +202,9 @@ function AgendaRow({
         <span className="block text-xs text-fg-subtle">
           {state === "running" && (
             <span className="mr-1 rounded bg-danger px-1 font-semibold text-on-danger">
-              <Trans>Now</Trans>
+              <Trans comment="Badge on a session that is running now">
+                Now
+              </Trans>
             </span>
           )}
           {details}
@@ -343,6 +345,8 @@ function MomentRow({
   const { data } = useSchedule();
   const timeFormat = useTimeFormat();
   const time = (at: Date) => formatOptionalTime(at, timezone, timeFormat);
+  const { title } = moment;
+  const sharedMoment = t`Shared moment: ${title}`;
   return (
     <AgendaRow
       state={timeState(moment.start, moment.end, data.now)}
@@ -353,8 +357,10 @@ function MomentRow({
             aria-hidden
             className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warning-fg"
           />
-          <span className="sr-only">{t`Shared moment: `}</span>
-          <span className="line-clamp-2">{moment.title}</span>
+          <span className="sr-only">{sharedMoment}</span>
+          <span aria-hidden className="line-clamp-2">
+            {moment.title}
+          </span>
         </>
       }
       details={[`${time(moment.start)}–${time(moment.end)}`, moment.description]
