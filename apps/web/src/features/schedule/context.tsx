@@ -90,6 +90,7 @@ const NO_MATCH: ScheduleMatch & { currentMatchId?: string | null } =
     rsvpd: () => false,
     bookmarked: () => false,
     hidden: () => false,
+    clashing: () => false,
   });
 
 const MatchContext = createContext<

@@ -53,6 +53,28 @@ describe("schedule filters", () => {
     });
   });
 
+  it("combines My schedule and Clashes, and lets Clashes stand alone", () => {
+    expect(parseScheduleFilters("clashes", null)).toEqual({
+      mine: null,
+      clashes: true,
+    });
+    expect(parseScheduleFilters("mine,clashes", "hosting")).toEqual({
+      mine: ["hosting"],
+      clashes: true,
+    });
+    expect(parseScheduleFilters("hidden,clashes", null)).toEqual({
+      mine: null,
+      clashes: true,
+    });
+    expect(
+      serializeScheduleFilters({ mine: ["hosting"], clashes: true })
+    ).toEqual({ filter: "mine,clashes", mine: "hosting" });
+    expect(serializeScheduleFilters({ mine: null, clashes: true })).toEqual({
+      filter: "clashes",
+      mine: null,
+    });
+  });
+
   it("serializes the Hidden chip as its own filter", () => {
     expect(serializeScheduleFilters({ mine: null, hidden: true })).toEqual({
       filter: "hidden",

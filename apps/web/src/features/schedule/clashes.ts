@@ -6,6 +6,17 @@ export type Clash =
   | { kind: "session"; session: Session }
   | { kind: "meeting"; meeting: MeetingView };
 
+function meetsSession(meeting: MeetingView, session: Session) {
+  const { startTime, endTime } = session;
+  return (
+    meeting.status === "accepted" &&
+    !!startTime &&
+    !!endTime &&
+    new Date(meeting.slotStart) < endTime &&
+    new Date(meeting.slotEnd) > startTime
+  );
+}
+
 // `meetings` is null until the viewer's 1-on-1s have loaded; until then only
 // sessions can be reported.
 export function findClashes(
@@ -20,22 +31,41 @@ export function findClashes(
       start: other.startTime?.getTime() ?? 0,
     }));
 
-  const { startTime, endTime } = session;
-  if (startTime && endTime) {
-    for (const meeting of meetings ?? []) {
-      if (
-        meeting.status === "accepted" &&
-        new Date(meeting.slotStart) < endTime &&
-        new Date(meeting.slotEnd) > startTime
-      ) {
-        clashes.push({
-          clash: { kind: "meeting", meeting },
-          start: new Date(meeting.slotStart).getTime(),
-        });
-      }
+  for (const meeting of meetings ?? []) {
+    if (meetsSession(meeting, session)) {
+      clashes.push({
+        clash: { kind: "meeting", meeting },
+        start: new Date(meeting.slotStart).getTime(),
+      });
     }
   }
   return clashes.sort((a, b) => a.start - b.start).map(({ clash }) => clash);
+}
+
+export function clashesAmong(
+  sessions: Session[],
+  meetings: MeetingView[] | null
+): Map<string, Clash[]> {
+  const real = sessions.filter((s) => !s.blocker);
+  const found = new Map<string, Clash[]>();
+  for (const session of real) {
+    const clashes = findClashes(
+      session,
+      real.filter((other) => other.id !== session.id),
+      meetings
+    );
+    if (clashes.length > 0) found.set(session.id, clashes);
+  }
+  return found;
+}
+
+export function meetingClashes(
+  sessions: Session[],
+  meetings: MeetingView[]
+): string[] {
+  return meetings
+    .filter((m) => sessions.some((s) => !s.blocker && meetsSession(m, s)))
+    .map((m) => m.id);
 }
 
 export function describeClash(

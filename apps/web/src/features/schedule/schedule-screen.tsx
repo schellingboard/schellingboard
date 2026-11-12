@@ -128,6 +128,7 @@ export function ScheduleScreen({
         rsvpd: data.rsvpd,
         bookmarked: data.bookmarked,
         hidden: data.hidden,
+        clashing: data.clashing,
       }),
     [debouncedSearch, filters, data]
   );
@@ -174,7 +175,7 @@ export function ScheduleScreen({
     of: number;
   } | null>(null);
   // Changes whenever the set of matches may have, which ends any stepping.
-  const matchKey = `${debouncedSearch}|${filters.mine?.join() ?? ""}|${filters.hidden ?? false}`;
+  const matchKey = `${debouncedSearch}|${filters.mine?.join() ?? ""}|${filters.hidden ?? false}|${filters.clashes ?? false}`;
   const current = stepped?.key === matchKey ? stepped : null;
   const step = (direction: 1 | -1) => {
     const scroller = scrollerRef.current;
@@ -244,19 +245,32 @@ export function ScheduleScreen({
           ? { active: !!filters.hidden }
           : null
       }
+      clashes={
+        data.guestId && (data.hasClashes || filters.clashes)
+          ? { active: !!filters.clashes }
+          : null
+      }
+      onToggleClashes={() =>
+        setFilters({ ...filters, hidden: false, clashes: !filters.clashes })
+      }
       onToggleHidden={() => {
         if (filters.mine) setKeptKinds(filters.mine);
         setFilters({ mine: null, hidden: !filters.hidden });
       }}
       onToggleMine={() => {
         if (filters.mine) setKeptKinds(filters.mine);
-        setFilters({ mine: filters.mine ? null : mineKinds });
+        setFilters({
+          ...filters,
+          hidden: false,
+          mine: filters.mine ? null : mineKinds,
+        });
       }}
       onToggleKind={(kind) => {
         const next = mineKinds.includes(kind)
           ? mineKinds.filter((k) => k !== kind)
           : ALL_KINDS.filter((k) => k === kind || mineKinds.includes(k));
-        if (next.length > 0) setFilters({ mine: next });
+        if (next.length > 0)
+          setFilters({ ...filters, hidden: false, mine: next });
       }}
       count={count}
       onShowAll={() => {

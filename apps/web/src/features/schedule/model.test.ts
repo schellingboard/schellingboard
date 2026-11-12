@@ -48,6 +48,7 @@ const none = createScheduleMatch({
   rsvpd: () => false,
   bookmarked: () => false,
   hidden: () => false,
+  clashing: () => false,
 });
 
 describe("includedLocations", () => {
@@ -71,6 +72,7 @@ describe("createScheduleMatch", () => {
       rsvpd: () => false,
       bookmarked: () => false,
       hidden: () => false,
+      clashing: () => false,
     });
     expect(m.filtering).toBe(true);
     expect(m.matchesSession(session("s", { title: "A TALK" }))).toBe(true);
@@ -89,6 +91,7 @@ describe("createScheduleMatch", () => {
       rsvpd: () => false,
       bookmarked: () => false,
       hidden: () => false,
+      clashing: () => false,
     });
     expect(m.matchesSession(hosted)).toBe(true);
     expect(m.matchesSession(session("x", {}))).toBe(false);
@@ -99,6 +102,7 @@ describe("createScheduleMatch", () => {
       rsvpd: () => false,
       bookmarked: () => false,
       hidden: () => false,
+      clashing: () => false,
     });
     expect(anonymous.filtering).toBe(false);
   });
@@ -111,6 +115,7 @@ describe("createScheduleMatch", () => {
       rsvpd: () => false,
       bookmarked: () => false,
       hidden: () => false,
+      clashing: () => false,
     });
     expect(m.matchesMeeting(meeting as unknown as MeetingView)).toBe(true);
     expect(
@@ -132,6 +137,7 @@ describe("hidden sessions", () => {
       rsvpd: () => false,
       bookmarked: () => false,
       hidden: (id) => hiddenIds.has(id),
+      clashing: () => false,
     });
 
   it("hides a hidden session and never matches it", () => {
@@ -158,6 +164,7 @@ describe("hidden sessions", () => {
       rsvpd: () => false,
       bookmarked: () => false,
       hidden: () => true,
+      clashing: () => false,
     });
     expect(m.filtering).toBe(false);
     expect(m.hides(session("h", {}))).toBe(false);
@@ -173,6 +180,53 @@ describe("hidden sessions", () => {
     });
     expect(entries[0].sessions.map((s) => s.id)).toEqual(["o"]);
     expect(entries[0].total).toBe(1);
+  });
+});
+
+describe("the Clashes chip", { tags: ["007-US11"] }, () => {
+  const make = (
+    filters: Parameters<typeof createScheduleMatch>[0]["filters"]
+  ) =>
+    createScheduleMatch({
+      search: "",
+      filters,
+      guestId: "mia",
+      rsvpd: (id) => id === "r",
+      bookmarked: () => false,
+      hidden: () => false,
+      clashing: (id) => id === "r" || id === "m1",
+    });
+  const meetingView = { id: "m1" } as unknown as MeetingView;
+  const other = { id: "m2" } as unknown as MeetingView;
+
+  it("matches only clashing sessions and 1-on-1s", () => {
+    const m = make({ mine: null, clashes: true });
+    expect(m.filtering).toBe(true);
+    expect(m.matchesSession(session("r", {}))).toBe(true);
+    expect(m.matchesSession(session("x", {}))).toBe(false);
+    expect(m.matchesMeeting(meetingView)).toBe(true);
+    expect(m.matchesMeeting(other)).toBe(false);
+  });
+
+  it("narrows to My schedule's kinds when that is on too", () => {
+    const m = make({ mine: ["hosting"], clashes: true });
+    expect(m.matchesSession(session("r", {}))).toBe(false);
+    expect(
+      m.matchesSession(session("r", { hosts: [{ id: "mia", name: "Mia" }] }))
+    ).toBe(true);
+  });
+
+  it("is ignored without a viewer", () => {
+    const m = createScheduleMatch({
+      search: "",
+      filters: { mine: null, clashes: true },
+      guestId: null,
+      rsvpd: () => false,
+      bookmarked: () => false,
+      hidden: () => false,
+      clashing: () => false,
+    });
+    expect(m.filtering).toBe(false);
   });
 });
 
@@ -202,6 +256,7 @@ describe("scheduleEntries", () => {
       rsvpd: () => false,
       bookmarked: () => false,
       hidden: () => false,
+      clashing: () => false,
     });
     const entries = scheduleEntries({
       days,

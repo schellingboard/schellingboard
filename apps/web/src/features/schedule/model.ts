@@ -37,26 +37,31 @@ export function createScheduleMatch(input: {
   rsvpd: (sessionId: string) => boolean;
   bookmarked: (sessionId: string) => boolean;
   hidden: (sessionId: string) => boolean;
+  /** A session or 1-on-1 the Clashes chip lists. */
+  clashing: (id: string) => boolean;
 }): ScheduleMatch {
-  const { search, guestId, rsvpd, bookmarked } = input;
+  const { search, guestId, rsvpd, bookmarked, clashing } = input;
   const hidden = guestId ? input.hidden : () => false;
   const filters: ScheduleFilterState = guestId ? input.filters : { mine: null };
   const hiddenOnly = !!filters.hidden;
   const searching = search.trim() !== "";
   return {
-    filtering: searching || filters.mine !== null || hiddenOnly,
+    filtering:
+      searching || filters.mine !== null || hiddenOnly || !!filters.clashes,
     hides: (session) => !hiddenOnly && hidden(session.id),
     matchesSession: (session) =>
       !session.blocker &&
       (!searching || sessionMatchesSearch(session, search)) &&
       hidden(session.id) === hiddenOnly &&
+      (!filters.clashes || clashing(session.id)) &&
       sessionPassesFilters(filters, {
         rsvpd: rsvpd(session.id),
         hosting: session.hosts.some((h) => h.id === guestId),
         bookmarked: bookmarked(session.id),
       }),
     matchesMeeting: (meeting) =>
-      !searching || meetingMatchesSearch(meeting, search),
+      (!searching || meetingMatchesSearch(meeting, search)) &&
+      (!filters.clashes || clashing(meeting.id)),
   };
 }
 

@@ -54,6 +54,51 @@ describe("scheduleDataFrom", () => {
     expect(hosting.hidden("s")).toBe(false);
   });
 
+  describe("clashes", { tags: ["007-US11"] }, () => {
+    const other = { ...snapshot.sessions[0], id: "o", hostIds: [] };
+    const make = (
+      marks: { sessionId: string; kind: "bookmark" }[],
+      rsvps: string[]
+    ) =>
+      scheduleDataFrom(
+        {
+          ...snapshot,
+          sessions: [snapshot.sessions[0], other],
+          me: {
+            ...snapshot.me!,
+            marks,
+            rsvps: rsvps.map((sessionId) => ({
+              id: sessionId,
+              sessionId,
+              guestId: "mia",
+            })),
+          },
+        },
+        new Date()
+      );
+
+    it("marks two RSVP'd sessions that overlap, with the clash named", () => {
+      const data = make([], ["s", "o"]);
+      expect(data.hasClashes).toBe(true);
+      expect(data.clashes("s").map((c) => c.kind)).toEqual(["session"]);
+      expect(data.clashing("s")).toBe(true);
+    });
+
+    it("counts a bookmark for the chip but never for the icon", () => {
+      const data = make([{ sessionId: "o", kind: "bookmark" }], ["s"]);
+      expect(data.hasClashes).toBe(true);
+      expect(data.clashing("o")).toBe(true);
+      expect(data.clashes("s")).toEqual([]);
+      expect(data.clashes("o")).toEqual([]);
+    });
+
+    it("has none without a second commitment", () => {
+      const data = make([], ["s"]);
+      expect(data.hasClashes).toBe(false);
+      expect(data.clashing("s")).toBe(false);
+    });
+  });
+
   it("has no viewer without one", () => {
     const data = scheduleDataFrom({ ...snapshot, me: null }, new Date());
     expect(data.guestId).toBeNull();

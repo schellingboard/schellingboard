@@ -14,6 +14,8 @@ export function ScheduleFilters({
   onToggleKind,
   hidden,
   onToggleHidden,
+  clashes,
+  onToggleClashes,
   count,
   onShowAll,
   onBackToTop,
@@ -35,6 +37,9 @@ export function ScheduleFilters({
   /** Null while the viewer has nothing hidden and the chip is off. */
   hidden: { active: boolean } | null;
   onToggleHidden: () => void;
+  /** Null while the viewer has no clash and the chip is off. */
+  clashes: { active: boolean } | null;
+  onToggleClashes: () => void;
   /** How many entries match out of how many, or null when nothing narrows them. */
   count: { matching: number; total: number } | null;
   onShowAll: () => void;
@@ -50,6 +55,7 @@ export function ScheduleFilters({
             .join(", ")})`,
         ]
       : []),
+    ...(clashes?.active ? ["Clashes"] : []),
     ...(hidden?.active ? ["Hidden"] : []),
     ...(search.trim() === "" ? [] : [`"${search.trim()}"`]),
   ];
@@ -91,20 +97,19 @@ export function ScheduleFilters({
                 onToggle={onToggleMine}
                 onToggleKind={onToggleKind}
               />
+              {clashes && (
+                <FilterChip
+                  active={clashes.active}
+                  onClick={onToggleClashes}
+                  label="Clashes"
+                />
+              )}
               {hidden && (
-                <button
-                  type="button"
-                  aria-pressed={hidden.active}
+                <FilterChip
+                  active={hidden.active}
                   onClick={onToggleHidden}
-                  className={cx(
-                    "h-9 rounded-md px-3 text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent",
-                    hidden.active
-                      ? "bg-info text-on-info hover:bg-info-hover"
-                      : "bg-surface-muted text-fg-muted hover:bg-surface-hover"
-                  )}
-                >
-                  Hidden
-                </button>
+                  label="Hidden"
+                />
               )}
             </div>
           )}
@@ -148,6 +153,32 @@ export function ScheduleFilters({
         </div>
       )}
     </>
+  );
+}
+
+function FilterChip({
+  active,
+  onClick,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={onClick}
+      className={cx(
+        "h-9 rounded-md px-3 text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent",
+        active
+          ? "bg-info text-on-info hover:bg-info-hover"
+          : "bg-surface-muted text-fg-muted hover:bg-surface-hover"
+      )}
+    >
+      {label}
+    </button>
   );
 }
 
