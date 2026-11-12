@@ -69,9 +69,8 @@ updates:
         patterns:
           - "*"
 
-  # The flake's inputs in flake.lock: nixpkgs, which the Nix package and the
-  # NixOS module's default build with (Node, libvips and Bun come from it),
-  # bun2nix and flake-parts.
+  # nixpkgs in flake.lock, which the Nix package and the NixOS module's default
+  # build with: Node, libvips and Bun come from it.
   - package-ecosystem: "nix"
     directory: "/"
     schedule:
