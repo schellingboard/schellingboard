@@ -1,9 +1,9 @@
 import { t } from "@lingui/core/macro";
-import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
 import { newSortSeed } from "@schellingboard/domain/attendee-search";
 import { useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 
+import { actingGuestRefusal } from "../commands/acting-guest-message";
 import { profileFormCalls } from "../commands/profile-form";
 import { DirectoryScreen } from "../features/people/directory-screen";
 import { peopleLinks } from "../features/people/links";
@@ -145,9 +145,9 @@ function EditProfile({
   if (viewerKnown && !viewerId && awaitingLogin !== undefined)
     return (
       <PageNotice>
-        {actingGuestRefusalMessage(
+        {actingGuestRefusal(
           awaitingLogin ? "guest.protected" : "guest.unselected",
-          "editing your profile"
+          "editProfile"
         )}
       </PageNotice>
     );

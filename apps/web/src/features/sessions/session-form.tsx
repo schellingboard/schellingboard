@@ -3,7 +3,6 @@ import {
   sessionUpdateSchema,
 } from "@schellingboard/contracts/session";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
-import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
 import { dateOnDay } from "@schellingboard/domain/event";
 import {
   buildSessionInterval,
@@ -26,11 +25,8 @@ import {
 import { type FormEvent, useMemo, useRef, useState } from "react";
 
 import { useTimeFormat } from "../../app/time-format";
-import {
-  type FieldErrors,
-  FIX_FIELDS_MESSAGE,
-  validateFields,
-} from "../../commands/mutation";
+import { actingGuestRefusal } from "../../commands/acting-guest-message";
+import { type FieldErrors, validateFields } from "../../commands/mutation";
 import type {
   SessionCreateBody,
   SessionFormCalls,
@@ -116,9 +112,9 @@ export function SessionForm(props: SessionFormProps) {
     if (snapshot.days.length === 0)
       return "This event has no days to schedule a session on yet.";
     if (!viewer)
-      return actingGuestRefusalMessage(
+      return actingGuestRefusal(
         "guest.unselected",
-        session ? "editing a session" : "adding a session"
+        session ? "editSession" : "addSession"
       );
     return null;
   })();
@@ -404,6 +400,7 @@ function Fields({
   const fields = hasClientErrors ? clientErrors : save.fields;
   const failure =
     last === "remove" ? remove.error : hasClientErrors ? null : save.error;
+  const fixing = last !== "remove" && save.fixFields;
   const busy = save.pending || remove.pending;
 
   const complete =
@@ -729,7 +726,7 @@ function Fields({
 
         <FormErrorSummary
           fields={fields}
-          error={failure === FIX_FIELDS_MESSAGE ? null : failure}
+          error={fixing ? null : failure}
           onJump={jump}
         />
 

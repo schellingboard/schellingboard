@@ -5,7 +5,6 @@ import {
   proposalUpdateSchema,
 } from "@schellingboard/contracts/proposal";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
-import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
 import { COHOST_WANTED_NOTE_MAX } from "@schellingboard/domain/session";
 import {
   durationMinusBreak,
@@ -14,11 +13,8 @@ import {
 import { formatDuration } from "@schellingboard/domain/time";
 import { type FormEvent, useMemo, useRef, useState } from "react";
 
-import {
-  type FieldErrors,
-  FIX_FIELDS_MESSAGE,
-  validateFields,
-} from "../../commands/mutation";
+import { actingGuestRefusal } from "../../commands/acting-guest-message";
+import { type FieldErrors, validateFields } from "../../commands/mutation";
 import type {
   ProposalCreateBody,
   ProposalFormCalls,
@@ -38,10 +34,6 @@ import { FormErrorSummary } from "../../ui/form-error-summary";
 import type { ProposalLinks } from "./links";
 import { ProposalHelp } from "./proposal-help";
 import { ScheduledSessionsNotice } from "./scheduled-sessions-notice";
-
-// The domain refusal sentence is English, so these phrases stay English.
-const TASK_EDIT = "editing this proposal";
-const TASK_CREATE = "creating a proposal";
 
 export type ProposalFormProps = {
   snapshot: Snapshot;
@@ -63,9 +55,9 @@ export function ProposalForm(props: ProposalFormProps) {
 
   const refusal = (() => {
     if (proposalId && !proposal) return t`Proposal not found.`;
-    const task = proposal ? TASK_EDIT : TASK_CREATE;
+    const task = proposal ? "editProposal" : "createProposal";
     if (!viewer && (!proposal || proposal.hosts.length > 0))
-      return actingGuestRefusalMessage("guest.unselected", task);
+      return actingGuestRefusal("guest.unselected", task);
     if (
       proposal &&
       proposal.hosts.length > 0 &&
@@ -177,6 +169,7 @@ function Fields({
   const hasClientErrors = Object.keys(clientErrors).length > 0;
   const fields = hasClientErrors ? clientErrors : save.fields;
   const failure = removing ? remove.error : hasClientErrors ? null : save.error;
+  const fixing = !removing && save.fixFields;
   const busy = save.pending || remove.pending;
 
   const onSubmit = async (e: FormEvent) => {
@@ -330,7 +323,7 @@ function Fields({
 
         <FormErrorSummary
           fields={fields}
-          error={failure === FIX_FIELDS_MESSAGE ? null : failure}
+          error={fixing ? null : failure}
           onJump={jump}
         />
 

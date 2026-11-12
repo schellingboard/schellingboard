@@ -122,7 +122,7 @@ function useMomentForm({
     errors,
     submit,
     pending: mutation.pending,
-    error: shown(mutation.error),
+    error: shown(mutation),
     change: (patch: Partial<MomentForm>) =>
       setForm((prev) => ({ ...prev, ...patch })),
   };

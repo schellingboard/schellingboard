@@ -1,5 +1,3 @@
-import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
-export { actingGuestRefusalMessage };
 import { pageReads } from "@/server/composition";
 import { guestOfCookie } from "@/server/kernel/session-actor";
 
@@ -80,25 +78,4 @@ export async function currentGuestSelection(
   const parsed = await guestOfCookie(cookieStore.get(GUEST_COOKIE_NAME)?.value);
   if (!parsed) return null;
   return (await guestExists(parsed.id)) ? parsed.id : null;
-}
-
-/**
- * What to tell a visitor that {@link verifiedCurrentUser} refused. It returns
- * null both when no name is selected and when the selected name is protected
- * without a verified session (protection enabled from another device), and the
- * two need different advice: being told to pick a name you have already picked
- * helps nobody. Kept here, like NAME_PROTECTED_ERROR, so the copy can't drift
- * across the pages that make this check. `task` completes "before …", e.g.
- * "changing your settings".
- */
-export async function unverifiedUserMessage(
-  cookieStore: ReadonlyCookies,
-  task: string
-): Promise<string> {
-  return actingGuestRefusalMessage(
-    (await currentGuestSelection(cookieStore))
-      ? "guest.protected"
-      : "guest.unselected",
-    task
-  );
 }

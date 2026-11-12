@@ -22,11 +22,7 @@ import {
   useState,
 } from "react";
 
-import {
-  type FieldErrors,
-  FIX_FIELDS_MESSAGE,
-  validateFields,
-} from "../../commands/mutation";
+import { type FieldErrors, validateFields } from "../../commands/mutation";
 import type {
   ProfileBody,
   ProfileFormCalls,
@@ -597,7 +593,7 @@ export function ProfileForm({
 
         <FormErrorSummary
           fields={fields}
-          error={failure === FIX_FIELDS_MESSAGE ? null : failure}
+          error={mutation.fixFields ? null : failure}
           onJump={jump}
         />
         {photoSaved && failure && (

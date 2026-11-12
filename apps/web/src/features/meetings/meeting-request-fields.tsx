@@ -221,10 +221,9 @@ export function MeetingRequestError({
 /** A clash is raised, never enforced: the pair decide for themselves. */
 export function MeetingClashNotice({ lines }: { lines: string[] }) {
   if (lines.length === 0) return null;
-  const joined = lines.join("; ");
   return (
     <p className="rounded-md bg-warning-tint p-3 text-sm text-fg">
-      <Trans>{joined} during this time — book it anyway?</Trans>
+      {lines.join(" ")} <Trans>Book it anyway?</Trans>
     </p>
   );
 }

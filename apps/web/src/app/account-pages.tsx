@@ -1,5 +1,4 @@
 import { Trans } from "@lingui/react/macro";
-import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
 import { safeRedirectPath } from "@schellingboard/domain/safe-redirect";
 import { useRouter } from "@tanstack/react-router";
 import {
@@ -10,6 +9,7 @@ import {
   useSyncExternalStore,
 } from "react";
 
+import { actingGuestRefusal } from "../commands/acting-guest-message";
 import { meetingAvailabilityCalls } from "../commands/meeting-availability";
 import { notificationCalls } from "../commands/notifications";
 import { settingsCalls } from "../commands/settings";
@@ -185,7 +185,7 @@ function Settings({
     return (
       <div className="flex flex-col gap-8">
         <PageNotice>
-          {actingGuestRefusalMessage(state.code, CHANGING_SETTINGS)}
+          {actingGuestRefusal(state.code, "changeSettings")}
         </PageNotice>
         <Appearance />
       </div>
@@ -203,11 +203,6 @@ function Settings({
   );
 }
 
-// English task phrases for the domain refusal text, until it is translated.
-const CHANGING_SETTINGS = "changing your settings";
-const SEEING_NOTIFICATIONS = "seeing your notifications";
-const SEEING_COMMENTS = "seeing your comments";
-
 function Notifications({ api, now }: { api: AppServices["api"]; now: Date }) {
   const { history } = useRouter();
   const [, setUnread] = useUnread();
@@ -224,7 +219,7 @@ function Notifications({ api, now }: { api: AppServices["api"]; now: Date }) {
   if (state.status === "error" && REFUSALS.includes(state.code))
     return (
       <PageNotice>
-        {actingGuestRefusalMessage(state.code, SEEING_NOTIFICATIONS)}
+        {actingGuestRefusal(state.code, "seeNotifications")}
       </PageNotice>
     );
   return (
@@ -250,9 +245,7 @@ function MyComments({ api, now }: { api: AppServices["api"]; now: Date }) {
 
   if (state.status === "error" && REFUSALS.includes(state.code))
     return (
-      <PageNotice>
-        {actingGuestRefusalMessage(state.code, SEEING_COMMENTS)}
-      </PageNotice>
+      <PageNotice>{actingGuestRefusal(state.code, "seeComments")}</PageNotice>
     );
   return (
     <MyCommentsScreen

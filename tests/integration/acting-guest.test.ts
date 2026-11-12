@@ -9,10 +9,7 @@ import {
 } from "vitest";
 
 import { getRepositories } from "@/db/container";
-import {
-  unverifiedUserMessage,
-  verifiedCurrentUser,
-} from "@/utils/acting-guest";
+import { verifiedCurrentUser } from "@/utils/acting-guest";
 
 import { resetTestDb, setupTestDb } from "../helpers/db";
 import { createGuest } from "../helpers/factories";
@@ -84,27 +81,5 @@ describe("the acting guest", () => {
     await getRepositories().guests.delete(guest.id);
 
     expect(await verifiedCurrentUser(jar(cookie))).toBeNull();
-  });
-
-  it("tells a visitor whose guest was deleted to pick a name", async () => {
-    const guest = await createGuest();
-    const cookie = openGuestValue(guest.id);
-    await getRepositories().guests.delete(guest.id);
-
-    expect(await unverifiedUserMessage(jar(cookie), "commenting")).toMatch(
-      /select who you are/i
-    );
-  });
-
-  it("tells a visitor with an unverified protected name to switch to it", async () => {
-    const guest = await createGuest();
-    await getRepositories().guests.setAuthProtection(guest.id, {
-      authProtected: true,
-      passwordHash: null,
-    });
-
-    expect(
-      await unverifiedUserMessage(jar(openGuestValue(guest.id)), "commenting")
-    ).toMatch(/protected/i);
   });
 });

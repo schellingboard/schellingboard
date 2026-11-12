@@ -2,6 +2,7 @@ import { i18n, type MessageDescriptor } from "@lingui/core";
 import { msg, t } from "@lingui/core/macro";
 import { type ReactNode, useState } from "react";
 
+import { failureMessage } from "../../commands/mutation";
 import type { CommandResponse } from "../../commands/runner";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import { cx } from "../../ui/cx";
@@ -13,7 +14,7 @@ import {
   pageOf,
   tableHandlers,
 } from "../../ui/list-paging";
-import { jumpTo, shown } from "./use-section-save";
+import { jumpTo } from "./use-section-save";
 
 export type AssignFilter = "all" | "assigned" | "not-assigned";
 
@@ -53,7 +54,7 @@ function AssignBox({
   });
   const toggle = async () => {
     const result = await mutation.submit();
-    if (result) onSettled(result.ok ? null : result.message);
+    if (result) onSettled(result.ok ? null : failureMessage(result));
   };
   return (
     <input
@@ -144,7 +145,7 @@ export function AssignmentManager<T extends Row>({
     const result = await (doAssign ? bulkAssign : bulkRemove).submit();
     if (!result) return;
     if (result.ok) setSelected(new Set());
-    settled(result.ok ? null : result.message);
+    settled(result.ok ? null : failureMessage(result));
   };
 
   const box = (row: T) => (
@@ -169,7 +170,7 @@ export function AssignmentManager<T extends Row>({
   return (
     <section aria-label={title} className="space-y-4">
       <h2 className="text-lg font-semibold text-fg">{title}</h2>
-      <FormErrorSummary fields={{}} error={shown(error)} onJump={jumpTo} />
+      <FormErrorSummary fields={{}} error={error} onJump={jumpTo} />
       {extra?.([...selected])}
       <DataTable
         rows={visible}

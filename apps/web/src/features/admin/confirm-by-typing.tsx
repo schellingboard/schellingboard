@@ -43,11 +43,7 @@ export function ConfirmByTyping<R>({
         onChange={setTyped}
         placeholder={expected}
       />
-      <FormErrorSummary
-        fields={{}}
-        error={shown(mutation.error)}
-        onJump={() => {}}
-      />
+      <FormErrorSummary fields={{}} error={shown(mutation)} onJump={() => {}} />
       <div className="flex gap-2">
         <Button
           variant="danger"

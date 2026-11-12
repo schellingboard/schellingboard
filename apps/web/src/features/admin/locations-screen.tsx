@@ -298,7 +298,7 @@ function LocationForm({
       </div>
       <FormErrorSummary
         fields={fields}
-        error={imageRefused ? null : shown(mutation.error)}
+        error={imageRefused ? null : shown(mutation)}
         onJump={jump}
       />
       <div className="flex gap-2">

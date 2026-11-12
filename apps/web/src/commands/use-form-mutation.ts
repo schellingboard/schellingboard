@@ -5,6 +5,7 @@ import { newKey } from "./keys";
 import {
   awaitMutation,
   type FieldErrors,
+  fixFieldsMessage,
   type MutationResult,
 } from "./mutation";
 import type { CommandResponse } from "./runner";
@@ -33,6 +34,7 @@ export function useFormMutation<R>({
   const [pending, setPending] = useState(false);
   const [fields, setFields] = useState<FieldErrors>({});
   const [error, setError] = useState<string | null>(null);
+  const [fixFields, setFixFields] = useState(false);
   const [unreachable, setUnreachable] = useState(false);
 
   const submit = async (): Promise<MutationResult<R> | undefined> => {
@@ -41,6 +43,7 @@ export function useFormMutation<R>({
     setPending(true);
     setFields({});
     setError(null);
+    setFixFields(false);
     setUnreachable(false);
     const result = await awaitMutation(call, key.current, { explainRefusals });
     inFlight.current = false;
@@ -55,7 +58,8 @@ export function useFormMutation<R>({
         !fieldNames || fieldNames.includes(path);
       const unmatched = entries.filter((e) => !isKnown(e)).map(([, m]) => m);
       setFields(Object.fromEntries(entries.filter(isKnown)));
-      setError(unmatched.length ? unmatched.join(" ") : result.message);
+      setError(unmatched.length ? unmatched.join(" ") : null);
+      setFixFields(unmatched.length === 0);
     } else {
       setError(result.message);
       setUnreachable(result.kind === "unreachable");
@@ -66,8 +70,17 @@ export function useFormMutation<R>({
   const reset = () => {
     setFields({});
     setError(null);
+    setFixFields(false);
     setUnreachable(false);
   };
 
-  return { submit, reset, pending, fields, error, unreachable };
+  return {
+    submit,
+    reset,
+    pending,
+    fields,
+    error: fixFields ? fixFieldsMessage() : error,
+    fixFields,
+    unreachable,
+  };
 }

@@ -1,14 +1,14 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
-import { clashLines } from "@schellingboard/domain/meeting-clash-text";
 import { useEffect, useState } from "react";
 
+import { actingGuestRefusal } from "../../commands/acting-guest-message";
 import { Button } from "../../ui/button";
 import { CopyLinkButton } from "../../ui/copy-link-button";
 import { TextField } from "../../ui/form";
 import { SidePanel } from "../../ui/side-panel";
 import { PersonLink } from "../people/person-link";
+import { slotClashText } from "../schedule/meeting-clash-text";
 import { canCancel, statusLine } from "../schedule/meeting-rules";
 import type { MeetingView } from "../schedule/meeting-view";
 
@@ -36,7 +36,7 @@ export function MeetingPanel({
   const [confirming, setConfirming] = useState(false);
   const [note, setNote] = useState("");
   const otherName = meeting?.otherName;
-  const clashText = meeting && clashLines(meeting.clashes);
+  const clashText = meeting && slotClashText(meeting.clashes);
 
   return (
     <SidePanel
@@ -112,7 +112,7 @@ export function MeetingPanel({
 
           {meeting.clashes.length > 0 && (
             <p className="rounded-md bg-warning-tint p-3 text-sm text-fg">
-              <Trans>{clashText} during this slot.</Trans>
+              {clashText}
             </p>
           )}
 
@@ -199,9 +199,9 @@ export function MeetingNeedsName({
     >
       {protectedName !== undefined && (
         <p className="text-fg-muted">
-          {actingGuestRefusalMessage(
+          {actingGuestRefusal(
             protectedName ? "guest.protected" : "guest.unselected",
-            t`opening your 1-on-1s`
+            "openMeetings"
           )}
         </p>
       )}

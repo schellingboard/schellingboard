@@ -1,6 +1,4 @@
 import { plural, select, t } from "@lingui/core/macro";
-import { Trans } from "@lingui/react/macro";
-import { clashLines } from "@schellingboard/domain/meeting-clash-text";
 import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
 import { getNumSlots } from "@schellingboard/domain/slots";
 import { DateTime } from "luxon";
@@ -19,6 +17,7 @@ import {
   useScheduleMatch,
 } from "./context";
 import { SLOT_HEIGHT_PX } from "./grid-layout";
+import { slotClashText } from "./meeting-clash-text";
 import { meetingColumnRows } from "./meeting-column";
 import {
   blockStatus,
@@ -148,7 +147,7 @@ function SlotCell({
 
 // What the block has no room for, on hover.
 function MeetingSummary({ meeting }: { meeting: MeetingView }) {
-  const clashText = clashLines(meeting.clashes);
+  const clashText = slotClashText(meeting.clashes);
   return (
     <div className="space-y-1 p-2">
       <p className="text-sm font-semibold text-fg">{meetingTitle(meeting)}</p>
@@ -162,9 +161,7 @@ function MeetingSummary({ meeting }: { meeting: MeetingView }) {
         </p>
       )}
       {meeting.clashes.length > 0 && (
-        <p className="text-xs text-fg">
-          <Trans>{clashText} during this slot.</Trans>
-        </p>
+        <p className="text-xs text-fg">{clashText}</p>
       )}
     </div>
   );
@@ -194,10 +191,9 @@ function SlotSummary({ meetings }: { meetings: MeetingView[] }) {
 
 function MeetingClashMark({ meeting }: { meeting: MeetingView }) {
   if (meeting.clashes.length === 0) return null;
-  const clashes = clashLines(meeting.clashes);
   return (
     <ClashIcon
-      text={t`${clashes} during this slot`}
+      text={slotClashText(meeting.clashes)}
       className="h-3 w-3 text-warning-fg"
     />
   );

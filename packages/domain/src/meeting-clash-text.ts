@@ -48,18 +48,3 @@ export function toMeetingClashes(
   }
   return [...distinct.values()];
 }
-
-/** "You are hosting Their talk" / "Yuki is already booked". */
-export function clashLine(clash: MeetingClash): string {
-  if (!clash.isViewer) return `${clash.guestName} is already booked`;
-  if (clash.kind === "meeting") return "You have another 1-on-1";
-  if (!clash.title) return "You are busy";
-  return clash.kind === "hosting"
-    ? `You are hosting ${clash.title}`
-    : `You are attending ${clash.title}`;
-}
-
-/** Every clash in one breath, each distinct line said once. */
-export function clashLines(clashes: MeetingClash[]): string {
-  return [...new Set(clashes.map(clashLine))].join("; ");
-}

@@ -215,6 +215,6 @@ describe("a clashing 1-on-1", () => {
     expect(
       document.getElementById(marks[0].getAttribute("aria-describedby")!)
         ?.textContent
-    ).toBe("You are attending Talk during this slot");
+    ).toBe("You are attending Talk during this slot.");
   });
 });

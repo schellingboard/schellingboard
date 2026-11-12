@@ -1,6 +1,5 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import { clashLines } from "@schellingboard/domain/meeting-clash-text";
 import { type FormEvent, useState } from "react";
 
 import type { MeetingRequestCalls } from "../../commands/meeting-request";
@@ -16,6 +15,7 @@ import {
   requestSentNotice,
   type RequestSubject,
 } from "../meetings/meeting-request-fields";
+import { timeClashSentences } from "../schedule/meeting-clash-text";
 
 type Day = ProfileMeetingOption["lengths"][number]["days"][number];
 
@@ -162,7 +162,7 @@ export function MeetingRequestDialog({
           <SlotList days={days} selected={slotStart} onSelect={setSlotStart} />
         </div>
         <MeetingClashNotice
-          lines={slot?.state === "busy" ? [clashLines(slot.clashes)] : []}
+          lines={slot?.state === "busy" ? timeClashSentences(slot.clashes) : []}
         />
         <MeetingRequestFields
           meetingPoints={option.meetingPoints}

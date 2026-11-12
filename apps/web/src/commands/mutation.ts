@@ -23,7 +23,12 @@ export type MutationResult<R> =
 const unreachable = () =>
   t`This might not have been saved. Check that it went through, then try again.`;
 
-export const FIX_FIELDS_MESSAGE = "Please fix the highlighted fields.";
+export const fixFieldsMessage = () => t`Please fix the highlighted fields.`;
+
+/** What a failed submit says, unless it only points at the highlighted fields. */
+export const failureMessage = (
+  result: Extract<MutationResult<unknown>, { ok: false }>
+) => (result.kind === "fields" ? null : result.message);
 
 const isVersionConflict = (code: string) => code.endsWith(".versionConflict");
 
@@ -66,7 +71,7 @@ export async function awaitMutation<R>(
       ok: false,
       kind: "fields",
       fields: Object.fromEntries(problems.map((p) => [p.path, p.message])),
-      message: FIX_FIELDS_MESSAGE,
+      message: fixFieldsMessage(),
       problem: error,
     };
   const code = problemCode(error, response.status);

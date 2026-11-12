@@ -5,7 +5,7 @@ import { formatEventDates } from "@schellingboard/domain/time";
 import { type FormEvent, useMemo, useState } from "react";
 
 import type { AdminEventCalls } from "../../commands/admin-events";
-import { type FieldErrors, FIX_FIELDS_MESSAGE } from "../../commands/mutation";
+import { type FieldErrors } from "../../commands/mutation";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import type { AdminEvent } from "../../queries/admin-events";
 import { Button } from "../../ui/button";
@@ -141,7 +141,7 @@ function NewEventForm({
       />
       <FormErrorSummary
         fields={fields}
-        error={mutation.error === FIX_FIELDS_MESSAGE ? null : mutation.error}
+        error={mutation.fixFields ? null : mutation.error}
         onJump={(name) =>
           document.querySelector<HTMLElement>(`[name="${name}"]`)?.focus()
         }

@@ -135,7 +135,7 @@ function AddGuestForm({
       </Button>
       <FormErrorSummary
         fields={mutation.fields}
-        error={shown(mutation.error)}
+        error={shown(mutation)}
         onJump={jump}
       />
     </form>
@@ -226,7 +226,7 @@ function EditForm({
       </div>
       <FormErrorSummary
         fields={mutation.fields}
-        error={shown(mutation.error)}
+        error={shown(mutation)}
         onJump={jump}
       />
     </form>

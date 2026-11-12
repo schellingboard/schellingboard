@@ -57,7 +57,7 @@ function PointRow({
     const result = await remove.submit();
     if (result?.ok || (result && result.kind === "conflict")) onChanged();
   };
-  const error = shown(save.error ?? remove.error);
+  const error = shown(save.error ? save : remove);
 
   if (mode === "edit")
     return (
@@ -239,11 +239,7 @@ function AddPoint({
           />
         </div>
       </div>
-      <FormErrorSummary
-        fields={{}}
-        error={shown(mutation.error)}
-        onJump={jumpTo}
-      />
+      <FormErrorSummary fields={{}} error={shown(mutation)} onJump={jumpTo} />
       <div className="flex gap-2">
         <Button disabled={mutation.pending} onClick={() => void add()}>
           {mutation.pending ? t`Adding...` : t`Add meeting point`}

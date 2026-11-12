@@ -235,6 +235,8 @@ export default tseslint.config(
             "^:(?:update|create|image)$",
             // The slot match-id prefix and problem codes passed as arguments
             "^(?:slot-|guest\\.(?:protected|unselected))$",
+            // Task ids of the "select who you are" refusal
+            "^(?:editProfile|(?:create|edit)Proposal|(?:add|edit)Session|changeSettings|see(?:Notifications|Comments)|openMeetings)$",
             // SVG path data
             "^(?=.*\\d)[MmLlHhVvCcSsQqTtAaZz0-9\\s.,-]+$",
           ],

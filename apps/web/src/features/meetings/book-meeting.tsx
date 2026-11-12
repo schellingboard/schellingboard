@@ -1,6 +1,5 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import { clashLines } from "@schellingboard/domain/meeting-clash-text";
 import {
   type FormEvent,
   useEffect,
@@ -20,6 +19,7 @@ import { Button } from "../../ui/button";
 import { Dialog } from "../../ui/dialog";
 import { useNotify } from "../../ui/notices";
 import { PersonLink } from "../people/person-link";
+import { timeClashSentences } from "../schedule/meeting-clash-text";
 import {
   MeetingClashNotice,
   MeetingLengthChips,
@@ -112,7 +112,7 @@ function CandidateStep({
   profileHref: (guestId: string) => string;
   onPick: (candidate: MeetingCandidate) => void;
 }) {
-  const clashText = clashLines(found.yourClashes);
+  const clashText = timeClashSentences(found.yourClashes).join(" ");
   return (
     <div className="flex flex-col gap-4">
       <span className="-mt-2 block text-sm text-fg-muted">
@@ -127,7 +127,7 @@ function CandidateStep({
 
       {found.yourClashes.length > 0 && (
         <p className="rounded-md bg-warning-tint p-3 text-sm text-fg">
-          <Trans>{clashText} during this time — book it anyway?</Trans>
+          {clashText} <Trans>Book it anyway?</Trans>
         </p>
       )}
 
@@ -268,9 +268,11 @@ function RequestStep({
       <MeetingClashNotice
         lines={[
           ...(found.yourClashes.length > 0
-            ? [clashLines(found.yourClashes)]
+            ? timeClashSentences(found.yourClashes)
             : []),
-          ...(candidate.busy ? [t`${name} is already booked`] : []),
+          ...(candidate.busy
+            ? [t`${name} is already booked during this time.`]
+            : []),
         ]}
       />
 

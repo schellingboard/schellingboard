@@ -284,11 +284,7 @@ export function SessionForm({
           onChange={(v) => setField("locationIds", v)}
         />
       )}
-      <FormErrorSummary
-        fields={errors}
-        error={shown(mutation.error)}
-        onJump={jump}
-      />
+      <FormErrorSummary fields={errors} error={shown(mutation)} onJump={jump} />
       <div className="flex gap-2">
         <Button type="submit" disabled={mutation.pending}>
           {mutation.pending ? pendingLabel : submitLabel}
@@ -361,11 +357,7 @@ function RsvpRow({
           </button>
         )}
       </div>
-      <FormErrorSummary
-        fields={{}}
-        error={shown(mutation.error)}
-        onJump={() => {}}
-      />
+      <FormErrorSummary fields={{}} error={shown(mutation)} onJump={() => {}} />
     </li>
   );
 }

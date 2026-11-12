@@ -1,9 +1,4 @@
-import {
-  clashLine,
-  clashLines,
-  type MeetingClash,
-  toMeetingClashes,
-} from "@schellingboard/domain/meeting-clash-text";
+import { toMeetingClashes } from "@schellingboard/domain/meeting-clash-text";
 import { describe, expect, it } from "vitest";
 
 describe("toMeetingClashes", () => {
@@ -45,80 +40,5 @@ describe("toMeetingClashes", () => {
     expect(toMeetingClashes([hosting, meeting], "ada")).toEqual([
       { guestName: "Grace", kind: "busy", title: null, isViewer: false },
     ]);
-  });
-});
-
-describe("clashLine", () => {
-  it("names the viewer's own session", () => {
-    expect(
-      clashLine({
-        guestName: "Grace",
-        kind: "hosting",
-        title: "Microservices for Dummies",
-        isViewer: true,
-      })
-    ).toBe("You are hosting Microservices for Dummies");
-  });
-
-  it("names a session the viewer only RSVP'd to", () => {
-    expect(
-      clashLine({
-        guestName: "Grace",
-        kind: "attending",
-        title: "Microservices for Dummies",
-        isViewer: true,
-      })
-    ).toBe("You are attending Microservices for Dummies");
-  });
-
-  it("says the viewer's other 1-on-1 is one", () => {
-    expect(
-      clashLine({
-        guestName: "Grace",
-        kind: "meeting",
-        title: null,
-        isViewer: true,
-      })
-    ).toBe("You have another 1-on-1");
-  });
-
-  it("says only that the other person is booked", () => {
-    expect(
-      clashLine({
-        guestName: "Grace",
-        kind: "busy",
-        title: null,
-        isViewer: false,
-      })
-    ).toBe("Grace is already booked");
-  });
-
-  it("says the viewer is busy when there is nothing to name", () => {
-    expect(
-      clashLine({
-        guestName: "Ada",
-        kind: "busy",
-        title: null,
-        isViewer: true,
-      })
-    ).toBe("You are busy");
-  });
-});
-
-describe("clashLines", () => {
-  it("says each distinct line once, in order", () => {
-    const theirs: MeetingClash = {
-      isViewer: false,
-      guestName: "Yuki",
-      kind: "busy",
-      title: null,
-    };
-    expect(
-      clashLines([
-        { isViewer: true, guestName: "Me", kind: "hosting", title: "Talk" },
-        theirs,
-        theirs,
-      ])
-    ).toBe("You are hosting Talk; Yuki is already booked");
   });
 });

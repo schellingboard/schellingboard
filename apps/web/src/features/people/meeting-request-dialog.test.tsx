@@ -141,9 +141,7 @@ describe("asking for a 1-on-1", { tags: ["012-US3"] }, () => {
     await userEvent.click(screen.getByRole("button", { name: /^09:40/ }));
 
     expect(
-      screen.getByText(
-        "You are hosting Bees during this time — book it anyway?"
-      )
+      screen.getByText("You are hosting Bees during this time. Book it anyway?")
     ).toBeTruthy();
     await userEvent.type(screen.getByLabelText("Where to meet"), "Lobby");
     expect((send() as HTMLButtonElement).disabled).toBe(false);

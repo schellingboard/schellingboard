@@ -1,7 +1,7 @@
 import { STALE_EVENT_MESSAGE } from "@schellingboard/contracts/event";
 import { type FormEvent, useRef, useState } from "react";
 
-import { type FieldErrors, FIX_FIELDS_MESSAGE } from "../../commands/mutation";
+import { type FieldErrors } from "../../commands/mutation";
 import type { CommandResponse } from "../../commands/runner";
 import { useFormMutation } from "../../commands/use-form-mutation";
 
@@ -17,8 +17,10 @@ export function useJumpWithin<T extends HTMLElement>() {
 }
 
 /** The error without the "fix the fields" line, which the summary says itself. */
-export const shown = (error: string | null) =>
-  error === FIX_FIELDS_MESSAGE ? null : error;
+export const shown = (mutation: {
+  error: string | null;
+  fixFields: boolean;
+}) => (mutation.fixFields ? null : mutation.error);
 
 export function useSectionSave({
   call,
@@ -55,7 +57,7 @@ export function useSectionSave({
     }
   };
 
-  const error = stale ? STALE_EVENT_MESSAGE : shown(mutation.error);
+  const error = stale ? STALE_EVENT_MESSAGE : shown(mutation);
   const fields: FieldErrors = stale ? {} : mutation.fields;
   return {
     save,

@@ -123,7 +123,7 @@ function SettingsForm({
       </div>
       <FormErrorSummary
         fields={fields}
-        error={Object.keys(refused).length > 0 ? null : shown(mutation.error)}
+        error={Object.keys(refused).length > 0 ? null : shown(mutation)}
         onJump={jumpTo}
       />
       <div className="flex items-center gap-3">

@@ -68,11 +68,7 @@ function PeriodRow({
           {mutation.pending ? t`Deleting...` : t`Delete`}
         </Button>
       </div>
-      <FormErrorSummary
-        fields={{}}
-        error={shown(mutation.error)}
-        onJump={() => {}}
-      />
+      <FormErrorSummary fields={{}} error={shown(mutation)} onJump={() => {}} />
     </li>
   );
 }
@@ -183,11 +179,7 @@ function AddPeriodForm({
           ))}
         </fieldset>
       )}
-      <FormErrorSummary
-        fields={errors}
-        error={shown(mutation.error)}
-        onJump={jump}
-      />
+      <FormErrorSummary fields={errors} error={shown(mutation)} onJump={jump} />
       <Button
         type="submit"
         disabled={mutation.pending || locationIds.length === 0}

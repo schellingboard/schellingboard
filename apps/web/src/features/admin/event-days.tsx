@@ -144,7 +144,7 @@ function useDayForm({
     errors,
     submit,
     pending: mutation.pending,
-    error: shown(mutation.error),
+    error: shown(mutation),
     change: (key: keyof DayForm, value: string) => {
       const follower = FOLLOWERS[key];
       if (Object.values(FOLLOWERS).includes(key)) edited.current.add(key);
