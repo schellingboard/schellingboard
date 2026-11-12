@@ -6,6 +6,8 @@ import { FIX_FIELDS_MESSAGE, type FieldErrors } from "../../commands/mutation";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import type { AdminEvent } from "../../queries/admin-events";
 import { Button } from "../../ui/button";
+import type { OnParams } from "../../ui/list-paging";
+import { usePaging } from "../../ui/use-paging";
 import {
   ComboboxField,
   MarkdownField,
@@ -160,14 +162,23 @@ export function AdminEventsScreen({
   events,
   calls,
   onCreated,
+  params,
+  onParams,
 }: {
   status: "loading" | "ready" | "error";
   events: AdminEvent[];
+  params: URLSearchParams;
+  onParams: OnParams;
   calls: AdminEventCalls;
   /** The list is out of date: load it again. */
   onCreated: () => void;
 }) {
   const [adding, setAdding] = useState(false);
+  const { visible, pager, top } = usePaging<AdminEvent, HTMLUListElement>(
+    events,
+    params,
+    onParams
+  );
 
   if (status === "error")
     return (
@@ -192,8 +203,11 @@ export function AdminEventsScreen({
       {events.length === 0 ? (
         <p className="text-sm text-fg-subtle">No events yet.</p>
       ) : (
-        <ul className="divide-y divide-line-subtle border-t border-b border-line-subtle">
-          {events.map((e) => (
+        <ul
+          ref={top}
+          className="divide-y divide-line-subtle border-t border-b border-line-subtle"
+        >
+          {visible.map((e) => (
             <li
               key={e.id}
               className="flex items-center justify-between gap-3 py-3"
@@ -227,6 +241,7 @@ export function AdminEventsScreen({
           ))}
         </ul>
       )}
+      {pager}
     </div>
   );
 }

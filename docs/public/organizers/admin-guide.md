@@ -215,7 +215,7 @@ another in **Event**. An event's admin page links to its statistics too.
 
 Each figure is a card with a title; its **?** button explains what it shows and how to read it. Most
 cards draw a chart, and **Table** next to it shows the figures behind it: sort by clicking a column.
-A long table shows 25 rows at a time, and its search box finds rows by their text. **CSV** saves the
+A long table shows 50 rows at a time, and its search box finds rows by their text. **CSV** saves the
 whole table, **Download all** every table as a ZIP. On a wide screen the sections and the figures of
 the open section are listed on the left. A figure the database cannot supply, such as attendee
 counts for an event that ran before they existed, says "No data" instead of 0. The page counts what

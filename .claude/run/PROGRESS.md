@@ -6,6 +6,10 @@
   row is loaded (deep links work), so Next stays on offer; `Pager` `more` shows "100+". "Select
   page" and the ticks are per page. Agenda moved to its own step 23c: it needs an owner decision
   (reveal, stepper, now line, folds across pages).
+- 23d (#831): `usePaging` (ui/use-paging.tsx) bundles pageOf, handlers, ref and pager for lists;
+  events, locations (reorder arrows use the absolute index) and stats tables use it. Stats tables
+  keep their page in component state, not the URL: one page holds several of them, and the shared
+  `page` names would collide. Event meetings has no list to page (chart points).
 - 23a also added to `Pager`: `listTop` (scroll on page change), `showTotal`; `pageOf` returns
   `lastPage`, `total`; `showsPager`.
 
@@ -160,4 +164,4 @@
 
 ## Next step
 
-Step 23c (agenda) waits for an owner decision; otherwise 23d, then 25 (#1328b).
+Step 23c (agenda, `fixes #831`) waits for an owner decision; otherwise 25 (#1328b).

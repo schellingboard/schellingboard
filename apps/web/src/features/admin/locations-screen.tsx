@@ -13,6 +13,8 @@ import type { FieldErrors } from "../../commands/mutation";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import type { AdminLocation } from "../../queries/admin-locations";
 import { Button } from "../../ui/button";
+import type { OnParams } from "../../ui/list-paging";
+import { usePaging } from "../../ui/use-paging";
 import { cx } from "../../ui/cx";
 import {
   CheckboxField,
@@ -419,15 +421,23 @@ export function LocationsScreen({
   events,
   calls,
   onChanged,
+  params,
+  onParams,
 }: {
   status: "loading" | "ready" | "error";
   locations: AdminLocation[];
+  params: URLSearchParams;
+  onParams: OnParams;
   events: EventOption[];
   calls: AdminLocationCalls;
   /** The list is out of date: load it again. */
   onChanged: () => void;
 }) {
   const [adding, setAdding] = useState(false);
+  const { visible, first, pager, top } = usePaging<
+    AdminLocation,
+    HTMLUListElement
+  >(locations, params, onParams);
 
   if (status === "error")
     return (
@@ -455,20 +465,24 @@ export function LocationsScreen({
       {locations.length === 0 ? (
         <p className="text-sm text-fg-subtle">No locations yet.</p>
       ) : (
-        <ul className="divide-y divide-line-subtle border-t border-b border-line-subtle">
-          {locations.map((location, index) => (
+        <ul
+          ref={top}
+          className="divide-y divide-line-subtle border-t border-b border-line-subtle"
+        >
+          {visible.map((location, index) => (
             <LocationRow
               key={location.id}
               location={location}
               events={events}
-              isFirst={index === 0}
-              isLast={index === locations.length - 1}
+              isFirst={first + index === 0}
+              isLast={first + index === locations.length - 1}
               calls={calls}
               onChanged={onChanged}
             />
           ))}
         </ul>
       )}
+      {pager}
     </section>
   );
 }
