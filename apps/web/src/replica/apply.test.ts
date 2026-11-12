@@ -124,6 +124,40 @@ describe("apply", () => {
     expect(removed.days.map((d) => d.id)).not.toContain("later");
   });
 
+  it("keeps shared moments by start and id", () => {
+    const moment = (id: string, start: string) => ({
+      id,
+      dayId: "d",
+      title: id,
+      description: "",
+      start,
+      end: "2030-01-01T20:00:00.000Z",
+    });
+    const sent = (seq: number, m: ReturnType<typeof moment>): FeedMessage => ({
+      seq,
+      type: "moment.changed",
+      commandKey: null,
+      moment: m,
+    });
+    const after = replay([
+      sent(8, moment("b", "2030-01-01T12:00:00.000Z")),
+      sent(9, moment("a", "2030-01-01T10:00:00.000Z")),
+      sent(10, { ...moment("b", "2030-01-01T12:00:00.000Z"), title: "Lunch" }),
+    ]);
+    expect(after.moments.map((m) => [m.id, m.title])).toEqual([
+      ["a", "a"],
+      ["b", "Lunch"],
+    ]);
+
+    const without = apply(after, {
+      seq: 11,
+      type: "moment.deleted",
+      commandKey: null,
+      momentId: "a",
+    });
+    expect(without.moments.map((m) => m.id)).toEqual(["b"]);
+  });
+
   it("replaces the event on an event change", () => {
     const after = apply(snapshot, {
       seq: 8,

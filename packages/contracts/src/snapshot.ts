@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { dayViewSchema, eventViewSchema } from "./event";
+import { dayViewSchema, eventViewSchema, momentViewSchema } from "./event";
 import { locationViewSchema, unavailabilityViewSchema } from "./location";
 import { meetingPointSchema, meetingSchema } from "./meeting";
 import { snapshotProposalSchema } from "./proposal";
@@ -40,6 +40,7 @@ export const snapshotSchema = z
     now: instant.describe("The server's clock, the dev fake clock included"),
     event: eventViewSchema,
     days: z.array(dayViewSchema),
+    moments: z.array(momentViewSchema),
     locations: z.array(snapshotLocationSchema),
     unavailability: z.array(unavailabilityViewSchema),
     guests: z.array(snapshotGuestSchema).describe("Members and session hosts"),

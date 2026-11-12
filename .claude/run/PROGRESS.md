@@ -2,12 +2,11 @@
 
 ## Decisions
 
-- #861a: moments have no `version`; of two admin edits at once the last wins (accepted).
+- #861b: day bands are absolutely positioned in the day grid (`MomentBands`), so cells keep their
+  auto-placement; `DayWithSessions.moments` is ready for the text view (step 10). The attendee guide
+  screenshot `schedule-grid.webp` was not recaptured (`make screenshots`); do it at the end.
 
-- #861a: moments have no change-feed or snapshot support yet and `createMoments`/`updateMoment`/
-  `deleteMoment` record no change (the admin reloads the event detail). Step 9 must add the changes
-  (`audienceOf`, `project`, `feed-apply`) and put moments in the snapshot, or the grid is stale.
-  Times are sent as `HH:mm` in the event zone; the server places them on each day.
+- #861a: moments have no `version`; of two admin edits at once the last wins (accepted).
 
 ## Problems
 
@@ -31,4 +30,4 @@
 
 ## Next step
 
-Step 9.
+Step 10.

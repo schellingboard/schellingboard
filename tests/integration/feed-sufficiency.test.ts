@@ -20,6 +20,7 @@ import { createSessionUseCases } from "@/server/modules/sessions/module";
 import { createMeetingUseCases } from "@/server/modules/meetings/module";
 import { createPeopleUseCases } from "@/server/modules/people/module";
 import { isoDay } from "../helpers/dates";
+import { snapshotFor } from "@/server/feed/snapshot";
 
 const NINE = new Date("2026-06-02T09:00:00.000Z");
 const TEN = new Date("2026-06-02T10:00:00.000Z");
@@ -402,6 +403,74 @@ describe("the logged changes suffice to keep a replica current", () => {
       });
       await expectChangesSuffice(w.viewer, w.scheduling.slug, async () => {
         const result = await events().deleteDay(ADMIN, { id: added!.id }, NOW);
+        expect(result.ok).toBe(true);
+      });
+    });
+
+    it("for shared moments added, edited and deleted with their day", async () => {
+      const w = await dayWorld();
+      const lunch = {
+        title: "Lunch",
+        description: "Buffet",
+        startTime: "12:30",
+        endTime: "14:00",
+      };
+      let moments: { id: string }[] = [];
+      await expectChangesSuffice(w.viewer, w.scheduling.slug, async () => {
+        const result = await events().createMoments(
+          ADMIN,
+          {
+            eventId: w.scheduling.id,
+            dayIds: [w.day.id],
+            ...lunch,
+          },
+          NOW
+        );
+        expect(result.ok).toBe(true);
+        if (result.ok) moments = result.value;
+      });
+      const snapshot = await snapshotFor(
+        unitOfWork,
+        w.viewer,
+        w.scheduling.slug,
+        NOW
+      );
+      expect(snapshot.ok && snapshot.value.moments).toMatchObject([
+        { id: moments[0].id, title: "Lunch", dayId: w.day.id },
+      ]);
+      await expectChangesSuffice(w.viewer, w.scheduling.slug, async () => {
+        const result = await events().updateMoment(
+          ADMIN,
+          {
+            id: moments[0].id,
+            ...lunch,
+            title: "Brunch",
+          },
+          NOW
+        );
+        expect(result.ok).toBe(true);
+      });
+      await expectChangesSuffice(w.viewer, w.scheduling.slug, async () => {
+        const result = await events().deleteMoment(
+          ADMIN,
+          {
+            id: moments[0].id,
+          },
+          NOW
+        );
+        expect(result.ok).toBe(true);
+      });
+      await events().createMoments(
+        ADMIN,
+        {
+          eventId: w.scheduling.id,
+          dayIds: [w.day.id],
+          ...lunch,
+        },
+        NOW
+      );
+      await expectChangesSuffice(w.viewer, w.scheduling.slug, async () => {
+        const result = await events().deleteDay(ADMIN, { id: w.day.id }, NOW);
         expect(result.ok).toBe(true);
       });
     });

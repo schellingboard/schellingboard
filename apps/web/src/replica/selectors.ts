@@ -1,5 +1,5 @@
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
-import type { Day, Event } from "@schellingboard/domain/event";
+import type { Day, Event, SharedMoment } from "@schellingboard/domain/event";
 import type { Guest } from "@schellingboard/domain/guest";
 import type {
   Location,
@@ -9,7 +9,10 @@ import type { LoggedProposal } from "@schellingboard/domain/change";
 import type { Rsvp, Session } from "@schellingboard/domain/session";
 import type { VoteChoice } from "@schellingboard/domain/vote";
 
-type DayWithSessions = Day & { sessions: Session[] };
+type DayWithSessions = Day & {
+  sessions: Session[];
+  moments: SharedMoment[];
+};
 
 const date = (iso: string) => new Date(iso);
 const optionalDate = (iso: string | null) => (iso ? new Date(iso) : undefined);
@@ -81,6 +84,9 @@ export function eventContextFrom(snapshot: Snapshot) {
         day.start.getTime() <= s.startTime.getTime() &&
         day.end.getTime() >= s.endTime.getTime()
     ),
+    moments: snapshot.moments
+      .filter((m) => m.dayId === day.id)
+      .map((m) => ({ ...m, start: date(m.start), end: date(m.end) })),
   }));
 
   const unavailability: LocationUnavailability[] = snapshot.unavailability

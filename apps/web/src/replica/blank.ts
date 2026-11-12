@@ -35,6 +35,7 @@ export function blankSnapshot(now: string): Snapshot {
       version: 0,
     },
     days: [],
+    moments: [],
     locations: [],
     unavailability: [],
     guests: [],

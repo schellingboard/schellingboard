@@ -1,6 +1,8 @@
 import type { Event, SharedMoment } from "@schellingboard/domain/event";
 import { dayTimeToUtc } from "@schellingboard/domain/admin-datetime";
+import { changes } from "@schellingboard/domain/change";
 import type { Actor } from "@/server/kernel/actor";
+import { byAdmin } from "@/server/kernel/change-context";
 import {
   invalidFields,
   notFound,
@@ -65,7 +67,8 @@ export const createMoments =
   ({ uow }: EventDeps) =>
   async (
     actor: Actor,
-    input: MomentInput & { eventId: string; dayIds: string[] }
+    input: MomentInput & { eventId: string; dayIds: string[] },
+    now: Date
   ): Promise<Result<SharedMoment[]>> => {
     if (!actor.admin) return adminRequired();
     const dayIds = [...new Set(input.dayIds)];
@@ -90,7 +93,10 @@ export const createMoments =
           ...placed.data,
         });
       }
-      return ok(await tx.sharedMoments.createMany(rows));
+      const created = await tx.sharedMoments.createMany(rows);
+      for (const moment of created)
+        tx.record(changes.momentChanged(moment, event.id, byAdmin(actor, now)));
+      return ok(created);
     });
   };
 
@@ -98,7 +104,8 @@ export const updateMoment =
   ({ uow }: EventDeps) =>
   async (
     actor: Actor,
-    input: MomentInput & { id: string }
+    input: MomentInput & { id: string },
+    now: Date
   ): Promise<Result<SharedMoment>> => {
     if (!actor.admin) return adminRequired();
     const refused = textOf(input);
@@ -116,7 +123,9 @@ export const updateMoment =
         description: input.description.trim(),
         ...placed.data,
       });
-      return updated ? ok(updated) : momentNotFound();
+      if (!updated) return momentNotFound();
+      tx.record(changes.momentChanged(updated, event.id, byAdmin(actor, now)));
+      return ok(updated);
     });
   };
 
@@ -124,13 +133,19 @@ export const deleteMoment =
   ({ uow }: EventDeps) =>
   async (
     actor: Actor,
-    input: { id: string }
+    input: { id: string },
+    now: Date
   ): Promise<Result<SharedMoment>> => {
     if (!actor.admin) return adminRequired();
     return uow.run(async (tx) => {
       const existing = await tx.sharedMoments.findById(input.id);
       if (!existing) return momentNotFound();
+      const day = await tx.days.findById(existing.dayId);
       await tx.sharedMoments.delete(input.id);
+      if (day)
+        tx.record(
+          changes.momentDeleted(existing, day.eventId, byAdmin(actor, now))
+        );
       return ok(existing);
     });
   };

@@ -20,13 +20,8 @@ the E2E specs a step touches; the user runs the full suite at the end.
 7. DONE **#771** Phase strip on the proposals page (`phaseTimeline` in domain).
 8. DONE **#861a** Shared moments data and admin (`shared_moments`, migration 0063, admin Config
    section, `moments` on the event detail).
-9. **#861b** Shared moments: grid band. Issue sections 1.1, 1.2, 2.2 (DayGrid). First make moments
-   live: record their changes (`audienceOf`, `project`, `feed-apply`, the three moment use cases)
-   and put moments in the snapshot and replica. Generalise `getNowOffsetPx`, unit test the maths;
-   striped band across room columns, pill with details tooltip, sticky on phone, honours `?loc=`;
-   "+" slots inside stay clickable. Seed: Conference Gamma gets a keynote and daily "Coffee & cake"
-   moments (hard Lunch blockers unchanged). E2E: attendee sees the pill. Attendee guide text and
-   screenshot. Footer `issue #861`.
+9. DONE **#861b** Shared moments live (`moment.changed`/`moment.deleted`, snapshot `moments`) and
+   the grid band with its pill; Gamma seed moments; E2E; attendee guide text.
 10. **#861c** Shared moments: text and RSVP'd views. Issue section 1.3 (DayText `MomentRow`, merged
     in time order, no link, no RSVP, blockers still hidden). Test the merge in a pure util; E2E in
     the existing schedule spec. Footer `issue #861`.

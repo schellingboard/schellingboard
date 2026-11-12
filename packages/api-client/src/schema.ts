@@ -7903,6 +7903,16 @@ export interface components {
         eventId: string;
         version: number;
       }[];
+      moments: {
+        id: string;
+        dayId: string;
+        title: string;
+        description: string;
+        /** Format: date-time */
+        start: string;
+        /** Format: date-time */
+        end: string;
+      }[];
       locations: components["schemas"]["SnapshotLocation"][];
       unavailability: components["schemas"]["Unavailability"][];
       /** @description Members and session hosts */
@@ -8114,6 +8124,31 @@ export interface components {
           /** @enum {string} */
           type: "day.deleted";
           dayId: string;
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "moment.changed";
+          moment: {
+            id: string;
+            dayId: string;
+            title: string;
+            description: string;
+            /** Format: date-time */
+            start: string;
+            /** Format: date-time */
+            end: string;
+          };
+        }
+      | {
+          seq: number;
+          /** @description The Idempotency-Key of your own request that made it */
+          commandKey: string | null;
+          /** @enum {string} */
+          type: "moment.deleted";
+          momentId: string;
         }
       | {
           seq: number;

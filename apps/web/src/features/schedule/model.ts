@@ -1,4 +1,4 @@
-import type { Day } from "@schellingboard/domain/event";
+import type { Day, SharedMoment } from "@schellingboard/domain/event";
 import type { Location } from "@schellingboard/domain/location";
 import type { Session } from "@schellingboard/domain/session";
 import { sessionPassesFilters, type ScheduleFilterState } from "./filters";
@@ -6,7 +6,10 @@ import { meetingsForDay } from "./meeting-column";
 import type { MeetingView } from "./meeting-view";
 import { meetingMatchesSearch, sessionMatchesSearch } from "./search";
 
-export type DayWithSessions = Day & { sessions: Session[] };
+export type DayWithSessions = Day & {
+  sessions: Session[];
+  moments: SharedMoment[];
+};
 
 export type ScheduleMatch = {
   filtering: boolean;
