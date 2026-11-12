@@ -25,6 +25,7 @@ concurrency:
 
 jobs:
   release:
+    if: github.repository == 'schellingboard/schellingboard'
     runs-on: ubuntu-latest
 
     permissions:
