@@ -37,7 +37,12 @@ the E2E specs a step touches; the user runs the full suite at the end.
 20. DONE **#607** Time format setting (`TimeFormatProvider`, `useTimeFormat`, cookie
     `sb-time-format`).
 21. DONE **#993** "My comments" (`GET /me/comments`, `/comments`, `my-comments-screen.tsx`).
-22. **#1046** (Medium) Ask someone to open up to 1-on-1s. Read the comment too.
+22. DONE **#1046** "Ask them to open up" (`meeting_nudges`, migration 0064, `askToOpenUp`,
+    `meetingNudge.*` changes, `nudges` on meeting-options).
+22a. **Bug** (no issue yet; create one, type Bug, priority High, `component: scheduling`, per
+    docs/dev/github-issues.md; no push to the repo needed) The "My schedule" dropdown on the grid
+    schedule opens behind the schedule and is not visible. Find the stacking/overflow cause, fix it,
+    cover with an E2E that opens the dropdown and clicks an option. Do before step 23.
 23. **#831** (Medium) Consistent pagination strategy; `Pager` (#684) exists, read the 5 comments and
     apply it where the issue says. Record in Questions if #684 covered it.
 24. **#1328a** (Medium) i18n foundation: Lingui, `apps/web/src/i18n/`, `en` catalog, scripts and
