@@ -62,6 +62,15 @@ the E2E specs a step touches; the user runs the full suite at the end.
     now). Consider: segment length proportional to the real phase length; hiding it once the
     schedule phase is reached; never showing it when the event has no phases. Not clickable (no
     link/button look, no hover). Builds on #771 (`phaseTimeline`). Issue first if none exists.
+22h. **Proposals toolbar redesign.** The filter area has dead white space at the bottom left (chips
+    top left, search top right, Sort by alone below right). Redesign for excellent UX, same
+    controls, no new features: one compact toolbar. Row 1: search field growing to fill the width,
+    then Sort by. Row 2 (or the same row when wide): filter chips, then the result count at the
+    far end. No empty corners at 390px, 768px and 1440px; chips wrap or scroll horizontally on
+    phones; keep keyboard order (search, filters, sort) and visible focus. Check the Agenda and
+    attendee directory toolbars: share one `ListToolbar` if they have the same shape. Pure
+    layout: adapt only the tests it breaks. Capture before/after screenshots at the three widths
+    into PROGRESS.md notes (not docs). Issue optional.
 23. BLOCKED, see Questions. **#831** (Medium) Consistent pagination strategy; `Pager` (#684) exists,
     read the 5 comments and apply it where the issue says. Record in Questions if #684 covered it.
 24. **#1328a** (Medium) i18n foundation: Lingui, `apps/web/src/i18n/`, `en` catalog, scripts and
