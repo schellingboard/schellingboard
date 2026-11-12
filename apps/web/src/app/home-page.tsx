@@ -6,6 +6,7 @@ import type { AppServices } from "./services";
 import { ShellFrame } from "./shell";
 import { useParamUpdates } from "./use-param-updates";
 import { useDirectoryShell } from "./use-directory-shell";
+import { t } from "@lingui/core/macro";
 
 export function HomePage({ services }: { services: AppServices }) {
   return <Home api={services.api} />;
@@ -39,8 +40,8 @@ function Home({ api }: { api: AppServices["api"] }) {
 
   return (
     <ShellFrame api={api} {...frame}>
-      {(failed || siteFailed) && <p>The events could not be loaded.</p>}
-      {loaded && events.length === 0 && <p>No events found.</p>}
+      {(failed || siteFailed) && <p>{t`The events could not be loaded.`}</p>}
+      {loaded && events.length === 0 && <p>{t`No events found.`}</p>}
       {site && events.length > 1 && (
         <InAppLinks
           owns={({ pathname }) => events.some((e) => pathname === `/${e.slug}`)}

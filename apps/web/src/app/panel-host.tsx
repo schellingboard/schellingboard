@@ -22,6 +22,7 @@ import { useScheduleSession } from "./use-schedule-session";
 import { useProposalActions } from "./use-proposal-actions";
 import { useScheduleActions } from "./use-schedule-actions";
 import { useViewer } from "./viewer";
+import { t } from "@lingui/core/macro";
 
 /** The open panel of this event, over whatever page of it is behind. */
 export function PanelHost() {
@@ -76,14 +77,14 @@ function ForeignEvent({
   });
   if (session.status !== "ready") {
     return (
-      <SidePanel label="Event details" title="Event" onClose={close}>
-        {session.status === "loading" && <p>Loading…</p>}
-        {session.status === "missing" && <p>Event not found.</p>}
+      <SidePanel label={t`Event details`} title={t`Event`} onClose={close}>
+        {session.status === "loading" && <p>{t`Loading…`}</p>}
+        {session.status === "missing" && <p>{t`Event not found.`}</p>}
         {session.status === "failed" && (
           <>
-            <p>The event could not be loaded.</p>
+            <p>{t`The event could not be loaded.`}</p>
             <button type="button" onClick={session.retry} className="underline">
-              Try again
+              {t`Try again`}
             </button>
           </>
         )}

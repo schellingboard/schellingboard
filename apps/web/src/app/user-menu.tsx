@@ -3,6 +3,8 @@ import { Dialog } from "../ui/dialog";
 import { hardNavigate, hardReload } from "./hard-navigate";
 import { endSiteSession } from "./site-session";
 import type { Viewer } from "./viewer";
+import { i18n, type MessageDescriptor } from "@lingui/core";
+import { msg, t } from "@lingui/core/macro";
 
 export type PickableGuest = {
   id: string;
@@ -51,11 +53,11 @@ export function UserMenu({
       <>
         <button
           type="button"
-          aria-label="Your name"
+          aria-label={t`Your name`}
           onClick={() => setPicking(true)}
           className={`${chip} bg-brand-tint text-brand-fg hover:bg-brand-tint-hover`}
         >
-          Select your name
+          {t`Select your name`}
         </button>
         <NamePicker
           open={picking}
@@ -67,11 +69,12 @@ export function UserMenu({
     );
   }
 
+  const name = current.name;
   return (
     <div className="relative">
       <button
         type="button"
-        aria-label={`Your name: ${current.name}`}
+        aria-label={t`Your name: ${name}`}
         aria-expanded={menuOpen}
         onClick={() => setMenuOpen(!menuOpen)}
         className={`${chip} text-fg-muted hover:bg-surface-muted`}
@@ -83,7 +86,7 @@ export function UserMenu({
       {menuOpen && (
         <div
           role="menu"
-          aria-label="Your name"
+          aria-label={t`Your name`}
           className="absolute right-0 z-40 mt-1 w-48 rounded-md bg-surface-raised py-1 shadow-lg ring-1 ring-line-subtle"
         >
           <a
@@ -92,7 +95,7 @@ export function UserMenu({
             className={item}
             onClick={() => setMenuOpen(false)}
           >
-            My profile
+            {t`My profile`}
           </a>
           <a
             role="menuitem"
@@ -100,7 +103,7 @@ export function UserMenu({
             className={item}
             onClick={() => setMenuOpen(false)}
           >
-            Edit profile
+            {t`Edit profile`}
           </a>
           <a
             role="menuitem"
@@ -108,7 +111,7 @@ export function UserMenu({
             className={item}
             onClick={() => setMenuOpen(false)}
           >
-            Settings
+            {t`Settings`}
           </a>
           <a
             role="menuitem"
@@ -116,7 +119,7 @@ export function UserMenu({
             className={item}
             onClick={() => setMenuOpen(false)}
           >
-            My comments
+            {t`My comments`}
           </a>
           <div className="my-1 h-px bg-surface-muted" />
           <button
@@ -126,11 +129,11 @@ export function UserMenu({
             onClick={() => void logOut()}
             className={`${item} disabled:opacity-50`}
           >
-            {loggingOut ? "Logging out..." : "Log out"}
+            {loggingOut ? t`Logging out...` : t`Log out`}
           </button>
           {logoutFailed && (
             <p role="alert" className="px-4 py-1 text-xs text-danger-fg">
-              Could not log out — try again
+              {t`Could not log out — try again`}
             </p>
           )}
         </div>
@@ -151,7 +154,7 @@ export function NamePicker({
   choose: Viewer["choose"];
 }) {
   const [query, setQuery] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<MessageDescriptor | null>(null);
   const inputId = useId();
   const listId = useId();
   const [active, setActive] = useState(-1);
@@ -176,7 +179,7 @@ export function NamePicker({
     if (result.ok) return onClose();
     if (result.code === "guest.protected")
       return hardNavigate(`/auth/login?guest=${guest.id}`);
-    setError("Could not select that name — try again");
+    setError(msg`Could not select that name — try again`);
   };
 
   const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -202,9 +205,9 @@ export function NamePicker({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} title="Who are you?">
+    <Dialog open={open} onClose={onClose} title={t`Who are you?`}>
       <label htmlFor={inputId} className="text-fg-subtle">
-        My name is:
+        {t`My name is:`}
       </label>
       <input
         id={inputId}
@@ -224,13 +227,13 @@ export function NamePicker({
       />
       {error && (
         <p role="alert" className="mt-2 text-sm text-danger-fg">
-          {error}
+          {i18n._(error)}
         </p>
       )}
       <ul
         id={listId}
         role="listbox"
-        aria-label="Names"
+        aria-label={t`Names`}
         className="mt-2 max-h-72 overflow-y-auto"
       >
         {shown.map((guest, i) => (
@@ -246,7 +249,7 @@ export function NamePicker({
           >
             {guest.name}
             {guest.authProtected && (
-              <span className="ml-2 text-xs text-fg-subtle">(password)</span>
+              <span className="ml-2 text-xs text-fg-subtle">{t`(password)`}</span>
             )}
           </li>
         ))}

@@ -11,6 +11,10 @@ msgstr ""
 msgid "(done)"
 msgstr "(done)"
 
+#: src/app/user-menu.tsx:252
+msgid "(password)"
+msgstr "(password)"
+
 #: src/ui/phase-bar.tsx:61
 msgid "(skipped)"
 msgstr "(skipped)"
@@ -35,19 +39,62 @@ msgstr "{total, plural, one {#+ result} other {#+ results}}"
 msgid "{valueLabel}: 0 to {max}"
 msgstr "{valueLabel}: 0 to {max}"
 
+#: src/app/time-format.tsx:64
+msgid "12-hour"
+msgstr "12-hour"
+
+#: src/app/time-format.tsx:65
+msgid "24-hour"
+msgstr "24-hour"
+
+#: src/app/reload-offer.tsx:93
+msgid "A new version of SchellingBoard is available."
+msgstr "A new version of SchellingBoard is available."
+
+#: src/app/footer.tsx:125
+msgid "A newer release is out: {latestVersion}, {latestDate}."
+msgstr "A newer release is out: {latestVersion}, {latestDate}."
+
+#: src/app/footer.tsx:126
+msgid "A newer release is out: {latestVersion}."
+msgstr "A newer release is out: {latestVersion}."
+
 #: src/ui/pager.tsx:83
 msgctxt "Rows per page: every row"
 msgid "All"
 msgstr "All"
 
+#: src/app/theme.tsx:80
+msgid "Always use dark colours"
+msgstr "Always use dark colours"
+
+#: src/app/theme.tsx:75
+msgid "Always use light colours"
+msgstr "Always use light colours"
+
 #: src/ui/data-table.tsx:60
 msgid "Assign selected"
 msgstr "Assign selected"
+
+#: src/app/header-links.tsx:37
+#: src/app/page-notice.tsx:12
+msgid "Attendees"
+msgstr "Attendees"
+
+#: src/app/time-format.tsx:61
+msgid "Automatic"
+msgstr "Automatic"
 
 #: src/ui/side-panel.tsx:147
 msgctxt "Side panel: go to the previous panel"
 msgid "Back"
 msgstr "Back"
+
+#: src/app/event-page.tsx:157
+#: src/app/event-page.tsx:204
+#: src/app/not-found.tsx:8
+msgid "Back to the events"
+msgstr "Back to the events"
 
 #: src/ui/data-table.tsx:46
 msgid "Bulk actions"
@@ -67,6 +114,14 @@ msgstr "Clear search"
 msgid "Close"
 msgstr "Close"
 
+#: src/app/nav-bar.tsx:27
+msgid "Close menu"
+msgstr "Close menu"
+
+#: src/app/theme.tsx:89
+msgid "Colour theme"
+msgstr "Colour theme"
+
 #: src/ui/copy-link-button.tsx:26
 msgid "Copy link"
 msgstr "Copy link"
@@ -74,6 +129,19 @@ msgstr "Copy link"
 #: src/ui/copy-link-button.tsx:16
 msgid "Could not copy the link"
 msgstr "Could not copy the link"
+
+#: src/app/user-menu.tsx:136
+msgid "Could not log out — try again"
+msgstr "Could not log out — try again"
+
+#: src/app/user-menu.tsx:182
+msgid "Could not select that name — try again"
+msgstr "Could not select that name — try again"
+
+#: src/app/theme.tsx:79
+msgctxt "Colour theme"
+msgid "Dark"
+msgstr "Dark"
 
 #: src/ui/use-discard-guard.tsx:89
 msgid "Discard"
@@ -95,6 +163,26 @@ msgstr "Dots are the model's midpoint, thick bars its 50% range, thin bars its 8
 msgctxt "Markdown field: write mode"
 msgid "Edit"
 msgstr "Edit"
+
+#: src/app/user-menu.tsx:106
+msgid "Edit profile"
+msgstr "Edit profile"
+
+#: src/app/panel-host.tsx:80
+msgid "Event"
+msgstr "Event"
+
+#: src/app/panel-host.tsx:80
+msgid "Event details"
+msgstr "Event details"
+
+#: src/app/event-page.tsx:155
+msgid "Event not found"
+msgstr "Event not found"
+
+#: src/app/panel-host.tsx:82
+msgid "Event not found."
+msgstr "Event not found."
 
 #: src/ui/phase-bar.tsx:42
 msgid "Event phases"
@@ -121,6 +209,34 @@ msgstr "First"
 msgid "First page"
 msgstr "First page"
 
+#: src/app/time-format.tsx:62
+msgid "Follow your browser's language"
+msgstr "Follow your browser's language"
+
+#: src/app/theme.tsx:70
+msgid "Follow your device's light/dark setting"
+msgstr "Follow your device's light/dark setting"
+
+#: src/app/footer.tsx:171
+msgid "Full changelog on GitHub"
+msgstr "Full changelog on GitHub"
+
+#: src/app/error-boundary.tsx:51
+msgid "Go to the events"
+msgstr "Go to the events"
+
+#: src/app/footer.tsx:100
+msgid "Help"
+msgstr "Help"
+
+#: src/app/footer.tsx:136
+msgid "How to update"
+msgstr "How to update"
+
+#: src/app/footer.tsx:150
+msgid "In this build, but not in a released version yet."
+msgstr "In this build, but not in a released version yet."
+
 #: src/ui/use-discard-guard.tsx:92
 msgid "Keep editing"
 msgstr "Keep editing"
@@ -134,14 +250,59 @@ msgstr "Last"
 msgid "Last page"
 msgstr "Last page"
 
+#: src/app/theme.tsx:74
+msgctxt "Colour theme"
+msgid "Light"
+msgstr "Light"
+
 #: src/ui/copy-link-button.tsx:14
 msgid "Link copied"
 msgstr "Link copied"
+
+#: src/app/sync-indicator.tsx:8
+msgctxt "Connection status: up to date"
+msgid "Live"
+msgstr "Live"
+
+#: src/app/event-page.tsx:151
+#: src/app/panel-host.tsx:81
+#: src/app/people-pages.tsx:161
+msgid "Loading…"
+msgstr "Loading…"
+
+#: src/app/user-menu.tsx:132
+msgid "Log out"
+msgstr "Log out"
+
+#: src/app/user-menu.tsx:132
+msgid "Logging out..."
+msgstr "Logging out..."
+
+#: src/app/map-button.tsx:35
+#: src/app/map-button.tsx:36
+msgid "Map"
+msgstr "Map"
 
 #: src/ui/form.tsx:185
 #: src/ui/form.tsx:343
 msgid "Markdown supported"
 msgstr "Markdown supported"
+
+#: src/app/nav-bar.tsx:52
+msgid "Menu"
+msgstr "Menu"
+
+#: src/app/user-menu.tsx:122
+msgid "My comments"
+msgstr "My comments"
+
+#: src/app/user-menu.tsx:210
+msgid "My name is:"
+msgstr "My name is:"
+
+#: src/app/user-menu.tsx:98
+msgid "My profile"
+msgstr "My profile"
 
 #: src/ui/charts/scatter.tsx:64
 msgid "n = {n}: too few points to read a trend"
@@ -150,6 +311,10 @@ msgstr "n = {n}: too few points to read a trend"
 #: src/ui/charts/scatter.tsx:58
 msgid "n/a"
 msgstr "n/a"
+
+#: src/app/user-menu.tsx:236
+msgid "Names"
+msgstr "Names"
 
 #: src/ui/pager.tsx:146
 msgid "Next"
@@ -163,6 +328,14 @@ msgstr "Next page"
 msgid "No"
 msgstr "No"
 
+#: src/app/home-page.tsx:44
+msgid "No events found."
+msgstr "No events found."
+
+#: src/app/sync-indicator.tsx:10
+msgid "Not updating: may be out of date"
+msgstr "Not updating: may be out of date"
+
 #: src/ui/people-picker.tsx:131
 msgid "Nothing found."
 msgstr "Nothing found."
@@ -170,6 +343,18 @@ msgstr "Nothing found."
 #: src/ui/data-table.tsx:200
 msgid "Nothing to show."
 msgstr "Nothing to show."
+
+#: src/app/header-links.tsx:43
+msgid "Notifications"
+msgstr "Notifications"
+
+#: src/app/header-links.tsx:43
+msgid "Notifications ({unread} unread)"
+msgstr "Notifications ({unread} unread)"
+
+#: src/app/nav-bar.tsx:27
+msgid "Open menu"
+msgstr "Open menu"
 
 #: src/ui/pager.tsx:129
 msgid "Page {entry}"
@@ -183,6 +368,10 @@ msgstr "Page {page} of {totalPages}"
 msgid "Page {page} of {totalPages}+"
 msgstr "Page {page} of {totalPages}+"
 
+#: src/app/not-found.tsx:6
+msgid "Page not found."
+msgstr "Page not found."
+
 #: src/ui/pager.tsx:56
 msgid "Pagination"
 msgstr "Pagination"
@@ -190,6 +379,10 @@ msgstr "Pagination"
 #: src/ui/combobox.tsx:169
 msgid "Pick one or type any text"
 msgstr "Pick one or type any text"
+
+#: src/app/footer.tsx:84
+msgid "Powered by"
+msgstr "Powered by"
 
 #: src/ui/pager.tsx:105
 msgid "Prev"
@@ -203,9 +396,22 @@ msgstr "Preview"
 msgid "Previous page"
 msgstr "Previous page"
 
+#: src/app/people-pages.tsx:168
+msgid "Profile not found, please log in again."
+msgstr "Profile not found, please log in again."
+
 #: src/ui/phase-bar.tsx:13
 msgid "Proposals"
 msgstr "Proposals"
+
+#: src/app/sync-indicator.tsx:9
+msgid "Reconnecting…"
+msgstr "Reconnecting…"
+
+#: src/app/error-boundary.tsx:45
+#: src/app/reload-offer.tsx:99
+msgid "Reload"
+msgstr "Reload"
 
 #. placeholder {0}: p.name
 #: src/ui/people-picker.tsx:89
@@ -215,6 +421,10 @@ msgstr "Remove {0}"
 #: src/ui/data-table.tsx:68
 msgid "Remove selected"
 msgstr "Remove selected"
+
+#: src/app/footer.tsx:109
+msgid "Report a Bug"
+msgstr "Report a Bug"
 
 #: src/ui/side-panel.tsx:132
 msgid "Resize panel"
@@ -246,25 +456,131 @@ msgstr "Select {0}"
 msgid "Select all"
 msgstr "Select all"
 
+#: src/app/user-menu.tsx:60
+msgid "Select your name"
+msgstr "Select your name"
+
+#: src/app/user-menu.tsx:114
+msgid "Settings"
+msgstr "Settings"
+
+#: src/app/map-button.tsx:29
+msgid "Show map"
+msgstr "Show map"
+
 #: src/ui/combobox.tsx:135
 msgid "Show suggestions"
 msgstr "Show suggestions"
+
+#: src/app/layout.tsx:19
+msgid "Skip to content"
+msgstr "Skip to content"
+
+#: src/app/error-boundary.tsx:28
+msgid "Something went wrong"
+msgstr "Something went wrong"
+
+#: src/app/theme.tsx:69
+msgctxt "Colour theme"
+msgid "System"
+msgstr "System"
 
 #: src/ui/charts/plot-frame.tsx:51
 msgid "The chart could not load. The table below has the figures."
 msgstr "The chart could not load. The table below has the figures."
 
+#: src/app/event-page.tsx:164
+#: src/app/panel-host.tsx:85
+msgid "The event could not be loaded."
+msgstr "The event could not be loaded."
+
+#: src/app/home-page.tsx:43
+msgid "The events could not be loaded."
+msgstr "The events could not be loaded."
+
 #: src/ui/form-error-summary.tsx:35
 msgid "There is a problem:"
 msgstr "There is a problem:"
+
+#: src/app/event-page.tsx:202
+msgid "This event has been deleted."
+msgstr "This event has been deleted."
+
+#: src/app/error-boundary.tsx:30
+msgid "This screen stopped working. Your data is safe."
+msgstr "This screen stopped working. Your data is safe."
+
+#: src/app/footer.tsx:120
+msgid "This site is running {shown}."
+msgstr "This site is running {shown}."
+
+#: src/app/footer.tsx:128
+msgid "This site runs {currentVersion}, {currentDate}."
+msgstr "This site runs {currentVersion}, {currentDate}."
+
+#: src/app/footer.tsx:129
+msgid "This site runs {currentVersion}."
+msgstr "This site runs {currentVersion}."
+
+#: src/app/time-format.tsx:73
+msgid "Time format"
+msgstr "Time format"
+
+#: src/app/time-format.tsx:65
+msgid "Times like 14:00"
+msgstr "Times like 14:00"
+
+#: src/app/time-format.tsx:64
+msgid "Times like 2:00 PM"
+msgstr "Times like 2:00 PM"
+
+#: src/app/error-boundary.tsx:38
+#: src/app/event-page.tsx:166
+#: src/app/panel-host.tsx:87
+msgid "Try again"
+msgstr "Try again"
+
+#: src/app/footer.tsx:42
+msgid "unknown"
+msgstr "unknown"
+
+#: src/app/footer.tsx:67
+msgid "Version {shown} — what's new"
+msgstr "Version {shown} — what's new"
+
+#: src/app/footer.tsx:66
+msgid "Version {shown} — what's new, update available"
+msgstr "Version {shown} — what's new, update available"
+
+#: src/app/footer.tsx:72
+msgid "Version:"
+msgstr "Version:"
 
 #: src/ui/phase-bar.tsx:14
 msgid "Voting"
 msgstr "Voting"
 
+#: src/app/footer.tsx:63
+#: src/app/footer.tsx:116
+msgid "What's new"
+msgstr "What's new"
+
+#: src/app/user-menu.tsx:208
+msgid "Who are you?"
+msgstr "Who are you?"
+
 #: src/ui/confirm-dialog.tsx:9
 msgid "Yes"
 msgstr "Yes"
+
+#: src/app/user-menu.tsx:56
+#: src/app/user-menu.tsx:89
+msgid "Your name"
+msgstr "Your name"
+
+#: src/app/user-menu.tsx:77
+msgid "Your name: {name}"
+msgstr "Your name: {name}"
 
 #: src/ui/charts/scatter.tsx:65
 msgid "ρ = {trend} (n = {n})"

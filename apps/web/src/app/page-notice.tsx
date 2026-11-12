@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { t } from "@lingui/core/macro";
 
 /** Why a screen cannot be shown, with the way back to the attendees. */
 export function PageNotice({ children }: { children: ReactNode }) {
@@ -8,7 +9,7 @@ export function PageNotice({ children }: { children: ReactNode }) {
         href="/guests"
         className="-my-1 inline-block py-1 text-sm text-fg-subtle hover:text-fg-muted"
       >
-        ← Attendees
+        ← {t`Attendees`}
       </a>
       <p className="text-fg-muted">{children}</p>
     </div>

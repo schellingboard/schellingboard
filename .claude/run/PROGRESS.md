@@ -87,6 +87,13 @@
   lazy locale chunks (plan 30a). Not done: pseudo-locale screenshot; E2E run only for
   proposals.spec.
 
+- 28b: allowlist is explicit per file (not `app/**`: most `app/` files hold only routes and API
+  paths). `theme.tsx`, `time-format.tsx`, `people-pages.tsx` have their messages done but stay off
+  the list (storage values, `actingGuestRefusalMessage` text belongs to 28m); 28n must make them
+  pass (move constants to UPPERCASE names). Footer date stays fixed `en-GB` (a test pins it); the
+  release-note highlights come from `packages/domain` and are not translated (28n or later).
+  `theme.spec.ts:81` (9 AM not found) fails on the previous commit too.
+
 ## Problems
 
 - #200: not checked in a browser at 390px (long URL, fixed vote bar); CSS read only.

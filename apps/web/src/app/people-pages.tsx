@@ -25,6 +25,7 @@ import { ShellFrame } from "./shell";
 import { useDirectoryShell } from "./use-directory-shell";
 import { useUrlSearchParams } from "./use-url-search-params";
 import { useViewer } from "./viewer";
+import { t } from "@lingui/core/macro";
 
 const LIST = "/guests";
 
@@ -157,14 +158,14 @@ function EditProfile({
   )
     return (
       <p role="status" className="px-4 text-fg-muted">
-        Loading…
+        {t`Loading…`}
       </p>
     );
   const me = entries.find((e) => e.id === viewerId);
   if (!me || status === "error")
     return (
       <p className="px-4 text-fg-muted">
-        Profile not found, please log in again.
+        {t`Profile not found, please log in again.`}
       </p>
     );
   return (
