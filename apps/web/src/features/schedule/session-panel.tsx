@@ -22,6 +22,7 @@ import { useSchedule } from "./context";
 import { AttendeeCountField } from "./attendee-count-field";
 import { SessionComments } from "./session-comments";
 import { useRsvp } from "./use-rsvp";
+import { PersonLink } from "../people/person-link";
 
 const BOOKMARK_NOTE = "Only you see your bookmarks. This is not an RSVP.";
 
@@ -221,12 +222,12 @@ function Details({ session }: { session: Session }) {
             {session.hosts.map((h, i) => (
               <span key={h.id}>
                 {i > 0 && ", "}
-                <a
+                <PersonLink
+                  guestId={h.id}
                   href={links.guest(h.id)}
+                  name={h.name}
                   className="text-brand-fg hover:underline"
-                >
-                  {h.name}
-                </a>
+                />
               </span>
             ))}
           </span>
@@ -275,12 +276,12 @@ function Details({ session }: { session: Session }) {
                 : attendees.map((a, i) => (
                     <span key={a.id}>
                       {i > 0 && ", "}
-                      <a
+                      <PersonLink
+                        guestId={a.id}
                         href={links.guest(a.id)}
+                        name={a.name}
                         className="text-brand-fg hover:underline"
-                      >
-                        {a.name}
-                      </a>
+                      />
                     </span>
                   ))}
           </span>

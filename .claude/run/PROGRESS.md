@@ -2,6 +2,12 @@
 
 ## Decisions
 
+- #789: card for host/attendee names, proposal hosts, comment authors, the 1-on-1 title and the
+  booking rows; not the Liked-by list (a whole-row link that already shows the avatar). The
+  directory loads on first hover (retry after an error at most every 30s); the hover card has its
+  own directory query besides the directory screens' (sharing needs a refactor). `Tooltip` gained
+  `interactive`, `as`, a describedby render prop, opens late content, and stacks at z-70.
+
 - #861d: `schedule-grid.webp` and `og-image.jpg` recaptured (Gamma, so the keynote band shows).
   Release note: shared moments replaced the API highlight (organizers-only). No E2E has an attendee
   see a moment an admin made: the new event has no rooms.
@@ -37,4 +43,4 @@
 
 ## Next step
 
-Step 12.
+Step 13.

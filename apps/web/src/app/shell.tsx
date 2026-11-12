@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
+import { createDirectoryQuery } from "../queries/directory";
+import { PersonCardsProvider } from "../features/people/person-cards";
 import type { ApiClient } from "@schellingboard/api-client";
 import { DevToolbar } from "./dev-toolbar";
 import { ErrorBoundary } from "./error-boundary";
@@ -79,11 +81,14 @@ export function ShellProviders({
   api: ApiClient;
   children: ReactNode;
 }) {
+  const people = useMemo(() => createDirectoryQuery({ api }), [api]);
   return (
     <ThemeProvider>
       <NoticeProvider>
         <ViewerProvider api={api}>
-          <UnreadProvider>{children}</UnreadProvider>
+          <UnreadProvider>
+            <PersonCardsProvider query={people}>{children}</PersonCardsProvider>
+          </UnreadProvider>
         </ViewerProvider>
       </NoticeProvider>
     </ThemeProvider>

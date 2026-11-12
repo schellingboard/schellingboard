@@ -12,6 +12,7 @@ import { Dialog } from "../../ui/dialog";
 import { Markdown } from "../../ui/markdown";
 import { Tooltip } from "../../ui/tooltip";
 import type { CommentsQuery } from "../../queries/comments";
+import { PersonLink } from "../people/person-link";
 
 export type CommentsHandle = {
   query: CommentsQuery;
@@ -243,12 +244,12 @@ function Thread({
           ) : (
             <>
               {node.author ? (
-                <a
+                <PersonLink
+                  guestId={node.author.id}
                   href={env.guestHref(node.author.id)}
+                  name={node.author.name}
                   className="font-medium text-brand-fg hover:text-brand-fg-hover hover:underline"
-                >
-                  {node.author.name}
-                </a>
+                />
               ) : (
                 <span className="font-medium text-fg-muted">Unknown</span>
               )}

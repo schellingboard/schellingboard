@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Hover over a name to see who it is** (#789): with a mouse, a small card shows the person's photo
+  and short summary; clicking still opens the profile.
 - **Shared moments on the schedule** (#861): organizers mark lunch or a keynote as a striped band
   across every room. Sessions can still be booked inside it; hosts are told and can go ahead.
 - **See which phase the event is in** (#771): the proposals page shows Proposals, Voting and
