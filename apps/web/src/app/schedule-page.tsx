@@ -34,30 +34,35 @@ function Loaded(view: EventView) {
       : null
   );
   const viewSession = params.get("viewSession");
+  const viewMeeting = params.get("viewMeeting");
   const redirected = useRef<string | null>(null);
   useEffect(() => {
-    if (!viewSession) {
+    const target = viewSession ?? viewMeeting;
+    if (!target) {
       redirected.current = null;
       return;
     }
-    if (redirected.current === viewSession) return;
-    redirected.current = viewSession;
+    if (redirected.current === target) return;
+    redirected.current = target;
     const rest = new URLSearchParams(params);
     rest.delete("viewSession");
+    rest.delete("viewMeeting");
     rest.delete("record");
     const query = rest.toString();
     landOnPanel(
       history,
-      {
-        kind: "session",
-        slug,
-        id: viewSession,
-        record: params.get("record") === "count",
-      },
+      viewSession
+        ? {
+            kind: "session",
+            slug,
+            id: viewSession,
+            record: params.get("record") === "count",
+          }
+        : { kind: "meeting", slug, id: viewMeeting! },
       `/${slug}/schedule${query ? `?${query}` : ""}`,
       history.location.hash
     );
-  }, [history, slug, viewSession, params]);
+  }, [history, slug, viewSession, viewMeeting, params]);
   const openSession = useCallback(
     (id: string) => open({ kind: "session", slug, id }),
     [open, slug]

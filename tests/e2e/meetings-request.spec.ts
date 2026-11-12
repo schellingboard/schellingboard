@@ -459,9 +459,8 @@ test.describe("1-on-1 meetings", () => {
       })
     );
 
-    // Opening one from the schedule arms "dismiss by going back" (docs/dev/web-app.md,
-    // anchor MnpjIo7Y). A meeting reached from a notification afterwards must
-    // not inherit it, or closing that one would pop back to the list.
+    // A meeting reached from a notification closes to the schedule, not back
+    // to the notifications it came from.
     await page.goto(`/${slug}`);
     await page.getByRole("link", { name: new RegExp(askee) }).click();
     await expect(
@@ -502,11 +501,11 @@ test.describe("1-on-1 meetings", () => {
       page.getByRole("link", { name: new RegExp(askee) })
     ).toBeHidden();
 
-    // Escape rewrites the URL and cancelling refreshes the schedule behind the
-    // modal, and afterEach navigates the moment this returns -- so wait for the
-    // rewrite, then leave by a link rather than letting the teardown's goto
-    // abort the refresh (see leaveForAttendees).
-    await expect(page).not.toHaveURL(/viewMeeting=/);
+    // Cancelling refreshes the schedule behind the panel, and afterEach
+    // navigates the moment this returns -- so wait for the panel to close, then
+    // leave by a link rather than letting the teardown's goto abort the
+    // refresh (see leaveForAttendees).
+    await expect(page).not.toHaveURL(/\/meetings\//);
     await leaveForAttendees(page);
   });
 });

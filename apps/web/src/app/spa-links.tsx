@@ -17,12 +17,15 @@ export function SpaLinks({
   const { open } = usePanel();
   const sessionPrefix = `/${slug}/sessions/`;
   const proposalPrefix = `/${slug}/proposals/`;
+  const meetingPrefix = `/${slug}/meetings/`;
   return (
     <InAppLinks
       intercept={(url, link) => {
         const opened = url.pathname.startsWith(sessionPrefix)
           ? panelSession(url, sessionPrefix, slug)
-          : panelProposal(url.pathname, proposalPrefix, slug);
+          : url.pathname.startsWith(meetingPrefix)
+            ? panelMeeting(url.pathname, meetingPrefix, slug)
+            : panelProposal(url.pathname, proposalPrefix, slug);
         if (!opened) return false;
         open(opened, {
           fromPanel: link.closest("[data-side-panel]") !== null,
@@ -35,6 +38,7 @@ export function SpaLinks({
         pathname === `/${slug}/schedule` ||
         pathname.startsWith(`/${slug}/sessions/`) ||
         pathname === `/${slug}/meetings` ||
+        pathname.startsWith(`/${slug}/meetings/`) ||
         pathname === `/${slug}/add-session` ||
         pathname === `/${slug}/edit-session` ||
         pathname === `/${slug}/proposals` ||
@@ -72,4 +76,10 @@ function panelProposal(pathname: string, prefix: string, slug: string) {
   const id = idAfter(pathname, prefix);
   if (!id || id.includes("/") || NOT_A_PROPOSAL.has(id)) return null;
   return { kind: "proposal", slug, id } as const;
+}
+
+function panelMeeting(pathname: string, prefix: string, slug: string) {
+  const id = idAfter(pathname, prefix);
+  if (!id || id.includes("/")) return null;
+  return { kind: "meeting", slug, id } as const;
 }

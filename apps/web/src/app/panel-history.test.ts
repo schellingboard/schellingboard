@@ -42,6 +42,12 @@ describe("panel history", () => {
     expect(panelOf(history.location)).toMatchObject({ depth: 2 });
   });
 
+  it("names a 1-on-1 by its own address", () => {
+    expect(panelPath({ kind: "meeting", slug: "conf", id: "m1" })).toBe(
+      "/conf/meetings/m1"
+    );
+  });
+
   it("names a profile by its own address, over any page", () => {
     const history = createMemoryHistory({ initialEntries: ["/settings"] });
     openPanel(history, { kind: "profile", id: "a b" });

@@ -158,7 +158,7 @@ function MeetingBlock({
   meeting: MeetingView;
   heightPx: number;
 }) {
-  const { links, params, breakMinutes, timezone } = useSchedule();
+  const { links, breakMinutes, timezone } = useSchedule();
   const { filtering, matchesMeeting, currentMatchId } = useScheduleMatch();
   const ghost = filtering && !matchesMeeting(meeting);
   return (
@@ -167,7 +167,7 @@ function MeetingBlock({
       className="flex min-w-0 flex-1"
     >
       <a
-        href={links.meeting(params, meeting.id)}
+        href={links.meeting(meeting.id)}
         aria-label={`${meetingTitle(meeting)} at ${slotLabel(
           meeting.slotStart,
           breakMinutes,
@@ -218,7 +218,7 @@ function MeetingBlock({
  * is what tells them apart. The dot marks one waiting on the reader.
  */
 function StackEntry({ meeting }: { meeting: MeetingView }) {
-  const { links, params, breakMinutes, timezone } = useSchedule();
+  const { links, breakMinutes, timezone } = useSchedule();
   const { filtering, matchesMeeting, currentMatchId } = useScheduleMatch();
   const ghost = filtering && !matchesMeeting(meeting);
   return (
@@ -227,7 +227,7 @@ function StackEntry({ meeting }: { meeting: MeetingView }) {
       className="flex min-h-0 min-w-0 flex-1"
     >
       <a
-        href={links.meeting(params, meeting.id)}
+        href={links.meeting(meeting.id)}
         aria-label={`${meetingTitle(meeting)} at ${slotLabel(
           meeting.slotStart,
           breakMinutes,
@@ -315,7 +315,7 @@ function SlotMeetings({
   meetings: MeetingView[];
   onClose: () => void;
 }) {
-  const { links, params, breakMinutes, timezone } = useSchedule();
+  const { links, breakMinutes, timezone } = useSchedule();
   return (
     <Dialog
       open
@@ -327,7 +327,11 @@ function SlotMeetings({
         {meetings.map((meeting) => (
           <li key={meeting.id}>
             <a
-              href={links.meeting(params, meeting.id)}
+              href={links.meeting(meeting.id)}
+              onClick={(e) => {
+                if (e.button === 0 && !(e.metaKey || e.ctrlKey || e.shiftKey))
+                  onClose();
+              }}
               className="flex flex-col gap-0.5 rounded-md bg-surface-sunken p-2 hover:bg-surface-muted"
             >
               <span className="font-medium text-fg">{meeting.otherName}</span>

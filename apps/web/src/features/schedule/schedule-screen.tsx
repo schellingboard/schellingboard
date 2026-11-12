@@ -31,7 +31,7 @@ import {
   includedLocations,
   scheduleEntries,
 } from "./model";
-import { MeetingModals } from "./meeting-modals";
+import { BookingDialog } from "./booking-dialog";
 import { ScheduleFilters } from "./schedule-filters";
 import { ScheduleToolbar, scheduleView } from "./schedule-toolbar";
 import { matchesInReadingOrder } from "./search";
@@ -301,7 +301,7 @@ export function ScheduleScreen({
       }}
     >
       {kiosk && <KioskController nowIsOnSchedule={nowIsOnSchedule} />}
-      <MeetingModals
+      <BookingDialog
         params={params}
         onParamsChange={onParamsChange}
         onBack={onBack}

@@ -389,9 +389,9 @@ with one arranged — so the rooms line up from day to day, and it isn't there a
 also shows the slots you are not offering. Declined and lapsed requests drop off it.
 
 Hovering one shows what the block has no room for — the time, their line of context, and anything it
-clashes with. Tap one to open it. That is also where either of you can **cancel** a 1-on-1 you had
-agreed, or take back a request nobody has answered yet, up until the slot begins; the other person
-is told.
+clashes with. Tap one to open it in a panel beside the schedule. That is also where either of you
+can **cancel** a 1-on-1 you had agreed, or take back a request nobody has answered yet, up until the
+slot begins; the other person is told.
 
 You can add a line saying why. It is optional — nobody owes an explanation for calling something off
 — and it reaches the other person on the meeting itself rather than in the email, the same as the
