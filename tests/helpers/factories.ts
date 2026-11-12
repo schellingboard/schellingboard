@@ -70,6 +70,7 @@ export async function createEvent(opts?: {
     name: opts?.name ?? `Test Event ${++eventCounter}`,
     description: "",
     website: "",
+    proposalHelp: "",
     proposalPhaseStart: opts?.proposalPhaseStart ?? proposalPhaseStart,
     proposalPhaseEnd: opts?.proposalPhaseEnd ?? proposalPhaseEnd,
     votingPhaseStart: opts?.votingPhaseStart ?? votingPhaseStart,

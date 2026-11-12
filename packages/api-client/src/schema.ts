@@ -5034,6 +5034,8 @@ export interface paths {
             description?: string;
             /** @default  */
             website?: string;
+            /** @description Markdown help for people who don't know what to propose; empty restores the default. Omitted: unchanged on edit, default on create */
+            proposalHelp?: string;
             /**
              * @description IANA time zone the event's times are shown in
              * @default UTC
@@ -5122,7 +5124,7 @@ export interface paths {
       cookie?: never;
     };
     get?: never;
-    /** @description Replaces the event's settings; phase dates, 1-on-1 settings and the slug stay. A new slot increment clears declared 1-on-1 availability. */
+    /** @description Replaces the event's settings; phase dates, 1-on-1 settings and the slug stay, and so does the proposal help when omitted. A new slot increment clears declared 1-on-1 availability. */
     put: {
       parameters: {
         query?: never;
@@ -5143,6 +5145,8 @@ export interface paths {
             description?: string;
             /** @default  */
             website?: string;
+            /** @description Markdown help for people who don't know what to propose; empty restores the default. Omitted: unchanged on edit, default on create */
+            proposalHelp?: string;
             /**
              * @description IANA time zone the event's times are shown in
              * @default UTC
@@ -7525,6 +7529,8 @@ export interface components {
       name: string;
       description: string;
       website: string;
+      /** @description Empty means the default text applies */
+      proposalHelp: string;
       timezone: string;
       maxSessionDuration: number;
       breakMinutes: number;

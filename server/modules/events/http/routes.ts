@@ -71,7 +71,7 @@ const updateEvent = createRoute({
   path: "/admin/events/{id}",
   tags,
   description:
-    "Replaces the event's settings; phase dates, 1-on-1 settings and the slug stay. A new slot increment clears declared 1-on-1 availability.",
+    "Replaces the event's settings; phase dates, 1-on-1 settings and the slug stay, and so does the proposal help when omitted. A new slot increment clears declared 1-on-1 availability.",
   request: {
     headers: idempotencyHeaders,
     params: idParam,

@@ -431,6 +431,10 @@
           "name": { "type": "string" },
           "description": { "type": "string" },
           "website": { "type": "string" },
+          "proposalHelp": {
+            "type": "string",
+            "description": "Empty means the default text applies"
+          },
           "timezone": { "type": "string" },
           "maxSessionDuration": { "type": "integer" },
           "breakMinutes": { "type": "integer" },
@@ -483,6 +487,7 @@
           "name",
           "description",
           "website",
+          "proposalHelp",
           "timezone",
           "maxSessionDuration",
           "breakMinutes",
@@ -7319,6 +7324,10 @@
                   "name": { "type": "string" },
                   "description": { "type": "string", "default": "" },
                   "website": { "type": "string", "default": "" },
+                  "proposalHelp": {
+                    "type": "string",
+                    "description": "Markdown help for people who don't know what to propose; empty restores the default. Omitted: unchanged on edit, default on create"
+                  },
                   "timezone": {
                     "type": "string",
                     "default": "UTC",
@@ -7415,7 +7424,7 @@
     "/api/v1/admin/events/{id}": {
       "put": {
         "tags": ["admin"],
-        "description": "Replaces the event's settings; phase dates, 1-on-1 settings and the slug stay. A new slot increment clears declared 1-on-1 availability.",
+        "description": "Replaces the event's settings; phase dates, 1-on-1 settings and the slug stay, and so does the proposal help when omitted. A new slot increment clears declared 1-on-1 availability.",
         "parameters": [
           {
             "schema": { "type": "string", "minLength": 1 },
@@ -7446,6 +7455,10 @@
                   "name": { "type": "string" },
                   "description": { "type": "string", "default": "" },
                   "website": { "type": "string", "default": "" },
+                  "proposalHelp": {
+                    "type": "string",
+                    "description": "Markdown help for people who don't know what to propose; empty restores the default. Omitted: unchanged on edit, default on create"
+                  },
                   "timezone": {
                     "type": "string",
                     "default": "UTC",

@@ -191,6 +191,7 @@ export const events = sqliteTable(
     slug: text("slug").notNull(),
     description: text("description").notNull().default(""),
     website: text("website").notNull().default(""),
+    proposalHelp: text("proposal_help").notNull().default(""),
     proposalPhaseStart: text("proposal_phase_start"),
     proposalPhaseEnd: text("proposal_phase_end"),
     votingPhaseStart: text("voting_phase_start"),

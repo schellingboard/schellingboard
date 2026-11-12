@@ -1,0 +1,1 @@
+ALTER TABLE `events` ADD `proposal_help` text DEFAULT '' NOT NULL;

@@ -13,6 +13,12 @@ export const eventSettingsBodySchema = z.object({
   name: z.string(),
   description: z.string().default(""),
   website: z.string().default(""),
+  proposalHelp: z
+    .string()
+    .optional()
+    .describe(
+      "Markdown help for people who don't know what to propose; empty restores the default. Omitted: unchanged on edit, default on create"
+    ),
   timezone: z
     .string()
     .default("UTC")
@@ -54,6 +60,7 @@ export const eventViewSchema = z
     name: z.string(),
     description: z.string(),
     website: z.string(),
+    proposalHelp: z.string().describe("Empty means the default text applies"),
     timezone: z.string(),
     maxSessionDuration: z.number().int(),
     breakMinutes: z.number().int(),

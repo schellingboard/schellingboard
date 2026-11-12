@@ -253,6 +253,43 @@ describe("event use cases", () => {
   );
 
   it(
+    "keeps the help text for proposers unless an edit sends one, and clears it with an empty one",
+    { tags: ["015-US8"] },
+    async () => {
+      const created = value(
+        await events().createEvent(ADMIN, {
+          ...settings,
+          proposalHelp: "  Bring a topic  ",
+        })
+      );
+      expect(created.proposalHelp).toBe("Bring a topic");
+
+      const unchanged = value(
+        await events().updateEvent(
+          ADMIN,
+          { ...settings, id: created.id, expectedVersion: created.version },
+          NOW
+        )
+      );
+      expect(unchanged.proposalHelp).toBe("Bring a topic");
+
+      const cleared = value(
+        await events().updateEvent(
+          ADMIN,
+          {
+            ...settings,
+            id: created.id,
+            expectedVersion: unchanged.version,
+            proposalHelp: "",
+          },
+          NOW
+        )
+      );
+      expect(cleared.proposalHelp).toBe("");
+    }
+  );
+
+  it(
     "changes the slot increment only when every day stays on the grid",
     { tags: ["015-US2"] },
     async () => {

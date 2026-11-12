@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **"Need ideas?" help for proposers** (#1337): a button on the proposals page and the new-proposal
+  form opens prompts to start from. Organizers can replace the text for each event.
 - **Remove comments left on your profile** (#901): profile owners, session and proposal hosts, and
   admins can now delete other people's comments.
 - **Read the schedule before scheduling opens** (#1336): **View Schedule** now works in every phase,

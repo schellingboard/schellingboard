@@ -20,6 +20,7 @@ function makeEvent(overrides: Partial<Event>): Event {
     slug: "Test",
     description: "",
     website: "",
+    proposalHelp: "",
     maxSessionDuration: 120,
     breakMinutes: 10,
     slotIncrementMinutes: 30,

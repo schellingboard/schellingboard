@@ -22,6 +22,7 @@ export const snapshot: Snapshot = {
     name: "Conf",
     description: "",
     website: "",
+    proposalHelp: "",
     timezone: "UTC",
     maxSessionDuration: 120,
     breakMinutes: 10,

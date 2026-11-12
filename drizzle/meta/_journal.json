@@ -435,6 +435,13 @@
       "when": 1794318259045,
       "tag": "0061_votes_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "6",
+      "when": 1794322007551,
+      "tag": "0062_event_proposal_help",
+      "breakpoints": true
     }
   ]
 }

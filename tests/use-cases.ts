@@ -147,6 +147,11 @@ export const features = {
         actor: "host",
         priority: "P3",
       },
+      US8: {
+        title: "Attendee opens ideas for what to propose",
+        actor: "attendee",
+        priority: "P3",
+      },
     },
   },
   "005": {
@@ -548,6 +553,11 @@ export const features = {
         title: "Organizer chooses how an event identifies its attendees",
         actor: "organizer",
         priority: "P1",
+      },
+      US8: {
+        title: "Organizer writes the help text for people who propose",
+        actor: "organizer",
+        priority: "P3",
       },
     },
   },

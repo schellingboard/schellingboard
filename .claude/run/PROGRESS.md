@@ -6,13 +6,17 @@
 
 - #200: not checked in a browser at 390px (long URL, fixed vote bar); CSS read only.
 
+- admin.spec.ts "Admin UI sessions > creates a session and deletes it again" fails on a strict-mode
+  Hosts label (checkbox "No hosts"); not touched by #1337, left alone.
+
 ## Questions
 
 - #691: the script uses the API, not a browser, so identity requests per navigation (#1148) are
   counted as one per page load only.
 
-- tests/unit/stats/correlation.test.ts "spearman property" failed once under fast-check in `make test-coverage`, passed on rerun; flaky, unrelated.
+- tests/unit/stats/correlation.test.ts "spearman property" failed once under fast-check in
+  `make test-coverage`, passed on rerun; flaky, unrelated.
 
 ## Next step
 
-Step 6.
+Step 7.
