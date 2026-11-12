@@ -8,6 +8,9 @@ type Activity = (typeof profileActivitySchema)["_output"];
 export type ProfileMeetingOption =
   (typeof meetingOptionsSchema)["_output"]["options"][number];
 
+export type ProfileNudge =
+  (typeof meetingOptionsSchema)["_output"]["nudges"][number];
+
 export type ProfileActivityQuery = ReturnType<
   typeof createProfileActivityQuery
 >;
@@ -18,10 +21,17 @@ export type ProfileActivityState = {
   proposals: Activity["proposals"];
   /** What the viewer may book with this guest, per shared event. */
   meetingOptions: ProfileMeetingOption[];
+  /** Where the guest has not opened up, and whether the viewer already asked. */
+  nudges: ProfileNudge[];
   code?: string;
 };
 
-const EMPTY = { hosting: [], proposals: [], meetingOptions: [] };
+const EMPTY = {
+  hosting: [],
+  proposals: [],
+  meetingOptions: [],
+  nudges: [],
+};
 
 /**
  * What a profile shows beyond the directory entry. It spans every event, so
@@ -70,6 +80,7 @@ export function createProfileActivityQuery({
           hosting: activity.data.hosting,
           proposals: activity.data.proposals,
           meetingOptions: options.data?.options ?? [],
+          nudges: options.data?.nudges ?? [],
         });
       } catch {
         if (current())

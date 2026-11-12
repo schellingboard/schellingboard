@@ -14,6 +14,8 @@ import type {
   VoteWithdrawn,
   LoggedProposal,
   MeetingAnswered,
+  MeetingNudgeAnswered,
+  MeetingNudged,
   RecordedChange,
 } from "@schellingboard/domain/change";
 import type { Day, Event, SharedMoment } from "@schellingboard/domain/event";
@@ -255,6 +257,20 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
         subjectType: "meeting",
         payload: row.payload as MeetingAnswered["payload"],
       };
+    case "meetingNudge.asked":
+      return {
+        ...common,
+        type: "meetingNudge.asked",
+        subjectType: "meetingNudge",
+        payload: row.payload as MeetingNudged["payload"],
+      };
+    case "meetingNudge.answered":
+      return {
+        ...common,
+        type: "meetingNudge.answered",
+        subjectType: "meetingNudge",
+        payload: row.payload as MeetingNudgeAnswered["payload"],
+      };
     case "availability.changed":
       return {
         ...common,
@@ -377,6 +393,8 @@ const KNOWN_TYPES: RecordedChange["type"][] = [
   "meeting.deleted",
   "meeting.requested",
   "meeting.answered",
+  "meetingNudge.asked",
+  "meetingNudge.answered",
   "availability.changed",
   "location.changed",
   "location.removed",

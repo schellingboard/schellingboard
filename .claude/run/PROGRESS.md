@@ -81,6 +81,15 @@
   event slug. Rows carry the server-built `url` (`#comment-<id>`). TDD: red run was 404 on
   `/me/comments`.
 
+- #1046: the nudge uses the `meetingRequest` setting, the "opened up" notice `meetingResponse` (an
+  answer to your ask). "Open" means a declared slot still ahead. Changing an event's slot increment
+  deletes availability, so an answered nudge then stays "Asked" (accepted). The nudge shows only
+  while the guest has declared no slots; once asked it stays "Asked" even if they later clear their
+  slots. The announcement to all attendees was left out, as decided. No release-notes entry (not a
+  headline). Meeting-options response is now `{options, nudges}`. `MeetingBookingCalls` is the
+  schedule's slice of `meetingRequestCalls`. TDD: red was `askToOpenUp is not a function`. Mailer
+  tests not run (mailpit down).
+
 ## Next step
 
-Step 22 (#1046).
+Step 23 (#831).

@@ -368,6 +368,14 @@ that number, wait for a reply or cancel one first.
 
 ![Request form for a 1-on-1, with the day's slots — one picked, the rest marked Busy or Unavailable — a choice of meeting points, and a line of context](../screenshots/meeting-request.webp)
 
+### Ask someone to open up
+
+Someone who has not said when they are free has no **Schedule a 1-on-1** button. Their profile says
+"Not open to 1-on-1s yet" with **Ask them to open up** instead. One click tells them you would like
+to book them, with a link to the 1-on-1s section of Settings; the button then reads **Asked**. You
+can ask each person once per event, and it does not count towards your waiting requests. When they
+open up you are told, so you can ask for a time.
+
 ### Answering a request
 
 You'll get a notification (and an email, unless you've turned that off) with who, when, where and
@@ -533,6 +541,7 @@ newest first. You'll be told when:
 - someone comments on a proposal or session you host, or on your profile
 - someone else comments on something you commented on
 - someone asks you for a 1-on-1, or answers a request of yours
+- someone asks you to open up to 1-on-1s, or opens up after you asked
 - it's time to [count how many people came](#record-how-many-people-came) to a session you host
 
 **Clicking a notification marks it read and takes you straight to what happened.** If you'd rather

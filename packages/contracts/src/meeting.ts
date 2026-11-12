@@ -145,8 +145,23 @@ const optionSlotSchema = z.object({
   clashes: z.array(clashSchema).describe("Empty unless the slot is busy"),
 });
 
+const meetingNudgeStateSchema = z.object({
+  eventId: z.string(),
+  eventName: z.string(),
+  state: z
+    .enum(["canAsk", "asked"])
+    .describe("asked: the caller already asked them at this event"),
+});
+
+export const meetingNudgeBodySchema = z.object({ eventId: z.string() });
+
 export const meetingOptionsSchema = z
   .object({
+    nudges: z
+      .array(meetingNudgeStateSchema)
+      .describe(
+        "One per shared event where 1-on-1s are open but the guest has declared no slots"
+      ),
     options: z
       .array(
         z.object({

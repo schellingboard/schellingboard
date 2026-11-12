@@ -31,6 +31,7 @@ describe("the profile activity", () => {
         hosting: activity.hosting,
         proposals: [],
         meetingOptions: options,
+        nudges: [],
       });
     }
   );
@@ -72,6 +73,7 @@ describe("the profile activity", () => {
         status: "ready",
         hosting: activity.hosting,
         meetingOptions: [],
+        nudges: [],
       });
     }
   );

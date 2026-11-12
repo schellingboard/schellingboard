@@ -80,9 +80,18 @@ const option = {
 };
 
 function Harness(
-  props: Partial<ProfilePanelProps> & { start?: string; options?: unknown[] }
+  props: Partial<ProfilePanelProps> & {
+    start?: string;
+    options?: unknown[];
+    nudges?: unknown[];
+  }
 ) {
-  const { start = "al", options = NO_OPTIONS, ...rest } = props;
+  const {
+    start = "al",
+    options = NO_OPTIONS,
+    nudges = NO_OPTIONS,
+    ...rest
+  } = props;
   const [guestId, setGuestId] = useState(start);
   const make = useCallback(
     (id: string) => {
@@ -92,12 +101,12 @@ function Harness(
             ? id === "al" || id === "cy"
               ? activity
               : { hosting: [], proposals: [] }
-            : { options }
+            : { options, nudges }
         )
       );
       return createProfileActivityQuery({ api, guestId: id });
     },
-    [options]
+    [options, nudges]
   );
   return (
     <ProfilePanel
@@ -209,6 +218,42 @@ describe("the profile panel", () => {
       expect(
         screen.getByRole("link", { name: "Edit profile" }).getAttribute("href")
       ).toBe("/guests/edit");
+    }
+  );
+
+  it(
+    "lets the viewer ask someone who has not opened up to do so",
+    { tags: ["012-US7"] },
+    async () => {
+      const { api, calls } = fakeApi(() => new Response(null, { status: 204 }));
+      const nudge = { eventId: "e1", eventName: "Camp", state: "canAsk" };
+      render(
+        <Harness nudges={[nudge]} meetingRequests={meetingRequestCalls(api)} />
+      );
+
+      await userEvent.click(
+        await screen.findByRole("button", { name: "Ask them to open up" })
+      );
+
+      const asked = await screen.findByRole("button", { name: "Asked" });
+      expect((asked as HTMLButtonElement).disabled).toBe(true);
+      expect(calls[0]).toMatchObject({
+        method: "POST",
+        path: "/api/v1/guests/al/open-up-requests",
+        body: { eventId: "e1" },
+      });
+    }
+  );
+
+  it(
+    "shows Asked at once for someone the viewer already asked",
+    { tags: ["012-US7"] },
+    async () => {
+      const nudge = { eventId: "e1", eventName: "Camp", state: "asked" };
+      render(<Harness nudges={[nudge]} />);
+
+      const asked = await screen.findByRole("button", { name: "Asked" });
+      expect((asked as HTMLButtonElement).disabled).toBe(true);
     }
   );
 

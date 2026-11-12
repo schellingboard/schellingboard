@@ -3,7 +3,7 @@ import {
   DEFAULT_BREAK_MINUTES,
   DEFAULT_SLOT_INCREMENT_MINUTES,
 } from "@schellingboard/domain/slots";
-import type { MeetingRequestCalls } from "../../commands/meeting-request";
+import type { MeetingBookingCalls } from "../../commands/meeting-request";
 import type { MeetingCandidatesQuery } from "../../queries/meeting-candidates";
 import type { AttendeeCountApi } from "../../queries/attendee-count";
 import type { CommentsController } from "../../queries/comments-controller";
@@ -35,7 +35,7 @@ export type ScheduleActions = {
   cancelMeeting: (meetingId: string, note: string) => Promise<void>;
   /** The booking screen's query for one slot; the caller loads it. */
   meetingCandidates: (slotStart: string) => MeetingCandidatesQuery;
-  meetingRequest: MeetingRequestCalls;
+  meetingRequest: MeetingBookingCalls;
   /** The caller destroys the query when done. */
   comments: (sessionId: string) => {
     query: CommentsQuery;

@@ -1,7 +1,12 @@
 import type { EmailMessage } from "@/utils/mailer";
 import { cohostAddedEmail } from "./cohost-added";
 import { commentEmail } from "./comment";
-import { meetingOutcomeEmail, meetingRequestEmail } from "./meeting";
+import {
+  meetingNudgeAnsweredEmail,
+  meetingNudgeEmail,
+  meetingOutcomeEmail,
+  meetingRequestEmail,
+} from "./meeting";
 import { proposalJoinedEmail } from "./proposal-joined";
 import { sessionChangedEmail } from "./session-changed";
 import { sessionDeletedEmail } from "./session-deleted";
@@ -13,6 +18,8 @@ import { sessionLostHostEmail } from "./session-lost-host";
 const templates = {
   cohostAdded: cohostAddedEmail,
   comment: commentEmail,
+  meetingNudge: meetingNudgeEmail,
+  meetingNudgeAnswered: meetingNudgeAnsweredEmail,
   meetingOutcome: meetingOutcomeEmail,
   meetingRequest: meetingRequestEmail,
   proposalJoined: proposalJoinedEmail,

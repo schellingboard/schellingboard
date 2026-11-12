@@ -2412,6 +2412,60 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/guests/{id}/open-up-requests": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Asks a guest who has declared no free slots to open up to 1-on-1s at an event; they are notified. Once per person and event, and not counted against the open-request cap. */
+    post: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            eventId: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Asked */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/meetings/{id}/accept": {
     parameters: {
       query?: never;
@@ -7847,6 +7901,16 @@ export interface components {
       }[];
     };
     MeetingOptions: {
+      /** @description One per shared event where 1-on-1s are open but the guest has declared no slots */
+      nudges: {
+        eventId: string;
+        eventName: string;
+        /**
+         * @description asked: the caller already asked them at this event
+         * @enum {string}
+         */
+        state: "canAsk" | "asked";
+      }[];
       /** @description One per event the caller and the guest share where 1-on-1s are open and the guest is bookable */
       options: {
         eventId: string;

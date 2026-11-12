@@ -9,6 +9,7 @@ import {
 import { saveMeetingAvailability } from "./availability";
 import { listMeetingCandidates } from "./candidates";
 import { cancelMeeting, requestMeeting, respondToMeeting } from "./meetings";
+import { askToOpenUp } from "./nudges";
 import {
   listAvailabilityForms,
   listHostClashes,
@@ -24,6 +25,7 @@ export function createMeetingUseCases(deps: MeetingDeps) {
     listHostClashes: listHostClashes(deps),
     listAvailabilityForms: listAvailabilityForms(deps),
     requestMeeting: requestMeeting(deps),
+    askToOpenUp: askToOpenUp(deps),
     respondToMeeting: respondToMeeting(deps),
     cancelMeeting: cancelMeeting(deps),
     saveMeetingAvailability: saveMeetingAvailability(deps),

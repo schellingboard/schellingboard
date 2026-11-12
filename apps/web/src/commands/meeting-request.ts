@@ -11,7 +11,16 @@ export function meetingRequestCalls(api: ApiClient) {
         body,
         headers: { "Idempotency-Key": key },
       }),
+    askToOpenUp: (guestId: string, eventId: string, key: string) =>
+      api.POST("/api/v1/guests/{id}/open-up-requests", {
+        params: { path: { id: guestId } },
+        body: { eventId },
+        headers: { "Idempotency-Key": key },
+      }),
   };
 }
 
 export type MeetingRequestCalls = ReturnType<typeof meetingRequestCalls>;
+
+/** What booking a slot needs; the rest of the calls belong to the profile. */
+export type MeetingBookingCalls = Pick<MeetingRequestCalls, "request">;

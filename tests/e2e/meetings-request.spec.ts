@@ -508,4 +508,49 @@ test.describe("1-on-1 meetings", () => {
     await expect(page).not.toHaveURL(/\/meetings\//);
     await leaveForAttendees(page);
   });
+  test("asks someone to open up and hears back once they have @012-US7", async ({
+    page,
+  }) => {
+    test.slow();
+
+    const unique = uniqueSuffix();
+    const eventName = `E2E Nudge ${unique}`;
+    const asker = `Nudge Asker ${unique}`;
+    const askee = `Nudge Askee ${unique}`;
+    await createGuests(page, [asker, askee]);
+    leftBehind.guests.push(asker, askee);
+    await meetingsEvent(page, eventName, [asker, askee]);
+    leftBehind.events.push(eventName);
+
+    await loginAndGoto(page, "/guests");
+    await actAs(page, new RegExp(asker));
+    await openProfile(page, askee);
+    await page.getByRole("button", { name: "Ask them to open up" }).click();
+    await expect(page.getByRole("button", { name: "Asked" })).toBeDisabled();
+
+    await page.goto("/guests");
+    await actAs(page, new RegExp(askee));
+    const nudge = page.getByRole("button", {
+      name: new RegExp(`${asker} would like to book a 1-on-1 with you`),
+    });
+    await openNotifications(page, nudge);
+    await nudge.click();
+    await expect(page).toHaveURL(/\/settings#one-on-ones$/);
+    const availability = await openAvailability(page, eventName);
+    await availability.getByLabel(/open to 1-on-1s/).check();
+    await availability
+      .getByRole("button", { name: "Save availability" })
+      .click();
+    await expect(availability.getByText("Saved!")).toBeVisible();
+
+    await page.goto("/guests");
+    await actAs(page, new RegExp(asker));
+    await openNotifications(
+      page,
+      page.getByRole("button", {
+        name: new RegExp(`${askee} is open to 1-on-1s at ${eventName}`),
+      })
+    );
+    await page.goto("/guests");
+  });
 });

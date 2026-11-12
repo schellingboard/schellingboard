@@ -113,12 +113,12 @@ describe("/api/v1 meetings", () => {
       const own = await call("GET", `/guests/${ada.id}/meeting-options`, {
         cookie: asGuest(ada.id),
       });
-      expect(await own.json()).toEqual({ options: [] });
+      expect(await own.json()).toEqual({ options: [], nudges: [] });
       const anonymous = await call(
         "GET",
         `/guests/${grace.id}/meeting-options`
       );
-      expect(await anonymous.json()).toEqual({ options: [] });
+      expect(await anonymous.json()).toEqual({ options: [], nudges: [] });
     }
   );
 
