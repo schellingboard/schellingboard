@@ -50,6 +50,7 @@ export const releaseNotes: ReleaseNote[] = [
     version: "Unreleased",
     highlights: [
       "**See the schedule early**: attendees can browse, bookmark and hide sessions before scheduling opens, with RSVPs and booking switched on when it does.",
+      "**A side panel for details**: sessions, proposals, 1-on-1s and profiles open beside the page, which keeps its search, filters and scroll position.",
     ],
   },
   {
