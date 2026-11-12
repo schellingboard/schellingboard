@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { PlotFrame, type Plot } from "./plot-frame";
 import { SERIES, baseOptions, labelMargin, shorten } from "./style";
+import { t } from "@lingui/core/macro";
 
 export type HeatCell = { x: string; y: string; value: number };
 
@@ -62,7 +63,7 @@ export function Heatmap({
             background: `linear-gradient(to right, transparent, ${SERIES[0]})`,
           }}
         />
-        <span>{`${valueLabel}: 0 to ${max}`}</span>
+        <span>{t`${valueLabel}: 0 to ${max}`}</span>
       </div>
       <PlotFrame summary={summary} draw={draw} />
     </div>

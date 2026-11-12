@@ -8,6 +8,7 @@ import {
   type RefObject,
 } from "react";
 import { Button } from "./button";
+import { Trans } from "@lingui/react/macro";
 
 // A number field holds a saved value after a submit (the attendee count),
 // and a combobox or search box is a query, not a draft.
@@ -75,7 +76,7 @@ export function useDiscardGuard(
       className="mt-3 space-y-2 rounded-md border border-line bg-surface-muted p-3"
     >
       <p id={questionId} className="text-sm font-medium text-fg">
-        Discard what you have typed?
+        <Trans>Discard what you have typed?</Trans>
       </p>
       <div className="flex flex-wrap gap-2">
         <Button
@@ -85,10 +86,10 @@ export function useDiscardGuard(
             onClose();
           }}
         >
-          Discard
+          <Trans>Discard</Trans>
         </Button>
         <Button variant="quiet" autoFocus onClick={keepEditing}>
-          Keep editing
+          <Trans>Keep editing</Trans>
         </Button>
       </div>
     </div>

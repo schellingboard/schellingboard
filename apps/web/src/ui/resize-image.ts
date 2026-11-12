@@ -1,4 +1,5 @@
 import { coverSquareSize } from "@schellingboard/domain/avatar-image";
+import { t } from "@lingui/core/macro";
 
 function drawCover(
   ctx: CanvasRenderingContext2D,
@@ -44,7 +45,7 @@ function toBlob(canvas: HTMLCanvasElement, file: Blob) {
     .then((blob) => ({ blob }))
     .catch((e) => {
       console.error(e);
-      return { error: "Failed to resize image" };
+      return { error: t`Failed to resize image` };
     });
 }
 
@@ -73,7 +74,7 @@ export async function resizeImage(
     );
   } catch (e) {
     console.error(e);
-    return { error: "Failed to draw image" };
+    return { error: t`Failed to draw image` };
   }
 
   return toBlob(canvas, file);

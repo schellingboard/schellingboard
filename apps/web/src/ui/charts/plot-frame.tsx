@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { Trans } from "@lingui/react/macro";
 
+// eslint-disable-next-line lingui/no-unlocalized-strings -- a module path
 export type Plot = typeof import("./plot");
 
 const FALLBACK_WIDTH = 640;
@@ -46,7 +48,9 @@ export function PlotFrame({
       <div ref={box} role="img" aria-label={summary} className="w-full" />
       {failed && (
         <p className="text-xs text-fg-muted">
-          The chart could not load. The table below has the figures.
+          <Trans>
+            The chart could not load. The table below has the figures.
+          </Trans>
         </p>
       )}
     </>

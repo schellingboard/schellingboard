@@ -15,7 +15,7 @@ export default defineConfig({
     include: ["src/**/*.test.{ts,tsx}"],
     environment: "happy-dom",
     pool: "vmThreads",
-    setupFiles: ["src/test-setup.ts"],
+    setupFiles: ["src/test-setup.tsx"],
     tags: useCases.map(({ id, title }) => ({ name: id, description: title })),
     strictTags: true,
   },

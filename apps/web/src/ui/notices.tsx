@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import { ExclamationTriangleIcon } from "./icons";
+import { Trans } from "@lingui/react/macro";
 
 export type Notice = {
   tone: "failure" | "info";
@@ -95,7 +96,7 @@ function Toast({
         </button>
       )}
       <button type="button" className="underline" onClick={() => dismiss(id)}>
-        Dismiss
+        <Trans>Dismiss</Trans>
       </button>
     </div>
   );

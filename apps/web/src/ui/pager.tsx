@@ -1,7 +1,11 @@
 import type { RefObject } from "react";
+import { plural, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 
 export const PAGE_SIZES = [25, 50, 100] as const;
 export const DEFAULT_PAGE_SIZE = 50;
+const ALL = "all";
+
 export type PageSize = number | "all";
 
 const BUTTON =
@@ -49,26 +53,24 @@ export function Pager({
   };
   return (
     <nav
-      aria-label="Pagination"
+      aria-label={t`Pagination`}
       className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm text-fg-muted"
     >
       {showTotal && (
         <span>
-          {total === 0
-            ? "0 results"
-            : `${total}${more ? "+" : ""} result${total === 1 ? "" : "s"}`}
+          {more
+            ? plural(total, { one: "#+ result", other: "#+ results" })
+            : plural(total, { one: "# result", other: "# results" })}
         </span>
       )}
       {onPageSize && (
         <label className="flex items-center gap-2">
-          Rows per page
+          <Trans>Rows per page</Trans>
           <select
             value={String(pageSize)}
             disabled={disabled}
             onChange={(e) =>
-              onPageSize(
-                e.target.value === "all" ? "all" : Number(e.target.value)
-              )
+              onPageSize(e.target.value === ALL ? ALL : Number(e.target.value))
             }
             className="rounded-md border border-line bg-surface-raised py-1 pl-2 pr-7 text-base text-fg sm:text-sm"
           >
@@ -77,7 +79,9 @@ export function Pager({
                 {size}
               </option>
             ))}
-            <option value="all">All</option>
+            <option value={ALL}>
+              {t({ message: "All", context: "Rows per page: every row" })}
+            </option>
           </select>
         </label>
       )}
@@ -86,23 +90,30 @@ export function Pager({
           type="button"
           onClick={() => goTo(1)}
           disabled={disabled || page <= 1}
-          aria-label="First page"
+          aria-label={t`First page`}
           className={BUTTON}
         >
-          First
+          <Trans context="Pager: first page">First</Trans>
         </button>
         <button
           type="button"
           onClick={() => goTo(page - 1)}
           disabled={disabled || page <= 1}
-          aria-label="Previous page"
+          aria-label={t`Previous page`}
           className={BUTTON}
         >
-          Prev
+          <Trans>Prev</Trans>
         </button>
         <span className="sm:hidden">
-          Page {page} of {totalPages}
-          {more && "+"}
+          {more ? (
+            <Trans>
+              Page {page} of {totalPages}+
+            </Trans>
+          ) : (
+            <Trans>
+              Page {page} of {totalPages}
+            </Trans>
+          )}
         </span>
         <span className="hidden items-center gap-1 sm:flex">
           {pageWindow(page, totalPages).map((entry, i) =>
@@ -115,7 +126,7 @@ export function Pager({
                 key={entry}
                 type="button"
                 onClick={() => goTo(entry)}
-                aria-label={`Page ${entry}`}
+                aria-label={t`Page ${entry}`}
                 aria-current={entry === page ? "page" : undefined}
                 disabled={disabled || entry === page}
                 className={`${BUTTON} ${entry === page ? "bg-surface-sunken font-semibold" : ""}`}
@@ -129,19 +140,19 @@ export function Pager({
           type="button"
           onClick={() => goTo(page + 1)}
           disabled={disabled || page >= totalPages}
-          aria-label="Next page"
+          aria-label={t`Next page`}
           className={BUTTON}
         >
-          Next
+          <Trans>Next</Trans>
         </button>
         <button
           type="button"
           onClick={() => goTo(totalPages)}
           disabled={disabled || page >= totalPages}
-          aria-label="Last page"
+          aria-label={t`Last page`}
           className={BUTTON}
         >
-          Last
+          <Trans context="Pager: last page">Last</Trans>
         </button>
       </div>
     </nav>

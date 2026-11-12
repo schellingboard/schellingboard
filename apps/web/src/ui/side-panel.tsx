@@ -9,6 +9,7 @@ import {
 } from "react";
 import { anyDialogOpen } from "./dialog";
 import { useDiscardGuard } from "./use-discard-guard";
+import { t } from "@lingui/core/macro";
 
 export const PANEL_WIDTH_KEY = "sb-panel-width";
 const MIN = 320;
@@ -128,7 +129,7 @@ export function SidePanel({
       <div
         role="separator"
         aria-orientation="vertical"
-        aria-label="Resize panel"
+        aria-label={t`Resize panel`}
         aria-valuemin={MIN}
         aria-valuemax={Math.round(maxWidth())}
         aria-valuenow={width}
@@ -143,7 +144,10 @@ export function SidePanel({
         {onBack && (
           <button
             type="button"
-            aria-label="Back"
+            aria-label={t({
+              message: "Back",
+              context: "Side panel: go to the previous panel",
+            })}
             onClick={backGuard.requestClose}
             className={button}
           >
@@ -156,7 +160,7 @@ export function SidePanel({
         {titleAction}
         <button
           type="button"
-          aria-label="Close"
+          aria-label={t`Close`}
           onClick={closeGuard.requestClose}
           className={button}
         >

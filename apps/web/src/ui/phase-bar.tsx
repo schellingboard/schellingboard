@@ -3,11 +3,16 @@ import { EventPhase, phaseTimeline } from "@schellingboard/domain/phase";
 import { formatInLocalZone } from "@schellingboard/domain/time";
 import { CheckIcon } from "./icons";
 import { cx } from "./cx";
+import { i18n, type MessageDescriptor } from "@lingui/core";
+import { msg, t } from "@lingui/core/macro";
 
-const NAMES = {
-  [EventPhase.PROPOSAL]: "Proposals",
-  [EventPhase.VOTING]: "Voting",
-  [EventPhase.SCHEDULING]: "Scheduling",
+const NAMES: Record<
+  Exclude<EventPhase, typeof EventPhase.INACTIVE>,
+  MessageDescriptor
+> = {
+  [EventPhase.PROPOSAL]: msg`Proposals`,
+  [EventPhase.VOTING]: msg`Voting`,
+  [EventPhase.SCHEDULING]: msg`Scheduling`,
 };
 
 const ARROW =
@@ -34,7 +39,7 @@ export function PhaseBar({
   }
   return (
     <ol
-      aria-label="Event phases"
+      aria-label={t`Event phases`}
       className="flex w-full gap-1 border-b border-line-subtle bg-surface px-3 py-1.5 text-xs"
     >
       {steps.map(({ phase, start, state, share }) => (
@@ -51,11 +56,11 @@ export function PhaseBar({
             {state === "past" && (
               <CheckIcon className="h-3 w-3 shrink-0 stroke-2" />
             )}
-            <span className="truncate">{NAMES[phase]}</span>
+            <span className="truncate">{i18n._(NAMES[phase])}</span>
             {state === "skipped" && (
-              <span className="truncate"> (skipped)</span>
+              <span className="truncate"> {t`(skipped)`}</span>
             )}
-            {state === "past" && <span className="sr-only"> (done)</span>}
+            {state === "past" && <span className="sr-only"> {t`(done)`}</span>}
           </span>
           {start && (
             <span className="mb-0.5 block text-[10px] font-normal leading-tight">

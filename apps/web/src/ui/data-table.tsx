@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { DEFAULT_PAGE_SIZE, Pager, type PageSize } from "./pager";
 import { SearchInput } from "./search-input";
 import { SEARCH_DEBOUNCE_MS } from "./use-debounced";
+import { Trans } from "@lingui/react/macro";
+import { plural, t } from "@lingui/core/macro";
 
 export type Column<T> = {
   header: ReactNode;
@@ -41,13 +43,13 @@ export function BulkActionsBar({
   return (
     <div
       role="region"
-      aria-label="Bulk actions"
+      aria-label={t`Bulk actions`}
       className={`flex flex-wrap items-center gap-3 rounded-md border border-line bg-surface-sunken px-3 py-2 text-sm ${
         selectedCount === 0 ? "invisible" : ""
       }`}
     >
       <span className="font-medium text-fg-muted">
-        {selectedCount} selected
+        {plural(selectedCount, { one: "# selected", other: "# selected" })}
       </span>
       <button
         type="button"
@@ -55,7 +57,7 @@ export function BulkActionsBar({
         disabled={isPending}
         className="px-3 py-1 rounded-md border border-line-strong bg-surface-inverse text-fg-inverse disabled:opacity-50 hover:bg-surface-inverse-hover"
       >
-        Assign selected
+        <Trans>Assign selected</Trans>
       </button>
       <button
         type="button"
@@ -63,14 +65,14 @@ export function BulkActionsBar({
         disabled={isPending}
         className="px-3 py-1 rounded-md border border-line bg-surface-raised text-fg-muted disabled:opacity-50 hover:bg-surface-sunken"
       >
-        Remove selected
+        <Trans>Remove selected</Trans>
       </button>
       <button
         type="button"
         onClick={onClear}
         className="px-3 py-1 rounded-md text-fg-muted hover:text-fg"
       >
-        Clear
+        <Trans context="Bulk actions: clear the selection">Clear</Trans>
       </button>
     </div>
   );
@@ -131,7 +133,7 @@ function SearchForm({
           search("");
         }}
         placeholder={placeholder}
-        aria-label="Search"
+        aria-label={t`Search`}
         inputClassName="px-3 py-1.5 text-base sm:text-sm rounded-md border border-line focus:border-line-strong focus:outline-none"
       />
     </form>
@@ -189,13 +191,13 @@ export function DataTable<T>({
   onSearch,
   onPage,
   onPageSize,
-  searchPlaceholder = "Search…",
+  searchPlaceholder = t`Search…`,
   toolbar,
   bulkBar,
   selection,
   mobileCard,
   listItem,
-  emptyMessage = "Nothing to show.",
+  emptyMessage = t`Nothing to show.`,
   paginationFooter = "always",
 }: DataTableProps<T>) {
   const totalPages =
@@ -245,7 +247,7 @@ export function DataTable<T>({
                       type="checkbox"
                       ref={selectAllRef}
                       checked={allOnPageSelected}
-                      aria-label="Select all"
+                      aria-label={t`Select all`}
                       onChange={() =>
                         selection.onToggleAllOnPage(
                           pageKeys,
@@ -274,7 +276,7 @@ export function DataTable<T>({
                       <input
                         type="checkbox"
                         checked={selection.selectedKeys.has(rowKey(row))}
-                        aria-label={`Select ${selection.rowLabel(row)}`}
+                        aria-label={t`Select ${selection.rowLabel(row)}`}
                         onChange={() => selection.onToggleRow(rowKey(row))}
                         className="h-4 w-4 cursor-pointer"
                       />
@@ -303,7 +305,7 @@ export function DataTable<T>({
                   <input
                     type="checkbox"
                     checked={selection.selectedKeys.has(rowKey(row))}
-                    aria-label={`Select ${selection.rowLabel(row)}`}
+                    aria-label={t`Select ${selection.rowLabel(row)}`}
                     onChange={() => selection.onToggleRow(rowKey(row))}
                     className="mt-1 h-4 w-4 shrink-0 cursor-pointer"
                   />

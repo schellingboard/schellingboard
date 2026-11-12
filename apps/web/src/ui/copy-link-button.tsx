@@ -1,16 +1,19 @@
 import { useState } from "react";
 import { Button } from "./button";
+import { i18n, type MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 
 /** Copies the address of the open panel, for an app that has no address bar. */
 export function CopyLinkButton() {
-  const [state, setState] = useState<"copied" | "failed">();
+  const [message, setMessage] = useState<MessageDescriptor>();
   const copy = async () => {
-    setState(undefined);
+    setMessage(undefined);
     try {
       await navigator.clipboard.writeText(window.location.href);
-      setState("copied");
+      setMessage(msg`Link copied`);
     } catch {
-      setState("failed");
+      setMessage(msg`Could not copy the link`);
     }
   };
   return (
@@ -20,11 +23,10 @@ export function CopyLinkButton() {
         className="border border-line"
         onClick={() => void copy()}
       >
-        Copy link
+        <Trans>Copy link</Trans>
       </Button>
       <span role="status" className="text-sm text-fg-muted">
-        {state === "copied" && "Link copied"}
-        {state === "failed" && "Could not copy the link"}
+        {message && i18n._(message)}
       </span>
     </div>
   );

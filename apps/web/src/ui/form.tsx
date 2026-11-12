@@ -3,6 +3,7 @@ import { Combobox } from "./combobox";
 import { ExclamationTriangleIcon } from "./icons";
 import { MarkdownTextarea } from "./markdown-textarea";
 import { PeoplePicker, type Person } from "./people-picker";
+import { t } from "@lingui/core/macro";
 
 const CONTROL =
   "w-full rounded-md border border-line bg-surface-raised p-2 text-base text-fg sm:text-sm focus:border-brand-accent focus:ring-brand-accent aria-[invalid=true]:border-danger-border";
@@ -181,7 +182,7 @@ export function GrowingTextField({
   onChange: (value: string) => void;
   placeholder?: string;
 }) {
-  const hint = frame.hint ?? "Markdown supported";
+  const hint = frame.hint ?? t`Markdown supported`;
   const ids = useField({ ...frame, hint });
   const textarea = useRef<HTMLTextAreaElement>(null);
   useLayoutEffect(() => {
@@ -339,7 +340,7 @@ export function MarkdownField({
   onChange: (value: string) => void;
   placeholder?: string;
 }) {
-  const hint = frame.hint ?? "Markdown supported";
+  const hint = frame.hint ?? t`Markdown supported`;
   const ids = useField({ ...frame, hint });
   return (
     <Frame {...frame} hint={hint} ids={ids}>
