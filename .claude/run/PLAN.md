@@ -23,12 +23,7 @@ the E2E specs a step touches; the user runs the full suite at the end.
 9. DONE **#861b** Shared moments live (`moment.changed`/`moment.deleted`, snapshot `moments`) and
    the grid band with its pill; Gamma seed moments; E2E; attendee guide text.
 10. DONE **#861c** Shared moments in the agenda (`moments` on `agendaGroups`, `showsMoments`).
-11. **#861d** Shared moments: booking notice, session popup line, wrap-up. Issue sections 1.4, 1.5,
-    2.3. Pure `overlappingMoment` (unit test), notice above submit in the attendee booking and edit
-    forms (not admin, never disables), "During Lunch" popup line (the issue's open question 2:
-    include, see PROGRESS.md). One E2E spec: admin adds Lunch on every day, attendee sees pill and
-    text row, books inside the band, sees the notice. One `CHANGELOG.md` Added entry, release notes
-    line. Footer `fixes #861`.
+11. DONE **#861d** Shared moments: booking notice, popup line, E2E, changelog (`overlappingMoment`).
 12. **#789** Attendee hover card.
 13. **#683** Combobox: tap outside on mobile.
 14. **#754** Error icon so red is not rose.

@@ -129,6 +129,29 @@ describe("the session panel", () => {
     expect(d.getByText("talk").tagName).toBe("STRONG");
   });
 
+  it(
+    "says which shared moment the session runs into",
+    { tags: ["007-US15"] },
+    () => {
+      open({
+        ...snapshotWith(),
+        moments: [
+          {
+            id: "m",
+            dayId: "d",
+            title: "Lunch",
+            description: "",
+            start: new Date(Date.UTC(2026, 5, 15, 9, 30)).toISOString(),
+            end: new Date(Date.UTC(2026, 5, 15, 10, 30)).toISOString(),
+          },
+        ],
+      });
+      expect(
+        within(dialog()).getByText("During Lunch (09:30–10:30)")
+      ).toBeTruthy();
+    }
+  );
+
   it("says so for a session that is not there", () => {
     open(snapshotWith(), { session: "nope" });
     expect(within(dialog()).getByText("Session not found.")).toBeTruthy();

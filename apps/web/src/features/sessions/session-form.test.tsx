@@ -195,6 +195,57 @@ describe("adding a session", { tags: ["008-US1"] }, () => {
     expect(screen.getByRole("radio", { name: "50 minutes" })).toBeTruthy();
   });
 
+  it(
+    "notes a slot during a shared moment, and still books it",
+    { tags: ["007-US15"] },
+    async () => {
+      const { writes, onDone } = setup({
+        prefill: SLOT,
+        patch: {
+          moments: [
+            {
+              id: "m",
+              dayId: "d",
+              title: "Lunch",
+              description: "Buffet in the foyer",
+              start: iso(10),
+              end: iso(11),
+            },
+          ],
+        },
+      });
+      expect(
+        screen.getByText("This slot is during Lunch (10:00 – 11:00)")
+      ).toBeTruthy();
+      expect(screen.getByText(/Buffet in the foyer/)).toBeTruthy();
+
+      await userEvent.type(screen.getByLabelText(/Session title/), "Talk");
+      await settled();
+      await userEvent.click(submit());
+      await waitFor(() => expect(onDone).toHaveBeenCalled());
+      expect(writes()).toHaveLength(1);
+    }
+  );
+
+  it("shows no moment notice for a slot outside every moment", () => {
+    setup({
+      prefill: SLOT,
+      patch: {
+        moments: [
+          {
+            id: "m",
+            dayId: "d",
+            title: "Lunch",
+            description: "",
+            start: iso(12),
+            end: iso(13),
+          },
+        ],
+      },
+    });
+    expect(screen.queryByText(/This slot is during/)).toBeNull();
+  });
+
   it("fills the form from a proposal and sends it with the session", async () => {
     const { writes } = setup({ prefill: SLOT });
 
@@ -285,6 +336,25 @@ describe("adding a session", { tags: ["008-US1"] }, () => {
 });
 
 describe("editing a session", { tags: ["008-US2"] }, () => {
+  it("notes a move into a shared moment", { tags: ["007-US15"] }, () => {
+    setup({
+      sessionId: "mine",
+      patch: {
+        moments: [
+          {
+            id: "m",
+            dayId: "d",
+            title: "Lunch",
+            description: "",
+            start: OWN_SLOT,
+            end: new Date(Date.parse(OWN_SLOT) + 3600000).toISOString(),
+          },
+        ],
+      },
+    });
+    expect(screen.getByText(/This slot is during Lunch/)).toBeTruthy();
+  });
+
   it("loads the session and replaces it against the version it was loaded at", async () => {
     const { writes, onDone } = setup({ sessionId: "mine" });
 

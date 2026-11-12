@@ -133,7 +133,7 @@ looked, marked **Not updating: may be out of date**. Open it once while online f
 is upgraded while a page is open, a note at the bottom offers a **Reload**; a kiosk screen reloads
 by itself.
 
-![Scheduling grid with rooms as columns and time slots as rows, and a first column holding the viewer's own 1-on-1s](../screenshots/schedule-grid.webp)
+![Scheduling grid with rooms as columns and time slots as rows, and a first column holding the viewer's own 1-on-1s, and a striped band across the rooms for a shared moment](../screenshots/schedule-grid.webp)
 
 A room name with an **ⓘ** next to it has more to say — tap it (or hover it) to read what the room
 offers (projector, whiteboard, the kind of seating), where to find it and how many people fit.
@@ -173,8 +173,9 @@ is private and has no effect on anyone else; it is not offered for sessions you 
 and RSVPing to or hosting a hidden session shows it again.
 
 A striped band across all the rooms marks a **shared moment**, such as lunch or an opening keynote.
-Tap its label for details. Sessions can still be booked inside a band; expect a smaller group there.
-The agenda lists a shared moment in time order, also under My schedule.
+Tap its label for details. Sessions can still be booked inside a band; the booking form and the
+session's details tell you when one runs into a moment, and expect a smaller group there. The agenda
+lists a shared moment in time order, also under My schedule.
 
 While the event is running, a red line marks the current time in the grid and the agenda, and
 **"Now"** at the top of the schedule jumps straight to it.
