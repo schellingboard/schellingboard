@@ -17,6 +17,9 @@ export type ScheduleMatch = {
   /** Hidden by the viewer, and not being looked for with the Hidden chip. */
   hides: (session: Session) => boolean;
   matchesMeeting: (meeting: MeetingView) => boolean;
+  /** Shared moments stay in lists, even in My schedule, but not under a search,
+   * Hidden or Clashes. */
+  showsMoments: boolean;
 };
 
 /** Every room, unless `?loc=` names some that exist. */
@@ -51,6 +54,7 @@ export function createScheduleMatch(input: {
   return {
     filtering:
       searching || filters.mine !== null || hiddenOnly || !!filters.clashes,
+    showsMoments: !searching && !hiddenOnly && !filters.clashes,
     hides: (session) => !hiddenOnly && hidden(session.id),
     matchesSession: (session) =>
       !session.blocker &&
@@ -73,6 +77,7 @@ export type ScheduleEntry = {
   total: number;
   sessions: Session[];
   meetings: MeetingView[];
+  moments: SharedMoment[];
 };
 
 export function scheduleEntries(input: {
@@ -100,6 +105,7 @@ export function scheduleEntries(input: {
       meetings: match.filtering
         ? dayMeetings.filter(match.matchesMeeting)
         : dayMeetings,
+      moments: match.showsMoments ? day.moments : [],
     };
   });
 }

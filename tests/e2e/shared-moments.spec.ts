@@ -2,6 +2,7 @@ import type { Locator } from "@playwright/test";
 import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
 import { selectUser } from "./helpers/user";
+import { filterChip, switchToView } from "./helpers/schedule";
 
 test("a shared moment is drawn over the grid and its slots stay bookable @007-US15", async ({
   page,
@@ -29,4 +30,23 @@ test("a shared moment is drawn over the grid and its slots stay bookable @007-US
   await expect(
     page.getByRole("heading", { name: /Add a session/i })
   ).toBeVisible();
+});
+
+test("the text view lists a shared moment among the sessions, even under My schedule @007-US15", async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto("/Conference-Gamma");
+  await selectUser(page, /Alice Test/i);
+  await switchToView(page, "Agenda");
+
+  const row = page
+    .getByRole("listitem")
+    .filter({ hasText: "Opening keynote" })
+    .filter({ hasText: "09:30–10:30" });
+  await expect(row).toBeVisible();
+  await expect(row.getByRole("link")).toHaveCount(0);
+
+  await filterChip(page, "My schedule").click();
+  await expect(row).toBeVisible();
 });

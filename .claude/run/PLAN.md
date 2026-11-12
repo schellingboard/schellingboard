@@ -22,9 +22,7 @@ the E2E specs a step touches; the user runs the full suite at the end.
    section, `moments` on the event detail).
 9. DONE **#861b** Shared moments live (`moment.changed`/`moment.deleted`, snapshot `moments`) and
    the grid band with its pill; Gamma seed moments; E2E; attendee guide text.
-10. **#861c** Shared moments: text and RSVP'd views. Issue section 1.3 (DayText `MomentRow`, merged
-    in time order, no link, no RSVP, blockers still hidden). Test the merge in a pure util; E2E in
-    the existing schedule spec. Footer `issue #861`.
+10. DONE **#861c** Shared moments in the agenda (`moments` on `agendaGroups`, `showsMoments`).
 11. **#861d** Shared moments: booking notice, session popup line, wrap-up. Issue sections 1.4, 1.5,
     2.3. Pure `overlappingMoment` (unit test), notice above submit in the attendee booking and edit
     forms (not admin, never disables), "During Lunch" popup line (the issue's open question 2:

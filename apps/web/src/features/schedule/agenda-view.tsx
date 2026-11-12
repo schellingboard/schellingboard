@@ -41,7 +41,7 @@ export function AgendaView({
       {toolbar}
       {filterBar}
       <div className="flex w-full flex-col gap-4 lg:grow">
-        {entries.map(({ day, sessions, meetings }) => {
+        {entries.map(({ day, sessions, meetings, moments }) => {
           const { foldable, folded } = agendaDayFold({
             dayId: day.id,
             filtering,
@@ -65,6 +65,7 @@ export function AgendaView({
                   day={day}
                   sessions={sessions}
                   meetings={meetings}
+                  moments={moments}
                   locations={locations}
                   filtering={filtering}
                   stickyTop={statusHeight}
