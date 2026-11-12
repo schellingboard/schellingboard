@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { DEFAULT_PAGE_SIZE, Pager, type PageSize } from "./pager";
 import { SearchInput } from "./search-input";
 import { SEARCH_DEBOUNCE_MS } from "./use-debounced";
 
@@ -22,9 +23,6 @@ export const searchParamUpdates = (query: string) => ({
   q: query || null,
   page: null,
 });
-
-const pagerButton =
-  "px-3 py-1 rounded-md border border-line bg-surface-raised disabled:opacity-40 disabled:cursor-not-allowed hover:bg-surface-sunken";
 
 /** Assign/remove/clear bar for a selection; it keeps its space while hidden so the table does not jump. */
 export function BulkActionsBar({
@@ -145,7 +143,7 @@ export type DataTableProps<T> = {
   rowKey: (row: T) => string;
   total: number;
   page: number;
-  pageSize: number;
+  pageSize: PageSize;
   searchQuery: string;
   /**
    * `replace` is true when refining a search that already started: the page
@@ -154,6 +152,8 @@ export type DataTableProps<T> = {
    */
   onSearch: (query: string, options: { replace: boolean }) => void;
   onPage: (page: number) => void;
+  /** Without it, the pager offers no rows-per-page choice. */
+  onPageSize?: (size: PageSize) => void;
   searchPlaceholder?: string;
   toolbar?: ReactNode;
   bulkBar?: ReactNode;
@@ -188,6 +188,7 @@ export function DataTable<T>({
   searchQuery,
   onSearch,
   onPage,
+  onPageSize,
   searchPlaceholder = "Search…",
   toolbar,
   bulkBar,
@@ -197,7 +198,8 @@ export function DataTable<T>({
   emptyMessage = "Nothing to show.",
   paginationFooter = "always",
 }: DataTableProps<T>) {
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const totalPages =
+    pageSize === "all" ? 1 : Math.max(1, Math.ceil(total / pageSize));
   const pageKeys = rows.map(rowKey);
   const allOnPageSelected =
     pageKeys.length > 0 &&
@@ -313,37 +315,17 @@ export function DataTable<T>({
         </>
       )}
 
-      {(paginationFooter === "always" || totalPages > 1) && (
-        <div className="flex items-center justify-between text-sm text-fg-muted">
-          <span>
-            {total === 0
-              ? "0 results"
-              : `${total} result${total === 1 ? "" : "s"}`}
-          </span>
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => onPage(page - 1)}
-              disabled={page <= 1}
-              aria-label="Previous page"
-              className={pagerButton}
-            >
-              Prev
-            </button>
-            <span>
-              Page {page} of {totalPages}
-            </span>
-            <button
-              type="button"
-              onClick={() => onPage(page + 1)}
-              disabled={page >= totalPages}
-              aria-label="Next page"
-              className={pagerButton}
-            >
-              Next
-            </button>
-          </div>
-        </div>
+      {(paginationFooter === "always" ||
+        totalPages > 1 ||
+        (onPageSize !== undefined && pageSize !== DEFAULT_PAGE_SIZE)) && (
+        <Pager
+          page={page}
+          totalPages={totalPages}
+          pageSize={pageSize}
+          total={total}
+          onPage={onPage}
+          onPageSize={onPageSize}
+        />
       )}
     </div>
   );

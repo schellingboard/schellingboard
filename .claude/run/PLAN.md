@@ -30,7 +30,7 @@ the E2E specs a step touches; the user runs the full suite at the end.
 14. DONE **#754** Warning icon on field errors, failure toasts and the form error summary.
 15. DONE **#1145** Toolbar edits use `execCommand` on the changed range (undoable).
 16. DONE **#969** Settings lists push devices (`/me/push-devices`) with Turn off.
-17. **#684** Admin table pager: numbers, page size.
+17. DONE **#684** `Pager` (numbers, First/Last, rows per page; `pageSize` URL param).
 18. **#380** ESLint 10.
 19. **#1169** Property-based tests for domain.
 

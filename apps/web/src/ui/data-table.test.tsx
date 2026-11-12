@@ -95,6 +95,19 @@ describe("DataTable", { tags: ["015-US1"] }, () => {
     ).toBe(true);
   });
 
+  it("keeps the footer when rows are not on the default page size", () => {
+    setup({
+      total: 5,
+      pageSize: "all",
+      onPageSize: vi.fn(),
+      paginationFooter: "when-paginated",
+    });
+
+    expect(
+      screen.getByRole("combobox", { name: "Rows per page" })
+    ).toBeTruthy();
+  });
+
   it("selects rows and all rows on the page", async () => {
     const user = userEvent.setup();
     const onToggleRow = vi.fn();

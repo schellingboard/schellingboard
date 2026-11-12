@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Admin lists have page numbers and a page size** (#684): jump to the first, last or any page, and
+  show 10, 25, 50, 100 or all rows.
 - **See and turn off the devices that get your notifications** (#969): Settings lists each phone or
   laptop with notifications on, so a lost one can be switched off from another.
 - **Hover over a name to see who it is** (#789): with a mouse, a small card shows the person's photo

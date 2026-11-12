@@ -377,10 +377,14 @@ test.describe("Admin UI", () => {
       users.getByRole("listitem").filter({ hasText: name });
 
     // The 40 seeded guests span two pages of 25, ordered by name.
-    await expect(users.getByText(/Page 1 of \d+/)).toBeVisible();
+    await expect(
+      users.getByRole("button", { name: "Page 1", exact: true })
+    ).toHaveAttribute("aria-current", "page");
     await expect(userItem("Alice Test")).toBeVisible();
     await users.getByRole("button", { name: "Next page" }).click();
-    await expect(users.getByText(/Page 2 of \d+/)).toBeVisible();
+    await expect(
+      users.getByRole("button", { name: "Page 2", exact: true })
+    ).toHaveAttribute("aria-current", "page");
     await expect(userItem("Alice Test")).toHaveCount(0);
 
     // Server-side search by name narrows the list and resets to page 1; the
@@ -391,7 +395,9 @@ test.describe("Admin UI", () => {
     await expect(page).toHaveURL(/[?&]q=Alice/);
     await expect(userItem("Alice Test")).toBeVisible();
     await expect(userItem("Bob Test")).toHaveCount(0);
-    await expect(users.getByText("Page 1 of 1")).toBeVisible();
+    await expect(
+      users.getByRole("button", { name: "Page 1", exact: true })
+    ).toHaveAttribute("aria-current", "page");
 
     // Clearing the box drops the search without pressing Search.
     await users.getByRole("button", { name: "Clear search" }).click();
@@ -1024,7 +1030,9 @@ test.describe("Admin UI guest assignment", () => {
     await expect(guests.getByRole("cell", { name: "Bob Test" })).toHaveCount(0);
 
     // A single page of results: pagination reports page 1 of 1.
-    await expect(guests.getByText("Page 1 of 1")).toBeVisible();
+    await expect(
+      guests.getByRole("button", { name: "Page 1", exact: true })
+    ).toHaveAttribute("aria-current", "page");
     await expect(
       guests.getByRole("button", { name: "Next page" })
     ).toBeDisabled();

@@ -8,7 +8,6 @@ import { DataTable } from "../../ui/data-table";
 import { CheckboxField, TextField } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
 import {
-  LIST_PAGE_SIZE,
   byTitleThenId,
   pageOf,
   tableHandlers,
@@ -421,7 +420,7 @@ export function AdminGuestsScreen({
         )
     )
     .sort(byTitleThenId((g) => g.name));
-  const { page, visible } = pageOf(matching, params);
+  const { page, pageSize, visible } = pageOf(matching, params);
 
   return (
     <div className="space-y-6">
@@ -441,7 +440,7 @@ export function AdminGuestsScreen({
           rowKey={(g) => g.id}
           total={matching.length}
           page={page}
-          pageSize={LIST_PAGE_SIZE}
+          pageSize={pageSize}
           searchQuery={query}
           {...tableHandlers(onParams)}
           searchPlaceholder="Search name or email…"
