@@ -218,6 +218,7 @@ function RealSessionCard({
         className="group h-full overflow-hidden"
       >
         <div
+          data-session-id={session.id}
           data-match-id={filtering && !ghost ? session.id : undefined}
           className={cx(
             "group relative flex h-full w-full flex-col overflow-hidden rounded border-2 px-1 font-roboto",
