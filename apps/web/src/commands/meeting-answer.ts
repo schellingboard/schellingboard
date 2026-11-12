@@ -1,9 +1,10 @@
+import { select, t } from "@lingui/core/macro";
 import type { meetingSchema } from "@schellingboard/contracts/meeting";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 
 import { canCancel } from "../features/schedule/meeting-rules";
-import type { MeetingView } from "../features/schedule/meeting-view";
 import { meetingViewsFrom } from "../features/schedule/meetings";
+import type { Described } from "./failure-message";
 import type { Command, Prediction } from "./runner";
 
 type Status = (typeof meetingSchema)["_output"]["status"];
@@ -12,11 +13,6 @@ const viewOf = (replica: Snapshot, meetingId: string) =>
   meetingViewsFrom(replica, new Date(replica.now)).find(
     (m) => m.id === meetingId
   );
-
-const describeMeeting = (view: MeetingView | undefined) =>
-  view
-    ? `the 1-on-1 with ${view.otherName} (${view.dayLabel}, ${view.timeLabel})`
-    : "the 1-on-1";
 
 function settle(
   replica: Snapshot,
@@ -45,8 +41,38 @@ export const answerMeeting: Command<
   unknown
 > = {
   kind: "meeting.answer",
-  describe: (replica, { meetingId, response }) =>
-    `${response} ${describeMeeting(viewOf(replica, meetingId))}`,
+  describe: (replica, { meetingId, response }): Described => {
+    const view = viewOf(replica, meetingId);
+    if (!view)
+      return {
+        failed: select(response, {
+          accept: "Could not accept the 1-on-1.",
+          decline: "Could not decline the 1-on-1.",
+          other: "Could not decline the 1-on-1.",
+        }),
+        unsure: select(response, {
+          accept:
+            "Your request to accept the 1-on-1 might not have been saved.",
+          decline:
+            "Your request to decline the 1-on-1 might not have been saved.",
+          other:
+            "Your request to decline the 1-on-1 might not have been saved.",
+        }),
+      };
+    const { otherName: name, dayLabel: day, timeLabel: time } = view;
+    return {
+      failed: select(response, {
+        accept: `Could not accept the 1-on-1 with ${name} (${day}, ${time}).`,
+        decline: `Could not decline the 1-on-1 with ${name} (${day}, ${time}).`,
+        other: `Could not decline the 1-on-1 with ${name} (${day}, ${time}).`,
+      }),
+      unsure: select(response, {
+        accept: `Your request to accept the 1-on-1 with ${name} (${day}, ${time}) might not have been saved.`,
+        decline: `Your request to decline the 1-on-1 with ${name} (${day}, ${time}) might not have been saved.`,
+        other: `Your request to decline the 1-on-1 with ${name} (${day}, ${time}) might not have been saved.`,
+      }),
+    };
+  },
   target: ({ meetingId }) => `meeting:${meetingId}`,
   predict: (replica, now, { meetingId, response }): Prediction => {
     const view = viewOf(replica, meetingId);
@@ -77,8 +103,19 @@ export const cancelMeeting: Command<
   unknown
 > = {
   kind: "meeting.cancel",
-  describe: (replica, { meetingId }) =>
-    `cancel ${describeMeeting(viewOf(replica, meetingId))}`,
+  describe: (replica, { meetingId }): Described => {
+    const view = viewOf(replica, meetingId);
+    if (!view)
+      return {
+        failed: t`Could not cancel the 1-on-1.`,
+        unsure: t`Your request to cancel the 1-on-1 might not have been saved.`,
+      };
+    const { otherName: name, dayLabel: day, timeLabel: time } = view;
+    return {
+      failed: t`Could not cancel the 1-on-1 with ${name} (${day}, ${time}).`,
+      unsure: t`Your request to cancel the 1-on-1 with ${name} (${day}, ${time}) might not have been saved.`,
+    };
+  },
   target: ({ meetingId }) => `meeting:${meetingId}`,
   predict: (replica, now, { meetingId, note }): Prediction => {
     const view = viewOf(replica, meetingId);

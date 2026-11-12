@@ -217,7 +217,7 @@ describe("a failed comment command", () => {
       store: createReplicaStore(snapshot),
       api,
       newKey: () => "k",
-      onFailure: ({ what }) => seen.push(what),
+      onFailure: ({ described }) => seen.push(described.failed),
     });
     const subject = { kind: "session", id: "s" } as const;
 
@@ -227,7 +227,7 @@ describe("a failed comment command", () => {
     await runner.run(unlikeComment, { commentId: "c", subject });
 
     expect(seen).toHaveLength(4);
-    for (const what of seen) expect(what).toMatch(/ on “.+” \(/);
+    for (const failed of seen) expect(failed).toMatch(/ on “.+” \(/);
   });
 });
 
@@ -259,7 +259,7 @@ describe("a failed proposal comment command", () => {
         }),
         api,
         newKey: () => "k",
-        onFailure: ({ what }) => seen.push(what),
+        onFailure: ({ described }) => seen.push(described.failed),
       });
       const subject = { kind: "proposal", id: "p" } as const;
 
@@ -268,9 +268,9 @@ describe("a failed proposal comment command", () => {
       await runner.run(deleteComment, { commentId: "c", subject });
 
       expect(seen).toEqual([
-        "post your comment on “Rust intro”",
-        "save your edit to a comment on “Rust intro”",
-        "delete your comment on “Rust intro”",
+        "Could not post your comment on “Rust intro”.",
+        "Could not save your edit to a comment on “Rust intro”.",
+        "Could not delete your comment on “Rust intro”.",
       ]);
     }
   );
@@ -284,7 +284,7 @@ describe("a failed profile comment command", () => {
       store: createReplicaStore(snapshot),
       api,
       newKey: () => "k",
-      onFailure: ({ what }) => seen.push(what),
+      onFailure: ({ described }) => seen.push(described.failed),
     });
     const subject = { kind: "profile", id: "g", name: "Ada" } as const;
 
@@ -294,10 +294,30 @@ describe("a failed profile comment command", () => {
     await runner.run(likeComment, { commentId: "c", subject });
 
     expect(seen).toEqual([
-      "post your comment on Ada’s profile",
-      "save your edit to a comment on Ada’s profile",
-      "delete your comment on Ada’s profile",
-      "like a comment on Ada’s profile",
+      "Could not post your comment on Ada’s profile.",
+      "Could not save your edit to a comment on Ada’s profile.",
+      "Could not delete your comment on Ada’s profile.",
+      "Could not like a comment on Ada’s profile.",
     ]);
+  });
+});
+
+describe("a failed comment command on a subject that is gone", () => {
+  it("still says what failed", async () => {
+    const seen: string[] = [];
+    const { api } = fakeApi(() => problem(403, "comment.notAuthor"));
+    const runner = createCommandRunner({
+      store: createReplicaStore(snapshot),
+      api,
+      newKey: () => "k",
+      onFailure: ({ described }) => seen.push(described.failed),
+    });
+
+    await runner.run(deleteComment, {
+      commentId: "c",
+      subject: { kind: "session", id: "missing" },
+    });
+
+    expect(seen).toEqual(["Could not delete your comment."]);
   });
 });

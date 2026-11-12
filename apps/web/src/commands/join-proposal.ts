@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { wantsHost } from "@schellingboard/domain/session";
 
 import type { Command } from "./runner";
@@ -8,8 +9,18 @@ type Input = { proposalId: string };
 /** Joining as a host takes the vote back, as on the server. */
 export const joinProposal: Command<Input> = {
   kind: "proposal.join",
-  describe: (replica, { proposalId }) =>
-    `join ${describeProposalIn(replica, proposalId)} as a host`,
+  describe: (replica, { proposalId }) => {
+    const proposal = describeProposalIn(replica, proposalId);
+    return proposal
+      ? {
+          failed: t`Could not join ${proposal} as a host.`,
+          unsure: t`Your request to join ${proposal} as a host might not have been saved.`,
+        }
+      : {
+          failed: t`Could not join the proposal as a host.`,
+          unsure: t`Your request to join the proposal as a host might not have been saved.`,
+        };
+  },
   target: ({ proposalId }) => `join:${proposalId}`,
   predict: (replica, now, { proposalId }) => {
     const { me } = replica;

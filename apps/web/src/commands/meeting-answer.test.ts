@@ -88,8 +88,8 @@ describe("answering and canceling a 1-on-1", () => {
 
     expect(outcome).toEqual({ ok: false, code: "meeting.notRecipient" });
     expect(calls).toHaveLength(0);
-    expect(failures[0]?.what).toBe(
-      "accept the 1-on-1 with Kai (Wed 3 Jun, 09:10 – 09:30)"
+    expect(failures[0]?.described.failed).toBe(
+      "Could not accept the 1-on-1 with Kai (Wed 3 Jun, 09:10 – 09:30)."
     );
   });
 
@@ -131,7 +131,10 @@ describe("answering and canceling a 1-on-1", () => {
     await runner.run(answerMeeting, { meetingId: "m1", response: "accept" });
     expect(failures[0]).toMatchObject({
       code: "meeting.alreadyAnswered",
-      what: expect.stringContaining("Kai") as string,
+      described: {
+        failed: expect.stringContaining("Kai") as string,
+        unsure: expect.stringContaining("Kai") as string,
+      },
     });
   });
 });

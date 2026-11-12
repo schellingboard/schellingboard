@@ -2,6 +2,7 @@ import type { ApiClient } from "@schellingboard/api-client";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 
 import type { ReplicaStore } from "../replica/store";
+import type { Described } from "./failure-message";
 import { problemCode } from "./problem";
 
 export type CommandResponse<R> = {
@@ -15,8 +16,8 @@ export type Prediction =
 
 export type Command<I, R = undefined> = {
   kind: string;
-  /** What the command does to what, e.g. `RSVP to “Intro” (Mon 10:00, Room A)`. */
-  describe: (replica: Snapshot, input: I) => string;
+  /** The opening sentences of the toast when the command fails or may not have been saved. */
+  describe: (replica: Snapshot, input: I) => Described;
   predict: (replica: Snapshot, now: Date, input: I) => Prediction;
   /** Commands with the same target are sent one after the other, in click order. */
   target?: (input: I) => string;
@@ -33,7 +34,7 @@ export type Outcome<R> =
   { ok: true; data: R | undefined } | { ok: false; code: string };
 
 export type CommandFailure = {
-  what: string;
+  described: Described;
   code: string;
   /** True when the retries ran out, so the server may have applied the command. */
   gaveUp: boolean;
@@ -170,7 +171,7 @@ export function createCommandRunner({
       const fail = (code: string, gaveUp: boolean) => {
         if (stopped || code === "command.cancelled") return;
         onFailure?.({
-          what: command.describe(replica, input),
+          described: command.describe(replica, input),
           code,
           gaveUp,
         });

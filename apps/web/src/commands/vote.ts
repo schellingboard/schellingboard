@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import type { VoteChoice } from "@schellingboard/domain/vote";
 import { voteRefusal } from "@schellingboard/domain/vote-rule";
@@ -72,8 +73,18 @@ const target = (replica: Snapshot, proposalId: string) => ({
 
 export const castVote: Command<{ proposalId: string; choice: VoteChoice }> = {
   kind: "vote.cast",
-  describe: (replica, { proposalId }) =>
-    `vote on ${describeProposalIn(replica, proposalId)}`,
+  describe: (replica, { proposalId }) => {
+    const proposal = describeProposalIn(replica, proposalId);
+    return proposal
+      ? {
+          failed: t`Could not vote on ${proposal}.`,
+          unsure: t`Your request to vote on ${proposal} might not have been saved.`,
+        }
+      : {
+          failed: t`Could not vote on the proposal.`,
+          unsure: t`Your request to vote on the proposal might not have been saved.`,
+        };
+  },
   target: ({ proposalId }) => `vote:${proposalId}`,
   predict: (replica, now, { proposalId, choice }) =>
     predictVote(replica, now, proposalId, { intent: "cast", choice }),
@@ -87,8 +98,18 @@ export const castVote: Command<{ proposalId: string; choice: VoteChoice }> = {
 
 export const withdrawVote: Command<{ proposalId: string }> = {
   kind: "vote.withdraw",
-  describe: (replica, { proposalId }) =>
-    `withdraw your vote on ${describeProposalIn(replica, proposalId)}`,
+  describe: (replica, { proposalId }) => {
+    const proposal = describeProposalIn(replica, proposalId);
+    return proposal
+      ? {
+          failed: t`Could not withdraw your vote on ${proposal}.`,
+          unsure: t`Your request to withdraw your vote on ${proposal} might not have been saved.`,
+        }
+      : {
+          failed: t`Could not withdraw your vote on the proposal.`,
+          unsure: t`Your request to withdraw your vote on the proposal might not have been saved.`,
+        };
+  },
   target: ({ proposalId }) => `vote:${proposalId}`,
   predict: (replica, now, { proposalId }) =>
     predictVote(replica, now, proposalId, { intent: "withdraw" }),

@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { rsvpRefusal } from "@schellingboard/domain/rsvp-rule";
 import type { SessionHost } from "@schellingboard/domain/session";
@@ -77,8 +78,18 @@ const PATH = "/api/v1/sessions/{id}/rsvps/{guestId}" as const;
 
 export const addRsvp: Command<Input> = {
   kind: "rsvp.add",
-  describe: (replica, { sessionId }) =>
-    `RSVP to ${describeSessionIn(replica, sessionId)}`,
+  describe: (replica, { sessionId }) => {
+    const session = describeSessionIn(replica, sessionId);
+    return session
+      ? {
+          failed: t`Could not RSVP to ${session}.`,
+          unsure: t`Your request to RSVP to ${session} might not have been saved.`,
+        }
+      : {
+          failed: t`Could not RSVP to the session.`,
+          unsure: t`Your request to RSVP to the session might not have been saved.`,
+        };
+  },
   target: ({ sessionId }) => `rsvp:${sessionId}`,
   predict: (replica, now, input) => predictRsvp("add", replica, now, input),
   call: (api, input, key, replica) =>
@@ -90,8 +101,18 @@ export const addRsvp: Command<Input> = {
 
 export const removeRsvp: Command<Input> = {
   kind: "rsvp.remove",
-  describe: (replica, { sessionId }) =>
-    `withdraw your RSVP to ${describeSessionIn(replica, sessionId)}`,
+  describe: (replica, { sessionId }) => {
+    const session = describeSessionIn(replica, sessionId);
+    return session
+      ? {
+          failed: t`Could not withdraw your RSVP to ${session}.`,
+          unsure: t`Your request to withdraw your RSVP to ${session} might not have been saved.`,
+        }
+      : {
+          failed: t`Could not withdraw your RSVP to the session.`,
+          unsure: t`Your request to withdraw your RSVP to the session might not have been saved.`,
+        };
+  },
   target: ({ sessionId }) => `rsvp:${sessionId}`,
   predict: (replica, now, input) =>
     predictRsvp("withdraw", replica, now, input),

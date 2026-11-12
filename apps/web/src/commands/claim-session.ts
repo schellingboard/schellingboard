@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { claimRefusal } from "@schellingboard/domain/session-claim";
 
 import type { Command } from "./runner";
@@ -9,8 +10,18 @@ const date = (iso: string | null) => (iso ? new Date(iso) : undefined);
 
 export const claimSession: Command<Input, unknown> = {
   kind: "session.claim",
-  describe: (replica, { sessionId }) =>
-    `become the host of ${describeSessionIn(replica, sessionId)}`,
+  describe: (replica, { sessionId }) => {
+    const session = describeSessionIn(replica, sessionId);
+    return session
+      ? {
+          failed: t`Could not become the host of ${session}.`,
+          unsure: t`Your request to become the host of ${session} might not have been saved.`,
+        }
+      : {
+          failed: t`Could not become the host of the session.`,
+          unsure: t`Your request to become the host of the session might not have been saved.`,
+        };
+  },
   target: ({ sessionId }) => `claim:${sessionId}`,
   predict: (replica, now, { sessionId }) => {
     const { me, event } = replica;

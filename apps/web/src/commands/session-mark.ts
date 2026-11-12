@@ -1,5 +1,7 @@
+import { t } from "@lingui/core/macro";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 
+import type { Described } from "./failure-message";
 import type { Command, Prediction } from "./runner";
 import { describeSessionIn } from "./subject";
 
@@ -35,7 +37,7 @@ const others = (held: Marks, sessionId: string) =>
 
 function addMark(
   kind: Mark,
-  label: (title: string) => string,
+  label: (session: string | undefined) => Described,
   command: string
 ): Command<Input> {
   return {
@@ -58,7 +60,7 @@ function addMark(
 }
 
 function removeMark(
-  label: (title: string) => string,
+  label: (session: string | undefined) => Described,
   command: string
 ): Command<Input> {
   return {
@@ -78,19 +80,55 @@ function removeMark(
 
 export const addBookmark = addMark(
   "bookmark",
-  (title) => `bookmark ${title}`,
+  (session) =>
+    session
+      ? {
+          failed: t`Could not bookmark ${session}.`,
+          unsure: t`Your request to bookmark ${session} might not have been saved.`,
+        }
+      : {
+          failed: t`Could not bookmark the session.`,
+          unsure: t`Your request to bookmark the session might not have been saved.`,
+        },
   "mark.bookmark"
 );
 export const removeBookmark = removeMark(
-  (title) => `remove the bookmark from ${title}`,
+  (session) =>
+    session
+      ? {
+          failed: t`Could not remove the bookmark from ${session}.`,
+          unsure: t`Your request to remove the bookmark from ${session} might not have been saved.`,
+        }
+      : {
+          failed: t`Could not remove the bookmark from the session.`,
+          unsure: t`Your request to remove the bookmark from the session might not have been saved.`,
+        },
   "mark.clear"
 );
 export const addHidden = addMark(
   "hidden",
-  (title) => `hide ${title}`,
+  (session) =>
+    session
+      ? {
+          failed: t`Could not hide ${session}.`,
+          unsure: t`Your request to hide ${session} might not have been saved.`,
+        }
+      : {
+          failed: t`Could not hide the session.`,
+          unsure: t`Your request to hide the session might not have been saved.`,
+        },
   "mark.hide"
 );
 export const removeHidden = removeMark(
-  (title) => `show ${title} again`,
+  (session) =>
+    session
+      ? {
+          failed: t`Could not show ${session} again.`,
+          unsure: t`Your request to show ${session} again might not have been saved.`,
+        }
+      : {
+          failed: t`Could not show the session again.`,
+          unsure: t`Your request to show the session again might not have been saved.`,
+        },
   "mark.unhide"
 );

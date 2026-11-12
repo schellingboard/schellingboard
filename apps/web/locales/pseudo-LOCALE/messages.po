@@ -269,6 +269,22 @@ msgstr ""
 msgid "{replyCount, plural, one {# reply} other {# replies}}"
 msgstr ""
 
+#: src/commands/meeting-answer.ts:64
+msgid "{response, select, accept {Could not accept the 1-on-1 with {name} ({day}, {time}).} decline {Could not decline the 1-on-1 with {name} ({day}, {time}).} other {Could not decline the 1-on-1 with {name} ({day}, {time}).}}"
+msgstr ""
+
+#: src/commands/meeting-answer.ts:48
+msgid "{response, select, accept {Could not accept the 1-on-1.} decline {Could not decline the 1-on-1.} other {Could not decline the 1-on-1.}}"
+msgstr ""
+
+#: src/commands/meeting-answer.ts:53
+msgid "{response, select, accept {Your request to accept the 1-on-1 might not have been saved.} decline {Your request to decline the 1-on-1 might not have been saved.} other {Your request to decline the 1-on-1 might not have been saved.}}"
+msgstr ""
+
+#: src/commands/meeting-answer.ts:69
+msgid "{response, select, accept {Your request to accept the 1-on-1 with {name} ({day}, {time}) might not have been saved.} decline {Your request to decline the 1-on-1 with {name} ({day}, {time}) might not have been saved.} other {Your request to decline the 1-on-1 with {name} ({day}, {time}) might not have been saved.}}"
+msgstr ""
+
 #: src/features/proposals/proposals-screen.tsx:393
 msgid "{resultCount, plural, one {# result} other {# results}}"
 msgstr ""
@@ -373,6 +389,46 @@ msgstr ""
 msgid "{when} in {rooms}"
 msgstr ""
 
+#: src/commands/comment.ts:122
+msgid "{where, select, place {Could not delete your comment on {place}.} profile {Could not delete your comment on {name}’s profile.} unnamed {Could not delete your comment on a profile.} other {Could not delete your comment.}}"
+msgstr ""
+
+#: src/commands/comment.ts:150
+msgid "{where, select, place {Could not like a comment on {place}.} profile {Could not like a comment on {name}’s profile.} unnamed {Could not like a comment on a profile.} other {Could not like a comment.}}"
+msgstr ""
+
+#: src/commands/comment.ts:30
+msgid "{where, select, place {Could not post your comment on {place}.} profile {Could not post your comment on {name}’s profile.} unnamed {Could not post your comment on a profile.} other {Could not post your comment.}}"
+msgstr ""
+
+#: src/commands/comment.ts:178
+msgid "{where, select, place {Could not remove your like from a comment on {place}.} profile {Could not remove your like from a comment on {name}’s profile.} unnamed {Could not remove your like from a comment on a profile.} other {Could not remove your like from a comment.}}"
+msgstr ""
+
+#: src/commands/comment.ts:90
+msgid "{where, select, place {Could not save your edit to a comment on {place}.} profile {Could not save your edit to a comment on {name}’s profile.} unnamed {Could not save your edit to a comment on a profile.} other {Could not save your edit to a comment.}}"
+msgstr ""
+
+#: src/commands/comment.ts:128
+msgid "{where, select, place {Your request to delete your comment on {place} might not have been saved.} profile {Your request to delete your comment on {name}’s profile might not have been saved.} unnamed {Your request to delete your comment on a profile might not have been saved.} other {Your request to delete your comment might not have been saved.}}"
+msgstr ""
+
+#: src/commands/comment.ts:156
+msgid "{where, select, place {Your request to like a comment on {place} might not have been saved.} profile {Your request to like a comment on {name}’s profile might not have been saved.} unnamed {Your request to like a comment on a profile might not have been saved.} other {Your request to like a comment might not have been saved.}}"
+msgstr ""
+
+#: src/commands/comment.ts:36
+msgid "{where, select, place {Your request to post your comment on {place} might not have been saved.} profile {Your request to post your comment on {name}’s profile might not have been saved.} unnamed {Your request to post your comment on a profile might not have been saved.} other {Your request to post your comment might not have been saved.}}"
+msgstr ""
+
+#: src/commands/comment.ts:184
+msgid "{where, select, place {Your request to remove your like from a comment on {place} might not have been saved.} profile {Your request to remove your like from a comment on {name}’s profile might not have been saved.} unnamed {Your request to remove your like from a comment on a profile might not have been saved.} other {Your request to remove your like from a comment might not have been saved.}}"
+msgstr ""
+
+#: src/commands/comment.ts:96
+msgid "{where, select, place {Your request to save your edit to a comment on {place} might not have been saved.} profile {Your request to save your edit to a comment on {name}’s profile might not have been saved.} unnamed {Your request to save your edit to a comment on a profile might not have been saved.} other {Your request to save your edit to a comment might not have been saved.}}"
+msgstr ""
+
 #: src/features/admin/join-links.tsx:174
 msgid "{withoutEmail, plural, one {# has no email.} other {# have no email.}}"
 msgstr ""
@@ -439,6 +495,10 @@ msgstr ""
 msgid "1-on-1s"
 msgstr ""
 
+#: src/commands/failure-message.ts:29
+msgid "1-on-1s are not enabled for this event."
+msgstr ""
+
 #: src/features/meetings/availability-form.tsx:76
 msgid "1-on-1s at {eventName}"
 msgstr ""
@@ -463,8 +523,17 @@ msgstr ""
 msgid "A big drop from Members to Active means many people never took part."
 msgstr ""
 
+#: src/commands/failure-message.ts:52
+msgid "A comment cannot be empty."
+msgstr ""
+
 #: src/features/admin/stats-figures.tsx:301
 msgid "A falling trend means late proposals had too little time to collect votes: give voting more time next year."
+msgstr ""
+
+#: src/commands/failure-message.ts:13
+#: src/commands/failure-message.ts:44
+msgid "A host is not part of this event."
 msgstr ""
 
 #: src/features/admin/stats-figures.tsx:824
@@ -698,6 +767,14 @@ msgstr ""
 #: src/features/admin/locations-screen.tsx:47
 msgctxt "Location colour"
 msgid "Amber"
+msgstr ""
+
+#: src/commands/failure-message.ts:47
+msgid "An organizer manages this session."
+msgstr ""
+
+#: src/commands/failure-message.ts:37
+msgid "Another session already uses that room at that time."
 msgstr ""
 
 #: src/features/people/profile-form.tsx:81
@@ -1048,6 +1125,10 @@ msgstr ""
 msgid "Chart"
 msgstr ""
 
+#: src/commands/failure-message.ts:69
+msgid "Check that it went through, then try again."
+msgstr ""
+
 #: src/features/sign-in/account-security.tsx:126
 msgid "Check your email for a link to set your password"
 msgstr ""
@@ -1069,8 +1150,16 @@ msgstr ""
 msgid "Choose a password. You are signed in with your personal link, so the old one is not needed."
 msgstr ""
 
+#: src/commands/failure-message.ts:28
+msgid "Choose or type where to meet."
+msgstr ""
+
 #: src/features/schedule/schedule-filters.tsx:286
 msgid "Choose what My schedule shows"
+msgstr ""
+
+#: src/commands/failure-message.ts:18
+msgid "Choose who you are first."
 msgstr ""
 
 #: src/features/sign-in/account-security.tsx:60
@@ -1334,8 +1423,48 @@ msgstr ""
 msgid "Could not ask {name}. {error}"
 msgstr ""
 
+#: src/commands/claim-session.ts:17
+msgid "Could not become the host of {session}."
+msgstr ""
+
+#: src/commands/claim-session.ts:21
+msgid "Could not become the host of the session."
+msgstr ""
+
+#: src/commands/session-mark.ts:86
+msgid "Could not bookmark {session}."
+msgstr ""
+
+#: src/commands/session-mark.ts:90
+msgid "Could not bookmark the session."
+msgstr ""
+
+#: src/commands/meeting-answer.ts:115
+msgid "Could not cancel the 1-on-1 with {name} ({day}, {time})."
+msgstr ""
+
+#: src/commands/meeting-answer.ts:110
+msgid "Could not cancel the 1-on-1."
+msgstr ""
+
 #: src/ui/copy-link-button.tsx:19
 msgid "Could not copy the link"
+msgstr ""
+
+#: src/commands/session-mark.ts:113
+msgid "Could not hide {session}."
+msgstr ""
+
+#: src/commands/session-mark.ts:117
+msgid "Could not hide the session."
+msgstr ""
+
+#: src/commands/join-proposal.ts:16
+msgid "Could not join {proposal} as a host."
+msgstr ""
+
+#: src/commands/join-proposal.ts:20
+msgid "Could not join the proposal as a host."
 msgstr ""
 
 #: src/features/people/profile-panel.tsx:399
@@ -1425,6 +1554,22 @@ msgstr ""
 msgid "Could not open the admin area ({errorCode})."
 msgstr ""
 
+#: src/commands/session-mark.ts:99
+msgid "Could not remove the bookmark from {session}."
+msgstr ""
+
+#: src/commands/session-mark.ts:103
+msgid "Could not remove the bookmark from the session."
+msgstr ""
+
+#: src/commands/rsvp.ts:85
+msgid "Could not RSVP to {session}."
+msgstr ""
+
+#: src/commands/rsvp.ts:89
+msgid "Could not RSVP to the session."
+msgstr ""
+
 #: src/features/schedule/attendee-count-field.tsx:76
 msgid "Could not save the attendee count for {what}. Please try again."
 msgstr ""
@@ -1435,6 +1580,14 @@ msgstr ""
 
 #: src/app/user-menu.tsx:183
 msgid "Could not select that name — try again"
+msgstr ""
+
+#: src/commands/session-mark.ts:126
+msgid "Could not show {session} again."
+msgstr ""
+
+#: src/commands/session-mark.ts:130
+msgid "Could not show the session again."
 msgstr ""
 
 #: src/features/sign-in/account-security.tsx:368
@@ -1451,6 +1604,30 @@ msgstr ""
 
 #: src/features/settings/push-notifications.tsx:181
 msgid "Could not turn notifications on for this device."
+msgstr ""
+
+#: src/commands/vote.ts:80
+msgid "Could not vote on {proposal}."
+msgstr ""
+
+#: src/commands/vote.ts:84
+msgid "Could not vote on the proposal."
+msgstr ""
+
+#: src/commands/rsvp.ts:108
+msgid "Could not withdraw your RSVP to {session}."
+msgstr ""
+
+#: src/commands/rsvp.ts:112
+msgid "Could not withdraw your RSVP to the session."
+msgstr ""
+
+#: src/commands/vote.ts:105
+msgid "Could not withdraw your vote on {proposal}."
+msgstr ""
+
+#: src/commands/vote.ts:109
+msgid "Could not withdraw your vote on the proposal."
 msgstr ""
 
 #: src/features/meetings/book-meeting.tsx:69
@@ -1544,6 +1721,10 @@ msgstr ""
 
 #: src/features/meetings/meeting-panel.tsx:128
 msgid "Decline"
+msgstr ""
+
+#: src/commands/failure-message.ts:36
+msgid "Decline it instead of canceling."
 msgstr ""
 
 #. State of a 1-on-1 on the grid, lower case
@@ -2274,6 +2455,14 @@ msgstr ""
 msgid "Hosts"
 msgstr ""
 
+#: src/commands/failure-message.ts:6
+msgid "Hosts cannot RSVP to their own session."
+msgstr ""
+
+#: src/commands/failure-message.ts:9
+msgid "Hosts cannot vote on their own proposal."
+msgstr ""
+
 #: src/features/admin/event-stats.tsx:128
 msgid "Hosts to leave out"
 msgstr ""
@@ -2713,6 +2902,10 @@ msgstr ""
 #: src/features/admin/locations-screen.tsx:366
 msgctxt "Location details: seats, lowercase in a list"
 msgid "max {capacity}"
+msgstr ""
+
+#: src/commands/failure-message.ts:51
+msgid "Max attendees must be a non-negative whole number"
 msgstr ""
 
 #: src/features/admin/event-config.tsx:194
@@ -3211,12 +3404,28 @@ msgstr ""
 msgid "One row per voter: their votes by choice, and the share of all proposals they voted on."
 msgstr ""
 
+#: src/commands/failure-message.ts:12
+msgid "Only a host of this proposal can change it."
+msgstr ""
+
 #: src/features/proposals/proposal-form.tsx:74
 msgid "Only a host of this proposal can edit it."
 msgstr ""
 
+#: src/commands/failure-message.ts:45
+msgid "Only a host of this session can change it."
+msgstr ""
+
 #: src/features/meetings/book-meeting.tsx:198
 msgid "Only people who marked this time free are listed. Nobody is told you looked."
+msgstr ""
+
+#: src/commands/failure-message.ts:53
+msgid "Only the author can change a comment."
+msgstr ""
+
+#: src/commands/failure-message.ts:31
+msgid "Only the person asked can answer."
 msgstr ""
 
 #: src/features/proposals/proposals-screen.tsx:332
@@ -3424,6 +3633,10 @@ msgstr ""
 
 #: src/features/sign-in/site-login-screen.tsx:38
 msgid "Please enter the password to access this site"
+msgstr ""
+
+#: src/commands/failure-message.ts:70
+msgid "Please try again."
 msgstr ""
 
 #: src/app/footer.tsx:87
@@ -4212,6 +4425,10 @@ msgstr ""
 msgid "Slots offered"
 msgstr ""
 
+#: src/commands/failure-message.ts:20
+msgid "Some of those slots are no longer offered. Reload the page."
+msgstr ""
+
 #: src/features/settings/email-settings-form.tsx:22
 msgid "someone adds me as a session host or co-host"
 msgstr ""
@@ -4238,6 +4455,10 @@ msgstr ""
 
 #: src/features/meetings/book-meeting.tsx:285
 msgid "Someone else"
+msgstr ""
+
+#: src/commands/mutation.ts:60
+msgid "Someone else changed this while you were editing it."
 msgstr ""
 
 #: src/features/settings/email-settings-form.tsx:26
@@ -4375,8 +4596,52 @@ msgstr ""
 msgid "Tell others about yourself"
 msgstr ""
 
+#: src/commands/failure-message.ts:27
+msgid "That 1-on-1 is longer than the event allows."
+msgstr ""
+
+#: src/commands/failure-message.ts:43
+msgid "That day is no longer part of this event."
+msgstr ""
+
+#: src/commands/failure-message.ts:40
+msgid "That length is not allowed for this event."
+msgstr ""
+
+#: src/commands/failure-message.ts:19
+msgid "That picture cannot be used."
+msgstr ""
+
+#: src/commands/failure-message.ts:42
+msgid "That room cannot be booked."
+msgstr ""
+
+#: src/commands/failure-message.ts:41
+msgid "That room is unavailable at that time."
+msgstr ""
+
+#: src/commands/failure-message.ts:22
+msgid "That slot has already passed."
+msgstr ""
+
+#: src/commands/failure-message.ts:33
+msgid "That slot has already started."
+msgstr ""
+
 #: src/features/meetings/book-meeting.tsx:68
 msgid "That slot is no longer open for 1-on-1s."
+msgstr ""
+
+#: src/commands/failure-message.ts:21
+msgid "That slot is not available."
+msgstr ""
+
+#: src/commands/failure-message.ts:38
+msgid "That start time has already passed."
+msgstr ""
+
+#: src/commands/failure-message.ts:39
+msgid "That time is outside the hours sessions can be booked."
 msgstr ""
 
 #: src/features/admin/stats-figures.tsx:289
@@ -4393,6 +4658,10 @@ msgstr ""
 
 #: src/ui/charts/plot-frame.tsx:51
 msgid "The chart could not load. The table below has the figures."
+msgstr ""
+
+#: src/commands/failure-message.ts:56
+msgid "The comment you replied to no longer exists."
 msgstr ""
 
 #: src/app/event-page.tsx:165
@@ -4436,6 +4705,14 @@ msgstr ""
 msgid "The predicted columns come from the attendance model, fitted on one event: treat them as rough."
 msgstr ""
 
+#: src/commands/failure-message.ts:14
+msgid "The proposal phase is over."
+msgstr ""
+
+#: src/commands/mutation.ts:81
+msgid "The server refused this. Please try again."
+msgstr ""
+
 #: src/features/proposals/proposal-panel.tsx:258
 msgid "The votes could not be loaded."
 msgstr ""
@@ -4456,8 +4733,20 @@ msgstr ""
 msgid "There is a problem:"
 msgstr ""
 
+#: src/commands/failure-message.ts:35
+msgid "There is nothing left to cancel."
+msgstr ""
+
 #: src/features/proposals/vote-breakdown.tsx:123
 msgid "There is nothing to measure this against yet — guessing at attendance needs the event's attendee list and {interestedEmoji} votes on its other proposals."
+msgstr ""
+
+#: src/commands/failure-message.ts:24
+msgid "They are not attending this event."
+msgstr ""
+
+#: src/commands/failure-message.ts:23
+msgid "They are not available at that time."
 msgstr ""
 
 #: src/features/people/profile-form.tsx:78
@@ -4468,6 +4757,10 @@ msgstr ""
 msgid "This 1-on-1 is confirmed"
 msgstr ""
 
+#: src/commands/failure-message.ts:30
+msgid "This 1-on-1 no longer exists."
+msgstr ""
+
 #: src/features/schedule/meeting-rules.ts:170
 msgid "This 1-on-1 was canceled."
 msgstr ""
@@ -4476,8 +4769,20 @@ msgstr ""
 msgid "This browser can’t show notifications. You’ll still see everything on the notifications page."
 msgstr ""
 
+#: src/commands/failure-message.ts:7
+msgid "This can only be changed during the scheduling phase."
+msgstr ""
+
+#: src/commands/failure-message.ts:8
+msgid "This can only be changed during the voting phase."
+msgstr ""
+
 #: src/features/proposals/proposal-form.tsx:363
 msgid "This cannot be undone."
+msgstr ""
+
+#: src/commands/failure-message.ts:55
+msgid "This comment no longer exists."
 msgstr ""
 
 #: src/features/settings/push-notifications.tsx:354
@@ -4508,6 +4813,14 @@ msgstr ""
 msgid "This login link is invalid. Request a new code from the name selector or your settings page."
 msgstr ""
 
+#: src/commands/mutation.ts:24
+msgid "This might not have been saved. Check that it went through, then try again."
+msgstr ""
+
+#: src/commands/failure-message.ts:17
+msgid "This name is protected. Sign in with its password."
+msgstr ""
+
 #: src/features/sign-in/bootstrap-screen.tsx:52
 msgid "This one-time link makes you a site admin. Choose who you are, or add yourself, then set a username and password."
 msgstr ""
@@ -4532,6 +4845,14 @@ msgstr ""
 msgid "This proposal is already on the schedule:"
 msgstr ""
 
+#: src/commands/failure-message.ts:11
+msgid "This proposal is not looking for a host."
+msgstr ""
+
+#: src/commands/failure-message.ts:10
+msgid "This proposal no longer exists."
+msgstr ""
+
 #: src/features/proposals/proposal-panel.tsx:310
 msgid "This proposal was scheduled on <0>{day} at {time} in {rooms}</0>."
 msgstr ""
@@ -4544,6 +4865,10 @@ msgstr ""
 msgid "This proposal was scheduled several times:"
 msgstr ""
 
+#: src/commands/failure-message.ts:32
+msgid "This request has already been answered."
+msgstr ""
+
 #: src/app/error-boundary.tsx:31
 msgid "This screen stopped working. Your data is safe."
 msgstr ""
@@ -4552,8 +4877,28 @@ msgstr ""
 msgid "This server cannot send email. Copy a personal link for each guest and share it yourself."
 msgstr ""
 
+#: src/commands/failure-message.ts:49
+msgid "This session already has a host."
+msgstr ""
+
+#: src/commands/failure-message.ts:50
+msgid "This session changed meanwhile. Check it and try again."
+msgstr ""
+
 #: src/features/schedule/clashes.ts:102
 msgid "This session clashes with {list}. Do you want to RSVP anyway?"
+msgstr ""
+
+#: src/commands/failure-message.ts:46
+msgid "This session has already started, so it can no longer be moved."
+msgstr ""
+
+#: src/commands/failure-message.ts:5
+msgid "This session is full."
+msgstr ""
+
+#: src/commands/failure-message.ts:48
+msgid "This session no longer exists."
 msgstr ""
 
 #: src/features/schedule/session-panel.tsx:368
@@ -5022,14 +5367,34 @@ msgstr ""
 msgid "Yes, mail all guests"
 msgstr ""
 
+#: src/commands/failure-message.ts:15
+msgid "You already host this proposal."
+msgstr ""
+
 #: src/features/schedule/day-agenda.tsx:318
 #: src/features/schedule/session-block.tsx:333
 #: src/features/schedule/session-panel.tsx:243
 msgid "You are hosting this session"
 msgstr ""
 
+#: src/commands/failure-message.ts:34
+msgid "You are not part of this 1-on-1."
+msgstr ""
+
+#: src/commands/failure-message.ts:16
+msgid "You are not part of this event."
+msgstr ""
+
+#: src/commands/failure-message.ts:54
+msgid "You cannot remove this comment."
+msgstr ""
+
 #: src/features/schedule/meeting-rules.ts:167
 msgid "You declined this."
+msgstr ""
+
+#: src/commands/failure-message.ts:25
+msgid "You have already asked them for that time."
 msgstr ""
 
 #: src/features/comments/my-comments-screen.tsx:89
@@ -5039,6 +5404,10 @@ msgstr ""
 #: src/features/schedule/day-agenda.tsx:326
 #: src/features/schedule/session-panel.tsx:248
 msgid "You have RSVP'd to this session"
+msgstr ""
+
+#: src/commands/failure-message.ts:26
+msgid "You have too many requests waiting for an answer. Wait for a reply, or cancel one first."
 msgstr ""
 
 #: src/features/proposals/quick-voting-screen.tsx:90
@@ -5085,6 +5454,94 @@ msgstr ""
 
 #: src/features/meetings/meeting-request-fields.tsx:194
 msgid "Your request to ask {name}: {error}"
+msgstr ""
+
+#: src/commands/claim-session.ts:18
+msgid "Your request to become the host of {session} might not have been saved."
+msgstr ""
+
+#: src/commands/claim-session.ts:22
+msgid "Your request to become the host of the session might not have been saved."
+msgstr ""
+
+#: src/commands/session-mark.ts:87
+msgid "Your request to bookmark {session} might not have been saved."
+msgstr ""
+
+#: src/commands/session-mark.ts:91
+msgid "Your request to bookmark the session might not have been saved."
+msgstr ""
+
+#: src/commands/meeting-answer.ts:111
+msgid "Your request to cancel the 1-on-1 might not have been saved."
+msgstr ""
+
+#: src/commands/meeting-answer.ts:116
+msgid "Your request to cancel the 1-on-1 with {name} ({day}, {time}) might not have been saved."
+msgstr ""
+
+#: src/commands/session-mark.ts:114
+msgid "Your request to hide {session} might not have been saved."
+msgstr ""
+
+#: src/commands/session-mark.ts:118
+msgid "Your request to hide the session might not have been saved."
+msgstr ""
+
+#: src/commands/join-proposal.ts:17
+msgid "Your request to join {proposal} as a host might not have been saved."
+msgstr ""
+
+#: src/commands/join-proposal.ts:21
+msgid "Your request to join the proposal as a host might not have been saved."
+msgstr ""
+
+#: src/commands/session-mark.ts:100
+msgid "Your request to remove the bookmark from {session} might not have been saved."
+msgstr ""
+
+#: src/commands/session-mark.ts:104
+msgid "Your request to remove the bookmark from the session might not have been saved."
+msgstr ""
+
+#: src/commands/rsvp.ts:86
+msgid "Your request to RSVP to {session} might not have been saved."
+msgstr ""
+
+#: src/commands/rsvp.ts:90
+msgid "Your request to RSVP to the session might not have been saved."
+msgstr ""
+
+#: src/commands/session-mark.ts:127
+msgid "Your request to show {session} again might not have been saved."
+msgstr ""
+
+#: src/commands/session-mark.ts:131
+msgid "Your request to show the session again might not have been saved."
+msgstr ""
+
+#: src/commands/vote.ts:81
+msgid "Your request to vote on {proposal} might not have been saved."
+msgstr ""
+
+#: src/commands/vote.ts:85
+msgid "Your request to vote on the proposal might not have been saved."
+msgstr ""
+
+#: src/commands/rsvp.ts:109
+msgid "Your request to withdraw your RSVP to {session} might not have been saved."
+msgstr ""
+
+#: src/commands/rsvp.ts:113
+msgid "Your request to withdraw your RSVP to the session might not have been saved."
+msgstr ""
+
+#: src/commands/vote.ts:106
+msgid "Your request to withdraw your vote on {proposal} might not have been saved."
+msgstr ""
+
+#: src/commands/vote.ts:110
+msgid "Your request to withdraw your vote on the proposal might not have been saved."
 msgstr ""
 
 #: src/features/proposals/proposals-screen.tsx:430

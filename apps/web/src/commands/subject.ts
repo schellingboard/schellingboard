@@ -19,13 +19,19 @@ export function describeSession(
   return `“${session.title}”${details ? ` (${details})` : ""}`;
 }
 
-export function describeProposalIn(replica: Snapshot, proposalId: string) {
+export function describeProposalIn(
+  replica: Snapshot,
+  proposalId: string
+): string | undefined {
   const proposal = replica.proposals.find((p) => p.id === proposalId);
-  return proposal ? `“${proposal.title}”` : "the proposal";
+  return proposal ? `“${proposal.title}”` : undefined;
 }
 
-export function describeSessionIn(replica: Snapshot, sessionId: string) {
+export function describeSessionIn(
+  replica: Snapshot,
+  sessionId: string
+): string | undefined {
   const { sessions, event } = eventContextFrom(replica);
   const session = sessions.find((s) => s.id === sessionId);
-  return session ? describeSession(session, event.timezone) : "the session";
+  return session ? describeSession(session, event.timezone) : undefined;
 }

@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import type { ZodType } from "zod";
 
 import { reasonFor } from "./failure-message";
@@ -19,8 +20,8 @@ export type MutationResult<R> =
   | { ok: false; kind: "refused"; code: string; message: string }
   | { ok: false; kind: "unreachable"; message: string };
 
-const UNREACHABLE =
-  "This might not have been saved. Check that it went through, then try again.";
+const unreachable = () =>
+  t`This might not have been saved. Check that it went through, then try again.`;
 
 export const FIX_FIELDS_MESSAGE = "Please fix the highlighted fields.";
 
@@ -36,7 +37,7 @@ export async function awaitMutation<R>(
   try {
     result = await call(key);
   } catch {
-    return { ok: false, kind: "unreachable", message: UNREACHABLE };
+    return { ok: false, kind: "unreachable", message: unreachable() };
   }
   const { response, data, error } = result;
   if (response.ok) return { ok: true, data };
@@ -50,13 +51,13 @@ export async function awaitMutation<R>(
       detail
     )
       return { ok: false, kind: "refused", code, message: detail };
-    return { ok: false, kind: "unreachable", message: UNREACHABLE };
+    return { ok: false, kind: "unreachable", message: unreachable() };
   }
   if (isVersionConflict(problemCode(error, response.status)))
     return {
       ok: false,
       kind: "conflict",
-      message: "Someone else changed this while you were editing it.",
+      message: t`Someone else changed this while you were editing it.`,
     };
   const problems = (error as { errors?: { path: string; message: string }[] })
     ?.errors;
@@ -77,7 +78,7 @@ export async function awaitMutation<R>(
       reasonFor(code) ??
       (explainRefusals && typeof detail === "string" && detail
         ? detail
-        : "The server refused this. Please try again."),
+        : t`The server refused this. Please try again.`),
   };
 }
 

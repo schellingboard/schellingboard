@@ -127,9 +127,14 @@ describe("vote commands", () => {
   it("describe the proposal by title", () => {
     expect(
       castVote.describe(voting, { proposalId: "p", choice: VoteChoice.skip })
-    ).toBe("vote on “Rust intro”");
-    expect(withdrawVote.describe(voting, { proposalId: "p" })).toBe(
-      "withdraw your vote on “Rust intro”"
-    );
+    ).toEqual({
+      failed: "Could not vote on “Rust intro”.",
+      unsure: "Your request to vote on “Rust intro” might not have been saved.",
+    });
+    expect(withdrawVote.describe(voting, { proposalId: "p" })).toEqual({
+      failed: "Could not withdraw your vote on “Rust intro”.",
+      unsure:
+        "Your request to withdraw your vote on “Rust intro” might not have been saved.",
+    });
   });
 });

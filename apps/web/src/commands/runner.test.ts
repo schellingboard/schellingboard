@@ -352,7 +352,10 @@ describe("a failed command", () => {
 
     expect(seen).toEqual([
       expect.objectContaining({
-        what: expect.stringContaining("RSVP to “") as string,
+        described: {
+          failed: expect.stringContaining("RSVP to “") as string,
+          unsure: expect.stringContaining("RSVP to “") as string,
+        },
         code: "session.full",
         gaveUp: false,
       }),
