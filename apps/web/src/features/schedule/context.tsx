@@ -18,6 +18,8 @@ export type ScheduleActions = {
   toggleRsvp: (sessionId: string, withdraw: boolean) => Promise<void>;
   /** A failure is reported as a notice, not returned. */
   becomeHost: (sessionId: string) => Promise<void>;
+  /** A failure is reported as a notice, not returned. */
+  setBookmark: (sessionId: string, bookmarked: boolean) => Promise<void>;
   /** Asks who the reader is, which an RSVP needs. */
   pickName: () => void;
   /** The caller destroys the query when done. */
@@ -85,6 +87,7 @@ const NO_MATCH: ScheduleMatch & { currentMatchId?: string | null } =
     filters: { mine: null },
     guestId: null,
     rsvpd: () => false,
+    bookmarked: () => false,
   });
 
 const MatchContext = createContext<

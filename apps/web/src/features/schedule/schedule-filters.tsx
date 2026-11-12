@@ -23,7 +23,11 @@ export function ScheduleFilters({
   search: string;
   onSearchChange: (search: string) => void;
   /** Null when there is no viewer for "mine" to mean. */
-  mine: { active: boolean; kinds: readonly MineKind[] } | null;
+  mine: {
+    active: boolean;
+    kinds: readonly MineKind[];
+    hasBookmarks: boolean;
+  } | null;
   onToggleMine: () => void;
   onToggleKind: (kind: MineKind) => void;
   /** How many entries match out of how many, or null when nothing narrows them. */
@@ -127,7 +131,11 @@ function MyScheduleChip({
   onToggle,
   onToggleKind,
 }: {
-  mine: { active: boolean; kinds: readonly MineKind[] };
+  mine: {
+    active: boolean;
+    kinds: readonly MineKind[];
+    hasBookmarks: boolean;
+  };
   onToggle: () => void;
   onToggleKind: (kind: MineKind) => void;
 }) {
@@ -198,7 +206,12 @@ function MyScheduleChip({
           className="absolute left-0 top-full z-40 mt-1 w-44 rounded-md bg-surface-raised px-3 py-2 shadow-lg ring-1 ring-line-subtle"
         >
           <legend className="sr-only">My schedule shows</legend>
-          {MINE_KINDS.map((kind) => {
+          {MINE_KINDS.filter(
+            (kind) =>
+              kind.value !== "bookmarked" ||
+              mine.hasBookmarks ||
+              mine.kinds.includes(kind.value)
+          ).map((kind) => {
             const ticked = mine.kinds.includes(kind.value);
             const last = ticked && mine.kinds.length === 1;
             return (

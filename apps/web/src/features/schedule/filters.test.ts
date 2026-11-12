@@ -37,6 +37,12 @@ describe("schedule filters", () => {
     });
   });
 
+  it("serializes all three kinds", () => {
+    expect(
+      serializeScheduleFilters({ mine: ["rsvpd", "hosting", "bookmarked"] })
+    ).toEqual({ filter: "mine", mine: "rsvpd,hosting,bookmarked" });
+  });
+
   it("serializes `mine` only when the kinds are not the default", () => {
     expect(serializeScheduleFilters({ mine: null })).toEqual({
       filter: null,
@@ -53,9 +59,9 @@ describe("schedule filters", () => {
   });
 
   it("lets through a session of any ticked kind", () => {
-    const rsvpd = { rsvpd: true, hosting: false };
-    const hosting = { rsvpd: false, hosting: true };
-    const neither = { rsvpd: false, hosting: false };
+    const rsvpd = { rsvpd: true, hosting: false, bookmarked: false };
+    const hosting = { rsvpd: false, hosting: true, bookmarked: false };
+    const neither = { rsvpd: false, hosting: false, bookmarked: false };
     const both = { mine: ["rsvpd", "hosting"] } as const;
     expect(sessionPassesFilters(both, rsvpd)).toBe(true);
     expect(sessionPassesFilters(both, hosting)).toBe(true);

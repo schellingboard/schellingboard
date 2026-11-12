@@ -10,6 +10,7 @@ import {
   LockIcon,
   PlusIcon,
   UserIcon,
+  BookmarkSolidIcon,
 } from "../../ui/icons";
 import { plainText } from "../../ui/plain-text";
 import { Tooltip } from "../../ui/tooltip";
@@ -243,6 +244,14 @@ function RealSessionCard({
             >
               {session.closed && (
                 <LockIcon className="mt-0 h-3 w-3 flex-shrink-0" />
+              )}
+              {data.bookmarked(session.id) && (
+                <BookmarkSolidIcon
+                  aria-hidden={false}
+                  role="img"
+                  aria-label="Bookmarked"
+                  className="mt-px h-3 w-3 flex-shrink-0"
+                />
               )}
               <span className="flex-1">{session.title}</span>
             </p>

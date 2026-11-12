@@ -15,6 +15,7 @@ import {
   parseScheduleFilters,
   serializeScheduleFilters,
   ALL_KINDS,
+  DEFAULT_KINDS,
   type MineKind,
   type ScheduleFilterState,
 } from "./filters";
@@ -105,7 +106,8 @@ export function ScheduleScreen({
 
   const chosen = parseScheduleFilters(params.get("filter"), params.get("mine"));
   const filters = data.guestId ? chosen : NO_FILTERS;
-  const [keptKinds, setKeptKinds] = useState<readonly MineKind[]>(ALL_KINDS);
+  const [keptKinds, setKeptKinds] =
+    useState<readonly MineKind[]>(DEFAULT_KINDS);
   const setFilters = (next: ScheduleFilterState) => {
     const updated = new URLSearchParams(params);
     const { filter, mine } = serializeScheduleFilters(next);
@@ -124,6 +126,7 @@ export function ScheduleScreen({
         filters,
         guestId: data.guestId,
         rsvpd: data.rsvpd,
+        bookmarked: data.bookmarked,
       }),
     [debouncedSearch, filters, data]
   );
@@ -228,7 +231,11 @@ export function ScheduleScreen({
       onSearchChange={setSearch}
       mine={
         data.guestId
-          ? { active: filters.mine !== null, kinds: mineKinds }
+          ? {
+              active: filters.mine !== null,
+              kinds: mineKinds,
+              hasBookmarks: data.hasBookmarks,
+            }
           : null
       }
       onToggleMine={() => {
@@ -244,7 +251,7 @@ export function ScheduleScreen({
       count={count}
       onShowAll={() => {
         setSearch("");
-        setKeptKinds(ALL_KINDS);
+        setKeptKinds(DEFAULT_KINDS);
         setFilters(NO_FILTERS);
       }}
       onBackToTop={() =>
