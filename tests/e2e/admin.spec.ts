@@ -1355,7 +1355,7 @@ test.describe("Admin UI proposals", () => {
       .click();
 
     // Add a host through the searchable multi-select (opens on focus).
-    await proposals.getByLabel("Hosts").click();
+    await proposals.getByLabel("Hosts", { exact: true }).click();
     await page.keyboard.type("Alice");
     await page.getByRole("option", { name: "Alice Test" }).click();
     await page.keyboard.press("Escape");
