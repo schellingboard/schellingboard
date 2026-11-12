@@ -32,4 +32,9 @@ describe("formatRelativeTime", () => {
     // renders) can disagree; "in 2 minutes" would be nonsense to the reader.
     expect(formatRelativeTime(ago(-2 * MINUTE), NOW)).toBe("just now");
   });
+
+  it("words the label in the given locale", { tags: ["022-US1"] }, () => {
+    expect(formatRelativeTime(ago(3 * DAY), NOW, "de-DE")).toBe("vor 3 Tagen");
+    expect(formatRelativeTime(ago(DAY), NOW, "de-DE")).toBe("gestern");
+  });
 });

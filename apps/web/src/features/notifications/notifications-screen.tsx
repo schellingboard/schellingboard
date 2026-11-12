@@ -5,6 +5,7 @@ import type {
   NotificationItem,
   NotificationsQuery,
 } from "../../queries/notifications";
+import { useFormatLocale } from "../../i18n/format-locale";
 import { Button } from "../../ui/button";
 import { ConfirmDialog } from "../../ui/confirm-dialog";
 import { CheckIcon } from "../../ui/icons";
@@ -251,6 +252,7 @@ function Row({
   onOpen: () => void;
   onMarkRead: () => void;
 }) {
+  const locale = useFormatLocale();
   const read = item.readAt !== null;
   return (
     <li
@@ -279,7 +281,7 @@ function Row({
             {item.text}
           </span>
           <span className="block text-sm text-fg-muted">
-            {formatRelativeTime(new Date(item.createdAt), now)}
+            {formatRelativeTime(new Date(item.createdAt), now, locale)}
           </span>
         </button>
         {!read && (

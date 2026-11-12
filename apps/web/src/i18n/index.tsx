@@ -2,6 +2,7 @@ import { i18n, type Messages } from "@lingui/core";
 import { I18nProvider as LinguiProvider } from "@lingui/react";
 import {
   createContext,
+  Fragment,
   useCallback,
   useContext,
   useEffect,
@@ -9,7 +10,10 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { Settings } from "luxon";
 import { messages as sourceMessages } from "../../locales/en/messages.po";
+import { formatLocale } from "./format";
+import { FormatLocaleContext } from "./format-locale";
 import { DEFAULT_LOCALE, resolveLocale, type Locale } from "./locales";
 
 // The source catalog is part of the main bundle so the app starts, and works
@@ -33,6 +37,8 @@ export async function activate(locale: string) {
 }
 
 const LocaleContext = createContext<Locale>(DEFAULT_LOCALE);
+
+export { useFormatLocale } from "./format-locale";
 
 export const useLocale = () => useContext(LocaleContext);
 
@@ -77,17 +83,30 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let current = true;
     activate(wanted).then(
-      () => current && setActive(wanted),
+      () => {
+        if (!current) return;
+        // Luxon names months and weekdays in this locale; set before the re-render that formats.
+        Settings.defaultLocale = formatLocale(wanted, navigator.languages);
+        setActive(wanted);
+      },
       () => {} // the locale in use stays active
     );
     return () => {
       current = false;
     };
   }, [wanted]);
+  const formatting = formatLocale(active, navigator.languages);
+  useState(() => {
+    Settings.defaultLocale = formatting;
+  });
   return (
     <StoredLocaleContext value={choice}>
       <LocaleContext value={active}>
-        <LinguiProvider i18n={i18n}>{children}</LinguiProvider>
+        <FormatLocaleContext value={formatting}>
+          <LinguiProvider i18n={i18n}>
+            <Fragment key={active}>{children}</Fragment>
+          </LinguiProvider>
+        </FormatLocaleContext>
       </LocaleContext>
     </StoredLocaleContext>
   );
