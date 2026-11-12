@@ -7,8 +7,36 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: pseudo-LOCALE\n"
 
+#: src/features/schedule/schedule-filters.tsx:147
+msgid ", back to the search"
+msgstr ""
+
+#: src/features/schedule/day-fold-bar.tsx:42
+msgid "· day has passed · hide"
+msgstr ""
+
+#: src/features/schedule/day-fold-bar.tsx:41
+msgid "· day has passed · show"
+msgstr ""
+
+#: src/features/schedule/day-fold-bar.tsx:39
+msgid "· no matches · hide"
+msgstr ""
+
+#: src/features/schedule/day-fold-bar.tsx:38
+msgid "· no matches · show"
+msgstr ""
+
 #: src/features/settings/push-notifications.tsx:347
 msgid "· on since {since}"
+msgstr ""
+
+#: src/features/schedule/clashes.ts:85
+msgid "\"{title}\", which you are attending"
+msgstr ""
+
+#: src/features/schedule/clashes.ts:84
+msgid "\"{title}\", which you are hosting"
 msgstr ""
 
 #: src/ui/phase-bar.tsx:63
@@ -32,6 +60,10 @@ msgstr ""
 msgid "{count, plural, one {There is a problem to fix:} other {There are # problems to fix:}}"
 msgstr ""
 
+#: src/features/schedule/schedule-filters.tsx:66
+msgid "{matching} of {total} match"
+msgstr ""
+
 #: src/ui/data-table.tsx:52
 msgid "{selectedCount, plural, one {# selected} other {# selected}}"
 msgstr ""
@@ -52,6 +84,11 @@ msgstr ""
 msgid "{valueLabel}: 0 to {max}"
 msgstr ""
 
+#: src/features/schedule/day-agenda.tsx:389
+msgid "1-on-1 with {otherName}"
+msgstr ""
+
+#: src/features/schedule/day-grid.tsx:99
 #: src/features/settings/settings-screen.tsx:92
 msgid "1-on-1s"
 msgstr ""
@@ -96,9 +133,17 @@ msgstr ""
 msgid "a session I’ve RSVP’d to changes time or location, loses its host, or is deleted"
 msgstr ""
 
+#: src/features/schedule/schedule-toolbar.tsx:36
+msgid "Agenda"
+msgstr ""
+
 #: src/ui/pager.tsx:83
 msgctxt "Rows per page: every row"
 msgid "All"
+msgstr ""
+
+#: src/features/schedule/day-agenda.tsx:261
+msgid "All rooms"
 msgstr ""
 
 #: src/app/theme.tsx:80
@@ -145,6 +190,19 @@ msgstr ""
 msgid "Back to the events"
 msgstr ""
 
+#: src/features/schedule/day-agenda.tsx:270
+msgid "Blocked"
+msgstr ""
+
+#: src/features/schedule/filters.ts:6
+msgid "bookmarked"
+msgstr ""
+
+#: src/features/schedule/day-agenda.tsx:300
+#: src/features/schedule/filters.ts:6
+msgid "Bookmarked"
+msgstr ""
+
 #: src/ui/data-table.tsx:46
 msgid "Bulk actions"
 msgstr ""
@@ -155,6 +213,27 @@ msgstr ""
 
 #: src/features/settings/push-notifications.tsx:263
 msgid "Checking…"
+msgstr ""
+
+#: src/features/schedule/schedule-filters.tsx:252
+msgid "Choose what My schedule shows"
+msgstr ""
+
+#: src/features/schedule/clash-mark.tsx:26
+msgid "Clash"
+msgstr ""
+
+#: src/features/schedule/schedule-filters.tsx:60
+#: src/features/schedule/schedule-filters.tsx:111
+msgid "Clashes"
+msgstr ""
+
+#: src/features/schedule/clash-mark.tsx:20
+msgid "Clashes with {what}"
+msgstr ""
+
+#: src/features/schedule/use-rsvp.tsx:44
+msgid "Clashing commitment"
 msgstr ""
 
 #: src/ui/data-table.tsx:75
@@ -197,6 +276,14 @@ msgstr ""
 
 #: src/app/user-menu.tsx:136
 msgid "Could not log out — try again"
+msgstr ""
+
+#: src/features/schedule/attendee-count-field.tsx:75
+msgid "Could not save the attendee count for {what}. Please try again."
+msgstr ""
+
+#: src/features/schedule/attendee-count-field.tsx:76
+msgid "Could not save the attendee count for the session. Please try again."
 msgstr ""
 
 #: src/app/user-menu.tsx:182
@@ -272,6 +359,7 @@ msgid "Event"
 msgstr ""
 
 #: src/app/panel-host.tsx:80
+#: src/features/schedule/schedule-toolbar.tsx:114
 msgid "Event details"
 msgstr ""
 
@@ -301,6 +389,10 @@ msgstr ""
 
 #: src/ui/resize-image.ts:48
 msgid "Failed to resize image"
+msgstr ""
+
+#: src/features/schedule/schedule-filters.tsx:99
+msgid "Filter sessions"
 msgstr ""
 
 #: src/ui/list-toolbar.tsx:21
@@ -336,8 +428,29 @@ msgstr ""
 msgid "Go to the events"
 msgstr ""
 
+#: src/features/schedule/schedule-toolbar.tsx:35
+msgid "Grid"
+msgstr ""
+
 #: src/app/footer.tsx:100
 msgid "Help"
+msgstr ""
+
+#: src/features/schedule/schedule-filters.tsx:61
+#: src/features/schedule/schedule-filters.tsx:118
+msgid "Hidden"
+msgstr ""
+
+#: src/features/schedule/filters.ts:5
+msgid "hosting"
+msgstr ""
+
+#: src/features/schedule/filters.ts:5
+msgid "Hosting"
+msgstr ""
+
+#: src/features/schedule/attendee-count-field.tsx:95
+msgid "How many people attended?"
 msgstr ""
 
 #: src/app/footer.tsx:136
@@ -346,6 +459,10 @@ msgstr ""
 
 #: src/app/footer.tsx:150
 msgid "In this build, but not in a released version yet."
+msgstr ""
+
+#: src/features/schedule/schedule-toolbar.tsx:101
+msgid "Jump to the current time"
 msgstr ""
 
 #: src/ui/use-discard-guard.tsx:92
@@ -413,6 +530,10 @@ msgstr ""
 msgid "Markdown supported"
 msgstr ""
 
+#: src/features/schedule/day-grid.tsx:24
+msgid "max {capacity}"
+msgstr ""
+
 #: src/app/nav-bar.tsx:52
 msgid "Menu"
 msgstr ""
@@ -427,6 +548,18 @@ msgstr ""
 
 #: src/app/user-menu.tsx:98
 msgid "My profile"
+msgstr ""
+
+#: src/features/schedule/schedule-filters.tsx:247
+msgid "My schedule"
+msgstr ""
+
+#: src/features/schedule/schedule-filters.tsx:59
+msgid "My schedule ({kinds})"
+msgstr ""
+
+#: src/features/schedule/schedule-filters.tsx:270
+msgid "My schedule shows"
 msgstr ""
 
 #: src/ui/charts/scatter.tsx:64
@@ -445,6 +578,10 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
+#: src/features/schedule/match-stepper.tsx:44
+msgid "Next match"
+msgstr ""
+
 #: src/ui/pager.tsx:143
 msgid "Next page"
 msgstr ""
@@ -455,6 +592,14 @@ msgstr ""
 
 #: src/app/home-page.tsx:44
 msgid "No events found."
+msgstr ""
+
+#: src/features/schedule/day-agenda.tsx:104
+msgid "No matching sessions"
+msgstr ""
+
+#: src/features/schedule/day-agenda.tsx:104
+msgid "No sessions"
 msgstr ""
 
 #: src/features/settings/settings-screen.tsx:102
@@ -502,6 +647,15 @@ msgstr ""
 msgid "Notifications on your devices"
 msgstr ""
 
+#: src/features/schedule/day-agenda.tsx:205
+#: src/features/schedule/schedule-toolbar.tsx:105
+msgid "Now"
+msgstr ""
+
+#: src/features/schedule/day-agenda.tsx:163
+msgid "Now · {at}"
+msgstr ""
+
 #: src/features/settings/push-notifications.tsx:308
 msgid "On for this device."
 msgstr ""
@@ -510,8 +664,16 @@ msgstr ""
 msgid "On iPhone and iPad this works once the site is on your home screen: tap the Share button, then <0>Add to Home Screen</0>, and open it from there."
 msgstr ""
 
+#: src/features/schedule/day-grid.tsx:113
+msgid "Only you see these"
+msgstr ""
+
 #: src/app/nav-bar.tsx:27
 msgid "Open menu"
+msgstr ""
+
+#: src/features/schedule/attendee-count-field.tsx:98
+msgid "Optional. Only you and your co-hosts will see this, not the attendees. Enter <0>0</0> if the session was held but nobody came. If it never happened at all, delete the session instead. Leave the field empty to go back to no count at all."
 msgstr ""
 
 #: src/ui/pager.tsx:129
@@ -550,6 +712,10 @@ msgstr ""
 msgid "Preview"
 msgstr ""
 
+#: src/features/schedule/match-stepper.tsx:30
+msgid "Previous match"
+msgstr ""
+
 #: src/ui/pager.tsx:102
 msgid "Previous page"
 msgstr ""
@@ -558,6 +724,7 @@ msgstr ""
 msgid "Profile not found, please log in again."
 msgstr ""
 
+#: src/features/schedule/schedule-toolbar.tsx:119
 #: src/ui/phase-bar.tsx:13
 msgid "Proposals"
 msgstr ""
@@ -592,10 +759,21 @@ msgstr ""
 msgid "Rows per page"
 msgstr ""
 
+#: src/features/schedule/filters.ts:4
+#: src/features/schedule/filters.ts:4
+msgid "RSVP'd"
+msgstr ""
+
+#: src/features/schedule/attendee-count-field.tsx:126
 #: src/features/settings/email-settings-form.tsx:115
 msgid "Save"
 msgstr ""
 
+#: src/features/schedule/attendee-count-field.tsx:122
+msgid "Save attendee count"
+msgstr ""
+
+#: src/features/schedule/attendee-count-field.tsx:135
 #: src/features/settings/email-settings-form.tsx:119
 msgid "Saved"
 msgstr ""
@@ -604,12 +782,25 @@ msgstr ""
 msgid "Saving..."
 msgstr ""
 
+#: src/features/schedule/attendee-count-field.tsx:131
+msgid "Saving…"
+msgstr ""
+
+#: src/features/schedule/schedule-toolbar.tsx:74
+msgid "Schedule view"
+msgstr ""
+
 #: src/ui/phase-bar.tsx:15
 msgid "Scheduling"
 msgstr ""
 
 #: src/ui/data-table.tsx:136
 msgid "Search"
+msgstr ""
+
+#: src/features/schedule/schedule-filters.tsx:85
+#: src/features/schedule/schedule-filters.tsx:86
+msgid "Search sessions"
 msgstr ""
 
 #: src/ui/data-table.tsx:194
@@ -641,6 +832,14 @@ msgstr ""
 #: src/app/user-menu.tsx:114
 #: src/features/settings/settings-screen.tsx:49
 msgid "Settings"
+msgstr ""
+
+#: src/features/schedule/day-agenda.tsx:356
+msgid "Shared moment: "
+msgstr ""
+
+#: src/features/schedule/schedule-filters.tsx:155
+msgid "Show all"
 msgstr ""
 
 #: src/app/map-button.tsx:29
@@ -687,6 +886,10 @@ msgstr ""
 msgid "Something went wrong"
 msgstr ""
 
+#: src/features/schedule/match-stepper.tsx:24
+msgid "Step through matches"
+msgstr ""
+
 #: src/app/theme.tsx:69
 msgctxt "Colour theme"
 msgid "System"
@@ -709,6 +912,10 @@ msgstr ""
 msgid "There is a problem:"
 msgstr ""
 
+#: src/features/schedule/day-agenda.tsx:397
+msgid "This 1-on-1 is confirmed"
+msgstr ""
+
 #: src/features/settings/push-notifications.tsx:278
 msgid "This browser can’t show notifications. You’ll still see everything on the notifications page."
 msgstr ""
@@ -723,6 +930,10 @@ msgstr ""
 
 #: src/app/error-boundary.tsx:30
 msgid "This screen stopped working. Your data is safe."
+msgstr ""
+
+#: src/features/schedule/clashes.ts:93
+msgid "This session clashes with {list}. Do you want to RSVP anyway?"
 msgstr ""
 
 #: src/app/footer.tsx:120
@@ -782,8 +993,17 @@ msgstr ""
 msgid "Turning on..."
 msgstr ""
 
+#: src/features/schedule/one-on-one-picture.tsx:7
+msgid "Two attendees in conversation"
+msgstr ""
+
 #: src/app/footer.tsx:42
 msgid "unknown"
+msgstr ""
+
+#: src/features/schedule/day-agenda.tsx:255
+#: src/features/schedule/day-agenda.tsx:381
+msgid "until {endsAt}"
 msgstr ""
 
 #: src/app/footer.tsx:67
@@ -821,6 +1041,18 @@ msgstr ""
 
 #: src/ui/confirm-dialog.tsx:9
 msgid "Yes"
+msgstr ""
+
+#: src/features/schedule/day-agenda.tsx:315
+msgid "You are hosting this session"
+msgstr ""
+
+#: src/features/schedule/day-agenda.tsx:323
+msgid "You have RSVP'd to this session"
+msgstr ""
+
+#: src/features/schedule/clashes.ts:78
+msgid "your 1-on-1 with {otherName}"
 msgstr ""
 
 #: src/app/user-menu.tsx:56

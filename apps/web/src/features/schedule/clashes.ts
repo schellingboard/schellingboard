@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import type { Session } from "@schellingboard/domain/session";
 import { sessionsOverlap } from "@schellingboard/domain/session-overlap";
 import type { MeetingView } from "./meeting-view";
@@ -73,11 +74,15 @@ export function describeClash(
   currentUser: string | null
 ): string {
   if (clash.kind === "meeting") {
-    return `your 1-on-1 with ${clash.meeting.otherName}`;
+    const { otherName } = clash.meeting;
+    return t`your 1-on-1 with ${otherName}`;
   }
   const { session } = clash;
   const hosting = session.hosts.some((h) => h.id === currentUser);
-  return `"${session.title}", which you are ${hosting ? "hosting" : "attending"}`;
+  const { title } = session;
+  return hosting
+    ? t`"${title}", which you are hosting`
+    : t`"${title}", which you are attending`;
 }
 
 export function clashMessage(
@@ -85,5 +90,5 @@ export function clashMessage(
   currentUser: string | null
 ): string {
   const list = clashes.map((c) => describeClash(c, currentUser)).join("; ");
-  return `This session clashes with ${list}. Do you want to RSVP anyway?`;
+  return t`This session clashes with ${list}. Do you want to RSVP anyway?`;
 }

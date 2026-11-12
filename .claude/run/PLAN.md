@@ -79,8 +79,8 @@ the E2E specs a step touches; the user runs the full suite at the end.
     offer, sync indicator, user menu; `theme.tsx`, `time-format.tsx` and `people-pages.tsx` are
     translated but off the allowlist until 28n: technical constants trip the rule). 28c. DONE Settings,
     notifications, events (`push-notifications.tsx` stays off the allowlist). 28b also dropped
-    `router.tsx`, `spa-links`, `panel links` (no UI text). 28d. Schedule grid, agenda, toolbar, filters, kiosk,
-    pull-to-refresh (~150 in 20 files). 28e. Session panel, session block, meetings column, 1-on-1
+    `router.tsx`, `spa-links`, `panel links` (no UI text). 28d. DONE Schedule grid, agenda, toolbar, filters, kiosk, pull-to-refresh, clashes
+    (`session-block`, `session-panel`, `meetings-col`, `meeting-rules.ts` `statusLine` go to 28e). 28e. Session panel, session block, meetings column, 1-on-1
     dialogs (`features/meetings`, `people/meeting-request-dialog`, `open-up-nudge`) (~150). 28f.
     Proposals (10 files, 174). 28g. Comments (69), people and profile (~137). 28h. Sign-in and
     account (`features/sign-in` 114, `app/account-pages` 17). 28i. Admin frame and pages
