@@ -168,4 +168,4 @@
 
 ## Next step
 
-Step 23c (agenda, `fixes #831`) waits for an owner decision; otherwise 25 (#1328b).
+Step 23c (docs-only, `fixes #831`), then wait for the coordinator.

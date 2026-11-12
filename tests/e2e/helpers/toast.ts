@@ -1,7 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
 
 export function toast(page: Page): Locator {
-  return page.getByRole("status");
+  return page.getByRole("status").filter({ hasText: /\S/ });
 }
 
 // A toast sits over the bottom of the page for seconds — clear it before a

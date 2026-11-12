@@ -8,6 +8,7 @@ import {
   type AttendeesQuery,
   type AttendeesState,
 } from "../../queries/attendees";
+import { CopyLinkButton } from "../../ui/copy-link-button";
 import { SidePanel } from "../../ui/side-panel";
 import {
   AcademicCapIcon,
@@ -311,6 +312,7 @@ function Details({ session }: { session: Session }) {
           .
         </p>
       )}
+      <CopyLinkButton />
       <SessionComments sessionId={session.id} />
     </div>
   );

@@ -280,6 +280,12 @@ export const features = {
         actor: "attendee",
         priority: "P2",
       },
+      US16: {
+        title:
+          "Attendee copies the link to a session, proposal, profile or 1-on-1",
+        actor: "attendee",
+        priority: "P3",
+      },
     },
   },
   "008": {

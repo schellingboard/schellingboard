@@ -21,6 +21,7 @@ import type {
 } from "../../queries/profile-activity";
 import { Comments, type CommentsHandle } from "../comments/comments-section";
 import { ChevronLeftIcon, ChevronRightIcon } from "../../ui/icons";
+import { CopyLinkButton } from "../../ui/copy-link-button";
 import { SidePanel } from "../../ui/side-panel";
 import type { DirectoryCard } from "./directory-model";
 import type { DirectoryState } from "../../queries/directory";
@@ -333,16 +334,19 @@ export function ProfilePanel(props: ProfilePanelProps) {
                       meetingRequests={props.meetingRequests}
                       comments={
                         current && (
-                          <Comments
-                            open={openComments}
-                            viewerId={viewerId}
-                            timezone="UTC"
-                            guestHref={links.guest}
-                            commentHref={(id) =>
-                              `${links.guest(guestId)}#comment-${id}`
-                            }
-                            setHash={setHash}
-                          />
+                          <>
+                            <CopyLinkButton />
+                            <Comments
+                              open={openComments}
+                              viewerId={viewerId}
+                              timezone="UTC"
+                              guestHref={links.guest}
+                              commentHref={(id) =>
+                                `${links.guest(guestId)}#comment-${id}`
+                              }
+                              setHash={setHash}
+                            />
+                          </>
                         )
                       }
                     />

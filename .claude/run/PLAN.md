@@ -65,13 +65,8 @@ the E2E specs a step touches; the user runs the full suite at the end.
     PROGRESS.md, no code. Footer `fixes #831`. 23d. DONE **#831d** Admin events, locations and stats
     tables on `Pager`.
 24. DONE **#1328a** (Medium) i18n foundation: Lingui, `apps/web/src/i18n/`, `en` catalog, scripts
-    and Makefile targets, `<html lang>`. Issue step 1. 24a. **Copy link button** (owner decision on
-    the installed-app gap after 22b): a text button "Copy link" at the end of the panel content,
-    before the comments, in the session, proposal and profile panels (and 1-on-1 if it has comments
-    or a similar end). Copies the panel's URL, short confirmation (toast or button label), legible
-    text, no icon-only. One shared component in `SidePanel`'s content area. E2E not needed unless
-    one exists for copy; unit test. Amend the ADR 0020 reversal note from 22b: the header button
-    stays gone, the link moves to the content end. No issue needed.
+    and Makefile targets, `<html lang>`. Issue step 1. 24a. DONE Text "Copy link" button at the end
+    of the session, proposal, profile and 1-on-1 panels (ADR 0020 note amended).
 25. DONE **#1328b** Locale storage: `guests.locale`, `PUT /me/locale`, switcher hidden while one
     locale exists.
 26. **#1328c** Locale-aware formatting, builds on #607. Issue step 3.

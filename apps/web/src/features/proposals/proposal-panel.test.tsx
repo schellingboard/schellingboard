@@ -224,7 +224,7 @@ describe("voting in the modal", () => {
       expect(button.getAttribute("aria-disabled")).toBe("true");
       await userEvent.click(button);
 
-      expect(screen.getByRole("status").textContent).toBe(
+      expect(screen.getAllByRole("status").map((s) => s.textContent)).toContain(
         "Select a user first" + "Dismiss"
       );
     }
@@ -382,9 +382,9 @@ describe("taking on a proposal that wants a host", () => {
     await userEvent.click(join);
 
     expect(actions.join).not.toHaveBeenCalled();
-    expect(screen.getByRole("status").textContent).toContain(
-      "Select a user first"
-    );
+    expect(
+      screen.getAllByRole("status").map((s) => s.textContent?.trim())
+    ).toContain("Select a user first" + "Dismiss");
   });
 
   it(

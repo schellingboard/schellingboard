@@ -20,6 +20,7 @@ import {
   ownVotesFrom,
   toEvent,
 } from "../../replica/selectors";
+import { CopyLinkButton } from "../../ui/copy-link-button";
 import { SidePanel } from "../../ui/side-panel";
 import { CalendarIcon, HandRaisedIcon, PencilIcon } from "../../ui/icons";
 import { Unavailable } from "../../ui/unavailable";
@@ -254,6 +255,7 @@ function Details({
         <Scheduled sessions={sessions} links={links} timezone={timezone} />
       )}
 
+      <CopyLinkButton />
       <Comments
         open={openComments}
         viewerId={guestId}
