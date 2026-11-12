@@ -61,7 +61,8 @@ in {
     };
 
     environmentFile = lib.mkOption {
-      type = lib.types.nullOr lib.types.path;
+      # Not types.path: a path literal would copy the secrets into the store.
+      type = lib.types.nullOr lib.types.str;
       default = null;
       example = "/run/secrets/schellingboard";
       description = ''

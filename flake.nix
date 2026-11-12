@@ -15,7 +15,12 @@
     linux = ["x86_64-linux" "aarch64-linux"];
     forSystems = systems: f: lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
     # The commit, for the footer's version, as scripts/app-version.js gives it.
-    appVersion = lib.substring 0 8 (self.rev or self.dirtyRev or "dev");
+    appVersion =
+      if self ? rev
+      then lib.substring 0 8 self.rev
+      else if self ? dirtyRev
+      then "${lib.substring 0 8 self.dirtyRev}-dirty"
+      else "dev";
   in {
     packages = forSystems linux (pkgs: {
       default = self.packages.${pkgs.stdenv.hostPlatform.system}.schellingboard;

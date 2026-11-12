@@ -1,13 +1,16 @@
 name: Nix
 
 # Builds SchellingBoard with Nix and boots it in a NixOS VM with the module on.
-# bun.lock is an input of the build, so a dependency bump runs this too.
+# bun.lock is an input of the build, so a dependency bump runs this too, and
+# package.nix copies what the Dockerfile copies, so a change there runs it.
 on:
   pull_request:
     paths:
       - "*.nix"
       - "flake.lock"
       - "bun.lock"
+      - "Dockerfile"
+      - "scripts/build-server.ts"
       - ".github/workflows/nix.yml"
   push:
     branches:
@@ -16,6 +19,8 @@ on:
       - "*.nix"
       - "flake.lock"
       - "bun.lock"
+      - "Dockerfile"
+      - "scripts/build-server.ts"
       - ".github/workflows/nix.yml"
 
 permissions:

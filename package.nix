@@ -28,14 +28,20 @@
     else part)
   (builtins.split ",([[:space:]]*[]}])" lockText));
 
-  # The release the changelog last names, e.g. "5.0.0".
-  version = let
-    release = builtins.match "## [[]([0-9]+[.][0-9]+[.][0-9]+)[]].*";
-    found = lib.findFirst (line: release line != null) null (lib.splitString "\n" (builtins.readFile ./CHANGELOG.md));
+  # The changelog's headings, newest first, e.g. ["Unreleased" "5.0.0" ...].
+  headings = lib.concatMap (line: let
+    m = builtins.match "## [[]([^]]+)[]].*" line;
   in
-    if found == null
-    then "0.0.0"
-    else builtins.head (release found);
+    lib.optionals (m != null) m) (lib.splitString "\n" (builtins.readFile ./CHANGELOG.md));
+  isRelease = heading: builtins.match "[0-9]+[.][0-9]+[.][0-9]+" heading != null;
+  version = lib.findFirst isRelease "0.0.0" headings;
+
+  # Only a release commit has no Unreleased heading. It shows the tag, as the
+  # Docker image does; the admin's update notice only understands a tag.
+  footerVersion =
+    if headings != [] && isRelease (builtins.head headings)
+    then "v${version}"
+    else appVersion;
 
   # npm's names for this platform; bun.lock tags platform packages with them.
   os = stdenv.hostPlatform.parsed.kernel.name;
@@ -149,14 +155,25 @@ in
 
     src = lib.fileset.toSource {
       root = ./.;
-      fileset = lib.fileset.difference ./. (lib.fileset.unions [
-        (lib.fileset.maybeMissing ./node_modules)
-        (lib.fileset.maybeMissing ./dist)
-        (lib.fileset.maybeMissing ./apps/web/dist)
-        (lib.fileset.maybeMissing ./.git)
-        (lib.fileset.fileFilter (f: f.hasExt "nix") ./.)
-        ./flake.lock
-      ]);
+      # What .dockerignore leaves out, so local databases, env files and the
+      # .jj store of a checkout without .git neither rebuild it nor reach the
+      # store.
+      fileset = lib.fileset.difference ./. (lib.fileset.unions ([
+          (lib.fileset.maybeMissing ./node_modules)
+          (lib.fileset.maybeMissing ./dist)
+          (lib.fileset.maybeMissing ./apps/web/dist)
+          (lib.fileset.maybeMissing ./apps/web/node_modules)
+          (lib.fileset.maybeMissing ./.git)
+          (lib.fileset.maybeMissing ./.jj)
+          (lib.fileset.maybeMissing ./.flake-hunt)
+          (lib.fileset.maybeMissing ./.e2e-docker)
+          (lib.fileset.maybeMissing ./coverage)
+          (lib.fileset.maybeMissing ./site)
+          ./flake.lock
+        ]
+        ++ map (name: ./. + "/${name}") (lib.filter (name:
+          builtins.match "[.]env.*[.]local|[.]env[.]test|.*[.]nix|.*[.]db(-shm|-wal|-journal)?" name != null)
+        (builtins.attrNames (builtins.readDir ./.)))));
     };
 
     nativeBuildInputs = [bun nodejs node-gyp python3 pkg-config makeWrapper autoPatchelfHook];
@@ -181,7 +198,7 @@ in
 
     buildPhase = ''
       runHook preBuild
-      export APP_VERSION=${lib.escapeShellArg appVersion}
+      export APP_VERSION=${lib.escapeShellArg footerVersion}
       node node_modules/vite/bin/vite.js build apps/web
       bun scripts/build-server.ts
 
