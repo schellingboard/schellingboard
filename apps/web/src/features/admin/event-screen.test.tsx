@@ -219,6 +219,14 @@ describe("the event details form", { tags: ["015-US2"] }, () => {
     expect(calls[1].body).toMatchObject({ icon: null });
   });
 
+  it("draws every icon option next to its name", () => {
+    setup();
+    const options = screen.getAllByRole("radio");
+    const icons = options.filter((o) => o.querySelector("svg"));
+    expect(icons).toHaveLength(options.length - 1);
+    expect(screen.getByRole("radio", { name: "Rocket Launch" })).toBeTruthy();
+  });
+
   it("shows the server's reason next to the name", async () => {
     const user = userEvent.setup();
     const message = 'An event with the URL "Con" already exists';
