@@ -7,8 +7,8 @@ import {
   formatDayLabel,
   formatOptionalTime,
   formatSlotLabel,
-  TIME_FORMAT,
 } from "@schellingboard/domain/time";
+import { useTimeFormat } from "../../app/time-format";
 import { cx } from "../../ui/cx";
 import {
   AcademicCapIcon,
@@ -57,6 +57,7 @@ export function DayAgenda({
 }) {
   const { data, timezone, slotIncrement, breakMinutes } = useSchedule();
   const { now } = data;
+  const timeFormat = useTimeFormat();
   const groups = useMemo(
     () =>
       agendaGroups({
@@ -67,9 +68,18 @@ export function DayAgenda({
         breakMinutes,
       }).map((group) => ({
         ...group,
-        label: formatSlotLabel(group.start, day.start, timezone),
+        label: formatSlotLabel(group.start, day.start, timezone, timeFormat),
       })),
-    [day, sessions, meetings, moments, locations, breakMinutes, timezone]
+    [
+      day,
+      sessions,
+      meetings,
+      moments,
+      locations,
+      breakMinutes,
+      timezone,
+      timeFormat,
+    ]
   );
   // Same condition as the grid's now line, so "Now" in the toolbar always has
   // something to jump to when it is offered.
@@ -85,7 +95,7 @@ export function DayAgenda({
       className="mx-auto w-full max-w-3xl px-2"
     >
       <h2 id={headingId} className="pb-1 pt-4 text-lg font-bold">
-        {formatDayLabel(day, timezone)}
+        {formatDayLabel(day, timezone, timeFormat)}
       </h2>
       {groups.length === 0 && (
         <p className="text-sm italic text-fg-subtle">
@@ -140,13 +150,14 @@ export function DayAgenda({
 // The agenda's counterpart of the grid's red now line; carries the same test
 // id so the toolbar's "Now" scrolls to it unchanged.
 function NowMarker({ now, timezone }: { now: Date; timezone: string }) {
+  const timeFormat = useTimeFormat();
   return (
     <div
       data-testid="now-line"
       className="flex items-center gap-2 py-1 text-xs font-semibold text-danger-fg"
     >
       <span aria-hidden className="h-0.5 flex-1 bg-danger" />
-      Now · {formatOptionalTime(now, timezone, TIME_FORMAT)}
+      Now · {formatOptionalTime(now, timezone, timeFormat)}
       <span aria-hidden className="h-0.5 flex-1 bg-danger" />
     </div>
   );
@@ -235,8 +246,9 @@ function SessionRow({
   timezone: string;
 }) {
   const { data, links, openSession } = useSchedule();
+  const timeFormat = useTimeFormat();
   const state = timeState(start, session.endTime ?? start, data.now);
-  const until = `until ${formatOptionalTime(session.endTime, timezone, TIME_FORMAT)}`;
+  const until = `until ${formatOptionalTime(session.endTime, timezone, timeFormat)}`;
   const inRooms = locations.filter((loc) =>
     session.locations.some((l) => l.id === loc.id)
   );
@@ -325,7 +337,8 @@ function MomentRow({
   timezone: string;
 }) {
   const { data } = useSchedule();
-  const time = (at: Date) => formatOptionalTime(at, timezone, TIME_FORMAT);
+  const timeFormat = useTimeFormat();
+  const time = (at: Date) => formatOptionalTime(at, timezone, timeFormat);
   return (
     <AgendaRow
       state={timeState(moment.start, moment.end, data.now)}
@@ -356,6 +369,7 @@ function MeetingRow({
   timezone: string;
 }) {
   const { data, links, breakMinutes } = useSchedule();
+  const timeFormat = useTimeFormat();
   const start = shownSlotStart(new Date(meeting.slotStart), breakMinutes);
   const end = new Date(meeting.slotEnd);
   return (
@@ -366,7 +380,7 @@ function MeetingRow({
       }
       href={links.meeting(meeting.id)}
       title={`1-on-1 with ${meeting.otherName}`}
-      details={`${meeting.meetingPoint} · until ${formatOptionalTime(end, timezone, TIME_FORMAT)} · ${statusLine(meeting)}`}
+      details={`${meeting.meetingPoint} · until ${formatOptionalTime(end, timezone, timeFormat)} · ${statusLine(meeting)}`}
       trailing={
         meeting.status === "accepted" && (
           <CheckCircleIcon

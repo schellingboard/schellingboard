@@ -9,6 +9,7 @@
 // a coarser grid would re-read a declared half-hour as a full hour.
 
 import { DateTime } from "luxon";
+import { TIME_FORMAT } from "./time";
 
 export type MeetingSlot = { start: Date; end: Date };
 
@@ -49,10 +50,11 @@ export function shownSlotStart(slotStart: Date, breakMinutes: number): Date {
 export function slotTimeLabel(
   slot: MeetingSlot,
   breakMinutes: number,
-  timezone: string
+  timezone: string,
+  format = TIME_FORMAT
 ): string {
   const clock = (date: Date) =>
-    DateTime.fromJSDate(date).setZone(timezone).toFormat("HH:mm");
+    DateTime.fromJSDate(date).setZone(timezone).toFormat(format);
   return `${clock(shownSlotStart(slot.start, breakMinutes))} – ${clock(slot.end)}`;
 }
 

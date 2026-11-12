@@ -63,6 +63,18 @@
 - ESLint 10 (#380): `tseslint.config` is deprecated in favour of `defineConfig` (eslint.config.mjs);
   the Dockerfile runs on node 25 (odd-numbered, not an LTS line).
 
+- #607: not converted (stay 24-hour): server-built 1-on-1 slot labels (availability form,
+  candidates), admin screens, `commands/subject.ts` toasts, `scheduling-notice.ts`, and the profile
+  arrival/departure. Grid axis in 12-hour shows "9 AM" on the hour, "9:30" otherwise. Playwright is
+  pinned to `en-GB`. `theme.spec.ts:44` (theme-color meta strict-mode, 3 elements) failed in my
+  runs; it concerns no code I touched, baseline not verified. `make test` failed only on mailpit
+  (mailer tests, port 8025 down).
+
+- Questions: `theme.spec.ts:44` fails because `SiteLoginPage` (account-pages.tsx) nests a second
+  `ThemeProvider` inside `ShellProviders` (router.tsx), giving 3 theme-color meta tags. Separate
+  fix.
+- #607 TDD: the formatter and setting tests were written after the code (no red run).
+
 ## Next step
 
-Step 20 (#607).
+Step 21 (#993).

@@ -39,6 +39,7 @@ import { PullToRefresh } from "./pull-to-refresh";
 import { useScrollRestoration } from "../../ui/use-scroll-restoration";
 import { useSearchParamText } from "../../ui/use-search-param-text";
 import { useDragToPan } from "./use-drag-to-pan";
+import { useTimeFormat } from "../../app/time-format";
 import { schedulingNotice } from "./scheduling-notice";
 import { dayOfSession, useRevealSession } from "./reveal-session";
 import { useStatusHeight } from "./use-status-height";
@@ -90,10 +91,11 @@ export function ScheduleScreen({
   /** What else is on during the viewer's 1-on-1s, by meeting id. */
   clashes: MeetingClashes;
 }) {
+  const timeFormat = useTimeFormat();
   const data = useMemo(() => {
-    const base = scheduleDataFrom(snapshot, now);
+    const base = scheduleDataFrom(snapshot, now, timeFormat);
     return { ...base, meetings: withClashes(base.meetings, clashes) };
-  }, [snapshot, now, clashes]);
+  }, [snapshot, now, clashes, timeFormat]);
   const view = scheduleView(params);
   const scrollerRef = useRef<HTMLDivElement>(null);
   useDragToPan(scrollerRef, view === "grid");

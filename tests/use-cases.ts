@@ -528,6 +528,11 @@ export const features = {
         actor: "organizer",
         priority: "P3",
       },
+      US7: {
+        title: "Attendee reads times in 12-hour or 24-hour format",
+        actor: "attendee",
+        priority: "P3",
+      },
     },
   },
   "015": {

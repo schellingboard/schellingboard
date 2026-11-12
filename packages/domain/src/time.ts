@@ -1,9 +1,12 @@
 import { DateTime } from "luxon";
 import type { Event, Day } from "./event";
 
-// Changing this to am/pm needs a wider time column in the schedule grid (see
-// https://github.com/schellingboard/schellingboard-legacy/pull/402/changes).
 export const TIME_FORMAT = "HH:mm";
+
+export type ClockStyle = "12h" | "24h";
+
+export const clockFormat = (style: ClockStyle) =>
+  style === "12h" ? "h:mm a" : TIME_FORMAT;
 
 export const DATETIME_FORMAT = `${TIME_FORMAT} - dd MMM`;
 
@@ -49,7 +52,11 @@ export const convertParamDateTime = (
  * (until 03:00 Sat)". Without that suffix nothing tells a host which of two
  * adjacent days owns 01:00.
  */
-export function formatDayLabel(day: Day, timezone: string): string {
+export function formatDayLabel(
+  day: Day,
+  timezone: string,
+  format = TIME_FORMAT
+): string {
   const start = DateTime.fromJSDate(day.start).setZone(timezone);
   const end = DateTime.fromJSDate(day.end).setZone(timezone);
   const label = start.toFormat("EEEE, MMMM d");
@@ -57,7 +64,7 @@ export function formatDayLabel(day: Day, timezone: string): string {
   // exactly 00:00 has no hours on the next date to explain.
   const spillsOver = end > start.startOf("day").plus({ days: 1 });
   return spillsOver
-    ? `${label} (until ${end.toFormat(TIME_FORMAT)} ${end.toFormat("EEE")})`
+    ? `${label} (until ${end.toFormat(format)} ${end.toFormat("EEE")})`
     : label;
 }
 
@@ -69,11 +76,12 @@ export function formatDayLabel(day: Day, timezone: string): string {
 export function formatSlotLabel(
   slot: Date,
   dayStart: Date,
-  timezone: string
+  timezone: string,
+  format = TIME_FORMAT
 ): string {
   const dt = DateTime.fromJSDate(slot).setZone(timezone);
   const start = DateTime.fromJSDate(dayStart).setZone(timezone);
-  const time = dt.toFormat(TIME_FORMAT);
+  const time = dt.toFormat(format);
   return dt.hasSame(start, "day") ? time : `${dt.toFormat("EEE")} ${time}`;
 }
 

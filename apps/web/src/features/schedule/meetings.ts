@@ -9,7 +9,11 @@ import type { MeetingView } from "./meeting-view";
  * Clashes rest on other guests' RSVPs, which the replica never holds
  * (ADR 0014 section 4); `withClashes` adds what the server says.
  */
-export function meetingViewsFrom(snapshot: Snapshot, now: Date): MeetingView[] {
+export function meetingViewsFrom(
+  snapshot: Snapshot,
+  now: Date,
+  timeFormat?: string
+): MeetingView[] {
   const me = snapshot.me;
   if (!me) return [];
   const { timezone, breakMinutes } = snapshot.event;
@@ -36,7 +40,8 @@ export function meetingViewsFrom(snapshot: Snapshot, now: Date): MeetingView[] {
         timeLabel: slotTimeLabel(
           { start, end: new Date(meeting.slotEnd) },
           breakMinutes,
-          timezone
+          timezone,
+          timeFormat
         ),
         meetingPoint: meeting.meetingPoint,
         message: meeting.message,

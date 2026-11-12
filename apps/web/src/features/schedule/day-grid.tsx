@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import type { Location } from "@schellingboard/domain/location";
 import { getNumSlots } from "@schellingboard/domain/slots";
-import { TIME_FORMAT } from "@schellingboard/domain/time";
+import { useClockStyle } from "../../app/time-format";
 import { InformationCircleIcon } from "../../ui/icons";
 import { Tooltip } from "../../ui/tooltip";
 import { cx } from "../../ui/cx";
@@ -35,6 +35,9 @@ export function DayGrid({
   const numSlots = getNumSlots(day.start, day.end, slotIncrement);
   const firstImageIndex = locations.findIndex((loc) => loc.imageUrl);
   const date = DateTime.fromJSDate(day.start).setZone(timezone);
+  const clockStyle = useClockStyle();
+  const axisFormat = (at: DateTime) =>
+    clockStyle === "24h" ? "HH:mm" : at.minute === 0 ? "h a" : "h:mm";
   // Null on any day that isn't today. `now` is the server's clock, the dev
   // fake clock included.
   const nowOffsetPx = getNowOffsetPx(day, data.now, slotIncrement);
@@ -139,11 +142,12 @@ export function DayGrid({
             key={i}
             className="h-[44px] border-b border-line-subtle p-1 text-[10px]"
           >
-            {DateTime.fromMillis(
-              day.start.getTime() + i * slotIncrement * 60 * 1000
-            )
-              .setZone(timezone)
-              .toFormat(TIME_FORMAT)}
+            {(() => {
+              const at = DateTime.fromMillis(
+                day.start.getTime() + i * slotIncrement * 60 * 1000
+              ).setZone(timezone);
+              return at.toFormat(axisFormat(at));
+            })()}
           </div>
         ))}
         {nowOffsetPx !== null && <NowLine offsetPx={nowOffsetPx} anchor />}
