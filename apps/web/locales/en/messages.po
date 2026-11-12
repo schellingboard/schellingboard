@@ -156,11 +156,11 @@ msgstr "All"
 msgid "All rooms"
 msgstr "All rooms"
 
-#: src/app/theme.tsx:82
+#: src/app/theme.tsx:95
 msgid "Always use dark colours"
 msgstr "Always use dark colours"
 
-#: src/app/theme.tsx:77
+#: src/app/theme.tsx:90
 msgid "Always use light colours"
 msgstr "Always use light colours"
 
@@ -275,7 +275,7 @@ msgstr "Close"
 msgid "Close menu"
 msgstr "Close menu"
 
-#: src/app/theme.tsx:91
+#: src/app/theme.tsx:104
 msgid "Colour theme"
 msgstr "Colour theme"
 
@@ -335,7 +335,7 @@ msgstr "Could not turn notifications off for this device."
 msgid "Could not turn notifications on for this device."
 msgstr "Could not turn notifications on for this device."
 
-#: src/app/theme.tsx:81
+#: src/app/theme.tsx:94
 msgctxt "Colour theme"
 msgid "Dark"
 msgstr "Dark"
@@ -456,7 +456,7 @@ msgstr "First page"
 msgid "Follow your browser's language"
 msgstr "Follow your browser's language"
 
-#: src/app/theme.tsx:72
+#: src/app/theme.tsx:85
 msgid "Follow your device's light/dark setting"
 msgstr "Follow your device's light/dark setting"
 
@@ -530,7 +530,7 @@ msgstr "Last"
 msgid "Last page"
 msgstr "Last page"
 
-#: src/app/theme.tsx:76
+#: src/app/theme.tsx:89
 msgctxt "Colour theme"
 msgid "Light"
 msgstr "Light"
@@ -962,7 +962,7 @@ msgstr "Starts {0}."
 msgid "Step through matches"
 msgstr "Step through matches"
 
-#: src/app/theme.tsx:71
+#: src/app/theme.tsx:84
 msgctxt "Colour theme"
 msgid "System"
 msgstr "System"

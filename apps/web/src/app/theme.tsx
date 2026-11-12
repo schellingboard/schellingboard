@@ -1,6 +1,12 @@
 import { i18n, type MessageDescriptor } from "@lingui/core";
 import { msg, t } from "@lingui/core/macro";
-import { createContext, type ReactNode, useContext, useState } from "react";
+import {
+  createContext,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 import { Tooltip } from "../ui/tooltip";
 
@@ -46,16 +52,23 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     document.cookie = `${THEME_COOKIE}=${next}; path=/; max-age=${THEME_COOKIE_MAX_AGE}; samesite=lax`;
   };
 
+  useEffect(() => {
+    // Rendered <meta> tags are hoisted by React, and Firefox keeps the stale
+    // ones after a switch; replacing them by hand leaves exactly the current set.
+    document
+      .querySelectorAll('meta[name="theme-color"]')
+      .forEach((meta) => meta.remove());
+    for (const { media, color } of themeColors(theme)) {
+      const meta = document.createElement("meta");
+      meta.name = "theme-color";
+      if (media) meta.media = media;
+      meta.content = color;
+      document.head.append(meta);
+    }
+  }, [theme]);
+
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
-      {themeColors(theme).map(({ media, color }) => (
-        <meta
-          key={media ?? color}
-          name="theme-color"
-          media={media}
-          content={color}
-        />
-      ))}
       {children}
     </ThemeContext.Provider>
   );
