@@ -1,3 +1,6 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
+
 import { Button } from "../../ui/button";
 import { TextField } from "../../ui/form";
 import type { Notice } from "../../ui/notices";
@@ -22,23 +25,28 @@ export function MeetingLengthChips({
 }) {
   if (lengths.length < 2) return null;
   return (
-    <div role="group" aria-label="Length" className="flex flex-col gap-1">
-      <span className="text-sm font-medium text-fg-muted">Length</span>
+    <div role="group" aria-label={t`Length`} className="flex flex-col gap-1">
+      <span className="text-sm font-medium text-fg-muted">
+        <Trans>Length</Trans>
+      </span>
       <ul className="flex flex-wrap gap-2">
-        {lengths.map((length) => (
-          <li key={length.slotCount}>
-            <button
-              type="button"
-              aria-pressed={slotCount === length.slotCount}
-              onClick={() => onSlotCount(length.slotCount)}
-              className={`rounded-full border px-3 py-1 text-sm tabular-nums transition-colors ${
-                slotCount === length.slotCount ? CHIP_ON : CHIP_OFF
-              }`}
-            >
-              {length.minutes} min
-            </button>
-          </li>
-        ))}
+        {lengths.map((length) => {
+          const { minutes } = length;
+          return (
+            <li key={length.slotCount}>
+              <button
+                type="button"
+                aria-pressed={slotCount === length.slotCount}
+                onClick={() => onSlotCount(length.slotCount)}
+                className={`rounded-full border px-3 py-1 text-sm tabular-nums transition-colors ${
+                  slotCount === length.slotCount ? CHIP_ON : CHIP_OFF
+                }`}
+              >
+                <Trans>{minutes} min</Trans>
+              </button>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
@@ -58,7 +66,7 @@ export function MeetingRequestFields({
   isSending,
   submitDisabled,
   onCancel,
-  cancelLabel = "Cancel",
+  cancelLabel,
   errors = {},
 }: {
   meetingPoints: MeetingPointChoice[];
@@ -76,7 +84,9 @@ export function MeetingRequestFields({
   return (
     <>
       <div className="flex flex-col gap-1">
-        <span className="text-sm font-medium text-fg-muted">Where to meet</span>
+        <span className="text-sm font-medium text-fg-muted">
+          <Trans>Where to meet</Trans>
+        </span>
         {meetingPoints.length > 0 && (
           <ul className="mb-1 flex flex-wrap gap-2">
             {meetingPoints.map((point) => (
@@ -112,25 +122,27 @@ export function MeetingRequestFields({
           </div>
         )}
         <TextField
-          label="Where to meet"
+          label={t`Where to meet`}
           hideLabel
           name="meetingPoint"
           value={meetingPoint}
           onChange={onMeetingPoint}
-          placeholder="or type somewhere else"
+          placeholder={t`or type somewhere else`}
           error={errors.meetingPoint}
         />
         <p className="text-xs text-fg-subtle">
-          Nothing is reserved — this is just where to find each other.
+          <Trans>
+            Nothing is reserved — this is just where to find each other.
+          </Trans>
         </p>
       </div>
 
       <TextField
-        label="Add a line of context (optional)"
+        label={t`Add a line of context (optional)`}
         name="message"
         value={message}
         onChange={onMessage}
-        placeholder="Would love to talk about…"
+        placeholder={t`Would love to talk about…`}
         error={errors.message}
       />
 
@@ -139,39 +151,69 @@ export function MeetingRequestFields({
           type="submit"
           disabled={isSending || submitDisabled || !meetingPoint.trim()}
         >
-          {isSending ? "Sending..." : "Send request"}
+          {isSending ? t`Sending...` : t`Send request`}
         </Button>
         <Button type="button" variant="quiet" onClick={onCancel}>
-          {cancelLabel}
+          {cancelLabel ?? t`Cancel`}
         </Button>
       </div>
     </>
   );
 }
 
+/** What a request is about: a slot with a person, or an ask to open up. */
+export type RequestSubject =
+  | { kind: "slot"; name: string; slotLabel: string; dayLabel: string }
+  | { kind: "person"; name: string }
+  | { kind: "openUp"; name: string };
+
 /** The toast after a request is sent: "Asked Al for 09:10 – 09:40 on Sat 9 May." */
-export const requestSentNotice = (what: string): Notice => ({
+export const requestSentNotice = (
+  name: string,
+  slotLabel: string,
+  dayLabel: string
+): Notice => ({
   tone: "info",
-  message: `Asked ${what}. You'll hear when they answer.`,
+  message: t`Asked ${name} for ${slotLabel} on ${dayLabel}. You'll hear when they answer.`,
   autoDismissMs: 10_000,
 });
 
+function failureText(
+  subject: RequestSubject,
+  error: string,
+  unreachable: boolean
+): string {
+  const { name } = subject;
+  if (subject.kind === "openUp") {
+    return unreachable
+      ? t`Your request to ask ${name} to open up to 1-on-1s: ${error}`
+      : t`Could not ask ${name} to open up to 1-on-1s. ${error}`;
+  }
+  if (subject.kind === "person") {
+    return unreachable
+      ? t`Your request to ask ${name}: ${error}`
+      : t`Could not ask ${name}. ${error}`;
+  }
+  const { slotLabel, dayLabel } = subject;
+  return unreachable
+    ? t`Your request to ask ${name} for ${slotLabel} on ${dayLabel}: ${error}`
+    : t`Could not ask ${name} for ${slotLabel} on ${dayLabel}. ${error}`;
+}
+
 /** Names who and when; an unreachable answer must not claim it failed. */
 export function MeetingRequestError({
-  what,
+  subject,
   error,
   unreachable,
 }: {
-  what: string;
+  subject: RequestSubject;
   error: string | null;
   unreachable: boolean;
 }) {
   if (!error) return null;
   return (
     <p role="alert" className="text-sm text-danger-fg">
-      {unreachable
-        ? `Your request to ask ${what}: ${error}`
-        : `Could not ask ${what}. ${error}`}
+      {failureText(subject, error, unreachable)}
     </p>
   );
 }
@@ -179,9 +221,10 @@ export function MeetingRequestError({
 /** A clash is raised, never enforced: the pair decide for themselves. */
 export function MeetingClashNotice({ lines }: { lines: string[] }) {
   if (lines.length === 0) return null;
+  const joined = lines.join("; ");
   return (
     <p className="rounded-md bg-warning-tint p-3 text-sm text-fg">
-      {lines.join("; ")} during this time — book it anyway?
+      <Trans>{joined} during this time — book it anyway?</Trans>
     </p>
   );
 }

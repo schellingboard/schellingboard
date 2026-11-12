@@ -1,3 +1,5 @@
+import { plural, select, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { clashLines } from "@schellingboard/domain/meeting-clash-text";
 import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
 import { getNumSlots } from "@schellingboard/domain/slots";
@@ -20,9 +22,11 @@ import { SLOT_HEIGHT_PX } from "./grid-layout";
 import { meetingColumnRows } from "./meeting-column";
 import {
   blockStatus,
+  blockStatusKey,
   blockTimeLabel,
   meetingTitle,
   needsReply,
+  slotSummary,
   slotSummaryLine,
   statusLine,
 } from "./meeting-rules";
@@ -35,13 +39,43 @@ import {
   TITLE_MIN_PX,
 } from "./positioned-block";
 
-const NO_MATCH = " — doesn't match";
+const meetingCount = (count: number) =>
+  plural(count, { one: "# 1-on-1", other: "# 1-on-1s" });
 
 // Pending reads as unfinished business, not a plan.
 const stateClasses = (status: MeetingViewStatus) =>
   status === "accepted"
     ? "bg-brand-tint border-brand-accent"
     : "bg-surface-muted border-dashed border-line";
+
+const GHOST = "ghost";
+const MATCHING = "match";
+
+/** The accessible name of a 1-on-1 block; the grid is narrow, so it carries what the block cannot. */
+function meetingLabel(
+  meeting: MeetingView,
+  time: string,
+  ghost: boolean,
+  withPoint: boolean
+): string {
+  const { otherName, meetingPoint } = meeting;
+  const status = blockStatusKey(meeting);
+  const match = ghost ? GHOST : MATCHING;
+  return withPoint
+    ? t`1-on-1 with ${otherName} at ${time} · ${meetingPoint} — ${select(status, { needsReply: "needs your reply", waiting: "waiting for reply", confirmed: "confirmed", declined: "declined", canceled: "canceled", unanswered: "unanswered", other: "" })}${select(match, { ghost: " — doesn't match", other: "" })}`
+    : t`1-on-1 with ${otherName} at ${time} — ${select(status, { needsReply: "needs your reply", waiting: "waiting for reply", confirmed: "confirmed", declined: "declined", canceled: "canceled", unanswered: "unanswered", other: "" })}${select(match, { ghost: " — doesn't match", other: "" })}`;
+}
+
+function slotLabelText(
+  meetings: MeetingView[],
+  time: string,
+  ghost: boolean
+): string {
+  const count = meetings.length;
+  const { kind, count: waiting } = slotSummary(meetings);
+  const match = ghost ? GHOST : MATCHING;
+  return t`${plural(count, { one: "# 1-on-1", other: "# 1-on-1s" })}, ${time} — ${select(kind, { yours: plural(waiting, { one: "# needs your reply", other: "# need your reply" }), pending: plural(waiting, { one: "# waiting for reply", other: "# waiting for reply" }), other: "all confirmed" })}${select(match, { ghost: " — doesn't match", other: "" })}`;
+}
 
 /** "14:40", in the event's zone, for a control's accessible name. */
 function slotLabel(
@@ -97,8 +131,8 @@ function SlotCell({
         // 1-on-1 there themselves, so the slot stays as bookable as any other.
         aria-label={
           blocked
-            ? `Arrange a 1-on-1 at ${label} — you are not offering this slot to others`
-            : `Arrange a 1-on-1 at ${label}`
+            ? t`Arrange a 1-on-1 at ${label} — you are not offering this slot to others`
+            : t`Arrange a 1-on-1 at ${label}`
         }
         className={cx(
           shape,
@@ -114,6 +148,7 @@ function SlotCell({
 
 // What the block has no room for, on hover.
 function MeetingSummary({ meeting }: { meeting: MeetingView }) {
+  const clashText = clashLines(meeting.clashes);
   return (
     <div className="space-y-1 p-2">
       <p className="text-sm font-semibold text-fg">{meetingTitle(meeting)}</p>
@@ -128,7 +163,7 @@ function MeetingSummary({ meeting }: { meeting: MeetingView }) {
       )}
       {meeting.clashes.length > 0 && (
         <p className="text-xs text-fg">
-          {clashLines(meeting.clashes)} during this slot.
+          <Trans>{clashText} during this slot.</Trans>
         </p>
       )}
     </div>
@@ -139,12 +174,12 @@ function MeetingSummary({ meeting }: { meeting: MeetingView }) {
 function SlotSummary({ meetings }: { meetings: MeetingView[] }) {
   const { breakMinutes, timezone } = useSchedule();
   const timeFormat = useTimeFormat();
+  const count = meetings.length;
+  const time = blockTimeLabel(meetings, breakMinutes, timezone, timeFormat);
+  const heading = t`${plural(count, { one: "# 1-on-1", other: "# 1-on-1s" })} · ${time}`;
   return (
     <div className="space-y-1 p-2">
-      <p className="text-sm font-semibold text-fg">
-        {meetings.length} 1-on-1s ·{" "}
-        {blockTimeLabel(meetings, breakMinutes, timezone, timeFormat)}
-      </p>
+      <p className="text-sm font-semibold text-fg">{heading}</p>
       <ul className="space-y-0.5">
         {meetings.map((meeting) => (
           <li key={meeting.id} className="text-xs text-fg-muted">
@@ -159,9 +194,10 @@ function SlotSummary({ meetings }: { meetings: MeetingView[] }) {
 
 function MeetingClashMark({ meeting }: { meeting: MeetingView }) {
   if (meeting.clashes.length === 0) return null;
+  const clashes = clashLines(meeting.clashes);
   return (
     <ClashIcon
-      text={`${clashLines(meeting.clashes)} during this slot`}
+      text={t`${clashes} during this slot`}
       className="h-3 w-3 text-warning-fg"
     />
   );
@@ -189,12 +225,12 @@ function MeetingBlock({
     >
       <a
         href={links.meeting(meeting.id)}
-        aria-label={`${meetingTitle(meeting)} at ${slotLabel(
-          meeting.slotStart,
-          breakMinutes,
-          timezone,
-          timeFormat
-        )} · ${meeting.meetingPoint} — ${blockStatus(meeting)}${ghost ? NO_MATCH : ""}`}
+        aria-label={meetingLabel(
+          meeting,
+          slotLabel(meeting.slotStart, breakMinutes, timezone, timeFormat),
+          ghost,
+          true
+        )}
         data-match-id={filtering && !ghost ? meeting.id : undefined}
         className={cx(
           "min-w-0 flex-1 overflow-hidden rounded border-2 px-1 py-0.5 font-roboto",
@@ -252,12 +288,12 @@ function StackEntry({ meeting }: { meeting: MeetingView }) {
     >
       <a
         href={links.meeting(meeting.id)}
-        aria-label={`${meetingTitle(meeting)} at ${slotLabel(
-          meeting.slotStart,
-          breakMinutes,
-          timezone,
-          timeFormat
-        )} — ${blockStatus(meeting)}${ghost ? NO_MATCH : ""}`}
+        aria-label={meetingLabel(
+          meeting,
+          slotLabel(meeting.slotStart, breakMinutes, timezone, timeFormat),
+          ghost,
+          false
+        )}
         data-match-id={filtering && !ghost ? meeting.id : undefined}
         className={cx(
           "flex min-w-0 flex-1 items-center gap-1 overflow-hidden rounded-sm border-l-4 px-1 font-roboto",
@@ -307,12 +343,11 @@ function SlotBlock({
       <button
         type="button"
         onClick={onOpen}
-        aria-label={`${meetings.length} 1-on-1s, ${blockTimeLabel(
+        aria-label={slotLabelText(
           meetings,
-          breakMinutes,
-          timezone,
-          timeFormat
-        )} — ${slotSummaryLine(meetings)}${ghost ? NO_MATCH : ""}`}
+          blockTimeLabel(meetings, breakMinutes, timezone, timeFormat),
+          ghost
+        )}
         data-match-id={filtering && !ghost ? matchId : undefined}
         className={cx(
           "flex min-w-0 flex-1 flex-col justify-center overflow-hidden rounded border-2 border-line bg-surface-muted px-1 text-left font-roboto hover:border-brand-accent",
@@ -322,7 +357,7 @@ function SlotBlock({
       >
         {heightPx >= TITLE_MIN_PX && (
           <span className="text-xs font-semibold leading-[1.15] text-fg">
-            {meetings.length} 1-on-1s
+            {meetingCount(meetings.length)}
           </span>
         )}
         {heightPx >= 38 && (
@@ -345,12 +380,11 @@ function SlotMeetings({
 }) {
   const { links, breakMinutes, timezone } = useSchedule();
   const timeFormat = useTimeFormat();
+  const count = meetings.length;
+  const time = blockTimeLabel(meetings, breakMinutes, timezone, timeFormat);
+  const dialogTitle = t`${plural(count, { one: "# 1-on-1", other: "# 1-on-1s" })}, ${time}`;
   return (
-    <Dialog
-      open
-      onClose={onClose}
-      title={`${meetings.length} 1-on-1s, ${blockTimeLabel(meetings, breakMinutes, timezone, timeFormat)}`}
-    >
+    <Dialog open onClose={onClose} title={dialogTitle}>
       <p className="text-sm text-fg-muted">{meetings[0].dayLabel}</p>
       <ul className="mt-3 flex max-h-72 flex-col gap-1 overflow-y-auto">
         {meetings.map((meeting) => (

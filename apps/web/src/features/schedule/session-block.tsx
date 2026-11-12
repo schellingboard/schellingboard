@@ -1,3 +1,5 @@
+import { plural, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import type { Location } from "@schellingboard/domain/location";
 import type { Session } from "@schellingboard/domain/session";
 import { isBookableSlot } from "@schellingboard/domain/session-bookable";
@@ -69,7 +71,13 @@ export function SessionBlock({
   const { session } = item;
   return session.blocker ? (
     <BlockerSessionCard
-      title={session.title || "Blocked"}
+      title={
+        session.title ||
+        t({
+          message: "Blocked",
+          comment: "Title of a time slot reserved by the organizers",
+        })
+      }
       position={position}
     />
   ) : (
@@ -98,7 +106,7 @@ function BookableSessionCard({
   return (
     <PositionedBlock position={position}>
       <a
-        aria-label="Add session"
+        aria-label={t`Add session`}
         className={cx(
           "flex h-full w-full items-center justify-center rounded bg-surface-muted font-roboto hover:bg-surface-hover",
           filtering && GHOST_CLASS
@@ -160,6 +168,7 @@ function SessionInfo({
   const { data } = useSchedule();
   const description = plainText(session.description);
   const clashes = data.clashes(session.id);
+  const { numRsvps, capacity } = session;
   const timeFormat = useTimeFormat();
   return (
     <div className="p-2">
@@ -169,7 +178,9 @@ function SessionInfo({
         )}
         {session.title}
       </h4>
-      <p className="mb-2 mt-1 text-xs text-fg-subtle">Hosted by {hosts}</p>
+      <p className="mb-2 mt-1 text-xs text-fg-subtle">
+        <Trans>Hosted by {hosts}</Trans>
+      </p>
       <p className="whitespace-pre-line text-sm">
         {description.length > 210
           ? description.substring(0, 200) + "..."
@@ -185,7 +196,10 @@ function SessionInfo({
         <div className="flex gap-1">
           <UserIcon className="h-4 w-4" />
           <span>
-            {session.numRsvps} RSVPs (max capacity {session.capacity})
+            {plural(numRsvps, {
+              one: `# RSVP (max capacity ${capacity})`,
+              other: `# RSVPs (max capacity ${capacity})`,
+            })}
           </span>
         </div>
         <div className="flex gap-1">
@@ -218,7 +232,7 @@ function RealSessionCard({
     useScheduleMatch();
   const hiddenByYou = hides(session);
   const ghost = hiddenByYou || (filtering && !matchesSession(session));
-  const hosts = session.hosts.map((h) => h.name).join(", ") || "No hosts";
+  const hosts = session.hosts.map((h) => h.name).join(", ") || t`No hosts`;
   const showTitle = height >= TITLE_MIN_PX && !hiddenByYou;
   const hostLines = hiddenByYou ? 0 : hostLinesFor(height);
 
@@ -273,16 +287,24 @@ function RealSessionCard({
                 <BookmarkSolidIcon
                   aria-hidden={false}
                   role="img"
-                  aria-label="Bookmarked"
+                  aria-label={t`Bookmarked`}
                   className="mt-px h-3 w-3 flex-shrink-0"
                 />
               )}
               <span className="flex-1">{session.title}</span>
             </p>
             {hiddenByYou ? (
-              <span className="sr-only"> — hidden by you</span>
+              <span className="sr-only">
+                {" "}
+                <Trans>— hidden by you</Trans>
+              </span>
             ) : (
-              ghost && <span className="sr-only"> — doesn&apos;t match</span>
+              ghost && (
+                <span className="sr-only">
+                  {" "}
+                  <Trans>— doesn&apos;t match</Trans>
+                </span>
+              )
             )}
           </a>
           {hostLines > 0 && (
@@ -308,7 +330,7 @@ function RealSessionCard({
             {hosting && (
               <div
                 className="flex items-center py-[2px]"
-                title="You are hosting this session"
+                title={t`You are hosting this session`}
               >
                 <AcademicCapIcon className="h-3 w-3" />
               </div>
@@ -334,6 +356,7 @@ function RsvpBadge({
 }) {
   const { data } = useSchedule();
   const { rsvpd, click, dialogs } = useRsvp(session);
+  const { title } = session;
 
   const count = (
     <>
@@ -349,7 +372,9 @@ function RsvpBadge({
     <>
       <button
         type="button"
-        aria-label={`${rsvpd ? "Withdraw RSVP from" : "RSVP to"} ${session.title}`}
+        aria-label={
+          rsvpd ? t`Withdraw RSVP from ${title}` : t`RSVP to ${title}`
+        }
         onClick={click}
         className={cx(badge, "cursor-pointer hover:opacity-80")}
       >

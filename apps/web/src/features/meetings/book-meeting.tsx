@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { clashLines } from "@schellingboard/domain/meeting-clash-text";
 import {
   type FormEvent,
@@ -50,22 +52,26 @@ export function BookMeeting({
   }, [query, slotCount]);
 
   const { found } = state;
+  const chosenName = chosen?.name ?? "";
+  const slotStartLabel = found?.slotLabel.split(" – ")[0] ?? "";
   const title = chosen
-    ? `1-on-1 with ${chosen.name}`
+    ? t`1-on-1 with ${chosenName}`
     : found
-      ? `Who's free at ${found.slotLabel.split(" – ")[0]}?`
-      : "1-on-1";
+      ? t`Who's free at ${slotStartLabel}?`
+      : t`1-on-1`;
 
   return (
     <Dialog open wide onClose={onClose} title={title}>
       {state.status === "gone" || state.status === "error" ? (
         <p className="text-fg">
           {state.status === "gone"
-            ? "That slot is no longer open for 1-on-1s."
-            : "Couldn't load who is free then. Try the slot again."}
+            ? t`That slot is no longer open for 1-on-1s.`
+            : t`Couldn't load who is free then. Try the slot again.`}
         </p>
       ) : !found ? (
-        <p className="text-fg-muted">Loading…</p>
+        <p className="text-fg-muted">
+          <Trans>Loading…</Trans>
+        </p>
       ) : chosen ? (
         <RequestStep
           calls={calls}
@@ -106,6 +112,7 @@ function CandidateStep({
   profileHref: (guestId: string) => string;
   onPick: (candidate: MeetingCandidate) => void;
 }) {
+  const clashText = clashLines(found.yourClashes);
   return (
     <div className="flex flex-col gap-4">
       <span className="-mt-2 block text-sm text-fg-muted">
@@ -120,69 +127,78 @@ function CandidateStep({
 
       {found.yourClashes.length > 0 && (
         <p className="rounded-md bg-warning-tint p-3 text-sm text-fg">
-          {clashLines(found.yourClashes)} during this time — book it anyway?
+          <Trans>{clashText} during this time — book it anyway?</Trans>
         </p>
       )}
 
       {found.candidates.length === 0 ? (
-        <p className="text-fg-muted">Nobody has marked this time free.</p>
+        <p className="text-fg-muted">
+          <Trans>Nobody has marked this time free.</Trans>
+        </p>
       ) : (
         <ul className="flex max-h-72 flex-col gap-1 overflow-y-auto">
-          {found.candidates.map((candidate) => (
-            <li
-              key={candidate.id}
-              className="flex items-center gap-4 rounded-md bg-surface-sunken p-2"
-            >
-              <Avatar
-                name={candidate.name}
-                size="sm"
-                image={candidate.avatarUrl}
-              />
-              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                  {/* A new tab, so reading who they are does not cost the slot. */}
-                  <PersonLink
-                    guestId={candidate.id}
-                    href={profileHref(candidate.id)}
-                    name={candidate.name}
-                    newTab
-                    className="font-medium text-brand-fg hover:text-brand-fg-hover"
-                  />
-                  {candidate.isHost && (
-                    <span className="w-fit rounded-full bg-brand-tint-hover px-3 py-1 text-xs font-semibold text-brand-fg">
-                      Session host
+          {found.candidates.map((candidate) => {
+            const { name } = candidate;
+            return (
+              <li
+                key={candidate.id}
+                className="flex items-center gap-4 rounded-md bg-surface-sunken p-2"
+              >
+                <Avatar
+                  name={candidate.name}
+                  size="sm"
+                  image={candidate.avatarUrl}
+                />
+                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    {/* A new tab, so reading who they are does not cost the slot. */}
+                    <PersonLink
+                      guestId={candidate.id}
+                      href={profileHref(candidate.id)}
+                      name={candidate.name}
+                      newTab
+                      className="font-medium text-brand-fg hover:text-brand-fg-hover"
+                    />
+                    {candidate.isHost && (
+                      <span className="w-fit rounded-full bg-brand-tint-hover px-3 py-1 text-xs font-semibold text-brand-fg">
+                        <Trans>Session host</Trans>
+                      </span>
+                    )}
+                  </span>
+                  {(candidate.pronouns || candidate.basedIn) && (
+                    <span className="line-clamp-1 text-sm text-fg-subtle">
+                      {[candidate.pronouns, candidate.basedIn]
+                        .filter(Boolean)
+                        .join(" · ")}
                     </span>
                   )}
-                </span>
-                {(candidate.pronouns || candidate.basedIn) && (
-                  <span className="line-clamp-1 text-sm text-fg-subtle">
-                    {[candidate.pronouns, candidate.basedIn]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </span>
-                )}
-                {candidate.busy && (
-                  <span className="text-xs text-warning-fg">
-                    Already booked at this time
-                  </span>
-                )}
-              </div>
-              <Button
-                variant="quiet"
-                disabled={loading}
-                onClick={() => onPick(candidate)}
-                aria-label={`Ask ${candidate.name}`}
-              >
-                Ask
-              </Button>
-            </li>
-          ))}
+                  {candidate.busy && (
+                    <span className="text-xs text-warning-fg">
+                      <Trans>Already booked at this time</Trans>
+                    </span>
+                  )}
+                </div>
+                <Button
+                  variant="quiet"
+                  disabled={loading}
+                  onClick={() => onPick(candidate)}
+                  aria-label={t`Ask ${name}`}
+                >
+                  <Trans comment="Button: ask this person for a 1-on-1">
+                    Ask
+                  </Trans>
+                </Button>
+              </li>
+            );
+          })}
         </ul>
       )}
 
       <p className="text-xs text-fg-subtle">
-        Only people who marked this time free are listed. Nobody is told you
-        looked.
+        <Trans>
+          Only people who marked this time free are listed. Nobody is told you
+          looked.
+        </Trans>
       </p>
     </div>
   );
@@ -225,13 +241,14 @@ function RequestStep({
         key
       ),
   });
-  const what = `${candidate.name} for ${found.slotLabel} on ${found.dayLabel}`;
+  const { name } = candidate;
+  const { slotLabel, dayLabel } = found;
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     if ((await mutation.submit())?.ok) {
       onBooked();
-      notify(requestSentNotice(what));
+      notify(requestSentNotice(name, slotLabel, dayLabel));
       onClose();
     }
   };
@@ -243,7 +260,7 @@ function RequestStep({
       </span>
 
       <MeetingRequestError
-        what={what}
+        subject={{ kind: "slot", name, slotLabel, dayLabel }}
         error={mutation.error}
         unreachable={mutation.unreachable}
       />
@@ -253,7 +270,7 @@ function RequestStep({
           ...(found.yourClashes.length > 0
             ? [clashLines(found.yourClashes)]
             : []),
-          ...(candidate.busy ? [`${candidate.name} is already booked`] : []),
+          ...(candidate.busy ? [t`${name} is already booked`] : []),
         ]}
       />
 
@@ -265,7 +282,7 @@ function RequestStep({
         onMessage={setMessage}
         isSending={mutation.pending}
         onCancel={onBack}
-        cancelLabel="Someone else"
+        cancelLabel={t`Someone else`}
         errors={mutation.fields}
       />
     </form>

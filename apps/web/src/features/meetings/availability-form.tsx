@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import type {
   AvailabilityFormData,
   SlotDay,
@@ -71,7 +73,7 @@ export function AvailabilityForm({
   return (
     <form
       onSubmit={(e) => void onSubmit(e)}
-      aria-label={`1-on-1s at ${eventName}`}
+      aria-label={t`1-on-1s at ${eventName}`}
       className="flex flex-col gap-4"
     >
       {mutation.error && (
@@ -91,11 +93,13 @@ export function AvailabilityForm({
           />
           <div>
             <label htmlFor={switchId} className="font-medium text-fg">
-              I&apos;m open to 1-on-1s at this event
+              <Trans>I&apos;m open to 1-on-1s at this event</Trans>
             </label>
             <p className="text-sm text-fg-subtle">
-              While this is off, nobody can book you and you won&apos;t appear
-              as bookable.
+              <Trans>
+                While this is off, nobody can book you and you won&apos;t appear
+                as bookable.
+              </Trans>
             </p>
           </div>
         </div>
@@ -104,70 +108,87 @@ export function AvailabilityForm({
       {open && (
         <>
           <p className="rounded-md bg-surface-sunken p-3 text-sm text-fg-subtle">
-            Clear the slots you want kept free. You don&apos;t need to clear the
-            ones where you&apos;re hosting or have RSVP&apos;d to — anyone
-            booking you is warned about those. Times are in the event timezone (
-            {timezone}).
+            <Trans>
+              Clear the slots you want kept free. You don&apos;t need to clear
+              the ones where you&apos;re hosting or have RSVP&apos;d to — anyone
+              booking you is warned about those. Times are in the event timezone
+              ({timezone}).
+            </Trans>
           </p>
 
           {days.length === 0 && (
             <p className="text-fg-muted">
-              The organizer hasn&apos;t set up any days with 1-on-1 slots yet.
+              <Trans>
+                The organizer hasn&apos;t set up any days with 1-on-1 slots yet.
+              </Trans>
             </p>
           )}
 
-          {days.map((day) => (
-            <section key={day.id} aria-label={day.label}>
-              <div className="mb-1 flex items-center justify-between gap-3">
-                <h3 className="text-base font-semibold text-fg">{day.label}</h3>
-                <div className="flex gap-2">
-                  <Button
-                    variant="quiet"
-                    className="bg-surface-muted"
-                    onClick={() => setDay(day, true)}
-                    aria-label={`Select all slots on ${day.label}`}
-                  >
-                    Select all
-                  </Button>
-                  <Button
-                    variant="quiet"
-                    className="bg-surface-muted"
-                    onClick={() => setDay(day, false)}
-                    aria-label={`Clear all slots on ${day.label}`}
-                  >
-                    Clear
-                  </Button>
+          {days.map((day) => {
+            const dayLabel = day.label;
+            return (
+              <section key={day.id} aria-label={day.label}>
+                <div className="mb-1 flex items-center justify-between gap-3">
+                  <h3 className="text-base font-semibold text-fg">
+                    {day.label}
+                  </h3>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="quiet"
+                      className="bg-surface-muted"
+                      onClick={() => setDay(day, true)}
+                      aria-label={t`Select all slots on ${dayLabel}`}
+                    >
+                      <Trans>Select all</Trans>
+                    </Button>
+                    <Button
+                      variant="quiet"
+                      className="bg-surface-muted"
+                      onClick={() => setDay(day, false)}
+                      aria-label={t`Clear all slots on ${dayLabel}`}
+                    >
+                      <Trans comment="Button: untick every slot of this day">
+                        Clear
+                      </Trans>
+                    </Button>
+                  </div>
                 </div>
-              </div>
-              <ul className="divide-y divide-line-subtle border-t border-line-subtle">
-                {day.slots.map((slot) => (
-                  <li key={slot.start}>
-                    <label className="flex cursor-pointer items-center gap-3 py-3">
-                      <input
-                        type="checkbox"
-                        checked={selected.has(slot.start)}
-                        onChange={() => toggleSlot(slot.start)}
-                        className="h-4 w-4 rounded border-line text-brand-fg focus:ring-brand-accent"
-                      />
-                      <span className="text-fg">{slot.label}</span>
-                    </label>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ))}
+                <ul className="divide-y divide-line-subtle border-t border-line-subtle">
+                  {day.slots.map((slot) => (
+                    <li key={slot.start}>
+                      <label className="flex cursor-pointer items-center gap-3 py-3">
+                        <input
+                          type="checkbox"
+                          checked={selected.has(slot.start)}
+                          onChange={() => toggleSlot(slot.start)}
+                          className="h-4 w-4 rounded border-line text-brand-fg focus:ring-brand-accent"
+                        />
+                        <span className="text-fg">{slot.label}</span>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            );
+          })}
         </>
       )}
 
       <div className="flex items-center justify-end gap-3">
         {emptyWhileOpen && (
           <span className="text-sm text-fg-subtle">
-            Clearing every slot is the same as switching this off.
+            <Trans>
+              Clearing every slot is the same as switching this off.
+            </Trans>
           </span>
         )}
-        {saved && <span className="text-sm text-success-fg">Saved!</span>}
+        {saved && (
+          <span className="text-sm text-success-fg">
+            <Trans>Saved!</Trans>
+          </span>
+        )}
         <Button type="submit" disabled={mutation.pending || emptyWhileOpen}>
-          {mutation.pending ? "Saving..." : "Save availability"}
+          {mutation.pending ? t`Saving...` : t`Save availability`}
         </Button>
       </div>
     </form>

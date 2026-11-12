@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { useState } from "react";
 
 import type { MeetingRequestCalls } from "../../commands/meeting-request";
@@ -26,16 +27,20 @@ export function OpenUpNudge({
   const mutation = useFormMutation({
     call: (key) => calls.askToOpenUp(guestId, nudge.eventId, key),
   });
+  const { eventName } = nudge;
   const ask = async () => {
     if ((await mutation.submit())?.ok) setAsked(true);
   };
-  const at = showEvent ? ` at ${nudge.eventName}` : "";
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <p className="text-sm text-fg-muted">Not open to 1-on-1s yet{at}</p>
+      <p className="text-sm text-fg-muted">
+        {showEvent
+          ? t`Not open to 1-on-1s yet at ${eventName}`
+          : t`Not open to 1-on-1s yet`}
+      </p>
       <MeetingRequestError
-        what={`${guestName} to open up to 1-on-1s`}
+        subject={{ kind: "openUp", name: guestName }}
         error={mutation.error}
         unreachable={mutation.unreachable}
       />
@@ -45,7 +50,12 @@ export function OpenUpNudge({
         onClick={() => void ask()}
         className={SECONDARY}
       >
-        {asked ? "Asked" : "Ask them to open up"}
+        {asked
+          ? t({
+              message: "Asked",
+              comment: "Button state: the request to open up was sent",
+            })
+          : t`Ask them to open up`}
       </button>
     </div>
   );

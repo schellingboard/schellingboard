@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
 import { clashLines } from "@schellingboard/domain/meeting-clash-text";
 import { useEffect, useState } from "react";
@@ -33,41 +35,51 @@ export function MeetingPanel({
 }) {
   const [confirming, setConfirming] = useState(false);
   const [note, setNote] = useState("");
+  const otherName = meeting?.otherName;
+  const clashText = meeting && clashLines(meeting.clashes);
 
   return (
     <SidePanel
-      label="1-on-1 details"
+      label={t`1-on-1 details`}
       onClose={onClose}
       onBack={onBack}
       title={
         meeting ? (
           <>
-            1-on-1 with{" "}
-            <PersonLink
-              guestId={meeting.otherId}
-              href={profileHref(meeting.otherId)}
-              name={meeting.otherName}
-              className="text-brand-fg hover:text-brand-fg-hover hover:underline"
-            />
+            <Trans>
+              1-on-1 with{" "}
+              <PersonLink
+                guestId={meeting.otherId}
+                href={profileHref(meeting.otherId)}
+                name={meeting.otherName}
+                className="text-brand-fg hover:text-brand-fg-hover hover:underline"
+              />
+            </Trans>
           </>
         ) : (
-          "1-on-1"
+          t`1-on-1`
         )
       }
     >
       {!meeting ? (
-        <p className="text-fg-muted">1-on-1 not found.</p>
+        <p className="text-fg-muted">
+          <Trans>1-on-1 not found.</Trans>
+        </p>
       ) : (
         <div className="flex flex-col gap-4">
           <dl className="flex flex-col gap-1 text-sm">
             <div className="flex gap-2">
-              <dt className="font-medium text-fg-muted">When</dt>
+              <dt className="font-medium text-fg-muted">
+                <Trans>When</Trans>
+              </dt>
               <dd className="text-fg">
                 {meeting.dayLabel}, {meeting.timeLabel}
               </dd>
             </div>
             <div className="flex gap-2">
-              <dt className="font-medium text-fg-muted">Where</dt>
+              <dt className="font-medium text-fg-muted">
+                <Trans>Where</Trans>
+              </dt>
               <dd className="text-fg">{meeting.meetingPoint}</dd>
             </div>
           </dl>
@@ -76,8 +88,10 @@ export function MeetingPanel({
 
           {readOnly && (
             <p className="text-sm text-fg-muted">
-              1-on-1s can only be answered or canceled during the scheduling
-              phase.
+              <Trans>
+                1-on-1s can only be answered or canceled during the scheduling
+                phase.
+              </Trans>
             </p>
           )}
 
@@ -90,7 +104,7 @@ export function MeetingPanel({
           {meeting.cancelNote && (
             <p className="rounded-md bg-surface-sunken p-3 text-sm text-fg">
               <span className="font-medium text-fg-muted">
-                Why it was called off:{" "}
+                <Trans>Why it was called off:</Trans>{" "}
               </span>
               {meeting.cancelNote}
             </p>
@@ -98,7 +112,7 @@ export function MeetingPanel({
 
           {meeting.clashes.length > 0 && (
             <p className="rounded-md bg-warning-tint p-3 text-sm text-fg">
-              {clashLines(meeting.clashes)} during this slot.
+              <Trans>{clashText} during this slot.</Trans>
             </p>
           )}
 
@@ -106,10 +120,12 @@ export function MeetingPanel({
             meeting.role === "recipient" &&
             meeting.status === "pending" && (
               <div className="flex gap-2">
-                <Button onClick={() => onAnswer("accept")}>Accept</Button>
+                <Button onClick={() => onAnswer("accept")}>
+                  <Trans>Accept</Trans>
+                </Button>
                 {/* Declining takes no explanation: people must not feel obliged. */}
                 <Button variant="quiet" onClick={() => onAnswer("decline")}>
-                  Decline
+                  <Trans>Decline</Trans>
                 </Button>
               </div>
             )}
@@ -119,21 +135,21 @@ export function MeetingPanel({
             (confirming ? (
               <div className="flex flex-col gap-2">
                 <p className="text-sm text-fg">
-                  {meeting.otherName} will be told. Cancel it?
+                  <Trans>{otherName} will be told. Cancel it?</Trans>
                 </p>
                 <TextField
-                  label="Say why, if you like (optional)"
+                  label={t`Say why, if you like (optional)`}
                   name="cancelNote"
                   value={note}
                   onChange={setNote}
-                  placeholder="Sorry — my session moved…"
+                  placeholder={t`Sorry — my session moved…`}
                 />
                 <div className="flex gap-2">
                   <Button variant="danger" onClick={() => onCancel(note)}>
-                    Yes, cancel it
+                    <Trans>Yes, cancel it</Trans>
                   </Button>
                   <Button variant="quiet" onClick={() => setConfirming(false)}>
-                    Keep it
+                    <Trans>Keep it</Trans>
                   </Button>
                 </div>
               </div>
@@ -143,13 +159,15 @@ export function MeetingPanel({
                 className="self-start"
                 onClick={() => setConfirming(true)}
               >
-                Cancel 1-on-1
+                <Trans>Cancel 1-on-1</Trans>
               </Button>
             ))}
 
           <p className="text-xs text-fg-subtle">
-            Nothing is reserved — the meeting point is just where to find each
-            other.
+            <Trans>
+              Nothing is reserved — the meeting point is just where to find each
+              other.
+            </Trans>
           </p>
           <CopyLinkButton />
         </div>
@@ -174,8 +192,8 @@ export function MeetingNeedsName({
   }, [awaitingLogin]);
   return (
     <SidePanel
-      label="1-on-1 details"
-      title="1-on-1"
+      label={t`1-on-1 details`}
+      title={t`1-on-1`}
       onClose={onClose}
       onBack={onBack}
     >
@@ -183,7 +201,7 @@ export function MeetingNeedsName({
         <p className="text-fg-muted">
           {actingGuestRefusalMessage(
             protectedName ? "guest.protected" : "guest.unselected",
-            "opening your 1-on-1s"
+            t`opening your 1-on-1s`
           )}
         </p>
       )}

@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { schedulingEnded } from "@schellingboard/domain/phase";
 import { dateStartDescription } from "@schellingboard/domain/phase-opens-text";
 import type { Session } from "@schellingboard/domain/session";
@@ -32,8 +34,6 @@ import { useSchedule } from "./context";
 import { SessionComments } from "./session-comments";
 import { useRsvp } from "./use-rsvp";
 
-const BOOKMARK_NOTE = "Only you see your bookmarks. This is not an RSVP.";
-
 const ACTION =
   "inline-flex items-center justify-center rounded-md border border-brand-accent px-2 py-1 text-xs font-medium text-brand-fg hover:bg-brand-tint focus:outline-none focus:ring-2 focus:ring-brand-accent disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50";
 
@@ -51,13 +51,19 @@ export function SessionPanel({
   const session = data.sessions.find((s) => s.id === sessionId);
   return (
     <SidePanel
-      label="Session details"
-      title={session ? session.title : "Session details"}
+      label={t`Session details`}
+      title={session ? session.title : t`Session details`}
       titleAction={session && <BookmarkToggle sessionId={session.id} />}
       onClose={onClose}
       onBack={onBack}
     >
-      {session ? <Details session={session} /> : <p>Session not found.</p>}
+      {session ? (
+        <Details session={session} />
+      ) : (
+        <p>
+          <Trans>Session not found.</Trans>
+        </p>
+      )}
     </SidePanel>
   );
 }
@@ -65,15 +71,16 @@ export function SessionPanel({
 function BookmarkToggle({ sessionId }: { sessionId: string }) {
   const { data, actions } = useSchedule();
   const noteId = useId();
+  const note = t`Only you see your bookmarks. This is not an RSVP.`;
   if (!data.guestId) return null;
   const marked = data.bookmarked(sessionId);
   const Icon = marked ? BookmarkSolidIcon : BookmarkIcon;
   return (
-    <Tooltip content={<p className="px-2 py-1 text-xs">{BOOKMARK_NOTE}</p>}>
+    <Tooltip content={<p className="px-2 py-1 text-xs">{note}</p>}>
       <button
         type="button"
         aria-pressed={marked}
-        aria-label={marked ? "Remove bookmark" : "Bookmark this session"}
+        aria-label={marked ? t`Remove bookmark` : t`Bookmark this session`}
         aria-describedby={noteId}
         onClick={() => void actions.setBookmark(sessionId, !marked)}
         className="-my-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-fg-muted hover:bg-surface-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
@@ -81,7 +88,7 @@ function BookmarkToggle({ sessionId }: { sessionId: string }) {
         <Icon className="h-5 w-5" />
       </button>
       <span id={noteId} className="sr-only">
-        {BOOKMARK_NOTE}
+        {note}
       </span>
     </Tooltip>
   );
@@ -118,9 +125,14 @@ function Details({ session }: { session: Session }) {
   const { rsvpd, busy, click, dialogs } = useRsvp(session);
   const attendeeState = useAttendees(session.id, session.numRsvps);
 
+  const opens = dateStartDescription(
+    data.event.schedulingPhaseStart,
+    timezone,
+    null
+  );
   const rsvpWhy = schedulingEnded(data.event, data.now)
-    ? "Scheduling has ended"
-    : `Scheduling ${dateStartDescription(data.event.schedulingPhaseStart, timezone, null)}`;
+    ? t`Scheduling has ended`
+    : t`Scheduling ${opens}`;
   const clashes = data.clashes(session.id);
   const isHost =
     data.guestId !== null && session.hosts.some((h) => h.id === data.guestId);
@@ -164,6 +176,18 @@ function Details({ session }: { session: Session }) {
     );
   }, [attendeeState, data.guests, data.guestId, rsvpd]);
 
+  const startsAt = formatOptionalTime(
+    session.startTime,
+    timezone,
+    `EEEE ${timeFormat}`
+  );
+  const endsAt = formatOptionalTime(session.endTime, timezone, timeFormat);
+  const momentTitle = moment?.title ?? "";
+  const momentStart = formatOptionalTime(moment?.start, timezone, timeFormat);
+  const momentEnd = formatOptionalTime(moment?.end, timezone, timeFormat);
+  const { capacity } = session;
+  const attendeeCount = attendees ? attendees.length : session.numRsvps;
+
   return (
     <div className="break-words">
       {dialogs}
@@ -171,12 +195,14 @@ function Details({ session }: { session: Session }) {
         <div className="mb-4 border-l-4 border-warning bg-warning-tint p-3 text-sm text-warning-fg">
           <div className="mb-1 flex items-center gap-2 font-medium">
             <LockIcon className="h-4 w-4" />
-            Closed Session
+            <Trans>Closed Session</Trans>
           </div>
           <p>
-            This is a closed session, meaning you can at most arrive 5 minutes
-            late. If you arrive later you may not join and please do not knock
-            or otherwise disrupt the session.
+            <Trans>
+              This is a closed session, meaning you can at most arrive 5 minutes
+              late. If you arrive later you may not join and please do not knock
+              or otherwise disrupt the session.
+            </Trans>
           </p>
         </div>
       )}
@@ -192,10 +218,10 @@ function Details({ session }: { session: Session }) {
               {busy
                 ? "..."
                 : rsvpd
-                  ? "Un-RSVP"
+                  ? t`Un-RSVP`
                   : full
-                    ? "Session full"
-                    : "RSVP"}
+                    ? t`Session full`
+                    : t`RSVP`}
             </button>
           </Unavailable>
         )}
@@ -205,21 +231,21 @@ function Details({ session }: { session: Session }) {
             onClick={() => void actions.becomeHost(session.id)}
             className={ACTION}
           >
-            Become host
+            <Trans>Become host</Trans>
           </button>
         )}
         {isHost && !session.adminManaged && !data.readOnly && (
           <a href={links.editSession(session.id)} className={ACTION}>
-            Edit
+            <Trans>Edit</Trans>
           </a>
         )}
         {isHost && (
-          <span title="You are hosting this session">
+          <span title={t`You are hosting this session`}>
             <AcademicCapIcon className="h-5 w-5" />
           </span>
         )}
         {rsvpd && (
-          <span title="You have RSVP'd to this session">
+          <span title={t`You have RSVP'd to this session`}>
             <CheckCircleIcon className="h-5 w-5" />
           </span>
         )}
@@ -228,8 +254,8 @@ function Details({ session }: { session: Session }) {
         <Tooltip
           content={
             data.hidden(session.id)
-              ? "Shows this session on your schedule again."
-              : "Hides this session on your schedule, for you only. Use it if you are not interested or for any other reason. You can show it again here."
+              ? t`Shows this session on your schedule again.`
+              : t`Hides this session on your schedule, for you only. Use it if you are not interested or for any other reason. You can show it again here.`
           }
           className="-mt-4 mb-6 w-fit"
         >
@@ -241,8 +267,8 @@ function Details({ session }: { session: Session }) {
             className="text-xs text-fg-subtle underline hover:text-fg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
           >
             {data.hidden(session.id)
-              ? "Show on the schedule"
-              : "Hide on the schedule"}
+              ? t`Show on the schedule`
+              : t`Hide on the schedule`}
           </button>
         </Tooltip>
       )}
@@ -254,7 +280,9 @@ function Details({ session }: { session: Session }) {
       )}
       <div className="mb-6 space-y-2 text-sm text-fg-muted">
         <div className="flex gap-2">
-          <span className="font-medium">Hosts(s):</span>
+          <span className="font-medium">
+            <Trans>Host(s):</Trans>
+          </span>
           <span>
             {session.hosts.map((h, i) => (
               <span key={h.id}>
@@ -270,7 +298,9 @@ function Details({ session }: { session: Session }) {
           </span>
         </div>
         <div className="flex gap-2">
-          <span className="font-medium">Location:</span>
+          <span className="font-medium">
+            <Trans>Location:</Trans>
+          </span>
           <span className="flex flex-wrap gap-1">
             {rooms.map((location) => (
               <span
@@ -283,33 +313,27 @@ function Details({ session }: { session: Session }) {
           </span>
         </div>
         <div className="flex gap-2">
-          <span className="font-medium">Time:</span>
-          <span>
-            {formatOptionalTime(
-              session.startTime,
-              timezone,
-              `EEEE ${timeFormat}`
-            )}
-            {" - "}
-            {formatOptionalTime(session.endTime, timezone, timeFormat)}
+          <span className="font-medium">
+            <Trans>Time:</Trans>
           </span>
+          <span>{t`${startsAt} - ${endsAt}`}</span>
         </div>
         {moment && (
           <p className="text-fg-muted">
-            During {moment.title} (
-            {formatOptionalTime(moment.start, timezone, timeFormat)}–
-            {formatOptionalTime(moment.end, timezone, timeFormat)})
+            {t`During ${momentTitle} (${momentStart}–${momentEnd})`}
           </p>
         )}
         <div className="flex gap-2">
           <span className="font-medium">
-            {`Attendees (${attendees ? attendees.length : session.numRsvps}${session.capacity > 0 ? ` / ${session.capacity}` : ""}):`}
+            {capacity > 0
+              ? t`Attendees (${attendeeCount} / ${capacity}):`
+              : t`Attendees (${attendeeCount}):`}
           </span>
           <span>
             {attendees === null
-              ? "Loading…"
+              ? t`Loading…`
               : attendees.length === 0
-                ? "No attendees yet"
+                ? t`No attendees yet`
                 : attendees.map((a, i) => (
                     <span key={a.id}>
                       {i > 0 && ", "}
@@ -332,21 +356,25 @@ function Details({ session }: { session: Session }) {
         />
       )}
       <div className="mb-6">
-        <h3 className="mb-2 font-semibold">Description</h3>
+        <h3 className="mb-2 font-semibold">
+          <Trans>Description</Trans>
+        </h3>
         <Markdown className="text-base leading-relaxed">
           {session.description}
         </Markdown>
       </div>
       {session.proposalId && (
         <p className="text-sm text-fg-muted">
-          This session was scheduled from a proposal. See it{" "}
-          <a
-            href={links.proposal(session.proposalId)}
-            className="text-brand-fg underline"
-          >
-            here
-          </a>
-          .
+          <Trans>
+            This session was scheduled from a proposal. See it{" "}
+            <a
+              href={links.proposal(session.proposalId)}
+              className="text-brand-fg underline"
+            >
+              here
+            </a>
+            .
+          </Trans>
         </p>
       )}
       <CopyLinkButton className="mt-6" />

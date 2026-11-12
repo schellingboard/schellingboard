@@ -7,6 +7,14 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: pseudo-LOCALE\n"
 
+#: src/features/schedule/session-block.tsx:305
+msgid "— doesn't match"
+msgstr ""
+
+#: src/features/schedule/session-block.tsx:299
+msgid "— hidden by you"
+msgstr ""
+
 #: src/features/schedule/day-fold-bar.tsx:43
 msgid "· day has passed · hide"
 msgstr ""
@@ -62,20 +70,89 @@ msgstr ""
 msgid "{0} phase: {what}"
 msgstr ""
 
+#: src/features/schedule/meetings-col.tsx:200
+msgid "{clashes} during this slot"
+msgstr ""
+
+#: src/features/meetings/meeting-panel.tsx:115
+#: src/features/schedule/meetings-col.tsx:166
+msgid "{clashText} during this slot."
+msgstr ""
+
+#: src/features/meetings/book-meeting.tsx:130
+msgid "{clashText} during this time — book it anyway?"
+msgstr ""
+
+#: src/features/schedule/meetings-col.tsx:43
+msgid "{count, plural, one {# 1-on-1} other {# 1-on-1s}}"
+msgstr ""
+
+#: src/features/schedule/meetings-col.tsx:179
+msgid "{count, plural, one {# 1-on-1} other {# 1-on-1s}} · {time}"
+msgstr ""
+
+#: src/features/schedule/meetings-col.tsx:385
+msgid "{count, plural, one {# 1-on-1} other {# 1-on-1s}}, {time}"
+msgstr ""
+
+#: src/features/schedule/meetings-col.tsx:77
+msgid "{count, plural, one {# 1-on-1} other {# 1-on-1s}}, {time} — {kind, select, yours {{waiting, plural, one {# needs your reply} other {# need your reply}}} pending {{waiting, plural, one {# waiting for reply} other {# waiting for reply}}} other {all confirmed}}{match, select, ghost { — doesn't match} other {}}"
+msgstr ""
+
+#: src/features/schedule/meeting-rules.ts:62
+msgid "{count, plural, one {# needs your reply} other {# need your reply}}"
+msgstr ""
+
+#: src/features/schedule/meeting-rules.ts:68
+msgid "{count, plural, one {# waiting for reply} other {# waiting for reply}}"
+msgstr ""
+
 #: src/ui/form-error-summary.tsx:32
 msgid "{count, plural, one {There is a problem to fix:} other {There are # problems to fix:}}"
+msgstr ""
+
+#: src/features/meetings/meeting-request-fields.tsx:227
+msgid "{joined} during this time — book it anyway?"
 msgstr ""
 
 #: src/features/schedule/schedule-filters.tsx:82
 msgid "{matching, plural, one {# of {total} match} other {# of {total} match}}"
 msgstr ""
 
+#: src/features/meetings/meeting-request-fields.tsx:45
+msgid "{minutes} min"
+msgstr ""
+
+#: src/features/meetings/book-meeting.tsx:273
+msgid "{name} is already booked"
+msgstr ""
+
+#: src/features/schedule/session-block.tsx:199
+msgid "{numRsvps, plural, one {# RSVP (max capacity {capacity})} other {# RSVPs (max capacity {capacity})}}"
+msgstr ""
+
+#: src/features/meetings/meeting-panel.tsx:138
+msgid "{otherName} will be told. Cancel it?"
+msgstr ""
+
 #: src/ui/data-table.tsx:53
 msgid "{selectedCount, plural, one {# selected} other {# selected}}"
 msgstr ""
 
+#: src/features/schedule/session-panel.tsx:319
+msgid "{startsAt} - {endsAt}"
+msgstr ""
+
 #: src/features/schedule/schedule-filters.tsx:87
 msgid "{summary}, back to the search"
+msgstr ""
+
+#: src/features/schedule/meeting-rules.ts:168
+msgid "{them} declined this."
+msgstr ""
+
+#: src/features/schedule/meeting-rules.ts:161
+msgid "{them} is waiting for your answer."
 msgstr ""
 
 #: src/ui/pager.tsx:63
@@ -94,13 +171,57 @@ msgstr ""
 msgid "{valueLabel}: 0 to {max}"
 msgstr ""
 
+#: src/features/meetings/book-meeting.tsx:61
+#: src/features/meetings/meeting-panel.tsx:60
+#: src/features/meetings/meeting-panel.tsx:196
+msgid "1-on-1"
+msgstr ""
+
+#: src/features/meetings/meeting-panel.tsx:43
+#: src/features/meetings/meeting-panel.tsx:195
+msgid "1-on-1 details"
+msgstr ""
+
+#: src/features/meetings/meeting-panel.tsx:66
+msgid "1-on-1 not found."
+msgstr ""
+
+#: src/features/meetings/book-meeting.tsx:58
+msgid "1-on-1 with {chosenName}"
+msgstr ""
+
 #: src/features/schedule/day-agenda.tsx:396
+#: src/features/schedule/meeting-rules.ts:90
 msgid "1-on-1 with {otherName}"
+msgstr ""
+
+#: src/features/schedule/meetings-col.tsx:66
+msgid "1-on-1 with {otherName} at {time} — {status, select, needsReply {needs your reply} waiting {waiting for reply} confirmed {confirmed} declined {declined} canceled {canceled} unanswered {unanswered} other {}}{match, select, ghost { — doesn't match} other {}}"
+msgstr ""
+
+#: src/features/schedule/meetings-col.tsx:65
+msgid "1-on-1 with {otherName} at {time} · {meetingPoint} — {status, select, needsReply {needs your reply} waiting {waiting for reply} confirmed {confirmed} declined {declined} canceled {canceled} unanswered {unanswered} other {}}{match, select, ghost { — doesn't match} other {}}"
+msgstr ""
+
+#: src/features/people/meeting-request-dialog.tsx:145
+msgid "1-on-1 with {recipientName}"
+msgstr ""
+
+#: src/features/meetings/meeting-panel.tsx:49
+msgid "1-on-1 with <0/>"
 msgstr ""
 
 #: src/features/schedule/day-grid.tsx:122
 #: src/features/settings/settings-screen.tsx:99
 msgid "1-on-1s"
+msgstr ""
+
+#: src/features/meetings/availability-form.tsx:76
+msgid "1-on-1s at {eventName}"
+msgstr ""
+
+#: src/features/meetings/meeting-panel.tsx:91
+msgid "1-on-1s can only be answered or canceled during the scheduling phase."
 msgstr ""
 
 #: src/app/time-format.tsx:61
@@ -143,6 +264,18 @@ msgstr ""
 msgid "a session I’ve RSVP’d to changes time or location, loses its host, or is deleted"
 msgstr ""
 
+#: src/features/meetings/meeting-panel.tsx:124
+msgid "Accept"
+msgstr ""
+
+#: src/features/meetings/meeting-request-fields.tsx:141
+msgid "Add a line of context (optional)"
+msgstr ""
+
+#: src/features/schedule/session-block.tsx:109
+msgid "Add session"
+msgstr ""
+
 #: src/features/schedule/schedule-toolbar.tsx:46
 msgid "Agenda"
 msgstr ""
@@ -152,8 +285,16 @@ msgctxt "Rows per page: every row"
 msgid "All"
 msgstr ""
 
+#: src/features/schedule/meeting-rules.ts:73
+msgid "all confirmed"
+msgstr ""
+
 #: src/features/schedule/day-agenda.tsx:264
 msgid "All rooms"
+msgstr ""
+
+#: src/features/meetings/book-meeting.tsx:177
+msgid "Already booked at this time"
 msgstr ""
 
 #: src/app/theme.tsx:95
@@ -168,6 +309,36 @@ msgstr ""
 msgid "Appearance (this device)"
 msgstr ""
 
+#: src/features/schedule/meetings-col.tsx:135
+msgid "Arrange a 1-on-1 at {label}"
+msgstr ""
+
+#: src/features/schedule/meetings-col.tsx:134
+msgid "Arrange a 1-on-1 at {label} — you are not offering this slot to others"
+msgstr ""
+
+#. Button: ask this person for a 1-on-1
+#: src/features/meetings/book-meeting.tsx:187
+msgid "Ask"
+msgstr ""
+
+#: src/features/meetings/book-meeting.tsx:185
+msgid "Ask {name}"
+msgstr ""
+
+#: src/features/people/open-up-nudge.tsx:58
+msgid "Ask them to open up"
+msgstr ""
+
+#. Button state: the request to open up was sent
+#: src/features/people/open-up-nudge.tsx:54
+msgid "Asked"
+msgstr ""
+
+#: src/features/meetings/meeting-request-fields.tsx:177
+msgid "Asked {name} for {slotLabel} on {dayLabel}. You'll hear when they answer."
+msgstr ""
+
 #: src/ui/data-table.tsx:61
 msgid "Assign selected"
 msgstr ""
@@ -175,6 +346,14 @@ msgstr ""
 #: src/app/header-links.tsx:17
 #: src/app/page-notice.tsx:12
 msgid "Attendees"
+msgstr ""
+
+#: src/features/schedule/session-panel.tsx:329
+msgid "Attendees ({attendeeCount} / {capacity}):"
+msgstr ""
+
+#: src/features/schedule/session-panel.tsx:330
+msgid "Attendees ({attendeeCount}):"
 msgstr ""
 
 #: src/ui/phase-bar.tsx:25
@@ -208,8 +387,18 @@ msgstr ""
 msgid "Back to the events"
 msgstr ""
 
+#: src/features/schedule/session-panel.tsx:234
+msgid "Become host"
+msgstr ""
+
+#. Title of a time slot reserved by the organizers
 #: src/features/schedule/day-agenda.tsx:273
+#: src/features/schedule/session-block.tsx:76
 msgid "Blocked"
+msgstr ""
+
+#: src/features/schedule/session-panel.tsx:83
+msgid "Bookmark this session"
 msgstr ""
 
 #: src/features/schedule/filters.ts:6
@@ -218,6 +407,7 @@ msgstr ""
 
 #: src/features/schedule/day-agenda.tsx:303
 #: src/features/schedule/filters.ts:6
+#: src/features/schedule/session-block.tsx:290
 msgid "Bookmarked"
 msgstr ""
 
@@ -225,8 +415,23 @@ msgstr ""
 msgid "Bulk actions"
 msgstr ""
 
+#. Time slot: the person has something else then
+#: src/features/people/meeting-request-dialog.tsx:65
+msgid "Busy"
+msgstr ""
+
+#: src/features/meetings/meeting-request-fields.tsx:157
 #: src/features/notifications/notifications-screen.tsx:232
 msgid "Cancel"
+msgstr ""
+
+#: src/features/meetings/meeting-panel.tsx:162
+msgid "Cancel 1-on-1"
+msgstr ""
+
+#. State of a 1-on-1 on the grid, lower case
+#: src/features/schedule/meeting-rules.ts:119
+msgid "canceled"
 msgstr ""
 
 #: src/features/settings/push-notifications.tsx:264
@@ -257,13 +462,30 @@ msgstr ""
 msgid "Clashing commitment"
 msgstr ""
 
+#. Button: untick every slot of this day
+#: src/features/meetings/availability-form.tsx:150
+msgid "Clear"
+msgstr ""
+
 #: src/ui/data-table.tsx:76
 msgctxt "Bulk actions: clear the selection"
 msgid "Clear"
 msgstr ""
 
+#: src/features/meetings/availability-form.tsx:148
+msgid "Clear all slots on {dayLabel}"
+msgstr ""
+
 #: src/ui/search-input.tsx:37
 msgid "Clear search"
+msgstr ""
+
+#: src/features/meetings/availability-form.tsx:111
+msgid "Clear the slots you want kept free. You don't need to clear the ones where you're hosting or have RSVP'd to — anyone booking you is warned about those. Times are in the event timezone ({timezone})."
+msgstr ""
+
+#: src/features/meetings/availability-form.tsx:180
+msgid "Clearing every slot is the same as switching this off."
 msgstr ""
 
 #: src/ui/dialog.tsx:117
@@ -275,8 +497,21 @@ msgstr ""
 msgid "Close menu"
 msgstr ""
 
+#: src/features/schedule/session-panel.tsx:198
+msgid "Closed Session"
+msgstr ""
+
 #: src/app/theme.tsx:104
 msgid "Colour theme"
+msgstr ""
+
+#. State of a 1-on-1 on the grid, lower case
+#: src/features/schedule/meeting-rules.ts:109
+msgid "confirmed"
+msgstr ""
+
+#: src/features/schedule/meeting-rules.ts:164
+msgid "Confirmed — see you there."
 msgstr ""
 
 #: src/ui/markdown.tsx:89
@@ -293,6 +528,18 @@ msgstr ""
 
 #: src/ui/copy-link-button.tsx:25
 msgid "Copy the address of this page, to share it or open it again later"
+msgstr ""
+
+#: src/features/meetings/meeting-request-fields.tsx:200
+msgid "Could not ask {name} for {slotLabel} on {dayLabel}. {error}"
+msgstr ""
+
+#: src/features/meetings/meeting-request-fields.tsx:190
+msgid "Could not ask {name} to open up to 1-on-1s. {error}"
+msgstr ""
+
+#: src/features/meetings/meeting-request-fields.tsx:195
+msgid "Could not ask {name}. {error}"
 msgstr ""
 
 #: src/ui/copy-link-button.tsx:19
@@ -335,9 +582,22 @@ msgstr ""
 msgid "Could not turn notifications on for this device."
 msgstr ""
 
+#: src/features/meetings/book-meeting.tsx:69
+msgid "Couldn't load who is free then. Try the slot again."
+msgstr ""
+
 #: src/app/theme.tsx:94
 msgctxt "Colour theme"
 msgid "Dark"
+msgstr ""
+
+#: src/features/meetings/meeting-panel.tsx:128
+msgid "Decline"
+msgstr ""
+
+#. State of a 1-on-1 on the grid, lower case
+#: src/features/schedule/meeting-rules.ts:114
+msgid "declined"
 msgstr ""
 
 #: src/features/notifications/notifications-screen.tsx:174
@@ -347,6 +607,10 @@ msgstr ""
 
 #: src/features/notifications/notifications-screen.tsx:225
 msgid "Delete notifications"
+msgstr ""
+
+#: src/features/schedule/session-panel.tsx:360
+msgid "Description"
 msgstr ""
 
 #: src/ui/use-discard-guard.tsx:90
@@ -363,6 +627,14 @@ msgstr ""
 
 #: src/ui/charts/prediction-scatter.tsx:73
 msgid "Dots are the model's midpoint, thick bars its 50% range, thin bars its 80% range. On the dashed line the prediction was exact. The model was fitted on one event, n = 13."
+msgstr ""
+
+#: src/features/schedule/session-panel.tsx:323
+msgid "During {momentTitle} ({momentStart}–{momentEnd})"
+msgstr ""
+
+#: src/features/schedule/session-panel.tsx:239
+msgid "Edit"
 msgstr ""
 
 #: src/ui/markdown-textarea.tsx:93
@@ -488,6 +760,22 @@ msgstr ""
 msgid "Hidden"
 msgstr ""
 
+#: src/features/schedule/session-panel.tsx:271
+msgid "Hide on the schedule"
+msgstr ""
+
+#: src/features/schedule/session-panel.tsx:258
+msgid "Hides this session on your schedule, for you only. Use it if you are not interested or for any other reason. You can show it again here."
+msgstr ""
+
+#: src/features/schedule/session-panel.tsx:284
+msgid "Host(s):"
+msgstr ""
+
+#: src/features/schedule/session-block.tsx:182
+msgid "Hosted by {hosts}"
+msgstr ""
+
 #: src/features/schedule/filters.ts:5
 msgid "hosting"
 msgstr ""
@@ -504,6 +792,10 @@ msgstr ""
 msgid "How to update"
 msgstr ""
 
+#: src/features/meetings/availability-form.tsx:96
+msgid "I'm open to 1-on-1s at this event"
+msgstr ""
+
 #: src/app/footer.tsx:153
 msgid "In this build, but not in a released version yet."
 msgstr ""
@@ -514,6 +806,10 @@ msgstr ""
 
 #: src/ui/use-discard-guard.tsx:93
 msgid "Keep editing"
+msgstr ""
+
+#: src/features/meetings/meeting-panel.tsx:152
+msgid "Keep it"
 msgstr ""
 
 #: src/features/settings/language-setting.tsx:36
@@ -528,6 +824,11 @@ msgstr ""
 
 #: src/ui/pager.tsx:152
 msgid "Last page"
+msgstr ""
+
+#: src/features/meetings/meeting-request-fields.tsx:28
+#: src/features/meetings/meeting-request-fields.tsx:30
+msgid "Length"
 msgstr ""
 
 #: src/app/theme.tsx:89
@@ -547,10 +848,16 @@ msgstr ""
 #: src/app/event-page.tsx:152
 #: src/app/panel-host.tsx:82
 #: src/app/people-pages.tsx:162
+#: src/features/meetings/book-meeting.tsx:73
 #: src/features/notifications/notifications-screen.tsx:78
 #: src/features/notifications/notifications-screen.tsx:181
+#: src/features/schedule/session-panel.tsx:334
 #: src/features/settings/settings-screen.tsx:38
 msgid "Loading…"
+msgstr ""
+
+#: src/features/schedule/session-panel.tsx:302
+msgid "Location:"
 msgstr ""
 
 #: src/app/user-menu.tsx:133
@@ -621,6 +928,10 @@ msgstr ""
 msgid "Names"
 msgstr ""
 
+#: src/features/schedule/meeting-rules.ts:105
+msgid "needs your reply"
+msgstr ""
+
 #: src/ui/pager.tsx:146
 msgid "Next"
 msgstr ""
@@ -637,8 +948,16 @@ msgstr ""
 msgid "No"
 msgstr ""
 
+#: src/features/schedule/session-panel.tsx:336
+msgid "No attendees yet"
+msgstr ""
+
 #: src/app/home-page.tsx:45
 msgid "No events found."
+msgstr ""
+
+#: src/features/schedule/session-block.tsx:235
+msgid "No hosts"
 msgstr ""
 
 #: src/features/schedule/day-agenda.tsx:105
@@ -649,12 +968,36 @@ msgstr ""
 msgid "No sessions"
 msgstr ""
 
+#: src/features/schedule/meeting-rules.ts:174
+msgid "Nobody answered before the slot began."
+msgstr ""
+
+#: src/features/meetings/book-meeting.tsx:136
+msgid "Nobody has marked this time free."
+msgstr ""
+
+#: src/features/people/open-up-nudge.tsx:40
+msgid "Not open to 1-on-1s yet"
+msgstr ""
+
+#: src/features/people/open-up-nudge.tsx:39
+msgid "Not open to 1-on-1s yet at {eventName}"
+msgstr ""
+
 #: src/app/sync-indicator.tsx:11
 msgid "Not updating: may be out of date"
 msgstr ""
 
 #: src/ui/people-picker.tsx:132
 msgid "Nothing found."
+msgstr ""
+
+#: src/features/meetings/meeting-panel.tsx:167
+msgid "Nothing is reserved — the meeting point is just where to find each other."
+msgstr ""
+
+#: src/features/meetings/meeting-request-fields.tsx:134
+msgid "Nothing is reserved — this is just where to find each other."
 msgstr ""
 
 #: src/ui/data-table.tsx:201
@@ -709,16 +1052,32 @@ msgstr ""
 msgid "On iPhone and iPad this works once the site is on your home screen: tap the Share button, then <0>Add to Home Screen</0>, and open it from there."
 msgstr ""
 
+#: src/features/meetings/book-meeting.tsx:198
+msgid "Only people who marked this time free are listed. Nobody is told you looked."
+msgstr ""
+
 #: src/features/schedule/day-grid.tsx:136
 msgid "Only you see these"
+msgstr ""
+
+#: src/features/schedule/session-panel.tsx:74
+msgid "Only you see your bookmarks. This is not an RSVP."
 msgstr ""
 
 #: src/app/nav-bar.tsx:38
 msgid "Open menu"
 msgstr ""
 
+#: src/features/meetings/meeting-panel.tsx:204
+msgid "opening your 1-on-1s"
+msgstr ""
+
 #: src/features/schedule/attendee-count-field.tsx:99
 msgid "Optional. Only you and your co-hosts will see this, not the attendees. Enter <0>0</0> if the session was held but nobody came. If it never happened at all, delete the session instead. Leave the field empty to go back to no count at all."
+msgstr ""
+
+#: src/features/meetings/meeting-request-fields.tsx:130
+msgid "or type somewhere else"
 msgstr ""
 
 #: src/ui/pager.tsx:129
@@ -788,6 +1147,10 @@ msgstr ""
 msgid "Remove {0}"
 msgstr ""
 
+#: src/features/schedule/session-panel.tsx:83
+msgid "Remove bookmark"
+msgstr ""
+
 #: src/ui/data-table.tsx:69
 msgid "Remove selected"
 msgstr ""
@@ -804,6 +1167,14 @@ msgstr ""
 msgid "Rows per page"
 msgstr ""
 
+#: src/features/schedule/session-panel.tsx:224
+msgid "RSVP"
+msgstr ""
+
+#: src/features/schedule/session-block.tsx:376
+msgid "RSVP to {title}"
+msgstr ""
+
 #: src/features/schedule/filters.ts:4
 #: src/features/schedule/filters.ts:4
 msgid "RSVP'd"
@@ -818,11 +1189,20 @@ msgstr ""
 msgid "Save attendee count"
 msgstr ""
 
+#: src/features/meetings/availability-form.tsx:191
+msgid "Save availability"
+msgstr ""
+
 #: src/features/schedule/attendee-count-field.tsx:136
 #: src/features/settings/email-settings-form.tsx:124
 msgid "Saved"
 msgstr ""
 
+#: src/features/meetings/availability-form.tsx:187
+msgid "Saved!"
+msgstr ""
+
+#: src/features/meetings/availability-form.tsx:191
 #: src/features/settings/email-settings-form.tsx:120
 msgid "Saving..."
 msgstr ""
@@ -831,12 +1211,24 @@ msgstr ""
 msgid "Saving…"
 msgstr ""
 
+#: src/features/meetings/meeting-panel.tsx:141
+msgid "Say why, if you like (optional)"
+msgstr ""
+
 #: src/features/schedule/schedule-toolbar.tsx:84
 msgid "Schedule view"
 msgstr ""
 
 #: src/ui/phase-bar.tsx:18
 msgid "Scheduling"
+msgstr ""
+
+#: src/features/schedule/session-panel.tsx:135
+msgid "Scheduling {opens}"
+msgstr ""
+
+#: src/features/schedule/session-panel.tsx:134
+msgid "Scheduling has ended"
 msgstr ""
 
 #: src/features/schedule/day-grid.tsx:83
@@ -871,8 +1263,13 @@ msgstr ""
 msgid "Select {text}"
 msgstr ""
 
+#: src/features/meetings/availability-form.tsx:142
 #: src/ui/data-table.tsx:251
 msgid "Select all"
+msgstr ""
+
+#: src/features/meetings/availability-form.tsx:140
+msgid "Select all slots on {dayLabel}"
 msgstr ""
 
 #: src/features/notifications/notifications-screen.tsx:158
@@ -881,6 +1278,31 @@ msgstr ""
 
 #: src/app/user-menu.tsx:61
 msgid "Select your name"
+msgstr ""
+
+#: src/features/meetings/meeting-request-fields.tsx:154
+msgid "Send request"
+msgstr ""
+
+#: src/features/meetings/meeting-request-fields.tsx:154
+msgid "Sending..."
+msgstr ""
+
+#: src/features/schedule/session-panel.tsx:54
+#: src/features/schedule/session-panel.tsx:55
+msgid "Session details"
+msgstr ""
+
+#: src/features/schedule/session-panel.tsx:223
+msgid "Session full"
+msgstr ""
+
+#: src/features/meetings/book-meeting.tsx:164
+msgid "Session host"
+msgstr ""
+
+#: src/features/schedule/session-panel.tsx:64
+msgid "Session not found."
 msgstr ""
 
 #: src/app/user-menu.tsx:115
@@ -900,6 +1322,10 @@ msgstr ""
 msgid "Show map"
 msgstr ""
 
+#: src/features/schedule/session-panel.tsx:270
+msgid "Show on the schedule"
+msgstr ""
+
 #: src/features/schedule/schedule-filters.tsx:138
 msgid "Show only your sessions and 1-on-1s that overlap in time with another of yours, bookmarks included."
 msgstr ""
@@ -910,6 +1336,10 @@ msgstr ""
 
 #: src/ui/combobox.tsx:136
 msgid "Show suggestions"
+msgstr ""
+
+#: src/features/schedule/session-panel.tsx:257
+msgid "Shows this session on your schedule again."
 msgstr ""
 
 #: src/app/layout.tsx:19
@@ -940,12 +1370,20 @@ msgstr ""
 msgid "someone comments on my profile"
 msgstr ""
 
+#: src/features/meetings/book-meeting.tsx:285
+msgid "Someone else"
+msgstr ""
+
 #: src/features/settings/email-settings-form.tsx:26
 msgid "someone joins a proposal I’m hosting as a co-host"
 msgstr ""
 
 #: src/app/error-boundary.tsx:29
 msgid "Something went wrong"
+msgstr ""
+
+#: src/features/meetings/meeting-panel.tsx:145
+msgid "Sorry — my session moved…"
 msgstr ""
 
 #. placeholder {0}: when(start)
@@ -967,6 +1405,10 @@ msgctxt "Colour theme"
 msgid "System"
 msgstr ""
 
+#: src/features/meetings/book-meeting.tsx:68
+msgid "That slot is no longer open for 1-on-1s."
+msgstr ""
+
 #: src/ui/charts/plot-frame.tsx:51
 msgid "The chart could not load. The table below has the figures."
 msgstr ""
@@ -980,12 +1422,20 @@ msgstr ""
 msgid "The events could not be loaded."
 msgstr ""
 
+#: src/features/meetings/availability-form.tsx:121
+msgid "The organizer hasn't set up any days with 1-on-1 slots yet."
+msgstr ""
+
 #: src/ui/form-error-summary.tsx:36
 msgid "There is a problem:"
 msgstr ""
 
 #: src/features/schedule/day-agenda.tsx:404
 msgid "This 1-on-1 is confirmed"
+msgstr ""
+
+#: src/features/schedule/meeting-rules.ts:170
+msgid "This 1-on-1 was canceled."
 msgstr ""
 
 #: src/features/settings/push-notifications.tsx:279
@@ -1004,12 +1454,20 @@ msgstr ""
 msgid "This event is over. You can still browse the schedule."
 msgstr ""
 
+#: src/features/schedule/session-panel.tsx:201
+msgid "This is a closed session, meaning you can at most arrive 5 minutes late. If you arrive later you may not join and please do not knock or otherwise disrupt the session."
+msgstr ""
+
 #: src/app/error-boundary.tsx:31
 msgid "This screen stopped working. Your data is safe."
 msgstr ""
 
 #: src/features/schedule/clashes.ts:102
 msgid "This session clashes with {list}. Do you want to RSVP anyway?"
+msgstr ""
+
+#: src/features/schedule/session-panel.tsx:368
+msgid "This session was scheduled from a proposal. See it <0>here</0>."
 msgstr ""
 
 #: src/app/footer.tsx:123
@@ -1027,6 +1485,10 @@ msgstr ""
 #: src/app/time-format.tsx:99
 #: src/features/settings/settings-screen.tsx:141
 msgid "Time format"
+msgstr ""
+
+#: src/features/schedule/session-panel.tsx:317
+msgid "Time:"
 msgstr ""
 
 #: src/app/time-format.tsx:71
@@ -1077,6 +1539,18 @@ msgstr ""
 msgid "Two attendees in conversation"
 msgstr ""
 
+#: src/features/schedule/session-panel.tsx:221
+msgid "Un-RSVP"
+msgstr ""
+
+#: src/features/schedule/meeting-rules.ts:124
+msgid "unanswered"
+msgstr ""
+
+#: src/features/people/meeting-request-dialog.tsx:60
+msgid "Unavailable"
+msgstr ""
+
 #: src/app/footer.tsx:44
 msgid "unknown"
 msgstr ""
@@ -1114,28 +1588,80 @@ msgstr ""
 msgid "Voting"
 msgstr ""
 
+#: src/features/schedule/meeting-rules.ts:162
+msgid "Waiting for {them} to answer."
+msgstr ""
+
+#: src/features/schedule/meeting-rules.ts:107
+msgid "waiting for reply"
+msgstr ""
+
 #: src/app/footer.tsx:63
 #: src/app/footer.tsx:119
 msgid "What's new"
+msgstr ""
+
+#: src/features/meetings/meeting-panel.tsx:73
+msgid "When"
 msgstr ""
 
 #: src/features/settings/settings-screen.tsx:102
 msgid "When you're free to meet other attendees, event by event. Only the events you're attending that offer 1-on-1s are listed."
 msgstr ""
 
+#: src/features/meetings/meeting-panel.tsx:81
+msgid "Where"
+msgstr ""
+
+#: src/features/meetings/meeting-request-fields.tsx:88
+#: src/features/meetings/meeting-request-fields.tsx:125
+msgid "Where to meet"
+msgstr ""
+
+#: src/features/meetings/availability-form.tsx:99
+msgid "While this is off, nobody can book you and you won't appear as bookable."
+msgstr ""
+
 #: src/app/user-menu.tsx:209
 msgid "Who are you?"
+msgstr ""
+
+#: src/features/meetings/book-meeting.tsx:60
+msgid "Who's free at {slotStartLabel}?"
+msgstr ""
+
+#: src/features/meetings/meeting-panel.tsx:107
+msgid "Why it was called off:"
+msgstr ""
+
+#: src/features/schedule/session-block.tsx:376
+msgid "Withdraw RSVP from {title}"
+msgstr ""
+
+#: src/features/meetings/meeting-request-fields.tsx:145
+msgid "Would love to talk about…"
 msgstr ""
 
 #: src/ui/confirm-dialog.tsx:10
 msgid "Yes"
 msgstr ""
 
+#: src/features/meetings/meeting-panel.tsx:149
+msgid "Yes, cancel it"
+msgstr ""
+
 #: src/features/schedule/day-agenda.tsx:318
+#: src/features/schedule/session-block.tsx:333
+#: src/features/schedule/session-panel.tsx:243
 msgid "You are hosting this session"
 msgstr ""
 
+#: src/features/schedule/meeting-rules.ts:167
+msgid "You declined this."
+msgstr ""
+
 #: src/features/schedule/day-agenda.tsx:326
+#: src/features/schedule/session-panel.tsx:248
 msgid "You have RSVP'd to this session"
 msgstr ""
 
@@ -1150,6 +1676,18 @@ msgstr ""
 
 #: src/app/user-menu.tsx:78
 msgid "Your name: {name}"
+msgstr ""
+
+#: src/features/meetings/meeting-request-fields.tsx:199
+msgid "Your request to ask {name} for {slotLabel} on {dayLabel}: {error}"
+msgstr ""
+
+#: src/features/meetings/meeting-request-fields.tsx:189
+msgid "Your request to ask {name} to open up to 1-on-1s: {error}"
+msgstr ""
+
+#: src/features/meetings/meeting-request-fields.tsx:194
+msgid "Your request to ask {name}: {error}"
 msgstr ""
 
 #: src/ui/charts/scatter.tsx:66

@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { clashLines } from "@schellingboard/domain/meeting-clash-text";
 import { type FormEvent, useState } from "react";
 
@@ -12,6 +14,7 @@ import {
   MeetingRequestError,
   MeetingRequestFields,
   requestSentNotice,
+  type RequestSubject,
 } from "../meetings/meeting-request-fields";
 
 type Day = ProfileMeetingOption["lengths"][number]["days"][number];
@@ -53,10 +56,16 @@ function SlotList({
                   >
                     <span className="whitespace-nowrap">{slot.label}</span>
                     {unavailable && (
-                      <span className="block text-xs">Unavailable</span>
+                      <span className="block text-xs">
+                        <Trans>Unavailable</Trans>
+                      </span>
                     )}
                     {slot.state === "busy" && (
-                      <span className="block text-xs">Busy</span>
+                      <span className="block text-xs">
+                        <Trans comment="Time slot: the person has something else then">
+                          Busy
+                        </Trans>
+                      </span>
                     )}
                   </button>
                 </li>
@@ -110,22 +119,34 @@ export function MeetingRequestDialog({
   const day = days.find((d) => d.slots.some((s) => s.start === slotStart));
   const slot = day?.slots.find((s) => s.start === slotStart);
 
+  const subject: RequestSubject =
+    slot && day
+      ? {
+          kind: "slot",
+          name: recipientName,
+          slotLabel: slot.label,
+          dayLabel: day.label,
+        }
+      : { kind: "person", name: recipientName };
+
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     if (!slotStart) return;
     if (!(await mutation.submit())?.ok) return;
-    notify(
-      requestSentNotice(`${recipientName} for ${slot?.label} on ${day?.label}`)
-    );
+    if (subject.kind === "slot") {
+      notify(
+        requestSentNotice(subject.name, subject.slotLabel, subject.dayLabel)
+      );
+    }
     onClose();
   };
 
   return (
-    <Dialog open wide onClose={onClose} title={`1-on-1 with ${recipientName}`}>
+    <Dialog open wide onClose={onClose} title={t`1-on-1 with ${recipientName}`}>
       <p className="-mt-2 mb-3 text-sm text-fg-muted">{option.eventName}</p>
       <form onSubmit={(e) => void submit(e)} className="flex flex-col gap-4">
         <MeetingRequestError
-          what={`${recipientName} for ${slot?.label ?? "that slot"} on ${day?.label ?? "that day"}`}
+          subject={subject}
           error={mutation.error}
           unreachable={mutation.unreachable}
         />

@@ -1,3 +1,4 @@
+import { plural, t } from "@lingui/core/macro";
 import type { Event } from "@schellingboard/domain/event";
 import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
 import { inSchedPhase } from "@schellingboard/domain/phase";
@@ -56,21 +57,37 @@ export function blockTimeLabel(
 export function slotSummaryLine(
   meetings: Pick<MeetingView, "status" | "role">[]
 ): string {
+  const { kind, count } = slotSummary(meetings);
+  if (kind === "yours") {
+    return plural(count, {
+      one: "# needs your reply",
+      other: "# need your reply",
+    });
+  }
+  if (kind === "pending") {
+    return plural(count, {
+      one: "# waiting for reply",
+      other: "# waiting for reply",
+    });
+  }
+  return t`all confirmed`;
+}
+
+/** What `slotSummaryLine` says, as data, for messages that embed it. */
+export function slotSummary(meetings: Pick<MeetingView, "status" | "role">[]): {
+  kind: "yours" | "pending" | "confirmed";
+  count: number;
+} {
   const pending = meetings.filter((m) => m.status === "pending");
   const yours = pending.filter(needsReply).length;
-  if (yours > 0) {
-    return yours === 1 ? "1 needs your reply" : `${yours} need your reply`;
-  }
-  if (pending.length > 0) {
-    return pending.length === 1
-      ? "1 waiting for reply"
-      : `${pending.length} waiting for reply`;
-  }
-  return "all confirmed";
+  if (yours > 0) return { kind: "yours", count: yours };
+  if (pending.length > 0) return { kind: "pending", count: pending.length };
+  return { kind: "confirmed", count: 0 };
 }
 
 export function meetingTitle(meeting: Pick<MeetingView, "otherName">): string {
-  return `1-on-1 with ${meeting.otherName}`;
+  const { otherName } = meeting;
+  return t`1-on-1 with ${otherName}`;
 }
 
 export function needsReply(
@@ -83,9 +100,45 @@ export function needsReply(
 export function blockStatus(
   meeting: Pick<MeetingView, "status" | "role">
 ): string {
+  switch (blockStatusKey(meeting)) {
+    case "needsReply":
+      return t`needs your reply`;
+    case "waiting":
+      return t`waiting for reply`;
+    case "confirmed":
+      return t({
+        message: "confirmed",
+        comment: "State of a 1-on-1 on the grid, lower case",
+      });
+    case "declined":
+      return t({
+        message: "declined",
+        comment: "State of a 1-on-1 on the grid, lower case",
+      });
+    case "canceled":
+      return t({
+        message: "canceled",
+        comment: "State of a 1-on-1 on the grid, lower case",
+      });
+    case "unanswered":
+      return t`unanswered`;
+  }
+}
+
+export type BlockStatusKey =
+  | "needsReply"
+  | "waiting"
+  | "confirmed"
+  | "declined"
+  | "canceled"
+  | "unanswered";
+
+export function blockStatusKey(
+  meeting: Pick<MeetingView, "status" | "role">
+): BlockStatusKey {
   switch (meeting.status) {
     case "pending":
-      return needsReply(meeting) ? "needs your reply" : "waiting for reply";
+      return needsReply(meeting) ? "needsReply" : "waiting";
     case "accepted":
       return "confirmed";
     case "declined":
@@ -105,19 +158,19 @@ export function statusLine(
   switch (meeting.status) {
     case "pending":
       return meeting.role === "recipient"
-        ? `${them} is waiting for your answer.`
-        : `Waiting for ${them} to answer.`;
+        ? t`${them} is waiting for your answer.`
+        : t`Waiting for ${them} to answer.`;
     case "accepted":
-      return "Confirmed — see you there.";
+      return t`Confirmed — see you there.`;
     case "declined":
       return meeting.role === "recipient"
-        ? "You declined this."
-        : `${them} declined this.`;
+        ? t`You declined this.`
+        : t`${them} declined this.`;
     case "canceled":
-      return "This 1-on-1 was canceled.";
+      return t`This 1-on-1 was canceled.`;
     case "expired":
       // Nobody is at fault for an unanswered request, so it is not phrased as
       // one: the slot simply came and went (issue #392, section 1.4).
-      return "Nobody answered before the slot began.";
+      return t`Nobody answered before the slot began.`;
   }
 }
