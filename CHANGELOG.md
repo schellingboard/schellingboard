@@ -65,6 +65,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **A profile's panel is titled with the person's name** (#1590): it said "Profile", and the back
+  arrow sat too low.
 - **The grid schedule has a line above each day's room names** (#1589): days ran into each other.
 - **Icon choices in the event settings show the icons** (#1588): they were listed by name only.
 - **"My schedule" menu works on the grid** (#1587): its options opened hidden behind the grid

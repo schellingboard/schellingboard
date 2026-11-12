@@ -254,7 +254,9 @@ export function ProfilePanel(props: ProfilePanelProps) {
               {position}
             </span>
           ) : (
-            "Profile"
+            <span title={guest?.name} className="block truncate">
+              {guest?.name ?? "Profile"}
+            </span>
           )
         }
         titleAction={

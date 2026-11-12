@@ -139,7 +139,7 @@ export function SidePanel({
         onPointerUp={() => remember(width)}
         className="absolute inset-y-0 -left-1 hidden w-2 cursor-col-resize hover:bg-brand-accent/40 focus:bg-brand-accent/60 focus:outline-none sm:block"
       />
-      <div className="flex items-start gap-2 p-4 pb-0">
+      <div className="flex items-center gap-2 p-4 pb-0">
         {onBack && (
           <button
             type="button"

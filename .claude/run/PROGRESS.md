@@ -27,6 +27,8 @@
 
 ## Questions
 
+- `profile-photo.spec.ts:9` fails without my changes too (about-me heading x 849 < 1184: the wide
+  two-column layout is not reached at the default viewport). Separate fix.
 - 22b: the installed (standalone) app has no address bar, the reason ADR 0020 gave for the Share
   button, so it can no longer share a link. Removal kept as decided; restore a share action there?
 - #691: the script uses the API, not a browser, so identity requests per navigation (#1148) are
