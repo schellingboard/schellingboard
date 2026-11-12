@@ -58,15 +58,9 @@ the E2E specs a step touches; the user runs the full suite at the end.
     form, a modal hides it); Quick Voting is a full-screen swipe flow and likely stays a page; long
     forms need panel width on desktop and are full-screen on mobile anyway. Put the open decisions
     under Questions; do not implement before the user answers. 22g. DONE #1591 **Phase bar**
-    (`ui/phase-bar.tsx`, `share` on `phaseTimeline`). 22h. **Proposals toolbar redesign.** The
-    filter area has dead white space at the bottom left (chips top left, search top right, Sort by
-    alone below right). Redesign for excellent UX, same controls, no new features: one compact
-    toolbar. Row 1: search field growing to fill the width, then Sort by. Row 2 (or the same row
-    when wide): filter chips, then the result count at the far end. No empty corners at 390px, 768px
-    and 1440px; chips wrap or scroll horizontally on phones; keep keyboard order (search, filters,
-    sort) and visible focus. Check the Agenda and attendee directory toolbars: share one
-    `ListToolbar` if they have the same shape. Pure layout: adapt only the tests it breaks. Capture
-    before/after screenshots at the three widths into PROGRESS.md notes (not docs). Issue optional.
+    (`ui/phase-bar.tsx`, `share` on `phaseTimeline`). 22h. DONE Proposals and attendee toolbars
+    share `ui/list-toolbar.tsx` (grid areas; the Agenda bar is a sticky bar with a menu, a different
+    shape, left as is).
 23. **#831** (Medium) Owner decision: every long list for users and admins is paginated with the
     shared `Pager` (page numbers, First, Prev, Next, Last, configurable page size, default 50, sizes
     e.g. 25/50/100, `page`/`pageSize` URL params). Survey all lists (proposals, directory, agenda,

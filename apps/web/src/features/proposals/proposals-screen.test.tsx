@@ -376,7 +376,7 @@ describe("the proposals list", () => {
       "garden"
     );
 
-    await waitFor(() => expect(screen.getByText("(1 result)")).toBeTruthy());
+    await waitFor(() => expect(screen.getByText("1 result")).toBeTruthy());
     expect(
       screen.getByRole("button", {
         name: "Filter to show only proposals that want a host",

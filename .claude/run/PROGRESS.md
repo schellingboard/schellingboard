@@ -26,6 +26,11 @@
   Segment width = `share` (real phase length, 20% minimum; last phase uses `schedulingPhaseEnd`).
   `scheduling-notice.ts` removed. No screenshot in `docs/` showed the old strip.
 
+- 22h: `ListToolbar` (search | sort, chips | count at md+; search, chips, count+sort on phones).
+  Count text is now "N results" (was "(N results)"), E2E regex adapted. Checked at 390/768/1440,
+  light and dark, on the proposals and attendees pages: no empty corners (screenshots were
+  temporary, not kept).
+
 ## Problems
 
 - #200: not checked in a browser at 390px (long URL, fixed vote bar); CSS read only.
