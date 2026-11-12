@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from "react";
+import { useId, useLayoutEffect, useRef, type ReactNode } from "react";
 import { Combobox } from "./combobox";
 import { MarkdownTextarea } from "./markdown-textarea";
 import { PeoplePicker, type Person } from "./people-picker";
@@ -156,6 +156,50 @@ export function TextAreaField({
         placeholder={placeholder}
         rows={rows}
         maxLength={maxLength}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    </Frame>
+  );
+}
+
+const GROW_MAX_ROWS = 8;
+
+/** Looks like one line until a line break is typed, then grows. */
+export function GrowingTextField({
+  value,
+  onChange,
+  placeholder,
+  ...frame
+}: FieldProps & {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+}) {
+  const hint = frame.hint ?? "Markdown supported";
+  const ids = useField({ ...frame, hint });
+  const textarea = useRef<HTMLTextAreaElement>(null);
+  useLayoutEffect(() => {
+    const el = textarea.current;
+    if (!el) return;
+    el.style.height = "auto";
+    const style = getComputedStyle(el);
+    const line = parseFloat(style.lineHeight) || 20;
+    // scrollHeight leaves out the borders, which border-box sizing counts.
+    const chrome = el.offsetHeight - el.clientHeight;
+    const padding =
+      parseFloat(style.paddingTop) + parseFloat(style.paddingBottom) || 0;
+    const max = line * GROW_MAX_ROWS + padding + chrome;
+    el.style.height = `${Math.min(el.scrollHeight + chrome, max)}px`;
+  }, [value]);
+  return (
+    <Frame {...frame} hint={hint} ids={ids}>
+      <textarea
+        {...ids.control}
+        ref={textarea}
+        rows={1}
+        className={`${CONTROL} resize-none`}
+        value={value}
+        placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
       />
     </Frame>

@@ -156,9 +156,9 @@ export function ProfileBody({
         {orderPrompts(guest.prompts ?? []).map(({ prompt, answer }) => (
           <section key={prompt}>
             <h2 className="text-lg font-semibold mb-2">{prompt}</h2>
-            <p className="text-fg">
-              <MarkdownInline>{answer}</MarkdownInline>
-            </p>
+            <div className="text-fg">
+              <Markdown className="text-base">{answer}</Markdown>
+            </div>
           </section>
         ))}
 

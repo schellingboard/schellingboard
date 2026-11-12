@@ -461,7 +461,8 @@ After picking your name, open **"Edit profile"** to set your About me, pronouns,
 are visible to other attendees wherever your name appears — proposals, hosting, RSVPs.
 
 About me, conversation-starter answers, and contact details all accept Markdown, and a web or email
-address you paste in becomes clickable on its own.
+address you paste in becomes clickable on its own. A conversation-starter answer can have several
+lines; start lines with `-` for a list.
 
 If your profile changed while you had the form open, for example from another tab or because an
 organizer renamed you, your save is refused rather than undoing that change. Copy your edits, reload

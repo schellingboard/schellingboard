@@ -52,7 +52,7 @@ const cards = cardsFrom(
       languages: ["Norwegian", "English"],
       prompts: [
         { prompt: "Zebra question", answer: "Stripes" },
-        { prompt: "Offering", answer: "Bees" },
+        { prompt: "Offering", answer: "Bees\n- Honey\n- Wax" },
       ],
       contacts: [
         { type: "email", value: "al@example.com" },
@@ -139,6 +139,15 @@ describe("the profile panel", () => {
     expect(d.getByText("<script>x</script>")).toBeTruthy();
     expect(d.getByText("Fediverse:")).toBeTruthy();
     expect(d.getByText("Email:")).toBeTruthy();
+  });
+
+  it("shows a prompt answer's list as a list", { tags: ["011-US1"] }, () => {
+    render(<Harness />);
+
+    const items = within(dialog()).getAllByRole("listitem");
+    expect(items.map((i) => i.textContent)).toEqual(
+      expect.arrayContaining(["Honey", "Wax"])
+    );
   });
 
   it(
