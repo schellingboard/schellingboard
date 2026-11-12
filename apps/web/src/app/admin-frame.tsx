@@ -1,3 +1,6 @@
+import { i18n } from "@lingui/core";
+import { msg, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import type { ApiClient } from "@schellingboard/api-client";
 import {
   createContext,
@@ -34,11 +37,11 @@ const FRAME = "mx-auto w-full max-w-[120rem] px-3 lg:px-8";
 const LOGIN = "/auth/login";
 
 const LINKS = [
-  { href: "/admin/events", label: "Events" },
-  { href: "/admin/users", label: "Users" },
-  { href: "/admin/locations", label: "Locations" },
-  { href: "/admin/statistics", label: "Statistics" },
-  { href: "/admin/settings", label: "Settings" },
+  { href: "/admin/events", label: msg`Events` },
+  { href: "/admin/users", label: msg`Users` },
+  { href: "/admin/locations", label: msg`Locations` },
+  { href: "/admin/statistics", label: msg`Statistics` },
+  { href: "/admin/settings", label: msg`Settings` },
 ];
 
 function NavLinks({
@@ -50,7 +53,7 @@ function NavLinks({
 }) {
   return (
     <nav
-      aria-label="Admin"
+      aria-label={t`Admin`}
       className={cx(block ? "flex flex-col gap-1" : "flex gap-1")}
     >
       {LINKS.map((link) => {
@@ -68,7 +71,7 @@ function NavLinks({
                 : "text-bar-fg-subtle hover:bg-bar-fg/10 hover:text-bar-fg"
             )}
           >
-            {link.label}
+            {i18n._(link.label)}
           </a>
         );
       })}
@@ -104,11 +107,11 @@ function LogoutButton() {
         className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-bar-fg-subtle transition-colors hover:bg-bar-fg/10 hover:text-bar-fg disabled:cursor-not-allowed disabled:opacity-50"
       >
         <ArrowRightOnRectangleIcon className="h-4 w-4" />
-        {pending ? "Logging out..." : "Admin logout"}
+        {pending ? t`Logging out...` : t`Admin logout`}
       </button>
       {failed && (
         <span role="alert" className="text-sm text-bar-fg">
-          Could not log out. Try again.
+          <Trans>Could not log out. Try again.</Trans>
         </span>
       )}
     </>
@@ -129,7 +132,7 @@ function AdminHeader({
         className={cx(FRAME, "flex items-center justify-between gap-4 py-3")}
       >
         <a href="/admin" className="font-semibold hover:text-bar-fg-subtle">
-          {title} Admin
+          <Trans>{title} Admin</Trans>
         </a>
         <div className="hidden items-center gap-4 sm:flex">
           <NavLinks currentPath={currentPath} />
@@ -137,7 +140,7 @@ function AdminHeader({
         </div>
         <button
           type="button"
-          aria-label={open ? "Close admin menu" : "Open admin menu"}
+          aria-label={open ? t`Close admin menu` : t`Open admin menu`}
           aria-expanded={open}
           onClick={() => setOpen(!open)}
           className="inline-flex items-center justify-center rounded-md p-2 text-bar-fg-subtle hover:bg-bar-fg/10 hover:text-bar-fg sm:hidden"
@@ -180,6 +183,7 @@ export function AdminFrame({
   }, [gate]);
   const state = useSyncExternalStore(gate.subscribe, gate.get);
   const reload = useCallback(() => void gate.load(), [gate]);
+  const errorCode = state.status === "error" ? state.code : undefined;
   const health = useHealth(api);
   const update = useUpdateStatus(api);
 
@@ -209,7 +213,7 @@ export function AdminFrame({
               )}
               {state.status === "error" && (
                 <p role="alert" className="text-sm text-danger-fg">
-                  Could not open the admin area ({state.code}).
+                  <Trans>Could not open the admin area ({errorCode}).</Trans>
                 </p>
               )}
             </div>

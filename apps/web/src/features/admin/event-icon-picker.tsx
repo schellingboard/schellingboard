@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import {
   EVENT_ICON_NAMES,
   eventIconLabel,
@@ -52,7 +53,7 @@ export function EventIconPicker({
       className="flex flex-wrap gap-1.5"
     >
       <Option
-        label="No icon"
+        label={t`No icon`}
         selected={value === ""}
         onSelect={() => onChange("")}
       />

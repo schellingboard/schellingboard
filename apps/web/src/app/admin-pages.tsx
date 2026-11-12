@@ -1,13 +1,9 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import type { EventStatistics } from "@schellingboard/contracts/stats";
 import { formatDayLabel } from "@schellingboard/domain/time";
 import { Outlet, useLocation, useRouter } from "@tanstack/react-router";
-import {
-  type ReactNode,
-  useEffect,
-  useMemo,
-  useState,
-  useSyncExternalStore,
-} from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 import { adminEventCalls } from "../commands/admin-events";
 import { adminGuestCalls } from "../commands/admin-guests";
@@ -115,10 +111,15 @@ export function AdminUserImportPage({ api }: { api: Api }) {
   if (events.status === "error")
     return (
       <p role="alert" className="text-sm text-danger-fg">
-        Could not load the events.
+        <Trans>Could not load the events.</Trans>
       </p>
     );
-  if (events.status === "loading") return <p className="text-sm">Loading…</p>;
+  if (events.status === "loading")
+    return (
+      <p className="text-sm">
+        <Trans>Loading…</Trans>
+      </p>
+    );
   return <UserImportScreen events={events.events.map(named)} calls={calls} />;
 }
 
@@ -159,7 +160,13 @@ export function AdminSettingsPage({ api }: { api: Api }) {
   );
 }
 
-const TABS = ["guests", "locations", "proposals", "sessions", "stats"];
+const TABS = {
+  guests: true,
+  locations: true,
+  proposals: true,
+  sessions: true,
+  stats: true,
+} as const;
 
 function Redirect({ to }: { to: string }) {
   const { history } = useRouter();
@@ -169,11 +176,21 @@ function Redirect({ to }: { to: string }) {
 
 export function AdminStatisticsHome({ api }: { api: Api }) {
   const [events] = useQuery(() => createAdminEventsQuery({ api }));
-  if (events.status === "error") return <Failed>the events</Failed>;
-  if (events.status === "loading") return <p className="text-sm">Loading…</p>;
+  if (events.status === "error")
+    return <Failed message={t`Could not load the events.`} />;
+  if (events.status === "loading")
+    return (
+      <p className="text-sm">
+        <Trans>Loading…</Trans>
+      </p>
+    );
   const event = defaultStatsEvent(events.events, new Date(events.now));
   if (!event)
-    return <p className="text-sm text-fg-muted">There are no events yet.</p>;
+    return (
+      <p className="text-sm text-fg-muted">
+        <Trans>There are no events yet.</Trans>
+      </p>
+    );
   return <Redirect to={`/admin/statistics/${event.id}`} />;
 }
 
@@ -185,10 +202,12 @@ export function AdminStatisticsPage({ api, id }: { api: Api; id: string }) {
   return (
     <div className="w-full space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <h1 className="text-2xl font-bold text-fg">Statistics</h1>
+        <h1 className="text-2xl font-bold text-fg">
+          <Trans>Statistics</Trans>
+        </h1>
         {events.status === "ready" && (
           <label className="flex items-center gap-2 text-sm font-medium text-fg-muted">
-            Event
+            {t({ message: "Event", context: "Statistics: the event to show" })}
             <select
               value={id}
               onChange={(e) =>
@@ -227,11 +246,11 @@ export function AdminEventPage({ api, id }: { api: Api; id: string }) {
       {ready &&
         (tab === undefined ? (
           <ConfigTab api={api} id={id} state={ready} reload={load} />
-        ) : TABS.includes(tab) ? (
+        ) : Object.hasOwn(TABS, tab) ? (
           <Tab api={api} id={id} tab={tab} state={ready} />
         ) : (
           <p role="alert" className="text-sm text-danger-fg">
-            Page not found.
+            <Trans>Page not found.</Trans>
           </p>
         ))}
     </AdminEventLayout>
@@ -265,9 +284,13 @@ function ConfigTab({
     createAdminSessionsQuery({ api, eventId: id })
   );
   if (jointStatus(points, sessions) === "error")
-    return <Failed>the event settings</Failed>;
+    return <Failed message={t`Could not load the event settings.`} />;
   if (points.status !== "ready" || sessions.status !== "ready")
-    return <p className="text-sm">Loading…</p>;
+    return (
+      <p className="text-sm">
+        <Trans>Loading…</Trans>
+      </p>
+    );
   return (
     <EventConfigTab
       event={state.event}
@@ -286,10 +309,10 @@ function ConfigTab({
   );
 }
 
-function Failed({ children }: { children: ReactNode }) {
+function Failed({ message }: { message: string }) {
   return (
     <p role="alert" className="text-sm text-danger-fg">
-      Could not load {children}.
+      {message}
     </p>
   );
 }
@@ -328,8 +351,14 @@ function GuestsTab({ api, id }: { api: Api; id: string }) {
   const [guests, load] = useQuery(() => createAdminGuestsQuery({ api }));
   const calls = useMemo(() => adminEventCalls(api), [api]);
   const { params, onParams } = useParamUpdates();
-  if (guests.status === "error") return <Failed>the guests</Failed>;
-  if (guests.status === "loading") return <p className="text-sm">Loading…</p>;
+  if (guests.status === "error")
+    return <Failed message={t`Could not load the guests.`} />;
+  if (guests.status === "loading")
+    return (
+      <p className="text-sm">
+        <Trans>Loading…</Trans>
+      </p>
+    );
   return (
     <EventGuestsManager
       eventId={id}
@@ -358,9 +387,13 @@ function LocationsTab({
   const calls = useMemo(() => adminEventCalls(api), [api]);
   const { params, onParams } = useParamUpdates();
   if (jointStatus(locations, periods) === "error")
-    return <Failed>the locations</Failed>;
+    return <Failed message={t`Could not load the locations.`} />;
   if (locations.status !== "ready" || periods.status !== "ready")
-    return <p className="text-sm">Loading…</p>;
+    return (
+      <p className="text-sm">
+        <Trans>Loading…</Trans>
+      </p>
+    );
   return (
     <div className="space-y-8">
       <EventLocationsManager
@@ -473,13 +506,17 @@ function ProposalsTab({
   const days = useDayOptions(state);
   const { params, onParams } = useParamUpdates();
   if (jointStatus(proposals, guests, locations) === "error")
-    return <Failed>the proposals</Failed>;
+    return <Failed message={t`Could not load the proposals.`} />;
   if (
     proposals.status !== "ready" ||
     guests.status !== "ready" ||
     locations.status !== "ready"
   )
-    return <p className="text-sm">Loading…</p>;
+    return (
+      <p className="text-sm">
+        <Trans>Loading…</Trans>
+      </p>
+    );
   return (
     <EventProposalsManager
       eventId={id}
@@ -515,13 +552,17 @@ function SessionsTab({
   const { params, onParams } = useParamUpdates();
   const days = useDayOptions(state);
   if (jointStatus(sessions, guests, locations) === "error")
-    return <Failed>the sessions</Failed>;
+    return <Failed message={t`Could not load the sessions.`} />;
   if (
     sessions.status !== "ready" ||
     guests.status !== "ready" ||
     locations.status !== "ready"
   )
-    return <p className="text-sm">Loading…</p>;
+    return (
+      <p className="text-sm">
+        <Trans>Loading…</Trans>
+      </p>
+    );
   return (
     <EventSessionsManager
       eventId={id}

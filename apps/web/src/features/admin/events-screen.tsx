@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import type { IdentityMode } from "@schellingboard/domain/event";
 import { formatEventDates } from "@schellingboard/domain/time";
 import { type FormEvent, useMemo, useState } from "react";
@@ -16,10 +18,7 @@ import {
 import { FormErrorSummary } from "../../ui/form-error-summary";
 import type { OnParams } from "../../ui/list-paging";
 import { usePaging } from "../../ui/use-paging";
-import {
-  IDENTITY_MODE_HINT,
-  IDENTITY_MODE_OPTIONS,
-} from "./identity-mode-options";
+import { identityModeHint, identityModeOptions } from "./identity-mode-options";
 import { matchingZones, timezones } from "./timezones";
 
 const DEFAULTS = {
@@ -45,7 +44,7 @@ function NewEventForm({
   const [form, setForm] = useState(DEFAULTS);
   const [checking, setChecking] = useState(false);
   const zones = useMemo(() => timezones(), []);
-  const set =
+  const setField =
     <K extends keyof typeof DEFAULTS>(key: K) =>
     (value: (typeof DEFAULTS)[K]) =>
       setForm((prev) => ({ ...prev, [key]: value }));
@@ -57,12 +56,11 @@ function NewEventForm({
     slotIncrementMinutes: 30,
   };
   const invalid: FieldErrors = {};
-  if (!form.name.trim()) invalid.name = "Name is required";
+  if (!form.name.trim()) invalid.name = t`Name is required`;
   if (!(body.maxSessionDuration > 0))
-    invalid.maxSessionDuration =
-      "Max session duration must be a positive number";
+    invalid.maxSessionDuration = t`Max session duration must be a positive number`;
   if (!zones.includes(form.timezone))
-    invalid.timezone = "Pick a time zone from the list";
+    invalid.timezone = t`Pick a time zone from the list`;
   const mutation = useFormMutation({
     call: (key) => calls.create(body, key),
     fieldNames: FIELD_NAMES,
@@ -86,57 +84,59 @@ function NewEventForm({
       noValidate
       className="flex max-w-2xl flex-col gap-3 rounded-md border border-line-subtle p-4"
     >
-      <h2 className="font-medium text-fg">New event</h2>
+      <h2 className="font-medium text-fg">
+        <Trans>New event</Trans>
+      </h2>
       <TextField
-        label="Name"
+        label={t`Name`}
         name="name"
         required
         value={form.name}
-        onChange={set("name")}
+        onChange={setField("name")}
         error={fields.name}
       />
       <MarkdownField
-        label="Description"
+        label={t`Description`}
         name="description"
         value={form.description}
-        onChange={set("description")}
+        onChange={setField("description")}
         error={fields.description}
       />
       <TextField
-        label="Website"
+        label={t`Website`}
         name="website"
         value={form.website}
-        onChange={set("website")}
+        onChange={setField("website")}
         error={fields.website}
       />
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <ComboboxField
-          label="Timezone"
+          label={t`Timezone`}
           name="timezone"
           required
           value={form.timezone}
-          onChange={set("timezone")}
+          onChange={setField("timezone")}
           strict
           options={matchingZones(zones, form.timezone)}
           error={fields.timezone}
         />
         <TextField
-          label="Max session duration (min)"
+          label={t`Max session duration (min)`}
           name="maxSessionDuration"
           type="number"
           required
           value={form.maxSessionDuration}
-          onChange={set("maxSessionDuration")}
+          onChange={setField("maxSessionDuration")}
           error={fields.maxSessionDuration}
         />
       </div>
       <SelectField
-        label="Identity"
+        label={t`Identity`}
         name="identityMode"
         value={form.identityMode}
-        onChange={(v) => set("identityMode")(v as IdentityMode)}
-        options={IDENTITY_MODE_OPTIONS}
-        hint={IDENTITY_MODE_HINT}
+        onChange={(v) => setField("identityMode")(v as IdentityMode)}
+        options={identityModeOptions()}
+        hint={identityModeHint()}
         error={fields.identityMode}
       />
       <FormErrorSummary
@@ -148,10 +148,10 @@ function NewEventForm({
       />
       <div className="flex gap-2">
         <Button type="submit" disabled={mutation.pending}>
-          {mutation.pending ? "Creating..." : "Create event"}
+          {mutation.pending ? t`Creating...` : t`Create event`}
         </Button>
         <Button variant="quiet" disabled={mutation.pending} onClick={onClose}>
-          Cancel
+          <Trans>Cancel</Trans>
         </Button>
       </div>
     </form>
@@ -184,14 +184,21 @@ export function AdminEventsScreen({
   if (status === "error")
     return (
       <p role="alert" className="text-sm text-danger-fg">
-        Could not load the events.
+        <Trans>Could not load the events.</Trans>
       </p>
     );
-  if (status === "loading") return <p className="text-sm">Loading…</p>;
+  if (status === "loading")
+    return (
+      <p className="text-sm">
+        <Trans>Loading…</Trans>
+      </p>
+    );
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-fg">Events</h1>
+      <h1 className="text-2xl font-bold text-fg">
+        <Trans>Events</Trans>
+      </h1>
       {adding ? (
         <NewEventForm
           calls={calls}
@@ -199,10 +206,14 @@ export function AdminEventsScreen({
           onClose={() => setAdding(false)}
         />
       ) : (
-        <Button onClick={() => setAdding(true)}>New event</Button>
+        <Button onClick={() => setAdding(true)}>
+          <Trans>New event</Trans>
+        </Button>
       )}
       {events.length === 0 ? (
-        <p className="text-sm text-fg-subtle">No events yet.</p>
+        <p className="text-sm text-fg-subtle">
+          <Trans>No events yet.</Trans>
+        </p>
       ) : (
         <ul
           ref={top}
@@ -227,7 +238,7 @@ export function AdminEventsScreen({
                         : undefined,
                     },
                     "yyyy-MM-dd"
-                  ) ?? "No days yet"}
+                  ) ?? t`No days yet`}
                   {" · "}
                   {e.timezone}
                 </p>
@@ -236,7 +247,7 @@ export function AdminEventsScreen({
                 href={`/admin/events/${e.id}`}
                 className="rounded-md border border-line px-3 py-1.5 text-sm font-medium text-fg-muted hover:bg-surface-muted"
               >
-                Manage
+                <Trans>Manage</Trans>
               </a>
             </li>
           ))}

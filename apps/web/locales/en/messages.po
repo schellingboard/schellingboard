@@ -154,6 +154,11 @@ msgstr "{eventName} Quick Voting"
 msgid "{eventName}: Session Proposals"
 msgstr "{eventName}: Session Proposals"
 
+#: src/features/admin/event-days.tsx:314
+#: src/features/admin/event-days.tsx:422
+msgid "{from} – {to} ({timezone})"
+msgstr "{from} – {to} ({timezone})"
+
 #. Read out before the position, e.g. "Ann, 3 of 20 attendees"
 #: src/features/people/profile-panel.tsx:272
 msgid "{guestName}, "
@@ -184,6 +189,10 @@ msgstr "{matching, plural, one {# of {total} match} other {# of {total} match}}"
 #: src/features/meetings/meeting-request-fields.tsx:45
 msgid "{minutes} min"
 msgstr "{minutes} min"
+
+#: src/features/admin/event-days.tsx:336
+msgid "{momentCount, plural, one {Its shared moment will also be deleted.} other {Its # shared moments will also be deleted.}}"
+msgstr "{momentCount, plural, one {Its shared moment will also be deleted.} other {Its # shared moments will also be deleted.}}"
 
 #: src/features/comments/comments-section.tsx:481
 msgid "{moreLikers, plural, one {and # more} other {and # more}}"
@@ -221,6 +230,10 @@ msgstr "{resultCount, plural, one {# result} other {# results}}"
 msgid "{selectedCount, plural, one {# selected} other {# selected}}"
 msgstr "{selectedCount, plural, one {# selected} other {# selected}}"
 
+#: src/features/admin/event-days.tsx:321
+msgid "{sessionCount, plural, one {Delete this day? The following session scheduled within its time window will also be deleted:} other {Delete this day? The following # sessions scheduled within its time window will also be deleted:}}"
+msgstr "{sessionCount, plural, one {Delete this day? The following session scheduled within its time window will also be deleted:} other {Delete this day? The following # sessions scheduled within its time window will also be deleted:}}"
+
 #: src/features/schedule/session-panel.tsx:319
 msgid "{startsAt} - {endsAt}"
 msgstr "{startsAt} - {endsAt}"
@@ -236,6 +249,10 @@ msgstr "{them} declined this."
 #: src/features/schedule/meeting-rules.ts:161
 msgid "{them} is waiting for your answer."
 msgstr "{them} is waiting for your answer."
+
+#: src/app/admin-frame.tsx:135
+msgid "{title} Admin"
+msgstr "{title} Admin"
 
 #: src/features/comments/comments-section.tsx:144
 msgid "{total, plural, one {# comment} other {# comments}}"
@@ -375,6 +392,10 @@ msgstr "a session I’m hosting starts in an hour"
 msgid "a session I’ve RSVP’d to changes time or location, loses its host, or is deleted"
 msgstr "a session I’ve RSVP’d to changes time or location, loses its host, or is deleted"
 
+#: src/features/admin/event-moments.tsx:385
+msgid "A shared moment, such as lunch or a keynote, shows as a striped band across every room. It blocks nothing: sessions can still be booked inside it. To make a time unbookable, add a blocker session in every room instead. Times are in the event timezone ({timezone})."
+msgstr "A shared moment, such as lunch or a keynote, shows as a striped band across every room. It blocks nothing: sessions can still be booked inside it. To make a time unbookable, add a blocker session in every room instead. Times are in the event timezone ({timezone})."
+
 #: src/features/people/profile-body.tsx:177
 #: src/features/people/profile-form.tsx:383
 msgid "About me"
@@ -404,6 +425,10 @@ msgstr "Actions"
 msgid "Add a comment"
 msgstr "Add a comment"
 
+#: src/features/admin/event-moments.tsx:416
+msgid "Add a day first; shared moments belong to days."
+msgstr "Add a day first; shared moments belong to days."
+
 #: src/features/meetings/meeting-request-fields.tsx:141
 msgid "Add a line of context (optional)"
 msgstr "Add a line of context (optional)"
@@ -412,9 +437,18 @@ msgstr "Add a line of context (optional)"
 msgid "Add contact"
 msgstr "Add contact"
 
+#: src/features/admin/event-days.tsx:177
+#: src/features/admin/event-days.tsx:227
+msgid "Add day"
+msgstr "Add day"
+
 #: src/features/people/profile-form.tsx:507
 msgid "Add language"
 msgstr "Add language"
+
+#: src/features/admin/event-moments.tsx:196
+msgid "Add moment"
+msgstr "Add moment"
 
 #: src/features/proposals/proposals-screen.tsx:108
 #: src/features/proposals/proposals-screen.tsx:139
@@ -428,6 +462,23 @@ msgstr "Add session"
 #: src/features/proposals/proposal-form.tsx:208
 msgid "Add Session Proposal"
 msgstr "Add Session Proposal"
+
+#: src/features/admin/event-moments.tsx:429
+msgid "Add shared moment"
+msgstr "Add shared moment"
+
+#: src/features/admin/event-days.tsx:227
+#: src/features/admin/event-moments.tsx:196
+msgid "Adding..."
+msgstr "Adding..."
+
+#: src/app/admin-frame.tsx:56
+msgid "Admin"
+msgstr "Admin"
+
+#: src/app/admin-frame.tsx:110
+msgid "Admin logout"
+msgstr "Admin logout"
 
 #: src/features/schedule/schedule-toolbar.tsx:46
 msgid "Agenda"
@@ -454,6 +505,10 @@ msgstr "All events"
 #: src/features/schedule/day-agenda.tsx:264
 msgid "All rooms"
 msgstr "All rooms"
+
+#: src/features/admin/event-config.tsx:323
+msgid "All times are in the event timezone ({timezone}). Leave fields empty to unset a phase. A phase with no end runs until the next phase starts; set an end earlier than the next start to leave an inactive gap."
+msgstr "All times are in the event timezone ({timezone}). Leave fields empty to unset a phase. A phase with no end runs until the next phase starts; set an end earlier than the next start to leave an inactive gap."
 
 #: src/features/meetings/book-meeting.tsx:177
 msgid "Already booked at this time"
@@ -482,6 +537,10 @@ msgstr "Anyone can currently act under your name. Protect it so switching to you
 #: src/features/settings/settings-screen.tsx:130
 msgid "Appearance (this device)"
 msgstr "Appearance (this device)"
+
+#: src/features/admin/event-config.tsx:209
+msgid "Applies to sessions booked from now on."
+msgstr "Applies to sessions booked from now on."
 
 #: src/features/schedule/meetings-col.tsx:135
 msgid "Arrange a 1-on-1 at {label}"
@@ -574,6 +633,10 @@ msgstr "Based in"
 msgid "Based in {basedIn}"
 msgstr "Based in {basedIn}"
 
+#: src/features/admin/event-config.tsx:141
+msgid "Basic info"
+msgstr "Basic info"
+
 #: src/features/proposals/proposals-screen.tsx:133
 msgid "Be the first to suggest a session!"
 msgstr "Be the first to suggest a session!"
@@ -600,6 +663,22 @@ msgstr "Become site admin"
 msgid "Blocked"
 msgstr "Blocked"
 
+#: src/features/admin/event-days.tsx:40
+msgid "Bookings close"
+msgstr "Bookings close"
+
+#: src/features/admin/event-days.tsx:47
+msgid "Bookings close is required"
+msgstr "Bookings close is required"
+
+#: src/features/admin/event-days.tsx:39
+msgid "Bookings open"
+msgstr "Bookings open"
+
+#: src/features/admin/event-days.tsx:46
+msgid "Bookings open is required"
+msgstr "Bookings open is required"
+
 #: src/features/schedule/session-panel.tsx:83
 msgid "Bookmark this session"
 msgstr "Bookmark this session"
@@ -614,6 +693,10 @@ msgstr "bookmarked"
 msgid "Bookmarked"
 msgstr "Bookmarked"
 
+#: src/features/admin/event-config.tsx:204
+msgid "Break before each session (min)"
+msgstr "Break before each session (min)"
+
 #: src/features/proposals/proposals-screen.tsx:100
 msgid "Browse session ideas or add your own proposal"
 msgstr "Browse session ideas or add your own proposal"
@@ -627,6 +710,14 @@ msgstr "Bulk actions"
 msgid "Busy"
 msgstr "Busy"
 
+#: src/features/admin/confirm-by-typing.tsx:60
+#: src/features/admin/event-days.tsx:230
+#: src/features/admin/event-days.tsx:274
+#: src/features/admin/event-days.tsx:357
+#: src/features/admin/event-moments.tsx:199
+#: src/features/admin/event-moments.tsx:246
+#: src/features/admin/event-moments.tsx:293
+#: src/features/admin/events-screen.tsx:154
 #: src/features/comments/comments-section.tsx:586
 #: src/features/meetings/meeting-request-fields.tsx:157
 #: src/features/notifications/notifications-screen.tsx:232
@@ -749,6 +840,10 @@ msgstr "Clearing every slot is the same as switching this off."
 msgid "Close"
 msgstr "Close"
 
+#: src/app/admin-frame.tsx:143
+msgid "Close admin menu"
+msgstr "Close admin menu"
+
 #: src/app/nav-bar.tsx:38
 msgid "Close menu"
 msgstr "Close menu"
@@ -785,6 +880,17 @@ msgstr "Comment deleted"
 #: src/features/comments/comments-section.tsx:126
 msgid "Comments could not be loaded"
 msgstr "Comments could not be loaded"
+
+#: src/features/admin/event-layout.tsx:13
+msgctxt "Event admin tab: the event settings"
+msgid "Config"
+msgstr "Config"
+
+#: src/features/admin/confirm-by-typing.tsx:57
+#: src/features/admin/event-days.tsx:354
+#: src/features/admin/event-moments.tsx:290
+msgid "Confirm delete"
+msgstr "Confirm delete"
 
 #. State of a 1-on-1 on the grid, lower case
 #: src/features/schedule/meeting-rules.ts:109
@@ -860,9 +966,43 @@ msgstr "Could not load the attendee list."
 msgid "Could not load the attendees. Reload the page to try again."
 msgstr "Could not load the attendees. Reload the page to try again."
 
+#: src/app/admin-pages.tsx:287
+msgid "Could not load the event settings."
+msgstr "Could not load the event settings."
+
+#: src/features/admin/event-layout.tsx:76
+msgid "Could not load the event."
+msgstr "Could not load the event."
+
+#: src/app/admin-pages.tsx:114
+#: src/app/admin-pages.tsx:180
+#: src/features/admin/events-screen.tsx:187
+msgid "Could not load the events."
+msgstr "Could not load the events."
+
+#: src/app/admin-pages.tsx:355
+msgid "Could not load the guests."
+msgstr "Could not load the guests."
+
+#: src/app/admin-pages.tsx:390
+msgid "Could not load the locations."
+msgstr "Could not load the locations."
+
 #: src/app/account-pages.tsx:271
 msgid "Could not load the names. Reload the page to try again."
 msgstr "Could not load the names. Reload the page to try again."
+
+#: src/app/admin-pages.tsx:509
+msgid "Could not load the proposals."
+msgstr "Could not load the proposals."
+
+#: src/app/admin-pages.tsx:555
+msgid "Could not load the sessions."
+msgstr "Could not load the sessions."
+
+#: src/features/admin/settings-screen.tsx:158
+msgid "Could not load the settings."
+msgstr "Could not load the settings."
 
 #: src/features/comments/my-comments-screen.tsx:48
 msgid "Could not load your comments. Reload the page to try again."
@@ -883,6 +1023,14 @@ msgstr "Could not load your settings. Reload the page to try again."
 #: src/app/user-menu.tsx:137
 msgid "Could not log out — try again"
 msgstr "Could not log out — try again"
+
+#: src/app/admin-frame.tsx:114
+msgid "Could not log out. Try again."
+msgstr "Could not log out. Try again."
+
+#: src/app/admin-frame.tsx:216
+msgid "Could not open the admin area ({errorCode})."
+msgstr "Could not open the admin area ({errorCode})."
 
 #: src/features/schedule/attendee-count-field.tsx:76
 msgid "Could not save the attendee count for {what}. Please try again."
@@ -916,14 +1064,37 @@ msgstr "Could not turn notifications on for this device."
 msgid "Couldn't load who is free then. Try the slot again."
 msgstr "Couldn't load who is free then. Try the slot again."
 
+#: src/features/admin/events-screen.tsx:151
+msgid "Create event"
+msgstr "Create event"
+
+#: src/features/admin/events-screen.tsx:151
+msgid "Creating..."
+msgstr "Creating..."
+
+#: src/features/admin/settings-screen.tsx:97
+msgid "Current map"
+msgstr "Current map"
+
 #: src/features/sign-in/account-security.tsx:232
 msgid "Current password"
 msgstr "Current password"
+
+#: src/features/admin/event-config.tsx:385
+#: src/features/admin/event-config.tsx:389
+msgid "Danger zone"
+msgstr "Danger zone"
 
 #: src/app/theme.tsx:94
 msgctxt "Colour theme"
 msgid "Dark"
 msgstr "Dark"
+
+#: src/features/admin/event-days.tsx:464
+#: src/features/admin/event-days.tsx:466
+#: src/features/admin/event-moments.tsx:176
+msgid "Days"
+msgstr "Days"
 
 #: src/features/meetings/meeting-panel.tsx:128
 msgid "Decline"
@@ -934,6 +1105,8 @@ msgstr "Decline"
 msgid "declined"
 msgstr "declined"
 
+#: src/features/admin/event-days.tsx:439
+#: src/features/admin/event-moments.tsx:356
 #: src/features/comments/comments-section.tsx:348
 #: src/features/comments/comments-section.tsx:397
 #: src/features/notifications/notifications-screen.tsx:174
@@ -943,9 +1116,25 @@ msgstr "declined"
 msgid "Delete"
 msgstr "Delete"
 
+#: src/features/admin/event-moments.tsx:353
+msgid "Delete {title} on {date}"
+msgstr "Delete {title} on {date}"
+
+#: src/features/admin/event-moments.tsx:279
+msgid "Delete {title} on {date}?"
+msgstr "Delete {title} on {date}?"
+
 #: src/features/comments/comments-section.tsx:391
 msgid "Delete comment"
 msgstr "Delete comment"
+
+#: src/features/admin/event-days.tsx:436
+msgid "Delete day {from} – {to} ({timezone})"
+msgstr "Delete day {from} – {to} ({timezone})"
+
+#: src/features/admin/event-config.tsx:393
+msgid "Delete event"
+msgstr "Delete event"
 
 #: src/features/notifications/notifications-screen.tsx:225
 msgid "Delete notifications"
@@ -959,15 +1148,32 @@ msgstr "Delete session proposal?"
 msgid "Delete this comment? This cannot be undone."
 msgstr "Delete this comment? This cannot be undone."
 
+#: src/features/admin/event-days.tsx:320
+msgid "Delete this day? No scheduled sessions fall within its time window."
+msgstr "Delete this day? No scheduled sessions fall within its time window."
+
+#: src/features/admin/confirm-by-typing.tsx:57
+#: src/features/admin/event-days.tsx:354
+#: src/features/admin/event-moments.tsx:290
+msgid "Deleting..."
+msgstr "Deleting..."
+
 #: src/features/proposals/proposal-form.tsx:256
 msgid "Describe what your session will cover"
 msgstr "Describe what your session will cover"
 
+#: src/features/admin/event-config.tsx:152
+#: src/features/admin/events-screen.tsx:99
+#: src/features/admin/settings-screen.tsx:87
 #: src/features/proposals/proposal-form.tsx:252
 #: src/features/proposals/proposals-screen.tsx:419
 #: src/features/schedule/session-panel.tsx:360
 msgid "Description"
 msgstr "Description"
+
+#: src/features/admin/event-moments.tsx:56
+msgid "Details"
+msgstr "Details"
 
 #: src/features/proposals/vote-breakdown.tsx:66
 msgid "Did not vote: {nonVoters, plural, one {# attendee} other {# attendees}}"
@@ -1028,6 +1234,8 @@ msgstr "Each browser you chose your name in stays signed in for 30 days after yo
 
 #. Button: edit (verb)
 #. Button: edit (verb)
+#: src/features/admin/event-days.tsx:432
+#: src/features/admin/event-moments.tsx:349
 #: src/features/comments/comments-section.tsx:339
 #: src/features/proposals/proposal-panel.tsx:197
 #: src/features/proposals/proposals-screen.tsx:669
@@ -1039,6 +1247,14 @@ msgstr "Edit"
 msgctxt "Markdown field: write mode"
 msgid "Edit"
 msgstr "Edit"
+
+#: src/features/admin/event-moments.tsx:346
+msgid "Edit {title} on {date}"
+msgstr "Edit {title} on {date}"
+
+#: src/features/admin/event-days.tsx:429
+msgid "Edit day {from} – {to} ({timezone})"
+msgstr "Edit day {from} – {to} ({timezone})"
 
 #: src/app/user-menu.tsx:107
 #: src/features/people/directory-screen.tsx:123
@@ -1084,6 +1300,18 @@ msgstr "Email settings"
 msgid "Enable protection"
 msgstr "Enable protection"
 
+#: src/features/admin/event-config.tsx:348
+#: src/features/admin/event-days.tsx:38
+#: src/features/admin/event-moments.tsx:74
+msgctxt "Date field: when it ends"
+msgid "End"
+msgstr "End"
+
+#: src/features/admin/event-days.tsx:45
+#: src/features/admin/event-moments.tsx:30
+msgid "End is required"
+msgstr "End is required"
+
 #. placeholder {0}: when(end)
 #: src/ui/phase-bar.tsx:75
 msgid "Ended {0}."
@@ -1093,6 +1321,10 @@ msgstr "Ended {0}."
 #: src/ui/phase-bar.tsx:75
 msgid "Ends {0}."
 msgstr "Ends {0}."
+
+#: src/features/admin/event-config.tsx:236
+msgid "Enforce session capacity as a hard limit — reject RSVPs once a session is full (capacity 0 means unlimited)"
+msgstr "Enforce session capacity as a hard limit — reject RSVPs once a session is full (capacity 0 means unlimited)"
 
 #: src/features/people/profile-photo.tsx:55
 msgid "Enlarge photo of {name}"
@@ -1136,6 +1368,11 @@ msgctxt "Comment filter: label of the event selector"
 msgid "Event"
 msgstr "Event"
 
+#: src/app/admin-pages.tsx:210
+msgctxt "Statistics: the event to show"
+msgid "Event"
+msgstr "Event"
+
 #: src/app/panel-host.tsx:81
 #: src/features/schedule/schedule-toolbar.tsx:125
 #: src/features/schedule/schedule-toolbar.tsx:138
@@ -1153,6 +1390,16 @@ msgstr "Event not found."
 #: src/ui/phase-bar.tsx:56
 msgid "Event phases"
 msgstr "Event phases"
+
+#: src/features/admin/event-layout.tsx:34
+msgid "Event sections"
+msgstr "Event sections"
+
+#: src/app/admin-frame.tsx:40
+#: src/features/admin/event-layout.tsx:90
+#: src/features/admin/events-screen.tsx:200
+msgid "Events"
+msgstr "Events"
 
 #: src/features/settings/settings-screen.tsx:52
 msgid "Everything here is private and never shown to other attendees. Your <0>public profile</0> is edited separately."
@@ -1269,6 +1516,10 @@ msgstr "Go to the start page"
 msgid "Grid"
 msgstr "Grid"
 
+#: src/features/admin/event-layout.tsx:18
+msgid "Guests"
+msgstr "Guests"
+
 #: src/features/people/directory-screen.tsx:62
 msgid "Has profile"
 msgstr "Has profile"
@@ -1288,6 +1539,10 @@ msgstr "He/They"
 #: src/app/footer.tsx:103
 msgid "Help"
 msgstr "Help"
+
+#: src/features/admin/event-config.tsx:167
+msgid "Help for proposers"
+msgstr "Help for proposers"
 
 #. Filter: sessions you hid from your schedule
 #. Filter: sessions you hid from your schedule
@@ -1357,6 +1612,16 @@ msgstr "How to update"
 #: src/features/meetings/availability-form.tsx:96
 msgid "I'm open to 1-on-1s at this event"
 msgstr "I'm open to 1-on-1s at this event"
+
+#: src/features/admin/event-config.tsx:243
+#: src/features/admin/event-config.tsx:246
+msgid "Icon"
+msgstr "Icon"
+
+#: src/features/admin/event-config.tsx:227
+#: src/features/admin/events-screen.tsx:134
+msgid "Identity"
+msgstr "Identity"
 
 #: src/features/proposals/vote-breakdown.tsx:21
 msgid "If you decide to host this as a session, expect <0>{kind, select, same {{low, plural, one {# person} other {# people}}} other {{high, plural, one {{low}–# person} other {{low}–# people}}}}</0>. Treat that as a very rough guess: it comes from a formula worked out on a single event, from what a handful of hosts there remembered about how many people turned up. It can be well out in either direction — use it to pick a room, nothing more. Future SchellingBoard versions should do better, as we incorporate more event feedback."
@@ -1482,9 +1747,19 @@ msgid "Loading proposals..."
 msgstr "Loading proposals..."
 
 #: src/app/account-pages.tsx:275
+#: src/app/admin-pages.tsx:120
+#: src/app/admin-pages.tsx:184
+#: src/app/admin-pages.tsx:291
+#: src/app/admin-pages.tsx:359
+#: src/app/admin-pages.tsx:394
+#: src/app/admin-pages.tsx:517
+#: src/app/admin-pages.tsx:563
 #: src/app/event-page.tsx:152
 #: src/app/panel-host.tsx:82
 #: src/app/people-pages.tsx:162
+#: src/features/admin/event-layout.tsx:82
+#: src/features/admin/events-screen.tsx:193
+#: src/features/admin/settings-screen.tsx:164
 #: src/features/comments/my-comments-screen.tsx:42
 #: src/features/meetings/book-meeting.tsx:73
 #: src/features/notifications/notifications-screen.tsx:78
@@ -1498,6 +1773,11 @@ msgstr "Loading…"
 #: src/features/schedule/session-panel.tsx:302
 msgid "Location:"
 msgstr "Location:"
+
+#: src/app/admin-frame.tsx:42
+#: src/features/admin/event-layout.tsx:19
+msgid "Locations"
+msgstr "Locations"
 
 #: src/features/sign-in/guest-login-form.tsx:172
 msgid "Log in"
@@ -1520,6 +1800,7 @@ msgstr "Log out"
 msgid "Logging in as"
 msgstr "Logging in as"
 
+#: src/app/admin-frame.tsx:110
 #: src/app/user-menu.tsx:133
 msgid "Logging out..."
 msgstr "Logging out..."
@@ -1533,10 +1814,19 @@ msgstr "Looking for a co-host"
 msgid "Looking for a co-host: {cohostNote}"
 msgstr "Looking for a co-host: {cohostNote}"
 
+#: src/features/admin/events-screen.tsx:250
+msgid "Manage"
+msgstr "Manage"
+
 #: src/app/map-button.tsx:36
 #: src/app/map-button.tsx:37
+#: src/features/admin/settings-screen.tsx:105
 msgid "Map"
 msgstr "Map"
+
+#: src/features/admin/settings-screen.tsx:113
+msgid "Map exceeds {maxMapMegabytes} MB."
+msgstr "Map exceeds {maxMapMegabytes} MB."
 
 #: src/features/notifications/notifications-screen.tsx:167
 #: src/features/notifications/notifications-screen.tsx:294
@@ -1554,6 +1844,15 @@ msgstr "Markdown supported"
 #: src/features/schedule/day-grid.tsx:30
 msgid "max {capacity}"
 msgstr "max {capacity}"
+
+#: src/features/admin/event-config.tsx:194
+#: src/features/admin/events-screen.tsx:124
+msgid "Max session duration (min)"
+msgstr "Max session duration (min)"
+
+#: src/features/admin/events-screen.tsx:61
+msgid "Max session duration must be a positive number"
+msgstr "Max session duration must be a positive number"
 
 #. Vote option on a session proposal
 #: src/features/proposals/vote-labels.ts:12
@@ -1601,6 +1900,8 @@ msgstr "n = {n}: too few points to read a trend"
 msgid "n/a"
 msgstr "n/a"
 
+#: src/features/admin/event-config.tsx:144
+#: src/features/admin/events-screen.tsx:91
 #: src/features/people/profile-form.tsx:355
 #: src/features/sign-in/bootstrap-screen.tsx:70
 msgid "Name"
@@ -1609,6 +1910,10 @@ msgstr "Name"
 #: src/features/people/directory-screen.tsx:74
 msgid "Name (A–Z)"
 msgstr "Name (A–Z)"
+
+#: src/features/admin/events-screen.tsx:59
+msgid "Name is required"
+msgstr "Name is required"
 
 #: src/app/user-menu.tsx:237
 msgid "Names"
@@ -1624,10 +1929,23 @@ msgstr "Need ideas?"
 msgid "needs your reply"
 msgstr "needs your reply"
 
+#: src/features/admin/event-days.tsx:221
+msgid "New day"
+msgstr "New day"
+
+#: src/features/admin/events-screen.tsx:88
+#: src/features/admin/events-screen.tsx:210
+msgid "New event"
+msgstr "New event"
+
 #: src/features/sign-in/account-security.tsx:241
 #: src/features/sign-in/reset-password-form.tsx:71
 msgid "New password (at least 8 characters)"
 msgstr "New password (at least 8 characters)"
+
+#: src/features/admin/event-moments.tsx:171
+msgid "New shared moment"
+msgstr "New shared moment"
 
 #: src/features/people/profile-panel.tsx:306
 #: src/ui/pager.tsx:146
@@ -1662,9 +1980,17 @@ msgstr "No attendees yet"
 msgid "No comments match."
 msgstr "No comments match."
 
+#: src/features/admin/events-screen.tsx:241
+msgid "No days yet"
+msgstr "No days yet"
+
 #: src/app/home-page.tsx:45
 msgid "No events found."
 msgstr "No events found."
+
+#: src/features/admin/events-screen.tsx:215
+msgid "No events yet."
+msgstr "No events yet."
 
 #: src/features/proposals/proposals-screen.tsx:465
 #: src/features/proposals/proposals-screen.tsx:560
@@ -1678,6 +2004,10 @@ msgstr "No host yet — someone would like to see this offered"
 #: src/features/schedule/session-block.tsx:235
 msgid "No hosts"
 msgstr "No hosts"
+
+#: src/features/admin/event-icon-picker.tsx:56
+msgid "No icon"
+msgstr "No icon"
 
 #: src/features/schedule/day-agenda.tsx:105
 msgid "No matching sessions"
@@ -1821,6 +2151,10 @@ msgstr "Only you see these"
 msgid "Only you see your bookmarks. This is not an RSVP."
 msgstr "Only you see your bookmarks. This is not an RSVP."
 
+#: src/app/admin-frame.tsx:143
+msgid "Open admin menu"
+msgstr "Open admin menu"
+
 #: src/app/nav-bar.tsx:38
 msgid "Open menu"
 msgstr "Open menu"
@@ -1828,6 +2162,10 @@ msgstr "Open menu"
 #: src/features/people/directory-screen.tsx:67
 msgid "Open to 1-on-1s"
 msgstr "Open to 1-on-1s"
+
+#: src/features/admin/identity-mode-options.ts:9
+msgid "Open: picking a name is enough"
+msgstr "Open: picking a name is enough"
 
 #: src/features/meetings/meeting-panel.tsx:204
 msgid "opening your 1-on-1s"
@@ -1837,9 +2175,17 @@ msgstr "opening your 1-on-1s"
 msgid "Opening your link…"
 msgstr "Opening your link…"
 
+#: src/features/admin/event-config.tsx:169
+msgid "Opens from the Need ideas? button. Markdown supported."
+msgstr "Opens from the Need ideas? button. Markdown supported."
+
 #: src/features/people/profile-form.tsx:393
 msgid "Optional prompts that give people something to ask you about"
 msgstr "Optional prompts that give people something to ask you about"
+
+#: src/features/admin/event-moments.tsx:59
+msgid "Optional, one line."
+msgstr "Optional, one line."
 
 #: src/features/sign-in/account-security.tsx:324
 msgid "Optional. Besides your email, you can log in with it and your password. Leave it empty to have none."
@@ -1870,6 +2216,7 @@ msgstr "Page {page} of {totalPages}"
 msgid "Page {page} of {totalPages}+"
 msgstr "Page {page} of {totalPages}+"
 
+#: src/app/admin-pages.tsx:253
 #: src/app/not-found.tsx:6
 msgid "Page not found."
 msgstr "Page not found."
@@ -1902,9 +2249,21 @@ msgstr "Password set"
 msgid "Password set. Your name is now protected — log in with your new password."
 msgstr "Password set. Your name is now protected — log in with your new password."
 
+#: src/features/admin/event-config.tsx:320
+msgid "Phases"
+msgstr "Phases"
+
 #: src/features/people/contact-labels.ts:7
 msgid "Phone"
 msgstr "Phone"
+
+#: src/features/admin/events-screen.tsx:63
+msgid "Pick a time zone from the list"
+msgstr "Pick a time zone from the list"
+
+#: src/features/admin/event-moments.tsx:31
+msgid "Pick at least one day"
+msgstr "Pick at least one day"
 
 #: src/ui/combobox.tsx:170
 msgid "Pick one or type any text"
@@ -1978,6 +2337,11 @@ msgstr "Proposal details"
 msgid "Proposal not found."
 msgstr "Proposal not found."
 
+#: src/features/admin/event-config.tsx:263
+msgid "Proposal phase"
+msgstr "Proposal phase"
+
+#: src/features/admin/event-layout.tsx:20
 #: src/features/comments/my-comments-screen.tsx:16
 #: src/features/people/profile-body.tsx:233
 #: src/features/proposals/proposal-form.tsx:82
@@ -2029,6 +2393,10 @@ msgstr "Remove {0}"
 msgid "Remove bookmark"
 msgstr "Remove bookmark"
 
+#: src/features/admin/settings-screen.tsx:118
+msgid "Remove current map"
+msgstr "Remove current map"
+
 #: src/ui/data-table.tsx:69
 msgid "Remove selected"
 msgstr "Remove selected"
@@ -2056,6 +2424,10 @@ msgstr "Reset"
 msgid "Reset link sent — check your email to set a new password"
 msgstr "Reset link sent — check your email to set a new password"
 
+#: src/features/admin/event-config.tsx:179
+msgid "Reset to default"
+msgstr "Reset to default"
+
 #: src/ui/side-panel.tsx:155
 msgid "Resize panel"
 msgstr "Resize panel"
@@ -2077,6 +2449,8 @@ msgstr "RSVP to {title}"
 msgid "RSVP'd"
 msgstr "RSVP'd"
 
+#: src/features/admin/event-days.tsx:271
+#: src/features/admin/event-moments.tsx:243
 #: src/features/comments/comments-section.tsx:306
 #: src/features/people/profile-form.tsx:613
 #: src/features/schedule/attendee-count-field.tsx:127
@@ -2092,6 +2466,18 @@ msgstr "Save attendee count"
 msgid "Save availability"
 msgstr "Save availability"
 
+#: src/features/admin/event-config.tsx:255
+msgid "Save changes"
+msgstr "Save changes"
+
+#: src/features/admin/event-config.tsx:366
+msgid "Save phases"
+msgstr "Save phases"
+
+#: src/features/admin/settings-screen.tsx:131
+msgid "Save settings"
+msgstr "Save settings"
+
 #: src/features/sign-in/account-security.tsx:334
 msgid "Save username"
 msgstr "Save username"
@@ -2101,10 +2487,15 @@ msgstr "Save username"
 msgid "Saved"
 msgstr "Saved"
 
+#: src/features/admin/event-config.tsx:61
 #: src/features/meetings/availability-form.tsx:187
 msgid "Saved!"
 msgstr "Saved!"
 
+#: src/features/admin/event-config.tsx:57
+#: src/features/admin/event-days.tsx:271
+#: src/features/admin/event-moments.tsx:243
+#: src/features/admin/settings-screen.tsx:131
 #: src/features/comments/comments-section.tsx:594
 #: src/features/meetings/availability-form.tsx:191
 #: src/features/people/profile-form.tsx:613
@@ -2136,6 +2527,10 @@ msgstr "Schedule a 1-on-1"
 msgid "Schedule a 1-on-1 at {eventName}"
 msgstr "Schedule a 1-on-1 at {eventName}"
 
+#: src/features/admin/event-config.tsx:215
+msgid "Schedule increment (min)"
+msgstr "Schedule increment (min)"
+
 #: src/features/schedule/schedule-toolbar.tsx:84
 msgid "Schedule view"
 msgstr "Schedule view"
@@ -2164,6 +2559,10 @@ msgstr "Scheduling is not open. You can only browse the schedule."
 #: src/features/schedule/day-grid.tsx:82
 msgid "Scheduling opens {0}. Until then you can only browse the schedule."
 msgstr "Scheduling opens {0}. Until then you can only browse the schedule."
+
+#: src/features/admin/event-config.tsx:273
+msgid "Scheduling phase"
+msgstr "Scheduling phase"
 
 #: src/features/proposals/list-model.ts:255
 msgid "Scheduling will be enabled at {schedulingAt}"
@@ -2271,6 +2670,7 @@ msgstr "Session host"
 msgid "Session not found."
 msgstr "Session not found."
 
+#: src/features/admin/event-layout.tsx:21
 #: src/features/comments/my-comments-screen.tsx:15
 msgid "Sessions"
 msgstr "Sessions"
@@ -2292,10 +2692,16 @@ msgstr "Set a password for {guestName}"
 msgid "Set password"
 msgstr "Set password"
 
+#: src/app/admin-frame.tsx:44
 #: src/app/user-menu.tsx:115
+#: src/features/admin/settings-screen.tsx:171
 #: src/features/settings/settings-screen.tsx:50
 msgid "Settings"
 msgstr "Settings"
+
+#: src/features/admin/settings-screen.tsx:135
+msgid "Settings saved."
+msgstr "Settings saved."
 
 #: src/features/proposals/proposal-form.tsx:211
 msgid "Share your session idea with the community. Only the title is required."
@@ -2304,6 +2710,11 @@ msgstr "Share your session idea with the community. Only the title is required."
 #: src/features/schedule/day-agenda.tsx:350
 msgid "Shared moment: {title}"
 msgstr "Shared moment: {title}"
+
+#: src/features/admin/event-moments.tsx:380
+#: src/features/admin/event-moments.tsx:382
+msgid "Shared moments"
+msgstr "Shared moments"
 
 #: src/features/people/profile-form.tsx:77
 msgid "She/Her"
@@ -2384,6 +2795,10 @@ msgstr "Signal"
 msgid "Signed-in browsers"
 msgstr "Signed-in browsers"
 
+#: src/features/admin/settings-screen.tsx:173
+msgid "Site settings"
+msgstr "Site settings"
+
 #. Vote option on a session proposal: not interested
 #: src/features/proposals/vote-labels.ts:17
 msgid "Skip"
@@ -2442,6 +2857,18 @@ msgstr "Sorry — my session moved…"
 msgid "Sort by"
 msgstr "Sort by"
 
+#: src/features/admin/event-config.tsx:337
+#: src/features/admin/event-days.tsx:37
+#: src/features/admin/event-moments.tsx:65
+msgctxt "Date field: when it begins"
+msgid "Start"
+msgstr "Start"
+
+#: src/features/admin/event-days.tsx:44
+#: src/features/admin/event-moments.tsx:29
+msgid "Start is required"
+msgstr "Start is required"
+
 #. placeholder {0}: when(start)
 #: src/ui/phase-bar.tsx:73
 msgid "Started {0}."
@@ -2451,6 +2878,12 @@ msgstr "Started {0}."
 #: src/ui/phase-bar.tsx:74
 msgid "Starts {0}."
 msgstr "Starts {0}."
+
+#: src/app/admin-frame.tsx:43
+#: src/app/admin-pages.tsx:206
+#: src/features/admin/event-layout.tsx:99
+msgid "Statistics"
+msgstr "Statistics"
 
 #: src/features/schedule/match-stepper.tsx:25
 msgid "Step through matches"
@@ -2499,6 +2932,10 @@ msgstr "The chart could not load. The table below has the figures."
 msgid "The event could not be loaded."
 msgstr "The event could not be loaded."
 
+#: src/features/admin/event-days.tsx:469
+msgid "The event's dates are the days you add here. All times are in the event timezone ({timezone})."
+msgstr "The event's dates are the days you add here. All times are in the event timezone ({timezone})."
+
 #: src/app/home-page.tsx:44
 msgid "The events could not be loaded."
 msgstr "The events could not be loaded."
@@ -2518,6 +2955,14 @@ msgstr "The votes could not be loaded."
 #: src/features/proposals/list-model.ts:246
 msgid "The voting phase is over"
 msgstr "The voting phase is over"
+
+#: src/features/admin/event-days.tsx:344
+msgid "Their hosts and RSVPed guests are told."
+msgstr "Their hosts and RSVPed guests are told."
+
+#: src/app/admin-pages.tsx:191
+msgid "There are no events yet."
+msgstr "There are no events yet."
 
 #: src/ui/form-error-summary.tsx:36
 msgid "There is a problem:"
@@ -2643,6 +3088,10 @@ msgstr "This user has protected their account. Enter their password, or use a si
 msgid "This user has protected their account. Enter their password. Forgot it? Ask an organizer for a new link."
 msgstr "This user has protected their account. Enter their password. Forgot it? Ask an organizer for a new link."
 
+#: src/features/admin/event-config.tsx:400
+msgid "This will permanently delete the event and all associated days, proposals, sessions, RSVPs, and assignments. No one is notified."
+msgstr "This will permanently delete the event and all associated days, proposals, sessions, RSVPs, and assignments. No one is notified."
+
 #: src/app/time-format.tsx:99
 #: src/features/settings/settings-screen.tsx:141
 msgid "Time format"
@@ -2656,6 +3105,13 @@ msgstr "Time:"
 msgid "Times like {example}"
 msgstr "Times like {example}"
 
+#: src/features/admin/event-config.tsx:184
+#: src/features/admin/events-screen.tsx:114
+msgid "Timezone"
+msgstr "Timezone"
+
+#: src/features/admin/event-moments.tsx:47
+#: src/features/admin/settings-screen.tsx:79
 #: src/features/proposals/proposal-form.tsx:242
 #: src/features/proposals/proposals-screen.tsx:405
 msgid "Title"
@@ -2729,6 +3185,10 @@ msgstr "Turning on..."
 msgid "Two attendees in conversation"
 msgstr "Two attendees in conversation"
 
+#: src/features/admin/event-config.tsx:398
+msgid "Type the event name to confirm"
+msgstr "Type the event name to confirm"
+
 #: src/features/schedule/session-panel.tsx:221
 msgid "Un-RSVP"
 msgstr "Un-RSVP"
@@ -2784,6 +3244,18 @@ msgstr "Username saved"
 #: src/features/sign-in/account-security.tsx:311
 msgid "Username settings"
 msgstr "Username settings"
+
+#: src/app/admin-frame.tsx:41
+msgid "Users"
+msgstr "Users"
+
+#: src/features/admin/identity-mode-options.ts:13
+msgid "Verified events need a personal join link, an emailed code or a password. Open events let anyone act as any name."
+msgstr "Verified events need a personal join link, an emailed code or a password. Open events let anyone act as any name."
+
+#: src/features/admin/identity-mode-options.ts:8
+msgid "Verified: attendees prove who they are"
+msgstr "Verified: attendees prove who they are"
 
 #: src/app/footer.tsx:69
 msgid "Version {shown} — what's new"
@@ -2845,6 +3317,10 @@ msgstr "Voting"
 msgid "Voting is not enabled"
 msgstr "Voting is not enabled"
 
+#: src/features/admin/event-config.tsx:268
+msgid "Voting phase"
+msgstr "Voting phase"
+
 #: src/features/proposals/list-model.ts:249
 msgid "Voting will be enabled at {votingAt}"
 msgstr "Voting will be enabled at {votingAt}"
@@ -2857,6 +3333,8 @@ msgstr "Waiting for {them} to answer."
 msgid "waiting for reply"
 msgstr "waiting for reply"
 
+#: src/features/admin/event-config.tsx:159
+#: src/features/admin/events-screen.tsx:106
 #: src/features/people/contact-labels.ts:12
 msgid "Website"
 msgstr "Website"

@@ -121,6 +121,16 @@ export default tseslint.config(
       "apps/web/src/app/reload-offer.tsx",
       "apps/web/src/app/sync-indicator.tsx",
       "apps/web/src/app/user-menu.tsx",
+      "apps/web/src/app/admin-frame.tsx",
+      "apps/web/src/app/admin-pages.tsx",
+      "apps/web/src/features/admin/confirm-by-typing.tsx",
+      "apps/web/src/features/admin/event-config.tsx",
+      "apps/web/src/features/admin/event-days.tsx",
+      "apps/web/src/features/admin/event-icon-picker.tsx",
+      "apps/web/src/features/admin/event-layout.tsx",
+      "apps/web/src/features/admin/event-moments.tsx",
+      "apps/web/src/features/admin/events-screen.tsx",
+      "apps/web/src/features/admin/settings-screen.tsx",
     ],
     ignores: ["**/*.test.{ts,tsx}"],
     plugins: { lingui },
@@ -167,6 +177,8 @@ export default tseslint.config(
             "Error",
             "onAnswer",
             "formatOptionalTime",
+            "formatEventDates",
+            "setField",
             "cx",
             "console.*",
           ],
@@ -186,6 +198,12 @@ export default tseslint.config(
             ":not\\(",
             // Tailwind class lists: only lower-case tokens, one of them a utility with a known prefix
             "^(?=.*(?:^| )(?:[a-z]+:)*(?:bg|text|border|ring|rounded|h|w|min-w|max-w|p[xytblr]?|m[xytblr]?|gap|space-[xy]|focus|hover|disabled)-)[a-z0-9\\[\\]:/.%()#_!=,'-]+(?: [a-z0-9\\[\\]:/.%()#_!=,'-]+)*$",
+            // Day form field keys
+            "^(?:start|end)(?:Bookings)?$",
+            // Event phase field keys
+            "^[a-z]+Phase(?:Start|End)$",
+            // Query-string openers such as `?redirect=`
+            "^\\?[a-z]+=$",
             // Id suffixes such as `${id}-hint`
             "^-[a-z]+$",
             // The slot match-id prefix and problem codes passed as arguments
@@ -208,6 +226,10 @@ export default tseslint.config(
             "timezone",
             "autoComplete",
             "dateStyle",
+            "method",
+            "accept",
+            "identityMode",
+            "status",
             "transition",
             "headingId",
             "commentHref",

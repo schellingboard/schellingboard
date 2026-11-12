@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { type ReactNode, useState } from "react";
 
 import type { CommandResponse } from "../../commands/runner";
@@ -52,10 +54,10 @@ export function ConfirmByTyping<R>({
           disabled={mutation.pending || typed !== expected}
           onClick={() => void remove()}
         >
-          {mutation.pending ? "Deleting..." : "Confirm delete"}
+          {mutation.pending ? t`Deleting...` : t`Confirm delete`}
         </Button>
         <Button variant="quiet" disabled={mutation.pending} onClick={onCancel}>
-          Cancel
+          <Trans>Cancel</Trans>
         </Button>
       </div>
     </div>

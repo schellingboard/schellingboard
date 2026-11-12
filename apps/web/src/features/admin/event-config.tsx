@@ -1,3 +1,6 @@
+import { i18n } from "@lingui/core";
+import { msg, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import {
   utcToZonedInput,
   zonedInputToInstant,
@@ -34,10 +37,7 @@ import { EventDaysManager } from "./event-days";
 import { EventIconPicker } from "./event-icon-picker";
 import { EventMeetingsForm } from "./event-meetings";
 import { EventMomentsManager } from "./event-moments";
-import {
-  IDENTITY_MODE_HINT,
-  IDENTITY_MODE_OPTIONS,
-} from "./identity-mode-options";
+import { identityModeHint, identityModeOptions } from "./identity-mode-options";
 import { matchingZones, timezones } from "./timezones";
 import { useEventSection } from "./use-event-section";
 import { jumpTo, useSectionSave } from "./use-section-save";
@@ -54,25 +54,16 @@ function SaveRow({
   return (
     <div className="flex items-center gap-3">
       <Button type="submit" disabled={pending}>
-        {pending ? "Saving..." : label}
+        {pending ? t`Saving...` : label}
       </Button>
-      {saved && <span className="text-sm text-success-fg">Saved!</span>}
+      {saved && (
+        <span className="text-sm text-success-fg">
+          <Trans>Saved!</Trans>
+        </span>
+      )}
     </div>
   );
 }
-
-const DETAIL_FIELDS = [
-  "name",
-  "description",
-  "website",
-  "proposalHelp",
-  "timezone",
-  "maxSessionDuration",
-  "breakMinutes",
-  "slotIncrementMinutes",
-  "icon",
-  "identityMode",
-];
 
 const detailsOf = (event: AdminEvent) => ({
   name: event.name,
@@ -117,11 +108,22 @@ function DetailsForm({
   };
   const section = useSectionSave({
     call: (key) => calls.update(event.id, body, version, key),
-    fieldNames: DETAIL_FIELDS,
+    fieldNames: [
+      "name",
+      "description",
+      "website",
+      "proposalHelp",
+      "timezone",
+      "maxSessionDuration",
+      "breakMinutes",
+      "slotIncrementMinutes",
+      "icon",
+      "identityMode",
+    ],
     onSaved: () => markSaved(form),
     onChanged,
   });
-  const set =
+  const setField =
     <K extends keyof Details>(key: K) =>
     (value: Details[K]) => {
       section.clearSaved();
@@ -135,83 +137,85 @@ function DetailsForm({
       noValidate
       className="space-y-4"
     >
-      <h2 className="text-lg font-semibold text-fg">Basic info</h2>
+      <h2 className="text-lg font-semibold text-fg">
+        <Trans>Basic info</Trans>
+      </h2>
       <TextField
-        label="Name"
+        label={t`Name`}
         name="name"
         required
         value={form.name}
-        onChange={set("name")}
+        onChange={setField("name")}
         error={fields.name}
       />
       <MarkdownField
-        label="Description"
+        label={t`Description`}
         name="description"
         value={form.description}
-        onChange={set("description")}
+        onChange={setField("description")}
         error={fields.description}
       />
       <TextField
-        label="Website"
+        label={t`Website`}
         name="website"
         value={form.website}
-        onChange={set("website")}
+        onChange={setField("website")}
         error={fields.website}
       />
       <div className="space-y-2">
         <MarkdownField
-          label="Help for proposers"
+          label={t`Help for proposers`}
           name="proposalHelp"
-          hint="Opens from the Need ideas? button. Markdown supported."
+          hint={t`Opens from the Need ideas? button. Markdown supported.`}
           value={form.proposalHelp}
-          onChange={set("proposalHelp")}
+          onChange={setField("proposalHelp")}
           error={fields.proposalHelp}
         />
         <Button
           type="button"
           variant="quiet"
-          onClick={() => set("proposalHelp")(DEFAULT_PROPOSAL_HELP)}
+          onClick={() => setField("proposalHelp")(DEFAULT_PROPOSAL_HELP)}
         >
-          Reset to default
+          <Trans>Reset to default</Trans>
         </Button>
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <ComboboxField
-          label="Timezone"
+          label={t`Timezone`}
           name="timezone"
           required
           strict
           value={form.timezone}
-          onChange={set("timezone")}
+          onChange={setField("timezone")}
           options={matchingZones(zones, form.timezone)}
           error={fields.timezone}
         />
         <TextField
-          label="Max session duration (min)"
+          label={t`Max session duration (min)`}
           name="maxSessionDuration"
           type="number"
           min={1}
           required
           value={form.maxSessionDuration}
-          onChange={set("maxSessionDuration")}
+          onChange={setField("maxSessionDuration")}
           error={fields.maxSessionDuration}
         />
         <TextField
-          label="Break before each session (min)"
+          label={t`Break before each session (min)`}
           name="breakMinutes"
           type="number"
           min={0}
           required
-          hint="Applies to sessions booked from now on."
+          hint={t`Applies to sessions booked from now on.`}
           value={form.breakMinutes}
-          onChange={set("breakMinutes")}
+          onChange={setField("breakMinutes")}
           error={fields.breakMinutes}
         />
         <SelectField
-          label="Schedule increment (min)"
+          label={t`Schedule increment (min)`}
           name="slotIncrementMinutes"
           value={form.slotIncrementMinutes}
-          onChange={set("slotIncrementMinutes")}
+          onChange={setField("slotIncrementMinutes")}
           options={SLOT_INCREMENT_OPTIONS.map((o) => ({
             value: String(o),
             label: String(o),
@@ -220,33 +224,35 @@ function DetailsForm({
         />
       </div>
       <SelectField
-        label="Identity"
+        label={t`Identity`}
         name="identityMode"
         value={form.identityMode}
-        onChange={(v) => set("identityMode")(v as IdentityMode)}
-        options={IDENTITY_MODE_OPTIONS}
-        hint={IDENTITY_MODE_HINT}
+        onChange={(v) => setField("identityMode")(v as IdentityMode)}
+        options={identityModeOptions()}
+        hint={identityModeHint()}
         error={fields.identityMode}
       />
       <CheckboxField
-        label="Enforce session capacity as a hard limit — reject RSVPs once a session is full (capacity 0 means unlimited)"
+        label={t`Enforce session capacity as a hard limit — reject RSVPs once a session is full (capacity 0 means unlimited)`}
         name="rsvpCapacityHardLimit"
         checked={form.rsvpCapacityHardLimit}
-        onChange={set("rsvpCapacityHardLimit")}
+        onChange={setField("rsvpCapacityHardLimit")}
       />
       <div className="flex flex-col gap-1">
-        <span className="font-medium">Icon</span>
+        <span className="font-medium">
+          <Trans>Icon</Trans>
+        </span>
         <EventIconPicker
-          label="Icon"
+          label={t`Icon`}
           value={form.icon}
-          onChange={set("icon")}
+          onChange={setField("icon")}
         />
       </div>
       <FormErrorSummary fields={fields} error={section.error} onJump={jumpTo} />
       <SaveRow
         pending={section.pending}
         saved={section.saved}
-        label="Save changes"
+        label={t`Save changes`}
       />
     </form>
   );
@@ -254,13 +260,17 @@ function DetailsForm({
 
 const PHASES = [
   {
-    label: "Proposal phase",
+    label: msg`Proposal phase`,
     start: "proposalPhaseStart",
     end: "proposalPhaseEnd",
   },
-  { label: "Voting phase", start: "votingPhaseStart", end: "votingPhaseEnd" },
   {
-    label: "Scheduling phase",
+    label: msg`Voting phase`,
+    start: "votingPhaseStart",
+    end: "votingPhaseEnd",
+  },
+  {
+    label: msg`Scheduling phase`,
     start: "schedulingPhaseStart",
     end: "schedulingPhaseEnd",
   },
@@ -279,6 +289,7 @@ function PhasesForm({
   calls: AdminEventCalls;
   onChanged: () => void;
 }) {
+  const timezone = event.timezone;
   const { form, setForm, version, markSaved } = useEventSection(
     Object.fromEntries(
       PHASE_KEYS.map((k) => [k, utcToZonedInput(event[k], event.timezone)])
@@ -294,7 +305,7 @@ function PhasesForm({
     onSaved: () => markSaved(form),
     onChanged,
   });
-  const set = (key: PhaseKey) => (value: string) => {
+  const setField = (key: PhaseKey) => (value: string) => {
     section.clearSaved();
     setForm((prev) => ({ ...prev, [key]: value }));
   };
@@ -305,30 +316,40 @@ function PhasesForm({
       noValidate
       className="space-y-4"
     >
-      <h2 className="text-lg font-semibold text-fg">Phases</h2>
+      <h2 className="text-lg font-semibold text-fg">
+        <Trans>Phases</Trans>
+      </h2>
       <p className="text-sm text-fg-subtle">
-        All times are in the event timezone ({event.timezone}). Leave fields
-        empty to unset a phase. A phase with no end runs until the next phase
-        starts; set an end earlier than the next start to leave an inactive gap.
+        <Trans>
+          All times are in the event timezone ({timezone}). Leave fields empty
+          to unset a phase. A phase with no end runs until the next phase
+          starts; set an end earlier than the next start to leave an inactive
+          gap.
+        </Trans>
       </p>
       {PHASES.map(({ label, start, end }) => (
-        <fieldset key={label}>
-          <legend className="text-sm font-medium text-fg-muted">{label}</legend>
+        <fieldset key={start}>
+          <legend className="text-sm font-medium text-fg-muted">
+            {i18n._(label)}
+          </legend>
           <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <DateTimeField
-              label="Start"
+              label={t({
+                message: "Start",
+                context: "Date field: when it begins",
+              })}
               name={start}
               kind="datetime-local"
               value={form[start]}
-              onChange={set(start)}
+              onChange={setField(start)}
               error={section.fields[start]}
             />
             <DateTimeField
-              label="End"
+              label={t({ message: "End", context: "Date field: when it ends" })}
               name={end}
               kind="datetime-local"
               value={form[end]}
-              onChange={set(end)}
+              onChange={setField(end)}
               error={section.fields[end]}
             />
           </div>
@@ -342,7 +363,7 @@ function PhasesForm({
       <SaveRow
         pending={section.pending}
         saved={section.saved}
-        label="Save phases"
+        label={t`Save phases`}
       />
     </form>
   );
@@ -361,20 +382,22 @@ function DangerZone({
 
   return (
     <section
-      aria-label="Danger zone"
+      aria-label={t`Danger zone`}
       className="space-y-3 border-t border-danger-border pt-6"
     >
-      <h2 className="text-lg font-semibold text-danger-fg">Danger zone</h2>
+      <h2 className="text-lg font-semibold text-danger-fg">
+        <Trans>Danger zone</Trans>
+      </h2>
       {!confirming ? (
         <Button variant="danger" onClick={() => setConfirming(true)}>
-          Delete event
+          <Trans>Delete event</Trans>
         </Button>
       ) : (
         <div className="rounded-md border border-danger-border p-4">
           <ConfirmByTyping
-            label="Type the event name to confirm"
+            label={t`Type the event name to confirm`}
             expected={event.name}
-            warning="This will permanently delete the event and all associated days, proposals, sessions, RSVPs, and assignments. No one is notified."
+            warning={t`This will permanently delete the event and all associated days, proposals, sessions, RSVPs, and assignments. No one is notified.`}
             call={(key) => calls.remove(event.id, key)}
             onDeleted={onDeleted}
             onCancel={() => setConfirming(false)}

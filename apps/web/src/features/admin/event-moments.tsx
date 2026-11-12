@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { utcToZonedInput } from "@schellingboard/domain/admin-datetime";
 import { type FormEvent, useState } from "react";
 
@@ -12,9 +14,8 @@ import type {
 import { Button } from "../../ui/button";
 import { CheckboxField, DateTimeField, TextField } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
+import { useRowMode } from "./row-mode";
 import { jumpTo, shown, useJumpWithin } from "./use-section-save";
-
-const FIELDS = ["title", "description", "startTime", "endTime", "dayIds"];
 
 type MomentForm = MomentBody & { description: string };
 
@@ -25,9 +26,9 @@ const timeOf = (iso: string, timezone: string) =>
 
 function missingOf(form: MomentForm, dayIds?: string[]): FieldErrors {
   const missing: FieldErrors = {};
-  if (!form.startTime) missing.startTime = "Start is required";
-  if (!form.endTime) missing.endTime = "End is required";
-  if (dayIds?.length === 0) missing.dayIds = "Pick at least one day";
+  if (!form.startTime) missing.startTime = t`Start is required`;
+  if (!form.endTime) missing.endTime = t`End is required`;
+  if (dayIds?.length === 0) missing.dayIds = t`Pick at least one day`;
   return missing;
 }
 
@@ -43,7 +44,7 @@ function MomentFields({
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
       <TextField
-        label="Title"
+        label={t`Title`}
         name="title"
         required
         maxLength={100}
@@ -52,16 +53,16 @@ function MomentFields({
         error={errors.title}
       />
       <TextField
-        label="Details"
+        label={t`Details`}
         name="description"
         maxLength={200}
-        hint="Optional, one line."
+        hint={t`Optional, one line.`}
         value={form.description}
         onChange={(description) => onChange({ description })}
         error={errors.description}
       />
       <DateTimeField
-        label="Start"
+        label={t({ message: "Start", context: "Date field: when it begins" })}
         name="startTime"
         kind="time"
         required
@@ -70,7 +71,7 @@ function MomentFields({
         error={errors.startTime}
       />
       <DateTimeField
-        label="End"
+        label={t({ message: "End", context: "Date field: when it ends" })}
         name="endTime"
         kind="time"
         required
@@ -100,7 +101,7 @@ function useMomentForm({
   const missing = missingOf(form, dayIds);
   const mutation = useFormMutation({
     call: (key) => call(form, key),
-    fieldNames: FIELDS,
+    fieldNames: ["title", "description", "startTime", "endTime", "dayIds"],
     explainRefusals: true,
   });
   const errors = { ...(checking ? missing : {}), ...mutation.fields };
@@ -166,10 +167,14 @@ function AddMomentForm({
       noValidate
       className="space-y-3 rounded-md border border-line-subtle p-4"
     >
-      <h3 className="font-medium text-fg">New shared moment</h3>
+      <h3 className="font-medium text-fg">
+        <Trans>New shared moment</Trans>
+      </h3>
       <MomentFields form={f.form} onChange={f.change} errors={f.errors} />
       <fieldset className="space-y-2">
-        <legend className="font-medium">Days</legend>
+        <legend className="font-medium">
+          <Trans>Days</Trans>
+        </legend>
         {days.map((d) => (
           <CheckboxField
             key={d.id}
@@ -188,10 +193,10 @@ function AddMomentForm({
       <FormErrorSummary fields={f.errors} error={f.error} onJump={jump} />
       <div className="flex gap-2">
         <Button type="submit" disabled={f.pending}>
-          {f.pending ? "Adding..." : "Add moment"}
+          {f.pending ? t`Adding...` : t`Add moment`}
         </Button>
         <Button variant="quiet" disabled={f.pending} onClick={onClose}>
-          Cancel
+          <Trans>Cancel</Trans>
         </Button>
       </div>
     </form>
@@ -235,10 +240,10 @@ function EditMomentForm({
         <FormErrorSummary fields={f.errors} error={f.error} onJump={jump} />
         <div className="flex gap-2">
           <Button type="submit" disabled={f.pending}>
-            {f.pending ? "Saving..." : "Save"}
+            {f.pending ? t`Saving...` : t`Save`}
           </Button>
           <Button variant="quiet" disabled={f.pending} onClick={onClose}>
-            Cancel
+            <Trans>Cancel</Trans>
           </Button>
         </div>
       </form>
@@ -248,13 +253,15 @@ function EditMomentForm({
 
 function DeleteMoment({
   moment,
-  label,
+  title,
+  date,
   calls,
   onChanged,
   onClose,
 }: {
   moment: AdminEventMoment;
-  label: string;
+  title: string;
+  date: string;
   calls: AdminEventCalls;
   onChanged: () => void;
   onClose: () => void;
@@ -268,7 +275,11 @@ function DeleteMoment({
   };
   return (
     <li className="space-y-2 py-3">
-      <p className="text-sm text-danger-fg">Delete {label}?</p>
+      <p className="text-sm text-danger-fg">
+        <Trans>
+          Delete {title} on {date}?
+        </Trans>
+      </p>
       <FormErrorSummary fields={{}} error={mutation.error} onJump={jumpTo} />
       <div className="flex gap-2">
         <Button
@@ -276,10 +287,10 @@ function DeleteMoment({
           disabled={mutation.pending}
           onClick={() => void remove()}
         >
-          {mutation.pending ? "Deleting..." : "Confirm delete"}
+          {mutation.pending ? t`Deleting...` : t`Confirm delete`}
         </Button>
         <Button variant="quiet" disabled={mutation.pending} onClick={onClose}>
-          Cancel
+          <Trans>Cancel</Trans>
         </Button>
       </div>
     </li>
@@ -299,9 +310,8 @@ function MomentRow({
   calls: AdminEventCalls;
   onChanged: () => void;
 }) {
-  const [mode, setMode] = useState<"view" | "edit" | "delete">("view");
-  const close = () => setMode("view");
-  const label = `${moment.title} on ${date}`;
+  const { mode, close, edit, remove } = useRowMode();
+  const { title } = moment;
   if (mode === "edit")
     return (
       <EditMomentForm
@@ -316,7 +326,8 @@ function MomentRow({
     return (
       <DeleteMoment
         moment={moment}
-        label={label}
+        title={moment.title}
+        date={date}
         calls={calls}
         onChanged={onChanged}
         onClose={close}
@@ -332,17 +343,17 @@ function MomentRow({
       <div className="flex shrink-0 gap-2">
         <Button
           variant="quiet"
-          aria-label={`Edit ${label}`}
-          onClick={() => setMode("edit")}
+          aria-label={t`Edit ${title} on ${date}`}
+          onClick={edit}
         >
-          Edit
+          <Trans>Edit</Trans>
         </Button>
         <Button
           variant="danger"
-          aria-label={`Delete ${label}`}
-          onClick={() => setMode("delete")}
+          aria-label={t`Delete ${title} on ${date}`}
+          onClick={remove}
         >
-          Delete
+          <Trans>Delete</Trans>
         </Button>
       </div>
     </li>
@@ -366,13 +377,17 @@ export function EventMomentsManager({
 }) {
   const [adding, setAdding] = useState(false);
   return (
-    <section aria-label="Shared moments" className="space-y-4">
-      <h2 className="text-lg font-semibold text-fg">Shared moments</h2>
+    <section aria-label={t`Shared moments`} className="space-y-4">
+      <h2 className="text-lg font-semibold text-fg">
+        <Trans>Shared moments</Trans>
+      </h2>
       <p className="text-sm text-fg-subtle">
-        A shared moment, such as lunch or a keynote, shows as a striped band
-        across every room. It blocks nothing: sessions can still be booked
-        inside it. To make a time unbookable, add a blocker session in every
-        room instead. Times are in the event timezone ({timezone}).
+        <Trans>
+          A shared moment, such as lunch or a keynote, shows as a striped band
+          across every room. It blocks nothing: sessions can still be booked
+          inside it. To make a time unbookable, add a blocker session in every
+          room instead. Times are in the event timezone ({timezone}).
+        </Trans>
       </p>
       {days.map((day) => {
         const own = moments.filter((m) => m.dayId === day.id);
@@ -398,7 +413,7 @@ export function EventMomentsManager({
       })}
       {days.length === 0 ? (
         <p className="text-sm text-fg-muted">
-          Add a day first; shared moments belong to days.
+          <Trans>Add a day first; shared moments belong to days.</Trans>
         </p>
       ) : adding ? (
         <AddMomentForm
@@ -410,7 +425,9 @@ export function EventMomentsManager({
           onClose={() => setAdding(false)}
         />
       ) : (
-        <Button onClick={() => setAdding(true)}>Add shared moment</Button>
+        <Button onClick={() => setAdding(true)}>
+          <Trans>Add shared moment</Trans>
+        </Button>
       )}
     </section>
   );

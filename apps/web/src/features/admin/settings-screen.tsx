@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import {
   MAP_REQUIREMENTS_HINT,
   MAX_MAP_BYTES,
@@ -42,6 +44,7 @@ function SettingsForm({
     fieldNames: ["title", "description"],
     explainRefusals: true,
   });
+  const maxMapMegabytes = MAX_MAP_BYTES / 1024 / 1024;
   const tooBig = image && image.size > MAX_MAP_BYTES;
   const fields = { ...mutation.fields, ...refused };
 
@@ -73,7 +76,7 @@ function SettingsForm({
       className="max-w-2xl space-y-4"
     >
       <TextField
-        label="Title"
+        label={t`Title`}
         name="title"
         required
         value={title}
@@ -81,7 +84,7 @@ function SettingsForm({
         error={fields.title}
       />
       <MarkdownField
-        label="Description"
+        label={t`Description`}
         name="description"
         value={description}
         onChange={setDescription}
@@ -91,7 +94,7 @@ function SettingsForm({
         {settings.mapImageUrl && !removeMap && (
           <img
             src={settings.mapImageUrl}
-            alt="Current map"
+            alt={t`Current map`}
             width={240}
             height={180}
             className="rounded border border-line-subtle"
@@ -99,7 +102,7 @@ function SettingsForm({
         )}
         <FileField
           key={fileKey}
-          label="Map"
+          label={t`Map`}
           name="image"
           accept="image/jpeg,image/png,image/webp"
           hint={MAP_REQUIREMENTS_HINT}
@@ -107,14 +110,12 @@ function SettingsForm({
           onChange={setImage}
           error={
             fields.image ??
-            (tooBig
-              ? `Map exceeds ${MAX_MAP_BYTES / 1024 / 1024} MB.`
-              : undefined)
+            (tooBig ? t`Map exceeds ${maxMapMegabytes} MB.` : undefined)
           }
         />
         {settings.mapImageUrl && (
           <CheckboxField
-            label="Remove current map"
+            label={t`Remove current map`}
             checked={removeMap}
             onChange={setRemoveMap}
           />
@@ -127,9 +128,13 @@ function SettingsForm({
       />
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={mutation.pending}>
-          {mutation.pending ? "Saving..." : "Save settings"}
+          {mutation.pending ? t`Saving...` : t`Save settings`}
         </Button>
-        {saved && <p className="text-sm text-success-fg">Settings saved.</p>}
+        {saved && (
+          <p className="text-sm text-success-fg">
+            <Trans>Settings saved.</Trans>
+          </p>
+        )}
       </div>
     </form>
   );
@@ -150,15 +155,22 @@ export function SettingsScreen({
   if (status === "error")
     return (
       <p role="alert" className="text-sm text-danger-fg">
-        Could not load the settings.
+        <Trans>Could not load the settings.</Trans>
       </p>
     );
-  if (status === "loading") return <p className="text-sm">Loading…</p>;
+  if (status === "loading")
+    return (
+      <p className="text-sm">
+        <Trans>Loading…</Trans>
+      </p>
+    );
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-fg">Settings</h1>
-      <section aria-label="Site settings" className="space-y-4">
+      <h1 className="text-2xl font-bold text-fg">
+        <Trans>Settings</Trans>
+      </h1>
+      <section aria-label={t`Site settings`} className="space-y-4">
         <SettingsForm settings={settings} calls={calls} onSaved={onSaved} />
       </section>
     </div>

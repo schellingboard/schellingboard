@@ -1,3 +1,6 @@
+import { i18n } from "@lingui/core";
+import { msg, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import type { ReactNode } from "react";
 
 import type { AdminEvent } from "../../queries/admin-events";
@@ -5,11 +8,17 @@ import { BackLink } from "../../ui/back-link";
 import { cx } from "../../ui/cx";
 
 const SECTIONS = [
-  { path: "", label: "Config" },
-  { path: "/guests", label: "Guests" },
-  { path: "/locations", label: "Locations" },
-  { path: "/proposals", label: "Proposals" },
-  { path: "/sessions", label: "Sessions" },
+  {
+    path: "",
+    label: msg({
+      message: "Config",
+      context: "Event admin tab: the event settings",
+    }),
+  },
+  { path: "/guests", label: msg`Guests` },
+  { path: "/locations", label: msg`Locations` },
+  { path: "/proposals", label: msg`Proposals` },
+  { path: "/sessions", label: msg`Sessions` },
 ];
 
 function EventTabs({
@@ -22,7 +31,7 @@ function EventTabs({
   const base = `/admin/events/${eventId}`;
   return (
     <nav
-      aria-label="Event sections"
+      aria-label={t`Event sections`}
       className="flex gap-1 overflow-x-auto border-b border-line-subtle"
     >
       {SECTIONS.map(({ path, label }) => {
@@ -42,7 +51,7 @@ function EventTabs({
                 : "border-transparent text-fg-subtle hover:border-line hover:text-fg-muted"
             )}
           >
-            {label}
+            {i18n._(label)}
           </a>
         );
       })}
@@ -64,16 +73,22 @@ export function AdminEventLayout({
   if (status === "error" || (status === "ready" && !event))
     return (
       <p role="alert" className="text-sm text-danger-fg">
-        Could not load the event.
+        <Trans>Could not load the event.</Trans>
       </p>
     );
   if (status === "loading" || !event)
-    return <p className="text-sm">Loading…</p>;
+    return (
+      <p className="text-sm">
+        <Trans>Loading…</Trans>
+      </p>
+    );
 
   return (
     <div className="w-full space-y-6">
       <div>
-        <BackLink href="/admin/events">Events</BackLink>
+        <BackLink href="/admin/events">
+          <Trans>Events</Trans>
+        </BackLink>
       </div>
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <h1 className="text-2xl font-bold text-fg">{event.name}</h1>
@@ -81,7 +96,7 @@ export function AdminEventLayout({
           href={`/admin/statistics/${event.id}`}
           className="text-sm font-medium text-fg-muted underline-offset-4 hover:text-fg hover:underline"
         >
-          Statistics
+          <Trans>Statistics</Trans>
         </a>
       </div>
       <EventTabs eventId={event.id} currentPath={currentPath} />

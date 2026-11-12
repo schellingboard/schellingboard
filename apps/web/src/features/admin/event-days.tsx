@@ -1,3 +1,6 @@
+import { i18n, type MessageDescriptor } from "@lingui/core";
+import { msg, plural, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import {
   utcToZonedInput,
   zonedInputToInstant,
@@ -17,6 +20,7 @@ import type { ScheduledSession } from "../../queries/admin-sessions";
 import { Button } from "../../ui/button";
 import { DateTimeField } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
+import { useRowMode } from "./row-mode";
 import { jumpTo, shown, useJumpWithin } from "./use-section-save";
 
 const FIELDS = ["start", "end", "startBookings", "endBookings"] as const;
@@ -29,11 +33,18 @@ const EMPTY: DayForm = {
   endBookings: "",
 };
 
-const LABELS: DayForm = {
-  start: "Start",
-  end: "End",
-  startBookings: "Bookings open",
-  endBookings: "Bookings close",
+const LABELS: Record<keyof DayForm, MessageDescriptor> = {
+  start: msg({ message: "Start", context: "Date field: when it begins" }),
+  end: msg({ message: "End", context: "Date field: when it ends" }),
+  startBookings: msg`Bookings open`,
+  endBookings: msg`Bookings close`,
+};
+
+const REQUIRED: Record<keyof DayForm, MessageDescriptor> = {
+  start: msg`Start is required`,
+  end: msg`End is required`,
+  startBookings: msg`Bookings open is required`,
+  endBookings: msg`Bookings close is required`,
 };
 
 const FOLLOWERS: Partial<Record<keyof DayForm, keyof DayForm>> = {
@@ -55,7 +66,7 @@ function bodyOf(
   const missing: FieldErrors = {};
   const instants = FIELDS.map((k) => {
     const instant = zonedInputToInstant(form[k], timezone);
-    if (!instant) missing[k] = `${LABELS[k]} is required`;
+    if (!instant) missing[k] = i18n._(REQUIRED[k]);
     return instant;
   });
   if (instants.some((i) => !i)) return { missing };
@@ -77,7 +88,7 @@ function DayFormFields({
       {FIELDS.map((key) => (
         <DateTimeField
           key={key}
-          label={LABELS[key]}
+          label={i18n._(LABELS[key])}
           name={key}
           kind="datetime-local"
           required
@@ -160,7 +171,12 @@ function AddDayForm({
   onChanged: () => void;
 }) {
   const [open, setOpen] = useState(false);
-  if (!open) return <Button onClick={() => setOpen(true)}>Add day</Button>;
+  if (!open)
+    return (
+      <Button onClick={() => setOpen(true)}>
+        <Trans>Add day</Trans>
+      </Button>
+    );
   return (
     <AddDayFields
       eventId={eventId}
@@ -201,15 +217,17 @@ function AddDayFields({
       noValidate
       className="space-y-3 rounded-md border border-line-subtle p-4"
     >
-      <h3 className="font-medium text-fg">New day</h3>
+      <h3 className="font-medium text-fg">
+        <Trans>New day</Trans>
+      </h3>
       <DayFormFields form={f.form} onChange={f.change} errors={f.errors} />
       <FormErrorSummary fields={f.errors} error={f.error} onJump={jump} />
       <div className="flex gap-2">
         <Button type="submit" disabled={f.pending}>
-          {f.pending ? "Adding..." : "Add day"}
+          {f.pending ? t`Adding...` : t`Add day`}
         </Button>
         <Button variant="quiet" disabled={f.pending} onClick={onClose}>
-          Cancel
+          <Trans>Cancel</Trans>
         </Button>
       </div>
     </form>
@@ -250,10 +268,10 @@ function EditDayForm({
         <FormErrorSummary fields={f.errors} error={f.error} onJump={jump} />
         <div className="flex gap-2">
           <Button type="submit" disabled={f.pending}>
-            {f.pending ? "Saving..." : "Save"}
+            {f.pending ? t`Saving...` : t`Save`}
           </Button>
           <Button variant="quiet" disabled={f.pending} onClick={onClose}>
-            Cancel
+            <Trans>Cancel</Trans>
           </Button>
         </div>
       </form>
@@ -263,7 +281,9 @@ function EditDayForm({
 
 function DeleteDay({
   day,
-  label,
+  from,
+  to,
+  timezone,
   affected,
   momentCount,
   calls,
@@ -271,7 +291,9 @@ function DeleteDay({
   onClose,
 }: {
   day: AdminEventDay;
-  label: string;
+  from: string;
+  to: string;
+  timezone: string;
   affected: string[];
   momentCount: number;
   calls: AdminEventCalls;
@@ -285,15 +307,22 @@ function DeleteDay({
   const remove = async () => {
     if ((await mutation.submit())?.ok) onChanged();
   };
+  const sessionCount = affected.length;
   return (
     <li className="space-y-2 py-3">
-      <p className="text-sm text-fg-muted">{label}</p>
+      <p className="text-sm text-fg-muted">
+        <Trans>
+          {from} – {to} ({timezone})
+        </Trans>
+      </p>
       <p className="text-sm text-danger-fg">
         {affected.length === 0
-          ? "Delete this day? No scheduled sessions fall within its time window."
-          : `Delete this day? The following ${
-              affected.length === 1 ? "session" : `${affected.length} sessions`
-            } scheduled within its time window will also be deleted:`}
+          ? t`Delete this day? No scheduled sessions fall within its time window.`
+          : plural(sessionCount, {
+              one: "Delete this day? The following session scheduled within its time window will also be deleted:",
+              other:
+                "Delete this day? The following # sessions scheduled within its time window will also be deleted:",
+            })}
       </p>
       {affected.length > 0 && (
         <ul className="list-inside list-disc text-sm text-danger-fg">
@@ -304,14 +333,15 @@ function DeleteDay({
       )}
       {momentCount > 0 && (
         <p className="text-sm text-danger-fg">
-          {momentCount === 1
-            ? "Its shared moment will also be deleted."
-            : `Its ${momentCount} shared moments will also be deleted.`}
+          {plural(momentCount, {
+            one: "Its shared moment will also be deleted.",
+            other: "Its # shared moments will also be deleted.",
+          })}
         </p>
       )}
       {affected.length > 0 && (
         <p className="text-sm text-fg-muted">
-          Their hosts and RSVPed guests are told.
+          <Trans>Their hosts and RSVPed guests are told.</Trans>
         </p>
       )}
       <FormErrorSummary fields={{}} error={mutation.error} onJump={jumpTo} />
@@ -321,10 +351,10 @@ function DeleteDay({
           disabled={mutation.pending}
           onClick={() => void remove()}
         >
-          {mutation.pending ? "Deleting..." : "Confirm delete"}
+          {mutation.pending ? t`Deleting...` : t`Confirm delete`}
         </Button>
         <Button variant="quiet" disabled={mutation.pending} onClick={onClose}>
-          Cancel
+          <Trans>Cancel</Trans>
         </Button>
       </div>
     </li>
@@ -346,12 +376,9 @@ function DayRow({
   calls: AdminEventCalls;
   onChanged: () => void;
 }) {
-  const [mode, setMode] = useState<"view" | "edit" | "delete">("view");
-  const close = () => setMode("view");
-  const label = `${utcToZonedInput(day.start, timezone)} – ${utcToZonedInput(
-    day.end,
-    timezone
-  )} (${timezone})`;
+  const { mode, close, edit, remove } = useRowMode();
+  const from = utcToZonedInput(day.start, timezone);
+  const to = utcToZonedInput(day.end, timezone);
 
   if (mode === "edit")
     return (
@@ -378,7 +405,9 @@ function DayRow({
     return (
       <DeleteDay
         day={day}
-        label={label}
+        from={from}
+        to={to}
+        timezone={timezone}
         affected={affected}
         momentCount={momentCount}
         calls={calls}
@@ -389,21 +418,25 @@ function DayRow({
   }
   return (
     <li className="flex items-center justify-between gap-3 py-3">
-      <p className="text-sm text-fg-muted">{label}</p>
+      <p className="text-sm text-fg-muted">
+        <Trans>
+          {from} – {to} ({timezone})
+        </Trans>
+      </p>
       <div className="flex shrink-0 gap-2">
         <Button
           variant="quiet"
-          aria-label={`Edit day ${label}`}
-          onClick={() => setMode("edit")}
+          aria-label={t`Edit day ${from} – ${to} (${timezone})`}
+          onClick={edit}
         >
-          Edit
+          <Trans>Edit</Trans>
         </Button>
         <Button
           variant="danger"
-          aria-label={`Delete day ${label}`}
-          onClick={() => setMode("delete")}
+          aria-label={t`Delete day ${from} – ${to} (${timezone})`}
+          onClick={remove}
         >
-          Delete
+          <Trans>Delete</Trans>
         </Button>
       </div>
     </li>
@@ -428,11 +461,15 @@ export function EventDaysManager({
   onChanged: () => void;
 }) {
   return (
-    <section aria-label="Days" className="space-y-4">
-      <h2 className="text-lg font-semibold text-fg">Days</h2>
+    <section aria-label={t`Days`} className="space-y-4">
+      <h2 className="text-lg font-semibold text-fg">
+        <Trans>Days</Trans>
+      </h2>
       <p className="text-sm text-fg-subtle">
-        The event&apos;s dates are the days you add here. All times are in the
-        event timezone ({timezone}).
+        <Trans>
+          The event&apos;s dates are the days you add here. All times are in the
+          event timezone ({timezone}).
+        </Trans>
       </p>
       {days.length > 0 && (
         <ul className="divide-y divide-line-subtle border-t border-b border-line-subtle">
