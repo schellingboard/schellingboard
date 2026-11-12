@@ -63,11 +63,11 @@ type Device = {
 const formatDate = (iso: string, locale: string) =>
   new Date(iso).toLocaleDateString(locale, { dateStyle: "medium" });
 
-const describe = ({ host, createdAt, current }: Device, locale: string) => {
+const turnOffLabel = ({ host, createdAt, current }: Device, locale: string) => {
   const since = formatDate(createdAt, locale);
   return current
-    ? t`${host}, on since ${since}, this device`
-    : t`${host}, on since ${since}`;
+    ? t`Turn off ${host}, on since ${since}, this device`
+    : t`Turn off ${host}, on since ${since}`;
 };
 
 export function PushNotifications({
@@ -237,7 +237,8 @@ export function PushNotifications({
     }
   };
 
-  const removedDescription = removed && describe(removed, locale);
+  const removedHost = removed?.host ?? "";
+  const removedSince = removed ? formatDate(removed.createdAt, locale) : "";
   return (
     <section aria-labelledby="push-heading" className="flex flex-col gap-2">
       <h2
@@ -317,9 +318,9 @@ export function PushNotifications({
         )}
       </div>
 
-      {removedDescription && (
+      {removed && (
         <p role="status" className="text-sm text-success-fg">
-          {t`Turned off for ${removedDescription}.`}
+          {t`Turned off for ${removedHost}, on since ${removedSince}.`}
         </p>
       )}
 
@@ -334,7 +335,6 @@ export function PushNotifications({
           >
             {devices.map((device) => {
               const since = formatDate(device.createdAt, locale);
-              const description = describe(device, locale);
               return (
                 <li
                   key={device.id}
@@ -356,7 +356,7 @@ export function PushNotifications({
                     variant="quiet"
                     onClick={() => void removeDevice(device)}
                     disabled={busy}
-                    aria-label={t`Turn off ${description}`}
+                    aria-label={turnOffLabel(device, locale)}
                     className="border border-line px-3 py-1"
                   >
                     {t`Turn off`}

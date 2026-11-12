@@ -77,8 +77,9 @@ the E2E specs a step touches; the user runs the full suite at the end.
     them to `ignoreNames`), plus the test setup for macros. 28b. DONE App shell (error boundary,
     event page, footer, header links, home, layout, map, nav bar, not found, panel host, reload
     offer, sync indicator, user menu; `theme.tsx`, `time-format.tsx` and `people-pages.tsx` are
-    translated but off the allowlist until 28n: technical constants trip the rule). 28c. Settings (4
-    files, 77), notifications (17), events (1). 28d. Schedule grid, agenda, toolbar, filters, kiosk,
+    translated but off the allowlist until 28n: technical constants trip the rule). 28c. DONE Settings,
+    notifications, events (`push-notifications.tsx` stays off the allowlist). 28b also dropped
+    `router.tsx`, `spa-links`, `panel links` (no UI text). 28d. Schedule grid, agenda, toolbar, filters, kiosk,
     pull-to-refresh (~150 in 20 files). 28e. Session panel, session block, meetings column, 1-on-1
     dialogs (`features/meetings`, `people/meeting-request-dialog`, `open-up-nudge`) (~150). 28f.
     Proposals (10 files, 174). 28g. Comments (69), people and profile (~137). 28h. Sign-in and
@@ -88,7 +89,9 @@ the E2E specs a step touches; the user runs the full suite at the end.
     availability, meetings (~120). 28l. Admin stats (`stats-*`, ~390, mostly `stats-figures.tsx`).
     28m. Problem codes and validation messages: `commands/problem.ts`, zod messages in
     `packages/contracts`, toasts in `commands/`. 28n. Leftovers: plurals as ICU, enum labels via
-    label functions, markdown/plain-text helpers that build sentences; then the allowlist becomes
+    label functions, markdown/plain-text helpers that build sentences; make `push-notifications.tsx`,
+    `theme.tsx`, `time-format.tsx`, `people-pages.tsx` pass the rule; translate the footer date
+    (fixed en-GB) and the release-note highlights (`packages/domain`); then the allowlist becomes
     `apps/web/src/**` with `ignoreFunctions` (Error, console.*) and tests excluded. Conventions:
     docs/dev/i18n.md.
 29. **#1328f** Server side: emails and notifications per recipient locale. Issue step 6.

@@ -32,14 +32,6 @@ msgstr "{0, plural, one {Delete this notification? This cannot be undone.} other
 msgid "{count, plural, one {There is a problem to fix:} other {There are # problems to fix:}}"
 msgstr "{count, plural, one {There is a problem to fix:} other {There are # problems to fix:}}"
 
-#: src/features/settings/push-notifications.tsx:70
-msgid "{host}, on since {since}"
-msgstr "{host}, on since {since}"
-
-#: src/features/settings/push-notifications.tsx:69
-msgid "{host}, on since {since}, this device"
-msgstr "{host}, on since {since}, this device"
-
 #: src/ui/data-table.tsx:52
 msgid "{selectedCount, plural, one {# selected} other {# selected}}"
 msgstr "{selectedCount, plural, one {# selected} other {# selected}}"
@@ -52,6 +44,10 @@ msgstr "{total, plural, one {# result} other {# results}}"
 msgid "{total, plural, one {#+ result} other {#+ results}}"
 msgstr "{total, plural, one {#+ result} other {#+ results}}"
 
+#: src/app/header-links.tsx:44
+msgid "{unread, plural, one {Notifications (# unread)} other {Notifications (# unread)}}"
+msgstr "{unread, plural, one {Notifications (# unread)} other {Notifications (# unread)}}"
+
 #: src/ui/charts/heatmap.tsx:66
 msgid "{valueLabel}: 0 to {max}"
 msgstr "{valueLabel}: 0 to {max}"
@@ -60,11 +56,11 @@ msgstr "{valueLabel}: 0 to {max}"
 msgid "1-on-1s"
 msgstr "1-on-1s"
 
-#: src/app/time-format.tsx:64
+#: src/app/time-format.tsx:60
 msgid "12-hour"
 msgstr "12-hour"
 
-#: src/app/time-format.tsx:65
+#: src/app/time-format.tsx:61
 msgid "24-hour"
 msgstr "24-hour"
 
@@ -126,7 +122,7 @@ msgstr "Assign selected"
 msgid "Attendees"
 msgstr "Attendees"
 
-#: src/app/time-format.tsx:61
+#: src/app/time-format.tsx:59
 msgid "Automatic"
 msgstr "Automatic"
 
@@ -157,7 +153,7 @@ msgstr "Bulk actions"
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/features/settings/push-notifications.tsx:262
+#: src/features/settings/push-notifications.tsx:263
 msgid "Checking…"
 msgstr "Checking…"
 
@@ -295,7 +291,7 @@ msgstr "Event phases"
 msgid "Everything here is private and never shown to other attendees. Your <0>public profile</0> is edited separately."
 msgstr "Everything here is private and never shown to other attendees. Your <0>public profile</0> is edited separately."
 
-#: src/features/settings/push-notifications.tsx:252
+#: src/features/settings/push-notifications.tsx:253
 msgid "Everything the notifications page tells you, on your phone or laptop while the site isn’t open. A device gets all of them — the email settings above only decide what is emailed. Each device is turned on separately."
 msgstr "Everything the notifications page tells you, on your phone or laptop while the site isn’t open. A device gets all of them — the email settings above only decide what is emailed. Each device is turned on separately."
 
@@ -320,7 +316,7 @@ msgstr "First"
 msgid "First page"
 msgstr "First page"
 
-#: src/app/time-format.tsx:62
+#: src/app/time-format.tsx:66
 msgid "Follow your browser's language"
 msgstr "Follow your browser's language"
 
@@ -485,16 +481,12 @@ msgstr "Nothing yet. When someone comments on your session or changes something 
 msgid "Notification actions"
 msgstr "Notification actions"
 
-#: src/app/header-links.tsx:43
+#: src/app/header-links.tsx:48
 #: src/features/notifications/notifications-screen.tsx:126
 msgid "Notifications"
 msgstr "Notifications"
 
-#: src/app/header-links.tsx:43
-msgid "Notifications ({unread} unread)"
-msgstr "Notifications ({unread} unread)"
-
-#: src/features/settings/push-notifications.tsx:286
+#: src/features/settings/push-notifications.tsx:287
 msgid "Notifications are blocked for this site. Allow them in your browser’s settings for this site, then reload this page."
 msgstr "Notifications are blocked for this site. Allow them in your browser’s settings for this site, then reload this page."
 
@@ -502,19 +494,19 @@ msgstr "Notifications are blocked for this site. Allow them in your browser’s 
 msgid "Notifications go to the email address the organizers have for you. Contact an organizer to change it."
 msgstr "Notifications go to the email address the organizers have for you. Contact an organizer to change it."
 
-#: src/features/settings/push-notifications.tsx:249
+#: src/features/settings/push-notifications.tsx:250
 msgid "Notifications on this device"
 msgstr "Notifications on this device"
 
-#: src/features/settings/push-notifications.tsx:329
+#: src/features/settings/push-notifications.tsx:330
 msgid "Notifications on your devices"
 msgstr "Notifications on your devices"
 
-#: src/features/settings/push-notifications.tsx:307
+#: src/features/settings/push-notifications.tsx:308
 msgid "On for this device."
 msgstr "On for this device."
 
-#: src/features/settings/push-notifications.tsx:267
+#: src/features/settings/push-notifications.tsx:268
 msgid "On iPhone and iPad this works once the site is on your home screen: tap the Share button, then <0>Add to Home Screen</0>, and open it from there."
 msgstr "On iPhone and iPad this works once the site is on your home screen: tap the Share button, then <0>Add to Home Screen</0>, and open it from there."
 
@@ -717,7 +709,7 @@ msgstr "The events could not be loaded."
 msgid "There is a problem:"
 msgstr "There is a problem:"
 
-#: src/features/settings/push-notifications.tsx:277
+#: src/features/settings/push-notifications.tsx:278
 msgid "This browser can’t show notifications. You’ll still see everything on the notifications page."
 msgstr "This browser can’t show notifications. You’ll still see everything on the notifications page."
 
@@ -745,18 +737,14 @@ msgstr "This site runs {currentVersion}, {currentDate}."
 msgid "This site runs {currentVersion}."
 msgstr "This site runs {currentVersion}."
 
-#: src/app/time-format.tsx:73
+#: src/app/time-format.tsx:98
 #: src/features/settings/settings-screen.tsx:140
 msgid "Time format"
 msgstr "Time format"
 
-#: src/app/time-format.tsx:65
-msgid "Times like 14:00"
-msgstr "Times like 14:00"
-
-#: src/app/time-format.tsx:64
-msgid "Times like 2:00 PM"
-msgstr "Times like 2:00 PM"
+#: src/app/time-format.tsx:70
+msgid "Times like {example}"
+msgstr "Times like {example}"
 
 #: src/app/error-boundary.tsx:38
 #: src/app/event-page.tsx:166
@@ -765,28 +753,32 @@ msgstr "Times like 2:00 PM"
 msgid "Try again"
 msgstr "Try again"
 
-#: src/features/settings/push-notifications.tsx:314
+#: src/features/settings/push-notifications.tsx:315
 #: src/features/settings/push-notifications.tsx:362
 msgid "Turn off"
 msgstr "Turn off"
 
-#: src/features/settings/push-notifications.tsx:359
-msgid "Turn off {description}"
-msgstr "Turn off {description}"
+#: src/features/settings/push-notifications.tsx:70
+msgid "Turn off {host}, on since {since}"
+msgstr "Turn off {host}, on since {since}"
 
-#: src/features/settings/push-notifications.tsx:300
+#: src/features/settings/push-notifications.tsx:69
+msgid "Turn off {host}, on since {since}, this device"
+msgstr "Turn off {host}, on since {since}, this device"
+
+#: src/features/settings/push-notifications.tsx:301
 msgid "Turn on for this device"
 msgstr "Turn on for this device"
 
-#: src/features/settings/push-notifications.tsx:322
-msgid "Turned off for {removedDescription}."
-msgstr "Turned off for {removedDescription}."
+#: src/features/settings/push-notifications.tsx:323
+msgid "Turned off for {removedHost}, on since {removedSince}."
+msgstr "Turned off for {removedHost}, on since {removedSince}."
 
-#: src/features/settings/push-notifications.tsx:314
+#: src/features/settings/push-notifications.tsx:315
 msgid "Turning off..."
 msgstr "Turning off..."
 
-#: src/features/settings/push-notifications.tsx:300
+#: src/features/settings/push-notifications.tsx:301
 msgid "Turning on..."
 msgstr "Turning on..."
 

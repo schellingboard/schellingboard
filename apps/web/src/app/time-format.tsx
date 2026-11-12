@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
+import { DateTime } from "luxon";
 import { clockFormat, type ClockStyle } from "@schellingboard/domain/time";
 import { clockStyleFor } from "../i18n/format";
 import { useFormatLocale } from "../i18n/format-locale";
@@ -54,36 +55,51 @@ export function useTimeFormat(): string {
 const OPTIONS: {
   value: Preference;
   label: MessageDescriptor;
-  hint: MessageDescriptor;
 }[] = [
-  {
-    value: "auto",
-    label: msg`Automatic`,
-    hint: msg`Follow your browser's language`,
-  },
-  { value: "12h", label: msg`12-hour`, hint: msg`Times like 2:00 PM` },
-  { value: "24h", label: msg`24-hour`, hint: msg`Times like 14:00` },
+  { value: "auto", label: msg`Automatic` },
+  { value: "12h", label: msg`12-hour` },
+  { value: "24h", label: msg`24-hour` },
 ];
 
-export function TimeFormatSelect() {
+function useHint(value: Preference): string {
+  const locale = useFormatLocale();
+  if (value === "auto") return t`Follow your browser's language`;
+  const example = DateTime.fromObject({ hour: 14 }, { locale }).toFormat(
+    clockFormat(value)
+  );
+  return t`Times like ${example}`;
+}
+
+function TimeFormatOption({
+  value,
+  label,
+}: {
+  value: Preference;
+  label: MessageDescriptor;
+}) {
   const { preference, setPreference } = useContext(TimeFormatContext);
+  return (
+    <button
+      type="button"
+      title={useHint(value)}
+      aria-pressed={preference === value}
+      onClick={() => setPreference(value)}
+      className={`px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-accent ${preference === value ? "bg-surface-inverse text-fg-inverse" : "text-fg-muted hover:bg-surface-hover"}`}
+    >
+      {i18n._(label)}
+    </button>
+  );
+}
+
+export function TimeFormatSelect() {
   return (
     <div
       role="group"
       aria-label={t`Time format`}
       className="inline-flex overflow-hidden rounded-md border border-line"
     >
-      {OPTIONS.map(({ value, label, hint }) => (
-        <button
-          key={value}
-          type="button"
-          title={i18n._(hint)}
-          aria-pressed={preference === value}
-          onClick={() => setPreference(value)}
-          className={`px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-accent ${preference === value ? "bg-surface-inverse text-fg-inverse" : "text-fg-muted hover:bg-surface-hover"}`}
-        >
-          {i18n._(label)}
-        </button>
+      {OPTIONS.map(({ value, label }) => (
+        <TimeFormatOption key={value} value={value} label={label} />
       ))}
     </div>
   );
