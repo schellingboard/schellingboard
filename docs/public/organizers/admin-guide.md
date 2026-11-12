@@ -117,6 +117,11 @@ before bookings open. You can still place a session there yourself.
 Use this rather than a **blocker** session when attendees don't need to know why. Something they
 should see on their schedule, such as lunch, stays a blocker.
 
+**Keep slots free for spontaneous sessions:** mark a room unavailable for that time, or add a
+blocker session there titled e.g. "Reserved for spontaneous sessions" so attendees know why. Nobody
+can book it in advance. Shortly before the time, delete the entry; the room is then open to
+attendees for sessions added on the spot.
+
 ## Guests / Users
 
 Guests are also a **global pool** (Name, Email — unique when set, Username, About me, Pronouns,
