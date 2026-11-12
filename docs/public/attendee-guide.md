@@ -223,11 +223,11 @@ emailed. If two people click at once, the first one wins.
 Vote counts show how much interest there is, not how many people will walk in — voters didn't know
 what would end up running against your session.
 
-Open your own proposal during voting or scheduling to see a **vote breakdown**: how many attendees
-voted and how many didn't, how the votes split across ❤️ ⭐ 👋, and how many people to expect if you
-host it — a range, like "expect 8–17 people".
+Open your own proposal during voting or scheduling (it opens in a panel beside the page) to see a
+**vote breakdown**: how many attendees voted and how many didn't, how the votes split across ❤️ ⭐
+👋, and how many people to expect if you host it — a range, like "expect 8–17 people".
 
-![Proposal popup in the scheduling phase, showing a vote breakdown with turnout, the split across Interested, Maybe and Skip, and a range of how many people to expect](../screenshots/proposal-vote-breakdown.webp)
+![Proposal panel in the scheduling phase, showing a vote breakdown with turnout, the split across Interested, Maybe and Skip, and a range of how many people to expect](../screenshots/proposal-vote-breakdown.webp)
 
 :::warning "The range is a very rough guess" It comes from a single event where thirteen hosts
 recalled roughly how many people came to their session, so it can be well out in either direction.

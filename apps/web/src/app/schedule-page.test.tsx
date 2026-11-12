@@ -64,6 +64,12 @@ describe("the event route", () => {
     }
   );
 
+  it("keeps the follow-up link's record request when the address is opened", async () => {
+    const { router } = await open({ path: "/conf/sessions/s?record=count" });
+    await screen.findByRole("dialog", { name: "Session details" });
+    expect(router.history.location.search).toBe("?record=count");
+  });
+
   it(
     "turns the old ?viewSession= address into the panel, keeping the page's own params",
     { tags: ["007-US1"] },

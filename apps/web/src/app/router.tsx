@@ -5,6 +5,7 @@ import {
   redirect,
   lazyRouteComponent,
   Outlet,
+  useRouter,
   type RouterHistory,
 } from "@tanstack/react-router";
 import { Suspense, type ReactElement } from "react";
@@ -29,8 +30,8 @@ import {
 import { EventLanding } from "./event-landing";
 import { EventLayout } from "./event-page";
 import { SchedulePage } from "./schedule-page";
-import { SessionLanding } from "./session-landing";
-import { PanelHost } from "./session-panel-host";
+import { PanelLanding } from "./panel-landing";
+import { PanelHost } from "./panel-host";
 import { SessionFormPage } from "./sessions-pages";
 import { SpaLinks } from "./spa-links";
 import { defaultServices, type AppServices } from "./services";
@@ -140,7 +141,18 @@ export function createAppRouter(
     path: "sessions/$sessionId",
     component: function SessionRoute(): ReactElement {
       const { slug, sessionId } = session.useParams();
-      return <SessionLanding slug={slug} sessionId={sessionId} />;
+      const { search } = useRouter().history.location;
+      return (
+        <PanelLanding
+          item={{
+            kind: "session",
+            slug,
+            id: sessionId,
+            record: new URLSearchParams(search).get("record") === "count",
+          }}
+          background={`/${slug}/schedule`}
+        />
+      );
     },
   });
   const meetings = createRoute({
@@ -152,6 +164,19 @@ export function createAppRouter(
     getParentRoute: () => event,
     path: "proposals",
     component: ProposalsPage,
+  });
+  const proposal = createRoute({
+    getParentRoute: () => event,
+    path: "proposals/$proposalId",
+    component: function ProposalRoute(): ReactElement {
+      const { slug, proposalId } = proposal.useParams();
+      return (
+        <PanelLanding
+          item={{ kind: "proposal", slug, id: proposalId }}
+          background={`/${slug}/proposals`}
+        />
+      );
+    },
   });
   const quickVoting = createRoute({
     getParentRoute: () => event,
@@ -350,6 +375,7 @@ export function createAppRouter(
         session,
         meetings,
         proposals,
+        proposal,
         quickVoting,
         newProposal,
         editProposal,

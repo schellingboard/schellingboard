@@ -15,7 +15,7 @@ import { iso, snapshot as fixture } from "../../replica/snapshot-fixture";
 import { NoticeProvider } from "../../ui/notices";
 import { comment, fakeComments } from "../comments/comments-test-support";
 import { proposalLinks } from "./links";
-import { ProposalModal, type ProposalActions } from "./proposal-modal";
+import { ProposalPanel, type ProposalActions } from "./proposal-panel";
 
 afterEach(cleanup);
 
@@ -104,7 +104,7 @@ function setup(
   const onClose = vi.fn();
   const element = (current: Snapshot) => (
     <NoticeProvider>
-      <ProposalModal
+      <ProposalPanel
         proposalId="p"
         snapshot={current}
         now={new Date(iso(10))}

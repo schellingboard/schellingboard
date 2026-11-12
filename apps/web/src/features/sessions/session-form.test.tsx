@@ -63,7 +63,7 @@ const OWN_SLOT = new Date(Date.UTC(2026, 5, 15, 13, 50)).toISOString();
 const NOW = new Date(fixture.now);
 const links = {
   schedule: "/conf",
-  proposal: (id: string) => `/conf/proposals?viewProposal=${id}`,
+  proposal: (id: string) => `/conf/proposals/${id}`,
   session: (id: string) => `/conf?viewSession=${id}`,
 };
 const saved = () => Response.json({ ...mine, id: "new" }, { status: 201 });
@@ -391,7 +391,7 @@ describe("editing a session", { tags: ["008-US2"] }, () => {
 
     expect(
       screen.getByRole("link", { name: "here" }).getAttribute("href")
-    ).toBe("/conf/proposals?viewProposal=p");
+    ).toBe("/conf/proposals/p");
   });
 
   it("keeps a started session where it is and still lets its length change", async () => {

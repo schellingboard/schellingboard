@@ -229,15 +229,15 @@ test("should open proposal detail page when clicking on a proposal @004-US4", as
 
   await expect(modal).toBeVisible();
   await expect(page.getByRole("dialog")).toHaveCount(1);
-  await expect(page).toHaveURL(/\/Conference-Alpha\/proposals\?viewProposal=/);
+  await expect(page).toHaveURL(/\/Conference-Alpha\/proposals\/[^/?#]+$/);
 
   // Verify the proposal title is displayed as a heading within the modal
   await expect(
     modal.getByRole("heading", { name: proposalTitle })
   ).toBeVisible();
 
-  // Reload with viewProposal in the URL. This is the "paste link" /
-  // "refresh while modal is open" scenario for testing hydration accuracy.
+  // Reload with the proposal's own address in the URL: the "paste link" /
+  // "refresh while the panel is open" scenario.
   await page.reload();
   await expect(
     page.getByRole("dialog", { name: "Proposal details" })
@@ -263,9 +263,8 @@ test("should open proposal detail page when clicking on a proposal @004-US4", as
   await proposalLink.click();
   await expect(modal).toBeVisible();
 
-  // Test closing by clicking outside the modal content (common user behavior)
-  // Click in an area that should be the backdrop
-  await page.click("body", { position: { x: 50, y: 50 } });
+  // The panel is non-modal: Escape closes it
+  await page.keyboard.press("Escape");
 
   // Verify modal is closed again
   await expect(modal).not.toBeVisible();

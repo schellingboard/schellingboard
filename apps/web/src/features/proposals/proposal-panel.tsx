@@ -19,7 +19,7 @@ import {
   ownVotesFrom,
   toEvent,
 } from "../../replica/selectors";
-import { Dialog } from "../../ui/dialog";
+import { SidePanel } from "../../ui/side-panel";
 import { CalendarIcon, HandRaisedIcon, PencilIcon } from "../../ui/icons";
 import { Unavailable } from "../../ui/unavailable";
 import { Comments, type CommentsHandle } from "../comments/comments-section";
@@ -34,7 +34,7 @@ export type ProposalActions = {
   /** Null withdraws. A failure is reported as a notice, not returned. */
   vote: (proposalId: string, choice: VoteChoice | null) => void;
   join: (proposalId: string) => Promise<void>;
-  /** The caller destroys nothing: the modal destroys the query when done. */
+  /** The caller destroys nothing: the panel destroys the query when done. */
   detail: (proposalId: string) => ProposalDetailQuery;
   comments: (proposalId: string) => CommentsHandle;
 };
@@ -42,8 +42,8 @@ export type ProposalActions = {
 const ACTION =
   "inline-flex items-center justify-center rounded-md border border-brand-accent px-2 py-1 text-xs font-medium text-brand-fg hover:bg-brand-tint focus:outline-none focus:ring-2 focus:ring-brand-accent";
 
-/** A proposal's details over the proposals list or quick voting, opened by `?viewProposal=`. */
-export function ProposalModal({
+/** A proposal's details in the side panel. */
+export function ProposalPanel({
   proposalId,
   snapshot,
   ...rest
@@ -56,22 +56,24 @@ export function ProposalModal({
   actions: ProposalActions;
   setHash: (hash: string) => void;
   onClose: () => void;
+  onBack?: () => void;
 }) {
   const proposal = snapshot.proposals.find((p) => p.id === proposalId);
+  const { onClose, onBack, ...details } = rest;
   return (
-    <Dialog
-      open
-      wide
-      onClose={rest.onClose}
+    <SidePanel
       label="Proposal details"
       title={proposal?.title ?? "Proposal details"}
+      onClose={onClose}
+      onBack={onBack}
+      shareUrl={rest.links.view(proposalId)}
     >
       {proposal ? (
-        <Details proposal={proposal} snapshot={snapshot} {...rest} />
+        <Details proposal={proposal} snapshot={snapshot} {...details} />
       ) : (
         <p>Proposal not found.</p>
       )}
-    </Dialog>
+    </SidePanel>
   );
 }
 

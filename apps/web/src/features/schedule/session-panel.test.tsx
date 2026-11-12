@@ -386,7 +386,7 @@ describe("the proposal a session came from", () => {
     open(snapshotWith({ proposalId: "p1" }));
     expect(
       within(dialog()).getByRole("link", { name: "here" }).getAttribute("href")
-    ).toBe("/conf/proposals?viewProposal=p1");
+    ).toBe("/conf/proposals/p1");
   });
 });
 

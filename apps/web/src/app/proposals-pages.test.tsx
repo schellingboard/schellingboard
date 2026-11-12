@@ -69,7 +69,7 @@ describe("the proposals pages", { tags: ["004-US4"] }, () => {
     expect(screen.getAllByText("Rust intro").length).toBeGreaterThan(0);
   });
 
-  it("opens a proposal on a new history entry, which Back closes", async () => {
+  it("opens a proposal in a panel at its own address, which Back closes", async () => {
     const { router } = await open({ ...phase(), path: "/conf/proposals" });
 
     await userEvent.click(
@@ -79,25 +79,54 @@ describe("the proposals pages", { tags: ["004-US4"] }, () => {
     expect(
       await screen.findByRole("dialog", { name: "Proposal details" })
     ).toBeTruthy();
-    expect(router.history.location.search).toBe("?viewProposal=p");
+    expect(router.history.location.pathname).toBe("/conf/proposals/p");
     router.history.back();
     await waitFor(() =>
       expect(
         screen.queryByRole("dialog", { name: "Proposal details" })
       ).toBeNull()
     );
+    expect(router.history.location.pathname).toBe("/conf/proposals");
   });
 
-  it("closes a proposal reached by its address in place", async () => {
-    const { router } = await open({
-      ...phase(),
-      path: "/conf/proposals?viewProposal=p",
-    });
+  it("opens a proposal reached by its address over the list, and Close leaves the list", async () => {
+    const { router } = await open({ ...phase(), path: "/conf/proposals/p" });
 
     await userEvent.click(await screen.findByRole("button", { name: "Close" }));
 
-    await waitFor(() => expect(router.history.location.search).toBe(""));
-    expect(router.history.location.pathname).toBe("/conf/proposals");
+    await waitFor(() =>
+      expect(router.history.location.pathname).toBe("/conf/proposals")
+    );
+    expect(
+      screen.queryByRole("dialog", { name: "Proposal details" })
+    ).toBeNull();
+    expect(screen.getAllByText("Rust intro").length).toBeGreaterThan(0);
+  });
+
+  it("turns the old ?viewProposal= address into the panel", async () => {
+    const { router } = await open({
+      ...phase(),
+      path: "/conf/proposals?viewProposal=p#comment-c1",
+    });
+
+    await screen.findByRole("dialog", { name: "Proposal details" });
+    expect(router.history.location.pathname).toBe("/conf/proposals/p");
+    expect(router.history.location.hash).toBe("#comment-c1");
+  });
+
+  it("opens the panel over quick voting too", async () => {
+    const { router } = await open({
+      ...phase(),
+      path: "/conf/proposals/quick-voting?viewProposal=p",
+    });
+
+    await screen.findByRole("dialog", { name: "Proposal details" });
+    router.history.back();
+    await waitFor(() =>
+      expect(router.history.location.pathname).toBe(
+        "/conf/proposals/quick-voting"
+      )
+    );
   });
 
   it("shows quick voting", async () => {
