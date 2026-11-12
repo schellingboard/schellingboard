@@ -32,7 +32,8 @@ the E2E specs a step touches; the user runs the full suite at the end.
 16. DONE **#969** Settings lists push devices (`/me/push-devices`) with Turn off.
 17. DONE **#684** `Pager` (numbers, First/Last, rows per page; `pageSize` URL param).
 18. DONE **#380** ESLint 10 (dependabot ignore removed; typescript-eslint packages dropped).
-19. **#1169** Property-based tests for domain.
+19. DONE **#1169** Property tests (`tests/unit/*.property.test.ts`) for slots, meeting-slots,
+    day-window, reminder-schedule, vote stats.
 
 ## Next steps
 
