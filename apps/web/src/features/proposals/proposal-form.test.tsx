@@ -288,7 +288,7 @@ describe("editing a proposal", { tags: ["004-US2"] }, () => {
     });
 
     const link = screen.getByRole("link", { name: /Monday 09:00 in Room/ });
-    expect(link.getAttribute("href")).toBe("/conf?viewSession=s");
+    expect(link.getAttribute("href")).toBe("/conf/schedule?viewSession=s");
     expect(
       screen.getByText(/Changes here do not reach the schedule/)
     ).toBeTruthy();

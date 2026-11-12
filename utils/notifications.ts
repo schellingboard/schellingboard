@@ -276,7 +276,7 @@ async function notifySessionDeletedUnsafe({
   const event = await getRepositories().events.findById(session.eventId);
   if (!event) return;
 
-  const eventPath = `/${event.slug}`;
+  const eventPath = `/${event.slug}/schedule`;
   const messageProps = {
     title: session.title,
     time: formatSessionTime(session, event.timezone),
@@ -764,7 +764,7 @@ function proposalCommentPath(
 // dispatch builds the same link for its notification and its email: one
 // definition, not three copies.
 export function sessionPath(eventSlug: string, sessionId: string) {
-  return `/${eventSlug}?viewSession=${sessionId}`;
+  return `/${eventSlug}/schedule?viewSession=${sessionId}`;
 }
 
 // Emails need an absolute link; in-app notifications keep the path, so they

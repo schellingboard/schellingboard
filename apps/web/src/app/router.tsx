@@ -26,6 +26,7 @@ import {
   ProposalsPage,
   QuickVotingPage,
 } from "./proposals-pages";
+import { EventLanding } from "./event-landing";
 import { EventLayout } from "./event-page";
 import { SchedulePage } from "./schedule-page";
 import { SessionFormPage } from "./sessions-pages";
@@ -121,9 +122,14 @@ export function createAppRouter(
       );
     },
   });
-  const schedule = createRoute({
+  const landing = createRoute({
     getParentRoute: () => event,
     path: "/",
+    component: EventLanding,
+  });
+  const schedule = createRoute({
+    getParentRoute: () => event,
+    path: "schedule",
     component: SchedulePage,
   });
   const meetings = createRoute({
@@ -328,6 +334,7 @@ export function createAppRouter(
       join,
       guests.addChildren([guestsList, guestsPage]),
       event.addChildren([
+        landing,
         schedule,
         meetings,
         proposals,

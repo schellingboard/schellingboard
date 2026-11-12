@@ -162,7 +162,7 @@ describe.skipIf(skipWithoutMailpit())(
         `How many people came to "${title}"?`
       );
       expect(message.HTML).toContain(
-        `https://site.example/${slug}?viewSession=${session.id}&amp;record=count`
+        `https://site.example/${slug}/schedule?viewSession=${session.id}&amp;record=count`
       );
       expect(message.HTML).toContain("13:00");
       expect(message.HTML).not.toContain("11:00");

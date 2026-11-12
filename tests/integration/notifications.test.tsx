@@ -231,7 +231,7 @@ describe("notifySessionChanged", () => {
     expect(html.match(/\(was /g)).toHaveLength(1);
     // Links to the session, prefixed with SITE_URL.
     expect(html).toContain(
-      `href="https://site.example/${event.slug}?viewSession=${session.id}"`
+      `href="https://site.example/${event.slug}/schedule?viewSession=${session.id}"`
     );
   });
 
@@ -620,7 +620,9 @@ describe("notifySessionDeleted", () => {
     expect(hostHtml).not.toContain("hands-on");
     expect(hostHtml).toContain("Saturday 1 August, 10:00");
     expect(hostHtml).toContain("Room A");
-    expect(hostHtml).toContain(`href="https://site.example/${event.slug}"`);
+    expect(hostHtml).toContain(
+      `href="https://site.example/${event.slug}/schedule"`
+    );
   });
 
   it("uses hostChange and rsvpChange settings for deletion recipients", async () => {
@@ -739,7 +741,7 @@ describe("notifyCohostsAdded", () => {
     expect(html).toContain("Saturday 1 August, 10:00–11:00");
     expect(html).toContain("Room A");
     expect(html).toContain(
-      `href="https://site.example/${event.slug}?viewSession=${session.id}"`
+      `href="https://site.example/${event.slug}/schedule?viewSession=${session.id}"`
     );
   });
 
@@ -849,7 +851,7 @@ describe("notifySessionLostHost", { tags: ["013-US4"] }, () => {
     expect(html).toContain("has no host");
     expect(html).toContain("cancelled");
     expect(html).toContain(
-      `href="https://site.example/${event.slug}?viewSession=${session.id}"`
+      `href="https://site.example/${event.slug}/schedule?viewSession=${session.id}"`
     );
     const [notification] = await getRepositories().notifications.listByGuest(
       rsvper.id
@@ -1187,7 +1189,7 @@ describe("notifySessionCommented", () => {
     expect(hostHtml).toContain("session you");
     expect(hostHtml).not.toContain("great");
     expect(hostHtml).toContain(
-      `href="https://site.example/${event.slug}?viewSession=${session.id}#comment-${posted.id}"`
+      `href="https://site.example/${event.slug}/schedule?viewSession=${session.id}#comment-${posted.id}"`
     );
   });
 
@@ -1224,7 +1226,7 @@ describe("notifySessionCommented", () => {
       host.id
     );
     expect(notification.url).toBe(
-      `/${event.slug}?viewSession=${session.id}#comment-${posted.id}`
+      `/${event.slug}/schedule?viewSession=${session.id}#comment-${posted.id}`
     );
     expect(notification.text).toBe('Rosa Diaz commented on "Hallway Track"');
   });

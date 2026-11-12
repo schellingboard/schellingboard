@@ -17,6 +17,7 @@ export function SpaLinks({
     <InAppLinks
       owns={({ pathname }) =>
         pathname === `/${slug}` ||
+        pathname === `/${slug}/schedule` ||
         pathname === `/${slug}/meetings` ||
         pathname === `/${slug}/add-session` ||
         pathname === `/${slug}/edit-session` ||

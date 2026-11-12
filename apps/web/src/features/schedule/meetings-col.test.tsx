@@ -96,7 +96,7 @@ describe("the 1-on-1 column", () => {
     expect(screen.getByText("Only you see these")).toBeTruthy();
     const link = screen.getByRole("link", { name: /1-on-1 with Kai at 10:10/ });
     expect(link.getAttribute("aria-label")).toContain("Coffee bar — confirmed");
-    expect(link.getAttribute("href")).toBe("/conf?viewMeeting=m1");
+    expect(link.getAttribute("href")).toBe("/conf/schedule?viewMeeting=m1");
   });
 
   it("leaves out declined meetings", () => {
@@ -114,7 +114,7 @@ describe("the 1-on-1 column", () => {
       name: "Arrange a 1-on-1 at 11:10",
     });
     expect(free.getAttribute("href")).toBe(
-      `/conf?bookMeeting=${encodeURIComponent(iso(11))}`
+      `/conf/schedule?bookMeeting=${encodeURIComponent(iso(11))}`
     );
   });
 
@@ -167,7 +167,7 @@ describe("the 1-on-1 column", () => {
     const dialog = screen.getByRole("dialog");
     expect(within(dialog).getAllByRole("link")).toHaveLength(5);
     expect(within(dialog).getAllByRole("link")[0].getAttribute("href")).toBe(
-      "/conf?viewMeeting=m-a"
+      "/conf/schedule?viewMeeting=m-a"
     );
   });
 });

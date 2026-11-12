@@ -78,12 +78,10 @@ overview, deep links, an early read-only schedule), and a session never gets stu
       (`useRevealSession`, `dayOfSession`); `data-session-id` on grid blocks and agenda rows; use
       case 007-US12; E2E in view-session.spec.ts (click, reload).
 
-- [ ] **11. refactor: the schedule moves to `/<slug>/schedule`** — `issue #1336`. `/<slug>` only
-      redirects (replace, no history entry): to `/<slug>/schedule` with the same search params if it
-      has any (`viewSession`, `view`, `filter`, `loc`, …) or scheduling has started (the event has
-      no phases, or now ≥ `schedulingPhaseStart`); else to `/<slug>/proposals`. Stored notification
-      links and old emails keep working. All in-app links and new emails use `/<slug>/schedule`. No
-      behaviour change otherwise.
+- [x] **11. refactor: the schedule moves to `/<slug>/schedule`** (`issue #1336`): route `schedule`;
+      `/{slug}` is `EventLanding` (app/event-landing.tsx, `landingPath(event, now, search)`) and
+      forwards with replace; `scheduleLinks(slug).schedule`, `sessionPath` (utils/notifications.ts)
+      use `/schedule`; use case 007-US13.
 
 - [ ] **12. feat: read-only schedule before scheduling opens** — `fixes #1336`.
   - Landing: step 11's redirect keeps opening the event on the proposals list before scheduling

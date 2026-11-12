@@ -255,6 +255,11 @@ export const features = {
         actor: "attendee",
         priority: "P2",
       },
+      US13: {
+        title: "Attendee opening an event lands on its schedule or proposals",
+        actor: "attendee",
+        priority: "P2",
+      },
     },
   },
   "008": {

@@ -163,7 +163,7 @@ describe("the profile modal", () => {
       render(<Harness />);
 
       const talk = await screen.findByRole("link", { name: "Hosted talk" });
-      expect(talk.getAttribute("href")).toBe("/Camp?viewSession=s1");
+      expect(talk.getAttribute("href")).toBe("/Camp/schedule?viewSession=s1");
       expect(
         screen.getByRole("link", { name: "Proposed talk" }).getAttribute("href")
       ).toBe("/Camp/proposals?viewProposal=p1");

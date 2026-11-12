@@ -107,7 +107,7 @@ describe("a 1-on-1 notification", { tags: ["012-US4"] }, () => {
       path: "/conf/meetings?viewMeeting=m1",
     });
     await screen.findByRole("dialog", { name: "1-on-1 details" });
-    expect(router.history.location.pathname).toBe("/conf");
+    expect(router.history.location.pathname).toBe("/conf/schedule");
   });
 
   it("opens it read-only outside scheduling (#952)", async () => {

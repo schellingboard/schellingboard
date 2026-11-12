@@ -7,7 +7,7 @@ const links = scheduleLinks("conf");
 describe("scheduleLinks", () => {
   it("opens a session over the current schedule view, keeping its params", () => {
     expect(links.session(new URLSearchParams("view=agenda"), "s1")).toBe(
-      "/conf?view=agenda&viewSession=s1"
+      "/conf/schedule?view=agenda&viewSession=s1"
     );
   });
 
@@ -19,7 +19,7 @@ describe("scheduleLinks", () => {
 
   it("opens a 1-on-1 the same way", () => {
     expect(links.meeting(new URLSearchParams(), "m1")).toBe(
-      "/conf?viewMeeting=m1"
+      "/conf/schedule?viewMeeting=m1"
     );
   });
 
@@ -31,12 +31,12 @@ describe("scheduleLinks", () => {
 
   it("books a free 1-on-1 slot on the schedule, which opens the request", () => {
     expect(links.bookMeeting("2026-06-15T10:00:00.000Z")).toBe(
-      "/conf?bookMeeting=2026-06-15T10%3A00%3A00.000Z"
+      "/conf/schedule?bookMeeting=2026-06-15T10%3A00%3A00.000Z"
     );
   });
 
   it("links the proposals and the schedule", () => {
     expect(links.proposals).toBe("/conf/proposals");
-    expect(links.schedule).toBe("/conf");
+    expect(links.schedule).toBe("/conf/schedule");
   });
 });

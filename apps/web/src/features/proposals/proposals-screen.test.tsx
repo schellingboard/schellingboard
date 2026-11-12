@@ -131,7 +131,7 @@ describe("the proposals list", () => {
     ).toBe("true");
     expect(
       screen.getByRole("link", { name: /View Schedule/ }).getAttribute("href")
-    ).toBe("/conf");
+    ).toBe("/conf/schedule");
   });
 
   it("says so when there are no proposals", () => {
