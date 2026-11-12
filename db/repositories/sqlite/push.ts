@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
 import * as schema from "../../schema";
@@ -71,6 +71,18 @@ export class SqlitePushRepository implements PushRepository {
     this.db
       .delete(schema.pushSubscriptions)
       .where(eq(schema.pushSubscriptions.endpoint, endpoint))
+      .run();
+  }
+
+  async deleteSubscriptionById(id: string, guestId: string): Promise<void> {
+    this.db
+      .delete(schema.pushSubscriptions)
+      .where(
+        and(
+          eq(schema.pushSubscriptions.id, id),
+          eq(schema.pushSubscriptions.guestId, guestId)
+        )
+      )
       .run();
   }
 

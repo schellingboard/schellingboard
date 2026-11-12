@@ -7182,6 +7182,112 @@
         "security": [{ "siteAuth": [] }]
       }
     },
+    "/api/v1/me/push-devices": {
+      "get": {
+        "tags": ["notifications"],
+        "description": "The acting guest's devices with notifications on, oldest first. Endpoints are never sent; pass this browser's to have its row marked current.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 2000,
+              "description": "This browser's endpoint, so the answer can mark its row"
+            },
+            "required": false,
+            "description": "This browser's endpoint, so the answer can mark its row",
+            "name": "endpoint",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The caller's devices",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Opaque; the endpoint itself is never sent back"
+                          },
+                          "host": {
+                            "type": "string",
+                            "description": "The push service, the only hint about the device"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "current": {
+                            "type": "boolean",
+                            "description": "Whether this is the browser that asked"
+                          }
+                        },
+                        "required": ["id", "host", "createdAt", "current"]
+                      }
+                    }
+                  },
+                  "required": ["items"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }]
+      }
+    },
+    "/api/v1/me/push-devices/{id}": {
+      "delete": {
+        "tags": ["notifications"],
+        "description": "Turns notifications off for one of the acting guest's devices. An id that is not theirs, or is already gone, gives the same answer.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Turned off" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }]
+      }
+    },
     "/api/v1/events": {
       "get": {
         "tags": ["events"],

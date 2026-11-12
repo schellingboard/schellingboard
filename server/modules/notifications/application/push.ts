@@ -39,6 +39,39 @@ export const unsubscribeFromPush =
       return ok(undefined);
     });
 
+export const listPushDevices =
+  ({ repos }: NotificationDeps) =>
+  async (
+    actor: Actor,
+    { endpoint }: { endpoint?: string }
+  ): Promise<
+    Result<{ id: string; host: string; createdAt: Date; current: boolean }[]>
+  > => {
+    const acting = await actingGuest(actor, repos.guests);
+    if (!acting.ok) return acting;
+    const subscriptions = await repos.push.listSubscriptions(acting.value);
+    return ok(
+      subscriptions
+        .map((s) => ({
+          id: s.id,
+          host: URL.canParse(s.endpoint) ? new URL(s.endpoint).host : "unknown",
+          createdAt: s.createdAt,
+          current: s.endpoint === endpoint,
+        }))
+        .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+    );
+  };
+
+export const removePushDevice =
+  ({ uow }: NotificationDeps) =>
+  (actor: Actor, { id }: { id: string }): Promise<Result<void>> =>
+    uow.run(async (tx) => {
+      const acting = await actingGuest(actor, tx.guests);
+      if (!acting.ok) return acting;
+      await tx.push.deleteSubscriptionById(id, acting.value);
+      return ok(undefined);
+    });
+
 /**
  * Whether the subscription a browser is holding is the acting guest's. The
  * browser keeps its subscription across name changes and past a server that

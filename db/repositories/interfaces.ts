@@ -859,6 +859,8 @@ export interface PushRepository {
    */
   saveSubscription(data: Omit<PushSubscription, "id">): Promise<void>;
   deleteSubscription(endpoint: string): Promise<void>;
+  /** Scoped to the guest, so an id that is not theirs deletes nothing. */
+  deleteSubscriptionById(id: string, guestId: string): Promise<void>;
   /**
    * The stored VAPID pair, calling `generate` and storing the result the first
    * time. Never regenerates: the public key is baked into every subscription

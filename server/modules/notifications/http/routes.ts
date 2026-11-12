@@ -8,6 +8,8 @@ import {
   notificationSchema,
 } from "@schellingboard/contracts/notification";
 import {
+  pushDeviceQuerySchema,
+  pushDevicesSchema,
   pushEnabledSchema,
   pushEndpointSchema,
   pushKeySchema,
@@ -132,6 +134,29 @@ const checkEnabled = createRoute({
   },
 });
 
+const listDevices = createRoute({
+  method: "get",
+  path: "/me/push-devices",
+  tags: ["notifications"],
+  description:
+    "The acting guest's devices with notifications on, oldest first. Endpoints are never sent; pass this browser's to have its row marked current.",
+  request: { query: pushDeviceQuerySchema },
+  responses: {
+    200: json(pushDevicesSchema, "The caller's devices"),
+    ...problemDefault,
+  },
+});
+
+const removeDevice = createRoute({
+  method: "delete",
+  path: "/me/push-devices/{id}",
+  tags: ["notifications"],
+  description:
+    "Turns notifications off for one of the acting guest's devices. An id that is not theirs, or is already gone, gives the same answer.",
+  request: { headers: idempotencyHeaders, params: idParam },
+  responses: { 204: noContent("Turned off"), ...problemDefault },
+});
+
 const getPushKey = createRoute({
   method: "get",
   path: "/push/key",
@@ -245,5 +270,30 @@ export function addNotificationRoutes(
     );
     if (!result.ok) return problem(result.error);
     return c.json({ enabled: result.value }, 200);
+  });
+
+  app.openapi(listDevices, async (c) => {
+    const result = await notifications().listPushDevices(
+      c.var.actor,
+      c.req.valid("query")
+    );
+    if (!result.ok) return problem(result.error);
+    return c.json(
+      {
+        items: result.value.map((d) => ({
+          ...d,
+          createdAt: d.createdAt.toISOString(),
+        })),
+      },
+      200
+    );
+  });
+
+  app.openapi(removeDevice, async (c) => {
+    const result = await notifications().removePushDevice(c.var.actor, {
+      id: c.req.valid("param").id,
+    });
+    if (!result.ok) return problem(result.error);
+    return c.body(null, 204);
   });
 }

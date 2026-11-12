@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { urlBase64ToUint8Array } from "@schellingboard/domain/push-key";
 import { newKey } from "../../commands/keys";
 import { awaitMutation } from "../../commands/mutation";
@@ -49,16 +49,57 @@ async function subscribeHere(
   }
 }
 
+type Device = {
+  id: string;
+  host: string;
+  createdAt: string;
+  current: boolean;
+};
+
+const formatDate = (iso: string) =>
+  new Date(iso).toLocaleDateString(undefined, { dateStyle: "medium" });
+
+const describe = (device: Device) =>
+  `${device.host}, on since ${formatDate(device.createdAt)}${device.current ? ", this device" : ""}`;
+
 export function PushNotifications({
   publicKey,
   calls,
 }: {
   publicKey: string;
-  calls: Pick<SettingsCalls, "subscribe" | "unsubscribe" | "isEnabledHere">;
+  calls: Pick<
+    SettingsCalls,
+    | "subscribe"
+    | "unsubscribe"
+    | "isEnabledHere"
+    | "listDevices"
+    | "removeDevice"
+  >;
 }) {
   const [state, setState] = useState<State>("checking");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [devices, setDevices] = useState<Device[]>([]);
+  const [removed, setRemoved] = useState<string | null>(null);
+  const heading = useRef<HTMLHeadingElement>(null);
+
+  const fetchDevices = useCallback(async (): Promise<Device[]> => {
+    const registration = await navigator.serviceWorker
+      ?.getRegistration()
+      .catch(() => undefined);
+    const subscription = await registration?.pushManager
+      .getSubscription()
+      .catch(() => null);
+    const answer = await calls.listDevices(subscription?.endpoint);
+    return answer.data?.items ?? [];
+  }, [calls]);
+
+  useEffect(() => {
+    if (state === "checking") return;
+    void fetchDevices()
+      .catch(() => [])
+      .then(setDevices);
+  }, [state, fetchDevices]);
 
   useEffect(() => {
     const check = async () => {
@@ -158,9 +199,43 @@ export function PushNotifications({
     }
   };
 
+  const removeDevice = async (device: Device) => {
+    setBusy(true);
+    setError(null);
+    setRemoved(null);
+    try {
+      const result = await awaitMutation(
+        () => calls.removeDevice(device.id),
+        newKey()
+      );
+      if (!result.ok) {
+        setError(result.message);
+        return;
+      }
+      setDevices((current) => current.filter((d) => d.id !== device.id));
+      setRemoved(`Turned off for ${describe(device)}.`);
+      heading.current?.focus();
+      if (device.current) {
+        const registration = await navigator.serviceWorker.getRegistration();
+        const subscription = await registration?.pushManager.getSubscription();
+        await subscription?.unsubscribe();
+        setState("off");
+      }
+    } catch {
+      setError("Could not turn notifications off for that device.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <section aria-labelledby="push-heading" className="flex flex-col gap-2">
-      <h2 id="push-heading" className="text-lg font-semibold">
+      <h2
+        id="push-heading"
+        ref={heading}
+        tabIndex={-1}
+        className="text-lg font-semibold outline-none"
+      >
         Notifications on this device
       </h2>
       <p className="text-sm text-fg-subtle">
@@ -223,6 +298,53 @@ export function PushNotifications({
           </div>
         )}
       </div>
+
+      {removed && (
+        <p role="status" className="text-sm text-success-fg">
+          {removed}
+        </p>
+      )}
+
+      {devices.length > 0 && (
+        <>
+          <h3 id="devices-heading" className="text-base font-semibold">
+            Notifications on your devices
+          </h3>
+          <ul
+            aria-labelledby="devices-heading"
+            className="flex flex-col divide-y divide-line-subtle rounded-md border border-line text-sm"
+          >
+            {devices.map((device) => (
+              <li
+                key={device.id}
+                className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2"
+              >
+                <span className="flex-1">
+                  {device.host}
+                  <span className="text-fg-subtle">
+                    {" "}
+                    &middot; on since {formatDate(device.createdAt)}
+                  </span>
+                  {device.current && (
+                    <span className="ms-2 rounded-full bg-brand-tint-hover px-2 py-0.5 text-xs text-brand-fg">
+                      This device
+                    </span>
+                  )}
+                </span>
+                <Button
+                  variant="quiet"
+                  onClick={() => void removeDevice(device)}
+                  disabled={busy}
+                  aria-label={`Turn off ${describe(device)}`}
+                  className="border border-line px-3 py-1"
+                >
+                  Turn off
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
       {error && (
         <p role="alert" className="text-sm text-danger-fg">
