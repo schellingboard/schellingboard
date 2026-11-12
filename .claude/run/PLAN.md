@@ -59,11 +59,8 @@ the E2E specs a step touches; the user runs the full suite at the end.
     full set, the result is paged. Search/filter resets to page 1; sort keeps the size. 23a. DONE
     **#831a** `Pager` 50 default; proposals list and directory paged. 23b. DONE **#831b**
     Notifications (chunks loaded on demand) and event list. "Load more comments" stays: it is a
-    thread, not a list. 23c. **#831c** Owner decision: the agenda stays one list, the single
-    exception to the paging rule (a time-ordered schedule with search and day folds). Last #831
-    commit, docs only: say so in docs/dev/web-app.md (or the nearest paging section) and
-    PROGRESS.md, no code. Footer `fixes #831`. 23d. DONE **#831d** Admin events, locations and stats
-    tables on `Pager`.
+    thread, not a list. 23c. DONE **#831c** Agenda stays one list (documented in
+    docs/dev/web-app.md). 23d. DONE **#831d** Admin events, locations and stats tables on `Pager`.
 24. DONE **#1328a** (Medium) i18n foundation: Lingui, `apps/web/src/i18n/`, `en` catalog, scripts
     and Makefile targets, `<html lang>`. Issue step 1. 24a. DONE Text "Copy link" button at the end
     of the session, proposal, profile and 1-on-1 panels (ADR 0020 note amended).

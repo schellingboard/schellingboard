@@ -197,3 +197,18 @@ because the server stores it and would refuse it with changed values. The result
 unreachable. `validateFields` runs a zod schema per field before sending. `ui/form.tsx` has the
 controlled fields (`TextField`, `TextAreaField`, `SelectField`, `DateTimeField`, `CheckboxField`):
 label, hint and error are tied to the input, and an error is a `role="alert"`.
+
+## Paging long lists
+
+Every long list is paged: `Pager` (`ui/pager.tsx`), 50 rows by default with 25, 50, 100 or all, and
+`page` and `pageSize` in the address. `usePaging` (`ui/use-paging.tsx`) bundles the page, its
+handlers and the pager; search and filter reset to page 1, sort keeps the size. Counts and clashes
+are computed on the full set and only the result is paged. Notifications load from the server in
+chunks as pages are reached. The stats tables keep their page in component state, as one page holds
+several of them.
+
+Not paged on purpose: the agenda (the text view of the schedule), the schedule grid, comment threads
+(they have "Load more"), push devices, event days and moments, the meetings column, Quick Voting and
+an event's guest assignment. The agenda is the one list that stays whole: it is a time-ordered
+schedule with day folds, search, the "now" line and a match stepper, all of which would have to
+reach into the right page.
