@@ -9,7 +9,10 @@ import {
 import userEvent from "@testing-library/user-event";
 import { adminEventCalls } from "../../commands/admin-events";
 import { fakeApi, problem, type FakeCall } from "../../commands/fake-api";
-import type { AdminEventDay } from "../../queries/admin-event";
+import type {
+  AdminEventDay,
+  AdminEventMoment,
+} from "../../queries/admin-event";
 import type { ScheduledSession } from "../../queries/admin-sessions";
 import { NoticeProvider } from "../../ui/notices";
 import { EventDaysManager } from "./event-days";
@@ -30,7 +33,8 @@ const day = (id: string, extra: Partial<AdminEventDay> = {}) => ({
 const setup = (
   days: AdminEventDay[],
   handler: (call: FakeCall) => Response = () => Response.json(day("d1")),
-  sessions: ScheduledSession[] = []
+  sessions: ScheduledSession[] = [],
+  moments: AdminEventMoment[] = []
 ) => {
   const { api, calls } = fakeApi(handler);
   const onChanged = vi.fn();
@@ -40,6 +44,7 @@ const setup = (
         eventId="e1"
         timezone="Europe/Berlin"
         days={days}
+        moments={moments}
         sessions={sessions}
         calls={adminEventCalls(api)}
         onChanged={onChanged}
@@ -229,6 +234,32 @@ describe("the days manager", { tags: ["015-US4"] }, () => {
 
     expect(
       screen.getByRole("button", { name: `Edit day ${LABEL}` })
+    ).toBeTruthy();
+  });
+
+  it("says a deleted day takes its shared moments with it", async () => {
+    const user = userEvent.setup();
+    const moment = (id: string, dayId: string) => ({
+      id,
+      dayId,
+      title: "Lunch",
+      description: "",
+      start: "2030-05-01T10:30:00.000Z",
+      end: "2030-05-01T12:00:00.000Z",
+    });
+    setup(
+      [day("d1"), day("d2")],
+      undefined,
+      [],
+      [moment("m1", "d1"), moment("m2", "d1"), moment("m3", "d2")]
+    );
+
+    await user.click(
+      screen.getAllByRole("button", { name: `Delete day ${LABEL}` })[0]
+    );
+
+    expect(
+      screen.getByText("Its 2 shared moments will also be deleted.")
     ).toBeTruthy();
   });
 

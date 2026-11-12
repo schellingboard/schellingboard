@@ -1,4 +1,5 @@
 import { createRoute } from "@hono/zod-openapi";
+import { z } from "zod";
 import {
   dayBodySchema,
   dayUpdateBodySchema,
@@ -9,6 +10,9 @@ import {
   eventSettingsBodySchema,
   eventUpdateBodySchema,
   eventViewSchema,
+  momentBodySchema,
+  momentCreateBodySchema,
+  momentViewSchema,
 } from "@schellingboard/contracts/event";
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import {
@@ -24,7 +28,7 @@ import {
   type App,
 } from "@/server/http/route-parts";
 import type { EventUseCases } from "../application/use-cases";
-import { toDayView, toEventView } from "./view";
+import { toDayView, toEventView, toMomentView } from "./view";
 
 const tags = ["admin"];
 const dates = <T extends Record<string, string | null>>(fields: T) =>
@@ -149,6 +153,46 @@ const deleteDay = createRoute({
   responses: { 204: noContent("Deleted"), ...problemDefault },
 });
 
+const createMoments = createRoute({
+  method: "post",
+  path: "/admin/events/{id}/moments",
+  tags,
+  description:
+    "Makes one shared moment on each of the days. A moment paints a band across every room and blocks nothing. Nothing is made if one day refuses the times.",
+  request: {
+    headers: idempotencyHeaders,
+    params: idParam,
+    body: body(momentCreateBodySchema),
+  },
+  responses: {
+    201: json(z.array(momentViewSchema), "The new moments, one per day"),
+    ...problemDefault,
+  },
+});
+
+const updateMoment = createRoute({
+  method: "put",
+  path: "/admin/moments/{id}",
+  tags,
+  request: {
+    headers: idempotencyHeaders,
+    params: idParam,
+    body: body(momentBodySchema),
+  },
+  responses: {
+    200: json(momentViewSchema, "The updated moment"),
+    ...problemDefault,
+  },
+});
+
+const deleteMoment = createRoute({
+  method: "delete",
+  path: "/admin/moments/{id}",
+  tags,
+  request: { headers: idempotencyHeaders, params: idParam },
+  responses: { 204: noContent("Deleted"), ...problemDefault },
+});
+
 export function addEventReadRoutes(app: App, events: () => EventUseCases) {
   app.openapi(listEvents, async (c) => {
     const result = await events().listEvents();
@@ -165,9 +209,13 @@ export function addEventReadRoutes(app: App, events: () => EventUseCases) {
   app.openapi(getEvent, async (c) => {
     const result = await events().getEvent(c.var.actor, c.req.valid("param"));
     if (!result.ok) return problem(result.error);
-    const { event, days } = result.value;
+    const { event, days, moments } = result.value;
     return c.json(
-      { event: toEventView(event), days: days.map(toDayView) },
+      {
+        event: toEventView(event),
+        days: days.map(toDayView),
+        moments: moments.map(toMomentView),
+      },
       200
     );
   });
@@ -251,6 +299,33 @@ export function addAdminEventRoutes(app: App, events: () => EventUseCases) {
       c.var.actor,
       c.req.valid("param"),
       c.var.now
+    );
+    if (!result.ok) return problem(result.error);
+    return c.body(null, 204);
+  });
+
+  app.openapi(createMoments, async (c) => {
+    const result = await events().createMoments(c.var.actor, {
+      ...c.req.valid("json"),
+      eventId: c.req.valid("param").id,
+    });
+    if (!result.ok) return problem(result.error);
+    return c.json(result.value.map(toMomentView), 201);
+  });
+
+  app.openapi(updateMoment, async (c) => {
+    const result = await events().updateMoment(c.var.actor, {
+      ...c.req.valid("json"),
+      id: c.req.valid("param").id,
+    });
+    if (!result.ok) return problem(result.error);
+    return c.json(toMomentView(result.value), 200);
+  });
+
+  app.openapi(deleteMoment, async (c) => {
+    const result = await events().deleteMoment(
+      c.var.actor,
+      c.req.valid("param")
     );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);

@@ -1,4 +1,4 @@
-import type { Day, Event } from "@schellingboard/domain/event";
+import type { Day, Event, SharedMoment } from "@schellingboard/domain/event";
 import type { Actor } from "@/server/kernel/actor";
 import { ok, type Result } from "@/server/kernel/result";
 import type { EventDeps } from "../ports";
@@ -16,8 +16,14 @@ export const getEvent =
   async (
     _actor: Actor,
     input: { id: string }
-  ): Promise<Result<{ event: Event; days: Day[] }>> => {
+  ): Promise<
+    Result<{ event: Event; days: Day[]; moments: SharedMoment[] }>
+  > => {
     const event = await repos.events.findById(input.id);
     if (!event) return eventNotFound();
-    return ok({ event, days: await repos.days.listByEvent(input.id) });
+    return ok({
+      event,
+      days: await repos.days.listByEvent(input.id),
+      moments: await repos.sharedMoments.listByEvent(input.id),
+    });
   };

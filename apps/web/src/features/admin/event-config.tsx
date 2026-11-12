@@ -22,11 +22,15 @@ import {
   TextField,
 } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
-import type { AdminEventDay } from "../../queries/admin-event";
+import type {
+  AdminEventDay,
+  AdminEventMoment,
+} from "../../queries/admin-event";
 import type { MeetingPoint } from "../../queries/admin-meeting-points";
 import type { ScheduledSession } from "../../queries/admin-sessions";
 import { ConfirmByTyping } from "./confirm-by-typing";
 import { EventDaysManager } from "./event-days";
+import { EventMomentsManager } from "./event-moments";
 import { EventMeetingsForm } from "./event-meetings";
 import { EventIconPicker } from "./event-icon-picker";
 import {
@@ -383,6 +387,7 @@ function DangerZone({
 export function EventConfigTab({
   event,
   days,
+  moments,
   points,
   sessions,
   calls,
@@ -392,6 +397,7 @@ export function EventConfigTab({
 }: {
   event: AdminEvent;
   days: AdminEventDay[];
+  moments: AdminEventMoment[];
   points: MeetingPoint[];
   sessions: ScheduledSession[];
   calls: AdminEventCalls;
@@ -425,7 +431,17 @@ export function EventConfigTab({
         eventId={event.id}
         timezone={event.timezone}
         days={days}
+        moments={moments}
         sessions={sessions}
+        calls={calls}
+        onChanged={onChanged}
+      />
+      <hr className="border-line-subtle" />
+      <EventMomentsManager
+        eventId={event.id}
+        timezone={event.timezone}
+        days={days}
+        moments={moments}
         calls={calls}
         onChanged={onChanged}
       />

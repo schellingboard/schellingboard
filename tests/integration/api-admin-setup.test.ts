@@ -128,6 +128,7 @@ describe("/api/v1/admin events and days", () => {
           lastDayStart: at("08:00"),
         },
         days: [{ id: dayId, eventId: event.id, ...dayBody, version: 1 }],
+        moments: [],
       });
       const list = await call("GET", "/events");
       const listed = (await list.json()) as { events: unknown[]; now: string };
@@ -148,6 +149,62 @@ describe("/api/v1/admin events and days", () => {
         version: 2,
       });
       expect((await call("DELETE", `/admin/days/${dayId}`)).status).toBe(204);
+    }
+  );
+
+  it(
+    "makes, changes and deletes shared moments",
+    { tags: ["015-US9"] },
+    async () => {
+      const event = await createEvent();
+      const day = await createDay(event.id, {
+        start: new Date(at("08:00")),
+        end: new Date(at("18:00")),
+        startBookings: new Date(at("09:00")),
+        endBookings: new Date(at("17:00")),
+      });
+      const body = {
+        title: "Lunch",
+        description: "",
+        startTime: "12:30",
+        endTime: "14:00",
+      };
+      const path = `/admin/events/${event.id}/moments`;
+
+      expect(
+        (
+          await call("POST", path, {
+            body: { ...body, dayIds: [day.id] },
+            cookie: "",
+          })
+        ).status
+      ).toBe(403);
+      const created = await call("POST", path, {
+        body: { ...body, dayIds: [day.id] },
+      });
+      expect(created.status).toBe(201);
+      const [moment] = (await created.json()) as { id: string }[];
+      expect(moment).toMatchObject({
+        dayId: day.id,
+        start: at("12:30"),
+        end: at("14:00"),
+      });
+
+      const badTime = await call("POST", path, {
+        body: { ...body, startTime: "noon", dayIds: [day.id] },
+      });
+      expect(badTime.status).toBe(400);
+      const renamed = await call("PUT", `/admin/moments/${moment.id}`, {
+        body: { ...body, title: "Brunch" },
+      });
+      expect(await renamed.json()).toMatchObject({ title: "Brunch" });
+
+      expect((await call("DELETE", `/admin/moments/${moment.id}`)).status).toBe(
+        204
+      );
+      expect((await call("DELETE", `/admin/moments/${moment.id}`)).status).toBe(
+        404
+      );
     }
   );
 

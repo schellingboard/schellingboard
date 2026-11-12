@@ -323,6 +323,21 @@ export const days = sqliteTable("days", {
   version: integer("version").notNull().default(1),
 });
 
+export const sharedMoments = sqliteTable(
+  "shared_moments",
+  {
+    id: text("id").primaryKey(),
+    dayId: text("day_id")
+      .notNull()
+      .references(() => days.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    description: text("description").notNull().default(""),
+    start: text("start").notNull(),
+    end: text("end").notNull(),
+  },
+  (t) => [index("shared_moments_day_idx").on(t.dayId)]
+);
+
 export const sessionProposals = sqliteTable("session_proposals", {
   id: text("id").primaryKey(),
   eventId: text("event_id")

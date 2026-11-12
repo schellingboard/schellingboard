@@ -73,6 +73,10 @@ One global row shown when there's more than one event (see
   allow late-night sessions: extend the evening's day into the small hours instead of adding a
   separate day for them. Hosts then pick that day and a time such as 01:00, and the session is
   scheduled on the following calendar date.
+- **Shared moments** — a time everyone is invited to share, such as lunch or a keynote. Give it a
+  title, optional details, a start and end time and the days it happens on (all ticked by default,
+  one moment per day, each edited or deleted on its own). It blocks nothing; to make a time
+  unbookable, add a blocker session in every room instead. Deleting a day deletes its moments.
 - **Deleting an event** requires typing the event name to confirm, and cascades to its days,
   proposals, sessions, RSVPs, and guest/location assignments.
 
