@@ -1,3 +1,6 @@
+import { i18n, type MessageDescriptor } from "@lingui/core";
+import { msg, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { type FormEvent, useState } from "react";
 
 import type { SignInCalls } from "../../commands/sign-in";
@@ -21,7 +24,7 @@ export function GuestLoginForm({
   const emailEnabled = useEmailEnabled(calls.emailEnabled);
   const [identifier, setIdentifier] = useState("");
   const [credential, setCredential] = useState(initialCredential);
-  const [info, setInfo] = useState<string | null>(null);
+  const [info, setInfo] = useState<MessageDescriptor | string | null>(null);
   const target = guest
     ? { guestId: guest.id }
     : { identifier: identifier.trim() };
@@ -37,7 +40,7 @@ export function GuestLoginForm({
 
   const run = async (
     form: (typeof forms)[number],
-    sent: string
+    sent: MessageDescriptor
   ): Promise<void> => {
     forms.forEach((f) => f.reset());
     setInfo(null);
@@ -62,15 +65,15 @@ export function GuestLoginForm({
       <p className="text-sm text-fg-muted">
         {emailEnabled === false
           ? guest
-            ? "This user has protected their account. Enter their password. Forgot it? Ask an organizer for a new link."
-            : "Enter your password. Forgot it? Ask an organizer for a new link."
+            ? t`This user has protected their account. Enter their password. Forgot it? Ask an organizer for a new link.`
+            : t`Enter your password. Forgot it? Ask an organizer for a new link.`
           : guest
-            ? "This user has protected their account. Enter their password, or use a single-use code emailed to them. Forgot the password? Reset it instead."
-            : "Enter your password, or a single-use code emailed to you. Forgot the password? Reset it instead."}
+            ? t`This user has protected their account. Enter their password, or use a single-use code emailed to them. Forgot the password? Reset it instead.`
+            : t`Enter your password, or a single-use code emailed to you. Forgot the password? Reset it instead.`}
       </p>
       {guest ? (
         <TextField
-          label="Logging in as"
+          label={t`Logging in as`}
           name="username"
           value={guest.name}
           onChange={() => {}}
@@ -79,7 +82,7 @@ export function GuestLoginForm({
         />
       ) : (
         <TextField
-          label="Email or username"
+          label={t`Email or username`}
           name="username"
           value={identifier}
           onChange={setIdentifier}
@@ -88,7 +91,7 @@ export function GuestLoginForm({
         />
       )}
       <TextField
-        label="Password or emailed code"
+        label={t`Password or emailed code`}
         type="password"
         value={credential}
         onChange={setCredential}
@@ -102,7 +105,7 @@ export function GuestLoginForm({
       )}
       {info && (
         <p role="status" className="text-sm text-success-fg">
-          {info}
+          {typeof info === "string" ? info : i18n._(info)}
         </p>
       )}
       <div className="flex flex-wrap items-center gap-2">
@@ -110,16 +113,16 @@ export function GuestLoginForm({
           type="submit"
           disabled={busy || !named || credential.length === 0}
         >
-          Log in
+          <Trans context="Button: submit the login form">Log in</Trans>
         </Button>
         {emailEnabled === true && (
           <>
             <Button
               variant="quiet"
               disabled={busy || !named}
-              onClick={() => void run(code, "Code sent — check your email")}
+              onClick={() => void run(code, msg`Code sent — check your email`)}
             >
-              Email me a code
+              <Trans>Email me a code</Trans>
             </Button>
             <Button
               variant="quiet"
@@ -127,11 +130,11 @@ export function GuestLoginForm({
               onClick={() =>
                 void run(
                   link,
-                  "Reset link sent — check your email to set a new password"
+                  msg`Reset link sent — check your email to set a new password`
                 )
               }
             >
-              Forgot your password?
+              <Trans>Forgot your password?</Trans>
             </Button>
           </>
         )}
@@ -153,17 +156,20 @@ export function LoginScreen({
   code?: string;
   onSignedIn: (guestId: string) => void;
 }) {
+  const guestName = guest?.name ?? "";
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 sm:px-0">
       {guest === null ? (
         <p className="text-fg-muted">
-          This login link is invalid. Request a new code from the name selector
-          or your settings page.
+          <Trans>
+            This login link is invalid. Request a new code from the name
+            selector or your settings page.
+          </Trans>
         </p>
       ) : (
         <>
           <h1 className="text-2xl font-bold">
-            {guest ? `Log in as ${guest.name}` : "Log in"}
+            {guest ? t`Log in as ${guestName}` : t`Log in`}
           </h1>
           <GuestLoginForm
             calls={calls}

@@ -128,6 +128,16 @@ msgstr "{count, plural, one {# waiting for reply} other {# waiting for reply}}"
 msgid "{count, plural, one {There is a problem to fix:} other {There are # problems to fix:}}"
 msgstr "{count, plural, one {There is a problem to fix:} other {There are # problems to fix:}}"
 
+#. {device} is the browser or device name, {lastUsed} a date
+#: src/features/sign-in/account-security.tsx:409
+msgid "{device} · last used {lastUsed}"
+msgstr "{device} · last used {lastUsed}"
+
+#. {device} is the browser or device name, {lastUsed} a date
+#: src/features/sign-in/account-security.tsx:402
+msgid "{device} (This browser) · last used {lastUsed}"
+msgstr "{device} (This browser) · last used {lastUsed}"
+
 #: src/features/proposals/vote-breakdown.tsx:49
 msgid "{emoji} {choice, select, interested {Interested} maybe {Maybe} skip {Skip} other {}}: {count}"
 msgstr "{emoji} {choice, select, interested {Interested} maybe {Maybe} skip {Skip} other {}}: {count}"
@@ -182,6 +192,10 @@ msgstr "{moreLikers, plural, one {and # more} other {and # more}}"
 #: src/features/meetings/book-meeting.tsx:273
 msgid "{name} is already booked"
 msgstr "{name} is already booked"
+
+#: src/features/sign-in/join-screen.tsx:94
+msgid "{name} needs to sign in first. You then join the event."
+msgstr "{name} needs to sign in first. You then join the event."
 
 #: src/features/schedule/session-block.tsx:199
 msgid "{numRsvps, plural, one {# RSVP (max capacity {capacity})} other {# RSVPs (max capacity {capacity})}}"
@@ -370,6 +384,18 @@ msgstr "About me"
 msgid "Accept"
 msgstr "Accept"
 
+#: src/features/sign-in/site-login-screen.tsx:35
+msgid "Access Required"
+msgstr "Access Required"
+
+#: src/features/sign-in/site-login-screen.tsx:63
+msgid "Access Site"
+msgstr "Access Site"
+
+#: src/features/sign-in/account-security.tsx:50
+msgid "Account security"
+msgstr "Account security"
+
 #: src/features/proposals/proposals-screen.tsx:446
 msgid "Actions"
 msgstr "Actions"
@@ -444,6 +470,14 @@ msgstr "Always use light colours"
 #: src/features/people/profile-form.tsx:81
 msgid "Any pronouns"
 msgstr "Any pronouns"
+
+#: src/features/sign-in/account-security.tsx:157
+msgid "Anyone can currently act under your name. Enable protection so switching to your name requires your password. We'll email you a link to set it."
+msgstr "Anyone can currently act under your name. Enable protection so switching to your name requires your password. We'll email you a link to set it."
+
+#: src/features/sign-in/account-security.tsx:158
+msgid "Anyone can currently act under your name. Protect it so switching to your name requires your password."
+msgstr "Anyone can currently act under your name. Protect it so switching to your name requires your password."
 
 #: src/features/settings/settings-screen.tsx:130
 msgid "Appearance (this device)"
@@ -548,9 +582,17 @@ msgstr "Be the first to suggest a session!"
 msgid "Be the first!"
 msgstr "Be the first!"
 
+#: src/features/sign-in/bootstrap-screen.tsx:44
+msgid "Become a site admin"
+msgstr "Become a site admin"
+
 #: src/features/schedule/session-panel.tsx:234
 msgid "Become host"
 msgstr "Become host"
+
+#: src/features/sign-in/bootstrap-screen.tsx:117
+msgid "Become site admin"
+msgstr "Become site admin"
 
 #. Title of a time slot reserved by the organizers
 #: src/features/schedule/day-agenda.tsx:273
@@ -590,6 +632,7 @@ msgstr "Busy"
 #: src/features/notifications/notifications-screen.tsx:232
 #: src/features/proposals/proposal-form.tsx:352
 #: src/features/proposals/proposal-form.tsx:365
+#: src/features/sign-in/account-security.tsx:274
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -602,6 +645,11 @@ msgstr "Cancel 1-on-1"
 msgid "canceled"
 msgstr "canceled"
 
+#: src/features/sign-in/account-security.tsx:171
+#: src/features/sign-in/account-security.tsx:267
+msgid "Change password"
+msgstr "Change password"
+
 #: src/features/people/profile-form.tsx:321
 msgid "Change profile picture"
 msgstr "Change profile picture"
@@ -610,13 +658,33 @@ msgstr "Change profile picture"
 msgid "Changes here do not reach the schedule. To change a session, open it and edit it there."
 msgstr "Changes here do not reach the schedule. To change a session, open it and edit it there."
 
+#: src/features/sign-in/account-security.tsx:126
+msgid "Check your email for a link to set your password"
+msgstr "Check your email for a link to set your password"
+
 #: src/features/settings/push-notifications.tsx:264
 msgid "Checking…"
 msgstr "Checking…"
 
+#: src/features/sign-in/reset-password-form.tsx:64
+msgid "Choose a new password. You'll use it to switch to your name from now on."
+msgstr "Choose a new password. You'll use it to switch to your name from now on."
+
+#: src/features/sign-in/account-security.tsx:224
+msgid "Choose a password. You are signed in with your personal link, so the old one is not needed."
+msgstr "Choose a password. You are signed in with your personal link, so the old one is not needed."
+
 #: src/features/schedule/schedule-filters.tsx:286
 msgid "Choose what My schedule shows"
 msgstr "Choose what My schedule shows"
+
+#: src/features/sign-in/account-security.tsx:60
+msgid "Choose who you are, and log in if your name is protected, to change your security settings."
+msgstr "Choose who you are, and log in if your name is protected, to change your security settings."
+
+#: src/features/sign-in/bootstrap-screen.tsx:62
+msgid "Choose…"
+msgstr "Choose…"
 
 #: src/features/people/profile-form.tsx:379
 msgid "City, region, or country"
@@ -692,6 +760,10 @@ msgstr "Closed Session"
 #: src/features/proposals/proposals-screen.tsx:483
 msgid "Co-host wanted"
 msgstr "Co-host wanted"
+
+#: src/features/sign-in/guest-login-form.tsx:123
+msgid "Code sent — check your email"
+msgstr "Code sent — check your email"
 
 #: src/features/comments/comments-section.tsx:247
 msgid "Collapse comment"
@@ -788,6 +860,10 @@ msgstr "Could not load the attendee list."
 msgid "Could not load the attendees. Reload the page to try again."
 msgstr "Could not load the attendees. Reload the page to try again."
 
+#: src/app/account-pages.tsx:271
+msgid "Could not load the names. Reload the page to try again."
+msgstr "Could not load the names. Reload the page to try again."
+
 #: src/features/comments/my-comments-screen.tsx:48
 msgid "Could not load your comments. Reload the page to try again."
 msgstr "Could not load your comments. Reload the page to try again."
@@ -795,6 +871,10 @@ msgstr "Could not load your comments. Reload the page to try again."
 #: src/features/notifications/notifications-screen.tsx:84
 msgid "Could not load your notifications. Reload the page to try again."
 msgstr "Could not load your notifications. Reload the page to try again."
+
+#: src/features/sign-in/account-security.tsx:61
+msgid "Could not load your security settings. Reload the page to try again."
+msgstr "Could not load your security settings. Reload the page to try again."
 
 #: src/features/settings/settings-screen.tsx:43
 msgid "Could not load your settings. Reload the page to try again."
@@ -816,6 +896,10 @@ msgstr "Could not save the attendee count for the session. Please try again."
 msgid "Could not select that name — try again"
 msgstr "Could not select that name — try again"
 
+#: src/features/sign-in/account-security.tsx:368
+msgid "Could not sign that browser out. Try again."
+msgstr "Could not sign that browser out. Try again."
+
 #: src/features/settings/push-notifications.tsx:235
 msgid "Could not turn notifications off for that device."
 msgstr "Could not turn notifications off for that device."
@@ -831,6 +915,10 @@ msgstr "Could not turn notifications on for this device."
 #: src/features/meetings/book-meeting.tsx:69
 msgid "Couldn't load who is free then. Try the slot again."
 msgstr "Couldn't load who is free then. Try the slot again."
+
+#: src/features/sign-in/account-security.tsx:232
+msgid "Current password"
+msgstr "Current password"
 
 #: src/app/theme.tsx:94
 msgctxt "Colour theme"
@@ -934,6 +1022,10 @@ msgstr "During {momentTitle} ({momentStart}–{momentEnd})"
 msgid "e.g. someone to take over, or a second facilitator"
 msgstr "e.g. someone to take over, or a second facilitator"
 
+#: src/features/sign-in/account-security.tsx:382
+msgid "Each browser you chose your name in stays signed in for 30 days after you last used it."
+msgstr "Each browser you chose your name in stays signed in for 30 days after you last used it."
+
 #. Button: edit (verb)
 #. Button: edit (verb)
 #: src/features/comments/comments-section.tsx:339
@@ -968,16 +1060,29 @@ msgid "Edited {editedAt}"
 msgstr "Edited {editedAt}"
 
 #: src/features/people/contact-labels.ts:6
+#: src/features/sign-in/bootstrap-screen.tsx:77
 msgid "Email"
 msgstr "Email"
+
+#: src/features/sign-in/guest-login-form.tsx:125
+msgid "Email me a code"
+msgstr "Email me a code"
 
 #: src/features/settings/email-settings-form.tsx:91
 msgid "Email me when…"
 msgstr "Email me when…"
 
+#: src/features/sign-in/guest-login-form.tsx:85
+msgid "Email or username"
+msgstr "Email or username"
+
 #: src/features/settings/email-settings-form.tsx:87
 msgid "Email settings"
 msgstr "Email settings"
+
+#: src/features/sign-in/account-security.tsx:204
+msgid "Enable protection"
+msgstr "Enable protection"
 
 #. placeholder {0}: when(end)
 #: src/ui/phase-bar.tsx:75
@@ -996,6 +1101,26 @@ msgstr "Enlarge photo of {name}"
 #: src/features/proposals/proposal-form.tsx:248
 msgid "Enter a clear, descriptive title"
 msgstr "Enter a clear, descriptive title"
+
+#: src/features/sign-in/site-login-screen.tsx:47
+msgid "Enter password"
+msgstr "Enter password"
+
+#: src/features/sign-in/account-security.tsx:226
+msgid "Enter your current password and choose a new one."
+msgstr "Enter your current password and choose a new one."
+
+#: src/features/sign-in/account-security.tsx:227
+msgid "Enter your current password to turn off protection. This also removes your password."
+msgstr "Enter your current password to turn off protection. This also removes your password."
+
+#: src/features/sign-in/guest-login-form.tsx:72
+msgid "Enter your password, or a single-use code emailed to you. Forgot the password? Reset it instead."
+msgstr "Enter your password, or a single-use code emailed to you. Forgot the password? Reset it instead."
+
+#: src/features/sign-in/guest-login-form.tsx:69
+msgid "Enter your password. Forgot it? Ask an organizer for a new link."
+msgstr "Enter your password. Forgot it? Ask an organizer for a new link."
 
 #: src/features/settings/email-settings-form.tsx:114
 #: src/features/settings/language-setting.tsx:54
@@ -1114,6 +1239,11 @@ msgstr "Follow your device's light/dark setting"
 msgid "Following the system means the site is dark whenever your phone or laptop is."
 msgstr "Following the system means the site is dark whenever your phone or laptop is."
 
+#: src/features/sign-in/account-security.tsx:179
+#: src/features/sign-in/guest-login-form.tsx:137
+msgid "Forgot your password?"
+msgstr "Forgot your password?"
+
 #: src/app/footer.tsx:174
 msgid "Full changelog on GitHub"
 msgstr "Full changelog on GitHub"
@@ -1122,9 +1252,17 @@ msgstr "Full changelog on GitHub"
 msgid "Go to Quick Voting!"
 msgstr "Go to Quick Voting!"
 
+#: src/features/sign-in/reset-password-form.tsx:56
+msgid "Go to sign in"
+msgstr "Go to sign in"
+
 #: src/app/error-boundary.tsx:52
 msgid "Go to the events"
 msgstr "Go to the events"
+
+#: src/features/sign-in/join-screen.tsx:72
+msgid "Go to the start page"
+msgstr "Go to the start page"
 
 #. Name of the schedule view that shows rooms as columns
 #: src/features/schedule/schedule-toolbar.tsx:40
@@ -1237,6 +1375,10 @@ msgstr "Interested"
 msgid "Join as co-host"
 msgstr "Join as co-host"
 
+#: src/features/sign-in/join-screen.tsx:50
+msgid "Join the event"
+msgstr "Join the event"
+
 #: src/features/schedule/schedule-toolbar.tsx:108
 msgid "Jump to the current time"
 msgstr "Jump to the current time"
@@ -1339,6 +1481,7 @@ msgstr "Loading profile"
 msgid "Loading proposals..."
 msgstr "Loading proposals..."
 
+#: src/app/account-pages.tsx:275
 #: src/app/event-page.tsx:152
 #: src/app/panel-host.tsx:82
 #: src/app/people-pages.tsx:162
@@ -1348,6 +1491,7 @@ msgstr "Loading proposals..."
 #: src/features/notifications/notifications-screen.tsx:181
 #: src/features/schedule/session-panel.tsx:334
 #: src/features/settings/settings-screen.tsx:38
+#: src/features/sign-in/account-security.tsx:54
 msgid "Loading…"
 msgstr "Loading…"
 
@@ -1355,9 +1499,26 @@ msgstr "Loading…"
 msgid "Location:"
 msgstr "Location:"
 
+#: src/features/sign-in/guest-login-form.tsx:172
+msgid "Log in"
+msgstr "Log in"
+
+#: src/features/sign-in/guest-login-form.tsx:116
+msgctxt "Button: submit the login form"
+msgid "Log in"
+msgstr "Log in"
+
+#: src/features/sign-in/guest-login-form.tsx:172
+msgid "Log in as {guestName}"
+msgstr "Log in as {guestName}"
+
 #: src/app/user-menu.tsx:133
 msgid "Log out"
 msgstr "Log out"
+
+#: src/features/sign-in/guest-login-form.tsx:76
+msgid "Logging in as"
+msgstr "Logging in as"
 
 #: src/app/user-menu.tsx:133
 msgid "Logging out..."
@@ -1441,6 +1602,7 @@ msgid "n/a"
 msgstr "n/a"
 
 #: src/features/people/profile-form.tsx:355
+#: src/features/sign-in/bootstrap-screen.tsx:70
 msgid "Name"
 msgstr "Name"
 
@@ -1461,6 +1623,11 @@ msgstr "Need ideas?"
 #: src/features/schedule/meeting-rules.ts:105
 msgid "needs your reply"
 msgstr "needs your reply"
+
+#: src/features/sign-in/account-security.tsx:241
+#: src/features/sign-in/reset-password-form.tsx:71
+msgid "New password (at least 8 characters)"
+msgstr "New password (at least 8 characters)"
 
 #: src/features/people/profile-panel.tsx:306
 #: src/ui/pager.tsx:146
@@ -1666,9 +1833,17 @@ msgstr "Open to 1-on-1s"
 msgid "opening your 1-on-1s"
 msgstr "opening your 1-on-1s"
 
+#: src/features/sign-in/join-screen.tsx:54
+msgid "Opening your link…"
+msgstr "Opening your link…"
+
 #: src/features/people/profile-form.tsx:393
 msgid "Optional prompts that give people something to ask you about"
 msgstr "Optional prompts that give people something to ask you about"
+
+#: src/features/sign-in/account-security.tsx:324
+msgid "Optional. Besides your email, you can log in with it and your password. Leave it empty to have none."
+msgstr "Optional. Besides your email, you can log in with it and your password. Leave it empty to have none."
 
 #: src/features/schedule/attendee-count-field.tsx:99
 msgid "Optional. Only you and your co-hosts will see this, not the attendees. Enter <0>0</0> if the session was held but nobody came. If it never happened at all, delete the session instead. Leave the field empty to go back to no count at all."
@@ -1703,6 +1878,30 @@ msgstr "Page not found."
 msgid "Pagination"
 msgstr "Pagination"
 
+#: src/features/sign-in/site-login-screen.tsx:44
+msgid "Password"
+msgstr "Password"
+
+#: src/features/sign-in/bootstrap-screen.tsx:95
+msgid "Password (at least 8 characters)"
+msgstr "Password (at least 8 characters)"
+
+#: src/features/sign-in/account-security.tsx:140
+msgid "Password changed"
+msgstr "Password changed"
+
+#: src/features/sign-in/guest-login-form.tsx:94
+msgid "Password or emailed code"
+msgstr "Password or emailed code"
+
+#: src/features/sign-in/account-security.tsx:139
+msgid "Password set"
+msgstr "Password set"
+
+#: src/features/sign-in/reset-password-form.tsx:47
+msgid "Password set. Your name is now protected — log in with your new password."
+msgstr "Password set. Your name is now protected — log in with your new password."
+
 #: src/features/people/contact-labels.ts:7
 msgid "Phone"
 msgstr "Phone"
@@ -1714,6 +1913,10 @@ msgstr "Pick one or type any text"
 #: src/features/proposals/quick-voting-screen.tsx:57
 msgid "Please choose who you are first."
 msgstr "Please choose who you are first."
+
+#: src/features/sign-in/site-login-screen.tsx:38
+msgid "Please enter the password to access this site"
+msgstr "Please enter the password to access this site"
 
 #: src/app/footer.tsx:87
 msgid "Powered by"
@@ -1784,6 +1987,14 @@ msgstr "Proposal not found."
 msgid "Proposals"
 msgstr "Proposals"
 
+#: src/features/sign-in/account-security.tsx:149
+msgid "Protection"
+msgstr "Protection"
+
+#: src/features/sign-in/account-security.tsx:137
+msgid "Protection turned off"
+msgstr "Protection turned off"
+
 #. Attendee sort order: a shuffled list
 #: src/features/people/directory-screen.tsx:76
 msgid "Random"
@@ -1841,6 +2052,10 @@ msgctxt "Profile picture: go back to the saved one"
 msgid "Reset"
 msgstr "Reset"
 
+#: src/features/sign-in/guest-login-form.tsx:133
+msgid "Reset link sent — check your email to set a new password"
+msgstr "Reset link sent — check your email to set a new password"
+
 #: src/ui/side-panel.tsx:155
 msgid "Resize panel"
 msgstr "Resize panel"
@@ -1876,6 +2091,10 @@ msgstr "Save attendee count"
 #: src/features/meetings/availability-form.tsx:191
 msgid "Save availability"
 msgstr "Save availability"
+
+#: src/features/sign-in/account-security.tsx:334
+msgid "Save username"
+msgstr "Save username"
 
 #: src/features/schedule/attendee-count-field.tsx:136
 #: src/features/settings/email-settings-form.tsx:124
@@ -2056,6 +2275,23 @@ msgstr "Session not found."
 msgid "Sessions"
 msgstr "Sessions"
 
+#: src/features/sign-in/account-security.tsx:187
+msgid "Set a new password"
+msgstr "Set a new password"
+
+#: src/features/sign-in/account-security.tsx:199
+msgid "Set a password"
+msgstr "Set a password"
+
+#: src/features/sign-in/reset-password-form.tsx:115
+msgid "Set a password for {guestName}"
+msgstr "Set a password for {guestName}"
+
+#: src/features/sign-in/account-security.tsx:266
+#: src/features/sign-in/reset-password-form.tsx:88
+msgid "Set password"
+msgstr "Set password"
+
 #: src/app/user-menu.tsx:115
 #: src/features/settings/settings-screen.tsx:50
 msgid "Settings"
@@ -2118,9 +2354,35 @@ msgstr "Shows this session on your schedule again."
 msgid "Shrink photo of {name}"
 msgstr "Shrink photo of {name}"
 
+#: src/features/sign-in/join-screen.tsx:105
+msgid "Sign in"
+msgstr "Sign in"
+
+#: src/features/sign-in/join-screen.tsx:105
+msgid "Sign in as {name}"
+msgstr "Sign in as {name}"
+
+#: src/features/sign-in/account-security.tsx:430
+msgid "Sign out"
+msgstr "Sign out"
+
+#. {device} is the browser or device name
+#: src/features/sign-in/account-security.tsx:421
+msgid "Sign out {device}"
+msgstr "Sign out {device}"
+
+#: src/features/sign-in/account-security.tsx:425
+msgid "Sign out unknown browser"
+msgstr "Sign out unknown browser"
+
 #: src/features/people/contact-labels.ts:9
 msgid "Signal"
 msgstr "Signal"
+
+#: src/features/sign-in/account-security.tsx:379
+#: src/features/sign-in/account-security.tsx:387
+msgid "Signed-in browsers"
+msgstr "Signed-in browsers"
 
 #. Vote option on a session proposal: not interested
 #: src/features/proposals/vote-labels.ts:17
@@ -2162,6 +2424,10 @@ msgstr "Someone else"
 #: src/features/settings/email-settings-form.tsx:26
 msgid "someone joins a proposal I’m hosting as a co-host"
 msgstr "someone joins a proposal I’m hosting as a co-host"
+
+#: src/features/sign-in/bootstrap-screen.tsx:63
+msgid "Someone new"
+msgstr "Someone new"
 
 #: src/app/error-boundary.tsx:29
 msgid "Something went wrong"
@@ -2297,9 +2563,33 @@ msgstr "This event is over. You can still browse the schedule."
 msgid "This is a closed session, meaning you can at most arrive 5 minutes late. If you arrive later you may not join and please do not knock or otherwise disrupt the session."
 msgstr "This is a closed session, meaning you can at most arrive 5 minutes late. If you arrive later you may not join and please do not knock or otherwise disrupt the session."
 
+#: src/features/sign-in/bootstrap-screen.tsx:123
+msgid "This link is invalid. Ask whoever runs the site for a new one."
+msgstr "This link is invalid. Ask whoever runs the site for a new one."
+
+#: src/features/sign-in/join-screen.tsx:68
+msgid "This link no longer works: a newer one replaced it. Ask an organizer for a new link."
+msgstr "This link no longer works: a newer one replaced it. Ask an organizer for a new link."
+
+#: src/features/sign-in/guest-login-form.tsx:164
+msgid "This login link is invalid. Request a new code from the name selector or your settings page."
+msgstr "This login link is invalid. Request a new code from the name selector or your settings page."
+
+#: src/features/sign-in/bootstrap-screen.tsx:52
+msgid "This one-time link makes you a site admin. Choose who you are, or add yourself, then set a username and password."
+msgstr "This one-time link makes you a site admin. Choose who you are, or add yourself, then set a username and password."
+
+#: src/features/sign-in/reset-password-form.tsx:127
+msgid "This password link is invalid. Request a new one from the name selector or your settings page."
+msgstr "This password link is invalid. Request a new one from the name selector or your settings page."
+
 #: src/features/people/profile-panel.tsx:400
 msgid "This person is no longer listed."
 msgstr "This person is no longer listed."
+
+#: src/features/sign-in/join-screen.tsx:96
+msgid "This person needs to sign in first. You then join the event."
+msgstr "This person needs to sign in first. You then join the event."
 
 #: src/features/proposals/proposal-panel.tsx:340
 msgid "This proposal has not been scheduled yet."
@@ -2344,6 +2634,14 @@ msgstr "This site runs {currentVersion}, {currentDate}."
 #: src/app/footer.tsx:132
 msgid "This site runs {currentVersion}."
 msgstr "This site runs {currentVersion}."
+
+#: src/features/sign-in/guest-login-form.tsx:71
+msgid "This user has protected their account. Enter their password, or use a single-use code emailed to them. Forgot the password? Reset it instead."
+msgstr "This user has protected their account. Enter their password, or use a single-use code emailed to them. Forgot the password? Reset it instead."
+
+#: src/features/sign-in/guest-login-form.tsx:68
+msgid "This user has protected their account. Enter their password. Forgot it? Ask an organizer for a new link."
+msgstr "This user has protected their account. Enter their password. Forgot it? Ask an organizer for a new link."
 
 #: src/app/time-format.tsx:99
 #: src/features/settings/settings-screen.tsx:141
@@ -2402,6 +2700,11 @@ msgstr "Turn off {host}, on since {since}"
 msgid "Turn off {host}, on since {since}, this device"
 msgstr "Turn off {host}, on since {since}, this device"
 
+#: src/features/sign-in/account-security.tsx:194
+#: src/features/sign-in/account-security.tsx:264
+msgid "Turn off protection"
+msgstr "Turn off protection"
+
 #: src/features/settings/push-notifications.tsx:302
 msgid "Turn on for this device"
 msgstr "Turn on for this device"
@@ -2451,6 +2754,14 @@ msgctxt "Comment author that no longer exists"
 msgid "Unknown"
 msgstr "Unknown"
 
+#: src/features/sign-in/account-security.tsx:414
+msgid "Unknown browser · last used {lastUsed}"
+msgstr "Unknown browser · last used {lastUsed}"
+
+#: src/features/sign-in/account-security.tsx:407
+msgid "Unknown browser (This browser) · last used {lastUsed}"
+msgstr "Unknown browser (This browser) · last used {lastUsed}"
+
 #: src/features/schedule/day-agenda.tsx:258
 #: src/features/schedule/day-agenda.tsx:388
 msgid "until {endsAt}"
@@ -2459,6 +2770,20 @@ msgstr "until {endsAt}"
 #: src/features/people/directory-screen.tsx:347
 msgid "updated {profileUpdated}"
 msgstr "updated {profileUpdated}"
+
+#: src/features/sign-in/account-security.tsx:314
+#: src/features/sign-in/account-security.tsx:317
+#: src/features/sign-in/bootstrap-screen.tsx:88
+msgid "Username"
+msgstr "Username"
+
+#: src/features/sign-in/account-security.tsx:338
+msgid "Username saved"
+msgstr "Username saved"
+
+#: src/features/sign-in/account-security.tsx:311
+msgid "Username settings"
+msgstr "Username settings"
 
 #: src/app/footer.tsx:69
 msgid "Version {shown} — what's new"
@@ -2571,6 +2896,7 @@ msgid "Who are you looking for?"
 msgstr "Who are you looking for?"
 
 #: src/app/user-menu.tsx:209
+#: src/features/sign-in/bootstrap-screen.tsx:58
 msgid "Who are you?"
 msgstr "Who are you?"
 
@@ -2638,6 +2964,14 @@ msgstr "your 1-on-1 with {otherName}"
 #: src/features/people/profile-form.tsx:360
 msgid "Your name"
 msgstr "Your name"
+
+#: src/features/sign-in/account-security.tsx:154
+msgid "Your name is protected: switching to it requires your password or a single-use code emailed to you. Forgot your password? Reset it with an emailed link."
+msgstr "Your name is protected: switching to it requires your password or a single-use code emailed to you. Forgot your password? Reset it with an emailed link."
+
+#: src/features/sign-in/account-security.tsx:155
+msgid "Your name is protected: switching to it requires your password. Forgot it? Ask an organizer for a new link, then set a new password here."
+msgstr "Your name is protected: switching to it requires your password. Forgot it? Ask an organizer for a new link, then set a new password here."
 
 #: src/app/user-menu.tsx:78
 msgid "Your name: {name}"

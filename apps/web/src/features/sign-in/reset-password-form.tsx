@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { type FormEvent, useState } from "react";
 
 import type { SignInCalls } from "../../commands/sign-in";
@@ -42,14 +44,16 @@ function ResetPasswordForm({
     return (
       <div className="flex flex-col gap-3">
         <p role="status" className="text-sm text-success-fg">
-          Password set. Your name is now protected — log in with your new
-          password.
+          <Trans>
+            Password set. Your name is now protected — log in with your new
+            password.
+          </Trans>
         </p>
         <a
           href={signInHref}
           className="self-start rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-on-brand hover:bg-brand-hover"
         >
-          Go to sign in
+          <Trans>Go to sign in</Trans>
         </a>
       </div>
     );
@@ -57,12 +61,14 @@ function ResetPasswordForm({
   return (
     <form onSubmit={(e) => void onSubmit(e)} className="flex flex-col gap-2">
       <p className="text-sm text-fg-muted">
-        Choose a new password. You&apos;ll use it to switch to your name from
-        now on.
+        <Trans>
+          Choose a new password. You&apos;ll use it to switch to your name from
+          now on.
+        </Trans>
       </p>
       <PasswordManagerHint username={guest.name} />
       <TextField
-        label="New password (at least 8 characters)"
+        label={t`New password (at least 8 characters)`}
         type="password"
         value={newPassword}
         onChange={setNewPassword}
@@ -79,7 +85,7 @@ function ResetPasswordForm({
           type="submit"
           disabled={mutation.pending || newPassword.length === 0}
         >
-          Set password
+          <Trans>Set password</Trans>
         </Button>
       </div>
     </form>
@@ -100,12 +106,13 @@ export function ResetScreen({
   signInHref: string;
   onPasswordSet?: () => void;
 }) {
+  const guestName = guest?.name;
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 sm:px-0">
       {guest && token ? (
         <>
           <h1 className="text-2xl font-bold">
-            Set a password for {guest.name}
+            <Trans>Set a password for {guestName}</Trans>
           </h1>
           <ResetPasswordForm
             calls={calls}
@@ -117,8 +124,10 @@ export function ResetScreen({
         </>
       ) : (
         <p className="text-fg-muted">
-          This password link is invalid. Request a new one from the name
-          selector or your settings page.
+          <Trans>
+            This password link is invalid. Request a new one from the name
+            selector or your settings page.
+          </Trans>
         </p>
       )}
     </div>

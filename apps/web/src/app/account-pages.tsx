@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
 import { safeRedirectPath } from "@schellingboard/domain/safe-redirect";
 import { useRouter } from "@tanstack/react-router";
@@ -184,7 +185,7 @@ function Settings({
     return (
       <div className="flex flex-col gap-8">
         <PageNotice>
-          {actingGuestRefusalMessage(state.code, "changing your settings")}
+          {actingGuestRefusalMessage(state.code, CHANGING_SETTINGS)}
         </PageNotice>
         <Appearance />
       </div>
@@ -202,6 +203,11 @@ function Settings({
   );
 }
 
+// English task phrases for the domain refusal text, until it is translated.
+const CHANGING_SETTINGS = "changing your settings";
+const SEEING_NOTIFICATIONS = "seeing your notifications";
+const SEEING_COMMENTS = "seeing your comments";
+
 function Notifications({ api, now }: { api: AppServices["api"]; now: Date }) {
   const { history } = useRouter();
   const [, setUnread] = useUnread();
@@ -218,7 +224,7 @@ function Notifications({ api, now }: { api: AppServices["api"]; now: Date }) {
   if (state.status === "error" && REFUSALS.includes(state.code))
     return (
       <PageNotice>
-        {actingGuestRefusalMessage(state.code, "seeing your notifications")}
+        {actingGuestRefusalMessage(state.code, SEEING_NOTIFICATIONS)}
       </PageNotice>
     );
   return (
@@ -245,7 +251,7 @@ function MyComments({ api, now }: { api: AppServices["api"]; now: Date }) {
   if (state.status === "error" && REFUSALS.includes(state.code))
     return (
       <PageNotice>
-        {actingGuestRefusalMessage(state.code, "seeing your comments")}
+        {actingGuestRefusalMessage(state.code, SEEING_COMMENTS)}
       </PageNotice>
     );
   return (
@@ -262,10 +268,12 @@ function MyComments({ api, now }: { api: AppServices["api"]; now: Date }) {
 function DirectoryWait({ failed }: { failed: boolean }) {
   return failed ? (
     <p role="alert" className="text-danger-fg">
-      Could not load the names. Reload the page to try again.
+      <Trans>Could not load the names. Reload the page to try again.</Trans>
     </p>
   ) : (
-    <p role="status">Loading…</p>
+    <p role="status">
+      <Trans>Loading…</Trans>
+    </p>
   );
 }
 

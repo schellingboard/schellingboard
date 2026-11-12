@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { useEffect, useRef, useState } from "react";
 
 import type { SignInCalls } from "../../commands/sign-in";
@@ -44,8 +46,14 @@ export function JoinScreen({
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 sm:px-0">
-      <h1 className="text-2xl font-bold">Join the event</h1>
-      {outcome.kind === "working" && <p role="status">Opening your link…</p>}
+      <h1 className="text-2xl font-bold">
+        <Trans>Join the event</Trans>
+      </h1>
+      {outcome.kind === "working" && (
+        <p role="status">
+          <Trans>Opening your link…</Trans>
+        </p>
+      )}
       {outcome.kind === "signIn" && (
         <SignInAsGuest
           guestId={outcome.guestId}
@@ -57,11 +65,11 @@ export function JoinScreen({
         <div className="flex flex-col gap-2">
           <p role="alert" className="text-danger-fg">
             {outcome.replaced
-              ? "This link no longer works: a newer one replaced it. Ask an organizer for a new link."
+              ? t`This link no longer works: a newer one replaced it. Ask an organizer for a new link.`
               : outcome.message}
           </p>
           <a href="/" className="self-start text-sm underline">
-            Go to the start page
+            <Trans>Go to the start page</Trans>
           </a>
         </div>
       )}
@@ -82,13 +90,19 @@ function SignInAsGuest({
   return (
     <div className="flex flex-col gap-3">
       <p className="text-fg-muted">
-        {name ?? "This person"} needs to sign in first. You then join the event.
+        {name ? (
+          <Trans>{name} needs to sign in first. You then join the event.</Trans>
+        ) : (
+          <Trans>
+            This person needs to sign in first. You then join the event.
+          </Trans>
+        )}
       </p>
       <a
         href={`/auth/login?guest=${encodeURIComponent(guestId)}&redirect=${redirect}`}
         className="self-start rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-on-brand hover:bg-brand-hover"
       >
-        {name ? `Sign in as ${name}` : "Sign in"}
+        {name ? t`Sign in as ${name}` : t`Sign in`}
       </a>
     </div>
   );

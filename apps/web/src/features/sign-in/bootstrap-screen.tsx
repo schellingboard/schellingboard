@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { type FormEvent, useState } from "react";
 
 import type { SignInCalls } from "../../commands/sign-in";
@@ -38,37 +40,41 @@ export function BootstrapScreen({
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 sm:px-0">
-      <h1 className="text-2xl font-bold">Become a site admin</h1>
+      <h1 className="text-2xl font-bold">
+        <Trans>Become a site admin</Trans>
+      </h1>
       {token ? (
         <form
           onSubmit={(e) => void onSubmit(e)}
           className="flex flex-col gap-2"
         >
           <p className="text-sm text-fg-muted">
-            This one-time link makes you a site admin. Choose who you are, or
-            add yourself, then set a username and password.
+            <Trans>
+              This one-time link makes you a site admin. Choose who you are, or
+              add yourself, then set a username and password.
+            </Trans>
           </p>
           <SelectField
-            label="Who are you?"
+            label={t`Who are you?`}
             value={who}
             onChange={setWho}
             options={[
-              { value: "", label: "Choose…", disabled: true },
-              { value: NEW, label: "Someone new" },
+              { value: "", label: t`Choose…`, disabled: true },
+              { value: NEW, label: t`Someone new` },
               ...guests.map((g) => ({ value: g.id, label: g.name })),
             ]}
           />
           {who === NEW && (
             <>
               <TextField
-                label="Name"
+                label={t`Name`}
                 value={name}
                 onChange={setName}
                 autoComplete="name"
                 error={mutation.fields.name}
               />
               <TextField
-                label="Email"
+                label={t`Email`}
                 type="email"
                 value={email}
                 onChange={setEmail}
@@ -79,14 +85,14 @@ export function BootstrapScreen({
           )}
           <PasswordManagerHint username={username} />
           <TextField
-            label="Username"
+            label={t`Username`}
             value={username}
             onChange={setUsername}
             autoComplete="username"
             error={mutation.fields.username}
           />
           <TextField
-            label="Password (at least 8 characters)"
+            label={t`Password (at least 8 characters)`}
             type="password"
             value={password}
             onChange={setPassword}
@@ -108,13 +114,15 @@ export function BootstrapScreen({
                 password === ""
               }
             >
-              Become site admin
+              <Trans>Become site admin</Trans>
             </Button>
           </div>
         </form>
       ) : (
         <p className="text-fg-muted">
-          This link is invalid. Ask whoever runs the site for a new one.
+          <Trans>
+            This link is invalid. Ask whoever runs the site for a new one.
+          </Trans>
         </p>
       )}
     </div>
