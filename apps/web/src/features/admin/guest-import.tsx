@@ -4,7 +4,7 @@ import { useFormMutation } from "../../commands/use-form-mutation";
 import { BackLink } from "../../ui/back-link";
 import { Button } from "../../ui/button";
 import { FileField, PeopleField } from "../../ui/form";
-import { plural } from "./list-paging";
+import { plural } from "../../ui/list-paging";
 
 type Problem = { detail?: string; errors?: { message: string }[] };
 type Summary = { created: number; existing: number };

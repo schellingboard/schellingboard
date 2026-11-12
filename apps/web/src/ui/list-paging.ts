@@ -1,5 +1,5 @@
-import { searchParamUpdates } from "../../ui/data-table";
-import { DEFAULT_PAGE_SIZE, PAGE_SIZES, type PageSize } from "../../ui/pager";
+import { searchParamUpdates } from "./data-table";
+import { DEFAULT_PAGE_SIZE, PAGE_SIZES, type PageSize } from "./pager";
 
 export type ParamUpdates = Record<string, string | null>;
 export type OnParams = (

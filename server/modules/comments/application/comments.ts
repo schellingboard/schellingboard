@@ -1,5 +1,5 @@
 import { changes } from "@schellingboard/domain/change";
-import type { Comment } from "@schellingboard/domain/comment";
+import type { AuthoredComment, Comment } from "@schellingboard/domain/comment";
 import type { IdentityMode } from "@schellingboard/domain/event";
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
@@ -160,6 +160,14 @@ export const listComments =
   async (_actor: Actor, subject: CommentSubject): Promise<Result<Comment[]>> =>
     (await missingSubject(repos, subject)) ??
     ok(await thread(repos, subject.kind).list(subject.id));
+
+export const listMyComments =
+  ({ repos }: CommentDeps) =>
+  async (actor: Actor): Promise<Result<AuthoredComment[]>> => {
+    const acting = await actingGuest(actor, repos.guests);
+    if (!acting.ok) return acting;
+    return ok(await repos.comments.listByAuthor(acting.value));
+  };
 
 export const createComment =
   (deps: CommentDeps) =>

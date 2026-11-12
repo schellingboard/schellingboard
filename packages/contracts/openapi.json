@@ -257,6 +257,45 @@
           "likes"
         ]
       },
+      "MyComment": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "kind": {
+            "type": "string",
+            "enum": ["proposal", "session", "profile"]
+          },
+          "subjectTitle": {
+            "type": "string",
+            "description": "The proposal's or session's title, or the profile owner's name"
+          },
+          "subjectId": { "type": "string" },
+          "event": {
+            "type": ["object", "null"],
+            "properties": {
+              "name": { "type": "string" },
+              "slug": { "type": "string" }
+            },
+            "required": ["name", "slug"],
+            "description": "Null for a profile, which belongs to no event"
+          },
+          "body": { "type": "string" },
+          "createdTime": { "type": "string", "format": "date-time" },
+          "replyCount": { "type": "integer" },
+          "likeCount": { "type": "integer" }
+        },
+        "required": [
+          "id",
+          "kind",
+          "subjectTitle",
+          "subjectId",
+          "event",
+          "body",
+          "createdTime",
+          "replyCount",
+          "likeCount"
+        ]
+      },
       "Meeting": {
         "type": "object",
         "properties": {
@@ -3844,6 +3883,40 @@
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Comment" }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }]
+      }
+    },
+    "/api/v1/me/comments": {
+      "get": {
+        "tags": ["comments"],
+        "description": "Every comment and reply the acting guest wrote that is still there, newest first, with where it was written.",
+        "responses": {
+          "200": {
+            "description": "The caller's comments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/MyComment" }
+                    }
+                  },
+                  "required": ["items"]
+                }
               }
             }
           },

@@ -1794,6 +1794,53 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/me/comments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Every comment and reply the acting guest wrote that is still there, newest first, with where it was written. */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The caller's comments */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              items: components["schemas"]["MyComment"][];
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/comments/{id}": {
     parameters: {
       query?: never;
@@ -7745,6 +7792,24 @@ export interface components {
         name: string;
         avatarUrl: string | null;
       }[];
+    };
+    MyComment: {
+      id: string;
+      /** @enum {string} */
+      kind: "proposal" | "session" | "profile";
+      /** @description The proposal's or session's title, or the profile owner's name */
+      subjectTitle: string;
+      subjectId: string;
+      /** @description Null for a profile, which belongs to no event */
+      event: {
+        name: string;
+        slug: string;
+      } | null;
+      body: string;
+      /** Format: date-time */
+      createdTime: string;
+      replyCount: number;
+      likeCount: number;
     };
     Meeting: {
       id: string;

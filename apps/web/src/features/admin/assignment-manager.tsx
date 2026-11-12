@@ -9,7 +9,7 @@ import {
   tableHandlers,
   byTitleThenId,
   type OnParams,
-} from "./list-paging";
+} from "../../ui/list-paging";
 import { jumpTo, shown } from "./use-section-save";
 
 export type AssignFilter = "all" | "assigned" | "not-assigned";

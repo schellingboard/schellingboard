@@ -12,7 +12,7 @@ import {
   pageOf,
   tableHandlers,
   type OnParams,
-} from "./list-paging";
+} from "../../ui/list-paging";
 import { shown, useJumpWithin } from "./use-section-save";
 
 const FIELDS = ["name", "email", "username"];

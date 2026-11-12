@@ -9,7 +9,7 @@ import type {
   LoggedProposal,
   RecordedChange,
 } from "@schellingboard/domain/change";
-import type { Comment } from "@schellingboard/domain/comment";
+import type { AuthoredComment, Comment } from "@schellingboard/domain/comment";
 import type {
   Event,
   EventMeetingSettings,
@@ -618,6 +618,8 @@ export interface SessionProposalsRepository {
  * live here. Attaching comments to a subject is a SubjectCommentsRepository.
  */
 export interface CommentsRepository {
+  /** The guest's live comments on any subject, newest first. */
+  listByAuthor(guestId: string): Promise<AuthoredComment[]>;
   findById(commentId: string): Promise<Comment | undefined>;
   update(id: string, data: { body: string; editedTime: Date }): Promise<void>;
   /** A like already there keeps its original time. */

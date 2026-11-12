@@ -83,6 +83,9 @@ reply.
   admins can delete any comment. The author is not notified.
 - Closing the panel with Esc or the close button while you have typed text asks "Discard what you
   have typed?" first; choose Keep editing to carry on.
+- **My comments** in your name menu lists every comment you wrote, newest first. Filter by sessions,
+  proposals, profiles or event, search the text, and click a row to open the comment where it was
+  written. Only you can see this list.
 - Each timestamp links to that comment alone, so you can point someone at one particular remark.
 
 ## Vote
