@@ -4,7 +4,12 @@ import { snapshot as fixture } from "../replica/snapshot-fixture";
 import { createReplicaStore } from "../replica/store";
 import { fakeApi } from "./fake-api";
 import { createCommandRunner } from "./runner";
-import { addBookmark, removeBookmark } from "./session-mark";
+import {
+  addBookmark,
+  addHidden,
+  removeBookmark,
+  removeHidden,
+} from "./session-mark";
 
 function setup(
   marks: { sessionId: string; kind: "bookmark" | "hidden" }[] = []
@@ -57,5 +62,37 @@ describe("bookmarking a session", () => {
       code: "session.notFound",
     });
     expect(calls).toEqual([]);
+  });
+});
+
+describe("hiding a session", () => {
+  it("replaces a bookmark at once and sends it", async () => {
+    const { runner, calls } = setup([{ sessionId: "s", kind: "bookmark" }]);
+
+    const pending = runner.run(addHidden, { sessionId: "s" });
+
+    expect(runner.view().me?.marks).toEqual([
+      { sessionId: "s", kind: "hidden" },
+    ]);
+    await pending;
+    expect(calls).toMatchObject([
+      {
+        method: "PUT",
+        path: "/api/v1/sessions/s/marks/mia",
+        body: { kind: "hidden" },
+      },
+    ]);
+  });
+
+  it("shows it again at once and sends it", async () => {
+    const { runner, calls } = setup([{ sessionId: "s", kind: "hidden" }]);
+
+    const pending = runner.run(removeHidden, { sessionId: "s" });
+
+    expect(runner.view().me?.marks).toEqual([]);
+    await pending;
+    expect(calls).toMatchObject([
+      { method: "DELETE", path: "/api/v1/sessions/s/marks/mia" },
+    ]);
   });
 });

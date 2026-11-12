@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Hide sessions you are not interested in** (#1103): "Not interested" in the session window greys
+  the session out on the grid and drops it from the agenda; a **Hidden** filter brings it back.
 - **Bookmark sessions privately** (#864, #264, #865): a bookmark icon in the session window keeps a
   session in view, and "My schedule" can list your bookmarks. Not an RSVP; others do not see it.
 

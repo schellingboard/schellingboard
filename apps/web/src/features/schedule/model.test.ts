@@ -47,6 +47,7 @@ const none = createScheduleMatch({
   guestId: "mia",
   rsvpd: () => false,
   bookmarked: () => false,
+  hidden: () => false,
 });
 
 describe("includedLocations", () => {
@@ -69,6 +70,7 @@ describe("createScheduleMatch", () => {
       guestId: null,
       rsvpd: () => false,
       bookmarked: () => false,
+      hidden: () => false,
     });
     expect(m.filtering).toBe(true);
     expect(m.matchesSession(session("s", { title: "A TALK" }))).toBe(true);
@@ -86,6 +88,7 @@ describe("createScheduleMatch", () => {
       guestId: "mia",
       rsvpd: () => false,
       bookmarked: () => false,
+      hidden: () => false,
     });
     expect(m.matchesSession(hosted)).toBe(true);
     expect(m.matchesSession(session("x", {}))).toBe(false);
@@ -95,6 +98,7 @@ describe("createScheduleMatch", () => {
       guestId: null,
       rsvpd: () => false,
       bookmarked: () => false,
+      hidden: () => false,
     });
     expect(anonymous.filtering).toBe(false);
   });
@@ -106,6 +110,7 @@ describe("createScheduleMatch", () => {
       guestId: "mia",
       rsvpd: () => false,
       bookmarked: () => false,
+      hidden: () => false,
     });
     expect(m.matchesMeeting(meeting as unknown as MeetingView)).toBe(true);
     expect(
@@ -114,6 +119,60 @@ describe("createScheduleMatch", () => {
         otherName: "Zoe",
       } as unknown as MeetingView)
     ).toBe(false);
+  });
+});
+
+describe("hidden sessions", () => {
+  const hiddenIds = new Set(["h"]);
+  const viewer = (filters: { mine: null; hidden?: boolean }, search = "") =>
+    createScheduleMatch({
+      search,
+      filters,
+      guestId: "mia",
+      rsvpd: () => false,
+      bookmarked: () => false,
+      hidden: (id) => hiddenIds.has(id),
+    });
+
+  it("hides a hidden session and never matches it", () => {
+    const m = viewer({ mine: null }, "x");
+    expect(m.hides(session("h", { title: "x" }))).toBe(true);
+    expect(m.hides(session("o", { title: "x" }))).toBe(false);
+    expect(m.matchesSession(session("h", { title: "x" }))).toBe(false);
+    expect(m.matchesSession(session("o", { title: "x" }))).toBe(true);
+  });
+
+  it("with the Hidden chip on, matches only hidden sessions and hides none", () => {
+    const m = viewer({ mine: null, hidden: true });
+    expect(m.filtering).toBe(true);
+    expect(m.hides(session("h", {}))).toBe(false);
+    expect(m.matchesSession(session("h", {}))).toBe(true);
+    expect(m.matchesSession(session("o", {}))).toBe(false);
+  });
+
+  it("is ignored without a viewer", () => {
+    const m = createScheduleMatch({
+      search: "",
+      filters: { mine: null, hidden: true },
+      guestId: null,
+      rsvpd: () => false,
+      bookmarked: () => false,
+      hidden: () => true,
+    });
+    expect(m.filtering).toBe(false);
+    expect(m.hides(session("h", {}))).toBe(false);
+  });
+
+  it("leaves hidden sessions out of the entries and their total", () => {
+    const entries = scheduleEntries({
+      days: [day("d1", [session("h", {}), session("o", {})])],
+      locations,
+      locParams: [],
+      meetings: [],
+      match: viewer({ mine: null }),
+    });
+    expect(entries[0].sessions.map((s) => s.id)).toEqual(["o"]);
+    expect(entries[0].total).toBe(1);
   });
 });
 
@@ -142,6 +201,7 @@ describe("scheduleEntries", () => {
       guestId: null,
       rsvpd: () => false,
       bookmarked: () => false,
+      hidden: () => false,
     });
     const entries = scheduleEntries({
       days,

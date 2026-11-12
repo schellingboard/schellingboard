@@ -7,7 +7,11 @@ export const MINE_KINDS = [
 export type MineKind = (typeof MINE_KINDS)[number]["value"];
 
 /** `mine` is null while the My schedule chip is off, else the kinds it shows. */
-export type ScheduleFilterState = { mine: readonly MineKind[] | null };
+export type ScheduleFilterState = {
+  mine: readonly MineKind[] | null;
+  /** The Hidden chip, which excludes My schedule; absent means off. */
+  hidden?: boolean;
+};
 
 export const ALL_KINDS: readonly MineKind[] = MINE_KINDS.map((k) => k.value);
 
@@ -29,7 +33,10 @@ export function parseScheduleFilters(
 ): ScheduleFilterState {
   const tokens = (filterParam ?? "").split(",");
   const legacy = inCanonicalOrder(tokens);
-  if (!tokens.includes("mine") && legacy.length === 0) return { mine: null };
+  if (!tokens.includes("mine") && legacy.length === 0)
+    return tokens.includes("hidden")
+      ? { mine: null, hidden: true }
+      : { mine: null };
   const narrowed = inCanonicalOrder((mineParam ?? "").split(","));
   if (narrowed.length > 0) return { mine: narrowed };
   return { mine: legacy.length > 0 ? legacy : DEFAULT_KINDS };
@@ -39,7 +46,8 @@ export function serializeScheduleFilters(state: ScheduleFilterState): {
   filter: string | null;
   mine: string | null;
 } {
-  if (!state.mine) return { filter: null, mine: null };
+  if (!state.mine)
+    return { filter: state.hidden ? "hidden" : null, mine: null };
   const kinds = inCanonicalOrder(state.mine);
   return {
     filter: "mine",

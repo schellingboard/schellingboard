@@ -63,6 +63,7 @@ function fakeActions(attendees = fakeAttendees(["zed", "abe"])) {
     toggleRsvp: vi.fn<ScheduleActions["toggleRsvp"]>(() => Promise.resolve()),
     becomeHost: vi.fn<ScheduleActions["becomeHost"]>(() => Promise.resolve()),
     setBookmark: vi.fn<ScheduleActions["setBookmark"]>(() => Promise.resolve()),
+    setHidden: vi.fn<ScheduleActions["setHidden"]>(() => Promise.resolve()),
     pickName: vi.fn<ScheduleActions["pickName"]>(),
     ...noMeetingActions,
     attendees: vi.fn<ScheduleActions["attendees"]>(() => attendees),
@@ -523,6 +524,61 @@ describe("bookmarking from the session modal", { tags: ["007-US9"] }, () => {
     open(snapshotWith({}, { me: null }));
     expect(
       within(dialog()).queryByRole("button", { name: /bookmark/i })
+    ).toBeNull();
+  });
+});
+
+describe("hiding from the session modal", { tags: ["007-US10"] }, () => {
+  const hiddenMe = {
+    ...notMe,
+    marks: [{ sessionId: "s", kind: "hidden" as const }],
+  };
+
+  it("hides a session the viewer is not committed to", async () => {
+    const { actions } = open(snapshotWith({}, { me: notMe }));
+    await userEvent.click(
+      within(dialog()).getByRole("button", { name: "Not interested" })
+    );
+    expect(actions.setHidden).toHaveBeenCalledWith("s", true);
+  });
+
+  it("shows a hidden session again", async () => {
+    const { actions } = open(snapshotWith({}, { me: hiddenMe }));
+    await userEvent.click(
+      within(dialog()).getByRole("button", { name: "Show again" })
+    );
+    expect(actions.setHidden).toHaveBeenCalledWith("s", false);
+  });
+
+  it("replaces a bookmark, as a session has one mark", () => {
+    open(
+      snapshotWith(
+        {},
+        { me: { ...notMe, marks: [{ sessionId: "s", kind: "bookmark" }] } }
+      )
+    );
+    expect(
+      within(dialog()).getByRole("button", { name: "Not interested" })
+    ).toBeTruthy();
+  });
+
+  it("is not offered after an RSVP, to a host, or without a name", () => {
+    open(snapshotWith());
+    expect(
+      within(dialog()).queryByRole("button", { name: "Not interested" })
+    ).toBeNull();
+    cleanup();
+    open(snapshotWith({}, { me: { ...hiddenMe, guestId: "host" } }));
+    expect(
+      within(dialog()).queryByRole("button", { name: "Show again" })
+    ).toBeNull();
+    expect(
+      within(dialog()).queryByRole("button", { name: "Not interested" })
+    ).toBeNull();
+    cleanup();
+    open(snapshotWith({}, { me: null }));
+    expect(
+      within(dialog()).queryByRole("button", { name: "Not interested" })
     ).toBeNull();
   });
 });

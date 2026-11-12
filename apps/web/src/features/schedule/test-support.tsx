@@ -15,6 +15,7 @@ export const noMatch = createScheduleMatch({
   guestId: null,
   rsvpd: () => false,
   bookmarked: () => false,
+  hidden: () => false,
 });
 
 export function snapshotWith(patch: Partial<Snapshot>): Snapshot {
@@ -52,6 +53,7 @@ export function renderScheduled(
             toggleRsvp: () => Promise.resolve(),
             becomeHost: () => Promise.resolve(),
             setBookmark: () => Promise.resolve(),
+            setHidden: () => Promise.resolve(),
             pickName: () => {},
             attendeeCount: {
               load: () => Promise.resolve({ ok: true, count: null }),

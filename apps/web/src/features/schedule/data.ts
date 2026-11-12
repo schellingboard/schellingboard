@@ -26,6 +26,9 @@ export type ScheduleData = {
   rsvpd: (sessionId: string) => boolean;
   bookmarked: (sessionId: string) => boolean;
   hasBookmarks: boolean;
+  /** Marked hidden by the viewer, who has neither RSVP'd to nor hosts it. */
+  hidden: (sessionId: string) => boolean;
+  hasHidden: boolean;
   meetings: MeetingView[];
   availability: string[];
 };
@@ -38,6 +41,19 @@ export function scheduleDataFrom(snapshot: Snapshot, now: Date): ScheduleData {
     (snapshot.me?.marks ?? [])
       .filter((m) => m.kind === "bookmark")
       .map((m) => m.sessionId)
+  );
+  const hiddenIds = new Set(
+    (snapshot.me?.marks ?? [])
+      .filter((m) => m.kind === "hidden")
+      .map((m) => m.sessionId)
+      .filter(
+        (id) =>
+          !rsvpdIds.has(id) &&
+          !sessions.some(
+            (s) =>
+              s.id === id && s.hosts.some((h) => h.id === snapshot.me?.guestId)
+          )
+      )
   );
   return {
     event,
@@ -54,6 +70,8 @@ export function scheduleDataFrom(snapshot: Snapshot, now: Date): ScheduleData {
     rsvpd: (sessionId) => rsvpdIds.has(sessionId),
     bookmarked: (sessionId) => bookmarkedIds.has(sessionId),
     hasBookmarks: bookmarkedIds.size > 0,
+    hidden: (sessionId) => hiddenIds.has(sessionId),
+    hasHidden: hiddenIds.size > 0,
     meetings: meetingViewsFrom(snapshot, now),
     availability: snapshot.me?.availability ?? [],
   };

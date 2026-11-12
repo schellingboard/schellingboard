@@ -147,6 +147,13 @@ schedule** can list them too (tick **Bookmarked** in its menu). A bookmark is no
 told and it is not counted. Other attendees and organizers do not see it, though in an event where
 anyone can pick any name, anyone using your name could.
 
+To tidy away a session you do not care about, open it and tap **Not interested** below the RSVP
+button. On the grid it turns into a faint, empty block that still opens when tapped, and the agenda
+leaves it out. A **Hidden** filter appears next to **My schedule** while you have one: it shows only
+your hidden sessions (and turns My schedule off). Tap **Show again** in the session to undo. Hiding
+is private and has no effect on anyone else; it is not offered for sessions you RSVP'd to or host,
+and RSVPing to or hosting a hidden session shows it again.
+
 While the event is running, a red line marks the current time in the grid and the agenda, and
 **"Now"** at the top of the schedule jumps straight to it.
 

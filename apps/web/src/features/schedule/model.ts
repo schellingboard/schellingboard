@@ -11,6 +11,8 @@ export type DayWithSessions = Day & { sessions: Session[] };
 export type ScheduleMatch = {
   filtering: boolean;
   matchesSession: (session: Session) => boolean;
+  /** Hidden by the viewer, and not being looked for with the Hidden chip. */
+  hides: (session: Session) => boolean;
   matchesMeeting: (meeting: MeetingView) => boolean;
 };
 
@@ -34,15 +36,20 @@ export function createScheduleMatch(input: {
   guestId: string | null;
   rsvpd: (sessionId: string) => boolean;
   bookmarked: (sessionId: string) => boolean;
+  hidden: (sessionId: string) => boolean;
 }): ScheduleMatch {
   const { search, guestId, rsvpd, bookmarked } = input;
-  const filters = guestId ? input.filters : { mine: null };
+  const hidden = guestId ? input.hidden : () => false;
+  const filters: ScheduleFilterState = guestId ? input.filters : { mine: null };
+  const hiddenOnly = !!filters.hidden;
   const searching = search.trim() !== "";
   return {
-    filtering: searching || filters.mine !== null,
+    filtering: searching || filters.mine !== null || hiddenOnly,
+    hides: (session) => !hiddenOnly && hidden(session.id),
     matchesSession: (session) =>
       !session.blocker &&
       (!searching || sessionMatchesSearch(session, search)) &&
+      hidden(session.id) === hiddenOnly &&
       sessionPassesFilters(filters, {
         rsvpd: rsvpd(session.id),
         hosting: session.hosts.some((h) => h.id === guestId),
@@ -76,10 +83,12 @@ export function scheduleEntries(input: {
     const dayMeetings = meetingsForDay(meetings, day);
     return {
       day,
-      total: sessions.filter((s) => !s.blocker).length + dayMeetings.length,
+      total:
+        sessions.filter((s) => !s.blocker && !match.hides(s)).length +
+        dayMeetings.length,
       sessions: match.filtering
         ? sessions.filter(match.matchesSession)
-        : sessions,
+        : sessions.filter((s) => !match.hides(s)),
       meetings: match.filtering
         ? dayMeetings.filter(match.matchesMeeting)
         : dayMeetings,

@@ -43,6 +43,23 @@ describe("schedule filters", () => {
     ).toEqual({ filter: "mine", mine: "rsvpd,hosting,bookmarked" });
   });
 
+  it("turns the Hidden chip on with `filter=hidden`, unless My schedule is also named", () => {
+    expect(parseScheduleFilters("hidden", null)).toEqual({
+      mine: null,
+      hidden: true,
+    });
+    expect(parseScheduleFilters("mine,hidden", null)).toEqual({
+      mine: ["rsvpd", "hosting"],
+    });
+  });
+
+  it("serializes the Hidden chip as its own filter", () => {
+    expect(serializeScheduleFilters({ mine: null, hidden: true })).toEqual({
+      filter: "hidden",
+      mine: null,
+    });
+  });
+
   it("serializes `mine` only when the kinds are not the default", () => {
     expect(serializeScheduleFilters({ mine: null })).toEqual({
       filter: null,
