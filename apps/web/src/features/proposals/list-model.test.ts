@@ -6,10 +6,14 @@ import type { Standing } from "../../queries/proposal-standings";
 import { iso, snapshot } from "../../replica/snapshot-fixture";
 import {
   defaultSort,
+  filterFrom,
   listRows,
   phaseTexts,
   rowsFrom,
+  sortFrom,
   sortOptions,
+  withFilter,
+  withSort,
   type ListInput,
 } from "./list-model";
 
@@ -255,5 +259,44 @@ describe("the phase texts", () => {
       phaseTexts(event({ schedulingPhaseStart: iso(5) }), at, true, "UTC")
         .proposing
     ).toBe("Proposal and voting phases are over");
+  });
+});
+
+describe("the list state in the address", () => {
+  const event = {
+    ...snapshot.event,
+    votingPhaseStart: iso(0),
+    votingPhaseEnd: iso(5),
+    schedulingPhaseStart: iso(5),
+  };
+  const at = new Date(iso(10));
+  const fallback = defaultSort(event, at);
+  const sortAt = (query: string) =>
+    sortFrom(new URLSearchParams(query), event, at);
+
+  it("ignores a filter or sort it does not know or the phase does not offer", () => {
+    expect(filterFrom(new URLSearchParams("filter=nope"))).toBeUndefined();
+    expect(sortAt("sort=title-asc")).toEqual({
+      key: "title",
+      direction: "asc",
+    });
+    expect(sortAt("sort=title-sideways")).toEqual(fallback);
+    expect(sortAt("sort=title-asc-x")).toEqual(fallback);
+    expect(sortAt("sort=votesCount-asc")).toEqual(fallback);
+  });
+
+  it("writes them back, leaving out the default sort and no filter", () => {
+    const params = new URLSearchParams("q=rust&sort=title-asc&filter=mine");
+    expect(withFilter(params, undefined).toString()).toBe(
+      "q=rust&sort=title-asc"
+    );
+    expect(withSort(params, fallback, fallback).toString()).toBe(
+      "q=rust&filter=mine"
+    );
+    expect(
+      withSort(params, { key: "hosts", direction: "desc" }, fallback).get(
+        "sort"
+      )
+    ).toBe("hosts-desc");
   });
 });

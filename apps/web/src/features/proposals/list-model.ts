@@ -30,6 +30,8 @@ export type SortKey =
   | "userVote"
   | "votes";
 
+const FILTERS = ["mine", "voted", "unvoted", "hostWanted"] as const;
+
 export type Sort = { key: SortKey; direction: "asc" | "desc" };
 
 export type ListInput = {
@@ -133,6 +135,47 @@ export function listRows(input: ListInput): Row[] {
   if (input.query.trim()) return searched(rows, input.query);
   const sign = input.sort.direction === "asc" ? 1 : -1;
   return [...rows].sort((a, b) => sign * compare(a, b, input.sort, input));
+}
+
+export function filterFrom(params: URLSearchParams): Filter {
+  const value = params.get("filter");
+  return FILTERS.find((f) => f === value);
+}
+
+export function sortFrom(
+  params: URLSearchParams,
+  event: Snapshot["event"],
+  now: Date
+): Sort {
+  const value = params.get("sort");
+  const offered = sortOptions(event, now).some((o) => o.value === value);
+  const [key, direction] = (value ?? "").split("-");
+  return offered
+    ? { key: key as SortKey, direction: direction as Sort["direction"] }
+    : defaultSort(event, now);
+}
+
+export function withFilter(
+  params: URLSearchParams,
+  filter: Filter
+): URLSearchParams {
+  const next = new URLSearchParams(params);
+  if (filter) next.set("filter", filter);
+  else next.delete("filter");
+  return next;
+}
+
+/** The default sort is left out of the address, so it can change with the phase. */
+export function withSort(
+  params: URLSearchParams,
+  sort: Sort,
+  fallback: Sort
+): URLSearchParams {
+  const next = new URLSearchParams(params);
+  if (sort.key === fallback.key && sort.direction === fallback.direction)
+    next.delete("sort");
+  else next.set("sort", `${sort.key}-${sort.direction}`);
+  return next;
 }
 
 export function defaultSort(event: Snapshot["event"], now: Date): Sort {

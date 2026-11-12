@@ -7,6 +7,7 @@ import {
   within,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useState } from "react";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { VoteChoice } from "@schellingboard/domain/vote";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -66,9 +67,11 @@ const phases = {
 function setup(
   phase: keyof typeof phases,
   patch: Partial<Snapshot> = {},
-  standings = new Map<string, Standing>()
+  standings = new Map<string, Standing>(),
+  params = ""
 ) {
   const onVote = vi.fn();
+  const onParamsChange = vi.fn<(params: URLSearchParams) => void>();
   const snapshot: Snapshot = {
     ...fixture,
     now: iso(10),
@@ -78,8 +81,9 @@ function setup(
     guests: fixture.guests.map((g) => ({ ...g, member: true })),
     ...patch,
   };
-  render(
-    <NoticeProvider>
+  function Page() {
+    const [current, setCurrent] = useState(new URLSearchParams(params));
+    return (
       <ProposalsScreen
         snapshot={snapshot}
         links={proposalLinks("conf")}
@@ -87,10 +91,24 @@ function setup(
         localZone="UTC"
         standings={standings}
         onVote={onVote}
+        params={current}
+        onParamsChange={(next) => {
+          onParamsChange(next);
+          setCurrent(next);
+        }}
       />
+    );
+  }
+  render(
+    <NoticeProvider>
+      <Page />
     </NoticeProvider>
   );
-  return { onVote, table: screen.queryByRole("table") as HTMLElement };
+  return {
+    onVote,
+    onParamsChange,
+    table: screen.queryByRole("table") as HTMLElement,
+  };
 }
 
 const titles = (table: HTMLElement) =>
@@ -182,6 +200,49 @@ describe("the proposals list", () => {
       screen.getByRole("button", { name: "Clear all active filters" })
     );
     expect(titles(table)).toHaveLength(3);
+  });
+
+  it("keeps the filter, the sort and the search in the params", async () => {
+    const { table, onParamsChange } = setup("scheduling");
+
+    await userEvent.click(
+      screen.getByRole("button", {
+        name: "Filter to show only proposals that want a host",
+      })
+    );
+    expect(onParamsChange.mock.lastCall![0].get("filter")).toBe("hostWanted");
+
+    await userEvent.selectOptions(screen.getByLabelText("Sort by"), "Title ↓");
+    expect(onParamsChange.mock.lastCall![0].get("sort")).toBe("title-asc");
+    expect(titles(table)).toEqual(["Cooking", "Gardening"]);
+
+    await userEvent.type(
+      screen.getByPlaceholderText("Search proposals..."),
+      "garden"
+    );
+    await waitFor(() =>
+      expect(onParamsChange.mock.lastCall![0].get("q")).toBe("garden")
+    );
+  });
+
+  it("starts from the filter, sort and search in the params", () => {
+    const { table } = setup(
+      "scheduling",
+      {},
+      undefined,
+      "filter=hostWanted&sort=title-desc"
+    );
+    expect(titles(table)).toEqual(["Gardening", "Cooking"]);
+    expect(screen.getByLabelText<HTMLSelectElement>("Sort by").value).toBe(
+      "title-desc"
+    );
+    cleanup();
+
+    const searched = setup("voting", {}, undefined, "q=garden");
+    expect(titles(searched.table)).toEqual(["Gardening"]);
+    expect(
+      screen.getByPlaceholderText<HTMLInputElement>("Search proposals...").value
+    ).toBe("garden");
   });
 
   it("filters to proposals that want a host, without a user too", async () => {

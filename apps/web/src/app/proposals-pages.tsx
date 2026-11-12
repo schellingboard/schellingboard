@@ -32,6 +32,7 @@ function List(view: EventView) {
   const { standings } = useEventStandings(view);
   const vote = useVoting(view);
   useViewProposalRedirect(slug, links.proposals);
+  const { params, change } = useUrlSearchParams();
 
   return (
     <>
@@ -42,6 +43,8 @@ function List(view: EventView) {
         localZone={LOCAL_ZONE}
         standings={standings}
         onVote={vote}
+        params={params}
+        onParamsChange={change}
       />
     </>
   );
