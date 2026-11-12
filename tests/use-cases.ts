@@ -774,6 +774,17 @@ export const features = {
       },
     },
   },
+  "022": {
+    slug: "interface-languages",
+    component: "ui/ux",
+    stories: {
+      US1: {
+        title: "Attendee reads the app in their own language",
+        actor: "attendee",
+        priority: "P2",
+      },
+    },
+  },
 } as const satisfies Record<string, Feature>;
 
 type Features = typeof features;

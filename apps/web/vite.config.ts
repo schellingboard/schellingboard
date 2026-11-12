@@ -1,6 +1,8 @@
+import path from "node:path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import { lingui } from "@lingui/vite-plugin";
 
 // Everything that is not a page of the SPA is answered by the server, in dev too.
 const SERVER_PATHS = [
@@ -19,7 +21,14 @@ const SERVER_PATHS = [
 ];
 
 export default defineConfig(({ command }) => ({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    lingui({
+      configPath: path.join(import.meta.dirname, "lingui.config.ts"),
+      macroTransform: true,
+    }),
+    tailwindcss(),
+  ],
   base: command === "build" ? "/_spa/" : "/",
   build: {
     outDir: "dist",

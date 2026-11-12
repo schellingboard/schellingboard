@@ -111,3 +111,6 @@ www-site/
 # Dependency graph rendered by `make arch-graph`.
 arch-graph.svg
 load-tmp/
+
+# Compiled catalogs; the build compiles the .po files itself
+/apps/web/locales/*/messages.ts

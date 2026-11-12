@@ -2,11 +2,14 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "@tanstack/react-router";
 import { createAppRouter } from "./app/router";
+import { I18nProvider } from "./i18n";
 import "./styles.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={createAppRouter()} />
+    <I18nProvider>
+      <RouterProvider router={createAppRouter()} />
+    </I18nProvider>
   </StrictMode>
 );
 

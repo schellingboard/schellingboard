@@ -80,8 +80,8 @@ the E2E specs a step touches; the user runs the full suite at the end.
     keeps the page size. Keep list behaviour that needs all rows (counts, "Clashes", day grouping in
     the agenda) correct: count and filter on the full set, page the result. If the survey shows too
     many lists for one commit, split into 23a, 23b... here first. Footer `fixes #831`.
-24. **#1328a** (Medium) i18n foundation: Lingui, `apps/web/src/i18n/`, `en` catalog, scripts and
-    Makefile targets, `<html lang>`. Issue step 1.
+24. DONE **#1328a** (Medium) i18n foundation: Lingui, `apps/web/src/i18n/`, `en` catalog, scripts
+    and Makefile targets, `<html lang>`. Issue step 1.
 25. **#1328b** Locale storage: `guests.locale`, `PATCH /me`, browser fallback, Settings switcher
     (hidden while one locale exists). Issue step 2.
 26. **#1328c** Locale-aware formatting, builds on #607. Issue step 3.
