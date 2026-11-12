@@ -41,6 +41,12 @@
   in step 11; closing #465 is for the maintainer. Phase 1 admin ships before attendees see anything,
   so the changelog entry waits for step 11.
 
+- #754: about 45 hand-written `<p role="alert" className="text-sm text-danger-fg">` errors (sign-in,
+  reset-password, settings, proposal/profile forms, admin screens), the over-capacity errors in
+  session-form and attendee-count-field, the avatar error in profile-form (no `role="alert"`) and
+  the session-form clash box still have no icon; convert them to `FieldError` in a follow-up. The
+  issue names only `FieldError`, notices and the summary.
+
 ## Next step
 
-Step 14.
+Step 15.

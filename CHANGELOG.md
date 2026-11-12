@@ -36,6 +36,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Form errors and failure messages carry a warning icon** (#754): they no longer rely on red
+  alone, which was easy to mistake for the rose accent colour.
 - **Conversation-starter answers can have several lines** (#1070): press Enter for a new line, and
   start lines with `-` for a list.
 - **Sessions, proposals, 1-on-1s and profiles open in a side panel**: the page stays usable beside
