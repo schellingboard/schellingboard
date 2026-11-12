@@ -47,6 +47,10 @@
   the session-form clash box still have no icon; convert them to `FieldError` in a follow-up. The
   issue names only `FieldError`, notices and the summary.
 
+- #1145: only Firefox is configured. Run once with Chromium enabled temporarily (config reverted):
+  every assertion of the toolbar test, undo included, passed; the test then failed only on the
+  console guard (a 401 from `/api/v1/me/identity` before login, which Firefox does not log).
+
 ## Next step
 
-Step 15.
+Step 16.

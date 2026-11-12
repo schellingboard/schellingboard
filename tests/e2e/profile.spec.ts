@@ -354,6 +354,19 @@ test.describe("Edit profile", () => {
     await page.getByRole("button", { name: "Bold" }).click();
     await expect(aboutMe).toHaveValue("**hello world**");
 
+    await aboutMe.press("ControlOrMeta+z");
+    await expect(aboutMe).toHaveValue("hello world");
+    await page.getByRole("button", { name: "Preview" }).click();
+    await expect(
+      page.getByRole("paragraph").filter({ hasText: "hello world" })
+    ).toBeVisible();
+    await expect(
+      page.locator("strong", { hasText: "hello world" })
+    ).toBeHidden();
+    await page.getByRole("button", { name: "Edit", exact: true }).click();
+    await page.getByRole("button", { name: "Bold" }).click();
+    await expect(aboutMe).toHaveValue("**hello world**");
+
     // Preview renders the markdown; Edit brings the textarea back.
     await page.getByRole("button", { name: "Preview" }).click();
     await expect(aboutMe).toBeHidden();
