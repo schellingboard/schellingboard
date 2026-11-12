@@ -79,9 +79,8 @@ data.*.db-journal
 # (see docs/dev/testing.md § Flake hunting)
 /.flake-hunt
 
-# Nix
-flake.nix
-flake.lock
+# Nix build outputs. The flake itself is tracked; see
+# docs/public/self-hosting/nixos.md
 /result*
 
 # Config file for jip, a stacked PR tool (see: https://github.com/omarkohl/jip)
