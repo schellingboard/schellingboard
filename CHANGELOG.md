@@ -22,42 +22,55 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- **Confirm before moving a session people RSVP'd to** (#289): saving a new time or room shows how
-  many people RSVP'd and that they will be told.
-- **Told when a session loses its last host** (#953): attendees who RSVP'd get an email and a
-  notification, and can take the session over themselves.
-- **Become the host of a session nobody hosts** (#714): attendees can take over a session left
-  without a host; organizers can filter the sessions list by "No hosts".
-- **Event statistics** (#389): a Statistics area in the admin shows how an event went in explained
-  charts and searchable tables, downloadable as CSV or ZIP; locations, hosts or session kinds can be
-  left out.
+- **Confirm before moving a session people RSVP'd to**
+  ([#289](https://github.com/schellingboard/schellingboard/issues/289)): saving a new time or room
+  shows how many people RSVP'd and that they will be told.
+- **Told when a session loses its last host**
+  ([#953](https://github.com/schellingboard/schellingboard/issues/953)): attendees who RSVP'd get an
+  email and a notification, and can take the session over themselves.
+- **Become the host of a session nobody hosts**
+  ([#714](https://github.com/schellingboard/schellingboard/issues/714)): attendees can take over a
+  session left without a host; organizers can filter the sessions list by "No hosts".
+- **Event statistics** ([#389](https://github.com/schellingboard/schellingboard/issues/389)): a
+  Statistics area in the admin shows how an event went in explained charts and searchable tables,
+  downloadable as CSV or ZIP; locations, hosts or session kinds can be left out.
 - **Site admins**: organizers can make people site admins, who open the admin pages after signing in
   with a password or email code. The first one is made through a one-time link the server logs.
 - **Verified events**: organizers choose per event whether attendees must prove who they are. New
   events are verified; existing events stay open.
 - **Personal join links**: organizers make a link for a guest, or mail new links to all or chosen
   guests. Opening it signs the guest in and adds them to the event.
-- **Guests without an email** (#1331): organizers can add guests and import CSV rows with no email
-  or a username only. Such guests sign in with a join link and can set a password themselves.
-- **Choose events when adding or editing a user** (#1335): the event checkboxes stay ticked after
-  adding a user, so several users can join the same events quickly.
-- **New days default their booking window** (#1330): "Bookings open" and "Bookings close" follow the
-  day's start and end until you edit them.
-- **Placeholder for locations without an image** (#1334): the admin list and the schedule show a
-  picture stand-in instead of a blank space.
+- **Guests without an email**
+  ([#1331](https://github.com/schellingboard/schellingboard/issues/1331)): organizers can add guests
+  and import CSV rows with no email or a username only. Such guests sign in with a join link and can
+  set a password themselves.
+- **Choose events when adding or editing a user**
+  ([#1335](https://github.com/schellingboard/schellingboard/issues/1335)): the event checkboxes stay
+  ticked after adding a user, so several users can join the same events quickly.
+- **New days default their booking window**
+  ([#1330](https://github.com/schellingboard/schellingboard/issues/1330)): "Bookings open" and
+  "Bookings close" follow the day's start and end until you edit them.
+- **Placeholder for locations without an image**
+  ([#1334](https://github.com/schellingboard/schellingboard/issues/1334)): the admin list and the
+  schedule show a picture stand-in instead of a blank space.
 - **Failed changes now say what failed**: a refused or unsaved RSVP, comment or attendee count names
   the session and the reason, and says when it might not have been saved.
-- **Admins see when a newer release is out** (#788): a red dot beside the footer's version names the
-  latest release and links to how to update. Turn the look-up off with `SB_UPDATE_CHECK=false`.
+- **Admins see when a newer release is out**
+  ([#788](https://github.com/schellingboard/schellingboard/issues/788)): a red dot beside the
+  footer's version names the latest release and links to how to update. Turn the look-up off with
+  `SB_UPDATE_CHECK=false`.
 - **The schedule opens without a connection**: it shows what your device last saved, marked as
   possibly out of date. After a site upgrade an open page offers a reload; kiosk screens reload by
   themselves.
-- **The schedule updates without a reload** (#1111): session changes, RSVP counts, rooms and days
-  appear for everyone as they happen, in the grid, agenda and kiosk. A note on the schedule says
-  when it is live, reconnecting, or not updating.
-- **An API for scripts and integrations** (#677): organizers can set up events, rooms, guests and
-  sessions from a script over a documented, versioned API, with a reference at `/api/v1/docs`. Edits
-  made from an outdated copy are refused, not overwritten, and long lists come in pages.
+- **The schedule updates without a reload**
+  ([#1111](https://github.com/schellingboard/schellingboard/issues/1111)): session changes, RSVP
+  counts, rooms and days appear for everyone as they happen, in the grid, agenda and kiosk. A note
+  on the schedule says when it is live, reconnecting, or not updating.
+- **An API for scripts and integrations**
+  ([#677](https://github.com/schellingboard/schellingboard/issues/677)): organizers can set up
+  events, rooms, guests and sessions from a script over a documented, versioned API, with a
+  reference at `/api/v1/docs`. Edits made from an outdated copy are refused, not overwritten, and
+  long lists come in pages.
 
 ### Changed
 
@@ -69,11 +82,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   and a short message says who was asked, instead of a "Done" step. It stays while you hover it.
 - **Choose your name with the keyboard**: in "Who are you?", the arrow keys move through the names
   and Enter picks one; typing makes the first match ready to pick.
-- **Search for a time zone** (#1329): an event's time zone is a searchable field instead of a long
-  list.
-- **Hosts see the vote breakdown of their own proposals during voting** (#1383): turnout and the
-  split across the three choices, for hosts only; it stays hidden from everyone else until
-  scheduling.
+- **Search for a time zone**
+  ([#1329](https://github.com/schellingboard/schellingboard/issues/1329)): an event's time zone is a
+  searchable field instead of a long list.
+- **Hosts see the vote breakdown of their own proposals during voting**
+  ([#1383](https://github.com/schellingboard/schellingboard/issues/1383)): turnout and the split
+  across the three choices, for hosts only; it stays hidden from everyone else until scheduling.
 - **Site admins replace the admin password**: sign in at `/admin` as a site admin; the server logs a
   link for the first one at start, and `ADMIN_PASSWORD` now only logs a warning. Scripts sign in
   through `/api/v1/auth/login` instead of `/api/auth/login`.
@@ -84,9 +98,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   moved to an Account security page linked from Settings.
 - **Deleting a day or location now tells RSVPed guests**: attendees whose session is removed or
   moved by it are notified, in the app and by email or push as their settings allow.
-- **Self-hosters behind a reverse proxy must set `SB_TRUSTED_PROXIES`** (#679): the app no longer
-  trusts the forwarded address by default, so without it all visitors share one limit on failed
-  logins.
+- **Self-hosters behind a reverse proxy must set `SB_TRUSTED_PROXIES`**
+  ([#679](https://github.com/schellingboard/schellingboard/issues/679)): the app no longer trusts
+  the forwarded address by default, so without it all visitors share one limit on failed logins.
 - **Everyone signs in again once; sessions then last 30 days from last use**: you stay signed in
   while you visit at least monthly. Before, a sign-in expired after 7 days.
 
@@ -99,10 +113,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
-- **"Now the host" email for a sole host** (#954): when you become a session's only host, the email
-  says you are the host instead of a co-host.
-- **The RSVP clash warning lists every clash** (#1042): it used to name only the first session or
-  1-on-1 it overlaps.
+- **"Now the host" email for a sole host**
+  ([#954](https://github.com/schellingboard/schellingboard/issues/954)): when you become a session's
+  only host, the email says you are the host instead of a co-host.
+- **The RSVP clash warning lists every clash**
+  ([#1042](https://github.com/schellingboard/schellingboard/issues/1042)): it used to name only the
+  first session or 1-on-1 it overlaps.
 - **The schedule stays visible after an event ends**: it used to be replaced by "Event unavailable"
   once the scheduling phase was over.
 - **Room descriptions no longer slide over the time column**: scrolling the schedule sideways showed
@@ -113,18 +129,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   pop-up used to scroll the page underneath.
 - **Hosts are told when deleting a day or location removes or moves their session**: until now only
   guests who RSVPed were.
-- **A proposal says "proposal", not "session"** (#1338): the hosting prompt and its button on a
-  proposal now read "Host this proposal".
-- **Form fields no longer zoom the page on phones** (#1333): tapping a text field used to zoom in on
-  some phones.
-- **Closing a window no longer loses what you typed** (#1361): Esc, the close button or a click
-  outside asks before discarding an unsent comment or message.
-- **A double click or double submit no longer repeats the action** (#141): proposals, sessions,
+- **A proposal says "proposal", not "session"**
+  ([#1338](https://github.com/schellingboard/schellingboard/issues/1338)): the hosting prompt and
+  its button on a proposal now read "Host this proposal".
+- **Form fields no longer zoom the page on phones**
+  ([#1333](https://github.com/schellingboard/schellingboard/issues/1333)): tapping a text field used
+  to zoom in on some phones.
+- **Closing a window no longer loses what you typed**
+  ([#1361](https://github.com/schellingboard/schellingboard/issues/1361)): Esc, the close button or
+  a click outside asks before discarding an unsent comment or message.
+- **A double click or double submit no longer repeats the action**
+  ([#141](https://github.com/schellingboard/schellingboard/issues/141)): proposals, sessions,
   comments and RSVPs sent twice by a slow connection or a retry count once.
 - **Deleting a guest deletes their photo too**: it used to stay on the server.
-- **Edits no longer overwrite each other** (#1111): saving a session, proposal, event setting,
-  profile, guest, day, room or meeting point from a form someone changed in the meantime now says
-  so, instead of silently undoing their change.
+- **Edits no longer overwrite each other**
+  ([#1111](https://github.com/schellingboard/schellingboard/issues/1111)): saving a session,
+  proposal, event setting, profile, guest, day, room or meeting point from a form someone changed in
+  the meantime now says so, instead of silently undoing their change.
 - **Edit opens the session form reliably**: on a slow device, pressing Edit in a session's details
   sometimes left you on the schedule.
 - **Edit in session details opens in a new tab**: Ctrl/Cmd-click on Edit used to close the details
@@ -141,8 +162,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - **Longer 1-on-1s**: when you ask someone for a 1-on-1 you can choose its length, such as 50
   minutes instead of 20, as long as they are free for all of it.
-- **Location unavailability** (#1059): organizers can mark when locations can't be used, several at
-  once, such as a room only free on Saturday, instead of filling the grid with blockers.
+- **Location unavailability**
+  ([#1059](https://github.com/schellingboard/schellingboard/issues/1059)): organizers can mark when
+  locations can't be used, several at once, such as a room only free on Saturday, instead of filling
+  the grid with blockers.
 - **Sessions at any minute, with or without a break**: organizers can place a session at any time,
   not just on the schedule's slots, and leave out the break before one, such as an opening keynote.
 - **Clear a search with one tap**: every search box shows an × while it holds text, which empties it
@@ -150,27 +173,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Search the schedule**: a search box above the Grid and Agenda views finds sessions by title,
   description, host or room, and your 1-on-1s by name; on the grid, arrows step from one match to
   the next.
-- **Sort proposals by last update** (#778): the proposal list opens with new and freshly edited
-  proposals first, and its Sort by menu now shows on every screen size. Votes and comments don't
-  count as updates.
-- **Find and take on proposals that want a host** (#774, #775): a Host wanted filter lists proposals
-  with no host or whose hosts ask for a co-host, and one click makes you a host.
-- **Comments in Quick Voting** (#780, #781): each proposal shows its discussion below it, and its
-  title opens the full proposal to join in; closing it returns you to Quick Voting.
+- **Sort proposals by last update**
+  ([#778](https://github.com/schellingboard/schellingboard/issues/778)): the proposal list opens
+  with new and freshly edited proposals first, and its Sort by menu now shows on every screen size.
+  Votes and comments don't count as updates.
+- **Find and take on proposals that want a host**
+  ([#774](https://github.com/schellingboard/schellingboard/issues/774),
+  [#775](https://github.com/schellingboard/schellingboard/issues/775)): a Host wanted filter lists
+  proposals with no host or whose hosts ask for a co-host, and one click makes you a host.
+- **Comments in Quick Voting** ([#780](https://github.com/schellingboard/schellingboard/issues/780),
+  [#781](https://github.com/schellingboard/schellingboard/issues/781)): each proposal shows its
+  discussion below it, and its title opens the full proposal to join in; closing it returns you to
+  Quick Voting.
 - **Filter the schedule to your own sessions**: My sessions, RSVP'd and Hosting narrow the Grid and
   Agenda views to what you are attending or hosting.
 
 ### Changed
 
-- **Editing or deleting a session is quicker** (#1005): it no longer waits for every attendee's
-  email before saving; they hear a moment later, and failed notification emails are retried.
+- **Editing or deleting a session is quicker**
+  ([#1005](https://github.com/schellingboard/schellingboard/issues/1005)): it no longer waits for
+  every attendee's email before saving; they hear a moment later, and failed notification emails are
+  retried.
 - **Clearer Delete, and a Cancel button**: proposal and session edit forms gain Cancel to leave
   without saving; Delete now has a trash icon, sits apart from Submit, and is confirmed with a red
   Delete button instead of Yes.
-- **1-on-1s open with the scheduling phase** (#952): before it, there is no schedule to fit them
-  around, so attendees can no longer offer, ask for or answer 1-on-1s then.
-- **Scheduled proposals say so** (#853): the forms to schedule or edit a proposal that is already on
-  the schedule link to its sessions and explain that they don't follow the proposal.
+- **1-on-1s open with the scheduling phase**
+  ([#952](https://github.com/schellingboard/schellingboard/issues/952)): before it, there is no
+  schedule to fit them around, so attendees can no longer offer, ask for or answer 1-on-1s then.
+- **Scheduled proposals say so**
+  ([#853](https://github.com/schellingboard/schellingboard/issues/853)): the forms to schedule or
+  edit a proposal that is already on the schedule link to its sessions and explain that they don't
+  follow the proposal.
 - **Quicker session setup for organizers**: the admin session form takes a day and two times instead
   of two full dates, offers All locations and Duplicate (e.g. lunch on every day), and fills in the
   room's capacity.
@@ -188,12 +221,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   schedule now also tells where the room is and how many fit, not just at the top of the grid.
 - **The "Open to 1-on-1s" filter only shows when 1-on-1s are on**: the attendee directory hides it
   unless at least one event has 1-on-1s enabled.
-- **Confirmed 1-on-1s carry the agenda's booked mark** (#1047): the same check as on a session you
-  have RSVP'd to, so everything you are booked into is marked alike.
+- **Confirmed 1-on-1s carry the agenda's booked mark**
+  ([#1047](https://github.com/schellingboard/schellingboard/issues/1047)): the same check as on a
+  session you have RSVP'd to, so everything you are booked into is marked alike.
 - **A tidier site password page**: just the password box and the footer, on one screen. It used to
   sit under an empty header and scroll.
-- **Event dates come from its days** (#1058): creating an event no longer asks for start and end
-  dates; the dates shown are those of the days you add. The event creation API ignores them too.
+- **Event dates come from its days**
+  ([#1058](https://github.com/schellingboard/schellingboard/issues/1058)): creating an event no
+  longer asks for start and end dates; the dates shown are those of the days you add. The event
+  creation API ignores them too.
 - **SchellingBoard has a new home on GitHub**: the source, the issue tracker and the changelog now
   live at github.com/schellingboard/schellingboard, and every link in the app points there.
 - **The Agenda view is out of beta**: it no longer carries a beta label or notice.
@@ -202,8 +238,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - **The Text and RSVP'd schedule views are gone**: the Agenda, with its search and its My sessions,
   RSVP'd and Hosting filters, does what they did.
-- **Locations no longer have a Hidden setting** (#855): to take a room off an event's schedule,
-  unassign it from the event. Hidden rooms are unassigned when you upgrade.
+- **Locations no longer have a Hidden setting**
+  ([#855](https://github.com/schellingboard/schellingboard/issues/855)): to take a room off an
+  event's schedule, unassign it from the event. Hidden rooms are unassigned when you upgrade.
 
 ### Fixed
 
@@ -214,8 +251,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   moment later and push every room to the right.
 - **Empty required fields no longer show as errors on load**: they now turn red only after you leave
   one empty or try to submit the form.
-- **The proposals table fits on narrow screens** (#847): on tablet-sized screens, the Edit and
-  Schedule buttons, votes and durations used to be cut off, and vote buttons overlapped them.
+- **The proposals table fits on narrow screens**
+  ([#847](https://github.com/schellingboard/schellingboard/issues/847)): on tablet-sized screens,
+  the Edit and Schedule buttons, votes and durations used to be cut off, and vote buttons overlapped
+  them.
 - **Editing a session keeps all its rooms**: a host's edit used to reduce a session that an
   organizer had put in several rooms to one room.
 - **Session details list every room**: a session held in several rooms showed only one of them in
@@ -224,21 +263,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   its buttons, instead of at the top of the page, often out of sight.
 - **Searching sessions and proposals keeps up with typing**: the results now update once you pause,
   instead of after every keystroke, which could make typing stutter on large events.
-- **1-on-1s start after the break, like sessions** (#1049): a 1-on-1 in the 12:00 slot now reads
-  12:10 wherever it is shown, and sits with that slot's sessions on the agenda instead of ten
-  minutes ahead of them.
+- **1-on-1s start after the break, like sessions**
+  ([#1049](https://github.com/schellingboard/schellingboard/issues/1049)): a 1-on-1 in the 12:00
+  slot now reads 12:10 wherever it is shown, and sits with that slot's sessions on the agenda
+  instead of ten minutes ahead of them.
 - **Saving an outdated proposal form no longer undoes newer changes**: if the proposal changed while
   you were editing it, such as a co-host joining, the save is refused.
 
 ### Internal
 
-- **Next.js is gone** (#1339): the server is its own Node process serving the API and the web app.
+- **Next.js is gone** ([#1339](https://github.com/schellingboard/schellingboard/issues/1339)): the
+  server is its own Node process serving the API and the web app.
 - **Developer docs are published** at developers.schellingboard.org from `main`, with interactive
   architecture diagrams; `CONTRIBUTING.md` is now a short entry point into them.
-- **Tests name the use cases they cover** (#1084): every E2E test is tagged from a catalogue of use
-  cases, and `make use-cases` reports gaps and over-tested ones.
-- **Domain and contracts are workspace packages** (#965): they replace `model/` and take the entity
-  types out of `db/`, with CI-enforced boundaries (ADR 0010).
+- **Tests name the use cases they cover**
+  ([#1084](https://github.com/schellingboard/schellingboard/issues/1084)): every E2E test is tagged
+  from a catalogue of use cases, and `make use-cases` reports gaps and over-tested ones.
+- **Domain and contracts are workspace packages**
+  ([#965](https://github.com/schellingboard/schellingboard/issues/965)): they replace `model/` and
+  take the entity types out of `db/`, with CI-enforced boundaries (ADR 0010).
 
 ## [3.8.1] - 2026-09-24
 
@@ -251,25 +294,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- **Hosts set a session's max attendees** (#1032): the session form starts at what the room holds
-  and the host can change it — lower for a hands-on session, higher for standing room, 0 for no
-  limit
-- **Shuffle the attendee directory** (#1037): "Sort by → Random" reorders everyone, and draws a new
-  order on every page load, so 1-on-1 requests don't all land on the names at the top of the
-  alphabet
+- **Hosts set a session's max attendees**
+  ([#1032](https://github.com/schellingboard/schellingboard/issues/1032)): the session form starts
+  at what the room holds and the host can change it — lower for a hands-on session, higher for
+  standing room, 0 for no limit
+- **Shuffle the attendee directory**
+  ([#1037](https://github.com/schellingboard/schellingboard/issues/1037)): "Sort by → Random"
+  reorders everyone, and draws a new order on every page load, so 1-on-1 requests don't all land on
+  the names at the top of the alphabet
 
 ### Changed
 
-- **Hosts can edit more of their sessions** (#1027): one that has already started is editable apart
-  from its start, and one an organizer placed outside bookable hours or in a room nobody may book
-  can be fixed without being forced to move it first.
-- **1-on-1 details link to the other attendee** (#1020): their name in the request's heading now
-  opens their profile.
+- **Hosts can edit more of their sessions**
+  ([#1027](https://github.com/schellingboard/schellingboard/issues/1027)): one that has already
+  started is editable apart from its start, and one an organizer placed outside bookable hours or in
+  a room nobody may book can be fixed without being forced to move it first.
+- **1-on-1 details link to the other attendee**
+  ([#1020](https://github.com/schellingboard/schellingboard/issues/1020)): their name in the
+  request's heading now opens their profile.
 
 ### Fixed
 
-- **RSVPing over a 1-on-1 warns you** (#1033): the clash warning only knew about sessions, so a
-  session overlapping a confirmed 1-on-1 could be RSVP'd without a word
+- **RSVPing over a 1-on-1 warns you**
+  ([#1033](https://github.com/schellingboard/schellingboard/issues/1033)): the clash warning only
+  knew about sessions, so a session overlapping a confirmed 1-on-1 could be RSVP'd without a word
 
 ## [3.7.0] - 2026-09-11
 
@@ -284,10 +332,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
-- **Your 1-on-1s in the Text and RSVP'd views** (#1023): Text lists them among the sessions and
-  RSVP'd the confirmed ones, where until now only the Grid view showed them
-- **Links to another attendee open their profile** (#1022): following one from inside an open
-  profile — a comment's author, say — left the old one on screen. Closing still returns to the list
+- **Your 1-on-1s in the Text and RSVP'd views**
+  ([#1023](https://github.com/schellingboard/schellingboard/issues/1023)): Text lists them among the
+  sessions and RSVP'd the confirmed ones, where until now only the Grid view showed them
+- **Links to another attendee open their profile**
+  ([#1022](https://github.com/schellingboard/schellingboard/issues/1022)): following one from inside
+  an open profile — a comment's author, say — left the old one on screen. Closing still returns to
+  the list
 - **Theme switch centred in the footer**: on wider screens it sits in the middle of the page rather
   than off to one side
 
@@ -295,50 +346,66 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- **Install it on your phone** (#317): attendees can add the site to their home screen and open it
-  like an app — its own icon, its own window, and no browser address bar taking up a line of the
-  schedule. Nothing changes for anyone who doesn't install it
-- **Notifications on your phone** (#317): Settings has a new **Notifications on this device**
-  section that sends the notifications you already get to the phone or laptop itself, so they arrive
-  while the site is closed. Each device is turned on separately and gets all of them — the email
-  settings only govern email. On iPhone and iPad the site has to be on your home screen first. Needs
-  the site to be served over HTTPS
-- **The schedule shows where you are in the day** (#863): a red line marks the current time and a
-  "Now" button jumps to it, both while the event is running — until now the line was only drawn on
-  kiosks
-- **In-app notifications** (#750): a bell in the header counts what is waiting, and the
-  notifications page lists everything newest first. Anything that emails you appears here too, so an
-  event with no email set up still reaches its attendees
-- **Delete or mark read the notifications you tick** (#936): a checkbox per row and a page-wide
-  "Select all" drive Mark as read and Delete; with nothing ticked the buttons do nothing, and
-  deleting asks first because it cannot be undone
-- **1-on-1 meetings, set up by the organizer** (#392): an event's Config tab gains a Meetings
-  section — switch 1-on-1s on, list the places you suggest people meet, and cap how many unanswered
-  requests one attendee may have out at a time
-- **Asking an attendee for a 1-on-1** (#392): attendees mark the slots they are free for under
-  Settings, ask someone from their profile, and accept or decline what they are asked. Both sides
-  are told the outcome; an unanswered request lapses at its slot
-- **Your 1-on-1s on the schedule** (#392): the grid's first column is yours alone — agreed 1-on-1s
-  and open requests, stacked where several share a slot. Hover for what it clashes with, tap to open
-  or cancel it
-- **Arrange a 1-on-1 straight from the schedule** (#945): tapping an empty slot in your 1-on-1
-  column lists who is free then, profile links included, and the request form follows on
-- **Say why, when you call a 1-on-1 off** (#946): cancelling takes an optional note, which the other
-  person reads on the meeting itself
-- **Find the attendees who are open to 1-on-1s** (#945): a new filter in the attendee directory,
-  beside Session host and Has profile. It covers every event on the site, not only this one
-- **Hosts can record how many people came** (#852): a finished session offers its hosts a field for
-  the real attendance figure. Only its hosts see it, and 0 means "held, nobody came"
-- **Two reminders nudge hosts to count the room** (#852): an hour before a session starts and a
-  quarter of an hour after it ends, in the app and — where email is set up — by email
+- **Install it on your phone**
+  ([#317](https://github.com/schellingboard/schellingboard/issues/317)): attendees can add the site
+  to their home screen and open it like an app — its own icon, its own window, and no browser
+  address bar taking up a line of the schedule. Nothing changes for anyone who doesn't install it
+- **Notifications on your phone**
+  ([#317](https://github.com/schellingboard/schellingboard/issues/317)): Settings has a new
+  **Notifications on this device** section that sends the notifications you already get to the phone
+  or laptop itself, so they arrive while the site is closed. Each device is turned on separately and
+  gets all of them — the email settings only govern email. On iPhone and iPad the site has to be on
+  your home screen first. Needs the site to be served over HTTPS
+- **The schedule shows where you are in the day**
+  ([#863](https://github.com/schellingboard/schellingboard/issues/863)): a red line marks the
+  current time and a "Now" button jumps to it, both while the event is running — until now the line
+  was only drawn on kiosks
+- **In-app notifications** ([#750](https://github.com/schellingboard/schellingboard/issues/750)): a
+  bell in the header counts what is waiting, and the notifications page lists everything newest
+  first. Anything that emails you appears here too, so an event with no email set up still reaches
+  its attendees
+- **Delete or mark read the notifications you tick**
+  ([#936](https://github.com/schellingboard/schellingboard/issues/936)): a checkbox per row and a
+  page-wide "Select all" drive Mark as read and Delete; with nothing ticked the buttons do nothing,
+  and deleting asks first because it cannot be undone
+- **1-on-1 meetings, set up by the organizer**
+  ([#392](https://github.com/schellingboard/schellingboard/issues/392)): an event's Config tab gains
+  a Meetings section — switch 1-on-1s on, list the places you suggest people meet, and cap how many
+  unanswered requests one attendee may have out at a time
+- **Asking an attendee for a 1-on-1**
+  ([#392](https://github.com/schellingboard/schellingboard/issues/392)): attendees mark the slots
+  they are free for under Settings, ask someone from their profile, and accept or decline what they
+  are asked. Both sides are told the outcome; an unanswered request lapses at its slot
+- **Your 1-on-1s on the schedule**
+  ([#392](https://github.com/schellingboard/schellingboard/issues/392)): the grid's first column is
+  yours alone — agreed 1-on-1s and open requests, stacked where several share a slot. Hover for what
+  it clashes with, tap to open or cancel it
+- **Arrange a 1-on-1 straight from the schedule**
+  ([#945](https://github.com/schellingboard/schellingboard/issues/945)): tapping an empty slot in
+  your 1-on-1 column lists who is free then, profile links included, and the request form follows on
+- **Say why, when you call a 1-on-1 off**
+  ([#946](https://github.com/schellingboard/schellingboard/issues/946)): cancelling takes an
+  optional note, which the other person reads on the meeting itself
+- **Find the attendees who are open to 1-on-1s**
+  ([#945](https://github.com/schellingboard/schellingboard/issues/945)): a new filter in the
+  attendee directory, beside Session host and Has profile. It covers every event on the site, not
+  only this one
+- **Hosts can record how many people came**
+  ([#852](https://github.com/schellingboard/schellingboard/issues/852)): a finished session offers
+  its hosts a field for the real attendance figure. Only its hosts see it, and 0 means "held, nobody
+  came"
+- **Two reminders nudge hosts to count the room**
+  ([#852](https://github.com/schellingboard/schellingboard/issues/852)): an hour before a session
+  starts and a quarter of an hour after it ends, in the app and — where email is set up — by email
 
 ### Changed
 
 - **Reading on while a profile is still sliding**: pressing Next or Prev — or swiping again — during
   the slide now moves on another profile instead of being ignored until it lands, so reading through
   the directory keeps up with the finger. Before, every press that arrived mid-slide was lost
-- **Session save confirmations clear themselves** (#859): the message confirming a session was
-  added, updated or deleted now goes after ten seconds instead of waiting to be closed
+- **Session save confirmations clear themselves**
+  ([#859](https://github.com/schellingboard/schellingboard/issues/859)): the message confirming a
+  session was added, updated or deleted now goes after ten seconds instead of waiting to be closed
 - **Schedule details wait until you stop moving**: the pop-up on a session, 1-on-1 or room name now
   appears once the mouse rests on it, instead of at every block the cursor crosses on its way
 - **Every pop-up closes the same way**: a small × in the top right corner. Some used to end instead
@@ -354,31 +421,40 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Picking your name works however many events a site runs**: from about seven events on, the
   header's event links crowded the name chip off the row, leaving no way to say who you are. The
   links now scroll instead of pushing
-- **Picking your name is less fiddly** (#777): the search box is focused as soon as the "My name is"
-  box opens, and erasing what you typed no longer closes the box
-- **The password prompt names the account it is asking about** (#777): choosing a protected name
+- **Picking your name is less fiddly**
+  ([#777](https://github.com/schellingboard/schellingboard/issues/777)): the search box is focused
+  as soon as the "My name is" box opens, and erasing what you typed no longer closes the box
+- **The password prompt names the account it is asking about**
+  ([#777](https://github.com/schellingboard/schellingboard/issues/777)): choosing a protected name
   left a blank password box with nothing to say whose password it wanted
-- **Account settings says why enabling protection failed** (#716): on a site with no email set up,
-  "Enable protection" looked like it did nothing at all
-- **A comment opened from an email no longer strands the page it lands on** (#930): a link to a
-  comment on a long profile could leave the profile scrolled under its own header
-- **A deleted name no longer leaves you half logged in** (#931): the header asked you to pick a name
-  again while the comment box still let you post, and posting then failed
+- **Account settings says why enabling protection failed**
+  ([#716](https://github.com/schellingboard/schellingboard/issues/716)): on a site with no email set
+  up, "Enable protection" looked like it did nothing at all
+- **A comment opened from an email no longer strands the page it lands on**
+  ([#930](https://github.com/schellingboard/schellingboard/issues/930)): a link to a comment on a
+  long profile could leave the profile scrolled under its own header
+- **A deleted name no longer leaves you half logged in**
+  ([#931](https://github.com/schellingboard/schellingboard/issues/931)): the header asked you to
+  pick a name again while the comment box still let you post, and posting then failed
 - **Kiosk displays move to the current time as soon as the day starts**: a display left on overnight
   sat at the top of the schedule for up to three minutes after the first slot began
 - **A modal closed while still opening no longer gets stuck**: pressing Escape or Close before a
   modal had finished fading in could leave it open with no way out but a reload
-- **Pull to refresh works on the schedule again** (#858): on a phone, pulling down from the top
-  reloads it — a deliberate pull, so panning the grid never reloads by accident
-- **The schedule keeps your place** (#860): adding or editing a session, or coming back to the
-  schedule from another page, used to return you to its top-left corner
+- **Pull to refresh works on the schedule again**
+  ([#858](https://github.com/schellingboard/schellingboard/issues/858)): on a phone, pulling down
+  from the top reloads it — a deliberate pull, so panning the grid never reloads by accident
+- **The schedule keeps your place**
+  ([#860](https://github.com/schellingboard/schellingboard/issues/860)): adding or editing a
+  session, or coming back to the schedule from another page, used to return you to its top-left
+  corner
 - **Leaving an event page while your RSVPs and votes are still loading is quiet**: the browser
   cancels those requests on the way out, and the page used to log each as an error
 
 ### Internal
 
-- **`make arch` checks the module graph** (#965) for circular dependencies and layer violations, and
-  runs as part of `make precommit`. See `docs/dev/architecture-rules.md`
+- **`make arch` checks the module graph**
+  ([#965](https://github.com/schellingboard/schellingboard/issues/965)) for circular dependencies
+  and layer violations, and runs as part of `make precommit`. See `docs/dev/architecture-rules.md`
 - **Lint bans ambient clock reads** in `app/`, `db/`, `emails/`, `model/` and `utils/`: "now" comes
   from the request boundary, so the dev fake clock cannot be bypassed. See ADR 0004
 - **The dev server accepts a Cloudflare quick tunnel as an origin**, so the site can be tried on a
