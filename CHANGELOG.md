@@ -47,6 +47,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Long lists are split into pages** (#831): the proposals list and the attendee directory show 50
+  at a time, with page numbers and a choice of 25, 50 or 100; the page stays in the address.
 - **Tidier proposal and attendee filters**: search fills the width beside Sort by, filter chips and
   the result count below it; no empty corners on phones.
 - **The side panel has no share button**: its icon was hard to read. A session's link is still the

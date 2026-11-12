@@ -71,7 +71,8 @@ function setup(
   params = ""
 ) {
   const onVote = vi.fn();
-  const onParamsChange = vi.fn<(params: URLSearchParams) => void>();
+  const onParamsChange =
+    vi.fn<(params: URLSearchParams, options?: { push?: boolean }) => void>();
   const snapshot: Snapshot = {
     ...fixture,
     now: iso(10),
@@ -92,8 +93,8 @@ function setup(
         standings={standings}
         onVote={onVote}
         params={current}
-        onParamsChange={(next) => {
-          onParamsChange(next);
+        onParamsChange={(next, options) => {
+          onParamsChange(next, options);
           setCurrent(next);
         }}
       />
@@ -525,5 +526,113 @@ describe("the proposals list", () => {
         "No host yet"
       )
     ).toBeTruthy();
+  });
+});
+
+describe("paging the proposals list", { tags: ["006-US3"] }, () => {
+  const many = Array.from({ length: 120 }, (_, i) =>
+    proposal(`p${String(i).padStart(3, "0")}`, {
+      title: `Idea ${String(i).padStart(3, "0")}`,
+    })
+  );
+  const first = () => within(screen.getByRole("table"));
+
+  it("shows 50 proposals a page, counts all of them and keeps the page in the address", async () => {
+    const user = userEvent.setup();
+    const { onParamsChange } = setup("voting", { proposals: many });
+
+    expect(titles(screen.getByRole("table"))).toHaveLength(50);
+    expect(screen.getByText("120 results", { selector: "p" })).toBeTruthy();
+
+    await user.click(screen.getByRole("button", { name: "Page 3" }));
+
+    expect(onParamsChange.mock.lastCall![0].toString()).toBe("page=3");
+    expect(onParamsChange.mock.lastCall![1]).toEqual({ push: true });
+    expect(titles(screen.getByRole("table"))[0]).toBe("Idea 100");
+    expect(titles(screen.getByRole("table"))).toHaveLength(20);
+  });
+
+  it("opens the page and size the address asks for", () => {
+    setup("voting", { proposals: many }, new Map(), "page=2&pageSize=25");
+
+    expect(titles(screen.getByRole("table"))[0]).toBe("Idea 025");
+    expect(
+      screen.getByRole("combobox", { name: "Rows per page" })
+    ).toHaveProperty("value", "25");
+  });
+
+  it("goes back to page 1 when the filter changes", async () => {
+    const user = userEvent.setup();
+    const { onParamsChange } = setup(
+      "voting",
+      { proposals: many },
+      new Map(),
+      "page=3&pageSize=25"
+    );
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Filter to show only proposals that want a host",
+      })
+    );
+
+    expect(onParamsChange.mock.lastCall![0].toString()).toBe(
+      "pageSize=25&filter=hostWanted"
+    );
+  });
+
+  it("shows the last page for a page past the end, and no second count", () => {
+    setup("voting", { proposals: many }, new Map(), "page=99");
+
+    expect(titles(screen.getByRole("table"))[0]).toBe("Idea 100");
+    expect(
+      screen
+        .getByRole("button", { name: "Page 3" })
+        .getAttribute("aria-current")
+    ).toBe("page");
+    expect(screen.getAllByText("120 results")).toHaveLength(1);
+  });
+
+  it("goes back to page 1 on a new search", async () => {
+    const user = userEvent.setup();
+    const { onParamsChange } = setup(
+      "voting",
+      { proposals: many },
+      new Map(),
+      "page=3"
+    );
+
+    await user.type(
+      screen.getByRole("searchbox", { name: "Search proposals" }),
+      "Idea"
+    );
+
+    await waitFor(() =>
+      expect(onParamsChange.mock.lastCall![0].toString()).toBe("q=Idea")
+    );
+  });
+
+  it("scrolls to the top of the list on a page change", async () => {
+    const user = userEvent.setup();
+    const scroll = vi.fn();
+    Element.prototype.scrollIntoView = scroll;
+    setup("voting", { proposals: many });
+
+    await user.click(screen.getByRole("button", { name: "Next page" }));
+
+    expect(scroll).toHaveBeenCalledWith({ block: "start" });
+  });
+
+  it("has no pager when nothing matches, whatever the page size", () => {
+    setup("voting", { proposals: many }, new Map(), "pageSize=25&q=zzzzqq");
+
+    expect(screen.queryByRole("navigation", { name: "Pagination" })).toBeNull();
+  });
+
+  it("has no pager for a short list", () => {
+    setup("voting");
+
+    expect(screen.queryByRole("navigation", { name: "Pagination" })).toBeNull();
+    expect(first().getAllByRole("row")).toHaveLength(4);
   });
 });

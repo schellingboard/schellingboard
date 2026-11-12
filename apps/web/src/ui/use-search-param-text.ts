@@ -28,6 +28,7 @@ export function useSearchParamText(
     const next = new URLSearchParams(current);
     if (trimmed) next.set("q", trimmed);
     else next.delete("q");
+    next.delete("page");
     change(next);
   }, [searched]);
   return [text, setText, searched] as const;

@@ -439,10 +439,11 @@ _you_; whom you ask, and when, is yours to decide.
 
 ## Attendee directory & profiles
 
-The directory lists everyone at the event on a single page — photo and the first couple of lines of
-their bio, or their first answered conversation starter if they haven't written one — so you can
-read who is coming without opening anything. With a mouse, hovering over a person's name anywhere
-else (hosts, attendees, comments) shows the same photo and short summary in a small card.
+The directory lists everyone at the event, 50 to a page (change it under the list) — photo and the
+first couple of lines of their bio, or their first answered conversation starter if they haven't
+written one — so you can read who is coming without opening anything. With a mouse, hovering over a
+person's name anywhere else (hosts, attendees, comments) shows the same photo and short summary in a
+small card.
 
 ![Searchable attendee directory with avatars, bios, and Session host badges](../screenshots/attendees.webp)
 

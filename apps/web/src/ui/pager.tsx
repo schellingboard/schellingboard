@@ -1,5 +1,7 @@
-export const PAGE_SIZES = [10, 25, 50, 100] as const;
-export const DEFAULT_PAGE_SIZE = 25;
+import type { RefObject } from "react";
+
+export const PAGE_SIZES = [25, 50, 100] as const;
+export const DEFAULT_PAGE_SIZE = 50;
 export type PageSize = number | "all";
 
 const BUTTON =
@@ -21,6 +23,8 @@ export function Pager({
   total,
   onPage,
   onPageSize,
+  showTotal = true,
+  listTop,
 }: {
   page: number;
   totalPages: number;
@@ -28,15 +32,27 @@ export function Pager({
   total: number;
   onPage: (page: number) => void;
   onPageSize?: (size: PageSize) => void;
+  /** False where the list already shows its count above. */
+  showTotal?: boolean;
+  /** Scrolled into view on a page change, as the list is above this pager. */
+  listTop?: RefObject<HTMLElement | null>;
 }) {
+  const goTo = (next: number) => {
+    onPage(next);
+    listTop?.current?.scrollIntoView({ block: "start" });
+  };
   return (
     <nav
       aria-label="Pagination"
       className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm text-fg-muted"
     >
-      <span>
-        {total === 0 ? "0 results" : `${total} result${total === 1 ? "" : "s"}`}
-      </span>
+      {showTotal && (
+        <span>
+          {total === 0
+            ? "0 results"
+            : `${total} result${total === 1 ? "" : "s"}`}
+        </span>
+      )}
       {onPageSize && (
         <label className="flex items-center gap-2">
           Rows per page
@@ -61,7 +77,7 @@ export function Pager({
       <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
-          onClick={() => onPage(1)}
+          onClick={() => goTo(1)}
           disabled={page <= 1}
           aria-label="First page"
           className={BUTTON}
@@ -70,7 +86,7 @@ export function Pager({
         </button>
         <button
           type="button"
-          onClick={() => onPage(page - 1)}
+          onClick={() => goTo(page - 1)}
           disabled={page <= 1}
           aria-label="Previous page"
           className={BUTTON}
@@ -90,7 +106,7 @@ export function Pager({
               <button
                 key={entry}
                 type="button"
-                onClick={() => onPage(entry)}
+                onClick={() => goTo(entry)}
                 aria-label={`Page ${entry}`}
                 aria-current={entry === page ? "page" : undefined}
                 disabled={entry === page}
@@ -103,7 +119,7 @@ export function Pager({
         </span>
         <button
           type="button"
-          onClick={() => onPage(page + 1)}
+          onClick={() => goTo(page + 1)}
           disabled={page >= totalPages}
           aria-label="Next page"
           className={BUTTON}
@@ -112,7 +128,7 @@ export function Pager({
         </button>
         <button
           type="button"
-          onClick={() => onPage(totalPages)}
+          onClick={() => goTo(totalPages)}
           disabled={page >= totalPages}
           aria-label="Last page"
           className={BUTTON}
