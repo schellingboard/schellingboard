@@ -1,15 +1,15 @@
 # SchellingBoard built from source, as the Dockerfile builds it.
 #
-# node_modules comes from bun.lock: every package is fetched by the integrity
-# hash the lockfile already records, and unpacked where bun.lock's key says it
-# lives. So there is no dependency hash to keep in step with Dependabot; a bump
-# to bun.lock is all a new dependency needs.
+# bun2nix installs node_modules with bun itself, from a cache of the packages
+# bun.lock names. Its CLI would write that list to a bun.nix to commit; here it
+# is read from bun.lock as the flake is evaluated, every package fetched by the
+# integrity hash the lockfile records. So there is no generated file or
+# dependency hash to keep in step with Dependabot; a bump to bun.lock is all a
+# new dependency needs.
 {
   lib,
   stdenv,
-  fetchurl,
-  writeText,
-  bun,
+  bun2nix,
   nodejs,
   node-gyp,
   python3,
@@ -17,7 +17,7 @@
   vips,
   makeWrapper,
   autoPatchelfHook,
-  # The version the footer shows; the flake passes the commit.
+  # The commit, for the version the footer shows; the flake passes it.
   appVersion ? "",
 }: let
   # bun.lock is JSON with trailing commas, which builtins.fromJSON refuses.
@@ -43,6 +43,30 @@
     then "v${version}"
     else appVersion;
 
+  # What .dockerignore leaves out, so local databases, env files and the
+  # .jj store of a checkout without .git neither rebuild it nor reach the
+  # store.
+  source = lib.fileset.difference ./. (lib.fileset.unions ([
+      (lib.fileset.maybeMissing ./node_modules)
+      (lib.fileset.maybeMissing ./dist)
+      (lib.fileset.maybeMissing ./apps/web/dist)
+      (lib.fileset.maybeMissing ./apps/web/node_modules)
+      (lib.fileset.maybeMissing ./.git)
+      (lib.fileset.maybeMissing ./.jj)
+      (lib.fileset.maybeMissing ./.flake-hunt)
+      (lib.fileset.maybeMissing ./.e2e-docker)
+      (lib.fileset.maybeMissing ./coverage)
+      (lib.fileset.maybeMissing ./site)
+      ./flake.lock
+    ]
+    ++ map (name: ./. + "/${name}") (lib.filter (name:
+      builtins.match "[.]env.*[.]local|[.]env[.]test|.*[.]nix|.*[.]db(-shm|-wal|-journal)?" name != null)
+    (builtins.attrNames (builtins.readDir ./.)))));
+  src = lib.fileset.toSource {
+    root = ./.;
+    fileset = source;
+  };
+
   # npm's names for this platform; bun.lock tags platform packages with them.
   os = stdenv.hostPlatform.parsed.kernel.name;
   cpu = let
@@ -63,137 +87,83 @@
     in
       !(lib.elem field denied) && (allowed == [] || lib.elem field allowed));
 
-  # One entry per bun.lock package: where it goes, what it is, how to get it.
-  entries = lib.mapAttrsToList (key: value: let
-    ident = builtins.head value;
-    meta =
-      if builtins.length value > 2 && builtins.isAttrs (builtins.elemAt value 2)
-      then builtins.elemAt value 2
-      else {};
-    at = lib.splitString "@" (lib.removePrefix "@" ident);
-    name = (lib.optionalString (lib.hasPrefix "@" ident) "@") + builtins.head at;
-    spec = lib.concatStringsSep "@" (builtins.tail at);
-    # "a/@s/b/c" is node_modules/a/node_modules/@s/b/node_modules/c.
-    segments = let
-      go = parts:
-        if parts == []
-        then []
-        else if lib.hasPrefix "@" (builtins.head parts)
-        then ["${builtins.head parts}/${builtins.elemAt parts 1}"] ++ go (lib.drop 2 parts)
-        else [(builtins.head parts)] ++ go (builtins.tail parts);
+  # bun.lock's packages as bun2nix's bun.nix lists them: a workspace by its
+  # name, an npm package by its name@version. Of the native packages only this
+  # platform's builds: bun skips other systems' and wasm fallbacks (os
+  # "none"). musl builds carry no libc tag in bun.lock, only their name, so
+  # bun tries those too and warns that it could not download them; they would
+  # only leave autoPatchelf a libc it cannot find. bun2nix's CLI also handles
+  # git, tarball and file dependencies; this has no need to yet, and refuses
+  # them.
+  bunNix = {fetchurl, ...}:
+    lib.listToAttrs (lib.concatLists (lib.mapAttrsToList (key: value: let
+      ident = builtins.head value;
+      meta =
+        if builtins.length value > 2 && builtins.isAttrs (builtins.elemAt value 2)
+        then builtins.elemAt value 2
+        else {};
+      at = lib.splitString "@" (lib.removePrefix "@" ident);
+      name = (lib.optionalString (lib.hasPrefix "@" ident) "@") + builtins.head at;
+      spec = lib.concatStringsSep "@" (builtins.tail at);
+      registry = builtins.elemAt value 1;
+      wanted =
+        fits (meta.os or null) os
+        && fits (meta.cpu or null) cpu
+        && !(stdenv.hostPlatform.isGnu && lib.hasInfix "musl" name);
     in
-      go (lib.splitString "/" key);
-  in {
-    inherit name meta segments;
-    path = "node_modules/" + lib.concatStringsSep "/node_modules/" segments;
-    workspace = lib.removePrefix "workspace:" spec;
-    isWorkspace = lib.hasPrefix "workspace:" spec;
-    integrity = lib.last value;
-    version = spec;
-  }) (lock.packages or {});
-
-  # Only this platform's builds of the native packages. musl builds carry no
-  # libc tag in bun.lock, only their name; wasm fallbacks say os "none".
-  wanted = e:
-    e.isWorkspace
-    || (fits (e.meta.os or null) os
-      && fits (e.meta.cpu or null) cpu
-      && !(stdenv.hostPlatform.isGnu && lib.hasInfix "musl" e.name));
-
-  installs = lib.filter wanted entries;
-
-  tarball = e:
-    fetchurl {
-      url = "https://registry.npmjs.org/${e.name}/-/${lib.last (lib.splitString "/" e.name)}-${e.version}.tgz";
-      hash = e.integrity;
-    };
-
-  # Workspaces first: a workspace's own nested dependencies are unpacked
-  # through its link. Shallower paths before deeper ones for the same reason.
-  ordered = lib.sort (a: b:
-    if a.isWorkspace != b.isWorkspace
-    then a.isWorkspace
-    else builtins.length a.segments < builtins.length b.segments)
-  installs;
-
-  bins = e: let
-    bin = e.meta.bin or {};
-  in
-    if builtins.isString bin
-    then {${lib.last (lib.splitString "/" e.name)} = bin;}
-    else bin;
-
-  # Command-line tools at the top level, for the build steps below.
-  linkBins = e:
-    lib.optionalString (builtins.length e.segments == 1) (lib.concatStrings (lib.mapAttrsToList (bin: file: ''
-        mkdir -p node_modules/.bin
-        chmod +x ${e.path}/${file}
-        ln -sf ../${builtins.head e.segments}/${file} node_modules/.bin/${bin}
-      '')
-      (bins e)));
-
-  unpack = e:
-    if e.isWorkspace
-    then ''
-      mkdir -p "$(dirname ${e.path})"
-      ln -s "$PWD/${e.workspace}" ${e.path}
-    ''
-    else
-      ''
-        mkdir -p ${e.path}
-        tar xzf ${tarball e} --strip-components=1 --no-same-owner -C ${e.path}
-      ''
-      + linkBins e;
-
-  # A file of its own: inline, a thousand packages are more than the kernel
-  # lets one environment variable hold.
-  unpackNodeModules = writeText "unpack-node-modules.sh" (lib.concatMapStrings unpack ordered);
+      if lib.hasPrefix "workspace:" spec
+      then let
+        dir = ./. + "/${lib.removePrefix "workspace:" spec}";
+      in [
+        (lib.nameValuePair key (lib.fileset.toSource {
+          root = dir;
+          fileset = lib.fileset.intersection source dir;
+        }))
+      ]
+      else if builtins.length value != 4
+      then throw "bun.lock: ${ident} is not from a registry; generate a bun.nix with bun2nix's CLI instead"
+      else
+        lib.optional wanted (lib.nameValuePair ident (fetchurl {
+          url =
+            if registry != ""
+            then registry
+            else "https://registry.npmjs.org/${name}/-/${lib.last (lib.splitString "/" name)}-${spec}.tgz";
+          hash = lib.last value;
+        })))
+    (lock.packages or {})));
 in
   stdenv.mkDerivation {
     pname = "schellingboard";
     inherit version;
 
-    src = lib.fileset.toSource {
-      root = ./.;
-      # What .dockerignore leaves out, so local databases, env files and the
-      # .jj store of a checkout without .git neither rebuild it nor reach the
-      # store.
-      fileset = lib.fileset.difference ./. (lib.fileset.unions ([
-          (lib.fileset.maybeMissing ./node_modules)
-          (lib.fileset.maybeMissing ./dist)
-          (lib.fileset.maybeMissing ./apps/web/dist)
-          (lib.fileset.maybeMissing ./apps/web/node_modules)
-          (lib.fileset.maybeMissing ./.git)
-          (lib.fileset.maybeMissing ./.jj)
-          (lib.fileset.maybeMissing ./.flake-hunt)
-          (lib.fileset.maybeMissing ./.e2e-docker)
-          (lib.fileset.maybeMissing ./coverage)
-          (lib.fileset.maybeMissing ./site)
-          ./flake.lock
-        ]
-        ++ map (name: ./. + "/${name}") (lib.filter (name:
-          builtins.match "[.]env.*[.]local|[.]env[.]test|.*[.]nix|.*[.]db(-shm|-wal|-journal)?" name != null)
-        (builtins.attrNames (builtins.readDir ./.)))));
-    };
+    inherit src;
 
-    nativeBuildInputs = [bun nodejs node-gyp python3 pkg-config makeWrapper autoPatchelfHook];
+    nativeBuildInputs = [bun2nix.hook nodejs node-gyp python3 pkg-config makeWrapper autoPatchelfHook];
     # The prebuilt build tools (rolldown, lightningcss, tailwind) link against
     # the C++ runtime; sharp is built against nixpkgs' libvips.
     buildInputs = [stdenv.cc.cc.lib vips];
 
-    configurePhase = ''
-      runHook preConfigure
-      export HOME=$TMPDIR
-      source ${unpackNodeModules}
+    bunDeps = bun2nix.fetchBunDeps {
+      inherit bunNix;
+      # Scripts keep running on Node, as in the Docker image.
+      useFakeNode = false;
+    };
+    # The layout the Dockerfile's `bun install` makes, which the install
+    # phase copies from.
+    bunInstallFlags = ["--frozen-lockfile" "--linker=hoisted"];
+    # As in the Docker image, no dependency's install script runs; the native
+    # addons are built below.
+    dontRunLifecycleScripts = true;
+
+    postBunNodeModulesInstallPhase = ''
       chmod -R u+w node_modules
       # Both native addons are built from source below. better-sqlite3's
-      # prebuilt copies include musl ones; sharp's bring their own libvips.
+      # build does nothing while a prebuilt copy for the host is there, and
+      # sharp's bring their own libvips.
       rm -rf node_modules/better-sqlite3/prebuilds node_modules/@img/sharp-*
-      patchShebangs node_modules
       # Their own binaries have to run during the build, before fixup would
       # patch them.
       autoPatchelf node_modules
-      runHook postConfigure
     '';
 
     buildPhase = ''
@@ -202,9 +172,8 @@ in
       node node_modules/vite/bin/vite.js build apps/web
       bun scripts/build-server.ts
 
-      # The native addons against this Node's ABI: better-sqlite3 as the
-      # Dockerfile's deps stage does, sharp against the libvips found by
-      # pkg-config.
+      # The native addons: better-sqlite3 with the SQLite it bundles, sharp
+      # against the libvips found by pkg-config.
       (cd node_modules/better-sqlite3 && node-gyp rebuild --nodedir=${nodejs})
       (cd node_modules/sharp && node-gyp rebuild --directory=src --nodedir=${nodejs})
       runHook postBuild

@@ -1,8 +1,8 @@
-# Compile native modules (better-sqlite3) against Node's ABI
+# The dependencies, in a layer of their own that only a change to the manifests
+# rebuilds. Nothing compiles: better-sqlite3 and sharp ship prebuilt addons.
 FROM node:25-bookworm AS deps
 WORKDIR /app
 COPY --from=oven/bun:1 /usr/local/bin/bun /usr/local/bin/bun
-RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ && rm -rf /var/lib/apt/lists/*
 COPY package.json bun.lock ./
 # A frozen install fails unless every workspace's manifest is present.
 COPY packages/domain/package.json packages/domain/

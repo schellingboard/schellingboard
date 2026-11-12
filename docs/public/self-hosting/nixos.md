@@ -33,8 +33,15 @@ and with all its data in one directory you can back up.
 }
 ```
 
-Point the input at a release tag, e.g. `github:schellingboard/schellingboard/v5.0.0`, to choose when
-the app changes under your attendees. `nix flake update schellingboard` moves it.
+Point the input at a release tag, `github:schellingboard/schellingboard/v<version>`, to choose when
+the app changes under your attendees; the releases after 5.0.0 have the flake. To update, change the
+tag and rebuild. Built from a release tag, the footer shows the release, and the admin sees the
+[update notice](deployment.md#updating) when a newer one is out; built from any other commit, it
+shows the commit.
+
+The package is built with the nixpkgs the flake pins, which is the one its CI tests. To build it
+with your system's nixpkgs instead, so that Node and libvips get the security fixes your system
+gets, add `inputs.schellingboard.inputs.nixpkgs.follows = "nixpkgs";`.
 
 The flake also has `packages.<system>.default` (Linux only) and `overlays.default`, which adds
 `pkgs.schellingboard`.
@@ -92,13 +99,36 @@ the venue's wifi for a trial run, where installing to the home screen is not wan
 ## Data and backups
 
 Everything is in `/var/lib/schellingboard`: `data.db`, the uploaded files, and the generated
-`auth-secret`. Back that directory up as [Backup and restore](backup.md) describes. The service runs
-as a dynamic user, so systemd keeps the directory at `/var/lib/private/schellingboard` and links it
-to the usual path.
+`auth-secret`. The service runs as a dynamic user, so systemd keeps the directory at
+`/var/lib/private/schellingboard` and links it to the usual path. Your `environmentFile` is not in
+it; keep a copy of that with your system's configuration.
+
+As [Backup and restore](backup.md) explains for Docker, never `cp` or `tar` a live `data.db`.
+SQLite's own backup command takes a consistent snapshot while the site runs:
+
+```bash
+DIR=/var/lib/schellingboard
+STAMP=$(date +%Y%m%d-%H%M%S)
+sudo mkdir -p /root/backups
+sudo nix shell nixpkgs#sqlite -c sqlite3 $DIR/data.db ".backup '/root/backups/data-$STAMP.db'"
+sudo tar czf /root/backups/files-$STAMP.tar.gz -C $DIR --exclude='./data.db*' .
+```
+
+To restore, stop the service, put the files back, and give them to the service's user, which is
+whoever owns the directory:
+
+```bash
+sudo systemctl stop schellingboard
+sudo rm -rf $DIR/data.db $DIR/data.db-wal $DIR/data.db-shm $DIR/uploads
+sudo cp /root/backups/data-$STAMP.db $DIR/data.db
+sudo tar xzf /root/backups/files-$STAMP.tar.gz -C $DIR
+sudo chown -R --reference=$DIR/ $DIR/
+sudo systemctl start schellingboard
+```
 
 ## A shell for working on it
 
-The same flake has a development shell with Bun, Node and what the native addons need to compile:
+The same flake has a development shell with Bun, Node, Make and SQLite:
 
 ```bash
 nix develop
