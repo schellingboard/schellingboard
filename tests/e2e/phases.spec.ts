@@ -15,7 +15,7 @@ import { selectUser } from "./helpers/user";
 // Alpha's Lightning Talks, Bob Beta's, Charlie Gamma's) — asserting the
 // buttons are absent for a host would pass no matter what the phase is.
 
-test("proposal phase: proposing is open, voting is not yet available @006-US1", async ({
+test("proposal phase: proposing is open, voting is not yet available @006-US1 @006-US3", async ({
   page,
 }) => {
   await login(page);
@@ -41,6 +41,13 @@ test("proposal phase: proposing is open, voting is not yet available @006-US1", 
   await expect(
     page.getByRole("link", { name: /Add Proposal/i })
   ).not.toHaveClass(/cursor-not-allowed/);
+
+  await expect(
+    page
+      .getByRole("list", { name: "Event phases" })
+      .getByRole("listitem")
+      .filter({ hasText: /^Proposals/ })
+  ).toHaveAttribute("aria-current", "step");
 });
 
 test("voting phase: proposing and voting are open, the schedule is read-only @006-US1 @007-US14", async ({

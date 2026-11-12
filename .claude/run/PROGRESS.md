@@ -14,6 +14,9 @@
 - tests/unit/stats/correlation.test.ts "spearman property" failed once under fast-check in
   `make test-coverage`, passed on rerun; flaky, unrelated.
 
+- #771: `getCurrentPhase` (earliest running phase, no production callers) and `phaseTimeline`
+  (latest running) disagree where phases overlap; delete or align `getCurrentPhase`.
+
 ## Next step
 
-Step 7.
+Step 8.
