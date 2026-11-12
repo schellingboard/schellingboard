@@ -39,6 +39,7 @@ import { matchesInReadingOrder } from "./search";
 import { PullToRefresh } from "./pull-to-refresh";
 import { useDebouncedSearch } from "../../ui/use-debounced";
 import { useDragToPan } from "./use-drag-to-pan";
+import { schedulingNotice } from "./scheduling-notice";
 import { dayOfSession, useRevealSession } from "./reveal-session";
 import { useScrollRestoration } from "./use-scroll-restoration";
 import { useStatusHeight } from "./use-status-height";
@@ -227,6 +228,7 @@ export function ScheduleScreen({
       }}
       showJumpToNow={nowIsOnSchedule}
       proposalsHref={links.proposals}
+      notice={schedulingNotice(data.event, data.now)}
       sync={sync}
     />
   );

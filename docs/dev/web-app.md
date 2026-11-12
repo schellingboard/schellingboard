@@ -134,8 +134,9 @@ scheduling phase.
 `app/schedule-page.tsx` composes it: `useScheduleSession` (`replica/session.ts`: `openReplica`,
 `connectFeed`, `autosaveReplica`, hidden-tab and back/forward-cache handling, plus a command runner)
 for the viewer from `useViewer()`, the events for the nav (`GET /api/v1/events`), the snapshot's
-guests for the picker, the proposals redirect for an event not in its scheduling phase. A viewer
-change closes the feed and opens the event again.
+guests for the picker, the schedule outside the scheduling phase (`scheduleReadOnly` in
+`packages/domain`: `ScheduleData.readOnly` hides RSVP, Edit and free slots, and a notice names the
+opening). A viewer change closes the feed and opens the event again.
 
 ## Tests
 

@@ -122,6 +122,17 @@ describe("a 1-on-1 notification", { tags: ["012-US4"] }, () => {
     expect(screen.getByText(/can only be answered or canceled/)).toBeTruthy();
   });
 
+  it("opens it read-only over a read-only schedule", async () => {
+    await open({
+      snapshot: withMeeting(snapshot),
+      path: "/conf/schedule?viewMeeting=m1",
+    });
+    const dialog = await screen.findByRole("dialog", {
+      name: "1-on-1 details",
+    });
+    expect(within(dialog).queryByRole("button", { name: "Accept" })).toBeNull();
+  });
+
   it("tells a reader with no name chosen so, instead of redirecting", async () => {
     const { router } = await open({
       snapshot: { ...running, me: null },

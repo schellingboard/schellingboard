@@ -118,6 +118,24 @@ describe("the 1-on-1 column", () => {
     );
   });
 
+  it("offers no slot to arrange a 1-on-1 while the schedule is read-only", () => {
+    const early = withMe([], [iso(10), iso(11)]);
+    show(
+      {
+        ...early,
+        event: {
+          ...early.event,
+          proposalPhaseStart: iso(0),
+          schedulingPhaseStart: new Date(Date.UTC(2026, 6, 1)).toISOString(),
+        },
+      },
+      at9
+    );
+    expect(screen.queryAllByRole("link", { name: /Arrange a 1-on-1/ })).toEqual(
+      []
+    );
+  });
+
   it("says when a slot is one the viewer is not offering", () => {
     show(withMe([], [iso(10)]));
     expect(

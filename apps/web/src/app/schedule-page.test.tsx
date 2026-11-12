@@ -173,22 +173,44 @@ describe("the schedule page", () => {
     }
   );
 
-  it("sends an event still taking proposals to its proposals page", async () => {
-    const proposing: Snapshot = {
-      ...running,
-      event: {
-        ...snapshot.event,
-        proposalPhaseStart: iso(0),
-        proposalPhaseEnd: iso(20),
-        schedulingPhaseStart: new Date(Date.UTC(2026, 6, 1)).toISOString(),
-      },
-    };
-    const { router } = await open({ snapshot: proposing });
-    await waitFor(() =>
-      expect(router.history.location.pathname).toBe("/conf/proposals")
-    );
-    expect(
-      await screen.findByRole("heading", { name: "Conf: Session Proposals" })
-    ).toBeTruthy();
-  });
+  it(
+    "shows the schedule, read-only, to someone who follows a link while proposals are taken",
+    { tags: ["007-US14"] },
+    async () => {
+      const proposing: Snapshot = {
+        ...running,
+        event: {
+          ...snapshot.event,
+          proposalPhaseStart: iso(0),
+          proposalPhaseEnd: iso(20),
+          schedulingPhaseStart: new Date(Date.UTC(2026, 6, 1)).toISOString(),
+        },
+      };
+      const { router } = await open({
+        snapshot: proposing,
+        path: "/conf/schedule",
+      });
+      expect(await screen.findByRole("link", { name: "Talk" })).toBeTruthy();
+      expect(router.history.location.pathname).toBe("/conf/schedule");
+    }
+  );
+
+  it(
+    "shows the schedule between the phases instead of an unavailable notice",
+    { tags: ["007-US14"] },
+    async () => {
+      const between: Snapshot = {
+        ...running,
+        event: {
+          ...snapshot.event,
+          proposalPhaseStart: iso(0),
+          proposalPhaseEnd: iso(5),
+          schedulingPhaseStart: new Date(Date.UTC(2026, 6, 1)).toISOString(),
+        },
+      };
+      await open({ snapshot: between, path: "/conf/schedule" });
+      expect(await screen.findByRole("link", { name: "Talk" })).toBeTruthy();
+      expect(screen.queryByText(/Event unavailable/)).toBeNull();
+    }
+  );
 });

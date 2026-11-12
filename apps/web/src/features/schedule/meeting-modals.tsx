@@ -65,7 +65,7 @@ export function MeetingModals({
           key={viewMeeting}
           meeting={data.meetings.find((m) => m.id === viewMeeting)}
           now={data.now}
-          readOnly={false}
+          readOnly={data.readOnly}
           profileHref={links.guest}
           onAnswer={(response) =>
             void actions.answerMeeting(viewMeeting, response)

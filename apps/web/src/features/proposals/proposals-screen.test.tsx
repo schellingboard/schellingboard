@@ -115,7 +115,7 @@ describe("the proposals list", () => {
     ).toHaveProperty("pathname", "/conf/proposals/quick-voting");
     expect(
       screen.getByRole("link", { name: /View Schedule/ }).getAttribute("href")
-    ).toBe("#");
+    ).toBe("/conf/schedule");
   });
 
   it("disables the actions a signed-out viewer or the phase rules out", () => {

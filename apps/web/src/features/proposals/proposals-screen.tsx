@@ -91,8 +91,8 @@ export function ProposalsScreen(props: ProposalsScreenProps) {
           />
           <ActionLink
             href={links.schedule}
-            enabled={schedEnabled}
-            why={texts.scheduling}
+            enabled
+            why=""
             icon={CalendarDaysIcon}
             label="View Schedule"
           />

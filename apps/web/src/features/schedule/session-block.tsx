@@ -44,13 +44,15 @@ export function SessionBlock({
   const position = { top: item.topPx, height: item.heightPx };
 
   if (item.kind === "free") {
-    const bookable = isBookableSlot({
-      locationBookable: !!location.bookable,
-      startTime: item.start.getTime(),
-      now: data.now.getTime(),
-      startBookings: day.startBookings?.getTime(),
-      endBookings: day.endBookings?.getTime(),
-    });
+    const bookable =
+      !data.readOnly &&
+      isBookableSlot({
+        locationBookable: !!location.bookable,
+        startTime: item.start.getTime(),
+        now: data.now.getTime(),
+        startBookings: day.startBookings?.getTime(),
+        endBookings: day.endBookings?.getTime(),
+      });
     return bookable ? (
       <BookableSessionCard
         startTime={item.start}
@@ -317,6 +319,7 @@ function RsvpBadge({
   session: Session;
   hosting: boolean;
 }) {
+  const { data } = useSchedule();
   const { rsvpd, click, dialogs } = useRsvp(session);
 
   const count = (
@@ -328,7 +331,7 @@ function RsvpBadge({
   );
   const badge =
     "loc-badge flex items-center gap-0.5 rounded-tl px-1 py-[1px] text-[10px]";
-  if (hosting) return <div className={badge}>{count}</div>;
+  if (hosting || data.readOnly) return <div className={badge}>{count}</div>;
   return (
     <>
       <button

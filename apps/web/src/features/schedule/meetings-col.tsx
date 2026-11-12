@@ -389,7 +389,7 @@ export function MeetingsCol({
               position={{ top: topPx, height: heightPx }}
               start={start}
               blocked={kind === "unavailable"}
-              bookable={new Date(start) > data.now}
+              bookable={!data.readOnly && new Date(start) > data.now}
             />
           ) : (
             <PositionedBlock

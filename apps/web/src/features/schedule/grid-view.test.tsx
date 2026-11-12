@@ -152,6 +152,27 @@ describe("GridView", () => {
     expect(hrefs.join()).not.toContain("time=12%3A00");
   });
 
+  it(
+    "offers no slot to add a session while the schedule is read-only",
+    { tags: ["007-US14"] },
+    () => {
+      const early = snapshotWith({
+        event: {
+          ...snapshot.event,
+          proposalPhaseStart: iso(0),
+          schedulingPhaseStart: new Date(Date.UTC(2026, 6, 1)).toISOString(),
+        },
+      });
+      renderScheduled(<Grid data={dataOf(early)} />, { snapshot: early });
+      expect(screen.queryAllByRole("link", { name: "Add session" })).toEqual(
+        []
+      );
+      expect(
+        screen.queryByRole("button", { name: /^(RSVP to|Withdraw RSVP from)/ })
+      ).toBeNull();
+    }
+  );
+
   it("describes a room by its details", () => {
     renderScheduled(<Grid data={dataOf()} />);
     expect(

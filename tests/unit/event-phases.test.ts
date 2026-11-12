@@ -3,6 +3,7 @@ import { dateStartDescription } from "@schellingboard/domain/phase-opens-text";
 import {
   EventPhase,
   getCurrentPhase,
+  scheduleReadOnly,
   schedulingEnded,
 } from "@schellingboard/domain/phase";
 import type { Event } from "@schellingboard/domain/event";
@@ -189,5 +190,45 @@ describe("dateStartDescription", () => {
     expect(dateStartDescription(undefined, "Europe/Berlin", null)).toBe(
       "is not enabled"
     );
+  });
+});
+
+describe("scheduleReadOnly", { tags: ["007-US14"] }, () => {
+  it("is read-only before, between and after the phases", () => {
+    expect(
+      scheduleReadOnly(
+        makeEvent({
+          proposalPhaseStart: ago(1),
+          schedulingPhaseStart: ahead(5),
+        }),
+        NOW()
+      )
+    ).toBe(true);
+    expect(
+      scheduleReadOnly(
+        makeEvent({
+          proposalPhaseStart: ago(5),
+          proposalPhaseEnd: ago(3),
+          schedulingPhaseStart: ahead(5),
+        }),
+        NOW()
+      )
+    ).toBe(true);
+    expect(
+      scheduleReadOnly(
+        makeEvent({
+          schedulingPhaseStart: ago(5),
+          schedulingPhaseEnd: ago(1),
+        }),
+        NOW()
+      )
+    ).toBe(true);
+  });
+
+  it("is open while scheduling runs and for an event without phases", () => {
+    expect(
+      scheduleReadOnly(makeEvent({ schedulingPhaseStart: ago(1) }), NOW())
+    ).toBe(false);
+    expect(scheduleReadOnly(makeEvent({}), NOW())).toBe(false);
   });
 });

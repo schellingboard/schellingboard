@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Read the schedule before scheduling opens** (#1336): **View Schedule** now works in every phase,
+  read-only, with a note saying when scheduling opens.
 - **A session link shows the session on the schedule** (#994): opening one (from an email, say)
   unfolds its day and scrolls the grid or agenda to it behind the session window.
 - **Show clashes in your schedule** (#1104): a **Clashes** filter lists sessions and 1-on-1s of

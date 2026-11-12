@@ -157,7 +157,7 @@ function Details({ session }: { session: Session }) {
         </div>
       )}
       <div className="mb-6 flex flex-wrap items-center gap-2">
-        {!isHost && (
+        {!isHost && !data.readOnly && (
           <button
             type="button"
             onClick={click}
@@ -176,7 +176,7 @@ function Details({ session }: { session: Session }) {
             Become host
           </button>
         )}
-        {isHost && !session.adminManaged && (
+        {isHost && !session.adminManaged && !data.readOnly && (
           <a href={links.editSession(session.id)} className={ACTION}>
             Edit
           </a>
