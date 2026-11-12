@@ -8,6 +8,7 @@ const comment = (id: string, createdTime = "2026-06-02T10:00:00.000Z") => ({
   parentId: null,
   body: id,
   deleted: false,
+  canDelete: false,
   createdTime,
   editedTime: null,
   author: null,

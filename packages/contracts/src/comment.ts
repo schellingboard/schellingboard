@@ -54,6 +54,11 @@ export const commentViewSchema = z
       .describe(
         "A deleted comment with replies stays in the thread, without body or author"
       ),
+    canDelete: z
+      .boolean()
+      .describe(
+        "Whether the acting guest may delete it: its author, the owner of what it is on, or an admin"
+      ),
     createdTime: instant,
     editedTime: instant.nullable(),
     author: guestRef.nullable(),

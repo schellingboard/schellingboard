@@ -75,6 +75,8 @@ reply.
   it, or "Liked" again to take yours back.
 - You can edit or delete your own comments. Deleting is permanent — no history, no undo. If there
   are replies, a "Comment deleted" placeholder stays behind.
+- You can also delete comments left on your profile, or on a session or proposal you host. Site
+  admins can delete any comment. The author is not notified.
 - Closing the panel with Esc or the close button while you have typed text asks "Discard what you
   have typed?" first; choose Keep editing to carry on.
 - Each timestamp links to that comment alone, so you can point someone at one particular remark.

@@ -13,6 +13,7 @@ export const comment = (
   parentId: null,
   body: `body of ${id}`,
   deleted: false,
+  canDelete: false,
   createdTime: "2026-06-02T10:00:00.000Z",
   editedTime: null,
   author: { id: "host", name: "HOST" },

@@ -79,7 +79,7 @@ const deleteComment = createRoute({
   path: "/comments/{id}",
   tags: ["comments"],
   description:
-    "Deletes the acting guest's own comment; one with replies stays as a placeholder.",
+    "Deletes a comment as its author, the owner of what it is on (a profile's person, a session's or proposal's hosts) or an admin; one with replies stays as a placeholder.",
   request: { headers: idempotencyHeaders, params: idParam },
   responses: { 204: noContent("Deleted"), ...problemDefault },
 });
@@ -117,8 +117,17 @@ export function addCommentRoutes(app: App, comments: () => CommentUseCases) {
         (comment) => [comment.createdTime.toISOString(), comment.id]
       );
       if (!page.ok) return problem(page.error);
+      const canDelete = await comments().removableBy(c.var.actor, {
+        kind,
+        id,
+      });
       return c.json(
-        { ...page.value, items: page.value.items.map(toCommentView) },
+        {
+          ...page.value,
+          items: page.value.items.map((item) =>
+            toCommentView(item, canDelete(item))
+          ),
+        },
         200
       );
     });
@@ -133,7 +142,7 @@ export function addCommentRoutes(app: App, comments: () => CommentUseCases) {
         c.var.now
       );
       if (!result.ok) return problem(result.error);
-      return c.json(toCommentView(result.value), 201);
+      return c.json(toCommentView(result.value, true), 201);
     });
   }
 
@@ -144,7 +153,7 @@ export function addCommentRoutes(app: App, comments: () => CommentUseCases) {
       c.var.now
     );
     if (!result.ok) return problem(result.error);
-    return c.json(toCommentView(result.value), 200);
+    return c.json(toCommentView(result.value, true), 200);
   });
 
   app.openapi(deleteComment, async (c) => {

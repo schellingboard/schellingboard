@@ -11,6 +11,7 @@ const comment = (id: string, over = {}) => ({
   parentId: null as string | null,
   body: id,
   deleted: false,
+  canDelete: false,
   createdTime: `2026-06-02T10:0${id.length}:00.000Z`,
   editedTime: null,
   author: { id: "mia", name: "MIA" },

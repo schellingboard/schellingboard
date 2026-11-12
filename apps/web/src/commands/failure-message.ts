@@ -56,6 +56,7 @@ const REASONS: Record<string, string> = {
   "session.capacityInvalid": CAPACITY_ERROR,
   "comment.invalid": "A comment cannot be empty.",
   "comment.notAuthor": "Only the author can change a comment.",
+  "comment.notAllowed": "You cannot remove this comment.",
   "comment.notFound": "This comment no longer exists.",
   "comment.parentInvalid": "The comment you replied to no longer exists.",
 };

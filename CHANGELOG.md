@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Remove comments left on your profile** (#901): profile owners, session and proposal hosts, and
+  admins can now delete other people's comments.
 - **Read the schedule before scheduling opens** (#1336): **View Schedule** now works in every phase,
   read-only, with a note saying when scheduling opens.
 - **A session link shows the session on the schedule** (#994): opening one (from an email, say)

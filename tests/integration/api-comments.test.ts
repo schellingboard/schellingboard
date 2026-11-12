@@ -64,6 +64,38 @@ afterEach(() => vi.unstubAllEnvs());
 
 describe("/api/v1 comments", () => {
   it(
+    "tells the owner of a profile, and not a stranger, they may delete its comments",
+    { tags: ["010-US8"] },
+    async () => {
+      const owner = await createGuest();
+      const author = await createGuest();
+      const stranger = await createGuest();
+      await POST(
+        request("POST", `/guests/${owner.id}/comments`, {
+          cookie: asGuest(author.id),
+          body: { body: "Hi" },
+        })
+      );
+
+      const canDelete = async (id: string) => {
+        const res = await GET(
+          request("GET", `/guests/${owner.id}/comments`, {
+            cookie: asGuest(id),
+          })
+        );
+        return ((await res.json()) as { items: { canDelete: boolean }[] })
+          .items[0].canDelete;
+      };
+
+      expect([
+        await canDelete(owner.id),
+        await canDelete(author.id),
+        await canDelete(stranger.id),
+      ]).toEqual([true, true, false]);
+    }
+  );
+
+  it(
     "posts, reads, edits, likes and deletes a comment on a proposal",
     { tags: ["010-US1", "010-US4", "010-US6"] },
     async () => {

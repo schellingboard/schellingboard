@@ -199,7 +199,9 @@ describe("writing comments", () => {
 
   it("deletes only after a confirmation", { tags: ["010-US4"] }, async () => {
     const handle = show(
-      fakeComments([comment("a", { author: { id: "mia", name: "MIA" } })])
+      fakeComments([
+        comment("a", { author: { id: "mia", name: "MIA" }, canDelete: true }),
+      ])
     );
     await userEvent.click(screen.getByRole("button", { name: "Delete" }));
     expect(handle.controller.remove).not.toHaveBeenCalled();
@@ -214,6 +216,27 @@ describe("writing comments", () => {
     );
     expect(handle.controller.remove).toHaveBeenCalledWith("a");
   });
+});
+
+describe("removing someone else's comment", () => {
+  it(
+    "offers Delete without Edit, and warns the author is not told",
+    { tags: ["010-US8"] },
+    async () => {
+      const handle = show(fakeComments([comment("a", { canDelete: true })]));
+      expect(screen.queryByRole("button", { name: "Edit" })).toBeNull();
+      await userEvent.click(screen.getByRole("button", { name: "Delete" }));
+      expect(
+        screen.getByText("Remove this comment? Its author is not notified.")
+      ).toBeTruthy();
+      await userEvent.click(
+        within(
+          screen.getByRole("dialog", { name: "Delete comment" })
+        ).getByRole("button", { name: "Delete" })
+      );
+      expect(handle.controller.remove).toHaveBeenCalledWith("a");
+    }
+  );
 });
 
 describe("liking comments", () => {
