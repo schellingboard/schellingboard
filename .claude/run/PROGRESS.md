@@ -27,8 +27,6 @@
 
 ## Questions
 
-- #831: the admin `Pager` (#684) exists. The issue was reopened: the pagination strategy for
-  attendee-facing lists (proposals, directory) is undecided. Needs a decision.
 - 22b: the installed (standalone) app has no address bar, the reason ADR 0020 gave for the Share
   button, so it can no longer share a link. Removal kept as decided; restore a share action there?
 - #691: the script uses the API, not a browser, so identity requests per navigation (#1148) are

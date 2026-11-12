@@ -72,8 +72,14 @@ the E2E specs a step touches; the user runs the full suite at the end.
     visible focus. Check the Agenda and attendee directory toolbars: share one `ListToolbar` if they
     have the same shape. Pure layout: adapt only the tests it breaks. Capture before/after
     screenshots at the three widths into PROGRESS.md notes (not docs). Issue optional.
-23. BLOCKED, see Questions. **#831** (Medium) Consistent pagination strategy; `Pager` (#684) exists,
-    read the 5 comments and apply it where the issue says. Record in Questions if #684 covered it.
+23. **#831** (Medium) Owner decision: every long list for users and admins is paginated with the
+    shared `Pager` (page numbers, First, Prev, Next, Last, configurable page size, default 50, sizes
+    e.g. 25/50/100, `page`/`pageSize` URL params). Survey all lists (proposals, directory, agenda,
+    comments, notifications, admin tables, stats table; use `Explore`), move each to the `Pager`,
+    drop `stats-table.tsx`'s own pager, and align defaults. Search/filter resets to page 1; sorting
+    keeps the page size. Keep list behaviour that needs all rows (counts, "Clashes", day grouping in
+    the agenda) correct: count and filter on the full set, page the result. If the survey shows too
+    many lists for one commit, split into 23a, 23b... here first. Footer `fixes #831`.
 24. **#1328a** (Medium) i18n foundation: Lingui, `apps/web/src/i18n/`, `en` catalog, scripts and
     Makefile targets, `<html lang>`. Issue step 1.
 25. **#1328b** Locale storage: `guests.locale`, `PATCH /me`, browser fallback, Settings switcher
