@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import {
   ScheduleMatchProvider,
@@ -48,7 +48,7 @@ const NO_FILTERS: ScheduleFilterState = { mine: null };
 /**
  * The schedule of one event, drawn from its replica at `now`. The view, the
  * chosen filters and the narrowed rooms live in `params`, which the owner of
- * the address bar passes in and receives changes to; the search text is local.
+ * the address bar passes in and receives changes to; the debounced search text is kept in `q`.
  */
 export function ScheduleScreen({
   snapshot,
@@ -99,24 +99,48 @@ export function ScheduleScreen({
   // After restoration, so the address wins over the remembered position.
   useRevealSession(scrollerRef, revealSessionId);
 
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(() => params.get("q") ?? "");
   const debouncedSearch = useDebouncedSearch(search);
-  const [unfolded, setUnfolded] = useState<ReadonlySet<string>>(
-    () => new Set()
-  );
+  const latest = useRef({ params, onParamsChange });
+  useEffect(() => {
+    latest.current = { params, onParamsChange };
+  });
+  useEffect(() => {
+    const { params: current, onParamsChange: change } = latest.current;
+    const text = debouncedSearch.trim();
+    if ((current.get("q") ?? "") === text) return;
+    const next = new URLSearchParams(current);
+    if (text) next.set("q", text);
+    else next.delete("q");
+    change(next);
+  }, [debouncedSearch]);
+
+  const [revealedDays, setRevealedDays] = useState<readonly string[]>([]);
   const [revealSeeded, setRevealSeeded] = useState<string | null>(null);
   const revealedDay = dayOfSession(data.days, revealSessionId);
   if (revealedDay && revealSeeded !== revealSessionId) {
     setRevealSeeded(revealSessionId);
-    setUnfolded((prev) => new Set([...prev, revealedDay]));
+    setRevealedDays((prev) => [...prev, revealedDay]);
   }
-  const toggleFold = (dayId: string) =>
-    setUnfolded((prev) => {
-      const next = new Set(prev);
-      if (next.has(dayId)) next.delete(dayId);
-      else next.add(dayId);
-      return next;
-    });
+  const unfoldKey = params.getAll("unfold").join("\u0000");
+  const unfolded: ReadonlySet<string> = useMemo(
+    () =>
+      new Set([
+        ...(unfoldKey ? unfoldKey.split("\u0000") : []),
+        ...revealedDays,
+      ]),
+    [unfoldKey, revealedDays]
+  );
+  const toggleFold = (dayId: string) => {
+    const kept = new Set(params.getAll("unfold"));
+    if (unfolded.has(dayId)) kept.delete(dayId);
+    else kept.add(dayId);
+    setRevealedDays((prev) => prev.filter((d) => d !== dayId));
+    const updated = new URLSearchParams(params);
+    updated.delete("unfold");
+    for (const id of kept) updated.append("unfold", id);
+    onParamsChange(updated);
+  };
   const defaultFolded = getDefaultFoldedDayIds(data.days, now);
 
   const chosen = parseScheduleFilters(params.get("filter"), params.get("mine"));

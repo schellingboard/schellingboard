@@ -1,6 +1,6 @@
 # Progress
 
-Steps 1 (c344e56d), 2, 3, 4, 5 and 6 done.
+Steps 1 (c344e56d), 2, 3, 4, 5, 6 and 7 done.
 
 - Panel: `ui/side-panel.tsx`; history: `app/panel-history.ts` (`PanelItem` union: session, proposal,
   profile, meeting); host: `app/panel-host.tsx`; links opened in the panel via the `SpaLinks`
@@ -22,7 +22,9 @@ Steps 1 (c344e56d), 2, 3, 4, 5 and 6 done.
   not that event. Nothing renders while it loads.
 - Step 6 done: link builders in `utils/notifications.ts` and `reminder-dispatch.ts` emit panel
   addresses (`?record=count` on reminders); fixtures with old URLs left as data.
-- Next: step 7.
+- Step 7 done: the search box stays local while typing; the debounced text is written to `q` with
+  `replace`. Reveal-seeded days stay local state, merged with `unfold`.
+- Next: step 8.
 
 ## Questions
 
