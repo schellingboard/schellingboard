@@ -10,6 +10,7 @@ import {
 } from "react";
 import type { ApiClient } from "@schellingboard/api-client";
 import { problemCode } from "../commands/problem";
+import { useStoredLocale } from "../i18n";
 import { createReplicaPersistence } from "../replica/persistence";
 
 const RETRY_MS = 5_000;
@@ -71,6 +72,7 @@ export function ViewerProvider({
   // The first answer can arrive after the viewer has already taken a name,
   // and must not take it back.
   const decided = useRef(false);
+  const { setStored } = useStoredLocale();
 
   useEffect(() => {
     let stale = false;
@@ -86,6 +88,7 @@ export function ViewerProvider({
           }
           if (decided.current) return;
           remembered.write(data.guestId);
+          setStored(data.locale);
           setGuestId(data.guestId);
         })
         .catch(() => {
@@ -99,7 +102,7 @@ export function ViewerProvider({
       stale = true;
       clearTimeout(timer);
     };
-  }, [api]);
+  }, [api, setStored]);
 
   const choose = useCallback(
     async (id: string): Promise<ChooseResult> => {
@@ -114,12 +117,13 @@ export function ViewerProvider({
         decided.current = true;
         remembered.write(data.guestId);
         setGuestId(data.guestId);
+        setStored(data.locale);
         return { ok: true };
       } catch {
         return { ok: false, code: "network.unreachable" };
       }
     },
-    [api, persistence, guestId]
+    [api, persistence, guestId, setStored]
   );
 
   const signOut = useCallback(async () => {
@@ -128,9 +132,10 @@ export function ViewerProvider({
       await persistence.clear();
       decided.current = true;
       remembered.write(null);
+      setStored(null);
       setGuestId(null);
     }
-  }, [api, persistence]);
+  }, [api, persistence, setStored]);
 
   const refresh = useCallback(async () => {
     try {
@@ -139,11 +144,12 @@ export function ViewerProvider({
       if (guestId && data.guestId !== guestId) await persistence.clear();
       decided.current = true;
       remembered.write(data.guestId);
+      setStored(data.locale);
       setGuestId(data.guestId);
     } catch {
       // Offline: the known viewer stands until the next load asks again.
     }
-  }, [api, persistence, guestId]);
+  }, [api, persistence, guestId, setStored]);
 
   const value = useMemo(
     () => ({ guestId, choose, signOut, refresh }),

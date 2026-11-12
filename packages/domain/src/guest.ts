@@ -80,6 +80,8 @@ export const DEFAULT_EMAIL_SETTINGS: EmailSettings = {
 type GuestPrivateInfo = {
   /** Null for a guest the organizer added without an address. */
   email: string | null;
+  /** The language the guest chose; null follows the browser. */
+  locale: string | null;
   // These aren't very private, but still no reason to expose them to other
   // guests.
   emailSettings: EmailSettings;

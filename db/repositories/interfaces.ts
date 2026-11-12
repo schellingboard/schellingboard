@@ -346,6 +346,8 @@ export interface GuestsRepository {
     id: string,
     settings: EmailSettings
   ): Promise<CompleteGuest | undefined>;
+  /** Usage: a user picks their language; null follows the browser. False if the guest is gone. */
+  updateLocale(id: string, locale: string | null): Promise<boolean>;
   /** Deletes the guest and all records referencing them (votes, RSVPs, host links, event assignments). */
   delete(id: string): Promise<void>;
   findExistingIds(ids: string[]): Promise<string[]>;

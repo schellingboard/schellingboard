@@ -2,8 +2,10 @@ import { i18n, type Messages } from "@lingui/core";
 import { I18nProvider as LinguiProvider } from "@lingui/react";
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
   type ReactNode,
 } from "react";
@@ -34,13 +36,42 @@ const LocaleContext = createContext<Locale>(DEFAULT_LOCALE);
 
 export const useLocale = () => useContext(LocaleContext);
 
-export function I18nProvider({
-  stored,
-  children,
-}: {
-  stored?: string | null;
-  children: ReactNode;
-}) {
+const STORED = "sb-locale";
+
+const rememberedLocale = () => {
+  try {
+    return localStorage.getItem(STORED);
+  } catch {
+    return null;
+  }
+};
+
+type StoredLocale = {
+  stored: string | null;
+  setStored: (locale: string | null) => void;
+};
+
+const StoredLocaleContext = createContext<StoredLocale>({
+  stored: null,
+  setStored: () => {},
+});
+
+/** The language the signed-in guest chose; null follows the browser. */
+export const useStoredLocale = () => useContext(StoredLocaleContext);
+
+export function I18nProvider({ children }: { children: ReactNode }) {
+  // Kept on the device too, so the first paint and an offline start use it.
+  const [stored, setStoredState] = useState<string | null>(rememberedLocale);
+  const setStored = useCallback((locale: string | null) => {
+    setStoredState(locale);
+    try {
+      if (locale) localStorage.setItem(STORED, locale);
+      else localStorage.removeItem(STORED);
+    } catch {
+      // The choice then lasts until the page is reloaded.
+    }
+  }, []);
+  const choice = useMemo(() => ({ stored, setStored }), [stored, setStored]);
   const wanted = resolveLocale(stored, navigator.languages);
   const [active, setActive] = useState<Locale>(DEFAULT_LOCALE);
   useEffect(() => {
@@ -54,8 +85,10 @@ export function I18nProvider({
     };
   }, [wanted]);
   return (
-    <LocaleContext value={active}>
-      <LinguiProvider i18n={i18n}>{children}</LinguiProvider>
-    </LocaleContext>
+    <StoredLocaleContext value={choice}>
+      <LocaleContext value={active}>
+        <LinguiProvider i18n={i18n}>{children}</LinguiProvider>
+      </LocaleContext>
+    </StoredLocaleContext>
   );
 }

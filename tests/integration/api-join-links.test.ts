@@ -82,7 +82,7 @@ describe("a personal join link", () => {
           headers: { cookie },
         })
       );
-      expect(await who.json()).toEqual({ guestId: guest.id });
+      expect(await who.json()).toEqual({ guestId: guest.id, locale: null });
     }
   );
 

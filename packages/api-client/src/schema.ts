@@ -3103,6 +3103,8 @@ export interface paths {
             "application/json": {
               /** @description The guest the browser now acts as, or null when signed out */
               guestId: string | null;
+              /** @description The guest's chosen language; null follows the browser */
+              locale: string | null;
               /** @description True when the browser holds a protected name it has not logged in to */
               awaitingLogin?: boolean;
             };
@@ -3145,8 +3147,66 @@ export interface paths {
             "application/json": {
               /** @description The guest the browser now acts as, or null when signed out */
               guestId: string | null;
+              /** @description The guest's chosen language; null follows the browser */
+              locale: string | null;
             };
           };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/locale": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Sets the language the acting guest reads the app in. */
+    put: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            /**
+             * @description A language of the app; null follows the browser
+             * @enum {string|null}
+             */
+            locale: "en" | null;
+          };
+        };
+      };
+      responses: {
+        /** @description Saved */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
         default: {
