@@ -76,6 +76,11 @@
           "icon": "container"
         },
         {
+          "title": "NixOS",
+          "path": "/self-hosting/nixos/",
+          "icon": "snowflake"
+        },
+        {
           "title": "Configuration",
           "path": "/self-hosting/configuration/",
           "icon": "settings"

@@ -1,0 +1,55 @@
+name: Nix
+
+# Builds SchellingBoard with Nix and boots it in a NixOS VM with the module on.
+# bun.lock is an input of the build, so a dependency bump runs this too, and
+# package.nix copies what the Dockerfile copies, so a change there runs it.
+on:
+  pull_request:
+    paths:
+      - "*.nix"
+      - "flake.lock"
+      - "bun.lock"
+      - "Dockerfile"
+      - "scripts/build-server.ts"
+      - ".github/workflows/nix.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "*.nix"
+      - "flake.lock"
+      - "bun.lock"
+      - "Dockerfile"
+      - "scripts/build-server.ts"
+      - ".github/workflows/nix.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # The NixOS test runs a VM; the runner has KVM but not for its user.
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@75c75c31ebece974e48ebc36b4ad125bd97bd97b # v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            system-features = nixos-test benchmark big-parallel kvm
+
+      - name: Check formatting
+        run: nix fmt -- --check flake.nix package.nix module.nix
+
+      - name: Build, and run the NixOS test
+        run: nix flake check --print-build-logs

@@ -11,6 +11,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **Hosting on NixOS** ([#1664](https://github.com/schellingboard/schellingboard/issues/1664)): a
+  NixOS module runs SchellingBoard as a system service. See the NixOS guide under Self-hosting.
+
 ## [5.0.0] - 2026-11-11
 
 > **Breaking change**: behind a reverse proxy, set `SB_TRUSTED_PROXIES` (usually `1`) when
