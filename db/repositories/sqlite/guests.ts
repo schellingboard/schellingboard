@@ -843,7 +843,7 @@ export class SqliteGuestsRepository implements GuestsRepository {
   }
 
   async delete(id: string): Promise<void> {
-    // votes, rsvps, proposal_hosts, session_hosts and event_guests are removed
+    // votes, rsvps, session_marks, proposal_hosts, session_hosts and event_guests are removed
     // by ON DELETE CASCADE.
     this.db.delete(schema.guests).where(eq(schema.guests.id, id)).run();
   }

@@ -3,7 +3,7 @@ import type { Day, Event } from "./event";
 import type { Guest } from "./guest";
 import type { Location, LocationUnavailability } from "./location";
 import type { Meeting, MeetingPoint } from "./meeting";
-import type { Rsvp, Session, SessionProposal } from "./session";
+import type { Rsvp, Session, SessionMark, SessionProposal } from "./session";
 import type { VoteChoice } from "./vote";
 
 export type Actor =
@@ -87,6 +87,15 @@ export type VoteWithdrawn = ChangeOf<
   "vote.withdrawn",
   "vote",
   { proposalId: string; guestId: string }
+>;
+
+/** Private to its owner: no one else, admins included, is ever told. */
+export type MarkSet = ChangeOf<"mark.set", "mark", { mark: SessionMark }>;
+
+export type MarkCleared = ChangeOf<
+  "mark.cleared",
+  "mark",
+  { sessionId: string; guestId: string }
 >;
 
 export type EventChanged = ChangeOf<"event.changed", "event", { event: Event }>;
@@ -273,7 +282,9 @@ export type Change =
   | RsvpAdded
   | RsvpRemoved
   | VoteCast
-  | VoteWithdrawn;
+  | VoteWithdrawn
+  | MarkSet
+  | MarkCleared;
 
 /**
  * Who may receive a change (ADR 0014). `guests` and `admins` stand in for the
@@ -328,7 +339,10 @@ export function audienceOf(change: Change): Audience {
       return { kind: "none" };
     case "rsvp.added":
       return { kind: "guests", ids: [change.payload.rsvp.guestId] };
+    case "mark.set":
+      return { kind: "guests", ids: [change.payload.mark.guestId] };
     case "rsvp.removed":
+    case "mark.cleared":
     case "vote.cast":
     case "vote.withdrawn":
       return { kind: "guests", ids: [change.payload.guestId] };
@@ -463,6 +477,39 @@ export const changes = {
       type: "rsvp.removed",
       subjectType: "rsvp",
       subjectId: rsvpId,
+      eventId,
+      actor,
+      occurredAt: at,
+      payload: { sessionId, guestId },
+    };
+  },
+
+  markSet(
+    mark: SessionMark,
+    eventId: string,
+    { actor, at }: ChangeContext
+  ): MarkSet {
+    return {
+      type: "mark.set",
+      subjectType: "mark",
+      subjectId: `${mark.guestId}:${mark.sessionId}`,
+      eventId,
+      actor,
+      occurredAt: at,
+      payload: { mark },
+    };
+  },
+
+  markCleared(
+    sessionId: string,
+    guestId: string,
+    eventId: string,
+    { actor, at }: ChangeContext
+  ): MarkCleared {
+    return {
+      type: "mark.cleared",
+      subjectType: "mark",
+      subjectId: `${guestId}:${sessionId}`,
       eventId,
       actor,
       occurredAt: at,

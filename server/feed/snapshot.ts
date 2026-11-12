@@ -102,6 +102,10 @@ async function assemble(
             sessionId,
             guestId,
           })),
+          marks: sessions.marks.map(({ sessionId, kind }) => ({
+            sessionId,
+            kind,
+          })),
           votes: votes.map(({ proposalId, choice }) => ({
             proposalId,
             choice,

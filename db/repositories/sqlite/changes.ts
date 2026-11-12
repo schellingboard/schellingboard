@@ -9,6 +9,8 @@ import type {
   Change,
   CommentCreated,
   VoteCast,
+  MarkCleared,
+  MarkSet,
   VoteWithdrawn,
   LoggedProposal,
   MeetingAnswered,
@@ -323,6 +325,20 @@ function toRecordedChange(row: ChangeRow): RecordedChange {
         subjectType: "vote",
         payload: row.payload as VoteCast["payload"],
       };
+    case "mark.set":
+      return {
+        ...common,
+        type: "mark.set",
+        subjectType: "mark",
+        payload: row.payload as MarkSet["payload"],
+      };
+    case "mark.cleared":
+      return {
+        ...common,
+        type: "mark.cleared",
+        subjectType: "mark",
+        payload: row.payload as MarkCleared["payload"],
+      };
     case "vote.withdrawn":
       return {
         ...common,
@@ -364,6 +380,8 @@ const KNOWN_TYPES: RecordedChange["type"][] = [
   "rsvp.removed",
   "vote.cast",
   "vote.withdrawn",
+  "mark.set",
+  "mark.cleared",
   "proposal.created",
   "proposal.changed",
   "proposal.deleted",

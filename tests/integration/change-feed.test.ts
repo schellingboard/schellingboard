@@ -95,6 +95,44 @@ describe("the change feed", () => {
     expect(forAdmin).toEqual([]);
   });
 
+  it(
+    "sends a guest's mark to that guest only",
+    { tags: ["007-US9"] },
+    async () => {
+      const event = await createEvent();
+      const session = await createSession(event.id);
+      const guest = await createGuest();
+      const other = await createGuest();
+      const forGuest = await listen(event.id, 0, {
+        guestId: guest.id,
+        admin: false,
+      });
+      const forOther = await listen(event.id, 0, {
+        guestId: other.id,
+        admin: false,
+      });
+      const forAdmin = await listen(event.id, 0, {
+        guestId: null,
+        admin: true,
+      });
+      const mark = {
+        sessionId: session.id,
+        guestId: guest.id,
+        kind: "bookmark" as const,
+      };
+
+      await unitOfWork.run((tx) => {
+        tx.record(changes.markSet(mark, event.id, BY_TEST));
+        tx.record(changes.markCleared(session.id, guest.id, event.id, BY_TEST));
+        return Promise.resolve();
+      });
+
+      expect(forGuest.map((m) => m.type)).toEqual(["mark.set", "mark.cleared"]);
+      expect(forOther).toEqual([]);
+      expect(forAdmin).toEqual([]);
+    }
+  );
+
   it("does not replay a private change to someone else on resume", async () => {
     const event = await createEvent();
     const session = await createSession(event.id);

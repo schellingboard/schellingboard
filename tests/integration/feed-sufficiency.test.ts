@@ -246,6 +246,48 @@ describe("the logged changes suffice to keep a replica current", () => {
       );
     });
 
+    it(
+      "for a mark set, replaced and cleared",
+      { tags: ["007-US9"] },
+      async () => {
+        const w = await rsvpWorld();
+        const mark = (kind: "bookmark" | "hidden") =>
+          sessions().setSessionMark(
+            w.actor(w.guest.id),
+            { sessionId: w.talk.id, guestId: w.guest.id, kind },
+            NOW
+          );
+        await expectChangesSuffice(w.actor(w.guest.id), w.scheduling.slug, () =>
+          mark("bookmark")
+        );
+        await expectChangesSuffice(w.actor(w.guest.id), w.scheduling.slug, () =>
+          mark("hidden")
+        );
+        await expectChangesSuffice(w.actor(w.guest.id), w.scheduling.slug, () =>
+          sessions().clearSessionMark(
+            w.actor(w.guest.id),
+            { sessionId: w.talk.id, guestId: w.guest.id },
+            NOW
+          )
+        );
+      }
+    );
+
+    it(
+      "for a session deleted with a mark on it",
+      { tags: ["007-US9"] },
+      async () => {
+        const w = await rsvpWorld();
+        await getRepositories().sessionMarks.upsert(
+          { sessionId: w.talk.id, guestId: w.guest.id, kind: "bookmark" },
+          NOW
+        );
+        await expectChangesSuffice(w.actor(w.guest.id), w.scheduling.slug, () =>
+          deleteLoggedSession(w.talk.id)
+        );
+      }
+    );
+
     it("for a session deleted with an RSVP to it", async () => {
       const w = await rsvpWorld();
       await getRepositories().rsvps.create({

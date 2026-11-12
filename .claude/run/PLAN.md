@@ -51,13 +51,15 @@ overview, deep links, an early read-only schedule), and a session never gets stu
       mapped); `MyScheduleChip` (schedule-filters.tsx) is the chip + kinds menu to extend with
       Bookmarked; e2e `filterChip` helper matches exactly.
 
-- [ ] **7. feat: private session bookmarks** — `fixes #864`, `fixes #264`, `fixes #865`.
-  - Data: table `session_marks` (guest, session, `kind` = `bookmark` | `hidden`, created at; unique
-    per guest+session; cascade on session and guest delete). Create both kinds now, so step 8 needs
-    no migration. One mark per session: setting one replaces the other.
-  - Server: set/clear mark use cases and routes; event members only; no phase gate. Snapshot
-    `me.marks`; feed `mark.set` / `mark.cleared`, audience: the owner. Add the row to the table in
-    ADR 0014.
+- [x] **7a. private session marks, data and server** (`issue #864`): table `session_marks`
+      (migration 0060, both kinds), `SessionMarksRepository` (`tx.sessionMarks`), use cases
+      setSessionMark/clearSessionMark, `PUT|DELETE /api/v1/sessions/{id}/marks/{guestId}`
+      (`{kind}`), changes `mark.set`/`mark.cleared` (owner-only), snapshot
+      `me.marks: {sessionId, kind}[]`, use case 007-US9; session.deleted drops marks in feed-apply.
+
+- [ ] **7b. feat: private session bookmarks, UI** — `fixes #864`, `fixes #264`, `fixes #865`. Needs
+      7a.
+  - Replica command to set/clear a mark (like the RSVP command); UI reads `snapshot.me.marks`.
   - UI: in the session modal only, an icon-only bookmark toggle (heroicons `BookmarkIcon`: outline =
     not bookmarked, solid = bookmarked) next to the title, not in the action row. Label "Bookmark
     this session" / "Remove bookmark", tooltip "Only you see your bookmarks. This is not an RSVP."

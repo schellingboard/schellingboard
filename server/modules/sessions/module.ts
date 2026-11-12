@@ -15,6 +15,7 @@ export {
 } from "./application/use-cases";
 export { addSessionRoutes } from "./http/routes";
 export { addRsvpRoutes } from "./http/rsvp-routes";
+export { addSessionMarkRoutes } from "./http/session-mark-routes";
 export { addAttendeeCountRoutes } from "./http/attendee-count-routes";
 export { addAdminUnavailabilityRoutes } from "./http/unavailability-routes";
 export {

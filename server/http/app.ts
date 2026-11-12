@@ -38,6 +38,7 @@ import {
   addAdminUnavailabilityRoutes,
   addAttendeeCountRoutes,
   addRsvpRoutes,
+  addSessionMarkRoutes,
   addSessionRoutes,
 } from "@/server/modules/sessions/module";
 import {
@@ -74,6 +75,7 @@ addHealthRoute(api);
 addApiDocsRoutes(api, API_BASE_PATH);
 addSessionRoutes(api, sessionUseCases);
 addRsvpRoutes(api, sessionUseCases);
+addSessionMarkRoutes(api, sessionUseCases);
 addProposalRoutes(api, proposalUseCases);
 addVoteRoutes(api, proposalUseCases);
 addCommentRoutes(api, commentUseCases);
