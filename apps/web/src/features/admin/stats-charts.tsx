@@ -1,3 +1,5 @@
+import { plural, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import type { StatsTable } from "@schellingboard/contracts/stats";
 import { histogram } from "@schellingboard/domain/stats/binning";
 import { useMemo } from "react";
@@ -13,6 +15,9 @@ import {
 import { RankedBars } from "../../ui/charts/ranked-bars";
 import { Scatter } from "../../ui/charts/scatter";
 import { StackedBars } from "../../ui/charts/stacked-bars";
+import { percentLabel } from "./stats-table";
+
+export { percentLabel };
 
 export const TOP_SHOWN = 15;
 
@@ -34,14 +39,15 @@ export function pairs(table: StatsTable, x: string, y: string) {
 }
 
 function NoData() {
-  return <p className="text-sm text-fg-subtle">No data</p>;
+  return (
+    <p className="text-sm text-fg-subtle">
+      <Trans>No data</Trans>
+    </p>
+  );
 }
 
 const listed = (data: { label: string; value: number }[]) =>
   data.map((d) => `${d.label} ${d.value}`).join(", ");
-
-export const percentLabel = (value: number) =>
-  `${Math.round(value * 10) / 10}%`;
 
 export function CountBars({
   table,
@@ -51,7 +57,7 @@ export function CountBars({
   yLabel,
   top,
   only,
-  summary = table.title,
+  summary,
   format,
 }: {
   table: StatsTable;
@@ -61,7 +67,7 @@ export function CountBars({
   yLabel: string;
   top?: number;
   only?: readonly string[];
-  summary?: string;
+  summary?: (list: string) => string;
   format?: (value: number) => string;
 }) {
   const data = useMemo(() => {
@@ -75,13 +81,15 @@ export function CountBars({
     return top ? bars.sort((a, b) => b.value - a.value).slice(0, top) : bars;
   }, [table, labelKey, valueKey, top, only]);
   if (data.length === 0) return <NoData />;
+  const title = table.title;
+  const list = listed(data);
   return (
     <RankedBars
       data={data}
       xLabel={xLabel}
       yLabel={yLabel}
       format={format}
-      summary={`${summary}: ${listed(data)}`}
+      summary={summary ? summary(list) : t`${title}: ${list}`}
     />
   );
 }
@@ -92,14 +100,14 @@ export function TableScatter({
   y,
   xLabel,
   yLabel,
-  noun,
+  summary,
 }: {
   table: StatsTable;
   x: string;
   y: string;
   xLabel: string;
   yLabel: string;
-  noun: string;
+  summary: (n: number) => string;
 }) {
   const points = useMemo(() => pairs(table, x, y), [table, x, y]);
   if (points.length === 0) return <NoData />;
@@ -108,24 +116,19 @@ export function TableScatter({
       points={points}
       xLabel={xLabel}
       yLabel={yLabel}
-      summary={`${yLabel} against ${xLabel}, ${points.length} ${noun}`}
+      summary={summary(points.length)}
     />
   );
 }
 
-const PREDICTION_KEYS = [
-  "reported",
-  "predicted",
-  "low50",
-  "high50",
-  "low80",
-  "high80",
-] as const;
-
 export function PredictedVsReported({ table }: { table: StatsTable }) {
   const points = useMemo(() => {
-    const [reported, predicted, low50, high50, low80, high80] =
-      PREDICTION_KEYS.map((key) => column(table, key));
+    const reported = column(table, "reported");
+    const predicted = column(table, "predicted");
+    const low50 = column(table, "low50");
+    const high50 = column(table, "high50");
+    const low80 = column(table, "low80");
+    const high80 = column(table, "high80");
     return table.rows.flatMap((row): PredictionPoint[] =>
       reported(row) === null || predicted(row) === null
         ? []
@@ -145,7 +148,10 @@ export function PredictedVsReported({ table }: { table: StatsTable }) {
   return (
     <PredictionScatter
       points={points}
-      summary={`Predicted against reported attendance, ${points.length} ${points.length === 1 ? "session" : "sessions"}`}
+      summary={plural(points.length, {
+        one: "Predicted against reported attendance, # session",
+        other: "Predicted against reported attendance, # sessions",
+      })}
     />
   );
 }
@@ -180,12 +186,14 @@ export function BinChart({
     }));
   }, [table, countKey]);
   if (bins.length === 0) return <NoData />;
+  const title = table.title;
+  const list = bins.map((b) => `${b.from}–${b.to}: ${b.count}`).join(", ");
   return (
     <Histogram
       bins={bins}
       xLabel={xLabel}
       yLabel={yLabel}
-      summary={`${table.title}: ${bins.map((b) => `${b.from} to ${b.to}: ${b.count}`).join(", ")}`}
+      summary={t`${title}: ${list}`}
     />
   );
 }
@@ -241,26 +249,32 @@ export function PopularProposals({ table }: { table: StatsTable }) {
     const title = column(table, "title");
     const interested = column(table, "interested");
     const session = column(table, "session");
+    const became = t`Became a session`;
+    const notScheduled = t`Not scheduled`;
     return table.rows
       .map((row) => ({
         label: String(title(row)),
         n: Number(interested(row)),
         values: {
-          "Became a session": session(row) ? Number(interested(row)) : 0,
-          "Not scheduled": session(row) ? 0 : Number(interested(row)),
+          [became]: session(row) ? Number(interested(row)) : 0,
+          [notScheduled]: session(row) ? 0 : Number(interested(row)),
         },
       }))
       .sort((a, b) => b.n - a.n)
       .slice(0, TOP_SHOWN);
   }, [table]);
   if (data.length === 0) return <NoData />;
+  const list = data.map((d) => `${d.label} ${d.n}`).join(", ");
   return (
     <StackedBars
       data={data}
-      series={["Became a session", "Not scheduled"]}
-      xLabel="Interested votes"
-      yLabel="Proposal"
-      summary={`Most popular proposals: ${data.map((d) => `${d.label} ${d.n}`).join(", ")}`}
+      series={[t`Became a session`, t`Not scheduled`]}
+      xLabel={t`Interested votes`}
+      yLabel={t({
+        message: "Proposal",
+        comment: "Chart axis: one bar per proposal",
+      })}
+      summary={t`Most popular proposals: ${list}`}
     />
   );
 }
@@ -289,7 +303,7 @@ export function DayTimeline({
   table: StatsTable;
   valueKey: string;
   yLabel: string;
-  summary: string;
+  summary: (list: string) => string;
 }) {
   const data = useMemo(() => {
     const day = column(table, "day");
@@ -305,9 +319,9 @@ export function DayTimeline({
   return (
     <ColumnChart
       data={data}
-      xLabel="Day"
+      xLabel={t({ message: "Day", comment: "Chart axis: day of the event" })}
       yLabel={yLabel}
-      summary={`${summary}: ${listed(data)}`}
+      summary={summary(listed(data))}
     />
   );
 }
@@ -339,6 +353,10 @@ export function UtilizationHeatmaps({ table }: { table: StatsTable }) {
       value: Number(booked(row)),
     }));
   }, [table]);
+  const hourLabel = t({
+    message: "Hour",
+    comment: "Chart axis: hour of the day",
+  });
   return (
     <div className="space-y-4">
       {days.map(([day, cells]) => (
@@ -346,10 +364,13 @@ export function UtilizationHeatmaps({ table }: { table: StatsTable }) {
           <h3 className="text-sm font-medium text-fg-muted">{day}</h3>
           <Heatmap
             cells={cells}
-            xLabel="Hour"
-            yLabel="Location"
-            valueLabel="Booked share of the open time (%)"
-            summary={`Utilization on ${day}`}
+            xLabel={hourLabel}
+            yLabel={t({
+              message: "Location",
+              comment: "Chart axis: one row per location",
+            })}
+            valueLabel={t`Booked share of the open time (%)`}
+            summary={t`Utilization on ${day}`}
           />
         </div>
       ))}
@@ -369,13 +390,17 @@ export function MeetingsHeatmap({ table }: { table: StatsTable }) {
     }));
   }, [table]);
   if (cells.length === 0) return <NoData />;
+  const hourLabel = t({
+    message: "Hour",
+    comment: "Chart axis: hour of the day",
+  });
   return (
     <Heatmap
       cells={cells}
-      xLabel="Hour"
-      yLabel="Day"
-      valueLabel="Accepted meetings"
-      summary="Accepted meetings by day and hour"
+      xLabel={hourLabel}
+      yLabel={t({ message: "Day", comment: "Chart axis: day of the event" })}
+      valueLabel={t`Accepted meetings`}
+      summary={t`Accepted meetings by day and hour`}
     />
   );
 }
@@ -397,17 +422,21 @@ export function SupplyDemand({ table }: { table: StatsTable }) {
           }
     ).filter(([, points]) => points.length > 0);
   }, [table]);
+  const rsvpsLabel = t`RSVPs per running session`;
   return (
     <div className="space-y-4">
       {days.map(([day, points]) => (
         <div key={day} className="space-y-1">
           <h3 className="text-sm font-medium text-fg-muted">{day}</h3>
           <LineChart
-            series={[{ name: "RSVPs per running session", points }]}
-            xLabel="Hour"
-            yLabel="RSVPs per running session"
+            series={[{ name: rsvpsLabel, points }]}
+            xLabel={t({
+              message: "Hour",
+              comment: "Chart axis: hour of the day",
+            })}
+            yLabel={rsvpsLabel}
             timeFormat="%H:%M"
-            summary={`RSVPs per running session on ${day}`}
+            summary={t`RSVPs per running session on ${day}`}
           />
         </div>
       ))}

@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import type { StatsTable } from "@schellingboard/contracts/stats";
 import { useState } from "react";
 
@@ -21,7 +23,7 @@ function Help({ title, help }: { title: string; help: string[] }) {
     <>
       <button
         type="button"
-        aria-label={`About ${title}`}
+        aria-label={t`About ${title}`}
         onClick={() => setOpen(true)}
         className="rounded-full p-0.5 text-fg-subtle hover:text-fg focus:outline-none focus:ring-2 focus:ring-brand-accent"
       >
@@ -73,12 +75,13 @@ export function FigureCard({
   table: StatsTable;
   csvUrl: string;
 }) {
-  const [view, setView] = useState<"chart" | "table">("chart");
+  const [asTable, setAsTable] = useState(false);
   const title = figureTitle(figure, table);
+  const tableTitle = table.title;
   const headingId = figureHeadingId(figure);
   const hasData = table.rows.length > 0 && (figure.hasChart?.(table) ?? true);
   const switchable = Boolean(figure.chart) && !figure.from && hasData;
-  const showTable = !figure.chart || (switchable && view === "table");
+  const showTable = !figure.chart || (switchable && asTable);
 
   return (
     <section
@@ -99,23 +102,31 @@ export function FigureCard({
           {switchable && (
             <div
               role="group"
-              aria-label={`Show ${title} as`}
+              aria-label={t`Show ${title} as`}
               className="flex rounded-md border border-line"
             >
-              {(["chart", "table"] as const).map((option) => (
+              {[false, true].map((table) => (
                 <button
-                  key={option}
+                  key={String(table)}
                   type="button"
-                  aria-pressed={view === option}
-                  onClick={() => setView(option)}
+                  aria-pressed={asTable === table}
+                  onClick={() => setAsTable(table)}
                   className={cx(
                     switchButton,
-                    view === option
+                    asTable === table
                       ? "bg-surface-sunken text-fg"
                       : "text-fg-subtle hover:text-fg"
                   )}
                 >
-                  {option === "chart" ? "Chart" : "Table"}
+                  {table
+                    ? t({
+                        message: "Table",
+                        comment: "Button: show the figure as a table",
+                      })
+                    : t({
+                        message: "Chart",
+                        comment: "Button: show the figure as a chart",
+                      })}
                 </button>
               ))}
             </div>
@@ -124,16 +135,18 @@ export function FigureCard({
             <a
               href={csvUrl}
               download
-              aria-label={`Download CSV of ${table.title}`}
+              aria-label={t`Download CSV of ${tableTitle}`}
               className="rounded-md border border-line px-2.5 py-1 text-sm font-medium text-fg-muted hover:bg-surface-sunken"
             >
-              CSV
+              <Trans>CSV</Trans>
             </a>
           )}
         </div>
       </div>
       {!hasData ? (
-        <p className="text-sm text-fg-subtle">No data</p>
+        <p className="text-sm text-fg-subtle">
+          <Trans>No data</Trans>
+        </p>
       ) : figure.tiles ? (
         <Tiles table={table} label={title} />
       ) : showTable ? (

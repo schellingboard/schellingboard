@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import type { StatsTable } from "@schellingboard/contracts/stats";
 import { useState } from "react";
 
@@ -9,17 +10,29 @@ import { usePaging } from "../../ui/use-paging";
 type Cell = StatsTable["rows"][number][number];
 type Column = StatsTable["columns"][number];
 
+export const percentLabel = (value: number) => {
+  const rounded = Math.round(value * 10) / 10;
+  return t({
+    message: `${rounded}%`,
+    comment: "A percentage; the number is already rounded",
+  });
+};
+
 export function formatCell(cell: Cell, type: Column["type"]): string {
-  if (cell === null) return "No data";
+  if (cell === null) return t`No data`;
+  const rounded = Math.round(Number(cell) * 10) / 10;
   switch (type) {
     case "percent":
-      return `${Math.round(Number(cell) * 10) / 10}%`;
+      return percentLabel(Number(cell));
     case "minutes":
-      return `${Math.round(Number(cell) * 10) / 10} min`;
+      return t({
+        message: `${rounded} min`,
+        comment: "Duration in minutes, min is the unit",
+      });
     case "number":
       return String(Math.round(Number(cell) * 100) / 100);
     case "boolean":
-      return cell ? "Yes" : "No";
+      return cell ? t`Yes` : t`No`;
     default:
       return String(cell);
   }
@@ -93,6 +106,7 @@ export function SortableStatsTable({
     paging,
     paramsUpdater(paging, (next) => setPaging(next))
   );
+  const tableTitle = table.title;
   const searchable = table.rows.length > SEARCH_FROM;
 
   return (
@@ -108,8 +122,8 @@ export function SortableStatsTable({
             setQuery("");
             resetPage();
           }}
-          aria-label={`Search ${table.title}`}
-          placeholder="Search…"
+          aria-label={t`Search ${tableTitle}`}
+          placeholder={t`Search…`}
           className="max-w-xs"
           inputClassName="rounded-md border border-line bg-surface-raised px-3 py-1.5 text-base sm:text-sm focus:border-line-strong focus:outline-none"
         />
@@ -166,7 +180,7 @@ export function SortableStatsTable({
                   colSpan={table.columns.length}
                   className="py-2 text-fg-subtle"
                 >
-                  {query ? "Nothing matches." : "No data"}
+                  {query ? t`Nothing matches.` : t`No data`}
                 </td>
               </tr>
             )}

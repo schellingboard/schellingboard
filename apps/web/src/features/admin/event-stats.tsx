@@ -1,3 +1,6 @@
+import { i18n, type MessageDescriptor } from "@lingui/core";
+import { msg, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import type { EventStatistics } from "@schellingboard/contracts/stats";
 import { SESSION_ORIGINS } from "@schellingboard/domain/stats/session-origin";
 import { type ReactNode, useId } from "react";
@@ -14,18 +17,27 @@ import { PeoplePicker } from "../../ui/people-picker";
 import { FigureCard, figureHeadingId, figureTitle } from "./stats-figure-card";
 import { figuresFor } from "./stats-figures";
 
-const SECTION_LABELS: Record<string, string> = {
-  overview: "Overview",
-  sessions: "Sessions",
-  meetings: "1-on-1s",
+const SECTION_LABELS: Record<string, MessageDescriptor> = {
+  overview: msg`Overview`,
+  proposals: msg`Proposals`,
+  sessions: msg`Sessions`,
+  attendees: msg`Attendees`,
+  meetings: msg`1-on-1s`,
+  locations: msg`Locations`,
+  profiles: msg`Profiles`,
+  comments: msg`Comments`,
+  notifications: msg`Notifications`,
 };
 
-const ORIGIN_LABELS = {
-  blocker: "Blockers",
-  proposal: "Proposal sessions",
-  organizer: "Organizer sessions",
-  spontaneous: "Spontaneous sessions",
-} as const;
+const ORIGIN_LABELS: Record<
+  (typeof SESSION_ORIGINS)[number],
+  MessageDescriptor
+> = {
+  blocker: msg`Blockers`,
+  proposal: msg`Proposal sessions`,
+  organizer: msg`Organizer sessions`,
+  spontaneous: msg`Spontaneous sessions`,
+};
 
 const sectionOf = (tableId: string) => tableId.split("-")[0];
 
@@ -58,7 +70,7 @@ function Picker({
         people={options}
         selected={excluded}
         onChange={onChange}
-        placeholder="Type to find, or pick from the list"
+        placeholder={t`Type to find, or pick from the list`}
       />
     </div>
   );
@@ -82,12 +94,14 @@ function FilterPanel({
   );
   return (
     <section
-      aria-label="Filter"
+      aria-label={t`Filter`}
       className="space-y-3 rounded-md border border-line-subtle p-3"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-fg-muted">
-          <span className="font-medium text-fg">Filter: </span>
+          <span className="font-medium text-fg">
+            <Trans>Filter:</Trans>{" "}
+          </span>
           {summary}
         </p>
         <div className="flex items-center gap-3">
@@ -97,7 +111,7 @@ function FilterPanel({
               onClick={() => onChange(filterFromParams(new URLSearchParams()))}
               className="text-sm font-medium text-fg-muted underline-offset-4 hover:text-fg hover:underline"
             >
-              Reset filter
+              <Trans>Reset filter</Trans>
             </button>
           )}
           {download}
@@ -105,20 +119,20 @@ function FilterPanel({
       </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
         <Picker
-          label="Locations to leave out"
+          label={t`Locations to leave out`}
           options={options.locations}
           excluded={filter.excludeLocations}
           onChange={(ids) => onChange({ ...filter, excludeLocations: ids })}
         />
         <Picker
-          label="Hosts to leave out"
+          label={t`Hosts to leave out`}
           options={options.hosts}
           excluded={filter.excludeHosts}
           onChange={(ids) => onChange({ ...filter, excludeHosts: ids })}
         />
         <fieldset className="min-w-0 space-y-1 md:col-span-2 xl:col-span-1">
           <legend className="text-sm font-medium text-fg">
-            Session origins
+            <Trans>Session origins</Trans>
           </legend>
           <div className="flex flex-wrap gap-x-4 gap-y-1 xl:flex-col">
             {SESSION_ORIGINS.map((origin) => (
@@ -140,15 +154,17 @@ function FilterPanel({
                     })
                   }
                 />
-                {ORIGIN_LABELS[origin]}
+                {i18n._(ORIGIN_LABELS[origin])}
               </label>
             ))}
           </div>
         </fieldset>
       </div>
       <p className="text-xs text-fg-subtle">
-        What you leave out leaves every figure and download. A host also leaves
-        the figures about people.
+        <Trans>
+          What you leave out leaves every figure and download. A host also
+          leaves the figures about people.
+        </Trans>
       </p>
     </section>
   );
@@ -170,10 +186,17 @@ export function EventStatsScreen({
   const failed = status === "error" || (status === "ready" && !stats);
   const alert = failed && (
     <p role="alert" className="text-sm text-danger-fg">
-      Could not load the statistics.
+      <Trans>Could not load the statistics.</Trans>
     </p>
   );
-  if (!stats) return alert || <p className="text-sm">Loading…</p>;
+  if (!stats)
+    return (
+      alert || (
+        <p className="text-sm">
+          <Trans>Loading…</Trans>
+        </p>
+      )
+    );
 
   const filter = filterFromParams(params);
   const sections = [...new Set(stats.tables.map((t) => sectionOf(t.id)))];
@@ -204,7 +227,7 @@ export function EventStatsScreen({
             download
             className={download}
           >
-            Download all
+            <Trans>Download all</Trans>
           </a>
         }
       />
@@ -212,7 +235,7 @@ export function EventStatsScreen({
       <div className="space-y-6 lg:grid lg:grid-cols-[11rem_minmax(0,1fr)] lg:gap-8 lg:space-y-0">
         <div className="space-y-6 lg:sticky lg:top-4 lg:max-h-[calc(100dvh-2rem)] lg:self-start lg:overflow-y-auto">
           <nav
-            aria-label="Statistics sections"
+            aria-label={t`Statistics sections`}
             className="flex gap-1 overflow-x-auto border-b border-line-subtle lg:flex-col lg:overflow-visible lg:border-b-0"
           >
             {sections.map((key) => (
@@ -227,11 +250,14 @@ export function EventStatsScreen({
                     : "border-transparent text-fg-subtle hover:border-line hover:text-fg-muted lg:hover:bg-surface-sunken"
                 )}
               >
-                {SECTION_LABELS[key] ?? key[0].toUpperCase() + key.slice(1)}
+                {SECTION_LABELS[key] ? i18n._(SECTION_LABELS[key]) : key}
               </a>
             ))}
           </nav>
-          <nav aria-label="Figures in this section" className="hidden lg:block">
+          <nav
+            aria-label={t`Figures in this section`}
+            className="hidden lg:block"
+          >
             <ul className="space-y-0.5 border-l border-line-subtle">
               {figures.map(({ figure, table }) => (
                 <li key={figure.key}>
@@ -259,8 +285,10 @@ export function EventStatsScreen({
         <div className="min-w-0 space-y-6">
           {section === "attendees" && (
             <p className="text-sm text-fg-muted">
-              RSVPs are intent, not attendance: people book more than they
-              attend.
+              <Trans>
+                RSVPs are intent, not attendance: people book more than they
+                attend.
+              </Trans>
             </p>
           )}
 

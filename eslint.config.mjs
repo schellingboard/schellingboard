@@ -143,6 +143,10 @@ export default tseslint.config(
       "apps/web/src/features/admin/location-availability.tsx",
       "apps/web/src/features/admin/locations-screen.tsx",
       "apps/web/src/features/admin/event-meetings.tsx",
+      "apps/web/src/features/admin/event-stats.tsx",
+      "apps/web/src/features/admin/stats-charts.tsx",
+      "apps/web/src/features/admin/stats-figure-card.tsx",
+      "apps/web/src/features/admin/stats-table.tsx",
     ],
     ignores: ["**/*.test.{ts,tsx}"],
     plugins: { lingui },
@@ -192,6 +196,10 @@ export default tseslint.config(
             "formatEventDates",
             "setField",
             "calls.move",
+            "column",
+            "next.set",
+            "*.replaceAll",
+            "statsDownloadUrl",
             "cx",
             "console.*",
           ],
@@ -217,6 +225,8 @@ export default tseslint.config(
             "^[a-z]+Phase(?:Start|End)$",
             // Query-string openers such as `?redirect=`
             "^\\?[a-z]+=$",
+            // Figure heading id prefix
+            "^stats-$",
             // Id suffixes such as `${id}-hint`
             "^-[a-z]+$",
             // Idempotency-key suffixes such as `${key}:update`
@@ -228,6 +238,7 @@ export default tseslint.config(
           ],
           ignoreNames: [
             "paginationFooter",
+            "timeFormat",
             "kind",
             "fieldNames",
             "direction",

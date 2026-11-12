@@ -112,7 +112,9 @@ export const FIGURES: Figure[] = [
         y="voters"
         xLabel="Days after the first proposal"
         yLabel="Voters"
-        noun="proposals"
+        summary={(n) =>
+          `Voters against Days after the first proposal, ${n} proposals`
+        }
       />
     ),
   },
@@ -130,7 +132,7 @@ export const FIGURES: Figure[] = [
         valueKey="share"
         xLabel="Became a session (%)"
         yLabel="Proposals by interested votes"
-        summary="Share that became a session"
+        summary={(list) => `Share that became a session: ${list}`}
         format={percentLabel}
       />
     ),
@@ -162,7 +164,7 @@ export const FIGURES: Figure[] = [
         table={table}
         valueKey="proposals"
         yLabel="Proposals created"
-        summary="Proposals created per day"
+        summary={(list) => `Proposals created per day: ${list}`}
       />
     ),
   },
@@ -265,7 +267,7 @@ export const FIGURES: Figure[] = [
         xLabel="RSVPs"
         yLabel="Session"
         top={TOP_SHOWN}
-        summary="Most RSVPed sessions"
+        summary={(list) => `Most RSVPed sessions: ${list}`}
       />
     ),
   },
@@ -316,7 +318,7 @@ export const FIGURES: Figure[] = [
         y="reported"
         xLabel="RSVPs"
         yLabel="Reported attendees"
-        noun="sessions"
+        summary={(n) => `Reported attendees against RSVPs, ${n} sessions`}
       />
     ),
   },
@@ -337,7 +339,7 @@ export const FIGURES: Figure[] = [
         y="rsvps"
         xLabel="Proposal interest (%)"
         yLabel="RSVPs"
-        noun="sessions"
+        summary={(n) => `RSVPs against Proposal interest (%), ${n} sessions`}
       />
     ),
   },
@@ -358,7 +360,7 @@ export const FIGURES: Figure[] = [
         y="rsvps"
         xLabel="Parallel sessions"
         yLabel="RSVPs"
-        noun="sessions"
+        summary={(n) => `RSVPs against Parallel sessions, ${n} sessions`}
       />
     ),
   },
@@ -554,7 +556,7 @@ export const FIGURES: Figure[] = [
         valueKey="utilization"
         xLabel="Utilization (%)"
         yLabel="Location"
-        summary="Utilization by location"
+        summary={(list) => `Utilization by location: ${list}`}
         format={percentLabel}
       />
     ),
@@ -759,7 +761,7 @@ export const FIGURES: Figure[] = [
         table={table}
         valueKey="comments"
         yLabel="Comments"
-        summary="Comments per day"
+        summary={(list) => `Comments per day: ${list}`}
       />
     ),
   },

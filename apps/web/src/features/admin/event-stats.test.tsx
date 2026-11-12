@@ -602,7 +602,7 @@ describe("1-on-1 charts", { tags: ["021-US1"] }, () => {
     ).toBeTruthy();
     expect(
       await screen.findByRole("img", {
-        name: "Slots offered per person: 1 to 2: 3, 2 to 4: 1",
+        name: "Slots offered per person: 1–2: 3, 2–4: 1",
       })
     ).toBeTruthy();
   });
@@ -672,7 +672,7 @@ describe("profile and comment charts", { tags: ["021-US1"] }, () => {
     ).toBeTruthy();
     expect(
       await screen.findByRole("img", {
-        name: "Comments per author: 1 to 2: 3, 2 to 4: 1",
+        name: "Comments per author: 1–2: 3, 2–4: 1",
       })
     ).toBeTruthy();
   });
