@@ -41,8 +41,8 @@ the E2E specs a step touches; the user runs the full suite at the end.
     `meetingNudge.*` changes, `nudges` on meeting-options). 22a. DONE **#1587** "My schedule" menu
     on the grid (z-index on the sticky filter bar). 22b. DONE Share button removed from the shared
     `SidePanel` (all panels).
-23. **#831** (Medium) Consistent pagination strategy; `Pager` (#684) exists, read the 5 comments and
-    apply it where the issue says. Record in Questions if #684 covered it.
+23. BLOCKED, see Questions. **#831** (Medium) Consistent pagination strategy; `Pager` (#684) exists,
+    read the 5 comments and apply it where the issue says. Record in Questions if #684 covered it.
 24. **#1328a** (Medium) i18n foundation: Lingui, `apps/web/src/i18n/`, `en` catalog, scripts and
     Makefile targets, `<html lang>`. Issue step 1.
 25. **#1328b** Locale storage: `guests.locale`, `PATCH /me`, browser fallback, Settings switcher
