@@ -1,3 +1,6 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
+
 import type { AdminEventCalls } from "../../commands/admin-events";
 import type { AdminLocation } from "../../queries/admin-locations";
 import type { OnParams } from "../../ui/list-paging";
@@ -21,26 +24,31 @@ export function EventLocationsManager({
   return (
     <AssignmentManager
       key={eventId}
-      title="Locations"
+      title={t`Locations`}
       rows={locations}
       isAssigned={(l) => l.eventIds.includes(eventId)}
       searchText={(l) => [l.name]}
-      searchPlaceholder="Search name…"
-      emptyMessage="No locations match."
+      searchPlaceholder={t`Search name…`}
+      emptyMessage={t`No locations match.`}
       columns={[
-        { header: "Name", cell: (l) => l.name },
+        { header: t`Name`, cell: (l) => l.name },
         {
-          header: "Capacity",
+          header: t`Capacity`,
           cell: (l) => l.capacity,
           cellClassName: "text-fg-subtle",
         },
       ]}
-      detail={(l) => (
-        <>
-          <p className="font-medium text-fg">{l.name}</p>
-          <p className="text-fg-subtle">Capacity: {l.capacity}</p>
-        </>
-      )}
+      detail={(l) => {
+        const capacity = l.capacity;
+        return (
+          <>
+            <p className="font-medium text-fg">{l.name}</p>
+            <p className="text-fg-subtle">
+              <Trans>Capacity: {capacity}</Trans>
+            </p>
+          </>
+        );
+      }}
       params={params}
       onParams={onParams}
       assign={(ids, key) => calls.assignLocations(eventId, ids, key)}

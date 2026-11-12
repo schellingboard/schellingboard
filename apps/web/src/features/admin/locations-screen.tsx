@@ -1,7 +1,11 @@
+import { i18n, type MessageDescriptor } from "@lingui/core";
+import { msg, plural, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import {
   DEFAULT_LOCATION_COLOR,
   isLocationColorName,
   LOCATION_COLOR_NAMES,
+  type LocationColorName,
 } from "@schellingboard/domain/location-colors";
 import {
   IMAGE_REQUIREMENTS_HINT,
@@ -24,25 +28,38 @@ import {
 } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
 import type { OnParams } from "../../ui/list-paging";
-import { plural } from "../../ui/list-paging";
 import { LocationPlaceholder } from "../../ui/location-placeholder";
 import { usePaging } from "../../ui/use-paging";
 import { ConfirmByTyping } from "./confirm-by-typing";
+import { useRowMode } from "./row-mode";
 import { shown, useJumpWithin } from "./use-section-save";
 
 export type EventOption = { id: string; name: string };
 
-const FIELDS = [
-  "name",
-  "capacity",
-  "description",
-  "areaDescription",
-  "color",
-  "bookable",
-  "eventIds",
-  "image",
-];
-const CAPACITY_ERROR = "Capacity must be a non-negative whole number";
+const COLOR_LABELS: Record<LocationColorName, MessageDescriptor> = {
+  slate: msg({ message: "Slate", context: "Location colour" }),
+  gray: msg({ message: "Gray", context: "Location colour" }),
+  zinc: msg({ message: "Zinc", context: "Location colour" }),
+  neutral: msg({ message: "Neutral", context: "Location colour" }),
+  stone: msg({ message: "Stone", context: "Location colour" }),
+  red: msg({ message: "Red", context: "Location colour" }),
+  orange: msg({ message: "Orange", context: "Location colour" }),
+  amber: msg({ message: "Amber", context: "Location colour" }),
+  yellow: msg({ message: "Yellow", context: "Location colour" }),
+  lime: msg({ message: "Lime", context: "Location colour" }),
+  green: msg({ message: "Green", context: "Location colour" }),
+  emerald: msg({ message: "Emerald", context: "Location colour" }),
+  teal: msg({ message: "Teal", context: "Location colour" }),
+  cyan: msg({ message: "Cyan", context: "Location colour" }),
+  sky: msg({ message: "Sky", context: "Location colour" }),
+  blue: msg({ message: "Blue", context: "Location colour" }),
+  indigo: msg({ message: "Indigo", context: "Location colour" }),
+  violet: msg({ message: "Violet", context: "Location colour" }),
+  purple: msg({ message: "Purple", context: "Location colour" }),
+  fuchsia: msg({ message: "Fuchsia", context: "Location colour" }),
+  pink: msg({ message: "Pink", context: "Location colour" }),
+  rose: msg({ message: "Rose", context: "Location colour" }),
+};
 
 function LocationForm({
   location,
@@ -61,6 +78,7 @@ function LocationForm({
   onSaved: () => void;
   onClose: () => void;
 }) {
+  const locationName = location?.name ?? "";
   const { ref, jump } = useJumpWithin<HTMLFormElement>();
   const [name, setName] = useState(location?.name ?? "");
   const [capacity, setCapacity] = useState(String(location?.capacity ?? 0));
@@ -84,11 +102,12 @@ function LocationForm({
 
   const capacityValue = capacity.trim() === "" ? NaN : Number(capacity);
   const invalid: FieldErrors = {};
-  if (!name.trim()) invalid.name = "Name is required";
+  const maxImageMb = MAX_IMAGE_BYTES / 1024 / 1024;
+  if (!name.trim()) invalid.name = t`Name is required`;
   if (!Number.isInteger(capacityValue) || capacityValue < 0)
-    invalid.capacity = CAPACITY_ERROR;
+    invalid.capacity = t`Capacity must be a non-negative whole number`;
   if (image && image.size >= MAX_IMAGE_BYTES)
-    invalid.image = `Image exceeds ${MAX_IMAGE_BYTES / 1024 / 1024} MB limit.`;
+    invalid.image = t`Image exceeds ${maxImageMb} MB limit.`;
 
   const mutation = useFormMutation({
     call: async (key) => {
@@ -121,7 +140,16 @@ function LocationForm({
       if (sent.data) target.current.version = sent.data.version;
       return sent;
     },
-    fieldNames: FIELDS,
+    fieldNames: [
+      "name",
+      "capacity",
+      "description",
+      "areaDescription",
+      "color",
+      "bookable",
+      "eventIds",
+      "image",
+    ],
     explainRefusals: true,
   });
   const fields: FieldErrors = {
@@ -154,7 +182,7 @@ function LocationForm({
     >
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <TextField
-          label="Name"
+          label={t`Name`}
           name="name"
           required
           value={name}
@@ -162,7 +190,7 @@ function LocationForm({
           error={fields.name}
         />
         <TextField
-          label="Capacity"
+          label={t`Capacity`}
           name="capacity"
           type="number"
           min={0}
@@ -173,7 +201,7 @@ function LocationForm({
         />
       </div>
       <TextAreaField
-        label="Description"
+        label={t`Description`}
         name="description"
         rows={2}
         value={description}
@@ -182,7 +210,7 @@ function LocationForm({
       />
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <TextField
-          label="Area description"
+          label={t`Area description`}
           name="areaDescription"
           value={area}
           onChange={setArea}
@@ -198,13 +226,16 @@ function LocationForm({
           />
           <div className="flex-1">
             <SelectField
-              label="Color"
+              label={t({
+                message: "Color",
+                comment: "Field: the colour of a location on the schedule",
+              })}
               name="color"
               value={color}
               onChange={(value) => setColor(value as typeof color)}
               options={LOCATION_COLOR_NAMES.map((c) => ({
                 value: c,
-                label: c,
+                label: i18n._(COLOR_LABELS[c]),
               }))}
               error={fields.color}
             />
@@ -212,7 +243,7 @@ function LocationForm({
         </div>
       </div>
       <CheckboxField
-        label="Bookable"
+        label={t`Bookable`}
         name="bookable"
         checked={bookable}
         onChange={setBookable}
@@ -220,7 +251,9 @@ function LocationForm({
       />
       {events.length > 0 && (
         <fieldset className="space-y-1">
-          <legend className="font-medium">Events</legend>
+          <legend className="font-medium">
+            <Trans>Events</Trans>
+          </legend>
           <div className="flex flex-wrap gap-x-6 gap-y-1">
             {events.map((event) => (
               <CheckboxField
@@ -248,14 +281,14 @@ function LocationForm({
         {location?.imageUrl && (
           <img
             src={location.imageUrl}
-            alt={`Current image of ${location.name}`}
+            alt={t`Current image of ${locationName}`}
             width={160}
             height={120}
             className="rounded border border-line-subtle"
           />
         )}
         <FileField
-          label="Image"
+          label={t`Image`}
           name="image"
           accept="image/jpeg,image/png,image/webp"
           hint={IMAGE_REQUIREMENTS_HINT}
@@ -270,10 +303,10 @@ function LocationForm({
       />
       <div className="flex gap-2">
         <Button type="submit" disabled={mutation.pending}>
-          {mutation.pending ? pendingLabel : created ? "Save" : submitLabel}
+          {mutation.pending ? pendingLabel : created ? t`Save` : submitLabel}
         </Button>
         <Button variant="quiet" disabled={mutation.pending} onClick={onClose}>
-          Cancel
+          <Trans>Cancel</Trans>
         </Button>
       </div>
     </form>
@@ -295,7 +328,8 @@ function LocationRow({
   calls: AdminLocationCalls;
   onChanged: () => void;
 }) {
-  const [mode, setMode] = useState<"view" | "edit" | "delete">("view");
+  const { mode, close, edit, remove } = useRowMode();
+  const name = location.name;
   const up = useFormMutation({
     call: (key) => calls.move(location.id, "up", location.version, key),
     explainRefusals: true,
@@ -305,7 +339,6 @@ function LocationRow({
     explainRefusals: true,
   });
   const moving = up.pending || down.pending;
-  const close = () => setMode("view");
 
   const move = async (mutation: typeof up) => {
     const result = await mutation.submit();
@@ -319,17 +352,28 @@ function LocationRow({
           location={location}
           events={events}
           calls={calls}
-          submitLabel="Save"
-          pendingLabel="Saving..."
+          submitLabel={t`Save`}
+          pendingLabel={t`Saving...`}
           onSaved={onChanged}
           onClose={close}
         />
       </li>
     );
 
+  const capacity = location.capacity;
   const details = [
-    location.capacity ? `max ${location.capacity}` : null,
-    location.bookable ? "bookable" : null,
+    capacity
+      ? t({
+          message: `max ${capacity}`,
+          context: "Location details: seats, lowercase in a list",
+        })
+      : null,
+    location.bookable
+      ? t({
+          message: "bookable",
+          comment: "Adjective in a lowercase details list",
+        })
+      : null,
     events
       .filter((e) => location.eventIds.includes(e.id))
       .map((e) => e.name)
@@ -338,6 +382,24 @@ function LocationRow({
     .filter(Boolean)
     .join(" · ");
   const error = up.error ?? down.error;
+  const sessionCount = location.sessionCount;
+  const eventCount = location.eventIds.length;
+  const deleteWarning =
+    sessionCount > 0
+      ? t`Deleting “${name}” removes it from ${plural(sessionCount, {
+          one: "# session",
+          other: "# sessions",
+        })} and ${plural(eventCount, {
+          one: "# event",
+          other: "# events",
+        })}. Hosts and RSVPed guests of those sessions are told. This cannot be undone. Type the location name to confirm.`
+      : t`Deleting “${name}” removes it from ${plural(sessionCount, {
+          one: "# session",
+          other: "# sessions",
+        })} and ${plural(eventCount, {
+          one: "# event",
+          other: "# events",
+        })}. This cannot be undone. Type the location name to confirm.`;
 
   return (
     <li className="space-y-2 py-3">
@@ -375,7 +437,7 @@ function LocationRow({
         <div className="flex items-center gap-2">
           <Button
             variant="quiet"
-            aria-label={`Move ${location.name} up`}
+            aria-label={t`Move ${name} up`}
             disabled={isFirst || moving}
             onClick={() => void move(up)}
           >
@@ -383,25 +445,25 @@ function LocationRow({
           </Button>
           <Button
             variant="quiet"
-            aria-label={`Move ${location.name} down`}
+            aria-label={t`Move ${name} down`}
             disabled={isLast || moving}
             onClick={() => void move(down)}
           >
             ↓
           </Button>
-          <Button variant="quiet" onClick={() => setMode("edit")}>
-            Edit
+          <Button variant="quiet" onClick={edit}>
+            <Trans>Edit</Trans>
           </Button>
-          <Button variant="danger" onClick={() => setMode("delete")}>
-            Delete
+          <Button variant="danger" onClick={remove}>
+            <Trans>Delete</Trans>
           </Button>
         </div>
       </div>
       {mode === "delete" && (
         <ConfirmByTyping
-          label="Location name confirmation"
+          label={t`Location name confirmation`}
           expected={location.name}
-          warning={`Deleting “${location.name}” removes it from ${plural(location.sessionCount, "session", "sessions")} and ${plural(location.eventIds.length, "event", "events")}.${location.sessionCount > 0 ? " Hosts and RSVPed guests of those sessions are told." : ""} This cannot be undone. Type the location name to confirm.`}
+          warning={deleteWarning}
           call={(key) => calls.remove(location.id, key)}
           onDeleted={onChanged}
           onCancel={close}
@@ -443,28 +505,39 @@ export function LocationsScreen({
   if (status === "error")
     return (
       <p role="alert" className="text-sm text-danger-fg">
-        Could not load the locations.
+        <Trans>Could not load the locations.</Trans>
       </p>
     );
-  if (status === "loading") return <p className="text-sm">Loading…</p>;
+  if (status === "loading")
+    return (
+      <p className="text-sm">
+        <Trans>Loading…</Trans>
+      </p>
+    );
 
   return (
-    <section aria-label="Locations" className="space-y-4">
-      <h1 className="text-2xl font-bold text-fg">Locations</h1>
+    <section aria-label={t`Locations`} className="space-y-4">
+      <h1 className="text-2xl font-bold text-fg">
+        <Trans>Locations</Trans>
+      </h1>
       {adding ? (
         <LocationForm
           events={events}
           calls={calls}
-          submitLabel="Add location"
-          pendingLabel="Adding..."
+          submitLabel={t`Add location`}
+          pendingLabel={t`Adding...`}
           onSaved={onChanged}
           onClose={() => setAdding(false)}
         />
       ) : (
-        <Button onClick={() => setAdding(true)}>New location</Button>
+        <Button onClick={() => setAdding(true)}>
+          <Trans>New location</Trans>
+        </Button>
       )}
       {locations.length === 0 ? (
-        <p className="text-sm text-fg-subtle">No locations yet.</p>
+        <p className="text-sm text-fg-subtle">
+          <Trans>No locations yet.</Trans>
+        </p>
       ) : (
         <ul
           ref={top}

@@ -168,6 +168,11 @@ msgstr ""
 msgid "{from} – {to} ({timezone})"
 msgstr ""
 
+#. Date range: start and end of a time period
+#: src/features/admin/location-availability.tsx:49
+msgid "{from} – {until}"
+msgstr ""
+
 #. Read out before the position, e.g. "Ann, 3 of 20 attendees"
 #: src/features/people/profile-panel.tsx:272
 msgid "{guestName}, "
@@ -336,6 +341,10 @@ msgstr ""
 msgid "← Proposals"
 msgstr ""
 
+#: src/features/admin/event-meetings.tsx:210
+msgid "+ Add meeting point"
+msgstr ""
+
 #: src/features/meetings/book-meeting.tsx:61
 #: src/features/meetings/meeting-panel.tsx:60
 #: src/features/meetings/meeting-panel.tsx:196
@@ -487,6 +496,14 @@ msgstr ""
 msgid "Add language"
 msgstr ""
 
+#: src/features/admin/locations-screen.tsx:527
+msgid "Add location"
+msgstr ""
+
+#: src/features/admin/event-meetings.tsx:249
+msgid "Add meeting point"
+msgstr ""
+
 #: src/features/admin/event-moments.tsx:196
 msgid "Add moment"
 msgstr ""
@@ -509,13 +526,20 @@ msgstr ""
 msgid "Add shared moment"
 msgstr ""
 
+#: src/features/admin/location-availability.tsx:195
+msgid "Add unavailable time"
+msgstr ""
+
 #: src/features/admin/guests-screen.tsx:134
 msgid "Add user"
 msgstr ""
 
 #: src/features/admin/event-days.tsx:227
+#: src/features/admin/event-meetings.tsx:249
 #: src/features/admin/event-moments.tsx:196
 #: src/features/admin/guests-screen.tsx:134
+#: src/features/admin/location-availability.tsx:195
+#: src/features/admin/locations-screen.tsx:528
 msgid "Adding..."
 msgstr ""
 
@@ -590,6 +614,11 @@ msgstr ""
 msgid "Always use light colours"
 msgstr ""
 
+#: src/features/admin/locations-screen.tsx:47
+msgctxt "Location colour"
+msgid "Amber"
+msgstr ""
+
 #: src/features/people/profile-form.tsx:81
 msgid "Any pronouns"
 msgstr ""
@@ -608,6 +637,10 @@ msgstr ""
 
 #: src/features/admin/event-config.tsx:209
 msgid "Applies to sessions booked from now on."
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:213
+msgid "Area description"
 msgstr ""
 
 #: src/features/schedule/meetings-col.tsx:135
@@ -648,6 +681,10 @@ msgstr ""
 msgid "Assign {rowName}"
 msgstr ""
 
+#: src/features/admin/location-availability.tsx:251
+msgid "Assign a location to the event first."
+msgstr ""
+
 #: src/ui/data-table.tsx:61
 msgid "Assign selected"
 msgstr ""
@@ -673,6 +710,10 @@ msgstr ""
 
 #: src/features/schedule/session-panel.tsx:330
 msgid "Attendees ({attendeeCount}):"
+msgstr ""
+
+#: src/features/admin/event-meetings.tsx:325
+msgid "Attendees choose their own availability once this is on."
 msgstr ""
 
 #: src/ui/phase-bar.tsx:25
@@ -752,6 +793,20 @@ msgstr ""
 msgid "Blocker"
 msgstr ""
 
+#: src/features/admin/locations-screen.tsx:55
+msgctxt "Location colour"
+msgid "Blue"
+msgstr ""
+
+#. Adjective in a lowercase details list
+#: src/features/admin/locations-screen.tsx:372
+msgid "bookable"
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:246
+msgid "Bookable"
+msgstr ""
+
 #: src/features/admin/event-days.tsx:40
 msgid "Bookings close"
 msgstr ""
@@ -807,6 +862,9 @@ msgstr ""
 #: src/features/admin/event-days.tsx:230
 #: src/features/admin/event-days.tsx:274
 #: src/features/admin/event-days.tsx:357
+#: src/features/admin/event-meetings.tsx:104
+#: src/features/admin/event-meetings.tsx:157
+#: src/features/admin/event-meetings.tsx:252
 #: src/features/admin/event-moments.tsx:199
 #: src/features/admin/event-moments.tsx:246
 #: src/features/admin/event-moments.tsx:293
@@ -817,6 +875,7 @@ msgstr ""
 #: src/features/admin/guests-screen.tsx:224
 #: src/features/admin/guests-screen.tsx:347
 #: src/features/admin/join-links.tsx:145
+#: src/features/admin/locations-screen.tsx:309
 #: src/features/comments/comments-section.tsx:586
 #: src/features/meetings/meeting-request-fields.tsx:157
 #: src/features/notifications/notifications-screen.tsx:232
@@ -835,8 +894,18 @@ msgstr ""
 msgid "canceled"
 msgstr ""
 
+#: src/features/admin/event-locations.tsx:36
 #: src/features/admin/event-sessions.tsx:233
+#: src/features/admin/locations-screen.tsx:193
 msgid "Capacity"
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:108
+msgid "Capacity must be a non-negative whole number"
+msgstr ""
+
+#: src/features/admin/event-locations.tsx:47
+msgid "Capacity: {capacity}"
 msgstr ""
 
 #: src/features/sign-in/account-security.tsx:171
@@ -973,8 +1042,17 @@ msgstr ""
 msgid "Code sent — check your email"
 msgstr ""
 
+#: src/features/admin/event-meetings.tsx:222
+msgid "Coffee bar"
+msgstr ""
+
 #: src/features/comments/comments-section.tsx:247
 msgid "Collapse comment"
+msgstr ""
+
+#. Field: the colour of a location on the schedule
+#: src/features/admin/locations-screen.tsx:229
+msgid "Color"
 msgstr ""
 
 #: src/app/theme.tsx:104
@@ -1005,9 +1083,14 @@ msgstr ""
 
 #: src/features/admin/confirm-by-typing.tsx:57
 #: src/features/admin/event-days.tsx:354
+#: src/features/admin/event-meetings.tsx:147
 #: src/features/admin/event-moments.tsx:290
 #: src/features/admin/guests-screen.tsx:344
 msgid "Confirm delete"
+msgstr ""
+
+#: src/features/admin/event-meetings.tsx:144
+msgid "Confirm delete {pointName}"
 msgstr ""
 
 #. State of a 1-on-1 on the grid, lower case
@@ -1116,6 +1199,7 @@ msgid "Could not load the guests."
 msgstr ""
 
 #: src/app/admin-pages.tsx:390
+#: src/features/admin/locations-screen.tsx:508
 msgid "Could not load the locations."
 msgstr ""
 
@@ -1232,12 +1316,21 @@ msgstr ""
 msgid "CSV file"
 msgstr ""
 
+#: src/features/admin/locations-screen.tsx:284
+msgid "Current image of {locationName}"
+msgstr ""
+
 #: src/features/admin/settings-screen.tsx:97
 msgid "Current map"
 msgstr ""
 
 #: src/features/sign-in/account-security.tsx:232
 msgid "Current password"
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:53
+msgctxt "Location colour"
+msgid "Cyan"
 msgstr ""
 
 #: src/features/admin/event-config.tsx:385
@@ -1271,10 +1364,13 @@ msgid "declined"
 msgstr ""
 
 #: src/features/admin/event-days.tsx:439
+#: src/features/admin/event-meetings.tsx:167
 #: src/features/admin/event-moments.tsx:356
 #: src/features/admin/event-proposals.tsx:325
 #: src/features/admin/event-sessions.tsx:594
 #: src/features/admin/guests-screen.tsx:376
+#: src/features/admin/location-availability.tsx:68
+#: src/features/admin/locations-screen.tsx:458
 #: src/features/comments/comments-section.tsx:348
 #: src/features/comments/comments-section.tsx:397
 #: src/features/notifications/notifications-screen.tsx:174
@@ -1282,6 +1378,10 @@ msgstr ""
 #: src/features/proposals/proposal-form.tsx:344
 #: src/features/proposals/proposal-form.tsx:364
 msgid "Delete"
+msgstr ""
+
+#: src/features/admin/event-meetings.tsx:164
+msgid "Delete {pointName}"
 msgstr ""
 
 #: src/features/admin/event-proposals.tsx:322
@@ -1332,10 +1432,24 @@ msgstr ""
 msgid "Delete this user?"
 msgstr ""
 
+#: src/features/admin/location-availability.tsx:65
+msgid "Delete unavailable time {roomName} {from} – {until}"
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:389
+msgid "Deleting “{name}” removes it from {sessionCount, plural, one {# session} other {# sessions}} and {eventCount, plural, one {# event} other {# events}}. Hosts and RSVPed guests of those sessions are told. This cannot be undone. Type the location name to confirm."
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:396
+msgid "Deleting “{name}” removes it from {sessionCount, plural, one {# session} other {# sessions}} and {eventCount, plural, one {# event} other {# events}}. This cannot be undone. Type the location name to confirm."
+msgstr ""
+
 #: src/features/admin/confirm-by-typing.tsx:57
 #: src/features/admin/event-days.tsx:354
+#: src/features/admin/event-meetings.tsx:147
 #: src/features/admin/event-moments.tsx:290
 #: src/features/admin/guests-screen.tsx:344
+#: src/features/admin/location-availability.tsx:68
 msgid "Deleting..."
 msgstr ""
 
@@ -1344,14 +1458,20 @@ msgid "Describe what your session will cover"
 msgstr ""
 
 #: src/features/admin/event-config.tsx:152
+#: src/features/admin/event-meetings.tsx:233
 #: src/features/admin/event-proposals.tsx:109
 #: src/features/admin/event-sessions.tsx:168
 #: src/features/admin/events-screen.tsx:99
+#: src/features/admin/locations-screen.tsx:204
 #: src/features/admin/settings-screen.tsx:87
 #: src/features/proposals/proposal-form.tsx:252
 #: src/features/proposals/proposals-screen.tsx:419
 #: src/features/schedule/session-panel.tsx:360
 msgid "Description"
+msgstr ""
+
+#: src/features/admin/event-meetings.tsx:83
+msgid "Description of {pointName}"
 msgstr ""
 
 #: src/features/admin/event-moments.tsx:56
@@ -1438,10 +1558,12 @@ msgstr ""
 #. Button: edit (verb)
 #. Button: edit (verb)
 #: src/features/admin/event-days.tsx:432
+#: src/features/admin/event-meetings.tsx:137
 #: src/features/admin/event-moments.tsx:349
 #: src/features/admin/event-proposals.tsx:318
 #: src/features/admin/event-sessions.tsx:580
 #: src/features/admin/guests-screen.tsx:353
+#: src/features/admin/locations-screen.tsx:455
 #: src/features/comments/comments-section.tsx:339
 #: src/features/proposals/proposal-panel.tsx:197
 #: src/features/proposals/proposals-screen.tsx:669
@@ -1512,6 +1634,15 @@ msgstr ""
 
 #: src/features/settings/email-settings-form.tsx:87
 msgid "Email settings"
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:51
+msgctxt "Location colour"
+msgid "Emerald"
+msgstr ""
+
+#: src/features/admin/event-meetings.tsx:324
+msgid "Enable meetings"
 msgstr ""
 
 #: src/features/sign-in/account-security.tsx:204
@@ -1622,6 +1753,7 @@ msgstr ""
 #: src/features/admin/event-layout.tsx:90
 #: src/features/admin/events-screen.tsx:200
 #: src/features/admin/guests-screen.tsx:37
+#: src/features/admin/locations-screen.tsx:255
 msgid "Events"
 msgstr ""
 
@@ -1651,6 +1783,10 @@ msgstr ""
 
 #: src/features/proposals/list-model.ts:207
 msgid "Fewest votes first"
+msgstr ""
+
+#: src/features/admin/location-availability.tsx:166
+msgid "Fill in a whole day"
 msgstr ""
 
 #: src/features/people/directory-screen.tsx:63
@@ -1719,6 +1855,19 @@ msgstr ""
 msgid "Forgot your password?"
 msgstr ""
 
+#: src/features/admin/location-availability.tsx:145
+msgid "From"
+msgstr ""
+
+#: src/features/admin/location-availability.tsx:113
+msgid "From is required"
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:59
+msgctxt "Location colour"
+msgid "Fuchsia"
+msgstr ""
+
 #: src/app/footer.tsx:174
 msgid "Full changelog on GitHub"
 msgstr ""
@@ -1739,9 +1888,23 @@ msgstr ""
 msgid "Go to the start page"
 msgstr ""
 
+#: src/features/admin/locations-screen.tsx:41
+msgctxt "Location colour"
+msgid "Gray"
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:50
+msgctxt "Location colour"
+msgid "Green"
+msgstr ""
+
 #. Name of the schedule view that shows rooms as columns
 #: src/features/schedule/schedule-toolbar.tsx:40
 msgid "Grid"
+msgstr ""
+
+#: src/features/admin/event-meetings.tsx:235
+msgid "Ground floor, next to reception"
 msgstr ""
 
 #: src/features/admin/event-guests.tsx:27
@@ -1844,6 +2007,10 @@ msgstr ""
 msgid "How many people attended?"
 msgstr ""
 
+#: src/features/admin/event-meetings.tsx:373
+msgid "How many unanswered requests one person can have outstanding at once. It caps what they send, never what they receive."
+msgstr ""
+
 #: src/app/footer.tsx:139
 msgid "How to update"
 msgstr ""
@@ -1866,6 +2033,14 @@ msgstr ""
 msgid "If you decide to host this as a session, expect <0>{kind, select, same {{low, plural, one {# person} other {# people}}} other {{high, plural, one {{low}–# person} other {{low}–# people}}}}</0>. Treat that as a very rough guess: it comes from a formula worked out on a single event, from what a handful of hosts there remembered about how many people turned up. It can be well out in either direction — use it to pick a room, nothing more. Future SchellingBoard versions should do better, as we incorporate more event feedback."
 msgstr ""
 
+#: src/features/admin/locations-screen.tsx:291
+msgid "Image"
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:110
+msgid "Image exceeds {maxImageMb} MB limit."
+msgstr ""
+
 #: src/features/admin/guest-import.tsx:101
 msgid "Import"
 msgstr ""
@@ -1884,6 +2059,11 @@ msgstr ""
 
 #: src/app/footer.tsx:153
 msgid "In this build, but not in a released version yet."
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:56
+msgctxt "Location colour"
+msgid "Indigo"
 msgstr ""
 
 #. Vote option on a session proposal
@@ -1957,6 +2137,10 @@ msgstr ""
 msgid "Length"
 msgstr ""
 
+#: src/features/admin/event-meetings.tsx:317
+msgid "Lets attendees book short 1-on-1s with each other in the gaps between sessions."
+msgstr ""
+
 #: src/app/theme.tsx:89
 msgctxt "Colour theme"
 msgid "Light"
@@ -1974,6 +2158,11 @@ msgstr ""
 
 #: src/features/comments/comments-section.tsx:502
 msgid "Liked by"
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:49
+msgctxt "Location colour"
+msgid "Lime"
 msgstr ""
 
 #: src/features/admin/join-links.tsx:43
@@ -2025,6 +2214,7 @@ msgstr ""
 #: src/features/admin/event-sessions.tsx:402
 #: src/features/admin/events-screen.tsx:193
 #: src/features/admin/guests-screen.tsx:418
+#: src/features/admin/locations-screen.tsx:514
 #: src/features/admin/settings-screen.tsx:164
 #: src/features/comments/my-comments-screen.tsx:42
 #: src/features/meetings/book-meeting.tsx:73
@@ -2036,13 +2226,26 @@ msgstr ""
 msgid "Loading…"
 msgstr ""
 
+#: src/features/admin/locations-screen.tsx:464
+msgid "Location name confirmation"
+msgstr ""
+
+#: src/features/admin/location-availability.tsx:220
+#: src/features/admin/location-availability.tsx:222
+msgid "Location unavailability"
+msgstr ""
+
 #: src/features/schedule/session-panel.tsx:302
 msgid "Location:"
 msgstr ""
 
 #: src/app/admin-frame.tsx:42
 #: src/features/admin/event-layout.tsx:19
+#: src/features/admin/event-locations.tsx:27
 #: src/features/admin/event-sessions.tsx:281
+#: src/features/admin/location-availability.tsx:138
+#: src/features/admin/locations-screen.tsx:519
+#: src/features/admin/locations-screen.tsx:521
 msgid "Locations"
 msgstr ""
 
@@ -2122,6 +2325,11 @@ msgstr ""
 msgid "max {capacity}"
 msgstr ""
 
+#: src/features/admin/locations-screen.tsx:366
+msgctxt "Location details: seats, lowercase in a list"
+msgid "max {capacity}"
+msgstr ""
+
 #: src/features/admin/event-config.tsx:194
 #: src/features/admin/events-screen.tsx:124
 msgid "Max session duration (min)"
@@ -2131,13 +2339,30 @@ msgstr ""
 msgid "Max session duration must be a positive number"
 msgstr ""
 
+#: src/features/admin/event-meetings.tsx:368
+msgid "Maximum open requests per attendee"
+msgstr ""
+
 #. Vote option on a session proposal
 #: src/features/proposals/vote-labels.ts:12
 msgid "Maybe"
 msgstr ""
 
+#: src/features/admin/event-meetings.tsx:308
+#: src/features/admin/event-meetings.tsx:314
+msgid "Meetings"
+msgstr ""
+
 #: src/app/nav-bar.tsx:63
 msgid "Menu"
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:448
+msgid "Move {name} down"
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:440
+msgid "Move {name} up"
 msgstr ""
 
 #: src/app/user-menu.tsx:123
@@ -2179,9 +2404,12 @@ msgstr ""
 
 #: src/features/admin/event-config.tsx:144
 #: src/features/admin/event-guests.tsx:34
+#: src/features/admin/event-locations.tsx:34
+#: src/features/admin/event-meetings.tsx:219
 #: src/features/admin/events-screen.tsx:91
 #: src/features/admin/guests-screen.tsx:101
 #: src/features/admin/guests-screen.tsx:189
+#: src/features/admin/locations-screen.tsx:185
 #: src/features/people/profile-form.tsx:355
 #: src/features/sign-in/bootstrap-screen.tsx:70
 msgid "Name"
@@ -2192,7 +2420,12 @@ msgid "Name (A–Z)"
 msgstr ""
 
 #: src/features/admin/events-screen.tsx:59
+#: src/features/admin/locations-screen.tsx:106
 msgid "Name is required"
+msgstr ""
+
+#: src/features/admin/event-meetings.tsx:71
+msgid "Name of {pointName}"
 msgstr ""
 
 #: src/app/user-menu.tsx:237
@@ -2207,6 +2440,11 @@ msgstr ""
 
 #: src/features/schedule/meeting-rules.ts:105
 msgid "needs your reply"
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:43
+msgctxt "Location colour"
+msgid "Neutral"
 msgstr ""
 
 #: src/features/admin/event-days.tsx:221
@@ -2224,6 +2462,10 @@ msgstr ""
 
 #: src/features/admin/join-links.tsx:66
 msgid "New link for {guestName}"
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:534
+msgid "New location"
 msgstr ""
 
 #: src/features/sign-in/account-security.tsx:241
@@ -2314,6 +2556,14 @@ msgstr ""
 
 #: src/features/admin/event-sessions.tsx:277
 msgid "No locations assigned to this event yet."
+msgstr ""
+
+#: src/features/admin/event-locations.tsx:32
+msgid "No locations match."
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:539
+msgid "No locations yet."
 msgstr ""
 
 #: src/features/schedule/day-agenda.tsx:105
@@ -2536,6 +2786,11 @@ msgstr ""
 msgid "or type somewhere else"
 msgstr ""
 
+#: src/features/admin/locations-screen.tsx:46
+msgctxt "Location colour"
+msgid "Orange"
+msgstr ""
+
 #. Kind of contact detail that is none of the listed ones
 #: src/features/people/contact-labels.ts:13
 msgid "Other"
@@ -2606,6 +2861,11 @@ msgstr ""
 msgid "Pick one or type any text"
 msgstr ""
 
+#: src/features/admin/locations-screen.tsx:60
+msgctxt "Location colour"
+msgid "Pink"
+msgstr ""
+
 #: src/features/proposals/quick-voting-screen.tsx:57
 msgid "Please choose who you are first."
 msgstr ""
@@ -2616,6 +2876,10 @@ msgstr ""
 
 #: src/app/footer.tsx:87
 msgid "Powered by"
+msgstr ""
+
+#: src/features/admin/event-meetings.tsx:341
+msgid "Presets attendees can pick when booking. Nothing is reserved — several pairs can use the same spot at the same time."
 msgstr ""
 
 #: src/features/people/profile-panel.tsx:297
@@ -2698,6 +2962,11 @@ msgstr ""
 msgid "Protection turned off"
 msgstr ""
 
+#: src/features/admin/locations-screen.tsx:58
+msgctxt "Location colour"
+msgid "Purple"
+msgstr ""
+
 #. Attendee sort order: a shuffled list
 #: src/features/people/directory-screen.tsx:76
 msgid "Random"
@@ -2710,6 +2979,11 @@ msgstr ""
 
 #: src/app/sync-indicator.tsx:10
 msgid "Reconnecting…"
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:45
+msgctxt "Location colour"
+msgid "Red"
 msgstr ""
 
 #: src/app/error-boundary.tsx:46
@@ -2784,6 +3058,11 @@ msgstr ""
 msgid "Resize panel"
 msgstr ""
 
+#: src/features/admin/locations-screen.tsx:61
+msgctxt "Location colour"
+msgid "Rose"
+msgstr ""
+
 #: src/ui/pager.tsx:68
 msgid "Rows per page"
 msgstr ""
@@ -2806,10 +3085,13 @@ msgid "RSVPs ({rsvpCount})"
 msgstr ""
 
 #: src/features/admin/event-days.tsx:271
+#: src/features/admin/event-meetings.tsx:92
 #: src/features/admin/event-moments.tsx:243
 #: src/features/admin/event-proposals.tsx:147
 #: src/features/admin/event-sessions.tsx:525
 #: src/features/admin/guests-screen.tsx:221
+#: src/features/admin/locations-screen.tsx:306
+#: src/features/admin/locations-screen.tsx:355
 #: src/features/comments/comments-section.tsx:306
 #: src/features/people/profile-form.tsx:613
 #: src/features/schedule/attendee-count-field.tsx:127
@@ -2827,6 +3109,10 @@ msgstr ""
 
 #: src/features/admin/event-config.tsx:255
 msgid "Save changes"
+msgstr ""
+
+#: src/features/admin/event-meetings.tsx:385
+msgid "Save meetings"
 msgstr ""
 
 #: src/features/admin/event-config.tsx:366
@@ -2847,16 +3133,20 @@ msgid "Saved"
 msgstr ""
 
 #: src/features/admin/event-config.tsx:61
+#: src/features/admin/event-meetings.tsx:389
 #: src/features/meetings/availability-form.tsx:187
 msgid "Saved!"
 msgstr ""
 
 #: src/features/admin/event-config.tsx:57
 #: src/features/admin/event-days.tsx:271
+#: src/features/admin/event-meetings.tsx:92
+#: src/features/admin/event-meetings.tsx:385
 #: src/features/admin/event-moments.tsx:243
 #: src/features/admin/event-proposals.tsx:147
 #: src/features/admin/event-sessions.tsx:526
 #: src/features/admin/guests-screen.tsx:221
+#: src/features/admin/locations-screen.tsx:356
 #: src/features/admin/settings-screen.tsx:131
 #: src/features/comments/comments-section.tsx:594
 #: src/features/meetings/availability-form.tsx:191
@@ -2938,6 +3228,10 @@ msgstr ""
 #: src/features/admin/event-guests.tsx:31
 #: src/features/admin/guests-screen.tsx:458
 msgid "Search name or email…"
+msgstr ""
+
+#: src/features/admin/event-locations.tsx:31
+msgid "Search name…"
 msgstr ""
 
 #: src/features/people/directory-screen.tsx:325
@@ -3200,6 +3494,16 @@ msgstr ""
 msgid "Skip to content"
 msgstr ""
 
+#: src/features/admin/locations-screen.tsx:54
+msgctxt "Location colour"
+msgid "Sky"
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:40
+msgctxt "Location colour"
+msgid "Slate"
+msgstr ""
+
 #: src/features/settings/email-settings-form.tsx:22
 msgid "someone adds me as a session host or co-host"
 msgstr ""
@@ -3290,6 +3594,11 @@ msgstr ""
 msgid "Step through matches"
 msgstr ""
 
+#: src/features/admin/locations-screen.tsx:44
+msgctxt "Location colour"
+msgid "Stone"
+msgstr ""
+
 #: src/features/proposals/proposal-form.tsx:355
 msgid "Submit"
 msgstr ""
@@ -3307,9 +3616,19 @@ msgstr ""
 msgid "Suggest a prompt"
 msgstr ""
 
+#: src/features/admin/event-meetings.tsx:334
+#: src/features/admin/event-meetings.tsx:338
+msgid "Suggested meeting points"
+msgstr ""
+
 #: src/app/theme.tsx:84
 msgctxt "Colour theme"
 msgid "System"
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:52
+msgctxt "Location colour"
+msgid "Teal"
 msgstr ""
 
 #: src/features/people/contact-labels.ts:10
@@ -3514,6 +3833,10 @@ msgstr ""
 msgid "Time:"
 msgstr ""
 
+#: src/features/admin/location-availability.tsx:225
+msgid "Times a location can't be booked, such as a location only open on one day. Attendees simply aren't offered those slots. For something they should see on the schedule, such as lunch, add a blocker session instead. All times are in the event timezone ({timezone})."
+msgstr ""
+
 #: src/app/time-format.tsx:71
 msgid "Times like {example}"
 msgstr ""
@@ -3620,6 +3943,10 @@ msgstr ""
 msgid "unanswered"
 msgstr ""
 
+#: src/features/admin/location-availability.tsx:240
+msgid "Unassigned location"
+msgstr ""
+
 #: src/features/people/meeting-request-dialog.tsx:60
 msgid "Unavailable"
 msgstr ""
@@ -3649,9 +3976,17 @@ msgstr ""
 msgid "Unknown guest"
 msgstr ""
 
+#: src/features/admin/location-availability.tsx:154
+msgid "Until"
+msgstr ""
+
 #: src/features/schedule/day-agenda.tsx:258
 #: src/features/schedule/day-agenda.tsx:388
 msgid "until {endsAt}"
+msgstr ""
+
+#: src/features/admin/location-availability.tsx:114
+msgid "Until is required"
 msgstr ""
 
 #: src/features/people/directory-screen.tsx:347
@@ -3711,6 +4046,11 @@ msgstr ""
 
 #: src/features/proposals/proposals-screen.tsx:123
 msgid "View Schedule"
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:57
+msgctxt "Location colour"
+msgid "Violet"
 msgstr ""
 
 #: src/features/proposals/vote-breakdown.tsx:93
@@ -3818,6 +4158,10 @@ msgstr ""
 msgid "Who's free at {slotStartLabel}?"
 msgstr ""
 
+#: src/features/admin/location-availability.tsx:169
+msgid "Whole day:"
+msgstr ""
+
 #: src/features/meetings/meeting-panel.tsx:107
 msgid "Why it was called off:"
 msgstr ""
@@ -3832,6 +4176,11 @@ msgstr ""
 
 #: src/features/comments/comments-section.tsx:357
 msgid "Write a reply"
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:48
+msgctxt "Location colour"
+msgid "Yellow"
 msgstr ""
 
 #: src/ui/confirm-dialog.tsx:10
@@ -3926,6 +4275,11 @@ msgstr ""
 #: src/features/proposals/proposal-panel.tsx:233
 #: src/features/proposals/proposals-screen.tsx:589
 msgid "Your vote:"
+msgstr ""
+
+#: src/features/admin/locations-screen.tsx:42
+msgctxt "Location colour"
+msgid "Zinc"
 msgstr ""
 
 #: src/ui/charts/scatter.tsx:66

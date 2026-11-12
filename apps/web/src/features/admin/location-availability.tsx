@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import {
   utcToZonedInput,
   zonedInputToInstant,
@@ -15,11 +17,15 @@ import { FormErrorSummary } from "../../ui/form-error-summary";
 import { RoomCheckboxes } from "./room-checkboxes";
 import { shown, useJumpWithin } from "./use-section-save";
 
+const DATE_TIME_FORMAT = "ccc d LLL HH:mm";
+const DAY_FORMAT = "ccc d LLL";
+const UTC_ZONE = "utc";
+
 type Room = { id: string; name: string };
 type DayWindow = { id: string; start: string; end: string };
 
 const formatIn = (iso: string, timezone: string, format: string) =>
-  DateTime.fromISO(iso, { zone: "utc" }).setZone(timezone).toFormat(format);
+  DateTime.fromISO(iso, { zone: UTC_ZONE }).setZone(timezone).toFormat(format);
 
 function PeriodRow({
   period,
@@ -38,11 +44,12 @@ function PeriodRow({
     call: (key) => calls.deleteUnavailability(period.id, key),
     explainRefusals: true,
   });
-  const range = `${formatIn(period.start, timezone, "ccc d LLL HH:mm")} – ${formatIn(
-    period.end,
-    timezone,
-    "ccc d LLL HH:mm"
-  )}`;
+  const from = formatIn(period.start, timezone, DATE_TIME_FORMAT);
+  const until = formatIn(period.end, timezone, DATE_TIME_FORMAT);
+  const range = t({
+    message: `${from} – ${until}`,
+    comment: "Date range: start and end of a time period",
+  });
   const remove = async () => {
     if ((await mutation.submit())?.ok) onChanged();
   };
@@ -55,10 +62,10 @@ function PeriodRow({
         <Button
           variant="danger"
           disabled={mutation.pending}
-          aria-label={`Delete unavailable time ${roomName} ${range}`}
+          aria-label={t`Delete unavailable time ${roomName} ${from} – ${until}`}
           onClick={() => void remove()}
         >
-          {mutation.pending ? "Deleting..." : "Delete"}
+          {mutation.pending ? t`Deleting...` : t`Delete`}
         </Button>
       </div>
       <FormErrorSummary
@@ -103,8 +110,8 @@ function AddPeriodForm({
     explainRefusals: true,
   });
   const missing: FieldErrors = {};
-  if (!startAt) missing.start = "From is required";
-  if (!endAt) missing.end = "Until is required";
+  if (!startAt) missing.start = t`From is required`;
+  if (!endAt) missing.end = t`Until is required`;
   const errors = { ...(checking ? missing : {}), ...mutation.fields };
 
   const submit = async (e: FormEvent) => {
@@ -128,14 +135,14 @@ function AddPeriodForm({
       className="space-y-3 rounded-md border border-line-subtle p-4"
     >
       <RoomCheckboxes
-        legend="Locations"
+        legend={t`Locations`}
         rooms={rooms}
         selectedIds={locationIds}
         onChange={setLocationIds}
       />
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <DateTimeField
-          label="From"
+          label={t`From`}
           name="start"
           kind="datetime-local"
           required
@@ -144,7 +151,7 @@ function AddPeriodForm({
           error={errors.start}
         />
         <DateTimeField
-          label="Until"
+          label={t`Until`}
           name="end"
           kind="datetime-local"
           required
@@ -155,9 +162,11 @@ function AddPeriodForm({
       </div>
       {days.length > 0 && (
         <fieldset className="flex flex-wrap items-center gap-2">
-          <legend className="sr-only">Fill in a whole day</legend>
+          <legend className="sr-only">
+            <Trans>Fill in a whole day</Trans>
+          </legend>
           <span aria-hidden className="text-sm text-fg-muted">
-            Whole day:
+            <Trans>Whole day:</Trans>
           </span>
           {days.map((day) => (
             <Button
@@ -169,7 +178,7 @@ function AddPeriodForm({
                 setEnd(utcToZonedInput(day.end, timezone));
               }}
             >
-              {formatIn(day.start, timezone, "ccc d LLL")}
+              {formatIn(day.start, timezone, DAY_FORMAT)}
             </Button>
           ))}
         </fieldset>
@@ -183,7 +192,7 @@ function AddPeriodForm({
         type="submit"
         disabled={mutation.pending || locationIds.length === 0}
       >
-        {mutation.pending ? "Adding..." : "Add unavailable time"}
+        {mutation.pending ? t`Adding...` : t`Add unavailable time`}
       </Button>
     </form>
   );
@@ -208,13 +217,18 @@ export function LocationAvailabilityManager({
 }) {
   const roomNames = new Map(rooms.map((room) => [room.id, room.name]));
   return (
-    <section aria-label="Location unavailability" className="space-y-4">
-      <h2 className="text-lg font-semibold text-fg">Location unavailability</h2>
+    <section aria-label={t`Location unavailability`} className="space-y-4">
+      <h2 className="text-lg font-semibold text-fg">
+        <Trans>Location unavailability</Trans>
+      </h2>
       <p className="text-sm text-fg-subtle">
-        Times a location can&apos;t be booked, such as a location only open on
-        one day. Attendees simply aren&apos;t offered those slots. For something
-        they should see on the schedule, such as lunch, add a blocker session
-        instead. All times are in the event timezone ({timezone}).
+        <Trans>
+          Times a location can&apos;t be booked, such as a location only open on
+          one day. Attendees simply aren&apos;t offered those slots. For
+          something they should see on the schedule, such as lunch, add a
+          blocker session instead. All times are in the event timezone (
+          {timezone}).
+        </Trans>
       </p>
       {periods.length > 0 && (
         <ul className="divide-y divide-line-subtle border-t border-b border-line-subtle">
@@ -223,7 +237,7 @@ export function LocationAvailabilityManager({
               key={period.id}
               period={period}
               roomName={
-                roomNames.get(period.locationId) ?? "Unassigned location"
+                roomNames.get(period.locationId) ?? t`Unassigned location`
               }
               timezone={timezone}
               calls={calls}
@@ -234,7 +248,7 @@ export function LocationAvailabilityManager({
       )}
       {rooms.length === 0 ? (
         <p className="text-sm text-fg-muted">
-          Assign a location to the event first.
+          <Trans>Assign a location to the event first.</Trans>
         </p>
       ) : (
         <AddPeriodForm

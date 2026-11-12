@@ -139,6 +139,10 @@ export default tseslint.config(
       "apps/web/src/features/admin/guests-screen.tsx",
       "apps/web/src/features/admin/join-links.tsx",
       "apps/web/src/features/admin/room-checkboxes.tsx",
+      "apps/web/src/features/admin/event-locations.tsx",
+      "apps/web/src/features/admin/location-availability.tsx",
+      "apps/web/src/features/admin/locations-screen.tsx",
+      "apps/web/src/features/admin/event-meetings.tsx",
     ],
     ignores: ["**/*.test.{ts,tsx}"],
     plugins: { lingui },
@@ -187,6 +191,7 @@ export default tseslint.config(
             "formatOptionalTime",
             "formatEventDates",
             "setField",
+            "calls.move",
             "cx",
             "console.*",
           ],
@@ -214,6 +219,8 @@ export default tseslint.config(
             "^\\?[a-z]+=$",
             // Id suffixes such as `${id}-hint`
             "^-[a-z]+$",
+            // Idempotency-key suffixes such as `${key}:update`
+            "^:(?:update|create|image)$",
             // The slot match-id prefix and problem codes passed as arguments
             "^(?:slot-|guest\\.(?:protected|unselected))$",
             // SVG path data

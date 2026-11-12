@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { type KeyboardEvent, useState } from "react";
 
 import type { AdminEventCalls } from "../../commands/admin-events";
@@ -7,6 +9,7 @@ import type { MeetingPoint } from "../../queries/admin-meeting-points";
 import { Button } from "../../ui/button";
 import { CheckboxField, TextField } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
+import { useRowMode } from "./row-mode";
 import { useEventSection } from "./use-event-section";
 import { jumpTo, shown, useSectionSave } from "./use-section-save";
 
@@ -28,7 +31,8 @@ function PointRow({
   calls: AdminEventCalls;
   onChanged: () => void;
 }) {
-  const [mode, setMode] = useState<"view" | "edit" | "delete">("view");
+  const { mode, close, edit, remove: askDelete } = useRowMode();
+  const pointName = point.name;
   const [name, setName] = useState(point.name);
   const [description, setDescription] = useState(point.description);
   const [version, setVersion] = useState(point.version);
@@ -46,7 +50,7 @@ function PointRow({
   const handleSave = async () => {
     const result = await save.submit();
     if (!result) return;
-    if (result.ok) setMode("view");
+    if (result.ok) close();
     if (result.ok || result.kind === "conflict") onChanged();
   };
   const handleDelete = async () => {
@@ -64,7 +68,7 @@ function PointRow({
             onKeyDown={submitOnEnter(() => void handleSave())}
           >
             <TextField
-              label={`Name of ${point.name}`}
+              label={t`Name of ${pointName}`}
               hideLabel
               value={name}
               onChange={setName}
@@ -76,7 +80,7 @@ function PointRow({
             onKeyDown={submitOnEnter(() => void handleSave())}
           >
             <TextField
-              label={`Description of ${point.name}`}
+              label={t`Description of ${pointName}`}
               hideLabel
               value={description}
               onChange={setDescription}
@@ -85,7 +89,7 @@ function PointRow({
           </div>
           <div className="flex gap-2">
             <Button disabled={pending} onClick={() => void handleSave()}>
-              {save.pending ? "Saving..." : "Save"}
+              {save.pending ? t`Saving...` : t`Save`}
             </Button>
             <Button
               variant="quiet"
@@ -93,11 +97,11 @@ function PointRow({
               onClick={() => {
                 setName(point.name);
                 setDescription(point.description);
-                setMode("view");
+                close();
                 save.reset();
               }}
             >
-              Cancel
+              <Trans>Cancel</Trans>
             </Button>
           </div>
         </div>
@@ -127,40 +131,40 @@ function PointRow({
               setDescription(point.description);
               setVersion(point.version);
               remove.reset();
-              setMode("edit");
+              edit();
             }}
           >
-            Edit
+            <Trans>Edit</Trans>
           </Button>
           {mode === "delete" ? (
             <>
               <Button
                 variant="danger"
                 disabled={pending}
-                aria-label={`Confirm delete ${point.name}`}
+                aria-label={t`Confirm delete ${pointName}`}
                 onClick={() => void handleDelete()}
               >
-                {remove.pending ? "Deleting..." : "Confirm delete"}
+                {remove.pending ? t`Deleting...` : t`Confirm delete`}
               </Button>
               <Button
                 variant="quiet"
                 disabled={pending}
                 onClick={() => {
-                  setMode("view");
+                  close();
                   remove.reset();
                 }}
               >
-                Cancel
+                <Trans>Cancel</Trans>
               </Button>
             </>
           ) : (
             <Button
               variant="danger"
               disabled={pending}
-              aria-label={`Delete ${point.name}`}
-              onClick={() => setMode("delete")}
+              aria-label={t`Delete ${pointName}`}
+              onClick={askDelete}
             >
-              Delete
+              <Trans>Delete</Trans>
             </Button>
           )}
         </div>
@@ -203,7 +207,7 @@ function AddPoint({
   if (!open)
     return (
       <Button variant="quiet" onClick={() => setOpen(true)}>
-        + Add meeting point
+        <Trans>+ Add meeting point</Trans>
       </Button>
     );
 
@@ -212,10 +216,10 @@ function AddPoint({
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div onKeyDown={submitOnEnter(() => void add())}>
           <TextField
-            label="Name"
+            label={t`Name`}
             name="meetingPointName"
             required
-            placeholder="Coffee bar"
+            placeholder={t`Coffee bar`}
             value={name}
             onChange={setName}
             error={mutation.fields.name}
@@ -226,9 +230,9 @@ function AddPoint({
           onKeyDown={submitOnEnter(() => void add())}
         >
           <TextField
-            label="Description"
+            label={t`Description`}
             name="meetingPointDescription"
-            placeholder="Ground floor, next to reception"
+            placeholder={t`Ground floor, next to reception`}
             value={description}
             onChange={setDescription}
             error={mutation.fields.description}
@@ -242,10 +246,10 @@ function AddPoint({
       />
       <div className="flex gap-2">
         <Button disabled={mutation.pending} onClick={() => void add()}>
-          {mutation.pending ? "Adding..." : "Add meeting point"}
+          {mutation.pending ? t`Adding...` : t`Add meeting point`}
         </Button>
         <Button variant="quiet" disabled={mutation.pending} onClick={close}>
-          Cancel
+          <Trans>Cancel</Trans>
         </Button>
       </div>
     </div>
@@ -290,7 +294,7 @@ export function EventMeetingsForm({
     onSaved: () => markSaved(form),
     onChanged,
   });
-  const set = <K extends keyof typeof form>(
+  const setField = <K extends keyof typeof form>(
     key: K,
     value: (typeof form)[K]
   ) => {
@@ -301,34 +305,43 @@ export function EventMeetingsForm({
 
   return (
     <form
-      aria-label="Meetings"
+      aria-label={t`Meetings`}
       onSubmit={(e) => void section.save(e)}
       noValidate
       className="space-y-4"
     >
-      <h2 className="text-lg font-semibold text-fg">Meetings</h2>
+      <h2 className="text-lg font-semibold text-fg">
+        <Trans>Meetings</Trans>
+      </h2>
       <p className="text-sm text-fg-subtle">
-        Lets attendees book short 1-on-1s with each other in the gaps between
-        sessions.
+        <Trans>
+          Lets attendees book short 1-on-1s with each other in the gaps between
+          sessions.
+        </Trans>
       </p>
       <div className="rounded-md border border-line-subtle p-4">
         <CheckboxField
-          label="Enable meetings"
-          hint="Attendees choose their own availability once this is on."
+          label={t`Enable meetings`}
+          hint={t`Attendees choose their own availability once this is on.`}
           checked={form.meetingsEnabled}
-          onChange={(v) => set("meetingsEnabled", v)}
+          onChange={(v) => setField("meetingsEnabled", v)}
         />
       </div>
 
       {form.meetingsEnabled && (
         <>
-          <section aria-label="Suggested meeting points" className="space-y-2">
+          <section
+            aria-label={t`Suggested meeting points`}
+            className="space-y-2"
+          >
             <h3 className="text-sm font-medium text-fg-muted">
-              Suggested meeting points
+              <Trans>Suggested meeting points</Trans>
             </h3>
             <p className="text-sm text-fg-subtle">
-              Presets attendees can pick when booking. Nothing is reserved —
-              several pairs can use the same spot at the same time.
+              <Trans>
+                Presets attendees can pick when booking. Nothing is reserved —
+                several pairs can use the same spot at the same time.
+              </Trans>
             </p>
             {points.length > 0 && (
               <ul className="divide-y divide-line-subtle rounded-md border border-line-subtle">
@@ -352,14 +365,14 @@ export function EventMeetingsForm({
 
           <div className="sm:max-w-xs">
             <TextField
-              label="Maximum open requests per attendee"
+              label={t`Maximum open requests per attendee`}
               name="maxOpenMeetingRequests"
               type="number"
               min={1}
               required
-              hint="How many unanswered requests one person can have outstanding at once. It caps what they send, never what they receive."
+              hint={t`How many unanswered requests one person can have outstanding at once. It caps what they send, never what they receive.`}
               value={form.maxOpenMeetingRequests}
-              onChange={(v) => set("maxOpenMeetingRequests", v)}
+              onChange={(v) => setField("maxOpenMeetingRequests", v)}
               error={fields.maxOpenMeetingRequests}
             />
           </div>
@@ -369,10 +382,12 @@ export function EventMeetingsForm({
       <FormErrorSummary fields={fields} error={error} onJump={jumpTo} />
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={section.pending}>
-          {section.pending ? "Saving..." : "Save meetings"}
+          {section.pending ? t`Saving...` : t`Save meetings`}
         </Button>
         {section.saved && (
-          <span className="text-sm text-success-fg">Saved!</span>
+          <span className="text-sm text-success-fg">
+            <Trans>Saved!</Trans>
+          </span>
         )}
       </div>
     </form>

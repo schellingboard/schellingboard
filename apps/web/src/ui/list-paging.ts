@@ -78,9 +78,6 @@ export const byTitleThenId =
     title(a).localeCompare(title(b), undefined, { sensitivity: "base" }) ||
     a.id.localeCompare(b.id);
 
-export const plural = (n: number, one: string, many: string) =>
-  `${n} ${n === 1 ? one : many}`;
-
 /** The rows whose title or a host name has the search text, sorted by title. */
 export function searchByTitleOrHost<
   T extends { id: string; title: string; hosts: { name: string }[] },
