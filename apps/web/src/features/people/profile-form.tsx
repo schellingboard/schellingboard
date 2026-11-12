@@ -1,7 +1,9 @@
+import { i18n, type MessageDescriptor } from "@lingui/core";
+import { msg, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { profileBodySchema } from "@schellingboard/contracts/guest";
 import { AVATAR_MAX_SIZE } from "@schellingboard/domain/avatar-image";
 import {
-  CONTACT_TYPE_LABELS,
   CONTACT_TYPES,
   type ContactType,
   MAX_CONTACTS,
@@ -44,6 +46,7 @@ import { FormErrorSummary } from "../../ui/form-error-summary";
 import { ArrowPathIcon } from "../../ui/icons";
 import { resizeImage } from "../../ui/resize-image";
 import { Tooltip } from "../../ui/tooltip";
+import { contactLabel } from "./contact-labels";
 
 export type ProfileDraft = Pick<
   DirectoryEntry,
@@ -69,14 +72,14 @@ export type ProfileFormProps = {
   onDone: () => void;
 };
 
-const PRONOUNS = [
-  "He/Him",
-  "She/Her",
-  "They/Them",
-  "He/They",
-  "She/They",
-  "Any pronouns",
-  "Ask me",
+const PRONOUNS: MessageDescriptor[] = [
+  msg`He/Him`,
+  msg`She/Her`,
+  msg`They/Them`,
+  msg`He/They`,
+  msg`She/They`,
+  msg`Any pronouns`,
+  msg`Ask me`,
 ];
 
 const LINK = "text-brand-fg underline hover:text-brand-fg-hover";
@@ -220,7 +223,7 @@ export function ProfileForm({
   const failure = hasClientErrors ? null : mutation.error;
 
   const sectionOf = (field: string) =>
-    (["prompts", "languages", "contacts"] as const).find((s) =>
+    (Object.keys(open) as (keyof typeof open)[]).find((s) =>
       field.startsWith(s)
     );
 
@@ -278,16 +281,20 @@ export function ProfileForm({
         href={links.people}
         className="inline-block py-1 -my-1 text-sm text-fg-subtle hover:text-fg-muted"
       >
-        ← Attendees
+        <Trans>← Attendees</Trans>
       </a>
-      <h1 className="text-2xl font-bold">Edit profile</h1>
+      <h1 className="text-2xl font-bold">
+        <Trans>Edit profile</Trans>
+      </h1>
       <p className="text-sm text-fg-subtle">
-        Everything here is shown on your public profile. Email notifications and
-        other private preferences live in{" "}
-        <a href={links.settings} className={LINK}>
-          Settings
-        </a>
-        .
+        <Trans>
+          Everything here is shown on your public profile. Email notifications
+          and other private preferences live in{" "}
+          <a href={links.settings} className={LINK}>
+            Settings
+          </a>
+          .
+        </Trans>
       </p>
 
       <form
@@ -310,7 +317,9 @@ export function ProfileForm({
             className={`flex cursor-pointer items-center gap-4 rounded-full pe-4 hover:text-brand-fg ${dragging ? "outline-4 outline-dashed outline-line" : ""}`}
           >
             <Avatar name={name} size="sm" image={shownPhoto} />
-            <span>Change profile picture</span>
+            <span>
+              <Trans>Change profile picture</Trans>
+            </span>
           </button>
           <button
             type="button"
@@ -324,7 +333,9 @@ export function ProfileForm({
               setPhotoSaved(false);
             }}
           >
-            Reset
+            <Trans context="Profile picture: go back to the saved one">
+              Reset
+            </Trans>
           </button>
           <input
             ref={fileInput}
@@ -341,45 +352,45 @@ export function ProfileForm({
         <div className="flex flex-col gap-4 md:flex-row">
           <div className="flex-1">
             <TextField
-              label="Name"
+              label={t`Name`}
               name="name"
               required
               value={name}
               onChange={setName}
-              placeholder="Your name"
+              placeholder={t`Your name`}
               error={fields.name}
             />
           </div>
           <ComboboxField
-            label="Pronouns"
+            label={t`Pronouns`}
             name="pronouns"
             value={pronouns}
             onChange={setPronouns}
-            options={PRONOUNS}
-            placeholder="He/Him/His/They/etc."
+            options={PRONOUNS.map((pronouns) => i18n._(pronouns))}
+            placeholder={t`He/Him/His/They/etc.`}
             error={fields.pronouns}
           />
         </div>
         <TextField
-          label="Based in"
+          label={t`Based in`}
           name="basedIn"
           value={basedIn}
           onChange={setBasedIn}
-          placeholder="City, region, or country"
+          placeholder={t`City, region, or country`}
           error={fields.basedIn}
         />
         <MarkdownField
-          label="About me"
+          label={t`About me`}
           name="aboutMe"
           value={aboutMe}
           onChange={setAboutMe}
-          placeholder="Tell others about yourself"
+          placeholder={t`Tell others about yourself`}
           error={fields.aboutMe}
         />
 
         <Section
-          title="Conversation starters"
-          hint="Optional prompts that give people something to ask you about"
+          title={t`Conversation starters`}
+          hint={t`Optional prompts that give people something to ask you about`}
           open={open.prompts}
           onToggle={() => setOpen((o) => ({ ...o, prompts: !o.prompts }))}
         >
@@ -393,11 +404,11 @@ export function ProfileForm({
               <div key={row.key} className="flex flex-col gap-1">
                 {!core && (
                   <div className="flex justify-end gap-3">
-                    <Tooltip content="Suggest a different prompt">
+                    <Tooltip content={t`Suggest a different prompt`}>
                       <button
                         type="button"
                         className={TEXT_BUTTON}
-                        aria-label="Suggest a different prompt"
+                        aria-label={t`Suggest a different prompt`}
                         onClick={() => {
                           const pick = pickUnusedPrompt(
                             prompts.map((p) => p.prompt)
@@ -415,7 +426,7 @@ export function ProfileForm({
                         setPrompts(prompts.filter((r) => r !== row))
                       }
                     >
-                      Remove
+                      <Trans>Remove</Trans>
                     </button>
                   </div>
                 )}
@@ -424,7 +435,7 @@ export function ProfileForm({
                   name={`prompts.${i}.answer`}
                   value={row.answer}
                   onChange={(answer) => change({ answer })}
-                  placeholder="A sentence or two"
+                  placeholder={t`A sentence or two`}
                   error={fields[`prompts.${i}.answer`]}
                 />
               </div>
@@ -442,13 +453,13 @@ export function ProfileForm({
                 ]);
             }}
           >
-            Suggest a prompt
+            <Trans>Suggest a prompt</Trans>
           </button>
         </Section>
 
         <Section
-          title="Languages"
-          hint="Languages you're happy to talk in"
+          title={t`Languages`}
+          hint={t`Languages you're happy to talk in`}
           open={open.languages}
           onToggle={() => setOpen((o) => ({ ...o, languages: !o.languages }))}
         >
@@ -456,7 +467,7 @@ export function ProfileForm({
             <div key={row.key} className="flex items-start gap-2">
               <div className="flex-1">
                 <ComboboxField
-                  label="Language"
+                  label={t`Language`}
                   hideLabel
                   name={`languages.${i}`}
                   value={row.value}
@@ -472,7 +483,7 @@ export function ProfileForm({
                         )
                       : languageOptions
                   }
-                  placeholder="Language"
+                  placeholder={t`Language`}
                   error={fields[`languages.${i}`]}
                 />
               </div>
@@ -481,7 +492,7 @@ export function ProfileForm({
                 className={`${TEXT_BUTTON} mt-2`}
                 onClick={() => setLanguages(languages.filter((r) => r !== row))}
               >
-                Remove
+                <Trans>Remove</Trans>
               </button>
             </div>
           ))}
@@ -493,7 +504,7 @@ export function ProfileForm({
               setLanguages([...languages, ...rows([{ value: "" }])])
             }
           >
-            Add language
+            <Trans>Add language</Trans>
           </button>
           {fields.languages && (
             <p role="alert" className="text-sm text-danger-fg">
@@ -503,8 +514,8 @@ export function ProfileForm({
         </Section>
 
         <Section
-          title="Contact details"
-          hint="Shown publicly on your profile — only add what you want visible"
+          title={t`Contact details`}
+          hint={t`Shown publicly on your profile — only add what you want visible`}
           open={open.contacts}
           onToggle={() => setOpen((o) => ({ ...o, contacts: !o.contacts }))}
         >
@@ -519,35 +530,35 @@ export function ProfileForm({
                 className="flex flex-col gap-2 sm:flex-row sm:items-start"
               >
                 <SelectField
-                  label="Contact type"
+                  label={t`Contact type`}
                   hideLabel
                   name={`contacts.${i}.type`}
                   value={row.type}
                   onChange={(type) => change({ type: type as ContactType })}
                   options={CONTACT_TYPES.map((type) => ({
                     value: type,
-                    label: CONTACT_TYPE_LABELS[type],
+                    label: contactLabel(type),
                   }))}
                 />
                 {row.type === "other" && (
                   <TextField
-                    label="Contact label"
+                    label={t`Contact label`}
                     hideLabel
                     name={`contacts.${i}.label`}
                     value={row.label}
                     onChange={(label) => change({ label })}
-                    placeholder="Label"
+                    placeholder={t`Label`}
                     error={fields[`contacts.${i}.label`]}
                   />
                 )}
                 <div className="flex-1">
                   <TextField
-                    label="Contact value"
+                    label={t`Contact value`}
                     hideLabel
                     name={`contacts.${i}.value`}
                     value={row.value}
                     onChange={(value) => change({ value })}
-                    placeholder="@handle, address, or URL"
+                    placeholder={t`@handle, address, or URL`}
                     error={fields[`contacts.${i}.value`]}
                   />
                 </div>
@@ -556,7 +567,7 @@ export function ProfileForm({
                   className={`${TEXT_BUTTON} sm:mt-2`}
                   onClick={() => setContacts(contacts.filter((r) => r !== row))}
                 >
-                  Remove
+                  <Trans>Remove</Trans>
                 </button>
               </div>
             );
@@ -572,9 +583,11 @@ export function ProfileForm({
               ])
             }
           >
-            Add contact
+            <Trans>Add contact</Trans>
           </button>
-          <p className="text-sm text-fg-subtle">Markdown supported</p>
+          <p className="text-sm text-fg-subtle">
+            <Trans>Markdown supported</Trans>
+          </p>
           {fields.contacts && (
             <p role="alert" className="text-sm text-danger-fg">
               {fields.contacts}
@@ -589,7 +602,7 @@ export function ProfileForm({
         />
         {photoSaved && failure && (
           <p role="status" className="text-sm text-fg-muted">
-            Your photo was saved; the details were not.
+            <Trans>Your photo was saved; the details were not.</Trans>
           </p>
         )}
         <Button
@@ -597,7 +610,7 @@ export function ProfileForm({
           disabled={mutation.pending}
           className="mx-auto px-12"
         >
-          {mutation.pending ? "Saving..." : "Save"}
+          {mutation.pending ? t`Saving...` : t`Save`}
         </Button>
       </form>
     </div>

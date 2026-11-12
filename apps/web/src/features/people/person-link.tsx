@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { profileExcerpt } from "@schellingboard/domain/attendee-profile";
 
 import type { DirectoryEntry } from "../../queries/directory";
@@ -23,7 +24,7 @@ function PersonCard({ entry }: { entry: DirectoryEntry }) {
         <span className="font-medium">{entry.name}</span>
         {entry.isHost && (
           <span className="w-fit rounded-full bg-brand-tint-hover px-2 py-0.5 text-xs font-semibold text-brand-fg">
-            Session host
+            <Trans>Session host</Trans>
           </span>
         )}
         {where && <span className="text-sm text-fg-subtle">{where}</span>}

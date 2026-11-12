@@ -1,6 +1,11 @@
+import { i18n, type MessageDescriptor } from "@lingui/core";
+import { msg, plural, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
+import type { AttendeeFilter } from "@schellingboard/domain/attendee-filters";
 import { serializeAttendeeFilters } from "@schellingboard/domain/attendee-filters";
 import {
   ATTENDEE_SORTS,
+  type AttendeeSort,
   DEFAULT_ATTENDEE_SORT,
 } from "@schellingboard/domain/attendee-search";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -40,6 +45,40 @@ export type DirectoryScreenProps = {
 
 const LINK = "font-semibold text-brand-fg hover:text-brand-fg-hover";
 
+const FILTER_LABEL: Record<
+  AttendeeFilter,
+  {
+    chip: MessageDescriptor;
+    aria: MessageDescriptor;
+    ariaActive: MessageDescriptor;
+  }
+> = {
+  isHost: {
+    chip: msg`Session host`,
+    aria: msg`Filter by Session host`,
+    ariaActive: msg`Filter by Session host (active)`,
+  },
+  hasProfile: {
+    chip: msg`Has profile`,
+    aria: msg`Filter by Has profile`,
+    ariaActive: msg`Filter by Has profile (active)`,
+  },
+  openToMeetings: {
+    chip: msg`Open to 1-on-1s`,
+    aria: msg`Filter by Open to 1-on-1s`,
+    ariaActive: msg`Filter by Open to 1-on-1s (active)`,
+  },
+};
+
+const SORT_LABEL: Record<AttendeeSort, MessageDescriptor> = {
+  name: msg`Name (A–Z)`,
+  updated: msg`Recently updated`,
+  random: msg({
+    message: "Random",
+    comment: "Attendee sort order: a shuffled list",
+  }),
+};
+
 export function DirectoryScreen(props: DirectoryScreenProps) {
   const { entries, status, now, viewerId, links, params, onParams } = props;
   const [seed, setSeed] = useState(props.randomSeed);
@@ -76,10 +115,12 @@ export function DirectoryScreen(props: DirectoryScreenProps) {
     <>
       <div className="max-w-4xl mx-auto flex flex-col gap-6 px-4">
         <div className="flex items-center justify-between gap-4">
-          <h1 className="text-3xl font-bold">Attendees</h1>
+          <h1 className="text-3xl font-bold">
+            <Trans>Attendees</Trans>
+          </h1>
           {viewerId && (
             <a href={links.edit} className={`text-sm ${LINK}`}>
-              Edit profile
+              <Trans>Edit profile</Trans>
             </a>
           )}
         </div>
@@ -115,9 +156,11 @@ export function DirectoryScreen(props: DirectoryScreenProps) {
                           : "bg-surface-muted text-fg-muted hover:bg-surface-hover"
                       }`}
                       aria-pressed={active}
-                      aria-label={`Filter by ${f.label}${active ? " (active)" : ""}`}
+                      aria-label={i18n._(
+                        FILTER_LABEL[f.value][active ? "ariaActive" : "aria"]
+                      )}
                     >
-                      {f.label}
+                      {i18n._(FILTER_LABEL[f.value].chip)}
                     </button>
                   );
                 })}
@@ -127,12 +170,12 @@ export function DirectoryScreen(props: DirectoryScreenProps) {
               <Tooltip
                 content={
                   sortDisabled
-                    ? "Search results are sorted by relevance"
+                    ? t`Search results are sorted by relevance`
                     : undefined
                 }
               >
                 <label className="flex items-center gap-2 text-sm text-fg-muted">
-                  Sort by
+                  <Trans>Sort by</Trans>
                   <select
                     value={sort}
                     disabled={sortDisabled}
@@ -154,7 +197,7 @@ export function DirectoryScreen(props: DirectoryScreenProps) {
                   >
                     {ATTENDEE_SORTS.map((s) => (
                       <option key={s.value} value={s.value}>
-                        {s.label}
+                        {i18n._(SORT_LABEL[s.value])}
                       </option>
                     ))}
                   </select>
@@ -163,7 +206,10 @@ export function DirectoryScreen(props: DirectoryScreenProps) {
             }
             count={
               rows.length > 0
-                ? `${rows.length} attendee${rows.length === 1 ? "" : "s"}`
+                ? plural(rows.length, {
+                    one: "# attendee",
+                    other: "# attendees",
+                  })
                 : null
             }
           />
@@ -182,28 +228,30 @@ export function DirectoryScreen(props: DirectoryScreenProps) {
           ) : entries.length === 0 &&
             (status === "loading" || status === "idle") ? (
             <p role="status" className="text-sm text-fg-subtle">
-              Loading attendees…
+              <Trans>Loading attendees…</Trans>
             </p>
           ) : status === "error" && entries.length === 0 ? (
             <p role="alert" className="text-sm text-fg-subtle">
-              Could not load the attendees. Reload the page to try again.
+              <Trans>
+                Could not load the attendees. Reload the page to try again.
+              </Trans>
             </p>
           ) : (
             <p className="text-sm text-fg-subtle">
               {onlyHasProfile ? (
                 <>
-                  Nobody has filled in a profile yet.
+                  <Trans>Nobody has filled in a profile yet.</Trans>
                   {viewerId && (
                     <>
                       {" "}
                       <a href={links.edit} className={LINK}>
-                        Be the first!
+                        <Trans>Be the first!</Trans>
                       </a>
                     </>
                   )}
                 </>
               ) : (
-                "No attendees match."
+                t`No attendees match.`
               )}
             </p>
           )}
@@ -274,8 +322,8 @@ function SearchBox({
           setDraft("");
           search("");
         }}
-        placeholder="Search names, languages, interests…"
-        aria-label="Search"
+        placeholder={t`Search names, languages, interests…`}
+        aria-label={t`Search`}
         inputClassName="h-10 px-3 text-base sm:text-sm rounded-md border border-line bg-surface-raised placeholder-fg-subtle focus:ring-2 focus:ring-brand-accent focus:border-transparent focus:outline-none"
       />
     </form>
@@ -295,7 +343,9 @@ function AttendeeRow({ card, href }: { card: DirectoryCard; href: string }) {
   // Sorting by recency with no visible dates would be opaque. Narrow screens
   // have no room beside the name, so it rides along under it there.
   const updated = profileUpdated && (
-    <span className="text-xs text-fg-subtle">updated {profileUpdated}</span>
+    <span className="text-xs text-fg-subtle">
+      <Trans>updated {profileUpdated}</Trans>
+    </span>
   );
   return (
     <a
@@ -308,7 +358,7 @@ function AttendeeRow({ card, href }: { card: DirectoryCard; href: string }) {
           {name}
           {isHost && (
             <span className="w-fit rounded-full bg-brand-tint-hover text-brand-fg text-xs font-semibold px-3 py-1">
-              Session host
+              <Trans>Session host</Trans>
             </span>
           )}
         </span>

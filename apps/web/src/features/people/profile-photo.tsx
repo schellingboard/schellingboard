@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+
 import { initials } from "../../ui/avatar";
 
 /**
@@ -36,7 +38,7 @@ export function ProfilePhoto({
         <img
           className="w-full h-full object-cover"
           src={image}
-          alt={`Profile avatar of ${name}`}
+          alt={t`Profile avatar of ${name}`}
           width={ZOOM_SIZE}
           height={ZOOM_SIZE}
         />
@@ -49,7 +51,9 @@ export function ProfilePhoto({
   return (
     <button
       type="button"
-      aria-label={`${zoomed ? "Shrink" : "Enlarge"} photo of ${name}`}
+      aria-label={
+        zoomed ? t`Shrink photo of ${name}` : t`Enlarge photo of ${name}`
+      }
       aria-pressed={zoomed}
       style={{ maxWidth: size }}
       className="w-full rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"

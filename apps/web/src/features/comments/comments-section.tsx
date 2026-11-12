@@ -1,3 +1,5 @@
+import { plural, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { COMMENT_MAX_LENGTH } from "@schellingboard/domain/comment";
 import { formatInLocalZone } from "@schellingboard/domain/time";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
@@ -71,11 +73,15 @@ function useComments(open: CommentsEnv["open"]) {
   return { state, handle };
 }
 
+export const COMMENT_HASH_PREFIX = "#comment-";
+
 /** The reader can scroll to a comment named by the address, `#comment-<id>`. */
 function useHighlighted(items: CommentView[] | undefined) {
   const [id, setId] = useState<string | null>(() => {
     const { hash } = window.location;
-    return hash.startsWith("#comment-") ? hash.slice("#comment-".length) : null;
+    return hash.startsWith(COMMENT_HASH_PREFIX)
+      ? hash.slice(COMMENT_HASH_PREFIX.length)
+      : null;
   });
   const scrolled = useRef<string | null>(null);
   useEffect(() => {
@@ -108,21 +114,23 @@ export function Comments(props: CommentsEnv) {
   )
     return (
       <section className={section}>
-        <h2 className="mb-4 text-lg font-semibold">Loading comments...</h2>
+        <h2 className="mb-4 text-lg font-semibold">
+          <Trans>Loading comments...</Trans>
+        </h2>
       </section>
     );
   if (state.status === "error" && state.items.length === 0)
     return (
       <section className={section}>
         <h2 className="mb-4 text-lg font-semibold">
-          Comments could not be loaded
+          <Trans>Comments could not be loaded</Trans>
         </h2>
         <button
           type="button"
           onClick={() => void handle.query.loadMore()}
           className="text-sm underline"
         >
-          Try again
+          <Trans>Try again</Trans>
         </button>
       </section>
     );
@@ -132,10 +140,8 @@ export function Comments(props: CommentsEnv) {
     <section className={section}>
       <h2 className="mb-4 text-lg font-semibold">
         {state.hasMore
-          ? `${total}+ comments`
-          : total === 1
-            ? "1 comment"
-            : `${total} comments`}
+          ? plural(total, { other: "#+ comments" })
+          : plural(total, { one: "# comment", other: "# comments" })}
       </h2>
       {roots.length > 0 && (
         <div className="mb-6">
@@ -159,19 +165,22 @@ export function Comments(props: CommentsEnv) {
           disabled={state.status === "loading"}
           className="mb-4 text-sm underline disabled:opacity-50"
         >
-          Load more comments
+          <Trans>Load more comments</Trans>
         </button>
       )}
       {props.readOnly ? null : env.viewerId ? (
         <CommentForm
           onSubmit={(body) => handle.controller.create(body)}
           clearOnSuccess
-          placeholder="Add a comment"
-          submitLabel="Comment"
+          placeholder={t`Add a comment`}
+          submitLabel={t({
+            message: "Comment",
+            comment: "Button: post the comment",
+          })}
         />
       ) : (
         <p className="text-sm text-fg-subtle">
-          Select your name to leave a comment.
+          <Trans>Select your name to leave a comment.</Trans>
         </p>
       )}
     </section>
@@ -208,6 +217,9 @@ function Thread({
     </time>
   );
   const action = "cursor-pointer hover:text-fg hover:underline";
+  const editedAt = node.editedTime
+    ? formatInLocalZone(new Date(node.editedTime), timezone, localZone)
+    : null;
 
   return (
     <div
@@ -232,14 +244,14 @@ function Thread({
             type="button"
             onClick={() => setCollapsed(!collapsed)}
             aria-expanded={!collapsed}
-            aria-label={collapsed ? "Expand comment" : "Collapse comment"}
+            aria-label={collapsed ? t`Expand comment` : t`Collapse comment`}
             className="cursor-pointer font-mono text-xs text-fg-muted hover:text-fg"
           >
             [{collapsed ? "+" : "-"}]
           </button>
           {node.deleted ? (
             <span className="text-sm italic text-fg-muted">
-              Comment deleted
+              <Trans>Comment deleted</Trans>
             </span>
           ) : (
             <>
@@ -251,7 +263,11 @@ function Thread({
                   className="font-medium text-brand-fg hover:text-brand-fg-hover hover:underline"
                 />
               ) : (
-                <span className="font-medium text-fg-muted">Unknown</span>
+                <span className="font-medium text-fg-muted">
+                  <Trans context="Comment author that no longer exists">
+                    Unknown
+                  </Trans>
+                </span>
               )}
               {env.readOnly ? (
                 <span className="text-xs text-fg-muted">{stamp}</span>
@@ -261,20 +277,20 @@ function Thread({
                   onClick={(e) => {
                     e.preventDefault();
                     highlight(node.id);
-                    env.setHash(`#comment-${node.id}`);
+                    env.setHash(`${COMMENT_HASH_PREFIX}${node.id}`);
                   }}
                   className="text-xs text-fg-muted hover:text-fg hover:underline"
                 >
                   {stamp}
                 </a>
               )}
-              {node.editedTime && (
+              {editedAt && (
                 <Tooltip
-                  content={`Edited ${formatInLocalZone(new Date(node.editedTime), timezone, localZone)}`}
+                  content={t`Edited ${editedAt}`}
                   toggleable
                   triggerClassName="text-xs text-fg-muted"
                 >
-                  (edited)
+                  <Trans>(edited)</Trans>
                 </Tooltip>
               )}
             </>
@@ -286,8 +302,8 @@ function Thread({
             {editing ? (
               <CommentForm
                 onSubmit={(body) => controller.edit(node.id, body)}
-                placeholder="Edit your comment"
-                submitLabel="Save"
+                placeholder={t`Edit your comment`}
+                submitLabel={t`Save`}
                 initialBody={node.body}
                 onCancel={() => setEditing(false)}
                 onDone={() => setEditing(false)}
@@ -311,7 +327,7 @@ function Thread({
                     onClick={() => setReplying(!replying)}
                     className={action}
                   >
-                    Reply
+                    <Trans context="Comment action: reply to it">Reply</Trans>
                   </button>
                 )}
                 {isAuthor && (
@@ -320,7 +336,7 @@ function Thread({
                     onClick={() => setEditing(true)}
                     className={action}
                   >
-                    Edit
+                    <Trans>Edit</Trans>
                   </button>
                 )}
                 {node.canDelete && (
@@ -329,7 +345,7 @@ function Thread({
                     onClick={() => setConfirmingDelete(true)}
                     className="cursor-pointer hover:text-danger-fg hover:underline"
                   >
-                    Delete
+                    <Trans>Delete</Trans>
                   </button>
                 )}
               </div>
@@ -338,8 +354,11 @@ function Thread({
               <CommentForm
                 onSubmit={(body) => controller.create(body, node.id)}
                 clearOnSuccess
-                placeholder="Write a reply"
-                submitLabel="Reply"
+                placeholder={t`Write a reply`}
+                submitLabel={t({
+                  message: "Reply",
+                  context: "Comment action: reply to it",
+                })}
                 onCancel={() => setReplying(false)}
                 onDone={() => setReplying(false)}
               />
@@ -369,13 +388,13 @@ function Thread({
 
       <ConfirmDialog
         open={confirmingDelete}
-        title="Delete comment"
+        title={t`Delete comment`}
         message={
           isAuthor
-            ? "Delete this comment? This cannot be undone."
-            : "Remove this comment? Its author is not notified."
+            ? t`Delete this comment? This cannot be undone.`
+            : t`Remove this comment? Its author is not notified.`
         }
-        confirmLabel="Delete"
+        confirmLabel={t`Delete`}
         onConfirm={() => {
           setConfirmingDelete(false);
           void controller.remove(node.id);
@@ -422,6 +441,8 @@ function Likes({
 }) {
   const [showing, setShowing] = useState(false);
   const liked = viewerId !== null && node.likes.some((l) => l.id === viewerId);
+  const likeCount = node.likes.length;
+  const moreLikers = likeCount - PREVIEW_LIKERS;
   return (
     <>
       {viewerId && (
@@ -435,7 +456,11 @@ function Likes({
               : "hover:text-fg hover:underline"
           }`}
         >
-          {liked ? "Liked" : "Like"}
+          {liked ? (
+            <Trans context="Comment action: you have liked it">Liked</Trans>
+          ) : (
+            <Trans context="Comment action: like it">Like</Trans>
+          )}
         </button>
       )}
       {node.likes.length > 0 && (
@@ -451,9 +476,12 @@ function Likes({
                     {liker.name}
                   </span>
                 ))}
-              {node.likes.length > PREVIEW_LIKERS && (
+              {moreLikers > 0 && (
                 <span className="block text-fg-muted">
-                  and {node.likes.length - PREVIEW_LIKERS} more
+                  {plural(moreLikers, {
+                    one: "and # more",
+                    other: "and # more",
+                  })}
                 </span>
               )}
             </div>
@@ -464,11 +492,15 @@ function Likes({
             onClick={() => setShowing(true)}
             className="cursor-pointer hover:text-fg hover:underline"
           >
-            {node.likes.length} like{node.likes.length === 1 ? "" : "s"}
+            {plural(likeCount, { one: "# like", other: "# likes" })}
           </button>
         </Tooltip>
       )}
-      <Dialog open={showing} onClose={() => setShowing(false)} title="Liked by">
+      <Dialog
+        open={showing}
+        onClose={() => setShowing(false)}
+        title={t`Liked by`}
+      >
         <ul className="max-h-72 overflow-y-auto text-sm">
           {node.likes.map((liker) => (
             <li key={liker.id}>
@@ -541,7 +573,9 @@ function CommentForm({
         className="w-full rounded-md border border-line p-2 text-base sm:text-sm focus:border-brand-accent focus:ring-brand-accent"
       />
       <div className="mt-1 flex items-center justify-between gap-2">
-        <p className="text-xs text-fg-subtle">Markdown supported</p>
+        <p className="text-xs text-fg-subtle">
+          <Trans>Markdown supported</Trans>
+        </p>
         <div className="flex gap-2">
           {onCancel && (
             <button
@@ -549,7 +583,7 @@ function CommentForm({
               onClick={onCancel}
               className="rounded-md border border-line px-3 py-1 text-sm font-medium text-fg-muted hover:bg-surface-muted"
             >
-              Cancel
+              <Trans>Cancel</Trans>
             </button>
           )}
           <button
@@ -557,7 +591,7 @@ function CommentForm({
             disabled={submitting || body.trim().length === 0}
             className="rounded-md bg-brand px-3 py-1 text-sm font-medium text-on-brand hover:bg-brand-hover disabled:opacity-50"
           >
-            {submitting ? "Saving..." : submitLabel}
+            {submitting ? t`Saving...` : submitLabel}
           </button>
         </div>
       </div>

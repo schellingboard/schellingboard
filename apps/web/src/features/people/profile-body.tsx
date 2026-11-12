@@ -1,8 +1,6 @@
-import {
-  CONTACT_TYPE_LABELS,
-  type ContactType,
-  type ProfilePrompt,
-} from "@schellingboard/domain/guest";
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
+import type { ContactType, ProfilePrompt } from "@schellingboard/domain/guest";
 import { CORE_PROMPTS } from "@schellingboard/domain/prompt-pool";
 import type { ComponentType, ReactNode, SVGProps } from "react";
 
@@ -21,6 +19,7 @@ import {
   PhoneIcon,
 } from "../../ui/icons";
 import { Markdown, MarkdownInline } from "../../ui/markdown";
+import { contactLabel } from "./contact-labels";
 import type { ProfileLinks } from "./links";
 import { OpenUpNudge } from "./open-up-nudge";
 import { ProfilePhoto } from "./profile-photo";
@@ -81,6 +80,7 @@ export function ProfileBody({
 }) {
   const options = activity?.meetingOptions ?? [];
   const nudges = activity?.nudges ?? [];
+  const basedIn = guest.basedIn;
   return (
     <div className="flex flex-col gap-8">
       <header className="flex flex-col items-center gap-2 text-center">
@@ -100,36 +100,41 @@ export function ProfileBody({
             )}
             {guest.isHost && (
               <span className="w-fit rounded-full bg-brand-tint-hover text-brand-fg text-xs font-semibold px-3 py-1">
-                Session host
+                <Trans>Session host</Trans>
               </span>
             )}
           </div>
         )}
         {guest.basedIn && (
-          <p className="text-fg-muted">Based in {guest.basedIn}</p>
+          <p className="text-fg-muted">
+            <Trans>Based in {basedIn}</Trans>
+          </p>
         )}
         {isOwnProfile && (
           <a
             href={links.edit}
             className="text-sm font-semibold text-brand-fg hover:text-brand-fg-hover"
           >
-            Edit profile
+            <Trans>Edit profile</Trans>
           </a>
         )}
         {!isOwnProfile && options.length > 0 && (
           <div className="flex flex-col gap-2">
-            {options.map((option) => (
-              <button
-                key={option.eventId}
-                type="button"
-                onClick={() => onSchedule(guest.id, option)}
-                className={SECONDARY}
-              >
-                {options.length === 1
-                  ? "Schedule a 1-on-1"
-                  : `Schedule a 1-on-1 at ${option.eventName}`}
-              </button>
-            ))}
+            {options.map((option) => {
+              const eventName = option.eventName;
+              return (
+                <button
+                  key={option.eventId}
+                  type="button"
+                  onClick={() => onSchedule(guest.id, option)}
+                  className={SECONDARY}
+                >
+                  {options.length === 1
+                    ? t`Schedule a 1-on-1`
+                    : t`Schedule a 1-on-1 at ${eventName}`}
+                </button>
+              );
+            })}
           </div>
         )}
         {!isOwnProfile && nudges.length > 0 && (
@@ -148,7 +153,9 @@ export function ProfileBody({
         )}
         {(guest.languages ?? []).length > 0 && (
           <section className="w-full mt-2">
-            <h2 className="text-lg font-semibold mb-2">Languages</h2>
+            <h2 className="text-lg font-semibold mb-2">
+              <Trans>Languages</Trans>
+            </h2>
             <ul className="flex flex-wrap justify-center gap-2">
               {guest.languages!.map((language, i) => (
                 <li
@@ -166,7 +173,9 @@ export function ProfileBody({
       <div className="flex flex-1 flex-col gap-8 min-w-0">
         {guest.aboutMe && (
           <section>
-            <h2 className="text-lg font-semibold mb-2">About me</h2>
+            <h2 className="text-lg font-semibold mb-2">
+              <Trans>About me</Trans>
+            </h2>
             <div className="text-fg">
               <Markdown className="text-base">{guest.aboutMe}</Markdown>
             </div>
@@ -184,18 +193,25 @@ export function ProfileBody({
 
         {(guest.contacts ?? []).length > 0 && (
           <section>
-            <h2 className="text-lg font-semibold mb-2">Contact</h2>
+            <h2 className="text-lg font-semibold mb-2">
+              <Trans context="Profile section: how to reach the person">
+                Contact
+              </Trans>
+            </h2>
             <ul className="flex flex-col gap-2">
               {guest.contacts!.map((contact, i) => {
                 const Icon = CONTACT_ICONS[contact.type];
+                const label =
+                  (contact.type === "other" && contact.label) ||
+                  contactLabel(contact.type);
                 return (
                   <li key={i} className="flex items-start gap-2 text-fg">
                     <Icon className="mt-0.5 h-5 w-5 shrink-0 text-fg-subtle" />
                     <span className="min-w-0 break-words">
                       <span className="font-medium">
-                        {(contact.type === "other" && contact.label) ||
-                          CONTACT_TYPE_LABELS[contact.type]}
-                        :
+                        <Trans comment="Label of a contact detail, followed by its value">
+                          {label}:
+                        </Trans>
                       </span>{" "}
                       <MarkdownInline>{contact.value}</MarkdownInline>
                     </span>
@@ -209,12 +225,12 @@ export function ProfileBody({
         {activity?.status === "ready" ? (
           <>
             <ActivityList
-              title="Hosting"
+              title={t`Hosting`}
               items={activity.hosting}
               href={links.session}
             />
             <ActivityList
-              title="Proposals"
+              title={t`Proposals`}
               items={activity.proposals}
               href={links.proposal}
             />

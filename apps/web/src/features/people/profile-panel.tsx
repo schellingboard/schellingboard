@@ -1,3 +1,5 @@
+import { plural, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import {
   catchSwipe,
   type Slide,
@@ -25,7 +27,11 @@ import type {
 import { CopyLinkButton } from "../../ui/copy-link-button";
 import { ChevronLeftIcon, ChevronRightIcon } from "../../ui/icons";
 import { SidePanel } from "../../ui/side-panel";
-import { Comments, type CommentsHandle } from "../comments/comments-section";
+import {
+  COMMENT_HASH_PREFIX,
+  Comments,
+  type CommentsHandle,
+} from "../comments/comments-section";
 import type { DirectoryCard } from "./directory-model";
 import type { ProfileLinks } from "./links";
 import { MeetingRequestDialog } from "./meeting-request-dialog";
@@ -33,6 +39,10 @@ import { ProfileBody } from "./profile-body";
 
 /** How long the profile takes to finish a swipe the finger has let go of. */
 const SETTLE_MS = 200;
+
+const TRACKING = "tracking" as const;
+const SETTLING = "settling" as const;
+const AXIS_X = "x" as const;
 
 type Drag = { guestId: string } & Slide;
 
@@ -125,7 +135,7 @@ export function ProfilePanel(props: ProfilePanelProps) {
         : null;
     const swipe = settling ? catchSwipe(point, rowOffset()) : startSwipe(point);
     if (!swipe) return;
-    setDrag({ guestId, phase: "tracking", swipe });
+    setDrag({ guestId, phase: TRACKING, swipe });
   };
 
   const rowOffset = () => {
@@ -159,7 +169,7 @@ export function ProfilePanel(props: ProfilePanelProps) {
     // Advancing before the slide settles means a drag that starts again at
     // once already has both neighbours on screen.
     if (target !== guestId) onOpen(target);
-    setDrag({ guestId: target, phase: "settling" });
+    setDrag({ guestId: target, phase: SETTLING });
   };
 
   useEffect(() => {
@@ -175,7 +185,7 @@ export function ProfilePanel(props: ProfilePanelProps) {
       onOpen(target);
 
       if (drag) {
-        setDrag({ guestId: target, phase: "settling" });
+        setDrag({ guestId: target, phase: SETTLING });
         return;
       }
 
@@ -185,15 +195,15 @@ export function ProfilePanel(props: ProfilePanelProps) {
       // pass; the guard keeps a stale callback from clobbering a caught card.
       setDrag({
         guestId: target,
-        phase: "tracking",
+        phase: TRACKING,
         arming: true,
-        swipe: { startX: 0, startY: 0, axis: "x", dx: offset * width },
+        swipe: { startX: 0, startY: 0, axis: AXIS_X, dx: offset * width },
       });
       requestAnimationFrame(() =>
         requestAnimationFrame(() => {
           setDrag((prev) =>
             prev?.guestId === target && prev.phase === "tracking" && prev.arming
-              ? { guestId: target, phase: "settling" }
+              ? { guestId: target, phase: SETTLING }
               : prev
           );
         })
@@ -232,12 +242,17 @@ export function ProfilePanel(props: ProfilePanelProps) {
   const offset = drag?.phase === "tracking" ? swipeOffset(drag.swipe, ends) : 0;
   const first = sliding && ends.canPrev ? index - 1 : index;
 
+  const place = index + 1;
+  const total = collection.length;
   const position =
     index >= 0
-      ? `${index + 1} of ${collection.length} attendee${
-          collection.length === 1 ? "" : "s"
-        }`
+      ? t`${place} of ${plural(total, { one: "# attendee", other: "# attendees" })}`
       : "";
+  const guestName = guest?.name ?? "";
+  const profileTitle = t({
+    message: "Profile",
+    comment: "Side panel title: a person's profile",
+  });
 
   const pages = sliding
     ? collection.slice(first, index + 2)
@@ -248,16 +263,24 @@ export function ProfilePanel(props: ProfilePanelProps) {
   return (
     <>
       <SidePanel
-        label={guest ? guest.name : "Profile"}
+        label={guest ? guest.name : profileTitle}
         title={
           walk ? (
             <span aria-live="polite" className="text-sm text-fg-muted">
-              <span className="sr-only">{guest ? `${guest.name}, ` : ""}</span>
+              <span className="sr-only">
+                {guest
+                  ? t({
+                      message: `${guestName}, `,
+                      comment:
+                        'Read out before the position, e.g. "Ann, 3 of 20 attendees"',
+                    })
+                  : ""}
+              </span>
               {position}
             </span>
           ) : (
             <span title={guest?.name} className="block truncate">
-              {guest?.name ?? "Profile"}
+              {guest?.name ?? profileTitle}
             </span>
           )
         }
@@ -265,19 +288,23 @@ export function ProfilePanel(props: ProfilePanelProps) {
           walk && (
             <>
               <NavButton
-                label="Previous attendee"
+                label={t`Previous attendee`}
                 disabled={index <= 0}
                 onClick={() => goToAnimated(-1)}
               >
                 <ChevronLeftIcon className="h-5 w-5 stroke-2" />
-                <span className="hidden sm:inline">Prev</span>
+                <span className="hidden sm:inline">
+                  <Trans>Prev</Trans>
+                </span>
               </NavButton>
               <NavButton
-                label="Next attendee"
+                label={t`Next attendee`}
                 disabled={index < 0 || index >= collection.length - 1}
                 onClick={() => goToAnimated(1)}
               >
-                <span className="hidden sm:inline">Next</span>
+                <span className="hidden sm:inline">
+                  <Trans>Next</Trans>
+                </span>
                 <ChevronRightIcon className="h-5 w-5 stroke-2" />
               </NavButton>
             </>
@@ -343,7 +370,7 @@ export function ProfilePanel(props: ProfilePanelProps) {
                               timezone="UTC"
                               guestHref={links.guest}
                               commentHref={(id) =>
-                                `${links.guest(guestId)}#comment-${id}`
+                                `${links.guest(guestId)}${COMMENT_HASH_PREFIX}${id}`
                               }
                               setHash={setHash}
                             />
@@ -358,7 +385,7 @@ export function ProfilePanel(props: ProfilePanelProps) {
           ) : props.status === "idle" || props.status === "loading" ? (
             <div
               role="status"
-              aria-label="Loading profile"
+              aria-label={t`Loading profile`}
               className="flex flex-col items-center gap-2"
             >
               <div className="aspect-square w-full max-w-64 animate-pulse rounded-2xl bg-surface-muted" />
@@ -369,8 +396,8 @@ export function ProfilePanel(props: ProfilePanelProps) {
             // here, and the page behind is more use than an error.
             <p className="text-fg-muted">
               {props.status === "error"
-                ? "Could not load the attendee list."
-                : "This person is no longer listed."}
+                ? t`Could not load the attendee list.`
+                : t`This person is no longer listed.`}
             </p>
           )}
         </div>
@@ -444,7 +471,9 @@ function isTextEntry(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
   return (
     target.isContentEditable ||
-    ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)
+    target instanceof HTMLInputElement ||
+    target instanceof HTMLTextAreaElement ||
+    target instanceof HTMLSelectElement
   );
 }
 

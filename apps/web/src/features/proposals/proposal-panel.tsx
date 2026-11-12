@@ -24,7 +24,11 @@ import { CalendarIcon, HandRaisedIcon, PencilIcon } from "../../ui/icons";
 import { SidePanel } from "../../ui/side-panel";
 import { Tooltip } from "../../ui/tooltip";
 import { Unavailable } from "../../ui/unavailable";
-import { Comments, type CommentsHandle } from "../comments/comments-section";
+import {
+  COMMENT_HASH_PREFIX,
+  Comments,
+  type CommentsHandle,
+} from "../comments/comments-section";
 import type { ProposalLinks } from "./links";
 import { phaseTexts } from "./list-model";
 import { ProposalBody } from "./proposal-body";
@@ -275,7 +279,9 @@ function Details({
         viewerId={guestId}
         timezone={timezone}
         guestHref={links.guest}
-        commentHref={(id) => `${links.view(proposal.id)}#comment-${id}`}
+        commentHref={(id) =>
+          `${links.view(proposal.id)}${COMMENT_HASH_PREFIX}${id}`
+        }
         setHash={setHash}
       />
     </div>

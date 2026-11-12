@@ -51,12 +51,21 @@ msgstr ""
 msgid "(done)"
 msgstr ""
 
+#: src/features/comments/comments-section.tsx:293
+msgid "(edited)"
+msgstr ""
+
 #: src/app/user-menu.tsx:253
 msgid "(password)"
 msgstr ""
 
 #: src/ui/phase-bar.tsx:107
 msgid "(skipped)"
+msgstr ""
+
+#. placeholder {0}: rows.length
+#: src/features/people/directory-screen.tsx:209
+msgid "{0, plural, one {# attendee} other {# attendees}}"
 msgstr ""
 
 #. placeholder {0}: chosen.length
@@ -135,8 +144,27 @@ msgstr ""
 msgid "{eventName}: Session Proposals"
 msgstr ""
 
+#. Read out before the position, e.g. "Ann, 3 of 20 attendees"
+#: src/features/people/profile-panel.tsx:272
+msgid "{guestName}, "
+msgstr ""
+
 #: src/features/meetings/meeting-request-fields.tsx:227
 msgid "{joined} during this time — book it anyway?"
+msgstr ""
+
+#: src/features/comments/my-comments-screen.tsx:175
+msgid "{kind, select, session {Session} proposal {Proposal} profile {Profile} other {}}: {subjectTitle}"
+msgstr ""
+
+#. Label of a contact detail, followed by its value
+#: src/features/people/profile-body.tsx:212
+msgid "{label}:"
+msgstr ""
+
+#: src/features/comments/comments-section.tsx:495
+#: src/features/comments/my-comments-screen.tsx:173
+msgid "{likeCount, plural, one {# like} other {# likes}}"
 msgstr ""
 
 #: src/features/schedule/schedule-filters.tsx:82
@@ -145,6 +173,10 @@ msgstr ""
 
 #: src/features/meetings/meeting-request-fields.tsx:45
 msgid "{minutes} min"
+msgstr ""
+
+#: src/features/comments/comments-section.tsx:481
+msgid "{moreLikers, plural, one {and # more} other {and # more}}"
 msgstr ""
 
 #: src/features/meetings/book-meeting.tsx:273
@@ -157,6 +189,14 @@ msgstr ""
 
 #: src/features/meetings/meeting-panel.tsx:138
 msgid "{otherName} will be told. Cancel it?"
+msgstr ""
+
+#: src/features/people/profile-panel.tsx:249
+msgid "{place} of {total, plural, one {# attendee} other {# attendees}}"
+msgstr ""
+
+#: src/features/comments/my-comments-screen.tsx:172
+msgid "{replyCount, plural, one {# reply} other {# replies}}"
 msgstr ""
 
 #: src/features/proposals/proposals-screen.tsx:393
@@ -183,12 +223,20 @@ msgstr ""
 msgid "{them} is waiting for your answer."
 msgstr ""
 
+#: src/features/comments/comments-section.tsx:144
+msgid "{total, plural, one {# comment} other {# comments}}"
+msgstr ""
+
 #: src/ui/pager.tsx:63
 msgid "{total, plural, one {# result} other {# results}}"
 msgstr ""
 
 #: src/ui/pager.tsx:62
 msgid "{total, plural, one {#+ result} other {#+ results}}"
+msgstr ""
+
+#: src/features/comments/comments-section.tsx:143
+msgid "{total, plural, other {#+ comments}}"
 msgstr ""
 
 #: src/app/header-links.tsx:24
@@ -199,9 +247,17 @@ msgstr ""
 msgid "{valueLabel}: 0 to {max}"
 msgstr ""
 
-#: src/features/proposals/proposal-panel.tsx:328
+#: src/features/proposals/proposal-panel.tsx:334
 #: src/features/proposals/scheduled-sessions-notice.tsx:52
 msgid "{when} in {rooms}"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:561
+msgid "@handle, address, or URL"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:284
+msgid "← Attendees"
 msgstr ""
 
 #: src/features/proposals/quick-voting-screen.tsx:49
@@ -285,6 +341,10 @@ msgstr ""
 msgid "A newer release is out: {latestVersion}."
 msgstr ""
 
+#: src/features/people/profile-form.tsx:438
+msgid "A sentence or two"
+msgstr ""
+
 #: src/features/settings/email-settings-form.tsx:18
 msgid "a session I’m hosting changes time or location, or is deleted"
 msgstr ""
@@ -301,6 +361,11 @@ msgstr ""
 msgid "a session I’ve RSVP’d to changes time or location, loses its host, or is deleted"
 msgstr ""
 
+#: src/features/people/profile-body.tsx:177
+#: src/features/people/profile-form.tsx:383
+msgid "About me"
+msgstr ""
+
 #: src/features/meetings/meeting-panel.tsx:124
 msgid "Accept"
 msgstr ""
@@ -309,8 +374,20 @@ msgstr ""
 msgid "Actions"
 msgstr ""
 
+#: src/features/comments/comments-section.tsx:175
+msgid "Add a comment"
+msgstr ""
+
 #: src/features/meetings/meeting-request-fields.tsx:141
 msgid "Add a line of context (optional)"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:586
+msgid "Add contact"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:507
+msgid "Add language"
 msgstr ""
 
 #: src/features/proposals/proposals-screen.tsx:108
@@ -330,6 +407,11 @@ msgstr ""
 msgid "Agenda"
 msgstr ""
 
+#: src/features/comments/my-comments-screen.tsx:105
+msgctxt "Comment filter: every kind"
+msgid "All"
+msgstr ""
+
 #: src/ui/pager.tsx:83
 msgctxt "Rows per page: every row"
 msgid "All"
@@ -337,6 +419,10 @@ msgstr ""
 
 #: src/features/schedule/meeting-rules.ts:73
 msgid "all confirmed"
+msgstr ""
+
+#: src/features/comments/my-comments-screen.tsx:127
+msgid "All events"
 msgstr ""
 
 #: src/features/schedule/day-agenda.tsx:264
@@ -353,6 +439,10 @@ msgstr ""
 
 #: src/app/theme.tsx:90
 msgid "Always use light colours"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:81
+msgid "Any pronouns"
 msgstr ""
 
 #: src/features/settings/settings-screen.tsx:130
@@ -376,6 +466,10 @@ msgstr ""
 msgid "Ask {name}"
 msgstr ""
 
+#: src/features/people/profile-form.tsx:82
+msgid "Ask me"
+msgstr ""
+
 #: src/features/people/open-up-nudge.tsx:58
 msgid "Ask them to open up"
 msgstr ""
@@ -395,6 +489,7 @@ msgstr ""
 
 #: src/app/header-links.tsx:17
 #: src/app/page-notice.tsx:12
+#: src/features/people/directory-screen.tsx:119
 msgid "Attendees"
 msgstr ""
 
@@ -437,8 +532,20 @@ msgstr ""
 msgid "Back to the events"
 msgstr ""
 
+#: src/features/people/profile-form.tsx:375
+msgid "Based in"
+msgstr ""
+
+#: src/features/people/profile-body.tsx:110
+msgid "Based in {basedIn}"
+msgstr ""
+
 #: src/features/proposals/proposals-screen.tsx:133
 msgid "Be the first to suggest a session!"
+msgstr ""
+
+#: src/features/people/directory-screen.tsx:248
+msgid "Be the first!"
 msgstr ""
 
 #: src/features/schedule/session-panel.tsx:234
@@ -478,6 +585,7 @@ msgstr ""
 msgid "Busy"
 msgstr ""
 
+#: src/features/comments/comments-section.tsx:586
 #: src/features/meetings/meeting-request-fields.tsx:157
 #: src/features/notifications/notifications-screen.tsx:232
 #: src/features/proposals/proposal-form.tsx:352
@@ -494,6 +602,10 @@ msgstr ""
 msgid "canceled"
 msgstr ""
 
+#: src/features/people/profile-form.tsx:321
+msgid "Change profile picture"
+msgstr ""
+
 #: src/features/proposals/proposal-form.tsx:228
 msgid "Changes here do not reach the schedule. To change a session, open it and edit it there."
 msgstr ""
@@ -504,6 +616,10 @@ msgstr ""
 
 #: src/features/schedule/schedule-filters.tsx:286
 msgid "Choose what My schedule shows"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:379
+msgid "City, region, or country"
 msgstr ""
 
 #. Label of a warning icon: this overlaps another commitment
@@ -577,8 +693,25 @@ msgstr ""
 msgid "Co-host wanted"
 msgstr ""
 
+#: src/features/comments/comments-section.tsx:247
+msgid "Collapse comment"
+msgstr ""
+
 #: src/app/theme.tsx:104
 msgid "Colour theme"
+msgstr ""
+
+#. Button: post the comment
+#: src/features/comments/comments-section.tsx:176
+msgid "Comment"
+msgstr ""
+
+#: src/features/comments/comments-section.tsx:254
+msgid "Comment deleted"
+msgstr ""
+
+#: src/features/comments/comments-section.tsx:126
+msgid "Comments could not be loaded"
 msgstr ""
 
 #. State of a 1-on-1 on the grid, lower case
@@ -588,6 +721,31 @@ msgstr ""
 
 #: src/features/schedule/meeting-rules.ts:164
 msgid "Confirmed — see you there."
+msgstr ""
+
+#: src/features/people/profile-body.tsx:197
+msgctxt "Profile section: how to reach the person"
+msgid "Contact"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:517
+msgid "Contact details"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:545
+msgid "Contact label"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:533
+msgid "Contact type"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:556
+msgid "Contact value"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:392
+msgid "Conversation starters"
 msgstr ""
 
 #: src/ui/markdown.tsx:89
@@ -620,6 +778,18 @@ msgstr ""
 
 #: src/ui/copy-link-button.tsx:19
 msgid "Could not copy the link"
+msgstr ""
+
+#: src/features/people/profile-panel.tsx:399
+msgid "Could not load the attendee list."
+msgstr ""
+
+#: src/features/people/directory-screen.tsx:235
+msgid "Could not load the attendees. Reload the page to try again."
+msgstr ""
+
+#: src/features/comments/my-comments-screen.tsx:48
+msgid "Could not load your comments. Reload the page to try again."
 msgstr ""
 
 #: src/features/notifications/notifications-screen.tsx:84
@@ -676,11 +846,17 @@ msgstr ""
 msgid "declined"
 msgstr ""
 
+#: src/features/comments/comments-section.tsx:348
+#: src/features/comments/comments-section.tsx:397
 #: src/features/notifications/notifications-screen.tsx:174
 #: src/features/notifications/notifications-screen.tsx:230
 #: src/features/proposals/proposal-form.tsx:344
 #: src/features/proposals/proposal-form.tsx:364
 msgid "Delete"
+msgstr ""
+
+#: src/features/comments/comments-section.tsx:391
+msgid "Delete comment"
 msgstr ""
 
 #: src/features/notifications/notifications-screen.tsx:225
@@ -689,6 +865,10 @@ msgstr ""
 
 #: src/features/proposals/proposal-form.tsx:362
 msgid "Delete session proposal?"
+msgstr ""
+
+#: src/features/comments/comments-section.tsx:394
+msgid "Delete this comment? This cannot be undone."
 msgstr ""
 
 #: src/features/proposals/proposal-form.tsx:256
@@ -715,6 +895,10 @@ msgstr ""
 
 #: src/ui/use-discard-guard.tsx:80
 msgid "Discard what you have typed?"
+msgstr ""
+
+#: src/features/people/contact-labels.ts:11
+msgid "Discord"
 msgstr ""
 
 #: src/ui/notices.tsx:106
@@ -752,7 +936,8 @@ msgstr ""
 
 #. Button: edit (verb)
 #. Button: edit (verb)
-#: src/features/proposals/proposal-panel.tsx:193
+#: src/features/comments/comments-section.tsx:339
+#: src/features/proposals/proposal-panel.tsx:197
 #: src/features/proposals/proposals-screen.tsx:669
 #: src/features/schedule/session-panel.tsx:239
 msgid "Edit"
@@ -764,11 +949,26 @@ msgid "Edit"
 msgstr ""
 
 #: src/app/user-menu.tsx:107
+#: src/features/people/directory-screen.tsx:123
+#: src/features/people/profile-body.tsx:118
+#: src/features/people/profile-form.tsx:287
 msgid "Edit profile"
 msgstr ""
 
 #: src/features/proposals/proposal-form.tsx:208
 msgid "Edit Session Proposal"
+msgstr ""
+
+#: src/features/comments/comments-section.tsx:305
+msgid "Edit your comment"
+msgstr ""
+
+#: src/features/comments/comments-section.tsx:289
+msgid "Edited {editedAt}"
+msgstr ""
+
+#: src/features/people/contact-labels.ts:6
+msgid "Email"
 msgstr ""
 
 #: src/features/settings/email-settings-form.tsx:91
@@ -789,6 +989,10 @@ msgstr ""
 msgid "Ends {0}."
 msgstr ""
 
+#: src/features/people/profile-photo.tsx:55
+msgid "Enlarge photo of {name}"
+msgstr ""
+
 #: src/features/proposals/proposal-form.tsx:248
 msgid "Enter a clear, descriptive title"
 msgstr ""
@@ -799,6 +1003,11 @@ msgid "Error: {error}"
 msgstr ""
 
 #: src/app/panel-host.tsx:81
+msgid "Event"
+msgstr ""
+
+#: src/features/comments/my-comments-screen.tsx:119
+msgctxt "Comment filter: label of the event selector"
 msgid "Event"
 msgstr ""
 
@@ -824,8 +1033,16 @@ msgstr ""
 msgid "Everything here is private and never shown to other attendees. Your <0>public profile</0> is edited separately."
 msgstr ""
 
+#: src/features/people/profile-form.tsx:290
+msgid "Everything here is shown on your public profile. Email notifications and other private preferences live in <0>Settings</0>."
+msgstr ""
+
 #: src/features/settings/push-notifications.tsx:254
 msgid "Everything the notifications page tells you, on your phone or laptop while the site isn’t open. A device gets all of them — the email settings above only decide what is emailed. Each device is turned on separately."
+msgstr ""
+
+#: src/features/comments/comments-section.tsx:247
+msgid "Expand comment"
 msgstr ""
 
 #: src/ui/resize-image.ts:77
@@ -838,6 +1055,30 @@ msgstr ""
 
 #: src/features/proposals/list-model.ts:207
 msgid "Fewest votes first"
+msgstr ""
+
+#: src/features/people/directory-screen.tsx:63
+msgid "Filter by Has profile"
+msgstr ""
+
+#: src/features/people/directory-screen.tsx:64
+msgid "Filter by Has profile (active)"
+msgstr ""
+
+#: src/features/people/directory-screen.tsx:68
+msgid "Filter by Open to 1-on-1s"
+msgstr ""
+
+#: src/features/people/directory-screen.tsx:69
+msgid "Filter by Open to 1-on-1s (active)"
+msgstr ""
+
+#: src/features/people/directory-screen.tsx:58
+msgid "Filter by Session host"
+msgstr ""
+
+#: src/features/people/directory-screen.tsx:59
+msgid "Filter by Session host (active)"
 msgstr ""
 
 #: src/features/schedule/schedule-filters.tsx:120
@@ -890,6 +1131,22 @@ msgstr ""
 msgid "Grid"
 msgstr ""
 
+#: src/features/people/directory-screen.tsx:62
+msgid "Has profile"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:76
+msgid "He/Him"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:370
+msgid "He/Him/His/They/etc."
+msgstr ""
+
+#: src/features/people/profile-form.tsx:79
+msgid "He/They"
+msgstr ""
+
 #: src/app/footer.tsx:103
 msgid "Help"
 msgstr ""
@@ -909,7 +1166,7 @@ msgstr ""
 msgid "Hides this session on your schedule, for you only. Use it if you are not interested or for any other reason. You can show it again here."
 msgstr ""
 
-#: src/features/proposals/proposal-panel.tsx:182
+#: src/features/proposals/proposal-panel.tsx:186
 msgid "Host this proposal"
 msgstr ""
 
@@ -946,6 +1203,7 @@ msgstr ""
 msgid "hosting"
 msgstr ""
 
+#: src/features/people/profile-body.tsx:228
 #: src/features/schedule/filters.ts:5
 msgid "Hosting"
 msgstr ""
@@ -975,7 +1233,7 @@ msgstr ""
 msgid "Interested"
 msgstr ""
 
-#: src/features/proposals/proposal-panel.tsx:183
+#: src/features/proposals/proposal-panel.tsx:187
 msgid "Join as co-host"
 msgstr ""
 
@@ -991,9 +1249,24 @@ msgstr ""
 msgid "Keep it"
 msgstr ""
 
+#: src/features/people/profile-form.tsx:550
+msgid "Label"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:470
+#: src/features/people/profile-form.tsx:486
 #: src/features/settings/language-setting.tsx:36
 #: src/features/settings/language-setting.tsx:39
 msgid "Language"
+msgstr ""
+
+#: src/features/people/profile-body.tsx:157
+#: src/features/people/profile-form.tsx:461
+msgid "Languages"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:462
+msgid "Languages you're happy to talk in"
 msgstr ""
 
 #: src/ui/pager.tsx:155
@@ -1019,6 +1292,20 @@ msgctxt "Colour theme"
 msgid "Light"
 msgstr ""
 
+#: src/features/comments/comments-section.tsx:462
+msgctxt "Comment action: like it"
+msgid "Like"
+msgstr ""
+
+#: src/features/comments/comments-section.tsx:460
+msgctxt "Comment action: you have liked it"
+msgid "Liked"
+msgstr ""
+
+#: src/features/comments/comments-section.tsx:502
+msgid "Liked by"
+msgstr ""
+
 #: src/ui/copy-link-button.tsx:17
 msgid "Link copied"
 msgstr ""
@@ -1032,6 +1319,22 @@ msgctxt "Connection status: up to date"
 msgid "Live"
 msgstr ""
 
+#: src/features/comments/comments-section.tsx:168
+msgid "Load more comments"
+msgstr ""
+
+#: src/features/people/directory-screen.tsx:231
+msgid "Loading attendees…"
+msgstr ""
+
+#: src/features/comments/comments-section.tsx:118
+msgid "Loading comments..."
+msgstr ""
+
+#: src/features/people/profile-panel.tsx:388
+msgid "Loading profile"
+msgstr ""
+
 #: src/features/proposals/quick-voting-screen.tsx:96
 msgid "Loading proposals..."
 msgstr ""
@@ -1039,6 +1342,7 @@ msgstr ""
 #: src/app/event-page.tsx:152
 #: src/app/panel-host.tsx:82
 #: src/app/people-pages.tsx:162
+#: src/features/comments/my-comments-screen.tsx:42
 #: src/features/meetings/book-meeting.tsx:73
 #: src/features/notifications/notifications-screen.tsx:78
 #: src/features/notifications/notifications-screen.tsx:181
@@ -1079,6 +1383,8 @@ msgstr ""
 msgid "Mark as read"
 msgstr ""
 
+#: src/features/comments/comments-section.tsx:577
+#: src/features/people/profile-form.tsx:589
 #: src/ui/form.tsx:186
 #: src/ui/form.tsx:344
 msgid "Markdown supported"
@@ -1098,6 +1404,7 @@ msgid "Menu"
 msgstr ""
 
 #: src/app/user-menu.tsx:123
+#: src/features/comments/my-comments-screen.tsx:77
 msgid "My comments"
 msgstr ""
 
@@ -1133,6 +1440,14 @@ msgstr ""
 msgid "n/a"
 msgstr ""
 
+#: src/features/people/profile-form.tsx:355
+msgid "Name"
+msgstr ""
+
+#: src/features/people/directory-screen.tsx:74
+msgid "Name (A–Z)"
+msgstr ""
+
 #: src/app/user-menu.tsx:237
 msgid "Names"
 msgstr ""
@@ -1147,8 +1462,13 @@ msgstr ""
 msgid "needs your reply"
 msgstr ""
 
+#: src/features/people/profile-panel.tsx:306
 #: src/ui/pager.tsx:146
 msgid "Next"
+msgstr ""
+
+#: src/features/people/profile-panel.tsx:301
+msgid "Next attendee"
 msgstr ""
 
 #: src/features/schedule/match-stepper.tsx:45
@@ -1163,8 +1483,16 @@ msgstr ""
 msgid "No"
 msgstr ""
 
+#: src/features/people/directory-screen.tsx:254
+msgid "No attendees match."
+msgstr ""
+
 #: src/features/schedule/session-panel.tsx:336
 msgid "No attendees yet"
+msgstr ""
+
+#: src/features/comments/my-comments-screen.tsx:90
+msgid "No comments match."
 msgstr ""
 
 #: src/app/home-page.tsx:45
@@ -1210,11 +1538,15 @@ msgstr ""
 msgid "Nobody answered before the slot began."
 msgstr ""
 
+#: src/features/people/directory-screen.tsx:243
+msgid "Nobody has filled in a profile yet."
+msgstr ""
+
 #: src/features/meetings/book-meeting.tsx:136
 msgid "Nobody has marked this time free."
 msgstr ""
 
-#: src/features/proposals/proposal-panel.tsx:171
+#: src/features/proposals/proposal-panel.tsx:175
 msgid "Nobody is offering to host this proposal yet. If you could run it, take it on."
 msgstr ""
 
@@ -1326,8 +1658,16 @@ msgstr ""
 msgid "Open menu"
 msgstr ""
 
+#: src/features/people/directory-screen.tsx:67
+msgid "Open to 1-on-1s"
+msgstr ""
+
 #: src/features/meetings/meeting-panel.tsx:204
 msgid "opening your 1-on-1s"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:393
+msgid "Optional prompts that give people something to ask you about"
 msgstr ""
 
 #: src/features/schedule/attendee-count-field.tsx:99
@@ -1336,6 +1676,11 @@ msgstr ""
 
 #: src/features/meetings/meeting-request-fields.tsx:130
 msgid "or type somewhere else"
+msgstr ""
+
+#. Kind of contact detail that is none of the listed ones
+#: src/features/people/contact-labels.ts:13
+msgid "Other"
 msgstr ""
 
 #: src/ui/pager.tsx:129
@@ -1358,6 +1703,10 @@ msgstr ""
 msgid "Pagination"
 msgstr ""
 
+#: src/features/people/contact-labels.ts:7
+msgid "Phone"
+msgstr ""
+
 #: src/ui/combobox.tsx:170
 msgid "Pick one or type any text"
 msgstr ""
@@ -1370,12 +1719,17 @@ msgstr ""
 msgid "Powered by"
 msgstr ""
 
+#: src/features/people/profile-panel.tsx:297
 #: src/ui/pager.tsx:105
 msgid "Prev"
 msgstr ""
 
 #: src/ui/markdown-textarea.tsx:100
 msgid "Preview"
+msgstr ""
+
+#: src/features/people/profile-panel.tsx:291
+msgid "Previous attendee"
 msgstr ""
 
 #: src/features/schedule/match-stepper.tsx:31
@@ -1386,24 +1740,43 @@ msgstr ""
 msgid "Previous page"
 msgstr ""
 
+#. Side panel title: a person's profile
+#: src/features/people/profile-panel.tsx:252
+msgid "Profile"
+msgstr ""
+
+#: src/features/people/profile-photo.tsx:41
+msgid "Profile avatar of {name}"
+msgstr ""
+
 #: src/app/people-pages.tsx:169
 msgid "Profile not found, please log in again."
+msgstr ""
+
+#: src/features/comments/my-comments-screen.tsx:17
+msgid "Profiles"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:365
+msgid "Pronouns"
 msgstr ""
 
 #: src/features/proposals/list-model.ts:241
 msgid "Proposal and voting phases are over"
 msgstr ""
 
-#: src/features/proposals/proposal-panel.tsx:68
-#: src/features/proposals/proposal-panel.tsx:69
+#: src/features/proposals/proposal-panel.tsx:72
+#: src/features/proposals/proposal-panel.tsx:73
 msgid "Proposal details"
 msgstr ""
 
 #: src/features/proposals/proposal-form.tsx:65
-#: src/features/proposals/proposal-panel.tsx:77
+#: src/features/proposals/proposal-panel.tsx:81
 msgid "Proposal not found."
 msgstr ""
 
+#: src/features/comments/my-comments-screen.tsx:16
+#: src/features/people/profile-body.tsx:233
 #: src/features/proposals/proposal-form.tsx:82
 #: src/features/proposals/proposal-form.tsx:204
 #: src/features/schedule/schedule-toolbar.tsx:130
@@ -1411,6 +1784,12 @@ msgstr ""
 msgid "Proposals"
 msgstr ""
 
+#. Attendee sort order: a shuffled list
+#: src/features/people/directory-screen.tsx:76
+msgid "Random"
+msgstr ""
+
+#: src/features/people/directory-screen.tsx:75
 #: src/features/proposals/list-model.ts:205
 msgid "Recently updated"
 msgstr ""
@@ -1422,6 +1801,12 @@ msgstr ""
 #: src/app/error-boundary.tsx:46
 #: src/app/reload-offer.tsx:99
 msgid "Reload"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:429
+#: src/features/people/profile-form.tsx:495
+#: src/features/people/profile-form.tsx:570
+msgid "Remove"
 msgstr ""
 
 #. placeholder {0}: p.name
@@ -1437,8 +1822,23 @@ msgstr ""
 msgid "Remove selected"
 msgstr ""
 
+#: src/features/comments/comments-section.tsx:395
+msgid "Remove this comment? Its author is not notified."
+msgstr ""
+
+#: src/features/comments/comments-section.tsx:330
+#: src/features/comments/comments-section.tsx:358
+msgctxt "Comment action: reply to it"
+msgid "Reply"
+msgstr ""
+
 #: src/app/footer.tsx:112
 msgid "Report a Bug"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:336
+msgctxt "Profile picture: go back to the saved one"
+msgid "Reset"
 msgstr ""
 
 #: src/ui/side-panel.tsx:155
@@ -1462,6 +1862,8 @@ msgstr ""
 msgid "RSVP'd"
 msgstr ""
 
+#: src/features/comments/comments-section.tsx:306
+#: src/features/people/profile-form.tsx:613
 #: src/features/schedule/attendee-count-field.tsx:127
 #: src/features/settings/email-settings-form.tsx:120
 msgid "Save"
@@ -1484,7 +1886,9 @@ msgstr ""
 msgid "Saved!"
 msgstr ""
 
+#: src/features/comments/comments-section.tsx:594
 #: src/features/meetings/availability-form.tsx:191
+#: src/features/people/profile-form.tsx:613
 #: src/features/settings/email-settings-form.tsx:120
 msgid "Saving..."
 msgstr ""
@@ -1499,10 +1903,18 @@ msgstr ""
 
 #. Button: put this proposal on the schedule
 #. Button: put this proposal on the schedule
-#: src/features/proposals/proposal-panel.tsx:201
+#: src/features/proposals/proposal-panel.tsx:205
 #: src/features/proposals/proposals-screen.tsx:656
 msgctxt "verb"
 msgid "Schedule"
+msgstr ""
+
+#: src/features/people/profile-body.tsx:133
+msgid "Schedule a 1-on-1"
+msgstr ""
+
+#: src/features/people/profile-body.tsx:134
+msgid "Schedule a 1-on-1 at {eventName}"
 msgstr ""
 
 #: src/features/schedule/schedule-toolbar.tsx:84
@@ -1538,8 +1950,13 @@ msgstr ""
 msgid "Scheduling will be enabled at {schedulingAt}"
 msgstr ""
 
+#: src/features/people/directory-screen.tsx:326
 #: src/ui/data-table.tsx:137
 msgid "Search"
+msgstr ""
+
+#: src/features/people/directory-screen.tsx:325
+msgid "Search names, languages, interests…"
 msgstr ""
 
 #: src/features/proposals/proposals-screen.tsx:314
@@ -1550,6 +1967,7 @@ msgstr ""
 msgid "Search proposals..."
 msgstr ""
 
+#: src/features/people/directory-screen.tsx:173
 #: src/features/proposals/proposals-screen.tsx:365
 msgid "Search results are sorted by relevance"
 msgstr ""
@@ -1557,6 +1975,10 @@ msgstr ""
 #: src/features/schedule/schedule-filters.tsx:106
 #: src/features/schedule/schedule-filters.tsx:107
 msgid "Search sessions"
+msgstr ""
+
+#: src/features/comments/my-comments-screen.tsx:86
+msgid "Search your comments"
 msgstr ""
 
 #: src/ui/data-table.tsx:195
@@ -1575,7 +1997,7 @@ msgstr ""
 
 #: src/features/proposals/list-model.ts:244
 #: src/features/proposals/list-model.ts:253
-#: src/features/proposals/proposal-panel.tsx:174
+#: src/features/proposals/proposal-panel.tsx:178
 #: src/features/proposals/proposals-screen.tsx:328
 msgid "Select a user first"
 msgstr ""
@@ -1597,6 +2019,10 @@ msgstr ""
 msgid "Select your name"
 msgstr ""
 
+#: src/features/comments/comments-section.tsx:183
+msgid "Select your name to leave a comment."
+msgstr ""
+
 #: src/features/meetings/meeting-request-fields.tsx:154
 msgid "Send request"
 msgstr ""
@@ -1615,11 +2041,19 @@ msgid "Session full"
 msgstr ""
 
 #: src/features/meetings/book-meeting.tsx:164
+#: src/features/people/directory-screen.tsx:57
+#: src/features/people/directory-screen.tsx:361
+#: src/features/people/person-link.tsx:27
+#: src/features/people/profile-body.tsx:103
 msgid "Session host"
 msgstr ""
 
 #: src/features/schedule/session-panel.tsx:64
 msgid "Session not found."
+msgstr ""
+
+#: src/features/comments/my-comments-screen.tsx:15
+msgid "Sessions"
 msgstr ""
 
 #: src/app/user-menu.tsx:115
@@ -1633,6 +2067,19 @@ msgstr ""
 
 #: src/features/schedule/day-agenda.tsx:350
 msgid "Shared moment: {title}"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:77
+msgid "She/Her"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:80
+msgid "She/They"
+msgstr ""
+
+#: src/features/comments/my-comments-screen.tsx:96
+msgctxt "Comment filter: label of the kind selector"
+msgid "Show"
 msgstr ""
 
 #: src/features/schedule/schedule-filters.tsx:185
@@ -1659,8 +2106,20 @@ msgstr ""
 msgid "Show suggestions"
 msgstr ""
 
+#: src/features/people/profile-form.tsx:518
+msgid "Shown publicly on your profile — only add what you want visible"
+msgstr ""
+
 #: src/features/schedule/session-panel.tsx:257
 msgid "Shows this session on your schedule again."
+msgstr ""
+
+#: src/features/people/profile-photo.tsx:55
+msgid "Shrink photo of {name}"
+msgstr ""
+
+#: src/features/people/contact-labels.ts:9
+msgid "Signal"
 msgstr ""
 
 #. Vote option on a session proposal: not interested
@@ -1712,6 +2171,7 @@ msgstr ""
 msgid "Sorry — my session moved…"
 msgstr ""
 
+#: src/features/people/directory-screen.tsx:178
 #: src/features/proposals/proposals-screen.tsx:370
 msgid "Sort by"
 msgstr ""
@@ -1738,9 +2198,26 @@ msgstr ""
 msgid "Submitting..."
 msgstr ""
 
+#: src/features/people/profile-form.tsx:407
+#: src/features/people/profile-form.tsx:411
+msgid "Suggest a different prompt"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:456
+msgid "Suggest a prompt"
+msgstr ""
+
 #: src/app/theme.tsx:84
 msgctxt "Colour theme"
 msgid "System"
+msgstr ""
+
+#: src/features/people/contact-labels.ts:10
+msgid "Telegram"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:387
+msgid "Tell others about yourself"
 msgstr ""
 
 #: src/features/meetings/book-meeting.tsx:68
@@ -1760,7 +2237,7 @@ msgstr ""
 msgid "The events could not be loaded."
 msgstr ""
 
-#: src/features/proposals/proposal-panel.tsx:172
+#: src/features/proposals/proposal-panel.tsx:176
 msgid "The hosts would like a co-host. Joining lets you edit this proposal with them."
 msgstr ""
 
@@ -1768,7 +2245,7 @@ msgstr ""
 msgid "The organizer hasn't set up any days with 1-on-1 slots yet."
 msgstr ""
 
-#: src/features/proposals/proposal-panel.tsx:254
+#: src/features/proposals/proposal-panel.tsx:258
 msgid "The votes could not be loaded."
 msgstr ""
 
@@ -1782,6 +2259,10 @@ msgstr ""
 
 #: src/features/proposals/vote-breakdown.tsx:123
 msgid "There is nothing to measure this against yet — guessing at attendance needs the event's attendee list and {interestedEmoji} votes on its other proposals."
+msgstr ""
+
+#: src/features/people/profile-form.tsx:78
+msgid "They/Them"
 msgstr ""
 
 #: src/features/schedule/day-agenda.tsx:404
@@ -1816,7 +2297,11 @@ msgstr ""
 msgid "This is a closed session, meaning you can at most arrive 5 minutes late. If you arrive later you may not join and please do not knock or otherwise disrupt the session."
 msgstr ""
 
-#: src/features/proposals/proposal-panel.tsx:334
+#: src/features/people/profile-panel.tsx:400
+msgid "This person is no longer listed."
+msgstr ""
+
+#: src/features/proposals/proposal-panel.tsx:340
 msgid "This proposal has not been scheduled yet."
 msgstr ""
 
@@ -1824,15 +2309,15 @@ msgstr ""
 msgid "This proposal is already on the schedule:"
 msgstr ""
 
-#: src/features/proposals/proposal-panel.tsx:304
+#: src/features/proposals/proposal-panel.tsx:310
 msgid "This proposal was scheduled on <0>{day} at {time} in {rooms}</0>."
 msgstr ""
 
-#: src/features/proposals/proposal-panel.tsx:312
+#: src/features/proposals/proposal-panel.tsx:318
 msgid "This proposal was scheduled on <0>{day} at {time}</0>."
 msgstr ""
 
-#: src/features/proposals/proposal-panel.tsx:341
+#: src/features/proposals/proposal-panel.tsx:347
 msgid "This proposal was scheduled several times:"
 msgstr ""
 
@@ -1890,7 +2375,7 @@ msgstr ""
 msgid "Too few attendees voted to guess at attendance — fewer than {minTurnout}% of them did, so a couple of votes either way would decide the number."
 msgstr ""
 
-#: src/features/proposals/proposal-panel.tsx:248
+#: src/features/proposals/proposal-panel.tsx:252
 #: src/features/proposals/proposals-screen.tsx:594
 msgid "Total votes:"
 msgstr ""
@@ -1898,8 +2383,9 @@ msgstr ""
 #: src/app/error-boundary.tsx:39
 #: src/app/event-page.tsx:167
 #: src/app/panel-host.tsx:88
+#: src/features/comments/comments-section.tsx:133
 #: src/features/notifications/notifications-screen.tsx:217
-#: src/features/proposals/proposal-panel.tsx:256
+#: src/features/proposals/proposal-panel.tsx:260
 msgid "Try again"
 msgstr ""
 
@@ -1960,9 +2446,18 @@ msgstr ""
 msgid "unknown"
 msgstr ""
 
+#: src/features/comments/comments-section.tsx:267
+msgctxt "Comment author that no longer exists"
+msgid "Unknown"
+msgstr ""
+
 #: src/features/schedule/day-agenda.tsx:258
 #: src/features/schedule/day-agenda.tsx:388
 msgid "until {endsAt}"
+msgstr ""
+
+#: src/features/people/directory-screen.tsx:347
+msgid "updated {profileUpdated}"
 msgstr ""
 
 #: src/app/footer.tsx:69
@@ -2037,9 +2532,17 @@ msgstr ""
 msgid "waiting for reply"
 msgstr ""
 
+#: src/features/people/contact-labels.ts:12
+msgid "Website"
+msgstr ""
+
 #: src/app/footer.tsx:63
 #: src/app/footer.tsx:119
 msgid "What's new"
+msgstr ""
+
+#: src/features/people/contact-labels.ts:8
+msgid "WhatsApp"
 msgstr ""
 
 #: src/features/meetings/meeting-panel.tsx:73
@@ -2087,6 +2590,10 @@ msgstr ""
 msgid "Would love to talk about…"
 msgstr ""
 
+#: src/features/comments/comments-section.tsx:357
+msgid "Write a reply"
+msgstr ""
+
 #: src/ui/confirm-dialog.tsx:10
 msgid "Yes"
 msgstr ""
@@ -2103,6 +2610,10 @@ msgstr ""
 
 #: src/features/schedule/meeting-rules.ts:167
 msgid "You declined this."
+msgstr ""
+
+#: src/features/comments/my-comments-screen.tsx:89
+msgid "You have not written any comments yet."
 msgstr ""
 
 #: src/features/schedule/day-agenda.tsx:326
@@ -2124,11 +2635,16 @@ msgstr ""
 
 #: src/app/user-menu.tsx:57
 #: src/app/user-menu.tsx:90
+#: src/features/people/profile-form.tsx:360
 msgid "Your name"
 msgstr ""
 
 #: src/app/user-menu.tsx:78
 msgid "Your name: {name}"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:605
+msgid "Your photo was saved; the details were not."
 msgstr ""
 
 #: src/features/meetings/meeting-request-fields.tsx:199
@@ -2155,7 +2671,7 @@ msgstr ""
 msgid "Your vote ↓"
 msgstr ""
 
-#: src/features/proposals/proposal-panel.tsx:229
+#: src/features/proposals/proposal-panel.tsx:233
 #: src/features/proposals/proposals-screen.tsx:589
 msgid "Your vote:"
 msgstr ""

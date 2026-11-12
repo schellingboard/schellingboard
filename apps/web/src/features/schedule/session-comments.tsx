@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-import { Comments } from "../comments/comments-section";
+import { COMMENT_HASH_PREFIX, Comments } from "../comments/comments-section";
 import { useSchedule } from "./context";
 
 export function SessionComments({ sessionId }: { sessionId: string }) {
@@ -15,7 +15,9 @@ export function SessionComments({ sessionId }: { sessionId: string }) {
       viewerId={data.guestId}
       timezone={timezone}
       guestHref={links.guest}
-      commentHref={(id) => `${links.session(sessionId)}#comment-${id}`}
+      commentHref={(id) =>
+        `${links.session(sessionId)}${COMMENT_HASH_PREFIX}${id}`
+      }
       setHash={setHash}
     />
   );
