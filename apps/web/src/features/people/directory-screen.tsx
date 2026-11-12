@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ATTENDEE_SORTS,
   DEFAULT_ATTENDEE_SORT,
@@ -11,7 +11,6 @@ import { SEARCH_DEBOUNCE_MS } from "../../ui/use-debounced";
 import {
   cardsFrom,
   directoryView,
-  everyoneIn,
   withParams,
   type DirectoryCard,
 } from "./directory-model";
@@ -29,11 +28,8 @@ export type DirectoryScreenProps = {
   links: PeopleLinks;
   params: URLSearchParams;
   onParams: (next: URLSearchParams, options?: { push?: boolean }) => void;
-  /** Drawn over the list with the order the list is showing, so a profile can walk it. */
-  profile?: (lists: {
-    matches: DirectoryCard[];
-    everyone: DirectoryCard[];
-  }) => ReactNode;
+  /** Told the order the list is showing (null once it goes), so a profile panel can walk it. */
+  onRows?: (rows: DirectoryCard[] | null) => void;
 };
 
 const LINK = "font-semibold text-brand-fg hover:text-brand-fg-hover";
@@ -53,7 +49,11 @@ export function DirectoryScreen(props: DirectoryScreenProps) {
       }),
     [cards, listQuery, props.meetingsEnabled, seed]
   );
-  const everyone = useMemo(() => everyoneIn(cards), [cards]);
+  const { onRows } = props;
+  useEffect(() => {
+    onRows?.(rows);
+    return () => onRows?.(null);
+  }, [onRows, rows]);
   const sortDisabled = query !== "";
   const onlyHasProfile =
     filters.length === 1 && filters[0] === "hasProfile" && query === "";
@@ -153,10 +153,7 @@ export function DirectoryScreen(props: DirectoryScreenProps) {
             <ul className="divide-y divide-line-subtle border-t border-b border-line-subtle">
               {rows.map((row) => (
                 <li key={row.id} className="py-3">
-                  <AttendeeRow
-                    card={row}
-                    href={links.guest(row.id, listQuery)}
-                  />
+                  <AttendeeRow card={row} href={links.guest(row.id)} />
                 </li>
               ))}
             </ul>
@@ -190,7 +187,6 @@ export function DirectoryScreen(props: DirectoryScreenProps) {
           )}
         </div>
       </div>
-      {props.profile?.({ matches: rows, everyone: everyone })}
     </>
   );
 }

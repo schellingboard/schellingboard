@@ -152,9 +152,12 @@ test("leaves a deep-linked profile scrollable back to its top @010-US5", async (
   // profile as well — the modal's clipped panels, which nothing can scroll
   // back — stranding the top of the profile out of reach.
   await page.mouse.move(400, 300);
-  await page.mouse.wheel(0, -5000);
+  // One wheel event scrolls at most a page of the short panel.
   await expect
-    .poll(async () => (await photo.boundingBox())?.y)
+    .poll(async () => {
+      await page.mouse.wheel(0, -5000);
+      return (await photo.boundingBox())?.y;
+    })
     .toBeCloseTo(top, 0);
 });
 
@@ -176,7 +179,7 @@ test("opens a comment author's profile from the profile it was left on @010-US3"
   await expect(postedComment(profile, "hello from Linh").first()).toBeVisible();
 
   // The author's name is a real link to their profile, not a Prev/Next step,
-  // so the modal has to pick the new profile up off the URL.
+  // so the panel has to pick the new profile up off the URL.
   await profile.getByRole("link", { name: "Linh Nguyen" }).first().click();
   const author = page.getByRole("dialog", { name: "Linh Nguyen" });
   await expect(author).toBeVisible();
@@ -184,7 +187,7 @@ test("opens a comment author's profile from the profile it was left on @010-US3"
     author.getByRole("heading", { name: "0 comments" })
   ).toBeVisible();
 
-  // The link carries no list context, so the modal has to keep the search it
+  // The link carries no list context, so the panel has to keep the search it
   // was opened over: closing still lands on the list reading started from.
   await author.getByRole("button", { name: "Close" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);

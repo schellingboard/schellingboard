@@ -211,6 +211,15 @@ describe("UserMenu", () => {
     expect(href("Settings")).toBe("/settings");
   });
 
+  it("closes after a link is followed, which may leave the page in place", async () => {
+    const { user } = setup({ guestId: "g1" });
+    await user.click(screen.getByRole("button", { name: "Your name: Ada" }));
+
+    await user.click(screen.getByRole("menuitem", { name: "My profile" }));
+
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
   it("logs out and reloads the page", async () => {
     const { user, signOut } = setup({ guestId: "g1" });
     await user.click(screen.getByRole("button", { name: "Your name: Ada" }));

@@ -17,7 +17,7 @@ import { createProfileActivityQuery } from "../../queries/profile-activity";
 import { comment, fakeComments } from "../comments/comments-test-support";
 import { cardsFrom, everyoneIn } from "./directory-model";
 import { profileLinks } from "./links";
-import { ProfileModal, type ProfileModalProps } from "./profile-modal";
+import { ProfilePanel, type ProfilePanelProps } from "./profile-panel";
 
 afterEach(cleanup);
 
@@ -80,7 +80,7 @@ const option = {
 };
 
 function Harness(
-  props: Partial<ProfileModalProps> & { start?: string; options?: unknown[] }
+  props: Partial<ProfilePanelProps> & { start?: string; options?: unknown[] }
 ) {
   const { start = "al", options = NO_OPTIONS, ...rest } = props;
   const [guestId, setGuestId] = useState(start);
@@ -100,7 +100,7 @@ function Harness(
     [options]
   );
   return (
-    <ProfileModal
+    <ProfilePanel
       guestId={guestId}
       matches={cards}
       everyone={everyoneIn(cards)}
@@ -122,7 +122,7 @@ function Harness(
 
 const dialog = () => screen.getByRole("dialog");
 
-describe("the profile modal", () => {
+describe("the profile panel", () => {
   it("shows the details of the profile", { tags: ["011-US1"] }, () => {
     render(<Harness />);
     const d = within(dialog());
@@ -230,6 +230,20 @@ describe("the profile modal", () => {
   );
 
   it(
+    "offers no Prev and Next without a directory behind it",
+    { tags: ["011-US4"] },
+    () => {
+      render(<Harness matches={null} />);
+
+      expect(screen.getByRole("heading", { name: "Al" })).toBeTruthy();
+      expect(
+        screen.queryByRole("button", { name: "Next attendee" })
+      ).toBeNull();
+      expect(screen.queryByText(/of 3 attendees/)).toBeNull();
+    }
+  );
+
+  it(
     "walks everyone for a profile the list behind does not show",
     { tags: ["011-US4"] },
     () => {
@@ -276,7 +290,7 @@ describe("the profile modal", () => {
   );
 
   it(
-    "closes with the button, Escape and the backdrop, Escape first shrinking an enlarged photo",
+    "closes with the button and Escape, Escape first shrinking an enlarged photo",
     { tags: ["011-US4", "011-US5"] },
     async () => {
       let closed = 0;

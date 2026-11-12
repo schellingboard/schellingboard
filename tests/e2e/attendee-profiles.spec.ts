@@ -28,8 +28,7 @@ test("reads a profile over the list and comes back to the same view @011-US4", a
   await expect(
     profile.getByRole("heading", { level: 1, name: "Charlie Test" })
   ).toBeVisible();
-  // The filtered view stays in the URL, so it survives a reload or a share.
-  await expect(page).toHaveURL(/\/guests\/[^/?]+\?filter=hasProfile/);
+  await expect(page).toHaveURL(/\/guests\/[^/?]+$/);
 
   await profile.getByRole("button", { name: "Close" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
@@ -118,7 +117,7 @@ test("starts each profile at its own top @011-US4", async ({ page }) => {
 
 test("a profile taller than the window scrolls @011-US4", async ({ page }) => {
   await login(page);
-  // Wide enough for the dialog layout rather than the phone sheet, short
+  // Wide enough for the side panel rather than the phone sheet, short
   // enough that a filled-in profile runs past the bottom of it.
   await page.setViewportSize({ width: 1024, height: 400 });
   await page.goto("/guests");
@@ -136,9 +135,12 @@ test("a profile taller than the window scrolls @011-US4", async ({ page }) => {
   const contact = profile.getByRole("heading", { name: "Contact" });
   await expect(contact).not.toBeInViewport();
 
-  await page.mouse.move(512, 250);
-  await page.mouse.wheel(0, 2000);
-  await expect(contact).toBeInViewport();
+  await page.mouse.move(800, 250);
+  // One wheel event scrolls at most a page, and the panel's page is short here.
+  await expect(async () => {
+    await page.mouse.wheel(0, 2000);
+    await expect(contact).toBeInViewport({ timeout: 1000 });
+  }).toPass();
 });
 
 test("slides the next profile in from beside this one, not from further out @011-US4", async ({
@@ -212,7 +214,7 @@ test("a press during a slide reads on rather than waiting for it @011-US4", asyn
   await page.waitForTimeout(80);
   await page.keyboard.press("ArrowRight");
   await expect(heading).toHaveText("Charlie Test");
-  await expect(page).toHaveURL(/\/guests\/[^/?]+\?q=Test/);
+  await expect(page).toHaveURL(/\/guests\/[^/?]+$/);
 });
 
 test("escape closes the profile, and back retraces the ones read @011-US4", async ({
@@ -312,24 +314,42 @@ test.describe("on a touchscreen", () => {
   });
 });
 
-test("a profile opened from outside the directory can still be read through @011-US4", async ({
+test("a profile opened from outside the directory has no list to read through @011-US4", async ({
   page,
 }) => {
   await login(page);
   await page.goto("/Conference-Alpha/proposals");
   await selectUser(page, /Bob Test/i);
 
-  // Hiding the way onwards here would make it undiscoverable to exactly the
-  // people who arrive from a session or a comment. With no list behind it, the
-  // collection is everyone.
   await page.getByRole("button", { name: /your name/i }).click();
   await page.getByRole("menuitem", { name: /my profile/i }).click();
-  const profile = page.getByRole("dialog");
+  const profile = page.getByRole("dialog", { name: "Bob Test" });
   await expect(
     profile.getByRole("heading", { level: 1, name: "Bob Test" })
   ).toBeVisible();
+  await expect(page).toHaveURL(/\/guests\/[^/?]+$/);
   await expect(
-    profile.getByText(/^Bob Test, \d+ of \d+ attendees$/)
+    profile.getByRole("button", { name: "Next attendee" })
+  ).toHaveCount(0);
+
+  await profile.getByRole("button", { name: "Close" }).click();
+  await expect(page).toHaveURL(/\/Conference-Alpha\/proposals/);
+});
+
+test("a reloaded profile still has the directory behind it @011-US4", async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto("/guests");
+  await searchForTestGuests(page);
+  await page.getByRole("link", { name: "Alice Test" }).click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+
+  await page.reload();
+  const profile = page.getByRole("dialog", { name: "Alice Test" });
+  await expect(profile).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Attendees", exact: true })
   ).toBeVisible();
   await expect(
     profile.getByRole("button", { name: "Next attendee" })

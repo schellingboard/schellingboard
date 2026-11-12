@@ -34,7 +34,7 @@ import { ThemeProvider } from "./theme";
 import { NoticeProvider } from "../ui/notices";
 import { PageNotice } from "./page-notice";
 import type { AppServices } from "./services";
-import { ShellFrame, ShellProviders } from "./shell";
+import { ShellFrame } from "./shell";
 import { useUnread } from "./unread-count";
 import { useDirectoryShell } from "./use-directory-shell";
 import { useUrlSearchParams } from "./use-url-search-params";
@@ -136,11 +136,7 @@ function AccountFrame({
   children: (shell: Shell) => ReactNode;
 }) {
   const { api } = services;
-  return (
-    <ShellProviders api={api}>
-      <Frame api={api}>{children}</Frame>
-    </ShellProviders>
-  );
+  return <Frame api={api}>{children}</Frame>;
 }
 
 function Frame({

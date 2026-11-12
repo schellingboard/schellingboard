@@ -20,36 +20,36 @@ import type {
   ProfileMeetingOption,
 } from "../../queries/profile-activity";
 import { Comments, type CommentsHandle } from "../comments/comments-section";
-import { ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from "../../ui/icons";
+import { ChevronLeftIcon, ChevronRightIcon } from "../../ui/icons";
+import { SidePanel } from "../../ui/side-panel";
 import type { DirectoryCard } from "./directory-model";
 import type { DirectoryState } from "../../queries/directory";
 import type { MeetingRequestCalls } from "../../commands/meeting-request";
 import { MeetingRequestDialog } from "./meeting-request-dialog";
 import type { ProfileLinks } from "./links";
 import { ProfileBody } from "./profile-body";
-import { useDiscardGuard } from "../../ui/use-discard-guard";
-import { useScrollLock } from "../../ui/use-scroll-lock";
 
 /** How long the profile takes to finish a swipe the finger has let go of. */
 const SETTLE_MS = 200;
 
 type Drag = { guestId: string } & Slide;
 
-export type ProfileModalProps = {
+export type ProfilePanelProps = {
   guestId: string;
-  /** What the list behind is showing; Prev and Next walk it. */
-  matches: DirectoryCard[];
+  /** What the directory behind is showing, which Prev and Next walk; null with none behind. */
+  matches: DirectoryCard[] | null;
   /** Everyone, alphabetically: the walk for a profile the filters exclude. */
   everyone: DirectoryCard[];
   viewerId: string | null;
   /** While the directory loads, a missing person is not yet "no longer listed". */
   status: DirectoryState["status"];
   links: ProfileLinks;
-  /** Stable between renders; the modal calls it once per profile read. */
+  /** Stable between renders; the panel calls it once per profile read. */
   activity: (guestId: string) => ProfileActivityQuery;
   /** Must change `guestId` in the same update, or a slide aims at the old profile. */
   onOpen: (guestId: string) => void;
   onClose: () => void;
+  onBack?: () => void;
   /** The 1-on-1 request form's call, for "Schedule a 1-on-1". */
   meetingRequests: MeetingRequestCalls;
   /** Must be stable; called once per profile read, with the name notices use. */
@@ -58,19 +58,19 @@ export type ProfileModalProps = {
 };
 
 /**
- * A guest's profile, read over the list it was opened from. Always a modal:
- * the list never unmounts, so closing lands exactly where reading started.
- *
- * Prev/Next walk the collection the list is showing, or everyone in
- * alphabetical order for a profile the filters exclude or one opened from a
- * session or a comment. The position label names which, so it is never
- * invisible state.
+ * A guest's profile in the side panel. With the directory behind it, Prev/Next
+ * walk the collection it is showing, or everyone in alphabetical order for a
+ * profile the filters exclude; the position label names which, so it is never
+ * invisible state. Opened over any other page there is nothing to walk.
  */
-export function ProfileModal(props: ProfileModalProps) {
+export function ProfilePanel(props: ProfilePanelProps) {
   const { guestId, matches, everyone, viewerId, links, onOpen, onClose } =
     props;
+  const walk = matches !== null;
   const [dragged, setDrag] = useState<Drag | null>(null);
-  const collection = matches.some((a) => a.id === guestId) ? matches : everyone;
+  const collection = matches?.some((a) => a.id === guestId)
+    ? matches
+    : everyone;
   const index = collection.findIndex((a) => a.id === guestId);
   const guest = index >= 0 ? collection[index] : null;
 
@@ -89,21 +89,17 @@ export function ProfileModal(props: ProfileModalProps) {
   );
 
   const ends: SwipeEnds = {
-    canPrev: index > 0,
-    canNext: index >= 0 && index < collection.length - 1,
+    canPrev: walk && index > 0,
+    canNext: walk && index >= 0 && index < collection.length - 1,
   };
 
   // One scroll container serves every profile, so without this the next one
   // opens at the offset the last one was left at.
-  const body = useRef<HTMLDivElement>(null);
+  const viewport = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    body.current?.scrollTo({ top: 0 });
+    viewport.current?.closest("[data-panel-scroll]")?.scrollTo({ top: 0 });
   }, [guestId]);
 
-  const viewport = useRef<HTMLDivElement>(null);
-  const panel = useRef<HTMLDivElement>(null);
-  const guard = useDiscardGuard(panel, onClose);
-  const { escape } = guard;
   const row = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   useEffect(() => {
@@ -119,7 +115,7 @@ export function ProfileModal(props: ProfileModalProps) {
   const drag = dragged?.guestId === guestId ? dragged : null;
 
   const onTouchStart = (e: ReactTouchEvent) => {
-    if (zoomed || index < 0 || e.touches.length !== 1) return;
+    if (!walk || zoomed || index < 0 || e.touches.length !== 1) return;
     const point = e.touches[0];
     const settling =
       dragged?.guestId === guestId && dragged.phase === "settling"
@@ -173,7 +169,7 @@ export function ProfileModal(props: ProfileModalProps) {
   const goToAnimated = useCallback(
     (offset: 1 | -1) => {
       const target = collection[index + offset]?.id;
-      if (!target) return;
+      if (!walk || !target) return;
       onOpen(target);
 
       if (drag) {
@@ -201,10 +197,8 @@ export function ProfileModal(props: ProfileModalProps) {
         })
       );
     },
-    [collection, index, drag, width, onOpen]
+    [walk, collection, index, drag, width, onOpen]
   );
-
-  useScrollLock(true);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -212,21 +206,24 @@ export function ProfileModal(props: ProfileModalProps) {
       if (e.key === "Escape") {
         // One layer at a time: the enlarged photo first, so Escape never
         // closes the profile out from under someone looking closely.
-        if (zoomed) setZoomedFor(null);
-        else escape();
+        if (zoomed) {
+          setZoomedFor(null);
+          e.preventDefault();
+        }
         return;
       }
-      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      if (!walk || (e.key !== "ArrowLeft" && e.key !== "ArrowRight")) return;
       if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
-      if (zoomed || isTextEntry(e.target)) return;
+      if (zoomed || isTextEntry(e.target) || !belongsToPanel(e.target)) return;
       e.preventDefault();
       goToAnimated(e.key === "ArrowRight" ? 1 : -1);
     };
-    document.addEventListener("keydown", onKeyDown);
+    // Captured, so it settles an Escape before the panel's own handler sees it.
+    document.addEventListener("keydown", onKeyDown, true);
     return () => {
-      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("keydown", onKeyDown, true);
     };
-  }, [escape, goToAnimated, zoomed, scheduling]);
+  }, [goToAnimated, walk, zoomed, scheduling]);
 
   const sliding =
     drag !== null && (drag.phase === "settling" || drag.swipe.axis === "x");
@@ -247,53 +244,45 @@ export function ProfileModal(props: ProfileModalProps) {
       : [];
 
   return (
-    // items-start: a centred panel puts Prev/Next at a different height for
-    // every profile, so they would jump under the pointer while reading on.
-    <div
-      ref={panel}
-      onFocus={guard.noteFocus}
-      className="fixed inset-0 z-50 flex justify-center sm:items-start sm:py-8"
-      role="dialog"
-      aria-modal="true"
-      aria-label={guest ? guest.name : "Profile"}
-    >
-      <div className="fixed inset-0 bg-overlay" onClick={guard.requestClose} />
-      <div className="relative flex h-full w-full flex-col overflow-hidden bg-surface-raised shadow-xl sm:mx-4 sm:h-auto sm:max-h-full sm:max-w-4xl sm:rounded-lg">
-        <div className="flex shrink-0 items-center gap-2 border-b border-line-subtle px-2 py-2 sm:px-4">
-          <NavButton
-            label="Previous attendee"
-            disabled={index <= 0}
-            onClick={() => goToAnimated(-1)}
-          >
-            <ChevronLeftIcon className="h-5 w-5 stroke-2" />
-            <span className="hidden sm:inline">Prev</span>
-          </NavButton>
-          <span
-            aria-live="polite"
-            className="flex-1 text-center text-sm text-fg-muted"
-          >
-            <span className="sr-only">{guest ? `${guest.name}, ` : ""}</span>
-            {position}
-          </span>
-          <NavButton
-            label="Next attendee"
-            disabled={index < 0 || index >= collection.length - 1}
-            onClick={() => goToAnimated(1)}
-          >
-            <span className="hidden sm:inline">Next</span>
-            <ChevronRightIcon className="h-5 w-5 stroke-2" />
-          </NavButton>
-          <button
-            type="button"
-            aria-label="Close"
-            onClick={guard.requestClose}
-            className="rounded-md bg-surface-raised p-1.5 text-fg-subtle hover:bg-surface-sunken hover:text-fg-muted focus:outline-none focus:ring-2 focus:ring-brand-accent"
-          >
-            <XMarkIcon className="h-6 w-6" />
-          </button>
-        </div>
-        {guard.prompt && <div className="shrink-0 px-4">{guard.prompt}</div>}
-
+    <>
+      <SidePanel
+        label={guest ? guest.name : "Profile"}
+        title={
+          walk ? (
+            <span aria-live="polite" className="text-sm text-fg-muted">
+              <span className="sr-only">{guest ? `${guest.name}, ` : ""}</span>
+              {position}
+            </span>
+          ) : (
+            "Profile"
+          )
+        }
+        titleAction={
+          walk && (
+            <>
+              <NavButton
+                label="Previous attendee"
+                disabled={index <= 0}
+                onClick={() => goToAnimated(-1)}
+              >
+                <ChevronLeftIcon className="h-5 w-5 stroke-2" />
+                <span className="hidden sm:inline">Prev</span>
+              </NavButton>
+              <NavButton
+                label="Next attendee"
+                disabled={index < 0 || index >= collection.length - 1}
+                onClick={() => goToAnimated(1)}
+              >
+                <span className="hidden sm:inline">Next</span>
+                <ChevronRightIcon className="h-5 w-5 stroke-2" />
+              </NavButton>
+            </>
+          )
+        }
+        onClose={onClose}
+        onBack={props.onBack}
+        shareUrl={links.guest(guestId)}
+      >
         {/* touch-pan-y hands vertical scrolling to the browser and keeps
             horizontal panning, the back gesture included, for this handler;
             React's touchmove is passive, so it has to be CSS.
@@ -303,7 +292,7 @@ export function ProfileModal(props: ProfileModalProps) {
             brings it back (#930). */}
         <div
           ref={viewport}
-          className="flex min-h-0 flex-1 flex-col overflow-clip touch-pan-y"
+          className="overflow-clip touch-pan-y"
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={endTouch}
@@ -312,7 +301,7 @@ export function ProfileModal(props: ProfileModalProps) {
           {guest ? (
             <div
               ref={row}
-              className="flex min-h-0 flex-1"
+              className="flex"
               style={{
                 paddingInlineStart: `${first * width}px`,
                 transform: `translateX(${offset - index * width}px)`,
@@ -327,10 +316,9 @@ export function ProfileModal(props: ProfileModalProps) {
                 return (
                   <div
                     key={attendee.id}
-                    ref={current ? body : undefined}
                     aria-hidden={!current}
                     inert={!current}
-                    className="w-full shrink-0 overflow-y-auto overscroll-contain px-4 py-6 sm:px-6"
+                    className="w-full shrink-0"
                     style={{ width: width || undefined }}
                   >
                     <ProfileBody
@@ -364,24 +352,22 @@ export function ProfileModal(props: ProfileModalProps) {
             <div
               role="status"
               aria-label="Loading profile"
-              className="flex flex-col items-center gap-2 px-4 py-6 sm:px-6 md:items-start"
+              className="flex flex-col items-center gap-2"
             >
               <div className="aspect-square w-full max-w-64 animate-pulse rounded-2xl bg-surface-muted" />
               <div className="h-9 w-48 animate-pulse rounded bg-surface-muted" />
             </div>
           ) : (
             // Not a 404: a stale link from an old session or comment lands
-            // here, and the list behind is more use than an error.
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-6 sm:px-6">
-              <p className="text-fg-muted">
-                {props.status === "error"
-                  ? "Could not load the attendee list."
-                  : "This person is no longer listed."}
-              </p>
-            </div>
+            // here, and the page behind is more use than an error.
+            <p className="text-fg-muted">
+              {props.status === "error"
+                ? "Could not load the attendee list."
+                : "This person is no longer listed."}
+            </p>
           )}
         </div>
-      </div>
+      </SidePanel>
       {scheduling && (
         <MeetingRequestDialog
           option={scheduling.option}
@@ -393,7 +379,7 @@ export function ProfileModal(props: ProfileModalProps) {
           onClose={() => setScheduling(null)}
         />
       )}
-    </div>
+    </>
   );
 }
 
@@ -452,5 +438,13 @@ function isTextEntry(target: EventTarget | null): boolean {
   return (
     target.isContentEditable ||
     ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)
+  );
+}
+
+function belongsToPanel(target: EventTarget | null): boolean {
+  if (!(target instanceof Element)) return false;
+  if (target.closest("[role=separator]")) return false;
+  return (
+    target === document.body || target.closest("[data-side-panel]") !== null
   );
 }

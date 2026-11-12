@@ -149,14 +149,16 @@ covered by the E2E suite; there is no browser component runner.
 
 (anchor: MnpjIo7Y)
 
-A session and a proposal open in the side panel (`ui/side-panel.tsx`, mounted by
-`app/panel-host.tsx`) at `/{slug}/sessions/:id` and `/{slug}/proposals/:id`. `app/panel-history.ts`
-keeps the page behind it and the stack depth in `history.state`; `SpaLinks` opens these links in the
-panel. An address opened directly lands on the schedule or the proposals list with the panel over
-it, and `?viewSession=` and `?viewProposal=` redirect the same way. The 1-on-1 modal is still
-`?viewMeeting=` on the page behind it, closed by Back or by removing the parameter. Links from
-legacy pages and emails are plain anchors: build them with `links.ts` and `utils/notifications.ts`,
-never a second copy.
+A session, a proposal and a profile open in the side panel (`ui/side-panel.tsx`) at
+`/{slug}/sessions/:id`, `/{slug}/proposals/:id` and `/guests/:id`. The first two are mounted by
+`app/panel-host.tsx` inside the event; a profile is mounted by `app/profile-host.tsx` at the root,
+over any page, and `ProfileLinks` opens its links. `app/panel-history.ts` keeps the page behind it
+and the stack depth in `history.state`; `SpaLinks` opens these links in the panel. An address opened
+directly lands on the schedule, the proposals list or the directory with the panel over it (only the
+directory behind a profile gives it Prev and Next), and `?viewSession=` and `?viewProposal=`
+redirect the same way. The 1-on-1 modal is still `?viewMeeting=` on the page behind it, closed by
+Back or by removing the parameter. Links from legacy pages and emails are plain anchors: build them
+with `links.ts` and `utils/notifications.ts`, never a second copy.
 
 ## Failure notices
 

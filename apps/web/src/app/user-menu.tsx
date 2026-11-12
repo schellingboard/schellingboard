@@ -86,13 +86,28 @@ export function UserMenu({
           aria-label="Your name"
           className="absolute right-0 z-40 mt-1 w-48 rounded-md bg-surface-raised py-1 shadow-lg ring-1 ring-line-subtle"
         >
-          <a role="menuitem" href={`/guests/${current.id}`} className={item}>
+          <a
+            role="menuitem"
+            href={`/guests/${current.id}`}
+            className={item}
+            onClick={() => setMenuOpen(false)}
+          >
             My profile
           </a>
-          <a role="menuitem" href="/guests/edit" className={item}>
+          <a
+            role="menuitem"
+            href="/guests/edit"
+            className={item}
+            onClick={() => setMenuOpen(false)}
+          >
             Edit profile
           </a>
-          <a role="menuitem" href="/settings" className={item}>
+          <a
+            role="menuitem"
+            href="/settings"
+            className={item}
+            onClick={() => setMenuOpen(false)}
+          >
             Settings
           </a>
           <div className="my-1 h-px bg-surface-muted" />

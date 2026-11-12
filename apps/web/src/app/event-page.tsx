@@ -10,7 +10,7 @@ import type { CommandRunner } from "../commands/runner";
 import type { ReplicaStore } from "../replica/store";
 import { hardReload } from "./hard-navigate";
 import type { AppServices } from "./services";
-import { ShellFrame, ShellProviders } from "./shell";
+import { ShellFrame } from "./shell";
 import { useEvents } from "./use-events";
 import {
   useScheduleSession,
@@ -77,11 +77,9 @@ export function EventPage({
   children: (view: EventView) => ReactNode;
 }) {
   return (
-    <ShellProviders api={services.api}>
-      <EventHost services={services} slug={slug}>
-        {children}
-      </EventHost>
-    </ShellProviders>
+    <EventHost services={services} slug={slug}>
+      {children}
+    </EventHost>
   );
 }
 
