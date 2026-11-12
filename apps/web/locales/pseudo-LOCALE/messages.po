@@ -128,6 +128,10 @@ msgstr ""
 msgid "{count, plural, one {There is a problem to fix:} other {There are # problems to fix:}}"
 msgstr ""
 
+#: src/features/admin/guest-import.tsx:91
+msgid "{created, plural, one {# user} other {# users}} created, {existing, plural, one {# user} other {# users}} already existed (skipped, but still assigned to the selected events)."
+msgstr ""
+
 #. {device} is the browser or device name, {lastUsed} a date
 #: src/features/sign-in/account-security.tsx:409
 msgid "{device} · last used {lastUsed}"
@@ -154,8 +158,13 @@ msgstr ""
 msgid "{eventName}: Session Proposals"
 msgstr ""
 
+#: src/features/admin/join-links.tsx:178
+msgid "{failed, plural, one {# failed.} other {# failed.}}"
+msgstr ""
+
 #: src/features/admin/event-days.tsx:314
 #: src/features/admin/event-days.tsx:422
+#: src/features/admin/event-sessions.tsx:552
 msgid "{from} – {to} ({timezone})"
 msgstr ""
 
@@ -226,8 +235,32 @@ msgstr ""
 msgid "{resultCount, plural, one {# result} other {# results}}"
 msgstr ""
 
+#: src/features/admin/event-sessions.tsx:567
+msgid "{rsvpCount, plural, one {# RSVP} other {# RSVPs}}"
+msgstr ""
+
 #: src/ui/data-table.tsx:53
 msgid "{selectedCount, plural, one {# selected} other {# selected}}"
+msgstr ""
+
+#: src/features/admin/join-links.tsx:154
+msgid "{selectedCount, plural, one {Mail new links to # selected} other {Mail new links to # selected}}"
+msgstr ""
+
+#: src/features/admin/join-links.tsx:138
+msgid "{selectedCount, plural, one {Yes, mail # selected guest} other {Yes, mail # selected guests}}"
+msgstr ""
+
+#: src/features/admin/join-links.tsx:170
+msgid "{sent, plural, one {Mailed # guest.} other {Mailed # guests.}}"
+msgstr ""
+
+#: src/features/admin/event-proposals.tsx:189
+msgid "{sessionCount, plural, one {# derived session will be kept (unlinked from this proposal).} other {# derived sessions will be kept (unlinked from this proposal).}}"
+msgstr ""
+
+#: src/features/admin/event-proposals.tsx:300
+msgid "{sessionCount, plural, one {# session} other {# sessions}}"
 msgstr ""
 
 #: src/features/admin/event-days.tsx:321
@@ -278,9 +311,17 @@ msgstr ""
 msgid "{valueLabel}: 0 to {max}"
 msgstr ""
 
+#: src/features/admin/event-proposals.tsx:296
+msgid "{votesCount, plural, one {# vote} other {# votes}}"
+msgstr ""
+
 #: src/features/proposals/proposal-panel.tsx:334
 #: src/features/proposals/scheduled-sessions-notice.tsx:52
 msgid "{when} in {rooms}"
+msgstr ""
+
+#: src/features/admin/join-links.tsx:174
+msgid "{withoutEmail, plural, one {# has no email.} other {# have no email.}}"
 msgstr ""
 
 #: src/features/people/profile-form.tsx:561
@@ -455,6 +496,7 @@ msgstr ""
 msgid "Add Proposal"
 msgstr ""
 
+#: src/features/admin/event-sessions.tsx:620
 #: src/features/schedule/session-block.tsx:109
 msgid "Add session"
 msgstr ""
@@ -467,8 +509,13 @@ msgstr ""
 msgid "Add shared moment"
 msgstr ""
 
+#: src/features/admin/guests-screen.tsx:134
+msgid "Add user"
+msgstr ""
+
 #: src/features/admin/event-days.tsx:227
 #: src/features/admin/event-moments.tsx:196
+#: src/features/admin/guests-screen.tsx:134
 msgid "Adding..."
 msgstr ""
 
@@ -480,12 +527,25 @@ msgstr ""
 msgid "Admin logout"
 msgstr ""
 
+#: src/features/admin/event-sessions.tsx:543
+msgid "admin-managed"
+msgstr ""
+
+#: src/features/admin/event-sessions.tsx:256
+msgid "Admin-managed"
+msgstr ""
+
 #: src/features/schedule/schedule-toolbar.tsx:46
 msgid "Agenda"
 msgstr ""
 
 #: src/features/comments/my-comments-screen.tsx:105
 msgctxt "Comment filter: every kind"
+msgid "All"
+msgstr ""
+
+#: src/features/admin/assignment-manager.tsx:23
+msgctxt "Filter: every row"
 msgid "All"
 msgstr ""
 
@@ -502,8 +562,16 @@ msgstr ""
 msgid "All events"
 msgstr ""
 
+#: src/features/admin/room-checkboxes.tsx:35
+msgid "All locations"
+msgstr ""
+
 #: src/features/schedule/day-agenda.tsx:264
 msgid "All rooms"
+msgstr ""
+
+#: src/features/admin/event-sessions.tsx:674
+msgid "All times are in the event timezone ({timezone})."
 msgstr ""
 
 #: src/features/admin/event-config.tsx:323
@@ -576,8 +644,21 @@ msgstr ""
 msgid "Asked {name} for {slotLabel} on {dayLabel}. You'll hear when they answer."
 msgstr ""
 
+#: src/features/admin/assignment-manager.tsx:63
+msgid "Assign {rowName}"
+msgstr ""
+
 #: src/ui/data-table.tsx:61
 msgid "Assign selected"
+msgstr ""
+
+#: src/features/admin/guest-import.tsx:72
+msgid "Assign to events"
+msgstr ""
+
+#: src/features/admin/assignment-manager.tsx:25
+#: src/features/admin/assignment-manager.tsx:176
+msgid "Assigned"
 msgstr ""
 
 #: src/app/header-links.tsx:17
@@ -663,6 +744,14 @@ msgstr ""
 msgid "Blocked"
 msgstr ""
 
+#: src/features/admin/event-sessions.tsx:540
+msgid "blocker"
+msgstr ""
+
+#: src/features/admin/event-sessions.tsx:246
+msgid "Blocker"
+msgstr ""
+
 #: src/features/admin/event-days.tsx:40
 msgid "Bookings close"
 msgstr ""
@@ -693,6 +782,10 @@ msgstr ""
 msgid "Bookmarked"
 msgstr ""
 
+#: src/features/admin/event-sessions.tsx:221
+msgid "Break before ({breakMinutes} min)"
+msgstr ""
+
 #: src/features/admin/event-config.tsx:204
 msgid "Break before each session (min)"
 msgstr ""
@@ -717,7 +810,13 @@ msgstr ""
 #: src/features/admin/event-moments.tsx:199
 #: src/features/admin/event-moments.tsx:246
 #: src/features/admin/event-moments.tsx:293
+#: src/features/admin/event-proposals.tsx:150
+#: src/features/admin/event-sessions.tsx:297
+#: src/features/admin/event-sessions.tsx:350
 #: src/features/admin/events-screen.tsx:154
+#: src/features/admin/guests-screen.tsx:224
+#: src/features/admin/guests-screen.tsx:347
+#: src/features/admin/join-links.tsx:145
 #: src/features/comments/comments-section.tsx:586
 #: src/features/meetings/meeting-request-fields.tsx:157
 #: src/features/notifications/notifications-screen.tsx:232
@@ -734,6 +833,10 @@ msgstr ""
 #. State of a 1-on-1 on the grid, lower case
 #: src/features/schedule/meeting-rules.ts:119
 msgid "canceled"
+msgstr ""
+
+#: src/features/admin/event-sessions.tsx:233
+msgid "Capacity"
 msgstr ""
 
 #: src/features/sign-in/account-security.tsx:171
@@ -848,6 +951,16 @@ msgstr ""
 msgid "Close menu"
 msgstr ""
 
+#: src/features/admin/event-sessions.tsx:542
+msgctxt "Session flag, in a lowercase list"
+msgid "closed"
+msgstr ""
+
+#: src/features/admin/event-sessions.tsx:251
+msgctxt "Session flag"
+msgid "Closed"
+msgstr ""
+
 #: src/features/schedule/session-panel.tsx:198
 msgid "Closed Session"
 msgstr ""
@@ -886,9 +999,14 @@ msgctxt "Event admin tab: the event settings"
 msgid "Config"
 msgstr ""
 
+#: src/features/admin/event-sessions.tsx:342
+msgid "Confirm"
+msgstr ""
+
 #: src/features/admin/confirm-by-typing.tsx:57
 #: src/features/admin/event-days.tsx:354
 #: src/features/admin/event-moments.tsx:290
+#: src/features/admin/guests-screen.tsx:344
 msgid "Confirm delete"
 msgstr ""
 
@@ -930,12 +1048,25 @@ msgstr ""
 msgid "Copied"
 msgstr ""
 
+#: src/features/admin/join-links.tsx:60
+msgid "Copy"
+msgstr ""
+
 #: src/ui/markdown.tsx:89
 msgid "Copy code"
 msgstr ""
 
 #: src/ui/copy-link-button.tsx:33
 msgid "Copy link"
+msgstr ""
+
+#: src/features/admin/join-links.tsx:57
+msgid "Copy link for {guestName}"
+msgstr ""
+
+#: src/features/admin/event-sessions.tsx:515
+#: src/features/admin/event-sessions.tsx:520
+msgid "Copy of {title}"
 msgstr ""
 
 #: src/ui/copy-link-button.tsx:25
@@ -996,12 +1127,20 @@ msgstr ""
 msgid "Could not load the proposals."
 msgstr ""
 
+#: src/features/admin/event-sessions.tsx:406
+msgid "Could not load the RSVPs."
+msgstr ""
+
 #: src/app/admin-pages.tsx:555
 msgid "Could not load the sessions."
 msgstr ""
 
 #: src/features/admin/settings-screen.tsx:158
 msgid "Could not load the settings."
+msgstr ""
+
+#: src/features/admin/guests-screen.tsx:412
+msgid "Could not load the users."
 msgstr ""
 
 #: src/features/comments/my-comments-screen.tsx:48
@@ -1064,12 +1203,33 @@ msgstr ""
 msgid "Couldn't load who is free then. Try the slot again."
 msgstr ""
 
+#: src/features/admin/event-proposals.tsx:267
+#: src/features/admin/event-sessions.tsx:525
+#: src/features/admin/event-sessions.tsx:636
+msgid "Create"
+msgstr ""
+
 #: src/features/admin/events-screen.tsx:151
 msgid "Create event"
 msgstr ""
 
+#: src/features/admin/event-proposals.tsx:311
+msgid "Create session"
+msgstr ""
+
+#: src/features/admin/event-proposals.tsx:308
+msgid "Create session from {proposalTitle}"
+msgstr ""
+
+#: src/features/admin/event-proposals.tsx:268
+#: src/features/admin/event-sessions.tsx:526
+#: src/features/admin/event-sessions.tsx:637
 #: src/features/admin/events-screen.tsx:151
 msgid "Creating..."
+msgstr ""
+
+#: src/features/admin/guest-import.tsx:63
+msgid "CSV file"
 msgstr ""
 
 #: src/features/admin/settings-screen.tsx:97
@@ -1090,6 +1250,11 @@ msgctxt "Colour theme"
 msgid "Dark"
 msgstr ""
 
+#: src/features/admin/event-sessions.tsx:177
+msgctxt "Session form: the day it is on"
+msgid "Day"
+msgstr ""
+
 #: src/features/admin/event-days.tsx:464
 #: src/features/admin/event-days.tsx:466
 #: src/features/admin/event-moments.tsx:176
@@ -1107,6 +1272,9 @@ msgstr ""
 
 #: src/features/admin/event-days.tsx:439
 #: src/features/admin/event-moments.tsx:356
+#: src/features/admin/event-proposals.tsx:325
+#: src/features/admin/event-sessions.tsx:594
+#: src/features/admin/guests-screen.tsx:376
 #: src/features/comments/comments-section.tsx:348
 #: src/features/comments/comments-section.tsx:397
 #: src/features/notifications/notifications-screen.tsx:174
@@ -1114,6 +1282,14 @@ msgstr ""
 #: src/features/proposals/proposal-form.tsx:344
 #: src/features/proposals/proposal-form.tsx:364
 msgid "Delete"
+msgstr ""
+
+#: src/features/admin/event-proposals.tsx:322
+msgid "Delete {proposalTitle}"
+msgstr ""
+
+#: src/features/admin/event-sessions.tsx:591
+msgid "Delete {title}"
 msgstr ""
 
 #: src/features/admin/event-moments.tsx:353
@@ -1152,9 +1328,14 @@ msgstr ""
 msgid "Delete this day? No scheduled sessions fall within its time window."
 msgstr ""
 
+#: src/features/admin/guests-screen.tsx:337
+msgid "Delete this user?"
+msgstr ""
+
 #: src/features/admin/confirm-by-typing.tsx:57
 #: src/features/admin/event-days.tsx:354
 #: src/features/admin/event-moments.tsx:290
+#: src/features/admin/guests-screen.tsx:344
 msgid "Deleting..."
 msgstr ""
 
@@ -1163,6 +1344,8 @@ msgid "Describe what your session will cover"
 msgstr ""
 
 #: src/features/admin/event-config.tsx:152
+#: src/features/admin/event-proposals.tsx:109
+#: src/features/admin/event-sessions.tsx:168
 #: src/features/admin/events-screen.tsx:99
 #: src/features/admin/settings-screen.tsx:87
 #: src/features/proposals/proposal-form.tsx:252
@@ -1203,9 +1386,21 @@ msgstr ""
 msgid "Dots are the model's midpoint, thick bars its 50% range, thin bars its 80% range. On the dashed line the prediction was exact. The model was fitted on one event, n = 13."
 msgstr ""
 
+#: src/features/admin/event-sessions.tsx:587
+msgid "Duplicate"
+msgstr ""
+
+#: src/features/admin/event-sessions.tsx:584
+msgid "Duplicate {title}"
+msgstr ""
+
 #: src/features/proposals/proposal-form.tsx:300
 #: src/features/proposals/proposals-screen.tsx:422
 msgid "Duration"
+msgstr ""
+
+#: src/features/admin/event-proposals.tsx:117
+msgid "Duration (minutes) — leave empty for undecided"
 msgstr ""
 
 #: src/features/proposals/list-model.ts:214
@@ -1214,6 +1409,10 @@ msgstr ""
 
 #: src/features/proposals/list-model.ts:213
 msgid "Duration ↓"
+msgstr ""
+
+#: src/features/admin/event-proposals.tsx:76
+msgid "Duration must be a non-negative whole number"
 msgstr ""
 
 #: src/features/proposals/proposal-body.tsx:67
@@ -1232,10 +1431,17 @@ msgstr ""
 msgid "Each browser you chose your name in stays signed in for 30 days after you last used it."
 msgstr ""
 
+#: src/features/admin/join-links.tsx:162
+msgid "Each guest gets a personal link by email. It replaces the link they had before."
+msgstr ""
+
 #. Button: edit (verb)
 #. Button: edit (verb)
 #: src/features/admin/event-days.tsx:432
 #: src/features/admin/event-moments.tsx:349
+#: src/features/admin/event-proposals.tsx:318
+#: src/features/admin/event-sessions.tsx:580
+#: src/features/admin/guests-screen.tsx:353
 #: src/features/comments/comments-section.tsx:339
 #: src/features/proposals/proposal-panel.tsx:197
 #: src/features/proposals/proposals-screen.tsx:669
@@ -1246,6 +1452,15 @@ msgstr ""
 #: src/ui/markdown-textarea.tsx:93
 msgctxt "Markdown field: write mode"
 msgid "Edit"
+msgstr ""
+
+#: src/features/admin/event-proposals.tsx:315
+msgid "Edit {proposalTitle}"
+msgstr ""
+
+#: src/features/admin/event-sessions.tsx:520
+#: src/features/admin/event-sessions.tsx:574
+msgid "Edit {title}"
 msgstr ""
 
 #: src/features/admin/event-moments.tsx:346
@@ -1275,6 +1490,9 @@ msgstr ""
 msgid "Edited {editedAt}"
 msgstr ""
 
+#: src/features/admin/event-guests.tsx:36
+#: src/features/admin/guests-screen.tsx:110
+#: src/features/admin/guests-screen.tsx:197
 #: src/features/people/contact-labels.ts:6
 #: src/features/sign-in/bootstrap-screen.tsx:77
 msgid "Email"
@@ -1305,6 +1523,11 @@ msgstr ""
 #: src/features/admin/event-moments.tsx:74
 msgctxt "Date field: when it ends"
 msgid "End"
+msgstr ""
+
+#: src/features/admin/event-sessions.tsx:202
+msgctxt "Time field: when it ends"
+msgid "End ({timezone})"
 msgstr ""
 
 #: src/features/admin/event-days.tsx:45
@@ -1398,6 +1621,7 @@ msgstr ""
 #: src/app/admin-frame.tsx:40
 #: src/features/admin/event-layout.tsx:90
 #: src/features/admin/events-screen.tsx:200
+#: src/features/admin/guests-screen.tsx:37
 msgid "Events"
 msgstr ""
 
@@ -1474,6 +1698,10 @@ msgstr ""
 msgid "First page"
 msgstr ""
 
+#: src/features/admin/event-sessions.tsx:243
+msgid "Flags"
+msgstr ""
+
 #: src/app/time-format.tsx:67
 msgid "Follow your browser's language"
 msgstr ""
@@ -1516,6 +1744,7 @@ msgstr ""
 msgid "Grid"
 msgstr ""
 
+#: src/features/admin/event-guests.tsx:27
 #: src/features/admin/event-layout.tsx:18
 msgid "Guests"
 msgstr ""
@@ -1601,6 +1830,16 @@ msgstr ""
 msgid "Hosting"
 msgstr ""
 
+#: src/features/admin/event-proposals.tsx:132
+#: src/features/admin/event-sessions.tsx:267
+msgid "Hosts"
+msgstr ""
+
+#: src/features/admin/event-proposals.tsx:294
+#: src/features/admin/event-sessions.tsx:566
+msgid "Hosts: {hostNames}"
+msgstr ""
+
 #: src/features/schedule/attendee-count-field.tsx:96
 msgid "How many people attended?"
 msgstr ""
@@ -1627,6 +1866,22 @@ msgstr ""
 msgid "If you decide to host this as a session, expect <0>{kind, select, same {{low, plural, one {# person} other {# people}}} other {{high, plural, one {{low}–# person} other {{low}–# people}}}}</0>. Treat that as a very rough guess: it comes from a formula worked out on a single event, from what a handful of hosts there remembered about how many people turned up. It can be well out in either direction — use it to pick a room, nothing more. Future SchellingBoard versions should do better, as we incorporate more event feedback."
 msgstr ""
 
+#: src/features/admin/guest-import.tsx:101
+msgid "Import"
+msgstr ""
+
+#: src/features/admin/guests-screen.tsx:445
+msgid "Import CSV"
+msgstr ""
+
+#: src/features/admin/guest-import.tsx:49
+msgid "Import users"
+msgstr ""
+
+#: src/features/admin/guest-import.tsx:101
+msgid "Importing..."
+msgstr ""
+
 #: src/app/footer.tsx:153
 msgid "In this build, but not in a released version yet."
 msgstr ""
@@ -1638,6 +1893,14 @@ msgstr ""
 
 #: src/features/proposals/proposal-panel.tsx:187
 msgid "Join as co-host"
+msgstr ""
+
+#: src/features/admin/event-guests.tsx:41
+msgid "Join link"
+msgstr ""
+
+#: src/features/admin/join-links.tsx:50
+msgid "Join link for {guestName}"
 msgstr ""
 
 #: src/features/sign-in/join-screen.tsx:50
@@ -1713,6 +1976,7 @@ msgstr ""
 msgid "Liked by"
 msgstr ""
 
+#: src/features/admin/join-links.tsx:43
 #: src/ui/copy-link-button.tsx:17
 msgid "Link copied"
 msgstr ""
@@ -1758,7 +2022,9 @@ msgstr ""
 #: src/app/panel-host.tsx:82
 #: src/app/people-pages.tsx:162
 #: src/features/admin/event-layout.tsx:82
+#: src/features/admin/event-sessions.tsx:402
 #: src/features/admin/events-screen.tsx:193
+#: src/features/admin/guests-screen.tsx:418
 #: src/features/admin/settings-screen.tsx:164
 #: src/features/comments/my-comments-screen.tsx:42
 #: src/features/meetings/book-meeting.tsx:73
@@ -1776,6 +2042,7 @@ msgstr ""
 
 #: src/app/admin-frame.tsx:42
 #: src/features/admin/event-layout.tsx:19
+#: src/features/admin/event-sessions.tsx:281
 msgid "Locations"
 msgstr ""
 
@@ -1814,6 +2081,14 @@ msgstr ""
 msgid "Looking for a co-host: {cohostNote}"
 msgstr ""
 
+#: src/features/admin/join-links.tsx:158
+msgid "Mail new links to all guests"
+msgstr ""
+
+#: src/features/admin/guests-screen.tsx:373
+msgid "Make site admin"
+msgstr ""
+
 #: src/features/admin/events-screen.tsx:250
 msgid "Manage"
 msgstr ""
@@ -1834,6 +2109,8 @@ msgstr ""
 msgid "Mark as read"
 msgstr ""
 
+#: src/features/admin/event-proposals.tsx:111
+#: src/features/admin/event-sessions.tsx:170
 #: src/features/comments/comments-section.tsx:577
 #: src/features/people/profile-form.tsx:589
 #: src/ui/form.tsx:186
@@ -1901,7 +2178,10 @@ msgid "n/a"
 msgstr ""
 
 #: src/features/admin/event-config.tsx:144
+#: src/features/admin/event-guests.tsx:34
 #: src/features/admin/events-screen.tsx:91
+#: src/features/admin/guests-screen.tsx:101
+#: src/features/admin/guests-screen.tsx:189
 #: src/features/people/profile-form.tsx:355
 #: src/features/sign-in/bootstrap-screen.tsx:70
 msgid "Name"
@@ -1938,9 +2218,22 @@ msgstr ""
 msgid "New event"
 msgstr ""
 
+#: src/features/admin/join-links.tsx:70
+msgid "New link"
+msgstr ""
+
+#: src/features/admin/join-links.tsx:66
+msgid "New link for {guestName}"
+msgstr ""
+
 #: src/features/sign-in/account-security.tsx:241
 #: src/features/sign-in/reset-password-form.tsx:71
 msgid "New password (at least 8 characters)"
+msgstr ""
+
+#: src/features/admin/event-sessions.tsx:626
+#: src/features/admin/event-sessions.tsx:630
+msgid "New session"
 msgstr ""
 
 #: src/features/admin/event-moments.tsx:171
@@ -1984,12 +2277,21 @@ msgstr ""
 msgid "No days yet"
 msgstr ""
 
+#: src/features/admin/guests-screen.tsx:315
+msgid "No email"
+msgstr ""
+
 #: src/app/home-page.tsx:45
 msgid "No events found."
 msgstr ""
 
 #: src/features/admin/events-screen.tsx:215
 msgid "No events yet."
+msgstr ""
+
+#: src/features/admin/event-proposals.tsx:128
+#: src/features/admin/event-sessions.tsx:263
+msgid "No guests assigned to this event yet."
 msgstr ""
 
 #: src/features/proposals/proposals-screen.tsx:465
@@ -2001,6 +2303,7 @@ msgstr ""
 msgid "No host yet — someone would like to see this offered"
 msgstr ""
 
+#: src/features/admin/event-sessions.tsx:698
 #: src/features/schedule/session-block.tsx:235
 msgid "No hosts"
 msgstr ""
@@ -2009,8 +2312,16 @@ msgstr ""
 msgid "No icon"
 msgstr ""
 
+#: src/features/admin/event-sessions.tsx:277
+msgid "No locations assigned to this event yet."
+msgstr ""
+
 #: src/features/schedule/day-agenda.tsx:105
 msgid "No matching sessions"
+msgstr ""
+
+#: src/features/admin/guests-screen.tsx:310
+msgid "No password yet"
 msgstr ""
 
 #: src/features/proposals/proposals-screen.tsx:531
@@ -2018,12 +2329,29 @@ msgstr ""
 msgid "No proposals found"
 msgstr ""
 
+#: src/features/admin/event-proposals.tsx:366
+msgid "No proposals match."
+msgstr ""
+
 #: src/features/proposals/proposals-screen.tsx:130
 msgid "No proposals yet"
 msgstr ""
 
+#: src/features/admin/event-sessions.tsx:410
+msgid "No RSVPs."
+msgstr ""
+
 #: src/features/schedule/day-agenda.tsx:105
 msgid "No sessions"
+msgstr ""
+
+#: src/features/admin/event-sessions.tsx:701
+msgid "No sessions match."
+msgstr ""
+
+#: src/features/admin/event-guests.tsx:32
+#: src/features/admin/guests-screen.tsx:459
+msgid "No users match."
 msgstr ""
 
 #. Shown where the viewer has not voted on a proposal
@@ -2051,12 +2379,21 @@ msgstr ""
 msgid "Nobody voted {interestedEmoji} Interested, and that is the only signal there is to guess attendance from."
 msgstr ""
 
+#: src/features/admin/assignment-manager.tsx:26
+msgid "Not assigned"
+msgstr ""
+
 #: src/features/people/open-up-nudge.tsx:40
 msgid "Not open to 1-on-1s yet"
 msgstr ""
 
 #: src/features/people/open-up-nudge.tsx:39
 msgid "Not open to 1-on-1s yet at {eventName}"
+msgstr ""
+
+#: src/features/admin/event-sessions.tsx:184
+#: src/features/admin/event-sessions.tsx:553
+msgid "Not scheduled"
 msgstr ""
 
 #: src/app/sync-indicator.tsx:11
@@ -2342,6 +2679,8 @@ msgid "Proposal phase"
 msgstr ""
 
 #: src/features/admin/event-layout.tsx:20
+#: src/features/admin/event-proposals.tsx:353
+#: src/features/admin/event-proposals.tsx:355
 #: src/features/comments/my-comments-screen.tsx:16
 #: src/features/people/profile-body.tsx:233
 #: src/features/proposals/proposal-form.tsx:82
@@ -2378,6 +2717,7 @@ msgstr ""
 msgid "Reload"
 msgstr ""
 
+#: src/features/admin/event-sessions.tsx:360
 #: src/features/people/profile-form.tsx:429
 #: src/features/people/profile-form.tsx:495
 #: src/features/people/profile-form.tsx:570
@@ -2397,12 +2737,24 @@ msgstr ""
 msgid "Remove current map"
 msgstr ""
 
+#: src/features/admin/event-sessions.tsx:356
+msgid "Remove RSVP {name}"
+msgstr ""
+
 #: src/ui/data-table.tsx:69
 msgid "Remove selected"
 msgstr ""
 
+#: src/features/admin/guests-screen.tsx:373
+msgid "Remove site admin"
+msgstr ""
+
 #: src/features/comments/comments-section.tsx:395
 msgid "Remove this comment? Its author is not notified."
+msgstr ""
+
+#: src/features/admin/event-sessions.tsx:334
+msgid "Remove?"
 msgstr ""
 
 #: src/features/comments/comments-section.tsx:330
@@ -2449,8 +2801,15 @@ msgstr ""
 msgid "RSVP'd"
 msgstr ""
 
+#: src/features/admin/event-sessions.tsx:398
+msgid "RSVPs ({rsvpCount})"
+msgstr ""
+
 #: src/features/admin/event-days.tsx:271
 #: src/features/admin/event-moments.tsx:243
+#: src/features/admin/event-proposals.tsx:147
+#: src/features/admin/event-sessions.tsx:525
+#: src/features/admin/guests-screen.tsx:221
 #: src/features/comments/comments-section.tsx:306
 #: src/features/people/profile-form.tsx:613
 #: src/features/schedule/attendee-count-field.tsx:127
@@ -2495,6 +2854,9 @@ msgstr ""
 #: src/features/admin/event-config.tsx:57
 #: src/features/admin/event-days.tsx:271
 #: src/features/admin/event-moments.tsx:243
+#: src/features/admin/event-proposals.tsx:147
+#: src/features/admin/event-sessions.tsx:526
+#: src/features/admin/guests-screen.tsx:221
 #: src/features/admin/settings-screen.tsx:131
 #: src/features/comments/comments-section.tsx:594
 #: src/features/meetings/availability-form.tsx:191
@@ -2573,6 +2935,11 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
+#: src/features/admin/event-guests.tsx:31
+#: src/features/admin/guests-screen.tsx:458
+msgid "Search name or email…"
+msgstr ""
+
 #: src/features/people/directory-screen.tsx:325
 msgid "Search names, languages, interests…"
 msgstr ""
@@ -2593,6 +2960,11 @@ msgstr ""
 #: src/features/schedule/schedule-filters.tsx:106
 #: src/features/schedule/schedule-filters.tsx:107
 msgid "Search sessions"
+msgstr ""
+
+#: src/features/admin/event-proposals.tsx:365
+#: src/features/admin/event-sessions.tsx:685
+msgid "Search title or host…"
 msgstr ""
 
 #: src/features/comments/my-comments-screen.tsx:86
@@ -2645,13 +3017,27 @@ msgstr ""
 msgid "Send request"
 msgstr ""
 
+#: src/features/admin/guests-screen.tsx:366
+msgid "Send test email"
+msgstr ""
+
+#: src/features/admin/guests-screen.tsx:363
 #: src/features/meetings/meeting-request-fields.tsx:154
 msgid "Sending..."
+msgstr ""
+
+#: src/features/admin/guests-screen.tsx:365
+msgid "Sent!"
 msgstr ""
 
 #: src/features/schedule/session-panel.tsx:54
 #: src/features/schedule/session-panel.tsx:55
 msgid "Session details"
+msgstr ""
+
+#: src/features/admin/event-proposals.tsx:251
+#: src/features/admin/event-proposals.tsx:260
+msgid "Session from {proposalTitle}"
 msgstr ""
 
 #: src/features/schedule/session-panel.tsx:223
@@ -2671,6 +3057,8 @@ msgid "Session not found."
 msgstr ""
 
 #: src/features/admin/event-layout.tsx:21
+#: src/features/admin/event-sessions.tsx:669
+#: src/features/admin/event-sessions.tsx:671
 #: src/features/comments/my-comments-screen.tsx:15
 msgid "Sessions"
 msgstr ""
@@ -2795,6 +3183,10 @@ msgstr ""
 msgid "Signed-in browsers"
 msgstr ""
 
+#: src/features/admin/guests-screen.tsx:305
+msgid "Site admin"
+msgstr ""
+
 #: src/features/admin/settings-screen.tsx:173
 msgid "Site settings"
 msgstr ""
@@ -2864,6 +3256,11 @@ msgctxt "Date field: when it begins"
 msgid "Start"
 msgstr ""
 
+#: src/features/admin/event-sessions.tsx:189
+msgctxt "Time field: when it begins"
+msgid "Start ({timezone})"
+msgstr ""
+
 #: src/features/admin/event-days.tsx:44
 #: src/features/admin/event-moments.tsx:29
 msgid "Start is required"
@@ -2877,6 +3274,10 @@ msgstr ""
 #. placeholder {0}: when(start)
 #: src/ui/phase-bar.tsx:74
 msgid "Starts {0}."
+msgstr ""
+
+#: src/features/admin/event-sessions.tsx:227
+msgid "Starts at {startTime}"
 msgstr ""
 
 #: src/app/admin-frame.tsx:43
@@ -3060,6 +3461,10 @@ msgstr ""
 msgid "This screen stopped working. Your data is safe."
 msgstr ""
 
+#: src/features/admin/join-links.tsx:125
+msgid "This server cannot send email. Copy a personal link for each guest and share it yourself."
+msgstr ""
+
 #: src/features/schedule/clashes.ts:102
 msgid "This session clashes with {list}. Do you want to RSVP anyway?"
 msgstr ""
@@ -3092,6 +3497,14 @@ msgstr ""
 msgid "This will permanently delete the event and all associated days, proposals, sessions, RSVPs, and assignments. No one is notified."
 msgstr ""
 
+#: src/features/admin/event-proposals.tsx:177
+msgid "This will permanently delete the proposal, its {votesCount, plural, one {# vote} other {# votes}} and {hostLinks, plural, one {# host link} other {# host links}}."
+msgstr ""
+
+#: src/features/admin/event-sessions.tsx:450
+msgid "This will permanently delete the session and its {rsvpCount, plural, one {# RSVP} other {# RSVPs}}. Host and location links are removed; the guests and locations themselves are kept."
+msgstr ""
+
 #: src/app/time-format.tsx:99
 #: src/features/settings/settings-screen.tsx:141
 msgid "Time format"
@@ -3111,6 +3524,8 @@ msgid "Timezone"
 msgstr ""
 
 #: src/features/admin/event-moments.tsx:47
+#: src/features/admin/event-proposals.tsx:101
+#: src/features/admin/event-sessions.tsx:160
 #: src/features/admin/settings-screen.tsx:79
 #: src/features/proposals/proposal-form.tsx:242
 #: src/features/proposals/proposals-screen.tsx:405
@@ -3189,6 +3604,14 @@ msgstr ""
 msgid "Type the event name to confirm"
 msgstr ""
 
+#: src/features/admin/event-proposals.tsx:173
+msgid "Type the proposal title to confirm"
+msgstr ""
+
+#: src/features/admin/event-sessions.tsx:448
+msgid "Type the session title to confirm"
+msgstr ""
+
 #: src/features/schedule/session-panel.tsx:221
 msgid "Un-RSVP"
 msgstr ""
@@ -3222,6 +3645,10 @@ msgstr ""
 msgid "Unknown browser (This browser) · last used {lastUsed}"
 msgstr ""
 
+#: src/features/admin/event-sessions.tsx:417
+msgid "Unknown guest"
+msgstr ""
+
 #: src/features/schedule/day-agenda.tsx:258
 #: src/features/schedule/day-agenda.tsx:388
 msgid "until {endsAt}"
@@ -3231,6 +3658,12 @@ msgstr ""
 msgid "updated {profileUpdated}"
 msgstr ""
 
+#: src/features/admin/guest-import.tsx:52
+msgid "Upload a CSV file with a header row containing <0>name</0> and <1>email</1> columns (extra columns are ignored). The email may be left blank for a user without one. Users are matched by email, or by exact name when the email is blank: existing users are left unchanged, new ones are created. Both are assigned to the selected events, so re-running an import is safe."
+msgstr ""
+
+#: src/features/admin/guests-screen.tsx:120
+#: src/features/admin/guests-screen.tsx:206
 #: src/features/sign-in/account-security.tsx:314
 #: src/features/sign-in/account-security.tsx:317
 #: src/features/sign-in/bootstrap-screen.tsx:88
@@ -3246,6 +3679,9 @@ msgid "Username settings"
 msgstr ""
 
 #: src/app/admin-frame.tsx:41
+#: src/features/admin/guest-import.tsx:46
+#: src/features/admin/guests-screen.tsx:439
+#: src/features/admin/guests-screen.tsx:448
 msgid "Users"
 msgstr ""
 
@@ -3404,6 +3840,10 @@ msgstr ""
 
 #: src/features/meetings/meeting-panel.tsx:149
 msgid "Yes, cancel it"
+msgstr ""
+
+#: src/features/admin/join-links.tsx:142
+msgid "Yes, mail all guests"
 msgstr ""
 
 #: src/features/schedule/day-agenda.tsx:318

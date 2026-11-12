@@ -1,3 +1,5 @@
+import { plural, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { utcToZonedInput } from "@schellingboard/domain/admin-datetime";
 import { DateTime } from "luxon";
 import { type FormEvent, useState } from "react";
@@ -24,7 +26,6 @@ import { FormErrorSummary } from "../../ui/form-error-summary";
 import {
   type OnParams,
   pageOf,
-  plural,
   searchByTitleOrHost,
   tableHandlers,
 } from "../../ui/list-paging";
@@ -39,19 +40,10 @@ import {
 } from "./admin-session-model";
 import { ConfirmByTyping } from "./confirm-by-typing";
 import { RoomCheckboxes } from "./room-checkboxes";
+import { useRowMode } from "./row-mode";
 import { shown, useJumpWithin } from "./use-section-save";
 
 export type EventLocation = { id: string; name: string; capacity: number };
-
-const FIELDS = [
-  "title",
-  "description",
-  "startTime",
-  "endTime",
-  "capacity",
-  "hostIds",
-  "locationIds",
-];
 
 const joinNames = (items: { name: string }[]) =>
   items.length > 0 ? items.map((i) => i.name).join(", ") : "—";
@@ -95,7 +87,7 @@ export function SessionForm({
   const [breakBefore, setBreakBefore] = useState(true);
   const [checking, setChecking] = useState(false);
   const [endTyped, setEndTyped] = useState(false);
-  const set = <K extends keyof SessionFormValues>(
+  const setField = <K extends keyof SessionFormValues>(
     key: K,
     value: SessionFormValues[K]
   ) => setForm((prev) => ({ ...prev, [key]: value }));
@@ -122,10 +114,21 @@ export function SessionForm({
     timezone,
     shift
   );
+  const startTime = start
+    ? DateTime.fromISO(start).setZone(timezone).toFormat("HH:mm")
+    : "";
 
   const mutation = useFormMutation({
     call: (key) => call(parsed.body as AdminSessionBody, key),
-    fieldNames: FIELDS,
+    fieldNames: [
+      "title",
+      "description",
+      "startTime",
+      "endTime",
+      "capacity",
+      "hostIds",
+      "locationIds",
+    ],
     explainRefusals: true,
   });
   const errors: FieldErrors = {
@@ -154,43 +157,52 @@ export function SessionForm({
       className="space-y-3"
     >
       <TextField
-        label="Title"
+        label={t`Title`}
         name="title"
         required
         value={form.title}
-        onChange={(v) => set("title", v)}
+        onChange={(v) => setField("title", v)}
         error={errors.title}
       />
       <TextAreaField
-        label="Description"
+        label={t`Description`}
         name="description"
-        hint="Markdown supported"
+        hint={t`Markdown supported`}
         value={form.description}
-        onChange={(v) => set("description", v)}
+        onChange={(v) => setField("description", v)}
         error={errors.description}
       />
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <SelectField
-          label="Day"
+          label={t({
+            message: "Day",
+            context: "Session form: the day it is on",
+          })}
           value={form.dayKey}
-          onChange={(v) => set("dayKey", v)}
+          onChange={(v) => setField("dayKey", v)}
           options={[
-            { value: "", label: "Not scheduled" },
+            { value: "", label: t`Not scheduled` },
             ...days.map((d) => ({ value: d.key, label: d.label })),
           ]}
         />
         <DateTimeField
-          label={`Start (${timezone})`}
+          label={t({
+            message: `Start (${timezone})`,
+            context: "Time field: when it begins",
+          })}
           name="startTime"
           kind="time"
           required={!!day}
           disabled={!day}
           value={form.startTime}
-          onChange={(v) => set("startTime", v)}
+          onChange={(v) => setField("startTime", v)}
           error={errors.startTime}
         />
         <DateTimeField
-          label={`End (${timezone})`}
+          label={t({
+            message: `End (${timezone})`,
+            context: "Time field: when it ends",
+          })}
           name="endTime"
           kind="time"
           required={!!day}
@@ -198,7 +210,7 @@ export function SessionForm({
           value={endTime}
           onChange={(v) => {
             setEndTyped(true);
-            set("endTime", v);
+            setField("endTime", v);
           }}
           error={errors.endTime}
         />
@@ -206,69 +218,70 @@ export function SessionForm({
       {!!breakMinutes && !form.blocker && (
         <div className="space-y-1">
           <CheckboxField
-            label={`Break before (${breakMinutes} min)`}
+            label={t`Break before (${breakMinutes} min)`}
             checked={breakBefore}
             onChange={setBreakBefore}
           />
           {start && (
             <p className="text-sm text-fg-subtle">
-              Starts at{" "}
-              {DateTime.fromISO(start).setZone(timezone).toFormat("HH:mm")}
+              <Trans>Starts at {startTime}</Trans>
             </p>
           )}
         </div>
       )}
       <TextField
-        label="Capacity"
+        label={t`Capacity`}
         name="capacity"
         type="number"
         min={0}
         value={capacity}
-        onChange={(v) => set("capacity", v)}
+        onChange={(v) => setField("capacity", v)}
         error={errors.capacity}
       />
       <fieldset className="flex flex-col gap-1">
-        <legend className="text-sm text-fg-muted">Flags</legend>
+        <legend className="text-sm text-fg-muted">
+          <Trans>Flags</Trans>
+        </legend>
         <CheckboxField
-          label="Blocker"
+          label={t`Blocker`}
           checked={form.blocker}
-          onChange={(v) => set("blocker", v)}
+          onChange={(v) => setField("blocker", v)}
         />
         <CheckboxField
-          label="Closed"
+          label={t({ message: "Closed", context: "Session flag" })}
           checked={form.closed}
-          onChange={(v) => set("closed", v)}
+          onChange={(v) => setField("closed", v)}
         />
         <CheckboxField
-          label="Admin-managed"
+          label={t`Admin-managed`}
           checked={form.adminManaged}
-          onChange={(v) => set("adminManaged", v)}
+          onChange={(v) => setField("adminManaged", v)}
         />
       </fieldset>
       {hosts.length === 0 ? (
         <p className="text-sm text-fg-subtle">
-          No guests assigned to this event yet.
+          <Trans>No guests assigned to this event yet.</Trans>
         </p>
       ) : (
         <PeopleField
-          label="Hosts"
+          label={t`Hosts`}
           name="hostIds"
           people={hosts}
           selected={form.hostIds}
-          onChange={(v) => set("hostIds", v)}
+          onChange={(v) => setField("hostIds", v)}
           error={errors.hostIds}
         />
       )}
       {locations.length === 0 ? (
         <p className="text-sm text-fg-subtle">
-          No locations assigned to this event yet.
+          <Trans>No locations assigned to this event yet.</Trans>
         </p>
       ) : (
         <RoomCheckboxes
-          legend="Locations"
+          legend={t`Locations`}
           rooms={locations}
           selectedIds={form.locationIds}
-          onChange={(v) => set("locationIds", v)}
+          onChange={(v) => setField("locationIds", v)}
         />
       )}
       <FormErrorSummary
@@ -281,7 +294,7 @@ export function SessionForm({
           {mutation.pending ? pendingLabel : submitLabel}
         </Button>
         <Button variant="quiet" disabled={mutation.pending} onClick={onClose}>
-          Cancel
+          <Trans>Cancel</Trans>
         </Button>
       </div>
     </form>
@@ -317,14 +330,16 @@ function RsvpRow({
         <span className="text-fg-muted">{name}</span>
         {confirming ? (
           <span className="flex items-center gap-2">
-            <span className="text-danger-fg">Remove?</span>
+            <span className="text-danger-fg">
+              <Trans>Remove?</Trans>
+            </span>
             <button
               type="button"
               disabled={mutation.pending}
               onClick={() => void remove()}
               className="text-danger-fg hover:underline"
             >
-              Confirm
+              <Trans>Confirm</Trans>
             </button>
             <button
               type="button"
@@ -332,17 +347,17 @@ function RsvpRow({
               onClick={() => setConfirming(false)}
               className="text-fg-subtle hover:underline"
             >
-              Cancel
+              <Trans>Cancel</Trans>
             </button>
           </span>
         ) : (
           <button
             type="button"
-            aria-label={`Remove RSVP ${name}`}
+            aria-label={t`Remove RSVP ${name}`}
             onClick={() => setConfirming(true)}
             className="text-danger-fg hover:underline"
           >
-            Remove
+            <Trans>Remove</Trans>
           </button>
         )}
       </div>
@@ -368,6 +383,7 @@ function SessionRsvps({
   calls: AdminEventCalls;
   onChanged: () => void;
 }) {
+  const rsvpCount = session.numRsvps;
   const [guestIds, setGuestIds] = useState<string[] | null | undefined>();
   const load = async () => setGuestIds(await loadRsvps(session.id));
 
@@ -379,22 +395,26 @@ function SessionRsvps({
       }}
     >
       <summary className="cursor-pointer text-fg-muted">
-        RSVPs ({session.numRsvps})
+        {t`RSVPs (${rsvpCount})`}
       </summary>
       {guestIds === undefined ? (
-        <p className="mt-2 text-fg-subtle">Loading…</p>
+        <p className="mt-2 text-fg-subtle">
+          <Trans>Loading…</Trans>
+        </p>
       ) : guestIds === null ? (
         <p role="alert" className="mt-2 text-danger-fg">
-          Could not load the RSVPs.
+          <Trans>Could not load the RSVPs.</Trans>
         </p>
       ) : guestIds.length === 0 ? (
-        <p className="mt-2 text-fg-subtle">No RSVPs.</p>
+        <p className="mt-2 text-fg-subtle">
+          <Trans>No RSVPs.</Trans>
+        </p>
       ) : (
         <ul className="mt-2 space-y-1">
           {guestIds.map((id) => (
             <RsvpRow
               key={id}
-              name={guestNames.get(id) ?? "Unknown guest"}
+              name={guestNames.get(id) ?? t`Unknown guest`}
               sessionId={session.id}
               guestId={id}
               calls={calls}
@@ -421,12 +441,19 @@ function DeleteConfirm({
   onChanged: () => void;
   onClose: () => void;
 }) {
+  const rsvpCount = session.numRsvps;
   return (
     <ConfirmByTyping
       heading={session.title}
-      label="Type the session title to confirm"
+      label={t`Type the session title to confirm`}
       expected={session.title}
-      warning={`This will permanently delete the session and its ${plural(session.numRsvps, "RSVP", "RSVPs")}. Host and location links are removed; the guests and locations themselves are kept.`}
+      warning={t`This will permanently delete the session and its ${plural(
+        rsvpCount,
+        {
+          one: "# RSVP",
+          other: "# RSVPs",
+        }
+      )}. Host and location links are removed; the guests and locations themselves are kept.`}
       call={(key) => calls.deleteSession(session.id, key)}
       onDeleted={onChanged}
       onCancel={onClose}
@@ -453,11 +480,9 @@ function SessionItem({
   session: AdminSession;
   ctx: Context;
 }) {
-  const [mode, setMode] = useState<"view" | "edit" | "duplicate" | "delete">(
-    "view"
-  );
+  const { mode, close, edit, duplicate, remove } = useRowMode();
   const [version, setVersion] = useState(session.version);
-  const close = () => setMode("view");
+  const title = session.title;
   // A current host or location that left the event stays offered, so saving never drops it.
   const hosts = [
     ...ctx.guests,
@@ -486,17 +511,19 @@ function SessionItem({
     return (
       <div className="space-y-3">
         {duplicating && (
-          <h3 className="font-medium text-fg">Copy of {session.title}</h3>
+          <h3 className="font-medium text-fg">
+            <Trans>Copy of {title}</Trans>
+          </h3>
         )}
         <SessionForm
           initial={form.values}
-          label={`${duplicating ? "Copy of" : "Edit"} ${session.title}`}
+          label={duplicating ? t`Copy of ${title}` : t`Edit ${title}`}
           timezone={ctx.timezone}
           days={form.days}
           hosts={hosts}
           locations={locations}
-          submitLabel={duplicating ? "Create" : "Save"}
-          pendingLabel={duplicating ? "Creating..." : "Saving..."}
+          submitLabel={duplicating ? t`Create` : t`Save`}
+          pendingLabel={duplicating ? t`Creating...` : t`Saving...`}
           call={(body, key) =>
             duplicating
               ? ctx.calls.createSession({ eventId: ctx.eventId, ...body }, key)
@@ -510,17 +537,22 @@ function SessionItem({
   }
 
   const flags = [
-    session.blocker && "blocker",
-    session.closed && "closed",
-    session.adminManaged && "admin-managed",
+    session.blocker && t`blocker`,
+    session.closed &&
+      t({ message: "closed", context: "Session flag, in a lowercase list" }),
+    session.adminManaged && t`admin-managed`,
   ].filter(Boolean);
+  const timezone = ctx.timezone;
+  const from = session.startTime
+    ? utcToZonedInput(session.startTime, timezone)
+    : "";
+  const to = session.endTime ? utcToZonedInput(session.endTime, timezone) : "";
   const when =
     session.startTime && session.endTime
-      ? `${utcToZonedInput(session.startTime, ctx.timezone)} – ${utcToZonedInput(
-          session.endTime,
-          ctx.timezone
-        )} (${ctx.timezone})`
-      : "Not scheduled";
+      ? t`${from} – ${to} (${timezone})`
+      : t`Not scheduled`;
+  const hostNames = joinNames(session.hosts);
+  const rsvpCount = session.numRsvps;
 
   return (
     <div className="space-y-3">
@@ -531,34 +563,35 @@ function SessionItem({
             {when} · {joinNames(session.locations)}
           </p>
           <p className="text-sm text-fg-subtle">
-            Hosts: {joinNames(session.hosts)} · {session.numRsvps} RSVPs
+            <Trans>Hosts: {hostNames}</Trans> ·{" "}
+            {plural(rsvpCount, { one: "# RSVP", other: "# RSVPs" })}
             {flags.length > 0 ? ` · ${flags.join(", ")}` : ""}
           </p>
         </div>
         <div className="flex shrink-0 gap-2">
           <Button
             variant="quiet"
-            aria-label={`Edit ${session.title}`}
+            aria-label={t`Edit ${title}`}
             onClick={() => {
               setVersion(session.version);
-              setMode("edit");
+              edit();
             }}
           >
-            Edit
+            <Trans>Edit</Trans>
           </Button>
           <Button
             variant="quiet"
-            aria-label={`Duplicate ${session.title}`}
-            onClick={() => setMode("duplicate")}
+            aria-label={t`Duplicate ${title}`}
+            onClick={duplicate}
           >
-            Duplicate
+            <Trans>Duplicate</Trans>
           </Button>
           <Button
             variant="danger"
-            aria-label={`Delete ${session.title}`}
-            onClick={() => setMode("delete")}
+            aria-label={t`Delete ${title}`}
+            onClick={remove}
           >
-            Delete
+            <Trans>Delete</Trans>
           </Button>
         </div>
       </div>
@@ -581,20 +614,27 @@ function AddSession({
   breakMinutes: number;
 }) {
   const [open, setOpen] = useState(false);
-  if (!open) return <Button onClick={() => setOpen(true)}>Add session</Button>;
+  if (!open)
+    return (
+      <Button onClick={() => setOpen(true)}>
+        <Trans>Add session</Trans>
+      </Button>
+    );
   return (
     <div className="space-y-3 rounded-md border border-line-subtle p-4">
-      <h3 className="font-medium text-fg">New session</h3>
+      <h3 className="font-medium text-fg">
+        <Trans>New session</Trans>
+      </h3>
       <SessionForm
         initial={EMPTY_SESSION}
-        label="New session"
+        label={t`New session`}
         timezone={ctx.timezone}
         days={ctx.days}
         breakMinutes={breakMinutes}
         hosts={ctx.guests}
         locations={ctx.locations}
-        submitLabel="Create"
-        pendingLabel="Creating..."
+        submitLabel={t`Create`}
+        pendingLabel={t`Creating...`}
         call={(body, key) =>
           ctx.calls.createSession({ eventId: ctx.eventId, ...body }, key)
         }
@@ -617,6 +657,7 @@ export function EventSessionsManager({
   params: URLSearchParams;
   onParams: OnParams;
 }) {
+  const timezone = ctx.timezone;
   const hostless = params.get("hostless") === "1";
   const { query, matching } = searchByTitleOrHost(
     hostless ? sessions.filter((s) => s.hosts.length === 0) : sessions,
@@ -625,10 +666,12 @@ export function EventSessionsManager({
   const { page, pageSize, visible } = pageOf(matching, params);
 
   return (
-    <section aria-label="Sessions" className="space-y-4">
-      <h2 className="text-lg font-semibold text-fg">Sessions</h2>
+    <section aria-label={t`Sessions`} className="space-y-4">
+      <h2 className="text-lg font-semibold text-fg">
+        <Trans>Sessions</Trans>
+      </h2>
       <p className="text-sm text-fg-subtle">
-        All times are in the event timezone ({ctx.timezone}).
+        <Trans>All times are in the event timezone ({timezone}).</Trans>
       </p>
       <AddSession ctx={ctx} breakMinutes={breakMinutes} />
       <DataTable
@@ -639,7 +682,7 @@ export function EventSessionsManager({
         pageSize={pageSize}
         searchQuery={query}
         {...tableHandlers(onParams)}
-        searchPlaceholder="Search title or host…"
+        searchPlaceholder={t`Search title or host…`}
         toolbar={
           <label className="flex items-center gap-2 text-sm text-fg-muted">
             <input
@@ -652,10 +695,10 @@ export function EventSessionsManager({
                 )
               }
             />
-            No hosts
+            <Trans>No hosts</Trans>
           </label>
         }
-        emptyMessage="No sessions match."
+        emptyMessage={t`No sessions match.`}
         listItem={(s) => <SessionItem session={s} ctx={ctx} />}
       />
     </section>

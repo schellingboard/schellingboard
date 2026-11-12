@@ -1,3 +1,5 @@
+import { i18n, type MessageDescriptor } from "@lingui/core";
+import { msg, t } from "@lingui/core/macro";
 import { type ReactNode, useState } from "react";
 
 import type { CommandResponse } from "../../commands/runner";
@@ -15,16 +17,19 @@ import { jumpTo, shown } from "./use-section-save";
 
 export type AssignFilter = "all" | "assigned" | "not-assigned";
 
-const FILTERS: { value: AssignFilter; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "assigned", label: "Assigned" },
-  { value: "not-assigned", label: "Not assigned" },
+const FILTERS: { kind: AssignFilter; label: MessageDescriptor }[] = [
+  {
+    kind: "all",
+    label: msg({ message: "All", context: "Filter: every row" }),
+  },
+  { kind: "assigned", label: msg`Assigned` },
+  { kind: "not-assigned", label: msg`Not assigned` },
 ];
 
 type Row = { id: string; name: string };
 
 const asFilter = (value: string | null): AssignFilter =>
-  value === "assigned" || value === "not-assigned" ? value : "all";
+  FILTERS.find((f) => f.kind === value)?.kind ?? FILTERS[0].kind;
 
 function AssignBox({
   row,
@@ -41,6 +46,7 @@ function AssignBox({
   remove: (ids: string[], key: string) => Promise<CommandResponse<unknown>>;
   onSettled: (message: string | null) => void;
 }) {
+  const rowName = row.name;
   const mutation = useFormMutation({
     call: (key) => (assigned ? remove : assign)([row.id], key),
     explainRefusals: true,
@@ -54,7 +60,7 @@ function AssignBox({
       type="checkbox"
       checked={assigned}
       disabled={disabled || mutation.pending}
-      aria-label={`Assign ${row.name}`}
+      aria-label={t`Assign ${rowName}`}
       onChange={() => void toggle()}
       className="h-4 w-4 cursor-pointer"
     />
@@ -167,7 +173,7 @@ export function AssignmentManager<T extends Row>({
       {extra?.([...selected])}
       <DataTable
         rows={visible}
-        columns={[...columns, { header: "Assigned", cell: box }]}
+        columns={[...columns, { header: t`Assigned`, cell: box }]}
         rowKey={(row) => row.id}
         total={matching.length}
         page={page}
@@ -179,22 +185,22 @@ export function AssignmentManager<T extends Row>({
           <div className="flex gap-2">
             {FILTERS.map((f) => (
               <button
-                key={f.value}
+                key={f.kind}
                 type="button"
                 onClick={() =>
                   onParams(
-                    { filter: f.value === "all" ? null : f.value, page: null },
+                    { filter: f.kind === "all" ? null : f.kind, page: null },
                     { push: true }
                   )
                 }
                 className={cx(
                   "rounded-md border px-3 py-1 text-sm",
-                  filter === f.value
+                  filter === f.kind
                     ? "border-line-strong bg-surface-inverse text-fg-inverse"
                     : "border-line bg-surface-raised text-fg-muted hover:bg-surface-sunken"
                 )}
               >
-                {f.label}
+                {i18n._(f.label)}
               </button>
             ))}
           </div>

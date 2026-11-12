@@ -1,3 +1,5 @@
+import { plural, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { useState } from "react";
 
 import type { AdminEventCalls } from "../../commands/admin-events";
@@ -14,6 +16,7 @@ export function NewLink({
   guest: { id: string; name: string };
   calls: AdminEventCalls;
 }) {
+  const guestName = guest.name;
   const [url, setUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const mutation = useFormMutation({
@@ -37,34 +40,34 @@ export function NewLink({
     <div className="flex flex-col gap-1">
       {copied && (
         <p role="status" className="text-sm text-fg-muted">
-          Link copied
+          <Trans>Link copied</Trans>
         </p>
       )}
       {url ? (
         <div className="flex gap-1">
           <input
             readOnly
-            aria-label={`Join link for ${guest.name}`}
+            aria-label={t`Join link for ${guestName}`}
             value={url}
             onFocus={(e) => e.currentTarget.select()}
             className="min-w-0 rounded-md border border-line bg-surface-raised px-2 py-1 text-sm"
           />
           <Button
             variant="quiet"
-            aria-label={`Copy link for ${guest.name}`}
+            aria-label={t`Copy link for ${guestName}`}
             onClick={() => void copy(url)}
           >
-            Copy
+            <Trans>Copy</Trans>
           </Button>
         </div>
       ) : (
         <Button
           variant="quiet"
-          aria-label={`New link for ${guest.name}`}
+          aria-label={t`New link for ${guestName}`}
           disabled={mutation.pending}
           onClick={() => void make()}
         >
-          New link
+          <Trans>New link</Trans>
         </Button>
       )}
       {mutation.error && (
@@ -86,7 +89,11 @@ export function MailLinks({
   calls: AdminEventCalls;
 }) {
   const emailEnabled = useEmailEnabled(calls.emailEnabled);
-  const [summary, setSummary] = useState<string | null>(null);
+  const [summary, setSummary] = useState<{
+    sent: number;
+    withoutEmail: number;
+    failed: number;
+  } | null>(null);
   const [confirming, setConfirming] = useState(false);
   const mutation = useFormMutation({
     call: (key) =>
@@ -102,18 +109,23 @@ export function MailLinks({
     setConfirming(false);
     const result = await mutation.submit();
     if (result?.ok && result.data) {
-      const { sent, withoutEmail, failed } = result.data;
-      setSummary(
-        `Mailed ${sent} ${sent === 1 ? "guest" : "guests"}. ${withoutEmail} ${withoutEmail === 1 ? "has" : "have"} no email. ${failed} failed.`
-      );
+      setSummary(result.data);
     }
+  };
+  const selectedCount = selectedIds.length;
+  const { sent, withoutEmail, failed } = summary ?? {
+    sent: 0,
+    withoutEmail: 0,
+    failed: 0,
   };
   if (emailEnabled === null) return null;
   if (!emailEnabled)
     return (
       <p className="text-sm text-fg-muted">
-        This server cannot send email. Copy a personal link for each guest and
-        share it yourself.
+        <Trans>
+          This server cannot send email. Copy a personal link for each guest and
+          share it yourself.
+        </Trans>
       </p>
     );
   return (
@@ -123,11 +135,14 @@ export function MailLinks({
           <>
             <Button disabled={mutation.pending} onClick={() => void mail()}>
               {selectedIds.length
-                ? `Yes, mail ${selectedIds.length} selected ${selectedIds.length === 1 ? "guest" : "guests"}`
-                : "Yes, mail all guests"}
+                ? plural(selectedCount, {
+                    one: "Yes, mail # selected guest",
+                    other: "Yes, mail # selected guests",
+                  })
+                : t`Yes, mail all guests`}
             </Button>
             <Button variant="quiet" onClick={() => setConfirming(false)}>
-              Cancel
+              <Trans>Cancel</Trans>
             </Button>
           </>
         ) : (
@@ -136,16 +151,33 @@ export function MailLinks({
             onClick={() => setConfirming(true)}
           >
             {selectedIds.length
-              ? `Mail new links to ${selectedIds.length} selected`
-              : "Mail new links to all guests"}
+              ? plural(selectedCount, {
+                  one: "Mail new links to # selected",
+                  other: "Mail new links to # selected",
+                })
+              : t`Mail new links to all guests`}
           </Button>
         )}
         <p className="text-sm text-fg-muted">
-          Each guest gets a personal link by email. It replaces the link they
-          had before.
+          <Trans>
+            Each guest gets a personal link by email. It replaces the link they
+            had before.
+          </Trans>
         </p>
       </div>
-      {summary && <p role="status">{summary}</p>}
+      {summary && (
+        <p role="status">
+          {plural(sent, {
+            one: "Mailed # guest.",
+            other: "Mailed # guests.",
+          })}{" "}
+          {plural(withoutEmail, {
+            one: "# has no email.",
+            other: "# have no email.",
+          })}{" "}
+          {plural(failed, { one: "# failed.", other: "# failed." })}
+        </p>
+      )}
       {mutation.error && (
         <p role="alert" className="text-danger-fg">
           {mutation.error}

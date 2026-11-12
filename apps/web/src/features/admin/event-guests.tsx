@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+
 import type { AdminEventCalls } from "../../commands/admin-events";
 import type { AdminGuest } from "../../queries/admin-guests";
 import type { OnParams } from "../../ui/list-paging";
@@ -22,21 +24,21 @@ export function EventGuestsManager({
   return (
     <AssignmentManager
       key={eventId}
-      title="Guests"
+      title={t`Guests`}
       rows={guests}
       isAssigned={(g) => g.eventIds.includes(eventId)}
       searchText={(g) => [g.name, g.email]}
-      searchPlaceholder="Search name or email…"
-      emptyMessage="No users match."
+      searchPlaceholder={t`Search name or email…`}
+      emptyMessage={t`No users match.`}
       columns={[
-        { header: "Name", cell: (g) => g.name },
+        { header: t`Name`, cell: (g) => g.name },
         {
-          header: "Email",
+          header: t`Email`,
           cell: (g) => g.email,
           cellClassName: "text-fg-subtle",
         },
         {
-          header: "Join link",
+          header: t`Join link`,
           cell: (g) => <NewLink eventId={eventId} guest={g} calls={calls} />,
         },
       ]}

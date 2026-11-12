@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { type FormEvent, Fragment, useEffect, useState } from "react";
 
 import type { AdminGuestCalls } from "../../commands/admin-guests";
@@ -14,9 +16,8 @@ import {
   pageOf,
   tableHandlers,
 } from "../../ui/list-paging";
+import { useRowMode } from "./row-mode";
 import { shown, useJumpWithin } from "./use-section-save";
-
-const FIELDS = ["name", "email", "username"];
 
 type EventOption = { id: string; name: string };
 
@@ -32,7 +33,9 @@ function EventChoices({
   if (events.length === 0) return null;
   return (
     <fieldset className="space-y-1">
-      <legend className="text-sm font-medium text-fg">Events</legend>
+      <legend className="text-sm font-medium text-fg">
+        <Trans>Events</Trans>
+      </legend>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         {events.map((event) => (
           <CheckboxField
@@ -72,7 +75,7 @@ function AddGuestForm({
   const [eventIds, setEventIds] = useState<string[]>([]);
   const mutation = useFormMutation({
     call: (key) => calls.create({ name, email, username, eventIds }, key),
-    fieldNames: FIELDS,
+    fieldNames: ["name", "email", "username"],
     explainRefusals: true,
   });
 
@@ -95,7 +98,7 @@ function AddGuestForm({
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
         <div className="flex-1">
           <TextField
-            label="Name"
+            label={t`Name`}
             name="name"
             value={name}
             onChange={setName}
@@ -104,7 +107,7 @@ function AddGuestForm({
         </div>
         <div className="flex-1">
           <TextField
-            label="Email"
+            label={t`Email`}
             name="email"
             type="email"
             value={email}
@@ -114,7 +117,7 @@ function AddGuestForm({
         </div>
         <div className="flex-1">
           <TextField
-            label="Username"
+            label={t`Username`}
             name="username"
             value={username}
             onChange={setUsername}
@@ -128,7 +131,7 @@ function AddGuestForm({
         onChange={setEventIds}
       />
       <Button type="submit" disabled={mutation.pending}>
-        {mutation.pending ? "Adding..." : "Add user"}
+        {mutation.pending ? t`Adding...` : t`Add user`}
       </Button>
       <FormErrorSummary
         fields={mutation.fields}
@@ -165,7 +168,7 @@ function EditForm({
         guest.version,
         key
       ),
-    fieldNames: FIELDS,
+    fieldNames: ["name", "email", "username"],
     explainRefusals: true,
   });
 
@@ -183,7 +186,7 @@ function EditForm({
     <form ref={ref} noValidate onSubmit={(e) => void submit(e)}>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
         <TextField
-          label="Name"
+          label={t`Name`}
           name="name"
           hideLabel
           value={name}
@@ -191,7 +194,7 @@ function EditForm({
           error={mutation.fields.name}
         />
         <TextField
-          label="Email"
+          label={t`Email`}
           name="email"
           type="email"
           hideLabel
@@ -200,7 +203,7 @@ function EditForm({
           error={mutation.fields.email}
         />
         <TextField
-          label="Username"
+          label={t`Username`}
           name="username"
           hideLabel
           value={username}
@@ -215,10 +218,10 @@ function EditForm({
       />
       <div className="flex gap-2">
         <Button type="submit" disabled={mutation.pending}>
-          {mutation.pending ? "Saving..." : "Save"}
+          {mutation.pending ? t`Saving...` : t`Save`}
         </Button>
         <Button variant="quiet" disabled={mutation.pending} onClick={onClose}>
-          Cancel
+          <Trans>Cancel</Trans>
         </Button>
       </div>
       <FormErrorSummary
@@ -243,7 +246,7 @@ function GuestRow({
   onChanged: () => void;
   emailEnabled: boolean | null;
 }) {
-  const [mode, setMode] = useState<"view" | "edit" | "delete">("view");
+  const { mode, close, edit, remove: startDelete } = useRowMode();
   const [sent, setSent] = useState(false);
   const remove = useFormMutation({
     call: (key) => calls.remove(guest.id, key),
@@ -257,7 +260,6 @@ function GuestRow({
     call: (key) => calls.setSiteAdmin(guest.id, !guest.siteAdmin, key),
     explainRefusals: true,
   });
-  const close = () => setMode("view");
 
   useEffect(() => {
     if (!sent) return;
@@ -300,18 +302,18 @@ function GuestRow({
             <p className="min-w-0 truncate font-medium text-fg">{guest.name}</p>
             {guest.siteAdmin && (
               <span className="rounded-md bg-surface-muted px-1.5 py-0.5 text-xs font-normal text-fg-muted">
-                Site admin
+                <Trans>Site admin</Trans>
               </span>
             )}
             {guest.siteAdmin && !guest.hasPassword && (
               <span className="rounded-md bg-surface-muted px-1.5 py-0.5 text-xs font-normal text-fg-muted">
-                No password yet
+                <Trans>No password yet</Trans>
               </span>
             )}
           </div>
           <p className="truncate text-sm text-fg-subtle">
-            {guest.email || "No email"}
-            {guest.username && ` · @${guest.username}`}
+            {guest.email || t`No email`}
+            {guest.username && <> · @{guest.username}</>}
           </p>
           {memberOf.length > 0 && (
             <p className="truncate text-sm text-fg-subtle">
@@ -331,22 +333,24 @@ function GuestRow({
         </div>
         {mode === "delete" ? (
           <div className="flex items-center gap-2">
-            <span className="text-sm text-danger-fg">Delete this user?</span>
+            <span className="text-sm text-danger-fg">
+              <Trans>Delete this user?</Trans>
+            </span>
             <Button
               variant="danger"
               disabled={remove.pending}
               onClick={() => void confirmDelete()}
             >
-              {remove.pending ? "Deleting..." : "Confirm delete"}
+              {remove.pending ? t`Deleting...` : t`Confirm delete`}
             </Button>
             <Button variant="quiet" disabled={remove.pending} onClick={close}>
-              Cancel
+              <Trans>Cancel</Trans>
             </Button>
           </div>
         ) : (
           <div className="flex flex-wrap gap-2">
-            <Button variant="quiet" onClick={() => setMode("edit")}>
-              Edit
+            <Button variant="quiet" onClick={edit}>
+              <Trans>Edit</Trans>
             </Button>
             <Button
               variant="quiet"
@@ -356,20 +360,20 @@ function GuestRow({
               onClick={() => void sendTestEmail()}
             >
               {email.pending
-                ? "Sending..."
+                ? t`Sending...`
                 : sent
-                  ? "Sent!"
-                  : "Send test email"}
+                  ? t`Sent!`
+                  : t`Send test email`}
             </Button>
             <Button
               variant="quiet"
               disabled={role.pending}
               onClick={() => void toggleRole()}
             >
-              {guest.siteAdmin ? "Remove site admin" : "Make site admin"}
+              {guest.siteAdmin ? t`Remove site admin` : t`Make site admin`}
             </Button>
-            <Button variant="danger" onClick={() => setMode("delete")}>
-              Delete
+            <Button variant="danger" onClick={startDelete}>
+              <Trans>Delete</Trans>
             </Button>
           </div>
         )}
@@ -405,10 +409,15 @@ export function AdminGuestsScreen({
   if (status === "error")
     return (
       <p role="alert" className="text-sm text-danger-fg">
-        Could not load the users.
+        <Trans>Could not load the users.</Trans>
       </p>
     );
-  if (status === "loading") return <p className="text-sm">Loading…</p>;
+  if (status === "loading")
+    return (
+      <p className="text-sm">
+        <Trans>Loading…</Trans>
+      </p>
+    );
 
   const query = params.get("q")?.trim() ?? "";
   const needle = query.toLowerCase();
@@ -426,15 +435,17 @@ export function AdminGuestsScreen({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold text-fg">Users</h1>
+        <h1 className="text-2xl font-bold text-fg">
+          <Trans>Users</Trans>
+        </h1>
         <a
           href="/admin/users/import"
           className="rounded-md border border-line px-3 py-1.5 text-sm font-medium text-fg-muted hover:bg-surface-muted"
         >
-          Import CSV
+          <Trans>Import CSV</Trans>
         </a>
       </div>
-      <section aria-label="Users" className="space-y-4">
+      <section aria-label={t`Users`} className="space-y-4">
         <AddGuestForm events={events} calls={calls} onChanged={onChanged} />
         <DataTable
           rows={visible}
@@ -444,8 +455,8 @@ export function AdminGuestsScreen({
           pageSize={pageSize}
           searchQuery={query}
           {...tableHandlers(onParams)}
-          searchPlaceholder="Search name or email…"
-          emptyMessage="No users match."
+          searchPlaceholder={t`Search name or email…`}
+          emptyMessage={t`No users match.`}
           listItem={(g) => (
             <GuestRow
               guest={g}

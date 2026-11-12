@@ -1,3 +1,5 @@
+import { Trans } from "@lingui/react/macro";
+
 type Room = { id: string; name: string };
 
 export function RoomCheckboxes({
@@ -30,7 +32,7 @@ export function RoomCheckboxes({
             onChange={() => onChange(allSelected ? [] : rooms.map((r) => r.id))}
             className="h-4 w-4 cursor-pointer"
           />
-          All locations
+          <Trans>All locations</Trans>
         </label>
       )}
       {rooms.map((r) => (
