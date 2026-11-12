@@ -12,6 +12,8 @@ import { useScrollLock } from "./use-scroll-lock";
 /** Open dialogs, innermost last: Escape closes only the one on top. */
 const openDialogs: symbol[] = [];
 
+export const anyDialogOpen = () => openDialogs.length > 0;
+
 export function Dialog({
   open,
   onClose,

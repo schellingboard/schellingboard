@@ -29,6 +29,8 @@ import {
 import { EventLanding } from "./event-landing";
 import { EventLayout } from "./event-page";
 import { SchedulePage } from "./schedule-page";
+import { SessionLanding } from "./session-landing";
+import { PanelHost } from "./session-panel-host";
 import { SessionFormPage } from "./sessions-pages";
 import { SpaLinks } from "./spa-links";
 import { defaultServices, type AppServices } from "./services";
@@ -117,6 +119,7 @@ export function createAppRouter(
         <EventLayout services={services} slug={slug}>
           <SpaLinks slug={slug}>
             <Outlet />
+            <PanelHost />
           </SpaLinks>
         </EventLayout>
       );
@@ -131,6 +134,14 @@ export function createAppRouter(
     getParentRoute: () => event,
     path: "schedule",
     component: SchedulePage,
+  });
+  const session = createRoute({
+    getParentRoute: () => event,
+    path: "sessions/$sessionId",
+    component: function SessionRoute(): ReactElement {
+      const { slug, sessionId } = session.useParams();
+      return <SessionLanding slug={slug} sessionId={sessionId} />;
+    },
   });
   const meetings = createRoute({
     getParentRoute: () => event,
@@ -336,6 +347,7 @@ export function createAppRouter(
       event.addChildren([
         landing,
         schedule,
+        session,
         meetings,
         proposals,
         quickVoting,

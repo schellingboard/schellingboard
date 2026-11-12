@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState, type RefObject } from "react";
+import { useLayoutEffect, type RefObject } from "react";
 import type { DayWithSessions } from "./model";
 
 export function dayOfSession(
@@ -16,15 +16,14 @@ export function useRevealSession(
   scrollerRef: RefObject<HTMLElement | null>,
   sessionId: string | null
 ) {
-  const [opened] = useState(sessionId);
   useLayoutEffect(() => {
-    if (!opened) return;
+    if (!sessionId) return;
     scrollerRef.current
-      ?.querySelector(`[data-session-id="${CSS.escape(opened)}"]`)
+      ?.querySelector(`[data-session-id="${CSS.escape(sessionId)}"]`)
       ?.scrollIntoView({
         block: "center",
         inline: "center",
         behavior: "instant",
       });
-  }, [scrollerRef, opened]);
+  }, [scrollerRef, sessionId]);
 }

@@ -125,8 +125,8 @@ The pure parts (`grid-layout`, `column`, `meeting-column`, `agenda`, `fold`, `fi
 `meeting-rules`, `meeting-clash-text`) are the schedule's own; the legacy copies went with the Next
 schedule. `model.ts` has the new pure rules (narrowing by room, matching, day folds). `links.ts` is
 the one place that decides where a session, a 1-on-1, add-session or booking link goes: a session
-and a 1-on-1 (`?viewMeeting=`, `?bookMeeting=`) open in the SPA's own modals over the schedule, the
-add and edit session links go to the session form (`app/sessions-pages.tsx`, `/{slug}/add-session`,
+(its panel address) and a 1-on-1 (`?viewMeeting=`, `?bookMeeting=`) open over the schedule, the add
+and edit session links go to the session form (`app/sessions-pages.tsx`, `/{slug}/add-session`,
 `/{slug}/edit-session`). `/{slug}/meetings` (`app/meetings-page.tsx`) is where a meeting
 notification lands: it hands the meeting to the schedule, or opens it read-only outside the
 scheduling phase.
@@ -149,13 +149,16 @@ covered by the E2E suite; there is no browser component runner.
 
 (anchor: MnpjIo7Y)
 
-The session, proposal and 1-on-1 modals are `?viewSession=`, `?viewProposal=` and `?viewMeeting=` on
-the page behind them. A click on a link inside the SPA pushes the address, so Back closes the modal
-(`SpaLinks` arms this; `app/proposal-nav.ts` holds the flag). An address opened directly, or reached
-from a notification or an email, has no entry of ours to pop, so closing it removes the parameter.
-The flag must be taken when the modal closes and cleared when none is open, or a later modal
-inherits "close by going back" (two E2E specs cover it). Links from legacy pages and emails are
-plain anchors: build them with `links.ts` and `utils/notifications.ts`, never a second copy.
+A session opens in the side panel (`ui/side-panel.tsx`, mounted by `app/session-panel-host.tsx`) at
+`/{slug}/sessions/:id`; `app/panel-history.ts` keeps the page behind it and the stack depth in
+`history.state`, and `?viewSession=` redirects to it. The proposal and 1-on-1 modals are
+`?viewProposal=` and `?viewMeeting=` on the page behind them. A click on a link inside the SPA
+pushes the address, so Back closes the modal (`SpaLinks` arms this; `app/proposal-nav.ts` holds the
+flag). An address opened directly, or reached from a notification or an email, has no entry of ours
+to pop, so closing it removes the parameter. The flag must be taken when the modal closes and
+cleared when none is open, or a later modal inherits "close by going back" (two E2E specs cover it).
+Links from legacy pages and emails are plain anchors: build them with `links.ts` and
+`utils/notifications.ts`, never a second copy.
 
 ## Failure notices
 

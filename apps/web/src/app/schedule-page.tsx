@@ -1,33 +1,17 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "@tanstack/react-router";
 import { scheduleLinks } from "../features/schedule/links";
-import {
-  ScheduleScreen,
-  type ScheduleActions,
-} from "../features/schedule/schedule-screen";
-import { attendeeCountApi } from "../queries/attendee-count";
-import { createAttendeesQuery } from "../queries/attendees";
-import { answerMeeting, cancelMeeting } from "../commands/meeting-answer";
-import { meetingRequestCalls } from "../commands/meeting-request";
-import { createMeetingCandidatesQuery } from "../queries/meeting-candidates";
-import { claimSession } from "../commands/claim-session";
-import { addRsvp, removeRsvp } from "../commands/rsvp";
-import {
-  addBookmark,
-  addHidden,
-  removeBookmark,
-  removeHidden,
-} from "../commands/session-mark";
+import { ScheduleScreen } from "../features/schedule/schedule-screen";
 import { useEventView, type EventView } from "./event-page";
 import { Footer } from "./footer";
 import { hardReload } from "./hard-navigate";
-import { newKey } from "../commands/keys";
 import { useMeetingClashes } from "./use-meeting-clashes";
 import { useHealth } from "./health";
 import { useUpdateStatus } from "./updates";
-import { likerFrom, useCommentSource } from "./use-comment-actions";
 import { useUrlSearchParams } from "./use-url-search-params";
-import { NamePicker } from "./user-menu";
-import { useViewer } from "./viewer";
+import { landOnPanel } from "./panel-history";
+import { useScheduleActions } from "./use-schedule-actions";
+import { usePanel } from "./use-panel";
 import { SyncIndicator } from "./sync-indicator";
 
 /** An event's schedule, inside the event layout. */
@@ -35,63 +19,47 @@ export function SchedulePage() {
   return <Loaded {...useEventView()} />;
 }
 
-function Loaded({ api, slug, runner, store, snapshot, now }: EventView) {
+function Loaded(view: EventView) {
+  const { api, slug, store, snapshot, now } = view;
   const health = useHealth(api);
   const update = useUpdateStatus(api);
   const { params, change: changeParams, back, setHash } = useUrlSearchParams();
   const links = useMemo(() => scheduleLinks(slug), [slug]);
-  const viewer = useViewer();
   const clashes = useMeetingClashes(api, store);
-  const [picking, setPicking] = useState(false);
-  const openComments = useCommentSource(api, runner, likerFrom(snapshot));
-  const actions = useMemo<ScheduleActions>(
-    () => ({
-      pickName: () => setPicking(true),
-      toggleRsvp: async (sessionId, withdraw) => {
-        await runner.run(withdraw ? removeRsvp : addRsvp, { sessionId });
-      },
-      becomeHost: async (sessionId) => {
-        await runner.run(claimSession, { sessionId });
-      },
-      setBookmark: async (sessionId, bookmarked) => {
-        await runner.run(bookmarked ? addBookmark : removeBookmark, {
-          sessionId,
-        });
-      },
-      setHidden: async (sessionId, hidden) => {
-        await runner.run(hidden ? addHidden : removeHidden, { sessionId });
-      },
-      attendees: (sessionId) => createAttendeesQuery({ api, sessionId }),
-      attendeeCount: attendeeCountApi(api, newKey),
-      awaitingLogin: async () => {
-        const { data } = await api.GET("/api/v1/me/identity");
-        return data?.awaitingLogin === true;
-      },
-      answerMeeting: async (meetingId, response) => {
-        await runner.run(answerMeeting, { meetingId, response });
-      },
-      cancelMeeting: async (meetingId, note) => {
-        await runner.run(cancelMeeting, { meetingId, note });
-      },
-      meetingCandidates: (slotStart) =>
-        createMeetingCandidatesQuery({
-          api,
-          eventId: snapshot.event.id,
-          slotStart,
-        }),
-      meetingRequest: meetingRequestCalls(api),
-      comments: (sessionId) => openComments({ kind: "session", id: sessionId }),
-    }),
-    [runner, api, openComments, snapshot.event.id]
+  const { history } = useRouter();
+  const { panel, open } = usePanel();
+  const [openAtMount] = useState(() =>
+    panel?.item.slug === slug ? panel.item.id : null
   );
+  const viewSession = params.get("viewSession");
+  const redirected = useRef<string | null>(null);
+  useEffect(() => {
+    if (!viewSession || redirected.current === viewSession) return;
+    redirected.current = viewSession;
+    const rest = new URLSearchParams(params);
+    rest.delete("viewSession");
+    rest.delete("record");
+    const query = rest.toString();
+    landOnPanel(
+      history,
+      {
+        kind: "session",
+        slug,
+        id: viewSession,
+        record: params.get("record") === "count",
+      },
+      `/${slug}/schedule${query ? `?${query}` : ""}`,
+      history.location.hash
+    );
+  }, [history, slug, viewSession, params]);
+  const openSession = useCallback(
+    (id: string) => open({ kind: "session", slug, id }),
+    [open, slug]
+  );
+  const { actions, picker } = useScheduleActions(view);
   return (
     <>
-      <NamePicker
-        open={picking}
-        onClose={() => setPicking(false)}
-        guests={snapshot.guests}
-        choose={viewer.choose}
-      />
+      {picker}
       <ScheduleScreen
         actions={actions}
         clashes={clashes}
@@ -101,6 +69,12 @@ function Loaded({ api, slug, runner, store, snapshot, now }: EventView) {
         params={params}
         onParamsChange={changeParams}
         onBack={back}
+        openSession={openSession}
+        revealSessionId={
+          panel?.landed && panel.item.slug === slug
+            ? panel.item.id
+            : openAtMount
+        }
         onHashChange={setHash}
         sync={<SyncIndicator store={store} />}
         footer={<Footer version={health?.version} update={update} inline />}

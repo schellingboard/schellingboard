@@ -1,21 +1,25 @@
 import { useCallback, useSyncExternalStore } from "react";
 import { useRouter } from "@tanstack/react-router";
+import { backgroundOf, panelOf, replaceBackground } from "./panel-history";
 
 /**
  * The address bar's query as URLSearchParams, and a way to change it: replacing
  * by default, or adding a history entry so Back undoes the change. The router's
  * history is the source, so a back button or an outside change re-renders.
+ * With a side panel open these are the page behind it, not the panel's address.
  */
 export function useUrlSearchParams() {
   const { history } = useRouter();
   const search = useSyncExternalStore(
     (listener) => history.subscribe(listener),
-    () => history.location.search
+    () => backgroundOf(history.location).search
   );
   const change = useCallback(
     (next: URLSearchParams, { push = false } = {}) => {
-      const { pathname, hash } = history.location;
       const query = next.toString();
+      if (!push && panelOf(history.location))
+        return replaceBackground(history, query ? `?${query}` : "");
+      const { pathname, hash } = backgroundOf(history.location);
       const path = `${pathname}${query ? `?${query}` : ""}`;
       // A pushed address is a new place: the old one's #comment- target is not its own.
       if (push) history.push(path);

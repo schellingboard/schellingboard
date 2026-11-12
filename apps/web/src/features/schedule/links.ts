@@ -1,8 +1,8 @@
 export type ScheduleLinks = {
   schedule: string;
   proposals: string;
-  /** Opens the session over the schedule, keeping the view and filters. */
-  session: (current: URLSearchParams, sessionId: string) => string;
+  /** A session's own address, which opens its side panel. */
+  session: (sessionId: string) => string;
   meeting: (current: URLSearchParams, meetingId: string) => string;
   addSession: (slot: { location: string; day: string; time: string }) => string;
   guest: (guestId: string) => string;
@@ -12,17 +12,13 @@ export type ScheduleLinks = {
   bookMeeting: (slotStart: string) => string;
 };
 
-/** Every address is the SPA's own; the session and 1-on-1 modals sit over `/{slug}/schedule`. */
+/** Every address is the SPA's own; the 1-on-1 modals sit over `/{slug}/schedule`. */
 export function scheduleLinks(eventSlug: string): ScheduleLinks {
   const schedule = `/${eventSlug}/schedule`;
   return {
     schedule,
     proposals: `/${eventSlug}/proposals`,
-    session: (current, id) => {
-      const params = new URLSearchParams(current);
-      params.set("viewSession", id);
-      return `${schedule}?${params.toString()}`;
-    },
+    session: (id) => `/${eventSlug}/sessions/${encodeURIComponent(id)}`,
     meeting: (current, id) => {
       const params = new URLSearchParams(current);
       params.set("viewMeeting", id);

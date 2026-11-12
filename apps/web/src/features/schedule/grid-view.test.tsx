@@ -62,7 +62,7 @@ describe("GridView", () => {
     renderScheduled(<Grid data={dataOf()} />);
     expect(screen.getByRole("heading", { name: "Room" })).toBeTruthy();
     const link = screen.getByRole("link", { name: "Talk" });
-    expect(link.getAttribute("href")).toBe("/conf/schedule?viewSession=s");
+    expect(link.getAttribute("href")).toBe("/conf/sessions/s");
   });
 
   it(

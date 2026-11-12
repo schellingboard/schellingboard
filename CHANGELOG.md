@@ -26,6 +26,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **Session details open in a side panel**: the schedule stays usable beside it, you can drag its
+  edge to resize it, and each session has its own shareable link.
 - **One "My schedule" filter on the schedule** (#865): replaces My sessions, RSVP'd and Hosting. A
   menu beside it picks which of your RSVP'd and hosted sessions it shows.
 

@@ -15,7 +15,7 @@ it(
     });
 
     expect(screen.getByRole("link", { name: /^\d/ }).getAttribute("href")).toBe(
-      "/conf/schedule?viewSession=s#comment-a"
+      "/conf/sessions/s#comment-a"
     );
   }
 );

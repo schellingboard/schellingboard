@@ -6,7 +6,7 @@ import {
   type AttendeesQuery,
   type AttendeesState,
 } from "../../queries/attendees";
-import { Dialog } from "../../ui/dialog";
+import { SidePanel } from "../../ui/side-panel";
 import {
   AcademicCapIcon,
   BookmarkIcon,
@@ -27,27 +27,29 @@ const BOOKMARK_NOTE = "Only you see your bookmarks. This is not an RSVP.";
 const ACTION =
   "inline-flex items-center justify-center rounded-md border border-brand-accent px-2 py-1 text-xs font-medium text-brand-fg hover:bg-brand-tint focus:outline-none focus:ring-2 focus:ring-brand-accent disabled:opacity-50";
 
-/** A session's details over the schedule, opened by `?viewSession=`. */
-export function SessionModal({
+/** A session's details in the side panel. */
+export function SessionPanel({
   sessionId,
   onClose,
+  onBack,
 }: {
   sessionId: string;
   onClose: () => void;
+  onBack?: () => void;
 }) {
-  const { data } = useSchedule();
+  const { data, links } = useSchedule();
   const session = data.sessions.find((s) => s.id === sessionId);
   return (
-    <Dialog
-      open
-      wide
-      onClose={onClose}
+    <SidePanel
       label="Session details"
       title={session ? session.title : "Session details"}
       titleAction={session && <BookmarkToggle sessionId={session.id} />}
+      onClose={onClose}
+      onBack={onBack}
+      shareUrl={links.session(sessionId)}
     >
       {session ? <Details session={session} /> : <p>Session not found.</p>}
-    </Dialog>
+    </SidePanel>
   );
 }
 

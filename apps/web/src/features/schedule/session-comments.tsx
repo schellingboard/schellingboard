@@ -3,7 +3,7 @@ import { Comments } from "../comments/comments-section";
 import { useSchedule } from "./context";
 
 export function SessionComments({ sessionId }: { sessionId: string }) {
-  const { actions, data, timezone, links, params, setHash } = useSchedule();
+  const { actions, data, timezone, links, setHash } = useSchedule();
   const open = useCallback(
     () => actions.comments(sessionId),
     [actions, sessionId]
@@ -14,7 +14,7 @@ export function SessionComments({ sessionId }: { sessionId: string }) {
       viewerId={data.guestId}
       timezone={timezone}
       guestHref={links.guest}
-      commentHref={(id) => `${links.session(params, sessionId)}#comment-${id}`}
+      commentHref={(id) => `${links.session(sessionId)}#comment-${id}`}
       setHash={setHash}
     />
   );

@@ -61,7 +61,7 @@ export function GridView({
         // widest day's grid when it overflows yet still fill the viewport when
         // it is narrower. `cursor` inherits, so links and buttons are reset to
         // theirs rather than showing the grab hand.
-        className="grid w-full flex-1 cursor-grab content-start overflow-auto [&_a]:cursor-pointer [&_button]:cursor-pointer"
+        className="grid w-full flex-1 cursor-grab content-start overflow-auto pr-[var(--side-panel-inset,0px)] [&_a]:cursor-pointer [&_button]:cursor-pointer"
         style={{ gridTemplateColumns: "minmax(max-content, 1fr)" }}
       >
         {toolbar}
