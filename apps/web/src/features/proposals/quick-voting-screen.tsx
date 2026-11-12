@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { inVotingPhase } from "@schellingboard/domain/phase";
 import type { VoteChoice } from "@schellingboard/domain/vote";
@@ -45,14 +46,16 @@ export function QuickVotingScreen({
   const [shownId, setShownId] = useState<string | null>(null);
   const back = (
     <a href={links.proposals} className={BACK}>
-      ← Proposals
+      <Trans>← Proposals</Trans>
     </a>
   );
   if (!guestId)
     return (
       <div className="mx-auto max-w-2xl px-4">
         {back}
-        <div className="mt-6">Please choose who you are first.</div>
+        <div className="mt-6">
+          <Trans>Please choose who you are first.</Trans>
+        </div>
       </div>
     );
 
@@ -72,18 +75,26 @@ export function QuickVotingScreen({
     )[0];
   if (!loading && next && next.id !== shownId) setShownId(next.id);
   const votedCount = votable.filter((p) => votes.has(p.id)).length;
+  const votableCount = votable.length;
+  const eventName = snapshot.event.name;
   const texts = phaseTexts(snapshot.event, now, true, localZone);
   const votingEnabled = inVotingPhase(toEvent(snapshot.event), now);
 
   return (
     <div className="relative mx-auto max-w-2xl px-4 pb-32 wrap-anywhere">
       {back}
-      <p className="mb-4 mt-4 text-lg">{snapshot.event.name} Quick Voting</p>
+      <p className="mb-4 mt-4 text-lg">
+        <Trans>{eventName} Quick Voting</Trans>
+      </p>
       <div className="mb-6 text-fg-muted">
-        You have voted on {votedCount} / {votable.length} proposals
+        <Trans>
+          You have voted on {votedCount} / {votableCount} proposals
+        </Trans>
       </div>
       {loading ? (
-        <p>Loading proposals...</p>
+        <p>
+          <Trans>Loading proposals...</Trans>
+        </p>
       ) : next ? (
         <>
           <h1 className="mb-2 mt-5 text-xl font-semibold">
@@ -114,8 +125,10 @@ export function QuickVotingScreen({
         </>
       ) : (
         <p>
-          You have voted on all proposals. Go to the overview to change your
-          votes.
+          <Trans>
+            You have voted on all proposals. Go to the overview to change your
+            votes.
+          </Trans>
         </p>
       )}
     </div>

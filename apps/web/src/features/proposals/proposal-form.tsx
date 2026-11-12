@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import {
   proposalCreateSchema,
   proposalUpdateSchema,
@@ -37,14 +39,9 @@ import type { ProposalLinks } from "./links";
 import { ProposalHelp } from "./proposal-help";
 import { ScheduledSessionsNotice } from "./scheduled-sessions-notice";
 
-const FIELD_NAMES = [
-  "title",
-  "description",
-  "hostIds",
-  "durationMinutes",
-  "cohostWanted",
-  "cohostWantedNote",
-];
+// The domain refusal sentence is English, so these phrases stay English.
+const TASK_EDIT = "editing this proposal";
+const TASK_CREATE = "creating a proposal";
 
 export type ProposalFormProps = {
   snapshot: Snapshot;
@@ -65,8 +62,8 @@ export function ProposalForm(props: ProposalFormProps) {
     : undefined;
 
   const refusal = (() => {
-    if (proposalId && !proposal) return "Proposal not found.";
-    const task = proposal ? "editing this proposal" : "creating a proposal";
+    if (proposalId && !proposal) return t`Proposal not found.`;
+    const task = proposal ? TASK_EDIT : TASK_CREATE;
     if (!viewer && (!proposal || proposal.hosts.length > 0))
       return actingGuestRefusalMessage("guest.unselected", task);
     if (
@@ -74,14 +71,16 @@ export function ProposalForm(props: ProposalFormProps) {
       proposal.hosts.length > 0 &&
       !proposal.hosts.some((h) => h.id === viewer)
     )
-      return "Only a host of this proposal can edit it.";
+      return t`Only a host of this proposal can edit it.`;
     return null;
   })();
 
   if (refusal)
     return (
       <div className="mx-auto max-w-2xl px-4">
-        <BackLink href={links.proposals}>Proposals</BackLink>
+        <BackLink href={links.proposals}>
+          <Trans>Proposals</Trans>
+        </BackLink>
         <div className="mt-6">{refusal}</div>
       </div>
     );
@@ -119,7 +118,7 @@ function Fields({
     proposal?.cohostWantedNote ?? ""
   );
   const [checking, setChecking] = useState(false);
-  const [last, setLast] = useState<"save" | "remove">("save");
+  const [removing, setRemoving] = useState(false);
   const [confirming, setConfirming] = useState(false);
 
   const people = useMemo(() => {
@@ -143,7 +142,14 @@ function Fields({
       proposal
         ? actions.update(proposal.id, body.current as ProposalUpdateBody, key)
         : actions.create(body.current as ProposalCreateBody, key),
-    fieldNames: FIELD_NAMES,
+    fieldNames: [
+      "title",
+      "description",
+      "hostIds",
+      "durationMinutes",
+      "cohostWanted",
+      "cohostWantedNote",
+    ],
   });
   const remove = useFormMutation({
     call: (key) => actions.remove(proposal!.id, key),
@@ -170,15 +176,14 @@ function Fields({
   const clientErrors: FieldErrors = checking ? (invalid ?? {}) : {};
   const hasClientErrors = Object.keys(clientErrors).length > 0;
   const fields = hasClientErrors ? clientErrors : save.fields;
-  const failure =
-    last === "remove" ? remove.error : hasClientErrors ? null : save.error;
+  const failure = removing ? remove.error : hasClientErrors ? null : save.error;
   const busy = save.pending || remove.pending;
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (busy) return;
     setChecking(!!invalid);
-    setLast("save");
+    setRemoving(false);
     if (invalid) return;
     body.current = next;
     if ((await save.submit())?.ok) onDone();
@@ -186,7 +191,7 @@ function Fields({
 
   const onDelete = async () => {
     setConfirming(false);
-    setLast("remove");
+    setRemoving(true);
     if ((await remove.submit())?.ok) onDone();
   };
 
@@ -195,14 +200,18 @@ function Fields({
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-4 px-4 pb-24">
-      <BackLink href={links.proposals}>Proposals</BackLink>
+      <BackLink href={links.proposals}>
+        <Trans>Proposals</Trans>
+      </BackLink>
       <div>
         <h2 className="text-2xl font-bold">
-          {proposal ? "Edit" : "Add"} Session Proposal
+          {proposal ? t`Edit Session Proposal` : t`Add Session Proposal`}
         </h2>
         <p className="mt-2 text-sm text-fg-subtle">
-          Share your session idea with the community. Only the title is
-          required.
+          <Trans>
+            Share your session idea with the community. Only the title is
+            required.
+          </Trans>
         </p>
       </div>
       {!proposal && (
@@ -216,8 +225,10 @@ function Fields({
           snapshot={snapshot}
           links={links}
         >
-          Changes here do not reach the schedule. To change a session, open it
-          and edit it there.
+          <Trans>
+            Changes here do not reach the schedule. To change a session, open it
+            and edit it there.
+          </Trans>
         </ScheduledSessionsNotice>
       )}
 
@@ -228,28 +239,28 @@ function Fields({
         className="flex flex-col gap-4"
       >
         <TextField
-          label="Title"
+          label={t`Title`}
           name="title"
           required
           autoFocus
           value={title}
           onChange={setTitle}
-          placeholder="Enter a clear, descriptive title"
+          placeholder={t`Enter a clear, descriptive title`}
           error={fields.title}
         />
         <MarkdownField
-          label="Description"
+          label={t`Description`}
           name="description"
           value={description}
           onChange={setDescription}
-          placeholder="Describe what your session will cover"
+          placeholder={t`Describe what your session will cover`}
           error={fields.description}
         />
         <div className="flex flex-col gap-2">
           <PeopleField
-            label="Host(s)"
+            label={t`Host(s)`}
             name="hostIds"
-            hint="Leave empty to ask for a session without offering to give it yourself — anyone who can host it may add themselves here later."
+            hint={t`Leave empty to ask for a session without offering to give it yourself — anyone who can host it may add themselves here later.`}
             people={people}
             selected={hostIds}
             error={fields.hostIds}
@@ -263,20 +274,20 @@ function Fields({
           {hostIds.length > 0 && (
             <>
               <CheckboxField
-                label="Looking for a co-host"
+                label={t`Looking for a co-host`}
                 name="cohostWanted"
-                hint="Lists the proposal under “Host wanted” and lets anyone join as a co-host. Stops as soon as someone joins."
+                hint={t`Lists the proposal under “Host wanted” and lets anyone join as a co-host. Stops as soon as someone joins.`}
                 checked={cohostWanted}
                 onChange={setCohostWanted}
               />
               {cohostWanted && (
                 <TextField
-                  label="Who are you looking for?"
+                  label={t`Who are you looking for?`}
                   name="cohostWantedNote"
                   value={cohostNote}
                   onChange={setCohostNote}
                   maxLength={COHOST_WANTED_NOTE_MAX}
-                  placeholder="e.g. someone to take over, or a second facilitator"
+                  placeholder={t`e.g. someone to take over, or a second facilitator`}
                   error={fields.cohostWantedNote}
                 />
               )}
@@ -285,7 +296,9 @@ function Fields({
         </div>
 
         <fieldset className="flex flex-col gap-1">
-          <legend className="mb-1 font-medium">Duration</legend>
+          <legend className="mb-1 font-medium">
+            <Trans>Duration</Trans>
+          </legend>
           <div className="grid gap-3">
             {durations.map((value) => (
               <label
@@ -304,7 +317,7 @@ function Fields({
                       durationMinusBreak(value, event.breakMinutes),
                       true
                     )
-                  : "Undecided"}
+                  : t`Undecided`}
               </label>
             ))}
           </div>
@@ -328,7 +341,7 @@ function Fields({
               disabled={busy}
               onClick={() => setConfirming(true)}
             >
-              Delete
+              <Trans>Delete</Trans>
             </Button>
           )}
           <div className="ml-auto flex gap-3">
@@ -336,20 +349,20 @@ function Fields({
               href={links.proposals}
               className="rounded px-6 py-2 font-semibold text-fg-muted bg-surface-muted hover:bg-surface-hover"
             >
-              Cancel
+              <Trans>Cancel</Trans>
             </a>
             <Button type="submit" disabled={!title || busy}>
-              {save.pending ? "Submitting..." : "Submit"}
+              {save.pending ? t`Submitting...` : t`Submit`}
             </Button>
           </div>
         </div>
       </form>
       <ConfirmDialog
         open={confirming}
-        title="Delete session proposal?"
-        message="This cannot be undone."
-        confirmLabel="Delete"
-        cancelLabel="Cancel"
+        title={t`Delete session proposal?`}
+        message={t`This cannot be undone.`}
+        confirmLabel={t`Delete`}
+        cancelLabel={t`Cancel`}
         onConfirm={() => void onDelete()}
         onCancel={() => setConfirming(false)}
       />

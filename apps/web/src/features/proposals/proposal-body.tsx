@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { durationMinusBreak } from "@schellingboard/domain/slots";
 import { formatDuration } from "@schellingboard/domain/time";
 
@@ -21,11 +23,18 @@ export function ProposalBody({
   links: Pick<ProposalLinks, "guest">;
   breakMinutes: number;
 }) {
+  const cohostNote = proposal.cohostWantedNote;
+  const duration = proposal.durationMinutes
+    ? formatDuration(
+        durationMinusBreak(proposal.durationMinutes, breakMinutes),
+        true
+      )
+    : "";
   return (
     <>
       {proposal.hosts.length === 0 ? (
         <p className="mb-4 text-lg font-medium italic text-fg-subtle">
-          No host yet — someone would like to see this offered
+          <Trans>No host yet — someone would like to see this offered</Trans>
         </p>
       ) : (
         <p className="mb-4 text-lg font-medium text-fg-muted">
@@ -44,8 +53,9 @@ export function ProposalBody({
       )}
       {proposal.cohostWanted && (
         <p className="mb-4 text-sm italic text-fg-muted">
-          Looking for a co-host
-          {proposal.cohostWantedNote && `: ${proposal.cohostWantedNote}`}
+          {cohostNote
+            ? t`Looking for a co-host: ${cohostNote}`
+            : t`Looking for a co-host`}
         </p>
       )}
       <div className="mb-3">
@@ -54,13 +64,7 @@ export function ProposalBody({
         </Markdown>
       </div>
       {proposal.durationMinutes && (
-        <p className="mb-4 text-sm text-fg-muted">
-          Duration:{" "}
-          {formatDuration(
-            durationMinusBreak(proposal.durationMinutes, breakMinutes),
-            true
-          )}
-        </p>
+        <p className="mb-4 text-sm text-fg-muted">{t`Duration: ${duration}`}</p>
       )}
     </>
   );

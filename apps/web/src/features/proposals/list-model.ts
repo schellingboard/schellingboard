@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import type { LoggedProposal } from "@schellingboard/domain/change";
 import {
@@ -5,8 +6,8 @@ import {
   inSchedPhase,
   inVotingPhase,
 } from "@schellingboard/domain/phase";
-import { dateStartDescription } from "@schellingboard/domain/phase-opens-text";
 import { wantsHost } from "@schellingboard/domain/session";
+import { formatInLocalZone } from "@schellingboard/domain/time";
 import type { VoteChoice } from "@schellingboard/domain/vote";
 import { voteChoiceRank } from "@schellingboard/domain/vote-display";
 import Fuse from "fuse.js";
@@ -201,20 +202,23 @@ export function sortOptions(
     label,
   });
   return [
-    option("updatedTime", "desc", "Recently updated"),
+    option("updatedTime", "desc", t`Recently updated`),
     ...(inVotingPhase(e, now)
-      ? [option("votesCount", "asc", "Fewest votes first")]
+      ? [option("votesCount", "asc", t`Fewest votes first`)]
       : []),
-    option("title", "asc", "Title ↓"),
-    option("title", "desc", "Title ↑"),
-    option("hosts", "asc", "Host(s) ↓"),
-    option("hosts", "desc", "Host(s) ↑"),
-    option("durationMinutes", "asc", "Duration ↓"),
-    option("durationMinutes", "desc", "Duration ↑"),
-    option("userVote", "asc", "Your vote ↓"),
-    option("userVote", "desc", "Your vote ↑"),
+    option("title", "asc", t`Title ↓`),
+    option("title", "desc", t`Title ↑`),
+    option("hosts", "asc", t`Host(s) ↓`),
+    option("hosts", "desc", t`Host(s) ↑`),
+    option("durationMinutes", "asc", t`Duration ↓`),
+    option("durationMinutes", "desc", t`Duration ↑`),
+    option("userVote", "asc", t`Your vote ↓`),
+    option("userVote", "desc", t`Your vote ↑`),
     ...(inSchedPhase(e, now)
-      ? [option("votes", "asc", "Votes ↓"), option("votes", "desc", "Votes ↑")]
+      ? [
+          option("votes", "asc", t`Votes ↓`),
+          option("votes", "desc", t`Votes ↑`),
+        ]
       : []),
   ];
 }
@@ -227,22 +231,28 @@ export function phaseTexts(
   localZone: string | null
 ): { proposing: string; voting: string; scheduling: string } {
   const e = toEvent(event);
-  const opens = (date: Date | undefined) =>
-    dateStartDescription(date, e.timezone, localZone);
+  const at = (date: Date | undefined) =>
+    date ? formatInLocalZone(date, e.timezone, localZone) : null;
+  const votingAt = at(e.votingPhaseStart);
+  const schedulingAt = at(e.schedulingPhaseStart);
   const scheduling = inSchedPhase(e, now);
   return {
     proposing: scheduling
-      ? "Proposal and voting phases are over"
+      ? t`Proposal and voting phases are over`
       : signedIn
         ? ""
-        : "Select a user first",
+        : t`Select a user first`,
     voting: scheduling
-      ? "The voting phase is over"
+      ? t`The voting phase is over`
       : inProposalPhase(e, now)
-        ? `Voting ${opens(e.votingPhaseStart)}`
+        ? votingAt
+          ? t`Voting will be enabled at ${votingAt}`
+          : t`Voting is not enabled`
         : signedIn
           ? ""
-          : "Select a user first",
-    scheduling: `Scheduling ${opens(e.schedulingPhaseStart)}`,
+          : t`Select a user first`,
+    scheduling: schedulingAt
+      ? t`Scheduling will be enabled at ${schedulingAt}`
+      : t`Scheduling is not enabled`,
   };
 }

@@ -2,12 +2,12 @@ import type { VoteChoice } from "@schellingboard/domain/vote";
 import {
   VOTE_CHOICES,
   voteChoiceToEmoji,
-  voteChoiceToLabel,
 } from "@schellingboard/domain/vote-display";
 
 import { cx } from "../../ui/cx";
 import { Tooltip } from "../../ui/tooltip";
 import { Unavailable } from "../../ui/unavailable";
+import { voteLabel } from "./vote-labels";
 
 export function VotingButtons({
   chosen,
@@ -52,9 +52,7 @@ export function VotingButtons({
               {voteChoiceToEmoji(choice)}
             </div>
             {large && (
-              <div className="text-[10px] sm:text-xs">
-                {voteChoiceToLabel(choice)}
-              </div>
+              <div className="text-[10px] sm:text-xs">{voteLabel(choice)}</div>
             )}
             {selected && (
               <span
@@ -67,7 +65,7 @@ export function VotingButtons({
           </button>
         );
         return enabled ? (
-          <Tooltip key={choice} content={voteChoiceToLabel(choice)}>
+          <Tooltip key={choice} content={voteLabel(choice)}>
             {button}
           </Tooltip>
         ) : (

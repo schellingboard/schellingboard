@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { formatOptionalTime } from "@schellingboard/domain/time";
 import { Fragment, type ReactNode } from "react";
@@ -28,10 +30,17 @@ export function ScheduledSessionsNotice({
 
   return (
     <div className="rounded-md border border-brand-tint-hover bg-brand-tint px-3 py-2 text-sm text-fg-muted">
-      This proposal is already on the schedule:{" "}
+      <Trans>This proposal is already on the schedule:</Trans>{" "}
       {scheduled.map((session, i) => {
-        const rooms = session.locationIds.flatMap(
-          (id) => snapshot.locations.find((l) => l.id === id)?.name ?? []
+        const rooms = session.locationIds
+          .flatMap(
+            (id) => snapshot.locations.find((l) => l.id === id)?.name ?? []
+          )
+          .join(", ");
+        const when = formatOptionalTime(
+          new Date(session.startTime!),
+          snapshot.event.timezone,
+          `EEEE ${timeFormat}`
         );
         return (
           <Fragment key={session.id}>
@@ -40,12 +49,7 @@ export function ScheduledSessionsNotice({
               href={links.session(session.id)}
               className="text-brand-fg underline transition-colors hover:text-brand-fg-hover"
             >
-              {formatOptionalTime(
-                new Date(session.startTime!),
-                snapshot.event.timezone,
-                `EEEE ${timeFormat}`
-              )}
-              {rooms.length > 0 && ` in ${rooms.join(", ")}`}
+              {rooms ? t`${when} in ${rooms}` : when}
             </a>
           </Fragment>
         );

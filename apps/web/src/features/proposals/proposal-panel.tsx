@@ -1,14 +1,12 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { inSchedPhase, inVotingPhase } from "@schellingboard/domain/phase";
 import type { Session } from "@schellingboard/domain/session";
 import { wantsHost } from "@schellingboard/domain/session";
 import { formatOptionalTime } from "@schellingboard/domain/time";
 import type { VoteChoice } from "@schellingboard/domain/vote";
-import {
-  NO_VOTE_LABEL,
-  voteChoiceToEmoji,
-  voteChoiceToLabel,
-} from "@schellingboard/domain/vote-display";
+import { voteChoiceToEmoji } from "@schellingboard/domain/vote-display";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useTimeFormat } from "../../app/time-format";
@@ -31,6 +29,7 @@ import type { ProposalLinks } from "./links";
 import { phaseTexts } from "./list-model";
 import { ProposalBody } from "./proposal-body";
 import { VoteBreakdown } from "./vote-breakdown";
+import { noVoteLabel, voteLabel } from "./vote-labels";
 import { VoteTally } from "./vote-tally";
 import { VotingButtons } from "./voting-buttons";
 
@@ -66,15 +65,17 @@ export function ProposalPanel({
   const { onClose, onBack, ...details } = rest;
   return (
     <SidePanel
-      label="Proposal details"
-      title={proposal?.title ?? "Proposal details"}
+      label={t`Proposal details`}
+      title={proposal?.title ?? t`Proposal details`}
       onClose={onClose}
       onBack={onBack}
     >
       {proposal ? (
         <Details proposal={proposal} snapshot={snapshot} {...details} />
       ) : (
-        <p>Proposal not found.</p>
+        <p>
+          <Trans>Proposal not found.</Trans>
+        </p>
       )}
     </SidePanel>
   );
@@ -167,10 +168,10 @@ function Details({
         <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-md border border-brand-tint-hover bg-brand-tint px-3 py-2 text-sm text-fg-muted">
           <p className="flex-1 basis-64">
             {proposal.hosts.length === 0
-              ? "Nobody is offering to host this proposal yet. If you could run it, take it on."
-              : "The hosts would like a co-host. Joining lets you edit this proposal with them."}
+              ? t`Nobody is offering to host this proposal yet. If you could run it, take it on.`
+              : t`The hosts would like a co-host. Joining lets you edit this proposal with them.`}
           </p>
-          <Unavailable blocked={!guestId} why="Select a user first">
+          <Unavailable blocked={!guestId} why={t`Select a user first`}>
             <button
               type="button"
               onClick={() => void actions.join(proposal.id)}
@@ -178,8 +179,8 @@ function Details({
             >
               <HandRaisedIcon className="mr-1 h-4 w-4" />
               {proposal.hosts.length === 0
-                ? "Host this proposal"
-                : "Join as co-host"}
+                ? t`Host this proposal`
+                : t`Join as co-host`}
             </button>
           </Unavailable>
         </div>
@@ -189,7 +190,7 @@ function Details({
         <div className="mt-6 flex flex-wrap gap-2">
           <a href={links.edit(proposal.id)} className={ACTION}>
             <PencilIcon className="mr-1 h-3 w-3" />
-            Edit
+            <Trans comment="Button: edit (verb)">Edit</Trans>
           </a>
           <Unavailable blocked={!schedEnabled} why={texts.scheduling}>
             <a
@@ -197,7 +198,12 @@ function Details({
               className={`${ACTION} aria-disabled:cursor-not-allowed aria-disabled:opacity-50`}
             >
               <CalendarIcon className="mr-1 h-3 w-3" />
-              Schedule
+              <Trans
+                context="verb"
+                comment="Button: put this proposal on the schedule"
+              >
+                Schedule
+              </Trans>
             </a>
           </Unavailable>
         </div>
@@ -220,9 +226,9 @@ function Details({
         <div className="mt-6 space-y-3">
           {!isHost && (
             <div className="text-sm text-fg-muted">
-              Your vote:
+              <Trans>Your vote:</Trans>
               <Tooltip
-                content={myVote ? voteChoiceToLabel(myVote) : NO_VOTE_LABEL}
+                content={myVote ? voteLabel(myVote) : noVoteLabel()}
                 toggleable
                 triggerClassName="ml-1"
               >
@@ -230,7 +236,7 @@ function Details({
                   {myVote ? voteChoiceToEmoji(myVote) : "-"}
                 </span>
                 <span className="sr-only">
-                  {myVote ? voteChoiceToLabel(myVote) : NO_VOTE_LABEL}
+                  {myVote ? voteLabel(myVote) : noVoteLabel()}
                 </span>
               </Tooltip>
             </div>
@@ -239,15 +245,15 @@ function Details({
             <VoteBreakdown stats={detail.breakdown} />
           ) : detail?.status === "ready" ? (
             <div className="text-sm text-fg-muted">
-              Total votes:
+              <Trans>Total votes:</Trans>
               <VoteTally tally={detail.tally} className="ml-2" />
             </div>
           ) : (
             detail?.status === "error" && (
               <p className="text-sm text-fg-muted">
-                The votes could not be loaded.{" "}
+                <Trans>The votes could not be loaded.</Trans>{" "}
                 <button type="button" onClick={retry} className="underline">
-                  Try again
+                  <Trans>Try again</Trans>
                 </button>
               </p>
             )
@@ -286,38 +292,59 @@ function Scheduled({
   timezone: string;
 }) {
   const timeFormat = useTimeFormat();
-  const inRooms = (session: Session) =>
-    session.locations.length > 0
-      ? ` in ${session.locations.map((l) => l.name).join(", ")}`
-      : "";
+  const roomNames = (session: Session) =>
+    session.locations.map((l) => l.name).join(", ");
   const link = "text-brand-fg underline hover:text-brand-fg-hover";
+  const once = (session: Session) => {
+    const day = formatOptionalTime(session.startTime, timezone, "EEEE");
+    const time = formatOptionalTime(session.startTime, timezone, timeFormat);
+    const rooms = roomNames(session);
+    const href = links.session(session.id);
+    return rooms ? (
+      <Trans>
+        This proposal was scheduled on{" "}
+        <a href={href} className={link}>
+          {day} at {time} in {rooms}
+        </a>
+        .
+      </Trans>
+    ) : (
+      <Trans>
+        This proposal was scheduled on{" "}
+        <a href={href} className={link}>
+          {day} at {time}
+        </a>
+        .
+      </Trans>
+    );
+  };
+  const manyText = (session: Session) => {
+    const when = formatOptionalTime(
+      session.startTime,
+      timezone,
+      `EEEE ${timeFormat}`
+    );
+    const rooms = roomNames(session);
+    return rooms ? t`${when} in ${rooms}` : when;
+  };
   return (
     <div className="mt-6 text-sm text-fg-muted">
       {sessions.length === 0 ? (
-        <p>This proposal has not been scheduled yet.</p>
-      ) : sessions.length === 1 ? (
         <p>
-          This proposal was scheduled on{" "}
-          <a href={links.session(sessions[0].id)} className={link}>
-            {formatOptionalTime(sessions[0].startTime, timezone, "EEEE")} at{" "}
-            {formatOptionalTime(sessions[0].startTime, timezone, timeFormat)}
-            {inRooms(sessions[0])}
-          </a>
-          .
+          <Trans>This proposal has not been scheduled yet.</Trans>
         </p>
+      ) : sessions.length === 1 ? (
+        <p>{once(sessions[0])}</p>
       ) : (
         <div>
-          <p>This proposal was scheduled several times:</p>
+          <p>
+            <Trans>This proposal was scheduled several times:</Trans>
+          </p>
           <ul className="ml-4 mt-2 space-y-1">
             {sessions.map((session) => (
               <li key={session.id}>
                 <a href={links.session(session.id)} className={link}>
-                  {formatOptionalTime(
-                    session.startTime,
-                    timezone,
-                    `EEEE ${timeFormat}`
-                  )}
-                  {inRooms(session)}
+                  {manyText(session)}
                 </a>
               </li>
             ))}

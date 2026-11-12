@@ -1,13 +1,11 @@
+import { plural, select, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { inSchedPhase, inVotingPhase } from "@schellingboard/domain/phase";
 import { durationMinusBreak } from "@schellingboard/domain/slots";
 import { formatDuration } from "@schellingboard/domain/time";
 import type { VoteChoice } from "@schellingboard/domain/vote";
-import {
-  NO_VOTE_LABEL,
-  voteChoiceToEmoji,
-  voteChoiceToLabel,
-} from "@schellingboard/domain/vote-display";
+import { voteChoiceToEmoji } from "@schellingboard/domain/vote-display";
 import { type ComponentType, useMemo } from "react";
 
 import type { Standing } from "../../queries/proposal-standings";
@@ -53,6 +51,7 @@ import {
   withSort,
 } from "./list-model";
 import { ProposalHelp } from "./proposal-help";
+import { noVoteLabel, voteLabel } from "./vote-labels";
 import { VoteTally } from "./vote-tally";
 import { VotingButtons } from "./voting-buttons";
 
@@ -72,12 +71,18 @@ export type ProposalsScreenProps = {
   ) => void;
 };
 
+const FILTER_MINE = "mine";
+const FILTER_UNVOTED = "unvoted";
+const FILTER_VOTED = "voted";
+const FILTER_HOST_WANTED = "hostWanted";
+
 const LINK = "hover:text-link transition-colors";
 
 export function ProposalsScreen(props: ProposalsScreenProps) {
   const { snapshot, links, now, localZone } = props;
   const event = toEvent(snapshot.event);
   const guestId = snapshot.me?.guestId ?? null;
+  const eventName = snapshot.event.name;
   const texts = phaseTexts(snapshot.event, now, !!guestId, localZone);
   const votingEnabled = !!guestId && inVotingPhase(event, now);
   const schedEnabled = inSchedPhase(event, now);
@@ -89,10 +94,10 @@ export function ProposalsScreen(props: ProposalsScreenProps) {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold">
-            {snapshot.event.name}: Session Proposals
+            <Trans>{eventName}: Session Proposals</Trans>
           </h1>
           <p className="text-fg-muted mt-2">
-            Browse session ideas or add your own proposal
+            <Trans>Browse session ideas or add your own proposal</Trans>
           </p>
           <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center my-6">
             <ActionLink
@@ -100,7 +105,7 @@ export function ProposalsScreen(props: ProposalsScreenProps) {
               enabled={proposingEnabled}
               why={texts.proposing}
               icon={PlusIcon}
-              label="Add Proposal"
+              label={t`Add Proposal`}
             />
             {!schedEnabled && <ProposalHelp event={snapshot.event} />}
             <ActionLink
@@ -108,30 +113,30 @@ export function ProposalsScreen(props: ProposalsScreenProps) {
               enabled={votingEnabled}
               why={texts.voting}
               icon={ChartBarIcon}
-              label="Go to Quick Voting!"
+              label={t`Go to Quick Voting!`}
             />
             <ActionLink
               href={links.schedule}
               enabled
               why=""
               icon={CalendarDaysIcon}
-              label="View Schedule"
+              label={t`View Schedule`}
             />
           </div>
         </div>
         {snapshot.proposals.length === 0 ? (
           <div className="text-center py-12 bg-surface-sunken rounded-lg">
             <h2 className="text-xl font-medium text-fg-muted">
-              No proposals yet
+              <Trans>No proposals yet</Trans>
             </h2>
             <p className="text-fg-subtle mt-2">
-              Be the first to suggest a session!
+              <Trans>Be the first to suggest a session!</Trans>
             </p>
             <a
               href={links.add}
               className="mt-4 inline-block bg-brand text-on-brand px-4 py-2 rounded-md hover:bg-brand-hover"
             >
-              Add Proposal
+              <Trans>Add Proposal</Trans>
             </a>
           </div>
         ) : (
@@ -230,6 +235,7 @@ function ProposalTable({
     paramsUpdater(params, onParamsChange),
     { showTotal: false }
   );
+  const resultCount = shown.length;
   const toggle = (next: Filter) =>
     setFilter(filter === next ? undefined : next);
   const sortBy = (key: SortKey) =>
@@ -272,13 +278,10 @@ function ProposalTable({
   const yourVote = (row: Row) => {
     const choice = votes.get(row.id);
     return (
-      <Tooltip
-        content={choice ? voteChoiceToLabel(choice) : NO_VOTE_LABEL}
-        toggleable
-      >
+      <Tooltip content={choice ? voteLabel(choice) : noVoteLabel()} toggleable>
         <span aria-hidden>{choice ? voteChoiceToEmoji(choice) : "-"}</span>
         <span className="sr-only">
-          {choice ? voteChoiceToLabel(choice) : NO_VOTE_LABEL}
+          {choice ? voteLabel(choice) : noVoteLabel()}
         </span>
       </Tooltip>
     );
@@ -286,14 +289,13 @@ function ProposalTable({
   const filterButton = (
     key: NonNullable<Filter>,
     label: string,
-    describes: string,
     icon: ComponentType<{ className?: string }>,
     available: boolean,
     why: string
   ) => (
     <FilterButton
+      filterKey={key}
       label={label}
-      describes={describes}
       icon={icon}
       available={available}
       why={why}
@@ -308,8 +310,8 @@ function ProposalTable({
       <ListToolbar
         search={
           <SearchInput
-            placeholder="Search proposals..."
-            aria-label="Search proposals"
+            placeholder={t`Search proposals...`}
+            aria-label={t`Search proposals`}
             inputClassName="h-10 px-3 text-base sm:text-sm border border-line rounded-md bg-surface-raised placeholder-fg-subtle focus:ring-2 focus:ring-brand-accent focus:border-transparent"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -319,33 +321,29 @@ function ProposalTable({
         filters={
           <>
             {filterButton(
-              "mine",
-              "My proposals",
-              "your proposals",
+              FILTER_MINE,
+              t`My proposals`,
               UserIcon,
               !!guestId,
-              "Select a user first"
+              t`Select a user first`
             )}
             {filterButton(
-              "unvoted",
-              "Only unvoted",
-              "unvoted proposals",
+              FILTER_UNVOTED,
+              t`Only unvoted`,
               EyeSlashIcon,
               votingEnabled,
               texts.voting
             )}
             {filterButton(
-              "voted",
-              "Only voted",
-              "voted proposals",
+              FILTER_VOTED,
+              t`Only voted`,
               CheckCircleIcon,
               votingEnabled,
               texts.voting
             )}
             {filterButton(
-              "hostWanted",
-              "Host wanted",
-              "proposals that want a host",
+              FILTER_HOST_WANTED,
+              t`Host wanted`,
               HandRaisedIcon,
               true,
               ""
@@ -354,9 +352,9 @@ function ProposalTable({
               <button
                 onClick={() => setFilter(undefined)}
                 className="text-xs text-fg-subtle hover:text-fg-muted px-2 py-1 rounded border border-line bg-surface-raised hover:bg-surface-sunken transition-colors inline-flex items-center gap-1"
-                aria-label="Clear all active filters"
+                aria-label={t`Clear all active filters`}
               >
-                Clear filters
+                <Trans>Clear filters</Trans>
               </button>
             )}
           </>
@@ -364,11 +362,13 @@ function ProposalTable({
         sort={
           <Tooltip
             content={
-              searching ? "Search results are sorted by relevance" : undefined
+              searching ? t`Search results are sorted by relevance` : undefined
             }
             className="flex items-center gap-2"
           >
-            <label htmlFor="proposal-sort">Sort by</label>
+            <label htmlFor="proposal-sort">
+              <Trans>Sort by</Trans>
+            </label>
             <select
               id="proposal-sort"
               disabled={searching}
@@ -390,7 +390,10 @@ function ProposalTable({
             </select>
           </Tooltip>
         }
-        count={`${shown.length} result${shown.length !== 1 ? "s" : ""}`}
+        count={plural(resultCount, {
+          one: "# result",
+          other: "# results",
+        })}
       />
 
       <div className="hidden md:block overflow-x-auto">
@@ -399,7 +402,7 @@ function ProposalTable({
             <tr>
               <SortHeader
                 column="title"
-                label="Title"
+                label={t`Title`}
                 width={schedEnabled ? "w-[18%]" : "w-[20%]"}
                 sort={sort}
                 sorting={!searching}
@@ -407,16 +410,16 @@ function ProposalTable({
               />
               <SortHeader
                 column="hosts"
-                label="Host(s)"
+                label={t`Host(s)`}
                 width="w-[15%]"
                 sort={sort}
                 sorting={!searching}
                 onSort={sortBy}
               />
-              <PlainHeader label="Description" width="w-[20%]" />
+              <PlainHeader label={t`Description`} width="w-[20%]" />
               <SortHeader
                 column="durationMinutes"
-                label="Duration"
+                label={t`Duration`}
                 width="w-[10%]"
                 sort={sort}
                 sorting={!searching}
@@ -424,7 +427,7 @@ function ProposalTable({
               />
               <SortHeader
                 column="userVote"
-                label="Your vote"
+                label={t`Your vote`}
                 width={schedEnabled ? "w-[7%]" : "w-[15%]"}
                 sort={sort}
                 sorting={!searching}
@@ -433,14 +436,14 @@ function ProposalTable({
               {schedEnabled && (
                 <SortHeader
                   column="votes"
-                  label="Votes"
+                  label={t`Votes`}
                   width="w-[10%]"
                   sort={sort}
                   sorting={!searching}
                   onSort={sortBy}
                 />
               )}
-              <PlainHeader label="Actions" width="w-[20%]" />
+              <PlainHeader label={t`Actions`} width="w-[20%]" />
             </tr>
           </thead>
           <tbody className="bg-surface-raised divide-y divide-line-subtle">
@@ -458,7 +461,9 @@ function ProposalTable({
                 <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-fg-subtle">
                   <div className="truncate">
                     {row.hosts.length === 0 ? (
-                      <span className="italic">No host yet</span>
+                      <span className="italic">
+                        <Trans>No host yet</Trans>
+                      </span>
                     ) : (
                       row.hosts.map((h, i) => (
                         <span key={h.id}>
@@ -474,7 +479,9 @@ function ProposalTable({
                     )}
                   </div>
                   {row.cohostWanted && (
-                    <div className="text-xs italic">Co-host wanted</div>
+                    <div className="text-xs italic">
+                      <Trans>Co-host wanted</Trans>
+                    </div>
                   )}
                 </td>
                 <td className="px-4 lg:px-6 py-4">
@@ -521,7 +528,7 @@ function ProposalTable({
                   colSpan={schedEnabled ? 7 : 6}
                   className="px-4 lg:px-6 py-4 text-center text-sm text-fg-subtle"
                 >
-                  No proposals found
+                  <Trans>No proposals found</Trans>
                 </td>
               </tr>
             )}
@@ -530,68 +537,78 @@ function ProposalTable({
       </div>
 
       <div className="block md:hidden space-y-4">
-        {visible.map((row) => (
-          <div
-            key={row.id}
-            className="bg-surface-raised border border-line-subtle rounded-lg p-4 hover:bg-surface-sunken relative"
-          >
-            <div className="space-y-3">
-              <div>
-                <h3 className="text-base font-medium text-fg">
-                  <a
-                    href={links.view(row.id)}
-                    className={cx(LINK, "after:absolute after:inset-0")}
-                  >
-                    {row.title}
-                  </a>
-                </h3>
-                <p className="text-sm text-fg-subtle mt-1">
-                  {row.hosts.length === 0 ? (
-                    <span className="italic">No host yet</span>
-                  ) : (
-                    `Host(s): ${row.hostNames.join(", ")}`
-                  )}
-                  {row.cohostWanted && (
-                    <span className="italic"> · Co-host wanted</span>
-                  )}
-                </p>
-              </div>
-              {row.plainDescription ? (
-                <p className="text-sm text-fg-muted line-clamp-3">
-                  {row.plainDescription}
-                </p>
-              ) : (
-                <p className="text-sm text-fg-subtle">-</p>
-              )}
-              <Duration text={duration(row)} />
-              <div className="pt-2 border-t border-line-subtle space-y-3">
-                {!schedEnabled && (
-                  <div className="relative z-10">{voteControls(row)}</div>
-                )}
-                {schedEnabled && (
-                  <>
-                    {!canEdit(row) && (
-                      <div className="relative z-10">
-                        Your vote:
-                        <span className="ml-1">{yourVote(row)}</span>
-                      </div>
+        {visible.map((row) => {
+          const hostNames = row.hostNames.join(", ");
+          return (
+            <div
+              key={row.id}
+              className="bg-surface-raised border border-line-subtle rounded-lg p-4 hover:bg-surface-sunken relative"
+            >
+              <div className="space-y-3">
+                <div>
+                  <h3 className="text-base font-medium text-fg">
+                    <a
+                      href={links.view(row.id)}
+                      className={cx(LINK, "after:absolute after:inset-0")}
+                    >
+                      {row.title}
+                    </a>
+                  </h3>
+                  <p className="text-sm text-fg-subtle mt-1">
+                    {row.hosts.length === 0 ? (
+                      <span className="italic">
+                        <Trans>No host yet</Trans>
+                      </span>
+                    ) : (
+                      t`Host(s): ${hostNames}`
                     )}
-                    <div className="relative z-10 flex items-center gap-2">
-                      Total votes:
-                      <VoteTally tally={standings.get(row.id)?.tally ?? null} />
-                    </div>
-                  </>
+                    {row.cohostWanted && (
+                      <span className="italic">
+                        {" "}
+                        <Trans>· Co-host wanted</Trans>
+                      </span>
+                    )}
+                  </p>
+                </div>
+                {row.plainDescription ? (
+                  <p className="text-sm text-fg-muted line-clamp-3">
+                    {row.plainDescription}
+                  </p>
+                ) : (
+                  <p className="text-sm text-fg-subtle">-</p>
                 )}
-                <div className="flex gap-2 relative z-10">
-                  {actions(row, false)}
+                <Duration text={duration(row)} />
+                <div className="pt-2 border-t border-line-subtle space-y-3">
+                  {!schedEnabled && (
+                    <div className="relative z-10">{voteControls(row)}</div>
+                  )}
+                  {schedEnabled && (
+                    <>
+                      {!canEdit(row) && (
+                        <div className="relative z-10">
+                          <Trans>Your vote:</Trans>
+                          <span className="ml-1">{yourVote(row)}</span>
+                        </div>
+                      )}
+                      <div className="relative z-10 flex items-center gap-2">
+                        <Trans>Total votes:</Trans>
+                        <VoteTally
+                          tally={standings.get(row.id)?.tally ?? null}
+                        />
+                      </div>
+                    </>
+                  )}
+                  <div className="flex gap-2 relative z-10">
+                    {actions(row, false)}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
         {shown.length === 0 && (
           <div className="text-center py-8 text-sm text-fg-subtle">
-            No proposals found
+            <Trans>No proposals found</Trans>
           </div>
         )}
       </div>
@@ -636,7 +653,12 @@ function RowActions({
         className={cx(css, !schedEnabled && "opacity-50 cursor-not-allowed")}
       >
         <CalendarIcon className={icon} />
-        Schedule
+        <Trans
+          context="verb"
+          comment="Button: put this proposal on the schedule"
+        >
+          Schedule
+        </Trans>
       </a>
     </Unavailable>
   );
@@ -644,7 +666,7 @@ function RowActions({
     <>
       <a href={edit} className={css}>
         <PencilIcon className={icon} />
-        Edit
+        <Trans comment="Button: edit (verb)">Edit</Trans>
       </a>
       {scheduleLink}
     </>
@@ -652,8 +674,8 @@ function RowActions({
 }
 
 function FilterButton({
+  filterKey,
   label,
-  describes,
   icon: Icon,
   available,
   why,
@@ -661,8 +683,8 @@ function FilterButton({
   count,
   onClick,
 }: {
+  filterKey: NonNullable<Filter>;
   label: string;
-  describes: string;
   icon: ComponentType<{ className?: string }>;
   available: boolean;
   why: string;
@@ -682,7 +704,13 @@ function FilterButton({
         )}
         onClick={onClick}
         aria-pressed={active}
-        aria-label={`Filter to show only ${describes}`}
+        aria-label={t`Filter to show only ${select(filterKey, {
+          mine: "your proposals",
+          unvoted: "unvoted proposals",
+          voted: "voted proposals",
+          hostWanted: "proposals that want a host",
+          other: "",
+        })}`}
       >
         <Icon className="h-4 w-4" />
         {label}

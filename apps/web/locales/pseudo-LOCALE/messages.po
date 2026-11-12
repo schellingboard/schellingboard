@@ -15,6 +15,10 @@ msgstr ""
 msgid "— hidden by you"
 msgstr ""
 
+#: src/features/proposals/proposals-screen.tsx:568
+msgid "· Co-host wanted"
+msgstr ""
+
 #: src/features/schedule/day-fold-bar.tsx:43
 msgid "· day has passed · hide"
 msgstr ""
@@ -70,6 +74,10 @@ msgstr ""
 msgid "{0} phase: {what}"
 msgstr ""
 
+#: src/features/proposals/vote-tally.tsx:9
+msgid "{choice, select, interested {{count, plural, one {# interested vote} other {# interested votes}}} maybe {{count, plural, one {# maybe vote} other {# maybe votes}}} other {}}"
+msgstr ""
+
 #: src/features/schedule/meetings-col.tsx:200
 msgid "{clashes} during this slot"
 msgstr ""
@@ -111,6 +119,22 @@ msgstr ""
 msgid "{count, plural, one {There is a problem to fix:} other {There are # problems to fix:}}"
 msgstr ""
 
+#: src/features/proposals/vote-breakdown.tsx:49
+msgid "{emoji} {choice, select, interested {Interested} maybe {Maybe} skip {Skip} other {}}: {count}"
+msgstr ""
+
+#: src/features/proposals/vote-breakdown.tsx:50
+msgid "{emoji} {choice, select, interested {Interested} maybe {Maybe} skip {Skip} other {}}: {count} ({percent}% of votes)"
+msgstr ""
+
+#: src/features/proposals/quick-voting-screen.tsx:87
+msgid "{eventName} Quick Voting"
+msgstr ""
+
+#: src/features/proposals/proposals-screen.tsx:97
+msgid "{eventName}: Session Proposals"
+msgstr ""
+
 #: src/features/meetings/meeting-request-fields.tsx:227
 msgid "{joined} during this time — book it anyway?"
 msgstr ""
@@ -133,6 +157,10 @@ msgstr ""
 
 #: src/features/meetings/meeting-panel.tsx:138
 msgid "{otherName} will be told. Cancel it?"
+msgstr ""
+
+#: src/features/proposals/proposals-screen.tsx:393
+msgid "{resultCount, plural, one {# result} other {# results}}"
 msgstr ""
 
 #: src/ui/data-table.tsx:53
@@ -169,6 +197,15 @@ msgstr ""
 
 #: src/ui/charts/heatmap.tsx:67
 msgid "{valueLabel}: 0 to {max}"
+msgstr ""
+
+#: src/features/proposals/proposal-panel.tsx:328
+#: src/features/proposals/scheduled-sessions-notice.tsx:52
+msgid "{when} in {rooms}"
+msgstr ""
+
+#: src/features/proposals/quick-voting-screen.tsx:49
+msgid "← Proposals"
 msgstr ""
 
 #: src/features/meetings/book-meeting.tsx:61
@@ -268,12 +305,25 @@ msgstr ""
 msgid "Accept"
 msgstr ""
 
+#: src/features/proposals/proposals-screen.tsx:446
+msgid "Actions"
+msgstr ""
+
 #: src/features/meetings/meeting-request-fields.tsx:141
 msgid "Add a line of context (optional)"
 msgstr ""
 
+#: src/features/proposals/proposals-screen.tsx:108
+#: src/features/proposals/proposals-screen.tsx:139
+msgid "Add Proposal"
+msgstr ""
+
 #: src/features/schedule/session-block.tsx:109
 msgid "Add session"
+msgstr ""
+
+#: src/features/proposals/proposal-form.tsx:208
+msgid "Add Session Proposal"
 msgstr ""
 
 #: src/features/schedule/schedule-toolbar.tsx:46
@@ -387,6 +437,10 @@ msgstr ""
 msgid "Back to the events"
 msgstr ""
 
+#: src/features/proposals/proposals-screen.tsx:133
+msgid "Be the first to suggest a session!"
+msgstr ""
+
 #: src/features/schedule/session-panel.tsx:234
 msgid "Become host"
 msgstr ""
@@ -411,6 +465,10 @@ msgstr ""
 msgid "Bookmarked"
 msgstr ""
 
+#: src/features/proposals/proposals-screen.tsx:100
+msgid "Browse session ideas or add your own proposal"
+msgstr ""
+
 #: src/ui/data-table.tsx:47
 msgid "Bulk actions"
 msgstr ""
@@ -422,6 +480,8 @@ msgstr ""
 
 #: src/features/meetings/meeting-request-fields.tsx:157
 #: src/features/notifications/notifications-screen.tsx:232
+#: src/features/proposals/proposal-form.tsx:352
+#: src/features/proposals/proposal-form.tsx:365
 msgid "Cancel"
 msgstr ""
 
@@ -432,6 +492,10 @@ msgstr ""
 #. State of a 1-on-1 on the grid, lower case
 #: src/features/schedule/meeting-rules.ts:119
 msgid "canceled"
+msgstr ""
+
+#: src/features/proposals/proposal-form.tsx:228
+msgid "Changes here do not reach the schedule. To change a session, open it and edit it there."
 msgstr ""
 
 #: src/features/settings/push-notifications.tsx:264
@@ -472,8 +536,16 @@ msgctxt "Bulk actions: clear the selection"
 msgid "Clear"
 msgstr ""
 
+#: src/features/proposals/proposals-screen.tsx:355
+msgid "Clear all active filters"
+msgstr ""
+
 #: src/features/meetings/availability-form.tsx:148
 msgid "Clear all slots on {dayLabel}"
+msgstr ""
+
+#: src/features/proposals/proposals-screen.tsx:357
+msgid "Clear filters"
 msgstr ""
 
 #: src/ui/search-input.tsx:37
@@ -499,6 +571,10 @@ msgstr ""
 
 #: src/features/schedule/session-panel.tsx:198
 msgid "Closed Session"
+msgstr ""
+
+#: src/features/proposals/proposals-screen.tsx:483
+msgid "Co-host wanted"
 msgstr ""
 
 #: src/app/theme.tsx:104
@@ -602,6 +678,8 @@ msgstr ""
 
 #: src/features/notifications/notifications-screen.tsx:174
 #: src/features/notifications/notifications-screen.tsx:230
+#: src/features/proposals/proposal-form.tsx:344
+#: src/features/proposals/proposal-form.tsx:364
 msgid "Delete"
 msgstr ""
 
@@ -609,8 +687,26 @@ msgstr ""
 msgid "Delete notifications"
 msgstr ""
 
+#: src/features/proposals/proposal-form.tsx:362
+msgid "Delete session proposal?"
+msgstr ""
+
+#: src/features/proposals/proposal-form.tsx:256
+msgid "Describe what your session will cover"
+msgstr ""
+
+#: src/features/proposals/proposal-form.tsx:252
+#: src/features/proposals/proposals-screen.tsx:419
 #: src/features/schedule/session-panel.tsx:360
 msgid "Description"
+msgstr ""
+
+#: src/features/proposals/vote-breakdown.tsx:66
+msgid "Did not vote: {nonVoters, plural, one {# attendee} other {# attendees}}"
+msgstr ""
+
+#: src/features/proposals/vote-breakdown.tsx:67
+msgid "Did not vote: {nonVoters, plural, one {# attendee} other {# attendees}} ({nonVotersPercent}%)"
 msgstr ""
 
 #: src/ui/use-discard-guard.tsx:90
@@ -629,10 +725,35 @@ msgstr ""
 msgid "Dots are the model's midpoint, thick bars its 50% range, thin bars its 80% range. On the dashed line the prediction was exact. The model was fitted on one event, n = 13."
 msgstr ""
 
+#: src/features/proposals/proposal-form.tsx:300
+#: src/features/proposals/proposals-screen.tsx:422
+msgid "Duration"
+msgstr ""
+
+#: src/features/proposals/list-model.ts:214
+msgid "Duration ↑"
+msgstr ""
+
+#: src/features/proposals/list-model.ts:213
+msgid "Duration ↓"
+msgstr ""
+
+#: src/features/proposals/proposal-body.tsx:67
+msgid "Duration: {duration}"
+msgstr ""
+
 #: src/features/schedule/session-panel.tsx:323
 msgid "During {momentTitle} ({momentStart}–{momentEnd})"
 msgstr ""
 
+#: src/features/proposals/proposal-form.tsx:290
+msgid "e.g. someone to take over, or a second facilitator"
+msgstr ""
+
+#. Button: edit (verb)
+#. Button: edit (verb)
+#: src/features/proposals/proposal-panel.tsx:193
+#: src/features/proposals/proposals-screen.tsx:669
 #: src/features/schedule/session-panel.tsx:239
 msgid "Edit"
 msgstr ""
@@ -644,6 +765,10 @@ msgstr ""
 
 #: src/app/user-menu.tsx:107
 msgid "Edit profile"
+msgstr ""
+
+#: src/features/proposals/proposal-form.tsx:208
+msgid "Edit Session Proposal"
 msgstr ""
 
 #: src/features/settings/email-settings-form.tsx:91
@@ -662,6 +787,10 @@ msgstr ""
 #. placeholder {0}: when(end)
 #: src/ui/phase-bar.tsx:75
 msgid "Ends {0}."
+msgstr ""
+
+#: src/features/proposals/proposal-form.tsx:248
+msgid "Enter a clear, descriptive title"
 msgstr ""
 
 #: src/features/settings/email-settings-form.tsx:114
@@ -707,8 +836,16 @@ msgstr ""
 msgid "Failed to resize image"
 msgstr ""
 
+#: src/features/proposals/list-model.ts:207
+msgid "Fewest votes first"
+msgstr ""
+
 #: src/features/schedule/schedule-filters.tsx:120
 msgid "Filter sessions"
+msgstr ""
+
+#: src/features/proposals/proposals-screen.tsx:707
+msgid "Filter to show only {filterKey, select, mine {your proposals} unvoted {unvoted proposals} voted {voted proposals} hostWanted {proposals that want a host} other {}}"
 msgstr ""
 
 #: src/ui/list-toolbar.tsx:21
@@ -740,6 +877,10 @@ msgstr ""
 msgid "Full changelog on GitHub"
 msgstr ""
 
+#: src/features/proposals/proposals-screen.tsx:116
+msgid "Go to Quick Voting!"
+msgstr ""
+
 #: src/app/error-boundary.tsx:52
 msgid "Go to the events"
 msgstr ""
@@ -768,8 +909,33 @@ msgstr ""
 msgid "Hides this session on your schedule, for you only. Use it if you are not interested or for any other reason. You can show it again here."
 msgstr ""
 
+#: src/features/proposals/proposal-panel.tsx:182
+msgid "Host this proposal"
+msgstr ""
+
+#: src/features/proposals/proposals-screen.tsx:346
+msgid "Host wanted"
+msgstr ""
+
+#: src/features/proposals/proposal-form.tsx:261
+#: src/features/proposals/proposals-screen.tsx:413
+msgid "Host(s)"
+msgstr ""
+
+#: src/features/proposals/list-model.ts:212
+msgid "Host(s) ↑"
+msgstr ""
+
+#: src/features/proposals/list-model.ts:211
+msgid "Host(s) ↓"
+msgstr ""
+
 #: src/features/schedule/session-panel.tsx:284
 msgid "Host(s):"
+msgstr ""
+
+#: src/features/proposals/proposals-screen.tsx:563
+msgid "Host(s): {hostNames}"
 msgstr ""
 
 #: src/features/schedule/session-block.tsx:182
@@ -796,8 +962,21 @@ msgstr ""
 msgid "I'm open to 1-on-1s at this event"
 msgstr ""
 
+#: src/features/proposals/vote-breakdown.tsx:21
+msgid "If you decide to host this as a session, expect <0>{kind, select, same {{low, plural, one {# person} other {# people}}} other {{high, plural, one {{low}–# person} other {{low}–# people}}}}</0>. Treat that as a very rough guess: it comes from a formula worked out on a single event, from what a handful of hosts there remembered about how many people turned up. It can be well out in either direction — use it to pick a room, nothing more. Future SchellingBoard versions should do better, as we incorporate more event feedback."
+msgstr ""
+
 #: src/app/footer.tsx:153
 msgid "In this build, but not in a released version yet."
+msgstr ""
+
+#. Vote option on a session proposal
+#: src/features/proposals/vote-labels.ts:7
+msgid "Interested"
+msgstr ""
+
+#: src/features/proposals/proposal-panel.tsx:183
+msgid "Join as co-host"
 msgstr ""
 
 #: src/features/schedule/schedule-toolbar.tsx:108
@@ -826,6 +1005,10 @@ msgstr ""
 msgid "Last page"
 msgstr ""
 
+#: src/features/proposals/proposal-form.tsx:263
+msgid "Leave empty to ask for a session without offering to give it yourself — anyone who can host it may add themselves here later."
+msgstr ""
+
 #: src/features/meetings/meeting-request-fields.tsx:28
 #: src/features/meetings/meeting-request-fields.tsx:30
 msgid "Length"
@@ -840,9 +1023,17 @@ msgstr ""
 msgid "Link copied"
 msgstr ""
 
+#: src/features/proposals/proposal-form.tsx:279
+msgid "Lists the proposal under “Host wanted” and lets anyone join as a co-host. Stops as soon as someone joins."
+msgstr ""
+
 #: src/app/sync-indicator.tsx:9
 msgctxt "Connection status: up to date"
 msgid "Live"
+msgstr ""
+
+#: src/features/proposals/quick-voting-screen.tsx:96
+msgid "Loading proposals..."
 msgstr ""
 
 #: src/app/event-page.tsx:152
@@ -868,6 +1059,15 @@ msgstr ""
 msgid "Logging out..."
 msgstr ""
 
+#: src/features/proposals/proposal-body.tsx:58
+#: src/features/proposals/proposal-form.tsx:277
+msgid "Looking for a co-host"
+msgstr ""
+
+#: src/features/proposals/proposal-body.tsx:57
+msgid "Looking for a co-host: {cohostNote}"
+msgstr ""
+
 #: src/app/map-button.tsx:36
 #: src/app/map-button.tsx:37
 msgid "Map"
@@ -888,6 +1088,11 @@ msgstr ""
 msgid "max {capacity}"
 msgstr ""
 
+#. Vote option on a session proposal
+#: src/features/proposals/vote-labels.ts:12
+msgid "Maybe"
+msgstr ""
+
 #: src/app/nav-bar.tsx:63
 msgid "Menu"
 msgstr ""
@@ -902,6 +1107,10 @@ msgstr ""
 
 #: src/app/user-menu.tsx:99
 msgid "My profile"
+msgstr ""
+
+#: src/features/proposals/proposals-screen.tsx:325
+msgid "My proposals"
 msgstr ""
 
 #: src/features/schedule/schedule-filters.tsx:281
@@ -926,6 +1135,12 @@ msgstr ""
 
 #: src/app/user-menu.tsx:237
 msgid "Names"
+msgstr ""
+
+#: src/features/proposals/proposal-help.tsx:18
+#: src/features/proposals/proposal-help.tsx:22
+#: src/features/proposals/proposal-help.tsx:23
+msgid "Need ideas?"
 msgstr ""
 
 #: src/features/schedule/meeting-rules.ts:105
@@ -956,6 +1171,15 @@ msgstr ""
 msgid "No events found."
 msgstr ""
 
+#: src/features/proposals/proposals-screen.tsx:465
+#: src/features/proposals/proposals-screen.tsx:560
+msgid "No host yet"
+msgstr ""
+
+#: src/features/proposals/proposal-body.tsx:37
+msgid "No host yet — someone would like to see this offered"
+msgstr ""
+
 #: src/features/schedule/session-block.tsx:235
 msgid "No hosts"
 msgstr ""
@@ -964,8 +1188,22 @@ msgstr ""
 msgid "No matching sessions"
 msgstr ""
 
+#: src/features/proposals/proposals-screen.tsx:531
+#: src/features/proposals/proposals-screen.tsx:611
+msgid "No proposals found"
+msgstr ""
+
+#: src/features/proposals/proposals-screen.tsx:130
+msgid "No proposals yet"
+msgstr ""
+
 #: src/features/schedule/day-agenda.tsx:105
 msgid "No sessions"
+msgstr ""
+
+#. Shown where the viewer has not voted on a proposal
+#: src/features/proposals/vote-labels.ts:25
+msgid "No vote"
 msgstr ""
 
 #: src/features/schedule/meeting-rules.ts:174
@@ -974,6 +1212,14 @@ msgstr ""
 
 #: src/features/meetings/book-meeting.tsx:136
 msgid "Nobody has marked this time free."
+msgstr ""
+
+#: src/features/proposals/proposal-panel.tsx:171
+msgid "Nobody is offering to host this proposal yet. If you could run it, take it on."
+msgstr ""
+
+#: src/features/proposals/vote-breakdown.tsx:118
+msgid "Nobody voted {interestedEmoji} Interested, and that is the only signal there is to guess attendance from."
 msgstr ""
 
 #: src/features/people/open-up-nudge.tsx:40
@@ -1052,8 +1298,20 @@ msgstr ""
 msgid "On iPhone and iPad this works once the site is on your home screen: tap the Share button, then <0>Add to Home Screen</0>, and open it from there."
 msgstr ""
 
+#: src/features/proposals/proposal-form.tsx:74
+msgid "Only a host of this proposal can edit it."
+msgstr ""
+
 #: src/features/meetings/book-meeting.tsx:198
 msgid "Only people who marked this time free are listed. Nobody is told you looked."
+msgstr ""
+
+#: src/features/proposals/proposals-screen.tsx:332
+msgid "Only unvoted"
+msgstr ""
+
+#: src/features/proposals/proposals-screen.tsx:339
+msgid "Only voted"
 msgstr ""
 
 #: src/features/schedule/day-grid.tsx:136
@@ -1104,6 +1362,10 @@ msgstr ""
 msgid "Pick one or type any text"
 msgstr ""
 
+#: src/features/proposals/quick-voting-screen.tsx:57
+msgid "Please choose who you are first."
+msgstr ""
+
 #: src/app/footer.tsx:87
 msgid "Powered by"
 msgstr ""
@@ -1128,9 +1390,29 @@ msgstr ""
 msgid "Profile not found, please log in again."
 msgstr ""
 
+#: src/features/proposals/list-model.ts:241
+msgid "Proposal and voting phases are over"
+msgstr ""
+
+#: src/features/proposals/proposal-panel.tsx:68
+#: src/features/proposals/proposal-panel.tsx:69
+msgid "Proposal details"
+msgstr ""
+
+#: src/features/proposals/proposal-form.tsx:65
+#: src/features/proposals/proposal-panel.tsx:77
+msgid "Proposal not found."
+msgstr ""
+
+#: src/features/proposals/proposal-form.tsx:82
+#: src/features/proposals/proposal-form.tsx:204
 #: src/features/schedule/schedule-toolbar.tsx:130
 #: src/ui/phase-bar.tsx:16
 msgid "Proposals"
+msgstr ""
+
+#: src/features/proposals/list-model.ts:205
+msgid "Recently updated"
 msgstr ""
 
 #: src/app/sync-indicator.tsx:10
@@ -1215,6 +1497,14 @@ msgstr ""
 msgid "Say why, if you like (optional)"
 msgstr ""
 
+#. Button: put this proposal on the schedule
+#. Button: put this proposal on the schedule
+#: src/features/proposals/proposal-panel.tsx:201
+#: src/features/proposals/proposals-screen.tsx:656
+msgctxt "verb"
+msgid "Schedule"
+msgstr ""
+
 #: src/features/schedule/schedule-toolbar.tsx:84
 msgid "Schedule view"
 msgstr ""
@@ -1231,6 +1521,10 @@ msgstr ""
 msgid "Scheduling has ended"
 msgstr ""
 
+#: src/features/proposals/list-model.ts:256
+msgid "Scheduling is not enabled"
+msgstr ""
+
 #: src/features/schedule/day-grid.tsx:83
 msgid "Scheduling is not open. You can only browse the schedule."
 msgstr ""
@@ -1240,8 +1534,24 @@ msgstr ""
 msgid "Scheduling opens {0}. Until then you can only browse the schedule."
 msgstr ""
 
+#: src/features/proposals/list-model.ts:255
+msgid "Scheduling will be enabled at {schedulingAt}"
+msgstr ""
+
 #: src/ui/data-table.tsx:137
 msgid "Search"
+msgstr ""
+
+#: src/features/proposals/proposals-screen.tsx:314
+msgid "Search proposals"
+msgstr ""
+
+#: src/features/proposals/proposals-screen.tsx:313
+msgid "Search proposals..."
+msgstr ""
+
+#: src/features/proposals/proposals-screen.tsx:365
+msgid "Search results are sorted by relevance"
 msgstr ""
 
 #: src/features/schedule/schedule-filters.tsx:106
@@ -1261,6 +1571,13 @@ msgstr ""
 
 #: src/features/notifications/notifications-screen.tsx:276
 msgid "Select {text}"
+msgstr ""
+
+#: src/features/proposals/list-model.ts:244
+#: src/features/proposals/list-model.ts:253
+#: src/features/proposals/proposal-panel.tsx:174
+#: src/features/proposals/proposals-screen.tsx:328
+msgid "Select a user first"
 msgstr ""
 
 #: src/features/meetings/availability-form.tsx:142
@@ -1310,6 +1627,10 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
+#: src/features/proposals/proposal-form.tsx:211
+msgid "Share your session idea with the community. Only the title is required."
+msgstr ""
+
 #: src/features/schedule/day-agenda.tsx:350
 msgid "Shared moment: {title}"
 msgstr ""
@@ -1340,6 +1661,11 @@ msgstr ""
 
 #: src/features/schedule/session-panel.tsx:257
 msgid "Shows this session on your schedule again."
+msgstr ""
+
+#. Vote option on a session proposal: not interested
+#: src/features/proposals/vote-labels.ts:17
+msgid "Skip"
 msgstr ""
 
 #: src/app/layout.tsx:19
@@ -1386,6 +1712,10 @@ msgstr ""
 msgid "Sorry — my session moved…"
 msgstr ""
 
+#: src/features/proposals/proposals-screen.tsx:370
+msgid "Sort by"
+msgstr ""
+
 #. placeholder {0}: when(start)
 #: src/ui/phase-bar.tsx:73
 msgid "Started {0}."
@@ -1398,6 +1728,14 @@ msgstr ""
 
 #: src/features/schedule/match-stepper.tsx:25
 msgid "Step through matches"
+msgstr ""
+
+#: src/features/proposals/proposal-form.tsx:355
+msgid "Submit"
+msgstr ""
+
+#: src/features/proposals/proposal-form.tsx:355
+msgid "Submitting..."
 msgstr ""
 
 #: src/app/theme.tsx:84
@@ -1422,12 +1760,28 @@ msgstr ""
 msgid "The events could not be loaded."
 msgstr ""
 
+#: src/features/proposals/proposal-panel.tsx:172
+msgid "The hosts would like a co-host. Joining lets you edit this proposal with them."
+msgstr ""
+
 #: src/features/meetings/availability-form.tsx:121
 msgid "The organizer hasn't set up any days with 1-on-1 slots yet."
 msgstr ""
 
+#: src/features/proposals/proposal-panel.tsx:254
+msgid "The votes could not be loaded."
+msgstr ""
+
+#: src/features/proposals/list-model.ts:246
+msgid "The voting phase is over"
+msgstr ""
+
 #: src/ui/form-error-summary.tsx:36
 msgid "There is a problem:"
+msgstr ""
+
+#: src/features/proposals/vote-breakdown.tsx:123
+msgid "There is nothing to measure this against yet — guessing at attendance needs the event's attendee list and {interestedEmoji} votes on its other proposals."
 msgstr ""
 
 #: src/features/schedule/day-agenda.tsx:404
@@ -1440,6 +1794,10 @@ msgstr ""
 
 #: src/features/settings/push-notifications.tsx:279
 msgid "This browser can’t show notifications. You’ll still see everything on the notifications page."
+msgstr ""
+
+#: src/features/proposals/proposal-form.tsx:363
+msgid "This cannot be undone."
 msgstr ""
 
 #: src/features/settings/push-notifications.tsx:354
@@ -1456,6 +1814,26 @@ msgstr ""
 
 #: src/features/schedule/session-panel.tsx:201
 msgid "This is a closed session, meaning you can at most arrive 5 minutes late. If you arrive later you may not join and please do not knock or otherwise disrupt the session."
+msgstr ""
+
+#: src/features/proposals/proposal-panel.tsx:334
+msgid "This proposal has not been scheduled yet."
+msgstr ""
+
+#: src/features/proposals/scheduled-sessions-notice.tsx:33
+msgid "This proposal is already on the schedule:"
+msgstr ""
+
+#: src/features/proposals/proposal-panel.tsx:304
+msgid "This proposal was scheduled on <0>{day} at {time} in {rooms}</0>."
+msgstr ""
+
+#: src/features/proposals/proposal-panel.tsx:312
+msgid "This proposal was scheduled on <0>{day} at {time}</0>."
+msgstr ""
+
+#: src/features/proposals/proposal-panel.tsx:341
+msgid "This proposal was scheduled several times:"
 msgstr ""
 
 #: src/app/error-boundary.tsx:31
@@ -1495,10 +1873,33 @@ msgstr ""
 msgid "Times like {example}"
 msgstr ""
 
+#: src/features/proposals/proposal-form.tsx:242
+#: src/features/proposals/proposals-screen.tsx:405
+msgid "Title"
+msgstr ""
+
+#: src/features/proposals/list-model.ts:210
+msgid "Title ↑"
+msgstr ""
+
+#: src/features/proposals/list-model.ts:209
+msgid "Title ↓"
+msgstr ""
+
+#: src/features/proposals/vote-breakdown.tsx:113
+msgid "Too few attendees voted to guess at attendance — fewer than {minTurnout}% of them did, so a couple of votes either way would decide the number."
+msgstr ""
+
+#: src/features/proposals/proposal-panel.tsx:248
+#: src/features/proposals/proposals-screen.tsx:594
+msgid "Total votes:"
+msgstr ""
+
 #: src/app/error-boundary.tsx:39
 #: src/app/event-page.tsx:167
 #: src/app/panel-host.tsx:88
 #: src/features/notifications/notifications-screen.tsx:217
+#: src/features/proposals/proposal-panel.tsx:256
 msgid "Try again"
 msgstr ""
 
@@ -1551,6 +1952,10 @@ msgstr ""
 msgid "Unavailable"
 msgstr ""
 
+#: src/features/proposals/proposal-form.tsx:320
+msgid "Undecided"
+msgstr ""
+
 #: src/app/footer.tsx:44
 msgid "unknown"
 msgstr ""
@@ -1576,6 +1981,14 @@ msgstr ""
 msgid "View event"
 msgstr ""
 
+#: src/features/proposals/proposals-screen.tsx:123
+msgid "View Schedule"
+msgstr ""
+
+#: src/features/proposals/vote-breakdown.tsx:93
+msgid "Vote breakdown"
+msgstr ""
+
 #: src/ui/phase-bar.tsx:29
 msgid "Vote counts show, sessions are scheduled, and attendees RSVP and book 1-on-1s."
 msgstr ""
@@ -1584,8 +1997,36 @@ msgstr ""
 msgid "Vote counts show, sessions are scheduled, and attendees RSVP."
 msgstr ""
 
+#: src/features/proposals/proposals-screen.tsx:439
+msgid "Votes"
+msgstr ""
+
+#: src/features/proposals/list-model.ts:220
+msgid "Votes ↑"
+msgstr ""
+
+#: src/features/proposals/list-model.ts:219
+msgid "Votes ↓"
+msgstr ""
+
+#: src/features/proposals/vote-breakdown.tsx:62
+msgid "Votes: {votes} of {attendees, plural, one {# attendee} other {# attendees}}"
+msgstr ""
+
+#: src/features/proposals/vote-breakdown.tsx:63
+msgid "Votes: {votes} of {attendees, plural, one {# attendee} other {# attendees}} ({votesPercent}%)"
+msgstr ""
+
 #: src/ui/phase-bar.tsx:17
 msgid "Voting"
+msgstr ""
+
+#: src/features/proposals/list-model.ts:250
+msgid "Voting is not enabled"
+msgstr ""
+
+#: src/features/proposals/list-model.ts:249
+msgid "Voting will be enabled at {votingAt}"
 msgstr ""
 
 #: src/features/schedule/meeting-rules.ts:162
@@ -1620,6 +2061,10 @@ msgstr ""
 
 #: src/features/meetings/availability-form.tsx:99
 msgid "While this is off, nobody can book you and you won't appear as bookable."
+msgstr ""
+
+#: src/features/proposals/proposal-form.tsx:285
+msgid "Who are you looking for?"
 msgstr ""
 
 #: src/app/user-menu.tsx:209
@@ -1665,6 +2110,14 @@ msgstr ""
 msgid "You have RSVP'd to this session"
 msgstr ""
 
+#: src/features/proposals/quick-voting-screen.tsx:90
+msgid "You have voted on {votedCount} / {votableCount} proposals"
+msgstr ""
+
+#: src/features/proposals/quick-voting-screen.tsx:128
+msgid "You have voted on all proposals. Go to the overview to change your votes."
+msgstr ""
+
 #: src/features/schedule/clashes.ts:79
 msgid "your 1-on-1 with {otherName}"
 msgstr ""
@@ -1688,6 +2141,23 @@ msgstr ""
 
 #: src/features/meetings/meeting-request-fields.tsx:194
 msgid "Your request to ask {name}: {error}"
+msgstr ""
+
+#: src/features/proposals/proposals-screen.tsx:430
+msgid "Your vote"
+msgstr ""
+
+#: src/features/proposals/list-model.ts:216
+msgid "Your vote ↑"
+msgstr ""
+
+#: src/features/proposals/list-model.ts:215
+msgid "Your vote ↓"
+msgstr ""
+
+#: src/features/proposals/proposal-panel.tsx:229
+#: src/features/proposals/proposals-screen.tsx:589
+msgid "Your vote:"
 msgstr ""
 
 #: src/ui/charts/scatter.tsx:66

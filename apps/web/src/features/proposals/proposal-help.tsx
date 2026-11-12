@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { proposalHelpOf } from "@schellingboard/domain/proposal-help";
 import { useState } from "react";
 
@@ -13,12 +15,12 @@ export function ProposalHelp({ event }: { event: { proposalHelp: string } }) {
         onClick={() => setOpen(true)}
         className="cursor-pointer rounded-md border border-line px-4 py-2 hover:bg-surface-hover"
       >
-        Need ideas?
+        <Trans>Need ideas?</Trans>
       </button>
       {open && (
         <SidePanel
-          label="Need ideas?"
-          title="Need ideas?"
+          label={t`Need ideas?`}
+          title={t`Need ideas?`}
           onClose={() => setOpen(false)}
           transient
         >
