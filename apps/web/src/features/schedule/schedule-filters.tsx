@@ -59,9 +59,11 @@ export function ScheduleFilters({
     ...(hidden?.active ? ["Hidden"] : []),
     ...(search.trim() === "" ? [] : [`"${search.trim()}"`]),
   ];
+  // Lifted only while the menu is open: always-on, the bar would paint over
+  // the grid's sticky headers as it scrolls away.
   const width =
     layout === "grid"
-      ? "sticky left-0 w-[100dvw] max-w-3xl"
+      ? "sticky left-0 has-[[aria-expanded=true]]:z-40 w-[100dvw] max-w-3xl"
       : "mx-auto max-w-3xl";
   return (
     <>
