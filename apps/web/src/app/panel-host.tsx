@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { useRouter } from "@tanstack/react-router";
 import { scheduleDataFrom } from "../features/schedule/data";
 import { ScheduleProvider } from "../features/schedule/context";
 import { scheduleLinks } from "../features/schedule/links";
@@ -9,12 +10,17 @@ import {
 } from "../features/meetings/meeting-panel";
 import { proposalLinks } from "../features/proposals/links";
 import { ProposalPanel } from "../features/proposals/proposal-panel";
-import { useEventView } from "./event-page";
+import { EventViewContext, Ready, useEventView } from "./event-page";
 import { LOCAL_ZONE } from "./local-zone";
-import type { PanelItem } from "./panel-history";
+import { backgroundOf, panelPath, type PanelItem } from "./panel-history";
+import { SidePanel } from "../ui/side-panel";
+import { SpaLinks } from "./spa-links";
+import type { AppServices } from "./services";
 import { usePanel } from "./use-panel";
+import { useScheduleSession } from "./use-schedule-session";
 import { useProposalActions } from "./use-proposal-actions";
 import { useScheduleActions } from "./use-schedule-actions";
+import { useViewer } from "./viewer";
 
 /** The open panel of this event, over whatever page of it is behind. */
 export function PanelHost() {
@@ -28,6 +34,78 @@ export function PanelHost() {
   if (panel.item.kind === "meeting")
     return <MeetingHost key={key} item={panel.item} depth={panel.depth} />;
   return <ProposalHost key={key} item={panel.item} depth={panel.depth} />;
+}
+
+/**
+ * The panel of an event the page behind does not belong to (a session over the
+ * directory): it opens that event's replica for the panel alone, and keeps it
+ * while the panel stays open, even over a profile in between.
+ */
+export function ForeignPanelHost({ services }: { services: AppServices }) {
+  const { panel } = usePanel();
+  const { history } = useRouter();
+  const behind = backgroundOf(history.location).pathname.split("/")[1];
+  const wanted =
+    panel && panel.item.kind !== "profile" && behind !== panel.item.slug
+      ? panel.item.slug
+      : null;
+  const [kept, setKept] = useState<string | null>(null);
+  const slug = wanted ?? (panel ? kept : null);
+  if (slug !== kept) setKept(slug);
+  if (!panel || !slug || behind === slug) return null;
+  return <ForeignEvent key={slug} services={services} slug={slug} />;
+}
+
+function ForeignEvent({
+  services,
+  slug,
+}: {
+  services: AppServices;
+  slug: string;
+}) {
+  const { api } = services;
+  const viewer = useViewer();
+  const { panel, close } = usePanel();
+  const session = useScheduleSession({
+    api,
+    slug,
+    viewer: viewer.guestId,
+    persistence: services.persistence,
+    createSource: services.createSource,
+  });
+  if (session.status !== "ready") {
+    const shareUrl = panel ? panelPath(panel.item) : `/${slug}`;
+    return (
+      <SidePanel
+        label="Event details"
+        title="Event"
+        onClose={close}
+        shareUrl={shareUrl}
+      >
+        {session.status === "loading" && <p>Loading…</p>}
+        {session.status === "missing" && <p>Event not found.</p>}
+        {session.status === "failed" && (
+          <>
+            <p>The event could not be loaded.</p>
+            <button type="button" onClick={session.retry} className="underline">
+              Try again
+            </button>
+          </>
+        )}
+      </SidePanel>
+    );
+  }
+  return (
+    <Ready api={api} slug={slug} store={session.store} runner={session.runner}>
+      {(view) => (
+        <EventViewContext.Provider value={view}>
+          <SpaLinks slug={slug}>
+            <PanelHost />
+          </SpaLinks>
+        </EventViewContext.Provider>
+      )}
+    </Ready>
+  );
 }
 
 function MeetingHost({

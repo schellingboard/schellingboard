@@ -30,7 +30,7 @@ export type EventView = {
   now: Date;
 };
 
-const EventViewContext = createContext<EventView | null>(null);
+export const EventViewContext = createContext<EventView | null>(null);
 
 /** The open event's view, for a screen rendered inside `EventLayout`. */
 export function useEventView(): EventView {
@@ -173,7 +173,7 @@ function Body({
   );
 }
 
-function Ready({
+export function Ready({
   api,
   slug,
   store,
