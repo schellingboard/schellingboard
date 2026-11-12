@@ -4,7 +4,11 @@ import type {
   AuthCode,
   LoginSession,
 } from "@schellingboard/domain/auth";
-import type { Change, RecordedChange } from "@schellingboard/domain/change";
+import type {
+  Change,
+  LoggedProposal,
+  RecordedChange,
+} from "@schellingboard/domain/change";
 import type { Comment } from "@schellingboard/domain/comment";
 import type {
   Event,
@@ -576,6 +580,8 @@ export type SessionProposalUpdateInput = {
 
 export interface SessionProposalsRepository {
   listByEvent(eventId: string): Promise<SessionProposal[]>;
+  /** Without the vote counts, which cost a pass over the event's votes. */
+  listLoggedByEvent(eventId: string): Promise<LoggedProposal[]>;
   listByHost(guestId: string): Promise<SessionProposal[]>;
   findById(id: string): Promise<SessionProposal | undefined>;
   create(data: SessionProposalCreateInput): Promise<SessionProposal>;

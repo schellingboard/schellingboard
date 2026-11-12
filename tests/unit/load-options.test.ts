@@ -55,7 +55,7 @@ describe("parseOptions", () => {
     expect(() => parseOptions(["--bogus"])).toThrow(/--bogus/);
     expect(() => parseOptions(["--users", "0"])).toThrow(/users/);
     expect(() => parseOptions(["--users", "many"])).toThrow(/users/);
-    expect(() => parseOptions(["--users", "981"])).toThrow(/users/);
+    expect(() => parseOptions(["--users", "1021"])).toThrow(/users/);
   });
 });
 

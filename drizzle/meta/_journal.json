@@ -428,6 +428,13 @@
       "when": 1794234351960,
       "tag": "0060_session_marks",
       "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "6",
+      "when": 1794318259045,
+      "tag": "0061_votes_indexes",
+      "breakpoints": true
     }
   ]
 }

@@ -568,6 +568,10 @@ export const votes = sqliteTable(
   },
   (t) => [
     uniqueIndex("votes_proposal_guest_unique").on(t.proposalId, t.guestId),
+    // Every snapshot reads one guest's votes; without it that scans all of them.
+    index("votes_guest_idx").on(t.guestId),
+    // Covers the per-proposal tallies, which would otherwise read every vote row.
+    index("votes_proposal_choice_idx").on(t.proposalId, t.choice),
   ]
 );
 
