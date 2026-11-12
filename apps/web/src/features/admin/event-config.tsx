@@ -7,10 +7,6 @@ import {
 } from "@schellingboard/domain/admin-datetime";
 import type { IdentityMode } from "@schellingboard/domain/event";
 import { isEventIconName } from "@schellingboard/domain/event-icons";
-import {
-  DEFAULT_PROPOSAL_HELP,
-  proposalHelpOf,
-} from "@schellingboard/domain/proposal-help";
 import { SLOT_INCREMENT_OPTIONS } from "@schellingboard/domain/slots";
 import { useMemo, useState } from "react";
 
@@ -32,6 +28,10 @@ import {
   TextField,
 } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
+import {
+  defaultProposalHelp,
+  proposalHelpOf,
+} from "../proposals/default-proposal-help";
 import { ConfirmByTyping } from "./confirm-by-typing";
 import { EventDaysManager } from "./event-days";
 import { EventIconPicker } from "./event-icon-picker";
@@ -102,7 +102,7 @@ function DetailsForm({
     slotIncrementMinutes: Number(form.slotIncrementMinutes),
     icon: isEventIconName(form.icon) ? form.icon : null,
     proposalHelp:
-      form.proposalHelp.trim() === DEFAULT_PROPOSAL_HELP
+      form.proposalHelp.trim() === defaultProposalHelp()
         ? ""
         : form.proposalHelp,
   };
@@ -174,7 +174,7 @@ function DetailsForm({
         <Button
           type="button"
           variant="quiet"
-          onClick={() => setField("proposalHelp")(DEFAULT_PROPOSAL_HELP)}
+          onClick={() => setField("proposalHelp")(defaultProposalHelp())}
         >
           <Trans>Reset to default</Trans>
         </Button>

@@ -8,8 +8,8 @@ import {
   type LocationColorName,
 } from "@schellingboard/domain/location-colors";
 import {
-  IMAGE_REQUIREMENTS_HINT,
   MAX_IMAGE_BYTES,
+  MIN_IMAGE_WIDTH,
 } from "@schellingboard/domain/location-image-constraints";
 import { type FormEvent, useRef, useState } from "react";
 
@@ -291,7 +291,7 @@ function LocationForm({
           label={t`Image`}
           name="image"
           accept="image/jpeg,image/png,image/webp"
-          hint={IMAGE_REQUIREMENTS_HINT}
+          hint={t`JPEG, PNG, or WebP, max ${maxImageMb} MB, at least ${MIN_IMAGE_WIDTH}px wide, 4:3 aspect ratio (e.g. 800×600)`}
           onChange={setImage}
           error={fields.image}
         />

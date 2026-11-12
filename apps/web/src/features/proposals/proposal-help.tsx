@@ -1,10 +1,10 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import { proposalHelpOf } from "@schellingboard/domain/proposal-help";
 import { useState } from "react";
 
 import { Markdown } from "../../ui/markdown";
 import { SidePanel } from "../../ui/side-panel";
+import { proposalHelpOf } from "./default-proposal-help";
 
 export function ProposalHelp({ event }: { event: { proposalHelp: string } }) {
   const [open, setOpen] = useState(false);

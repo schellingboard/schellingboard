@@ -1,11 +1,9 @@
 import { t } from "@lingui/core/macro";
-import {
-  EVENT_ICON_NAMES,
-  eventIconLabel,
-} from "@schellingboard/domain/event-icons";
+import { EVENT_ICON_NAMES } from "@schellingboard/domain/event-icons";
 
 import { cx } from "../../ui/cx";
 import { EventIcon } from "../../ui/event-icon";
+import { eventIconLabel } from "../../ui/event-icons";
 
 function Option({
   label,

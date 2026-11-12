@@ -334,7 +334,7 @@ msgstr "{sessionCount, plural, one {# session} other {# sessions}}"
 msgid "{sessionCount, plural, one {Delete this day? The following session scheduled within its time window will also be deleted:} other {Delete this day? The following # sessions scheduled within its time window will also be deleted:}}"
 msgstr "{sessionCount, plural, one {Delete this day? The following session scheduled within its time window will also be deleted:} other {Delete this day? The following # sessions scheduled within its time window will also be deleted:}}"
 
-#: src/features/schedule/session-panel.tsx:319
+#: src/features/schedule/session-panel.tsx:320
 msgid "{startsAt} - {endsAt}"
 msgstr "{startsAt} - {endsAt}"
 
@@ -567,6 +567,10 @@ msgstr "A newer release is out: {latestVersion}."
 msgid "A sentence or two"
 msgstr "A sentence or two"
 
+#: src/features/proposals/default-proposal-help.ts:18
+msgid "A session can be a talk, a discussion, a workshop or a 1-on-1."
+msgstr "A session can be a talk, a discussion, a workshop or a 1-on-1."
+
 #: src/features/settings/email-settings-form.tsx:18
 msgid "a session I’m hosting changes time or location, or is deleted"
 msgstr "a session I’m hosting changes time or location, or is deleted"
@@ -595,6 +599,11 @@ msgstr "About {title}"
 #: src/features/people/profile-form.tsx:379
 msgid "About me"
 msgstr "About me"
+
+#. Name of an event icon
+#: src/ui/event-icons.ts:74
+msgid "Academic Cap"
+msgstr "Academic Cap"
 
 #: src/features/meetings/meeting-panel.tsx:124
 msgid "Accept"
@@ -876,11 +885,11 @@ msgstr "Assigned"
 msgid "Attendees"
 msgstr "Attendees"
 
-#: src/features/schedule/session-panel.tsx:329
+#: src/features/schedule/session-panel.tsx:330
 msgid "Attendees ({attendeeCount} / {capacity}):"
 msgstr "Attendees ({attendeeCount} / {capacity}):"
 
-#: src/features/schedule/session-panel.tsx:330
+#: src/features/schedule/session-panel.tsx:331
 msgid "Attendees ({attendeeCount}):"
 msgstr "Attendees ({attendeeCount}):"
 
@@ -951,6 +960,11 @@ msgstr "Be the first to suggest a session!"
 msgid "Be the first!"
 msgstr "Be the first!"
 
+#. Name of an event icon
+#: src/ui/event-icons.ts:78
+msgid "Beaker"
+msgstr "Beaker"
+
 #: src/features/admin/stats-charts.tsx:252
 #: src/features/admin/stats-charts.tsx:271
 msgid "Became a session"
@@ -969,7 +983,7 @@ msgstr "Became a session is Yes when any session came from it, even one the filt
 msgid "Become a site admin"
 msgstr "Become a site admin"
 
-#: src/features/schedule/session-panel.tsx:234
+#: src/features/schedule/session-panel.tsx:235
 msgid "Become host"
 msgstr "Become host"
 
@@ -1004,10 +1018,20 @@ msgctxt "Location colour"
 msgid "Blue"
 msgstr "Blue"
 
+#. Name of an event icon
+#: src/ui/event-icons.ts:79
+msgid "Bolt"
+msgstr "Bolt"
+
 #: src/features/meetings/book-meeting.tsx:130
 #: src/features/meetings/meeting-request-fields.tsx:226
 msgid "Book it anyway?"
 msgstr "Book it anyway?"
+
+#. Name of an event icon
+#: src/ui/event-icons.ts:80
+msgid "Book Open"
+msgstr "Book Open"
 
 #. Adjective in a lowercase details list
 #: src/features/admin/locations-screen.tsx:372
@@ -1038,7 +1062,7 @@ msgstr "Bookings open"
 msgid "Bookings open is required"
 msgstr "Bookings open is required"
 
-#: src/features/schedule/session-panel.tsx:83
+#: src/features/schedule/session-panel.tsx:85
 msgid "Bookmark this session"
 msgstr "Bookmark this session"
 
@@ -1060,9 +1084,19 @@ msgstr "Break before ({breakMinutes} min)"
 msgid "Break before each session (min)"
 msgstr "Break before each session (min)"
 
+#. Name of an event icon
+#: src/ui/event-icons.ts:81
+msgid "Briefcase"
+msgstr "Briefcase"
+
 #: src/features/proposals/proposals-screen.tsx:100
 msgid "Browse session ideas or add your own proposal"
 msgstr "Browse session ideas or add your own proposal"
+
+#. Name of an event icon
+#: src/ui/event-icons.ts:85
+msgid "Building Office"
+msgstr "Building Office"
 
 #: src/ui/data-table.tsx:47
 msgid "Bulk actions"
@@ -1072,6 +1106,16 @@ msgstr "Bulk actions"
 #: src/features/people/meeting-request-dialog.tsx:65
 msgid "Busy"
 msgstr "Busy"
+
+#. Name of an event icon
+#: src/ui/event-icons.ts:89
+msgid "Cake"
+msgstr "Cake"
+
+#. Name of an event icon
+#: src/ui/event-icons.ts:90
+msgid "Calendar"
+msgstr "Calendar"
 
 #: src/features/admin/confirm-by-typing.tsx:56
 #: src/features/admin/event-days.tsx:230
@@ -1140,6 +1184,11 @@ msgstr "Changes here do not reach the schedule. To change a session, open it and
 #: src/features/admin/stats-figure-card.tsx:128
 msgid "Chart"
 msgstr "Chart"
+
+#. Name of an event icon
+#: src/ui/event-icons.ts:91
+msgid "Chat Bubble Left"
+msgstr "Chat Bubble Left"
 
 #: src/commands/failure-message.ts:69
 msgid "Check that it went through, then try again."
@@ -1267,7 +1316,7 @@ msgctxt "Session flag"
 msgid "Closed"
 msgstr "Closed"
 
-#: src/features/schedule/session-panel.tsx:198
+#: src/features/schedule/session-panel.tsx:199
 msgid "Closed Session"
 msgstr "Closed Session"
 
@@ -1275,9 +1324,19 @@ msgstr "Closed Session"
 msgid "Closed sessions take no more RSVPs. This compares them with the open ones."
 msgstr "Closed sessions take no more RSVPs. This compares them with the open ones."
 
+#. Name of an event icon
+#: src/ui/event-icons.ts:95
+msgid "Cloud"
+msgstr "Cloud"
+
 #: src/features/proposals/proposals-screen.tsx:483
 msgid "Co-host wanted"
 msgstr "Co-host wanted"
+
+#. Name of an event icon
+#: src/ui/event-icons.ts:96
+msgid "Code Bracket"
+msgstr "Code Bracket"
 
 #: src/features/sign-in/guest-login-form.tsx:123
 msgid "Code sent — check your email"
@@ -1286,6 +1345,11 @@ msgstr "Code sent — check your email"
 #: src/features/admin/event-meetings.tsx:222
 msgid "Coffee bar"
 msgstr "Coffee bar"
+
+#. Name of an event icon
+#: src/ui/event-icons.ts:100
+msgid "Cog"
+msgstr "Cog"
 
 #: src/features/comments/comments-section.tsx:247
 msgid "Collapse comment"
@@ -1299,6 +1363,11 @@ msgstr "Color"
 #: src/app/theme.tsx:104
 msgid "Colour theme"
 msgstr "Colour theme"
+
+#. Name of an event icon
+#: src/ui/event-icons.ts:101
+msgid "Command Line"
+msgstr "Command Line"
 
 #. Button: post the comment
 #: src/features/comments/comments-section.tsx:176
@@ -1340,6 +1409,11 @@ msgstr "Comments written per day."
 #: src/features/admin/stats-figures.tsx:278
 msgid "Compare All voters with All other members to see whether voters also take part more in the schedule."
 msgstr "Compare All voters with All other members to see whether voters also take part more in the schedule."
+
+#. Name of an event icon
+#: src/ui/event-icons.ts:105
+msgid "Computer Desktop"
+msgstr "Computer Desktop"
 
 #: src/features/admin/event-layout.tsx:13
 msgctxt "Event admin tab: the event settings"
@@ -1530,7 +1604,7 @@ msgstr "Could not load the RSVPs."
 msgid "Could not load the sessions."
 msgstr "Could not load the sessions."
 
-#: src/features/admin/settings-screen.tsx:158
+#: src/features/admin/settings-screen.tsx:155
 msgid "Could not load the settings."
 msgstr "Could not load the settings."
 
@@ -1650,6 +1724,11 @@ msgstr "Could not withdraw your vote on the proposal."
 msgid "Couldn't load who is free then. Try the slot again."
 msgstr "Couldn't load who is free then. Try the slot again."
 
+#. Name of an event icon
+#: src/ui/event-icons.ts:109
+msgid "Cpu Chip"
+msgstr "Cpu Chip"
+
 #: src/features/admin/event-proposals.tsx:263
 #: src/features/admin/event-sessions.tsx:517
 #: src/features/admin/event-sessions.tsx:628
@@ -1687,7 +1766,7 @@ msgstr "CSV file"
 msgid "Current image of {locationName}"
 msgstr "Current image of {locationName}"
 
-#: src/features/admin/settings-screen.tsx:97
+#: src/features/admin/settings-screen.tsx:94
 msgid "Current map"
 msgstr "Current map"
 
@@ -1848,10 +1927,10 @@ msgstr "Describe what your session will cover"
 #: src/features/admin/event-sessions.tsx:168
 #: src/features/admin/events-screen.tsx:99
 #: src/features/admin/locations-screen.tsx:204
-#: src/features/admin/settings-screen.tsx:87
+#: src/features/admin/settings-screen.tsx:84
 #: src/features/proposals/proposal-form.tsx:245
 #: src/features/proposals/proposals-screen.tsx:419
-#: src/features/schedule/session-panel.tsx:360
+#: src/features/schedule/session-panel.tsx:361
 msgid "Description"
 msgstr "Description"
 
@@ -1957,7 +2036,7 @@ msgstr "Duration must be a non-negative whole number"
 msgid "Duration: {duration}"
 msgstr "Duration: {duration}"
 
-#: src/features/schedule/session-panel.tsx:323
+#: src/features/schedule/session-panel.tsx:324
 msgid "During {momentTitle} ({momentStart}–{momentEnd})"
 msgstr "During {momentTitle} ({momentStart}–{momentEnd})"
 
@@ -1985,7 +2064,7 @@ msgstr "Each guest gets a personal link by email. It replaces the link they had 
 #: src/features/comments/comments-section.tsx:339
 #: src/features/proposals/proposal-panel.tsx:197
 #: src/features/proposals/proposals-screen.tsx:669
-#: src/features/schedule/session-panel.tsx:239
+#: src/features/schedule/session-panel.tsx:240
 msgid "Edit"
 msgstr "Edit"
 
@@ -2184,6 +2263,10 @@ msgstr "Events"
 msgid "Every proposal is in the Proposals table."
 msgstr "Every proposal is in the Proposals table."
 
+#: src/features/proposals/default-proposal-help.ts:18
+msgid "Everyone then votes on the proposals, and the most wanted ones go on the schedule."
+msgstr "Everyone then votes on the proposals, and the most wanted ones go on the schedule."
+
 #: src/features/settings/settings-screen.tsx:52
 msgid "Everything here is private and never shown to other attendees. Your <0>public profile</0> is edited separately."
 msgstr "Everything here is private and never shown to other attendees. Your <0>public profile</0> is edited separately."
@@ -2274,6 +2357,11 @@ msgstr "Filter:"
 msgid "Filters"
 msgstr "Filters"
 
+#. Name of an event icon
+#: src/ui/event-icons.ts:110
+msgid "Fire"
+msgstr "Fire"
+
 #: src/ui/pager.tsx:96
 msgctxt "Pager: first page"
 msgid "First"
@@ -2343,6 +2431,11 @@ msgstr "Gap length"
 msgid "Gaps"
 msgstr "Gaps"
 
+#. Name of an event icon
+#: src/ui/event-icons.ts:111
+msgid "Globe Alt"
+msgstr "Globe Alt"
+
 #: src/features/proposals/proposals-screen.tsx:116
 msgid "Go to Quick Voting!"
 msgstr "Go to Quick Voting!"
@@ -2399,6 +2492,11 @@ msgstr "He/Him/His/They/etc."
 msgid "He/They"
 msgstr "He/They"
 
+#. Name of an event icon
+#: src/ui/event-icons.ts:112
+msgid "Heart"
+msgstr "Heart"
+
 #: src/app/footer.tsx:103
 msgid "Help"
 msgstr "Help"
@@ -2414,13 +2512,18 @@ msgstr "Help for proposers"
 msgid "Hidden"
 msgstr "Hidden"
 
-#: src/features/schedule/session-panel.tsx:271
+#: src/features/schedule/session-panel.tsx:272
 msgid "Hide on the schedule"
 msgstr "Hide on the schedule"
 
-#: src/features/schedule/session-panel.tsx:258
+#: src/features/schedule/session-panel.tsx:259
 msgid "Hides this session on your schedule, for you only. Use it if you are not interested or for any other reason. You can show it again here."
 msgstr "Hides this session on your schedule, for you only. Use it if you are not interested or for any other reason. You can show it again here."
+
+#. Name of an event icon
+#: src/ui/event-icons.ts:113
+msgid "Home"
+msgstr "Home"
 
 #: src/features/proposals/proposal-panel.tsx:186
 msgid "Host this proposal"
@@ -2443,7 +2546,7 @@ msgstr "Host(s) ↑"
 msgid "Host(s) ↓"
 msgstr "Host(s) ↓"
 
-#: src/features/schedule/session-panel.tsx:284
+#: src/features/schedule/session-panel.tsx:285
 msgid "Host(s):"
 msgstr "Host(s):"
 
@@ -2658,6 +2761,14 @@ msgstr "Join link for {guestName}"
 msgid "Join the event"
 msgstr "Join the event"
 
+#: src/features/admin/locations-screen.tsx:294
+msgid "JPEG, PNG, or WebP, max {maxImageMb} MB, at least {MIN_IMAGE_WIDTH}px wide, 4:3 aspect ratio (e.g. 800×600)"
+msgstr "JPEG, PNG, or WebP, max {maxImageMb} MB, at least {MIN_IMAGE_WIDTH}px wide, 4:3 aspect ratio (e.g. 800×600)"
+
+#: src/features/admin/settings-screen.tsx:105
+msgid "JPEG, PNG, or WebP, max {maxMapMegabytes} MB."
+msgstr "JPEG, PNG, or WebP, max {maxMapMegabytes} MB."
+
 #: src/features/schedule/schedule-toolbar.tsx:108
 msgid "Jump to the current time"
 msgstr "Jump to the current time"
@@ -2793,12 +2904,12 @@ msgstr "Loading proposals..."
 #: src/features/admin/events-screen.tsx:193
 #: src/features/admin/guests-screen.tsx:418
 #: src/features/admin/locations-screen.tsx:514
-#: src/features/admin/settings-screen.tsx:164
+#: src/features/admin/settings-screen.tsx:161
 #: src/features/comments/my-comments-screen.tsx:42
 #: src/features/meetings/book-meeting.tsx:73
 #: src/features/notifications/notifications-screen.tsx:78
 #: src/features/notifications/notifications-screen.tsx:181
-#: src/features/schedule/session-panel.tsx:334
+#: src/features/schedule/session-panel.tsx:335
 #: src/features/settings/settings-screen.tsx:38
 #: src/features/sign-in/account-security.tsx:54
 msgid "Loading…"
@@ -2820,7 +2931,7 @@ msgstr "Location name confirmation"
 msgid "Location unavailability"
 msgstr "Location unavailability"
 
-#: src/features/schedule/session-panel.tsx:302
+#: src/features/schedule/session-panel.tsx:303
 msgid "Location:"
 msgstr "Location:"
 
@@ -2888,11 +2999,11 @@ msgstr "Manage"
 
 #: src/app/map-button.tsx:36
 #: src/app/map-button.tsx:37
-#: src/features/admin/settings-screen.tsx:105
+#: src/features/admin/settings-screen.tsx:102
 msgid "Map"
 msgstr "Map"
 
-#: src/features/admin/settings-screen.tsx:113
+#: src/features/admin/settings-screen.tsx:110
 msgid "Map exceeds {maxMapMegabytes} MB."
 msgstr "Map exceeds {maxMapMegabytes} MB."
 
@@ -2995,6 +3106,11 @@ msgstr "Members with it on (%)"
 msgid "Menu"
 msgstr "Menu"
 
+#. Name of an event icon
+#: src/ui/event-icons.ts:114
+msgid "Microphone"
+msgstr "Microphone"
+
 #: src/features/admin/stats-figures.tsx:287
 msgid "Most popular proposals"
 msgstr "Most popular proposals"
@@ -3019,6 +3135,11 @@ msgstr "Move {name} down"
 #: src/features/admin/locations-screen.tsx:440
 msgid "Move {name} up"
 msgstr "Move {name} up"
+
+#. Name of an event icon
+#: src/ui/event-icons.ts:118
+msgid "Musical Note"
+msgstr "Musical Note"
 
 #: src/app/user-menu.tsx:123
 #: src/features/comments/my-comments-screen.tsx:77
@@ -3163,7 +3284,7 @@ msgstr "No"
 msgid "No attendees match."
 msgstr "No attendees match."
 
-#: src/features/schedule/session-panel.tsx:336
+#: src/features/schedule/session-panel.tsx:337
 msgid "No attendees yet"
 msgstr "No attendees yet"
 
@@ -3213,7 +3334,7 @@ msgstr "No host yet — someone would like to see this offered"
 msgid "No hosts"
 msgstr "No hosts"
 
-#: src/features/admin/event-icon-picker.tsx:56
+#: src/features/admin/event-icon-picker.tsx:54
 msgid "No icon"
 msgstr "No icon"
 
@@ -3310,6 +3431,10 @@ msgstr "Not open to 1-on-1s yet at {eventName}"
 #: src/features/admin/stats-charts.tsx:271
 msgid "Not scheduled"
 msgstr "Not scheduled"
+
+#: src/features/proposals/default-proposal-help.ts:16
+msgid "Not sure what to propose? Start from one of these questions."
+msgstr "Not sure what to propose? Start from one of these questions."
 
 #: src/app/sync-indicator.tsx:11
 msgid "Not updating: may be out of date"
@@ -3456,7 +3581,7 @@ msgstr "Only voted"
 msgid "Only you see these"
 msgstr "Only you see these"
 
-#: src/features/schedule/session-panel.tsx:74
+#: src/features/schedule/session-panel.tsx:76
 msgid "Only you see your bookmarks. This is not an RSVP."
 msgstr "Only you see your bookmarks. This is not an RSVP."
 
@@ -3551,6 +3676,11 @@ msgstr "Page not found."
 #: src/ui/pager.tsx:56
 msgid "Pagination"
 msgstr "Pagination"
+
+#. Name of an event icon
+#: src/ui/event-icons.ts:122
+msgid "Paint Brush"
+msgstr "Paint Brush"
 
 #. Chart axis: number of other sessions at the same time
 #: src/features/admin/stats-figures.tsx:112
@@ -3844,11 +3974,11 @@ msgstr "Remove"
 msgid "Remove {0}"
 msgstr "Remove {0}"
 
-#: src/features/schedule/session-panel.tsx:83
+#: src/features/schedule/session-panel.tsx:85
 msgid "Remove bookmark"
 msgstr "Remove bookmark"
 
-#: src/features/admin/settings-screen.tsx:118
+#: src/features/admin/settings-screen.tsx:115
 msgid "Remove current map"
 msgstr "Remove current map"
 
@@ -3921,6 +4051,11 @@ msgstr "Reset to default"
 msgid "Resize panel"
 msgstr "Resize panel"
 
+#. Name of an event icon
+#: src/ui/event-icons.ts:126
+msgid "Rocket Launch"
+msgstr "Rocket Launch"
+
 #: src/features/admin/locations-screen.tsx:61
 msgctxt "Location colour"
 msgid "Rose"
@@ -3934,7 +4069,7 @@ msgstr "Rows per page"
 msgid "Rows split it by origin and by day, and by whether the follow-up reminder went out."
 msgstr "Rows split it by origin and by day, and by whether the follow-up reminder went out."
 
-#: src/features/schedule/session-panel.tsx:224
+#: src/features/schedule/session-panel.tsx:225
 msgid "RSVP"
 msgstr "RSVP"
 
@@ -4008,7 +4143,7 @@ msgstr "Save meetings"
 msgid "Save phases"
 msgstr "Save phases"
 
-#: src/features/admin/settings-screen.tsx:131
+#: src/features/admin/settings-screen.tsx:128
 msgid "Save settings"
 msgstr "Save settings"
 
@@ -4036,7 +4171,7 @@ msgstr "Saved!"
 #: src/features/admin/event-sessions.tsx:518
 #: src/features/admin/guests-screen.tsx:221
 #: src/features/admin/locations-screen.tsx:356
-#: src/features/admin/settings-screen.tsx:131
+#: src/features/admin/settings-screen.tsx:128
 #: src/features/comments/comments-section.tsx:594
 #: src/features/meetings/availability-form.tsx:191
 #: src/features/people/profile-form.tsx:609
@@ -4080,15 +4215,12 @@ msgstr "Schedule view"
 msgid "Scheduling"
 msgstr "Scheduling"
 
-#: src/features/schedule/session-panel.tsx:135
-msgid "Scheduling {opens}"
-msgstr "Scheduling {opens}"
-
-#: src/features/schedule/session-panel.tsx:134
+#: src/features/schedule/session-panel.tsx:133
 msgid "Scheduling has ended"
 msgstr "Scheduling has ended"
 
 #: src/features/proposals/list-model.ts:256
+#: src/features/schedule/session-panel.tsx:136
 msgid "Scheduling is not enabled"
 msgstr "Scheduling is not enabled"
 
@@ -4104,6 +4236,10 @@ msgstr "Scheduling opens {0}. Until then you can only browse the schedule."
 #: src/features/admin/event-config.tsx:273
 msgid "Scheduling phase"
 msgstr "Scheduling phase"
+
+#: src/features/schedule/session-panel.tsx:135
+msgid "Scheduling will be enabled at {opensAt}"
+msgstr "Scheduling will be enabled at {opensAt}"
 
 #: src/features/proposals/list-model.ts:255
 msgid "Scheduling will be enabled at {schedulingAt}"
@@ -4223,8 +4359,8 @@ msgstr "Sent!"
 msgid "Session"
 msgstr "Session"
 
-#: src/features/schedule/session-panel.tsx:54
-#: src/features/schedule/session-panel.tsx:55
+#: src/features/schedule/session-panel.tsx:56
+#: src/features/schedule/session-panel.tsx:57
 msgid "Session details"
 msgstr "Session details"
 
@@ -4233,7 +4369,7 @@ msgstr "Session details"
 msgid "Session from {proposalTitle}"
 msgstr "Session from {proposalTitle}"
 
-#: src/features/schedule/session-panel.tsx:223
+#: src/features/schedule/session-panel.tsx:224
 msgid "Session full"
 msgstr "Session full"
 
@@ -4245,7 +4381,7 @@ msgstr "Session full"
 msgid "Session host"
 msgstr "Session host"
 
-#: src/features/schedule/session-panel.tsx:64
+#: src/features/schedule/session-panel.tsx:66
 msgid "Session not found."
 msgstr "Session not found."
 
@@ -4299,12 +4435,12 @@ msgstr "Set password"
 
 #: src/app/admin-frame.tsx:44
 #: src/app/user-menu.tsx:115
-#: src/features/admin/settings-screen.tsx:171
+#: src/features/admin/settings-screen.tsx:168
 #: src/features/settings/settings-screen.tsx:50
 msgid "Settings"
 msgstr "Settings"
 
-#: src/features/admin/settings-screen.tsx:135
+#: src/features/admin/settings-screen.tsx:132
 msgid "Settings saved."
 msgstr "Settings saved."
 
@@ -4351,7 +4487,7 @@ msgstr "Show all"
 msgid "Show map"
 msgstr "Show map"
 
-#: src/features/schedule/session-panel.tsx:270
+#: src/features/schedule/session-panel.tsx:271
 msgid "Show on the schedule"
 msgstr "Show on the schedule"
 
@@ -4371,7 +4507,7 @@ msgstr "Show suggestions"
 msgid "Shown publicly on your profile — only add what you want visible"
 msgstr "Shown publicly on your profile — only add what you want visible"
 
-#: src/features/schedule/session-panel.tsx:257
+#: src/features/schedule/session-panel.tsx:258
 msgid "Shows this session on your schedule again."
 msgstr "Shows this session on your schedule again."
 
@@ -4413,7 +4549,7 @@ msgstr "Signed-in browsers"
 msgid "Site admin"
 msgstr "Site admin"
 
-#: src/features/admin/settings-screen.tsx:173
+#: src/features/admin/settings-screen.tsx:170
 msgid "Site settings"
 msgstr "Site settings"
 
@@ -4498,9 +4634,19 @@ msgstr "Sorry — my session moved…"
 msgid "Sort by"
 msgstr "Sort by"
 
+#. Name of an event icon
+#: src/ui/event-icons.ts:130
+msgid "Sparkles"
+msgstr "Sparkles"
+
 #: src/features/admin/event-stats.tsx:39
 msgid "Spontaneous sessions"
 msgstr "Spontaneous sessions"
+
+#. Name of an event icon
+#: src/ui/event-icons.ts:131
+msgid "Star"
+msgstr "Star"
 
 #: src/features/admin/event-config.tsx:337
 #: src/features/admin/event-days.tsx:37
@@ -4588,6 +4734,11 @@ msgstr "Suggest a prompt"
 #: src/features/admin/event-meetings.tsx:334
 msgid "Suggested meeting points"
 msgstr "Suggested meeting points"
+
+#. Name of an event icon
+#: src/ui/event-icons.ts:132
+msgid "Sun"
+msgstr "Sun"
 
 #: src/app/theme.tsx:84
 msgctxt "Colour theme"
@@ -4813,7 +4964,7 @@ msgstr "This event has been deleted."
 msgid "This event is over. You can still browse the schedule."
 msgstr "This event is over. You can still browse the schedule."
 
-#: src/features/schedule/session-panel.tsx:201
+#: src/features/schedule/session-panel.tsx:202
 msgid "This is a closed session, meaning you can at most arrive 5 minutes late. If you arrive later you may not join and please do not knock or otherwise disrupt the session."
 msgstr "This is a closed session, meaning you can at most arrive 5 minutes late. If you arrive later you may not join and please do not knock or otherwise disrupt the session."
 
@@ -4917,7 +5068,7 @@ msgstr "This session is full."
 msgid "This session no longer exists."
 msgstr "This session no longer exists."
 
-#: src/features/schedule/session-panel.tsx:368
+#: src/features/schedule/session-panel.tsx:369
 msgid "This session was scheduled from a proposal. See it <0>here</0>."
 msgstr "This session was scheduled from a proposal. See it <0>here</0>."
 
@@ -4958,7 +5109,7 @@ msgstr "This will permanently delete the session and its {rsvpCount, plural, one
 msgid "Time format"
 msgstr "Time format"
 
-#: src/features/schedule/session-panel.tsx:317
+#: src/features/schedule/session-panel.tsx:318
 msgid "Time:"
 msgstr "Time:"
 
@@ -4978,7 +5129,7 @@ msgstr "Timezone"
 #: src/features/admin/event-moments.tsx:47
 #: src/features/admin/event-proposals.tsx:101
 #: src/features/admin/event-sessions.tsx:160
-#: src/features/admin/settings-screen.tsx:79
+#: src/features/admin/settings-screen.tsx:76
 #: src/features/proposals/proposal-form.tsx:235
 #: src/features/proposals/proposals-screen.tsx:405
 msgid "Title"
@@ -5000,6 +5151,11 @@ msgstr "Too few attendees voted to guess at attendance — fewer than {minTurnou
 #: src/features/proposals/proposals-screen.tsx:594
 msgid "Total votes:"
 msgstr "Total votes:"
+
+#. Name of an event icon
+#: src/ui/event-icons.ts:133
+msgid "Trophy"
+msgstr "Trophy"
 
 #: src/app/error-boundary.tsx:39
 #: src/app/event-page.tsx:167
@@ -5068,7 +5224,7 @@ msgstr "Type the session title to confirm"
 msgid "Type to find, or pick from the list"
 msgstr "Type to find, or pick from the list"
 
-#: src/features/schedule/session-panel.tsx:221
+#: src/features/schedule/session-panel.tsx:222
 msgid "Un-RSVP"
 msgstr "Un-RSVP"
 
@@ -5129,6 +5285,11 @@ msgstr "updated {profileUpdated}"
 #: src/features/admin/guest-import.tsx:52
 msgid "Upload a CSV file with a header row containing <0>name</0> and <1>email</1> columns (extra columns are ignored). The email may be left blank for a user without one. Users are matched by email, or by exact name when the email is blank: existing users are left unchanged, new ones are created. Both are assigned to the selected events, so re-running an import is safe."
 msgstr "Upload a CSV file with a header row containing <0>name</0> and <1>email</1> columns (extra columns are ignored). The email may be left blank for a user without one. Users are matched by email, or by exact name when the email is blank: existing users are left unchanged, new ones are created. Both are assigned to the selected events, so re-running an import is safe."
+
+#. Name of an event icon
+#: src/ui/event-icons.ts:134
+msgid "User Group"
+msgstr "User Group"
 
 #: src/features/admin/guests-screen.tsx:120
 #: src/features/admin/guests-screen.tsx:206
@@ -5278,6 +5439,26 @@ msgstr "waiting for reply"
 msgid "Website"
 msgstr "Website"
 
+#: src/features/proposals/default-proposal-help.ts:5
+msgid "What did you learn recently that you could explain in 20 minutes?"
+msgstr "What did you learn recently that you could explain in 20 minutes?"
+
+#: src/features/proposals/default-proposal-help.ts:6
+msgid "What problem are you stuck on? Ask the group for input."
+msgstr "What problem are you stuck on? Ask the group for input."
+
+#: src/features/proposals/default-proposal-help.ts:9
+msgid "What work or project could you present, and get feedback on?"
+msgstr "What work or project could you present, and get feedback on?"
+
+#: src/features/proposals/default-proposal-help.ts:12
+msgid "What would be fun and not work-related (a game, a walk, music)?"
+msgstr "What would be fun and not work-related (a game, a walk, music)?"
+
+#: src/features/proposals/default-proposal-help.ts:7
+msgid "What would you like to learn? Propose it and ask for a host."
+msgstr "What would you like to learn? Propose it and ask for a host."
+
 #: src/features/admin/event-stats.tsx:164
 msgid "What you leave out leaves every figure and download. A host also leaves the figures about people."
 msgstr "What you leave out leaves every figure and download. A host also leaves the figures about people."
@@ -5320,6 +5501,22 @@ msgstr "Where people met. Places people typed themselves are counted as Other."
 msgid "Where to meet"
 msgstr "Where to meet"
 
+#: src/features/proposals/default-proposal-help.ts:10
+msgid "Which practical skill could you teach (a demo, a workshop, a hands-on session)?"
+msgstr "Which practical skill could you teach (a demo, a workshop, a hands-on session)?"
+
+#: src/features/proposals/default-proposal-help.ts:8
+msgid "Which question do you want to discuss with people who disagree with you?"
+msgstr "Which question do you want to discuss with people who disagree with you?"
+
+#: src/features/proposals/default-proposal-help.ts:13
+msgid "Which talk, book or article would you like to discuss?"
+msgstr "Which talk, book or article would you like to discuss?"
+
+#: src/features/proposals/default-proposal-help.ts:11
+msgid "Which topic did you enjoy at an earlier event? Do it again, or take it further."
+msgstr "Which topic did you enjoy at an earlier event? Do it again, or take it further."
+
 #: src/features/meetings/availability-form.tsx:99
 msgid "While this is off, nobody can book you and you won't appear as bookable."
 msgstr "While this is off, nobody can book you and you won't appear as bookable."
@@ -5361,6 +5558,11 @@ msgstr "Withdraw RSVP from {title}"
 msgid "Would love to talk about…"
 msgstr "Would love to talk about…"
 
+#. Name of an event icon
+#: src/ui/event-icons.ts:138
+msgid "Wrench"
+msgstr "Wrench"
+
 #: src/features/comments/comments-section.tsx:357
 msgid "Write a reply"
 msgstr "Write a reply"
@@ -5389,7 +5591,7 @@ msgstr "You already host this proposal."
 
 #: src/features/schedule/day-agenda.tsx:318
 #: src/features/schedule/session-block.tsx:333
-#: src/features/schedule/session-panel.tsx:243
+#: src/features/schedule/session-panel.tsx:244
 msgid "You are hosting this session"
 msgstr "You are hosting this session"
 
@@ -5418,7 +5620,7 @@ msgid "You have not written any comments yet."
 msgstr "You have not written any comments yet."
 
 #: src/features/schedule/day-agenda.tsx:326
-#: src/features/schedule/session-panel.tsx:248
+#: src/features/schedule/session-panel.tsx:249
 msgid "You have RSVP'd to this session"
 msgstr "You have RSVP'd to this session"
 

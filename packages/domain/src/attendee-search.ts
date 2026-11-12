@@ -1,4 +1,4 @@
-import { CONTACT_TYPE_LABELS, type Guest } from "./guest";
+import { CONTACT_TYPE_LABELS, type ContactType, type Guest } from "./guest";
 import { containsIgnoringAccents, equalsIgnoringAccents } from "./search-text";
 
 /** The fields a directory search reads. */
@@ -22,7 +22,11 @@ const NAME = 3;
 const STRUCTURED = 2;
 const FREE_TEXT = 1;
 
-function rank(attendee: Searchable, query: string): number {
+function rank(
+  attendee: Searchable,
+  query: string,
+  contactLabel: (type: ContactType) => string
+): number {
   if (containsIgnoringAccents(attendee.name, query)) return NAME;
 
   const languages = attendee.languages ?? [];
@@ -38,9 +42,9 @@ function rank(attendee: Searchable, query: string): number {
     ...languages,
     ...(attendee.prompts ?? []).flatMap((p) => [p.prompt, p.answer]),
     ...(attendee.contacts ?? []).flatMap((c) => [
-      // The label the profile prints: stored only for "other" contacts, the
-      // type's name for the rest.
-      (c.type === "other" && c.label) || CONTACT_TYPE_LABELS[c.type],
+      // Stored only for "other" contacts; the rest print the type's name.
+      (c.type === "other" && c.label) || contactLabel(c.type),
+      CONTACT_TYPE_LABELS[c.type],
       c.value,
     ]),
   ];
@@ -51,9 +55,9 @@ function rank(attendee: Searchable, query: string): number {
 }
 
 export const ATTENDEE_SORTS = [
-  { value: "name", label: "Name (A–Z)" },
-  { value: "updated", label: "Recently updated" },
-  { value: "random", label: "Random" },
+  { value: "name" },
+  { value: "updated" },
+  { value: "random" },
 ] as const;
 
 export type AttendeeSort = (typeof ATTENDEE_SORTS)[number]["value"];
@@ -85,6 +89,9 @@ function hash(text: string): number {
  * A query overrides `sort`: relevance ranking is the more useful answer to a
  * search, and an explicit sort would discard it.
  *
+ * `contactLabel` is the viewer-language name of a contact type; the English
+ * name matches too.
+ *
  * `seed` drives the random sort. A per-attendee key rather than a shuffle, so
  * that filtering the list down never reorders what is left of it.
  */
@@ -92,7 +99,9 @@ export function searchAttendees<A extends Searchable>(
   attendees: A[],
   query: string,
   sort: AttendeeSort = DEFAULT_ATTENDEE_SORT,
-  seed = ""
+  seed = "",
+  contactLabel: (type: ContactType) => string = (type) =>
+    CONTACT_TYPE_LABELS[type]
 ): A[] {
   const byName = (a: A, b: A) =>
     a.name.localeCompare(b.name) || a.id.localeCompare(b.id);
@@ -118,7 +127,7 @@ export function searchAttendees<A extends Searchable>(
   if (!q) return [...attendees].sort(sort === "updated" ? byRecency : byName);
 
   return attendees
-    .map((attendee) => ({ attendee, rank: rank(attendee, q) }))
+    .map((attendee) => ({ attendee, rank: rank(attendee, q, contactLabel) }))
     .filter((r) => r.rank > 0)
     .sort((x, y) => y.rank - x.rank || byName(x.attendee, y.attendee))
     .map((r) => r.attendee);

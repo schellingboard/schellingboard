@@ -18,6 +18,7 @@ import { formatRelativeTime } from "@schellingboard/domain/relative-time";
 
 import type { DirectoryEntry } from "../../queries/directory";
 import { plainText } from "../../ui/plain-text";
+import { contactLabel } from "./contact-labels";
 
 /** An entry plus what the list derives from it once, up front. */
 export type DirectoryCard = DirectoryEntry & {
@@ -66,7 +67,7 @@ export function directoryView({
     available,
     filters,
     sort,
-    rows: searchAttendees(scoped, query, sort, seed),
+    rows: searchAttendees(scoped, query, sort, seed, contactLabel),
   };
 }
 

@@ -1,9 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import {
-  MAP_REQUIREMENTS_HINT,
-  MAX_MAP_BYTES,
-} from "@schellingboard/domain/map-image-constraints";
+import { MAX_MAP_BYTES } from "@schellingboard/domain/map-image-constraints";
 import { type FormEvent, useState } from "react";
 
 import type { AdminSettingsCalls } from "../../commands/admin-settings";
@@ -105,7 +102,7 @@ function SettingsForm({
           label={t`Map`}
           name="image"
           accept="image/jpeg,image/png,image/webp"
-          hint={MAP_REQUIREMENTS_HINT}
+          hint={t`JPEG, PNG, or WebP, max ${maxMapMegabytes} MB.`}
           disabled={removeMap}
           onChange={setImage}
           error={

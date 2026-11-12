@@ -2,7 +2,7 @@ import {
   newSortSeed,
   searchAttendees,
 } from "@schellingboard/domain/attendee-search";
-import type { Attendee } from "@schellingboard/domain/guest";
+import type { Attendee, ContactType } from "@schellingboard/domain/guest";
 import { describe, expect, it } from "vitest";
 
 let counter = 0;
@@ -129,6 +129,40 @@ describe("searchAttendees", () => {
     expect(searchAttendees(rows, "telegram").map((r) => r.name)).toEqual([
       "Alice",
     ]);
+  });
+
+  it("also matches the type's label in the viewer's language", () => {
+    const rows = [
+      attendee({
+        name: "Alice",
+        contacts: [{ type: "phone", value: "+49 30 1234" }],
+      }),
+      attendee({ name: "Bob" }),
+    ];
+    const german = (type: ContactType) => (type === "phone" ? "Telefon" : type);
+
+    expect(
+      searchAttendees(rows, "telefon", "name", "", german).map((r) => r.name)
+    ).toEqual(["Alice"]);
+    expect(
+      searchAttendees(rows, "phone", "name", "", german).map((r) => r.name)
+    ).toEqual(["Alice"]);
+  });
+
+  it("finds a contact without a stored label by its type's translated name", () => {
+    const rows = [
+      attendee({
+        name: "Alice",
+        contacts: [{ type: "other", value: "alice.example" }],
+      }),
+      attendee({ name: "Bob" }),
+    ];
+    const german = (type: ContactType) =>
+      type === "other" ? "Sonstiges" : type;
+
+    expect(
+      searchAttendees(rows, "sonstiges", "name", "", german).map((r) => r.name)
+    ).toEqual(["Alice"]);
   });
 
   it("matches the prompt question, not just its answer", () => {

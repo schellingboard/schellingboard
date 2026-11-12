@@ -1,11 +1,13 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { schedulingEnded } from "@schellingboard/domain/phase";
-import { dateStartDescription } from "@schellingboard/domain/phase-opens-text";
 import type { Session } from "@schellingboard/domain/session";
 import { claimRefusal } from "@schellingboard/domain/session-claim";
 import { overlappingMoment } from "@schellingboard/domain/shared-moment";
-import { formatOptionalTime } from "@schellingboard/domain/time";
+import {
+  formatInLocalZone,
+  formatOptionalTime,
+} from "@schellingboard/domain/time";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { useTimeFormat } from "../../app/time-format";
@@ -125,14 +127,13 @@ function Details({ session }: { session: Session }) {
   const { rsvpd, busy, click, dialogs } = useRsvp(session);
   const attendeeState = useAttendees(session.id, session.numRsvps);
 
-  const opens = dateStartDescription(
-    data.event.schedulingPhaseStart,
-    timezone,
-    null
-  );
+  const start = data.event.schedulingPhaseStart;
+  const opensAt = start ? formatInLocalZone(start, timezone, null) : null;
   const rsvpWhy = schedulingEnded(data.event, data.now)
     ? t`Scheduling has ended`
-    : t`Scheduling ${opens}`;
+    : opensAt
+      ? t`Scheduling will be enabled at ${opensAt}`
+      : t`Scheduling is not enabled`;
   const clashes = data.clashes(session.id);
   const isHost =
     data.guestId !== null && session.hosts.some((h) => h.id === data.guestId);
