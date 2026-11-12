@@ -46,15 +46,10 @@ overview, deep links, an early read-only schedule), and a session never gets stu
       (features/sessions/session-form.tsx) opens a ConfirmDialog when start, end or rooms change and
       `snapshot.counts[id] > 0`.
 
-- [ ] **6. feat: "My schedule" filter** — `issue #865`. Replace the chips My sessions / RSVP'd /
-      Hosting with one chip **My schedule**. Its label toggles it; a chevron beside it opens a small
-      menu of checkboxes for the kinds it shows: RSVP'd, Hosting (both ticked by default). Kinds
-      combine with OR; the chip combines with search and other chips with AND (as in the attendee
-      directory). The last ticked kind cannot be unticked. Ticking a kind while the chip is off
-      turns it on. Status line: "9 of 84 match · My schedule (RSVP'd, hosting)". URL: `filter=mine`,
-      plus `mine=rsvpd` etc. only when not the default; old links `filter=rsvpd` / `filter=hosting`
-      map to My schedule with that kind. Reuse an existing popover/menu from `apps/web/src/ui` if
-      there is one; keyboard and screen reader accessible; works on phones.
+- [x] **6. "My schedule" filter**: filters.ts has `ScheduleFilterState {mine: kinds|null}`,
+      `MINE_KINDS`, `ALL_KINDS`, parse/serialize (`filter=mine`, `mine=rsvpd|hosting`, legacy values
+      mapped); `MyScheduleChip` (schedule-filters.tsx) is the chip + kinds menu to extend with
+      Bookmarked; e2e `filterChip` helper matches exactly.
 
 - [ ] **7. feat: private session bookmarks** — `fixes #864`, `fixes #264`, `fixes #865`.
   - Data: table `session_marks` (guest, session, `kind` = `bookmark` | `hidden`, created at; unique

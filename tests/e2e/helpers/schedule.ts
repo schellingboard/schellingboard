@@ -3,7 +3,7 @@ import { expect, type Page } from "@playwright/test";
 export const viewButton = (page: Page, name: string) =>
   page
     .getByRole("group", { name: "Schedule view" })
-    .getByRole("button", { name });
+    .getByRole("button", { name, exact: true });
 
 const VIEW_PARAMS: Record<string, string> = {
   Grid: "grid",
@@ -30,4 +30,4 @@ export const switchToView = async (page: Page, name: string) => {
 export const filterChip = (page: Page, name: string) =>
   page
     .getByRole("group", { name: "Filter sessions" })
-    .getByRole("button", { name });
+    .getByRole("button", { name, exact: true });

@@ -43,7 +43,7 @@ const meeting = { id: "m", otherName: "Kai", meetingPoint: "", message: "" };
 
 const none = createScheduleMatch({
   search: "",
-  filters: [],
+  filters: { mine: null },
   guestId: "mia",
   rsvpd: () => false,
 });
@@ -64,7 +64,7 @@ describe("createScheduleMatch", () => {
   it("matches sessions by search and never blockers", () => {
     const m = createScheduleMatch({
       search: "talk",
-      filters: [],
+      filters: { mine: null },
       guestId: null,
       rsvpd: () => false,
     });
@@ -80,7 +80,7 @@ describe("createScheduleMatch", () => {
     const hosted = session("h", { hosts: [{ id: "mia", name: "Mia" }] });
     const m = createScheduleMatch({
       search: "",
-      filters: ["hosting"],
+      filters: { mine: ["hosting"] },
       guestId: "mia",
       rsvpd: () => false,
     });
@@ -88,7 +88,7 @@ describe("createScheduleMatch", () => {
     expect(m.matchesSession(session("x", {}))).toBe(false);
     const anonymous = createScheduleMatch({
       search: "",
-      filters: ["hosting"],
+      filters: { mine: ["hosting"] },
       guestId: null,
       rsvpd: () => false,
     });
@@ -98,7 +98,7 @@ describe("createScheduleMatch", () => {
   it("keeps the viewer's 1-on-1s under every filter, narrowing by search only", () => {
     const m = createScheduleMatch({
       search: "kai",
-      filters: ["hosting"],
+      filters: { mine: ["hosting"] },
       guestId: "mia",
       rsvpd: () => false,
     });
@@ -133,7 +133,7 @@ describe("scheduleEntries", () => {
   it("filters sessions and meetings while filtering, counting matches", () => {
     const m = createScheduleMatch({
       search: "s1",
-      filters: [],
+      filters: { mine: null },
       guestId: null,
       rsvpd: () => false,
     });

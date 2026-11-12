@@ -82,7 +82,7 @@ export function useSchedule(): ScheduleContextValue & {
 const NO_MATCH: ScheduleMatch & { currentMatchId?: string | null } =
   createScheduleMatch({
     search: "",
-    filters: [],
+    filters: { mine: null },
     guestId: null,
     rsvpd: () => false,
   });

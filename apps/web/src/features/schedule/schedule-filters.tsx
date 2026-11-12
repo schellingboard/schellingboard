@@ -1,16 +1,17 @@
-import type { Ref } from "react";
+import { useEffect, useId, useRef, useState, type Ref } from "react";
 import { cx } from "../../ui/cx";
-import { ArrowUpIcon } from "../../ui/icons";
+import { ArrowUpIcon, ChevronDownSmallIcon } from "../../ui/icons";
 import { SearchInput } from "../../ui/search-input";
-import type { ScheduleFilter } from "./filters";
+import { MINE_KINDS, type MineKind } from "./filters";
 
 export function ScheduleFilters({
   statusRef,
   layout = "centered",
   search,
   onSearchChange,
-  filters,
-  onToggleFilter,
+  mine,
+  onToggleMine,
+  onToggleKind,
   count,
   onShowAll,
   onBackToTop,
@@ -22,8 +23,9 @@ export function ScheduleFilters({
   search: string;
   onSearchChange: (search: string) => void;
   /** Null when there is no viewer for "mine" to mean. */
-  filters: { value: ScheduleFilter; label: string; active: boolean }[] | null;
-  onToggleFilter: (value: ScheduleFilter) => void;
+  mine: { active: boolean; kinds: readonly MineKind[] } | null;
+  onToggleMine: () => void;
+  onToggleKind: (kind: MineKind) => void;
   /** How many entries match out of how many, or null when nothing narrows them. */
   count: { matching: number; total: number } | null;
   onShowAll: () => void;
@@ -32,7 +34,13 @@ export function ScheduleFilters({
   onStep?: (direction: 1 | -1) => void;
 }) {
   const active = [
-    ...(filters ?? []).filter((f) => f.active).map((f) => f.label),
+    ...(mine?.active
+      ? [
+          `My schedule (${MINE_KINDS.filter((k) => mine.kinds.includes(k.value))
+            .map((k) => k.summary)
+            .join(", ")})`,
+        ]
+      : []),
     ...(search.trim() === "" ? [] : [`"${search.trim()}"`]),
   ];
   const width =
@@ -62,28 +70,13 @@ export function ScheduleFilters({
               onStep(event.shiftKey ? -1 : 1);
             }}
           />
-          {filters && (
-            <div
-              role="group"
-              aria-label="Filter sessions"
-              className="flex flex-wrap gap-2"
-            >
-              {filters.map((f) => (
-                <button
-                  key={f.value}
-                  type="button"
-                  aria-pressed={f.active}
-                  onClick={() => onToggleFilter(f.value)}
-                  className={cx(
-                    "h-9 rounded-md px-3 text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent",
-                    f.active
-                      ? "bg-info text-on-info hover:bg-info-hover"
-                      : "bg-surface-muted text-fg-muted hover:bg-surface-hover"
-                  )}
-                >
-                  {f.label}
-                </button>
-              ))}
+          {mine && (
+            <div role="group" aria-label="Filter sessions" className="flex">
+              <MyScheduleChip
+                mine={mine}
+                onToggle={onToggleMine}
+                onToggleKind={onToggleKind}
+              />
             </div>
           )}
         </div>
@@ -126,5 +119,108 @@ export function ScheduleFilters({
         </div>
       )}
     </>
+  );
+}
+
+function MyScheduleChip({
+  mine,
+  onToggle,
+  onToggleKind,
+}: {
+  mine: { active: boolean; kinds: readonly MineKind[] };
+  onToggle: () => void;
+  onToggleKind: (kind: MineKind) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
+  const chevron = useRef<HTMLButtonElement>(null);
+  const menuId = useId();
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (!root.current?.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [open]);
+
+  const tone = mine.active
+    ? "bg-info text-on-info hover:bg-info-hover"
+    : "bg-surface-muted text-fg-muted hover:bg-surface-hover";
+  const focus =
+    "focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent";
+  return (
+    <div
+      ref={root}
+      className="relative flex"
+      onBlur={(event) => {
+        if (event.relatedTarget && !root.current?.contains(event.relatedTarget))
+          setOpen(false);
+      }}
+      onKeyDown={(event) => {
+        if (event.key !== "Escape" || !open) return;
+        event.stopPropagation();
+        setOpen(false);
+        chevron.current?.focus();
+      }}
+    >
+      <button
+        type="button"
+        aria-pressed={mine.active}
+        onClick={onToggle}
+        className={cx(
+          "h-9 rounded-l-md pl-3 pr-2 text-sm transition-colors",
+          tone,
+          focus
+        )}
+      >
+        My schedule
+      </button>
+      <button
+        ref={chevron}
+        type="button"
+        aria-label="Choose what My schedule shows"
+        aria-expanded={open}
+        aria-controls={open ? menuId : undefined}
+        onClick={() => setOpen(!open)}
+        className={cx(
+          "flex h-9 min-w-10 items-center justify-center rounded-r-md border-l border-surface/40 px-2.5 transition-colors",
+          tone,
+          focus
+        )}
+      >
+        <ChevronDownSmallIcon aria-hidden className="h-5 w-5" />
+      </button>
+      {open && (
+        <fieldset
+          id={menuId}
+          className="absolute left-0 top-full z-40 mt-1 w-44 rounded-md bg-surface-raised px-3 py-2 shadow-lg ring-1 ring-line-subtle"
+        >
+          <legend className="sr-only">My schedule shows</legend>
+          {MINE_KINDS.map((kind) => {
+            const ticked = mine.kinds.includes(kind.value);
+            const last = ticked && mine.kinds.length === 1;
+            return (
+              <label
+                key={kind.value}
+                className="flex min-h-11 items-center gap-2 text-sm text-fg-muted"
+              >
+                <input
+                  type="checkbox"
+                  checked={ticked}
+                  aria-disabled={last}
+                  onChange={() => {
+                    if (!last) onToggleKind(kind.value);
+                  }}
+                  className="h-5 w-5"
+                />
+                {kind.label}
+              </label>
+            );
+          })}
+        </fieldset>
+      )}
+    </div>
   );
 }

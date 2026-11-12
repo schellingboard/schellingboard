@@ -7,28 +7,60 @@ import {
 } from "./filters";
 
 describe("schedule filters", () => {
-  it("parses the comma-separated param in canonical order, dropping unknowns", () => {
-    expect(parseScheduleFilters("hosting,nope,mine")).toEqual([
-      "mine",
-      "hosting",
-    ]);
-    expect(parseScheduleFilters(null)).toEqual([]);
+  it("is off without the param", () => {
+    expect(parseScheduleFilters(null, null)).toEqual({ mine: null });
+    expect(parseScheduleFilters("nope", null)).toEqual({ mine: null });
   });
 
-  it("serializes canonically, null for none", () => {
-    expect(serializeScheduleFilters(["hosting", "mine"])).toBe("mine,hosting");
-    expect(serializeScheduleFilters([])).toBeNull();
+  it("turns My schedule on with both kinds unless `mine` narrows them", () => {
+    expect(parseScheduleFilters("mine", null)).toEqual({
+      mine: ["rsvpd", "hosting"],
+    });
+    expect(parseScheduleFilters("mine", "hosting")).toEqual({
+      mine: ["hosting"],
+    });
+    expect(parseScheduleFilters("mine", "hosting,rsvpd,nope")).toEqual({
+      mine: ["rsvpd", "hosting"],
+    });
+    expect(parseScheduleFilters("mine", "nope")).toEqual({
+      mine: ["rsvpd", "hosting"],
+    });
   });
 
-  it("narrows further with every active filter", () => {
+  it("maps old links to My schedule with that kind", () => {
+    expect(parseScheduleFilters("rsvpd", null)).toEqual({ mine: ["rsvpd"] });
+    expect(parseScheduleFilters("hosting", null)).toEqual({
+      mine: ["hosting"],
+    });
+    expect(parseScheduleFilters("rsvpd,hosting", null)).toEqual({
+      mine: ["rsvpd", "hosting"],
+    });
+  });
+
+  it("serializes `mine` only when the kinds are not the default", () => {
+    expect(serializeScheduleFilters({ mine: null })).toEqual({
+      filter: null,
+      mine: null,
+    });
+    expect(serializeScheduleFilters({ mine: ["hosting", "rsvpd"] })).toEqual({
+      filter: "mine",
+      mine: null,
+    });
+    expect(serializeScheduleFilters({ mine: ["hosting"] })).toEqual({
+      filter: "mine",
+      mine: "hosting",
+    });
+  });
+
+  it("lets through a session of any ticked kind", () => {
     const rsvpd = { rsvpd: true, hosting: false };
     const hosting = { rsvpd: false, hosting: true };
-    expect(sessionPassesFilters(["mine"], rsvpd)).toBe(true);
-    expect(sessionPassesFilters(["mine"], hosting)).toBe(true);
-    expect(sessionPassesFilters(["rsvpd"], hosting)).toBe(false);
-    expect(sessionPassesFilters(["rsvpd", "hosting"], rsvpd)).toBe(false);
-    expect(sessionPassesFilters([], { rsvpd: false, hosting: false })).toBe(
-      true
-    );
+    const neither = { rsvpd: false, hosting: false };
+    const both = { mine: ["rsvpd", "hosting"] } as const;
+    expect(sessionPassesFilters(both, rsvpd)).toBe(true);
+    expect(sessionPassesFilters(both, hosting)).toBe(true);
+    expect(sessionPassesFilters(both, neither)).toBe(false);
+    expect(sessionPassesFilters({ mine: ["rsvpd"] }, hosting)).toBe(false);
+    expect(sessionPassesFilters({ mine: null }, neither)).toBe(true);
   });
 });
