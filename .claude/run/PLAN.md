@@ -49,18 +49,10 @@ the E2E specs a step touches; the user runs the full suite at the end.
     panel title for a person is their name (shortened with an ellipsis when long, full name on
     hover/`title`) instead of "Profile"; the back link label should follow the same rule. Same
     header component as the bug, so one commit; adapt the tests that assert "Profile". Issue first
-    (Bug, Low, `component: ui/ux`). 22f. **Analysis, no code.** Should the create session / create
-    proposal / Quick Voting / "Need ideas?" flows open in the side panel (ADR 0020) instead of a
-    page or modal, for consistency? Survey every place that opens a new page, modal or dialog (use
-    `Explore`), and write the findings in PROGRESS.md and a short issue: per spot, panel yes/no with
-    reasons. Lean so far (check against the code): panel is good for create session/proposal from
-    the schedule (keeps context, deep link) and for "Need ideas?" (the tips stay readable beside the
-    form, a modal hides it); Quick Voting is a full-screen swipe flow and likely stays a page; long
-    forms need panel width on desktop and are full-screen on mobile anyway. Put the open decisions
-    under Questions; do not implement before the user answers. 22g. DONE #1591 **Phase bar**
-    (`ui/phase-bar.tsx`, `share` on `phaseTimeline`). 22h. DONE Proposals and attendee toolbars
-    share `ui/list-toolbar.tsx` (grid areas; the Agenda bar is a sticky bar with a menu, a different
-    shape, left as is).
+    (Bug, Low, `component: ui/ux`). 22f. DONE Analysis (no code): findings and open decisions in
+    PROGRESS.md ("22f survey"). 22g. DONE #1591 **Phase bar** (`ui/phase-bar.tsx`, `share` on
+    `phaseTimeline`). 22h. DONE Proposals and attendee toolbars share `ui/list-toolbar.tsx` (grid
+    areas; the Agenda bar is a sticky bar with a menu, a different shape, left as is).
 23. **#831** (Medium) Owner decision: every long list for users and admins is paginated with the
     shared `Pager` (page numbers, First, Prev, Next, Last, configurable page size, default 50, sizes
     e.g. 25/50/100, `page`/`pageSize` URL params). Survey all lists (proposals, directory, agenda,
