@@ -46,6 +46,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **The side panel has no share button**: its icon was hard to read. A session's link is still the
+  address of the open panel.
 - **Form errors and failure messages carry a warning icon** (#754): they no longer rely on red
   alone, which was easy to mistake for the rose accent colour.
 - **Conversation-starter answers can have several lines** (#1070): press Enter for a new line, and

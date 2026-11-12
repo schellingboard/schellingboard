@@ -281,7 +281,6 @@ export function ProfilePanel(props: ProfilePanelProps) {
         }
         onClose={onClose}
         onBack={props.onBack}
-        shareUrl={links.guest(guestId)}
       >
         {/* touch-pan-y hands vertical scrolling to the browser and keeps
             horizontal panning, the back gesture included, for this handler;

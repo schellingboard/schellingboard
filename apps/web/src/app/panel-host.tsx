@@ -13,7 +13,7 @@ import { proposalLinks } from "../features/proposals/links";
 import { ProposalPanel } from "../features/proposals/proposal-panel";
 import { EventViewContext, Ready, useEventView } from "./event-page";
 import { LOCAL_ZONE } from "./local-zone";
-import { backgroundOf, panelPath, type PanelItem } from "./panel-history";
+import { backgroundOf, type PanelItem } from "./panel-history";
 import { SidePanel } from "../ui/side-panel";
 import { SpaLinks } from "./spa-links";
 import type { AppServices } from "./services";
@@ -66,7 +66,7 @@ function ForeignEvent({
 }) {
   const { api } = services;
   const viewer = useViewer();
-  const { panel, close } = usePanel();
+  const { close } = usePanel();
   const session = useScheduleSession({
     api,
     slug,
@@ -75,14 +75,8 @@ function ForeignEvent({
     createSource: services.createSource,
   });
   if (session.status !== "ready") {
-    const shareUrl = panel ? panelPath(panel.item) : `/${slug}`;
     return (
-      <SidePanel
-        label="Event details"
-        title="Event"
-        onClose={close}
-        shareUrl={shareUrl}
-      >
+      <SidePanel label="Event details" title="Event" onClose={close}>
         {session.status === "loading" && <p>Loading…</p>}
         {session.status === "missing" && <p>Event not found.</p>}
         {session.status === "failed" && (
@@ -126,13 +120,11 @@ function MeetingHost({
   );
   const links = useMemo(() => scheduleLinks(slug), [slug]);
   const { actions, picker } = useScheduleActions(view);
-  const shareUrl = links.meeting(item.id);
   const onBack = depth > 1 ? back : undefined;
   if (!data.guestId)
     return (
       <MeetingNeedsName
         awaitingLogin={actions.awaitingLogin}
-        shareUrl={shareUrl}
         onClose={close}
         onBack={onBack}
       />
@@ -145,7 +137,6 @@ function MeetingHost({
         now={now}
         readOnly={data.readOnly}
         profileHref={links.guest}
-        shareUrl={shareUrl}
         onAnswer={(response) => void actions.answerMeeting(item.id, response)}
         onCancel={(note) => void actions.cancelMeeting(item.id, note)}
         onClose={close}

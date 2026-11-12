@@ -67,7 +67,6 @@ export function ProposalPanel({
       title={proposal?.title ?? "Proposal details"}
       onClose={onClose}
       onBack={onBack}
-      shareUrl={rest.links.view(proposalId)}
     >
       {proposal ? (
         <Details proposal={proposal} snapshot={snapshot} {...details} />

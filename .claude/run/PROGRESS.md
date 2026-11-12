@@ -27,6 +27,8 @@
 
 ## Questions
 
+- 22b: the installed (standalone) app has no address bar, the reason ADR 0020 gave for the Share
+  button, so it can no longer share a link. Removal kept as decided; restore a share action there?
 - #691: the script uses the API, not a browser, so identity requests per navigation (#1148) are
   counted as one per page load only.
 
@@ -90,6 +92,9 @@
   schedule's slice of `meetingRequestCalls`. TDD: red was `askToOpenUp is not a function`. Mailer
   tests not run (mailpit down).
 
+- 22b: the button was "Share" (⤴) in `SidePanel`, shared by all panels, so all lost it; `shareUrl`
+  prop removed everywhere. No issue, no E2E or guide mention existed.
+
 ## Next step
 
-Step 22b (copy-link button), then 23 (#831).
+Step 23 (#831).

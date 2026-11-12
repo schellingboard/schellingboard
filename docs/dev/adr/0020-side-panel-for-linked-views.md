@@ -38,7 +38,9 @@ where most attendees use the app, and need a non-drag alternative (WCAG 2.5.7).
 5. **The page behind never unmounts** while panels open, change or close. Its own state stays in the
    component tree.
 6. **Share.** The panel has a Share button: `navigator.share` where it exists (phones, the installed
-   app has no address bar), else copy the item's URL.
+   app has no address bar), else copy the item's URL. _Reversed 2026-11-11: the button is removed,
+   its icon was hard to read and the address bar holds the link. The installed app, which has no
+   address bar, loses its way to share a link._
 7. **Old addresses keep working.** `?viewSession=`, `?viewProposal=` and `?viewMeeting=` are
    replaced on arrival by the new URL with the page they were on as background. Emails already sent
    contain them.

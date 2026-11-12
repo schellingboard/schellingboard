@@ -14,7 +14,6 @@ export function MeetingPanel({
   now,
   readOnly,
   profileHref,
-  shareUrl,
   onAnswer,
   onCancel,
   onClose,
@@ -25,7 +24,6 @@ export function MeetingPanel({
   now: Date;
   readOnly: boolean;
   profileHref: (guestId: string) => string;
-  shareUrl: string;
   onAnswer: (response: "accept" | "decline") => void;
   onCancel: (note: string) => void;
   onClose: () => void;
@@ -39,7 +37,6 @@ export function MeetingPanel({
       label="1-on-1 details"
       onClose={onClose}
       onBack={onBack}
-      shareUrl={shareUrl}
       title={
         meeting ? (
           <>
@@ -161,12 +158,10 @@ export function MeetingPanel({
 /** Stands in for a 1-on-1 when the reader has no name chosen or a locked one. */
 export function MeetingNeedsName({
   awaitingLogin,
-  shareUrl,
   onClose,
   onBack,
 }: {
   awaitingLogin: () => Promise<boolean>;
-  shareUrl: string;
   onClose: () => void;
   onBack?: () => void;
 }) {
@@ -180,7 +175,6 @@ export function MeetingNeedsName({
       title="1-on-1"
       onClose={onClose}
       onBack={onBack}
-      shareUrl={shareUrl}
     >
       {protectedName !== undefined && (
         <p className="text-fg-muted">
