@@ -21,6 +21,11 @@
 
 - #861a: moments have no `version`; of two admin edits at once the last wins (accepted).
 
+- 22g (#1591): `PhaseBar` renders at the top of the proposals screen and in the schedule toolbar
+  (not in the shell, which has no event data); hidden once the scheduling step is current or past.
+  Segment width = `share` (real phase length, 20% minimum; last phase uses `schedulingPhaseEnd`).
+  `scheduling-notice.ts` removed. No screenshot in `docs/` showed the old strip.
+
 ## Problems
 
 - #200: not checked in a browser at 390px (long URL, fixed vote bar); CSS read only.

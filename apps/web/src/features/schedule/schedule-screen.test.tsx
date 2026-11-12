@@ -921,18 +921,18 @@ describe("the schedule before scheduling opens", { tags: ["007-US14"] }, () => {
     },
   });
 
-  it("says when scheduling opens, in the event's time zone", () => {
+  it("shows the phase bar with when scheduling opens", () => {
     screenAt("", { snapshot: early("2026-07-01T00:30:00.000Z") });
-    expect(
-      screen.getByText(/Scheduling opens on .*1 July 2026.*09:30 (JST|GMT\+9)/)
-    ).toBeTruthy();
+    const steps = within(
+      screen.getByRole("list", { name: "Event phases" })
+    ).getAllByRole("listitem");
+    expect(steps.at(-1)?.textContent).toMatch(
+      /^Scheduling, \d\d:\d\d - 01 Jul/
+    );
   });
 
-  it("says nothing when no opening is set or scheduling is open", () => {
-    screenAt("", { snapshot: early(null) });
-    expect(screen.queryByText(/Scheduling opens/)).toBeNull();
-    cleanup();
+  it("shows no phase bar once scheduling is open", () => {
     screenAt("");
-    expect(screen.queryByText(/Scheduling opens/)).toBeNull();
+    expect(screen.queryByRole("list", { name: "Event phases" })).toBeNull();
   });
 });

@@ -98,7 +98,39 @@ export type PhaseStep = {
   phase: EventPhase.PROPOSAL | EventPhase.VOTING | EventPhase.SCHEDULING;
   start?: Date;
   state: "past" | "current" | "upcoming" | "skipped";
+  /** Of the whole timeline, 0 to 1: the phase's real length, never too small to read. */
+  share: number;
 };
+
+const MIN_SHARE = 0.2;
+
+function phaseShares(starts: (Date | undefined)[], end?: Date): number[] {
+  const lengths = starts.map((start, i) => {
+    if (!start) return undefined;
+    const next = starts.slice(i + 1).find(Boolean) ?? end;
+    return next && next > start ? next.getTime() - start.getTime() : undefined;
+  });
+  const known = lengths.filter((l): l is number => l !== undefined);
+  const mean = known.length
+    ? known.reduce((sum, l) => sum + l, 0) / known.length
+    : 1;
+  const weights = lengths.map((l) => l ?? mean);
+  const atMin = starts.map((s, i) => !s && starts.slice(i + 1).some(Boolean));
+  for (;;) {
+    const free = weights.filter((_, i) => !atMin[i]);
+    const room = 1 - atMin.filter(Boolean).length * MIN_SHARE;
+    const total = free.reduce((sum, w) => sum + w, 0);
+    const short = weights.findIndex(
+      (w, i) => !atMin[i] && (w / total) * room < MIN_SHARE
+    );
+    if (short === -1 || free.length <= 1) {
+      return weights.map((w, i) =>
+        atMin[i] ? MIN_SHARE : free.length === 1 ? room : (w / total) * room
+      );
+    }
+    atMin[short] = true;
+  }
+}
 
 /**
  * Where phases overlap, the latest one running is the current one. A phase
@@ -125,9 +157,14 @@ export function phaseTimeline(event: Event, now: Date): PhaseStep[] {
   ] as const;
   const current = [...steps].reverse().find((s) => s.running)?.phase;
   const started = (start?: Date) => !!start && start.getTime() <= now.getTime();
+  const shares = phaseShares(
+    steps.map((s) => s.start),
+    event.schedulingPhaseEnd
+  );
   return steps.map(({ phase, start }, i) => ({
     phase,
     start,
+    share: shares[i] ?? 1 / steps.length,
     state:
       phase === current
         ? "current"

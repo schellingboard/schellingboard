@@ -15,8 +15,9 @@ can do next depends on the event's phase.
 | **Voting**     | All of the above, plus vote. Counts stay hidden                                        |
 | **Scheduling** | Counts become visible; schedule sessions, book slots, RSVP. Proposing and voting close |
 
-A strip at the top of the proposals page shows the phases with the current one highlighted, passed
-ones ticked, and the date each starts.
+A thin bar under the menu on the proposals page and the schedule shows the phases with the current
+one highlighted, passed ones ticked, and the date each starts. Longer phases get longer segments.
+The bar goes away once scheduling starts.
 
 Buttons belonging to another phase are greyed out rather than hidden — hover one to see when it
 opens. Organizers can skip phases, and an event with no phase dates at all is always in the
