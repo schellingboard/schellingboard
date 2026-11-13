@@ -130,15 +130,16 @@ test("a profile taller than the window scrolls @011-US4", async ({ page }) => {
     profile.getByRole("heading", { level: 1, name: "Alice Test" })
   ).toBeVisible();
 
-  // Standing in for the bottom of the profile: Hosting and Proposals arrive
-  // later and only if there are any, so Contact is the last section that is
-  // reliably there.
   const contact = profile.getByRole("heading", { name: "Contact" });
   await expect(contact).not.toBeInViewport();
 
+  // Small steps: Hosting and Proposals below Contact can outgrow the window,
+  // so one big wheel (Firefox applies all of it) scrolls Contact past the top.
   await page.mouse.move(512, 250);
-  await page.mouse.wheel(0, 2000);
-  await expect(contact).toBeInViewport();
+  await expect(async () => {
+    await page.mouse.wheel(0, 100);
+    await expect(contact).toBeInViewport({ timeout: 200 });
+  }).toPass();
 });
 
 test("slides the next profile in from beside this one, not from further out @011-US4", async ({
