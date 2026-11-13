@@ -63,6 +63,22 @@ msgstr ""
 msgid "(skipped)"
 msgstr ""
 
+#: ../../emails/session-changed.tsx:49
+msgid "(was {oldLocationText})"
+msgstr ""
+
+#: ../../emails/session-changed.tsx:44
+msgid "(was {oldTimeText})"
+msgstr ""
+
+#: ../../emails/session-changed.tsx:48
+msgid "(was no location)"
+msgstr ""
+
+#: ../../emails/session-changed.tsx:43
+msgid "(was unscheduled)"
+msgstr ""
+
 #: src/features/sessions/session-form.tsx:538
 msgid "[none]"
 msgstr ""
@@ -104,8 +120,52 @@ msgstr ""
 msgid "{0} phase: {what}"
 msgstr ""
 
+#: ../../emails/meeting.tsx:80
+msgid "{actorName} accepted your 1-on-1 request for {time}"
+msgstr ""
+
+#: ../../emails/meeting.tsx:88
+msgid "{actorName} canceled the 1-on-1 on {time}"
+msgstr ""
+
+#: ../../emails/meeting.tsx:84
+msgid "{actorName} declined your 1-on-1 request for {time}"
+msgstr ""
+
+#: ../../emails/meeting.tsx:134
+msgid "{askerName} would like a 1-on-1 with you"
+msgstr ""
+
+#: ../../emails/meeting.tsx:139
+msgid "{askerName} would like to book a 1-on-1 with you at {eventName}"
+msgstr ""
+
 #: src/features/proposals/vote-tally.tsx:9
 msgid "{choice, select, interested {{count, plural, one {# interested vote} other {# interested votes}}} maybe {{count, plural, one {# maybe vote} other {# maybe votes}}} other {}}"
+msgstr ""
+
+#: ../../emails/comment.tsx:61
+msgid "{commenterName} commented on a profile you commented on."
+msgstr ""
+
+#: ../../emails/comment.tsx:69
+msgid "{commenterName} commented on a proposal you commented on."
+msgstr ""
+
+#: ../../emails/comment.tsx:68
+msgid "{commenterName} commented on a proposal you're hosting."
+msgstr ""
+
+#: ../../emails/comment.tsx:73
+msgid "{commenterName} commented on a session you commented on."
+msgstr ""
+
+#: ../../emails/comment.tsx:72
+msgid "{commenterName} commented on a session you're hosting."
+msgstr ""
+
+#: ../../emails/comment.tsx:60
+msgid "{commenterName} commented on your profile."
 msgstr ""
 
 #: src/features/schedule/meeting-clash-text.ts:10
@@ -206,6 +266,14 @@ msgstr ""
 msgid "{guestName}, "
 msgstr ""
 
+#: ../../emails/proposal-joined.tsx:18
+msgid "{joinerName} joined this proposal as a co-host and can now edit it with you. It is no longer marked as looking for a co-host."
+msgstr ""
+
+#: ../../emails/proposal-joined.tsx:12
+msgid "{joinerName} joined your proposal: {title}"
+msgstr ""
+
 #: src/features/comments/my-comments-screen.tsx:175
 msgid "{kind, select, session {Session} proposal {Proposal} profile {Profile} other {}}: {subjectTitle}"
 msgstr ""
@@ -293,12 +361,28 @@ msgstr ""
 msgid "{otherName} will be told. Cancel it?"
 msgstr ""
 
+#: ../../emails/comment.tsx:55
+msgid "{ownerName}'s profile"
+msgstr ""
+
 #: src/features/people/profile-panel.tsx:249
 msgid "{place} of {total, plural, one {# attendee} other {# attendees}}"
 msgstr ""
 
+#: ../../emails/meeting.tsx:163
+msgid "{recipientName} is open to 1-on-1s"
+msgstr ""
+
+#: ../../emails/meeting.tsx:166
+msgid "{recipientName} is open to 1-on-1s at {eventName}"
+msgstr ""
+
 #: src/features/comments/my-comments-screen.tsx:172
 msgid "{replyCount, plural, one {# reply} other {# replies}}"
+msgstr ""
+
+#: ../../emails/meeting.tsx:49
+msgid "{requesterName} would like to meet you"
 msgstr ""
 
 #: src/commands/meeting-answer.ts:64
@@ -571,6 +655,18 @@ msgstr ""
 msgid "1-on-1"
 msgstr ""
 
+#: ../../emails/meeting.tsx:79
+msgid "1-on-1 accepted: {time}"
+msgstr ""
+
+#: ../../emails/meeting.tsx:87
+msgid "1-on-1 canceled: {time}"
+msgstr ""
+
+#: ../../emails/meeting.tsx:83
+msgid "1-on-1 declined: {time}"
+msgstr ""
+
 #: src/features/meetings/meeting-panel.tsx:43
 #: src/features/meetings/meeting-panel.tsx:195
 msgid "1-on-1 details"
@@ -582,6 +678,10 @@ msgstr ""
 
 #: src/features/admin/stats-text.ts:302
 msgid "1-on-1 request"
+msgstr ""
+
+#: ../../emails/meeting.tsx:46
+msgid "1-on-1 request from {requesterName}"
 msgstr ""
 
 #: src/features/admin/stats-text.ts:66
@@ -680,8 +780,16 @@ msgstr ""
 msgid "A left-out session still occupies its location, so the gaps stay true."
 msgstr ""
 
+#: ../../emails/join-link.tsx:42
+msgid "A new link to {eventName} was made for you"
+msgstr ""
+
 #: src/app/reload-offer.tsx:93
 msgid "A new version of SchellingBoard is available."
+msgstr ""
+
+#: ../../emails/join-link.tsx:26
+msgid "A newer link replaces this one, and so does setting a password: the link then asks you to sign in first."
 msgstr ""
 
 #: src/app/footer.tsx:131
@@ -716,6 +824,42 @@ msgstr ""
 msgid "a session I’ve RSVP’d to changes time or location, loses its host, or is deleted"
 msgstr ""
 
+#: ../../emails/session-deleted.tsx:39
+msgid "A session you RSVP’d to has been deleted."
+msgstr ""
+
+#: ../../emails/session-changed.tsx:70
+msgid "A session you RSVP’d to has changed location."
+msgstr ""
+
+#: ../../emails/session-changed.tsx:63
+msgid "A session you RSVP’d to has changed time and location."
+msgstr ""
+
+#: ../../emails/session-changed.tsx:67
+msgid "A session you RSVP’d to has changed time."
+msgstr ""
+
+#: ../../emails/session-lost-host.tsx:17
+msgid "A session you RSVP’d to has no host now."
+msgstr ""
+
+#: ../../emails/session-deleted.tsx:38
+msgid "A session you’re hosting has been deleted."
+msgstr ""
+
+#: ../../emails/session-changed.tsx:69
+msgid "A session you’re hosting has changed location."
+msgstr ""
+
+#: ../../emails/session-changed.tsx:62
+msgid "A session you’re hosting has changed time and location."
+msgstr ""
+
+#: ../../emails/session-changed.tsx:66
+msgid "A session you’re hosting has changed time."
+msgstr ""
+
 #: src/features/admin/event-moments.tsx:385
 msgid "A shared moment, such as lunch or a keynote, shows as a striped band across every room. It blocks nothing: sessions can still be booked inside it. To make a time unbookable, add a blocker session in every room instead. Times are in the event timezone ({timezone})."
 msgstr ""
@@ -741,6 +885,10 @@ msgstr ""
 
 #: src/features/meetings/meeting-panel.tsx:124
 msgid "Accept"
+msgstr ""
+
+#: ../../emails/meeting.tsx:57
+msgid "Accept or decline"
 msgstr ""
 
 #: src/features/admin/stats-text.ts:275
@@ -968,6 +1116,10 @@ msgstr ""
 
 #: src/commands/field-message.ts:47
 msgid "An event with the URL \"{slug}\" already exists (\"{name}\")"
+msgstr ""
+
+#: ../../emails/join-link.tsx:48
+msgid "An organizer made a new personal link for you to join {eventName}. Links sent to you before no longer work."
 msgstr ""
 
 #: src/commands/failure-message.ts:51
@@ -3049,6 +3201,14 @@ msgstr ""
 msgid "Help for proposers"
 msgstr ""
 
+#: ../../emails/auth-code.tsx:24
+#: ../../emails/auth-password-reset.tsx:19
+#: ../../emails/auth-security-changed.tsx:22
+#: ../../emails/join-link.tsx:15
+#: ../../emails/join-link.tsx:45
+msgid "Hi {name},"
+msgstr ""
+
 #. Filter: sessions you hid from your schedule
 #. Filter: sessions you hid from your schedule
 #: src/features/schedule/schedule-filters.tsx:76
@@ -3193,6 +3353,10 @@ msgstr ""
 msgid "How many people attended?"
 msgstr ""
 
+#: ../../emails/attendee-count-followup.tsx:19
+msgid "How many people came to \"{title}\"?"
+msgstr ""
+
 #: src/features/admin/stats-figures.tsx:854
 msgid "How many people offered how many 1-on-1 slots."
 msgstr ""
@@ -3259,6 +3423,18 @@ msgstr ""
 msgid "If you decide to host this as a session, expect <0>{kind, select, same {{low, plural, one {# person} other {# people}}} other {{high, plural, one {{low}–# person} other {{low}–# people}}}}</0>. Treat that as a very rough guess: it comes from a formula worked out on a single event, from what a handful of hosts there remembered about how many people turned up. It can be well out in either direction — use it to pick a room, nothing more. Future SchellingBoard versions should do better, as we incorporate more event feedback."
 msgstr ""
 
+#: ../../emails/join-link.tsx:53
+msgid "If you did not expect this, do not share the link with anyone who asks for it."
+msgstr ""
+
+#: ../../emails/auth-security-changed.tsx:32
+msgid "If you didn’t make this change, protect your name again (or set a new password) from Settings — an emailed code gets you back in even without the old password."
+msgstr ""
+
+#: ../../emails/auth-code.tsx:39
+msgid "If you didn’t request this code, you can safely ignore this email."
+msgstr ""
+
 #: src/features/admin/locations-screen.tsx:291
 msgid "Image"
 msgstr ""
@@ -3318,6 +3494,22 @@ msgstr ""
 #. Chart axis: share of a voter's votes that were interested, in percent
 #: src/features/admin/stats-figures.tsx:74
 msgid "Interested votes of a voter (%)"
+msgstr ""
+
+#: ../../emails/session-lost-host.tsx:20
+msgid "It may be cancelled. You can become its host on the session page."
+msgstr ""
+
+#: ../../emails/auth-code.tsx:31
+msgid "It works once, for {validMinutes, plural, one {# minute} other {# minutes}} — type it on the device where you are logging in, or log in here directly:"
+msgstr ""
+
+#: ../../emails/attendee-count-followup.tsx:33
+msgid "It’s optional, and you can come back and change it whenever you like."
+msgstr ""
+
+#: ../../emails/join-link.tsx:22
+msgid "Join {eventName}"
 msgstr ""
 
 #: src/features/proposals/proposal-panel.tsx:188
@@ -3560,6 +3752,10 @@ msgstr ""
 msgid "Location unavailability"
 msgstr ""
 
+#: ../../emails/attendee-count-headsup.tsx:36
+#: ../../emails/cohost-added.tsx:46
+#: ../../emails/session-changed.tsx:77
+#: ../../emails/session-deleted.tsx:45
 #: src/features/schedule/session-panel.tsx:303
 msgid "Location:"
 msgstr ""
@@ -3592,6 +3788,10 @@ msgstr ""
 
 #: src/features/sign-in/guest-login-form.tsx:172
 msgid "Log in as {guestName}"
+msgstr ""
+
+#: ../../emails/auth-code.tsx:35
+msgid "Log in as {name}"
 msgstr ""
 
 #: src/app/user-menu.tsx:133
@@ -3924,6 +4124,18 @@ msgctxt "Location colour"
 msgid "Neutral"
 msgstr ""
 
+#: ../../emails/comment.tsx:57
+msgid "New comment on your profile"
+msgstr ""
+
+#: ../../emails/comment.tsx:65
+msgid "New comment on: {name}"
+msgstr ""
+
+#: ../../emails/comment.tsx:58
+msgid "New comment on: {ownerName}'s profile"
+msgstr ""
+
 #: src/features/admin/event-days.tsx:221
 msgid "New day"
 msgstr ""
@@ -4033,6 +4245,10 @@ msgstr ""
 msgid "No guests assigned to this event yet."
 msgstr ""
 
+#: ../../emails/session-lost-host.tsx:13
+msgid "No host for: {title}"
+msgstr ""
+
 #: src/features/proposals/proposals-screen.tsx:467
 #: src/features/proposals/proposals-screen.tsx:562
 msgid "No host yet"
@@ -4049,6 +4265,10 @@ msgstr ""
 
 #: src/features/admin/event-icon-picker.tsx:54
 msgid "No icon"
+msgstr ""
+
+#: ../../emails/format.ts:75
+msgid "No location"
 msgstr ""
 
 #: src/features/admin/event-sessions.tsx:277
@@ -4324,6 +4544,10 @@ msgstr ""
 
 #: src/features/people/directory-screen.tsx:69
 msgid "Open to 1-on-1s"
+msgstr ""
+
+#: ../../emails/meeting.tsx:149
+msgid "Open your 1-on-1 settings"
 msgstr ""
 
 #: src/features/admin/identity-mode-options.ts:9
@@ -4786,6 +5010,10 @@ msgstr ""
 msgid "Protection"
 msgstr ""
 
+#: ../../emails/auth-security-changed.tsx:26
+msgid "Protection on your name was just turned off — anyone can now act under it until you protect it again."
+msgstr ""
+
 #: src/features/sign-in/account-security.tsx:137
 msgid "Protection turned off"
 msgstr ""
@@ -4831,6 +5059,10 @@ msgstr ""
 
 #: src/app/sync-indicator.tsx:10
 msgid "Reconnecting…"
+msgstr ""
+
+#: ../../emails/attendee-count-followup.tsx:29
+msgid "Record the attendee count"
 msgstr ""
 
 #: src/ui/label-badge.tsx:10
@@ -5142,6 +5374,7 @@ msgctxt "verb"
 msgid "Schedule"
 msgstr ""
 
+#: ../../emails/meeting.tsx:168
 #: src/features/people/profile-body.tsx:135
 msgid "Schedule a 1-on-1"
 msgstr ""
@@ -5322,6 +5555,10 @@ msgstr ""
 msgid "Session"
 msgstr ""
 
+#: ../../emails/session-deleted.tsx:32
+msgid "Session deleted: {title}"
+msgstr ""
+
 #: src/features/schedule/session-panel.tsx:56
 #: src/features/schedule/session-panel.tsx:57
 msgid "Session details"
@@ -5352,6 +5589,10 @@ msgstr ""
 msgid "Session host"
 msgstr ""
 
+#: ../../emails/session-changed.tsx:55
+msgid "Session location changed: {title}"
+msgstr ""
+
 #: src/features/schedule/session-panel.tsx:66
 #: src/features/sessions/session-form.tsx:104
 msgid "Session not found."
@@ -5368,6 +5609,14 @@ msgstr ""
 
 #: src/features/admin/stats-text.ts:102
 msgid "Session RSVPs"
+msgstr ""
+
+#: ../../emails/session-changed.tsx:52
+msgid "Session time and location changed: {title}"
+msgstr ""
+
+#: ../../emails/session-changed.tsx:54
+msgid "Session time changed: {title}"
 msgstr ""
 
 #: src/features/sessions/session-form.tsx:556
@@ -5480,6 +5729,11 @@ msgstr ""
 #: src/features/sign-in/account-security.tsx:266
 #: src/features/sign-in/reset-password-form.tsx:88
 msgid "Set password"
+msgstr ""
+
+#: ../../emails/auth-password-reset.tsx:16
+#: ../../emails/auth-password-reset.tsx:26
+msgid "Set your password"
 msgstr ""
 
 #: src/app/admin-frame.tsx:44
@@ -5918,6 +6172,11 @@ msgstr ""
 msgid "Tell others about yourself"
 msgstr ""
 
+#: ../../emails/test-email.tsx:7
+#: ../../emails/test-email.tsx:10
+msgid "Test email"
+msgstr ""
+
 #: src/commands/failure-message.ts:31
 msgid "That 1-on-1 is longer than the event allows."
 msgstr ""
@@ -6075,6 +6334,10 @@ msgstr ""
 msgid "They are not available at that time."
 msgstr ""
 
+#: ../../emails/meeting.tsx:142
+msgid "They can only book you once you are open to 1-on-1s."
+msgstr ""
+
 #: src/features/people/profile-form.tsx:78
 msgid "They/Them"
 msgstr ""
@@ -6134,6 +6397,10 @@ msgstr ""
 
 #: src/features/schedule/session-panel.tsx:202
 msgid "This is a closed session, meaning you can at most arrive 5 minutes late. If you arrive later you may not join and please do not knock or otherwise disrupt the session."
+msgstr ""
+
+#: ../../emails/test-email.tsx:11
+msgid "This is a test email sent to {name}."
 msgstr ""
 
 #: src/features/sign-in/bootstrap-screen.tsx:123
@@ -6286,6 +6553,10 @@ msgstr ""
 msgid "Time format"
 msgstr ""
 
+#: ../../emails/attendee-count-headsup.tsx:33
+#: ../../emails/cohost-added.tsx:43
+#: ../../emails/session-changed.tsx:73
+#: ../../emails/session-deleted.tsx:42
 #: src/features/schedule/session-panel.tsx:318
 msgid "Time:"
 msgstr ""
@@ -6324,6 +6595,10 @@ msgstr ""
 #: src/commands/field-message.test.ts:17
 #: src/commands/field-message.ts:15
 msgid "Title is required"
+msgstr ""
+
+#: ../../emails/meeting.tsx:145
+msgid "To open up, go to Settings and find 1-on-1s. Open {eventName}, tick \"I'm open to 1-on-1s at this event\", choose when you are free and save."
 msgstr ""
 
 #: src/features/proposals/vote-breakdown.tsx:113
@@ -6460,6 +6735,10 @@ msgstr ""
 msgid "Unknown guest"
 msgstr ""
 
+#: ../../emails/format.ts:62
+msgid "Unscheduled"
+msgstr ""
+
 #: src/features/admin/location-availability.tsx:150
 msgid "Until"
 msgstr ""
@@ -6503,6 +6782,14 @@ msgstr ""
 
 #: src/commands/field-message.ts:19
 msgid "Use at least 8 characters"
+msgstr ""
+
+#: ../../emails/auth-password-reset.tsx:22
+msgid "Use this link to set a new password for your name. It works once and expires in {validMinutes, plural, one {# minute} other {# minutes}}:"
+msgstr ""
+
+#: ../../emails/join-link.tsx:18
+msgid "Use this personal link to join {eventName}. It signs you in as you, so keep it to yourself:"
 msgstr ""
 
 #. Name of an event icon
@@ -6589,6 +6876,29 @@ msgstr ""
 
 #: src/features/proposals/proposals-screen.tsx:124
 msgid "View Schedule"
+msgstr ""
+
+#: ../../emails/meeting.tsx:102
+msgid "View the 1-on-1"
+msgstr ""
+
+#: ../../emails/comment.tsx:83
+msgid "View the comment"
+msgstr ""
+
+#: ../../emails/proposal-joined.tsx:22
+msgid "View the proposal"
+msgstr ""
+
+#: ../../emails/session-deleted.tsx:48
+msgid "View the schedule"
+msgstr ""
+
+#: ../../emails/attendee-count-headsup.tsx:44
+#: ../../emails/cohost-added.tsx:49
+#: ../../emails/session-changed.tsx:82
+#: ../../emails/session-lost-host.tsx:24
+msgid "View the session"
 msgstr ""
 
 #: src/features/admin/locations-screen.tsx:57
@@ -6743,6 +7053,10 @@ msgstr ""
 msgid "When you're free to meet other attendees, event by event. Only the events you're attending that offer 1-on-1s are listed."
 msgstr ""
 
+#: ../../emails/meeting.tsx:51
+msgid "When:"
+msgstr ""
+
 #: src/features/meetings/meeting-panel.tsx:81
 msgid "Where"
 msgstr ""
@@ -6758,6 +7072,11 @@ msgstr ""
 #: src/features/meetings/meeting-request-fields.tsx:88
 #: src/features/meetings/meeting-request-fields.tsx:125
 msgid "Where to meet"
+msgstr ""
+
+#: ../../emails/meeting.tsx:54
+#: ../../emails/meeting.tsx:98
+msgid "Where:"
 msgstr ""
 
 #: src/features/proposals/default-proposal-help.ts:10
@@ -6778,6 +7097,10 @@ msgstr ""
 
 #: src/features/meetings/availability-form.tsx:101
 msgid "While this is off, nobody can book you and you won't appear as bookable."
+msgstr ""
+
+#: ../../emails/attendee-count-headsup.tsx:40
+msgid "While you’re there, please count how many people attend. Once the session has finished you’ll be able to record the number, and we’ll remind you when it’s time."
 msgstr ""
 
 #: src/features/proposals/proposal-form.tsx:269
@@ -6886,6 +7209,14 @@ msgstr ""
 msgid "You are not part of this event."
 msgstr ""
 
+#: ../../emails/cohost-added.tsx:33
+msgid "You are now a co-host of: {title}"
+msgstr ""
+
+#: ../../emails/cohost-added.tsx:32
+msgid "You are now the host of: {title}"
+msgstr ""
+
 #: src/features/sessions/session-form.tsx:747
 msgid "You can still schedule here; just expect a smaller group."
 msgstr ""
@@ -6923,8 +7254,32 @@ msgstr ""
 msgid "You have voted on all proposals. Go to the overview to change your votes."
 msgstr ""
 
+#: ../../emails/auth-password-reset.tsx:30
+msgid "You’ll then log in with the new password. If you didn’t request this, you can safely ignore this email — nothing changes until the link is used."
+msgstr ""
+
+#: ../../emails/attendee-count-headsup.tsx:27
+msgid "You're hosting \"{title}\" shortly"
+msgstr ""
+
+#: ../../emails/attendee-count-headsup.tsx:31
+msgid "You’re hosting this session in about an hour."
+msgstr ""
+
+#: ../../emails/cohost-added.tsx:40
+msgid "You’ve been added as a co-host of this session."
+msgstr ""
+
+#: ../../emails/cohost-added.tsx:39
+msgid "You’ve been added as the host of this session."
+msgstr ""
+
 #: src/features/schedule/clashes.ts:79
 msgid "your 1-on-1 with {otherName}"
+msgstr ""
+
+#: ../../emails/join-link.tsx:12
+msgid "Your link to {eventName}"
 msgstr ""
 
 #: src/app/user-menu.tsx:57
@@ -6941,12 +7296,28 @@ msgstr ""
 msgid "Your name is protected: switching to it requires your password. Forgot it? Ask an organizer for a new link, then set a new password here."
 msgstr ""
 
+#: ../../emails/auth-security-changed.tsx:18
+msgid "Your name protection was turned off"
+msgstr ""
+
 #: src/app/user-menu.tsx:78
 msgid "Your name: {name}"
 msgstr ""
 
+#: ../../emails/auth-security-changed.tsx:19
+msgid "Your password was changed"
+msgstr ""
+
+#: ../../emails/auth-security-changed.tsx:28
+msgid "Your password was just changed."
+msgstr ""
+
 #: src/features/people/profile-form.tsx:631
 msgid "Your photo was saved; the details were not."
+msgstr ""
+
+#: ../../emails/comment.tsx:55
+msgid "Your profile"
 msgstr ""
 
 #: src/features/meetings/meeting-request-fields.tsx:199
@@ -7061,12 +7432,24 @@ msgstr ""
 msgid "Your session “{title}” has been updated successfully!"
 msgstr ""
 
+#: ../../emails/attendee-count-followup.tsx:25
+msgid "Your session finished at {time}. If you counted the room, record the number now — it only takes a moment. Only you and your co-hosts will see it, not the attendees."
+msgstr ""
+
 #: src/features/sessions/session-form.tsx:732
 msgid "Your session runs {start} – {end}."
 msgstr ""
 
 #: src/features/sessions/session-form.tsx:516
 msgid "Your session will be added to the schedule immediately, but we may reach out to you about rescheduling, relocating, or cancelling."
+msgstr ""
+
+#: ../../emails/auth-code.tsx:21
+msgid "Your temporary login code"
+msgstr ""
+
+#: ../../emails/auth-code.tsx:25
+msgid "Your temporary login code is:"
 msgstr ""
 
 #: src/features/proposals/proposals-screen.tsx:432

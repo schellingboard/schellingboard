@@ -4,6 +4,7 @@ import { authPasswordResetEmail } from "@/emails/auth-password-reset";
 import { authSecurityChangedEmail } from "@/emails/auth-security-changed";
 import { joinLinkEmail, joinLinkMadeEmail } from "@/emails/join-link";
 import { testEmail } from "@/emails/test-email";
+import { translatorFor } from "@/server/kernel/translator";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
 import {
   type CommentUseCases,
@@ -114,45 +115,60 @@ export function peopleUseCases(): PeopleUseCases {
     avatars: getImageRepositories().avatars,
     loginMail: {
       configured: () => isMailerConfigured(),
-      send: ({ guestId, name, email, code, validMinutes }) =>
+      send: ({ guestId, name, email, locale, code, validMinutes }) =>
         sendMail({
           to: email,
-          ...authCodeEmail({
-            name,
-            code,
-            loginUrl: `${siteUrl()}/auth/login?guest=${encodeURIComponent(
-              guestId
-            )}&code=${encodeURIComponent(code)}`,
-            validMinutes,
-          }),
+          ...authCodeEmail(
+            {
+              name,
+              code,
+              loginUrl: `${siteUrl()}/auth/login?guest=${encodeURIComponent(
+                guestId
+              )}&code=${encodeURIComponent(code)}`,
+              validMinutes,
+            },
+            translatorFor(locale)
+          ),
         }),
-      sendResetLink: ({ guestId, name, email, token, validMinutes }) =>
+      sendResetLink: ({ guestId, name, email, locale, token, validMinutes }) =>
         sendMail({
           to: email,
-          ...authPasswordResetEmail({
-            name,
-            resetUrl: `${siteUrl()}/auth/reset?guest=${encodeURIComponent(
-              guestId
-            )}&token=${encodeURIComponent(token)}`,
-            validMinutes,
-          }),
+          ...authPasswordResetEmail(
+            {
+              name,
+              resetUrl: `${siteUrl()}/auth/reset?guest=${encodeURIComponent(
+                guestId
+              )}&token=${encodeURIComponent(token)}`,
+              validMinutes,
+            },
+            translatorFor(locale)
+          ),
         }),
-      sendJoinLink: ({ name, email, eventName, token }) =>
+      sendJoinLink: ({ name, email, locale, eventName, token }) =>
         sendMail({
           to: email,
-          ...joinLinkEmail({
-            name,
-            eventName,
-            joinUrl: `${siteUrl()}/join/${encodeURIComponent(token)}`,
-          }),
+          ...joinLinkEmail(
+            {
+              name,
+              eventName,
+              joinUrl: `${siteUrl()}/join/${encodeURIComponent(token)}`,
+            },
+            translatorFor(locale)
+          ),
         }),
-      sendJoinLinkMade: ({ name, email, eventName }) =>
-        sendMail({ to: email, ...joinLinkMadeEmail({ name, eventName }) }),
-      sendSecurityChanged: ({ name, email, change }) =>
-        sendMail({ to: email, ...authSecurityChangedEmail({ name, change }) }),
+      sendJoinLinkMade: ({ name, email, locale, eventName }) =>
+        sendMail({
+          to: email,
+          ...joinLinkMadeEmail({ name, eventName }, translatorFor(locale)),
+        }),
+      sendSecurityChanged: ({ name, email, locale, change }) =>
+        sendMail({
+          to: email,
+          ...authSecurityChangedEmail({ name, change }, translatorFor(locale)),
+        }),
     },
-    sendTestEmail: ({ name, email }) =>
-      sendMail({ to: email, ...testEmail({ name }) }),
+    sendTestEmail: ({ name, email, locale }) =>
+      sendMail({ to: email, ...testEmail({ name }, translatorFor(locale)) }),
     uow: unitOfWork,
   });
 }

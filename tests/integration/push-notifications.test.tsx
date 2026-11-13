@@ -17,6 +17,7 @@ import * as webpush from "web-push";
 
 import { getRepositories } from "@/db/container";
 import { buildEmail, type EmailRecipe } from "@/emails/registry";
+import { translatorFor } from "@/server/kernel/translator";
 import { sendMail } from "@/utils/mailer";
 import { notifyGuest } from "@/utils/notifications";
 
@@ -106,7 +107,9 @@ describe("push notifications", () => {
     const payload = payloadOf(
       vi.mocked(webpush.sendNotification).mock.calls[0]
     );
-    expect(payload.title).toBe(buildEmail(MESSAGE).subject);
+    expect(payload.title).toBe(
+      buildEmail(MESSAGE, translatorFor(null)).subject
+    );
     expect(payload.body).toBe("Your session moved");
   });
 

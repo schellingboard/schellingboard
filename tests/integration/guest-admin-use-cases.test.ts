@@ -363,6 +363,7 @@ describe("guest admin use cases", () => {
       expect(sendTestEmail).toHaveBeenCalledWith({
         name: "Ada",
         email: "ada@x.org",
+        locale: null,
       });
 
       sendTestEmail.mockRejectedValueOnce(new Error("smtp down"));

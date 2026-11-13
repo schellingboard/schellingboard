@@ -3,7 +3,7 @@
 //
 //     bun x tsx scripts/run-bundled.ts scripts/openapi.ts [args]
 
-import { mkdirSync } from "node:fs";
+import { mkdirSync, rmSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -14,7 +14,7 @@ import { linguiEsbuild } from "./lingui-macro.ts";
 const [entry, ...args] = process.argv.slice(2);
 const outfile = path.resolve(
   "node_modules/.cache/run-bundled",
-  `${path.basename(entry, path.extname(entry))}.mjs`
+  `${path.basename(entry, path.extname(entry))}-${process.pid}.mjs`
 );
 mkdirSync(path.dirname(outfile), { recursive: true });
 await build({
@@ -43,4 +43,8 @@ await build({
   logLevel: "warning",
 });
 process.argv.splice(1, process.argv.length, entry, ...args);
-await import(pathToFileURL(outfile).href);
+try {
+  await import(pathToFileURL(outfile).href);
+} finally {
+  rmSync(outfile, { force: true });
+}

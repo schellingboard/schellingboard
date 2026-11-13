@@ -28,6 +28,8 @@ export type DueReminderCandidate = ReminderKey & {
    * in-app notification still goes out and a row is still written.
    */
   guestEmail: string | null;
+  /** The host's chosen language; null reads as English. */
+  guestLocale: string | null;
   /**
    * The EmailSettings key for *this* kind — `sessionHeadsUp` or
    * `attendeeCountReminder` — which gates the **email** alone (FR-017). It has

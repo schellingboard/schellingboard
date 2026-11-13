@@ -1,3 +1,4 @@
+import type { Translate } from "@/server/kernel/translator";
 import type { EmailMessage } from "@/utils/mailer";
 
 import { cohostAddedEmail } from "./cohost-added";
@@ -38,13 +39,13 @@ export type EmailRecipe = {
 /** Thrown for a queued email whose template this version no longer has. */
 export class UnknownTemplateError extends Error {}
 
-export function buildEmail(recipe: EmailRecipe): EmailMessage {
+export function buildEmail(recipe: EmailRecipe, t: Translate): EmailMessage {
   const build = templates[recipe.template] as
-    ((props: EmailRecipe["props"]) => EmailMessage) | undefined;
+    ((props: EmailRecipe["props"], t: Translate) => EmailMessage) | undefined;
   if (!build) {
     throw new UnknownTemplateError(
       `Unknown email template: ${recipe.template}`
     );
   }
-  return build(recipe.props);
+  return build(recipe.props, t);
 }

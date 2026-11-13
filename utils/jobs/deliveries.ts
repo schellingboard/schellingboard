@@ -6,6 +6,7 @@ import {
   type EmailRecipe,
   UnknownTemplateError,
 } from "@/emails/registry";
+import { translatorFor } from "@/server/kernel/translator";
 import { sendMail } from "@/utils/mailer";
 import { pushToGuest } from "@/utils/push";
 
@@ -42,7 +43,10 @@ async function send(delivery: Delivery): Promise<void> {
   const guest = await getRepositories().guests.findById(delivery.guestId);
   if (!guest?.info.email) return;
   const { recipe } = delivery.payload as EmailPayload;
-  await sendMail({ to: guest.info.email, ...buildEmail(recipe) });
+  await sendMail({
+    to: guest.info.email,
+    ...buildEmail(recipe, translatorFor(guest.info.locale)),
+  });
 }
 
 // A 5xx to the recipient or the message will be the same tomorrow. One to the

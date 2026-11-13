@@ -71,6 +71,7 @@ export class SqliteRemindersRepository implements RemindersRepository {
         sessionId: schema.sessionHosts.sessionId,
         guestId: schema.guests.id,
         email: schema.guests.email,
+        locale: schema.guests.locale,
         headsUpOptIn: schema.guests.emailOnSessionHeadsUp,
         followUpOptIn: schema.guests.emailOnAttendeeCountReminder,
       })
@@ -157,6 +158,7 @@ export class SqliteRemindersRepository implements RemindersRepository {
             eventSlug: session.eventSlug,
             eventTimezone: session.eventTimezone,
             guestEmail: host.email === "" ? null : host.email,
+            guestLocale: host.locale,
             reminderOptIn:
               kind === "headsUp" ? host.headsUpOptIn : host.followUpOptIn,
             storedDueTime: parse(row?.dueTime ?? null),

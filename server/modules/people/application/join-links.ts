@@ -58,6 +58,7 @@ export const createJoinLink = (deps: PeopleDeps) => {
         await loginMail.sendJoinLinkMade({
           name: guest.name,
           email: guest.info.email,
+          locale: guest.info.locale,
           eventName: event.name,
         });
       } catch (err) {
@@ -105,6 +106,7 @@ export const mailJoinLinks =
         await loginMail.sendJoinLink({
           name: guest.name,
           email: guest.info.email,
+          locale: guest.info.locale,
           eventName: event.name,
           token,
         });

@@ -8,12 +8,13 @@ import {
   headsUpEligible,
   reminderNoticeText,
 } from "@schellingboard/domain/reminder-schedule";
-import { DateTime } from "luxon";
 
 import type { Repositories } from "@/db/container";
 import { attendeeCountFollowUpEmail } from "@/emails/attendee-count-followup";
 import { attendeeCountHeadsUpEmail } from "@/emails/attendee-count-headsup";
+import { emailInstant } from "@/emails/format";
 import { notificationsChanged } from "@/server/kernel/notification-changes";
+import { type Translate, translatorFor } from "@/server/kernel/translator";
 import { isMailerConfigured, sendMail } from "@/utils/mailer";
 import { sessionPath } from "@/utils/notifications";
 import { siteUrl } from "@/utils/site-url";
@@ -156,7 +157,10 @@ export async function dispatchDueReminders(
     }
 
     try {
-      await sendMail({ to: email, ...message(candidate, base) });
+      await sendMail({
+        to: email,
+        ...message(candidate, base, translatorFor(candidate.guestLocale)),
+      });
       await reminders.markSent(key, now);
       summary.sent += 1;
     } catch (err) {
@@ -192,30 +196,26 @@ function recordPath(candidate: DueReminderCandidate): string {
   return candidate.kind === "headsUp" ? path : `${path}?record=count`;
 }
 
-function message(candidate: DueReminderCandidate, base: string) {
+function message(candidate: DueReminderCandidate, base: string, t: Translate) {
   const url = base + recordPath(candidate);
+  const zone = candidate.eventTimezone;
   if (candidate.kind === "headsUp") {
-    return attendeeCountHeadsUpEmail({
-      title: candidate.sessionTitle,
-      time: formatInEventZone(
-        candidate.sessionStartTime,
-        candidate.eventTimezone
-      ),
-      location: candidate.sessionLocationNames.join(", ") || "No location",
-      sessionUrl: url,
-    });
+    return attendeeCountHeadsUpEmail(
+      {
+        title: candidate.sessionTitle,
+        time: emailInstant(candidate.sessionStartTime, zone),
+        location: candidate.sessionLocationNames,
+        sessionUrl: url,
+      },
+      t
+    );
   }
-  return attendeeCountFollowUpEmail({
-    title: candidate.sessionTitle,
-    time: formatInEventZone(candidate.sessionEndTime, candidate.eventTimezone),
-    recordUrl: url,
-  });
-}
-
-// The shipped container runs in UTC, so a time formatted in the ambient zone
-// is invisible in development and wrong in production (Constitution IV).
-function formatInEventZone(instant: Date, timezone: string): string {
-  return DateTime.fromJSDate(instant)
-    .setZone(timezone)
-    .toFormat("cccc d LLLL, HH:mm");
+  return attendeeCountFollowUpEmail(
+    {
+      title: candidate.sessionTitle,
+      time: emailInstant(candidate.sessionEndTime, zone),
+      recordUrl: url,
+    },
+    t
+  );
 }

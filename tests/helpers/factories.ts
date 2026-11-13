@@ -91,6 +91,7 @@ export async function createGuest(opts?: {
   name?: string;
   email?: string | null;
   emailSettings?: Partial<EmailSettings>;
+  locale?: string | null;
   /** When set, the guest is also assigned to this event. */
   eventId?: string;
 }): Promise<Guest> {
@@ -115,6 +116,7 @@ export async function createGuest(opts?: {
       ...opts.emailSettings,
     });
   }
+  if (opts?.locale) await guests.updateLocale(guest.id, opts.locale);
   if (opts?.eventId) {
     await guests.assignToEvent(opts.eventId, [guest.id]);
   }

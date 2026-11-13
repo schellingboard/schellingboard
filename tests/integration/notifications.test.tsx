@@ -19,6 +19,7 @@ import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
 
 import { getRepositories } from "@/db/container";
 import { buildEmail, type EmailRecipe } from "@/emails/registry";
+import { translatorFor } from "@/server/kernel/translator";
 import { sendMail } from "@/utils/mailer";
 import {
   notifyCohostsAdded,
@@ -91,7 +92,7 @@ describe("notifyGuest", () => {
     await deliverQueued();
     expect(sendMail).toHaveBeenCalledExactlyOnceWith({
       to: "on@test.example",
-      ...buildEmail(MESSAGE),
+      ...buildEmail(MESSAGE, translatorFor(null)),
     });
   });
 
@@ -113,7 +114,7 @@ describe("notifyGuest", () => {
     await deliverQueued();
     expect(sendMail).toHaveBeenCalledExactlyOnceWith({
       to: "cohost@test.example",
-      ...buildEmail(MESSAGE),
+      ...buildEmail(MESSAGE, translatorFor(null)),
     });
   });
 

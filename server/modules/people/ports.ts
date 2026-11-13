@@ -19,6 +19,7 @@ export interface LoginMail {
     guestId: string;
     name: string;
     email: string;
+    locale: string | null;
     code: string;
     validMinutes: number;
   }): Promise<void>;
@@ -26,23 +27,27 @@ export interface LoginMail {
     guestId: string;
     name: string;
     email: string;
+    locale: string | null;
     token: string;
     validMinutes: number;
   }): Promise<void>;
   sendJoinLink(input: {
     name: string;
     email: string;
+    locale: string | null;
     eventName: string;
     token: string;
   }): Promise<void>;
   sendJoinLinkMade(input: {
     name: string;
     email: string;
+    locale: string | null;
     eventName: string;
   }): Promise<void>;
   sendSecurityChanged(input: {
     name: string;
     email: string;
+    locale: string | null;
     change: "disabled" | "password-changed";
   }): Promise<void>;
 }
@@ -63,5 +68,9 @@ export interface PeopleDeps {
   >;
   avatars: AvatarStore;
   loginMail: LoginMail;
-  sendTestEmail: (to: { name: string; email: string }) => Promise<void>;
+  sendTestEmail: (to: {
+    name: string;
+    email: string;
+    locale: string | null;
+  }) => Promise<void>;
 }

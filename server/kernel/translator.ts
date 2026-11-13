@@ -13,7 +13,10 @@ import { parsePoEntries } from "@schellingboard/domain/po-catalog";
 const generateMessageId = (msg: string, context?: string) =>
   hashedId(msg, context) as string;
 
-export type Translate = (message: MessageDescriptor) => string;
+/** `locale` is the language the text comes out in, for formatting dates and lists to match. */
+export type Translate = ((message: MessageDescriptor) => string) & {
+  locale: string;
+};
 
 export const LOCALES_DIR = path.join(process.cwd(), "apps/web/locales");
 
@@ -58,7 +61,10 @@ export function createTranslators(localesDir = LOCALES_DIR) {
         console.error(`Could not load the ${locale} catalog:`, error);
         i18n = english();
       }
-      translate = (message) => i18n._(message);
+      translate = Object.assign(
+        (message: MessageDescriptor) => i18n._(message),
+        { locale: i18n.locale }
+      );
       cache.set(locale, translate);
     }
     return translate;

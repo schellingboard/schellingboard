@@ -87,6 +87,7 @@ export const requestLoginCode =
         guestId,
         name: guest.name,
         email: guest.info.email,
+        locale: guest.info.locale,
         code,
         validMinutes: AUTH_CODE_VALID_MINUTES,
       });

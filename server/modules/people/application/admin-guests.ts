@@ -382,7 +382,11 @@ export const sendTestEmail =
     if (!guest) return guestNotFound();
     if (!guest.info.email) return noEmail();
     try {
-      await send({ name: guest.name, email: guest.info.email });
+      await send({
+        name: guest.name,
+        email: guest.info.email,
+        locale: guest.info.locale,
+      });
     } catch (err) {
       console.error("Failed to send test email:", err);
       const detail = err instanceof Error ? err.message : String(err);

@@ -18,6 +18,7 @@ import { VoteChoice } from "@schellingboard/domain/vote";
 
 import { getRepositories } from "@/db/container";
 import { testEmail } from "@/emails/test-email";
+import { translatorFor } from "@/server/kernel/translator";
 import { sendMail } from "@/utils/mailer";
 
 import {
@@ -352,7 +353,7 @@ describe("admin guest actions", () => {
       // we sent to the correct address and filled in the correct name.
       expect(vi.mocked(sendMail).mock.calls[0][0]).toEqual({
         to: "guest@test.example",
-        ...testEmail({ name: "Ada Lovelace" }),
+        ...testEmail({ name: "Ada Lovelace" }, translatorFor(null)),
       });
     });
 

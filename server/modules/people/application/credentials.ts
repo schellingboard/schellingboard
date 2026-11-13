@@ -79,6 +79,7 @@ async function notifySecurityChange(
       await loginMail.sendSecurityChanged({
         name: guest.name,
         email: guest.info.email,
+        locale: guest.info.locale,
         change,
       });
   } catch (err) {
@@ -136,6 +137,7 @@ export const requestResetLink =
         guestId,
         name: guest.name,
         email: guest.info.email,
+        locale: guest.info.locale,
         token,
         validMinutes: RESET_TOKEN_VALID_MINUTES,
       });

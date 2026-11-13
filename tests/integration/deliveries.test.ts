@@ -6,6 +6,7 @@ vi.mock("@/utils/push", () => ({ pushToGuest: vi.fn() }));
 
 import { getRepositories } from "@/db/container";
 import { buildEmail, type EmailRecipe } from "@/emails/registry";
+import { translatorFor } from "@/server/kernel/translator";
 import { sendMail } from "@/utils/mailer";
 import { notifyGuest } from "@/utils/notifications";
 import { pushToGuest } from "@/utils/push";
@@ -58,11 +59,11 @@ describe("deliveries", () => {
     await runJobs(T0);
     expect(sendMail).toHaveBeenCalledExactlyOnceWith({
       to: "ari@test.example",
-      ...buildEmail(RECIPE),
+      ...buildEmail(RECIPE, translatorFor(null)),
     });
     expect(pushToGuest).toHaveBeenCalledExactlyOnceWith(
       guest.id,
-      { title: buildEmail(RECIPE).subject, ...IN_APP },
+      { title: buildEmail(RECIPE, translatorFor(null)).subject, ...IN_APP },
       T0
     );
   });
