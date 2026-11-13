@@ -10,6 +10,7 @@ import { voteChoiceToEmoji } from "@schellingboard/domain/vote-display";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useTimeFormat } from "../../app/time-format";
+import { useListFormat } from "../../i18n/format-locale";
 import type {
   ProposalDetailQuery,
   ProposalDetailState,
@@ -298,8 +299,9 @@ function Scheduled({
   timezone: string;
 }) {
   const timeFormat = useTimeFormat();
+  const listFormat = useListFormat();
   const roomNames = (session: Session) =>
-    session.locations.map((l) => l.name).join(", ");
+    listFormat(session.locations.map((l) => l.name));
   const link = "text-brand-fg underline hover:text-brand-fg-hover";
   const once = (session: Session) => {
     const day = formatOptionalTime(session.startTime, timezone, "EEEE");

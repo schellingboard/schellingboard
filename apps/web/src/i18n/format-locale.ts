@@ -1,6 +1,6 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useMemo } from "react";
 
-import { formatLocale } from "./format";
+import { formatList, formatLocale } from "./format";
 import { DEFAULT_LOCALE } from "./locales";
 
 export const FormatLocaleContext = createContext<string>(
@@ -8,3 +8,11 @@ export const FormatLocaleContext = createContext<string>(
 );
 
 export const useFormatLocale = () => useContext(FormatLocaleContext);
+
+export function useListFormat() {
+  const locale = useFormatLocale();
+  return useMemo(
+    () => (items: readonly string[]) => formatList(locale, items),
+    [locale]
+  );
+}

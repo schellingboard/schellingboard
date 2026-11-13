@@ -3,6 +3,7 @@ import { plural, t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { type Ref, useEffect, useId, useRef, useState } from "react";
 
+import { useListFormat } from "../../i18n/format-locale";
 import { cx } from "../../ui/cx";
 import { ArrowUpIcon, ChevronDownSmallIcon } from "../../ui/icons";
 import { SearchInput } from "../../ui/search-input";
@@ -52,10 +53,13 @@ export function ScheduleFilters({
   /** Where every match stays in place, Enter steps to the next one. */
   onStep?: (direction: 1 | -1) => void;
 }) {
+  const listFormat = useListFormat();
   const kinds = mine
-    ? MINE_KINDS.filter((k) => mine.kinds.includes(k.value))
-        .map((k) => i18n._(k.summary))
-        .join(", ")
+    ? listFormat(
+        MINE_KINDS.filter((k) => mine.kinds.includes(k.value)).map((k) =>
+          i18n._(k.summary)
+        )
+      )
     : "";
   const active = [
     ...(mine?.active ? [t`My schedule (${kinds})`] : []),

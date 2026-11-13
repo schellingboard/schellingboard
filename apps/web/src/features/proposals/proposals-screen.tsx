@@ -8,6 +8,7 @@ import type { VoteChoice } from "@schellingboard/domain/vote";
 import { voteChoiceToEmoji } from "@schellingboard/domain/vote-display";
 import { type ComponentType, useMemo } from "react";
 
+import { useListFormat } from "../../i18n/format-locale";
 import type { Standing } from "../../queries/proposal-standings";
 import { ownVotesFrom, toEvent } from "../../replica/selectors";
 import { cx } from "../../ui/cx";
@@ -197,6 +198,7 @@ function ProposalTable({
   votingEnabled: boolean;
   schedEnabled: boolean;
 }) {
+  const listFormat = useListFormat();
   const guestId = snapshot.me?.guestId ?? null;
   const rows = useMemo(() => rowsFrom(snapshot), [snapshot]);
   const votes = useMemo(() => ownVotesFrom(snapshot), [snapshot]);
@@ -538,7 +540,7 @@ function ProposalTable({
 
       <div className="block md:hidden space-y-4">
         {visible.map((row) => {
-          const hostNames = row.hostNames.join(", ");
+          const hostNames = listFormat(row.hostNames);
           return (
             <div
               key={row.id}

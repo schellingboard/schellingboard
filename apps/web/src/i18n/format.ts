@@ -35,3 +35,14 @@ export function clockStyleFor(locale: string): ClockStyle {
   }).resolvedOptions().hourCycle;
   return cycle === "h11" || cycle === "h12" ? "12h" : "24h";
 }
+
+const listFormats = new Map<string, Intl.ListFormat>();
+
+export function formatList(locale: string, items: readonly string[]): string {
+  let format = listFormats.get(locale);
+  if (!format) {
+    format = new Intl.ListFormat(locale, { type: "unit", style: "short" });
+    listFormats.set(locale, format);
+  }
+  return format.format(items);
+}

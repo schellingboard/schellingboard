@@ -7,6 +7,7 @@ import { formatOptionalTime } from "@schellingboard/domain/time";
 import { DateTime } from "luxon";
 
 import { useTimeFormat } from "../../app/time-format";
+import { useListFormat } from "../../i18n/format-locale";
 import { cx } from "../../ui/cx";
 import {
   AcademicCapIcon,
@@ -232,7 +233,8 @@ function RealSessionCard({
     useScheduleMatch();
   const hiddenByYou = hides(session);
   const ghost = hiddenByYou || (filtering && !matchesSession(session));
-  const hosts = session.hosts.map((h) => h.name).join(", ") || t`No hosts`;
+  const listFormat = useListFormat();
+  const hosts = listFormat(session.hosts.map((h) => h.name)) || t`No hosts`;
   const showTitle = height >= TITLE_MIN_PX && !hiddenByYou;
   const hostLines = hiddenByYou ? 0 : hostLinesFor(height);
 

@@ -35,6 +35,7 @@ import type {
   SessionUpdateBody,
 } from "../../commands/session-form";
 import { useFormMutation } from "../../commands/use-form-mutation";
+import { useListFormat } from "../../i18n/format-locale";
 import { BackLink } from "../../ui/back-link";
 import { Button } from "../../ui/button";
 import { ConfirmDialog } from "../../ui/confirm-dialog";
@@ -137,6 +138,7 @@ function Fields({
   const eventName = event.name;
   const { timezone, breakMinutes, slotIncrementMinutes } = event;
   const timeFormat = useTimeFormat();
+  const listFormat = useListFormat();
   const maxSessionDuration = event.maxSessionDuration;
   const notify = useNotify();
   const formRef = useRef<HTMLFormElement>(null);
@@ -466,20 +468,21 @@ function Fields({
     }
   };
 
-  const roomName = room?.name;
-  const roomCapacity = room?.capacity;
-  const start =
-    (runsFrom && formatSlotLabel(runsFrom, day.start, timezone, timeFormat)) ??
-    "";
-  const end =
-    (interval &&
-      formatSlotLabel(interval.end, day.start, timezone, timeFormat)) ??
-    "";
+  const roomName = room?.name ?? "";
+  const roomCapacity = room?.capacity ?? 0;
+  const start = runsFrom
+    ? (formatSlotLabel(runsFrom, day.start, timezone, timeFormat) ?? "")
+    : "";
+  const end = interval
+    ? (formatSlotLabel(interval.end, day.start, timezone, timeFormat) ?? "")
+    : "";
   const momentTitle = moment?.title ?? "";
-  const momentStart =
-    (moment && formatOptionalTime(moment.start, timezone, timeFormat)) ?? "";
-  const momentEnd =
-    (moment && formatOptionalTime(moment.end, timezone, timeFormat)) ?? "";
+  const momentStart = moment
+    ? (formatOptionalTime(moment.start, timezone, timeFormat) ?? "")
+    : "";
+  const momentEnd = moment
+    ? (formatOptionalTime(moment.end, timezone, timeFormat) ?? "")
+    : "";
 
   const jump = (name: string) =>
     formRef.current?.querySelector<HTMLElement>(`[name="${name}"]`)?.focus();
@@ -583,7 +586,7 @@ function Fields({
               ? [
                   {
                     value: KEEP_ROOMS,
-                    label: ownRooms.map((r) => r.name).join(", "),
+                    label: listFormat(ownRooms.map((r) => r.name)),
                   },
                 ]
               : []),

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { clockStyleFor, formatLocale } from "./format";
+import { clockStyleFor, formatList, formatLocale } from "./format";
 
 describe("formatLocale", { tags: ["022-US1"] }, () => {
   it("keeps the region the browser asks for within the app's language", () => {
@@ -24,5 +24,13 @@ describe("clockStyleFor", { tags: ["014-US7"] }, () => {
     expect(clockStyleFor("en-US")).toBe("12h");
     expect(clockStyleFor("en-GB")).toBe("24h");
     expect(clockStyleFor("de-DE")).toBe("24h");
+  });
+});
+
+describe("formatList", { tags: ["022-US1"] }, () => {
+  it("joins names in the short unit style", () => {
+    expect(formatList("en-GB", ["A", "B", "C"])).toBe("A, B, C");
+    expect(formatList("en-GB", ["A"])).toBe("A");
+    expect(formatList("en-GB", [])).toBe("");
   });
 });

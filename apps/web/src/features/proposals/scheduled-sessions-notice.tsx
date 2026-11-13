@@ -5,6 +5,7 @@ import { formatOptionalTime } from "@schellingboard/domain/time";
 import { Fragment, type ReactNode } from "react";
 
 import { useTimeFormat } from "../../app/time-format";
+import { useListFormat } from "../../i18n/format-locale";
 import type { ProposalLinks } from "./links";
 
 /**
@@ -23,6 +24,7 @@ export function ScheduledSessionsNotice({
   children: ReactNode;
 }) {
   const timeFormat = useTimeFormat();
+  const listFormat = useListFormat();
   const scheduled = snapshot.sessions
     .filter((s) => s.proposalId === proposalId && s.startTime)
     .sort((a, b) => a.startTime!.localeCompare(b.startTime!));
@@ -32,11 +34,11 @@ export function ScheduledSessionsNotice({
     <div className="rounded-md border border-brand-tint-hover bg-brand-tint px-3 py-2 text-sm text-fg-muted">
       <Trans>This proposal is already on the schedule:</Trans>{" "}
       {scheduled.map((session, i) => {
-        const rooms = session.locationIds
-          .flatMap(
+        const rooms = listFormat(
+          session.locationIds.flatMap(
             (id) => snapshot.locations.find((l) => l.id === id)?.name ?? []
           )
-          .join(", ");
+        );
         const when = formatOptionalTime(
           new Date(session.startTime!),
           snapshot.event.timezone,

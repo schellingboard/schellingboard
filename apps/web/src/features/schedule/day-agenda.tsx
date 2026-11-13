@@ -12,6 +12,7 @@ import {
 import { Fragment, type ReactNode, useMemo } from "react";
 
 import { useTimeFormat } from "../../app/time-format";
+import { useListFormat } from "../../i18n/format-locale";
 import { cx } from "../../ui/cx";
 import {
   AcademicCapIcon,
@@ -253,6 +254,7 @@ function SessionRow({
 }) {
   const { data, links, openSession } = useSchedule();
   const timeFormat = useTimeFormat();
+  const listFormat = useListFormat();
   const state = timeState(start, session.endTime ?? start, data.now);
   const endsAt = formatOptionalTime(session.endTime, timezone, timeFormat);
   const until = t`until ${endsAt}`;
@@ -262,7 +264,7 @@ function SessionRow({
   const rooms =
     inRooms.length === locations.length && inRooms.length > 1
       ? t`All rooms`
-      : inRooms.map((r) => r.name).join(", ");
+      : listFormat(inRooms.map((r) => r.name));
   const color = inRooms[0]?.color;
 
   if (session.blocker) {
@@ -279,7 +281,7 @@ function SessionRow({
   const rsvpd = data.guestId ? data.rsvpd(session.id) : false;
   const hosting =
     !!data.guestId && session.hosts.some((h) => h.id === data.guestId);
-  const hosts = session.hosts.map((h) => h.name).join(", ");
+  const hosts = listFormat(session.hosts.map((h) => h.name));
   return (
     <AgendaRow
       state={state}
