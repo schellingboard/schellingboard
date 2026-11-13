@@ -15,7 +15,7 @@
     "@hono/zod-openapi": "^1.6.3",
     "@hookform/resolvers": "^7.0.3",
     "@react-email/render": "^2.2.0",
-    "@scalar/api-reference": "^1.76.4",
+    "@scalar/api-reference": "^1.77.0",
     "@scalar/hono-api-reference": "^0.12.18",
     "@schellingboard/contracts": "workspace:*",
     "@schellingboard/domain": "workspace:*",
@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@docmd/core": "^0.9.9",
-    "@playwright/test": "^1.64.1",
+    "@playwright/test": "^1.65.0",
     "@schellingboard/api-client": "workspace:*",
     "@types/better-sqlite3": "^9.6.0",
     "@types/js-cookie": "^3.0.6",
