@@ -62,20 +62,4 @@ describe("in-app release notes", () => {
       expect(note.version).toBe("Unreleased");
     }
   });
-
-  it("say something, briefly", () => {
-    // The reopened Unreleased entry starts empty and fills in as changes land.
-    for (const note of releaseNotes) {
-      if (note.date === undefined) continue;
-      expect(note.highlights.length).toBeGreaterThan(0);
-    }
-    const highlights = releaseNotes.flatMap((note) => note.highlights);
-    for (const highlight of highlights) {
-      expect(highlight.trim()).toBe(highlight);
-      expect(highlight).not.toBe("");
-      // A modal an organizer/attendee skims, not the changelog: a highlight that no
-      // longer fits in a sentence belongs in CHANGELOG.md instead.
-      expect(highlight.length).toBeLessThanOrEqual(200);
-    }
-  });
 });

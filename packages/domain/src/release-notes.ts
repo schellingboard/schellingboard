@@ -1,7 +1,5 @@
-// What the footer's version button shows: the 3-5 highlights of each recent
-// release, for an organizer who wants to know what changed without leaving the
-// app. Written by hand rather than derived from CHANGELOG.md, which lists every
-// change and is far too long to read in a modal.
+// The releases the footer's version button lists, with their dates. Their
+// highlights are in apps/web/src/app/release-highlights.ts, keyed by version.
 //
 // Newest first, and one entry per release: the dates are what tells a reader
 // how old the deployment in front of them is, so a release left out makes the
@@ -13,10 +11,7 @@
 // exactly those changes, so it is shown like any other entry; cutting the
 // release turns it into one by giving it its version and date.
 //
-// Highlights only, and at most five: what would open a release announcement,
-// not everything that shipped. The list is not append-only — when it is full,
-// replace the weakest highlight rather than adding a sixth, and re-read it
-// against CHANGELOG.md before finalizing the release. See AGENTS.md.
+// The highlight rules (at most five, not append-only) are in AGENTS.md.
 
 export type ReleaseNote = {
   /**
@@ -29,13 +24,6 @@ export type ReleaseNote = {
    * on the unreleased entry, and the one thing that marks it as unreleased.
    */
   date?: string;
-  /**
-   * Inline markdown, rendered as such — as in CHANGELOG.md, a **bold** phrase
-   * naming what changed, so a reader finds the entry that concerns them
-   * without reading every line. Block markdown (lists, headings) is dropped:
-   * one highlight is one bullet.
-   */
-  highlights: string[];
 };
 
 /** Where the footer sends an admin whose site is behind. */
@@ -48,118 +36,53 @@ export const SHOWN_RELEASES = 3;
 export const releaseNotes: ReleaseNote[] = [
   {
     version: "Unreleased",
-    highlights: [
-      "**Shared moments**: organizers mark lunch or a keynote as a striped band across every room, so hosts see when most people are away, and can still book there.",
-      "**A side panel for details**: sessions, proposals, 1-on-1s and profiles open beside the page, which keeps its search, filters and scroll position.",
-    ],
   },
   {
     version: "5.2.0",
     date: "2026-11-20",
-    highlights: [
-      "**See the schedule early**: attendees can browse, bookmark and hide sessions before scheduling opens, with RSVPs and booking switched on when it does.",
-      "**Spot clashes**: a Clashes filter lists your overlapping sessions and 1-on-1s, and clashing blocks get a warning icon.",
-      "**Know the phase**: a thin bar under the menu shows whether the event is in proposals, voting or scheduling.",
-    ],
   },
   {
     version: "5.1.0",
     date: "2026-11-18",
-    highlights: [
-      "**Hosting on NixOS**: a NixOS module runs SchellingBoard as a system service.",
-      "**Create a session from a proposal**: organizers turn a proposal into a session in one click, prefilled with its title, hosts and duration.",
-      "**Live notifications**: the bell and the notification list update the moment something is sent, with no reload.",
-    ],
   },
   {
     version: "5.0.0",
     date: "2026-11-11",
-    highlights: [
-      "**A faster, live schedule**: sessions open at once and changes to sessions, RSVP counts and rooms appear on everyone's screen without a reload. It also opens offline.",
-      "**Verified events and personal join links**: organizers choose whether attendees must prove who they are, and send each guest a link that signs them in.",
-      "**Site admins**: organizers make people site admins, who replace the shared admin password and sign in with a password or email code.",
-      "**An API for scripts and integrations**: organizers can set up events, rooms, guests and sessions from a script, with a reference at `/api/v1/docs`.",
-      "**Event statistics**: admins see how an event went in explained charts and searchable tables, with CSV download, and can leave out volunteer shifts or other sessions.",
-    ],
   },
   {
     version: "4.0.0",
     date: "2026-10-04",
-    highlights: [
-      "**Sessions at any minute, with or without a break**: organizers can start a session whenever they like, and skip the break before one such as an opening keynote.",
-      "**Location unavailability**: mark when a location can't be used, such as a room only free on Saturday, and attendees simply aren't offered those slots.",
-      "**Proposals that want a host**: hosts can ask for a co-host, a Host wanted filter finds those proposals and the ones with no host, and one click makes you a host.",
-      "**Search and filter the schedule**: find sessions by anything in their description, or narrow the grid and agenda to the ones you have RSVP'd to or are hosting.",
-      "**Longer 1-on-1s**: ask someone for 50 minutes instead of 20, or any length up to the event's longest session, as long as they are free for all of it.",
-    ],
   },
   {
     version: "3.8.1",
     date: "2026-09-24",
-    highlights: [
-      "**The footer's \"Report a Bug\" link opens the right repository again**, instead of the project's old one.",
-    ],
   },
   {
     version: "3.8.0",
     date: "2026-09-12",
-    highlights: [
-      "**Hosts choose how many people fit**: a session's max attendees starts at what the room holds, and the host can cap it lower or allow standing room.",
-      "**Fix a session after it has started**, or one an organizer placed in a slot you could never have booked yourself — without having to move it first.",
-      "**A random attendee order**: shuffle the directory for a different few people at the top on every load, and a fairer share of 1-on-1 requests.",
-    ],
   },
   {
     version: "3.7.0",
     date: "2026-09-11",
-    highlights: [
-      "**Agenda view (beta)**: a list of sessions and your 1-on-1s in start-time order, all rooms together, as an alternative to the grid on narrow screens.",
-    ],
   },
   {
     version: "3.6.0",
     date: "2026-09-08",
-    highlights: [
-      "**Install it on your phone, with notifications**: add the site to your home screen to open it like an app, and get your notifications there even when it's closed.",
-      '**See where you are in the day**: a red line marks the current time on the schedule, and a "Now" button jumps to it, while the event is running.',
-      "**Notifications in the app**: a bell counts what is waiting, and clicking one takes you to it. Tick the ones you are done with to mark them read or delete them. No email set-up needed.",
-      "**1-on-1s**: organizers switch them on and suggest where to meet; attendees mark when they are free, ask from a profile or an empty slot on the schedule, and accept or decline.",
-      '**Hosts can record how many people came** to a session once it has finished. Only that session\'s hosts ever see the number, and 0 is a real answer: "held, nobody came".',
-    ],
   },
   {
     version: "3.5.0",
     date: "2026-08-30",
-    highlights: [
-      "**Comments on sessions and on attendee profiles**, with threaded replies, likes and editing — the section proposals already had.",
-      "**A session booked into the hours after midnight** lands on the right date, instead of disappearing from the schedule.",
-      "**What a room offers is easier to find**, just click/tap on the room name.",
-      "**Clicking the version** at the bottom of any page says what the last few releases changed.",
-    ],
   },
   {
     version: "3.4.2",
     date: "2026-08-24",
-    highlights: [
-      "**Sessions can only be booked in the event's own rooms**, so one can no longer end up in another event's room and vanish from the schedule.",
-      "**The session form says why a save was refused**, instead of only that it failed.",
-    ],
   },
   {
     version: "3.4.1",
     date: "2026-08-21",
-    highlights: [
-      "**Long attendee profiles scroll again**, instead of being cut off at the bottom.",
-    ],
   },
   {
     version: "3.4.0",
     date: "2026-08-21",
-    highlights: [
-      "**Dark mode**, chosen with the System / Light / Dark switch at the bottom of every page.",
-      "**Attendee profiles open over the directory**, with Prev and Next — or arrow keys and swiping — to read through them.",
-      "**The directory can be sorted** by who updated their profile last, and narrowed to attendees who have filled something in.",
-      "**Hosts see how the vote went** on their own proposal, ending with a rough range for how many people to expect.",
-    ],
   },
 ];

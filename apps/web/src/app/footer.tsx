@@ -1,3 +1,4 @@
+import { i18n } from "@lingui/core";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import {
@@ -11,6 +12,7 @@ import { useFormatLocale } from "../i18n/format-locale";
 import { Dialog } from "../ui/dialog";
 import { InlineMarkdown } from "../ui/inline-markdown";
 import { Tooltip } from "../ui/tooltip";
+import { releaseHighlights } from "./release-highlights";
 import { ThemeSelect } from "./theme";
 import type { UpdateStatus } from "./updates";
 
@@ -162,11 +164,13 @@ export function Footer({
                   </p>
                 )}
                 <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-fg">
-                  {release.highlights.map((highlight) => (
-                    <li key={highlight}>
-                      <InlineMarkdown>{highlight}</InlineMarkdown>
-                    </li>
-                  ))}
+                  {(releaseHighlights[release.version] ?? []).map(
+                    (highlight, index) => (
+                      <li key={index}>
+                        <InlineMarkdown>{i18n._(highlight)}</InlineMarkdown>
+                      </li>
+                    )
+                  )}
                 </ul>
               </section>
             );

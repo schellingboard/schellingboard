@@ -138,7 +138,8 @@ id it was served by (`<meta name="sb-build">`, added by `serveSpaShell`); a clie
 `health` report another one offers a reload, and a kiosk reloads by itself. It stays behind the site
 password.
 
-The in-app release notes live in `packages/domain/src/release-notes.ts` so the footer imports it.
+The in-app release versions and dates live in `packages/domain/src/release-notes.ts`; the highlight
+text is in the web app.
 
 ## Keys from the UI
 

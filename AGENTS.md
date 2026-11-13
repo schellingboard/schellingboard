@@ -65,8 +65,9 @@ Good - **Interrupting a profile slide no longer restarts it** ([#123](https://gi
 
 ## In-app release notes
 
-`packages/domain/src/release-notes.ts` backs the footer's version button. Its first entry is the
-release being prepared, and it holds **3–5 highlights of that release — no more**.
+`apps/web/src/app/release-highlights.ts` (text, Lingui messages keyed by version) and
+`packages/domain/src/release-notes.ts` (versions, dates) back the footer's version button. The first
+entry is the release being prepared, and it holds **3–5 highlights of that release — no more**.
 
 - A highlight is something a reader would want announced. If it wouldn't open a release
   announcement, it doesn't belong: bug fixes, polish and internal work almost never do.

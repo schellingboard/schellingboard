@@ -424,7 +424,7 @@ msgstr ""
 msgid "{valueLabel}: 0 to {max}"
 msgstr ""
 
-#: src/app/footer.tsx:154
+#: src/app/footer.tsx:156
 msgid "{version} — {releaseDate}"
 msgstr ""
 
@@ -483,6 +483,78 @@ msgstr ""
 
 #: src/features/people/profile-form.tsx:587
 msgid "@handle, address, or URL"
+msgstr ""
+
+#: src/app/release-highlights.ts:21
+msgid "**A faster, live schedule**: sessions open at once and changes to sessions, RSVP counts and rooms appear on everyone's screen without a reload. It also opens offline."
+msgstr ""
+
+#: src/app/release-highlights.ts:8
+msgid "**A side panel for details**: sessions, proposals, 1-on-1s and profiles open beside the page, which keeps its search, filters and scroll position."
+msgstr ""
+
+#: src/app/release-highlights.ts:24
+msgid "**An API for scripts and integrations**: organizers can set up events, rooms, guests and sessions from a script, with a reference at `/api/v1/docs`."
+msgstr ""
+
+#: src/app/release-highlights.ts:17
+msgid "**Create a session from a proposal**: organizers turn a proposal into a session in one click, prefilled with its title, hosts and duration."
+msgstr ""
+
+#: src/app/release-highlights.ts:25
+msgid "**Event statistics**: admins see how an event went in explained charts and searchable tables, with CSV download, and can leave out volunteer shifts or other sessions."
+msgstr ""
+
+#: src/app/release-highlights.ts:16
+msgid "**Hosting on NixOS**: a NixOS module runs SchellingBoard as a system service."
+msgstr ""
+
+#: src/app/release-highlights.ts:13
+msgid "**Know the phase**: a thin bar under the menu shows whether the event is in proposals, voting or scheduling."
+msgstr ""
+
+#: src/app/release-highlights.ts:18
+msgid "**Live notifications**: the bell and the notification list update the moment something is sent, with no reload."
+msgstr ""
+
+#: src/app/release-highlights.ts:29
+msgid "**Location unavailability**: mark when a location can't be used, such as a room only free on Saturday, and attendees simply aren't offered those slots."
+msgstr ""
+
+#: src/app/release-highlights.ts:32
+msgid "**Longer 1-on-1s**: ask someone for 50 minutes instead of 20, or any length up to the event's longest session, as long as they are free for all of it."
+msgstr ""
+
+#: src/app/release-highlights.ts:30
+msgid "**Proposals that want a host**: hosts can ask for a co-host, a Host wanted filter finds those proposals and the ones with no host, and one click makes you a host."
+msgstr ""
+
+#: src/app/release-highlights.ts:31
+msgid "**Search and filter the schedule**: find sessions by anything in their description, or narrow the grid and agenda to the ones you have RSVP'd to or are hosting."
+msgstr ""
+
+#: src/app/release-highlights.ts:11
+msgid "**See the schedule early**: attendees can browse, bookmark and hide sessions before scheduling opens, with RSVPs and booking switched on when it does."
+msgstr ""
+
+#: src/app/release-highlights.ts:28
+msgid "**Sessions at any minute, with or without a break**: organizers can start a session whenever they like, and skip the break before one such as an opening keynote."
+msgstr ""
+
+#: src/app/release-highlights.ts:7
+msgid "**Shared moments**: organizers mark lunch or a keynote as a striped band across every room, so hosts see when most people are away, and can still book there."
+msgstr ""
+
+#: src/app/release-highlights.ts:23
+msgid "**Site admins**: organizers make people site admins, who replace the shared admin password and sign in with a password or email code."
+msgstr ""
+
+#: src/app/release-highlights.ts:12
+msgid "**Spot clashes**: a Clashes filter lists your overlapping sessions and 1-on-1s, and clashing blocks get a warning icon."
+msgstr ""
+
+#: src/app/release-highlights.ts:22
+msgid "**Verified events and personal join links**: organizers choose whether attendees must prove who they are, and send each guest a link that signs them in."
 msgstr ""
 
 #: src/features/proposals/quick-voting-screen.tsx:49
@@ -612,11 +684,11 @@ msgstr ""
 msgid "A new version of SchellingBoard is available."
 msgstr ""
 
-#: src/app/footer.tsx:129
+#: src/app/footer.tsx:131
 msgid "A newer release is out: {latestVersion}, {latestDate}."
 msgstr ""
 
-#: src/app/footer.tsx:130
+#: src/app/footer.tsx:132
 msgid "A newer release is out: {latestVersion}."
 msgstr ""
 
@@ -2856,7 +2928,7 @@ msgctxt "Location colour"
 msgid "Fuchsia"
 msgstr ""
 
-#: src/app/footer.tsx:181
+#: src/app/footer.tsx:185
 msgid "Full changelog on GitHub"
 msgstr ""
 
@@ -2969,7 +3041,7 @@ msgstr ""
 msgid "Heart"
 msgstr ""
 
-#: src/app/footer.tsx:104
+#: src/app/footer.tsx:106
 msgid "Help"
 msgstr ""
 
@@ -3161,7 +3233,7 @@ msgstr ""
 msgid "How often was the prediction right?"
 msgstr ""
 
-#: src/app/footer.tsx:140
+#: src/app/footer.tsx:142
 msgid "How to update"
 msgstr ""
 
@@ -3211,7 +3283,7 @@ msgstr ""
 msgid "Importing..."
 msgstr ""
 
-#: src/app/footer.tsx:159
+#: src/app/footer.tsx:161
 msgid "In this build, but not in a released version yet."
 msgstr ""
 
@@ -4498,7 +4570,7 @@ msgstr ""
 msgid "Popular but never scheduled"
 msgstr ""
 
-#: src/app/footer.tsx:88
+#: src/app/footer.tsx:90
 msgid "Powered by"
 msgstr ""
 
@@ -4829,7 +4901,7 @@ msgctxt "Comment action: reply to it"
 msgid "Reply"
 msgstr ""
 
-#: src/app/footer.tsx:113
+#: src/app/footer.tsx:115
 msgid "Report a Bug"
 msgstr ""
 
@@ -6173,15 +6245,15 @@ msgstr ""
 msgid "This session was scheduled from a proposal. See it <0>here</0>."
 msgstr ""
 
-#: src/app/footer.tsx:124
+#: src/app/footer.tsx:126
 msgid "This site is running {shown}."
 msgstr ""
 
-#: src/app/footer.tsx:132
+#: src/app/footer.tsx:134
 msgid "This site runs {currentVersion}, {currentDate}."
 msgstr ""
 
-#: src/app/footer.tsx:133
+#: src/app/footer.tsx:135
 msgid "This site runs {currentVersion}."
 msgstr ""
 
@@ -6367,7 +6439,7 @@ msgstr ""
 msgid "Undecided"
 msgstr ""
 
-#: src/app/footer.tsx:45
+#: src/app/footer.tsx:47
 msgid "unknown"
 msgstr ""
 
@@ -6499,15 +6571,15 @@ msgstr ""
 msgid "Verified: attendees prove who they are"
 msgstr ""
 
-#: src/app/footer.tsx:70
+#: src/app/footer.tsx:72
 msgid "Version {shown} — what's new"
 msgstr ""
 
-#: src/app/footer.tsx:69
+#: src/app/footer.tsx:71
 msgid "Version {shown} — what's new, update available"
 msgstr ""
 
-#: src/app/footer.tsx:75
+#: src/app/footer.tsx:77
 msgid "Version:"
 msgstr ""
 
@@ -6650,8 +6722,8 @@ msgstr ""
 msgid "What you leave out leaves every figure and download. A host also leaves the figures about people."
 msgstr ""
 
-#: src/app/footer.tsx:64
-#: src/app/footer.tsx:120
+#: src/app/footer.tsx:66
+#: src/app/footer.tsx:122
 msgid "What's new"
 msgstr ""
 

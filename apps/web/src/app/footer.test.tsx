@@ -11,15 +11,22 @@ vi.mock("@schellingboard/domain/release-notes", async (importOriginal) => ({
   ...(await importOriginal<object>()),
   SHOWN_RELEASES: 3,
   releaseNotes: [
-    { version: "Unreleased", highlights: ["**Dragon taming**: in progress."] },
-    {
-      version: "2.2.2",
-      date: "2031-03-07",
-      highlights: ["**Teleporting rooms**: sessions move themselves."],
-    },
-    { version: "2.2.1", date: "2030-12-25", highlights: ["**Snow mode**."] },
-    { version: "2.2.0", date: "2030-01-01", highlights: ["**Too old**."] },
+    { version: "Unreleased" },
+    { version: "2.2.2", date: "2031-03-07" },
+    { version: "2.2.1", date: "2030-12-25" },
+    { version: "2.2.0", date: "2030-01-01" },
   ],
+}));
+
+vi.mock("./release-highlights", () => ({
+  releaseHighlights: {
+    Unreleased: [{ id: "h1", message: "**Dragon taming**: in progress." }],
+    "2.2.2": [
+      { id: "h2", message: "**Teleporting rooms**: sessions move themselves." },
+    ],
+    "2.2.1": [{ id: "h3", message: "**Snow mode**." }],
+    "2.2.0": [{ id: "h4", message: "**Too old**." }],
+  },
 }));
 
 const show = (version: string | undefined, update?: UpdateStatus | null) =>
@@ -54,6 +61,18 @@ describe("Footer", () => {
     expect(
       screen.getByRole("button", { name: /Version unknown/ })
     ).toBeTruthy();
+  });
+
+  it("lists the highlights of each shown release in English", async () => {
+    const user = userEvent.setup();
+    show("2.2.2");
+
+    await user.click(screen.getByRole("button", { name: /Version 2\.2\.2/ }));
+
+    const dialog = screen.getByRole("dialog", { name: "What's new" });
+    expect(within(dialog).getByText("Dragon taming")).toBeTruthy();
+    expect(within(dialog).getByText("Snow mode")).toBeTruthy();
+    expect(dialog.textContent).not.toContain("**");
   });
 
   it("opens the release notes with the running version and dates", async () => {

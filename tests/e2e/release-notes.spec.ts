@@ -7,7 +7,7 @@ import { login } from "./helpers/auth";
 import { expect, test } from "./helpers/fixtures";
 
 // What the notes actually say is the release notes' own business (see
-// tests/unit/release-notes.test.ts); this is about the version in the footer
+// apps/web/src/app/release-highlights.test.ts); this is about the version in the footer
 // being a way in to them at all.
 test("the footer's version opens the recent release notes @014-US3", async ({
   page,
@@ -34,14 +34,6 @@ test("the footer's version opens the recent release notes @014-US3", async ({
     );
   }
   await expect(dialog.getByRole("listitem").first()).not.toBeEmpty();
-
-  // Highlights are markdown, so a bold lead phrase arrives as bold text rather
-  // than as asterisks.
-  const highlights = shown.flatMap((note) => note.highlights);
-  await expect(dialog).not.toContainText("**");
-  if (highlights.some((highlight) => highlight.includes("**"))) {
-    await expect(dialog.locator("li strong").first()).toBeVisible();
-  }
 
   await expect(
     dialog.getByRole("link", { name: /full changelog/i })
