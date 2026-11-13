@@ -21,13 +21,21 @@ const person = {
   version: 1,
   isHost: true,
   openToMeetings: false,
+  labels: [] as {
+    id: string;
+    eventId: string;
+    eventName: string;
+    name: string;
+    description: string;
+    color: string;
+  }[],
   authProtected: false,
 };
 
-function fakeApi() {
+function fakeApi(entry: typeof person) {
   const get = vi.fn(() =>
     Promise.resolve({
-      data: { items: [person], nextCursor: null },
+      data: { items: [entry], nextCursor: null },
       response: { status: 200 },
     })
   );
@@ -37,12 +45,18 @@ function fakeApi() {
   return { query: createDirectoryQuery({ api }), get };
 }
 
-function setup({ hover }: { hover: boolean }) {
+function setup({
+  hover,
+  labels = [],
+}: {
+  hover: boolean;
+  labels?: (typeof person)["labels"];
+}) {
   vi.stubGlobal(
     "matchMedia",
     vi.fn((query: string) => ({ matches: hover && query === "(hover: hover)" }))
   );
-  const { query, get } = fakeApi();
+  const { query, get } = fakeApi({ ...person, labels });
   render(
     <PersonCardsProvider query={query}>
       <PersonLink guestId="cy" href="/guests/cy" name="Cy" />
@@ -73,6 +87,30 @@ describe("a person's name", () => {
     expect(link.getAttribute("href")).toBe("/guests/cy");
     expect(link.textContent, "the card is not part of the name").toBe("Cy");
   });
+
+  it(
+    "shows the person's labels on the card",
+    { tags: ["011-US7"] },
+    async () => {
+      setup({
+        hover: true,
+        labels: [
+          {
+            id: "l1",
+            eventId: "e1",
+            eventName: "",
+            name: "Orga team",
+            description: "",
+            color: "red",
+          },
+        ],
+      });
+      await user().hover(screen.getByRole("link", { name: "Cy" }));
+      await vi.advanceTimersByTimeAsync(700);
+      const card = await screen.findByRole("tooltip");
+      expect(card.textContent).toContain("Orga team");
+    }
+  );
 
   it("keeps the card open while the pointer moves onto it", async () => {
     setup({ hover: true });

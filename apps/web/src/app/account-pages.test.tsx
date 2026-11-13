@@ -86,6 +86,7 @@ const bo = {
   version: 1,
   isHost: false,
   openToMeetings: false,
+  labels: [],
   authProtected: true,
 };
 

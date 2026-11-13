@@ -38,6 +38,7 @@ const entry = (
   profileUpdatedAt: null,
   version: 1,
   isHost: false,
+  labels: [],
   openToMeetings: false,
   authProtected: false,
   ...patch,
@@ -60,6 +61,16 @@ const cards = cardsFrom(
         { type: "other", label: "Fediverse", value: "@al" },
       ],
       isHost: true,
+      labels: [
+        {
+          id: "l1",
+          eventId: "e1",
+          eventName: "Camp",
+          name: "Volunteer",
+          description: "Helps on site",
+          color: "green",
+        },
+      ],
     }),
     entry("Bo"),
     entry("Cy"),
@@ -140,6 +151,7 @@ describe("the profile panel", () => {
     expect(d.getByRole("heading", { name: "Al" })).toBeTruthy();
     expect(d.getByText("she/her")).toBeTruthy();
     expect(d.getByText("Session host")).toBeTruthy();
+    expect(d.getByText("Volunteer")).toBeTruthy();
     expect(d.getByText("Based in Oslo")).toBeTruthy();
     expect(d.getByText("Norwegian")).toBeTruthy();
     expect(d.getByText("Bold").tagName).toBe("STRONG");

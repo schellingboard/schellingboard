@@ -25,3 +25,9 @@ export type EventLabel = {
   color: LabelColorName;
   guestIds: string[];
 };
+
+/** A label as an attendee's card shows it: with the event it belongs to. */
+export type AttendeeLabel = Pick<
+  EventLabel,
+  "id" | "eventId" | "name" | "description" | "color"
+> & { eventName: string };

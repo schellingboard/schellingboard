@@ -52,6 +52,20 @@ export class SqliteEventLabelsRepository implements EventLabelsRepository {
     );
   }
 
+  async listAll(): Promise<EventLabel[]> {
+    return this.withGuests(
+      this.db
+        .select()
+        .from(schema.eventLabels)
+        .orderBy(
+          asc(schema.eventLabels.eventId),
+          asc(schema.eventLabels.position),
+          asc(schema.eventLabels.id)
+        )
+        .all()
+    );
+  }
+
   async findById(id: string): Promise<EventLabel | undefined> {
     return this.withGuests(
       this.db

@@ -3,8 +3,10 @@ import type {
   publicProfileSchema,
 } from "@schellingboard/contracts/guest";
 import type { eventGuestSchema } from "@schellingboard/contracts/snapshot";
-import type { Attendee, Guest } from "@schellingboard/domain/guest";
+import type { Guest } from "@schellingboard/domain/guest";
 import type { z } from "zod";
+
+import type { LabelledAttendee } from "../application/profiles";
 
 export function toProfileView(g: Guest): z.input<typeof publicProfileSchema> {
   return {
@@ -23,13 +25,14 @@ export function toProfileView(g: Guest): z.input<typeof publicProfileSchema> {
 }
 
 export function toAttendeeView(
-  a: Attendee
+  a: LabelledAttendee
 ): z.input<typeof attendeeViewSchema> {
   return {
     ...toProfileView(a),
     isHost: a.isHost,
     openToMeetings: a.openToMeetings,
     authProtected: a.authProtected ?? false,
+    labels: a.labels,
   };
 }
 

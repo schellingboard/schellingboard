@@ -8505,6 +8505,26 @@ export interface components {
       openToMeetings: boolean;
       /** @description Taking this name asks for a password or an emailed code */
       authProtected: boolean;
+      /** @description Labels from the events the viewer is in; every event's for an admin */
+      labels: components["schemas"]["AttendeeLabel"][];
+    };
+    AttendeeLabel: {
+      id: string;
+      eventId: string;
+      /** @description Empty when the viewer is in one event only, where it is obvious */
+      eventName: string;
+      name: string;
+      description: string;
+      /** @enum {string} */
+      color:
+        | "slate"
+        | "red"
+        | "orange"
+        | "amber"
+        | "green"
+        | "teal"
+        | "blue"
+        | "violet";
     };
     ProfileActivity: {
       /** @description Sessions, at any event */

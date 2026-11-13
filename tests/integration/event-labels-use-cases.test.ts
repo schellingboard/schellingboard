@@ -266,4 +266,101 @@ describe("attendee labels", { tags: ["011-US7"] }, () => {
       value(await people.listLabels(ADMIN, { eventId: event.id }))[0].guestIds
     ).toEqual([]);
   });
+
+  it("shows an attendee's labels only for events the viewer is in", async () => {
+    const mine = await createEvent({ name: "Mine" });
+    const theirs = await createEvent({ name: "Theirs" });
+    const viewer = await createGuest({ eventId: mine.id });
+    const person = await createGuest({ name: "Pat", eventId: mine.id });
+    const people = peopleUseCases();
+    await getRepositories().guests.assignToEvent(theirs.id, [person.id]);
+    const here = value(
+      await people.createLabel(ADMIN, { eventId: mine.id, ...orga })
+    );
+    const there = value(
+      await people.createLabel(ADMIN, {
+        eventId: theirs.id,
+        ...orga,
+        name: "Sponsor",
+      })
+    );
+    value(
+      await people.setGuestLabels(ADMIN, {
+        eventId: mine.id,
+        guestId: person.id,
+        labelIds: [here.id],
+      })
+    );
+    value(
+      await people.setGuestLabels(ADMIN, {
+        eventId: theirs.id,
+        guestId: person.id,
+        labelIds: [there.id],
+      })
+    );
+    const asViewer: Actor = {
+      admin: false,
+      guest: { id: viewer.id, level: "claimed" },
+    };
+    const labelsOf = async (actor: Actor) =>
+      value(await people.listAttendees(actor, new Date())).find(
+        (a) => a.id === person.id
+      )?.labels;
+
+    expect(await labelsOf(asViewer)).toEqual([
+      {
+        id: here.id,
+        eventId: mine.id,
+        eventName: "",
+        name: "Orga team",
+        description: "Runs the event",
+        color: "red",
+      },
+    ]);
+    expect(await labelsOf(NOBODY)).toEqual([]);
+
+    await getRepositories().guests.assignToEvent(theirs.id, [viewer.id]);
+    expect((await labelsOf(asViewer))?.map((l) => l.eventName).sort()).toEqual([
+      "Mine",
+      "Theirs",
+    ]);
+    expect((await labelsOf(ADMIN))?.map((l) => l.name).sort()).toEqual([
+      "Orga team",
+      "Sponsor",
+    ]);
+  });
+
+  it("shows nothing to a protected viewer who has not verified", async () => {
+    const event = await createEvent();
+    const viewer = await createGuest({ eventId: event.id });
+    const person = await createGuest({ eventId: event.id });
+    await getRepositories().guests.setAuthProtection(viewer.id, {
+      authProtected: true,
+      passwordHash: null,
+    });
+    const people = peopleUseCases();
+    const label = value(
+      await people.createLabel(ADMIN, { eventId: event.id, ...orga })
+    );
+    value(
+      await people.setGuestLabels(ADMIN, {
+        eventId: event.id,
+        guestId: person.id,
+        labelIds: [label.id],
+      })
+    );
+
+    const attendees = (level: "claimed" | "verified") =>
+      people.listAttendees(
+        { admin: false, guest: { id: viewer.id, level } },
+        new Date()
+      );
+
+    expect(
+      value(await attendees("claimed")).find((a) => a.id === person.id)?.labels
+    ).toEqual([]);
+    expect(
+      value(await attendees("verified")).find((a) => a.id === person.id)?.labels
+    ).toHaveLength(1);
+  });
 });

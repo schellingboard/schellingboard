@@ -95,6 +95,8 @@ export interface SharedMomentsRepository {
 export interface EventLabelsRepository {
   /** In the order they were made, with the guests that carry each. */
   listByEvent(eventId: string): Promise<EventLabel[]>;
+  /** Every event's labels, each event's in creation order. */
+  listAll(): Promise<EventLabel[]>;
   findById(id: string): Promise<EventLabel | undefined>;
   create(
     data: Pick<EventLabel, "eventId" | "name" | "description" | "color">

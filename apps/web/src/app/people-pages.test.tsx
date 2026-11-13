@@ -30,6 +30,7 @@ const person = (id: string, name: string, patch = {}) => ({
   version: 2,
   isHost: false,
   openToMeetings: false,
+  labels: [],
   authProtected: false,
   ...patch,
 });

@@ -33,6 +33,7 @@ const entry = (
   isHost: false,
   openToMeetings: false,
   authProtected: false,
+  labels: [],
   ...patch,
 });
 
@@ -258,5 +259,64 @@ describe("paging the directory", { tags: ["011-US3"] }, () => {
     render(<Harness entries={crowd.slice(0, 60)} />);
     await user.click(screen.getByRole("button", { name: "Page 2" }));
     expect(names()).toHaveLength(10);
+  });
+});
+
+describe("attendee labels", { tags: ["011-US7"] }, () => {
+  it("shows a label as a badge on the person's card", () => {
+    render(
+      <Harness
+        entries={[
+          entry("Al", {
+            labels: [
+              {
+                id: "l1",
+                eventId: "e1",
+                eventName: "",
+                name: "Orga team",
+                description: "Runs the event",
+                color: "red",
+              },
+            ],
+          }),
+          entry("Bo"),
+        ]}
+      />
+    );
+
+    const al = screen.getByRole("link", { name: /^Al/ });
+    const bo = screen.getByRole("link", { name: /^Bo/ });
+    expect(within(al).getByText("Orga team")).toBeTruthy();
+    expect(within(bo).queryByText("Orga team")).toBeNull();
+  });
+});
+
+describe("attendee label tooltips", { tags: ["011-US7"] }, () => {
+  const label = (eventName: string, description: string) => ({
+    id: "l1",
+    eventId: "e1",
+    eventName,
+    name: "Sponsor",
+    description,
+    color: "violet" as const,
+  });
+  const hover = async (eventName: string, description: string) => {
+    render(
+      <Harness
+        entries={[entry("Al", { labels: [label(eventName, description)] })]}
+      />
+    );
+    await userEvent.hover(screen.getByText("Sponsor"));
+  };
+
+  it("names the event and the meaning", async () => {
+    await hover("Camp", "Pays the venue");
+    expect(await screen.findByText("Camp · Pays the venue")).toBeTruthy();
+  });
+
+  it("shows no tooltip when there is nothing to say", async () => {
+    await hover("", "");
+    await new Promise((r) => setTimeout(r, 700));
+    expect(screen.queryByRole("tooltip")).toBeNull();
   });
 });

@@ -19,6 +19,7 @@ import {
   PhoneIcon,
 } from "../../ui/icons";
 import { Markdown, MarkdownInline } from "../../ui/markdown";
+import { AttendeeLabels } from "./attendee-labels";
 import { contactLabel } from "./contact-labels";
 import type { ProfileLinks } from "./links";
 import { OpenUpNudge } from "./open-up-nudge";
@@ -93,7 +94,7 @@ export function ProfileBody({
         <h1 className="text-3xl font-bold break-words max-w-full">
           {guest.name}
         </h1>
-        {(guest.pronouns || guest.isHost) && (
+        {(guest.pronouns || guest.isHost || guest.labels.length > 0) && (
           <div className="flex flex-row flex-wrap items-center justify-center gap-2">
             {guest.pronouns && (
               <p className="text-fg-muted">{guest.pronouns}</p>
@@ -103,6 +104,7 @@ export function ProfileBody({
                 <Trans>Session host</Trans>
               </span>
             )}
+            <AttendeeLabels labels={guest.labels} tappable />
           </div>
         )}
         {guest.basedIn && (

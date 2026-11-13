@@ -1,3 +1,4 @@
+import type { AttendeeLabel } from "@schellingboard/domain/event-label";
 import {
   type Attendee,
   type CompleteGuest,
@@ -58,10 +59,43 @@ export const listEventProfiles =
     return ok(await repos.guests.listProfilesByEvent(eventId));
   };
 
+export type LabelledAttendee = Attendee & { labels: AttendeeLabel[] };
+
 export const listAttendees =
   ({ repos }: PeopleDeps) =>
-  async (_actor: Actor, now: Date): Promise<Result<Attendee[]>> =>
-    ok(await repos.guests.listAttendees(now));
+  async (actor: Actor, now: Date): Promise<Result<LabelledAttendee[]>> => {
+    const [attendees, labels, events] = await Promise.all([
+      repos.guests.listAttendees(now),
+      repos.eventLabels.listAll(),
+      repos.events.list(),
+    ]);
+    const viewer = actor.admin ? null : await actingGuest(actor, repos.guests);
+    const viewerEvents = viewer?.ok
+      ? ((await repos.guests.listEventsByGuests([viewer.value])).get(
+          viewer.value
+        ) ?? [])
+      : [];
+    const visible = labels.filter(
+      (l) => actor.admin || viewerEvents.some((e) => e.id === l.eventId)
+    );
+    const eventName = new Map(events.map((e) => [e.id, e.name]));
+    const named = actor.admin || viewerEvents.length > 1;
+    return ok(
+      attendees.map((a) => ({
+        ...a,
+        labels: visible
+          .filter((l) => l.guestIds.includes(a.id))
+          .map(({ id, eventId, name, description, color }) => ({
+            id,
+            eventId,
+            eventName: named ? (eventName.get(eventId) ?? "") : "",
+            name,
+            description,
+            color,
+          })),
+      }))
+    );
+  };
 
 export const getProfile =
   ({ repos }: PeopleDeps) =>

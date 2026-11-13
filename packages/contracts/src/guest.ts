@@ -1,3 +1,4 @@
+import { LABEL_COLOR_NAMES } from "@schellingboard/domain/event-label";
 import {
   CONTACT_TYPES,
   type EmailSettings,
@@ -196,6 +197,21 @@ export const publicProfileSchema = z
 
 export const publicProfileListSchema = pageSchema(publicProfileSchema);
 
+const attendeeLabelSchema = z
+  .object({
+    id: z.string(),
+    eventId: z.string(),
+    eventName: z
+      .string()
+      .describe(
+        "Empty when the viewer is in one event only, where it is obvious"
+      ),
+    name: z.string(),
+    description: z.string(),
+    color: z.enum(LABEL_COLOR_NAMES),
+  })
+  .meta({ id: "AttendeeLabel" });
+
 // A directory entry: the public profile plus what the list filters on.
 export const attendeeViewSchema = publicProfileSchema
   .extend({
@@ -206,6 +222,11 @@ export const attendeeViewSchema = publicProfileSchema
     authProtected: z
       .boolean()
       .describe("Taking this name asks for a password or an emailed code"),
+    labels: z
+      .array(attendeeLabelSchema)
+      .describe(
+        "Labels from the events the viewer is in; every event's for an admin"
+      ),
   })
   .meta({ id: "Attendee" });
 

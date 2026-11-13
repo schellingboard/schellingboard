@@ -22,6 +22,7 @@ const entry = (
   isHost: false,
   openToMeetings: false,
   authProtected: false,
+  labels: [],
   ...patch,
 });
 

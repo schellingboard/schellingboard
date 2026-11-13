@@ -19,6 +19,7 @@ import { SearchInput } from "../../ui/search-input";
 import { Tooltip } from "../../ui/tooltip";
 import { SEARCH_DEBOUNCE_MS } from "../../ui/use-debounced";
 import { usePaging } from "../../ui/use-paging";
+import { AttendeeLabels } from "./attendee-labels";
 import {
   cardsFrom,
   type DirectoryCard,
@@ -337,6 +338,7 @@ function AttendeeRow({ card, href }: { card: DirectoryCard; href: string }) {
     pronouns,
     basedIn,
     isHost,
+    labels,
     excerpt,
     profileUpdated,
   } = card;
@@ -361,6 +363,7 @@ function AttendeeRow({ card, href }: { card: DirectoryCard; href: string }) {
               <Trans>Session host</Trans>
             </span>
           )}
+          <AttendeeLabels labels={labels} />
         </span>
         {(pronouns || basedIn || updated) && (
           <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">

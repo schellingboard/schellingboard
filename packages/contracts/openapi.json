@@ -696,6 +696,11 @@
           "authProtected": {
             "type": "boolean",
             "description": "Taking this name asks for a password or an emailed code"
+          },
+          "labels": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/AttendeeLabel" },
+            "description": "Labels from the events the viewer is in; every event's for an admin"
           }
         },
         "required": [
@@ -712,7 +717,42 @@
           "version",
           "isHost",
           "openToMeetings",
-          "authProtected"
+          "authProtected",
+          "labels"
+        ]
+      },
+      "AttendeeLabel": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "eventId": { "type": "string" },
+          "eventName": {
+            "type": "string",
+            "description": "Empty when the viewer is in one event only, where it is obvious"
+          },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "color": {
+            "type": "string",
+            "enum": [
+              "slate",
+              "red",
+              "orange",
+              "amber",
+              "green",
+              "teal",
+              "blue",
+              "violet"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "eventId",
+          "eventName",
+          "name",
+          "description",
+          "color"
         ]
       },
       "ProfileActivity": {

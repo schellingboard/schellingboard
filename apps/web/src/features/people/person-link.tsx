@@ -3,6 +3,7 @@ import { profileExcerpt } from "@schellingboard/domain/attendee-profile";
 
 import type { DirectoryEntry } from "../../queries/directory";
 import { Avatar } from "../../ui/avatar";
+import { LabelBadge } from "../../ui/label-badge";
 import { plainText } from "../../ui/plain-text";
 import { Tooltip } from "../../ui/tooltip";
 import { usePersonEntry } from "./person-cards";
@@ -22,9 +23,20 @@ function PersonCard({ entry }: { entry: DirectoryEntry }) {
       <Avatar name={entry.name} size="md" image={entry.avatarUrl} />
       <div className="flex min-w-0 flex-col gap-1">
         <span className="font-medium">{entry.name}</span>
-        {entry.isHost && (
-          <span className="w-fit rounded-full bg-brand-tint-hover px-2 py-0.5 text-xs font-semibold text-brand-fg">
-            <Trans>Session host</Trans>
+        {(entry.isHost || entry.labels.length > 0) && (
+          <span className="flex flex-wrap gap-1">
+            {entry.isHost && (
+              <span className="w-fit rounded-full bg-brand-tint-hover px-2 py-0.5 text-xs font-semibold text-brand-fg">
+                <Trans>Session host</Trans>
+              </span>
+            )}
+            {entry.labels.map((label) => (
+              <LabelBadge
+                key={label.id}
+                name={label.name}
+                color={label.color}
+              />
+            ))}
           </span>
         )}
         {where && <span className="text-sm text-fg-subtle">{where}</span>}

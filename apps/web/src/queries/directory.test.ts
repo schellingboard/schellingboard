@@ -18,6 +18,7 @@ const item = (id: string, profileUpdatedAt: string | null = null) => ({
   version: 1,
   isHost: false,
   openToMeetings: false,
+  labels: [],
   authProtected: false,
 });
 
