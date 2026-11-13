@@ -1,6 +1,6 @@
 # The dependencies, in a layer of their own that only a change to the manifests
 # rebuilds. Nothing compiles: better-sqlite3 and sharp ship prebuilt addons.
-FROM node:25-bookworm AS deps
+FROM node:26-trixie-slim AS deps
 WORKDIR /app
 COPY --from=oven/bun:1 /usr/local/bin/bun /usr/local/bin/bun
 COPY package.json bun.lock ./
@@ -11,7 +11,7 @@ COPY packages/api-client/package.json packages/api-client/
 COPY apps/web/package.json apps/web/
 RUN bun install --frozen-lockfile
 
-FROM node:25-bookworm AS builder
+FROM node:26-trixie-slim AS builder
 WORKDIR /app
 COPY --from=oven/bun:1 /usr/local/bin/bun /usr/local/bin/bun
 COPY --from=deps /app/node_modules ./node_modules
@@ -21,7 +21,7 @@ ARG APP_VERSION
 ENV APP_VERSION=$APP_VERSION
 RUN bun x vite build apps/web && bun scripts/build-server.ts
 
-FROM node:25-bookworm-slim AS runner
+FROM node:26-trixie-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
