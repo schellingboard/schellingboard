@@ -32,11 +32,7 @@ import { PanelLinks } from "./panel-links";
 import { PeoplePage } from "./people-pages";
 import { ProfilePanelHost } from "./profile-host";
 import { ProfileWalkProvider } from "./profile-walk";
-import {
-  ProposalFormPage,
-  ProposalsPage,
-  QuickVotingPage,
-} from "./proposals-pages";
+import { ProposalsPage, QuickVotingPage } from "./proposals-pages";
 import { SchedulePage } from "./schedule-page";
 import { type AppServices, defaultServices } from "./services";
 import { SessionFormPage } from "./sessions-pages";
@@ -218,14 +214,27 @@ export function createAppRouter(
   const newProposal = createRoute({
     getParentRoute: () => event,
     path: "proposals/new",
-    component: ProposalFormPage,
+    component: function NewProposalRoute(): ReactElement {
+      const { slug } = newProposal.useParams();
+      return (
+        <PanelLanding
+          item={{ kind: "proposal-form", slug }}
+          background={`/${slug}/proposals`}
+        />
+      );
+    },
   });
   const editProposal = createRoute({
     getParentRoute: () => event,
     path: "proposals/$proposalId/edit",
     component: function EditProposalRoute(): ReactElement {
-      const { proposalId } = editProposal.useParams();
-      return <ProposalFormPage proposalId={proposalId} />;
+      const { slug, proposalId } = editProposal.useParams();
+      return (
+        <PanelLanding
+          item={{ kind: "proposal-form", slug, id: proposalId }}
+          background={`/${slug}/proposals`}
+        />
+      );
     },
   });
   const addSession = createRoute({

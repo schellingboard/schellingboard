@@ -18,8 +18,21 @@ export function profileIdOf(pathname: string) {
 
 const EVENT_PATH = /^\/([^/]+)\/(sessions|proposals|meetings)\/([^/]+)\/?$/;
 const NOT_A_PROPOSAL = new Set(["new", "quick-voting"]);
+const FORM_PATH = /^\/([^/]+)\/proposals\/(?:new|([^/]+)\/edit)\/?$/;
 
 function eventItemOf(pathname: string): PanelItem | null {
+  const [, formSlug, formId] = FORM_PATH.exec(pathname) ?? [];
+  if (formSlug) {
+    try {
+      return {
+        kind: "proposal-form",
+        slug: formSlug,
+        id: formId === undefined ? undefined : decodeURIComponent(formId),
+      };
+    } catch {
+      return null;
+    }
+  }
   const [, slug, kind, raw] = EVENT_PATH.exec(pathname) ?? [];
   if (!slug || (kind === "proposals" && NOT_A_PROPOSAL.has(raw))) return null;
   try {

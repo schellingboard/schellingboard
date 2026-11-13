@@ -74,9 +74,12 @@ function panelSession(url: URL, prefix: string, slug: string) {
 
 function panelProposal(pathname: string, prefix: string, slug: string) {
   if (!pathname.startsWith(prefix)) return null;
-  const id = idAfter(pathname, prefix);
-  if (!id || id.includes("/") || NOT_A_PROPOSAL.has(id)) return null;
-  return { kind: "proposal", slug, id } as const;
+  const rest = idAfter(pathname, prefix);
+  if (rest === "new") return { kind: "proposal-form", slug } as const;
+  const edit = /^([^/]+)\/edit$/.exec(rest ?? "");
+  if (edit) return { kind: "proposal-form", slug, id: edit[1] } as const;
+  if (!rest || rest.includes("/") || NOT_A_PROPOSAL.has(rest)) return null;
+  return { kind: "proposal", slug, id: rest } as const;
 }
 
 function panelMeeting(pathname: string, prefix: string, slug: string) {

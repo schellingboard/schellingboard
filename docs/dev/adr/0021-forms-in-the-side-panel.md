@@ -20,13 +20,15 @@ panel.
 2. **Short tasks stay dialogs.** Confirmations, booking a 1-on-1, the meeting request, What's new,
    the map and "Liked by" do not change. Quick Voting stays a page. Settings, sign-in,
    notifications, "My comments" and the admin area keep their pages and frames.
-3. **Saving or cancelling closes the form; it does not walk history back.** A form panel is replaced
-   by the item's own view (a saved proposal opens its view), or closed when the form came from a
-   list, so the address after a save never depends on how the form was reached.
+3. **Saving closes the form, one step; deleting closes the panel.** A save returns to the entry
+   under the form in the panel's stack (a proposal's view, when the form was opened from it) or to
+   the page when it is the first. A delete leaves the panel, as that entry would show what is gone.
+   Cancel and Close leave the panel, as for a view.
 4. **Leaving a form asks first when something was entered.** The guard covers text, selects,
-   checkboxes, radios and dates, and fires on Close, Escape, the panel's Back arrow, browser Back
-   and leaving the page. A control that only changes the view (a page size, a sort) opts out with
-   `data-discard-ignore`; comboboxes, search boxes, number fields and file inputs are never counted.
+   checkboxes, radios and dates, and fires on Close, Cancel, Escape, the panel's Back arrow, browser
+   Back and leaving the page. A control that only changes the view (a page size, a sort) opts out
+   with `data-discard-ignore`; comboboxes, search boxes, number fields and file inputs are never
+   counted.
 5. **Old addresses keep working.** The routes of the former pages redirect to the panel over the
    list they belong to, as ADR 0020 does for `?viewSession=`.
 

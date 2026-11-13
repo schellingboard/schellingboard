@@ -1,7 +1,8 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { SidePanel } from "../../ui/side-panel";
 import { ProposalHelp } from "./proposal-help";
 
 afterEach(cleanup);
@@ -29,6 +30,28 @@ describe("proposal help", () => {
       const dialog = await openHelp("Ask **Sam** about the venue");
       expect(dialog.textContent).toContain("Ask Sam about the venue");
       expect(dialog.textContent).not.toContain("explain in 20 minutes");
+    }
+  );
+
+  it(
+    "shows the ideas in place inside the proposal form's panel",
+    { tags: ["004-US8"] },
+    async () => {
+      const onClose = vi.fn();
+      render(
+        <SidePanel label="New proposal" title="New proposal" onClose={onClose}>
+          <ProposalHelp event={{ proposalHelp: "" }} />
+        </SidePanel>
+      );
+      const help = screen.getByRole("button", { name: "Need ideas?" });
+      await userEvent.click(help);
+
+      expect(onClose).not.toHaveBeenCalled();
+      const form = screen.getByRole("dialog", { name: "New proposal" });
+      expect(form.textContent).toContain("explain in 20 minutes");
+      expect(help.getAttribute("aria-expanded")).toBe("true");
+      await userEvent.click(help);
+      expect(form.textContent).not.toContain("explain in 20 minutes");
     }
   );
 });

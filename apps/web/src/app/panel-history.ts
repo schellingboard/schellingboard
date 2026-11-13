@@ -3,6 +3,7 @@ import type { HistoryLocation, RouterHistory } from "@tanstack/react-router";
 export type PanelItem =
   | { kind: "session"; slug: string; id: string; record?: boolean }
   | { kind: "proposal"; slug: string; id: string }
+  | { kind: "proposal-form"; slug: string; id?: string }
   | { kind: "meeting"; slug: string; id: string }
   | { kind: "profile"; id: string };
 
@@ -25,6 +26,10 @@ const rawState = (location: Pick<HistoryLocation, "state">) =>
   location.state as Raw;
 
 export const panelPath = (item: PanelItem) => {
+  if (item.kind === "proposal-form")
+    return item.id === undefined
+      ? `/${item.slug}/proposals/new`
+      : `/${item.slug}/proposals/${encodeURIComponent(item.id)}/edit`;
   const id = encodeURIComponent(item.id);
   if (item.kind === "profile") return `/guests/${id}`;
   if (item.kind === "proposal") return `/${item.slug}/proposals/${id}`;

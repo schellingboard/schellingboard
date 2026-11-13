@@ -50,6 +50,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- **The proposal form opens beside the list**: you keep your place, and closing over typed text asks
+  before discarding it.
 - **1-on-1s are mentioned only where an event offers them**: the phase bar, the Clashes hint and
   Settings no longer name them for events without 1-on-1s.
 - **Long descriptions are easier to read**: session, proposal and event descriptions use larger text

@@ -1,5 +1,11 @@
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import {
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -55,7 +61,9 @@ function setup(
   }: { handler?: FakeHandler; patch?: Partial<Snapshot> } = {}
 ) {
   const { api, calls } = fakeApi(handler);
-  const onDone = vi.fn();
+  const onSaved = vi.fn();
+  const onDeleted = vi.fn();
+  const onCancel = vi.fn();
   const element = (snapshot: Snapshot) => (
     <NoticeProvider>
       <ProposalForm
@@ -63,14 +71,18 @@ function setup(
         snapshot={snapshot}
         links={proposalLinks("conf")}
         actions={proposalFormCalls(api)}
-        onDone={onDone}
+        onSaved={onSaved}
+        onDeleted={onDeleted}
+        onCancel={onCancel}
       />
     </NoticeProvider>
   );
   const { rerender } = render(element({ ...base, ...patch }));
   return {
     calls,
-    onDone,
+    onSaved,
+    onDeleted,
+    onCancel,
     update: (next: Partial<Snapshot>) =>
       rerender(element({ ...base, ...patch, ...next })),
   };
@@ -80,7 +92,7 @@ const submit = () => screen.getByRole("button", { name: /Submit/ });
 
 describe("a new proposal", { tags: ["004-US1"] }, () => {
   it("starts on the title, with the viewer as host, and sends what was typed", async () => {
-    const { calls, onDone } = setup(undefined);
+    const { calls, onSaved } = setup(undefined);
     expect(document.activeElement).toBe(screen.getByLabelText(/Title/));
     expect(
       (submit() as HTMLButtonElement).disabled,
@@ -92,7 +104,7 @@ describe("a new proposal", { tags: ["004-US1"] }, () => {
     await userEvent.click(screen.getByRole("radio", { name: "50 minutes" }));
     await userEvent.click(submit());
 
-    await waitFor(() => expect(onDone).toHaveBeenCalled());
+    await waitFor(() => expect(onSaved).toHaveBeenCalled());
     expect(calls).toHaveLength(1);
     expect(calls[0]).toMatchObject({
       method: "POST",
@@ -222,7 +234,7 @@ describe("a new proposal", { tags: ["004-US1"] }, () => {
 
   it("says a save might not have happened, and a repeat carries the same key", async () => {
     let answer = 503;
-    const { calls, onDone } = setup(undefined, {
+    const { calls, onSaved } = setup(undefined, {
       handler: () =>
         answer === 503 ? new Response(null, { status: 503 }) : created.clone(),
     });
@@ -233,7 +245,7 @@ describe("a new proposal", { tags: ["004-US1"] }, () => {
     answer = 201;
     await userEvent.click(submit());
 
-    await waitFor(() => expect(onDone).toHaveBeenCalled());
+    await waitFor(() => expect(onSaved).toHaveBeenCalled());
     expect(calls[0].key).toBe(calls[1].key);
   });
 
@@ -243,14 +255,20 @@ describe("a new proposal", { tags: ["004-US1"] }, () => {
     expect(screen.getByText(/select who you are/)).toBeTruthy();
     expect(screen.queryByLabelText(/Title/)).toBeNull();
   });
+
+  it("leaves through the caller when Cancel is pressed", async () => {
+    const { calls, onCancel } = setup(undefined);
+
+    await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(onCancel).toHaveBeenCalled();
+    expect(calls).toHaveLength(0);
+  });
 });
 
 describe("editing a proposal", { tags: ["004-US2"] }, () => {
   it("fills the form in and replaces the proposal from the version it loaded", async () => {
-    const { calls, onDone, update } = setup("p");
-    expect(
-      screen.getByRole("heading", { name: "Edit Session Proposal" })
-    ).toBeTruthy();
+    const { calls, onSaved, update } = setup("p");
     expect(screen.getByLabelText<HTMLInputElement>(/Title/).value).toBe(
       "Rust intro"
     );
@@ -263,7 +281,7 @@ describe("editing a proposal", { tags: ["004-US2"] }, () => {
     await userEvent.type(screen.getByLabelText(/Title/), "!");
     await userEvent.click(submit());
 
-    await waitFor(() => expect(onDone).toHaveBeenCalled());
+    await waitFor(() => expect(onSaved).toHaveBeenCalled());
     expect(calls[0]).toMatchObject({
       method: "PUT",
       path: "/api/v1/proposals/p",
@@ -324,7 +342,7 @@ describe("editing a proposal", { tags: ["004-US2"] }, () => {
 
 describe("deleting a proposal", { tags: ["004-US3"] }, () => {
   it("deletes after a confirmation", async () => {
-    const { calls, onDone } = setup("p", {
+    const { calls, onDeleted } = setup("p", {
       handler: () => new Response(null, { status: 204 }),
     });
 
@@ -334,7 +352,7 @@ describe("deleting a proposal", { tags: ["004-US3"] }, () => {
       screen.getAllByRole("button", { name: "Delete" }).at(-1)!
     );
 
-    await waitFor(() => expect(onDone).toHaveBeenCalled());
+    await waitFor(() => expect(onDeleted).toHaveBeenCalled());
     expect(calls[0]).toMatchObject({
       method: "DELETE",
       path: "/api/v1/proposals/p",
@@ -353,7 +371,9 @@ describe("deleting a proposal", { tags: ["004-US3"] }, () => {
     await userEvent.click(submit());
     await screen.findByText(/Someone else changed this/);
     await userEvent.click(screen.getByRole("button", { name: "Delete" }));
-    await userEvent.click(screen.getAllByRole("button", { name: "Delete" })[1]);
+    await userEvent.click(
+      within(screen.getByRole("dialog")).getByRole("button", { name: "Delete" })
+    );
 
     expect(
       await screen.findByText(/Only a host of this proposal can change it/)
@@ -377,20 +397,25 @@ describe("deleting a proposal", { tags: ["004-US3"] }, () => {
   });
 
   it("keeps the proposal when the deletion is cancelled or refused", async () => {
-    const { calls, onDone } = setup("p", {
+    const { calls, onDeleted } = setup("p", {
       handler: () => problem(403, "proposal.notHost"),
     });
 
     await userEvent.click(screen.getByRole("button", { name: "Delete" }));
-    await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    const dialog = screen.getByRole("dialog");
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "Cancel" })
+    );
     expect(calls).toHaveLength(0);
 
     await userEvent.click(screen.getByRole("button", { name: "Delete" }));
-    await userEvent.click(screen.getAllByRole("button", { name: "Delete" })[1]);
+    await userEvent.click(
+      within(screen.getByRole("dialog")).getByRole("button", { name: "Delete" })
+    );
 
     expect(
       await screen.findByText(/Only a host of this proposal can change it/)
     ).toBeTruthy();
-    expect(onDone).not.toHaveBeenCalled();
+    expect(onDeleted).not.toHaveBeenCalled();
   });
 });

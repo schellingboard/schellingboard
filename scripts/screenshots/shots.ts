@@ -112,9 +112,7 @@ export const shots: Shot[] = [
     await openProposals(page, "Conference Alpha");
     await page.getByText("My proposals", { exact: true }).click();
     await page.getByRole("button", { name: "Edit" }).first().click();
-    await page
-      .getByRole("heading", { name: /Edit Session Proposal/ })
-      .waitFor();
+    await page.getByRole("heading", { name: /Edit proposal/ }).waitFor();
   }),
   shot("proposals-results", (page) => openProposals(page, "Conference Gamma")),
   shot("proposal-vote-breakdown", async (page) => {

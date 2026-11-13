@@ -182,3 +182,16 @@ describe("the entry of the page behind a panel", () => {
     expect(entryIndexOf(history.location)).toBe(page);
   });
 });
+
+describe("form panels", () => {
+  const form = (id?: string) => ({
+    kind: "proposal-form" as const,
+    slug: "conf",
+    id,
+  });
+
+  it("names the add and edit forms by their own addresses", () => {
+    expect(panelPath(form())).toBe("/conf/proposals/new");
+    expect(panelPath(form("p 1"))).toBe("/conf/proposals/p%201/edit");
+  });
+});

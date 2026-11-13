@@ -158,9 +158,12 @@ behind does not belong to. `app/panel-history.ts` keeps the page behind it and t
 `history.state`; `SpaLinks` opens these links in the panel. An address opened directly lands on the
 schedule (for a session or a 1-on-1), the proposals list or the directory with the panel over it
 (only the directory behind a profile gives it Prev and Next), and `?viewSession=`, `?viewProposal=`
-and `?viewMeeting=` (also at `/{slug}/meetings`) redirect the same way. Booking a 1-on-1 stays a
-dialog, `?bookMeeting=` on the schedule. Links from legacy pages and emails are plain anchors: build
-them with `links.ts` and `utils/notifications.ts`, never a second copy.
+and `?viewMeeting=` (also at `/{slug}/meetings`) redirect the same way. The proposal form is a panel
+kind too (`proposal-form` at `/{slug}/proposals/new` and `.../:id/edit`, ADR 0021):
+`ProposalFormHost` blocks history Back over unsaved changes with `history.block`, and `leaving`
+marks a confirmed or saved exit so the blocker lets it through. Booking a 1-on-1 stays a dialog,
+`?bookMeeting=` on the schedule. Links from legacy pages and emails are plain anchors: build them
+with `links.ts` and `utils/notifications.ts`, never a second copy.
 
 Two gotchas. The panel is `role="dialog"` with `aria-modal="false"`, so `dialog` locators in E2E
 still find it while the page behind stays usable. `landOnPanel` replaces the entry with the list

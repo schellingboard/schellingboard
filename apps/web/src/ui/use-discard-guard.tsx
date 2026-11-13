@@ -1,7 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import {
   type RefObject,
-  type SyntheticEvent,
   useCallback,
   useEffect,
   useId,
@@ -35,7 +34,10 @@ export function useDiscardGuard(
   { beforeUnload = false }: { beforeUnload?: boolean } = {}
 ) {
   const starts = useRef(new WeakMap<Element, string>());
-  const [pending, setPending] = useState<(() => void) | null>(null);
+  const [pending, setPending] = useState<{
+    then: () => void;
+    stay?: () => void;
+  } | null>(null);
   const returnFocus = useRef<HTMLElement | null>(null);
   const questionId = useId();
   const asking = pending !== null;
@@ -49,16 +51,17 @@ export function useDiscardGuard(
     );
 
   const keepEditing = () => {
+    pending?.stay?.();
     setPending(null);
     returnFocus.current?.focus?.();
   };
 
-  // `then` is what to do once nothing is lost: close by default, or go Back.
-  const requestClose = (then: () => void = onClose) => {
-    if (asking) return;
+  // `then` runs once nothing is lost (default: close); `stay` if the user keeps editing.
+  const requestClose = (then: () => void = onClose, stay?: () => void) => {
+    if (asking) return stay?.();
     if (!hasUnsaved()) return then();
     returnFocus.current = document.activeElement as HTMLElement | null;
-    setPending(() => then);
+    setPending({ then, stay });
   };
 
   const latest = useRef({ requestClose, keepEditing, asking, hasUnsaved });
@@ -70,7 +73,7 @@ export function useDiscardGuard(
     else latest.current.requestClose();
   }, []);
 
-  const noteField = (e: SyntheticEvent) => {
+  const noteField = (e: { target: EventTarget | null }) => {
     const target = e.target as HTMLElement;
     // A press on a label's text targets the label, and Safari does not focus
     // a checkbox or radio at all.
@@ -119,7 +122,7 @@ export function useDiscardGuard(
           variant="danger"
           onClick={() => {
             setPending(null);
-            pending();
+            pending.then();
           }}
         >
           <Trans>Discard</Trans>
@@ -131,5 +134,5 @@ export function useDiscardGuard(
     </div>
   ) : null;
 
-  return { requestClose, escape, noteField, reset, prompt };
+  return { requestClose, hasUnsaved, escape, noteField, reset, prompt };
 }

@@ -726,10 +726,6 @@ msgstr "Add Proposal"
 msgid "Add session"
 msgstr "Add session"
 
-#: src/features/proposals/proposal-form.tsx:201
-msgid "Add Session Proposal"
-msgstr "Add Session Proposal"
-
 #: src/features/admin/event-moments.tsx:429
 msgid "Add shared moment"
 msgstr "Add shared moment"
@@ -970,7 +966,7 @@ msgstr "Automatic (follow my browser)"
 msgid "Automatic follows your browser's language."
 msgstr "Automatic follows your browser's language."
 
-#: src/ui/side-panel.tsx:170
+#: src/ui/side-panel.tsx:206
 msgctxt "Side panel: go to the previous panel"
 msgid "Back"
 msgstr "Back"
@@ -1187,8 +1183,8 @@ msgstr "Calendar"
 #: src/features/comments/comments-section.tsx:586
 #: src/features/meetings/meeting-request-fields.tsx:157
 #: src/features/notifications/notifications-screen.tsx:232
-#: src/features/proposals/proposal-form.tsx:345
-#: src/features/proposals/proposal-form.tsx:358
+#: src/features/proposals/proposal-form.tsx:333
+#: src/features/proposals/proposal-form.tsx:346
 #: src/features/sessions/session-form.tsx:793
 #: src/features/sessions/session-form.tsx:820
 #: src/features/sign-in/account-security.tsx:274
@@ -1232,7 +1228,7 @@ msgstr "Change profile picture"
 msgid "Change this session's time or room?"
 msgstr "Change this session's time or room?"
 
-#: src/features/proposals/proposal-form.tsx:221
+#: src/features/proposals/proposal-form.tsx:212
 msgid "Changes here do not reach the schedule. To change a session, open it and edit it there."
 msgstr "Changes here do not reach the schedule. To change a session, open it and edit it there."
 
@@ -1354,7 +1350,7 @@ msgid "Clearing every slot is the same as switching this off."
 msgstr "Clearing every slot is the same as switching this off."
 
 #: src/ui/dialog.tsx:118
-#: src/ui/side-panel.tsx:184
+#: src/ui/side-panel.tsx:220
 msgid "Close"
 msgstr "Close"
 
@@ -1930,8 +1926,8 @@ msgstr "declined"
 #: src/features/comments/comments-section.tsx:397
 #: src/features/notifications/notifications-screen.tsx:174
 #: src/features/notifications/notifications-screen.tsx:230
-#: src/features/proposals/proposal-form.tsx:337
-#: src/features/proposals/proposal-form.tsx:357
+#: src/features/proposals/proposal-form.tsx:328
+#: src/features/proposals/proposal-form.tsx:345
 #: src/features/sessions/session-form.tsx:785
 #: src/features/sessions/session-form.tsx:819
 msgid "Delete"
@@ -1977,7 +1973,7 @@ msgstr "Delete event"
 msgid "Delete notifications"
 msgstr "Delete notifications"
 
-#: src/features/proposals/proposal-form.tsx:355
+#: src/features/proposals/proposal-form.tsx:343
 msgid "Delete session proposal?"
 msgstr "Delete session proposal?"
 
@@ -2023,7 +2019,7 @@ msgstr "Deleting “{name}” removes it from {sessionCount, plural, one {# sess
 msgid "Deleting..."
 msgstr "Deleting..."
 
-#: src/features/proposals/proposal-form.tsx:249
+#: src/features/proposals/proposal-form.tsx:240
 msgid "Describe what your session will cover"
 msgstr "Describe what your session will cover"
 
@@ -2035,7 +2031,7 @@ msgstr "Describe what your session will cover"
 #: src/features/admin/events-screen.tsx:99
 #: src/features/admin/locations-screen.tsx:204
 #: src/features/admin/settings-screen.tsx:84
-#: src/features/proposals/proposal-form.tsx:245
+#: src/features/proposals/proposal-form.tsx:236
 #: src/features/proposals/proposals-screen.tsx:421
 #: src/features/schedule/session-panel.tsx:361
 #: src/features/sessions/session-form.tsx:553
@@ -2074,11 +2070,11 @@ msgstr "Did the people who RSVPed come?"
 msgid "Did votes predict RSVPs?"
 msgstr "Did votes predict RSVPs?"
 
-#: src/ui/use-discard-guard.tsx:125
+#: src/ui/use-discard-guard.tsx:128
 msgid "Discard"
 msgstr "Discard"
 
-#: src/ui/use-discard-guard.tsx:115
+#: src/ui/use-discard-guard.tsx:118
 msgid "Discard your changes?"
 msgstr "Discard your changes?"
 
@@ -2114,7 +2110,7 @@ msgstr "Duplicate"
 msgid "Duplicate {title}"
 msgstr "Duplicate {title}"
 
-#: src/features/proposals/proposal-form.tsx:293
+#: src/features/proposals/proposal-form.tsx:284
 #: src/features/proposals/proposals-screen.tsx:424
 #: src/features/sessions/session-form.tsx:697
 msgid "Duration"
@@ -2149,7 +2145,7 @@ msgstr "Duration: {duration}"
 msgid "During {momentTitle} ({momentStart}–{momentEnd})"
 msgstr "During {momentTitle} ({momentStart}–{momentEnd})"
 
-#: src/features/proposals/proposal-form.tsx:283
+#: src/features/proposals/proposal-form.tsx:274
 msgid "e.g. someone to take over, or a second facilitator"
 msgstr "e.g. someone to take over, or a second facilitator"
 
@@ -2211,9 +2207,9 @@ msgstr "Edit day {from} – {to} ({timezone})"
 msgid "Edit profile"
 msgstr "Edit profile"
 
-#: src/features/proposals/proposal-form.tsx:201
-msgid "Edit Session Proposal"
-msgstr "Edit Session Proposal"
+#: src/app/panel-host.tsx:244
+msgid "Edit proposal"
+msgstr "Edit proposal"
 
 #: src/features/comments/comments-section.tsx:305
 msgid "Edit your comment"
@@ -2301,7 +2297,7 @@ msgstr "Enforce session capacity as a hard limit — reject RSVPs once a session
 msgid "Enlarge photo of {name}"
 msgstr "Enlarge photo of {name}"
 
-#: src/features/proposals/proposal-form.tsx:241
+#: src/features/proposals/proposal-form.tsx:232
 msgid "Enter a clear, descriptive title"
 msgstr "Enter a clear, descriptive title"
 
@@ -2334,7 +2330,7 @@ msgstr "Enter your password. Forgot it? Ask an organizer for a new link."
 msgid "Error: {error}"
 msgstr "Error: {error}"
 
-#: src/app/panel-host.tsx:81
+#: src/app/panel-host.tsx:85
 msgid "Event"
 msgstr "Event"
 
@@ -2348,7 +2344,7 @@ msgctxt "Statistics: the event to show"
 msgid "Event"
 msgstr "Event"
 
-#: src/app/panel-host.tsx:81
+#: src/app/panel-host.tsx:85
 #: src/features/schedule/schedule-toolbar.tsx:125
 #: src/features/schedule/schedule-toolbar.tsx:138
 msgid "Event details"
@@ -2358,7 +2354,7 @@ msgstr "Event details"
 msgid "Event not found"
 msgstr "Event not found"
 
-#: src/app/panel-host.tsx:83
+#: src/app/panel-host.tsx:87
 msgid "Event not found."
 msgstr "Event not found."
 
@@ -2668,7 +2664,7 @@ msgstr "Host this proposal"
 msgid "Host wanted"
 msgstr "Host wanted"
 
-#: src/features/proposals/proposal-form.tsx:254
+#: src/features/proposals/proposal-form.tsx:245
 #: src/features/proposals/proposals-screen.tsx:415
 msgid "Host(s)"
 msgstr "Host(s)"
@@ -2909,7 +2905,7 @@ msgstr "JPEG, PNG, or WebP, max {maxMapMegabytes} MB."
 msgid "Jump to the current time"
 msgstr "Jump to the current time"
 
-#: src/ui/use-discard-guard.tsx:128
+#: src/ui/use-discard-guard.tsx:131
 msgid "Keep editing"
 msgstr "Keep editing"
 
@@ -2967,7 +2963,7 @@ msgstr "Last"
 msgid "Last page"
 msgstr "Last page"
 
-#: src/features/proposals/proposal-form.tsx:256
+#: src/features/proposals/proposal-form.tsx:247
 msgid "Leave empty to ask for a session without offering to give it yourself — anyone who can host it may add themselves here later."
 msgstr "Leave empty to ask for a session without offering to give it yourself — anyone who can host it may add themselves here later."
 
@@ -3009,7 +3005,7 @@ msgstr "Lime"
 msgid "Link copied"
 msgstr "Link copied"
 
-#: src/features/proposals/proposal-form.tsx:272
+#: src/features/proposals/proposal-form.tsx:263
 msgid "Lists the proposal under “Host wanted” and lets anyone join as a co-host. Stops as soon as someone joins."
 msgstr "Lists the proposal under “Host wanted” and lets anyone join as a co-host. Stops as soon as someone joins."
 
@@ -3047,7 +3043,7 @@ msgstr "Loading proposals..."
 #: src/app/admin-pages.tsx:594
 #: src/app/admin-pages.tsx:640
 #: src/app/event-page.tsx:152
-#: src/app/panel-host.tsx:82
+#: src/app/panel-host.tsx:86
 #: src/app/people-pages.tsx:162
 #: src/features/admin/event-layout.tsx:82
 #: src/features/admin/event-sessions.tsx:394
@@ -3129,7 +3125,7 @@ msgid "Logging out..."
 msgstr "Logging out..."
 
 #: src/features/proposals/proposal-body.tsx:58
-#: src/features/proposals/proposal-form.tsx:270
+#: src/features/proposals/proposal-form.tsx:261
 msgid "Looking for a co-host"
 msgstr "Looking for a co-host"
 
@@ -3366,9 +3362,9 @@ msgstr "Name of {pointName}"
 msgid "Names"
 msgstr "Names"
 
-#: src/features/proposals/proposal-help.tsx:18
-#: src/features/proposals/proposal-help.tsx:22
-#: src/features/proposals/proposal-help.tsx:23
+#: src/features/proposals/proposal-help.tsx:28
+#: src/features/proposals/proposal-help.tsx:40
+#: src/features/proposals/proposal-help.tsx:41
 msgid "Need ideas?"
 msgstr "Need ideas?"
 
@@ -3406,6 +3402,10 @@ msgstr "New location"
 #: src/features/sign-in/reset-password-form.tsx:71
 msgid "New password (at least 8 characters)"
 msgstr "New password (at least 8 characters)"
+
+#: src/app/panel-host.tsx:244
+msgid "New proposal"
+msgstr "New proposal"
 
 #: src/features/admin/event-sessions.tsx:618
 #: src/features/admin/event-sessions.tsx:622
@@ -4050,8 +4050,6 @@ msgstr "Proposal sessions"
 #: src/features/admin/event-stats.tsx:22
 #: src/features/comments/my-comments-screen.tsx:16
 #: src/features/people/profile-body.tsx:235
-#: src/features/proposals/proposal-form.tsx:74
-#: src/features/proposals/proposal-form.tsx:197
 #: src/features/schedule/schedule-toolbar.tsx:130
 #: src/ui/phase-bar.tsx:16
 msgid "Proposals"
@@ -4223,7 +4221,7 @@ msgstr "Reset link sent — check your email to set a new password"
 msgid "Reset to default"
 msgstr "Reset to default"
 
-#: src/ui/side-panel.tsx:155
+#: src/ui/side-panel.tsx:191
 msgid "Resize panel"
 msgstr "Resize panel"
 
@@ -4585,6 +4583,10 @@ msgstr "Session not found."
 msgid "Session origins"
 msgstr "Session origins"
 
+#: src/app/panel-host.tsx:243
+msgid "Session proposal form"
+msgstr "Session proposal form"
+
 #: src/features/sessions/session-form.tsx:545
 msgid "Session title"
 msgstr "Session title"
@@ -4649,7 +4651,7 @@ msgstr "Settings saved."
 msgid "Share that became a session: {list}"
 msgstr "Share that became a session: {list}"
 
-#: src/features/proposals/proposal-form.tsx:204
+#: src/features/proposals/proposal-form.tsx:196
 msgid "Share your session idea with the community. Only the title is required."
 msgstr "Share your session idea with the community. Only the title is required."
 
@@ -4923,7 +4925,7 @@ msgctxt "Location colour"
 msgid "Stone"
 msgstr "Stone"
 
-#: src/features/proposals/proposal-form.tsx:348
+#: src/features/proposals/proposal-form.tsx:336
 #: src/features/sessions/session-form.tsx:799
 msgid "Submit"
 msgstr "Submit"
@@ -4932,7 +4934,7 @@ msgstr "Submit"
 msgid "Submitting adds another session. To change a scheduled one, open it and edit it there."
 msgstr "Submitting adds another session. To change a scheduled one, open it and edit it there."
 
-#: src/features/proposals/proposal-form.tsx:348
+#: src/features/proposals/proposal-form.tsx:336
 #: src/features/sessions/session-form.tsx:799
 msgid "Submitting..."
 msgstr "Submitting..."
@@ -5056,7 +5058,7 @@ msgid "The comment you replied to no longer exists."
 msgstr "The comment you replied to no longer exists."
 
 #: src/app/event-page.tsx:165
-#: src/app/panel-host.tsx:86
+#: src/app/panel-host.tsx:90
 msgid "The event could not be loaded."
 msgstr "The event could not be loaded."
 
@@ -5168,7 +5170,7 @@ msgstr "This can only be changed during the scheduling phase."
 msgid "This can only be changed during the voting phase."
 msgstr "This can only be changed during the voting phase."
 
-#: src/features/proposals/proposal-form.tsx:356
+#: src/features/proposals/proposal-form.tsx:344
 #: src/features/sessions/session-form.tsx:818
 msgid "This cannot be undone."
 msgstr "This cannot be undone."
@@ -5368,7 +5370,7 @@ msgstr "Timezone"
 #: src/features/admin/event-proposals.tsx:101
 #: src/features/admin/event-sessions.tsx:160
 #: src/features/admin/settings-screen.tsx:76
-#: src/features/proposals/proposal-form.tsx:235
+#: src/features/proposals/proposal-form.tsx:226
 #: src/features/proposals/proposals-screen.tsx:407
 msgid "Title"
 msgstr "Title"
@@ -5397,7 +5399,7 @@ msgstr "Trophy"
 
 #: src/app/error-boundary.tsx:39
 #: src/app/event-page.tsx:167
-#: src/app/panel-host.tsx:88
+#: src/app/panel-host.tsx:92
 #: src/features/comments/comments-section.tsx:133
 #: src/features/notifications/notifications-screen.tsx:217
 #: src/features/proposals/proposal-panel.tsx:261
@@ -5478,7 +5480,7 @@ msgstr "Unassigned location"
 msgid "Unavailable"
 msgstr "Unavailable"
 
-#: src/features/proposals/proposal-form.tsx:313
+#: src/features/proposals/proposal-form.tsx:304
 msgid "Undecided"
 msgstr "Undecided"
 
@@ -5763,7 +5765,7 @@ msgstr "Which topic did you enjoy at an earlier event? Do it again, or take it f
 msgid "While this is off, nobody can book you and you won't appear as bookable."
 msgstr "While this is off, nobody can book you and you won't appear as bookable."
 
-#: src/features/proposals/proposal-form.tsx:278
+#: src/features/proposals/proposal-form.tsx:269
 msgid "Who are you looking for?"
 msgstr "Who are you looking for?"
 

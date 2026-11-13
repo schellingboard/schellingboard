@@ -168,7 +168,7 @@ describe("the proposal form pages", { tags: ["004-US1"] }, () => {
       });
 
       expect(
-        await screen.findByRole("heading", { name: "Edit Session Proposal" })
+        await screen.findByRole("heading", { name: "Edit proposal" })
       ).toBeTruthy();
       expect(screen.getByLabelText<HTMLInputElement>(/Title/).value).toBe(
         "Rust intro"

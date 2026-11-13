@@ -1,9 +1,7 @@
 import { useRouter } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
-import { proposalFormCalls } from "../commands/proposal-form";
 import { proposalLinks } from "../features/proposals/links";
-import { ProposalForm } from "../features/proposals/proposal-form";
 import { ProposalsScreen } from "../features/proposals/proposals-screen";
 import { QuickVotingScreen } from "../features/proposals/quick-voting-screen";
 import { useStandings } from "../features/proposals/use-standings";
@@ -108,30 +106,5 @@ function QuickVoting(view: EventView) {
         comments={comments}
       />
     </>
-  );
-}
-
-/** Adds a proposal, or edits the one named. */
-export function ProposalFormPage({ proposalId }: { proposalId?: string }) {
-  return <Form {...useEventView()} proposalId={proposalId} />;
-}
-
-function Form({
-  api,
-  slug,
-  snapshot,
-  proposalId,
-}: EventView & { proposalId?: string }) {
-  const { history } = useRouter();
-  const links = useMemo(() => proposalLinks(slug), [slug]);
-  const actions = useMemo(() => proposalFormCalls(api), [api]);
-  return (
-    <ProposalForm
-      snapshot={snapshot}
-      proposalId={proposalId}
-      links={links}
-      actions={actions}
-      onDone={() => history.push(links.proposals)}
-    />
   );
 }

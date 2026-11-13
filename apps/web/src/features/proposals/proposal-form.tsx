@@ -21,7 +21,6 @@ import type {
   ProposalUpdateBody,
 } from "../../commands/proposal-form";
 import { useFormMutation } from "../../commands/use-form-mutation";
-import { BackLink } from "../../ui/back-link";
 import { Button } from "../../ui/button";
 import { ConfirmDialog } from "../../ui/confirm-dialog";
 import {
@@ -41,13 +40,14 @@ export type ProposalFormProps = {
   proposalId?: string;
   links: ProposalLinks;
   actions: ProposalFormCalls;
-  /** Saved or deleted: the caller leaves the form. */
-  onDone: () => void;
+  onSaved: () => void;
+  onDeleted: () => void;
+  onCancel: () => void;
 };
 
 /** The add and edit proposal screens. */
 export function ProposalForm(props: ProposalFormProps) {
-  const { snapshot, proposalId, links } = props;
+  const { snapshot, proposalId } = props;
   const viewer = snapshot.me?.guestId ?? null;
   const proposal = proposalId
     ? snapshot.proposals.find((p) => p.id === proposalId)
@@ -70,10 +70,7 @@ export function ProposalForm(props: ProposalFormProps) {
   if (refusal)
     return (
       <div className="mx-auto max-w-2xl px-4">
-        <BackLink href={links.proposals}>
-          <Trans>Proposals</Trans>
-        </BackLink>
-        <div className="mt-6">{refusal}</div>
+        <div>{refusal}</div>
       </div>
     );
   return <Fields {...props} viewer={viewer} proposal={proposal} />;
@@ -83,7 +80,9 @@ function Fields({
   snapshot,
   links,
   actions,
-  onDone,
+  onSaved,
+  onDeleted,
+  onCancel,
   viewer,
   proposal,
 }: ProposalFormProps & {
@@ -179,34 +178,26 @@ function Fields({
     setRemoving(false);
     if (invalid) return;
     body.current = next;
-    if ((await save.submit())?.ok) onDone();
+    if ((await save.submit())?.ok) onSaved();
   };
 
   const onDelete = async () => {
     setConfirming(false);
     setRemoving(true);
-    if ((await remove.submit())?.ok) onDone();
+    if ((await remove.submit())?.ok) onDeleted();
   };
 
   const jump = (name: string) =>
     formRef.current?.querySelector<HTMLElement>(`[name="${name}"]`)?.focus();
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-4 px-4 pb-24">
-      <BackLink href={links.proposals}>
-        <Trans>Proposals</Trans>
-      </BackLink>
-      <div>
-        <h2 className="text-2xl font-bold">
-          {proposal ? t`Edit Session Proposal` : t`Add Session Proposal`}
-        </h2>
-        <p className="mt-2 text-sm text-fg-subtle">
-          <Trans>
-            Share your session idea with the community. Only the title is
-            required.
-          </Trans>
-        </p>
-      </div>
+    <div className="flex flex-col gap-4">
+      <p className="text-sm text-fg-subtle">
+        <Trans>
+          Share your session idea with the community. Only the title is
+          required.
+        </Trans>
+      </p>
       {!proposal && (
         <div className="self-start">
           <ProposalHelp event={event} />
@@ -338,12 +329,9 @@ function Fields({
             </Button>
           )}
           <div className="ml-auto flex gap-3">
-            <a
-              href={links.proposals}
-              className="rounded px-6 py-2 font-semibold text-fg-muted bg-surface-muted hover:bg-surface-hover"
-            >
+            <Button variant="quiet" onClick={onCancel}>
               <Trans>Cancel</Trans>
-            </a>
+            </Button>
             <Button type="submit" disabled={!title || busy}>
               {save.pending ? t`Submitting...` : t`Submit`}
             </Button>

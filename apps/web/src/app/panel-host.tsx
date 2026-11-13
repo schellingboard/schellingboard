@@ -1,18 +1,20 @@
 import { t } from "@lingui/core/macro";
 import { useRouter } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
+import { proposalFormCalls } from "../commands/proposal-form";
 import {
   MeetingNeedsName,
   MeetingPanel,
 } from "../features/meetings/meeting-panel";
 import { proposalLinks } from "../features/proposals/links";
+import { ProposalForm } from "../features/proposals/proposal-form";
 import { ProposalPanel } from "../features/proposals/proposal-panel";
 import { ScheduleProvider } from "../features/schedule/context";
 import { scheduleDataFrom } from "../features/schedule/data";
 import { scheduleLinks } from "../features/schedule/links";
 import { SessionPanel } from "../features/schedule/session-panel";
-import { SidePanel } from "../ui/side-panel";
+import { SidePanel, usePanelGuard } from "../ui/side-panel";
 import { EventViewContext, Ready, useEventView } from "./event-page";
 import { LOCAL_ZONE } from "./local-zone";
 import { backgroundOf, type PanelItem } from "./panel-history";
@@ -36,6 +38,8 @@ export function PanelHost() {
     return <SessionHost key={key} item={panel.item} depth={panel.depth} />;
   if (panel.item.kind === "meeting")
     return <MeetingHost key={key} item={panel.item} depth={panel.depth} />;
+  if (panel.item.kind === "proposal-form")
+    return <ProposalFormHost key={key} item={panel.item} depth={panel.depth} />;
   return <ProposalHost key={key} item={panel.item} depth={panel.depth} />;
 }
 
@@ -215,4 +219,78 @@ function ProposalHost({
       onBack={depth > 1 ? back : undefined}
     />
   );
+}
+
+/** `leaving` marks a confirmed or saved exit so the history blocker lets it through. */
+function ProposalFormHost({
+  item,
+  depth,
+}: {
+  item: Extract<PanelItem, { kind: "proposal-form" }>;
+  depth: number;
+}) {
+  const view = useEventView();
+  const { close, back } = usePanel();
+  const links = useMemo(() => proposalLinks(view.slug), [view.slug]);
+  const actions = useMemo(() => proposalFormCalls(view.api), [view.api]);
+  const leaving = useRef(false);
+  const leave = (then: () => void) => {
+    leaving.current = true;
+    then();
+  };
+  return (
+    <SidePanel
+      label={t`Session proposal form`}
+      title={item.id ? t`Edit proposal` : t`New proposal`}
+      onClose={() => leave(close)}
+      onBack={depth > 1 ? () => leave(back) : undefined}
+      guardUnload
+    >
+      <FormBody leaving={leaving}>
+        {(cancel) => (
+          <ProposalForm
+            snapshot={view.snapshot}
+            proposalId={item.id}
+            links={links}
+            actions={actions}
+            onCancel={cancel}
+            onSaved={() => leave(depth > 1 ? back : close)}
+            onDeleted={() => leave(close)}
+          />
+        )}
+      </FormBody>
+    </SidePanel>
+  );
+}
+
+function FormBody({
+  leaving,
+  children,
+}: {
+  leaving: { current: boolean };
+  children: (cancel: () => void) => ReactNode;
+}) {
+  const { history } = useRouter();
+  const guard = usePanelGuard();
+  const latest = useRef(guard);
+  useEffect(() => {
+    latest.current = guard;
+  });
+  useEffect(
+    () =>
+      history.block({
+        enableBeforeUnload: false,
+        blockerFn: () => {
+          if (leaving.current || !latest.current.hasUnsaved()) return false;
+          return new Promise<boolean>((resolve) =>
+            latest.current.ask(
+              () => resolve(false),
+              () => resolve(true)
+            )
+          );
+        },
+      }),
+    [history, leaving]
+  );
+  return children(guard.requestClose);
 }

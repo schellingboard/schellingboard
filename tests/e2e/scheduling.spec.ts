@@ -282,7 +282,7 @@ test("an already scheduled proposal says the schedule won't follow it @008-US1 @
   await page.goBack();
   await row.getByRole("link", { name: "Edit", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: /Edit Session Proposal/i })
+    page.getByRole("heading", { name: /Edit proposal/i })
   ).toBeVisible();
   await expect(
     page.getByText(/already on the schedule.*do not reach the schedule/)
