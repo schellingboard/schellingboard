@@ -330,7 +330,7 @@ test("asks before Escape discards an unsent comment @010-US7", async ({
   await draft.fill("a thought I have not sent");
 
   await page.keyboard.press("Escape");
-  await expect(modal.getByText("Discard what you have typed?")).toBeVisible();
+  await expect(modal.getByText("Discard your changes?")).toBeVisible();
   await modal.getByRole("button", { name: "Keep editing" }).click();
   await expect(modal).toBeVisible();
   await expect(draft).toHaveValue("a thought I have not sent");

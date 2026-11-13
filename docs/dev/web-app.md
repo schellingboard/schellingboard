@@ -177,6 +177,15 @@ in `list-model.ts`); the typed text stays local and its debounced value goes to 
 whatever panels are open over it). The router's `scrollRestoration` is `createScrollReset()`, which
 resets the window only when the page behind changes and restores nothing itself.
 
+## Leaving over unsaved changes
+
+`useDiscardGuard` (`ui/use-discard-guard.tsx`) is what `Dialog` and `SidePanel` use to ask "Discard
+your changes?" before Close, Escape or the Back arrow. It counts text, selects, checkboxes, radio
+groups and dates once the control was focused or pressed and now differs. Comboboxes, search boxes,
+number fields and file inputs are never counted; give any other control that only changes the view
+(a page size, a sort) a `data-discard-ignore` attribute. `beforeUnload: true` also warns when the
+page is left; only form panels turn it on.
+
 ## Failure notices
 
 `NoticeProvider` (`ui/notices.tsx`, mounted in `ShellProviders`) shows failures as `role="alert"`

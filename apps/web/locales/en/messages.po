@@ -1353,7 +1353,7 @@ msgstr "Clear the slots you want kept free. You don't need to clear the ones whe
 msgid "Clearing every slot is the same as switching this off."
 msgstr "Clearing every slot is the same as switching this off."
 
-#: src/ui/dialog.tsx:117
+#: src/ui/dialog.tsx:118
 #: src/ui/side-panel.tsx:184
 msgid "Close"
 msgstr "Close"
@@ -2074,13 +2074,13 @@ msgstr "Did the people who RSVPed come?"
 msgid "Did votes predict RSVPs?"
 msgstr "Did votes predict RSVPs?"
 
-#: src/ui/use-discard-guard.tsx:90
+#: src/ui/use-discard-guard.tsx:125
 msgid "Discard"
 msgstr "Discard"
 
-#: src/ui/use-discard-guard.tsx:80
-msgid "Discard what you have typed?"
-msgstr "Discard what you have typed?"
+#: src/ui/use-discard-guard.tsx:115
+msgid "Discard your changes?"
+msgstr "Discard your changes?"
 
 #: src/features/people/contact-labels.ts:11
 msgid "Discord"
@@ -2909,7 +2909,7 @@ msgstr "JPEG, PNG, or WebP, max {maxMapMegabytes} MB."
 msgid "Jump to the current time"
 msgstr "Jump to the current time"
 
-#: src/ui/use-discard-guard.tsx:93
+#: src/ui/use-discard-guard.tsx:128
 msgid "Keep editing"
 msgstr "Keep editing"
 

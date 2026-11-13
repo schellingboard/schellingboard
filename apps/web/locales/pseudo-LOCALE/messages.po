@@ -1353,7 +1353,7 @@ msgstr ""
 msgid "Clearing every slot is the same as switching this off."
 msgstr ""
 
-#: src/ui/dialog.tsx:117
+#: src/ui/dialog.tsx:118
 #: src/ui/side-panel.tsx:184
 msgid "Close"
 msgstr ""
@@ -2074,12 +2074,12 @@ msgstr ""
 msgid "Did votes predict RSVPs?"
 msgstr ""
 
-#: src/ui/use-discard-guard.tsx:90
+#: src/ui/use-discard-guard.tsx:125
 msgid "Discard"
 msgstr ""
 
-#: src/ui/use-discard-guard.tsx:80
-msgid "Discard what you have typed?"
+#: src/ui/use-discard-guard.tsx:115
+msgid "Discard your changes?"
 msgstr ""
 
 #: src/features/people/contact-labels.ts:11
@@ -2909,7 +2909,7 @@ msgstr ""
 msgid "Jump to the current time"
 msgstr ""
 
-#: src/ui/use-discard-guard.tsx:93
+#: src/ui/use-discard-guard.tsx:128
 msgid "Keep editing"
 msgstr ""
 

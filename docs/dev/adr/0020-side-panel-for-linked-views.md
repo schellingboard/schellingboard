@@ -2,6 +2,8 @@
 
 - **Status:** Accepted
 - **Date:** 2026-11-09
+- **Amended by:** [ADR 0021](0021-forms-in-the-side-panel.md): create and edit forms are panel kinds
+  too
 
 ## Context
 

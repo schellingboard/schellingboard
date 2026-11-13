@@ -134,4 +134,46 @@ describe("SidePanel", () => {
         .getAttribute("aria-valuenow")
     ).toBe(stored);
   });
+
+  describe("leaving over unsaved changes", { tags: ["010-US7"] }, () => {
+    const form = (props: Partial<Parameters<typeof SidePanel>[0]> = {}) =>
+      render(
+        <SidePanel
+          label="Details"
+          title="A title"
+          onClose={() => {}}
+          {...props}
+        >
+          <input type="checkbox" aria-label="Open to all" />
+        </SidePanel>
+      );
+
+    it("asks before the Back arrow goes back", async () => {
+      const onBack = vi.fn();
+      const user = userEvent.setup();
+      form({ onBack });
+      await user.click(screen.getByRole("checkbox", { name: "Open to all" }));
+
+      await user.click(screen.getByRole("button", { name: "Back" }));
+
+      expect(onBack).not.toHaveBeenCalled();
+      await user.click(screen.getByRole("button", { name: "Discard" }));
+      expect(onBack).toHaveBeenCalledTimes(1);
+    });
+
+    it("asks once when Close and Back are both pressed", async () => {
+      const onClose = vi.fn();
+      const user = userEvent.setup();
+      form({ onBack: () => {}, onClose });
+      await user.click(screen.getByRole("checkbox", { name: "Open to all" }));
+
+      await user.click(screen.getByRole("button", { name: "Close" }));
+      await user.click(screen.getByRole("button", { name: "Back" }));
+
+      expect(screen.getAllByRole("alertdialog")).toHaveLength(1);
+      await user.keyboard("{Escape}");
+      expect(screen.queryByRole("alertdialog")).toBeNull();
+      expect(onClose).not.toHaveBeenCalled();
+    });
+  });
 });

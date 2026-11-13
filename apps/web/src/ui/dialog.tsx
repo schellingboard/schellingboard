@@ -89,7 +89,7 @@ export function Dialog({
     <div
       data-testid="dialog-backdrop"
       className="fixed inset-0 z-[60] flex items-end justify-center bg-overlay p-0 sm:items-center sm:p-4"
-      onClick={guard.requestClose}
+      onClick={() => guard.requestClose()}
     >
       <div
         ref={panel}
@@ -100,7 +100,8 @@ export function Dialog({
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         onKeyDown={keepFocusInside}
-        onFocus={guard.noteFocus}
+        onFocus={guard.noteField}
+        onPointerDown={guard.noteField}
         className={`relative max-h-[90dvh] w-full overflow-y-auto overscroll-contain rounded-t-lg bg-surface-raised p-4 shadow-xl focus:outline-none sm:rounded-lg sm:p-6 ${wide ? "sm:max-w-2xl" : "sm:max-w-md"}`}
       >
         <div className="flex items-start gap-2 pr-8">
@@ -115,7 +116,7 @@ export function Dialog({
         <button
           type="button"
           aria-label={t`Close`}
-          onClick={guard.requestClose}
+          onClick={() => guard.requestClose()}
           className="absolute right-3 top-3 rounded-md p-1 text-fg-subtle hover:bg-surface-muted focus:outline-none focus:ring-2 focus:ring-brand-accent"
         >
           <span aria-hidden>✕</span>

@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import {
-  type FocusEvent,
   type RefObject,
+  type SyntheticEvent,
   useCallback,
   useEffect,
   useId,
@@ -12,79 +12,114 @@ import {
 import { Button } from "./button";
 
 // A number field holds a saved value after a submit (the attendee count),
-// and a combobox or search box is a query, not a draft.
-const TEXT_FIELDS =
-  "textarea, input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=hidden]):not([type=number]):not([type=search]):not([type=submit]):not([type=button]):not([role=combobox])";
+// a combobox or search box is a query, not a draft, and data-discard-ignore
+// marks any other control that only changes the view (a page size, a sort).
+const FIELDS =
+  "textarea, select, input:not([type=file]):not([type=hidden]):not([type=number]):not([type=search]):not([type=submit]):not([type=button]):not([role=combobox])";
+
+const IGNORED = "[data-discard-ignore]";
+
+const valueOf = (field: HTMLInputElement) =>
+  field.type === "checkbox" || field.type === "radio"
+    ? String(field.checked)
+    : field.value;
 
 /**
- * Asks before a dialog is dismissed over text the user typed. A field counts
- * once it has had focus and now differs from what it held then.
+ * Asks before a dialog or panel is dismissed over what the user entered. A
+ * control counts once it has been focused or pressed and now differs from what
+ * it held then. With `beforeUnload`, leaving the page asks too.
  */
 export function useDiscardGuard(
   panel: RefObject<HTMLElement | null>,
-  onClose: () => void
+  onClose: () => void,
+  { beforeUnload = false }: { beforeUnload?: boolean } = {}
 ) {
   const starts = useRef(new WeakMap<Element, string>());
-  const [asking, setAsking] = useState(false);
+  const [pending, setPending] = useState<(() => void) | null>(null);
   const returnFocus = useRef<HTMLElement | null>(null);
   const questionId = useId();
+  const asking = pending !== null;
 
-  const hasUnsavedText = () =>
-    [
-      ...(panel.current?.querySelectorAll<HTMLInputElement>(TEXT_FIELDS) ?? []),
-    ].some((field) => {
-      const start = starts.current.get(field);
-      return start !== undefined && field.value !== start;
-    });
+  const hasUnsaved = () =>
+    [...(panel.current?.querySelectorAll<HTMLInputElement>(FIELDS) ?? [])].some(
+      (field) => {
+        const start = starts.current.get(field);
+        return start !== undefined && valueOf(field) !== start;
+      }
+    );
 
   const keepEditing = () => {
-    setAsking(false);
+    setPending(null);
     returnFocus.current?.focus?.();
   };
 
-  const requestClose = () => {
+  // `then` is what to do once nothing is lost: close by default, or go Back.
+  const requestClose = (then: () => void = onClose) => {
     if (asking) return;
-    if (!hasUnsavedText()) return onClose();
+    if (!hasUnsaved()) return then();
     returnFocus.current = document.activeElement as HTMLElement | null;
-    setAsking(true);
+    setPending(() => then);
   };
 
-  const latest = useRef({ requestClose, keepEditing, asking });
+  const latest = useRef({ requestClose, keepEditing, asking, hasUnsaved });
   useEffect(() => {
-    latest.current = { requestClose, keepEditing, asking };
+    latest.current = { requestClose, keepEditing, asking, hasUnsaved };
   });
   const escape = useCallback(() => {
     if (latest.current.asking) latest.current.keepEditing();
     else latest.current.requestClose();
   }, []);
 
-  const noteFocus = (e: FocusEvent) => {
-    const field = e.target as HTMLInputElement;
-    if (
-      panel.current?.contains(field) &&
-      field.matches(TEXT_FIELDS) &&
-      !starts.current.has(field)
-    )
-      starts.current.set(field, field.value);
+  const noteField = (e: SyntheticEvent) => {
+    const target = e.target as HTMLElement;
+    // A press on a label's text targets the label, and Safari does not focus
+    // a checkbox or radio at all.
+    const field = (target.closest<HTMLLabelElement>("label")?.control ??
+      target) as HTMLInputElement;
+    if (!panel.current?.contains(field) || !field.matches?.(FIELDS)) return;
+    if (field.closest(IGNORED)) return;
+    // Radios of one group move together: only the group has a value.
+    const group =
+      field.type === "radio" && field.name
+        ? [
+            ...panel.current.querySelectorAll<HTMLInputElement>(
+              "input[type=radio]"
+            ),
+          ].filter((radio) => radio.name === field.name)
+        : [field];
+    for (const member of group)
+      if (!starts.current.has(member))
+        starts.current.set(member, valueOf(member));
   };
 
-  const reset = useCallback(() => setAsking(false), []);
+  useEffect(() => {
+    if (!beforeUnload) return;
+    const warn = (e: BeforeUnloadEvent) => {
+      if (!latest.current.hasUnsaved()) return;
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [beforeUnload]);
 
-  const prompt = asking ? (
+  const reset = useCallback(() => setPending(null), []);
+
+  const prompt = pending ? (
     <div
       role="alertdialog"
       aria-labelledby={questionId}
       className="mt-3 space-y-2 rounded-md border border-line bg-surface-muted p-3"
     >
       <p id={questionId} className="text-sm font-medium text-fg">
-        <Trans>Discard what you have typed?</Trans>
+        <Trans>Discard your changes?</Trans>
       </p>
       <div className="flex flex-wrap gap-2">
         <Button
           variant="danger"
           onClick={() => {
-            setAsking(false);
-            onClose();
+            setPending(null);
+            pending();
           }}
         >
           <Trans>Discard</Trans>
@@ -96,5 +131,5 @@ export function useDiscardGuard(
     </div>
   ) : null;
 
-  return { requestClose, escape, noteFocus, reset, prompt };
+  return { requestClose, escape, noteField, reset, prompt };
 }

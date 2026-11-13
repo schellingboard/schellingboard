@@ -57,9 +57,8 @@ export function SidePanel({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(storedWidth);
-  const closeGuard = useDiscardGuard(ref, onClose);
-  const { escape, reset } = closeGuard;
-  const backGuard = useDiscardGuard(ref, onBack ?? onClose);
+  const guard = useDiscardGuard(ref, onClose);
+  const { escape, reset } = guard;
 
   const remember = (value: number) => {
     try {
@@ -74,9 +73,9 @@ export function SidePanel({
     if (persist) remember(clamped);
   };
 
-  const requestClose = useRef(closeGuard.requestClose);
+  const requestClose = useRef(guard.requestClose);
   useEffect(() => {
-    requestClose.current = closeGuard.requestClose;
+    requestClose.current = guard.requestClose;
   });
   useEffect(() => {
     const self = { transient, close: () => requestClose.current() };
@@ -145,7 +144,8 @@ export function SidePanel({
       aria-modal="false"
       aria-label={label}
       tabIndex={-1}
-      onFocus={closeGuard.noteFocus}
+      onFocus={guard.noteField}
+      onPointerDown={guard.noteField}
       style={{ ["--panel-w" as string]: `${width}px` }}
       className="fixed inset-0 z-[55] flex flex-col bg-surface-raised shadow-xl focus:outline-none sm:inset-y-auto sm:bottom-0 sm:left-auto sm:right-0 sm:top-16 sm:w-[var(--panel-w)] sm:border-l sm:border-t sm:border-line"
     >
@@ -171,7 +171,7 @@ export function SidePanel({
               message: "Back",
               context: "Side panel: go to the previous panel",
             })}
-            onClick={backGuard.requestClose}
+            onClick={() => guard.requestClose(onBack)}
             className={button}
           >
             <span aria-hidden>←</span>
@@ -182,7 +182,7 @@ export function SidePanel({
         <button
           type="button"
           aria-label={t`Close`}
-          onClick={closeGuard.requestClose}
+          onClick={() => guard.requestClose()}
           className={button}
         >
           <span aria-hidden>✕</span>
@@ -192,8 +192,7 @@ export function SidePanel({
         data-panel-scroll
         className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4"
       >
-        {closeGuard.prompt}
-        {backGuard.prompt}
+        {guard.prompt}
         {children}
       </div>
     </div>,

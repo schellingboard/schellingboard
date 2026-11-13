@@ -183,7 +183,7 @@ describe("Dialog with unsaved text", { tags: ["010-US7"] }, () => {
 
     expect(onClose).not.toHaveBeenCalled();
     expect(
-      screen.getByRole("alertdialog", { name: "Discard what you have typed?" })
+      screen.getByRole("alertdialog", { name: "Discard your changes?" })
     ).toBeTruthy();
   });
 
