@@ -2,19 +2,16 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
-import { generateMessageId } from "@lingui/message-utils/generateMessageId";
+import { msg, plural } from "@lingui/core/macro";
 import { describe, expect, it, vi } from "vitest";
 
 import { createTranslators } from "@/server/kernel/translator";
 
-// Built the way the msg macro builds them: a hashed id, the source as message.
-const descriptor = (
-  message: string,
-  values: Record<string, unknown> = {},
-  context?: string
-) => ({ id: generateMessageId(message, context) as string, message, values });
-
-const SESSIONS = "{count, plural, one {# session} other {# sessions}}";
+const hello = (name: string) => msg`Hello ${name}`;
+const sessions = (count: number) =>
+  msg`${plural(count, { one: "# session", other: "# sessions" })}`;
+const menuAll = msg({ message: "All", context: "Menu" });
+const filterAll = msg({ message: "All", context: "Filter" });
 
 const dir = mkdtempSync(path.join(tmpdir(), "locales-"));
 const catalog = (locale: string, po: string[]) => {
@@ -25,7 +22,7 @@ catalog("de", [
   'msgid "Hello {name}"',
   'msgstr "Hallo {name}"',
   "",
-  `msgid "${SESSIONS}"`,
+  `msgid "{count, plural, one {# session} other {# sessions}}"`,
   'msgstr "{count, plural, one {# Sitzung} other {# Sitzungen}}"',
   "",
   'msgctxt "Menu"',
@@ -45,40 +42,34 @@ catalog("fr", ['msgid "broken', ""]);
 const translatorFor = createTranslators(dir);
 
 describe("server translator", { tags: ["022-US2"] }, () => {
-  it("translates a macro-built message with the web's catalogs and ICU", () => {
+  it("translates a message written with the macros using the web's catalogs and ICU", () => {
     const de = translatorFor("de");
-    expect(de(descriptor("Hello {name}", { name: "Ada" }))).toBe("Hallo Ada");
-    expect(de(descriptor(SESSIONS, { count: 1 }))).toBe("1 Sitzung");
-    expect(de(descriptor(SESSIONS, { count: 3 }))).toBe("3 Sitzungen");
+    expect(de(hello("Ada"))).toBe("Hallo Ada");
+    expect(de(sessions(1))).toBe("1 Sitzung");
+    expect(de(sessions(3))).toBe("3 Sitzungen");
   });
 
   it("tells apart messages that differ only in context", () => {
     const de = translatorFor("de");
-    expect(de(descriptor("All", {}, "Menu"))).toBe("Alles");
-    expect(de(descriptor("All", {}, "Filter"))).toBe("Alle");
+    expect(de(menuAll)).toBe("Alles");
+    expect(de(filterAll)).toBe("Alle");
   });
 
   it("reads the source, not the hashed id, in English and when untranslated", () => {
-    const hello = descriptor("Hello {name}", { name: "Ada" });
-    expect(translatorFor("en")(hello)).toBe("Hello Ada");
-    expect(translatorFor("de")(descriptor("Untranslated"))).toBe(
-      "Untranslated"
-    );
+    expect(translatorFor("en")(hello("Ada"))).toBe("Hello Ada");
+    expect(translatorFor("de")(msg`Untranslated`)).toBe("Untranslated");
   });
 
   it("falls back to English for no locale, an unknown one or a broken catalog", () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
-    const hello = descriptor("Hello {name}", { name: "Ada" });
     for (const locale of [null, undefined, "es", "../x", "fr"]) {
-      expect(translatorFor(locale)(hello)).toBe("Hello Ada");
+      expect(translatorFor(locale)(hello("Ada"))).toBe("Hello Ada");
     }
     expect(error).toHaveBeenCalledTimes(1);
     error.mockRestore();
   });
 
   it("takes a regional tag for a locale it has", () => {
-    expect(
-      translatorFor("de-DE")(descriptor("Hello {name}", { name: "Ada" }))
-    ).toBe("Hallo Ada");
+    expect(translatorFor("de-DE")(hello("Ada"))).toBe("Hallo Ada");
   });
 });

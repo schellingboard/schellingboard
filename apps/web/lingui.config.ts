@@ -7,7 +7,12 @@ export default defineConfig({
   catalogs: [
     {
       path: "<rootDir>/locales/{locale}/messages",
-      include: ["<rootDir>/src"],
+      include: [
+        "<rootDir>/src",
+        "<rootDir>/../../emails",
+        "<rootDir>/../../server",
+        "<rootDir>/../../utils",
+      ],
     },
   ],
 });

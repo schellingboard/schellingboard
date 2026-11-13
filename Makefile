@@ -112,10 +112,10 @@ arch: install arch-diagrams-check
 # The committed API description and the client types generated from it; a stale
 # copy of either fails precommit and CI (ADR 0012).
 openapi: install
-	bun x tsx scripts/openapi.ts
+	bun x tsx scripts/run-bundled.ts scripts/openapi.ts
 
 openapi-check: install
-	bun x tsx scripts/openapi.ts --check
+	bun x tsx scripts/run-bundled.ts scripts/openapi.ts --check
 
 LIKEC4_DIR := docs/dev/architecture/diagrams
 
@@ -209,7 +209,7 @@ dev-migrate-create: install
 	bun set-env.ts dev bun x drizzle-kit generate $(if $(NAME),--name $(NAME),)
 
 bootstrap-link: install
-	bun set-env.ts dev bun x tsx scripts/bootstrap-link.ts
+	bun set-env.ts dev bun x tsx scripts/run-bundled.ts scripts/bootstrap-link.ts
 
 dev-db-seed: install
 	bun set-env.ts dev bun x tsx scripts/seed/seed-database.ts

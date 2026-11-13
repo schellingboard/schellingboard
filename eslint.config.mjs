@@ -65,6 +65,28 @@ export default tseslint.config(
     },
   },
   {
+    // Server text is a `msg` descriptor passed to the recipient's translator;
+    // `t` and the others read a global i18n that the server never activates.
+    files: [
+      "server/**/*.{ts,tsx}",
+      "emails/**/*.{ts,tsx}",
+      "utils/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: ["@lingui/core/macro", "@lingui/react/macro"].map((name) => ({
+            name,
+            importNames: ["t", "Trans", "useLingui"],
+            message:
+              "Server text uses `msg` and the recipient's translator, not the global i18n.",
+          })),
+        },
+      ],
+    },
+  },
+  {
     // Every .tsx file of the web app; see docs/dev/i18n.md. The dev toolbar is
     // English on purpose: it only exists with SB_ENABLE_DEV_TOOLS.
     files: ["apps/web/src/**/*.tsx"],

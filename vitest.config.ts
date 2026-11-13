@@ -1,9 +1,11 @@
 import path from "path";
 import { defineConfig } from "vitest/config";
 
+import { linguiVitest } from "./scripts/lingui-macro.ts";
 import { useCases } from "./tests/use-cases.ts";
 
 export default defineConfig({
+  plugins: [linguiVitest()],
   test: {
     projects: [
       {

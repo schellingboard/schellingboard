@@ -3,6 +3,7 @@ import { build, type BuildOptions, context } from "esbuild";
 import { mkdirSync, writeFileSync } from "fs";
 
 import { getAppVersion } from "./app-version.js";
+import { linguiEsbuild } from "./lingui-macro.js";
 
 const OUT = "dist/server";
 const version = process.env.APP_VERSION || getAppVersion();
@@ -21,6 +22,7 @@ const options: BuildOptions = {
   define: {
     "process.env.NEXT_PUBLIC_APP_VERSION": JSON.stringify(version),
   },
+  plugins: [linguiEsbuild()],
   logLevel: "info",
 };
 
