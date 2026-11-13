@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   CheckboxField,
   DateTimeField,
+  SearchableSelectField,
   SelectField,
   TextAreaField,
   TextField,
@@ -118,5 +119,20 @@ describe("form fields", () => {
     expect(screen.getByLabelText("Opens").getAttribute("type")).toBe(
       "datetime-local"
     );
+  });
+
+  it("label a searchable select and mark a required one", () => {
+    render(
+      <SearchableSelectField
+        label="Location"
+        required
+        value=""
+        onChange={() => {}}
+        options={[{ value: "a", label: "Main hall" }]}
+      />
+    );
+
+    const input = screen.getByRole("combobox", { name: /Location/ });
+    expect(input.getAttribute("aria-required")).toBe("true");
   });
 });

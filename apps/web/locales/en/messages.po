@@ -3092,8 +3092,8 @@ msgstr "Mark as read"
 #: src/features/admin/event-sessions.tsx:170
 #: src/features/comments/comments-section.tsx:577
 #: src/features/people/profile-form.tsx:585
-#: src/ui/form.tsx:186
-#: src/ui/form.tsx:344
+#: src/ui/form.tsx:187
+#: src/ui/form.tsx:375
 msgid "Markdown supported"
 msgstr "Markdown supported"
 
@@ -3835,7 +3835,7 @@ msgstr "Pick a time zone from the list"
 msgid "Pick at least one day"
 msgstr "Pick at least one day"
 
-#: src/ui/combobox.tsx:170
+#: src/ui/combobox.tsx:180
 msgid "Pick one or type any text"
 msgstr "Pick one or type any text"
 
@@ -4597,7 +4597,7 @@ msgstr "Show only your sessions and 1-on-1s that overlap in time with another of
 msgid "Show only your sessions that overlap in time with another of yours, bookmarks included."
 msgstr "Show only your sessions that overlap in time with another of yours, bookmarks included."
 
-#: src/ui/combobox.tsx:136
+#: src/ui/combobox.tsx:146
 msgid "Show suggestions"
 msgstr "Show suggestions"
 

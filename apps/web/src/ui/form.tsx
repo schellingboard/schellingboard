@@ -5,6 +5,7 @@ import { Combobox } from "./combobox";
 import { ExclamationTriangleIcon } from "./icons";
 import { MarkdownTextarea } from "./markdown-textarea";
 import { PeoplePicker, type Person } from "./people-picker";
+import { SearchableSelect, type SelectOption } from "./searchable-select";
 
 const CONTROL =
   "w-full rounded-md border border-line bg-surface-raised p-2 text-base text-fg sm:text-sm focus:border-brand-accent focus:ring-brand-accent aria-[invalid=true]:border-danger-border";
@@ -240,6 +241,36 @@ export function SelectField({
           </option>
         ))}
       </select>
+    </Frame>
+  );
+}
+
+export function SearchableSelectField({
+  value,
+  onChange,
+  options,
+  placeholder,
+  ...frame
+}: FieldProps & {
+  value: string;
+  onChange: (value: string) => void;
+  options: SelectOption[];
+  placeholder?: string;
+}) {
+  const ids = useField(frame);
+  return (
+    <Frame {...frame} ids={ids}>
+      <SearchableSelect
+        id={ids.id}
+        name={frame.name}
+        value={value}
+        onChange={onChange}
+        options={options}
+        invalid={!!frame.error}
+        describedBy={ids.control["aria-describedby"]}
+        required={frame.required}
+        placeholder={placeholder}
+      />
     </Frame>
   );
 }

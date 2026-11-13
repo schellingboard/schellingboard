@@ -23,6 +23,9 @@ export function Combobox({
   invalid,
   describedBy,
   strict = false,
+  onBlur,
+  onChoose,
+  required,
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -36,6 +39,10 @@ export function Combobox({
   describedBy?: string;
   /** Only the listed options are valid, so the footer does not invite free text. */
   strict?: boolean;
+  onBlur?: () => void;
+  /** Takes over from `onChange` when a listed option is picked, by its position. */
+  onChoose?: (index: number) => void;
+  required?: boolean;
 }) {
   const listId = useId();
   const [open, setOpen] = useState(false);
@@ -74,8 +81,9 @@ export function Combobox({
       document.removeEventListener("pointerdown", onPointerDown, true);
   }, [open]);
 
-  const choose = (option: string) => {
-    onChange(option);
+  const choose = (index: number) => {
+    if (onChoose) onChoose(index);
+    else onChange(options[index]);
     setOpen(false);
     setActive(-1);
   };
@@ -92,6 +100,7 @@ export function Combobox({
         aria-controls={listId}
         aria-autocomplete="list"
         aria-activedescendant={active >= 0 ? `${listId}-${active}` : undefined}
+        aria-required={required ? true : undefined}
         aria-invalid={invalid ? true : undefined}
         aria-describedby={describedBy}
         autoComplete="off"
@@ -108,6 +117,7 @@ export function Combobox({
         onBlur={() => {
           setOpen(false);
           setActive(-1);
+          onBlur?.();
         }}
         onKeyDown={(e) => {
           if (e.key === "ArrowDown" || e.key === "ArrowUp") {
@@ -119,7 +129,7 @@ export function Combobox({
           } else if (e.key === "Enter") {
             if (open && active >= 0) {
               e.preventDefault();
-              choose(options[active]);
+              choose(active);
             } else {
               e.preventDefault();
               setOpen(false);
@@ -148,7 +158,7 @@ export function Combobox({
       >
         {options.map((option, i) => (
           <li
-            key={option}
+            key={i}
             id={`${listId}-${i}`}
             role="option"
             aria-selected={i === active}
@@ -157,7 +167,7 @@ export function Combobox({
               i === active && "bg-brand-tint-hover text-brand-fg"
             )}
             onMouseDown={(e) => e.preventDefault()}
-            onClick={() => choose(option)}
+            onClick={() => choose(i)}
           >
             {option}
           </li>
