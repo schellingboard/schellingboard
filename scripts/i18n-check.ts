@@ -8,7 +8,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { missingKeys, parsePo } from "./i18n-catalogs";
+import { missingKeys, parsePo } from "@schellingboard/domain/po-catalog";
 
 const webDir = path.join(
   path.dirname(fileURLToPath(import.meta.url)),

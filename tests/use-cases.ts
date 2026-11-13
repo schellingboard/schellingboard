@@ -806,6 +806,11 @@ export const features = {
         actor: "attendee",
         priority: "P2",
       },
+      US2: {
+        title: "Attendee gets emails and notifications in their language",
+        actor: "attendee",
+        priority: "P2",
+      },
     },
   },
 } as const satisfies Record<string, Feature>;

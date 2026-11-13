@@ -43,6 +43,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/dist ./apps/web/dist
 # Migrations are loaded at runtime relative to process.cwd()
 COPY --from=builder --chown=nextjs:nodejs /app/drizzle ./drizzle
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/locales ./apps/web/locales
 # The bundle's externals (scripts/build-server.ts) with their dependencies, and
 # the API reference script that is served by path
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/better-sqlite3 ./node_modules/better-sqlite3

@@ -1,6 +1,5 @@
+import { missingKeys, parsePo } from "@schellingboard/domain/po-catalog";
 import { describe, expect, it } from "vitest";
-
-import { missingKeys, parsePo } from "@/scripts/i18n-catalogs";
 
 const header = 'msgid ""\nmsgstr ""\n"Language: de-DE\\n"\n\n';
 
@@ -23,6 +22,21 @@ msgstr ""
         ["Save all", ["Alles speichern"]],
       ])
     );
+  });
+
+  it("keeps same-text messages of different context apart", () => {
+    const po = `${header}msgctxt "Filter"
+msgid "All"
+msgstr "Alle"
+
+msgctxt "Menu"
+msgid "All"
+msgstr "Alles"
+`;
+    expect([...parsePo(po)]).toEqual([
+      ["Filter\u0004All", ["Alle"]],
+      ["Menu\u0004All", ["Alles"]],
+    ]);
   });
 
   it("reads each form of a plural", () => {
