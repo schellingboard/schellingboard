@@ -74,13 +74,23 @@ msgstr ""
 msgid "{0, plural, one {# attendee} other {# attendees}}"
 msgstr ""
 
+#. placeholder {0}: summary.hosts
+#: src/features/admin/stats-text.ts:345
+msgid "{0, plural, one {# host} other {# hosts}}"
+msgstr ""
+
+#. placeholder {0}: summary.locations
+#: src/features/admin/stats-text.ts:343
+msgid "{0, plural, one {# location} other {# locations}}"
+msgstr ""
+
 #. placeholder {0}: chosen.length
 #: src/features/notifications/notifications-screen.tsx:226
 msgid "{0, plural, one {Delete this notification? This cannot be undone.} other {Delete these # notifications? This cannot be undone.}}"
 msgstr ""
 
 #. placeholder {0}: points.length
-#: src/features/admin/stats-charts.tsx:151
+#: src/features/admin/stats-charts.tsx:161
 msgid "{0, plural, one {Predicted against reported attendance, # session} other {Predicted against reported attendance, # sessions}}"
 msgstr ""
 
@@ -307,12 +317,12 @@ msgid "{resultCount, plural, one {# result} other {# results}}"
 msgstr ""
 
 #. Duration in minutes, min is the unit
-#: src/features/admin/stats-table.tsx:28
+#: src/features/admin/stats-table.tsx:29
 msgid "{rounded} min"
 msgstr ""
 
 #. A percentage; the number is already rounded
-#: src/features/admin/stats-table.tsx:15
+#: src/features/admin/stats-table.tsx:16
 msgid "{rounded}%"
 msgstr ""
 
@@ -380,8 +390,8 @@ msgstr ""
 msgid "{title} Admin"
 msgstr ""
 
-#: src/features/admin/stats-charts.tsx:92
-#: src/features/admin/stats-charts.tsx:196
+#: src/features/admin/stats-charts.tsx:102
+#: src/features/admin/stats-charts.tsx:206
 msgid "{title}: {list}"
 msgstr ""
 
@@ -493,6 +503,18 @@ msgstr ""
 msgid "1-on-1 not found."
 msgstr ""
 
+#: src/features/admin/stats-text.ts:302
+msgid "1-on-1 request"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:66
+msgid "1-on-1 requests per person"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:303
+msgid "1-on-1 response"
+msgstr ""
+
 #: src/features/meetings/book-meeting.tsx:58
 msgid "1-on-1 with {chosenName}"
 msgstr ""
@@ -518,7 +540,7 @@ msgstr ""
 msgid "1-on-1 with <0/>"
 msgstr ""
 
-#: src/features/admin/event-stats.tsx:25
+#: src/features/admin/event-stats.tsx:27
 #: src/features/schedule/day-grid.tsx:122
 #: src/features/settings/settings-screen.tsx:99
 msgid "1-on-1s"
@@ -542,6 +564,14 @@ msgstr ""
 
 #: src/app/time-format.tsx:62
 msgid "24-hour"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:262
+msgid "50% range"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:263
+msgid "80% range"
 msgstr ""
 
 #: src/features/settings/email-settings-form.tsx:44
@@ -613,10 +643,11 @@ msgstr ""
 msgid "A shared moment, such as lunch or a keynote, shows as a striped band across every room. It blocks nothing: sessions can still be booked inside it. To make a time unbookable, add a blocker session in every room instead. Times are in the event timezone ({timezone})."
 msgstr ""
 
-#: src/features/admin/stats-figure-card.tsx:27
+#: src/features/admin/stats-figure-card.tsx:28
 msgid "About {title}"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:287
 #: src/features/people/profile-body.tsx:179
 #: src/features/people/profile-form.tsx:390
 msgid "About me"
@@ -631,11 +662,21 @@ msgstr ""
 msgid "Accept"
 msgstr ""
 
-#: src/features/admin/stats-charts.tsx:402
+#: src/features/admin/stats-text.ts:275
+msgid "Accepted"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:280
+msgid "Accepted and declined"
+msgstr ""
+
+#: src/features/admin/stats-charts.tsx:412
+#: src/features/admin/stats-text.ts:195
 msgid "Accepted meetings"
 msgstr ""
 
-#: src/features/admin/stats-charts.tsx:403
+#: src/features/admin/stats-charts.tsx:413
+#: src/features/admin/stats-text.ts:68
 msgid "Accepted meetings by day and hour"
 msgstr ""
 
@@ -653,6 +694,14 @@ msgstr ""
 
 #: src/features/proposals/proposals-screen.tsx:448
 msgid "Actions"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:225
+msgid "Active"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:217
+msgid "Active members"
 msgstr ""
 
 #: src/features/admin/stats-figures.tsx:253
@@ -730,6 +779,10 @@ msgstr ""
 msgid "Add user"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:296
+msgid "Added as co-host"
+msgstr ""
+
 #: src/features/admin/event-days.tsx:227
 #: src/features/admin/event-labels.tsx:269
 #: src/features/admin/event-meetings.tsx:245
@@ -787,6 +840,10 @@ msgstr ""
 msgid "All locations"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:234
+msgid "All other members"
+msgstr ""
+
 #: src/features/schedule/day-agenda.tsx:266
 msgid "All rooms"
 msgstr ""
@@ -797,6 +854,10 @@ msgstr ""
 
 #: src/features/admin/event-config.tsx:323
 msgid "All times are in the event timezone ({timezone}). Leave fields empty to unset a phase. A phase with no end runs until the next phase starts; set an end earlier than the next start to leave an inactive gap."
+msgstr ""
+
+#: src/features/admin/stats-text.ts:233
+msgid "All voters"
 msgstr ""
 
 #: src/features/admin/stats-figures.tsx:441
@@ -878,6 +939,8 @@ msgid "Ask them to open up"
 msgstr ""
 
 #. Button state: the request to open up was sent
+#: src/features/admin/stats-text.ts:147
+#: src/features/admin/stats-text.ts:282
 #: src/features/people/open-up-nudge.tsx:54
 msgid "Asked"
 msgstr ""
@@ -907,10 +970,18 @@ msgstr ""
 msgid "Assigned"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:117
+msgid "Attendee"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:305
+msgid "Attendee count reminder"
+msgstr ""
+
 #. Chart axis: number of people
 #: src/app/header-links.tsx:17
 #: src/app/page-notice.tsx:12
-#: src/features/admin/event-stats.tsx:24
+#: src/features/admin/event-stats.tsx:26
 #: src/features/admin/stats-figures.tsx:152
 #: src/features/people/directory-screen.tsx:122
 msgid "Attendees"
@@ -930,7 +1001,17 @@ msgstr ""
 
 #. Chart axis: people who came divided by RSVPs
 #: src/features/admin/stats-figures.tsx:140
+#: src/features/admin/stats-text.ts:82
+#: src/features/admin/stats-text.ts:155
 msgid "Attendees per RSVP"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:209
+msgid "Attendees per RSVP, from"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:210
+msgid "Attendees per RSVP, up to"
 msgstr ""
 
 #: src/ui/phase-bar.tsx:25
@@ -943,6 +1024,7 @@ msgstr ""
 
 #. Chart axis: number of people who wrote comments
 #: src/features/admin/stats-figures.tsx:220
+#: src/features/admin/stats-text.ts:175
 msgid "Authors"
 msgstr ""
 
@@ -958,9 +1040,21 @@ msgstr ""
 msgid "Automatic follows your browser's language."
 msgstr ""
 
+#: src/features/admin/stats-text.ts:62
+msgid "Availability for 1-on-1s"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:131
+msgid "Available hours"
+msgstr ""
+
 #: src/ui/side-panel.tsx:208
 msgctxt "Side panel: go to the previous panel"
 msgid "Back"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:265
+msgid "Back to back"
 msgstr ""
 
 #: src/app/event-page.tsx:158
@@ -969,10 +1063,19 @@ msgstr ""
 msgid "Back to the events"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:121
+msgid "Back-to-back pairs"
+msgstr ""
+
 #. Chart axis: place where members are based
 #: src/features/admin/stats-figures.tsx:204
+#: src/features/admin/stats-text.ts:289
 #: src/features/people/profile-form.tsx:382
 msgid "Based in"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:85
+msgid "Based in (shared by at least 3 members)"
 msgstr ""
 
 #: src/features/people/profile-body.tsx:112
@@ -996,8 +1099,9 @@ msgstr ""
 msgid "Beaker"
 msgstr ""
 
-#: src/features/admin/stats-charts.tsx:252
-#: src/features/admin/stats-charts.tsx:271
+#: src/features/admin/stats-charts.tsx:262
+#: src/features/admin/stats-charts.tsx:281
+#: src/features/admin/stats-text.ts:101
 msgid "Became a session"
 msgstr ""
 
@@ -1033,6 +1137,7 @@ msgid "Blocked"
 msgstr ""
 
 #: src/features/admin/event-sessions.tsx:532
+#: src/features/admin/stats-text.ts:246
 msgid "blocker"
 msgstr ""
 
@@ -1040,7 +1145,11 @@ msgstr ""
 msgid "Blocker"
 msgstr ""
 
-#: src/features/admin/event-stats.tsx:36
+#: src/features/admin/stats-text.ts:331
+msgid "blockers"
+msgstr ""
+
+#: src/features/admin/event-stats.tsx:38
 msgid "Blockers"
 msgstr ""
 
@@ -1074,10 +1183,19 @@ msgid "bookable"
 msgstr ""
 
 #: src/features/admin/locations-screen.tsx:246
+#: src/features/admin/stats-text.ts:137
 msgid "Bookable"
 msgstr ""
 
-#: src/features/admin/stats-charts.tsx:372
+#: src/features/admin/stats-text.ts:130
+msgid "Booked hours"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:141
+msgid "Booked share of the open time"
+msgstr ""
+
+#: src/features/admin/stats-charts.tsx:382
 msgid "Booked share of the open time (%)"
 msgstr ""
 
@@ -1109,6 +1227,10 @@ msgstr ""
 #: src/features/schedule/filters.ts:6
 #: src/features/schedule/session-block.tsx:292
 msgid "Bookmarked"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:238
+msgid "Bottom quarter"
 msgstr ""
 
 #: src/features/admin/event-sessions.tsx:221
@@ -1193,10 +1315,19 @@ msgstr ""
 msgid "canceled"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:277
+msgid "Canceled"
+msgstr ""
+
 #: src/features/admin/event-locations.tsx:36
 #: src/features/admin/event-sessions.tsx:233
 #: src/features/admin/locations-screen.tsx:193
+#: src/features/admin/stats-text.ts:136
 msgid "Capacity"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:53
+msgid "Capacity by location"
 msgstr ""
 
 #: src/features/admin/admin-session-model.ts:126
@@ -1225,8 +1356,12 @@ msgstr ""
 msgid "Changes here do not reach the schedule. To change a session, open it and edit it there."
 msgstr ""
 
+#: src/features/admin/stats-text.ts:295
+msgid "Changes to my sessions"
+msgstr ""
+
 #. Button: show the figure as a chart
-#: src/features/admin/stats-figure-card.tsx:128
+#: src/features/admin/stats-figure-card.tsx:131
 msgid "Chart"
 msgstr ""
 
@@ -1254,6 +1389,10 @@ msgstr ""
 #. Chart axis: one bar per vote choice
 #: src/features/admin/stats-figures.tsx:83
 msgid "Choice"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:38
+msgid "Choice mix"
 msgstr ""
 
 #: src/features/sign-in/reset-password-form.tsx:64
@@ -1360,6 +1499,11 @@ msgctxt "Session flag, in a lowercase list"
 msgid "closed"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:156
+#: src/features/admin/stats-text.ts:260
+msgid "Closed"
+msgstr ""
+
 #: src/features/admin/event-sessions.tsx:251
 msgctxt "Session flag"
 msgid "Closed"
@@ -1373,6 +1517,10 @@ msgstr ""
 msgid "Closed Session"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:79
+msgid "Closed sessions"
+msgstr ""
+
 #: src/features/admin/stats-figures.tsx:721
 msgid "Closed sessions take no more RSVPs. This compares them with the open ones."
 msgstr ""
@@ -1382,8 +1530,13 @@ msgstr ""
 msgid "Cloud"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:94
 #: src/features/proposals/proposals-screen.tsx:485
 msgid "Co-host wanted"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:245
+msgid "Co-host wanted and found"
 msgstr ""
 
 #. Name of an event icon
@@ -1435,10 +1588,39 @@ msgstr ""
 msgid "Comment deleted"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:308
+msgid "Comment on a profile"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:306
+msgid "Comment on a proposal"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:307
+msgid "Comment on a session"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:300
+msgid "Comment on my profile"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:298
+msgid "Comment on my proposal"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:299
+msgid "Comment on my session"
+msgstr ""
+
 #. Chart axis: number of comments
-#: src/features/admin/event-stats.tsx:28
+#: src/features/admin/event-stats.tsx:30
 #: src/features/admin/stats-figures.tsx:212
+#: src/features/admin/stats-text.ts:104
 msgid "Comments"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:56
+msgid "Comments by what they are on"
 msgstr ""
 
 #: src/features/comments/comments-section.tsx:126
@@ -1451,7 +1633,12 @@ msgstr ""
 
 #. Chart axis: number of comments one person wrote
 #: src/features/admin/stats-figures.tsx:216
+#: src/features/admin/stats-text.ts:58
 msgid "Comments per author"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:57
+msgid "Comments per day"
 msgstr ""
 
 #. {list} is a comma-separated list of labels with their values
@@ -1461,6 +1648,14 @@ msgstr ""
 
 #: src/features/admin/stats-figures.tsx:1012
 msgid "Comments written per day."
+msgstr ""
+
+#: src/features/admin/stats-text.ts:180
+msgid "Comments, from"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:181
+msgid "Comments, up to"
 msgstr ""
 
 #: src/features/admin/stats-figures.tsx:278
@@ -1518,16 +1713,29 @@ msgstr ""
 
 #. Chart axis: kind of contact a member gave
 #: src/features/admin/stats-figures.tsx:208
+#: src/features/admin/stats-text.ts:186
 #: src/features/people/profile-form.tsx:559
 msgid "Contact type"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:61
+msgid "Contact types used"
 msgstr ""
 
 #: src/features/people/profile-form.tsx:582
 msgid "Contact value"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:292
+msgid "Contacts"
+msgstr ""
+
 #: src/features/people/profile-form.tsx:399
 msgid "Conversation starters"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:41
+msgid "Conversion to sessions by interest"
 msgstr ""
 
 #: src/ui/markdown.tsx:89
@@ -1674,7 +1882,7 @@ msgstr ""
 msgid "Could not load the settings."
 msgstr ""
 
-#: src/features/admin/event-stats.tsx:189
+#: src/features/admin/event-stats.tsx:192
 msgid "Could not load the statistics."
 msgstr ""
 
@@ -1825,6 +2033,10 @@ msgstr ""
 msgid "Create session from {proposalTitle}"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:91
+msgid "Created"
+msgstr ""
+
 #: src/features/admin/event-proposals.tsx:264
 #: src/features/admin/event-sessions.tsx:518
 #: src/features/admin/event-sessions.tsx:629
@@ -1832,7 +2044,7 @@ msgstr ""
 msgid "Creating..."
 msgstr ""
 
-#: src/features/admin/stats-figure-card.tsx:143
+#: src/features/admin/stats-figure-card.tsx:146
 msgid "CSV"
 msgstr ""
 
@@ -1870,9 +2082,10 @@ msgstr ""
 #. Chart axis: day of the event
 #. Chart axis: day of the event
 #. Chart axis: day of the event
-#: src/features/admin/stats-charts.tsx:322
-#: src/features/admin/stats-charts.tsx:401
+#: src/features/admin/stats-charts.tsx:332
+#: src/features/admin/stats-charts.tsx:411
 #: src/features/admin/stats-figures.tsx:132
+#: src/features/admin/stats-text.ts:105
 #: src/features/sessions/session-form.tsx:643
 msgid "Day"
 msgstr ""
@@ -1890,7 +2103,12 @@ msgstr ""
 
 #. Chart axis: days since the first proposal was made
 #: src/features/admin/stats-figures.tsx:50
+#: src/features/admin/stats-text.ts:92
 msgid "Days after the first proposal"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:119
+msgid "Days with RSVPs"
 msgstr ""
 
 #: src/features/meetings/meeting-panel.tsx:128
@@ -1904,6 +2122,10 @@ msgstr ""
 #. State of a 1-on-1 on the grid, lower case
 #: src/features/schedule/meeting-rules.ts:114
 msgid "declined"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:276
+msgid "Declined"
 msgstr ""
 
 #: src/features/admin/event-days.tsx:439
@@ -1994,6 +2216,10 @@ msgstr ""
 msgid "Delete unavailable time {roomName} {from} – {until}"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:179
+msgid "Deleted, kept for replies"
+msgstr ""
+
 #: src/features/admin/locations-screen.tsx:389
 msgid "Deleting “{name}” removes it from {sessionCount, plural, one {# session} other {# sessions}} and {eventCount, plural, one {# event} other {# events}}. Hosts and RSVPed guests of those sessions are told. This cannot be undone. Type the location name to confirm."
 msgstr ""
@@ -2037,6 +2263,10 @@ msgstr ""
 
 #: src/features/admin/event-moments.tsx:56
 msgid "Details"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:49
+msgid "Did hosts report attendance?"
 msgstr ""
 
 #: src/features/admin/stats-figures.tsx:298
@@ -2087,11 +2317,15 @@ msgstr ""
 msgid "Dots are the model's midpoint, thick bars its 50% range, thin bars its 80% range. On the dashed line the prediction was exact. The model was fitted on one event, n = 13."
 msgstr ""
 
-#: src/features/admin/event-stats.tsx:230
+#: src/features/admin/stats-text.ts:44
+msgid "Double bookings"
+msgstr ""
+
+#: src/features/admin/event-stats.tsx:233
 msgid "Download all"
 msgstr ""
 
-#: src/features/admin/stats-figure-card.tsx:140
+#: src/features/admin/stats-figure-card.tsx:143
 msgid "Download CSV of {tableTitle}"
 msgstr ""
 
@@ -2103,6 +2337,7 @@ msgstr ""
 msgid "Duplicate {title}"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:93
 #: src/features/proposals/proposal-form.tsx:284
 #: src/features/proposals/proposals-screen.tsx:424
 #: src/features/sessions/session-form.tsx:708
@@ -2112,6 +2347,14 @@ msgstr ""
 #. Chart axis: session length in minutes
 #: src/features/admin/stats-figures.tsx:136
 msgid "Duration (min)"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:211
+msgid "Duration (min), from"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:212
+msgid "Duration (min), up to"
 msgstr ""
 
 #: src/features/admin/event-proposals.tsx:117
@@ -2216,6 +2459,10 @@ msgstr ""
 msgid "Edit your comment"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:178
+msgid "Edited"
+msgstr ""
+
 #: src/features/comments/comments-section.tsx:289
 msgid "Edited {editedAt}"
 msgstr ""
@@ -2260,6 +2507,10 @@ msgstr ""
 
 #: src/features/sign-in/account-security.tsx:204
 msgid "Enable protection"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:152
+msgid "End"
 msgstr ""
 
 #: src/features/admin/event-config.tsx:348
@@ -2395,8 +2646,20 @@ msgstr ""
 msgid "Everything the notifications page tells you, on your phone or laptop while the site isn’t open. A device gets all of them — the email settings above only decide what is emailed. Each device is turned on separately."
 msgstr ""
 
+#: src/features/admin/stats-text.ts:350
+msgid "Excluding {list}"
+msgstr ""
+
 #: src/features/comments/comments-section.tsx:247
 msgid "Expand comment"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:172
+msgid "Expected share"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:279
+msgid "Expired"
 msgstr ""
 
 #: src/ui/resize-image.ts:77
@@ -2413,16 +2676,26 @@ msgstr ""
 
 #. Chart axis: one bar per profile field
 #: src/features/admin/stats-figures.tsx:192
+#: src/features/admin/stats-text.ts:183
 msgid "Field"
 msgstr ""
 
 #. Chart axis: number of profile fields a member filled in
 #: src/features/admin/stats-figures.tsx:196
+#: src/features/admin/stats-text.ts:185
 msgid "Fields filled in"
 msgstr ""
 
-#: src/features/admin/event-stats.tsx:258
+#: src/features/admin/stats-text.ts:111
+msgid "Figure"
+msgstr ""
+
+#: src/features/admin/event-stats.tsx:261
 msgid "Figures in this section"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:154
+msgid "Fill"
 msgstr ""
 
 #: src/features/admin/location-availability.tsx:162
@@ -2433,7 +2706,7 @@ msgstr ""
 msgid "Fill out this form to add a session to the schedule!"
 msgstr ""
 
-#: src/features/admin/event-stats.tsx:97
+#: src/features/admin/event-stats.tsx:100
 msgid "Filter"
 msgstr ""
 
@@ -2473,7 +2746,7 @@ msgstr ""
 msgid "Filter to show only {filterKey, select, mine {your proposals} unvoted {unvoted proposals} voted {voted proposals} hostWanted {proposals that want a host} other {}}"
 msgstr ""
 
-#: src/features/admin/event-stats.tsx:103
+#: src/features/admin/event-stats.tsx:106
 msgid "Filter:"
 msgstr ""
 
@@ -2505,6 +2778,10 @@ msgstr ""
 
 #: src/app/theme.tsx:85
 msgid "Follow your device's light/dark setting"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:255
+msgid "Follow-up reminder sent"
 msgstr ""
 
 #: src/features/settings/settings-screen.tsx:133
@@ -2545,6 +2822,10 @@ msgstr ""
 msgid "Full changelog on GitHub"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:124
+msgid "Gap"
+msgstr ""
+
 #. Chart axis: length of the free time between two sessions
 #: src/features/admin/stats-figures.tsx:160
 msgid "Gap length"
@@ -2552,7 +2833,12 @@ msgstr ""
 
 #. Chart axis: number of gaps between sessions
 #: src/features/admin/stats-figures.tsx:156
+#: src/features/admin/stats-text.ts:125
 msgid "Gaps"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:43
+msgid "Gaps between RSVPed sessions"
 msgstr ""
 
 #. Name of an event icon
@@ -2603,6 +2889,10 @@ msgstr ""
 msgid "Ground floor, next to reception"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:146
+msgid "Group"
+msgstr ""
+
 #: src/features/admin/event-guests.tsx:99
 #: src/features/admin/event-layout.tsx:18
 msgid "Guests"
@@ -2622,6 +2912,14 @@ msgstr ""
 
 #: src/features/people/profile-form.tsx:79
 msgid "He/They"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:70
+msgid "Headline numbers"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:304
+msgid "Heads-up before my session"
 msgstr ""
 
 #. Name of an event icon
@@ -2686,6 +2984,10 @@ msgstr ""
 msgid "Host(s): {hostNames}"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:228
+msgid "Hosted"
+msgstr ""
+
 #: src/features/schedule/session-block.tsx:183
 msgid "Hosted by {hosts}"
 msgstr ""
@@ -2703,8 +3005,15 @@ msgstr ""
 #: src/features/admin/event-proposals.tsx:132
 #: src/features/admin/event-sessions.tsx:267
 #: src/features/admin/stats-figures.tsx:87
+#: src/features/admin/stats-text.ts:51
+#: src/features/admin/stats-text.ts:90
+#: src/features/admin/stats-text.ts:223
 #: src/features/sessions/session-form.tsx:578
 msgid "Hosts"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:39
+msgid "Hosts and proposals"
 msgstr ""
 
 #: src/commands/failure-message.ts:10
@@ -2715,12 +3024,16 @@ msgstr ""
 msgid "Hosts cannot vote on their own proposal."
 msgstr ""
 
-#: src/features/admin/event-stats.tsx:128
+#: src/features/admin/event-stats.tsx:131
 msgid "Hosts to leave out"
 msgstr ""
 
 #: src/features/admin/stats-figures.tsx:788
 msgid "Hosts who also RSVPed to sessions other than their own."
+msgstr ""
+
+#: src/features/admin/stats-text.ts:45
+msgid "Hosts who attend other sessions"
 msgstr ""
 
 #: src/features/admin/event-proposals.tsx:290
@@ -2731,10 +3044,15 @@ msgstr ""
 #. Chart axis: hour of the day
 #. Chart axis: hour of the day
 #. Chart axis: hour of the day
-#: src/features/admin/stats-charts.tsx:356
-#: src/features/admin/stats-charts.tsx:393
-#: src/features/admin/stats-charts.tsx:433
+#: src/features/admin/stats-charts.tsx:366
+#: src/features/admin/stats-charts.tsx:403
+#: src/features/admin/stats-charts.tsx:443
+#: src/features/admin/stats-text.ts:140
 msgid "Hour"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:120
+msgid "Hours booked"
 msgstr ""
 
 #: src/features/admin/stats-figures.tsx:796
@@ -2855,6 +3173,10 @@ msgstr ""
 msgid "In this build, but not in a released version yet."
 msgstr ""
 
+#: src/features/admin/stats-text.ts:77
+msgid "In-app notifications read (a deleted unread one is not counted)"
+msgstr ""
+
 #: src/features/admin/stats-figures.tsx:1066
 msgid "In-app notifications sent per kind, and the share read. It shows which notifications people act on."
 msgstr ""
@@ -2864,12 +3186,18 @@ msgctxt "Location colour"
 msgid "Indigo"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:99
+msgid "Interest share"
+msgstr ""
+
 #. Vote option on a session proposal
+#: src/features/admin/stats-text.ts:95
+#: src/features/admin/stats-text.ts:239
 #: src/features/proposals/vote-labels.ts:7
 msgid "Interested"
 msgstr ""
 
-#: src/features/admin/stats-charts.tsx:272
+#: src/features/admin/stats-charts.tsx:282
 msgid "Interested votes"
 msgstr ""
 
@@ -2914,6 +3242,10 @@ msgstr ""
 msgid "Keep it"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:207
+msgid "Kind"
+msgstr ""
+
 #: src/features/people/label-menu.tsx:30
 #: src/features/people/profile-form.tsx:576
 msgid "Label"
@@ -2942,9 +3274,14 @@ msgstr ""
 msgid "Language"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:290
 #: src/features/people/profile-body.tsx:159
 #: src/features/people/profile-form.tsx:487
 msgid "Languages"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:84
+msgid "Languages (shared by at least 3 members)"
 msgstr ""
 
 #: src/features/admin/stats-figures.tsx:954
@@ -2994,6 +3331,10 @@ msgstr ""
 
 #: src/features/comments/comments-section.tsx:502
 msgid "Liked by"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:177
+msgid "Likes"
 msgstr ""
 
 #: src/features/admin/locations-screen.tsx:49
@@ -3048,7 +3389,7 @@ msgstr ""
 #: src/app/profile-host.tsx:174
 #: src/features/admin/event-layout.tsx:82
 #: src/features/admin/event-sessions.tsx:394
-#: src/features/admin/event-stats.tsx:196
+#: src/features/admin/event-stats.tsx:199
 #: src/features/admin/events-screen.tsx:193
 #: src/features/admin/guests-screen.tsx:518
 #: src/features/admin/locations-screen.tsx:514
@@ -3065,8 +3406,9 @@ msgstr ""
 
 #. Chart axis: one row per location
 #. Chart axis: one row per location
-#: src/features/admin/stats-charts.tsx:368
+#: src/features/admin/stats-charts.tsx:378
 #: src/features/admin/stats-figures.tsx:168
+#: src/features/admin/stats-text.ts:128
 #: src/features/sessions/session-form.tsx:588
 msgid "Location"
 msgstr ""
@@ -3088,14 +3430,16 @@ msgstr ""
 #: src/features/admin/event-layout.tsx:19
 #: src/features/admin/event-locations.tsx:27
 #: src/features/admin/event-sessions.tsx:281
-#: src/features/admin/event-stats.tsx:26
+#: src/features/admin/event-stats.tsx:28
 #: src/features/admin/location-availability.tsx:134
 #: src/features/admin/locations-screen.tsx:519
 #: src/features/admin/locations-screen.tsx:521
+#: src/features/admin/stats-text.ts:46
+#: src/features/admin/stats-text.ts:153
 msgid "Locations"
 msgstr ""
 
-#: src/features/admin/event-stats.tsx:122
+#: src/features/admin/event-stats.tsx:125
 msgid "Locations to leave out"
 msgstr ""
 
@@ -3123,6 +3467,10 @@ msgstr ""
 #: src/app/admin-frame.tsx:110
 #: src/app/user-menu.tsx:133
 msgid "Logging out..."
+msgstr ""
+
+#: src/features/admin/stats-text.ts:135
+msgid "Longest gap"
 msgstr ""
 
 #: src/features/proposals/proposal-body.tsx:58
@@ -3202,27 +3550,58 @@ msgid "Maximum open requests per attendee"
 msgstr ""
 
 #. Vote option on a session proposal
+#: src/features/admin/stats-text.ts:96
+#: src/features/admin/stats-text.ts:240
 #: src/features/proposals/vote-labels.ts:12
 msgid "Maybe"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:202
+msgid "Mean RSVPs per member"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:145
+msgid "Median duration"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:123
+msgid "Median gap"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:144
+msgid "Median reported attendees"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:197
+msgid "Median response time"
+msgstr ""
+
 #. Chart axis: the median number of RSVPs
 #: src/features/admin/stats-figures.tsx:124
+#: src/features/admin/stats-text.ts:138
 msgid "Median RSVPs"
 msgstr ""
 
 #. Chart axis: where a 1-on-1 took place
 #: src/features/admin/stats-figures.tsx:188
+#: src/features/admin/stats-text.ts:199
 msgid "Meeting point"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:69
+msgid "Meeting points"
 msgstr ""
 
 #: src/features/admin/event-meetings.tsx:304
 #: src/features/admin/event-meetings.tsx:310
+#: src/features/admin/stats-text.ts:198
 msgid "Meetings"
 msgstr ""
 
 #. Chart axis: number of members
 #: src/features/admin/stats-figures.tsx:42
+#: src/features/admin/stats-text.ts:182
+#: src/features/admin/stats-text.ts:216
 msgid "Members"
 msgstr ""
 
@@ -3246,13 +3625,33 @@ msgstr ""
 msgid "Members who offered times for 1-on-1s, and how many times."
 msgstr ""
 
+#: src/features/admin/stats-text.ts:273
+msgid "Members with availability"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:74
+msgid "Members with each email notification on"
+msgstr ""
+
 #: src/features/admin/stats-figures.tsx:1045
 msgid "Members with each email notification switched on."
+msgstr ""
+
+#: src/features/admin/stats-text.ts:59
+msgid "Members with each profile field"
 msgstr ""
 
 #. Chart axis: share of members with a notification on, in percent
 #: src/features/admin/stats-figures.tsx:224
 msgid "Members with it on (%)"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:310
+msgid "Members with push"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:309
+msgid "Members without an email address"
 msgstr ""
 
 #: src/app/nav-bar.tsx:63
@@ -3264,11 +3663,15 @@ msgstr ""
 msgid "Microphone"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:270
+msgid "More than 2 h"
+msgstr ""
+
 #: src/features/admin/stats-figures.tsx:287
 msgid "Most popular proposals"
 msgstr ""
 
-#: src/features/admin/stats-charts.tsx:277
+#: src/features/admin/stats-charts.tsx:287
 msgid "Most popular proposals: {list}"
 msgstr ""
 
@@ -3373,6 +3776,10 @@ msgstr ""
 msgid "needs your reply"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:232
+msgid "Neither"
+msgstr ""
+
 #: src/features/admin/locations-screen.tsx:43
 msgctxt "Location colour"
 msgid "Neutral"
@@ -3434,7 +3841,7 @@ msgstr ""
 msgid "Next page"
 msgstr ""
 
-#: src/features/admin/stats-table.tsx:35
+#: src/features/admin/stats-table.tsx:36
 #: src/ui/confirm-dialog.tsx:11
 msgid "No"
 msgstr ""
@@ -3451,10 +3858,10 @@ msgstr ""
 msgid "No comments match."
 msgstr ""
 
-#: src/features/admin/stats-charts.tsx:44
-#: src/features/admin/stats-figure-card.tsx:150
-#: src/features/admin/stats-table.tsx:22
-#: src/features/admin/stats-table.tsx:183
+#: src/features/admin/stats-charts.tsx:45
+#: src/features/admin/stats-figure-card.tsx:153
+#: src/features/admin/stats-table.tsx:23
+#: src/features/admin/stats-table.tsx:205
 msgid "No data"
 msgstr ""
 
@@ -3472,6 +3879,14 @@ msgstr ""
 
 #: src/features/admin/events-screen.tsx:215
 msgid "No events yet."
+msgstr ""
+
+#: src/features/admin/stats-text.ts:348
+msgid "No exclusions"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:256
+msgid "No follow-up reminder"
 msgstr ""
 
 #: src/features/admin/event-proposals.tsx:128
@@ -3586,8 +4001,8 @@ msgstr ""
 
 #: src/features/admin/event-sessions.tsx:184
 #: src/features/admin/event-sessions.tsx:545
-#: src/features/admin/stats-charts.tsx:253
-#: src/features/admin/stats-charts.tsx:271
+#: src/features/admin/stats-charts.tsx:263
+#: src/features/admin/stats-charts.tsx:281
 msgid "Not scheduled"
 msgstr ""
 
@@ -3597,6 +4012,10 @@ msgstr ""
 
 #: src/app/sync-indicator.tsx:11
 msgid "Not updating: may be out of date"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:173
+msgid "Note"
 msgstr ""
 
 #: src/ui/people-picker.tsx:135
@@ -3611,7 +4030,7 @@ msgstr ""
 msgid "Nothing is reserved — this is just where to find each other."
 msgstr ""
 
-#: src/features/admin/stats-table.tsx:183
+#: src/features/admin/stats-table.tsx:205
 msgid "Nothing matches."
 msgstr ""
 
@@ -3623,12 +4042,16 @@ msgstr ""
 msgid "Nothing yet. When someone comments on your session or changes something you have RSVP'd to, it will show up here."
 msgstr ""
 
+#: src/features/admin/stats-text.ts:203
+msgid "Notification"
+msgstr ""
+
 #: src/features/notifications/notifications-screen.tsx:141
 msgid "Notification actions"
 msgstr ""
 
 #: src/app/header-links.tsx:28
-#: src/features/admin/event-stats.tsx:29
+#: src/features/admin/event-stats.tsx:31
 #: src/features/notifications/notifications-screen.tsx:128
 msgid "Notifications"
 msgstr ""
@@ -3662,6 +4085,10 @@ msgstr ""
 
 #: src/features/schedule/day-agenda.tsx:165
 msgid "Now · {at}"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:174
+msgid "On"
 msgstr ""
 
 #: src/features/settings/push-notifications.tsx:309
@@ -3744,6 +4171,10 @@ msgstr ""
 msgid "Only you see your bookmarks. This is not an RSVP."
 msgstr ""
 
+#: src/features/admin/stats-text.ts:261
+msgid "Open"
+msgstr ""
+
 #: src/app/admin-frame.tsx:143
 msgid "Open admin menu"
 msgstr ""
@@ -3797,12 +4228,21 @@ msgctxt "Location colour"
 msgid "Orange"
 msgstr ""
 
-#: src/features/admin/event-stats.tsx:38
+#: src/features/admin/stats-text.ts:248
+msgid "organizer"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:333
+msgid "organizer sessions"
+msgstr ""
+
+#: src/features/admin/event-stats.tsx:40
 msgid "Organizer sessions"
 msgstr ""
 
 #. Chart axis: how a session came about
 #: src/features/admin/stats-figures.tsx:120
+#: src/features/admin/stats-text.ts:150
 msgid "Origin"
 msgstr ""
 
@@ -3811,11 +4251,20 @@ msgid "Origin is worked out from the data: a blocker; else from a proposal; else
 msgstr ""
 
 #. Kind of contact detail that is none of the listed ones
+#: src/features/admin/stats-text.ts:284
 #: src/features/people/contact-labels.ts:13
 msgid "Other"
 msgstr ""
 
-#: src/features/admin/event-stats.tsx:21
+#: src/features/admin/stats-text.ts:196
+msgid "Outcome"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:122
+msgid "Overlapping pairs"
+msgstr ""
+
+#: src/features/admin/event-stats.tsx:23
 msgid "Overview"
 msgstr ""
 
@@ -3847,7 +4296,16 @@ msgstr ""
 
 #. Chart axis: number of other sessions at the same time
 #: src/features/admin/stats-figures.tsx:112
+#: src/features/admin/stats-text.ts:157
 msgid "Parallel sessions"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:48
+msgid "Parallel sessions and RSVPs by hour"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:71
+msgid "Participation funnel"
 msgstr ""
 
 #: src/features/sign-in/site-login-screen.tsx:44
@@ -3874,13 +4332,22 @@ msgstr ""
 msgid "Password set. Your name is now protected — log in with your new password."
 msgstr ""
 
+#: src/features/admin/stats-text.ts:278
+msgid "Pending"
+msgstr ""
+
 #. Chart axis: number of people
 #: src/features/admin/stats-figures.tsx:176
+#: src/features/admin/stats-text.ts:127
 msgid "People"
 msgstr ""
 
 #: src/features/admin/stats-figures.tsx:39
 msgid "People have no names here: P001, P002… are numbered anew in every table and every request, so rows cannot be matched to a person."
+msgstr ""
+
+#: src/features/admin/stats-text.ts:65
+msgid "People in 1-on-1 requests"
 msgstr ""
 
 #: src/features/admin/stats-figures.tsx:782
@@ -3889,6 +4356,10 @@ msgstr ""
 
 #: src/features/admin/stats-figures.tsx:884
 msgid "People who sent requests, people who got them, and people with at least one accepted meeting."
+msgstr ""
+
+#: src/features/admin/stats-text.ts:219
+msgid "People with RSVPs"
 msgstr ""
 
 #: src/features/admin/stats-figures.tsx:832
@@ -3903,12 +4374,20 @@ msgstr ""
 msgid "Per location: its sessions, how many had a capacity, and how many got more RSVPs than it."
 msgstr ""
 
+#: src/features/admin/stats-text.ts:192
+msgid "Person"
+msgstr ""
+
 #: src/features/admin/event-config.tsx:320
 msgid "Phases"
 msgstr ""
 
 #: src/features/people/contact-labels.ts:7
 msgid "Phone"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:286
+msgid "Photo"
 msgstr ""
 
 #: src/features/admin/events-screen.tsx:63
@@ -3948,12 +4427,40 @@ msgstr ""
 msgid "Please try again."
 msgstr ""
 
+#: src/features/admin/stats-text.ts:35
+msgid "Popular but never scheduled"
+msgstr ""
+
 #: src/app/footer.tsx:88
 msgid "Powered by"
 msgstr ""
 
 #: src/features/admin/stats-figures.tsx:514
 msgid "Predicted against reported attendance"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:161
+msgid "Predicted attendance (model fitted on one event)"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:55
+msgid "Predicted attendance: how often the report falls in the range (model fitted on one event, n = 13)"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:162
+msgid "Predicted, 50% range from"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:163
+msgid "Predicted, 50% range to"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:164
+msgid "Predicted, 80% range from"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:165
+msgid "Predicted, 80% range to"
 msgstr ""
 
 #: src/features/admin/event-meetings.tsx:337
@@ -3994,11 +4501,16 @@ msgstr ""
 msgid "Profile comments have no event: on a site with several events they count in every event the member belongs to."
 msgstr ""
 
+#: src/features/admin/stats-text.ts:60
+msgid "Profile fields filled in per member"
+msgstr ""
+
 #: src/app/profile-host.tsx:180
 msgid "Profile not found, please log in again."
 msgstr ""
 
-#: src/features/admin/event-stats.tsx:27
+#: src/features/admin/event-stats.tsx:29
+#: src/features/admin/stats-text.ts:222
 #: src/features/comments/my-comments-screen.tsx:17
 msgid "Profiles"
 msgstr ""
@@ -4008,12 +4520,21 @@ msgstr ""
 msgid "Prompt {0}"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:291
+msgid "Prompts"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:288
 #: src/features/people/profile-form.tsx:372
 msgid "Pronouns"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:247
+msgid "proposal"
+msgstr ""
+
 #. Chart axis: one bar per proposal
-#: src/features/admin/stats-charts.tsx:273
+#: src/features/admin/stats-charts.tsx:283
 #: src/features/sessions/session-form.tsx:531
 msgid "Proposal"
 msgstr ""
@@ -4025,6 +4546,10 @@ msgstr ""
 #: src/features/proposals/proposal-panel.tsx:73
 #: src/features/proposals/proposal-panel.tsx:74
 msgid "Proposal details"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:158
+msgid "Proposal interest"
 msgstr ""
 
 #. Chart axis: share of a proposal's votes that were interested, in percent
@@ -4041,14 +4566,25 @@ msgstr ""
 msgid "Proposal phase"
 msgstr ""
 
-#: src/features/admin/event-stats.tsx:37
+#: src/features/admin/stats-text.ts:332
+msgid "proposal sessions"
+msgstr ""
+
+#: src/features/admin/event-stats.tsx:39
 msgid "Proposal sessions"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:159
+msgid "Proposal votes"
 msgstr ""
 
 #: src/features/admin/event-layout.tsx:20
 #: src/features/admin/event-proposals.tsx:349
 #: src/features/admin/event-proposals.tsx:351
-#: src/features/admin/event-stats.tsx:22
+#: src/features/admin/event-stats.tsx:24
+#: src/features/admin/stats-text.ts:34
+#: src/features/admin/stats-text.ts:116
+#: src/features/admin/stats-text.ts:220
 #: src/features/comments/my-comments-screen.tsx:16
 #: src/features/people/profile-body.tsx:235
 #: src/features/schedule/schedule-toolbar.tsx:123
@@ -4058,11 +4594,13 @@ msgstr ""
 
 #. Chart axis: groups of proposals by their interested votes
 #: src/features/admin/stats-figures.tsx:62
+#: src/features/admin/stats-text.ts:115
 msgid "Proposals by interested votes"
 msgstr ""
 
 #. Chart axis: number of proposals created
 #: src/features/admin/stats-figures.tsx:66
+#: src/features/admin/stats-text.ts:106
 msgid "Proposals created"
 msgstr ""
 
@@ -4077,6 +4615,7 @@ msgstr ""
 
 #. Chart axis: number of proposals a host made
 #: src/features/admin/stats-figures.tsx:91
+#: src/features/admin/stats-text.ts:114
 msgid "Proposals hosted"
 msgstr ""
 
@@ -4086,6 +4625,22 @@ msgstr ""
 
 #: src/features/admin/stats-figures.tsx:359
 msgid "Proposals in the top quarter by interested votes that never became a session: what people wanted and did not get."
+msgstr ""
+
+#: src/features/admin/stats-text.ts:36
+msgid "Proposals over time"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:40
+msgid "Proposals per host"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:244
+msgid "Proposals wanting a co-host"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:243
+msgid "Proposals with more than one host"
 msgstr ""
 
 #: src/features/sign-in/account-security.tsx:149
@@ -4105,9 +4660,25 @@ msgctxt "Location colour"
 msgid "Purple"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:75
+msgid "Push notifications"
+msgstr ""
+
 #. Attendee sort order: a shuffled list
 #: src/features/people/directory-screen.tsx:78
 msgid "Random"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:168
+msgid "Range"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:100
+msgid "Rank"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:205
+msgid "Read"
 msgstr ""
 
 #: src/features/admin/stats-figures.tsx:506
@@ -4177,6 +4748,14 @@ msgstr ""
 msgid "Remove?"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:176
+msgid "Replies"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:301
+msgid "Replies in a thread"
+msgstr ""
+
 #: src/features/comments/comments-section.tsx:330
 #: src/features/comments/comments-section.tsx:358
 msgctxt "Comment action: reply to it"
@@ -4187,18 +4766,44 @@ msgstr ""
 msgid "Report a Bug"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:148
+msgid "Reported"
+msgstr ""
+
 #. Chart axis: people who came, as reported by the host
 #: src/features/admin/stats-figures.tsx:103
+#: src/features/admin/stats-text.ts:103
 msgid "Reported attendees"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:170
+msgid "Reports inside"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:281
+msgid "Requested"
 msgstr ""
 
 #. Chart axis: number of 1-on-1 requests
 #: src/features/admin/stats-figures.tsx:180
+#: src/features/admin/stats-text.ts:190
 msgid "Requests"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:64
+msgid "Requests by status"
 msgstr ""
 
 #: src/features/admin/stats-figures.tsx:868
 msgid "Requests by what became of them. A pending request whose time has passed counts as expired."
+msgstr ""
+
+#: src/features/admin/stats-text.ts:194
+msgid "Requests received"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:193
+msgid "Requests sent"
 msgstr ""
 
 #: src/features/admin/stats-figures.tsx:890
@@ -4210,7 +4815,7 @@ msgctxt "Profile picture: go back to the saved one"
 msgid "Reset"
 msgstr ""
 
-#: src/features/admin/event-stats.tsx:114
+#: src/features/admin/event-stats.tsx:117
 msgid "Reset filter"
 msgstr ""
 
@@ -4224,6 +4829,10 @@ msgstr ""
 
 #: src/ui/side-panel.tsx:193
 msgid "Resize panel"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:67
+msgid "Response time (a later cancel hides the response)"
 msgstr ""
 
 #. Name of an event icon
@@ -4248,6 +4857,10 @@ msgstr ""
 msgid "RSVP"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:294
+msgid "RSVP changes"
+msgstr ""
+
 #: src/features/schedule/session-block.tsx:378
 msgid "RSVP to {title}"
 msgstr ""
@@ -4257,8 +4870,17 @@ msgstr ""
 msgid "RSVP'd"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:227
+msgid "RSVPed"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:230
+msgid "RSVPed only"
+msgstr ""
+
 #. Chart axis: number of RSVPs
 #: src/features/admin/stats-figures.tsx:95
+#: src/features/admin/stats-text.ts:118
 msgid "RSVPs"
 msgstr ""
 
@@ -4266,21 +4888,26 @@ msgstr ""
 msgid "RSVPs ({rsvpCount})"
 msgstr ""
 
-#: src/features/admin/event-stats.tsx:288
+#: src/features/admin/event-stats.tsx:291
 msgid "RSVPs are intent, not attendance: people book more than they attend."
 msgstr ""
 
 #. Chart axis: number of sessions one person RSVPed to
 #: src/features/admin/stats-figures.tsx:148
+#: src/features/admin/stats-text.ts:42
 msgid "RSVPs per attendee"
 msgstr ""
 
-#: src/features/admin/stats-charts.tsx:425
+#: src/features/admin/stats-charts.tsx:435
 msgid "RSVPs per running session"
 msgstr ""
 
-#: src/features/admin/stats-charts.tsx:439
+#: src/features/admin/stats-charts.tsx:449
 msgid "RSVPs per running session on {day}"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:143
+msgid "RSVPs to running sessions (average)"
 msgstr ""
 
 #: src/features/admin/event-days.tsx:271
@@ -4431,7 +5058,7 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
-#: src/features/admin/stats-table.tsx:125
+#: src/features/admin/stats-table.tsx:147
 msgid "Search {tableTitle}"
 msgstr ""
 
@@ -4475,9 +5102,13 @@ msgstr ""
 msgid "Search your comments"
 msgstr ""
 
-#: src/features/admin/stats-table.tsx:126
+#: src/features/admin/stats-table.tsx:148
 #: src/ui/data-table.tsx:195
 msgid "Search…"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:236
+msgid "Second quarter"
 msgstr ""
 
 #. placeholder {0}: selection.rowLabel(row)
@@ -4539,6 +5170,10 @@ msgstr ""
 msgid "Sending..."
 msgstr ""
 
+#: src/features/admin/stats-text.ts:204
+msgid "Sent"
+msgstr ""
+
 #: src/features/admin/guests-screen.tsx:463
 msgid "Sent!"
 msgstr ""
@@ -4551,6 +5186,10 @@ msgstr ""
 #: src/features/schedule/session-panel.tsx:56
 #: src/features/schedule/session-panel.tsx:57
 msgid "Session details"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:83
+msgid "Session duration"
 msgstr ""
 
 #: src/app/panel-host.tsx:311
@@ -4579,12 +5218,17 @@ msgstr ""
 msgid "Session not found."
 msgstr ""
 
-#: src/features/admin/event-stats.tsx:135
+#: src/features/admin/event-stats.tsx:138
+#: src/features/admin/stats-text.ts:78
 msgid "Session origins"
 msgstr ""
 
 #: src/app/panel-host.tsx:264
 msgid "Session proposal form"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:102
+msgid "Session RSVPs"
 msgstr ""
 
 #: src/features/sessions/session-form.tsx:556
@@ -4595,27 +5239,91 @@ msgstr ""
 #: src/features/admin/event-layout.tsx:21
 #: src/features/admin/event-sessions.tsx:661
 #: src/features/admin/event-sessions.tsx:663
-#: src/features/admin/event-stats.tsx:23
+#: src/features/admin/event-stats.tsx:25
 #: src/features/admin/stats-figures.tsx:116
+#: src/features/admin/stats-text.ts:50
+#: src/features/admin/stats-text.ts:129
+#: src/features/admin/stats-text.ts:221
 #: src/features/comments/my-comments-screen.tsx:15
 msgid "Sessions"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:81
+msgid "Sessions by day"
 msgstr ""
 
 #: src/features/admin/stats-figures.tsx:624
 msgid "Sessions by how they came about, with their median RSVPs, attendees and duration."
 msgstr ""
 
+#: src/features/admin/stats-text.ts:80
+msgid "Sessions by start hour"
+msgstr ""
+
 #: src/features/admin/stats-figures.tsx:640
 msgid "Sessions by the hour they started, with their median RSVPs. It shows whether early or late slots drew fewer people."
 msgstr ""
 
+#: src/features/admin/stats-text.ts:169
+msgid "Sessions compared"
+msgstr ""
+
 #. Chart axis: number of sessions a host ran
 #: src/features/admin/stats-figures.tsx:144
+#: src/features/admin/stats-text.ts:166
 msgid "Sessions hosted"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:139
+msgid "Sessions over capacity"
 msgstr ""
 
 #: src/features/admin/stats-figures.tsx:655
 msgid "Sessions per day, with their median RSVPs."
+msgstr ""
+
+#: src/features/admin/stats-text.ts:52
+msgid "Sessions per host"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:142
+msgid "Sessions running (average)"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:167
+msgid "Sessions with a capacity"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:257
+msgid "Sessions with a host"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:224
+msgid "Sessions with an attendee report"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:259
+msgid "Sessions with more than one host"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:254
+msgid "Sessions: {param}"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:250
+msgid "Sessions: blocker"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:252
+msgid "Sessions: organizer"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:251
+msgid "Sessions: proposal"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:253
+msgid "Sessions: spontaneous"
 msgstr ""
 
 #: src/features/sign-in/account-security.tsx:187
@@ -4644,6 +5352,50 @@ msgstr ""
 
 #: src/features/admin/settings-screen.tsx:132
 msgid "Settings saved."
+msgstr ""
+
+#: src/features/admin/stats-text.ts:113
+msgid "Share"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:171
+msgid "Share inside"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:110
+msgid "Share interested"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:126
+msgid "Share of gaps"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:184
+msgid "Share of members"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:201
+msgid "Share of members (%)"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:258
+msgid "Share of members who hosted (%)"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:109
+msgid "Share of proposals voted on"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:191
+msgid "Share of requests"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:206
+msgid "Share read"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:149
+msgid "Share reported"
 msgstr ""
 
 #. {list} is a comma-separated list of labels with their values
@@ -4677,7 +5429,7 @@ msgctxt "Comment filter: label of the kind selector"
 msgid "Show"
 msgstr ""
 
-#: src/features/admin/stats-figure-card.tsx:107
+#: src/features/admin/stats-figure-card.tsx:110
 msgid "Show {title} as"
 msgstr ""
 
@@ -4756,6 +5508,8 @@ msgid "Site settings"
 msgstr ""
 
 #. Vote option on a session proposal: not interested
+#: src/features/admin/stats-text.ts:97
+#: src/features/admin/stats-text.ts:241
 #: src/features/proposals/vote-labels.ts:17
 msgid "Skip"
 msgstr ""
@@ -4776,7 +5530,20 @@ msgstr ""
 
 #. Chart axis: number of 1-on-1 time slots a person offered
 #: src/features/admin/stats-figures.tsx:172
+#: src/features/admin/stats-text.ts:274
 msgid "Slots offered"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:63
+msgid "Slots offered per person"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:187
+msgid "Slots, from"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:188
+msgid "Slots, up to"
 msgstr ""
 
 #: src/commands/failure-message.ts:24
@@ -4819,6 +5586,10 @@ msgstr ""
 msgid "someone joins a proposal I’m hosting as a co-host"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:297
+msgid "Someone joins my proposal"
+msgstr ""
+
 #: src/features/sign-in/bootstrap-screen.tsx:63
 msgid "Someone new"
 msgstr ""
@@ -4841,13 +5612,25 @@ msgstr ""
 msgid "Sparkles"
 msgstr ""
 
-#: src/features/admin/event-stats.tsx:39
+#: src/features/admin/stats-text.ts:249
+msgid "spontaneous"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:334
+msgid "spontaneous sessions"
+msgstr ""
+
+#: src/features/admin/event-stats.tsx:41
 msgid "Spontaneous sessions"
 msgstr ""
 
 #. Name of an event icon
 #: src/ui/event-icons.ts:131
 msgid "Star"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:151
+msgid "Start"
 msgstr ""
 
 #: src/features/admin/event-config.tsx:337
@@ -4864,6 +5647,7 @@ msgstr ""
 
 #. Chart axis: hour at which sessions started
 #: src/features/admin/stats-figures.tsx:128
+#: src/features/admin/stats-text.ts:208
 msgid "Start hour"
 msgstr ""
 
@@ -4902,17 +5686,19 @@ msgstr ""
 msgid "Statistics"
 msgstr ""
 
-#: src/features/admin/event-stats.tsx:238
+#: src/features/admin/event-stats.tsx:241
 msgid "Statistics sections"
 msgstr ""
 
 #. Chart axis: what became of a 1-on-1 request
 #: src/features/admin/stats-figures.tsx:184
+#: src/features/admin/stats-text.ts:189
 msgid "Status"
 msgstr ""
 
 #. Chart axis: one bar per funnel step
 #: src/features/admin/stats-figures.tsx:46
+#: src/features/admin/stats-text.ts:200
 msgid "Step"
 msgstr ""
 
@@ -4964,7 +5750,7 @@ msgid "System"
 msgstr ""
 
 #. Button: show the figure as a table
-#: src/features/admin/stats-figure-card.tsx:124
+#: src/features/admin/stats-figure-card.tsx:127
 msgid "Table"
 msgstr ""
 
@@ -5144,6 +5930,10 @@ msgstr ""
 
 #: src/features/people/profile-form.tsx:78
 msgid "They/Them"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:237
+msgid "Third quarter"
 msgstr ""
 
 #: src/features/schedule/day-agenda.tsx:406
@@ -5370,6 +6160,7 @@ msgstr ""
 #: src/features/admin/event-proposals.tsx:101
 #: src/features/admin/event-sessions.tsx:160
 #: src/features/admin/settings-screen.tsx:76
+#: src/features/admin/stats-text.ts:89
 #: src/features/proposals/proposal-form.tsx:226
 #: src/features/proposals/proposals-screen.tsx:407
 msgid "Title"
@@ -5385,6 +6176,18 @@ msgstr ""
 
 #: src/features/proposals/vote-breakdown.tsx:113
 msgid "Too few attendees voted to guess at attendance — fewer than {minTurnout}% of them did, so a couple of votes either way would decide the number."
+msgstr ""
+
+#: src/features/admin/stats-text.ts:264
+msgid "too few to say"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:235
+msgid "Top quarter"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:134
+msgid "Total gap time"
 msgstr ""
 
 #: src/features/proposals/proposal-panel.tsx:253
@@ -5460,7 +6263,7 @@ msgstr ""
 msgid "Type the session title to confirm"
 msgstr ""
 
-#: src/features/admin/event-stats.tsx:73
+#: src/features/admin/event-stats.tsx:75
 msgid "Type to find, or pick from the list"
 msgstr ""
 
@@ -5518,6 +6321,26 @@ msgstr ""
 msgid "Until is required"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:133
+msgid "Unusable fragments"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:268
+msgid "Up to 1 h"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:269
+msgid "Up to 2 h"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:267
+msgid "Up to 30 min"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:266
+msgid "Up to the break"
+msgstr ""
+
 #: src/features/people/directory-screen.tsx:363
 msgid "updated {profileUpdated}"
 msgstr ""
@@ -5554,9 +6377,17 @@ msgstr ""
 msgid "Users"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:132
+msgid "Utilization"
+msgstr ""
+
 #. Chart axis: booked share of a location's open time, in percent
 #: src/features/admin/stats-figures.tsx:164
 msgid "Utilization (%)"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:47
+msgid "Utilization by hour"
 msgstr ""
 
 #. {list} is a comma-separated list of labels with their values
@@ -5568,8 +6399,12 @@ msgstr ""
 msgid "Utilization is booked hours divided by available hours. A gap is free time inside the booking window. An unusable fragment is a gap too short to hold a session on the grid: it shows where the grid wastes time."
 msgstr ""
 
-#: src/features/admin/stats-charts.tsx:373
+#: src/features/admin/stats-charts.tsx:383
 msgid "Utilization on {day}"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:112
+msgid "Value"
 msgstr ""
 
 #: src/features/admin/identity-mode-options.ts:13
@@ -5617,13 +6452,36 @@ msgstr ""
 msgid "Vote counts show, sessions are scheduled, and attendees RSVP."
 msgstr ""
 
+#: src/features/admin/stats-text.ts:226
+msgid "Voted"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:231
+msgid "Voted and RSVPed"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:229
+msgid "Voted only"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:107
+msgid "Voter"
+msgstr ""
+
 #. Chart axis: number of voters
 #: src/features/admin/stats-figures.tsx:54
+#: src/features/admin/stats-text.ts:98
+#: src/features/admin/stats-text.ts:218
 msgid "Voters"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:242
+msgid "Voters who voted on every proposal"
 msgstr ""
 
 #. Chart axis: number of votes
 #: src/features/admin/stats-figures.tsx:79
+#: src/features/admin/stats-text.ts:108
 #: src/features/proposals/proposals-screen.tsx:441
 msgid "Votes"
 msgstr ""
@@ -5638,6 +6496,7 @@ msgstr ""
 
 #. Chart axis: number of votes one person cast
 #: src/features/admin/stats-figures.tsx:70
+#: src/features/admin/stats-text.ts:37
 msgid "Votes per voter"
 msgstr ""
 
@@ -5703,7 +6562,7 @@ msgstr ""
 msgid "What would you like to learn? Propose it and ask for a host."
 msgstr ""
 
-#: src/features/admin/event-stats.tsx:164
+#: src/features/admin/event-stats.tsx:167
 msgid "What you leave out leaves every figure and download. A host also leaves the figures about people."
 msgstr ""
 
@@ -5774,6 +6633,10 @@ msgstr ""
 msgid "Who are you?"
 msgstr ""
 
+#: src/features/admin/stats-text.ts:72
+msgid "Who did what"
+msgstr ""
+
 #: src/features/admin/stats-figures.tsx:700
 msgid "Who hosted: sessions, unique hosts, the share of members who hosted, and sessions with more than one host."
 msgstr ""
@@ -5792,6 +6655,18 @@ msgstr ""
 
 #: src/features/meetings/meeting-panel.tsx:107
 msgid "Why it was called off:"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:283
+msgid "With an accepted meeting"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:272
+msgid "With an RSVP to another session"
+msgstr ""
+
+#: src/features/admin/stats-text.ts:271
+msgid "With overlapping RSVPs"
 msgstr ""
 
 #: src/features/schedule/session-block.tsx:378
@@ -5820,7 +6695,7 @@ msgctxt "Location colour"
 msgid "Yellow"
 msgstr ""
 
-#: src/features/admin/stats-table.tsx:35
+#: src/features/admin/stats-table.tsx:36
 #: src/ui/confirm-dialog.tsx:10
 msgid "Yes"
 msgstr ""

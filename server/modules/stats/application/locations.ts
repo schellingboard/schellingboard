@@ -21,19 +21,19 @@ const length = (list: readonly Interval[]) =>
   list.reduce((sum, i) => sum + i.end - i.start, 0);
 
 const COLUMNS = [
-  col("location", "Location", "text"),
-  col("sessions", "Sessions", "integer"),
-  col("bookedHours", "Booked hours", "number"),
-  col("availableHours", "Available hours", "number"),
-  col("utilization", "Utilization", "percent"),
-  col("gaps", "Gaps", "integer"),
-  col("fragments", "Unusable fragments", "integer"),
-  col("gapMinutes", "Total gap time", "minutes"),
-  col("longestGap", "Longest gap", "minutes"),
-  col("capacity", "Capacity", "integer"),
-  col("bookable", "Bookable", "boolean"),
-  col("medianRsvps", "Median RSVPs", "number"),
-  col("over", "Sessions over capacity", "integer"),
+  col("location", "location", "text"),
+  col("sessions", "sessions", "integer"),
+  col("bookedHours", "bookedHours", "number"),
+  col("availableHours", "availableHours", "number"),
+  col("utilization", "utilization", "percent"),
+  col("gaps", "gaps", "integer"),
+  col("fragments", "unusableFragments", "integer"),
+  col("gapMinutes", "totalGapTime", "minutes"),
+  col("longestGap", "longestGap", "minutes"),
+  col("capacity", "capacity", "integer"),
+  col("bookable", "bookable", "boolean"),
+  col("medianRsvps", "medianRsvps", "number"),
+  col("over", "sessionsOverCapacity", "integer"),
 ];
 
 export function locationTables(
@@ -143,7 +143,7 @@ export function locationTables(
 
   const table: StatsTable = {
     id: "locations-table",
-    title: "Locations",
+    titleId: "locations",
     columns: COLUMNS,
     rows,
   };
@@ -199,23 +199,23 @@ export function locationTables(
     table,
     {
       id: "locations-heatmap",
-      title: "Utilization by hour",
+      titleId: "utilizationByHour",
       columns: [
-        col("day", "Day", "text"),
-        col("location", "Location", "text"),
-        col("hour", "Hour", "text"),
-        col("booked", "Booked share of the open time", "percent"),
+        col("day", "day", "text"),
+        col("location", "location", "text"),
+        col("hour", "hour", "text"),
+        col("booked", "bookedShareOfTheOpenTime", "percent"),
       ],
       rows: heat,
     },
     {
       id: "locations-supply-demand",
-      title: "Parallel sessions and RSVPs by hour",
+      titleId: "parallelSessionsAndRsvpsByHour",
       columns: [
-        col("day", "Day", "text"),
-        col("hour", "Hour", "text"),
-        col("sessions", "Sessions running (average)", "number"),
-        col("rsvps", "RSVPs to running sessions (average)", "number"),
+        col("day", "day", "text"),
+        col("hour", "hour", "text"),
+        col("sessions", "sessionsRunningAverage", "number"),
+        col("rsvps", "rsvpsToRunningSessionsAverage", "number"),
       ],
       rows: supply,
     },

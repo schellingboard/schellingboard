@@ -35,37 +35,37 @@ export function overviewTables(
 
   const headline: StatsTable = {
     id: "overview-headline",
-    title: "Headline numbers",
+    titleId: "headlineNumbers",
     columns: [
-      { key: "figure", label: "Figure", type: "text" },
-      { key: "value", label: "Value", type: "integer" },
+      { key: "figure", labelId: "figure", type: "label" },
+      { key: "value", labelId: "value", type: "integer" },
     ],
     rows: [
-      ["Members", people.size],
-      ["Active members", active.size],
-      ["Voters", voters.size],
-      ["People with RSVPs", rsvpers.size],
-      ["Proposals", proposals.length],
-      ["Sessions", sessions.length],
-      ["Hosts", hosts.size],
-      ["Sessions with an attendee report", reported === 0 ? null : reported],
+      ["members", people.size],
+      ["activeMembers", active.size],
+      ["voters", voters.size],
+      ["peopleWithRsvps", rsvpers.size],
+      ["proposals", proposals.length],
+      ["sessions", sessions.length],
+      ["hosts", hosts.size],
+      ["sessionsWithAnAttendeeReport", reported === 0 ? null : reported],
     ],
   };
 
   const steps: [string, number][] = [
-    ["Members", people.size],
-    ["Active", active.size],
-    ["Voted", voters.size],
-    ["RSVPed", rsvpers.size],
-    ["Hosted", hosts.size],
+    ["members", people.size],
+    ["active", active.size],
+    ["voted", voters.size],
+    ["rsvped", rsvpers.size],
+    ["hosted", hosts.size],
   ];
   const funnel: StatsTable = {
     id: "overview-funnel",
-    title: "Participation funnel",
+    titleId: "participationFunnel",
     columns: [
-      { key: "step", label: "Step", type: "text" },
-      { key: "members", label: "Members", type: "integer" },
-      { key: "share", label: "Share of members (%)", type: "percent" },
+      { key: "step", labelId: "step", type: "label" },
+      { key: "members", labelId: "members", type: "integer" },
+      { key: "share", labelId: "shareOfMembersPercent", type: "percent" },
     ],
     rows: steps.map(([label, count]) => [
       label,
@@ -97,33 +97,33 @@ export function overviewTables(
   const rsvped = (id: string) => rsvpers.has(id);
   const whoDidWhat: StatsTable = {
     id: "overview-who-did-what",
-    title: "Who did what",
+    titleId: "whoDidWhat",
     columns: [
-      { key: "group", label: "Group", type: "text" },
-      { key: "members", label: "Members", type: "integer" },
-      { key: "share", label: "Share of members (%)", type: "percent" },
-      { key: "meanRsvps", label: "Mean RSVPs per member", type: "number" },
+      { key: "group", labelId: "group", type: "label" },
+      { key: "members", labelId: "members", type: "integer" },
+      { key: "share", labelId: "shareOfMembersPercent", type: "percent" },
+      { key: "meanRsvps", labelId: "meanRsvpsPerMember", type: "number" },
     ],
     rows: [
       group(
-        "Voted only",
+        "votedOnly",
         members.filter((id) => voted(id) && !rsvped(id))
       ),
       group(
-        "RSVPed only",
+        "rsvpedOnly",
         members.filter((id) => !voted(id) && rsvped(id))
       ),
       group(
-        "Voted and RSVPed",
+        "votedAndRsvped",
         members.filter((id) => voted(id) && rsvped(id))
       ),
       group(
-        "Neither",
+        "neither",
         members.filter((id) => !voted(id) && !rsvped(id))
       ),
-      group("All voters", members.filter(voted)),
+      group("allVoters", members.filter(voted)),
       group(
-        "All other members",
+        "allOtherMembers",
         members.filter((id) => !voted(id))
       ),
     ],

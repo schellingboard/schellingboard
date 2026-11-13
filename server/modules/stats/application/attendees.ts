@@ -90,15 +90,15 @@ export function attendeeTables(
 
   const table: StatsTable = {
     id: "attendees-table",
-    title: "RSVPs per attendee",
+    titleId: "rsvpsPerAttendee",
     columns: [
-      col("attendee", "Attendee", "text"),
-      col("rsvps", "RSVPs", "integer"),
-      col("days", "Days with RSVPs", "integer"),
-      col("hours", "Hours booked", "number"),
-      col("backToBack", "Back-to-back pairs", "integer"),
-      col("overlapping", "Overlapping pairs", "integer"),
-      col("medianGap", "Median gap", "minutes"),
+      col("attendee", "attendee", "text"),
+      col("rsvps", "rsvps", "integer"),
+      col("days", "daysWithRsvps", "integer"),
+      col("hours", "hoursBooked", "number"),
+      col("backToBack", "backToBackPairs", "integer"),
+      col("overlapping", "overlappingPairs", "integer"),
+      col("medianGap", "medianGap", "minutes"),
     ],
     rows: pseudonymize(perPerson.map((p) => p.row)).map(
       ({ pseudonym, values }) => [
@@ -110,26 +110,26 @@ export function attendeeTables(
   };
 
   const steps: [string, number][] = [
-    ["Back to back", 0],
-    ["Up to the break", facts.breakMinutes],
-    ["Up to 30 min", 30],
-    ["Up to 1 h", 60],
-    ["Up to 2 h", 120],
+    ["backToBack", 0],
+    ["upToTheBreak", facts.breakMinutes],
+    ["upTo30Min", 30],
+    ["upTo1H", 60],
+    ["upTo2H", 120],
   ];
   const buckets: [string, number][] = [];
   for (const step of steps.sort((a, b) => a[1] - b[1]))
     if (buckets.length === 0 || step[1] > buckets[buckets.length - 1][1])
       buckets.push(step);
-  buckets.push(["More than 2 h", Infinity]);
+  buckets.push(["moreThan2H", Infinity]);
   const counts = buckets.map(() => 0);
   for (const gap of gaps) counts[buckets.findIndex(([, max]) => gap <= max)]++;
   const gapTable: StatsTable = {
     id: "attendees-gaps",
-    title: "Gaps between RSVPed sessions",
+    titleId: "gapsBetweenRsvpedSessions",
     columns: [
-      col("gap", "Gap", "text"),
-      col("gaps", "Gaps", "integer"),
-      col("share", "Share of gaps", "percent"),
+      col("gap", "gap", "label"),
+      col("gaps", "gaps", "integer"),
+      col("share", "shareOfGaps", "percent"),
     ],
     rows:
       gaps.length === 0
@@ -145,18 +145,18 @@ export function attendeeTables(
   const doubled = perPerson.filter((p) => p.overlapping > 0).length;
   const doubleBookings: StatsTable = {
     id: "attendees-double-bookings",
-    title: "Double bookings",
+    titleId: "doubleBookings",
     columns: [
-      col("figure", "Figure", "text"),
-      col("value", "People", "integer"),
-      col("share", "Share", "percent"),
+      col("figure", "figure", "label"),
+      col("value", "people", "integer"),
+      col("share", "share", "percent"),
     ],
     rows:
       withRsvps === 0
         ? []
         : [
-            ["People with RSVPs", withRsvps, 100],
-            ["With overlapping RSVPs", doubled, percent(doubled, withRsvps)],
+            ["peopleWithRsvps", withRsvps, 100],
+            ["withOverlappingRsvps", doubled, percent(doubled, withRsvps)],
           ],
   };
 
@@ -176,19 +176,19 @@ export function attendeeTables(
   const hostCount = [...hosts].filter((h) => people.has(h)).length;
   const hostsTable: StatsTable = {
     id: "attendees-hosts",
-    title: "Hosts who attend other sessions",
+    titleId: "hostsWhoAttendOtherSessions",
     columns: [
-      col("figure", "Figure", "text"),
-      col("value", "Hosts", "integer"),
-      col("share", "Share", "percent"),
+      col("figure", "figure", "label"),
+      col("value", "hosts", "integer"),
+      col("share", "share", "percent"),
     ],
     rows:
       hostCount === 0
         ? []
         : [
-            ["Hosts", hostCount, 100],
+            ["hosts", hostCount, 100],
             [
-              "With an RSVP to another session",
+              "withAnRsvpToAnotherSession",
               attending.size,
               percent(attending.size, hostCount),
             ],

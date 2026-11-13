@@ -66,7 +66,7 @@ const answers = (call: FakeCall): Response | undefined => {
   if (/^\/api\/v1\/admin\/events\/e\d\/stats$/.test(call.path))
     return Response.json({
       event: { id: "e1", name: "Spring Con", slug: "con" },
-      filterSummary: "Excluding blockers",
+      filterSummary: { locations: 0, hosts: 0, origins: ["blocker"] },
       filterOptions: { locations: [], hosts: [] },
       tables: [],
     });

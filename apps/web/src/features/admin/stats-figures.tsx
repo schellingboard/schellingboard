@@ -233,8 +233,8 @@ const AXIS = {
 
 const axisLabel = (label: MessageDescriptor) => i18n._(label);
 
-// eslint-disable-next-line lingui/no-unlocalized-strings -- vote choice names as the stats tables spell them
-const VOTE_CHOICES = ["Interested", "Maybe", "Skip"];
+// eslint-disable-next-line lingui/no-unlocalized-strings -- vote choice ids as the stats tables send them
+const VOTE_CHOICES = ["interested", "maybe", "skip"];
 const SHARE_EDGES = [0, 20, 40, 60, 80, 100];
 
 const scatter =

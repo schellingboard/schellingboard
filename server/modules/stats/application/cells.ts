@@ -1,15 +1,16 @@
 import type { StatsTable } from "@schellingboard/contracts/stats";
+import type { StatsColumnId } from "@schellingboard/domain/stats/text";
 
 export type Column = StatsTable["columns"][number];
 export type Cell = StatsTable["rows"][number][number];
 
 export const col = (
   key: string,
-  label: string,
+  labelId: StatsColumnId,
   type: Column["type"]
 ): Column => ({
   key,
-  label,
+  labelId,
   type,
 });
 

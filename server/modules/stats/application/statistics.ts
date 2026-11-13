@@ -5,9 +5,14 @@ import type {
 import { TOO_FEW_TO_SAY } from "@schellingboard/domain/stats/correlation";
 import { encodeCsv } from "@schellingboard/domain/stats/csv";
 import {
+  filterExclusions,
   filterSummary,
   isDefaultFilter,
 } from "@schellingboard/domain/stats/filter";
+import {
+  STATS_COLUMNS,
+  statsCellEnglish,
+} from "@schellingboard/domain/stats/text";
 
 import type { Actor } from "@/server/kernel/actor";
 import { forbidden, notFound, ok, type Result } from "@/server/kernel/result";
@@ -40,7 +45,7 @@ export const eventStatistics =
     if (!facts) return notFound("event.notFound", "Event not found");
     return ok({
       event: facts.event,
-      filterSummary: filterSummary(filter),
+      filterSummary: filterExclusions(filter),
       filterOptions: { locations: facts.locations, hosts: facts.hosts },
       tables: [
         ...overviewTables(facts, filter),
@@ -55,6 +60,20 @@ export const eventStatistics =
       ],
     });
   };
+
+const tableCsv = (table: EventStatistics["tables"][number]) =>
+  encodeCsv(
+    table.columns.map((c) => ({
+      label: (STATS_COLUMNS as Record<string, string>)[c.labelId] ?? c.labelId,
+    })),
+    table.rows.map((row) =>
+      row.map((cell, i) =>
+        table.columns[i].type === "label" && typeof cell === "string"
+          ? statsCellEnglish(cell)
+          : cell
+      )
+    )
+  );
 
 const fileName = (slug: string, table: string, filter: StatsFilter) =>
   `${slug}-${table}${isDefaultFilter(filter) ? "" : "-filtered"}.csv`;
@@ -73,7 +92,7 @@ export const statisticsCsv =
     if (!table) return notFound("stats.tableNotFound", "No such table");
     return ok({
       name: fileName(stats.value.event.slug, table.id, filter),
-      content: encodeCsv(table.columns, table.rows),
+      content: tableCsv(table),
     });
   };
 
@@ -90,7 +109,7 @@ export const statisticsFiles =
     const { event, tables } = stats.value;
     const about = [
       `Statistics for ${event.name}`,
-      `Filter: ${stats.value.filterSummary}`,
+      `Filter: ${filterSummary(filter)}`,
       `Exported: ${now.toISOString()}`,
       `Release: ${deps.version()}`,
       "",
@@ -104,7 +123,7 @@ export const statisticsFiles =
       files: [
         ...tables.map((t) => ({
           name: fileName(event.slug, t.id, filter),
-          content: encodeCsv(t.columns, t.rows),
+          content: tableCsv(t),
         })),
         { name: "about.txt", content: about },
       ],

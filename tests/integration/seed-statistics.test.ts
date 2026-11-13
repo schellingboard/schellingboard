@@ -1,4 +1,10 @@
-import type { StatsTable } from "@schellingboard/contracts/stats";
+import type { EventStatistics } from "@schellingboard/contracts/stats";
+import {
+  parseStatsRef,
+  STATS_CELLS,
+  STATS_COLUMNS,
+  STATS_TITLES,
+} from "@schellingboard/domain/stats/text";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { getRepositories, resetRepositories } from "@/db/container";
@@ -7,9 +13,10 @@ import { GET } from "@/tests/helpers/v1-route";
 
 import { createAdminAuthCookie } from "../helpers/admin-cookie";
 import { setupTestDb } from "../helpers/db";
+import { type EnglishTable, inEnglish } from "../helpers/stats-english";
 
 type Stats = {
-  tables: StatsTable[];
+  tables: EnglishTable[];
   filterOptions: {
     locations: { id: string; name: string }[];
     hosts: { id: string; name: string }[];
@@ -19,6 +26,15 @@ type Stats = {
 let eventId = "";
 let cookie = "";
 
+async function rawStats() {
+  const res = await GET(
+    new Request(`http://test/api/v1/admin/events/${eventId}/stats`, {
+      headers: { cookie },
+    })
+  );
+  return (await res.json()) as EventStatistics;
+}
+
 async function stats(query = "") {
   const res = await GET(
     new Request(`http://test/api/v1/admin/events/${eventId}/stats${query}`, {
@@ -26,7 +42,7 @@ async function stats(query = "") {
     })
   );
   expect(res.status).toBe(200);
-  return (await res.json()) as Stats;
+  return inEnglish(await res.json()) as Stats;
 }
 
 const cell = (s: Stats, table: string, label: string) =>
@@ -71,5 +87,23 @@ describe("the large dev seed", { tags: ["021-US3"] }, () => {
     expect(
       cell(s, "overview-headline", "Sessions with an attendee report") as number
     ).toBeGreaterThan(0);
+  });
+
+  it("sends only ids its text catalog knows", async () => {
+    const { tables } = await rawStats();
+    expect(tables.length).toBeGreaterThan(20);
+    const known = (catalog: object, id: string) => id in catalog;
+    for (const table of tables) {
+      expect(known(STATS_TITLES, table.titleId), table.titleId).toBe(true);
+      table.columns.forEach((column, i) => {
+        expect(known(STATS_COLUMNS, column.labelId), column.labelId).toBe(true);
+        if (column.type !== "label") return;
+        for (const row of table.rows) {
+          if (row[i] === null) continue;
+          const { id } = parseStatsRef(String(row[i]));
+          expect(known(STATS_CELLS, id), `${table.id}: ${id}`).toBe(true);
+        }
+      });
+    }
   });
 });

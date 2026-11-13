@@ -64,7 +64,7 @@ describe("the statistics filter in the address", { tags: ["021-US3"] }, () => {
 describe("the statistics query", { tags: ["021-US1"] }, () => {
   const body = {
     event: { id: "e1", name: "Conf", slug: "conf" },
-    filterSummary: "Excluding blockers",
+    filterSummary: { locations: 0, hosts: 0, origins: ["blocker"] },
     filterOptions: { locations: [], hosts: [] },
     tables: [],
   };

@@ -6,6 +6,7 @@ import { cx } from "../../ui/cx";
 import { paramsUpdater } from "../../ui/list-paging";
 import { SearchInput } from "../../ui/search-input";
 import { usePaging } from "../../ui/use-paging";
+import { statsColumnLabel, statsLabelText, statsTitle } from "./stats-text";
 
 type Cell = StatsTable["rows"][number][number];
 type Column = StatsTable["columns"][number];
@@ -33,6 +34,8 @@ export function formatCell(cell: Cell, type: Column["type"]): string {
       return String(Math.round(Number(cell) * 100) / 100);
     case "boolean":
       return cell ? t`Yes` : t`No`;
+    case "label":
+      return statsLabelText(cell);
     default:
       return String(cell);
   }
@@ -42,15 +45,19 @@ export function formatCell(cell: Cell, type: Column["type"]): string {
 export function sortRows(
   rows: StatsTable["rows"],
   column: number,
-  direction: "asc" | "desc"
+  direction: "asc" | "desc",
+  type?: Column["type"]
 ) {
   const sign = direction === "asc" ? 1 : -1;
   return [...rows].sort((a, b) => {
     const x = a[column];
     const y = b[column];
     if (x === null || y === null) return x === y ? 0 : x === null ? 1 : -1;
-    if (typeof x === "string" && typeof y === "string")
-      return sign * x.localeCompare(y, undefined, { numeric: true });
+    if (typeof x === "string" && typeof y === "string") {
+      const [a, b] =
+        type === "label" ? [statsLabelText(x), statsLabelText(y)] : [x, y];
+      return sign * a.localeCompare(b, undefined, { numeric: true });
+    }
     return sign * (Number(x) - Number(y));
   });
 }
@@ -64,11 +71,21 @@ const plain = (text: string) =>
     .toLowerCase();
 
 /** The rows with a text cell holding the query, in their order. */
-export function searchRows(rows: StatsTable["rows"], query: string) {
+export function searchRows(
+  rows: StatsTable["rows"],
+  query: string,
+  columns?: StatsTable["columns"]
+) {
   const needle = plain(query.trim());
   if (!needle) return rows;
   return rows.filter((row) =>
-    row.some((cell) => typeof cell === "string" && plain(cell).includes(needle))
+    row.some(
+      (cell, i) =>
+        typeof cell === "string" &&
+        plain(
+          columns?.[i].type === "label" ? statsLabelText(cell) : cell
+        ).includes(needle)
+    )
   );
 }
 
@@ -92,9 +109,14 @@ export function SortableStatsTable({
       return next;
     });
 
-  const matching = searchRows(table.rows, query);
+  const matching = searchRows(table.rows, query, table.columns);
   const sorted = sort
-    ? sortRows(matching, sort.column, sort.direction)
+    ? sortRows(
+        matching,
+        sort.column,
+        sort.direction,
+        table.columns[sort.column].type
+      )
     : matching;
   const {
     visible: rows,
@@ -106,7 +128,7 @@ export function SortableStatsTable({
     paging,
     paramsUpdater(paging, (next) => setPaging(next))
   );
-  const tableTitle = table.title;
+  const tableTitle = statsTitle(table.titleId);
   const searchable = table.rows.length > SEARCH_FROM;
 
   return (
@@ -163,7 +185,7 @@ export function SortableStatsTable({
                       }}
                       className="font-medium hover:text-fg"
                     >
-                      {column.label}
+                      {statsColumnLabel(column.labelId)}
                       <span aria-hidden="true">
                         {active ? (sort.direction === "asc" ? " ▲" : " ▼") : ""}
                       </span>

@@ -15,7 +15,7 @@ afterEach(cleanup);
 
 const stats: EventStatistics = {
   event: { id: "e1", name: "Conf", slug: "conf" },
-  filterSummary: "Excluding blockers",
+  filterSummary: { locations: 0, hosts: 0, origins: ["blocker"] },
   filterOptions: {
     locations: [
       { id: "l1", name: "Volunteers 1" },
@@ -26,28 +26,28 @@ const stats: EventStatistics = {
   tables: [
     {
       id: "overview-headline",
-      title: "Headline numbers",
+      titleId: "headlineNumbers",
       columns: [
-        { key: "figure", label: "Figure", type: "text" },
-        { key: "value", label: "Value", type: "integer" },
+        { key: "figure", labelId: "figure", type: "label" },
+        { key: "value", labelId: "value", type: "integer" },
       ],
       rows: [
-        ["Members", 12],
-        ["Sessions", 3],
-        ["Sessions with an attendee report", null],
+        ["members", 12],
+        ["sessions", 3],
+        ["sessionsWithAnAttendeeReport", null],
       ],
     },
     {
       id: "overview-funnel",
-      title: "Participation funnel",
+      titleId: "participationFunnel",
       columns: [
-        { key: "step", label: "Step", type: "text" },
-        { key: "members", label: "Members", type: "integer" },
-        { key: "share", label: "Share of members (%)", type: "percent" },
+        { key: "step", labelId: "step", type: "label" },
+        { key: "members", labelId: "members", type: "integer" },
+        { key: "share", labelId: "shareOfMembersPercent", type: "percent" },
       ],
       rows: [
-        ["Members", 12, 100],
-        ["Voted", 5, 41.6666],
+        ["members", 12, 100],
+        ["voted", 5, 41.6666],
       ],
     },
   ],
@@ -136,7 +136,7 @@ describe("the statistics screen", { tags: ["021-US1"] }, () => {
   it("shows the Sessions section with its charts and a No data state", async () => {
     const col = (key: string, type: "text" | "integer" = "integer") => ({
       key,
-      label: key,
+      labelId: key,
       type,
     });
     const sessionStats: EventStatistics = {
@@ -145,7 +145,7 @@ describe("the statistics screen", { tags: ["021-US1"] }, () => {
         ...stats.tables,
         {
           id: "sessions-table",
-          title: "Sessions",
+          titleId: "sessions",
           columns: [
             col("title", "text"),
             col("rsvps"),
@@ -165,7 +165,7 @@ describe("the statistics screen", { tags: ["021-US1"] }, () => {
         },
         {
           id: "sessions-duration",
-          title: "Session duration",
+          titleId: "sessionDuration",
           columns: [col("from"), col("to"), col("sessions")],
           rows: [],
         },
@@ -249,10 +249,10 @@ describe("long statistics tables", { tags: ["021-US1"] }, () => {
     tables: [
       {
         id: "proposals-table",
-        title: "Proposals",
+        titleId: "proposals",
         columns: [
-          { key: "title", label: "Title", type: "text" },
-          { key: "voters", label: "Voters", type: "integer" },
+          { key: "title", labelId: "title", type: "text" },
+          { key: "voters", labelId: "voters", type: "integer" },
         ],
         rows: Array.from({ length: 120 }, (_, i) => [`Talk ${i + 1}`, i]),
       },
@@ -336,7 +336,7 @@ describe("predicted attendance", { tags: ["021-US4"] }, () => {
   it("draws predicted against reported attendance with its basis", async () => {
     const col = (key: string) => ({
       key,
-      label: key,
+      labelId: key,
       type: "integer" as const,
     });
     renderScreen("section=sessions", {
@@ -345,7 +345,7 @@ describe("predicted attendance", { tags: ["021-US4"] }, () => {
         tables: [
           {
             id: "sessions-table",
-            title: "Sessions",
+            titleId: "sessions",
             columns: [
               "reported",
               "predicted",
@@ -376,7 +376,7 @@ describe("proposal charts", { tags: ["021-US1"] }, () => {
       type: "text" | "integer" | "number" | "boolean" = "integer"
     ) => ({
       key,
-      label: key,
+      labelId: key,
       type,
     });
     renderScreen("section=proposals", {
@@ -385,7 +385,7 @@ describe("proposal charts", { tags: ["021-US1"] }, () => {
         tables: [
           {
             id: "proposals-table",
-            title: "Proposals",
+            titleId: "proposals",
             columns: [
               c("title", "text"),
               c("daysIn", "number"),
@@ -400,7 +400,7 @@ describe("proposal charts", { tags: ["021-US1"] }, () => {
           },
           {
             id: "proposals-over-time",
-            title: "Proposals over time",
+            titleId: "proposalsOverTime",
             columns: [c("day", "text"), c("proposals")],
             rows: [
               ["2026-01-01", 1],
@@ -410,7 +410,7 @@ describe("proposal charts", { tags: ["021-US1"] }, () => {
           },
           {
             id: "proposals-voters",
-            title: "Votes per voter",
+            titleId: "votesPerVoter",
             columns: [c("voter", "text"), c("total"), c("interestedShare")],
             rows: [
               ["P001", 3, 100],
@@ -419,7 +419,7 @@ describe("proposal charts", { tags: ["021-US1"] }, () => {
           },
           {
             id: "proposals-conversion",
-            title: "Conversion to sessions by interest",
+            titleId: "conversionToSessionsByInterest",
             columns: [
               c("group", "text"),
               c("proposals"),
@@ -448,7 +448,7 @@ describe("attendee charts", { tags: ["021-US1"] }, () => {
   it("draws RSVPs per attendee and the gaps between sessions", async () => {
     const c = (key: string, type: "text" | "integer" = "integer") => ({
       key,
-      label: key,
+      labelId: key,
       type,
     });
     renderScreen("section=attendees", {
@@ -457,7 +457,7 @@ describe("attendee charts", { tags: ["021-US1"] }, () => {
         tables: [
           {
             id: "attendees-table",
-            title: "RSVPs per attendee",
+            titleId: "rsvpsPerAttendee",
             columns: [c("attendee", "text"), c("rsvps")],
             rows: [
               ["P001", 5],
@@ -466,7 +466,7 @@ describe("attendee charts", { tags: ["021-US1"] }, () => {
           },
           {
             id: "attendees-gaps",
-            title: "Gaps between RSVPed sessions",
+            titleId: "gapsBetweenRsvpedSessions",
             columns: [c("gap", "text"), c("gaps")],
             rows: [
               ["Back to back", 4],
@@ -494,14 +494,14 @@ describe("location charts", { tags: ["021-US1"] }, () => {
     const c = (
       key: string,
       type: "text" | "integer" | "number" = "integer"
-    ) => ({ key, label: key, type });
+    ) => ({ key, labelId: key, type });
     renderScreen("section=locations", {
       stats: {
         ...stats,
         tables: [
           {
             id: "locations-table",
-            title: "Locations",
+            titleId: "locations",
             columns: [c("location", "text"), c("utilization", "number")],
             rows: [
               ["Main Hall", 62.5],
@@ -510,7 +510,7 @@ describe("location charts", { tags: ["021-US1"] }, () => {
           },
           {
             id: "locations-heatmap",
-            title: "Utilization by hour",
+            titleId: "utilizationByHour",
             columns: [
               c("day", "text"),
               c("location", "text"),
@@ -525,7 +525,7 @@ describe("location charts", { tags: ["021-US1"] }, () => {
           },
           {
             id: "locations-supply-demand",
-            title: "Parallel sessions and RSVPs by hour",
+            titleId: "parallelSessionsAndRsvpsByHour",
             columns: [
               c("day", "text"),
               c("hour", "text"),
@@ -566,14 +566,14 @@ describe("1-on-1 charts", { tags: ["021-US1"] }, () => {
     const c = (
       key: string,
       type: "text" | "integer" | "number" = "integer"
-    ) => ({ key, label: key, type });
+    ) => ({ key, labelId: key, type });
     renderScreen("section=meetings", {
       stats: {
         ...stats,
         tables: [
           {
             id: "meetings-status",
-            title: "Requests by status",
+            titleId: "requestsByStatus",
             columns: [c("status", "text"), c("requests")],
             rows: [
               ["Accepted", 4],
@@ -582,7 +582,7 @@ describe("1-on-1 charts", { tags: ["021-US1"] }, () => {
           },
           {
             id: "meetings-slots",
-            title: "Slots offered per person",
+            titleId: "slotsOfferedPerPerson",
             columns: [c("from"), c("to"), c("people")],
             rows: [
               [1, 2, 3],
@@ -611,7 +611,7 @@ describe("1-on-1 charts", { tags: ["021-US1"] }, () => {
 describe("profile and comment charts", { tags: ["021-US1"] }, () => {
   const c = (key: string, type: "text" | "integer" | "number" = "integer") => ({
     key,
-    label: key,
+    labelId: key,
     type,
   });
 
@@ -622,7 +622,7 @@ describe("profile and comment charts", { tags: ["021-US1"] }, () => {
         tables: [
           {
             id: "profiles-fields",
-            title: "Members with each profile field",
+            titleId: "membersWithEachProfileField",
             columns: [c("field", "text"), c("members")],
             rows: [
               ["Photo", 1],
@@ -647,7 +647,7 @@ describe("profile and comment charts", { tags: ["021-US1"] }, () => {
         tables: [
           {
             id: "comments-per-day",
-            title: "Comments per day",
+            titleId: "commentsPerDay",
             columns: [c("day", "text"), c("comments")],
             rows: [
               ["2026-05-01", 4],
@@ -656,7 +656,7 @@ describe("profile and comment charts", { tags: ["021-US1"] }, () => {
           },
           {
             id: "comments-per-author",
-            title: "Comments per author",
+            titleId: "commentsPerAuthor",
             columns: [c("from"), c("to"), c("authors")],
             rows: [
               [1, 2, 3],
@@ -788,12 +788,12 @@ describe("the statistics filter panel", { tags: ["021-US3"] }, () => {
 describe("figures with gaps in their data", { tags: ["021-US1"] }, () => {
   const table = (
     id: string,
-    columns: [string, "text" | "integer" | "percent"][],
+    columns: [string, "text" | "label" | "integer" | "percent"][],
     rows: (string | number | null)[][]
   ) => ({
     id,
-    title: id,
-    columns: columns.map(([key, type]) => ({ key, label: key, type })),
+    titleId: id,
+    columns: columns.map(([key, type]) => ({ key, labelId: key, type })),
     rows,
   });
 
@@ -828,15 +828,15 @@ describe("figures with gaps in their data", { tags: ["021-US1"] }, () => {
           table(
             "proposals-choice-mix",
             [
-              ["figure", "text"],
+              ["figure", "label"],
               ["value", "integer"],
               ["share", "percent"],
             ],
             [
-              ["Interested", 5, 50],
-              ["Maybe", 3, 30],
-              ["Skip", 2, 20],
-              ["Voters who voted on every proposal", 1, 25],
+              ["interested", 5, 50],
+              ["maybe", 3, 30],
+              ["skip", 2, 20],
+              ["votersOnEveryProposal", 1, 25],
             ]
           ),
         ],

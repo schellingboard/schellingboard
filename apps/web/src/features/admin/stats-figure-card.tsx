@@ -9,11 +9,12 @@ import { Dialog } from "../../ui/dialog";
 import { QuestionMarkCircleIcon } from "../../ui/icons";
 import type { Figure } from "./stats-figures";
 import { formatCell, SortableStatsTable } from "./stats-table";
+import { statsTitle } from "./stats-text";
 
 export const figureHeadingId = (figure: Figure) => `stats-${figure.key}`;
 
 export const figureTitle = (figure: Figure, table: StatsTable) =>
-  figure.title ? i18n._(figure.title) : table.title;
+  figure.title ? i18n._(figure.title) : statsTitle(table.titleId);
 
 const switchButton =
   "px-2.5 py-1 text-sm font-medium first:rounded-l-md last:rounded-r-md";
@@ -61,7 +62,9 @@ function Tiles({ table, label }: { table: StatsTable; label: string }) {
           >
             {formatCell(row[1], table.columns[1].type)}
           </p>
-          <p className="text-sm text-fg-muted">{String(row[0])}</p>
+          <p className="text-sm text-fg-muted">
+            {formatCell(row[0], table.columns[0].type)}
+          </p>
         </li>
       ))}
     </ul>
@@ -79,7 +82,7 @@ export function FigureCard({
 }) {
   const [asTable, setAsTable] = useState(false);
   const title = figureTitle(figure, table);
-  const tableTitle = table.title;
+  const tableTitle = statsTitle(table.titleId);
   const headingId = figureHeadingId(figure);
   const hasData = table.rows.length > 0 && (figure.hasChart?.(table) ?? true);
   const switchable = Boolean(figure.chart) && !figure.from && hasData;

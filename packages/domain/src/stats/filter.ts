@@ -25,6 +25,14 @@ const ORIGIN_WORDS: Record<SessionOrigin, string> = {
   spontaneous: "spontaneous sessions",
 };
 
+export function filterExclusions(filter: StatsFilterInput) {
+  return {
+    locations: filter.excludeLocations.length,
+    hosts: filter.excludeHosts.length,
+    origins: filter.excludeOrigins,
+  };
+}
+
 export function filterSummary(filter: StatsFilterInput): string {
   const parts = [
     filter.excludeLocations.length > 0 &&

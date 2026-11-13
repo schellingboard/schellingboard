@@ -6,6 +6,7 @@ import {
   type StatsFilterInput,
 } from "@schellingboard/domain/stats/filter";
 import { pseudonymize } from "@schellingboard/domain/stats/pseudonyms";
+import { statsRef } from "@schellingboard/domain/stats/text";
 import { DateTime } from "luxon";
 
 import { col, doublingEdges, percent } from "./cells";
@@ -14,14 +15,13 @@ const MINUTE = 60_000;
 
 type Meeting = EventFacts["meetings"][number];
 
-const STATUSES = ["Accepted", "Declined", "Canceled", "Pending", "Expired"];
+const STATUSES = ["accepted", "declined", "canceled", "pending", "expired"];
 
 function statusOf(meeting: Meeting, now: Date) {
-  if (meeting.status !== "pending")
-    return meeting.status[0].toUpperCase() + meeting.status.slice(1);
+  if (meeting.status !== "pending") return meeting.status;
   return new Date(meeting.slotStart).getTime() <= now.getTime()
-    ? "Expired"
-    : "Pending";
+    ? "expired"
+    : "pending";
 }
 
 const minutesBetween = (from: string, to: string) =>
@@ -45,30 +45,30 @@ export function meetingTables(
   const slotsOffered = offered.reduce((sum, c) => sum + c.slots, 0);
   const adoption: StatsTable = {
     id: "meetings-adoption",
-    title: "Availability for 1-on-1s",
+    titleId: "availabilityForOneOnOnes",
     columns: [
-      col("figure", "Figure", "text"),
-      col("value", "Value", "integer"),
-      col("share", "Share of members", "percent"),
+      col("figure", "figure", "label"),
+      col("value", "value", "integer"),
+      col("share", "shareOfMembers", "percent"),
     ],
     rows: [
-      ["Members", people.size, 100],
+      ["members", people.size, 100],
       [
-        "Members with availability",
+        "membersWithAvailability",
         offered.length,
         percent(offered.length, people.size),
       ],
-      ["Slots offered", slotsOffered, null],
+      ["slotsOffered", slotsOffered, null],
     ],
   };
 
   const slots: StatsTable = {
     id: "meetings-slots",
-    title: "Slots offered per person",
+    titleId: "slotsOfferedPerPerson",
     columns: [
-      col("from", "Slots, from", "integer"),
-      col("to", "Slots, up to", "integer"),
-      col("people", "People", "integer"),
+      col("from", "slotsFrom", "integer"),
+      col("to", "slotsUpTo", "integer"),
+      col("people", "people", "integer"),
     ],
     rows:
       offered.length === 0
@@ -82,11 +82,11 @@ export function meetingTables(
   const statuses = meetings.map((m) => statusOf(m, now));
   const status: StatsTable = {
     id: "meetings-status",
-    title: "Requests by status",
+    titleId: "requestsByStatus",
     columns: [
-      col("status", "Status", "text"),
-      col("requests", "Requests", "integer"),
-      col("share", "Share of requests", "percent"),
+      col("status", "status", "label"),
+      col("requests", "requests", "integer"),
+      col("share", "shareOfRequests", "percent"),
     ],
     rows: (meetings.length === 0 ? [] : STATUSES).map((name) => {
       const n = statuses.filter((s) => s === name).length;
@@ -102,20 +102,20 @@ export function meetingTables(
   );
   const peopleTable: StatsTable = {
     id: "meetings-people",
-    title: "People in 1-on-1 requests",
+    titleId: "peopleInOneOnOneRequests",
     columns: [
-      col("figure", "Figure", "text"),
-      col("people", "People", "integer"),
-      col("share", "Share of members", "percent"),
+      col("figure", "figure", "label"),
+      col("people", "people", "integer"),
+      col("share", "shareOfMembers", "percent"),
     ],
     rows:
       meetings.length === 0
         ? []
         : (
             [
-              ["Requested", requesters],
-              ["Asked", recipients],
-              ["With an accepted meeting", meeters],
+              ["requested", requesters],
+              ["asked", recipients],
+              ["withAnAcceptedMeeting", meeters],
             ] as const
           ).map(([label, set]) => [
             label,
@@ -140,12 +140,12 @@ export function meetingTables(
   }
   const perPerson: StatsTable = {
     id: "meetings-per-person",
-    title: "1-on-1 requests per person",
+    titleId: "oneOnOneRequestsPerPerson",
     columns: [
-      col("person", "Person", "text"),
-      col("sent", "Requests sent", "integer"),
-      col("received", "Requests received", "integer"),
-      col("accepted", "Accepted meetings", "integer"),
+      col("person", "person", "text"),
+      col("sent", "requestsSent", "integer"),
+      col("received", "requestsReceived", "integer"),
+      col("accepted", "acceptedMeetings", "integer"),
     ],
     rows: pseudonymize([...tally.values()]).map(({ pseudonym, values }) => [
       pseudonym,
@@ -164,20 +164,20 @@ export function meetingTables(
   ];
   const response: StatsTable = {
     id: "meetings-response",
-    title: "Response time (a later cancel hides the response)",
+    titleId: "responseTime",
     columns: [
-      col("outcome", "Outcome", "text"),
-      col("requests", "Requests", "integer"),
-      col("median", "Median response time", "minutes"),
+      col("outcome", "outcome", "label"),
+      col("requests", "requests", "integer"),
+      col("median", "medianResponseTime", "minutes"),
     ],
     rows:
       answered(["accepted", "declined"]).length === 0
         ? []
         : [
-            responseRow("Accepted", answered(["accepted"])),
-            responseRow("Declined", answered(["declined"])),
+            responseRow("accepted", answered(["accepted"])),
+            responseRow("declined", answered(["declined"])),
             responseRow(
-              "Accepted and declined",
+              "acceptedAndDeclined",
               answered(["accepted", "declined"])
             ),
           ],
@@ -191,11 +191,11 @@ export function meetingTables(
   }
   const when: StatsTable = {
     id: "meetings-when",
-    title: "Accepted meetings by day and hour",
+    titleId: "acceptedMeetingsByDayAndHour",
     columns: [
-      col("day", "Day", "text"),
-      col("hour", "Hour", "text"),
-      col("meetings", "Meetings", "integer"),
+      col("day", "day", "text"),
+      col("hour", "hour", "text"),
+      col("meetings", "meetings", "integer"),
     ],
     rows: [...byHour]
       .sort(([a], [b]) => a.localeCompare(b))
@@ -215,11 +215,11 @@ export function meetingTables(
   }
   const points: StatsTable = {
     id: "meetings-points",
-    title: "Meeting points",
+    titleId: "meetingPoints",
     columns: [
-      col("point", "Meeting point", "text"),
-      col("requests", "Requests", "integer"),
-      col("share", "Share of requests", "percent"),
+      col("point", "meetingPoint", "label"),
+      col("requests", "requests", "integer"),
+      col("share", "shareOfRequests", "percent"),
     ],
     rows:
       meetings.length === 0
@@ -227,9 +227,13 @@ export function meetingTables(
         : [
             ...pointNames.map((name) => {
               const n = uses.get(keyOf(name))!;
-              return [name, n, percent(n, meetings.length)];
+              return [
+                statsRef("literal", name),
+                n,
+                percent(n, meetings.length),
+              ];
             }),
-            ["Other", other, percent(other, meetings.length)],
+            ["other", other, percent(other, meetings.length)],
           ],
   };
 

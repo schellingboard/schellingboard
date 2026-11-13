@@ -10,9 +10,9 @@ import { DateTime } from "luxon";
 import { col, doublingEdges } from "./cells";
 
 const KINDS = [
-  ["proposal", "Proposals"],
-  ["session", "Sessions"],
-  ["profile", "Profiles"],
+  ["proposal", "proposals"],
+  ["session", "sessions"],
+  ["profile", "profiles"],
 ] as const;
 
 export function commentTables(
@@ -35,15 +35,15 @@ export function commentTables(
 
   const perTarget: StatsTable = {
     id: "comments-targets",
-    title: "Comments by what they are on",
+    titleId: "commentsByWhatTheyAreOn",
     columns: [
-      col("target", "On", "text"),
-      col("comments", "Comments", "integer"),
-      col("authors", "Authors", "integer"),
-      col("replies", "Replies", "integer"),
-      col("likes", "Likes", "integer"),
-      col("edited", "Edited", "integer"),
-      col("deleted", "Deleted, kept for replies", "integer"),
+      col("target", "on", "label"),
+      col("comments", "comments", "integer"),
+      col("authors", "authors", "integer"),
+      col("replies", "replies", "integer"),
+      col("likes", "likes", "integer"),
+      col("edited", "edited", "integer"),
+      col("deleted", "deletedKeptForReplies", "integer"),
     ],
     rows: KINDS.map(([kind, label]) => {
       const mine = live.filter((c) => c.kind === kind);
@@ -71,10 +71,10 @@ export function commentTables(
   }
   const perDay: StatsTable = {
     id: "comments-per-day",
-    title: "Comments per day",
+    titleId: "commentsPerDay",
     columns: [
-      col("day", "Day", "text"),
-      col("comments", "Comments", "integer"),
+      col("day", "day", "text"),
+      col("comments", "comments", "integer"),
     ],
     rows: [...byDay].sort(([a], [b]) => a.localeCompare(b)),
   };
@@ -86,11 +86,11 @@ export function commentTables(
   const totals = [...perAuthor.values()];
   const authors: StatsTable = {
     id: "comments-per-author",
-    title: "Comments per author",
+    titleId: "commentsPerAuthor",
     columns: [
-      col("from", "Comments, from", "integer"),
-      col("to", "Comments, up to", "integer"),
-      col("authors", "Authors", "integer"),
+      col("from", "commentsFrom", "integer"),
+      col("to", "commentsUpTo", "integer"),
+      col("authors", "authors", "integer"),
     ],
     rows:
       totals.length === 0

@@ -9,6 +9,7 @@ export const statsColumnTypeSchema = z.enum([
   "minutes",
   "datetime",
   "boolean",
+  "label",
 ]);
 
 export const statsCellSchema = z.union([
@@ -20,13 +21,17 @@ export const statsCellSchema = z.union([
 
 export const statsTableSchema = z.object({
   id: z.string().describe("Stable name of the table, also its CSV file name"),
-  title: z.string(),
+  titleId: z
+    .string()
+    .describe("Id of the table's title; the client turns it into text"),
   columns: z.array(
     z.object({
       key: z.string(),
-      label: z.string(),
+      labelId: z
+        .string()
+        .describe("Id of the column's heading; the client turns it into text"),
       type: statsColumnTypeSchema.describe(
-        "A percent is a number from 0 to 100. A null cell means No data"
+        "A percent is a number from 0 to 100. A null cell means No data. A label cell holds a text id, or `id:param` when the text embeds one raw value; the client turns it into text"
       ),
     })
   ),
@@ -63,7 +68,13 @@ export type StatsFilter = z.output<typeof statsFilterQuerySchema>;
 
 export const eventStatisticsSchema = z.object({
   event: z.object({ id: z.string(), name: z.string(), slug: z.string() }),
-  filterSummary: z.string().describe("The active filter in one line"),
+  filterSummary: z
+    .object({
+      locations: z.number().int().describe("Locations left out"),
+      hosts: z.number().int().describe("Hosts left out"),
+      origins: z.array(z.enum(SESSION_ORIGINS)).describe("Origins left out"),
+    })
+    .describe("What the active filter leaves out; the client words it"),
   filterOptions: z.object({
     locations: z.array(z.object({ id: z.string(), name: z.string() })),
     hosts: z.array(z.object({ id: z.string(), name: z.string() })),

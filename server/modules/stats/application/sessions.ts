@@ -20,6 +20,12 @@ import {
   type SessionOrigin,
   sessionOrigin,
 } from "@schellingboard/domain/stats/session-origin";
+import {
+  type StatsCellId,
+  type StatsColumnId,
+  statsRef,
+  type StatsTitleId,
+} from "@schellingboard/domain/stats/text";
 import { DateTime } from "luxon";
 
 import {
@@ -57,6 +63,13 @@ interface Row {
   p50: Prediction | null;
   p80: Prediction | null;
 }
+
+const SESSIONS_OF: Record<SessionOrigin, StatsCellId> = {
+  blocker: "sessionsBlocker",
+  proposal: "sessionsProposal",
+  organizer: "sessionsOrganizer",
+  spontaneous: "sessionsSpontaneous",
+};
 
 function sessionRows(facts: EventFacts, filter: StatsFilterInput) {
   const { sessions, people } = applyFilter(facts, filter);
@@ -149,10 +162,11 @@ const medianOf = (values: (number | null)[]) => round(median(present(values)));
 
 function groupedTable(
   id: string,
-  title: string,
-  label: string,
+  titleId: StatsTitleId,
+  label: StatsColumnId,
   rows: Row[],
-  keyOf: (row: Row) => string | null
+  keyOf: (row: Row) => string | null,
+  type: "label" | "text" = "label"
 ): StatsTable {
   const groups = new Map<string, Row[]>();
   for (const row of rows) {
@@ -164,13 +178,13 @@ function groupedTable(
   }
   return {
     id,
-    title,
+    titleId,
     columns: [
-      col("group", label, "text"),
-      col("sessions", "Sessions", "integer"),
-      col("medianRsvps", "Median RSVPs", "number"),
-      col("medianAttendees", "Median reported attendees", "number"),
-      col("medianDuration", "Median duration", "minutes"),
+      col("group", label, type),
+      col("sessions", "sessions", "integer"),
+      col("medianRsvps", "medianRsvps", "number"),
+      col("medianAttendees", "medianReportedAttendees", "number"),
+      col("medianDuration", "medianDuration", "minutes"),
     ],
     rows: [...groups.entries()]
       .sort(([a], [b]) => a.localeCompare(b))
@@ -186,8 +200,9 @@ function groupedTable(
 
 function binTable(
   id: string,
-  title: string,
-  label: string,
+  titleId: StatsTitleId,
+  from: StatsColumnId,
+  to: StatsColumnId,
   type: Column["type"],
   edges: number[],
   rows: Row[],
@@ -200,13 +215,13 @@ function binTable(
   );
   return {
     id,
-    title,
+    titleId,
     columns: [
-      col("from", `${label}, from`, type),
-      col("to", `${label}, up to`, type),
-      col("sessions", "Sessions", "integer"),
-      col("medianRsvps", "Median RSVPs", "number"),
-      col("medianAttendees", "Median reported attendees", "number"),
+      col("from", from, type),
+      col("to", to, type),
+      col("sessions", "sessions", "integer"),
+      col("medianRsvps", "medianRsvps", "number"),
+      col("medianAttendees", "medianReportedAttendees", "number"),
     ],
     rows: usable.length
       ? bins.map((bin) => {
@@ -262,38 +277,38 @@ function reportsTable(
   );
   return {
     id: "sessions-reports",
-    title: "Did hosts report attendance?",
+    titleId: "didHostsReportAttendance",
     columns: [
-      col("group", "Group", "text"),
-      col("asked", "Asked", "integer"),
-      col("reported", "Reported", "integer"),
-      col("share", "Share reported", "percent"),
+      col("group", "group", "label"),
+      col("asked", "asked", "integer"),
+      col("reported", "reported", "integer"),
+      col("share", "shareReported", "percent"),
     ],
     rows: asked.length
       ? [
-          line("Sessions", asked),
+          line("sessions", asked),
           ...origins.map((o) =>
             line(
-              `Sessions: ${o}`,
+              SESSIONS_OF[o],
               asked.filter((r) => r.origin === o)
             )
           ),
           ...days.map((d) =>
             line(
-              `Sessions: ${d}`,
+              statsRef("sessionsDay", d),
               asked.filter((r) => r.start?.toISODate() === d)
             )
           ),
           line(
-            "Follow-up reminder sent",
+            "followUpReminderSent",
             asked.filter((r) => r.followUpSent)
           ),
           line(
-            "No follow-up reminder",
+            "noFollowUpReminder",
             asked.filter((r) => !r.followUpSent)
           ),
           [
-            "Hosts",
+            "hosts",
             hostIds.size,
             anyReported ? reportingHosts.size : null,
             anyReported ? percent(reportingHosts.size, hostIds.size) : null,
@@ -314,35 +329,31 @@ export function sessionTables(
 
   const table: StatsTable = {
     id: "sessions-table",
-    title: "Sessions",
+    titleId: "sessions",
     columns: [
-      col("title", "Title", "text"),
-      col("origin", "Origin", "text"),
-      col("day", "Day", "text"),
-      col("start", "Start", "datetime"),
-      col("end", "End", "datetime"),
-      col("duration", "Duration", "minutes"),
-      col("locations", "Locations", "text"),
-      col("hosts", "Hosts", "text"),
-      col("capacity", "Capacity", "integer"),
-      col("rsvps", "RSVPs", "integer"),
-      col("fill", "Fill", "percent"),
-      col("reported", "Reported attendees", "integer"),
-      col("perRsvp", "Attendees per RSVP", "number"),
-      col("closed", "Closed", "boolean"),
-      col("parallel", "Parallel sessions", "integer"),
-      col("interest", "Proposal interest", "percent"),
-      col("votes", "Proposal votes", "integer"),
-      col("comments", "Comments", "integer"),
-      col(
-        "predicted",
-        "Predicted attendance (model fitted on one event)",
-        "number"
-      ),
-      col("low50", "Predicted, 50% range from", "number"),
-      col("high50", "Predicted, 50% range to", "number"),
-      col("low80", "Predicted, 80% range from", "number"),
-      col("high80", "Predicted, 80% range to", "number"),
+      col("title", "title", "text"),
+      col("origin", "origin", "label"),
+      col("day", "day", "text"),
+      col("start", "start", "datetime"),
+      col("end", "end", "datetime"),
+      col("duration", "duration", "minutes"),
+      col("locations", "locations", "text"),
+      col("hosts", "hosts", "text"),
+      col("capacity", "capacity", "integer"),
+      col("rsvps", "rsvps", "integer"),
+      col("fill", "fill", "percent"),
+      col("reported", "reportedAttendees", "integer"),
+      col("perRsvp", "attendeesPerRsvp", "number"),
+      col("closed", "closed", "boolean"),
+      col("parallel", "parallelSessions", "integer"),
+      col("interest", "proposalInterest", "percent"),
+      col("votes", "proposalVotes", "integer"),
+      col("comments", "comments", "integer"),
+      col("predicted", "predictedAttendance", "number"),
+      col("low50", "predicted50PercentRangeFrom", "number"),
+      col("high50", "predicted50PercentRangeTo", "number"),
+      col("low80", "predicted80PercentRangeFrom", "number"),
+      col("high80", "predicted80PercentRangeTo", "number"),
     ],
     rows: rows.map((r) => [
       r.title,
@@ -380,30 +391,33 @@ export function sessionTables(
 
   const hosts: StatsTable = {
     id: "sessions-hosts",
-    title: "Hosts",
-    columns: [col("figure", "Figure", "text"), col("value", "Value", "number")],
+    titleId: "hosts",
+    columns: [
+      col("figure", "figure", "label"),
+      col("value", "value", "number"),
+    ],
     rows: [
-      ["Sessions with a host", withHost.length],
-      ["Hosts", hostedBy.size],
+      ["sessionsWithAHost", withHost.length],
+      ["hosts", hostedBy.size],
       [
-        "Share of members who hosted (%)",
+        "shareOfMembersWhoHosted",
         percent(
           [...hostedBy.keys()].filter((h) => people.has(h)).length,
           people.size
         ),
       ],
       [
-        "Sessions with more than one host",
+        "sessionsWithMoreThanOneHost",
         rows.filter((r) => r.hostIds.length > 1).length,
       ],
     ],
   };
   const spread: StatsTable = {
     id: "sessions-per-host",
-    title: "Sessions per host",
+    titleId: "sessionsPerHost",
     columns: [
-      col("sessions", "Sessions hosted", "text"),
-      col("hosts", "Hosts", "integer"),
+      col("sessions", "sessionsHosted", "text"),
+      col("hosts", "hosts", "integer"),
     ],
     rows: [...perHost.entries()]
       .sort(([a], [b]) => a - b)
@@ -414,12 +428,12 @@ export function sessionTables(
   const usedLocations = new Set(rows.flatMap((r) => r.locationIds));
   const capacity: StatsTable = {
     id: "sessions-capacity",
-    title: "Capacity by location",
+    titleId: "capacityByLocation",
     columns: [
-      col("location", "Location", "text"),
-      col("sessions", "Sessions", "integer"),
-      col("limited", "Sessions with a capacity", "integer"),
-      col("over", "Sessions over capacity", "integer"),
+      col("location", "location", "text"),
+      col("sessions", "sessions", "integer"),
+      col("limited", "sessionsWithACapacity", "integer"),
+      col("over", "sessionsOverCapacity", "integer"),
     ],
     rows: facts.locations
       .filter(
@@ -439,17 +453,18 @@ export function sessionTables(
 
   const closed = groupedTable(
     "sessions-closed",
-    "Closed sessions",
-    "Kind",
+    "closedSessions",
+    "kind",
     rows,
-    (r) => (r.closed ? "Closed" : "Open")
+    (r) => (r.closed ? "closed" : "open")
   );
 
   const reportedRows = rows.filter((r) => r.reported !== null && r.rsvps > 0);
   const ratio = binTable(
     "sessions-attendance-ratio",
-    "Attendees per RSVP",
-    "Attendees per RSVP",
+    "attendeesPerRsvp",
+    "attendeesPerRsvpFrom",
+    "attendeesPerRsvpUpTo",
     "number",
     edgesTo(
       [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5],
@@ -470,23 +485,22 @@ export function sessionTables(
       inside,
       percent(inside, compared.length),
       expected,
-      compared.length < TOO_FEW_TO_SAY ? "too few to say" : null,
+      compared.length < TOO_FEW_TO_SAY ? "tooFewToSay" : null,
     ];
   };
   const calibration: StatsTable = {
     id: "sessions-calibration",
-    title:
-      "Predicted attendance: how often the report falls in the range (model fitted on one event, n = 13)",
+    titleId: "predictionCalibration",
     columns: [
-      col("range", "Range", "text"),
-      col("compared", "Sessions compared", "integer"),
-      col("inside", "Reports inside", "integer"),
-      col("share", "Share inside", "percent"),
-      col("expected", "Expected share", "percent"),
-      col("note", "Note", "text"),
+      col("range", "range", "label"),
+      col("compared", "sessionsCompared", "integer"),
+      col("inside", "reportsInside", "integer"),
+      col("share", "shareInside", "percent"),
+      col("expected", "expectedShare", "percent"),
+      col("note", "note", "label"),
     ],
     rows: compared.length
-      ? [calibrate("50% range", 50, "p50"), calibrate("80% range", 80, "p80")]
+      ? [calibrate("range50", 50, "p50"), calibrate("range80", 80, "p80")]
       : [],
   };
 
@@ -495,8 +509,8 @@ export function sessionTables(
     calibration,
     groupedTable(
       "sessions-origins",
-      "Session origins",
-      "Origin",
+      "sessionOrigins",
+      "origin",
       rows,
       (r) => r.origin
     ),
@@ -506,8 +520,9 @@ export function sessionTables(
     ratio,
     binTable(
       "sessions-duration",
-      "Session duration",
-      "Duration (min)",
+      "sessionDuration",
+      "durationMinFrom",
+      "durationMinUpTo",
       "minutes",
       edgesTo(
         [0, 30, 60, 90, 120, 180, 240],
@@ -518,17 +533,19 @@ export function sessionTables(
     ),
     groupedTable(
       "sessions-by-hour",
-      "Sessions by start hour",
-      "Start hour",
+      "sessionsByStartHour",
+      "startHour",
       rows,
-      (r) => r.start?.toFormat("HH:00") ?? null
+      (r) => r.start?.toFormat("HH:00") ?? null,
+      "text"
     ),
     groupedTable(
       "sessions-by-day",
-      "Sessions by day",
-      "Day",
+      "sessionsByDay",
+      "day",
       rows,
-      (r) => r.start?.toISODate() ?? null
+      (r) => r.start?.toISODate() ?? null,
+      "text"
     ),
     closed,
     capacity,

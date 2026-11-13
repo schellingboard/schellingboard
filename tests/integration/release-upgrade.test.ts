@@ -138,7 +138,7 @@ describe.each(dumps)("upgrading from $version", (dump) => {
         (t) => t.id === "overview-headline"
       );
       const reports = headline?.rows.find(
-        (r) => r[0] === "Sessions with an attendee report"
+        (r) => r[0] === "sessionsWithAnAttendeeReport"
       )?.[1];
       const counts = await Promise.all(
         (await sessions.listByEvent(event.id))

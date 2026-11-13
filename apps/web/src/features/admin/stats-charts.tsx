@@ -16,6 +16,7 @@ import { RankedBars } from "../../ui/charts/ranked-bars";
 import { Scatter } from "../../ui/charts/scatter";
 import { StackedBars } from "../../ui/charts/stacked-bars";
 import { percentLabel } from "./stats-table";
+import { statsLabelText, statsTitle } from "./stats-text";
 
 export { percentLabel };
 
@@ -73,15 +74,24 @@ export function CountBars({
   const data = useMemo(() => {
     const label = column(table, labelKey);
     const value = column(table, valueKey);
+    const translated =
+      table.columns.find((c) => c.key === labelKey)?.type === "label";
     const bars = table.rows.flatMap((row) =>
       value(row) === null || (only && !only.includes(String(label(row))))
         ? []
-        : [{ label: String(label(row)), value: Number(value(row)) }]
+        : [
+            {
+              label: translated
+                ? statsLabelText(label(row))
+                : String(label(row)),
+              value: Number(value(row)),
+            },
+          ]
     );
     return top ? bars.sort((a, b) => b.value - a.value).slice(0, top) : bars;
   }, [table, labelKey, valueKey, top, only]);
   if (data.length === 0) return <NoData />;
-  const title = table.title;
+  const title = statsTitle(table.titleId);
   const list = listed(data);
   return (
     <RankedBars
@@ -186,7 +196,7 @@ export function BinChart({
     }));
   }, [table, countKey]);
   if (bins.length === 0) return <NoData />;
-  const title = table.title;
+  const title = statsTitle(table.titleId);
   const list = bins.map((b) => `${b.from}–${b.to}: ${b.count}`).join(", ");
   return (
     <Histogram

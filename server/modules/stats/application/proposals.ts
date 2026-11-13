@@ -11,10 +11,10 @@ import { DateTime } from "luxon";
 import { type Cell, col, percent, round, tallyVotes } from "./cells";
 
 const QUARTERS = [
-  "Top quarter",
-  "Second quarter",
-  "Third quarter",
-  "Bottom quarter",
+  "topQuarter",
+  "secondQuarter",
+  "thirdQuarter",
+  "bottomQuarter",
 ];
 const DAY_MS = 86_400_000;
 
@@ -80,24 +80,24 @@ export function proposalTables(
 
   const table: StatsTable = {
     id: "proposals-table",
-    title: "Proposals",
+    titleId: "proposals",
     columns: [
-      col("title", "Title", "text"),
-      col("hosts", "Hosts", "text"),
-      col("created", "Created", "datetime"),
-      col("daysIn", "Days after the first proposal", "number"),
-      col("duration", "Duration", "minutes"),
-      col("cohost", "Co-host wanted", "boolean"),
-      col("interested", "Interested", "integer"),
-      col("maybe", "Maybe", "integer"),
-      col("skip", "Skip", "integer"),
-      col("voters", "Voters", "integer"),
-      col("interest", "Interest share", "percent"),
-      col("rank", "Rank", "integer"),
-      col("session", "Became a session", "boolean"),
-      col("rsvps", "Session RSVPs", "integer"),
-      col("reported", "Reported attendees", "integer"),
-      col("comments", "Comments", "integer"),
+      col("title", "title", "text"),
+      col("hosts", "hosts", "text"),
+      col("created", "created", "datetime"),
+      col("daysIn", "daysAfterTheFirstProposal", "number"),
+      col("duration", "duration", "minutes"),
+      col("cohost", "coHostWanted", "boolean"),
+      col("interested", "interested", "integer"),
+      col("maybe", "maybe", "integer"),
+      col("skip", "skip", "integer"),
+      col("voters", "voters", "integer"),
+      col("interest", "interestShare", "percent"),
+      col("rank", "rank", "integer"),
+      col("session", "becameASession", "boolean"),
+      col("rsvps", "sessionRsvps", "integer"),
+      col("reported", "reportedAttendees", "integer"),
+      col("comments", "comments", "integer"),
     ],
     rows: base.map((b) => [
       b.p.title,
@@ -125,13 +125,13 @@ export function proposalTables(
   );
   const unscheduled: StatsTable = {
     id: "proposals-unscheduled",
-    title: "Popular but never scheduled",
+    titleId: "popularButNeverScheduled",
     columns: [
-      col("title", "Title", "text"),
-      col("hosts", "Hosts", "text"),
-      col("interested", "Interested", "integer"),
-      col("voters", "Voters", "integer"),
-      col("interest", "Interest share", "percent"),
+      col("title", "title", "text"),
+      col("hosts", "hosts", "text"),
+      col("interested", "interested", "integer"),
+      col("voters", "voters", "integer"),
+      col("interest", "interestShare", "percent"),
     ],
     rows: base
       .filter(
@@ -168,10 +168,10 @@ export function proposalTables(
   }
   const overTime: StatsTable = {
     id: "proposals-over-time",
-    title: "Proposals over time",
+    titleId: "proposalsOverTime",
     columns: [
-      col("day", "Day", "text"),
-      col("proposals", "Proposals created", "integer"),
+      col("day", "day", "text"),
+      col("proposals", "proposalsCreated", "integer"),
     ],
     rows: days,
   };
@@ -185,15 +185,15 @@ export function proposalTables(
   }
   const voters: StatsTable = {
     id: "proposals-voters",
-    title: "Votes per voter",
+    titleId: "votesPerVoter",
     columns: [
-      col("voter", "Voter", "text"),
-      col("total", "Votes", "integer"),
-      col("interested", "Interested", "integer"),
-      col("maybe", "Maybe", "integer"),
-      col("skip", "Skip", "integer"),
-      col("coverage", "Share of proposals voted on", "percent"),
-      col("interestedShare", "Share interested", "percent"),
+      col("voter", "voter", "text"),
+      col("total", "votes", "integer"),
+      col("interested", "interested", "integer"),
+      col("maybe", "maybe", "integer"),
+      col("skip", "skip", "integer"),
+      col("coverage", "shareOfProposalsVotedOn", "percent"),
+      col("interestedShare", "shareInterested", "percent"),
     ],
     rows: pseudonymize([...perVoter.values()]).map(({ pseudonym, values }) => [
       pseudonym,
@@ -211,21 +211,21 @@ export function proposalTables(
     [...perVoter.values()].reduce((s, c) => s + c[i], 0);
   const mix: StatsTable = {
     id: "proposals-choice-mix",
-    title: "Choice mix",
+    titleId: "choiceMix",
     columns: [
-      col("figure", "Figure", "text"),
-      col("value", "Value", "integer"),
-      col("share", "Share", "percent"),
+      col("figure", "figure", "label"),
+      col("value", "value", "integer"),
+      col("share", "share", "percent"),
     ],
     rows:
       votes.length === 0
         ? []
         : [
-            ["Interested", sum(1), percent(sum(1), votes.length)],
-            ["Maybe", sum(2), percent(sum(2), votes.length)],
-            ["Skip", sum(3), percent(sum(3), votes.length)],
+            ["interested", sum(1), percent(sum(1), votes.length)],
+            ["maybe", sum(2), percent(sum(2), votes.length)],
+            ["skip", sum(3), percent(sum(3), votes.length)],
             [
-              "Voters who voted on every proposal",
+              "votersOnEveryProposal",
               everything,
               percent(everything, voterCount),
             ],
@@ -240,33 +240,30 @@ export function proposalTables(
   for (const n of hostedBy.values()) spread.set(n, (spread.get(n) ?? 0) + 1);
   const hostsTable: StatsTable = {
     id: "proposals-hosts",
-    title: "Hosts and proposals",
+    titleId: "hostsAndProposals",
     columns: [
-      col("figure", "Figure", "text"),
-      col("value", "Value", "integer"),
+      col("figure", "figure", "label"),
+      col("value", "value", "integer"),
     ],
     rows: [
-      ["Hosts", hostedBy.size],
+      ["hosts", hostedBy.size],
       [
-        "Proposals with more than one host",
+        "proposalsWithMoreThanOneHost",
         base.filter((b) => b.hosts.length > 1).length,
       ],
+      ["proposalsWantingACoHost", base.filter((b) => b.p.cohostWanted).length],
       [
-        "Proposals wanting a co-host",
-        base.filter((b) => b.p.cohostWanted).length,
-      ],
-      [
-        "Co-host wanted and found",
+        "coHostWantedAndFound",
         base.filter((b) => b.p.cohostWanted && b.hosts.length > 1).length,
       ],
     ],
   };
   const perHost: StatsTable = {
     id: "proposals-per-host",
-    title: "Proposals per host",
+    titleId: "proposalsPerHost",
     columns: [
-      col("proposals", "Proposals hosted", "text"),
-      col("hosts", "Hosts", "integer"),
+      col("proposals", "proposalsHosted", "text"),
+      col("hosts", "hosts", "integer"),
     ],
     rows: [...spread.entries()]
       .sort(([a], [b]) => a - b)
@@ -290,12 +287,12 @@ export function proposalTables(
   }).filter((row) => row[1] !== 0);
   const conversion: StatsTable = {
     id: "proposals-conversion",
-    title: "Conversion to sessions by interest",
+    titleId: "conversionToSessionsByInterest",
     columns: [
-      col("group", "Proposals by interested votes", "text"),
-      col("proposals", "Proposals", "integer"),
-      col("sessions", "Became a session", "integer"),
-      col("share", "Share", "percent"),
+      col("group", "proposalsByInterestedVotes", "label"),
+      col("proposals", "proposals", "integer"),
+      col("sessions", "becameASession", "integer"),
+      col("share", "share", "percent"),
     ],
     rows: quarters,
   };

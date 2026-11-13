@@ -1,4 +1,4 @@
-import type { StatsTable } from "@schellingboard/contracts/stats";
+import type { EventStatistics } from "@schellingboard/contracts/stats";
 import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
 import { VoteChoice } from "@schellingboard/domain/vote";
 import { strFromU8, unzipSync } from "fflate";
@@ -19,10 +19,11 @@ import {
   createUnavailability,
 } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, verifiedGuestValue } from "../helpers/guest-cookie";
+import { type EnglishTable, inEnglish } from "../helpers/stats-english";
 
 type Stats = {
-  tables: StatsTable[];
-  filterSummary: string;
+  tables: EnglishTable[];
+  filterSummary: EventStatistics["filterSummary"];
   filterOptions: {
     locations: { id: string; name: string }[];
     hosts: { id: string; name: string }[];
@@ -39,10 +40,14 @@ function get(path: string, cookie = admin) {
   return GET(new Request(`http://test/api/v1${path}`, { headers: { cookie } }));
 }
 
-async function stats(query = "") {
+async function rawStats(query = "") {
   const res = await get(`/admin/events/${eventId}/stats${query}`);
   expect(res.status).toBe(200);
-  return (await res.json()) as Stats;
+  return (await res.json()) as EventStatistics;
+}
+
+async function stats(query = ""): Promise<Stats> {
+  return inEnglish(await rawStats(query));
 }
 
 const cell = (stats: Stats, table: string, label: string) =>
@@ -141,7 +146,22 @@ describe("event statistics", { tags: ["021-US1"] }, () => {
     expect(
       cell(s, "overview-headline", "Sessions with an attendee report")
     ).toBe(1);
-    expect(s.filterSummary).toBe("Excluding blockers");
+    expect(s.filterSummary).toEqual({
+      locations: 0,
+      hosts: 0,
+      origins: ["blocker"],
+    });
+  });
+
+  it("names tables, columns and rows by id, not by text", async () => {
+    const raw = await rawStats();
+    const headline = raw.tables.find((t) => t.id === "overview-headline")!;
+    expect(headline.titleId).toBe("headlineNumbers");
+    expect(headline.columns).toEqual([
+      { key: "figure", labelId: "figure", type: "label" },
+      { key: "value", labelId: "value", type: "integer" },
+    ]);
+    expect(headline.rows[0]).toEqual(["members", 5]);
   });
 
   it("shows the participation funnel with shares of the members", async () => {
@@ -189,7 +209,11 @@ describe("the statistics filter", { tags: ["021-US3"] }, () => {
     expect(cell(s, "overview-headline", "Hosts")).toBe(2);
     expect(cell(s, "overview-headline", "People with RSVPs")).toBe(2);
     expect(cell(s, "overview-funnel", "Hosted")).toBe(2);
-    expect(s.filterSummary).toBe("Excluding 1 location, 1 host, blockers");
+    expect(s.filterSummary).toEqual({
+      locations: 1,
+      hosts: 1,
+      origins: ["blocker"],
+    });
   });
 
   it("drops proposals whose hosts are all excluded", async () => {
@@ -199,7 +223,11 @@ describe("the statistics filter", { tags: ["021-US3"] }, () => {
 
   it("counts a repeated origin once", async () => {
     const s = await stats("?excludeOrigins=blocker,blocker");
-    expect(s.filterSummary).toBe("Excluding blockers");
+    expect(s.filterSummary).toEqual({
+      locations: 0,
+      hosts: 0,
+      origins: ["blocker"],
+    });
   });
 
   it("counts a host who is not a member in both Hosts figures", async () => {
@@ -214,7 +242,7 @@ describe("the statistics filter", { tags: ["021-US3"] }, () => {
   it("keeps blockers when the origins list is sent empty", async () => {
     const s = await stats("?excludeOrigins=");
     expect(cell(s, "overview-headline", "Sessions")).toBe(4);
-    expect(s.filterSummary).toBe("No exclusions");
+    expect(s.filterSummary).toEqual({ locations: 0, hosts: 0, origins: [] });
   });
 
   it("excludes sessions by origin", async () => {

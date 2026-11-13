@@ -7992,8 +7992,17 @@ export interface paths {
                 name: string;
                 slug: string;
               };
-              /** @description The active filter in one line */
-              filterSummary: string;
+              /** @description What the active filter leaves out; the client words it */
+              filterSummary: {
+                /** @description Locations left out */
+                locations: number;
+                /** @description Hosts left out */
+                hosts: number;
+                /** @description Origins left out */
+                origins: (
+                  "blocker" | "proposal" | "organizer" | "spontaneous"
+                )[];
+              };
               filterOptions: {
                 locations: {
                   id: string;
@@ -8007,12 +8016,14 @@ export interface paths {
               tables: {
                 /** @description Stable name of the table, also its CSV file name */
                 id: string;
-                title: string;
+                /** @description Id of the table's title; the client turns it into text */
+                titleId: string;
                 columns: {
                   key: string;
-                  label: string;
+                  /** @description Id of the column's heading; the client turns it into text */
+                  labelId: string;
                   /**
-                   * @description A percent is a number from 0 to 100. A null cell means No data
+                   * @description A percent is a number from 0 to 100. A null cell means No data. A label cell holds a text id, or `id:param` when the text embeds one raw value; the client turns it into text
                    * @enum {string}
                    */
                   type:
@@ -8022,7 +8033,8 @@ export interface paths {
                     | "percent"
                     | "minutes"
                     | "datetime"
-                    | "boolean";
+                    | "boolean"
+                    | "label";
                 }[];
                 rows: (string | number | boolean | null)[][];
               }[];

@@ -5,6 +5,7 @@ import type { EventStatistics } from "@schellingboard/contracts/stats";
 import { SESSION_ORIGINS } from "@schellingboard/domain/stats/session-origin";
 import { type ReactNode, useId } from "react";
 
+import { useFormatLocale } from "../../i18n/format-locale";
 import {
   filterFromParams,
   filterToParams,
@@ -16,6 +17,7 @@ import type { OnParams } from "../../ui/list-paging";
 import { PeoplePicker } from "../../ui/people-picker";
 import { FigureCard, figureHeadingId, figureTitle } from "./stats-figure-card";
 import { figuresFor } from "./stats-figures";
+import { filterSummaryText } from "./stats-text";
 
 const SECTION_LABELS: Record<string, MessageDescriptor> = {
   overview: msg`Overview`,
@@ -85,10 +87,11 @@ function FilterPanel({
 }: {
   options: EventStatistics["filterOptions"];
   filter: StatsFilter;
-  summary: string;
+  summary: EventStatistics["filterSummary"];
   onChange: (filter: StatsFilter) => void;
   download: ReactNode;
 }) {
+  const locale = useFormatLocale();
   const isDefault = Object.values(filterToParams(filter)).every(
     (value) => value === null
   );
@@ -102,7 +105,7 @@ function FilterPanel({
           <span className="font-medium text-fg">
             <Trans>Filter:</Trans>{" "}
           </span>
-          {summary}
+          {filterSummaryText(summary, locale)}
         </p>
         <div className="flex items-center gap-3">
           {!isDefault && (

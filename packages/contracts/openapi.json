@@ -10880,8 +10880,32 @@
                       "required": ["id", "name", "slug"]
                     },
                     "filterSummary": {
-                      "type": "string",
-                      "description": "The active filter in one line"
+                      "type": "object",
+                      "properties": {
+                        "locations": {
+                          "type": "integer",
+                          "description": "Locations left out"
+                        },
+                        "hosts": {
+                          "type": "integer",
+                          "description": "Hosts left out"
+                        },
+                        "origins": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "blocker",
+                              "proposal",
+                              "organizer",
+                              "spontaneous"
+                            ]
+                          },
+                          "description": "Origins left out"
+                        }
+                      },
+                      "required": ["locations", "hosts", "origins"],
+                      "description": "What the active filter leaves out; the client words it"
                     },
                     "filterOptions": {
                       "type": "object",
@@ -10920,14 +10944,20 @@
                             "type": "string",
                             "description": "Stable name of the table, also its CSV file name"
                           },
-                          "title": { "type": "string" },
+                          "titleId": {
+                            "type": "string",
+                            "description": "Id of the table's title; the client turns it into text"
+                          },
                           "columns": {
                             "type": "array",
                             "items": {
                               "type": "object",
                               "properties": {
                                 "key": { "type": "string" },
-                                "label": { "type": "string" },
+                                "labelId": {
+                                  "type": "string",
+                                  "description": "Id of the column's heading; the client turns it into text"
+                                },
                                 "type": {
                                   "type": "string",
                                   "enum": [
@@ -10937,12 +10967,13 @@
                                     "percent",
                                     "minutes",
                                     "datetime",
-                                    "boolean"
+                                    "boolean",
+                                    "label"
                                   ],
-                                  "description": "A percent is a number from 0 to 100. A null cell means No data"
+                                  "description": "A percent is a number from 0 to 100. A null cell means No data. A label cell holds a text id, or `id:param` when the text embeds one raw value; the client turns it into text"
                                 }
                               },
-                              "required": ["key", "label", "type"]
+                              "required": ["key", "labelId", "type"]
                             }
                           },
                           "rows": {
@@ -10960,7 +10991,7 @@
                             }
                           }
                         },
-                        "required": ["id", "title", "columns", "rows"]
+                        "required": ["id", "titleId", "columns", "rows"]
                       }
                     }
                   },
