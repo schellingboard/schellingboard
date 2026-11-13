@@ -43,7 +43,15 @@ export function upgradeFromDump(dump: ReleaseDump): void {
   previousDatabaseUrl = process.env.DATABASE_URL;
   process.env.DATABASE_URL = `file:${dbPath}`;
   resetRepositories();
-  getRepositories();
+  // The test env has a site password, which would make every old event
+  // link-only; these tests are about the data, not the gate.
+  const sitePassword = process.env.SITE_PASSWORD;
+  delete process.env.SITE_PASSWORD;
+  try {
+    getRepositories();
+  } finally {
+    if (sitePassword !== undefined) process.env.SITE_PASSWORD = sitePassword;
+  }
 }
 
 export function disposeUpgradedDb(): void {

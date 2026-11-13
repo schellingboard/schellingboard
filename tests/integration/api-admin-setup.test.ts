@@ -102,7 +102,12 @@ describe("/api/v1/admin events and days", () => {
         call("POST", "/admin/events", { body: settings, key: "event-1" });
       const first = await create();
       expect(first.status).toBe(201);
-      const event = (await first.json()) as { id: string };
+      const { linkToken, kioskToken, ...event } = (await first.json()) as {
+        id: string;
+        linkToken: string;
+        kioskToken: string;
+      };
+      expect(linkToken).not.toBe(kioskToken);
       expect(event).toMatchObject({
         slug: "Unconference",
         version: 1,
@@ -112,7 +117,7 @@ describe("/api/v1/admin events and days", () => {
       });
       const replay = await create();
       expect(replay.status).toBe(201);
-      expect(await replay.json()).toEqual(event);
+      expect(await replay.json()).toEqual({ ...event, linkToken, kioskToken });
       expect(await getRepositories().events.list()).toHaveLength(1);
 
       const day = await call("POST", `/admin/events/${event.id}/days`, {

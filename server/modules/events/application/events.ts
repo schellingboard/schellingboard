@@ -5,6 +5,10 @@ import {
   type Event,
   IDENTITY_MODES,
   type IdentityMode,
+  isAllowedAccessPair,
+  READ_ACCESS,
+  type ReadAccess,
+  type StoredEvent,
 } from "@schellingboard/domain/event";
 import { isEventIconName } from "@schellingboard/domain/event-icons";
 import {
@@ -50,6 +54,7 @@ export interface EventSettingsInput {
   rsvpCapacityHardLimit?: boolean;
   icon?: string | null;
   identityMode?: IdentityMode;
+  readAccess?: ReadAccess;
 }
 
 export const PHASE_FIELDS = [
@@ -101,7 +106,11 @@ type EventSettings = Pick<
   | "slotIncrementMinutes"
   | "rsvpCapacityHardLimit"
   | "icon"
-> & { identityMode?: IdentityMode; proposalHelp?: string };
+> & {
+  identityMode?: IdentityMode;
+  readAccess?: ReadAccess;
+  proposalHelp?: string;
+};
 
 function isKnownTimeZone(timeZone: string): boolean {
   try {
@@ -189,6 +198,15 @@ function parseSettings(
     );
   }
 
+  const { readAccess } = input;
+  if (readAccess !== undefined && !READ_ACCESS.includes(readAccess)) {
+    return fieldInvalid(
+      "event.readAccessInvalid",
+      "readAccess",
+      `Read access must be one of ${READ_ACCESS.join(", ")}`
+    );
+  }
+
   return {
     data: {
       name,
@@ -202,8 +220,27 @@ function parseSettings(
       rsvpCapacityHardLimit,
       icon,
       identityMode,
+      readAccess,
     },
   };
+}
+
+// Until the site password goes, an instance that has one keeps new events
+// behind it as well as old ones.
+const defaultReadAccess = (): ReadAccess =>
+  process.env.SITE_PASSWORD ? "link" : "public";
+
+function accessPairRefused(
+  readAccess: ReadAccess,
+  identityMode: IdentityMode
+): Failure | null {
+  return isAllowedAccessPair(readAccess, identityMode)
+    ? null
+    : fieldInvalid(
+        "event.accessPairInvalid",
+        "readAccess",
+        "Only signed-in members can read a participants-only event, so its identity mode must be verified"
+      );
 }
 
 // The schedule grid anchors its slots at each day's start, so a new increment
@@ -227,12 +264,17 @@ export const createEvent =
   async (
     actor: Actor,
     { phases = {}, ...input }: EventSettingsInput & { phases?: EventPhases }
-  ): Promise<Result<Event>> => {
+  ): Promise<Result<StoredEvent>> => {
     if (!actor.admin) return adminRequired();
     const parsed = parseSettings(input);
     if (!("data" in parsed)) return parsed;
     const phasesRefused = phasesError(phases);
     if (phasesRefused) return phasesRefused;
+    const pairRefused = accessPairRefused(
+      parsed.data.readAccess ?? defaultReadAccess(),
+      parsed.data.identityMode ?? "verified"
+    );
+    if (pairRefused) return pairRefused;
 
     const slug = eventNameToSlug(parsed.data.name);
     if (!slug) {
@@ -262,6 +304,7 @@ export const createEvent =
           ...parsed.data,
           proposalHelp: parsed.data.proposalHelp ?? "",
           identityMode: parsed.data.identityMode ?? "verified",
+          readAccess: parsed.data.readAccess ?? defaultReadAccess(),
           ...phases,
         })
       );
@@ -284,7 +327,7 @@ export const updateEvent =
     actor: Actor,
     input: EventSettingsInput & { id: string; expectedVersion: number },
     now: Date
-  ): Promise<Result<Event>> => {
+  ): Promise<Result<StoredEvent>> => {
     if (!actor.admin) return adminRequired();
     const parsed = parseSettings(input);
     if (!("data" in parsed)) return parsed;
@@ -294,6 +337,12 @@ export const updateEvent =
       if (!existing) return eventNotFound();
       if (existing.version !== input.expectedVersion)
         return eventChangedMeanwhile(tx, input.id);
+
+      const pairRefused = accessPairRefused(
+        parsed.data.readAccess ?? existing.readAccess,
+        parsed.data.identityMode ?? existing.identityMode
+      );
+      if (pairRefused) return pairRefused;
 
       const incrementChanged =
         parsed.data.slotIncrementMinutes !== existing.slotIncrementMinutes;
@@ -408,7 +457,7 @@ export const updateEventPhases =
     actor: Actor,
     input: EventPhasesInput,
     now: Date
-  ): Promise<Result<Event>> => {
+  ): Promise<Result<StoredEvent>> => {
     if (!actor.admin) return adminRequired();
     const { id, expectedVersion, ...phases } = input;
     const refused = phasesError(phases);

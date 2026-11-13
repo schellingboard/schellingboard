@@ -7,12 +7,13 @@ import {
   updateEventPhases,
 } from "./events";
 import { createMoments, deleteMoment, updateMoment } from "./moments";
-import { getEvent, listEvents } from "./queries";
+import { getEvent, getEventAsAdmin, listEvents } from "./queries";
 
 export function createEventUseCases(deps: EventDeps) {
   return {
     listEvents: listEvents(deps),
     getEvent: getEvent(deps),
+    getEventAsAdmin: getEventAsAdmin(deps),
     createEvent: createEvent(deps),
     updateEvent: updateEvent(deps),
     updateEventPhases: updateEventPhases(deps),

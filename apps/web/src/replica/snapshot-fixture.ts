@@ -30,6 +30,7 @@ export const snapshot: Snapshot = {
     rsvpCapacityHardLimit: false,
     icon: null,
     identityMode: "open",
+    readAccess: "public",
     meetingsEnabled: false,
     maxOpenMeetingRequests: 5,
     firstDayStart: iso(8),

@@ -477,6 +477,13 @@
       "when": 1794555233168,
       "tag": "0067_notification_message",
       "breakpoints": true
+    },
+    {
+      "idx": 68,
+      "version": "6",
+      "when": 1794561853726,
+      "tag": "0068_event_read_access",
+      "breakpoints": true
     }
   ]
 }

@@ -1,4 +1,7 @@
-import { compareEventsByStart, type Event } from "@schellingboard/domain/event";
+import {
+  compareEventsByStart,
+  type StoredEvent,
+} from "@schellingboard/domain/event";
 import {
   type AvailabilityFormData,
   availabilityFormFor,
@@ -28,7 +31,8 @@ export async function availabilityFormsFor(
   );
   const offering = attending
     .filter(
-      (event): event is Event => event !== undefined && meetingsOpen(event, now)
+      (event): event is StoredEvent =>
+        event !== undefined && meetingsOpen(event, now)
     )
     .sort(compareEventsByStart);
 

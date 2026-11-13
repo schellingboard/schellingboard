@@ -492,7 +492,7 @@
         },
         "required": ["nudges", "options"]
       },
-      "Event": {
+      "AdminEvent": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -511,6 +511,10 @@
           "rsvpCapacityHardLimit": { "type": "boolean" },
           "icon": { "type": ["string", "null"] },
           "identityMode": { "type": "string", "enum": ["open", "verified"] },
+          "readAccess": {
+            "type": "string",
+            "enum": ["public", "link", "participants"]
+          },
           "meetingsEnabled": { "type": "boolean" },
           "maxOpenMeetingRequests": { "type": "integer" },
           "firstDayStart": {
@@ -548,7 +552,15 @@
             "format": "date-time",
             "description": "null clears it"
           },
-          "version": { "type": "integer" }
+          "version": { "type": "integer" },
+          "linkToken": {
+            "type": "string",
+            "description": "Secret in the event link"
+          },
+          "kioskToken": {
+            "type": "string",
+            "description": "Secret in the kiosk link, which reads the program only"
+          }
         },
         "required": [
           "id",
@@ -564,6 +576,7 @@
           "rsvpCapacityHardLimit",
           "icon",
           "identityMode",
+          "readAccess",
           "meetingsEnabled",
           "maxOpenMeetingRequests",
           "firstDayStart",
@@ -574,7 +587,9 @@
           "votingPhaseEnd",
           "schedulingPhaseStart",
           "schedulingPhaseEnd",
-          "version"
+          "version",
+          "linkToken",
+          "kioskToken"
         ]
       },
       "PublicProfile": {
@@ -836,6 +851,96 @@
           "readAt": { "type": ["string", "null"], "format": "date-time" }
         },
         "required": ["id", "type", "text", "url", "createdAt", "readAt"]
+      },
+      "Event": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "slug": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "website": { "type": "string" },
+          "proposalHelp": {
+            "type": "string",
+            "description": "Empty means the default text applies"
+          },
+          "timezone": { "type": "string" },
+          "maxSessionDuration": { "type": "integer" },
+          "breakMinutes": { "type": "integer" },
+          "slotIncrementMinutes": { "type": "integer" },
+          "rsvpCapacityHardLimit": { "type": "boolean" },
+          "icon": { "type": ["string", "null"] },
+          "identityMode": { "type": "string", "enum": ["open", "verified"] },
+          "readAccess": {
+            "type": "string",
+            "enum": ["public", "link", "participants"]
+          },
+          "meetingsEnabled": { "type": "boolean" },
+          "maxOpenMeetingRequests": { "type": "integer" },
+          "firstDayStart": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          },
+          "lastDayStart": { "type": ["string", "null"], "format": "date-time" },
+          "proposalPhaseStart": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "null clears it"
+          },
+          "proposalPhaseEnd": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "null clears it"
+          },
+          "votingPhaseStart": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "null clears it"
+          },
+          "votingPhaseEnd": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "null clears it"
+          },
+          "schedulingPhaseStart": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "null clears it"
+          },
+          "schedulingPhaseEnd": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "null clears it"
+          },
+          "version": { "type": "integer" }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "description",
+          "website",
+          "proposalHelp",
+          "timezone",
+          "maxSessionDuration",
+          "breakMinutes",
+          "slotIncrementMinutes",
+          "rsvpCapacityHardLimit",
+          "icon",
+          "identityMode",
+          "readAccess",
+          "meetingsEnabled",
+          "maxOpenMeetingRequests",
+          "firstDayStart",
+          "lastDayStart",
+          "proposalPhaseStart",
+          "proposalPhaseEnd",
+          "votingPhaseStart",
+          "votingPhaseEnd",
+          "schedulingPhaseStart",
+          "schedulingPhaseEnd",
+          "version"
+        ]
       },
       "Snapshot": {
         "type": "object",
@@ -5082,7 +5187,7 @@
             "description": "The updated event",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Event" }
+                "schema": { "$ref": "#/components/schemas/AdminEvent" }
               }
             }
           },
@@ -5109,7 +5214,7 @@
                         "required": ["path", "message"]
                       }
                     },
-                    "current": { "$ref": "#/components/schemas/Event" }
+                    "current": { "$ref": "#/components/schemas/AdminEvent" }
                   },
                   "required": ["type", "title", "status", "code"]
                 }
@@ -7795,116 +7900,24 @@
         "security": [{ "siteAuth": [] }]
       }
     },
-    "/api/v1/admin/events": {
-      "post": {
+    "/api/v1/admin/events/{id}": {
+      "get": {
         "tags": ["admin"],
-        "description": "Creates an event; its URL slug is derived from the name.",
+        "description": "The event with its link and kiosk tokens.",
         "parameters": [
           {
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 255,
-              "description": "Retries with the same key get the first response (24 h)"
-            },
-            "required": false,
-            "description": "Retries with the same key get the first response (24 h)",
-            "name": "idempotency-key",
-            "in": "header"
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": { "type": "string" },
-                  "description": { "type": "string", "default": "" },
-                  "website": { "type": "string", "default": "" },
-                  "proposalHelp": {
-                    "type": "string",
-                    "description": "Markdown help for people who don't know what to propose; empty restores the default. Omitted: unchanged on edit, default on create"
-                  },
-                  "timezone": {
-                    "type": "string",
-                    "default": "UTC",
-                    "description": "IANA time zone the event's times are shown in"
-                  },
-                  "maxSessionDuration": {
-                    "type": "integer",
-                    "description": "Minutes"
-                  },
-                  "breakMinutes": {
-                    "type": "integer",
-                    "description": "Break before each session, in minutes"
-                  },
-                  "slotIncrementMinutes": {
-                    "type": "integer",
-                    "description": "One of 15, 30, 45, 60"
-                  },
-                  "rsvpCapacityHardLimit": {
-                    "type": "boolean",
-                    "default": false
-                  },
-                  "icon": {
-                    "type": ["string", "null"],
-                    "enum": [
-                      "AcademicCapIcon",
-                      "BeakerIcon",
-                      "BoltIcon",
-                      "BookOpenIcon",
-                      "BriefcaseIcon",
-                      "BuildingOfficeIcon",
-                      "CakeIcon",
-                      "CalendarIcon",
-                      "ChatBubbleLeftIcon",
-                      "CloudIcon",
-                      "CodeBracketIcon",
-                      "CogIcon",
-                      "CommandLineIcon",
-                      "ComputerDesktopIcon",
-                      "CpuChipIcon",
-                      "FireIcon",
-                      "GlobeAltIcon",
-                      "HeartIcon",
-                      "HomeIcon",
-                      "MicrophoneIcon",
-                      "MusicalNoteIcon",
-                      "PaintBrushIcon",
-                      "RocketLaunchIcon",
-                      "SparklesIcon",
-                      "StarIcon",
-                      "SunIcon",
-                      "TrophyIcon",
-                      "UserGroupIcon",
-                      "WrenchIcon",
-                      null
-                    ]
-                  },
-                  "identityMode": {
-                    "type": "string",
-                    "enum": ["open", "verified"],
-                    "description": "open: picking a name is enough to act; verified: a checked login is needed. Omitted: unchanged on edit, verified on create"
-                  }
-                },
-                "required": [
-                  "name",
-                  "maxSessionDuration",
-                  "breakMinutes",
-                  "slotIncrementMinutes"
-                ]
-              }
-            }
-          }
-        },
         "responses": {
-          "201": {
-            "description": "The new event",
+          "200": {
+            "description": "The event",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Event" }
+                "schema": { "$ref": "#/components/schemas/AdminEvent" }
               }
             }
           },
@@ -7918,9 +7931,7 @@
           }
         },
         "security": [{ "guestAuth": [] }]
-      }
-    },
-    "/api/v1/admin/events/{id}": {
+      },
       "put": {
         "tags": ["admin"],
         "description": "Replaces the event's settings; phase dates, 1-on-1 settings and the slug stay, and so does the proposal help when omitted. A new slot increment clears declared 1-on-1 availability.",
@@ -8019,6 +8030,11 @@
                     "enum": ["open", "verified"],
                     "description": "open: picking a name is enough to act; verified: a checked login is needed. Omitted: unchanged on edit, verified on create"
                   },
+                  "readAccess": {
+                    "type": "string",
+                    "enum": ["public", "link", "participants"],
+                    "description": "public: anyone reads the program; link: only holders of the event link; participants: only signed-in members. People are for insiders in every case. participants cannot go with open identity. Omitted: unchanged on edit, public on create"
+                  },
                   "expectedVersion": {
                     "type": "integer",
                     "description": "The version the edit was made from; a later change refuses it with `<subject>.versionConflict`"
@@ -8040,7 +8056,7 @@
             "description": "The updated event",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Event" }
+                "schema": { "$ref": "#/components/schemas/AdminEvent" }
               }
             }
           },
@@ -8067,7 +8083,7 @@
                         "required": ["path", "message"]
                       }
                     },
-                    "current": { "$ref": "#/components/schemas/Event" }
+                    "current": { "$ref": "#/components/schemas/AdminEvent" }
                   },
                   "required": ["type", "title", "status", "code"]
                 }
@@ -8110,6 +8126,136 @@
         ],
         "responses": {
           "204": { "description": "Deleted" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "guestAuth": [] }]
+      }
+    },
+    "/api/v1/admin/events": {
+      "post": {
+        "tags": ["admin"],
+        "description": "Creates an event; its URL slug is derived from the name.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string", "default": "" },
+                  "website": { "type": "string", "default": "" },
+                  "proposalHelp": {
+                    "type": "string",
+                    "description": "Markdown help for people who don't know what to propose; empty restores the default. Omitted: unchanged on edit, default on create"
+                  },
+                  "timezone": {
+                    "type": "string",
+                    "default": "UTC",
+                    "description": "IANA time zone the event's times are shown in"
+                  },
+                  "maxSessionDuration": {
+                    "type": "integer",
+                    "description": "Minutes"
+                  },
+                  "breakMinutes": {
+                    "type": "integer",
+                    "description": "Break before each session, in minutes"
+                  },
+                  "slotIncrementMinutes": {
+                    "type": "integer",
+                    "description": "One of 15, 30, 45, 60"
+                  },
+                  "rsvpCapacityHardLimit": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "icon": {
+                    "type": ["string", "null"],
+                    "enum": [
+                      "AcademicCapIcon",
+                      "BeakerIcon",
+                      "BoltIcon",
+                      "BookOpenIcon",
+                      "BriefcaseIcon",
+                      "BuildingOfficeIcon",
+                      "CakeIcon",
+                      "CalendarIcon",
+                      "ChatBubbleLeftIcon",
+                      "CloudIcon",
+                      "CodeBracketIcon",
+                      "CogIcon",
+                      "CommandLineIcon",
+                      "ComputerDesktopIcon",
+                      "CpuChipIcon",
+                      "FireIcon",
+                      "GlobeAltIcon",
+                      "HeartIcon",
+                      "HomeIcon",
+                      "MicrophoneIcon",
+                      "MusicalNoteIcon",
+                      "PaintBrushIcon",
+                      "RocketLaunchIcon",
+                      "SparklesIcon",
+                      "StarIcon",
+                      "SunIcon",
+                      "TrophyIcon",
+                      "UserGroupIcon",
+                      "WrenchIcon",
+                      null
+                    ]
+                  },
+                  "identityMode": {
+                    "type": "string",
+                    "enum": ["open", "verified"],
+                    "description": "open: picking a name is enough to act; verified: a checked login is needed. Omitted: unchanged on edit, verified on create"
+                  },
+                  "readAccess": {
+                    "type": "string",
+                    "enum": ["public", "link", "participants"],
+                    "description": "public: anyone reads the program; link: only holders of the event link; participants: only signed-in members. People are for insiders in every case. participants cannot go with open identity. Omitted: unchanged on edit, public on create"
+                  }
+                },
+                "required": [
+                  "name",
+                  "maxSessionDuration",
+                  "breakMinutes",
+                  "slotIncrementMinutes"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The new event",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AdminEvent" }
+              }
+            }
+          },
           "default": {
             "description": "Problem details (RFC 9457); clients branch on `code`",
             "content": {
@@ -8205,7 +8351,7 @@
             "description": "The updated event",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Event" }
+                "schema": { "$ref": "#/components/schemas/AdminEvent" }
               }
             }
           },
@@ -8232,7 +8378,7 @@
                         "required": ["path", "message"]
                       }
                     },
-                    "current": { "$ref": "#/components/schemas/Event" }
+                    "current": { "$ref": "#/components/schemas/AdminEvent" }
                   },
                   "required": ["type", "title", "status", "code"]
                 }

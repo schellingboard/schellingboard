@@ -1,4 +1,4 @@
-import type { Event, EventMeetingSettings } from "@schellingboard/domain/event";
+import type { StoredEvent } from "@schellingboard/domain/event";
 import { eq, getTableColumns, inArray, sql } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
@@ -29,7 +29,7 @@ type EventSelectRow = typeof schema.events.$inferSelect & {
   lastDayStart: string | null;
 };
 
-function rowToEvent(row: EventSelectRow): Event {
+function rowToEvent(row: EventSelectRow): StoredEvent {
   return {
     id: row.id,
     name: row.name,
@@ -64,6 +64,9 @@ function rowToEvent(row: EventSelectRow): Event {
     rsvpCapacityHardLimit: row.rsvpCapacityHardLimit,
     icon: row.icon ?? undefined,
     identityMode: row.identityMode,
+    readAccess: row.readAccess,
+    linkToken: row.linkToken,
+    kioskToken: row.kioskToken,
     meetingsEnabled: row.meetingsEnabled,
     maxOpenMeetingRequests: row.maxOpenMeetingRequests,
     version: row.version,
@@ -73,7 +76,7 @@ function rowToEvent(row: EventSelectRow): Event {
 export class SqliteEventsRepository implements EventsRepository {
   constructor(private readonly db: DB) {}
 
-  async list(): Promise<Event[]> {
+  async list(): Promise<StoredEvent[]> {
     return this.db
       .select(eventColumns)
       .from(schema.events)
@@ -81,11 +84,11 @@ export class SqliteEventsRepository implements EventsRepository {
       .map(rowToEvent);
   }
 
-  async findById(id: string): Promise<Event | undefined> {
+  async findById(id: string): Promise<StoredEvent | undefined> {
     return this.findByIdSync(id);
   }
 
-  private findByIdSync(id: string): Event | undefined {
+  private findByIdSync(id: string): StoredEvent | undefined {
     const row = this.db
       .select(eventColumns)
       .from(schema.events)
@@ -94,7 +97,7 @@ export class SqliteEventsRepository implements EventsRepository {
     return row ? rowToEvent(row) : undefined;
   }
 
-  async findByName(name: string): Promise<Event | undefined> {
+  async findByName(name: string): Promise<StoredEvent | undefined> {
     const row = this.db
       .select(eventColumns)
       .from(schema.events)
@@ -103,7 +106,7 @@ export class SqliteEventsRepository implements EventsRepository {
     return row ? rowToEvent(row) : undefined;
   }
 
-  async findBySlug(slug: string): Promise<Event | undefined> {
+  async findBySlug(slug: string): Promise<StoredEvent | undefined> {
     const row = this.db
       .select(eventColumns)
       .from(schema.events)
@@ -113,9 +116,8 @@ export class SqliteEventsRepository implements EventsRepository {
   }
 
   async create(
-    data: Omit<Event, "id" | "slug" | "version" | keyof EventMeetingSettings> &
-      Partial<EventMeetingSettings>
-  ): Promise<Event> {
+    data: Parameters<EventsRepository["create"]>[0]
+  ): Promise<StoredEvent> {
     const id = nanoid();
     const slug = eventNameToSlug(data.name);
     this.db
@@ -140,6 +142,7 @@ export class SqliteEventsRepository implements EventsRepository {
         rsvpCapacityHardLimit: data.rsvpCapacityHardLimit,
         icon: data.icon ?? null,
         ...(data.identityMode && { identityMode: data.identityMode }),
+        ...(data.readAccess && { readAccess: data.readAccess }),
         ...(data.meetingsEnabled !== undefined && {
           meetingsEnabled: data.meetingsEnabled,
         }),
@@ -157,10 +160,8 @@ export class SqliteEventsRepository implements EventsRepository {
 
   async update(
     id: string,
-    patch: Partial<Omit<Event, "id" | "slug" | "version">> & {
-      expectedVersion?: number;
-    }
-  ): Promise<Event | undefined> {
+    patch: Parameters<EventsRepository["update"]>[1]
+  ): Promise<StoredEvent | undefined> {
     const set: Partial<EventRow> = {};
     if (patch.name !== undefined) set.name = patch.name;
     if (patch.description !== undefined) set.description = patch.description;
@@ -189,6 +190,9 @@ export class SqliteEventsRepository implements EventsRepository {
       set.rsvpCapacityHardLimit = patch.rsvpCapacityHardLimit;
     if ("icon" in patch) set.icon = patch.icon ?? null;
     if (patch.identityMode !== undefined) set.identityMode = patch.identityMode;
+    if (patch.readAccess !== undefined) set.readAccess = patch.readAccess;
+    if (patch.linkToken !== undefined) set.linkToken = patch.linkToken;
+    if (patch.kioskToken !== undefined) set.kioskToken = patch.kioskToken;
     if (patch.meetingsEnabled !== undefined)
       set.meetingsEnabled = patch.meetingsEnabled;
     if (patch.maxOpenMeetingRequests !== undefined)

@@ -11,6 +11,16 @@ export function resolveDbPath(
   return url.replace(/^file:/, "");
 }
 
+/** `PRAGMA user_version` while migration 0068 awaits its site-password flip. */
+const READ_ACCESS_FLIP_PENDING = 1;
+
+/** Undefined on a new database, where there are no events to carry over. */
+function hasReadAccessColumn(sqlite: Database.Database): boolean | undefined {
+  const columns = sqlite.pragma("table_info(events)") as { name: string }[];
+  if (columns.length === 0) return undefined;
+  return columns.some((c) => c.name === "read_access");
+}
+
 /**
  * Runs Drizzle migrations with foreign-key enforcement disabled.
  *
@@ -29,11 +39,28 @@ export function resolveDbPath(
  */
 export function runMigrations(
   sqlite: Database.Database,
-  migrationsFolder: string
+  migrationsFolder: string,
+  { sitePasswordSet = Boolean(process.env.SITE_PASSWORD) } = {}
 ): void {
   try {
     sqlite.pragma("foreign_keys = OFF");
+    // SQL cannot read the environment: events of an instance behind a site
+    // password become link-only on the run that introduces the setting. The
+    // marker is written before migrating so that a stop in between still
+    // flips them on the next start.
+    if (sitePasswordSet && hasReadAccessColumn(sqlite) === false) {
+      sqlite.pragma(`user_version = ${READ_ACCESS_FLIP_PENDING}`);
+    }
     migrate(drizzle(sqlite), { migrationsFolder });
+    if (
+      sqlite.pragma("user_version", { simple: true }) ===
+      READ_ACCESS_FLIP_PENDING
+    ) {
+      sqlite.transaction(() => {
+        sqlite.prepare("UPDATE events SET read_access = 'link'").run();
+        sqlite.pragma("user_version = 0");
+      })();
+    }
     const violations = sqlite.pragma("foreign_key_check") as unknown[];
     if (violations.length > 0) {
       throw new Error(

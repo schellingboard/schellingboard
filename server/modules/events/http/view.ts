@@ -1,9 +1,15 @@
 import type {
+  adminEventViewSchema,
   dayViewSchema,
   eventViewSchema,
   momentViewSchema,
 } from "@schellingboard/contracts/event";
-import type { Day, Event, SharedMoment } from "@schellingboard/domain/event";
+import type {
+  Day,
+  Event,
+  SharedMoment,
+  StoredEvent,
+} from "@schellingboard/domain/event";
 import type { z } from "zod";
 
 const iso = (d: Date | undefined) => d?.toISOString() ?? null;
@@ -23,6 +29,7 @@ export function toEventView(e: Event): z.input<typeof eventViewSchema> {
     rsvpCapacityHardLimit: e.rsvpCapacityHardLimit,
     icon: e.icon ?? null,
     identityMode: e.identityMode,
+    readAccess: e.readAccess,
     meetingsEnabled: e.meetingsEnabled,
     maxOpenMeetingRequests: e.maxOpenMeetingRequests,
     firstDayStart: iso(e.firstDayStart),
@@ -34,6 +41,16 @@ export function toEventView(e: Event): z.input<typeof eventViewSchema> {
     schedulingPhaseStart: iso(e.schedulingPhaseStart),
     schedulingPhaseEnd: iso(e.schedulingPhaseEnd),
     version: e.version,
+  };
+}
+
+export function toAdminEventView(
+  e: StoredEvent
+): z.input<typeof adminEventViewSchema> {
+  return {
+    ...toEventView(e),
+    linkToken: e.linkToken,
+    kioskToken: e.kioskToken,
   };
 }
 

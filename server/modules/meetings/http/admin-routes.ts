@@ -1,5 +1,5 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import { eventViewSchema } from "@schellingboard/contracts/event";
+import { adminEventViewSchema } from "@schellingboard/contracts/event";
 import {
   eventMeetingsUpdateBodySchema,
   meetingPointInputSchema,
@@ -21,7 +21,7 @@ import {
   json,
   noContent,
 } from "@/server/http/route-parts";
-import { toEventView } from "@/server/modules/events/module";
+import { toAdminEventView } from "@/server/modules/events/module";
 
 import type { MeetingUseCases } from "../application/use-cases";
 
@@ -41,8 +41,8 @@ const updateEventMeetings = createRoute({
     body: body(eventMeetingsUpdateBodySchema),
   },
   responses: {
-    200: json(eventViewSchema, "The updated event"),
-    ...versionConflictResponse(eventViewSchema),
+    200: json(adminEventViewSchema, "The updated event"),
+    ...versionConflictResponse(adminEventViewSchema),
     ...problemDefault,
   },
 });
@@ -115,8 +115,8 @@ export function addAdminMeetingRoutes(
       },
       c.var.now
     );
-    if (!result.ok) return problem(result.error, toEventView);
-    return c.json(toEventView(result.value), 200);
+    if (!result.ok) return problem(result.error, toAdminEventView);
+    return c.json(toAdminEventView(result.value), 200);
   });
 
   app.openapi(listPoints, async (c) => {

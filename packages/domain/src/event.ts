@@ -1,6 +1,17 @@
 export const IDENTITY_MODES = ["open", "verified"] as const;
 export type IdentityMode = (typeof IDENTITY_MODES)[number];
 
+export const READ_ACCESS = ["public", "link", "participants"] as const;
+export type ReadAccess = (typeof READ_ACCESS)[number];
+
+/** A name picker would show a participants-only roster to anyone. */
+export function isAllowedAccessPair(
+  readAccess: ReadAccess,
+  identityMode: IdentityMode
+): boolean {
+  return !(readAccess === "participants" && identityMode === "open");
+}
+
 export type Event = {
   id: string;
   name: string;
@@ -29,12 +40,29 @@ export type Event = {
   rsvpCapacityHardLimit: boolean;
   icon?: string | null;
   identityMode: IdentityMode;
+  readAccess: ReadAccess;
   /** Whether attendees can book 1-on-1 meetings with each other. */
   meetingsEnabled: boolean;
   /** How many unanswered requests one attendee may have outstanding. */
   maxOpenMeetingRequests: number;
   version: number;
 };
+
+/** Server-side only: the secrets in the event and kiosk links. */
+export type EventSecrets = {
+  linkToken: string;
+  kioskToken: string;
+};
+
+export type StoredEvent = Event & EventSecrets;
+
+/** The change log and the feed carry events; the secrets must not travel. */
+export function withoutSecrets(event: Event): Event {
+  const copy: Event & Partial<EventSecrets> = { ...event };
+  delete copy.linkToken;
+  delete copy.kioskToken;
+  return copy;
+}
 
 /**
  * The organizer's 1-on-1 settings, configured from the admin Meetings section

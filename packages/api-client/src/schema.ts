@@ -2722,7 +2722,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["Event"];
+            "application/json": components["schemas"]["AdminEvent"];
           };
         };
         /** @description A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion` */
@@ -2741,7 +2741,7 @@ export interface paths {
                 path: string;
                 message: string;
               }[];
-              current?: components["schemas"]["Event"];
+              current?: components["schemas"]["AdminEvent"];
             };
           };
         };
@@ -5339,6 +5339,208 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/admin/events/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The event with its link and kiosk tokens. */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The event */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["AdminEvent"];
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    /** @description Replaces the event's settings; phase dates, 1-on-1 settings and the slug stay, and so does the proposal help when omitted. A new slot increment clears declared 1-on-1 availability. */
+    put: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            name: string;
+            /** @default  */
+            description?: string;
+            /** @default  */
+            website?: string;
+            /** @description Markdown help for people who don't know what to propose; empty restores the default. Omitted: unchanged on edit, default on create */
+            proposalHelp?: string;
+            /**
+             * @description IANA time zone the event's times are shown in
+             * @default UTC
+             */
+            timezone?: string;
+            /** @description Minutes */
+            maxSessionDuration: number;
+            /** @description Break before each session, in minutes */
+            breakMinutes: number;
+            /** @description One of 15, 30, 45, 60 */
+            slotIncrementMinutes: number;
+            /** @default false */
+            rsvpCapacityHardLimit?: boolean;
+            /** @enum {string|null} */
+            icon?:
+              | "AcademicCapIcon"
+              | "BeakerIcon"
+              | "BoltIcon"
+              | "BookOpenIcon"
+              | "BriefcaseIcon"
+              | "BuildingOfficeIcon"
+              | "CakeIcon"
+              | "CalendarIcon"
+              | "ChatBubbleLeftIcon"
+              | "CloudIcon"
+              | "CodeBracketIcon"
+              | "CogIcon"
+              | "CommandLineIcon"
+              | "ComputerDesktopIcon"
+              | "CpuChipIcon"
+              | "FireIcon"
+              | "GlobeAltIcon"
+              | "HeartIcon"
+              | "HomeIcon"
+              | "MicrophoneIcon"
+              | "MusicalNoteIcon"
+              | "PaintBrushIcon"
+              | "RocketLaunchIcon"
+              | "SparklesIcon"
+              | "StarIcon"
+              | "SunIcon"
+              | "TrophyIcon"
+              | "UserGroupIcon"
+              | "WrenchIcon"
+              | null;
+            /**
+             * @description open: picking a name is enough to act; verified: a checked login is needed. Omitted: unchanged on edit, verified on create
+             * @enum {string}
+             */
+            identityMode?: "open" | "verified";
+            /**
+             * @description public: anyone reads the program; link: only holders of the event link; participants: only signed-in members. People are for insiders in every case. participants cannot go with open identity. Omitted: unchanged on edit, public on create
+             * @enum {string}
+             */
+            readAccess?: "public" | "link" | "participants";
+            /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
+            expectedVersion: number;
+          };
+        };
+      };
+      responses: {
+        /** @description The updated event */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["AdminEvent"];
+          };
+        };
+        /** @description A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion` */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": {
+              type: string;
+              title: string;
+              status: number;
+              code: string;
+              detail?: string;
+              errors?: {
+                path: string;
+                message: string;
+              }[];
+              current?: components["schemas"]["AdminEvent"];
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    post?: never;
+    /** @description Deletes the event with its days, proposals, sessions and everything attached. */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Deleted */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/admin/events": {
     parameters: {
       query?: never;
@@ -5419,6 +5621,11 @@ export interface paths {
              * @enum {string}
              */
             identityMode?: "open" | "verified";
+            /**
+             * @description public: anyone reads the program; link: only holders of the event link; participants: only signed-in members. People are for insiders in every case. participants cannot go with open identity. Omitted: unchanged on edit, public on create
+             * @enum {string}
+             */
+            readAccess?: "public" | "link" | "participants";
           };
         };
       };
@@ -5429,7 +5636,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["Event"];
+            "application/json": components["schemas"]["AdminEvent"];
           };
         };
         /** @description Problem details (RFC 9457); clients branch on `code` */
@@ -5444,172 +5651,6 @@ export interface paths {
       };
     };
     delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/admin/events/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    /** @description Replaces the event's settings; phase dates, 1-on-1 settings and the slug stay, and so does the proposal help when omitted. A new slot increment clears declared 1-on-1 availability. */
-    put: {
-      parameters: {
-        query?: never;
-        header?: {
-          /** @description Retries with the same key get the first response (24 h) */
-          "idempotency-key"?: string;
-        };
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": {
-            name: string;
-            /** @default  */
-            description?: string;
-            /** @default  */
-            website?: string;
-            /** @description Markdown help for people who don't know what to propose; empty restores the default. Omitted: unchanged on edit, default on create */
-            proposalHelp?: string;
-            /**
-             * @description IANA time zone the event's times are shown in
-             * @default UTC
-             */
-            timezone?: string;
-            /** @description Minutes */
-            maxSessionDuration: number;
-            /** @description Break before each session, in minutes */
-            breakMinutes: number;
-            /** @description One of 15, 30, 45, 60 */
-            slotIncrementMinutes: number;
-            /** @default false */
-            rsvpCapacityHardLimit?: boolean;
-            /** @enum {string|null} */
-            icon?:
-              | "AcademicCapIcon"
-              | "BeakerIcon"
-              | "BoltIcon"
-              | "BookOpenIcon"
-              | "BriefcaseIcon"
-              | "BuildingOfficeIcon"
-              | "CakeIcon"
-              | "CalendarIcon"
-              | "ChatBubbleLeftIcon"
-              | "CloudIcon"
-              | "CodeBracketIcon"
-              | "CogIcon"
-              | "CommandLineIcon"
-              | "ComputerDesktopIcon"
-              | "CpuChipIcon"
-              | "FireIcon"
-              | "GlobeAltIcon"
-              | "HeartIcon"
-              | "HomeIcon"
-              | "MicrophoneIcon"
-              | "MusicalNoteIcon"
-              | "PaintBrushIcon"
-              | "RocketLaunchIcon"
-              | "SparklesIcon"
-              | "StarIcon"
-              | "SunIcon"
-              | "TrophyIcon"
-              | "UserGroupIcon"
-              | "WrenchIcon"
-              | null;
-            /**
-             * @description open: picking a name is enough to act; verified: a checked login is needed. Omitted: unchanged on edit, verified on create
-             * @enum {string}
-             */
-            identityMode?: "open" | "verified";
-            /** @description The version the edit was made from; a later change refuses it with `<subject>.versionConflict` */
-            expectedVersion: number;
-          };
-        };
-      };
-      responses: {
-        /** @description The updated event */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["Event"];
-          };
-        };
-        /** @description A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion` */
-        409: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/problem+json": {
-              type: string;
-              title: string;
-              status: number;
-              code: string;
-              detail?: string;
-              errors?: {
-                path: string;
-                message: string;
-              }[];
-              current?: components["schemas"]["Event"];
-            };
-          };
-        };
-        /** @description Problem details (RFC 9457); clients branch on `code` */
-        default: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/problem+json": components["schemas"]["Problem"];
-          };
-        };
-      };
-    };
-    post?: never;
-    /** @description Deletes the event with its days, proposals, sessions and everything attached. */
-    delete: {
-      parameters: {
-        query?: never;
-        header?: {
-          /** @description Retries with the same key get the first response (24 h) */
-          "idempotency-key"?: string;
-        };
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description Deleted */
-        204: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-        /** @description Problem details (RFC 9457); clients branch on `code` */
-        default: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/problem+json": components["schemas"]["Problem"];
-          };
-        };
-      };
-    };
     options?: never;
     head?: never;
     patch?: never;
@@ -5680,7 +5721,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["Event"];
+            "application/json": components["schemas"]["AdminEvent"];
           };
         };
         /** @description A conflict; `<subject>.versionConflict`, with `current`, when the subject changed since `expectedVersion` */
@@ -5699,7 +5740,7 @@ export interface paths {
                 path: string;
                 message: string;
               }[];
-              current?: components["schemas"]["Event"];
+              current?: components["schemas"]["AdminEvent"];
             };
           };
         };
@@ -8401,7 +8442,7 @@ export interface components {
         }[];
       }[];
     };
-    Event: {
+    AdminEvent: {
       id: string;
       slug: string;
       name: string;
@@ -8417,6 +8458,8 @@ export interface components {
       icon: string | null;
       /** @enum {string} */
       identityMode: "open" | "verified";
+      /** @enum {string} */
+      readAccess: "public" | "link" | "participants";
       meetingsEnabled: boolean;
       maxOpenMeetingRequests: number;
       /** Format: date-time */
@@ -8454,6 +8497,10 @@ export interface components {
        */
       schedulingPhaseEnd: string | null;
       version: number;
+      /** @description Secret in the event link */
+      linkToken: string;
+      /** @description Secret in the kiosk link, which reads the program only */
+      kioskToken: string;
     };
     PublicProfile: {
       id: string;
@@ -8588,6 +8635,62 @@ export interface components {
       createdAt: string;
       /** Format: date-time */
       readAt: string | null;
+    };
+    Event: {
+      id: string;
+      slug: string;
+      name: string;
+      description: string;
+      website: string;
+      /** @description Empty means the default text applies */
+      proposalHelp: string;
+      timezone: string;
+      maxSessionDuration: number;
+      breakMinutes: number;
+      slotIncrementMinutes: number;
+      rsvpCapacityHardLimit: boolean;
+      icon: string | null;
+      /** @enum {string} */
+      identityMode: "open" | "verified";
+      /** @enum {string} */
+      readAccess: "public" | "link" | "participants";
+      meetingsEnabled: boolean;
+      maxOpenMeetingRequests: number;
+      /** Format: date-time */
+      firstDayStart: string | null;
+      /** Format: date-time */
+      lastDayStart: string | null;
+      /**
+       * Format: date-time
+       * @description null clears it
+       */
+      proposalPhaseStart: string | null;
+      /**
+       * Format: date-time
+       * @description null clears it
+       */
+      proposalPhaseEnd: string | null;
+      /**
+       * Format: date-time
+       * @description null clears it
+       */
+      votingPhaseStart: string | null;
+      /**
+       * Format: date-time
+       * @description null clears it
+       */
+      votingPhaseEnd: string | null;
+      /**
+       * Format: date-time
+       * @description null clears it
+       */
+      schedulingPhaseStart: string | null;
+      /**
+       * Format: date-time
+       * @description null clears it
+       */
+      schedulingPhaseEnd: string | null;
+      version: number;
     };
     Snapshot: {
       /** @description Resume the feed after this */

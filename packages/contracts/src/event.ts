@@ -1,4 +1,4 @@
-import { IDENTITY_MODES } from "@schellingboard/domain/event";
+import { IDENTITY_MODES, READ_ACCESS } from "@schellingboard/domain/event";
 import { EVENT_ICON_NAMES } from "@schellingboard/domain/event-icons";
 import { SLOT_INCREMENT_OPTIONS } from "@schellingboard/domain/slots";
 import { z } from "zod";
@@ -41,6 +41,12 @@ export const eventSettingsBodySchema = z.object({
     .describe(
       "open: picking a name is enough to act; verified: a checked login is needed. Omitted: unchanged on edit, verified on create"
     ),
+  readAccess: z
+    .enum(READ_ACCESS)
+    .optional()
+    .describe(
+      "public: anyone reads the program; link: only holders of the event link; participants: only signed-in members. People are for insiders in every case. participants cannot go with open identity. Omitted: unchanged on edit, public on create"
+    ),
 });
 
 const phaseDate = instant.nullable().describe("null clears it");
@@ -69,6 +75,7 @@ export const eventViewSchema = z
     rsvpCapacityHardLimit: z.boolean(),
     icon: z.string().nullable(),
     identityMode: z.enum(IDENTITY_MODES),
+    readAccess: z.enum(READ_ACCESS),
     meetingsEnabled: z.boolean(),
     maxOpenMeetingRequests: z.number().int(),
     firstDayStart: instant.nullable(),
@@ -77,6 +84,15 @@ export const eventViewSchema = z
     version: z.number().int(),
   })
   .meta({ id: "Event" });
+
+export const adminEventViewSchema = eventViewSchema
+  .extend({
+    linkToken: z.string().describe("Secret in the event link"),
+    kioskToken: z
+      .string()
+      .describe("Secret in the kiosk link, which reads the program only"),
+  })
+  .meta({ id: "AdminEvent" });
 
 export const eventUpdateBodySchema = eventSettingsBodySchema.extend({
   expectedVersion,

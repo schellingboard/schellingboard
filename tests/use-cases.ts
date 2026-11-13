@@ -813,6 +813,17 @@ export const features = {
       },
     },
   },
+  "023": {
+    slug: "event-read-access",
+    component: "auth",
+    stories: {
+      US1: {
+        title: "Organizer chooses who can read an event",
+        actor: "organizer",
+        priority: "P1",
+      },
+    },
+  },
 } as const satisfies Record<string, Feature>;
 
 type Features = typeof features;

@@ -1,5 +1,6 @@
 import { createRoute } from "@hono/zod-openapi";
 import {
+  adminEventViewSchema,
   dayBodySchema,
   dayUpdateBodySchema,
   dayViewSchema,
@@ -8,7 +9,6 @@ import {
   eventPhasesUpdateBodySchema,
   eventSettingsBodySchema,
   eventUpdateBodySchema,
-  eventViewSchema,
   momentBodySchema,
   momentCreateBodySchema,
   momentViewSchema,
@@ -30,7 +30,7 @@ import {
 } from "@/server/http/route-parts";
 
 import type { EventUseCases } from "../application/use-cases";
-import { toDayView, toEventView, toMomentView } from "./view";
+import { toAdminEventView, toDayView, toEventView, toMomentView } from "./view";
 
 const tags = ["admin"];
 const dates = <T extends Record<string, string | null>>(fields: T) =>
@@ -60,6 +60,18 @@ const getEvent = createRoute({
   },
 });
 
+const getAdminEvent = createRoute({
+  method: "get",
+  path: "/admin/events/{id}",
+  tags,
+  description: "The event with its link and kiosk tokens.",
+  request: { params: idParam },
+  responses: {
+    200: json(adminEventViewSchema, "The event"),
+    ...problemDefault,
+  },
+});
+
 const createEvent = createRoute({
   method: "post",
   path: "/admin/events",
@@ -67,7 +79,7 @@ const createEvent = createRoute({
   description: "Creates an event; its URL slug is derived from the name.",
   request: { headers: idempotencyHeaders, body: body(eventSettingsBodySchema) },
   responses: {
-    201: json(eventViewSchema, "The new event"),
+    201: json(adminEventViewSchema, "The new event"),
     ...problemDefault,
   },
 });
@@ -84,8 +96,8 @@ const updateEvent = createRoute({
     body: body(eventUpdateBodySchema),
   },
   responses: {
-    200: json(eventViewSchema, "The updated event"),
-    ...versionConflictResponse(eventViewSchema),
+    200: json(adminEventViewSchema, "The updated event"),
+    ...versionConflictResponse(adminEventViewSchema),
     ...problemDefault,
   },
 });
@@ -100,8 +112,8 @@ const updatePhases = createRoute({
     body: body(eventPhasesUpdateBodySchema),
   },
   responses: {
-    200: json(eventViewSchema, "The updated event"),
-    ...versionConflictResponse(eventViewSchema),
+    200: json(adminEventViewSchema, "The updated event"),
+    ...versionConflictResponse(adminEventViewSchema),
     ...problemDefault,
   },
 });
@@ -224,10 +236,19 @@ export function addEventReadRoutes(app: App, events: () => EventUseCases) {
 }
 
 export function addAdminEventRoutes(app: App, events: () => EventUseCases) {
+  app.openapi(getAdminEvent, async (c) => {
+    const result = await events().getEventAsAdmin(
+      c.var.actor,
+      c.req.valid("param")
+    );
+    if (!result.ok) return problem(result.error);
+    return c.json(toAdminEventView(result.value), 200);
+  });
+
   app.openapi(createEvent, async (c) => {
     const result = await events().createEvent(c.var.actor, c.req.valid("json"));
     if (!result.ok) return problem(result.error);
-    return c.json(toEventView(result.value), 201);
+    return c.json(toAdminEventView(result.value), 201);
   });
 
   app.openapi(updateEvent, async (c) => {
@@ -239,8 +260,8 @@ export function addAdminEventRoutes(app: App, events: () => EventUseCases) {
       },
       c.var.now
     );
-    if (!result.ok) return problem(result.error, toEventView);
-    return c.json(toEventView(result.value), 200);
+    if (!result.ok) return problem(result.error, toAdminEventView);
+    return c.json(toAdminEventView(result.value), 200);
   });
 
   app.openapi(updatePhases, async (c) => {
@@ -254,8 +275,8 @@ export function addAdminEventRoutes(app: App, events: () => EventUseCases) {
       },
       c.var.now
     );
-    if (!result.ok) return problem(result.error, toEventView);
-    return c.json(toEventView(result.value), 200);
+    if (!result.ok) return problem(result.error, toAdminEventView);
+    return c.json(toAdminEventView(result.value), 200);
   });
 
   app.openapi(deleteEvent, async (c) => {

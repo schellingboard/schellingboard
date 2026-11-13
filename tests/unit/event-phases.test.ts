@@ -27,6 +27,7 @@ function makeEvent(overrides: Partial<Event>): Event {
     timezone: "UTC",
     rsvpCapacityHardLimit: false,
     identityMode: "open",
+    readAccess: "public",
     meetingsEnabled: false,
     maxOpenMeetingRequests: 5,
     version: 1,

@@ -1,5 +1,5 @@
 import type { LoginAssurance, LoginVia } from "@schellingboard/domain/auth";
-import type { IdentityMode } from "@schellingboard/domain/event";
+import type { IdentityMode, ReadAccess } from "@schellingboard/domain/event";
 import type {
   ProfileContact,
   ProfilePrompt,
@@ -14,6 +14,8 @@ import {
   text,
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
+
+import { newEventToken } from "@/utils/event-token";
 
 // Singleton table holding site-wide configuration (title, description, map).
 // Always a single row with id "singleton"; see SqliteSettingsRepository.
@@ -216,6 +218,12 @@ export const events = sqliteTable(
       .$type<IdentityMode>()
       .notNull()
       .default("open"),
+    readAccess: text("read_access")
+      .$type<ReadAccess>()
+      .notNull()
+      .default("public"),
+    linkToken: text("link_token").notNull().$defaultFn(newEventToken),
+    kioskToken: text("kiosk_token").notNull().$defaultFn(newEventToken),
     meetingsEnabled: integer("meetings_enabled", { mode: "boolean" })
       .notNull()
       .default(false),
@@ -224,7 +232,11 @@ export const events = sqliteTable(
       .default(5),
     version: integer("version").notNull().default(1),
   },
-  (table) => [uniqueIndex("events_slug_unique").on(table.slug)]
+  (table) => [
+    uniqueIndex("events_slug_unique").on(table.slug),
+    uniqueIndex("events_link_token_unique").on(table.linkToken),
+    uniqueIndex("events_kiosk_token_unique").on(table.kioskToken),
+  ]
 );
 
 // One row per signed-in browser; the guest cookie holds a random token and

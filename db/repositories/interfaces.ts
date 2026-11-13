@@ -14,6 +14,7 @@ import type {
   Event,
   EventMeetingSettings,
   SharedMoment,
+  StoredEvent,
 } from "@schellingboard/domain/event";
 import type { EventLabel } from "@schellingboard/domain/event-label";
 import type {
@@ -132,11 +133,11 @@ type EventDerivedFields =
   "id" | "slug" | "firstDayStart" | "lastDayStart" | "version";
 
 export interface EventsRepository {
-  list(): Promise<Event[]>;
-  findById(id: string): Promise<Event | undefined>;
-  findByName(name: string): Promise<Event | undefined>;
+  list(): Promise<StoredEvent[]>;
+  findById(id: string): Promise<StoredEvent | undefined>;
+  findByName(name: string): Promise<StoredEvent | undefined>;
   /** Finds the event with the given slug. Slugs are unique. */
-  findBySlug(slug: string): Promise<Event | undefined>;
+  findBySlug(slug: string): Promise<StoredEvent | undefined>;
   /**
    * Creates the event with a slug derived from its name. Rejects when another
    * event already has that slug (unique constraint). Meeting settings are
@@ -145,20 +146,23 @@ export interface EventsRepository {
   create(
     data: Omit<
       Event,
-      EventDerivedFields | keyof EventMeetingSettings | "identityMode"
+      | EventDerivedFields
+      | keyof EventMeetingSettings
+      | "identityMode"
+      | "readAccess"
     > &
-      Partial<EventMeetingSettings & Pick<Event, "identityMode">>
-  ): Promise<Event>;
+      Partial<EventMeetingSettings & Pick<Event, "identityMode" | "readAccess">>
+  ): Promise<StoredEvent>;
   /**
    * Undefined, changing nothing, if the event is gone or not at
    * `expectedVersion`.
    */
   update(
     id: string,
-    patch: Partial<Omit<Event, EventDerivedFields>> & {
+    patch: Partial<Omit<StoredEvent, EventDerivedFields>> & {
       expectedVersion?: number;
     }
-  ): Promise<Event | undefined>;
+  ): Promise<StoredEvent | undefined>;
   /**
    * Deletes the event and all records referencing it (cascades via DB FK),
    * raising the version of the locations and guests it leaves.

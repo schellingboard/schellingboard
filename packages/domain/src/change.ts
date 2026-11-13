@@ -1,5 +1,10 @@
 import type { CommentRef } from "./comment";
-import type { Day, Event, SharedMoment } from "./event";
+import {
+  type Day,
+  type Event,
+  type SharedMoment,
+  withoutSecrets,
+} from "./event";
 import type { Guest } from "./guest";
 import type { Location, LocationUnavailability } from "./location";
 import type { Meeting, MeetingPoint } from "./meeting";
@@ -736,7 +741,7 @@ export const changes = {
       eventId: event.id,
       actor,
       occurredAt: at,
-      payload: { event },
+      payload: { event: withoutSecrets(event) },
     };
   },
 
@@ -748,7 +753,7 @@ export const changes = {
       eventId: event.id,
       actor,
       occurredAt: at,
-      payload: { event },
+      payload: { event: withoutSecrets(event) },
     };
   },
 
