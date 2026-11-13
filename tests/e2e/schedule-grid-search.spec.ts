@@ -9,7 +9,10 @@ import { selectUser } from "./helpers/user";
 
 const NO_MATCH = /doesn't match/;
 // Seeded at today+14 (see helpers/dev-clock.ts); API Design is on day one.
-const gammaDayTwo = gammaDay(1).toFormat("EEEE, MMMM d");
+// The day bar follows the browser locale (en-GB in the Playwright config).
+const gammaDayTwo = gammaDay(1)
+  .setLocale("en-GB")
+  .toLocaleString({ weekday: "long", month: "long", day: "numeric" });
 
 test("searching the grid fades what doesn't match and folds days without a match @007-US3", async ({
   page,

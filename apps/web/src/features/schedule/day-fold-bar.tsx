@@ -32,7 +32,13 @@ export function DayFoldBar({
     >
       <span className="sticky left-0 inline-flex items-center gap-1.5 px-2 py-1.5 text-xs text-fg-subtle">
         <Chevron className="h-3.5 w-3.5 stroke-2" />
-        <span className="font-medium">{date.toFormat("EEEE, MMMM d")}</span>
+        <span className="font-medium">
+          {date.toLocaleString({
+            weekday: "long",
+            month: "long",
+            day: "numeric",
+          })}
+        </span>
         <span>
           {noMatches
             ? folded

@@ -1,7 +1,7 @@
 import { i18n } from "@lingui/core";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import type { Session } from "@schellingboard/domain/session";
-import { DateTime } from "luxon";
+import { DateTime, Settings } from "luxon";
 
 import { formatList } from "../i18n/format";
 import { eventContextFrom } from "../replica/selectors";
@@ -16,14 +16,12 @@ export function describeSession(
         .setZone(timezone)
         .toFormat("ccc HH:mm")
     : undefined;
+  const locale = Settings.defaultLocale ?? i18n.locale;
   const where = formatList(
-    i18n.locale,
+    locale,
     session.locations.map((l) => l.name)
   );
-  const details = formatList(
-    i18n.locale,
-    [when, where].filter(Boolean) as string[]
-  );
+  const details = formatList(locale, [when, where].filter(Boolean) as string[]);
   return `“${session.title}”${details ? ` (${details})` : ""}`;
 }
 

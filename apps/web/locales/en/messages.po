@@ -19,19 +19,19 @@ msgstr "— hidden by you"
 msgid "· Co-host wanted"
 msgstr "· Co-host wanted"
 
-#: src/features/schedule/day-fold-bar.tsx:43
+#: src/features/schedule/day-fold-bar.tsx:49
 msgid "· day has passed · hide"
 msgstr "· day has passed · hide"
 
-#: src/features/schedule/day-fold-bar.tsx:42
+#: src/features/schedule/day-fold-bar.tsx:48
 msgid "· day has passed · show"
 msgstr "· day has passed · show"
 
-#: src/features/schedule/day-fold-bar.tsx:40
+#: src/features/schedule/day-fold-bar.tsx:46
 msgid "· no matches · hide"
 msgstr "· no matches · hide"
 
-#: src/features/schedule/day-fold-bar.tsx:39
+#: src/features/schedule/day-fold-bar.tsx:45
 msgid "· no matches · show"
 msgstr "· no matches · show"
 
@@ -411,6 +411,10 @@ msgstr "{unread, plural, one {Notifications (# unread)} other {Notifications (# 
 msgid "{valueLabel}: 0 to {max}"
 msgstr "{valueLabel}: 0 to {max}"
 
+#: src/app/footer.tsx:154
+msgid "{version} — {releaseDate}"
+msgstr "{version} — {releaseDate}"
+
 #: src/features/admin/event-proposals.tsx:292
 msgid "{votesCount, plural, one {# vote} other {# votes}}"
 msgstr "{votesCount, plural, one {# vote} other {# votes}}"
@@ -575,11 +579,11 @@ msgstr "A left-out session still occupies its location, so the gaps stay true."
 msgid "A new version of SchellingBoard is available."
 msgstr "A new version of SchellingBoard is available."
 
-#: src/app/footer.tsx:128
+#: src/app/footer.tsx:129
 msgid "A newer release is out: {latestVersion}, {latestDate}."
 msgstr "A newer release is out: {latestVersion}, {latestDate}."
 
-#: src/app/footer.tsx:129
+#: src/app/footer.tsx:130
 msgid "A newer release is out: {latestVersion}."
 msgstr "A newer release is out: {latestVersion}."
 
@@ -2486,7 +2490,7 @@ msgctxt "Location colour"
 msgid "Fuchsia"
 msgstr "Fuchsia"
 
-#: src/app/footer.tsx:174
+#: src/app/footer.tsx:181
 msgid "Full changelog on GitHub"
 msgstr "Full changelog on GitHub"
 
@@ -2566,7 +2570,7 @@ msgstr "He/They"
 msgid "Heart"
 msgstr "Heart"
 
-#: src/app/footer.tsx:103
+#: src/app/footer.tsx:104
 msgid "Help"
 msgstr "Help"
 
@@ -2738,7 +2742,7 @@ msgstr "How often the reported count fell inside the model's 50% and 80% ranges.
 msgid "How often was the prediction right?"
 msgstr "How often was the prediction right?"
 
-#: src/app/footer.tsx:139
+#: src/app/footer.tsx:140
 msgid "How to update"
 msgstr "How to update"
 
@@ -2788,7 +2792,7 @@ msgstr "Import users"
 msgid "Importing..."
 msgstr "Importing..."
 
-#: src/app/footer.tsx:153
+#: src/app/footer.tsx:159
 msgid "In this build, but not in a released version yet."
 msgstr "In this build, but not in a released version yet."
 
@@ -3860,7 +3864,7 @@ msgstr "Please fix the highlighted fields."
 msgid "Please try again."
 msgstr "Please try again."
 
-#: src/app/footer.tsx:87
+#: src/app/footer.tsx:88
 msgid "Powered by"
 msgstr "Powered by"
 
@@ -4084,7 +4088,7 @@ msgctxt "Comment action: reply to it"
 msgid "Reply"
 msgstr "Reply"
 
-#: src/app/footer.tsx:112
+#: src/app/footer.tsx:113
 msgid "Report a Bug"
 msgstr "Report a Bug"
 
@@ -5196,15 +5200,15 @@ msgstr "This session no longer exists."
 msgid "This session was scheduled from a proposal. See it <0>here</0>."
 msgstr "This session was scheduled from a proposal. See it <0>here</0>."
 
-#: src/app/footer.tsx:123
+#: src/app/footer.tsx:124
 msgid "This site is running {shown}."
 msgstr "This site is running {shown}."
 
-#: src/app/footer.tsx:131
+#: src/app/footer.tsx:132
 msgid "This site runs {currentVersion}, {currentDate}."
 msgstr "This site runs {currentVersion}, {currentDate}."
 
-#: src/app/footer.tsx:132
+#: src/app/footer.tsx:133
 msgid "This site runs {currentVersion}."
 msgstr "This site runs {currentVersion}."
 
@@ -5372,7 +5376,7 @@ msgstr "Unavailable"
 msgid "Undecided"
 msgstr "Undecided"
 
-#: src/app/footer.tsx:44
+#: src/app/footer.tsx:45
 msgid "unknown"
 msgstr "unknown"
 
@@ -5468,15 +5472,15 @@ msgstr "Verified events need a personal join link, an emailed code or a password
 msgid "Verified: attendees prove who they are"
 msgstr "Verified: attendees prove who they are"
 
-#: src/app/footer.tsx:69
+#: src/app/footer.tsx:70
 msgid "Version {shown} — what's new"
 msgstr "Version {shown} — what's new"
 
-#: src/app/footer.tsx:68
+#: src/app/footer.tsx:69
 msgid "Version {shown} — what's new, update available"
 msgstr "Version {shown} — what's new, update available"
 
-#: src/app/footer.tsx:74
+#: src/app/footer.tsx:75
 msgid "Version:"
 msgstr "Version:"
 
@@ -5595,8 +5599,8 @@ msgstr "What would you like to learn? Propose it and ask for a host."
 msgid "What you leave out leaves every figure and download. A host also leaves the figures about people."
 msgstr "What you leave out leaves every figure and download. A host also leaves the figures about people."
 
-#: src/app/footer.tsx:63
-#: src/app/footer.tsx:119
+#: src/app/footer.tsx:64
+#: src/app/footer.tsx:120
 msgid "What's new"
 msgstr "What's new"
 

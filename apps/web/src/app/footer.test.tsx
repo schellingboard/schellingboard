@@ -2,6 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
+import { FormatLocaleContext } from "../i18n/format-locale";
 import { Footer } from "./footer";
 import { ThemeProvider } from "./theme";
 import type { UpdateStatus } from "./updates";
@@ -23,9 +24,11 @@ vi.mock("@schellingboard/domain/release-notes", async (importOriginal) => ({
 
 const show = (version: string | undefined, update?: UpdateStatus | null) =>
   render(
-    <ThemeProvider>
-      <Footer version={version} update={update} />
-    </ThemeProvider>
+    <FormatLocaleContext.Provider value="en-GB">
+      <ThemeProvider>
+        <Footer version={version} update={update} />
+      </ThemeProvider>
+    </FormatLocaleContext.Provider>
   );
 
 const behind: UpdateStatus = {

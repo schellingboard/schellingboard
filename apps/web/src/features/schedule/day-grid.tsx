@@ -108,7 +108,7 @@ export function DayGrid({
       >
         <span className="text-[11px] font-bold">{date.toFormat("EEE")}</span>
         <span className="text-[10px] text-fg-subtle">
-          {date.toFormat("MMM d")}
+          {date.toLocaleString({ month: "short", day: "numeric" })}
         </span>
       </div>
       {showMeetings && (

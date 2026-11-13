@@ -7,6 +7,7 @@ import {
 } from "@schellingboard/domain/release-notes";
 import { useState } from "react";
 
+import { useFormatLocale } from "../i18n/format-locale";
 import { Dialog } from "../ui/dialog";
 import { InlineMarkdown } from "../ui/inline-markdown";
 import { Tooltip } from "../ui/tooltip";
@@ -17,15 +18,14 @@ const CHANGELOG_URL =
   "https://github.com/schellingboard/schellingboard/blob/main/CHANGELOG.md";
 
 // The calendar date the release carries in CHANGELOG.md, whatever the reader's zone.
-const formatDate = (date: string) =>
-  new Date(date).toLocaleDateString(DATE_LOCALE, {
+const formatDate = (date: string, locale: string) =>
+  new Date(date).toLocaleDateString(locale, {
     day: "numeric",
     month: "long",
     year: "numeric",
     timeZone: "UTC",
   });
 
-const DATE_LOCALE = "en-GB";
 const BRAND = "SchellingBoard";
 const link = "text-link hover:underline";
 
@@ -40,15 +40,16 @@ export function Footer({
   /** A copy inside a screen's scroll content, for screens that hide the page's footer. */
   inline?: boolean;
 }) {
+  const locale = useFormatLocale();
   const [open, setOpen] = useState(false);
   const shown = version ?? t`unknown`;
   const behind = update?.updateAvailable ? update : null;
   const latest = behind?.latest;
   const latestVersion = latest?.version ?? "";
   const currentVersion = behind?.current.version ?? "";
-  const latestDate = latest?.date ? formatDate(latest.date) : null;
+  const latestDate = latest?.date ? formatDate(latest.date, locale) : null;
   const currentDate = behind?.current.date
-    ? formatDate(behind.current.date)
+    ? formatDate(behind.current.date, locale)
     : null;
 
   return (
@@ -141,29 +142,35 @@ export function Footer({
           </p>
         )}
         <div className="mt-4 space-y-4">
-          {releaseNotes.slice(0, SHOWN_RELEASES).map((release) => (
-            <section key={release.version}>
-              <h3 className="border-b border-line-subtle pb-1 text-base font-bold text-fg">
-                {release.date
-                  ? `${release.version} — ${formatDate(release.date)}`
-                  : release.version}
-              </h3>
-              {!release.date && (
-                <p className="mt-1 text-xs text-fg-subtle">
-                  <Trans>
-                    In this build, but not in a released version yet.
-                  </Trans>
-                </p>
-              )}
-              <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-fg">
-                {release.highlights.map((highlight) => (
-                  <li key={highlight}>
-                    <InlineMarkdown>{highlight}</InlineMarkdown>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ))}
+          {releaseNotes.slice(0, SHOWN_RELEASES).map((release) => {
+            const { version } = release;
+            const releaseDate = release.date
+              ? formatDate(release.date, locale)
+              : "";
+            return (
+              <section key={release.version}>
+                <h3 className="border-b border-line-subtle pb-1 text-base font-bold text-fg">
+                  {release.date
+                    ? t`${version} — ${releaseDate}`
+                    : release.version}
+                </h3>
+                {!release.date && (
+                  <p className="mt-1 text-xs text-fg-subtle">
+                    <Trans>
+                      In this build, but not in a released version yet.
+                    </Trans>
+                  </p>
+                )}
+                <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-fg">
+                  {release.highlights.map((highlight) => (
+                    <li key={highlight}>
+                      <InlineMarkdown>{highlight}</InlineMarkdown>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            );
+          })}
         </div>
         <a
           href={CHANGELOG_URL}

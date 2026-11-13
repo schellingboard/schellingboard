@@ -221,6 +221,8 @@ export default tseslint.config(
             // Enum values of props and options
             "^(?:failure|info|centered|grid|smooth)$",
             "path=/; max-age=",
+            // Intl and Luxon option values
+            "^(?:long|short|narrow|numeric|2-digit)$",
             // Theme, time-format and push-state tokens (stored or compared, never shown). Global: a
             // UI string that is exactly one of these passes in every file, so translate such words by hand.
             "^(?:system|light|dark|auto|checking|needs-install|unsupported|blocked|on|off)$",

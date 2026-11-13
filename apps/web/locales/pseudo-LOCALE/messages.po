@@ -19,19 +19,19 @@ msgstr ""
 msgid "· Co-host wanted"
 msgstr ""
 
-#: src/features/schedule/day-fold-bar.tsx:43
+#: src/features/schedule/day-fold-bar.tsx:49
 msgid "· day has passed · hide"
 msgstr ""
 
-#: src/features/schedule/day-fold-bar.tsx:42
+#: src/features/schedule/day-fold-bar.tsx:48
 msgid "· day has passed · show"
 msgstr ""
 
-#: src/features/schedule/day-fold-bar.tsx:40
+#: src/features/schedule/day-fold-bar.tsx:46
 msgid "· no matches · hide"
 msgstr ""
 
-#: src/features/schedule/day-fold-bar.tsx:39
+#: src/features/schedule/day-fold-bar.tsx:45
 msgid "· no matches · show"
 msgstr ""
 
@@ -411,6 +411,10 @@ msgstr ""
 msgid "{valueLabel}: 0 to {max}"
 msgstr ""
 
+#: src/app/footer.tsx:154
+msgid "{version} — {releaseDate}"
+msgstr ""
+
 #: src/features/admin/event-proposals.tsx:292
 msgid "{votesCount, plural, one {# vote} other {# votes}}"
 msgstr ""
@@ -575,11 +579,11 @@ msgstr ""
 msgid "A new version of SchellingBoard is available."
 msgstr ""
 
-#: src/app/footer.tsx:128
+#: src/app/footer.tsx:129
 msgid "A newer release is out: {latestVersion}, {latestDate}."
 msgstr ""
 
-#: src/app/footer.tsx:129
+#: src/app/footer.tsx:130
 msgid "A newer release is out: {latestVersion}."
 msgstr ""
 
@@ -2486,7 +2490,7 @@ msgctxt "Location colour"
 msgid "Fuchsia"
 msgstr ""
 
-#: src/app/footer.tsx:174
+#: src/app/footer.tsx:181
 msgid "Full changelog on GitHub"
 msgstr ""
 
@@ -2566,7 +2570,7 @@ msgstr ""
 msgid "Heart"
 msgstr ""
 
-#: src/app/footer.tsx:103
+#: src/app/footer.tsx:104
 msgid "Help"
 msgstr ""
 
@@ -2738,7 +2742,7 @@ msgstr ""
 msgid "How often was the prediction right?"
 msgstr ""
 
-#: src/app/footer.tsx:139
+#: src/app/footer.tsx:140
 msgid "How to update"
 msgstr ""
 
@@ -2788,7 +2792,7 @@ msgstr ""
 msgid "Importing..."
 msgstr ""
 
-#: src/app/footer.tsx:153
+#: src/app/footer.tsx:159
 msgid "In this build, but not in a released version yet."
 msgstr ""
 
@@ -3860,7 +3864,7 @@ msgstr ""
 msgid "Please try again."
 msgstr ""
 
-#: src/app/footer.tsx:87
+#: src/app/footer.tsx:88
 msgid "Powered by"
 msgstr ""
 
@@ -4084,7 +4088,7 @@ msgctxt "Comment action: reply to it"
 msgid "Reply"
 msgstr ""
 
-#: src/app/footer.tsx:112
+#: src/app/footer.tsx:113
 msgid "Report a Bug"
 msgstr ""
 
@@ -5196,15 +5200,15 @@ msgstr ""
 msgid "This session was scheduled from a proposal. See it <0>here</0>."
 msgstr ""
 
-#: src/app/footer.tsx:123
+#: src/app/footer.tsx:124
 msgid "This site is running {shown}."
 msgstr ""
 
-#: src/app/footer.tsx:131
+#: src/app/footer.tsx:132
 msgid "This site runs {currentVersion}, {currentDate}."
 msgstr ""
 
-#: src/app/footer.tsx:132
+#: src/app/footer.tsx:133
 msgid "This site runs {currentVersion}."
 msgstr ""
 
@@ -5372,7 +5376,7 @@ msgstr ""
 msgid "Undecided"
 msgstr ""
 
-#: src/app/footer.tsx:44
+#: src/app/footer.tsx:45
 msgid "unknown"
 msgstr ""
 
@@ -5468,15 +5472,15 @@ msgstr ""
 msgid "Verified: attendees prove who they are"
 msgstr ""
 
-#: src/app/footer.tsx:69
+#: src/app/footer.tsx:70
 msgid "Version {shown} — what's new"
 msgstr ""
 
-#: src/app/footer.tsx:68
+#: src/app/footer.tsx:69
 msgid "Version {shown} — what's new, update available"
 msgstr ""
 
-#: src/app/footer.tsx:74
+#: src/app/footer.tsx:75
 msgid "Version:"
 msgstr ""
 
@@ -5595,8 +5599,8 @@ msgstr ""
 msgid "What you leave out leaves every figure and download. A host also leaves the figures about people."
 msgstr ""
 
-#: src/app/footer.tsx:63
-#: src/app/footer.tsx:119
+#: src/app/footer.tsx:64
+#: src/app/footer.tsx:120
 msgid "What's new"
 msgstr ""
 
