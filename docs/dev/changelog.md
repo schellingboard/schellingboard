@@ -21,9 +21,9 @@ file/function names, library versions) — describe what changed for them, not h
 **Conventions**:
 
 - One bullet per change, at most two lines:
-  `- **Bold lead phrase** (#123): what changed, and — where it isn't obvious — what was wrong before`
+  `- **Bold lead phrase** ([#123](https://github.com/schellingboard/schellingboard/issues/123)): what changed, and — where it isn't obvious — what was wrong before`
 - Reference the GitHub issue when one exists, taken from the commit's `fixes #123` / `issue #123`
-  footer (not the PR number in a squashed subject)
+  footer (not the PR number in a squashed subject), as a link to the issue
 - Several commits delivering one feature get one bullet between them
 - Order bullets within a section roughly by importance
 - Breaking changes: `> **Breaking change**: ...` blockquote at the top of the release

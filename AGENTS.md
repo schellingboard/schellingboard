@@ -30,15 +30,16 @@ organizers and attendees, so keep it non-technical. Dev-only changes go under `I
 [docs/dev/changelog.md](docs/dev/changelog.md) for the section types.
 
 **Format**:
-`- **Bold lead phrase** (#123): what changed, and — only where it isn't obvious — what was wrong before.`
+`- **Bold lead phrase** ([#123](https://github.com/schellingboard/schellingboard/issues/123)): what changed, and — only where it isn't obvious — what was wrong before.`
 
 **Hard limits** — limits, not targets:
 
 - One bullet per change. **Two lines of prose, ~40 words, maximum.** No sub-bullets, no second
   paragraph. If it doesn't fit, you are explaining too much.
-- Reference the GitHub issue where one exists — `(#123)`, straight after the lead phrase. Take the
-  number from the commit's `fixes #123` / `issue #123` footer, never from the PR number GitHub
-  appends to a squashed subject. No issue, no reference.
+- Reference the GitHub issue where one exists — as a link,
+  `([#123](https://github.com/schellingboard/schellingboard/issues/123))`, straight after the lead
+  phrase. Take the number from the commit's `fixes #123` / `issue #123` footer, never from the PR
+  number GitHub appends to a squashed subject. No issue, no reference.
 - Several commits that together deliver one feature get **one** bullet, not one each.
 - `Internal` is **not a second commit history** — git already has that, in more detail and better
   indexed. It lists only internal changes that are particularly valuable, disruptive, or otherwise a
@@ -58,7 +59,7 @@ Bad  - **Interrupting a profile slide no longer restarts it**: pressing Next or 
        with every press. Repeated presses in the same direction now let the first slide
        finish, a press the other way turns the card around from wherever it is, and
        catching a sliding card with a finger picks it up where it is.
-Good - **Interrupting a profile slide no longer restarts it** (#123): pressing Next or
+Good - **Interrupting a profile slide no longer restarts it** ([#123](https://github.com/schellingboard/schellingboard/issues/123)): pressing Next or
        Prev mid-slide used to replay the animation from the start.
 ```
 
