@@ -24,6 +24,9 @@ export function SpaLinks({
     <InAppLinks
       intercept={(url, link) => {
         const opened =
+          (url.pathname === `/${slug}/details`
+            ? ({ kind: "event", slug } as const)
+            : null) ??
           sessionFormOf(slug, url.pathname, url.search) ??
           (url.pathname.startsWith(sessionPrefix)
             ? panelSession(url, sessionPrefix, slug)
@@ -40,6 +43,7 @@ export function SpaLinks({
       owns={({ pathname }) =>
         pathname === `/${slug}` ||
         pathname === `/${slug}/schedule` ||
+        pathname === `/${slug}/details` ||
         pathname.startsWith(`/${slug}/sessions/`) ||
         pathname === `/${slug}/meetings` ||
         pathname.startsWith(`/${slug}/meetings/`) ||

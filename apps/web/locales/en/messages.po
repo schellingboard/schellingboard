@@ -675,7 +675,7 @@ msgstr "Add a label…"
 msgid "Add a line of context (optional)"
 msgstr "Add a line of context (optional)"
 
-#: src/app/panel-host.tsx:295
+#: src/app/panel-host.tsx:312
 msgid "Add a session"
 msgstr "Add a session"
 
@@ -756,7 +756,7 @@ msgstr "admin-managed"
 msgid "Admin-managed"
 msgstr "Admin-managed"
 
-#: src/features/schedule/schedule-toolbar.tsx:46
+#: src/features/schedule/schedule-toolbar.tsx:42
 msgid "Agenda"
 msgstr "Agenda"
 
@@ -2204,11 +2204,11 @@ msgstr "Edit profile"
 msgid "Edit profile form"
 msgstr "Edit profile form"
 
-#: src/app/panel-host.tsx:248
+#: src/app/panel-host.tsx:265
 msgid "Edit proposal"
 msgstr "Edit proposal"
 
-#: src/app/panel-host.tsx:295
+#: src/app/panel-host.tsx:312
 msgid "Edit session"
 msgstr "Edit session"
 
@@ -2331,7 +2331,7 @@ msgstr "Enter your password. Forgot it? Ask an organizer for a new link."
 msgid "Error: {error}"
 msgstr "Error: {error}"
 
-#: src/app/panel-host.tsx:89
+#: src/app/panel-host.tsx:93
 msgid "Event"
 msgstr "Event"
 
@@ -2345,9 +2345,9 @@ msgctxt "Statistics: the event to show"
 msgid "Event"
 msgstr "Event"
 
-#: src/app/panel-host.tsx:89
-#: src/features/schedule/schedule-toolbar.tsx:125
-#: src/features/schedule/schedule-toolbar.tsx:138
+#: src/app/panel-host.tsx:93
+#: src/features/schedule/event-details-panel.tsx:21
+#: src/features/schedule/schedule-toolbar.tsx:118
 msgid "Event details"
 msgstr "Event details"
 
@@ -2355,7 +2355,7 @@ msgstr "Event details"
 msgid "Event not found"
 msgstr "Event not found"
 
-#: src/app/panel-host.tsx:91
+#: src/app/panel-host.tsx:95
 msgid "Event not found."
 msgstr "Event not found."
 
@@ -2595,7 +2595,7 @@ msgid "Grey"
 msgstr "Grey"
 
 #. Name of the schedule view that shows rooms as columns
-#: src/features/schedule/schedule-toolbar.tsx:40
+#: src/features/schedule/schedule-toolbar.tsx:36
 msgid "Grid"
 msgstr "Grid"
 
@@ -2902,7 +2902,7 @@ msgstr "JPEG, PNG, or WebP, max {maxImageMb} MB, at least {MIN_IMAGE_WIDTH}px wi
 msgid "JPEG, PNG, or WebP, max {maxMapMegabytes} MB."
 msgstr "JPEG, PNG, or WebP, max {maxMapMegabytes} MB."
 
-#: src/features/schedule/schedule-toolbar.tsx:108
+#: src/features/schedule/schedule-toolbar.tsx:105
 msgid "Jump to the current time"
 msgstr "Jump to the current time"
 
@@ -3044,7 +3044,7 @@ msgstr "Loading proposals..."
 #: src/app/admin-pages.tsx:594
 #: src/app/admin-pages.tsx:640
 #: src/app/event-page.tsx:152
-#: src/app/panel-host.tsx:90
+#: src/app/panel-host.tsx:94
 #: src/app/profile-host.tsx:174
 #: src/features/admin/event-layout.tsx:82
 #: src/features/admin/event-sessions.tsx:394
@@ -3404,7 +3404,7 @@ msgstr "New location"
 msgid "New password (at least 8 characters)"
 msgstr "New password (at least 8 characters)"
 
-#: src/app/panel-host.tsx:248
+#: src/app/panel-host.tsx:265
 msgid "New proposal"
 msgstr "New proposal"
 
@@ -3656,7 +3656,7 @@ msgstr "Notifications on your devices"
 #. Badge on a session that is running now
 #. Button: jump to the current time
 #: src/features/schedule/day-agenda.tsx:207
-#: src/features/schedule/schedule-toolbar.tsx:115
+#: src/features/schedule/schedule-toolbar.tsx:112
 msgid "Now"
 msgstr "Now"
 
@@ -4051,7 +4051,7 @@ msgstr "Proposal sessions"
 #: src/features/admin/event-stats.tsx:22
 #: src/features/comments/my-comments-screen.tsx:16
 #: src/features/people/profile-body.tsx:235
-#: src/features/schedule/schedule-toolbar.tsx:130
+#: src/features/schedule/schedule-toolbar.tsx:123
 #: src/ui/phase-bar.tsx:16
 msgid "Proposals"
 msgstr "Proposals"
@@ -4388,7 +4388,7 @@ msgstr "Schedule a 1-on-1 at {eventName}"
 msgid "Schedule increment (min)"
 msgstr "Schedule increment (min)"
 
-#: src/features/schedule/schedule-toolbar.tsx:84
+#: src/features/schedule/schedule-toolbar.tsx:81
 msgid "Schedule view"
 msgstr "Schedule view"
 
@@ -4553,7 +4553,7 @@ msgstr "Session"
 msgid "Session details"
 msgstr "Session details"
 
-#: src/app/panel-host.tsx:294
+#: src/app/panel-host.tsx:311
 msgid "Session form"
 msgstr "Session form"
 
@@ -4583,7 +4583,7 @@ msgstr "Session not found."
 msgid "Session origins"
 msgstr "Session origins"
 
-#: src/app/panel-host.tsx:247
+#: src/app/panel-host.tsx:264
 msgid "Session proposal form"
 msgstr "Session proposal form"
 
@@ -5058,7 +5058,7 @@ msgid "The comment you replied to no longer exists."
 msgstr "The comment you replied to no longer exists."
 
 #: src/app/event-page.tsx:165
-#: src/app/panel-host.tsx:94
+#: src/app/panel-host.tsx:98
 msgid "The event could not be loaded."
 msgstr "The event could not be loaded."
 
@@ -5399,7 +5399,7 @@ msgstr "Trophy"
 
 #: src/app/error-boundary.tsx:39
 #: src/app/event-page.tsx:167
-#: src/app/panel-host.tsx:96
+#: src/app/panel-host.tsx:100
 #: src/features/comments/comments-section.tsx:133
 #: src/features/notifications/notifications-screen.tsx:217
 #: src/features/proposals/proposal-panel.tsx:261

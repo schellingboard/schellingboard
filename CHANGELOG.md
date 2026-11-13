@@ -58,8 +58,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   with more space between lines, and headings stand out by level.
 - **Sessions, proposals, 1-on-1s, profiles and event details open in a side panel**
   ([#1590](https://github.com/schellingboard/schellingboard/issues/1590)): the page stays usable
-  beside it and you can drag its edge to resize it. All but event details have their own shareable
-  link.
+  beside it and you can drag its edge to resize it. Each has its own shareable link.
 - **The schedule and the proposals list keep their search, filter and sort**: they are part of the
   page address, so Back and a reload bring them back.
 - **Back returns to where you were scrolled**: the schedule, the proposals list and the attendee

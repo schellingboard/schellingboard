@@ -11,6 +11,7 @@ export type PanelItem =
       prefill?: SessionFormPrefill;
     }
   | { kind: "meeting"; slug: string; id: string }
+  | { kind: "event"; slug: string }
   | { kind: "profile"; id: string }
   | { kind: "profile-form" };
 
@@ -62,6 +63,7 @@ export const panelPath = (item: PanelItem) => {
     return `/${item.slug}/sessions/new${query.size ? `?${query}` : ""}`;
   }
   if (item.kind === "profile-form") return "/guests/edit";
+  if (item.kind === "event") return `/${item.slug}/details`;
   const id = encodeURIComponent(item.id);
   if (item.kind === "profile") return `/guests/${id}`;
   if (item.kind === "proposal") return `/${item.slug}/proposals/${id}`;

@@ -83,6 +83,10 @@ function Loaded(view: EventView) {
     (id: string) => open({ kind: "session", slug, id }),
     [open, slug]
   );
+  const openDetails = useCallback(
+    () => open({ kind: "event", slug }),
+    [open, slug]
+  );
   const { actions, picker } = useScheduleActions(view);
   return (
     <>
@@ -98,6 +102,7 @@ function Loaded(view: EventView) {
         onBack={back}
         historyEntry={historyEntry}
         openSession={openSession}
+        openDetails={openDetails}
         revealSessionId={
           panel?.landed &&
           panel.item.kind === "session" &&

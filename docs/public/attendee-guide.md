@@ -150,6 +150,11 @@ by itself.
 A room name with an **ⓘ** next to it has more to say — tap it (or hover it) to read what the room
 offers (projector, whiteboard, the kind of seating), where to find it and how many people fit.
 
+**Event details** in the toolbar opens the event's dates, time zone, website and description in a
+panel beside the schedule, with its own link.
+
+![The event details panel beside the schedule grid](../screenshots/event-details.webp)
+
 The buttons at the top switch how the schedule is laid out: **Grid** (rooms side by side, the day
 running down) and **Agenda** (every session under the time it starts, all rooms together — handy on
 a phone).

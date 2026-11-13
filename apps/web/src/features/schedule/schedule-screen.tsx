@@ -59,6 +59,7 @@ export function ScheduleScreen({
   onParamsChange,
   onBack,
   openSession,
+  openDetails,
   revealSessionId,
   historyEntry,
   onHashChange,
@@ -77,6 +78,7 @@ export function ScheduleScreen({
   onBack: () => void;
   /** Opens a session's side panel over the schedule. */
   openSession: (sessionId: string) => void;
+  openDetails: () => void;
   /** A session an address named, or one just added, which is brought into view. */
   revealSessionId: string | null;
   /** Names the history entry the page is shown at, which its scroll position is kept under. */
@@ -246,6 +248,7 @@ export function ScheduleScreen({
         updated.set("view", next);
         onParamsChange(updated);
       }}
+      onOpenDetails={openDetails}
       showJumpToNow={nowIsOnSchedule}
       proposalsHref={links.proposals}
       now={data.now}

@@ -23,17 +23,24 @@ test.beforeEach(async ({ page }) => {
   await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
 });
 
-test("event details open in a panel and the proposals link navigates @007-US6", async ({
+test("event details open in the side panel, survive a reload, and the proposals link navigates @007-US6", async ({
   page,
 }) => {
   // The description (here: its "Venue map" link) is hidden until the panel opens.
   const venueMapLink = page.getByRole("link", { name: "Venue map" });
   await expect(venueMapLink).not.toBeVisible();
   await page.getByRole("button", { name: "Event details" }).click();
-  const dialog = page.getByRole("dialog");
-  await expect(dialog.getByRole("link", { name: "Venue map" })).toBeVisible();
-  await dialog.getByRole("button", { name: "Close" }).click();
+  const panel = page.getByRole("dialog", { name: "Event details" });
+  await expect(panel.getByRole("link", { name: "Venue map" })).toBeVisible();
+
+  await page.reload();
+  await expect(panel.getByRole("link", { name: "Venue map" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
+
+  await panel.getByRole("button", { name: "Close" }).click();
+  await expect(panel).toHaveCount(0);
   await expect(venueMapLink).not.toBeVisible();
+  await expect(page).toHaveURL(/\/Conference-Gamma\/schedule$/);
 
   // The Proposals link sits next to the view toggle and navigates.
   await page.getByRole("link", { name: "Proposals" }).click();

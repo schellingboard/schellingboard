@@ -13,9 +13,11 @@ import { ProposalForm } from "../features/proposals/proposal-form";
 import { ProposalPanel } from "../features/proposals/proposal-panel";
 import { ScheduleProvider } from "../features/schedule/context";
 import { scheduleDataFrom } from "../features/schedule/data";
+import { EventDetailsPanel } from "../features/schedule/event-details-panel";
 import { scheduleLinks } from "../features/schedule/links";
 import { SessionPanel } from "../features/schedule/session-panel";
 import { SessionForm } from "../features/sessions/session-form";
+import { eventContextFrom } from "../replica/selectors";
 import { SidePanel, usePanelGuard } from "../ui/side-panel";
 import { EventViewContext, Ready, useEventView } from "./event-page";
 import { LOCAL_ZONE } from "./local-zone";
@@ -35,7 +37,9 @@ export function PanelHost() {
   const { slug } = useEventView();
   if (!panel || !("slug" in panel.item) || panel.item.slug !== slug)
     return null;
-  const key = `${panel.item.kind}:${panel.item.id}:${panel.depth}`;
+  const key = `${panel.item.kind}:${"id" in panel.item ? panel.item.id : ""}:${panel.depth}`;
+  if (panel.item.kind === "event")
+    return <EventDetailsHost key={key} depth={panel.depth} />;
   if (panel.item.kind === "session")
     return <SessionHost key={key} item={panel.item} depth={panel.depth} />;
   if (panel.item.kind === "meeting")
@@ -110,6 +114,19 @@ function ForeignEvent({
         </EventViewContext.Provider>
       )}
     </Ready>
+  );
+}
+
+function EventDetailsHost({ depth }: { depth: number }) {
+  const { snapshot } = useEventView();
+  const { close, back } = usePanel();
+  const event = useMemo(() => eventContextFrom(snapshot).event, [snapshot]);
+  return (
+    <EventDetailsPanel
+      event={event}
+      onClose={close}
+      onBack={depth > 1 ? back : undefined}
+    />
   );
 }
 

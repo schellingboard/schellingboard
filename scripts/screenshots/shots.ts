@@ -111,7 +111,7 @@ export const shots: Shot[] = [
   shot("proposal-edit", async (page) => {
     await openProposals(page, "Conference Alpha");
     await page.getByText("My proposals", { exact: true }).click();
-    await page.getByRole("button", { name: "Edit" }).first().click();
+    await page.getByRole("link", { name: "Edit" }).first().click();
     await page.getByRole("heading", { name: /Edit proposal/ }).waitFor();
   }),
   shot("proposals-results", (page) => openProposals(page, "Conference Gamma")),
@@ -122,6 +122,11 @@ export const shots: Shot[] = [
     await page.getByText("Vote breakdown").waitFor();
   }),
   shot("schedule-grid", (page) => openEvent(page, "Conference Gamma")),
+  shot("event-details", async (page) => {
+    await openEvent(page, "Conference Gamma");
+    await page.getByRole("button", { name: "Event details" }).click();
+    await page.getByRole("dialog", { name: "Event details" }).waitFor();
+  }),
   shot("session-details", async (page) => {
     await openEvent(page, "Conference Gamma");
     await page

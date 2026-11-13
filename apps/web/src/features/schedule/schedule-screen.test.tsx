@@ -84,6 +84,7 @@ function screenAt(
   } = {}
 ) {
   const openSession = vi.fn<(sessionId: string) => void>();
+  const openDetails = vi.fn<() => void>();
   const onParamsChange = vi.fn<(params: URLSearchParams) => void>();
   let setSnapshot: (next: Snapshot) => void = () => {};
   const Harness = () => {
@@ -104,6 +105,7 @@ function screenAt(
         onHashChange={() => {}}
         onBack={() => {}}
         openSession={openSession}
+        openDetails={openDetails}
         revealSessionId={reveal}
         historyEntry="entry"
         sync={<span>Live</span>}
@@ -117,6 +119,7 @@ function screenAt(
   return {
     onParamsChange,
     openSession,
+    openDetails,
     showSnapshot: (next: Snapshot) => act(() => setSnapshot(next)),
   };
 }
@@ -439,20 +442,14 @@ describe("ScheduleScreen toolbar", () => {
   });
 
   it(
-    "shows the event's dates, zone and description in a panel",
+    "asks to open the event details from the toolbar",
     { tags: ["007-US6"] },
     async () => {
-      const withText: Snapshot = {
-        ...snap,
-        event: { ...snap.event, description: "Bring **a mug**." },
-      };
-      screenAt("", { snapshot: withText });
+      const { openDetails } = screenAt("");
       await userEvent.click(
         screen.getByRole("button", { name: "Event details" })
       );
-      const dialog = screen.getByRole("dialog", { name: "Event details" });
-      expect(within(dialog).getByText(/Jun 15 · UTC/)).toBeTruthy();
-      expect(within(dialog).getByText("a mug").tagName).toBe("STRONG");
+      expect(openDetails).toHaveBeenCalledOnce();
     }
   );
 

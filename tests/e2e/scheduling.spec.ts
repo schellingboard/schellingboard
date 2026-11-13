@@ -94,8 +94,14 @@ test("cancelling a session edit keeps it unchanged @008-US2", async ({
   await createSessionViaForm(page, title, /Workshop Room/, "16:10");
 
   await openEditForm(page, title);
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: /Edit session/i })
+  ).toBeVisible();
   await page.getByRole("textbox").first().fill(`${title} discarded`);
-  await page.getByRole("link", { name: "Cancel" }).click();
+  await page.getByRole("button", { name: "Cancel" }).click();
+  await expect(page.getByText("Discard your changes?")).toBeVisible();
+  await page.getByRole("button", { name: "Discard" }).click();
   await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
 
   await page.reload();

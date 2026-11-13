@@ -675,7 +675,7 @@ msgstr ""
 msgid "Add a line of context (optional)"
 msgstr ""
 
-#: src/app/panel-host.tsx:295
+#: src/app/panel-host.tsx:312
 msgid "Add a session"
 msgstr ""
 
@@ -756,7 +756,7 @@ msgstr ""
 msgid "Admin-managed"
 msgstr ""
 
-#: src/features/schedule/schedule-toolbar.tsx:46
+#: src/features/schedule/schedule-toolbar.tsx:42
 msgid "Agenda"
 msgstr ""
 
@@ -2204,11 +2204,11 @@ msgstr ""
 msgid "Edit profile form"
 msgstr ""
 
-#: src/app/panel-host.tsx:248
+#: src/app/panel-host.tsx:265
 msgid "Edit proposal"
 msgstr ""
 
-#: src/app/panel-host.tsx:295
+#: src/app/panel-host.tsx:312
 msgid "Edit session"
 msgstr ""
 
@@ -2331,7 +2331,7 @@ msgstr ""
 msgid "Error: {error}"
 msgstr ""
 
-#: src/app/panel-host.tsx:89
+#: src/app/panel-host.tsx:93
 msgid "Event"
 msgstr ""
 
@@ -2345,9 +2345,9 @@ msgctxt "Statistics: the event to show"
 msgid "Event"
 msgstr ""
 
-#: src/app/panel-host.tsx:89
-#: src/features/schedule/schedule-toolbar.tsx:125
-#: src/features/schedule/schedule-toolbar.tsx:138
+#: src/app/panel-host.tsx:93
+#: src/features/schedule/event-details-panel.tsx:21
+#: src/features/schedule/schedule-toolbar.tsx:118
 msgid "Event details"
 msgstr ""
 
@@ -2355,7 +2355,7 @@ msgstr ""
 msgid "Event not found"
 msgstr ""
 
-#: src/app/panel-host.tsx:91
+#: src/app/panel-host.tsx:95
 msgid "Event not found."
 msgstr ""
 
@@ -2595,7 +2595,7 @@ msgid "Grey"
 msgstr ""
 
 #. Name of the schedule view that shows rooms as columns
-#: src/features/schedule/schedule-toolbar.tsx:40
+#: src/features/schedule/schedule-toolbar.tsx:36
 msgid "Grid"
 msgstr ""
 
@@ -2902,7 +2902,7 @@ msgstr ""
 msgid "JPEG, PNG, or WebP, max {maxMapMegabytes} MB."
 msgstr ""
 
-#: src/features/schedule/schedule-toolbar.tsx:108
+#: src/features/schedule/schedule-toolbar.tsx:105
 msgid "Jump to the current time"
 msgstr ""
 
@@ -3044,7 +3044,7 @@ msgstr ""
 #: src/app/admin-pages.tsx:594
 #: src/app/admin-pages.tsx:640
 #: src/app/event-page.tsx:152
-#: src/app/panel-host.tsx:90
+#: src/app/panel-host.tsx:94
 #: src/app/profile-host.tsx:174
 #: src/features/admin/event-layout.tsx:82
 #: src/features/admin/event-sessions.tsx:394
@@ -3404,7 +3404,7 @@ msgstr ""
 msgid "New password (at least 8 characters)"
 msgstr ""
 
-#: src/app/panel-host.tsx:248
+#: src/app/panel-host.tsx:265
 msgid "New proposal"
 msgstr ""
 
@@ -3656,7 +3656,7 @@ msgstr ""
 #. Badge on a session that is running now
 #. Button: jump to the current time
 #: src/features/schedule/day-agenda.tsx:207
-#: src/features/schedule/schedule-toolbar.tsx:115
+#: src/features/schedule/schedule-toolbar.tsx:112
 msgid "Now"
 msgstr ""
 
@@ -4051,7 +4051,7 @@ msgstr ""
 #: src/features/admin/event-stats.tsx:22
 #: src/features/comments/my-comments-screen.tsx:16
 #: src/features/people/profile-body.tsx:235
-#: src/features/schedule/schedule-toolbar.tsx:130
+#: src/features/schedule/schedule-toolbar.tsx:123
 #: src/ui/phase-bar.tsx:16
 msgid "Proposals"
 msgstr ""
@@ -4388,7 +4388,7 @@ msgstr ""
 msgid "Schedule increment (min)"
 msgstr ""
 
-#: src/features/schedule/schedule-toolbar.tsx:84
+#: src/features/schedule/schedule-toolbar.tsx:81
 msgid "Schedule view"
 msgstr ""
 
@@ -4553,7 +4553,7 @@ msgstr ""
 msgid "Session details"
 msgstr ""
 
-#: src/app/panel-host.tsx:294
+#: src/app/panel-host.tsx:311
 msgid "Session form"
 msgstr ""
 
@@ -4583,7 +4583,7 @@ msgstr ""
 msgid "Session origins"
 msgstr ""
 
-#: src/app/panel-host.tsx:247
+#: src/app/panel-host.tsx:264
 msgid "Session proposal form"
 msgstr ""
 
@@ -5058,7 +5058,7 @@ msgid "The comment you replied to no longer exists."
 msgstr ""
 
 #: src/app/event-page.tsx:165
-#: src/app/panel-host.tsx:94
+#: src/app/panel-host.tsx:98
 msgid "The event could not be loaded."
 msgstr ""
 
@@ -5399,7 +5399,7 @@ msgstr ""
 
 #: src/app/error-boundary.tsx:39
 #: src/app/event-page.tsx:167
-#: src/app/panel-host.tsx:96
+#: src/app/panel-host.tsx:100
 #: src/features/comments/comments-section.tsx:133
 #: src/features/notifications/notifications-screen.tsx:217
 #: src/features/proposals/proposal-panel.tsx:261

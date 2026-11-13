@@ -3,21 +3,17 @@ import { msg, t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import type { Event } from "@schellingboard/domain/event";
 import { hasPhases } from "@schellingboard/domain/phase";
-import { formatEventDates } from "@schellingboard/domain/time";
-import { type ReactNode, useState } from "react";
+import type { ReactNode } from "react";
 
 import { cx } from "../../ui/cx";
 import {
-  CalendarIcon,
   ClockIcon,
   InformationCircleIcon,
   ProposalsIcon,
   QueueIcon,
   TableIcon,
 } from "../../ui/icons";
-import { Markdown } from "../../ui/markdown";
 import { PhaseBar } from "../../ui/phase-bar";
-import { SidePanel } from "../../ui/side-panel";
 import { Tooltip } from "../../ui/tooltip";
 import { scrollNowLineIntoView } from "./now-line";
 
@@ -56,6 +52,7 @@ export function ScheduleToolbar({
   event,
   view,
   onViewChange,
+  onOpenDetails,
   showJumpToNow,
   proposalsHref,
   now,
@@ -64,13 +61,13 @@ export function ScheduleToolbar({
   event: Event;
   view: ScheduleView;
   onViewChange: (view: ScheduleView) => void;
+  onOpenDetails: () => void;
   /** Whether to offer "Now": only while the view has a line to jump to. */
   showJumpToNow: boolean;
   proposalsHref: string;
   now: Date;
   sync: ReactNode;
 }) {
-  const [detailsOpen, setDetailsOpen] = useState(false);
   return (
     // The outer div spans the (possibly horizontally overflowing) grid width;
     // the inner one sticks the controls to the visible area, as the fold bars do.
@@ -116,11 +113,7 @@ export function ScheduleToolbar({
               </button>
             </Tooltip>
           )}
-          <button
-            type="button"
-            onClick={() => setDetailsOpen(true)}
-            className={ITEM_CLASS}
-          >
+          <button type="button" onClick={onOpenDetails} className={ITEM_CLASS}>
             <InformationCircleIcon className="h-4 w-4 stroke-2" />
             <Trans>Event details</Trans>
           </button>
@@ -132,43 +125,6 @@ export function ScheduleToolbar({
           )}
         </div>
         {sync}
-      </div>
-      {detailsOpen && (
-        <SidePanel
-          label={t`Event details`}
-          title={event.name}
-          onClose={() => setDetailsOpen(false)}
-          transient
-        >
-          <EventDetails event={event} />
-        </SidePanel>
-      )}
-    </div>
-  );
-}
-
-function EventDetails({ event }: { event: Event }) {
-  const dates = formatEventDates(event);
-  return (
-    <div>
-      <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm font-medium text-fg-subtle">
-        <span className="flex items-center gap-1">
-          <CalendarIcon className="h-4 w-4 stroke-2" />
-          <span>
-            {dates && `${dates} · `}
-            {event.timezone}
-          </span>
-        </span>
-        {event.website && (
-          <a className="hover:underline" href={event.website}>
-            {event.website}
-          </a>
-        )}
-      </div>
-      <div className="mt-3 text-fg">
-        <Markdown className="text-base leading-relaxed">
-          {event.description}
-        </Markdown>
       </div>
     </div>
   );
