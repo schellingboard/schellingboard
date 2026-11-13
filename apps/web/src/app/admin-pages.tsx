@@ -1,7 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import type { EventStatistics } from "@schellingboard/contracts/stats";
-import { formatDayLabel } from "@schellingboard/domain/time";
 import { Outlet, useLocation, useRouter } from "@tanstack/react-router";
 import {
   useEffect,
@@ -31,6 +30,7 @@ import { LocationAvailabilityManager } from "../features/admin/location-availabi
 import { LocationsScreen } from "../features/admin/locations-screen";
 import { SettingsScreen } from "../features/admin/settings-screen";
 import { defaultStatsEvent } from "../features/admin/stats-event";
+import { formatDayLabel } from "../features/schedule/day-label";
 import { createAdminEventQuery } from "../queries/admin-event";
 import { createAdminEventsQuery } from "../queries/admin-events";
 import {

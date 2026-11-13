@@ -9,6 +9,7 @@ import { type FormEvent, useId, useState } from "react";
 import type { MeetingAvailabilityCalls } from "../../commands/meeting-availability";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import { Button } from "../../ui/button";
+import { slotDayHeadings } from "./slot-day-headings";
 
 export function AvailabilityForm({
   eventId,
@@ -19,6 +20,7 @@ export function AvailabilityForm({
   calls,
 }: AvailabilityFormData & { calls: MeetingAvailabilityCalls }) {
   const switchId = useId();
+  const headings = slotDayHeadings(days, timezone);
   // No rows means not bookable, so the switch is "did you declare anything".
   const [open, setOpen] = useState(declared.length > 0);
   const [selected, setSelected] = useState<Set<string>>(new Set(declared));
@@ -124,13 +126,13 @@ export function AvailabilityForm({
             </p>
           )}
 
-          {days.map((day) => {
-            const dayLabel = day.label;
+          {days.map((day, index) => {
+            const dayLabel = headings[index];
             return (
-              <section key={day.id} aria-label={day.label}>
+              <section key={day.id} aria-label={dayLabel}>
                 <div className="mb-1 flex items-center justify-between gap-3">
                   <h3 className="text-base font-semibold text-fg">
-                    {day.label}
+                    {dayLabel}
                   </h3>
                   <div className="flex gap-2">
                     <Button

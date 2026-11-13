@@ -18,7 +18,6 @@ import {
 } from "@schellingboard/domain/slots";
 import {
   convertParamDateTime,
-  formatDayLabel,
   formatDuration,
   formatOptionalTime,
   formatSlotLabel,
@@ -49,6 +48,7 @@ import {
 import { FormErrorSummary } from "../../ui/form-error-summary";
 import { useNotify } from "../../ui/notices";
 import { ScheduledSessionsNotice } from "../proposals/scheduled-sessions-notice";
+import { formatDayLabel } from "../schedule/day-label";
 import {
   closestAtMost,
   dayFrom,

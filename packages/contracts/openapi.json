@@ -4468,7 +4468,12 @@
                               "type": "object",
                               "properties": {
                                 "id": { "type": "string" },
-                                "label": { "type": "string" },
+                                "label": {
+                                  "type": "string",
+                                  "description": "English; clients may build their own from start and end"
+                                },
+                                "start": { "type": "string" },
+                                "end": { "type": "string" },
                                 "slots": {
                                   "type": "array",
                                   "items": {
@@ -4481,7 +4486,13 @@
                                   }
                                 }
                               },
-                              "required": ["id", "label", "slots"]
+                              "required": [
+                                "id",
+                                "label",
+                                "start",
+                                "end",
+                                "slots"
+                              ]
                             }
                           },
                           "declared": {

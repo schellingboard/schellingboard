@@ -58,6 +58,8 @@ describe("availabilityFormsFor", () => {
     });
     expect(forms[0].days).toHaveLength(1);
     expect(forms[0].days[0].label).toBe("Fri 2 Oct");
+    expect(forms[0].days[0].start).toMatch(/^2026-10-02T.*Z$/);
+    expect(forms[0].days[0].end).toMatch(/^2026-10-0[23]T.*Z$/);
     expect(forms[0].days[0].slots.map((s) => s.label)).toEqual([
       "09:10 – 09:30",
       "09:40 – 10:00",

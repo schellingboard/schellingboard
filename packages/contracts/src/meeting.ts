@@ -37,7 +37,13 @@ export const availabilityFormsSchema = z.object({
       days: z.array(
         z.object({
           id: z.string(),
-          label: z.string(),
+          label: z
+            .string()
+            .describe(
+              "English; clients may build their own from start and end"
+            ),
+          start: z.string(),
+          end: z.string(),
           slots: z.array(z.object({ start: z.string(), label: z.string() })),
         })
       ),

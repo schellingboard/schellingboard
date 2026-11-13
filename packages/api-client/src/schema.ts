@@ -2234,7 +2234,10 @@ export interface paths {
                 timezone: string;
                 days: {
                   id: string;
+                  /** @description English; clients may build their own from start and end */
                   label: string;
+                  start: string;
+                  end: string;
                   slots: {
                     start: string;
                     label: string;

@@ -210,6 +210,11 @@ msgstr "{guestName}, "
 msgid "{kind, select, session {Session} proposal {Proposal} profile {Profile} other {}}: {subjectTitle}"
 msgstr "{kind, select, session {Session} proposal {Proposal} profile {Profile} other {}}: {subjectTitle}"
 
+#. Day heading when the day ends after midnight: date, end time, weekday of the end
+#: src/features/schedule/day-label.ts:27
+msgid "{label} (until {time} {weekday})"
+msgstr "{label} (until {time} {weekday})"
+
 #. Label of a contact detail, followed by its value
 #: src/features/people/profile-body.tsx:214
 msgid "{label}:"
@@ -550,7 +555,7 @@ msgstr "1-on-1s"
 msgid "1-on-1s are not enabled for this event."
 msgstr "1-on-1s are not enabled for this event."
 
-#: src/features/meetings/availability-form.tsx:76
+#: src/features/meetings/availability-form.tsx:78
 msgid "1-on-1s at {eventName}"
 msgstr "1-on-1s at {eventName}"
 
@@ -1472,7 +1477,7 @@ msgid "Clashing commitment"
 msgstr "Clashing commitment"
 
 #. Button: untick every slot of this day
-#: src/features/meetings/availability-form.tsx:150
+#: src/features/meetings/availability-form.tsx:152
 msgid "Clear"
 msgstr "Clear"
 
@@ -1485,7 +1490,7 @@ msgstr "Clear"
 msgid "Clear all active filters"
 msgstr "Clear all active filters"
 
-#: src/features/meetings/availability-form.tsx:148
+#: src/features/meetings/availability-form.tsx:150
 msgid "Clear all slots on {dayLabel}"
 msgstr "Clear all slots on {dayLabel}"
 
@@ -1497,11 +1502,11 @@ msgstr "Clear filters"
 msgid "Clear search"
 msgstr "Clear search"
 
-#: src/features/meetings/availability-form.tsx:111
+#: src/features/meetings/availability-form.tsx:113
 msgid "Clear the slots you want kept free. You don't need to clear the ones where you're hosting or have RSVP'd to — anyone booking you is warned about those. Times are in the event timezone ({timezone})."
 msgstr "Clear the slots you want kept free. You don't need to clear the ones where you're hosting or have RSVP'd to — anyone booking you is warned about those. Times are in the event timezone ({timezone})."
 
-#: src/features/meetings/availability-form.tsx:180
+#: src/features/meetings/availability-form.tsx:182
 msgid "Clearing every slot is the same as switching this off."
 msgstr "Clearing every slot is the same as switching this off."
 
@@ -3160,7 +3165,7 @@ msgstr "How often was the prediction right?"
 msgid "How to update"
 msgstr "How to update"
 
-#: src/features/meetings/availability-form.tsx:96
+#: src/features/meetings/availability-form.tsx:98
 msgid "I'm open to 1-on-1s at this event"
 msgstr "I'm open to 1-on-1s at this event"
 
@@ -4992,7 +4997,7 @@ msgstr "Save"
 msgid "Save attendee count"
 msgstr "Save attendee count"
 
-#: src/features/meetings/availability-form.tsx:191
+#: src/features/meetings/availability-form.tsx:193
 msgid "Save availability"
 msgstr "Save availability"
 
@@ -5027,7 +5032,7 @@ msgstr "Saved"
 
 #: src/features/admin/event-config.tsx:61
 #: src/features/admin/event-meetings.tsx:385
-#: src/features/meetings/availability-form.tsx:187
+#: src/features/meetings/availability-form.tsx:189
 msgid "Saved!"
 msgstr "Saved!"
 
@@ -5043,7 +5048,7 @@ msgstr "Saved!"
 #: src/features/admin/locations-screen.tsx:356
 #: src/features/admin/settings-screen.tsx:128
 #: src/features/comments/comments-section.tsx:594
-#: src/features/meetings/availability-form.tsx:191
+#: src/features/meetings/availability-form.tsx:193
 #: src/features/people/profile-form.tsx:639
 #: src/features/settings/email-settings-form.tsx:120
 msgid "Saving..."
@@ -5198,12 +5203,12 @@ msgstr "Select a start time"
 msgid "Select a user first"
 msgstr "Select a user first"
 
-#: src/features/meetings/availability-form.tsx:142
+#: src/features/meetings/availability-form.tsx:144
 #: src/ui/data-table.tsx:251
 msgid "Select all"
 msgstr "Select all"
 
-#: src/features/meetings/availability-form.tsx:140
+#: src/features/meetings/availability-form.tsx:142
 msgid "Select all slots on {dayLabel}"
 msgstr "Select all slots on {dayLabel}"
 
@@ -5946,7 +5951,7 @@ msgstr "The median time from request to answer. A later cancel overwrites the ti
 msgid "The model was fitted on one event with 13 sessions: a rough guide, not a forecast."
 msgstr "The model was fitted on one event with 13 sessions: a rough guide, not a forecast."
 
-#: src/features/meetings/availability-form.tsx:121
+#: src/features/meetings/availability-form.tsx:123
 msgid "The organizer hasn't set up any days with 1-on-1 slots yet."
 msgstr "The organizer hasn't set up any days with 1-on-1 slots yet."
 
@@ -6699,7 +6704,7 @@ msgstr "Which talk, book or article would you like to discuss?"
 msgid "Which topic did you enjoy at an earlier event? Do it again, or take it further."
 msgstr "Which topic did you enjoy at an earlier event? Do it again, or take it further."
 
-#: src/features/meetings/availability-form.tsx:99
+#: src/features/meetings/availability-form.tsx:101
 msgid "While this is off, nobody can book you and you won't appear as bookable."
 msgstr "While this is off, nobody can book you and you won't appear as bookable."
 

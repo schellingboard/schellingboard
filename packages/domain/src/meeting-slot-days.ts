@@ -6,7 +6,10 @@ import { meetingSlotsForDay, slotTimeLabel } from "./meeting-slots";
 export type SlotDay = {
   /** Two days may share a date, so the id is what keys them apart. */
   id: string;
+  /** English; the web builds its own heading from `start` and `end`. */
   label: string;
+  start: string;
+  end: string;
   slots: { start: string; label: string }[];
 };
 
@@ -37,6 +40,8 @@ export function slotDaysFor(event: Event, days: Day[]): SlotDay[] {
   return days
     .map((day) => ({
       id: day.id,
+      start: day.start.toISOString(),
+      end: day.end.toISOString(),
       label:
         (dateCounts.get(dateOf(day)) ?? 0) > 1
           ? `${dateOf(day)}, ${zoned(day.start).toFormat("HH:mm")}–${zoned(

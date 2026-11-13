@@ -5,7 +5,6 @@ import type { Location } from "@schellingboard/domain/location";
 import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
 import type { Session } from "@schellingboard/domain/session";
 import {
-  formatDayLabel,
   formatOptionalTime,
   formatSlotLabel,
 } from "@schellingboard/domain/time";
@@ -30,6 +29,7 @@ import {
 } from "./agenda";
 import { ClashMark } from "./clash-mark";
 import { useSchedule } from "./context";
+import { formatDayLabel } from "./day-label";
 import { getNowOffsetPx } from "./grid-layout";
 import { statusLine } from "./meeting-rules";
 import type { MeetingView } from "./meeting-view";

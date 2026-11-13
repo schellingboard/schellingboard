@@ -212,7 +212,7 @@ test("a day running past midnight says so, and its late slots name the day @008-
 
   // Gamma's last day runs 09:00 → 03:00; the earlier ones end at 18:00.
   await expect(dayRadios(page).first()).toHaveAccessibleName(
-    /^[A-Z][a-z]+, [A-Z][a-z]+ \d+$/
+    /^[A-Z][a-z]+ \d+ [A-Z][a-z]+$/
   );
   await expect(dayRadios(page).last()).toHaveAccessibleName(
     /\(until 03:00 [A-Z][a-z]{2}\)$/

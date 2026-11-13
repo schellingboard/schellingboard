@@ -1,18 +1,28 @@
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it } from "vitest";
+import { Settings } from "luxon";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { fakeApi, type FakeHandler, problem } from "../../commands/fake-api";
 import { meetingAvailabilityCalls } from "../../commands/meeting-availability";
 import { NoticeProvider } from "../../ui/notices";
 import { AvailabilityForm } from "./availability-form";
 
-afterEach(cleanup);
+const defaultLocale = Settings.defaultLocale;
+beforeEach(() => {
+  Settings.defaultLocale = "en-GB";
+});
+afterEach(() => {
+  cleanup();
+  Settings.defaultLocale = defaultLocale;
+});
 
 const days = [
   {
     id: "d1",
-    label: "Mon 1 Jun",
+    label: "Sat 1 Jun",
+    start: "2030-06-01T09:00:00.000Z",
+    end: "2030-06-01T12:00:00.000Z",
     slots: [
       { start: "2030-06-01T09:00:00.000Z", label: "09:00" },
       { start: "2030-06-01T10:00:00.000Z", label: "10:00" },
@@ -73,7 +83,7 @@ describe("declaring availability for 1-on-1s", { tags: ["012-US2"] }, () => {
     setup(["2030-06-01T09:00:00.000Z"]);
 
     await userEvent.click(
-      screen.getByRole("button", { name: "Clear all slots on Mon 1 Jun" })
+      screen.getByRole("button", { name: "Clear all slots on Sat 1 Jun" })
     );
 
     expect(
@@ -82,7 +92,7 @@ describe("declaring availability for 1-on-1s", { tags: ["012-US2"] }, () => {
     expect((save() as HTMLButtonElement).disabled).toBe(true);
 
     await userEvent.click(
-      screen.getByRole("button", { name: "Select all slots on Mon 1 Jun" })
+      screen.getByRole("button", { name: "Select all slots on Sat 1 Jun" })
     );
     expect((save() as HTMLButtonElement).disabled).toBe(false);
   });
