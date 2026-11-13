@@ -93,3 +93,34 @@ describe("withParams", () => {
     );
   });
 });
+
+describe("the label filter", { tags: ["011-US7"] }, () => {
+  const crew = {
+    id: "l1",
+    eventId: "e1",
+    eventName: "",
+    name: "Crew",
+    description: "",
+    color: "red" as const,
+  };
+  const labelled = cardsFrom(
+    [entry("Al", { labels: [crew] }), entry("Bo")],
+    now
+  );
+  const rows = (query: string) =>
+    directoryView({
+      cards: labelled,
+      params: new URLSearchParams(query),
+      meetingsEnabled: true,
+      seed: "s",
+    });
+
+  it("ignores a label the viewer cannot see instead of emptying the list", () => {
+    expect(rows("labels=gone").rows.map((r) => r.name)).toEqual(["Al", "Bo"]);
+    expect(rows("labels=gone").labelIds).toEqual([]);
+  });
+
+  it("keeps the labels it knows", () => {
+    expect(rows("labels=l1,gone").rows.map((r) => r.name)).toEqual(["Al"]);
+  });
+});

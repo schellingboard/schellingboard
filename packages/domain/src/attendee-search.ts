@@ -2,7 +2,9 @@ import { CONTACT_TYPE_LABELS, type ContactType, type Guest } from "./guest";
 import { containsIgnoringAccents, equalsIgnoringAccents } from "./search-text";
 
 /** The fields a directory search reads. */
-export type Searchable = Pick<
+export type Searchable = {
+  labels?: readonly { name: string }[];
+} & Pick<
   Guest,
   | "id"
   | "name"
@@ -30,7 +32,9 @@ function rank(
   if (containsIgnoringAccents(attendee.name, query)) return NAME;
 
   const languages = attendee.languages ?? [];
-  if (languages.some((l) => equalsIgnoringAccents(l, query))) return STRUCTURED;
+  const labels = (attendee.labels ?? []).map((l) => l.name);
+  if ([...languages, ...labels].some((v) => equalsIgnoringAccents(v, query)))
+    return STRUCTURED;
 
   // Every public profile field, including contacts — someone who knows a
   // handle should find its owner. The private system email is not part of
@@ -40,6 +44,7 @@ function rank(
     attendee.pronouns,
     attendee.aboutMe,
     ...languages,
+    ...labels,
     ...(attendee.prompts ?? []).flatMap((p) => [p.prompt, p.answer]),
     ...(attendee.contacts ?? []).flatMap((c) => [
       // Stored only for "other" contacts; the rest print the type's name.

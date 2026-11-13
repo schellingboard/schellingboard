@@ -467,10 +467,13 @@ small card.
   based, prompts and answers, and any contact details they published. A remembered handle, a service
   name like "Signal", or a shared interest is enough to find someone. Your private email address is
   never part of a profile and is never searched.
-- **Filters, which combine**: **Session host**, **Has profile** (anyone who filled in a bio,
-  pronouns, location, languages, photo, an answered conversation starter or a contact detail), and
-  **Open to 1-on-1s** (anyone with slots still to come, at any event on the site). The last one only
-  appears while at least one event is open for 1-on-1s.
+- **Labels**: organizers can tag people (Orga team, Volunteer, Sponsor) with a coloured badge; point
+  at one for what it means. The **Label** filter, where you type to find a label, narrows the list
+  to people holding any picked label, and searching a label's name finds them too.
+- **Filters combine**: someone must pass every active filter. **Session host**, **Has profile**
+  (anyone who filled in a bio, pronouns, location, languages, photo, an answered conversation
+  starter or a contact detail), and **Open to 1-on-1s** (anyone with slots still to come, at any
+  event on the site). The last one only appears while at least one event is open for 1-on-1s.
 - **Sort by → Recently updated** is the quick way to see who has filled theirs in since you last
   looked. Each row shows when the profile last changed; empty profiles show no date and come last.
   While searching, results stay ordered by match instead, so the sort choice is unavailable.

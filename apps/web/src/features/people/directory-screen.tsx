@@ -26,6 +26,7 @@ import {
   directoryView,
   withParams,
 } from "./directory-model";
+import { LabelMenu } from "./label-menu";
 import type { PeopleLinks } from "./links";
 
 export type DirectoryScreenProps = {
@@ -89,16 +90,17 @@ export function DirectoryScreen(props: DirectoryScreenProps) {
     [entries, now, locale]
   );
   const listQuery = params.toString();
-  const { query, available, filters, sort, rows } = useMemo(
-    () =>
-      directoryView({
-        cards,
-        params: new URLSearchParams(listQuery),
-        meetingsEnabled: props.meetingsEnabled,
-        seed,
-      }),
-    [cards, listQuery, props.meetingsEnabled, seed]
-  );
+  const { query, available, filters, labelIds, labelGroups, sort, rows } =
+    useMemo(
+      () =>
+        directoryView({
+          cards,
+          params: new URLSearchParams(listQuery),
+          meetingsEnabled: props.meetingsEnabled,
+          seed,
+        }),
+      [cards, listQuery, props.meetingsEnabled, seed]
+    );
   const { onRows } = props;
   useEffect(() => {
     onRows?.(rows);
@@ -165,6 +167,18 @@ export function DirectoryScreen(props: DirectoryScreenProps) {
                     </button>
                   );
                 })}
+                <LabelMenu
+                  groups={labelGroups}
+                  selected={labelIds}
+                  onChange={(next) =>
+                    onParams(
+                      withParams(params, {
+                        labels: next.length > 0 ? next.join(",") : null,
+                      }),
+                      { push: true }
+                    )
+                  }
+                />
               </>
             }
             sort={

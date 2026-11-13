@@ -144,6 +144,14 @@ quick; saving an edit sets the guest's events to those ticked.
 - Attendees edit their own About me/Pronouns/Avatar from a profile page once they've picked their
   name; admins don't set these.
 
+### Labels
+
+An event's **Guests** tab has a **Labels** section for tags such as "Orga team", "Volunteer" or
+"Sponsor": a name, an optional description (shown on hover) and one of eight colours. Give a label
+to a guest in the **Labels** column of the guest list above it, or in the Users edit form, under
+"Labels in" each event the guest is in. Attendees see the labels as badges on the directory and
+profiles, only for the events they are in. Deleting a label removes it from everyone.
+
 ### Personal join links
 
 On an event's **Guests** tab, **New link** makes a personal link for one guest: copy it into a

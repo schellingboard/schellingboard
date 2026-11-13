@@ -61,14 +61,51 @@ export function directoryView({
   const sort: AttendeeSort =
     ATTENDEE_SORTS.find((s) => s.value === requested)?.value ??
     DEFAULT_ATTENDEE_SORT;
-  const scoped = cards.filter((card) => matchesAttendeeFilters(card, filters));
+  const groups = labelGroups(cards);
+  const known = new Set(groups.flatMap((g) => g.labels.map((l) => l.id)));
+  const labelIds = (params.get("labels") ?? "")
+    .split(",")
+    .filter((id) => known.has(id));
+  const scoped = cards.filter(
+    (card) =>
+      matchesAttendeeFilters(card, filters) &&
+      (labelIds.length === 0 ||
+        card.labels.some((l) => labelIds.includes(l.id)))
+  );
   return {
     query,
     available,
     filters,
+    labelIds,
+    labelGroups: groups,
     sort,
     rows: searchAttendees(scoped, query, sort, seed, contactLabel),
   };
+}
+
+export type LabelGroup = { eventName: string; labels: DirectoryCard["labels"] };
+
+export function labelGroups(cards: DirectoryCard[]): LabelGroup[] {
+  const byId = new Map(
+    cards.flatMap((card) => card.labels).map((label) => [label.id, label])
+  );
+  const byEvent = new Map<string, LabelGroup>();
+  for (const label of byId.values()) {
+    const group = byEvent.get(label.eventId) ?? {
+      eventName: label.eventName,
+      labels: [],
+    };
+    group.labels.push(label);
+    byEvent.set(label.eventId, group);
+  }
+  return [...byEvent.values()]
+    .map((g) => ({
+      ...g,
+      labels: g.labels.sort(
+        (a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id)
+      ),
+    }))
+    .sort((a, b) => a.eventName.localeCompare(b.eventName));
 }
 
 /** The canonical order, for a profile opened with no list behind it, or one the filters exclude. */

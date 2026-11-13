@@ -7,7 +7,12 @@ import { describe, expect, it } from "vitest";
 
 let counter = 0;
 
-function attendee(overrides: Partial<Attendee> & { name: string }): Attendee {
+function attendee(
+  overrides: Partial<Attendee> & {
+    name: string;
+    labels?: { name: string }[];
+  }
+): Attendee & { labels?: { name: string }[] } {
   return {
     id: `id-${++counter}`,
     isHost: false,
@@ -289,5 +294,32 @@ describe("searchAttendees sorted randomly", () => {
 
   it("mints a fresh seed each time", () => {
     expect(newSortSeed()).not.toEqual(newSortSeed());
+  });
+});
+
+describe("searchAttendees by label", { tags: ["011-US7"] }, () => {
+  const label = (name: string) => ({ name });
+
+  it("finds an attendee by the name of a label", () => {
+    const rows = [
+      attendee({ name: "Alice", labels: [label("Volunteer")] }),
+      attendee({ name: "Bob" }),
+    ];
+
+    expect(searchAttendees(rows, "volun").map((r) => r.name)).toEqual([
+      "Alice",
+    ]);
+  });
+
+  it("ranks an exact label above a passing mention", () => {
+    const rows = [
+      attendee({ name: "Alice", aboutMe: "I volunteer at the zoo" }),
+      attendee({ name: "Bob", labels: [label("Volunteer")] }),
+    ];
+
+    expect(searchAttendees(rows, "Volunteer").map((r) => r.name)).toEqual([
+      "Bob",
+      "Alice",
+    ]);
   });
 });

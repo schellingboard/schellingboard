@@ -291,6 +291,77 @@ describe("attendee labels", { tags: ["011-US7"] }, () => {
   });
 });
 
+describe("filtering by label", { tags: ["011-US7"] }, () => {
+  const label = (id: string, name: string, eventName: string) => ({
+    id,
+    eventId: `e-${eventName}`,
+    eventName,
+    name,
+    description: "",
+    color: "green" as const,
+  });
+  const volunteer = label("l1", "Volunteer", "");
+  const labelled = [
+    entry("Al", { labels: [volunteer] }),
+    entry("Bo"),
+    entry("Cy", { labels: [volunteer] }),
+  ];
+
+  const picker = () =>
+    screen.getByRole("combobox", { name: "Filter by label" });
+
+  it("picks labels from a searchable list and narrows the list to their holders", async () => {
+    render(<Harness entries={labelled} />);
+
+    await userEvent.type(picker(), "vol");
+    await userEvent.click(screen.getByRole("option", { name: "Volunteer" }));
+
+    expect(screen.getByTestId("url").textContent).toBe("labels=l1");
+    expect(screen.queryByRole("link", { name: /^Bo/ })).toBeNull();
+    expect(screen.getByRole("link", { name: /^Al/ })).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Remove Volunteer" })
+    ).toBeTruthy();
+  });
+
+  it("closes the list on a click elsewhere", async () => {
+    render(<Harness entries={labelled} />);
+
+    await userEvent.click(picker());
+    expect(screen.getByRole("listbox")).toBeTruthy();
+    await userEvent.click(document.body);
+
+    expect(screen.queryByRole("listbox")).toBeNull();
+  });
+
+  it("names the event of a label, so equal names stay apart", async () => {
+    render(
+      <Harness
+        entries={[
+          entry("Al", { labels: [label("l1", "Crew", "Camp")] }),
+          entry("Bo", { labels: [label("l2", "Crew", "Summit")] }),
+        ]}
+      />
+    );
+
+    await userEvent.click(picker());
+    await userEvent.click(
+      screen.getByRole("option", { name: "Crew (Summit)" })
+    );
+
+    expect(screen.getByTestId("url").textContent).toBe("labels=l2");
+    expect(screen.queryByRole("link", { name: /^Al/ })).toBeNull();
+  });
+
+  it("offers no label filter when nobody has a label", () => {
+    render(<Harness />);
+
+    expect(
+      screen.queryByRole("combobox", { name: "Filter by label" })
+    ).toBeNull();
+  });
+});
+
 describe("attendee label tooltips", { tags: ["011-US7"] }, () => {
   const label = (eventName: string, description: string) => ({
     id: "l1",
@@ -306,7 +377,9 @@ describe("attendee label tooltips", { tags: ["011-US7"] }, () => {
         entries={[entry("Al", { labels: [label(eventName, description)] })]}
       />
     );
-    await userEvent.hover(screen.getByText("Sponsor"));
+    await userEvent.hover(
+      within(screen.getByRole("link", { name: /^Al/ })).getByText("Sponsor")
+    );
   };
 
   it("names the event and the meaning", async () => {

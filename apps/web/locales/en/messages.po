@@ -70,7 +70,7 @@ msgstr "[none]"
 #. placeholder {0}: label.guestIds.length
 #. placeholder {0}: rows.length
 #: src/features/admin/event-labels.tsx:198
-#: src/features/people/directory-screen.tsx:210
+#: src/features/people/directory-screen.tsx:224
 msgid "{0, plural, one {# attendee} other {# attendees}}"
 msgstr "{0, plural, one {# attendee} other {# attendees}}"
 
@@ -261,6 +261,10 @@ msgstr "{n, plural, one {Voters against Days after the first proposal, # proposa
 #: src/features/admin/stats-figures.tsx:398
 msgid "{n, plural, one {Votes per voter, # voter} other {Votes per voter, # voters}}"
 msgstr "{n, plural, one {Votes per voter, # voter} other {Votes per voter, # voters}}"
+
+#: src/features/people/label-menu.tsx:20
+msgid "{name} ({event})"
+msgstr "{name} ({event})"
 
 #: src/features/sessions/session-form.tsx:598
 msgid "{name} (max {max})"
@@ -920,7 +924,7 @@ msgstr "Assigned"
 #: src/app/page-notice.tsx:12
 #: src/features/admin/event-stats.tsx:24
 #: src/features/admin/stats-figures.tsx:152
-#: src/features/people/directory-screen.tsx:120
+#: src/features/people/directory-screen.tsx:122
 msgid "Attendees"
 msgstr "Attendees"
 
@@ -995,7 +999,7 @@ msgstr "Basic info"
 msgid "Be the first to suggest a session!"
 msgstr "Be the first to suggest a session!"
 
-#: src/features/people/directory-screen.tsx:249
+#: src/features/people/directory-screen.tsx:263
 msgid "Be the first!"
 msgstr "Be the first!"
 
@@ -1626,7 +1630,7 @@ msgstr "Could not join the proposal as a host."
 msgid "Could not load the attendee list."
 msgstr "Could not load the attendee list."
 
-#: src/features/people/directory-screen.tsx:236
+#: src/features/people/directory-screen.tsx:250
 msgid "Could not load the attendees. Reload the page to try again."
 msgstr "Could not load the attendees. Reload the page to try again."
 
@@ -2201,7 +2205,7 @@ msgid "Edit day {from} – {to} ({timezone})"
 msgstr "Edit day {from} – {to} ({timezone})"
 
 #: src/app/user-menu.tsx:107
-#: src/features/people/directory-screen.tsx:124
+#: src/features/people/directory-screen.tsx:126
 #: src/features/people/profile-body.tsx:120
 #: src/features/people/profile-form.tsx:284
 msgid "Edit profile"
@@ -2436,27 +2440,31 @@ msgstr "Fill out this form to add a session to the schedule!"
 msgid "Filter"
 msgstr "Filter"
 
-#: src/features/people/directory-screen.tsx:64
+#: src/features/people/directory-screen.tsx:65
 msgid "Filter by Has profile"
 msgstr "Filter by Has profile"
 
-#: src/features/people/directory-screen.tsx:65
+#: src/features/people/directory-screen.tsx:66
 msgid "Filter by Has profile (active)"
 msgstr "Filter by Has profile (active)"
 
-#: src/features/people/directory-screen.tsx:69
+#: src/features/people/label-menu.tsx:29
+msgid "Filter by label"
+msgstr "Filter by label"
+
+#: src/features/people/directory-screen.tsx:70
 msgid "Filter by Open to 1-on-1s"
 msgstr "Filter by Open to 1-on-1s"
 
-#: src/features/people/directory-screen.tsx:70
+#: src/features/people/directory-screen.tsx:71
 msgid "Filter by Open to 1-on-1s (active)"
 msgstr "Filter by Open to 1-on-1s (active)"
 
-#: src/features/people/directory-screen.tsx:59
+#: src/features/people/directory-screen.tsx:60
 msgid "Filter by Session host"
 msgstr "Filter by Session host"
 
-#: src/features/people/directory-screen.tsx:60
+#: src/features/people/directory-screen.tsx:61
 msgid "Filter by Session host (active)"
 msgstr "Filter by Session host (active)"
 
@@ -2603,7 +2611,7 @@ msgstr "Ground floor, next to reception"
 msgid "Guests"
 msgstr "Guests"
 
-#: src/features/people/directory-screen.tsx:63
+#: src/features/people/directory-screen.tsx:64
 msgid "Has profile"
 msgstr "Has profile"
 
@@ -2909,6 +2917,7 @@ msgstr "Keep editing"
 msgid "Keep it"
 msgstr "Keep it"
 
+#: src/features/people/label-menu.tsx:30
 #: src/features/people/profile-form.tsx:566
 msgid "Label"
 msgstr "Label"
@@ -3013,7 +3022,7 @@ msgstr "Live"
 msgid "Load more comments"
 msgstr "Load more comments"
 
-#: src/features/people/directory-screen.tsx:232
+#: src/features/people/directory-screen.tsx:246
 msgid "Loading attendees…"
 msgstr "Loading attendees…"
 
@@ -3339,7 +3348,7 @@ msgstr "n/a"
 msgid "Name"
 msgstr "Name"
 
-#: src/features/people/directory-screen.tsx:75
+#: src/features/people/directory-screen.tsx:76
 msgid "Name (A–Z)"
 msgstr "Name (A–Z)"
 
@@ -3429,7 +3438,7 @@ msgstr "Next page"
 msgid "No"
 msgstr "No"
 
-#: src/features/people/directory-screen.tsx:255
+#: src/features/people/directory-screen.tsx:269
 msgid "No attendees match."
 msgstr "No attendees match."
 
@@ -3546,7 +3555,7 @@ msgstr "No vote"
 msgid "Nobody answered before the slot began."
 msgstr "Nobody answered before the slot began."
 
-#: src/features/people/directory-screen.tsx:244
+#: src/features/people/directory-screen.tsx:258
 msgid "Nobody has filled in a profile yet."
 msgstr "Nobody has filled in a profile yet."
 
@@ -3742,7 +3751,7 @@ msgstr "Open admin menu"
 msgid "Open menu"
 msgstr "Open menu"
 
-#: src/features/people/directory-screen.tsx:68
+#: src/features/people/directory-screen.tsx:69
 msgid "Open to 1-on-1s"
 msgstr "Open to 1-on-1s"
 
@@ -4098,7 +4107,7 @@ msgid "Purple"
 msgstr "Purple"
 
 #. Attendee sort order: a shuffled list
-#: src/features/people/directory-screen.tsx:77
+#: src/features/people/directory-screen.tsx:78
 msgid "Random"
 msgstr "Random"
 
@@ -4106,7 +4115,7 @@ msgstr "Random"
 msgid "Read this first: it tells how far to trust every attendance figure. Hosts type in how many people came; this counts the ended sessions with hosts that have such a report."
 msgstr "Read this first: it tells how far to trust every attendance figure. Hosts type in how many people came; this counts the ended sessions with hosts that have such a report."
 
-#: src/features/people/directory-screen.tsx:76
+#: src/features/people/directory-screen.tsx:77
 #: src/features/proposals/list-model.ts:205
 msgid "Recently updated"
 msgstr "Recently updated"
@@ -4423,7 +4432,7 @@ msgstr "Scheduling will be enabled at {opensAt}"
 msgid "Scheduling will be enabled at {schedulingAt}"
 msgstr "Scheduling will be enabled at {schedulingAt}"
 
-#: src/features/people/directory-screen.tsx:327
+#: src/features/people/directory-screen.tsx:341
 #: src/ui/data-table.tsx:137
 msgid "Search"
 msgstr "Search"
@@ -4441,7 +4450,7 @@ msgstr "Search name or email…"
 msgid "Search name…"
 msgstr "Search name…"
 
-#: src/features/people/directory-screen.tsx:326
+#: src/features/people/directory-screen.tsx:340
 msgid "Search names, languages, interests…"
 msgstr "Search names, languages, interests…"
 
@@ -4453,7 +4462,7 @@ msgstr "Search proposals"
 msgid "Search proposals..."
 msgstr "Search proposals..."
 
-#: src/features/people/directory-screen.tsx:174
+#: src/features/people/directory-screen.tsx:188
 #: src/features/proposals/proposals-screen.tsx:367
 msgid "Search results are sorted by relevance"
 msgstr "Search results are sorted by relevance"
@@ -4560,8 +4569,8 @@ msgid "Session full"
 msgstr "Session full"
 
 #: src/features/meetings/book-meeting.tsx:164
-#: src/features/people/directory-screen.tsx:58
-#: src/features/people/directory-screen.tsx:363
+#: src/features/people/directory-screen.tsx:59
+#: src/features/people/directory-screen.tsx:377
 #: src/features/people/person-link.tsx:30
 #: src/features/people/profile-body.tsx:104
 msgid "Session host"
@@ -4820,7 +4829,7 @@ msgstr "Something went wrong"
 msgid "Sorry — my session moved…"
 msgstr "Sorry — my session moved…"
 
-#: src/features/people/directory-screen.tsx:179
+#: src/features/people/directory-screen.tsx:193
 #: src/features/proposals/proposals-screen.tsx:372
 msgid "Sort by"
 msgstr "Sort by"
@@ -5507,7 +5516,7 @@ msgstr "until {endsAt}"
 msgid "Until is required"
 msgstr "Until is required"
 
-#: src/features/people/directory-screen.tsx:349
+#: src/features/people/directory-screen.tsx:363
 msgid "updated {profileUpdated}"
 msgstr "updated {profileUpdated}"
 

@@ -2,7 +2,7 @@ import { Page, Route } from "@playwright/test";
 import sharp from "sharp";
 
 import { adminLogin, enterSitePassword } from "./helpers/admin";
-import { loginAndGoto } from "./helpers/auth";
+import { login, loginAndGoto } from "./helpers/auth";
 import { expect, test } from "./helpers/fixtures";
 import { expectImageLoaded } from "./helpers/images";
 import { uniqueSuffix } from "./helpers/unique";
@@ -356,6 +356,75 @@ test.describe("Admin UI", () => {
     await row.getByRole("button", { name: "Delete", exact: true }).click();
     await row.getByRole("button", { name: "Confirm delete" }).click();
     await expect(row).toHaveCount(0);
+  });
+
+  test("an attendee filters and searches the directory by a label @011-US7", async ({
+    page,
+    browser,
+  }) => {
+    await adminLogin(page);
+    const unique = uniqueSuffix();
+    const eventName = `E2E Label Filter ${unique}`;
+    const crewMember = `Labelled ${unique}`;
+    const other = `Plain ${unique}`;
+    await page.getByRole("button", { name: "New event" }).click();
+    await page.getByLabel("Name*").fill(eventName);
+    await page.getByLabel("Identity").selectOption("open");
+    await page.getByRole("button", { name: "Create event" }).click();
+    await page
+      .getByRole("listitem")
+      .filter({ hasText: eventName })
+      .getByRole("link", { name: "Manage" })
+      .click();
+    await page
+      .getByRole("navigation", { name: "Event sections" })
+      .getByRole("link", { name: "Guests" })
+      .click();
+    const labels = page.getByRole("region", { name: "Labels" });
+    await labels.getByRole("button", { name: "Add label" }).click();
+    await labels.getByLabel("Name").fill(`Crew ${unique}`);
+    await labels.getByRole("button", { name: "Save label" }).click();
+    await expect(labels.getByRole("listitem")).toContainText(`Crew ${unique}`);
+
+    await gotoUsers(page);
+    for (const name of [crewMember, other]) {
+      await page.getByRole("checkbox", { name: eventName }).check();
+      await page.getByLabel("Name", { exact: true }).fill(name);
+      await page.getByRole("button", { name: "Add user" }).click();
+      await findUser(page, name);
+    }
+    const row = await findUser(page, crewMember);
+    await row.getByRole("button", { name: "Edit" }).click();
+    const editRow = page
+      .getByRole("listitem")
+      .filter({ has: page.getByRole("button", { name: "Save" }) });
+    await editRow.getByRole("checkbox", { name: `Crew ${unique}` }).check();
+    await editRow.getByRole("button", { name: "Save" }).click();
+    await expect(row.getByText(`Crew ${unique}`)).toBeVisible();
+
+    const attendee = await browser.newContext();
+    const visitor = await attendee.newPage();
+    await visitor.goto("/");
+    await login(visitor);
+    await selectUser(visitor, other);
+    await visitor.goto("/guests");
+    await visitor.getByLabel("Search", { exact: true }).fill(unique);
+    await expect(visitor.getByRole("link", { name: other })).toBeVisible();
+
+    await visitor
+      .getByRole("combobox", { name: "Filter by label" })
+      .fill(`Crew ${unique}`);
+    await visitor.getByRole("option", { name: `Crew ${unique}` }).click();
+    await expect(visitor.getByRole("link", { name: crewMember })).toBeVisible();
+    await expect(visitor.getByRole("link", { name: other })).toHaveCount(0);
+
+    await visitor
+      .getByRole("button", { name: `Remove Crew ${unique}` })
+      .click();
+    await visitor.getByLabel("Search", { exact: true }).fill(`Crew ${unique}`);
+    await expect(visitor.getByRole("link", { name: crewMember })).toBeVisible();
+    await expect(visitor.getByRole("link", { name: other })).toHaveCount(0);
+    await attendee.close();
   });
 
   test("imports users from CSV and assigns them to an event @016-US2 @016-US3", async ({
