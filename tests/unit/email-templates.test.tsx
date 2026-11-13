@@ -159,3 +159,52 @@ describe("email templates", { tags: ["022-US2"] }, () => {
     }
   });
 });
+
+describe("emails about a deleted guest", { tags: ["022-US2"] }, () => {
+  const german = translatorFor("de");
+  const html = (recipe: EmailRecipe) => {
+    const mail = buildEmail(recipe, german);
+    return mail.subject + renderToStaticMarkup(<>{mail.body}</>);
+  };
+  const recipes: EmailRecipe[] = [
+    {
+      template: "meetingRequest",
+      props: { requesterName: undefined, time: when, meetingPoint: "", url },
+    },
+    {
+      template: "meetingOutcome",
+      props: {
+        actorName: undefined,
+        outcome: "accepted",
+        time: when,
+        meetingPoint: "",
+        url,
+      },
+    },
+    {
+      template: "meetingNudge",
+      props: { askerName: undefined, eventName: "Conf", url },
+    },
+    {
+      template: "meetingNudgeAnswered",
+      props: { recipientName: undefined, eventName: "Conf", url },
+    },
+    {
+      template: "comment",
+      props: {
+        subject: { kind: "session", title: "Talk" },
+        recipient: "responsible",
+        commenterName: undefined,
+        url,
+      },
+    },
+  ];
+
+  it("say Jemand in German, and never the English word", () => {
+    for (const recipe of recipes) {
+      const text = html(recipe);
+      expect(text, recipe.template).toContain("Jemand");
+      expect(text, recipe.template).not.toContain("Someone");
+    }
+  });
+});

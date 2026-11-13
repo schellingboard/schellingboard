@@ -78,3 +78,8 @@ export function formatPlaces(places: PlacesProp, t: Translate): string {
     style: "short",
   }).format(places);
 }
+
+// A deleted guest has no name. A message then says "Someone" in the reader's
+// language through a `select` on `whoOf`, instead of an English word as the name.
+export const whoOf = (name: string | undefined) => (name ? "named" : "gone");
+export const nameOf = (name: string | undefined) => name ?? "";

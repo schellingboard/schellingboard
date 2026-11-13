@@ -1,5 +1,6 @@
-import { msg } from "@lingui/core/macro";
+import { msg, select } from "@lingui/core/macro";
 
+import { nameOf, whoOf } from "@/server/kernel/localized-text";
 import type { Translate } from "@/server/kernel/translator";
 import type { EmailMessage } from "@/utils/mailer";
 
@@ -24,12 +25,14 @@ export function commentEmail(
   props: {
     subject: CommentSubject;
     recipient: CommentRecipient;
-    commenterName: string;
+    commenterName: string | undefined;
     url: string;
   },
   t: Translate
 ): EmailMessage {
-  const { subject, commenterName } = props;
+  const { subject } = props;
+  const commenterKind = whoOf(props.commenterName);
+  const commenter = nameOf(props.commenterName);
   const mine = props.recipient === "responsible";
   let heading: string;
   let line: string;
@@ -41,20 +44,32 @@ export function commentEmail(
       ? t(msg`New comment on your profile`)
       : t(msg`New comment on: ${ownerName}'s profile`);
     line = mine
-      ? t(msg`${commenterName} commented on your profile.`)
-      : t(msg`${commenterName} commented on a profile you commented on.`);
+      ? t(
+          msg`${select(commenterKind, { gone: "Someone", other: commenter })} commented on your profile.`
+        )
+      : t(
+          msg`${select(commenterKind, { gone: "Someone", other: commenter })} commented on a profile you commented on.`
+        );
   } else {
     const { title: name } = subject;
     heading = name;
     subjectLine = t(msg`New comment on: ${name}`);
     if (subject.kind === "proposal") {
       line = mine
-        ? t(msg`${commenterName} commented on a proposal you're hosting.`)
-        : t(msg`${commenterName} commented on a proposal you commented on.`);
+        ? t(
+            msg`${select(commenterKind, { gone: "Someone", other: commenter })} commented on a proposal you're hosting.`
+          )
+        : t(
+            msg`${select(commenterKind, { gone: "Someone", other: commenter })} commented on a proposal you commented on.`
+          );
     } else {
       line = mine
-        ? t(msg`${commenterName} commented on a session you're hosting.`)
-        : t(msg`${commenterName} commented on a session you commented on.`);
+        ? t(
+            msg`${select(commenterKind, { gone: "Someone", other: commenter })} commented on a session you're hosting.`
+          )
+        : t(
+            msg`${select(commenterKind, { gone: "Someone", other: commenter })} commented on a session you commented on.`
+          );
     }
   }
   return {

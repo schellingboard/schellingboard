@@ -8,6 +8,8 @@ import {
   type EmailTime,
   hasNoPlaces,
   isUnscheduled,
+  nameOf,
+  whoOf,
 } from "@/server/kernel/localized-text";
 import { toNotice } from "@/server/kernel/notice";
 
@@ -18,57 +20,73 @@ const asText = (value: EmailTime | string[]) => value as unknown as string;
 export function commentNotice(
   subject: CommentSubject,
   to: CommentRecipient,
-  commenterName: string
+  commenterName: string | undefined
 ): NoticeMessage {
+  const commenterKind = whoOf(commenterName);
+  const commenter = nameOf(commenterName);
   if (subject.kind === "profile") {
     const { ownerName } = subject;
     return toNotice(
       to === "responsible"
-        ? msg`${commenterName} commented on your profile`
-        : msg`${commenterName} commented on ${ownerName}'s profile`
+        ? msg`${select(commenterKind, { gone: "Someone", other: commenter })} commented on your profile`
+        : msg`${select(commenterKind, { gone: "Someone", other: commenter })} commented on ${ownerName}'s profile`
     );
   }
   const { title } = subject;
-  return toNotice(msg`${commenterName} commented on "${title}"`);
+  return toNotice(
+    msg`${select(commenterKind, { gone: "Someone", other: commenter })} commented on "${title}"`
+  );
 }
 
 export function meetingRequestNotice(
-  requesterName: string,
+  requesterName: string | undefined,
   at: EmailTime
 ): NoticeMessage {
   const time = asText(at);
-  return toNotice(msg`${requesterName} asked you for a 1-on-1 on ${time}`);
+  const requesterKind = whoOf(requesterName);
+  const requester = nameOf(requesterName);
+  return toNotice(
+    msg`${select(requesterKind, { gone: "Someone", other: requester })} asked you for a 1-on-1 on ${time}`
+  );
 }
 
 export function meetingOutcomeNotice(
-  actorName: string,
+  actorName: string | undefined,
   outcome: MeetingOutcome,
   at: EmailTime
 ): NoticeMessage {
   const time = asText(at);
+  const actorKind = whoOf(actorName);
+  const actor = nameOf(actorName);
   return toNotice(
     {
-      accepted: msg`${actorName} accepted your 1-on-1 request for ${time}`,
-      declined: msg`${actorName} declined your 1-on-1 request for ${time}`,
-      canceled: msg`${actorName} canceled the 1-on-1 on ${time}`,
+      accepted: msg`${select(actorKind, { gone: "Someone", other: actor })} accepted your 1-on-1 request for ${time}`,
+      declined: msg`${select(actorKind, { gone: "Someone", other: actor })} declined your 1-on-1 request for ${time}`,
+      canceled: msg`${select(actorKind, { gone: "Someone", other: actor })} canceled the 1-on-1 on ${time}`,
     }[outcome]
   );
 }
 
 export function meetingNudgeNotice(
-  askerName: string,
+  askerName: string | undefined,
   eventName: string
 ): NoticeMessage {
+  const askerKind = whoOf(askerName);
+  const asker = nameOf(askerName);
   return toNotice(
-    msg`${askerName} would like to book a 1-on-1 with you at ${eventName}. Say when you are free in Settings, under 1-on-1s.`
+    msg`${select(askerKind, { gone: "Someone", other: asker })} would like to book a 1-on-1 with you at ${eventName}. Say when you are free in Settings, under 1-on-1s.`
   );
 }
 
 export function meetingNudgeAnsweredNotice(
-  recipientName: string,
+  recipientName: string | undefined,
   eventName: string
 ): NoticeMessage {
-  return toNotice(msg`${recipientName} is open to 1-on-1s at ${eventName}`);
+  const recipientKind = whoOf(recipientName);
+  const recipient = nameOf(recipientName);
+  return toNotice(
+    msg`${select(recipientKind, { gone: "Someone", other: recipient })} is open to 1-on-1s at ${eventName}`
+  );
 }
 
 // Names the session and the ask and nothing else: a notification renders on a

@@ -1,6 +1,11 @@
-import { msg } from "@lingui/core/macro";
+import { msg, select } from "@lingui/core/macro";
 
-import { formatTime, type TimeProp } from "@/server/kernel/localized-text";
+import {
+  formatTime,
+  nameOf,
+  type TimeProp,
+  whoOf,
+} from "@/server/kernel/localized-text";
 import type { Translate } from "@/server/kernel/translator";
 import type { EmailMessage } from "@/utils/mailer";
 
@@ -14,19 +19,26 @@ export type MeetingOutcome = "accepted" | "declined" | "canceled";
 // write to each other need not go to their email providers.
 export function meetingRequestEmail(
   props: {
-    requesterName: string;
+    requesterName: string | undefined;
     time: TimeProp;
     meetingPoint: string;
     url: string;
   },
   t: Translate
 ): EmailMessage {
-  const { requesterName } = props;
+  const requesterKind = whoOf(props.requesterName);
+  const requester = nameOf(props.requesterName);
   return {
-    subject: t(msg`1-on-1 request from ${requesterName}`),
+    subject: t(
+      msg`1-on-1 request from ${select(requesterKind, { gone: "Someone", other: requester })}`
+    ),
     body: (
       <>
-        <h1>{t(msg`${requesterName} would like to meet you`)}</h1>
+        <h1>
+          {t(
+            msg`${select(requesterKind, { gone: "Someone", other: requester })} would like to meet you`
+          )}
+        </h1>
         <p>
           <strong>{t(msg`When:`)}</strong> {formatTime(props.time, t)}
         </p>
@@ -44,7 +56,7 @@ export function meetingRequestEmail(
 // Sent to the other party when a 1-on-1 is accepted, declined or canceled.
 export function meetingOutcomeEmail(
   props: {
-    actorName: string;
+    actorName: string | undefined;
     outcome: MeetingOutcome;
     time: TimeProp;
     meetingPoint: string;
@@ -52,20 +64,27 @@ export function meetingOutcomeEmail(
   },
   t: Translate
 ): EmailMessage {
-  const { actorName } = props;
+  const actorKind = whoOf(props.actorName);
+  const actor = nameOf(props.actorName);
   const time = formatTime(props.time, t);
   const [subject, heading] = {
     accepted: [
       t(msg`1-on-1 accepted: ${time}`),
-      t(msg`${actorName} accepted your 1-on-1 request for ${time}`),
+      t(
+        msg`${select(actorKind, { gone: "Someone", other: actor })} accepted your 1-on-1 request for ${time}`
+      ),
     ],
     declined: [
       t(msg`1-on-1 declined: ${time}`),
-      t(msg`${actorName} declined your 1-on-1 request for ${time}`),
+      t(
+        msg`${select(actorKind, { gone: "Someone", other: actor })} declined your 1-on-1 request for ${time}`
+      ),
     ],
     canceled: [
       t(msg`1-on-1 canceled: ${time}`),
-      t(msg`${actorName} canceled the 1-on-1 on ${time}`),
+      t(
+        msg`${select(actorKind, { gone: "Someone", other: actor })} canceled the 1-on-1 on ${time}`
+      ),
     ],
   }[props.outcome];
   return {
@@ -88,17 +107,21 @@ export function meetingOutcomeEmail(
 
 // Sent when someone asks the guest to say when they are free for 1-on-1s.
 export function meetingNudgeEmail(
-  props: { askerName: string; eventName: string; url: string },
+  props: { askerName: string | undefined; eventName: string; url: string },
   t: Translate
 ): EmailMessage {
-  const { askerName, eventName } = props;
+  const { eventName } = props;
+  const askerKind = whoOf(props.askerName);
+  const asker = nameOf(props.askerName);
   return {
-    subject: t(msg`${askerName} would like a 1-on-1 with you`),
+    subject: t(
+      msg`${select(askerKind, { gone: "Someone", other: asker })} would like a 1-on-1 with you`
+    ),
     body: (
       <>
         <h1>
           {t(
-            msg`${askerName} would like to book a 1-on-1 with you at ${eventName}`
+            msg`${select(askerKind, { gone: "Someone", other: asker })} would like to book a 1-on-1 with you at ${eventName}`
           )}
         </h1>
         <p>{t(msg`They can only book you once you are open to 1-on-1s.`)}</p>
@@ -117,15 +140,23 @@ export function meetingNudgeEmail(
 
 // Sent to whoever asked, once the guest has declared their first free slots.
 export function meetingNudgeAnsweredEmail(
-  props: { recipientName: string; eventName: string; url: string },
+  props: { recipientName: string | undefined; eventName: string; url: string },
   t: Translate
 ): EmailMessage {
-  const { recipientName, eventName } = props;
+  const { eventName } = props;
+  const recipientKind = whoOf(props.recipientName);
+  const recipient = nameOf(props.recipientName);
   return {
-    subject: t(msg`${recipientName} is open to 1-on-1s`),
+    subject: t(
+      msg`${select(recipientKind, { gone: "Someone", other: recipient })} is open to 1-on-1s`
+    ),
     body: (
       <>
-        <h1>{t(msg`${recipientName} is open to 1-on-1s at ${eventName}`)}</h1>
+        <h1>
+          {t(
+            msg`${select(recipientKind, { gone: "Someone", other: recipient })} is open to 1-on-1s at ${eventName}`
+          )}
+        </h1>
         <p>
           <a href={props.url}>{t(msg`Schedule a 1-on-1`)}</a>
         </p>

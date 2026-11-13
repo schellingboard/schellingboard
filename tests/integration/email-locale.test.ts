@@ -27,8 +27,8 @@ vi.mock("@/server/kernel/translator", async (importOriginal) => {
       'msgid "No location"',
       'msgstr "Kein Ort"',
       "",
-      'msgid "{requesterName} asked you for a 1-on-1 on {time}"',
-      'msgstr "{requesterName} möchte am {time} ein 1:1 mit dir"',
+      'msgid "{requesterKind, select, gone {Someone} other {{requester}}} asked you for a 1-on-1 on {time}"',
+      'msgstr "{requesterKind, select, gone {Jemand} other {{requester}}} möchte am {time} ein 1:1 mit dir"',
       "",
     ].join("\n")
   );

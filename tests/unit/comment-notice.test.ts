@@ -38,4 +38,29 @@ describe("commentNotice", () => {
       "Rosa Diaz commented on Anna Kowalska's profile"
     );
   });
+
+  describe("when the author is gone", { tags: ["022-US2"] }, () => {
+    const subject = { kind: "session", title: "Hallway Track" } as const;
+    const say = (
+      locale: "en" | "de",
+      notice = commentNotice(subject, "responsible", undefined)
+    ) => renderNotice(notice, translatorFor(locale));
+
+    it("says Someone in English, without storing the word as a value", () => {
+      const notice = commentNotice(subject, "responsible", undefined);
+      expect(JSON.stringify(notice.values)).not.toContain("Someone");
+      expect(say("en", notice)).toBe('Someone commented on "Hallway Track"');
+    });
+
+    it("says it in German", () => {
+      expect(say("de")).toBe("Jemand hat „Hallway Track“ kommentiert");
+    });
+
+    it("keeps a stored name readable in German", () => {
+      const notice = commentNotice(subject, "responsible", "Rosa Diaz");
+      expect(say("de", notice)).toBe(
+        "Rosa Diaz hat „Hallway Track“ kommentiert"
+      );
+    });
+  });
 });

@@ -4,7 +4,10 @@ import { emailTime } from "@/server/kernel/localized-text";
 import { renderNotice } from "@/server/kernel/notice";
 import { translatorFor } from "@/server/kernel/translator";
 import {
+  meetingNudgeAnsweredNotice,
+  meetingNudgeNotice,
   meetingOutcomeNotice,
+  meetingRequestNotice,
   reminderNotice,
   sessionChangedNotice,
 } from "@/utils/notices";
@@ -56,5 +59,31 @@ describe("notices in English", { tags: ["022-US2"] }, () => {
     expect(say(reminderNotice("followUp", "Talk"))).toBe(
       'How many people came to "Talk"?'
     );
+  });
+});
+
+describe("notices about a deleted guest", { tags: ["022-US2"] }, () => {
+  const german = translatorFor("de");
+  const when = at("2026-06-01T10:00:00Z");
+  const notices = [
+    meetingRequestNotice(undefined, when),
+    meetingOutcomeNotice(undefined, "accepted", when),
+    meetingOutcomeNotice(undefined, "declined", when),
+    meetingOutcomeNotice(undefined, "canceled", when),
+    meetingNudgeNotice(undefined, "Conf"),
+    meetingNudgeAnsweredNotice(undefined, "Conf"),
+  ];
+
+  it("do not store an English placeholder as a value", () => {
+    for (const notice of notices) {
+      expect(JSON.stringify(notice.values)).not.toContain("Someone");
+    }
+  });
+
+  it("start with Someone in English and Jemand in German", () => {
+    for (const notice of notices) {
+      expect(renderNotice(notice, english)).toMatch(/^Someone /);
+      expect(renderNotice(notice, german)).toMatch(/^Jemand /);
+    }
   });
 });

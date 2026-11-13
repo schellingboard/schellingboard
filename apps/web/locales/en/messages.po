@@ -39,23 +39,23 @@ msgstr "· no matches · show"
 msgid "· on since {since}"
 msgstr "· on since {since}"
 
-#: ../../utils/notices.ts:145
+#: ../../utils/notices.ts:163
 msgid "\"{title}\" has no host now"
 msgstr "\"{title}\" has no host now"
 
-#: ../../utils/notices.ts:116
+#: ../../utils/notices.ts:134
 msgid "\"{title}\" is now {newTimeKind, select, none {unscheduled} other {{newTime}}}, {newLocationKind, select, none {no location} other {{newLocation}}} (was {oldTimeKind, select, none {unscheduled} other {{oldTime}}}, {oldLocationKind, select, none {no location} other {{oldLocation}}})"
 msgstr "\"{title}\" is now {newTimeKind, select, none {unscheduled} other {{newTime}}}, {newLocationKind, select, none {no location} other {{newLocation}}} (was {oldTimeKind, select, none {unscheduled} other {{oldTime}}}, {oldLocationKind, select, none {no location} other {{oldLocation}}})"
 
-#: ../../utils/notices.ts:129
+#: ../../utils/notices.ts:147
 msgid "\"{title}\" moved to {newLocationKind, select, none {no location} other {{newLocation}}} (was {oldLocationKind, select, none {no location} other {{oldLocation}}})"
 msgstr "\"{title}\" moved to {newLocationKind, select, none {no location} other {{newLocation}}} (was {oldLocationKind, select, none {no location} other {{oldLocation}}})"
 
-#: ../../utils/notices.ts:123
+#: ../../utils/notices.ts:141
 msgid "\"{title}\" moved to {newTimeKind, select, none {unscheduled} other {{newTime}}} (was {oldTimeKind, select, none {unscheduled} other {{oldTime}}})"
 msgstr "\"{title}\" moved to {newTimeKind, select, none {unscheduled} other {{newTime}}} (was {oldTimeKind, select, none {unscheduled} other {{oldTime}}})"
 
-#: ../../utils/notices.ts:140
+#: ../../utils/notices.ts:158
 msgid "\"{title}\" was deleted"
 msgstr "\"{title}\" was deleted"
 
@@ -140,72 +140,72 @@ msgstr "{0} phase (skipped): {what}"
 msgid "{0} phase: {what}"
 msgstr "{0} phase: {what}"
 
-#: ../../emails/meeting.tsx:60
-#: ../../utils/notices.ts:51
-msgid "{actorName} accepted your 1-on-1 request for {time}"
-msgstr "{actorName} accepted your 1-on-1 request for {time}"
-
-#: ../../emails/meeting.tsx:68
-#: ../../utils/notices.ts:53
-msgid "{actorName} canceled the 1-on-1 on {time}"
-msgstr "{actorName} canceled the 1-on-1 on {time}"
-
-#: ../../emails/meeting.tsx:64
-#: ../../utils/notices.ts:52
-msgid "{actorName} declined your 1-on-1 request for {time}"
-msgstr "{actorName} declined your 1-on-1 request for {time}"
-
-#: ../../emails/meeting.tsx:96
-msgid "{askerName} would like a 1-on-1 with you"
-msgstr "{askerName} would like a 1-on-1 with you"
-
-#: ../../emails/meeting.tsx:101
-msgid "{askerName} would like to book a 1-on-1 with you at {eventName}"
-msgstr "{askerName} would like to book a 1-on-1 with you at {eventName}"
-
+#: ../../emails/meeting.tsx:74
 #: ../../utils/notices.ts:63
-msgid "{askerName} would like to book a 1-on-1 with you at {eventName}. Say when you are free in Settings, under 1-on-1s."
-msgstr "{askerName} would like to book a 1-on-1 with you at {eventName}. Say when you are free in Settings, under 1-on-1s."
+msgid "{actorKind, select, gone {Someone} other {{actor}}} accepted your 1-on-1 request for {time}"
+msgstr "{actorKind, select, gone {Someone} other {{actor}}} accepted your 1-on-1 request for {time}"
+
+#: ../../emails/meeting.tsx:86
+#: ../../utils/notices.ts:65
+msgid "{actorKind, select, gone {Someone} other {{actor}}} canceled the 1-on-1 on {time}"
+msgstr "{actorKind, select, gone {Someone} other {{actor}}} canceled the 1-on-1 on {time}"
+
+#: ../../emails/meeting.tsx:80
+#: ../../utils/notices.ts:64
+msgid "{actorKind, select, gone {Someone} other {{actor}}} declined your 1-on-1 request for {time}"
+msgstr "{actorKind, select, gone {Someone} other {{actor}}} declined your 1-on-1 request for {time}"
+
+#: ../../emails/meeting.tsx:118
+msgid "{askerKind, select, gone {Someone} other {{asker}}} would like a 1-on-1 with you"
+msgstr "{askerKind, select, gone {Someone} other {{asker}}} would like a 1-on-1 with you"
+
+#: ../../emails/meeting.tsx:124
+msgid "{askerKind, select, gone {Someone} other {{asker}}} would like to book a 1-on-1 with you at {eventName}"
+msgstr "{askerKind, select, gone {Someone} other {{asker}}} would like to book a 1-on-1 with you at {eventName}"
+
+#: ../../utils/notices.ts:77
+msgid "{askerKind, select, gone {Someone} other {{asker}}} would like to book a 1-on-1 with you at {eventName}. Say when you are free in Settings, under 1-on-1s."
+msgstr "{askerKind, select, gone {Someone} other {{asker}}} would like to book a 1-on-1 with you at {eventName}. Say when you are free in Settings, under 1-on-1s."
 
 #: src/features/proposals/vote-tally.tsx:9
 msgid "{choice, select, interested {{count, plural, one {# interested vote} other {# interested votes}}} maybe {{count, plural, one {# maybe vote} other {# maybe votes}}} other {}}"
 msgstr "{choice, select, interested {{count, plural, one {# interested vote} other {# interested votes}}} maybe {{count, plural, one {# maybe vote} other {# maybe votes}}} other {}}"
 
+#: ../../utils/notices.ts:37
+msgid "{commenterKind, select, gone {Someone} other {{commenter}}} commented on \"{title}\""
+msgstr "{commenterKind, select, gone {Someone} other {{commenter}}} commented on \"{title}\""
+
 #: ../../utils/notices.ts:32
-msgid "{commenterName} commented on \"{title}\""
-msgstr "{commenterName} commented on \"{title}\""
+msgid "{commenterKind, select, gone {Someone} other {{commenter}}} commented on {ownerName}'s profile"
+msgstr "{commenterKind, select, gone {Someone} other {{commenter}}} commented on {ownerName}'s profile"
 
-#: ../../utils/notices.ts:28
-msgid "{commenterName} commented on {ownerName}'s profile"
-msgstr "{commenterName} commented on {ownerName}'s profile"
+#: ../../emails/comment.tsx:51
+msgid "{commenterKind, select, gone {Someone} other {{commenter}}} commented on a profile you commented on."
+msgstr "{commenterKind, select, gone {Someone} other {{commenter}}} commented on a profile you commented on."
 
-#: ../../emails/comment.tsx:45
-msgid "{commenterName} commented on a profile you commented on."
-msgstr "{commenterName} commented on a profile you commented on."
+#: ../../emails/comment.tsx:63
+msgid "{commenterKind, select, gone {Someone} other {{commenter}}} commented on a proposal you commented on."
+msgstr "{commenterKind, select, gone {Someone} other {{commenter}}} commented on a proposal you commented on."
 
-#: ../../emails/comment.tsx:53
-msgid "{commenterName} commented on a proposal you commented on."
-msgstr "{commenterName} commented on a proposal you commented on."
+#: ../../emails/comment.tsx:60
+msgid "{commenterKind, select, gone {Someone} other {{commenter}}} commented on a proposal you're hosting."
+msgstr "{commenterKind, select, gone {Someone} other {{commenter}}} commented on a proposal you're hosting."
 
-#: ../../emails/comment.tsx:52
-msgid "{commenterName} commented on a proposal you're hosting."
-msgstr "{commenterName} commented on a proposal you're hosting."
+#: ../../emails/comment.tsx:71
+msgid "{commenterKind, select, gone {Someone} other {{commenter}}} commented on a session you commented on."
+msgstr "{commenterKind, select, gone {Someone} other {{commenter}}} commented on a session you commented on."
 
-#: ../../emails/comment.tsx:57
-msgid "{commenterName} commented on a session you commented on."
-msgstr "{commenterName} commented on a session you commented on."
+#: ../../emails/comment.tsx:68
+msgid "{commenterKind, select, gone {Someone} other {{commenter}}} commented on a session you're hosting."
+msgstr "{commenterKind, select, gone {Someone} other {{commenter}}} commented on a session you're hosting."
 
-#: ../../emails/comment.tsx:56
-msgid "{commenterName} commented on a session you're hosting."
-msgstr "{commenterName} commented on a session you're hosting."
+#: ../../utils/notices.ts:31
+msgid "{commenterKind, select, gone {Someone} other {{commenter}}} commented on your profile"
+msgstr "{commenterKind, select, gone {Someone} other {{commenter}}} commented on your profile"
 
-#: ../../utils/notices.ts:27
-msgid "{commenterName} commented on your profile"
-msgstr "{commenterName} commented on your profile"
-
-#: ../../emails/comment.tsx:44
-msgid "{commenterName} commented on your profile."
-msgstr "{commenterName} commented on your profile."
+#: ../../emails/comment.tsx:48
+msgid "{commenterKind, select, gone {Someone} other {{commenter}}} commented on your profile."
+msgstr "{commenterKind, select, gone {Someone} other {{commenter}}} commented on your profile."
 
 #: src/features/schedule/meeting-clash-text.ts:10
 msgid "{context, select, slot {{name} is already booked during this slot.} other {{name} is already booked during this time.}}"
@@ -321,7 +321,7 @@ msgstr "{hours}h"
 msgid "{hours}h {minutes}m"
 msgstr "{hours}h {minutes}m"
 
-#: ../../utils/notices.ts:163
+#: ../../utils/notices.ts:181
 msgid "{joinerName} joined \"{title}\" as a co-host"
 msgstr "{joinerName} joined \"{title}\" as a co-host"
 
@@ -420,7 +420,7 @@ msgstr "{numRsvps, plural, one {# RSVP (max capacity {capacity})} other {# RSVPs
 msgid "{otherName} will be told. Cancel it?"
 msgstr "{otherName} will be told. Cancel it?"
 
-#: ../../emails/comment.tsx:39
+#: ../../emails/comment.tsx:42
 msgid "{ownerName}'s profile"
 msgstr "{ownerName}'s profile"
 
@@ -428,26 +428,26 @@ msgstr "{ownerName}'s profile"
 msgid "{place} of {total, plural, one {# attendee} other {# attendees}}"
 msgstr "{place} of {total, plural, one {# attendee} other {# attendees}}"
 
-#: ../../emails/meeting.tsx:125
-msgid "{recipientName} is open to 1-on-1s"
-msgstr "{recipientName} is open to 1-on-1s"
+#: ../../emails/meeting.tsx:151
+msgid "{recipientKind, select, gone {Someone} other {{recipient}}} is open to 1-on-1s"
+msgstr "{recipientKind, select, gone {Someone} other {{recipient}}} is open to 1-on-1s"
 
-#: ../../emails/meeting.tsx:128
-#: ../../utils/notices.ts:71
-msgid "{recipientName} is open to 1-on-1s at {eventName}"
-msgstr "{recipientName} is open to 1-on-1s at {eventName}"
+#: ../../emails/meeting.tsx:157
+#: ../../utils/notices.ts:88
+msgid "{recipientKind, select, gone {Someone} other {{recipient}}} is open to 1-on-1s at {eventName}"
+msgstr "{recipientKind, select, gone {Someone} other {{recipient}}} is open to 1-on-1s at {eventName}"
 
 #: src/features/comments/my-comments-screen.tsx:172
 msgid "{replyCount, plural, one {# reply} other {# replies}}"
 msgstr "{replyCount, plural, one {# reply} other {# replies}}"
 
-#: ../../utils/notices.ts:40
-msgid "{requesterName} asked you for a 1-on-1 on {time}"
-msgstr "{requesterName} asked you for a 1-on-1 on {time}"
+#: ../../utils/notices.ts:49
+msgid "{requesterKind, select, gone {Someone} other {{requester}}} asked you for a 1-on-1 on {time}"
+msgstr "{requesterKind, select, gone {Someone} other {{requester}}} asked you for a 1-on-1 on {time}"
 
-#: ../../emails/meeting.tsx:29
-msgid "{requesterName} would like to meet you"
-msgstr "{requesterName} would like to meet you"
+#: ../../emails/meeting.tsx:39
+msgid "{requesterKind, select, gone {Someone} other {{requester}}} would like to meet you"
+msgstr "{requesterKind, select, gone {Someone} other {{requester}}} would like to meet you"
 
 #: src/commands/meeting-answer.ts:64
 msgid "{response, select, accept {Could not accept the 1-on-1 with {name} ({day}, {time}).} decline {Could not decline the 1-on-1 with {name} ({day}, {time}).} other {Could not decline the 1-on-1 with {name} ({day}, {time}).}}"
@@ -731,15 +731,15 @@ msgstr "+ Add meeting point"
 msgid "1-on-1"
 msgstr "1-on-1"
 
-#: ../../emails/meeting.tsx:59
+#: ../../emails/meeting.tsx:72
 msgid "1-on-1 accepted: {time}"
 msgstr "1-on-1 accepted: {time}"
 
-#: ../../emails/meeting.tsx:67
+#: ../../emails/meeting.tsx:84
 msgid "1-on-1 canceled: {time}"
 msgstr "1-on-1 canceled: {time}"
 
-#: ../../emails/meeting.tsx:63
+#: ../../emails/meeting.tsx:78
 msgid "1-on-1 declined: {time}"
 msgstr "1-on-1 declined: {time}"
 
@@ -756,9 +756,9 @@ msgstr "1-on-1 not found."
 msgid "1-on-1 request"
 msgstr "1-on-1 request"
 
-#: ../../emails/meeting.tsx:26
-msgid "1-on-1 request from {requesterName}"
-msgstr "1-on-1 request from {requesterName}"
+#: ../../emails/meeting.tsx:33
+msgid "1-on-1 request from {requesterKind, select, gone {Someone} other {{requester}}}"
+msgstr "1-on-1 request from {requesterKind, select, gone {Someone} other {{requester}}}"
 
 #: src/features/admin/stats-text.ts:66
 msgid "1-on-1 requests per person"
@@ -1047,7 +1047,7 @@ msgstr "Academic Cap"
 msgid "Accept"
 msgstr "Accept"
 
-#: ../../emails/meeting.tsx:37
+#: ../../emails/meeting.tsx:49
 msgid "Accept or decline"
 msgstr "Accept or decline"
 
@@ -3526,7 +3526,7 @@ msgid "How many people attended?"
 msgstr "How many people attended?"
 
 #: ../../emails/attendee-count-followup.tsx:18
-#: ../../utils/notices.ts:83
+#: ../../utils/notices.ts:101
 msgid "How many people came to \"{title}\"?"
 msgstr "How many people came to \"{title}\"?"
 
@@ -4349,15 +4349,15 @@ msgctxt "Location colour"
 msgid "Neutral"
 msgstr "Neutral"
 
-#: ../../emails/comment.tsx:41
+#: ../../emails/comment.tsx:44
 msgid "New comment on your profile"
 msgstr "New comment on your profile"
 
-#: ../../emails/comment.tsx:49
+#: ../../emails/comment.tsx:56
 msgid "New comment on: {name}"
 msgstr "New comment on: {name}"
 
-#: ../../emails/comment.tsx:42
+#: ../../emails/comment.tsx:45
 msgid "New comment on: {ownerName}'s profile"
 msgstr "New comment on: {ownerName}'s profile"
 
@@ -4775,7 +4775,7 @@ msgstr "Open menu"
 msgid "Open to 1-on-1s"
 msgstr "Open to 1-on-1s"
 
-#: ../../emails/meeting.tsx:111
+#: ../../emails/meeting.tsx:134
 msgid "Open your 1-on-1 settings"
 msgstr "Open your 1-on-1 settings"
 
@@ -5603,7 +5603,7 @@ msgctxt "verb"
 msgid "Schedule"
 msgstr "Schedule"
 
-#: ../../emails/meeting.tsx:130
+#: ../../emails/meeting.tsx:161
 #: src/features/people/profile-body.tsx:136
 msgid "Schedule a 1-on-1"
 msgstr "Schedule a 1-on-1"
@@ -6643,7 +6643,7 @@ msgstr "They are not attending this event."
 msgid "They are not available at that time."
 msgstr "They are not available at that time."
 
-#: ../../emails/meeting.tsx:104
+#: ../../emails/meeting.tsx:127
 msgid "They can only book you once you are open to 1-on-1s."
 msgstr "They can only book you once you are open to 1-on-1s."
 
@@ -6906,7 +6906,7 @@ msgstr "Title ↓"
 msgid "Title is required"
 msgstr "Title is required"
 
-#: ../../emails/meeting.tsx:107
+#: ../../emails/meeting.tsx:130
 msgid "To open up, go to Settings and find 1-on-1s. Open {eventName}, tick \"I'm open to 1-on-1s at this event\", choose when you are free and save."
 msgstr "To open up, go to Settings and find 1-on-1s. Open {eventName}, tick \"I'm open to 1-on-1s at this event\", choose when you are free and save."
 
@@ -7187,11 +7187,11 @@ msgstr "View event"
 msgid "View Schedule"
 msgstr "View Schedule"
 
-#: ../../emails/meeting.tsx:82
+#: ../../emails/meeting.tsx:101
 msgid "View the 1-on-1"
 msgstr "View the 1-on-1"
 
-#: ../../emails/comment.tsx:67
+#: ../../emails/comment.tsx:82
 msgid "View the comment"
 msgstr "View the comment"
 
@@ -7390,7 +7390,7 @@ msgstr "When I leave, and where I could share a ride to"
 msgid "When you're free to meet other attendees, event by event. Only the events you're attending that offer 1-on-1s are listed."
 msgstr "When you're free to meet other attendees, event by event. Only the events you're attending that offer 1-on-1s are listed."
 
-#: ../../emails/meeting.tsx:31
+#: ../../emails/meeting.tsx:43
 msgid "When:"
 msgstr "When:"
 
@@ -7411,8 +7411,8 @@ msgstr "Where people met. Places people typed themselves are counted as Other."
 msgid "Where to meet"
 msgstr "Where to meet"
 
-#: ../../emails/meeting.tsx:34
-#: ../../emails/meeting.tsx:78
+#: ../../emails/meeting.tsx:46
+#: ../../emails/meeting.tsx:97
 msgid "Where:"
 msgstr "Where:"
 
@@ -7591,11 +7591,11 @@ msgstr "You have voted on {votedCount} / {votableCount} proposals"
 msgid "You have voted on all proposals. Go to the overview to change your votes."
 msgstr "You have voted on all proposals. Go to the overview to change your votes."
 
-#: ../../utils/notices.ts:155
+#: ../../utils/notices.ts:173
 msgid "You were added as a co-host of \"{title}\""
 msgstr "You were added as a co-host of \"{title}\""
 
-#: ../../utils/notices.ts:154
+#: ../../utils/notices.ts:172
 msgid "You were added as the host of \"{title}\""
 msgstr "You were added as the host of \"{title}\""
 
@@ -7607,7 +7607,7 @@ msgstr "You’ll then log in with the new password. If you didn’t request this
 msgid "You're hosting \"{title}\" shortly"
 msgstr "You're hosting \"{title}\" shortly"
 
-#: ../../utils/notices.ts:82
+#: ../../utils/notices.ts:100
 msgid "You're hosting \"{title}\" shortly — count the people who come"
 msgstr "You're hosting \"{title}\" shortly — count the people who come"
 
@@ -7665,7 +7665,7 @@ msgstr "Your password was just changed."
 msgid "Your photo was saved; the details were not."
 msgstr "Your photo was saved; the details were not."
 
-#: ../../emails/comment.tsx:39
+#: ../../emails/comment.tsx:42
 msgid "Your profile"
 msgstr "Your profile"
 
@@ -7781,19 +7781,19 @@ msgstr "Your session “{title}” has been deleted successfully."
 msgid "Your session “{title}” has been updated successfully!"
 msgstr "Your session “{title}” has been updated successfully!"
 
-#: ../../utils/notices.ts:115
+#: ../../utils/notices.ts:133
 msgid "Your session \"{title}\" is now {newTimeKind, select, none {unscheduled} other {{newTime}}}, {newLocationKind, select, none {no location} other {{newLocation}}} (was {oldTimeKind, select, none {unscheduled} other {{oldTime}}}, {oldLocationKind, select, none {no location} other {{oldLocation}}})"
 msgstr "Your session \"{title}\" is now {newTimeKind, select, none {unscheduled} other {{newTime}}}, {newLocationKind, select, none {no location} other {{newLocation}}} (was {oldTimeKind, select, none {unscheduled} other {{oldTime}}}, {oldLocationKind, select, none {no location} other {{oldLocation}}})"
 
-#: ../../utils/notices.ts:128
+#: ../../utils/notices.ts:146
 msgid "Your session \"{title}\" moved to {newLocationKind, select, none {no location} other {{newLocation}}} (was {oldLocationKind, select, none {no location} other {{oldLocation}}})"
 msgstr "Your session \"{title}\" moved to {newLocationKind, select, none {no location} other {{newLocation}}} (was {oldLocationKind, select, none {no location} other {{oldLocation}}})"
 
-#: ../../utils/notices.ts:122
+#: ../../utils/notices.ts:140
 msgid "Your session \"{title}\" moved to {newTimeKind, select, none {unscheduled} other {{newTime}}} (was {oldTimeKind, select, none {unscheduled} other {{oldTime}}})"
 msgstr "Your session \"{title}\" moved to {newTimeKind, select, none {unscheduled} other {{newTime}}} (was {oldTimeKind, select, none {unscheduled} other {{oldTime}}})"
 
-#: ../../utils/notices.ts:139
+#: ../../utils/notices.ts:157
 msgid "Your session \"{title}\" was deleted"
 msgstr "Your session \"{title}\" was deleted"
 

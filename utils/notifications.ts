@@ -477,7 +477,7 @@ async function deliverCommentNotifications({
 }): Promise<void> {
   const messageProps = {
     subject,
-    commenterName: comment.author?.name ?? "Someone",
+    commenterName: comment.author?.name,
     url: emailBase() + path,
   };
 
@@ -495,11 +495,7 @@ async function deliverCommentNotifications({
         props: { ...messageProps, recipient: "responsible" },
       },
       {
-        notice: commentNotice(
-          subject,
-          "responsible",
-          messageProps.commenterName
-        ),
+        notice: commentNotice(subject, "responsible", comment.author?.name),
         url: path,
         at: now,
       }
@@ -522,7 +518,7 @@ async function deliverCommentNotifications({
         props: { ...messageProps, recipient: "commenter" },
       },
       {
-        notice: commentNotice(subject, "commenter", messageProps.commenterName),
+        notice: commentNotice(subject, "commenter", comment.author?.name),
         url: path,
         at: now,
       }
@@ -821,11 +817,11 @@ async function meetingContext(
   };
 }
 
-// A deleted guest still has a meeting to answer about, and "Someone" is a
-// better line than a crash.
-async function guestName(guestId: string): Promise<string> {
+// A deleted guest still has a meeting to answer about; the messages say
+// "Someone" in the reader's language when there is no name.
+async function guestName(guestId: string): Promise<string | undefined> {
   const guest = await getRepositories().guests.findById(guestId);
-  return guest?.name ?? "Someone";
+  return guest?.name;
 }
 
 function proposalPath(eventSlug: string, proposalId: string) {
