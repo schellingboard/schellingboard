@@ -72,6 +72,9 @@ export default tseslint.config(
       "apps/web/src/app/panel-landing.tsx",
       "apps/web/src/app/profile-walk.tsx",
       "apps/web/src/app/unread-count.tsx",
+      "apps/web/src/app/theme.tsx",
+      "apps/web/src/app/time-format.tsx",
+      "apps/web/src/app/people-pages.tsx",
       "apps/web/src/features/people/*.tsx",
       "apps/web/src/features/sign-in/*.tsx",
       "apps/web/src/app/account-pages.tsx",
@@ -104,6 +107,7 @@ export default tseslint.config(
       "apps/web/src/features/schedule/meetings-col.tsx",
       "apps/web/src/features/settings/email-settings-form.tsx",
       "apps/web/src/features/settings/language-setting.tsx",
+      "apps/web/src/features/settings/push-notifications.tsx",
       "apps/web/src/features/settings/settings-screen.tsx",
       "apps/web/src/features/notifications/*.tsx",
       "apps/web/src/features/events/*.tsx",
@@ -216,6 +220,10 @@ export default tseslint.config(
             // Enum values of props and options
             "^(?:failure|info|centered|grid|smooth)$",
             "path=/; max-age=",
+            // Theme, time-format and push-state tokens (stored or compared, never shown). Global: a
+            // UI string that is exactly one of these passes in every file, so translate such words by hand.
+            "^(?:system|light|dark|auto|checking|needs-install|unsupported|blocked|on|off)$",
+            "^\\(prefers-color-scheme: (?:light|dark)\\)$",
             "^translate\\(",
             // CSS selectors
             ":not\\(",
