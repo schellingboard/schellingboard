@@ -67,7 +67,9 @@ msgstr ""
 msgid "[none]"
 msgstr ""
 
+#. placeholder {0}: label.guestIds.length
 #. placeholder {0}: rows.length
+#: src/features/admin/event-labels.tsx:198
 #: src/features/people/directory-screen.tsx:209
 msgid "{0, plural, one {# attendee} other {# attendees}}"
 msgstr ""
@@ -571,6 +573,10 @@ msgstr ""
 msgid "A host is not part of this event."
 msgstr ""
 
+#: src/features/admin/event-labels.tsx:248
+msgid "A label, such as Orga team or Volunteer, marks attendees of this event. Give it to people in the guest list above."
+msgstr ""
+
 #: src/features/admin/stats-figures.tsx:824
 msgid "A left-out session still occupies its location, so the gaps stay true."
 msgstr ""
@@ -669,6 +675,10 @@ msgstr ""
 msgid "Add a day first; shared moments belong to days."
 msgstr ""
 
+#: src/features/admin/event-guests.tsx:58
+msgid "Add a label…"
+msgstr ""
+
 #: src/features/meetings/meeting-request-fields.tsx:141
 msgid "Add a line of context (optional)"
 msgstr ""
@@ -680,6 +690,10 @@ msgstr ""
 #: src/features/admin/event-days.tsx:177
 #: src/features/admin/event-days.tsx:227
 msgid "Add day"
+msgstr ""
+
+#: src/features/admin/event-labels.tsx:277
+msgid "Add label"
 msgstr ""
 
 #: src/features/people/profile-form.tsx:523
@@ -720,14 +734,15 @@ msgstr ""
 msgid "Add unavailable time"
 msgstr ""
 
-#: src/features/admin/guests-screen.tsx:134
+#: src/features/admin/guests-screen.tsx:188
 msgid "Add user"
 msgstr ""
 
 #: src/features/admin/event-days.tsx:227
+#: src/features/admin/event-labels.tsx:269
 #: src/features/admin/event-meetings.tsx:245
 #: src/features/admin/event-moments.tsx:196
-#: src/features/admin/guests-screen.tsx:134
+#: src/features/admin/guests-screen.tsx:188
 #: src/features/admin/location-availability.tsx:187
 #: src/features/admin/locations-screen.tsx:528
 msgid "Adding..."
@@ -1037,6 +1052,10 @@ msgstr ""
 msgid "Blockers"
 msgstr ""
 
+#: src/ui/label-badge.tsx:15
+msgid "Blue"
+msgstr ""
+
 #: src/features/admin/locations-screen.tsx:55
 msgctxt "Location colour"
 msgid "Blue"
@@ -1145,6 +1164,8 @@ msgstr ""
 #: src/features/admin/event-days.tsx:230
 #: src/features/admin/event-days.tsx:274
 #: src/features/admin/event-days.tsx:357
+#: src/features/admin/event-labels.tsx:106
+#: src/features/admin/event-labels.tsx:147
 #: src/features/admin/event-meetings.tsx:104
 #: src/features/admin/event-meetings.tsx:157
 #: src/features/admin/event-meetings.tsx:248
@@ -1155,8 +1176,8 @@ msgstr ""
 #: src/features/admin/event-sessions.tsx:293
 #: src/features/admin/event-sessions.tsx:346
 #: src/features/admin/events-screen.tsx:154
-#: src/features/admin/guests-screen.tsx:224
-#: src/features/admin/guests-screen.tsx:347
+#: src/features/admin/guests-screen.tsx:313
+#: src/features/admin/guests-screen.tsx:445
 #: src/features/admin/join-links.tsx:145
 #: src/features/admin/locations-screen.tsx:309
 #: src/features/comments/comments-section.tsx:586
@@ -1399,6 +1420,10 @@ msgstr ""
 msgid "Color"
 msgstr ""
 
+#: src/features/admin/event-labels.tsx:87
+msgid "Colour"
+msgstr ""
+
 #: src/app/theme.tsx:104
 msgid "Colour theme"
 msgstr ""
@@ -1465,9 +1490,10 @@ msgstr ""
 
 #: src/features/admin/confirm-by-typing.tsx:53
 #: src/features/admin/event-days.tsx:354
+#: src/features/admin/event-labels.tsx:144
 #: src/features/admin/event-meetings.tsx:147
 #: src/features/admin/event-moments.tsx:290
-#: src/features/admin/guests-screen.tsx:344
+#: src/features/admin/guests-screen.tsx:442
 msgid "Confirm delete"
 msgstr ""
 
@@ -1608,7 +1634,7 @@ msgstr ""
 msgid "Could not load the count — try again"
 msgstr ""
 
-#: src/app/admin-pages.tsx:300
+#: src/app/admin-pages.tsx:343
 msgid "Could not load the event settings."
 msgstr ""
 
@@ -1616,17 +1642,21 @@ msgstr ""
 msgid "Could not load the event."
 msgstr ""
 
-#: src/app/admin-pages.tsx:121
-#: src/app/admin-pages.tsx:187
+#: src/app/admin-pages.tsx:164
+#: src/app/admin-pages.tsx:230
 #: src/features/admin/events-screen.tsx:187
 msgid "Could not load the events."
 msgstr ""
 
-#: src/app/admin-pages.tsx:368
+#: src/app/admin-pages.tsx:415
 msgid "Could not load the guests."
 msgstr ""
 
-#: src/app/admin-pages.tsx:403
+#: src/app/admin-pages.tsx:417
+msgid "Could not load the labels."
+msgstr ""
+
+#: src/app/admin-pages.tsx:467
 #: src/features/admin/locations-screen.tsx:508
 msgid "Could not load the locations."
 msgstr ""
@@ -1635,7 +1665,7 @@ msgstr ""
 msgid "Could not load the names. Reload the page to try again."
 msgstr ""
 
-#: src/app/admin-pages.tsx:522
+#: src/app/admin-pages.tsx:586
 msgid "Could not load the proposals."
 msgstr ""
 
@@ -1643,7 +1673,7 @@ msgstr ""
 msgid "Could not load the RSVPs."
 msgstr ""
 
-#: src/app/admin-pages.tsx:568
+#: src/app/admin-pages.tsx:632
 msgid "Could not load the sessions."
 msgstr ""
 
@@ -1655,7 +1685,7 @@ msgstr ""
 msgid "Could not load the statistics."
 msgstr ""
 
-#: src/features/admin/guests-screen.tsx:412
+#: src/features/admin/guests-screen.tsx:512
 msgid "Could not load the users."
 msgstr ""
 
@@ -1884,11 +1914,12 @@ msgid "declined"
 msgstr ""
 
 #: src/features/admin/event-days.tsx:439
+#: src/features/admin/event-labels.tsx:217
 #: src/features/admin/event-meetings.tsx:167
 #: src/features/admin/event-moments.tsx:356
 #: src/features/admin/event-proposals.tsx:321
 #: src/features/admin/event-sessions.tsx:586
-#: src/features/admin/guests-screen.tsx:376
+#: src/features/admin/guests-screen.tsx:474
 #: src/features/admin/location-availability.tsx:68
 #: src/features/admin/locations-screen.tsx:458
 #: src/features/comments/comments-section.tsx:348
@@ -1900,6 +1931,10 @@ msgstr ""
 #: src/features/sessions/session-form.tsx:785
 #: src/features/sessions/session-form.tsx:819
 msgid "Delete"
+msgstr ""
+
+#: src/features/admin/event-labels.tsx:214
+msgid "Delete {name}"
 msgstr ""
 
 #: src/features/admin/event-meetings.tsx:164
@@ -1946,6 +1981,10 @@ msgstr ""
 msgid "Delete session?"
 msgstr ""
 
+#: src/features/admin/event-labels.tsx:135
+msgid "Delete the label {name}? It is taken off everyone."
+msgstr ""
+
 #: src/features/comments/comments-section.tsx:394
 msgid "Delete this comment? This cannot be undone."
 msgstr ""
@@ -1954,7 +1993,7 @@ msgstr ""
 msgid "Delete this day? No scheduled sessions fall within its time window."
 msgstr ""
 
-#: src/features/admin/guests-screen.tsx:337
+#: src/features/admin/guests-screen.tsx:435
 msgid "Delete this user?"
 msgstr ""
 
@@ -1972,9 +2011,10 @@ msgstr ""
 
 #: src/features/admin/confirm-by-typing.tsx:53
 #: src/features/admin/event-days.tsx:354
+#: src/features/admin/event-labels.tsx:144
 #: src/features/admin/event-meetings.tsx:147
 #: src/features/admin/event-moments.tsx:290
-#: src/features/admin/guests-screen.tsx:344
+#: src/features/admin/guests-screen.tsx:442
 #: src/features/admin/location-availability.tsx:68
 msgid "Deleting..."
 msgstr ""
@@ -1984,6 +2024,7 @@ msgid "Describe what your session will cover"
 msgstr ""
 
 #: src/features/admin/event-config.tsx:152
+#: src/features/admin/event-labels.tsx:79
 #: src/features/admin/event-meetings.tsx:233
 #: src/features/admin/event-proposals.tsx:109
 #: src/features/admin/event-sessions.tsx:168
@@ -2119,11 +2160,12 @@ msgstr ""
 #. Button: edit (verb)
 #. Button: edit (verb)
 #: src/features/admin/event-days.tsx:432
+#: src/features/admin/event-labels.tsx:210
 #: src/features/admin/event-meetings.tsx:137
 #: src/features/admin/event-moments.tsx:349
 #: src/features/admin/event-proposals.tsx:314
 #: src/features/admin/event-sessions.tsx:572
-#: src/features/admin/guests-screen.tsx:353
+#: src/features/admin/guests-screen.tsx:451
 #: src/features/admin/locations-screen.tsx:455
 #: src/features/comments/comments-section.tsx:339
 #: src/features/proposals/proposal-panel.tsx:198
@@ -2135,6 +2177,10 @@ msgstr ""
 #: src/ui/markdown-textarea.tsx:93
 msgctxt "Markdown field: write mode"
 msgid "Edit"
+msgstr ""
+
+#: src/features/admin/event-labels.tsx:209
+msgid "Edit {name}"
 msgstr ""
 
 #: src/features/admin/event-proposals.tsx:311
@@ -2173,9 +2219,9 @@ msgstr ""
 msgid "Edited {editedAt}"
 msgstr ""
 
-#: src/features/admin/event-guests.tsx:36
-#: src/features/admin/guests-screen.tsx:110
-#: src/features/admin/guests-screen.tsx:197
+#: src/features/admin/event-guests.tsx:108
+#: src/features/admin/guests-screen.tsx:164
+#: src/features/admin/guests-screen.tsx:280
 #: src/features/people/contact-labels.ts:6
 #: src/features/sign-in/bootstrap-screen.tsx:77
 msgid "Email"
@@ -2293,7 +2339,7 @@ msgctxt "Comment filter: label of the event selector"
 msgid "Event"
 msgstr ""
 
-#: src/app/admin-pages.tsx:219
+#: src/app/admin-pages.tsx:262
 msgctxt "Statistics: the event to show"
 msgid "Event"
 msgstr ""
@@ -2323,7 +2369,7 @@ msgstr ""
 #: src/app/admin-frame.tsx:40
 #: src/features/admin/event-layout.tsx:90
 #: src/features/admin/events-screen.tsx:200
-#: src/features/admin/guests-screen.tsx:37
+#: src/features/admin/guests-screen.tsx:42
 #: src/features/admin/locations-screen.tsx:255
 msgid "Events"
 msgstr ""
@@ -2530,9 +2576,17 @@ msgctxt "Location colour"
 msgid "Gray"
 msgstr ""
 
+#: src/ui/label-badge.tsx:13
+msgid "Green"
+msgstr ""
+
 #: src/features/admin/locations-screen.tsx:50
 msgctxt "Location colour"
 msgid "Green"
+msgstr ""
+
+#: src/ui/label-badge.tsx:9
+msgid "Grey"
 msgstr ""
 
 #. Name of the schedule view that shows rooms as columns
@@ -2544,7 +2598,7 @@ msgstr ""
 msgid "Ground floor, next to reception"
 msgstr ""
 
-#: src/features/admin/event-guests.tsx:27
+#: src/features/admin/event-guests.tsx:99
 #: src/features/admin/event-layout.tsx:18
 msgid "Guests"
 msgstr ""
@@ -2780,7 +2834,7 @@ msgstr ""
 msgid "Import"
 msgstr ""
 
-#: src/features/admin/guests-screen.tsx:445
+#: src/features/admin/guests-screen.tsx:545
 msgid "Import CSV"
 msgstr ""
 
@@ -2823,7 +2877,7 @@ msgstr ""
 msgid "Join as co-host"
 msgstr ""
 
-#: src/features/admin/event-guests.tsx:41
+#: src/features/admin/event-guests.tsx:114
 msgid "Join link"
 msgstr ""
 
@@ -2857,6 +2911,20 @@ msgstr ""
 
 #: src/features/people/profile-form.tsx:566
 msgid "Label"
+msgstr ""
+
+#: src/features/admin/event-guests.tsx:112
+#: src/features/admin/event-labels.tsx:243
+#: src/features/admin/event-labels.tsx:245
+msgid "Labels"
+msgstr ""
+
+#: src/features/admin/guests-screen.tsx:90
+msgid "Labels in {name}"
+msgstr ""
+
+#: src/features/admin/event-guests.tsx:57
+msgid "Labels of {name}"
 msgstr ""
 
 #. Chart axis: one bar per language
@@ -2962,13 +3030,13 @@ msgid "Loading proposals..."
 msgstr ""
 
 #: src/app/account-pages.tsx:268
-#: src/app/admin-pages.tsx:127
-#: src/app/admin-pages.tsx:191
-#: src/app/admin-pages.tsx:304
-#: src/app/admin-pages.tsx:372
-#: src/app/admin-pages.tsx:407
-#: src/app/admin-pages.tsx:530
-#: src/app/admin-pages.tsx:576
+#: src/app/admin-pages.tsx:170
+#: src/app/admin-pages.tsx:234
+#: src/app/admin-pages.tsx:347
+#: src/app/admin-pages.tsx:421
+#: src/app/admin-pages.tsx:471
+#: src/app/admin-pages.tsx:594
+#: src/app/admin-pages.tsx:640
 #: src/app/event-page.tsx:152
 #: src/app/panel-host.tsx:82
 #: src/app/people-pages.tsx:162
@@ -2976,7 +3044,7 @@ msgstr ""
 #: src/features/admin/event-sessions.tsx:394
 #: src/features/admin/event-stats.tsx:196
 #: src/features/admin/events-screen.tsx:193
-#: src/features/admin/guests-screen.tsx:418
+#: src/features/admin/guests-screen.tsx:518
 #: src/features/admin/locations-screen.tsx:514
 #: src/features/admin/settings-screen.tsx:161
 #: src/features/comments/my-comments-screen.tsx:42
@@ -3064,7 +3132,7 @@ msgstr ""
 msgid "Mail new links to all guests"
 msgstr ""
 
-#: src/features/admin/guests-screen.tsx:373
+#: src/features/admin/guests-screen.tsx:471
 msgid "Make site admin"
 msgstr ""
 
@@ -3258,12 +3326,13 @@ msgid "n/a"
 msgstr ""
 
 #: src/features/admin/event-config.tsx:144
-#: src/features/admin/event-guests.tsx:34
+#: src/features/admin/event-guests.tsx:106
+#: src/features/admin/event-labels.tsx:70
 #: src/features/admin/event-locations.tsx:34
 #: src/features/admin/event-meetings.tsx:219
 #: src/features/admin/events-screen.tsx:91
-#: src/features/admin/guests-screen.tsx:101
-#: src/features/admin/guests-screen.tsx:189
+#: src/features/admin/guests-screen.tsx:155
+#: src/features/admin/guests-screen.tsx:272
 #: src/features/admin/locations-screen.tsx:185
 #: src/features/people/profile-form.tsx:352
 #: src/features/sign-in/bootstrap-screen.tsx:70
@@ -3274,6 +3343,7 @@ msgstr ""
 msgid "Name (A–Z)"
 msgstr ""
 
+#: src/features/admin/event-labels.tsx:48
 #: src/features/admin/events-screen.tsx:59
 #: src/features/admin/locations-screen.tsx:106
 msgid "Name is required"
@@ -3382,7 +3452,7 @@ msgstr ""
 msgid "No days yet"
 msgstr ""
 
-#: src/features/admin/guests-screen.tsx:315
+#: src/features/admin/guests-screen.tsx:413
 msgid "No email"
 msgstr ""
 
@@ -3433,7 +3503,7 @@ msgstr ""
 msgid "No matching sessions"
 msgstr ""
 
-#: src/features/admin/guests-screen.tsx:310
+#: src/features/admin/guests-screen.tsx:408
 msgid "No password yet"
 msgstr ""
 
@@ -3462,8 +3532,8 @@ msgstr ""
 msgid "No sessions match."
 msgstr ""
 
-#: src/features/admin/event-guests.tsx:32
-#: src/features/admin/guests-screen.tsx:459
+#: src/features/admin/event-guests.tsx:104
+#: src/features/admin/guests-screen.tsx:559
 msgid "No users match."
 msgstr ""
 
@@ -3519,7 +3589,7 @@ msgstr ""
 msgid "Not updating: may be out of date"
 msgstr ""
 
-#: src/ui/people-picker.tsx:132
+#: src/ui/people-picker.tsx:135
 msgid "Nothing found."
 msgstr ""
 
@@ -3708,6 +3778,10 @@ msgstr ""
 msgid "or type somewhere else"
 msgstr ""
 
+#: src/ui/label-badge.tsx:11
+msgid "Orange"
+msgstr ""
+
 #: src/features/admin/locations-screen.tsx:46
 msgctxt "Location colour"
 msgid "Orange"
@@ -3747,7 +3821,7 @@ msgstr ""
 msgid "Page {page} of {totalPages}+"
 msgstr ""
 
-#: src/app/admin-pages.tsx:266
+#: src/app/admin-pages.tsx:309
 #: src/app/not-found.tsx:6
 msgid "Page not found."
 msgstr ""
@@ -4014,6 +4088,10 @@ msgstr ""
 msgid "Protection turned off"
 msgstr ""
 
+#: src/ui/label-badge.tsx:16
+msgid "Purple"
+msgstr ""
+
 #: src/features/admin/locations-screen.tsx:58
 msgctxt "Location colour"
 msgid "Purple"
@@ -4037,6 +4115,10 @@ msgstr ""
 msgid "Reconnecting…"
 msgstr ""
 
+#: src/ui/label-badge.tsx:10
+msgid "Red"
+msgstr ""
+
 #: src/features/admin/locations-screen.tsx:45
 msgctxt "Location colour"
 msgid "Red"
@@ -4055,7 +4137,7 @@ msgid "Remove"
 msgstr ""
 
 #. placeholder {0}: p.name
-#: src/ui/people-picker.tsx:90
+#: src/ui/people-picker.tsx:92
 msgid "Remove {0}"
 msgstr ""
 
@@ -4075,7 +4157,7 @@ msgstr ""
 msgid "Remove selected"
 msgstr ""
 
-#: src/features/admin/guests-screen.tsx:373
+#: src/features/admin/guests-screen.tsx:471
 msgid "Remove site admin"
 msgstr ""
 
@@ -4194,11 +4276,12 @@ msgid "RSVPs per running session on {day}"
 msgstr ""
 
 #: src/features/admin/event-days.tsx:271
+#: src/features/admin/event-labels.tsx:174
 #: src/features/admin/event-meetings.tsx:92
 #: src/features/admin/event-moments.tsx:243
 #: src/features/admin/event-proposals.tsx:143
 #: src/features/admin/event-sessions.tsx:517
-#: src/features/admin/guests-screen.tsx:221
+#: src/features/admin/guests-screen.tsx:310
 #: src/features/admin/locations-screen.tsx:306
 #: src/features/admin/locations-screen.tsx:355
 #: src/features/comments/comments-section.tsx:306
@@ -4218,6 +4301,10 @@ msgstr ""
 
 #: src/features/admin/event-config.tsx:255
 msgid "Save changes"
+msgstr ""
+
+#: src/features/admin/event-labels.tsx:268
+msgid "Save label"
 msgstr ""
 
 #: src/features/admin/event-meetings.tsx:381
@@ -4249,12 +4336,13 @@ msgstr ""
 
 #: src/features/admin/event-config.tsx:57
 #: src/features/admin/event-days.tsx:271
+#: src/features/admin/event-labels.tsx:175
 #: src/features/admin/event-meetings.tsx:92
 #: src/features/admin/event-meetings.tsx:381
 #: src/features/admin/event-moments.tsx:243
 #: src/features/admin/event-proposals.tsx:143
 #: src/features/admin/event-sessions.tsx:518
-#: src/features/admin/guests-screen.tsx:221
+#: src/features/admin/guests-screen.tsx:310
 #: src/features/admin/locations-screen.tsx:356
 #: src/features/admin/settings-screen.tsx:128
 #: src/features/comments/comments-section.tsx:594
@@ -4344,8 +4432,8 @@ msgstr ""
 msgid "Search {tableTitle}"
 msgstr ""
 
-#: src/features/admin/event-guests.tsx:31
-#: src/features/admin/guests-screen.tsx:458
+#: src/features/admin/event-guests.tsx:103
+#: src/features/admin/guests-screen.tsx:558
 msgid "Search name or email…"
 msgstr ""
 
@@ -4439,16 +4527,16 @@ msgstr ""
 msgid "Send request"
 msgstr ""
 
-#: src/features/admin/guests-screen.tsx:366
+#: src/features/admin/guests-screen.tsx:464
 msgid "Send test email"
 msgstr ""
 
-#: src/features/admin/guests-screen.tsx:363
+#: src/features/admin/guests-screen.tsx:461
 #: src/features/meetings/meeting-request-fields.tsx:154
 msgid "Sending..."
 msgstr ""
 
-#: src/features/admin/guests-screen.tsx:365
+#: src/features/admin/guests-screen.tsx:463
 msgid "Sent!"
 msgstr ""
 
@@ -4648,7 +4736,7 @@ msgstr ""
 msgid "Signed-in browsers"
 msgstr ""
 
-#: src/features/admin/guests-screen.tsx:305
+#: src/features/admin/guests-screen.tsx:400
 msgid "Site admin"
 msgstr ""
 
@@ -4798,7 +4886,7 @@ msgid "Starts at what the room holds. 0 means no limit."
 msgstr ""
 
 #: src/app/admin-frame.tsx:43
-#: src/app/admin-pages.tsx:214
+#: src/app/admin-pages.tsx:257
 #: src/features/admin/event-layout.tsx:99
 msgid "Statistics"
 msgstr ""
@@ -4867,6 +4955,10 @@ msgstr ""
 #. Button: show the figure as a table
 #: src/features/admin/stats-figure-card.tsx:124
 msgid "Table"
+msgstr ""
+
+#: src/ui/label-badge.tsx:14
+msgid "Teal"
 msgstr ""
 
 #: src/features/admin/locations-screen.tsx:52
@@ -5015,7 +5107,7 @@ msgstr ""
 msgid "Their hosts and RSVPed guests are told."
 msgstr ""
 
-#: src/app/admin-pages.tsx:198
+#: src/app/admin-pages.tsx:241
 msgid "There are no events yet."
 msgstr ""
 
@@ -5428,8 +5520,8 @@ msgstr ""
 msgid "User Group"
 msgstr ""
 
-#: src/features/admin/guests-screen.tsx:120
-#: src/features/admin/guests-screen.tsx:206
+#: src/features/admin/guests-screen.tsx:174
+#: src/features/admin/guests-screen.tsx:289
 #: src/features/sign-in/account-security.tsx:314
 #: src/features/sign-in/account-security.tsx:317
 #: src/features/sign-in/bootstrap-screen.tsx:88
@@ -5446,8 +5538,8 @@ msgstr ""
 
 #: src/app/admin-frame.tsx:41
 #: src/features/admin/guest-import.tsx:46
-#: src/features/admin/guests-screen.tsx:439
-#: src/features/admin/guests-screen.tsx:448
+#: src/features/admin/guests-screen.tsx:539
+#: src/features/admin/guests-screen.tsx:548
 msgid "Users"
 msgstr ""
 
@@ -5706,6 +5798,10 @@ msgstr ""
 
 #: src/features/comments/comments-section.tsx:357
 msgid "Write a reply"
+msgstr ""
+
+#: src/ui/label-badge.tsx:12
+msgid "Yellow"
 msgstr ""
 
 #: src/features/admin/locations-screen.tsx:48

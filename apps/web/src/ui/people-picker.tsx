@@ -24,6 +24,7 @@ export function PeoplePicker({
   invalid,
   describedBy,
   placeholder,
+  ariaLabel,
 }: {
   people: Person[];
   selected: string[];
@@ -33,6 +34,7 @@ export function PeoplePicker({
   invalid?: boolean;
   describedBy?: string;
   placeholder?: string;
+  ariaLabel?: string;
 }) {
   const listId = useId();
   const root = useRef<HTMLDivElement>(null);
@@ -98,6 +100,7 @@ export function PeoplePicker({
           id={id}
           name={name}
           role="combobox"
+          aria-label={ariaLabel}
           aria-expanded={open}
           aria-controls={listId}
           aria-autocomplete="list"

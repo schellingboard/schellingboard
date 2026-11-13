@@ -72,6 +72,8 @@ const answers = (call: FakeCall): Response | undefined => {
     });
   if (call.path === "/api/v1/events/e1")
     return Response.json({ event, days: [] });
+  if (/^\/api\/v1\/admin\/events\/e\d\/labels$/.test(call.path))
+    return Response.json([]);
   if (call.path === "/api/v1/admin/guests")
     return Response.json({
       items: [guest("g1", "Alice", ["e1"]), guest("g2", "Bob", [])],

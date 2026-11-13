@@ -1,15 +1,20 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import { type FormEvent, Fragment, useEffect, useState } from "react";
+import { type FormEvent, Fragment, useEffect, useRef, useState } from "react";
 
 import type { AdminGuestCalls } from "../../commands/admin-guests";
+import type { AdminLabelCalls } from "../../commands/admin-labels";
+import { newKey } from "../../commands/keys";
+import type { CommandResponse } from "../../commands/runner";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import type { AdminGuest } from "../../queries/admin-guests";
+import type { AdminLabel } from "../../queries/admin-labels";
 import { useEmailEnabled } from "../../queries/email-enabled";
 import { Button } from "../../ui/button";
 import { DataTable } from "../../ui/data-table";
 import { CheckboxField, TextField } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
+import { LabelBadge } from "../../ui/label-badge";
 import {
   byTitleThenId,
   type OnParams,
@@ -57,6 +62,55 @@ function EventChoices({
       </div>
     </fieldset>
   );
+}
+
+type Calls = AdminGuestCalls & AdminLabelCalls;
+
+const sameIds = (a: string[], b: string[]) =>
+  a.length === b.length && a.every((id) => b.includes(id));
+
+function LabelChoices({
+  events,
+  labels,
+  selected,
+  onChange,
+}: {
+  events: EventOption[];
+  labels: AdminLabel[];
+  selected: string[];
+  onChange: (ids: string[]) => void;
+}) {
+  return events.map((event) => {
+    const { name } = event;
+    const own = labels.filter((l) => l.eventId === event.id);
+    if (own.length === 0) return null;
+    return (
+      <fieldset key={event.id} className="space-y-1">
+        <legend className="text-sm font-medium text-fg">
+          <Trans>Labels in {name}</Trans>
+        </legend>
+        <div className="flex flex-wrap gap-x-4 gap-y-1">
+          {own.map((label) => (
+            <CheckboxField
+              key={label.id}
+              label={label.name}
+              name={`label-${label.id}`}
+              checked={selected.includes(label.id)}
+              onChange={(on) =>
+                onChange(
+                  labels
+                    .map((l) => l.id)
+                    .filter((id) =>
+                      id === label.id ? on : selected.includes(id)
+                    )
+                )
+              }
+            />
+          ))}
+        </div>
+      </fieldset>
+    );
+  });
 }
 
 function AddGuestForm({
@@ -145,13 +199,15 @@ function AddGuestForm({
 function EditForm({
   guest,
   events,
+  labels,
   calls,
   onChanged,
   onClose,
 }: {
   guest: AdminGuest;
   events: EventOption[];
-  calls: AdminGuestCalls;
+  labels: AdminLabel[];
+  calls: Calls;
   onChanged: () => void;
   onClose: () => void;
 }) {
@@ -160,14 +216,40 @@ function EditForm({
   const [email, setEmail] = useState(guest.email);
   const [username, setUsername] = useState(guest.username);
   const [eventIds, setEventIds] = useState(guest.eventIds);
+  const worn = (l: AdminLabel) => l.guestIds.includes(guest.id);
+  const [labelIds, setLabelIds] = useState(
+    labels.filter(worn).map((l) => l.id)
+  );
+  const saved = useRef<CommandResponse<unknown> | null>(null);
   const mutation = useFormMutation({
-    call: (key) =>
-      calls.update(
-        guest.id,
-        { name, email, username, eventIds },
-        guest.version,
-        key
-      ),
+    call: async (key): Promise<CommandResponse<unknown>> => {
+      if (!saved.current) {
+        const result = await calls.update(
+          guest.id,
+          { name, email, username, eventIds },
+          guest.version,
+          key
+        );
+        if (!result.response.ok) return result;
+        saved.current = result;
+      }
+      for (const eventId of eventIds) {
+        const own = labels.filter((l) => l.eventId === eventId);
+        const before = own.filter(worn).map((l) => l.id);
+        const after = own
+          .map((l) => l.id)
+          .filter((id) => labelIds.includes(id));
+        if (sameIds(before, after)) continue;
+        const answer = await calls.setGuestLabels(
+          eventId,
+          guest.id,
+          after,
+          newKey()
+        );
+        if (!answer.response.ok) return answer;
+      }
+      return saved.current;
+    },
     fieldNames: ["name", "email", "username"],
     explainRefusals: true,
   });
@@ -177,9 +259,10 @@ function EditForm({
     const result = await mutation.submit();
     if (!result) return;
     if (result.ok) {
+      saved.current = null;
       onChanged();
       onClose();
-    } else if (result.kind === "conflict") onChanged();
+    } else if (result.kind === "conflict" || saved.current) onChanged();
   };
 
   return (
@@ -216,6 +299,12 @@ function EditForm({
         selected={eventIds}
         onChange={setEventIds}
       />
+      <LabelChoices
+        events={events.filter((e) => eventIds.includes(e.id))}
+        labels={labels}
+        selected={labelIds}
+        onChange={setLabelIds}
+      />
       <div className="flex gap-2">
         <Button type="submit" disabled={mutation.pending}>
           {mutation.pending ? t`Saving...` : t`Save`}
@@ -236,13 +325,15 @@ function EditForm({
 function GuestRow({
   guest,
   events,
+  labels,
   calls,
   onChanged,
   emailEnabled,
 }: {
   guest: AdminGuest;
   events: EventOption[];
-  calls: AdminGuestCalls;
+  labels: AdminLabel[];
+  calls: Calls;
   onChanged: () => void;
   emailEnabled: boolean | null;
 }) {
@@ -272,6 +363,7 @@ function GuestRow({
       <EditForm
         guest={guest}
         events={events}
+        labels={labels}
         calls={calls}
         onChanged={onChanged}
         onClose={() => {
@@ -292,6 +384,9 @@ function GuestRow({
     if ((await role.submit())?.ok) onChanged();
   };
   const memberOf = events.filter((e) => guest.eventIds.includes(e.id));
+  const worn = labels.filter(
+    (l) => l.guestIds.includes(guest.id) && guest.eventIds.includes(l.eventId)
+  );
   const error = email.error ?? remove.error ?? role.error;
 
   return (
@@ -305,6 +400,9 @@ function GuestRow({
                 <Trans>Site admin</Trans>
               </span>
             )}
+            {worn.map((l) => (
+              <LabelBadge key={l.id} name={l.name} color={l.color} />
+            ))}
             {guest.siteAdmin && !guest.hasPassword && (
               <span className="rounded-md bg-surface-muted px-1.5 py-0.5 text-xs font-normal text-fg-muted">
                 <Trans>No password yet</Trans>
@@ -391,6 +489,7 @@ export function AdminGuestsScreen({
   status,
   guests,
   events,
+  labels,
   params,
   onParams,
   calls,
@@ -399,9 +498,10 @@ export function AdminGuestsScreen({
   status: "loading" | "ready" | "error";
   guests: AdminGuest[];
   events: EventOption[];
+  labels: AdminLabel[];
   params: URLSearchParams;
   onParams: OnParams;
-  calls: AdminGuestCalls;
+  calls: Calls;
   /** The users are out of date: load them again. */
   onChanged: () => void;
 }) {
@@ -461,6 +561,7 @@ export function AdminGuestsScreen({
             <GuestRow
               guest={g}
               events={events}
+              labels={labels}
               calls={calls}
               onChanged={onChanged}
               emailEnabled={emailEnabled}

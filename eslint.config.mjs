@@ -132,6 +132,7 @@ export default tseslint.config(
       "apps/web/src/features/admin/event-config.tsx",
       "apps/web/src/features/admin/event-days.tsx",
       "apps/web/src/features/admin/event-icon-picker.tsx",
+      "apps/web/src/features/admin/event-labels.tsx",
       "apps/web/src/features/admin/event-layout.tsx",
       "apps/web/src/features/admin/event-moments.tsx",
       "apps/web/src/features/admin/events-screen.tsx",

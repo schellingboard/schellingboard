@@ -285,6 +285,79 @@ test.describe("Admin UI", () => {
     }
   });
 
+  test("an organizer defines a label for an event and gives it to a user @011-US7", async ({
+    page,
+  }) => {
+    await adminLogin(page);
+    const unique = uniqueSuffix();
+    const eventName = `E2E Labels ${unique}`;
+    const userName = `E2E Labelled ${unique}`;
+    await page.getByRole("button", { name: "New event" }).click();
+    await page.getByLabel("Name*").fill(eventName);
+    await page.getByLabel("Identity").selectOption("open");
+    await page.getByRole("button", { name: "Create event" }).click();
+    await page
+      .getByRole("listitem")
+      .filter({ hasText: eventName })
+      .getByRole("link", { name: "Manage" })
+      .click();
+    await page
+      .getByRole("navigation", { name: "Event sections" })
+      .getByRole("link", { name: "Guests" })
+      .click();
+
+    const labels = page.getByRole("region", { name: "Labels" });
+    await labels.getByRole("button", { name: "Add label" }).click();
+    await labels.getByLabel("Name").fill("Sponsor");
+    await labels.getByLabel("Description").fill("Pays for the venue");
+    await labels.getByLabel("Colour").selectOption({ label: "Purple" });
+    await labels.getByRole("button", { name: "Save label" }).click();
+    await expect(labels.getByRole("listitem")).toContainText("Sponsor");
+    await expect(labels.getByRole("listitem")).toContainText(
+      "Pays for the venue"
+    );
+
+    await gotoUsers(page);
+    await page.getByRole("checkbox", { name: eventName }).check();
+    await page.getByLabel("Name", { exact: true }).fill(userName);
+    await page.getByRole("button", { name: "Add user" }).click();
+    await expect(
+      page.getByRole("region", { name: "Users" }).getByText(userName)
+    ).toBeVisible();
+
+    await page
+      .getByRole("navigation", { name: "Admin" })
+      .getByRole("link", { name: "Events" })
+      .click();
+    await page
+      .getByRole("listitem")
+      .filter({ hasText: eventName })
+      .getByRole("link", { name: "Manage" })
+      .click();
+    await page
+      .getByRole("navigation", { name: "Event sections" })
+      .getByRole("link", { name: "Guests" })
+      .click();
+    const guests = page.getByRole("region", { name: "Guests" });
+    await guests
+      .getByRole("searchbox", { name: "Search", exact: true })
+      .fill(userName);
+    await guests
+      .getByRole("combobox", { name: `Labels of ${userName}` })
+      .locator("visible=true")
+      .fill("spon");
+    await page.getByRole("option", { name: "Sponsor" }).click();
+    await expect(labels.getByRole("listitem")).toContainText("1 attendee");
+
+    await gotoUsers(page);
+    const row = await findUser(page, userName);
+    await expect(row.getByText("Sponsor")).toBeVisible();
+
+    await row.getByRole("button", { name: "Delete", exact: true }).click();
+    await row.getByRole("button", { name: "Confirm delete" }).click();
+    await expect(row).toHaveCount(0);
+  });
+
   test("imports users from CSV and assigns them to an event @016-US2 @016-US3", async ({
     page,
   }) => {

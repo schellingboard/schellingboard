@@ -9,8 +9,10 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { adminGuestCalls } from "../../commands/admin-guests";
+import { adminLabelCalls } from "../../commands/admin-labels";
 import { fakeApi, type FakeCall, problem } from "../../commands/fake-api";
 import type { AdminGuest } from "../../queries/admin-guests";
+import type { AdminLabel } from "../../queries/admin-labels";
 import type { ParamUpdates } from "../../ui/list-paging";
 import { NoticeProvider } from "../../ui/notices";
 import { AdminGuestsScreen } from "./guests-screen";
@@ -47,10 +49,12 @@ const setup = (
     query = "",
     handler = () => Response.json(guest("g9", "Saved")),
     emailEnabled = true,
+    labels = [],
   }: {
     query?: string;
     handler?: (call: FakeCall) => Response;
     emailEnabled?: boolean;
+    labels?: AdminLabel[];
   } = {}
 ) => {
   const { api, calls } = fakeApi(handler);
@@ -62,11 +66,13 @@ const setup = (
         status="ready"
         guests={guests}
         events={events}
+        labels={labels}
         params={new URLSearchParams(query)}
         onParams={onParams}
         calls={{
           ...adminGuestCalls(api),
           emailEnabled: () => Promise.resolve(emailEnabled),
+          ...adminLabelCalls(api),
         }}
         onChanged={onChanged}
       />
@@ -383,6 +389,136 @@ describe("assigning users to events", { tags: ["016-US3"] }, () => {
     expect(calls[0]).toMatchObject({
       method: "PUT",
       body: { eventIds: [], expectedVersion: 3 },
+    });
+  });
+
+  describe("labels", { tags: ["011-US7"] }, () => {
+    const volunteer: AdminLabel = {
+      id: "l1",
+      eventId: "e1",
+      name: "Volunteer",
+      description: "",
+      color: "green",
+      guestIds: ["g1"],
+    };
+    const sponsor: AdminLabel = {
+      id: "l2",
+      eventId: "e1",
+      name: "Sponsor",
+      description: "",
+      color: "violet",
+      guestIds: [],
+    };
+    const member = guest("g1", "Alice", { eventIds: ["e1"] });
+
+    it("shows the labels a user wears in the list", () => {
+      const { region } = setup([member], { labels: [volunteer, sponsor] });
+
+      const [alice] = within(region).getAllByRole("listitem");
+      expect(within(alice).getByText("Volunteer")).toBeTruthy();
+      expect(within(alice).queryByText("Sponsor")).toBeNull();
+    });
+
+    it("sets the labels of the events the user is in, after saving them", async () => {
+      const { region, calls, onChanged } = setup([member], {
+        labels: [volunteer, sponsor],
+        handler: (call) =>
+          call.path.endsWith("/labels")
+            ? Response.json([])
+            : Response.json(member),
+      });
+
+      await userEvent.click(
+        within(region).getByRole("button", { name: "Edit" })
+      );
+      expect(
+        within(region).getByRole("checkbox", { name: "Volunteer" })
+      ).toHaveProperty("checked", true);
+      await userEvent.click(
+        within(region).getByRole("checkbox", { name: "Volunteer" })
+      );
+      await userEvent.click(
+        within(region).getByRole("checkbox", { name: "Sponsor" })
+      );
+      await userEvent.click(
+        within(region).getByRole("button", { name: "Save" })
+      );
+
+      await waitFor(() => expect(onChanged).toHaveBeenCalled());
+      expect(calls.map((c) => c.path)).toEqual([
+        "/api/v1/admin/guests/g1",
+        "/api/v1/admin/events/e1/guests/g1/labels",
+      ]);
+      expect(calls[1]).toMatchObject({
+        method: "PUT",
+        body: { labelIds: ["l2"] },
+      });
+    });
+
+    it("keeps the form open when the labels fail after the user was saved, and retries only the labels", async () => {
+      let fail = true;
+      const { region, calls, onChanged } = setup([member], {
+        labels: [volunteer, sponsor],
+        handler: (call) => {
+          if (!call.path.endsWith("/labels")) return Response.json(member);
+          if (!fail) return Response.json([]);
+          fail = false;
+          return problem(500, "server.error");
+        },
+      });
+
+      await userEvent.click(
+        within(region).getByRole("button", { name: "Edit" })
+      );
+      await userEvent.click(
+        within(region).getByRole("checkbox", { name: "Sponsor" })
+      );
+      await userEvent.click(
+        within(region).getByRole("button", { name: "Save" })
+      );
+
+      await waitFor(() => expect(onChanged).toHaveBeenCalled());
+      expect(within(region).getByRole("button", { name: "Save" })).toBeTruthy();
+      await userEvent.click(
+        within(region).getByRole("button", { name: "Save" })
+      );
+
+      await waitFor(() =>
+        expect(calls.map((c) => c.method + " " + c.path)).toEqual([
+          "PUT /api/v1/admin/guests/g1",
+          "PUT /api/v1/admin/events/e1/guests/g1/labels",
+          "PUT /api/v1/admin/events/e1/guests/g1/labels",
+        ])
+      );
+    });
+
+    it("leaves the labels alone when they did not change", async () => {
+      const { region, calls, onChanged } = setup([member], {
+        labels: [volunteer, sponsor],
+      });
+
+      await userEvent.click(
+        within(region).getByRole("button", { name: "Edit" })
+      );
+      await userEvent.click(
+        within(region).getByRole("button", { name: "Save" })
+      );
+
+      await waitFor(() => expect(onChanged).toHaveBeenCalled());
+      expect(calls).toHaveLength(1);
+    });
+
+    it("offers no labels for an event the user is not in", async () => {
+      const { region } = setup([guest("g1", "Alice")], {
+        labels: [volunteer],
+      });
+
+      await userEvent.click(
+        within(region).getByRole("button", { name: "Edit" })
+      );
+      expect(
+        within(region).queryByRole("checkbox", { name: "Volunteer" })
+      ).toBeNull();
     });
   });
 });

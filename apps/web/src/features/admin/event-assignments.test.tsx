@@ -9,6 +9,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { adminEventCalls } from "../../commands/admin-events";
+import { adminLabelCalls } from "../../commands/admin-labels";
 import { fakeApi, type FakeCall, problem } from "../../commands/fake-api";
 import type { AdminGuest } from "../../queries/admin-guests";
 import type { AdminLocation } from "../../queries/admin-locations";
@@ -48,10 +49,12 @@ const setupGuests = (
       <EventGuestsManager
         eventId="e1"
         guests={guests}
+        labels={[]}
         params={new URLSearchParams(query)}
         onParams={onParams}
         calls={{
           ...adminEventCalls(api),
+          ...adminLabelCalls(api),
           emailEnabled: () => Promise.resolve(true),
         }}
         onChanged={onChanged}

@@ -13,10 +13,12 @@ import {
 
 import { adminEventCalls } from "../commands/admin-events";
 import { adminGuestCalls } from "../commands/admin-guests";
+import { adminLabelCalls } from "../commands/admin-labels";
 import { adminLocationCalls } from "../commands/admin-locations";
 import { adminSettingsCalls } from "../commands/admin-settings";
 import { EventConfigTab } from "../features/admin/event-config";
 import { EventGuestsManager } from "../features/admin/event-guests";
+import { EventLabelsManager } from "../features/admin/event-labels";
 import { AdminEventLayout } from "../features/admin/event-layout";
 import { EventLocationsManager } from "../features/admin/event-locations";
 import { EventProposalsManager } from "../features/admin/event-proposals";
@@ -31,7 +33,11 @@ import { SettingsScreen } from "../features/admin/settings-screen";
 import { defaultStatsEvent } from "../features/admin/stats-event";
 import { createAdminEventQuery } from "../queries/admin-event";
 import { createAdminEventsQuery } from "../queries/admin-events";
-import { createAdminGuestsQuery } from "../queries/admin-guests";
+import {
+  type AdminGuestsState,
+  createAdminGuestsQuery,
+} from "../queries/admin-guests";
+import { createAdminLabelsQuery } from "../queries/admin-labels";
 import { createAdminLocationsQuery } from "../queries/admin-locations";
 import { createAdminMeetingPointsQuery } from "../queries/admin-meeting-points";
 import { createAdminProposalsQuery } from "../queries/admin-proposals";
@@ -94,20 +100,57 @@ export function AdminEventsPage({ api }: { api: Api }) {
   );
 }
 
+type EventOption = { id: string; name: string };
+
 export function AdminUsersPage({ api }: { api: Api }) {
-  const [guests, loadGuests] = useQuery(() => createAdminGuestsQuery({ api }));
   const [events] = useQuery(() => createAdminEventsQuery({ api }));
-  const calls = useMemo(() => adminGuestCalls(api), [api]);
+  const [guests, loadGuests] = useQuery(() => createAdminGuestsQuery({ api }));
+  return (
+    <UsersScreen
+      key={events.status}
+      api={api}
+      events={events.status === "ready" ? events.events.map(named) : []}
+      eventsStatus={events.status}
+      guests={guests}
+      loadGuests={loadGuests}
+    />
+  );
+}
+
+function UsersScreen({
+  api,
+  events,
+  eventsStatus,
+  guests,
+  loadGuests,
+}: {
+  api: Api;
+  events: EventOption[];
+  eventsStatus: "loading" | "error" | "ready";
+  guests: AdminGuestsState;
+  loadGuests: () => void;
+}) {
+  const [labels, loadLabels] = useQuery(() =>
+    createAdminLabelsQuery({ api, eventIds: events.map((e) => e.id) })
+  );
+  const calls = useMemo(
+    () => ({ ...adminGuestCalls(api), ...adminLabelCalls(api) }),
+    [api]
+  );
   const { params, onParams } = useParamUpdates();
   return (
     <AdminGuestsScreen
-      status={jointStatus(guests, events)}
+      status={jointStatus(guests, { status: eventsStatus }, labels)}
       guests={guests.status === "ready" ? guests.guests : []}
-      events={events.status === "ready" ? events.events.map(named) : []}
+      events={events}
+      labels={labels.status === "ready" ? labels.labels : []}
       params={params}
       onParams={onParams}
       calls={calls}
-      onChanged={loadGuests}
+      onChanged={() => {
+        loadGuests();
+        loadLabels();
+      }}
     />
   );
 }
@@ -362,25 +405,46 @@ function StatsRedirect({ id }: { id: string }) {
 
 function GuestsTab({ api, id }: { api: Api; id: string }) {
   const [guests, load] = useQuery(() => createAdminGuestsQuery({ api }));
+  const [labels, loadLabels] = useQuery(() =>
+    createAdminLabelsQuery({ api, eventIds: [id] })
+  );
   const calls = useMemo(() => adminEventCalls(api), [api]);
+  const labelCalls = useMemo(() => adminLabelCalls(api), [api]);
   const { params, onParams } = useParamUpdates();
   if (guests.status === "error")
     return <Failed message={t`Could not load the guests.`} />;
-  if (guests.status === "loading")
+  if (labels.status === "error")
+    return <Failed message={t`Could not load the labels.`} />;
+  if (guests.status !== "ready" || labels.status !== "ready")
     return (
       <p className="text-sm">
         <Trans>Loading…</Trans>
       </p>
     );
   return (
-    <EventGuestsManager
-      eventId={id}
-      guests={guests.guests}
-      params={params}
-      onParams={onParams}
-      calls={calls}
-      onChanged={load}
-    />
+    <div className="space-y-8">
+      <EventGuestsManager
+        eventId={id}
+        guests={guests.guests}
+        labels={labels.labels}
+        params={params}
+        onParams={onParams}
+        calls={{ ...calls, ...labelCalls }}
+        onChanged={() => {
+          load();
+          loadLabels();
+        }}
+      />
+      <EventLabelsManager
+        eventId={id}
+        labels={labels.labels}
+        calls={labelCalls}
+        onChanged={() => {
+          load();
+          loadLabels();
+        }}
+      />
+    </div>
   );
 }
 
