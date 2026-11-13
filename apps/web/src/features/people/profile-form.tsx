@@ -61,12 +61,15 @@ export type ProfileDraft = Pick<
 
 export type ProfileFormProps = {
   profile: ProfileDraft;
-  links: { people: string; settings: string };
+  links: { settings: string };
   actions: ProfileFormCalls;
   /** Cuts the chosen picture down before it is sent; the server has the final say. */
   prepareImage?: (file: Blob) => Promise<{ blob: Blob } | { error: string }>;
   /** Saved: the caller leaves the form. */
   onDone: () => void;
+  onCancel: () => void;
+  /** Lets the host ask before the form is left over edits the fields cannot show. */
+  track?: (check: () => boolean) => () => void;
 };
 
 const PRONOUNS: MessageDescriptor[] = [
@@ -119,6 +122,8 @@ export function ProfileForm({
   actions,
   prepareImage = prepareWithCanvas,
   onDone,
+  onCancel,
+  track,
 }: ProfileFormProps) {
   const [name, setName] = useState(profile.name);
   const [pronouns, setPronouns] = useState(profile.pronouns ?? "");
@@ -188,6 +193,20 @@ export function ProfileForm({
     })),
     expectedVersion: profile.version,
   };
+  const edits = JSON.stringify({
+    ...next,
+    expectedVersion: 0,
+    photo: photo.kind,
+  });
+  const [original] = useState(edits);
+  const latestEdits = useRef(edits);
+  useEffect(() => {
+    latestEdits.current = edits;
+  });
+  useEffect(
+    () => track?.(() => latestEdits.current !== original),
+    [track, original]
+  );
   const invalid = validateFields(profileBodySchema, next);
   const clientErrors: FieldErrors = checking ? (invalid ?? {}) : {};
   const hasClientErrors = Object.keys(clientErrors).length > 0;
@@ -273,16 +292,7 @@ export function ProfileForm({
     photo.kind === "reset" ? null : (preview ?? profile.avatarUrl);
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-4 px-4 pb-24">
-      <a
-        href={links.people}
-        className="inline-block py-1 -my-1 text-sm text-fg-subtle hover:text-fg-muted"
-      >
-        <Trans>← Attendees</Trans>
-      </a>
-      <h1 className="text-2xl font-bold">
-        <Trans>Edit profile</Trans>
-      </h1>
+    <div className="flex flex-col gap-4">
       <p className="text-sm text-fg-subtle">
         <Trans>
           Everything here is shown on your public profile. Email notifications
@@ -621,13 +631,14 @@ export function ProfileForm({
             <Trans>Your photo was saved; the details were not.</Trans>
           </p>
         )}
-        <Button
-          type="submit"
-          disabled={mutation.pending}
-          className="mx-auto px-12"
-        >
-          {mutation.pending ? t`Saving...` : t`Save`}
-        </Button>
+        <div className="flex justify-end gap-3">
+          <Button variant="quiet" onClick={onCancel}>
+            <Trans>Cancel</Trans>
+          </Button>
+          <Button type="submit" disabled={mutation.pending} className="px-12">
+            {mutation.pending ? t`Saving...` : t`Save`}
+          </Button>
+        </div>
       </form>
     </div>
   );

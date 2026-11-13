@@ -42,7 +42,15 @@ export function useDiscardGuard(
   const questionId = useId();
   const asking = pending !== null;
 
+  const checks = useRef(new Set<() => boolean>());
+  // For what the DOM cannot show: a file input, a combobox, a removed row.
+  const track = useCallback((check: () => boolean) => {
+    checks.current.add(check);
+    return () => void checks.current.delete(check);
+  }, []);
+
   const hasUnsaved = () =>
+    [...checks.current].some((check) => check()) ||
     [...(panel.current?.querySelectorAll<HTMLInputElement>(FIELDS) ?? [])].some(
       (field) => {
         const start = starts.current.get(field);
@@ -108,8 +116,13 @@ export function useDiscardGuard(
 
   const reset = useCallback(() => setPending(null), []);
 
+  const promptRef = useCallback((node: HTMLElement | null) => {
+    node?.scrollIntoView?.({ block: "nearest" });
+  }, []);
+
   const prompt = pending ? (
     <div
+      ref={promptRef}
       role="alertdialog"
       aria-labelledby={questionId}
       className="mt-3 space-y-2 rounded-md border border-line bg-surface-muted p-3"
@@ -134,5 +147,5 @@ export function useDiscardGuard(
     </div>
   ) : null;
 
-  return { requestClose, hasUnsaved, escape, noteField, reset, prompt };
+  return { requestClose, hasUnsaved, escape, noteField, reset, prompt, track };
 }

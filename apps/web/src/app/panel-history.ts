@@ -5,7 +5,8 @@ export type PanelItem =
   | { kind: "proposal"; slug: string; id: string }
   | { kind: "proposal-form"; slug: string; id?: string }
   | { kind: "meeting"; slug: string; id: string }
-  | { kind: "profile"; id: string };
+  | { kind: "profile"; id: string }
+  | { kind: "profile-form" };
 
 export type PanelState = {
   item: PanelItem;
@@ -30,6 +31,7 @@ export const panelPath = (item: PanelItem) => {
     return item.id === undefined
       ? `/${item.slug}/proposals/new`
       : `/${item.slug}/proposals/${encodeURIComponent(item.id)}/edit`;
+  if (item.kind === "profile-form") return "/guests/edit";
   const id = encodeURIComponent(item.id);
   if (item.kind === "profile") return `/guests/${id}`;
   if (item.kind === "proposal") return `/${item.slug}/proposals/${id}`;

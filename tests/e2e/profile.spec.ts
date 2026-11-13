@@ -75,9 +75,10 @@ test.describe("Edit profile", () => {
     });
     await page.getByRole("button", { name: /^Save$/ }).click();
 
-    // Lands on Alice's profile with the new About me text. Scoped to the
-    // profile: it opens over the directory, whose cards preview the same bio.
-    await expect(page).toHaveURL(/\/guests\/[^/]+$/);
+    // Saving closes the form over the directory; Alice's profile shows the new
+    // About me text, scoped to the panel as the cards preview the same bio.
+    await expect(page).toHaveURL(/\/guests$/);
+    await page.getByRole("link", { name: "Alice Test" }).click();
     const profile = page.getByRole("dialog");
     await expect(
       profile.getByRole("heading", { level: 1, name: "Alice Test" })
@@ -136,6 +137,8 @@ test.describe("Edit profile", () => {
     const aboutMe = `Conference enthusiast ${uniqueSuffix()}`;
     await page.getByLabel("About me").fill(aboutMe);
     await page.getByRole("button", { name: /^Save$/ }).click();
+    await expect(page).toHaveURL(/\/guests$/);
+    await page.getByRole("link", { name: "Alice Test" }).click();
 
     await expect(
       page.getByAltText("Profile avatar of Alice Test")
@@ -156,7 +159,8 @@ test.describe("Edit profile", () => {
         "# Big header\n\n**Bold statement** and [my site](https://example.com)\n\n<script>alert(1)</script>"
       );
     await page.getByRole("button", { name: /^Save$/ }).click();
-    await expect(page).toHaveURL(/\/guests\/[^/]+$/);
+    await expect(page).toHaveURL(/\/guests$/);
+    await page.getByRole("link", { name: /Alice Test/ }).click();
 
     // Markdown renders: bold text and a real link. Scoped to the profile,
     // since the list behind it previews the same bio on Alice's card.
@@ -282,7 +286,8 @@ test.describe("Edit profile", () => {
 
     // The profile shows every filled-in section. Scoped to it: it opens over
     // the directory, which previews the same fields on the cards behind.
-    await expect(page).toHaveURL(/\/guests\/[^/]+$/);
+    await expect(page).toHaveURL(/\/guests$/);
+    await page.getByRole("link", { name: /Alice Test/ }).click();
     const profile = page.getByRole("dialog");
     await expect(profile.getByText("Berlin")).toBeVisible();
     await expect(
@@ -339,6 +344,7 @@ test.describe("Edit profile", () => {
     // Reset the avatar
     await page.getByRole("button", { name: /^Reset$/ }).click();
     await page.getByRole("button", { name: /^Save$/ }).click();
+    await expect(page).toHaveURL(/\/guests$/);
 
     await expect(
       page.getByAltText("Profile avatar of Alice Test")
@@ -386,9 +392,10 @@ test.describe("Edit profile", () => {
 
     // The toolbar's edit reaches the form, not just the textarea's own value.
     await page.getByRole("button", { name: /^Save$/ }).click();
-    await expect(page).toHaveURL(/\/guests\/[^/]+$/);
+    await expect(page).toHaveURL(/\/guests$/);
+    await page.getByRole("link", { name: /Alice Test/ }).click();
     await expect(
-      page.locator("strong", { hasText: "hello world" })
+      page.getByRole("dialog").getByText("hello world")
     ).toBeVisible();
   });
 });
@@ -470,9 +477,46 @@ test("shows an error on the edit page when no user is selected @011-US1", async 
   await page.goto("/guests/edit");
 
   await expect(page.getByText(/select who you are/i)).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: /Edit profile/i })
-  ).toHaveCount(0);
+  await expect(page.getByLabel("About me")).toHaveCount(0);
+});
+
+test("the profile form asks before discarding changes, then closes @011-US1", async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto("/Conference-Alpha/proposals");
+  await selectUser(page, "Alice Test");
+  await page.getByRole("link", { name: "Attendees", exact: true }).click();
+  await page.getByRole("link", { name: /Edit profile/i }).click();
+  const form = page.getByRole("dialog", { name: "Edit profile form" });
+  await form.getByLabel("Pronouns").fill(`Unsaved ${uniqueSuffix()}`);
+
+  await form.getByRole("button", { name: "Cancel" }).click();
+  await expect(page.getByText("Discard your changes?")).toBeVisible();
+  await page.getByRole("button", { name: "Keep editing" }).click();
+  await expect(form).toBeVisible();
+
+  await page.goBack();
+  await page.getByRole("button", { name: "Discard" }).click();
+  await expect(form).toHaveCount(0);
+  await expect(page).toHaveURL(/\/guests$/);
+});
+
+test("the profile form opens from its address and closes to the directory @011-US1", async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto("/Conference-Alpha/proposals");
+  await selectUser(page, "Alice Test");
+  await page.getByRole("link", { name: "Attendees", exact: true }).click();
+  await page.getByRole("link", { name: /Edit profile/i }).click();
+  await page.reload();
+
+  const form = page.getByRole("dialog", { name: "Edit profile form" });
+  await expect(form.getByLabel("Name")).toHaveValue("Alice Test");
+  await form.getByRole("button", { name: "Close" }).click();
+  await expect(form).toHaveCount(0);
+  await expect(page).toHaveURL(/\/guests$/);
 });
 
 test("lists every attendee on one page, with their bios @011-US3", async ({
@@ -603,16 +647,7 @@ test("sorts the attendee directory by recently updated @011-US3", async ({
   await page.getByRole("link", { name: /Edit profile/i }).click();
   await page.getByLabel("About me").fill(`Freshly edited ${uniqueSuffix()}`);
   await page.getByRole("button", { name: /^Save$/ }).click();
-  await expect(page).toHaveURL(/\/guests\/[^/]+$/);
-  // The save redirects here itself; a click that lands while that navigation
-  // is still in flight is dropped, so retry until it takes.
-  await expect(async () => {
-    await page
-      .getByRole("dialog")
-      .getByRole("button", { name: "Close" })
-      .click();
-    await expect(page).toHaveURL(/\/guests$/, { timeout: 2000 });
-  }).toPass();
+  await expect(page).toHaveURL(/\/guests$/);
 
   const attendees = page
     .getByRole("list")

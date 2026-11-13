@@ -31,7 +31,7 @@ import { useViewer } from "./viewer";
 export function PanelHost() {
   const { panel } = usePanel();
   const { slug } = useEventView();
-  if (!panel || panel.item.kind === "profile" || panel.item.slug !== slug)
+  if (!panel || !("slug" in panel.item) || panel.item.slug !== slug)
     return null;
   const key = `${panel.item.kind}:${panel.item.id}:${panel.depth}`;
   if (panel.item.kind === "session")
@@ -53,7 +53,7 @@ export function ForeignPanelHost({ services }: { services: AppServices }) {
   const { history } = useRouter();
   const behind = backgroundOf(history.location).pathname.split("/")[1];
   const wanted =
-    panel && panel.item.kind !== "profile" && behind !== panel.item.slug
+    panel && "slug" in panel.item && behind !== panel.item.slug
       ? panel.item.slug
       : null;
   const [kept, setKept] = useState<string | null>(null);
@@ -263,12 +263,15 @@ function ProposalFormHost({
   );
 }
 
-function FormBody({
+export function FormBody({
   leaving,
   children,
 }: {
   leaving: { current: boolean };
-  children: (cancel: () => void) => ReactNode;
+  children: (
+    cancel: () => void,
+    track: (check: () => boolean) => () => void
+  ) => ReactNode;
 }) {
   const { history } = useRouter();
   const guard = usePanelGuard();
@@ -292,5 +295,5 @@ function FormBody({
       }),
     [history, leaving]
   );
-  return children(guard.requestClose);
+  return children(guard.requestClose, guard.track);
 }

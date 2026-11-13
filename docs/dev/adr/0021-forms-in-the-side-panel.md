@@ -28,7 +28,8 @@ panel.
    checkboxes, radios and dates, and fires on Close, Cancel, Escape, the panel's Back arrow, browser
    Back and leaving the page. A control that only changes the view (a page size, a sort) opts out
    with `data-discard-ignore`; comboboxes, search boxes, number fields and file inputs are never
-   counted.
+   counted by the DOM check. A form whose state the DOM cannot show (a photo, a combobox, a removed
+   row) registers its own check with `usePanelGuard().track`.
 5. **Old addresses keep working.** The routes of the former pages redirect to the panel over the
    list they belong to, as ADR 0020 does for `?viewSession=`.
 

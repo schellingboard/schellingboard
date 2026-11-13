@@ -1,13 +1,8 @@
-import { t } from "@lingui/core/macro";
 import { newSortSeed } from "@schellingboard/domain/attendee-search";
-import { useRouter } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { actingGuestRefusal } from "../commands/acting-guest-message";
-import { profileFormCalls } from "../commands/profile-form";
 import { DirectoryScreen } from "../features/people/directory-screen";
 import { peopleLinks } from "../features/people/links";
-import { ProfileForm } from "../features/people/profile-form";
 import { meetingsOpen } from "../features/schedule/meeting-rules";
 import {
   type DirectoryEntry,
@@ -17,7 +12,6 @@ import {
 import { toEvent } from "../replica/selectors";
 import { useScrollRestoration } from "../ui/use-scroll-restoration";
 import { InAppLinks } from "./in-app-links";
-import { PageNotice } from "./page-notice";
 import { PanelLanding } from "./panel-landing";
 import { profileIdOf } from "./panel-links";
 import { useProfileWalk } from "./profile-walk";
@@ -25,10 +19,9 @@ import type { AppServices } from "./services";
 import { ShellFrame } from "./shell";
 import { useDirectoryShell } from "./use-directory-shell";
 import { useHistoryEntry } from "./use-history-entry";
+import { usePanel } from "./use-panel";
 import { useUrlSearchParams } from "./use-url-search-params";
 import { useViewer } from "./viewer";
-
-const LIST = "/guests";
 
 const isPeoplePath = (pathname: string) =>
   pathname === "/guests" || pathname === "/guests/edit";
@@ -55,12 +48,22 @@ function Host({ api }: { api: AppServices["api"] }) {
     api,
   };
   const editing = pathname.replace(/\/$/, "") === "/guests/edit";
+  const { panel } = usePanel();
+  const formOpen = panel?.item.kind === "profile-form";
+  const wasOpen = useRef(false);
+  useEffect(() => {
+    if (wasOpen.current && !formOpen) void directory.refresh();
+    wasOpen.current = formOpen;
+  }, [formOpen, directory]);
   const profileId = editing ? null : profileIdOf(pathname);
 
   return (
     <ShellFrame api={api} {...frame}>
       <InAppLinks owns={(url) => isPeoplePath(url.pathname)}>
-        {editing ? <EditProfile {...view} /> : <Directory {...view} />}
+        <Directory {...view} />
+        {editing && (
+          <PanelLanding item={{ kind: "profile-form" }} background="/guests" />
+        )}
         {profileId && (
           <PanelLanding
             item={{ kind: "profile", id: profileId }}
@@ -105,81 +108,6 @@ function Directory({ entries, status, now, viewerId, meetingsEnabled }: View) {
       params={params}
       onParams={change}
       onRows={setRows}
-    />
-  );
-}
-
-function EditProfile({
-  api,
-  directory,
-  entries,
-  status,
-  viewerId,
-  viewerKnown,
-}: View) {
-  const { history } = useRouter();
-  const actions = useMemo(() => profileFormCalls(api), [api]);
-  const [fresh, setFresh] = useState(false);
-  const [awaitingLogin, setAwaitingLogin] = useState<boolean>();
-  const missing = viewerKnown && !viewerId;
-  useEffect(() => {
-    if (!missing) return;
-    let stale = false;
-    void api.GET("/api/v1/me/identity").then(({ data }) => {
-      if (!stale) setAwaitingLogin(data?.awaitingLogin === true);
-    });
-    return () => {
-      stale = true;
-    };
-  }, [api, missing]);
-  useEffect(() => {
-    let stale = false;
-    void directory.refresh().then(() => {
-      if (!stale) setFresh(true);
-    });
-    return () => {
-      stale = true;
-    };
-  }, [directory]);
-
-  if (viewerKnown && !viewerId && awaitingLogin !== undefined)
-    return (
-      <PageNotice>
-        {actingGuestRefusal(
-          awaitingLogin ? "guest.protected" : "guest.unselected",
-          "editProfile"
-        )}
-      </PageNotice>
-    );
-  if (
-    !viewerKnown ||
-    !viewerId ||
-    !fresh ||
-    (status !== "ready" && status !== "error" && entries.length === 0)
-  )
-    return (
-      <p role="status" className="px-4 text-fg-muted">
-        {t`Loading…`}
-      </p>
-    );
-  const me = entries.find((e) => e.id === viewerId);
-  if (!me || status === "error")
-    return (
-      <p className="px-4 text-fg-muted">
-        {t`Profile not found, please log in again.`}
-      </p>
-    );
-  return (
-    <ProfileForm
-      key={me.id}
-      profile={me}
-      links={{ people: LIST, settings: "/settings" }}
-      actions={actions}
-      onDone={() => {
-        void directory
-          .refresh()
-          .then(() => history.push(peopleLinks.guest(me.id)));
-      }}
     />
   );
 }

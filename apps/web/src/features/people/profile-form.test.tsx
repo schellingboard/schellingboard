@@ -35,25 +35,30 @@ function setup({
   handler = () => saved(),
   draft = profile,
   prepareImage = (file: Blob) => Promise.resolve({ blob: file }),
+  track,
 }: {
+  track?: (check: () => boolean) => () => void;
   handler?: FakeHandler;
   draft?: ProfileDraft;
   prepareImage?: (file: Blob) => Promise<{ blob: Blob } | { error: string }>;
 } = {}) {
   const { api, calls } = fakeApi(handler);
   const onDone = vi.fn();
+  const onCancel = vi.fn();
   render(
     <NoticeProvider>
       <ProfileForm
         profile={draft}
-        links={{ people: "/guests", settings: "/settings" }}
+        links={{ settings: "/settings" }}
         actions={profileFormCalls(api)}
         prepareImage={prepareImage}
         onDone={onDone}
+        onCancel={onCancel}
+        track={track}
       />
     </NoticeProvider>
   );
-  return { calls, onDone };
+  return { calls, onDone, onCancel };
 }
 
 const save = () => screen.getByRole("button", { name: "Save" });
@@ -64,6 +69,15 @@ const pick = (file: File) =>
   });
 
 describe("editing my profile", { tags: ["011-US1"] }, () => {
+  it("leaves through the caller when Cancel is pressed", async () => {
+    const { calls, onCancel } = setup();
+
+    await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(onCancel).toHaveBeenCalled();
+    expect(calls).toHaveLength(0);
+  });
+
   it("starts from the saved profile and saves the edits against its version", async () => {
     const { calls, onDone } = setup();
     expect(screen.getByLabelText<HTMLInputElement>(/^Name/).value).toBe("Al");
@@ -240,6 +254,53 @@ describe("editing my profile", { tags: ["011-US1"] }, () => {
 
     expect(await screen.findByText(/Someone else changed this/)).toBeTruthy();
     expect(onDone).not.toHaveBeenCalled();
+  });
+});
+
+describe("unsaved changes", { tags: ["011-US1"] }, () => {
+  function tracked() {
+    let check = () => false;
+    const track = (fn: () => boolean) => {
+      check = fn;
+      return () => {};
+    };
+    return { track, dirty: () => check() };
+  }
+
+  it("are none until something is edited", () => {
+    const t = tracked();
+    setup({ track: t.track });
+    expect(t.dirty()).toBe(false);
+  });
+
+  it("count a new photo", () => {
+    const t = tracked();
+    setup({ track: t.track });
+    pick(png());
+    expect(t.dirty()).toBe(true);
+  });
+
+  it("count a removed photo", async () => {
+    const t = tracked();
+    setup({ track: t.track });
+    await userEvent.click(screen.getByRole("button", { name: "Reset" }));
+    expect(t.dirty()).toBe(true);
+  });
+
+  it("count changed pronouns", async () => {
+    const t = tracked();
+    setup({ track: t.track });
+    await userEvent.clear(screen.getByLabelText("Pronouns"));
+    await userEvent.type(screen.getByLabelText("Pronouns"), "They/Them");
+    expect(t.dirty()).toBe(true);
+  });
+
+  it("count a removed language", async () => {
+    const t = tracked();
+    setup({ track: t.track });
+    await userEvent.click(screen.getByRole("button", { name: /Languages/ }));
+    await userEvent.click(screen.getByRole("button", { name: "Remove" }));
+    expect(t.dirty()).toBe(true);
   });
 });
 

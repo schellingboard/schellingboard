@@ -64,7 +64,11 @@ export function PanelLinks({ children }: { children: ReactNode }) {
       intercept={(url, link) => {
         const id = profileIdOf(url.pathname);
         const item: PanelItem | null =
-          id === null ? eventItemOf(url.pathname) : { kind: "profile", id };
+          url.pathname === "/guests/edit"
+            ? { kind: "profile-form" }
+            : id === null
+              ? eventItemOf(url.pathname)
+              : { kind: "profile", id };
         if (!item) return false;
         if (item.kind === "session")
           item.record = url.searchParams.get("record") === "count";

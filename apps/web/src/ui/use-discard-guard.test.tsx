@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { useDiscardGuard } from "./use-discard-guard";
@@ -8,12 +8,16 @@ import { useDiscardGuard } from "./use-discard-guard";
 function Form({
   onClose,
   beforeUnload,
+  dirty,
 }: {
   onClose: () => void;
   beforeUnload?: boolean;
+  dirty?: () => boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const guard = useDiscardGuard(ref, onClose, { beforeUnload });
+  const { track } = guard;
+  useEffect(() => (dirty ? track(dirty) : undefined), [track, dirty]);
   return (
     <div ref={ref} onFocus={guard.noteField} onPointerDown={guard.noteField}>
       <label>
@@ -127,6 +131,26 @@ describe("the discard guard", { tags: ["010-US7"] }, () => {
     await userEvent.click(screen.getByRole("button", { name: "Close" }));
 
     expect(asked()).not.toBeNull();
+  });
+
+  it("asks when a registered check says the form changed, and not once it is unregistered", async () => {
+    const onClose = vi.fn();
+    let changed = true;
+    const dirty = () => changed;
+    const { rerender } = render(<Form onClose={onClose} dirty={dirty} />);
+    await userEvent.click(screen.getByRole("button", { name: "Close" }));
+    expect(asked()).not.toBeNull();
+    await userEvent.click(screen.getByRole("button", { name: "Keep editing" }));
+
+    changed = false;
+    await userEvent.click(screen.getByRole("button", { name: "Close" }));
+    expect(onClose).toHaveBeenCalledTimes(1);
+
+    onClose.mockClear();
+    changed = true;
+    rerender(<Form onClose={onClose} />);
+    await userEvent.click(screen.getByRole("button", { name: "Close" }));
+    expect(onClose).toHaveBeenCalled();
   });
 
   it("ignores a control marked data-discard-ignore", async () => {

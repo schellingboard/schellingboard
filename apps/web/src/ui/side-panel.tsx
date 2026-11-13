@@ -39,6 +39,8 @@ type PanelGuard = {
   /** Asks first if something was entered, else closes. */
   requestClose: () => void;
   hasUnsaved: () => boolean;
+  /** Registers a check for changes the fields cannot show; returns its removal. */
+  track: (check: () => boolean) => () => void;
   /** Runs `proceed` once nothing is lost, `stay` if the user keeps editing. */
   ask: (proceed: () => void, stay: () => void) => void;
 };
@@ -233,6 +235,7 @@ export function SidePanel({
           value={{
             requestClose: () => guard.requestClose(),
             hasUnsaved: guard.hasUnsaved,
+            track: guard.track,
             ask: guard.requestClose,
           }}
         >

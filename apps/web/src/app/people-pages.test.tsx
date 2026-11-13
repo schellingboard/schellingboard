@@ -272,31 +272,30 @@ describe("the edit-profile page", { tags: ["011-US1"] }, () => {
     expect(await screen.findByText(/This name is protected/)).toBeTruthy();
   });
 
-  it("saves the viewer's own profile and lands on it", async () => {
+  it("saves the viewer's own profile in the panel and returns to the directory", async () => {
     const { calls, router } = await open({
       handler: answers,
       path: "/guests/edit",
       identity: "al",
     });
+    const form = await screen.findByRole("dialog", {
+      name: "Edit profile form",
+    });
 
-    await userEvent.type(await screen.findByLabelText("Based in"), "Oslo");
-    await userEvent.click(screen.getByRole("button", { name: "Save" }));
+    await userEvent.type(
+      await within(form).findByLabelText("Based in"),
+      "Oslo"
+    );
+    await userEvent.click(within(form).getByRole("button", { name: "Save" }));
 
     await waitFor(() =>
-      expect(router.history.location.pathname).toBe("/guests/al")
+      expect(
+        screen.queryByRole("dialog", { name: "Edit profile form" })
+      ).toBeNull()
     );
+    expect(router.history.location.pathname).toBe("/guests");
     expect(
       calls.find((c) => c.path === "/api/v1/me/profile")?.body
     ).toMatchObject({ basedIn: "Oslo", expectedVersion: 2 });
-
-    await userEvent.click(
-      within(await screen.findByRole("dialog", { name: "Al" })).getByRole(
-        "button",
-        { name: "Close" }
-      )
-    );
-    await waitFor(() =>
-      expect(router.history.location.pathname).toBe("/guests")
-    );
   });
 });
