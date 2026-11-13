@@ -277,7 +277,7 @@ msgstr ""
 msgid "{name} (max {max})"
 msgstr ""
 
-#: src/features/meetings/book-meeting.tsx:274
+#: src/features/meetings/book-meeting.tsx:277
 msgid "{name} is already booked during this time."
 msgstr ""
 
@@ -493,7 +493,7 @@ msgstr ""
 msgid "+ Add meeting point"
 msgstr ""
 
-#: src/features/meetings/book-meeting.tsx:61
+#: src/features/meetings/book-meeting.tsx:62
 #: src/features/meetings/meeting-panel.tsx:60
 #: src/features/meetings/meeting-panel.tsx:196
 msgid "1-on-1"
@@ -520,7 +520,7 @@ msgstr ""
 msgid "1-on-1 response"
 msgstr ""
 
-#: src/features/meetings/book-meeting.tsx:58
+#: src/features/meetings/book-meeting.tsx:59
 msgid "1-on-1 with {chosenName}"
 msgstr ""
 
@@ -537,7 +537,7 @@ msgstr ""
 msgid "1-on-1 with {otherName} at {time} · {meetingPoint} — {status, select, needsReply {needs your reply} waiting {waiting for reply} confirmed {confirmed} declined {declined} canceled {canceled} unanswered {unanswered} other {}}{match, select, ghost { — doesn't match} other {}}"
 msgstr ""
 
-#: src/features/people/meeting-request-dialog.tsx:145
+#: src/features/people/meeting-request-dialog.tsx:155
 msgid "1-on-1 with {recipientName}"
 msgstr ""
 
@@ -873,7 +873,7 @@ msgstr ""
 msgid "All votes by choice: interested, maybe and skip."
 msgstr ""
 
-#: src/features/meetings/book-meeting.tsx:177
+#: src/features/meetings/book-meeting.tsx:179
 msgid "Already booked at this time"
 msgstr ""
 
@@ -939,11 +939,11 @@ msgid "Arrange a 1-on-1 at {label} — you are not offering this slot to others"
 msgstr ""
 
 #. Button: ask this person for a 1-on-1
-#: src/features/meetings/book-meeting.tsx:187
+#: src/features/meetings/book-meeting.tsx:189
 msgid "Ask"
 msgstr ""
 
-#: src/features/meetings/book-meeting.tsx:185
+#: src/features/meetings/book-meeting.tsx:187
 msgid "Ask {name}"
 msgstr ""
 
@@ -1196,7 +1196,7 @@ msgstr ""
 msgid "Bolt"
 msgstr ""
 
-#: src/features/meetings/book-meeting.tsx:130
+#: src/features/meetings/book-meeting.tsx:132
 #: src/features/meetings/meeting-request-fields.tsx:226
 msgid "Book it anyway?"
 msgstr ""
@@ -1289,7 +1289,7 @@ msgid "Bulk actions"
 msgstr ""
 
 #. Time slot: the person has something else then
-#: src/features/people/meeting-request-dialog.tsx:65
+#: src/features/people/meeting-request-dialog.tsx:71
 msgid "Busy"
 msgstr ""
 
@@ -2043,7 +2043,7 @@ msgstr ""
 msgid "Could not withdraw your vote on the proposal."
 msgstr ""
 
-#: src/features/meetings/book-meeting.tsx:69
+#: src/features/meetings/book-meeting.tsx:70
 msgid "Couldn't load who is free then. Try the slot again."
 msgstr ""
 
@@ -3461,7 +3461,7 @@ msgstr ""
 #: src/features/admin/locations-screen.tsx:514
 #: src/features/admin/settings-screen.tsx:161
 #: src/features/comments/my-comments-screen.tsx:42
-#: src/features/meetings/book-meeting.tsx:73
+#: src/features/meetings/book-meeting.tsx:74
 #: src/features/notifications/notifications-screen.tsx:78
 #: src/features/notifications/notifications-screen.tsx:181
 #: src/features/schedule/session-panel.tsx:335
@@ -4042,7 +4042,7 @@ msgstr ""
 msgid "Nobody has filled in a profile yet."
 msgstr ""
 
-#: src/features/meetings/book-meeting.tsx:136
+#: src/features/meetings/book-meeting.tsx:138
 msgid "Nobody has marked this time free."
 msgstr ""
 
@@ -4210,7 +4210,7 @@ msgstr ""
 msgid "Only a host of this session can change it."
 msgstr ""
 
-#: src/features/meetings/book-meeting.tsx:198
+#: src/features/meetings/book-meeting.tsx:200
 msgid "Only people who marked this time free are listed. Nobody is told you looked."
 msgstr ""
 
@@ -5272,7 +5272,7 @@ msgstr ""
 msgid "Session full"
 msgstr ""
 
-#: src/features/meetings/book-meeting.tsx:164
+#: src/features/meetings/book-meeting.tsx:166
 #: src/features/people/directory-screen.tsx:59
 #: src/features/people/directory-screen.tsx:377
 #: src/features/people/person-link.tsx:30
@@ -5649,7 +5649,7 @@ msgstr ""
 msgid "someone comments on my profile"
 msgstr ""
 
-#: src/features/meetings/book-meeting.tsx:287
+#: src/features/meetings/book-meeting.tsx:290
 msgid "Someone else"
 msgstr ""
 
@@ -5882,7 +5882,7 @@ msgstr ""
 msgid "That slot has already started."
 msgstr ""
 
-#: src/features/meetings/book-meeting.tsx:68
+#: src/features/meetings/book-meeting.tsx:69
 msgid "That slot is no longer open for 1-on-1s."
 msgstr ""
 
@@ -6359,7 +6359,7 @@ msgstr ""
 msgid "Unassigned location"
 msgstr ""
 
-#: src/features/people/meeting-request-dialog.tsx:60
+#: src/features/people/meeting-request-dialog.tsx:66
 msgid "Unavailable"
 msgstr ""
 
@@ -6729,7 +6729,7 @@ msgstr ""
 msgid "Who proposed: hosts of proposals, co-hosted proposals, and how many proposals that asked for a co-host found one."
 msgstr ""
 
-#: src/features/meetings/book-meeting.tsx:60
+#: src/features/meetings/book-meeting.tsx:61
 msgid "Who's free at {slotStartLabel}?"
 msgstr ""
 

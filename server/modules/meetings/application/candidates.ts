@@ -179,6 +179,8 @@ export const listMeetingCandidates =
     return ok({
       eventName: event.name,
       dayLabel: zoned(slot.start).toFormat("EEE d LLL"),
+      slotStart: slot.start.toISOString(),
+      timezone: event.timezone,
       slotLabel: slotTimeLabel(slot, event.breakMinutes, event.timezone),
       slotCount,
       lengths,

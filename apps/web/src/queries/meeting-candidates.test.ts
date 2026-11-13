@@ -6,6 +6,8 @@ import { createMeetingCandidatesQuery } from "./meeting-candidates";
 const found = {
   eventName: "Camp",
   dayLabel: "Sat 9 May",
+  slotStart: "2026-05-09T09:10:00.000Z",
+  timezone: "UTC",
   slotLabel: "09:10 – 09:40",
   slotCount: 1,
   lengths: [],

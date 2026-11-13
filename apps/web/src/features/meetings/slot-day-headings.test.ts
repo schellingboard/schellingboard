@@ -2,6 +2,7 @@
 import { Settings } from "luxon";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
+import { dayHeading } from "../schedule/day-label";
 import { slotDayHeadings } from "./slot-day-headings";
 
 const day = (id: string, start: string, end: string) => ({
@@ -34,5 +35,15 @@ describe("slotDayHeadings", () => {
     const headings = slotDayHeadings(days, "UTC");
     expect(headings[0]).toBe("Fri 2 Oct, 08:00–10:00");
     expect(headings[1]).toBe("Fri 2 Oct, 14:00–18:00");
+  });
+
+  it("names the day of one instant in the event's zone", () => {
+    expect(dayHeading("2026-10-02T23:30:00Z", "Europe/Berlin")).toBe(
+      "Sat 3 Oct"
+    );
+    Settings.defaultLocale = "de";
+    expect(dayHeading("2026-10-02T23:30:00Z", "Europe/Berlin")).toBe(
+      "Sa., 3. Okt."
+    );
   });
 });

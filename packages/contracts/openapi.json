@@ -390,6 +390,7 @@
               "properties": {
                 "eventId": { "type": "string" },
                 "eventName": { "type": "string" },
+                "timezone": { "type": "string" },
                 "meetingPoints": {
                   "type": "array",
                   "items": {
@@ -414,7 +415,13 @@
                         "items": {
                           "type": "object",
                           "properties": {
-                            "label": { "type": "string" },
+                            "id": { "type": "string" },
+                            "label": {
+                              "type": "string",
+                              "description": "English; clients may build their own from start and end"
+                            },
+                            "start": { "type": "string" },
+                            "end": { "type": "string" },
                             "slots": {
                               "type": "array",
                               "items": {
@@ -464,7 +471,7 @@
                               }
                             }
                           },
-                          "required": ["label", "slots"]
+                          "required": ["id", "label", "start", "end", "slots"]
                         }
                       }
                     },
@@ -472,7 +479,13 @@
                   }
                 }
               },
-              "required": ["eventId", "eventName", "meetingPoints", "lengths"]
+              "required": [
+                "eventId",
+                "eventName",
+                "timezone",
+                "meetingPoints",
+                "lengths"
+              ]
             },
             "description": "One per event the caller and the guest share where 1-on-1s are open and the guest is bookable"
           }
@@ -4345,7 +4358,12 @@
                   "type": "object",
                   "properties": {
                     "eventName": { "type": "string" },
-                    "dayLabel": { "type": "string" },
+                    "dayLabel": {
+                      "type": "string",
+                      "description": "English; clients may build their own from slotStart"
+                    },
+                    "slotStart": { "type": "string" },
+                    "timezone": { "type": "string" },
                     "slotLabel": { "type": "string" },
                     "slotCount": { "type": "integer" },
                     "lengths": {
@@ -4419,6 +4437,8 @@
                   "required": [
                     "eventName",
                     "dayLabel",
+                    "slotStart",
+                    "timezone",
                     "slotLabel",
                     "slotCount",
                     "lengths",

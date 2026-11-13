@@ -13,7 +13,7 @@ const EVENT_START = isoDay(30);
 
 const POINT_DESCRIPTION = "By the main staircase, open all day.";
 
-/** How the picker heads that day's slots: luxon's "EEE d LLL". */
+/** How the picker heads that day's slots, in the en-GB browser locale. */
 const DAY_HEADING = new RegExp(
   new Date(`${EVENT_START}T09:00:00Z`).toLocaleDateString("en-GB", {
     day: "numeric",

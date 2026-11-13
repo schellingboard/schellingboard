@@ -31,3 +31,11 @@ export function formatDayLabel(
     })
   );
 }
+
+export function dayHeading(iso: string, timezone: string): string {
+  return DateTime.fromISO(iso).setZone(timezone).toLocaleString({
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  });
+}

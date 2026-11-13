@@ -102,6 +102,20 @@ describe("meeting options on a profile", () => {
 
   afterEach(() => vi.unstubAllEnvs());
 
+  it("sends each day's window and the zone for the web to head it", async () => {
+    const { event, other } = await scenario();
+    const [option] = await listMeetingOptions(other.id);
+    expect(option.timezone).toBe(event.timezone);
+    const [day] = option.lengths[0].days;
+    expect(day.id).toEqual(expect.any(String));
+    expect(new Date(day.start).getTime()).toBeLessThanOrEqual(
+      new Date(day.slots[0].start).getTime()
+    );
+    expect(new Date(day.end).getTime()).toBeGreaterThan(
+      new Date(day.slots[0].start).getTime()
+    );
+  });
+
   it("offers the event, its meeting points and their declared slots", async () => {
     const { event, other } = await scenario({ declared: [SLOT_A, SLOT_C] });
     await getRepositories().meetingPoints.create({

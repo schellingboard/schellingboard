@@ -15,24 +15,30 @@ import {
   requestSentNotice,
   type RequestSubject,
 } from "../meetings/meeting-request-fields";
+import { slotDayHeadings } from "../meetings/slot-day-headings";
+import { dayHeading } from "../schedule/day-label";
 import { timeClashSentences } from "../schedule/meeting-clash-text";
 
 type Day = ProfileMeetingOption["lengths"][number]["days"][number];
 
 function SlotList({
   days,
+  headings,
   selected,
   onSelect,
 }: {
   days: Day[];
+  headings: string[];
   selected: string | null;
   onSelect: (start: string) => void;
 }) {
   return (
     <>
-      {days.map((day) => (
-        <section key={day.label} aria-label={day.label} className="mb-4">
-          <h3 className="mb-1 text-sm font-semibold text-fg">{day.label}</h3>
+      {days.map((day, index) => (
+        <section key={day.id} aria-label={headings[index]} className="mb-4">
+          <h3 className="mb-1 text-sm font-semibold text-fg">
+            {headings[index]}
+          </h3>
           <ul className="grid grid-cols-2 gap-2 sm:grid-cols-5">
             {day.slots.map((slot) => {
               const unavailable = slot.state === "unavailable";
@@ -116,7 +122,11 @@ export function MeetingRequestDialog({
 
   const days =
     option.lengths.find((l) => l.slotCount === slotCount)?.days ?? [];
-  const day = days.find((d) => d.slots.some((s) => s.start === slotStart));
+  const headings = slotDayHeadings(days, option.timezone);
+  const dayIndex = days.findIndex((d) =>
+    d.slots.some((s) => s.start === slotStart)
+  );
+  const day = days[dayIndex];
   const slot = day?.slots.find((s) => s.start === slotStart);
 
   const subject: RequestSubject =
@@ -125,7 +135,7 @@ export function MeetingRequestDialog({
           kind: "slot",
           name: recipientName,
           slotLabel: slot.label,
-          dayLabel: day.label,
+          dayLabel: dayHeading(slot.start, option.timezone),
         }
       : { kind: "person", name: recipientName };
 
@@ -159,7 +169,12 @@ export function MeetingRequestDialog({
           }}
         />
         <div className="max-h-64 overflow-y-auto">
-          <SlotList days={days} selected={slotStart} onSelect={setSlotStart} />
+          <SlotList
+            days={days}
+            headings={headings}
+            selected={slotStart}
+            onSelect={setSlotStart}
+          />
         </div>
         <MeetingClashNotice
           lines={slot?.state === "busy" ? timeClashSentences(slot.clashes) : []}

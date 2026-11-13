@@ -120,7 +120,11 @@ export const meetingCandidatesQuerySchema = z.object({
 
 export const meetingCandidatesSchema = z.object({
   eventName: z.string(),
-  dayLabel: z.string(),
+  dayLabel: z
+    .string()
+    .describe("English; clients may build their own from slotStart"),
+  slotStart: z.string(),
+  timezone: z.string(),
   slotLabel: z.string(),
   slotCount: z.number().int(),
   lengths: z.array(
@@ -174,6 +178,7 @@ export const meetingOptionsSchema = z
         z.object({
           eventId: z.string(),
           eventName: z.string(),
+          timezone: z.string(),
           meetingPoints: z.array(
             z.object({
               id: z.string(),
@@ -187,7 +192,14 @@ export const meetingOptionsSchema = z
               minutes: z.number(),
               days: z.array(
                 z.object({
-                  label: z.string(),
+                  id: z.string(),
+                  label: z
+                    .string()
+                    .describe(
+                      "English; clients may build their own from start and end"
+                    ),
+                  start: z.string(),
+                  end: z.string(),
                   slots: z.array(optionSlotSchema),
                 })
               ),

@@ -40,7 +40,11 @@ export type MeetingSlotOption = {
  * and the label is the same string for every slot of the day.
  */
 export type MeetingDayOption = {
+  id: string;
+  /** English; the web builds its own heading from `start` and `end`. */
   label: string;
+  start: string;
+  end: string;
   slots: MeetingSlotOption[];
 };
 
@@ -54,6 +58,7 @@ export type MeetingLengthOption = {
 export type MeetingOption = {
   eventId: string;
   eventName: string;
+  timezone: string;
   meetingPoints: Pick<MeetingPoint, "id" | "name" | "description">[];
   lengths: MeetingLengthOption[];
 };
@@ -151,7 +156,10 @@ export async function meetingOptionsFor(
         }
         if (slots.length > 0) {
           dayOptions.push({
+            id: day.id,
             label: zoned(day.start).toFormat("EEE d LLL"),
+            start: day.start.toISOString(),
+            end: day.end.toISOString(),
             slots,
           });
         }
@@ -173,6 +181,7 @@ export async function meetingOptionsFor(
     options.push({
       eventId,
       eventName: event.name,
+      timezone: event.timezone,
       meetingPoints: meetingPoints.map(({ id, name, description }) => ({
         id,
         name,

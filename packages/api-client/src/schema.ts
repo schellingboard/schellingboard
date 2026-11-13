@@ -2153,7 +2153,10 @@ export interface paths {
           content: {
             "application/json": {
               eventName: string;
+              /** @description English; clients may build their own from slotStart */
               dayLabel: string;
+              slotStart: string;
+              timezone: string;
               slotLabel: string;
               slotCount: number;
               lengths: {
@@ -8365,6 +8368,7 @@ export interface components {
       options: {
         eventId: string;
         eventName: string;
+        timezone: string;
         meetingPoints: {
           id: string;
           name: string;
@@ -8374,7 +8378,11 @@ export interface components {
           slotCount: number;
           minutes: number;
           days: {
+            id: string;
+            /** @description English; clients may build their own from start and end */
             label: string;
+            start: string;
+            end: string;
             slots: {
               start: string;
               label: string;

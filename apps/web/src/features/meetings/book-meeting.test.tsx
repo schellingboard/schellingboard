@@ -1,6 +1,7 @@
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it } from "vitest";
+import { Settings } from "luxon";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { fakeApi, type FakeHandler, problem } from "../../commands/fake-api";
 import { meetingRequestCalls } from "../../commands/meeting-request";
@@ -8,7 +9,14 @@ import { createMeetingCandidatesQuery } from "../../queries/meeting-candidates";
 import { NoticeProvider } from "../../ui/notices";
 import { BookMeeting } from "./book-meeting";
 
-afterEach(cleanup);
+const defaultLocale = Settings.defaultLocale;
+beforeEach(() => {
+  Settings.defaultLocale = "en-GB";
+});
+afterEach(() => {
+  cleanup();
+  Settings.defaultLocale = defaultLocale;
+});
 
 const person = (id: string, name: string, extra = {}) => ({
   id,
@@ -24,6 +32,8 @@ const person = (id: string, name: string, extra = {}) => ({
 const found = (slotCount = 1) => ({
   eventName: "Camp",
   dayLabel: "Sat 9 May",
+  slotStart: "2026-05-09T09:10:00.000Z",
+  timezone: "UTC",
   slotLabel: slotCount === 1 ? "09:10 – 09:40" : "09:10 – 10:10",
   slotCount,
   lengths: [

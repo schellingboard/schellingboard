@@ -1,16 +1,13 @@
 import { DateTime } from "luxon";
 
+import { dayHeading } from "../schedule/day-label";
+
 type Window = { id: string; start: string; end: string };
 
 /** One heading per day, in order; days sharing a date also name their window. */
 export function slotDayHeadings(days: Window[], timezone: string): string[] {
   const zoned = (iso: string) => DateTime.fromISO(iso).setZone(timezone);
-  const dateOf = (day: Window) =>
-    zoned(day.start).toLocaleString({
-      weekday: "short",
-      day: "numeric",
-      month: "short",
-    });
+  const dateOf = (day: Window) => dayHeading(day.start, timezone);
   const counts = new Map<string, number>();
   for (const day of days) {
     counts.set(dateOf(day), (counts.get(dateOf(day)) ?? 0) + 1);

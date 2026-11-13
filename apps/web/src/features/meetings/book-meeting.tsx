@@ -19,6 +19,7 @@ import { Button } from "../../ui/button";
 import { Dialog } from "../../ui/dialog";
 import { useNotify } from "../../ui/notices";
 import { PersonLink } from "../people/person-link";
+import { dayHeading } from "../schedule/day-label";
 import { timeClashSentences } from "../schedule/meeting-clash-text";
 import {
   MeetingClashNotice,
@@ -116,7 +117,8 @@ function CandidateStep({
   return (
     <div className="flex flex-col gap-4">
       <span className="-mt-2 block text-sm text-fg-muted">
-        {found.dayLabel}, {found.slotLabel} · {found.eventName}
+        {dayHeading(found.slotStart, found.timezone)}, {found.slotLabel} ·{" "}
+        {found.eventName}
       </span>
 
       <MeetingLengthChips
@@ -242,7 +244,8 @@ function RequestStep({
       ),
   });
   const { name } = candidate;
-  const { slotLabel, dayLabel } = found;
+  const { slotLabel } = found;
+  const dayLabel = dayHeading(found.slotStart, found.timezone);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -256,7 +259,7 @@ function RequestStep({
   return (
     <form onSubmit={(e) => void submit(e)} className="flex flex-col gap-4">
       <span className="-mt-2 block text-sm text-fg-muted">
-        {found.dayLabel}, {found.slotLabel}
+        {dayHeading(found.slotStart, found.timezone)}, {found.slotLabel}
       </span>
 
       <MeetingRequestError

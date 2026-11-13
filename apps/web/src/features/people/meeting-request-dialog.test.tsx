@@ -1,6 +1,7 @@
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it } from "vitest";
+import { Settings } from "luxon";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { fakeApi, type FakeHandler, problem } from "../../commands/fake-api";
 import { meetingRequestCalls } from "../../commands/meeting-request";
@@ -8,7 +9,14 @@ import type { ProfileMeetingOption } from "../../queries/profile-activity";
 import { NoticeProvider } from "../../ui/notices";
 import { MeetingRequestDialog } from "./meeting-request-dialog";
 
-afterEach(cleanup);
+const defaultLocale = Settings.defaultLocale;
+beforeEach(() => {
+  Settings.defaultLocale = "en-GB";
+});
+afterEach(() => {
+  cleanup();
+  Settings.defaultLocale = defaultLocale;
+});
 
 const slot = (
   start: string,
@@ -34,6 +42,7 @@ const slot = (
 const option: ProfileMeetingOption = {
   eventId: "e1",
   eventName: "Camp",
+  timezone: "UTC",
   meetingPoints: [{ id: "m1", name: "Coffee bar", description: "By the door" }],
   lengths: [
     {
@@ -41,7 +50,10 @@ const option: ProfileMeetingOption = {
       minutes: 30,
       days: [
         {
+          id: "d1",
           label: "Sat 9 May",
+          start: "2026-05-09T08:00:00Z",
+          end: "2026-05-09T18:00:00Z",
           slots: [
             slot("2026-05-09T09:10:00Z", "09:10 – 09:40"),
             slot("2026-05-09T09:40:00Z", "09:40 – 10:10", "busy"),
@@ -55,7 +67,10 @@ const option: ProfileMeetingOption = {
       minutes: 60,
       days: [
         {
+          id: "d1",
           label: "Sat 9 May",
+          start: "2026-05-09T08:00:00Z",
+          end: "2026-05-09T18:00:00Z",
           slots: [slot("2026-05-09T09:10:00Z", "09:10 – 10:10")],
         },
       ],

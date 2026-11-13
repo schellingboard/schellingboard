@@ -1,8 +1,8 @@
 import { t } from "@lingui/core/macro";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { slotTimeLabel } from "@schellingboard/domain/meeting-slots";
-import { DateTime } from "luxon";
 
+import { dayHeading } from "./day-label";
 import { compareMeetings } from "./meeting-column";
 import type { MeetingView } from "./meeting-view";
 
@@ -36,9 +36,7 @@ export function meetingViewsFrom(
         otherName: names.get(otherId) ?? t`Someone`,
         slotStart: meeting.slotStart,
         slotEnd: meeting.slotEnd,
-        dayLabel: DateTime.fromJSDate(start)
-          .setZone(timezone)
-          .toLocaleString({ weekday: "short", day: "numeric", month: "short" }),
+        dayLabel: dayHeading(meeting.slotStart, timezone),
         timeLabel: slotTimeLabel(
           { start, end: new Date(meeting.slotEnd) },
           breakMinutes,
