@@ -8,9 +8,10 @@ import { PanelLanding } from "./panel-landing";
 export function MeetingsPage() {
   const { slug } = useEventView();
   const { history } = useRouter();
-  const [id] = useState(() =>
-    new URLSearchParams(history.location.search).get("viewMeeting")
-  );
+  const [id] = useState(() => {
+    const params = new URLSearchParams(history.location.search);
+    return params.get("viewMeeting");
+  });
   useEffect(() => {
     if (!id) history.replace(`/${slug}/schedule`);
   }, [history, slug, id]);

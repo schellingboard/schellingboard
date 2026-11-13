@@ -7,6 +7,7 @@ import {
 } from "@schellingboard/domain/attendee-count";
 import { type FormEvent, useEffect, useId, useState } from "react";
 
+import { fieldMessage } from "../../commands/field-message";
 import { describeSession } from "../../commands/subject";
 import { useNotify } from "../../ui/notices";
 import { useSchedule } from "./context";
@@ -56,7 +57,8 @@ export function AttendeeCountField({
     e.preventDefault();
     setSaved(false);
     const parsed = attendeeCountFormSchema.safeParse({ count: value });
-    if (!parsed.success) return setMessage(parsed.error.issues[0].message);
+    if (!parsed.success)
+      return setMessage(fieldMessage(parsed.error.issues[0].message));
     setMessage(null);
     setSaving(true);
     const result = await actions.attendeeCount.save(

@@ -2,6 +2,7 @@ import { t } from "@lingui/core/macro";
 import type { ZodType } from "zod";
 
 import { reasonFor } from "./failure-message";
+import { fieldMessage } from "./field-message";
 import { problemCode } from "./problem";
 import type { CommandResponse } from "./runner";
 
@@ -70,7 +71,9 @@ export async function awaitMutation<R>(
     return {
       ok: false,
       kind: "fields",
-      fields: Object.fromEntries(problems.map((p) => [p.path, p.message])),
+      fields: Object.fromEntries(
+        problems.map((p) => [p.path, fieldMessage(p.message)])
+      ),
       message: fixFieldsMessage(),
       problem: error,
     };
@@ -96,7 +99,7 @@ export function validateFields(
   const fields: FieldErrors = {};
   for (const issue of parsed.error.issues) {
     const path = issue.path.join(".");
-    fields[path] ??= issue.message;
+    fields[path] ??= fieldMessage(issue.message);
   }
   return fields;
 }

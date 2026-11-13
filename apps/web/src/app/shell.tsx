@@ -57,9 +57,11 @@ export function ShellFrame({
           const response = await fetch("/api/dev/reminders", {
             method: "POST",
           });
+          /* eslint-disable lingui/no-unlocalized-strings -- dev toolbar, English only */
           if (!response.ok) return "dispatch failed";
           const { sent } = (await response.json()) as { sent: number };
           return `sent ${sent} reminders`;
+          /* eslint-enable lingui/no-unlocalized-strings */
         }}
       />
     </Layout>

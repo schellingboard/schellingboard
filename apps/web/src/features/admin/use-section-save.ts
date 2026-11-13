@@ -1,4 +1,4 @@
-import { STALE_EVENT_MESSAGE } from "@schellingboard/contracts/event";
+import { t } from "@lingui/core/macro";
 import { type FormEvent, useRef, useState } from "react";
 
 import { type FieldErrors } from "../../commands/mutation";
@@ -57,7 +57,9 @@ export function useSectionSave({
     }
   };
 
-  const error = stale ? STALE_EVENT_MESSAGE : shown(mutation);
+  const error = stale
+    ? t`Someone changed this event while you edited it. Copy your edits somewhere safe: reloading the page discards them.`
+    : shown(mutation);
   const fields: FieldErrors = stale ? {} : mutation.fields;
   return {
     save,

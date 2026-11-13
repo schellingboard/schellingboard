@@ -15,6 +15,7 @@ export function landingPath(
     !hasPhases(event) ||
     (!!event.schedulingPhaseStart &&
       now.getTime() >= event.schedulingPhaseStart.getTime());
+  // eslint-disable-next-line lingui/no-unlocalized-strings -- route names
   return search !== "" || started ? "schedule" : "proposals";
 }
 

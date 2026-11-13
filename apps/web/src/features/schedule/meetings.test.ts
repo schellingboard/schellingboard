@@ -1,8 +1,17 @@
 // @module-tag 012-US5
-import { describe, expect, it } from "vitest";
+import { Settings } from "luxon";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { snapshot } from "../../replica/snapshot-fixture";
 import { meetingViewsFrom, withClashes } from "./meetings";
+
+const defaultLocale = Settings.defaultLocale;
+beforeEach(() => {
+  Settings.defaultLocale = "en-GB";
+});
+afterEach(() => {
+  Settings.defaultLocale = defaultLocale;
+});
 
 const meeting = (patch: object) => ({
   id: "m1",
@@ -54,6 +63,15 @@ describe("meetingViewsFrom", () => {
       timeLabel: "11:10 – 11:30",
       clashes: [],
     });
+  });
+
+  it("writes the day in the format locale", () => {
+    Settings.defaultLocale = "de";
+    const [view] = meetingViewsFrom(
+      withMeetings([meeting({})]),
+      new Date("2026-06-10T00:00:00Z")
+    );
+    expect(view?.dayLabel).toBe("Mo., 15. Juni");
   });
 
   it("reads the recipient's side", () => {

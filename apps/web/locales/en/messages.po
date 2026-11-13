@@ -643,6 +643,10 @@ msgstr "a session I’ve RSVP’d to changes time or location, loses its host, o
 msgid "A shared moment, such as lunch or a keynote, shows as a striped band across every room. It blocks nothing: sessions can still be booked inside it. To make a time unbookable, add a blocker session in every room instead. Times are in the event timezone ({timezone})."
 msgstr "A shared moment, such as lunch or a keynote, shows as a striped band across every room. It blocks nothing: sessions can still be booked inside it. To make a time unbookable, add a blocker session in every room instead. Times are in the event timezone ({timezone})."
 
+#: src/commands/field-message.ts:18
+msgid "A user with this email already exists"
+msgstr "A user with this email already exists"
+
 #: src/features/admin/stats-figure-card.tsx:28
 msgid "About {title}"
 msgstr "About {title}"
@@ -881,6 +885,14 @@ msgctxt "Location colour"
 msgid "Amber"
 msgstr "Amber"
 
+#: src/commands/field-message.ts:46
+msgid "An event with the URL \"{slug}\" already exists"
+msgstr "An event with the URL \"{slug}\" already exists"
+
+#: src/commands/field-message.ts:47
+msgid "An event with the URL \"{slug}\" already exists (\"{name}\")"
+msgstr "An event with the URL \"{slug}\" already exists (\"{name}\")"
+
 #: src/commands/failure-message.ts:51
 msgid "An organizer manages this session."
 msgstr "An organizer manages this session."
@@ -969,6 +981,18 @@ msgstr "Assign to events"
 #: src/features/admin/assignment-manager.tsx:177
 msgid "Assigned"
 msgstr "Assigned"
+
+#: src/commands/field-message.ts:30
+msgid "At most {MAX_CONTACTS} contacts"
+msgstr "At most {MAX_CONTACTS} contacts"
+
+#: src/commands/field-message.ts:29
+msgid "At most {MAX_LANGUAGES} languages"
+msgstr "At most {MAX_LANGUAGES} languages"
+
+#: src/commands/field-message.ts:27
+msgid "At most 100 prompts"
+msgstr "At most 100 prompts"
 
 #: src/features/admin/stats-text.ts:117
 msgid "Attendee"
@@ -1584,9 +1608,17 @@ msgstr "Command Line"
 msgid "Comment"
 msgstr "Comment"
 
+#: src/commands/field-message.ts:16
+msgid "Comment cannot be empty"
+msgstr "Comment cannot be empty"
+
 #: src/features/comments/comments-section.tsx:254
 msgid "Comment deleted"
 msgstr "Comment deleted"
+
+#: src/commands/field-message.ts:17
+msgid "Comment must be at most {COMMENT_MAX_LENGTH} characters"
+msgstr "Comment must be at most {COMMENT_MAX_LENGTH} characters"
 
 #: src/features/admin/stats-text.ts:308
 msgid "Comment on a profile"
@@ -1946,11 +1978,11 @@ msgstr "Could not RSVP to the session."
 msgid "Could not save — try again"
 msgstr "Could not save — try again"
 
-#: src/features/schedule/attendee-count-field.tsx:76
+#: src/features/schedule/attendee-count-field.tsx:78
 msgid "Could not save the attendee count for {what}. Please try again."
 msgstr "Could not save the attendee count for {what}. Please try again."
 
-#: src/features/schedule/attendee-count-field.tsx:77
+#: src/features/schedule/attendee-count-field.tsx:79
 msgid "Could not save the attendee count for the session. Please try again."
 msgstr "Could not save the attendee count for the session. Please try again."
 
@@ -2553,6 +2585,7 @@ msgstr "Enlarge photo of {name}"
 msgid "Enter a clear, descriptive title"
 msgstr "Enter a clear, descriptive title"
 
+#: src/commands/field-message.ts:31
 #: src/queries/attendee-count.ts:17
 msgid "Enter a whole number between {MIN_ATTENDEE_COUNT} and {MAX_ATTENDEE_COUNT}"
 msgstr "Enter a whole number between {MIN_ATTENDEE_COUNT} and {MAX_ATTENDEE_COUNT}"
@@ -2841,6 +2874,10 @@ msgstr "Gaps"
 msgid "Gaps between RSVPed sessions"
 msgstr "Gaps between RSVPed sessions"
 
+#: src/commands/field-message.ts:25
+msgid "Give this contact a label"
+msgstr "Give this contact a label"
+
 #. Name of an event icon
 #: src/ui/event-icons.ts:111
 msgid "Globe Alt"
@@ -3075,7 +3112,7 @@ msgstr "How many members filled in how many profile fields."
 msgid "How many members took each step. Each bar counts the members who did that, so one member can be in several bars."
 msgstr "How many members took each step. Each bar counts the members who did that, so one member can be in several bars."
 
-#: src/features/schedule/attendee-count-field.tsx:96
+#: src/features/schedule/attendee-count-field.tsx:98
 msgid "How many people attended?"
 msgstr "How many people attended?"
 
@@ -3234,6 +3271,14 @@ msgstr "JPEG, PNG, or WebP, max {maxMapMegabytes} MB."
 msgid "Jump to the current time"
 msgstr "Jump to the current time"
 
+#: src/commands/field-message.ts:24
+msgid "Keep contact entries under 200 characters"
+msgstr "Keep contact entries under 200 characters"
+
+#: src/commands/field-message.ts:23
+msgid "Keep contact labels under 40 characters"
+msgstr "Keep contact labels under 40 characters"
+
 #: src/ui/use-discard-guard.tsx:144
 msgid "Keep editing"
 msgstr "Keep editing"
@@ -3241,6 +3286,22 @@ msgstr "Keep editing"
 #: src/features/meetings/meeting-panel.tsx:152
 msgid "Keep it"
 msgstr "Keep it"
+
+#: src/commands/field-message.ts:21
+msgid "Keep it under {COHOST_WANTED_NOTE_MAX} characters"
+msgstr "Keep it under {COHOST_WANTED_NOTE_MAX} characters"
+
+#: src/commands/field-message.ts:28
+msgid "Keep language names under 50 characters"
+msgstr "Keep language names under 50 characters"
+
+#: src/commands/field-message.ts:22
+msgid "Keep prompt answers under 500 characters"
+msgstr "Keep prompt answers under 500 characters"
+
+#: src/commands/field-message.ts:26
+msgid "Keep this under 100 characters"
+msgstr "Keep this under 100 characters"
 
 #: src/features/admin/stats-text.ts:207
 msgid "Kind"
@@ -3752,6 +3813,7 @@ msgstr "Name"
 msgid "Name (A–Z)"
 msgstr "Name (A–Z)"
 
+#: src/commands/field-message.ts:20
 #: src/features/admin/event-labels.tsx:48
 #: src/features/admin/events-screen.tsx:59
 #: src/features/admin/locations-screen.tsx:106
@@ -4211,7 +4273,7 @@ msgstr "Optional, one line."
 msgid "Optional. Besides your email, you can log in with it and your password. Leave it empty to have none."
 msgstr "Optional. Besides your email, you can log in with it and your password. Leave it empty to have none."
 
-#: src/features/schedule/attendee-count-field.tsx:99
+#: src/features/schedule/attendee-count-field.tsx:101
 msgid "Optional. Only you and your co-hosts will see this, not the attendees. Enter <0>0</0> if the session was held but nobody came. If it never happened at all, delete the session instead. Leave the field empty to go back to no count at all."
 msgstr "Optional. Only you and your co-hosts will see this, not the attendees. Enter <0>0</0> if the session was held but nobody came. If it never happened at all, delete the session instead. Leave the field empty to go back to no count at all."
 
@@ -4419,7 +4481,7 @@ msgstr "Please choose who you are first."
 msgid "Please enter the password to access this site"
 msgstr "Please enter the password to access this site"
 
-#: src/commands/mutation.ts:26
+#: src/commands/mutation.ts:27
 msgid "Please fix the highlighted fields."
 msgstr "Please fix the highlighted fields."
 
@@ -4921,12 +4983,12 @@ msgstr "RSVPs to running sessions (average)"
 #: src/features/admin/locations-screen.tsx:355
 #: src/features/comments/comments-section.tsx:306
 #: src/features/people/profile-form.tsx:639
-#: src/features/schedule/attendee-count-field.tsx:127
+#: src/features/schedule/attendee-count-field.tsx:129
 #: src/features/settings/email-settings-form.tsx:120
 msgid "Save"
 msgstr "Save"
 
-#: src/features/schedule/attendee-count-field.tsx:123
+#: src/features/schedule/attendee-count-field.tsx:125
 msgid "Save attendee count"
 msgstr "Save attendee count"
 
@@ -4958,7 +5020,7 @@ msgstr "Save settings"
 msgid "Save username"
 msgstr "Save username"
 
-#: src/features/schedule/attendee-count-field.tsx:136
+#: src/features/schedule/attendee-count-field.tsx:138
 #: src/features/settings/email-settings-form.tsx:124
 msgid "Saved"
 msgstr "Saved"
@@ -4987,7 +5049,7 @@ msgstr "Saved!"
 msgid "Saving..."
 msgstr "Saving..."
 
-#: src/features/schedule/attendee-count-field.tsx:132
+#: src/features/schedule/attendee-count-field.tsx:134
 msgid "Saving…"
 msgstr "Saving…"
 
@@ -5550,6 +5612,10 @@ msgstr "Slots, up to"
 msgid "Some of those slots are no longer offered. Reload the page."
 msgstr "Some of those slots are no longer offered. Reload the page."
 
+#: src/features/schedule/meetings.ts:36
+msgid "Someone"
+msgstr "Someone"
+
 #: src/features/settings/email-settings-form.tsx:22
 msgid "someone adds me as a session host or co-host"
 msgstr "someone adds me as a session host or co-host"
@@ -5557,6 +5623,10 @@ msgstr "someone adds me as a session host or co-host"
 #: src/features/settings/email-settings-form.tsx:41
 msgid "someone asks me for a 1-on-1"
 msgstr "someone asks me for a 1-on-1"
+
+#: src/features/admin/use-section-save.ts:61
+msgid "Someone changed this event while you edited it. Copy your edits somewhere safe: reloading the page discards them."
+msgstr "Someone changed this event while you edited it. Copy your edits somewhere safe: reloading the page discards them."
 
 #: src/features/settings/email-settings-form.tsx:30
 msgid "someone comments on a proposal I’m hosting"
@@ -5578,7 +5648,7 @@ msgstr "someone comments on my profile"
 msgid "Someone else"
 msgstr "Someone else"
 
-#: src/commands/mutation.ts:65
+#: src/commands/mutation.ts:66
 msgid "Someone else changed this while you were editing it."
 msgstr "Someone else changed this while you were editing it."
 
@@ -5888,7 +5958,7 @@ msgstr "The predicted columns come from the attendance model, fitted on one even
 msgid "The proposal phase is over."
 msgstr "The proposal phase is over."
 
-#: src/commands/mutation.ts:86
+#: src/commands/mutation.ts:89
 msgid "The server refused this. Please try again."
 msgstr "The server refused this. Please try again."
 
@@ -6001,7 +6071,7 @@ msgstr "This link no longer works: a newer one replaced it. Ask an organizer for
 msgid "This login link is invalid. Request a new code from the name selector or your settings page."
 msgstr "This login link is invalid. Request a new code from the name selector or your settings page."
 
-#: src/commands/mutation.ts:24
+#: src/commands/mutation.ts:25
 msgid "This might not have been saved. Check that it went through, then try again."
 msgstr "This might not have been saved. Check that it went through, then try again."
 
@@ -6173,6 +6243,11 @@ msgstr "Title ↑"
 #: src/features/proposals/list-model.ts:209
 msgid "Title ↓"
 msgstr "Title ↓"
+
+#: src/commands/field-message.test.ts:17
+#: src/commands/field-message.ts:15
+msgid "Title is required"
+msgstr "Title is required"
 
 #: src/features/proposals/vote-breakdown.tsx:113
 msgid "Too few attendees voted to guess at attendance — fewer than {minTurnout}% of them did, so a couple of votes either way would decide the number."
@@ -6348,6 +6423,10 @@ msgstr "updated {profileUpdated}"
 #: src/features/admin/guest-import.tsx:52
 msgid "Upload a CSV file with a header row containing <0>name</0> and <1>email</1> columns (extra columns are ignored). The email may be left blank for a user without one. Users are matched by email, or by exact name when the email is blank: existing users are left unchanged, new ones are created. Both are assigned to the selected events, so re-running an import is safe."
 msgstr "Upload a CSV file with a header row containing <0>name</0> and <1>email</1> columns (extra columns are ignored). The email may be left blank for a user without one. Users are matched by email, or by exact name when the email is blank: existing users are left unchanged, new ones are created. Both are assigned to the selected events, so re-running an import is safe."
+
+#: src/commands/field-message.ts:19
+msgid "Use at least 8 characters"
+msgstr "Use at least 8 characters"
 
 #. Name of an event icon
 #: src/ui/event-icons.ts:134
