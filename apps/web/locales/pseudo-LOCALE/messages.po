@@ -468,11 +468,11 @@ msgstr ""
 msgid "{withoutEmail, plural, one {# has no email.} other {# have no email.}}"
 msgstr ""
 
-#: src/features/people/profile-form.tsx:557
+#: src/features/people/profile-form.tsx:577
 msgid "@handle, address, or URL"
 msgstr ""
 
-#: src/features/people/profile-form.tsx:280
+#: src/features/people/profile-form.tsx:281
 msgid "← Attendees"
 msgstr ""
 
@@ -587,7 +587,7 @@ msgstr ""
 msgid "A newer release is out: {latestVersion}."
 msgstr ""
 
-#: src/features/people/profile-form.tsx:434
+#: src/features/people/profile-form.tsx:454
 msgid "A sentence or two"
 msgstr ""
 
@@ -620,7 +620,7 @@ msgid "About {title}"
 msgstr ""
 
 #: src/features/people/profile-body.tsx:177
-#: src/features/people/profile-form.tsx:379
+#: src/features/people/profile-form.tsx:380
 msgid "About me"
 msgstr ""
 
@@ -673,7 +673,7 @@ msgstr ""
 msgid "Add a line of context (optional)"
 msgstr ""
 
-#: src/features/people/profile-form.tsx:582
+#: src/features/people/profile-form.tsx:602
 msgid "Add contact"
 msgstr ""
 
@@ -682,7 +682,7 @@ msgstr ""
 msgid "Add day"
 msgstr ""
 
-#: src/features/people/profile-form.tsx:503
+#: src/features/people/profile-form.tsx:523
 msgid "Add language"
 msgstr ""
 
@@ -821,7 +821,7 @@ msgstr ""
 msgid "Another session already uses that room at that time."
 msgstr ""
 
-#: src/features/people/profile-form.tsx:77
+#: src/features/people/profile-form.tsx:78
 msgid "Any pronouns"
 msgstr ""
 
@@ -862,7 +862,7 @@ msgstr ""
 msgid "Ask {name}"
 msgstr ""
 
-#: src/features/people/profile-form.tsx:78
+#: src/features/people/profile-form.tsx:79
 msgid "Ask me"
 msgstr ""
 
@@ -964,7 +964,7 @@ msgstr ""
 
 #. Chart axis: place where members are based
 #: src/features/admin/stats-figures.tsx:204
-#: src/features/people/profile-form.tsx:371
+#: src/features/people/profile-form.tsx:372
 msgid "Based in"
 msgstr ""
 
@@ -1199,7 +1199,7 @@ msgstr ""
 msgid "Change password"
 msgstr ""
 
-#: src/features/people/profile-form.tsx:317
+#: src/features/people/profile-form.tsx:318
 msgid "Change profile picture"
 msgstr ""
 
@@ -1270,7 +1270,7 @@ msgstr ""
 msgid "Choose…"
 msgstr ""
 
-#: src/features/people/profile-form.tsx:375
+#: src/features/people/profile-form.tsx:376
 msgid "City, region, or country"
 msgstr ""
 
@@ -1489,25 +1489,25 @@ msgctxt "Profile section: how to reach the person"
 msgid "Contact"
 msgstr ""
 
-#: src/features/people/profile-form.tsx:513
+#: src/features/people/profile-form.tsx:533
 msgid "Contact details"
 msgstr ""
 
-#: src/features/people/profile-form.tsx:541
+#: src/features/people/profile-form.tsx:561
 msgid "Contact label"
 msgstr ""
 
 #. Chart axis: kind of contact a member gave
 #: src/features/admin/stats-figures.tsx:208
-#: src/features/people/profile-form.tsx:529
+#: src/features/people/profile-form.tsx:549
 msgid "Contact type"
 msgstr ""
 
-#: src/features/people/profile-form.tsx:552
+#: src/features/people/profile-form.tsx:572
 msgid "Contact value"
 msgstr ""
 
-#: src/features/people/profile-form.tsx:388
+#: src/features/people/profile-form.tsx:389
 msgid "Conversation starters"
 msgstr ""
 
@@ -2157,7 +2157,7 @@ msgstr ""
 #: src/app/user-menu.tsx:107
 #: src/features/people/directory-screen.tsx:123
 #: src/features/people/profile-body.tsx:118
-#: src/features/people/profile-form.tsx:283
+#: src/features/people/profile-form.tsx:284
 msgid "Edit profile"
 msgstr ""
 
@@ -2340,7 +2340,7 @@ msgstr ""
 msgid "Everything here is private and never shown to other attendees. Your <0>public profile</0> is edited separately."
 msgstr ""
 
-#: src/features/people/profile-form.tsx:286
+#: src/features/people/profile-form.tsx:287
 msgid "Everything here is shown on your public profile. Email notifications and other private preferences live in <0>Settings</0>."
 msgstr ""
 
@@ -2553,15 +2553,15 @@ msgstr ""
 msgid "Has profile"
 msgstr ""
 
-#: src/features/people/profile-form.tsx:72
+#: src/features/people/profile-form.tsx:73
 msgid "He/Him"
 msgstr ""
 
-#: src/features/people/profile-form.tsx:366
+#: src/features/people/profile-form.tsx:367
 msgid "He/Him/His/They/etc."
 msgstr ""
 
-#: src/features/people/profile-form.tsx:75
+#: src/features/people/profile-form.tsx:76
 msgid "He/They"
 msgstr ""
 
@@ -2855,21 +2855,21 @@ msgstr ""
 msgid "Keep it"
 msgstr ""
 
-#: src/features/people/profile-form.tsx:546
+#: src/features/people/profile-form.tsx:566
 msgid "Label"
 msgstr ""
 
 #. Chart axis: one bar per language
 #: src/features/admin/stats-figures.tsx:200
-#: src/features/people/profile-form.tsx:466
-#: src/features/people/profile-form.tsx:482
+#: src/features/people/profile-form.tsx:486
+#: src/features/people/profile-form.tsx:502
 #: src/features/settings/language-setting.tsx:36
 #: src/features/settings/language-setting.tsx:39
 msgid "Language"
 msgstr ""
 
 #: src/features/people/profile-body.tsx:157
-#: src/features/people/profile-form.tsx:457
+#: src/features/people/profile-form.tsx:477
 msgid "Languages"
 msgstr ""
 
@@ -2877,7 +2877,7 @@ msgstr ""
 msgid "Languages members speak. A language appears only when at least 3 members share it."
 msgstr ""
 
-#: src/features/people/profile-form.tsx:458
+#: src/features/people/profile-form.tsx:478
 msgid "Languages you're happy to talk in"
 msgstr ""
 
@@ -3091,7 +3091,7 @@ msgstr ""
 #: src/features/admin/event-proposals.tsx:111
 #: src/features/admin/event-sessions.tsx:170
 #: src/features/comments/comments-section.tsx:577
-#: src/features/people/profile-form.tsx:585
+#: src/features/people/profile-form.tsx:605
 #: src/ui/form.tsx:187
 #: src/ui/form.tsx:375
 msgid "Markdown supported"
@@ -3265,7 +3265,7 @@ msgstr ""
 #: src/features/admin/guests-screen.tsx:101
 #: src/features/admin/guests-screen.tsx:189
 #: src/features/admin/locations-screen.tsx:185
-#: src/features/people/profile-form.tsx:351
+#: src/features/people/profile-form.tsx:352
 #: src/features/sign-in/bootstrap-screen.tsx:70
 msgid "Name"
 msgstr ""
@@ -3688,7 +3688,7 @@ msgstr ""
 msgid "Opens from the Need ideas? button. Markdown supported."
 msgstr ""
 
-#: src/features/people/profile-form.tsx:389
+#: src/features/people/profile-form.tsx:390
 msgid "Optional prompts that give people something to ask you about"
 msgstr ""
 
@@ -3919,7 +3919,12 @@ msgstr ""
 msgid "Profiles"
 msgstr ""
 
-#: src/features/people/profile-form.tsx:361
+#. placeholder {0}: prompts.filter((r) => !CORE_PROMPTS.includes(r.prompt)).indexOf(row) + 1
+#: src/features/people/profile-form.tsx:406
+msgid "Prompt {0}"
+msgstr ""
+
+#: src/features/people/profile-form.tsx:362
 msgid "Pronouns"
 msgstr ""
 
@@ -4043,9 +4048,9 @@ msgid "Reload"
 msgstr ""
 
 #: src/features/admin/event-sessions.tsx:356
-#: src/features/people/profile-form.tsx:425
-#: src/features/people/profile-form.tsx:491
-#: src/features/people/profile-form.tsx:566
+#: src/features/people/profile-form.tsx:444
+#: src/features/people/profile-form.tsx:511
+#: src/features/people/profile-form.tsx:586
 msgid "Remove"
 msgstr ""
 
@@ -4110,7 +4115,7 @@ msgstr ""
 msgid "Requests sent, received and accepted, per person."
 msgstr ""
 
-#: src/features/people/profile-form.tsx:332
+#: src/features/people/profile-form.tsx:333
 msgctxt "Profile picture: go back to the saved one"
 msgid "Reset"
 msgstr ""
@@ -4197,7 +4202,7 @@ msgstr ""
 #: src/features/admin/locations-screen.tsx:306
 #: src/features/admin/locations-screen.tsx:355
 #: src/features/comments/comments-section.tsx:306
-#: src/features/people/profile-form.tsx:609
+#: src/features/people/profile-form.tsx:629
 #: src/features/schedule/attendee-count-field.tsx:127
 #: src/features/settings/email-settings-form.tsx:120
 msgid "Save"
@@ -4254,7 +4259,7 @@ msgstr ""
 #: src/features/admin/settings-screen.tsx:128
 #: src/features/comments/comments-section.tsx:594
 #: src/features/meetings/availability-form.tsx:191
-#: src/features/people/profile-form.tsx:609
+#: src/features/people/profile-form.tsx:629
 #: src/features/settings/email-settings-form.tsx:120
 msgid "Saving..."
 msgstr ""
@@ -4560,11 +4565,11 @@ msgstr ""
 msgid "Shared moments"
 msgstr ""
 
-#: src/features/people/profile-form.tsx:73
+#: src/features/people/profile-form.tsx:74
 msgid "She/Her"
 msgstr ""
 
-#: src/features/people/profile-form.tsx:76
+#: src/features/people/profile-form.tsx:77
 msgid "She/They"
 msgstr ""
 
@@ -4601,7 +4606,7 @@ msgstr ""
 msgid "Show suggestions"
 msgstr ""
 
-#: src/features/people/profile-form.tsx:514
+#: src/features/people/profile-form.tsx:534
 msgid "Shown publicly on your profile — only add what you want visible"
 msgstr ""
 
@@ -4835,12 +4840,12 @@ msgstr ""
 msgid "Submitting..."
 msgstr ""
 
-#: src/features/people/profile-form.tsx:403
-#: src/features/people/profile-form.tsx:407
+#: src/features/people/profile-form.tsx:422
+#: src/features/people/profile-form.tsx:426
 msgid "Suggest a different prompt"
 msgstr ""
 
-#: src/features/people/profile-form.tsx:452
+#: src/features/people/profile-form.tsx:472
 msgid "Suggest a prompt"
 msgstr ""
 
@@ -4873,7 +4878,7 @@ msgstr ""
 msgid "Telegram"
 msgstr ""
 
-#: src/features/people/profile-form.tsx:383
+#: src/features/people/profile-form.tsx:384
 msgid "Tell others about yourself"
 msgstr ""
 
@@ -5034,7 +5039,7 @@ msgstr ""
 msgid "They are not available at that time."
 msgstr ""
 
-#: src/features/people/profile-form.tsx:74
+#: src/features/people/profile-form.tsx:75
 msgid "They/Them"
 msgstr ""
 
@@ -5786,7 +5791,7 @@ msgstr ""
 
 #: src/app/user-menu.tsx:57
 #: src/app/user-menu.tsx:90
-#: src/features/people/profile-form.tsx:356
+#: src/features/people/profile-form.tsx:357
 msgid "Your name"
 msgstr ""
 
@@ -5802,7 +5807,7 @@ msgstr ""
 msgid "Your name: {name}"
 msgstr ""
 
-#: src/features/people/profile-form.tsx:601
+#: src/features/people/profile-form.tsx:621
 msgid "Your photo was saved; the details were not."
 msgstr ""
 

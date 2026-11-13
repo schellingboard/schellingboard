@@ -13,6 +13,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Choose your conversation starters**
+  ([#1108](https://github.com/schellingboard/schellingboard/issues/1108)): pick a prompt by name
+  instead of only getting a random one, with new prompts for when you arrive and leave.
 - **Remove comments left on your profile**
   ([#901](https://github.com/schellingboard/schellingboard/issues/901)): profile owners, session and
   proposal hosts, and admins can now delete other people's comments.

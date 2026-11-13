@@ -68,4 +68,6 @@ export const PROMPT_POOL: string[] = [
   "What my younger self would find surprising about me",
   "The thing I always overpack",
   "A ritual that keeps me sane",
+  "When I arrive, and how I get there",
+  "When I leave, and where I could share a ride to",
 ];

@@ -102,6 +102,48 @@ describe("editing my profile", { tags: ["011-US1"] }, () => {
     ]);
   });
 
+  it("lets me choose which prompt to answer", async () => {
+    const { calls } = setup();
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Suggest a prompt" })
+    );
+    await userEvent.click(screen.getByRole("combobox", { name: "Prompt 1" }));
+    await userEvent.click(
+      screen.getByRole("option", { name: "When I arrive, and how I get there" })
+    );
+    await userEvent.type(
+      screen.getByLabelText("When I arrive, and how I get there"),
+      "Friday, by train"
+    );
+    await userEvent.click(save());
+
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect((calls[0].body as { prompts: unknown[] }).prompts).toContainEqual({
+      prompt: "When I arrive, and how I get there",
+      answer: "Friday, by train",
+    });
+  });
+
+  it("keeps the answer when the same prompt is chosen again", async () => {
+    setup();
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Suggest a prompt" })
+    );
+    const prompt = screen.getByRole<HTMLInputElement>("combobox", {
+      name: "Prompt 1",
+    });
+    const chosen = prompt.value;
+    await userEvent.type(screen.getByLabelText(chosen), "Friday");
+    await userEvent.click(prompt);
+    await userEvent.click(screen.getByRole("option", { name: chosen }));
+
+    expect(screen.getByLabelText<HTMLTextAreaElement>(chosen).value).toBe(
+      "Friday"
+    );
+  });
+
   it("keeps the line breaks of a prompt answer", async () => {
     const { calls } = setup();
 

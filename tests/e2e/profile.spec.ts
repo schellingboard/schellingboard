@@ -1,4 +1,3 @@
-import { PROMPT_POOL } from "@schellingboard/domain/prompt-pool";
 import sharp from "sharp";
 
 import { login } from "./helpers/auth";
@@ -236,15 +235,13 @@ test.describe("Edit profile", () => {
       .fill("Urban beekeeping, see https://bees.example.com");
 
     // Suggested prompts can be swapped in place for a different one. The
-    // suggestion is random, so find which pool prompt is on screen. One
-    // locator matching the whole pool, not one round trip per prompt: this
-    // runs on every iteration of the poll below, and 60 round trips a go is
-    // what pushed this test past its timeout under parallel load.
-    const anyPoolPrompt = new RegExp(
-      `^(${PROMPT_POOL.map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})$`
-    );
+    // suggestion is random, so read which pool prompt is on screen.
     const visiblePoolPrompts = () =>
-      page.getByText(anyPoolPrompt).filter({ visible: true }).allTextContents();
+      page
+        .getByRole("combobox", { name: "Prompt 1" })
+        .evaluateAll((inputs) =>
+          inputs.map((input) => (input as HTMLInputElement).value)
+        );
     await page.getByRole("button", { name: "Suggest a prompt" }).click();
     const [suggestedPrompt, ...extraBefore] = await visiblePoolPrompts();
     expect(suggestedPrompt).toBeDefined();
@@ -254,9 +251,17 @@ test.describe("Edit profile", () => {
       .click();
     await expect.poll(visiblePoolPrompts).not.toEqual([suggestedPrompt]);
     // Left unanswered, so it must not appear on the saved profile.
-    const [swappedPrompt, ...extraAfter] = await visiblePoolPrompts();
-    expect(swappedPrompt).toBeDefined();
+    const extraAfter = (await visiblePoolPrompts()).slice(1);
     expect(extraAfter).toEqual([]);
+
+    // A prompt can also be chosen by name.
+    await page.getByRole("combobox", { name: "Prompt 1" }).fill("arrive");
+    await page
+      .getByRole("option", { name: "When I arrive, and how I get there" })
+      .click();
+    await expect(page.getByRole("combobox", { name: "Prompt 1" })).toHaveValue(
+      "When I arrive, and how I get there"
+    );
 
     await page.getByRole("button", { name: "Add language" }).click();
     await page.getByRole("combobox", { name: "Language" }).fill("Italian");
@@ -285,7 +290,9 @@ test.describe("Edit profile", () => {
     ).toBeVisible();
     await expect(profile.getByText("Urban beekeeping")).toBeVisible();
     await expect(
-      profile.getByRole("heading", { name: swappedPrompt })
+      profile.getByRole("heading", {
+        name: "When I arrive, and how I get there",
+      })
     ).toHaveCount(0);
     await expect(profile.getByText("Italian")).toBeVisible();
     await expect(profile.getByText("Signal:")).toBeVisible();

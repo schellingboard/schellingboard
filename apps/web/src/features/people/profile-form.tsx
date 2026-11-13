@@ -41,6 +41,7 @@ import {
 import { FormErrorSummary } from "../../ui/form-error-summary";
 import { ArrowPathIcon } from "../../ui/icons";
 import { resizeImage } from "../../ui/resize-image";
+import { SearchableSelect } from "../../ui/searchable-select";
 import { Tooltip } from "../../ui/tooltip";
 import { contactLabel } from "./contact-labels";
 
@@ -399,7 +400,25 @@ export function ProfileForm({
             return (
               <div key={row.key} className="flex flex-col gap-1">
                 {!core && (
-                  <div className="flex justify-end gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="min-w-0 flex-1">
+                      <SearchableSelect
+                        label={t`Prompt ${prompts.filter((r) => !CORE_PROMPTS.includes(r.prompt)).indexOf(row) + 1}`}
+                        value={row.prompt}
+                        onChange={(prompt) => {
+                          if (prompt !== row.prompt)
+                            change({ prompt, answer: "" });
+                        }}
+                        options={[
+                          row.prompt,
+                          ...PROMPT_POOL.filter(
+                            (p) =>
+                              p !== row.prompt &&
+                              !prompts.some((r) => r.prompt === p)
+                          ),
+                        ].map((p) => ({ value: p, label: p }))}
+                      />
+                    </div>
                     <Tooltip content={t`Suggest a different prompt`}>
                       <button
                         type="button"
@@ -428,6 +447,7 @@ export function ProfileForm({
                 )}
                 <GrowingTextField
                   label={row.prompt}
+                  hideLabel={!core}
                   name={`prompts.${i}.answer`}
                   value={row.answer}
                   onChange={(answer) => change({ answer })}
