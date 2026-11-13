@@ -63,6 +63,10 @@ msgstr ""
 msgid "(skipped)"
 msgstr ""
 
+#: src/features/sessions/session-form.tsx:524
+msgid "[none]"
+msgstr ""
+
 #. placeholder {0}: rows.length
 #: src/features/people/directory-screen.tsx:209
 msgid "{0, plural, one {# attendee} other {# attendees}}"
@@ -166,6 +170,14 @@ msgstr ""
 msgid "{eventName} Quick Voting"
 msgstr ""
 
+#: src/features/sessions/session-form.tsx:496
+msgid "{eventName}: Add a session"
+msgstr ""
+
+#: src/features/sessions/session-form.tsx:495
+msgid "{eventName}: Edit session"
+msgstr ""
+
 #: src/features/proposals/proposals-screen.tsx:97
 msgid "{eventName}: Session Proposals"
 msgstr ""
@@ -248,6 +260,10 @@ msgstr ""
 msgid "{n, plural, one {Votes per voter, # voter} other {Votes per voter, # voters}}"
 msgstr ""
 
+#: src/features/sessions/session-form.tsx:595
+msgid "{name} (max {max})"
+msgstr ""
+
 #: src/features/meetings/book-meeting.tsx:274
 msgid "{name} is already booked during this time."
 msgstr ""
@@ -304,6 +320,10 @@ msgstr ""
 
 #: src/features/admin/event-sessions.tsx:559
 msgid "{rsvpCount, plural, one {# RSVP} other {# RSVPs}}"
+msgstr ""
+
+#: src/features/sessions/session-form.tsx:804
+msgid "{rsvps, plural, one {# person RSVP'd to this session. They will be told about the change.} other {# people RSVP'd to this session. They will be told about the change.}}"
 msgstr ""
 
 #: src/ui/data-table.tsx:53
@@ -1140,6 +1160,8 @@ msgstr ""
 #: src/features/notifications/notifications-screen.tsx:232
 #: src/features/proposals/proposal-form.tsx:345
 #: src/features/proposals/proposal-form.tsx:358
+#: src/features/sessions/session-form.tsx:790
+#: src/features/sessions/session-form.tsx:817
 #: src/features/sign-in/account-security.tsx:274
 msgid "Cancel"
 msgstr ""
@@ -1177,6 +1199,10 @@ msgstr ""
 msgid "Change profile picture"
 msgstr ""
 
+#: src/features/sessions/session-form.tsx:803
+msgid "Change this session's time or room?"
+msgstr ""
+
 #: src/features/proposals/proposal-form.tsx:221
 msgid "Changes here do not reach the schedule. To change a session, open it and edit it there."
 msgstr ""
@@ -1193,6 +1219,10 @@ msgstr ""
 
 #: src/commands/failure-message.ts:73
 msgid "Check that it went through, then try again."
+msgstr ""
+
+#: src/features/sessions/session-form.tsx:559
+msgid "Check this if attendees can at most arrive 5 minutes late. If they arrive later they may not join and should not knock or otherwise disrupt the session."
 msgstr ""
 
 #: src/features/sign-in/account-security.tsx:126
@@ -1315,6 +1345,10 @@ msgstr ""
 #: src/features/admin/event-sessions.tsx:251
 msgctxt "Session flag"
 msgid "Closed"
+msgstr ""
+
+#: src/features/sessions/session-form.tsx:557
+msgid "Closed session"
 msgstr ""
 
 #: src/features/schedule/session-panel.tsx:199
@@ -1812,6 +1846,7 @@ msgstr ""
 #: src/features/admin/stats-charts.tsx:322
 #: src/features/admin/stats-charts.tsx:401
 #: src/features/admin/stats-figures.tsx:132
+#: src/features/sessions/session-form.tsx:629
 msgid "Day"
 msgstr ""
 
@@ -1858,6 +1893,8 @@ msgstr ""
 #: src/features/notifications/notifications-screen.tsx:230
 #: src/features/proposals/proposal-form.tsx:337
 #: src/features/proposals/proposal-form.tsx:357
+#: src/features/sessions/session-form.tsx:782
+#: src/features/sessions/session-form.tsx:816
 msgid "Delete"
 msgstr ""
 
@@ -1899,6 +1936,10 @@ msgstr ""
 
 #: src/features/proposals/proposal-form.tsx:355
 msgid "Delete session proposal?"
+msgstr ""
+
+#: src/features/sessions/session-form.tsx:814
+msgid "Delete session?"
 msgstr ""
 
 #: src/features/comments/comments-section.tsx:394
@@ -1948,6 +1989,7 @@ msgstr ""
 #: src/features/proposals/proposal-form.tsx:245
 #: src/features/proposals/proposals-screen.tsx:419
 #: src/features/schedule/session-panel.tsx:361
+#: src/features/sessions/session-form.tsx:550
 msgid "Description"
 msgstr ""
 
@@ -2025,6 +2067,7 @@ msgstr ""
 
 #: src/features/proposals/proposal-form.tsx:293
 #: src/features/proposals/proposals-screen.tsx:422
+#: src/features/sessions/session-form.tsx:694
 msgid "Duration"
 msgstr ""
 
@@ -2335,6 +2378,10 @@ msgstr ""
 msgid "Fill in a whole day"
 msgstr ""
 
+#: src/features/sessions/session-form.tsx:500
+msgid "Fill out this form to add a session to the schedule!"
+msgstr ""
+
 #: src/features/admin/event-stats.tsx:97
 msgid "Filter"
 msgstr ""
@@ -2593,6 +2640,7 @@ msgstr ""
 #: src/features/admin/event-proposals.tsx:132
 #: src/features/admin/event-sessions.tsx:267
 #: src/features/admin/stats-figures.tsx:87
+#: src/features/sessions/session-form.tsx:564
 msgid "Hosts"
 msgstr ""
 
@@ -2941,6 +2989,7 @@ msgstr ""
 #. Chart axis: one row per location
 #: src/features/admin/stats-charts.tsx:368
 #: src/features/admin/stats-figures.tsx:168
+#: src/features/sessions/session-form.tsx:574
 msgid "Location"
 msgstr ""
 
@@ -3051,6 +3100,10 @@ msgstr ""
 #: src/features/admin/locations-screen.tsx:366
 msgctxt "Location details: seats, lowercase in a list"
 msgid "max {capacity}"
+msgstr ""
+
+#: src/features/sessions/session-form.tsx:602
+msgid "Max attendees"
 msgstr ""
 
 #: src/commands/failure-message.ts:4
@@ -3868,6 +3921,7 @@ msgstr ""
 
 #. Chart axis: one bar per proposal
 #: src/features/admin/stats-charts.tsx:273
+#: src/features/sessions/session-form.tsx:517
 msgid "Proposal"
 msgstr ""
 
@@ -4209,6 +4263,11 @@ msgstr ""
 msgid "Say why, if you like (optional)"
 msgstr ""
 
+#: src/features/sessions/session-form.tsx:115
+#: src/features/sessions/session-form.tsx:490
+msgid "Schedule"
+msgstr ""
+
 #. Button: put this proposal on the schedule
 #. Button: put this proposal on the schedule
 #: src/features/proposals/proposal-panel.tsx:205
@@ -4331,6 +4390,14 @@ msgstr ""
 msgid "Select {text}"
 msgstr ""
 
+#: src/features/sessions/session-form.tsx:581
+msgid "Select a location"
+msgstr ""
+
+#: src/features/sessions/session-form.tsx:683
+msgid "Select a start time"
+msgstr ""
+
 #: src/features/proposals/list-model.ts:244
 #: src/features/proposals/list-model.ts:253
 #: src/features/proposals/proposal-panel.tsx:178
@@ -4404,11 +4471,16 @@ msgid "Session host"
 msgstr ""
 
 #: src/features/schedule/session-panel.tsx:66
+#: src/features/sessions/session-form.tsx:100
 msgid "Session not found."
 msgstr ""
 
 #: src/features/admin/event-stats.tsx:135
 msgid "Session origins"
+msgstr ""
+
+#: src/features/sessions/session-form.tsx:542
+msgid "Session title"
 msgstr ""
 
 #. Chart axis: number of sessions
@@ -4693,6 +4765,11 @@ msgstr ""
 msgid "Start is required"
 msgstr ""
 
+#: src/features/sessions/session-form.tsx:660
+#: src/features/sessions/session-form.tsx:674
+msgid "Start Time"
+msgstr ""
+
 #. placeholder {0}: when(start)
 #: src/ui/phase-bar.tsx:73
 msgid "Started {0}."
@@ -4705,6 +4782,10 @@ msgstr ""
 
 #: src/features/admin/event-sessions.tsx:227
 msgid "Starts at {startTime}"
+msgstr ""
+
+#: src/features/sessions/session-form.tsx:605
+msgid "Starts at what the room holds. 0 means no limit."
 msgstr ""
 
 #: src/app/admin-frame.tsx:43
@@ -4737,10 +4818,16 @@ msgid "Stone"
 msgstr ""
 
 #: src/features/proposals/proposal-form.tsx:348
+#: src/features/sessions/session-form.tsx:796
 msgid "Submit"
 msgstr ""
 
+#: src/features/sessions/session-form.tsx:535
+msgid "Submitting adds another session. To change a scheduled one, open it and edit it there."
+msgstr ""
+
 #: src/features/proposals/proposal-form.tsx:348
+#: src/features/sessions/session-form.tsx:796
 msgid "Submitting..."
 msgstr ""
 
@@ -4792,6 +4879,10 @@ msgstr ""
 
 #: src/commands/failure-message.ts:47
 msgid "That day is no longer part of this event."
+msgstr ""
+
+#: src/features/sessions/session-form.tsx:612
+msgid "That is more than {roomName} holds ({roomCapacity})."
 msgstr ""
 
 #: src/commands/failure-message.ts:44
@@ -4968,6 +5059,7 @@ msgid "This can only be changed during the voting phase."
 msgstr ""
 
 #: src/features/proposals/proposal-form.tsx:356
+#: src/features/sessions/session-form.tsx:815
 msgid "This cannot be undone."
 msgstr ""
 
@@ -4981,6 +5073,10 @@ msgstr ""
 
 #: src/app/event-page.tsx:203
 msgid "This event has been deleted."
+msgstr ""
+
+#: src/features/sessions/session-form.tsx:102
+msgid "This event has no days to schedule a session on yet."
 msgstr ""
 
 #: src/features/schedule/day-grid.tsx:80
@@ -5079,6 +5175,10 @@ msgstr ""
 msgid "This session clashes with {list}. Do you want to RSVP anyway?"
 msgstr ""
 
+#: src/features/sessions/session-form.tsx:620
+msgid "This session has already started, so it can no longer be moved to another time — but you can still change everything else, including how long it runs."
+msgstr ""
+
 #: src/commands/failure-message.ts:50
 msgid "This session has already started, so it can no longer be moved."
 msgstr ""
@@ -5092,6 +5192,7 @@ msgid "This session no longer exists."
 msgstr ""
 
 #: src/features/schedule/session-panel.tsx:369
+#: src/features/sessions/session-form.tsx:741
 msgid "This session was scheduled from a proposal. See it <0>here</0>."
 msgstr ""
 
@@ -5105,6 +5206,10 @@ msgstr ""
 
 #: src/app/footer.tsx:132
 msgid "This site runs {currentVersion}."
+msgstr ""
+
+#: src/features/sessions/session-form.tsx:727
+msgid "This slot is during {momentTitle} ({momentStart} – {momentEnd})"
 msgstr ""
 
 #: src/features/sign-in/guest-login-form.tsx:71
@@ -5456,6 +5561,10 @@ msgstr ""
 msgid "waiting for reply"
 msgstr ""
 
+#: src/features/sessions/session-form.tsx:756
+msgid "Warning: schedule clash"
+msgstr ""
+
 #: src/features/admin/event-config.tsx:159
 #: src/features/admin/events-screen.tsx:106
 #: src/features/people/contact-labels.ts:12
@@ -5612,6 +5721,10 @@ msgstr ""
 msgid "You already host this proposal."
 msgstr ""
 
+#: src/features/sessions/session-form.tsx:567
+msgid "You and any cohosts who have agreed to host this session with you. Your cohosts will get an email confirmation when this form is submitted."
+msgstr ""
+
 #: src/features/schedule/day-agenda.tsx:318
 #: src/features/schedule/session-block.tsx:333
 #: src/features/schedule/session-panel.tsx:244
@@ -5624,6 +5737,10 @@ msgstr ""
 
 #: src/commands/failure-message.ts:20
 msgid "You are not part of this event."
+msgstr ""
+
+#: src/features/sessions/session-form.tsx:733
+msgid "You can still schedule here; just expect a smaller group."
 msgstr ""
 
 #: src/commands/failure-message.ts:58
@@ -5783,6 +5900,26 @@ msgstr ""
 
 #: src/commands/vote.ts:110
 msgid "Your request to withdraw your vote on the proposal might not have been saved."
+msgstr ""
+
+#: src/features/sessions/session-form.tsx:444
+msgid "Your session “{title}” has been added successfully!"
+msgstr ""
+
+#: src/features/sessions/session-form.tsx:464
+msgid "Your session “{title}” has been deleted successfully."
+msgstr ""
+
+#: src/features/sessions/session-form.tsx:443
+msgid "Your session “{title}” has been updated successfully!"
+msgstr ""
+
+#: src/features/sessions/session-form.tsx:718
+msgid "Your session runs {start} – {end}."
+msgstr ""
+
+#: src/features/sessions/session-form.tsx:502
+msgid "Your session will be added to the schedule immediately, but we may reach out to you about rescheduling, relocating, or cancelling."
 msgstr ""
 
 #: src/features/proposals/proposals-screen.tsx:430

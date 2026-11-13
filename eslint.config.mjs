@@ -73,6 +73,7 @@ export default tseslint.config(
       "apps/web/src/app/profile-walk.tsx",
       "apps/web/src/app/unread-count.tsx",
       "apps/web/src/app/theme.tsx",
+      "apps/web/src/features/sessions/session-form.tsx",
       "apps/web/src/app/time-format.tsx",
       "apps/web/src/app/people-pages.tsx",
       "apps/web/src/features/people/*.tsx",

@@ -1,3 +1,5 @@
+import { plural, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import {
   sessionCreateSchema,
   sessionUpdateSchema,
@@ -57,19 +59,6 @@ import {
 } from "./session-model";
 import { useHostClashes } from "./use-host-clashes";
 
-const FIELD_NAMES = [
-  "title",
-  "description",
-  "closed",
-  "hostIds",
-  "locationId",
-  "locationIds",
-  "capacity",
-  "dayId",
-  "startTime",
-  "durationMinutes",
-];
-
 const CONFIRMATION_MS = 10_000;
 
 export type SessionFormLinks = {
@@ -108,9 +97,9 @@ export function SessionForm(props: SessionFormProps) {
     : undefined;
 
   const refusal = (() => {
-    if (sessionId && !session) return "Session not found.";
+    if (sessionId && !session) return t`Session not found.`;
     if (snapshot.days.length === 0)
-      return "This event has no days to schedule a session on yet.";
+      return t`This event has no days to schedule a session on yet.`;
     if (!viewer)
       return actingGuestRefusal(
         "guest.unselected",
@@ -122,7 +111,9 @@ export function SessionForm(props: SessionFormProps) {
   if (refusal || !viewer)
     return (
       <div className="mx-auto max-w-2xl px-4">
-        <BackLink href={links.schedule}>Schedule</BackLink>
+        <BackLink href={links.schedule}>
+          <Trans>Schedule</Trans>
+        </BackLink>
         <div className="mt-6">{refusal}</div>
       </div>
     );
@@ -143,6 +134,7 @@ function Fields({
   session: Snapshot["sessions"][number] | undefined;
 }) {
   const { event } = snapshot;
+  const eventName = event.name;
   const { timezone, breakMinutes, slotIncrementMinutes } = event;
   const timeFormat = useTimeFormat();
   const maxSessionDuration = event.maxSessionDuration;
@@ -309,7 +301,7 @@ function Fields({
 
   const [confirming, setConfirming] = useState(false);
   const [confirmingMove, setConfirmingMove] = useState(false);
-  const [last, setLast] = useState<"save" | "remove">("save");
+  const [removing, setRemoving] = useState(false);
   const [checkingFields, setChecking] = useState(false);
 
   const applyProposal = (next: typeof proposal) => {
@@ -367,7 +359,18 @@ function Fields({
       session
         ? actions.update(session.id, body.current as SessionUpdateBody, key)
         : actions.create(body.current as SessionCreateBody, key),
-    fieldNames: FIELD_NAMES,
+    fieldNames: [
+      "title",
+      "description",
+      "closed",
+      "hostIds",
+      "locationId",
+      "locationIds",
+      "capacity",
+      "dayId",
+      "startTime",
+      "durationMinutes",
+    ],
   });
   const remove = useFormMutation({
     call: (key) => actions.remove(session!.id, key),
@@ -398,9 +401,8 @@ function Fields({
   const clientErrors: FieldErrors = checkingFields ? (invalid ?? {}) : {};
   const hasClientErrors = Object.keys(clientErrors).length > 0;
   const fields = hasClientErrors ? clientErrors : save.fields;
-  const failure =
-    last === "remove" ? remove.error : hasClientErrors ? null : save.error;
-  const fixing = last !== "remove" && save.fixFields;
+  const failure = removing ? remove.error : hasClientErrors ? null : save.error;
+  const fixing = !removing && save.fixFields;
   const busy = save.pending || remove.pending;
 
   const complete =
@@ -412,10 +414,10 @@ function Fields({
     !!day &&
     !!effectiveDuration;
 
-  const confirmation = (what: string) =>
+  const confirmation = (message: string) =>
     notify({
       tone: "info",
-      message: `Your session “${title}” has been ${what}`,
+      message,
       autoDismissMs: CONFIRMATION_MS,
     });
 
@@ -432,11 +434,15 @@ function Fields({
 
   const saveNow = async () => {
     setConfirmingMove(false);
-    setLast("save");
+    setRemoving(false);
     body.current = next;
     const saved = await save.submit();
     if (saved?.ok) {
-      confirmation(editing ? "updated successfully!" : "added successfully!");
+      confirmation(
+        editing
+          ? t`Your session “${title}” has been updated successfully!`
+          : t`Your session “${title}” has been added successfully!`
+      );
       onDone(editing ? undefined : saved.data?.id);
     }
   };
@@ -445,7 +451,7 @@ function Fields({
     e.preventDefault();
     if (busy || !complete) return;
     setChecking(!!invalid);
-    setLast("save");
+    setRemoving(false);
     if (invalid) return;
     if (moves && rsvps > 0) return setConfirmingMove(true);
     await saveNow();
@@ -453,29 +459,50 @@ function Fields({
 
   const onDelete = async () => {
     setConfirming(false);
-    setLast("remove");
+    setRemoving(true);
     if ((await remove.submit())?.ok) {
-      confirmation("deleted successfully.");
+      confirmation(t`Your session “${title}” has been deleted successfully.`);
       onDone();
     }
   };
+
+  const roomName = room?.name;
+  const roomCapacity = room?.capacity;
+  const start =
+    (runsFrom && formatSlotLabel(runsFrom, day.start, timezone, timeFormat)) ??
+    "";
+  const end =
+    (interval &&
+      formatSlotLabel(interval.end, day.start, timezone, timeFormat)) ??
+    "";
+  const momentTitle = moment?.title ?? "";
+  const momentStart =
+    (moment && formatOptionalTime(moment.start, timezone, timeFormat)) ?? "";
+  const momentEnd =
+    (moment && formatOptionalTime(moment.end, timezone, timeFormat)) ?? "";
 
   const jump = (name: string) =>
     formRef.current?.querySelector<HTMLElement>(`[name="${name}"]`)?.focus();
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-4 px-4 pb-24">
-      <BackLink href={links.schedule}>Schedule</BackLink>
+      <BackLink href={links.schedule}>
+        <Trans>Schedule</Trans>
+      </BackLink>
       <div>
         <h2 className="text-2xl font-bold">
-          {event.name}: {editing ? "Edit" : "Add a"} session
+          {editing
+            ? t`${eventName}: Edit session`
+            : t`${eventName}: Add a session`}
         </h2>
         <p className="mt-2 text-sm text-fg-subtle">
-          {editing
-            ? ""
-            : "Fill out this form to add a session to the schedule! "}
-          Your session will be added to the schedule immediately, but we may
-          reach out to you about rescheduling, relocating, or cancelling.
+          {!editing && (
+            <Trans>Fill out this form to add a session to the schedule!</Trans>
+          )}{" "}
+          <Trans>
+            Your session will be added to the schedule immediately, but we may
+            reach out to you about rescheduling, relocating, or cancelling.
+          </Trans>
         </p>
       </div>
 
@@ -487,14 +514,14 @@ function Fields({
       >
         {proposals.length > 0 && !editing && (
           <SelectField
-            label="Proposal"
+            label={t`Proposal`}
             name="proposalId"
             value={proposal?.id ?? ""}
             onChange={(id) =>
               applyProposal(proposals.find((p) => p.id === id) ?? null)
             }
             options={[
-              { value: "", label: "[none]" },
+              { value: "", label: t`[none]` },
               ...proposals.map((p) => ({ value: p.id, label: p.title })),
             ]}
           />
@@ -505,12 +532,14 @@ function Fields({
             snapshot={snapshot}
             links={links}
           >
-            Submitting adds another session. To change a scheduled one, open it
-            and edit it there.
+            <Trans>
+              Submitting adds another session. To change a scheduled one, open
+              it and edit it there.
+            </Trans>
           </ScheduledSessionsNotice>
         )}
         <TextField
-          label="Session title"
+          label={t`Session title`}
           name="title"
           required
           value={title}
@@ -518,38 +547,38 @@ function Fields({
           error={fields.title}
         />
         <MarkdownField
-          label="Description"
+          label={t`Description`}
           name="description"
           value={description}
           onChange={setDescription}
           error={fields.description}
         />
         <CheckboxField
-          label="Closed session"
+          label={t`Closed session`}
           name="closed"
-          hint="Check this if attendees can at most arrive 5 minutes late. If they arrive later they may not join and should not knock or otherwise disrupt the session."
+          hint={t`Check this if attendees can at most arrive 5 minutes late. If they arrive later they may not join and should not knock or otherwise disrupt the session.`}
           checked={closed}
           onChange={setClosed}
         />
         <PeopleField
-          label="Hosts"
+          label={t`Hosts`}
           name="hostIds"
           required
-          hint="You and any cohosts who have agreed to host this session with you. Your cohosts will get an email confirmation when this form is submitted."
+          hint={t`You and any cohosts who have agreed to host this session with you. Your cohosts will get an email confirmation when this form is submitted.`}
           people={people}
           selected={hostIds}
           error={fields.hostIds}
           onChange={setHostIds}
         />
         <SelectField
-          label="Location"
+          label={t`Location`}
           name="locationId"
           required
           value={locationId ?? ""}
           onChange={setLocationId}
           error={fields.locationId ?? fields.locationIds}
           options={[
-            { value: "", label: "Select a location" },
+            { value: "", label: t`Select a location` },
             ...(ownRooms.length > 1
               ? [
                   {
@@ -558,38 +587,47 @@ function Fields({
                   },
                 ]
               : []),
-            ...locations.map((l) => ({
-              value: l.id,
-              label: `${l.name} (max ${l.capacity})`,
-            })),
+            ...locations.map((l) => {
+              const name = l.name;
+              const max = l.capacity;
+              return {
+                value: l.id,
+                label: t`${name} (max ${max})`,
+              };
+            }),
           ]}
         />
         <div className="flex flex-col gap-1">
           <TextField
-            label="Max attendees"
+            label={t`Max attendees`}
             name="capacity"
             type="number"
-            hint="Starts at what the room holds. 0 means no limit."
+            hint={t`Starts at what the room holds. 0 means no limit.`}
             value={capacity}
             onChange={setCapacityInput}
             error={capacityValid ? fields.capacity : capacityError()}
           />
           {overRoomCapacity && room && (
             <p className="text-sm text-danger-fg">
-              That is more than {room.name} holds ({room.capacity}).
+              <Trans>
+                That is more than {roomName} holds ({roomCapacity}).
+              </Trans>
             </p>
           )}
         </div>
         {lockedStart !== null && (
           <p className="text-sm text-fg-subtle">
-            This session has already started, so it can no longer be moved to
-            another time — but you can still change everything else, including
-            how long it runs.
+            <Trans>
+              This session has already started, so it can no longer be moved to
+              another time — but you can still change everything else, including
+              how long it runs.
+            </Trans>
           </p>
         )}
         <fieldset className="flex flex-col gap-1">
           <legend className="mb-1 font-medium">
-            Day<span className="mx-1 text-brand-fg">*</span>
+            <Trans>Day</Trans>
+            <span className="mx-1 text-brand-fg">*</span>
           </legend>
           {lockedStart !== null ? (
             <p className="text-fg-muted">
@@ -619,7 +657,8 @@ function Fields({
         {lockedStart !== null ? (
           <div className="flex flex-col gap-1">
             <p className="font-medium">
-              Start Time<span className="mx-1 text-brand-fg">*</span>
+              <Trans>Start Time</Trans>
+              <span className="mx-1 text-brand-fg">*</span>
             </p>
             <p className="text-fg-muted">
               {formatSlotLabel(
@@ -632,7 +671,7 @@ function Fields({
           </div>
         ) : (
           <SelectField
-            label="Start Time"
+            label={t`Start Time`}
             name="startTime"
             required
             value={
@@ -641,7 +680,7 @@ function Fields({
             onChange={(v) => setStartTime(v ? parseInt(v, 10) : undefined)}
             error={fields.startTime}
             options={[
-              { value: "", label: "Select a start time" },
+              { value: "", label: t`Select a start time` },
               ...startTimes.map((st) => ({
                 value: String(st.time),
                 label: st.label,
@@ -652,7 +691,8 @@ function Fields({
         )}
         <fieldset className="flex flex-col gap-1">
           <legend className="mb-1 font-medium">
-            Duration<span className="mx-1 text-brand-fg">*</span>
+            <Trans>Duration</Trans>
+            <span className="mx-1 text-brand-fg">*</span>
           </legend>
           <div className="grid gap-3">
             {durationChoices.map((value) => (
@@ -675,9 +715,7 @@ function Fields({
         </fieldset>
         {runsFrom && interval && (
           <p className="text-sm text-fg-muted">
-            Your session runs{" "}
-            {formatSlotLabel(runsFrom, day.start, timezone, timeFormat)} –{" "}
-            {formatSlotLabel(interval.end, day.start, timezone, timeFormat)}.
+            {t`Your session runs ${start} – ${end}.`}
           </p>
         )}
         {moment && (
@@ -686,33 +724,37 @@ function Fields({
             className="rounded-md border border-warning bg-warning-tint px-4 py-3 text-warning-fg"
           >
             <p className="text-sm font-medium">
-              This slot is during {moment.title} (
-              {formatOptionalTime(moment.start, timezone, timeFormat)} –{" "}
-              {formatOptionalTime(moment.end, timezone, timeFormat)})
+              {t`This slot is during ${momentTitle} (${momentStart} – ${momentEnd})`}
             </p>
             {moment.description && (
               <p className="text-sm">{moment.description}</p>
             )}
             <p className="text-sm">
-              You can still schedule here; just expect a smaller group.
+              <Trans>
+                You can still schedule here; just expect a smaller group.
+              </Trans>
             </p>
           </div>
         )}
         {session?.proposalId && (
           <p className="text-sm text-fg-muted">
-            This session was scheduled from a proposal. See it{" "}
-            <a
-              href={links.proposal(session.proposalId)}
-              className="text-brand-fg underline"
-            >
-              here
-            </a>
-            .
+            <Trans>
+              This session was scheduled from a proposal. See it{" "}
+              <a
+                href={links.proposal(session.proposalId)}
+                className="text-brand-fg underline"
+              >
+                here
+              </a>
+              .
+            </Trans>
           </p>
         )}
         {clashes.length > 0 && (
           <div className="rounded-md border border-danger-border bg-danger-tint px-4 py-3 text-danger-fg">
-            <p className="text-sm font-medium">Warning: schedule clash</p>
+            <p className="text-sm font-medium">
+              <Trans>Warning: schedule clash</Trans>
+            </p>
             {clashes.map((clash) => {
               const line = hostClashLine(clash, timezone, timeFormat);
               return (
@@ -737,7 +779,7 @@ function Fields({
               disabled={busy}
               onClick={() => setConfirming(true)}
             >
-              Delete
+              <Trans>Delete</Trans>
             </Button>
           )}
           <div className="ml-auto flex gap-3">
@@ -745,30 +787,34 @@ function Fields({
               href={links.schedule}
               className="rounded px-6 py-2 font-semibold text-fg-muted bg-surface-muted hover:bg-surface-hover"
             >
-              Cancel
+              <Trans>Cancel</Trans>
             </a>
             <Button
               type="submit"
               disabled={!complete || checkingClashes || busy}
             >
-              {save.pending ? "Submitting..." : "Submit"}
+              {save.pending ? t`Submitting...` : t`Submit`}
             </Button>
           </div>
         </div>
       </form>
       <ConfirmDialog
         open={confirmingMove}
-        title="Change this session's time or room?"
-        message={`${rsvps === 1 ? "1 person" : `${rsvps} people`} RSVP'd to this session. They will be told about the change.`}
+        title={t`Change this session's time or room?`}
+        message={plural(rsvps, {
+          one: "# person RSVP'd to this session. They will be told about the change.",
+          other:
+            "# people RSVP'd to this session. They will be told about the change.",
+        })}
         onConfirm={() => void saveNow()}
         onCancel={() => setConfirmingMove(false)}
       />
       <ConfirmDialog
         open={confirming}
-        title="Delete session?"
-        message="This cannot be undone."
-        confirmLabel="Delete"
-        cancelLabel="Cancel"
+        title={t`Delete session?`}
+        message={t`This cannot be undone.`}
+        confirmLabel={t`Delete`}
+        cancelLabel={t`Cancel`}
         onConfirm={() => void onDelete()}
         onCancel={() => setConfirming(false)}
       />
