@@ -57,10 +57,10 @@ const readyWith = (forms: ReturnType<typeof form>[]): SettingsState => ({
 });
 
 describe("the settings page", { tags: ["013-US5"] }, () => {
-  it("has no language setting while the app has one language", () => {
+  it("has a language setting", () => {
     show(readyWith([]));
 
-    expect(screen.queryByRole("combobox", { name: "Language" })).toBeNull();
+    expect(screen.getByRole("combobox", { name: "Language" })).toBeTruthy();
   });
 
   it("has the email settings, this device, one panel per event and the theme", () => {

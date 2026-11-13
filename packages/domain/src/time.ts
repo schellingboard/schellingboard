@@ -64,23 +64,6 @@ export function formatSlotLabel(
   return dt.hasSame(start, "day") ? time : `${dt.toFormat("EEE")} ${time}`;
 }
 
-/**
- * Format duration minutes into a string (e.g., "25m", "1h 20m", "2 hours 50 minutes")
- */
-export function formatDuration(
-  minutes: number,
-  longFormat: boolean = false
-): string {
-  const minuteString = longFormat ? " minutes" : "m";
-  if (minutes < 60) return `${minutes}${minuteString}`;
-  const hours = Math.floor(minutes / 60);
-  const hourString = longFormat ? (hours === 1 ? " hour" : " hours") : "h";
-  const remainingMinutes = minutes % 60;
-  return remainingMinutes > 0
-    ? `${hours}${hourString} ${remainingMinutes}${minuteString}`
-    : `${hours}${hourString}`;
-}
-
 /** Stands in for a session time the type allows to be absent. */
 const TIME_PLACEHOLDER = "—";
 

@@ -44,6 +44,7 @@ import { resizeImage } from "../../ui/resize-image";
 import { SearchableSelect } from "../../ui/searchable-select";
 import { Tooltip } from "../../ui/tooltip";
 import { contactLabel } from "./contact-labels";
+import { promptLabel } from "./prompt-text";
 
 export type ProfileDraft = Pick<
   DirectoryEntry,
@@ -426,7 +427,7 @@ export function ProfileForm({
                               p !== row.prompt &&
                               !prompts.some((r) => r.prompt === p)
                           ),
-                        ].map((p) => ({ value: p, label: p }))}
+                        ].map((p) => ({ value: p, label: promptLabel(p) }))}
                       />
                     </div>
                     <Tooltip content={t`Suggest a different prompt`}>
@@ -456,7 +457,7 @@ export function ProfileForm({
                   </div>
                 )}
                 <GrowingTextField
-                  label={row.prompt}
+                  label={promptLabel(row.prompt)}
                   hideLabel={!core}
                   name={`prompts.${i}.answer`}
                   value={row.answer}

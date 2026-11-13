@@ -25,6 +25,7 @@ test("the schedule opens without a connection and says it may be out of date @01
   await expect(page.getByText("Live", { exact: true })).toBeVisible();
   // The app saves the schedule a second after it shows; the attendee reads
   // it for a while, and nothing on the page says when the saving is done.
+  // The cache write has no later signal; give the worker a moment to settle.
   await page.waitForTimeout(2000);
 
   await context.setOffline(true);
@@ -104,4 +105,35 @@ test("a chunk the app loaded later stays cached when the app is reloaded @014-US
   await page.waitForTimeout(2000);
 
   expect(await cachedAssets()).toEqual(expect.arrayContaining(before));
+});
+
+test("a language the attendee has not used yet still opens offline @022-US1", async ({
+  page,
+  context,
+}) => {
+  await login(page);
+  await page.goto("/Conference-Gamma");
+  await expect(
+    page.getByRole("link", { name: /Opening Keynote/ })
+  ).toBeVisible();
+  await page.evaluate(() => navigator.serviceWorker.ready);
+  await expect
+    .poll(() =>
+      page.evaluate(async () =>
+        (await (await caches.open("sb-spa-v1")).keys()).some((request) =>
+          request.url.includes("/_spa/assets/messages-")
+        )
+      )
+    )
+    .toBe(true);
+  await page.waitForTimeout(2000);
+
+  // The language was chosen on another device; this one never loaded it.
+  await page.evaluate(() => localStorage.setItem("sb-locale", "de"));
+  await context.setOffline(true);
+  await page.reload();
+
+  await expect(
+    page.getByText("Wird nicht aktualisiert: möglicherweise veraltet")
+  ).toBeVisible();
 });

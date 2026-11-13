@@ -24,6 +24,7 @@ import { contactLabel } from "./contact-labels";
 import type { ProfileLinks } from "./links";
 import { OpenUpNudge } from "./open-up-nudge";
 import { ProfilePhoto } from "./profile-photo";
+import { promptLabel } from "./prompt-text";
 
 const LINK = "text-brand-fg hover:text-brand-fg-hover hover:underline";
 const SECONDARY =
@@ -186,7 +187,9 @@ export function ProfileBody({
 
         {orderPrompts(guest.prompts ?? []).map(({ prompt, answer }) => (
           <section key={prompt}>
-            <h2 className="text-lg font-semibold mb-2">{prompt}</h2>
+            <h2 className="text-lg font-semibold mb-2">
+              {promptLabel(prompt)}
+            </h2>
             <div className="text-fg">
               <Markdown className="text-base">{answer}</Markdown>
             </div>

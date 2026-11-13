@@ -1,7 +1,6 @@
 import { dateOnDay, type Day } from "@schellingboard/domain/event";
 import { durationMinusBreak } from "@schellingboard/domain/slots";
 import {
-  formatDuration,
   formatOptionalTime,
   formatSlotLabel,
   getPercentThroughDay,
@@ -22,27 +21,6 @@ describe("durationMinusBreak", () => {
   it("0 break → unchanged", () => expect(durationMinusBreak(60, 0)).toBe(60));
   it("clamps to 0 when break ≥ duration", () =>
     expect(durationMinusBreak(10, 10)).toBe(0));
-});
-
-// ── formatDuration ───────────────────────────────────────────────────────────
-
-describe("formatDuration", () => {
-  it("45 short format → '45m'", () => expect(formatDuration(45)).toBe("45m"));
-  it("45 long format → '45 minutes'", () =>
-    expect(formatDuration(45, true)).toBe("45 minutes"));
-
-  it("60 short format → '1h'", () => expect(formatDuration(60)).toBe("1h"));
-  it("60 long format → '1 hour'", () =>
-    expect(formatDuration(60, true)).toBe("1 hour"));
-
-  it("90 short format → '1h 30m'", () =>
-    expect(formatDuration(90)).toBe("1h 30m"));
-  it("90 long format → '1 hour 30 minutes'", () =>
-    expect(formatDuration(90, true)).toBe("1 hour 30 minutes"));
-
-  it("120 short format → '2h'", () => expect(formatDuration(120)).toBe("2h"));
-  it("120 long format → '2 hours'", () =>
-    expect(formatDuration(120, true)).toBe("2 hours"));
 });
 
 // ── eventNameToSlug ──────────────────────────────────────────────────────────

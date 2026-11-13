@@ -5664,7 +5664,7 @@
                 "properties": {
                   "locale": {
                     "type": ["string", "null"],
-                    "enum": ["en", null],
+                    "enum": ["en", "de", null],
                     "description": "A language of the app; null follows the browser"
                   }
                 },

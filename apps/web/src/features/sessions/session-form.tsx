@@ -18,7 +18,6 @@ import {
 } from "@schellingboard/domain/slots";
 import {
   convertParamDateTime,
-  formatDuration,
   formatOptionalTime,
   formatSlotLabel,
 } from "@schellingboard/domain/time";
@@ -34,6 +33,7 @@ import type {
   SessionUpdateBody,
 } from "../../commands/session-form";
 import { useFormMutation } from "../../commands/use-form-mutation";
+import { formatDuration } from "../../i18n/duration";
 import { useListFormat } from "../../i18n/format-locale";
 import { Button } from "../../ui/button";
 import { ConfirmDialog } from "../../ui/confirm-dialog";

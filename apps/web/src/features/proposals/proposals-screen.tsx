@@ -3,11 +3,11 @@ import { Trans } from "@lingui/react/macro";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { inSchedPhase, inVotingPhase } from "@schellingboard/domain/phase";
 import { durationMinusBreak } from "@schellingboard/domain/slots";
-import { formatDuration } from "@schellingboard/domain/time";
 import type { VoteChoice } from "@schellingboard/domain/vote";
 import { voteChoiceToEmoji } from "@schellingboard/domain/vote-display";
 import { type ComponentType, useMemo } from "react";
 
+import { formatDuration } from "../../i18n/duration";
 import { useListFormat } from "../../i18n/format-locale";
 import type { Standing } from "../../queries/proposal-standings";
 import { ownVotesFrom, toEvent } from "../../replica/selectors";

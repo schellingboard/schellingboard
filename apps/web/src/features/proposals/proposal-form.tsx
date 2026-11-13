@@ -10,7 +10,6 @@ import {
   durationMinusBreak,
   slotDurationOptions,
 } from "@schellingboard/domain/slots";
-import { formatDuration } from "@schellingboard/domain/time";
 import { type FormEvent, useMemo, useRef, useState } from "react";
 
 import { actingGuestRefusal } from "../../commands/acting-guest-message";
@@ -21,6 +20,7 @@ import type {
   ProposalUpdateBody,
 } from "../../commands/proposal-form";
 import { useFormMutation } from "../../commands/use-form-mutation";
+import { formatDuration } from "../../i18n/duration";
 import { Button } from "../../ui/button";
 import { ConfirmDialog } from "../../ui/confirm-dialog";
 import {

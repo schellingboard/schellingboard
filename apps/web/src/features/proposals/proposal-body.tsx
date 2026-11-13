@@ -1,8 +1,8 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { durationMinusBreak } from "@schellingboard/domain/slots";
-import { formatDuration } from "@schellingboard/domain/time";
 
+import { formatDuration } from "../../i18n/duration";
 import { Markdown } from "../../ui/markdown";
 import { PersonLink } from "../people/person-link";
 import type { ProposalLinks } from "./links";

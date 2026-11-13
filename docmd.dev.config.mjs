@@ -127,6 +127,16 @@ export default {
           icon: "monitor",
         },
         {
+          title: "Internationalisation",
+          path: "/i18n/",
+          icon: "languages",
+        },
+        {
+          title: "German glossary",
+          path: "/i18n-glossary-de/",
+          icon: "book-open",
+        },
+        {
           title: "Database migrations",
           path: "/migrations/",
           icon: "database",

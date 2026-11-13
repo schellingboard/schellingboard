@@ -20,8 +20,9 @@ translations. The web app also works offline, so a language must not need the ne
 4. **Catalogs are `.po` files**, `apps/web/locales/<locale>/messages.po`, committed. Translators can
    use any PO editor; a review reads as a diff. `en` is bundled with the app; other locales are lazy
    chunks.
-5. **Lazy locale chunks are cached by the service worker** like any asset the page loads. They stay
-   until the build changes, so a language the attendee used keeps working offline.
+5. **The service worker caches the locale chunks.** The shell names them, so the worker fetches them
+   ahead of use, and it keeps them until the build changes. A language works offline, also right
+   after an upgrade.
 
 ## Consequences
 

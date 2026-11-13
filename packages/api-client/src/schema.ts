@@ -3203,7 +3203,7 @@ export interface paths {
              * @description A language of the app; null follows the browser
              * @enum {string|null}
              */
-            locale: "en" | null;
+            locale: "en" | "de" | null;
           };
         };
       };

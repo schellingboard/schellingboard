@@ -23,7 +23,7 @@ function show(handler: Parameters<typeof fakeApi>[0]) {
       <I18nProvider>
         <LanguageSetting
           calls={settingsCalls(fake.api)}
-          locales={["en", "de-DE"]}
+          locales={["en", "fr"]}
         />
         <Stored />
       </I18nProvider>
@@ -38,19 +38,19 @@ describe("the language setting", { tags: ["022-US1"] }, () => {
 
     await userEvent.selectOptions(
       screen.getByRole("combobox", { name: "Language" }),
-      "de-DE"
+      "fr"
     );
 
-    await waitFor(() => expect(screen.getByText("stored de-DE")).toBeTruthy());
+    await waitFor(() => expect(screen.getByText("stored fr")).toBeTruthy());
     expect(calls[0]).toMatchObject({
       method: "PUT",
       path: "/api/v1/me/locale",
-      body: { locale: "de-DE" },
+      body: { locale: "fr" },
     });
   });
 
   it("goes back to the browser's language on Automatic", async () => {
-    localStorage.setItem("sb-locale", "de-DE");
+    localStorage.setItem("sb-locale", "fr");
     const { calls } = show(() => new Response(null, { status: 204 }));
 
     await userEvent.selectOptions(
@@ -67,7 +67,7 @@ describe("the language setting", { tags: ["022-US1"] }, () => {
 
     await userEvent.selectOptions(
       screen.getByRole("combobox", { name: "Language" }),
-      "de-DE"
+      "fr"
     );
 
     expect(await screen.findByRole("alert")).toBeTruthy();

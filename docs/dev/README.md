@@ -27,6 +27,7 @@ the repository.
 | [The server and the API](server.md)                 | `server/` and `/api/v1`: adding a use case and its route                   |
 | [The web app](web-app.md)                           | `apps/web`: the SPA, how the server serves it, running it                  |
 | [Internationalisation](i18n.md)                     | Lingui, adding strings, the catalog and lint guardrails, the pseudo-locale |
+| [German glossary](i18n-glossary-de.md)              | the terms of the German catalog, for translators and reviewers             |
 | [Database migrations](migrations.md)                | generating migrations, resolving drizzle conflicts                         |
 | [Running multiple instances](multiple-instances.md) | ports and env files when several clones share a machine                    |
 | [Documentation and the sites](documentation.md)     | how the three published sites are built                                    |
