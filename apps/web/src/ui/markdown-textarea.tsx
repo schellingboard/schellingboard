@@ -84,7 +84,7 @@ export function MarkdownTextarea({
 
   return (
     <div className="flex flex-col rounded-md border border-line shadow-sm focus-within:border-brand-accent focus-within:ring-2 focus-within:ring-brand-accent">
-      <div className="flex items-center rounded-t-md border-b border-line bg-surface-muted">
+      <div className="flex flex-wrap items-center rounded-t-md border-b border-line bg-surface-muted">
         <button
           type="button"
           className={`${TAB} ${previewing ? "" : "bg-surface-hover"}`}
@@ -99,12 +99,12 @@ export function MarkdownTextarea({
         >
           <Trans>Preview</Trans>
         </button>
-        <span className="flex flex-1 justify-end overflow-hidden">
+        <span className="flex flex-1 justify-end">
           {markdownOptions.map((option) => (
             <Tooltip
               key={option.id}
               content={option.label}
-              className="m-1 h-fit"
+              className="m-1 h-fit shrink-0"
             >
               <button
                 type="button"

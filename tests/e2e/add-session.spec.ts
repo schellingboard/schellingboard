@@ -1,5 +1,6 @@
 import { login } from "./helpers/auth";
 import { expect, test } from "./helpers/fixtures";
+import { selectOption } from "./helpers/session-form";
 import { toast } from "./helpers/toast";
 import { uniqueSuffix } from "./helpers/unique";
 import { selectUser } from "./helpers/user";
@@ -76,4 +77,24 @@ test("the session form asks before discarding, and opens again from its address 
   await form.getByRole("button", { name: "Close" }).click();
   await expect(form).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
+});
+
+test("the session form warns when a host is busy at the chosen time @008-US1", async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto("/Conference-Gamma");
+  await selectUser(page, /Charlie Test/i);
+  await page.getByRole("link", { name: "Add session" }).first().click();
+  const form = page.getByRole("dialog", { name: "Session form" });
+  await expect(form).toBeVisible();
+
+  // Charlie hosts the Opening Keynote in the Main Hall on the first day.
+  await selectOption(page, /^Location/, /Workshop Room/);
+  await selectOption(page, /^Start Time/, "09:40");
+
+  await expect(form.getByText("Warning: schedule clash")).toBeVisible();
+  await expect(
+    form.getByText(/Charlie Test is hosting Opening Keynote/)
+  ).toBeVisible();
 });
