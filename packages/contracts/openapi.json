@@ -9970,6 +9970,439 @@
         "security": [{ "guestAuth": [] }]
       }
     },
+    "/api/v1/admin/events/{id}/labels": {
+      "get": {
+        "tags": ["admin"],
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The event's labels, in order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 40
+                      },
+                      "description": {
+                        "type": "string",
+                        "maxLength": 200,
+                        "default": ""
+                      },
+                      "color": {
+                        "type": "string",
+                        "enum": [
+                          "slate",
+                          "red",
+                          "orange",
+                          "amber",
+                          "green",
+                          "teal",
+                          "blue",
+                          "violet"
+                        ]
+                      },
+                      "id": { "type": "string" },
+                      "eventId": { "type": "string" },
+                      "guestIds": {
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "description": "Guests of the event wearing it"
+                      }
+                    },
+                    "required": ["name", "color", "id", "eventId", "guestIds"]
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "guestAuth": [] }]
+      },
+      "post": {
+        "tags": ["admin"],
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "minLength": 1, "maxLength": 40 },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 200,
+                    "default": ""
+                  },
+                  "color": {
+                    "type": "string",
+                    "enum": [
+                      "slate",
+                      "red",
+                      "orange",
+                      "amber",
+                      "green",
+                      "teal",
+                      "blue",
+                      "violet"
+                    ]
+                  }
+                },
+                "required": ["name", "color"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The new label",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 40
+                    },
+                    "description": {
+                      "type": "string",
+                      "maxLength": 200,
+                      "default": ""
+                    },
+                    "color": {
+                      "type": "string",
+                      "enum": [
+                        "slate",
+                        "red",
+                        "orange",
+                        "amber",
+                        "green",
+                        "teal",
+                        "blue",
+                        "violet"
+                      ]
+                    },
+                    "id": { "type": "string" },
+                    "eventId": { "type": "string" },
+                    "guestIds": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "Guests of the event wearing it"
+                    }
+                  },
+                  "required": ["name", "color", "id", "eventId", "guestIds"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "guestAuth": [] }]
+      }
+    },
+    "/api/v1/admin/labels/{id}": {
+      "put": {
+        "tags": ["admin"],
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "minLength": 1, "maxLength": 40 },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 200,
+                    "default": ""
+                  },
+                  "color": {
+                    "type": "string",
+                    "enum": [
+                      "slate",
+                      "red",
+                      "orange",
+                      "amber",
+                      "green",
+                      "teal",
+                      "blue",
+                      "violet"
+                    ]
+                  }
+                },
+                "required": ["name", "color"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated label",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 40
+                    },
+                    "description": {
+                      "type": "string",
+                      "maxLength": 200,
+                      "default": ""
+                    },
+                    "color": {
+                      "type": "string",
+                      "enum": [
+                        "slate",
+                        "red",
+                        "orange",
+                        "amber",
+                        "green",
+                        "teal",
+                        "blue",
+                        "violet"
+                      ]
+                    },
+                    "id": { "type": "string" },
+                    "eventId": { "type": "string" },
+                    "guestIds": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "Guests of the event wearing it"
+                    }
+                  },
+                  "required": ["name", "color", "id", "eventId", "guestIds"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "guestAuth": [] }]
+      },
+      "delete": {
+        "tags": ["admin"],
+        "description": "Removes the label from every guest wearing it.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Deleted" },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "guestAuth": [] }]
+      }
+    },
+    "/api/v1/admin/events/{id}/guests/{guestId}/labels": {
+      "put": {
+        "tags": ["admin"],
+        "description": "Replaces the labels the guest wears in this event. 400 `guest.notInEvent` for a guest outside it, 404 `label.notFound` for a label of another event. Answers with all the event's labels.",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": { "type": "string" },
+            "required": true,
+            "name": "guestId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "description": "Retries with the same key get the first response (24 h)"
+            },
+            "required": false,
+            "description": "Retries with the same key get the first response (24 h)",
+            "name": "idempotency-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "labelIds": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "All the labels the guest wears in this event"
+                  }
+                },
+                "required": ["labelIds"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The event's labels, in order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 40
+                      },
+                      "description": {
+                        "type": "string",
+                        "maxLength": 200,
+                        "default": ""
+                      },
+                      "color": {
+                        "type": "string",
+                        "enum": [
+                          "slate",
+                          "red",
+                          "orange",
+                          "amber",
+                          "green",
+                          "teal",
+                          "blue",
+                          "violet"
+                        ]
+                      },
+                      "id": { "type": "string" },
+                      "eventId": { "type": "string" },
+                      "guestIds": {
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "description": "Guests of the event wearing it"
+                      }
+                    },
+                    "required": ["name", "color", "id", "eventId", "guestIds"]
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "guestAuth": [] }]
+      }
+    },
     "/api/v1/admin/events/{id}/guests/{guestId}/join-link": {
       "post": {
         "tags": ["admin"],

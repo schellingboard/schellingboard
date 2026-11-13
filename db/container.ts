@@ -11,6 +11,7 @@ import type {
   CommentsRepository,
   DaysRepository,
   DeliveriesRepository,
+  EventLabelsRepository,
   EventsRepository,
   GuestsRepository,
   IdempotencyRepository,
@@ -45,6 +46,7 @@ import {
 } from "./repositories/sqlite/comments";
 import { SqliteDaysRepository } from "./repositories/sqlite/days";
 import { SqliteDeliveriesRepository } from "./repositories/sqlite/deliveries";
+import { SqliteEventLabelsRepository } from "./repositories/sqlite/event-labels";
 import { SqliteEventsRepository } from "./repositories/sqlite/events";
 import { SqliteGuestsRepository } from "./repositories/sqlite/guests";
 import { SqliteIdempotencyRepository } from "./repositories/sqlite/idempotency";
@@ -101,6 +103,7 @@ export type Repositories = {
   rsvps: RsvpsRepository;
   sessionMarks: SessionMarksRepository;
   settings: SettingsRepository;
+  eventLabels: EventLabelsRepository;
   sharedMoments: SharedMomentsRepository;
   sessionProposals: SessionProposalsRepository;
   stats: StatsRepository;
@@ -150,6 +153,7 @@ function buildRepositories(sqlite: Database.Database): Repositories {
     reminders: new SqliteRemindersRepository(db),
     rsvps: new SqliteRsvpsRepository(db),
     sessionMarks: new SqliteSessionMarksRepository(db),
+    eventLabels: new SqliteEventLabelsRepository(db),
     sharedMoments: new SqliteSharedMomentsRepository(db),
     settings: new SqliteSettingsRepository(db),
     sessionProposals: new SqliteSessionProposalsRepository(db),

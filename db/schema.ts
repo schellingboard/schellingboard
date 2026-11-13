@@ -268,6 +268,37 @@ export const eventGuests = sqliteTable(
   ]
 );
 
+export const eventLabels = sqliteTable(
+  "event_labels",
+  {
+    id: text("id").primaryKey(),
+    eventId: text("event_id")
+      .notNull()
+      .references(() => events.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    description: text("description").notNull().default(""),
+    color: text("color").notNull(),
+    position: integer("position").notNull(),
+  },
+  (t) => [index("event_labels_event_idx").on(t.eventId)]
+);
+
+export const guestLabels = sqliteTable(
+  "guest_labels",
+  {
+    eventLabelId: text("event_label_id")
+      .notNull()
+      .references(() => eventLabels.id, { onDelete: "cascade" }),
+    guestId: text("guest_id")
+      .notNull()
+      .references(() => guests.id, { onDelete: "cascade" }),
+  },
+  (t) => [
+    primaryKey({ columns: [t.eventLabelId, t.guestId] }),
+    index("guest_labels_guest_idx").on(t.guestId),
+  ]
+);
+
 export const locations = sqliteTable("locations", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),

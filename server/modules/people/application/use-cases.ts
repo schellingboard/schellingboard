@@ -28,6 +28,13 @@ import { assignGuestsToEvent, removeGuestsFromEvent } from "./event-guests";
 import { importGuests } from "./guest-import";
 import { chooseGuest, currentGuest, signIn, signOut } from "./identity";
 import { createJoinLink, joinWithLink, mailJoinLinks } from "./join-links";
+import {
+  createLabel,
+  deleteLabel,
+  listLabels,
+  setGuestLabels,
+  updateLabel,
+} from "./labels";
 import { updateMyLocale } from "./locale";
 import {
   getProfile,
@@ -81,6 +88,11 @@ export function createPeopleUseCases(deps: PeopleDeps) {
     assignGuestsToEvent: assignGuestsToEvent(deps),
     removeGuestsFromEvent: removeGuestsFromEvent(deps),
     importGuests: importGuests(deps),
+    listLabels: listLabels(deps),
+    createLabel: createLabel(deps),
+    updateLabel: updateLabel(deps),
+    deleteLabel: deleteLabel(deps),
+    setGuestLabels: setGuestLabels(deps),
   };
 }
 

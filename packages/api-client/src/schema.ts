@@ -7249,6 +7249,332 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/admin/events/{id}/labels": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The event's labels, in order */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              name: string;
+              /** @default  */
+              description: string;
+              /** @enum {string} */
+              color:
+                | "slate"
+                | "red"
+                | "orange"
+                | "amber"
+                | "green"
+                | "teal"
+                | "blue"
+                | "violet";
+              id: string;
+              eventId: string;
+              /** @description Guests of the event wearing it */
+              guestIds: string[];
+            }[];
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            name: string;
+            /** @default  */
+            description?: string;
+            /** @enum {string} */
+            color:
+              | "slate"
+              | "red"
+              | "orange"
+              | "amber"
+              | "green"
+              | "teal"
+              | "blue"
+              | "violet";
+          };
+        };
+      };
+      responses: {
+        /** @description The new label */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              name: string;
+              /** @default  */
+              description: string;
+              /** @enum {string} */
+              color:
+                | "slate"
+                | "red"
+                | "orange"
+                | "amber"
+                | "green"
+                | "teal"
+                | "blue"
+                | "violet";
+              id: string;
+              eventId: string;
+              /** @description Guests of the event wearing it */
+              guestIds: string[];
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/labels/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            name: string;
+            /** @default  */
+            description?: string;
+            /** @enum {string} */
+            color:
+              | "slate"
+              | "red"
+              | "orange"
+              | "amber"
+              | "green"
+              | "teal"
+              | "blue"
+              | "violet";
+          };
+        };
+      };
+      responses: {
+        /** @description The updated label */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              name: string;
+              /** @default  */
+              description: string;
+              /** @enum {string} */
+              color:
+                | "slate"
+                | "red"
+                | "orange"
+                | "amber"
+                | "green"
+                | "teal"
+                | "blue"
+                | "violet";
+              id: string;
+              eventId: string;
+              /** @description Guests of the event wearing it */
+              guestIds: string[];
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    post?: never;
+    /** @description Removes the label from every guest wearing it. */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Deleted */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/events/{id}/guests/{guestId}/labels": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Replaces the labels the guest wears in this event. 400 `guest.notInEvent` for a guest outside it, 404 `label.notFound` for a label of another event. Answers with all the event's labels. */
+    put: {
+      parameters: {
+        query?: never;
+        header?: {
+          /** @description Retries with the same key get the first response (24 h) */
+          "idempotency-key"?: string;
+        };
+        path: {
+          id: string;
+          guestId: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            /** @description All the labels the guest wears in this event */
+            labelIds: string[];
+          };
+        };
+      };
+      responses: {
+        /** @description The event's labels, in order */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              name: string;
+              /** @default  */
+              description: string;
+              /** @enum {string} */
+              color:
+                | "slate"
+                | "red"
+                | "orange"
+                | "amber"
+                | "green"
+                | "teal"
+                | "blue"
+                | "violet";
+              id: string;
+              eventId: string;
+              /** @description Guests of the event wearing it */
+              guestIds: string[];
+            }[];
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/admin/events/{id}/guests/{guestId}/join-link": {
     parameters: {
       query?: never;

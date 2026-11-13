@@ -395,3 +395,39 @@ describe("/api/v1/admin guests and settings", () => {
     }
   );
 });
+
+describe("attendee labels over the API", { tags: ["011-US7"] }, () => {
+  it("creates a label, gives it to a guest and deletes it", async () => {
+    const event = await createEvent();
+    const guest = await createGuest({ eventId: event.id });
+
+    const made = await call("POST", `/admin/events/${event.id}/labels`, {
+      body: { name: "Orga team", color: "red" },
+      key: "label-1",
+    });
+    expect(made.status).toBe(201);
+    const label = (await made.json()) as { id: string };
+
+    const given = await call(
+      "PUT",
+      `/admin/events/${event.id}/guests/${guest.id}/labels`,
+      { body: { labelIds: [label.id] }, key: "label-2" }
+    );
+    expect(given.status).toBe(200);
+    expect(await given.json()).toMatchObject([
+      { name: "Orga team", description: "", guestIds: [guest.id] },
+    ]);
+
+    expect(
+      (await call("DELETE", `/admin/labels/${label.id}`, { key: "label-3" }))
+        .status
+    ).toBe(204);
+    expect(
+      await (await call("GET", `/admin/events/${event.id}/labels`)).json()
+    ).toEqual([]);
+    expect(
+      (await call("GET", `/admin/events/${event.id}/labels`, { cookie: "" }))
+        .status
+    ).toBe(403);
+  });
+});

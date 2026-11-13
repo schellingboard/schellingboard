@@ -854,6 +854,21 @@ export class SqliteGuestsRepository implements GuestsRepository {
         )
         .returning({ guestId: schema.eventGuests.guestId })
         .all();
+      const labels = tx
+        .select({ id: schema.eventLabels.id })
+        .from(schema.eventLabels)
+        .where(eq(schema.eventLabels.eventId, eventId))
+        .all()
+        .map((r) => r.id);
+      if (labels.length > 0)
+        tx.delete(schema.guestLabels)
+          .where(
+            and(
+              inArray(schema.guestLabels.eventLabelId, labels),
+              inArray(schema.guestLabels.guestId, guestIds)
+            )
+          )
+          .run();
       this.bumpVersions(removed.map((r) => r.guestId));
     });
   }

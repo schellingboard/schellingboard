@@ -430,6 +430,11 @@ export const features = {
         actor: "attendee",
         priority: "P3",
       },
+      US7: {
+        title: "Organizer labels attendees (Orga team, Volunteer, Sponsor)",
+        actor: "organizer",
+        priority: "P3",
+      },
     },
   },
   "012": {

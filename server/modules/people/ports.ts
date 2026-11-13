@@ -54,6 +54,7 @@ export interface PeopleDeps {
     | "authCodes"
     | "bootstrapTokens"
     | "events"
+    | "eventLabels"
     | "guests"
     | "joinTokens"
     | "loginSessions"

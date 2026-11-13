@@ -2,6 +2,11 @@ import { createRoute } from "@hono/zod-openapi";
 import { z } from "@hono/zod-openapi";
 import { pageQuerySchema } from "@schellingboard/contracts/cursor-page";
 import {
+  eventLabelBodySchema,
+  eventLabelViewSchema,
+  guestLabelsBodySchema,
+} from "@schellingboard/contracts/event-label";
+import {
   adminGuestBodySchema,
   adminGuestListSchema,
   adminGuestUpdateBodySchema,
@@ -152,6 +157,73 @@ const remove = createRoute({
   responses: { 204: noContent("Removed"), ...problemDefault },
 });
 
+const listLabels = createRoute({
+  method: "get",
+  path: "/admin/events/{id}/labels",
+  tags,
+  request: { params: idParam },
+  responses: {
+    200: json(z.array(eventLabelViewSchema), "The event's labels, in order"),
+    ...problemDefault,
+  },
+});
+
+const createLabel = createRoute({
+  method: "post",
+  path: "/admin/events/{id}/labels",
+  tags,
+  request: {
+    headers: idempotencyHeaders,
+    params: idParam,
+    body: body(eventLabelBodySchema),
+  },
+  responses: {
+    201: json(eventLabelViewSchema, "The new label"),
+    ...problemDefault,
+  },
+});
+
+const updateLabel = createRoute({
+  method: "put",
+  path: "/admin/labels/{id}",
+  tags,
+  request: {
+    headers: idempotencyHeaders,
+    params: idParam,
+    body: body(eventLabelBodySchema),
+  },
+  responses: {
+    200: json(eventLabelViewSchema, "The updated label"),
+    ...problemDefault,
+  },
+});
+
+const deleteLabel = createRoute({
+  method: "delete",
+  path: "/admin/labels/{id}",
+  tags,
+  description: "Removes the label from every guest wearing it.",
+  request: { headers: idempotencyHeaders, params: idParam },
+  responses: { 204: noContent("Deleted"), ...problemDefault },
+});
+
+const setGuestLabels = createRoute({
+  method: "put",
+  path: "/admin/events/{id}/guests/{guestId}/labels",
+  tags,
+  description:
+    "Replaces the labels the guest wears in this event. 400 `guest.notInEvent` for a guest outside it, 404 `label.notFound` for a label of another event. Answers with all the event's labels.",
+  request: {
+    headers: idempotencyHeaders,
+    params: idParam.extend({ guestId: z.string() }),
+    body: body(guestLabelsBodySchema),
+  },
+  responses: {
+    200: json(z.array(eventLabelViewSchema), "The event's labels, in order"),
+    ...problemDefault,
+  },
+});
+
 const createJoinLink = createRoute({
   method: "post",
   path: "/admin/events/{id}/guests/{guestId}/join-link",
@@ -260,6 +332,52 @@ export function addAdminGuestRoutes(app: App, people: () => PeopleUseCases) {
     );
     if (!result.ok) return problem(result.error);
     return c.body(null, 204);
+  });
+
+  app.openapi(listLabels, async (c) => {
+    const result = await people().listLabels(c.var.actor, {
+      eventId: c.req.valid("param").id,
+    });
+    if (!result.ok) return problem(result.error);
+    return c.json(result.value, 200);
+  });
+
+  app.openapi(createLabel, async (c) => {
+    const result = await people().createLabel(c.var.actor, {
+      ...c.req.valid("json"),
+      eventId: c.req.valid("param").id,
+    });
+    if (!result.ok) return problem(result.error);
+    return c.json(result.value, 201);
+  });
+
+  app.openapi(updateLabel, async (c) => {
+    const result = await people().updateLabel(c.var.actor, {
+      ...c.req.valid("json"),
+      id: c.req.valid("param").id,
+    });
+    if (!result.ok) return problem(result.error);
+    return c.json(result.value, 200);
+  });
+
+  app.openapi(deleteLabel, async (c) => {
+    const result = await people().deleteLabel(
+      c.var.actor,
+      c.req.valid("param")
+    );
+    if (!result.ok) return problem(result.error);
+    return c.body(null, 204);
+  });
+
+  app.openapi(setGuestLabels, async (c) => {
+    const { id, guestId } = c.req.valid("param");
+    const result = await people().setGuestLabels(c.var.actor, {
+      ...c.req.valid("json"),
+      eventId: id,
+      guestId,
+    });
+    if (!result.ok) return problem(result.error);
+    return c.json(result.value, 200);
   });
 
   app.openapi(createJoinLink, async (c) => {

@@ -15,6 +15,7 @@ import type {
   EventMeetingSettings,
   SharedMoment,
 } from "@schellingboard/domain/event";
+import type { EventLabel } from "@schellingboard/domain/event-label";
 import type {
   Attendee,
   CompleteGuest,
@@ -89,6 +90,26 @@ export interface SharedMomentsRepository {
     patch: Partial<Omit<SharedMoment, "id" | "dayId">>
   ): Promise<SharedMoment | undefined>;
   delete(id: string): Promise<void>;
+}
+
+export interface EventLabelsRepository {
+  /** In the order they were made, with the guests that carry each. */
+  listByEvent(eventId: string): Promise<EventLabel[]>;
+  findById(id: string): Promise<EventLabel | undefined>;
+  create(
+    data: Pick<EventLabel, "eventId" | "name" | "description" | "color">
+  ): Promise<EventLabel>;
+  update(
+    id: string,
+    patch: Pick<EventLabel, "name" | "description" | "color">
+  ): Promise<EventLabel | undefined>;
+  delete(id: string): Promise<void>;
+  /** Replaces the guest's labels of this event. Leaving the event drops them (guests.removeFromEvent). */
+  setGuestLabels(
+    eventId: string,
+    guestId: string,
+    labelIds: string[]
+  ): Promise<void>;
 }
 
 export interface LocationUnavailabilityRepository {
