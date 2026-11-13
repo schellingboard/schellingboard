@@ -1,9 +1,8 @@
 import { msg } from "@lingui/core/macro";
 
+import { formatTime, type TimeProp } from "@/server/kernel/localized-text";
 import type { Translate } from "@/server/kernel/translator";
 import type { EmailMessage } from "@/utils/mailer";
-
-import { formatTime, type TimeProp } from "./format";
 
 // Sent to each host fifteen minutes after their session ends. `recordUrl` is a
 // plain deep link carrying no identity or token, like every other notification

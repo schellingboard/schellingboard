@@ -774,6 +774,7 @@ export const notifications = sqliteTable(
       ],
     }).notNull(),
     text: text("text").notNull(),
+    message: text("message"),
     url: text("url").notNull(),
     createdAt: text("created_at").notNull(),
     readAt: text("read_at"),

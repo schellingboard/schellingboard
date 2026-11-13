@@ -6,16 +6,17 @@ import {
   ABANDON_AFTER_HOURS,
   followUpEligible,
   headsUpEligible,
-  reminderNoticeText,
 } from "@schellingboard/domain/reminder-schedule";
 
 import type { Repositories } from "@/db/container";
 import { attendeeCountFollowUpEmail } from "@/emails/attendee-count-followup";
 import { attendeeCountHeadsUpEmail } from "@/emails/attendee-count-headsup";
-import { emailInstant } from "@/emails/format";
+import { emailInstant } from "@/server/kernel/localized-text";
+import { renderNotice } from "@/server/kernel/notice";
 import { notificationsChanged } from "@/server/kernel/notification-changes";
 import { type Translate, translatorFor } from "@/server/kernel/translator";
 import { isMailerConfigured, sendMail } from "@/utils/mailer";
+import { reminderNotice } from "@/utils/notices";
 import { sessionPath } from "@/utils/notifications";
 import { siteUrl } from "@/utils/site-url";
 
@@ -120,13 +121,15 @@ export async function dispatchDueReminders(
 
     if (notifyOwed) {
       try {
+        const notice = reminderNotice(candidate.kind, candidate.sessionTitle);
         await notifications.create({
           guestId: candidate.guestId,
           type:
             candidate.kind === "headsUp"
               ? "sessionHeadsUp"
               : "attendeeCountReminder",
-          text: reminderNoticeText(candidate.kind, candidate.sessionTitle),
+          text: renderNotice(notice, translatorFor(null)),
+          message: notice,
           url: recordPath(candidate),
           createdAt: now,
         });

@@ -24,8 +24,8 @@ const RECIPE: EmailRecipe = {
     eventUrl: "https://site.example/e",
   },
 };
-const notice = (text: string) => ({
-  text,
+const notice = (message: string) => ({
+  notice: { id: "added", message },
   url: "/e",
   at: new Date("2026-06-01T10:00:00.000Z"),
 });

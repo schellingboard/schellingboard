@@ -1,5 +1,3 @@
-import type { ReminderKind } from "./reminder";
-
 // Due-time arithmetic and eligibility for the two attendee-count reminders.
 // The whole reschedule matrix from the spec is decided here, in the unit tier,
 // so dispatch needs only a handful of seeded database tests.
@@ -86,15 +84,6 @@ export function followUpEligible({
     sameInstant(storedDueTime, followUpDueTime(endTime)) &&
     storedClaimedAt !== null
   );
-}
-
-// One line for the notification list, mirroring the matching email's subject.
-// Names the session and the ask and nothing else: a notification renders on a
-// (site) page, where guest switching is unauthenticated (FR-022).
-export function reminderNoticeText(kind: ReminderKind, title: string): string {
-  return kind === "headsUp"
-    ? `You're hosting "${title}" shortly — count the people who come`
-    : `How many people came to "${title}"?`;
 }
 
 function sameInstant(a: Date | null, b: Date): boolean {

@@ -1,31 +1,11 @@
 import { msg } from "@lingui/core/macro";
 
+import { formatTime, type TimeProp } from "@/server/kernel/localized-text";
 import type { Translate } from "@/server/kernel/translator";
 import type { EmailMessage } from "@/utils/mailer";
 
-import { formatTime, type TimeProp } from "./format";
-
 /** How a pending 1-on-1 ended, from the point of view of the guest being told. */
 export type MeetingOutcome = "accepted" | "declined" | "canceled";
-
-// The one-line version, for the in-app notification. The time is what tells
-// two requests from the same person apart, so it is always named.
-export function meetingRequestNoticeText(
-  requesterName: string,
-  time: string
-): string {
-  return `${requesterName} asked you for a 1-on-1 on ${time}`;
-}
-
-export function meetingOutcomeNoticeText(
-  actorName: string,
-  outcome: MeetingOutcome,
-  time: string
-): string {
-  return outcome === "canceled"
-    ? `${actorName} canceled the 1-on-1 on ${time}`
-    : `${actorName} ${outcome} your 1-on-1 request for ${time}`;
-}
 
 // Sent when someone asks the guest for a 1-on-1.
 //
@@ -104,24 +84,6 @@ export function meetingOutcomeEmail(
       </>
     ),
   };
-}
-
-function meetingNudgeHeadline(askerName: string, eventName: string): string {
-  return `${askerName} would like to book a 1-on-1 with you at ${eventName}`;
-}
-
-export function meetingNudgeNoticeText(
-  askerName: string,
-  eventName: string
-): string {
-  return `${meetingNudgeHeadline(askerName, eventName)}. Say when you are free in Settings, under 1-on-1s.`;
-}
-
-export function meetingNudgeAnsweredNoticeText(
-  recipientName: string,
-  eventName: string
-): string {
-  return `${recipientName} is open to 1-on-1s at ${eventName}`;
 }
 
 // Sent when someone asks the guest to say when they are free for 1-on-1s.

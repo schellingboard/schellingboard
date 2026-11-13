@@ -1,14 +1,13 @@
 import { msg } from "@lingui/core/macro";
 
-import type { Translate } from "@/server/kernel/translator";
-import type { EmailMessage } from "@/utils/mailer";
-
 import {
   formatPlaces,
   formatTime,
   type PlacesProp,
   type TimeProp,
-} from "./format";
+} from "@/server/kernel/localized-text";
+import type { Translate } from "@/server/kernel/translator";
+import type { EmailMessage } from "@/utils/mailer";
 
 // Sent to each host an hour before their session's displayed start. It does
 // double duty (FR-009): the reminder that they are hosting shortly, and the

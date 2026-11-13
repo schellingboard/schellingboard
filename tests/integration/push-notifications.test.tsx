@@ -35,7 +35,7 @@ const MESSAGE: EmailRecipe = {
 };
 const NOW = new Date("2026-08-01T12:00:00.000Z");
 const IN_APP = {
-  text: "Your session moved",
+  notice: { id: "moved", message: "Your session moved" },
   url: "/e?viewSession=s1",
   at: NOW,
 };

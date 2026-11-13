@@ -1,14 +1,13 @@
 import { msg } from "@lingui/core/macro";
 
-import type { Translate } from "@/server/kernel/translator";
-import type { EmailMessage } from "@/utils/mailer";
-
 import {
   formatPlaces,
   formatTime,
   type PlacesProp,
   type TimeProp,
-} from "./format";
+} from "@/server/kernel/localized-text";
+import type { Translate } from "@/server/kernel/translator";
+import type { EmailMessage } from "@/utils/mailer";
 
 // Sent to a guest when someone adds them as a co-host of a session (or
 // creates a session listing them).

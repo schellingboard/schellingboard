@@ -6,10 +6,10 @@ import { attendeeCountHeadsUpEmail } from "@/emails/attendee-count-headsup";
 import { authCodeEmail } from "@/emails/auth-code";
 import { authPasswordResetEmail } from "@/emails/auth-password-reset";
 import { authSecurityChangedEmail } from "@/emails/auth-security-changed";
-import { formatTime } from "@/emails/format";
 import { joinLinkEmail, joinLinkMadeEmail } from "@/emails/join-link";
 import { buildEmail, type EmailRecipe } from "@/emails/registry";
 import { testEmail } from "@/emails/test-email";
+import { formatTime } from "@/server/kernel/localized-text";
 import { type Translate, translatorFor } from "@/server/kernel/translator";
 
 const english = translatorFor(null);

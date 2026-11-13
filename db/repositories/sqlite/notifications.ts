@@ -1,4 +1,7 @@
-import type { Notification } from "@schellingboard/domain/notification";
+import type {
+  NoticeMessage,
+  Notification,
+} from "@schellingboard/domain/notification";
 import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
@@ -16,6 +19,9 @@ function rowToNotification(
     guestId: row.guestId,
     type: row.type,
     text: row.text,
+    message: row.message
+      ? (JSON.parse(row.message) as NoticeMessage)
+      : undefined,
     url: row.url,
     createdAt: new Date(row.createdAt),
     readAt: row.readAt ? new Date(row.readAt) : undefined,
@@ -116,6 +122,7 @@ export class SqliteNotificationsRepository implements NotificationsRepository {
     const row = {
       id: nanoid(),
       ...data,
+      message: data.message ? JSON.stringify(data.message) : null,
       createdAt: data.createdAt.toISOString(),
       readAt: null,
     };

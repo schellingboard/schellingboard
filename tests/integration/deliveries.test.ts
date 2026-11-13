@@ -8,6 +8,7 @@ import { getRepositories } from "@/db/container";
 import { buildEmail, type EmailRecipe } from "@/emails/registry";
 import { translatorFor } from "@/server/kernel/translator";
 import { sendMail } from "@/utils/mailer";
+import { sessionDeletedNotice } from "@/utils/notices";
 import { notifyGuest } from "@/utils/notifications";
 import { pushToGuest } from "@/utils/push";
 
@@ -26,7 +27,11 @@ const RECIPE: EmailRecipe = {
   },
 };
 const T0 = new Date("2026-06-01T10:00:00.000Z");
-const IN_APP = { text: '"Workshop" was deleted', url: "/e", at: T0 };
+const IN_APP = {
+  notice: sessionDeletedNotice("attendee", "Workshop"),
+  url: "/e",
+  at: T0,
+};
 const minutes = (n: number) => new Date(T0.getTime() + n * 60 * 1000);
 
 async function subscribe(guestId: string) {
@@ -63,7 +68,12 @@ describe("deliveries", () => {
     });
     expect(pushToGuest).toHaveBeenCalledExactlyOnceWith(
       guest.id,
-      { title: buildEmail(RECIPE, translatorFor(null)).subject, ...IN_APP },
+      {
+        title: buildEmail(RECIPE, translatorFor(null)).subject,
+        text: '"Workshop" was deleted',
+        url: IN_APP.url,
+        at: IN_APP.at,
+      },
       T0
     );
   });

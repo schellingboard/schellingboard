@@ -2,10 +2,17 @@ import type { Notification } from "@schellingboard/domain/notification";
 
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
+import { renderNotice } from "@/server/kernel/notice";
 import { notificationsChanged } from "@/server/kernel/notification-changes";
 import { notFound, ok, type Result } from "@/server/kernel/result";
+import { type Translate, translatorFor } from "@/server/kernel/translator";
 
 import type { NotificationDeps } from "../ports";
+
+const inLanguage = (notification: Notification, t: Translate): Notification =>
+  notification.message
+    ? { ...notification, text: renderNotice(notification.message, t) }
+    : notification;
 
 export interface MyNotifications {
   guestId: string;
@@ -19,11 +26,17 @@ export const listMyNotifications =
     const acting = await actingGuest(actor, repos.guests);
     if (!acting.ok) return acting;
     const guestId = acting.value;
-    const [notifications, unreadCount] = await Promise.all([
+    const [guest, notifications, unreadCount] = await Promise.all([
+      repos.guests.findById(guestId),
       repos.notifications.listByGuest(guestId),
       repos.notifications.countUnread(guestId),
     ]);
-    return ok({ guestId, notifications, unreadCount });
+    const t = translatorFor(guest?.info.locale);
+    return ok({
+      guestId,
+      notifications: notifications.map((n) => inLanguage(n, t)),
+      unreadCount,
+    });
   };
 
 export const markNotificationsRead =
@@ -67,9 +80,13 @@ export const readNotification =
       if (!notification)
         return notFound("notification.notFound", "Notification not found");
       await tx.notifications.markRead(acting.value, id, now);
+      const guest = await tx.guests.findById(acting.value);
       return ok({
         guestId: acting.value,
-        notification: { ...notification, readAt: notification.readAt ?? now },
+        notification: {
+          ...inLanguage(notification, translatorFor(guest?.info.locale)),
+          readAt: notification.readAt ?? now,
+        },
       });
     });
     if (!result.ok) return result;

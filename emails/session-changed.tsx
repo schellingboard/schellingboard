@@ -1,8 +1,5 @@
 import { msg } from "@lingui/core/macro";
 
-import type { Translate } from "@/server/kernel/translator";
-import type { EmailMessage } from "@/utils/mailer";
-
 import {
   formatPlaces,
   formatTime,
@@ -10,7 +7,9 @@ import {
   isUnscheduled,
   type PlacesProp,
   type TimeProp,
-} from "./format";
+} from "@/server/kernel/localized-text";
+import type { Translate } from "@/server/kernel/translator";
+import type { EmailMessage } from "@/utils/mailer";
 
 // Sent to hosts and RSVP'd guests when a session changes time and/or
 // location. The old value is given only for what actually changed.

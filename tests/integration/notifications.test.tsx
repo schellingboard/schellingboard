@@ -64,7 +64,7 @@ const updateSession = async (...args: Parameters<typeof updateLoggedSession>) =>
   (await updateLoggedSession(...args))!;
 
 const IN_APP = {
-  text: "Your session moved",
+  notice: { id: "moved", message: "Your session moved" },
   url: "/e?viewSession=s1",
   at: NOW,
 };

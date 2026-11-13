@@ -2,30 +2,38 @@ import type { Comment, CommentRef } from "@schellingboard/domain/comment";
 import type { EmailSettings } from "@schellingboard/domain/guest";
 import type { Meeting } from "@schellingboard/domain/meeting";
 import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
+import type { NoticeMessage } from "@schellingboard/domain/notification";
 import type { Session } from "@schellingboard/domain/session";
 import { DateTime } from "luxon";
 
 import { getRepositories } from "@/db/container";
-import { commentNoticeText, type CommentSubject } from "@/emails/comment";
-import { type EmailTime, emailTime } from "@/emails/format";
-import {
-  meetingNudgeAnsweredNoticeText,
-  meetingNudgeNoticeText,
-  type MeetingOutcome,
-  meetingOutcomeNoticeText,
-  meetingRequestNoticeText,
-} from "@/emails/meeting";
+import type { CommentSubject } from "@/emails/comment";
+import type { MeetingOutcome } from "@/emails/meeting";
 import { buildEmail, type EmailRecipe } from "@/emails/registry";
+import { type EmailTime, emailTime } from "@/server/kernel/localized-text";
+import { renderNotice } from "@/server/kernel/notice";
 import { notificationsChanged } from "@/server/kernel/notification-changes";
 import { translatorFor } from "@/server/kernel/translator";
 import type { EmailPayload, PushPayload } from "@/utils/jobs/deliveries";
 import { nudgeJobs } from "@/utils/jobs/nudge";
+import {
+  cohostAddedNotice,
+  commentNotice,
+  meetingNudgeAnsweredNotice,
+  meetingNudgeNotice,
+  meetingOutcomeNotice,
+  meetingRequestNotice,
+  proposalJoinedNotice,
+  sessionChangedNotice,
+  sessionDeletedNotice,
+  sessionLostHostNotice,
+} from "@/utils/notices";
 import { siteUrl } from "@/utils/site-url";
 
 // One line in the past tense, where it happened, and when — `at` comes from
 // the caller's clock so the dev fake clock reaches these rows like every other
 // timestamp (ADR 0004).
-export type InAppNotice = { text: string; url: string; at: Date };
+export type InAppNotice = { notice: NoticeMessage; url: string; at: Date };
 
 // Tell the guest that something happened, on every channel: an in-app
 // notification always, a push to each device they have turned notifications
@@ -50,7 +58,8 @@ export async function notifyGuest(
   await notifications.create({
     guestId,
     type: setting,
-    text: inApp.text,
+    text: renderNotice(inApp.notice, translatorFor(null)),
+    message: inApp.notice,
     url: inApp.url,
     createdAt: inApp.at,
   });
@@ -61,11 +70,14 @@ export async function notifyGuest(
   // The mail's subject is the one-line "what happened" a notification title
   // wants.
   if ((await push.listSubscriptions(guestId)).length > 0) {
+    const english = translatorFor(null);
     const notice: PushPayload = {
-      title: buildEmail(email, translatorFor(guest.info.locale)).subject,
-      text: inApp.text,
+      title: buildEmail(email, english).subject,
+      text: renderNotice(inApp.notice, english),
       url: inApp.url,
       at: inApp.at.toISOString(),
+      recipe: email,
+      notice: inApp.notice,
     };
     await deliveries.enqueue({ guestId, channel: "push", payload: notice });
     nudgeJobs();
@@ -162,14 +174,12 @@ async function notifySessionChangedUnsafe({
       recipient: "attendee",
     },
   };
-  const what = changeSummary({
-    newTime: formatSessionTime(after, event.timezone),
-    oldTime: timeChanged
-      ? formatSessionTime(before, event.timezone)
-      : undefined,
-    newLocation: formatLocations(after),
-    oldLocation: locationChanged ? formatLocations(before) : undefined,
-  });
+  const change = {
+    newTime: messageProps.newTime,
+    oldTime: messageProps.oldTime,
+    newLocation: messageProps.newLocation,
+    oldLocation: messageProps.oldLocation,
+  };
   await notifySessionRecipients({
     hostIds: after.hosts.map((host) => host.id),
     rsvpGuestIds: (await rsvps.listBySession(after.id)).map(
@@ -179,11 +189,15 @@ async function notifySessionChangedUnsafe({
     hostMessage,
     attendeeMessage,
     hostInApp: {
-      text: `Your session "${after.title}" ${what}`,
+      notice: sessionChangedNotice("host", after.title, change),
       url: path,
       at: now,
     },
-    attendeeInApp: { text: `"${after.title}" ${what}`, url: path, at: now },
+    attendeeInApp: {
+      notice: sessionChangedNotice("attendee", after.title, change),
+      url: path,
+      at: now,
+    },
   });
 }
 
@@ -228,33 +242,12 @@ async function notifySessionLostHostUnsafe({
     props: { title: after.title, sessionUrl: emailBase() + path },
   };
   const inApp = {
-    text: `"${after.title}" has no host now`,
+    notice: sessionLostHostNotice(after.title),
     url: path,
     at: now,
   };
   for (const rsvp of await rsvps.listBySession(after.id))
     await tryNotifyGuest(rsvp.guestId, "rsvpChange", message, inApp);
-}
-
-// What to say happened, given only what actually changed. The old value is
-// named too: someone told their session moved wants to know which slot just
-// freed up, to fill it or to host in it.
-function changeSummary({
-  newTime,
-  oldTime,
-  newLocation,
-  oldLocation,
-}: {
-  newTime: string;
-  oldTime?: string;
-  newLocation: string;
-  oldLocation?: string;
-}): string {
-  if (oldTime !== undefined && oldLocation !== undefined) {
-    return `is now ${newTime}, ${newLocation} (was ${oldTime}, ${oldLocation})`;
-  }
-  if (oldTime !== undefined) return `moved to ${newTime} (was ${oldTime})`;
-  return `moved to ${newLocation} (was ${oldLocation})`;
 }
 
 // Email the session's hosts and RSVP'd guests (who have opted in) after a
@@ -316,12 +309,12 @@ async function notifySessionDeletedUnsafe({
     },
     // The session is gone, so the link can only be the event it was at.
     hostInApp: {
-      text: `Your session "${session.title}" was deleted`,
+      notice: sessionDeletedNotice("host", session.title),
       url: eventPath,
       at: now,
     },
     attendeeInApp: {
-      text: `"${session.title}" was deleted`,
+      notice: sessionDeletedNotice("attendee", session.title),
       url: eventPath,
       at: now,
     },
@@ -409,7 +402,7 @@ async function notifyCohostsAddedUnsafe({
       props: { ...props, soleHost },
     };
     const inApp = {
-      text: `You were added as ${soleHost ? "the host" : "a co-host"} of "${session.title}"`,
+      notice: cohostAddedNotice(session.title, soleHost),
       url: path,
       at: now,
     };
@@ -446,7 +439,7 @@ export async function notifyProposalJoined({
       },
     };
     const inApp = {
-      text: `${joiner.name} joined "${proposal.title}" as a co-host`,
+      notice: proposalJoinedNotice(joiner.name, proposal.title),
       url: path,
       at: now,
     };
@@ -502,7 +495,7 @@ async function deliverCommentNotifications({
         props: { ...messageProps, recipient: "responsible" },
       },
       {
-        text: commentNoticeText(
+        notice: commentNotice(
           subject,
           "responsible",
           messageProps.commenterName
@@ -529,11 +522,7 @@ async function deliverCommentNotifications({
         props: { ...messageProps, recipient: "commenter" },
       },
       {
-        text: commentNoticeText(
-          subject,
-          "commenter",
-          messageProps.commenterName
-        ),
+        notice: commentNotice(subject, "commenter", messageProps.commenterName),
         url: path,
         at: now,
       }
@@ -658,7 +647,7 @@ export async function notifyMeetingRequested({
   try {
     const context = await meetingContext(meeting);
     if (!context) return;
-    const { time, when, path } = context;
+    const { when, path } = context;
     const requesterName = await guestName(meeting.requesterId);
     await notifyGuest(
       meeting.recipientId,
@@ -673,7 +662,7 @@ export async function notifyMeetingRequested({
         },
       },
       {
-        text: meetingRequestNoticeText(requesterName, time),
+        notice: meetingRequestNotice(requesterName, when),
         url: path,
         at: now,
       }
@@ -713,7 +702,7 @@ export async function notifyMeetingNudged({
         },
       },
       {
-        text: meetingNudgeNoticeText(askerName, event.name),
+        notice: meetingNudgeNotice(askerName, event.name),
         url: path,
         at: now,
       }
@@ -754,7 +743,7 @@ export async function notifyMeetingNudgeAnswered({
           },
         },
         {
-          text: meetingNudgeAnsweredNoticeText(recipientName, event.name),
+          notice: meetingNudgeAnsweredNotice(recipientName, event.name),
           url: path,
           at: now,
         }
@@ -784,7 +773,7 @@ export async function notifyMeetingOutcome({
   try {
     const context = await meetingContext(meeting);
     if (!context) return;
-    const { time, when, path } = context;
+    const { when, path } = context;
     const otherId =
       actorId === meeting.requesterId
         ? meeting.recipientId
@@ -804,7 +793,7 @@ export async function notifyMeetingOutcome({
         },
       },
       {
-        text: meetingOutcomeNoticeText(actorName, outcome, time),
+        notice: meetingOutcomeNotice(actorName, outcome, when),
         url: path,
         at: now,
       }
@@ -819,7 +808,7 @@ export async function notifyMeetingOutcome({
 // leaves nothing worth linking to.
 async function meetingContext(
   meeting: Meeting
-): Promise<{ time: string; when: EmailTime; path: string } | undefined> {
+): Promise<{ when: EmailTime; path: string } | undefined> {
   const event = await getRepositories().events.findById(meeting.eventId);
   if (!event) return undefined;
   const start = DateTime.fromJSDate(
@@ -827,7 +816,6 @@ async function meetingContext(
   ).setZone(event.timezone);
   const end = DateTime.fromJSDate(meeting.slotEnd).setZone(event.timezone);
   return {
-    time: `${start.toFormat("cccc d LLLL, HH:mm")}–${end.toFormat("HH:mm")}`,
     when: emailTime(start.toJSDate(), end.toJSDate(), event.timezone),
     path: `/${event.slug}/meetings/${meeting.id}`,
   };
@@ -874,21 +862,10 @@ function sameLocations(a: { id: string }[], b: { id: string }[]): boolean {
   return aIds.symmetricDifference(bIds).size === 0;
 }
 
-function formatSessionTime(session: Session, timezone: string): string {
-  if (!session.startTime || !session.endTime) return "Unscheduled";
-  const start = DateTime.fromJSDate(session.startTime).setZone(timezone);
-  const end = DateTime.fromJSDate(session.endTime).setZone(timezone);
-  return `${start.toFormat("cccc d LLLL, HH:mm")}–${end.toFormat("HH:mm")}`;
-}
-
 function sessionTime(session: Session, timezone: string): EmailTime {
   return emailTime(session.startTime, session.endTime, timezone);
 }
 
 function locationNames(session: { locations: { name: string }[] }): string[] {
   return session.locations.map((l) => l.name);
-}
-
-function formatLocations(session: { locations: { name: string }[] }): string {
-  return session.locations.map((l) => l.name).join(", ") || "No location";
 }

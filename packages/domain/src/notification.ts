@@ -7,12 +7,26 @@ import type { EmailSettings } from "./guest";
  */
 export type NotificationType = keyof EmailSettings;
 
+/**
+ * A message the server wrote for the guest, kept as the source text and its
+ * values so it can be read in the reader's language. Values are strings,
+ * numbers, or a time or places the reader's language formats.
+ */
+export type NoticeMessage = {
+  id: string;
+  message?: string;
+  context?: string;
+  values?: Record<string, unknown>;
+};
+
 export type Notification = {
   id: string;
   guestId: string;
   type: NotificationType;
   /** One line, in the past tense: "Anna commented on your session". */
   text: string;
+  /** Read in the reader's language; rows from before it was stored have only `text`. */
+  message?: NoticeMessage;
   /** Site-relative path to whatever happened, e.g. `/eventslug/sessions/x`. */
   url: string;
   createdAt: Date;

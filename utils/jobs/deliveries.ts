@@ -1,4 +1,7 @@
-import type { Delivery } from "@schellingboard/domain/notification";
+import type {
+  Delivery,
+  NoticeMessage,
+} from "@schellingboard/domain/notification";
 
 import { getRepositories } from "@/db/container";
 import {
@@ -6,6 +9,7 @@ import {
   type EmailRecipe,
   UnknownTemplateError,
 } from "@/emails/registry";
+import { renderNotice } from "@/server/kernel/notice";
 import { translatorFor } from "@/server/kernel/translator";
 import { sendMail } from "@/utils/mailer";
 import { pushToGuest } from "@/utils/push";
@@ -13,11 +17,15 @@ import { pushToGuest } from "@/utils/push";
 import { DELIVERIES, type Job, PRUNE_DELIVERIES } from "./job";
 
 export type EmailPayload = { recipe: EmailRecipe };
+// `title` and `text` are English, as written when queued; with `recipe` and
+// `notice` the push is written in the recipient's language when it is sent.
 export type PushPayload = {
   title: string;
   text: string;
   url: string;
   at: string;
+  recipe?: EmailRecipe;
+  notice?: NoticeMessage;
 };
 
 // Small: the loop runs nothing else, reminders included, while a batch sends,
@@ -33,8 +41,37 @@ const RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
 
 async function send(delivery: Delivery): Promise<void> {
   if (delivery.channel === "push") {
-    const { at, ...rest } = delivery.payload as PushPayload;
-    const notice = { ...rest, at: new Date(at) };
+    const {
+      at,
+      recipe,
+      notice: message,
+      ...rest
+    } = delivery.payload as PushPayload;
+    const guest = await getRepositories().guests.findById(delivery.guestId);
+    const t = translatorFor(guest?.info.locale);
+    // A push that cannot be written in the recipient's language still goes
+    // out in the text it was queued with.
+    const written = (render: () => string, stored: string) => {
+      try {
+        return render();
+      } catch (err) {
+        console.error(
+          "Could not write a push in the recipient's language:",
+          err
+        );
+        return stored;
+      }
+    };
+    const notice = {
+      ...rest,
+      title: recipe
+        ? written(() => buildEmail(recipe, t).subject, rest.title)
+        : rest.title,
+      text: message
+        ? written(() => renderNotice(message, t), rest.text)
+        : rest.text,
+      at: new Date(at),
+    };
     await pushToGuest(delivery.guestId, notice, notice.at);
     return;
   }

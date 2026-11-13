@@ -470,6 +470,13 @@
       "when": 1794496142703,
       "tag": "0066_attendee_labels",
       "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "6",
+      "when": 1794555233168,
+      "tag": "0067_notification_message",
+      "breakpoints": true
     }
   ]
 }
