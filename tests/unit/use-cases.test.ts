@@ -32,6 +32,7 @@ describe("use case catalogue", () => {
     expect(new Set(slugs).size).toBe(slugs.length);
   });
 
+  // Spawns `playwright test --list`, which is slow while the full suite runs.
   it("every E2E test covers at least one catalogued use case", () => {
     const { untagged, unknown } = summarise(useCases, listE2eTests());
     const offenders = [
@@ -43,7 +44,7 @@ describe("use case catalogue", () => {
       "End each E2E test title with the use cases it covers, e.g. " +
         '"votes on a proposal @005-US1", adding missing ones to tests/use-cases.ts'
     ).toEqual([]);
-  });
+  }, 60_000);
 });
 
 describe("use case summary", () => {
