@@ -12,6 +12,7 @@
 
 const CACHE = "sb-spa-v1";
 const SHELL_KEY = "/_spa/shell";
+const BUILD_KEY = "/_spa/build";
 const ASSET_PATTERN = /\/_spa\/assets\/[^"'\s)]+/g;
 const NOT_SPA_PAGES = ["/api", "/media", "/locations", "/_spa"];
 
@@ -34,10 +35,17 @@ async function keepShell(response) {
   const wanted = new Set(
     assets.map((asset) => new URL(asset, self.location.origin).href)
   );
-  for (const request of await cache.keys()) {
-    const path = new URL(request.url).pathname;
-    if (path.startsWith("/_spa/assets/") && !wanted.has(request.url))
-      await cache.delete(request);
+  // Chunks the shell does not name (admin pages, translations) are cached as
+  // the page loads them. They belong to the build, so they go with the build.
+  const build = [...wanted].sort().join("\n");
+  const kept = await cache.match(BUILD_KEY);
+  if (!kept || (await kept.text()) !== build) {
+    for (const request of await cache.keys()) {
+      const path = new URL(request.url).pathname;
+      if (path.startsWith("/_spa/assets/") && !wanted.has(request.url))
+        await cache.delete(request);
+    }
+    await cache.put(BUILD_KEY, new Response(build));
   }
   await Promise.all(
     assets.map(async (asset) => {

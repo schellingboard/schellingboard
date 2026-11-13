@@ -33,6 +33,7 @@ same header block: status, date, and the tracking issue where there is one.
 | [0020](0020-side-panel-for-linked-views.md)          | A side panel for linked views                               | 2026-11-09 |
 | [0021](0021-forms-in-the-side-panel.md)              | Create and edit forms open in the side panel                | 2026-11-12 |
 | [0022](0022-event-access-and-people-scope.md)        | Event access and people scope                               | 2026-11-13 |
+| [0023](0023-translation-library-and-format.md)       | Lingui, ICU messages and `.po` catalogs                     | 2026-11-13 |
 
 Longer design work that isn't a single decision lives next door:
 [Architecture](../architecture/README.md) and [Attendance model](../attendance-model/README.md).

@@ -103,6 +103,7 @@ describe("the service worker", () => {
     const cache = [...worker.store.values()][0];
     expect([...cache.keys()].sort()).toEqual([
       "/_spa/assets/index-1.js",
+      "/_spa/build",
       "/_spa/shell",
     ]);
     expect(worker.self.skipWaiting).toHaveBeenCalled();
@@ -114,6 +115,13 @@ describe("the service worker", () => {
       pathname.startsWith("/_spa/assets/") ? new Response("js") : html(build)
     );
     await upgraded.navigate("/Conference-Gamma");
+    await upgraded.dispatch("fetch", {
+      request: {
+        method: "GET",
+        url: "http://x/_spa/assets/messages-de-1.js",
+        mode: "cors",
+      },
+    });
     build = '<script src="/_spa/assets/index-2.js"></script>shell-2';
 
     await upgraded.navigate("/Conference-Gamma");
@@ -121,8 +129,28 @@ describe("the service worker", () => {
     const cache = [...upgraded.store.values()][0];
     expect([...cache.keys()].sort()).toEqual([
       "/_spa/assets/index-2.js",
+      "/_spa/build",
       "/_spa/shell",
     ]);
+  });
+
+  it("keeps a chunk the page loaded while the build stays the same @014-US5", async () => {
+    const same = boot((pathname) =>
+      pathname.startsWith("/_spa/assets/") ? new Response("js") : html(shell)
+    );
+    await same.navigate("/Conference-Gamma");
+    await same.dispatch("fetch", {
+      request: {
+        method: "GET",
+        url: "http://x/_spa/assets/messages-de-1.js",
+        mode: "cors",
+      },
+    });
+
+    await same.navigate("/Conference-Gamma");
+
+    const cache = [...same.store.values()][0];
+    expect([...cache.keys()]).toContain("/_spa/assets/messages-de-1.js");
   });
 
   it("serves the kept shell for a page of the SPA when the network is gone @014-US5", async () => {

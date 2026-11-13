@@ -1,3 +1,4 @@
+import { adminLogin } from "./helpers/admin";
 import { login } from "./helpers/auth";
 import { expect, test } from "./helpers/fixtures";
 
@@ -72,4 +73,35 @@ test("a schedule left open offers a reload after the server is upgraded @014-US5
   await expect(
     page.getByRole("link", { name: /Opening Keynote/ })
   ).toBeVisible();
+});
+
+// The admin pages are a chunk the shell does not name, as a translation will
+// be. Their area needs the server, so the cache is what shows it is kept.
+test("a chunk the app loaded later stays cached when the app is reloaded @014-US5", async ({
+  page,
+}) => {
+  const cachedAssets = () =>
+    page.evaluate(async () => {
+      const cache = await caches.open("sb-spa-v1");
+      return (await cache.keys())
+        .map((request) => new URL(request.url).pathname)
+        .filter((path) => path.startsWith("/_spa/assets/"));
+    });
+
+  await adminLogin(page);
+  await expect(page.getByRole("heading", { name: "Events" })).toBeVisible();
+  await page.evaluate(() => navigator.serviceWorker.ready);
+  await expect
+    .poll(async () => (await cachedAssets()).length)
+    .toBeGreaterThan(2);
+  const before = await cachedAssets();
+
+  await page.goto("/Conference-Gamma");
+  await expect(
+    page.getByRole("link", { name: /Opening Keynote/ })
+  ).toBeVisible();
+  // The worker prunes the cache after the page shows; nothing says when.
+  await page.waitForTimeout(2000);
+
+  expect(await cachedAssets()).toEqual(expect.arrayContaining(before));
 });
