@@ -12,7 +12,7 @@ describe("scheduleLinks", () => {
 
   it("points the modal's pages at the app's own screens", () => {
     expect(links.guest("g1")).toBe("/guests/g1");
-    expect(links.editSession("s1")).toBe("/conf/edit-session?sessionID=s1");
+    expect(links.editSession("s1")).toBe("/conf/sessions/s1/edit");
     expect(links.proposal("p1")).toBe("/conf/proposals/p1");
   });
 
@@ -23,7 +23,7 @@ describe("scheduleLinks", () => {
   it("books into a free slot with its room, day and time", () => {
     expect(
       links.addSession({ location: "Aula A", day: "2026-06-15", time: "09:30" })
-    ).toBe("/conf/add-session?location=Aula+A&time=09%3A30&day=2026-06-15");
+    ).toBe("/conf/sessions/new?location=Aula+A&time=09%3A30&day=2026-06-15");
   });
 
   it("books a free 1-on-1 slot on the schedule, which opens the request", () => {

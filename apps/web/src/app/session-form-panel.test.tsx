@@ -24,10 +24,10 @@ const answers = (call: FakeCall): Response | undefined => {
   return undefined;
 };
 
-describe("the session form pages", { tags: ["008-US1"] }, () => {
-  it("adds a session in the slot named in the address, then shows the schedule", async () => {
+describe("the session form panel", { tags: ["008-US1"] }, () => {
+  it("adds a session in the slot named in the address, then closes over the schedule", async () => {
     const { calls, router } = await open({
-      path: "/conf/add-session?day=2026-06-15&time=10%3A00&location=Room",
+      path: "/conf/sessions/new?day=2026-06-15&time=10%3A00&location=Room",
       handler: answers,
     });
 
@@ -40,6 +40,10 @@ describe("the session form pages", { tags: ["008-US1"] }, () => {
     await waitFor(() =>
       expect(router.history.location.pathname).toBe("/conf/schedule")
     );
+    expect(screen.queryByRole("dialog", { name: "Session form" })).toBeNull();
+    await waitFor(() =>
+      expect(router.history.location.state).not.toHaveProperty("revealSession")
+    );
     expect(
       calls.some((c) => c.method === "POST" && c.path === "/api/v1/sessions")
     ).toBe(true);
@@ -50,7 +54,7 @@ describe("the session form pages", { tags: ["008-US1"] }, () => {
     { tags: ["008-US2"] },
     async () => {
       await open({
-        path: "/conf/edit-session?sessionID=s",
+        path: "/conf/sessions/s/edit",
         handler: answers,
         snapshot: {
           ...running,
@@ -64,6 +68,18 @@ describe("the session form pages", { tags: ["008-US1"] }, () => {
     }
   );
 
+  it("still opens from the former addresses", async () => {
+    await open({
+      path: "/conf/edit-session?sessionID=s",
+      handler: answers,
+      snapshot: { ...running, me: { ...running.me!, guestId: "host" } },
+    });
+
+    expect(
+      (await screen.findByLabelText<HTMLInputElement>(/Session title/)).value
+    ).toBe("Talk");
+  });
+
   it("is reached from a free slot's link without leaving the app", async () => {
     const { router } = await open({ path: "/conf", handler: answers });
 
@@ -72,7 +88,7 @@ describe("the session form pages", { tags: ["008-US1"] }, () => {
     );
 
     expect(await screen.findByLabelText(/Session title/)).toBeTruthy();
-    expect(router.history.location.pathname).toBe("/conf/add-session");
+    expect(router.history.location.pathname).toBe("/conf/sessions/new");
     expect(hardNavigate).not.toHaveBeenCalled();
   });
 });

@@ -117,7 +117,7 @@ test("a host can delete a session and it disappears from the grid @008-US3", asy
   await page.getByRole("button", { name: "Delete", exact: true }).click();
   await expect(page.getByText("Delete session?")).toBeVisible();
   await page
-    .getByRole("dialog")
+    .getByRole("dialog", { name: "Delete session?" })
     .getByRole("button", { name: "Delete" })
     .click();
   await expect(toast(page)).toContainText(
@@ -125,6 +125,7 @@ test("a host can delete a session and it disappears from the grid @008-US3", asy
   );
   await dismissToast(page);
   await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.getByRole("link", { name: title })).toHaveCount(0);
 
   // Still gone after a full reload

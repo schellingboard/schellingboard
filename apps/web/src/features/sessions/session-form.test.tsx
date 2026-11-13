@@ -63,7 +63,6 @@ const base: Snapshot = {
 const OWN_SLOT = new Date(Date.UTC(2026, 5, 15, 13, 50)).toISOString();
 const NOW = new Date(fixture.now);
 const links = {
-  schedule: "/conf",
   proposal: (id: string) => `/conf/proposals/${id}`,
   session: (id: string) => `/conf?viewSession=${id}`,
 };
@@ -76,7 +75,9 @@ function setup({
   now = NOW,
   clashes = [],
   handler,
+  track,
 }: {
+  track?: (check: () => boolean) => () => void;
   sessionId?: string;
   prefill?: SessionPrefill;
   patch?: Partial<Snapshot>;
@@ -90,6 +91,8 @@ function setup({
       saved()
   );
   const onDone = vi.fn();
+  const onCancel = vi.fn();
+  const onDeleted = vi.fn();
   const actions = sessionFormCalls(api);
   render(
     <NoticeProvider>
@@ -101,11 +104,14 @@ function setup({
         links={links}
         actions={actions}
         onDone={onDone}
+        onCancel={onCancel}
+        onDeleted={onDeleted}
+        track={track}
       />
     </NoticeProvider>
   );
   const writes = () => calls.filter((c) => c.method !== "GET");
-  return { calls, writes, onDone };
+  return { calls, writes, onDone, onCancel, onDeleted };
 }
 
 const SLOT = { day: "2026-06-15", time: "10:00", location: "Room" };
@@ -520,7 +526,7 @@ describe("editing a session", { tags: ["008-US2"] }, () => {
   });
 
   it("deletes after a confirmation", { tags: ["008-US3"] }, async () => {
-    const { writes, onDone } = setup({
+    const { writes, onDone, onDeleted } = setup({
       sessionId: "mine",
       handler: () => new Response(null, { status: 204 }),
     });
@@ -531,7 +537,8 @@ describe("editing a session", { tags: ["008-US2"] }, () => {
       within(screen.getByRole("dialog")).getByRole("button", { name: "Delete" })
     );
 
-    await waitFor(() => expect(onDone).toHaveBeenCalled());
+    await waitFor(() => expect(onDeleted).toHaveBeenCalled());
+    expect(onDone).not.toHaveBeenCalled();
     expect(writes()[0]).toMatchObject({
       method: "DELETE",
       path: "/api/v1/sessions/mine",
@@ -541,12 +548,29 @@ describe("editing a session", { tags: ["008-US2"] }, () => {
     );
   });
 
-  it("leaves the session as it is when cancelled", () => {
-    setup({ sessionId: "mine" });
+  it("leaves through the caller when cancelled", async () => {
+    const { onCancel, writes } = setup({ sessionId: "mine" });
 
-    expect(
-      screen.getByRole("link", { name: "Cancel" }).getAttribute("href")
-    ).toBe("/conf");
+    await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(onCancel).toHaveBeenCalled();
+    expect(writes()).toEqual([]);
+  });
+
+  it("reports unsaved edits to the panel", async () => {
+    let check = () => false;
+    setup({
+      sessionId: "mine",
+      track: (fn) => {
+        check = fn;
+        return () => {};
+      },
+    });
+    expect(check()).toBe(false);
+
+    await userEvent.type(screen.getByLabelText(/Session title/), "!");
+
+    expect(check()).toBe(true);
   });
 
   it("says when the session is gone", () => {

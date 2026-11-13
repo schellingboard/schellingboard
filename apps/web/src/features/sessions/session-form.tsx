@@ -23,7 +23,7 @@ import {
   formatOptionalTime,
   formatSlotLabel,
 } from "@schellingboard/domain/time";
-import { type FormEvent, useMemo, useRef, useState } from "react";
+import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import { useTimeFormat } from "../../app/time-format";
 import { actingGuestRefusal } from "../../commands/acting-guest-message";
@@ -36,7 +36,6 @@ import type {
 } from "../../commands/session-form";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import { useListFormat } from "../../i18n/format-locale";
-import { BackLink } from "../../ui/back-link";
 import { Button } from "../../ui/button";
 import { ConfirmDialog } from "../../ui/confirm-dialog";
 import {
@@ -63,7 +62,6 @@ import { useHostClashes } from "./use-host-clashes";
 const CONFIRMATION_MS = 10_000;
 
 export type SessionFormLinks = {
-  schedule: string;
   proposal: (proposalId: string) => string;
   session: (sessionId: string) => string;
 };
@@ -85,13 +83,18 @@ export type SessionFormProps = {
   links: SessionFormLinks;
   /** Stable between renders: a new one asks the server about the hosts again. */
   actions: SessionFormCalls;
-  /** Saved or deleted: the caller leaves the form. `created` names a session just added. */
+  /** Saved: the caller leaves the form. `created` names a session just added. */
   onDone: (created?: string) => void;
+  /** Deleted: the session the caller came from is gone too. */
+  onDeleted: () => void;
+  onCancel: () => void;
+  /** Lets the host ask before the form is left over edits the fields cannot show. */
+  track?: (check: () => boolean) => () => void;
 };
 
-/** The add and edit session screens. */
+/** The add and edit session form, the body of its side panel. */
 export function SessionForm(props: SessionFormProps) {
-  const { snapshot, sessionId, links } = props;
+  const { snapshot, sessionId } = props;
   const viewer = snapshot.me?.guestId ?? null;
   const session = sessionId
     ? snapshot.sessions.find((s) => s.id === sessionId)
@@ -109,15 +112,7 @@ export function SessionForm(props: SessionFormProps) {
     return null;
   })();
 
-  if (refusal || !viewer)
-    return (
-      <div className="mx-auto max-w-2xl px-4">
-        <BackLink href={links.schedule}>
-          <Trans>Schedule</Trans>
-        </BackLink>
-        <div className="mt-6">{refusal}</div>
-      </div>
-    );
+  if (refusal || !viewer) return <p className="text-fg-muted">{refusal}</p>;
   return <Fields {...props} viewer={viewer} session={session} />;
 }
 
@@ -128,6 +123,9 @@ function Fields({
   links,
   actions,
   onDone,
+  onDeleted,
+  onCancel,
+  track,
   viewer,
   session,
 }: SessionFormProps & {
@@ -135,7 +133,6 @@ function Fields({
   session: Snapshot["sessions"][number] | undefined;
 }) {
   const { event } = snapshot;
-  const eventName = event.name;
   const { timezone, breakMinutes, slotIncrementMinutes } = event;
   const timeFormat = useTimeFormat();
   const listFormat = useListFormat();
@@ -301,6 +298,28 @@ function Fields({
     return [...byId].map(([id, name]) => ({ id, name }));
   }, [snapshot.guests, hostIds]);
 
+  const edits = JSON.stringify([
+    proposal?.id,
+    title,
+    description,
+    closed,
+    dayId,
+    locationId,
+    capacityInput,
+    startTime,
+    duration,
+    hostIds,
+  ]);
+  const [original] = useState(edits);
+  const latestEdits = useRef(edits);
+  useEffect(() => {
+    latestEdits.current = edits;
+  });
+  useEffect(
+    () => track?.(() => latestEdits.current !== original),
+    [track, original]
+  );
+
   const [confirming, setConfirming] = useState(false);
   const [confirmingMove, setConfirmingMove] = useState(false);
   const [removing, setRemoving] = useState(false);
@@ -464,7 +483,7 @@ function Fields({
     setRemoving(true);
     if ((await remove.submit())?.ok) {
       confirmation(t`Your session “${title}” has been deleted successfully.`);
-      onDone();
+      onDeleted();
     }
   };
 
@@ -488,17 +507,9 @@ function Fields({
     formRef.current?.querySelector<HTMLElement>(`[name="${name}"]`)?.focus();
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-4 px-4 pb-24">
-      <BackLink href={links.schedule}>
-        <Trans>Schedule</Trans>
-      </BackLink>
+    <div className="flex flex-col gap-4">
       <div>
-        <h2 className="text-2xl font-bold">
-          {editing
-            ? t`${eventName}: Edit session`
-            : t`${eventName}: Add a session`}
-        </h2>
-        <p className="mt-2 text-sm text-fg-subtle">
+        <p className="text-sm text-fg-subtle">
           {!editing && (
             <Trans>Fill out this form to add a session to the schedule!</Trans>
           )}{" "}
@@ -786,12 +797,9 @@ function Fields({
             </Button>
           )}
           <div className="ml-auto flex gap-3">
-            <a
-              href={links.schedule}
-              className="rounded px-6 py-2 font-semibold text-fg-muted bg-surface-muted hover:bg-surface-hover"
-            >
+            <Button variant="quiet" onClick={onCancel}>
               <Trans>Cancel</Trans>
-            </a>
+            </Button>
             <Button
               type="submit"
               disabled={!complete || checkingClashes || busy}

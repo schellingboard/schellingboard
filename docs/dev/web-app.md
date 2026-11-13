@@ -126,10 +126,11 @@ The pure parts (`grid-layout`, `column`, `meeting-column`, `agenda`, `fold`, `fi
 schedule. `model.ts` has the new pure rules (narrowing by room, matching, day folds). `links.ts` is
 the one place that decides where a session, a 1-on-1, add-session or booking link goes: a session
 (`/{slug}/sessions/:id`) and a 1-on-1 (`/{slug}/meetings/:id`) open in the panel over the schedule,
-booking (`?bookMeeting=`) in a dialog, the add and edit session links go to the session form
-(`app/sessions-pages.tsx`, `/{slug}/add-session`, `/{slug}/edit-session`). `/{slug}/meetings`
-(`app/meetings-page.tsx`) only redirects an old `?viewMeeting=` address to the 1-on-1's panel;
-outside the scheduling phase the panel is read-only.
+booking (`?bookMeeting=`) in a dialog, the add and edit session links open the session form in the
+panel (`session-form`, `/{slug}/sessions/new` with the slot or proposal as query,
+`/{slug}/sessions/:id/edit`; the former `add-session` and `edit-session` addresses land the same
+way). `/{slug}/meetings` (`app/meetings-page.tsx`) only redirects an old `?viewMeeting=` address to
+the 1-on-1's panel; outside the scheduling phase the panel is read-only.
 
 `app/schedule-page.tsx` composes it: `useScheduleSession` (`replica/session.ts`: `openReplica`,
 `connectFeed`, `autosaveReplica`, hidden-tab and back/forward-cache handling, plus a command runner)
@@ -159,12 +160,12 @@ behind does not belong to. `app/panel-history.ts` keeps the page behind it and t
 schedule (for a session or a 1-on-1), the proposals list or the directory with the panel over it
 (only the directory behind a profile gives it Prev and Next), and `?viewSession=`, `?viewProposal=`
 and `?viewMeeting=` (also at `/{slug}/meetings`) redirect the same way. The proposal form is a panel
-kind too (`proposal-form` at `/{slug}/proposals/new` and `.../:id/edit`, and `profile-form` at
-`/guests/edit`, ADR 0021): `ProposalFormHost` and `ProfileFormHost` block history Back over unsaved
-changes with `history.block`, and `leaving` marks a confirmed or saved exit so the blocker lets it
-through. Booking a 1-on-1 stays a dialog, `?bookMeeting=` on the schedule. Links from legacy pages
-and emails are plain anchors: build them with `links.ts` and `utils/notifications.ts`, never a
-second copy.
+kind too (`proposal-form` at `/{slug}/proposals/new` and `.../:id/edit`, `session-form`, and
+`profile-form` at `/guests/edit`, ADR 0021): `ProposalFormHost`, `SessionFormHost` and
+`ProfileFormHost` block history Back over unsaved changes with `history.block`, and `leaving` marks
+a confirmed or saved exit so the blocker lets it through. Booking a 1-on-1 stays a dialog,
+`?bookMeeting=` on the schedule. Links from legacy pages and emails are plain anchors: build them
+with `links.ts` and `utils/notifications.ts`, never a second copy.
 
 Two gotchas. The panel is `role="dialog"` with `aria-modal="false"`, so `dialog` locators in E2E
 still find it while the page behind stays usable. `landOnPanel` replaces the entry with the list

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 import { InAppLinks } from "./in-app-links";
-import type { PanelItem } from "./panel-history";
+import { type PanelItem, sessionFormOf } from "./panel-history";
 import { usePanel } from "./use-panel";
 
 const PROFILE_PATH = /^\/guests\/([^/]+)\/?$/;
@@ -20,7 +20,10 @@ const EVENT_PATH = /^\/([^/]+)\/(sessions|proposals|meetings)\/([^/]+)\/?$/;
 const NOT_A_PROPOSAL = new Set(["new", "quick-voting"]);
 const FORM_PATH = /^\/([^/]+)\/proposals\/(?:new|([^/]+)\/edit)\/?$/;
 
-function eventItemOf(pathname: string): PanelItem | null {
+function eventItemOf(pathname: string, search = ""): PanelItem | null {
+  const slugOf = /^\/([^/]+)\//.exec(pathname)?.[1];
+  const form = slugOf ? sessionFormOf(slugOf, pathname, search) : null;
+  if (form) return form;
   const [, formSlug, formId] = FORM_PATH.exec(pathname) ?? [];
   if (formSlug) {
     try {
@@ -56,10 +59,10 @@ export function PanelLinks({ children }: { children: ReactNode }) {
   return (
     <InAppLinks
       className="contents"
-      owns={({ pathname }) =>
+      owns={({ pathname, search }) =>
         pathname === "/guests/edit" ||
         profileIdOf(pathname) !== null ||
-        eventItemOf(pathname) !== null
+        eventItemOf(pathname, search) !== null
       }
       intercept={(url, link) => {
         const id = profileIdOf(url.pathname);
@@ -67,7 +70,7 @@ export function PanelLinks({ children }: { children: ReactNode }) {
           url.pathname === "/guests/edit"
             ? { kind: "profile-form" }
             : id === null
-              ? eventItemOf(url.pathname)
+              ? eventItemOf(url.pathname, url.search)
               : { kind: "profile", id };
         if (!item) return false;
         if (item.kind === "session")

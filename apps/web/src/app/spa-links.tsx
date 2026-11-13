@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { InAppLinks } from "./in-app-links";
+import { sessionFormOf } from "./panel-history";
 import { usePanel } from "./use-panel";
 
 /**
@@ -22,11 +23,13 @@ export function SpaLinks({
   return (
     <InAppLinks
       intercept={(url, link) => {
-        const opened = url.pathname.startsWith(sessionPrefix)
-          ? panelSession(url, sessionPrefix, slug)
-          : url.pathname.startsWith(meetingPrefix)
-            ? panelMeeting(url.pathname, meetingPrefix, slug)
-            : panelProposal(url.pathname, proposalPrefix, slug);
+        const opened =
+          sessionFormOf(slug, url.pathname, url.search) ??
+          (url.pathname.startsWith(sessionPrefix)
+            ? panelSession(url, sessionPrefix, slug)
+            : url.pathname.startsWith(meetingPrefix)
+              ? panelMeeting(url.pathname, meetingPrefix, slug)
+              : panelProposal(url.pathname, proposalPrefix, slug));
         if (!opened) return false;
         open(opened, {
           fromPanel: link.closest("[data-side-panel]") !== null,
@@ -40,8 +43,6 @@ export function SpaLinks({
         pathname.startsWith(`/${slug}/sessions/`) ||
         pathname === `/${slug}/meetings` ||
         pathname.startsWith(`/${slug}/meetings/`) ||
-        pathname === `/${slug}/add-session` ||
-        pathname === `/${slug}/edit-session` ||
         pathname === `/${slug}/proposals` ||
         pathname.startsWith(`/${slug}/proposals/`)
       }

@@ -12,6 +12,7 @@ import {
   panelOf,
   panelPath,
   replaceBackground,
+  sessionFormOf,
 } from "./panel-history";
 
 const session = (id: string) => ({
@@ -193,5 +194,49 @@ describe("form panels", () => {
   it("names the add and edit forms by their own addresses", () => {
     expect(panelPath(form())).toBe("/conf/proposals/new");
     expect(panelPath(form("p 1"))).toBe("/conf/proposals/p%201/edit");
+  });
+});
+
+describe("the session form panel", () => {
+  const form = (id?: string, prefill = {}) => ({
+    kind: "session-form" as const,
+    slug: "conf",
+    id,
+    prefill,
+  });
+
+  it("names the add form with the slot or proposal, and the edit form by id", () => {
+    expect(panelPath(form())).toBe("/conf/sessions/new");
+    expect(
+      panelPath(form(undefined, { day: "2026-06-15", time: "10:00" }))
+    ).toBe("/conf/sessions/new?day=2026-06-15&time=10%3A00");
+    expect(panelPath(form(undefined, { proposalId: "p" }))).toBe(
+      "/conf/sessions/new?proposalID=p"
+    );
+    expect(panelPath(form("s 1"))).toBe("/conf/sessions/s%201/edit");
+  });
+
+  it("is read back from those addresses and the former ones", () => {
+    expect(
+      sessionFormOf("conf", "/conf/sessions/new", "?location=Room")
+    ).toMatchObject({
+      id: undefined,
+      prefill: { location: "Room" },
+    });
+    expect(sessionFormOf("conf", "/conf/add-session", "")).toMatchObject({
+      id: undefined,
+    });
+    expect(
+      sessionFormOf("conf", "/conf/sessions/s%201/edit", "")
+    ).toMatchObject({
+      id: "s 1",
+    });
+    expect(
+      sessionFormOf("conf", "/conf/edit-session", "?sessionID=s")
+    ).toMatchObject({ id: "s" });
+    expect(sessionFormOf("conf", "/conf/edit-session", "")).toMatchObject({
+      id: undefined,
+    });
+    expect(sessionFormOf("conf", "/conf/sessions/s", "")).toBeNull();
   });
 });

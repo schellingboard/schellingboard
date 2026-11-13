@@ -6,6 +6,7 @@ import {
   Outlet,
   redirect,
   type RouterHistory,
+  useParams,
   useRouter,
 } from "@tanstack/react-router";
 import { type ReactElement, Suspense } from "react";
@@ -25,7 +26,11 @@ import { EventLayout } from "./event-page";
 import { HomePage } from "./home-page";
 import { MeetingsPage } from "./meetings-page";
 import { NotFound } from "./not-found";
-import { createScrollReset } from "./panel-history";
+import {
+  createScrollReset,
+  type PanelItem,
+  sessionFormOf,
+} from "./panel-history";
 import { ForeignPanelHost, PanelHost } from "./panel-host";
 import { PanelLanding } from "./panel-landing";
 import { PanelLinks } from "./panel-links";
@@ -35,7 +40,6 @@ import { ProfileWalkProvider } from "./profile-walk";
 import { ProposalsPage, QuickVotingPage } from "./proposals-pages";
 import { SchedulePage } from "./schedule-page";
 import { type AppServices, defaultServices } from "./services";
-import { SessionFormPage } from "./sessions-pages";
 import { ShellProviders } from "./shell";
 import { SpaLinks } from "./spa-links";
 
@@ -237,16 +241,27 @@ export function createAppRouter(
       );
     },
   });
-  const addSession = createRoute({
-    getParentRoute: () => event,
-    path: "add-session",
-    component: SessionFormPage,
-  });
-  const editSession = createRoute({
-    getParentRoute: () => event,
-    path: "edit-session",
-    component: SessionFormPage,
-  });
+  const sessionFormRoute = (path: string) => {
+    const route = createRoute({
+      getParentRoute: () => event,
+      path,
+      component: function SessionFormRoute(): ReactElement | null {
+        const { slug, sessionId } = useParams({ strict: false });
+        const { pathname, search } = useRouter().history.location;
+        if (!slug) return null;
+        const item: PanelItem | null = sessionId
+          ? { kind: "session-form", slug, id: sessionId }
+          : sessionFormOf(slug, pathname, search);
+        if (!item) return null;
+        return <PanelLanding item={item} background={`/${slug}/schedule`} />;
+      },
+    });
+    return route;
+  };
+  const newSession = sessionFormRoute("sessions/new");
+  const editSession = sessionFormRoute("sessions/$sessionId/edit");
+  const addSession = sessionFormRoute("add-session");
+  const legacyEditSession = sessionFormRoute("edit-session");
   // One component for the directory, a profile over it and the edit page, so
   // moving between them keeps the list mounted.
   const guests = createRoute({
@@ -429,8 +444,10 @@ export function createAppRouter(
         quickVoting,
         newProposal,
         editProposal,
-        addSession,
+        newSession,
         editSession,
+        addSession,
+        legacyEditSession,
       ]),
       catchAll,
     ]),

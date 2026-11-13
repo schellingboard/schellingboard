@@ -4,9 +4,30 @@ export type PanelItem =
   | { kind: "session"; slug: string; id: string; record?: boolean }
   | { kind: "proposal"; slug: string; id: string }
   | { kind: "proposal-form"; slug: string; id?: string }
+  | {
+      kind: "session-form";
+      slug: string;
+      id?: string;
+      prefill?: SessionFormPrefill;
+    }
   | { kind: "meeting"; slug: string; id: string }
   | { kind: "profile"; id: string }
   | { kind: "profile-form" };
+
+/** What the schedule's free cells and the proposal list put in the address of a new session. */
+export type SessionFormPrefill = {
+  day?: string;
+  time?: string;
+  location?: string;
+  proposalId?: string;
+};
+
+const PREFILL_PARAMS = {
+  day: "day",
+  time: "time",
+  location: "location",
+  proposalId: "proposalID",
+} as const;
 
 export type PanelState = {
   item: PanelItem;
@@ -31,6 +52,15 @@ export const panelPath = (item: PanelItem) => {
     return item.id === undefined
       ? `/${item.slug}/proposals/new`
       : `/${item.slug}/proposals/${encodeURIComponent(item.id)}/edit`;
+  if (item.kind === "session-form") {
+    if (item.id !== undefined)
+      return `/${item.slug}/sessions/${encodeURIComponent(item.id)}/edit`;
+    const query = new URLSearchParams();
+    for (const [key, param] of Object.entries(PREFILL_PARAMS))
+      if (item.prefill?.[key as keyof SessionFormPrefill])
+        query.set(param, item.prefill[key as keyof SessionFormPrefill]!);
+    return `/${item.slug}/sessions/new${query.size ? `?${query}` : ""}`;
+  }
   if (item.kind === "profile-form") return "/guests/edit";
   const id = encodeURIComponent(item.id);
   if (item.kind === "profile") return `/guests/${id}`;
@@ -94,8 +124,11 @@ export function openPanel(
   }
 }
 
-/** Back to the page, carrying over what was changed on it while the panel was open. */
-export function closePanel(history: RouterHistory) {
+/** Back to the page, carrying over what was changed on it while the panel was open; `reveal` scrolls it to a session. */
+export function closePanel(
+  history: RouterHistory,
+  reveal?: { revealSession: string }
+) {
   const current = panelOf(history.location);
   if (!current) return;
   const { search } = backgroundOf(history.location);
@@ -103,7 +136,8 @@ export function closePanel(history: RouterHistory) {
     if (panelOf(history.location)) return;
     off();
     const { pathname, search: left, hash } = history.location;
-    if (left !== search) history.replace(`${pathname}${search}${hash}`);
+    if (left !== search || reveal)
+      history.replace(`${pathname}${search}${hash}`, reveal);
   });
   history.go(-current.depth);
 }
@@ -183,4 +217,39 @@ export function createScrollReset() {
 export function entryIndexOf(location: HistoryLocation) {
   const index = (location.state as { __TSR_index?: number }).__TSR_index ?? 0;
   return index - (panelOf(location)?.depth ?? 0);
+}
+
+export function sessionFormOf(
+  slug: string,
+  pathname: string,
+  search: string
+): Extract<PanelItem, { kind: "session-form" }> | null {
+  const rest = pathname.replace(/\/$/, "");
+  const query = new URLSearchParams(search);
+  const item = (id?: string) => ({
+    kind: "session-form" as const,
+    slug,
+    id,
+    prefill: {
+      day: query.get(PREFILL_PARAMS.day) ?? undefined,
+      time: query.get(PREFILL_PARAMS.time) ?? undefined,
+      location: query.get(PREFILL_PARAMS.location) ?? undefined,
+      proposalId: query.get(PREFILL_PARAMS.proposalId) ?? undefined,
+    },
+  });
+  if (rest === `/${slug}/sessions/new` || rest === `/${slug}/add-session`)
+    return item();
+  if (rest === `/${slug}/edit-session`) {
+    const id = query.get("sessionID");
+    return item(id ?? undefined);
+  }
+  const prefix = `/${slug}/sessions/`;
+  if (!rest.startsWith(prefix) || !rest.endsWith("/edit")) return null;
+  const id = rest.slice(prefix.length, -"/edit".length);
+  if (!id || id.includes("/")) return null;
+  try {
+    return item(decodeURIComponent(id));
+  } catch {
+    return null;
+  }
 }

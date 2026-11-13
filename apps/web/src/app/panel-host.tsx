@@ -3,6 +3,7 @@ import { useRouter } from "@tanstack/react-router";
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
 import { proposalFormCalls } from "../commands/proposal-form";
+import { sessionFormCalls } from "../commands/session-form";
 import {
   MeetingNeedsName,
   MeetingPanel,
@@ -14,6 +15,7 @@ import { ScheduleProvider } from "../features/schedule/context";
 import { scheduleDataFrom } from "../features/schedule/data";
 import { scheduleLinks } from "../features/schedule/links";
 import { SessionPanel } from "../features/schedule/session-panel";
+import { SessionForm } from "../features/sessions/session-form";
 import { SidePanel, usePanelGuard } from "../ui/side-panel";
 import { EventViewContext, Ready, useEventView } from "./event-page";
 import { LOCAL_ZONE } from "./local-zone";
@@ -38,6 +40,8 @@ export function PanelHost() {
     return <SessionHost key={key} item={panel.item} depth={panel.depth} />;
   if (panel.item.kind === "meeting")
     return <MeetingHost key={key} item={panel.item} depth={panel.depth} />;
+  if (panel.item.kind === "session-form")
+    return <SessionFormHost key={key} item={panel.item} depth={panel.depth} />;
   if (panel.item.kind === "proposal-form")
     return <ProposalFormHost key={key} item={panel.item} depth={panel.depth} />;
   return <ProposalHost key={key} item={panel.item} depth={panel.depth} />;
@@ -256,6 +260,62 @@ function ProposalFormHost({
             onCancel={cancel}
             onSaved={() => leave(depth > 1 ? back : close)}
             onDeleted={() => leave(close)}
+          />
+        )}
+      </FormBody>
+    </SidePanel>
+  );
+}
+
+function SessionFormHost({
+  item,
+  depth,
+}: {
+  item: Extract<PanelItem, { kind: "session-form" }>;
+  depth: number;
+}) {
+  const view = useEventView();
+  const { close, back } = usePanel();
+  const links = useMemo(
+    () => ({
+      proposal: proposalLinks(view.slug).view,
+      session: proposalLinks(view.slug).session,
+    }),
+    [view.slug]
+  );
+  const actions = useMemo(() => sessionFormCalls(view.api), [view.api]);
+  const leaving = useRef(false);
+  const leave = (then: () => void) => {
+    leaving.current = true;
+    then();
+  };
+  return (
+    <SidePanel
+      label={t`Session form`}
+      title={item.id ? t`Edit session` : t`Add a session`}
+      onClose={() => leave(close)}
+      onBack={depth > 1 ? () => leave(back) : undefined}
+      guardUnload
+    >
+      <FormBody leaving={leaving}>
+        {(cancel, track) => (
+          <SessionForm
+            snapshot={view.snapshot}
+            now={view.now}
+            sessionId={item.id}
+            prefill={item.prefill}
+            links={links}
+            actions={actions}
+            track={track}
+            onCancel={cancel}
+            onDone={(created) => {
+              if (depth > 1) leave(back);
+              else
+                leave(() =>
+                  close(created ? { revealSession: created } : undefined)
+                );
+            }}
+            onDeleted={() => leave(() => close())}
           />
         )}
       </FormBody>

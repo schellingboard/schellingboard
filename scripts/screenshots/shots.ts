@@ -133,7 +133,7 @@ export const shots: Shot[] = [
   shot("add-session", async (page) => {
     await openEvent(page, "Conference Gamma");
     await page.getByRole("link", { name: /add/i }).first().click();
-    await page.waitForURL(/add-session/);
+    await page.getByRole("dialog", { name: "Session form" }).waitFor();
   }),
   shot("attendees", async (page) => {
     await page.getByRole("link", { name: "Attendees" }).click();

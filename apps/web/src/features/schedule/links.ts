@@ -23,11 +23,11 @@ export function scheduleLinks(eventSlug: string): ScheduleLinks {
     meeting: (id) => `/${eventSlug}/meetings/${encodeURIComponent(id)}`,
     guest: (guestId) => `/guests/${guestId}`,
     editSession: (sessionId) =>
-      `/${eventSlug}/edit-session?${new URLSearchParams({ sessionID: sessionId })}`,
+      `/${eventSlug}/sessions/${encodeURIComponent(sessionId)}/edit`,
     proposal: (proposalId) =>
       `/${eventSlug}/proposals/${encodeURIComponent(proposalId)}`,
     addSession: ({ location, day, time }) =>
-      `/${eventSlug}/add-session?${new URLSearchParams({ location, time, day })}`,
+      `/${eventSlug}/sessions/new?${new URLSearchParams({ location, time, day })}`,
     bookMeeting: (slotStart) =>
       `${schedule}?${new URLSearchParams({ bookMeeting: slotStart })}`,
   };

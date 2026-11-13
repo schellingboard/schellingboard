@@ -95,5 +95,8 @@ test("voting phase: tapping a greyed-out Schedule button says when scheduling op
   await schedule.focus();
   await page.keyboard.press("Enter");
   await expect(toast(page)).toContainText(/Scheduling will be enabled at/);
-  await expect(page).not.toHaveURL(/add-session/);
+  await expect(page).not.toHaveURL(/sessions\/new/);
+  await expect(page.getByRole("dialog", { name: "Session form" })).toHaveCount(
+    0
+  );
 });

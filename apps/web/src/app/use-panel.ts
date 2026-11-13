@@ -21,7 +21,10 @@ export function usePanel() {
       openPanel(history, item, how),
     [history]
   );
-  const close = useCallback(() => closePanel(history), [history]);
+  const close = useCallback(
+    (reveal?: { revealSession: string }) => closePanel(history, reveal),
+    [history]
+  );
   const back = useCallback(() => history.back(), [history]);
   const setHash = useCallback(
     (hash: string) => setPanelHash(history, hash),

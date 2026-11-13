@@ -31,12 +31,23 @@ function Loaded(view: EventView) {
   const clashes = useMeetingClashes(api, store);
   const { history } = useRouter();
   const { panel, open } = usePanel();
-  const [openAtMount] = useState(
+  const [openAtMount] = useState(() =>
+    panel?.item.kind === "session" && panel.item.slug === slug
+      ? panel.item.id
+      : null
+  );
+  const [created, setCreated] = useState<string | null>(null);
+  useEffect(
     () =>
-      (history.location.state as { revealSession?: string }).revealSession ??
-      (panel?.item.kind === "session" && panel.item.slug === slug
-        ? panel.item.id
-        : null)
+      history.subscribe(() => {
+        const id = (history.location.state as { revealSession?: string })
+          .revealSession;
+        if (!id) return;
+        setCreated(id);
+        const { pathname, search, hash } = history.location;
+        history.replace(`${pathname}${search}${hash}`, {});
+      }),
+    [history]
   );
   const viewSession = params.get("viewSession");
   const viewMeeting = params.get("viewMeeting");
@@ -92,7 +103,7 @@ function Loaded(view: EventView) {
           panel.item.kind === "session" &&
           panel.item.slug === slug
             ? panel.item.id
-            : openAtMount
+            : (created ?? openAtMount)
         }
         onHashChange={setHash}
         sync={<SyncIndicator store={store} />}

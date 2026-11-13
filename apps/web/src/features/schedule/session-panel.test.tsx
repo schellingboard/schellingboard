@@ -322,7 +322,7 @@ describe("the session modal's RSVP", () => {
     const d = within(dialog());
     expect(d.queryByRole("button", { name: "RSVP" })).toBeNull();
     expect(d.getByRole("link", { name: "Edit" }).getAttribute("href")).toBe(
-      "/conf/edit-session?sessionID=s"
+      "/conf/sessions/s/edit"
     );
   });
 

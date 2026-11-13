@@ -206,6 +206,10 @@ Two ways, whichever you find first:
   **Proposal** to fill the form from it. Or leave it at **[none]** and book the slot with a
   brand-new session that was never proposed.
 
+The form opens in a side panel over the schedule, so you can still see which rooms and times are
+free; saving returns you to where you started, and closing it over changes you have not saved asks
+before discarding them.
+
 ![Form for adding a session to the schedule, with a Proposal dropdown to fill it from a proposal](../screenshots/add-session.webp)
 
 **Max attendees** starts at what the room holds. Cap it lower for a hands-on session, or raise it

@@ -49,7 +49,7 @@ async function openEditForm(page: Page, title: string) {
 async function deleteSession(page: Page) {
   await page.getByRole("button", { name: "Delete", exact: true }).click();
   await page
-    .getByRole("dialog")
+    .getByRole("dialog", { name: "Delete session?" })
     .getByRole("button", { name: "Delete" })
     .click();
   await expect(toast(page)).toContainText(

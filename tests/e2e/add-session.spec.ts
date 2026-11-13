@@ -55,3 +55,25 @@ test("a newly added session appears on the overview and can be opened @008-US1 @
   await expect(dialog).toBeVisible();
   await expect(dialog.getByText(sessionTitle, { exact: true })).toBeVisible();
 });
+
+test("the session form asks before discarding, and opens again from its address @008-US1", async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto("/Conference-Gamma");
+  await selectUser(page, /Alice Test/i);
+  await page.getByRole("link", { name: "Add session" }).first().click();
+  const form = page.getByRole("dialog", { name: "Session form" });
+  await form.getByLabel("Session title").fill(`Unsaved ${uniqueSuffix()}`);
+
+  await form.getByRole("button", { name: "Cancel" }).click();
+  await expect(page.getByText("Discard your changes?")).toBeVisible();
+  await page.getByRole("button", { name: "Keep editing" }).click();
+  await expect(form).toBeVisible();
+
+  await page.reload();
+  await expect(form.getByLabel("Session title")).toHaveValue("");
+  await form.getByRole("button", { name: "Close" }).click();
+  await expect(form).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Grid" })).toBeVisible();
+});

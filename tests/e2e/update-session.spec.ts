@@ -177,7 +177,9 @@ test("a host can fix a session placed where they could never have booked one @00
   const description = `Loose ends ${uniqueSuffix()}`;
   await page.getByRole("textbox").nth(1).fill(description);
   await page.getByRole("button", { name: "Submit" }).click();
-  await page.waitForURL(/\/Conference-Gamma\/schedule$/);
+  await expect(page.getByRole("dialog", { name: "Session form" })).toHaveCount(
+    0
+  );
   await expect(toast(page)).toContainText(
     /Your session .* has been updated successfully/i
   );
@@ -196,7 +198,9 @@ test("a host can fix a session placed where they could never have booked one @00
   });
   await expect(moveDialog.getByText(/RSVP'd to this session/)).toBeVisible();
   await moveDialog.getByRole("button", { name: "Yes", exact: true }).click();
-  await page.waitForURL(/\/Conference-Gamma\/schedule$/);
+  await expect(page.getByRole("dialog", { name: "Session form" })).toHaveCount(
+    0
+  );
   await dismissToast(page);
 
   await page.getByRole("link", { name: "Evening Wrap-up" }).click();
