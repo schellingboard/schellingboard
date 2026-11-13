@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import type { ApiClient } from "@schellingboard/api-client";
 import {
   MAX_ATTENDEE_COUNT,
@@ -12,7 +13,10 @@ export type AttendeeCountResult =
 
 export type AttendeeCountApi = ReturnType<typeof attendeeCountApi>;
 
-const RANGE_MESSAGE = `Enter a whole number between ${MIN_ATTENDEE_COUNT} and ${MAX_ATTENDEE_COUNT}`;
+const rangeMessage = () =>
+  t`Enter a whole number between ${MIN_ATTENDEE_COUNT} and ${MAX_ATTENDEE_COUNT}`;
+const loadFailed = () => t`Could not load the count — try again`;
+const saveFailed = () => t`Could not save — try again`;
 
 /** A host's count of who came: not in the replica, which every visitor receives. */
 export function attendeeCountApi(api: ApiClient, newKey: () => string) {
@@ -26,9 +30,9 @@ export function attendeeCountApi(api: ApiClient, newKey: () => string) {
         );
         return data
           ? { ok: true, count: data.count }
-          : { ok: false, message: "Could not load the count — try again" };
+          : { ok: false, message: loadFailed() };
       } catch {
-        return { ok: false, message: "Could not load the count — try again" };
+        return { ok: false, message: loadFailed() };
       }
     },
     async save(
@@ -46,10 +50,10 @@ export function attendeeCountApi(api: ApiClient, newKey: () => string) {
         );
         if (data) return { ok: true, count: data.count };
         return problemCode(error, response.status) === "attendeeCount.invalid"
-          ? { ok: false, message: RANGE_MESSAGE, invalid: true }
-          : { ok: false, message: "Could not save — try again" };
+          ? { ok: false, message: rangeMessage(), invalid: true }
+          : { ok: false, message: saveFailed() };
       } catch {
-        return { ok: false, message: "Could not save — try again" };
+        return { ok: false, message: saveFailed() };
       }
     },
   };

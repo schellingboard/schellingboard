@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import type { AdminSession } from "../../queries/admin-sessions";
 import {
-  CAPACITY_ERROR,
   type DayOption,
   EMPTY_SESSION,
   sessionBody,
@@ -122,6 +121,8 @@ describe("the admin session form model", { tags: ["018-US2"] }, () => {
     });
 
     const bad = sessionBody({ ...EMPTY_SESSION, capacity: "2.5" }, [], TZ);
-    expect(bad.errors.capacity).toBe(CAPACITY_ERROR);
+    expect(bad.errors.capacity).toBe(
+      "Capacity must be a non-negative whole number"
+    );
   });
 });

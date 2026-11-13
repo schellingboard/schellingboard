@@ -1,6 +1,10 @@
 import { i18n, type MessageDescriptor } from "@lingui/core";
 import { msg, t } from "@lingui/core/macro";
 
+const CAPACITY_INVALID = msg`Max attendees must be a non-negative whole number`;
+
+export const capacityError = () => i18n._(CAPACITY_INVALID);
+
 const REASONS: Record<string, MessageDescriptor> = {
   "session.full": msg`This session is full.`,
   "rsvp.ownSession": msg`Hosts cannot RSVP to their own session.`,
@@ -48,7 +52,7 @@ const REASONS: Record<string, MessageDescriptor> = {
   "session.notFound": msg`This session no longer exists.`,
   "session.hasHost": msg`This session already has a host.`,
   "session.versionConflict": msg`This session changed meanwhile. Check it and try again.`,
-  "session.capacityInvalid": msg`Max attendees must be a non-negative whole number`,
+  "session.capacityInvalid": CAPACITY_INVALID,
   "comment.invalid": msg`A comment cannot be empty.`,
   "comment.notAuthor": msg`Only the author can change a comment.`,
   "comment.notAllowed": msg`You cannot remove this comment.`,

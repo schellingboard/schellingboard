@@ -6,7 +6,6 @@ import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { dateOnDay } from "@schellingboard/domain/event";
 import {
   buildSessionInterval,
-  CAPACITY_ERROR,
   sessionHasStarted,
 } from "@schellingboard/domain/session-booking";
 import { overlappingMoment } from "@schellingboard/domain/shared-moment";
@@ -26,6 +25,7 @@ import { type FormEvent, useMemo, useRef, useState } from "react";
 
 import { useTimeFormat } from "../../app/time-format";
 import { actingGuestRefusal } from "../../commands/acting-guest-message";
+import { capacityError } from "../../commands/failure-message";
 import { type FieldErrors, validateFields } from "../../commands/mutation";
 import type {
   SessionCreateBody,
@@ -572,7 +572,7 @@ function Fields({
             hint="Starts at what the room holds. 0 means no limit."
             value={capacity}
             onChange={setCapacityInput}
-            error={capacityValid ? fields.capacity : CAPACITY_ERROR}
+            error={capacityValid ? fields.capacity : capacityError()}
           />
           {overRoomCapacity && room && (
             <p className="text-sm text-danger-fg">

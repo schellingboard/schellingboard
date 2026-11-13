@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import type { myNotificationsSchema } from "@schellingboard/contracts/notification";
 
 import { newKey } from "../commands/keys";
@@ -50,7 +51,7 @@ export function createNotificationsQuery({
   ): NotificationAction => {
     // A failed "older" page must not take the loaded rows away.
     if (!after) state.set({ status: "error", code });
-    return { ok: false, message: "Could not load your notifications." };
+    return { ok: false, message: t`Could not load your notifications.` };
   };
 
   const fetchPage = async (after?: string): Promise<NotificationAction> => {
@@ -132,7 +133,7 @@ export function createNotificationsQuery({
         return {
           ok: false,
           message: result.ok
-            ? "Could not open this notification."
+            ? t`Could not open this notification.`
             : result.message,
         };
       const current = ready();

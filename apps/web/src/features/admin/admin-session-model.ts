@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import {
   calendarDayOf,
   dayIndexOf,
@@ -109,8 +110,6 @@ export function startInstant(
   );
 }
 
-export const CAPACITY_ERROR = "Capacity must be a non-negative whole number";
-
 /** The request body, or the field errors that stop it. An empty capacity means 0. */
 export function sessionBody(
   values: SessionFormValues,
@@ -120,11 +119,11 @@ export function sessionBody(
 ): { body?: AdminSessionBody; errors: Record<string, string> } {
   const errors: Record<string, string> = {};
   const day = days.find((d) => d.key === values.dayKey);
-  if (day && !values.startTime) errors.startTime = "Start is required";
-  if (day && !values.endTime) errors.endTime = "End is required";
+  if (day && !values.startTime) errors.startTime = t`Start is required`;
+  if (day && !values.endTime) errors.endTime = t`End is required`;
   const capacity = values.capacity === "" ? 0 : Number(values.capacity);
   if (!Number.isInteger(capacity) || capacity < 0)
-    errors.capacity = CAPACITY_ERROR;
+    errors.capacity = t`Capacity must be a non-negative whole number`;
   if (Object.keys(errors).length > 0) return { errors };
   const startTime = startInstant(values, days, timezone, breakShiftMinutes);
   return {
