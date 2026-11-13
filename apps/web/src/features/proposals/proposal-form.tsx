@@ -296,7 +296,7 @@ function Fields({
             {durations.map((value) => (
               <label
                 key={value ?? "undecided"}
-                className="flex items-center gap-3 text-sm font-medium text-fg"
+                className="-mx-2 flex cursor-pointer items-center gap-3 rounded px-2 py-1 text-sm font-medium text-fg hover:bg-surface-hover"
               >
                 <input
                   type="radio"

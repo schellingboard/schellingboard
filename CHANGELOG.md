@@ -68,6 +68,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Form errors and failure messages carry a warning icon**
   ([#754](https://github.com/schellingboard/schellingboard/issues/754)): they no longer rely on red
   alone, which was easy to mistake for the rose accent colour.
+- **Duration options light up on hover**
+  ([#1585](https://github.com/schellingboard/schellingboard/issues/1585)): in the session and
+  proposal forms.
 
 ### Fixed
 
