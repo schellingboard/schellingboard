@@ -3,7 +3,13 @@ import { Trans } from "@lingui/react/macro";
 import type { EventStatistics } from "@schellingboard/contracts/stats";
 import { formatDayLabel } from "@schellingboard/domain/time";
 import { Outlet, useLocation, useRouter } from "@tanstack/react-router";
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import {
+  useEffect,
+  useId,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 import { adminEventCalls } from "../commands/admin-events";
 import { adminGuestCalls } from "../commands/admin-guests";
@@ -41,6 +47,7 @@ import {
   type StatsFilter,
 } from "../queries/admin-stats";
 import { createAdminUnavailabilityQuery } from "../queries/admin-unavailability";
+import { SearchableSelect } from "../ui/searchable-select";
 import { AdminFrame, useReloadAdminGate } from "./admin-frame";
 import { InAppLinks } from "./in-app-links";
 import type { AppServices } from "./services";
@@ -199,6 +206,7 @@ export function AdminStatisticsPage({ api, id }: { api: Api; id: string }) {
   const { history } = useRouter();
   const { params } = useUrlSearchParams();
   const section = params.get("section");
+  const eventSelectId = useId();
   return (
     <div className="w-full space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -206,24 +214,29 @@ export function AdminStatisticsPage({ api, id }: { api: Api; id: string }) {
           <Trans>Statistics</Trans>
         </h1>
         {events.status === "ready" && (
-          <label className="flex items-center gap-2 text-sm font-medium text-fg-muted">
-            {t({ message: "Event", context: "Statistics: the event to show" })}
-            <select
-              value={id}
-              onChange={(e) =>
-                history.push(
-                  `/admin/statistics/${e.target.value}${section ? `?section=${encodeURIComponent(section)}` : ""}`
-                )
-              }
-              className="rounded-md border border-line bg-surface-raised py-1.5 pl-3 pr-8 text-base text-fg sm:text-sm"
-            >
-              {events.events.map((event) => (
-                <option key={event.id} value={event.id}>
-                  {event.name}
-                </option>
-              ))}
-            </select>
-          </label>
+          <div className="flex items-center gap-2 text-sm font-medium text-fg-muted">
+            <label htmlFor={eventSelectId}>
+              {t({
+                message: "Event",
+                context: "Statistics: the event to show",
+              })}
+            </label>
+            <div className="w-64 max-w-full">
+              <SearchableSelect
+                id={eventSelectId}
+                value={id}
+                onChange={(next) =>
+                  history.push(
+                    `/admin/statistics/${next}${section ? `?section=${encodeURIComponent(section)}` : ""}`
+                  )
+                }
+                options={events.events.map((event) => ({
+                  value: event.id,
+                  label: event.name,
+                }))}
+              />
+            </div>
+          </div>
         )}
       </div>
       <StatsTab key={id} api={api} id={id} />

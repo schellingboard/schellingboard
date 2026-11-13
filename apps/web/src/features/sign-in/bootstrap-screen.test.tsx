@@ -29,13 +29,18 @@ function setup(
   return { calls, onDone };
 }
 
+async function pick(label: string, option: string) {
+  await userEvent.click(screen.getByLabelText(label));
+  await userEvent.click(screen.getByRole("option", { name: option }));
+}
+
 const ok = () => Response.json({ guestId: "g1" });
 
 describe("the bootstrap page", { tags: ["015-US6"] }, () => {
   it("makes an existing person the site admin", async () => {
     const { calls, onDone } = setup(ok);
 
-    await userEvent.selectOptions(screen.getByLabelText("Who are you?"), "g1");
+    await pick("Who are you?", "Ada");
     await userEvent.type(screen.getByLabelText("Username"), "ada");
     await userEvent.type(
       screen.getByLabelText("Password (at least 8 characters)"),
@@ -60,7 +65,7 @@ describe("the bootstrap page", { tags: ["015-US6"] }, () => {
   it("makes a new person from a name and an email", async () => {
     const { calls } = setup(ok);
 
-    await userEvent.selectOptions(screen.getByLabelText("Who are you?"), "new");
+    await pick("Who are you?", "Someone new");
     await userEvent.type(screen.getByLabelText("Name"), "Grace");
     await userEvent.type(screen.getByLabelText("Email"), "grace@example.org");
     await userEvent.type(screen.getByLabelText("Username"), "grace");
@@ -90,7 +95,7 @@ describe("the bootstrap page", { tags: ["015-US6"] }, () => {
         "This link is invalid, expired or already used"
       )
     );
-    await userEvent.selectOptions(screen.getByLabelText("Who are you?"), "g1");
+    await pick("Who are you?", "Ada");
     await userEvent.type(screen.getByLabelText("Username"), "ada");
     await userEvent.type(
       screen.getByLabelText("Password (at least 8 characters)"),

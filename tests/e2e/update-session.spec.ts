@@ -168,17 +168,11 @@ test("a host can fix a session placed where they could never have booked one @00
 
   // The slot it already holds is offered, so keeping it is possible at all.
   // Labels carry the 10-minute break, so 17:30 reads as 17:40.
-  await expect(
-    page
-      .getByLabel(/^Start Time/)
-      .getByRole("option", { name: "17:40", selected: true })
-  ).toBeAttached();
+  await expect(page.getByLabel(/^Start Time/)).toHaveValue("17:40");
   // So are the two rooms an organizer gave it, which a host can only book one of.
-  await expect(
-    page
-      .getByLabel(/^Location/)
-      .getByRole("option", { name: "Main Hall, Auditorium", selected: true })
-  ).toBeAttached();
+  await expect(page.getByLabel(/^Location/)).toHaveValue(
+    "Main Hall, Auditorium"
+  );
 
   const description = `Loose ends ${uniqueSuffix()}`;
   await page.getByRole("textbox").nth(1).fill(description);

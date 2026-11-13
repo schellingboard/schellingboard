@@ -5,8 +5,8 @@ import { login } from "./helpers/auth";
 import { expect, test } from "./helpers/fixtures";
 import {
   dayRadios,
+  openStartTimes,
   selectOption,
-  startTimeOption,
 } from "./helpers/session-form";
 import { selectUser } from "./helpers/user";
 
@@ -57,10 +57,16 @@ test("a room marked unavailable cannot be booked then @017-US4", async ({
   // by the next render. The listbox opens only once hydrated.
   await selectOption(page, /^Location/, /Rooftop Terrace/);
   await dayRadios(page).nth(1).check();
-  await expect(startTimeOption(page, "15:10")).toBeDisabled();
+  await expect(await openStartTimes(page, "15:10")).toHaveAttribute(
+    "aria-disabled",
+    "true"
+  );
 
   await dayRadios(page).first().check();
-  await expect(startTimeOption(page, "15:10")).not.toBeDisabled();
+  await expect(await openStartTimes(page, "15:10")).not.toHaveAttribute(
+    "aria-disabled",
+    "true"
+  );
 
   await adminLogin(page);
   availability = await openGammaLocations(page);

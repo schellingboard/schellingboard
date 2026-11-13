@@ -25,6 +25,7 @@ export function Combobox({
   strict = false,
   onBlur,
   onChoose,
+  disabledOptions,
   required,
 }: {
   value: string;
@@ -42,6 +43,8 @@ export function Combobox({
   onBlur?: () => void;
   /** Takes over from `onChange` when a listed option is picked, by its position. */
   onChoose?: (index: number) => void;
+  /** Positions in `options` that are listed but cannot be picked. */
+  disabledOptions?: ReadonlySet<number>;
   required?: boolean;
 }) {
   const listId = useId();
@@ -81,7 +84,20 @@ export function Combobox({
       document.removeEventListener("pointerdown", onPointerDown, true);
   }, [open]);
 
+  const isDisabled = (i: number) => disabledOptions?.has(i) ?? false;
+
+  const nextEnabled = (from: number, step: number) => {
+    for (let n = 1; n <= options.length; n++) {
+      const i =
+        (((from + step * n) % options.length) + options.length) %
+        options.length;
+      if (!isDisabled(i)) return i;
+    }
+    return -1;
+  };
+
   const choose = (index: number) => {
+    if (isDisabled(index)) return;
     if (onChoose) onChoose(index);
     else onChange(options[index]);
     setOpen(false);
@@ -125,7 +141,7 @@ export function Combobox({
             if (options.length === 0) return;
             setOpen(true);
             const step = e.key === "ArrowDown" ? 1 : -1;
-            setActive((active + step + options.length) % options.length);
+            setActive(nextEnabled(active, step));
           } else if (e.key === "Enter") {
             if (open && active >= 0) {
               e.preventDefault();
@@ -162,8 +178,12 @@ export function Combobox({
             id={`${listId}-${i}`}
             role="option"
             aria-selected={i === active}
+            aria-disabled={isDisabled(i) ? true : undefined}
             className={cx(
-              "cursor-pointer px-4 py-2 hover:bg-surface-hover",
+              "px-4 py-2",
+              isDisabled(i)
+                ? "cursor-not-allowed text-fg-subtle"
+                : "cursor-pointer hover:bg-surface-hover",
               i === active && "bg-brand-tint-hover text-brand-fg"
             )}
             onMouseDown={(e) => e.preventDefault()}

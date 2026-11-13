@@ -217,7 +217,7 @@ Admins can create/edit/delete sessions directly, outside the normal proposal →
 
 **Statistics** in the admin menu answers how an event went: did proposals turn into sessions, did
 the venue work, which features did people use. It opens the event running or run last; choose
-another in **Event**. An event's admin page links to its statistics too.
+another in **Event** (type to narrow the list). An event's admin page links to its statistics too.
 
 Each figure is a card with a title; its **?** button explains what it shows and how to read it. Most
 cards draw a chart, and **Table** next to it shows the figures behind it: sort by clicking a column.

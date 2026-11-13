@@ -71,6 +71,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Duration options light up on hover**
   ([#1585](https://github.com/schellingboard/schellingboard/issues/1585)): in the session and
   proposal forms.
+- **Long lists can be searched by typing**
+  ([#204](https://github.com/schellingboard/schellingboard/issues/204)): the session form's
+  proposal, room and start time, the "Who are you?" sign-in list and the statistics event picker
+  narrow as you type. Times that are taken are no longer listed.
 
 ### Fixed
 

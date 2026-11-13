@@ -44,7 +44,7 @@ import {
   FieldError,
   MarkdownField,
   PeopleField,
-  SelectField,
+  SearchableSelectField,
   TextField,
 } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
@@ -516,7 +516,7 @@ function Fields({
         className="flex flex-col gap-4"
       >
         {proposals.length > 0 && !editing && (
-          <SelectField
+          <SearchableSelectField
             label={t`Proposal`}
             name="proposalId"
             value={proposal?.id ?? ""}
@@ -573,15 +573,15 @@ function Fields({
           error={fields.hostIds}
           onChange={setHostIds}
         />
-        <SelectField
+        <SearchableSelectField
           label={t`Location`}
           name="locationId"
+          placeholder={t`Select a location`}
           required
           value={locationId ?? ""}
           onChange={setLocationId}
           error={fields.locationId ?? fields.locationIds}
           options={[
-            { value: "", label: t`Select a location` },
             ...(ownRooms.length > 1
               ? [
                   {
@@ -673,9 +673,10 @@ function Fields({
             </p>
           </div>
         ) : (
-          <SelectField
+          <SearchableSelectField
             label={t`Start Time`}
             name="startTime"
+            placeholder={t`Select a start time`}
             required
             value={
               effectiveStartTime === undefined ? "" : String(effectiveStartTime)
@@ -683,7 +684,6 @@ function Fields({
             onChange={(v) => setStartTime(v ? parseInt(v, 10) : undefined)}
             error={fields.startTime}
             options={[
-              { value: "", label: t`Select a start time` },
               ...startTimes.map((st) => ({
                 value: String(st.time),
                 label: st.label,

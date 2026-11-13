@@ -199,7 +199,8 @@ On a phone, pull down from the top of the schedule and let go to load the latest
 Two ways, whichever you find first:
 
 - **From the proposal** — click **"Proposals"** at the top of the schedule, then **"Schedule"**,
-  either in the table or on the proposal's own page. Pick a room and a time slot, and save.
+  either in the table or on the proposal's own page. Pick a room and a time slot, and save. The
+  lists of rooms, times and proposals narrow as you type.
 - **From the grid** — click an empty slot in a bookable room, then pick one of your proposals under
   **Proposal** to fill the form from it. Or leave it at **[none]** and book the slot with a
   brand-new session that was never proposed.

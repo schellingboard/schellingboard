@@ -29,9 +29,7 @@ export function SearchableSelect({
   required?: boolean;
 }) {
   const [typed, setTyped] = useState<string | null>(null);
-  const available = options.filter(
-    (o) => !o.disabled && !(placeholder && o.value === "")
-  );
+  const available = options.filter((o) => !(placeholder && o.value === ""));
   const selected = available.find((o) => o.value === value);
   const shown = typed ?? selected?.label ?? "";
   const needle = typed?.trim().toLowerCase();
@@ -47,6 +45,9 @@ export function SearchableSelect({
       placeholder={placeholder}
       value={shown}
       options={matches.map((o) => o.label)}
+      disabledOptions={
+        new Set(matches.flatMap((o, i) => (o.disabled ? [i] : [])))
+      }
       onChange={setTyped}
       onChoose={(i) => {
         setTyped(null);

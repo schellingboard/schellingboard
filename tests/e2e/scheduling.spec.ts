@@ -6,8 +6,8 @@ import { switchToView } from "./helpers/schedule";
 import { gammaDay } from "./helpers/seed";
 import {
   dayRadios,
+  openStartTimes,
   selectOption,
-  startTimeOption,
 } from "./helpers/session-form";
 import { dismissToast, toast } from "./helpers/toast";
 import { uniqueSuffix } from "./helpers/unique";
@@ -214,8 +214,10 @@ test("a day running past midnight says so, and its late slots name the day @008-
   await dayRadios(page).last().check();
   // Times before midnight stand alone; the ones after it carry their weekday,
   // so "01:10" can't be read as an hour earlier in the day than "23:10".
-  await expect(startTimeOption(page, "23:10")).toBeAttached();
-  await expect(startTimeOption(page, /^[A-Z][a-z]{2} 01:10$/)).toBeAttached();
+  await expect(await openStartTimes(page, "23:10")).toBeVisible();
+  await expect(
+    await openStartTimes(page, /^[A-Z][a-z]{2} 01:10$/)
+  ).toBeVisible();
 });
 
 test("occupied start times are not offered in the same location but are in others @008-US1", async ({
@@ -236,16 +238,28 @@ test("occupied start times are not offered in the same location but are in other
   await selectOption(page, /^Location/, /Main Hall/);
 
   // Overlapping the keynote in the same location is not offered...
-  await expect(startTimeOption(page, "09:10")).toBeDisabled();
+  await expect(await openStartTimes(page, "09:10")).toHaveAttribute(
+    "aria-disabled",
+    "true"
+  );
   // ...nor is the blocker slot...
-  await expect(startTimeOption(page, "12:40")).toBeDisabled();
+  await expect(await openStartTimes(page, "12:40")).toHaveAttribute(
+    "aria-disabled",
+    "true"
+  );
   // ...while a free slot in the same location is.
-  await expect(startTimeOption(page, "16:10")).not.toBeDisabled();
+  await expect(await openStartTimes(page, "16:10")).not.toHaveAttribute(
+    "aria-disabled",
+    "true"
+  );
   await page.keyboard.press("Escape");
 
   // The keynote's slot IS offered in a different location.
   await selectOption(page, /^Location/, /Garden Terrace/);
-  await expect(startTimeOption(page, "09:10")).not.toBeDisabled();
+  await expect(await openStartTimes(page, "09:10")).not.toHaveAttribute(
+    "aria-disabled",
+    "true"
+  );
 });
 
 test("an already scheduled proposal says the schedule won't follow it @008-US1 @004-US2", async ({

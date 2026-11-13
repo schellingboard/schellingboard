@@ -110,6 +110,11 @@ function setup({
 
 const SLOT = { day: "2026-06-15", time: "10:00", location: "Room" };
 const submit = () => screen.getByRole("button", { name: /Submit/ });
+async function pick(label: string | RegExp, option: string) {
+  await userEvent.click(screen.getByLabelText(label));
+  await userEvent.click(screen.getByRole("option", { name: option }));
+}
+
 const settled = () =>
   waitFor(() => expect((submit() as HTMLButtonElement).disabled).toBe(false));
 
@@ -153,10 +158,7 @@ describe("adding a session", { tags: ["008-US1"] }, () => {
       const { writes } = setup({ prefill: SLOT });
 
       await userEvent.type(screen.getByLabelText(/Session title/), "Talk");
-      await userEvent.selectOptions(
-        screen.getByLabelText(/Start Time/),
-        "10:40"
-      );
+      await pick(/Start Time/, "10:40");
       await userEvent.click(
         screen.getByRole("radio", { name: "1 hour 20 minutes" })
       );
@@ -174,21 +176,29 @@ describe("adding a session", { tags: ["008-US1"] }, () => {
     }
   );
 
-  it("offers no start the room is taken in, and shortens the lengths before the next session", () => {
+  it("offers no start the room is taken in, and shortens the lengths before the next session", async () => {
     setup({ prefill: { day: SLOT.day, time: "13:00", location: "Room" } });
 
-    const starts = screen.getByLabelText(/Start Time/);
+    const starts = screen.getByLabelText<HTMLInputElement>(/Start Time/);
+    expect(starts.value).toBe("13:10");
+    await userEvent.click(starts);
     expect(
-      screen.getByRole<HTMLOptionElement>("option", { name: "14:10" }).disabled,
+      screen
+        .getByRole("option", { name: "14:10" })
+        .getAttribute("aria-disabled"),
       "My talk holds 14:00 to 14:50"
-    ).toBe(true);
+    ).toBe("true");
     expect(
-      screen.getByRole<HTMLOptionElement>("option", { name: "12:10" }).disabled,
+      screen
+        .getByRole("option", { name: "12:10" })
+        .getAttribute("aria-disabled"),
       "the room is unavailable from 12:00 to 13:00"
-    ).toBe(true);
-    expect((starts as HTMLSelectElement).value).toBe(
-      String(Date.UTC(2026, 5, 15, 13))
-    );
+    ).toBe("true");
+    expect(
+      screen
+        .getByRole("option", { name: "13:10" })
+        .getAttribute("aria-disabled")
+    ).toBeNull();
     expect(
       screen.queryByRole("radio", { name: "1 hour 50 minutes" }),
       "the next session starts an hour on"
@@ -250,10 +260,7 @@ describe("adding a session", { tags: ["008-US1"] }, () => {
   it("fills the form from a proposal and sends it with the session", async () => {
     const { writes } = setup({ prefill: SLOT });
 
-    await userEvent.selectOptions(
-      screen.getByLabelText("Proposal"),
-      "Rust intro"
-    );
+    await pick("Proposal", "Rust intro");
 
     expect(screen.getByLabelText<HTMLInputElement>(/Session title/).value).toBe(
       "Rust intro"
@@ -280,7 +287,7 @@ describe("adding a session", { tags: ["008-US1"] }, () => {
       "Rust intro"
     );
 
-    await userEvent.selectOptions(screen.getByLabelText("Proposal"), "[none]");
+    await pick("Proposal", "[none]");
 
     expect(screen.getByLabelText<HTMLInputElement>(/Session title/).value).toBe(
       ""
@@ -362,8 +369,8 @@ describe("editing a session", { tags: ["008-US2"] }, () => {
     expect(screen.getByLabelText<HTMLInputElement>(/Session title/).value).toBe(
       "My talk"
     );
-    expect(screen.getByLabelText<HTMLSelectElement>(/Start Time/).value).toBe(
-      String(Date.parse(OWN_SLOT))
+    expect(screen.getByLabelText<HTMLInputElement>(/Start Time/).value).toBe(
+      "14:00"
     );
     expect(screen.getByRole("radio", { name: "50 minutes" })).toHaveProperty(
       "checked",
@@ -502,8 +509,8 @@ describe("editing a session", { tags: ["008-US2"] }, () => {
       },
     });
 
-    expect(screen.getByLabelText<HTMLSelectElement>(/Location/).value).toBe(
-      "keep-rooms"
+    expect(screen.getByLabelText<HTMLInputElement>(/Location/).value).toBe(
+      "Room, Hall"
     );
     await settled();
     await userEvent.click(submit());

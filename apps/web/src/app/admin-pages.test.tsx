@@ -174,10 +174,10 @@ describe("the statistics area", { tags: ["021-US1"] }, () => {
       path: "/admin/statistics/e0?section=sessions&excludeHosts=g1",
     });
 
-    await userEvent.selectOptions(
-      await screen.findByRole("combobox", { name: "Event" }),
-      "Spring Con"
+    await userEvent.click(
+      await screen.findByRole("combobox", { name: "Event" })
     );
+    await userEvent.click(screen.getByRole("option", { name: "Spring Con" }));
 
     expect(router.history.location.pathname).toBe("/admin/statistics/e1");
     expect(router.history.location.search).toBe("?section=sessions");

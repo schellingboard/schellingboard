@@ -1266,7 +1266,7 @@ msgstr "Choose who you are first."
 msgid "Choose who you are, and log in if your name is protected, to change your security settings."
 msgstr "Choose who you are, and log in if your name is protected, to change your security settings."
 
-#: src/features/sign-in/bootstrap-screen.tsx:62
+#: src/features/sign-in/bootstrap-screen.tsx:59
 msgid "Choose…"
 msgstr "Choose…"
 
@@ -1608,7 +1608,7 @@ msgstr "Could not load the attendees. Reload the page to try again."
 msgid "Could not load the count — try again"
 msgstr "Could not load the count — try again"
 
-#: src/app/admin-pages.tsx:287
+#: src/app/admin-pages.tsx:300
 msgid "Could not load the event settings."
 msgstr "Could not load the event settings."
 
@@ -1616,17 +1616,17 @@ msgstr "Could not load the event settings."
 msgid "Could not load the event."
 msgstr "Could not load the event."
 
-#: src/app/admin-pages.tsx:114
-#: src/app/admin-pages.tsx:180
+#: src/app/admin-pages.tsx:121
+#: src/app/admin-pages.tsx:187
 #: src/features/admin/events-screen.tsx:187
 msgid "Could not load the events."
 msgstr "Could not load the events."
 
-#: src/app/admin-pages.tsx:355
+#: src/app/admin-pages.tsx:368
 msgid "Could not load the guests."
 msgstr "Could not load the guests."
 
-#: src/app/admin-pages.tsx:390
+#: src/app/admin-pages.tsx:403
 #: src/features/admin/locations-screen.tsx:508
 msgid "Could not load the locations."
 msgstr "Could not load the locations."
@@ -1635,7 +1635,7 @@ msgstr "Could not load the locations."
 msgid "Could not load the names. Reload the page to try again."
 msgstr "Could not load the names. Reload the page to try again."
 
-#: src/app/admin-pages.tsx:509
+#: src/app/admin-pages.tsx:522
 msgid "Could not load the proposals."
 msgstr "Could not load the proposals."
 
@@ -1643,7 +1643,7 @@ msgstr "Could not load the proposals."
 msgid "Could not load the RSVPs."
 msgstr "Could not load the RSVPs."
 
-#: src/app/admin-pages.tsx:555
+#: src/app/admin-pages.tsx:568
 msgid "Could not load the sessions."
 msgstr "Could not load the sessions."
 
@@ -2293,7 +2293,7 @@ msgctxt "Comment filter: label of the event selector"
 msgid "Event"
 msgstr "Event"
 
-#: src/app/admin-pages.tsx:210
+#: src/app/admin-pages.tsx:219
 msgctxt "Statistics: the event to show"
 msgid "Event"
 msgstr "Event"
@@ -2962,13 +2962,13 @@ msgid "Loading proposals..."
 msgstr "Loading proposals..."
 
 #: src/app/account-pages.tsx:268
-#: src/app/admin-pages.tsx:120
-#: src/app/admin-pages.tsx:184
-#: src/app/admin-pages.tsx:291
-#: src/app/admin-pages.tsx:359
-#: src/app/admin-pages.tsx:394
-#: src/app/admin-pages.tsx:517
-#: src/app/admin-pages.tsx:563
+#: src/app/admin-pages.tsx:127
+#: src/app/admin-pages.tsx:191
+#: src/app/admin-pages.tsx:304
+#: src/app/admin-pages.tsx:372
+#: src/app/admin-pages.tsx:407
+#: src/app/admin-pages.tsx:530
+#: src/app/admin-pages.tsx:576
 #: src/app/event-page.tsx:152
 #: src/app/panel-host.tsx:82
 #: src/app/people-pages.tsx:162
@@ -3747,7 +3747,7 @@ msgstr "Page {page} of {totalPages}"
 msgid "Page {page} of {totalPages}+"
 msgstr "Page {page} of {totalPages}+"
 
-#: src/app/admin-pages.tsx:253
+#: src/app/admin-pages.tsx:266
 #: src/app/not-found.tsx:6
 msgid "Page not found."
 msgstr "Page not found."
@@ -3835,7 +3835,7 @@ msgstr "Pick a time zone from the list"
 msgid "Pick at least one day"
 msgstr "Pick at least one day"
 
-#: src/ui/combobox.tsx:180
+#: src/ui/combobox.tsx:200
 msgid "Pick one or type any text"
 msgstr "Pick one or type any text"
 
@@ -4394,11 +4394,11 @@ msgstr "Select {0}"
 msgid "Select {text}"
 msgstr "Select {text}"
 
-#: src/features/sessions/session-form.tsx:584
+#: src/features/sessions/session-form.tsx:579
 msgid "Select a location"
 msgstr "Select a location"
 
-#: src/features/sessions/session-form.tsx:686
+#: src/features/sessions/session-form.tsx:679
 msgid "Select a start time"
 msgstr "Select a start time"
 
@@ -4597,7 +4597,7 @@ msgstr "Show only your sessions and 1-on-1s that overlap in time with another of
 msgid "Show only your sessions that overlap in time with another of yours, bookmarks included."
 msgstr "Show only your sessions that overlap in time with another of yours, bookmarks included."
 
-#: src/ui/combobox.tsx:146
+#: src/ui/combobox.tsx:162
 msgid "Show suggestions"
 msgstr "Show suggestions"
 
@@ -4793,7 +4793,7 @@ msgid "Starts at what the room holds. 0 means no limit."
 msgstr "Starts at what the room holds. 0 means no limit."
 
 #: src/app/admin-frame.tsx:43
-#: src/app/admin-pages.tsx:206
+#: src/app/admin-pages.tsx:214
 #: src/features/admin/event-layout.tsx:99
 msgid "Statistics"
 msgstr "Statistics"
@@ -5010,7 +5010,7 @@ msgstr "The voting phase is over"
 msgid "Their hosts and RSVPed guests are told."
 msgstr "Their hosts and RSVPed guests are told."
 
-#: src/app/admin-pages.tsx:191
+#: src/app/admin-pages.tsx:198
 msgid "There are no events yet."
 msgstr "There are no events yet."
 

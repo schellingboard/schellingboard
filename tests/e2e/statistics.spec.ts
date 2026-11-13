@@ -12,9 +12,8 @@ test("reads the statistics, leaves a location and a host out and downloads the t
     .getByRole("navigation", { name: "Admin" })
     .getByRole("link", { name: "Statistics" })
     .click();
-  await page
-    .getByRole("combobox", { name: "Event" })
-    .selectOption({ label: "Conference Gamma" });
+  await page.getByRole("combobox", { name: "Event" }).fill("gamma");
+  await page.getByRole("option", { name: "Conference Gamma" }).click();
 
   await expect(page.getByText("Excluding blockers")).toBeVisible();
   const headline = page.getByRole("list", { name: "Headline numbers" });

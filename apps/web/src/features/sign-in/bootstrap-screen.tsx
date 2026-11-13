@@ -4,7 +4,7 @@ import { type FormEvent, useState } from "react";
 
 import type { SignInCalls } from "../../commands/sign-in";
 import { Button } from "../../ui/button";
-import { SelectField, TextField } from "../../ui/form";
+import { SearchableSelectField, TextField } from "../../ui/form";
 import { PasswordManagerHint } from "../../ui/password-manager-hint";
 import { useCredentialForm } from "./use-credential-form";
 
@@ -54,12 +54,12 @@ export function BootstrapScreen({
               add yourself, then set a username and password.
             </Trans>
           </p>
-          <SelectField
+          <SearchableSelectField
             label={t`Who are you?`}
+            placeholder={t`Choose…`}
             value={who}
             onChange={setWho}
             options={[
-              { value: "", label: t`Choose…`, disabled: true },
               { value: NEW, label: t`Someone new` },
               ...guests.map((g) => ({ value: g.id, label: g.name })),
             ]}

@@ -73,11 +73,19 @@ describe("SearchableSelect", { tags: ["008-US1"] }, () => {
     expect(screen.getByRole("status").textContent).toBe("b");
   });
 
-  it("does not offer disabled options", async () => {
+  it("lists disabled options but cannot pick or arrow onto them", async () => {
     const user = userEvent.setup();
     render(<Harness />);
-    await user.click(screen.getByRole("combobox", { name: "Location" }));
-    expect(screen.queryByRole("option", { name: "Attic" })).toBeNull();
+    const input = screen.getByRole("combobox", { name: "Location" });
+    await user.click(input);
+    const attic = screen.getByRole("option", { name: "Attic" });
+    expect(attic.getAttribute("aria-disabled")).toBe("true");
+
+    await user.click(attic);
+    expect(screen.getByRole("status").textContent).toBe("");
+
+    await user.keyboard("{ArrowUp}{Enter}");
+    expect(screen.getByRole("status").textContent).toBe("b");
   });
 
   it("tells equal labels apart by position", async () => {
@@ -121,6 +129,7 @@ describe("SearchableSelect", { tags: ["008-US1"] }, () => {
     expect(screen.getAllByRole("option").map((o) => o.textContent)).toEqual([
       "Main hall",
       "Library",
+      "Attic",
     ]);
   });
 });
