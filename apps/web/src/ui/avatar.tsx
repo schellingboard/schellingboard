@@ -38,6 +38,8 @@ export function Avatar({
   size?: keyof typeof SIZES;
   className?: string;
 }) {
+  // CodeQL js/xss-through-dom flags the preview's blob: URL; a false positive: the
+  // browser makes that string itself, and an <img> runs no script.
   const src = image ? safeSrc(image) : undefined;
   return (
     <div
