@@ -32,3 +32,5 @@ Two things worth knowing before you open a pull request:
 
 User-facing changes need a `CHANGELOG.md` bullet under `[Unreleased]`, written for event organizers
 rather than developers — see [Changelog](https://developers.schellingboard.org/changelog/).
+
+Found a vulnerability? Do not open an issue; follow [SECURITY.md](SECURITY.md).

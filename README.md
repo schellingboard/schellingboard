@@ -47,6 +47,10 @@ See [docs.schellingboard.org](https://docs.schellingboard.org/self-hosting/deplo
 deployment and administration instructions. Docker images are published on
 [Docker Hub](https://hub.docker.com/r/schellingboard/schellingboard).
 
+## Security
+
+To report a vulnerability, see [SECURITY.md](SECURITY.md).
+
 ## Attendees
 
 See the [attendee guide](https://docs.schellingboard.org/attendee-guide/) for how to propose, vote,

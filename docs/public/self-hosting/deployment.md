@@ -52,6 +52,11 @@ Nothing needs configuring for notifications beyond the certificate: the keys the
 are generated the first time an attendee turns them on and kept in the database, so a restored
 backup keeps working.
 
+## Reporting a vulnerability
+
+Report security problems privately, as described in the
+[security policy](https://github.com/schellingboard/schellingboard/blob/main/SECURITY.md).
+
 ## Updating
 
 Pull the new image and start the container again; your data stays in the volume. With
