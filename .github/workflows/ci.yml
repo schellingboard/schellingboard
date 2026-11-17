@@ -86,9 +86,6 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Build
-        env:
-          AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
-          AIRTABLE_BASE_ID: ${{ secrets.AIRTABLE_BASE_ID }}
         run: make build
 
   prettier:
