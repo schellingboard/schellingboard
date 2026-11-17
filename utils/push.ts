@@ -1,4 +1,4 @@
-import webpush from "web-push";
+import * as webpush from "web-push";
 
 import { getRepositories } from "@/db/container";
 import { siteUrl } from "@/utils/site-url";

@@ -3,19 +3,17 @@ import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
 
 vi.mock("@/utils/mailer", () => ({ sendMail: vi.fn() }));
 vi.mock("web-push", () => ({
-  default: {
-    setVapidDetails: vi.fn(),
-    sendNotification: vi.fn(),
-    generateVAPIDKeys: vi.fn(() => ({
-      publicKey: `public-${++generated}`,
-      privateKey: `private-${generated}`,
-    })),
-  },
+  setVapidDetails: vi.fn(),
+  sendNotification: vi.fn(),
+  generateVAPIDKeys: vi.fn(() => ({
+    publicKey: `public-${++generated}`,
+    privateKey: `private-${generated}`,
+  })),
 }));
 
 let generated = 0;
 
-import webpush from "web-push";
+import * as webpush from "web-push";
 import { setupTestDb, resetTestDb } from "../helpers/db";
 import { runJobs } from "../helpers/jobs";
 import { createGuest } from "../helpers/factories";

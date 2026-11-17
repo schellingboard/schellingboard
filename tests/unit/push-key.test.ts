@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import webpush from "web-push";
+import * as webpush from "web-push";
 
 import { urlBase64ToUint8Array } from "@schellingboard/domain/push-key";
 
