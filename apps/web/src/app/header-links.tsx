@@ -3,6 +3,10 @@ import type { ApiClient } from "@schellingboard/api-client";
 import { BellIcon, UserGroupIcon } from "../ui/icons";
 import { useUnread } from "./unread-count";
 
+// The event feed carries schedule changes only, so a page that is never
+// reloaded would otherwise never see a new notification.
+export const UNREAD_POLL_MS = 30_000;
+
 const link =
   "flex items-center gap-1 rounded-md px-2 py-2 text-sm font-medium text-fg-subtle hover:bg-surface-muted sm:px-3";
 
@@ -18,14 +22,25 @@ export function HeaderLinks({
   useEffect(() => {
     if (!signedIn) return;
     let stale = false;
-    api
-      .GET("/api/v1/me/notifications")
-      .then(({ data }) => {
-        if (!stale && data) setUnread(data.unreadCount);
-      })
-      .catch(() => {});
+    const refresh = () =>
+      api
+        .GET("/api/v1/me/notifications")
+        .then(({ data }) => {
+          if (!stale && data) setUnread(data.unreadCount);
+        })
+        .catch(() => {});
+    const refreshIfVisible = () => {
+      if (document.visibilityState !== "hidden") void refresh();
+    };
+    void refresh();
+    const timer = setInterval(refreshIfVisible, UNREAD_POLL_MS);
+    document.addEventListener("visibilitychange", refreshIfVisible);
+    window.addEventListener("focus", refreshIfVisible);
     return () => {
       stale = true;
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", refreshIfVisible);
+      window.removeEventListener("focus", refreshIfVisible);
     };
   }, [api, signedIn, setUnread]);
 
