@@ -315,7 +315,7 @@ function Tab({
     case "locations":
       return <LocationsTab api={api} id={id} state={state} />;
     case "proposals":
-      return <ProposalsTab api={api} id={id} />;
+      return <ProposalsTab api={api} id={id} state={state} />;
     case "stats":
       return <StatsRedirect id={id} />;
     default:
@@ -424,19 +424,73 @@ function StatsTab({ api, id }: { api: Api; id: string }) {
   );
 }
 
-function ProposalsTab({ api, id }: { api: Api; id: string }) {
+function useDayOptions(state: EventState) {
+  return useMemo(
+    () =>
+      state.days.map((d) => ({
+        key: d.id,
+        label: formatDayLabel(
+          {
+            ...d,
+            start: new Date(d.start),
+            end: new Date(d.end),
+            startBookings: new Date(d.startBookings),
+            endBookings: new Date(d.endBookings),
+          },
+          state.event.timezone
+        ),
+        start: d.start,
+        end: d.end,
+      })),
+    [state]
+  );
+}
+
+const eventRooms = (
+  locations: {
+    id: string;
+    name: string;
+    capacity: number;
+    eventIds: string[];
+  }[],
+  eventId: string
+) =>
+  locations
+    .filter((l) => l.eventIds.includes(eventId))
+    .map(({ id, name, capacity }) => ({ id, name, capacity }));
+
+function ProposalsTab({
+  api,
+  id,
+  state,
+}: {
+  api: Api;
+  id: string;
+  state: EventState;
+}) {
   const [proposals, load] = useQuery(() =>
     createAdminProposalsQuery({ api, eventId: id })
   );
   const [guests] = useQuery(() => createAdminGuestsQuery({ api }));
+  const [locations] = useQuery(() => createAdminLocationsQuery({ api }));
   const calls = useMemo(() => adminEventCalls(api), [api]);
+  const days = useDayOptions(state);
   const { params, onParams } = useParamUpdates();
-  if (jointStatus(proposals, guests) === "error")
+  if (jointStatus(proposals, guests, locations) === "error")
     return <Failed>the proposals</Failed>;
-  if (proposals.status !== "ready" || guests.status !== "ready")
+  if (
+    proposals.status !== "ready" ||
+    guests.status !== "ready" ||
+    locations.status !== "ready"
+  )
     return <p className="text-sm">Loading…</p>;
   return (
     <EventProposalsManager
+      eventId={id}
+      locations={eventRooms(locations.locations, id)}
+      timezone={state.event.timezone}
+      days={days}
+      breakMinutes={state.event.breakMinutes}
       proposals={proposals.proposals}
       guests={guests.guests.filter((g) => g.eventIds.includes(id)).map(named)}
       params={params}
@@ -463,25 +517,7 @@ function SessionsTab({
   const [locations] = useQuery(() => createAdminLocationsQuery({ api }));
   const calls = useMemo(() => adminEventCalls(api), [api]);
   const { params, onParams } = useParamUpdates();
-  const days = useMemo(
-    () =>
-      state.days.map((d) => ({
-        key: d.id,
-        label: formatDayLabel(
-          {
-            ...d,
-            start: new Date(d.start),
-            end: new Date(d.end),
-            startBookings: new Date(d.startBookings),
-            endBookings: new Date(d.endBookings),
-          },
-          state.event.timezone
-        ),
-        start: d.start,
-        end: d.end,
-      })),
-    [state]
-  );
+  const days = useDayOptions(state);
   if (jointStatus(sessions, guests, locations) === "error")
     return <Failed>the sessions</Failed>;
   if (
@@ -495,13 +531,7 @@ function SessionsTab({
       eventId={id}
       sessions={sessions.sessions}
       guests={guests.guests.filter((g) => g.eventIds.includes(id)).map(named)}
-      locations={locations.locations
-        .filter((l) => l.eventIds.includes(id))
-        .map(({ id: locationId, name, capacity }) => ({
-          id: locationId,
-          name,
-          capacity,
-        }))}
+      locations={eventRooms(locations.locations, id)}
       guestNames={new Map(guests.guests.map((g) => [g.id, g.name]))}
       loadRsvps={(sessionId) => loadSessionRsvpGuests(api, sessionId)}
       timezone={state.event.timezone}

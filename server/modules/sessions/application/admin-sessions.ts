@@ -37,6 +37,7 @@ export interface AdminSessionFields {
 
 export interface AdminCreateSessionInput extends AdminSessionFields {
   eventId: string;
+  proposalId?: string;
 }
 
 export interface AdminUpdateSessionInput extends AdminSessionFields {
@@ -153,7 +154,7 @@ export const adminCreateSession =
   (deps: SessionDeps) =>
   async (
     actor: Actor,
-    { eventId, ...input }: AdminCreateSessionInput,
+    { eventId, proposalId, ...input }: AdminCreateSessionInput,
     now: Date
   ): Promise<Result<Session>> => {
     if (!actor.admin) return adminRequired();
@@ -163,11 +164,20 @@ export const adminCreateSession =
     return deps.uow.run(async (tx) => {
       if (!(await tx.events.findById(eventId)))
         return notFound("event.notFound", "Event not found");
+      if (
+        proposalId &&
+        (await tx.sessionProposals.findById(proposalId))?.eventId !== eventId
+      )
+        return notFound("proposal.notFound", "Proposal not found");
       const unknown = await unknownReference(tx, fields.value);
       if (unknown) return unknown;
       const clashing = await clash(tx, eventId, fields.value);
       if (clashing) return clashing;
-      const created = await addSession(tx, { ...fields.value, eventId }, by);
+      const created = await addSession(
+        tx,
+        { ...fields.value, eventId, proposalId },
+        by
+      );
       recordCohostsAdded(tx, created, [], by);
       return ok(created);
     });

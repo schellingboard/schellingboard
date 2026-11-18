@@ -56,12 +56,13 @@ const FIELDS = [
 const joinNames = (items: { name: string }[]) =>
   items.length > 0 ? items.map((i) => i.name).join(", ") : "—";
 
-function SessionForm({
+export function SessionForm({
   initial,
   label,
   timezone,
   days,
   breakMinutes,
+  durationMinutes,
   hosts,
   locations,
   submitLabel,
@@ -76,6 +77,8 @@ function SessionForm({
   days: DayOption[];
   /** Offers to start a new session after the event's break. */
   breakMinutes?: number;
+  /** The end follows the start by this long until it is typed. */
+  durationMinutes?: number | null;
   hosts: Person[];
   locations: EventLocation[];
   submitLabel: string;
@@ -91,6 +94,7 @@ function SessionForm({
   const [form, setForm] = useState(initial);
   const [breakBefore, setBreakBefore] = useState(true);
   const [checking, setChecking] = useState(false);
+  const [endTyped, setEndTyped] = useState(false);
   const set = <K extends keyof SessionFormValues>(
     key: K,
     value: SessionFormValues[K]
@@ -102,8 +106,22 @@ function SessionForm({
   const day = days.find((d) => d.key === form.dayKey);
   const shift =
     breakMinutes && breakBefore && !form.blocker && day ? breakMinutes : 0;
-  const parsed = sessionBody({ ...form, capacity }, days, timezone, shift);
   const start = startInstant(form, days, timezone, shift);
+  // A proposal's duration includes the break, as when attendees book it.
+  const slotStart = startInstant(form, days, timezone);
+  const endTime =
+    !endTyped && durationMinutes && slotStart
+      ? DateTime.fromISO(slotStart)
+          .plus({ minutes: durationMinutes })
+          .setZone(timezone)
+          .toFormat("HH:mm")
+      : form.endTime;
+  const parsed = sessionBody(
+    { ...form, capacity, endTime },
+    days,
+    timezone,
+    shift
+  );
 
   const mutation = useFormMutation({
     call: (key) => call(parsed.body as AdminSessionBody, key),
@@ -177,8 +195,11 @@ function SessionForm({
           kind="time"
           required={!!day}
           disabled={!day}
-          value={form.endTime}
-          onChange={(v) => set("endTime", v)}
+          value={endTime}
+          onChange={(v) => {
+            setEndTyped(true);
+            set("endTime", v);
+          }}
           error={errors.endTime}
         />
       </div>

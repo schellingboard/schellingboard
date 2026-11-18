@@ -15,6 +15,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - **Hosting on NixOS** ([#1664](https://github.com/schellingboard/schellingboard/issues/1664)): a
   NixOS module runs SchellingBoard as a system service. See the NixOS guide under Self-hosting.
+- **Organizers can create a session from a proposal**: a Create session button on each proposal in
+  the admin area opens the session form prefilled with its title, description, hosts and end time
+  (from its duration), in any phase.
 
 ### Fixed
 

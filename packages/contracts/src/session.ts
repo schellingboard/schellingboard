@@ -122,6 +122,7 @@ export const adminSessionCreateSchema = z.object({
   hostIds: adminFields.hostIds.default([]),
   locationIds: adminFields.locationIds.default([]),
   eventId: z.string().min(1),
+  proposalId: z.string().min(1).optional(),
 });
 
 // A replacement: a field left out is refused, not reset to a default.

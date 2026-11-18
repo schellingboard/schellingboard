@@ -167,6 +167,11 @@ Admins can **edit** a proposal's title, description, duration, and host list, an
 (confirm dialog shows how many votes/host-links will be destroyed). There's no separate
 approve/reject step — proposals are visible and votable as soon as attendees submit them.
 
+**Create session** on a proposal opens the session form with its title, description and hosts filled
+in, and the end follows the start by the proposal's duration until you type one. It works in any
+phase. The session is linked to the proposal, so the proposal shows it as scheduled. Set the day,
+time and room there, or leave it unscheduled.
+
 ## Sessions
 
 Admins can create/edit/delete sessions directly, outside the normal proposal → schedule flow.

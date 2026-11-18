@@ -181,7 +181,7 @@ export function adminEventCalls(api: ApiClient) {
         headers: { "Idempotency-Key": key },
       }),
     createSession: (
-      body: AdminSessionBody & { eventId: string },
+      body: AdminSessionBody & { eventId: string; proposalId?: string },
       key: string
     ) =>
       api.POST("/api/v1/admin/sessions", {

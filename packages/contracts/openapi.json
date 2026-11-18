@@ -2135,7 +2135,8 @@
                     "items": { "type": "string" },
                     "default": []
                   },
-                  "eventId": { "type": "string", "minLength": 1 }
+                  "eventId": { "type": "string", "minLength": 1 },
+                  "proposalId": { "type": "string", "minLength": 1 }
                 },
                 "required": ["title", "startTime", "endTime", "eventId"]
               }

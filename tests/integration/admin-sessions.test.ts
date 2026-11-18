@@ -28,6 +28,7 @@ import {
   createEvent,
   createGuest,
   createLocation,
+  createProposal,
   createSession,
 } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
@@ -129,6 +130,59 @@ describe("adminCreateSessionAction", () => {
     expect(sessions[0].endTime).toBeUndefined();
     expect(sessions[0].hosts).toHaveLength(0);
     expect(sessions[0].locations).toHaveLength(0);
+  });
+
+  it("links the session to the proposal it was made from", async () => {
+    const event = await createEvent();
+    const proposal = await createProposal(event.id, []);
+    const input = {
+      eventId: event.id,
+      title: "From a proposal",
+      description: "",
+      startTime: null,
+      endTime: null,
+      capacity: 10,
+      adminManaged: true,
+      blocker: false,
+      closed: false,
+      hostIds: [],
+      locationIds: [],
+    };
+
+    const result = await adminCreateSessionAction({
+      ...input,
+      proposalId: proposal.id,
+    });
+    expect(result.ok).toBe(true);
+
+    const [created] = await getRepositories().sessions.listByEvent(event.id);
+    expect(created.proposalId).toBe(proposal.id);
+  });
+
+  it("refuses a proposal of another event", async () => {
+    const event = await createEvent();
+    const other = await createEvent({ name: "Other event" });
+    const proposal = await createProposal(other.id, []);
+
+    const result = await adminCreateSessionAction({
+      eventId: event.id,
+      title: "Wrong event",
+      description: "",
+      startTime: null,
+      endTime: null,
+      capacity: 10,
+      adminManaged: true,
+      blocker: false,
+      closed: false,
+      hostIds: [],
+      locationIds: [],
+      proposalId: proposal.id,
+    });
+
+    expect(!result.ok && result.error).toBe("Proposal not found");
+    expect(await getRepositories().sessions.listByEvent(event.id)).toHaveLength(
+      0
+    );
   });
 
   it("rejects an empty title", async () => {

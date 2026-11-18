@@ -429,6 +429,7 @@ export interface paths {
             /** @default [] */
             locationIds?: string[];
             eventId: string;
+            proposalId?: string;
           };
         };
       };

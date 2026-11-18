@@ -12,6 +12,7 @@ import { fakeApi, problem, type FakeCall } from "../../commands/fake-api";
 import type { AdminProposal } from "../../queries/admin-proposals";
 import { NoticeProvider } from "../../ui/notices";
 import type { ParamUpdates } from "./list-paging";
+import type { DayOption } from "./admin-session-model";
 import { EventProposalsManager } from "./event-proposals";
 
 afterEach(cleanup);
@@ -32,6 +33,14 @@ const proposal = (
   ...extra,
 });
 
+const day: DayOption = {
+  key: "d1",
+  label: "Wednesday, May 1",
+  start: "2030-05-01T07:00:00.000Z",
+  end: "2030-05-01T17:00:00.000Z",
+};
+const hall = { id: "l1", name: "Hall", capacity: 30 };
+
 const alice = { id: "g1", name: "Alice" };
 const bob = { id: "g2", name: "Bob" };
 
@@ -48,8 +57,13 @@ const setup = (
   render(
     <NoticeProvider>
       <EventProposalsManager
+        eventId="e1"
         proposals={proposals}
         guests={[alice, bob]}
+        locations={[hall]}
+        timezone="Europe/Berlin"
+        days={[day]}
+        breakMinutes={10}
         params={new URLSearchParams(query)}
         onParams={onParams}
         calls={adminEventCalls(api)}
@@ -206,5 +220,69 @@ describe("the event proposals manager", { tags: ["018-US1"] }, () => {
       method: "DELETE",
       path: "/api/v1/admin/proposals/p1",
     });
+  });
+
+  it("creates a session from a proposal, carrying over what it says", async () => {
+    const user = userEvent.setup();
+    const { calls, onChanged } = setup(
+      [
+        proposal("p1", "Talk", {
+          description: "About it",
+          hosts: [alice],
+        }),
+      ],
+      { handler: () => Response.json({}, { status: 201 }) }
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "Create session from Talk" })
+    );
+    const form = screen.getByRole("form", { name: "Session from Talk" });
+    expect(
+      within(form).getByRole<HTMLInputElement>("textbox", { name: /Title/ })
+        .value
+    ).toBe("Talk");
+    expect(
+      within(form).getByRole<HTMLTextAreaElement>("textbox", {
+        name: /Description/,
+      }).value
+    ).toBe("About it");
+    await user.click(within(form).getByRole("checkbox", { name: /Hall/ }));
+    await user.click(within(form).getByRole("button", { name: "Create" }));
+
+    await waitFor(() => expect(onChanged).toHaveBeenCalled());
+    const call = calls.find((c) => c.method === "POST");
+    expect(call?.path).toBe("/api/v1/admin/sessions");
+    expect(call?.body).toMatchObject({
+      eventId: "e1",
+      proposalId: "p1",
+      title: "Talk",
+      hostIds: ["g1"],
+      locationIds: ["l1"],
+    });
+  });
+
+  it("fills in the end from the proposal's duration, until it is typed over", async () => {
+    const user = userEvent.setup();
+    setup([proposal("p1", "Talk", { durationMinutes: 45 })]);
+    await user.click(
+      screen.getByRole("button", { name: "Create session from Talk" })
+    );
+    const form = screen.getByRole("form", { name: "Session from Talk" });
+    await user.selectOptions(within(form).getByLabelText("Day"), "d1");
+    const end = within(form).getByLabelText<HTMLInputElement>(
+      /^End \(Europe\/Berlin\)/
+    );
+
+    await user.type(
+      within(form).getByLabelText(/^Start \(Europe\/Berlin\)/),
+      "12:00"
+    );
+    expect(within(form).getByText("Starts at 12:10")).toBeTruthy();
+    expect(end.value).toBe("12:45");
+
+    await user.clear(end);
+    await user.type(end, "14:00");
+    expect(end.value).toBe("14:00");
   });
 });

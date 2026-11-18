@@ -16,7 +16,9 @@ import {
   tableHandlers,
   type OnParams,
 } from "./list-paging";
+import { EMPTY_SESSION, type DayOption } from "./admin-session-model";
 import { ConfirmByTyping } from "./confirm-by-typing";
+import { SessionForm, type EventLocation } from "./event-sessions";
 import { shown, useJumpWithin } from "./use-section-save";
 
 const FIELDS = ["title", "description", "durationMinutes", "hostIds"];
@@ -180,18 +182,30 @@ function DeleteConfirm({
   );
 }
 
+type Scheduling = {
+  eventId: string;
+  timezone: string;
+  days: DayOption[];
+  locations: EventLocation[];
+  breakMinutes: number;
+};
+
 function ProposalItem({
   proposal,
   guests,
   calls,
+  scheduling,
   onChanged,
 }: {
   proposal: AdminProposal;
   guests: Person[];
   calls: AdminEventCalls;
+  scheduling: Scheduling;
   onChanged: () => void;
 }) {
-  const [mode, setMode] = useState<"view" | "edit" | "delete">("view");
+  const [mode, setMode] = useState<"view" | "edit" | "delete" | "session">(
+    "view"
+  );
   const close = () => setMode("view");
   // A current host who left the event stays offered, so saving never drops them.
   const candidates = [
@@ -208,6 +222,37 @@ function ProposalItem({
         onChanged={onChanged}
         onClose={close}
       />
+    );
+  if (mode === "session")
+    return (
+      <div className="space-y-3">
+        <h3 className="font-medium text-fg">Session from {proposal.title}</h3>
+        <SessionForm
+          initial={{
+            ...EMPTY_SESSION,
+            title: proposal.title,
+            description: proposal.description,
+            hostIds: proposal.hosts.map((h) => h.id),
+          }}
+          label={`Session from ${proposal.title}`}
+          timezone={scheduling.timezone}
+          days={scheduling.days}
+          breakMinutes={scheduling.breakMinutes}
+          durationMinutes={proposal.durationMinutes}
+          hosts={candidates}
+          locations={scheduling.locations}
+          submitLabel="Create"
+          pendingLabel="Creating..."
+          call={(body, key) =>
+            calls.createSession(
+              { eventId: scheduling.eventId, proposalId: proposal.id, ...body },
+              key
+            )
+          }
+          onChanged={onChanged}
+          onClose={close}
+        />
+      </div>
     );
   if (mode === "delete")
     return (
@@ -228,9 +273,18 @@ function ProposalItem({
             ? proposal.hosts.map((h) => h.name).join(", ")
             : "—"}
           {` · ${plural(proposal.votesCount, "vote", "votes")}`}
+          {proposal.sessionCount > 0 &&
+            ` · ${plural(proposal.sessionCount, "session", "sessions")}`}
         </p>
       </div>
       <div className="flex shrink-0 gap-2">
+        <Button
+          variant="quiet"
+          aria-label={`Create session from ${proposal.title}`}
+          onClick={() => setMode("session")}
+        >
+          Create session
+        </Button>
         <Button
           variant="quiet"
           aria-label={`Edit ${proposal.title}`}
@@ -257,7 +311,8 @@ export function EventProposalsManager({
   onParams,
   calls,
   onChanged,
-}: {
+  ...scheduling
+}: Scheduling & {
   proposals: AdminProposal[];
   /** The guests assigned to the event. */
   guests: Person[];
@@ -287,6 +342,7 @@ export function EventProposalsManager({
             proposal={p}
             guests={guests}
             calls={calls}
+            scheduling={scheduling}
             onChanged={onChanged}
           />
         )}

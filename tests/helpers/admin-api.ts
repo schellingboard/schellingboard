@@ -411,7 +411,7 @@ export type AdminSessionInput = {
 };
 
 export const adminCreateSessionAction = (
-  input: AdminSessionInput & { eventId: string }
+  input: AdminSessionInput & { eventId: string; proposalId?: string }
 ) => send("POST", "/admin/sessions", input);
 
 export const adminUpdateSessionAction = ({
