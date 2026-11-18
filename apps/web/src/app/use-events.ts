@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback } from "react";
 import type { ApiClient } from "@schellingboard/api-client";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import type { NavItem } from "./nav-bar";
+import { useRetrying } from "./use-retrying";
 
 export type EventSummary = Snapshot["event"];
 
@@ -11,24 +12,20 @@ export function useEventList(api: ApiClient): {
   now: Date | undefined;
   loaded: boolean;
   failed: boolean;
+  retry: () => void;
 } {
-  const [list, setList] = useState<{ events: EventSummary[]; now: Date }>();
-  const [failed, setFailed] = useState(false);
-  useEffect(() => {
-    let stale = false;
-    api
-      .GET("/api/v1/events")
-      .then(({ data }) => {
-        if (stale) return;
-        if (data) setList({ events: data.events, now: new Date(data.now) });
-        else setFailed(true);
-      })
-      .catch(() => setFailed(true));
-    return () => {
-      stale = true;
-    };
+  const load = useCallback(async () => {
+    const { data } = await api.GET("/api/v1/events");
+    return data && { events: data.events, now: new Date(data.now) };
   }, [api]);
-  return { events: list?.events ?? [], now: list?.now, loaded: !!list, failed };
+  const { data: list, failed, retry } = useRetrying(load);
+  return {
+    events: list?.events ?? [],
+    now: list?.now,
+    loaded: !!list,
+    failed,
+    retry,
+  };
 }
 
 /** The events for the nav bar, linking to each event's page. */

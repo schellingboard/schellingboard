@@ -1,5 +1,5 @@
 // @module-tag 007-US8
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { IDBFactory } from "fake-indexeddb";
 import { act, renderHook, screen, waitFor } from "@testing-library/react";
 import { fakeApi, problem } from "../commands/fake-api";
@@ -8,6 +8,11 @@ import { snapshot } from "../replica/snapshot-fixture";
 import { removeRsvp } from "../commands/rsvp";
 import { NoticeProvider } from "../ui/notices";
 import { useScheduleSession } from "./use-schedule-session";
+
+// Captured before the clock is faked, so real I/O (the fake IndexedDB) can finish.
+const realSetTimeout = globalThis.setTimeout;
+const realTick = () =>
+  new Promise<void>((resolve) => realSetTimeout(resolve, 0));
 
 class FakeSource {
   closed = false;
@@ -43,6 +48,8 @@ function setup(
   );
   return { ...hook, calls, sources };
 }
+
+afterEach(() => vi.useRealTimers());
 
 describe("useScheduleSession", () => {
   it("waits for the viewer to be known before loading anything", () => {
@@ -93,6 +100,25 @@ describe("useScheduleSession", () => {
       if (result.current.status === "failed") result.current.retry();
     });
     await waitFor(() => expect(result.current.status).toBe("ready"));
+  });
+
+  it("tries again by itself when loading fails, so a throttled or flaky start recovers", async () => {
+    vi.useFakeTimers({
+      shouldAdvanceTime: true,
+      toFake: ["setTimeout", "clearTimeout"],
+    });
+    let failures = 2;
+    const { result } = setup("mia", () =>
+      failures-- > 0 ? problem(429, "rate.limited") : Response.json(snapshot)
+    );
+    await waitFor(() => expect(result.current.status).toBe("failed"));
+
+    for (let i = 0; i < 40 && result.current.status !== "ready"; i++) {
+      await act(() => vi.advanceTimersByTimeAsync(3_000));
+      await realTick();
+    }
+
+    expect(result.current.status).toBe("ready");
   });
 
   it("stops its feed on unmount", async () => {

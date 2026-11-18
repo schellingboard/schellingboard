@@ -13,6 +13,28 @@ afterEach(() => vi.useRealTimers());
 const guestId = snapshot.me!.guestId;
 
 describe("opening a replica", () => {
+  it("loads from the network when the device's storage never answers", async () => {
+    vi.useFakeTimers();
+    const never = new Promise<never>(() => {});
+    const persistence = {
+      discardOthers: () => never,
+      load: () => never,
+    };
+    const loadSnapshot = vi.fn().mockResolvedValue(snapshot);
+
+    const opened = openReplica({
+      slug: "conf",
+      viewer: guestId,
+      persistence,
+      loadSnapshot,
+    });
+    await vi.advanceTimersByTimeAsync(10_000);
+
+    const { store, persisted } = await opened;
+    expect(persisted).toBe(false);
+    expect(store.get()).toEqual(snapshot);
+  });
+
   it("loads a snapshot when nothing is persisted, and starts live", async () => {
     const persistence = createReplicaPersistence(new IDBFactory());
     const loadSnapshot = vi.fn().mockResolvedValue(snapshot);

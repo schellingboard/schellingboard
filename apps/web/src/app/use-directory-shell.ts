@@ -13,7 +13,7 @@ import { useUrlSearchParams } from "./use-url-search-params";
  * of the `ShellFrame`'s props.
  */
 export function useDirectoryShell(api: AppServices["api"]) {
-  const { events, now: serverNow, loaded, failed } = useEventList(api);
+  const { events, now: serverNow, loaded, failed, retry } = useEventList(api);
   const [loadedAt] = useState(() => new Date());
   const { search } = useUrlSearchParams();
   const pathname = useLocation({ select: (l) => l.pathname });
@@ -43,6 +43,7 @@ export function useDirectoryShell(api: AppServices["api"]) {
     events,
     loaded,
     failed,
+    retry,
     now: serverNow ?? loadedAt,
     directory,
     status,

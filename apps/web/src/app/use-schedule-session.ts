@@ -11,6 +11,7 @@ import type { ReplicaStore } from "../replica/store";
 import { newKey } from "../commands/keys";
 import { failureMessage } from "../commands/failure-message";
 import { useNotify } from "../ui/notices";
+import { retryDelayMs } from "./retry";
 
 export type ScheduleSession =
   | { status: "loading" }
@@ -44,6 +45,7 @@ export function useScheduleSession({
     session: ScheduleSession;
   } | null>(null);
   const [attempt, setAttempt] = useState(0);
+  const failures = useRef(0);
   // Read when a session starts, not a reason to start another.
   const notify = useNotify();
   const latest = useRef({ persistence, createSource, notify });
@@ -56,6 +58,7 @@ export function useScheduleSession({
     if (viewer === undefined) return;
     let cancelled = false;
     let stop: (() => void) | undefined;
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
     const loadSnapshot = async (): Promise<Snapshot> => {
       const { data, response } = await api.GET(
         "/api/v1/events/{slug}/snapshot",
@@ -89,6 +92,7 @@ export function useScheduleSession({
               message: failureMessage(failure),
             }),
         });
+        failures.current = 0;
         stop = () => {
           runner.stop();
           opened.stop();
@@ -100,6 +104,13 @@ export function useScheduleSession({
       },
       (error: unknown) => {
         if (cancelled) return;
+        if (!(error instanceof EventNotFound)) {
+          failures.current++;
+          retryTimer = setTimeout(
+            () => setAttempt((n) => n + 1),
+            retryDelayMs(failures.current)
+          );
+        }
         setState({
           key,
           session:
@@ -114,6 +125,7 @@ export function useScheduleSession({
     );
     return () => {
       cancelled = true;
+      clearTimeout(retryTimer);
       stop?.();
     };
   }, [api, slug, viewer, key]);

@@ -3,6 +3,7 @@ import {
   createReplicaPersistence,
   type ReplicaPersistence,
 } from "../replica/persistence";
+import { fetchWithTimeout } from "./api-fetch";
 import { sendToSiteLoginWhenGated } from "./site-gate";
 
 /** What the screens reach the outside world through, so tests can fake it. */
@@ -13,7 +14,10 @@ export type AppServices = {
 };
 
 export function defaultServices(): AppServices {
-  const api = createApiClient({ baseUrl: window.location.origin });
+  const api = createApiClient({
+    baseUrl: window.location.origin,
+    fetch: fetchWithTimeout,
+  });
   sendToSiteLoginWhenGated(api);
   return {
     api,

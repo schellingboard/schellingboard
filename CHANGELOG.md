@@ -16,6 +16,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Hosting on NixOS** ([#1664](https://github.com/schellingboard/schellingboard/issues/1664)): a
   NixOS module runs SchellingBoard as a system service. See the NixOS guide under Self-hosting.
 
+### Fixed
+
+- **A slow or busy server no longer leaves a page stuck**: the home page and an event's schedule
+  kept showing "could not be loaded" or "Loading…" until reloaded; they now retry on their own.
+  Requests that never get an answer give up after 20 seconds.
+
 ## [5.0.0] - 2026-11-11
 
 > **Breaking change**: behind a reverse proxy, set `SB_TRUSTED_PROXIES` (usually `1`) when

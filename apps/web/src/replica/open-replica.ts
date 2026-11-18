@@ -3,6 +3,19 @@ import type { ReplicaPersistence } from "./persistence";
 import { createReplicaStore, type ReplicaStore } from "./store";
 
 const SAVE_AFTER_MS = 1_000;
+// Some browsers leave an IndexedDB request unanswered for good; the copy only
+// saves a network load, so it is not worth waiting for.
+const STORAGE_WAIT_MS = 3_000;
+
+function within<T>(wait: Promise<T>, fallback: T): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  return Promise.race([
+    wait,
+    new Promise<T>((resolve) => {
+      timer = setTimeout(() => resolve(fallback), STORAGE_WAIT_MS);
+    }),
+  ]).finally(() => clearTimeout(timer));
+}
 
 /**
  * The replica to show first: the persisted copy of this viewer's event, stale
@@ -23,8 +36,12 @@ export async function openReplica({
   loadSnapshot: () => Promise<Snapshot>;
   wallClock?: () => number;
 }): Promise<{ store: ReplicaStore; persisted: boolean }> {
-  await persistence.discardOthers(slug, viewer);
-  const saved = await persistence.load(slug, viewer);
+  const saved = await within(
+    persistence
+      .discardOthers(slug, viewer)
+      .then(() => persistence.load(slug, viewer)),
+    null
+  );
   if (saved)
     return {
       store: createReplicaStore(saved, undefined, wallClock, {
