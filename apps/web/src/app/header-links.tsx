@@ -3,9 +3,8 @@ import type { ApiClient } from "@schellingboard/api-client";
 import { BellIcon, UserGroupIcon } from "../ui/icons";
 import { useUnread } from "./unread-count";
 
-// The event feed carries schedule changes only, so a page that is never
-// reloaded would otherwise never see a new notification. Slow, because open-name
-// visitors behind one venue address share a single rate-limit bucket.
+// The event feed carries schedule changes only. Slow, because open-name
+// visitors behind one venue address share one rate-limit bucket.
 export const UNREAD_POLL_MS = 120_000;
 
 const link =
