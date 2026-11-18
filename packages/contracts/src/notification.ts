@@ -17,6 +17,10 @@ export const myNotificationsSchema = pageSchema(notificationSchema).extend({
   unreadCount: z.number().int().describe("Unread across every page"),
 });
 
+export const notificationStreamMessageSchema = z.object({
+  unreadCount: z.number().int().describe("Unread across every page"),
+});
+
 export const notificationIdsSchema = z.object({
   ids: z.array(z.string().min(1)).max(1000),
 });

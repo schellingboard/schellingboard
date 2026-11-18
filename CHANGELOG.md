@@ -18,8 +18,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
-- **Notifications now arrive without reloading the page**: the bell's unread count only updated on
-  reload, so reminders (such as for your own session) could go unnoticed.
+- **Notifications arrive the moment they are sent**: the bell and the notification list updated only
+  on reload, so reminders (such as for your own session) could go unnoticed.
 
 ## [5.0.0] - 2026-11-11
 

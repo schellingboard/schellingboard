@@ -4375,6 +4375,54 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/me/notifications/stream": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description A `text/event-stream` that tells the acting guest's browser when their notifications change, so it need not poll. `event: unread` carries `{unreadCount}`: once as the stream opens and again after every notification created, read or deleted; fetch `GET /me/notifications` for the list. `event: ping` every 25 seconds keeps proxies from closing it; it ends after 10 minutes, and the first message after a reconnect holds the current count. The first message carries `retry: 1000`. */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Changes as server-sent events */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "text/event-stream": {
+              /** @description Unread across every page */
+              unreadCount: number;
+            };
+          };
+        };
+        /** @description Problem details (RFC 9457); clients branch on `code` */
+        default: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/problem+json": components["schemas"]["Problem"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/me/notifications/read": {
     parameters: {
       query?: never;

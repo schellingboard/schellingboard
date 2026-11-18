@@ -7,6 +7,7 @@ import type { EmailSettings } from "@schellingboard/domain/guest";
 import { buildEmail, type EmailRecipe } from "@/emails/registry";
 import type { EmailPayload, PushPayload } from "@/utils/jobs/deliveries";
 import { nudgeJobs } from "@/utils/jobs/nudge";
+import { notificationsChanged } from "@/server/kernel/notification-changes";
 import { siteUrl } from "@/utils/site-url";
 import { type CommentSubject, commentNoticeText } from "@/emails/comment";
 import {
@@ -48,6 +49,7 @@ export async function notifyGuest(
     url: inApp.url,
     createdAt: inApp.at,
   });
+  notificationsChanged(guestId);
 
   // Push carries site-relative links a service worker resolves against its
   // own origin, so unlike the mail it works on an instance with no SITE_URL.

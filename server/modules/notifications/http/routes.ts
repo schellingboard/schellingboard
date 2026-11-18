@@ -6,6 +6,7 @@ import {
   notificationIdsQuerySchema,
   notificationIdsSchema,
   notificationSchema,
+  notificationStreamMessageSchema,
 } from "@schellingboard/contracts/notification";
 import {
   pushEnabledSchema,
@@ -25,6 +26,7 @@ import {
   type App,
 } from "@/server/http/route-parts";
 import type { NotificationUseCases } from "../application/use-cases";
+import { notificationStream } from "./stream";
 
 const toNotificationView = (n: Notification) => ({
   id: n.id,
@@ -43,6 +45,23 @@ const listMyNotifications = createRoute({
   request: { query: pageQuerySchema },
   responses: {
     200: json(myNotificationsSchema, "The caller's notifications"),
+    ...problemDefault,
+  },
+});
+
+const streamMine = createRoute({
+  method: "get",
+  path: "/me/notifications/stream",
+  tags: ["notifications"],
+  description:
+    "A `text/event-stream` that tells the acting guest's browser when their notifications change, so it need not poll. `event: unread` carries `{unreadCount}`: once as the stream opens and again after every notification created, read or deleted; fetch `GET /me/notifications` for the list. `event: ping` every 25 seconds keeps proxies from closing it; it ends after 10 minutes, and the first message after a reconnect holds the current count. The first message carries `retry: 1000`.",
+  responses: {
+    200: {
+      description: "Changes as server-sent events",
+      content: {
+        "text/event-stream": { schema: notificationStreamMessageSchema },
+      },
+    },
     ...problemDefault,
   },
 });
@@ -173,6 +192,16 @@ export function addNotificationRoutes(
       },
       200
     );
+  });
+
+  app.openapi(streamMine, async (c) => {
+    const result = await notifications().openNotificationStream(c.var.actor);
+    if (!result.ok) return problem(result.error);
+    return c.body(notificationStream(result.value, c.req.raw.signal), 200, {
+      "content-type": "text/event-stream",
+      "cache-control": "no-store, no-transform",
+      "x-accel-buffering": "no",
+    });
   });
 
   app.openapi(markRead, async (c) => {

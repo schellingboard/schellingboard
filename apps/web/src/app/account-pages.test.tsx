@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { FakeCall } from "../commands/fake-api";
 import { problem } from "../commands/fake-api";
@@ -282,6 +282,52 @@ describe("the notifications page", { tags: ["013-US2"] }, () => {
 
     await waitFor(() => expect(router.history.location.pathname).toBe("/conf"));
     expect(router.history.location.search).toBe("?viewSession=s1");
+  });
+
+  it("shows a notification the moment the server pushes it", async () => {
+    const sources: Array<{ emit: (type: string, data: unknown) => void }> = [];
+    class PushedSource {
+      readyState = 1;
+      private listeners = new Map<string, (e: { data: string }) => void>();
+      constructor(readonly url: string) {
+        if (url.endsWith("/me/notifications/stream")) sources.push(this);
+      }
+      addEventListener(type: string, l: (e: { data: string }) => void) {
+        this.listeners.set(type, l);
+      }
+      close() {}
+      emit(type: string, data: unknown) {
+        this.listeners.get(type)?.({ data: JSON.stringify(data) });
+      }
+    }
+    vi.stubGlobal("EventSource", PushedSource);
+    try {
+      let items = [notification("Anna", "/conf?viewSession=s1")];
+      await open({
+        handler: (call) =>
+          call.method === "GET" &&
+          call.path.startsWith("/api/v1/me/notifications?")
+            ? Response.json({
+                items,
+                nextCursor: null,
+                unreadCount: items.length,
+              })
+            : answers(call),
+        path: "/notifications",
+        identity: "al",
+      });
+      await screen.findByRole("button", { name: /Anna commented/ });
+      act(() => sources[0].emit("unread", { unreadCount: 1 }));
+
+      items = [notification("Bo", "/conf?viewSession=s2"), ...items];
+      act(() => sources[0].emit("unread", { unreadCount: 2 }));
+
+      expect(
+        await screen.findByRole("button", { name: /Bo commented/ })
+      ).toBeTruthy();
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it("asks to select a name first", async () => {

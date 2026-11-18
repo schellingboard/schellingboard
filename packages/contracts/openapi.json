@@ -6620,6 +6620,40 @@
         "security": [{ "siteAuth": [] }]
       }
     },
+    "/api/v1/me/notifications/stream": {
+      "get": {
+        "tags": ["notifications"],
+        "description": "A `text/event-stream` that tells the acting guest's browser when their notifications change, so it need not poll. `event: unread` carries `{unreadCount}`: once as the stream opens and again after every notification created, read or deleted; fetch `GET /me/notifications` for the list. `event: ping` every 25 seconds keeps proxies from closing it; it ends after 10 minutes, and the first message after a reconnect holds the current count. The first message carries `retry: 1000`.",
+        "responses": {
+          "200": {
+            "description": "Changes as server-sent events",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "unreadCount": {
+                      "type": "integer",
+                      "description": "Unread across every page"
+                    }
+                  },
+                  "required": ["unreadCount"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Problem details (RFC 9457); clients branch on `code`",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        },
+        "security": [{ "siteAuth": [] }]
+      }
+    },
     "/api/v1/me/notifications/read": {
       "post": {
         "tags": ["notifications"],
