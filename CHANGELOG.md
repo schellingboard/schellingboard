@@ -20,6 +20,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - **Event icons are shown** (#1588): the icon picker in the event settings draws each icon, and the
   chosen icon appears beside the event's name in the menu and on the home page.
+- **Notifications arrive the moment they are sent**: the bell and the notification list updated only
+  on reload, so reminders (such as for your own session) could go unnoticed.
 
 ## [5.0.0] - 2026-11-11
 

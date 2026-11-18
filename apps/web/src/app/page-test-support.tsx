@@ -3,20 +3,11 @@ import { render } from "@testing-library/react";
 import { createMemoryHistory, RouterProvider } from "@tanstack/react-router";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { fakeApi, problem, type FakeCall } from "../commands/fake-api";
+import { fakeSources } from "../commands/fake-source";
 import { createReplicaPersistence } from "../replica/persistence";
 import { iso, snapshot } from "../replica/snapshot-fixture";
 import { createAppRouter } from "./router";
 import type { AppServices } from "./services";
-
-class FakeSource {
-  closed = false;
-  readyState = 1;
-  constructor(readonly url: string) {}
-  addEventListener() {}
-  close() {
-    this.closed = true;
-  }
-}
 
 // The fixture's own clock is before its scheduling phase.
 export const running: Snapshot = { ...snapshot, now: iso(9) };
@@ -34,7 +25,7 @@ export async function open({
   identity = "mia",
   path = "/conf",
 }: Setup = {}) {
-  const sources: FakeSource[] = [];
+  const { feeds: sources, notifications, createSource } = fakeSources();
   const { api, calls } = fakeApi((call) => {
     const custom = handler?.(call);
     if (custom) return custom;
@@ -68,11 +59,7 @@ export async function open({
   const services: AppServices = {
     api,
     persistence: createReplicaPersistence(new IDBFactory()),
-    createSource: (url) => {
-      const source = new FakeSource(url);
-      sources.push(source);
-      return source as unknown as EventSource;
-    },
+    createSource,
   };
   const router = createAppRouter(
     createMemoryHistory({ initialEntries: [path] }),
@@ -80,5 +67,5 @@ export async function open({
   );
   await router.load();
   render(<RouterProvider router={router} />);
-  return { calls, sources, router };
+  return { calls, sources, notifications, router };
 }

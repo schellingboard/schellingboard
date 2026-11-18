@@ -122,10 +122,11 @@ reader is the reaction, as before.
 
 ### 6. Connections per tab
 
-Each tab opens one `EventSource`. HTTP/1.1 allows six connections per origin, so the seventh tab
-would hang. Two measures, both:
+Each tab opens one `EventSource` for the feed, and a viewer with a name a second one for their
+notifications (`/me/notifications/stream`). HTTP/1.1 allows six connections per origin, so the
+fourth such tab would hang. Two measures, both:
 
-- A tab hidden for more than 30 seconds closes its feed. When it is visible again, it opens a new
+- A tab hidden for more than 30 seconds closes its streams. When it is visible again, it opens a new
   `EventSource` with `?since=` the replica's `seq` (a new `EventSource` cannot set `Last-Event-ID`)
   and shows "reconnecting" until it is live. A kiosk stays visible, so it is never affected.
 - The self-hosting docs ask for HTTP/2 at the reverse proxy. Caddy and Traefik use it by default;

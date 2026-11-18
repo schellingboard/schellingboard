@@ -4,6 +4,7 @@ import type {
   DueReminderCandidate,
   ReminderKey,
 } from "@schellingboard/domain/reminder";
+import { notificationsChanged } from "@/server/kernel/notification-changes";
 import { isMailerConfigured, sendMail } from "@/utils/mailer";
 import { sessionPath } from "@/utils/notifications";
 import { siteUrl } from "@/utils/site-url";
@@ -127,6 +128,7 @@ export async function dispatchDueReminders(
           url: recordPath(candidate),
           createdAt: now,
         });
+        notificationsChanged(candidate.guestId);
         await reminders.markNotified(key, now);
         summary.notified += 1;
       } catch (err) {

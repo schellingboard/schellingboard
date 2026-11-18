@@ -40,7 +40,7 @@ const isPeoplePath = (pathname: string) =>
 /** The attendee directory, a profile over it, and the edit-profile page. */
 export function PeoplePage({ services }: { services: AppServices }) {
   return (
-    <ShellProviders api={services.api}>
+    <ShellProviders api={services.api} createSource={services.createSource}>
       <Host api={services.api} />
     </ShellProviders>
   );

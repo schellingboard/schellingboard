@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { fakeApi } from "../commands/fake-api";
+import { fakeSources } from "../commands/fake-source";
 import { Shell } from "./shell";
 
 vi.mock("./hard-navigate", () => ({
@@ -23,6 +24,7 @@ function show(devTools: boolean) {
   render(
     <Shell
       api={api}
+      createSource={fakeSources().createSource}
       events={[{ name: "Conf", href: "/legacy/conf" }]}
       guests={[{ id: "g1", name: "Ada", authProtected: false }]}
       currentPath="/legacy/conf"
@@ -65,6 +67,7 @@ describe("Shell", () => {
     render(
       <Shell
         api={api}
+        createSource={fakeSources().createSource}
         events={[]}
         guests={[]}
         currentPath="/"
@@ -88,6 +91,7 @@ describe("Shell", () => {
       render(
         <Shell
           api={api}
+          createSource={fakeSources().createSource}
           events={[]}
           guests={[]}
           currentPath="/"

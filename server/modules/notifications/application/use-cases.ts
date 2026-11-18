@@ -4,6 +4,7 @@ import {
   deleteNotifications,
   listMyNotifications,
   markNotificationsRead,
+  openNotificationStream,
   readNotification,
 } from "./notifications";
 import {
@@ -19,6 +20,7 @@ export function createNotificationUseCases(deps: NotificationDeps) {
     markNotificationsRead: markNotificationsRead(deps),
     deleteNotifications: deleteNotifications(deps),
     readNotification: readNotification(deps),
+    openNotificationStream: openNotificationStream(deps),
     getMyEmailSettings: getMyEmailSettings(deps),
     updateMyEmailSettings: updateMyEmailSettings(deps),
     subscribeToPush: subscribeToPush(deps),

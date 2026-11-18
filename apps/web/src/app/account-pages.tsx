@@ -35,7 +35,7 @@ import { NoticeProvider } from "../ui/notices";
 import { PageNotice } from "./page-notice";
 import type { AppServices } from "./services";
 import { ShellFrame, ShellProviders } from "./shell";
-import { useUnread } from "./unread-count";
+import { useNotificationRevision, useUnread } from "./unread-count";
 import { useDirectoryShell } from "./use-directory-shell";
 import { useUrlSearchParams } from "./use-url-search-params";
 import { useViewer } from "./viewer";
@@ -137,7 +137,7 @@ function AccountFrame({
 }) {
   const { api } = services;
   return (
-    <ShellProviders api={api}>
+    <ShellProviders api={api} createSource={services.createSource}>
       <Frame api={api}>{children}</Frame>
     </ShellProviders>
   );
@@ -205,9 +205,10 @@ function Notifications({ api, now }: { api: AppServices["api"]; now: Date }) {
   const [query] = useState(() =>
     createNotificationsQuery({ calls: notificationCalls(api) })
   );
+  const revision = useNotificationRevision();
   useEffect(() => {
     void query.load();
-  }, [query]);
+  }, [query, revision]);
   const state = useSyncExternalStore(query.subscribe, query.get);
 
   if (state.status === "error" && REFUSALS.includes(state.code))

@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-import type { ApiClient } from "@schellingboard/api-client";
 import { BellIcon, UserGroupIcon } from "../ui/icons";
 import { useUnread } from "./unread-count";
 
@@ -7,27 +5,8 @@ const link =
   "flex items-center gap-1 rounded-md px-2 py-2 text-sm font-medium text-fg-subtle hover:bg-surface-muted sm:px-3";
 
 /** The attendee list and, for someone with a name, their notifications. */
-export function HeaderLinks({
-  api,
-  signedIn,
-}: {
-  api: ApiClient;
-  signedIn: boolean;
-}) {
-  const [unread, setUnread] = useUnread();
-  useEffect(() => {
-    if (!signedIn) return;
-    let stale = false;
-    api
-      .GET("/api/v1/me/notifications")
-      .then(({ data }) => {
-        if (!stale && data) setUnread(data.unreadCount);
-      })
-      .catch(() => {});
-    return () => {
-      stale = true;
-    };
-  }, [api, signedIn, setUnread]);
+export function HeaderLinks({ signedIn }: { signedIn: boolean }) {
+  const [unread] = useUnread();
 
   return (
     <>

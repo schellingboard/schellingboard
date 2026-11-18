@@ -77,7 +77,7 @@ export function EventPage({
   children: (view: EventView) => ReactNode;
 }) {
   return (
-    <ShellProviders api={services.api}>
+    <ShellProviders api={services.api} createSource={services.createSource}>
       <EventHost services={services} slug={slug}>
         {children}
       </EventHost>

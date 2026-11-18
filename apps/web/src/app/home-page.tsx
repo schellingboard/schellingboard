@@ -8,7 +8,7 @@ import { useDirectoryShell } from "./use-directory-shell";
 
 export function HomePage({ services }: { services: AppServices }) {
   return (
-    <ShellProviders api={services.api}>
+    <ShellProviders api={services.api} createSource={services.createSource}>
       <Home api={services.api} />
     </ShellProviders>
   );

@@ -15,6 +15,7 @@ import { useUpdateStatus } from "./updates";
 import { ThemeProvider } from "./theme";
 import { UnreadProvider } from "./unread-count";
 import { UserMenu, type PickableGuest } from "./user-menu";
+import type { AppServices } from "./services";
 import { useViewer, ViewerProvider } from "./viewer";
 import { NoticeProvider } from "../ui/notices";
 
@@ -35,7 +36,7 @@ export function ShellFrame({
     <Layout
       nav={
         <NavBar items={events} currentPath={currentPath}>
-          <HeaderLinks api={api} signedIn={!!viewer.guestId} />
+          <HeaderLinks signedIn={!!viewer.guestId} />
           <MapButton api={api} />
           <UserMenu viewer={viewer} guests={guests} />
         </NavBar>
@@ -74,26 +75,45 @@ export type ShellProps = {
 /** The theme and the viewer, for a screen that needs the viewer to load its data. */
 export function ShellProviders({
   api,
+  createSource,
   children,
 }: {
   api: ApiClient;
+  createSource: AppServices["createSource"];
   children: ReactNode;
 }) {
   return (
     <ThemeProvider>
       <NoticeProvider>
         <ViewerProvider api={api}>
-          <UnreadProvider>{children}</UnreadProvider>
+          <ViewerUnread createSource={createSource}>{children}</ViewerUnread>
         </ViewerProvider>
       </NoticeProvider>
     </ThemeProvider>
   );
 }
 
-/** Everything around a screen. */
-export function Shell(props: ShellProps) {
+function ViewerUnread({
+  createSource,
+  children,
+}: {
+  createSource: AppServices["createSource"];
+  children: ReactNode;
+}) {
+  const { guestId } = useViewer();
   return (
-    <ShellProviders api={props.api}>
+    <UnreadProvider guestId={guestId} createSource={createSource}>
+      {children}
+    </UnreadProvider>
+  );
+}
+
+/** Everything around a screen. */
+export function Shell(
+  props: ShellProps & { createSource: AppServices["createSource"] }
+) {
+  return (
+    <ShellProviders api={props.api} createSource={props.createSource}>
       <ShellFrame {...props} />
     </ShellProviders>
   );
