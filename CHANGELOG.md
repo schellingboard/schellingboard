@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > [`packages/domain/src/release-notes.ts`](packages/domain/src/release-notes.ts), which holds 3-5 of
 > them.
 
-## [Unreleased]
+## [5.1.0] - 2026-11-18
 
 ### Added
 
@@ -1374,7 +1374,7 @@ of [rachelweinberg12/scheduling-app](https://github.com/rachelweinberg12/schedul
 ([full log](https://github.com/rachelweinberg12/scheduling-app/commits/babcd6275a853f1911cd48bbdaf4f2b1725c3d47/)).
 It was never properly released since it was deployed directly from the Git repository.
 
-[Unreleased]: https://github.com/schellingboard/schellingboard/compare/v5.0.0...HEAD
+[5.1.0]: https://github.com/schellingboard/schellingboard/compare/v5.0.0...v5.1.0
 [5.0.0]: https://github.com/schellingboard/schellingboard/compare/v4.0.0...v5.0.0
 [4.0.0]: https://github.com/schellingboard/schellingboard/compare/v3.8.1...v4.0.0
 [3.8.1]: https://github.com/schellingboard/schellingboard/compare/v3.8.0...v3.8.1

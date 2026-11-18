@@ -47,8 +47,13 @@ export const SHOWN_RELEASES = 3;
 
 export const releaseNotes: ReleaseNote[] = [
   {
-    version: "Unreleased",
-    highlights: [],
+    version: "5.1.0",
+    date: "2026-11-18",
+    highlights: [
+      "**Hosting on NixOS**: a NixOS module runs SchellingBoard as a system service.",
+      "**Create a session from a proposal**: organizers turn a proposal into a session in one click, prefilled with its title, hosts and duration.",
+      "**Live notifications**: the bell and the notification list update the moment something is sent, with no reload.",
+    ],
   },
   {
     version: "5.0.0",
