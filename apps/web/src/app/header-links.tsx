@@ -4,8 +4,9 @@ import { BellIcon, UserGroupIcon } from "../ui/icons";
 import { useUnread } from "./unread-count";
 
 // The event feed carries schedule changes only, so a page that is never
-// reloaded would otherwise never see a new notification.
-export const UNREAD_POLL_MS = 30_000;
+// reloaded would otherwise never see a new notification. Slow, because open-name
+// visitors behind one venue address share a single rate-limit bucket.
+export const UNREAD_POLL_MS = 120_000;
 
 const link =
   "flex items-center gap-1 rounded-md px-2 py-2 text-sm font-medium text-fg-subtle hover:bg-surface-muted sm:px-3";
