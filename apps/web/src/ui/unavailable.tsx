@@ -29,7 +29,7 @@ export function Unavailable({
         onClickCapture={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          if (why) notify({ tone: "info", message: why });
+          if (why) notify({ tone: "info", message: why, autoDismissMs: 6000 });
         }}
       >
         {cloneElement(children, {

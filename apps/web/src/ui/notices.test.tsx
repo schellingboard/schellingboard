@@ -87,6 +87,19 @@ describe("notices", () => {
     expect(screen.getByRole("status").textContent).toContain("Saved");
   });
 
+  it("shows a repeated notice once while it is still up", async () => {
+    render(
+      <NoticeProvider>
+        <Raiser notice={{ tone: "info", message: "Saved" }} />
+      </NoticeProvider>
+    );
+
+    await go();
+    await go();
+
+    expect(screen.getAllByRole("status")).toHaveLength(1);
+  });
+
   it("clears a notice by itself when it asks to", async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     try {

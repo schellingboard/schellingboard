@@ -23,6 +23,24 @@ describe("Tooltip", () => {
     expect(screen.queryByRole("tooltip")).toBeNull();
   });
 
+  it("stays shut when a tap, not a mouse, crossed the trigger", () => {
+    render(
+      <Tooltip content="More">
+        <a href="/x">Trigger</a>
+      </Tooltip>
+    );
+    const trigger = screen.getByRole("link").parentElement!;
+    fireEvent.pointerEnter(trigger, { pointerType: "touch" });
+    fireEvent.mouseEnter(trigger);
+    act(() => void vi.advanceTimersByTime(1000));
+    expect(screen.queryByRole("tooltip")).toBeNull();
+
+    fireEvent.pointerEnter(trigger, { pointerType: "mouse" });
+    fireEvent.mouseEnter(trigger);
+    act(() => void vi.advanceTimersByTime(1000));
+    expect(screen.getByRole("tooltip")).toBeTruthy();
+  });
+
   it("opens on keyboard focus at once", () => {
     render(
       <Tooltip content="More">

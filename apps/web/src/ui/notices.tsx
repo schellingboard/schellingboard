@@ -30,7 +30,13 @@ export function NoticeProvider({ children }: { children: ReactNode }) {
     []
   );
   const notify = useCallback<Notify>((notice) => {
-    setShown((current) => [...current, { ...notice, id: nextId++ }]);
+    setShown((current) =>
+      current.some(
+        (n) => n.tone === notice.tone && n.message === notice.message
+      )
+        ? current
+        : [...current, { ...notice, id: nextId++ }]
+    );
   }, []);
 
   return (

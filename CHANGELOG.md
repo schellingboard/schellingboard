@@ -11,6 +11,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **Reasons for unavailable buttons read better**: their hover box has padding, and a tap shows the
+  reason once, as a notice that goes away by itself, instead of stacking copies under a hover box.
+
 ## [5.1.0] - 2026-11-18
 
 ### Added

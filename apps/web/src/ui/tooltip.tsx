@@ -49,6 +49,7 @@ export function Tooltip({
   const trigger = useRef<HTMLElement>(null);
   const panel = useRef<HTMLDivElement>(null);
   const rest = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const touched = useRef(false);
   const id = useId();
 
   useLayoutEffect(() => {
@@ -106,14 +107,23 @@ export function Tooltip({
           style={position ?? { top: 0, left: 0, visibility: "hidden" }}
           className="pointer-events-none fixed z-50 max-w-xs rounded-md border border-line bg-surface-raised text-fg shadow-lg"
         >
-          {content}
+          {typeof content === "string" ? (
+            <p className="px-3 py-2 text-sm">{content}</p>
+          ) : (
+            content
+          )}
         </div>,
         document.body
       )
     : null;
 
+  const sensed = (e: React.PointerEvent) => {
+    touched.current = e.pointerType === "touch";
+  };
   const rested = () => {
     clearTimeout(rest.current);
+    // A tap is followed by emulated mouse events, even on hover-capable screens.
+    if (touched.current) return;
     rest.current = setTimeout(show, REST_MS);
   };
 
@@ -126,6 +136,7 @@ export function Tooltip({
           aria-expanded={open}
           aria-describedby={open ? id : undefined}
           onClick={() => setOpen((o) => !o)}
+          onPointerEnter={sensed}
           onMouseEnter={rested}
           onMouseMove={() => !open && rested()}
           onMouseLeave={hide}
@@ -142,6 +153,7 @@ export function Tooltip({
       ref={trigger as React.RefObject<HTMLDivElement>}
       className={cx(className, triggerClassName)}
       aria-describedby={open ? id : undefined}
+      onPointerEnter={sensed}
       onMouseEnter={rested}
       onMouseMove={() => !open && rested()}
       onMouseLeave={hide}
