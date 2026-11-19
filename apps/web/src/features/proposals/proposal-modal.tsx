@@ -21,6 +21,7 @@ import {
 } from "../../replica/selectors";
 import { Dialog } from "../../ui/dialog";
 import { CalendarIcon, HandRaisedIcon, PencilIcon } from "../../ui/icons";
+import { Tooltip } from "../../ui/tooltip";
 import { Unavailable } from "../../ui/unavailable";
 import { Comments, type CommentsHandle } from "../comments/comments-section";
 import type { ProposalLinks } from "./links";
@@ -216,12 +217,18 @@ function Details({
           {!isHost && (
             <div className="text-sm text-fg-muted">
               Your vote:
-              <span
-                title={myVote ? voteChoiceToLabel(myVote) : NO_VOTE_LABEL}
-                className="ml-1"
+              <Tooltip
+                content={myVote ? voteChoiceToLabel(myVote) : NO_VOTE_LABEL}
+                toggleable
+                triggerClassName="ml-1"
               >
-                {myVote ? voteChoiceToEmoji(myVote) : "-"}
-              </span>
+                <span aria-hidden>
+                  {myVote ? voteChoiceToEmoji(myVote) : "-"}
+                </span>
+                <span className="sr-only">
+                  {myVote ? voteChoiceToLabel(myVote) : NO_VOTE_LABEL}
+                </span>
+              </Tooltip>
             </div>
           )}
           {detail?.breakdown ? (

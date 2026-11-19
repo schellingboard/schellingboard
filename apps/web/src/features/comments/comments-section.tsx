@@ -268,12 +268,13 @@ function Thread({
                 </a>
               )}
               {node.editedTime && (
-                <span
-                  className="text-xs text-fg-muted"
-                  title={`Edited ${formatInLocalZone(new Date(node.editedTime), timezone, localZone)}`}
+                <Tooltip
+                  content={`Edited ${formatInLocalZone(new Date(node.editedTime), timezone, localZone)}`}
+                  toggleable
+                  triggerClassName="text-xs text-fg-muted"
                 >
                   (edited)
-                </span>
+                </Tooltip>
               )}
             </>
           )}

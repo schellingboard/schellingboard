@@ -9,6 +9,7 @@ import {
 import { Dialog } from "../../ui/dialog";
 import { AcademicCapIcon, CheckCircleIcon, LockIcon } from "../../ui/icons";
 import { Markdown } from "../../ui/markdown";
+import { Tooltip } from "../../ui/tooltip";
 import { claimRefusal } from "@schellingboard/domain/session-claim";
 import { useSchedule } from "./context";
 import { AttendeeCountField } from "./attendee-count-field";
@@ -147,14 +148,16 @@ function Details({ session }: { session: Session }) {
           </a>
         )}
         {isHost && (
-          <span title="You are hosting this session">
+          <Tooltip content="You are hosting this session" toggleable>
             <AcademicCapIcon className="h-5 w-5" />
-          </span>
+            <span className="sr-only">You are hosting this session</span>
+          </Tooltip>
         )}
         {rsvpd && (
-          <span title="You have RSVP'd to this session">
+          <Tooltip content="You have RSVP'd to this session" toggleable>
             <CheckCircleIcon className="h-5 w-5" />
-          </span>
+            <span className="sr-only">You have RSVP'd to this session</span>
+          </Tooltip>
         )}
       </div>
       <div className="mb-6 space-y-2 text-sm text-fg-muted">

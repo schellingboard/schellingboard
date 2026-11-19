@@ -4,6 +4,7 @@ import {
   voteChoiceToLabel,
 } from "@schellingboard/domain/vote-display";
 import { cx } from "../../ui/cx";
+import { Tooltip } from "../../ui/tooltip";
 
 // Skip votes are left out on purpose: this is the public tally, and it reads as
 // interest in a proposal rather than as a scoreboard for it.
@@ -19,14 +20,19 @@ export function VoteTally({
       {(["interested", "maybe"] as const).map((choice) => {
         const count = tally?.[choice] ?? 0;
         const label = voteChoiceToLabel(choice as VoteChoice).toLowerCase();
+        const text = `${count} ${label} vote${count !== 1 ? "s" : ""}`;
         return (
-          <span
+          <Tooltip
             key={choice}
-            title={`${count} ${label} vote${count !== 1 ? "s" : ""}`}
-            className="inline-flex items-center gap-1 text-sm text-fg-subtle"
+            content={text}
+            toggleable
+            triggerClassName="inline-flex items-center gap-1 text-sm text-fg-subtle"
           >
-            {voteChoiceToEmoji(choice as VoteChoice)}&nbsp;{count}
-          </span>
+            <span aria-hidden>
+              {voteChoiceToEmoji(choice as VoteChoice)}&nbsp;{count}
+            </span>
+            <span className="sr-only">{text}</span>
+          </Tooltip>
         );
       })}
     </span>

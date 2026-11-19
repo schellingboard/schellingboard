@@ -8,6 +8,7 @@ import type {
 import { Button } from "../../ui/button";
 import { ConfirmDialog } from "../../ui/confirm-dialog";
 import { CheckIcon } from "../../ui/icons";
+import { Tooltip } from "../../ui/tooltip";
 
 /** The signed-in guest's notifications: tick rows to mark or delete them, click one to open it. */
 export function NotificationsScreen({
@@ -238,16 +239,17 @@ function Row({
           </span>
         </button>
         {!read && (
-          <button
-            type="button"
-            title="Mark as read"
-            aria-label="Mark as read"
-            disabled={busy}
-            onClick={onMarkRead}
-            className="shrink-0 cursor-pointer rounded-md p-2 text-fg-subtle hover:bg-surface-muted disabled:opacity-50"
-          >
-            <CheckIcon className="h-5 w-5" />
-          </button>
+          <Tooltip content="Mark as read" className="shrink-0">
+            <button
+              type="button"
+              aria-label="Mark as read"
+              disabled={busy}
+              onClick={onMarkRead}
+              className="cursor-pointer rounded-md p-2 text-fg-subtle hover:bg-surface-muted disabled:opacity-50"
+            >
+              <CheckIcon className="h-5 w-5" />
+            </button>
+          </Tooltip>
         )}
       </div>
     </li>

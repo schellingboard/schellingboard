@@ -269,8 +269,10 @@ describe("the votes after voting closed", () => {
       });
 
       expect(dialog().getByText(/Total votes/)).toBeTruthy();
-      expect(dialog().getByTitle("2 interested votes")).toBeTruthy();
-      expect(dialog().getByTitle("Maybe").textContent).toBe("⭐");
+      expect(dialog().getByText(/2 interested votes/)).toBeTruthy();
+      expect(
+        dialog().getByRole("button", { name: "Maybe" }).textContent
+      ).toContain("⭐");
       expect(
         dialog().queryByRole("region", { name: "Vote breakdown" })
       ).toBeNull();
@@ -347,7 +349,9 @@ describe("the votes after voting closed", () => {
     { tags: ["005-US3"] },
     () => {
       setup("scheduling");
-      expect(dialog().getByTitle("No vote").textContent).toBe("-");
+      expect(
+        dialog().getByRole("button", { name: "No vote" }).textContent
+      ).toContain("-");
     }
   );
 });

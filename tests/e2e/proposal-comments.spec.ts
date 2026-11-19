@@ -82,9 +82,8 @@ test("edits a comment, showing when it was edited, then deletes it @010-US4", as
 
   await expect(modal.getByText("second thoughts")).toBeVisible();
   await expect(modal.getByText("first thoughts")).toHaveCount(0);
-  const editedMarker = modal.getByText("(edited)");
-  await expect(editedMarker).toBeVisible();
-  await expect(editedMarker).toHaveAttribute("title", /^Edited /);
+  await modal.getByRole("button", { name: "(edited)" }).click();
+  await expect(page.getByRole("tooltip")).toHaveText(/^Edited /);
 
   await modal.getByRole("button", { name: "Delete" }).click();
   await page

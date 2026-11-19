@@ -1,3 +1,4 @@
+import { Tooltip } from "../ui/tooltip";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
 // The same cookie, values and colours as the Next pages (utils/theme.ts there);
@@ -76,16 +77,16 @@ export function ThemeSelect() {
       className="inline-flex overflow-hidden rounded-md border border-line"
     >
       {OPTIONS.map(({ value, label, hint }) => (
-        <button
-          key={value}
-          type="button"
-          title={hint}
-          aria-pressed={theme === value}
-          onClick={() => setTheme(value)}
-          className={`px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-accent ${theme === value ? "bg-surface-inverse text-fg-inverse" : "text-fg-muted hover:bg-surface-hover"}`}
-        >
-          {label}
-        </button>
+        <Tooltip key={value} content={hint}>
+          <button
+            type="button"
+            aria-pressed={theme === value}
+            onClick={() => setTheme(value)}
+            className={`px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-accent ${theme === value ? "bg-surface-inverse text-fg-inverse" : "text-fg-muted hover:bg-surface-hover"}`}
+          >
+            {label}
+          </button>
+        </Tooltip>
       ))}
     </div>
   );

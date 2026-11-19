@@ -6,6 +6,7 @@ import {
   type Template,
 } from "@schellingboard/domain/markdown-edit";
 import { Markdown } from "./markdown";
+import { Tooltip } from "./tooltip";
 
 const GLYPHS: Record<string, string> = {
   bold: "B",
@@ -68,20 +69,24 @@ export function MarkdownTextarea({
         </button>
         <span className="flex flex-1 justify-end overflow-hidden">
           {markdownOptions.map((option) => (
-            <button
+            <Tooltip
               key={option.id}
-              type="button"
-              aria-label={option.label}
-              title={option.label}
-              disabled={previewing}
-              className="m-1 h-fit rounded-md p-1 text-xs font-semibold hover:bg-surface-hover disabled:opacity-50"
-              onClick={() =>
-                textarea.current &&
-                applyToTextarea(option.template, textarea.current)
-              }
+              content={option.label}
+              className="m-1 h-fit"
             >
-              {GLYPHS[option.id]}
-            </button>
+              <button
+                type="button"
+                aria-label={option.label}
+                disabled={previewing}
+                className="rounded-md p-1 text-xs font-semibold hover:bg-surface-hover disabled:opacity-50"
+                onClick={() =>
+                  textarea.current &&
+                  applyToTextarea(option.template, textarea.current)
+                }
+              >
+                {GLYPHS[option.id]}
+              </button>
+            </Tooltip>
           ))}
         </span>
       </div>

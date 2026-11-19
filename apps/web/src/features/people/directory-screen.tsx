@@ -7,6 +7,7 @@ import { serializeAttendeeFilters } from "@schellingboard/domain/attendee-filter
 import type { DirectoryEntry, DirectoryState } from "../../queries/directory";
 import { Avatar } from "../../ui/avatar";
 import { SearchInput } from "../../ui/search-input";
+import { Tooltip } from "../../ui/tooltip";
 import { SEARCH_DEBOUNCE_MS } from "../../ui/use-debounced";
 import {
   cardsFrom,
@@ -104,43 +105,42 @@ export function DirectoryScreen(props: DirectoryScreenProps) {
                   </button>
                 );
               })}
-              <label
-                className="flex items-center gap-2 text-sm text-fg-muted"
-                // On the label: browsers suppress pointer events on a disabled
-                // control, so a title there would never show.
-                title={
+              <Tooltip
+                content={
                   sortDisabled
                     ? "Search results are sorted by relevance"
                     : undefined
                 }
               >
-                Sort by
-                <select
-                  value={sort}
-                  disabled={sortDisabled}
-                  onChange={(e) => {
-                    // Coming back to Random draws a new order, as a reload does.
-                    if (e.target.value === "random")
-                      setSeed(Math.random().toString(36).slice(2));
-                    onParams(
-                      withParams(params, {
-                        sort:
-                          e.target.value === DEFAULT_ATTENDEE_SORT
-                            ? null
-                            : e.target.value,
-                      }),
-                      { push: true }
-                    );
-                  }}
-                  className="pl-2 pr-9 py-1.5 text-sm rounded-md border border-line bg-surface-raised disabled:bg-surface-muted disabled:text-fg-subtle"
-                >
-                  {ATTENDEE_SORTS.map((s) => (
-                    <option key={s.value} value={s.value}>
-                      {s.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                <label className="flex items-center gap-2 text-sm text-fg-muted">
+                  Sort by
+                  <select
+                    value={sort}
+                    disabled={sortDisabled}
+                    onChange={(e) => {
+                      // Coming back to Random draws a new order, as a reload does.
+                      if (e.target.value === "random")
+                        setSeed(Math.random().toString(36).slice(2));
+                      onParams(
+                        withParams(params, {
+                          sort:
+                            e.target.value === DEFAULT_ATTENDEE_SORT
+                              ? null
+                              : e.target.value,
+                        }),
+                        { push: true }
+                      );
+                    }}
+                    className="pl-2 pr-9 py-1.5 text-sm rounded-md border border-line bg-surface-raised disabled:bg-surface-muted disabled:text-fg-subtle"
+                  >
+                    {ATTENDEE_SORTS.map((s) => (
+                      <option key={s.value} value={s.value}>
+                        {s.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </Tooltip>
               {rows.length > 0 && (
                 <span className="text-sm text-fg-subtle">
                   {rows.length} attendee{rows.length === 1 ? "" : "s"}

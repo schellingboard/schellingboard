@@ -87,7 +87,15 @@ export function Tooltip({
 
   useEffect(() => () => clearTimeout(rest.current), []);
 
-  if (!content) return <div className={className}>{children}</div>;
+  // `{null}` keeps the children's position the same as with a panel, so they
+  // keep their state when content comes and goes.
+  if (!content)
+    return (
+      <div className={cx(className, triggerClassName)}>
+        {children}
+        {null}
+      </div>
+    );
 
   const show = () => {
     clearTimeout(rest.current);
@@ -108,7 +116,7 @@ export function Tooltip({
           className="pointer-events-none fixed z-50 max-w-xs rounded-md border border-line bg-surface-raised text-fg shadow-lg"
         >
           {typeof content === "string" ? (
-            <p className="px-3 py-2 text-sm">{content}</p>
+            <p className="line-clamp-6 px-3 py-2 text-sm">{content}</p>
           ) : (
             content
           )}

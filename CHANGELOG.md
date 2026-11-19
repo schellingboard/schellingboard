@@ -15,6 +15,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - **Reasons for unavailable buttons read better**: their hover box has padding, and a tap shows the
   reason once, as a notice that goes away by itself, instead of stacking copies under a hover box.
+- **Hover hints match the app's style**: they replace the browser's plain tooltips, and on phones a
+  tap on a vote count, your vote or a badge shows its meaning.
 
 ## [5.1.0] - 2026-11-18
 

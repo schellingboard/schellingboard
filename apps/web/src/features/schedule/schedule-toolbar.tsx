@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { Tooltip } from "../../ui/tooltip";
 import type { Event } from "@schellingboard/domain/event";
 import { hasPhases } from "@schellingboard/domain/phase";
 import { formatEventDates } from "@schellingboard/domain/time";
@@ -83,15 +84,16 @@ export function ScheduleToolbar({
         <span className="hidden h-5 w-px bg-line-subtle sm:block" aria-hidden />
         <div className="flex items-center gap-x-4 gap-y-1">
           {showJumpToNow && (
-            <button
-              type="button"
-              onClick={() => scrollNowLineIntoView()}
-              title="Jump to the current time"
-              className={ITEM_CLASS}
-            >
-              <ClockIcon className="h-4 w-4 stroke-2" />
-              Now
-            </button>
+            <Tooltip content="Jump to the current time">
+              <button
+                type="button"
+                onClick={() => scrollNowLineIntoView()}
+                className={ITEM_CLASS}
+              >
+                <ClockIcon className="h-4 w-4 stroke-2" />
+                Now
+              </button>
+            </Tooltip>
           )}
           <button
             type="button"

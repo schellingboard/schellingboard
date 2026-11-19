@@ -23,6 +23,7 @@ import {
   UserIcon,
 } from "../../ui/icons";
 import { SearchInput } from "../../ui/search-input";
+import { Tooltip } from "../../ui/tooltip";
 import { Unavailable } from "../../ui/unavailable";
 import { useDebouncedSearch } from "../../ui/use-debounced";
 import { cx } from "../../ui/cx";
@@ -238,9 +239,15 @@ function ProposalTable({
   const yourVote = (row: Row) => {
     const choice = votes.get(row.id);
     return (
-      <span title={choice ? voteChoiceToLabel(choice) : NO_VOTE_LABEL}>
-        {choice ? voteChoiceToEmoji(choice) : "-"}
-      </span>
+      <Tooltip
+        content={choice ? voteChoiceToLabel(choice) : NO_VOTE_LABEL}
+        toggleable
+      >
+        <span aria-hidden>{choice ? voteChoiceToEmoji(choice) : "-"}</span>
+        <span className="sr-only">
+          {choice ? voteChoiceToLabel(choice) : NO_VOTE_LABEL}
+        </span>
+      </Tooltip>
     );
   };
   const filterButton = (
@@ -328,9 +335,11 @@ function ProposalTable({
         </div>
       </div>
 
-      <div
+      <Tooltip
+        content={
+          searching ? "Search results are sorted by relevance" : undefined
+        }
         className="flex items-center justify-between md:justify-end gap-2 text-sm text-fg-muted"
-        title={searching ? "Search results are sorted by relevance" : undefined}
       >
         <label htmlFor="proposal-sort">Sort by</label>
         <select
@@ -352,7 +361,7 @@ function ProposalTable({
             </option>
           ))}
         </select>
-      </div>
+      </Tooltip>
 
       <div className="hidden md:block overflow-x-auto">
         <table className="table-fixed w-full divide-y divide-line-subtle min-w-0">
@@ -407,12 +416,14 @@ function ProposalTable({
           <tbody className="bg-surface-raised divide-y divide-line-subtle">
             {shown.map((row) => (
               <tr key={row.id} className="hover:bg-surface-hover">
-                <td className="px-4 lg:px-6 py-4" title={row.title}>
-                  <a href={links.view(row.id)} className="block w-full">
-                    <div className="text-sm font-medium text-fg hover:text-link transition-colors line-clamp-2 leading-tight">
-                      {row.title}
-                    </div>
-                  </a>
+                <td className="px-4 lg:px-6 py-4">
+                  <Tooltip content={row.title}>
+                    <a href={links.view(row.id)} className="block w-full">
+                      <div className="text-sm font-medium text-fg hover:text-link transition-colors line-clamp-2 leading-tight">
+                        {row.title}
+                      </div>
+                    </a>
+                  </Tooltip>
                 </td>
                 <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-fg-subtle">
                   <div className="truncate">
@@ -433,10 +444,18 @@ function ProposalTable({
                     <div className="text-xs italic">Co-host wanted</div>
                   )}
                 </td>
-                <td className="px-4 lg:px-6 py-4" title={row.plainDescription}>
-                  <div className="text-sm text-fg-subtle line-clamp-2 leading-tight">
-                    {row.plainDescription || "-"}
-                  </div>
+                <td className="px-4 lg:px-6 py-4">
+                  <Tooltip content={row.plainDescription}>
+                    <a
+                      href={links.view(row.id)}
+                      tabIndex={-1}
+                      className="block w-full"
+                    >
+                      <div className="text-sm text-fg-subtle line-clamp-2 leading-tight">
+                        {row.plainDescription || "-"}
+                      </div>
+                    </a>
+                  </Tooltip>
                 </td>
                 <td className="px-4 lg:px-6 py-4">
                   <Duration text={duration(row)} />
@@ -519,12 +538,12 @@ function ProposalTable({
                 {schedEnabled && (
                   <>
                     {!canEdit(row) && (
-                      <div>
+                      <div className="relative z-10">
                         Your vote:
                         <span className="ml-1">{yourVote(row)}</span>
                       </div>
                     )}
-                    <div className="flex items-center gap-2">
+                    <div className="relative z-10 flex items-center gap-2">
                       Total votes:
                       <VoteTally tally={standings.get(row.id)?.tally ?? null} />
                     </div>

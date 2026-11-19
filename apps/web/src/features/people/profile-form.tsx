@@ -32,6 +32,7 @@ import { useFormMutation } from "../../commands/use-form-mutation";
 import type { DirectoryEntry } from "../../queries/directory";
 import { Avatar } from "../../ui/avatar";
 import { ArrowPathIcon } from "../../ui/icons";
+import { Tooltip } from "../../ui/tooltip";
 import { Button } from "../../ui/button";
 import {
   ComboboxField,
@@ -390,20 +391,21 @@ export function ProfileForm({
               <div key={row.key} className="flex flex-col gap-1">
                 {!core && (
                   <div className="flex justify-end gap-3">
-                    <button
-                      type="button"
-                      className={TEXT_BUTTON}
-                      aria-label="Suggest a different prompt"
-                      title="Suggest a different prompt"
-                      onClick={() => {
-                        const pick = pickUnusedPrompt(
-                          prompts.map((p) => p.prompt)
-                        );
-                        if (pick) change({ prompt: pick, answer: "" });
-                      }}
-                    >
-                      <ArrowPathIcon className="h-4 w-4" />
-                    </button>
+                    <Tooltip content="Suggest a different prompt">
+                      <button
+                        type="button"
+                        className={TEXT_BUTTON}
+                        aria-label="Suggest a different prompt"
+                        onClick={() => {
+                          const pick = pickUnusedPrompt(
+                            prompts.map((p) => p.prompt)
+                          );
+                          if (pick) change({ prompt: pick, answer: "" });
+                        }}
+                      >
+                        <ArrowPathIcon className="h-4 w-4" />
+                      </button>
+                    </Tooltip>
                     <button
                       type="button"
                       className={TEXT_BUTTON}

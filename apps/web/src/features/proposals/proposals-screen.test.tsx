@@ -339,11 +339,15 @@ describe("the proposals list", () => {
     );
 
     const row = within(table).getByRole("row", { name: /Cooking/ });
-    expect(within(row).getByTitle("3 interested votes")).toBeTruthy();
-    expect(within(row).getByTitle("1 maybe vote")).toBeTruthy();
-    expect(within(row).getByTitle("Maybe").textContent).toBe("⭐");
+    expect(within(row).getByText(/3 interested votes/)).toBeTruthy();
+    expect(within(row).getByText(/1 maybe vote/)).toBeTruthy();
+    expect(
+      within(row).getByRole("button", { name: "Maybe" }).textContent
+    ).toContain("⭐");
     const other = within(table).getByRole("row", { name: /Gardening/ });
-    expect(within(other).getByTitle("No vote").textContent).toBe("-");
+    expect(
+      within(other).getByRole("button", { name: "No vote" }).textContent
+    ).toContain("-");
   });
 
   it("offers Edit and Schedule to hosts and for proposals nobody hosts", () => {

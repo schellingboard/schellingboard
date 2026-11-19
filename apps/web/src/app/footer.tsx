@@ -6,6 +6,7 @@ import {
 } from "@schellingboard/domain/release-notes";
 import { Dialog } from "../ui/dialog";
 import { InlineMarkdown } from "../ui/inline-markdown";
+import { Tooltip } from "../ui/tooltip";
 import { ThemeSelect } from "./theme";
 import type { UpdateStatus } from "./updates";
 
@@ -47,22 +48,23 @@ export function Footer({
         className={`flex flex-wrap items-center justify-between gap-x-2 gap-y-1 px-3 text-xs text-fg-subtle md:grid md:grid-cols-[1fr_auto_1fr] ${inline ? "sticky left-0 max-w-[100dvw]" : ""}`}
       >
         <div className="md:justify-self-start">
-          <button
-            type="button"
-            title="What's new"
-            aria-label={`Version ${shown} — what's new${behind ? ", update available" : ""}`}
-            onClick={() => setOpen(true)}
-            className={`flex gap-1 rounded-sm ${link} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent`}
-          >
-            <span className="hidden sm:block">Version: </span>
-            {shown}
-            {behind && (
-              <span
-                aria-hidden
-                className="mt-[3px] size-2 shrink-0 rounded-full bg-danger"
-              />
-            )}
-          </button>
+          <Tooltip content="What's new">
+            <button
+              type="button"
+              aria-label={`Version ${shown} — what's new${behind ? ", update available" : ""}`}
+              onClick={() => setOpen(true)}
+              className={`flex gap-1 rounded-sm ${link} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent`}
+            >
+              <span className="hidden sm:block">Version: </span>
+              {shown}
+              {behind && (
+                <span
+                  aria-hidden
+                  className="mt-[3px] size-2 shrink-0 rounded-full bg-danger"
+                />
+              )}
+            </button>
+          </Tooltip>
         </div>
         <ThemeSelect />
         <div className="flex flex-wrap items-center justify-end gap-1 md:justify-self-end">
