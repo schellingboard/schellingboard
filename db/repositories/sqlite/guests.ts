@@ -1,34 +1,36 @@
 import {
+  type Attendee,
+  type CompleteGuest,
+  DEFAULT_EMAIL_SETTINGS,
+  type EmailSettings,
+  type EventAttendee,
+  type Guest,
+  type ProfileContact,
+  type ProfilePrompt,
+  sanitizeGuest,
+} from "@schellingboard/domain/guest";
+import {
   and,
-  isNull,
   eq,
   exists,
   gt,
   inArray,
   isNotNull,
-  sql,
+  isNull,
   type SQL,
+  sql,
 } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
+
 import { realNow } from "@/utils/real-clock";
+
 import * as schema from "../../schema";
 import {
   type GuestAuthCredentials,
   type GuestsRepository,
   type NewGuest,
 } from "../interfaces";
-import {
-  DEFAULT_EMAIL_SETTINGS,
-  type CompleteGuest,
-  type EmailSettings,
-  type EventAttendee,
-  type Guest,
-  type ProfileContact,
-  type ProfilePrompt,
-  type Attendee,
-  sanitizeGuest,
-} from "@schellingboard/domain/guest";
 
 type DB = BetterSQLite3Database<typeof schema>;
 

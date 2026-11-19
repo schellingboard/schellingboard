@@ -1,7 +1,18 @@
 // @module-tag 007-US8
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+
+import { getRepositories } from "@/db/container";
+import type { Actor } from "@/server/kernel/actor";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
+import { createEventUseCases } from "@/server/modules/events/module";
+import { createMeetingUseCases } from "@/server/modules/meetings/module";
+import { createPeopleUseCases } from "@/server/modules/people/module";
+import { createSessionUseCases } from "@/server/modules/sessions/module";
+import { createVenueUseCases } from "@/server/modules/venue/module";
+
 import { deleteLoggedSession, updateLoggedSession } from "../helpers/changes";
+import { isoDay } from "../helpers/dates";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createDay,
   createEvent,
@@ -11,15 +22,6 @@ import {
   createUnavailability,
 } from "../helpers/factories";
 import { expectChangesSuffice } from "../helpers/sufficiency";
-import { getRepositories } from "@/db/container";
-import type { Actor } from "@/server/kernel/actor";
-import { unitOfWork } from "@/server/kernel/unit-of-work";
-import { createVenueUseCases } from "@/server/modules/venue/module";
-import { createEventUseCases } from "@/server/modules/events/module";
-import { createSessionUseCases } from "@/server/modules/sessions/module";
-import { createMeetingUseCases } from "@/server/modules/meetings/module";
-import { createPeopleUseCases } from "@/server/modules/people/module";
-import { isoDay } from "../helpers/dates";
 
 const NINE = new Date("2026-06-02T09:00:00.000Z");
 const TEN = new Date("2026-06-02T10:00:00.000Z");

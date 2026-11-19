@@ -1,4 +1,5 @@
 import type { LoginAssurance, LoginVia } from "@schellingboard/domain/auth";
+
 import { GUEST_COOKIE_NAME } from "@/utils/auth-cookies";
 
 export interface Actor {

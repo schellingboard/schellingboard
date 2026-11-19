@@ -10,13 +10,14 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+
+import { escapeTableCell } from "./markdown-table";
 import {
   collectSpecs,
+  type JsonReport,
   specFile,
   specTitle,
-  type JsonReport,
 } from "./playwright-json";
-import { escapeTableCell } from "./markdown-table";
 
 interface FlakyTest {
   file: string;

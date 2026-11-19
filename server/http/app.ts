@@ -47,13 +47,14 @@ import {
 import { addAdminStatsRoutes } from "@/server/modules/stats/module";
 import { addAdminUpdateRoutes } from "@/server/modules/updates/module";
 import { addAdminVenueRoutes } from "@/server/modules/venue/module";
+
 import { actorMiddleware } from "./actor";
 import { createApp } from "./create-app";
 import { addApiDocsRoutes } from "./docs";
-import { addSiteAuthRoute } from "./site-auth";
 import { addHealthRoute } from "./health";
 import { idempotencyMiddleware } from "./idempotency";
 import { authRateLimitMiddleware, rateLimitMiddleware } from "./rate-limit";
+import { addSiteAuthRoute } from "./site-auth";
 
 export const API_BASE_PATH = "/api/v1";
 

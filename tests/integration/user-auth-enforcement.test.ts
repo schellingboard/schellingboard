@@ -1,28 +1,30 @@
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
 
 const cookieJar = new Map<string, string>();
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { siteAuthenticate } from "../helpers/site-auth";
-import { createEvent, createGuest, createSession } from "../helpers/factories";
+import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
+
 import { getRepositories } from "@/db/container";
+import { GET, PUT } from "@/tests/helpers/v1-route";
+
+import { callApi } from "../helpers/api";
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createEvent, createGuest, createSession } from "../helpers/factories";
 import {
   GUEST_COOKIE_NAME,
   openGuestValue,
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
-import { GET, PUT } from "@/tests/helpers/v1-route";
 import { saveProfile } from "../helpers/profile-api";
-import { callApi } from "../helpers/api";
-import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
+import { siteAuthenticate } from "../helpers/site-auth";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 

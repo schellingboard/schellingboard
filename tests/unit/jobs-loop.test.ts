@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const acquireLease = vi.fn();
 const repos = { jobs: { acquireLease } };
@@ -8,15 +8,16 @@ vi.mock("@/utils/reminder-dispatch", () => ({
 }));
 
 import type { RecordedChange } from "@schellingboard/domain/change";
+
 import { publish } from "@/server/kernel/change-subscribers";
-import { dispatchDueReminders } from "@/utils/reminder-dispatch";
 import {
   defaultJobs,
+  type Job,
   nudgeJobs,
   startJobsLoop,
   stopJobsLoop,
-  type Job,
 } from "@/utils/jobs/loop";
+import { dispatchDueReminders } from "@/utils/reminder-dispatch";
 
 function job(
   name: string,

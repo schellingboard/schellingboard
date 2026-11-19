@@ -1,13 +1,15 @@
-import { getRepositories } from "@/db/container";
 import type { Delivery } from "@schellingboard/domain/notification";
+
+import { getRepositories } from "@/db/container";
 import {
   buildEmail,
-  UnknownTemplateError,
   type EmailRecipe,
+  UnknownTemplateError,
 } from "@/emails/registry";
 import { sendMail } from "@/utils/mailer";
 import { pushToGuest } from "@/utils/push";
-import { DELIVERIES, PRUNE_DELIVERIES, type Job } from "./job";
+
+import { DELIVERIES, type Job, PRUNE_DELIVERIES } from "./job";
 
 export type EmailPayload = { recipe: EmailRecipe };
 export type PushPayload = {

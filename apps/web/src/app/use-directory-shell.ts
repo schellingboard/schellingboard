@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { useLocation } from "@tanstack/react-router";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+
 import { createDirectoryQuery } from "../queries/directory";
 import { hardReload } from "./hard-navigate";
 import type { AppServices } from "./services";

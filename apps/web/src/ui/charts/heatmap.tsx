@@ -1,6 +1,7 @@
 import { useCallback } from "react";
-import { PlotFrame, type Plot } from "./plot-frame";
-import { SERIES, baseOptions, labelMargin, shorten } from "./style";
+
+import { type Plot, PlotFrame } from "./plot-frame";
+import { baseOptions, labelMargin, SERIES, shorten } from "./style";
 
 export type HeatCell = { x: string; y: string; value: number };
 

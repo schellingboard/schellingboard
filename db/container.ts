@@ -2,11 +2,38 @@ import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import fs from "fs";
 import path from "path";
-import * as schema from "./schema";
+
 import { resolveDbPath, runMigrations } from "./migrate";
-import { createLock, withWriteLock, type Lock } from "./write-lock";
+import type {
+  AuthCodesRepository,
+  BootstrapTokensRepository,
+  ChangesRepository,
+  CommentsRepository,
+  DaysRepository,
+  DeliveriesRepository,
+  EventsRepository,
+  GuestsRepository,
+  IdempotencyRepository,
+  JobsRepository,
+  JoinTokensRepository,
+  LocationsRepository,
+  LocationUnavailabilityRepository,
+  LoginSessionsRepository,
+  MeetingAvailabilityRepository,
+  MeetingPointsRepository,
+  MeetingsRepository,
+  NotificationsRepository,
+  PushRepository,
+  RemindersRepository,
+  RsvpsRepository,
+  SessionProposalsRepository,
+  SessionsRepository,
+  SettingsRepository,
+  StatsRepository,
+  SubjectCommentsRepository,
+  VotesRepository,
+} from "./repositories/interfaces";
 import { SqliteAuthCodesRepository } from "./repositories/sqlite/auth-codes";
-import { SqliteJoinTokensRepository } from "./repositories/sqlite/join-tokens";
 import { SqliteBootstrapTokensRepository } from "./repositories/sqlite/bootstrap-tokens";
 import { SqliteChangesRepository } from "./repositories/sqlite/changes";
 import {
@@ -18,10 +45,11 @@ import { SqliteDeliveriesRepository } from "./repositories/sqlite/deliveries";
 import { SqliteEventsRepository } from "./repositories/sqlite/events";
 import { SqliteGuestsRepository } from "./repositories/sqlite/guests";
 import { SqliteIdempotencyRepository } from "./repositories/sqlite/idempotency";
-import { SqliteLoginSessionsRepository } from "./repositories/sqlite/login-sessions";
 import { SqliteJobsRepository } from "./repositories/sqlite/jobs";
-import { SqliteLocationsRepository } from "./repositories/sqlite/locations";
+import { SqliteJoinTokensRepository } from "./repositories/sqlite/join-tokens";
 import { SqliteLocationUnavailabilityRepository } from "./repositories/sqlite/location-unavailability";
+import { SqliteLocationsRepository } from "./repositories/sqlite/locations";
+import { SqliteLoginSessionsRepository } from "./repositories/sqlite/login-sessions";
 import { SqliteMeetingAvailabilityRepository } from "./repositories/sqlite/meeting-availability";
 import { SqliteMeetingPointsRepository } from "./repositories/sqlite/meeting-points";
 import { SqliteMeetingsRepository } from "./repositories/sqlite/meetings";
@@ -29,40 +57,13 @@ import { SqliteNotificationsRepository } from "./repositories/sqlite/notificatio
 import { SqlitePushRepository } from "./repositories/sqlite/push";
 import { SqliteRemindersRepository } from "./repositories/sqlite/reminders";
 import { SqliteRsvpsRepository } from "./repositories/sqlite/rsvps";
-import { SqliteSettingsRepository } from "./repositories/sqlite/settings";
 import { SqliteSessionProposalsRepository } from "./repositories/sqlite/session-proposals";
 import { SqliteSessionsRepository } from "./repositories/sqlite/sessions";
+import { SqliteSettingsRepository } from "./repositories/sqlite/settings";
 import { SqliteStatsRepository } from "./repositories/sqlite/stats";
 import { SqliteVotesRepository } from "./repositories/sqlite/votes";
-import type {
-  AuthCodesRepository,
-  BootstrapTokensRepository,
-  JoinTokensRepository,
-  ChangesRepository,
-  CommentsRepository,
-  DaysRepository,
-  DeliveriesRepository,
-  EventsRepository,
-  GuestsRepository,
-  IdempotencyRepository,
-  JobsRepository,
-  LocationsRepository,
-  LoginSessionsRepository,
-  LocationUnavailabilityRepository,
-  MeetingAvailabilityRepository,
-  MeetingPointsRepository,
-  MeetingsRepository,
-  NotificationsRepository,
-  PushRepository,
-  RemindersRepository,
-  RsvpsRepository,
-  SettingsRepository,
-  SessionProposalsRepository,
-  SessionsRepository,
-  SubjectCommentsRepository,
-  StatsRepository,
-  VotesRepository,
-} from "./repositories/interfaces";
+import * as schema from "./schema";
+import { createLock, type Lock, withWriteLock } from "./write-lock";
 
 export type Repositories = {
   authCodes: AuthCodesRepository;

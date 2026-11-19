@@ -4,9 +4,11 @@ import {
   siteSettingsSchema,
 } from "@schellingboard/contracts/settings";
 import { MAX_MAP_BYTES } from "@schellingboard/domain/map-image-constraints";
+
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import { problem, problemDefault } from "@/server/http/problem";
-import { json, type App } from "@/server/http/route-parts";
+import { type App, json } from "@/server/http/route-parts";
+
 import type { SettingsUseCases } from "../application/use-cases";
 
 const tags = ["admin"];

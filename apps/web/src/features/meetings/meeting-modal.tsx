@@ -1,5 +1,6 @@
-import { useState } from "react";
 import { clashLines } from "@schellingboard/domain/meeting-clash-text";
+import { useState } from "react";
+
 import { Button } from "../../ui/button";
 import { Dialog } from "../../ui/dialog";
 import { TextField } from "../../ui/form";

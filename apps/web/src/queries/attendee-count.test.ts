@@ -1,5 +1,6 @@
 // @module-tag 001-US1
 import { describe, expect, it } from "vitest";
+
 import { fakeApi, problem } from "../commands/fake-api";
 import { attendeeCountApi } from "./attendee-count";
 

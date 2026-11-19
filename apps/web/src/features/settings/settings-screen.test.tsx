@@ -1,10 +1,11 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
+
 import { fakeApi } from "../../commands/fake-api";
 import { meetingAvailabilityCalls } from "../../commands/meeting-availability";
 import { settingsCalls } from "../../commands/settings";
-import { NoticeProvider } from "../../ui/notices";
 import type { SettingsState } from "../../queries/settings";
+import { NoticeProvider } from "../../ui/notices";
 import { SettingsScreen } from "./settings-screen";
 
 afterEach(cleanup);

@@ -1,15 +1,16 @@
 // @module-tag 011-US1
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { getRepositories } from "@/db/container";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createEvent,
   createGuest,
   createProposal,
   createSession,
 } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
-import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
 
 describe("guest profile repositories", () => {
   beforeAll(() => setupTestDb());

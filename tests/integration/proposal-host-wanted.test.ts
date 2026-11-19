@@ -1,12 +1,12 @@
 // @module-tag 004-US6
 // @module-tag 004-US7
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
 
@@ -14,18 +14,20 @@ vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
 }));
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { runJobs } from "../helpers/jobs";
+import { VoteChoice } from "@schellingboard/domain/vote";
+
+import { getRepositories } from "@/db/container";
+import { sendMail } from "@/utils/mailer";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createEvent,
   createGuest,
   createProposal as createProposalFixture,
 } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
+import { runJobs } from "../helpers/jobs";
 import { proposalApi } from "../helpers/proposal-api";
-import { VoteChoice } from "@schellingboard/domain/vote";
-import { sendMail } from "@/utils/mailer";
 
 const cookieJar = new Map<string, string>();
 const { createProposal, joinProposal, updateProposal } = proposalApi(cookieJar);

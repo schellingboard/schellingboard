@@ -1,12 +1,13 @@
 // @module-tag 007-US8
-import { describe, it, expect, vi, afterEach } from "vitest";
 import { IDBFactory } from "fake-indexeddb";
-import { createReplicaPersistence } from "./persistence";
-import { autosaveReplica, openReplica } from "./open-replica";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { connectFeed } from "./feed-client";
+import { autosaveReplica, openReplica } from "./open-replica";
+import { createReplicaPersistence } from "./persistence";
+import { snapshot } from "./snapshot-fixture";
 import { createReplicaStore } from "./store";
 import { syncState } from "./sync-state";
-import { snapshot } from "./snapshot-fixture";
 
 afterEach(() => vi.useRealTimers());
 

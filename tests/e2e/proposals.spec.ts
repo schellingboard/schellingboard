@@ -1,7 +1,8 @@
 import type { Page } from "@playwright/test";
-import { test, expect } from "./helpers/fixtures";
+
+import { login, loginAndGoto } from "./helpers/auth";
+import { expect, test } from "./helpers/fixtures";
 import { uniqueSuffix } from "./helpers/unique";
-import { loginAndGoto, login } from "./helpers/auth";
 import { selectUser } from "./helpers/user";
 
 // Parallel tests add proposals above this one, and a row that moves between

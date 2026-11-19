@@ -1,4 +1,5 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { collectSpecs, specFile, specTitle } from "@/scripts/playwright-json";
 
 /** The suite tree Playwright writes for a file with a describe block in it. */

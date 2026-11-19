@@ -1,7 +1,8 @@
 // @module-tag 007-US8
-import { describe, it, expect } from "vitest";
-import { createReplicaStore } from "./store";
+import { describe, expect, it } from "vitest";
+
 import { snapshot } from "./snapshot-fixture";
+import { createReplicaStore } from "./store";
 
 describe("replica store", () => {
   it("replace swaps the replica, even for a lower seq, and notifies", () => {

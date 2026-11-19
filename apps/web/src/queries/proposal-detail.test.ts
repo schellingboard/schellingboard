@@ -1,5 +1,6 @@
 // @module-tag 005-US1
 import { describe, expect, it } from "vitest";
+
 import { fakeApi, problem } from "../commands/fake-api";
 import { createProposalDetailQuery } from "./proposal-detail";
 

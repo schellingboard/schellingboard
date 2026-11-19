@@ -1,9 +1,11 @@
 import type { Context } from "hono";
 import { setCookie } from "hono/cookie";
+
 import {
   createGuestCookie,
   createGuestLogoutCookie,
 } from "@/utils/auth-cookies";
+
 import type { Identity } from "../application/identity";
 
 export function setGuestCookie(c: Context, identity: Identity) {

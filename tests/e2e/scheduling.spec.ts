@@ -1,16 +1,17 @@
 import { Page } from "@playwright/test";
-import { test, expect } from "./helpers/fixtures";
+
+import { login, loginAndGoto } from "./helpers/auth";
+import { expect, test } from "./helpers/fixtures";
 import { switchToView } from "./helpers/schedule";
 import { gammaDay } from "./helpers/seed";
-import { uniqueSuffix } from "./helpers/unique";
-import { login, loginAndGoto } from "./helpers/auth";
-import { selectUser } from "./helpers/user";
-import { dismissToast, toast } from "./helpers/toast";
 import {
   dayRadios,
   selectOption,
   startTimeOption,
 } from "./helpers/session-form";
+import { dismissToast, toast } from "./helpers/toast";
+import { uniqueSuffix } from "./helpers/unique";
+import { selectUser } from "./helpers/user";
 
 // All tests run in Conference Gamma (scheduling phase). Each test creates its
 // own uniquely-titled session on the LAST event day at a fixed location and

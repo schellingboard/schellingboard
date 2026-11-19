@@ -1,5 +1,6 @@
 // @module-tag 007-US8
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
 import { createLiveReplica } from "./live-replica";
 import { snapshot } from "./snapshot-fixture";
 

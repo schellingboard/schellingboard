@@ -1,12 +1,13 @@
 import { createRoute } from "@hono/zod-openapi";
-import { peopleUseCases } from "@/server/composition";
-import { setCookie } from "hono/cookie";
 import { siteLoginBodySchema } from "@schellingboard/contracts/auth";
+import { setCookie } from "hono/cookie";
+
+import { peopleUseCases } from "@/server/composition";
 import {
-  TOO_MANY_ATTEMPTS_ERROR,
   clientIp,
   loginRetryAfter,
   recordLoginFailure,
+  TOO_MANY_ATTEMPTS_ERROR,
 } from "@/server/kernel/rate-limit";
 import { forbidden, limited } from "@/server/kernel/result";
 import {
@@ -16,8 +17,9 @@ import {
   isPasswordProtectionEnabled,
   verifyPassword,
 } from "@/utils/auth";
+
 import { problem, problemDefault } from "./problem";
-import { body, noContent, type App } from "./route-parts";
+import { type App, body, noContent } from "./route-parts";
 
 const route = createRoute({
   method: "post",

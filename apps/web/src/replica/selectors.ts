@@ -1,11 +1,11 @@
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
+import type { LoggedProposal } from "@schellingboard/domain/change";
 import type { Day, Event } from "@schellingboard/domain/event";
 import type { Guest } from "@schellingboard/domain/guest";
 import type {
   Location,
   LocationUnavailability,
 } from "@schellingboard/domain/location";
-import type { LoggedProposal } from "@schellingboard/domain/change";
 import type { Rsvp, Session } from "@schellingboard/domain/session";
 import type { VoteChoice } from "@schellingboard/domain/vote";
 

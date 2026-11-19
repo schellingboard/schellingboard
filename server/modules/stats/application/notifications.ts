@@ -1,10 +1,11 @@
 import type { StatsTable } from "@schellingboard/contracts/stats";
+import type { EmailSettings } from "@schellingboard/domain/guest";
 import type { EventFacts } from "@schellingboard/domain/stats/facts";
 import {
   applyFilter,
   type StatsFilterInput,
 } from "@schellingboard/domain/stats/filter";
-import type { EmailSettings } from "@schellingboard/domain/guest";
+
 import { col, percent } from "./cells";
 
 const SETTINGS: [keyof EmailSettings, string, string][] = [

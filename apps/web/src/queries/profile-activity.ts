@@ -1,6 +1,7 @@
 import type { ApiClient } from "@schellingboard/api-client";
 import type { profileActivitySchema } from "@schellingboard/contracts/guest";
 import type { meetingOptionsSchema } from "@schellingboard/contracts/meeting";
+
 import { problemCode } from "../commands/problem";
 import { createObservable } from "./store";
 

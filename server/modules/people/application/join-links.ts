@@ -5,8 +5,8 @@ import {
   invalid,
   notFound,
   ok,
-  unavailable,
   type Result,
+  unavailable,
 } from "@/server/kernel/result";
 import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import {
@@ -14,9 +14,10 @@ import {
   hashSessionToken,
 } from "@/utils/login-session-token";
 import { realNow } from "@/utils/real-clock";
+
 import type { PeopleDeps } from "../ports";
 import { adminRequired, eventNotFound } from "./admin-guests";
-import { signIn, type SignedIn } from "./identity";
+import { type SignedIn, signIn } from "./identity";
 
 const tokenWrong = () =>
   forbidden("join.tokenWrong", "This link is invalid or was replaced");

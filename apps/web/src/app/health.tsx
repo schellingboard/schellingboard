@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import type { ApiClient } from "@schellingboard/api-client";
+import { useEffect, useState } from "react";
 
 export type Health = { version: string; buildId: string; devTools: boolean };
 

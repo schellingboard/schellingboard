@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { fakeApi, problem, type FakeHandler } from "../commands/fake-api";
+
+import { fakeApi, type FakeHandler, problem } from "../commands/fake-api";
 import { notificationCalls } from "../commands/notifications";
 import { createNotificationsQuery } from "./notifications";
 

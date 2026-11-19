@@ -1,13 +1,13 @@
-import { describe, it, expect } from "vitest";
+import type {
+  Session,
+  SessionCreateInput,
+} from "@schellingboard/domain/session";
 import {
   CAPACITY_ERROR,
   sessionCapacityError,
   sessionPlacementError,
 } from "@schellingboard/domain/session-booking";
-import type {
-  Session,
-  SessionCreateInput,
-} from "@schellingboard/domain/session";
+import { describe, expect, it } from "vitest";
 
 const LOC_A = "loc-a";
 const LOC_B = "loc-b";

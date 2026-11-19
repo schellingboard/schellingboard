@@ -1,9 +1,10 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { UserMenu } from "./user-menu";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { hardNavigate, hardReload } from "./hard-navigate";
 import { endSiteSession } from "./site-session";
+import { UserMenu } from "./user-menu";
 
 vi.mock("./site-session", () => ({ endSiteSession: vi.fn() }));
 vi.mock("./hard-navigate", () => ({

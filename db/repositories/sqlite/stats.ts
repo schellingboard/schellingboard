@@ -1,11 +1,12 @@
-import { and, eq, inArray, isNotNull, or } from "drizzle-orm";
-import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
-import type { EventFacts } from "@schellingboard/domain/stats/facts";
-import { meetingSlotsForDay } from "@schellingboard/domain/meeting-slots";
 import {
   DEFAULT_EMAIL_SETTINGS,
   type EmailSettings,
 } from "@schellingboard/domain/guest";
+import { meetingSlotsForDay } from "@schellingboard/domain/meeting-slots";
+import type { EventFacts } from "@schellingboard/domain/stats/facts";
+import { and, eq, inArray, isNotNull, or } from "drizzle-orm";
+import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+
 import * as schema from "../../schema";
 import type { StatsRepository } from "../interfaces";
 

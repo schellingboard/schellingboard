@@ -1,13 +1,15 @@
 // @module-tag 015-US4
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
+
+import { getRepositories } from "@/db/container";
 
 import {
   createDayAction,
@@ -16,10 +18,9 @@ import {
   logoutAdmin,
   updateDayAction,
 } from "../helpers/admin-api";
-import { setupTestDb, resetTestDb } from "../helpers/db";
 import { BY_TEST, updateLoggedSession } from "../helpers/changes";
-import { createEvent, createDay, createSession } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createDay, createEvent, createSession } from "../helpers/factories";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 

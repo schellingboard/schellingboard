@@ -1,7 +1,8 @@
 // @module-tag 007-US1
-import { describe, it, expect, vi } from "vitest";
-import { createRef } from "react";
 import { render, screen } from "@testing-library/react";
+import { createRef } from "react";
+import { describe, expect, it, vi } from "vitest";
+
 import { PullToRefresh } from "./pull-to-refresh";
 
 function setup() {

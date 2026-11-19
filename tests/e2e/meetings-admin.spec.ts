@@ -1,6 +1,6 @@
-import { test, expect } from "./helpers/fixtures";
-import { uniqueSuffix } from "./helpers/unique";
 import { adminLogin } from "./helpers/admin";
+import { expect, test } from "./helpers/fixtures";
+import { uniqueSuffix } from "./helpers/unique";
 
 // One event, one lifecycle: the section's rules are covered by
 // tests/integration/admin-meetings.test.ts, so the browser is here for what

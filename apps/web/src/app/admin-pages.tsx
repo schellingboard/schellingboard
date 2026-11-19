@@ -1,13 +1,14 @@
+import type { EventStatistics } from "@schellingboard/contracts/stats";
+import { formatDayLabel } from "@schellingboard/domain/time";
+import { Outlet, useLocation, useRouter } from "@tanstack/react-router";
 import {
+  type ReactNode,
   useEffect,
   useMemo,
   useState,
   useSyncExternalStore,
-  type ReactNode,
 } from "react";
-import type { EventStatistics } from "@schellingboard/contracts/stats";
-import { Outlet, useLocation, useRouter } from "@tanstack/react-router";
-import { formatDayLabel } from "@schellingboard/domain/time";
+
 import { adminEventCalls } from "../commands/admin-events";
 import { adminGuestCalls } from "../commands/admin-guests";
 import { adminLocationCalls } from "../commands/admin-locations";
@@ -17,14 +18,14 @@ import { EventGuestsManager } from "../features/admin/event-guests";
 import { AdminEventLayout } from "../features/admin/event-layout";
 import { EventLocationsManager } from "../features/admin/event-locations";
 import { EventProposalsManager } from "../features/admin/event-proposals";
-import { EventStatsScreen } from "../features/admin/event-stats";
 import { EventSessionsManager } from "../features/admin/event-sessions";
+import { EventStatsScreen } from "../features/admin/event-stats";
 import { AdminEventsScreen } from "../features/admin/events-screen";
 import { UserImportScreen } from "../features/admin/guest-import";
 import { AdminGuestsScreen } from "../features/admin/guests-screen";
+import type { OnParams } from "../features/admin/list-paging";
 import { LocationAvailabilityManager } from "../features/admin/location-availability";
 import { LocationsScreen } from "../features/admin/locations-screen";
-import type { OnParams } from "../features/admin/list-paging";
 import { SettingsScreen } from "../features/admin/settings-screen";
 import { defaultStatsEvent } from "../features/admin/stats-event";
 import { createAdminEventQuery } from "../queries/admin-event";
@@ -38,18 +39,18 @@ import {
   loadSessionRsvpGuests,
   scheduledOf,
 } from "../queries/admin-sessions";
+import { createAdminSettingsQuery } from "../queries/admin-settings";
 import {
   createAdminStatsQuery,
   filterFromParams,
   type StatsFilter,
 } from "../queries/admin-stats";
-import { createAdminSettingsQuery } from "../queries/admin-settings";
 import { createAdminUnavailabilityQuery } from "../queries/admin-unavailability";
 import { AdminFrame, useReloadAdminGate } from "./admin-frame";
 import { InAppLinks } from "./in-app-links";
 import type { AppServices } from "./services";
-import { useUrlSearchParams } from "./use-url-search-params";
 import { jointStatus, useQuery } from "./use-query";
+import { useUrlSearchParams } from "./use-url-search-params";
 
 type Api = AppServices["api"];
 

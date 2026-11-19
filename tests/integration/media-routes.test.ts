@@ -1,10 +1,12 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+
 import sharp from "sharp";
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AUTH_COOKIE_NAME, createAuthCookie } from "@/utils/auth";
+
 import { throughWeb } from "../helpers/through-web";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";

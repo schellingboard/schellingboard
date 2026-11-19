@@ -1,7 +1,8 @@
-import { changes } from "@schellingboard/domain/change";
 import { STALE_EVENT_MESSAGE } from "@schellingboard/contracts/event";
+import { changes } from "@schellingboard/domain/change";
 import type { Event } from "@schellingboard/domain/event";
 import type { MeetingPoint } from "@schellingboard/domain/meeting";
+
 import type { Actor } from "@/server/kernel/actor";
 import { byAdmin } from "@/server/kernel/change-context";
 import {
@@ -9,9 +10,10 @@ import {
   invalid,
   notFound,
   ok,
-  versionConflict,
   type Result,
+  versionConflict,
 } from "@/server/kernel/result";
+
 import type { MeetingDeps } from "../ports";
 import { eventNotFound } from "./meetings";
 

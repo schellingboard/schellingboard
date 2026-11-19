@@ -1,5 +1,6 @@
 import type { ApiClient } from "@schellingboard/api-client";
 import type { meetingCandidatesSchema } from "@schellingboard/contracts/meeting";
+
 import { createObservable } from "./store";
 
 export type MeetingCandidates = (typeof meetingCandidatesSchema)["_output"];

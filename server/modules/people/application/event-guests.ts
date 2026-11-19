@@ -1,7 +1,8 @@
 import type { Actor } from "@/server/kernel/actor";
 import { byAdmin } from "@/server/kernel/change-context";
-import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import { invalid, ok, type Result } from "@/server/kernel/result";
+import { recordingShownGuests } from "@/server/kernel/shown-guests";
+
 import type { PeopleDeps } from "../ports";
 import { adminRequired, eventNotFound } from "./admin-guests";
 

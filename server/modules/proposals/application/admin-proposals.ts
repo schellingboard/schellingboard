@@ -1,22 +1,24 @@
 import { changes } from "@schellingboard/domain/change";
 import type { SessionProposal } from "@schellingboard/domain/session";
+
 import type { Actor } from "@/server/kernel/actor";
 import { byAdmin } from "@/server/kernel/change-context";
-import { recordingVoteLoss } from "@/server/kernel/vote-cascade";
-import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import {
+  type Failure,
   forbidden,
   invalid,
   notFound,
   ok,
-  type Failure,
   type Result,
 } from "@/server/kernel/result";
+import { recordingShownGuests } from "@/server/kernel/shown-guests";
+import { recordingVoteLoss } from "@/server/kernel/vote-cascade";
+
 import type { ProposalDeps } from "../ports";
 import {
   changedMeanwhile,
-  presentOne,
   presenter,
+  presentOne,
   proposalNotFound,
   type ProposalView,
 } from "./queries";

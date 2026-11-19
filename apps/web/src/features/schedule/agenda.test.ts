@@ -1,14 +1,15 @@
-import { describe, it, expect } from "vitest";
+import type { Location } from "@schellingboard/domain/location";
+import type { Session } from "@schellingboard/domain/session";
+import { newEmptySession } from "@schellingboard/domain/session";
+import { describe, expect, it } from "vitest";
+
 import {
+  type AgendaGroup,
   agendaGroups,
   nowMarkerIndex,
   timeState,
-  type AgendaGroup,
 } from "./agenda";
-import type { Session } from "@schellingboard/domain/session";
-import type { Location } from "@schellingboard/domain/location";
 import type { MeetingView } from "./meeting-view";
-import { newEmptySession } from "@schellingboard/domain/session";
 
 const at = (hour: number, minute = 0) =>
   new Date(Date.UTC(2026, 9, 1, hour, minute));

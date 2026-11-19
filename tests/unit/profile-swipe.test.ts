@@ -1,5 +1,3 @@
-import { describe, expect, it } from "vitest";
-
 import {
   catchSwipe,
   startSwipe,
@@ -8,6 +6,7 @@ import {
   swipeOffset,
   trackSwipe,
 } from "@schellingboard/domain/swipe";
+import { describe, expect, it } from "vitest";
 
 const BOTH_WAYS = { canPrev: true, canNext: true };
 const WIDTH = 400;

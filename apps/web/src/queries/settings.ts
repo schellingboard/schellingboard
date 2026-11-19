@@ -1,6 +1,7 @@
 import type { ApiClient } from "@schellingboard/api-client";
 import type { emailSettingsSchema } from "@schellingboard/contracts/guest";
 import type { availabilityFormsSchema } from "@schellingboard/contracts/meeting";
+
 import { problemCode } from "../commands/problem";
 import { fetchEmailEnabled } from "./email-enabled";
 import { createObservable } from "./store";

@@ -2,6 +2,7 @@ import {
   EVENT_ICON_NAMES,
   eventIconLabel,
 } from "@schellingboard/domain/event-icons";
+
 import { cx } from "../../ui/cx";
 import { EventIcon } from "../../ui/event-icon";
 

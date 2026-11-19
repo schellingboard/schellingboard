@@ -1,6 +1,6 @@
 import {
-  snapshotSchema,
   type Snapshot,
+  snapshotSchema,
 } from "@schellingboard/contracts/snapshot";
 
 export const REPLICA_DB = "schellingboard-replica";

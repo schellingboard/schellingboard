@@ -1,6 +1,7 @@
 // @module-tag 007-US8
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { IDBFactory } from "fake-indexeddb";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { createReplicaPersistence } from "./persistence";
 import { startReplicaSession } from "./session";
 import { snapshot } from "./snapshot-fixture";

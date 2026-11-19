@@ -1,4 +1,5 @@
-import { Page, expect } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
+
 import { login } from "./auth";
 
 // The seeded site admin (scripts/seed/data/guests.ts).

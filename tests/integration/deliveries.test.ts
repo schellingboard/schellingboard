@@ -1,17 +1,18 @@
 // @module-tag 013-US6
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/utils/mailer", () => ({ sendMail: vi.fn() }));
 vi.mock("@/utils/push", () => ({ pushToGuest: vi.fn() }));
 
-import { sendMail } from "@/utils/mailer";
-import { pushToGuest } from "@/utils/push";
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createGuest } from "../helpers/factories";
-import { runJobs } from "../helpers/jobs";
-import { notifyGuest } from "@/utils/notifications";
 import { getRepositories } from "@/db/container";
 import { buildEmail, type EmailRecipe } from "@/emails/registry";
+import { sendMail } from "@/utils/mailer";
+import { notifyGuest } from "@/utils/notifications";
+import { pushToGuest } from "@/utils/push";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createGuest } from "../helpers/factories";
+import { runJobs } from "../helpers/jobs";
 
 const RECIPE: EmailRecipe = {
   template: "sessionDeleted",

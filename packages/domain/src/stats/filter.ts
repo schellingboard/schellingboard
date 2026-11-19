@@ -1,5 +1,5 @@
 import type { EventFacts } from "./facts";
-import { sessionOrigin, type SessionOrigin } from "./session-origin";
+import { type SessionOrigin, sessionOrigin } from "./session-origin";
 
 export interface StatsFilterInput {
   excludeLocations: string[];

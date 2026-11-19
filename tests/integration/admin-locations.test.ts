@@ -1,16 +1,21 @@
 // @module-tag 017-US1
-import {
-  describe,
-  it,
-  expect,
-  beforeAll,
-  beforeEach,
-  afterEach,
-  vi,
-} from "vitest";
+import { locationSchema } from "@schellingboard/contracts/location";
 import fs from "fs";
 import os from "os";
 import path from "path";
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
+import { z } from "zod";
+
+import { getRepositories } from "@/db/container";
+import { createImageFile } from "@/tests/helpers/utils";
 
 import {
   createLocationAction,
@@ -20,16 +25,12 @@ import {
   moveLocationAction,
   updateLocationAction,
 } from "../helpers/admin-api";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createEvent,
   createLocation,
   createSession,
 } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
-import { createImageFile } from "@/tests/helpers/utils";
-import { locationSchema } from "@schellingboard/contracts/location";
-import { z } from "zod";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef"; // 32 chars
 

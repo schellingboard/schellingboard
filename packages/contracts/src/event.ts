@@ -1,7 +1,8 @@
-import { z } from "zod";
-import { EVENT_ICON_NAMES } from "@schellingboard/domain/event-icons";
 import { IDENTITY_MODES } from "@schellingboard/domain/event";
+import { EVENT_ICON_NAMES } from "@schellingboard/domain/event-icons";
 import { SLOT_INCREMENT_OPTIONS } from "@schellingboard/domain/slots";
+import { z } from "zod";
+
 import { expectedVersion } from "./session";
 
 export const STALE_EVENT_MESSAGE =

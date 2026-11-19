@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { serializeAttendeeFilters } from "@schellingboard/domain/attendee-filters";
 import {
   ATTENDEE_SORTS,
   DEFAULT_ATTENDEE_SORT,
 } from "@schellingboard/domain/attendee-search";
-import { serializeAttendeeFilters } from "@schellingboard/domain/attendee-filters";
+import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+
 import type { DirectoryEntry, DirectoryState } from "../../queries/directory";
 import { Avatar } from "../../ui/avatar";
 import { SearchInput } from "../../ui/search-input";
@@ -11,10 +12,10 @@ import { Tooltip } from "../../ui/tooltip";
 import { SEARCH_DEBOUNCE_MS } from "../../ui/use-debounced";
 import {
   cardsFrom,
+  type DirectoryCard,
   directoryView,
   everyoneIn,
   withParams,
-  type DirectoryCard,
 } from "./directory-model";
 import type { PeopleLinks } from "./links";
 

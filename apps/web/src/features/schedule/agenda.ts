@@ -1,7 +1,8 @@
-import type { Session } from "@schellingboard/domain/session";
 import type { Location } from "@schellingboard/domain/location";
-import type { MeetingView } from "./meeting-view";
 import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
+import type { Session } from "@schellingboard/domain/session";
+
+import type { MeetingView } from "./meeting-view";
 
 export type AgendaGroup = {
   start: Date;

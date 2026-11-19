@@ -1,6 +1,6 @@
+import { ranks, spearman } from "@schellingboard/domain/stats/correlation";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { ranks, spearman } from "@schellingboard/domain/stats/correlation";
 
 describe("spearman", { tags: ["021-US1"] }, () => {
   it("averages the ranks of ties", () => {

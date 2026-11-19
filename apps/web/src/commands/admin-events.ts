@@ -1,11 +1,12 @@
 import type { ApiClient } from "@schellingboard/api-client";
-import { fetchEmailEnabled } from "../queries/email-enabled";
-import type { adminSessionUpdateSchema } from "@schellingboard/contracts/session";
 import type {
   dayBodySchema,
   eventPhasesBodySchema,
   eventSettingsBodySchema,
 } from "@schellingboard/contracts/event";
+import type { adminSessionUpdateSchema } from "@schellingboard/contracts/session";
+
+import { fetchEmailEnabled } from "../queries/email-enabled";
 
 export type EventSettingsBody = (typeof eventSettingsBodySchema)["_input"];
 export type DayBody = (typeof dayBodySchema)["_input"];

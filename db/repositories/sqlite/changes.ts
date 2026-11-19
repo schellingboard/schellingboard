@@ -1,27 +1,28 @@
-import { and, asc, eq, gt, gte, inArray, lte, min, sql } from "drizzle-orm";
-import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
-import { nanoid } from "nanoid";
-import * as schema from "../../schema";
-import type { ChangesRepository } from "../interfaces";
 import type {
   Actor,
   Audience,
   Change,
   CommentCreated,
-  VoteCast,
-  VoteWithdrawn,
   LoggedProposal,
   MeetingAnswered,
   RecordedChange,
+  VoteCast,
+  VoteWithdrawn,
 } from "@schellingboard/domain/change";
 import type { Day, Event } from "@schellingboard/domain/event";
+import type { Guest } from "@schellingboard/domain/guest";
 import type {
   Location,
   LocationUnavailability,
 } from "@schellingboard/domain/location";
-import type { Guest } from "@schellingboard/domain/guest";
 import type { Meeting, MeetingPoint } from "@schellingboard/domain/meeting";
 import type { Rsvp, Session } from "@schellingboard/domain/session";
+import { and, asc, eq, gt, gte, inArray, lte, min, sql } from "drizzle-orm";
+import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+import { nanoid } from "nanoid";
+
+import * as schema from "../../schema";
+import type { ChangesRepository } from "../interfaces";
 
 type DB = BetterSQLite3Database<typeof schema>;
 type ChangeRow = typeof schema.changes.$inferSelect;

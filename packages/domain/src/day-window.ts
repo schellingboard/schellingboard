@@ -2,8 +2,8 @@
 // for validating a day's own window against its event and sibling days.
 // Shared so every caller agrees.
 
-import { isSlotAligned } from "./slots";
 import type { Day } from "./event";
+import { isSlotAligned } from "./slots";
 
 type ScheduledTimes = {
   startTime?: Date | null;

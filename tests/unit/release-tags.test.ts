@@ -1,5 +1,6 @@
-import { describe, it, expect } from "vitest";
-import { releaseTags, releaseRefs } from "@/scripts/release-tags";
+import { describe, expect, it } from "vitest";
+
+import { releaseRefs, releaseTags } from "@/scripts/release-tags";
 
 describe("releaseTags", () => {
   it("publishes the version, its minor and its major line", () => {

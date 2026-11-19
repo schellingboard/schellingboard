@@ -1,5 +1,6 @@
 import type { ApiClient } from "@schellingboard/api-client";
 import type { voteBreakdownSchema } from "@schellingboard/contracts/proposal";
+
 import { problemCode } from "../commands/problem";
 import { createObservable } from "./store";
 

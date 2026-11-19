@@ -1,11 +1,12 @@
 import type { Location } from "@schellingboard/domain/location";
 import type { Session } from "@schellingboard/domain/session";
 import { getNumSlots } from "@schellingboard/domain/slots";
+
 import { locationColumn } from "./column";
 import { useSchedule } from "./context";
 import { SLOT_HEIGHT_PX } from "./grid-layout";
-import { NowLine } from "./now-line";
 import type { DayWithSessions } from "./model";
+import { NowLine } from "./now-line";
 import { SessionBlock } from "./session-block";
 
 export function LocationCol({

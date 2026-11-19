@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { sessionOrigin } from "@schellingboard/domain/stats/session-origin";
+import { describe, expect, it } from "vitest";
 
 describe("sessionOrigin", { tags: ["021-US3"] }, () => {
   const base = { blocker: false, proposalId: null, adminManaged: false };

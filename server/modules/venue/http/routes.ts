@@ -7,6 +7,11 @@ import {
   locationUpdateBodySchema,
   locationViewSchema,
 } from "@schellingboard/contracts/location";
+import {
+  MAX_IMAGE_BYTES,
+  MIN_IMAGE_WIDTH,
+} from "@schellingboard/domain/location-image-constraints";
+
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import {
   problem,
@@ -14,17 +19,14 @@ import {
   versionConflictResponse,
 } from "@/server/http/problem";
 import {
+  type App,
   body,
   idParam,
   json,
   noContent,
   textExpectedVersion,
-  type App,
 } from "@/server/http/route-parts";
-import {
-  MAX_IMAGE_BYTES,
-  MIN_IMAGE_WIDTH,
-} from "@schellingboard/domain/location-image-constraints";
+
 import type { LocationWithEvents } from "../application/locations";
 import type { VenueUseCases } from "../application/use-cases";
 import { toLocationView } from "./view";

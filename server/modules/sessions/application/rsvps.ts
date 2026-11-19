@@ -1,23 +1,25 @@
-import { byAdmin } from "@/server/kernel/change-context";
 import type { ChangeContext } from "@schellingboard/domain/change";
-import {
-  rsvpRefusal,
-  type RsvpRefusal,
-} from "@schellingboard/domain/rsvp-rule";
 import type { Event } from "@schellingboard/domain/event";
+import {
+  type RsvpRefusal,
+  rsvpRefusal,
+} from "@schellingboard/domain/rsvp-rule";
 import type { Rsvp, Session } from "@schellingboard/domain/session";
+
 import { actingAsNamedGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
-import { recordingShownGuests } from "@/server/kernel/shown-guests";
+import { byAdmin } from "@/server/kernel/change-context";
 import {
   conflict,
+  type Failure,
   forbidden,
   notFound,
   ok,
-  type Failure,
   type Result,
 } from "@/server/kernel/result";
+import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import type { Tx } from "@/server/kernel/unit-of-work";
+
 import type { SessionDeps } from "../ports";
 import { findRsvp, recordRsvpAdded, removeRsvp } from "./session-changes";
 

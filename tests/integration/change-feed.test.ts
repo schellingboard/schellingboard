@@ -1,15 +1,17 @@
 // @module-tag 007-US8
-import { describe, it, expect, beforeAll, beforeEach, afterEach } from "vitest";
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { BY_TEST, updateLoggedSession } from "../helpers/changes";
-import { createEvent, createGuest, createSession } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
-import { changes, type Viewer } from "@schellingboard/domain/change";
 import type { FeedMessage } from "@schellingboard/contracts/feed";
+import { changes, type Viewer } from "@schellingboard/domain/change";
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
+
+import { getRepositories } from "@/db/container";
 import { openFeed } from "@/server/feed/feed";
-import { unitOfWork, type UnitOfWork } from "@/server/kernel/unit-of-work";
+import { type UnitOfWork, unitOfWork } from "@/server/kernel/unit-of-work";
 import { CHANGE_NOTIFICATIONS } from "@/utils/jobs/job";
 import { pruneChanges } from "@/utils/jobs/reactions";
+
+import { BY_TEST, updateLoggedSession } from "../helpers/changes";
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createEvent, createGuest, createSession } from "../helpers/factories";
 
 const EVERYONE: Viewer = { guestId: null, admin: false };
 const DAY_MS = 24 * 60 * 60 * 1000;

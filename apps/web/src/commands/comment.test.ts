@@ -1,8 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
+
 import { iso, snapshot } from "../replica/snapshot-fixture";
 import { createReplicaStore } from "../replica/store";
-import { fakeApi, problem } from "./fake-api";
-import { createCommandRunner } from "./runner";
 import {
   createComment,
   deleteComment,
@@ -10,6 +9,8 @@ import {
   likeComment,
   unlikeComment,
 } from "./comment";
+import { fakeApi, problem } from "./fake-api";
+import { createCommandRunner } from "./runner";
 
 const created = {
   id: "c1",

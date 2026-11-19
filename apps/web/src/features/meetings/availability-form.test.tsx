@@ -1,7 +1,8 @@
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
-import { fakeApi, problem, type FakeHandler } from "../../commands/fake-api";
+
+import { fakeApi, type FakeHandler, problem } from "../../commands/fake-api";
 import { meetingAvailabilityCalls } from "../../commands/meeting-availability";
 import { NoticeProvider } from "../../ui/notices";
 import { AvailabilityForm } from "./availability-form";

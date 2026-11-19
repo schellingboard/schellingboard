@@ -1,12 +1,13 @@
-import { and, asc, eq, inArray, isNull, lt, lte, or, sql } from "drizzle-orm";
-import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
-import { nanoid } from "nanoid";
-import * as schema from "../../schema";
-import type { DeliveriesRepository } from "../interfaces";
 import type {
   Delivery,
   DeliveryChannel,
 } from "@schellingboard/domain/notification";
+import { and, asc, eq, inArray, isNull, lt, lte, or, sql } from "drizzle-orm";
+import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+import { nanoid } from "nanoid";
+
+import * as schema from "../../schema";
+import type { DeliveriesRepository } from "../interfaces";
 
 type DB = BetterSQLite3Database<typeof schema>;
 

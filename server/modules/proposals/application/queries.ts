@@ -1,21 +1,23 @@
-import {
-  eventInterestSummary,
-  proposalVoteStats,
-  type ProposalVoteStats,
-} from "@schellingboard/domain/proposal-vote-stats";
 import { STALE_PROPOSAL_MESSAGE } from "@schellingboard/contracts/session";
 import type { Event } from "@schellingboard/domain/event";
 import { inSchedPhase, inVotingPhase } from "@schellingboard/domain/phase";
+import {
+  eventInterestSummary,
+  type ProposalVoteStats,
+  proposalVoteStats,
+} from "@schellingboard/domain/proposal-vote-stats";
 import type { SessionProposal } from "@schellingboard/domain/session";
+
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import {
+  type Failure,
   notFound,
   ok,
-  versionConflict,
-  type Failure,
   type Result,
+  versionConflict,
 } from "@/server/kernel/result";
+
 import type { ProposalDeps } from "../ports";
 
 // Skip votes and the total stay out of the public tally: it reads as interest

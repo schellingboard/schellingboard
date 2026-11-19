@@ -1,11 +1,4 @@
 import {
-  type TouchEvent as ReactTouchEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import {
   catchSwipe,
   type Slide,
   startSwipe,
@@ -14,21 +7,29 @@ import {
   swipeOffset,
   trackSwipe,
 } from "@schellingboard/domain/swipe";
+import {
+  type TouchEvent as ReactTouchEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+import type { MeetingRequestCalls } from "../../commands/meeting-request";
+import type { DirectoryState } from "../../queries/directory";
 import type {
   ProfileActivityQuery,
   ProfileActivityState,
   ProfileMeetingOption,
 } from "../../queries/profile-activity";
-import { Comments, type CommentsHandle } from "../comments/comments-section";
 import { ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from "../../ui/icons";
-import type { DirectoryCard } from "./directory-model";
-import type { DirectoryState } from "../../queries/directory";
-import type { MeetingRequestCalls } from "../../commands/meeting-request";
-import { MeetingRequestDialog } from "./meeting-request-dialog";
-import type { ProfileLinks } from "./links";
-import { ProfileBody } from "./profile-body";
 import { useDiscardGuard } from "../../ui/use-discard-guard";
 import { useScrollLock } from "../../ui/use-scroll-lock";
+import { Comments, type CommentsHandle } from "../comments/comments-section";
+import type { DirectoryCard } from "./directory-model";
+import type { ProfileLinks } from "./links";
+import { MeetingRequestDialog } from "./meeting-request-dialog";
+import { ProfileBody } from "./profile-body";
 
 /** How long the profile takes to finish a swipe the finger has let go of. */
 const SETTLE_MS = 200;

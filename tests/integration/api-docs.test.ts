@@ -1,7 +1,9 @@
 // @module-tag 019-US6
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { openApiDocument } from "@/server/http/openapi";
 import { createAuthCookie } from "@/utils/auth";
+
 import { throughWeb } from "../helpers/through-web";
 
 beforeEach(() => {

@@ -1,5 +1,5 @@
-import type { MouseEvent, ReactNode } from "react";
 import { useRouter } from "@tanstack/react-router";
+import type { MouseEvent, ReactNode } from "react";
 
 /** Follows a link the app owns without reloading; a modifier-key click is left to the browser. */
 // A handler, not a DOM listener: React's bubbling reaches through the portals modals render in.

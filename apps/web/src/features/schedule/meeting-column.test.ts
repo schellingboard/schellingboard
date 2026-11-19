@@ -1,12 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
+import { SLOT_HEIGHT_PX } from "./grid-layout";
 import {
   meetingColumnRows,
   meetingsForDay,
   takesPartInMeetings,
 } from "./meeting-column";
 import type { MeetingView } from "./meeting-view";
-import { SLOT_HEIGHT_PX } from "./grid-layout";
 
 const DAY = {
   start: new Date("2026-10-01T09:00:00.000Z"),

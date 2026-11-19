@@ -1,7 +1,8 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { fakeApi, problem, type FakeHandler } from "../../commands/fake-api";
+
+import { fakeApi, type FakeHandler, problem } from "../../commands/fake-api";
 import { signInCalls } from "../../commands/sign-in";
 import type { AccountSecurityState } from "../../queries/account-security";
 import { NoticeProvider } from "../../ui/notices";

@@ -1,15 +1,16 @@
-import { useMemo } from "react";
 import type { StatsTable } from "@schellingboard/contracts/stats";
 import { histogram } from "@schellingboard/domain/stats/binning";
+import { useMemo } from "react";
+
 import { ColumnChart } from "../../ui/charts/column-chart";
 import { Heatmap } from "../../ui/charts/heatmap";
 import { Histogram } from "../../ui/charts/histogram";
 import { LineChart } from "../../ui/charts/line-chart";
-import { RankedBars } from "../../ui/charts/ranked-bars";
 import {
-  PredictionScatter,
   type PredictionPoint,
+  PredictionScatter,
 } from "../../ui/charts/prediction-scatter";
+import { RankedBars } from "../../ui/charts/ranked-bars";
 import { Scatter } from "../../ui/charts/scatter";
 import { StackedBars } from "../../ui/charts/stacked-bars";
 

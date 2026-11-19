@@ -1,16 +1,17 @@
 // @module-tag 010-US1
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
 }));
 
-import { sendMail } from "@/utils/mailer";
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { runJobs } from "../helpers/jobs";
-import { createEvent, createGuest, createProposal } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { commentUseCases, proposalUseCases } from "@/server/composition";
+import { sendMail } from "@/utils/mailer";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createEvent, createGuest, createProposal } from "../helpers/factories";
+import { runJobs } from "../helpers/jobs";
 
 const open = (id: string) => ({
   admin: false,

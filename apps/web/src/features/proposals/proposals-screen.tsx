@@ -1,4 +1,3 @@
-import { useMemo, useState, type ComponentType } from "react";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { inSchedPhase, inVotingPhase } from "@schellingboard/domain/phase";
 import { durationMinusBreak } from "@schellingboard/domain/slots";
@@ -9,12 +8,16 @@ import {
   voteChoiceToEmoji,
   voteChoiceToLabel,
 } from "@schellingboard/domain/vote-display";
+import { type ComponentType, useMemo, useState } from "react";
+
+import type { Standing } from "../../queries/proposal-standings";
 import { ownVotesFrom, toEvent } from "../../replica/selectors";
+import { cx } from "../../ui/cx";
 import {
   CalendarDaysIcon,
   CalendarIcon,
-  CheckCircleIcon,
   ChartBarIcon,
+  CheckCircleIcon,
   ClockIcon,
   EyeSlashIcon,
   HandRaisedIcon,
@@ -26,24 +29,22 @@ import { SearchInput } from "../../ui/search-input";
 import { Tooltip } from "../../ui/tooltip";
 import { Unavailable } from "../../ui/unavailable";
 import { useDebouncedSearch } from "../../ui/use-debounced";
-import { cx } from "../../ui/cx";
 import type { ProposalLinks } from "./links";
-import { VoteTally } from "./vote-tally";
-import { VotingButtons } from "./voting-buttons";
-import type { Standing } from "../../queries/proposal-standings";
 import {
   defaultSort,
   effectiveFilter,
+  type Filter,
   filteredRows,
   listRows,
   phaseTexts,
-  rowsFrom,
-  sortOptions,
-  type Filter,
   type Row,
+  rowsFrom,
   type Sort,
   type SortKey,
+  sortOptions,
 } from "./list-model";
+import { VoteTally } from "./vote-tally";
+import { VotingButtons } from "./voting-buttons";
 
 export type ProposalsScreenProps = {
   snapshot: Snapshot;

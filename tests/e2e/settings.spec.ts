@@ -1,9 +1,10 @@
 import { Page } from "@playwright/test";
 import sharp from "sharp";
-import { test, expect } from "./helpers/fixtures";
-import { uniqueSuffix } from "./helpers/unique";
-import { loginAndGoto } from "./helpers/auth";
+
 import { adminLogin } from "./helpers/admin";
+import { loginAndGoto } from "./helpers/auth";
+import { expect, test } from "./helpers/fixtures";
+import { uniqueSuffix } from "./helpers/unique";
 
 async function gotoSettings(page: Page) {
   await page

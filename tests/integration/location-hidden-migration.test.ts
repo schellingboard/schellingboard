@@ -1,12 +1,12 @@
 // @module-tag 017-US3
+import Database from "better-sqlite3";
 import fs from "fs";
 import os from "os";
 import path from "path";
-
-import Database from "better-sqlite3";
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { runMigrations } from "@/db/migrate";
+
 import { MIGRATIONS, migrationsBefore } from "../helpers/migrations";
 
 // The Hidden flag kept a location off the grid and out of booking. Unassigning

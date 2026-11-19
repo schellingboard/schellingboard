@@ -1,7 +1,9 @@
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createEvent } from "../helpers/factories";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+
 import { getRepositories } from "@/db/container";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createEvent } from "../helpers/factories";
 
 describe("integration sanity", () => {
   beforeAll(() => {

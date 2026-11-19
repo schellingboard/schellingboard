@@ -1,7 +1,7 @@
 import { createGuestSchema } from "@schellingboard/contracts/guest";
+
 import type { Actor } from "@/server/kernel/actor";
 import { byAdmin } from "@/server/kernel/change-context";
-import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import { credentialsChanged } from "@/server/kernel/credential-changes";
 import {
   conflict,
@@ -11,14 +11,16 @@ import {
   ok,
   type Result,
 } from "@/server/kernel/result";
+import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import {
   generateSessionToken,
   hashSessionToken,
 } from "@/utils/login-session-token";
 import { realNow } from "@/utils/real-clock";
 import { hashUserPassword } from "@/utils/user-credentials";
+
 import type { PeopleDeps } from "../ports";
-import { signIn, type SignedIn } from "./identity";
+import { type SignedIn, signIn } from "./identity";
 
 const tokenWrong = () =>
   forbidden(

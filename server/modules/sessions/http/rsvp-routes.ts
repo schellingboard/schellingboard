@@ -1,8 +1,10 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import { rsvpListSchema, rsvpViewSchema } from "@schellingboard/contracts/rsvp";
+
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import { problem, problemDefault } from "@/server/http/problem";
-import { idParam, json, noContent, type App } from "@/server/http/route-parts";
+import { type App, idParam, json, noContent } from "@/server/http/route-parts";
+
 import type { SessionUseCases } from "../application/use-cases";
 
 const rsvpParams = z.object({

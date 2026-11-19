@@ -1,8 +1,9 @@
 import type { Page } from "@playwright/test";
-import { expect, test } from "./helpers/fixtures";
+
 import { login } from "./helpers/auth";
-import { selectUser } from "./helpers/user";
 import { openReplyForm, postedComment, submitReply } from "./helpers/comments";
+import { expect, test } from "./helpers/fixtures";
+import { selectUser } from "./helpers/user";
 
 // Each test comments on a different seeded guest's profile: the suite runs in
 // parallel against one shared database, so two tests on the same profile

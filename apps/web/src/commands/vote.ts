@@ -1,6 +1,7 @@
-import { voteRefusal } from "@schellingboard/domain/vote-rule";
-import type { VoteChoice } from "@schellingboard/domain/vote";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
+import type { VoteChoice } from "@schellingboard/domain/vote";
+import { voteRefusal } from "@schellingboard/domain/vote-rule";
+
 import type { Command, Prediction } from "./runner";
 import { describeProposalIn } from "./subject";
 

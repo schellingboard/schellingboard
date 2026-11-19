@@ -1,8 +1,9 @@
 // @module-tag 007-US8
-import { describe, it, expect } from "vitest";
-import { VoteChoice } from "@schellingboard/domain/vote";
-import { eventContextFrom, ownVotesFrom, proposalsFrom } from "./selectors";
 import { apply } from "@schellingboard/contracts/feed-apply";
+import { VoteChoice } from "@schellingboard/domain/vote";
+import { describe, expect, it } from "vitest";
+
+import { eventContextFrom, ownVotesFrom, proposalsFrom } from "./selectors";
 import { iso, snapshot } from "./snapshot-fixture";
 
 describe("eventContextFrom", () => {

@@ -1,11 +1,12 @@
-import { describe, it, expect, afterEach, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import {
   clientIp,
+  LOGIN_LIMITS,
   loginRetryAfter,
+  MAX_BUCKETS,
   recordLoginFailure,
   takeToken,
-  LOGIN_LIMITS,
-  MAX_BUCKETS,
 } from "@/server/kernel/rate-limit";
 
 const T0 = Date.parse("2026-07-25T12:00:00Z");

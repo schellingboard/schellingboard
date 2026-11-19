@@ -3,8 +3,9 @@ import {
   type RecordedChange,
   type Viewer,
 } from "@schellingboard/domain/change";
-import { onCredentialsChanged } from "@/server/kernel/credential-changes";
+
 import { subscribeToChanges } from "@/server/kernel/change-subscribers";
+import { onCredentialsChanged } from "@/server/kernel/credential-changes";
 
 export interface Connection {
   eventId: string;

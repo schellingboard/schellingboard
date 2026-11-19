@@ -15,16 +15,18 @@ import {
   pushSubscriptionSchema,
 } from "@schellingboard/contracts/push";
 import type { Notification } from "@schellingboard/domain/notification";
+
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import { pageOf } from "@/server/http/pagination";
 import { problem, problemDefault } from "@/server/http/problem";
 import {
+  type App,
   body,
   idParam,
   json,
   noContent,
-  type App,
 } from "@/server/http/route-parts";
+
 import type { NotificationUseCases } from "../application/use-cases";
 import { notificationStream } from "./stream";
 

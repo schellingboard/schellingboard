@@ -1,15 +1,16 @@
-import { describe, it, expect } from "vitest";
-import { eventNameToSlug, normalizeWebsiteUrl } from "@/utils/utils";
-import { durationMinusBreak } from "@schellingboard/domain/slots";
 import { dateOnDay, type Day } from "@schellingboard/domain/event";
+import { durationMinusBreak } from "@schellingboard/domain/slots";
 import {
-  formatDuration,
   formatDayLabel,
+  formatDuration,
+  formatOptionalTime,
   formatSlotLabel,
   getPercentThroughDay,
-  formatOptionalTime,
   TIME_FORMAT,
 } from "@schellingboard/domain/time";
+import { describe, expect, it } from "vitest";
+
+import { eventNameToSlug, normalizeWebsiteUrl } from "@/utils/utils";
 
 // ── durationMinusBreak ───────────────────────────────────────────────────────
 

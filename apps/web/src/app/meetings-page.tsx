@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
 import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
-import { useRouter } from "@tanstack/react-router";
 import { EventPhase, getCurrentPhase } from "@schellingboard/domain/phase";
+import { useRouter } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+
 import { MeetingModal } from "../features/meetings/meeting-modal";
 import { meetingViewsFrom } from "../features/schedule/meetings";
 import { eventContextFrom } from "../replica/selectors";

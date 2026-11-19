@@ -1,7 +1,8 @@
 import type { Day } from "@schellingboard/domain/event";
 import type { Location } from "@schellingboard/domain/location";
 import type { Session } from "@schellingboard/domain/session";
-import { sessionPassesFilters, type ScheduleFilter } from "./filters";
+
+import { type ScheduleFilter, sessionPassesFilters } from "./filters";
 import { meetingsForDay } from "./meeting-column";
 import type { MeetingView } from "./meeting-view";
 import { meetingMatchesSearch, sessionMatchesSearch } from "./search";

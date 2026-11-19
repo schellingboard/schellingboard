@@ -1,4 +1,5 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { getDefaultFoldedDayIds } from "./fold";
 
 function day(id: string, start: string, end: string) {

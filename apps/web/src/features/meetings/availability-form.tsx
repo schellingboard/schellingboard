@@ -1,8 +1,9 @@
-import { useId, useState, type FormEvent } from "react";
 import type {
   AvailabilityFormData,
   SlotDay,
 } from "@schellingboard/domain/meeting-slot-days";
+import { type FormEvent, useId, useState } from "react";
+
 import type { MeetingAvailabilityCalls } from "../../commands/meeting-availability";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import { Button } from "../../ui/button";

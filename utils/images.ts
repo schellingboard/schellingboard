@@ -1,16 +1,17 @@
-import sharp, { FormatEnum, Metadata, Sharp } from "sharp";
-import fs from "fs/promises";
-import path from "path";
+import {
+  AVATAR_MAX_SIZE,
+  coverSquareSize,
+  MIN_AVATAR_WIDTH,
+} from "@schellingboard/domain/avatar-image";
 import {
   ASPECT_RATIO_TOLERANCE,
   MIN_IMAGE_WIDTH,
   REQUIRED_ASPECT_RATIO,
 } from "@schellingboard/domain/location-image-constraints";
-import {
-  AVATAR_MAX_SIZE,
-  MIN_AVATAR_WIDTH,
-  coverSquareSize,
-} from "@schellingboard/domain/avatar-image";
+import fs from "fs/promises";
+import path from "path";
+import sharp, { FormatEnum, Metadata, Sharp } from "sharp";
+
 import { uploadsDir } from "@/utils/uploads-dir";
 
 // Images are stored on the filesystem under SB_UPLOADS_DIR

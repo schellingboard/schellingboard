@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
 import { pageRequestSchema } from "@schellingboard/contracts/page";
+import { describe, expect, it } from "vitest";
 
 describe("pageRequestSchema", () => {
   it("parses a valid page and query", () => {

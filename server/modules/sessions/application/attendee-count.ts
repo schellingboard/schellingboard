@@ -1,4 +1,5 @@
 import { attendeeCountSchema } from "@schellingboard/contracts/attendee-count";
+
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import {
@@ -8,6 +9,7 @@ import {
   ok,
   type Result,
 } from "@/server/kernel/result";
+
 import type { SessionDeps } from "../ports";
 
 // Deliberately the same refusal for "not your session" and "no such session":

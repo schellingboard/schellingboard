@@ -1,9 +1,9 @@
-import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
-import { swipe } from "./helpers/touch";
-import { selectUser } from "./helpers/user";
-import { uniqueSuffix } from "./helpers/unique";
+import { expect, test } from "./helpers/fixtures";
 import { dayRadios, selectOption } from "./helpers/session-form";
+import { swipe } from "./helpers/touch";
+import { uniqueSuffix } from "./helpers/unique";
+import { selectUser } from "./helpers/user";
 
 // The grid view is an "app frame": below the nav bar a single scroll
 // container owns the viewport, with a slim toolbar as its first row. The

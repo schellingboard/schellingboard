@@ -1,7 +1,8 @@
 import type { Page } from "@playwright/test";
-import { test, expect } from "./helpers/fixtures";
+
+import { login, loginAndGoto } from "./helpers/auth";
+import { expect, test } from "./helpers/fixtures";
 import { uniqueSuffix } from "./helpers/unique";
-import { loginAndGoto, login } from "./helpers/auth";
 import { selectUser } from "./helpers/user";
 
 test("should allow voting on proposals with different choices @005-US1", async ({

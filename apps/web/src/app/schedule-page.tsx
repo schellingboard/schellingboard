@@ -1,35 +1,36 @@
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "@tanstack/react-router";
 import {
   EventPhase,
   getCurrentPhase,
   schedulingEnded,
 } from "@schellingboard/domain/phase";
-import { eventContextFrom } from "../replica/selectors";
+import { useRouter } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+
+import { claimSession } from "../commands/claim-session";
+import { newKey } from "../commands/keys";
+import { answerMeeting, cancelMeeting } from "../commands/meeting-answer";
+import { meetingRequestCalls } from "../commands/meeting-request";
+import { addRsvp, removeRsvp } from "../commands/rsvp";
 import { scheduleLinks } from "../features/schedule/links";
 import {
-  ScheduleScreen,
   type ScheduleActions,
+  ScheduleScreen,
 } from "../features/schedule/schedule-screen";
 import { attendeeCountApi } from "../queries/attendee-count";
 import { createAttendeesQuery } from "../queries/attendees";
-import { answerMeeting, cancelMeeting } from "../commands/meeting-answer";
-import { meetingRequestCalls } from "../commands/meeting-request";
 import { createMeetingCandidatesQuery } from "../queries/meeting-candidates";
-import { claimSession } from "../commands/claim-session";
-import { addRsvp, removeRsvp } from "../commands/rsvp";
-import { Message, useEventView, type EventView } from "./event-page";
+import { eventContextFrom } from "../replica/selectors";
+import { type EventView, Message, useEventView } from "./event-page";
 import { Footer } from "./footer";
 import { hardReload } from "./hard-navigate";
-import { newKey } from "../commands/keys";
-import { useMeetingClashes } from "./use-meeting-clashes";
 import { useHealth } from "./health";
+import { SyncIndicator } from "./sync-indicator";
 import { useUpdateStatus } from "./updates";
 import { likerFrom, useCommentSource } from "./use-comment-actions";
+import { useMeetingClashes } from "./use-meeting-clashes";
 import { useUrlSearchParams } from "./use-url-search-params";
 import { NamePicker } from "./user-menu";
 import { useViewer } from "./viewer";
-import { SyncIndicator } from "./sync-indicator";
 
 /** An event's schedule, inside the event layout. */
 export function SchedulePage() {

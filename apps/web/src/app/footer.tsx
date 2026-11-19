@@ -1,9 +1,10 @@
-import { useState } from "react";
 import {
   releaseNotes,
   SHOWN_RELEASES,
   UPDATE_DOCS_URL,
 } from "@schellingboard/domain/release-notes";
+import { useState } from "react";
+
 import { Dialog } from "../ui/dialog";
 import { InlineMarkdown } from "../ui/inline-markdown";
 import { Tooltip } from "../ui/tooltip";

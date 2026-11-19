@@ -1,9 +1,12 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+
 import { Scalar } from "@scalar/hono-api-reference";
 import type { MiddlewareHandler } from "hono";
-import { GUEST_COOKIE_NAME } from "@/utils/auth-cookies";
+
 import { AUTH_COOKIE_NAME } from "@/utils/auth";
+import { GUEST_COOKIE_NAME } from "@/utils/auth-cookies";
+
 import type { createApp } from "./create-app";
 
 type App = ReturnType<typeof createApp>;

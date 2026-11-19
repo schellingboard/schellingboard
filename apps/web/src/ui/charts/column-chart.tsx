@@ -1,6 +1,7 @@
 import { useCallback } from "react";
-import { PlotFrame, type Plot } from "./plot-frame";
-import { SERIES, SURFACE, baseOptions } from "./style";
+
+import { type Plot, PlotFrame } from "./plot-frame";
+import { baseOptions, SERIES, SURFACE } from "./style";
 
 const MAX_TICKS = 31;
 

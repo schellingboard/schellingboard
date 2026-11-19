@@ -1,16 +1,18 @@
 import { changes } from "@schellingboard/domain/change";
 import type { Comment } from "@schellingboard/domain/comment";
 import type { IdentityMode } from "@schellingboard/domain/event";
+
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import {
+  type Failure,
   forbidden,
   invalid,
   notFound,
   ok,
-  type Failure,
   type Result,
 } from "@/server/kernel/result";
+
 import type { CommentDeps, CommentSubject } from "../ports";
 
 export interface CreateCommentInput {

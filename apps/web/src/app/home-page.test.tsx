@@ -1,5 +1,6 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, screen, waitFor, within } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import type { FakeCall } from "../commands/fake-api";
 import { snapshot } from "../replica/snapshot-fixture";
 import { open } from "./page-test-support";

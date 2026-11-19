@@ -1,9 +1,10 @@
+import type { AuthCode, AuthCodePurpose } from "@schellingboard/domain/auth";
 import { and, eq, sql } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
+
 import * as schema from "../../schema";
 import type { AuthCodesRepository, NewAuthCode } from "../interfaces";
-import type { AuthCode, AuthCodePurpose } from "@schellingboard/domain/auth";
 
 type DB = BetterSQLite3Database<typeof schema>;
 

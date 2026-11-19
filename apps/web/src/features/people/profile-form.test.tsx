@@ -8,10 +8,11 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { fakeApi, problem, type FakeHandler } from "../../commands/fake-api";
+
+import { fakeApi, type FakeHandler, problem } from "../../commands/fake-api";
 import { profileFormCalls } from "../../commands/profile-form";
 import { NoticeProvider } from "../../ui/notices";
-import { ProfileForm, type ProfileDraft } from "./profile-form";
+import { type ProfileDraft, ProfileForm } from "./profile-form";
 
 afterEach(cleanup);
 

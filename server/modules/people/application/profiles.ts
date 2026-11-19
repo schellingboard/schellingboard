@@ -1,26 +1,28 @@
 import {
-  sanitizeGuest,
   type Attendee,
   type CompleteGuest,
   type Guest,
   type ProfileContact,
   type ProfilePrompt,
+  sanitizeGuest,
 } from "@schellingboard/domain/guest";
+
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import { byGuest } from "@/server/kernel/change-context";
 import { recordingProposalCascade } from "@/server/kernel/proposal-cascade";
-import { recordingShownGuests } from "@/server/kernel/shown-guests";
-import { withStoredFile } from "@/server/kernel/stored-files";
 import {
   forbidden,
   invalidFields,
   notFound,
   ok,
-  versionConflict,
   type Result,
+  versionConflict,
 } from "@/server/kernel/result";
+import { recordingShownGuests } from "@/server/kernel/shown-guests";
+import { withStoredFile } from "@/server/kernel/stored-files";
 import { eventNameToSlug } from "@/utils/utils";
+
 import type { PeopleDeps, ValidatedImage } from "../ports";
 
 export interface ProfileInput {

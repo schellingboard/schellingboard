@@ -1,8 +1,10 @@
 import type { Notification } from "@schellingboard/domain/notification";
+
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import { notificationsChanged } from "@/server/kernel/notification-changes";
 import { notFound, ok, type Result } from "@/server/kernel/result";
+
 import type { NotificationDeps } from "../ports";
 
 export interface MyNotifications {

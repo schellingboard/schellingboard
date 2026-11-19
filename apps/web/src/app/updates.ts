@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import type { UpdateStatus } from "@schellingboard/contracts/updates";
 import type { ApiClient } from "@schellingboard/api-client";
+import type { UpdateStatus } from "@schellingboard/contracts/updates";
+import { useEffect, useState } from "react";
 
 export type { UpdateStatus };
 

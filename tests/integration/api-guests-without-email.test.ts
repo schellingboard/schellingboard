@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { GET, POST, PUT } from "@/tests/helpers/v1-route";
 
 vi.mock("@/utils/mailer", () => ({
@@ -9,8 +10,9 @@ vi.mock("@/utils/mailer", () => ({
 import { getRepositories } from "@/db/container";
 import { isMailerConfigured, sendMail } from "@/utils/mailer";
 import { hashUserPassword } from "@/utils/user-credentials";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+
 import { createAdminAuthCookie } from "../helpers/admin-cookie";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import { createEvent, createGuest } from "../helpers/factories";
 import {
   GUEST_COOKIE_NAME,

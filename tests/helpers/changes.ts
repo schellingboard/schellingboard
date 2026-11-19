@@ -1,7 +1,8 @@
 import type { ChangeContext } from "@schellingboard/domain/change";
 import type { Session } from "@schellingboard/domain/session";
+
 import type { Repositories } from "@/db/container";
-import { unitOfWork, type UnitOfWork } from "@/server/kernel/unit-of-work";
+import { type UnitOfWork, unitOfWork } from "@/server/kernel/unit-of-work";
 import { changeSession, removeSession } from "@/server/modules/sessions/module";
 
 /** Who made a change, for tests that are not about who made it. */

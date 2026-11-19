@@ -10,6 +10,7 @@ import {
 import userEvent from "@testing-library/user-event";
 import { useCallback, useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { fakeApi } from "../../commands/fake-api";
 import { meetingRequestCalls } from "../../commands/meeting-request";
 import type { DirectoryEntry } from "../../queries/directory";

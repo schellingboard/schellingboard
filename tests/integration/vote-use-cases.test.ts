@@ -1,10 +1,12 @@
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createEvent, createGuest, createProposal } from "../helpers/factories";
+import { VoteChoice } from "@schellingboard/domain/vote";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+
 import { getRepositories } from "@/db/container";
 import { proposalUseCases } from "@/server/composition";
 import type { Actor } from "@/server/kernel/actor";
-import { VoteChoice } from "@schellingboard/domain/vote";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createEvent, createGuest, createProposal } from "../helpers/factories";
 
 const NOBODY: Actor = { admin: false, guest: null };
 const open = (id: string): Actor => ({

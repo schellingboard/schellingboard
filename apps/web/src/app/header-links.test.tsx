@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { act, render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+
 import { fakeSources } from "../commands/fake-source";
 import { HeaderLinks } from "./header-links";
 import { UnreadProvider } from "./unread-count";

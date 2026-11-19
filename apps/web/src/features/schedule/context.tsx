@@ -1,14 +1,15 @@
-import { createContext, useContext, type ReactNode } from "react";
 import {
   DEFAULT_BREAK_MINUTES,
   DEFAULT_SLOT_INCREMENT_MINUTES,
 } from "@schellingboard/domain/slots";
+import { createContext, type ReactNode, useContext } from "react";
+
 import type { MeetingRequestCalls } from "../../commands/meeting-request";
-import type { MeetingCandidatesQuery } from "../../queries/meeting-candidates";
 import type { AttendeeCountApi } from "../../queries/attendee-count";
-import type { CommentsController } from "../../queries/comments-controller";
-import type { CommentsQuery } from "../../queries/comments";
 import type { AttendeesQuery } from "../../queries/attendees";
+import type { CommentsQuery } from "../../queries/comments";
+import type { CommentsController } from "../../queries/comments-controller";
+import type { MeetingCandidatesQuery } from "../../queries/meeting-candidates";
 import type { ScheduleData } from "./data";
 import type { ScheduleLinks } from "./links";
 import { createScheduleMatch, type ScheduleMatch } from "./model";

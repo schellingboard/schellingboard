@@ -1,7 +1,8 @@
 // @module-tag 007-US1
-import { describe, it, expect, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { useRef } from "react";
+import { describe, expect, it, vi } from "vitest";
+
 import { useDragToPan } from "./use-drag-to-pan";
 
 function Pannable({

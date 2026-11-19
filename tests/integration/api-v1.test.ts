@@ -1,28 +1,30 @@
+import { createRoute } from "@hono/zod-openapi";
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
 import { z } from "zod";
-import { createRoute } from "@hono/zod-openapi";
-import { GET } from "@/tests/helpers/v1-route";
-import { createApp } from "@/server/http/create-app";
+
 import { actorMiddleware } from "@/server/http/actor";
+import { createApp } from "@/server/http/create-app";
 import { openApiDocument } from "@/server/http/openapi";
+import { GET } from "@/tests/helpers/v1-route";
 import { createAuthCookie } from "@/utils/auth";
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createGuest } from "../helpers/factories";
+
 import { createAdminAuthCookie } from "../helpers/admin-cookie";
-import { throughWeb } from "../helpers/through-web";
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createGuest } from "../helpers/factories";
 import {
   GUEST_COOKIE_NAME,
   openGuestValue,
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
+import { throughWeb } from "../helpers/through-web";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef"; // 32 chars
 

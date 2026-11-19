@@ -1,20 +1,22 @@
 import { changes } from "@schellingboard/domain/change";
 import type { Vote, VoteChoice } from "@schellingboard/domain/vote";
 import {
-  voteRefusal,
   type VoteRefusal,
+  voteRefusal,
 } from "@schellingboard/domain/vote-rule";
+
 import { actingAsNamedGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import { byActor } from "@/server/kernel/change-context";
 import {
+  type Failure,
   forbidden,
   notFound,
   ok,
-  type Failure,
   type Result,
 } from "@/server/kernel/result";
 import type { Tx } from "@/server/kernel/unit-of-work";
+
 import type { ProposalDeps } from "../ports";
 
 export interface VoteInput {

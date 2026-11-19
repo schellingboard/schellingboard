@@ -1,6 +1,7 @@
-import { Fragment, type ReactNode } from "react";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { formatOptionalTime, TIME_FORMAT } from "@schellingboard/domain/time";
+import { Fragment, type ReactNode } from "react";
+
 import type { ProposalLinks } from "./links";
 
 /**

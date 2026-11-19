@@ -1,9 +1,10 @@
-import { z } from "zod";
 import {
   DEFAULT_LOCATION_COLOR,
   LOCATION_COLOR_NAMES,
   normalizeLocationColor,
 } from "@schellingboard/domain/location-colors";
+import { z } from "zod";
+
 import { expectedVersion } from "./session";
 
 // Clearing the capacity field yields NaN, and a fractional entry yields a

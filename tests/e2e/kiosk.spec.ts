@@ -1,10 +1,10 @@
-import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
 import {
   duringGammaDayOne,
   openGammaScheduleDuringEvent,
   setDevClock,
 } from "./helpers/dev-clock";
+import { expect, test } from "./helpers/fixtures";
 
 // Kiosk mode (?kiosk=1) is meant for large screens at the venue. The now line
 // itself is drawn on every schedule (see now-line.spec.ts); what kiosk mode

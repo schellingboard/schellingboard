@@ -1,5 +1,6 @@
 // @module-tag 004-US5
 import { describe, expect, it } from "vitest";
+
 import { fakeApi, problem } from "../commands/fake-api";
 import { createStandingsQuery } from "./proposal-standings";
 

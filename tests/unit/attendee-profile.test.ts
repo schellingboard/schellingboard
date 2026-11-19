@@ -1,10 +1,9 @@
-import { describe, it, expect } from "vitest";
-
-import type { Attendee } from "@schellingboard/domain/guest";
 import {
   hasFilledProfile,
   profileExcerpt as excerptOf,
 } from "@schellingboard/domain/attendee-profile";
+import type { Attendee } from "@schellingboard/domain/guest";
+import { describe, expect, it } from "vitest";
 
 const plainText = (text: string | null | undefined) =>
   (text ?? "").replaceAll("**", "").replace(/\[([^\]]+)\]\([^)]*\)/g, "$1");

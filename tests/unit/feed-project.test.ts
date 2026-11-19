@@ -1,14 +1,15 @@
 // @module-tag 007-US8
-import { describe, it, expect } from "vitest";
 import {
-  changes,
-  reaches,
   type Actor,
   type Audience,
+  changes,
+  reaches,
   type RecordedChange,
   type Viewer,
 } from "@schellingboard/domain/change";
 import type { Session } from "@schellingboard/domain/session";
+import { describe, expect, it } from "vitest";
+
 import { project } from "@/server/feed/project";
 
 const session: Session = {

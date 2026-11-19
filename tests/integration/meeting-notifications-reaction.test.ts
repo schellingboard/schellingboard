@@ -1,18 +1,19 @@
 // @module-tag 012-US3
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
 }));
 
-import { sendMail } from "@/utils/mailer";
-import { isoDay } from "../helpers/dates";
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { runJobs } from "../helpers/jobs";
-import { createDay, createEvent, createGuest } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { meetingUseCases } from "@/server/composition";
 import type { Actor } from "@/server/kernel/actor";
+import { sendMail } from "@/utils/mailer";
+
+import { isoDay } from "../helpers/dates";
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createDay, createEvent, createGuest } from "../helpers/factories";
+import { runJobs } from "../helpers/jobs";
 
 const open = (id: string): Actor => ({
   admin: false,

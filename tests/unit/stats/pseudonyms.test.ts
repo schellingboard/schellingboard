@@ -1,6 +1,6 @@
+import { pseudonymize } from "@schellingboard/domain/stats/pseudonyms";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { pseudonymize } from "@schellingboard/domain/stats/pseudonyms";
 
 describe("pseudonymize", { tags: ["021-US1"] }, () => {
   it("sorts rows by value, highest first, and numbers them", () => {

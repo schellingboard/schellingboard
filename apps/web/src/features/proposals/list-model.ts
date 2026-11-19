@@ -1,18 +1,19 @@
-import Fuse from "fuse.js";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import type { LoggedProposal } from "@schellingboard/domain/change";
-import { dateStartDescription } from "@schellingboard/domain/phase-opens-text";
 import {
   inProposalPhase,
   inSchedPhase,
   inVotingPhase,
 } from "@schellingboard/domain/phase";
+import { dateStartDescription } from "@schellingboard/domain/phase-opens-text";
 import { wantsHost } from "@schellingboard/domain/session";
 import type { VoteChoice } from "@schellingboard/domain/vote";
 import { voteChoiceRank } from "@schellingboard/domain/vote-display";
-import { plainText } from "../../ui/plain-text";
-import { proposalsFrom, toEvent } from "../../replica/selectors";
+import Fuse from "fuse.js";
+
 import type { Standing } from "../../queries/proposal-standings";
+import { proposalsFrom, toEvent } from "../../replica/selectors";
+import { plainText } from "../../ui/plain-text";
 
 export type Row = LoggedProposal & {
   hostNames: string[];

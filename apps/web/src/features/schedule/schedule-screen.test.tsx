@@ -1,10 +1,11 @@
-import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
+import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { Snapshot } from "@schellingboard/contracts/snapshot";
-import { snapshot as base, iso } from "../../replica/snapshot-fixture";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { iso, snapshot as base } from "../../replica/snapshot-fixture";
 import { scheduleLinks } from "./links";
-import { ScheduleScreen, type ScheduleActions } from "./schedule-screen";
+import { type ScheduleActions, ScheduleScreen } from "./schedule-screen";
 import { noMeetingActions } from "./test-support";
 
 const sessionOf = (

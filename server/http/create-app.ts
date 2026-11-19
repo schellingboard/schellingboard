@@ -1,5 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
+
 import type { ApiEnv } from "./actor";
 import { problemResponse } from "./problem";
 

@@ -1,7 +1,7 @@
-import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
-import { selectUser } from "./helpers/user";
+import { expect, test } from "./helpers/fixtures";
 import { dismissToast, toast } from "./helpers/toast";
+import { selectUser } from "./helpers/user";
 
 // A phone has no hover, so the tooltip explaining why a control is greyed out
 // can never be seen there. Tapping the control has to say the same thing, and a

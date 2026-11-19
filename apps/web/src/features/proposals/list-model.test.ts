@@ -2,15 +2,16 @@
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { VoteChoice } from "@schellingboard/domain/vote";
 import { describe, expect, it } from "vitest";
+
 import type { Standing } from "../../queries/proposal-standings";
 import { iso, snapshot } from "../../replica/snapshot-fixture";
 import {
   defaultSort,
+  type ListInput,
   listRows,
   phaseTexts,
   rowsFrom,
   sortOptions,
-  type ListInput,
 } from "./list-model";
 
 const proposal = (

@@ -10,13 +10,14 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+
+import { escapeTableCell } from "./markdown-table";
 import {
   collectSpecs,
+  type JsonReport,
   specFile,
   specTitle,
-  type JsonReport,
 } from "./playwright-json";
-import { escapeTableCell } from "./markdown-table";
 
 interface HuntReport extends JsonReport {
   // Not Playwright's: set by e2e-flake-hunt.sh when HUNT_KEEP_PASSING=0 threw

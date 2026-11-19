@@ -1,11 +1,11 @@
 // @module-tag 001-US2
-import { describe, it, expect } from "vitest";
 import {
   followUpDueTime,
   followUpEligible,
   headsUpDueTime,
   headsUpEligible,
 } from "@schellingboard/domain/reminder-schedule";
+import { describe, expect, it } from "vitest";
 
 const at = (time: string) => new Date(`2026-09-01T${time}:00Z`);
 

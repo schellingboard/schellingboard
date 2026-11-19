@@ -1,12 +1,13 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { Hono } from "hono";
 import { setCookie } from "hono/cookie";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import {
-  isAuthCookieValid,
-  createAuthCookie,
-  verifyPassword,
-  isPasswordProtectionEnabled,
   AUTH_COOKIE_NAME,
+  createAuthCookie,
+  isAuthCookieValid,
+  isPasswordProtectionEnabled,
+  verifyPassword,
 } from "@/utils/auth";
 
 // Serialize the cookie the way the server does (server/http/site-auth.ts), so

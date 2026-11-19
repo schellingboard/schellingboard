@@ -1,5 +1,4 @@
 import type { ApiClient } from "@schellingboard/api-client";
-
 import { NOTIFICATION_IDS_MAX } from "@schellingboard/contracts/notification";
 
 const NOTIFICATION_BATCH = NOTIFICATION_IDS_MAX;

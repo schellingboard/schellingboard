@@ -1,11 +1,12 @@
+import type { Snapshot } from "@schellingboard/contracts/snapshot";
+import { useLocation } from "@tanstack/react-router";
 import {
   createContext,
+  type ReactNode,
   useContext,
   useSyncExternalStore,
-  type ReactNode,
 } from "react";
-import { useLocation } from "@tanstack/react-router";
-import type { Snapshot } from "@schellingboard/contracts/snapshot";
+
 import type { CommandRunner } from "../commands/runner";
 import type { ReplicaStore } from "../replica/store";
 import { hardReload } from "./hard-navigate";
@@ -13,8 +14,8 @@ import type { AppServices } from "./services";
 import { ShellFrame, ShellProviders } from "./shell";
 import { useEvents } from "./use-events";
 import {
-  useScheduleSession,
   type ScheduleSession,
+  useScheduleSession,
 } from "./use-schedule-session";
 import { useServerNow } from "./use-server-now";
 import { useUrlSearchParams } from "./use-url-search-params";

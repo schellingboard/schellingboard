@@ -1,5 +1,6 @@
-import { useState, type ReactNode, type RefObject } from "react";
 import type { Location } from "@schellingboard/domain/location";
+import { type ReactNode, type RefObject, useState } from "react";
+
 import { DayFoldBar } from "./day-fold-bar";
 import { DayGrid } from "./day-grid";
 import { gridDayFold, type ScheduleEntry } from "./model";

@@ -1,5 +1,6 @@
 import type { ApiClient } from "@schellingboard/api-client";
 import type { eventDetailSchema } from "@schellingboard/contracts/event";
+
 import { problemCode } from "../commands/problem";
 import { createObservable } from "./store";
 

@@ -1,13 +1,14 @@
 import { Page } from "@playwright/test";
-import { test, expect } from "./helpers/fixtures";
+
+import { adminLogin } from "./helpers/admin";
 import { login } from "./helpers/auth";
-import { selectUser } from "./helpers/user";
+import { expect, test } from "./helpers/fixtures";
 import {
   dayRadios,
-  startTimeOption,
   selectOption,
+  startTimeOption,
 } from "./helpers/session-form";
-import { adminLogin } from "./helpers/admin";
+import { selectUser } from "./helpers/user";
 
 async function openGammaLocations(page: Page) {
   await page.goto("/admin");

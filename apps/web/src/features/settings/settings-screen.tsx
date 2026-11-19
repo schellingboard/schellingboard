@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
+
+import { ThemeSelect } from "../../app/theme";
 import type { MeetingAvailabilityCalls } from "../../commands/meeting-availability";
 import type { SettingsCalls } from "../../commands/settings";
 import type { SettingsState } from "../../queries/settings";
-import { ThemeSelect } from "../../app/theme";
 import { AvailabilityForm } from "../meetings/availability-form";
 import { EmailSettingsForm } from "./email-settings-form";
 import { PushNotifications } from "./push-notifications";

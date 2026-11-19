@@ -1,10 +1,12 @@
+import type { Event, EventMeetingSettings } from "@schellingboard/domain/event";
 import { eq, getTableColumns, inArray, sql } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
-import * as schema from "../../schema";
+
 import { eventNameToSlug } from "@/utils/utils";
+
+import * as schema from "../../schema";
 import type { EventsRepository } from "../interfaces";
-import type { Event, EventMeetingSettings } from "@schellingboard/domain/event";
 
 type EventRow = typeof schema.events.$inferInsert;
 

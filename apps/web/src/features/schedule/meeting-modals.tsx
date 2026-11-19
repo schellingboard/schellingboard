@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
 import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
+import { useEffect, useMemo, useRef, useState } from "react";
+
 import { Dialog } from "../../ui/dialog";
 import { BookMeeting } from "../meetings/book-meeting";
 import { MeetingModal } from "../meetings/meeting-modal";

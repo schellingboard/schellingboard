@@ -1,5 +1,6 @@
 // @module-tag 013-US1
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { FakeSource } from "../commands/fake-source";
 import {
   connectNotificationStream,

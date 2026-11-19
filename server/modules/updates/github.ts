@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import type { Release } from "./application/release-check";
 
 const LATEST_URL =

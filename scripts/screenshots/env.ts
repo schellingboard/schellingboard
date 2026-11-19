@@ -1,4 +1,4 @@
-import { expect, type Browser, BrowserContext, Page } from "@playwright/test";
+import { type Browser, BrowserContext, expect, Page } from "@playwright/test";
 
 import { login } from "../../tests/e2e/helpers/auth";
 import { selectUser } from "../../tests/e2e/helpers/user";

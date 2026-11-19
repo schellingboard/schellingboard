@@ -1,8 +1,10 @@
-import type { z } from "zod";
 import type { pushSubscriptionSchema } from "@schellingboard/contracts/push";
+import type { z } from "zod";
+
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import { ok, type Result } from "@/server/kernel/result";
+
 import type { NotificationDeps } from "../ports";
 
 export const subscribeToPush =

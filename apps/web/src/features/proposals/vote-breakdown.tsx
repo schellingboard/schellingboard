@@ -1,7 +1,6 @@
-import { useId } from "react";
 import {
-  MIN_TURNOUT_PCT_FOR_ESTIMATE,
   type AttendanceRange,
+  MIN_TURNOUT_PCT_FOR_ESTIMATE,
 } from "@schellingboard/domain/proposal-vote-stats";
 import { VoteChoice } from "@schellingboard/domain/vote";
 import {
@@ -9,6 +8,8 @@ import {
   voteChoiceToEmoji,
   voteChoiceToLabel,
 } from "@schellingboard/domain/vote-display";
+import { useId } from "react";
+
 import type { VoteBreakdown as VoteBreakdownStats } from "../../queries/proposal-detail";
 
 function pct(value: number | null): string {

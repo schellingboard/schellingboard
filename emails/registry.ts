@@ -1,4 +1,5 @@
 import type { EmailMessage } from "@/utils/mailer";
+
 import { cohostAddedEmail } from "./cohost-added";
 import { commentEmail } from "./comment";
 import { meetingOutcomeEmail, meetingRequestEmail } from "./meeting";

@@ -1,5 +1,6 @@
-import { useState } from "react";
 import type { StatsTable } from "@schellingboard/contracts/stats";
+import { useState } from "react";
+
 import { cx } from "../../ui/cx";
 import { SearchInput } from "../../ui/search-input";
 

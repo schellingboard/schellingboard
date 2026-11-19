@@ -9,8 +9,10 @@ import {
   resetBodySchema,
   resetLinkBodySchema,
 } from "@schellingboard/contracts/auth";
+
 import { problem, problemDefault } from "@/server/http/problem";
-import { body, json, noContent, type App } from "@/server/http/route-parts";
+import { type App, body, json, noContent } from "@/server/http/route-parts";
+
 import type { PeopleUseCases } from "../application/use-cases";
 import { setGuestCookie } from "./guest-cookie";
 

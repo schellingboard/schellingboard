@@ -1,5 +1,6 @@
+import { createContext, type ReactNode, useContext, useState } from "react";
+
 import { Tooltip } from "../ui/tooltip";
-import { createContext, useContext, useState, type ReactNode } from "react";
 
 // The same cookie, values and colours as the Next pages (utils/theme.ts there);
 // index.html's inline script applies the class before first paint.

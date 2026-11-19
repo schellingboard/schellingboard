@@ -1,5 +1,6 @@
 import { assuranceRequired } from "@schellingboard/domain/auth";
 import type { IdentityMode } from "@schellingboard/domain/event";
+
 import type { Actor } from "./actor";
 import { forbidden, ok, type Result } from "./result";
 

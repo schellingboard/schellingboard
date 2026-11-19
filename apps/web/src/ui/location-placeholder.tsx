@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+
 import { cx } from "./cx";
 
 export function LocationPlaceholder({

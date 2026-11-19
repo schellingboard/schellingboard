@@ -1,8 +1,8 @@
-import type { eventGuestSchema } from "@schellingboard/contracts/snapshot";
 import type {
   attendeeViewSchema,
   publicProfileSchema,
 } from "@schellingboard/contracts/guest";
+import type { eventGuestSchema } from "@schellingboard/contracts/snapshot";
 import type { Attendee, Guest } from "@schellingboard/domain/guest";
 import type { z } from "zod";
 

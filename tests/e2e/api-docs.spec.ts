@@ -1,5 +1,5 @@
-import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
+import { expect, test } from "./helpers/fixtures";
 
 test("attendee reads the API reference @019-US6", async ({ page }) => {
   await login(page);

@@ -1,9 +1,10 @@
 // @module-tag 013-US1
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createGuest } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createGuest } from "../helpers/factories";
 
 // Read time is passed in rather than taken from the wall clock, so the dev
 // fake clock reaches these rows like every other timestamp in the app.

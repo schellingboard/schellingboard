@@ -7,18 +7,20 @@ import {
   meetingSlotsForDay,
 } from "@schellingboard/domain/meeting-slots";
 import { inSchedPhase } from "@schellingboard/domain/phase";
+
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import { byGuest } from "@/server/kernel/change-context";
 import {
   conflict,
+  type Failure,
   forbidden,
   invalid,
   notFound,
   ok,
-  type Failure,
   type Result,
 } from "@/server/kernel/result";
+
 import type { MeetingDeps } from "../ports";
 
 export interface MeetingRequestInput {

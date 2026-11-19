@@ -1,23 +1,24 @@
 // @module-tag 002-US1
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { getRepositories } from "@/db/container";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
+  createDay,
   createEvent,
   createGuest,
   createLocation,
-  createDay,
   slotStart,
 } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 

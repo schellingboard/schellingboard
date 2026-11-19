@@ -1,8 +1,8 @@
-import { test, expect } from "./helpers/fixtures";
 import { loginAndGoto } from "./helpers/auth";
-import { selectUser } from "./helpers/user";
+import { expect, test } from "./helpers/fixtures";
 import { filterChip, switchToView } from "./helpers/schedule";
 import { gammaDay } from "./helpers/seed";
+import { selectUser } from "./helpers/user";
 
 // The grid keeps every session where it is while searching or filtering —
 // an empty cell there means a free slot — and fades out what doesn't match.

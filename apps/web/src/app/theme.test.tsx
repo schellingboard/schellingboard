@@ -1,7 +1,8 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { ThemeProvider, ThemeSelect, readThemeCookie } from "./theme";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+
+import { readThemeCookie, ThemeProvider, ThemeSelect } from "./theme";
 
 const clear = () => {
   document.cookie = "sb-theme=; path=/; max-age=0";

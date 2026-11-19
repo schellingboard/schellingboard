@@ -1,20 +1,21 @@
-import { useMemo, useRef, useState, type FormEvent } from "react";
 import {
   proposalCreateSchema,
   proposalUpdateSchema,
 } from "@schellingboard/contracts/proposal";
-import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
+import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
 import { COHOST_WANTED_NOTE_MAX } from "@schellingboard/domain/session";
 import {
   durationMinusBreak,
   slotDurationOptions,
 } from "@schellingboard/domain/slots";
 import { formatDuration } from "@schellingboard/domain/time";
+import { type FormEvent, useMemo, useRef, useState } from "react";
+
 import {
+  type FieldErrors,
   FIX_FIELDS_MESSAGE,
   validateFields,
-  type FieldErrors,
 } from "../../commands/mutation";
 import type {
   ProposalCreateBody,

@@ -1,12 +1,13 @@
-import { describe, it, expect } from "vitest";
-import { readFileSync, readdirSync } from "fs";
+import { readdirSync, readFileSync } from "fs";
 import path from "path";
+import { describe, expect, it } from "vitest";
+
 import {
-  TOKENS_CSS_PATH,
   contrastRatio,
   parseColor,
   readThemes,
   relativeLuminance,
+  TOKENS_CSS_PATH,
 } from "../helpers/color-math";
 
 // The pairs that actually occur in the UI, each with the ratio WCAG 2.2 asks

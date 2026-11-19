@@ -1,8 +1,9 @@
-import { describe, it, expect } from "vitest";
-import { locationColumn } from "./column";
-import { SLOT_HEIGHT_PX } from "./grid-layout";
 import type { Session } from "@schellingboard/domain/session";
 import { newEmptySession } from "@schellingboard/domain/session";
+import { describe, expect, it } from "vitest";
+
+import { locationColumn } from "./column";
+import { SLOT_HEIGHT_PX } from "./grid-layout";
 
 const at = (hour: number, minute = 0) =>
   new Date(Date.UTC(2026, 9, 1, hour, minute));

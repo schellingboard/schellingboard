@@ -1,6 +1,8 @@
 import { readFile, writeFile } from "node:fs/promises";
+
 import openapiTS, { astToString } from "openapi-typescript";
 import { format, resolveConfig } from "prettier";
+
 import { openApiDocument } from "../server/http/openapi.ts";
 
 const DOCUMENT = "packages/contracts/openapi.json";

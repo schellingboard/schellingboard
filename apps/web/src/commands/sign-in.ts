@@ -1,5 +1,4 @@
 import type { ApiClient } from "@schellingboard/api-client";
-import { fetchEmailEnabled } from "../queries/email-enabled";
 import type {
   bootstrapBodySchema,
   changePasswordBodySchema,
@@ -12,6 +11,8 @@ import type {
   unprotectBodySchema,
   usernameBodySchema,
 } from "@schellingboard/contracts/auth";
+
+import { fetchEmailEnabled } from "../queries/email-enabled";
 
 export type SiteLoginBody = (typeof siteLoginBodySchema)["_input"];
 export type LoginBody = (typeof loginBodySchema)["_input"];

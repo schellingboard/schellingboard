@@ -4,7 +4,7 @@
 // there is no bulk fixture file to maintain. E2E tests run the "small"
 // profile and never see this data, so it can change freely.
 
-import { hasProfileFields, type GuestConfig } from "./data/guests";
+import { type GuestConfig, hasProfileFields } from "./data/guests";
 
 const firstNames = [
   "Aiko",

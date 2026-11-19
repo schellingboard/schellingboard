@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import Database from "better-sqlite3";
 import fs from "fs";
 import os from "os";
 import path from "path";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+
 import { runMigrations } from "@/db/migrate";
 
 // Writes a minimal Drizzle migrations folder. Each entry is one migration's

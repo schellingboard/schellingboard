@@ -1,5 +1,6 @@
-import { afterEach, describe, expect, it } from "vitest";
 import { renderHook } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
+
 import { useScrollLock } from "./use-scroll-lock";
 
 const overflow = () => document.documentElement.style.overflow;

@@ -1,4 +1,5 @@
 import reactHooks from "eslint-plugin-react-hooks";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
 import tseslint from "typescript-eslint";
 
 // "Now" enters at the request boundary and is passed down; reading an ambient
@@ -51,6 +52,10 @@ export default tseslint.config(
   },
   ...tseslint.configs.recommendedTypeChecked,
   reactHooks.configs.flat.recommended,
+  {
+    plugins: { "simple-import-sort": simpleImportSort },
+    rules: { "simple-import-sort/imports": "error" },
+  },
   {
     languageOptions: {
       parserOptions: {

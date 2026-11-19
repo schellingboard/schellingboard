@@ -1,12 +1,11 @@
-import { GUEST_COOKIE_NAME, openGuestValue } from "./guest-cookie";
-
 import {
-  callApi,
   type ApiResult,
+  callApi,
   type Fields,
   type Method,
   type Problem,
 } from "./api";
+import { GUEST_COOKIE_NAME, openGuestValue } from "./guest-cookie";
 
 export type { Problem };
 export type ProposalResult = ApiResult;

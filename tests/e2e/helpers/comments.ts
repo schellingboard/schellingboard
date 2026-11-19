@@ -1,4 +1,5 @@
 import type { Locator } from "@playwright/test";
+
 import { expect } from "./fixtures";
 
 // Helpers shared by the proposal, session and profile comment specs: the three

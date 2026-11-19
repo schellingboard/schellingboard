@@ -1,7 +1,7 @@
 import {
   COOKIE_MAX_AGE_SEC,
-  signCookieValue,
   cookieOptions,
+  signCookieValue,
 } from "@/utils/auth-cookies";
 
 export {

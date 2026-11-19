@@ -1,10 +1,11 @@
 // @module-tag 007-US8
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { act, render, screen } from "@testing-library/react";
-import { createReplicaStore } from "../replica/store";
 import { RECONNECT_GRACE_MS } from "@schellingboard/contracts/feed";
-import { STALE_AFTER_MS } from "../replica/sync-state";
+import { act, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { snapshot } from "../replica/snapshot-fixture";
+import { createReplicaStore } from "../replica/store";
+import { STALE_AFTER_MS } from "../replica/sync-state";
 import { SyncIndicator } from "./sync-indicator";
 
 let t = 0;

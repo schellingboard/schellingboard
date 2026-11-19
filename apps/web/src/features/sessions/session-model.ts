@@ -3,6 +3,7 @@ import type { Day } from "@schellingboard/domain/event";
 import { dateOnDay } from "@schellingboard/domain/event";
 import { formatSlotLabel, TIME_FORMAT } from "@schellingboard/domain/time";
 import { DateTime } from "luxon";
+
 import { slotIsFree } from "../schedule/column";
 
 const MS_PER_MINUTE = 60 * 1000;

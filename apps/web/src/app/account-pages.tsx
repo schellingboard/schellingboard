@@ -1,40 +1,41 @@
+import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
+import { safeRedirectPath } from "@schellingboard/domain/safe-redirect";
+import { useRouter } from "@tanstack/react-router";
 import {
+  type ReactNode,
   useEffect,
   useMemo,
   useState,
   useSyncExternalStore,
-  type ReactNode,
 } from "react";
-import { useRouter } from "@tanstack/react-router";
-import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
-import { safeRedirectPath } from "@schellingboard/domain/safe-redirect";
-import { signInCalls } from "../commands/sign-in";
+
 import { meetingAvailabilityCalls } from "../commands/meeting-availability";
 import { notificationCalls } from "../commands/notifications";
 import { settingsCalls } from "../commands/settings";
+import { signInCalls } from "../commands/sign-in";
 import { NotificationsScreen } from "../features/notifications/notifications-screen";
-import { JoinScreen } from "../features/sign-in/join-screen";
-import { BootstrapScreen } from "../features/sign-in/bootstrap-screen";
-import { AccountSecuritySection } from "../features/sign-in/account-security";
-import { SiteLoginScreen } from "../features/sign-in/site-login-screen";
-import { LoginScreen } from "../features/sign-in/guest-login-form";
-import { ResetScreen } from "../features/sign-in/reset-password-form";
 import {
   Appearance,
   SettingsScreen,
 } from "../features/settings/settings-screen";
+import { AccountSecuritySection } from "../features/sign-in/account-security";
+import { BootstrapScreen } from "../features/sign-in/bootstrap-screen";
+import { LoginScreen } from "../features/sign-in/guest-login-form";
+import { JoinScreen } from "../features/sign-in/join-screen";
+import { ResetScreen } from "../features/sign-in/reset-password-form";
+import { SiteLoginScreen } from "../features/sign-in/site-login-screen";
 import { createAccountSecurityQuery } from "../queries/account-security";
 import { createNotificationsQuery } from "../queries/notifications";
 import { createSettingsQuery } from "../queries/settings";
+import { NoticeProvider } from "../ui/notices";
 import { Footer } from "./footer";
 import { hardNavigate } from "./hard-navigate";
 import { useHealth } from "./health";
 import { Layout } from "./layout";
-import { ThemeProvider } from "./theme";
-import { NoticeProvider } from "../ui/notices";
 import { PageNotice } from "./page-notice";
 import type { AppServices } from "./services";
 import { ShellFrame, ShellProviders } from "./shell";
+import { ThemeProvider } from "./theme";
 import { useNotificationRevision, useUnread } from "./unread-count";
 import { useDirectoryShell } from "./use-directory-shell";
 import { useUrlSearchParams } from "./use-url-search-params";

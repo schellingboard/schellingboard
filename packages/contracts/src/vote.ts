@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { VoteChoice } from "@schellingboard/domain/vote";
+import { z } from "zod";
 
 const voteChoiceSchema = z.enum(VoteChoice);
 

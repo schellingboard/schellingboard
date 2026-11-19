@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
 import { useRouter } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+
 import { EventListScreen } from "../features/events/event-list-screen";
 import { InAppLinks } from "./in-app-links";
 import type { AppServices } from "./services";

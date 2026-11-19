@@ -2,6 +2,7 @@ import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-m
 export { actingGuestRefusalMessage };
 import { pageReads } from "@/server/composition";
 import { guestOfCookie } from "@/server/kernel/session-actor";
+
 import { GUEST_COOKIE_NAME } from "./auth";
 
 // Server-side enforcement for guest account security (issue #370): a request

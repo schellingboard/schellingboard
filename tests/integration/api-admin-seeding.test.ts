@@ -1,16 +1,17 @@
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
 
 import { POST, PUT } from "@/tests/helpers/v1-route";
+
 import { createAdminAuthCookie } from "../helpers/admin-cookie";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";

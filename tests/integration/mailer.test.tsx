@@ -1,22 +1,24 @@
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
+
+import { getRepositories } from "@/db/container";
+import { dispatchReminders } from "@/server/composition";
 import { initMailer, resetMailer, sendMail } from "@/utils/mailer";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createEvent, createGuest, createLocation } from "../helpers/factories";
 import {
   getMessage,
   searchBySubject,
   skipWithoutMailpit,
 } from "../helpers/mailpit";
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createEvent, createGuest, createLocation } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
-import { dispatchReminders } from "@/server/composition";
 
 // This suite runs only when MAILPIT_API_URL points at a mailpit instance
 // (start one with `make mailpit`, see docs/dev/testing.md § Running tests). Skips

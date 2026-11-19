@@ -1,13 +1,17 @@
 // @module-tag 018-US1
+import { STALE_PROPOSAL_MESSAGE } from "@schellingboard/contracts/session";
+import { VoteChoice } from "@schellingboard/domain/vote";
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
+
+import { getRepositories } from "@/db/container";
 
 import {
   adminDeleteProposalAction,
@@ -15,17 +19,14 @@ import {
   loginAsAdmin,
   logoutAdmin,
 } from "../helpers/admin-api";
-import { setupTestDb, resetTestDb } from "../helpers/db";
 import { BY_TEST, updateLoggedSession } from "../helpers/changes";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createEvent,
   createGuest,
   createProposal,
   createSession,
 } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
-import { VoteChoice } from "@schellingboard/domain/vote";
-import { STALE_PROPOSAL_MESSAGE } from "@schellingboard/contracts/session";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 

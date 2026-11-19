@@ -1,6 +1,14 @@
 // @module-tag 007-US8
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { snapshotSchema } from "@schellingboard/contracts/snapshot";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+
+import { getRepositories, withWriter } from "@/db/container";
+import { snapshotFor } from "@/server/feed/snapshot";
+import type { Actor } from "@/server/kernel/actor";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
+
+import { updateLoggedSession } from "../helpers/changes";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createDay,
   createEvent,
@@ -9,12 +17,6 @@ import {
   createSession,
   createUnavailability,
 } from "../helpers/factories";
-import { updateLoggedSession } from "../helpers/changes";
-import { getRepositories, withWriter } from "@/db/container";
-import { unitOfWork } from "@/server/kernel/unit-of-work";
-import { snapshotFor } from "@/server/feed/snapshot";
-import type { Actor } from "@/server/kernel/actor";
-import { snapshotSchema } from "@schellingboard/contracts/snapshot";
 
 const NINE = new Date("2026-06-02T09:00:00.000Z");
 const TEN = new Date("2026-06-02T10:00:00.000Z");

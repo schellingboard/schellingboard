@@ -1,5 +1,5 @@
-import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
+import { expect, test } from "./helpers/fixtures";
 
 // Going offline is the one thing a script does that a person does with a
 // tunnel or a flight mode. Everything before it is what the attendee did on

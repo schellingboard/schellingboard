@@ -1,6 +1,7 @@
+import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { rsvpRefusal } from "@schellingboard/domain/rsvp-rule";
 import type { SessionHost } from "@schellingboard/domain/session";
-import type { Snapshot } from "@schellingboard/contracts/snapshot";
+
 import type { Command, Prediction } from "./runner";
 import { describeSessionIn } from "./subject";
 

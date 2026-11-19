@@ -1,10 +1,11 @@
 // @module-tag 012-US2
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createEvent, createGuest, createDay } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { availabilityFormsFor } from "@/utils/meeting-availability-form";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createDay, createEvent, createGuest } from "../helpers/factories";
 
 const NOW = new Date("2026-10-01T08:00:00.000Z");
 const DAY = {

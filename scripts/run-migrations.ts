@@ -1,10 +1,9 @@
 // Runs DB migrations with foreign keys disabled, working around
 // https://github.com/drizzle-team/drizzle-orm/issues/4089 — see db/migrate.ts.
 
+import Database from "better-sqlite3";
 import path from "path";
 import { fileURLToPath } from "url";
-
-import Database from "better-sqlite3";
 
 import { resolveDbPath, runMigrations } from "../db/migrate.js";
 

@@ -1,5 +1,6 @@
 import { changes } from "@schellingboard/domain/change";
 import type { LocationUnavailability } from "@schellingboard/domain/location";
+
 import type { Actor } from "@/server/kernel/actor";
 import { byAdmin } from "@/server/kernel/change-context";
 import {
@@ -9,6 +10,7 @@ import {
   ok,
   type Result,
 } from "@/server/kernel/result";
+
 import type { SessionDeps } from "../ports";
 
 export interface LocationUnavailabilityInput {

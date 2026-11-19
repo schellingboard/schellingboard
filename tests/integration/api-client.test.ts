@@ -1,15 +1,17 @@
+import { createApiClient } from "@schellingboard/api-client";
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
-import { createApiClient } from "@schellingboard/api-client";
+
 import { createAuthCookie } from "@/utils/auth";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import { createEvent } from "../helpers/factories";
 import { throughWeb } from "../helpers/through-web";
 

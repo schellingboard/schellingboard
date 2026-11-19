@@ -7,10 +7,11 @@ import {
 } from "@schellingboard/domain/stats/filter";
 import {
   gapsWithin,
-  mergeIntervals,
   type Interval,
+  mergeIntervals,
 } from "@schellingboard/domain/stats/intervals";
 import { DateTime } from "luxon";
+
 import { col, percent, round } from "./cells";
 
 const MINUTE = 60_000;

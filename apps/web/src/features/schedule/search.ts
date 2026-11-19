@@ -1,4 +1,5 @@
 import type { Session } from "@schellingboard/domain/session";
+
 import { meetingTitle } from "./meeting-rules";
 import type { MeetingView } from "./meeting-view";
 

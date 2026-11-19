@@ -1,34 +1,28 @@
 import { getRepositories } from "@/db/container";
-import { unitOfWork } from "@/server/kernel/unit-of-work";
 import { authCodeEmail } from "@/emails/auth-code";
 import { authPasswordResetEmail } from "@/emails/auth-password-reset";
 import { authSecurityChangedEmail } from "@/emails/auth-security-changed";
 import { joinLinkEmail, joinLinkMadeEmail } from "@/emails/join-link";
 import { testEmail } from "@/emails/test-email";
-import { dispatchDueReminders } from "@/utils/reminder-dispatch";
-import { getImageRepositories } from "@/utils/images";
-import { isMailerConfigured, sendMail } from "@/utils/mailer";
-import { siteUrl } from "@/utils/site-url";
-import { generateVapidKeys } from "@/utils/push";
-import { mapImages } from "@/utils/map-image";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
 import {
-  createCommentUseCases,
   type CommentUseCases,
+  createCommentUseCases,
   proposalComments,
 } from "@/server/modules/comments/module";
 import {
-  createEventUseCases,
-  type EventUseCases,
   allEvents,
+  createEventUseCases,
   eventById,
   eventBySlug,
   eventDays,
+  type EventUseCases,
 } from "@/server/modules/events/module";
 import {
   createMeetingUseCases,
   guestSchedules,
-  meetingViews,
   type MeetingUseCases,
+  meetingViews,
 } from "@/server/modules/meetings/module";
 import {
   createNotificationUseCases,
@@ -36,26 +30,26 @@ import {
   unreadNotificationCount,
 } from "@/server/modules/notifications/module";
 import {
-  createPeopleUseCases,
-  type PeopleUseCases,
   allGuests,
   attendees,
+  createPeopleUseCases,
   guestAuthProtection,
   guestById,
+  type PeopleUseCases,
 } from "@/server/modules/people/module";
 import {
   createProposalUseCases,
-  type ProposalUseCases,
   eventProposals,
   guestVotes,
   hostedProposals,
   proposalById,
+  type ProposalUseCases,
 } from "@/server/modules/proposals/module";
 import {
   createSessionUseCases,
-  type SessionUseCases,
   hostedSessions,
   sessionsOfEvent,
+  type SessionUseCases,
 } from "@/server/modules/sessions/module";
 import {
   createSettingsUseCases,
@@ -72,12 +66,18 @@ import {
   fetchLatestRelease,
   type UpdateUseCases,
 } from "@/server/modules/updates/module";
-import { getAppVersion } from "@/utils/git";
 import {
   createVenueUseCases,
-  type VenueUseCases,
   eventLocations,
+  type VenueUseCases,
 } from "@/server/modules/venue/module";
+import { getAppVersion } from "@/utils/git";
+import { getImageRepositories } from "@/utils/images";
+import { isMailerConfigured, sendMail } from "@/utils/mailer";
+import { mapImages } from "@/utils/map-image";
+import { generateVapidKeys } from "@/utils/push";
+import { dispatchDueReminders } from "@/utils/reminder-dispatch";
+import { siteUrl } from "@/utils/site-url";
 
 // Built per call: tests swap the repository container between cases.
 export function sessionUseCases(): SessionUseCases {

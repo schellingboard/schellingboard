@@ -1,8 +1,9 @@
 // @module-tag 007-US4
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook } from "@testing-library/react";
-import { createReplicaStore } from "../replica/store";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { snapshot } from "../replica/snapshot-fixture";
+import { createReplicaStore } from "../replica/store";
 import { useServerNow } from "./use-server-now";
 
 beforeEach(() => vi.useFakeTimers());

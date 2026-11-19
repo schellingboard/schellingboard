@@ -1,14 +1,14 @@
-import { describe, it, expect } from "vitest";
 import {
-  SLOT_INCREMENT_OPTIONS,
-  isValidSlotIncrement,
   getNumSlots,
   gridEndingDurations,
   isSlotAligned,
+  isValidSlotIncrement,
   sessionDurationError,
+  SLOT_INCREMENT_OPTIONS,
   slotDurationOptions,
   snapDurationToSlots,
 } from "@schellingboard/domain/slots";
+import { describe, expect, it } from "vitest";
 
 // ── isValidSlotIncrement ─────────────────────────────────────────────────────
 

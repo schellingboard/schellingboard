@@ -1,7 +1,9 @@
-import { useState } from "react";
-import { DateTime } from "luxon";
+import { clashLines } from "@schellingboard/domain/meeting-clash-text";
 import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
 import { getNumSlots } from "@schellingboard/domain/slots";
+import { DateTime } from "luxon";
+import { useState } from "react";
+
 import { cx } from "../../ui/cx";
 import { Dialog } from "../../ui/dialog";
 import { PlusIcon } from "../../ui/icons";
@@ -13,7 +15,6 @@ import {
   useScheduleMatch,
 } from "./context";
 import { SLOT_HEIGHT_PX } from "./grid-layout";
-import { clashLines } from "@schellingboard/domain/meeting-clash-text";
 import { meetingColumnRows } from "./meeting-column";
 import {
   blockStatus,
@@ -27,9 +28,9 @@ import type { MeetingView, MeetingViewStatus } from "./meeting-view";
 import type { DayWithSessions } from "./model";
 import { NowLine } from "./now-line";
 import {
+  type Position,
   PositionedBlock,
   TITLE_MIN_PX,
-  type Position,
 } from "./positioned-block";
 
 const NO_MATCH = " — doesn't match";

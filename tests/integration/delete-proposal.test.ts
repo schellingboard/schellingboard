@@ -1,29 +1,30 @@
 // @module-tag 004-US3
+import { VoteChoice } from "@schellingboard/domain/vote";
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { getRepositories } from "@/db/container";
+
 import { BY_TEST, updateLoggedSession } from "../helpers/changes";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createEvent,
   createGuest,
   createProposal,
   createSession,
 } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
 import {
   GUEST_COOKIE_NAME,
   openGuestValue,
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
-import { VoteChoice } from "@schellingboard/domain/vote";
 import { proposalApi } from "../helpers/proposal-api";
 
 const cookieJar = new Map<string, string>();

@@ -1,17 +1,18 @@
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
 
-import { GET } from "@/tests/helpers/v1-route";
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createEvent, createGuest, createSession } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
+import { GET } from "@/tests/helpers/v1-route";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createEvent, createGuest, createSession } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";

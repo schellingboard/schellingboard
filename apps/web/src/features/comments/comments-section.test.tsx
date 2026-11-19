@@ -1,8 +1,9 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { comment, fakeComments } from "./comments-test-support";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { Comments } from "./comments-section";
+import { comment, fakeComments } from "./comments-test-support";
 
 function show(
   handle = fakeComments(),

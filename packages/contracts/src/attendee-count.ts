@@ -1,8 +1,8 @@
-import { z } from "zod";
 import {
   MAX_ATTENDEE_COUNT,
   MIN_ATTENDEE_COUNT,
 } from "@schellingboard/domain/attendee-count";
+import { z } from "zod";
 
 const RANGE_MESSAGE = `Enter a whole number between ${MIN_ATTENDEE_COUNT} and ${MAX_ATTENDEE_COUNT}`;
 

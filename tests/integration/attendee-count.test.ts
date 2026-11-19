@@ -1,5 +1,5 @@
 // @module-tag 001-US1
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 const cookieJar = new Map<string, string>();
 
@@ -10,18 +10,19 @@ const cookieStore = () => ({
   },
 });
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { getRepositories } from "@/db/container";
+import { sessionUseCases } from "@/server/composition";
+import { actorOf } from "@/server/kernel/session-actor";
+
 import {
   BY_TEST,
   deleteLoggedSession,
   updateLoggedSession,
 } from "../helpers/changes";
-import { siteAuthenticate } from "../helpers/site-auth";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
-import { getRepositories } from "@/db/container";
-import { sessionUseCases } from "@/server/composition";
-import { actorOf } from "@/server/kernel/session-actor";
+import { siteAuthenticate } from "../helpers/site-auth";
 
 const HOUR_MS = 60 * 60 * 1000;
 

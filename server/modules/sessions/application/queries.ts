@@ -1,6 +1,8 @@
 import type { Session } from "@schellingboard/domain/session";
+
 import type { Actor } from "@/server/kernel/actor";
 import { notFound, ok, type Result } from "@/server/kernel/result";
+
 import type { SessionDeps } from "../ports";
 
 // Sessions are public to everyone past the site password; the actor is part

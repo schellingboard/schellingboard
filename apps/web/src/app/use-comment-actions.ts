@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef } from "react";
 import type { ApiClient } from "@schellingboard/api-client";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
+import { useCallback, useEffect, useRef } from "react";
+
 import type { CommandRunner } from "../commands/runner";
 import { createCommentsQuery } from "../queries/comments";
 import {

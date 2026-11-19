@@ -1,12 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter } from "@tanstack/react-router";
 import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
 import { newSortSeed } from "@schellingboard/domain/attendee-search";
+import { useRouter } from "@tanstack/react-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
 import { failureMessage } from "../commands/failure-message";
 import { newKey } from "../commands/keys";
 import { meetingRequestCalls } from "../commands/meeting-request";
 import { profileFormCalls } from "../commands/profile-form";
 import { createCommandRunner } from "../commands/runner";
+import type { CommentsHandle } from "../features/comments/comments-section";
 import { DirectoryScreen } from "../features/people/directory-screen";
 import { peopleLinks, profileLinks } from "../features/people/links";
 import { ProfileForm } from "../features/people/profile-form";
@@ -17,11 +19,10 @@ import {
   type DirectoryQuery,
   type DirectoryState,
 } from "../queries/directory";
-import type { CommentsHandle } from "../features/comments/comments-section";
 import { createProfileActivityQuery } from "../queries/profile-activity";
 import { blankSnapshot } from "../replica/blank";
-import { createReplicaStore } from "../replica/store";
 import { toEvent } from "../replica/selectors";
+import { createReplicaStore } from "../replica/store";
 import { useNotify } from "../ui/notices";
 import { InAppLinks } from "./in-app-links";
 import { PageNotice } from "./page-notice";

@@ -1,6 +1,6 @@
-import { test, expect } from "./helpers/fixtures";
 import { adminLogin } from "./helpers/admin";
 import { login } from "./helpers/auth";
+import { expect, test } from "./helpers/fixtures";
 import { uniqueSuffix } from "./helpers/unique";
 
 test("an organizer's personal link signs a guest in and opens the event @003-US6 @016-US5", async ({

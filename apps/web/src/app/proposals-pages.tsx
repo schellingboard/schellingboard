@@ -1,18 +1,19 @@
-import { useCallback, useEffect, useMemo } from "react";
-import { useRouter } from "@tanstack/react-router";
 import type { VoteChoice } from "@schellingboard/domain/vote";
+import { useRouter } from "@tanstack/react-router";
+import { useCallback, useEffect, useMemo } from "react";
+
 import { joinProposal } from "../commands/join-proposal";
 import { proposalFormCalls } from "../commands/proposal-form";
 import { castVote, withdrawVote } from "../commands/vote";
+import { type ProposalLinks, proposalLinks } from "../features/proposals/links";
 import { ProposalForm } from "../features/proposals/proposal-form";
-import { proposalLinks, type ProposalLinks } from "../features/proposals/links";
 import { ProposalModal } from "../features/proposals/proposal-modal";
 import { ProposalsScreen } from "../features/proposals/proposals-screen";
 import { QuickVotingScreen } from "../features/proposals/quick-voting-screen";
 import { useStandings } from "../features/proposals/use-standings";
 import { createProposalDetailQuery } from "../queries/proposal-detail";
 import { createStandingsQuery } from "../queries/proposal-standings";
-import { useEventView, type EventView } from "./event-page";
+import { type EventView, useEventView } from "./event-page";
 import {
   proposalOpenedByClick,
   takeProposalOpenedByClick,

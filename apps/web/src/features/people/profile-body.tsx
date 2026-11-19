@@ -1,10 +1,11 @@
-import type { ComponentType, ReactNode, SVGProps } from "react";
 import {
   CONTACT_TYPE_LABELS,
   type ContactType,
   type ProfilePrompt,
 } from "@schellingboard/domain/guest";
 import { CORE_PROMPTS } from "@schellingboard/domain/prompt-pool";
+import type { ComponentType, ReactNode, SVGProps } from "react";
+
 import type { DirectoryEntry } from "../../queries/directory";
 import type {
   ProfileActivityState,

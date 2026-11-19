@@ -1,11 +1,12 @@
 import { Browser, Page } from "@playwright/test";
-import { test, expect } from "./helpers/fixtures";
-import { switchToView } from "./helpers/schedule";
-import { uniqueSuffix } from "./helpers/unique";
+
 import { login } from "./helpers/auth";
-import { selectUser } from "./helpers/user";
+import { expect, test } from "./helpers/fixtures";
+import { switchToView } from "./helpers/schedule";
 import { dayRadios, selectOption } from "./helpers/session-form";
 import { dismissToast, toast } from "./helpers/toast";
+import { uniqueSuffix } from "./helpers/unique";
+import { selectUser } from "./helpers/user";
 
 // Alice works in `page`; a second context is another attendee's screen or the
 // kiosk and is never reloaded. Slots in Workshop Room on the last day are unclaimed.

@@ -1,11 +1,13 @@
-import { describe, it, expect, afterEach } from "vitest";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+
+import { afterEach, describe, expect, it } from "vitest";
+
 import {
-  normalizeSignature,
-  loadHunt,
   buildReport,
+  loadHunt,
+  normalizeSignature,
 } from "@/scripts/e2e-flake-report";
 
 const tmpDirs: string[] = [];

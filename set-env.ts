@@ -1,8 +1,8 @@
+import { spawnSync } from "child_process";
+import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
-import { spawnSync } from "child_process";
 import { fileURLToPath } from "url";
-import dotenv from "dotenv";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

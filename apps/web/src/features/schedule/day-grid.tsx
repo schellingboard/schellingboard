@@ -1,11 +1,12 @@
-import { DateTime } from "luxon";
 import type { Location } from "@schellingboard/domain/location";
 import { getNumSlots } from "@schellingboard/domain/slots";
 import { TIME_FORMAT } from "@schellingboard/domain/time";
-import { InformationCircleIcon } from "../../ui/icons";
-import { Tooltip } from "../../ui/tooltip";
+import { DateTime } from "luxon";
+
 import { cx } from "../../ui/cx";
+import { InformationCircleIcon } from "../../ui/icons";
 import { LocationPlaceholder } from "../../ui/location-placeholder";
+import { Tooltip } from "../../ui/tooltip";
 import { useSchedule } from "./context";
 import { getNowOffsetPx } from "./grid-layout";
 import { LocationCol } from "./location-col";

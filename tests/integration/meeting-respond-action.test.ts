@@ -1,11 +1,11 @@
 // @module-tag 012-US4
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
 
@@ -15,18 +15,20 @@ vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
 }));
 
-import { isoDay } from "../helpers/dates";
-import { runJobs } from "../helpers/jobs";
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { siteAuthenticate } from "../helpers/site-auth";
-import { createEvent, createGuest } from "../helpers/factories";
-import { GUEST_COOKIE_NAME, verifiedGuestValue } from "../helpers/guest-cookie";
+import type { Event } from "@schellingboard/domain/event";
+import type { Guest } from "@schellingboard/domain/guest";
+import type { Meeting } from "@schellingboard/domain/meeting";
+
 import { getRepositories } from "@/db/container";
 import { sendMail } from "@/utils/mailer";
+
+import { isoDay } from "../helpers/dates";
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createEvent, createGuest } from "../helpers/factories";
+import { GUEST_COOKIE_NAME, verifiedGuestValue } from "../helpers/guest-cookie";
+import { runJobs } from "../helpers/jobs";
 import { meetingApi } from "../helpers/meeting-api";
-import type { Meeting } from "@schellingboard/domain/meeting";
-import type { Guest } from "@schellingboard/domain/guest";
-import type { Event } from "@schellingboard/domain/event";
+import { siteAuthenticate } from "../helpers/site-auth";
 
 const { respondToMeeting, cancelMeeting } = meetingApi(cookieJar);
 

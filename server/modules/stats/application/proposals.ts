@@ -7,7 +7,8 @@ import {
 } from "@schellingboard/domain/stats/filter";
 import { pseudonymize } from "@schellingboard/domain/stats/pseudonyms";
 import { DateTime } from "luxon";
-import { col, percent, round, tallyVotes, type Cell } from "./cells";
+
+import { type Cell, col, percent, round, tallyVotes } from "./cells";
 
 const QUARTERS = [
   "Top quarter",

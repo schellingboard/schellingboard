@@ -1,8 +1,9 @@
 // @module-tag 007-US8
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { connectFeed } from "./feed-client";
-import { createReplicaStore } from "./store";
 import { snapshot } from "./snapshot-fixture";
+import { createReplicaStore } from "./store";
 
 const SERVER = Date.parse(snapshot.now);
 

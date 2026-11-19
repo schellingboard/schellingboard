@@ -1,7 +1,8 @@
-import { useCallback, useState } from "react";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { inVotingPhase } from "@schellingboard/domain/phase";
 import type { VoteChoice } from "@schellingboard/domain/vote";
+import { useCallback, useState } from "react";
+
 import type {
   Standing,
   StandingsState,

@@ -1,12 +1,13 @@
 import { Page } from "@playwright/test";
-import { test, expect } from "./helpers/fixtures";
-import { login } from "./helpers/auth";
-import { openNameSwitcher, selectUser, tapUntilOpen } from "./helpers/user";
+
 import {
   getMessage,
   newestBySubjectTo,
   skipWithoutMailpit,
 } from "../helpers/mailpit";
+import { login } from "./helpers/auth";
+import { expect, test } from "./helpers/fixtures";
+import { openNameSwitcher, selectUser, tapUntilOpen } from "./helpers/user";
 
 // Priya Sharma is used by no other spec, so her protection settings can be
 // mutated without racing parallel test files.

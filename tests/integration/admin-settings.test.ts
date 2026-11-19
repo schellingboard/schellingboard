@@ -1,30 +1,31 @@
 // @module-tag 015-US5
-import {
-  describe,
-  it,
-  expect,
-  beforeAll,
-  beforeEach,
-  afterEach,
-  vi,
-} from "vitest";
+import { DEFAULT_SITE_SETTINGS } from "@schellingboard/domain/site-settings";
 import fs from "fs";
 import os from "os";
 import path from "path";
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
+
+import { getRepositories } from "@/db/container";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
+import { createSettingsUseCases } from "@/server/modules/settings/module";
+import { createImageFile } from "@/tests/helpers/utils";
+import { mapImages } from "@/utils/map-image";
 
 import {
   loginAsAdmin,
   logoutAdmin,
   updateSettingsAction,
 } from "../helpers/admin-api";
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { getRepositories } from "@/db/container";
-import { createImageFile } from "@/tests/helpers/utils";
-import { DEFAULT_SITE_SETTINGS } from "@schellingboard/domain/site-settings";
-import { unitOfWork } from "@/server/kernel/unit-of-work";
-import { createSettingsUseCases } from "@/server/modules/settings/module";
-import { mapImages } from "@/utils/map-image";
 import { uowFailingAt } from "../helpers/changes";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef"; // 32 chars
 

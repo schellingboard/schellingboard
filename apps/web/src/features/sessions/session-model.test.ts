@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
+
 import { iso, snapshot } from "../../replica/snapshot-fixture";
 import {
   closestAtMost,
   dayFrom,
   hostClashLine,
   minutesPastGrid,
-  startTimesFor,
   type SessionRow,
+  startTimesFor,
 } from "./session-model";
 
 const day = dayFrom(snapshot.days[0]);

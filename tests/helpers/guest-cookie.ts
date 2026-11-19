@@ -1,5 +1,6 @@
-import Database from "better-sqlite3";
 import type { LoginAssurance, LoginVia } from "@schellingboard/domain/auth";
+import Database from "better-sqlite3";
+
 import { resolveDbPath } from "@/db/migrate";
 import { GUEST_COOKIE_NAME } from "@/utils/auth";
 import {

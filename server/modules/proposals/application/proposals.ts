@@ -1,18 +1,20 @@
-import { changes, type ChangeContext } from "@schellingboard/domain/change";
+import { type ChangeContext, changes } from "@schellingboard/domain/change";
 import { inSchedPhase } from "@schellingboard/domain/phase";
 import type { SessionProposal } from "@schellingboard/domain/session";
+
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import { byActor } from "@/server/kernel/change-context";
-import { recordingVoteLoss } from "@/server/kernel/vote-cascade";
 import {
   conflict,
+  type Failure,
   forbidden,
   notFound,
   ok,
-  type Failure,
   type Result,
 } from "@/server/kernel/result";
+import { recordingVoteLoss } from "@/server/kernel/vote-cascade";
+
 import type { ProposalDeps } from "../ports";
 import {
   changedMeanwhile,

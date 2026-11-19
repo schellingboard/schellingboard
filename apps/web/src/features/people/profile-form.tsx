@@ -1,28 +1,29 @@
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type DragEvent,
-  type FormEvent,
-  type ReactNode,
-} from "react";
 import { profileBodySchema } from "@schellingboard/contracts/guest";
 import { AVATAR_MAX_SIZE } from "@schellingboard/domain/avatar-image";
 import {
   CONTACT_TYPE_LABELS,
   CONTACT_TYPES,
+  type ContactType,
   MAX_CONTACTS,
   MAX_LANGUAGES,
-  type ContactType,
 } from "@schellingboard/domain/guest";
 import { languageSuggestions } from "@schellingboard/domain/language-suggestions";
 import { CORE_PROMPTS, PROMPT_POOL } from "@schellingboard/domain/prompt-pool";
 import { containsIgnoringAccents } from "@schellingboard/domain/search-text";
 import {
+  type DragEvent,
+  type FormEvent,
+  type ReactNode,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
+import {
+  type FieldErrors,
   FIX_FIELDS_MESSAGE,
   validateFields,
-  type FieldErrors,
 } from "../../commands/mutation";
 import type {
   ProfileBody,
@@ -31,8 +32,6 @@ import type {
 import { useFormMutation } from "../../commands/use-form-mutation";
 import type { DirectoryEntry } from "../../queries/directory";
 import { Avatar } from "../../ui/avatar";
-import { ArrowPathIcon } from "../../ui/icons";
-import { Tooltip } from "../../ui/tooltip";
 import { Button } from "../../ui/button";
 import {
   ComboboxField,
@@ -41,7 +40,9 @@ import {
   TextField,
 } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
+import { ArrowPathIcon } from "../../ui/icons";
 import { resizeImage } from "../../ui/resize-image";
+import { Tooltip } from "../../ui/tooltip";
 
 export type ProfileDraft = Pick<
   DirectoryEntry,

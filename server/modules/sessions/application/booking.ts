@@ -9,17 +9,19 @@ import {
   type SessionInterval,
   type SessionPlacementCode,
 } from "@schellingboard/domain/session-booking";
+
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import {
   conflict,
+  type Failure,
   forbidden,
   invalid,
   notFound,
-  versionConflict,
-  type Failure,
   type Result,
+  versionConflict,
 } from "@/server/kernel/result";
+
 import type { SessionDeps } from "../ports";
 
 export interface SessionBooking {

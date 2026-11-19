@@ -1,17 +1,18 @@
 // @module-tag 012-US3
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import type { Event } from "@schellingboard/domain/event";
+import type { Guest } from "@schellingboard/domain/guest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import {
-  createEvent,
-  createGuest,
-  createDay,
-  createSession,
-} from "../helpers/factories";
 import { getRepositories } from "@/db/container";
 import { meetingUseCases } from "@/server/composition";
-import type { Guest } from "@schellingboard/domain/guest";
-import type { Event } from "@schellingboard/domain/event";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import {
+  createDay,
+  createEvent,
+  createGuest,
+  createSession,
+} from "../helpers/factories";
 
 const DAY_START = new Date("2026-10-01T09:00:00.000Z");
 const DAY_END = new Date("2026-10-01T12:00:00.000Z");

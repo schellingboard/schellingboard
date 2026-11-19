@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
+
 import { hardReload } from "./hard-navigate";
 
 export class ErrorBoundary extends Component<

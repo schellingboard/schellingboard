@@ -1,5 +1,6 @@
-import { changes, type ChangeContext } from "@schellingboard/domain/change";
+import { type ChangeContext, changes } from "@schellingboard/domain/change";
 import type { SessionProposal } from "@schellingboard/domain/session";
+
 import type { Tx } from "./unit-of-work";
 
 const hostsOf = (p: SessionProposal) =>

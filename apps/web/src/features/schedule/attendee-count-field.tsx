@@ -1,9 +1,10 @@
-import { useEffect, useId, useState, type FormEvent } from "react";
 import { attendeeCountFormSchema } from "@schellingboard/contracts/attendee-count";
 import {
   MAX_ATTENDEE_COUNT,
   MIN_ATTENDEE_COUNT,
 } from "@schellingboard/domain/attendee-count";
+import { type FormEvent, useEffect, useId, useState } from "react";
+
 import { describeSession } from "../../commands/subject";
 import { useNotify } from "../../ui/notices";
 import { useSchedule } from "./context";

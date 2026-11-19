@@ -7,6 +7,7 @@ import {
 } from "@schellingboard/domain/stats/filter";
 import { pseudonymize } from "@schellingboard/domain/stats/pseudonyms";
 import { DateTime } from "luxon";
+
 import { col, doublingEdges, percent } from "./cells";
 
 const MINUTE = 60_000;

@@ -1,5 +1,6 @@
-import type { ReactNode, RefObject } from "react";
 import type { Location } from "@schellingboard/domain/location";
+import type { ReactNode, RefObject } from "react";
+
 import { DayAgenda } from "./day-agenda";
 import { DayFoldBar } from "./day-fold-bar";
 import { agendaDayFold, type ScheduleEntry } from "./model";

@@ -15,13 +15,12 @@
 //
 //   bun x tsx scripts/dump-release-db.ts v3.4.2
 
+import Database from "better-sqlite3";
 import { execFileSync, spawnSync } from "child_process";
 import fs from "fs";
 import os from "os";
 import path from "path";
 import { fileURLToPath } from "url";
-
-import Database from "better-sqlite3";
 
 import {
   DUMP_DIR as dumpDir,

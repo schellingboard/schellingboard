@@ -1,14 +1,16 @@
 // @module-tag 019-US7
-import { describe, it, expect, beforeAll, beforeEach, afterEach } from "vitest";
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createEvent, createSession } from "../helpers/factories";
-import { BY_TEST } from "../helpers/changes";
-import { getRepositories } from "@/db/container";
-import { unitOfWork, type Tx } from "@/server/kernel/unit-of-work";
-import { subscribeToChanges } from "@/server/kernel/change-subscribers";
-import { conflict } from "@/server/kernel/result";
-import { commandKey, withCommandKey } from "@/server/kernel/command-key";
 import { changes, type RecordedChange } from "@schellingboard/domain/change";
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
+
+import { getRepositories } from "@/db/container";
+import { subscribeToChanges } from "@/server/kernel/change-subscribers";
+import { commandKey, withCommandKey } from "@/server/kernel/command-key";
+import { conflict } from "@/server/kernel/result";
+import { type Tx, unitOfWork } from "@/server/kernel/unit-of-work";
+
+import { BY_TEST } from "../helpers/changes";
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createEvent, createSession } from "../helpers/factories";
 
 function gate() {
   let open!: () => void;

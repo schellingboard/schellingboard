@@ -6,6 +6,8 @@ import {
   meetingPointSchema,
   meetingPointUpdateBodySchema,
 } from "@schellingboard/contracts/meeting";
+import type { MeetingPoint } from "@schellingboard/domain/meeting";
+
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import {
   problem,
@@ -13,14 +15,14 @@ import {
   versionConflictResponse,
 } from "@/server/http/problem";
 import {
+  type App,
   body,
   idParam,
   json,
   noContent,
-  type App,
 } from "@/server/http/route-parts";
 import { toEventView } from "@/server/modules/events/module";
-import type { MeetingPoint } from "@schellingboard/domain/meeting";
+
 import type { MeetingUseCases } from "../application/use-cases";
 
 const pointParams = z.object({

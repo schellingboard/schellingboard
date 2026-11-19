@@ -1,8 +1,9 @@
+import { render } from "@react-email/render";
 import nodemailer, { type Transporter } from "nodemailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
-import TurndownService from "turndown";
-import { render } from "@react-email/render";
 import type { ReactElement } from "react";
+import TurndownService from "turndown";
+
 import { siteUrl } from "@/utils/site-url";
 
 const turndown = new TurndownService();

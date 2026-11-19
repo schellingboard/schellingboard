@@ -1,13 +1,14 @@
-import { useRef, useState, type FormEvent } from "react";
 import {
   DEFAULT_LOCATION_COLOR,
-  LOCATION_COLOR_NAMES,
   isLocationColorName,
+  LOCATION_COLOR_NAMES,
 } from "@schellingboard/domain/location-colors";
 import {
   IMAGE_REQUIREMENTS_HINT,
   MAX_IMAGE_BYTES,
 } from "@schellingboard/domain/location-image-constraints";
+import { type FormEvent, useRef, useState } from "react";
+
 import type { AdminLocationCalls } from "../../commands/admin-locations";
 import type { FieldErrors } from "../../commands/mutation";
 import { useFormMutation } from "../../commands/use-form-mutation";

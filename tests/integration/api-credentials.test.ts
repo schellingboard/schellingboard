@@ -1,16 +1,17 @@
 // @module-tag 003-US3
 // @module-tag 003-US4
 // @module-tag 003-US5
+import { render } from "@react-email/render";
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
-import { render } from "@react-email/render";
+
 import { DELETE, GET, POST, PUT } from "@/tests/helpers/v1-route";
 
 vi.mock("@/utils/mailer", () => ({
@@ -21,9 +22,10 @@ vi.mock("@/utils/mailer", () => ({
 import { getRepositories } from "@/db/container";
 import { LOGIN_LIMITS, resetRateLimits } from "@/server/kernel/rate-limit";
 import { hashSessionToken } from "@/utils/login-session-token";
-import { hashUserPassword } from "@/utils/user-credentials";
 import { isMailerConfigured, sendMail } from "@/utils/mailer";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { hashUserPassword } from "@/utils/user-credentials";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import { createEvent, createGuest } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, sessionGuestValue } from "../helpers/guest-cookie";
 

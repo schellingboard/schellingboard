@@ -1,6 +1,7 @@
 import fs from "fs";
-import { test, expect } from "./helpers/fixtures";
+
 import { adminLogin } from "./helpers/admin";
+import { expect, test } from "./helpers/fixtures";
 
 // Read-only on the seeded Conference Gamma, so it can run beside the other specs.
 test("reads the statistics, leaves a location and a host out and downloads the tables @021-US1 @021-US2 @021-US3", async ({

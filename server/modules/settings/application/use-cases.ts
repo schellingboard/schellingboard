@@ -1,7 +1,7 @@
 import type { SettingsDeps } from "../ports";
 import {
-  getSiteSettings,
   getPublicSiteSettings,
+  getSiteSettings,
   updateSiteSettings,
 } from "./settings";
 

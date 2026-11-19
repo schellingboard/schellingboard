@@ -1,10 +1,10 @@
-import { describe, it, expect } from "vitest";
 import {
-  sessionOverlapsWindow,
-  sessionContainedInWindow,
   sessionBookingWindowError,
+  sessionContainedInWindow,
+  sessionOverlapsWindow,
 } from "@schellingboard/domain/day-window";
 import type { Day } from "@schellingboard/domain/event";
+import { describe, expect, it } from "vitest";
 
 const winStart = new Date("2026-10-01T09:00:00Z");
 const winEnd = new Date("2026-10-01T18:00:00Z");

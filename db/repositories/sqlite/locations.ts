@@ -1,9 +1,10 @@
+import type { Location } from "@schellingboard/domain/location";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
+
 import * as schema from "../../schema";
 import type { LocationsRepository } from "../interfaces";
-import type { Location } from "@schellingboard/domain/location";
 
 type DB = BetterSQLite3Database<typeof schema>;
 type Tx = Parameters<Parameters<DB["transaction"]>[0]>[0];

@@ -1,16 +1,17 @@
-import { and, count, eq, inArray, isNotNull, sql } from "drizzle-orm";
-import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
-import { nanoid } from "nanoid";
-import * as schema from "../../schema";
-import type {
-  SessionProposalCreateInput,
-  SessionProposalUpdateInput,
-  SessionProposalsRepository,
-} from "../interfaces";
 import type {
   ProposalHost,
   SessionProposal,
 } from "@schellingboard/domain/session";
+import { and, count, eq, inArray, isNotNull, sql } from "drizzle-orm";
+import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+import { nanoid } from "nanoid";
+
+import * as schema from "../../schema";
+import type {
+  SessionProposalCreateInput,
+  SessionProposalsRepository,
+  SessionProposalUpdateInput,
+} from "../interfaces";
 
 type DB = BetterSQLite3Database<typeof schema>;
 type ProposalRow = typeof schema.sessionProposals.$inferSelect;

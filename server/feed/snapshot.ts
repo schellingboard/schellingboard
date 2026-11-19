@@ -1,4 +1,5 @@
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
+
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import { newestSeq } from "@/server/kernel/change-log";
@@ -14,12 +15,12 @@ import {
   toMeetingPointView,
   toMeetingView,
 } from "@/server/modules/meetings/module";
+import { eventGuests, toEventGuestView } from "@/server/modules/people/module";
 import {
   eventProposals,
   guestVotes,
   toSnapshotProposalView,
 } from "@/server/modules/proposals/module";
-import { eventGuests, toEventGuestView } from "@/server/modules/people/module";
 import {
   eventSessions,
   toSnapshotSessionView,

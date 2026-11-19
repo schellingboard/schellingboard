@@ -1,5 +1,6 @@
-import { defineConfig } from "vitest/config";
 import path from "path";
+import { defineConfig } from "vitest/config";
+
 import { useCases } from "./tests/use-cases.ts";
 
 export default defineConfig({

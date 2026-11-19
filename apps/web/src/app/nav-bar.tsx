@@ -1,4 +1,5 @@
-import { useState, type ReactNode } from "react";
+import { type ReactNode, useState } from "react";
+
 import { EventIcon } from "../ui/event-icon";
 
 export type NavItem = { name: string; href: string; icon?: string | null };

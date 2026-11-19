@@ -1,10 +1,10 @@
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
 
@@ -19,7 +19,11 @@ vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
 }));
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { getRepositories } from "@/db/container";
+import { api } from "@/server/http/app";
+import { web } from "@/server/http/web";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createDay,
   createEvent,
@@ -28,9 +32,6 @@ import {
   slotStart,
 } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
-import { getRepositories } from "@/db/container";
-import { api } from "@/server/http/app";
-import { web } from "@/server/http/web";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 

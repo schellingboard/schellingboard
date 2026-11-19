@@ -1,9 +1,10 @@
+import type { LocationUnavailability } from "@schellingboard/domain/location";
 import { asc, eq } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
+
 import * as schema from "../../schema";
 import type { LocationUnavailabilityRepository } from "../interfaces";
-import type { LocationUnavailability } from "@schellingboard/domain/location";
 
 type DB = BetterSQLite3Database<typeof schema>;
 

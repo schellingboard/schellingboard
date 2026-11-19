@@ -1,25 +1,27 @@
-import { z } from "zod";
 import {
   locationSchema,
   updateLocationSchema,
 } from "@schellingboard/contracts/location";
 import { changes } from "@schellingboard/domain/change";
 import type { Location } from "@schellingboard/domain/location";
+import { z } from "zod";
+
 import type { Actor } from "@/server/kernel/actor";
-import { recordingSessionCascade } from "@/server/kernel/session-cascade";
-import type { Tx } from "@/server/kernel/unit-of-work";
-import { withStoredFile } from "@/server/kernel/stored-files";
+import { byAdmin } from "@/server/kernel/change-context";
 import {
+  type Failure,
   forbidden,
   invalid,
   invalidFields,
   notFound,
   ok,
-  versionConflict,
-  type Failure,
   type Result,
+  versionConflict,
 } from "@/server/kernel/result";
-import { byAdmin } from "@/server/kernel/change-context";
+import { recordingSessionCascade } from "@/server/kernel/session-cascade";
+import { withStoredFile } from "@/server/kernel/stored-files";
+import type { Tx } from "@/server/kernel/unit-of-work";
+
 import type { VenueDeps } from "../ports";
 import {
   recordLocationChanged,

@@ -1,16 +1,18 @@
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
-import { GET, PUT, DELETE } from "@/tests/helpers/v1-route";
-import { createAdminAuthCookie } from "../helpers/admin-cookie";
+
 import { getRepositories } from "@/db/container";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { DELETE, GET, PUT } from "@/tests/helpers/v1-route";
+
+import { createAdminAuthCookie } from "../helpers/admin-cookie";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createEvent,
   createGuest,

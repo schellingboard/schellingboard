@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
 import type { ApiClient } from "@schellingboard/api-client";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
+import { useEffect, useState } from "react";
+
 import type { NavItem } from "./nav-bar";
 
 export type EventSummary = Snapshot["event"];

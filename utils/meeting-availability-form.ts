@@ -1,10 +1,11 @@
-import type { Repositories } from "@/db/container";
-import { type Event, compareEventsByStart } from "@schellingboard/domain/event";
-import { meetingsOpen } from "@/utils/meeting-rules";
+import { compareEventsByStart, type Event } from "@schellingboard/domain/event";
 import {
-  availabilityFormFor,
   type AvailabilityFormData,
+  availabilityFormFor,
 } from "@schellingboard/domain/meeting-slot-days";
+
+import type { Repositories } from "@/db/container";
+import { meetingsOpen } from "@/utils/meeting-rules";
 
 /**
  * One form per event the guest can still be booked at: attended, offering

@@ -1,18 +1,20 @@
-import { byAdmin } from "@/server/kernel/change-context";
-import { changes, type ChangeContext } from "@schellingboard/domain/change";
+import { type ChangeContext, changes } from "@schellingboard/domain/change";
 import type { Session } from "@schellingboard/domain/session";
+
 import type { Actor } from "@/server/kernel/actor";
-import { recordingShownGuests } from "@/server/kernel/shown-guests";
+import { byAdmin } from "@/server/kernel/change-context";
 import {
   conflict,
+  type Failure,
   forbidden,
   invalid,
   notFound,
   ok,
-  type Failure,
   type Result,
 } from "@/server/kernel/result";
+import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import type { Tx } from "@/server/kernel/unit-of-work";
+
 import type { SessionDeps } from "../ports";
 import { changedMeanwhile } from "./booking";
 import {

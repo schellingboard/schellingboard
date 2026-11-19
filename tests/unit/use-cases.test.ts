@@ -1,11 +1,12 @@
-import { describe, it, expect } from "vitest";
-import { features, useCases } from "@/tests/use-cases";
+import { describe, expect, it } from "vitest";
+
 import {
   listE2eTests,
   renderReport,
   summarise,
   type TaggedTest,
 } from "@/scripts/use-cases";
+import { features, useCases } from "@/tests/use-cases";
 
 function tagged(
   tier: TaggedTest["tier"],

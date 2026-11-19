@@ -1,25 +1,26 @@
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createGuest } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
+import {
+  unverifiedUserMessage,
+  verifiedCurrentUser,
+} from "@/utils/acting-guest";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createGuest } from "../helpers/factories";
 import {
   GUEST_COOKIE_NAME,
   openGuestValue,
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
-import {
-  unverifiedUserMessage,
-  verifiedCurrentUser,
-} from "@/utils/acting-guest";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 

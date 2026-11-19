@@ -1,8 +1,10 @@
-import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { COMMENT_MAX_LENGTH } from "@schellingboard/domain/comment";
 import { formatInLocalZone } from "@schellingboard/domain/time";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
+
 import type { CommentView } from "../../commands/comment";
 import type { CommentsState } from "../../queries/comments";
+import type { CommentsQuery } from "../../queries/comments";
 import type {
   CommentResult,
   CommentsController,
@@ -11,7 +13,6 @@ import { ConfirmDialog } from "../../ui/confirm-dialog";
 import { Dialog } from "../../ui/dialog";
 import { Markdown } from "../../ui/markdown";
 import { Tooltip } from "../../ui/tooltip";
-import type { CommentsQuery } from "../../queries/comments";
 
 export type CommentsHandle = {
   query: CommentsQuery;

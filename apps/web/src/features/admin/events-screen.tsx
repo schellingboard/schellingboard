@@ -1,8 +1,9 @@
-import { useMemo, useState, type FormEvent } from "react";
 import type { IdentityMode } from "@schellingboard/domain/event";
 import { formatEventDates } from "@schellingboard/domain/time";
+import { type FormEvent, useMemo, useState } from "react";
+
 import type { AdminEventCalls } from "../../commands/admin-events";
-import { FIX_FIELDS_MESSAGE, type FieldErrors } from "../../commands/mutation";
+import { type FieldErrors, FIX_FIELDS_MESSAGE } from "../../commands/mutation";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import type { AdminEvent } from "../../queries/admin-events";
 import { Button } from "../../ui/button";

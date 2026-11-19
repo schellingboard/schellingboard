@@ -1,11 +1,11 @@
+import Database from "better-sqlite3";
 import fs from "fs";
 import os from "os";
 import path from "path";
-
-import Database from "better-sqlite3";
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { runMigrations } from "@/db/migrate";
+
 import { MIGRATIONS, migrationsBefore } from "../helpers/migrations";
 
 // Sessions used to be stored from their slot's start, and every screen added

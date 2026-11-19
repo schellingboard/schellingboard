@@ -1,11 +1,11 @@
-import { describe, it, expect, afterEach, vi } from "vitest";
-import { dateStartDescription } from "@schellingboard/domain/phase-opens-text";
+import type { Event } from "@schellingboard/domain/event";
 import {
   EventPhase,
   getCurrentPhase,
   schedulingEnded,
 } from "@schellingboard/domain/phase";
-import type { Event } from "@schellingboard/domain/event";
+import { dateStartDescription } from "@schellingboard/domain/phase-opens-text";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const ago = (days: number) => new Date(Date.now() - days * DAY_MS);

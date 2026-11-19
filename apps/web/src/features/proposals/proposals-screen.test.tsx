@@ -1,4 +1,6 @@
 // @module-tag 004-US5
+import type { Snapshot } from "@schellingboard/contracts/snapshot";
+import { VoteChoice } from "@schellingboard/domain/vote";
 import {
   cleanup,
   render,
@@ -7,14 +9,13 @@ import {
   within,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { Snapshot } from "@schellingboard/contracts/snapshot";
-import { VoteChoice } from "@schellingboard/domain/vote";
 import { afterEach, describe, expect, it, vi } from "vitest";
+
+import type { Standing } from "../../queries/proposal-standings";
 import { iso, snapshot as fixture } from "../../replica/snapshot-fixture";
 import { NoticeProvider } from "../../ui/notices";
 import { proposalLinks } from "./links";
 import { ProposalsScreen } from "./proposals-screen";
-import type { Standing } from "../../queries/proposal-standings";
 
 afterEach(cleanup);
 

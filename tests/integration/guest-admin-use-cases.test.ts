@@ -1,15 +1,16 @@
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createEvent, createGuest } from "../helpers/factories";
-import { uowFailingAt } from "../helpers/changes";
 import { getRepositories } from "@/db/container";
-import { unitOfWork, type UnitOfWork } from "@/server/kernel/unit-of-work";
-import { createPeopleUseCases } from "@/server/modules/people/module";
-import { createSettingsUseCases } from "@/server/modules/settings/module";
 import type { Actor } from "@/server/kernel/actor";
 import type { Result } from "@/server/kernel/result";
+import { type UnitOfWork, unitOfWork } from "@/server/kernel/unit-of-work";
+import { createPeopleUseCases } from "@/server/modules/people/module";
+import { createSettingsUseCases } from "@/server/modules/settings/module";
 import { getImageRepositories } from "@/utils/images";
+
+import { uowFailingAt } from "../helpers/changes";
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createEvent, createGuest } from "../helpers/factories";
 
 const ADMIN: Actor = { admin: true, guest: null };
 const NOBODY: Actor = { admin: false, guest: null };

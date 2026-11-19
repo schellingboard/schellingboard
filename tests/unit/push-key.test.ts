@@ -1,7 +1,6 @@
-import { describe, it, expect } from "vitest";
-import * as webpush from "web-push";
-
 import { urlBase64ToUint8Array } from "@schellingboard/domain/push-key";
+import { describe, expect, it } from "vitest";
+import * as webpush from "web-push";
 
 describe("urlBase64ToUint8Array", () => {
   // A real VAPID public key is 65 bytes, which is not a multiple of 3 — so it

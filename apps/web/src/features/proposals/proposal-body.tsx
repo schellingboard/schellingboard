@@ -1,5 +1,6 @@
 import { durationMinusBreak } from "@schellingboard/domain/slots";
 import { formatDuration } from "@schellingboard/domain/time";
+
 import { Markdown } from "../../ui/markdown";
 import type { ProposalLinks } from "./links";
 

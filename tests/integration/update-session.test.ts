@@ -1,12 +1,12 @@
 // @module-tag 008-US2
 // @module-tag 013-US4
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
 
@@ -15,32 +15,34 @@ vi.mock("@/utils/mailer", () => ({
 }));
 
 import { render } from "@react-email/render";
+import type { Day } from "@schellingboard/domain/event";
+import type { Guest } from "@schellingboard/domain/guest";
+import type { Location } from "@schellingboard/domain/location";
+import type { Session } from "@schellingboard/domain/session";
+
+import { getRepositories } from "@/db/container";
 import { sendMail } from "@/utils/mailer";
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { runJobs } from "../helpers/jobs";
+
 import { BY_TEST, updateLoggedSession } from "../helpers/changes";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
+  createDay,
   createEvent,
   createGuest,
   createLocation,
-  createDay,
   createSession,
-  slotStart,
   createUnavailability,
+  slotStart,
 } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
 import {
   GUEST_COOKIE_NAME,
   openGuestValue,
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
+import { runJobs } from "../helpers/jobs";
+import type { SessionParams } from "../helpers/session-form";
 import { addSession as addPOST } from "../helpers/session-form";
 import { updateSession as POST } from "../helpers/session-form";
-import type { SessionParams } from "../helpers/session-form";
-import type { Session } from "@schellingboard/domain/session";
-import type { Location } from "@schellingboard/domain/location";
-import type { Guest } from "@schellingboard/domain/guest";
-import type { Day } from "@schellingboard/domain/event";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 

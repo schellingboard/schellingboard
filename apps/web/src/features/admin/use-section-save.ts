@@ -1,6 +1,7 @@
-import { useRef, useState, type FormEvent } from "react";
 import { STALE_EVENT_MESSAGE } from "@schellingboard/contracts/event";
-import { FIX_FIELDS_MESSAGE, type FieldErrors } from "../../commands/mutation";
+import { type FormEvent, useRef, useState } from "react";
+
+import { type FieldErrors, FIX_FIELDS_MESSAGE } from "../../commands/mutation";
 import type { CommandResponse } from "../../commands/runner";
 import { useFormMutation } from "../../commands/use-form-mutation";
 

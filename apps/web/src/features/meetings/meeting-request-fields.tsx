@@ -1,6 +1,6 @@
-import type { Notice } from "../../ui/notices";
 import { Button } from "../../ui/button";
 import { TextField } from "../../ui/form";
+import type { Notice } from "../../ui/notices";
 
 export type MeetingPointChoice = {
   id: string;

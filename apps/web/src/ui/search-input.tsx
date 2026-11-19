@@ -1,4 +1,5 @@
-import { useRef, type ComponentPropsWithoutRef } from "react";
+import { type ComponentPropsWithoutRef, useRef } from "react";
+
 import { cx } from "./cx";
 import { XMarkIcon } from "./icons";
 

@@ -1,11 +1,12 @@
 import { Page, Route } from "@playwright/test";
 import sharp from "sharp";
-import { test, expect } from "./helpers/fixtures";
-import { uniqueSuffix } from "./helpers/unique";
-import { loginAndGoto } from "./helpers/auth";
-import { expectImageLoaded } from "./helpers/images";
-import { selectUser } from "./helpers/user";
+
 import { adminLogin, enterSitePassword } from "./helpers/admin";
+import { loginAndGoto } from "./helpers/auth";
+import { expect, test } from "./helpers/fixtures";
+import { expectImageLoaded } from "./helpers/images";
+import { uniqueSuffix } from "./helpers/unique";
+import { selectUser } from "./helpers/user";
 
 async function gotoUsers(page: Page) {
   await page

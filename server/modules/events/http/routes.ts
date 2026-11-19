@@ -10,6 +10,7 @@ import {
   eventUpdateBodySchema,
   eventViewSchema,
 } from "@schellingboard/contracts/event";
+
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import {
   problem,
@@ -17,12 +18,13 @@ import {
   versionConflictResponse,
 } from "@/server/http/problem";
 import {
+  type App,
   body,
   idParam,
   json,
   noContent,
-  type App,
 } from "@/server/http/route-parts";
+
 import type { EventUseCases } from "../application/use-cases";
 import { toDayView, toEventView } from "./view";
 

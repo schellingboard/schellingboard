@@ -1,6 +1,7 @@
 // @module-tag 007-US7
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, render } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { KioskController } from "./kiosk";
 import { scrollNowLineIntoView } from "./now-line";
 

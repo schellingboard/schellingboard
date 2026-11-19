@@ -1,9 +1,9 @@
-import { describe, it, expect } from "vitest";
 import {
-  normalizeForSearch,
   containsIgnoringAccents,
   equalsIgnoringAccents,
+  normalizeForSearch,
 } from "@schellingboard/domain/search-text";
+import { describe, expect, it } from "vitest";
 
 describe("normalizeForSearch", () => {
   it("trims, lowercases and strips accents", () => {

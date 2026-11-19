@@ -1,4 +1,5 @@
-import { changes, type ChangeContext } from "@schellingboard/domain/change";
+import { type ChangeContext, changes } from "@schellingboard/domain/change";
+
 import type { Tx } from "./unit-of-work";
 
 /**

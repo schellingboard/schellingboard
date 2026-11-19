@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
+
 import type { AdminSession } from "../../queries/admin-sessions";
 import {
   CAPACITY_ERROR,
+  type DayOption,
   EMPTY_SESSION,
   sessionBody,
   sessionFormValues,
-  type DayOption,
 } from "./admin-session-model";
 
 const TZ = "Europe/Berlin";

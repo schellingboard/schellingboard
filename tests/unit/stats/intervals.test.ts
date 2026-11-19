@@ -1,5 +1,3 @@
-import fc from "fast-check";
-import { describe, expect, it } from "vitest";
 import {
   backToBackPairs,
   gapsWithin,
@@ -10,6 +8,8 @@ import {
   overlappingCounts,
   utilization,
 } from "@schellingboard/domain/stats/intervals";
+import fc from "fast-check";
+import { describe, expect, it } from "vitest";
 
 const iv = (start: number, end: number) => ({ start, end });
 

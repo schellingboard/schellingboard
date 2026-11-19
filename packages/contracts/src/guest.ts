@@ -1,10 +1,11 @@
-import { z } from "zod";
 import {
   CONTACT_TYPES,
+  type EmailSettings,
   MAX_CONTACTS,
   MAX_LANGUAGES,
-  type EmailSettings,
 } from "@schellingboard/domain/guest";
+import { z } from "zod";
+
 import { usernameSchema } from "./auth";
 import { pageSchema } from "./cursor-page";
 import { expectedVersion } from "./session";

@@ -1,20 +1,21 @@
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
 
 vi.mock("@/utils/mailer", () => ({ sendMail: vi.fn() }));
 
-import { GET, POST, PUT, DELETE } from "@/tests/helpers/v1-route";
 import { getRepositories } from "@/db/container";
+import { DELETE, GET, POST, PUT } from "@/tests/helpers/v1-route";
+
 import { createAdminAuthCookie } from "../helpers/admin-cookie";
 import { isoDay } from "../helpers/dates";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createDay,
   createEvent,

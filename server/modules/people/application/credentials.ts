@@ -1,18 +1,19 @@
-import type { LoginSession } from "@schellingboard/domain/auth";
 import {
   newPasswordSchema,
   usernameSchema,
 } from "@schellingboard/contracts/auth";
+import type { LoginSession } from "@schellingboard/domain/auth";
+
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import { credentialsChanged } from "@/server/kernel/credential-changes";
 import {
-  TOO_MANY_ATTEMPTS_ERROR,
-  TOO_MANY_EMAILS_ERROR,
   emailRetryAfter,
   loginRetryAfter,
   recordEmailIssued,
   recordLoginFailure,
+  TOO_MANY_ATTEMPTS_ERROR,
+  TOO_MANY_EMAILS_ERROR,
 } from "@/server/kernel/rate-limit";
 import {
   conflict,
@@ -21,27 +22,28 @@ import {
   limited,
   notFound,
   ok,
-  unavailable,
   type Result,
+  unavailable,
 } from "@/server/kernel/result";
 import { realNow } from "@/utils/real-clock";
 import {
-  RESET_TOKEN_VALID_MINUTES,
   generateAuthCodeSalt,
   generateResetToken,
   hashAuthCode,
   hashUserPassword,
+  RESET_TOKEN_VALID_MINUTES,
   verifyUserPassword,
 } from "@/utils/user-credentials";
+
 import type { PeopleDeps } from "../ports";
+import { noEmail } from "./admin-guests";
 import {
+  type GuestTarget,
   matchToken,
   recentlyIssued,
   resolveTarget,
-  type GuestTarget,
 } from "./auth-tokens";
-import { noEmail } from "./admin-guests";
-import { signIn, type SignedIn } from "./identity";
+import { type SignedIn, signIn } from "./identity";
 
 const NO_USER = "No user is selected";
 

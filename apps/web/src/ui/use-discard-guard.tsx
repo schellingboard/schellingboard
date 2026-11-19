@@ -1,12 +1,13 @@
 import {
+  type FocusEvent,
+  type RefObject,
   useCallback,
   useEffect,
   useId,
   useRef,
   useState,
-  type FocusEvent,
-  type RefObject,
 } from "react";
+
 import { Button } from "./button";
 
 // A number field holds a saved value after a submit (the attendee count),

@@ -1,11 +1,12 @@
 // @module-tag 007-US8
-import { describe, expect, it } from "vitest";
-import { IDBFactory } from "fake-indexeddb";
 import { act, renderHook, screen, waitFor } from "@testing-library/react";
+import { IDBFactory } from "fake-indexeddb";
+import { describe, expect, it } from "vitest";
+
 import { fakeApi, problem } from "../commands/fake-api";
+import { removeRsvp } from "../commands/rsvp";
 import { createReplicaPersistence } from "../replica/persistence";
 import { snapshot } from "../replica/snapshot-fixture";
-import { removeRsvp } from "../commands/rsvp";
 import { NoticeProvider } from "../ui/notices";
 import { useScheduleSession } from "./use-schedule-session";
 

@@ -1,10 +1,10 @@
-import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
 import {
   duringGammaDayOne,
   openGammaScheduleDuringEvent,
   setDevClock,
 } from "./helpers/dev-clock";
+import { expect, test } from "./helpers/fixtures";
 
 // The red now line and the toolbar's "Now" button are for everyone, not just
 // kiosk displays (see kiosk.spec.ts for what kiosk mode adds on top). The

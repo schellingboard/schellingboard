@@ -1,21 +1,22 @@
+import type { ApiClient } from "@schellingboard/api-client";
 import {
   createContext,
+  type ReactNode,
   useCallback,
   useContext,
   useEffect,
   useState,
   useSyncExternalStore,
-  type ReactNode,
 } from "react";
-import type { ApiClient } from "@schellingboard/api-client";
+
 import { createAdminGate } from "../queries/admin-gate";
-import { NoticeProvider } from "../ui/notices";
 import { cx } from "../ui/cx";
 import {
   ArrowRightOnRectangleIcon,
   Bars3Icon,
   XMarkOutlineIcon,
 } from "../ui/icons";
+import { NoticeProvider } from "../ui/notices";
 import { Footer } from "./footer";
 import { hardNavigate } from "./hard-navigate";
 import { useHealth } from "./health";

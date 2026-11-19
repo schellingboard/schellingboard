@@ -2,25 +2,26 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createGuest } from "../helpers/factories";
-import { createImageFile } from "../helpers/utils";
-import { uowFailingAt } from "../helpers/changes";
 import { getRepositories } from "@/db/container";
-import { unitOfWork } from "@/server/kernel/unit-of-work";
-import { createPeopleUseCases } from "@/server/modules/people/module";
 import type { Actor } from "@/server/kernel/actor";
 import type { Result } from "@/server/kernel/result";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
+import { createPeopleUseCases } from "@/server/modules/people/module";
 import { getImageRepositories } from "@/utils/images";
+
+import { uowFailingAt } from "../helpers/changes";
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createGuest } from "../helpers/factories";
+import { createImageFile } from "../helpers/utils";
 
 const NOBODY: Actor = { admin: false, guest: null };
 const open = (id: string): Actor => ({

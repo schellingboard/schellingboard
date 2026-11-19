@@ -1,33 +1,32 @@
-import type { EventFacts } from "@schellingboard/domain/stats/facts";
 import type {
-  AuthCodePurpose,
   AuthCode,
+  AuthCodePurpose,
   LoginSession,
 } from "@schellingboard/domain/auth";
 import type { Change, RecordedChange } from "@schellingboard/domain/change";
 import type { Comment } from "@schellingboard/domain/comment";
 import type {
+  Day,
   Event,
   EventMeetingSettings,
-  Day,
 } from "@schellingboard/domain/event";
 import type {
-  EmailSettings,
-  ProfilePrompt,
-  ProfileContact,
-  Guest,
-  CompleteGuest,
   Attendee,
+  CompleteGuest,
+  EmailSettings,
   EventAttendee,
+  Guest,
+  ProfileContact,
+  ProfilePrompt,
 } from "@schellingboard/domain/guest";
 import type {
   Location,
   LocationUnavailability,
 } from "@schellingboard/domain/location";
 import type {
+  Meeting,
   MeetingPoint,
   MeetingStatus,
-  Meeting,
 } from "@schellingboard/domain/meeting";
 import type {
   Delivery,
@@ -35,17 +34,18 @@ import type {
   Notification,
 } from "@schellingboard/domain/notification";
 import type {
-  ReminderKey,
   DueReminderCandidate,
+  ReminderKey,
 } from "@schellingboard/domain/reminder";
 import type {
   Rsvp,
-  SessionProposal,
   Session,
   SessionCreateInput,
+  SessionProposal,
 } from "@schellingboard/domain/session";
 import type { SiteSettings } from "@schellingboard/domain/site-settings";
-import type { VoteChoice, Vote } from "@schellingboard/domain/vote";
+import type { EventFacts } from "@schellingboard/domain/stats/facts";
+import type { Vote, VoteChoice } from "@schellingboard/domain/vote";
 
 export interface SettingsRepository {
   /** The singleton settings row, falling back to defaults when unset. */

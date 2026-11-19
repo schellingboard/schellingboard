@@ -1,21 +1,22 @@
-import { DateTime } from "luxon";
-import type { Repositories } from "@/db/container";
 import type {
   DueReminderCandidate,
   ReminderKey,
 } from "@schellingboard/domain/reminder";
-import { notificationsChanged } from "@/server/kernel/notification-changes";
-import { isMailerConfigured, sendMail } from "@/utils/mailer";
-import { sessionPath } from "@/utils/notifications";
-import { siteUrl } from "@/utils/site-url";
-import { attendeeCountHeadsUpEmail } from "@/emails/attendee-count-headsup";
-import { attendeeCountFollowUpEmail } from "@/emails/attendee-count-followup";
 import {
   ABANDON_AFTER_HOURS,
   followUpEligible,
   headsUpEligible,
   reminderNoticeText,
 } from "@schellingboard/domain/reminder-schedule";
+import { DateTime } from "luxon";
+
+import type { Repositories } from "@/db/container";
+import { attendeeCountFollowUpEmail } from "@/emails/attendee-count-followup";
+import { attendeeCountHeadsUpEmail } from "@/emails/attendee-count-headsup";
+import { notificationsChanged } from "@/server/kernel/notification-changes";
+import { isMailerConfigured, sendMail } from "@/utils/mailer";
+import { sessionPath } from "@/utils/notifications";
+import { siteUrl } from "@/utils/site-url";
 
 export type DispatchSummary = {
   /** In-app notifications created. */

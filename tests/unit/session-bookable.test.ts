@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
 import { isBookableSlot } from "@schellingboard/domain/session-bookable";
+import { describe, expect, it } from "vitest";
 
 const baseParams = {
   locationBookable: true,

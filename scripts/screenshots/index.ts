@@ -8,17 +8,16 @@
 // What each shot shows is in docs/screenshots/README.md; how it is reached is
 // in shots.ts.
 
-import { execFileSync, spawn, type ChildProcess } from "child_process";
+import { type Browser, firefox } from "@playwright/test";
+import { type ChildProcess, execFileSync, spawn } from "child_process";
 import fs from "fs";
 import net from "net";
 import path from "path";
+import sharp from "sharp";
 import { fileURLToPath } from "url";
 
-import { firefox, type Browser } from "@playwright/test";
-import sharp from "sharp";
-
-import { shots, type Shot } from "./shots";
-import { SITE_PASSWORD, type Env } from "./env";
+import { type Env, SITE_PASSWORD } from "./env";
+import { type Shot, shots } from "./shots";
 
 const repoRoot = path.join(
   path.dirname(fileURLToPath(import.meta.url)),

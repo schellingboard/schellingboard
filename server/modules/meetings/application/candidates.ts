@@ -1,6 +1,5 @@
-import { DateTime } from "luxon";
-import type { z } from "zod";
 import type { meetingCandidatesSchema } from "@schellingboard/contracts/meeting";
+import { toMeetingClashes } from "@schellingboard/domain/meeting-clash-text";
 import {
   maxMeetingSlots,
   meetingMinutes,
@@ -8,12 +7,15 @@ import {
   meetingSlotsForDay,
   slotTimeLabel,
 } from "@schellingboard/domain/meeting-slots";
+import { DateTime } from "luxon";
+import type { z } from "zod";
+
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import { notFound, ok, type Result } from "@/server/kernel/result";
 import { clashesForInterval, loadGuestSchedules } from "@/utils/guest-clashes";
-import { toMeetingClashes } from "@schellingboard/domain/meeting-clash-text";
 import { meetingsOpen } from "@/utils/meeting-rules";
+
 import type { MeetingDeps } from "../ports";
 
 type MeetingCandidates = z.input<typeof meetingCandidatesSchema>;

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+
 import { InAppLinks } from "./in-app-links";
 import { proposalOpenedByClick } from "./proposal-nav";
 

@@ -1,4 +1,5 @@
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
+
 import type { ReplicaPersistence } from "./persistence";
 import { createReplicaStore, type ReplicaStore } from "./store";
 

@@ -1,14 +1,15 @@
 import type { StatsTable } from "@schellingboard/contracts/stats";
+import {
+  CONTACT_TYPE_LABELS,
+  type ContactType,
+} from "@schellingboard/domain/guest";
 import type { EventFacts } from "@schellingboard/domain/stats/facts";
 import {
   applyFilter,
   type StatsFilterInput,
 } from "@schellingboard/domain/stats/filter";
 import { suppressSmall } from "@schellingboard/domain/stats/suppression";
-import {
-  CONTACT_TYPE_LABELS,
-  type ContactType,
-} from "@schellingboard/domain/guest";
+
 import { col, percent } from "./cells";
 
 type Profile = EventFacts["profiles"][number];

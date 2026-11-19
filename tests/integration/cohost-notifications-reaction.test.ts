@@ -1,20 +1,22 @@
 // @module-tag 013-US4
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
 }));
 
-import { sendMail } from "@/utils/mailer";
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { runJobs } from "../helpers/jobs";
-import { createEvent, createGuest } from "../helpers/factories";
+import type { Session } from "@schellingboard/domain/session";
+
 import { getRepositories } from "@/db/container";
 import { sessionUseCases } from "@/server/composition";
-import { recordCohostsAdded } from "@/server/modules/sessions/module";
 import type { Actor } from "@/server/kernel/actor";
 import type { Tx } from "@/server/kernel/unit-of-work";
-import type { Session } from "@schellingboard/domain/session";
+import { recordCohostsAdded } from "@/server/modules/sessions/module";
+import { sendMail } from "@/utils/mailer";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createEvent, createGuest } from "../helpers/factories";
+import { runJobs } from "../helpers/jobs";
 
 const ADMIN: Actor = { admin: true, guest: null };
 const AT = new Date("2026-06-01T10:00:00.000Z");

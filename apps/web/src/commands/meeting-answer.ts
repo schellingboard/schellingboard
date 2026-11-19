@@ -1,5 +1,6 @@
 import type { meetingSchema } from "@schellingboard/contracts/meeting";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
+
 import { canCancel } from "../features/schedule/meeting-rules";
 import type { MeetingView } from "../features/schedule/meeting-view";
 import { meetingViewsFrom } from "../features/schedule/meetings";

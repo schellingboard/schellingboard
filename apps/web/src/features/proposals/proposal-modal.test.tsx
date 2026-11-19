@@ -1,3 +1,5 @@
+import type { Snapshot } from "@schellingboard/contracts/snapshot";
+import { VoteChoice } from "@schellingboard/domain/vote";
 import {
   cleanup,
   render,
@@ -6,16 +8,15 @@ import {
   within,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { Snapshot } from "@schellingboard/contracts/snapshot";
-import { VoteChoice } from "@schellingboard/domain/vote";
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { type ProposalDetailState } from "../../queries/proposal-detail";
 import { createObservable } from "../../queries/store";
 import { iso, snapshot as fixture } from "../../replica/snapshot-fixture";
 import { NoticeProvider } from "../../ui/notices";
 import { comment, fakeComments } from "../comments/comments-test-support";
 import { proposalLinks } from "./links";
-import { ProposalModal, type ProposalActions } from "./proposal-modal";
+import { type ProposalActions, ProposalModal } from "./proposal-modal";
 
 afterEach(cleanup);
 

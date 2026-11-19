@@ -3,9 +3,11 @@ import {
   attendeeCountBodySchema,
   attendeeCountViewSchema,
 } from "@schellingboard/contracts/attendee-count";
+
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import { problem, problemDefault } from "@/server/http/problem";
-import { body, idParam, json, type App } from "@/server/http/route-parts";
+import { type App, body, idParam, json } from "@/server/http/route-parts";
+
 import type { SessionUseCases } from "../application/use-cases";
 
 const getAttendeeCount = createRoute({

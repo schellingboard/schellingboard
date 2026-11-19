@@ -1,4 +1,4 @@
-import { Locator, expect } from "@playwright/test";
+import { expect, Locator } from "@playwright/test";
 
 /**
  * Asserts the image actually decoded, not merely that its element is on the

@@ -1,11 +1,11 @@
 // @module-tag 008-US3
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
 
@@ -13,28 +13,30 @@ vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
 }));
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { runJobs } from "../helpers/jobs";
+import type { Day } from "@schellingboard/domain/event";
+import type { Guest } from "@schellingboard/domain/guest";
+import type { Location } from "@schellingboard/domain/location";
+
+import { getRepositories } from "@/db/container";
+import { sendMail } from "@/utils/mailer";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
+  createDay,
   createEvent,
   createGuest,
   createLocation,
-  createDay,
   slotStart,
 } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
 import {
   GUEST_COOKIE_NAME,
   openGuestValue,
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
+import { runJobs } from "../helpers/jobs";
+import type { SessionParams } from "../helpers/session-form";
 import { addSession as addPOST } from "../helpers/session-form";
 import { deleteSession as POST } from "../helpers/session-form";
-import type { SessionParams } from "../helpers/session-form";
-import type { Location } from "@schellingboard/domain/location";
-import type { Guest } from "@schellingboard/domain/guest";
-import type { Day } from "@schellingboard/domain/event";
-import { sendMail } from "@/utils/mailer";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 

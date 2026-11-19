@@ -1,9 +1,10 @@
 // @module-tag 012-US5
-import { createRef } from "react";
-import { describe, it, expect } from "vitest";
+import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { Snapshot } from "@schellingboard/contracts/snapshot";
+import { createRef } from "react";
+import { describe, expect, it } from "vitest";
+
 import { snapshot as base } from "../../replica/snapshot-fixture";
 import { GridView } from "./grid-view";
 import {

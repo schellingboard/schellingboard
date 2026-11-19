@@ -6,6 +6,7 @@ import {
   type StatsFilterInput,
 } from "@schellingboard/domain/stats/filter";
 import { DateTime } from "luxon";
+
 import { col, doublingEdges } from "./cells";
 
 const KINDS = [

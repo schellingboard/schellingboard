@@ -1,7 +1,8 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
-import { fakeApi, problem, type FakeHandler } from "../../commands/fake-api";
+
+import { fakeApi, type FakeHandler, problem } from "../../commands/fake-api";
 import { settingsCalls } from "../../commands/settings";
 import { NoticeProvider } from "../../ui/notices";
 import { EmailSettingsForm } from "./email-settings-form";

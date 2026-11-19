@@ -1,11 +1,13 @@
 import type { AuthCode, AuthCodePurpose } from "@schellingboard/domain/auth";
+
+import { realNow } from "@/utils/real-clock";
 import {
-  MAX_CODE_ATTEMPTS,
   authCodeMatches,
   isAuthCodeShaped,
+  MAX_CODE_ATTEMPTS,
   normalizeAuthCode,
 } from "@/utils/user-credentials";
-import { realNow } from "@/utils/real-clock";
+
 import type { PeopleDeps } from "../ports";
 
 export const REQUEST_THROTTLE_SECONDS = 60;

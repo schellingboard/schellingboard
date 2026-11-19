@@ -1,16 +1,16 @@
 // @module-tag 010-US6
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 const cookieJar = new Map<string, string>();
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { siteAuthenticate } from "../helpers/site-auth";
-import { createEvent, createGuest, createProposal } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
-import { commentApi } from "../helpers/comment-api";
 
+import { commentApi } from "../helpers/comment-api";
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createEvent, createGuest, createProposal } from "../helpers/factories";
+import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 import { proposalApi } from "../helpers/proposal-api";
+import { siteAuthenticate } from "../helpers/site-auth";
 
 const { deleteComment, likeComment, unlikeComment } = commentApi(cookieJar);
 

@@ -1,18 +1,20 @@
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+
+import { getRepositories } from "@/db/container";
+import { sessionUseCases } from "@/server/composition";
+import type { Actor } from "@/server/kernel/actor";
+import type { Result } from "@/server/kernel/result";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
+import { createCommentUseCases } from "@/server/modules/comments/module";
+import { createEventUseCases } from "@/server/modules/events/module";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createEvent,
   createGuest,
   createProposal,
   createSession,
 } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
-import { unitOfWork } from "@/server/kernel/unit-of-work";
-import { createEventUseCases } from "@/server/modules/events/module";
-import { sessionUseCases } from "@/server/composition";
-import { createCommentUseCases } from "@/server/modules/comments/module";
-import type { Actor } from "@/server/kernel/actor";
-import type { Result } from "@/server/kernel/result";
 
 const ADMIN: Actor = { admin: true, guest: null };
 const claimed = (id: string): Actor => ({

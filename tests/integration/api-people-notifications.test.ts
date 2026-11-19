@@ -1,20 +1,23 @@
+import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
 import fs from "fs";
 import os from "os";
 import path from "path";
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
 
-import { GET, POST, PUT, DELETE } from "@/tests/helpers/v1-route";
 import { getRepositories } from "@/db/container";
-import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { DELETE, GET, POST, PUT } from "@/tests/helpers/v1-route";
+import { TIME_OFFSET_COOKIE } from "@/utils/dev-clock";
+
+import { createAdminAuthCookie } from "../helpers/admin-cookie";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createEvent,
   createGuest,
@@ -23,8 +26,6 @@ import {
 } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 import { createImageFile } from "../helpers/utils";
-import { createAdminAuthCookie } from "../helpers/admin-cookie";
-import { TIME_OFFSET_COOKIE } from "@/utils/dev-clock";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 const HANDLERS = { GET, POST, PUT, DELETE } as const;

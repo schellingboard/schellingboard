@@ -1,11 +1,11 @@
 // @module-tag 012-US3
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
 
@@ -18,19 +18,20 @@ const cookieStore = () => ({
   },
 });
 
+import { getRepositories } from "@/db/container";
+import { verifiedCurrentUser } from "@/utils/acting-guest";
+import { type MeetingOption, meetingOptionsFor } from "@/utils/meeting-options";
+
 import { isoDay } from "../helpers/dates";
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { siteAuthenticate } from "../helpers/site-auth";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
+  createDay,
   createEvent,
   createGuest,
-  createDay,
   createSession,
 } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, verifiedGuestValue } from "../helpers/guest-cookie";
-import { getRepositories } from "@/db/container";
-import { meetingOptionsFor, type MeetingOption } from "@/utils/meeting-options";
-import { verifiedCurrentUser } from "@/utils/acting-guest";
+import { siteAuthenticate } from "../helpers/site-auth";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 

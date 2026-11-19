@@ -1,10 +1,11 @@
+import { clashLines } from "@schellingboard/domain/meeting-clash-text";
 import {
+  type FormEvent,
   useEffect,
   useState,
   useSyncExternalStore,
-  type FormEvent,
 } from "react";
-import { clashLines } from "@schellingboard/domain/meeting-clash-text";
+
 import type { MeetingRequestCalls } from "../../commands/meeting-request";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import type {

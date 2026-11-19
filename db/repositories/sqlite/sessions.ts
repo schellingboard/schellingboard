@@ -1,14 +1,15 @@
-import { and, count, eq, exists, inArray, isNotNull, sql } from "drizzle-orm";
-import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
-import { nanoid } from "nanoid";
-import * as schema from "../../schema";
-import type { SessionsRepository, SessionUpdateInput } from "../interfaces";
 import type {
   Session,
   SessionCreateInput,
   SessionHost,
   SessionLocation,
 } from "@schellingboard/domain/session";
+import { and, count, eq, exists, inArray, isNotNull, sql } from "drizzle-orm";
+import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+import { nanoid } from "nanoid";
+
+import * as schema from "../../schema";
+import type { SessionsRepository, SessionUpdateInput } from "../interfaces";
 
 type DB = BetterSQLite3Database<typeof schema>;
 type SessionRow = typeof schema.sessions.$inferSelect;

@@ -1,8 +1,8 @@
-import { describe, it, expect } from "vitest";
-
 import { newEmptySession } from "@schellingboard/domain/session";
-import type { MeetingView } from "./meeting-view";
+import { describe, expect, it } from "vitest";
+
 import { clashMessage, describeClash, findClashes } from "./clashes";
+import type { MeetingView } from "./meeting-view";
 
 const at = (hour: number, minute = 0) =>
   new Date(Date.UTC(2026, 9, 1, hour, minute));

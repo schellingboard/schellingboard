@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
+
 import { SearchInput } from "./search-input";
 import { SEARCH_DEBOUNCE_MS } from "./use-debounced";
 

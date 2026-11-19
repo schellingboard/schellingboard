@@ -1,6 +1,5 @@
-import { describe, it, expect } from "vitest";
-
 import { formatRelativeTime } from "@schellingboard/domain/relative-time";
+import { describe, expect, it } from "vitest";
 
 const NOW = new Date("2026-03-15T12:00:00Z");
 const ago = (ms: number) => new Date(NOW.getTime() - ms);

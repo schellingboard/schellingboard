@@ -1,4 +1,3 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   cleanup,
   render,
@@ -7,13 +6,15 @@ import {
   within,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { adminEventCalls } from "../../commands/admin-events";
-import { fakeApi, problem, type FakeCall } from "../../commands/fake-api";
+import { fakeApi, type FakeCall, problem } from "../../commands/fake-api";
 import type { AdminProposal } from "../../queries/admin-proposals";
 import { NoticeProvider } from "../../ui/notices";
-import type { ParamUpdates } from "./list-paging";
 import type { DayOption } from "./admin-session-model";
 import { EventProposalsManager } from "./event-proposals";
+import type { ParamUpdates } from "./list-paging";
 
 afterEach(cleanup);
 

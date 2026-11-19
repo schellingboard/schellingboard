@@ -1,5 +1,5 @@
-import { useCallback, useSyncExternalStore } from "react";
 import { useRouter } from "@tanstack/react-router";
+import { useCallback, useSyncExternalStore } from "react";
 
 /**
  * The address bar's query as URLSearchParams, and a way to change it: replacing

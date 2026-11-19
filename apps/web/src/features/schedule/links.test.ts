@@ -1,5 +1,6 @@
 // @module-tag 007-US5
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { scheduleLinks } from "./links";
 
 const links = scheduleLinks("conf");

@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
+import { build, type BuildOptions, context } from "esbuild";
 import { mkdirSync, writeFileSync } from "fs";
-import { build, context, type BuildOptions } from "esbuild";
+
 import { getAppVersion } from "./app-version.js";
 
 const OUT = "dist/server";

@@ -1,14 +1,15 @@
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createGuest } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { unitOfWork } from "@/server/kernel/unit-of-work";
-import { generateVapidKeys } from "@/utils/push";
-import { createNotificationUseCases } from "@/server/modules/notifications/module";
 import type { Actor } from "@/server/kernel/actor";
 import type { Result } from "@/server/kernel/result";
-import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
+import { createNotificationUseCases } from "@/server/modules/notifications/module";
+import { generateVapidKeys } from "@/utils/push";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createGuest } from "../helpers/factories";
 
 const NOBODY: Actor = { admin: false, guest: null };
 const ADMIN: Actor = { admin: true, guest: null };

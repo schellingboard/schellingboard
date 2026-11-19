@@ -1,5 +1,6 @@
 // @module-tag 009-US1
 import { describe, expect, it, vi } from "vitest";
+
 import { fakeApi, problem } from "../commands/fake-api";
 import { snapshot } from "../replica/snapshot-fixture";
 import { attendeeGuests, createAttendeesQuery } from "./attendees";

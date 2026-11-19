@@ -1,13 +1,14 @@
 import type { Page } from "@playwright/test";
-import { expect, test } from "./helpers/fixtures";
+
 import { login } from "./helpers/auth";
-import { selectUser } from "./helpers/user";
 import {
   openReplyForm,
   postedComment,
   submitReply,
   toggleUntil,
 } from "./helpers/comments";
+import { expect, test } from "./helpers/fixtures";
+import { selectUser } from "./helpers/user";
 
 // Conference Gamma is in the scheduling phase, so only its schedule has
 // sessions. Each test claims its own session: the suite runs in parallel

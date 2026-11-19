@@ -1,9 +1,8 @@
 import { expect, type Page } from "@playwright/test";
-
 import { DateTime } from "luxon";
 
 import { adminLogin } from "../../tests/e2e/helpers/admin";
-import { capture, openSite, setTheme, type Env, type Viewport } from "./env";
+import { capture, type Env, openSite, setTheme, type Viewport } from "./env";
 
 export type Shot = {
   name: string;

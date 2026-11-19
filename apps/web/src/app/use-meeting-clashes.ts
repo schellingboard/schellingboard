@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useSyncExternalStore } from "react";
 import type { ApiClient } from "@schellingboard/api-client";
+import { useEffect, useMemo, useSyncExternalStore } from "react";
+
 import {
   createMeetingClashesQuery,
   type MeetingClashes,

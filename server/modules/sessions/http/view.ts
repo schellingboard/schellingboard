@@ -1,8 +1,8 @@
-import type { LocationUnavailability } from "@schellingboard/domain/location";
-import type { Session } from "@schellingboard/domain/session";
 import type { unavailabilityViewSchema } from "@schellingboard/contracts/location";
 import type { sessionViewSchema } from "@schellingboard/contracts/session";
 import type { snapshotSessionSchema } from "@schellingboard/contracts/snapshot";
+import type { LocationUnavailability } from "@schellingboard/domain/location";
+import type { Session } from "@schellingboard/domain/session";
 import type { z } from "zod";
 
 export function toSessionView(s: Session): z.input<typeof sessionViewSchema> {

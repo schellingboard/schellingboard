@@ -1,5 +1,6 @@
-import { z } from "zod";
 import { COHOST_WANTED_NOTE_MAX } from "@schellingboard/domain/session";
+import { z } from "zod";
+
 import { pageSchema } from "./cursor-page";
 
 export const expectedVersion = z

@@ -1,7 +1,8 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { fakeApi, problem, type FakeCall } from "../commands/fake-api";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import { fakeApi, type FakeCall, problem } from "../commands/fake-api";
 import { AdminFrame, useReloadAdminGate } from "./admin-frame";
 
 const hardNavigate = vi.hoisted(() => vi.fn());

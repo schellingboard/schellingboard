@@ -1,13 +1,15 @@
 // @module-tag 017-US3
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
+
+import { getRepositories } from "@/db/container";
 
 import {
   assignLocationsToEventAction,
@@ -15,9 +17,8 @@ import {
   logoutAdmin,
   removeLocationsFromEventAction,
 } from "../helpers/admin-api";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import { createEvent, createLocation } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 

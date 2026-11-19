@@ -1,26 +1,44 @@
 // @module-tag 013-US1
+import type { ReactElement } from "react";
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
-import type { ReactElement } from "react";
 
 vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
 }));
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { deliverQueued } from "../helpers/jobs";
+import { render } from "@react-email/render";
+import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
+
+import { getRepositories } from "@/db/container";
+import { buildEmail, type EmailRecipe } from "@/emails/registry";
+import { sendMail } from "@/utils/mailer";
+import {
+  notifyCohostsAdded,
+  notifyGuest,
+  notifyMeetingOutcome,
+  notifyMeetingRequested,
+  notifyProfileCommented,
+  notifyProposalCommented,
+  notifySessionChanged,
+  notifySessionCommented,
+  notifySessionDeleted,
+  notifySessionLostHost,
+} from "@/utils/notifications";
+
 import {
   BY_TEST,
   deleteLoggedSession,
   updateLoggedSession,
 } from "../helpers/changes";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createEvent,
   createGuest,
@@ -28,23 +46,7 @@ import {
   createProposal,
   createSession,
 } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
-import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
-import { render } from "@react-email/render";
-import { sendMail } from "@/utils/mailer";
-import { buildEmail, type EmailRecipe } from "@/emails/registry";
-import {
-  notifyCohostsAdded,
-  notifyGuest,
-  notifyProfileCommented,
-  notifyProposalCommented,
-  notifySessionCommented,
-  notifyMeetingOutcome,
-  notifyMeetingRequested,
-  notifySessionChanged,
-  notifySessionDeleted,
-  notifySessionLostHost,
-} from "@/utils/notifications";
+import { deliverQueued } from "../helpers/jobs";
 
 const MESSAGE: EmailRecipe = {
   template: "proposalJoined",

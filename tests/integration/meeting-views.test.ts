@@ -1,18 +1,19 @@
 // @module-tag 012-US5
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import type { Event } from "@schellingboard/domain/event";
+import type { Guest } from "@schellingboard/domain/guest";
+import type { Meeting } from "@schellingboard/domain/meeting";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { getRepositories } from "@/db/container";
+import { pageReads } from "@/server/composition";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createEvent,
   createGuest,
   createLocation,
   createSession,
 } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
-import { pageReads } from "@/server/composition";
-import type { Meeting } from "@schellingboard/domain/meeting";
-import type { Guest } from "@schellingboard/domain/guest";
-import type { Event } from "@schellingboard/domain/event";
 
 const SLOT_START = new Date("2026-10-01T13:00:00.000Z");
 const SLOT_END = new Date("2026-10-01T13:30:00.000Z");

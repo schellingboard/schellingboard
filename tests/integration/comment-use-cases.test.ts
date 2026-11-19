@@ -1,20 +1,21 @@
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { getRepositories } from "@/db/container";
+import { proposalUseCases } from "@/server/composition";
+import type { Actor } from "@/server/kernel/actor";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
+import {
+  type CommentSubject,
+  createCommentUseCases,
+} from "@/server/modules/comments/module";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createEvent,
   createGuest,
   createProposal,
   createSession,
 } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
-import { unitOfWork } from "@/server/kernel/unit-of-work";
-import { proposalUseCases } from "@/server/composition";
-import {
-  createCommentUseCases,
-  type CommentSubject,
-} from "@/server/modules/comments/module";
-import type { Actor } from "@/server/kernel/actor";
 
 const NOBODY: Actor = { admin: false, guest: null };
 const ADMIN: Actor = { admin: true, guest: null };

@@ -1,8 +1,8 @@
-import { test, expect } from "./helpers/fixtures";
 import { login, loginAndGoto } from "./helpers/auth";
-import { selectUser } from "./helpers/user";
 import { openGammaScheduleDuringEvent } from "./helpers/dev-clock";
+import { expect, test } from "./helpers/fixtures";
 import { filterChip, switchToView, viewButton } from "./helpers/schedule";
+import { selectUser } from "./helpers/user";
 
 // The agenda view: behind its own toolbar button, the grid staying the default
 // everywhere.

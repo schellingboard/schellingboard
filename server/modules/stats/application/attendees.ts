@@ -11,6 +11,7 @@ import {
 } from "@schellingboard/domain/stats/intervals";
 import { pseudonymize } from "@schellingboard/domain/stats/pseudonyms";
 import { DateTime } from "luxon";
+
 import { col, percent, round } from "./cells";
 
 const NONE = -1;

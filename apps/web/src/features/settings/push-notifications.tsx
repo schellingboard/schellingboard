@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
 import { urlBase64ToUint8Array } from "@schellingboard/domain/push-key";
+import { useEffect, useState } from "react";
+
 import { newKey } from "../../commands/keys";
 import { awaitMutation } from "../../commands/mutation";
 import type { SettingsCalls } from "../../commands/settings";

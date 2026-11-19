@@ -1,25 +1,27 @@
 // @module-tag 007-US8
+import { RECONNECT_GRACE_MS } from "@schellingboard/contracts/feed";
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
-import { GET } from "@/tests/helpers/v1-route";
+
 import { getRepositories } from "@/db/container";
-import { RECONNECT_DELAY_MS } from "@/server/feed/routes";
-import { RECONNECT_GRACE_MS } from "@schellingboard/contracts/feed";
 import { connectionCount } from "@/server/feed/hub";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { RECONNECT_DELAY_MS } from "@/server/feed/routes";
+import { credentialsChanged } from "@/server/kernel/credential-changes";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
+import { createPeopleUseCases } from "@/server/modules/people/module";
+import { GET } from "@/tests/helpers/v1-route";
+
 import { updateLoggedSession } from "../helpers/changes";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
-import { credentialsChanged } from "@/server/kernel/credential-changes";
-import { createPeopleUseCases } from "@/server/modules/people/module";
-import { unitOfWork } from "@/server/kernel/unit-of-work";
 
 beforeAll(() => setupTestDb());
 beforeEach(() => resetTestDb());

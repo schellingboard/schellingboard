@@ -1,4 +1,5 @@
 import type { ChangeContext } from "@schellingboard/domain/change";
+
 import type { Actor } from "./actor";
 
 /** A site admin is named in the log; the admin password has no person. */

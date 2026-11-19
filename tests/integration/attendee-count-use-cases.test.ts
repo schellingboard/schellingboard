@@ -1,12 +1,13 @@
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createEvent, createGuest, createSession } from "../helpers/factories";
 import { getRepositories } from "@/db/container";
-import { unitOfWork } from "@/server/kernel/unit-of-work";
-import { createSessionUseCases } from "@/server/modules/sessions/module";
 import type { Actor } from "@/server/kernel/actor";
 import type { Result } from "@/server/kernel/result";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
+import { createSessionUseCases } from "@/server/modules/sessions/module";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createEvent, createGuest, createSession } from "../helpers/factories";
 
 const HOUR_MS = 60 * 60 * 1000;
 const NOBODY: Actor = { admin: false, guest: null };

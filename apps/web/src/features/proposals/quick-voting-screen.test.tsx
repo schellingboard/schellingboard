@@ -1,9 +1,10 @@
 // @module-tag 005-US2
-import { cleanup, render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { VoteChoice } from "@schellingboard/domain/vote";
+import { cleanup, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import type { Standing } from "../../queries/proposal-standings";
 import { iso, snapshot as fixture } from "../../replica/snapshot-fixture";
 import { NoticeProvider } from "../../ui/notices";

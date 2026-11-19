@@ -1,6 +1,7 @@
 import type { Page } from "@playwright/test";
-import { test, expect } from "./helpers/fixtures";
+
 import { login } from "./helpers/auth";
+import { expect, test } from "./helpers/fixtures";
 
 // The server asks GitHub for the latest release, which a test run cannot rely
 // on, so the answer an admin would get is supplied.

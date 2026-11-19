@@ -1,4 +1,5 @@
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
+
 import { connectFeed } from "./feed-client";
 import { autosaveReplica, openReplica } from "./open-replica";
 import type { ReplicaPersistence } from "./persistence";

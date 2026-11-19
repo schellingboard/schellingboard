@@ -1,5 +1,6 @@
 // @module-tag 009-US1
 import { describe, expect, it } from "vitest";
+
 import { failureMessage } from "./failure-message";
 
 const what = "RSVP to “Intro” (Mon 10:00, Room A)";

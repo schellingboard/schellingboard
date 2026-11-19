@@ -1,11 +1,10 @@
-import { describe, it, expect } from "vitest";
-
 import {
   clashLine,
   clashLines,
-  toMeetingClashes,
   type MeetingClash,
+  toMeetingClashes,
 } from "@schellingboard/domain/meeting-clash-text";
+import { describe, expect, it } from "vitest";
 
 describe("toMeetingClashes", () => {
   const hosting = {

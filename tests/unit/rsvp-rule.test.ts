@@ -1,8 +1,8 @@
-import { describe, it, expect } from "vitest";
 import {
   rsvpRefusal,
   type RsvpRuleInput,
 } from "@schellingboard/domain/rsvp-rule";
+import { describe, expect, it } from "vitest";
 
 const NOW = new Date("2030-01-01T12:00:00.000Z");
 const scheduling = {

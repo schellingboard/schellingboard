@@ -1,4 +1,5 @@
 import type { myNotificationsSchema } from "@schellingboard/contracts/notification";
+
 import { newKey } from "../commands/keys";
 import { awaitMutation } from "../commands/mutation";
 import type { NotificationCalls } from "../commands/notifications";

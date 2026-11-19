@@ -1,13 +1,14 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { describe, expect, it } from "vitest";
+
 import {
-  type PredictionConfidence,
-  type PredictionInput,
   meanInterestShare,
   predictAttendance,
+  type PredictionConfidence,
+  type PredictionInput,
   rangeCovers,
 } from "@schellingboard/domain/stats/attendance-prediction";
+import { describe, expect, it } from "vitest";
 
 type Row = {
   min: number;

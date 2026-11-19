@@ -1,5 +1,6 @@
-import { defineConfig, devices } from "@playwright/test";
 import { spawnSync } from "node:child_process";
+
+import { defineConfig, devices } from "@playwright/test";
 
 /**
  * Pick a free TCP port so E2E runs never collide with `make dev` (port 3000)

@@ -1,25 +1,27 @@
-import { changes, type ChangeContext } from "@schellingboard/domain/change";
-import type { Day, Event } from "@schellingboard/domain/event";
+import { type ChangeContext, changes } from "@schellingboard/domain/change";
 import {
   dayAlignmentError,
   daysOverlap,
   sessionContainedInWindow,
 } from "@schellingboard/domain/day-window";
+import type { Day, Event } from "@schellingboard/domain/event";
+
 import type { Actor } from "@/server/kernel/actor";
-import { recordingShownGuests } from "@/server/kernel/shown-guests";
-import { recordingSessionCascade } from "@/server/kernel/session-cascade";
-import type { Tx } from "@/server/kernel/unit-of-work";
+import { byAdmin } from "@/server/kernel/change-context";
 import {
   conflict,
+  type Failure,
   invalid,
   notFound,
   ok,
-  versionConflict,
-  type Failure,
   type Result,
+  versionConflict,
 } from "@/server/kernel/result";
+import { recordingSessionCascade } from "@/server/kernel/session-cascade";
+import { recordingShownGuests } from "@/server/kernel/shown-guests";
+import type { Tx } from "@/server/kernel/unit-of-work";
+
 import type { EventDeps } from "../ports";
-import { byAdmin } from "@/server/kernel/change-context";
 import { adminRequired, eventNotFound } from "./events";
 
 export interface DayWindowInput {

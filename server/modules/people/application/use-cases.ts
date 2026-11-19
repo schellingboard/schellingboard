@@ -15,20 +15,19 @@ import {
 } from "./bootstrap";
 import {
   changePassword,
-  setFirstPassword,
   getCredentials,
   listLoginSessions,
   requestResetLink,
   resetPassword,
   revokeLoginSession,
+  setFirstPassword,
   setUsername,
   unprotect,
 } from "./credentials";
 import { assignGuestsToEvent, removeGuestsFromEvent } from "./event-guests";
 import { importGuests } from "./guest-import";
-import { createJoinLink, joinWithLink, mailJoinLinks } from "./join-links";
-import { logIn, requestLoginCode } from "./sign-in";
 import { chooseGuest, currentGuest, signIn, signOut } from "./identity";
+import { createJoinLink, joinWithLink, mailJoinLinks } from "./join-links";
 import {
   getProfile,
   getProfileActivity,
@@ -38,6 +37,7 @@ import {
   replaceMyAvatar,
   updateMyProfile,
 } from "./profiles";
+import { logIn, requestLoginCode } from "./sign-in";
 
 export function createPeopleUseCases(deps: PeopleDeps) {
   return {

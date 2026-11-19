@@ -1,7 +1,8 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { cleanup, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { Snapshot } from "@schellingboard/contracts/snapshot";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { FakeCall } from "../commands/fake-api";
 import { iso, snapshot } from "../replica/snapshot-fixture";
 import { open, running } from "./page-test-support";

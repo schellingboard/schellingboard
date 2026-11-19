@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
-import type { Event, Day } from "./event";
+
+import type { Day, Event } from "./event";
 
 // Changing this to am/pm needs a wider time column in the schedule grid (see
 // https://github.com/schellingboard/schellingboard-legacy/pull/402/changes).

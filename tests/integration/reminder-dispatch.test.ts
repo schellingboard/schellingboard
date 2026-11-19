@@ -1,11 +1,11 @@
 // @module-tag 001-US2
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
 
@@ -14,20 +14,22 @@ vi.mock("@/utils/mailer", () => ({
   isMailerConfigured: vi.fn(() => true),
 }));
 
+import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
+import { followUpDueTime } from "@schellingboard/domain/reminder-schedule";
 import Database from "better-sqlite3";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+
+import { getRepositories } from "@/db/container";
+import { resolveDbPath } from "@/db/migrate";
+import { dispatchReminders } from "@/server/composition";
+import { isMailerConfigured, sendMail } from "@/utils/mailer";
+
 import {
   BY_TEST,
   deleteLoggedSession,
   updateLoggedSession,
 } from "../helpers/changes";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import { createEvent, createGuest, createLocation } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
-import { resolveDbPath } from "@/db/migrate";
-import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
-import { isMailerConfigured, sendMail } from "@/utils/mailer";
-import { dispatchReminders } from "@/server/composition";
-import { followUpDueTime } from "@schellingboard/domain/reminder-schedule";
 
 // The reference session: 10:00–11:00 UTC with the factory's 10-minute break,
 // so the displayed start is 10:10, the heads-up is due at 09:10 and the

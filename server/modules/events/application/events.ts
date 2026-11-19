@@ -1,38 +1,40 @@
 import { STALE_EVENT_MESSAGE } from "@schellingboard/contracts/event";
-import { changes, type ChangeContext } from "@schellingboard/domain/change";
+import { type ChangeContext, changes } from "@schellingboard/domain/change";
 import {
-  IDENTITY_MODES,
   type Day,
   type Event,
+  IDENTITY_MODES,
   type IdentityMode,
 } from "@schellingboard/domain/event";
 import { isEventIconName } from "@schellingboard/domain/event-icons";
 import {
-  SLOT_INCREMENT_OPTIONS,
   isSlotAligned,
   isValidSlotIncrement,
+  SLOT_INCREMENT_OPTIONS,
 } from "@schellingboard/domain/slots";
+
 import type { Actor } from "@/server/kernel/actor";
 import { byAdmin } from "@/server/kernel/change-context";
-import { recordingSessionCascade } from "@/server/kernel/session-cascade";
-import { recordingShownGuests } from "@/server/kernel/shown-guests";
-import type { Tx } from "@/server/kernel/unit-of-work";
 import {
   conflict,
+  type Failure,
   forbidden,
   invalid,
   invalidFields,
   notFound,
   ok,
-  versionConflict,
-  type Failure,
   type Result,
+  versionConflict,
 } from "@/server/kernel/result";
+import { recordingSessionCascade } from "@/server/kernel/session-cascade";
+import { recordingShownGuests } from "@/server/kernel/shown-guests";
+import type { Tx } from "@/server/kernel/unit-of-work";
 import {
   eventNameToSlug,
   normalizeWebsiteUrl,
   RESERVED_EVENT_SLUGS,
 } from "@/utils/utils";
+
 import type { EventDeps } from "../ports";
 
 export interface EventSettingsInput {

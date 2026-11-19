@@ -1,5 +1,5 @@
-import { expect, test } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
+import { expect, test } from "./helpers/fixtures";
 import { selectUser } from "./helpers/user";
 
 // Installing happens on the login page, before anyone has a cookie: Safari

@@ -1,26 +1,27 @@
 // @module-tag 012-US2
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
 
 const cookieJar = new Map<string, string>();
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { siteAuthenticate } from "../helpers/site-auth";
-import { createEvent, createGuest, createDay } from "../helpers/factories";
+import { getRepositories } from "@/db/container";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createDay, createEvent, createGuest } from "../helpers/factories";
 import {
   GUEST_COOKIE_NAME,
   openGuestValue,
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
-import { getRepositories } from "@/db/container";
 import { meetingApi } from "../helpers/meeting-api";
+import { siteAuthenticate } from "../helpers/site-auth";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 

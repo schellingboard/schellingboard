@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+
 import type { ReplicaStore } from "../replica/store";
 
 const REFRESH_MS = 60_000;

@@ -1,5 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { SEARCH_DEBOUNCE_MS, useDebouncedSearch } from "./use-debounced";
 
 describe("useDebouncedSearch", () => {

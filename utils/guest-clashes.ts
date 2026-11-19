@@ -1,8 +1,9 @@
-import type { Repositories } from "@/db/container";
 import type { Meeting } from "@schellingboard/domain/meeting";
+import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
 import { newEmptySession, type Session } from "@schellingboard/domain/session";
 import { sessionsOverlap } from "@schellingboard/domain/session-overlap";
-import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
+
+import type { Repositories } from "@/db/container";
 
 // A schedule clash for one guest, computed server-side so their RSVPs and
 // meetings never reach the client. Only `detailFor`'s RSVPs and 1-on-1s are

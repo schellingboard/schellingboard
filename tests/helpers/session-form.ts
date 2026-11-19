@@ -1,7 +1,8 @@
-import { DELETE, POST, PUT } from "@/tests/helpers/v1-route";
 import type { Day } from "@schellingboard/domain/event";
 import type { Guest } from "@schellingboard/domain/guest";
 import type { Location } from "@schellingboard/domain/location";
+
+import { DELETE, POST, PUT } from "@/tests/helpers/v1-route";
 
 /** The booking form's payload, which the tests build and these calls translate. */
 export type SessionParams = {

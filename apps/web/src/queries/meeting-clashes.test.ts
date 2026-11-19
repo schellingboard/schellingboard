@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { fakeApi } from "../commands/fake-api";
 import { createMeetingClashesQuery } from "./meeting-clashes";
 

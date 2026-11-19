@@ -1,5 +1,5 @@
-import { test, expect } from "./helpers/fixtures";
 import { loginAndGoto } from "./helpers/auth";
+import { expect, test } from "./helpers/fixtures";
 import { selectUser } from "./helpers/user";
 
 /**

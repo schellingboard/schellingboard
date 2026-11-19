@@ -1,8 +1,10 @@
 import { createRoute } from "@hono/zod-openapi";
 import { healthSchema } from "@schellingboard/contracts/health";
-import { getAppVersion } from "@/utils/git";
-import { isDevToolsEnabled } from "@/utils/dev-clock";
+
 import { getBuildId } from "@/utils/build-id";
+import { isDevToolsEnabled } from "@/utils/dev-clock";
+import { getAppVersion } from "@/utils/git";
+
 import type { createApp } from "./create-app";
 
 const route = createRoute({

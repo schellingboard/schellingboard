@@ -1,4 +1,5 @@
 import createClient, { type ClientOptions } from "openapi-fetch";
+
 import type { paths } from "./schema.ts";
 
 export type { paths, components, operations } from "./schema.ts";

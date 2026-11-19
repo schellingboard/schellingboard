@@ -1,6 +1,8 @@
 import type { Day, Event } from "@schellingboard/domain/event";
+
 import type { Actor } from "@/server/kernel/actor";
 import { ok, type Result } from "@/server/kernel/result";
+
 import type { EventDeps } from "../ports";
 import { eventNotFound } from "./events";
 

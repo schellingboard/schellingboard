@@ -1,7 +1,8 @@
-import { useCallback, useMemo } from "react";
 import { spearman } from "@schellingboard/domain/stats/correlation";
-import { PlotFrame, type Plot } from "./plot-frame";
-import { SERIES, SURFACE, baseOptions } from "./style";
+import { useCallback, useMemo } from "react";
+
+import { type Plot, PlotFrame } from "./plot-frame";
+import { baseOptions, SERIES, SURFACE } from "./style";
 
 /** Points with Spearman's rho; below 15 points the trend line is left out and the note says why. */
 export function Scatter({

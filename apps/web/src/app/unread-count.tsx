@@ -1,11 +1,12 @@
 import {
   createContext,
+  type ReactNode,
   useContext,
   useEffect,
   useState,
   useSyncExternalStore,
-  type ReactNode,
 } from "react";
+
 import { createObservable } from "../queries/store";
 import { connectNotificationStream } from "./notification-stream";
 

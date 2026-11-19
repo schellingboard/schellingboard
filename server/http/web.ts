@@ -1,4 +1,5 @@
-import { Hono, type Context } from "hono";
+import { type Context, Hono } from "hono";
+
 import { dispatchReminders, pageReads } from "@/server/composition";
 import { isPasswordProtectionEnabled } from "@/utils/auth";
 import { getBuildId } from "@/utils/build-id";
@@ -6,6 +7,7 @@ import { getImageRepositories, requestedWidth } from "@/utils/images";
 import { readMapImage } from "@/utils/map-image";
 import { serveSpaAsset, serveSpaShell, spaDir } from "@/utils/spa-files";
 import { LIGHT_SURFACE } from "@/utils/theme";
+
 import { api } from "./app";
 import { addDevRoutes } from "./dev";
 import { adminApiRefusal, hasSiteCookie, siteApiRefusal } from "./gates";

@@ -1,5 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
 import { createApiClient } from "@schellingboard/api-client";
+import { describe, expect, it, vi } from "vitest";
+
 import { sendToSiteLoginWhenGated } from "./site-gate";
 
 function setup(response: Response, pathname = "/conf") {

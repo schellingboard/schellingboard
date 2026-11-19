@@ -1,3 +1,4 @@
+import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import {
   cleanup,
   render,
@@ -6,9 +7,9 @@ import {
   within,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { fakeApi, problem, type FakeHandler } from "../../commands/fake-api";
+
+import { fakeApi, type FakeHandler, problem } from "../../commands/fake-api";
 import { sessionFormCalls } from "../../commands/session-form";
 import { iso, snapshot as fixture } from "../../replica/snapshot-fixture";
 import { NoticeProvider } from "../../ui/notices";

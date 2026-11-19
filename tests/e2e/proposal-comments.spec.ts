@@ -1,8 +1,9 @@
 import type { Page } from "@playwright/test";
-import { test, expect } from "./helpers/fixtures";
+
 import { login } from "./helpers/auth";
-import { selectUser } from "./helpers/user";
 import { openReplyForm, submitReply, toggleUntil } from "./helpers/comments";
+import { expect, test } from "./helpers/fixtures";
+import { selectUser } from "./helpers/user";
 
 // Each test claims its own proposal: the suite runs in parallel against one
 // shared database, so two tests commenting on the same proposal would see

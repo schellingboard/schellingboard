@@ -1,6 +1,7 @@
 // @module-tag 005-US1
 import { act, cleanup, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
+
 import { fakeApi } from "../../commands/fake-api";
 import { createStandingsQuery } from "../../queries/proposal-standings";
 import { useStandings } from "./use-standings";

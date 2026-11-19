@@ -1,9 +1,11 @@
 // @module-tag 019-US2
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+
 import { getRepositories } from "@/db/container";
 import { commandKey } from "@/server/kernel/command-key";
 import { runIdempotent } from "@/server/kernel/idempotency";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
 
 const T0 = new Date("2026-06-01T10:00:00.000Z");
 const request = (key: string, bodyHash = "h") => ({

@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react";
 import type { Session } from "@schellingboard/domain/session";
+import { claimRefusal } from "@schellingboard/domain/session-claim";
 import { formatOptionalTime, TIME_FORMAT } from "@schellingboard/domain/time";
+import { useEffect, useMemo, useRef, useState } from "react";
+
 import {
   attendeeGuests,
   type AttendeesQuery,
@@ -10,9 +12,8 @@ import { Dialog } from "../../ui/dialog";
 import { AcademicCapIcon, CheckCircleIcon, LockIcon } from "../../ui/icons";
 import { Markdown } from "../../ui/markdown";
 import { Tooltip } from "../../ui/tooltip";
-import { claimRefusal } from "@schellingboard/domain/session-claim";
-import { useSchedule } from "./context";
 import { AttendeeCountField } from "./attendee-count-field";
+import { useSchedule } from "./context";
 import { SessionComments } from "./session-comments";
 import { useRsvp } from "./use-rsvp";
 

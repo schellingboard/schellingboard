@@ -3,12 +3,13 @@ import type { Actor } from "@/server/kernel/actor";
 import { ok, type Result } from "@/server/kernel/result";
 import {
   clashesForInterval,
-  loadGuestSchedules,
   type GuestClash,
+  loadGuestSchedules,
 } from "@/utils/guest-clashes";
 import { availabilityFormsFor } from "@/utils/meeting-availability-form";
-import { meetingOptionsFor, type MeetingOption } from "@/utils/meeting-options";
+import { type MeetingOption, meetingOptionsFor } from "@/utils/meeting-options";
 import { myMeetingsFor, type MyMeetingsResponse } from "@/utils/meeting-views";
+
 import type { MeetingDeps } from "../ports";
 import { eventNotFound } from "./meetings";
 

@@ -1,17 +1,24 @@
 // @module-tag 016-US1
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
 
 vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
 }));
+
+import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
+import { VoteChoice } from "@schellingboard/domain/vote";
+
+import { getRepositories } from "@/db/container";
+import { testEmail } from "@/emails/test-email";
+import { sendMail } from "@/utils/mailer";
 
 import {
   createGuestAction,
@@ -21,18 +28,13 @@ import {
   sendTestEmailAction,
   updateGuestAction,
 } from "../helpers/admin-api";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createEvent,
   createGuest,
   createProposal,
   createSession,
 } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
-import { testEmail } from "@/emails/test-email";
-import { sendMail } from "@/utils/mailer";
-import { VoteChoice } from "@schellingboard/domain/vote";
-import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef"; // 32 chars
 

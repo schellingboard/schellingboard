@@ -1,9 +1,10 @@
 // @module-tag 007-US8
-import { describe, it, expect } from "vitest";
 import { RECONNECT_GRACE_MS } from "@schellingboard/contracts/feed";
-import { STALE_AFTER_MS, nextChangeAt, staleAt, syncState } from "./sync-state";
-import { createReplicaStore } from "./store";
+import { describe, expect, it } from "vitest";
+
 import { snapshot } from "./snapshot-fixture";
+import { createReplicaStore } from "./store";
+import { nextChangeAt, STALE_AFTER_MS, staleAt, syncState } from "./sync-state";
 
 describe("syncState", () => {
   it("is live while the feed is connected, however long ago it connected", () => {

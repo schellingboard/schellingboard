@@ -1,9 +1,10 @@
 // @module-tag 007-US8
-import { describe, it, expect } from "vitest";
-import fc from "fast-check";
 import type { FeedMessage } from "@schellingboard/contracts/feed";
-import { VoteChoice } from "@schellingboard/domain/vote";
 import { apply } from "@schellingboard/contracts/feed-apply";
+import { VoteChoice } from "@schellingboard/domain/vote";
+import fc from "fast-check";
+import { describe, expect, it } from "vitest";
+
 import { snapshot } from "./snapshot-fixture";
 
 const [talk] = snapshot.sessions;

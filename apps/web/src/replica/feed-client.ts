@@ -1,8 +1,9 @@
 import {
-  feedMessageSchema,
   type FeedMessage,
+  feedMessageSchema,
 } from "@schellingboard/contracts/feed";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
+
 import type { ReplicaStore } from "./store";
 
 type Source = {

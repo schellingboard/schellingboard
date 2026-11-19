@@ -1,10 +1,9 @@
-import { describe, it, expect } from "vitest";
-
 import {
   availableAttendeeFilters,
   parseAttendeeFilters,
   serializeAttendeeFilters,
 } from "@schellingboard/domain/attendee-filters";
+import { describe, expect, it } from "vitest";
 
 describe("attendee filters", () => {
   it("reads several active filters from one param", () => {

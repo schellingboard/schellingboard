@@ -1,6 +1,7 @@
 // @module-tag 008-US5
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { describe, expect, it } from "vitest";
+
 import { iso, snapshot as fixture } from "../replica/snapshot-fixture";
 import { createReplicaStore } from "../replica/store";
 import { claimSession } from "./claim-session";

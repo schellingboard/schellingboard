@@ -1,41 +1,43 @@
+import { meetingSlotsForDay } from "@schellingboard/domain/meeting-slots";
+import { VoteChoice } from "@schellingboard/domain/vote";
 import Database from "better-sqlite3";
+import dotenv from "dotenv";
 import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import fs from "fs";
+import { DateTime } from "luxon";
 import { nanoid } from "nanoid";
-import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
-import { DateTime } from "luxon";
-import * as schema from "@/db/schema";
+
 import { resolveDbPath, runMigrations } from "@/db/migrate";
-import { eventNameToSlug } from "@/utils/utils";
-import { meetingSlotsForDay } from "@schellingboard/domain/meeting-slots";
+import * as schema from "@/db/schema";
 import { uploadsDir } from "@/utils/uploads-dir";
-import { VoteChoice } from "@schellingboard/domain/vote";
 import { hashUserPassword } from "@/utils/user-credentials";
-import { createSeededRandom } from "./random";
+import { eventNameToSlug } from "@/utils/utils";
+
 import { generateBulkGuests, generateBulkProposals } from "./bulk";
+import { gammaSessionConfigs } from "./data/gamma-schedule";
 import {
+  type GuestConfig,
   guestConfigs,
   hasProfileFields,
+  SCREENSHOT_GUEST,
   SEED_PROTECTED_PASSWORD,
   SEED_SITE_ADMIN,
-  SCREENSHOT_GUEST,
-  type GuestConfig,
 } from "./data/guests";
-import { gammaSessionConfigs } from "./data/gamma-schedule";
 import { locationRows } from "./data/locations";
 import {
-  sessionTemplates,
-  type SessionTemplate,
+  commentFollowUps,
+  commentOpeners,
+  commentReplies,
   eventSpecificProposals,
   eventSpecificTitlePatterns,
   gammaExtraProposals,
-  commentOpeners,
-  commentReplies,
-  commentFollowUps,
+  type SessionTemplate,
+  sessionTemplates,
 } from "./data/templates";
+import { createSeededRandom } from "./random";
 
 const TZ = "Europe/Berlin";
 

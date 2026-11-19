@@ -2,29 +2,30 @@
 // @module-tag 010-US2
 // @module-tag 010-US3
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
 
 const cookieJar = new Map<string, string>();
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { siteAuthenticate } from "../helpers/site-auth";
+import { getRepositories } from "@/db/container";
+
+import { commentApi } from "../helpers/comment-api";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createEvent,
   createGuest,
   createProposal as createProposalRow,
   createSession,
 } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
-import { commentApi } from "../helpers/comment-api";
 import { proposalApi } from "../helpers/proposal-api";
+import { siteAuthenticate } from "../helpers/site-auth";
 
 const { createProfileComment, createSessionComment } = commentApi(cookieJar);
 

@@ -1,10 +1,11 @@
-import { DateTime } from "luxon";
-import type { Repositories } from "@/db/container";
-import type { z } from "zod";
 import type { myMeetingsSchema } from "@schellingboard/contracts/meeting";
-import { clashesForInterval, loadGuestSchedules } from "@/utils/guest-clashes";
 import { toMeetingClashes } from "@schellingboard/domain/meeting-clash-text";
 import { slotTimeLabel } from "@schellingboard/domain/meeting-slots";
+import { DateTime } from "luxon";
+import type { z } from "zod";
+
+import type { Repositories } from "@/db/container";
+import { clashesForInterval, loadGuestSchedules } from "@/utils/guest-clashes";
 
 export type MyMeetingsResponse = z.infer<typeof myMeetingsSchema>;
 export type MeetingView = MyMeetingsResponse["meetings"][number];

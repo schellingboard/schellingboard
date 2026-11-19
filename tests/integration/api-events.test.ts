@@ -1,17 +1,19 @@
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
+
 import { GET } from "@/tests/helpers/v1-route";
 
 vi.mock("@/utils/mailer", () => ({ isMailerConfigured: () => false }));
 import { getRepositories } from "@/db/container";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import { createDay, createEvent } from "../helpers/factories";
 
 const get = (path: string) => GET(new Request(`http://test/api/v1${path}`));

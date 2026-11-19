@@ -1,9 +1,11 @@
 import { changes } from "@schellingboard/domain/change";
 import { meetingSlotsForDay } from "@schellingboard/domain/meeting-slots";
+
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import { byGuest } from "@/server/kernel/change-context";
 import { forbidden, invalid, ok, type Result } from "@/server/kernel/result";
+
 import type { MeetingDeps } from "../ports";
 import { attendees, closedFor, eventNotFound } from "./meetings";
 

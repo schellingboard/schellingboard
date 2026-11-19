@@ -1,6 +1,7 @@
-import { afterEach, describe, expect, it } from "vitest";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { afterEach, describe, expect, it } from "vitest";
+
 import { adminGuestCalls } from "../../commands/admin-guests";
 import { fakeApi, type FakeCall } from "../../commands/fake-api";
 import { NoticeProvider } from "../../ui/notices";

@@ -4,10 +4,11 @@ import {
   SESSION_LIFETIME_MS,
 } from "@/utils/login-session-token";
 import { realNow } from "@/utils/real-clock";
+
 import {
+  type CookieReader,
   readGuestIdentity,
   resolveActor,
-  type CookieReader,
   type SessionLookup,
 } from "./actor";
 

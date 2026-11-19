@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { suppressSmall } from "@schellingboard/domain/stats/suppression";
+import { describe, expect, it } from "vitest";
 
 describe("suppressSmall", { tags: ["021-US1"] }, () => {
   it("keeps values shared by at least k people and folds the rest into Other", () => {

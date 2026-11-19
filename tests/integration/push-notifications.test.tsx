@@ -1,5 +1,5 @@
 // @module-tag 013-US3
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/utils/mailer", () => ({ sendMail: vi.fn() }));
 vi.mock("web-push", () => ({
@@ -14,13 +14,15 @@ vi.mock("web-push", () => ({
 let generated = 0;
 
 import * as webpush from "web-push";
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { runJobs } from "../helpers/jobs";
-import { createGuest } from "../helpers/factories";
+
 import { getRepositories } from "@/db/container";
-import { sendMail } from "@/utils/mailer";
 import { buildEmail, type EmailRecipe } from "@/emails/registry";
+import { sendMail } from "@/utils/mailer";
 import { notifyGuest } from "@/utils/notifications";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createGuest } from "../helpers/factories";
+import { runJobs } from "../helpers/jobs";
 
 const MESSAGE: EmailRecipe = {
   template: "proposalJoined",

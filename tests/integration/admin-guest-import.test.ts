@@ -1,22 +1,23 @@
 // @module-tag 016-US2
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
+
+import { getRepositories } from "@/db/container";
 
 import {
   importGuestsAction,
   loginAsAdmin,
   logoutAdmin,
 } from "../helpers/admin-api";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import { createEvent, createGuest } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 

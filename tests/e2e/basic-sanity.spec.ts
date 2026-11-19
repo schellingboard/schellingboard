@@ -1,5 +1,5 @@
-import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
+import { expect, test } from "./helpers/fixtures";
 
 test.describe("Health endpoint", () => {
   test("GET /api/health returns 200 without authentication @019-US1", async ({

@@ -2,10 +2,11 @@
 // HMR and proxies everything the server owns to the Node server one port
 // higher, which restarts when the bundle is rebuilt.
 import { spawn, spawnSync } from "child_process";
+
 import {
   guestConfigs,
-  SEED_PROTECTED_PASSWORD,
   SCREENSHOT_GUEST,
+  SEED_PROTECTED_PASSWORD,
   SEED_SITE_ADMIN,
 } from "./seed/data/guests";
 

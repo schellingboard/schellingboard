@@ -1,6 +1,7 @@
-import { describe, it, expect } from "vitest";
-import sharp from "sharp";
 import { MAX_IMAGE_BYTES } from "@schellingboard/domain/location-image-constraints";
+import sharp from "sharp";
+import { describe, expect, it } from "vitest";
+
 import { getImageRepositories } from "@/utils/images";
 
 async function makeImage(

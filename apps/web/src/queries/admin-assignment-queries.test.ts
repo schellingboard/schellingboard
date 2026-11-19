@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { fakeApi, problem } from "../commands/fake-api";
 import { createAdminGuestsQuery } from "./admin-guests";
 import { createAdminLocationsQuery } from "./admin-locations";

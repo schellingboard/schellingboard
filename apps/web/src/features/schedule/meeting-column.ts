@@ -1,5 +1,6 @@
 import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
 import { getNumSlots } from "@schellingboard/domain/slots";
+
 import { gridBlockPx } from "./grid-layout";
 import type { MeetingView } from "./meeting-view";
 

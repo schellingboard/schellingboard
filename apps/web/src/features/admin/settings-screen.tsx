@@ -1,8 +1,9 @@
-import { useState, type FormEvent } from "react";
 import {
   MAP_REQUIREMENTS_HINT,
   MAX_MAP_BYTES,
 } from "@schellingboard/domain/map-image-constraints";
+import { type FormEvent, useState } from "react";
+
 import type { AdminSettingsCalls } from "../../commands/admin-settings";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import type { AdminSettings } from "../../queries/admin-settings";

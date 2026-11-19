@@ -1,5 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
 import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+
 import { fakeApi, problem } from "../commands/fake-api";
 import { useViewer, ViewerProvider } from "./viewer";
 

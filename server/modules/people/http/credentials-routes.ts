@@ -9,15 +9,17 @@ import {
   usernameBodySchema,
   usernameResultSchema,
 } from "@schellingboard/contracts/auth";
+
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import { problem, problemDefault } from "@/server/http/problem";
 import {
+  type App,
   body,
   idParam,
   json,
   noContent,
-  type App,
 } from "@/server/http/route-parts";
+
 import type { PeopleUseCases } from "../application/use-cases";
 import { setGuestCookie } from "./guest-cookie";
 

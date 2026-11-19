@@ -4,8 +4,10 @@ import {
   type RecordedChange,
   type Viewer,
 } from "@schellingboard/domain/change";
+
 import { newestSeq } from "@/server/kernel/change-log";
 import type { UnitOfWork } from "@/server/kernel/unit-of-work";
+
 import { register } from "./hub";
 import { project } from "./project";
 

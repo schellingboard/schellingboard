@@ -1,11 +1,13 @@
 // @module-tag 019-US2
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { getRepositories } from "@/db/container";
-import { createApp } from "@/server/http/create-app";
 import { actorMiddleware } from "@/server/http/actor";
+import { createApp } from "@/server/http/create-app";
 import { idempotencyMiddleware } from "@/server/http/idempotency";
 import { pruneIdempotencyKeys } from "@/utils/jobs/idempotency";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import { createGuest } from "../helpers/factories";
 import {
   GUEST_COOKIE_NAME,

@@ -1,8 +1,8 @@
-import { test, expect } from "./helpers/fixtures";
-import { uniqueSuffix } from "./helpers/unique";
 import { login } from "./helpers/auth";
-import { selectUser } from "./helpers/user";
+import { expect, test } from "./helpers/fixtures";
 import { toast } from "./helpers/toast";
+import { uniqueSuffix } from "./helpers/unique";
+import { selectUser } from "./helpers/user";
 
 test("a newly added session appears on the overview and can be opened @008-US1 @007-US5", async ({
   page,

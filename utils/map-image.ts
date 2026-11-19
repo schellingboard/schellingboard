@@ -1,7 +1,3 @@
-import fs from "fs/promises";
-import path from "path";
-import sharp from "sharp";
-
 // The site map is uploaded through the admin UI and stored on the filesystem
 // under SB_UPLOADS_DIR (a persistent volume in production), not in public/, because
 // public/ is baked into the build and lost on redeploy. It is served by
@@ -9,8 +5,11 @@ import sharp from "sharp";
 //
 // Unlike location images (utils/location-images.ts), a map may have any aspect
 // ratio, so we validate only format and size.
-
 import { MAX_MAP_BYTES } from "@schellingboard/domain/map-image-constraints";
+import fs from "fs/promises";
+import path from "path";
+import sharp from "sharp";
+
 import { uploadsDir } from "./uploads-dir";
 
 const FORMAT_EXTENSIONS: Record<string, string> = {

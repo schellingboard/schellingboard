@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+
 import { warnAboutAdminPassword } from "@/server/admin-password-notice";
 
 describe("the ADMIN_PASSWORD notice", () => {

@@ -1,4 +1,5 @@
 import type { ApiClient } from "@schellingboard/api-client";
+
 import { fetchEmailEnabled } from "../queries/email-enabled";
 
 type GuestBody = {

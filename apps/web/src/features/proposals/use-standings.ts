@@ -1,4 +1,5 @@
 import { useEffect, useSyncExternalStore } from "react";
+
 import type { StandingsQuery } from "../../queries/proposal-standings";
 
 /**

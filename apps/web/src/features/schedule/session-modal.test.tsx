@@ -1,15 +1,16 @@
 // @module-tag 007-US5
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { Snapshot } from "@schellingboard/contracts/snapshot";
-import { snapshot as base, iso } from "../../replica/snapshot-fixture";
-import { createObservable } from "../../queries/store";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { AttendeesState } from "../../queries/attendees";
+import { createObservable } from "../../queries/store";
+import { iso, snapshot as base } from "../../replica/snapshot-fixture";
+import { NoticeProvider } from "../../ui/notices";
 import { fakeComments } from "../comments/comments-test-support";
 import { scheduleLinks } from "./links";
-import { NoticeProvider } from "../../ui/notices";
-import { ScheduleScreen, type ScheduleActions } from "./schedule-screen";
+import { type ScheduleActions, ScheduleScreen } from "./schedule-screen";
 import { noMeetingActions } from "./test-support";
 
 const talk = base.sessions[0];

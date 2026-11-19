@@ -1,8 +1,9 @@
-import { IDBFactory } from "fake-indexeddb";
-import { render } from "@testing-library/react";
-import { createMemoryHistory, RouterProvider } from "@tanstack/react-router";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
-import { fakeApi, problem, type FakeCall } from "../commands/fake-api";
+import { createMemoryHistory, RouterProvider } from "@tanstack/react-router";
+import { render } from "@testing-library/react";
+import { IDBFactory } from "fake-indexeddb";
+
+import { fakeApi, type FakeCall, problem } from "../commands/fake-api";
 import { fakeSources } from "../commands/fake-source";
 import { createReplicaPersistence } from "../replica/persistence";
 import { iso, snapshot } from "../replica/snapshot-fixture";

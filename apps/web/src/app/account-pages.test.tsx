@@ -1,6 +1,7 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { FakeCall } from "../commands/fake-api";
 import { problem } from "../commands/fake-api";
 import { hardNavigate } from "./hard-navigate";

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import type { ApiClient } from "@schellingboard/api-client";
+import { useEffect, useState } from "react";
 
 const CHECK_EVERY_MS = 5 * 60 * 1000;
 const RELOADED_FOR = "sb-reloaded-for";

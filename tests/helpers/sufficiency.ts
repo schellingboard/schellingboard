@@ -1,7 +1,8 @@
-import { expect } from "vitest";
+import { apply } from "@schellingboard/contracts/feed-apply";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { reaches } from "@schellingboard/domain/change";
-import { apply } from "@schellingboard/contracts/feed-apply";
+import { expect } from "vitest";
+
 import { getRepositories } from "@/db/container";
 import { project } from "@/server/feed/project";
 import { snapshotFor } from "@/server/feed/snapshot";

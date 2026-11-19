@@ -1,9 +1,11 @@
 // @module-tag 019-US7
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createEvent } from "../helpers/factories";
 import type Database from "better-sqlite3";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+
 import { getRepositories, withWriter } from "@/db/container";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createEvent } from "../helpers/factories";
 
 function insertEvent(writer: Database.Database, slug: string) {
   writer

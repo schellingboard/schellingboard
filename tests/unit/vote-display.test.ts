@@ -1,11 +1,11 @@
-import { describe, it, expect } from "vitest";
+import { VoteChoice } from "@schellingboard/domain/vote";
 import {
+  VOTE_CHOICES,
+  voteChoiceRank,
   voteChoiceToEmoji,
   voteChoiceToLabel,
-  voteChoiceRank,
-  VOTE_CHOICES,
 } from "@schellingboard/domain/vote-display";
-import { VoteChoice } from "@schellingboard/domain/vote";
+import { describe, expect, it } from "vitest";
 
 describe("voteChoiceToEmoji", () => {
   it("interested → ❤️", () =>

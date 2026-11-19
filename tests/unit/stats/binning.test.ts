@@ -1,10 +1,10 @@
-import fc from "fast-check";
-import { describe, expect, it } from "vitest";
 import {
   histogram,
   median,
   quantile,
 } from "@schellingboard/domain/stats/binning";
+import fc from "fast-check";
+import { describe, expect, it } from "vitest";
 
 describe("binning", { tags: ["021-US1"] }, () => {
   it("counts values into half-open bins, the last one closed", () => {

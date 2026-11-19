@@ -1,6 +1,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
+
 import type { ReplicaStore } from "../replica/store";
-import { nextChangeAt, syncState, type SyncState } from "../replica/sync-state";
+import { nextChangeAt, type SyncState, syncState } from "../replica/sync-state";
 
 const COPY: Record<SyncState, string> = {
   live: "Live",

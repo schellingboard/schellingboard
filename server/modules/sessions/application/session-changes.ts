@@ -1,11 +1,13 @@
-import { changes, type ChangeContext } from "@schellingboard/domain/change";
+import { type ChangeContext, changes } from "@schellingboard/domain/change";
 import type {
   Rsvp,
   Session,
   SessionCreateInput,
 } from "@schellingboard/domain/session";
+
 import { recordingShownGuests } from "@/server/kernel/shown-guests";
 import type { Tx } from "@/server/kernel/unit-of-work";
+
 import type { SessionDeps } from "../ports";
 
 type SessionPatch = Parameters<SessionDeps["repos"]["sessions"]["update"]>[1];

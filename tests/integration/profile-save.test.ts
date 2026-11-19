@@ -1,28 +1,30 @@
 // @module-tag 011-US1
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
+  describe,
+  expect,
+  it,
   vi,
-  afterEach,
 } from "vitest";
 
 const cookieJar = new Map<string, string>();
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { siteAuthenticate } from "../helpers/site-auth";
+import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
+import fs from "fs";
+import os from "os";
+import path from "path";
+import sharp from "sharp";
+
+import { getRepositories } from "@/db/container";
+import { createImageFile } from "@/tests/helpers/utils";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import { createGuest } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
-import { getRepositories } from "@/db/container";
-import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
 import { saveProfile } from "../helpers/profile-api";
-import { createImageFile } from "@/tests/helpers/utils";
-import fs from "fs";
-import path from "path";
-import os from "os";
-import sharp from "sharp";
+import { siteAuthenticate } from "../helpers/site-auth";
 
 let uploadsDir: string;
 

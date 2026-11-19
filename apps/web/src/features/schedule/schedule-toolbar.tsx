@@ -1,8 +1,9 @@
-import { useState, type ReactNode } from "react";
-import { Tooltip } from "../../ui/tooltip";
 import type { Event } from "@schellingboard/domain/event";
 import { hasPhases } from "@schellingboard/domain/phase";
 import { formatEventDates } from "@schellingboard/domain/time";
+import { type ReactNode, useState } from "react";
+
+import { cx } from "../../ui/cx";
 import { Dialog } from "../../ui/dialog";
 import {
   CalendarIcon,
@@ -12,8 +13,8 @@ import {
   QueueIcon,
   TableIcon,
 } from "../../ui/icons";
-import { cx } from "../../ui/cx";
 import { Markdown } from "../../ui/markdown";
+import { Tooltip } from "../../ui/tooltip";
 import { scrollNowLineIntoView } from "./now-line";
 
 const ITEM_CLASS =

@@ -1,5 +1,5 @@
 // @module-tag 010-US2
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
@@ -7,25 +7,26 @@ vi.mock("@/utils/mailer", () => ({
 
 const cookieJar = new Map<string, string>();
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { runJobs } from "../helpers/jobs";
+import { getRepositories } from "@/db/container";
+import { sendMail } from "@/utils/mailer";
+
 import { BY_TEST, deleteLoggedSession } from "../helpers/changes";
-import { siteAuthenticate } from "../helpers/site-auth";
+import { commentApi } from "../helpers/comment-api";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createEvent,
   createGuest,
   createProposal,
   createSession,
 } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
 import {
   GUEST_COOKIE_NAME,
   openGuestValue,
   verifiedGuestValue,
 } from "../helpers/guest-cookie";
-import { commentApi } from "../helpers/comment-api";
-import { sendMail } from "@/utils/mailer";
+import { runJobs } from "../helpers/jobs";
 import { proposalApi } from "../helpers/proposal-api";
+import { siteAuthenticate } from "../helpers/site-auth";
 
 const {
   createSessionComment: createComment,

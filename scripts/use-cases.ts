@@ -11,9 +11,10 @@ import { spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { type CatalogueEntry, useCases } from "../tests/use-cases";
 import { escapeTableCell } from "./markdown-table";
-import { collectSpecs, specTitle, type JsonReport } from "./playwright-json";
-import { useCases, type CatalogueEntry } from "../tests/use-cases";
+import { collectSpecs, type JsonReport, specTitle } from "./playwright-json";
 
 const TIERS = ["e2e", "integration", "unit"] as const;
 type Tier = (typeof TIERS)[number];

@@ -1,14 +1,16 @@
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/utils/mailer", () => ({ sendMail: vi.fn() }));
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { runJobs } from "../helpers/jobs";
-import { createEvent, createGuest, createProposal } from "../helpers/factories";
+import { VoteChoice } from "@schellingboard/domain/vote";
+
 import { getRepositories } from "@/db/container";
 import { proposalUseCases } from "@/server/composition";
 import type { Actor } from "@/server/kernel/actor";
-import { VoteChoice } from "@schellingboard/domain/vote";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createEvent, createGuest, createProposal } from "../helpers/factories";
+import { runJobs } from "../helpers/jobs";
 
 const NOBODY: Actor = { admin: false, guest: null };
 const ADMIN: Actor = { admin: true, guest: null };

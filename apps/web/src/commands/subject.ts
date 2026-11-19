@@ -1,6 +1,7 @@
-import { DateTime } from "luxon";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import type { Session } from "@schellingboard/domain/session";
+import { DateTime } from "luxon";
+
 import { eventContextFrom } from "../replica/selectors";
 
 /** “Title” (Mon 10:00, Room A): enough for the user to know which session failed. */

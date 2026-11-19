@@ -1,20 +1,21 @@
 import {
-  ATTENDEE_SORTS,
-  DEFAULT_ATTENDEE_SORT,
-  searchAttendees,
-  type AttendeeSort,
-} from "@schellingboard/domain/attendee-search";
-import {
+  type AttendeeFilter,
   availableAttendeeFilters,
   matchesAttendeeFilters,
   parseAttendeeFilters,
-  type AttendeeFilter,
 } from "@schellingboard/domain/attendee-filters";
 import {
   hasFilledProfile,
   profileExcerpt,
 } from "@schellingboard/domain/attendee-profile";
+import {
+  ATTENDEE_SORTS,
+  type AttendeeSort,
+  DEFAULT_ATTENDEE_SORT,
+  searchAttendees,
+} from "@schellingboard/domain/attendee-search";
 import { formatRelativeTime } from "@schellingboard/domain/relative-time";
+
 import type { DirectoryEntry } from "../../queries/directory";
 import { plainText } from "../../ui/plain-text";
 

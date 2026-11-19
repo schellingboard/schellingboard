@@ -1,7 +1,8 @@
 // @module-tag 007-US8
-import { describe, it, expect, vi } from "vitest";
-import { IDBFactory } from "fake-indexeddb";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
+import { IDBFactory } from "fake-indexeddb";
+import { describe, expect, it, vi } from "vitest";
+
 import {
   createReplicaPersistence,
   REPLICA_DB,

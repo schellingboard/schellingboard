@@ -1,4 +1,3 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   act,
   cleanup,
@@ -6,6 +5,8 @@ import {
   render,
   screen,
 } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { fakeApi } from "../commands/fake-api";
 import { ReloadOffer, runningBuildId } from "./reload-offer";
 

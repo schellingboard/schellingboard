@@ -1,4 +1,4 @@
-import { test as base, expect, ConsoleMessage } from "@playwright/test";
+import { ConsoleMessage, expect, test as base } from "@playwright/test";
 
 const ALLOWED_CONSOLE_PATTERNS: RegExp[] = [
   // Firefox quirk: when a test navigates while a font

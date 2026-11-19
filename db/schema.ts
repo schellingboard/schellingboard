@@ -1,19 +1,19 @@
-import { sql } from "drizzle-orm";
-import {
-  sqliteTable,
-  text,
-  integer,
-  primaryKey,
-  uniqueIndex,
-  index,
-  type AnySQLiteColumn,
-} from "drizzle-orm/sqlite-core";
 import type { LoginAssurance, LoginVia } from "@schellingboard/domain/auth";
 import type { IdentityMode } from "@schellingboard/domain/event";
 import type {
   ProfileContact,
   ProfilePrompt,
 } from "@schellingboard/domain/guest";
+import { sql } from "drizzle-orm";
+import {
+  type AnySQLiteColumn,
+  index,
+  integer,
+  primaryKey,
+  sqliteTable,
+  text,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 
 // Singleton table holding site-wide configuration (title, description, map).
 // Always a single row with id "singleton"; see SqliteSettingsRepository.

@@ -1,4 +1,5 @@
 import type { ApiClient } from "@schellingboard/api-client";
+
 import type { MeetingView } from "../features/schedule/meeting-view";
 import { createObservable } from "./store";
 

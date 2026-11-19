@@ -1,4 +1,5 @@
 import { DateTime } from "luxon";
+
 import type { Day, Event } from "./event";
 import { meetingSlotsForDay, slotTimeLabel } from "./meeting-slots";
 

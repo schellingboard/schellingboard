@@ -1,7 +1,9 @@
 import type { EmailSettings } from "@schellingboard/domain/guest";
+
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import { notFound, ok, type Result } from "@/server/kernel/result";
+
 import type { NotificationDeps } from "../ports";
 
 const profileNotFound = () => notFound("profile.notFound", "Profile not found");

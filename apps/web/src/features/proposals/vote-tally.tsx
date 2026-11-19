@@ -3,6 +3,7 @@ import {
   voteChoiceToEmoji,
   voteChoiceToLabel,
 } from "@schellingboard/domain/vote-display";
+
 import { cx } from "../../ui/cx";
 import { Tooltip } from "../../ui/tooltip";
 

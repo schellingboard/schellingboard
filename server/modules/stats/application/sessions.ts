@@ -1,33 +1,34 @@
 import type { StatsTable } from "@schellingboard/contracts/stats";
+import {
+  meanInterestShare,
+  predictAttendance,
+  type Prediction,
+  rangeCovers,
+} from "@schellingboard/domain/stats/attendance-prediction";
 import { histogram, median } from "@schellingboard/domain/stats/binning";
+import { TOO_FEW_TO_SAY } from "@schellingboard/domain/stats/correlation";
 import type { EventFacts } from "@schellingboard/domain/stats/facts";
 import {
   applyFilter,
   type StatsFilterInput,
 } from "@schellingboard/domain/stats/filter";
-import { TOO_FEW_TO_SAY } from "@schellingboard/domain/stats/correlation";
 import {
   meanConcurrency,
   overlappingCounts,
 } from "@schellingboard/domain/stats/intervals";
 import {
-  meanInterestShare,
-  predictAttendance,
-  rangeCovers,
-  type Prediction,
-} from "@schellingboard/domain/stats/attendance-prediction";
-import {
-  sessionOrigin,
   type SessionOrigin,
+  sessionOrigin,
 } from "@schellingboard/domain/stats/session-origin";
 import { DateTime } from "luxon";
+
 import {
+  type Cell,
   col,
+  type Column,
   percent,
   round,
   tallyVotes,
-  type Cell,
-  type Column,
 } from "./cells";
 
 interface Row {

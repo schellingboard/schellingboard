@@ -1,6 +1,7 @@
 // @module-tag 002-US2
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
+
 import type { EventSummary } from "../../app/use-events";
 import { snapshot } from "../../replica/snapshot-fixture";
 import { EventListScreen } from "./event-list-screen";

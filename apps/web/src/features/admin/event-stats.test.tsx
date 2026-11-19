@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import type { EventStatistics } from "@schellingboard/contracts/stats";
 import {
   cleanup,
   render,
@@ -7,7 +7,8 @@ import {
   within,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { EventStatistics } from "@schellingboard/contracts/stats";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { EventStatsScreen } from "./event-stats";
 
 afterEach(cleanup);

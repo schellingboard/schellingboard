@@ -1,41 +1,42 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
+import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+
 import {
+  type ScheduleActions,
   ScheduleMatchProvider,
   ScheduleProvider,
-  type ScheduleActions,
 } from "./context";
 
 export type { ScheduleActions };
-import { scheduleDataFrom } from "./data";
-import { withClashes } from "./meetings";
 import type { MeetingClashes } from "../../queries/meeting-clashes";
+import { useDebouncedSearch } from "../../ui/use-debounced";
 import { AgendaView } from "./agenda-view";
+import { scheduleDataFrom } from "./data";
 import {
   parseScheduleFilters,
   SCHEDULE_FILTERS,
-  serializeScheduleFilters,
   type ScheduleFilter,
+  serializeScheduleFilters,
 } from "./filters";
-import { getNowOffsetPx } from "./grid-layout";
 import { getDefaultFoldedDayIds } from "./fold";
+import { getNowOffsetPx } from "./grid-layout";
 import { GridView } from "./grid-view";
-import type { ScheduleLinks } from "./links";
 import { KioskController, useKioskMode } from "./kiosk";
+import type { ScheduleLinks } from "./links";
 import { MatchStepper } from "./match-stepper";
+import { MeetingModals } from "./meeting-modals";
+import { withClashes } from "./meetings";
 import {
   countMatches,
   createScheduleMatch,
   includedLocations,
   scheduleEntries,
 } from "./model";
-import { MeetingModals } from "./meeting-modals";
-import { SessionModal } from "./session-modal";
+import { PullToRefresh } from "./pull-to-refresh";
 import { ScheduleFilters } from "./schedule-filters";
 import { ScheduleToolbar, scheduleView } from "./schedule-toolbar";
 import { matchesInReadingOrder } from "./search";
-import { PullToRefresh } from "./pull-to-refresh";
-import { useDebouncedSearch } from "../../ui/use-debounced";
+import { SessionModal } from "./session-modal";
 import { useDragToPan } from "./use-drag-to-pan";
 import { useScrollRestoration } from "./use-scroll-restoration";
 import { useStatusHeight } from "./use-status-height";

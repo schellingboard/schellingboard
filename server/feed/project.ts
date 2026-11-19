@@ -1,17 +1,18 @@
 import type { FeedMessage } from "@schellingboard/contracts/feed";
 import type { RecordedChange, Viewer } from "@schellingboard/domain/change";
+
 import { toDayView, toEventView } from "@/server/modules/events/module";
 import {
   toMeetingPointView,
   toMeetingView,
 } from "@/server/modules/meetings/module";
-import { toSnapshotProposalView } from "@/server/modules/proposals/module";
 import { toEventGuestView } from "@/server/modules/people/module";
-import { toLocationView } from "@/server/modules/venue/module";
+import { toSnapshotProposalView } from "@/server/modules/proposals/module";
 import {
   toSnapshotSessionView,
   toUnavailabilityView,
 } from "@/server/modules/sessions/module";
+import { toLocationView } from "@/server/modules/venue/module";
 
 // Only the actor learns the key: keys are unique per actor. Coarser than ADR
 // 0012 section 5's scope (no admin id, no cookie level); see ADR 0014.

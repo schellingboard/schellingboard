@@ -1,13 +1,14 @@
 // @module-tag 009-US1
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { describe, expect, it } from "vitest";
+
 import { iso, snapshot as fixture } from "../replica/snapshot-fixture";
 
 const snapshot: Snapshot = { ...fixture, now: iso(10) };
 import { createReplicaStore } from "../replica/store";
 import { fakeApi } from "./fake-api";
-import { createCommandRunner } from "./runner";
 import { addRsvp } from "./rsvp";
+import { createCommandRunner } from "./runner";
 
 function refusal(patch: Partial<Snapshot>) {
   const { api, calls } = fakeApi(() => new Response(null, { status: 204 }));

@@ -1,9 +1,10 @@
-import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import {
   commentCreateSchema,
   commentEditSchema,
   type commentViewSchema,
 } from "@schellingboard/contracts/comment";
+import type { Snapshot } from "@schellingboard/contracts/snapshot";
+
 import type { Command } from "./runner";
 import { describeProposalIn, describeSessionIn } from "./subject";
 

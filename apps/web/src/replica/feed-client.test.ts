@@ -1,10 +1,11 @@
 // @module-tag 007-US8
-import { describe, it, expect, vi } from "vitest";
-import { feedMessageSchema } from "@schellingboard/contracts/feed";
 import type { FeedMessage } from "@schellingboard/contracts/feed";
+import { feedMessageSchema } from "@schellingboard/contracts/feed";
+import { describe, expect, it, vi } from "vitest";
+
 import { connectFeed, SILENCE_MS } from "./feed-client";
-import { createReplicaStore } from "./store";
 import { snapshot } from "./snapshot-fixture";
+import { createReplicaStore } from "./store";
 
 type Listener = (event: { data: string }) => void;
 

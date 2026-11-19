@@ -2,6 +2,7 @@
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { VoteChoice } from "@schellingboard/domain/vote";
 import { describe, expect, it } from "vitest";
+
 import { iso, snapshot as fixture } from "../replica/snapshot-fixture";
 import { createReplicaStore } from "../replica/store";
 import { fakeApi, problem } from "./fake-api";

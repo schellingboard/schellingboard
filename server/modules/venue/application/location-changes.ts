@@ -1,5 +1,6 @@
-import { changes, type ChangeContext } from "@schellingboard/domain/change";
+import { type ChangeContext, changes } from "@schellingboard/domain/change";
 import type { Location } from "@schellingboard/domain/location";
+
 import type { Tx } from "@/server/kernel/unit-of-work";
 
 /** One change per event: a location belongs to several, each with its own feed. */

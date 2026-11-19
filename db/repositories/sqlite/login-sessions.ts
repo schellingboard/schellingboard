@@ -1,6 +1,7 @@
+import type { LoginSession } from "@schellingboard/domain/auth";
 import { and, eq, lt, ne } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
-import type { LoginSession } from "@schellingboard/domain/auth";
+
 import * as schema from "../../schema";
 import type { LoginSessionsRepository } from "../interfaces";
 

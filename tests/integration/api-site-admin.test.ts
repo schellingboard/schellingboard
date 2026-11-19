@@ -1,11 +1,13 @@
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
-import { DELETE, GET, POST, PUT } from "@/tests/helpers/v1-route";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+
 import { getRepositories } from "@/db/container";
 import { peopleUseCases } from "@/server/composition";
+import { openApiDocument } from "@/server/http/openapi";
+import { DELETE, GET, POST, PUT } from "@/tests/helpers/v1-route";
 import { hashSessionToken } from "@/utils/login-session-token";
 import { verifyUserPassword } from "@/utils/user-credentials";
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { openApiDocument } from "@/server/http/openapi";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import { createEvent, createGuest } from "../helpers/factories";
 import {
   GUEST_COOKIE_NAME,

@@ -1,34 +1,35 @@
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { VoteChoice } from "@schellingboard/domain/vote";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { getRepositories } from "@/db/container";
 import {
-  listReleaseDumps,
-  upgradeFromDump,
-  disposeUpgradedDb,
-  appliedMigrationCount,
-  migrationFileCount,
-  schemaOfUpgradedDb,
-  schemaOfFreshDb,
-} from "../helpers/upgrade-db";
+  changelogReleases,
+  compareVersions,
+  readManifest,
+} from "@/scripts/release-dumps";
+import { statsUseCases } from "@/server/composition";
+
 import {
   BY_TEST,
   deleteLoggedSession,
   updateLoggedSession,
 } from "../helpers/changes";
 import {
+  createDay,
   createGuest,
   createLocation,
-  createDay,
   createProposal,
   createSession,
 } from "../helpers/factories";
 import {
-  changelogReleases,
-  compareVersions,
-  readManifest,
-} from "@/scripts/release-dumps";
-import { getRepositories } from "@/db/container";
-import { VoteChoice } from "@schellingboard/domain/vote";
-import { statsUseCases } from "@/server/composition";
+  appliedMigrationCount,
+  disposeUpgradedDb,
+  listReleaseDumps,
+  migrationFileCount,
+  schemaOfFreshDb,
+  schemaOfUpgradedDb,
+  upgradeFromDump,
+} from "../helpers/upgrade-db";
 
 const dumps = listReleaseDumps();
 const manifest = readManifest();

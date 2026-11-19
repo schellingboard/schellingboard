@@ -1,10 +1,12 @@
 import type { Hono } from "hono";
+
 import {
   isDevToolsEnabled,
   nowWithOffset,
   parseTimeOffset,
   readTimeOffsetCookie,
 } from "@/utils/dev-clock";
+
 import { isTrustedOrigin, siteApiRefusal } from "./gates";
 import { problemResponse } from "./problem";
 

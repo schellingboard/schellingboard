@@ -1,12 +1,13 @@
 // @module-tag 009-US1
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { createReplicaStore } from "../replica/store";
-import { iso, snapshot as fixture } from "../replica/snapshot-fixture";
-import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import type { FeedMessage } from "@schellingboard/contracts/feed";
+import type { Snapshot } from "@schellingboard/contracts/snapshot";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import { iso, snapshot as fixture } from "../replica/snapshot-fixture";
+import { createReplicaStore } from "../replica/store";
 import { fakeApi, problem } from "./fake-api";
-import { createCommandRunner, type CommandFailure } from "./runner";
 import { addRsvp, removeRsvp } from "./rsvp";
+import { type CommandFailure, createCommandRunner } from "./runner";
 
 afterEach(() => vi.useRealTimers());
 

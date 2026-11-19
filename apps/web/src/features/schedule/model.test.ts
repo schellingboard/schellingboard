@@ -1,7 +1,10 @@
 // @module-tag 007-US3
-import { describe, it, expect } from "vitest";
-import type { Session } from "@schellingboard/domain/session";
 import type { Location } from "@schellingboard/domain/location";
+import type { Session } from "@schellingboard/domain/session";
+import { newEmptySession } from "@schellingboard/domain/session";
+import { describe, expect, it } from "vitest";
+
+import type { MeetingView } from "./meeting-view";
 import {
   agendaDayFold,
   countMatches,
@@ -10,8 +13,6 @@ import {
   includedLocations,
   scheduleEntries,
 } from "./model";
-import type { MeetingView } from "./meeting-view";
-import { newEmptySession } from "@schellingboard/domain/session";
 
 const room = (id: string, name: string) =>
   ({ id, name, color: "blue" }) satisfies Session["locations"][number];

@@ -1,13 +1,16 @@
 // @module-tag 015-US2
+import { VoteChoice } from "@schellingboard/domain/vote";
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
+
+import { getRepositories } from "@/db/container";
 
 import {
   createEventAction,
@@ -18,18 +21,16 @@ import {
   updateEventMeetingsAction,
   updateEventPhasesAction,
 } from "../helpers/admin-api";
-import { setupTestDb, resetTestDb } from "../helpers/db";
 import { BY_TEST, updateLoggedSession } from "../helpers/changes";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
-  createEvent,
   createDay,
+  createEvent,
   createGuest,
   createLocation,
   createProposal,
   createSession,
 } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
-import { VoteChoice } from "@schellingboard/domain/vote";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 

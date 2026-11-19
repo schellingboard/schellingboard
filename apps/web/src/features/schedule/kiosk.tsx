@@ -1,4 +1,5 @@
 import { useEffect, useRef, useSyncExternalStore } from "react";
+
 import { scrollNowLineIntoView } from "./now-line";
 
 const SCROLL_INTERVAL_MS = 3 * 60 * 1000;

@@ -1,10 +1,12 @@
 // @module-tag 009-US1
 // @module-tag 009-US2
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createEvent, createGuest, createSession } from "../helpers/factories";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+
 import { getRepositories } from "@/db/container";
 import { DELETE, PUT } from "@/tests/helpers/v1-route";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createEvent, createGuest, createSession } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 
 type RsvpCall = {

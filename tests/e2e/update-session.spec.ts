@@ -1,14 +1,14 @@
-import { test, expect } from "./helpers/fixtures";
-import { uniqueSuffix } from "./helpers/unique";
-import { login } from "./helpers/auth";
-import { selectUser } from "./helpers/user";
-import { dismissToast, toast } from "./helpers/toast";
-import { dayRadios, selectOption } from "./helpers/session-form";
 import {
   getMessage,
   searchBySubject,
   skipWithoutMailpit,
 } from "../helpers/mailpit";
+import { login } from "./helpers/auth";
+import { expect, test } from "./helpers/fixtures";
+import { dayRadios, selectOption } from "./helpers/session-form";
+import { dismissToast, toast } from "./helpers/toast";
+import { uniqueSuffix } from "./helpers/unique";
+import { selectUser } from "./helpers/user";
 
 test("updating a session emails the RSVP'd guest and the added co-host @013-US4 @008-US2", async ({
   page,

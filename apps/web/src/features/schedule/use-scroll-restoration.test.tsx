@@ -1,7 +1,8 @@
 // @module-tag 007-US1
-import { afterEach, describe, it, expect, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { useRef } from "react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { useScrollRestoration } from "./use-scroll-restoration";
 
 function Scroller({ storageKey }: { storageKey: string }) {

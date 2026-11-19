@@ -1,31 +1,32 @@
-import { useMemo, useRef, useState, type FormEvent } from "react";
 import {
   sessionCreateSchema,
   sessionUpdateSchema,
 } from "@schellingboard/contracts/session";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { actingGuestRefusalMessage } from "@schellingboard/domain/acting-guest-message";
-import {
-  durationMinusBreak,
-  gridEndingDurations,
-  snapDurationToSlots,
-} from "@schellingboard/domain/slots";
+import { dateOnDay } from "@schellingboard/domain/event";
 import {
   buildSessionInterval,
   CAPACITY_ERROR,
   sessionHasStarted,
 } from "@schellingboard/domain/session-booking";
 import {
+  durationMinusBreak,
+  gridEndingDurations,
+  snapDurationToSlots,
+} from "@schellingboard/domain/slots";
+import {
   convertParamDateTime,
   formatDayLabel,
   formatDuration,
   formatSlotLabel,
 } from "@schellingboard/domain/time";
-import { dateOnDay } from "@schellingboard/domain/event";
+import { type FormEvent, useMemo, useRef, useState } from "react";
+
 import {
+  type FieldErrors,
   FIX_FIELDS_MESSAGE,
   validateFields,
-  type FieldErrors,
 } from "../../commands/mutation";
 import type {
   SessionCreateBody,

@@ -1,15 +1,16 @@
 import { z } from "zod";
+
 import { dayViewSchema, eventViewSchema } from "./event";
 import { unavailabilityViewSchema } from "./location";
 import { meetingPointSchema, meetingSchema } from "./meeting";
 import { snapshotProposalSchema } from "./proposal";
 import { rsvpViewSchema } from "./rsvp";
-import { ownVoteSchema } from "./vote";
 import {
   snapshotGuestSchema,
   snapshotLocationSchema,
   snapshotSessionSchema,
 } from "./snapshot";
+import { ownVoteSchema } from "./vote";
 
 const common = {
   seq: z.number().int(),

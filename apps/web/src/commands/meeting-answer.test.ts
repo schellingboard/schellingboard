@@ -1,11 +1,12 @@
 // @module-tag 012-US4
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { describe, expect, it } from "vitest";
+
 import { snapshot as fixture } from "../replica/snapshot-fixture";
 import { createReplicaStore } from "../replica/store";
 import { fakeApi, problem } from "./fake-api";
 import { answerMeeting, cancelMeeting } from "./meeting-answer";
-import { createCommandRunner, type CommandFailure } from "./runner";
+import { type CommandFailure, createCommandRunner } from "./runner";
 
 const meeting = (extra = {}) => ({
   id: "m1",

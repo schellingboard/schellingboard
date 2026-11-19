@@ -1,5 +1,6 @@
-import { EVENT_ICONS } from "./event-icons";
 import { isEventIconName } from "@schellingboard/domain/event-icons";
+
+import { EVENT_ICONS } from "./event-icons";
 
 export function EventIcon({
   name,

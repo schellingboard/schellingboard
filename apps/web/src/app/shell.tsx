@@ -1,8 +1,10 @@
-import type { ReactNode } from "react";
 import type { ApiClient } from "@schellingboard/api-client";
+import type { ReactNode } from "react";
+
+import { useKioskMode } from "../features/schedule/kiosk";
+import { NoticeProvider } from "../ui/notices";
 import { DevToolbar } from "./dev-toolbar";
 import { ErrorBoundary } from "./error-boundary";
-import { useKioskMode } from "../features/schedule/kiosk";
 import { Footer } from "./footer";
 import { hardReload } from "./hard-navigate";
 import { HeaderLinks } from "./header-links";
@@ -11,13 +13,12 @@ import { Layout } from "./layout";
 import { MapButton } from "./map-button";
 import { NavBar, type NavItem } from "./nav-bar";
 import { ReloadOffer } from "./reload-offer";
-import { useUpdateStatus } from "./updates";
+import type { AppServices } from "./services";
 import { ThemeProvider } from "./theme";
 import { UnreadProvider } from "./unread-count";
-import { UserMenu, type PickableGuest } from "./user-menu";
-import type { AppServices } from "./services";
+import { useUpdateStatus } from "./updates";
+import { type PickableGuest, UserMenu } from "./user-menu";
 import { useViewer, ViewerProvider } from "./viewer";
-import { NoticeProvider } from "../ui/notices";
 
 export function ShellFrame({
   api,

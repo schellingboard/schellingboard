@@ -2,35 +2,36 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
-  redirect,
   lazyRouteComponent,
   Outlet,
+  redirect,
   type RouterHistory,
 } from "@tanstack/react-router";
-import { Suspense, type ReactElement } from "react";
+import { type ReactElement, Suspense } from "react";
+
 import {
+  BootstrapPage,
+  JoinPage,
   LoginPage,
   NotificationsPage,
   ResetPage,
-  BootstrapPage,
-  JoinPage,
   SettingsPage,
   SiteLoginPage,
 } from "./account-pages";
+import { EventLayout } from "./event-page";
 import { HomePage } from "./home-page";
-import { NotFound } from "./not-found";
 import { MeetingsPage } from "./meetings-page";
+import { NotFound } from "./not-found";
 import { PeoplePage } from "./people-pages";
 import {
   ProposalFormPage,
   ProposalsPage,
   QuickVotingPage,
 } from "./proposals-pages";
-import { EventLayout } from "./event-page";
 import { SchedulePage } from "./schedule-page";
+import { type AppServices, defaultServices } from "./services";
 import { SessionFormPage } from "./sessions-pages";
 import { SpaLinks } from "./spa-links";
-import { defaultServices, type AppServices } from "./services";
 
 const AdminEventPage = lazyRouteComponent(
   () => import("./admin-pages"),

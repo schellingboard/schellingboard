@@ -1,9 +1,9 @@
-import { describe, it, expect } from "vitest";
 import {
-  eventInterestSummary,
   estimateAttendanceRange,
+  eventInterestSummary,
   proposalVoteStats,
 } from "@schellingboard/domain/proposal-vote-stats";
+import { describe, expect, it } from "vitest";
 
 // The 2025 event the model was fitted on: 259 attendees, 9 parallel sessions,
 // mean interest share 27%. See docs/dev/attendance-model/attendance-2025.md.

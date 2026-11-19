@@ -1,13 +1,15 @@
 import {
-  readTransaction,
-  writeTransaction,
-  type Repositories,
-} from "@/db/container";
-import {
   audienceOf,
   type Change,
   type RecordedChange,
 } from "@schellingboard/domain/change";
+
+import {
+  readTransaction,
+  type Repositories,
+  writeTransaction,
+} from "@/db/container";
+
 import { publish } from "./change-subscribers";
 import { commandKey, withoutCommandKey } from "./command-key";
 

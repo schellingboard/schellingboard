@@ -1,10 +1,11 @@
-import { useState } from "react";
 import type { StatsTable } from "@schellingboard/contracts/stats";
+import { useState } from "react";
+
 import { cx } from "../../ui/cx";
 import { Dialog } from "../../ui/dialog";
 import { QuestionMarkCircleIcon } from "../../ui/icons";
 import type { Figure } from "./stats-figures";
-import { SortableStatsTable, formatCell } from "./stats-table";
+import { formatCell, SortableStatsTable } from "./stats-table";
 
 export const figureHeadingId = (figure: Figure) => `stats-${figure.key}`;
 

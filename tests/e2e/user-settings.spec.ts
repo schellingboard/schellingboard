@@ -1,5 +1,5 @@
-import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
+import { expect, test } from "./helpers/fixtures";
 import { selectUser } from "./helpers/user";
 
 // Amara Okafor is used by no other spec, so her email settings can be

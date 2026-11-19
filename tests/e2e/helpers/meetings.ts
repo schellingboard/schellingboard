@@ -1,4 +1,4 @@
-import { Locator, Page, expect } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
 
 // Settings holds one collapsed panel per event that offers 1-on-1s, except
 // that a lone one starts open -- so look before clicking its summary.

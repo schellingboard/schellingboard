@@ -1,28 +1,29 @@
-import {
-  describe,
-  it,
-  expect,
-  beforeAll,
-  beforeEach,
-  afterEach,
-  vi,
-} from "vitest";
 import fs from "fs";
 import os from "os";
 import path from "path";
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 
 vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
   isMailerConfigured: vi.fn(() => true),
 }));
 
-import { GET, POST, PUT, DELETE } from "@/tests/helpers/v1-route";
 import { getRepositories } from "@/db/container";
-import { createAdminAuthCookie } from "../helpers/admin-cookie";
+import { DELETE, GET, POST, PUT } from "@/tests/helpers/v1-route";
 import { sendMail } from "@/utils/mailer";
-import { createImageFile } from "../helpers/utils";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+
+import { createAdminAuthCookie } from "../helpers/admin-cookie";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import { createEvent, createGuest } from "../helpers/factories";
+import { createImageFile } from "../helpers/utils";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 const HANDLERS = { GET, POST, PUT, DELETE } as const;

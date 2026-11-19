@@ -1,5 +1,10 @@
 // @module-tag 001-US1
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+
+import { getRepositories } from "@/db/container";
+import { snapshotFor } from "@/server/feed/snapshot";
+import type { Actor } from "@/server/kernel/actor";
+import { unitOfWork } from "@/server/kernel/unit-of-work";
 
 // FR-005/FR-020: a recorded attendee count is host-only. The enforcement is
 // structural — `attendeeCount` is absent from the `Session` type, which the
@@ -7,13 +12,8 @@ import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 // "Structurally impossible" is a claim a test should hold, not something a
 // reviewer has to remember, so this pins both payloads that carry sessions:
 // the attendee-facing snapshot and the admin session list.
-
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import { createEvent, createGuest, createSession } from "../helpers/factories";
-import { snapshotFor } from "@/server/feed/snapshot";
-import type { Actor } from "@/server/kernel/actor";
-import { unitOfWork } from "@/server/kernel/unit-of-work";
-import { getRepositories } from "@/db/container";
 
 const HOUR_MS = 60 * 60 * 1000;
 const RECORDED_COUNT = 137;

@@ -1,8 +1,9 @@
-import { useState, type FormEvent } from "react";
+import { type FormEvent, useState } from "react";
+
 import type { SignInCalls } from "../../commands/sign-in";
+import { useEmailEnabled } from "../../queries/email-enabled";
 import { Button } from "../../ui/button";
 import { TextField } from "../../ui/form";
-import { useEmailEnabled } from "../../queries/email-enabled";
 import { isRecentlySent, useCredentialForm } from "./use-credential-form";
 
 /** With `guest` the form names whose login it is; without, the person types an email or username. */

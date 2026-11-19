@@ -3,15 +3,17 @@ import {
   unavailabilityBodySchema,
   unavailabilityListSchema,
 } from "@schellingboard/contracts/location";
+
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import { problem, problemDefault } from "@/server/http/problem";
 import {
+  type App,
   body,
   idParam,
   json,
   noContent,
-  type App,
 } from "@/server/http/route-parts";
+
 import type { SessionUseCases } from "../application/use-cases";
 import { toUnavailabilityView } from "./view";
 

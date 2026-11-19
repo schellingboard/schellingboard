@@ -1,5 +1,6 @@
 import { z } from "@hono/zod-openapi";
 import { expectedVersion } from "@schellingboard/contracts/session";
+
 import type { createApp } from "./create-app";
 
 export type App = ReturnType<typeof createApp>;

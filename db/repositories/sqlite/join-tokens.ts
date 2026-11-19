@@ -1,5 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+
 import * as schema from "../../schema";
 import type { JoinToken, JoinTokensRepository } from "../interfaces";
 

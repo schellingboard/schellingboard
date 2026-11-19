@@ -1,8 +1,9 @@
-import { useState, type ReactNode } from "react";
 import type { Session } from "@schellingboard/domain/session";
+import { type ReactNode, useState } from "react";
+
 import { ConfirmDialog } from "../../ui/confirm-dialog";
+import { type Clash, clashMessage, findClashes } from "./clashes";
 import { useSchedule } from "./context";
-import { clashMessage, findClashes, type Clash } from "./clashes";
 
 /** What clicking RSVP does for the reader: ask who they are, warn of a clash, toggle. */
 export function useRsvp(session: Session) {

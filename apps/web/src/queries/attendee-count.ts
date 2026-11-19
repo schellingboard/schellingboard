@@ -3,6 +3,7 @@ import {
   MAX_ATTENDEE_COUNT,
   MIN_ATTENDEE_COUNT,
 } from "@schellingboard/domain/attendee-count";
+
 import { problemCode } from "../commands/problem";
 
 export type AttendeeCountResult =

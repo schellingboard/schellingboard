@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import type { ApiClient } from "@schellingboard/api-client";
+import { useEffect, useState } from "react";
 
 /** True when unknown: a screen only hides mail options once the server says it cannot send. */
 export async function fetchEmailEnabled(api: ApiClient): Promise<boolean> {

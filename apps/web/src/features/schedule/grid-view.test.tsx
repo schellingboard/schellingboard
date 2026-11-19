@@ -1,8 +1,10 @@
 // @module-tag 007-US1
-import { createRef } from "react";
-import { describe, it, expect } from "vitest";
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { createRef } from "react";
+import { describe, expect, it } from "vitest";
+
+import { snapshot } from "../../replica/snapshot-fixture";
 import { GridView } from "./grid-view";
 import {
   dataOf,
@@ -11,7 +13,6 @@ import {
   renderScheduled,
   snapshotWith,
 } from "./test-support";
-import { snapshot } from "../../replica/snapshot-fixture";
 
 function Grid({
   data,

@@ -1,9 +1,10 @@
-import { test, expect } from "./helpers/fixtures";
-import { uniqueSuffix } from "./helpers/unique";
-import { login } from "./helpers/auth";
-import { selectUser } from "./helpers/user";
 import { PROMPT_POOL } from "@schellingboard/domain/prompt-pool";
 import sharp from "sharp";
+
+import { login } from "./helpers/auth";
+import { expect, test } from "./helpers/fixtures";
+import { uniqueSuffix } from "./helpers/unique";
+import { selectUser } from "./helpers/user";
 
 /**
  * Opens one of the optional profile sections, which sit behind expandable

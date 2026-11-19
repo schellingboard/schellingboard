@@ -1,6 +1,7 @@
-import { DateTime } from "luxon";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { slotTimeLabel } from "@schellingboard/domain/meeting-slots";
+import { DateTime } from "luxon";
+
 import { compareMeetings } from "./meeting-column";
 import type { MeetingView } from "./meeting-view";
 

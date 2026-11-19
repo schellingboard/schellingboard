@@ -1,9 +1,10 @@
+import type { Day } from "@schellingboard/domain/event";
 import { and, eq, gt, isNotNull, lt, sql } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { nanoid } from "nanoid";
+
 import * as schema from "../../schema";
 import type { DaysRepository } from "../interfaces";
-import type { Day } from "@schellingboard/domain/event";
 
 type DB = BetterSQLite3Database<typeof schema>;
 

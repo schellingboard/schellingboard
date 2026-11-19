@@ -1,13 +1,14 @@
-import { Fragment, useMemo, type ReactNode } from "react";
 import type { Location } from "@schellingboard/domain/location";
-import type { Session } from "@schellingboard/domain/session";
 import { shownSlotStart } from "@schellingboard/domain/meeting-slots";
+import type { Session } from "@schellingboard/domain/session";
 import {
   formatDayLabel,
   formatOptionalTime,
   formatSlotLabel,
   TIME_FORMAT,
 } from "@schellingboard/domain/time";
+import { Fragment, type ReactNode, useMemo } from "react";
+
 import { cx } from "../../ui/cx";
 import {
   AcademicCapIcon,
@@ -18,8 +19,8 @@ import {
 import {
   agendaGroups,
   nowMarkerIndex,
-  timeState,
   type TimeState,
+  timeState,
 } from "./agenda";
 import { useSchedule } from "./context";
 import { getNowOffsetPx } from "./grid-layout";

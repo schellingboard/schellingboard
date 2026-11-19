@@ -1,5 +1,6 @@
 // @module-tag 014-US6
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import {
   createReleaseCheck,
   fetchLatestRelease,

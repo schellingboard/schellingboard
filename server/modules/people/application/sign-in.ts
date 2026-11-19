@@ -1,3 +1,12 @@
+import type { Actor } from "@/server/kernel/actor";
+import {
+  emailRetryAfter,
+  loginRetryAfter,
+  recordEmailIssued,
+  recordLoginFailure,
+  TOO_MANY_ATTEMPTS_ERROR,
+  TOO_MANY_EMAILS_ERROR,
+} from "@/server/kernel/rate-limit";
 import {
   conflict,
   forbidden,
@@ -5,18 +14,9 @@ import {
   limited,
   notFound,
   ok,
-  unavailable,
   type Result,
+  unavailable,
 } from "@/server/kernel/result";
-import type { Actor } from "@/server/kernel/actor";
-import {
-  TOO_MANY_ATTEMPTS_ERROR,
-  TOO_MANY_EMAILS_ERROR,
-  emailRetryAfter,
-  loginRetryAfter,
-  recordEmailIssued,
-  recordLoginFailure,
-} from "@/server/kernel/rate-limit";
 import { realNow } from "@/utils/real-clock";
 import {
   AUTH_CODE_VALID_MINUTES,
@@ -26,16 +26,17 @@ import {
   hashUserPassword,
   verifyUserPassword,
 } from "@/utils/user-credentials";
+
 import type { PeopleDeps } from "../ports";
+import { noEmail } from "./admin-guests";
 import {
+  type GuestTarget,
   isSpent,
   matchToken,
   recentlyIssued,
   resolveTarget,
-  type GuestTarget,
 } from "./auth-tokens";
-import { noEmail } from "./admin-guests";
-import { signIn, type SignedIn } from "./identity";
+import { type SignedIn, signIn } from "./identity";
 
 let dummy: Promise<string> | undefined;
 const dummyHash = () => (dummy ??= hashUserPassword("no such guest"));

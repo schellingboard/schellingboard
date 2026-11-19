@@ -1,20 +1,21 @@
-import type { ReactNode } from "react";
 import type { StatsTable } from "@schellingboard/contracts/stats";
+import type { ReactNode } from "react";
+
 import {
   BinChart,
   CountBars,
   CountHistogram,
   DayTimeline,
+  hasPrediction,
   MeetingsHeatmap,
+  pairs,
+  percentLabel,
   PopularProposals,
   PredictedVsReported,
   SupplyDemand,
-  TOP_SHOWN,
   TableScatter,
+  TOP_SHOWN,
   UtilizationHeatmaps,
-  hasPrediction,
-  pairs,
-  percentLabel,
 } from "./stats-charts";
 
 // A figure with `from` charts a table that has its own card, so it offers no

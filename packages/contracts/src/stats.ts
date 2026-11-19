@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { SESSION_ORIGINS } from "@schellingboard/domain/stats/session-origin";
+import { z } from "zod";
 
 export const statsColumnTypeSchema = z.enum([
   "text",

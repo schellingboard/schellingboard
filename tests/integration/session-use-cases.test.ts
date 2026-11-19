@@ -1,10 +1,16 @@
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
 }));
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import type { Day } from "@schellingboard/domain/event";
+
+import { getRepositories } from "@/db/container";
+import { sessionUseCases } from "@/server/composition";
+import type { Actor } from "@/server/kernel/actor";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createDay,
   createEvent,
@@ -14,10 +20,6 @@ import {
   createSession,
   slotStart,
 } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
-import { sessionUseCases } from "@/server/composition";
-import type { Actor } from "@/server/kernel/actor";
-import type { Day } from "@schellingboard/domain/event";
 
 const NOBODY: Actor = { admin: false, guest: null };
 const ADMIN: Actor = { admin: true, guest: null };

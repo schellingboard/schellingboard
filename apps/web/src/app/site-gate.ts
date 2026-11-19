@@ -1,4 +1,5 @@
 import type { ApiClient } from "@schellingboard/api-client";
+
 import { hardNavigate } from "./hard-navigate";
 
 /** The server serves page shells to everyone in dev, so the API call is where a missing site cookie shows. */

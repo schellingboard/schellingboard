@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
 import { readFileSync } from "fs";
 import path from "path";
+import { describe, expect, it } from "vitest";
 
 /**
  * docker-compose.yml is the one file in the repository whose only user is a

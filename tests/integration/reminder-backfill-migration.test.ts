@@ -1,13 +1,13 @@
 // @module-tag 001-US2
+import { followUpDueTime } from "@schellingboard/domain/reminder-schedule";
+import Database from "better-sqlite3";
 import fs from "fs";
 import os from "os";
 import path from "path";
-
-import Database from "better-sqlite3";
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { runMigrations } from "@/db/migrate";
-import { followUpDueTime } from "@schellingboard/domain/reminder-schedule";
+
 import { MIGRATIONS, migrationsBefore } from "../helpers/migrations";
 
 // The migration that adds the reminder machinery has to settle the follow-up

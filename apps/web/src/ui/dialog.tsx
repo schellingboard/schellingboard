@@ -1,11 +1,12 @@
-import { createPortal } from "react-dom";
 import {
+  type KeyboardEvent,
+  type ReactNode,
   useEffect,
   useId,
   useRef,
-  type KeyboardEvent,
-  type ReactNode,
 } from "react";
+import { createPortal } from "react-dom";
+
 import { useDiscardGuard } from "./use-discard-guard";
 import { useScrollLock } from "./use-scroll-lock";
 

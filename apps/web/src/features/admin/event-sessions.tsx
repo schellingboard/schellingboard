@@ -1,6 +1,7 @@
-import { useState, type FormEvent } from "react";
-import { DateTime } from "luxon";
 import { utcToZonedInput } from "@schellingboard/domain/admin-datetime";
+import { DateTime } from "luxon";
+import { type FormEvent, useState } from "react";
+
 import type {
   AdminEventCalls,
   AdminSessionBody,
@@ -22,22 +23,22 @@ import {
 import { FormErrorSummary } from "../../ui/form-error-summary";
 import type { Person } from "../../ui/people-picker";
 import {
+  type DayOption,
   EMPTY_SESSION,
   sessionBody,
-  startInstant,
-  sessionFormValues,
-  type DayOption,
   type SessionFormValues,
+  sessionFormValues,
+  startInstant,
 } from "./admin-session-model";
+import { ConfirmByTyping } from "./confirm-by-typing";
 import {
   LIST_PAGE_SIZE,
+  type OnParams,
   pageOf,
   plural,
   searchByTitleOrHost,
   tableHandlers,
-  type OnParams,
 } from "./list-paging";
-import { ConfirmByTyping } from "./confirm-by-typing";
 import { RoomCheckboxes } from "./room-checkboxes";
 import { shown, useJumpWithin } from "./use-section-save";
 

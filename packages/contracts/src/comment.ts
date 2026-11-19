@@ -1,6 +1,7 @@
-import { z } from "zod";
-import { pageSchema } from "./cursor-page";
 import { COMMENT_MAX_LENGTH } from "@schellingboard/domain/comment";
+import { z } from "zod";
+
+import { pageSchema } from "./cursor-page";
 
 const body = z
   .string()

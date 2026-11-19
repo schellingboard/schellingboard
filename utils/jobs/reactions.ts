@@ -1,5 +1,6 @@
-import { getRepositories } from "@/db/container";
 import type { Actor, RecordedChange } from "@schellingboard/domain/change";
+
+import { getRepositories } from "@/db/container";
 import {
   notifyCohostsAdded,
   notifyMeetingOutcome,
@@ -8,11 +9,12 @@ import {
   notifyProposalCommented,
   notifyProposalJoined,
   notifySessionChanged,
+  notifySessionCommented,
   notifySessionDeleted,
   notifySessionLostHost,
-  notifySessionCommented,
 } from "@/utils/notifications";
-import { PRUNE_CHANGES, CHANGE_NOTIFICATIONS, type Job } from "./job";
+
+import { CHANGE_NOTIFICATIONS, type Job, PRUNE_CHANGES } from "./job";
 
 const BATCH = 50;
 const RETENTION_MS = 7 * 24 * 60 * 60 * 1000;

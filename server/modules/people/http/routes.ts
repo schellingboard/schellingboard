@@ -1,10 +1,10 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import { pageQuerySchema } from "@schellingboard/contracts/cursor-page";
 import {
   chooseGuestBodySchema,
   currentIdentitySchema,
   identitySchema,
 } from "@schellingboard/contracts/auth";
+import { pageQuerySchema } from "@schellingboard/contracts/cursor-page";
 import {
   attendeeListSchema,
   profileActivitySchema,
@@ -13,7 +13,7 @@ import {
   publicProfileSchema,
 } from "@schellingboard/contracts/guest";
 import { MIN_AVATAR_WIDTH } from "@schellingboard/domain/avatar-image";
-import { MAX_IMAGE_BYTES } from "@/utils/images";
+
 import { idempotencyHeaders } from "@/server/http/idempotency";
 import { pageOf } from "@/server/http/pagination";
 import {
@@ -22,15 +22,17 @@ import {
   versionConflictResponse,
 } from "@/server/http/problem";
 import {
+  type App,
   body,
   idParam,
   json,
   textExpectedVersion as expectedVersion,
-  type App,
 } from "@/server/http/route-parts";
+import { MAX_IMAGE_BYTES } from "@/utils/images";
+
 import type { PeopleUseCases } from "../application/use-cases";
-import { toAttendeeView, toProfileView } from "./view";
 import { setGuestCookie } from "./guest-cookie";
+import { toAttendeeView, toProfileView } from "./view";
 
 const avatarForm = z.object({
   avatar: z

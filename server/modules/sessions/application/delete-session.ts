@@ -1,7 +1,9 @@
 import { inSchedPhase } from "@schellingboard/domain/phase";
 import type { Session } from "@schellingboard/domain/session";
+
 import type { Actor } from "@/server/kernel/actor";
 import { notFound, ok, type Result } from "@/server/kernel/result";
+
 import type { SessionDeps } from "../ports";
 import { actingHost, managedByOrganizer, outsidePhase } from "./booking";
 import { removeSession } from "./session-changes";

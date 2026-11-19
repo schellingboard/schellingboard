@@ -1,7 +1,8 @@
 import { getCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
-import { actorOf } from "@/server/kernel/session-actor";
+
 import type { Actor } from "@/server/kernel/actor";
+import { actorOf } from "@/server/kernel/session-actor";
 import { requestNow } from "@/utils/dev-clock";
 
 export type ApiEnv = { Variables: { actor: Actor; now: Date } };

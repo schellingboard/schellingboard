@@ -1,4 +1,5 @@
 import { serve } from "@hono/node-server";
+
 import { warnAboutAdminPassword } from "@/server/admin-password-notice";
 import { logBootstrapLink } from "@/server/bootstrap-link";
 import { withForwardedProto } from "@/server/http/forwarded";

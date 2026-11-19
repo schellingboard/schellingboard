@@ -1,5 +1,6 @@
-import { useState, type FormEvent } from "react";
-import { settingsCalls, type EmailSettingsBody } from "../../commands/settings";
+import { type FormEvent, useState } from "react";
+
+import { type EmailSettingsBody, settingsCalls } from "../../commands/settings";
 import { useFormMutation } from "../../commands/use-form-mutation";
 import { Button } from "../../ui/button";
 import { CheckboxField } from "../../ui/form";

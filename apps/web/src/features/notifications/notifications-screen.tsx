@@ -1,5 +1,6 @@
-import { useEffect, useState, useSyncExternalStore } from "react";
 import { formatRelativeTime } from "@schellingboard/domain/relative-time";
+import { useEffect, useState, useSyncExternalStore } from "react";
+
 import type {
   NotificationAction,
   NotificationItem,

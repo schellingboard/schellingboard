@@ -1,8 +1,9 @@
 import type { Page } from "@playwright/test";
-import { test, expect } from "./helpers/fixtures";
+
 import { login } from "./helpers/auth";
-import { selectUser } from "./helpers/user";
+import { expect, test } from "./helpers/fixtures";
 import { swipe } from "./helpers/touch";
+import { selectUser } from "./helpers/user";
 
 /**
  * Narrows the directory to the three seeded "… Test" guests, in that order: a

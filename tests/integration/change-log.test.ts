@@ -1,25 +1,27 @@
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { updateLoggedSession, deleteLoggedSession } from "../helpers/changes";
-import {
-  createDay,
-  createEvent,
-  createGuest,
-  createLocation,
-  createUnavailability,
-  createSession,
-} from "../helpers/factories";
+import type { ChangeContext } from "@schellingboard/domain/change";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+
 import { getRepositories, withWriter } from "@/db/container";
-import { createEventUseCases } from "@/server/modules/events/module";
-import { createVenueUseCases } from "@/server/modules/venue/module";
-import { createMeetingUseCases } from "@/server/modules/meetings/module";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
+import { createEventUseCases } from "@/server/modules/events/module";
+import { createMeetingUseCases } from "@/server/modules/meetings/module";
 import {
   addSession,
   recordRsvpAdded,
   removeRsvp,
 } from "@/server/modules/sessions/module";
-import type { ChangeContext } from "@schellingboard/domain/change";
+import { createVenueUseCases } from "@/server/modules/venue/module";
+
+import { deleteLoggedSession, updateLoggedSession } from "../helpers/changes";
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import {
+  createDay,
+  createEvent,
+  createGuest,
+  createLocation,
+  createSession,
+  createUnavailability,
+} from "../helpers/factories";
 
 const AT = new Date("2026-06-01T10:00:00.000Z");
 const BY: ChangeContext = { actor: { type: "system" }, at: AT };

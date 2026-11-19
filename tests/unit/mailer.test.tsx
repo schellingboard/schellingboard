@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const transportSendMail = vi.fn();
 
@@ -9,6 +9,7 @@ vi.mock("nodemailer", () => ({
 }));
 
 import nodemailer from "nodemailer";
+
 import {
   initMailer,
   resetMailer,

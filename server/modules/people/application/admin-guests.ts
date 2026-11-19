@@ -1,28 +1,30 @@
-import { credentialsChanged } from "@/server/kernel/credential-changes";
 import {
   createGuestSchema,
   updateGuestSchema,
 } from "@schellingboard/contracts/guest";
-import type { z } from "zod";
 import { changes } from "@schellingboard/domain/change";
 import type { CompleteGuest } from "@schellingboard/domain/guest";
+import type { z } from "zod";
+
 import type { Actor } from "@/server/kernel/actor";
 import { byAdmin } from "@/server/kernel/change-context";
+import { credentialsChanged } from "@/server/kernel/credential-changes";
 import { recordingProposalCascade } from "@/server/kernel/proposal-cascade";
-import { recordingSessionCascade } from "@/server/kernel/session-cascade";
-import { recordingShownGuests } from "@/server/kernel/shown-guests";
-import { withStoredFile } from "@/server/kernel/stored-files";
 import {
   conflict,
+  type Failure,
   forbidden,
   invalidFields,
   notFound,
   ok,
+  type Result,
   unavailable,
   versionConflict,
-  type Failure,
-  type Result,
 } from "@/server/kernel/result";
+import { recordingSessionCascade } from "@/server/kernel/session-cascade";
+import { recordingShownGuests } from "@/server/kernel/shown-guests";
+import { withStoredFile } from "@/server/kernel/stored-files";
+
 import type { PeopleDeps } from "../ports";
 
 export interface AdminGuest {

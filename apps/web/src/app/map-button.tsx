@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
 import type { ApiClient } from "@schellingboard/api-client";
+import { useEffect, useState } from "react";
+
 import { Dialog } from "../ui/dialog";
 import { MapIcon } from "../ui/icons";
 

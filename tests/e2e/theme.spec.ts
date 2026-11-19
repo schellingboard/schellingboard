@@ -1,5 +1,5 @@
-import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
+import { expect, test } from "./helpers/fixtures";
 
 // The theme is per device rather than per attendee, so it lives in a cookie
 // and shows up as a class on <html> — the contract `styles/tokens.css` and the

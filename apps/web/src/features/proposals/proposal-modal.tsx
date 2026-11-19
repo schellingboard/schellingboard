@@ -1,4 +1,3 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
 import { inSchedPhase, inVotingPhase } from "@schellingboard/domain/phase";
 import type { Session } from "@schellingboard/domain/session";
@@ -10,6 +9,8 @@ import {
   voteChoiceToEmoji,
   voteChoiceToLabel,
 } from "@schellingboard/domain/vote-display";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
 import type {
   ProposalDetailQuery,
   ProposalDetailState,

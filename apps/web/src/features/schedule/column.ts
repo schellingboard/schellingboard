@@ -1,4 +1,5 @@
 import type { Session } from "@schellingboard/domain/session";
+
 import { gridBlockPx } from "./grid-layout";
 
 export type ColumnItem =

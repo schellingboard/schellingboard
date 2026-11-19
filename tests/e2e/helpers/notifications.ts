@@ -1,4 +1,4 @@
-import { Locator, Page, expect } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
 
 // A notification is written by the jobs loop after the request has answered,
 // and the list reads once per load, so a row can be missing until a reload.

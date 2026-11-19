@@ -1,10 +1,11 @@
-import { useRef, useState, type TextareaHTMLAttributes } from "react";
 import {
   applyTemplate,
   markdownOptions,
   matchesKey,
   type Template,
 } from "@schellingboard/domain/markdown-edit";
+import { type TextareaHTMLAttributes, useRef, useState } from "react";
+
 import { Markdown } from "./markdown";
 import { Tooltip } from "./tooltip";
 

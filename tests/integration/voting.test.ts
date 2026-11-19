@@ -1,10 +1,12 @@
 // @module-tag 005-US1
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createEvent, createGuest, createProposal } from "../helpers/factories";
+import { type Vote, VoteChoice } from "@schellingboard/domain/vote";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+
 import { getRepositories } from "@/db/container";
-import { VoteChoice, type Vote } from "@schellingboard/domain/vote";
 import { DELETE, GET, PUT } from "@/tests/helpers/v1-route";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createEvent, createGuest, createProposal } from "../helpers/factories";
 import { apiRequest } from "../helpers/proposal-api";
 
 const votePath = (proposalId: string, guestId: string) =>

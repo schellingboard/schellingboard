@@ -1,9 +1,9 @@
-import { test, expect } from "./helpers/fixtures";
 import { adminLogin } from "./helpers/admin";
 import { login } from "./helpers/auth";
-import { selectUser } from "./helpers/user";
-import { toast } from "./helpers/toast";
+import { expect, test } from "./helpers/fixtures";
 import { dayRadios, selectOption } from "./helpers/session-form";
+import { toast } from "./helpers/toast";
+import { selectUser } from "./helpers/user";
 
 test("RSVP to a session persists across reloads and can be removed again @009-US1", async ({
   page,

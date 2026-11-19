@@ -1,11 +1,11 @@
 import {
+  type CommentSubject,
+  type CommentView,
   createComment,
   deleteComment,
   editComment,
   likeComment,
   unlikeComment,
-  type CommentSubject,
-  type CommentView,
 } from "../commands/comment";
 import type { CommandRunner } from "../commands/runner";
 import type { CommentsQuery } from "./comments";

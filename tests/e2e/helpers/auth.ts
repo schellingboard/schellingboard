@@ -1,4 +1,4 @@
-import { Page, expect } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
 
 const DEFAULT_PASSWORD = process.env.TEST_PASSWORD || "testtest";
 

@@ -1,22 +1,23 @@
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { getRepositories } from "@/db/container";
+import type { Actor } from "@/server/kernel/actor";
+import type { Result } from "@/server/kernel/result";
+import { type UnitOfWork, unitOfWork } from "@/server/kernel/unit-of-work";
+import { createEventUseCases } from "@/server/modules/events/module";
+import { createProposalUseCases } from "@/server/modules/proposals/module";
+import { createSessionUseCases } from "@/server/modules/sessions/module";
+import { createVenueUseCases } from "@/server/modules/venue/module";
+
+import { uowFailingAt } from "../helpers/changes";
 import { isoDay } from "../helpers/dates";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createEvent,
   createGuest,
   createLocation,
   createSession,
 } from "../helpers/factories";
-import { uowFailingAt } from "../helpers/changes";
-import { getRepositories } from "@/db/container";
-import { unitOfWork, type UnitOfWork } from "@/server/kernel/unit-of-work";
-import { createEventUseCases } from "@/server/modules/events/module";
-import { createProposalUseCases } from "@/server/modules/proposals/module";
-import { createSessionUseCases } from "@/server/modules/sessions/module";
-import { createVenueUseCases } from "@/server/modules/venue/module";
-import type { Actor } from "@/server/kernel/actor";
-import type { Result } from "@/server/kernel/result";
 
 const ADMIN: Actor = { admin: true, guest: null };
 const NOBODY: Actor = { admin: false, guest: null };

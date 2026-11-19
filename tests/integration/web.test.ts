@@ -1,20 +1,23 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
-import { createAuthCookie } from "@/utils/auth";
+
 import { getRepositories } from "@/db/container";
-import { setupTestDb, resetTestDb } from "../helpers/db";
 import { withForwardedProto } from "@/server/http/forwarded";
 import { web } from "@/server/http/web";
+import { createAuthCookie } from "@/utils/auth";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import { throughWeb } from "../helpers/through-web";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef"; // 32 chars

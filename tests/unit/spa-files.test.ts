@@ -1,7 +1,8 @@
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "fs";
 import { tmpdir } from "os";
 import path from "path";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+
 import { serveSpaAsset, serveSpaShell } from "@/utils/spa-files";
 
 let dir: string;

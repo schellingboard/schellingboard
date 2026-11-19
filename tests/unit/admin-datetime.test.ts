@@ -1,4 +1,3 @@
-import { describe, it, expect } from "vitest";
 import {
   calendarDayOf,
   dayIndexOf,
@@ -7,6 +6,7 @@ import {
   zonedInputToInstant,
   zonedInputToUtc,
 } from "@schellingboard/domain/admin-datetime";
+import { describe, expect, it } from "vitest";
 
 // ── utcToZonedInput ──────────────────────────────────────────────────────────
 

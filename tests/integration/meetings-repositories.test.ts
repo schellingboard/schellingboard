@@ -1,9 +1,10 @@
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
-
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createEvent, createGuest } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
 import { DEFAULT_EMAIL_SETTINGS } from "@schellingboard/domain/guest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+
+import { getRepositories } from "@/db/container";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createEvent, createGuest } from "../helpers/factories";
 
 const SLOT_A = new Date("2026-09-12T10:00:00.000Z");
 const SLOT_B = new Date("2026-09-12T10:30:00.000Z");

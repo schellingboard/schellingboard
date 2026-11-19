@@ -1,9 +1,9 @@
-import type { z } from "zod";
 import type {
   dayViewSchema,
   eventViewSchema,
 } from "@schellingboard/contracts/event";
 import type { Day, Event } from "@schellingboard/domain/event";
+import type { z } from "zod";
 
 const iso = (d: Date | undefined) => d?.toISOString() ?? null;
 

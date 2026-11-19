@@ -1,4 +1,5 @@
 import type { LoginAssurance, LoginVia } from "@schellingboard/domain/auth";
+
 import type { Actor } from "@/server/kernel/actor";
 import { forbidden, notFound, ok, type Result } from "@/server/kernel/result";
 import {
@@ -7,6 +8,7 @@ import {
   SESSION_LIFETIME_MS,
 } from "@/utils/login-session-token";
 import { realNow } from "@/utils/real-clock";
+
 import type { PeopleDeps } from "../ports";
 
 /** What the caller must store: the guest, and the cookie token that names the new session. */

@@ -3,7 +3,8 @@ import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
-import { NoticeProvider, useNotify, type Notice } from "./notices";
+
+import { type Notice, NoticeProvider, useNotify } from "./notices";
 
 function Raiser({
   notice,

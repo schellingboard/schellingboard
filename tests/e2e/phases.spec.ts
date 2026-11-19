@@ -1,5 +1,5 @@
-import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
+import { expect, test } from "./helpers/fixtures";
 import { selectUser } from "./helpers/user";
 
 // Phase-dependent UI, one seeded event per phase:

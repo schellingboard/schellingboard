@@ -1,12 +1,13 @@
 // @module-tag 013-US1
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-import { GET, POST } from "@/tests/helpers/v1-route";
 import { getRepositories } from "@/db/container";
-import { notifyGuest } from "@/utils/notifications";
 import type { EmailRecipe } from "@/emails/registry";
 import { credentialsChanged } from "@/server/kernel/credential-changes";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { GET, POST } from "@/tests/helpers/v1-route";
+import { notifyGuest } from "@/utils/notifications";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import { createGuest } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
 

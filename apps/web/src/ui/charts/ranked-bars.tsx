@@ -1,6 +1,7 @@
 import { useCallback } from "react";
-import { PlotFrame, type Plot } from "./plot-frame";
-import { SERIES, SURFACE, baseOptions, labelMargin, shorten } from "./style";
+
+import { type Plot, PlotFrame } from "./plot-frame";
+import { baseOptions, labelMargin, SERIES, shorten, SURFACE } from "./style";
 
 export type RankedBar = { label: string; value: number };
 

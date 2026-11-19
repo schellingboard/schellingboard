@@ -1,14 +1,15 @@
-import { describe, it, expect } from "vitest";
-import { readFileSync } from "fs";
 import { LOCATION_COLOR_NAMES } from "@schellingboard/domain/location-colors";
+import { readFileSync } from "fs";
+import { describe, expect, it } from "vitest";
+
 import {
-  TOKENS_CSS_PATH,
   contrastRatio,
+  type Linear,
   mixOklab,
   parseColor,
   readTailwindPalette,
   readThemes,
-  type Linear,
+  TOKENS_CSS_PATH,
 } from "../helpers/color-math";
 
 const css = readFileSync(TOKENS_CSS_PATH, "utf8");

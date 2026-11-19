@@ -1,10 +1,10 @@
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
 
@@ -12,11 +12,15 @@ vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
 }));
 
-import { GET, POST, PUT, DELETE } from "@/tests/helpers/v1-route";
-import { openApiDocument } from "@/server/http/openapi";
-import { createAdminAuthCookie } from "../helpers/admin-cookie";
+import type { Day } from "@schellingboard/domain/event";
+
 import { getRepositories } from "@/db/container";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { isIdempotencyExempt } from "@/server/http/idempotency";
+import { openApiDocument } from "@/server/http/openapi";
+import { DELETE, GET, POST, PUT } from "@/tests/helpers/v1-route";
+
+import { createAdminAuthCookie } from "../helpers/admin-cookie";
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
   createDay,
   createEvent,
@@ -27,8 +31,6 @@ import {
   slotStart,
 } from "../helpers/factories";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
-import type { Day } from "@schellingboard/domain/event";
-import { isIdempotencyExempt } from "@/server/http/idempotency";
 
 const VALID_SECRET = "0123456789abcdef0123456789abcdef";
 

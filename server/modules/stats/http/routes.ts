@@ -3,9 +3,11 @@ import {
   eventStatisticsSchema,
   statsFilterQuerySchema,
 } from "@schellingboard/contracts/stats";
-import { zipSync, strToU8 } from "fflate";
+import { strToU8, zipSync } from "fflate";
+
 import { problem, problemDefault } from "@/server/http/problem";
-import { json, type App } from "@/server/http/route-parts";
+import { type App, json } from "@/server/http/route-parts";
+
 import type { StatsUseCases } from "../application/use-cases";
 
 const tags = ["admin"];

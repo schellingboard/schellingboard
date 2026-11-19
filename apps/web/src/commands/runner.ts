@@ -1,7 +1,8 @@
 import type { ApiClient } from "@schellingboard/api-client";
 import type { Snapshot } from "@schellingboard/contracts/snapshot";
-import { problemCode } from "./problem";
+
 import type { ReplicaStore } from "../replica/store";
+import { problemCode } from "./problem";
 
 export type CommandResponse<R> = {
   data?: R;

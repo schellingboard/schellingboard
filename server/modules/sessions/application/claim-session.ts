@@ -1,9 +1,11 @@
 import type { ChangeContext } from "@schellingboard/domain/change";
 import type { Session } from "@schellingboard/domain/session";
 import { claimRefusal } from "@schellingboard/domain/session-claim";
+
 import { actingGuest } from "@/server/kernel/acting-guest";
 import type { Actor } from "@/server/kernel/actor";
 import { forbidden, notFound, ok, type Result } from "@/server/kernel/result";
+
 import type { SessionDeps } from "../ports";
 import {
   changedMeanwhile,

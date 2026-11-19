@@ -1,5 +1,6 @@
 // @module-tag 007-US3
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import {
   parseScheduleFilters,
   serializeScheduleFilters,

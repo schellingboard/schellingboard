@@ -1,13 +1,14 @@
-import { and, asc, eq, inArray, sql, type SQL } from "drizzle-orm";
+import type { Comment, CommentLiker } from "@schellingboard/domain/comment";
+import { and, asc, eq, inArray, type SQL, sql } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import type { AnySQLiteColumn, SQLiteTable } from "drizzle-orm/sqlite-core";
 import { nanoid } from "nanoid";
+
 import * as schema from "../../schema";
 import type {
   CommentsRepository,
   SubjectCommentsRepository,
 } from "../interfaces";
-import type { Comment, CommentLiker } from "@schellingboard/domain/comment";
 
 type DB = BetterSQLite3Database<typeof schema>;
 

@@ -1,9 +1,10 @@
-import { describe, it, expect, afterEach, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import {
-  parseTimeOffset,
   nowWithOffset,
-  requestNow,
+  parseTimeOffset,
   readTimeOffsetCookie,
+  requestNow,
   TIME_OFFSET_COOKIE,
 } from "@/utils/dev-clock";
 

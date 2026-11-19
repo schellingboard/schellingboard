@@ -1,8 +1,8 @@
-import { describe, it, expect } from "vitest";
 import {
   meetingSlotsForDay,
   slotTimeLabel,
 } from "@schellingboard/domain/meeting-slots";
+import { describe, expect, it } from "vitest";
 
 const DAY = {
   start: new Date("2026-09-11T07:00:00.000Z"),

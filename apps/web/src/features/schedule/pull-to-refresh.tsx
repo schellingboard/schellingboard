@@ -1,4 +1,5 @@
-import { useEffect, useRef, type RefObject } from "react";
+import { type RefObject, useEffect, useRef } from "react";
+
 import { ArrowPathIcon } from "../../ui/icons";
 
 const AXIS_PX = 8;

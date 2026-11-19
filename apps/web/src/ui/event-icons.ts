@@ -1,5 +1,6 @@
-import type { ComponentType, SVGProps } from "react";
 import type { EventIconName } from "@schellingboard/domain/event-icons";
+import type { ComponentType, SVGProps } from "react";
+
 import {
   AcademicCapOutlineIcon,
   BeakerIcon,

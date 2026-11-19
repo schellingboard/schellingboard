@@ -1,4 +1,5 @@
-import { Locator, Page, expect } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
+
 import { login } from "./auth";
 
 // Clicks `trigger` until `opened` shows up. The header is server-rendered, so

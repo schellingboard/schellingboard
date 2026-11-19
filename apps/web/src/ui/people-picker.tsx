@@ -1,4 +1,5 @@
-import { useId, useRef, useState, type KeyboardEvent } from "react";
+import { type KeyboardEvent, useId, useRef, useState } from "react";
+
 import { XMarkIcon } from "./icons";
 
 export type Person = { id: string; name: string };

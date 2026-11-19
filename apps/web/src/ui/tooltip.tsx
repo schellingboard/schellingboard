@@ -1,12 +1,13 @@
 import {
+  type ReactNode,
   useEffect,
   useId,
   useLayoutEffect,
   useRef,
   useState,
-  type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
+
 import { cx } from "./cx";
 
 // The schedule grid is wall-to-wall triggers, so opening on mouseenter fires a

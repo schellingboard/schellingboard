@@ -1,6 +1,6 @@
+import { encodeCsv } from "@schellingboard/domain/stats/csv";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { encodeCsv } from "@schellingboard/domain/stats/csv";
 
 const cols = [{ label: "Title" }, { label: "RSVPs" }];
 

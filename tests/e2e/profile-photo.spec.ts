@@ -1,5 +1,5 @@
-import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
+import { expect, test } from "./helpers/fixtures";
 import { expectImageLoaded } from "./helpers/images";
 
 // Charlie Test is seeded with an uploaded photo and no other spec edits their

@@ -1,5 +1,5 @@
-import { test, expect } from "./helpers/fixtures";
 import { login } from "./helpers/auth";
+import { expect, test } from "./helpers/fixtures";
 import { switchToView } from "./helpers/schedule";
 
 const KEYNOTE = /Opening Keynote/;

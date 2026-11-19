@@ -1,6 +1,6 @@
-import { test, expect } from "./helpers/fixtures";
 import { adminLogin } from "./helpers/admin";
 import { login } from "./helpers/auth";
+import { expect, test } from "./helpers/fixtures";
 import { uniqueSuffix } from "./helpers/unique";
 import { openNameSwitcher } from "./helpers/user";
 

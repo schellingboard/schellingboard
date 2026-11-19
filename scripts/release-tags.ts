@@ -16,6 +16,7 @@
 import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
 import { compareVersions } from "./release-dumps";
 
 const repoRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");

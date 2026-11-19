@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from "react";
+import { type FormEvent, useState } from "react";
+
 import type { AdminEventCalls } from "../../commands/admin-events";
 import type { FieldErrors } from "../../commands/mutation";
 import { useFormMutation } from "../../commands/use-form-mutation";
@@ -8,17 +9,17 @@ import { DataTable } from "../../ui/data-table";
 import { PeopleField, TextAreaField, TextField } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
 import type { Person } from "../../ui/people-picker";
+import { type DayOption, EMPTY_SESSION } from "./admin-session-model";
+import { ConfirmByTyping } from "./confirm-by-typing";
+import { type EventLocation, SessionForm } from "./event-sessions";
 import {
   LIST_PAGE_SIZE,
+  type OnParams,
   pageOf,
   plural,
   searchByTitleOrHost,
   tableHandlers,
-  type OnParams,
 } from "./list-paging";
-import { EMPTY_SESSION, type DayOption } from "./admin-session-model";
-import { ConfirmByTyping } from "./confirm-by-typing";
-import { SessionForm, type EventLocation } from "./event-sessions";
 import { shown, useJumpWithin } from "./use-section-save";
 
 const FIELDS = ["title", "description", "durationMinutes", "hostIds"];

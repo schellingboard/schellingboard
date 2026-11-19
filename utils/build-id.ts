@@ -1,5 +1,6 @@
 import { readFileSync } from "fs";
 import path from "path";
+
 import { getAppVersion } from "./git";
 
 let cached: string | undefined;

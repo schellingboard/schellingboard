@@ -1,4 +1,3 @@
-import { useMemo, useState } from "react";
 import {
   utcToZonedInput,
   zonedInputToInstant,
@@ -6,25 +5,27 @@ import {
 import type { IdentityMode } from "@schellingboard/domain/event";
 import { isEventIconName } from "@schellingboard/domain/event-icons";
 import { SLOT_INCREMENT_OPTIONS } from "@schellingboard/domain/slots";
+import { useMemo, useState } from "react";
+
 import type { AdminEventCalls } from "../../commands/admin-events";
+import type { AdminEventDay } from "../../queries/admin-event";
 import type { AdminEvent } from "../../queries/admin-events";
+import type { MeetingPoint } from "../../queries/admin-meeting-points";
+import type { ScheduledSession } from "../../queries/admin-sessions";
 import { Button } from "../../ui/button";
 import {
-  ComboboxField,
   CheckboxField,
+  ComboboxField,
   DateTimeField,
   MarkdownField,
   SelectField,
   TextField,
 } from "../../ui/form";
 import { FormErrorSummary } from "../../ui/form-error-summary";
-import type { AdminEventDay } from "../../queries/admin-event";
-import type { MeetingPoint } from "../../queries/admin-meeting-points";
-import type { ScheduledSession } from "../../queries/admin-sessions";
 import { ConfirmByTyping } from "./confirm-by-typing";
 import { EventDaysManager } from "./event-days";
-import { EventMeetingsForm } from "./event-meetings";
 import { EventIconPicker } from "./event-icon-picker";
+import { EventMeetingsForm } from "./event-meetings";
 import {
   IDENTITY_MODE_HINT,
   IDENTITY_MODE_OPTIONS,

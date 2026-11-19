@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
+
+import { fakeApi, type FakeHandler, problem } from "../commands/fake-api";
+import { createCommandRunner } from "../commands/runner";
 import { snapshot } from "../replica/snapshot-fixture";
 import { createReplicaStore } from "../replica/store";
-import { createCommandRunner } from "../commands/runner";
-import { fakeApi, problem, type FakeHandler } from "../commands/fake-api";
 import { createCommentsQuery } from "./comments";
 import { createCommentsController } from "./comments-controller";
 

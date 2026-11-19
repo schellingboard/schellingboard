@@ -1,4 +1,5 @@
 import { createRoute, z } from "@hono/zod-openapi";
+import { pageQuerySchema } from "@schellingboard/contracts/cursor-page";
 import {
   adminProposalCreateSchema,
   adminProposalUpdateSchema,
@@ -7,21 +8,22 @@ import {
   proposalUpdateSchema,
   proposalViewSchema,
 } from "@schellingboard/contracts/proposal";
-import { pageQuerySchema } from "@schellingboard/contracts/cursor-page";
-import { pageOf } from "@/server/http/pagination";
+
 import { idempotencyHeaders } from "@/server/http/idempotency";
+import { pageOf } from "@/server/http/pagination";
 import {
   problem,
   problemDefault,
   versionConflictResponse,
 } from "@/server/http/problem";
 import {
+  type App,
   body,
   idParam,
   json,
   noContent,
-  type App,
 } from "@/server/http/route-parts";
+
 import type { ProposalUseCases } from "../application/use-cases";
 import { toProposalView } from "./view";
 

@@ -1,26 +1,28 @@
 // @module-tag 006-US1
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/utils/mailer", () => ({
   sendMail: vi.fn(),
 }));
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { VoteChoice } from "@schellingboard/domain/vote";
+
+import { getRepositories } from "@/db/container";
+import { DELETE as deleteV1, PUT as putV1 } from "@/tests/helpers/v1-route";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
 import {
+  createDay,
   createEvent,
   createGuest,
   createLocation,
-  createDay,
-  slotStart,
   createProposal as createProposalFixture,
   createSession,
+  slotStart,
 } from "../helpers/factories";
-import { getRepositories } from "@/db/container";
-import { VoteChoice } from "@schellingboard/domain/vote";
-import { addSession, type SessionParams } from "../helpers/session-form";
-import { DELETE as deleteV1, PUT as putV1 } from "@/tests/helpers/v1-route";
-import { apiRequest, proposalApi } from "../helpers/proposal-api";
 import { GUEST_COOKIE_NAME, openGuestValue } from "../helpers/guest-cookie";
+import { apiRequest, proposalApi } from "../helpers/proposal-api";
+import { addSession, type SessionParams } from "../helpers/session-form";
 
 const cookieJar = new Map<string, string>();
 const { createProposal } = proposalApi(cookieJar);

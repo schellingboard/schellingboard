@@ -1,4 +1,5 @@
 import type { ApiClient } from "@schellingboard/api-client";
+
 import { createPagedQuery, type PagedState } from "./paged-query";
 
 export type AdminProposal = {

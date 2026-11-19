@@ -1,18 +1,20 @@
 // @module-tag 001-US2b
 import {
-  describe,
-  it,
-  expect,
+  afterEach,
   beforeAll,
   beforeEach,
-  afterEach,
+  describe,
+  expect,
+  it,
   vi,
 } from "vitest";
+
 import { api } from "@/server/http/app";
 import { openApiDocumentOf } from "@/server/http/docs";
-import { createAuthCookie } from "@/utils/auth";
 import { throughWeb } from "@/tests/helpers/through-web";
-import { setupTestDb, resetTestDb } from "../helpers/db";
+import { createAuthCookie } from "@/utils/auth";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
 
 const dispatch = async () =>
   throughWeb("/api/dev/reminders", { method: "POST" }, [

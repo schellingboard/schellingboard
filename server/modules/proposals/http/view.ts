@@ -4,6 +4,7 @@ import type {
 } from "@schellingboard/contracts/proposal";
 import type { LoggedProposal } from "@schellingboard/domain/change";
 import type { z } from "zod";
+
 import type { ProposalView } from "../application/queries";
 
 export function toSnapshotProposalView(

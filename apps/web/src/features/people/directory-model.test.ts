@@ -1,5 +1,6 @@
 // @module-tag 011-US3
 import { describe, expect, it } from "vitest";
+
 import type { DirectoryEntry } from "../../queries/directory";
 import { cardsFrom, directoryView, withParams } from "./directory-model";
 

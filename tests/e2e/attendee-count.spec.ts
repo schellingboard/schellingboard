@@ -1,14 +1,15 @@
 import { Page } from "@playwright/test";
-import { test, expect } from "./helpers/fixtures";
-import { login } from "./helpers/auth";
-import { setDevClock } from "./helpers/dev-clock";
-import { gammaDay } from "./helpers/seed";
-import { selectUser } from "./helpers/user";
+
 import {
   getMessage,
   searchBySubject,
   skipWithoutMailpit,
 } from "../helpers/mailpit";
+import { login } from "./helpers/auth";
+import { setDevClock } from "./helpers/dev-clock";
+import { expect, test } from "./helpers/fixtures";
+import { gammaDay } from "./helpers/seed";
+import { selectUser } from "./helpers/user";
 
 // A host records how many people came to a session of theirs once it has
 // finished. Only the browser reveals what is tested here: that the control

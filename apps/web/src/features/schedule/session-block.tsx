@@ -1,8 +1,9 @@
-import { DateTime } from "luxon";
 import type { Location } from "@schellingboard/domain/location";
 import type { Session } from "@schellingboard/domain/session";
 import { isBookableSlot } from "@schellingboard/domain/session-bookable";
 import { formatOptionalTime, TIME_FORMAT } from "@schellingboard/domain/time";
+import { DateTime } from "luxon";
+
 import { cx } from "../../ui/cx";
 import {
   AcademicCapIcon,
@@ -13,21 +14,21 @@ import {
 } from "../../ui/icons";
 import { plainText } from "../../ui/plain-text";
 import { Tooltip } from "../../ui/tooltip";
+import type { ColumnItem } from "./column";
 import {
   CURRENT_MATCH_CLASS,
   GHOST_CLASS,
   useSchedule,
   useScheduleMatch,
 } from "./context";
-import type { ColumnItem } from "./column";
 import type { DayWithSessions } from "./model";
-import { useRsvp } from "./use-rsvp";
-import { sessionLink } from "./session-link";
 import {
+  type Position,
   PositionedBlock,
   TITLE_MIN_PX,
-  type Position,
 } from "./positioned-block";
+import { sessionLink } from "./session-link";
+import { useRsvp } from "./use-rsvp";
 
 export function SessionBlock({
   item,

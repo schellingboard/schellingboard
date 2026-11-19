@@ -1,18 +1,20 @@
 // @module-tag 005-US1
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/utils/mailer", () => ({ sendMail: vi.fn() }));
 
-import { setupTestDb, resetTestDb } from "../helpers/db";
-import { createEvent, createGuest, createProposal } from "../helpers/factories";
-import { expectChangesSuffice } from "../helpers/sufficiency";
-import { getRepositories } from "@/db/container";
-import { proposalUseCases } from "@/server/composition";
-import type { Actor } from "@/server/kernel/actor";
 import { reaches } from "@schellingboard/domain/change";
 import { VoteChoice } from "@schellingboard/domain/vote";
+
+import { getRepositories } from "@/db/container";
+import { proposalUseCases } from "@/server/composition";
 import { snapshotFor } from "@/server/feed/snapshot";
+import type { Actor } from "@/server/kernel/actor";
 import { unitOfWork } from "@/server/kernel/unit-of-work";
+
+import { resetTestDb, setupTestDb } from "../helpers/db";
+import { createEvent, createGuest, createProposal } from "../helpers/factories";
+import { expectChangesSuffice } from "../helpers/sufficiency";
 
 const NOBODY: Actor = { admin: false, guest: null };
 const ADMIN: Actor = { admin: true, guest: null };

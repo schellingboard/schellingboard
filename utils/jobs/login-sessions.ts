@@ -1,5 +1,6 @@
 import { getRepositories } from "@/db/container";
-import { PRUNE_LOGIN_SESSIONS, type Job } from "./job";
+
+import { type Job, PRUNE_LOGIN_SESSIONS } from "./job";
 
 export const pruneLoginSessions: Job = {
   name: PRUNE_LOGIN_SESSIONS,

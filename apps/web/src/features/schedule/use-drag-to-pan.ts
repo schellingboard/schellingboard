@@ -1,4 +1,4 @@
-import { useEffect, type RefObject } from "react";
+import { type RefObject, useEffect } from "react";
 
 // Movement below this many px stays a click; beyond it the press becomes a
 // pan and the eventual click is swallowed.

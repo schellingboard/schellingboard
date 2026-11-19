@@ -1,7 +1,9 @@
 import { createRoute } from "@hono/zod-openapi";
 import { updateStatusSchema } from "@schellingboard/contracts/updates";
+
 import { problem, problemDefault } from "@/server/http/problem";
-import { json, type App } from "@/server/http/route-parts";
+import { type App, json } from "@/server/http/route-parts";
+
 import type { UpdateUseCases } from "../application/use-cases";
 
 const getUpdates = createRoute({

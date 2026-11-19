@@ -1,9 +1,10 @@
 import { compareEventsByStart } from "@schellingboard/domain/event";
 import { formatEventDates } from "@schellingboard/domain/time";
+
 import type { EventSummary } from "../../app/use-events";
 import { toEvent } from "../../replica/selectors";
-import { CalendarIcon, ChevronRightIcon, LinkIcon } from "../../ui/icons";
 import { EventIcon } from "../../ui/event-icon";
+import { CalendarIcon, ChevronRightIcon, LinkIcon } from "../../ui/icons";
 import { Markdown } from "../../ui/markdown";
 
 export interface SiteInfo {
