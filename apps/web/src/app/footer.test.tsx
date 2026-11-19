@@ -1,9 +1,24 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Footer } from "./footer";
 import { ThemeProvider } from "./theme";
 import type { UpdateStatus } from "./updates";
+
+vi.mock("@schellingboard/domain/release-notes", async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  SHOWN_RELEASES: 3,
+  releaseNotes: [
+    { version: "Unreleased", highlights: ["**Dragon taming**: in progress."] },
+    {
+      version: "2.2.2",
+      date: "2031-03-07",
+      highlights: ["**Teleporting rooms**: sessions move themselves."],
+    },
+    { version: "2.2.1", date: "2030-12-25", highlights: ["**Snow mode**."] },
+    { version: "2.2.0", date: "2030-01-01", highlights: ["**Too old**."] },
+  ],
+}));
 
 const show = (version: string | undefined, update?: UpdateStatus | null) =>
   render(
@@ -39,19 +54,27 @@ describe("Footer", () => {
 
   it("opens the release notes with the running version and dates", async () => {
     const user = userEvent.setup();
-    show("5.0.0");
+    show("2.2.2");
 
-    await user.click(screen.getByRole("button", { name: /Version 5.0.0/ }));
+    await user.click(screen.getByRole("button", { name: /Version 2\.2\.2/ }));
 
     const dialog = screen.getByRole("dialog", { name: "What's new" });
-    expect(dialog.textContent).toContain("This site is running 5.0.0.");
+    expect(dialog.textContent).toContain("This site is running 2.2.2.");
     expect(
-      within(dialog).getByRole("heading", { name: "5.0.0 — 11 November 2026" })
-    ).toBeTruthy();
+      within(dialog)
+        .getAllByRole("heading", { level: 3 })
+        .map((heading) => heading.textContent)
+    ).toEqual([
+      "Unreleased",
+      "2.2.2 — 7 March 2031",
+      "2.2.1 — 25 December 2030",
+    ]);
     expect(
-      within(dialog).getByRole("heading", { name: "4.0.0 — 4 October 2026" })
+      within(dialog).getByText(
+        "In this build, but not in a released version yet."
+      )
     ).toBeTruthy();
-    expect(within(dialog).getByText("A faster, live schedule")).toBeTruthy();
+    expect(within(dialog).getByText("Teleporting rooms")).toBeTruthy();
     expect(
       within(dialog).getByRole("link", { name: "Full changelog on GitHub" })
     ).toBeTruthy();
