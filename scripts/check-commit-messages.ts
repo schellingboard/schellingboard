@@ -1,15 +1,16 @@
 // Checks commit messages against docs/dev/version-control.md.
 //
-//     bun scripts/check-commit-messages.ts            # origin/main..HEAD (or main..HEAD)
-//     bun scripts/check-commit-messages.ts base..head # any git range
+//     bun scripts/check-commit-messages.ts            # origin/main..HEAD, or trunk()..@ in jj
+//     bun scripts/check-commit-messages.ts base..head # a git range, or a jj revset
 //     echo "feat: x" | bun scripts/check-commit-messages.ts --stdin
 
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
+const usesJj = existsSync(path.join(repoRoot, ".jj"));
 
 const TYPES = [
   "feat",
@@ -67,6 +68,7 @@ export function commitMessageProblems(message: string): string[] {
 }
 
 function defaultRange(): string {
+  if (usesJj) return "trunk()..@";
   const hasOrigin = (() => {
     try {
       git(["rev-parse", "--verify", "--quiet", "origin/main"]);
@@ -82,8 +84,21 @@ function git(args: string[]): string {
   return execFileSync("git", args, { encoding: "utf8", cwd: repoRoot });
 }
 
+function jj(args: string[]): string {
+  return execFileSync("jj", args, { encoding: "utf8", cwd: repoRoot });
+}
+
+function log(range: string): string {
+  if (!usesJj)
+    return git(["log", "--no-merges", "--format=%h%x00%B%x01", range]);
+  // An undescribed @ is work in progress, not yet a commit.
+  const revset = `(${range}) ~ merges() ~ (@ & description(exact:""))`;
+  const template = 'change_id.short() ++ "\\x00" ++ description ++ "\\x01"';
+  return jj(["log", "--no-graph", "-r", revset, "-T", template]);
+}
+
 function messagesIn(range: string): { id: string; message: string }[] {
-  return git(["log", "--no-merges", "--format=%h%x00%B%x01", range])
+  return log(range)
     .split("\x01")
     .map((entry) => entry.replace(/^\n/, ""))
     .filter((entry) => entry.trim() !== "")

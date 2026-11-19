@@ -25,7 +25,7 @@ help:
 	@printf "  %-28s %s\n" "make lint"               "Run linter"
 	@printf "  %-28s %s\n" "make lint-watch"         "Run linter in watch mode"
 	@printf "  %-28s %s\n" "make typecheck"          "Run TypeScript type checking"
-	@printf "  %-28s %s\n" "make commit-check"       "Check commit messages (RANGE=base..head, default origin/main..HEAD)"
+	@printf "  %-28s %s\n" "make commit-check"       "Check commit messages (RANGE=base..head or a jj revset, default origin/main..HEAD or trunk()..@)"
 	@printf "  %-28s %s\n" "make arch"               "Check architecture rules (cycles, layer boundaries)"
 	@printf "  %-28s %s\n" "make openapi"            "Regenerate openapi.json and the api-client types"
 	@printf "  %-28s %s\n" "make openapi-check"      "Check openapi.json and the api-client match the API"
