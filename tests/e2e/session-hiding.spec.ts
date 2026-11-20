@@ -15,7 +15,7 @@ test("an attendee hides a session, finds it under Hidden and shows it again @007
 
   await page.getByRole("link", { name: /API Design/ }).click();
   const dialog = page.getByRole("dialog", { name: "Session details" });
-  await dialog.getByRole("button", { name: "Not interested" }).click();
+  await dialog.getByRole("button", { name: "Hide on the schedule" }).click();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("link", { name: /API Design/ })).toBeHidden();
 
@@ -26,7 +26,7 @@ test("an attendee hides a session, finds it under Hidden and shows it again @007
   ).toBeHidden();
 
   await page.getByRole("link", { name: /API Design/ }).click();
-  await dialog.getByRole("button", { name: "Show again" }).click();
+  await dialog.getByRole("button", { name: "Show on the schedule" }).click();
   await page.keyboard.press("Escape");
   await filterChip(page, "Hidden").click();
   await expect(page.getByRole("link", { name: /API Design/ })).toBeVisible();

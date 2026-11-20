@@ -213,15 +213,26 @@ function Details({ session }: { session: Session }) {
         )}
       </div>
       {data.guestId && !isHost && !rsvpd && (
-        <button
-          type="button"
-          onClick={() =>
-            void actions.setHidden(session.id, !data.hidden(session.id))
+        <Tooltip
+          content={
+            data.hidden(session.id)
+              ? "Shows this session on your schedule again."
+              : "Hides this session on your schedule, for you only. Use it if you are not interested or for any other reason. You can show it again here."
           }
-          className="-mt-4 mb-6 text-xs text-fg-subtle underline hover:text-fg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+          className="-mt-4 mb-6 w-fit"
         >
-          {data.hidden(session.id) ? "Show again" : "Not interested"}
-        </button>
+          <button
+            type="button"
+            onClick={() =>
+              void actions.setHidden(session.id, !data.hidden(session.id))
+            }
+            className="text-xs text-fg-subtle underline hover:text-fg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+          >
+            {data.hidden(session.id)
+              ? "Show on the schedule"
+              : "Hide on the schedule"}
+          </button>
+        </Tooltip>
       )}
       {clashes.length > 0 && (
         <p className="mb-6 flex items-start gap-2 rounded-md bg-warning-tint p-3 text-sm text-warning-fg">

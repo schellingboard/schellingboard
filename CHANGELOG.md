@@ -32,9 +32,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   ([#1104](https://github.com/schellingboard/schellingboard/issues/1104)): a **Clashes** filter
   lists sessions and 1-on-1s of yours that overlap, and clashing blocks get a warning icon.
 - **Hide sessions you are not interested in**
-  ([#1103](https://github.com/schellingboard/schellingboard/issues/1103)): "Not interested" in the
-  session window greys the session out on the grid and drops it from the agenda; a **Hidden** filter
-  brings it back.
+  ([#1103](https://github.com/schellingboard/schellingboard/issues/1103)): "Hide on the schedule" in
+  the session window greys the session out on the grid and drops it from the agenda; a **Hidden**
+  filter brings it back.
 - **Bookmark sessions privately**
   ([#864](https://github.com/schellingboard/schellingboard/issues/864),
   [#264](https://github.com/schellingboard/schellingboard/issues/264),

@@ -584,7 +584,7 @@ describe("hiding from the session modal", { tags: ["007-US10"] }, () => {
   it("hides a session the viewer is not committed to", async () => {
     const { actions } = open(snapshotWith({}, { me: notMe }));
     await userEvent.click(
-      within(dialog()).getByRole("button", { name: "Not interested" })
+      within(dialog()).getByRole("button", { name: "Hide on the schedule" })
     );
     expect(actions.setHidden).toHaveBeenCalledWith("s", true);
   });
@@ -592,7 +592,7 @@ describe("hiding from the session modal", { tags: ["007-US10"] }, () => {
   it("shows a hidden session again", async () => {
     const { actions } = open(snapshotWith({}, { me: hiddenMe }));
     await userEvent.click(
-      within(dialog()).getByRole("button", { name: "Show again" })
+      within(dialog()).getByRole("button", { name: "Show on the schedule" })
     );
     expect(actions.setHidden).toHaveBeenCalledWith("s", false);
   });
@@ -605,27 +605,27 @@ describe("hiding from the session modal", { tags: ["007-US10"] }, () => {
       )
     );
     expect(
-      within(dialog()).getByRole("button", { name: "Not interested" })
+      within(dialog()).getByRole("button", { name: "Hide on the schedule" })
     ).toBeTruthy();
   });
 
   it("is not offered after an RSVP, to a host, or without a name", () => {
     open(snapshotWith());
     expect(
-      within(dialog()).queryByRole("button", { name: "Not interested" })
+      within(dialog()).queryByRole("button", { name: "Hide on the schedule" })
     ).toBeNull();
     cleanup();
     open(snapshotWith({}, { me: { ...hiddenMe, guestId: "host" } }));
     expect(
-      within(dialog()).queryByRole("button", { name: "Show again" })
+      within(dialog()).queryByRole("button", { name: "Show on the schedule" })
     ).toBeNull();
     expect(
-      within(dialog()).queryByRole("button", { name: "Not interested" })
+      within(dialog()).queryByRole("button", { name: "Hide on the schedule" })
     ).toBeNull();
     cleanup();
     open(snapshotWith({}, { me: null }));
     expect(
-      within(dialog()).queryByRole("button", { name: "Not interested" })
+      within(dialog()).queryByRole("button", { name: "Hide on the schedule" })
     ).toBeNull();
   });
 });
