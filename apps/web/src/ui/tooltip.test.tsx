@@ -42,6 +42,33 @@ describe("Tooltip", () => {
     expect(screen.getByRole("tooltip")).toBeTruthy();
   });
 
+  it("stays shut when a tap focuses the trigger", () => {
+    render(
+      <Tooltip content="More">
+        <button type="button">Trigger</button>
+      </Tooltip>
+    );
+    const button = screen.getByRole("button");
+    fireEvent.pointerDown(button, { pointerType: "touch" });
+    act(() => button.focus());
+    expect(screen.queryByRole("tooltip")).toBeNull();
+  });
+
+  it("closes when the trigger is clicked, even if the click is stopped", () => {
+    render(
+      <Tooltip content="More">
+        <button type="button" onClick={(e) => e.stopPropagation()}>
+          Trigger
+        </button>
+      </Tooltip>
+    );
+    const button = screen.getByRole("button");
+    act(() => button.focus());
+    expect(screen.getByRole("tooltip")).toBeTruthy();
+    fireEvent.click(button);
+    expect(screen.queryByRole("tooltip")).toBeNull();
+  });
+
   it("opens on keyboard focus at once", () => {
     render(
       <Tooltip content="More">

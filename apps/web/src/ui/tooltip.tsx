@@ -114,7 +114,7 @@ export function Tooltip({
           id={id}
           role="tooltip"
           style={position ?? { top: 0, left: 0, visibility: "hidden" }}
-          className="pointer-events-none fixed z-50 max-w-xs rounded-md border border-line bg-surface-raised text-fg shadow-lg"
+          className="pointer-events-none fixed z-[65] max-w-xs rounded-md border border-line bg-surface-raised text-fg shadow-lg"
         >
           {typeof content === "string" ? (
             <p className="line-clamp-6 px-3 py-2 text-sm">{content}</p>
@@ -128,6 +128,7 @@ export function Tooltip({
 
   const sensed = (e: React.PointerEvent) => {
     touched.current = e.pointerType === "touch";
+    if (touched.current) hide();
   };
   const rested = () => {
     clearTimeout(rest.current);
@@ -163,10 +164,12 @@ export function Tooltip({
       className={cx(className, triggerClassName)}
       aria-describedby={open ? id : undefined}
       onPointerEnter={sensed}
+      onPointerDown={sensed}
+      onClickCapture={hide}
       onMouseEnter={rested}
       onMouseMove={() => !open && rested()}
       onMouseLeave={hide}
-      onFocus={(e) => focusVisible(e.target) && show()}
+      onFocus={(e) => !touched.current && focusVisible(e.target) && show()}
       onBlur={hide}
       onClick={hide}
     >
