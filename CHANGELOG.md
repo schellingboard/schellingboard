@@ -13,10 +13,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- **Hide sessions you are not interested in** (#1103): "Not interested" in the session window greys
-  the session out on the grid and drops it from the agenda; a **Hidden** filter brings it back.
-- **Bookmark sessions privately** (#864, #264, #865): a bookmark icon in the session window keeps a
-  session in view, and "My schedule" can list your bookmarks. Not an RSVP; others do not see it.
+- **Hide sessions you are not interested in**
+  ([#1103](https://github.com/schellingboard/schellingboard/issues/1103)): "Not interested" in the
+  session window greys the session out on the grid and drops it from the agenda; a **Hidden** filter
+  brings it back.
+- **Bookmark sessions privately**
+  ([#864](https://github.com/schellingboard/schellingboard/issues/864),
+  [#264](https://github.com/schellingboard/schellingboard/issues/264),
+  [#865](https://github.com/schellingboard/schellingboard/issues/865)): a bookmark icon in the
+  session window keeps a session in view, and "My schedule" can list your bookmarks. Not an RSVP;
+  others do not see it.
 
 ### Fixed
 
@@ -27,8 +33,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
-- **One "My schedule" filter on the schedule** (#865): replaces My sessions, RSVP'd and Hosting. A
-  menu beside it picks which of your RSVP'd and hosted sessions it shows.
+- **One "My schedule" filter on the schedule**
+  ([#865](https://github.com/schellingboard/schellingboard/issues/865)): replaces My sessions,
+  RSVP'd and Hosting. A menu beside it picks which of your RSVP'd and hosted sessions it shows.
 
 ## [5.1.0] - 2026-11-18
 
@@ -42,8 +49,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
-- **Event icons are shown** (#1588): the icon picker in the event settings draws each icon, and the
-  chosen icon appears beside the event's name in the menu and on the home page.
+- **Event icons are shown** ([#1588](https://github.com/schellingboard/schellingboard/issues/1588)):
+  the icon picker in the event settings draws each icon, and the chosen icon appears beside the
+  event's name in the menu and on the home page.
 - **Notifications arrive the moment they are sent**: the bell and the notification list updated only
   on reload, so reminders (such as for your own session) could go unnoticed.
 
