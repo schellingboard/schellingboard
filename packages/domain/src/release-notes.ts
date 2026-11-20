@@ -47,9 +47,12 @@ export const SHOWN_RELEASES = 3;
 
 export const releaseNotes: ReleaseNote[] = [
   {
-    version: "Unreleased",
+    version: "5.2.0",
+    date: "2026-11-20",
     highlights: [
       "**See the schedule early**: attendees can browse, bookmark and hide sessions before scheduling opens, with RSVPs and booking switched on when it does.",
+      "**Spot clashes**: a Clashes filter lists your overlapping sessions and 1-on-1s, and clashing blocks get a warning icon.",
+      "**Know the phase**: a thin bar under the menu shows whether the event is in proposals, voting or scheduling.",
     ],
   },
   {
