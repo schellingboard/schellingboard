@@ -16,12 +16,14 @@ import {
   BookmarkIcon,
   BookmarkSolidIcon,
   CheckCircleIcon,
+  ExclamationTriangleIcon,
   LockIcon,
 } from "../../ui/icons";
 import { Markdown } from "../../ui/markdown";
 import { Tooltip } from "../../ui/tooltip";
 import { Unavailable } from "../../ui/unavailable";
 import { AttendeeCountField } from "./attendee-count-field";
+import { clashSummary } from "./clashes";
 import { useSchedule } from "./context";
 import { SessionComments } from "./session-comments";
 import { useRsvp } from "./use-rsvp";
@@ -113,6 +115,7 @@ function Details({ session }: { session: Session }) {
   const rsvpWhy = schedulingEnded(data.event, data.now)
     ? "Scheduling has ended"
     : `Scheduling ${dateStartDescription(data.event.schedulingPhaseStart, timezone, null)}`;
+  const clashes = data.clashes(session.id);
   const isHost =
     data.guestId !== null && session.hosts.some((h) => h.id === data.guestId);
   const canBecomeHost =
@@ -219,6 +222,12 @@ function Details({ session }: { session: Session }) {
         >
           {data.hidden(session.id) ? "Show again" : "Not interested"}
         </button>
+      )}
+      {clashes.length > 0 && (
+        <p className="mb-6 flex items-start gap-2 rounded-md bg-warning-tint p-3 text-sm text-warning-fg">
+          <ExclamationTriangleIcon className="mt-0.5 h-4 w-4 flex-shrink-0" />
+          {clashSummary(clashes, data.guestId)}
+        </p>
       )}
       <div className="mb-6 space-y-2 text-sm text-fg-muted">
         <div className="flex gap-2">

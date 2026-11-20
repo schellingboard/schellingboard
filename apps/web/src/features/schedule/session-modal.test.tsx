@@ -267,6 +267,20 @@ describe("the session modal's RSVP", () => {
     }
   );
 
+  it("says in the details what the session clashes with", () => {
+    const snap = snapshotWith();
+    snap.sessions.push({
+      ...talk,
+      id: "other",
+      title: "Other",
+      hostIds: ["mia"],
+    });
+    open(snap);
+    expect(dialog().textContent).toMatch(
+      /Clashes with "Other", which you are hosting/
+    );
+  });
+
   it("closes only the clash question on Escape, not the modal under it", async () => {
     const snap = snapshotWith({}, { me: notMe });
     snap.sessions.push({
