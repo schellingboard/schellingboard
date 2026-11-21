@@ -24,11 +24,11 @@ import { EventLayout } from "./event-page";
 import { HomePage } from "./home-page";
 import { MeetingsPage } from "./meetings-page";
 import { NotFound } from "./not-found";
-import { PanelHost } from "./panel-host";
+import { ForeignPanelHost, PanelHost } from "./panel-host";
 import { PanelLanding } from "./panel-landing";
+import { PanelLinks } from "./panel-links";
 import { PeoplePage } from "./people-pages";
 import { ProfilePanelHost } from "./profile-host";
-import { ProfileLinks } from "./profile-links";
 import { ProfileWalkProvider } from "./profile-walk";
 import {
   ProposalFormPage,
@@ -104,10 +104,11 @@ export function createAppRouter(
       return (
         <ShellProviders api={services.api} createSource={services.createSource}>
           <ProfileWalkProvider>
-            <ProfileLinks>
+            <PanelLinks>
               <Outlet />
               <ProfilePanelHost api={services.api} />
-            </ProfileLinks>
+              <ForeignPanelHost services={services} />
+            </PanelLinks>
           </ProfileWalkProvider>
         </ShellProviders>
       );
